@@ -1,85 +1,69 @@
-Return-Path: <netdev+bounces-283803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283804-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SAI3LoGE+Gn0wAIAu9opvQ
-	(envelope-from <netdev+bounces-283803-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 13:35:29 +0200
+	id eN70HbuF+GkZwQIAu9opvQ
+	(envelope-from <netdev+bounces-283804-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 13:40:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A5F04BC6EC
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 13:35:28 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C1904BC893
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 13:40:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C40FB3021D08
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 11:34:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EC4A4302A6BD
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 11:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 252203BFE2E;
-	Mon,  4 May 2026 11:34:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="UJ8HoK1l"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70CA63ACF06;
+	Mon,  4 May 2026 11:38:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012052.outbound.protection.outlook.com [52.101.53.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f65.google.com (mail-ej1-f65.google.com [209.85.218.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D640B3BE65F;
-	Mon,  4 May 2026 11:34:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777894470; cv=fail; b=RpWEcp19z218DwU9JRwgCr10nvt6hAFbEmPK4hNqni1ZYtPDfy6fHIB0T20XO0z2h90xARo5f6b/oVi5arYExmsVBqt9hKEeDIUXwD19kDyRcajhjjuR+WUpqEc9k1U2TIy1UNN2aoQ6359U6JpGYYRzN2/lTRfFpTBFuXHFODg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777894470; c=relaxed/simple;
-	bh=LhzJcXK1lQ3quKnRD5JFBLyBqAEdwfu/B8+ux1SlViU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=heOso5RJYM2TvWBqeuldvwHskMV9IHODjXqdSTuahpRj3ygXD17yAmPUShgjyn9y7HmJW1E05eF6s4uNzBj6Jmd9KWrM+kgiQjtia8+ipi+AhQnH/ZFlMPUuIzWfQ4CtlG0C9eDoKzF/wy/p4oNWBOYgHaDO4UQGxjb79Qma9Ww=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=UJ8HoK1l; arc=fail smtp.client-ip=52.101.53.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JG9kBCIl86W/sHwfHEtWhyhp30Z2HNpvJtiTR75QD6vLI0kFdfJ1JK1S/8Lch1XWRC1Vt/wmWt384PetihcQ1SJm6uml/97GJzd6n/azKv4PEYhYsHmp3sotngp0ZuaU71++k+T4zW+TeRGYMjJ4Jhddv+xV2E3GZRi7/fiHowuPTcBLi/VMcYAfKo0YZ1jZn5AtnbJTXTrzBYk0/dosig3u09hld6L36GAcPVv9xWtIaUr18qeldFqJAxFIWTfpsgzW6WrqfrWXbsx+XVh6gUmca97LYvgPcJQSFfriJV0a1/t3STRCAiKtMh2XatExMqDVf32ouejw1oj2X7uGZQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tZUgtoRaI6Quom+Sr07Mg9kj2MslGNfavtxZVZ7S2S0=;
- b=H1UXJBeKxsXhj+jgSuTLCjoMRe7TnxYDFpMIBOqiqZsI4+W+LrmiGGygNKn4T6ZAy65DuvDl4+povIXwpLH+1Ix3L3HhYP3JmQ2mPR4XO9tYsXZVX3lxrU7OzocvyFeeGte34PYs46oJW8D/7/g340odbbet1Y0Rdna3F+KE7wy2CztHoJPMtrlsVZWPWL2hIkxXoQg5Ywt4EhgFsfZuhYl0DevrgeuL4g6cYxlb9cQpipPO/dAAnkja4CR+P5YdS1WUn7dwj2IeNySjpu3pZBKDJAQYyMv+4/q1j+D9WaNZr5V4xLjHWJE6ogmqTy/AXrv3qe/T2+isMZvBsb8nJA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tZUgtoRaI6Quom+Sr07Mg9kj2MslGNfavtxZVZ7S2S0=;
- b=UJ8HoK1lvq3qD54pON5g6GpYLT+4vol/X1Pxk4kC1u8HsFUz4fVuFMrSIw3uawmkiIz1uWZ4sYiXrfIcpkPvaPmVknhihMfZd5Ln4HyciIiEzNtWls/L7YiZn3N6irgpXGz89cyoIwfZ3bhg4ifeZAe+W+A/3zK4FnXNWh39HZ7WZonhgGrm8dt8ZYzhXpCY/r5/HH0ov0+YJ4N0Y7428Nu2pu3MHRTOww/gMyIt2yv3Ha6ebXR1GrSujizIUq43YNke5cTFSR+JyBn9nkig/XhjWrWqhS+1KAZywsY7CB1q2GkvhOfcjcEbJcxC3yPnt/11SSBC0A99DLZ2WhGlrg==
-Received: from SJ0PR03CA0020.namprd03.prod.outlook.com (2603:10b6:a03:33a::25)
- by SJ1PR12MB6290.namprd12.prod.outlook.com (2603:10b6:a03:457::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Mon, 4 May
- 2026 11:34:17 +0000
-Received: from SJ5PEPF000001EE.namprd05.prod.outlook.com
- (2603:10b6:a03:33a:cafe::59) by SJ0PR03CA0020.outlook.office365.com
- (2603:10b6:a03:33a::25) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9870.25 via Frontend Transport; Mon,
- 4 May 2026 11:34:17 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SJ5PEPF000001EE.mail.protection.outlook.com (10.167.242.202) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9891.9 via Frontend Transport; Mon, 4 May 2026 11:34:17 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 4 May
- 2026 04:34:06 -0700
-Received: from [10.125.201.174] (10.126.230.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 4 May
- 2026 04:34:01 -0700
-Message-ID: <2b06dc5a-542e-440e-af7e-73c29204cda5@nvidia.com>
-Date: Mon, 4 May 2026 14:33:57 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D228B3B9D84
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 11:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.65
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777894706; cv=none; b=Ofqb4oKwJF7B77ufleIjjyCFDy+Dl5k0D0lZQoGRn+45PWsWbHwVPMZQO9EOTK6fnm4j0pJWpKsasbApCmnFom9KGtlal1U8m3w9BfJB+Luj5G8zUAXPfNdKsJmCPS0fr4T1qTMq1A4ssF65B6cqC7FsZfTOtJDRdSGQqiqvl/s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777894706; c=relaxed/simple;
+	bh=+tA4qxXl2t+oEZbM3+Zk0zW0E9ezjZ0ohNt8AiULAVg=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=CyfXhB752Mb3S7if6DsQ07mXVuEhgJpnfNXqDMGOV/9Ivz6PM6l9hQYfQJxTbw+vOcLEyXPJXwkX5OZHFNRWsnyTWWJNdm80nvZ0+RX5WjrGNx/tbSLvu7oFUm2eAl3gdBwNkau8BQ5Db6QGzzMjHFzmU9WqF7aJsMhKyxWe96E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f65.google.com with SMTP id a640c23a62f3a-bc356898256so48275066b.3
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 04:38:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777894702; x=1778499502;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:cc:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RQdjq+BZnrlheD2NvaoPdP4vjEP1u3bAcSN0nX5cZZU=;
+        b=YQbR4bG5uwTlDyB1CMNiUrGkB2/8TQRTuiWB0pSmXEru1DUhYjxbY8AeIWj3adp2nz
+         euw/+vwDtMKdcnf8qcj3zTMSv13BBTiMRJoTV5CBhLy3Wjh6mt0QjIfXBALWlb9ZaOSH
+         uwCVh+yZ9QYHs+WK3NTdxQvmzv6QLv2zx2OLAWCh+ygO1TkQor83X4UscuhwjvmP2iKj
+         PTfMBO1rSzCD1uu9ROaaVp1cUAchCyzIt3GCgEIxU3PruHp4b85s4s8wkRFbu/siMhmd
+         03gzgea/hXZfcKeatZWH9yoAerLmK8NPQbzYbV6yAg+2ZVf4Mj2Fkdf/7USqU8PDvnSO
+         XM9Q==
+X-Gm-Message-State: AOJu0YzctHQ41/lc1w8khElHOroItsq1/JYC7JlFtr8KEM/kSvcEkBGW
+	16joRnJe20tinAcLu9mH2kU0awVsrO2UiXQjAr57hrZ1AN2l6A79y1R5vT9jNSvi
+X-Gm-Gg: AeBDiev1coK8eUOe85ucCI5qIPlqY3QmtQmL2gHh2t0fFkROBMKKkprMeD+OjenefR1
+	bBffCKhFNwCvWkdGaj0SIW7msYsLDc3NEMLPunXJPU9M3ZXYV6pMqppwJU9PMASsBaoTuYyBgm5
+	n/3YyUizJdseMHZTNXFcfawEqyxIoTdgdwcITGYP90mMUf5//LOYsVU4VHLMl6jJdnqcNPj/PNO
+	J+kBRu3sQk8k3y6kr2GImkw6D4OiHiIowgXCHCW//4d37x+8V3ROO5GfEfaUI5XlN2y74VWH4wc
+	wT+DBpEj4dZu3L/0dEEK3C5C/+TE8nH34MHhYCooOP88YcUqsnKfn5908yFjLMrhqxoE++XnxvF
+	OgyoOPh/wRaCIoXcla6pXG4pyYzXYodWaYJFObD1/KYulAuqFt+APk7ubnoL5hDbURygwmOksRx
+	QPLm6cO96WeWtaqIRgq5QLHeA96NJGiNzWsGxunj4qCcHUwBuABf3+ktTK4n1jywYJ9g==
+X-Received: by 2002:a17:907:3e0f:b0:bba:3e2c:f3a3 with SMTP id a640c23a62f3a-bbffc68079emr357352866b.45.1777894701838;
+        Mon, 04 May 2026 04:38:21 -0700 (PDT)
+Received: from [192.168.88.241] (37-48-40-237.nat.epc.tmcz.cz. [37.48.40.237])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-67b877d5ab2sm3384508a12.14.2026.05.04.04.38.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 May 2026 04:38:21 -0700 (PDT)
+Message-ID: <c51329ce-0af0-4b5d-93bd-5663b5d5c7bf@ovn.org>
+Date: Mon, 4 May 2026 13:38:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,440 +71,197 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/3] net/mlx5: Add VHCA_ID page management mode
- support
-To: Jakub Kicinski <kuba@kernel.org>, <tariqt@nvidia.com>
-CC: <edumazet@google.com>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <saeedm@nvidia.com>, <leon@kernel.org>,
-	<mbloch@nvidia.com>, <agoldberger@nvidia.com>, <netdev@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<gal@nvidia.com>, <dtatulea@nvidia.com>
-References: <20260501044156.260875-4-tariqt@nvidia.com>
- <20260503014501.4098393-1-kuba@kernel.org>
+Cc: i.maximets@ovn.org, Aaron Conole <aconole@redhat.com>,
+ Eelco Chaudron <echaudro@redhat.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, dev@openvswitch.org,
+ linux-kernel@vger.kernel.org, Yuan Tan <tanyuan98@outlook.com>,
+ Yifan Wu <yifanwucs@gmail.com>, Juefei Pu <tomapufckgml@gmail.com>,
+ Xin Liu <bird@lzu.edu.cn>, Yang Yang <n05ec@lzu.edu.cn>
+Subject: Re: [PATCH net] openvswitch: vport: fix race between tunnel creation
+ and linking
+To: netdev@vger.kernel.org
+References: <20260430213349.407991-1-i.maximets@ovn.org>
 Content-Language: en-US
-From: Moshe Shemesh <moshe@nvidia.com>
-In-Reply-To: <20260503014501.4098393-1-kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <20260430213349.407991-1-i.maximets@ovn.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001EE:EE_|SJ1PR12MB6290:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7fe90fa5-b566-4034-e696-08dea9d1137c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700016|82310400026|18002099003|22082099003|18092099006|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	i7yWtd9j8GTDD5dREYoefwd6YTirpb6y+pxCzyDNWVEv/JmlnL1tju7yPNa3SQjz6Agy3LBRcXjWDQM4sxFHinSdcVtbxFGaz3Ozf7cf3qOJq2Dv1t9SO37XMuPYi18pXsPa9pbezhF+S1VqchE+83e/sKqMjNSz2MZK3pPIK2Rt1hWHQ196Zlj8cnQyZj4nMj7zCOfxwqc/jkOazFo2E3zBizEv0BDLrfn+KBBAeiC9dRGZ3cHbxlIj6ldUygBnvn8bQ54nGSNq6cFvzMM68RQ3uSt9Dr3nsYnqi3RXAES4FJr7NHW2TVYgVoLsjBOhNWdOoLDxu0crZoHy7CTyyecozV7IITPAAKLSAqw2KU4mCztWhkH7YF3Xm08SZ0OtFOf46U0s43OS87ckwihr5O0l7QCX0s/u76nwnEURMdgsNs4zNmnEe8V0JXLb7U2ajGQHXLLBqqpdyEUbRVWhxLb5aiYqCTTKSrM5qvDZ8WPgXlm7oyZlLKwpNfnSZ/4Mr5McLLL1p6aQ3+wMV0eJ7b2qE79plHqxzDBG+C3RHMcu1K1EyVVGxQ6Kb/QqARbpJw3tyMKpFddpvFxqorJf9cV4SNEBeIS6UX59cL8UInkPvm0OMaUOdKEUh34YY2roCHITpGAA/Z8hpMuzK7vi6c4i83BSodVd3rXcJs95rHvZS23XoP+pD2SAwLi3sgJnyMTEqsOEstdxt+Kv80aBH+AlVY6Yq+n6B/pjxSYBtPk=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700016)(82310400026)(18002099003)(22082099003)(18092099006)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	HZ6ECk3HdCMbx9uPd+L8xCrypc3NklPLLc1mpC+BM38oKB3bVZCxhlG7JxcgalxaLR2PcCOyd4a+Ab90JfiO6NHMOJQiyCwT59zDQujfowKtwPXs+2RxGtflEVbLw3hKEYpPDvJ7gBrIgQDHsF7SvCx+4LGZKbmyY/K3h1ajcI6W1hnsWvGtdXWx4ppx8MAluP164CoWReGKUTZMQDTz9MVzpWoOc28Fwo6SYTKtpA5b9CI44W6W/wx06qYttjnto2OZoEymFJQNqv45xyEK3zT08gEe39HcOWi9CT9BF4vbF8rZSHwAtL1qdvH4KIExp35Hmw+p2co/dfPcllWR1eZqvQ6Bmk7lsJTwOq1jV4ofdhdyIINVVvn2ewIK1/xbkzygL1MW3UnV/45HaW7j73HRfN5Ow75MUNDi2bWSFN/U52IwAh2+nEXL2J4yo1gq
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2026 11:34:17.2373
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7fe90fa5-b566-4034-e696-08dea9d1137c
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001EE.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6290
-X-Rspamd-Queue-Id: 2A5F04BC6EC
+X-Rspamd-Queue-Id: 1C1904BC893
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-1.46 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-283803-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[ovn.org,redhat.com,davemloft.net,google.com,kernel.org,openvswitch.org,vger.kernel.org,outlook.com,gmail.com,lzu.edu.cn];
+	TAGGED_FROM(0.00)[bounces-283804-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[ovn.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:mid,Nvidia.com:dkim];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[moshe@nvidia.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.969];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lzu.edu.cn:email,outlook.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-
-
-On 5/3/2026 4:45 AM, Jakub Kicinski wrote:
+On 4/30/26 11:32 PM, Ilya Maximets wrote:
+> When a tunnel vport is created it first creates the tunnel device, e.g.,
+> with geneve_dev_create_fb(), then it calls ovs_netdev_link() to take a
+> reference and link it to the device that represents openvswitch datapath.
 > 
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
+> The creation of the device is happening under RTNL, but then RTNL is
+> released and re-acquired to find the device by name.  It is technically
+> possible for the tunnel device to be re-named or deleted within that
+> window while RTNL is not held, and some other device created in its
+> place.  This will cause a non-tunnel device to be referenced in the
+> vport and tunnel-specific functions used on it, e.g. vxlan_get_options()
+> that directly casts the private netdev data into a struct vxlan_dev
+> causing an invalid memory access:
+> 
+>  BUG: KASAN: slab-use-after-free in vxlan_get_options+0x323/0x3a0
+>   vxlan_get_options+0x323/0x3a0
+>   ovs_vport_cmd_new+0x6e3/0xd30
+> 
+> Fix that by taking a reference to the just created device before
+> releasing RTNL.  This ensures that the device in the vport is always
+> the one that was just created.  The search by name is only needed
+> for a standard vport-netdev that links pre-existing devices, so that
+> functionality and device type checks are moved to netdev_create().
+> 
+> It is also awkward that ovs_netdev_link() takes ownership of the vport
+> and destroys it on failure.  It doesn't know the type of the port it is
+> dealing with, so we need to pass down the indicator that it's a tunnel,
+> so the link can be properly deleted on failure.
+> 
+> It's possible to refactor the logic to make the ovs_netdev_link() do
+> only the linking part and let the callers perform a proper destruction,
+> but it will be much more code for each legacy tunnel port type, so it
+> is not worth it for the bug fix.
+> 
+> Fixes: 614732eaa12d ("openvswitch: Use regular VXLAN net_device device")
+> Reported-by: Yuan Tan <tanyuan98@outlook.com>
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Reported-by: Xin Liu <bird@lzu.edu.cn>
+> Reported-by: Yang Yang <n05ec@lzu.edu.cn>
+> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
 > ---
-> net/mlx5: Add VHCA_ID page management mode support
+>  net/openvswitch/vport-geneve.c |  5 ++-
+>  net/openvswitch/vport-gre.c    |  5 ++-
+>  net/openvswitch/vport-netdev.c | 58 ++++++++++++++++++++--------------
+>  net/openvswitch/vport-netdev.h |  2 +-
+>  net/openvswitch/vport-vxlan.c  |  5 ++-
+>  5 files changed, 48 insertions(+), 27 deletions(-)
 > 
-> This change adds a VHCA_ID-based page management mode that uses vhca_id
-> instead of function_id as the effective function identifier when the
-> firmware advertises icm_mng_function_id_mode. Boot pages keep FUNC_ID
-> semantics for backward compatibility, and tracked pages are migrated to
-> the vhca_id key after set_hca_cap().
-> 
-> A few questions below on the per-type counter accounting, the boot-page
-> migration helper, and locking on the FW-driven page path.
-> 
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
->> index e0eafcf0c52a..d3eaefc5c0e0 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
->> @@ -852,6 +852,48 @@ bool mlx5_esw_vport_vhca_id(struct mlx5_eswitch *esw, u16 vportn, u16 *vhca_id)
->>        return true;
->>   }
->>
->> +u16 mlx5_esw_vhca_id_to_func_type(struct mlx5_core_dev *dev, u16 vhca_id)
->> +{
->> +     struct mlx5_eswitch *esw = dev->priv.eswitch;
->> +     struct mlx5_vport *vport;
->> +     unsigned long i;
->> +     u16 type;
->> +
->> +     if (vhca_id == MLX5_CAP_GEN(dev, vhca_id))
->> +             return MLX5_SELF;
->> +
->> +     if (!esw)
->> +             return MLX5_FUNC_TYPE_NONE;
->> +
->> +     mutex_lock(&esw->state_lock);
-> 
-> This function is reached from give_pages()/reclaim_pages()/
-> release_all_pages() via func_vhca_id_to_type(), which in turn runs
-> from the pg_wq work handler triggered by firmware page-request EQE
-> events. Does acquiring esw->state_lock on that path introduce a new
-> lock dependency?
-> 
-> Several eswitch paths (for example mlx5_esw_vport_enable(),
-> mlx5_esw_vport_disable(), mlx5_eswitch_set_vport_mac()) hold
-> state_lock while synchronously issuing firmware commands. Before this
-> patch, the page path held no eswitch locks.
-> 
-> Would it be safer to resolve the func_type outside of state_lock, for
-> example by caching the vhca_id-to-type mapping separately, or by
-> attaching the resolved type to the fw_page at give time so reclaim
-> does not need to look it up again?
-> 
+...
+> diff --git a/net/openvswitch/vport-netdev.c b/net/openvswitch/vport-netdev.c
+> index 12055af832dc0..a92ca8b37f96a 100644
+> --- a/net/openvswitch/vport-netdev.c
+> +++ b/net/openvswitch/vport-netdev.c
+> @@ -73,37 +73,21 @@ static struct net_device *get_dpdev(const struct datapath *dp)
+>  	return local->dev;
+>  }
+>  
+> -struct vport *ovs_netdev_link(struct vport *vport, const char *name)
+> +struct vport *ovs_netdev_link(struct vport *vport, bool tunnel)
+>  {
+>  	int err;
+>  
+> -	vport->dev = dev_get_by_name(ovs_dp_get_net(vport->dp), name);
+> -	if (!vport->dev) {
+> +	if (WARN_ON_ONCE(!vport->dev)) {
+>  		err = -ENODEV;
+>  		goto error_free_vport;
+>  	}
+> -	/* Ensure that the device exists and that the provided
+> -	 * name is not one of its aliases.
+> -	 */
+> -	if (strcmp(name, ovs_vport_name(vport))) {
+> -		err = -ENODEV;
+> -		goto error_put;
+> -	}
+> -	netdev_tracker_alloc(vport->dev, &vport->dev_tracker, GFP_KERNEL);
+> -	if (vport->dev->flags & IFF_LOOPBACK ||
+> -	    (vport->dev->type != ARPHRD_ETHER &&
+> -	     vport->dev->type != ARPHRD_NONE) ||
+> -	    ovs_is_internal_dev(vport->dev)) {
+> -		err = -EINVAL;
+> -		goto error_put;
+> -	}
+>  
+>  	rtnl_lock();
+>  	err = netdev_master_upper_dev_link(vport->dev,
+>  					   get_dpdev(vport->dp),
+>  					   NULL, NULL, NULL);
+>  	if (err)
+> -		goto error_unlock;
+> +		goto error_put_unlock;
+>  
+>  	err = netdev_rx_handler_register(vport->dev, netdev_frame_hook,
+>  					 vport);
 
-I don't think there is a real issue with the lock, but for sure better 
-without, I will try caching vhca_id to type mapping.
+Sashiko-gemini reports that here we could be linking an already unregistering
+device since we're not checking the registration status after re-acquiring the
+lock.  Which seems like an issue, which is related, but fairly separate from
+what this patch is trying to fix.  It is also not specific to the tunnel ports.
+So, should be addressed separately.
 
->> +     mlx5_esw_for_each_vport(esw, i, vport) {
->> +             if (vport->vhca_id != vhca_id)
->> +                     continue;
->> +
->> +             if (vport->vport == MLX5_VPORT_HOST_PF) {
->> +                     type = MLX5_HOST_PF;
->> +                     goto unlock;
->> +             }
->> +
->> +             if (xa_get_mark(&esw->vports, i, MLX5_ESW_VPT_SF)) {
->> +                     type = MLX5_SF;
->> +                     goto unlock;
->> +             }
->> +
->> +             if (xa_get_mark(&esw->vports, i, MLX5_ESW_VPT_VF)) {
->> +                     type = MLX5_VF;
->> +                     goto unlock;
->> +             }
->> +
->> +             type = MLX5_EC_VF;
->> +             goto unlock;
-> 
-> Can this fall-through misattribute counters?
-> 
-> If a matching vport is not HOST_PF and has neither the VPT_SF nor the
-> VPT_VF mark, it is unconditionally classified as MLX5_EC_VF. Would an
-> UPLINK, ECPF, manager, or adjacent-style vport whose vhca_id happens
-> to match end up charged to the EC_VF bucket here?
-> 
-
-The fallthrough is correct in practice  - uplink is the physical port, 
-not a separate HCA function, FW doesn't request pages for it. ECPF is 
-the esw manager, if requested here can be only as self, will catch the 
-MLX5_SELF condition. Adjacent VFs are caught correctly by the VF mark.
-
->> +     }
->> +     type = MLX5_FUNC_TYPE_NONE;
->> +unlock:
->> +     mutex_unlock(&esw->state_lock);
->> +     return type;
->> +}
->> +
-> 
-> [ ... ]
-> 
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
->> index a242053f3a58..52cf341ad6b3 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
->> @@ -597,6 +597,9 @@ static int handle_hca_cap(struct mlx5_core_dev *dev, void *set_ctx)
->>        if (MLX5_CAP_GEN_MAX(dev, release_all_pages))
->>                MLX5_SET(cmd_hca_cap, set_hca_cap, release_all_pages, 1);
->>
->> +     if (MLX5_CAP_GEN_MAX(dev, icm_mng_function_id_mode))
->> +             MLX5_SET(cmd_hca_cap, set_hca_cap, icm_mng_function_id_mode, 1);
->> +
-> 
-> [ ... ]
-> 
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
->> index 77ffa31cc505..7ebe88aa3b3e 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-> 
-> [ ... ]
-> 
->> @@ -89,12 +105,21 @@ static u16 func_id_to_type(struct mlx5_core_dev *dev, u16 func_id, bool ec_funct
->>        return MLX5_SF;
->>   }
->>
->> +static u16 func_vhca_id_to_type(struct mlx5_core_dev *dev, u16 func_vhca_id,
->> +                             bool ec_function)
->> +{
->> +     if (mlx5_page_mgt_mode_is_vhca_id(dev))
->> +             return mlx5_esw_vhca_id_to_func_type(dev, func_vhca_id);
->> +
->> +     return func_id_to_type(dev, func_vhca_id, ec_function);
->> +}
-> 
-> Can the give/reclaim accounting become asymmetric in VHCA_ID mode?
-> 
-> The per-type counters are only updated when the resolved type is not
-> MLX5_FUNC_TYPE_NONE:
-> 
->          func_type = func_vhca_id_to_type(dev, func_vhca_id, ec_function);
->          if (func_type != MLX5_FUNC_TYPE_NONE)
->                  dev->priv.page_counters[func_type] += npages;
-> 
-> Since mlx5_esw_vhca_id_to_func_type() walks the eswitch vport table
-> dynamically on every call, can the give and the corresponding reclaim
-> resolve to different types?
-> 
-> For example, if a give runs before vport->vhca_id is populated in
-> mlx5_esw_vport_caps_get(), the lookup returns MLX5_FUNC_TYPE_NONE and
-> the counter is not incremented. Later, when the vport is fully
-> populated, reclaim resolves to a real type and decrements the counter
-> below the amount ever added, which on a u32 drives it to a very large
-> value.
-> 
-> Similarly, if a vport is removed before reclaim, the increment at
-> give time is recorded but the decrement at reclaim is skipped, so the
-> counter leaks upward.
-> 
-> Would caching the func_type on the fw_page at give time and reusing
-> it on reclaim make the accounting symmetric by construction?
-
-Following first comment, I will try caching.
-
-> 
-> [ ... ]
-> 
->> @@ -658,30 +708,101 @@ static int req_pages_handler(struct notifier_block *nb,
->>         * req->npages (and not min ()).
->>         */
->>        req->npages = max_t(s32, npages, MAX_RECLAIM_NPAGES);
->> -     req->ec_function = ec_function;
->> +     if (!mlx5_page_mgt_mode_is_vhca_id(dev))
->> +             req->ec_function = ec_function;
->>        req->release_all = release_all;
->>        INIT_WORK(&req->work, pages_work_handler);
->>        queue_work(dev->priv.pg_wq, &req->work);
->>        return NOTIFY_OK;
->>   }
->>
->> +/*
->> + * After set_hca_cap(), the second satisfy_startup_pages(dev, 0) may see
->> + * VHCA_ID mode. If page_root_xa already has the PF entry from the first
->> + * (boot) call under FUNC_ID keys 0 or (ec_function << 16), migrate that
->> + * entry to the device vhca_id key so lookups use VHCA_ID semantics.
->> + */
->> +static int mlx5_pagealloc_migrate_pf_to_vhca_id(struct mlx5_core_dev *dev)
->> +{
->> +     u32 vhca_id_key, old_key;
->> +     struct rb_root *root;
->> +     struct fw_page *fwp;
->> +     struct rb_node *p;
->> +     bool ec_function;
->> +     int err;
->> +
->> +     if (xa_empty(&dev->priv.page_root_xa))
->> +             return 0;
->> +
->> +     vhca_id_key = MLX5_CAP_GEN(dev, vhca_id);
->> +     ec_function = mlx5_core_is_ecpf(dev);
->> +
->> +     old_key = ec_function ? (1U << 16) : 0;
->> +     root = xa_load(&dev->priv.page_root_xa, old_key);
->> +     if (!root)
->> +             return 0;
-> 
-> Does this assume the boot-path func_vhca_id was always 0?
-> 
-> The boot call to mlx5_cmd_query_pages() reads func_vhca_id directly
-> from the firmware output, and give_pages() then uses that value to
-> compute the key. The migration here instead hardcodes old_key as
-> ec_function ? (1U << 16) : 0.
-> 
-> If firmware returned a non-zero boot function_id, xa_load(old_key)
-> returns NULL, the function silently returns 0, the caller flips the
-> mode to VHCA_ID, and the original rb_root is orphaned in page_root_xa
-> under the old key. Subsequent free_fwp()/find_fw_page() paths would
-> then hit WARN_ON_ONCE(!root) and leak the DMA mappings and pages.
-> 
-> Would it be more robust to look up the actual key used at boot
-> (derived from the stored func_vhca_id), and to treat the "xa not
-> empty but old_key absent" case as an invariant violation rather than
-> silently succeeding?
-> 
-
-During boot (mlx5_satisfy_startup_pages(dev, 1)), the mode is FUNC_ID. 
-The mlx5_cmd_query_pages() call sets embedded_cpu_function in the 
-request but leaves function_id as 0 (the PF queries its own pages). 
-Firmware returns function_id in the output, which for the PF's own pages 
-is always 0.
-The "silently returns 0" when xa_load returns NULL is also fine, it 
-means no boot pages were allocated.
-
->> +
->> +     if (old_key == vhca_id_key)
->> +             return 0;
->> +
->> +     err = xa_insert(&dev->priv.page_root_xa, vhca_id_key, root, GFP_KERNEL);
->> +     if (err) {
->> +             mlx5_core_warn(dev,
->> +                            "failed to migrate page root key 0x%x to vhca_id 0x%x\n",
->> +                            old_key, vhca_id_key);
->> +             return err;
->> +     }
->> +
->> +     xa_erase(&dev->priv.page_root_xa, old_key);
->> +
->> +     for (p = rb_first(root); p; p = rb_next(p)) {
->> +             fwp = rb_entry(p, struct fw_page, rb_node);
->> +             fwp->function = vhca_id_key;
->> +     }
-> 
-> Is the ordering here safe against any concurrent free_fwp()?
-> 
-> Between xa_erase(old_key) and the loop that updates fwp->function,
-> every fw_page still carries the old key while page_root_xa no longer
-> resolves it. If a free_fwp() were to run in that window:
-> 
->          root = xa_load(&dev->priv.page_root_xa, fwp->function);
->          if (WARN_ON_ONCE(!root))
->                  return;
-> 
-> it would return early, skipping dma_unmap_page(), __free_page(), and
-> kfree(fwp), leaking the DMA mapping and the backing page.
-> 
-> No concurrent free path is structurally reachable today because this
-> runs before the EQ notifier is registered in mlx5_pagealloc_start(),
-> but would it be cleaner to update the fwp->function values first,
-> then swap the xarray entries (or store the new value at a single key)
-> so the two views cannot disagree?
-> 
-
-Reordering is safer, I will reorder.
-
->> +
->> +     return 0;
->> +}
->> +
->>   int mlx5_satisfy_startup_pages(struct mlx5_core_dev *dev, int boot)
->>   {
->> -     u16 func_id;
->> +     bool ec_function = false;
->> +     u16 func_vhca_id;
->>        s32 npages;
->>        int err;
->>
->> -     err = mlx5_cmd_query_pages(dev, &func_id, &npages, boot);
->> +     /* When boot flag is set, the icm_mng_function_id_mode capability is
->> +      * not yet set (only set after set_hca_cap()), so use FUNC_ID mode
->> +      * for backward compatibility. When boot is false, set mode from
->> +      * cap (set_hca_cap has run successfully).
->> +      */
->> +     if (boot) {
->> +             mlx5_page_mgt_mode_set(dev, MLX5_PAGE_MGT_MODE_FUNC_ID);
->> +     } else {
->> +             if (MLX5_CAP_GEN_MAX(dev, icm_mng_function_id_mode) ==
->> +                 MLX5_ID_MODE_FUNCTION_VHCA_ID) {
-> 
-> The comment just above says "set mode from cap (set_hca_cap has run
-> successfully)", which reads as "use the current/negotiated cap value",
-> but the check uses MLX5_CAP_GEN_MAX rather than MLX5_CAP_GEN. The
-> sibling code in drivers/net/ethernet/mellanox/mlx5/core/debugfs.c uses
-> MLX5_CAP_GEN(dev, icm_mng_function_id_mode) for the same semantic
-> check.
-> 
-> Could the comment and the _MAX usage be made consistent? If anyone
-> later adds a conditional around the MLX5_SET() in handle_hca_cap()
-> (for example a module parameter), the driver would start flipping to
-> VHCA_ID mode based on _MAX without actually having enabled the feature
-> in firmware.
-
-OK, I will rewrite the comment.
-
-> 
->> +                     err = mlx5_pagealloc_migrate_pf_to_vhca_id(dev);
->> +                     if (err)
->> +                             return err;
->> +                     mlx5_page_mgt_mode_set(dev, MLX5_PAGE_MGT_MODE_VHCA_ID);
->> +             }
->> +     }
-> 
-> Once page_mgt_mode is flipped to MLX5_PAGE_MGT_MODE_VHCA_ID, it stays
-> set in dev->priv and is only reset on the next boot=1 call. Between
-> teardown and the next boot=1 path (for example during health
-> recovery, PCI reset, or any async flow that runs page work before
-> mlx5_satisfy_startup_pages(dev, 1) re-runs), would a FW page-request
-> EQE observe a stale mode?
-> 
-> The req_pages EQ notifier is registered via mlx5_pagealloc_start()
-> and unregistered via mlx5_pagealloc_stop(), so this is not reachable
-> today, but would it be worth resetting the mode explicitly on the
-> teardown side rather than relying on the next reinit?
-
-No. Once flipped to MLX5_PAGE_MGT_MODE_VHCA_ID, both driver and firmware 
-keep using it till reopen function (next boot=1 call).
-> 
-> [ ... ]
-> 
->> @@ -751,6 +874,9 @@ int mlx5_reclaim_startup_pages(struct mlx5_core_dev *dev)
->>        WARN(dev->priv.fw_pages,
->>             "FW pages counter is %d after reclaiming all pages\n",
->>             dev->priv.fw_pages);
->> +     if (mlx5_page_mgt_mode_is_vhca_id(dev) && !dev->priv.eswitch)
->> +             return 0;
->> +
-> 
-> Does this guard address the asymmetric-counter case raised above?
-> 
-> It only skips the per-type WARNs when the eswitch is entirely absent.
-> In the common case where the eswitch is present but a vport's
-> vhca_id/marks change between give and reclaim, the counters can still
-> drift and these WARNs would still fire on normal teardown paths.
-> 
-
-Following first comment, will try caching.
-
-> [ ... ]
-
+Best regards, Ilya Maximets.
 
