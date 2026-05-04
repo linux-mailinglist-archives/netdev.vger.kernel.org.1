@@ -1,146 +1,296 @@
-Return-Path: <netdev+bounces-283916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283917-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cKBQHOi4+Gn1zAIAu9opvQ
-	(envelope-from <netdev+bounces-283916-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 17:19:04 +0200
+	id CM4wOsa6+Gnh0AIAu9opvQ
+	(envelope-from <netdev+bounces-283917-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 17:27:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 883B34C08FD
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 17:19:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A68A4C0A94
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 17:27:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0AECC303B4E2
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 15:17:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BC8B3300D841
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 15:27:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DAF23DFC65;
-	Mon,  4 May 2026 15:17:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A20E3DFC77;
+	Mon,  4 May 2026 15:27:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="v8EOGJNf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dw8zFknh"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A277E212FAD;
-	Mon,  4 May 2026 15:17:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379E933F5BF
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 15:27:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777907825; cv=none; b=lMwPZCoAH9kdZ8isR0POsU/emZbC1UaETyGk6osfX7YraYH9LOAgfLiAj/wZlSe0RSUPwiuvHJncRhnqFb+Bp3voIb774SbIRhBnFZPS/njrM1BYoC1vS5MLKRiOY1G7Vu4Tp7yc3EgzC3ZVk/U2PA61zmP7kTrCalxDO8vW6Ts=
+	t=1777908420; cv=none; b=uXzn0+qby73Dmw6NV4qK4EVcryvndT98V4TIItYlYuzbKaFR+bCkIAdJ6VgKnH2sVX0i+1LQL9uhZkePAH9itNN/vl2GpPU8tbUCxZMRUhVUF/UgZwCjhaLjvL4JjvFjhr9RlfPDOcQwZOv7FRa/mDSflHRtJGrLTPuPcEv0cto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777907825; c=relaxed/simple;
-	bh=Sa2svEuLBLZ8KH/j6RQ4fA5zFnL3S+2a01dYu7BXg3I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m4fuQEWo2YG/j5gH8wzWd5IgXYW6O6SPoUESF14ZVzqHlVI0Xduc/qJcHCr3D1iaQfLlRiextC2SYwLfqTBeXE35hKUXMHbOfF28p+eIZ2oSdMNXe9ORbDToEaaOo48oRWweoAdauJRtvhrzc3CuI9h08UAoCNEikCWrscHWNe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=v8EOGJNf; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=t5mOwJSbOKVmcddoujovssiEkLg2+KNjkUu/7AIUfk4=; b=v8EOGJNfTFTqkEbMl40D58wnNP
-	0OVyx4oJ9ioxV6r29xmzi/ohoTWDxEtBZFj4+U9j6oQFFzs0LZErYH/TQ1rrAh0wb/1Q33lklgNTA
-	dbWilQeoz0xgbzgILqbZIsC5HB7V6nFBNP4M94NW6oe8uqgzePJd31QCIV+qDCsOLvC8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wJv2X-001I3F-HC; Mon, 04 May 2026 17:16:57 +0200
-Date: Mon, 4 May 2026 17:16:57 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>
-Subject: Re: [PATCH net-next v1 0/5] net: mdiobus: HIde ACPI implementation
-Message-ID: <28a4ebd7-2670-439d-836b-14559a916ed0@lunn.ch>
-References: <20260504074610.40799-1-andriy.shevchenko@linux.intel.com>
- <aee27459-387c-46ce-9c06-3de66309c8d6@lunn.ch>
- <afij7wOkQUGUN0kM@ashevche-desk.local>
+	s=arc-20240116; t=1777908420; c=relaxed/simple;
+	bh=fmHQpYB6QIOlPggxdxF5xuuPVox9ItejlLVycJ8p8wI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tca0Gi+QgnZk8HKBb505yH3oS7bvEObzP//AS8oTV80nv90XVJOhrmBZ8t7diHjTOU/0/Qrj9h9OWMJ9gny3AVXg0k9LmHSgFVmxpxexjN6NUI6gfbhqJYMhgERoyuRryyVVDWr8VeUhbg9J7ZreipKbJ7wBBzkzo3JLrYhW6tA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dw8zFknh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7762EC2BCB8;
+	Mon,  4 May 2026 15:26:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777908420;
+	bh=fmHQpYB6QIOlPggxdxF5xuuPVox9ItejlLVycJ8p8wI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Dw8zFknhMWqTAM0kARlGNUbkrBQswMkF6fpHr+vb4rDXk3rDwdoUCFYYMCXnCBccc
+	 P5R+R95hC11prLe+Sv16/D62AbeOqQYjyq0BVz0wM4GcYDbJjUQgwXL41qbxoDH2T4
+	 09QaW/lBfUiK5FUbDjEldbIFuAEPFwUZRMac8pOQ59uo7kLg8JshfYsfVSB98knXk3
+	 SFd51slTgfBp8bnx/ornjNW3C9o6nXWfAcb8VVplbGVYdp1kEJ/8CDcAuxkSgRFQgh
+	 R1Zbnbb+/ZvYB8N82pshavseYGNWydHP6ZYOdYrsstWVDr9IEHfU7i0gF7Prs39hbb
+	 YkYc7NaRCOCkQ==
+From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Vivien Didelot <vivien.didelot@gmail.com>,
+	Tobias Waldekranz <tobias@waldekranz.com>,
+	netdev@vger.kernel.org
+Cc: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+Subject: [PATCH] net: dsa: mv88e6xxx: remove unused .port_max_speed_mode()
+Date: Mon,  4 May 2026 17:26:53 +0200
+Message-ID: <20260504152653.1389394-1-kabel@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <afij7wOkQUGUN0kM@ashevche-desk.local>
-X-Rspamd-Queue-Id: 883B34C08FD
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 4A68A4C0A94
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
-	TAGGED_FROM(0.00)[bounces-283916-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-283917-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,waldekranz.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+	FROM_NEQ_ENVFROM(0.00)[kabel@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Mon, May 04, 2026 at 04:49:35PM +0300, Andy Shevchenko wrote:
-> On Mon, May 04, 2026 at 03:02:54PM +0200, Andrew Lunn wrote:
-> > On Mon, May 04, 2026 at 09:29:51AM +0200, Andy Shevchenko wrote:
-> > > This mini-series is dedicated to hiding ACPI implementation details
-> > > from the wider users as they (as of today) do not need to know that.
-> > 
-> > Please could you expand on that. ACPI != OF. They have different
-> > bindings, so you need different implementations.
-> 
-> As of today the users that want ACPI also have the OF support. Even without
-> that if the device is pure ACPI supported one (and somehow never going to DT)
-> the proposed API (see the first patch) will be no-op in case when CONFIG_ACPI=n
-> or when it's a non-ACPI platform with no support of the device. Hence, the
-> pure ACPI (and actually OF as well) do not need to be exposed. The decision is
-> made based on the type of firmware node.
+The .port_max_speed_mode() method is not used anymore since commit
+40da0c32c3fc ("net: dsa: mv88e6xxx: remove handling for DSA and CPU ports").
+Drop it.
 
-I see two different things here:
+Signed-off-by: Marek Behún <kabel@kernel.org>
+---
+ drivers/net/dsa/mv88e6xxx/chip.c |  9 -------
+ drivers/net/dsa/mv88e6xxx/chip.h |  4 ----
+ drivers/net/dsa/mv88e6xxx/port.c | 40 --------------------------------
+ drivers/net/dsa/mv88e6xxx/port.h |  9 -------
+ 4 files changed, 62 deletions(-)
 
-You are refactoring code into a helper, so reducing the amount of
-duplicated code. That in itself is good.
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index 8ca5fd40df92..c618abc75ebb 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -4434,7 +4434,6 @@ static const struct mv88e6xxx_ops mv88e6141_ops = {
+ 	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6390_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6341_port_set_speed_duplex,
+-	.port_max_speed_mode = mv88e6341_port_max_speed_mode,
+ 	.port_tag_remap = mv88e6095_port_tag_remap,
+ 	.port_set_policy = mv88e6352_port_set_policy,
+ 	.port_set_frame_mode = mv88e6351_port_set_frame_mode,
+@@ -4826,7 +4825,6 @@ static const struct mv88e6xxx_ops mv88e6190_ops = {
+ 	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6390_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6390_port_set_speed_duplex,
+-	.port_max_speed_mode = mv88e6390_port_max_speed_mode,
+ 	.port_tag_remap = mv88e6390_port_tag_remap,
+ 	.port_set_policy = mv88e6352_port_set_policy,
+ 	.port_set_frame_mode = mv88e6351_port_set_frame_mode,
+@@ -4886,7 +4884,6 @@ static const struct mv88e6xxx_ops mv88e6190x_ops = {
+ 	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6390_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6390x_port_set_speed_duplex,
+-	.port_max_speed_mode = mv88e6390x_port_max_speed_mode,
+ 	.port_tag_remap = mv88e6390_port_tag_remap,
+ 	.port_set_policy = mv88e6352_port_set_policy,
+ 	.port_set_frame_mode = mv88e6351_port_set_frame_mode,
+@@ -4946,7 +4943,6 @@ static const struct mv88e6xxx_ops mv88e6191_ops = {
+ 	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6390_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6390_port_set_speed_duplex,
+-	.port_max_speed_mode = mv88e6390_port_max_speed_mode,
+ 	.port_tag_remap = mv88e6390_port_tag_remap,
+ 	.port_set_frame_mode = mv88e6351_port_set_frame_mode,
+ 	.port_set_ucast_flood = mv88e6352_port_set_ucast_flood,
+@@ -5110,7 +5106,6 @@ static const struct mv88e6xxx_ops mv88e6290_ops = {
+ 	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6390_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6390_port_set_speed_duplex,
+-	.port_max_speed_mode = mv88e6390_port_max_speed_mode,
+ 	.port_tag_remap = mv88e6390_port_tag_remap,
+ 	.port_set_policy = mv88e6352_port_set_policy,
+ 	.port_set_frame_mode = mv88e6351_port_set_frame_mode,
+@@ -5278,7 +5273,6 @@ static const struct mv88e6xxx_ops mv88e6341_ops = {
+ 	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6390_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6341_port_set_speed_duplex,
+-	.port_max_speed_mode = mv88e6341_port_max_speed_mode,
+ 	.port_tag_remap = mv88e6095_port_tag_remap,
+ 	.port_set_policy = mv88e6352_port_set_policy,
+ 	.port_set_frame_mode = mv88e6351_port_set_frame_mode,
+@@ -5499,7 +5493,6 @@ static const struct mv88e6xxx_ops mv88e6390_ops = {
+ 	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6390_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6390_port_set_speed_duplex,
+-	.port_max_speed_mode = mv88e6390_port_max_speed_mode,
+ 	.port_tag_remap = mv88e6390_port_tag_remap,
+ 	.port_set_policy = mv88e6352_port_set_policy,
+ 	.port_set_frame_mode = mv88e6351_port_set_frame_mode,
+@@ -5564,7 +5557,6 @@ static const struct mv88e6xxx_ops mv88e6390x_ops = {
+ 	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6390_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6390x_port_set_speed_duplex,
+-	.port_max_speed_mode = mv88e6390x_port_max_speed_mode,
+ 	.port_tag_remap = mv88e6390_port_tag_remap,
+ 	.port_set_policy = mv88e6352_port_set_policy,
+ 	.port_set_frame_mode = mv88e6351_port_set_frame_mode,
+@@ -5627,7 +5619,6 @@ static const struct mv88e6xxx_ops mv88e6393x_ops = {
+ 	.port_sync_link = mv88e6xxx_port_sync_link,
+ 	.port_set_rgmii_delay = mv88e6390_port_set_rgmii_delay,
+ 	.port_set_speed_duplex = mv88e6393x_port_set_speed_duplex,
+-	.port_max_speed_mode = mv88e6393x_port_max_speed_mode,
+ 	.port_tag_remap = mv88e6390_port_tag_remap,
+ 	.port_set_policy = mv88e6393x_port_set_policy,
+ 	.port_set_frame_mode = mv88e6351_port_set_frame_mode,
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
+index 2b235ac2c5df..4339f6810535 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.h
++++ b/drivers/net/dsa/mv88e6xxx/chip.h
+@@ -585,10 +585,6 @@ struct mv88e6xxx_ops {
+ 	int (*port_set_speed_duplex)(struct mv88e6xxx_chip *chip, int port,
+ 				     int speed, int duplex);
+ 
+-	/* What interface mode should be used for maximum speed? */
+-	phy_interface_t (*port_max_speed_mode)(struct mv88e6xxx_chip *chip,
+-					       int port);
+-
+ 	int (*port_tag_remap)(struct mv88e6xxx_chip *chip, int port);
+ 
+ 	int (*port_set_policy)(struct mv88e6xxx_chip *chip, int port,
+diff --git a/drivers/net/dsa/mv88e6xxx/port.c b/drivers/net/dsa/mv88e6xxx/port.c
+index 49cd82930b7a..74cfc0bb7b5b 100644
+--- a/drivers/net/dsa/mv88e6xxx/port.c
++++ b/drivers/net/dsa/mv88e6xxx/port.c
+@@ -344,15 +344,6 @@ int mv88e6341_port_set_speed_duplex(struct mv88e6xxx_chip *chip, int port,
+ 					       duplex);
+ }
+ 
+-phy_interface_t mv88e6341_port_max_speed_mode(struct mv88e6xxx_chip *chip,
+-					      int port)
+-{
+-	if (port == 5)
+-		return PHY_INTERFACE_MODE_2500BASEX;
+-
+-	return PHY_INTERFACE_MODE_NA;
+-}
+-
+ /* Support 10, 100, 200, 1000 Mbps (e.g. 88E6352 family) */
+ int mv88e6352_port_set_speed_duplex(struct mv88e6xxx_chip *chip, int port,
+ 				    int speed, int duplex)
+@@ -384,15 +375,6 @@ int mv88e6390_port_set_speed_duplex(struct mv88e6xxx_chip *chip, int port,
+ 					       duplex);
+ }
+ 
+-phy_interface_t mv88e6390_port_max_speed_mode(struct mv88e6xxx_chip *chip,
+-					      int port)
+-{
+-	if (port == 9 || port == 10)
+-		return PHY_INTERFACE_MODE_2500BASEX;
+-
+-	return PHY_INTERFACE_MODE_NA;
+-}
+-
+ /* Support 10, 100, 200, 1000, 2500, 10000 Mbps (e.g. 88E6190X) */
+ int mv88e6390x_port_set_speed_duplex(struct mv88e6xxx_chip *chip, int port,
+ 				     int speed, int duplex)
+@@ -407,15 +389,6 @@ int mv88e6390x_port_set_speed_duplex(struct mv88e6xxx_chip *chip, int port,
+ 					       duplex);
+ }
+ 
+-phy_interface_t mv88e6390x_port_max_speed_mode(struct mv88e6xxx_chip *chip,
+-					       int port)
+-{
+-	if (port == 9 || port == 10)
+-		return PHY_INTERFACE_MODE_XAUI;
+-
+-	return PHY_INTERFACE_MODE_NA;
+-}
+-
+ /* Support 10, 100, 200, 1000, 2500, 5000, 10000 Mbps (e.g. 88E6393X)
+  * Function mv88e6xxx_port_set_speed_duplex() can't be used as the register
+  * values for speeds 2500 & 5000 conflict.
+@@ -509,19 +482,6 @@ int mv88e6393x_port_set_speed_duplex(struct mv88e6xxx_chip *chip, int port,
+ 	return 0;
+ }
+ 
+-phy_interface_t mv88e6393x_port_max_speed_mode(struct mv88e6xxx_chip *chip,
+-					       int port)
+-{
+-
+-	if (port != 0 && port != 9 && port != 10)
+-		return PHY_INTERFACE_MODE_NA;
+-
+-	if (chip->info->prod_num == MV88E6XXX_PORT_SWITCH_ID_PROD_6361)
+-		return PHY_INTERFACE_MODE_2500BASEX;
+-
+-	return PHY_INTERFACE_MODE_10GBASER;
+-}
+-
+ static int mv88e6xxx_port_set_cmode(struct mv88e6xxx_chip *chip, int port,
+ 				    phy_interface_t mode, bool force)
+ {
+diff --git a/drivers/net/dsa/mv88e6xxx/port.h b/drivers/net/dsa/mv88e6xxx/port.h
+index a2492cf4d920..44b100dd618b 100644
+--- a/drivers/net/dsa/mv88e6xxx/port.h
++++ b/drivers/net/dsa/mv88e6xxx/port.h
+@@ -504,15 +504,6 @@ int mv88e6390x_port_set_speed_duplex(struct mv88e6xxx_chip *chip, int port,
+ int mv88e6393x_port_set_speed_duplex(struct mv88e6xxx_chip *chip, int port,
+ 				     int speed, int duplex);
+ 
+-phy_interface_t mv88e6341_port_max_speed_mode(struct mv88e6xxx_chip *chip,
+-					      int port);
+-phy_interface_t mv88e6390_port_max_speed_mode(struct mv88e6xxx_chip *chip,
+-					      int port);
+-phy_interface_t mv88e6390x_port_max_speed_mode(struct mv88e6xxx_chip *chip,
+-					       int port);
+-phy_interface_t mv88e6393x_port_max_speed_mode(struct mv88e6xxx_chip *chip,
+-					       int port);
+-
+ int mv88e6xxx_port_set_state(struct mv88e6xxx_chip *chip, int port, u8 state);
+ 
+ int mv88e6xxx_port_set_vlan_map(struct mv88e6xxx_chip *chip, int port, u16 map);
+-- 
+2.53.0
 
-However, we have the problem in general that developers think that OF
-and ACPI do the same thing. And that is not true. OF MDIO busses have
-support for a GPIO used as a reset. In retrospect, that was a bad
-idea. The documented ACPI binding does not have this, and if anybody
-was to suggest adding it, i want to NACK it.
-
-Having OF code and ACPI code to instantiate the MDIO bus makes it
-clearer they are different things. fwnode gives the impression they
-are the same, which is not true. Hence i don't like fwnode at this
-level.
-
-Where fwnode makes sense is deeper down in the implementation of the
-bindings, for properties which are the same in both bindings.  Then
-you can use fwnode_ for the shared properties, of_ for the OF only
-properties, and acpi_ for the ACPI only properties.
-
-So although i like the reduction in duplicated code, i think overall
-it makes the code worse because developers are more likely to wrongly
-understand it.
-
-	    Andrew
 
