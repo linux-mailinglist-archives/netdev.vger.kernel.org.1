@@ -1,183 +1,235 @@
-Return-Path: <netdev+bounces-283801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283802-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mH6JCsGC+GnIwAIAu9opvQ
-	(envelope-from <netdev+bounces-283801-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 13:28:01 +0200
+	id AMIaGayE+Gn0wAIAu9opvQ
+	(envelope-from <netdev+bounces-283802-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 13:36:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 995444BC5A6
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 13:28:00 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0067A4BC731
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 13:36:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8B14D30071C6
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 11:27:59 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AF82C300682F
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 11:30:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452C43AA4F9;
-	Mon,  4 May 2026 11:27:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A346A36495E;
+	Mon,  4 May 2026 11:30:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A8pMY5gA"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="AAhR9l55"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012007.outbound.protection.outlook.com [52.101.43.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3DD354AE3;
-	Mon,  4 May 2026 11:27:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777894078; cv=none; b=eN5/jo/YToV4Y5JQdoSTYkhHONCcxdJ4Rcw3VYE0XfCYB5XAJTuloEKTJnUwlcU0mLy0xxGBwi6xgBfifv1CGPUR4sK2kLd9Mb2xsBC/FoIRXbTCC9Rf3O1+ulY4xrcsNzI3D824WtE5M7Q9bzRIirwQUoMjv3vc2Oml8uj8SMo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777894078; c=relaxed/simple;
-	bh=vmwhKpIuJ/kZwCXjcaFmLTe8fKVmq6dYhXjPDXJ2dss=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WIaN1Ty1u7kbhYMmZL1drIR04iMXMTKtkne4efG3tlqpQz0fmuvM4pEugy26HZlNXRpODMi6tFCAKIXtAKeNAVNQuGXHRZI06nf1oJ1fyXHiALoeywt7RiNOw1x2s6uY5Wg0QoCrZiGGLOkYDhUFb0IdQdN1fygE574W6AeQDEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A8pMY5gA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E6DCC2BCB9;
-	Mon,  4 May 2026 11:27:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777894077;
-	bh=vmwhKpIuJ/kZwCXjcaFmLTe8fKVmq6dYhXjPDXJ2dss=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=A8pMY5gALGtg1xGJyZawkZqX7NzKmzo4hhJUD7PMuWFYqDT8DYoMLbSATCHNzy+9j
-	 9pzpd9WM9PXAQ+qliFpwwott2DWy2pCyXdx5Pw7lqK3jbHhf1CT65KX7rWU5Cw0MIc
-	 sd8rLoBV6+GFdaDmgxzjH9jwRFlBKMUpt6nmcM3IcrwXVlCgYr+0etwE0BZvRLMz+b
-	 8klOVo3i4ybTG3ezMXQ+iQ5THKHKoQEMA6oGmz/eHqqXBbEiXLOVss8ditfDjE6JuP
-	 tpjWuBpj+w4SeVFI9wVqlnmhjC0SfO4TRkmpW6BSmb6MzURpeP0INtWUP8lduNUb2T
-	 mLFJIqtsD3TIw==
-Date: Mon, 4 May 2026 16:57:40 +0530
-From: Sumit Garg <sumit.garg@kernel.org>
-To: Harshal Dev <harshal.dev@oss.qualcomm.com>
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
-	linux-media@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
-	linux-remoteproc@vger.kernel.org, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org,
-	robin.clark@oss.qualcomm.com, sean@poorly.run,
-	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
-	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
-	airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
-	dikshita.agarwal@oss.qualcomm.com, bod@kernel.org,
-	mchehab@kernel.org, elder@kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, jjohnson@kernel.org, mathieu.poirier@linaro.org,
-	trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
-	pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
-	tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
-	srinivas.kandagatla@oss.qualcomm.com,
-	amirreza.zarrabi@oss.qualcomm.com, op-tee@lists.trustedfirmware.org,
-	apurupa@qti.qualcomm.com, skare@qti.qualcomm.com,
-	linux-kernel@vger.kernel.org,
-	Sumit Garg <sumit.garg@oss.qualcomm.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>
-Subject: Re: [PATCH v4 04/15] firmware: qcom: Add a PAS TEE service
-Message-ID: <afiCrIYSm8AK9xn9@sumit-xelite>
-References: <20260427095603.1157963-1-sumit.garg@kernel.org>
- <20260427095603.1157963-5-sumit.garg@kernel.org>
- <ab4b5257-92df-4201-ab04-436ab77b2fd8@oss.qualcomm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4216A7081E;
+	Mon,  4 May 2026 11:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777894256; cv=fail; b=hLtY5KDTbPqU/GnJNlAk9SIo6k8Kg2uY4ZpvDdSYWqCRI/cN6hZL9wBU2ZLRcWMZyzi075U6dP3w3dEtFb4N/SOsXdDU0g8oYKBaiydsOCm6D15GJrr0/qOhCHfu0JzuiH2ukeaPlyN7h2T/71enYJtcyBkBfLFiJxf3tSnzS5w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777894256; c=relaxed/simple;
+	bh=oWzayq6LGhaJ2G8w0lYZr7UoX8BMvQ9hjR9X9aYQskA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=IqySuae3CHRI3t5CjR3DqewmwPrveDxfbqHQGLM4ggxtFOofwZ+P+K1hjrwYm8HxhAPfUIKhrm/DrajeUVPIn4uQXU5hH7oq+leljit2JwOaGacm+ZVANzbChoOzAGO/v/P6gC9PExzdh8vKiw5gH+v4pHHUWbCnryuaU8Pl5Qs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=fail (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=AAhR9l55 reason="signature verification failed"; arc=fail smtp.client-ip=52.101.43.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Tz5QaBBurC9Yr1pz6rH3FcSCEBXiTES140jAXJtu1IrUxgGPJWNgXGxmmFzfOLDq1o6OxAAAqCp644kvs2HgMLhZZ/6QjhDZ/S8SfvbDVrEpi47GfkpQo+mAo7T/9XIBUtzgFw8pqPEpL/XTFMU5lzL3Fm00pG+KFwy2uK/nm757+suXGjBsR9s0PBaMwp+3/wpwZXXdJ5T4TDJCZcK/fhZt05yEnUKRiGH4X5tdvWz20bzumNhS9mNpFrvRJgsEmNNA1x4wJkPCLzHV6t3iLaVmvpk10nE2nN6fuIBkLPyGCWmmvf6tRzNS5ppJLRPVgCArmQoYw8Jqmx5cxDHVeQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=W6BU+vNc3OH8GA4MsMBAWYVjmzokyff/8jmBrwBGNMM=;
+ b=WS/Rf6xdabw1Fjv9RbN8I+kSVYcTrfGCywAO+5nDZGtZiFV5b6/6mH+W06hPQQKu9YZyb7EC5NbUrcJpqGZ6Z/bVqpyuzFqP9Y3/n09peG66hyeYmf+o9d9/S5EmXT+m3a3QMmZVEmYI4lxpjXNhW9iTbCBCPzPtrHideULHmyCLsvO3hSCtwsWYdE8RJeBbY5t+fIaCXko/9fGOc44Uu4ErNIOOreKopyo/JOkaKJPr7/MThF9IZTb3tJnFQZzC6XxqTf2ZbdReMMIcsDL1xVGGNvqRmwJM3YKmlw7zgM+NhdaW3E9z8PzwfaL/gvbOB2dwJNo6N06daAH1IzoS+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=W6BU+vNc3OH8GA4MsMBAWYVjmzokyff/8jmBrwBGNMM=;
+ b=AAhR9l55KA4oayurv29yWj9Id6E1lt4gY8FkqNr8ztdcKuxL4JNYPf3hmq3Zq/e9zsu7w/WvxOZYuKP59zQ65y3ZfmNIC+mdb4AjaO/yYd9RnjlnMlrva+64O4kYMm/Ppe6lVbxf6t7oIr08eaKUARs0tLW+aCUwOkgQGFMUoaTaNL7Xq+ObfFmuG3dCVr7UpUZBlSv1xwzTkZ5JSR2hZpaeOcsYiFg/kLLJ6qNKRZ9D56Ku5qMOEzXFtmGg8RlilO+dlItrj3WW3ijaHXwQW5adA636IW15dKEJ0IYBp+q1wU9CwWVo08VD+8iW8z52DWY8P5RA3a6YlFfeLRdVrg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8728.namprd12.prod.outlook.com (2603:10b6:610:171::12)
+ by PH0PR12MB8775.namprd12.prod.outlook.com (2603:10b6:510:28e::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Mon, 4 May
+ 2026 11:30:51 +0000
+Received: from CH3PR12MB8728.namprd12.prod.outlook.com
+ ([fe80::2641:1046:bdf3:93d7]) by CH3PR12MB8728.namprd12.prod.outlook.com
+ ([fe80::2641:1046:bdf3:93d7%7]) with mapi id 15.20.9870.023; Mon, 4 May 2026
+ 11:30:51 +0000
+Date: Mon, 4 May 2026 11:30:47 +0000
+From: Dragos Tatulea <dtatulea@nvidia.com>
+To: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin Karsten <mkarsten@uwaterloo.ca>, 
+	Gal Pressman <gal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Joe Damato <joe@dama.to>, 
+	Frederik Deweerdt <fdeweerdt@fastly.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH net-next 1/2] net: napi: Fix interrupts permanently
+ disabled during busy poll
+Message-ID: <4onzzvtgdyj5k4himhtv4dsga4dnunk4ppjyqgam6us44biear@7vvozjz2ywrr>
+References: <20260428175134.1197036-2-dtatulea@nvidia.com>
+ <20260428175134.1197036-3-dtatulea@nvidia.com>
+ <20260428173844.1354aabe@kernel.org>
+ <36csl4lgsy3psknzdpssq4zc2zsy36negybhhvfhozthhnmfl4@c6y75w6udaiv>
+ <87o6j2hslk.fsf@all.your.base.are.belong.to.us>
+ <bq662gcnuk3yltgzg4q5w672xsbsdf3abqrej2mrg6rl74ts2v@5uv5a35jrlp7>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <bq662gcnuk3yltgzg4q5w672xsbsdf3abqrej2mrg6rl74ts2v@5uv5a35jrlp7>
+X-ClientProxiedBy: TL0P290CA0015.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:5::7)
+ To CH3PR12MB8728.namprd12.prod.outlook.com (2603:10b6:610:171::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ab4b5257-92df-4201-ab04-436ab77b2fd8@oss.qualcomm.com>
-X-Rspamd-Queue-Id: 995444BC5A6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8728:EE_|PH0PR12MB8775:EE_
+X-MS-Office365-Filtering-Correlation-Id: eeb7112a-8e81-457a-cdda-08dea9d098a5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|7416014|1800799024|376014|56012099003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	1h7MBBfJR4mes+0x9QrRO/JUnCqcvKhKr+sIG3mdyX6VEZiUxEiZZpMeVfRxqxqy/ENvSmLUPA/7vpWGMMDXUF5+uwPbn0WHkjfdyGqRSN/0wzudmW1iGnIpUnfw8un0ELykyEkINnlBC1zQI8rFMfuUEWoHS6gAmJazhFygsiW5QZM3o2yJ91aTlovEAkxfjkrFK6aqXUpmKzdDQLGovScoPWSmeOUoUG4IQQ3TvHbKJ8WcoKE69dONm7iFQdrrdqPnT6n4TvC99zB7xqSeqm1l60beI+2npbbf7lcQpPrwKkqqf1bHFPqR9Oq53AAWzsNGbAdiflwg0YUxy8qfU0BmIfJgTfDSgoWDPa6VDqmjxo7ZvXca5Ev1duf8SWdcp+58zJQ2J1X9Pvu083/JCKZTX06nKvYPmJJBRmjDT+eQLGZKLlxO7rut1Wt4qmRUaLiErcQepUMsOJNQbHohd10N1VDqd6DqLU5Jv+LtXF7JYcVezpQMcqZsZOJ6x2kGgec6DDQutqzwDXL9Mvj1mat9n6aUdzgZFC9fCaXpCiFTRJY98UL0BAwTm6TreaIrY+2tjUw39P5L+jCCpc8G57JVhbpq8e/BxuV68/PrChMOWq1FPK4v7OdkhoNYbaG80vtUeca+rMPPp+IwXi8G3iytQ7UhAVYHaVmLI95mFEKIu/2ccZFqjdMgWBBsWv4s
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8728.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?iso-8859-1?Q?zsPAoFUcqIFrvB/8kV5W/9LQ9f5sfcdRgL+FJqnfD68ITSCR/zih6k/UU8?=
+ =?iso-8859-1?Q?9JBNfmfE485Pjq0GSXAwZJvzDl5RiGG0mWsArHLQcc/D7bfLeyKGBVh4i1?=
+ =?iso-8859-1?Q?Uq6q8yxWSXHjeLV4Hor8fVrtIJ6cw98I1VeT7H//ad8wMIrb+oMuOlyPtG?=
+ =?iso-8859-1?Q?mSqErabp7rRX+gP29H968ts+kHVORYptyb0DLkELDZmNU0T4pCsdE3bB1R?=
+ =?iso-8859-1?Q?KvORsHg5oGufCpQUgDshwVQQE3i8obms/JBBTopRQUcp99KAqNJLiWa/Wt?=
+ =?iso-8859-1?Q?/VYliK9uk3x13NSIhCpdm2jBAAk/EwNHUq1m56P5MNKflECgrto/t+ZLFy?=
+ =?iso-8859-1?Q?VuXeG4ZpOti0xxhlq8Yrj6rczf1vcqRf3FG1Qa8SHZoVnd87LzO83geO8M?=
+ =?iso-8859-1?Q?bI2cZBLq2Ejys/6GyIxQ8e2m0/2GypeIDu5LuPK42+jZEIuv8V2bH67f0M?=
+ =?iso-8859-1?Q?+gnh8oOzt0jvtopReitZHPA7HuPp9EbCSFzTPmiss+9+pDpc6r9TxoBWN1?=
+ =?iso-8859-1?Q?vSxGxjqsJrECSi49NZN0C7xYtPd4yL0ZrIHSFa1kDKvqIAnZt/B56/63+x?=
+ =?iso-8859-1?Q?LokVM45LS1Wf0w4AZhsB9FkD8/S3AOqSt06L60BhfuVzrIYuoxqdIBRWQS?=
+ =?iso-8859-1?Q?nQWZw9lcQate/Mm2tdxaTG8M1K01e+QlfACrs7uv3drI5LqU1vB2XzyJKG?=
+ =?iso-8859-1?Q?V6xydPng69N6iubxXvOZoDLLL7oHk3nlGMB58h1zks2RIbI51bInoyRGAB?=
+ =?iso-8859-1?Q?Yr5B/hDef3byWDfcxs8CahdNjPXgpdxAiKVHvUsr4MeEt11QZGvuM4E1Uk?=
+ =?iso-8859-1?Q?nde5IMMlxtn6AA4sm+5PbdiJQ113qxCmH5Hke4ZR920vl6/SE1ldcqTl1r?=
+ =?iso-8859-1?Q?vayluEde9qd97/Wg6kysVGv63XaIeUgCm3+mF4Y/+MJv6fYJaIhI5jpxHA?=
+ =?iso-8859-1?Q?+V9ZAIy81VRxey0taeUQ1IP09W6gblHmYj5CXsU8e8J9jJRAinVemlACWu?=
+ =?iso-8859-1?Q?dj2MvFMc/iIjjZy9CvYDE5ahdINofdOxe22n3QUU7f/wOKOH6Zd3tFC8+V?=
+ =?iso-8859-1?Q?MkUhJrhp6cCPJnEF8stfljT9RWZtnERlpI6B4JK9yKL7Xt5vRX0npXPnRK?=
+ =?iso-8859-1?Q?zMwHLZrdiTjJhqP7Sf7wXoHgcMdUWV/qZrWlqHLrmM7G70iZ/7sBdbaE3a?=
+ =?iso-8859-1?Q?UvOr78MgewTqREEWBIDQCwjkHtJFa9c1wn0E3OIQfiJ1rewPb209IOSIta?=
+ =?iso-8859-1?Q?MMZ8+o1USx7h4mKTQZY70W2pteAmxsWKx+gsjoiMePYy5TZr41E5aaA9+3?=
+ =?iso-8859-1?Q?M5bpGhmBHuteb81lPVZHLQVV4glXNlVwOkYP0rgQSYYUm5J1OLjr8uhpCC?=
+ =?iso-8859-1?Q?QRk2vqPRHXLhPT5HRTzhQWNIL88jOpU6U1LiR+xdiLMQtEoi4/tqWc3Bli?=
+ =?iso-8859-1?Q?47skkiQzVEaJT5H15YQ4RpQslE18QIlFPrvGsahRQX/no+mN+Sa1JQ1GL5?=
+ =?iso-8859-1?Q?fNRc1fOcumOuSDEJOt3yn7oJLRhAoyKlyttRfa01Vg8I3FFST2HRUv5D09?=
+ =?iso-8859-1?Q?Kpd8e8NG+Z16omWrsEipXharucYGDpgVEaNtWj1NYCreyQyoHQdhiEhXh1?=
+ =?iso-8859-1?Q?d1mR9zxVFzjC6GKd8fxocJ173zklfSVjrYFNV2hc+2dv44rWPyIkq0AIvT?=
+ =?iso-8859-1?Q?WoGwZJMpmW0VVKk58uVxE47VcC/xdDj9f1DmUih5z+mnwPthSrh96scCOH?=
+ =?iso-8859-1?Q?xt82JkQzPhC8XGk3h2u30/PnYQopOccNxwHhYn4c2/NDK524t5QXmOFkGt?=
+ =?iso-8859-1?Q?wUB9ce2kJw=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eeb7112a-8e81-457a-cdda-08dea9d098a5
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8728.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2026 11:30:51.4395
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +z6tCACo8FATzFDhpYBuHJKBOqY8iPAE1EhJ8IQ3gNGOqrswPG6JD48fpEczi/w4G8xbm/PpXVlU5aYcxpUHxw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8775
+X-Rspamd-Queue-Id: 0067A4BC731
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [4.04 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[nvidia.com : SPF not aligned (relaxed),reject];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_DKIM_REJECT(1.00)[Nvidia.com:s=selector2];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283801-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[49];
+	TAGGED_FROM(0.00)[bounces-283802-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	GREYLIST(0.00)[pass,body];
+	DKIM_TRACE(0.00)[Nvidia.com:-];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dtatulea@nvidia.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.962];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-On Mon, May 04, 2026 at 03:33:06PM +0530, Harshal Dev wrote:
-> Hi Sumit,
-> 
-> On 4/27/2026 3:25 PM, Sumit Garg via OP-TEE wrote:
-> > From: Sumit Garg <sumit.garg@oss.qualcomm.com>
+On Wed, Apr 29, 2026 at 12:43:54PM +0000, Dragos Tatulea wrote:
+> On Wed, Apr 29, 2026 at 02:13:43PM +0200, Björn Töpel wrote:
+> > Dragos Tatulea <dtatulea@nvidia.com> writes:
 > > 
-> > Add support for Peripheral Authentication Service (PAS) driver based
-> > on TEE bus with OP-TEE providing the backend PAS service implementation.
+> > > On Tue, Apr 28, 2026 at 05:38:44PM -0700, Jakub Kicinski wrote:
+> > >> On Tue, 28 Apr 2026 17:51:30 +0000 Dragos Tatulea wrote:
+> > >> > +	local_irq_save(flags);
+> > >> > +	hrtimer_start(&napi->timer, ns_to_ktime(timeout),
+> > >> > +		      HRTIMER_MODE_REL_PINNED);
+> > >> >  	clear_bit(NAPI_STATE_SCHED, &napi->state);
+> > >> > +	local_irq_restore(flags);
+> > >> 
+> > >> I don't think disabling IRQ is necessary?
+> > >> Isn't it legal to clear the bit first then schedule the timer?
+> > >> The timer does not own the napi instance.
+> > >
+> > > Isn't the following scenario possible (but extremely unlikely)?
+> > >
+> > > 1. busy_poll_stop(): napi timer is schedueled.
+> > > 2. Hard irq pre-empts busy_poll_stop() and takes an unusually long time.
+> > > 4. napi timer triggers (also hard irq), napi_watchdog() skips schedule
+> > >    because NAPI_STATE_SCHED is set.
+> > > 5. busy_poll_stop(): NAPI_STATE_SCHED gets cleared.
 > > 
-> > The TEE PAS service ABI is designed to be extensible with additional API
-> > as PTA_QCOM_PAS_CAPABILITIES. This allows to accommodate any future
-> > extensions of the PAS service needed while still maintaining backwards
-> > compatibility.
+> > (Nice work finding the bug! I had to jog my memory to understand the
+> > gnarly busy-poll details again!)
+> >
+> > You're right that you need the save/restore if you do arm timer/clear,
+> > but not if you do what Jakub suggests.
 > > 
-> > Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> > ---
-> >  drivers/firmware/qcom/Kconfig        |  10 +
-> >  drivers/firmware/qcom/Makefile       |   1 +
-> >  drivers/firmware/qcom/qcom_pas_tee.c | 479 +++++++++++++++++++++++++++
-> >  3 files changed, 490 insertions(+)
-> >  create mode 100644 drivers/firmware/qcom/qcom_pas_tee.c
+> >   clear_bit(...);
+> >   hrtimer_start();
+> >
+> Ah sorry, I didn't read it right the first time because I was too fixed
+> on the order.
 > 
-> [...]
+> > That would also follow the scheme in napi_schedule_done(). (Note that
+> > swapping arm/clear does mean that we can get a wasted-timer outcome.)
+> >
+> If it is wasted is fine. I figured that this could end up with a timer
+> scheduled after the napi deletion:
 > 
-> > diff --git a/drivers/firmware/qcom/qcom_pas_tee.c b/drivers/firmware/qcom/qcom_pas_tee.c
+> 1. busy_poll_stop(): clears SCHED bit.
+> 2. napi_disable() runs past SCHED wait, cancels timer and caller
+>    deletes napi mem.
+> 3. busy_poll_stop(): napi->timer is armed but napi is freed memory
+>    by now.
 > 
-> > +static int qcom_pas_tee_mem_setup(struct device *dev, u32 pas_id,
-> > +				  phys_addr_t addr, phys_addr_t size)
-> > +{
-> 
-> [...]
-> 
-> > +
-> > +	ret = tee_client_invoke_func(data->ctx, &inv_arg, param);
-> > +	if (ret < 0 || inv_arg.ret != 0) {
-> > +		dev_err(dev, "PAS mem setup failed, pas_id: %d, ret: %d, err: 0x%x\n",
-> > +			pas_id, ret, inv_arg.ret);
-> > +		return ret ?: -EINVAL;
-> 
-> Following the example from qcom_scm_pas_mem_setup() here:
-> https://elixir.bootlin.com/linux/v7.0.1/source/drivers/firmware/qcom/qcom_scm.c#L778
-> 
-> I think it should be:
-> return ret ?: inv_arg.ret;
+> What am I missing here?
+>
+Gentle ping. Once I understand how/why the above is incorrect I can
+update the patch and send it.
 
-inv_arg.ret return a GP TEE error code which doesn't map 1:1 to kernel
-error codes. The client drivers won't benefit without having a way to
-decode those errors. So just printing here can help the user to debug
-any issues.
-
-> 
-> This way the client (say mdt_loader) knows what error OPTEE PAS service returned.
-> I can see that is tries to print this error:
-> https://elixir.bootlin.com/linux/v7.0.1/source/drivers/soc/qcom/mdt_loader.c#L286
-> 
-> With that,
-> Reviewed-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
-> 
-
-Thanks, I hope with above I can keep your tag.
-
--Sumit
+Thanks,
+Dragos
+ 
 
