@@ -1,81 +1,82 @@
-Return-Path: <netdev+bounces-284013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284014-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kH1CHlLr+Gmi3AIAu9opvQ
-	(envelope-from <netdev+bounces-284013-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 20:54:10 +0200
+	id ADadDmHr+Gmi3AIAu9opvQ
+	(envelope-from <netdev+bounces-284014-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 20:54:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E13A44C2CAC
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 20:54:09 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2F644C2CC9
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 20:54:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 49AF830387A0
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 18:53:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 34E22302158C
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 18:53:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C8D3E7141;
-	Mon,  4 May 2026 18:53:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC3073E6DF5;
+	Mon,  4 May 2026 18:53:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="gCsXPRR7"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="IqFk7Jto"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
+Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F623E63B1
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 18:53:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE633E6383
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 18:53:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777920787; cv=none; b=YQBzz9sVMhk2Vp+F9b4Ch4PFIyGR4Bh+F4JDzCCXBNVim9eqSMehmnwuVELyoxDNzOF8mdKXoDPiKyXUF1ndq9LY5S5f41aHEmh1uhJ1luXsu+FjUiYrUfh1CuWqnBFIrcfOHqznUqTisd3J9rsvBzQDQZ6kVeG2c1gAE75tSng=
+	t=1777920789; cv=none; b=E9XsL56kZinPifLJAaI+k44sN/4Y4AobHEI7pHNfZ+yLAde6xeJLDOJIfD/cFHD4eU28ycDtRnGA8aVa5+3cCtSrWKb0z95mIsxcWRCC3qyDy8xpbPsr52WATtEf7T6B5BvF5m+PNtRaFi1rqs4PxlvrHaKiAKjBWInUA8FNImA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777920787; c=relaxed/simple;
-	bh=ZtOC5ms5Vw3wN4Ct4+uGxTLbzcX+dHTDwStfrM5iKkE=;
+	s=arc-20240116; t=1777920789; c=relaxed/simple;
+	bh=rAZ4O12mQMt/V2JxpVYuANQjlNTYeWa/pk7rs4oLiok=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AV7sMDNZR/JWNsRbinfOIZDT4a9zg9yfRk09rsv2j9+Gyqkbf3GlDgGSJ1c1Pj73grKCgApV+qfMBzqwDC49Bf5uWJmcEO0O8uLIFPdH/tKkBuzjUudcBsS4+5EfyF62y4YsPBlmvUa6w2xGR6itpjbJjT6xk0L6ZVk5dRhE2Ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=gCsXPRR7; arc=none smtp.client-ip=74.125.82.171
+	 MIME-Version; b=eBl+5msBXDSKFxTksPov4PI+KUx0fIfTOxrFW/+OOp/V7bWtLDTeK1Y3lewUQij2JLs0eXKSFUbn1iw3KXkfMZtJH/7CMTRA9mlnlFcwQSaeUtWyo808E0nEYDwwzH+wD85E4RlV1D0gMUkWibgrIlumW0BugK4k89GA1t2eH5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=IqFk7Jto; arc=none smtp.client-ip=74.125.82.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-2ee1054627bso2980693eec.1
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 11:53:05 -0700 (PDT)
+Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-12ddbe104ccso4528908c88.0
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 11:53:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1777920785; x=1778525585; darn=vger.kernel.org;
+        d=herbertland.com; s=google; t=1777920787; x=1778525587; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=r2RLuVRTNjnVEux/2W9Ys/cIEt28eGUDB9bvJlM3qvQ=;
-        b=gCsXPRR7OR6FKlUbJxfYUX+9tagZISWmITnvbx5GBl8QALujq9dse2o7/l2TPq8elL
-         VYO/zH99W6hC14rohuA5rU6JnBMu9HMAl02+i4FYpxWPQ8iWSNYTUUuuhJFhJTDeS4mZ
-         MTR5Z1MC+rUnH9HwgXCzaoCRJ7RnlxaDI85n/KLqeo9dbiJgyYaSm1D78skn26h68Vjp
-         6+ryoyK37mIGPBVoUCUz3tRc1M7vwtVGmWw5wXcvukB/L0NgOed9jjiKJBy2oOytFsN1
-         0kfX4SJ8lJZMYar8Dy3XynXA2XQlHCyfI39Ip2DADI0hqB9MiXDNpJw03tY9tZHaxzJi
-         V5qA==
+        bh=JbaCNAkrvT0+fBSMiERTy4cCfhMqy13VCtnukl+0EeI=;
+        b=IqFk7JtoW41yfJFe2N89BpENuIoC3gmBKXmXYOmlyKemK84GssKDNMfU+CfqDOtjQK
+         D71KphACGwxt7suuEGhh0TpvYtTLHRdvkH7v+GiIUkIWdenGbwh5suXYnhuyIWXgsmF0
+         3085/t3ubShoj+f+kY1nUSNkWz6+UQSUOtb+ZgkiT9xOYVJ99Fm0fk6ycAB77e0lHuLs
+         iaXUKZlUok8zY7W+TmWXg2xVBh09D1VfAkkXkX87EZYh4pldz2dxEgrSBWLfzkh3rnnY
+         WtoChNz0fRmJ/ollwB/BHqSFVgNJscVSZXhUgB6RndwOmjXWW8QSm6tl6L6nlBhy9y+R
+         InPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777920785; x=1778525585;
+        d=1e100.net; s=20251104; t=1777920787; x=1778525587;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=r2RLuVRTNjnVEux/2W9Ys/cIEt28eGUDB9bvJlM3qvQ=;
-        b=sibKSFt3F6682k0qsv8LzJqef+TSLdE8RoqfPyFts5gAhu9qEZhhDcPHzU8r4wIyXU
-         JInA5ndGQDj4+wNLjYf8kgH3jQsNjYRLLDA4xWdKNFECLB0JI/+k+p7kOEEi2of4C/Sc
-         sbcTx+Io3+aD/LDi99LXbOGWYsWdn+oPuUSVb/ePlesbh2tTVSZE/lkL8CcYrqM5AhDX
-         QYfU7ZfTsMv0lp7qrNHCYF+enaIcS/Ge17XQE0I4QeZbpqJlUp6h3eKcWsyjcL/z7qcg
-         bc2dXkpXpDAv8525X/qvMAo35l3cJ16byGdFpffb1KE3T2Jmo1578qc65EDjPtIRkPkb
-         Ab2w==
-X-Forwarded-Encrypted: i=1; AFNElJ9gv3Z0xJZ/q0b6BeSXr4MVbaAOQ7AxEkhqFZCeLjGEZykHhExe9LxqG2TMC2vUfpH5cKzwtXs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy61nTjTexX5ai3wvRDgaiDqZDDJf+IaL1enyw134pjbd/Xln06
-	m7j94a2UeP5upzvRsplBWtlByM9mRWAqflSqk0H5IOO9A5SjSCCC6oSD+1EijSKLKQ==
-X-Gm-Gg: AeBDieuOYkZZDVYGFLnmlqJbldt2vuGgPMubkU6vLskKwXyNSPpfmxGDjxZTEKJKqeI
-	DOMpoXiTWoE0a2RFb1G7Uw2exwRtiwkAY3vakJeWm8NTU9JymtgqhRaHII0bNPWGG2dlJeutchR
-	CaFYJ9TVBtcOzG8oPg7Mik6vKhiIMFVEygAGf+Rf6RJKts5b4FBi/edIRJdOKnrOc69CAnRRasP
-	nxgY2yShGyl+Fm18p/v+LTV/nlXjwhYpjJtYRWKPnp5xcCXoDnQvbImW4JgwE8tFA2ruRV/SfwA
-	7ED2ZzoD5ExmICvrDtKsUAUBzOnz3cd5ez/mfde+u3k8RQQZ2+Eambj+w2T/2N5TBZ6RTsB475g
-	47ShLuJassDiTcqZq+/z4GRwh2UoPKcXfH9EnXXHPO8tM/b/EAfR2GG1PZBAQPGffzAQYQEJdIo
-	D+bn9NVyqDK2nFsSa+23RLCjFGrzeU7eRo/CPZEu9Vbhx+pBNU/UU73+Tl/LGik1ze/lHBn7ZM
-X-Received: by 2002:a05:7301:4586:b0:2f3:5d44:eeba with SMTP id 5a478bee46e88-2f3ceaea156mr358670eec.6.1777920784610;
-        Mon, 04 May 2026 11:53:04 -0700 (PDT)
+        bh=JbaCNAkrvT0+fBSMiERTy4cCfhMqy13VCtnukl+0EeI=;
+        b=ID9JvNtJq3MThMdZH4mluTpggRnhRJiv/kcX9GPn438FFlTjMpsAgXHOtU/PgCXrbx
+         kcrG1zLhAa2ufBNbXQ+moWcYH4vHYXWmKkLRZY0px3EQZAUlglUiOvmlxOJYyJLQ1Yku
+         dMPQOmNYuAyJoollWYpiAW9cXo/X9K0JZ9FWblDU1iYYNDVGYUOMCgtoKh6CiM91IaW7
+         8X1Mazky2D5EavWuhN+fRMSXoN1muCUXn0lzotIPXBJLZRB2LSuN4kEjt2jHvw+TR0cF
+         VdOUE/1+rDt+wALd4ZjNgA6cwFEQftw1kEtv6k+uQoAEKhxVQeZNl4J9c6Hmaz4GS4pr
+         khww==
+X-Forwarded-Encrypted: i=1; AFNElJ+LzPncwPtypBPbfwi7AmTYG1cRj+nm0RB8giwUSaoS0T76KjZIJPM1RH9zPBoOmQwMgijm1y0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpuYPJqNrDojSpVWC7kfYXcxBS3zUGhS9a8fBPYhfihuJIyekL
+	Dt0gNn5iXyNNKruX1wAqz98thRFMW5cd3sdXAGPNvNTBuJjEVMwjXlilGSee7XPVcA==
+X-Gm-Gg: AeBDietlA0irifx4havqt7g6ca03m47MeFngsAt90rasZ1k+QCy41Fq9xCcp83db28h
+	RLBkOK/AP4LWjbCIJAtoiirvs4D55AqtCzgXfMSH5afQaWCih6n1IrVCWyNEdGLf3HLYeYU6p0K
+	duANvlZ2KaRRe6LFtK1Stf//+v1pGRNF40LZi4OIinswco7xBVFy2PfgA0gqtQP9EZWj6s+ociI
+	5r4RYWYbOiLa1c5OhgwZUqX9Zevqm9Z0R95moXL8YEr/LNVuiciVx1vR8c1BxA9iHCHqIfLsitI
+	ExOrr3He3GT3D+v4XXsb2poilBtnfXS6GX6Ke5sSfAsLAlPKWX5CTW6OCBPGKJf/fR8A/SY8btm
+	Cw6a464eJoN5nbGPwrPM22okPtA1WnQGDB668ALdgy2UGi1ZX3qGJ+nORuuj9/EqjcHh6c6nTT+
+	9YL4Zh5OpWnvh/JAHHy1GTNArAMzLmn4/Bt47eVVyKz1178FZPJXgN0DrarMqIYGUP4mH0eSlMz
+	ibP9hS3pYo=
+X-Received: by 2002:a05:7022:ea2f:b0:128:c77a:6c8e with SMTP id a92af1059eb24-130b1c6f540mr53920c88.28.1777920787011;
+        Mon, 04 May 2026 11:53:07 -0700 (PDT)
 Received: from pong.herbertland.com ([2601:646:8980:b330:8e62:719f:fc3d:b6ad])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ee3889d657sm17186262eec.4.2026.05.04.11.53.03
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ee3889d657sm17186262eec.4.2026.05.04.11.53.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2026 11:53:04 -0700 (PDT)
+        Mon, 04 May 2026 11:53:06 -0700 (PDT)
 From: Tom Herbert <tom@herbertland.com>
 X-Google-Original-From: Tom Herbert <tom@xdpnet.ai>
 To: davem@davemloft.net,
@@ -86,9 +87,9 @@ To: davem@davemloft.net,
 	pabeni@redhat.com,
 	horms@kernel.org
 Cc: Tom Herbert <tom@herbertland.com>
-Subject: [PATCH net-next v10 08/10] test: Add proto_nums.py in networking selftests
-Date: Mon,  4 May 2026 11:51:20 -0700
-Message-ID: <20260504185122.50642-9-tom@xdpnet.ai>
+Subject: [PATCH net-next v10 09/10] test: Add ext_hdr.py in networking selftests
+Date: Mon,  4 May 2026 11:51:21 -0700
+Message-ID: <20260504185122.50642-10-tom@xdpnet.ai>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260504185122.50642-1-tom@xdpnet.ai>
 References: <20260504185122.50642-1-tom@xdpnet.ai>
@@ -99,7 +100,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: E13A44C2CAC
+X-Rspamd-Queue-Id: A2F644C2CC9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
@@ -107,13 +108,13 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[herbertland.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[herbertland.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284013-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-284014-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FREEMAIL_TO(0.00)[davemloft.net,kernel.org,vger.kernel.org,uliege.be,gmail.com,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -128,270 +129,447 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,xdpnet.ai:mid,herbertland.com:dkim,herbertland.com:email,proto_nums.py:url]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[herbertland.com:dkim,herbertland.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,xdpnet.ai:mid,shlex.split:url]
 
 From: Tom Herbert <tom@herbertland.com>
 
-Add proto_nums.py that contains various python definitions of
-common protocol constants
+Add ext_hdr.py that contains various Extension Header format definitions
+and related helper functions.
+
+This includes the Make_EH_Chain function that creates an Extension
+Header chain based on an input list. The input list has the format:
+
+   [(<type>, <args>), (<type>, <args>), ... (<type>, <args>)]
+
+where <type> is "H" for Hop-by-Hop Options, "D" for Destination
+Options, "R" for Routing Header, "F" for Fragment header, "A" for
+Authentication Header, and "E" for ESP header.
+
+<args> is specific to the type of extension header. For Hop-by-Hop
+and Destination Options <args> is a list of options in the format:
+
+   [(<opt_type>, <opt_length>), (<opt_type>, <opt_length>), ...
+					(<opt_type>, <opt_length>)]
+
+For the Routing Header, <args> is a list of SIDs in the format:
+
+    [IPv6_address, IPv6_address, ... IPv6_address]
+
+For the Fragment Header, <args> is the identifier number
+
+Authentication and ESP are not currently supported by Make_EH_Chain
 
 Signed-off-by: Tom Herbert <tom@herbertland.com>
 ---
- tools/testing/selftests/net/Makefile      |   1 +
- tools/testing/selftests/net/proto_nums.py | 231 ++++++++++++++++++++++
- 2 files changed, 232 insertions(+)
- create mode 100644 tools/testing/selftests/net/proto_nums.py
+ tools/testing/selftests/net/Makefile   |   1 +
+ tools/testing/selftests/net/ext_hdr.py | 385 +++++++++++++++++++++++++
+ 2 files changed, 386 insertions(+)
+ create mode 100755 tools/testing/selftests/net/ext_hdr.py
 
 diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index a275ed584026..21897ee81916 100644
+index 21897ee81916..d0f98081d702 100644
 --- a/tools/testing/selftests/net/Makefile
 +++ b/tools/testing/selftests/net/Makefile
-@@ -69,6 +69,7 @@ TEST_PROGS := \
- 	nl_netdev.py \
- 	nl_nlctrl.py \
- 	pmtu.sh \
-+	proto_nums.py \
- 	psock_snd.sh \
- 	reuseaddr_ports_exhausted.sh \
- 	reuseport_addr_any.sh \
-diff --git a/tools/testing/selftests/net/proto_nums.py b/tools/testing/selftests/net/proto_nums.py
-new file mode 100644
-index 000000000000..dc775164dacc
+@@ -26,6 +26,7 @@ TEST_PROGS := \
+ 	cmsg_time.sh \
+ 	double_udp_encap.sh \
+ 	drop_monitor_tests.sh \
++	ext_hdr.py \
+ 	fcnal-ipv4.sh \
+ 	fcnal-ipv6.sh \
+ 	fcnal-other.sh \
+diff --git a/tools/testing/selftests/net/ext_hdr.py b/tools/testing/selftests/net/ext_hdr.py
+new file mode 100755
+index 000000000000..bfb7da4a7c88
 --- /dev/null
-+++ b/tools/testing/selftests/net/proto_nums.py
-@@ -0,0 +1,231 @@
++++ b/tools/testing/selftests/net/ext_hdr.py
+@@ -0,0 +1,385 @@
++#!/usr/bin/env python3
 +# SPDX-License-Identifier: GPL-2.0
 +
-+# Various protocol constant definitions
++# Helper functions for creating extension headers using scapy
 +
-+from enum import Enum
++import ctypes
++import shlex
++import socket
++import sys
++import subprocess
++import scapy
++import proto_nums
 +
-+# IP protocol numbers
-+class IP_Proto(Enum):
-+    IP_PROTO_HOPOPT = 0
-+    IP_PROTO_ICMP = 1
-+    IP_PROTO_IGMP = 2
-+    IP_PROTO_GGP = 3
-+    IP_PROTO_IPv4 = 4
-+    IP_PROTO_ST = 5
-+    IP_PROTO_TCP = 6
-+    IP_PROTO_CBT = 7
-+    IP_PROTO_EGP = 8
-+    IP_PROTO_IGP = 9
-+    IP_PROTO_BBN_RCC_MON = 10
-+    IP_PROTO_NVP_II = 11
-+    IP_PROTO_PUP = 12
-+    IP_PROTO_ARGUS = 13
-+    IP_PROTO_EMCON = 14
-+    IP_PROTO_XNET = 15
-+    IP_PROTO_CHAOS = 16
-+    IP_PROTO_UDP = 17
-+    IP_PROTO_MUX = 18
-+    IP_PROTO_DCN_MEAS = 19
-+    IP_PROTO_HMP = 20
-+    IP_PROTO_PRM = 21
-+    IP_PROTO_XNS_IDP = 22
-+    IP_PROTO_TRUNK_1 = 23
-+    IP_PROTO_TRUNK_2 = 24
-+    IP_PROTO_LEAF_1 = 25
-+    IP_PROTO_LEAF_2 = 26
-+    IP_PROTO_RDP = 27
-+    IP_PROTO_IRTP = 28
-+    IP_PROTO_ISO_TP4 = 29
-+    IP_PROTO_NETBLT = 30
-+    IP_PROTO_MFE_NSP = 31
-+    IP_PROTO_MERIT_INP = 32
-+    IP_PROTO_DCCP = 33
-+    IP_PROTO_3PC = 34
-+    IP_PROTO_IDPR = 35
-+    IP_PROTO_XTP = 36
-+    IP_PROTO_DDP = 37
-+    IP_PROTO_IDPR_CMTP = 38
-+    IP_PROTO_TP_PLUS_PLUS = 39
-+    IP_PROTO_IL = 40
-+    IP_PROTO_IPv6 = 41
-+    IP_PROTO_SDRP = 42
-+    IP_PROTO_IPv6_Route = 43
-+    IP_PROTO_IPv6_Frag = 44
-+    IP_PROTO_IDRP = 45
-+    IP_PROTO_RSVP = 46
-+    IP_PROTO_GRE = 47
-+    IP_PROTO_DSR = 48
-+    IP_PROTO_BNA = 49
-+    IP_PROTO_ESP = 50
-+    IP_PROTO_AH = 51
-+    IP_PROTO_I_NLSP = 52
-+    IP_PROTO_SWIPE = 53
-+    IP_PROTO_NARP = 54
-+    IP_PROTO_Min_IPv4 = 55
-+    IP_PROTO_TLSP = 56
-+    IP_PROTO_SKIP = 57
-+    IP_PROTO_IPv6_ICMP = 58
-+    IP_PROTO_IPv6_NoNxt = 59
-+    IP_PROTO_IPv6_Opts = 60
-+    IP_PROTO_any_1 = 61
-+    IP_PROTO_CFTP = 62
-+    IP_PROTO_any_2 = 63
-+    IP_PROTO_SAT_EXPAK = 64
-+    IP_PROTO_KRYPTOLAN = 65
-+    IP_PROTO_RVD = 66
-+    IP_PROTO_IPPC = 67
-+    IP_PROTO_any_3 = 68
-+    IP_PROTO_SAT_MON = 69
-+    IP_PROTO_VISA = 70
-+    IP_PROTO_IPCV = 71
-+    IP_PROTO_CPNX = 72
-+    IP_PROTO_CPHB = 73
-+    IP_PROTO_WSN = 74
-+    IP_PROTO_PVP = 75
-+    IP_PROTO_BR_SAT_MON = 76
-+    IP_PROTO_SUN_ND = 77
-+    IP_PROTO_WB_MON = 78
-+    IP_PROTO_WB_EXPAK = 79
-+    IP_PROTO_ISO_IP = 80
-+    IP_PROTO_VMTP = 81
-+    IP_PROTO_SECURE_VMTP = 82
-+    IP_PROTO_VINES = 83
-+    IP_PROTO_IPTM = 84
-+    IP_PROTO_NSFNET_IGP = 85
-+    IP_PROTO_DGP = 86
-+    IP_PROTO_TCF = 87
-+    IP_PROTO_EIGRP = 88
-+    IP_PROTO_OSPFIGP = 89
-+    IP_PROTO_Sprite_RPC = 90
-+    IP_PROTO_LARP = 91
-+    IP_PROTO_MTP = 92
-+    IP_PROTO_AX_25 = 93
-+    IP_PROTO_IPIP = 94
-+    IP_PROTO_MICP = 95
-+    IP_PROTO_SCC_SP = 96
-+    IP_PROTO_ETHERIP = 97
-+    IP_PROTO_ENCAP = 98
-+    IP_PROTO_any_4 = 99
-+    IP_PROTO_GMTP = 100
-+    IP_PROTO_IFMP = 101
-+    IP_PROTO_PNNI = 102
-+    IP_PROTO_PIM = 103
-+    IP_PROTO_ARIS = 104
-+    IP_PROTO_SCPS = 105
-+    IP_PROTO_QNX = 106
-+    IP_PROTO_A_N = 107
-+    IP_PROTO_IPComp = 108
-+    IP_PROTO_SNP = 109
-+    IP_PROTO_Compaq_Peer = 110
-+    IP_PROTO_IPX_in_IP = 111
-+    IP_PROTO_VRRP = 112
-+    IP_PROTO_PGM = 113
-+    IP_PROTO_any_5 = 114
-+    IP_PROTO_L2TP = 115
-+    IP_PROTO_DDX = 116
-+    IP_PROTO_IATP = 117
-+    IP_PROTO_STP = 118
-+    IP_PROTO_SRP = 119
-+    IP_PROTO_UTI = 120
-+    IP_PROTO_SMP = 121
-+    IP_PROTO_SM = 122
-+    IP_PROTO_PTP = 123
-+    IP_PROTO_ISIS = 124
-+    IP_PROTO_FIRE = 125
-+    IP_PROTO_CRTP = 126
-+    IP_PROTO_CRUDP = 127
-+    IP_PROTO_SSCOPMCE = 128
-+    IP_PROTO_IPLT = 129
-+    IP_PROTO_SPS = 130
-+    IP_PROTO_PIPE = 131
-+    IP_PROTO_SCTP = 132
-+    IP_PROTO_FC = 133
-+    IP_PROTO_RSVP_E2E_IGNORE = 134
-+    IP_PROTO_Mobility = 135
-+    IP_PROTO_UDPLite = 136
-+    IP_PROTO_MPLS_in_IP = 137
-+    IP_PROTO_manet = 138
-+    IP_PROTO_HIP = 139
-+    IP_PROTO_Shim6 = 140
-+    IP_PROTO_WESP = 141
-+    IP_PROTO_ROHC = 142
-+    IP_PROTO_Ethernet = 143
-+    IP_PROTO_AGGFRAG = 144
-+    IP_PROTO_NSH = 145
-+    IP_PROTO_Homa = 146
-+    IP_PROTO_BIT_EMU = 147
 +
-+# Hop-by-Hop and Destination Options numbers
-+class HBHDst_Types(Enum):
-+    HBHDST_TYPE_PAD1 = 0x0
-+    HBHDST_TYPE_PADN = 0x1
-+    HBHDST_TYPE_JUMBO = 0xc2
-+    HBHDST_TYPE_RPL = 0x23
-+    HBHDST_TYPE_RPL_DEPRECATED = 0x63
-+    HBHDST_TYPE_TNL_ENCAP_LIMIT = 0x4
-+    HBHDST_TYPE_ROUTER_ALERT = 0x5
-+    HBHDST_TYPE_QUICK_START = 0x26
-+    HBHDST_TYPE_CALIPSO = 0x7
-+    HBHDST_TYPE_SMF_DPD = 0x8
-+    HBHDST_TYPE_HAO = 0xc9
-+    HBHDST_TYPE_ENDPOINT_ID = 0x8a
-+    HBHDST_TYPE_ILNP_NONCE = 0x8b
-+    HBHDST_TYPE_LINE_ID = 0x8c
-+    HBHDST_TYPE_DEPRECATED = 0x4d
-+    HBHDST_TYPE_MPL = 0x6d
-+    HBHDST_TYPE_DFF = 0xee
-+    HBHDST_TYPE_PDM = 0x0f
-+    HBHDST_TYPE_MIN_PATH_MTU = 0x30
-+    HBHDST_TYPE_IOAM_NO_CHNG = 0x11
-+    HBHDST_TYPE_IOAM_CHNG = 0x31
-+    HBHDST_TYPE_ALT_MARK = 0x12
-+    HBHDST_TYPE_RFC3692_1 = 0x1e
-+    HBHDST_TYPE_RFC3692_2 = 0x3e
-+    HBHDST_TYPE_RFC3692_3 = 0x5e
-+    HBHDST_TYPE_RFC3692_4 = 0x7e
-+    HBHDST_TYPE_RFC3692_5 = 0x9e
-+    HBHDST_TYPE_RFC3692_6 = 0xbe
-+    HBHDST_TYPE_RFC3692_7 = 0xde
++# Read a sysctl
++def sysctl_read(name):
++    try:
++        # shlex.split helps handle arguments correctly
++        command = shlex.split(f"sysctl -n {name}")
++        # Use check=True to raise an exception if the command fails
++        result = subprocess.run(command, check=True,
++                    capture_output=True, text=True)
++        value = result.stdout.strip()
++    except subprocess.CalledProcessError as ex:
++        print(f"Error reading sysctl: {ex.stderr}")
++    except FileNotFoundError:
++        print("The 'sysctl' command was not found. "
++              "Check your system's PATH.")
 +
-+# Routing header types
-+class RoutingTypes(Enum):
-+    ROUTING_TYPE_SRC_RT = 0
-+    ROUTING_TYPE_NIMROD = 1
-+    ROUTING_TYPE_2 = 2
-+    ROUTING_TYPE_RPL = 3
-+    ROUTING_TYPE_SRH = 4
-+    ROUTING_TYPE_CRH16 = 5
-+    ROUTING_TYPE_CRH32 = 6
-+    ROUTING_TYPE_RFC3692_1 = 253
-+    ROUTING_TYPE_RFC3692_2 = 254
++    return int(value)
 +
-+# Canonical extension header order
-+class EH_Order(Enum):
-+    IPV6_EXT_HDR_ORDER_HOP = 1 << 0
-+    IPV6_EXT_HDR_ORDER_DEST_BEFORE_RH = 1 << 1
-+    IPV6_EXT_HDR_ORDER_ROUTING = 1 << 2
-+    IPV6_EXT_HDR_ORDER_FRAGMENT = 1 << 3
-+    IPV6_EXT_HDR_ORDER_AUTH = 1 << 4
-+    IPV6_EXT_HDR_ORDER_ESP = 1 << 5
-+    IPV6_EXT_HDR_ORDER_DEST = 1 << 6
++# Common definitions for Destination and Hop-by-Hop options
 +
-+# ICMPv6 types
-+class ICMP6_Type(Enum):
-+    ICMPV6_DEST_UNREACH = 1
-+    ICMPV6_PKT_TOOBIG = 2
-+    ICMPV6_TIME_EXCEED = 3
-+    ICMPV6_PARAMPROB = 4
-+    ICMPV6_ECHO_REQUEST = 128
-+    ICMPV6_ECHO_REPLY = 129
-+    ICMPV6_MGM_QUERY = 130
-+    ICMPV6_MGM_REPORT = 131
-+    ICMPV6_MGM_REDUCTION = 132
-+    ICMPV6_NI_QUERY = 139
-+    ICMPV6_NI_REPLY = 140
-+    ICMPV6_MLD2_REPORT = 143
-+    ICMPV6_DHAAD_REQUEST = 144
-+    ICMPV6_DHAAD_REPLY = 145
-+    ICMPV6_MOBILE_PREFIX_SOL = 146
-+    ICMPV6_MOBILE_PREFIX_ADV = 147
-+    ICMPV6_MRDISC_ADV = 151
-+    ICMPV6_MRDISC_SOL = 152
++# Common Destination and Hop-by-Hop Options header
++class HbhDstOptions(ctypes.BigEndianStructure):
++    _pack_ = 1
++    _fields_ = [
++        ("next_hdr", ctypes.c_uint8),
++        ("hdr_ext_len", ctypes.c_uint8)
++    ]
++
++    def __init__(self, next_hdr, length):
++        self.next_hdr = next_hdr
++        self.hdr_ext_len = length
++
++# Common single Destination and Hop-by-Hop Option header
++class HbhDstOption(ctypes.BigEndianStructure):
++    _pack_ = 1
++    _fields_ = [
++        ("opt_type", ctypes.c_uint8),
++        ("opt_data_len", ctypes.c_uint8),
++    ]
++
++    def __init__(self, opt_type, length):
++        self.opt_type = opt_type
++        self.opt_data_len = length
++
++# Make PAD1 option
++def make_hbh_dst_option_pad1():
++    opt_bytes = bytearray(1)
++    opt_bytes[0] = proto_nums.HBHDst_Types.HBHDST_TYPE_PAD1.value
++    return (scapy.all.Raw(opt_bytes), 1)
++
++# Make a full DestOpt or HBH Option with some length
++def make_hbh_dst_option_with_data(opt_type, opt_len):
++    hdr = scapy.all.Raw(load=HbhDstOption(opt_type, opt_len))
++    opt_bytes = scapy.all.Raw(bytearray(opt_len))
++    allhdr = hdr/opt_bytes
++    return (scapy.all.Raw(allhdr), 2 + opt_len)
++
++# Make PADN option
++def make_hbh_dst_option_pad_n(opt_len):
++    return make_hbh_dst_option_with_data(
++            proto_nums.HBHDst_Types.HBHDST_TYPE_PADN.value, opt_len)
++
++# Make a Destination or Hop-by-Hop Options list. Input is list of pairs as
++# (type, length). Option data is set to zeroes.
++#
++# Return value is (hdr, len, outcome) where hdr is the raw bytes and length
++# is the length of the header including two bytes for the common extension
++# header (the returned header does not include the two byte common header).
++# outcome is True or False depending on whether the options are expected to
++# exceed a sysctl limit and would be dropped
++def make_hbh_dst_options_list(opt_list, max_cnt, max_len):
++    hdr = scapy.all.Raw()
++    eh_len = 0
++
++    num_non_padding_opts = 0
++    max_consect_pad_len = 0
++
++    consect_padlen = 0
++
++    # Create the set of options
++    for opt_type, jlen in opt_list:
++        if opt_type == proto_nums.HBHDst_Types.HBHDST_TYPE_PAD1.value:
++            # PAD1 is a special case
++            pair = make_hbh_dst_option_pad1()
++            consect_padlen += pair[1]
++        else:
++            pair = make_hbh_dst_option_with_data(opt_type, jlen)
++
++            if opt_type == proto_nums.HBHDst_Types.HBHDST_TYPE_PADN.value:
++                consect_padlen += pair[1]
++            else:
++                if consect_padlen > max_consect_pad_len:
++                    max_consect_pad_len = consect_padlen
++                consect_padlen = 0
++                num_non_padding_opts += 1
++
++        # Append the option, add to cumulative length
++        hdr = hdr/pair[0]
++        eh_len += pair[1]
++
++    # Add two to length to account for two byte extension header
++    eh_len += 2
++
++    if eh_len % 8 != 0:
++        # The extension header length must be a multiple of eight bytes.
++        # If we're short add a padding option
++        plen = 8 - (eh_len % 8)
++        if plen == 1:
++            pair = make_hbh_dst_option_pad1()
++        else:
++            pair = make_hbh_dst_option_pad_n(plen - 2)
++
++        consect_padlen += pair[1]
++        hdr = hdr/pair[0]
++        eh_len += plen
++
++    if consect_padlen > max_consect_pad_len:
++        max_consect_pad_len = consect_padlen
++
++    outcome = True
++    if num_non_padding_opts > max_cnt:
++        # The number of options we created is greater then the sysctl
++        # limit, so we expect the packet to be dropped
++        outcome = False
++    if eh_len > max_len:
++        # The length of the extension is greater then the sysctl limit,
++        # so we expect the packet to be dropped
++        outcome = False
++    if max_consect_pad_len > 7:
++        # The maximum consecutive number of bytes of padding is
++        # greater than seven, so we expect the packet to be dropped
++        outcome = False
++
++    return (hdr, eh_len - 2, outcome)
++
++# Make a full Hop-by-Hop or Destination Options header
++def make_full_hbh_dst_options_list(next_hdr, opt_list, max_cnt, max_len):
++    pair = make_hbh_dst_options_list(opt_list, max_cnt, max_len)
++    opt_len = pair[1] + 2
++
++    opts = HbhDstOptions(next_hdr, (opt_len - 1) // 8)
++    hdr = scapy.all.Raw(load=opts)/pair[0]
++
++    return (hdr, opt_len, pair[2])
++
++# Routing header definitions
++
++# Base Routing Header
++class RoutingHdr(ctypes.BigEndianStructure):
++    _pack_ = 1
++    _fields_ = [
++        ("next_hdr", ctypes.c_uint8),
++        ("hdr_ext_len", ctypes.c_uint8),
++        ("routing_type", ctypes.c_uint8),
++        ("segments_left", ctypes.c_uint8)
++    ]
++
++# SRv6 Routing Header
++class Srv6RoutingHdr(ctypes.BigEndianStructure):
++    _pack_ = 1
++    _fields_ = [
++        ("rh", RoutingHdr),
++        ("last_entry", ctypes.c_uint8),
++        ("flags", ctypes.c_uint8),
++        ("tags", ctypes.c_uint16),
++        # Variable list
++        # TLV options
++   ]
++
++    def __init__(self, next_hdr, hdr_ext_len, segments_left, last_entry):
++        self.rh.next_hdr = next_hdr
++        self.rh.hdr_ext_len = hdr_ext_len
++        self.rh.routing_type = proto_nums.RoutingTypes.ROUTING_TYPE_SRH.value
++        self.rh.segments_left = segments_left
++
++        self.last_entry = last_entry
++
++# Make an SRv6 Routing Header (with no segments left)
++def make_srv6_routing_hdr(next_hdr, sids):
++
++    bhdr = scapy.all.Raw()
++    num_sids = 0
++
++    # Set up each SID in the list
++    for sid in sids:
++        sid_bytes = socket.inet_pton(socket.AF_INET6, sid)
++        bhdr = bhdr/scapy.all.Raw(load=sid_bytes)
++        num_sids += 1
++
++    eh_len = num_sids * 16
++
++    hdr = Srv6RoutingHdr(next_hdr, eh_len // 8, 0, num_sids - 1)
++
++    bhdr = scapy.all.Raw(load=hdr)/bhdr
++
++    return (bhdr, eh_len + 8, True)
++
++# Fragment header
++
++# Basic Fragment Header
++class FragmentHdr(ctypes.BigEndianStructure):
++    _pack_ = 1
++    _fields_ = [
++        ("next_hdr", ctypes.c_uint8),
++        ("rsvd", ctypes.c_uint8),
++        ("fragment_offset", ctypes.c_uint16, 13),
++        ("rsvd2", ctypes.c_uint16, 2),
++        ("more", ctypes.c_uint16, 1),
++        ("identfication", ctypes.c_uint32),
++    ]
++
++    def __init__(self, next_hdr, fragment_offset, more, ident):
++        self.next_hdr = next_hdr
++        self.fragment_offset = fragment_offset
++        self.more = more
++        self.identfication = ident
++
++# Make a raw fragment header
++def make_fragment_hdr(next_hdr, fragment_offset, more, ident):
++    hdr = FragmentHdr(next_hdr, fragment_offset, more, ident)
++
++    return (scapy.all.Raw(load=hdr), 8, True)
++
++# Authentication Header
++
++# Base Authentication Header
++class AuthHdr(ctypes.BigEndianStructure):
++    _pack_ = 1
++    _fields_ = [
++        ("next_hdr", ctypes.c_uint8),
++                ("payload_len", ctypes.c_uint8),
++        ("spi", ctypes.c_uint32)
++        # ICV is variable length
++    ]
++
++    def __init__(self, next_hdr, payload_len, spi):
++        self.next_hdr = next_hdr
++        self.payload_len = payload_len
++        self.spi = spi
++
++# ESP
++
++# Base ESP header
++class EspHdr(ctypes.BigEndianStructure):
++    _pack_ = 1
++    _fields_ = [
++        ("spi", ctypes.c_uint32),
++        ("seqno", ctypes.c_uint32)
++        # Payload data + padding
++        # ICV is variable length
++    ]
++
++    def __init__(self, spi, seqno):
++        self.spi = spi
++        self.seqno = seqno
++
++# Check if EH list is out of order
++def check_eh_order(eh_list):
++    # OOO is okay if sysctl is not enforcing in order
++    do_check = sysctl_read("net.ipv6.enforce_ext_hdr_order")
++
++    seen = 0
++    for eh_type, _args in eh_list:
++        if eh_type == "H":
++            order = proto_nums.EH_Order.IPV6_EXT_HDR_ORDER_HOP.value
++        elif eh_type == "D":
++            if (seen &
++                proto_nums.EH_Order.IPV6_EXT_HDR_ORDER_ROUTING.value):
++                order = proto_nums.EH_Order.IPV6_EXT_HDR_ORDER_DEST.value
++            else:
++                order = proto_nums.EH_Order.IPV6_EXT_HDR_ORDER_DEST_BEFORE_RH.value
++        elif eh_type == "R":
++            order = proto_nums.EH_Order.IPV6_EXT_HDR_ORDER_ROUTING.value
++        elif eh_type == "F":
++            order = proto_nums.EH_Order.IPV6_EXT_HDR_ORDER_FRAGMENT.value
++            if seen & order != 0:
++                # Linux stack doesn't allow more than one
++                # Fragment Header in a packet
++                return False
++        elif eh_type == "A":
++            order = proto_nums.EH_Order.IPV6_EXT_HDR_ORDER_AUTH.value
++        elif eh_type == "E":
++            order = proto_nums.EH_Order.IPV6_EXT_HDR_ORDER_ESP.value
++
++        if (do_check and seen >= order):
++            return False
++        seen |= order
++
++    return True
++
++# Compute the next headers for an EH chain. Returns a new list of EHs
++# with the next header attached to each element
++def compute_next_hdrs(next_hdr, eh_list):
++    nlist = []
++
++    # Run through the list in reverse and set the next header up for each
++    # enty
++    for eh_type, args in reversed(eh_list):
++        entry = (eh_type, args, next_hdr)
++        nlist.insert(0, entry)
++        if eh_type == "H":
++            next_hdr = proto_nums.IP_Proto.IP_PROTO_HOPOPT.value
++        elif eh_type == "D":
++            next_hdr = proto_nums.IP_Proto.IP_PROTO_IPv6_Opts.value
++        elif eh_type == "R":
++            next_hdr = proto_nums.IP_Proto.IP_PROTO_IPv6_Route.value
++        elif eh_type == "F":
++            next_hdr = proto_nums.IP_Proto.IP_PROTO_IPv6_Frag.value
++        elif eh_type == "A":
++            next_hdr = proto_nums.IP_Proto.IP_PROTO_AH.value
++        elif eh_type == "E":
++            next_hdr = proto_nums.IP_Proto.IP_PROTO_ESP.value
++
++    return nlist, next_hdr
++
++# Make an extension header chain from a list
++# The list contains a set of pairs in the form (<eh_type>, <args>)
++# <eh_type> is:
++#   "H"-- Hop-by-Hop Options
++#   "D"-- Destination Options
++#   "R"-- Routing Header
++#   "F"-- Fragment Header
++#   "A"-- Authentication Header
++#   "E"-- ESP
++#
++# <args> is specific to EH type
++def make_eh_chain(next_hdr, eh_list):
++    nlist = []
++
++    # Run through the list in reverse and set the next header up for each
++    # enty
++    nlist, next_hdr = compute_next_hdrs(next_hdr, eh_list)
++
++    outcome = check_eh_order(eh_list)
++
++    hdr = scapy.all.Raw()
++    eh_len = 0
++
++    for eh_type, args, nnext_hdr in reversed(nlist):
++        if eh_type == "H":
++            # args is a list of (<opt_type>, <opt_len>) pairs
++            pair = make_full_hbh_dst_options_list(nnext_hdr, args,
++                sysctl_read("net.ipv6.max_hbh_opts_number"),
++                sysctl_read("net.ipv6.max_hbh_length"))
++        elif eh_type == "D":
++            # args is a list of (<opt_type>, <opt_len>) pairs
++            pair = make_full_hbh_dst_options_list(nnext_hdr, args,
++                sysctl_read("net.ipv6.max_dst_opts_number"),
++                sysctl_read("net.ipv6.max_dst_opts_length"))
++        elif eh_type == "R":
++            # args is a list of IPv6 address string
++            pair = make_srv6_routing_hdr(nnext_hdr, args)
++        elif eh_type == "F":
++            # Arg is (<identifier>)
++            pair = make_fragment_hdr(nnext_hdr, 0, False, args)
++        elif eh_type == "A":
++            print("Auth type not supported for test")
++            sys.exit(1)
++        elif eh_type == "E":
++            print("ESP type not supported for test")
++            sys.exit(1)
++        else:
++            print("Unknown EH type character")
++            sys.exit(1)
++
++        hdr = pair[0]/hdr
++        eh_len += pair[1]
++
++        if pair[2] is False:
++            outcome = False
++
++    return (hdr, eh_len, next_hdr, outcome)
 -- 
 2.43.0
 
