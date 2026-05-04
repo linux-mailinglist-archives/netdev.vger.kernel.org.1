@@ -1,269 +1,176 @@
-Return-Path: <netdev+bounces-283760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283761-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eOdcAgxi+GlJtgIAu9opvQ
-	(envelope-from <netdev+bounces-283760-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 11:08:28 +0200
+	id MBoXF35h+GlJtgIAu9opvQ
+	(envelope-from <netdev+bounces-283761-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 11:06:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6903E4BAC29
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 11:08:27 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB8634BABE6
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 11:06:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8BA22304C951
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 09:05:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 903DA300ECA7
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 09:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40F9735CB89;
-	Mon,  4 May 2026 09:05:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E9B5359A7E;
+	Mon,  4 May 2026 09:06:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gzprFKxl"
+	dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b="tUOR269P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64B1A35B649
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 09:05:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE603596E3
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 09:06:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777885516; cv=none; b=Wxnolqj/ZjjFP2pj35x6kIpT43Bvm1CnZ5RHD63i9ObZjOxiPj4GBr6bIGGr0C3tPNBT3O8ywQuJg2TMyul3aWX0Tly5DiKHszPyTCu96sJnlWSChih3A9BPxB59PjrdOJWENgmYkINLjZv7xdwXkJpyCGUp9mbLo2d+03C7sJY=
+	t=1777885563; cv=none; b=LIrSfflX6bjLMUO9b5VB3deb995PU4/URliE9kYEfwmcVMHZxVLUvVIFhPO9/GRTV8QX8X5/536kVLOG2BDwkxX6jmgPfa9WkuY/y7VIu+OLixbOmu2jVr8zT5CaEmIz0JS8z8w3/5TZKIktWjp7kJoHgCTK5croWuwqme7LEao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777885516; c=relaxed/simple;
-	bh=1wCvLKojE5VMmDHf90lahs0vrb8enbEkI/Ogt8PvM1o=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eLh8ILYpCYEJ6hltI7lJzp1m63mJbWw9URHQoyJx6I0966ezENTyvg+ewh8/3C5o8wBnglVifQ6OOhMn/h767dnv8LNV569g2UNwUPVwhETWYc8O4/SjSSTq03GvLVBzAdh1jYVez80P//OnDt2oY6hsk1c16le5X3pv11xPzQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gzprFKxl; arc=none smtp.client-ip=209.85.221.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-44696b11265so4123141f8f.0
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 02:05:14 -0700 (PDT)
+	s=arc-20240116; t=1777885563; c=relaxed/simple;
+	bh=Jk8DjIwtSgRzibN3X2t/wMdUSa6oMFBpDIDWhZbYEIU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JcFFqOIU1eP9ctGhTU5dRZMsyxbvxgDe2swZDTdV/I3ircL7SUMZR2KyyEnmWIDwRtrwm3TejYI7HeqkH/M7Wr4KJ5gzDbWbeqGMW58o0/huc+Owc/kaU2mBYVpV4F2Sg8NXNZyPoWxRAwc4Y9l+b6ZXifFCXL2D3oeM14wlfsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b=tUOR269P; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-488b150559bso25526245e9.1
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 02:06:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777885513; x=1778490313; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SEY60xtnrtZlmDpZYjCBRIROfxsrlUrdOXIjmLSez0o=;
-        b=gzprFKxlRQyvj2uWo3GNgiXetnceccJwv5KR2Airyb7j6lb4K5s+Olg4IzwdoUU2KN
-         GRrcnQz4O23u60/7nttMAZg801QDIA5OFFAyI6IZSN3kcY64fznxY4dSXE3rurJvP4Ku
-         kiRU0z5n6W1g4oQEA6GnxclOIwPguV/Fu3alkdXbLSauQwUBZqmXwlleRH2I/TtfYip+
-         71zl5teC5i6SBGft87PDY3aPVUsZfK3SamXwdv9WQvaaX2N7/Fka2vboVDEkBpCRA7Az
-         zDSUrtPWZqWzIPODdkFtX5+6lAtDcsjkGMY7xw/4SA+awOou1VmICYam5ENiJ1KJP1qD
-         Ylpw==
+        d=linbit-com.20251104.gappssmtp.com; s=20251104; t=1777885560; x=1778490360; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jk8DjIwtSgRzibN3X2t/wMdUSa6oMFBpDIDWhZbYEIU=;
+        b=tUOR269PbqHtHZjwxbhVEueffWVgTNCl8z+rObRQV4y89f8K+mOe7RZ7oh2bzOmSPH
+         VgB/7tZk+nr3AieW1792J6gcWLWUrBnp9S3lH8kRW9LTj0CstA4KAaHVAcgbkZLexQqE
+         h9LKoYFGzfpxgWEoKmLX3oGMKbRqFdgHTTvzL3KnBZN41YCfkEuzfqXxP06RphXGEc6B
+         utev2WuNRraycIwqt+3hS88z2T4IM8gvo4jW7gJEcgjMOhme7uCpsxhICDOqscdvw59c
+         kW3H1MhTQ0VLjExWjaZdtZT39OvJG0ZMLlU2n9Q7KBYrXeLJlzNVmoFBF800uDOP2rxK
+         BsKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777885513; x=1778490313;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SEY60xtnrtZlmDpZYjCBRIROfxsrlUrdOXIjmLSez0o=;
-        b=UB2EPbgxk2Hqc2juVOmlsu4Yzj9BQHwIka9hdvj2kjUZAnMVXTxvoyrfm/Yyhh2el2
-         yArKs3bMn/HoMSCfapxIy0a8N/Z50skFjYEcFD3f0jsYNoMzIlxjl/he4ygN69cJA7RA
-         exscHF+HxpOPmQY6F/xV//3t4BDmJVOyT10zkrpvqbb6HVA8yjue2L9Cyxcn3YFmpQIJ
-         4qINLPR9aBEw9PfMcoSJZ5h9Yn8tBbLGjSpByuLTgsmVi5Uz9KPktjxkN43mm6pgKUSA
-         AHQo97DflmfGG583DtDVHUg9UjMf2BM/kxAfdZZQ+rs8lKxEYDuZw14DEzqmUFdDeo0n
-         j3Uw==
-X-Forwarded-Encrypted: i=1; AFNElJ+Fh68hKH9IKGQvdJz/vZtoTDJRSz7cftkg5uoNn/cIR++whnLo+SAhhd/P3z/8ImZw5eqnIug=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1/Qs8x/dRbRl61AG4CjHzK30DgtypUgFzuNRIO2haaoNKPuJD
-	ExfC/B7oQFgV9jJ4EXRDPQHPR54SsR3CmfzXll2TgKMhb8GTSUiQ7t/G5Y24uQF2892PUIhZYIb
-	n36mM9xE+wQA35BCyyg==
-X-Received: from wrom11.prod.google.com ([2002:adf:f38b:0:b0:43c:ffef:4ab3])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6000:4287:b0:43d:70de:1c70 with SMTP id ffacd0b85a97d-44bb68c79a0mr14978714f8f.32.1777885512373;
- Mon, 04 May 2026 02:05:12 -0700 (PDT)
-Date: Mon, 04 May 2026 09:04:57 +0000
-In-Reply-To: <20260504-binder-netlink-v4-0-601b41cd25b2@google.com>
+        d=1e100.net; s=20251104; t=1777885560; x=1778490360;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Jk8DjIwtSgRzibN3X2t/wMdUSa6oMFBpDIDWhZbYEIU=;
+        b=db6w9GXmGtMia12KVcEWr0+mIytbnC0dHiPG0jgL4L2h1ripErahDIhERZ+dELOQ2J
+         /Y0aVprDO0zA7uTRFUI/HeObxW5hnJ52ZYPDStZm36kWfXiFhmDMGM3NuTEAyDGGA7KY
+         Pa1xc0PQsoiJ4BbY92m+Zd1v/xOLjkLyzvPBimnGzDi0UnxPjsKoLgQSZIa6AvyiJXNf
+         QajJLtHsQNOosQRscpWaqbES16a9wTM2kalvDevNO6oSijFh+qF4gFUplQ31pIGWe1ps
+         0oxS61G/l1T1kekWFNIbQpe06WNK1v7dTbstpSKGe/aJis5jwT1yd9gG59qEnAX4mB9r
+         7ylA==
+X-Forwarded-Encrypted: i=1; AFNElJ/Wy3Wdqbqb6PFO8DGenv/wnUS+aoF9YL7wyV0+d7uiRIZO48LAOl4FDB86fNQ0SfgRrVRuN4g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEUimw5N/euyTe36UMAlvPIhOKA1MUHxjejXkyr//VDohCsnxZ
+	7w9XjoOJHk+WWdV2Zyv+j8Aq2dN44FqKp1HobqLngHftUDkINi3o5XOzNIZTcw79Sgc=
+X-Gm-Gg: AeBDiev97br27A5c30RCNQfGMvcNCp7M0QWYirHP4Eo4Gk2gNTvXqsLch+C2tyIsmaL
+	tco9k4lAqRK0ETRXRnMJD8eM0ximU0KHbtMVT27e2nLsDwC/SgXRaquBUdvUIzdS6f+IMsaMXTw
+	XI4haeD1zVdJuBpxts67/yJI1JKs5HXTdPTv8AGfgpfZMh9HoAAmRqmaE6JU2e+cNrUQVoQBang
+	DwOBs1RJuDOArwCPazxyN4a+KERh9YAK1GY03MG3yUSPTrqcmEmK6XgTFMOVrIMkbilk5R83+iG
+	NPIOINLQn4peKYe84HmM0htUH93f+s7VkYsQ/4Rq6AyrlRVWjo3h84roAwGRrl4a7/tPq80hFR1
+	WJNX6ngt80b5vY1YryhQvNPillUrg2iRHoSVbmYde2FnunttkGZLlZX7uMYl+cC6Mbge8vEzEkP
+	0q0Um8KQv7lPaeoWqYw3RHPuhmla81BOcnmG+uvn9F2b561uw5zp5q6zFKmjS2DtGkDznJHiKxq
+	vAmro8uM95dIC6F
+X-Received: by 2002:a05:600c:4445:b0:48a:52ee:5776 with SMTP id 5b1f17b1804b1-48a986380ecmr140685845e9.11.1777885558358;
+        Mon, 04 May 2026 02:05:58 -0700 (PDT)
+Received: from localhost (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a82307f28sm526970305e9.13.2026.05.04.02.05.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 May 2026 02:05:57 -0700 (PDT)
+Date: Mon, 4 May 2026 11:05:55 +0200
+From: Christoph =?utf-8?Q?B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com, 
+	linux-kernel@vger.kernel.org, Lars Ellenberg <lars.ellenberg@linbit.com>, 
+	Philipp Reisner <philipp.reisner@linbit.com>, linux-block@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH 2/4] tools: ynl-gen-c: optionally emit structs and helpers
+Message-ID: <afhgQgySpoxXFCn1@localhost.localdomain>
+Mail-Followup-To: Jakub Kicinski <kuba@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org, 
+	Lars Ellenberg <lars.ellenberg@linbit.com>, Philipp Reisner <philipp.reisner@linbit.com>, 
+	linux-block@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, 
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
+References: <20260407173356.873887-1-christoph.boehmwalder@linbit.com>
+ <20260407173356.873887-3-christoph.boehmwalder@linbit.com>
+ <20260412125502.3f8ff576@kernel.org>
+ <adzVUdf74CVk2DwJ@localhost.localdomain>
+ <20260413104939.5ef4d9dc@kernel.org>
+ <ad4ox7ibZoiW-tje@localhost.localdomain>
+ <20260414083548.02f76970@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260504-binder-netlink-v4-0-601b41cd25b2@google.com>
-X-Developer-Key: i=aliceryhl@google.com; a=openpgp; fpr=49F6C1FAA74960F43A5B86A1EE7A392FDE96209F
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4353; i=aliceryhl@google.com;
- h=from:subject:message-id; bh=e73WyOyB+mDDLHLibrQ4vjOLyE9SKfri82WTOXEFb3Q=;
- b=owEBbQKS/ZANAwAKAQRYvu5YxjlGAcsmYgBp+GFAKMS1St3zC0Se2iWAaH7evFPI7zqntrHGm
- yKRSVTsnyuJAjMEAAEKAB0WIQSDkqKUTWQHCvFIvbIEWL7uWMY5RgUCafhhQAAKCRAEWL7uWMY5
- RuE7D/4vIMshog5wxMxLVYiT2zWIQW2eTJ05nCquFUkoBrITs6advjQOzEQrZHoF9fHbIplNp9I
- FbW5IN/0my1AtE1ONhqX3/eyjNgciX51/ZnVfdIopMg8x9TaWPzPhX7rYmBTzTVcqhBK7vsvuKZ
- rnkx9+zNGM2nBKXojrv/wKlp0trlIHIwyvyw9qF16kwhxNc3PH2iYEnQHCSG8i7zmhxW3lowhdR
- n9u97rczFLXnvg1jglpSeS1XiBAJNIYuenCukVFKIUJ11wpTemZaNmW9X+b8NdLkqE171YuqPBw
- TDhjqRKhqggNp9XYTObqhL7j+oJ3ZWijzoRiEFpqZEqdhYVY35Ywr8qQUxzecvhhJ9DfDSHUYqx
- raN2hse1xy3xE9ukK+C2E1ceNA6z0zqeFxAbjkhZwgsO7vmW2m9i800GboaaiMaztBfM44Dph/2
- d4XhDrBuuVoexePsU8IobI0qGjEJkDPnFvCcTEC3qpEvWywGqWprSGIjTcjhrAegb5rcrw/AyNf
- TgZSc1PK8yZFMAE+y4O4e/s/xjurPkYRAFJ+oTzyHBn2oBMYj2fHU+EEo4bSegwsw9XCMc88XEJ
- wDKdqKGtpI10ztMb6mlboCu36IQ7OpG8xmViyX8bJ8yNuG4hurOPwSF/3syZ1+Hiec2lbfcP8FR jGeLc+huavhQpGw==
-X-Mailer: b4 0.14.3
-Message-ID: <20260504-binder-netlink-v4-4-601b41cd25b2@google.com>
-Subject: [PATCH v4 4/4] rust_binder: report netlink transactions
-From: Alice Ryhl <aliceryhl@google.com>
-To: Carlos Llamas <cmllamas@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Andrew Lunn <andrew@lunn.ch>, Donald Hunter <donald.hunter@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Matthew Maurer <mmaurer@google.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	"=?utf-8?q?Bj=C3=B6rn_Roy_Baron?=" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Christian Brauner <brauner@kernel.org>, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, 
-	Alice Ryhl <aliceryhl@google.com>
-Content-Type: text/plain; charset="utf-8"
-X-Rspamd-Queue-Id: 6903E4BAC29
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260414083548.02f76970@kernel.org>
+X-Rspamd-Queue-Id: AB8634BABE6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.06 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[linbit-com.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[linbit.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-283761-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283760-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[google.com,linuxfoundation.org,lunn.ch,gmail.com,kernel.org,davemloft.net,redhat.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.dk,lists.linbit.com,vger.kernel.org,linbit.com,gmail.com,google.com];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linbit-com.20251104.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,garyguo.net,protonmail.com,umich.edu,vger.kernel.org,google.com];
+	FROM_NEQ_ENVFROM(0.00)[christoph.boehmwalder@linbit.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,localhost.localdomain:mid,linbit-com.20251104.gappssmtp.com:dkim]
 
-From: Carlos Llamas <cmllamas@google.com>
+On Tue, Apr 14, 2026 at 08:35:48AM -0700, Jakub Kicinski wrote:
+>On Tue, 14 Apr 2026 14:08:58 +0200 Christoph Böhmwalder wrote:
+>> But we still need to support the current family via a compat path, and
+>> I would much rather have two YNL-based families than one genl_magic and
+>> one YNL-based. Carrying both sounds like a nightmare.
+>>
+>> So the spec proposed in this series would never actually be used to
+>> generate a userspace client, if that's what you're asking. We would
+>> continue to use the current libgenl-based approach, with some userspace
+>> compat shims to make it work with YNL. Then, when "drbd2" comes along,
+>> we could "do things properly".
+>
+>Let's jump to the drbd2 work.
 
-The Android Binder driver supports a netlink API that reports
-transaction *failures* to a userspace daemon. This allows devices to
-monitor processes with many failed transactions so that it can e.g. kill
-misbehaving apps.
+We have a bit of a chicken-egg situation there.
 
-One very important thing that this monitors is when many oneway messages
-are sent to a frozen process, so there is special handling to ensure
-this scenario is surfaced over netlink.
+The drbd2 work depends on the DRBD 9 upstreaming series, since the drbd2
+netlink family will use the new DRBD 9 semantics.
+However, the DRBD 9 series depends on the current DRBD module already
+using YNL (or rather, *not* using genl_magic anymore).
 
-Signed-off-by: Carlos Llamas <cmllamas@google.com>
-Signed-off-by: Alice Ryhl <aliceryhl@google.com>
----
- drivers/android/binder/rust_binder_main.rs |  1 -
- drivers/android/binder/thread.rs           | 10 ++++++++
- drivers/android/binder/transaction.rs      | 40 ++++++++++++++++++++++++++++++
- 3 files changed, 50 insertions(+), 1 deletion(-)
+Our plan is to convert the current family to YNL in-place first, then
+incrementally add the new modern drbd2 family with DRBD 9 semantics in
+another series.
 
-diff --git a/drivers/android/binder/rust_binder_main.rs b/drivers/android/binder/rust_binder_main.rs
-index 2cb9f4897ad7..bbef68993b8d 100644
---- a/drivers/android/binder/rust_binder_main.rs
-+++ b/drivers/android/binder/rust_binder_main.rs
-@@ -38,7 +38,6 @@
- mod deferred_close;
- mod defs;
- mod error;
--#[allow(dead_code)]
- mod netlink;
- mod node;
- mod page_range;
-diff --git a/drivers/android/binder/thread.rs b/drivers/android/binder/thread.rs
-index 97d5f31e8fe3..aa4e93a877ac 100644
---- a/drivers/android/binder/thread.rs
-+++ b/drivers/android/binder/thread.rs
-@@ -1263,6 +1263,15 @@ fn transaction(self: &Arc<Self>, cmd: u32, reader: &mut UserSliceReader) -> Resu
-             }
-         }
- 
-+        if info.oneway_spam_suspect {
-+            // If this is both a oneway spam suspect and a failure, we report it twice. This is
-+            // useful in case the transaction failed with BR_TRANSACTION_PENDING_FROZEN.
-+            info.report_netlink(BR_ONEWAY_SPAM_SUSPECT, &self.process.ctx);
-+        }
-+        if info.reply != 0 {
-+            info.report_netlink(info.reply, &self.process.ctx);
-+        }
-+
-         Ok(())
-     }
- 
-@@ -1332,6 +1341,7 @@ fn reply_inner(self: &Arc<Self>, info: &mut TransactionInfo) -> BinderResult {
-             );
-             let reply = Err(BR_FAILED_REPLY);
-             orig.from.deliver_reply(reply, &orig);
-+            info.reply = BR_FAILED_REPLY;
-             err.reply = BR_TRANSACTION_COMPLETE;
-             err
-         });
-diff --git a/drivers/android/binder/transaction.rs b/drivers/android/binder/transaction.rs
-index 47d5e4d88b07..3fa7091ed8a6 100644
---- a/drivers/android/binder/transaction.rs
-+++ b/drivers/android/binder/transaction.rs
-@@ -3,6 +3,7 @@
- // Copyright (C) 2025 Google LLC.
- 
- use kernel::{
-+    netlink::GENLMSG_DEFAULT_SIZE,
-     prelude::*,
-     seq_file::SeqFile,
-     seq_print,
-@@ -17,6 +18,7 @@
-     allocation::{Allocation, TranslatedFds},
-     defs::*,
-     error::{BinderError, BinderResult},
-+    netlink::Report,
-     node::{Node, NodeRef},
-     process::{Process, ProcessInner},
-     ptr_align,
-@@ -49,6 +51,44 @@ impl TransactionInfo {
-     pub(crate) fn is_oneway(&self) -> bool {
-         self.flags & TF_ONE_WAY != 0
-     }
-+
-+    pub(crate) fn report_netlink(&self, reply: u32, ctx: &crate::Context) {
-+        if let Err(err) = self.report_netlink_inner(reply, ctx) {
-+            pr_warn!(
-+                "{}:{} netlink report failed: {err:?}\n",
-+                self.from_pid,
-+                self.from_tid
-+            );
-+        }
-+    }
-+
-+    fn report_netlink_inner(&self, reply: u32, ctx: &crate::Context) -> kernel::error::Result {
-+        if !Report::has_listeners() {
-+            return Ok(());
-+        }
-+        let mut report = Report::new(GENLMSG_DEFAULT_SIZE, 0, 0, GFP_KERNEL)?;
-+
-+        report.error(reply)?;
-+        report.context(&ctx.name)?;
-+        report.from_pid(self.from_pid as u32)?;
-+        report.from_tid(self.from_tid as u32)?;
-+        if self.to_pid != 0 {
-+            report.to_pid(self.to_pid as u32)?;
-+        }
-+        if self.to_tid != 0 {
-+            report.to_tid(self.to_tid as u32)?;
-+        }
-+
-+        if self.is_reply {
-+            report.is_reply()?;
-+        }
-+        report.flags(self.flags)?;
-+        report.code(self.code)?;
-+        report.data_size(self.data_size as u32)?;
-+
-+        report.multicast(0, GFP_KERNEL)?;
-+        Ok(())
-+    }
- }
- 
- use core::mem::offset_of;
+How would you prefer to handle the YNL switch? If it makes it easier for
+you, just committing the YNL-generated code without the generator is
+fine for me. The old family is effectively frozen, so that would work.
 
--- 
-2.54.0.545.g6539524ca2-goog
-
+Thanks,
+Christoph
 
