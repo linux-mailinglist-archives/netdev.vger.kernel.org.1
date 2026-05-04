@@ -1,221 +1,202 @@
-Return-Path: <netdev+bounces-283706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283707-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oKi4JpI1+GmxrQIAu9opvQ
-	(envelope-from <netdev+bounces-283706-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 07:58:42 +0200
+	id pUF+Lkw7+GnvrgIAu9opvQ
+	(envelope-from <netdev+bounces-283707-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 08:23:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D7704B8BB3
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 07:58:42 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04E3B4B8D4A
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 08:23:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C74C130038D2
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 05:58:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2390830075E3
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 06:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A8E82253FC;
-	Mon,  4 May 2026 05:58:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D6C625B2F4;
+	Mon,  4 May 2026 06:23:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hitachienergy.com header.i=@hitachienergy.com header.b="FL/eEEfO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jKwhjDfP"
 X-Original-To: netdev@vger.kernel.org
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011056.outbound.protection.outlook.com [52.101.70.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8968628C009
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 05:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777874320; cv=fail; b=VEnxusoljVcv21sIIlKXRHYncxen6R+aPnDfDYRTl6FmQC9RdfjkmFrYiC1yYTF90DyOVh+RJCiD+qFx+O7WQLE8Pg8McIG4RTovwJQV+79A1BSS0swUVBl2yFfeNfSJVOiMnkvj4fLsn0DhkwfH05kYS+3sVOE+PGVPqjZCTH4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777874320; c=relaxed/simple;
-	bh=pO7M432LXorKJV0/hujW4Ln6D8PFn6w8rGP/QffMxsc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Pu8I3lb69MuQS18yfCIct4NiFiM2fQQSUvxeKqLSREpUpiiHtYHuNZnmCqsCMt8vC+akUcKdNpsr+bv7/flVCJ0ivu1kshNM5RFp7X+dngTdpX+EryfugvX2Zz6hGWL7sbkYO73MIUbCx6oZMJXo579uu200SaeZoc6c5pJ3Me0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hitachienergy.com; spf=pass smtp.mailfrom=hitachienergy.com; dkim=pass (2048-bit key) header.d=hitachienergy.com header.i=@hitachienergy.com header.b=FL/eEEfO; arc=fail smtp.client-ip=52.101.70.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hitachienergy.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hitachienergy.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vO2v6XbQJHyd0r6tzCYFo/4Zh81nzyknI/5WLphX68Wipw0qRB5dkHbW1lJr9S5b/t4kbWP2dR7iTQ02FWbH6OA5n1uXq3LH2JNSgixCmlJGvU6F75W69XIBck0K6y24sST0w7/pfkD32p3kcsBP9cICGjAmrs2wpWASSYww10gu7NM9AU9pPatlBu/pdKkMeLhc0l/e/vHDCDiOp1Hol4faX/JON7BLeCRsE2bL3wewDgQQy4d1WBNbsmQN+1zSN2Kn3elIWnbESXGItVkARsQPeigi5OZjQRTtqhMiRO4pyu/pXGAHLSPmzKtx9tu7XQ1juTqsH0wsZESBF53SqA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=goS/RWqTYCu+aSndrQeOOU2qMmF5HP0unuX6icaaVbQ=;
- b=MeGEY2katqWHvHoonP7JLz5Lazi3cHNgu4OMWE88hubR6ZE9UuElpx/mLIC+JhqJGPwC+/SaBMl0EL/Ap2V6XQGU0zAzlLfa50Zpz2cI3Z7W1gov7mcwQeBySG99ZddsjKfJy9vpPA55AGTioKzGiMZ/E/HINMILFPwgqv4I8XdWRZGRW25SlsJGdUivCZ6vI77wJh/agLgr71gW/6LIYabs0x2y1Oh5ozxFq6v/R22C0SPsQ/o7mcbZhNLoqRBTn3DleOjvFYkEwwesCYZ5U/6WVrMVUAxUwyo92K4NWIP3KEUd1+OnDWxmedc4WYZNLhg/MezwlFmCzlfpI4B7Ug==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hitachienergy.com; dmarc=pass action=none
- header.from=hitachienergy.com; dkim=pass header.d=hitachienergy.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hitachienergy.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=goS/RWqTYCu+aSndrQeOOU2qMmF5HP0unuX6icaaVbQ=;
- b=FL/eEEfOsY1VrgDQTwalWACxBhBwM4vq6EZYGHdTMN/CtSr14Aydogwq4x924StAIi0LvKK8OXMzsrykqtHq3PPtdnCckCQ5Mp/oWlFIs1Nvd16k7M6CuT0MX7WLIVNppPeMq82z58HophGcH7mU0V3smMAZM+9ucK0d8OpLuS5Ab0SkT/INq43mVGlXeuiLmgo9T+M/5OCOICiv2wfNGp5xtWqMoIuIzmgsCCHDkEIIMTqHnn7tE44Jdz5H4tOEnff/R3UJ84drHaU3DxvckR1K9eGEPXFGpabMTUAF85TYV1BrHw21Auk4GhZIgiLfjQCb1cFO0ayZWh+Lqwi3ag==
-Received: from AM0PR06MB10396.eurprd06.prod.outlook.com (2603:10a6:20b:6fd::9)
- by GV2PR06MB11048.eurprd06.prod.outlook.com (2603:10a6:150:343::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Mon, 4 May
- 2026 05:58:33 +0000
-Received: from AM0PR06MB10396.eurprd06.prod.outlook.com
- ([fe80::f64e:6a20:6d85:183f]) by AM0PR06MB10396.eurprd06.prod.outlook.com
- ([fe80::f64e:6a20:6d85:183f%5]) with mapi id 15.20.9870.023; Mon, 4 May 2026
- 05:58:33 +0000
-From: Holger Brunck <holger.brunck@hitachienergy.com>
-To: Simon Horman <horms@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "chleroy@kernel.org"
-	<chleroy@kernel.org>, "qiang.zhao@nxp.com" <qiang.zhao@nxp.com>
-Subject: RE: [PATCH 1/2] net: wan: fsl_ucc_hdlc: fix uhdlc_memclean
-Thread-Topic: [PATCH 1/2] net: wan: fsl_ucc_hdlc: fix uhdlc_memclean
-Thread-Index: AQHc181CUlbpXlMAkUeEM17nC2/SEbX5HEUAgARIxcA=
-Date: Mon, 4 May 2026 05:58:33 +0000
-Message-ID:
- <AM0PR06MB10396EA1DB3F5A3DD966704D5F7312@AM0PR06MB10396.eurprd06.prod.outlook.com>
-References: <20260429114208.941011-1-holger.brunck@hitachienergy.com>
- <20260501122756.GB15617@horms.kernel.org>
-In-Reply-To: <20260501122756.GB15617@horms.kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=hitachienergy.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM0PR06MB10396:EE_|GV2PR06MB11048:EE_
-x-ms-office365-filtering-correlation-id: 612c9450-7b6b-433e-2d17-08dea9a22cca
-x-he-o365-outbound: HEO365Out
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|38070700021|18002099003|22082099003|56012099003;
-x-microsoft-antispam-message-info:
- be+eak+D5pOXe8ojbyIE57FSvdbbSTQMrap7F1CFewjYMsIbv0KGNnIQIglurGefK90Ao45T3xCv9LWCmNf6iFThDQVVDN3XaebsvpRIQCqFzCsXHlHMoVt8BNe9Yqq2DDx57c4W+2RWbYt6yhe1DgTG30Zy345Ri13/1KyRJ/HA2OZ0iYkwMVbxcYB4F1mlFY1ftX9DkaAYpWZNrNmcx66a93nsHHcbC+hmkz5lI0bP1bXmiXk39HgV+CN6XZrZdRjLRqtk02oHbdKnHMO+3KJ6wYH29nnj1oAkEKD/YV0DofSm4SOuw2e+/t67HsE0QPQGNBNtIbqAc3sZYsggXqPsw9TE8asrBZVwDD33SqS1APL0oRYjr7eMipKfN8vFHyMH21kIpbugY8zVMDJwrDmE+r8iCzB1cUTJhVa/qozHFlCv2zYoXQThjqvi5t6C777Zi5jRDOpJm1rhtMitYIdQDrMqMu4e/g4li4NYx40SmjYIxXIESF4zyJfvoeEHtDJf7FqDFVCSWzDESFgEQlmKPMnckCmdPrG+COmnf//xdz2NkhsknVNXMyClgKS4nhVw0SQdnRLrRXtJnuHsQS/P3DHEwyiUO1Nf8PadcTheb77xwGy0hxqDWsgHIlG6q4xPnmcFrtw0I0CsexaVrrJI/BwxIfD778ZKY65vnIeKwOQ6Q0EX8IEpxQLFrD8dN6Lve0LqVXM+h7rsWGBqf8SJK+LXQlXJ4OMfGm7prxSzWfPaSiV/1fX5QKGOUkDn
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR06MB10396.eurprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700021)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?ggyXwVxrY/dARRcDPxgt5KaMe+/2P58iuUe1RggaRB3z84b1zkBOOMqDBsT5?=
- =?us-ascii?Q?Ifos8qkOu4ojfOvwZHethekE6bQnEIT05eYup4Uc4YkrPKPm+sCLVCPZTZ/5?=
- =?us-ascii?Q?p3iUiuJ9SYkqiOcqc5s9NR2B2Sg/95x3X1hS40uw9BgGzrkZP+JJTfrk2lRN?=
- =?us-ascii?Q?c9HtO7hvQ6BZQChjRgQAuN6Ck2DXsS/ve8VRrUoZ3UaX2yRb974oFoqurRCc?=
- =?us-ascii?Q?XANrkk0LOgRuv18d/YsJS2mF7Q16Tso1p+CzPPDharg+DR+ZpefGYpfdw5FO?=
- =?us-ascii?Q?dtrDkOdvK8/meW3YXys0k2zR2+hkEb0CD8pjBGnM5vmiT6xAF9W2U6Q8ZXlp?=
- =?us-ascii?Q?1qOEOd6Y/Y5Wq3Fs3QfgJzQxry1Vcmy+cFfEEvVpxOqP9aejhmNQXL1mnhw3?=
- =?us-ascii?Q?9z/ZAzQdg8W3AXAPtKjNafoTRDNICdGPzR3gAqXRnKGUKA4EXGBOAkAt45cl?=
- =?us-ascii?Q?/L44gfGVf3PHymt4SGivWfkLje/4OI0qcoi/AxVrUr/fUDBLQEq95W0cSy21?=
- =?us-ascii?Q?w75E+DqwmmcNhqIPuNbaDjG8pKQOPJRpYWJmuz8yIpnFPQaOl1qwhVD3Yq1f?=
- =?us-ascii?Q?owprCtzT5GSw5xQyrG1nY+G0lNsDq9Uiepkw2Z88C47l0P/AqtDOvnU89+OC?=
- =?us-ascii?Q?ad4nK24D2dxlXPIaf+wF+EgNRjIRxCUazzZ5AsH9Qglbi1jkdlqqkA6Ad2VS?=
- =?us-ascii?Q?kZJNs1zSWwpyxn0ozL3zKZ2e+hFNGA3etX5KInJihQPChNPlVLegXumRWI3P?=
- =?us-ascii?Q?ZBOTLFy9Rxl1H32vEciLmOAeEYkv7EnuF0/ITCesvc5yZcLEmQ1JEjFPXf+A?=
- =?us-ascii?Q?kkUD3hWzGqttavf6hSI6o76Sv1j0zl/ZwzyMePHESnXa/8wr4PSFKAEd9nLt?=
- =?us-ascii?Q?K9hEMS7X0d81ctYiVkqIzZ0zhvQPQcer0q852asn7ut/vAMdVH7R/F88nhLy?=
- =?us-ascii?Q?xiNS1lAQWaCfJDXTkEJKCeLHcY4ZPHIy6IK7tDu1TQ11mA6NG6YEKDaYNdJS?=
- =?us-ascii?Q?6qCGIAhKQ9iCQXZsytbfjElFP7Izyrnzb8P3AG42auGq5fIIgJfRXzNx7zdP?=
- =?us-ascii?Q?t2UwyYo3X1vrM13G5K6ZACbx8RUZc8o+Jc+hgSh5A35PGrDz8Gy8DEMMPB60?=
- =?us-ascii?Q?tk6Tvmp/UYQK4Ya2ceZJVhBWjNpYr6+xWy0KBfK3cC0yd7CXvcRnghXnkea7?=
- =?us-ascii?Q?vJ66gGa5N9TEEDbb6CJkW8auuRXQ9ykaLkwJu2WoUnxNAOUccc/JpEPE7UFM?=
- =?us-ascii?Q?NFDPHt9lTj3+ROceiBqYjpJDJSynGLsKYe1nQ4vnNwwQQxnaG9QiAR+HwK/9?=
- =?us-ascii?Q?I2j64cP2mx/dErMBq9PyxP79m4e5KAhRzupparQiBGUMemOh84arIoMJwbIe?=
- =?us-ascii?Q?jBDLpGBYKCah8rSEjkq9Gkb/ORv7rNHlz2lnbL34d6GiePwGGRs5FkVbQKe8?=
- =?us-ascii?Q?Lw+Ie4ptzTFILNLqC75HDmPOqefUTi5shEnnDOnuF9v0NqpMgHit18n4CgYT?=
- =?us-ascii?Q?5+n2mGpaR5aT9wvHvdJT2pE1IqEH5VMtZs/Xi7IWUUYHE6IR9jol1aFNcUlP?=
- =?us-ascii?Q?cDvZDacnYPqHtE5fOWUyIikaLoGX1ebS4SfbZyNO/xDzvZ7G6zFv9VMFdsrb?=
- =?us-ascii?Q?3pFyjmcDYfe2Itri49WTgZ9dPXwsUx/c7W8VYlNjLX/zatkqkntG7ijqeNyH?=
- =?us-ascii?Q?1DcpV9WVttRLc2j0QDXNjMe2e9PhxbELAvqqVqi8ywdSAMqZfBqDICABJzmT?=
- =?us-ascii?Q?OLCr6KRVVJelqcVrxtC86iSokF/lDrE=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D438D14AD20
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 06:23:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777875784; cv=none; b=kQdwSmJVK+V0CYqLFLAQHn7yIM4pRG8Om7SSJcQJc4VJFnHWVD7p8ctH8RLTFMgeyAc1aV4cIZiuRBWH8XeRJjISVWtVjSv5RK26dFjvX70z5w0ytrGDxvnZOFkgO7l+JRxlYnBTHME/s9lBYllEdCcv6qYqF1mOeN4cytZoyqY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777875784; c=relaxed/simple;
+	bh=OUJKAnSSKBK4NVixGUpnELUihzSk6cas2RIndIcRiLM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PWdwvw79IkU7tlpaay7lb94ubJnZWW3/d8RVswqU5er/fpIjYRj9Ctt+T/NxHcXgSFlqmbMEgx7ZfgSdv1NvI0v73/MOzidroAoJnQYBPeWAnpGl+cQj232rYSUNG8DLjbGUhgX6mvF6+kUBPt+eD75mz5kJKly9+ZaA7h4qiNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jKwhjDfP; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-488e1a8ac40so34980745e9.2
+        for <netdev@vger.kernel.org>; Sun, 03 May 2026 23:23:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777875781; x=1778480581; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SsKY674gEcmVloxh8QcPPtKruXs8CJmiJS+7itrX6N0=;
+        b=jKwhjDfP55dnzcjlbdaQiQ13PX8YQ1gPGXHS/itau/WvctBdu6X6UmXC+78b2qCumH
+         ypfRzhTGdLl774ejJN3UBrRpSUcDi4xiU1rlVDQXYSX8sH6vMFPzOIu/Hzk2FwPmf5QU
+         dVzFzKO38MVPG0zF3WccKDLc7Rtcz6NV1vKTpmR6vypl2Jvqq82p6hbkPe73k4fZmVYf
+         MV1xj3rs0oOI61stMMN0lwJo+eOak3KxssNpMSQeoOJyTa2VrVx3X3EmPYSL13XorJPk
+         EfuT9uKshCuQKCoW4qj5bEDIhkCkIxn24wDhONI5OPtwNIXQPq3qeyCYaTnA/gQOJPAX
+         +oug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777875781; x=1778480581;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SsKY674gEcmVloxh8QcPPtKruXs8CJmiJS+7itrX6N0=;
+        b=lzcbi7cgZbVDUSu5U5wav+LfRq1N/ywEcpYEDQx/d/RTGlZ4ySwB70pE3+3QvH1SxZ
+         x6xSgFXVr4wxNL7GRjCKI0uZxRLZ3u2Z0zgk+sHyoZT4Oms9Z6ID6GvoeCZXb7yzAyKR
+         NAchyiWn91C8lXDfTnPXWhVw/dXi4ypCYp+RxxaTHhTME5ktX+ELUpOJoxem4kxIL8Ex
+         Xs7BYtKDx0fNG4sMVecFHT1JIAWGl+QHnmoLVIvqNJi6umwVdr1SG4MJrV3QmYtsAJz5
+         SSlEbGGh3M0xDye4w9MvKMEm1fqeKxAAAOT+DfYxVbrOgjfJv55OF9b3xJP/+g4t5A69
+         nPCQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/njfCmTRN2XKaUnk/QJ5qnLK8SvQBXa4PZGLMwJxLCxuEv4STzkdxWDFGARqIuGwuXRL79lkI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywi6IdZysdxlOT/2fA7ndDs/nO6FETBxfl2S5j4sBjujuA9td7k
+	FaaWhu8eBq26z9/mbqacWPkMKkRXT4llusmTiOjOZXk+UPKRDM3I7EOs
+X-Gm-Gg: AeBDieuC9VDB79XRA2KCxq/0RAFccmBujw5dOPprrQE5nTxIBLs5XMGJsDleqvlH+PZ
+	c9qnbsG/4FxFarV+wABVUNSCcAjrdFB00oJZkkEI7VRh4bAozAOdwLwuOhBFkzEj4fpARPtoK6m
+	ESjclUlueyEC33pYp3ZUfUM4Aq32vYgJRnpJLs5gzIRYvBESlizIb3H5OTgFMP5xcXoqwZKXJI8
+	ZhuKSXzNJygeBDiagpdfNK4gC6DQ+dCl3OKliAnBZUdYNneVlc/pdmT6BLDn/aCZfEGHv2AfZMc
+	oWKhEe49fgqDDh5u4jfhHR45DRvV7ucwut7p0CH+2NJtnqQ3rmaehbuC4xudJsrQBGy04Zlh0q+
+	xIRclvn7Cp7yaHVwwDHv+ugmQAtUnU75PUgiHB3Zk1+hy2KF3ay/cN3WrKVgCmEBHfYUQWl2IvV
+	jdCzkyqN4CGbaxSJaeFPuVEHxVfCTB9+UrFqFRlmKJT8YoU7ZNmOawOyqCQic/3t81AuM49H3m9
+	QjGZ3r1to78lJ9dDOErjw==
+X-Received: by 2002:a05:600c:8590:b0:489:1f3e:5f6f with SMTP id 5b1f17b1804b1-48a98636c00mr95678385e9.12.1777875780935;
+        Sun, 03 May 2026 23:23:00 -0700 (PDT)
+Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a81b99127sm297500385e9.0.2026.05.03.23.22.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 03 May 2026 23:23:00 -0700 (PDT)
+From: David Carlier <devnexen@gmail.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: David Carlier <devnexen@gmail.com>
+Subject: [PATCH] ixgbe: E610: do not fill EEE lp_advertised from local PHY caps
+Date: Mon,  4 May 2026 07:22:57 +0100
+Message-ID: <20260504062257.77460-1-devnexen@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: hitachienergy.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR06MB10396.eurprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 612c9450-7b6b-433e-2d17-08dea9a22cca
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 May 2026 05:58:33.4036
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 7831e6d9-dc6c-4cd1-9ec6-1dc2b4133195
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: VAdVORKISYmfwpVyVK8ueKG8T6m4LBArpxSvgvcE2wMDcGjQhFYxzODgcv+p7b2yrnb1qZ57h+0Pq3ZEv4iGwM3kw0bxCrpCEYT2puCH+Xg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR06MB11048
-X-Rspamd-Queue-Id: 0D7704B8BB3
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 04E3B4B8D4A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[hitachienergy.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[hitachienergy.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283706-lists,netdev=lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-283707-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[holger.brunck@hitachienergy.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[hitachienergy.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.996];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,hitachienergy.com:dkim,hitachienergy.com:email]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[]
 
->=20
-> On Wed, Apr 29, 2026 at 01:42:07PM +0200, Holger Brunck wrote:
-> > Unmapping of uf_regs is done from ucc_fast_free and doesn't need to be
-> > done explicitly. If already unmapped ucc_fast_free will crash.
-> >
-> > Signed-off-by: Holger Brunck <holger.brunck@hitachienergy.com>
->=20
-> As a fix for code present in net, this warrants a fixes tag that cites th=
-e commit
-> that introduced this bug.
-> Perhaps this one is appropriate.
->=20
-> Fixes: ca20e191eed0 ("net: wan: fsl_ucc_hdlc: fix ucc_hdlc_remove")
->=20
-> Also, as a fix for net it would be best to explicitly target that branch,=
- like this:
->=20
-> Subject: [PATCH net 1/2] ...
->=20
-> I don't think it's necessary to repost to just to address either of the a=
-bove.  But for
-> reference more information on the Netdev development process can be found
-> here:
->=20
+ixgbe_get_eee_e610() fills kedata->lp_advertised from pcaps.eee_cap
+returned by ixgbe_aci_get_phy_caps() with IXGBE_ACI_REPORT_ACTIVE_CFG.
+That report mode (and the other IXGBE_ACI_REPORT_* modes) describe the
+local PHY only, not the link partner. The X550 path uses a separate
+FW_PHY_ACT_UD_2 activity for partner data; the E610 ACI has no
+equivalent.
 
-ok I will take care of this next time.
+Leave lp_advertised zeroed via the existing linkmode_zero() and drop
+the now-unused ixgbe_eee_cap_map[]. eee_active/eee_enabled are
+unaffected (sourced from link.eee_status).
 
->=20
-> The above not withstanding, this looks good to me.
->=20
-> Reviewed-by: Simon Horman <horms@kernel.org>
->=20
-> FTR, an AI generated review of this patch is available on sashiko.dev.
-> All the issues flagged there seem to be pre-existing and I do not believe=
- they
-> should block progress of this patch. But you may want to look into then i=
-n the
-> context of follow-up.
->
+Fixes: b61dbdeff3a9 ("ixgbe: E610: add EEE support")
+Signed-off-by: David Carlier <devnexen@gmail.com>
+---
+ .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  | 20 -------------------
+ 1 file changed, 20 deletions(-)
 
-Thanks, I will have a look at this.
-
-Best regards
-Holger
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+index 6990fe53f049..36e43b5e88d1 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+@@ -3558,17 +3558,6 @@ static const struct {
+ 	{ FW_PHY_ACT_UD_2_10G_KR_EEE, ETHTOOL_LINK_MODE_10000baseKR_Full_BIT},
+ };
+ 
+-static const struct {
+-	u16 eee_cap_bit;
+-	u32 link_mode;
+-} ixgbe_eee_cap_map[] = {
+-	{ IXGBE_ACI_PHY_EEE_EN_100BASE_TX, ETHTOOL_LINK_MODE_100baseT_Full_BIT },
+-	{ IXGBE_ACI_PHY_EEE_EN_1000BASE_T, ETHTOOL_LINK_MODE_1000baseT_Full_BIT },
+-	{ IXGBE_ACI_PHY_EEE_EN_10GBASE_T, ETHTOOL_LINK_MODE_10000baseT_Full_BIT },
+-	{ IXGBE_ACI_PHY_EEE_EN_5GBASE_T, ETHTOOL_LINK_MODE_5000baseT_Full_BIT },
+-	{ IXGBE_ACI_PHY_EEE_EN_2_5GBASE_T, ETHTOOL_LINK_MODE_2500baseT_Full_BIT },
+-};
+-
+ static int ixgbe_validate_keee(struct net_device *netdev,
+ 			       struct ethtool_keee *keee_requested)
+ {
+@@ -3645,7 +3634,6 @@ static int ixgbe_get_eee_e610(struct net_device *netdev,
+ 	struct ixgbe_aci_cmd_get_phy_caps_data pcaps;
+ 	struct ixgbe_hw *hw = &adapter->hw;
+ 	struct ixgbe_link_status link;
+-	u16 eee_cap;
+ 	int err;
+ 
+ 	linkmode_zero(kedata->lp_advertised);
+@@ -3670,14 +3658,6 @@ static int ixgbe_get_eee_e610(struct net_device *netdev,
+ 	if (kedata->eee_enabled)
+ 		kedata->tx_lpi_timer = le16_to_cpu(pcaps.eee_entry_delay);
+ 
+-	eee_cap = le16_to_cpu(pcaps.eee_cap);
+-
+-	for (int i = 0; i < ARRAY_SIZE(ixgbe_eee_cap_map); i++) {
+-		if (eee_cap & ixgbe_eee_cap_map[i].eee_cap_bit)
+-			linkmode_set_bit(ixgbe_eee_cap_map[i].link_mode,
+-					 kedata->lp_advertised);
+-	}
+-
+ 	for (int i = 0; i < ARRAY_SIZE(ixgbe_ls_map); i++) {
+ 		if (hw->phy.eee_speeds_supported &
+ 		    ixgbe_ls_map[i].mac_speed)
+-- 
+2.53.0
 
 
