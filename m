@@ -1,241 +1,175 @@
-Return-Path: <netdev+bounces-283969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283970-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gGSrGmHW+GlR2AIAu9opvQ
-	(envelope-from <netdev+bounces-283969-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:24:49 +0200
+	id kLOLOjfa+GnG2QIAu9opvQ
+	(envelope-from <netdev+bounces-283970-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:41:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF98D4C1E46
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:24:48 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59C674C2012
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:41:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0991A304BD96
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 17:19:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A60E430104B5
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 17:41:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48C073E0C74;
-	Mon,  4 May 2026 17:19:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 004583E3DB3;
+	Mon,  4 May 2026 17:41:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="HLg1jwQv";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="UDtc9tn6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="In0E+sY4"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F4DB34CFDD;
-	Mon,  4 May 2026 17:19:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A48093E3D89
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 17:41:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777915191; cv=none; b=lYn01yCMyyP2ohqK++/4jPcSfesyZ1jMSHr8hJwq6Oc7E6z6dZunGPaNsvpTf+CUVjWy04gZmKX/EDNu8OShVsyRUfyv31xse8pyC3Z0XMyx5XHWwfLZdVG9vFUZskt98mtvuLvZFW8E6yuV70vZQYYfmN07359+ubS7LuFxiyY=
+	t=1777916466; cv=none; b=hwxrf/VNlPRH/1vOO3A59osb00AbYiSgHCBCtAg2k51v0zhI4Y3DSf/8RfnuPK3+p28CiYRxpL0dbGwwuxcQa0l05/d/kgJa4DY9FAE0r2dmK5087vbOggDtIWy/+y7l3+O5PPsf7KhZXFVI9xksbEuB78HkSAd9EEiq2FfMIUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777915191; c=relaxed/simple;
-	bh=lICNTNrFPr4USG5uODYfiY/UKX7d8HIgK8u4F6i4kbs=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=AzxLlhR7zfS7W5vrRmoHpE19kyw3wyJuxJQUDO1/Ci7NwsD0HkBPUQL5GBhy5Gz7nKTk6fr85Ge5zUaGFQ82lyz6n+Oi1uYcXfBPEWKNxVSXBEQFF8aAOis9qgVcE70IvlkFG4r0nDVTR2XInc52C7MPZSBe42YRNSx5Tnl0VPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=HLg1jwQv; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=UDtc9tn6; arc=none smtp.client-ip=103.168.172.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 332E21400147;
-	Mon,  4 May 2026 13:19:48 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-04.internal (MEProxy); Mon, 04 May 2026 13:19:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1777915188;
-	 x=1778001588; bh=WGiGQOyaGwv7FZl7+rlUdXd7BeeldqbKfQtj/iAX1Jk=; b=
-	HLg1jwQvS7ZqlJFtylk993phBsLKxPz1nfazf6HxZeaWoWl/6knObNVwP2eHZJ40
-	EVfvcYQTzYsoKDJ/p88ljBbm7QgQdUOotOOh8jFnGmwTZ0ef6BA+P+7sDTOIAsli
-	S+TfshxGfBYO1Bzw0Rbsvh8ZsvgYwNhWGkyfGsuJCQteQiZealS4+2tYNY6Hibwv
-	+F7qZ0wjYeIeeDZY75zVqlgrt5D9QSlNxj5u7hQx8kAL5qzh0KXwQvHIouGz0KiA
-	1Wty3n+RBqCtH7whK2b2GJB+Xzx06v8P4xNBo9Nfp5umtQFUPcSjq+SGmKAqn/af
-	SJAq62TWugmGb3Y35H8TUA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1777915188; x=
-	1778001588; bh=WGiGQOyaGwv7FZl7+rlUdXd7BeeldqbKfQtj/iAX1Jk=; b=U
-	Dtc9tn6Jt4JrSgcx2thtneOxZKhtGBS7DLH+qF+Ons3aXAJzunC6LTZkYPS3Cg9Y
-	t2VqqdEgb+8zUgQENZL3mwdzYQ4cZDMu5Zr04CJ+oSCdjEW9/VZScV1BLpEps58z
-	lleLsjqjrKscIzFCWRMOg2w85AhaUlBXiYjHWudNrQ8HyPqJ6Ht3419uPKronioz
-	GP5yQYqme8aAItTqYlz5qjmunTWoESF4Ix+6g7zlczXIKT9ZZeDRWXLWOWhEuDjn
-	jX2sBuFVh+jxAYt5ML7Lcu0GzdLK8AMLHi1gJw0vjPnMirk5BzznumjCI66Lfs+L
-	w1bi66cb5PAaMhb4hnLug==
-X-ME-Sender: <xms:MdX4afa1pBs5uEG_t3f12Z-gE9HTxgmzMUZycLEed8FWRbVzrWLicQ>
-    <xme:MdX4aZNR866_s47xDdRjNjZVK1LgNhJm-z3o2QH-xJ7qzzUn8VAxXdnR0MfZwB7fi
-    pkRJeLANLJJBDdvCQumEy3VqJNiQQ3S9QCadfgAOfSwfj8SsxLpz2OV>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdelleegvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhhnugcu
-    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
-    hnpefhtdfhvddtfeehudekteeggffghfejgeegteefgffgvedugeduveelvdekhfdvieen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnug
-    esrghrnhgusgdruggvpdhnsggprhgtphhtthhopedvhedpmhhouggvpehsmhhtphhouhht
-    pdhrtghpthhtohepphgrlhhmvghrsegurggssggvlhhtrdgtohhmpdhrtghpthhtohepug
-    grvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrohhusegvvggtshdr
-    sggvrhhkvghlvgihrdgvughupdhrtghpthhtohepshgufhesfhhomhhitghhvghvrdhmvg
-    dprhgtphhtthhopegrlhgvgiesghhhihhtihdrfhhrpdhrtghpthhtohepjhhohhhnrdhf
-    rghsthgrsggvnhgusehgmhgrihhlrdgtohhmpdhrtghpthhtohephihurhihrdhnohhroh
-    hvsehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdr
-    tghomhdprhgtphhtthhopehruhgrnhhjihhnjhhivgeshhhurgifvghirdgtohhm
-X-ME-Proxy: <xmx:MdX4afzHdMEtgThUZaAWI6SFPmBNRmeC1NRAxO4cXWsioEaIeremRA>
-    <xmx:MdX4aXINmE_2brig3dXmo6YXPUC02VALRoMOVz6BP2wKMlZyJoF9WQ>
-    <xmx:MdX4aWoswhdJLUXWit56efNJntJjmZMcBrEvsiFN9rA5dPuiAecUCQ>
-    <xmx:MdX4aVvc_FbpGTK9ef68zBUtvGYiu-uzO1xgMmjMDNfjpVvSmayyEg>
-    <xmx:NNX4adZkAFqLSMqD_KSGzTMioWXpn0lYpHN-tV27TAbnGDgwhv0TrZv8>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id D122270006A; Mon,  4 May 2026 13:19:45 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1777916466; c=relaxed/simple;
+	bh=1UsReSX+8wdCLHB7KFJQ+E5VgWUto9I66Wc7oO8lIyc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aoy8CR9ar0NMDYcOOzLYTf0L3Gsd4Di4qnOXMrA1dEIIThCbgbVndGTP7J99xWSJy9Vncnn6WZ4AlTvsulMvUjsJDvnbZtJTzSFe92bjpJbZt4asIo9gIYobxY26NErqibQ1HuEPHnPnQShpJHbjhL6/gdBaG4Nc5mrc0ydzp0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=In0E+sY4; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-79495b1aaa7so46240477b3.1
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 10:41:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777916465; x=1778521265; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MVXd468iEVfxLrg6jVOPb84V8zxADSA4fIpheWYNkXw=;
+        b=In0E+sY40WjXr38vjuFwqy9YAP9Uo5UgBmqy3Qprdg5mlu2uyL3cy122gNEsaFn7dW
+         hemO1tPw3qQKb/8uImOiRWerTgkuXuMxY9hC5ksTd15rzo7mvVVgKwbO2iwXgj1M0DRS
+         tOz/dABDMi9XANL5ylOcZmTqAdGzRyX9eFFhieD8mhKYmdv0C4XnPJaRSdopimwHWP1C
+         wtpswnK194r2H0ywyWanBu80k9l9BwvH1QkO3dB1rQkAg+Li1zNA81PQdrLFspAbftCt
+         mUPWMh2QQPtS8e+PX8vL+Y99AaJllfysXy505pavZqqNorromYownMlnhXrwWxZi4Mtm
+         pZlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777916465; x=1778521265;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MVXd468iEVfxLrg6jVOPb84V8zxADSA4fIpheWYNkXw=;
+        b=NMq8rXOdMQvSJcY42UBswvEfdDYIDJbQPmCQYY3i6oJpE4z+sDFSKP2MIfR5A9bVoT
+         JDGaTmGpywwkZCv64vzswIc6RaINFUG4dkXkuU936sXnorQ84oIEsY4hm8sZO1cDcQi/
+         WR5x9gpEgzZqwTZAQqm/n7cIVkd3x2mTWhjMK/Md9522SioAh4dEGNpPZXIP8mUwyu3M
+         P15tIIMzEGr9LVsF5djV1rUAP6dKarOYUH5mL/ilwbp4ZDD19FQGu8dsXTboe+JEloPY
+         Hsit09RAMfl0uu0FqV5vuV1K+ewHbnTPqj0hTna88iYnKAC8ZY6+nklhk2q4FAvd9v11
+         j7gw==
+X-Gm-Message-State: AOJu0YzI1IcTPTlE8T7RUFah474GfLKmAc5dT27/nF7JLh9yIFdPN3zH
+	2Mp5LNy4ww5Vpm6w+rPr5HT8U4obMS9bPUMBBrkuRbRrd/KX/DuN4WgQbT249Q==
+X-Gm-Gg: AeBDietHd1kPwioZlhuVn4V8L/idNk9dIS1Wt5vgy4MBMaMhhwz60DMgij6ZIxmBDfh
+	/EViOYsDShORzoVaZxk7yk4qrUJiLsaJwsbWaffgmuG74/QyX4QHxNIhMFbZx4em+YbTEgUzfq6
+	D3ywzHAXaCMPuRIroQ6D4l8REZHE75y7xXGjukWI0wOlXdQDEpVzu4CSqOA4KvVZIFYkoRoQohg
+	QeNjoy+b/ncm6bobQK2lzKtoRB13/ZqHgGqW8qtzOdcnB4uDU1pMfSzdqv4D6CeWuciso4H6Jfq
+	4mJlDRDqVoJenDwXCesj5TgYXGToVZiDIp6iAxCON8J6MxYJYqFOv6OdlMlM7O3i1BgZmxRpzxV
+	Tux/3pqp78LAPRofs0Y4dvkaZowYDG+Cgvt2yMNpoTeyXPezct4YxoIxMXoNlP6xT0hGOCkEC5X
+	rC6ry3qCsdZmeWzQhvY7QcLMANYvZOXINb6tUKFvdqwcNVEPpjHzaZduEAVMzlFW9UeCngqPoV9
+	h2ARpQtaPwD2hcEnR1B4beg5dDo3FUGOGjf2g==
+X-Received: by 2002:a05:690c:c0b:b0:7b4:b591:e77e with SMTP id 00721157ae682-7bd76fdb62bmr112277547b3.18.1777916464547;
+        Mon, 04 May 2026 10:41:04 -0700 (PDT)
+Received: from willemb.c.googlers.com.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7bd6685d0cbsm51551767b3.35.2026.05.04.10.41.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 May 2026 10:41:02 -0700 (PDT)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	shuah@kernel.org,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next v7 0/3] selftests: drv-net: convert so_txtime to drv-net
+Date: Mon,  4 May 2026 13:38:31 -0400
+Message-ID: <20260504174056.565319-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AduvTQsiZ6dJ
-Date: Mon, 04 May 2026 19:18:49 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Yury Norov" <ynorov@nvidia.com>
-Cc: "Paul Walmsley" <pjw@kernel.org>, "Palmer Dabbelt" <palmer@dabbelt.com>,
- "Albert Ou" <aou@eecs.berkeley.edu>, "Alexandre Ghiti" <alex@ghiti.fr>,
- "Yury Norov" <yury.norov@gmail.com>,
- "Rasmus Villemoes" <linux@rasmusvillemoes.dk>,
- "Andrew Lunn" <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>,
- "Andrew Morton" <akpm@linux-foundation.org>,
- "Alexei Starovoitov" <ast@kernel.org>,
- "Daniel Borkmann" <daniel@iogearbox.net>,
- "Jesper Dangaard Brouer" <hawk@kernel.org>,
- "John Fastabend" <john.fastabend@gmail.com>,
- "Stanislav Fomichev" <sdf@fomichev.me>,
- "Ruan Jinjie" <ruanjinjie@huawei.com>, linux-kernel@vger.kernel.org,
- linux-riscv@lists.infradead.org, Linux-Arch <linux-arch@vger.kernel.org>,
- Netdev <netdev@vger.kernel.org>, bpf@vger.kernel.org,
- "Nathan Chancellor" <nathan@kernel.org>
-Message-Id: <9d45acd1-667b-4acf-9e2e-bcd79630d726@app.fastmail.com>
-In-Reply-To: <afjNaToyptiMogV4@yury>
-References: <20260430211351.658193-1-ynorov@nvidia.com>
- <20260430211351.658193-2-ynorov@nvidia.com>
- <ec4ed7f5-b1c8-49e4-b83d-e29c5414b9de@app.fastmail.com>
- <afjNaToyptiMogV4@yury>
-Subject: Re: [PATCH 1/6] lib: include crc32.h conditionally on CONFIG_CRC32
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: BF98D4C1E46
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 59C674C2012
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.65 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[arndb.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[arndb.de:s=fm2,messagingengine.com:s=fm3];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
-	TAGGED_FROM(0.00)[bounces-283969-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	FREEMAIL_CC(0.00)[kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,gmail.com,rasmusvillemoes.dk,lunn.ch,davemloft.net,google.com,redhat.com,linux-foundation.org,iogearbox.net,fomichev.me,huawei.com,vger.kernel.org,lists.infradead.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arnd@arndb.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[arndb.de:+,messagingengine.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283970-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,app.fastmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,arndb.de:dkim]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On Mon, May 4, 2026, at 18:46, Yury Norov wrote:
-> On Mon, May 04, 2026 at 10:03:10AM +0200, Arnd Bergmann wrote:
->> On Thu, Apr 30, 2026, at 23:13, Yury Norov wrote:
->> I'm not following that description. Why is it an error to declare
->> a funtion that is not implemented? Isn't that how optional interfaces
->> tend to work in general?
->
-> Never heard about such a thing like "optional interface". And git grep
-> tends to second that...
+From: Willem de Bruijn <willemb@google.com>
 
-I meant any library interface that can be turned on or off
- 
->> > The only header requiring the crc32 and bitreverse prototypes is
->> > include/linux/etherdevice.h. Thus, protect inclusion of corresponding
->> > headers in the etherdevice with CONFIG_CRC32, together with the only
->> > function depending on it.
->> ...
->> >  #include <linux/if_ether.h>
->> >  #include <linux/netdevice.h>
->> >  #include <linux/random.h>
->> > +#ifdef CONFIG_CRC32
->> >  #include <linux/crc32.h>
->> > +#endif
->> >  #include <linux/unaligned.h>
->> >  #include <asm/bitsperlong.h>
->> 
->> Don't add #ifdef blocks around headers. If the header cannot
->> be included without side-effects, change the linux/crc32.h
->> file instead of its users.
->
-> linux/acpi.h does that like many othes. What exactly is wrong with
-> protecting headers inclusion?
+In preparation for extending to pacing hardware offload, convert the
+so_txtime.sh test to a drv-net test that can be run against netdevsim
+and real hardware.
 
-There is no "protecting" here, you just add complexity to the
-build when headers are sometimes included indirectly and but
-other times are not, depending on kernel configuration.
+Two preparatory patches
+1. support negative tests, where tests are expected to fail
+2. add a tc helper 
 
-It's unlikely to cause problems for the crc32.h header, but
-the acpi example definitely risks running into circular
-inclusions when you end up with some other header that depending
-on configuration ends up including linux/acpi.h while also
-bring included indirectly from that one.
+See individual patches for details and detailed changelog
 
->> It looks like the problem is the check for CONFIG_GENERIC_BITREVERSE
->> in include/asm-generic/bitops/__bitrev.h, which ends up
->> hinding the generic___bitrev32() helper without need.
->> 
->> Simply removing the #ifdef there should avoid the build failure.
->
-> OK, it seems like this is what I don't understand.
->
-> We've got an optional feature, like CRC32, which is enabled by
-> CONFIG_CRC32. The most conservative way is to declare everything
-> CRC32-related in the corresponding header, and then protect the header
-> with IS_ENABLED(CONFIG_CRC32).
->
-> I understand that from practical perspective, we can declare some simple
-> macros, like header size, unprotected. But what we've got now is a sort
-> of mess: all CRC32-related functions are declared unprotected, and
-> generic headers are good to use them. Compiler is happy while those
-> functions are actually unused. Next, CRC32 depends on BITREVERSE, which
-> is again unprotected, and it may optionally have an arch implementation.
->
-> So if arch bitrev() is implemented, you can use part of bitreverse and
-> crc32 APIs despite that they are explicitly disabled - just because they
-> are implemented as macros in unprotected headers. And you cannot use some
-> others - because they are implemented differently, as a real functions.
+Previous versions:
 
-I think you trying to solve a non-problem here. It is extremely rare
-for any kernel to be built without crc32 or bitrev. Even in randconfig
-builds, both are usually selected by some driver. The behavior
-we've always had here is that in the rare one randconfig in 10000
-that hits the one driver missing 'select BITREVERSE', we get a link
-failure with an obvious fix. If you add the extra #ifdef, it gets
-a little more likely to actually run into the bug, and it shows
-up a little earlier as a compile failure instead of a link failure,
-but otherwise, nothing changes.
+v6: https://lore.kernel.org/netdev/20260430132820.1944517-1-willemdebruijn.kernel@gmail.com/
+v5: https://lore.kernel.org/netdev/20260427201640.294694-1-willemdebruijn.kernel@gmail.com/
+v4: https://lore.kernel.org/netdev/20260409164238.661091-1-willemdebruijn.kernel@gmail.com/
+v3: https://lore.kernel.org/netdev/20260406025020.1636895-1-willemdebruijn.kernel@gmail.com/
+v2: https://lore.kernel.org/netdev/20260405014458.1038165-1-willemdebruijn.kernel@gmail.com/
+v1: https://lore.kernel.org/netdev/20260403175047.152646-1-willemdebruijn.kernel@gmail.com/
 
-       Arnd
+Willem de Bruijn (3):
+  selftests: net: py: support cmd verifying expected failure
+  selftests: net: py: add tc utility
+  selftests: drv-net: convert so_txtime to drv-net
+
+ .../testing/selftests/drivers/net/.gitignore  |   1 +
+ tools/testing/selftests/drivers/net/Makefile  |   2 +
+ tools/testing/selftests/drivers/net/config    |   2 +
+ .../selftests/drivers/net/lib/py/__init__.py  |   5 +-
+ .../selftests/{ => drivers}/net/so_txtime.c   |  25 +++-
+ .../selftests/drivers/net/so_txtime.py        |  96 +++++++++++++++
+ tools/testing/selftests/net/.gitignore        |   1 -
+ tools/testing/selftests/net/Makefile          |   2 -
+ .../testing/selftests/net/lib/py/__init__.py  |   4 +-
+ tools/testing/selftests/net/lib/py/utils.py   |  51 ++++++--
+ tools/testing/selftests/net/so_txtime.sh      | 110 ------------------
+ 11 files changed, 166 insertions(+), 133 deletions(-)
+ rename tools/testing/selftests/{ => drivers}/net/so_txtime.c (96%)
+ create mode 100755 tools/testing/selftests/drivers/net/so_txtime.py
+ delete mode 100755 tools/testing/selftests/net/so_txtime.sh
+
+-- 
+2.54.0.545.g6539524ca2-goog
+
 
