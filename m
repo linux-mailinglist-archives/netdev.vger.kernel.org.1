@@ -1,180 +1,155 @@
-Return-Path: <netdev+bounces-283975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283973-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gKxwDZja+GnG2QIAu9opvQ
-	(envelope-from <netdev+bounces-283975-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:42:48 +0200
+	id kEd7FmDa+GnG2QIAu9opvQ
+	(envelope-from <netdev+bounces-283973-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:41:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E965F4C20A5
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:42:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADEC94C2058
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:41:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 191AE3020840
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 17:41:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8558E3025E7E
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 17:41:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2F33E5599;
-	Mon,  4 May 2026 17:41:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E44193E51EF;
+	Mon,  4 May 2026 17:41:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hf6SWaca"
+	dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b="FcK7apwI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540873E5EC1;
-	Mon,  4 May 2026 17:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB1A3E4C8C
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 17:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777916472; cv=none; b=cyjTDqv/ZixkWVDRM045tFFDg1zF9H6fMpXFK8sczxHvojGzqVV08KFirMNuknIOx08xFwprDkSAeuRncSE5NvIzCqGTOkF+mr4/mK6AZ5AyHVG89QiJ4Tp4LS1zXB+sUe2pNkQGvm6tJQL+r33SkchKWQRjS9iw2/TG23+OTCc=
+	t=1777916469; cv=none; b=doY7zGYVcyB/k5SserswHt8PTootChBWaj3sfQdpYaZcKRV+omt4F1YMR/na3tGXDCR+57RkCFglOX7qsjjDdvh4d05ruNxz0LhN4H/w1YWOG1F3Q8t1RmBZd+k2IVmrITUTyCfXbNEwkogQbyHbK90PHd6n8msbw/WMEDiC97c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777916472; c=relaxed/simple;
-	bh=gXCIxglj6nEmYjf0Vl9jKj/cd7xazV9XVYCGS2F8+kA=;
+	s=arc-20240116; t=1777916469; c=relaxed/simple;
+	bh=kzKsrs0y5jrGnVqBaAyXbt3JJM72U8Ryvc3+DSouO8k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QTQnzSSlYFgLF2Esa9jqu94jubR4H9NJLlDfvk8x9F+qXhVG6yEeIfCvLvS7fe4srDXpRCBEB2j6nx8rYTVPWkt1c95VEdmrqoOLwdrC4DCm8Vc8h4tg4eoMesTWltETccH1DybP1i75XY1zw5WfL74eGIFtJAMQr0Ai9F1rlt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hf6SWaca; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF928C2BCB8;
-	Mon,  4 May 2026 17:41:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777916472;
-	bh=gXCIxglj6nEmYjf0Vl9jKj/cd7xazV9XVYCGS2F8+kA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hf6SWaca7SqxrkrXkC7kijSGnxlJ6IYOITp4mg4SlDVSk6WB76juKkXB9eXxGVVP6
-	 51OuFI7tAv+j1NpcB1ag6Hpra2YCUWwqVrS8ktRkOMNn19p+rxYDYOT+vexdVqa1iL
-	 weSTW0LQR0xmiQdVVaNyceaYslwrMNz4Fw4KAp6ryTGtdbsk2CRod4s11pkAnGVSW+
-	 9p0Fbw4+hl+PYYLsB91RO1PJuy1/AIt9iU8yBpFkwTKQQTz6lYKuHcqn8cgEGOSxQG
-	 +yPdwW/XUhb5f7g3l8FLe+Jk7YFfK7PC99SiU8057/Hsit7pVmrGlHiOGjS1S9XZvw
-	 kUG+syil/wG/g==
-Date: Mon, 4 May 2026 10:39:52 -0700
-From: Eric Biggers <ebiggers@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=dhwPIqej+lL+TnQC9uZW37N3WRQMXkwtaxlrmOq3EyXAcOtqw65EpfFBcY/y2FnZQSpTneWcPpPVeTnQvq1va79mQn8mCatQ1t79Hr7aYp+ogzSBm4YlsbpiRkrRTPoBG/ptdOyoTLgz7pBzsEDiDDc2qlODmEIowlr91/qkWmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=FcK7apwI; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2b9ec9443c2so11652835ad.1
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 10:41:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1777916467; x=1778521267; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nmJADCUYYJkAP0ynYy9365oRJvMWu6Lq9KoE1sTjfVQ=;
+        b=FcK7apwIBG4P45xVGvf2cIRnLYLXNcQKG60EY8EQhnkpCrQzSRFyKVi4Fn417DO6BM
+         sqhGzV/IrXn7Mg7pt+oYJbItA0zHAVU3b4Xygp4oe2RGAUY+pCZTeiVtBBklnIRVs8Rp
+         IUxTho7TICNZbNrSCDSuIsnahLdBDpFs70m33LI6U8/Y9AlZME0Ac/BEleYl1Y4txgK1
+         VgFWVIftkun5nRv3YAtwjQoYuIbu16iG48zD4DOa4/sHaR20AmEiAZ3RXob6JiyRXB0+
+         29oW87CNPWXQQJn277B4to1Kim7ZeTSNtBBmE7OxV9Y067YhqtQEiL4eeShVWYWnnXCk
+         dC3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777916467; x=1778521267;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nmJADCUYYJkAP0ynYy9365oRJvMWu6Lq9KoE1sTjfVQ=;
+        b=kyN42cBsOwe2N17QF+eYs6ukG6Iuik90o5BuD90dRpfMI7R7W1RhnPAsi+vF5UxkVv
+         esYBqbo+5N6eC9j9/LCgB6W4liH8VQP9fkbVJFkIMr9PFHQPukggEOiOD26rhRnVQwJz
+         mK83nVaeOGTk511h2UbP382vz9zGT7P++hdSDQJXMhBZWDeTOTY8DhWt9i8Rgsl7ReVH
+         Y73GPrCiA7ypwXwRAh57adesXdfNiMWLAa/6jeWesQs7qfKdKt6qqku6+Dfh86Vk14M9
+         GzSBOiHyjan76kD1Qe53shuzrjHPklXs02eBMcwoUZ+lxdnui/L7r65Jz3G8eeuuVdoB
+         UI2A==
+X-Forwarded-Encrypted: i=1; AFNElJ8Qcc3f4BCVROiaZd4757hA7XWr+N6MxZ/zubT/aMYDWLUowrx0ymEhX4aiuAWgTz0dq55X910=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0rTrW6YXN0Fp1QWJrKGOOGPzBoJXClwmhwotwE2asZFd589y5
+	0QqcCScSsj0j5qbikWnF1mm/aIrQRVNOrdYZv+Ac6U8HYLWxz7VCXt6FFJF0z4aHeYA=
+X-Gm-Gg: AeBDievIgn49O0znVal8zESNeQ4iMtA/U691nyVp0lWIQTINl2KoVy/MlDRNjXrNgrF
+	HYDrLzrf7CAaN83fBUQ4lq712jGYg1tJoq1BaLAErpzSGekO4q976mscfGvO59tnAGRF0rCMpv8
+	jVdP88q+H8Qpea/U612FuyklwnlC1JpGWmkqL02MqxwwH11jVKgVx/MYLvFVlMHyJHAusYtGeCY
+	tyopBQOZAzo9n7hdwuU5kYlUhJ3Nj/ucXMmXrPYsULHyzy4HZuiJDw3DPpFzs6kcVkHFgevlwq+
+	rQJDqejFeNWywdZjRMrXcgtVaH5m9FwCHtH+aqz5ct/puyOyOnDg8d9vPMO2q8qtj7ktBcSAo0n
+	6qaSPbeL+bunnG+rO3x/Ol0nmayDW5rOvwHeiYdc91kObvVNLAh4riMI6TKZR3eDUhOfQ9gcZQ7
+	mLd3+AFdowHxKvAQ==
+X-Received: by 2002:a17:902:c992:b0:2ae:4ad5:b76c with SMTP id d9443c01a7336-2ba4d7b9de6mr2316725ad.10.1777916466780;
+        Mon, 04 May 2026 10:41:06 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:b::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b9cae59f57sm109511655ad.77.2026.05.04.10.41.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 May 2026 10:41:06 -0700 (PDT)
+Date: Mon, 4 May 2026 10:41:05 -0700
+From: Joe Damato <joe@dama.to>
 To: Jon Kohler <jon@nutanix.com>
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
-Message-ID: <20260504173952.GA2291@sol>
-References: <20260430011544.31823-1-ebiggers@kernel.org>
- <4D424F50-7E9F-4B1F-AE9C-86D8526284E6@nutanix.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] e1000e: ethtool: add get_channels support
+Message-ID: <afjaMXktB3WmT7KC@devvm20253.cco0.facebook.com>
+Mail-Followup-To: Joe Damato <joe@dama.to>, Jon Kohler <jon@nutanix.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+References: <20260504154823.2535612-1-jon@nutanix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4D424F50-7E9F-4B1F-AE9C-86D8526284E6@nutanix.com>
-X-Rspamd-Queue-Id: E965F4C20A5
+In-Reply-To: <20260504154823.2535612-1-jon@nutanix.com>
+X-Rspamd-Queue-Id: ADEC94C2058
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283975-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283973-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[dama-to.20251104.gappssmtp.com:+];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ebiggers@kernel.org,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[dama.to];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[copy.fail:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nutanix.com:email,devvm20253.cco0.facebook.com:mid,dama.to:email,dama-to.20251104.gappssmtp.com:dkim]
 
-On Mon, May 04, 2026 at 02:39:12PM +0000, Jon Kohler wrote:
-> > On Apr 29, 2026, at 9:15 PM, Eric Biggers <ebiggers@kernel.org> wrote:
-> > 
-> > AF_ALG is almost completely unnecessary, and it exposes a massive attack
-> > surface that hasn't been standing up to modern vulnerability discovery
-> > tools.  The latest one even has its own website, providing a small
-> > Python script that reliably roots most Linux distros: https://copy.fail/
-> > 
-> > This isn't sustainable, especially as LLMs have accelerated the rate the
-> > vulnerabilities are coming in.  The effort that is being put into this
-> > thing is vastly disproportional to the few programs that actually use
-> > it, and those programs would be better served by userspace code anyway.
-> > 
-> > These issues have been noted in many mailing list discussions already.
-> > But until now they haven't been reflected in the documentation or
-> > kconfig menu itself, and the vulnerabilities are still coming in.
-> > 
-> > Let's go ahead and document the deprecation.
-> > 
-> > This isn't intended to change anything overnight.  After all, most Linux
-> > distros won't be able to disable the kconfig options quite yet, mainly
-> > because of iwd.  But this should create a bit more impetus for these
-> > userspace programs to be fixed, and the documentation update should also
-> > help prevent more users from appearing.
-> > 
-> > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> > ---
+On Mon, May 04, 2026 at 08:48:23AM -0700, Jon Kohler wrote:
+> e1000e hardware supports a single RX/TX queue pair, add basic support
+> for ethtool -l (i.e. get_channels), so that callers indeed see a single
+> queue.
 > 
-> Quick passing observation
-> I noticed that when attempting to completely disable these Crypto APIs,
-> I was experiencing boot failures with fips=1 enabled systems.
+> Signed-off-by: Jon Kohler <jon@nutanix.com>
+> ---
+>  drivers/net/ethernet/intel/e1000e/ethtool.c | 26 +++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
 > 
-> Using 6.18-based kernel with an el9-based user space, I see the
-> following hang in the early boot console from dracut-pre-pivot:
->   Check integrity of kernel
->   libkcapi - Error: AF_ALG: socket syscall failed (errno: -97)
->   Allocation of hmac(sha512) cipher failed (-97)
-> 
-> I haven't looked at every elX version, but at least in el9 and el10,
-> they use libkcapi-hmaccalc to provide sha512hmac, which dracut [1]
-> uses to calculate the HMAC value in do_fips().
-> 
-> Digging further, I was only able to disable RNG and AEAD APIs, but
-> not HASH and SKCIPHER APIs when FIPS was in the picture with el9++.
-> 
-> I’m not sure how other distros do the same, but this could be problematic
-> elsehwere if other distros went down the libkcapi route.
-> 
-> [1] https://github.com/dracutdevs/dracut/blob/059/modules.d/01fips/fips.sh#L167
 
-That seems to be an implementation of FIPS 140-3's integrity self-check.
-A few observations:
-
-- It could easily use userspace SHA-512 code instead.  If including
-  libcrypto.so in the "FIPS cryptographic boundary" would cause
-  certification difficulties, then a sha512.c file could simply be added
-  to 'libkcapi-hmaccalc' which is already in it.
-
-- It's compatible with all of the proposed hardening.  It doesn't
-  require zero-copy performance.  It runs as root, so it would be
-  compatible with a capability check.  "hmac(sha512)" will need to be on
-  the algorithm allowlist anyway for iwd.
-
-- FIPS 140-3 might also allow it to be simplified to use a plain hash
-  instead of pointlessly using HMAC with a fixed key.
-
-Anyway, just another one of the long tail of odd users that could have
-solved their problem in a better way.  This one is at least compatible
-with the hardening that's being considered.
-
-By the way, also on the topic of FIPS 140-3, some people do use AF_ALG
-for ACVP (even though it's not all that great for that purpose, either).
-But ACVP is a testing thing, not something that is needed on production
-systems.  ACVP can just be run as root on a testing build; there's no
-need to enable support for it in the actual production build.
-
-- Eric
+Reviewed-by: Joe Damato <joe@dama.to>
 
