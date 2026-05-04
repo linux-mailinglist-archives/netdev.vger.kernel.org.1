@@ -1,423 +1,245 @@
-Return-Path: <netdev+bounces-283959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283960-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iPysCljK+Gma0wIAu9opvQ
-	(envelope-from <netdev+bounces-283959-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 18:33:28 +0200
+	id MOttMPzK+Gma0wIAu9opvQ
+	(envelope-from <netdev+bounces-283960-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 18:36:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35B224C1703
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 18:33:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28DCD4C17C4
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 18:36:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5F74C3007AE8
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 16:31:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 771023018AF9
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 16:36:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 905333E559F;
-	Mon,  4 May 2026 16:30:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 089D43DBD43;
+	Mon,  4 May 2026 16:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nSgldfGD"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="bsBQ0s0V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011062.outbound.protection.outlook.com [52.101.57.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09CDA3E4C67
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 16:30:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777912240; cv=none; b=Sp41yRN8mn4cqn/6U+AuukOzrTkbze4pXEkHMVsxB7P7YFnnq5VwkybPSheFXX5denu+586gX17fgTVRxaEtSt41EV/RkxjYzawjOPPybKlmtZMRBKdQcz9HK3LdL1q3rXVvI5TbTIJl6CPTk/ezB8QsfrocZgHWrW8GehVXA9w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777912240; c=relaxed/simple;
-	bh=ytJNk6Sp5oqo2mhDyk8PHPFkvKfco1b3mZP7WKRR2TM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DKd0qFE8h9lhkCK74wZgfceZQ8mmSiOng0Ub5/joiSaj57isB0pyPLTeLHCHQFlSxcCoEaZehWlgP7FKyasxyXWL1PGw9G2bzB/Qdd6hZBZ20tc3I1cluIrK8DmP8axn9dq1dJeUs1mCN//fti+85yMC7znCTt3O1m0eogZPUYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nSgldfGD; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-8367df48711so583591b3a.1
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 09:30:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777912237; x=1778517037; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MGj4HzPbiY0MFbpVfiKxyLwbBa+PWzq3vhH8Hs94Z0I=;
-        b=nSgldfGD7mo2crLkHMR80vVJV+g4d4wS5XHKk8j62wHbbZnZMITbSUZFVd69TnjLII
-         83kLx1lGOoQ7uAYbcbRIBWnQSHlxHHZjpxiWsdPPs7ywBddfJfCpnNmpvzN4UumCzyPz
-         0Zne/DYqkav0S3G0urxVDSxImL329CAnqQhJXW+03bPiyNKBBJwMaB5BpV/LVTtt/cO9
-         Sg2LLqpHB17C4eyUhnwM65zczlDaA6Y8m3QFiUlBL+hwAn/IHmu+xISEHEPmz0TdJS6r
-         ICyAtTOEVSishWKSS7MMna6eHEwM+tIIYUjj1Y9tQ8OgGPBTsZzC2flkIWNxek4EI+I0
-         MnKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777912237; x=1778517037;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=MGj4HzPbiY0MFbpVfiKxyLwbBa+PWzq3vhH8Hs94Z0I=;
-        b=mtQsxFOM65wUCukq/Kg9NDSiCzis1vcKsneI0pe/H9i3a2E3idPKCx49OLxlEQoMVn
-         biByC+SMUVy6z4Hu/Y1B9zfsIbt3nJNJJOk8LQsccUdL4g330Ldm4RZZPRi+5Nq9Slri
-         DPMzIX3BLRn2paPA1RjRLdIkJxsRrgWOm8j4eV0gqX8672IGls+1QqxkqOj2BZKcsAVK
-         OhZeeWR/PjFstoSIjd4GIzwYS1GUJ79nRADRCc0rivlmR4+ARZiiRf3AqQiMtgGBAu3U
-         GMHmXDTnE2aOYlI4AX3R7VkyIDXOaGBBnxaFM+P0ox+AMfyzHgVxxTLEbsKyGa+uB+x9
-         x0iA==
-X-Forwarded-Encrypted: i=1; AFNElJ+tkZxemzKzqVhw7Omv2PIlgVguUrepM0736jyqCcLa7vs7+9Leny3lAi8mlritkW29TmlHwBc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUOpu4Kip+HhI4NxdjwOyywobm21jkgXnT3+QbXgU/Kq7WvJ7M
-	ql0L+3RJumJ43SZNB5DD8nkUci9HiPI84VFqYbOU2pOWOziMNSFtwbCgwUClvOiJ
-X-Gm-Gg: AeBDieuVagLK90lMeMQoID0VYEY/lkp6O/RPBUS4YlskLyg4O4CDHhK7INICx8TPOLB
-	4ij2HbVdTLRt32Md+xrjopzG8QTezyipzJQdS7HIAp672MY9xpLOHSvyw3z6j5rk4kZiZi4v0l+
-	3+QR2/S8zygUO/n2VQCJm7kpv+Gcz8Dh5hG6ttyjlYeOp/Hyhb93FsjtdN+nkgtylg8bWhTVBu/
-	QBIHYoZo8Z6+Oh2ydz5+HxkUgLCbDAnA55SuM1A4PrK3y3Yn6VIukc/A6w57wUPE14EHq1Gum3s
-	bQ/is6Ix3LvPTr1dzXViFpVn+OSwDGHGJ3W2rwslCCmP5XuFtW6H59MCFeCKaKpMWfxOKrJF2gr
-	Z3/ai1S9m4dybWOI4VVK5PMNHj9ugN/+PIqoHZqNRdO+0JmRhcCmL9her+sTRB7CbqJd1QU1PWI
-	1MavYxwsInu7ogI4aCees+EFnbCFyKp/TEy4QmcATCxynP
-X-Received: by 2002:a05:6a00:3016:b0:839:9ad:ee33 with SMTP id d2e1a72fcca58-83909adf655mr21028b3a.7.1777912237156;
-        Mon, 04 May 2026 09:30:37 -0700 (PDT)
-Received: from [163.43.103.131] ([163.43.103.131])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-837081abadfsm4998663b3a.42.2026.05.04.09.30.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2026 09:30:36 -0700 (PDT)
-From: Yuya Kusakabe <yuya.kusakabe@gmail.com>
-Date: Tue, 05 May 2026 01:30:17 +0900
-Subject: [PATCH v2 7/7] Documentation: networking: add seg6_mobile guide
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 847D61CEAC2;
+	Mon,  4 May 2026 16:36:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.62
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777912569; cv=fail; b=cLXpOmHo8xjuuJ2oytW2aqdO9jdmHw2r18yZInOCMQYu1zZ0ApwUhlWZwBhixHKy9qimyTDTqti5CFeYuwc/gT8IzkEMvYrIQW0JpS0EcIkvYn5seNn+qp8dVWcx9Z1PAFf1/AQq5AMgN0gHAv3/mm/Gip3wvGhw++RDYtFN2A4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777912569; c=relaxed/simple;
+	bh=5gutF3N2aHAfaU1OyW7qwCnpJENFD7+0oKKbwtjuweE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=T4yWytkCerG+C43b+66mnB2dVIe5TcxCJxTNXX5l7pwWbZpQPfBCoBh8ZjCPrULvoZWlANdZC3fS5TIN5cc683AKvlFk/9B2ML+g+cO3QPBxI51mKxnzptiujVyz9QQSHzP75J5W56zWQMnCxKINtjVO07sZCGeypNqNj23jpMQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=bsBQ0s0V; arc=fail smtp.client-ip=52.101.57.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Cmf3QLGSHZ08iC5IgbWJPkbdrc+My0VpPtiLXENNqRkndzFaOHj53ljoSNGM4JPwpEDuZ6lLhgwuHcTD2PwH67mdhtenECGEda4HVeIy65iogfo5RZv9WVfTFUxs27A38kxij8wth4kzPAmpDKG8qyB58pRjGfHZdb1yI0GyiHzGNT4IjNUA7ptyBKQhVTZ/HYiZyCMWzxYYkdhfG4rbZbaJ4irR0yjZoHJdPaF3WW3OD7MVM3uhivKkjm0m/e0wmgof3itNYGkL5Eb+sV+i1ljbllajJvkk6tW0eaz0Nrx5jvN+EIm8VEG/lPtlxpTSfb/sBaiugSgt0rLY+GgkbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MLaS0NwRiUuFlXLCcuPo9seaXk4N5HL499lBaRjqAwM=;
+ b=a4D/recTpk6codlnWm750v84KcNpS45xj4/ybuTGcd+FOC9RJlHpyVpe/ZMLbVvUwYjbxAD+s0a/vJA+KBSrSs/G5Ol76KaZTodyLarK4TSLTggjciUi/K8qS+/gS+d2/fcBhmEPfSxCLN8B5H7GAXWW3sLUrqVu1Y/+JxEqWlXuy2gMlcOEPmZHqDdHwDBWZzBDIDyDI1keJva1/YjVAfqyL4jnDY/IVNQZSEyTFj5qxrTYHrqtCDTiE9i8uwCb0IEBF/36cusSvV1U6f3pNfOjjN1gZ1E/Ga20oiQiEZecIUruwesWTfHrk/VWqcDI30FKraOAFqb9OaP3IjWnOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MLaS0NwRiUuFlXLCcuPo9seaXk4N5HL499lBaRjqAwM=;
+ b=bsBQ0s0VjQkl8J/00KHgnMklF4sTSuTtnL8AaATx2C7xlnfTKsL16Obn/D45g7EpnzMKa+NHrmF6dRvSoBzRuR03QZpERpDg8wNxUYmBC+vLtTfmkNRU8g/xDIiF7CY3DPVS1WPdNTsZn5c44PjTywGD6p0orW7wFMnwDOtvUcejC3v2LzqYhMmCqLRfFir5iGMYq1IZSv7Qhy9t0ejtc73/IBUeHSDpPaTCtG1v1ihtpnpvKArqqvhBNKxn3ctZzmjAOo3kzjgg45910QsuKgkIdD1IWh0cInnBnFb9/PtthDnd0lC4/pt1SuAgb3LF9tXQMF5smjJydoavo/h+7w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by SJ0PR12MB6966.namprd12.prod.outlook.com (2603:10b6:a03:449::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Mon, 4 May
+ 2026 16:36:01 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.20.9870.023; Mon, 4 May 2026
+ 16:36:01 +0000
+Date: Mon, 4 May 2026 19:35:49 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Fernando Fernandez Mancera <fmancera@suse.de>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	horms@kernel.org, pabeni@redhat.com, kuba@kernel.org,
+	edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
+	=?utf-8?Q?=C5=81ukasz?= Stelmach <steelman@post.pl>
+Subject: Re: [PATCH 1/2 net] ipv6: addrconf: fix temp address generation
+ after prefix deprecation
+Message-ID: <20260504163549.GA385401@shredder>
+References: <20260503221139.3742-3-fmancera@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260503221139.3742-3-fmancera@suse.de>
+X-ClientProxiedBy: TLZP290CA0002.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:9::8)
+ To SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260505-seg6-mobile-v2-7-9e8022bdfdb6@gmail.com>
-References: <20260505-seg6-mobile-v2-0-9e8022bdfdb6@gmail.com>
-In-Reply-To: <20260505-seg6-mobile-v2-0-9e8022bdfdb6@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Andrea Mayer <andrea.mayer@uniroma2.it>, Shuah Khan <shuah@kernel.org>, 
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, 
- Yuya Kusakabe <yuya.kusakabe@gmail.com>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=11107;
- i=yuya.kusakabe@gmail.com; h=from:subject:message-id;
- bh=ytJNk6Sp5oqo2mhDyk8PHPFkvKfco1b3mZP7WKRR2TM=;
- b=owEBbQKS/ZANAwAIASrX0XUqXRtNAcsmYgBp+MmW5g6Bpgp8S6YSEI4Lzw6V3kCEsE5FOZMor
- zXtL9tV73yJAjMEAAEIAB0WIQTaB7usAfxNKMeqa6Yq19F1Kl0bTQUCafjJlgAKCRAq19F1Kl0b
- TSJWD/0YOev6w6S2JBwzhbIwmTGlV4O2syClQdHe2mjp7LBu3vlBwtJIFXAKpdx1gYHHMS/VzIW
- kX72aKTnel9/+TtyoC7z2pqZZbG7V6aguW978+24HopOnrZl7at8EXdnmSwcK6xU34lVXg9iY4e
- nnMgtHSs9iNYsHbK/vncMByRQgHS4oXNo0IdV2qo5nPohZlStmzNbYgzC87tvUH/sNNLr7D1in0
- owP1wkCcsTOB4hSx1a/XDDlRLkpVPKysFMTEHlL+Gwhuc+z6HEzstuoQ9aCkRw8+B7v3Lg8WQ8R
- Tj9d0/UQH5SwoifdB9TX1aY94Q/TLVyW4eOFZo3kTt6qvfqszun3t3SGMilquUFZMaWNq3guGZt
- JAr7yeFBYZy3BF1LH08IfffaBhHcj6Irc4PBQ6zcfEabvfXo7cIv+ChsvF3uXZgIFqwxqn8Bh+R
- 0Top+oEN5cqh0bDe49HoyDNptjK922OT18foKd8mkIs8FQuuC+eJSBBs08ZzvKndJRuQYlXHcVg
- QD3w02GEK1mgKjd243vHmCHqlJEJamcyKg0B/QPo0kuOOeRl/P15+6mfLR8p+0ZTBwaEYomtzcn
- qfbsop4khHTq6FXjNaSo4i5R6GxVlmyRWjXonhxCDJAWQdoLGYzXCW0oB5u2VtCpkRd/8N9oMSX
- ZS3GmgQV60MzJIA==
-X-Developer-Key: i=yuya.kusakabe@gmail.com; a=openpgp;
- fpr=DA07BBAC01FC4D28C7AA6BA62AD7D1752A5D1B4D
-X-Rspamd-Queue-Id: 35B224C1703
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|SJ0PR12MB6966:EE_
+X-MS-Office365-Filtering-Correlation-Id: 74d2424c-82a0-40d1-21e0-08dea9fb3a20
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	a8aoQt0IxBMqkLY/lq/pdvwxWMEjkbfnkLQ0CzmzyMeoxCKet4i6QKi3bQWLDvZfN2ROH6+z1Z+Cx2rRTAIasD//AHBwW+AkLr6Hov9JKf2zTUIfeuVea7IzUz35mcZlAtzhaI2GMAsAAQcOQlJh7R4Sdgnu25cSB3v1iRolFD0M/oxo34ovzfOAa+7xHAM4kqh3amV8A5ybHEXbh9kuSdOvd5EhNeTcVdhUg5bKSuCp0hHc/Xrynvyo3wTqpSjmpNEUAeAxZbNK6fb+0h7o6XNp69D4R5FTWFai+2QbP7fG6l44qTByWh1kiqDO75kjpYEUmpkrmWlhZvVN15MYkElo1j/9KSDye+yi3iojkIbENhVk3bxiu5oRe7+EhA9Tjoq5PnqxwlTpETSGxwJYJzMWg4eDPGg8Jgzqy1UJLm1JwSwvzce+yTpPru1OiSQJQIfYU1xpw5drTbVOXmax26uOepu6zCDkt5QYvywDq0YAD8rL/Y2Uun94klpCKcvQ+j0OVXaQJd7M6kh2R2spU7cT6Temb+b8h2lWzyyB7J/HnmhoS/Dd6UhNRsp2G6+AWMTs9syB5rIoJAkyPjWPpmYqtBGY+2OexuaHjNSmuaSOOoFhGewRDRAmrE2Iai7foXTjOafPKdN+7Yz2vw/BjNfax9bVFlTPJwLJFmuq9ZpAP2t9ttv5Me+pTBt6c1pyp8N1YFAeoDcppn5slekp2g==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WVMyTGh6eit6c01aZ2RaUi9wQ2hGZHJzN0VuVERrN0lHZ2dGUkdnQ0pNaTNv?=
+ =?utf-8?B?bUw0VnVyRXIyVFZHcHZURFlGbUd4VmtWN25RL0kyaEdFbEdxSm5UdDRKMVUz?=
+ =?utf-8?B?eUw5dHIzVnQ0djA5Y1hQeGF5eGxoSHczR21wOGhpa2pJUmdKdlFKenZwOVZi?=
+ =?utf-8?B?RHJJR1RpNXpnU2J5SEZoTmtoOHl5d01KQnNMTkhYRWtwS3A4K1pSVlJJRXkx?=
+ =?utf-8?B?WDdaOGt2d0tPZWRYQVBHbzFtOWgxZUpBUjVvTXBack8raGthVEwzUC8yR3hV?=
+ =?utf-8?B?T094UElsaXFYNkYxMjQzeGRpN0NWMy96K0hwOEcrekw3TzdXc2wvcHMyOHNo?=
+ =?utf-8?B?SFRIdEtPYjNyOW53b2lva0RMdWNLSGs1VDVVOEZUdzFJdGI5MHgwMG9rcTNw?=
+ =?utf-8?B?bW8xMEwybWFDeDFiT3dOWVd6b2ZMUUtqTUYrcG9yVmdKODcvdEt2NVJiWG1Q?=
+ =?utf-8?B?TGJHbGdxSUkwVERQUmczZXRkWGxPRVlHNEhKVjIrL2dKYm1QdVBYOElxZUdN?=
+ =?utf-8?B?WXArV2tOcGJjRERtRnBnTktkdWlZRzMzaFpqVkJtWjNETXFtSVdoK1hEVGlz?=
+ =?utf-8?B?MTc1b1ZhMnkycU1LYVFSdUpMdy96T3h6UE14R1dTanBwaUtxbGZxejhVcktk?=
+ =?utf-8?B?TjQ2QkhtSHJYNkk1U3dFem1ZWk5XTDZIQ091ZDJVWVlJU0ZXN0xQYmtYa2FG?=
+ =?utf-8?B?Z090TjZlMmg4eTlkU1k5cTZBRmZqZVpwMG1jVDNxUUVnb0lOL2NycGVTTm5D?=
+ =?utf-8?B?RVZ4ZTRXRklSazBSQ2pnb0V2aEcrbDU2dnZXeU1YN3N1NU9FQ0t2S2pZREVj?=
+ =?utf-8?B?eWxyWTJ2NHhuNFF4QkNYYnArbGt2QUFBbEV2MnkwSDJleUloY1BYNDhiOXgz?=
+ =?utf-8?B?VHRCOTVtcFBqa2hJazNZS24wTFMwK3lVV1o4elNmK0t3OVhsSi81SjlWbzE5?=
+ =?utf-8?B?ek1WZ0tTVm1nQjN0dHJ5dWVXQjUwbDFzYWpTV2k3YTU1TUtOWlEyRDdlWTdu?=
+ =?utf-8?B?VkpMNlU4enZTVndzcktPNVo4Y2w0OTdlK3J2VHQwYmFkRCtmdUdvS1U4Sm1U?=
+ =?utf-8?B?TnVFTVVXNklKTFlKak91Mk8zWkloV2oyWkR3OU8xdWUvVEdCYnM2UWp1b1Nr?=
+ =?utf-8?B?ZVVHTlpjV2ZqK0JRWEp6b1pGY3pvZFVHUm1XS21OR1A5bit4M1JPWDlYbGxD?=
+ =?utf-8?B?cnNVZlRqZ2FDNUJUMm83MmQvdGpWdDhucGxPSCtQeGV3NUg5K1d0NzNjK2I4?=
+ =?utf-8?B?NWcxWGdxQUpoa21JOW9SczVQbnhTYWgza0VnZ0dhZlVMaVZ6Yzc1N3VyWlJ3?=
+ =?utf-8?B?L2N5MzQ3blU3SG9LRmNPNGo2VTNBQ3BiMFN2ei9nSHF1M3pReTYxQitXVTkw?=
+ =?utf-8?B?ZjV2QXpiaDVsdEEvMnVuOVk4bTZZMzZ3aklaeG1NcUMxS3h6RzdFbEdLVnlm?=
+ =?utf-8?B?L0hLd25iN3RxRml5ZXdIYTI4QVZYTjFmOFN4SmlZUzl5QjF5SExsRGNLS1JP?=
+ =?utf-8?B?alVkaGx6YUc4bjZkUjhpbEpKWjNta3Y1eVNpRVh5b252WUhDNURkUTNKYmM2?=
+ =?utf-8?B?bTMyeFhLKzh3eDJJckgrNkZWUTBzTTFiL0YycnV2Q2orOS9TR1FqTEFXaWJR?=
+ =?utf-8?B?S1JGMVcrT1BxR2FlWUpRNkZwN2dMOUJxTklLQVh1SnAzbzN2QVdmbjM1eWp5?=
+ =?utf-8?B?Vk1jTnV5VVd6Nnlua1pjQ3hoeWpSamtqS0U2c0FPd05icG9VNWtMdTROa2JH?=
+ =?utf-8?B?alNNR04xN1VTWjFzVTlRVFlVK08xMStSVUoyaGQ0V1FOWEtHMmwrZ09TS0E2?=
+ =?utf-8?B?dkRiN0xiTFRlT1d3U3piMlVsQnd4REkyRllwUWU4dnF6TVVyM01pZzBHa3Rs?=
+ =?utf-8?B?bnhub0d3ZjEybStjYTZvMWdKV3Y0Zk9QbDNVaDVzSDM5U2U4WDZhekVnK09a?=
+ =?utf-8?B?T2Q2SlVoV0RBcWVmdXZzeklKekE1SFdEeldrTmtWZUJ6bTBXcFZObG1vOFJP?=
+ =?utf-8?B?WG5UQzJseCtuQzVFSVkyQXlNcTlXWEJpYTk3TVg5dVhSZUNnZURrNlAyYm5q?=
+ =?utf-8?B?NDY1YndPL0JiTzFQbm1jbjYrN01PZEVSN053Wkt0MGhGdnAzZk1vc3hEbkZP?=
+ =?utf-8?B?bTVZcTR3U004ajJmZE5rMERmSDdTMjdaaUdhMFhWU1hrbjZDWXRXWkhnMVJj?=
+ =?utf-8?B?Qm91bjRwWnpleDZ6T2FyZjFwVUNGUzZyYkJWY2RnZFpOWXJQWDBoUVJUaHJt?=
+ =?utf-8?B?eFRzb2FYL2hWODhHSjZJc1pjT3p1dFNQQThnMEx1RFZsV3RZWGNaSWlRUUtV?=
+ =?utf-8?Q?gEqB+wHyGwmwl7CHja?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 74d2424c-82a0-40d1-21e0-08dea9fb3a20
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2026 16:36:01.3047
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XLEIxukkD4SlFZOvKzdEkKPp/KkHNwRGPZK3cROgEPbv45SufvlxB9z1ePO08oAt62HA1khMRt0yHzXAtppo1Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6966
+X-Rspamd-Queue-Id: 28DCD4C17C4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283959-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-283960-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yuyakusakabe@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[end.map:url,rfc-editor.org:url]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,Nvidia.com:dkim]
 
-Document the six RFC 9433 Mobile User Plane behaviors implemented
-by seg6_local, the SID layout used by the GTP behaviors, security
-considerations (HMAC, SR-domain perimeter filtering), netfilter
-integration with nf_hooks_lwtunnel, and the location of the
-selftests.
+On Mon, May 04, 2026 at 12:11:40AM +0200, Fernando Fernandez Mancera wrote:
+> When a router temporarily deprecates an IPv6 prefix (either by sending a
+> Router Advertisement with Preferred Lifetime = 0 or by letting the
+> lifetime expire) and later restores it, the kernel permanently loses its
+> ability to generate temporary privacy addresses (RFC 8981) for that
+> prefix.
+> 
+> This happens because the address worker attempts to generate a
+> replacement temporary address when the current one nears expiration. As
+> the base prefix is deprecated already, the generation fails, burning the
+> retry counter for temporary address generation of that prefix.
+> 
+> When the router eventually restores the prefix, the temporary address
+> becomes active again. However, once it naturally expires, the kernel
+> sees the exhausted retry limit and permanently stops generating new
+> privacy addresses.
 
-Link: https://www.rfc-editor.org/rfc/rfc9433
-Signed-off-by: Yuya Kusakabe <yuya.kusakabe@gmail.com>
----
- Documentation/networking/index.rst       |   1 +
- Documentation/networking/seg6_mobile.rst | 236 +++++++++++++++++++++++++++++++
- 2 files changed, 237 insertions(+)
+It's not clear to me to which "retry counter" you are referring to. Are
+you referring to the counter of the temporary address or to that of the
+"public address" from which it was generated?
 
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index 44a422ad3b05..90fa0ad223da 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -108,6 +108,7 @@ Contents:
-    sctp
-    secid
-    seg6-sysctl
-+   seg6_mobile
-    skbuff
-    smc-sysctl
-    sriov
-diff --git a/Documentation/networking/seg6_mobile.rst b/Documentation/networking/seg6_mobile.rst
-new file mode 100644
-index 000000000000..6a268bedf3be
---- /dev/null
-+++ b/Documentation/networking/seg6_mobile.rst
-@@ -0,0 +1,236 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=================================
-+SRv6 Mobile User Plane (RFC 9433)
-+=================================
-+
-+This document describes the SRv6 Mobile User Plane (MUP) behaviors
-+implemented by the ``seg6_local`` lightweight tunnel.  Six of the
-+seven behaviors defined in `RFC 9433`_ are supported and configurable
-+through ``ip route ... encap seg6local action ...``: End.MAP,
-+End.M.GTP6.D, End.M.GTP6.D.Di, End.M.GTP6.E, End.M.GTP4.E, and
-+H.M.GTP4.D.
-+
-+End.Limit (RFC 9433 Section 6.8) is unimplemented.
-+
-+.. _`RFC 9433`: https://www.rfc-editor.org/rfc/rfc9433
-+
-+Behaviors
-+=========
-+
-+End.MAP (`RFC 9433`_ Section 6.2)
-+---------------------------------
-+
-+Endpoint with SID mapping.  Replaces the IPv6 destination address with
-+the next SID; the SRH is left untouched.  Standard SRv6 endpoint hop
-+limit handling applies (an ICMP Time Exceeded is emitted when the IPv6
-+Hop Limit would reach zero per RFC 9433 Section 6.2 S01-S03; the Hop
-+Limit is decremented per S04 before forwarding).  ``nh6`` selects the
-+replacement SID::
-+
-+    ip -6 route add 2001:db8:f::/64 \
-+        encap seg6local action End.MAP nh6 2001:db8:2::e \
-+        dev <dev>
-+
-+End.M.GTP6.D (`RFC 9433`_ Section 6.3)
-+--------------------------------------
-+
-+Encapsulation endpoint that consumes IPv6/UDP/GTP-U and emits SRv6.
-+The new SRH is built from the configured segment list, with the
-+original outer IPv6 destination ``D`` of the inbound GTP-U packet
-+stamped at SRH ``segments[0]`` (the ultimate destination of the SR
-+Policy).  The configured ``srh segs`` last entry is the remote
-+End.M.GTP6.E SID and lands at SRH ``segments[1]``, the penultimate
-+position required by RFC 9433 Section 6.5 Note; the kernel encodes
-+``Args.Mob.Session`` into the locator-relative slice of that SID so
-+that the egress End.M.GTP6.E peer can recover ``D`` (and hence the
-+original gNB-side GTP-U destination) from ``segments[0]`` after its
-+SRv6 strip::
-+
-+    ip -6 route add 2001:db8:f::/64 \
-+        encap seg6local action End.M.GTP6.D \
-+            srh segs 2001:db8:2::e \
-+            src 2001:db8:2::1 \
-+            sr_prefix_len 64 \
-+        dev <dev>
-+
-+``sr_prefix_len`` declares the locator length used by the remote
-+End.M.GTP6.E SID and must match the prefix length configured on that
-+remote endpoint; the SR Gateway has no way to discover the remote
-+SID's locator length on its own.
-+
-+The wire SRH for the example above is
-+``[D, 2001:db8:2::e | Args.Mob.Session]``: ``segments[0]`` is the
-+saved original outer IPv6 DA of the GTP-U packet, and
-+``segments[1]`` is the End.M.GTP6.E SID at the egress UPF in the
-+penultimate position required by RFC 9433 Section 6.5.
-+
-+End.M.GTP6.D.Di (`RFC 9433`_ Section 6.4)
-+-----------------------------------------
-+
-+Drop-in variant of End.M.GTP6.D that preserves the original IPv6
-+destination address as ``segments[0]`` (the last in-transit SID in the
-+new SRH) and discards TEID/QFI rather than folding them into
-+Args.Mob.Session.  Useful when the upstream service expects the
-+original destination to survive untouched::
-+
-+    ip -6 route add 2001:db8:f::/64 \
-+        encap seg6local action End.M.GTP6.D.Di \
-+            srh segs 2001:db8:2::e,2001:db8:3::e \
-+            src 2001:db8:2::1 \
-+        dev <dev>
-+
-+End.M.GTP6.E (`RFC 9433`_ Section 6.5)
-+--------------------------------------
-+
-+Egress endpoint that decapsulates SRv6 and emits IPv6/UDP/GTP-U.  The
-+active SID carries the 40-bit ``Args.Mob.Session`` field defined in
-+RFC 9433 Section 6.1 immediately after the locator; TEID and QFI are
-+extracted from it.  The route prefix length implicitly declares the
-+locator length on this end of the tunnel; no explicit
-+``sr_prefix_len`` is required because the SID is locally instantiated
-+by this route::
-+
-+    ip -6 route add 2001:db8:e::/64 \
-+        encap seg6local action End.M.GTP6.E src 2001:db8:2::1 \
-+        dev <dev>
-+
-+The route prefix length must leave room for the 40-bit
-+``Args.Mob.Session`` that immediately follows the locator, so the
-+constraint ``prefix_len + 40 <= 128`` (i.e. ``prefix_len <= 88``)
-+is enforced at install time.
-+
-+The optional ``pdu_type {dl|ul|<num>}`` attribute supplies the PDU
-+Type field (3GPP TS 38.415 Section 5.5.2) of the GTP-U PDU Session
-+Container.  When set, every emitted packet carries the container with
-+that PDU Type and the QFI from ``Args.Mob.Session``; when unset the
-+kernel emits a short GTPv1-U header with no container, regardless of
-+the QFI.  ``pdu_type`` MUST be set on routes serving 5G N3 traffic;
-+omitting it targets LTE-only / S1-U deployments.  Numeric ``<num>``
-+in 0..15 is also accepted (per TS 38.415 the field is 4 bits wide;
-+2..15 are currently reserved).
-+
-+End.M.GTP4.E (`RFC 9433`_ Section 6.6)
-+--------------------------------------
-+
-+Egress endpoint that decapsulates SRv6 and emits IPv4/UDP/GTP-U.
-+The SID encodes the IPv4 destination per RFC 9433 Section 6.6
-+Figure 9.  ``v4_mask_len`` declares the width of the IPv4 DA slice
-+that immediately follows the locator (in 1..32, the constraint
-+``locator + v4_mask_len + 40 <= 128`` is enforced at install time)::
-+
-+    ip -6 route add 2001:db8::/32 \
-+        encap seg6local action End.M.GTP4.E \
-+            src 2001:db8:2::1 v4_mask_len 32 \
-+        dev <dev>
-+
-+The IPv6 source address carries the IPv4 SA per RFC 9433 Section 6.6
-+Figure 10.  ``v6_src_prefix_len`` declares the Source UPF Prefix
-+length P in bits (1..127, default 64); the IPv4 SA slice is then
-+``v4_mask_len`` bits wide starting at bit offset P.  The kernel
-+always reads a 32-bit window from the configured ``src`` template at
-+offset P (the upper ``v4_mask_len`` bits are overlaid with the
-+recovered IPv4 SA), so the constraint ``v6_src_prefix_len <= 96``
-+(equivalently ``v6_src_prefix_len + 32 <= 128``) is enforced at
-+install time.  Bits outside the IPv4 SA slice are taken verbatim
-+from the configured ``src`` template::
-+
-+    ip -6 route add 2001:db8::/32 \
-+        encap seg6local action End.M.GTP4.E \
-+            src 2001:db8:2::1 v4_mask_len 32 v6_src_prefix_len 64 \
-+        dev <dev>
-+
-+``pdu_type`` takes the same values and has the same effect as on
-+End.M.GTP6.E (see above).
-+
-+H.M.GTP4.D (`RFC 9433`_ Section 6.7)
-+------------------------------------
-+
-+Headend behavior that consumes IPv4/UDP/GTP-U and emits IPv6 with
-+the SID encoding the original IPv4 destination plus Args.Mob.Session
-+per RFC 9433 Section 6.7 Figure 11::
-+
-+    ip -4 route add 10.99.0.0/24 \
-+        encap seg6local action H.M.GTP4.D \
-+            nh6 2001:db8:: \
-+            src 2001:db8:2::1 \
-+            v4_mask_len 32 sr_prefix_len 32 \
-+        dev <dev>
-+
-+The inbound IPv4 SA is encoded into the IPv6 SA using the same
-+Figure 10 layout as End.M.GTP4.E (controlled by ``v6_src_prefix_len``,
-+default 64).
-+
-+Per-route VRF / interface binding
-+=================================
-+
-+The five GTP-related behaviors (End.M.GTP4.E, End.M.GTP6.E,
-+End.M.GTP6.D, End.M.GTP6.D.Di and H.M.GTP4.D) accept the standard
-+``oif`` ``seg6_local`` attribute to bind their egress lookup to a
-+specific output interface or VRF device.  This lets operators keep
-+the SRv6 underlay, the N3 reference point (toward gNB) and the N6
-+reference point (toward the data network) on separate routing tables
-+or VLAN sub-interfaces, which matches typical multi-tenant
-+deployments::
-+
-+    ip -6 route add 2001:db8:e::/64 \
-+        encap seg6local action End.M.GTP6.E \
-+            src 2001:db8:2::1 \
-+            oif vrf-n3 \
-+        dev <dev>
-+
-+Without ``oif`` the egress lookup uses the default routing table.
-+
-+Netfilter integration
-+=====================
-+
-+The five GTP-related behaviors expose IPv4 / IPv6 inner T-PDUs to
-+``NF_INET_PRE_ROUTING`` between the outer strip and the new outer
-+push (mirroring ``End.DX4`` / ``End.DX6``), so iptables / nftables /
-+conntrack can apply policy on the inner 5-tuple before
-+re-encapsulation.  Non-IP inner payloads bypass the hook and are
-+re-encapsulated unchanged.
-+
-+Enable with::
-+
-+    sysctl -w net.netfilter.nf_hooks_lwtunnel=1
-+
-+This sysctl is one-way: it cannot be cleared without reloading the
-+kernel (see :doc:`nf_conntrack-sysctl`).
-+
-+Example: drop traffic from a UE address on an ``End.M.GTP6.D`` SR
-+Gateway::
-+
-+    nft add table ip filter
-+    nft 'add chain ip filter prerouting \
-+        { type filter hook prerouting priority 0; }'
-+    nft add rule ip filter prerouting \
-+        ip saddr 10.0.0.42 counter drop
-+
-+GTP-U non-T-PDU handling
-+========================
-+
-+The three GTP-U decap behaviors (``End.M.GTP6.D``,
-+``End.M.GTP6.D.Di`` and ``H.M.GTP4.D``) only encapsulate ``T-PDU``
-+frames (3GPP TS 29.281 Section 5.1, message type 255) into SRv6.
-+Any other GTP-U message (``Echo Request``/``Echo Response``,
-+``Error Indication``, ``Supported Extension Headers Notification``,
-+...) is forwarded unchanged toward its IPv4 / IPv6 destination as
-+a regular packet, so a downstream UPF that owns the GTP-U control
-+plane can process it.
-+
-+The downstream UPF must therefore live behind the SR Gateway, on
-+the IPv4 / IPv6 network the GTP-U destination is reachable through.
-+Assigning the UPF's address to a local interface on the SR Gateway
-+is not a supported topology: the SR Gateway cannot at the same
-+time intercept ``T-PDU`` for SRv6 encapsulation and deliver
-+non-T-PDU GTP-U to a local userspace socket addressed to the same
-+destination.
-+
-+Debugging
-+=========
-+
-+The SRv6 Mobile data path drops malformed or out-of-policy packets via
-+the standard skb drop-reason infrastructure (``SEG6_MOBILE_*`` in
-+``include/net/dropreason-core.h``) rather than silent ``-EINVAL``, so
-+the cause is observable via the ``skb:kfree_skb`` tracepoint.
+AFAICT, in the case of temporary addresses (those w/o "mngtmpaddr") this
+isn't really a counter, but a boolean that tells you if an address was
+already spawned from this address.
 
--- 
-2.50.1
+> 
+> Fix this by verifying that the base prefix has sufficient preferred
+> lifetime remaining before attempting to generate a new temporary
+> address. This prevents the worker from burning through its retry counter
+> during temporary network deprecation events like a router reboot.
 
+Again, I think that "retry counter" here is confusing. IIUC, what
+happens is that the kernel marks the temporary address as having spawned
+an address ('ifp->regen_count++'), then tries to spawn an address by
+calling ipv6_create_tempaddr(), which fails because the preferred
+lifetime of the public address is 0.
+
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Reported-by: Łukasz Stelmach <steelman@post.pl>
+> Closes: https://lore.kernel.org/netdev/87340td30q.fsf%25steelman@post.pl/
+> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+> ---
+>  net/ipv6/addrconf.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+> index 5476b6536eb7..f6a3d9da3cb1 100644
+> --- a/net/ipv6/addrconf.c
+> +++ b/net/ipv6/addrconf.c
+> @@ -4654,9 +4654,11 @@ static void addrconf_verify_rtnl(struct net *net)
+>  			    !ifp->regen_count && ifp->ifpub) {
+>  				/* This is a non-regenerated temporary addr. */
+>  
+> +				unsigned long pub_age = (now - READ_ONCE(ifp->ifpub->tstamp)) / HZ;
+>  				unsigned long regen_advance = ipv6_get_regen_advance(ifp->idev);
+>  
+> -				if (age + regen_advance >= ifp->prefered_lft) {
+> +				if (age + regen_advance >= ifp->prefered_lft &&
+> +				    pub_age + regen_advance < READ_ONCE(ifp->ifpub->prefered_lft)) {
+>  					struct inet6_ifaddr *ifpub = ifp->ifpub;
+>  					if (time_before(ifp->tstamp + ifp->prefered_lft * HZ, next))
+>  						next = ifp->tstamp + ifp->prefered_lft * HZ;
+> -- 
+> 2.53.0
+> 
 
