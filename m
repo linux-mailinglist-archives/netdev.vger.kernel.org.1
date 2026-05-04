@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-283967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283968-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2Hv5G13U+Gm41AIAu9opvQ
-	(envelope-from <netdev+bounces-283967-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:16:13 +0200
+	id oODrFZrU+Gm41AIAu9opvQ
+	(envelope-from <netdev+bounces-283968-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:17:14 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C43B24C1D06
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:16:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D32504C1D1D
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 19:17:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 345E6303CA49
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 17:14:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 616D0300C93C
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 17:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DB143E3D9D;
-	Mon,  4 May 2026 17:14:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E58523E2745;
+	Mon,  4 May 2026 17:15:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DI14WPC2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lO7qZNEx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 386BF3E3C70
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 17:14:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F97238C1A
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 17:15:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777914882; cv=none; b=K+6G3a7KYOoMc5QL/NMzFFFUfWVHURfLBqbPEAOwFgl/bYBHbhvtBNm/UhzjtMV3B9Q9H23me4hSBHqwk0+RTRja6Vndh30aVtIUAofIq6rdIiXdYGIMljJ1pjxLwhmXzYqoWXM/yxErU7i/ACFX3FGw4J3tDsCU1qo3Slbxn/c=
+	t=1777914916; cv=none; b=FRnAGjPHjASjp1eNj4Oes+1Gki10drbr3i4d0NScX6P5/2PPPWA7nt4BPRsAbKWyILVd5ek5GvQCIvTMtF3S3uMSUuxWfoPUSSxuV0FSqn7JaaF1YeX2gwhqnHDzrPW6Plgfgm42oF52PJVb+lIUqSGL1H1UWbtz50EmKrZMWaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777914882; c=relaxed/simple;
-	bh=gGhv5aBvag8GkJJw8oK+HvN5ptj86XyPHMattSfFigo=;
+	s=arc-20240116; t=1777914916; c=relaxed/simple;
+	bh=ZF0b5k6QZhASJhGoG2LmpZvetDnSN8wEAPWc9ASZ37o=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=oog+00XJEhvjrFRL3/i/pMdaE3leEjBKGHjvw3wcf2RLmyY8Mr7/66kWrDBLUgj8lQMlXtQ8oO+OuaO3pAI96GpOenAbE3SMzeS9oXx6Nx83p6G6Fqf0Bry2EQ83TblOvUsS0YDJzgQipNMs0b9p0xLzGChkgVKbx60gd6CuRwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DI14WPC2; arc=none smtp.client-ip=74.125.224.53
+	 Mime-Version:Content-Type; b=I4u4SmLgyXsWrjTEmO9gLlBl41AVJ3x78SfpNFgfko8wVTDCR8H63Sd5zac5k9x5reW53GwJ3zfLB0rPlI6HP2G+o2c3CqPYUNobdQdk5UjKRVIa3P4dHyP7XMIluLciJ+8GkEtZFWVVtn9iHfewglBk2ut6d2K/zGX6mJj9fnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lO7qZNEx; arc=none smtp.client-ip=74.125.224.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-64d5a7926cfso4148139d50.2
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 10:14:41 -0700 (PDT)
+Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-64eb84d1e37so3304713d50.2
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 10:15:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777914880; x=1778519680; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1777914914; x=1778519714; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ar9A5QrYRWGb5NIZabW3eNiZEMmSWnS35Z/zWd2ipnM=;
-        b=DI14WPC2wnkewoRYZry85ZxY+ipIWLtEYITEHtf283ICw1sHSz3p/TiAqWEXJDd59F
-         /BhFrabnLgIRwRsEmPg4w6tF60HHxKOpXn82PQ+ss1hJSzIvXqpzBdFm5OU6Uz1l2YQi
-         QAXnA9fub1TVdUMGE+oEisUTVDJ0xN4l4FNWAZjTypSEXEv1NjUZltedFZZdmkq9slzm
-         tZhIPCmy/sT2X942gaoVGepvErELv7KhVzXD7/B1SrE/85pIbGaN8NVlZB9ws2IEKQxj
-         OJhLxh1b+1gT/KcdiSfNv++109GpFnseMArG4WZMiZSAL5129FaCx7QQLJ2oyCnUt03/
-         zvTA==
+        bh=MPjKfclZpuBGr4xr8o/9fBtma70T3K5CPwubsAor7+c=;
+        b=lO7qZNExMB1ZmiSztIGEx4pyhabxfqLpdaZB4tmiWkCk3VBUpbeUqmz4j/9tQSUzsP
+         196dzppjzbfA+7+DtpVUYj47RkF9xP8lE+0riwvbIpjCw/5cmSCE+hldhZpHLTjZNRLw
+         4CuGAUh4OUQ5W7rFlkbbox3dmWzWZXNBH0uZcQvAt1ptaJS0pfGXS3E9HRanzCRtveQU
+         EvqEoPtg9XOlc5+ONmv00D4yCQTG3izh9v/Ac3g2++vszPk60bJ2RkEw4zPyr8jPsI19
+         wkTSgv0NhwqepDSTxdmQ0t7Lje6oVWMJHLydNKwOPzvRNXOgmwbwC1asl/iNFIlnuafH
+         U6nA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777914880; x=1778519680;
+        d=1e100.net; s=20251104; t=1777914914; x=1778519714;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ar9A5QrYRWGb5NIZabW3eNiZEMmSWnS35Z/zWd2ipnM=;
-        b=nFzs7fagOzGYwXs3cp2qtSflTzdDRNh/Sh7n5cofFaQsk0uXfBINDdWdtKZc1tnYG+
-         dN/C6BDUDe/AMxXIojnIsJAz9CSazgt2QeFYCzYG9HqT83xuA0YJoKjSjyl4RTVYi8or
-         PYu7vMNTXtM9RXQm6ZkeRWOpA9C5e9bB5jNv6etKRztfsCJEcSEvPIUYUmJwtvTVeaXQ
-         QCYagVU5I1YOqQT7G8E/FMZNBJADB2idsdr8Ebyq12KJtAtGHGh1RLGPxwhVjsGQcULz
-         gyskv16l3B+La7A6nFOnUrF13XmkWPm1C8kn1mBwWXMEAY0k9mOoXaEjB+A3hvqpw9iL
-         rBAw==
-X-Forwarded-Encrypted: i=1; AFNElJ8ovVKHmlWb2+Xkhnj1omX3QFVdQgLwvXig2b7OoXusWXGmfi2perPKYIYDyxUpf+WZjxEJuyM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyl26xsAnpw6NrIj8RuAWKTIAPSv1denlCdLUMsi8Rq3xuncezI
-	6qW1D8dFOsX3YS9q+GwQx7vuMydXI4beBQ54HtHSSy0whDgN/P6HK+ztKMfNZQ==
-X-Gm-Gg: AeBDieuAP//H8s4ZwrSJLu33gZ/rXyI09dUUM7xLEkzE41yDs+ixKg+OvNatt3cR+23
-	IubPzhc5MZD0l4LwO4W2C8dZxr+cHV5wxlnZfTMy6uKAXOmoJxQywl2QYzZfXLnwkDTVmVnO1Kd
-	PPczzu95zQAemthpi4m1ULrOryQDDxT8WkP5kgT9iqKF9r7lGXkU39mFRqjMaBS6TSkHkN9hMMA
-	htewYRlP+1Y9TDPgHfMlaaOJbsNpOf/yX++k4RFuSnzE5Qm145hRv7Me0GRD6EnA8FLFm72xz8G
-	z/+E8P8/x96+EGpLv27PsRuArPHxqq29WsPRrNiszY7VoNXgaEJhi8ZpAMmg3V6ObXtF2b6/f/J
-	g0NW/C+jflEaYYsDG7TdeTWVRQKpCgNzfx5vt6p3K3HRNOVcE0oV+bHze3aw0zecpe8Z7CfDABw
-	/IGJGu4Wx8yHBCg+7oMZ646KsW0l8MKXajuf55CyGRjUVTfiT1LDdj9dD5UME/9Un4anuMUqdEW
-	yI17mXk9IY1Blrnf6PLK5IHMw==
-X-Received: by 2002:a05:690e:d41:b0:651:b13e:f9ef with SMTP id 956f58d0204a3-65c3d9a2bb6mr9826363d50.14.1777914880194;
-        Mon, 04 May 2026 10:14:40 -0700 (PDT)
+        bh=MPjKfclZpuBGr4xr8o/9fBtma70T3K5CPwubsAor7+c=;
+        b=k3839yyYpmNXHsDFP+iLpSzxcbLhVotysFLXI8oGDG1ZZ87brE4Ngr/zE4LAYBT/Zl
+         ZN48BTENYaXub7I7xxcfceafN+xLNkn+kNNOfZ0SMCkK0TBtjdRFGIi7XEOSQ+MWdUrH
+         /tDNMN539Ad1Lv+4B7K7Jbvzj/F3Ru4qVFNRbyGm21uEigaqBf1Of9kJXfZ27g5VdoMm
+         kgnrt7tTv3LJFh9BjdUIrXpuN7ZTcjnMwVvgX6rvGpjfXM0EEyf7p1VDX0qKj4bPIst4
+         Vk7qLlKLJwp9eK1ez4gcIaXxYMBjPYjeyTgjBGbxs4ajASxeeTDo7jzTYDm0bw+9Xdd3
+         lFJA==
+X-Forwarded-Encrypted: i=1; AFNElJ+P75OGKIwQ77I9tXRS5XMG1DMXy14GEXkKNpZR0XHjAy2UlzMaS0W88L18MXtSuhF4dv8J6TY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwA6lsib40zT0dfe2hBPP6BWpaekKfkuy0O/NSNOHJr1dbZftXi
+	JGMOug0zWXnTYpir0qkJBjMprsCdIZNGVbSzFbhFmXNRwyIw1dzxUZSj
+X-Gm-Gg: AeBDieuSHSaS2qJ/KnsOK7WjRwEb0RZf0SS/6goXBiZCIPrGzbFzab4tjjD9NMI0L9A
+	pUaziTn++9h4NbqBPlYcLhRPA8auRcBFYhkhXGBVmwdlIBj1M6oCXWkDjzK5P2nrwMVpNH74iMw
+	Ru9oXAJ810ExAHcBoKVl3NH/BTagAtH2vbzDlhtEWJ9a9TNIfAOR2xtsOc0lSQ6EmECVhWFkjkS
+	guZK5W1pwLuWMGZGsFaOvCLpsVBCDbZkc0grI1xEPD47rOryyZShLgUclbBhCJFdT6gzw+B2Slo
+	f05T1X+cXsccwG/uruB5+cmir+YlzXA6b6fz0NuxpyZqVRRgknfN8b+vSDbtXhnhg3NXeTVR+zT
+	mucRoTfxEbMUGFJo1+FXOiBnxOVbhdStDniJOMZHBsGpfGhiAf4fTgOFlXAgtASblEMxWvYiTcE
+	1M5s0boxWojY1qv61K3Jzu9UhfuhSUjPTPVqhN9B4KUXvGT+bouzKC+z1QRaGXr7n1MSXGjITe6
+	fHzwzVxh5ce5alcmmWKygB50w==
+X-Received: by 2002:a05:690e:bcb:b0:651:bd70:1622 with SMTP id 956f58d0204a3-65c3da0c96cmr10543400d50.10.1777914914418;
+        Mon, 04 May 2026 10:15:14 -0700 (PDT)
 Received: from gmail.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65c2e1bb5adsm5751702d50.7.2026.05.04.10.14.39
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65c2e86e35csm5782052d50.16.2026.05.04.10.15.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2026 10:14:39 -0700 (PDT)
-Date: Mon, 04 May 2026 13:14:39 -0400
+        Mon, 04 May 2026 10:15:13 -0700 (PDT)
+Date: Mon, 04 May 2026 13:15:12 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: Nick Hudson <nhudson@akamai.com>, 
  bpf@vger.kernel.org, 
@@ -97,12 +97,12 @@ Cc: Nick Hudson <nhudson@akamai.com>,
  Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>, 
  linux-kernel@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.3bdd02f2dd7c@gmail.com>
-In-Reply-To: <20260504101759.3319427-3-nhudson@akamai.com>
+Message-ID: <willemdebruijn.kernel.3b7e1901d86e3@gmail.com>
+In-Reply-To: <20260504101759.3319427-6-nhudson@akamai.com>
 References: <20260504101759.3319427-1-nhudson@akamai.com>
- <20260504101759.3319427-3-nhudson@akamai.com>
-Subject: Re: [PATCH v6 2/6] bpf: refactor masks for ADJ_ROOM flags and encap
- validation
+ <20260504101759.3319427-6-nhudson@akamai.com>
+Subject: Re: [PATCH v6 5/6] bpf: clear decap state on skb_adjust_room shrink
+ path
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -112,7 +112,7 @@ Mime-Version: 1.0
 Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: C43B24C1D06
+X-Rspamd-Queue-Id: D32504C1D1D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
@@ -124,7 +124,7 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283967-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283968-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[akamai.com,iogearbox.net,kernel.org,gmail.com,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -144,19 +144,26 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,akamai.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[akamai.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
 Nick Hudson wrote:
-> Refactor the helper masks for bpf_skb_adjust_room() flags to simplify
-> validation logic and introduce:
+> On shrink in bpf_skb_adjust_room(), apply decapsulation state updates
+> according to BPF_F_ADJ_ROOM_DECAP_* flags.
 > 
-> - BPF_F_ADJ_ROOM_ENCAP_MASK
-> - BPF_F_ADJ_ROOM_DECAP_MASK
+> For GSO skbs, clear only the tunnel gso_type bits that correspond to the
+> requested decap layer:
+> - DECAP_L4_UDP: SKB_GSO_UDP_TUNNEL{,_CSUM}
+> - DECAP_L4_GRE: SKB_GSO_GRE{,_CSUM}
+> - DECAP_IPXIP4: SKB_GSO_IPXIP4
+> - DECAP_IPXIP6: SKB_GSO_IPXIP6
 > 
-> Refactor existing validation checks in bpf_skb_net_shrink()
-> and bpf_skb_adjust_room() to use the new masks (no behavior change).
+> Then clear skb->encapsulation only if no tunnel GSO bits remain, keeping
+> encapsulation set for cases such as ESP-in-UDP where tunnel state remains.
 > 
-> This is in preparation for supporting the new decap flags.
+> For non-GSO skbs, there are no tunnel GSO bits to consult, so clear
+> skb->encapsulation directly when DECAP_L4_* or DECAP_IPXIP_* flags are set.
+> 
+> This keeps decap state handling consistent between GSO and non-GSO packets.
 > 
 > Co-developed-by: Max Tottenham <mtottenh@akamai.com>
 > Signed-off-by: Max Tottenham <mtottenh@akamai.com>
