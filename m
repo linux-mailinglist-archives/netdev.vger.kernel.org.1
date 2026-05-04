@@ -1,119 +1,119 @@
-Return-Path: <netdev+bounces-283770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283771-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0HXfOfxu+GnkugIAu9opvQ
-	(envelope-from <netdev+bounces-283770-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 12:03:40 +0200
+	id 6L9QJdNv+GkYuwIAu9opvQ
+	(envelope-from <netdev+bounces-283771-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 12:07:15 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 744894BB64D
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 12:03:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D9DE4BB6B9
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 12:07:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3C83F3015A4D
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 10:03:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A68FB3013EDD
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 10:07:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD17C38E119;
-	Mon,  4 May 2026 10:03:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C30390C8C;
+	Mon,  4 May 2026 10:07:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WM9h21GD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="muz9aXvS"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E2938D011
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 10:03:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF5538F957
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 10:07:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777889007; cv=pass; b=iZGr0qBjukXOVOQv3lqy3TNSs8wHGWGbIZ/0tOj9cOXrR67DU+wJeGn2uqDHz6/F8AZDQwaTjkdrjUWEgQMUvNf0qltCA1nP35VM/A7Z9vN9y2+4WW9+Zo0X4BvYSAVwyzcX3WBh/JNxyTVM7yfAQMh/EtkQXKXZBzflZpWLi/o=
+	t=1777889226; cv=pass; b=WR4EE8tJ18gMDtYb07MROPq9x0d63W3Fs/MmcqSMhTd2boMLj3MRnc85zUH0uBU7OxzL4dNRb0il67H5UK5sMzMaaDiSoWUYGKzgmDsKBHLI19WzavLqu7iVsOko1Dhx36ZtfAznIGPoEyXoBqslWOeXVt3pNZJYmgFnQNbt0DE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777889007; c=relaxed/simple;
-	bh=fTRrJjV34qZQDRuG23Tk+EmuUUwK8IsUO01i7mfimyE=;
+	s=arc-20240116; t=1777889226; c=relaxed/simple;
+	bh=A8j2uAak57KcKUqXH317uowDb7PaTwJP49rr/2FSGxg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nGAs/mu3VSeI2XfRROnJJnO9H8/qzde1E6kuuZqgbTfDr7Vj6oX46H+7W4ohQupG5xMbR0fIX9yPu8HQlIJ1ihDBACZi7kuPjisSC33J9HjL7v9j7OrCwkVEgcQ/THRLyiahLE+djh//TVdSQ0fY4bzn/8KVAw7Zwopcts/saX4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WM9h21GD; arc=pass smtp.client-ip=209.85.160.176
+	 To:Cc:Content-Type; b=QE94l5KbIr2SeTrFD/s3vT3DBtMcAOy6pUNlOXPRtgtb/EbUA6R2fsdtOBiMxuu+1zWuZyz6Wg9svTxVI0utW5q+EyQQAe7AgbOPdPEG79svqg3UWK+f/8LjEv/igCymkBtnwLjePBvEkFMpCvj9/1Sblmz7kh/8wRNfkpXIO3s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=muz9aXvS; arc=pass smtp.client-ip=209.85.160.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-50e614fdb42so34693591cf.3
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 03:03:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777889005; cv=none;
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-50d6b9bca48so58113231cf.2
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 03:07:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777889221; cv=none;
         d=google.com; s=arc-20240605;
-        b=B7sf9xbfjDAxpije93Zt5FmOJVfSahqreBqt6zwMxivSw5EPDe21+IDVLqzP2cJndi
-         LKHCm5mYp543eNKNmZYR/w+On37jwPAfxMhCVJ4f+uM1GMq9eXxXrfTGd02iu0NQjU0H
-         GgZRWNcLv6hJ2KRdoxDsFCeW2x5A/I9+SuG4v6efbPZxE4azn3z82qyd+GFfRdMnG+45
-         NjOCWfd/WvvoyUeLqMMxTdJrMj7ZTfu4TPodXiFLlHdg+YEHHwvvXBWSoS2CYUUc8DSZ
-         g3ghQrQrM88td0jAUWpYWyzG5WLP3zdK2UMkIcabyEckIlrFafcn7j04dQIRgMy6Qb2r
-         9JgA==
+        b=c4M0u/+4TxQyiN29CYjH73u8gwVUoknWp4SR+8cDCg08CWTS8QM9NFVpCfQWzBgzDz
+         vPq0XZZlkVCHKyLbC0B3StxokyzhFCBwxQ3cgW/1HkRFUO90sERdrO5PuEr5r1jsnZ7j
+         6akkQ5jXqHZ1GIla//9IJW92ZHbAU8NENVDLZypHs0mW3XvkwWG4/ahoqAJzpxwXXhkK
+         bs6EcoypQJ1+UbSigwO/jpYAf+DGoKiWiWjdLto+Mw1gbhuZ2hL89ZRpBxbmZ7fO83fv
+         yO4Nia72sVzfEDVxsAvsGVzkZqGfvj8Z3gQbrlb/F5sHp9O7EXs2IxtroYgknGqeeopW
+         MgeQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=SevCSvA/vlH8QdRGoRkpvzPTZ9TtM+vve4oLpHVSjLM=;
-        fh=648PHnvz/AxizxqIRMmsSLmM873pHQ9JVuofgK2nylQ=;
-        b=ZenKtbxHJHoZZEeA3zswHfZJ6+1XgcXdeThLMhEmV3AxNCTqSs8aqzr3bn7mvsJYBZ
-         pKrLLBdFh0PKwGiFz35X5elAqnxQsVAtd3a40dAXxU2hDofOgKGQ5SLaz1LdH9D09tNC
-         TyyvwG6Ds6H4/fgsdkur/aJwThVR6CE6Xv4IWHggGkSPFJ8z0BTNwGcdnuwVA/RbfN3B
-         uwiUU2aSyKFMVuDVZSW3fDl/phXhs+mWfkvdpawnAG4Yd03ee5wPUNN2AqZ3kGJXzot8
-         qEbJ2/sMWcDIaLPh7Q+zNOSOMmxYXgk94/EV9EyYqUbQNcde7ZHdLCrqXzJH7+VQbUwX
-         XyFQ==;
+        bh=28TX/MhhEQJejGX5c2OZbC5NJrccgjPFgxvWmNQ6nGY=;
+        fh=1QAkXB1jIQMbhONOcIh7TtysnfeXU1AsXd5Z/I/Bad8=;
+        b=B6n3hZbnE8kQi3cf4YpDWgkg4NGR9u9YIoKUDFHrvr9M2XzllKzqb5dncXeVrEbWmU
+         8VPbiD1Af5Ll30psZM66InjWsdDbzqohPk6vfSgeBlwELtU4guf3fC4dpSm5RkEnFMog
+         TkzEzuRcWud5mM9ggaJ3EBYnyYZis/zFd6sn5V36d5pjeY4SIYyhnpbA629lWFxaRlMN
+         Bty/svCBxBdS3+pI/InE4zLyqdmh9gYMXEzZccumnOR7+gT879Na9ivvvloRsr3WoIDh
+         /H7M9z46Aamrq1TXm6/o0n7lHl4NPev6RsLZ0rDJN0GZVnTWUHBBJ6cTiJDfwzmnwa6A
+         re3w==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777889005; x=1778493805; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1777889221; x=1778494021; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SevCSvA/vlH8QdRGoRkpvzPTZ9TtM+vve4oLpHVSjLM=;
-        b=WM9h21GDtsZlmdku6+niHJn0TJGcK96fZDErIbd7ha1HKnJsLkX5mLpcGmIs9TafsH
-         H9qEQ3RREpNorJ+UaH3ZUT9s5ruSvkxZf+3YOz4Sr3U+/3kEA08/Xdx4p3tDD8liG4ZZ
-         xKMt6vKsrbsfD756RLogbZvoO2cglr/5CS8SDWsG2GNtscTUEscIw0y5y4yaZUPX50YS
-         D26Bf2OcEr8OwhAq2ptP6iiHoFE17UnYolpf39upBHDnw7pLO/J+oeF0kIsVORZP8rOm
-         nz0FHpWuoad0A6E8oBsnR59T1s73nrgGTCKSJzMMrvtJ8cHrr5L97uBHDTXKwlOvpEua
-         kvSg==
+        bh=28TX/MhhEQJejGX5c2OZbC5NJrccgjPFgxvWmNQ6nGY=;
+        b=muz9aXvS/2468QvCeG5PkXJuN8u9phwkoAUqk/pqY/Ibycl/+cs2e4DVCUt6W22OpJ
+         1f80Ke4XqxPMvBCWQY8gc7lT9R2ruRpoRcTxVeQ/iuJTkET+6FtexQ3QUchB95SGEkjY
+         1iNpfMThGVk3qX1DuUaTOEfaqmftEYMeA9PyUm3TW5VSUGlIClOvqFm32HR4LISYK24F
+         +4Flx6/VwEn3p1zR5jo5p29dVOJz8McoalWCm2exKNVrG48htu2AQ/DCmiuqcNZmnPBz
+         kAatQf+1jYzss3mmEctsJKEefFS0H91yDfS/VH3HfV4NlwMVew2PfUPWasbopt2lbTqA
+         UV/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777889005; x=1778493805;
+        d=1e100.net; s=20251104; t=1777889221; x=1778494021;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=SevCSvA/vlH8QdRGoRkpvzPTZ9TtM+vve4oLpHVSjLM=;
-        b=MWwwHSzu6CnEQh/HJg7o8vGQi34iSV35pnfO2FBklk7NG+mD7y00ZSudn19wWDahcl
-         IHLdbLfuHO1v/XbsuVJJgJGgi+pbLxTHWL3mv0EZUBJs9FhTI3Bfq5yi+rMF5krlph5K
-         ScNZZLPW3Mr+AVX4WtyiwpL8CGGkU7pGH8pkWH4q2FIdD1TN77UxEO25Cp2/vNyJo34T
-         gniy8zTEiULrhnXmS1noWNXhfsD0NEqfoHs4Fqnf6n7I7RI9JhiVcIfl8bmbPABDvu0G
-         QwFyLd8eUf/f0sHp9fmrI49MfDwW7TGFuzg5txISNaVRc4NQXERPljQ/8FT4y5W2uzbG
-         B+dA==
-X-Forwarded-Encrypted: i=1; AFNElJ8m4RSNlrnVxUZhQiDK6bs7akIZKDR5TcU63Tn5VsUygrkrjZF3Vqs+fg2WIdFb6uMwW3eRnK4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxX/NhPWpx6YvCoXAHz07zQnn6Owhbp/BH1+YUJ9N3ZCZgclS7o
-	hOGsoQgmdWrM7jJjK8CDa2/Zjrn4iMVKFfTx3bG0hQF7WjrIFlD5MXdO/24MiQ5gqc8R5SY5kxl
-	dGHuG/6wQn6Y133ytvrhIISV+DcohUGO3MTxZOn4h
-X-Gm-Gg: AeBDietjk/U6cWoIcVVcfknFJRKWg+hxBqDvpGMPpz8HrlOe9GGoYyw9b/kqdgd0Fen
-	iAM/VW9t/wlUqmZD1QTiWjpJEO/ahNH8j2Y5550d98eT7Up3++OYLYTQ7vXQdAHvCXTpNyQ9JbG
-	WpC75SrQA3YIylNfiWJC+EmieL99laqX9a69F+F88GYcVeuP/iH0MDdSqL8D3gHv+q8KRAvCIiL
-	L6e9BMr2AK4sLTlisLkXK3YzEvapZmacmwEOgRRxhSADDippF3t3fntAUy80WGxDJXPHG/uEgjn
-	UgxzqzH+EgyV1c4iQQmZUT1PZndVdLfgmMjj1g82ZBTTpAZ/bhhILQDPV35zV1qvXTqSk2Koev9
-	W9JEYo+2HNwYej+DJukVjTCtx4wM8nMUMqkPRCL8=
-X-Received: by 2002:a05:622a:a15:b0:50b:4a84:aa94 with SMTP id
- d75a77b69052e-5104bde3d4dmr130942281cf.7.1777889004551; Mon, 04 May 2026
- 03:03:24 -0700 (PDT)
+        bh=28TX/MhhEQJejGX5c2OZbC5NJrccgjPFgxvWmNQ6nGY=;
+        b=rNkWtwkhZnv66/+8a8dDYZaL8QLejddKMim50Zd9cCY2J5eSF5BpGj8cx4BruFn4sH
+         vy0NPCphEkAbjyZAkqjIGhyo79s8SC85jdHO1GcgRsVb/U1W4PRRrL4loWjjbO5pQOuQ
+         tpscKf7WB0EJPKcH9SRYwbPRSOOLncitCx5F/eYKgLMVdTBXlkSHYS9HSVPAAKipbDlK
+         yEly3QYHiHarTFKsVo8S1DNB6t2LsWhFm6ckKqX1DV3EPy8vt/ytYpOhGNXUHuymuZ4K
+         VHNlmfCF96dlDx8Vf3ujTbVIdsKcIFbB9oa/2UkDc0EEKO2pSPRxaPK3+t+lBOoQNQkO
+         U7rQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+2ZrXuP2CMITL+il5ECPv/c/BNWhAHMFxJ6njoRcpQIfiYJAxDQNIPIEAXT+iZTv73ZePFP8s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwR07UYH1wi2MYl9HVPIYguvR/PSCE54jC95NDbR+diSr/hV6FE
+	P6G9Y35+alDBFXuCIBQ58ZTRdAnK2NtpEnPoZY4JXLbHruAMSTJUQvmVZunPNgq6LRUEOGh3ijo
+	SzaibAflozBgEZr+tP21hY0ZpmrOLuYx8nemJY8SW
+X-Gm-Gg: AeBDievnT2yN2ndEdf79nPfcFyU8KiL0o+BGoErdz1aGuQnssT7Nl+S67OwEC0uo27u
+	HzTHPEhmazis1blNozcpgNvCF0dFW+o464jr9ZmndhyEZuDYkWi4jXAB35DsBjhtrngUWc7AJM4
+	ILBkTMDsaJ8ZxTsXj39hzIW01vQthHreR1puMt04guCJhluXHH4UHtJtK+AMRZg8BxTbXCwYBgB
+	H87Fw9bhc6DNDTfRHw2lMmSz4/49myGvecB5V1R4C7j0pRIiyJ2XCzEeHGGYiPNnRh4yY04Cc+q
+	R5b8sTs8txgQbXtDxb3pgMRQYGhT1h+AIji9qketBbgnlDrZS9ZC/m/YXU6j7UnJ5D0UPmSICS6
+	hTw23My+JsivrD35S318ymRGt9Xo7mAMNAIGwIio=
+X-Received: by 2002:a05:622a:4805:b0:50d:86cb:db75 with SMTP id
+ d75a77b69052e-5104be06a0cmr127767591cf.7.1777889221074; Mon, 04 May 2026
+ 03:07:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260504055558.3470994-1-edumazet@google.com>
-In-Reply-To: <20260504055558.3470994-1-edumazet@google.com>
+References: <20260503170257.2782962-1-edumazet@google.com>
+In-Reply-To: <20260503170257.2782962-1-edumazet@google.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 4 May 2026 03:03:13 -0700
-X-Gm-Features: AVHnY4LLGg9Mgp5MqokeasqCI8yCsCOsgDWT6veVjvte6tFpkrO_6ZSTzVNYu8k
-Message-ID: <CANn89iKgiGV=y8Q_x6Eb5Yym_6yXwBQgodLj0e5veUOHf7Cxtw@mail.gmail.com>
-Subject: Re: [PATCH net] net/sched: sch_sfq: annotate data-races from sfq_dump_class_stats()
+Date: Mon, 4 May 2026 03:06:49 -0700
+X-Gm-Features: AVHnY4K8l1Xzn_Yy7FVzYG7WTKdwgY0paavy9AjmY2tQB54bdwR2YanOizjc--I
+Message-ID: <CANn89iJdT09YJ5fRnwxV_hHS25DrCLM1J-8FmgRA=bgenp_Hvg@mail.gmail.com>
+Subject: Re: [PATCH net] net/sched: sch_fq_codel: annotate data-races from fq_codel_dump_class_stats()
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
 Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
 	netdev@vger.kernel.org, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 744894BB64D
+X-Rspamd-Queue-Id: 2D9DE4BB6B9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -128,7 +128,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-283770-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283771-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -142,41 +142,60 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On Sun, May 3, 2026 at 10:55=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+On Sun, May 3, 2026 at 10:02=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
 wrote:
 >
-> sfq_dump_class_stats() runs locklessly, add needed READ_ONCE()
-> and WRITE_ONCE() annotations.
+> fq_codel_dump_class_stats() acquires qdisc spinlock only when requested
+> to follow flow->head chain.
+>
+> As we did in sch_cake recently, add the missing READ_ONCE()/WRITE_ONCE()
+> annotations.
 >
 > Fixes: edb09eb17ed8 ("net: sched: do not acquire qdisc spinlock in qdisc/=
 class stats dump")
 > Signed-off-by: Eric Dumazet <edumazet@google.com>
 > ---
->  net/sched/sch_sfq.c | 48 +++++++++++++++++++++++----------------------
->  1 file changed, 25 insertions(+), 23 deletions(-)
+>  net/sched/sch_fq_codel.c | 37 +++++++++++++++++++------------------
+>  1 file changed, 19 insertions(+), 18 deletions(-)
 >
-> diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
-> index c3f3181dba5424eb9d26362a1628653bb9392e89..bf55e3d71ef4da24eaa5a7344=
-4c14d809268ef54 100644
-> --- a/net/sched/sch_sfq.c
-> +++ b/net/sched/sch_sfq.c
-> @@ -225,7 +225,8 @@ static inline void sfq_dec(struct sfq_sched_data *q, =
-sfq_index x)
+> diff --git a/net/sched/sch_fq_codel.c b/net/sched/sch_fq_codel.c
+> index 0664b2f2d6f28041e5250a44fc92311116ae0cf1..f52198ea849b0cc966b455905=
+a62d6c413441260 100644
+> --- a/net/sched/sch_fq_codel.c
+> +++ b/net/sched/sch_fq_codel.c
+> @@ -117,7 +117,7 @@ static inline struct sk_buff *dequeue_head(struct fq_=
+codel_flow *flow)
+>  {
+>         struct sk_buff *skb =3D flow->head;
 >
->         sfq_unlink(q, x, n, p);
+> -       flow->head =3D skb->next;
+> +       WRITE_ONCE(flow->head, skb->next);
+>         skb_mark_not_on_list(skb);
+>         return skb;
+>  }
+> @@ -127,7 +127,7 @@ static inline void flow_queue_add(struct fq_codel_flo=
+w *flow,
+>                                   struct sk_buff *skb)
+>  {
+>         if (flow->head =3D=3D NULL)
+> -               flow->head =3D skb;
+> +               WRITE_ONCE(flow->head, skb);
+>         else
+>                 flow->tail->next =3D skb;
+>         flow->tail =3D skb;
+> @@ -174,7 +174,7 @@ static unsigned int fq_codel_drop(struct Qdisc *sch, =
+unsigned int max_packets,
 >
-> -       d =3D q->slots[x].qlen--;
-> +       d =3D q->slots[x].qlen - 1;
-> +       WRITE_ONCE(q->slots[x].qlen, d);
->         if (n =3D=3D p && q->cur_depth =3D=3D d)
+>         /* Tell codel to increase its signal strength also */
+>         flow->cvars.count +=3D i;
 
-Oh well, silly bug. I will fix in V2
+I missed this also needs:
 
-This should have been:
+WRITE_ONCE(flow->cvars.count, flow->cvars.count + i);
 
--       d =3D q->slots[x].qlen--;
-+       d =3D q->slots[x].qlen;
-+       WRITE_ONCE(q->slots[x].qlen, d - 1);
+I will fix this in a V2
+
+pw-bot: cr
 
