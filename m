@@ -1,232 +1,310 @@
-Return-Path: <netdev+bounces-283994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283995-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CsSUDYDm+Gmt2wIAu9opvQ
-	(envelope-from <netdev+bounces-283994-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 20:33:36 +0200
+	id WLOlAy/m+Gkt2wIAu9opvQ
+	(envelope-from <netdev+bounces-283995-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 20:32:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1C454C2963
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 20:33:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C21A4C2936
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 20:32:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 77F1F3051501
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 18:27:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1B0BA301BC2B
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 18:32:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 633AF3E5599;
-	Mon,  4 May 2026 18:27:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 064F13E4C9E;
+	Mon,  4 May 2026 18:32:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ajFqOG7n";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="X0TACS4X"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="C8WvEPj1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010015.outbound.protection.outlook.com [52.101.56.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA02829E0E5
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 18:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777919243; cv=none; b=LUw6QG084CANQWyOWr4EDPuejvavqqZ9O4a8XE8W0z6CwREPSzJMCfWsXZ35ItFwmEMGL3rj2OtmsvAlkQoEMPV8qTWb45S57PymKvCDrf8BbVMsk2j+405EqT70uGfN9O3S8PNG1qvRIJlVemFGAgkVZDf0cf/F1M4vGkoOj8w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777919243; c=relaxed/simple;
-	bh=y/kTyLZ+HlrQ86LL8qEx3AHdGjyMN0oqqtY2orbYvNk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=t7/7MlpFO2sPOar5w3qymA8FZsm845PGTmG8qC7L1iPgq0BDJN4STtZ5MLJfw8mOhzCo7J0mQwaKg1pCfCpc5iGx33BxuQ1pYEknIqmc/CEvcudTsCe6m6wgl/qCfR7lGRuuXL0ZoqEzT4W23tpJEL46rjQ/UbeJ5ZJkXxekvys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ajFqOG7n; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=X0TACS4X; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777919241;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QcIoIPVGpy+t+hQB2IAxs25ATlafdN5syK1oi+kQ6lo=;
-	b=ajFqOG7npDB9cr38r1KHbO6t0tbncY2+MTX6CEOyHqNrMpqCftF7ObSow3Ut8ncyHv12BB
-	gqQfWPUwReD6wAmbyb8TgXUTdwQne+EZ2KeY/ojPRawQFyXNwi8av0Nc2q1xpzfVBfBSHx
-	k6EfqxfFdRJOoTRLxmaDy3l43OEEipQ=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-473-XzqcSXd1OS6y-kZFEebuBw-1; Mon, 04 May 2026 14:27:19 -0400
-X-MC-Unique: XzqcSXd1OS6y-kZFEebuBw-1
-X-Mimecast-MFC-AGG-ID: XzqcSXd1OS6y-kZFEebuBw_1777919239
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-50da31af14cso114131981cf.1
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 11:27:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1777919239; x=1778524039; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:organization
-         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=QcIoIPVGpy+t+hQB2IAxs25ATlafdN5syK1oi+kQ6lo=;
-        b=X0TACS4XXf3YLMC+ZSqUzPgih6j7BGfb0qvSALIdbFSgXDcnSq2D+/roChPmKAB2i/
-         I9xJTYPXRGwYI9krqrt4HBBkZt1iTt2kuy7+n5nE4y7RW48VgHJC5RRCpBnEFGgGW6Jw
-         qvYJ3XN/yC6htjdvm+27ZEePZy/0sx6u4mZGt8KF9dj72Bjip+70Ps1XFczIH7jQHNdu
-         rXLWE4L6lKh8kKrA5Fm4OQajZjqFBqOU6/iPZLvmzB3Exzjo19dsWjDQtBpGJ4czXSQX
-         uOapTF9697atNxMLgyuiRMPiUj6qJMg5X7WofJaEKn1wx3ZOtGJ5TvtomBXLoUHifK0M
-         8cvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777919239; x=1778524039;
-        h=mime-version:user-agent:content-transfer-encoding:organization
-         :references:in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QcIoIPVGpy+t+hQB2IAxs25ATlafdN5syK1oi+kQ6lo=;
-        b=omySUxwu/WxdRb7APcG2/a5UniSj3sFJSOzwX3kLbEdyeD9x32rkLrHtVLNYCNrllb
-         nDkHR7bTHt2Q6X4uwirnNyfATeTmB35BEVKz0Br3RVCJncaFqM/az3JsLofpP2GanaY0
-         HjjQC9q3VBwAcoLhVo4XccPZTPuHDnGFz+xRSInp1IYFoJVIZJ9JBoa6fJtff42faAYA
-         QFb94pzZMPzL9FwlvJdPLc+eytX8rPcdkf19ry27hM66LHNEb/J+F1++i/Y+If5MaU2k
-         ZDFYTk5X9TOyq1OCDPmoUZ9Gt3CdZeXWjxrwDGInx/oLPXUVQ58tPQrWZ/wegZVV6JCW
-         n87Q==
-X-Forwarded-Encrypted: i=1; AFNElJ9ZZ3/7ZmlY1sPeaQdnfCzPuGqSNmHaxqR5DvhyDIuQkHaKwahqykUb7kpUMXcXcy9GerUokwY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCtQgYEhEfIaWnepScHf8djPDHQPC1qn2TzRVOf7UjKva50iky
-	d82ERFWf0MpeMu0yYpTjcvacNDgP5AfyekHD4JmKyKsMspNHsNej5mLCbtbjAYD+SPtSUh7YqVC
-	KtnpB7Xd/P5Tc1HFGi7J+Xk+Q+knBrQNO7StUyhcYL8NOrytgslFVxn+UBqUO5yVrow==
-X-Gm-Gg: AeBDiesLEHqhkD9hsIAQ3MwXVp5pMn4aaDLCVFQkW6K2NcCVrP1Cm1L7Xi73ZoaJ4fZ
-	t/YxpVRJH50IQ+t4dKaIhEJ8B8As04zzxs3eQU6l6M8robou3PCrQJAA5b7vTlH5TLBiEuQtsjt
-	q66mAkW6LxDpobc31L6yYQQhOKJ/0VOgl9S4BhzlPmU8cgzAPArOQx0jdPvsynPTktzwMynR1Y3
-	sxVOhyg5yopLrIIkO6+bClpN1A1HlI7CsUYGW/yrzTE+E0aSwXgo8/YjqEW7gqWNl0vRFPDCGM5
-	Iw/FKahFC0lZzLGReaToTYYMjU3DPsno7kSvDMZIWYhN39eZzKLGiA7A/9HVOyZRzT869XdBI5R
-	A/+Mo6V98YyBuic/+9dhtEDpqTn8=
-X-Received: by 2002:a05:622a:5c09:b0:509:26f4:64e9 with SMTP id d75a77b69052e-5104bfa3385mr199674351cf.51.1777919239184;
-        Mon, 04 May 2026 11:27:19 -0700 (PDT)
-X-Received: by 2002:a05:622a:5c09:b0:509:26f4:64e9 with SMTP id d75a77b69052e-5104bfa3385mr199673581cf.51.1777919238563;
-        Mon, 04 May 2026 11:27:18 -0700 (PDT)
-Received: from m8.users.ipa.redhat.com ([2603:7000:9400:fe80::fc6])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b53ca982a1sm142199276d6.38.2026.05.04.11.27.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2026 11:27:18 -0700 (PDT)
-Message-ID: <2890ba9558b503c5316f04aed958337455b8f7ad.camel@redhat.com>
-Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
-From: Simo Sorce <simo@redhat.com>
-To: Jeff Barnes <jeffbarnes@linux.microsoft.com>, Eric Biggers
-	 <ebiggers@kernel.org>
-Cc: Jon Kohler <jon@nutanix.com>, "linux-crypto@vger.kernel.org"
-	 <linux-crypto@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
- "linux-doc@vger.kernel.org"
-	 <linux-doc@vger.kernel.org>, "linux-api@vger.kernel.org"
-	 <linux-api@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	 <linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	 <netdev@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
-Date: Mon, 04 May 2026 14:27:16 -0400
-In-Reply-To: <F100C726-F841-461B-BE2F-C2018C122426@getmailspring.com>
-References: <20260504173952.GA2291@sol>
-	 <F100C726-F841-461B-BE2F-C2018C122426@getmailspring.com>
-Organization: Red Hat
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801D63ACA65;
+	Mon,  4 May 2026 18:32:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777919530; cv=fail; b=TujhHabmu3BCMcY2D2LsnGWdeU7k5lIqB2P2+3gM83weqR5+yUIS1VSdn5gjPaV+1ZCJ6ywgxQgvQ9xOoUKHYDeFRzSIR0DaOdttUaNoMCHxEzFPcIAz6ZnR/tKSE5wbrqLoEqjXYibZmv2bVGEkcZRNF4H+yRwUnKoEomVIUn0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777919530; c=relaxed/simple;
+	bh=8qEHna0BQChiwkWAU9chQvc3ppCH4aCE0gCZ7CBb5nA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=heTSTGieGSOiSN07urN4UcTkWaTAeFS72vJY393DdOvGueGbXj8MNxIj97zU4D7/V3LRTqhSRbZMNxIYbCZjEark6IdCKLRqTviQpqM2IA2bN0OFRZRFOf79kj2TG1raT/JD2u8hY9Eu8nPMjYlwnAf4xblsrWblLBjXPeu02ic=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=C8WvEPj1; arc=fail smtp.client-ip=52.101.56.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lFs2FYh7Vo4BqUCXih480TfE+630N95NMFlRf5QR3eqs2LJrDOUt165nNf4VzX7m+Foo3b5TDA4ONIk0zWCM099oQlX4e8kPscGbAmnYd4bwm929rwsV3ve2o74FGQ/JbCPxXcr3JuvL1b99+iMlZpJjZxV/afPgK0H8tVqydg7Gmqrvx2CYvDF+5mQuV+NVLK9iqdBm5XOC8IxlzQ8AQTP8gy2qR66Xsv2EFckunfKyxTphsp3tJBmKF/2UIHnSUGu18LL5K6lOd1t+g1Aqn4FgP9aS4L7fueIEACOZxxSat2A5ej3Su8E6KBUi6/KLD8rZf0mwI5phqNbJOzQxTw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CBW7ZFI4MKlBJxx30Z8ejLX20Y+H39dCGpQz/YXPEdY=;
+ b=vZi34K/6bwnB3x5jPUGS2a9fw8iiBzuvwhkn6TL8+jomGg5OcU/aT/P1sHWuLA9JQ5gVvyJ/10yzaOo+RUHQn65iKm3giG2DoclRDSK5Tgf4n9iIe7tp2QajeCvO0d0RopO405hu7MfgyyqKNsvFnOIBkq+XhKIHCENLyB1QAG26EpVVfFjSy8CewcduN3SdZjLki3s3wXhbqoX5vG8oDUUroUnZ7XOFq9Nws1fkzJr3KMOldsmNZuSPGkO7IkO5uTO1INy8TNGN0iLuF/rsMc/SQQ9Isd/JZfM9uLYuONbMhAAwltZDIWe1grdDc3JuGYSFb0ZPzY/goRmObDX/CA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CBW7ZFI4MKlBJxx30Z8ejLX20Y+H39dCGpQz/YXPEdY=;
+ b=C8WvEPj1tx+QC7VuTC1pt2NskhzltUgRDxBje0OVLkEMp7kNKpegVxRDoaqXVJ78si1u7SF5pjjnpBw9efautWJM4kxn5XSCmR9iIzvBz4Au/Gj+Dx0hZXUhADrIx6TwPYpfj3LnIKgzRQH6+QTvoG+4QQheD2q5cm1siqqNG4CXdxMfXxN23mSODcdBSlKRhNxTa6vAzBzTeekmZfDKuub1g1l8szhYmhl96WzbyW5uaS5TqeOW7v15IKfn/q8PetYNcVusp1/jKxsCbajjR5yx9g4Zh4qjZ1ZDKfIBoj8eIOmKT4xPuyahl9cIevQCB8ixEdmbXTuwA+faTRGkbg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY8PR12MB8300.namprd12.prod.outlook.com (2603:10b6:930:7d::16)
+ by LV5PR12MB9779.namprd12.prod.outlook.com (2603:10b6:408:301::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Mon, 4 May
+ 2026 18:32:04 +0000
+Received: from CY8PR12MB8300.namprd12.prod.outlook.com
+ ([fe80::ce75:8187:3ac3:c5de]) by CY8PR12MB8300.namprd12.prod.outlook.com
+ ([fe80::ce75:8187:3ac3:c5de%3]) with mapi id 15.20.9870.023; Mon, 4 May 2026
+ 18:32:02 +0000
+Date: Mon, 4 May 2026 14:32:00 -0400
+From: Yury Norov <ynorov@nvidia.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Ruan Jinjie <ruanjinjie@huawei.com>, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	Linux-Arch <linux-arch@vger.kernel.org>,
+	Netdev <netdev@vger.kernel.org>, bpf@vger.kernel.org,
+	Nathan Chancellor <nathan@kernel.org>
+Subject: Re: [PATCH 1/6] lib: include crc32.h conditionally on CONFIG_CRC32
+Message-ID: <afjmIK4mlCWeywuS@yury>
+References: <20260430211351.658193-1-ynorov@nvidia.com>
+ <20260430211351.658193-2-ynorov@nvidia.com>
+ <ec4ed7f5-b1c8-49e4-b83d-e29c5414b9de@app.fastmail.com>
+ <afjNaToyptiMogV4@yury>
+ <9d45acd1-667b-4acf-9e2e-bcd79630d726@app.fastmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9d45acd1-667b-4acf-9e2e-bcd79630d726@app.fastmail.com>
+X-ClientProxiedBy: SJ0PR03CA0263.namprd03.prod.outlook.com
+ (2603:10b6:a03:3a0::28) To CY8PR12MB8300.namprd12.prod.outlook.com
+ (2603:10b6:930:7d::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: E1C454C2963
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY8PR12MB8300:EE_|LV5PR12MB9779:EE_
+X-MS-Office365-Filtering-Correlation-Id: d44c07fa-c92f-4013-00c7-08deaa0b6f50
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|10070799003|56012099003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	+yKFsHxbNKLnafRFPLrd8Ts8Zaq6EmJ0YGf/eYfUhjomUdDpyCqU2/2WcMNZWtqjKNRL7Q/pFHKCmRx258D8SOLHAF1mBjKNP1UqRISHwU3wKEB6Q5cuDh15Ib91GO9coLTabYOFgJ/dHhHf0OuVORC9MC6yAZrE3lRMZTgSCYKyf0bhmBHjboe5LquzwoPaB3Ps4ZUJ3Stsr8jt+cvNPg9v0uajTYqJBmqpgWLPdJijtz6BV3Q7fwQVnEC0TUk2Voe4Hmtd2/s30KU4o+hkurGf64OdyTkz8ZyWy9F4xWzE8fbrM8k0wIJ85Ke1R0ydPOiYrgLGXgJXGzNNp88twXAZXRdqMZiBjbR9yxp3c5kCUeTUjjeCke5tbMx8e5ud37y3JVrhaNgrjKjJ7du0nt7LSJY1mtXuktTye40Fi3w7D6q5ceTQ4iQLuW0gErYBEUisqwCiD04uqNC8W5W5AEzrAtE7GrORTF28B3tkTNZncOhyx2G/+Hhm6qJgbDlmpk/Ys5CrKo6dvpknmDL16zZW2AvR0Epwg2nYdwhdzJigpTaXCKaTJxKGmbPdBvGoo8OZcfCL96C+aRhJTMQ2lVisAd9eETxvFPkA9U9ERje5FLYZf1RI+Qez5oJpY2JFrgFwbgqojzYoDlqJzmYZ1eFWuidEbuArl11AhpmqrjICr7LHSr/2xp2WkP90bMaCaQBPwaiFeCbx9OBoycMJzA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8300.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(10070799003)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Y84ya5zJUOdPbm0F/Tyj0VA9daBoKJTOdJd6a5LqSj1N3sJpNkuT05HSH0c0?=
+ =?us-ascii?Q?GKTYfiB1gNN7EePhsNtrLokvLaJuRL24d5FaaxV4442h9iocGr5xF58MLeV7?=
+ =?us-ascii?Q?WLtd4xqlmSRzny2CF9OLLeVU3wCruL1SzF1lLfhEKVpLfJQTr9vE351SnsKr?=
+ =?us-ascii?Q?KfwMrQsbocanuoAwsGesdjm4VkialHyMHuMw791hlqzVOB1eE6AO87yz9JvX?=
+ =?us-ascii?Q?Zhi+nkplIi2zkBW97lOvodEfUJJPFQzVodRwT/sB+WjD9Bf0CQ4h5r7rqg4S?=
+ =?us-ascii?Q?8IzhBlkpsOnEPqpRXtx4mBRn+Z99ZRdsvu1hY0xApD/4Y3Xwi46B55/smMgZ?=
+ =?us-ascii?Q?N/WPWJyuXY6KQX6HumHb0zOEj7JPY/7H80IrmIk3YGBRJ57fMolfuP8ZZXsu?=
+ =?us-ascii?Q?oVBwbb709q4SoqXfq0hdmc+s68rFJcpEJpgGluxibgXlplWW1PfNe4WI+U+R?=
+ =?us-ascii?Q?Abd+RbKR5j6H9qDq4rRT366KT+Rt7dS8OP6PzKUAylAj59tTTzbZnQ6sBk1x?=
+ =?us-ascii?Q?VHyz1I1yZmj1dGRR+TegSe98bPhkodgWHTQnXzSFS0Huzh4Sl+zyL0sUs86F?=
+ =?us-ascii?Q?5SVkn94TiMieiUHufeTQ6CA1+u47F5kl+dVcQ6PLHB/aCIWXkTN7QjHXeNM6?=
+ =?us-ascii?Q?TW1xNhilL74iELsA67u1VCgrNcaWKtTwP16eEVmG/nQqyyJ262v4qA+Lvi0o?=
+ =?us-ascii?Q?EoEGqS8CQlhMGEcI+TTNZOPmXNZ+dIa4nGAvgAoiNdYJ/eHWeZE3GRV5DyhS?=
+ =?us-ascii?Q?AZmixSTc3BZvnHjRBOZ0m8vCCbCSIfG2i+CKuPDX8sJ0T8Y7oi2vGdjAZQ50?=
+ =?us-ascii?Q?wjHOqUECoBCzg9LlWTGf5zvKSy07ckcM7pX0gG9WtlzFBeNQKZzZKXj4xFx9?=
+ =?us-ascii?Q?o93/t6B9EY3Hetqe5avbhppwPDLxfcV2MWU/LGkav8pLyrrTJGaNIfx1hvu3?=
+ =?us-ascii?Q?vz4aNBeXWKhuzNlVWUJBmD+H98DYP3puu9BukSL+Mh5cFMQ6evo4nwsJk4lB?=
+ =?us-ascii?Q?hm68QzveBjBqOUz/TnHRjCXegIc82B3lDy1HwJzlArnDre/Vflmh84kI3NT6?=
+ =?us-ascii?Q?irNolNqRfOOh2qgfehG5NFu06fD6eWYcFrzZGBFvy6yYGb0eIB3FRgFCk/71?=
+ =?us-ascii?Q?xTnNv83SAv7FDgXS7UHK3Y1GVe/oHcMmwg5wfGT+Sk0dyDhhBMDhCZQrnraJ?=
+ =?us-ascii?Q?r+aEckTVajgcI5mLOCHBXta8WlQSjvSvHZNhlXRS9p7WD/VKex68IZweieeK?=
+ =?us-ascii?Q?v2GZUYJCLpxMdGZzFIuHs4kLbDfskVsq7VsKEC1H/iHZB64SyBoyLdNHXibB?=
+ =?us-ascii?Q?QQ8XGN7pKmnRHs8VXoRFBJjpxGT9MskMjzPnykcKAmJzOFt7j+Zp/maNFXI/?=
+ =?us-ascii?Q?a80cf1Al0zsncHSo4/cZ3X79UOF3LqmDtTu8z/UmC/Xjo4fT/VaRov2LBBFJ?=
+ =?us-ascii?Q?+XtiQn1N7CkVH79Se8ubxf0ODKUVzN36LmIeC1QHVvUBt0P69O/VAG5XCTrI?=
+ =?us-ascii?Q?5/BLiRrJAmtxMvmPSY9IqqPs9oZfW1ukQZpS870JcsdaBGEJFQBfc+5lfLjS?=
+ =?us-ascii?Q?gr5h9Z16yWuNM1CsaWasuZZACcYIsBEAosidttjhXozUKswjDwxmYe+zL4Pq?=
+ =?us-ascii?Q?/dZV5RA8d6IG4lu5Or16w1CwF8zG7HUgShtRx8ssv2TUA8z1cIlgV4orczxy?=
+ =?us-ascii?Q?zwgJbYbpB60VNih7dfVziibTHrcnRvvosM25aGYVMe/hNvkn6HJgqxAQEPn/?=
+ =?us-ascii?Q?AhEzN0UPR3seHYvskkgI7pwtKB4IF7koehtVAnBXeV2pA40qj/pv?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d44c07fa-c92f-4013-00c7-08deaa0b6f50
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB8300.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2026 18:32:02.6056
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9Ks9ibU0ZDdaUrpWvb428KkpFFXXRujFuJihsFGJvgwa7mPyWyzCchj3HU9iOKcbgU2qYVy1X5VR6ncZ+U5KSg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV5PR12MB9779
+X-Rspamd-Queue-Id: 6C21A4C2936
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [1.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FREEMAIL_CC(0.00)[kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,gmail.com,rasmusvillemoes.dk,lunn.ch,davemloft.net,google.com,redhat.com,linux-foundation.org,iogearbox.net,fomichev.me,huawei.com,vger.kernel.org,lists.infradead.org];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-283994-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	HAS_ORG_HEADER(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simo@redhat.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-283995-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ynorov@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_EQ_ADDR_SOME(0.00)[]
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[]
 
-On Mon, 2026-05-04 at 14:12 -0400, Jeff Barnes wrote:
->=20
-> On May 4 2026, at 1:39 pm, Eric Biggers <ebiggers@kernel.org> wrote:
-> > =20
-> > That seems to be an implementation of FIPS 140-3's integrity self-check=
-.
-> > A few observations:
-> > =20
-> > - It could easily use userspace SHA-512 code instead.  If including
-> >  libcrypto.so in the "FIPS cryptographic boundary" would cause
-> >  certification difficulties, then a sha512.c file could simply be added
-> >  to 'libkcapi-hmaccalc' which is already in it.
->=20
-> Indeed expanding the crypto boundary to include libcrypto.so would cause
-> certification difficulties, it would mean certifying all of libcrypto.so
-> with the kernel. There *may* be a case for saying that it is outside the
-> module boundary but only if:
->=20
->     * The integrity mechanism is clearly external
->     * The cryptographic module refuses to operate unless integrity is con=
-firmed
->     * The trust relationship is clearly documented
->=20
-> I don't see how this could be justified cleanly without significant pushb=
-ack.
->=20
-> > =20
-> > - It's compatible with all of the proposed hardening.  It doesn't
-> >  require zero-copy performance.  It runs as root, so it would be
-> >  compatible with a capability check.  "hmac(sha512)" will need to be on
-> >  the algorithm allowlist anyway for iwd.
-> > =20
-> > - FIPS 140-3 might also allow it to be simplified to use a plain hash
-> >  instead of pointlessly using HMAC with a fixed key.
->=20
-> FIPS 140=E2=80=913 (via ISO/IEC 19790) draws a hard distinction between:
->     * Integrity checking (cryptographic protection)
->     * Integrity measurement (detection only)
->=20
-> A plain hash provides no protection against an attacker who can modify
-> both the object and its reference hash.
+On Mon, May 04, 2026 at 07:18:49PM +0200, Arnd Bergmann wrote:
+> On Mon, May 4, 2026, at 18:46, Yury Norov wrote:
+> > On Mon, May 04, 2026 at 10:03:10AM +0200, Arnd Bergmann wrote:
+> >> On Thu, Apr 30, 2026, at 23:13, Yury Norov wrote:
+> >> I'm not following that description. Why is it an error to declare
+> >> a funtion that is not implemented? Isn't that how optional interfaces
+> >> tend to work in general?
+> >
+> > Never heard about such a thing like "optional interface". And git grep
+> > tends to second that...
+> 
+> I meant any library interface that can be turned on or off
 
-The integrity mechanism is not build to detect adversarial tampering
-(at least at level 1), that is not its purpose.
+So? If I disable CRC32, can I use the either_crc()? In case of that
+networking header, the answer is yes. In some other piece of code
+the answer is no. Is that correct?
+  
+> >> > The only header requiring the crc32 and bitreverse prototypes is
+> >> > include/linux/etherdevice.h. Thus, protect inclusion of corresponding
+> >> > headers in the etherdevice with CONFIG_CRC32, together with the only
+> >> > function depending on it.
+> >> ...
+> >> >  #include <linux/if_ether.h>
+> >> >  #include <linux/netdevice.h>
+> >> >  #include <linux/random.h>
+> >> > +#ifdef CONFIG_CRC32
+> >> >  #include <linux/crc32.h>
+> >> > +#endif
+> >> >  #include <linux/unaligned.h>
+> >> >  #include <asm/bitsperlong.h>
+> >> 
+> >> Don't add #ifdef blocks around headers. If the header cannot
+> >> be included without side-effects, change the linux/crc32.h
+> >> file instead of its users.
+> >
+> > linux/acpi.h does that like many othes. What exactly is wrong with
+> > protecting headers inclusion?
+> 
+> There is no "protecting" here, you just add complexity to the
+> build when headers are sometimes included indirectly and but
+> other times are not, depending on kernel configuration.
 
-That said a HMAC is just a hash with a secret key in the mix, it does
-not change the conditions wrt Hash if the key is known.
+Sorry, don't understand... I use the 'protecting' term with the meaning:
+the functionality that is explicitly disabled should be never used.
+Otherwise, what for we disable it?
 
-=20
-> > By the way, also on the topic of FIPS 140-3, some people do use AF_ALG
-> > for ACVP (even though it's not all that great for that purpose, either)=
-.
-> > But ACVP is a testing thing, not something that is needed on production
-> > systems.  ACVP can just be run as root on a testing build; there's no
-> > need to enable support for it in the actual production build.
->=20
-> Agreed it's not a good use case. Unless/until pkcs1 is supported, I
-> don't see how you can use it for all of the test cases. Plus as
-> evidenced by Ubuntu's new cert, it requires validating the library.
+This comes with the cost of increasing the config space, but that's
+how it works.
 
-Of course it requires validating the library, validating the
-cryptography implementation is what FIPS is for. libcrypto.so can never
-be outside the boundary, unless you turn it off at runtime ...
+In terms of build complexity, I guess that the more you disable on
+preprocessing stage, the less a compiler should actually process.
 
-The problems are rather that libcrypto is not instrumented to enforce
-KAT tests are executed before it allows operation (crypto-API did this
-via test manager) and does not provide an indicator (or blocks)
-unapproved algorithms ...
+> It's unlikely to cause problems for the crc32.h header, but
+> the acpi example definitely risks running into circular
+> inclusions when you end up with some other header that depending
+> on configuration ends up including linux/acpi.h while also
+> bring included indirectly from that one.
+> 
+> >> It looks like the problem is the check for CONFIG_GENERIC_BITREVERSE
+> >> in include/asm-generic/bitops/__bitrev.h, which ends up
+> >> hinding the generic___bitrev32() helper without need.
+> >> 
+> >> Simply removing the #ifdef there should avoid the build failure.
+> >
+> > OK, it seems like this is what I don't understand.
+> >
+> > We've got an optional feature, like CRC32, which is enabled by
+> > CONFIG_CRC32. The most conservative way is to declare everything
+> > CRC32-related in the corresponding header, and then protect the header
+> > with IS_ENABLED(CONFIG_CRC32).
+> >
+> > I understand that from practical perspective, we can declare some simple
+> > macros, like header size, unprotected. But what we've got now is a sort
+> > of mess: all CRC32-related functions are declared unprotected, and
+> > generic headers are good to use them. Compiler is happy while those
+> > functions are actually unused. Next, CRC32 depends on BITREVERSE, which
+> > is again unprotected, and it may optionally have an arch implementation.
+> >
+> > So if arch bitrev() is implemented, you can use part of bitreverse and
+> > crc32 APIs despite that they are explicitly disabled - just because they
+> > are implemented as macros in unprotected headers. And you cannot use some
+> > others - because they are implemented differently, as a real functions.
+> 
+> I think you trying to solve a non-problem here.
 
-Simo.
+This was reported by Nathan for tinyconfig. At least x86 and s390 are
+affected.
 
---=20
-Simo Sorce
-Distinguished Engineer
-RHEL Crypto Team
-Red Hat, Inc
+https://lore.kernel.org/all/20260429202922.GA3575295@ax162/
 
+Is tinyconfig important?
+
+> It is extremely rare
+> for any kernel to be built without crc32 or bitrev. Even in randconfig
+> builds, both are usually selected by some driver. The behavior
+> we've always had here is that in the rare one randconfig in 10000
+> that hits the one driver missing 'select BITREVERSE', we get a link
+> failure with an obvious fix. If you add the extra #ifdef, it gets
+> a little more likely to actually run into the bug, and it shows
+> up a little earlier as a compile failure instead of a link failure,
+> but otherwise, nothing changes.
+
+Except that it fixes the tinyconfig build.
+
+The above argument sounds to me like you believe that CRC32 config is
+really useless because it's enabled for any practical configuration.
+And the same for BITREVERSE. Would it be better to get rid of them?
+Would simplification of config space overweights the bloat of the
+tinyconfig?
+
+On the context: CONFIG_CRC32 is pre-historic, and BITREVERSE is 2006.
+
+Right now half CRC32 is available if CONFIG_CRC32 is on, and half is
+not available. The bitreverse is the same. If HAVE_ARCH_BITREVERSE is
+enabled, one can use the API, bypassing the BITREVERSE. This doesn't
+sound right to me long-term.
+
+Whatever this ends up, let's figure out a consistent solution please?
+
+Thanks,
+Yury
 
