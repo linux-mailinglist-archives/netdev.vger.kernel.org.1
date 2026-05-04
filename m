@@ -1,247 +1,311 @@
-Return-Path: <netdev+bounces-284089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284090-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qGcPJ5Mu+Wma6QIAu9opvQ
-	(envelope-from <netdev+bounces-284089-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 01:41:07 +0200
+	id SHuvKLsu+Wma6QIAu9opvQ
+	(envelope-from <netdev+bounces-284090-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 01:41:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 987494C4EB5
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 01:41:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19B3B4C4EBE
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 01:41:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 638FC3008C9D
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 23:41:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1F1213019C83
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 23:41:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A4253D6475;
-	Mon,  4 May 2026 23:41:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 011023DD533;
+	Mon,  4 May 2026 23:41:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="ujwQ2YVO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fangWAu8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94EFE2D3EC7;
-	Mon,  4 May 2026 23:40:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777938060; cv=none; b=IS2dRYEggQvStSwrKRLd2cOjIzTzdsZIJyFvFyL02lt0oPdhQrF8Z6aa5Li0HS0qB/ABgX0poF2P+CkgDHooHaVZVaV3QJRdXR7ZGa/0BIdLsy8/MgN7LPZ7X+avYEm+6n3JwFPpfbfeRXF/rjG3OJWJyYLUAD7MbOYyNhuoIfg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777938060; c=relaxed/simple;
-	bh=RcBZXcX8EAEUZjJFdtgZgh/kwGfy8h5kj1j49AsVUlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=csvdeOhesTbpKHS5X+VlzJLXzTsYZDguYP6dHkGzD5/h8+V28tVa1CnVcYAirnJVWG7hI/XF2w49hDVJfvvSL/zxW6rHw/O5Z28tCDs/zRjoVQoR5i3xVimGiQmGKtrehIpuw/OJx5bIcCrxm0PVGh/ttqhxukdJLAPzGlVOkRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=ujwQ2YVO; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 47F276017D;
-	Tue,  5 May 2026 01:40:56 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1777938056;
-	bh=BFRvixt3q/dnHxHSuvmWagBm0APhHcLiblX83aOinQ0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ujwQ2YVO6skJFToigVW0mJ3xEM2sLO1cz6TMCLn1t9bIizgh78Pn422CjAFskDYCE
-	 O/MUnMeMZYqATeUGnWysIicPfeZrKdI3o3nlQJEo35m2kmo3471CTojTz8ZRAcP1B5
-	 bxA058HVqzLiOGnobf3oPmedfsWpGtRMKBhMvBtTYSZvzvoJCzGKbWfy6E5ehYAEyO
-	 S4h1QNCygnte042+pWZe62mrCZEscQ0/VgoB6PxITtMNz2M/Y3dVbekZ/x4k7O4IdO
-	 ytgEZ9O4KNyCeycHb3e4Y/YQxzh3fsZE4Ptx1up8Mr6V/yeCgnhCDxCfosuQWBsizR
-	 T02ApLCwFn2IA==
-Date: Tue, 5 May 2026 01:40:53 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Ilya Maximets <i.maximets@ovn.org>
-Cc: netfilter-devel@vger.kernel.org, fw@strlen.de, davem@davemloft.net,
-	netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, horms@kernel.org,
-	Eelco Chaudron <echaudro@redhat.com>,
-	Aaron Conole <aconole@redhat.com>
-Subject: Re: [PATCH net 06/12] netfilter: nf_conntrack_expect: honor
- expectation helper field
-Message-ID: <afkuhbWieFXRTirN@chamomile>
-References: <20260326125153.685915-1-pablo@netfilter.org>
- <20260326125153.685915-7-pablo@netfilter.org>
- <8fd5d3a3-d1d7-4542-a0db-1678989940d4@ovn.org>
- <afSCXEg-X-ieL9cY@chamomile>
- <ef01005e-d867-4936-b138-b98f37e5f394@ovn.org>
- <afkosr2fDEPA_jX9@chamomile>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B7838CFEF
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 23:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777938103; cv=fail; b=m8Trnum3MFW7mHsuWUPuFvpAKTAX182ivkuopYQLLSOUIiDm6cItwYEDJGWuAZAxuCFSNq6arhBQx8Ekw5lI6PrBs6bcVJVXOAEg1tmkcxA2HJKc9uckJfPX0D74/AMUX7TmlgoD67S1SG8bUD97ifxB5VvVvPYe+by5MMB7tjw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777938103; c=relaxed/simple;
+	bh=pF1pog98pgFYdynWaI0bcuLySctTpv5GSZRFlYLCoRE=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Jwz1yWAPeJx5bPKvudySe9MPp2AzlLpWk3/rJz7DbicfE8qRV3UVc7NxF9B9Nhd16kkZ6cpPPdWa6YbycbFD8trz56yKmxp9OU3WSakWjdM+hYxlDnxBia/frxJzX+Lx72r8V1pXxywUh66SEqc7p7+WDmdwqQ35xTNZ+njmpzs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fangWAu8; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777938102; x=1809474102;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=pF1pog98pgFYdynWaI0bcuLySctTpv5GSZRFlYLCoRE=;
+  b=fangWAu85kbizaJMsUI1JZoiTYSdyC6WwME5luWZqriw1GdZjqO7M4g9
+   Zj/in3xTqELGQUGrIsT6rWWLHk9WQHdU5QPMyB/CidGVhtnLwuxYBUQ8V
+   MRo1Q+ZiGalQTPDkGuFEKpctveMOTChhiTa18mZSakXjUJi16rJh+uPTD
+   A/SeSFrFr4HBsAj8NtIRqCPVf/C/AZFZStYMQu6Tu9F1UywJFPSU2Rhuk
+   DDFC0hrQnr2/VZEbH+lB7XMpf5yZOwXvfpb+5/xL4VGlReDbuXWHaRDbU
+   Z32bfQSRLZxn8TqC0oqqG3j3Al8ZkYdNvG1Psd+LEuTUKgOA5j/ygaret
+   A==;
+X-CSE-ConnectionGUID: Ve7v9gTWRyOpNhg18ehvqg==
+X-CSE-MsgGUID: Bg8x3PvpRA6zk5th4lGNLw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11776"; a="78903684"
+X-IronPort-AV: E=Sophos;i="6.23,216,1770624000"; 
+   d="scan'208";a="78903684"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 16:41:37 -0700
+X-CSE-ConnectionGUID: iigNFcouTcSY6NRLXxRXxg==
+X-CSE-MsgGUID: rY7RTQktREybR2YHOzGdig==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,216,1770624000"; 
+   d="scan'208";a="235523868"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 16:41:37 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 4 May 2026 16:41:36 -0700
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Mon, 4 May 2026 16:41:36 -0700
+Received: from BN1PR04CU002.outbound.protection.outlook.com (52.101.56.13) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 4 May 2026 16:41:36 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=c2Ww8nfdz80sgcJsTgadmHmaIxtSgpkCHl1QLXo/JwPOiJbOj1YSsozuSnadvkq623rvw/hEidEDw42O/DFeRUAsIFFhqv0n6B1Kq4dL9qhdO431BV/S91Og7xiNF2eyR3CmD1SqvcQPtpP/oY9DSm7kNfio/qRMQOAOQamiKz6pyh06SahRV1+/y6Y/bpfw2wiXKrTXQmGAWHFKRAk01M83Yds6MWvM4Fj5w56Ai9AkUFUXGhIShMDsMe1ssBiGSVTKgMm+a+b2tEO9JUy0fKeXDYzfbe92aouqOovMeUzt13R+btVZaeyxCQhEQwM9BajbBwEOxVNqQelndwf+FQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jC9aFb5KxLxPKWUean7lzkSNbK5JVDc68IbkGk+3Alg=;
+ b=TKs/i5ma2VgKMGST2NuwgPOHTjRP7YdcD/o0x7i7vAZwCP8WGWUOXivbNm+Vr7F41XZgx4Th8fuXymkxF9eBcTpOJ+3V7IMa8SuYhrwUuViv2uIjIZmSl5q2axakrt8W1Gjg4Ke0ypJXxLUWEKQvmeYhtiXbDqAYnGum66xC/4LU88nYaX140Y1uAiPjJ7BYdlJg+fLFEnOwih3+iWq72ewsnLT0VxwLaoIpkVABrOB35Mv+Y3CQ1YlQpE1lvgHEEo+fSKFuMuaauowLQH11f/YrCyZYNtkb53r+RrVoHyDFW3hHLhOOj9gk7NDRUCzEbfzAVJ9BSKccPF6P2eQ1dg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7592.namprd11.prod.outlook.com (2603:10b6:806:343::16)
+ by MW4PR11MB8267.namprd11.prod.outlook.com (2603:10b6:303:1e2::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Mon, 4 May
+ 2026 23:41:34 +0000
+Received: from SN7PR11MB7592.namprd11.prod.outlook.com
+ ([fe80::3e09:8700:df72:37b6]) by SN7PR11MB7592.namprd11.prod.outlook.com
+ ([fe80::3e09:8700:df72:37b6%6]) with mapi id 15.20.9870.022; Mon, 4 May 2026
+ 23:41:33 +0000
+Message-ID: <85ec6953-3a52-4ea6-9c74-d798bf5ecce3@intel.com>
+Date: Mon, 4 May 2026 16:41:30 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next] ice: add SBQ posted writes
+ with non-posted support for CGU
+To: Przemyslaw Korba <przemyslaw.korba@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <netdev@vger.kernel.org>, <anthony.l.nguyen@intel.com>,
+	<przemyslaw.kitszel@intel.com>, Aleksandr Loktionov
+	<aleksandr.loktionov@intel.com>, Arkadiusz Kubalewski
+	<arkadiusz.kubalewski@intel.com>
+References: <20260415112706.1562382-2-przemyslaw.korba@intel.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20260415112706.1562382-2-przemyslaw.korba@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MW4PR03CA0116.namprd03.prod.outlook.com
+ (2603:10b6:303:b7::31) To SN7PR11MB7592.namprd11.prod.outlook.com
+ (2603:10b6:806:343::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="iyhop23c+WPECR0i"
-Content-Disposition: inline
-In-Reply-To: <afkosr2fDEPA_jX9@chamomile>
-X-Rspamd-Queue-Id: 987494C4EB5
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7592:EE_|MW4PR11MB8267:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6651e552-f3ef-4ea9-584c-08deaa36aca2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|22082099003|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info: bDr61J5soBA6fJGZHCsK1NbtZXSy7e0QVHzEuL3QAc6dnnxxyoBOtMgrc1ZzL3xYLWSbq48kt0yX7uXVNKQcgxLKXAdCbVK6UqyDk5O7O5F2cNzJIznhjPdmk42jQgpvvTdI04fu0xPno4T7q2Cg0UtXj79BIcUKpxskVGt0cQB6Pegz89T/URGEIEWz+cBqQhKn3FSDvFr3FmpkiY84+4qnISpSUfQ3GG5h8PZ9woyb0ibqhUool5U+CAcLsZk4r9x8mIuYP92i+ENp5s3J6KYo5V1juVhZW8M/2wnNWAoB/3f9cU6r1ttbQqTxUuLy6uAVKAKRqybmhdd+SfKqhmGJT1PzelKW0Ke0BVpQ+3H0rZcRhycQmaoVJni7f+DdCHNWFvUiZf4cf9pTz37fD/l9ueOOdQ2kW6ePlGAWO+cMz2xrwpV/r9KRB6L2/vclxv/ODKFx8CV/NkGId3rRIZcJ8/jp7Y3nMwnFbZXjxkdEaVSYq2x5TvTAddjPVZqzngHItARTI7G3IbRtBY9VFs8oCU1ICfZRlW9nI9Ob6pgJ+BFfjNIrHRu+UAOv2mwj3ZuN+puZTp6Dj9FWAt9ql02auoKXN2BHfrSzuvArxV49XkfcBEHLaWNDYRRntDI9B+75XD/etAXwqRLKgCdWakOeS5rCHklrQ1H7kg+VKXZRkIQW8VUtw5JLt9rtYU3v
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7592.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?M3huWklWKzdjd01xSis5Y0VNR2I3TGhjWWlhNFRMcGhxcm5wYnVHWmt4TGhp?=
+ =?utf-8?B?K0ZkZS9ZdlZWSWtTOEIydWNBVXcreTVSdlRLZmVuV0lmbDg1Z0dsRFBXWTJU?=
+ =?utf-8?B?R0V6TzVFMitlNUpNclBEZC9vQ3VuTVZ5YmdJVWpLdzV3VCtJTEIrbk5iUFdn?=
+ =?utf-8?B?ZUpiK3lsU0V1V29lV0FoaytWV25rWCt6YnpqKzQvSWhjN3ZuN0xpMkVCQ0l2?=
+ =?utf-8?B?bFF1Z242MitzUUhjMDJPSmNtS3dVOEc2SjN3eW5ET1YwK0RBSWF3RDBucEFT?=
+ =?utf-8?B?ZEJFMnB4TnFERVNRVVhnbi9yNkh1OTJsWVppWmx2YmkxMTNGM3IwUEx1NmRi?=
+ =?utf-8?B?My9ITmNrc1VBdzVKY3BGd2xVWG9Md0tjQVErbzBxZUoraUZUYXF1Z1d4UHl0?=
+ =?utf-8?B?UTBhYVlqZ21Tc05uVjlBSmdQbUYzMHNPYzk4aHlGZDB5NGljTDVldDRVUU1a?=
+ =?utf-8?B?UDNpZmsybFRxN2NscnEyTTlLbFcyU2ZrM285T2Fpb2xpaElieTlTWFZhcWh1?=
+ =?utf-8?B?dFprTjZBZFJDRDhKOURETnM2aVRFRk54aEFibDZlZEZiZkRRakJzQzJDL0ZG?=
+ =?utf-8?B?d3RGcDE3RE1UOERjQTRMQkpzZmY2aUVISWRhODE0N01TcjhHTWUyQ2g3TlpQ?=
+ =?utf-8?B?VTQxRzVSVVdOcGNIM0ZhMXdpMi8xZHBRZ1dhV24vMmdYR3oyY0ZSOTlFeElW?=
+ =?utf-8?B?dEdoaS9xeDR6akxUeWZ3NmpNOVJoWXBONGhuN29Ra0Jhc25vNWVTNEk4WEZx?=
+ =?utf-8?B?ajgrQWZReVg2ZEZ4YTQ4dzIwZm01WkRvL0FNVUZ4Ui81SFNaU011Mld4ZHRT?=
+ =?utf-8?B?TFMzSGRodm83cmRJWE9KUFdMRWx4ZThwcDV0V3l5K3lFVUNTeVM1ZHNleWM5?=
+ =?utf-8?B?cjdTSWQ4OTh3OGxkMlVxSTB2WFpkVjRDWnVQalZDYUtkanpYa2xSTS9pcW9u?=
+ =?utf-8?B?WUtzSWxyZ0RXTlpRNk4raVpmL3VERXpJVEdRbkk0eHRIZFpicFZNbzRweVFh?=
+ =?utf-8?B?NW42N3IycUJ4ek1jekw4UzZJaUEvcE1OQXovL3crbzRQN3UyTVRVK3FDMmd1?=
+ =?utf-8?B?TlhrSWwxOFc3cnByT2hDcm1tU1VUa2dzblJFWFdnTURtMjJkdk1NRW9WTFBi?=
+ =?utf-8?B?L1JZM3l0d3Q0cWFablFkUE12Qmw5NzQ3bXBnNkk2R3FIdXZRTXBIRS9sUC96?=
+ =?utf-8?B?Zm9IbithaTdFS3pZZFlibEZyN1d0YjlQUTZOV3JTSTJjL043eUxIdGNjMjBQ?=
+ =?utf-8?B?aUovV3o1U3VLU3hPYjkyczBreHc2cE5NdUZ2YlJHU0F3Tmd2SWppb3pub1hS?=
+ =?utf-8?B?cjVQaUF2ak9jQUNOcW16Y2NXdnZpZ1V4bEVtSE8ySkVteWl2enV0QVRBNmEw?=
+ =?utf-8?B?V2xOZzF1VGhrbzZHRUdTQURuNE1HaVQybHZRcmw2VTBrckZqYXhYcjQxdUtn?=
+ =?utf-8?B?aUZQdmpQYzcwWVFBQ0ZPZTBlUXpYR3JCQ1QxTXNZbXo4ZllFQ0c4VVdHWTUv?=
+ =?utf-8?B?TE9TM2hVbGlxVG9idUJsTVZvZ2g5Mzg0Skh5aWtYWDg4ODE1aDlwWTVkM2VD?=
+ =?utf-8?B?ckN6cGpaVlgrS29tb0RBMVdxem5rQ25WUVdqS1F5anNSRUhRS0twRjVkb3l3?=
+ =?utf-8?B?K1doWFRxM2RrZzFiWHd3ckZaQ05xcVhOMjdDbWNROEZ1K2wrc3BQM0FiUncw?=
+ =?utf-8?B?SmNDbUpkNFJ1eHUwdURoTTRJQnovT0lIUDhwYStKZGxWRkovU01vTlNJU1E2?=
+ =?utf-8?B?WFBBZDhtb3pCMHMxOHRjNE4xWW1YdmFremJLRkJxcEhtcGJBVEtONmh1UlMz?=
+ =?utf-8?B?a3BoeEVkWjlzaEp3ckdDOURJZi9QQlg4b3paZ3ZzY2hTY3JndU1USU55UzY0?=
+ =?utf-8?B?QzFxZmF2TGQwcE1NUVk3NlBIZmdaVkdjalFISWtDOFV1WE04Z2w1SWlBaFlM?=
+ =?utf-8?B?ZjZyVHJPdXFoRG1NbmRUOFM5TkFlbmV2NW4wQWUxMGZFb1h1dTdlWXRSM0Q2?=
+ =?utf-8?B?cHVFQ2ZZaGFTaER6eUJrdVJTeEFQSVpZT3RNVkQvUzRDNnU5NVhLc3d0V0l2?=
+ =?utf-8?B?cXY3VWxvbjd5OWYyUmsySXlpWUNqbHlXd2ZDY0NCbGVHWlJka0FqRHlMOVlE?=
+ =?utf-8?B?YStzT1NTSUd0UDU1M2FmcURHaDZBcE9ValM4N0dRUjFMNmdud3hBSHRmYUxs?=
+ =?utf-8?B?T3JLdW54S2xkMDgwMXh0RWE1TWdaaFZrdVNVMEU3M1E0NEg5RmVoQmliR2t1?=
+ =?utf-8?B?cU9JZHlqNVBydDJNM0lXTFRJU1hYcm5nOTNPak1iTUpPbnRPNW5pbXJXWjlt?=
+ =?utf-8?B?aGNwWTRzbkgvMExWbjNqWVpSQjFhMFUrdkVCZTdnWTByL1AvK0dJZz09?=
+X-Exchange-RoutingPolicyChecked: Eq6zaUnDIwLCfQ56dyPPEkby66lsxkhBD7J0h3TOsGlB2l6gM3iNehHr+piZJr4TqSZZiYb//Pv9TC3twOARDNzGwXyh+GmoUPqlWBwTqF6WPkrr9TSguvj0EFymRz/h7QVpadwJamnSOIT4qaxzjTdUa21HsQBDWtwxCy1wrBHxI4mQaSwAbqwcMmkQXS2n7osEf1UvTh24AOjd7Gu+V5WrDDc4eXE/eg6TjJCN6LDn+Wju1ssHRU3PNkbaM9++6pUstL0iVFsNcqIMyCpq50/1HvrnEMKAl9dqTo+nV9h9rQF93BNqtoNFiqEwSKFFA14hB0a5fUNBCAD5V6Blkg==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6651e552-f3ef-4ea9-584c-08deaa36aca2
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7592.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2026 23:41:33.6898
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GbpBVo7pMkyRqmAGzRUHohuzSE2tLTAolub0Db6yznGiJqMnBCqMcRIh7ecJydUR3ZIk2i4proM/YU1jchYM1lv4GKrRPG/S6XomHHiWTfw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB8267
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: 19B3B4C4EBE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain,text/x-diff];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-284090-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[netfilter.org];
-	TAGGED_FROM(0.00)[bounces-284089-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+,1:+,2:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,msg.data:url];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	HAS_ATTACHMENT(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim]
+	RCVD_COUNT_SEVEN(0.00)[10]
 
-
---iyhop23c+WPECR0i
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-
-On Tue, May 05, 2026 at 01:16:05AM +0200, Pablo Neira Ayuso wrote:
-> Thanks for the detailed report. It seems I changed the semantics of
-> exp->helper, this used to be use to set a new helper for an expected
-> connection, which is the case for sip and h323.
+On 4/15/2026 4:27 AM, Przemyslaw Korba wrote:
+> From: Karol Kolacinski <karol.kolacinski@intel.com>
 > 
-> Would this patch help address the issue you are observing?
+> Sideband queue (SBQ) is a HW queue with very short completion time. All
+> SBQ writes were posted by default, which means that the driver did not
+> have to wait for completion from the neighbor device, because there was
+> none. This introduced unnecessary delays, where only those delays were
+> "ensuring" that the command is "completed" and this was a potential race
+> condition.
+> 
+> Add the possibility to perform non-posted writes where it's necessary to
+> wait for completion, instead of relying on fake completion from the FW,
+> where only the delays are guarding the writes.
+> 
+> Flush the SBQ by reading address 0 from the PHY 0 before issuing SYNC
+> command to ensure that writes to all PHYs were completed and skip SBQ
+> message completion if it's posted.
+> 
+> To analyze if delays are gone, look for and compare time spent in
+> ice_sq_send_cmd — posted writes should return immediately after the wr32.
+> That can be done for example by adjusting phc time with phc_ctl on E830
+> device, for less than 2 seconds to use this new mechanism. Without it,
+> command below will fail.
+> 
+> Reproduction steps:
+> phc_ctl eth13 adj 1
+> phc_ctl[4478170.994]: adjusted clock by 1.000000 seconds
+> 
+> Check trace for timing for comparisions:
+> echo ice_sbq_send_cmd > /sys/kernel/debug/tracing/set_ftrace_filter
+> echo function_graph > /sys/kernel/debug/tracing/current_tracer
+> cat /sys/kernel/debug/tracing/trace
+> 
+> Tested on:
+>   - Intel E830 NIC (FW version 1.00)
+>   - Kernel 6.19.0+
+> 
+> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> ---
 
-Actually, this needs to set to NULL the new exp->assign_helper field,
-see new patch, untested.
+This doesn't appear to apply clean to the tip of Intel Wired LAN
+dev-queue, nor to net-next/main...
 
---iyhop23c+WPECR0i
-Content-Type: text/x-diff; charset=utf-8
-Content-Disposition: attachment; filename="fix-exp-helper.patch"
+>  drivers/net/ethernet/intel/ice/ice_common.c  | 18 ++++--
+>  drivers/net/ethernet/intel/ice/ice_ptp_hw.c  | 64 ++++++++++++--------
+>  drivers/net/ethernet/intel/ice/ice_sbq_cmd.h |  5 +-
+>  3 files changed, 53 insertions(+), 34 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+> index f84990996530..2cd3d6d450a9 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_common.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
+> @@ -1777,23 +1777,29 @@ int ice_sbq_rw_reg(struct ice_hw *hw, struct ice_sbq_msg_input *in, u16 flags)
+>  	msg.msg_addr_low = cpu_to_le16(in->msg_addr_low);
+>  	msg.msg_addr_high = cpu_to_le32(in->msg_addr_high);
+>  
+> -	if (in->opcode)
+> +	switch (in->opcode) {
+> +	case ice_sbq_msg_wr_p:
+> +	case ice_sbq_msg_wr_np:
+>  		msg.data = cpu_to_le32(in->data);
+> -	else
+> +		break;
+> +	case ice_sbq_msg_rd:
+>  		/* data read comes back in completion, so shorten the struct by
+>  		 * sizeof(msg.data)
+>  		 */
+>  		msg_len -= sizeof(msg.data);
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+>  
+> -	if (in->opcode == ice_sbq_msg_wr)
+> -		cd.posted = 1;
 
-diff --git a/include/net/netfilter/nf_conntrack_expect.h b/include/net/netfilter/nf_conntrack_expect.h
-index e9a8350e7ccf..80f50fd0f7ad 100644
---- a/include/net/netfilter/nf_conntrack_expect.h
-+++ b/include/net/netfilter/nf_conntrack_expect.h
-@@ -45,9 +45,12 @@ struct nf_conntrack_expect {
- 	void (*expectfn)(struct nf_conn *new,
- 			 struct nf_conntrack_expect *this);
- 
--	/* Helper to assign to new connection */
-+	/* Helper that created this expectation */
- 	struct nf_conntrack_helper __rcu *helper;
- 
-+	/* Helper to assign to new connection */
-+	struct nf_conntrack_helper __rcu *assign_helper;
-+
- 	/* The conntrack of the master connection */
- 	struct nf_conn *master;
- 
-diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
-index b08189226320..656287d16d86 100644
---- a/net/netfilter/nf_conntrack_core.c
-+++ b/net/netfilter/nf_conntrack_core.c
-@@ -1815,10 +1815,10 @@ init_conntrack(struct net *net, struct nf_conn *tmpl,
- 			__set_bit(IPS_EXPECTED_BIT, &ct->status);
- 			/* exp->master safe, refcnt bumped in nf_ct_find_expectation */
- 			ct->master = exp->master;
--			if (exp->helper) {
-+			if (exp->assign_helper) {
- 				help = nf_ct_helper_ext_add(ct, GFP_ATOMIC);
- 				if (help)
--					rcu_assign_pointer(help->helper, exp->helper);
-+					rcu_assign_pointer(help->helper, exp->assign_helper);
- 			}
- 
- #ifdef CONFIG_NF_CONNTRACK_MARK
-diff --git a/net/netfilter/nf_conntrack_expect.c b/net/netfilter/nf_conntrack_expect.c
-index 24d0576d84b7..b01d48ab351e 100644
---- a/net/netfilter/nf_conntrack_expect.c
-+++ b/net/netfilter/nf_conntrack_expect.c
-@@ -308,6 +308,7 @@ struct nf_conntrack_expect *nf_ct_expect_alloc(struct nf_conn *me)
- 	if (!new)
- 		return NULL;
- 
-+	new->assign_helper = NULL;
- 	new->master = me;
- 	refcount_set(&new->use, 1);
- 	return new;
-diff --git a/net/netfilter/nf_conntrack_h323_main.c b/net/netfilter/nf_conntrack_h323_main.c
-index 3f5c50455b71..b2fe6554b9cf 100644
---- a/net/netfilter/nf_conntrack_h323_main.c
-+++ b/net/netfilter/nf_conntrack_h323_main.c
-@@ -643,7 +643,7 @@ static int expect_h245(struct sk_buff *skb, struct nf_conn *ct,
- 			  &ct->tuplehash[!dir].tuple.src.u3,
- 			  &ct->tuplehash[!dir].tuple.dst.u3,
- 			  IPPROTO_TCP, NULL, &port);
--	rcu_assign_pointer(exp->helper, &nf_conntrack_helper_h245);
-+	rcu_assign_pointer(exp->assign_helper, &nf_conntrack_helper_h245);
- 
- 	nathook = rcu_dereference(nfct_h323_nat_hook);
- 	if (memcmp(&ct->tuplehash[dir].tuple.src.u3,
-@@ -767,7 +767,7 @@ static int expect_callforwarding(struct sk_buff *skb,
- 	nf_ct_expect_init(exp, NF_CT_EXPECT_CLASS_DEFAULT, nf_ct_l3num(ct),
- 			  &ct->tuplehash[!dir].tuple.src.u3, &addr,
- 			  IPPROTO_TCP, NULL, &port);
--	rcu_assign_pointer(exp->helper, nf_conntrack_helper_q931);
-+	rcu_assign_pointer(exp->assign_helper, nf_conntrack_helper_q931);
- 
- 	nathook = rcu_dereference(nfct_h323_nat_hook);
- 	if (memcmp(&ct->tuplehash[dir].tuple.src.u3,
-@@ -1234,7 +1234,7 @@ static int expect_q931(struct sk_buff *skb, struct nf_conn *ct,
- 				&ct->tuplehash[!dir].tuple.src.u3 : NULL,
- 			  &ct->tuplehash[!dir].tuple.dst.u3,
- 			  IPPROTO_TCP, NULL, &port);
--	rcu_assign_pointer(exp->helper, nf_conntrack_helper_q931);
-+	rcu_assign_pointer(exp->assign_helper, nf_conntrack_helper_q931);
- 	exp->flags = NF_CT_EXPECT_PERMANENT;	/* Accept multiple calls */
- 
- 	nathook = rcu_dereference(nfct_h323_nat_hook);
-@@ -1306,7 +1306,7 @@ static int process_gcf(struct sk_buff *skb, struct nf_conn *ct,
- 	nf_ct_expect_init(exp, NF_CT_EXPECT_CLASS_DEFAULT, nf_ct_l3num(ct),
- 			  &ct->tuplehash[!dir].tuple.src.u3, &addr,
- 			  IPPROTO_UDP, NULL, &port);
--	rcu_assign_pointer(exp->helper, nf_conntrack_helper_ras);
-+	rcu_assign_pointer(exp->assign_helper, nf_conntrack_helper_ras);
- 
- 	if (nf_ct_expect_related(exp, 0) == 0) {
- 		pr_debug("nf_ct_ras: expect RAS ");
-@@ -1523,7 +1523,7 @@ static int process_acf(struct sk_buff *skb, struct nf_conn *ct,
- 			  &ct->tuplehash[!dir].tuple.src.u3, &addr,
- 			  IPPROTO_TCP, NULL, &port);
- 	exp->flags = NF_CT_EXPECT_PERMANENT;
--	rcu_assign_pointer(exp->helper, nf_conntrack_helper_q931);
-+	rcu_assign_pointer(exp->assign_helper, nf_conntrack_helper_q931);
- 
- 	if (nf_ct_expect_related(exp, 0) == 0) {
- 		pr_debug("nf_ct_ras: expect Q.931 ");
-@@ -1577,7 +1577,7 @@ static int process_lcf(struct sk_buff *skb, struct nf_conn *ct,
- 			  &ct->tuplehash[!dir].tuple.src.u3, &addr,
- 			  IPPROTO_TCP, NULL, &port);
- 	exp->flags = NF_CT_EXPECT_PERMANENT;
--	rcu_assign_pointer(exp->helper, nf_conntrack_helper_q931);
-+	rcu_assign_pointer(exp->assign_helper, nf_conntrack_helper_q931);
- 
- 	if (nf_ct_expect_related(exp, 0) == 0) {
- 		pr_debug("nf_ct_ras: expect Q.931 ");
-diff --git a/net/netfilter/nf_conntrack_sip.c b/net/netfilter/nf_conntrack_sip.c
-index 1eb55907d470..d24bfa9e8234 100644
---- a/net/netfilter/nf_conntrack_sip.c
-+++ b/net/netfilter/nf_conntrack_sip.c
-@@ -1383,7 +1383,7 @@ static int process_register_request(struct sk_buff *skb, unsigned int protoff,
- 	nf_ct_expect_init(exp, SIP_EXPECT_SIGNALLING, nf_ct_l3num(ct),
- 			  saddr, &daddr, proto, NULL, &port);
- 	exp->timeout.expires = sip_timeout * HZ;
--	rcu_assign_pointer(exp->helper, helper);
-+	rcu_assign_pointer(exp->assign_helper, helper);
- 	exp->flags = NF_CT_EXPECT_PERMANENT | NF_CT_EXPECT_INACTIVE;
- 
- 	hooks = rcu_dereference(nf_nat_sip_hooks);
+It looks like this code in the upstream version doesn't have the cd
+structure on this function.
 
---iyhop23c+WPECR0i--
+> +	cd.posted = in->opcode == ice_sbq_msg_wr_p;
+> 
+
+It looks like this is based on top of "ice: fix posted write support for
+sideband queue operations"? That was dropped from the queue because of
+our discussion that you would re-submit a fixed version.
+
+Since that didn't get applied, this won't apply clean either. Do you
+still want the part that fixes E830 to go to net? Or do you just want to
+implement posted writes all together in one patch?
+
+Either way, could you please re-submit the work either as 2 patches or
+as a single combined patch?
+
+Thanks,
+Jake
 
