@@ -1,67 +1,96 @@
-Return-Path: <netdev+bounces-283883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283884-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +NIHDxCv+Gn2xgIAu9opvQ
-	(envelope-from <netdev+bounces-283883-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:37:04 +0200
+	id qI0yLu+y+GkdzAIAu9opvQ
+	(envelope-from <netdev+bounces-283884-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:53:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A65944BFC3D
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:37:03 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDBCB4C0274
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:53:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5BFD230B1125
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 14:29:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 20A59307D52D
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 14:29:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CC343E1D02;
-	Mon,  4 May 2026 14:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C09513E3C45;
+	Mon,  4 May 2026 14:27:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="EKLzPc6F"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CetqyqCd"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3118A3E0C4C;
-	Mon,  4 May 2026 14:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A3963E317A
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 14:27:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777904827; cv=none; b=FT1p5+xri7W65gXdAlftgNsaqy6Us25UjQF4xAiuhBDDMwCeraXlE/5pJZGQgludzwDAwQpZ9CepXM/LpM2klBkNI5dz40odZI/GKy1MBbuNae2z2BqcHIdA/g8yDStUupLlu/O0Ocb5WdjsV/mSYJOaLylXx4iDAs6uslMLFH4=
+	t=1777904863; cv=none; b=QFyhrY2DVXrkKFEkVvCQHqm+Pbv0lZBfyVaSsVMDlyROM3oWsXJTyMe10paJyfTUq7Us2ZrogInR9tFkJkyGPwcjU3/JUJJ7VXkTKf32EZg3IeGp8m7sK94g8mQRu6UBp6ixu1U+C8a1d3GRJXF7PwdgHeyy0DZLI3+crVObPwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777904827; c=relaxed/simple;
-	bh=CEQ2eJVlBY0MBBnYJPAwGrHd1dsTp96QIqY5diczfEQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pwYh5MyU1hJ5JBdBGcD/v0NxlOErjZru3yIJAGohqhbh3QvmeznU14Fqr/DMPKc/M3iekk0Fj3Sg8WUDJp51DEx/2CC0QIF4g2UlS7xlRksoljEpd05gnAyHtsf19R7Z0GPazpTjb8NkIDS/xamZTpmCmGP1CyW1nyEuaeHvXBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=EKLzPc6F; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1186)
-	id 65F0920B7168; Mon,  4 May 2026 07:27:04 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 65F0920B7168
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1777904824;
-	bh=kuovHcqF7R2ksxoktodkXKRikTI9yOb7xF6NJ5FrWvw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=EKLzPc6Flk78IuMUi5gFVN4DO6mTCdEIxXSiCM+vwsAZsoB478VW0ybjB/hlAA5nF
-	 ygHvCpzixElz68G7YW9TQGpkOeOCmbi7S+JJ78SpXvZSxxBBcaQmYR/IeWSsYiPi2Q
-	 K4yk/kZcyqUQ2xuXkVSfOGF46UkUPld4p0GBYVY4=
-From: Konstantin Taranov <kotaranov@linux.microsoft.com>
-To: shirazsaleem@microsoft.com,
-	kotaranov@microsoft.com,
-	pabeni@redhat.com,
-	haiyangz@microsoft.com,
-	kys@microsoft.com,
-	edumazet@google.com,
+	s=arc-20240116; t=1777904863; c=relaxed/simple;
+	bh=vvEh2bcJjDHTEu49dfPKRZ5OIW+CAt6wUr8DC1l33J8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lOwUWZN5L1S+vcI0eVt4sji+Kmo1vWRnoFMb/zVdMUNsmPRfXbjM+g1zCvaHtT7wHc4fCmEiGDqU3ohVXXABy1Wthhi//NHRIc1lhv8E9s2V5gaicyApJw8EM8dbgiA+2YeJc4MO62vXIW8gURxPF+yNInA0QNd/g9CgVqgo2PA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CetqyqCd; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-834f1075805so2771308b3a.2
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 07:27:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777904862; x=1778509662; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y14fsCh2hvBLp5LgfY7vOJDAXfPr7uBAgs7IcUtTCWQ=;
+        b=CetqyqCdIyuPHcO6ZRKCTX2uOO6A6oWWo/X2dnpQDer4EgNxgYel3idMhtjZGE0NX7
+         ipN8CRXUPgAGfF1qdiQ/wnI7f9rx0f+bJL5wlLdvBldPggUGZGjufHE7CNOKq2jclhuV
+         Ap1XWtqHGWI6iPVu6BsBDZLsmG6d9AaZj9sH3Up52MsV4lRxeDnFzc53tk2GSTaxZ19o
+         iAIN2SanULeKl+3d/yHdQVTf/Z9yykGZn7qze8JNZqKArDtA3E2oivBbeUj2he9iiAKQ
+         i/cJW02G54YY2rYEJOGnnyAKUpLXyl9xgif3m1uhvOaKOp41Fg+6AalVYe3QA2Kkd1im
+         DcuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777904862; x=1778509662;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y14fsCh2hvBLp5LgfY7vOJDAXfPr7uBAgs7IcUtTCWQ=;
+        b=AgShu90QPD5lHBBw18ntQDZ56t/u3aJoeZZOFDRtHIil7Jdu98sJ7iJRJ1PZyTWrr6
+         KpI3oh5rY418EerMtjH1cQROHnmprXH/e3l3OSbTsclBsL03pmauocaKFBq7ZxBnL/jE
+         dBOWapLmog3IZxlApd+pidfNnAQ+RkNqjnFwDa5qCnlMMp6Ulu9I3JZkIRy1nMWPdqxU
+         xofQgZ03ahmyNb0W5P4KoUoG96R7k3M2OqYtu79K7OAQf0xW9KFy9UoXkyfj8k7h2kys
+         zfandDJaR76BdgBVWEhex0OljF8V5CQgzA/qMZopKHQr6Yr4kWTjGFfvLiaB8rCMlkMI
+         MU8A==
+X-Forwarded-Encrypted: i=1; AFNElJ8p6DuUJN5m+mm7MrTNw/wQZ6xLjTD+QV/M4GXZ6gWOEKJS8+QFzzXvfHNnHwOP9kJkIJa98ZE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzI9HvBrUGftH4y7cRCEH1OShUeyV8OBpBx2NOLGzAA2HaTnJCk
+	hoMxbciEMZQdgBOFt0+Uc1szQfWDFTgRs+dgZHE3a8BvpX3lqakAEaEG
+X-Gm-Gg: AeBDievlg7OE/YtEQnnC3gARN9kGT16bISVh4K00clD8Q6rvB4uiGRdqMwT9fSz3i8h
+	5PGqQFxBVcmBiFxLBEUJSEoTMb8sBWJihBBxmTtVsDHt2P4RVzqqPCCIb8Q86ThAxmAfR2OhcfG
+	xFdKtr9gBYUBQ3z2zSi0nPY95db5jh1xNzXhxqo9IO6Cv7JD2XGrxDXP1QiD5pkCMcb8s/UiVL1
+	40tbi9Hl6WfeeYqncCmrNiEdJ+hUyV7NYu5gCxVbqfvRBbtYAE1SjnMZhvOox29z4LFVZqMIuwT
+	PnMDIxSyvtdXeDIXh3OD0dhIYktE6gwO2rV3yeNmjJTh4RidrQd9reGVCqs/D1SiGX/GPsuE/gs
+	6oxTB7f5/DbKAi/rXWy4v3VQBFddip0r/xxetkxYOwFBQyKQ8tEZiIBWoZg6RiLPyd+cwfpEWrn
+	CS4Tm3vKpsFfBf1sPC6RB/ehNpi0bgTrg1SP4VyG3XRYEmgPdNwaAEuHn6
+X-Received: by 2002:a05:6a00:1748:b0:832:e65:ddcd with SMTP id d2e1a72fcca58-8352d2ac0a2mr9386999b3a.45.1777904861465;
+        Mon, 04 May 2026 07:27:41 -0700 (PDT)
+Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-835293f022asm9111662b3a.45.2026.05.04.07.27.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 May 2026 07:27:40 -0700 (PDT)
+From: Maoyi Xie <maoyixie.tju@gmail.com>
+X-Google-Original-From: Maoyi Xie <maoyi.xie@ntu.edu.sg>
+To: steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au
+Cc: davem@davemloft.net,
 	kuba@kernel.org,
-	davem@davemloft.net,
-	decui@microsoft.com,
-	wei.liu@kernel.org,
-	longli@microsoft.com,
-	jgg@ziepe.ca,
-	leon@kernel.org
-Cc: linux-rdma@vger.kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	antony.antony@secunet.com,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net v3] net/mana: Fix auxiliary device double-delete race
-Date: Mon,  4 May 2026 07:27:04 -0700
-Message-ID: <20260504142704.159035-1-kotaranov@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.7
+	stable@vger.kernel.org
+Subject: [PATCH net] xfrm: route MIGRATE notifications to caller's netns
+Date: Mon,  4 May 2026 22:27:36 +0800
+Message-Id: <20260504142736.1228425-1-maoyi.xie@ntu.edu.sg>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,110 +98,200 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: A65944BFC3D
+X-Rspamd-Queue-Id: BDBCB4C0274
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283883-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FROM_NEQ_ENVFROM(0.00)[kotaranov@linux.microsoft.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
 	TO_DN_NONE(0.00)[];
+	TAGGED_FROM(0.00)[bounces-283884-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,ntu.edu.sg:mid,ntu.edu.sg:email]
 
-From: Shiraz Saleem <shirazsaleem@microsoft.com>
+xfrm_send_migrate() in net/xfrm/xfrm_user.c and pfkey_send_migrate()
+in net/key/af_key.c both hardcode &init_net for the multicast that
+announces a successful XFRM_MSG_MIGRATE / SADB_X_MIGRATE.
 
-Make remove_adev() safe to call concurrently from the service reset
-and PCI eject paths by using xchg() to atomically claim the adev
-pointer. This prevents double auxiliary_device_delete/uninit when
-hv_eject_device_work races with the service reset workqueue.
+XFRM_MSG_MIGRATE arrives on a per-netns NETLINK_XFRM socket, and the
+rest of the xfrm/af_key netlink path was made netns-aware in 2008.
+The other 14 multicast paths in xfrm_user.c route their event using
+xs_net(x), xp_net(xp) or sock_net(skb->sk); only the migrate path
+was missed.
 
-Fixes: 505cc26bcae0 ("net: mana: Add support for auxiliary device servicing events")
-Signed-off-by: Shiraz Saleem <shirazsaleem@microsoft.com>
-Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
+Two consequences of the init_net hardcoding:
+
+  1. The notification (selector, old/new endpoint addresses, and the
+     km_address) is delivered to listeners on init_net's
+     XFRMNLGRP_MIGRATE / pfkey BROADCAST_ALL groups rather than on
+     the issuing netns. An IKE daemon running in init_net therefore
+     receives migration notifications originating from any other
+     netns on the host.
+
+  2. An IKE daemon running inside a non-init netns and subscribed
+     to its own XFRMNLGRP_MIGRATE / pfkey groups never receives the
+     notification of its own migration. IKEv2 MOBIKE / address-update
+     handling inside a netns is silently broken.
+
+Thread struct net through km_migrate() and the xfrm_mgr.migrate
+function pointer, drop the &init_net override in xfrm_send_migrate()
+and pfkey_send_migrate(), and pass the caller's net (already in
+scope in xfrm_migrate() via sock_net(skb->sk)) all the way down.
+struct xfrm_mgr is in-tree only and not exported as a stable API,
+so the function-pointer signature change is internal.
+
+pfkey_broadcast() is already netns-aware via net_generic(net,
+pfkey_net_id) since the pernet conversion. The five other
+pfkey_broadcast() callers in af_key.c already pass xs_net(x),
+sock_net(sk) or a per-netns net, so this only removes the
+&init_net outlier.
+
+Fixes: 5c79de6e79cd ("[XFRM]: User interface for handling XFRM_MSG_MIGRATE")
+Cc: stable@vger.kernel.org # v5.15+
+Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
 ---
-v3: Separate the xchg() call from the variable declaration in remove_adev()
-to avoid calling functions with side effects as variable initializers
-v2: rebased on the latest net
- drivers/net/ethernet/microsoft/mana/mana_en.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+ include/net/xfrm.h     | 3 ++-
+ net/key/af_key.c       | 6 +++---
+ net/xfrm/xfrm_policy.c | 2 +-
+ net/xfrm/xfrm_state.c  | 4 ++--
+ net/xfrm/xfrm_user.c   | 5 ++---
+ 5 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index a654b3699..dd4f4215a 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -3465,14 +3465,19 @@ static void adev_release(struct device *dev)
- 
- static void remove_adev(struct gdma_dev *gd)
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index 10d3edde6..874409127 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -715,6 +715,7 @@ struct xfrm_mgr {
+ 					   const struct xfrm_migrate *m,
+ 					   int num_bundles,
+ 					   const struct xfrm_kmaddress *k,
++					   struct net *net,
+ 					   const struct xfrm_encap_tmpl *encap);
+ 	bool			(*is_alive)(const struct km_event *c);
+ };
+@@ -1891,7 +1892,7 @@ int xfrm_sk_policy_insert(struct sock *sk, int dir, struct xfrm_policy *pol);
+ #ifdef CONFIG_XFRM_MIGRATE
+ int km_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 	       const struct xfrm_migrate *m, int num_bundles,
+-	       const struct xfrm_kmaddress *k,
++	       const struct xfrm_kmaddress *k, struct net *net,
+ 	       const struct xfrm_encap_tmpl *encap);
+ struct xfrm_state *xfrm_migrate_state_find(struct xfrm_migrate *m, struct net *net,
+ 						u32 if_id);
+diff --git a/net/key/af_key.c b/net/key/af_key.c
+index a166a88d8..9cffeef18 100644
+--- a/net/key/af_key.c
++++ b/net/key/af_key.c
+@@ -3564,7 +3564,7 @@ static int set_ipsecrequest(struct sk_buff *skb,
+ #ifdef CONFIG_NET_KEY_MIGRATE
+ static int pfkey_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 			      const struct xfrm_migrate *m, int num_bundles,
+-			      const struct xfrm_kmaddress *k,
++			      const struct xfrm_kmaddress *k, struct net *net,
+ 			      const struct xfrm_encap_tmpl *encap)
  {
--	struct auxiliary_device *adev = gd->adev;
--	int id = adev->id;
-+	struct auxiliary_device *adev;
-+	int id;
-+
-+	adev = xchg(&gd->adev, NULL);
-+	if (!adev)
-+		return;
-+
-+	id = adev->id;
+ 	int i;
+@@ -3669,7 +3669,7 @@ static int pfkey_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 	}
  
- 	auxiliary_device_delete(adev);
- 	auxiliary_device_uninit(adev);
+ 	/* broadcast migrate message to sockets */
+-	pfkey_broadcast(skb, GFP_ATOMIC, BROADCAST_ALL, NULL, &init_net);
++	pfkey_broadcast(skb, GFP_ATOMIC, BROADCAST_ALL, NULL, net);
  
- 	mana_adev_idx_free(id);
--	gd->adev = NULL;
- }
+ 	return 0;
  
- static int add_adev(struct gdma_dev *gd, const char *name)
-@@ -3538,7 +3543,7 @@ static void mana_rdma_service_handle(struct work_struct *work)
+@@ -3680,7 +3680,7 @@ static int pfkey_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ #else
+ static int pfkey_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 			      const struct xfrm_migrate *m, int num_bundles,
+-			      const struct xfrm_kmaddress *k,
++			      const struct xfrm_kmaddress *k, struct net *net,
+ 			      const struct xfrm_encap_tmpl *encap)
+ {
+ 	return -ENOPROTOOPT;
+diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+index c944327ce..59968dcba 100644
+--- a/net/xfrm/xfrm_policy.c
++++ b/net/xfrm/xfrm_policy.c
+@@ -4703,7 +4703,7 @@ int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 	}
  
- 	switch (serv_work->event) {
- 	case GDMA_SERVICE_TYPE_RDMA_SUSPEND:
--		if (!gd->adev || gd->is_suspended)
-+		if (gd->is_suspended)
- 			break;
+ 	/* Stage 5 - announce */
+-	km_migrate(sel, dir, type, m, num_migrate, k, encap);
++	km_migrate(sel, dir, type, m, num_migrate, k, net, encap);
  
- 		remove_adev(gd);
-@@ -3753,8 +3758,7 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
- 	cancel_delayed_work_sync(&ac->gf_stats_work);
+ 	xfrm_pol_put(pol);
  
- 	/* adev currently doesn't support suspending, always remove it */
--	if (gd->adev)
--		remove_adev(gd);
-+	remove_adev(gd);
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index 1748d374a..8f1379681 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -2837,7 +2837,7 @@ EXPORT_SYMBOL(km_policy_expired);
+ #ifdef CONFIG_XFRM_MIGRATE
+ int km_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 	       const struct xfrm_migrate *m, int num_migrate,
+-	       const struct xfrm_kmaddress *k,
++	       const struct xfrm_kmaddress *k, struct net *net,
+ 	       const struct xfrm_encap_tmpl *encap)
+ {
+ 	int err = -EINVAL;
+@@ -2848,7 +2848,7 @@ int km_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 	list_for_each_entry_rcu(km, &xfrm_km_list, list) {
+ 		if (km->migrate) {
+ 			ret = km->migrate(sel, dir, type, m, num_migrate, k,
+-					  encap);
++					  net, encap);
+ 			if (!ret)
+ 				err = ret;
+ 		}
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index d56450f61..b39c33276 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -3271,10 +3271,9 @@ static int build_migrate(struct sk_buff *skb, const struct xfrm_migrate *m,
  
- 	for (i = 0; i < ac->num_ports; i++) {
- 		ndev = ac->ports[i];
-@@ -3843,8 +3847,7 @@ void mana_rdma_remove(struct gdma_dev *gd)
- 	if (gc->service_wq)
- 		flush_workqueue(gc->service_wq);
+ static int xfrm_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 			     const struct xfrm_migrate *m, int num_migrate,
+-			     const struct xfrm_kmaddress *k,
++			     const struct xfrm_kmaddress *k, struct net *net,
+ 			     const struct xfrm_encap_tmpl *encap)
+ {
+-	struct net *net = &init_net;
+ 	struct sk_buff *skb;
+ 	int err;
  
--	if (gd->adev)
--		remove_adev(gd);
-+	remove_adev(gd);
- 
- 	mana_gd_deregister_device(gd);
- }
+@@ -3292,7 +3291,7 @@ static int xfrm_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ #else
+ static int xfrm_send_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 			     const struct xfrm_migrate *m, int num_migrate,
+-			     const struct xfrm_kmaddress *k,
++			     const struct xfrm_kmaddress *k, struct net *net,
+ 			     const struct xfrm_encap_tmpl *encap)
+ {
+ 	return -ENOPROTOOPT;
+
+base-commit: bd3a4795d5744f59a1f485379f1303e5e606f377
 -- 
-2.43.0
+2.34.1
 
 
