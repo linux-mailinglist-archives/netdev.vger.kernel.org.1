@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-283725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283726-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cOIKEWRP+GmQsQIAu9opvQ
-	(envelope-from <netdev+bounces-283725-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 09:48:52 +0200
+	id YMejDHVP+GmQsQIAu9opvQ
+	(envelope-from <netdev+bounces-283726-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 09:49:09 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96D844B99BB
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 09:48:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D16574B99DA
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 09:49:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9358B300F53A
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 07:43:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3AFBC301AF43
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 07:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1198830595C;
-	Mon,  4 May 2026 07:43:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4ED3033F7;
+	Mon,  4 May 2026 07:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="D7WP5BEi"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="XFL9Is5g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F482F0C79
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 07:43:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C82E1D63F3
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 07:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777880635; cv=none; b=YLe/413Jod0KyjJOmckHV6EcsGgqFvya2+5b35UQNKXradRs8hp2fH0zjpCthGJvQpH0VhFU4rOJMdZIF6M4b67+sGluBD/e5b9zvVeotRm6iJ9vU6VQnYp4SaoHd2OKS0RtpUtoUArHowQKG0Dv/unRLq/TncurRYr0WdGXi+Y=
+	t=1777880655; cv=none; b=FlIA0USJnjZVHgPdsuAYCyCwY8Hbcoe4DuO/M3q7cYX7pe0sRwoTbMD3ly+8lNQCfFHJTFasA20gNhuqZngmDvrKRWhResQGbpFIzStpnYHb1ayUQJSSYDMj+v9lfTqcArrbn7+02QKXV3z63B3qAo735wldHf54v/3tdkYdCc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777880635; c=relaxed/simple;
-	bh=boGwKw02j+YN2/NIEQgBpXs69EV5KI3+mVKmW0Vhc30=;
+	s=arc-20240116; t=1777880655; c=relaxed/simple;
+	bh=WqTgDRyF7thxXL2tFuIlt/14bQOXqqiDNxfbMkQh+l0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z8O6hE1AUmCMN4pQr+MfQlzPd7fxEsyyjpCm5FT7eJMNLD4Xlp6KCmP8cgMD4y+323BAS8Wylpeo+7M6ezS21HVY8xl3LynkRH8h4YIGHGu2btABCTdKtL8rZt/ZR+xvJE7FEgBmL/vnRGzZuUPyY7LHTv1rhBZwPhUra7oR3eM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=D7WP5BEi; arc=none smtp.client-ip=209.85.128.44
+	 In-Reply-To:Content-Type; b=s5vC6UZFwtdO3yby5WCOHOmzxOsRY8xJiTa8Fsfqr8GrYnX8bZVPLvhH2wN3cCKxm5rE/avtL+4wIG+RGQauWQZFYIo7IdE4U5fEjwVKHPlwLZzqKjYIZtMY9XCPFDHx5iKbxXNJriOpwzkPJO7AYSep17bzxvAJlEQCk36Ckm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=XFL9Is5g; arc=none smtp.client-ip=209.85.221.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-48896199cbaso33352905e9.1
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 00:43:54 -0700 (PDT)
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-449e96a8a80so2041662f8f.3
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 00:44:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1777880633; x=1778485433; darn=vger.kernel.org;
+        d=blackwall.org; s=google; t=1777880653; x=1778485453; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=VyNdEo2zQTUk85Np/ZYvwEJkoha6O3/ZtIdB/pJF5MU=;
-        b=D7WP5BEiB6zf+NnOkiTUWSsBttOjGnxnz7KjwaqJR1BCL78lrksqQ9bg7VzqdTSaJH
-         EE0ryx1CVwpFeHfOgl76nh9rvGmB6Vs+Qj+oTNtR8q1nL6GWWErF1eDpDZEfq1bq8WR/
-         TzLTf2fY9NO4tANLqVrVSKQR8Ij2IeZPLrDi5NyI70Em/ibdUFGQ1sC12giSg1wF6nkQ
-         G7eGTgJKxojtQz+N264J9mbYHqBcP9Ryf4QJU9e7D0j20o/ItW1uc/u8uVp6GwEp9O6N
-         S9x/54g1MWTxZaRQOZupW0m/j21u1crXkU125fOAAsmMcezb5uNiqvwh606ub9Vu8Rhw
-         UV2g==
+        bh=BqVl4u47O1sLc62PW00yH8pyp8rHN1ZyUmrViFkDQUc=;
+        b=XFL9Is5g1T1huGr0lGuFfsrGeJ43rtB7zVJRoKl9ccye2OYGNojfUWjor6vUUBtcRV
+         /6l9h/9VXWOKiRb+SL5OKbwV3g9/De+7XsnULCXxwPA2FtiACr3jD5J8MRECk/lFX1EZ
+         pYMt4A+6D6MXgb9p75q/lv4MnNnx5cy39KQFZeC5EIpycqoFHKQ66CVsi4FbQktCTngd
+         hsxd2XZEF/6QxuO0pzRK2gnamBxHFL8OXdgdQSeeKvuq9CH43D/S7+vuER9//Jle2c09
+         FPOd9jESw6CKA50O+7va40HqaTqPUrQqYY1BnFjaeo30tvGxBxfPf05EzU3wMdSWS+uJ
+         cOTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777880633; x=1778485433;
+        d=1e100.net; s=20251104; t=1777880653; x=1778485453;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=VyNdEo2zQTUk85Np/ZYvwEJkoha6O3/ZtIdB/pJF5MU=;
-        b=iODT2EOmztHO1iuaW5fQunuKWX5PTxY1nrts1Mueg23Sgbeur5gd5/n+o0WDuAmLc0
-         9otsBwwx5aonRvw6Iiy/AW3e7WuBxWzT/4LqAcavpxn/sXtHHi2YNQvS4IAfpHFR4aXM
-         HmcQytPrFK7F+8gkHSzeKJN6/yxg9ikcoXZVw6AloWEioun+OL+y26agzJGEUkazRVQ6
-         dvfajC5TXNxsEZDncOq7BJsNWRCAB7XZ7lEWSnJg/6rmhVsQ+5SEzoHJ7qdjoNuxtCTC
-         wRUg06Tjtyo5d5O+y3YHMQxgrAQvMQX1arDJ5/pTozulXVM+4mVKlECZzJ4dzlQb0C1M
-         S5+A==
-X-Forwarded-Encrypted: i=1; AFNElJ+5UG/7YwPMIdLVAyxlSAhLrrqMiJJUKCrL1RprAUaHqOtCNZ7D8gs2NjDR70Wi1QgrNbv2kwo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YweqwGbDPHt2uuZTx3mjID5MrS+0iLdyp/wSS6Zjif9kjNIBtVY
-	MWirRcTTNQ0qDjK4QlLXgikBwagnsJy/pVKeSTZzLdjqXI5TauPtMjUN+Hx60NhgP2Y=
-X-Gm-Gg: AeBDietVpMW8OiDHm8RvXSJQM0cIyv1+Biky8zZTAasPDJ4oGovYxaLoe3ZysUoTld0
-	LmVEwu5xV4UA7tAR2Pod9ksJWgl5ZgYcFgZu2XEsRY9pEwqJtc7K2ch746MKsl3phdmgthfRSEM
-	3dLMXZiHQMGeQv+fWV45zGiNAnxo6XmU88P+/7E1sayRmFlKiPUjIbuBjTeP/yD0kaZZoubIzFD
-	sTp4cM6ukaXvBbe/i7D3kxRJ8IekqUfccwQUTrxDsAQv5Fo2rwoTQcxNY+FyUo8IN5RxdYxbpNM
-	2MKf9FG1DyhRLHVebv79IChmjymRsY0zKswzR1Ep94CLiI5VFFczODKhhfiuIEZcvoMdnHPYGzg
-	2la41Qy3IdDbT3ay8EnzZOaerVRbLqoMVHSoGRJl5O2ZBONrVzyrLBwgVyqW5ha9L17ARUk22ak
-	ERQxUrLvMiVsa9k8fEkVaa/s6j86ACip2mIQLUcQOz+RZAY0YNok5w/HMuSZq2Oscd
-X-Received: by 2002:a05:600c:1604:b0:48a:66a8:9981 with SMTP id 5b1f17b1804b1-48d0562f7efmr35523185e9.27.1777880632919;
-        Mon, 04 May 2026 00:43:52 -0700 (PDT)
+        bh=BqVl4u47O1sLc62PW00yH8pyp8rHN1ZyUmrViFkDQUc=;
+        b=ovk4rUG0jCmVKCcjiQS1uIVv1p+hH4m5wD6TFPA2LrfDfwAGyJA80TWi7BKlO/oBMA
+         vjQ/3blG0d54mjaXmIop3mQPQG3YWojL2DbLPlCPibbUF7naEchZ237Pwlf/NykSp9qe
+         IWDU1hgrQNcRZFvz3RoDx00IEHvBNNXp6nuf415fhvStfa6JZ+OyEp7fSBVMM39T6n34
+         veRLJ4lEXPLQbdSeFf+QpYqArj94hgVSEugXNpHCWhybkk5u2a/q/gmevJmXNuU8fOEQ
+         xl6iL+jMw3XwyXb1ipHkGZ1dBE1v0181hc8TR8R02oR29mzBwWzVUpt37WEhYSfN10ai
+         6IkA==
+X-Forwarded-Encrypted: i=1; AFNElJ8OuUlLp088LfWxw5YAF31p74/Wa8oRXPcsWW7PmlmgztHzyBL6FcouYHzKX5tE+h7Z46+IQUQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlGTewe0ncXFhtbeiLwDVgN6146cOFLSla2s/lySlAREZkI+dU
+	SQAzUlcJzzdvLkTUdP1qSoqgzuVhv2/HssY5UM/1peCGpfQOSOvoaYJVRFU575Cuqz8=
+X-Gm-Gg: AeBDiet1SSwmVsQocBGc29uhu3y5jnOa5M7CfNPBGiSYwUiS2Z0RScKe25wPGPKpmiQ
+	7Q9xM5q+q1tSqVtIOTYPZ8V2+WVmimHvvcaKtPnOhXtqRjfRLrbzpLTzboAtNMKdSwqCqVZijHF
+	qwEfSGkK/0rrGcmb4R2BEhNNYK9h1W+cskMME2Bsxn0o2Bk1qQv8J04BhQB40aOrttlu+L12Rej
+	j7xnEmvf21MAd4ZdTNQ7fXm0TC8rg7wFgr3MalvlKCN+XyNXL6ZrDE5izc2LpBTk5J16YzGNbs6
+	s80icRUKQd9igA/8dC4jGgyVXssXGW3elw2AzZLbn17bGH3ZP7KYCS//OZyO/cNUbxoeai8tS2T
+	Ik9xCHSDtmFMKdG17g3mPl/lGUTh/EnpL1nJv46bW1woEBqySxB1jMUcvBOtxgBOmAm31Vt2mUa
+	RR6YuDc4CNhC1eHm1fFQgFR6CWUAoSwh2NLZLD0FVGPuddoLdK2uWUNYxxvDKEM6F6
+X-Received: by 2002:a05:6000:2f83:b0:43f:e22e:e8da with SMTP id ffacd0b85a97d-44bb444393fmr14065131f8f.5.1777880652602;
+        Mon, 04 May 2026 00:44:12 -0700 (PDT)
 Received: from [192.168.0.161] (78-154-15-182.ip.btc-net.bg. [78.154.15.182])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a81ed6b89sm306862325e9.1.2026.05.04.00.43.50
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-44a981ded99sm24332121f8f.18.2026.05.04.00.44.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 May 2026 00:43:52 -0700 (PDT)
-Message-ID: <f3a36ed5-52b2-481b-aee6-c2080cf5f14e@blackwall.org>
-Date: Mon, 4 May 2026 10:43:49 +0300
+        Mon, 04 May 2026 00:44:12 -0700 (PDT)
+Message-ID: <fbbc57a7-76c7-434d-af40-4f0e8c314aad@blackwall.org>
+Date: Mon, 4 May 2026 10:44:10 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,8 +86,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/6] bridge: Add per-VLAN netlink handling for
- neigh_forward_grat
+Subject: Re: [PATCH net-next 6/6] selftests: net: Add tests for
+ neigh_forward_grat option
 Content-Language: en-US, bg
 To: Danielle Ratson <danieller@nvidia.com>, netdev@vger.kernel.org
 Cc: donald.hunter@gmail.com, kuba@kernel.org, davem@davemloft.net,
@@ -100,12 +100,12 @@ Cc: donald.hunter@gmail.com, kuba@kernel.org, davem@davemloft.net,
  petrm@nvidia.com, linux-kernel@vger.kernel.org, bridge@lists.linux.dev,
  linux-kselftest@vger.kernel.org
 References: <20260503073532.2138165-1-danieller@nvidia.com>
- <20260503073532.2138165-6-danieller@nvidia.com>
+ <20260503073532.2138165-7-danieller@nvidia.com>
 From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20260503073532.2138165-6-danieller@nvidia.com>
+In-Reply-To: <20260503073532.2138165-7-danieller@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 96D844B99BB
+X-Rspamd-Queue-Id: D16574B99DA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
@@ -119,7 +119,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,nvidia.com,lunn.ch,fiberby.net,iogearbox.net,queasysnail.net,mcwilliam.dev,aisec.fraunhofer.de,vger.kernel.org,lists.linux.dev];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283725-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283726-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	DMARC_NA(0.00)[blackwall.org];
 	DKIM_TRACE(0.00)[blackwall.org:+];
@@ -137,28 +137,31 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TO_DN_SOME(0.00)[]
 
 On 03/05/2026 10:35, Danielle Ratson wrote:
-> Add netlink handlers for the per-VLAN neigh_forward_grat option via
-> BRIDGE_VLANDB_ENTRY_NEIGH_FORWARD_GRAT attribute.
+> Add tests to validate the neigh_forward_grat bridge option for selective
+> forwarding of gratuitous neighbor announcements.
 > 
-> The per-VLAN option provides fine-grained control, allowing different
-> VLANs on the same port to have different gratuitous ARP/unsolicited NA
-> forwarding behavior.
+> The tests verify per-port and per-VLAN control of gratuitous neighbor
+> announcement forwarding for both IPv4 (gratuitous ARP) and IPv6
+> (unsolicited NA):
+> - When neigh_suppress is enabled with neigh_forward_grat off (default),
+>    gratuitous announcements are suppressed
+> - When neigh_forward_grat is enabled, gratuitous announcements are
+>    forwarded while regular neighbor discovery remains suppressed
 > 
-> This enables control via 'bridge' commands:
->   # bridge vlan set dev eth0 vid 10 neigh_suppress on
->   # bridge vlan set dev eth0 vid 10 neigh_forward_grat on
+> For IPv4, use arping to send gratuitous ARP packets. For IPv6, use
+> mausezahn to craft unsolicited Neighbor Advertisement packets.
+> 
+> For the per-port tests, the IPv4 test exercises the ip link interface,
+> while the IPv6 test exercises the bridge link interface.
+> The per-VLAN tests use the bridge interface throughout, as per-VLAN
+> attributes are only accessible via 'bridge vlan'.
 > 
 > Signed-off-by: Danielle Ratson <danieller@nvidia.com>
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-> Reviewed-by: Petr Machata <petrm@nvidia.com>
 > ---
->   net/bridge/br_vlan.c         |  1 +
->   net/bridge/br_vlan_options.c | 24 ++++++++++++++++++++++--
->   2 files changed, 23 insertions(+), 2 deletions(-)
+>   .../net/test_bridge_neigh_suppress.sh         | 298 +++++++++++++++++-
+>   1 file changed, 296 insertions(+), 2 deletions(-)
 > 
 
 Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
-
-
 
 
