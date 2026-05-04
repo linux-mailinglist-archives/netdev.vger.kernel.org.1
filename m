@@ -1,174 +1,232 @@
-Return-Path: <netdev+bounces-284071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284072-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0PVyF2Ah+Wmz5wIAu9opvQ
-	(envelope-from <netdev+bounces-284071-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 00:44:48 +0200
+	id KK1GL4Ej+Wmz5wIAu9opvQ
+	(envelope-from <netdev+bounces-284072-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 00:53:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 627724C4847
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 00:44:47 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 187D74C496A
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 00:53:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 80A593009392
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 22:44:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 114583015C80
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 22:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E956838657D;
-	Mon,  4 May 2026 22:44:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C2A6243956;
+	Mon,  4 May 2026 22:53:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JgjxUrbz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jbR+Aan6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A276368947
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 22:44:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777934680; cv=pass; b=oC/aOqfAEfhQEHS5/dBzE6jOd9LUjKXyU5eKTaE6DkPGrnYHYybSDt7Bc/X2dP2IiJ3s6iuuftYXwrg+kgGdrDPyWigGmTqdtMhuFbHwn2AIizYt9yW9FyS4uoGZpKFffYnWRlK5oYc4m19hzUZPVruTm/sym3Fqa+6JBhs+glk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777934680; c=relaxed/simple;
-	bh=h4g/aXIAan0ee1uFOoXPGBT468lGBaAVwYmjcBxQ4Oc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qsnP1BktmGyPpQidla6g1kswuuFiEdcKNKv2U0npJkeL9VVEqLG0Q25IgvYbdScUPne8IMRWQ/LejNFEzeGhGazsIQxSEuFAzAGXeP0EKoSqlI0A9A5483xtRl1QgG3rao1FUdMUZrhyJ2qLemUOrmfnqcQ2NDI/DfdIsXk3Sm4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JgjxUrbz; arc=pass smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-671588ab0cfso2142a12.1
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 15:44:39 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777934678; cv=none;
-        d=google.com; s=arc-20240605;
-        b=VSlOconj0DyZSkkLPGDoYRrQ5QULOzSvWhffqLuF1TD7zMhdpQExf+ZcB9QvZ+62OF
-         DqGj/BDI5NFa8uXFGHRN0DMImyknHFU6+uy/rnRr9idydZffGNLORKc9zP4B39UyxLQY
-         ds2pDW61V+GAb5BrELPpD/ZUAC+32mWxjidd6J/JeRqxnVWxMBz8ezsl0pXfZzU7EBCM
-         +kT3K6dtTXc7ov2rJWZXuMRybgdd0XEq1YuvJA+EScQKMSPj/BEcHwEgqGuk8xaJ+zkw
-         nOnDXcX3uj1f4nnTZCCNgTUkWXFJfq2gaFH9GMqKTZCHj40fssgCP0vezdAyfPbDL/XO
-         ePDg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=h4g/aXIAan0ee1uFOoXPGBT468lGBaAVwYmjcBxQ4Oc=;
-        fh=ykIu+IOCroeLOJaMO9uNIMg9IYBjMb2u3OGr95dKA94=;
-        b=WiNQfm+PdXn3qIuc8rbBsYiz2R+K62IYmusTXh0TKBJc/nQJAH64RfqUvDAqe1Vf/k
-         HhLnagIGbH+jvZwNAAcg+oC1IpiTrr/b5sKFZRwuKbpcnzX3erw5RJWrXW+coZDbKmMv
-         +LsOtAH2VBa2vfQudxBeIcJbAlzTr5ikKOMIdEVZ6SofSjrXRs18nUpE4L49/zkIugMD
-         wGzCbNK0IxcqNmwH20fRnSxO2fmi2P7Qz/4My0OENtxxCh6PNDlMCunbun0dwZ5AbRbz
-         zhNm2bnZWGpusjQP8MAHgFyhr7ckD8W05dYeskWvaZDZQQVVm+QhDc3N7BHyNiW5LZ2a
-         00qQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4D733DEF2
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 22:53:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777935211; cv=none; b=oCTOogZn31sAKxbzxRWnUNJU9YCh1IeJ+4e+8dAdhj3AY2aa6gEvvjE40kO7HTZYptbAkVJQzJUQvrTuDVfRLX2u7iYgVMlpov6TKyursE/NYPjmvJlNm/Q5sEVtS6t7VjWpSbsDyrS4oQs7CPCxy4vVqGnQ6YmHKv9vhKrHLIk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777935211; c=relaxed/simple;
+	bh=kl+VKiVcXFJLGz+zh1YjrPpBSIjFpq/0QZXFRB4vlQY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lcygyQxTpLIF0vT2Pb2VLBf9nylIHg5fdx5xPc9X6HksB8viPYOquwF2WQ+KLmfj+Jm6HFohWonMQ68PBwXetxJ0axDh2SnOVrtjPESCRjJglDY68Uc+i8GmuCifygNYc7q1+33S3WieP+cOB0G3/yyWrGghTW78SkJNVHAm1ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jbR+Aan6; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-393925cb1baso22601601fa.0
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 15:53:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777934678; x=1778539478; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1777935208; x=1778540008; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=h4g/aXIAan0ee1uFOoXPGBT468lGBaAVwYmjcBxQ4Oc=;
-        b=JgjxUrbzRxZJnFoxwn+lkGfk9p6dyi2/BALGU2HDZARuAtdZT6q44GpYulSPolihSB
-         6J8UQcN3es2bbnn7oeaWECe7mkGp4jPyQW9rEn8uC85TIZIhqSQzlEwNkYMiyCcH8Lfz
-         Y23E2hwhegi/KLE7q/o1CkUUa5qogMoPCi18YCqXiU6hnct8pbCxdBqLMF5XxhUlDN2s
-         UYQyFf/8X8zXlZq5rwteIJ6vkZzVVYjOVynO1M0rSM/G+066gwDGWcAqVGzFB6QpQrq7
-         5NNBm8h3j05y30RJOVvmo4xvUd8mIi9lXiBFpJ3bCML/t7W/v9MYViO6CzjAuBMSxVuI
-         e4Dg==
+        bh=po4u7/Rujwbm7uihMqIsA/eo7S1xmgz8pQV0r2hhPeo=;
+        b=jbR+Aan6NTM1C9bwGODvJC8obmEzJ3T2agwcKRY4Yu+jfsw6TGxwHJwz88l00iwB8r
+         /Gq765gHp6mVwO04u9LDvU/IOPh2pFWnXY4xjXapPRKgxAmLkZvMha7JClIkXETsr2Rf
+         n+2gNrIiMxyGFB3RX8hi02ct2IFKj0NhuSnVtGoFDuZhypdOY9QoUZ/+FIrMQPsEby4F
+         +LbHpvRrhYA6kOYAM2qccs7KZ+G0Bo1d6dU87D+eh2l7HD3PrjIxaq88bHNOX5RukbVC
+         MWSIxaWa2H8i/NAub38P9zgAphw3FaavAF1X4wUrFP/897kbxkmTqDECF5ii0gVTp0xC
+         eY5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777934678; x=1778539478;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1777935208; x=1778540008;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=h4g/aXIAan0ee1uFOoXPGBT468lGBaAVwYmjcBxQ4Oc=;
-        b=NXAMokQaEbTqVTGYWnoowqk34QV9kbS/GudSowtDX/K1r8GFR1EnU4RkbGC/7zWdzD
-         zwHX2i8OziR/AZbQNkhDnj7Vvfy/4x0KlGpCcf3sKE3UHsVn+QeZD6c4/WVNpkC747ce
-         +/rvSmcE+vs8gRtkg9fa+/mAban/+G2AqhGrkpDlCiD2836dmoeBNIMgVwWm2JlnIxp1
-         sX3X/qeheQj0D+pPb11BGF7SA83LImZ4U2jn0BM1e9J8EalEVTq1silopJ2a+Z1gOBsj
-         QiYggdSF8kPwy5w29IXUC2hHRRcgXyBvJQtIkrLkyIpzsl+u7Lr2cGlkuYLrX/cuvmSG
-         7amw==
-X-Forwarded-Encrypted: i=1; AFNElJ8q9wjQC126wUX26ecP9UCFSpLNyDyuMr36gSwenL4RYPCuvDqUyBFN2orlVKlu7/tvxbG7LbM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVxpBVVAdsF1daDV1KOSKas2Pp6R4FSdWbMLG9Ihv4rb5IWyT3
-	3sw1+GfZCTcaS6gHr2FvYY0ISwvDeNgVHUgzeMyXX/sLO/QG7cbIAk/y1wHHpHxQ9nxsxQsK2ur
-	87AaphpPK8YZbFcf10kaOHB4oeCY6XUxjyGvELHKBSPWal0Gxp1VUV5Vt
-X-Gm-Gg: AeBDieuyfo9WSljBuba7Khbe22a8EE88pvAzGcN5PuTA1WtNh7HzjhW3MDZ3a1+Urg4
-	NFrlzqf7vKitWCXBmHWb2F0ZsODXkbX+FqEe4Jmk3GlZaoA6bk/Z1pS2jdvJxc41cMMsXbXH+9a
-	8BCuyhAEvsWrmcsrjWedMM4T0pL+g/KPpNpGw4aaDubBQipEbq8SwE5r12AHMRrnUxbkzAvISVK
-	seB8pFcj421F5fzbHznp6c3B9iosSbyAxAJBQemHJyv6NBKcKIslCEkCxDeYDiQcrJDcybBJc1j
-	drJYMf24zRoosFpGKGzA0c/YPFZsGQT78oRt3cWPBbvXjgHd2LgEz7l93Rb7ATeMS+osyKhtdbb
-	2sN8KJ2Kj+hLn5L02amhRyrGgAg==
-X-Received: by 2002:a05:6402:71a:b0:678:a5c3:4d12 with SMTP id
- 4fb4d7f45d1cf-67cccf0f26bmr7665a12.3.1777934677562; Mon, 04 May 2026 15:44:37
- -0700 (PDT)
+        bh=po4u7/Rujwbm7uihMqIsA/eo7S1xmgz8pQV0r2hhPeo=;
+        b=RBhQk8NwAo4ld7vmadhr0EVoMbvFZzcuQZ0mcaBUaVOmzd0u3CZoMFF5yFnubX7wuT
+         yXZQI+jOlNoWtne/mzEbuKXtToBpjtj1HKKB1RJi+ZlaQPNeVgXAjwUjCIG55U/sVaYa
+         0rPc6KyOq711JFwDWKoZHB+PwIpMLFPJsk70LoOZ5vQ8bbboNQ6za5ndFhwPcGlI2x5w
+         dt3qx9Vc0uc1HttzLcNwJvBGxTHzE079OUXThydiF1H0fWuvUl5P2+G8ZYMKnLdSK+3u
+         GY+V0Ks94q89k0RqlZ01YkgigZtV8VuTfQwzx6oeHcRWajWORiKmrEJSpgfBdy/x5NjF
+         Bdng==
+X-Gm-Message-State: AOJu0Yxlla3p6Jp/0uLVPEF1PACZukdpxphXUUD8Lqrxc1gGaOkOSE7/
+	TG9gSYIQGRhRVPCzg1MWwec7EJD4bpeCJsLr8jLnYUydu6gt/d0yUEQe73HLCp6koZw=
+X-Gm-Gg: AeBDiets299jivA3Fwu578HIoZxS+yFz0rMd3PkbiAVuPVxnJRDit4XBQ2w/o4AiuaF
+	xotSHl0p7ySKl9rmVMNrevjmIr24wLvGNPaKC/a5PxEoYjdl/Q5UBnu4hA5WJBQ8Wmrn72/DhMJ
+	PUeiR4RT8AAafhEbJM0IcfVnfTUoI9z5gfgapHxF7KGBAJp0FmZu/7WEbCpi1nlu5NbmbQMCmeN
+	ZN598bkEHIKBVbmMB+VNxdkJM4yPGwRbao+tuFlTWoaOTu4gBbgjG2qDodneGvkOLfD7vlOajmS
+	Iyu/1lpB8YTpuHu3wsKNyFHqYV2yq4z9Qc5I1X2zrrgPpwUYFfRGsV1N8e5R0IQww+NTXFuBF+P
+	RM1Duc9Tr7sisjq35KPst//vWZL0ti2zULa3QEcn8lIukbrPJskDSe2buTtOVxP1w17ZWPmRf6c
+	vjar81jorwUhzwawyThAY2GgOBFRcNxIIh4qyCb/6AaScLfoLtgefkL0HnOmemwPFJB1i5nb2Fz
+	qRBIwH39qRlvn3STF0xPOYJ
+X-Received: by 2002:a05:651c:2116:b0:38a:45d6:c246 with SMTP id 38308e7fff4ca-393783ef512mr45088291fa.8.1777935207897;
+        Mon, 04 May 2026 15:53:27 -0700 (PDT)
+Received: from dau-home-pc.megasoftware.org ([46.246.34.10])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3939b43a795sm15774901fa.35.2026.05.04.15.53.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 May 2026 15:53:26 -0700 (PDT)
+From: Anton Danilov <littlesmilingcloud@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemb@google.com>,
+	davem@davemloft.net,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org
+Subject: [RFC PATCH net-next v3 0/2] udp: fix FOU/GUE over multicast
+Date: Tue,  5 May 2026 01:53:08 +0300
+Message-ID: <cover.1777934869.git.littlesmilingcloud@gmail.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <ad_dal164gVmImWl@dau-home-pc>
+References: <ad_dal164gVmImWl@dau-home-pc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260428-mlx5_vxlan-v1-1-cf666d042618@google.com>
- <20260428184631.40f1f1b7@kernel.org> <CANkEMgkBnuRfurKcFEUAZcJcX1XYSnHbBozZGP8DpnKq--tWbw@mail.gmail.com>
- <20260429190150.417b0302@kernel.org>
-In-Reply-To: <20260429190150.417b0302@kernel.org>
-From: Marc Harvey <marcharvey@google.com>
-Date: Mon, 4 May 2026 15:44:26 -0700
-X-Gm-Features: AVHnY4J3w0BS71H3Vp7F7zgIqkv3XQzUGxKzlNG30V6pti40qOkOAPp-uV87PII
-Message-ID: <CANkEMg=Xc9jN8McZmLerK_ffOwRFfX+yO=4Ha6+umVogbkBj3A@mail.gmail.com>
-Subject: Re: [PATCH net-next] net/mlx5: Add MLX5_VXLAN config option
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
-	Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Kuniyuki Iwashima <kuniyu@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 627724C4847
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 187D74C496A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284071-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-284072-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[littlesmilingcloud@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marcharvey@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.999];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Wed, Apr 29, 2026 at 7:01=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> Are you aware of NETIF_F_RX_UDP_TUNNEL_PORT ?
-> I haven't checked it does exactly what we need, but I recall there was
-> a ethtool feature for this..
+UDP encapsulation (FOU, GUE) has never worked correctly with multicast
+destination addresses. When a FOU-encapsulated packet arrives at a
+multicast address, it enters __udp4_lib_mcast_deliver() which calls
+consume_skb() on packets that need resubmission to the inner protocol
+handler, silently dropping them instead.
 
-Thanks, I didn't know about that feature and mlx5 uses it. However,
-mlx5 unconditionally sets the `UDP_TUNNEL_NIC_INFO_STATIC_IANA_VXLAN`
-flag, which excludes port 4789 from the entire UDP tunnel core offload
-management (see `__udp_tunnel_nic_add_port()`).
+The unicast delivery path handles this correctly by returning -ret,
+but the multicast path was never updated to support UDP encapsulation
+resubmit.
 
-So using ethtool to disable `NETIF_F_RX_UDP_TUNNEL_PORT` will not
-disable vxlan offload for port 4789.
+This causes silent packet loss for FOU/GRETAP tunnels configured with
+multicast remote addresses. The loss ratio depends on the early demux
+cache hit rate - packets that hit early demux bypass the multicast path
+and work correctly, masking the issue.
 
-I think a better approach would be to just remove this static
-automatic offloading for port 4789, mlx5 is the only driver using
-`UDP_TUNNEL_NIC_INFO_STATIC_IANA_VXLAN` anyway. However, there might
-be a reason for this, such as some supported hardware offloading vxlan
-on port 4789 by default even without commands from the driver.
+Reproducing the issue:
 
-If mlx5 continues to use the `UDP_TUNNEL_NIC_INFO_STATIC_IANA_VXLAN`
-flag, then some change is required to fully disable vxlan offloading.
+  ip netns add ns_a && ip netns add ns_b
+  ip link add veth0 type veth peer name veth1
+  ip link set veth0 netns ns_a && ip link set veth1 netns ns_b
+
+  ip -n ns_a addr add 10.0.0.1/24 dev veth0 && ip -n ns_a link set veth0 up
+  ip -n ns_b addr add 10.0.0.2/24 dev veth1 && ip -n ns_b link set veth1 up
+
+  # Multicast routes
+  ip -n ns_a route add 239.0.0.0/8 dev veth0
+  ip -n ns_b route add 239.0.0.0/8 dev veth1
+
+  # Disable early demux to expose the issue (otherwise it's partially masked)
+  ip netns exec ns_b sysctl -w net.ipv4.ip_early_demux=0
+
+  # Join multicast group on receiver
+  ip -n ns_b addr add 239.0.0.1/32 dev veth1 autojoin
+
+  # Sender: GRETAP with FOU encap
+  ip -n ns_a link add eoudp0 type gretap \
+      remote 239.0.0.1 local 10.0.0.1 \
+      encap fou encap-sport 4797 encap-dport 4797 key 239.0.0.1
+  ip -n ns_a link set eoudp0 up
+  ip -n ns_a addr add 192.168.99.1/24 dev eoudp0
+
+  # Receiver: FOU listener + GRETAP
+  ip netns exec ns_b ip fou add port 4797 ipproto 47
+  ip -n ns_b link add eoudp0 type gretap \
+      remote 239.0.0.1 local 10.0.0.2 \
+      encap fou encap-sport 4797 encap-dport 4797 key 239.0.0.1
+  ip -n ns_b link set eoudp0 up
+  ip -n ns_b addr add 192.168.99.2/24 dev eoudp0
+
+  # Static neigh: ARP replies can't traverse unidirectional mcast tunnel
+  recv_mac=$(ip -n ns_b link show eoudp0 | awk '/ether/{print $2}')
+  ip -n ns_a neigh add 192.168.99.2 lladdr $recv_mac dev eoudp0
+
+  # Test: ping through the FOU/GRETAP tunnel
+  ip netns exec ns_a ping -c 100 192.168.99.2
+  # -> without this patch: 0 packets received on eoudp0
+  # -> with this patch: all packets received on eoudp0
+
+AI assistance (Claude, claude-opus-4-6) was used during root cause
+analysis of the kernel source code (tracing the call chain from
+udp_queue_rcv_skb through encap_rcv to ip_protocol_deliver_rcu,
+comparing unicast/GSO/multicast paths) and during patch and selftest
+authoring. The fix approach was identified by observing that the
+unicast path (udp_unicast_rcv_skb) already handles encap resubmit
+correctly via return -ret, while the multicast path did not.
+
+Changes since v2:
+  - Use return -ret instead of calling ip_protocol_deliver_rcu()
+    directly, matching the unicast path and avoiding call stack
+    growth with nested encapsulations (Eric Dumazet)
+  - Only change the first-socket path; the clone loop is not
+    reachable for tunnel sockets (no SO_REUSEADDR/SO_REUSEPORT)
+  - Replace Python packet generator with ping through a properly
+    configured FOU/GRETAP tunnel in the selftest
+  - Add static neighbor entry in the test (ARP replies cannot
+    traverse the unidirectional multicast tunnel)
+
+Changes since v1 (RFC):
+  - Moved inline Python packet generator into a separate helper
+  - Fixed author email typo in Signed-off-by
+
+Anton Danilov (2):
+  udp: fix encapsulation packet resubmit in multicast deliver
+  selftests: net: add FOU multicast encapsulation resubmit test
+
+ net/ipv4/udp.c                                |   6 +-
+ net/ipv6/udp.c                                |   6 +-
+ tools/testing/selftests/net/Makefile          |   1 +
+ .../testing/selftests/net/fou_mcast_encap.sh  | 112 ++++++++++++++++++
+ 4 files changed, 121 insertions(+), 4 deletions(-)
+ create mode 100755 tools/testing/selftests/net/fou_mcast_encap.sh
+
+-- 
+2.47.3
+
 
