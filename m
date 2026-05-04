@@ -1,178 +1,247 @@
-Return-Path: <netdev+bounces-283861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283862-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UJtxETCt+GkuxwIAu9opvQ
-	(envelope-from <netdev+bounces-283861-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:29:04 +0200
+	id 8AuaGfmr+GnHxgIAu9opvQ
+	(envelope-from <netdev+bounces-283862-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:23:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4804D4BF893
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:29:03 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F00E84BF474
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 16:23:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A0AAA305FE6A
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 14:16:24 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D59403017EC9
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 14:20:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FE813DEAEC;
-	Mon,  4 May 2026 14:16:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 261C03DE43C;
+	Mon,  4 May 2026 14:20:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="IUinIam6"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="ZivXVeQ7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 245BB3DE428
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 14:16:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.170
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777904175; cv=pass; b=lZedE+j43McDSeJUyPqlJj1dZ8FU/bvQtgMMgBzm6Ij61RL8g0Wtve9wt9Rl9yAj8+dSrwmFX74jeZl0Wohn/w1uvFlEKt21zIO4vIU0KXBbmzClL50OQtrjbgNj4BmR5l7Rlrl1YBsJyvaNoPAax+daHxJcZ8PPRjKyKDmRf5M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777904175; c=relaxed/simple;
-	bh=aSqe4HTBnnCiXeuThlWr1tp64VwP4F/+mQ4NzEuHJms=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=BHbt3zYB3XSSbAdP7Ghj1rdVsqAO95c83ruJ338aq1hdiILc8YXuKyGW+Fl0Yweo2pIHG88s4Eyqrweqtk32dWhiwQtIpDWzS21gzfuKaDVbN30xlZ3/Ddz1p/YY8U7DyBDLCAL49YC+T2tAWLweg53LZu9S+TyRaesXdpONraU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=IUinIam6; arc=pass smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-7bd8cb26219so4002767b3.0
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 07:16:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777904172; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Uqf0igjz/y2SPqDzX8b9KUKrsXevFru3YPa2eutkrjobRbj/pCA7YYXslz57gicIr0
-         xlOlS13KtD9GkOPCOLjQa9TMGqgTs9LEZQee5KafFomcBPCXr5eoiS9feWMsx5mDudhw
-         062oknSI+7jUvaIz2KlcAMAAFaRurOxw2EmuCluJ224WbdWnXNp18WSl3ywQA9q3v8lS
-         Lx/0toZQzHAduLnhpWvH47bDY5lHYLP8oSh10TjDVRuOj7yn4nYab4Uz/IZUIeTpZaHv
-         tleP3vJKIU5nCx7pNzgPuUOZbF3/HW+skwbFLg6q9lzD8C/duU33b36S2y9eyqVCTo4D
-         0wrA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:dkim-signature;
-        bh=c3jgVhbnA9PiNUDUKJWWXg4N4o4wEhFshJKHx6mDKD0=;
-        fh=Q4wgaZzpfUg8xis1MzxfMQluX7TCxxnvBxy/5IfdQhw=;
-        b=GeFLayFUojvs4wOXWsudchcU+DwK/T2RQlYtLg+rcfZzF9Yogc10vx3WVSjf8BNm+C
-         gyPj3d5q/V+mWm4/JpP724Py2KEpKRHyaYvjKyPm7VCY3FUeEinH+PWKr+jZjoxeXWjU
-         qYX7LsHChoJ31bYq8NJ0cz0t8uALT+wB9nm6XPQsPD6tpLmpPwmenoyT15YhlwxXKsO2
-         NPN1qULYX/GUVNM/l+KQNHImw/vBdAfEfVPUQvPVhB7lDMg5WkJv1FPu0bf1Bs9D5ke3
-         eQoxHKvB1RCzxbJcQAwLYiJ+LDud8SZdvDf7PXVX8qpBL/Wq6QGkLg2RKpV1qoSb92c5
-         +SWA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F0F29E116
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 14:20:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777904441; cv=none; b=iakVEXvh2a4wFzE+zv9VfT78dYeIzGzDa1HybfzwvO45E1viHzxuKFk1JzCII/5OrgqNQ6QVf8nBdJX+xFmO0byy46Mx26YVcdOrZ20Eu1Ztk24FrVMzd17njFLYTUPXfh1MLK0RN3hsrdx6La9rTUWcZwpkvIwvGtaKwqrGcQE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777904441; c=relaxed/simple;
+	bh=9OUajsvoVYdXpMybKSG/0NvwqxgowwKsta8AaAO2Zbo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QHo/5Clp3oXHbXJbqrP0sy4oOutmXDxuQNDVyMj6maRSfei71RIPWiRVZMEe4jQeUEc38W4cs0hd5Ul/T10To3fpS52xOx8pti4naiiBsuBa/xf99ZWgu+iKpRWDH99dLdz3cR9Z7tbVT+wz855KoUyANP3FYxkxYDiISZxils8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=ZivXVeQ7; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4852a9c6309so33561225e9.0
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 07:20:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1777904172; x=1778508972; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=c3jgVhbnA9PiNUDUKJWWXg4N4o4wEhFshJKHx6mDKD0=;
-        b=IUinIam6aUys461t2vh3v9sq1v1HF+rXpBRUhOqJtslVJ2d9pGAYDnYyplVTDUa/kF
-         E8iGOoYWXlNiKatwaZ5yPSWRWpdIpU0Ypb3eVVZfHXsXwCgaQiAKAZSwaUYdhDd7YOq/
-         xNKbMM1BazzAGz7Wt/kNb+1deh5RIwKnV2msqPXIBgd2rgAKntHdIthVSZT7AXIogIdL
-         CDSNbyg6hgF7TJY1Bur4+zZxccZzZWwGCLMM3uZJf6eCrKL5/UGZEiJ6TB6dgQ8CU7AJ
-         8CIS7HAMyQsleifA41R16IpdBIfKC1BTIMjljx6jT2MpCddiEyzJN37BPhQ0QH+dA+ZH
-         Wekg==
+        d=openvpn.net; s=google; t=1777904437; x=1778509237; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eIwRzJNBGP4qpF839RJR539plQuxlG2HBX9ojRw93ys=;
+        b=ZivXVeQ7xHjY61ZT0O3MqC9DMtIwIJCZ3EomDi92DIULRjSmrQtxWK4e2n7Yx2GHpT
+         dpDBs3vl7Rqq4M/ni7hOtzvbAftM2+e2OlnwsC/xlmTAADqOFt/6FFxJlFjf6g2djanR
+         AHafBW7xteLU9bLLHUda9MqUBLwP0xS1oEb/V47aWySlt69HOOPmqbe0TO7iDHYF9xEo
+         liBsGhfB7eLSmE2C20dlmpnWASWLs8+uGaINk4iHnUkt9ltixQnfsOgd5fvrshHF871z
+         ZF70NyL/f4v2NAL4Gc1bYly5M1Pbx9jSNaURRfKlbJErJIQyveU/mdDDfrVnrh9ow040
+         elYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777904172; x=1778508972;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1777904437; x=1778509237;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=c3jgVhbnA9PiNUDUKJWWXg4N4o4wEhFshJKHx6mDKD0=;
-        b=Lo7JK1tL9GrWHWgtif+gaI1pjTFBSJIy7UIaetrPYmjPhMfbMd2C3xbIEmcczf5xkp
-         t7HgKSw+pV9/+9C4+1rnTMYmm8RqBmtMJkySD4ZrZUy+/Oi0JbpKNQ3SlfZXidBgYbmu
-         HQuNnKKFN93QNrMcZc8PCBF4c9jiiTNMCJiHv0HljACQ7N1bAeQZsfHlbImChZG3tzTl
-         Wd+HQLpJt9jDL9oxZtu7vXx89WjsdRTv5Z/jK7Na8ipg5BsLkvYgEhMRm3/z3MLl+lgO
-         NpSxzrjmAi0bXdZOLo2a+A3dobbyEq6b7MQHoGhyJEOSsxTP+C3RxYhSYNf33oz4NVxJ
-         /nsw==
-X-Forwarded-Encrypted: i=1; AFNElJ/ccg+IAT4vNpTqLX5jDjyRX4CzA9hDRSwBE1nD/vRILWCruBuy42LWvu/7rzstlms9i+IZzLw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDVJzzoiB2R4QWg4C4M0qgfpYPoYSPoeOE7X92IRRsYGFkvlMo
-	vLKENM8re1gY/QW33dDp4RgZw3+uvExSXYFmvQvaFS0+PP7zJoYKdAVED1XvNEOnJbc0jzuEw7T
-	wuLL/+wMEJMe5PQz9n/6Hd9lVl3jn7os9QqoIadiwk7Td3DtXrB1tUlHU
-X-Gm-Gg: AeBDietAJQJnm7JcBMnKP+ZXUe95BljCcpXztSp7wJggELH4c61B8IJNbIVacwZNQ5u
-	xoziAVERo8Klwx2AoZvej1LObA0Va5NV0n7Qi0UChtSqWi88/oyfnwfFX3bUeJfnQyd1f46TAAY
-	Ml0eWWzf4wuUTLWHN3nt7ww15mfwOkMN1RmrVUPY4hxwoWIQibUz9DwA0/0C/tB2zXrgV8LOnzh
-	e7whS63eFZQ+JjniazA+ZQVnE1Xdzvasg1OUtDmLDZhk1AowlSnwRS9xEiV1MelD/gztFkIFk8w
-	Lpi0gxzg/wBoamVqHyLdmtCXZrJ1fxIW
-X-Received: by 2002:a05:690c:6c0b:b0:7ba:f414:cd2d with SMTP id
- 00721157ae682-7bd772c7168mr98215377b3.50.1777904171994; Mon, 04 May 2026
- 07:16:11 -0700 (PDT)
+        bh=eIwRzJNBGP4qpF839RJR539plQuxlG2HBX9ojRw93ys=;
+        b=s8BPCucRy+jx5qbQl8awV80DmPOLrKsPNQ/lNk9JN/dUxghO6GoWArRSN9woFA/8V/
+         VC+m5+H7Kps+enTlU/NspDG8sgjUOYCcxdRwkM1TYeF8OiYT2/nh6qwy9slKm+ODz11c
+         CNmytOlk9K1UbE2OUKYl0ngQ1ufAmjpkJ3PdrDJExdXfCwu59TAE5poXajSBRF/LafXq
+         qpwXRs7BbDbpW2hULv1c4kP6koRQS7lrdsnlNdmK1rZaYy1FnSXwiWTPqsBcpnDfr8Hz
+         4zWe3hP3VMcfc2BrgTTH0T/yQsUFzj+/A56G7u6IZjM/0N+Ue/JfXUKEgV8zGH6rBudG
+         RVWA==
+X-Gm-Message-State: AOJu0YyzXxHqNedHCUTanNCfSjUnEGShGozXQPWRh4kV0BMVe0s6ZcA1
+	v7IRbkGv/jwnrRkvAKwqNJiQcT9Eze92AXekXciO9pGaF1JjZvUEKuxQ9RcFK2J2bO9SwgIhhDX
+	uLpZvus3Gy2q2V1YHixrSpSpjN5bfFg+X1GoncTuMaHnFznmVnCGvl2ZTA3xfzAD6hgU=
+X-Gm-Gg: AeBDietwSt9tI0mnz15M+jMgeDRHFSjsBMWJwbAqg2XGijIFEay0LJueVSspq9He9aj
+	vDU/jMIDf2cZKmrpQs9dCmsTNpofGqYchGUNm3Coo3CiFQric+VWnVo2jWf7PiVWIPu6D9ROh7i
+	IwtZ2DcOf7ryTto0qA6xO1NDvDxV7iD/zzXeCtXfzKJxFqzT+8CudxvSMW5gAF6paRORSkw4xZX
+	DEV4ZpTUqMANkQON7NZuErJf5AVAFJgOd+8SwHkZ6l1myviThORR8YrH6TWwZaa52gZh7kDXP1y
+	3pA0lS6mT49sY80L4vt8gwyxFGG5VUTxDU6DbCGyf6tAdyW03vn0rdngVxMKlFgfI88CMfKBzMH
+	3Mp65xRYyrL16TMrjuiC9D78J7EVQLcY7iujGU7kyPxt3llVBjkCHGmNxKtTF3HGxN1k2dgnI8A
+	2+n/Y1R+2X5tuApfeCDCzslKybxjouUwP+sNcpPYow9w1m/Lc=
+X-Received: by 2002:a05:600d:f:b0:488:904b:f31 with SMTP id 5b1f17b1804b1-48a9866a9a3mr130488175e9.22.1777904437271;
+        Mon, 04 May 2026 07:20:37 -0700 (PDT)
+Received: from inifinity.mandelbit.com ([2001:67c:2fbc:1:4b13:4164:f406:ce59])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a8ebb2fa5sm237782595e9.12.2026.05.04.07.20.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 May 2026 07:20:36 -0700 (PDT)
+From: Antonio Quartulli <antonio@openvpn.net>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	ralf@mandelbit.com,
+	Antonio Quartulli <antonio@openvpn.net>,
+	Hyunwoo Kim <imv4bel@gmail.com>,
+	Sabrina Dubroca <sd@queasysnail.net>
+Subject: [RFC net] ovpn: fix race between deleting interface and adding new peer
+Date: Mon,  4 May 2026 16:20:33 +0200
+Message-ID: <20260504142033.2327646-1-antonio@openvpn.net>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Victor Nogueira <victor@mojatatu.com>
-Date: Mon, 4 May 2026 11:16:00 -0300
-X-Gm-Features: AVHnY4LMomlt4-sBZr5wUn0CL5GXQWu9fa5qQIVEWi7kURvw4SbKPVW3PLjUYu4
-Message-ID: <CA+NMeC-VCxWfzwHQTiY-eGA=FEmLY7_7AHgBrZ+dK+LC-d7pUw@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 1/5] net: mdiobus: Provide fwnode_mdiobus_register()
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, linux-kernel@vger.kernel.org, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 4804D4BF893
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: F00E84BF474
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	FAKE_REPLY(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
+	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-283861-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_CC(0.00)[kernel.org,mandelbit.com,openvpn.net,gmail.com,queasysnail.net];
+	TAGGED_FROM(0.00)[bounces-283862-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[openvpn.net:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid,mojatatu-com.20251104.gappssmtp.com:dkim,intel.com:email]
+	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,queasysnail.net:email,openvpn.net:email,openvpn.net:dkim,openvpn.net:mid]
 
-Hi!
+While deleting an existing ovpn interface, there is a very
+narrow window where adding a new peer via netlink may cause
+the netdevice to hang and prevent its unregistration.
 
-On 04/05/2026 04:29, Andy Shevchenko wrote:
-> Provide an agnostic helper to register MDIO bus independently on
-> the firmware node provider.
->
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> [...]
-> @@ -187,3 +189,16 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
->       return rc;
->   }
->   EXPORT_SYMBOL(fwnode_mdiobus_register_phy);
-> +
-> +int __fwnode_mdiobus_register(struct mii_bus *mdio, struct fwnode_handle=
- *fwnode,
-> +                           struct module *owner)
-> +{
-> +     if (is_of_node(fwnode))
-> +             return __of_mdiobus_register(mdio, to_of_node(fwnode), owne=
-r);
+It may happen during ovpn_dellink(), when all existing peers are
+freed and the device is queued for deregistration, but a
+CMD_PEER_NEW message comes in adding a new peer that takes again
+a reference to the netdev.
 
-Build seems to break when CONFIG_OF_MDIO is not defined:
+At this point there is no way to release the device because we are
+under the assumption that all peers were already released.
 
-drivers/net/mdio/fwnode_mdio.c: In function =E2=80=98__fwnode_mdiobus_regis=
-ter=E2=80=99:
-drivers/net/mdio/fwnode_mdio.c:198:24: error: implicit declaration of
-function =E2=80=98__of_mdiobus_register=E2=80=99; did you mean =E2=80=98of_=
-mdiobus_register=E2=80=99?
-[-Wimplicit-function-declaration]
-  198 |                 return __of_mdiobus_register(mdio,
-to_of_node(fwnode), owner);
+Fix the race condition by releasing all peers in ndo_uninit(),
+when the netdevice has already been removed from the netdev
+list.
 
-cheers,
-Victor
+Also ovpn_peer_add() has now an extra check that forces the
+function to bail out if the device reg_state is not REGISTERED.
+This way any incoming CMD_PEER_NEW racing with the interface
+deletion routine will simply stop before adding the peer.
+
+Note that the above check happens while holding the netdev_lock
+to prevent racing netdev state changes.
+
+ovpn_dellink() is now empty and can be removed.
+
+Reported-by: Hyunwoo Kim <imv4bel@gmail.com>
+Closes: https://lore.kernel.org/netdev/aaVgJ16edTfQkYbx@v4bel/
+Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
+Fixes: 80747caef33d ("ovpn: introduce the ovpn_peer object")
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+---
+
+This patch is sent as RFC to give the AI a chance to review it once
+again, since it was able to spot a new race condition in its
+previous version.
+
+
+ drivers/net/ovpn/main.c | 12 ++----------
+ drivers/net/ovpn/peer.c | 21 ++++++++++++++++++---
+ 2 files changed, 20 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
+index 2e0420febda0..9993c1dfe471 100644
+--- a/drivers/net/ovpn/main.c
++++ b/drivers/net/ovpn/main.c
+@@ -92,6 +92,8 @@ static void ovpn_net_uninit(struct net_device *dev)
+ {
+ 	struct ovpn_priv *ovpn = netdev_priv(dev);
+ 
++	disable_delayed_work_sync(&ovpn->keepalive_work);
++	ovpn_peers_free(ovpn, NULL, OVPN_DEL_PEER_REASON_TEARDOWN);
+ 	gro_cells_destroy(&ovpn->gro_cells);
+ }
+ 
+@@ -208,15 +210,6 @@ static int ovpn_newlink(struct net_device *dev,
+ 	return register_netdevice(dev);
+ }
+ 
+-static void ovpn_dellink(struct net_device *dev, struct list_head *head)
+-{
+-	struct ovpn_priv *ovpn = netdev_priv(dev);
+-
+-	cancel_delayed_work_sync(&ovpn->keepalive_work);
+-	ovpn_peers_free(ovpn, NULL, OVPN_DEL_PEER_REASON_TEARDOWN);
+-	unregister_netdevice_queue(dev, head);
+-}
+-
+ static int ovpn_fill_info(struct sk_buff *skb, const struct net_device *dev)
+ {
+ 	struct ovpn_priv *ovpn = netdev_priv(dev);
+@@ -235,7 +228,6 @@ static struct rtnl_link_ops ovpn_link_ops = {
+ 	.policy = ovpn_policy,
+ 	.maxtype = IFLA_OVPN_MAX,
+ 	.newlink = ovpn_newlink,
+-	.dellink = ovpn_dellink,
+ 	.fill_info = ovpn_fill_info,
+ };
+ 
+diff --git a/drivers/net/ovpn/peer.c b/drivers/net/ovpn/peer.c
+index c02dfab51a6e..7bf912e40ee2 100644
+--- a/drivers/net/ovpn/peer.c
++++ b/drivers/net/ovpn/peer.c
+@@ -1034,14 +1034,29 @@ static int ovpn_peer_add_p2p(struct ovpn_priv *ovpn, struct ovpn_peer *peer)
+  */
+ int ovpn_peer_add(struct ovpn_priv *ovpn, struct ovpn_peer *peer)
+ {
++	int ret = -ENODEV;
++
++	/* Prevent adding new peers while destroying the ovpn interface.
++	 * Failing to do so would end up holding the device reference
++	 * endlessly hostage of the new peer object with no chance of
++	 * release..
++	 */
++	netdev_lock(ovpn->dev);
++	if (ovpn->dev->reg_state != NETREG_REGISTERED)
++		goto out;
++
+ 	switch (ovpn->mode) {
+ 	case OVPN_MODE_MP:
+-		return ovpn_peer_add_mp(ovpn, peer);
++		ret = ovpn_peer_add_mp(ovpn, peer);
++		break;
+ 	case OVPN_MODE_P2P:
+-		return ovpn_peer_add_p2p(ovpn, peer);
++		ret = ovpn_peer_add_p2p(ovpn, peer);
++		break;
+ 	}
++out:
++	netdev_unlock(ovpn->dev);
+ 
+-	return -EOPNOTSUPP;
++	return ret;
+ }
+ 
+ /**
+-- 
+2.53.0
+
 
