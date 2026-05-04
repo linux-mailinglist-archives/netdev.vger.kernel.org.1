@@ -1,117 +1,247 @@
-Return-Path: <netdev+bounces-284088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284089-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SFMiECsu+Wma6QIAu9opvQ
-	(envelope-from <netdev+bounces-284088-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 01:39:23 +0200
+	id qGcPJ5Mu+Wma6QIAu9opvQ
+	(envelope-from <netdev+bounces-284089-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 01:41:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D63D4C4E8F
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 01:39:22 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 987494C4EB5
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 01:41:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5EDB2301D4EC
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 23:39:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 638FC3008C9D
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 23:41:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 172F53DDDCA;
-	Mon,  4 May 2026 23:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A4253D6475;
+	Mon,  4 May 2026 23:41:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QeYaQTwk"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="ujwQ2YVO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E607637B3F4;
-	Mon,  4 May 2026 23:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94EFE2D3EC7;
+	Mon,  4 May 2026 23:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777937958; cv=none; b=JbhpEIj3IDIqYZgBUIdQzeZMqb1MTrMD6Ls2+M81C8tNtil5XbSkoMsssk/HNxDASR/CwHGxo7gRzNriPX4DyrnhrGT8rFZ5m9ztoXgGchJBhtXM1lfT+GGO5H7QKAT32QfLUSAnB7C0LNh8qPShxu7V9NlAA8amj+gLnx6WdPc=
+	t=1777938060; cv=none; b=IS2dRYEggQvStSwrKRLd2cOjIzTzdsZIJyFvFyL02lt0oPdhQrF8Z6aa5Li0HS0qB/ABgX0poF2P+CkgDHooHaVZVaV3QJRdXR7ZGa/0BIdLsy8/MgN7LPZ7X+avYEm+6n3JwFPpfbfeRXF/rjG3OJWJyYLUAD7MbOYyNhuoIfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777937958; c=relaxed/simple;
-	bh=rGhCAgv7V+Aw2yNHCHAsZ1MiCQDgCZexQb57zy/+Wto=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mAWDcxgZZ93FTo6W0quzqab5GSiVK5Cy5yRnLL3p6XVPvWOFetV2j8vXcE9ij31SD5uwNo5CRy/zLVEUpuhIJoGAmOMGuiKa0Yw6h6Z/JjkC/ziaOaUBYyCAohJixbD70dQs+Yd4zs+ZbYHIman3TpnRFqnTlEPAzZ6nGISWSaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QeYaQTwk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C8F2C2BCB8;
-	Mon,  4 May 2026 23:39:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777937957;
-	bh=rGhCAgv7V+Aw2yNHCHAsZ1MiCQDgCZexQb57zy/+Wto=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QeYaQTwkspFYexYjdtm/g3tch402fhCdjjnsFH6OilZB5yCV70ZaSP8BB//uJ5JmK
-	 GPS5Y43vKC0N4eq8VZF0iVK0vuhuUHM8Br6tXoH6Q2hfMrUpEifVYsrdPFBp+tM9lD
-	 lu8JjaaUsLBYbraoVxS6uBBHDqXdBUAq5a0eJ74uvbHmIRLiCVt8hLOkKqcIS4PP/g
-	 icqRIgxccUqUuJjvVHD1tC3V0upu+Hpzpl25L6qqZepj6Ge+/ossmPKvSAAweT8ySw
-	 dik1KUi9zIBN3OqALQ4RqfTCeCkMIfcrqKafHAW1lhym5WJPc0yOsBdEp6honMUc7w
-	 nR8Adg+AamVwA==
-Date: Mon, 4 May 2026 16:39:15 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yuya Kusakabe <yuya.kusakabe@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Andrea Mayer <andrea.mayer@uniroma2.it>, Shuah Khan
- <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
- <skhan@linuxfoundation.org>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-doc@vger.kernel.org
-Subject: Re: [PATCH v2 0/7] seg6: add SRv6 Mobile User Plane (RFC 9433)
- behaviors
-Message-ID: <20260504163915.4a8b028e@kernel.org>
-In-Reply-To: <20260505-seg6-mobile-v2-0-9e8022bdfdb6@gmail.com>
-References: <20260505-seg6-mobile-v2-0-9e8022bdfdb6@gmail.com>
+	s=arc-20240116; t=1777938060; c=relaxed/simple;
+	bh=RcBZXcX8EAEUZjJFdtgZgh/kwGfy8h5kj1j49AsVUlw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=csvdeOhesTbpKHS5X+VlzJLXzTsYZDguYP6dHkGzD5/h8+V28tVa1CnVcYAirnJVWG7hI/XF2w49hDVJfvvSL/zxW6rHw/O5Z28tCDs/zRjoVQoR5i3xVimGiQmGKtrehIpuw/OJx5bIcCrxm0PVGh/ttqhxukdJLAPzGlVOkRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=ujwQ2YVO; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 47F276017D;
+	Tue,  5 May 2026 01:40:56 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1777938056;
+	bh=BFRvixt3q/dnHxHSuvmWagBm0APhHcLiblX83aOinQ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ujwQ2YVO6skJFToigVW0mJ3xEM2sLO1cz6TMCLn1t9bIizgh78Pn422CjAFskDYCE
+	 O/MUnMeMZYqATeUGnWysIicPfeZrKdI3o3nlQJEo35m2kmo3471CTojTz8ZRAcP1B5
+	 bxA058HVqzLiOGnobf3oPmedfsWpGtRMKBhMvBtTYSZvzvoJCzGKbWfy6E5ehYAEyO
+	 S4h1QNCygnte042+pWZe62mrCZEscQ0/VgoB6PxITtMNz2M/Y3dVbekZ/x4k7O4IdO
+	 ytgEZ9O4KNyCeycHb3e4Y/YQxzh3fsZE4Ptx1up8Mr6V/yeCgnhCDxCfosuQWBsizR
+	 T02ApLCwFn2IA==
+Date: Tue, 5 May 2026 01:40:53 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netfilter-devel@vger.kernel.org, fw@strlen.de, davem@davemloft.net,
+	netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, horms@kernel.org,
+	Eelco Chaudron <echaudro@redhat.com>,
+	Aaron Conole <aconole@redhat.com>
+Subject: Re: [PATCH net 06/12] netfilter: nf_conntrack_expect: honor
+ expectation helper field
+Message-ID: <afkuhbWieFXRTirN@chamomile>
+References: <20260326125153.685915-1-pablo@netfilter.org>
+ <20260326125153.685915-7-pablo@netfilter.org>
+ <8fd5d3a3-d1d7-4542-a0db-1678989940d4@ovn.org>
+ <afSCXEg-X-ieL9cY@chamomile>
+ <ef01005e-d867-4936-b138-b98f37e5f394@ovn.org>
+ <afkosr2fDEPA_jX9@chamomile>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 9D63D4C4E8F
+Content-Type: multipart/mixed; boundary="iyhop23c+WPECR0i"
+Content-Disposition: inline
+In-Reply-To: <afkosr2fDEPA_jX9@chamomile>
+X-Rspamd-Queue-Id: 987494C4EB5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain,text/x-diff];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284088-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[netfilter.org];
+	TAGGED_FROM(0.00)[bounces-284089-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[netfilter.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	HAS_ATTACHMENT(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim]
 
-On Tue, 05 May 2026 01:30:10 +0900 Yuya Kusakabe wrote:
-> This series adds the in-kernel data path for the SRv6 Mobile User
-> Plane (MUP) architecture defined in RFC 9433.  SRv6 MUP integrates
-> GTP-U mobile traffic into an SRv6 transport domain by mapping the
-> 5-tuple (TEID, QFI, R, U, PDU Session ID) into a single SID, allowing
-> operators to replace the GTP-U overlay between the gNB and the
-> upstream UPF with native SRv6 forwarding while keeping the radio side
-> unchanged.
 
-Could you switch to posting this as an RFC until you gather some review
-tags? Our CI require manual intervention to add the necessary iproute2
-patches, I suspect there may be some uAPI changes therefore requiring
-iproute2 changes here.
+--iyhop23c+WPECR0i
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+
+On Tue, May 05, 2026 at 01:16:05AM +0200, Pablo Neira Ayuso wrote:
+> Thanks for the detailed report. It seems I changed the semantics of
+> exp->helper, this used to be use to set a new helper for an expected
+> connection, which is the case for sip and h323.
+> 
+> Would this patch help address the issue you are observing?
+
+Actually, this needs to set to NULL the new exp->assign_helper field,
+see new patch, untested.
+
+--iyhop23c+WPECR0i
+Content-Type: text/x-diff; charset=utf-8
+Content-Disposition: attachment; filename="fix-exp-helper.patch"
+
+diff --git a/include/net/netfilter/nf_conntrack_expect.h b/include/net/netfilter/nf_conntrack_expect.h
+index e9a8350e7ccf..80f50fd0f7ad 100644
+--- a/include/net/netfilter/nf_conntrack_expect.h
++++ b/include/net/netfilter/nf_conntrack_expect.h
+@@ -45,9 +45,12 @@ struct nf_conntrack_expect {
+ 	void (*expectfn)(struct nf_conn *new,
+ 			 struct nf_conntrack_expect *this);
+ 
+-	/* Helper to assign to new connection */
++	/* Helper that created this expectation */
+ 	struct nf_conntrack_helper __rcu *helper;
+ 
++	/* Helper to assign to new connection */
++	struct nf_conntrack_helper __rcu *assign_helper;
++
+ 	/* The conntrack of the master connection */
+ 	struct nf_conn *master;
+ 
+diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
+index b08189226320..656287d16d86 100644
+--- a/net/netfilter/nf_conntrack_core.c
++++ b/net/netfilter/nf_conntrack_core.c
+@@ -1815,10 +1815,10 @@ init_conntrack(struct net *net, struct nf_conn *tmpl,
+ 			__set_bit(IPS_EXPECTED_BIT, &ct->status);
+ 			/* exp->master safe, refcnt bumped in nf_ct_find_expectation */
+ 			ct->master = exp->master;
+-			if (exp->helper) {
++			if (exp->assign_helper) {
+ 				help = nf_ct_helper_ext_add(ct, GFP_ATOMIC);
+ 				if (help)
+-					rcu_assign_pointer(help->helper, exp->helper);
++					rcu_assign_pointer(help->helper, exp->assign_helper);
+ 			}
+ 
+ #ifdef CONFIG_NF_CONNTRACK_MARK
+diff --git a/net/netfilter/nf_conntrack_expect.c b/net/netfilter/nf_conntrack_expect.c
+index 24d0576d84b7..b01d48ab351e 100644
+--- a/net/netfilter/nf_conntrack_expect.c
++++ b/net/netfilter/nf_conntrack_expect.c
+@@ -308,6 +308,7 @@ struct nf_conntrack_expect *nf_ct_expect_alloc(struct nf_conn *me)
+ 	if (!new)
+ 		return NULL;
+ 
++	new->assign_helper = NULL;
+ 	new->master = me;
+ 	refcount_set(&new->use, 1);
+ 	return new;
+diff --git a/net/netfilter/nf_conntrack_h323_main.c b/net/netfilter/nf_conntrack_h323_main.c
+index 3f5c50455b71..b2fe6554b9cf 100644
+--- a/net/netfilter/nf_conntrack_h323_main.c
++++ b/net/netfilter/nf_conntrack_h323_main.c
+@@ -643,7 +643,7 @@ static int expect_h245(struct sk_buff *skb, struct nf_conn *ct,
+ 			  &ct->tuplehash[!dir].tuple.src.u3,
+ 			  &ct->tuplehash[!dir].tuple.dst.u3,
+ 			  IPPROTO_TCP, NULL, &port);
+-	rcu_assign_pointer(exp->helper, &nf_conntrack_helper_h245);
++	rcu_assign_pointer(exp->assign_helper, &nf_conntrack_helper_h245);
+ 
+ 	nathook = rcu_dereference(nfct_h323_nat_hook);
+ 	if (memcmp(&ct->tuplehash[dir].tuple.src.u3,
+@@ -767,7 +767,7 @@ static int expect_callforwarding(struct sk_buff *skb,
+ 	nf_ct_expect_init(exp, NF_CT_EXPECT_CLASS_DEFAULT, nf_ct_l3num(ct),
+ 			  &ct->tuplehash[!dir].tuple.src.u3, &addr,
+ 			  IPPROTO_TCP, NULL, &port);
+-	rcu_assign_pointer(exp->helper, nf_conntrack_helper_q931);
++	rcu_assign_pointer(exp->assign_helper, nf_conntrack_helper_q931);
+ 
+ 	nathook = rcu_dereference(nfct_h323_nat_hook);
+ 	if (memcmp(&ct->tuplehash[dir].tuple.src.u3,
+@@ -1234,7 +1234,7 @@ static int expect_q931(struct sk_buff *skb, struct nf_conn *ct,
+ 				&ct->tuplehash[!dir].tuple.src.u3 : NULL,
+ 			  &ct->tuplehash[!dir].tuple.dst.u3,
+ 			  IPPROTO_TCP, NULL, &port);
+-	rcu_assign_pointer(exp->helper, nf_conntrack_helper_q931);
++	rcu_assign_pointer(exp->assign_helper, nf_conntrack_helper_q931);
+ 	exp->flags = NF_CT_EXPECT_PERMANENT;	/* Accept multiple calls */
+ 
+ 	nathook = rcu_dereference(nfct_h323_nat_hook);
+@@ -1306,7 +1306,7 @@ static int process_gcf(struct sk_buff *skb, struct nf_conn *ct,
+ 	nf_ct_expect_init(exp, NF_CT_EXPECT_CLASS_DEFAULT, nf_ct_l3num(ct),
+ 			  &ct->tuplehash[!dir].tuple.src.u3, &addr,
+ 			  IPPROTO_UDP, NULL, &port);
+-	rcu_assign_pointer(exp->helper, nf_conntrack_helper_ras);
++	rcu_assign_pointer(exp->assign_helper, nf_conntrack_helper_ras);
+ 
+ 	if (nf_ct_expect_related(exp, 0) == 0) {
+ 		pr_debug("nf_ct_ras: expect RAS ");
+@@ -1523,7 +1523,7 @@ static int process_acf(struct sk_buff *skb, struct nf_conn *ct,
+ 			  &ct->tuplehash[!dir].tuple.src.u3, &addr,
+ 			  IPPROTO_TCP, NULL, &port);
+ 	exp->flags = NF_CT_EXPECT_PERMANENT;
+-	rcu_assign_pointer(exp->helper, nf_conntrack_helper_q931);
++	rcu_assign_pointer(exp->assign_helper, nf_conntrack_helper_q931);
+ 
+ 	if (nf_ct_expect_related(exp, 0) == 0) {
+ 		pr_debug("nf_ct_ras: expect Q.931 ");
+@@ -1577,7 +1577,7 @@ static int process_lcf(struct sk_buff *skb, struct nf_conn *ct,
+ 			  &ct->tuplehash[!dir].tuple.src.u3, &addr,
+ 			  IPPROTO_TCP, NULL, &port);
+ 	exp->flags = NF_CT_EXPECT_PERMANENT;
+-	rcu_assign_pointer(exp->helper, nf_conntrack_helper_q931);
++	rcu_assign_pointer(exp->assign_helper, nf_conntrack_helper_q931);
+ 
+ 	if (nf_ct_expect_related(exp, 0) == 0) {
+ 		pr_debug("nf_ct_ras: expect Q.931 ");
+diff --git a/net/netfilter/nf_conntrack_sip.c b/net/netfilter/nf_conntrack_sip.c
+index 1eb55907d470..d24bfa9e8234 100644
+--- a/net/netfilter/nf_conntrack_sip.c
++++ b/net/netfilter/nf_conntrack_sip.c
+@@ -1383,7 +1383,7 @@ static int process_register_request(struct sk_buff *skb, unsigned int protoff,
+ 	nf_ct_expect_init(exp, SIP_EXPECT_SIGNALLING, nf_ct_l3num(ct),
+ 			  saddr, &daddr, proto, NULL, &port);
+ 	exp->timeout.expires = sip_timeout * HZ;
+-	rcu_assign_pointer(exp->helper, helper);
++	rcu_assign_pointer(exp->assign_helper, helper);
+ 	exp->flags = NF_CT_EXPECT_PERMANENT | NF_CT_EXPECT_INACTIVE;
+ 
+ 	hooks = rcu_dereference(nf_nat_sip_hooks);
+
+--iyhop23c+WPECR0i--
 
