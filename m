@@ -1,96 +1,96 @@
-Return-Path: <netdev+bounces-283817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-283818-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ePO3MdGR+Gl8wgIAu9opvQ
-	(envelope-from <netdev+bounces-283817-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:32:17 +0200
+	id AGHrJtmR+GmQwgIAu9opvQ
+	(envelope-from <netdev+bounces-283818-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:32:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 465964BCEA4
-	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:32:17 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 976024BCEAD
+	for <lists+netdev@lfdr.de>; Mon, 04 May 2026 14:32:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0E2D23016D34
-	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 12:32:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 689DE30055C9
+	for <lists+netdev@lfdr.de>; Mon,  4 May 2026 12:32:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 449A43D1CB6;
-	Mon,  4 May 2026 12:32:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55CA33D1CB6;
+	Mon,  4 May 2026 12:32:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YlkFXnKG";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vm4NxGlj";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YlkFXnKG";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vm4NxGlj"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="UjjImKM7";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="f2Am95ZI";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="O9MkyMDO";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="+N1UyPBC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA042343D64
-	for <netdev@vger.kernel.org>; Mon,  4 May 2026 12:32:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 992581A683E
+	for <netdev@vger.kernel.org>; Mon,  4 May 2026 12:32:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777897925; cv=none; b=cHtNXZ+ix8YwEjm668oULASAEII0r7k7V5ruoDfXFc4qICwNlMG2Yu5yy4O4FXlV2Ok6Qgq66bohF00svsIdy9htwwJxIh1xMpswu67gX8roIXzt9/Y0lQ8QjCGnvcJhIquQcoT3nEjQLbRJIjIry+3mRxg9dYm63Ub3O6D3ufk=
+	t=1777897931; cv=none; b=GNLN6lt2mb9yrO1ngm25pKuIaiw/S/sG8kJmlxI5uVOGPpbsJeUiVmdg5Db5l07i/5dbq56K6pioiexDRPHEgSJmQlf3WOE/4CS1iWAfkDjWrIZIPRhepk+A5E2/Mbi0OpUuHUHp2sNucopVTQ3zFwpA6JrpbO6CJ1UDHtUNAf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777897925; c=relaxed/simple;
-	bh=JvLuEHu2bzX+Z8ybm6nqQT+8KAh46mpFQ2UfmGvbRdU=;
+	s=arc-20240116; t=1777897931; c=relaxed/simple;
+	bh=k4QL8qvkzMM84LE0VCc92a90Vt/42H1pZ5NNSERDBUU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UG46EIACBLttXdTe3YlmZGfWKNEnzopMRnrVO1ep65zlDb06rNzKSU3SaR1oO+cq2O6N4FM6hTUYl3xLsMdIvY896uJS5/BfhmmG0e2uz4hrQkJcpfgYMsparWwQROXZzDQrio7U0B5g3ZSCJ8g3R6iCr5ApuumOSUJ21LZiGZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YlkFXnKG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vm4NxGlj; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YlkFXnKG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vm4NxGlj; arc=none smtp.client-ip=195.135.223.131
+	 MIME-Version; b=YwYRVtWoXTvZVTv7C/4w4lPi/LOdkcjghZRUriemx02z5TPZDACnEq8PqecnNYUyjM13QI3AvTTm+vJQDFU7s3UkAwFTxsh5HTg1KtrqAfljg8AILH//7IpkkVtYU/r7qP4Wms72YZAANVbMRfBfzjKO5vi84dr3VyxPuWANiAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=UjjImKM7; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=f2Am95ZI; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=O9MkyMDO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=+N1UyPBC; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 87D535BD3A;
-	Mon,  4 May 2026 12:31:57 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id EED385C547;
+	Mon,  4 May 2026 12:31:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1777897917; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1777897919; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+8M2SbcRdOT+1NM/sR9pAi2A2vxPT4uORclMDC0b5Vs=;
-	b=YlkFXnKGzBFU/TAIW0x3CRBsjkRutu/V8MknsSqENCYLa+OjVAL7fxaDeizCOeknsXFHNM
-	BsyUoAjod6wh5xeOt8SjCLTZQ88bSWbRv89/c8iNAbg1pHlv+fnbbTiuxSX49sCRVB5HpJ
-	qG6yKLGy9zmbLHsL9791NmmFlZ8kQGE=
+	bh=HpNtzM/lNNWKN+0w7GrcPbMne22lAOtj7Q4395GVrqI=;
+	b=UjjImKM7mC9/KENyStIBjExtWHbFcns/8VTU83lXw4snQOr6nNbdmJEC/lmCdVZuG6ZXTJ
+	RMzFhpS8m0p4Q47QzRRg8trCcl3bjvPz6kgo+9fSPQMUmRtTy0asC96pXPn2k9R/elh149
+	S34kfgFjuSxkjfBzhE2rWbj0kOztx7w=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1777897917;
+	s=susede2_ed25519; t=1777897919;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+8M2SbcRdOT+1NM/sR9pAi2A2vxPT4uORclMDC0b5Vs=;
-	b=vm4NxGljIyhl50ImUW+mg7vASAIzWm/NwRSrTHclUbB6KuZ4RgVHVTtOKJ1bTbDhV1u3Nx
-	sivkjEpENjg0AiDQ==
+	bh=HpNtzM/lNNWKN+0w7GrcPbMne22lAOtj7Q4395GVrqI=;
+	b=f2Am95ZItL8unQKXIu55+eo84BDj+APiR2Ul2gwr02gwVVcQv1XXFO1Z5/7RHmEaF/rpdi
+	DGierZl6S5FyA9Dw==
 Authentication-Results: smtp-out2.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1777897917; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1777897918; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+8M2SbcRdOT+1NM/sR9pAi2A2vxPT4uORclMDC0b5Vs=;
-	b=YlkFXnKGzBFU/TAIW0x3CRBsjkRutu/V8MknsSqENCYLa+OjVAL7fxaDeizCOeknsXFHNM
-	BsyUoAjod6wh5xeOt8SjCLTZQ88bSWbRv89/c8iNAbg1pHlv+fnbbTiuxSX49sCRVB5HpJ
-	qG6yKLGy9zmbLHsL9791NmmFlZ8kQGE=
+	bh=HpNtzM/lNNWKN+0w7GrcPbMne22lAOtj7Q4395GVrqI=;
+	b=O9MkyMDOghUtp+kyU+W9nYaYopMGkVARwD0OmTm8SHe2cymD8Tpqns5L872kGeXh6UbgvP
+	dkUl12M9ag+RVCI8zh1t0vWuoJjK3spym+N7vZxWLIFioi8fnFc92iwBj0Bl0Xz4XUiIHE
+	6HEcl+EoEU6fIqdwLv0Ne1osg18aJ3k=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1777897917;
+	s=susede2_ed25519; t=1777897918;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+8M2SbcRdOT+1NM/sR9pAi2A2vxPT4uORclMDC0b5Vs=;
-	b=vm4NxGljIyhl50ImUW+mg7vASAIzWm/NwRSrTHclUbB6KuZ4RgVHVTtOKJ1bTbDhV1u3Nx
-	sivkjEpENjg0AiDQ==
+	bh=HpNtzM/lNNWKN+0w7GrcPbMne22lAOtj7Q4395GVrqI=;
+	b=+N1UyPBCfxId/ZI6twQ+X/CH+5tzCcQ3LcphZBlZEfsLF+i/ih8qlm1cQ4ODYE5jcZmaDm
+	VwIlNt6W8GU15ZAQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E7CD7593A3;
-	Mon,  4 May 2026 12:31:56 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5A222593A3;
+	Mon,  4 May 2026 12:31:58 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 8MejNbyR+GnBXQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Mon, 04 May 2026 12:31:56 +0000
+	id AOgOE76R+GnBXQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Mon, 04 May 2026 12:31:58 +0000
 From: Fernando Fernandez Mancera <fmancera@suse.de>
 To: netdev@vger.kernel.org
 Cc: linux-kselftest@vger.kernel.org,
@@ -102,9 +102,9 @@ Cc: linux-kselftest@vger.kernel.org,
 	idosch@nvidia.com,
 	dsahern@kernel.org,
 	Fernando Fernandez Mancera <fmancera@suse.de>
-Subject: [PATCH 2/3 net-next v3] ipv4: handle devconf post-set actions on netlink updates
-Date: Mon,  4 May 2026 14:31:42 +0200
-Message-ID: <20260504123143.6284-2-fmancera@suse.de>
+Subject: [PATCH 3/3 net-next v3] selftests: net: add test for IPv4 devconf netlink notifications
+Date: Mon,  4 May 2026 14:31:43 +0200
+Message-ID: <20260504123143.6284-3-fmancera@suse.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260504123143.6284-1-fmancera@suse.de>
 References: <20260504123143.6284-1-fmancera@suse.de>
@@ -118,7 +118,7 @@ Content-Transfer-Encoding: 8bit
 X-Spam-Score: -6.80
 X-Spam-Level: 
 X-Spam-Flag: NO
-X-Rspamd-Queue-Id: 465964BCEA4
+X-Rspamd-Queue-Id: 976024BCEAD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -126,7 +126,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -134,7 +134,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[suse.de:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-283817-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-283818-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -142,89 +142,132 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_COUNT_FIVE(0.00)[6];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim,suse.de:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,suse.de:email,suse.de:dkim,suse.de:mid,lib.py:url]
 
-When IPv4 device configuration parameters are updated via netlink, the
-kernel currently only updates the value. This bypasses several
-post-modification actions that occur when these same parameters are
-updated via sysctl, such as flushing the routing cache or emitting
-RTM_NEWNETCONF notifications.
+Introduce a new test, `ipv4_devconf_notify`, to verify that the kernel
+sends the appropriate netlink notifications when IPv4 devconf parameters
+are modified.
 
-This patch addresses the inconsistency by calling the
-devinet_conf_post_set() helper inside inet_set_link_af(). If a flush is
-required, we defer it until the netlink attribute parsing loop
-completes.
-
-This ensures consistent behavior and side-effects for devconf changes,
-regardless of whether they are initiated via sysctl or netlink.
+Since YNL currently has a bug where it declares an array of u32 values
+instead of the nested attributes expected by the kernel for devconf set
+operations, a temporary hack (`patched_add_attr`) is included to
+pack the netlink attributes correctly.
 
 Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
 ---
-v2: handled forwarding notification and disabling LRO
-v3: no changes
+v3: added this patch to the series as requested by Paolo.
 ---
- net/ipv4/devinet.c | 29 +++++++++++++++++++++++++++--
- 1 file changed, 27 insertions(+), 2 deletions(-)
+ tools/testing/selftests/net/rtnetlink.py | 75 ++++++++++++++++++++++--
+ 1 file changed, 71 insertions(+), 4 deletions(-)
 
-diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-index 8300516fb38f..a35b72662e43 100644
---- a/net/ipv4/devinet.c
-+++ b/net/ipv4/devinet.c
-@@ -2161,6 +2161,20 @@ static bool devinet_conf_post_set(struct net *net, struct ipv4_devconf *cnf,
- 					    NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN,
- 					    ifindex, cnf);
- 		break;
-+	case IPV4_DEVCONF_FORWARDING:
-+		if (new == 1) {
-+			/* it is safe to use container_of() because forwarding case
-+			 * is only used by the netlink path
-+			 */
-+			struct in_device *idev = container_of(cnf, struct in_device, cnf);
-+
-+			netif_disable_lro(idev->dev);
-+		}
-+
-+		inet_netconf_notify_devconf(net, RTM_NEWNETCONF,
-+					    NETCONFA_FORWARDING,
-+					    ifindex, cnf);
-+		return true;
- 	default:
- 		break;
- 	}
-@@ -2173,6 +2187,8 @@ static int inet_set_link_af(struct net_device *dev, const struct nlattr *nla,
- {
- 	struct in_device *in_dev = __in_dev_get_rtnl(dev);
- 	struct nlattr *a, *tb[IFLA_INET_MAX+1];
-+	struct net *net = dev_net(dev);
-+	bool flush_cache = false;
- 	int rem;
+diff --git a/tools/testing/selftests/net/rtnetlink.py b/tools/testing/selftests/net/rtnetlink.py
+index e9ad5e88da97..99c5a3e7f1f0 100755
+--- a/tools/testing/selftests/net/rtnetlink.py
++++ b/tools/testing/selftests/net/rtnetlink.py
+@@ -1,17 +1,22 @@
+ #!/usr/bin/env python3
+ # SPDX-License-Identifier: GPL-2.0
  
- 	if (!in_dev)
-@@ -2182,8 +2198,17 @@ static int inet_set_link_af(struct net_device *dev, const struct nlattr *nla,
- 		return -EINVAL;
+-from lib.py import ksft_exit, ksft_run, ksft_ge, RtnlAddrFamily
++from lib.py import bkg, ip, ksft_exit, ksft_run, ksft_ge, ksft_true
++from lib.py import NetNS, NetNSEnter, RtnlAddrFamily, RtnlFamily
+ import socket
++import struct
++import time
++import types
  
- 	if (tb[IFLA_INET_CONF]) {
--		nla_for_each_nested(a, tb[IFLA_INET_CONF], rem)
--			ipv4_devconf_set(in_dev, nla_type(a), nla_get_u32(a));
-+		nla_for_each_nested(a, tb[IFLA_INET_CONF], rem) {
-+			int old_value = ipv4_devconf_get(in_dev, nla_type(a));
-+			int new_value = nla_get_u32(a);
+ IPV4_ALL_HOSTS_MULTICAST = b'\xe0\x00\x00\x01'
+ 
+-def dump_mcaddr_check(rtnl: RtnlAddrFamily) -> None:
++def dump_mcaddr_check() -> None:
+     """
+     Verify that at least one interface has the IPv4 all-hosts multicast address.
+     At least the loopback interface should have this address.
+     """
+ 
++    rtnl = RtnlAddrFamily()
+     addresses = rtnl.getmulticast({"ifa-family": socket.AF_INET}, dump=True)
+ 
+     all_host_multicasts = [
+@@ -21,9 +26,71 @@ def dump_mcaddr_check(rtnl: RtnlAddrFamily) -> None:
+     ksft_ge(len(all_host_multicasts), 1,
+             "No interface found with the IPv4 all-hosts multicast address")
+ 
++def ipv4_devconf_notify() -> None:
++    """
++    Configure an interface and set ipv4-devconf values through netlink
++    to verify that the appropriate netlink notifications are being sent.
++    """
 +
-+			ipv4_devconf_set(in_dev, nla_type(a), new_value);
-+			if (devinet_conf_post_set(net, &in_dev->cnf, nla_type(a), new_value,
-+						  old_value, dev->ifindex))
-+				flush_cache = true;
-+		}
-+		if (flush_cache)
-+			rt_cache_flush(net);
- 	}
++    with NetNS() as ns:
++        with NetNSEnter(str(ns)):
++            rtnl = RtnlFamily()
++
++            ifname = "dummy1"
++            ip(f"link add name {ifname} type dummy", ns=str(ns))
++
++            link_info = ip(f"link show dev {ifname}", ns=str(ns), json=True)
++            ksft_true(bool(link_info), f"Failed to retrieve link info for {ifname}")
++            ifindex = link_info[0]["ifindex"]
++            notification_found = False
++
++            # YNL do not support netconf notifications yet
++            with bkg(f"ip monitor", ns=str(ns)) as cmd_obj:
++                original_add_attr = rtnl._add_attr
++                time.sleep(0.5)
++
++                # Currently YNL has a bug for applying devconf values,
++                # this hack fixes it. In essence, YNL is declaring an
++                # array of u32 values, while kernel expects a nested attribute
++                # on set operation.
++                def patched_add_attr(self, space, name, value, search_attrs):
++                    if name == 'conf' and value == b"MAGIC_CONF":
++                        fwd_attr = struct.pack("=HHI", 8, 1, 1)
++                        proxy_arp_attr = struct.pack("=HHI", 8, 3, 1)
++                        rp_filter_attr = struct.pack("=HHI", 8, 8, 1)
++                        ignore_routes_attr = struct.pack("=HHI", 8, 29, 1)
++
++                        return struct.pack("=HH", 36, 0x8001) + fwd_attr \
++                                + proxy_arp_attr \
++                                + rp_filter_attr \
++                                + ignore_routes_attr
++
++                    return original_add_attr(space, name, value, search_attrs)
++
++                rtnl._add_attr = types.MethodType(patched_add_attr, rtnl)
++
++                req = {
++                    "ifi-index": ifindex,
++                    "af-spec": {
++                        "inet": {
++                            "conf": b"MAGIC_CONF"
++                        }
++                    }
++                }
++                rtnl.newlink(req)
++                time.sleep(0.5)
++
++    ksft_true(f"inet {ifname} ignore_routes_with_linkdown on" in cmd_obj.stdout,
++              f"No 'ignore_routes_with_linkdown on' notificiation found for interface {ifname}")
++    ksft_true(f"inet {ifname} rp_filter strict" in cmd_obj.stdout,
++              f"No 'rp_filter strict' notificiation found for interface {ifname}")
++    ksft_true(f"inet {ifname} proxy_neigh on" in cmd_obj.stdout,
++              f"No 'proxy_neigh on' notificiation found for interface {ifname}")
++    ksft_true(f"inet {ifname} forwarding on" in cmd_obj.stdout,
++              f"No 'forwarding on' notificiation found for interface {ifname}")
++
+ def main() -> None:
+-    rtnl = RtnlAddrFamily()
+-    ksft_run([dump_mcaddr_check], args=(rtnl, ))
++    ksft_run([dump_mcaddr_check, ipv4_devconf_notify])
+     ksft_exit()
  
- 	return 0;
+ if __name__ == "__main__":
 -- 
 2.53.0
 
