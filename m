@@ -1,60 +1,101 @@
-Return-Path: <netdev+bounces-284271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284274-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gMF8ADCx+Wld/AIAu9opvQ
-	(envelope-from <netdev+bounces-284271-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 10:58:24 +0200
+	id iFhIO7yx+Wld/AIAu9opvQ
+	(envelope-from <netdev+bounces-284274-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:00:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 551CF4C9030
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 10:58:23 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 917304C90B6
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:00:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D9277303DAB4
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 08:53:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0138E305637C
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 08:59:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96EA838C430;
-	Tue,  5 May 2026 08:53:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60D53C6A39;
+	Tue,  5 May 2026 08:59:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dPNbfl+m"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDBC82DF138
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 08:53:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB7D3A1A3B
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 08:59:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777971212; cv=none; b=hSxChmdJwcvGO4oFSTk8ldTmr9WQVq15YggqA/fmi+5K9/SU1rrXpC9uWdI5lG8Mg3bpnOLcsYoIUkFL7ZKXGR5hwsWy9JdbxqeMh6GJZwRn97jjq70ZLxPp3vF6U3bctI0Rl1ISqkx/qbQfUV7uVzKOo9H1DZhLJDjcJKixeN4=
+	t=1777971587; cv=none; b=Pue/6KS7mqNlbWcfA0nkv9eKA9JV7pastXoFo2eHl6ohR4SJWebxON77FYKEwNpHpRq3oXy/6GFVbTxJcRU1Nq7yo1Q/3DhvJT6RL1EqdM7cHxOhyRtgZJI0hGsEMN90eP46gY9pdT2gqOTF4wJxE+5B2iKotlAQVcaeawMTdk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777971212; c=relaxed/simple;
-	bh=d5I8vqzyHFczPZXouYwzWRXXl+9hXZKXZKhOayo59hA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YA3OYVNk/gssY9QJVLwE+lqCrr2G5Nni8E6+CEFRxG/jzlgjGTSHjFzBTKto/gj5Zj2gpHMYWhkbzNGfJof8ZukQ4TvafqjNHUTwLopw9MWwjy0ll6NyfIZVP+kfudG9ISRzCakpeI7343lpakN/EkcmyLhSN6WDoPk47thYTuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=162.243.164.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app2 (Coremail) with SMTP id zQmowADHYIfpr_lpFHVKAA--.39790S3;
-	Tue, 05 May 2026 16:53:02 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org
-Cc: steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	yuantan098@gmail.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	bird@lzu.edu.cn,
-	ronbogo@outlook.com,
-	zylzyl2333@gmail.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net 1/1] xfrm: ipcomp: Free destination pages on acomp errors
-Date: Tue,  5 May 2026 16:52:59 +0800
-Message-ID: <8c304d9250d947b94cebc1cb1f85c73aa2bf0414.1777923646.git.zylzyl2333@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1777923646.git.zylzyl2333@gmail.com>
-References: <cover.1777923646.git.zylzyl2333@gmail.com>
+	s=arc-20240116; t=1777971587; c=relaxed/simple;
+	bh=GtnmXgWBnlVbum8VU82XoIoP2qzEtwowPEy/lSbUNBc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=petBoSw3tu3RHt8FgJE82TYtgGW+zlSyRZKW41l5m0gcgTG0RmRBHG0cObkA2o1cqI8o7KvWtLtKkyqY9jKE1vOzqf923VI/ik3ucCa2wUEQUJxizR1R2jS12kPQnnjyMt4Hhogi0e6g5tvyAnzpJFJHrqLH/XyDDZ5o7/o9e9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dPNbfl+m; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-365425c98c6so1383249a91.0
+        for <netdev@vger.kernel.org>; Tue, 05 May 2026 01:59:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777971585; x=1778576385; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=scgXwfpWRTztGmGbOBFzi2/rYTv6bkNqRVNUxAo7T3c=;
+        b=dPNbfl+mQfuF5iFuA4h/oDLdV+N6e39r4NeGUMHjBrQ8VpddRgowN/3bUgf73Xz0UQ
+         +EivlcGMfx2NMdJnxbGnkfZKH0oKpKd9lH1O3zEBueWHipWF2LW2vFu22kzwLD0xZXCE
+         IjJnS6mzDEEZzDHqrJoW5Aj/3PYMRO+qtiuEO6ffgCbeyFGftbbfiZt/EcrajVgrdfoO
+         Xp0d34QjvfonJnfdtp/ZvU6L6+bDDnUwlC+dkvCKnMlNaZ1iDDMD+53SECpP+oI8AWFH
+         kGywZY4KHbkQRd4O6AQ9XPx8fmIQcmu0NCE3B5Z6VEw+wk0N+CXbSk8bskdQcO9Dc9Fd
+         REnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777971585; x=1778576385;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=scgXwfpWRTztGmGbOBFzi2/rYTv6bkNqRVNUxAo7T3c=;
+        b=T6EGiiBGnu3lFpvB3Ntj5VSiKXKaIT8q0hOlHhqzKACP7BrGzsQ8WWkpdctj68X6eW
+         wxs7yM/mKlfiQP7i97rf/IrvOHJSCjGXyp2xa7V3c1XFuaNWcHVcV7RDRlxMe4fFnUZX
+         e4Ji3sMOcMzcsH3HYn4OHWyoF7C9iUIDmWd69n6R4aiVp14ieEQWzRgJX7RL9h1ZY+jM
+         XTQSFSvH/+y6Vz5qpM2wN8epfylhy31eZuaB0Kscn3xp9suZEsBvFjxzI9aa6c5Kiyg/
+         N1Pn62gFF+dGr8utoWA80hvxkeJK2wVpWrfoEqi2wMU9arMEK10u+AHfWeihMZAa7+W+
+         budg==
+X-Forwarded-Encrypted: i=1; AFNElJ/b9QAQuH3uffmDUgnpWaGntIhpRSkBsLcZiZ3DBpsbK8FvtBX+GDgM5pvSYGC3D923qRaqLes=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywf8q32F1aJSTyFnL598+ZW3RDaiBOmjllhd+Qkkh1w/25plY0v
+	HO1f8EXznNgJApqmB8XYHDIWcBQXTbWj6+OEVuZGcv37Cs5XT6QDbOtn
+X-Gm-Gg: AeBDietamV4f90jf8uLPMvglh1mv6pLpkpjXF4cHdRBeCWrIXL9wkFM1oz0HeF4dY72
+	ucYvxJGTJMjS/4wxklFPZAmTs9BAW5LjZa0ulczhFPFXNTULMRF24ONWJpMuZqEfMxY52t+583u
+	haBxZo16mMk5fx8+ey32K/rUSX6N8GPc5+l+8G9B82tQX4BPlSfQM3lbUb+PpXjXu4w3htnDpZ4
+	2cEjpo5aFUKymNVoMbFRN0XeBRMKSPVQjIxcE6eF+J1wM25kAucBAS1MAMpvuBZgimgi8CzPT4A
+	ENfjOGqsRqje4mHuMIV6cshJlIo9tyTqLl/lWMaD3ZbIvxNW0wkvp4dmdBtwysRX5fGSiEyfAs7
+	Y3GHVDSwZ0i8ra5GuRjDUNzmR/0LdLI9PjP0qf1vLbv0qziyaJOszJdN8dkcc2rjj1qiKXpC4xz
+	XTgqvwbe6rlwDEfugGdEaFmIboZVAL2hSvNrdSs4vZiz25hb3AYTPW1SsVmP6NVjR/rqP/t+Rl
+X-Received: by 2002:a17:90b:17d0:b0:35a:cf:64a6 with SMTP id 98e67ed59e1d1-3650ce552camr13753846a91.23.1777971585283;
+        Tue, 05 May 2026 01:59:45 -0700 (PDT)
+Received: from localhost.localdomain ([115.110.225.242])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-364dbeb2db0sm19293267a91.10.2026.05.05.01.59.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 May 2026 01:59:44 -0700 (PDT)
+From: Shitalkumar Gandhi <shital.gandhi45@gmail.com>
+X-Google-Original-From: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+To: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
+Cc: Geert Uytterhoeven <geert+renesas@glider.be>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+Subject: [PATCH net v2] net: rtsn: fix mdio_node leak in rtsn_mdio_alloc()
+Date: Tue,  5 May 2026 14:28:40 +0530
+Message-Id: <20260505085840.352206-1-shitalkumar.gandhi@cambiumnetworks.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20260504200356.3529873-1-shitalkumar.gandhi@cambiumnetworks.com>
+References: <20260504200356.3529873-1-shitalkumar.gandhi@cambiumnetworks.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,137 +103,84 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQmowADHYIfpr_lpFHVKAA--.39790S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxZr1ruw1xKryxXryfGrWDCFg_yoW5GF4kpF
-	W3G3WqkFyDXF9rGF18tFW8u3W3KrZ2gFW7Gw43Kw1agF43trWFvFZ5tryjgrW8AFy8CF15
-	Jr4qyFy7K3yqvrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
-	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
-	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
-	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
-	w2AFwI0_Jw0_GFylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
-	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQ0SCWn5ruQAGQAAsU
-X-Rspamd-Queue-Id: 551CF4C9030
+X-Rspamd-Queue-Id: 917304C90B6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.96 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284271-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lzu.edu.cn,outlook.com];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-284274-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.472];
-	TO_DN_NONE(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[outlook.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lzu.edu.cn:email]
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shitalgandhi45@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.996];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[]
 
-From: Yilin Zhu <zylzyl2333@gmail.com>
+of_get_child_by_name() takes a reference. The rtsn_reset() and
+rtsn_change_mode() failure paths jump to out_free_bus and leak
+mdio_node.
 
-ipcomp_setup_req() allocates destination pages for the acomp output
-scatterlist. On successful completion, ipcomp_post_acomp() attaches the
-used pages to the skb and frees any unused pages.
+Add out_put_node to drop it before falling through.
 
-On an acomp error, ipcomp_post_acomp() skips directly to freeing the
-request. acomp_request_free() only releases the request itself, so the
-caller-allocated destination pages are left allocated.
-
-Track the number of destination pages allocated for the request and free
-them on the error path before releasing the request.
-
-Fixes: eb2953d26971 ("xfrm: ipcomp: Use crypto_acomp interface")
-Cc: stable@kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Co-developed-by: Peihan Liu <ronbogo@outlook.com>
-Signed-off-by: Peihan Liu <ronbogo@outlook.com>
-Signed-off-by: Yilin Zhu <zylzyl2333@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+Fixes: b0d3969d2b4d ("net: ethernet: rtsn: Add support for Renesas Ethernet-TSN")
+Signed-off-by: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
- net/xfrm/xfrm_ipcomp.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+Changes in v2:
+- Restore blank line between `return 0;` and `out_put_node:` label (Geert)
+- Add Reviewed-by: Geert Uytterhoeven
 
-diff --git a/net/xfrm/xfrm_ipcomp.c b/net/xfrm/xfrm_ipcomp.c
-index 5f38dff16177..1e0080300ec7 100644
---- a/net/xfrm/xfrm_ipcomp.c
-+++ b/net/xfrm/xfrm_ipcomp.c
-@@ -33,6 +33,7 @@ struct ipcomp_data {
+Link to v1: https://lore.kernel.org/netdev/20260504200356.3529873-1-shitalkumar.gandhi@cambiumnetworks.com/
+
+ drivers/net/ethernet/renesas/rtsn.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/renesas/rtsn.c b/drivers/net/ethernet/renesas/rtsn.c
+index 03a2669f0518..ee8381b60b8d 100644
+--- a/drivers/net/ethernet/renesas/rtsn.c
++++ b/drivers/net/ethernet/renesas/rtsn.c
+@@ -797,11 +797,11 @@ static int rtsn_mdio_alloc(struct rtsn_private *priv)
+ 	/* Enter config mode before registering the MDIO bus */
+ 	ret = rtsn_reset(priv);
+ 	if (ret)
+-		goto out_free_bus;
++		goto out_put_node;
  
- struct ipcomp_req_extra {
- 	struct xfrm_state *x;
-+	int dpages;
- 	struct scatterlist sg[];
- };
+ 	ret = rtsn_change_mode(priv, OCR_OPC_CONFIG);
+ 	if (ret)
+-		goto out_free_bus;
++		goto out_put_node;
  
-@@ -44,6 +45,12 @@ static inline struct ipcomp_skb_cb *ipcomp_cb(struct sk_buff *skb)
- 	return cb;
- }
+ 	rtsn_modify(priv, MPIC, MPIC_PSMCS_MASK | MPIC_PSMHT_MASK,
+ 		    MPIC_PSMCS_DEFAULT | MPIC_PSMHT_DEFAULT);
+@@ -824,6 +824,8 @@ static int rtsn_mdio_alloc(struct rtsn_private *priv)
  
-+static void ipcomp_free_dpages(struct scatterlist *dsg, int dpages)
-+{
-+	while (dpages--)
-+		__free_page(sg_page(dsg++));
-+}
-+
- static int ipcomp_post_acomp(struct sk_buff *skb, int err, int hlen)
- {
- 	struct acomp_req *req = ipcomp_cb(skb)->req;
-@@ -51,8 +58,13 @@ static int ipcomp_post_acomp(struct sk_buff *skb, int err, int hlen)
- 	struct scatterlist *dsg;
- 	int len, dlen;
+ 	return 0;
  
--	if (unlikely(err))
-+	if (unlikely(err)) {
-+		if (req) {
-+			extra = acomp_request_extra(req);
-+			ipcomp_free_dpages(extra->sg, extra->dpages);
-+		}
- 		goto out_free_req;
-+	}
- 
- 	extra = acomp_request_extra(req);
- 	dsg = extra->sg;
-@@ -167,6 +179,7 @@ static struct acomp_req *ipcomp_setup_req(struct xfrm_state *x,
- 
- 	extra = acomp_request_extra(req);
- 	extra->x = x;
-+	extra->dpages = 0;
- 
- 	dsg = extra->sg;
- 	sg = dsg + dnfrags;
-@@ -184,6 +197,7 @@ static struct acomp_req *ipcomp_setup_req(struct xfrm_state *x,
- 		if (!page)
- 			break;
- 		sg_set_page(dsg + i, page, PAGE_SIZE, 0);
-+		extra->dpages++;
- 		total += PAGE_SIZE;
- 	}
- 	if (!i)
++out_put_node:
++	of_node_put(mdio_node);
+ out_free_bus:
+ 	mdiobus_free(mii);
+ 	return ret;
 -- 
-2.47.3
+2.25.1
 
 
