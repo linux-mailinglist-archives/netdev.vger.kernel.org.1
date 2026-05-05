@@ -1,398 +1,533 @@
-Return-Path: <netdev+bounces-284584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284585-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CF5oGIpi+mm3OAMAu9opvQ
-	(envelope-from <netdev+bounces-284584-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 23:35:06 +0200
+	id awntGmxj+mloOgMAu9opvQ
+	(envelope-from <netdev+bounces-284585-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 23:38:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B97724D3F26
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 23:35:05 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D26224D3F51
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 23:38:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 403793004207
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 21:33:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F28BB300C815
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 21:38:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA793644C1;
-	Tue,  5 May 2026 21:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02AE448BD3B;
+	Tue,  5 May 2026 21:38:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xd2GGYzm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dvFquWNc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00AA621255A;
-	Tue,  5 May 2026 21:33:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 170B848A2C3
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 21:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778016810; cv=fail; b=aavcohjKwB8emlS0qfGDcff/G/l77atYO/iHFpvxBs41EQa0npS1aK9UxV0WslxAAa2twQ+Zw5/POQrciWbEwFzW8t0BHBe6siFUY/h03AztPLo+nRCn6UmY/kwjY7pKwuLfHg7exsled+xEn+EeicoWnNUPOhu70+YbKQ3D62o=
+	t=1778017128; cv=pass; b=QB0eyWawPW6HXJWxrFQJ8o4Iy1JC5LB+7HyazumJ1DJ/tzbDdVTrePIncR6AZ/i2alAPIB0pATGnMBuaeeJKLcXJr49OlJf/6n3i4vDcXV79qwWLgHVaTe/hofrpEhwN9hKWbA1ej9XajwKkos4m95o02aj+nsvGkG2cjhcxJWQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778016810; c=relaxed/simple;
-	bh=V/1hCF2M8P9imWjW5W1OMSvn89SklrIuiWyQ/KzjO+I=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=YmUi5yRfJk2pzWz1TLXXVHqpWM8KfquEk4EziVuXjHsnF8CYpdtfKCHk3SK9VOH0Fh0tCWjgJ1myJ3qq59YnjfNVU+5GV7L/Te79ba+VHwyC6uVF5x0EBxOg9h7KuhXud94FbY8Dh5YFLDt1+q+3QNMYrTvNojiMb6ZrmJsAF88=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xd2GGYzm; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778016809; x=1809552809;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=V/1hCF2M8P9imWjW5W1OMSvn89SklrIuiWyQ/KzjO+I=;
-  b=Xd2GGYzmCUVjeeZOCQxWcsuieYEjaV0J6jNkDG+viLVTd6P4ZTcD0lMx
-   rojVhe6y2OyTvabokEK23BIfml0zNJMctaR79hNTtfg4E4s0HrGne736B
-   QAnhkXGfq1LYkYX1rMlbVWC13ZuNcK++C7ip4TWMQ64nj/Hs+p3VOFwzV
-   rMVeT8/cux/NBaUCfrwtccT5kV2mq05OPWSusqpukHr2Be9mITen9xjJ+
-   vdyig0HskyO0lUWWnJJb+SGZ6dlNUZ2/wstFWYfVFwepDwrX5vxkDleRF
-   RLKj3YWkMHvJPgcjGLrtdcD81y5zVdsWo2kwCukUOtda8H4EGiRcwrW+F
-   A==;
-X-CSE-ConnectionGUID: xuQJboSfQ1mguIv2f/NwOQ==
-X-CSE-MsgGUID: CYBgmTSzQbyyeMB/m+dNTA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11777"; a="78613980"
-X-IronPort-AV: E=Sophos;i="6.23,218,1770624000"; 
-   d="scan'208";a="78613980"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2026 14:33:24 -0700
-X-CSE-ConnectionGUID: Z+/6OlAhQxKCH7q7k7DaPw==
-X-CSE-MsgGUID: HxPhyo1IS8aw9WdpY3JRwQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,218,1770624000"; 
-   d="scan'208";a="237707205"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2026 14:33:21 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 5 May 2026 14:33:21 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Tue, 5 May 2026 14:33:21 -0700
-Received: from BYAPR05CU005.outbound.protection.outlook.com (52.101.85.46) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 5 May 2026 14:33:20 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FfVQN31zQk13JFdcfVmMaoQ0MBNMzi9dcFPbFjp1gChTJFGA1G8WcGKkJ1VowAMkOftv746eP+d+8inHPQZFlAxBsUmsIf6HAldzV0vMBD4Q3Hr89aDShipQE7bHwwHIDtMnCkpiqY8Vt8Mrlnec46Y6lvkfhu9mUR06hn1I1ZxelbJhi8c7jTU73e2u7UkeI8kRX6nfQ0a0zk94GmNJ5SmMRsBIBGC72dTwGF/Lkvsefag5Zzo4UVnmlET2cUYKnIoG1mXh24T7+LeoAm8eyMHF+603xrt52vqsSocwCrE+jkdiS4xSDVG3XizdShJQCaHjJW1xnENYI9q/oaD2cg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JHK1MNuQOV3E20tX4KroA1lkWUoypkMt0beMR/quMXo=;
- b=MmkA/hzvJOsa4G8bOVOcl5IO9uSNj8IJfKbrNMlcHPYLRAhsNfSJA2bWWW+605qWeQzLj5VdcP+g0CgbF2j9o3n8GetPGn48O1WWJHyydlqTuORZFRkueIxfgra3nDei9SOHiShHr1vw3JVhSLn8lq/r6ONDSEy8gtjhldGxYSUjBFzxNzuUqBd/l0qeGiavuSg5v5IuJNCgrCdLPopMJ8/tYHz5AD0oISwXb0r3ebw0+ftPQ9Q14XarIJnSQdRPDHYkj4l+aek92Fyrl5caI3g0M87DDcP9LfaFkM6Z7dvcJ/LDJo2ejXwksSkqrn+NyRzDOC7tHDSiKYnfPZv9lg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6219.namprd11.prod.outlook.com (2603:10b6:208:3e9::15)
- by IA1PR11MB6323.namprd11.prod.outlook.com (2603:10b6:208:389::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.27; Tue, 5 May
- 2026 21:33:17 +0000
-Received: from IA1PR11MB6219.namprd11.prod.outlook.com
- ([fe80::a2b9:8e8:c48b:ea31]) by IA1PR11MB6219.namprd11.prod.outlook.com
- ([fe80::a2b9:8e8:c48b:ea31%5]) with mapi id 15.20.9870.023; Tue, 5 May 2026
- 21:33:16 +0000
-From: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Vecera, Ivan"
-	<ivecera@redhat.com>, "vadim.fedorenko@linux.dev"
-	<vadim.fedorenko@linux.dev>, "jiri@resnulli.us" <jiri@resnulli.us>,
-	"edumazet@google.com" <edumazet@google.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "richardcochran@gmail.com"
-	<richardcochran@gmail.com>, "donald.hunter@gmail.com"
-	<donald.hunter@gmail.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "Kubalewski, Arkadiusz"
-	<arkadiusz.kubalewski@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "horms@kernel.org" <horms@kernel.org>,
-	"Prathosh.Satish@microchip.com" <Prathosh.Satish@microchip.com>, "Nguyen,
- Anthony L" <anthony.l.nguyen@intel.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "davem@davemloft.net" <davem@davemloft.net>
-Subject: RE: [PATCH v7 net-next 5/8] ice: introduce TXC DPLL device and TX ref
- clock pin framework for E825
-Thread-Topic: [PATCH v7 net-next 5/8] ice: introduce TXC DPLL device and TX
- ref clock pin framework for E825
-Thread-Index: AQHc2IZaFwqh9v0iyk+UQevY0KxUqLX7AnGAgAT5QJA=
-Date: Tue, 5 May 2026 21:33:16 +0000
-Message-ID: <IA1PR11MB6219AC7EBC66AA5C69C03D90923E2@IA1PR11MB6219.namprd11.prod.outlook.com>
-References: <20260430094238.987976-6-grzegorz.nitka@intel.com>
- <20260502173312.3849706-1-kuba@kernel.org>
-In-Reply-To: <20260502173312.3849706-1-kuba@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6219:EE_|IA1PR11MB6323:EE_
-x-ms-office365-filtering-correlation-id: 74d2b7c5-bb0a-4c69-e8f6-08deaaedeb82
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|7416014|366016|376014|1800799024|18002099003|22082099003|56012099003|38070700021;
-x-microsoft-antispam-message-info: 4p6mEczGyuscRe2P8zszmET4GJ9RAoisy/dsHfn6NfPBV4SZ71kOqs2XBBEuZqVOllUszeFB30h2mH9KP9ayKH/Z3yrdsmut183jv0RSteFDaoJeOYZbICuD9gLPkkSvqNW8LDds6PfJZhWLYk3ZPsvwg7P1hrf/jjCSBqnhAmFA7WBL5RFKcGUUhZhN12Kvpi+4u9K/VoMP/FjDLMr56OGBuAamb5je/Q59k/Y/UXZz+50Yo23O3Wy0+IQuCusm2ZUzTqZFY+I2cD0zlpR0exaU069q+IxFRJUb0Zif3IItI9MiuQggqYZvZbIOpxGhcdhHYKkVrmC9irhmXqBY744kba3JNpqPGx0pgWcDxLGweZI2jb1+V7dLs+aLvGgqxZr4GZVTJKNFXy/D1lfEdJwzWv1QYSoY0d8e8toahDLay8orsSd4mM3JHvoNX5guBFa+qqDCiXIId7XJRBqrDmOxkbP2NzLSbX1tJG7jKxcLlEayMjbHH2rxW3uUK5s7arXTWRXUK6GQfdI6b8dPSX/O+zYGOFc6udxrzjlVjV4KTHiIZ8OfM9TapvyE5j29mgPBMfmFnfnAlJ145KbGWWMSiu2e6Yu/eoz0MnUPlgRSIm4eZydwQAsvturE92cPLorNNdBCnffB4slcr33quTtZOlfGQJa40UfLHhAxPH2kZ/+XIV7BBQm17IkwvZb62ztdpgmto0ST7yAIT087WiU9ro/XnB1L35DA4Yc6lBiaO5Bt8s82UddnhgJh+Hfx
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6219.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024)(18002099003)(22082099003)(56012099003)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?NprCZ184HRb8UXJcD0aR9TCoaskeOF3Qq+QjicDcFcBsNllgQxuaE4sf28cN?=
- =?us-ascii?Q?DAwoIgSN6XFNeg7tg6pa8m5EhDSx57ZJg/3SV0JhzauPBMoBlBsyGLSAI4ZV?=
- =?us-ascii?Q?WmUGC/n/rF9d1GJYsqvh/1Y1KyT3AqQOWj1ESLAkDpVGpNqgTdyeVMTYvkP8?=
- =?us-ascii?Q?zFwC66me9TQnjD5I+LxmbjHJ4oPm12FEoEpGp1IzDYaZLU668TyhdU1o7Joc?=
- =?us-ascii?Q?gqUG9ep9ZajPBtC6SLjziG3xUVtZY7nEhOaneZyJCEQN6Zitd6Ewc6BXbwS2?=
- =?us-ascii?Q?cCFVes5aj1mu2zt2/orIeKkSdIMuaBHkDZYIG7VfnMxhR855PsESYFdH2meG?=
- =?us-ascii?Q?hWTQUwsAzM6Thhd1OGndJ3icI1wewbJqy+iYpJ1jh64GHQavvbECKM0yJUHi?=
- =?us-ascii?Q?0sambbvhqQPehKez9ym8z6vM0YDob92FqquhfN/dI3NGeDvXXuZiweMXmkil?=
- =?us-ascii?Q?m30xb0ajf9NiOGVZ7Nfmrnccg4KFc42nLjHWzSpReBoxK+9XPxwMpSe6UizI?=
- =?us-ascii?Q?Fc2d6ZV2HrIh5vDiCX+wvL/QplOwSAOT2IyhKa2iwCCDq3m2y46Ve0qf3JYT?=
- =?us-ascii?Q?dTmP2DOuLwEC9xrcoeTHzjd8i+3d2bxP4RkplQwxsxQD0phUovOlhr1Tt5aG?=
- =?us-ascii?Q?tUE93nu/Eq+QXtNnovzxakkX+sXK6vv5vV2j3v2dJmYQSQtJJABCSWnO3C2x?=
- =?us-ascii?Q?KQK2ahxkfjYIlKWkrJ+3gsmDZ/koI7NOHwWzIzBu+OaYJjTIDRun38E24hAz?=
- =?us-ascii?Q?yMH/hH0/ocILgYKfSjX5tErGf1trNYsFxxc1sMcSy6hw5L9BnNLifFzCcY2+?=
- =?us-ascii?Q?kfKsYXABUNxgcFB2IN4p8yM8AGC9ZWWW5fUtzeZSnDeBNE/uKtbJl+i/Cp6d?=
- =?us-ascii?Q?Y2mpqOajn6mNFDsHjC4UnaKqBSa3fR3K6u16sey2HVuNzninBYgFVTryAE5X?=
- =?us-ascii?Q?8HhGkMyVT2jLWt2dRi3jyYenWO9G7itE8jGUZqApFNEyBzVPg+Nyd+hOr1/0?=
- =?us-ascii?Q?8NYOK40Wv5e6+3iGvXDtQa0LvyPkAzrV5eJHBKNMaCpD4CXRia/vkxXs8RKv?=
- =?us-ascii?Q?n/JSuvW8eXLNEf3O/Ziv8kkg6myuBXtadBhxjOa4TTcXiDcWracICZL+49tY?=
- =?us-ascii?Q?t4eTbKhf9eEPhD/LpmhyjyTA5z8jvyP4WFrAM9oGuXzlAKJeMxPwRgdbVGEb?=
- =?us-ascii?Q?OX0PLASGRhRuP5832xUvQ27SPFM4/KS1Ho6LOxoPQMJ++wWmvheKIZJBODee?=
- =?us-ascii?Q?Mtb4QrPoJTsESaP3CaDlgP0It7/+yt759TX3e5Q4fGkpZ4pTtGWo52dNFdx9?=
- =?us-ascii?Q?s+XGhno/2b+1EIdROSxj8foN98Vvde+hDy7rqb+FNUAh0dC4WHp+uQpIBWwU?=
- =?us-ascii?Q?NsKlX7ovGeuD9V9YLUkJe+gjuu8a9S199eBKEt9amg34WRviSs7jYmYZxBBt?=
- =?us-ascii?Q?ip/FO4yQdRTqkd6g+ijBqZdoAvxQJuCu7aE3YtelPu43djTVdamx8p5LQe77?=
- =?us-ascii?Q?JRJh07vZSRbKhTcRone/zJleoVu13raPWY5ZDX4Q+7QyTgt2H20n0f3/Yp3T?=
- =?us-ascii?Q?DOIi3txTN6kDfDiJLV0DusN77NhjgzgAJWtQyD97QEvFaT/BJzEFZJb5FUw5?=
- =?us-ascii?Q?b4ZcHleVxwLtGJrl0THA5U1Qjy1i0TYEufECAC5mb7PnuT8RHYtYoDsquAeA?=
- =?us-ascii?Q?ihEHVBf24G7WoemBviedL61gEcr6JBjeaUDu6y0nUAcjjLbEI/Et9cJBClYU?=
- =?us-ascii?Q?sCIhZb6MDg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1778017128; c=relaxed/simple;
+	bh=o56SsozYLnBS7QqkJg3mhCPwcci7VSGnHl+GaSefSOo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=srN1lc5uyUR4TtYWreKqXQbk0WYZG6KFlCVQIro4fczUYXKvPgVtW9VTPGukQepc4XnEJbdUbQu3PjR9/yR1KW6fg+7lc9D9UVgTMKETh5ZkjtZ7NlK+vnsVFrd1qN8JaedI+1T/dsulk6310Kn+mexuk768vovEZ0sQ7bSQxyU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dvFquWNc; arc=pass smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-671588ab0cfso1775a12.1
+        for <netdev@vger.kernel.org>; Tue, 05 May 2026 14:38:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778017125; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Ehhl4JeNvQxYetnIm/O+KVz6BsqMk+/ZM0KXccFHfgjMbvcup8JOWIdicw/6dWGpzG
+         fqtEwj7K4grSfDWap/avdF2BgvrcepkBehxHn0IPqP3Qql1e6lgit0lf6Bzbflf5OIC+
+         GlRIQOVoUuToEZPtpRP/a/F8IzVM0owka1jUtM9Xnlq2Ejak5o4COYQtZmMCxFFWRSvC
+         pPMQOuXTCGsYuh4cbVFWgePgTN9NZX8FzDhR+3AlAdlwDz1fROSXRt9iFCuIGt8zkerm
+         k+pxz2nFR/p1vXK5bEL6Cshu34LeD063q7o5YlZ3V9DH29JykJchzVkaVJ/QRJpKYhqG
+         4lRQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Ntym9XPdCphsxs/UpnBC2AeoVeU6VBD8C2hfcG8Y55Y=;
+        fh=HrsTciLZ9igq3iV4DW5Hkp2zEA16WVIS/uA+qy8yIp0=;
+        b=OOB1QxvQI9VlugDPkwfnNEYFB0ohAEVzWvynJuOz8he9O+RCkR4KChx4vPpMkO1Udn
+         +RjCGJb4fMBPuY1eDhpMYzDyqIGbCqWxK8PSBy59wGBXowJe2HvXbv/PsG9Wwsy4q7Vo
+         vUiLek0jLYam/9c8hnfLoHn9u4JZ+gq/tMllAy0XIEmnCJzookFIa6oLxzDuMmft0J5r
+         4WMAThQwbGIYrOlX9Tjv/tAmDn0SMFMxk08NCaLXnHgycC5FMRPzr/P8kab1zEzIbIhv
+         btLQ4ljs+EN4TH+ICCBdKXmmZ/TEgvERj7YY7fQ7zi0ZoFlhqNuCA6mZA9l3qWey38UM
+         zT0Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1778017125; x=1778621925; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ntym9XPdCphsxs/UpnBC2AeoVeU6VBD8C2hfcG8Y55Y=;
+        b=dvFquWNc+gVKqUBrDG0qLZoRBgvZMuSObmH7QlROHF9yMqzRe1yoeqk3GfxHj9cWvm
+         DAik8v47xcF3WXmoWAmGRD47tJ0O6lAU083T5QhHZwZPWQlNFUw9UmZTEfT9hQuKiZcW
+         QJMATzWavGxN1t4sQ4U9ukL5EqLaT6N8v+qZlmpfbE7YkBBfTp8JLP8tvek8bgyinyjW
+         FlkDey1JhdVKI+tC3v0uoZClMizMuXh8ylED1UZPDQpjUy2ozZWyhutvic6VATHxj/BA
+         iS4tpFt5y7vjL912iYfpA4QkESNArcnqij0TD1GytatX/TfFF0prAFScwxJNRzyrt5pP
+         Q9+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778017125; x=1778621925;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Ntym9XPdCphsxs/UpnBC2AeoVeU6VBD8C2hfcG8Y55Y=;
+        b=NH/sfjd477OB0I1YqA0BLLkKNePo3m/i58+fgcWo4cbQ640pXoAiiMbH3XzQsH02V2
+         J0Er5qnxqGxn1B/MMZSSP4txngmHqNRzk2nChnEbmgng171h6riLCIsa15ASZ4P/BkEF
+         xYpjZMQ5xzuNbh4CUzlrA7m5sqxijS3og/RtQRkuQjOrTDPNPvdzCRUqXgjfjFmiP2Wj
+         NVZXp0gEE1Ey5rTZ0+gQiqMA3ROiVTYC3BnTgYdBnho3JAR8t6v0qVCXPpaKL/RcNBkZ
+         c4G1+cwGi+JgbpfNnJtDpRjKtTwSdA9yezbI6bTOlZQyXyq8tB1WTSP3YdhTcsJ3XjdL
+         N73g==
+X-Gm-Message-State: AOJu0YzdAc+itq1gPZXr+Gptu6cXV4dRM2Rp49gQcEVTtR32TO2HOEAl
+	65I+tKdbSET6gNVmMsSrh7FiBRa75UpK+t7yId/FcaN1RXCYsCjcPyUHC1hKKJhzxzssnV4AAUX
+	E1v9iDMl51cfZKq4Z/Q4GIlqmNHdv9u8S4fi60rGt
+X-Gm-Gg: AeBDieuNDz0wUhv02RkAvf5DUtc1ReOU9fvI0o0fTXdMmEeWLZ+qLAIxuFg0cvlXkO9
+	Nnsa4kqyePlK0VXkeCzuiYdeX+8B+qr/fqb3/LVOTv6AkqCg5x1IarUQDymufimjsK24XQMc/Tg
+	9xRcj4NQ0OjhdNBM4sg7S4Y2thtG7i1g8vYLPbRV337ry4YBwC2KF4H2eTHM+m4Zjs3gvZwer3S
+	muoLSgOPl55/D/SFo2Ss7U7cTiInDzuL1RYNcmu8mrOWIXsgmq3vcBPPCxQfoSJkWsWQOghngs0
+	RxlayHG7nbxRjuuzsnuL2z9X+vF4Uw==
+X-Received: by 2002:a05:6402:14c2:b0:660:efc9:900a with SMTP id
+ 4fb4d7f45d1cf-67d4f79adc7mr14739a12.10.1778017124722; Tue, 05 May 2026
+ 14:38:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: lom2R+NbFRaLxZtVyGHaV0gdEmM+66LIAhNMlsBISHnPchUFlur5q0u7iI8Nc6L3VNJHhunE+ivpqqTuJ/YSjK3/LoSTP6fcAkvG46rzqWH5Y24mC2PLFc2XGZM3s9qaJ3vBAl3chJXfptDDx3xruXEcz1cCco1j2vxXN6Ttf0pkid723clNzCLE/Hd+/z+bHHM6Srd/dKmjBVZoyHmGFE2I9hpMRtMSFYQ3k+OGh9NFySPj3JlSwSMRYeXorqoyoWu7+wWYpsqW3zxmMq7qF/gxSJqkybcrsmLarjFtkX7TNUKFYqb0lCgn0N0XY+jXy7OPAdKOrvukrsabq32pow==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6219.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 74d2b7c5-bb0a-4c69-e8f6-08deaaedeb82
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 May 2026 21:33:16.7846
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 3Fue/NOgZqz9sCMdglSaWwty1HdknG0/DxXr1S1lE5Ichhtbs4+1fCc45iVhh/VpJqpLEdedhEsFZgga1TxM2AI7c4cw+resvm1Pu774F5k=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6323
-X-OriginatorOrg: intel.com
-X-Rspamd-Queue-Id: B97724D3F26
+References: <20260429012819.3102675-1-hramamurthy@google.com> <20260429012819.3102675-3-hramamurthy@google.com>
+In-Reply-To: <20260429012819.3102675-3-hramamurthy@google.com>
+From: Jordan Rhee <jordanrhee@google.com>
+Date: Tue, 5 May 2026 14:38:32 -0700
+X-Gm-Features: AVHnY4IzXqRsbLyrcwRvn4L_VCtj33qDtr_lxAL5f8zMnGyTN3xb_8qBMi64ag4
+Message-ID: <CA+mzVttAv=EYEiLaJnijdVQMyMK8LrCKCszwPcDh7uoV+niYcw@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 2/3] gve: make nic clock reads thread safe
+To: Harshitha Ramamurthy <hramamurthy@google.com>
+Cc: netdev@vger.kernel.org, joshwash@google.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	richardcochran@gmail.com, jstultz@google.com, tglx@kernel.org, 
+	sboyd@kernel.org, willemb@google.com, nktgrg@google.com, jfraker@google.com, 
+	ziweixiao@google.com, maolson@google.com, thostet@google.com, 
+	alok.a.tiwari@oracle.com, pkaligineedi@google.com, horms@kernel.org, 
+	dwmw2@infradead.org, jacob.e.keller@intel.com, yyd@google.com, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: D26224D3F51
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284584-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TAGGED_FROM(0.00)[bounces-284585-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,linux.dev,resnulli.us,google.com,intel.com,gmail.com,lunn.ch,lists.osuosl.org,kernel.org,microchip.com,davemloft.net];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[grzegorz.nitka@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jordanrhee@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,gmail.com,oracle.com,infradead.org,intel.com];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
 
-
-
-> -----Original Message-----
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: Saturday, May 2, 2026 7:33 PM
-> To: Nitka, Grzegorz <grzegorz.nitka@intel.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>; netdev@vger.kernel.org; Vecera, Iva=
-n
-> <ivecera@redhat.com>; vadim.fedorenko@linux.dev; jiri@resnulli.us;
-> edumazet@google.com; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>;
-> richardcochran@gmail.com; donald.hunter@gmail.com; linux-
-> kernel@vger.kernel.org; Kubalewski, Arkadiusz
-> <arkadiusz.kubalewski@intel.com>; andrew+netdev@lunn.ch; intel-wired-
-> lan@lists.osuosl.org; horms@kernel.org; Prathosh.Satish@microchip.com;
-> Nguyen, Anthony L <anthony.l.nguyen@intel.com>; pabeni@redhat.com;
-> davem@davemloft.net
-> Subject: Re: [PATCH v7 net-next 5/8] ice: introduce TXC DPLL device and T=
-X ref
-> clock pin framework for E825
->=20
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
+On Tue, Apr 28, 2026 at 6:28=E2=80=AFPM Harshitha Ramamurthy
+<hramamurthy@google.com> wrote:
+>
+> From: Ankit Garg <nktgrg@google.com>
+>
+> Add a mutex to protect the shared DMA buffer that receives NIC
+> timestamp reports. The NIC timestamp will be read from two different
+> threads: the periodic worker and upcoming `gettimex64`.
+>
+> Move clock registration to the last step of initialization to ensure
+> that all data needed by the clock module is initialized before
+> the clock is exposed to usermode.
+>
+> Reviewed-by: Joshua Washington <joshwash@google.com>
+> Signed-off-by: Ankit Garg <nktgrg@google.com>
+> Signed-off-by: Jordan Rhee <jordanrhee@google.com>
+> Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
 > ---
-> ice: introduce TXC DPLL device and TX ref clock pin framework for E825
->=20
-> This patch adds a new TXC DPLL device of DPLL_TYPE_GENERIC for E825
-> devices, together with a TXCLK pin type and two TX reference pins
-> (EXT_EREF0 and a fwnode-described SYNCE pin). Pin state callbacks and
-> TXC lock status are placeholders at this stage.
->=20
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c
-> b/drivers/net/ethernet/intel/ice/ice_dpll.c
-> > index 62f75701d652..d839b50187ba 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_dpll.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
->=20
-> [ ... ]
->=20
-> > @@ -3199,19 +3276,40 @@ static bool ice_dpll_is_fwnode_pin(struct
-> ice_dpll_pin *pin)
-> >  	return !IS_ERR_OR_NULL(pin->fwnode);
-> >  }
-> >
-> > +static bool ice_dpll_fwnode_eq(const struct fwnode_handle *a,
-> > +			       const struct fwnode_handle *b)
-> > +{
-> > +	return a && b && a =3D=3D b;
-> > +}
-> > +
-> >  static void ice_dpll_pin_notify_work(struct work_struct *work)
-> >  {
-> >  	struct ice_dpll_pin_work *w =3D container_of(work,
-> >  						   struct ice_dpll_pin_work,
-> >  						   work);
-> >  	struct ice_dpll_pin *pin, *parent =3D w->pin;
-> > +	bool is_tx_synce_parent =3D false;
-> >  	struct ice_pf *pf =3D parent->pf;
-> > +	bool is_rclk_parent =3D false;
-> >  	int ret;
-> >
-> >  	wait_for_completion(&pf->dplls.dpll_init);
-> >  	if (!test_bit(ICE_FLAG_DPLL, pf->flags))
-> >  		goto out; /* DPLL initialization failed */
-> >
-> > +	/* Decide which parent we are handling, defensively checking FWNs */
->=20
-> [ ... ]
->=20
-> > +		} else if (is_tx_synce_parent) {
-> > +			/* Register TX-CLK SYNCE pin directly to TXC DPLL */
-> > +			pin =3D &pf->dplls.txclks[E825_EXT_SYNCE_PIN_IDX];
-> > +			ret =3D dpll_pin_register(pf->dplls.txc.dpll, pin->pin,
-> > +						&ice_dpll_txclk_ops, pin);
-> > +			if (ret) {
-> > +				dev_err(ice_pf_to_dev(pf),
-> > +					"TX SYNCE pin register failed: %pe\n",
-> > +					ERR_PTR(ret));
-> > +				goto drop_parent_ref;
-> > +			}
-> >  		}
-> >  		break;
->=20
-> [ ... ]
->=20
-> > @@ -3401,6 +3524,19 @@ ice_dpll_deinit_fwnode_pins(struct ice_pf *pf,
-> struct ice_dpll_pin *pins,
-> >  	destroy_workqueue(pf->dplls.wq);
-> >  }
-> >
-> > +static int ice_dpll_deinit_txclk_pins(struct ice_pf *pf)
-> > +{
-> > +	struct ice_dpll_pin *synce_pin =3D &pf-
-> >dplls.txclks[E825_EXT_SYNCE_PIN_IDX];
-> > +	struct ice_dpll *dt =3D &pf->dplls.txc;
-> > +
-> > +	ice_dpll_unregister_pins(dt->dpll, pf->dplls.txclks,
-> > +				 &ice_dpll_txclk_ops,
-> > +				 ARRAY_SIZE(pf->dplls.txclks));
-> > +	ice_dpll_release_pins(&pf->dplls.txclks[E825_EXT_EREF_PIN_IDX], 1);
-> > +	ice_dpll_deinit_fwnode_pin(synce_pin);
-> > +	return 0;
-> > +}
->=20
-> Is there a teardown race between this function and a concurrent
-> ice_dpll_pin_notify_work() that is about to register the SYNCE pin on
-> the TXC DPLL?
->=20
-> The work's registration path runs:
->=20
-> 	parent->pin =3D fwnode_dpll_pin_find(parent->fwnode,
-> 					   &parent->tracker);
-> 	...
-> 	} else if (is_tx_synce_parent) {
-> 		pin =3D &pf->dplls.txclks[E825_EXT_SYNCE_PIN_IDX];
-> 		ret =3D dpll_pin_register(pf->dplls.txc.dpll, pin->pin,
-> 					&ice_dpll_txclk_ops, pin);
->=20
-> while ice_dpll_deinit_txclk_pins() first scans pf->dplls.txclks[] with
-> ice_dpll_unregister_pins(), which skips any slot where pins[i].pin is
-> still NULL:
->=20
-> 	for (i =3D 0; i < count; i++) {
-> 		if (pins[i].hidden)
-> 			continue;
-> 		if (IS_ERR_OR_NULL(pins[i].pin))
-> 			continue;
-> 		dpll_pin_unregister(dpll, pins[i].pin, ops, &pins[i]);
-> 	}
->=20
-> Only afterward does it call ice_dpll_deinit_fwnode_pin(synce_pin), which
-> unregisters the notifier and flushes pf->dplls.wq.
->=20
-> If an external fwnode DPLL provider emits a DPLL_PIN_CREATED for
-> clk_ref_synce between the two steps, can this sequence occur?
->=20
->   deinit thread                    notifier work
->   -------------                    -------------
->   ice_dpll_unregister_pins(txclks)
->      sees txclks[1].pin =3D=3D NULL
->      skips SYNCE slot
->                                    parent->pin =3D fwnode_dpll_pin_find()
->                                    dpll_pin_register(txc->dpll,
->                                        pin->pin, &ops, pin)
->                                      -> adds to txc->dpll->pin_refs
->                                         and pin->dpll_refs
->   ice_dpll_release_pins(EREF0, 1)
->   ice_dpll_deinit_fwnode_pin(synce_pin)
->      unregister_dpll_notifier()
->      flush_workqueue()   /* no work pending */
->      dpll_pin_put(synce_pin->pin, ...)
->=20
-> After this, dpll_pin_put() only drops the pin refcount; it does not call
-> dpll_pin_unregister(). So the TXC dpll's pin_refs still contains the
-> SYNCE entry when ice_dpll_deinit_dpll(pf, &pf->dplls.txc, false) later
-> runs dpll_device_unregister() and dpll_device_put(). Does this trip
-> WARN_ON_ONCE(!xa_empty(&dpll->pin_refs)) in __dpll_device_put() and
-> then
-> free the dpll_device while pin->dpll_refs still references it, leaving a
-> use-after-free on any subsequent walk of pin->dpll_refs?
->=20
-> Would it be safer to call ice_dpll_deinit_fwnode_pin(synce_pin) first so
-> the notifier is torn down and pf->dplls.wq drained before txclks[] is
-> scanned, or to hold pf->dplls.lock across both the deinit scan and the
-> work's parent->pin =3D ...; dpll_pin_register(...) sequence?
->=20
-> A similar structural race exists for the rclk path via
-> dpll_pin_on_pin_register(), but this patch introduces a new instance on
-> the direct-on-TXC SYNCE registration. The ordering in
-> ice_dpll_deinit_txclk_pins() appears unchanged by later patches in the
-> series, so the same race seems to persist beyond this commit.
+> Changes in v3:
+> - Reorder init/teardown to register PTP clock last, and simplify code
+> - Move ptp-related members from gve_priv to gve_ptp
+> - Only assign priv->ptp after ptp module is successfully initialized
+> ---
+>  drivers/net/ethernet/google/gve/gve.h         |  12 +-
+>  drivers/net/ethernet/google/gve/gve_ethtool.c |   3 +-
+>  drivers/net/ethernet/google/gve/gve_ptp.c     | 134 ++++++++----------
+>  3 files changed, 63 insertions(+), 86 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet=
+/google/gve/gve.h
+> index 1d66d3834f7e..7b69d0cfc0d5 100644
+> --- a/drivers/net/ethernet/google/gve/gve.h
+> +++ b/drivers/net/ethernet/google/gve/gve.h
+> @@ -792,6 +792,9 @@ struct gve_ptp {
+>         struct ptp_clock_info info;
+>         struct ptp_clock *clock;
+>         struct gve_priv *priv;
+> +       struct mutex nic_ts_read_lock; /* Protects nic_ts_report */
+> +       struct gve_nic_ts_report *nic_ts_report;
+> +       dma_addr_t nic_ts_report_bus;
+>  };
+>
+>  struct gve_priv {
+> @@ -923,8 +926,6 @@ struct gve_priv {
+>         bool nic_timestamp_supported;
+>         struct gve_ptp *ptp;
+>         struct kernel_hwtstamp_config ts_config;
+> -       struct gve_nic_ts_report *nic_ts_report;
+> -       dma_addr_t nic_ts_report_bus;
+>         u64 last_sync_nic_counter; /* Clock counter from last NIC TS repo=
+rt */
+>  };
+>
+> @@ -1201,7 +1202,7 @@ static inline bool gve_supports_xdp_xmit(struct gve=
+_priv *priv)
+>
+>  static inline bool gve_is_clock_enabled(struct gve_priv *priv)
+>  {
+> -       return priv->nic_ts_report;
+> +       return priv->ptp;
+>  }
+>
+>  /* gqi napi handler defined in gve_main.c */
+> @@ -1321,14 +1322,9 @@ int gve_flow_rules_reset(struct gve_priv *priv);
+>  int gve_init_rss_config(struct gve_priv *priv, u16 num_queues);
+>  /* PTP and timestamping */
+>  #if IS_ENABLED(CONFIG_PTP_1588_CLOCK)
+> -int gve_clock_nic_ts_read(struct gve_priv *priv);
+>  int gve_init_clock(struct gve_priv *priv);
+>  void gve_teardown_clock(struct gve_priv *priv);
+>  #else /* CONFIG_PTP_1588_CLOCK */
+> -static inline int gve_clock_nic_ts_read(struct gve_priv *priv)
+> -{
+> -       return -EOPNOTSUPP;
+> -}
+>
+>  static inline int gve_init_clock(struct gve_priv *priv)
+>  {
+> diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/=
+ethernet/google/gve/gve_ethtool.c
+> index dc2213b5ce24..4fd7e8a442c5 100644
+> --- a/drivers/net/ethernet/google/gve/gve_ethtool.c
+> +++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
+> @@ -972,8 +972,7 @@ static int gve_get_ts_info(struct net_device *netdev,
+>                 info->rx_filters |=3D BIT(HWTSTAMP_FILTER_NONE) |
+>                                     BIT(HWTSTAMP_FILTER_ALL);
+>
+> -               if (priv->ptp)
+> -                       info->phc_index =3D ptp_clock_index(priv->ptp->cl=
+ock);
+> +               info->phc_index =3D ptp_clock_index(priv->ptp->clock);
+>         }
+>
+>         return 0;
+> diff --git a/drivers/net/ethernet/google/gve/gve_ptp.c b/drivers/net/ethe=
+rnet/google/gve/gve_ptp.c
+> index 06b1cf4a5efc..ad15f1209a83 100644
+> --- a/drivers/net/ethernet/google/gve/gve_ptp.c
+> +++ b/drivers/net/ethernet/google/gve/gve_ptp.c
+> @@ -11,19 +11,20 @@
+>  #define GVE_NIC_TS_SYNC_INTERVAL_MS 250
+>
+>  /* Read the nic timestamp from hardware via the admin queue. */
+> -int gve_clock_nic_ts_read(struct gve_priv *priv)
+> +static int gve_clock_nic_ts_read(struct gve_ptp *ptp, u64 *nic_raw)
+>  {
+> -       u64 nic_raw;
+>         int err;
+>
+> -       err =3D gve_adminq_report_nic_ts(priv, priv->nic_ts_report_bus);
+> +       mutex_lock(&ptp->nic_ts_read_lock);
+> +       err =3D gve_adminq_report_nic_ts(ptp->priv, ptp->nic_ts_report_bu=
+s);
+>         if (err)
+> -               return err;
+> +               goto out;
+>
+> -       nic_raw =3D be64_to_cpu(priv->nic_ts_report->nic_timestamp);
+> -       WRITE_ONCE(priv->last_sync_nic_counter, nic_raw);
+> +       *nic_raw =3D be64_to_cpu(ptp->nic_ts_report->nic_timestamp);
+>
+> -       return 0;
+> +out:
+> +       mutex_unlock(&ptp->nic_ts_read_lock);
+> +       return err;
+>  }
+>
+>  static int gve_ptp_gettimex64(struct ptp_clock_info *info,
+> @@ -41,17 +42,21 @@ static int gve_ptp_settime64(struct ptp_clock_info *i=
+nfo,
+>
+>  static long gve_ptp_do_aux_work(struct ptp_clock_info *info)
+>  {
+> -       const struct gve_ptp *ptp =3D container_of(info, struct gve_ptp, =
+info);
+> +       struct gve_ptp *ptp =3D container_of(info, struct gve_ptp, info);
+>         struct gve_priv *priv =3D ptp->priv;
+> +       u64 nic_raw;
+>         int err;
+>
+>         if (gve_get_reset_in_progress(priv) || !gve_get_admin_queue_ok(pr=
+iv))
+>                 goto out;
+>
+> -       err =3D gve_clock_nic_ts_read(priv);
+> -       if (err && net_ratelimit())
+> -               dev_err(&priv->pdev->dev,
+> -                       "%s read err %d\n", __func__, err);
+> +       err =3D gve_clock_nic_ts_read(ptp, &nic_raw);
+> +       if (err) {
+> +               dev_err_ratelimited(&priv->pdev->dev, "%s read err %d\n",
+> +                                   __func__, err);
+> +               goto out;
+> +       }
+> +       WRITE_ONCE(priv->last_sync_nic_counter, nic_raw);
 
-This is a valid concern and to be fixed in the next iteration.
-I'd go with stopping new notifier-driven work and then tear down DPLL
-registration and references.
+Sashiko says:
+---
+This problem wasn't introduced by this patch, but since the patch moves
+the WRITE_ONCE() operation, does it cause a torn read on 32-bit
+architectures?
 
-Thanks
+The 64-bit variable last_sync_nic_counter is updated in process context (by
+the PTP worker thread) using WRITE_ONCE() and read concurrently in NAPI
+softirq context (gve_rx_get_hwtstamp()) using READ_ONCE().
 
-Grzegorz
+On 32-bit architectures, READ_ONCE() and WRITE_ONCE() on 64-bit variables
+do not guarantee atomicity and will compile into two separate 32-bit memory
+accesses.
+
+If a softirq interrupts the worker thread exactly between the two 32-bit
+writes, could it read a corrupted 64-bit value combining halves of the old
+and new timestamps?
+
+Because the upper 32 bits wrap roughly every 4.3 seconds, a torn read will
+cause a multi-second jump in the calculated packet timestamps, corrupting
+PTP synchronization and packet captures.
+
+Would it be better to use a seqcount, u64_stats_sync, or atomic64_t to
+synchronize these accesses?
+---
+
+GVE only runs on x86_64 and ARM64, so this won't hit in the wild. It
+might be good to fix from a code correctness perspective, but I
+believe it's beyond the scope of this patch which is to introduce
+thread safety to gve_clock_nic_ts_read().
+
+>
+>  out:
+>         return msecs_to_jiffies(GVE_NIC_TS_SYNC_INTERVAL_MS);
+> @@ -65,94 +70,71 @@ static const struct ptp_clock_info gve_ptp_caps =3D {
+>         .do_aux_work    =3D gve_ptp_do_aux_work,
+>  };
+>
+> -static int gve_ptp_init(struct gve_priv *priv)
+> +int gve_init_clock(struct gve_priv *priv)
+>  {
+>         struct gve_ptp *ptp;
+> +       u64 nic_raw;
+>         int err;
+>
+> -       priv->ptp =3D kzalloc_obj(*priv->ptp);
+> -       if (!priv->ptp)
+> +       ptp =3D kzalloc_obj(*priv->ptp);
+> +       if (!ptp)
+>                 return -ENOMEM;
+>
+> -       ptp =3D priv->ptp;
+>         ptp->info =3D gve_ptp_caps;
+> -       ptp->clock =3D ptp_clock_register(&ptp->info, &priv->pdev->dev);
+> -
+> -       if (IS_ERR(ptp->clock)) {
+> -               dev_err(&priv->pdev->dev, "PTP clock registration failed\=
+n");
+> -               err  =3D PTR_ERR(ptp->clock);
+> -               goto free_ptp;
+> -       }
+> -
+>         ptp->priv =3D priv;
+> -       return 0;
+> -
+> -free_ptp:
+> -       kfree(ptp);
+> -       priv->ptp =3D NULL;
+> -       return err;
+> -}
+> -
+> -static void gve_ptp_release(struct gve_priv *priv)
+> -{
+> -       struct gve_ptp *ptp =3D priv->ptp;
+> -
+> -       if (!ptp)
+> -               return;
+> -
+> -       if (ptp->clock)
+> -               ptp_clock_unregister(ptp->clock);
+> -
+> -       kfree(ptp);
+> -       priv->ptp =3D NULL;
+> -}
+> -
+> -int gve_init_clock(struct gve_priv *priv)
+> -{
+> -       int err;
+> -
+> -       err =3D gve_ptp_init(priv);
+> -       if (err)
+> -               return err;
+> -
+> -       priv->nic_ts_report =3D
+> +       mutex_init(&ptp->nic_ts_read_lock);
+> +       ptp->nic_ts_report =3D
+>                 dma_alloc_coherent(&priv->pdev->dev,
+>                                    sizeof(struct gve_nic_ts_report),
+> -                                  &priv->nic_ts_report_bus,
+> -                                  GFP_KERNEL);
+> -       if (!priv->nic_ts_report) {
+> +                                  &ptp->nic_ts_report_bus, GFP_KERNEL);
+> +       if (!ptp->nic_ts_report) {
+>                 dev_err(&priv->pdev->dev, "%s dma alloc error\n", __func_=
+_);
+>                 err =3D -ENOMEM;
+> -               goto release_ptp;
+> +               goto free_ptp;
+>         }
+> -       err =3D gve_clock_nic_ts_read(priv);
+> +
+> +       err =3D gve_clock_nic_ts_read(ptp, &nic_raw);
+>         if (err) {
+>                 dev_err(&priv->pdev->dev, "failed to read NIC clock %d\n"=
+, err);
+> -               goto release_nic_ts_report;
+> +               goto free_dma_mem;
+>         }
+> -       ptp_schedule_worker(priv->ptp->clock,
+> +       WRITE_ONCE(priv->last_sync_nic_counter, nic_raw);
+> +
+> +       ptp->clock =3D ptp_clock_register(&ptp->info, &priv->pdev->dev);
+> +       if (IS_ERR(ptp->clock)) {
+> +               dev_err(&priv->pdev->dev, "PTP clock registration failed\=
+n");
+> +               err =3D PTR_ERR(ptp->clock);
+> +               goto free_dma_mem;
+> +       }
+> +
+> +       priv->ptp =3D ptp;
+
+Sashiko says:
+---
+This problem wasn't introduced by this patch, but since the patch attempts
+to fix a related publication race by moving the clock registration, could
+this priv->ptp assignment be reordered before ptp->clock is fully
+initialized?
+
+If gve_get_ts_info() reads priv->ptp locklessly (for example, when called
+from sock_timestamping_bind_phc()), could it see an uninitialized
+ptp->clock because smp_store_release() wasn't used here?
+---
+
+The only place that priv->ptp is accessed is from
+gve_is_clock_enabled(), which is called from the following places:
+ - gve_get_ts_info() ethtool op
+   - No risk of race with gve_init_clock() when called from probe()
+because it runs *before* netdev is registered. The ethool operation
+cannot be dispatched before the netdev is registered.
+   - No risk of race with gve_init_clock() when called in reset
+recovery path because rtnl and netdev locks are held across
+gve_reset(), and ethtool operations also take the rtnl/netdev locks.
+ - gve_set_ts_config() ndo op and gve_xdp_rx_timestamp()
+   - No risk of race because gve_init_clock() runs before netdev is registe=
+red
+
+
+> +       ptp_schedule_worker(ptp->clock,
+>                             msecs_to_jiffies(GVE_NIC_TS_SYNC_INTERVAL_MS)=
+);
+>
+>         return 0;
+>
+> -release_nic_ts_report:
+> -       dma_free_coherent(&priv->pdev->dev,
+> -                         sizeof(struct gve_nic_ts_report),
+> -                         priv->nic_ts_report, priv->nic_ts_report_bus);
+> -       priv->nic_ts_report =3D NULL;
+> -release_ptp:
+> -       gve_ptp_release(priv);
+> +free_dma_mem:
+> +       dma_free_coherent(&priv->pdev->dev, sizeof(struct gve_nic_ts_repo=
+rt),
+> +                         ptp->nic_ts_report, ptp->nic_ts_report_bus);
+> +       ptp->nic_ts_report =3D NULL;
+> +free_ptp:
+> +       mutex_destroy(&ptp->nic_ts_read_lock);
+> +       kfree(ptp);
+>         return err;
+>  }
+>
+>  void gve_teardown_clock(struct gve_priv *priv)
+>  {
+> -       gve_ptp_release(priv);
+> +       struct gve_ptp *ptp =3D priv->ptp;
+>
+> -       if (priv->nic_ts_report) {
+> -               dma_free_coherent(&priv->pdev->dev,
+> -                                 sizeof(struct gve_nic_ts_report),
+> -                                 priv->nic_ts_report, priv->nic_ts_repor=
+t_bus);
+> -               priv->nic_ts_report =3D NULL;
+> -       }
+> +       if (!ptp)
+> +               return;
+> +
+> +       priv->ptp =3D NULL;
+> +       ptp_clock_unregister(ptp->clock);
+> +       dma_free_coherent(&priv->pdev->dev, sizeof(struct gve_nic_ts_repo=
+rt),
+> +                         ptp->nic_ts_report, ptp->nic_ts_report_bus);
+> +       ptp->nic_ts_report =3D NULL;
+> +       mutex_destroy(&ptp->nic_ts_read_lock);
+> +       kfree(ptp);
+
+Sashiko says:
+---
+Can this synchronous kfree() cause a use-after-free or a NULL pointer
+dereference?
+
+If a concurrent device reset executes gve_teardown_clock(), it sets
+priv->ptp =3D NULL and frees ptp synchronously without an RCU grace period
+(such as using kfree_rcu() or synchronize_rcu()).
+
+If gve_get_ts_info() reads priv->ptp locklessly, could it dereference
+priv->ptp->clock while it is being freed, leading to a Time-Of-Check to
+Time-Of-Use (TOCTOU) bug?
+---
+
+Reset cannot race against the gve_get_ts_info() ethtool op because of
+the netdev/rtnl locks.
+
+>  }
+> --
+> 2.54.0.545.g6539524ca2-goog
+>
 
