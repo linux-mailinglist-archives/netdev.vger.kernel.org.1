@@ -1,302 +1,201 @@
-Return-Path: <netdev+bounces-284414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284417-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GDHCNWLx+WmcFQMAu9opvQ
-	(envelope-from <netdev+bounces-284414-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 15:32:18 +0200
+	id GHlNCDDz+WmcFQMAu9opvQ
+	(envelope-from <netdev+bounces-284417-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 15:40:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 902B84CE8F0
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 15:32:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 751734CEA9A
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 15:39:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 13C07306C20F
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 13:28:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E91E430607D7
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 13:32:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2593477992;
-	Tue,  5 May 2026 13:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEDB133C50D;
+	Tue,  5 May 2026 13:32:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="EOznjxZj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KXfZzjQ1";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="YospqjKt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECA57388371
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 13:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7FF346E74
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 13:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777987659; cv=none; b=ojIpQgHmAH28mFG+fv6qe2OqbQbPS3KwOcGcjQVlN6St7J6bNzYkiciPa2Qq1V2biu5CXk+vVpv77+VS/fwFidJ3dvINoZH+TbZbW7MfPiBVIpXW4BoQW91VrKdfQAShnE0gA99Pl/HgsbCOGvLSFp1hLiYPjGj6geUCi1KngrQ=
+	t=1777987939; cv=none; b=GyeRiQyilputWx6oZaJKKAbsLzd8gKZ0CgnIX84igMJeca5cQcNkg995GUDu8pCSmqxWH/RxWUX1kI8deBwcfwkTOU8KhZTjSyO/52Vqtbr6CjM0B7HCDnO4oz1CqeGVOJukevsONvfMOza1KynbWxG0N+Oo+hLEN09YcI3y7HA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777987659; c=relaxed/simple;
-	bh=YPthGmBagOjav013lu+wSW9xMVwN5Gu+hGSDUNENwvE=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nRaGEIdeoxK1NLHW9i2cANl6BwqAZNnRUr4tBQRxspAvRnJPI6PTVZ2NP9F7u6VUJJ9NuCdR4C7VqMKUzXkNq+vuE/Rg+edouCKbLr1/NRnsW4ZzF0aLy8fPz7WgwE4t/XFjTrvf3qYBdjC/EMehF8qNZ6R8zg/sLX3aDVCuzq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=EOznjxZj; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-444826c16ffso5073564f8f.1
-        for <netdev@vger.kernel.org>; Tue, 05 May 2026 06:27:37 -0700 (PDT)
+	s=arc-20240116; t=1777987939; c=relaxed/simple;
+	bh=0s89vfwi9u2GmyoZr12XQ/VmH/dxXgL1PDXgs/5ffAc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aDU4rO4PDS6r4C3bEP2x706Q54wftiCRm9yuri0aWIRplQTBLAIG5wayY+/hfE+AbDPpHCpkCCIGcqKtuq+G+DtU/BX/teV5fIjh/gppV3VZ0ke50fL8zQqaGKt5TN0ccbFgfYZ68VX5JZyohNYovOQPTFF2QiOyUVh4macFfuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KXfZzjQ1; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=YospqjKt; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777987937;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YKwv69+ZbjlA9yYfwrMMQoESYnCKOjctNrQItlrYybQ=;
+	b=KXfZzjQ1Pg8SyvU1RTjNJwIQWDQzV0/Zu4sN7+Ehe3xIHpLCp7jDUR5F4od4JJTgfbh2/3
+	KNO1QNno1cZryfMQ4jMRyzesVSR7hn1b75XLtHauQWixtcVNjvCxa8JHLabVEfEHjofbez
+	nHqtkwhub4m8zPTwZTVbPLAc4qOjHfo=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-375-C2bEU8gIN6OD_1xPWuVUaA-1; Tue, 05 May 2026 09:32:13 -0400
+X-MC-Unique: C2bEU8gIN6OD_1xPWuVUaA-1
+X-Mimecast-MFC-AGG-ID: C2bEU8gIN6OD_1xPWuVUaA_1777987933
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-48a9592f666so23477045e9.1
+        for <netdev@vger.kernel.org>; Tue, 05 May 2026 06:32:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1777987656; x=1778592456; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lraFz6oBhP7MmXTOPo6oBPAEVJFopwF4+HMSlIJwUjg=;
-        b=EOznjxZjTkWhcFqAP+iKuD8RXYBKGEVi3PG5UCauKz+BYjcyytRhCnD+MSR6Zf3cDd
-         Bfoz1AHDgwUiyKara4RCTNZMOoE03SkkIFS6ZeTzEAFwzkc3cjdXaxW3YQf+VYoiqv6K
-         CURS9IdI9qbCyDpxFn74UM31m60vTGrYwTke+eUSuasjpTuhoiut4JEexFcMAVMG3r3L
-         oAxPhxbc1qvPfx7Fo9D3XZ1CX4CDIiEEmVFYd5Q91boaLtsBTaU9b32SwtP+U6bJRATn
-         ljIYdmBKJEcZ5yKA2+EYwOTorhcN0s6HH8uVHKDtJ7Y8jjzNva5vG4oHecnuM2N3RinO
-         M7qw==
+        d=redhat.com; s=google; t=1777987932; x=1778592732; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YKwv69+ZbjlA9yYfwrMMQoESYnCKOjctNrQItlrYybQ=;
+        b=YospqjKtBoSuN8XM6UboXywz5TnUJtC+tg8PyBxGViW2pAKrMAqoHiLuLfJ0tyM2E4
+         6bASS1/1k99IJAsKdMfoUqIUKfjHMAR/XjAA+UBW5VFY3T2nAW54RIvq5q4gJnDfYA7r
+         oTHANx8lEpdSoMeDWOtA+DxLIdwViCluMiRpZr3aQsgdXN4ls4SOADsC2OyWyyoFRgPY
+         aQijhu0EYhGpStfL6qo3H7MkFzF2pCkmcaFFBpPuaeDWnfy4RiSJM5nnLbOeZkTMPFSR
+         LKc8vzsSu5YQN9U/4FW70bFp4wfaJCOEf0qalgapJiAe/CPvFgPLQj8oQKzGgFyuB+dG
+         dpng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777987656; x=1778592456;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lraFz6oBhP7MmXTOPo6oBPAEVJFopwF4+HMSlIJwUjg=;
-        b=B4mUxFs5B/npYgqqPbDy1bJDYBpQYEvuXSFF45hIc2bpyrqPz5XTWwLMguOEKI61yF
-         T/pYQE/YgLFxsATMPRTeDJANp3/Ot5IHai6DFWQLtr8O3M+fkkOLwlwjuaNONWAZXnxD
-         iM1DmSzQJ++hfbtGcjYBXGYCrpEn5Mc4dk6Hs7/NqLs54wa30pShy14bwlMyzaVTQxBj
-         9xn1ibAI/lKSGyR7vassTi5FWGMssstq7Nuk/YJzI2Y367bNK6cTOytpUcCZZqkRIrr4
-         CxbUGVBtDz0vzhKQQT10c7ICtKXjpEPRWp61DzKc68eycv7S0ZhPI1Pozf1vH8Qo+DW5
-         vq0Q==
-X-Gm-Message-State: AOJu0YyHO2RxxyXnni1tM4jCeoEcjLx5Coly72A697hlWnbgRW0RQll5
-	vdwhV0DrMJ8X+DpNV8SByxLl2Px+krUSQu/q8V2SyI42KEiMRo9Fpzn/aGUCzRgvGzE=
-X-Gm-Gg: AeBDiev0DZ3hclIyl58ZukJNdWZMVbSy5iwAtu315f2dMByYfVXWn95CYActTEhrMKu
-	VVrd8IGjAnyiSeG35jkUaHTub9Kjz1r0mEQ45XUhtcyAObKxyf08e9rDYLzKfxlPssUsSr1vgaz
-	G8ksF2Sq3qStxKWNuoGnCZ+rcMOFoz/G9P/1zc6Dwom7BjJXl4xWkzV7p/fULILHewX8WCKPn8A
-	gERuLgSOOTgK8R+wgRtAxe2Z1JqhSfpJS1P4bsgb0P2ErVYat7D6uXjnw2yZAyIckaXv+DvWzNm
-	EW6Trk5StfwkgwulopNJq4YAwsyCLqvqedyRBjLOpKo2QSOCfp9DMfQx1FtuoPhrGXwAvavwtjh
-	7pK7YQxu+rchXH8WK7ksmloHkjPQofxnPKxYymj7X5DeUH4D78y7A0m+f1rUnuo43UuRENxS4e2
-	bqVHciMOcmeSIy1/9PZDDYGFjhG4K433ByszvRQkyhoooc1RXs+/GlPkCSSapAdAbAhstfkm3R+
-	beN9CQryNCfZwkcpg==
-X-Received: by 2002:a05:6000:18a5:b0:449:c5e2:a8b7 with SMTP id ffacd0b85a97d-450060571bemr5745163f8f.30.1777987656056;
-        Tue, 05 May 2026 06:27:36 -0700 (PDT)
-Received: from localhost (host-79-47-155-212.retail.telecomitalia.it. [79.47.155.212])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45055960022sm4650340f8f.26.2026.05.05.06.27.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 May 2026 06:27:35 -0700 (PDT)
-From: Andrea della Porta <andrea.porta@suse.com>
-X-Google-Original-From: Andrea della Porta <aporta@suse.de>
-Date: Tue, 5 May 2026 15:30:51 +0200
-To: Lukasz Raczylo <lukasz@raczylo.com>
-Cc: netdev@vger.kernel.org, Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-rpi-kernel@lists.infradead.org
-Subject: Re: [RFC PATCH net-next 3/3] net: macb: add TX stall watchdog as
- defence-in-depth safety net
-Message-ID: <afnxC-Lk5LELsm42@apocalypse>
-References: <cover.1777064117.git.lukasz@raczylo.com>
- <c0469642f42ada85d91a8a685eb7c0e04cb99131.1777064117.git.lukasz@raczylo.com>
+        d=1e100.net; s=20251104; t=1777987932; x=1778592732;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YKwv69+ZbjlA9yYfwrMMQoESYnCKOjctNrQItlrYybQ=;
+        b=Klx3oKvW8FA1EXH2dPkP9M3+kYAz40J+/6uWBB6fCbbwfQhEKzX20pK/mSKjlty1Im
+         5qwzeOd1GlAVYS/i80HYRFvOJMssokji3CULSyWiWcIFiqlp1jwLqNMHmJCTfnX0pFd2
+         Gxi5+vTsZdy8K3g5mvUx7wl8RaD4bSwla09oz5rDKJ74W1XqtStMCF/Ln0FUSBPE/3g1
+         rEmZ+j1uCU2ZMglBXIUlYKz+VzKmDjZ2o1+tvh+jI8p+j04G9DSkOPsqkQY7AXBn6rxa
+         VZPrjCELT+DgWU831O84Pf8StfnbHmcFlPaVmsCpxD8Wcyh+GsVw3loSFRqxDhacYA3p
+         3czw==
+X-Forwarded-Encrypted: i=1; AFNElJ86ksm9Kt5CgrtuDFjz2owrcZKdVQLLbgiTCum8kxJ+8Gru/61MAH9TyxSujY3mNQjlYra5hHE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5NJvtJ/YZkesV5GngSLAjR7l9x1BVGK3kuIBh3NFwx78vj0/s
+	IFmAGGQprsZsELuEFHSeyDsWGOEya7jbvg5MlEo1W4VcEuxRus0JMQzFEYxotxBFOCzsW3ErKwf
+	WVmUL2hFxvp8O/IBohUEFp2ztlfG3dlMmGgZQKyrIND/0JRLINlWbowtM1Q==
+X-Gm-Gg: AeBDiev4WreNWEL+YjX6NADj6UnU/GyHQLVIUKVeTuglq6HPA+PGV2voAW8TFTAp/qL
+	bKC+ItdhW0ilpvGwDAAi/VFimhctVFShB5SMeM0q7MLhNkj25GKa2yKS854dn91kwWDA2VHMTcu
+	cgojFhokUMtHs71hcOvy3M5zSWZ3+9Uh2xlzFTHqz2XoeKVOmjd8D/5hBAgvdwzk5w2zaBz6sJ6
+	mTBoVLB1AR6/KkzqLXUeslezub07Qp5i4EQePOk3hp65HUE8oKvjaJ1zbXC+vlm7NXLr6N9/lII
+	LrHRcEGrtFegZtwfcjZA6j99sKz1ZtikfeTedpfb0SUo7yN4mLtEhq5Q3ydsS5y/gHrCDEz74xu
+	KKClJ7PTSFxCIoMT0ljguraH4ZfoHE07QFhiAuqXpdmREL/GOvSk4h5cpOCOYJUAk14E=
+X-Received: by 2002:a05:600c:4e04:b0:48a:906a:9050 with SMTP id 5b1f17b1804b1-48a98638cebmr245847125e9.10.1777987932493;
+        Tue, 05 May 2026 06:32:12 -0700 (PDT)
+X-Received: by 2002:a05:600c:4e04:b0:48a:906a:9050 with SMTP id 5b1f17b1804b1-48a98638cebmr245846325e9.10.1777987931898;
+        Tue, 05 May 2026 06:32:11 -0700 (PDT)
+Received: from [192.168.88.32] ([212.105.155.47])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a82301ad1sm628732505e9.9.2026.05.05.06.32.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 May 2026 06:32:11 -0700 (PDT)
+Message-ID: <673288e7-37ac-4533-a4d3-2fa87dc282f1@redhat.com>
+Date: Tue, 5 May 2026 15:32:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c0469642f42ada85d91a8a685eb7c0e04cb99131.1777064117.git.lukasz@raczylo.com>
-X-Rspamd-Queue-Id: 902B84CE8F0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/1] net/rds: handle zerocopy send cleanup before the
+ message is queued
+To: Allison Henderson <achender@kernel.org>, linux-rdma@vger.kernel.org,
+ rds-devel@oss.oracle.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ horms@kernel.org, santosh.shilimkar@oracle.com, sowmini.varadhan@oracle.com,
+ willemb@google.com, yuantan098@gmail.com, yifanwucs@gmail.com,
+ tomapufckgml@gmail.com, bird@lzu.edu.cn, lx24@stu.ynu.edu.cn,
+ tonanli66@gmail.com, Ren Wei <n05ec@lzu.edu.cn>, netdev@vger.kernel.org
+References: <cover.1777550074.git.tonanli66@gmail.com>
+ <d2ea98a6313d5467bac00f7c9fef8c7acddb9258.1777550074.git.tonanli66@gmail.com>
+ <87f79bc7483aa1a7b3a44718b62a5cd5bd016f8c.camel@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <87f79bc7483aa1a7b3a44718b62a5cd5bd016f8c.camel@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 751734CEA9A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [3.34 / 15.00];
+	SEM_URIBL(3.50)[ynu.edu.cn:email];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,oracle.com,gmail.com,lzu.edu.cn,stu.ynu.edu.cn,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-284417-lists,netdev=lfdr.de];
+	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284414-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	R_DKIM_ALLOW(0.00)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrea.porta@suse.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[suse.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,suse.com:dkim,raczylo.com:email,launchpad.net:url]
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	NEURAL_SPAM(0.00)[0.661];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lzu.edu.cn:email]
 
-Hi Lukasz,
+On 5/1/26 9:40 PM, Allison Henderson wrote:
+> On Fri, 2026-05-01 at 09:08 +0800, Ren Wei wrote:
+>> From: Nan Li <tonanli66@gmail.com>
+>>
+>> A zerocopy send can fail after user pages have been pinned but before
+>> the message is attached to the sending socket.
+>>
+>> The purge path currently infers zerocopy state from rm->m_rs, so an
+>> unqueued message can be cleaned up as if it owned normal payload pages.
+>> However, zerocopy ownership is really determined by the presence of
+>> op_mmp_znotifier, regardless of whether the message has reached the
+>> socket queue.
+>>
+>> Capture op_mmp_znotifier up front in rds_message_purge() and use it as
+>> the cleanup discriminator. If the message is already associated with a
+>> socket, keep the existing completion path. Otherwise, drop the pinned
+>> page accounting directly and release the notifier before putting the
+>> payload pages.
+>>
+>> This keeps early send failure cleanup consistent with the zerocopy
+>> lifetime rules without changing the normal queued completion path.
+>>
+>> Fixes: 0cebaccef3ac ("rds: zerocopy Tx support.")
+>> Cc: stable@kernel.org
+>> Reported-by: Yuan Tan <yuantan098@gmail.com>
+>> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+>> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+>> Reported-by: Xin Liu <bird@lzu.edu.cn>
+>> Co-developed-by: Xiao Liu <lx24@stu.ynu.edu.cn>
+>> Signed-off-by: Xiao Liu <lx24@stu.ynu.edu.cn>
+>> Signed-off-by: Nan Li <tonanli66@gmail.com>
+>> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> 
+> This fix looks fine to me.  Thanks Ren Wei!
+> Reviewed-by: Allison Henderson <achender@kernel.org>
 
-On 23:38 Fri 24 Apr     , Lukasz Raczylo wrote:
-> Patches 1/3 and 2/3 address two candidate races that could lead
-> to a TCOMP completion being missed on PCIe-attached macb
-> instances.  This patch adds a defence-in-depth safety net, in
-> case a further race remains that we have not identified.
-> 
-> The watchdog is a per-queue delayed_work that runs once per
-> second.  It snapshots queue->tx_tail; if the ring is non-empty
-> (queue->tx_head != queue->tx_tail) and tx_tail has not advanced
-> since the previous tick, it calls macb_tx_restart().
-> 
-> No new recovery logic is introduced.  macb_tx_restart() already
-> exists in this file, is correctly locked (tx_ptr_lock, bp->lock),
-> and verifies that the hardware's TBQP is behind the driver's
-> head index before re-asserting TSTART.  On a healthy ring it is
-> a no-op at the hardware level; the watchdog only supplies the
-> missing trigger.
-> 
-> On a healthy queue the per-tick cost is one spin_lock_irqsave()
-> / spin_unlock_irqrestore() and one branch.  The delayed_work is
-> only scheduled between macb_open() and macb_close(), and is
-> cancelled synchronously on close.
-> 
-> Context for submission: on our 24-node Raspberry Pi 5 fleet,
-> before this series, an out-of-band user-space watchdog
-> (monitoring tx_packets from /sys/class/net/.../statistics and
-> toggling the link down/up when it froze) was required to keep
-> nodes usable.  We include this kernel-side watchdog as a cleaner
-> in-kernel equivalent for any residual stall that patches 1 and
-> 2 do not cover.  We are willing to drop this patch if the view
-> is that 1 and 2 should stand alone.
-> 
-> Link: https://github.com/cilium/cilium/issues/43198
-> Link: https://bugs.launchpad.net/ubuntu/+source/linux-raspi/+bug/2133877
-> Signed-off-by: Lukasz Raczylo <lukasz@raczylo.com>
-> ---
->  drivers/net/ethernet/cadence/macb.h      |  5 ++
->  drivers/net/ethernet/cadence/macb_main.c | 59 ++++++++++++++++++++++++
->  2 files changed, 64 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-> index 2de56017e..9115f2b47 100644
-> --- a/drivers/net/ethernet/cadence/macb.h
-> +++ b/drivers/net/ethernet/cadence/macb.h
-> @@ -1278,6 +1278,11 @@ struct macb_queue {
->  	dma_addr_t		tx_ring_dma;
->  	struct work_struct	tx_error_task;
->  	bool			txubr_pending;
-> +
-> +	/* TX stall watchdog -- see macb_tx_stall_watchdog() in macb_main.c */
-> +	struct delayed_work	tx_stall_watchdog_work;
-> +	unsigned int		tx_stall_last_tail;
-> +
->  	struct napi_struct	napi_tx;
->  
->  	dma_addr_t		rx_ring_dma;
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index ea231b1c5..ea2306ef7 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -2002,6 +2002,59 @@ static int macb_tx_poll(struct napi_struct *napi, int budget)
->  	return work_done;
->  }
->  
-> +#define MACB_TX_STALL_INTERVAL_MS	1000
-> +
-> +/*
-> + * TX stall watchdog.
-> + *
-> + * Defence-in-depth against lost TCOMP interrupts.  macb already has a
-> + * recovery chain (tx_pending -> txubr_pending -> macb_tx_restart())
-> + * that fires on TCOMP; if TCOMP itself is lost the TX ring stalls
-> + * silently until something else kicks TSTART.  This watchdog runs
-> + * once per second per queue, snapshots tx_tail, and calls
-> + * macb_tx_restart() if the ring is non-empty and tx_tail has not
-> + * advanced since the previous tick.
-> + *
-> + * macb_tx_restart() already checks the hardware's TBQP against the
-> + * driver's head index before re-asserting TSTART, so on a healthy
-> + * ring this is a no-op at the hardware level.  The watchdog only
-> + * adds the missing trigger.
-> + */
-> +static void macb_tx_stall_watchdog(struct work_struct *work)
-> +{
-> +	struct macb_queue *queue = container_of(to_delayed_work(work),
-> +						struct macb_queue,
-> +						tx_stall_watchdog_work);
-> +	struct macb *bp = queue->bp;
-> +	unsigned int cur_tail, cur_head;
-> +	bool stalled = false;
-> +	unsigned long flags;
-> +
-> +	if (!netif_running(bp->dev))
-> +		return;
-> +
-> +	spin_lock_irqsave(&queue->tx_ptr_lock, flags);
-> +	cur_tail = queue->tx_tail;
-> +	cur_head = queue->tx_head;
-> +	if (cur_head != cur_tail &&
-> +	    cur_tail == queue->tx_stall_last_tail)
-> +		stalled = true;
-> +	else
-> +		queue->tx_stall_last_tail = cur_tail;
-> +	spin_unlock_irqrestore(&queue->tx_ptr_lock, flags);
-> +
-> +	if (stalled) {
-> +		netdev_warn_once(bp->dev,
-> +				 "TX stall detected on queue %u (tail=%u head=%u); re-kicking TSTART\n",
-> +				 (unsigned int)(queue - bp->queues),
-> +				 cur_tail, cur_head);
-> +		macb_tx_restart(queue);
-> +	}
-> +
-> +	schedule_delayed_work(&queue->tx_stall_watchdog_work,
-> +			      msecs_to_jiffies(MACB_TX_STALL_INTERVAL_MS));
-> +}
-> +
->  static void macb_hresp_error_task(struct work_struct *work)
->  {
->  	struct macb *bp = from_work(bp, work, hresp_err_bh_work);
-> @@ -3190,6 +3243,9 @@ static int macb_open(struct net_device *dev)
->  	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
->  		napi_enable(&queue->napi_rx);
->  		napi_enable(&queue->napi_tx);
-> +		queue->tx_stall_last_tail = queue->tx_tail;
-> +		schedule_delayed_work(&queue->tx_stall_watchdog_work,
-> +				      msecs_to_jiffies(MACB_TX_STALL_INTERVAL_MS));
->  	}
->  
->  	macb_init_hw(bp);
-> @@ -3240,6 +3296,7 @@ static int macb_close(struct net_device *dev)
->  	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
->  		napi_disable(&queue->napi_rx);
->  		napi_disable(&queue->napi_tx);
-> +		cancel_delayed_work_sync(&queue->tx_stall_watchdog_work);
->  		netdev_tx_reset_queue(netdev_get_tx_queue(dev, q));
->  	}
->  
-> @@ -4802,6 +4859,8 @@ static int macb_init_dflt(struct platform_device *pdev)
->  		}
->  
->  		INIT_WORK(&queue->tx_error_task, macb_tx_error_task);
-> +		INIT_DELAYED_WORK(&queue->tx_stall_watchdog_work,
-> +				  macb_tx_stall_watchdog);
->  		q++;
->  	}
->  
-> -- 
-> 2.53.0
->
+Note that sashiko spotted more pre-existing problems in this area,
+please have a look:
 
-I've applied all three patches to v6.19.10 changing netdev_warn_once() from this one to
-netdev_warn() and it the "TX stall" warning appears several time. So it seems that there
-could be another cause escaping the filtering in the first two patches.
+https://sashiko.dev/#/patchset/d2ea98a6313d5467bac00f7c9fef8c7acddb9258.1777550074.git.tonanli66%40gmail.com
 
-Interestingly enough, running the same tests after substituing the entire macb driver with
-the downstream version works ok.
+/P
 
-Not sure how to interpret these results since they seem to be the opposite of yours.
-More investigation is ongoing from my side.
-
-Thanks,
-Andrea
 
