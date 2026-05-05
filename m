@@ -1,255 +1,161 @@
-Return-Path: <netdev+bounces-284241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284242-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YHEDMGqb+Wkn+QIAu9opvQ
-	(envelope-from <netdev+bounces-284241-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 09:25:30 +0200
+	id hyVlHSKd+Wlh+QIAu9opvQ
+	(envelope-from <netdev+bounces-284242-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 09:32:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 382D74C7DDD
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 09:25:30 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54D804C7FF7
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 09:32:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5C503307FDFE
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 07:20:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DA36830208FC
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 07:31:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28D2E3DC4B3;
-	Tue,  5 May 2026 07:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D36883DF000;
+	Tue,  5 May 2026 07:30:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pvzcBau9"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ZYA4QJ/d";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="l/9e7/D3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E5243DC4CB
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 07:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8323A42846D;
+	Tue,  5 May 2026 07:30:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777965629; cv=none; b=IdKpJbnM44Mi6ll2ZjbSCUw5iGsJ1hYd597rahdXh60qIGChHHIl72xNH2qLFf00AfNQNZrUvkjvvc0OSCQP4JWIi7FL3IH81FrQuMUYl68xi+gGH/b5J+/tlSzcL0xw6A1Igaqyx8j4hVxY387TH9kR0UWQWeKJpVKWE/3CVlU=
+	t=1777966201; cv=none; b=HyPrn5V+uN1ZN61gdf8+xww+gD14PcTHKoDBduQGxiNPrBKMZq015DcRVQ0YmmD1hbM+EU18pmW0sJWJ7zRul/RBEL3MF3ctAGj/WbHduzWDNkm4Ls1/WmxRMVVqy2XhCgb3fXb8Bj2EffQ23Pb022/j1nPFnYDrUrJfzh33Ry4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777965629; c=relaxed/simple;
-	bh=CWPXKjsjnzf2MJSXTZixtgVN37D9acgZ3iGAC6v+QiQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Bzm/3/2OsSrUa0QptGeEX7tfRY9JemhCUz9nf3ksnqSXrdUMGaDhCsdGJ/zVuMaB+N9AA3kjItw4nmAs3fgxcddbCQM9vYCNeVv06NllfkfFUc7xxg7pkzObNiZ/CchFpE2Q134u3JIeELRC8FsPGl6UYJ7Wp3FoHWm0Px0+LqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pvzcBau9; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-836ed29d1e5so825615b3a.2
-        for <netdev@vger.kernel.org>; Tue, 05 May 2026 00:20:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777965627; x=1778570427; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7yqj3j5E+sxGL3D0rj/RO5rzFrYw+YF42d/8r6R+oyY=;
-        b=pvzcBau9NYr51G6D0Z7v2/CUW2wh53Fja+bcvZWWUOM+P+xpJWjSBcRL3lNb5MwC3l
-         PgzwI3Vudijfme3xbecJVeixa2cW+JJpjKyaZEX4mJ3R24s9QSyieLJ2hOfN34MRgqnU
-         xyre9GcspC0FG9Ml4wozmaWfM9exFykOZPcFUA6l93dpE2Eu4mGyc2eYF1sYvXDjg81B
-         v0+c+EgcMvFZ4/89slGacydSWhZ/GuERtd59M8PxhWW5NhYrzUdVv/J76i4brHi+1yvZ
-         0B2TOrQ7Beo+95o7EVxVSCiPH7njv2LZ2r25vblJ4Rb+pZCAz8zOkSmozJq4fWZ+DVUW
-         bXlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777965627; x=1778570427;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7yqj3j5E+sxGL3D0rj/RO5rzFrYw+YF42d/8r6R+oyY=;
-        b=R4+Bx3kyxlilQ/pjst126MLmCZ0an5mAlI+o54GVxA6WIeG+PJvNlDCaofAnm0XsrS
-         q7chKqJCGOw1icpyG+7WOQst/tWrzoZylhGQS60rByI0B4uBFqxOqOU41oALItAS9Ss9
-         oV2A+K4t8CoyFly2Tg6xn3AW4W3YfINu8L3lrysXug4aPEZ4WwGhJ97n35qibMw26U0T
-         LvuLPHesUwqycAK8vG8jZHcMr+dPhfKE2Jz8jk78MOWeMLGnyZN5Skpv9+cG+A27cpKH
-         96I0WV7+JfBWvk66drzkEsWjNvC9F6olFar5wUXkCs6Boj7iWhw8QYvvpRv2mc4FQKkE
-         8Czg==
-X-Forwarded-Encrypted: i=1; AFNElJ+TSdmFq9aTQ/fgk698emf+gW7RmCdrk98UGleP7dIL3mM2dmWLYFymliWMiM0bQ5B/h9U/09U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlaFZ1Z8IsNzXTKQAOhEcNtCeiRr1M9uR5y8b3pF55k1fsARan
-	04Bl09o7fmK1kbrj+z0cJmfHbcfiPHo9DEAIk+Q8xv/EA2xApMnRFV8K
-X-Gm-Gg: AeBDieuOahBQq59u7Ifc3X3Z1gXT3HI/CsKlStQu0flqVJcm9pvlxHf9cROdeb3gmIA
-	33jhHXSH/TRcorwirKqy2rcr1frPAPm1WX4hZGLL4oEo/Wu5gMknOBFIbdghCTkA+wMkBC1RzX5
-	4fEUhZT59Y1hFPcMar6kLwLx2QmGFrNV0yn5AxMWzFO8jiH/1/79zc8WBt26TA1n9dNCojRlBhe
-	d64pv9oJvoTWFHDt4uCl+Zrez6v1TFkjW4d0RBe2EZWCuL45STyYPAeX08LBUBQ3KaUcDhvEDRV
-	jzig+RKnH21emqFJoAA+c6Ue4anUaygk/nM5lwELd1I9ZiYfqQuYrozibrvAdraBRjOwcmugIYn
-	zwgB3tzjT9lFvJ6XEsiFJ7sfArNc/LfBjf4zeJ2m/PHATdJXigZVeAExCn5dWitxff4rjexMIN4
-	c9TKt8VdgfRe9QpdHSjucAnAv8hwlW82eS0J6Xob6EAtxqWhQ8m/J9TtdaSxM=
-X-Received: by 2002:aa7:88d2:0:b0:838:127d:a16e with SMTP id d2e1a72fcca58-839228cb3afmr1943221b3a.17.1777965626775;
-        Tue, 05 May 2026 00:20:26 -0700 (PDT)
-Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-839682a4bffsm1036227b3a.56.2026.05.05.00.20.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 May 2026 00:20:26 -0700 (PDT)
-From: Maoyi Xie <maoyixie.tju@gmail.com>
-X-Google-Original-From: Maoyi Xie <maoyi.xie@ntu.edu.sg>
-To: "David S . Miller" <davem@davemloft.net>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-	Willem de Bruijn <willemb@google.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net v7 2/2] ipv6: flowlabel: enforce per-netns limit for unprivileged callers
-Date: Tue,  5 May 2026 15:20:15 +0800
-Message-Id: <20260505072015.1672730-3-maoyi.xie@ntu.edu.sg>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260505072015.1672730-1-maoyi.xie@ntu.edu.sg>
-References: <20260505072015.1672730-1-maoyi.xie@ntu.edu.sg>
+	s=arc-20240116; t=1777966201; c=relaxed/simple;
+	bh=Mnc2hoZLvbm/kNdSaAVvsiO0Tsn8OPrfgghIMf1EpDs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f5SeDr846+gBDRO2fwJ6zNXlgMN/c5dV/i5h9HQ7SOdk5OwFEFhcKXUWFYqWKO69oz0m/ZIS1ttfxsO52COn9XOK0KM0waXhcRrNnUbCJAPtzHmIMxhpiTRaLTTkOXGsyryS0k0sen4HwfSkWfCzAN/laxcvhbodyfZAepxZFBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ZYA4QJ/d; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=l/9e7/D3; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Tue, 5 May 2026 09:29:54 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1777966196;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NpK8AnewU1uPLgOLGs+f2bK9sMEbV9YbuGWB3e9BzzQ=;
+	b=ZYA4QJ/d9RaDABQAXTVHP2rWxRrA78/EvZfkbFjDz1xldsoY6Q+cx2prC7cljm79yLNU+N
+	dcwQZEVOUUukz95gz1V2w4qJLTnloAq6LRWFWW8ENMKyH39HKAq2dkiCoj3/9VKE1Y8af/
+	m6GZ5LE8OfY5xKEh/6i4AnXCX4j51DeR2qfOKlapdsKd6IvkY/K1QY6msru2RiiNRXBFBl
+	2YmeLHDBNxZPh8ovpcRHNgPEzVhnoKY+gaDD0GgpfTrjKwtqN6LAB1ZUJ/jzPBspkos5Nl
+	iDxAhhKSuF+x5OAsWdT993416JO2MySHUNArTRNCYztIVgBfIKNTTYfaSwshIg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1777966196;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NpK8AnewU1uPLgOLGs+f2bK9sMEbV9YbuGWB3e9BzzQ=;
+	b=l/9e7/D3XSDs2ZSbClUOAvy+HxGzybciopnuvaiccu4xmbmGIK/9KoSIFH4nqTJWMMODTk
+	CtI8cEVD+vdAM6AA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: "Maciej W. Rozycki" <macro@orcam.me.uk>
+Cc: netdev@vger.kernel.org, linux-mips@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2] declance: Remove IRQF_ONESHOT
+Message-ID: <20260505072954.Ov2t-FGt@linutronix.de>
+References: <20260127135334.qUEaYP9G@linutronix.de>
+ <alpine.DEB.2.21.2601271508160.40317@angie.orcam.me.uk>
+ <20260127165430.7ui_LGkg@linutronix.de>
+ <alpine.DEB.2.21.2601271739250.40317@angie.orcam.me.uk>
+ <alpine.DEB.2.21.2603292037020.60268@angie.orcam.me.uk>
+ <alpine.DEB.2.21.2605042332070.46195@angie.orcam.me.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 382D74C7DDD
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <alpine.DEB.2.21.2605042332070.46195@angie.orcam.me.uk>
+X-Rspamd-Queue-Id: 54D804C7FF7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284241-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	TAGGED_FROM(0.00)[bounces-284242-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,redhat.com,google.com,ms2.inr.ac.ru,gmail.com,vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.995];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ntu.edu.sg:mid,ntu.edu.sg:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[]
 
-fl_size, fl_ht and ip6_fl_lock in net/ipv6/ip6_flowlabel.c are
-file scope and shared across netns. mem_check() reads fl_size to
-decide whether to deny non-CAP_NET_ADMIN callers. capable() runs
-against init_user_ns, so an unprivileged user in any non-init
-userns can push fl_size past FL_MAX_SIZE - FL_MAX_SIZE / 4 and
-starve every other unprivileged userns on the host.
+On 2026-05-04 23:35:42 [+0100], Maciej W. Rozycki wrote:
+> On Sun, 29 Mar 2026, Maciej W. Rozycki wrote:
+> 
+> >  I've now got back to it and while preparing the justification for the 
+> > removal of the IRQF_ONESHOT recommendation and having looked through 
+> > Documentation/core-api/real-time/differences.rst I became stumped and 
+> > need a further clarification after all.
+> > 
+> >  I read in the document that:
+> > 
+> > "However, on a PREEMPT_RT system, interrupts are forced-threaded and no 
+> > longer run in hard IRQ context."
+> > 
+> > and:
+> > 
+> > "All interrupts are forced-threaded in a PREEMPT_RT system. The exceptions 
+> > are interrupts that are requested with the IRQF_NO_THREAD, IRQF_PERCPU, or 
+> > IRQF_ONESHOT flags."
+> > 
+> > -- do I infer correctly that on a PREEMPT_RT system in the absence of any 
+> > flags passed to request_irq() the handler requested such as one concerned 
+> > here (i.e. lance_dma_merr_int()) will run with interrupts locally enabled 
+> > on the CPU?
+> 
+>  No reply, but I've gone through irq_setup_forced_threading() now and my 
+> inference was indeed correct, and the handler does need to be installed 
+> with IRQF_NO_THREAD.  I'll send corrective patches shortly.
 
-Add struct netns_ipv6::flowlabel_count, bumped and decremented
-next to fl_size in fl_intern, ip6_fl_gc and ip6_fl_purge. The new
-field fills the existing 4-byte hole after ipmr_seq, so struct
-netns_ipv6 stays the same size on 64-bit builds.
+Sorry. I missed that previous email.
+IRQF_NO_THREAD will not force-thread the interrupt handler so it will
+run with interrupts disabled.
 
-Bump FL_MAX_SIZE from 4096 to 8192. It has been 4096 since the
-file was added. Machines and connection counts have grown.
+With force-threading enabled, the interrupt handler is masked in the
+IRQ-chip until after the threaded-handler run. See the cond_unmask_irq()
+in handle_level_irq() or the mask_irq() & cond_unmask_eoi_irq() in
+handle_fasteoi_ack_irq(). That means the hw-IRQ is done, the thread is
+running with interrupts enabled but the hw-IRQ will not trigger again.
+The cited commit 5a4a4ad851dd8 ("MIPS: Mark cascade and low level
+interrupts IRQF_NO_THREAD") is different as it acts on cascading
+interrupts which is not what we have here.
 
-mem_check() folds an extra per-netns ceiling into the existing
-non-CAP_NET_ADMIN conditional. The ceiling is half of the total
-budget that unprivileged callers have ever been able to use, i.e.
-(FL_MAX_SIZE - FL_MAX_SIZE / 4) / 2 = 3072 entries. With
-FL_MAX_SIZE doubled, this preserves the original per-user reach
-of 3K (what an unprivileged caller could already obtain before
-this change), while forcing an attacker to spread allocations
-across at least two netns to exhaust the global non-CAP_NET_ADMIN
-budget.
+If you request a threaded interrupt you must either provide two handler
+and the primary must mask the interrupt so it does not fire again or you
+pass a flag such as IRQF_ONESHOT and which point the IRQ subsystem will
+mask the IRQ within the irqchip so it does not fire again.
 
-CAP_NET_ADMIN against init_user_ns still bypasses both caps.
+>   Maciej
 
-The previous patch took ip6_fl_lock across mem_check and
-fl_intern, so the new flowlabel_count read in mem_check and the
-new flowlabel_count++ in fl_intern run under the same critical
-section. flowlabel_count is therefore plain int, like fl_size.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Suggested-by: Willem de Bruijn <willemb@google.com>
-Cc: stable@vger.kernel.org # v5.15+
-Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
----
- include/net/netns/ipv6.h |  1 +
- net/ipv6/ip6_flowlabel.c | 14 +++++++++++---
- 2 files changed, 12 insertions(+), 3 deletions(-)
-
-diff --git a/include/net/netns/ipv6.h b/include/net/netns/ipv6.h
-index 499e42881..875916d60 100644
---- a/include/net/netns/ipv6.h
-+++ b/include/net/netns/ipv6.h
-@@ -119,6 +119,7 @@ struct netns_ipv6 {
- 	struct fib_notifier_ops	*notifier_ops;
- 	struct fib_notifier_ops	*ip6mr_notifier_ops;
- 	atomic_t		ipmr_seq;
-+	int			flowlabel_count;
- 	struct {
- 		struct hlist_head head;
- 		spinlock_t	lock;
-diff --git a/net/ipv6/ip6_flowlabel.c b/net/ipv6/ip6_flowlabel.c
-index 43b5e9ce9..e1b2460f9 100644
---- a/net/ipv6/ip6_flowlabel.c
-+++ b/net/ipv6/ip6_flowlabel.c
-@@ -36,7 +36,7 @@
- /* FL hash table */
- 
- #define FL_MAX_PER_SOCK	32
--#define FL_MAX_SIZE	4096
-+#define FL_MAX_SIZE	8192
- #define FL_HASH_MASK	255
- #define FL_HASH(l)	(ntohl(l)&FL_HASH_MASK)
- 
-@@ -162,8 +162,9 @@ static void ip6_fl_gc(struct timer_list *unused)
- 				ttd = fl->expires;
- 				if (time_after_eq(now, ttd)) {
- 					*flp = fl->next;
--					fl_free(fl);
- 					fl_size--;
-+					fl->fl_net->ipv6.flowlabel_count--;
-+					fl_free(fl);
- 					continue;
- 				}
- 				if (!sched || time_before(ttd, sched))
-@@ -197,6 +198,7 @@ static void __net_exit ip6_fl_purge(struct net *net)
- 				*flp = fl->next;
- 				fl_free(fl);
- 				fl_size--;
-+				net->ipv6.flowlabel_count--;
- 				continue;
- 			}
- 			flp = &fl->next;
-@@ -242,6 +244,7 @@ static struct ip6_flowlabel *fl_intern(struct net *net,
- 	fl->next = fl_ht[FL_HASH(fl->label)];
- 	rcu_assign_pointer(fl_ht[FL_HASH(fl->label)], fl);
- 	fl_size++;
-+	net->ipv6.flowlabel_count++;
- 	return NULL;
- }
- 
-@@ -459,6 +462,9 @@ fl_create(struct net *net, struct sock *sk, struct in6_flowlabel_req *freq,
- 
- static int mem_check(struct sock *sk)
- {
-+	const int unpriv_total_limit = FL_MAX_SIZE - (FL_MAX_SIZE / 4);
-+	const int unpriv_user_limit = unpriv_total_limit / 2;
-+	struct net *net = sock_net(sk);
- 	int room;
- 	struct ipv6_fl_socklist *sfl;
- 	int count = 0;
-@@ -477,7 +483,9 @@ static int mem_check(struct sock *sk)
- 
- 	if (room <= 0 ||
- 	    ((count >= FL_MAX_PER_SOCK ||
--	      (count > 0 && room < FL_MAX_SIZE/2) || room < FL_MAX_SIZE/4) &&
-+	      (count > 0 && room < FL_MAX_SIZE / 2) ||
-+	      room < FL_MAX_SIZE / 4 ||
-+	      net->ipv6.flowlabel_count >= unpriv_user_limit) &&
- 	     !capable(CAP_NET_ADMIN)))
- 		return -ENOBUFS;
- 
--- 
-2.34.1
-
+Sebastian
 
