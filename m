@@ -1,136 +1,125 @@
-Return-Path: <netdev+bounces-284357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284358-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mH2SDHvc+WkwEwMAu9opvQ
-	(envelope-from <netdev+bounces-284357-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 14:03:07 +0200
+	id aLvzJMvg+WlPEwMAu9opvQ
+	(envelope-from <netdev+bounces-284358-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 14:21:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1A1D4CD295
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 14:03:01 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B30E4CD59D
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 14:21:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 66A233021AC2
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 12:02:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 083CC30088B2
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 12:21:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D01F40B6DB;
-	Tue,  5 May 2026 12:02:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 728E9426D2B;
+	Tue,  5 May 2026 12:21:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tJbmWb5p"
 X-Original-To: netdev@vger.kernel.org
-Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16AD54266A8;
-	Tue,  5 May 2026 12:02:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.133.224.34
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5035F38E5C8
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 12:21:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777982547; cv=none; b=fy9eny7MXGK09NlOeNBRkNHNWAikymBoqkLWw/k+Bs3OlWxzqCs8Pyozg0azCgJabGGd6kgnhXvnK5dpnoqA0V45FdgcgXcn2xXO9/7olGeoXDA5n1YszQW9gJH8T3tskJ2ZQfpL1X5pe2ObccJbqqY5e+QVLPpIgALTF9/ZKLA=
+	t=1777983687; cv=none; b=clZn2jONJuWs+34EdPJGgJhGLAm7YwoXgw112hd39az3axLsoAscg7nu8Tp5Q4pXmCxYygB+zugjdwaQO6vGo2enJ8cpzE7R0ozH8sZan2gpZHOwgbfE8qZz+T+Yf3j+hKoBixTng0CtYDp1AMxogSmlCurlxK2fp25uZfgo458=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777982547; c=relaxed/simple;
-	bh=b/zIcom3hsUQ8kP/XBrUYbmMke5OJa2Y+fnt3KVZSnY=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=FNREKs2h790NaST13FLBWLhKfCAEupIjRdFE3GRKayDIDk596aCzmzJ47Nf1Bhd4U4VrpRE8fiwX1NEHy2JNCPmhpIqHp8wschSZgtme3F9YNxuPSjOhokNuqoH1NHxWHXXRdPksL8fddT5fwcfg0YDR56ClouXziLo4U9TwNEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=orcam.me.uk
-Received: by angie.orcam.me.uk (Postfix, from userid 500)
-	id 8515692009C; Tue,  5 May 2026 14:02:16 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by angie.orcam.me.uk (Postfix) with ESMTP id 7F18592009B;
-	Tue,  5 May 2026 13:02:16 +0100 (BST)
-Date: Tue, 5 May 2026 13:02:16 +0100 (BST)
-From: "Maciej W. Rozycki" <macro@orcam.me.uk>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-cc: netdev@vger.kernel.org, linux-mips@vger.kernel.org, 
-    Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2] declance: Remove IRQF_ONESHOT
-In-Reply-To: <20260505072954.Ov2t-FGt@linutronix.de>
-Message-ID: <alpine.DEB.2.21.2605051233210.46195@angie.orcam.me.uk>
-References: <20260127135334.qUEaYP9G@linutronix.de> <alpine.DEB.2.21.2601271508160.40317@angie.orcam.me.uk> <20260127165430.7ui_LGkg@linutronix.de> <alpine.DEB.2.21.2601271739250.40317@angie.orcam.me.uk> <alpine.DEB.2.21.2603292037020.60268@angie.orcam.me.uk>
- <alpine.DEB.2.21.2605042332070.46195@angie.orcam.me.uk> <20260505072954.Ov2t-FGt@linutronix.de>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+	s=arc-20240116; t=1777983687; c=relaxed/simple;
+	bh=6hSwkK1hVeHHOkr/8Je33iQCWFpHZmFOmGavBvYZ4gw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z0Wh2O9JMCJqPNtCqThybWODbY9Wg1q26qAnaAMShkoNCDH2L6IT7EyLfV1PBVoPgqOSqODuA3e96hh+dq0M2cL/DxrzybHnusMIX19IgaJwhdQpnjZk2Yt/+kKuAgadgTu7bIR0mVrudf3EfcO5CgkZWv1Qp5yzkSjs6F3cI5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tJbmWb5p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E460AC2BCFB
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 12:21:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777983686;
+	bh=6hSwkK1hVeHHOkr/8Je33iQCWFpHZmFOmGavBvYZ4gw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=tJbmWb5pBrJ9kVq5+baxVKvOUSmS27PLHuLviGByEsvSO4bHMLDYWlNQvXR0Vensp
+	 IE9dAnqYan6jVU4elgBkUAXZrIISUYUpwmejtrF6QbwJZMhBJF0bkeAQDq6HQ1s0bK
+	 F//hcI8j9fR9CS3SIXaoCaJ6afNKza/ly3v7oLPrW4770Vbrn8I8dHvjJkU3egAhnu
+	 DQ/2GdXxZ8S4p+RerlVpfMH9vK/669K22vJZP1sPmT7q1g6WTQy+XCgrvdJrRU6K3m
+	 JUS2Lad5H25fivYH8OZdhAfjsSAhvF8tgTy1/ZKDbv4xRX+Ro7WrFiQhOLmCiIflpX
+	 3cRIT7FwwLRdg==
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-59dea72099eso5297390e87.0
+        for <netdev@vger.kernel.org>; Tue, 05 May 2026 05:21:26 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ8bk8EosPG6ewI4MJqlTADkcvIflAELgtkWQlPcyfq9mTn5MhxcffnaOkaDIOQpp7RG+2pfBYI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyICz5pa3ZU0mLjhNM6Wh7FWQi3798FysPIGWexXkiTpY7CSWiP
+	ewv7TKKf4ro8EVMzRmWiEUN+xWT5xfsIQHMjwhBy/ZG25svh75jGDxvEJg9/tWKHsefnK8WtRL9
+	U0EE5E4646x4OoSNwsKLtE4JpC8YNPlo=
+X-Received: by 2002:a05:6512:2302:b0:5a8:65ce:e83a with SMTP id
+ 2adb3069b0e04-5a87f206564mr1341626e87.34.1777983685569; Tue, 05 May 2026
+ 05:21:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Rspamd-Queue-Id: B1A1D4CD295
+References: <20260503-realtek_forward-v2-0-d064e220b391@gmail.com> <20260503-realtek_forward-v2-1-d064e220b391@gmail.com>
+In-Reply-To: <20260503-realtek_forward-v2-1-d064e220b391@gmail.com>
+From: Linus Walleij <linusw@kernel.org>
+Date: Tue, 5 May 2026 14:21:13 +0200
+X-Gmail-Original-Message-ID: <CAD++jLkE7zUCZyJfnEsxcHF5TAa-ggQug8xqRygVFJ=oADbXxg@mail.gmail.com>
+X-Gm-Features: AVHnY4JVw5zQepvD73TQYk4486G0c3DGCb7V1d4QERhYyEC9XfVAH_gLihJbcCs
+Message-ID: <CAD++jLkE7zUCZyJfnEsxcHF5TAa-ggQug8xqRygVFJ=oADbXxg@mail.gmail.com>
+Subject: Re: [net-next PATCH v2 1/8] net: dsa: realtek: rtl8365mb: use ERR_PTR
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 0B30E4CD59D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284357-lists,netdev=lfdr.de];
-	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.7.a.0.0.1.0.0.e.9.0.c.3.0.0.6.2.asn6.rspamd.com:query timed out];
+	TAGGED_FROM(0.00)[bounces-284358-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[orcam.me.uk];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[macro@orcam.me.uk,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.858];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	R_DKIM_NA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,angie.orcam.me.uk:mid]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
 
-On Tue, 5 May 2026, Sebastian Andrzej Siewior wrote:
+On Sun, May 3, 2026 at 8:18=E2=80=AFAM Luiz Angelo Daros de Luca
+<luizluca@gmail.com> wrote:
 
-> >  No reply, but I've gone through irq_setup_forced_threading() now and my 
-> > inference was indeed correct, and the handler does need to be installed 
-> > with IRQF_NO_THREAD.  I'll send corrective patches shortly.
-> 
-> Sorry. I missed that previous email.
-> IRQF_NO_THREAD will not force-thread the interrupt handler so it will
-> run with interrupts disabled.
+> Convert numeric error codes into human-readable strings by
+> using %pe together with ERR_PTR() in dev_err() messages.
+>
+> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 
- That's one clear option I've identified and given that the handler 
-amounts to a printk() call it may well be the path of least resistance 
-solution.
+Reviewed-by: Linus Walleij <linusw@kernel.org>
 
-> With force-threading enabled, the interrupt handler is masked in the
-> IRQ-chip until after the threaded-handler run. See the cond_unmask_irq()
-> in handle_level_irq() or the mask_irq() & cond_unmask_eoi_irq() in
-> handle_fasteoi_ack_irq(). That means the hw-IRQ is done, the thread is
-> running with interrupts enabled but the hw-IRQ will not trigger again.
-> The cited commit 5a4a4ad851dd8 ("MIPS: Mark cascade and low level
-> interrupts IRQF_NO_THREAD") is different as it acts on cascading
-> interrupts which is not what we have here.
-
- Not with the current handle_fasteoi_irq() handler.
-
- And actually not with handle_fasteoi_ack_irq() either, which doesn't call 
-mask_irq() unless IRQF_ONESHOT has been requested (but ->irq_ack() could 
-be repurposed to do masking), however handle_fasteoi_mask_irq() seems a 
-matching candidate.  To use that handler the platform would have to select 
-IRQ_DOMAIN_HIERARCHY and IRQ_FASTEOI_HIERARCHY_HANDLERS, although none of 
-the stuff beyond just handle_fasteoi_mask_irq() appears relevant, so it 
-seems like a waste of memory.  Note that the handlers are much more recent 
-than the driver and back in the time IRQF_ONESHOT seemed a reasonable 
-approach.
-
- The handle_level_irq() handler is irrelevant, because we do need to issue 
-the EOI for deassertion.
-
-> If you request a threaded interrupt you must either provide two handler
-> and the primary must mask the interrupt so it does not fire again or you
-> pass a flag such as IRQF_ONESHOT and which point the IRQ subsystem will
-> mask the IRQ within the irqchip so it does not fire again.
-
- Well, yes, but you've just removed the flag from this driver, so either 
-the flag has to reinstated or the driver adjusted differently for the 
-threaded case to be handled correctly.
-
-  Maciej
+Yours,
+Linus Walleij
 
