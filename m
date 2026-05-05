@@ -1,220 +1,140 @@
-Return-Path: <netdev+bounces-284421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284422-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2EK3MtL1+WksFgMAu9opvQ
-	(envelope-from <netdev+bounces-284421-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 15:51:14 +0200
+	id mAmOAtv1+WksFgMAu9opvQ
+	(envelope-from <netdev+bounces-284422-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 15:51:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F2B84CED46
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 15:51:14 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75E544CED4D
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 15:51:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 22C1D300645A
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 13:44:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1D3F8305151C
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 13:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF1DC47D946;
-	Tue,  5 May 2026 13:44:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A9547ECD7;
+	Tue,  5 May 2026 13:50:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gF67CaYS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NXL0JWbK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC15B2E4257;
-	Tue,  5 May 2026 13:44:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C2C47ECCA;
+	Tue,  5 May 2026 13:50:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777988676; cv=none; b=HSXbCwDV0ZSZNcJXjHO+iahM5pKHuhvDtuixgBk1rAqq3KGo58aAQosduowBsumxrGlGqiutpebx1sVQx1UYda8xak4TJ1PEdylh6bimkOxkZshfOnSxCIuo/ljJ1g3RqNHMZTRvjx/yfIUSYk/p1hWiU8TDd27LnqVm3aEsRoE=
+	t=1777989055; cv=none; b=q5ckcImYP3/Q34ocv94J0MmDjzv5JgX2kkdjo0w3TIDD+3DYzH+rS1AhHqYYEr+dFNP8Skeog5/orkdoLxuN+EuVzjA3z/diV7QPEiAFc386JpZu3ifvH5qaMdsC1NQTZnJI422IrfpMALmbbpFmgRD5tkJ+yru9P/61MRJ+0Cg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777988676; c=relaxed/simple;
-	bh=A7dS5/876ollr6/HQZkXxu+8WFQ9pc0wzz5UdXRE8wY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s5lFKeNI0ymkchVhTANU52UXohqtAxdab2ZlNdxtMXAtWrRUFxo5t2viw90uraEejzR7nXJz53ppFgaZqewn9nqDwITvvfDL72tpOvX8sCadOnFR/KDqXSu/ajUg9rVMh6NkHpPnmlxZBfxzfaAjm9jyskx5xWXEhuZr/l7J+sE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gF67CaYS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC934C2BCB4;
-	Tue,  5 May 2026 13:44:35 +0000 (UTC)
+	s=arc-20240116; t=1777989055; c=relaxed/simple;
+	bh=dxSFC6cP0Ql4v7WRghtRbrO7p1KLq30hD6iB9ytHjPQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=dY+OWTkSaYYLp653vqnPIQZ/150HhCFrAGvcMJoA1VQlpIjaQApNNjTSq0X9Tn6e+OuVLLmoj4pJvYC67/PJelR5/VRM5teAwdLyED12ZdpE1O7CpD73+fcww3Qmh8ZEx0MqmyuhtPCFC8aYNg8ajDe2/P+uFKyqlsV2WS6AQKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NXL0JWbK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F434C2BCB4;
+	Tue,  5 May 2026 13:50:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777988676;
-	bh=A7dS5/876ollr6/HQZkXxu+8WFQ9pc0wzz5UdXRE8wY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gF67CaYSmcllcUMuR96x34F//N9Luw2NCMgkPGa+/4mZzOzK2cEpJjYgcFc/47+5r
-	 Kt5kYdk00K2fD2ltmBnCp1HrL9N4uS0aWieA4AeQDG10rpt65mYrHLq8VU1XADqPZS
-	 m1o+qBK+btQAVFUmhEj38cvl708bpqVWlmiIPBWDcYTMlbAkN/xLEWz4xbyg/nl93T
-	 HNgaaruzN5is6r0z7lgOXChRpZnI9QvdYG6TKy7aeYEzKWn6SKZBSl38mC/4b4NLQ2
-	 406InDwYarn9x5026nwNPPcr0r66jbrQ1269+tFwb9UyV7zGLBNdVhAMRUqfeqyn7B
-	 jq/uwETy5FB1w==
-Date: Tue, 5 May 2026 08:44:34 -0500
-From: Rob Herring <robh@kernel.org>
-To: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-Cc: Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 1/5] dt-bindings: net: add onsemi's
- TS2500/NCN26010 10BASE-T1S MACPHY
-Message-ID: <20260505134434.GA2493310-robh@kernel.org>
-References: <CY8PR02MB9249D083B637477C254F9B0583322@CY8PR02MB9249.namprd02.prod.outlook.com>
+	s=k20201202; t=1777989055;
+	bh=dxSFC6cP0Ql4v7WRghtRbrO7p1KLq30hD6iB9ytHjPQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=NXL0JWbKeHOB5TbZ2tOAhi+JilCacuR1QFeBKjxUqRNnC/uIeph7g79PAM4AliO8K
+	 sAGlKexet3Xnv9/76S9iihKk910A7vnsb2AEWXUMuiiPwtTrDnL8MXoIw1SNT6tifY
+	 eYkjlJxGYzGU0U26TTmP5A7aZehFEVwjjRNEyRNC+0RQTgidsv5x+wuesDZYoQXf6g
+	 Sd/0Efa0JjmRRUylynOCsqvLcFRixX8ut2U0ZYiyQbon+4ma/M9C41ABoYbO9Lxnue
+	 yGEYFnh+J1jP9V5hhqT73qVG1xG2uy4EElu52/piAYZ8hVh5B7i6DovLhvNgb2lDgn
+	 jErSlhgT6l1Yw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02D003930235;
+	Tue,  5 May 2026 13:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CY8PR02MB9249D083B637477C254F9B0583322@CY8PR02MB9249.namprd02.prod.outlook.com>
-X-Rspamd-Queue-Id: 7F2B84CED46
+Subject: Re: [PATCH net, v3] net: mana: Fix crash from unvalidated SHM offset
+ read from BAR0 during FLR
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177798900580.2064937.15974739888920715703.git-patchwork-notify@kernel.org>
+Date: Tue, 05 May 2026 13:50:05 +0000
+References: 
+ <afQUMClyjmBVfD+u@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+In-Reply-To: 
+ <afQUMClyjmBVfD+u@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, leon@kernel.org,
+ longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+ shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+ ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ stephen@networkplumber.org, jacob.e.keller@intel.com,
+ dipayanroy@microsoft.com, leitao@debian.org, kees@kernel.org,
+ john.fastabend@gmail.com, hawk@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, ast@kernel.org, sdf@fomichev.me, yury.norov@gmail.com
+X-Rspamd-Queue-Id: 75E544CED4D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [5.84 / 15.00];
-	SEM_URIBL(3.50)[0.0.0.0:email];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284421-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-284422-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	GREYLIST(0.00)[pass,body];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	R_DKIM_ALLOW(0.00)[kernel.org:s=k20201202];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[34];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.262];
-	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NO_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	R_SPF_ALLOW(0.00)[+ip4:172.232.135.74:c];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[devicetree.org:url,0.0.0.0:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,onsemi.com:url,onsemi.com:email]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On Fri, May 01, 2026 at 07:15:17PM +0000, Selvamani Rajagopal wrote:
-> Add YAML device tree binding for the onsemi NCN26010 and TS2500
-> IEEE 802.3cg compliant Ethernet transceiver devices.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Thu, 30 Apr 2026 19:47:12 -0700 you wrote:
+> During Function Level Reset recovery, the MANA driver reads
+> hardware BAR0 registers that may temporarily contain garbage values.
+> The SHM (Shared Memory) offset read from GDMA_REG_SHM_OFFSET is used
+> to compute gc->shm_base, which is later dereferenced via readl() in
+> mana_smc_poll_register(). If the hardware returns an unaligned or
+> out-of-range value, the driver must not blindly use it, as this would
+> propagate the hardware error into a kernel crash.
 > 
-> Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-> ---
->  .../bindings/net/onnn,ncn260xx.yaml           | 71 +++++++++++++++++++
->  1 file changed, 71 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/onnn,ncn260xx.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/onnn,ncn260xx.yaml b/Documentation/devicetree/bindings/net/onnn,ncn260xx.yaml
-> new file mode 100644
-> index 000000000..198cd7e9d
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/onnn,ncn260xx.yaml
-> @@ -0,0 +1,71 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/onnn,ncn260xx.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: onsemi NCN26010/TS2500 10BASE-T1S MACPHY Ethernet Controllers
-> +
-> +maintainers:
-> +  - Piergiorgio Beruto <Pier.Beruto@onsemi.com>
-> +  - Selva Rajagopal <Selvamani.Rajagopal@onsemi.com>
-> +
-> +description: |
-> +  The NCN26010 and TS2500 combine a Media Access Controller (MAC) and an
-> +  Ethernet PHY to enable 10BASE‑T1S networks. The Ethernet Media Access
-> +  Controller (MAC) module implements a 10 Mbps half duplex Ethernet MAC,
-> +  compatible with the IEEE 802.3 standard and a 10BASE-T1S physical layer
-> +  transceiver integrated into the NCN26010. The communication between
-> +  the host and the MAC-PHY is specified in the OPEN Alliance 10BASE-T1x
-> +  MACPHY Serial Interface (TC6).
-> +
-> +  Specifications about the NCN26010 can be found at:
-> +    https://www.onsemi.com/download/data-sheet/pdf/ncn26010-d.pdf
-> +    https://www.onsemi.com/products/interfaces/ethernet-controllers/t30hm1ts2500
-> +
-> +allOf:
-> +  - $ref: /schemas/net/ethernet-controller.yaml#
-> +  - $ref: /schemas/spi/spi-peripheral-props.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    const: onnn,ncn260xx
+> [...]
 
-Don't use wildcards in compatible strings.
+Here is the summary with links:
+  - [net,v3] net: mana: Fix crash from unvalidated SHM offset read from BAR0 during FLR
+    https://git.kernel.org/netdev/net/c/95084f1883a7
 
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  interrupts:
-> +    description: |
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Don't need '|'.
 
-> +      Interrupt from MAC-PHY asserted in the event of Receive Chunks
-> +      Available, Transmit Chunk Credits Available and Extended Status
-> +      Event.
-> +    maxItems: 1
-> +
-> +  spi-max-frequency:
-> +    minimum: 15000000
-
-A minimum is strange. What if you have a board issue requiring lower 
-frequency?
-
-> +    maximum: 25000000
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - interrupts
-> +  - spi-max-frequency
-
-Normally this is not required. It's only for boards which can't operate 
-at the maximum frequency of the device.
-
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    spi {
-> +      #address-cells = <1>;
-> +      #size-cells = <0>;
-> +
-> +      ethernet@0 {
-> +        compatible = "onnn,ncn260xx";
-> +        reg = <0>;
-> +        pinctrl-names = "default";
-> +        interrupt-parent = <&gpio>;
-> +        interrupts = <25 2>;
-> +        status = "okay";
-
-Drop. Examples are always enabled.
-
-> +        spi-max-frequency = <25000000>;
-> +      };
-> +    };
-> --
-> 2.43.0
-> 
-> 
-> Public Information
 
