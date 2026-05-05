@@ -1,144 +1,159 @@
-Return-Path: <netdev+bounces-284226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284227-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wwYRGQeC+Wkw9QIAu9opvQ
-	(envelope-from <netdev+bounces-284226-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 07:37:11 +0200
+	id 0b0JGkaD+WlN9QIAu9opvQ
+	(envelope-from <netdev+bounces-284227-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 07:42:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7AC64C6EDA
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 07:37:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A371B4C6F1B
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 07:42:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 379B7300B9CA
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 05:37:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2A1403013496
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 05:42:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B62AD3B9DB3;
-	Tue,  5 May 2026 05:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 609863C1967;
+	Tue,  5 May 2026 05:42:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TMKGNkLX"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="h95Yi7OQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934BB3B2FCC
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 05:37:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596AB3B38BD;
+	Tue,  5 May 2026 05:42:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777959428; cv=none; b=ElKR8rqvq30hN7jsMKt39L6LhLIvGNGoJ0Cc8Z4f354OWTuewXjimJlrGo2q9M2XydS2rpC+9ZcyYbRtyw0YmpDxy8QO8W3rk83jipEM1ruVhnEap6NxCtSIzniEIq7DtYGztNX7AG2MMgFfQIQ1z72FbThBtHVfcj3L3dNdSWg=
+	t=1777959746; cv=none; b=UyOvQGs9K1yL/3yBsPTH7NmvpdyFMptXD+Q22gU8zh1JGXrAF+FBe8w8dG3SmSjGi9VprLFJGBI0es8ZLpdSLB8E0LOZXGbUdnujLpOx4UJxooyAZoEdINNej/DZt/qPJJz/9FADOLfM+K/He28uovzl02Y3POfIxmmolrutz2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777959428; c=relaxed/simple;
-	bh=w7dQK57+pO4cmDbX9FAl4uLfSMH4ddaq1KgiB3tb0+k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YYHu2VM4SvSChbMGptncmzgOrrWeHvgZk7FG7houE9k6O1rkvNkU7HvQWFVYV9x2hIyuHkCZAx1gB0ZCBaEcNF6ZAZx7ZDN3iehTIe4WMmmuxVNEUzPNitcuDViyDV94IYkBe+w6ECNwvg+NrFyZTVO5UABjROE1orAenDY/Kcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TMKGNkLX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00FD9C2BCB4;
-	Tue,  5 May 2026 05:37:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777959428;
-	bh=w7dQK57+pO4cmDbX9FAl4uLfSMH4ddaq1KgiB3tb0+k=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=TMKGNkLXRidii1NpLdfVStwvVqd/ZEqEf3zEbyy9/gCaeZpf82yg5OHn/QSY29kHs
-	 xr+NHdYVwj0ta4m77b5TxFMz+oTW64lkR9nMbWOCDfjBCgXBIDRxI+jnR0PmawokC7
-	 bOvvd67+J8RL/9l6paZBow5hb0dRGk8BEMP7fBSG+gf7aRTWdGztYSHJJSPya7OTtb
-	 OofBCWpkhWsCa/MjGufIYmme2DMcD3nRV/Yq9OBEltGzRik7aKHaxvBRQuKneg2ikY
-	 +A8NURQHyKqYHx+bAg1NIU5EVEmBrF+Bw51trnz1XE0ZQdCvfVJcLPKgO9yHV+c8st
-	 270lBMnEIu4vQ==
-Message-ID: <3e1a653b-81bc-4008-8f84-77c823aeef49@kernel.org>
-Date: Tue, 5 May 2026 07:37:05 +0200
+	s=arc-20240116; t=1777959746; c=relaxed/simple;
+	bh=rc8ERhUgL8kJ9G6ULhFgUZndgBMUabGV9dCng+4g9lE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sCW5R95djRQPrRR6fC4LvvYPLw4QwbX1FsecL20LblNe7F+RZIFYGOiLiUkEjk9zzMg98JqClukDHzNA4dD3WpqoWvXcmvtcs4y0RFb0GuzyRqC47eKGsWbGt8ifhxGaJntgDJIugp2uPuzcnv+h0W04q0/Kk1XL65/JnraAnj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=h95Yi7OQ; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 3236F201D3;
+	Tue,  5 May 2026 07:42:21 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ZL8htbvpt135; Tue,  5 May 2026 07:42:20 +0200 (CEST)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 4BE4F206E9;
+	Tue,  5 May 2026 07:42:20 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 4BE4F206E9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1777959740;
+	bh=AX/mJIodJOkU62A34/3ZwiHur+eoFFAy0H8PUqWd6tg=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=h95Yi7OQh8MVszlvv8wse50Q1ynYdOoB71gycNyLbo3n1weFbqkLhj0a4AAKnk2gw
+	 nZJ8mDPNhkDiwFvsOgjVk32EB9bbQ76qxPTdLXUA66WmLcqb6VWWWfr2yRbzuO0KG2
+	 nzbyPacfIIW/jg1+Kam7NvyQBYoh2oVX0RldDPS28cn+NwlsOPxi2Ndn28p8kT+f9o
+	 nvPjnZRqPGhIjEDV7FLwgVOm+/+tqctq7cDdSVQvGIXO/m1HF1Ub+iCkvhFo+FwHGx
+	 AhclimUGEA/yq5I4c0Aqq/OoWaZKRNivkcAltvcMN9r4JgMkdnuOTDnvyiupXaBFmb
+	 uVzNLPBkAIWKQ==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 5 May
+ 2026 07:42:19 +0200
+Received: (nullmailer pid 3692452 invoked by uid 1000);
+	Tue, 05 May 2026 05:42:18 -0000
+Date: Tue, 5 May 2026 07:42:18 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Hex Rabbit <h3xrabbit@gmail.com>
+CC: Hyunwoo Kim <imv4bel@gmail.com>, <netdev@vger.kernel.org>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Herbert Xu
+	<herbert@gondor.apana.org.au>, Simon Horman <horms@kernel.org>, "David S .
+ Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net v2] xfrm: esp: avoid in-place decrypt on shared skb
+ frags
+Message-ID: <afmDOrObXxUC7eDt@secunet.com>
+References: <20260504152712.76305-1-h3xrabbit@gmail.com>
+ <afje62FxYMuTUpSb@v4bel>
+ <afjpqNXYFVfZjQl5@secunet.com>
+ <afjrqlBPSv0X9kaY@v4bel>
+ <CAF3ZFefQM5Ud8iWDoKV9FPdZ=8V0KD56Bvkdcku1fmm6aaD_Cg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: wan: fsl_ucc_hdlc: free tx_skbuff in
- uhdlc_memclean
-To: Holger Brunck <holger.brunck@hitachienergy.com>, netdev@vger.kernel.org
-Cc: linuxppc-dev@lists.ozlabs.org, andrew+netdev@lunn.ch, qiang.zhao@nxp.com,
- horms@kernel.org
-References: <20260504161145.2217950-1-holger.brunck@hitachienergy.com>
-Content-Language: fr-FR
-From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-In-Reply-To: <20260504161145.2217950-1-holger.brunck@hitachienergy.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: A7AC64C6EDA
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <CAF3ZFefQM5Ud8iWDoKV9FPdZ=8V0KD56Bvkdcku1fmm6aaD_Cg@mail.gmail.com>
+X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-01.secunet.de
+ (10.32.0.171)
+X-Rspamd-Queue-Id: A371B4C6F1B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-284227-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284226-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,linuxfoundation.org,gondor.apana.org.au,kernel.org,davemloft.net,google.com,redhat.com,nvidia.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chleroy@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,hitachienergy.com:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
 
-
-
-Le 04/05/2026 à 18:11, Holger Brunck a écrit :
-> When cleaning up the resources we need to iterate over the
-> tx_skbuf array to free pending TX messages.
+On Tue, May 05, 2026 at 10:49:42AM +0800, Hex Rabbit wrote:
+> Hi Hyunwoo, Steffen,
 > 
-> Fixes: c19b6d246a35 ("drivers/net: support hdlc function for QE-UCC")
-> Signed-off-by: Holger Brunck <holger.brunck@hitachienergy.com>
-> ---
->   drivers/net/wan/fsl_ucc_hdlc.c | 7 +++++++
->   1 file changed, 7 insertions(+)
+> > The report and patch for this issue were already posted on
+> > the public netdev ML 6 days ago, i.e., the bug was already
+> > publicly reported:
+> >
+> >   https://lore.kernel.org/all/afLDKSvAvMwGh7Fy@v4bel/
+> >
+> > Credit for patch authorship is adequately covered by
+> > Signed-off-by alone. Setting aside that your work proceeded
+> > independently rather than as a review of my earlier
+> > submission, the trailer should conform to convention to
+> > avoid future misunderstanding.
 > 
-> diff --git a/drivers/net/wan/fsl_ucc_hdlc.c b/drivers/net/wan/fsl_ucc_hdlc.c
-> index adf3863463f5..68f78aeabdc3 100644
-> --- a/drivers/net/wan/fsl_ucc_hdlc.c
-> +++ b/drivers/net/wan/fsl_ucc_hdlc.c
-> @@ -739,6 +739,8 @@ static int uhdlc_open(struct net_device *dev)
->   
->   static void uhdlc_memclean(struct ucc_hdlc_private *priv)
->   {
-> +	int i;
-> +
->   	qe_muram_free(ioread16be(&priv->ucc_pram->riptr));
->   	qe_muram_free(ioread16be(&priv->ucc_pram->tiptr));
->   
-> @@ -769,6 +771,11 @@ static void uhdlc_memclean(struct ucc_hdlc_private *priv)
->   	kfree(priv->rx_skbuff);
->   	priv->rx_skbuff = NULL;
->   
-> +	for (i = 0; i < TX_BD_RING_LEN) {
-> +		kfree(priv->tx_skbuff[i]);
+> For clarity, I also found and reported the issue independently to
+> security@kernel.org on the same day, with my own reproducer and
+> root-cause analysis. At that time I was not aware of your report or
+> patch; otherwise I would have referenced it earlier.
+> 
+> I am still not fully familiar with the exact kernel trailer convention
+> here, so I added both Reported-by tags because the reports were
+> independent.
+> 
+> Steffen, either trailer form is fine with me. If you decide to drop my
+> Reported-by because the patch already has my Signed-off-by, I have no
+> objection.
 
-I don't think you can just kfree() an skb like this.
+You reported it, so you can have the tag.
 
-I think you have to call dev_kfree_skb_any() instead.
-
-Christophe
-
-
-> +		priv->tx_skbuff[i] = NULL;
-> +	}
-> +
->   	kfree(priv->tx_skbuff);
->   	priv->tx_skbuff = NULL;
->   
-
+This is now applied to the ipsec tree, thanks a lot everybody!
 
