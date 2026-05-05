@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-284404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284408-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UHVeMcXv+WmcFQMAu9opvQ
-	(envelope-from <netdev+bounces-284404-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 15:25:25 +0200
+	id UNWEKJLx+WmcFQMAu9opvQ
+	(envelope-from <netdev+bounces-284408-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 15:33:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 736514CE6DD
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 15:25:24 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A56964CE911
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 15:33:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8810B3022BBE
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 13:23:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E16103005331
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 13:24:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CF55478E42;
-	Tue,  5 May 2026 13:23:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EC7E47D938;
+	Tue,  5 May 2026 13:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="BXgEBxws"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="dXDM+NDv"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB1633343C
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 13:23:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9782C478E2B
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 13:23:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777987424; cv=none; b=IWxqRp/qrFm9UAkJRl4LS/ybchFnlnpP4mp6HTBDzoBEP2+1Fyl8jp8eLN3AeISXKuDoajetY4CirCDchrBXHJ0Jb+B2uvO/KT+LxpAtv6Abtn5lsW28u/XoMKhduujJ8zvaWBm/8tPH+mIOzMaaZ6ewzRDdWxN/s+79tzhuwEQ=
+	t=1777987426; cv=none; b=Hw3rGxo9igIMVJhIzpNM2axfX9cLvIU3BkV4xqUovXwJIXN/xu13LaKCEDAeyWwMFFENGx3XyhdXiAeDq1rolCF6mJcKNolOhPIzxZscItjYf3TKxMfU11kC2mJVfBcdVoAUJKzh9NOyKSjjAZQXJGHR6Bkqne2a0GHtKwTGFwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777987424; c=relaxed/simple;
-	bh=bshQs1T4vcWynZkH4cc0udK8pzmlWOJz6aH5XGBW1uw=;
+	s=arc-20240116; t=1777987426; c=relaxed/simple;
+	bh=HWH4dl72mPi6B11UCcb4Z2m1jUYKI2uo8URUpshCi4Q=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oBeq0BKaUyuZONmls6lkw9vA4oR2/6VHwS98YhuLjjbFJomM7f1SRdn/CfnwK2VtIWwVpZ9/wthFoyMqSRIlGygYbZi8Yo9jMIlz6WNdmUo604uJdQ5g6DCALHGrms5D4nfOtXv7paS1VtRgaPk5HvRwcX7UIsofTq1TDMLFvu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=BXgEBxws; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=h9qMOaOPTi4TQ4BCRcfBOs9JoDOjLzyx6GM+gY+7ZOYyb2qC7iayyIPI8NbEJoDefBtVJM+AwKAKx+wshGMyedNA5J62V6Pse/+yNdbBsFZYfOLom0ADhxVwMAZrgZ9azs0mUt8L+WUZMH/a5rmSyoEF/mapve3xzbj9iDY8I9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=dXDM+NDv; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id A3B7D20743;
-	Tue,  5 May 2026 15:23:34 +0200 (CEST)
+	by mx1.secunet.com (Postfix) with ESMTP id 54D42206E9;
+	Tue,  5 May 2026 15:23:42 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wgI6DfUDxWKj; Tue,  5 May 2026 15:23:34 +0200 (CEST)
+ with ESMTP id 0xNLNPfjEm6O; Tue,  5 May 2026 15:23:41 +0200 (CEST)
 Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id E6D65206E9;
-	Tue,  5 May 2026 15:23:33 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com E6D65206E9
+	by mx1.secunet.com (Postfix) with ESMTPS id 96205201CC;
+	Tue,  5 May 2026 15:23:41 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 96205201CC
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1777987413;
-	bh=pUHY7aOXlt1mS76NWVKlJpNjKRUiEZtLk1hf7BrsxiU=;
+	s=202301; t=1777987421;
+	bh=Yh8cdCJW6JbpP02sOW4GJp3eJFc68TZzJsLF8UhLsFw=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=BXgEBxws6Lf7i6VW7kAih+A1ZDhD7jD2D6xHBRy9CTzNSoDLeuGBkWy7WYk3nmGYe
-	 HD/0WwEEd/2egjdR2f3x0tfuN/hE1eu2m87XtdYsVZwE/ESqxRQ3hosNllcJZgr0tb
-	 tG1T8RJD/RXgELiRKXktL0JsbOZccf6iRoxVGdg8TfVRwEAsb7Rv39HkE9Wz9wU0N1
-	 fG3NtdZoIvcoFprIvAihKxnkad9rSYFrdLbnxk7qmE1fLuyhmxPifRITlg7YXGH6q7
-	 uGlUMdebFPVtVOoCkeF0FKPoesI3dq4+91LASvCiJXW8ZcOFfkIRyeD6hJj+GwfXYh
-	 mnDE0f+j89KKg==
+	b=dXDM+NDvv/h7AooOSxkNEc9V8fk5QBh2/KEWIZ1UUIdDq9ntNpOBzFlakX/6DOkGY
+	 FVTPrLdhEORPqfI/SEGhiHYzo3ptdp8K7853BvP4RPaHIbyaN6QMdvcOkUncRLzJrL
+	 Z+o3BcRrWgh+Mvapu0IN/rIg5lMa+euw01D9QqumGwZyUHqKB5zUrNCqo1lTPq4Ffj
+	 fkMef4vSjP53Tc2DuKZUtuUebRZTcv1t8kgYMvpz99t4WbO+5jUz+GSslx08U5qilk
+	 Elu3Xe8icax61FQ/UecCDoXvp9DxjdGqaDN8EpqqCUAsch6cQJFoFkUP+i2t4pUgDN
+	 dsMUAI0ZROi0w==
 Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 5 May
- 2026 15:23:33 +0200
-Received: (nullmailer pid 1364098 invoked by uid 1000);
+ 2026 15:23:41 +0200
+Received: (nullmailer pid 1364101 invoked by uid 1000);
 	Tue, 05 May 2026 13:23:30 -0000
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 7/8] xfrm: defensively unhash xfrm_state lists in __xfrm_state_delete
-Date: Tue, 5 May 2026 15:23:03 +0200
-Message-ID: <20260505132326.1362733-8-steffen.klassert@secunet.com>
+Subject: [PATCH 8/8] xfrm: esp: avoid in-place decrypt on shared skb frags
+Date: Tue, 5 May 2026 15:23:04 +0200
+Message-ID: <20260505132326.1362733-9-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260505132326.1362733-1-steffen.klassert@secunet.com>
 References: <20260505132326.1362733-1-steffen.klassert@secunet.com>
@@ -81,9 +81,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
+X-ClientProxiedBy: EXCH-02.secunet.de (10.32.0.172) To EXCH-01.secunet.de
  (10.32.0.171)
-X-Rspamd-Queue-Id: 736514CE6DD
+X-Rspamd-Queue-Id: A56964CE911
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -91,142 +91,125 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284404-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284408-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[secunet.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,secunet.com:email,secunet.com:dkim,secunet.com:mid];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,secunet.com:email,secunet.com:dkim,secunet.com:mid];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCPT_COUNT_FIVE(0.00)[5];
 	RCVD_COUNT_SEVEN(0.00)[7]
 
-From: Michal Kosiorek <mkosiorek121@gmail.com>
+From: Kuan-Ting Chen <h3xrabbit@gmail.com>
 
-KASAN reproduces a slab-use-after-free in __xfrm_state_delete()'s
-hlist_del_rcu calls under syzkaller load on linux-6.12.y stable
-(reproduced on 6.12.47, also reachable via the same code path on
-torvalds/master and on the ipsec tree). Nine unique signatures cluster
-in the xfrm_state lifecycle, the load-bearing one being:
+MSG_SPLICE_PAGES can attach pages from a pipe directly to an skb. TCP
+marks such skbs with SKBFL_SHARED_FRAG after skb_splice_from_iter(),
+so later paths that may modify packet data can first make a private
+copy. The IPv4/IPv6 datagram append paths did not set this flag when
+splicing pages into UDP skbs.
 
-  BUG: KASAN: slab-use-after-free in __hlist_del include/linux/list.h:990 [inline]
-  BUG: KASAN: slab-use-after-free in hlist_del_rcu include/linux/rculist.h:516 [inline]
-  BUG: KASAN: slab-use-after-free in __xfrm_state_delete net/xfrm/xfrm_state.c
-  Write of size 8 at addr ffff8881198bcb70 by task kworker/u8:9/435
+That leaves an ESP-in-UDP packet made from shared pipe pages looking
+like an ordinary uncloned nonlinear skb. ESP input then takes the no-COW
+fast path for uncloned skbs without a frag_list and decrypts in place
+over data that is not owned privately by the skb.
 
-  Workqueue: netns cleanup_net
-  Call Trace:
-   __hlist_del / hlist_del_rcu
-   __xfrm_state_delete
-   xfrm_state_delete
-   xfrm_state_flush
-   xfrm_state_fini
-   ops_exit_list
-   cleanup_net
+Mark IPv4/IPv6 datagram splice frags with SKBFL_SHARED_FRAG, matching
+TCP. Also make ESP input fall back to skb_cow_data() when the flag is
+present, so ESP does not decrypt externally backed frags in place.
+Private nonlinear skb frags still use the existing fast path.
 
-The other observed signatures hit the same slab object from
-__xfrm_state_lookup, xfrm_alloc_spi, __xfrm_state_insert and an OOB
-write variant of __xfrm_state_delete, all on the byseq/byspi
-hash chains.
+This intentionally does not change ESP output. In esp_output_head(),
+the path that appends the ESP trailer to existing skb tailroom without
+calling skb_cow_data() is not reachable for nonlinear skbs:
+skb_tailroom() returns zero when skb->data_len is nonzero, while ESP
+tailen is positive. Thus ESP output will either use the separate
+destination-frag path or fall back to skb_cow_data().
 
-__xfrm_state_delete() guards its byseq and byspi unhashes with
-value-based predicates:
-
-	if (x->km.seq)
-		hlist_del_rcu(&x->byseq);
-	if (x->id.spi)
-		hlist_del_rcu(&x->byspi);
-
-while everywhere else in the file (e.g. state_cache, state_cache_input)
-the safer hlist_unhashed() check is used. xfrm_alloc_spi() sets
-x->id.spi = newspi inside xfrm_state_lock and then immediately inserts
-into byspi, but a path that observes x->id.spi != 0 outside of
-xfrm_state_lock can still skip-or-hit the byspi unhash inconsistently
-with whether x is actually on the list. The same holds for x->km.seq
-versus byseq, and the bydst/bysrc unhashes have no predicate at all,
-so a second __xfrm_state_delete() on the same object writes through
-LIST_POISON pprev.
-
-The defensive change here:
-
-  - Use hlist_del_init_rcu() instead of hlist_del_rcu() on bydst,
-    bysrc, byseq and byspi so a second deletion is a no-op rather
-    than a write through LIST_POISON pprev. The byseq/byspi nodes
-    are already initialised in xfrm_state_alloc().
-  - Test hlist_unhashed() rather than the value predicate for
-    byseq/byspi, so the unhash decision tracks list state rather than
-    mutable scalar fields.
-
-Empirical verification: applied this patch on top of v6.12.47, rebuilt,
-and re-ran the same syzkaller harness for 1h16m on a previously-crashy
-configuration that produced ~100 hits each of slab-use-after-free
-Read in xfrm_alloc_spi / Read in __xfrm_state_lookup / Write in
-__xfrm_state_delete. After the patch, 7.1M execs across 32 VMs at
-~1550 exec/sec produced zero xfrm_state UAF/OOB hits. /proc/slabinfo
-confirms the xfrm_state slab is actively allocated and freed during
-the run (~143 KiB resident), so the fuzzer is still exercising those
-code paths -- they just no longer crash.
-
-Reproduction:
-
-  - Linux 6.12.47 x86_64 + KASAN_GENERIC + KASAN_INLINE + KCOV
-  - syzkaller @ 746545b8b1e4c3a128db8652b340d3df90ce61db
-  - 32 QEMU/KVM VMs x 2 vCPU on AWS c5.metal bare metal
-  - 9 unique signatures collected in ~9h, all within xfrm_state
-    lifecycle
-
-Fixes: fe9f1d8779cb ("xfrm: add state hashtable keyed by seq")
-Fixes: 7b4dc3600e48 ("[XFRM]: Do not add a state whose SPI is zero to the SPI hash.")
-Reported-by: Michal Kosiorek <mkosiorek121@gmail.com>
-Tested-by: Michal Kosiorek <mkosiorek121@gmail.com>
+Fixes: cac2661c53f3 ("esp4: Avoid skb_cow_data whenever possible")
+Fixes: 03e2a30f6a27 ("esp6: Avoid skb_cow_data whenever possible")
+Fixes: 7da0dde68486 ("ip, udp: Support MSG_SPLICE_PAGES")
+Fixes: 6d8192bd69bb ("ip6, udp6: Support MSG_SPLICE_PAGES")
+Reported-by: Hyunwoo Kim <imv4bel@gmail.com>
+Reported-by: Kuan-Ting Chen <h3xrabbit@gmail.com>
+Tested-by: Hyunwoo Kim <imv4bel@gmail.com>
 Cc: stable@vger.kernel.org
-Signed-off-by: Michal Kosiorek <mkosiorek121@gmail.com>
+Signed-off-by: Kuan-Ting Chen <h3xrabbit@gmail.com>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- net/xfrm/xfrm_state.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ net/ipv4/esp4.c       | 3 ++-
+ net/ipv4/ip_output.c  | 2 ++
+ net/ipv6/esp6.c       | 3 ++-
+ net/ipv6/ip6_output.c | 2 ++
+ 4 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 1748d374abca..686014d39429 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -818,17 +818,17 @@ int __xfrm_state_delete(struct xfrm_state *x)
+diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+index 6dfc0bcdef65..6a5febbdbee4 100644
+--- a/net/ipv4/esp4.c
++++ b/net/ipv4/esp4.c
+@@ -873,7 +873,8 @@ static int esp_input(struct xfrm_state *x, struct sk_buff *skb)
+ 			nfrags = 1;
  
- 		spin_lock(&net->xfrm.xfrm_state_lock);
- 		list_del(&x->km.all);
--		hlist_del_rcu(&x->bydst);
--		hlist_del_rcu(&x->bysrc);
--		if (x->km.seq)
--			hlist_del_rcu(&x->byseq);
-+		hlist_del_init_rcu(&x->bydst);
-+		hlist_del_init_rcu(&x->bysrc);
-+		if (!hlist_unhashed(&x->byseq))
-+			hlist_del_init_rcu(&x->byseq);
- 		if (!hlist_unhashed(&x->state_cache))
- 			hlist_del_rcu(&x->state_cache);
- 		if (!hlist_unhashed(&x->state_cache_input))
- 			hlist_del_rcu(&x->state_cache_input);
+ 			goto skip_cow;
+-		} else if (!skb_has_frag_list(skb)) {
++		} else if (!skb_has_frag_list(skb) &&
++			   !skb_has_shared_frag(skb)) {
+ 			nfrags = skb_shinfo(skb)->nr_frags;
+ 			nfrags++;
  
--		if (x->id.spi)
--			hlist_del_rcu(&x->byspi);
-+		if (!hlist_unhashed(&x->byspi))
-+			hlist_del_init_rcu(&x->byspi);
- 		net->xfrm.state_num--;
- 		xfrm_nat_keepalive_state_updated(x);
- 		spin_unlock(&net->xfrm.xfrm_state_lock);
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index e4790cc7b5c2..5bcd73cbdb41 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -1233,6 +1233,8 @@ static int __ip_append_data(struct sock *sk,
+ 			if (err < 0)
+ 				goto error;
+ 			copy = err;
++			if (!(flags & MSG_NO_SHARED_FRAGS))
++				skb_shinfo(skb)->flags |= SKBFL_SHARED_FRAG;
+ 			wmem_alloc_delta += copy;
+ 		} else if (!zc) {
+ 			int i = skb_shinfo(skb)->nr_frags;
+diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
+index 9f75313734f8..9c06c5a1419d 100644
+--- a/net/ipv6/esp6.c
++++ b/net/ipv6/esp6.c
+@@ -915,7 +915,8 @@ static int esp6_input(struct xfrm_state *x, struct sk_buff *skb)
+ 			nfrags = 1;
+ 
+ 			goto skip_cow;
+-		} else if (!skb_has_frag_list(skb)) {
++		} else if (!skb_has_frag_list(skb) &&
++			   !skb_has_shared_frag(skb)) {
+ 			nfrags = skb_shinfo(skb)->nr_frags;
+ 			nfrags++;
+ 
+diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+index 7e92909ab5be..1f2a33fbed6e 100644
+--- a/net/ipv6/ip6_output.c
++++ b/net/ipv6/ip6_output.c
+@@ -1794,6 +1794,8 @@ static int __ip6_append_data(struct sock *sk,
+ 			if (err < 0)
+ 				goto error;
+ 			copy = err;
++			if (!(flags & MSG_NO_SHARED_FRAGS))
++				skb_shinfo(skb)->flags |= SKBFL_SHARED_FRAG;
+ 			wmem_alloc_delta += copy;
+ 		} else if (!zc) {
+ 			int i = skb_shinfo(skb)->nr_frags;
 -- 
 2.43.0
 
