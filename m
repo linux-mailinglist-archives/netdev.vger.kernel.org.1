@@ -1,232 +1,144 @@
-Return-Path: <netdev+bounces-284328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284330-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kKLfKVLI+WlhEAMAu9opvQ
-	(envelope-from <netdev+bounces-284328-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 12:37:06 +0200
+	id cNWqD1nI+WlhEAMAu9opvQ
+	(envelope-from <netdev+bounces-284330-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 12:37:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B9B04CB868
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 12:37:05 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 430C94CB876
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 12:37:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D7AF830C953A
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 10:21:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8E97E301946B
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 10:25:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DD04334688;
-	Tue,  5 May 2026 10:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8CA63A6B6A;
+	Tue,  5 May 2026 10:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hitachienergy.com header.i=@hitachienergy.com header.b="rceZgSXk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bglvbUhm"
 X-Original-To: netdev@vger.kernel.org
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011044.outbound.protection.outlook.com [40.107.130.44])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554A1481A8E
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 10:11:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777975913; cv=fail; b=qRYZSIQOhior0SFld6mtfsg6Yvh9Hv2GbHPHJJQkjbAKiEP5PZK00wFZ5jAcU429DmQWGtQVfgY94VB9syOpWUA/rLQBR0/b4lVzHt6lS1SxcHj+Cq+XiQ2VniWzCcvCml5o0py8xBL4RvV7Lclub0Y/WObQxXvua2BAS5CtH24=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777975913; c=relaxed/simple;
-	bh=eidSOQEut/hjXIAW+CuKkytdy+WCoRJ9uMOqHiV9Ays=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=OoZDESK60o22MVOSLPP56SwZFIWxXafSHPQRpGDaeVKfXp10hfbpnpDwUqWQkh+o0a4mGUueTqtYnXK9nk1wGdxqvifOhWWuF7NlBHzVrtvbi/SpEeGvXwZ+tTOZDYFPNM6uxkxIMDbpNEZ9WMom0EPBbpyCQil1jUv+AwW1MuY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hitachienergy.com; spf=pass smtp.mailfrom=hitachienergy.com; dkim=pass (2048-bit key) header.d=hitachienergy.com header.i=@hitachienergy.com header.b=rceZgSXk; arc=fail smtp.client-ip=40.107.130.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hitachienergy.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hitachienergy.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LWniJ9hKD/gfeRkDFriTSo+icOc7jtlQ94i3fn9BkWorSSprzjrgLq225cRYlX2v3EZ8BJBBzUa+YBfI3oR4jY3bxYNMCHIWTjdnUzAcHyN+4C0YE2hN5kNPUzcm5XR+TN/xAPO9b9Bm355IjKJ/r4fo3YQZRucEmCmfNsGM4v7BWeMlnMS0WiA7R3keyySLC+1LA1L5osIeCnM0pDxUNUWyOMQ3Zry+OS1dKdhmlNdiY/nI1QIugKjAYqrOr89cEM3pphWj1MiTUT27vikk3xHs5E6RWZm7OLKwZ2JC/Y4OIoY0eozRgh1qHigh9ClxlpTJ/9b4rRXTExunoUaEOg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eidSOQEut/hjXIAW+CuKkytdy+WCoRJ9uMOqHiV9Ays=;
- b=GVnDFGqkIBGB4BC1+LlHr05au8sVSGIk96J+L5aU/NNXC4t7idMu7w4frQZDWRoN738yWqi8oUqtGYQ5Q4XnQePSHawaunhITjYvr0Xg/JyZiieHWWobVmY6hiLO3YpnoTGUxK4qcvwc4aP5iPyX6o1KnOR8MwFyHg8RLwvHCmS0ujbouVgUdRyQhM8klekZHUcpAEzJw5XYj9OCSIc/gev+xb+Z1/ztsAd41Mn1RlSOqQ6BusRkvue3liZRHBBQGyc+aiSR+llh75GnbJt7N8aTZx3vhHEIsQHAnvgdp6fyYtCYv2h93OteJBA1AArNNNURNgCw7QqElyRVH11m5Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hitachienergy.com; dmarc=pass action=none
- header.from=hitachienergy.com; dkim=pass header.d=hitachienergy.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hitachienergy.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eidSOQEut/hjXIAW+CuKkytdy+WCoRJ9uMOqHiV9Ays=;
- b=rceZgSXk1h/ik3uXM8VTp+bwqW0Rb3Gbf5HT4K++QZHwdKw0mOU7MC5r7H/KnFVRJX/nRTA+WpefY+7NfRnSJRBqXLhB7e9pZT7FnU7VBL77reuBXTyAeHDPv6pQw2NqeoApt9iaeNyggqHwN/Tan8+Ji82uu7WhmhvqoDGhMtJKQrjHmVoYIAc2zfQff68iOhtDYhmOfuJi27HHZqzlaNDNQPO9r9LjUO2i+6D9sk7vxL98+T5s32g8aDkPlO/kaIa+qj6EW2wKGU51zWVsdaQetcn4wk02bGz29G17BrvLEZqxn5HiVLvx04eW7ApUMgI8tSJlLWmBO5EQWpkhZA==
-Received: from AM0PR06MB10396.eurprd06.prod.outlook.com (2603:10a6:20b:6fd::9)
- by VI1PR06MB8902.eurprd06.prod.outlook.com (2603:10a6:800:1dd::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Tue, 5 May
- 2026 10:11:45 +0000
-Received: from AM0PR06MB10396.eurprd06.prod.outlook.com
- ([fe80::f64e:6a20:6d85:183f]) by AM0PR06MB10396.eurprd06.prod.outlook.com
- ([fe80::f64e:6a20:6d85:183f%5]) with mapi id 15.20.9870.023; Tue, 5 May 2026
- 10:11:45 +0000
-From: Holger Brunck <holger.brunck@hitachienergy.com>
-To: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-CC: "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "qiang.zhao@nxp.com"
-	<qiang.zhao@nxp.com>, "horms@kernel.org" <horms@kernel.org>
-Subject: RE: [PATCH net] net: wan: fsl_uhdlc_hdlc: fix dma_rmb usage in
- hdlc_rx_done
-Thread-Topic: [PATCH net] net: wan: fsl_uhdlc_hdlc: fix dma_rmb usage in
- hdlc_rx_done
-Thread-Index: AQHc2960xmhVPMAKekKnNexcW8lvMrX+6IyAgAAqBeCAAAqDAIAAB8Tw
-Date: Tue, 5 May 2026 10:11:45 +0000
-Message-ID:
- <AM0PR06MB10396A396796DD5F09809B301F73E2@AM0PR06MB10396.eurprd06.prod.outlook.com>
-References: <20260504155642.2216040-1-holger.brunck@hitachienergy.com>
- <d6957853-9d24-4f35-8ea7-ef4376de991e@kernel.org>
- <AM0PR06MB10396920527D0B69CC9D9BDFEF73E2@AM0PR06MB10396.eurprd06.prod.outlook.com>
- <07fc37e5-7815-48ed-8632-62e896f8f6ad@kernel.org>
-In-Reply-To: <07fc37e5-7815-48ed-8632-62e896f8f6ad@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=hitachienergy.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM0PR06MB10396:EE_|VI1PR06MB8902:EE_
-x-ms-office365-filtering-correlation-id: 43d4698e-a9ae-4e3b-c255-08deaa8eb617
-x-he-o365-outbound: HEO365Out
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|1800799024|366016|38070700021|22082099003|18002099003|56012099003;
-x-microsoft-antispam-message-info:
- otuHD1qd0wXphnM6w9lwuT9p8TaRiBclmQeVTsFKTr2+5K2b8FgKu75KUu8TZSIDUiuf35sXhc24Vg1QAFJuxueou8YfiRxspNOPVsBFvwaoI81AnUaBMOkjHiEWXqEdd9+/7iqELhbkYUAE+8OPfNqfsLjqMbyz/fmLxTwiJKzkWhkr9JSMf4cMVpkOq5+NuoV2q2SUqhIlbyosiHYNthfof2HVV/wROvdB7S4UX46s80DZdrN3RfTWylDuhHN4xuG3An4z4uzNllzZjlhfoK7fppuUFvA78aKb3JehR2+dpcBxuB76WvK+A3J4JV/Rnh9f4T93x8+44HXVy32JwcinJDKc27EXBU8kHgMFNXggNIIDTNQOyk2SatS4QuqPAmrt1l+ip+xySRmjCq2n3RYgMaXNMLekOs0cmQ0cm46zQcCszBp7m5Rx7SEkLFPanGqnfNWaJdu0PzHyN7KBwwZdo7m97RnTksR1laOFDxNON0hw0b/xm3SOwVrDay0usiSymlOrdHBaf2XgoDrhv5n7sgYgLZqdnE86ifM3m7hVpyBFBmwZUOySOVZlNrOEigrtGEdEeASuR++sOjoRY8pFKqJN7soeHypw7pW4UBB36P9JVMeEWaC5okkLQqDQ8R5PkhjFGjNDQ3dOdZMDQ0uKq/VA8x3mwCCin5LfQUupwGvilgR/V23kXUwuqakkHF7ln3FPJ5aRSZDMz1QG26A0vpGtoWLXRyAEGs8XcDbIDsdF4lgiMnIuOXqdkaYq
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR06MB10396.eurprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700021)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?SWV5R2hEZmI4c1ozSXFFejlud1pPdHJVR3V1d29CRjFvQkdUR1NqQWMxcnVv?=
- =?utf-8?B?UVA1ZGdvUzdBZng3ZzBJWlcvWmlVejZHNmozR3VwaU9uaTVSdEk4cVV3UWRo?=
- =?utf-8?B?MzlJY05JdkZwcG8wWTNFc3JSWTUrYmFmdm1Rd3QrTjZjWDl4cHVMZkR0ZFJX?=
- =?utf-8?B?TER6S3BGa29LTUxINEFJWURZT2o3OHpFK2o4ZUtVNS9YZWIrL21Na0Y1SnVo?=
- =?utf-8?B?cVlQejZzclllY0FlYzNWMndPSXZUNnNmTG12b1dlRm5jM0Vwc2YvRVc5VVRn?=
- =?utf-8?B?RFd3RDlQeU5iZlFKK08yVFJjMzlsSDE2S1B2Y1lqVm1RQ3dBc2JZMG1tVkRm?=
- =?utf-8?B?SVNIQjhzV3BFZnZnTkVtSkRkK21tNWwrYWJrV2V3cFNUU1hSZFZ3VTl2UWc0?=
- =?utf-8?B?R1NLWkd0M3I4S2p4MDlsWEhYWUozWm5rS0krWG9Xc1ppcG5kaEpWeDEzTGxy?=
- =?utf-8?B?bTVQL3kvU0cwRnYzaElGSzBrUHhPdVRTb0pucko3MlRocjF2WG1BQWo3Q1VE?=
- =?utf-8?B?V0N5N2R4ZjFucXJQTEZ2SjNKam5LbzZBdUFLd0RlUXdsNFFuOHJzUkI0R090?=
- =?utf-8?B?eEl6M3h5dThERzZZMFlJakgvV05ZU0Z4N2tGYnlLOFFtbkxNaFVSczBlWmVh?=
- =?utf-8?B?L0RTMFZPUHBpMFBSWjZEK0dCU1NEWWs1ZThKRTVWQUlmeHg1Q1NqVklXQ1ZL?=
- =?utf-8?B?MW1NRVhqZmZEZFdRd0dtQlBKNUYxaFoxczd2ZWVtZzFoZDI1VWc0ejFoZG1v?=
- =?utf-8?B?ZWhUS25BN2lvaktPd1BtZmdhU1FIZHY0OHNFMVdLU3AzaU9BaHJkcC9WQm5Y?=
- =?utf-8?B?YlVnMWhvS3NaU2MzZlJ5d2h0TDhzRkRDQmluRWx1UXZtaUk0c3VaeENxYnpB?=
- =?utf-8?B?RkNxS0RRMWpDUXFwTlhSMGl3d2t4YzYxRHlzRE9BVlA4SXVia2h4WjFqYnF2?=
- =?utf-8?B?ZUt6RFpoNlBXSnhvZFduUStFM0c5RDJkK01pUGlYNE1WUUE3VmhFWjFVMlZC?=
- =?utf-8?B?cXFFNWxUY3RvZjA3MXN1VHp2c0d4bThuRXNBanRDL2pRTTFRamJSSlpFUlhK?=
- =?utf-8?B?aElUSm1kN2ZoelBQN1lneUZ2K1pTSzJYVmtYaVlPQ2RoZEt5UXBaT2lxbDdM?=
- =?utf-8?B?QTMwaE4zUmRDOGdWNlNqNGlUZ3NrVzFtZzMxcS9PeFg5Q1JzNWFCWDVucTVu?=
- =?utf-8?B?S1VxMXcyNWJuNThLU0NBSXpndzE0V1MxSWl0ZnFlYkdlN2JvOE9WZjkxNmJt?=
- =?utf-8?B?dThQOXF2Z3pDNTBGbDJ3MmtSYllJSVhxdFhTb01LVng0NGRWajBUOGltZU0x?=
- =?utf-8?B?bVFvSmVvUmdWL1FZaHlwM0dndmpzeUdPcFFQelloQkNpamU4dHRGL1k0R21V?=
- =?utf-8?B?ZXR4eHZlQ1NLQW5xL0ZGbDJjR0tRT0lqdU44Yy9IdnZnQld1dTdDOHVUSzFP?=
- =?utf-8?B?WURlZzUrVVVlVmtSaHBtb1hmTFQ3T2NmS2c0STNFYUs4cjBwUXhMSjRBRWNO?=
- =?utf-8?B?R3IrT3FrdmRwb0lyNlAzcE9mdHhvc1FLZGhjUkRXOWJ0cnBpS2diL21VOHN4?=
- =?utf-8?B?TnZIUmFNSThabFBGczd1T09VSTVRZEo3bXYyanBvOXd6cUYxZUlhMnh4NTBF?=
- =?utf-8?B?Qi9Oa0ljV3BTTG1HcWozbFQ0YVJoUXFyeTFod0xLWC91ZGlzV3p2SkU0VWpy?=
- =?utf-8?B?OFFsMUF6bklrS2Nxd3JwKzhYdGVLUS9kTitwdm1TZGJHUCt0UUJyUFZNMmdm?=
- =?utf-8?B?Rmg4cE5WMTFsTWIvYkk4Tm45eE15YmNManRDM0dYbDljTmR1bHJuTkU2R0hC?=
- =?utf-8?B?UWJSUXRmV1ZXcGhxYlliWFg3dDV5NXFhaTRXeGhmZHBaMDdHdm9rU3lsYlNs?=
- =?utf-8?B?QjdKakZ1c3FLYnJnYmZab0lQZGNtT0h1T0theWxjYTNYS3JLTWJzUzc1dXVh?=
- =?utf-8?B?ajZhVmg5aUNDeVhsb1NERjZQZGxrdG9SOVVhY1ovSkRGc3hrSHpMNG9yRHpX?=
- =?utf-8?B?cGVJQWZWLytJcjRNU2FyU05TQkRSaS8wWUduKzBXajFxZGFuT2N3WnZjYWNX?=
- =?utf-8?B?dEVGeGU0eFJjbEZTblowRGEzSGlCT0NNa3ZZNlFIWXY5dHR6bEE2RGQvVGpk?=
- =?utf-8?B?UEsxcjlSNmFzMDZvejA1c01VTmErVnZCWHhHbkVDWlpPdUJub3Eza0lDR0dS?=
- =?utf-8?B?R0J3OHQycHBIZlozcGFKUFhsY1J1c29nZVBSZmJEVXE5NVJYNWMrM0NnZ0NK?=
- =?utf-8?B?WHE4V2RJaGpQbk55UFVpdmllcmN6OHRpd0pGTElnUUlyd2E0LytOcHRBZzVk?=
- =?utf-8?B?cU95bUNzU0dWL012WXoza2JuREVaby85Mlp6T1JiaU5VaTJaVmZoVlNSc01N?=
- =?utf-8?Q?/5zz7D63y+ENxyFc=3D?=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A436235B657;
+	Tue,  5 May 2026 10:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777976460; cv=none; b=tYFFzyo9LiaOELsFCftqY1uZXQsD6TFRe5ujQF9ZnBuj0HZ6/4PpjMTS7KIdjpuivs35sjEcWRZzA3vafnUnIcxN5yWHOnaSPRSIeC8nombfcuC5ovOD5eNkGzWsgXIshde6LyRzHzKDgJwXrCA+hs6vwAy4W6+Ut4GfqgR3NPc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777976460; c=relaxed/simple;
+	bh=leghXJktf1RIFFo6BA/P1O4TGxDiVwVbjhQkh7sBwOM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=coKB7ZFCt4MHoZkYGiqoc1W7HtR63MaxDatqqcaNptsWNvCaPaK7origP2Uu1tJY63kIExEVOo4qP+8GrexTzJs1MuZpRflbTzVAwm58bv3jZUGL7ynSMhaO45QCt/gAM1tr//ue4/UCLy84tjC65C6zctBpQqUq0bGTz3OINbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bglvbUhm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2677C2BCB4;
+	Tue,  5 May 2026 10:20:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777976460;
+	bh=leghXJktf1RIFFo6BA/P1O4TGxDiVwVbjhQkh7sBwOM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bglvbUhmxgrBQ8yzV/ZTTuzG2QpNQpnTft2of/B82/TBI3zdWtyCgmigctccq9U3N
+	 ewaS7+hUTGICgu1S9j/G7A/6e3WtsVUo9xlY5dFBbZ+AhaWUjz7rt0pncWrVEwaIPQ
+	 y6Nss/e+RR5hV/BN/X9EhJMx+qLVMCpCsKKRxd6Z/1c7T1hIyVLg3FJL/YyrOkkAky
+	 95KKRKqeIslOHR5pC8cdzGFA6Dr9KGtX1JTLrMlKpXtOduMTkoKuHpS195PjiByQgm
+	 jfOVy3Nht+JRavQ8ikStJhbZproK8E7N2sVvC/Urc7sY4LIrka/2cGUtfXAVfPCJNF
+	 /XK9QDwuIGpeA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9ED1393020F;
+	Tue,  5 May 2026 10:20:11 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: hitachienergy.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR06MB10396.eurprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 43d4698e-a9ae-4e3b-c255-08deaa8eb617
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 May 2026 10:11:45.0212
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 7831e6d9-dc6c-4cd1-9ec6-1dc2b4133195
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: xenSct/+v/4Ovq43TER+/qE3PxQD2z+/pdJ8kZEnPTM4Mlbac5ZRWTFKz4FBLeisOuLFNpOneYXnzhPke+dxHInNdJa5n0zS9su1Rhv3fSI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR06MB8902
-X-Rspamd-Queue-Id: 2B9B04CB868
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 0/3] net: mana: Fix mana_destroy_rxq() cleanup for partial
+ RXQ
+ init
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177797641055.1553500.1206915425862203852.git-patchwork-notify@kernel.org>
+Date: Tue, 05 May 2026 10:20:10 +0000
+References: <20260430035935.1859220-1-dipayanroy@linux.microsoft.com>
+In-Reply-To: <20260430035935.1859220-1-dipayanroy@linux.microsoft.com>
+To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, leon@kernel.org,
+ longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+ shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+ ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ stephen@networkplumber.org, jacob.e.keller@intel.com,
+ dipayanroy@microsoft.com, leitao@debian.org, kees@kernel.org,
+ john.fastabend@gmail.com, hawk@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, ast@kernel.org, sdf@fomichev.me, yury.norov@gmail.com
+X-Rspamd-Queue-Id: 430C94CB876
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.44 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[hitachienergy.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[hitachienergy.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284328-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-284330-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[hitachienergy.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[holger.brunck@hitachienergy.com,netdev@vger.kernel.org];
-	RCPT_COUNT_FIVE(0.00)[6];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[AM0PR06MB10396.eurprd06.prod.outlook.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,hitachienergy.com:dkim]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-PiANCj4gTGUgMDUvMDUvMjAyNiDDoCAxMDoxNCwgSG9sZ2VyIEJydW5jayBhIMOpY3JpdCA6DQo+
-ID4+DQo+ID4+IExlIDA0LzA1LzIwMjYgw6AgMTc6NTYsIEhvbGdlciBCcnVuY2sgYSDDqWNyaXQg
-Og0KPiA+Pj4gSWYgZG1hX3JtYiBpcyB1c2VkIGl0IGhhcyB0byBiZSBkb25lIGFmdGVyIHJlYWRp
-bmcgYmRfc3RhdHVzIGFuZA0KPiA+Pj4gY2hlY2tpbmcgaWYgUl9FX1MgaXMgemVyby4gVGhlcmVm
-b3JlIHdlIG5lZWQgdG8gbW92ZSBpdCBpbnRvIHRoZSB3aGlsZSBsb29wLg0KPiA+Pg0KPiA+PiBD
-YW4geW91IGdpdmUgbW9yZSBkZXRhaWxzID8gV2h5IGRvZXMgZG1hX3JtYigpIGhhcyB0byBiZSBk
-b25lIGFmdGVyDQo+ID4+IHJlYWRpbmcgYmRfc3RhdHVzIGFuZCBjaGVja2luZyBpZiBSX0VfUyBp
-cyB6ZXJvID8NCj4gPj4NCj4gPg0KPiA+IHdoZW4gUl9FX1MgaXMgemVybyBpbiB0aGUgc3RhdHVz
-IG9mIHRoZSBidWZmZXIgZGVzY3JpcHRvciBpdCBtZWFucyB0aGUNCj4gPiBidWZmZXIgaXMgZmls
-bGVkIHdpdGggZGF0YSBmcm9tIHRoZSBkZXZpY2UuICBOb3cgdGhlIENQVSBvd25zIHRoZQ0KPiA+
-IGRlc2NyaXB0b3IuIE5vdyB3ZSBzaG91bGQgZXhlY3V0ZSB0aGUgZG1hX3JtYiB0byBiZSBzdXJl
-IHRoYXQgd2UgcmVhZCB0aGUNCj4gZGF0YSBjb3JyZWN0bHkuDQo+ID4gQW5kIHRoaXMgd2UgbmVl
-ZCB0byByZWRvIGZvciBlYWNoIGJ1ZmZlciBkZXNjcmlwdG9yIHdoaWNoIGlzIGZpbGxlZA0KPiA+
-IHdpdGggZGF0YSwgdGhhdOKAmXMgd2h5IGl0IG11c3QgYmUgZG9uZSB3aXRoaW4gdGhlIGZvciBs
-b29wIGFuZCBub3QgYmVmb3JlIGFuZA0KPiBhZnRlci4NCj4gDQo+IFdlIGVudGVyIGhkbGNfcnhf
-ZG9uZSgpIGFmdGVyIGFuIGludGVycnVwdCB3aGljaCB0cmlnZ2VycyBzY2hlZHVsaW5nIG9mDQo+
-IHVjY19oZGxjX3BvbGwoKS4gSSB0aGluayBkbWFfcm1iKCkgaXMgbmVlZGVkIF9iZWZvcmVfIHJl
-YWRpbmcgdGhlIGZpcnN0IHN0YXR1cywNCj4gb3RoZXJ3aXNlIGl0IG1pZ2h0IHJlYWQgYW4gZXJy
-b25lb3VzIHN0YXR1cy4NCj4gDQoNCndlIGVuZCB1cCBpbiBoZGxjX3J4X2RvbmUgYWxzbyBpZiBh
-IFRYIGludGVycnVwdCB3YXMgdHJpZ2dlcmVkIGR1ZSB0byB0aGUgTkFQSSBsYXllci4NCklmIFJY
-IGJkX3N0YXR1cyBpcyBzdGlsbCAxIHdlIHdvdWxkIHJlYWQgYSBwZW5kaW5nIFJYIHBhY2tldCBu
-ZXh0IHRpbWUuICBTbyB0aGUgZG1hX3JtYigpDQpiZWZvcmUgaXMgbm90IG5lY2Vzc2FyeS4gQnV0
-IGlmIHdlIGhhdmUgcmVhZCBhIHplcm8gaW4gYmRfc3RhdHVzIHdlIG5lZWQgdG8gYmUgc3VyZSB0
-aGF0DQp0aGUgZGF0YSB3cml0dGVuIGZyb20gdGhlIFFFIHRvIFJBTSBpcyBmdWxseSBhdmFpbGFi
-bGUuIFRoYXQgaXMgd2h5IEkgdGhpbmsgZG9pbmcgaXQgYWZ0ZXINCnJlYWRpbmcgdGhlIHN0YXR1
-cyBpcyBjb3JyZWN0IGhlcmUuDQogDQo+IE9uY2Ugd2UgYXJlIGhlcmUgdGhlIGludGVycnVwdCBo
-YXMgYmVlbiBjbGVhcmVkIHNvIGFueSBuZXcgYnVmZmVyIHdpbGwgdHJpZ2dlciBhDQo+IG5ldyBp
-bnRlcnJ1cHQgYW5kIGNhbGwgYWdhaW4gdGhpcyBmdW5jdGlvbi4gVGhlcmVmb3JlIEkgZG9uJ3Qg
-dGhpbmsgaXQgaXMgd29ydGggdGhlDQo+IGNvc3Qgb2YgYSBkbWFfcm1iKCkgaW5zaWRlIHRoZSBs
-b29wLg0KPiANCg0KWWVzLCBidXQgd2hpbGUgd2UgYXJlIGluIHRoZSBmb3IgbG9vcCB0aGUgUUUg
-bWlnaHQgaGF2ZSB3cml0dGVuIHRoZSBuZXh0IHBhY2tldCB0bw0KdGhlIG1lbW9yeSBpbiBiYWNr
-Z3JvdW5kIGFuZCBzZXRzIHRoZSBiZF9zdGF0dXMgdG8gemVyby4gQW5kIGlmIHRoaXMgaXMgdGhl
-DQpjYXNlIHdlIG5lZWQgYWdhaW4gbWFrZSBzdXJlIHRoYXQgdGhlIG1lbW9yeSB3ZSByZWFkIGlz
-IGNvcnJlY3QuDQoNCkZvciBleGFtcGxlIHRoZSBmb2xsb3dpbmcgZHJpdmVyIGRvZXMgdGhlIHNh
-bWUgQUZBSVUuDQpkcml2ZXJzL25ldC9ldGhlcm5ldC9pbnRlbC9lMTAwMGUvbmV0ZGV2LmMgIA0K
-ZnJvbSBsaW5lIDE1MjQgZmYNCg0KSXQgZmlyc3QgcmVhZHMgdGhlIHN0YXR1cyBmb3IgdGhlIFJY
-IHBhY2tldCB0aGVuIGRvZXMgZG1hX3JtYigpIGFuZCB0aGVuIHJlYWRzDQp0aGUgZGF0YSBpdHNl
-bGYuIEFuZCBpdCBpcyBkb25lIHdpdGhpbiB0aGUgd2hpbGUgbG9vcCBhcyBhbnkgZnVydGhlciBh
-dmFpbGFibGUgcGFja2V0DQptYXkgaGF2ZSBhcnJpdmVkIGp1c3Qgbm93IGFuZCB3ZSBuZWVkIHRv
-IGJlIHN1cmUgdGhhdCB0aGUgZGF0YSBpcyB2YWxpZC4gDQoNCkJlc3QgcmVnYXJkcw0KSG9sZ2Vy
-DQoNCg==
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Wed, 29 Apr 2026 20:57:51 -0700 you wrote:
+> When mana_create_rxq() fails partway through initialization (e.g. the
+> hardware rejects the WQ object creation), the error path calls
+> mana_destroy_rxq() to tear down a partially-initialized RXQ.
+> This exposed multiple issues in mana_destroy_rxq() path, as it assumed
+> the RXQ was always fully initialized, leading to multiple issues:
+> 
+> 1. xdp_rxq_info_unreg() was called on an unregistered xdp_rxq,
+>    triggering a WARN_ON ("Driver BUG") in net/core/xdp.c.
+> 
+> [...]
+
+Here is the summary with links:
+  - [1/3] net: mana: check xdp_rxq registration before unreg in mana_destroy_rxq()
+    https://git.kernel.org/netdev/net/c/e9e334f8063a
+  - [2/3] net: mana: Skip WQ object destruction for uninitialized RXQ
+    https://git.kernel.org/netdev/net/c/2a1c69118282
+  - [3/3] net: mana: remove double CQ cleanup in mana_create_rxq error path
+    https://git.kernel.org/netdev/net/c/3985c9a56da4
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
