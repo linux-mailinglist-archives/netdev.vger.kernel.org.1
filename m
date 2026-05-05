@@ -1,298 +1,424 @@
-Return-Path: <netdev+bounces-284543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284544-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kEs+J3cx+mlXKgMAu9opvQ
-	(envelope-from <netdev+bounces-284543-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 20:05:43 +0200
+	id SNpIOrEy+mlXKgMAu9opvQ
+	(envelope-from <netdev+bounces-284544-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 20:10:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1353E4D27C4
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 20:05:42 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98B554D2848
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 20:10:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 83C0B3067456
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 18:05:25 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E843330117EA
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 18:10:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAA594A33F7;
-	Tue,  5 May 2026 18:05:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEE4F4A2E27;
+	Tue,  5 May 2026 18:10:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vpf4TzUF"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="WZ3D8Zc6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7EDE4A2E27
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 18:05:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7464A2E13
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 18:10:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778004322; cv=none; b=Qlhe1efaCM1q67aFmsbJT8uyywdvWxELfZijO1qk1S3KmxJiV3PjgVxfsmSqel9BN2etFXUPnO9lmAP2g+6iaguuNj4IrcLucb75KHzOOKp8da+BlZJrWamuTUZlR+y6s+xKVBiyqUza70OXsbsH988T42zNwcfNMBJhnTokIqk=
+	t=1778004652; cv=none; b=F/1+Oqf+kQDVQML2/vsPqsnvUzMjMt25bEHC4pnj+HaK1TiqmJk90HBkJsjy7gsUOZBh8sRxAnb8ghpmKe0UN9CACF6rrQyLr8tasWVyH1wk0fYzeD+68IcDcDf2whfDBmDpFbTqN0p+zeRHKtxmrtKCwxSQSV4kqqXwW/9cXjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778004322; c=relaxed/simple;
-	bh=4yeAwzkSCEBJNzlb6PsjpfG5jvHrdfl25Khl/EwVQxU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NoAQjSKu75VNmTbWDTGIJyHDX3TLxFEIJv9zyLfndqQLrOXZFXGfbfszeZbzqCK35NI6BB/mpZhqnlmJ6kHYFSgpH94d5K2ZNsXviPPY+XDKyLPFrdcoDLgDsYN2G2hPwGdzCCFFbUTLqcQgwGS1aMuWZN7mE9VNf3SVACIDrlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vpf4TzUF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF3D3C2BCC7;
-	Tue,  5 May 2026 18:05:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778004322;
-	bh=4yeAwzkSCEBJNzlb6PsjpfG5jvHrdfl25Khl/EwVQxU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Vpf4TzUFItUbsgAvGWQPD1YwUSbcJkjCvmX/rt6z2LoKyveCbIvF6BGbwDszGPNMY
-	 ZYMGW74CzqyiX51R06gT+uOmugXpKlv3pDHUNDXLOtHp8PCFOrB67PDUovcksZEW+1
-	 mDKPP1PfBZEmG2qDBQkKQFnPB8cRYvD8PoBtK8Xw/hCzWWMQE3YOgqE4HTDgwjhUSq
-	 Gy4aC/OzUxPGzjHU6axR9yLWpNCkCiIPo6w5Td+ob/1/0PWKAL/G5vYFf9+6oqEtDO
-	 mPsnr98szcDXhowIFRTZZ5B7NifcOHF6XKZxVA2Eqb2+YGATQ+1a6wcmHAnU1fEB1Y
-	 asmtJyUE7wJ2A==
-From: Arnd Bergmann <arnd@kernel.org>
+	s=arc-20240116; t=1778004652; c=relaxed/simple;
+	bh=w9UcMhLhbZCgnxbCCuRa6knool1Ui/K5FQ8MLmhItXw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CqCtE6pkq5N+KmvkQIoWB3K5+iwNQhhRDi5f9JjFYs7NvGBZsH9OSJ0J6sYuc6q/negn9l8ejFOkdhlER3xsbUx0GIbSf0hSbRBgkmd/5p0qaIWRhduqWyGQCJ3ZB5DHJ1k9FheLnvlrx+1Hb4EuqFXPeBebclOg5VnLXZmyHlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=WZ3D8Zc6; arc=none smtp.client-ip=74.125.82.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-2f0d3e07e30so4138356eec.0
+        for <netdev@vger.kernel.org>; Tue, 05 May 2026 11:10:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1778004650; x=1778609450; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=G1mnF59M55VOMvghpS9JTzvOFDKUpRveiW72mobnymg=;
+        b=WZ3D8Zc6pFVxAvCi/R1eMyD6jOK03mGdcqzH12FP7bkdpjAsNWmuY1B8SJ9kbIjUbd
+         EGcYGKOeElaFSlU/g3PWTdXe71sSl7WqdDWrpP1o9wiqR9bONiZz5zZTQxipBfO09O5t
+         QHRZSygjNER4FkAXWtsncnFYQ90A7gWs/2JrB3AV2lPmVW1m3I9GmBXgHlQLnXxq132h
+         hvczHczX1zIaZJnlyJCiuk7OjI1sd/7+JbV5FHv6yn15Q6l+MH/tXD6+CFZbpFkyiuZB
+         oRCFGES6YkQ4Nh7jJqCdzbVqqqGVtUNCDl2W0/az5hrNIRrXjMTc7S2ADqNtLLN22KUR
+         4ujw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778004650; x=1778609450;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G1mnF59M55VOMvghpS9JTzvOFDKUpRveiW72mobnymg=;
+        b=pY/cMq805vK87Z2R4S94UvP9azpgK30xorgjIgNI6TPFzKXSF+4sulczajiroff9Ui
+         EqBe8ZhjwLhU2lihUkiBpqD6U6yrAyij3aq4px8kag1lWXfq0dBw0cP4VFmMEu/Bnr1A
+         CYBUVk8z3zzuR7tnlG8YrbCLDXpZALe6cblyuGP0XaCj6sjQCTwEgy2NmTR6r163nfDK
+         D+Bh8ZfoRDq8F/hdgDQWtfZmU8gHx8UhwiY3fHll9nRYa3T7YBeMjTjRdiKTnFcw85bh
+         pSj8Boix5wZ2Nw1ITcUDXAi6aACu1fr7EK1jOnWFYEX471JBGeDH4WMPOp4UAEHIG9Pr
+         SgvA==
+X-Gm-Message-State: AOJu0Yw7DWH3VYTcLtzVFdaPaSX8xRa9vl4mQc3d/7kuyzOtTPv+ukL5
+	YUfj5swakJSp3TUwi3sVvNmRBMFgu8cMe1DWBDKXbiUIzeLk2DVqHsgxsxJj3PAnQT0U58uOovA
+	ZY6h1
+X-Gm-Gg: AeBDiet2p2F/I0l7e0iUOapvZFSSw7NZvu99KnXvyzsuUeCNw7lu74S9iojuHlWxppi
+	Do+DaRUxIH0fcQkKSEHalbghppYE2JRfYyWk/MsulrhjPOP/F6UxGiUl3vlViJSXeqwjmVw5yDS
+	dd8RWholtZals3ilJTgSQyH3TYmH9K3bwA3hHn3ASGuOKiKanBF50M6uwXO//8OTC+2Wv8wAVm/
+	Ps51HxbjO6A0YUq6oVTn2dr9AwgdQ97T/jT5/TkklrjxVp4AIF5X8UEmV0H2u8Uul/0L9th0cnD
+	BOGKrQbkzaEMI2qJ9aQp7BfW+ymzqKkvAxqoRf653DfbWeHLA/VZAMKuqkJI9+BSwOlX9l2CTz6
+	S40FiKZ04VL24VMHyfgTo2Ldyu24SVwFFc6+aFpoaoSBoIc9JoJpAjkwbaBK6JaBHF1T/c2ac9Q
+	11uf7BUktIJxFrFB6r1zNHAIhqJniiOJTANm9MT5H6Wbg=
+X-Received: by 2002:a05:693c:2c01:b0:2c5:b23e:48a6 with SMTP id 5a478bee46e88-2f54b265a7dmr180703eec.23.1778004650162;
+        Tue, 05 May 2026 11:10:50 -0700 (PDT)
+Received: from phoenix.lan ([104.202.41.210])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ee3889cf53sm28344237eec.5.2026.05.05.11.10.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 May 2026 11:10:49 -0700 (PDT)
+From: Stephen Hemminger <stephen@networkplumber.org>
 To: netdev@vger.kernel.org
-Cc: Rob Herring <robh@kernel.org>,
-	Linus Walleij <linusw@kernel.org>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 3/3] [net-next v5] w5100: remove unused gpio link detection
-Date: Tue,  5 May 2026 20:04:59 +0200
-Message-Id: <20260505180459.1247690-3-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260505180459.1247690-1-arnd@kernel.org>
-References: <20260505180459.1247690-1-arnd@kernel.org>
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH iproute2] rdama: sync kernel headers and fix build
+Date: Tue,  5 May 2026 11:10:44 -0700
+Message-ID: <20260505181045.748088-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 1353E4D27C4
+X-Rspamd-Queue-Id: 98B554D2848
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.56 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284543-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arnd@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284544-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,arndb.de:email]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,networkplumber.org:mid,networkplumber.org:email,networkplumber-org.20251104.gappssmtp.com:dkim]
 
-From: Arnd Bergmann <arnd@arndb.de>
+The upstream kernel removed the 'RES_' prefix from RDMA netlink
+command and attribute names, but the rdma tool was still using
+the old names, causing build failures.
 
-Since the platform_device support is now gone, nothing ever passes a
-valid gpio number, and all the link state handling can go away.
+Update all references to match the new kernel header names:
+- RDMA_NLDEV_CMD_RES_FRMR_POOLS_* → RDMA_NLDEV_CMD_FRMR_POOLS_*
+- RDMA_NLDEV_ATTR_RES_FRMR_POOL* → RDMA_NLDEV_ATTR_FRMR_POOL*
+- RDMA_NLDEV_ATTR_FRMR_POOL_PINNED → RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES
+- RDMA_NLDEV_ATTR_FRMR_POOL_AGING_PERIOD → RDMA_NLDEV_ATTR_FRMR_POOLS_AGING_PERIOD
 
-An earlier version of my patch changed this to look up the GPIO descriptor
-from devicetree and convert it all to the modern interface, but there
-are no users of that binding at the moment.
+  Fixes build error:
+    res.h:203:26: error: 'RDMA_NLDEV_CMD_RES_FRMR_POOLS_GET' undeclared
 
-Remove the gpio handling, which is now one of the last users of the
-legacy gpio interface in platform-independent code.
-
-Cc: Rob Herring <robh@kernel.org>
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Link: https://lore.kernel.org/all/20230127095839.3266452-1-arnd@kernel.org/
+Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
-v5: rewrite to just remove gpio support
-v4: rebase to 7.1
-v3: include linux/gpio/consumer.h to avoid build failure without GPIOLIB
-v2: replace CONFIG_WIZNET_BUS_SHIFT with a constant
----
- drivers/net/ethernet/wiznet/w5100-spi.c |  2 +-
- drivers/net/ethernet/wiznet/w5100.c     | 62 +------------------------
- drivers/net/ethernet/wiznet/w5100.h     |  3 +-
- 3 files changed, 3 insertions(+), 64 deletions(-)
+ rdma/include/uapi/rdma/rdma_netlink.h | 30 ++++----
+ rdma/res-frmr-pools.c                 | 98 +++++++++++++--------------
+ rdma/res.h                            |  2 +-
+ 3 files changed, 65 insertions(+), 65 deletions(-)
 
-diff --git a/drivers/net/ethernet/wiznet/w5100-spi.c b/drivers/net/ethernet/wiznet/w5100-spi.c
-index 990a3cce8c0f..d2c5e99ab9c7 100644
---- a/drivers/net/ethernet/wiznet/w5100-spi.c
-+++ b/drivers/net/ethernet/wiznet/w5100-spi.c
-@@ -450,7 +450,7 @@ static int w5100_spi_probe(struct spi_device *spi)
+diff --git a/rdma/include/uapi/rdma/rdma_netlink.h b/rdma/include/uapi/rdma/rdma_netlink.h
+index 8709e558..4356ec4a 100644
+--- a/rdma/include/uapi/rdma/rdma_netlink.h
++++ b/rdma/include/uapi/rdma/rdma_netlink.h
+@@ -308,9 +308,9 @@ enum rdma_nldev_command {
+ 
+ 	RDMA_NLDEV_CMD_MONITOR,
+ 
+-	RDMA_NLDEV_CMD_RES_FRMR_POOLS_GET, /* can dump */
++	RDMA_NLDEV_CMD_FRMR_POOLS_GET, /* can dump */
+ 
+-	RDMA_NLDEV_CMD_RES_FRMR_POOLS_SET,
++	RDMA_NLDEV_CMD_FRMR_POOLS_SET,
+ 
+ 	RDMA_NLDEV_NUM_OPS
+ };
+@@ -590,19 +590,19 @@ enum rdma_nldev_attr {
+ 	/*
+ 	 * FRMR Pools attributes
+ 	 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOLS,			/* nested table */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_ENTRY,		/* nested table */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY,		/* nested table */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ATS,		/* u8 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ACCESS_FLAGS,	/* u32 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_VENDOR_KEY,	/* u64 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_NUM_DMA_BLOCKS, /* u64 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_QUEUE_HANDLES,	/* u32 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_MAX_IN_USE,	/* u64 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_IN_USE,		/* u64 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_AGING_PERIOD,	/* u32 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_PINNED,		/* u32 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_KERNEL_VENDOR_KEY, /* u64 */
++	RDMA_NLDEV_ATTR_FRMR_POOLS,		/* nested table */
++	RDMA_NLDEV_ATTR_FRMR_POOL_ENTRY,	/* nested table */
++	RDMA_NLDEV_ATTR_FRMR_POOL_KEY,		/* nested table */
++	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ATS,	/* u8 */
++	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ACCESS_FLAGS,	/* u32 */
++	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_VENDOR_KEY,	/* u64 */
++	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_NUM_DMA_BLOCKS,	/* u64 */
++	RDMA_NLDEV_ATTR_FRMR_POOL_QUEUE_HANDLES,	/* u32 */
++	RDMA_NLDEV_ATTR_FRMR_POOL_MAX_IN_USE,	/* u64 */
++	RDMA_NLDEV_ATTR_FRMR_POOL_IN_USE,	/* u64 */
++	RDMA_NLDEV_ATTR_FRMR_POOLS_AGING_PERIOD,	/* u32 */
++	RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES,	/* u32 */
++	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_KERNEL_VENDOR_KEY,	/* u64 */
+ 
+ 	/*
+ 	 * Always the end
+diff --git a/rdma/res-frmr-pools.c b/rdma/res-frmr-pools.c
+index abcd2188..d5faa5c1 100644
+--- a/rdma/res-frmr-pools.c
++++ b/rdma/res-frmr-pools.c
+@@ -80,83 +80,83 @@ static int res_frmr_pools_line(struct rd *rd, const char *name, int idx,
+ 	char key_str[FRMR_POOL_KEY_MAX_LEN];
+ 	struct frmr_pool_key key = { 0 };
+ 
+-	if (nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY]) {
++	if (nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_KEY]) {
+ 		if (mnl_attr_parse_nested(
+-			    nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY],
++			    nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_KEY],
+ 			    rd_attr_cb, key_tb) != MNL_CB_OK)
+ 			return MNL_CB_ERROR;
+ 
+-		if (key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ATS])
++		if (key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ATS])
+ 			key.ats = mnl_attr_get_u8(
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ATS]);
+-		if (key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ACCESS_FLAGS])
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ATS]);
++		if (key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ACCESS_FLAGS])
+ 			key.access_flags = mnl_attr_get_u32(
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ACCESS_FLAGS]);
+-		if (key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_VENDOR_KEY])
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ACCESS_FLAGS]);
++		if (key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_VENDOR_KEY])
+ 			key.vendor_key = mnl_attr_get_u64(
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_VENDOR_KEY]);
+-		if (key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_NUM_DMA_BLOCKS])
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_VENDOR_KEY]);
++		if (key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_NUM_DMA_BLOCKS])
+ 			key.num_dma_blocks = mnl_attr_get_u64(
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_NUM_DMA_BLOCKS]);
+-		if (key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_KERNEL_VENDOR_KEY])
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_NUM_DMA_BLOCKS]);
++		if (key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_KERNEL_VENDOR_KEY])
+ 			kernel_vendor_key = mnl_attr_get_u64(
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_KERNEL_VENDOR_KEY]);
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_KERNEL_VENDOR_KEY]);
+ 
+ 		if (rd_is_filtered_attr(
+ 			    rd, "ats", key.ats,
+-			    key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ATS]))
++			    key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ATS]))
+ 			goto out;
+ 
+ 		if (rd_is_filtered_attr(
+ 			    rd, "access_flags", key.access_flags,
+-			    key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ACCESS_FLAGS]))
++			    key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ACCESS_FLAGS]))
+ 			goto out;
+ 
+ 		if (rd_is_filtered_attr(
+ 			    rd, "vendor_key", key.vendor_key,
+-			    key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_VENDOR_KEY]))
++			    key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_VENDOR_KEY]))
+ 			goto out;
+ 
+ 		if (rd_is_filtered_attr(
+ 			    rd, "num_dma_blocks", key.num_dma_blocks,
+-			    key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_NUM_DMA_BLOCKS]))
++			    key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_NUM_DMA_BLOCKS]))
+ 			goto out;
+ 	}
+ 
+-	if (nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_QUEUE_HANDLES])
++	if (nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_QUEUE_HANDLES])
+ 		queue_handles = mnl_attr_get_u32(
+-			nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_QUEUE_HANDLES]);
++			nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_QUEUE_HANDLES]);
+ 	if (rd_is_filtered_attr(
+ 		    rd, "queue", queue_handles,
+-		    nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_QUEUE_HANDLES]))
++		    nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_QUEUE_HANDLES]))
+ 		goto out;
+ 
+-	if (nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_IN_USE])
++	if (nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_IN_USE])
+ 		in_use = mnl_attr_get_u64(
+-			nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_IN_USE]);
++			nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_IN_USE]);
+ 	if (rd_is_filtered_attr(rd, "in_use", in_use,
+-				nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_IN_USE]))
++				nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_IN_USE]))
+ 		goto out;
+ 
+-	if (nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_MAX_IN_USE])
++	if (nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_MAX_IN_USE])
+ 		max_in_use = mnl_attr_get_u64(
+-			nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_MAX_IN_USE]);
++			nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_MAX_IN_USE]);
+ 	if (rd_is_filtered_attr(
+ 		    rd, "max_in_use", max_in_use,
+-		    nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_MAX_IN_USE]))
++		    nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_MAX_IN_USE]))
+ 		goto out;
+ 
+-	if (nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_PINNED])
++	if (nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES])
+ 		pinned_handles = mnl_attr_get_u32(
+-			nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_PINNED]);
++			nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES]);
+ 	if (rd_is_filtered_attr(rd, "pinned", pinned_handles,
+-				nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_PINNED]))
++				nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES]))
+ 		goto out;
+ 
+ 	open_json_object(NULL);
+ 	print_dev(idx, name);
+ 
+-	if (nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY]) {
++	if (nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_KEY]) {
+ 		snprintf(key_str, sizeof(key_str),
+ 			 "%" PRIx64 ":%" PRIx64 ":%x:%s",
+ 			 key.vendor_key, key.num_dma_blocks,
+@@ -166,30 +166,30 @@ static int res_frmr_pools_line(struct rd *rd, const char *name, int idx,
+ 		if (rd->show_details) {
+ 			res_print_u32(
+ 				"ats", key.ats,
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ATS]);
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ATS]);
+ 			res_print_u32(
+ 				"access_flags", key.access_flags,
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ACCESS_FLAGS]);
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ACCESS_FLAGS]);
+ 			res_print_u64(
+ 				"vendor_key", key.vendor_key,
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_VENDOR_KEY]);
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_VENDOR_KEY]);
+ 			res_print_u64(
+ 				"num_dma_blocks", key.num_dma_blocks,
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_NUM_DMA_BLOCKS]);
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_NUM_DMA_BLOCKS]);
+ 			res_print_u64(
+ 				"kernel_vendor_key", kernel_vendor_key,
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_KERNEL_VENDOR_KEY]);
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_KERNEL_VENDOR_KEY]);
+ 		}
+ 	}
+ 
+ 	res_print_u32("queue", queue_handles,
+-		      nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_QUEUE_HANDLES]);
++		      nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_QUEUE_HANDLES]);
+ 	res_print_u64("in_use", in_use,
+-		      nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_IN_USE]);
++		      nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_IN_USE]);
+ 	res_print_u64("max_in_use", max_in_use,
+-		      nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_MAX_IN_USE]);
++		      nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_MAX_IN_USE]);
+ 	res_print_u32("pinned", pinned_handles,
+-		      nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_PINNED]);
++		      nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES]);
+ 
+ 	print_driver_table(rd, nla_line[RDMA_NLDEV_ATTR_DRIVER]);
+ 	close_json_object();
+@@ -215,12 +215,12 @@ int res_frmr_pools_parse_cb(const struct nlmsghdr *nlh, void *data)
+ 
+ 	mnl_attr_parse(nlh, 0, rd_attr_cb, tb);
+ 	if (!tb[RDMA_NLDEV_ATTR_DEV_INDEX] || !tb[RDMA_NLDEV_ATTR_DEV_NAME] ||
+-	    !tb[RDMA_NLDEV_ATTR_RES_FRMR_POOLS])
++	    !tb[RDMA_NLDEV_ATTR_FRMR_POOLS])
+ 		return MNL_CB_ERROR;
+ 
+ 	name = mnl_attr_get_str(tb[RDMA_NLDEV_ATTR_DEV_NAME]);
+ 	idx = mnl_attr_get_u32(tb[RDMA_NLDEV_ATTR_DEV_INDEX]);
+-	nla_table = tb[RDMA_NLDEV_ATTR_RES_FRMR_POOLS];
++	nla_table = tb[RDMA_NLDEV_ATTR_FRMR_POOLS];
+ 
+ 	mnl_attr_for_each_nested(nla_entry, nla_table) {
+ 		struct nlattr *nla_line[RDMA_NLDEV_ATTR_MAX] = {};
+@@ -256,10 +256,10 @@ static int res_frmr_pools_one_set_aging(struct rd *rd)
  		return -EINVAL;
  	}
  
--	return w5100_probe(&spi->dev, ops, priv_size, mac, spi->irq, -EINVAL);
-+	return w5100_probe(&spi->dev, ops, priv_size, mac, spi->irq);
- }
+-	rd_prepare_msg(rd, RDMA_NLDEV_CMD_RES_FRMR_POOLS_SET, &seq,
++	rd_prepare_msg(rd, RDMA_NLDEV_CMD_FRMR_POOLS_SET, &seq,
+ 		       (NLM_F_REQUEST | NLM_F_ACK));
+ 	mnl_attr_put_u32(rd->nlh, RDMA_NLDEV_ATTR_DEV_INDEX, rd->dev_idx);
+-	mnl_attr_put_u32(rd->nlh, RDMA_NLDEV_ATTR_RES_FRMR_POOL_AGING_PERIOD,
++	mnl_attr_put_u32(rd->nlh, RDMA_NLDEV_ATTR_FRMR_POOLS_AGING_PERIOD,
+ 			 aging_period);
  
- static void w5100_spi_remove(struct spi_device *spi)
-diff --git a/drivers/net/ethernet/wiznet/w5100.c b/drivers/net/ethernet/wiznet/w5100.c
-index cfe6813ce805..53d8dc642fbd 100644
---- a/drivers/net/ethernet/wiznet/w5100.c
-+++ b/drivers/net/ethernet/wiznet/w5100.c
-@@ -22,7 +22,6 @@
- #include <linux/ioport.h>
- #include <linux/interrupt.h>
- #include <linux/irq.h>
--#include <linux/gpio.h>
- 
- #include "w5100.h"
- 
-@@ -155,8 +154,6 @@ struct w5100_priv {
- 	u16 s0_rx_buf_size;
- 
- 	int irq;
--	int link_irq;
--	int link_gpio;
- 
- 	struct napi_struct napi;
- 	struct net_device *ndev;
-@@ -417,16 +414,6 @@ static void w5100_get_drvinfo(struct net_device *ndev,
- 		sizeof(info->bus_info));
- }
- 
--static u32 w5100_get_link(struct net_device *ndev)
--{
--	struct w5100_priv *priv = netdev_priv(ndev);
--
--	if (gpio_is_valid(priv->link_gpio))
--		return !!gpio_get_value(priv->link_gpio);
--
--	return 1;
--}
--
- static u32 w5100_get_msglevel(struct net_device *ndev)
- {
- 	struct w5100_priv *priv = netdev_priv(ndev);
-@@ -629,24 +616,6 @@ static irqreturn_t w5100_interrupt(int irq, void *ndev_instance)
- 	return IRQ_HANDLED;
- }
- 
--static irqreturn_t w5100_detect_link(int irq, void *ndev_instance)
--{
--	struct net_device *ndev = ndev_instance;
--	struct w5100_priv *priv = netdev_priv(ndev);
--
--	if (netif_running(ndev)) {
--		if (gpio_get_value(priv->link_gpio) != 0) {
--			netif_info(priv, link, ndev, "link is up\n");
--			netif_carrier_on(ndev);
--		} else {
--			netif_info(priv, link, ndev, "link is down\n");
--			netif_carrier_off(ndev);
--		}
--	}
--
--	return IRQ_HANDLED;
--}
--
- static void w5100_setrx_work(struct work_struct *work)
- {
- 	struct w5100_priv *priv = container_of(work, struct w5100_priv,
-@@ -690,9 +659,6 @@ static int w5100_open(struct net_device *ndev)
- 	w5100_hw_start(priv);
- 	napi_enable(&priv->napi);
- 	netif_start_queue(ndev);
--	if (!gpio_is_valid(priv->link_gpio) ||
--	    gpio_get_value(priv->link_gpio) != 0)
--		netif_carrier_on(ndev);
- 	return 0;
- }
- 
-@@ -712,7 +678,6 @@ static const struct ethtool_ops w5100_ethtool_ops = {
- 	.get_drvinfo		= w5100_get_drvinfo,
- 	.get_msglevel		= w5100_get_msglevel,
- 	.set_msglevel		= w5100_set_msglevel,
--	.get_link		= w5100_get_link,
- 	.get_regs_len		= w5100_get_regs_len,
- 	.get_regs		= w5100_get_regs,
- };
-@@ -735,8 +700,7 @@ void *w5100_ops_priv(const struct net_device *ndev)
- EXPORT_SYMBOL_GPL(w5100_ops_priv);
- 
- int w5100_probe(struct device *dev, const struct w5100_ops *ops,
--		int sizeof_ops_priv, const void *mac_addr, int irq,
--		int link_gpio)
-+		int sizeof_ops_priv, const void *mac_addr, int irq)
- {
- 	struct w5100_priv *priv;
- 	struct net_device *ndev;
-@@ -787,7 +751,6 @@ int w5100_probe(struct device *dev, const struct w5100_ops *ops,
- 	priv->ndev = ndev;
- 	priv->ops = ops;
- 	priv->irq = irq;
--	priv->link_gpio = link_gpio;
- 
- 	ndev->netdev_ops = &w5100_netdev_ops;
- 	ndev->ethtool_ops = &w5100_ethtool_ops;
-@@ -840,26 +803,8 @@ int w5100_probe(struct device *dev, const struct w5100_ops *ops,
- 	if (err)
- 		goto err_hw;
- 
--	if (gpio_is_valid(priv->link_gpio)) {
--		char *link_name = devm_kzalloc(dev, 16, GFP_KERNEL);
--
--		if (!link_name) {
--			err = -ENOMEM;
--			goto err_gpio;
--		}
--		snprintf(link_name, 16, "%s-link", netdev_name(ndev));
--		priv->link_irq = gpio_to_irq(priv->link_gpio);
--		if (request_any_context_irq(priv->link_irq, w5100_detect_link,
--					    IRQF_TRIGGER_RISING |
--					    IRQF_TRIGGER_FALLING,
--					    link_name, priv->ndev) < 0)
--			priv->link_gpio = -EINVAL;
--	}
--
- 	return 0;
- 
--err_gpio:
--	free_irq(priv->irq, ndev);
- err_hw:
- 	destroy_workqueue(priv->xfer_wq);
- err_wq:
-@@ -877,8 +822,6 @@ void w5100_remove(struct device *dev)
- 
- 	w5100_hw_reset(priv);
- 	free_irq(priv->irq, ndev);
--	if (gpio_is_valid(priv->link_gpio))
--		free_irq(priv->link_irq, ndev);
- 
- 	flush_work(&priv->setrx_work);
- 	flush_work(&priv->restart_work);
-@@ -914,9 +857,6 @@ static int w5100_resume(struct device *dev)
- 		w5100_hw_start(priv);
- 
- 		netif_device_attach(ndev);
--		if (!gpio_is_valid(priv->link_gpio) ||
--		    gpio_get_value(priv->link_gpio) != 0)
--			netif_carrier_on(ndev);
+ 	return rd_sendrecv_msg(rd, seq);
+@@ -294,24 +294,24 @@ static int res_frmr_pools_one_set_pinned(struct rd *rd)
+ 		return -EINVAL;
  	}
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/wiznet/w5100.h b/drivers/net/ethernet/wiznet/w5100.h
-index 481af3b6d9e8..76e1b8149041 100644
---- a/drivers/net/ethernet/wiznet/w5100.h
-+++ b/drivers/net/ethernet/wiznet/w5100.h
-@@ -29,8 +29,7 @@ struct w5100_ops {
- void *w5100_ops_priv(const struct net_device *ndev);
  
- int w5100_probe(struct device *dev, const struct w5100_ops *ops,
--		int sizeof_ops_priv, const void *mac_addr, int irq,
--		int link_gpio);
-+		int sizeof_ops_priv, const void *mac_addr, int irq);
- void w5100_remove(struct device *dev);
+-	rd_prepare_msg(rd, RDMA_NLDEV_CMD_RES_FRMR_POOLS_SET, &seq,
++	rd_prepare_msg(rd, RDMA_NLDEV_CMD_FRMR_POOLS_SET, &seq,
+ 		       (NLM_F_REQUEST | NLM_F_ACK));
+ 	mnl_attr_put_u32(rd->nlh, RDMA_NLDEV_ATTR_DEV_INDEX, rd->dev_idx);
  
- extern const struct dev_pm_ops w5100_pm_ops;
+-	mnl_attr_put_u32(rd->nlh, RDMA_NLDEV_ATTR_RES_FRMR_POOL_PINNED,
++	mnl_attr_put_u32(rd->nlh, RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES,
+ 			 pinned_value);
+ 
+ 	key_attr =
+-		mnl_attr_nest_start(rd->nlh, RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY);
+-	mnl_attr_put_u8(rd->nlh, RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ATS,
++		mnl_attr_nest_start(rd->nlh, RDMA_NLDEV_ATTR_FRMR_POOL_KEY);
++	mnl_attr_put_u8(rd->nlh, RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ATS,
+ 			pool_key.ats);
+ 	mnl_attr_put_u32(rd->nlh,
+-			 RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ACCESS_FLAGS,
++			 RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ACCESS_FLAGS,
+ 			 pool_key.access_flags);
+-	mnl_attr_put_u64(rd->nlh, RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_VENDOR_KEY,
++	mnl_attr_put_u64(rd->nlh, RDMA_NLDEV_ATTR_FRMR_POOL_KEY_VENDOR_KEY,
+ 			 pool_key.vendor_key);
+ 	mnl_attr_put_u64(rd->nlh,
+-			 RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_NUM_DMA_BLOCKS,
++			 RDMA_NLDEV_ATTR_FRMR_POOL_KEY_NUM_DMA_BLOCKS,
+ 			 pool_key.num_dma_blocks);
+ 	mnl_attr_nest_end(rd->nlh, key_attr);
+ 
+diff --git a/rdma/res.h b/rdma/res.h
+index 8d7b4a0b..1f71115b 100644
+--- a/rdma/res.h
++++ b/rdma/res.h
+@@ -200,7 +200,7 @@ struct filters frmr_pools_valid_filters[MAX_NUMBER_OF_FILTERS] = {
+ 	{ .name = "pinned", .is_number = true },
+ };
+ 
+-RES_FUNC(res_frmr_pools, RDMA_NLDEV_CMD_RES_FRMR_POOLS_GET,
++RES_FUNC(res_frmr_pools, RDMA_NLDEV_CMD_FRMR_POOLS_GET,
+ 	 frmr_pools_valid_filters, true, 0);
+ 
+ int res_frmr_pools_set(struct rd *rd);
 -- 
-2.39.5
+2.53.0
 
 
