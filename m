@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-284171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284172-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OOcENmpW+WkK8AIAu9opvQ
-	(envelope-from <netdev+bounces-284171-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 04:31:06 +0200
+	id YEGULoZW+WkK8AIAu9opvQ
+	(envelope-from <netdev+bounces-284172-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 04:31:34 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52F4B4C5FF8
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 04:31:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 733E44C6025
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 04:31:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A73CF301C11A
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 02:31:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7EACD302A4C4
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 02:31:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A259361DB2;
-	Tue,  5 May 2026 02:31:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943C2392C28;
+	Tue,  5 May 2026 02:31:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CcPjOAws"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e/S3bRzH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2616817AE11;
-	Tue,  5 May 2026 02:31:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7174B17AE11;
+	Tue,  5 May 2026 02:31:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777948261; cv=none; b=KXm0lsN70O5/8guKp9dwKg9k/T225u3HVndoxHulArs3jTDDt+Bge4U7Y9uJMfmAqzxmG76dA6dsRPaaMhx4ykR+tmT+EpVpGVZIitHmkX8PqMVm0OfDCwCsFYK/gAk4YJaBHhxmCSycOuRnYNFjbnCTq25tqGRHXPJ67Yvu+RA=
+	t=1777948268; cv=none; b=sVWeoK8BM5K9eXxpsc2N40ZfVVSM70lDLeRF2kfBj0dY0FmQwsLJJZ5PwIyMP8Ycpk/Wz0PA28LMxhentMeWRmUq0pszShCN/39UMj5CemAh4kZrCVMCqpSsIEJfzlvirWkPbLEhf+oUduND/BLVocn6UJvDzZEw4DxOeykbK6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777948261; c=relaxed/simple;
-	bh=AA8cH8hQ3P20TZYGC9RLfTAA7leVeZMi69S2rtE2FZY=;
+	s=arc-20240116; t=1777948268; c=relaxed/simple;
+	bh=RCAjlfKuZagrgxtMe0XjrLpsCYqCn3cYxzS3K/p3io4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sV8LMhNkHovjQaq8E7vMjlG83DYkdNTfY6/kQ9xf1u/ej+STQhEm03RU/94dEoALKOz4D6bFwlmS9CifZrWCDzwH0k51neYOUJh+gFLVaAltOkCqXwBe9LIDdw06K6dzjl9yH8WBx1/KLSmFEKOVV98aCib6Khef7u0bGQXe5Rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CcPjOAws; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C94DEC2BCB8;
-	Tue,  5 May 2026 02:31:00 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Rbgm4uHU8GgwYJbTI0MnUHpufmhgWM5s7MiBla6m5rDCIGFtceluVZKpT+HtpRfJbJKyRZjPVjtDeo9XVzbjvFZLaf88lJ656m1Nhgzz8yl0Jbve6ziKqv4Wx2K5l5YLPymnNWGGc5AZ18drz59gRxxxzZ0SA3+AyXcRQzVqI2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e/S3bRzH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 044BCC2BCB8;
+	Tue,  5 May 2026 02:31:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777948260;
-	bh=AA8cH8hQ3P20TZYGC9RLfTAA7leVeZMi69S2rtE2FZY=;
+	s=k20201202; t=1777948268;
+	bh=RCAjlfKuZagrgxtMe0XjrLpsCYqCn3cYxzS3K/p3io4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CcPjOAwsGtV2b+oHpYToX8y5hgsqILoLGLvc2YNZ5OC6krSDgxyXMpzTuC7W7NjZg
-	 J8SOInSr4WwQgfAJVW35KenF1Rzsm8oiAMtko5BBAm05dYlQzjw1ONGXqmll6Ff9g5
-	 LbXofClyRiBaBKTsmfVvk2AX+uwo4KTsFH+cVxrwURIElnPKVRPy7y2hABaQXsTeFh
-	 hPeWCviMtkDTUMgyfSI5fWdFO7ORgFo7HcZWvIo05lNFAlFVbI5elZsOpQP2DV2F9O
-	 07Y6z3w7PcIKVGpgiGiIib/dFPMme0wH05qx61znz2Jzk8SRcTA1zlFL1wbE1Zlv55
-	 FnzYWKQn+Gl7g==
+	b=e/S3bRzH5NibC2wo+6jcKtYgfdcsVJdUdCHSe9QtZdcbDWrf1/TJZeikkesNZydEz
+	 8+VfDfuPaSeMbpu1jNpvBlz1Cc+Y//tTvDcwUHxNmarcQdMt4DHhvOtKC0eG59/83J
+	 YU/TK8J8FGyIp4+f7TvPgKUDGD+xxCcDCjo86d7E+InSSPBRC7HAb1jCS8iQTQNkTl
+	 dFp9Jg9hbxkWqqaJ3XLIfLhXXjpfM7MdgmBj8lIN0cOYtxKm+xYln9Gx+gQMfdzd3H
+	 gMGy0Xf45TzWRoWkmMviJpsYNivRXF/rAOeV8+dQKFlSKdo4rNIl+IhJSonMmr5ipX
+	 cyRc+lCHe/nAA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9E0A39301A2;
-	Tue,  5 May 2026 02:30:12 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02E3339301A2;
+	Tue,  5 May 2026 02:30:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,77 +55,72 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/4] mptcp: misc fixes for v7.1-rc3
+Subject: Re: [PATCH net-next v2] net: mana: hardening: Reject zero
+ max_num_queues
+ from MANA_QUERY_VPORT_CONFIG
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177794821155.1394832.1837410198700398471.git-patchwork-notify@kernel.org>
-Date: Tue, 05 May 2026 02:30:11 +0000
-References: 
- <20260501-net-mptcp-misc-fixes-7-1-rc3-v1-0-b70118df778e@kernel.org>
-In-Reply-To: 
- <20260501-net-mptcp-misc-fixes-7-1-rc3-v1-0-b70118df778e@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: martineau@kernel.org, geliang@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- fw@strlen.de, yangang@kylinos.cn, dmytro@shytyi.net, netdev@vger.kernel.org,
- mptcp@lists.linux.dev, linux-kernel@vger.kernel.org,
- shardul.b@mpiricsoftware.com, stable@vger.kernel.org
-X-Rspamd-Queue-Id: 52F4B4C5FF8
+ <177794821880.1394832.6493120099852463221.git-patchwork-notify@kernel.org>
+Date: Tue, 05 May 2026 02:30:18 +0000
+References: <20260430085638.1875400-1-ernis@linux.microsoft.com>
+In-Reply-To: <20260430085638.1875400-1-ernis@linux.microsoft.com>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ dipayanroy@linux.microsoft.com, shirazsaleem@microsoft.com, kees@kernel.org,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+X-Rspamd-Queue-Id: 733E44C6025
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284171-lists,netdev=lfdr.de,netdevbpf];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-284172-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
 	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	TO_DN_SOME(0.00)[]
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 01 May 2026 21:35:33 +0200 you wrote:
-> Here are various unrelated fixes:
+On Thu, 30 Apr 2026 01:56:31 -0700 you wrote:
+> As a part of MANA hardening for CVM, validate that max_num_sq and
+> max_num_rq returned by MANA_QUERY_VPORT_CONFIG are not zero. These
+> values flow into apc->num_queues, which is used as an allocation count
+> and loop bound. A zero value would result in zero-size allocations and
+> incorrect driver behavior.
 > 
-> - Patch 1: increment the right MIB counter. A fix for v5.7.
-> 
-> - Patch 2: set the right MPTCP reset reason. A fix for v5.9.
-> 
-> - Patch 3: fix rx timestamp corruption when on MPTCP passive fastopen. A
->   fix for v6.2.
+> Return -EPROTO if either value is zero.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/4] mptcp: use MPJoinSynAckHMacFailure for SynAck HMAC failure
-    https://git.kernel.org/netdev/net/c/c4a99a921949
-  - [net,2/4] mptcp: use MPTCP_RST_EMPTCP for ACK HMAC validation failure
-    https://git.kernel.org/netdev/net/c/a6da02d4c00f
-  - [net,3/4] mptcp: fix rx timestamp corruption on fastopen
-    https://git.kernel.org/netdev/net/c/6254a16d6f0c
-  - [net,4/4] mptcp: sockopt: increase seq in mptcp_setsockopt_all_sf
-    https://git.kernel.org/netdev/net/c/70ece9d7021c
+  - [net-next,v2] net: mana: hardening: Reject zero max_num_queues from MANA_QUERY_VPORT_CONFIG
+    https://git.kernel.org/netdev/net-next/c/93ca1575dd1f
 
 You are awesome, thank you!
 -- 
