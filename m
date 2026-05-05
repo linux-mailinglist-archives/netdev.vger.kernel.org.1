@@ -1,171 +1,157 @@
-Return-Path: <netdev+bounces-284148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284149-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UM7KIIVG+Wki7gIAu9opvQ
-	(envelope-from <netdev+bounces-284148-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 03:23:17 +0200
+	id ULz3GVBH+Wki7gIAu9opvQ
+	(envelope-from <netdev+bounces-284149-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 03:26:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBBC14C5BAC
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 03:23:16 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1A874C5BE5
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 03:26:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 97DBE3010B8E
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 01:23:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2DB6A3014BC1
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 01:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16FE5332621;
-	Tue,  5 May 2026 01:23:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F5C194C96;
+	Tue,  5 May 2026 01:26:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KL4gnMYl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s4rT0w84"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2565C613
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 01:23:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777944195; cv=pass; b=pKPTCb27J8JcGzjjfNY+KZKe0w6TvzBW8WWKYRrPK7rcz38NOSK+Nozrn3c8VsyKzDtl2MMsTIyh5EZ/LsY46z9gdmKPgxzFm9c3x8VLlmcc/1Uff3PwlOyy8fc94GxbFM0G56Qm3tXixM3RFDzHHLfU/zq5diosOGmRjBkroKk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777944195; c=relaxed/simple;
-	bh=Rr3wU4+uo7PsSxYrNtmT6CjW/2oWhP4X5/7X8ZQP0tA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L1Qu7Y8b6jorxxuO0cawEws3HWk4kZBIQen7WUjskq3ewR26uysyQHCuKZdoBDCyhBDVt6mtEDODdk2sjDEGZEKL0VK2E8iHk0cwY9o44Yght8mzmxCYq6wm0pAjRRsvHRlDTlQL+7YWqc8NwvFRFRh+uG8XTORzoUMR+jAzVus=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KL4gnMYl; arc=pass smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-67b8d9c26bbso6145045a12.2
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 18:23:13 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777944192; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ZFkikmQC80QjgMd96VNiIBwTGCozFw5JlfbVR2OonwMTjeu1OCkHXzQ62i06WYWpJM
-         45v1wW0zEkUAq7XWAALpDXf584nS0VpLHqcozGPLEnNDM3Y2xvLiP8R8Q+UKVclJcWp/
-         klsJOY9tOo6RZAkLm877w50bY1UtiaMNBir5zBkP08Kv/oZ0kZRCbJORczjtIf6kGK0k
-         bOOa5EpisUZkHZmCrd5DR9WV3YDbgjKEcT480RZxFFE8fX5m7elp1B11Q6o7YXaWejnp
-         OIwe4HG11vJzNFjuDq6rn6fLj0BlGAR7OeQ8qIqZy3HVn58wqrgxcgNKpeHMPiTMm182
-         BkRg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=cCXrAWmoAymL9ifKCG4c/wEuHOu5FPfo6N65MqG9vPs=;
-        fh=iuRHt7dolYZH6iFBvp8zeByKnv36cRFQjsgFAkZBaeE=;
-        b=CPch1yAiQkeXvL5nyuzFRfGsHTERBDmDd3ytoqzieQbNwcJsnVq/8kFwaOXRRZt79E
-         Dn4h4o/YCrpay+OiH5dqOEIQXKIdi7PthFZ6u1sl0hrsruqoR7TMdq3ky2a2ddb5qkVC
-         zoi0dxZUBi38YjxH0BPgoCaZxf037aJDhzS3R+809i4MwqUvzbxaJgpUGTcBque35giX
-         hdsnO21z7LLe9n0dXQsOCRtmXEDQWWDSUfR4ThFj5Bzdm6ogCfHbADiC2YkWUNcbJ1wG
-         sXh++5h4yVns9ckYg2hLzCMeEz25pAOvHIicDJcxdr33wKzk2e4UctYuiK1xLFiT9rpl
-         SlDQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777944192; x=1778548992; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cCXrAWmoAymL9ifKCG4c/wEuHOu5FPfo6N65MqG9vPs=;
-        b=KL4gnMYlcA1PF8bTf7kOe2sd5FK3/paFvLZPyIrGLO/mpUp05Wk357vRzuAVydpSzX
-         fHLbvt2C2I7+x8Nc83g56+DwMz2fIJ4bxIC0suemFM5i9FulLwqe7Nb/3xHpaMeHl03b
-         9IDX+bvC2KLMQDPuSD7PwNN7SqpfDQ+iKXase/bJmSEFlYE7g8eKnc5qSVvJCTAHEbKQ
-         m7iixZKURyplgTeE24eOIsNftklf9pyN2rR/PDdm4fHlwp0l1KSIStQf3pIxV2cY++Qs
-         Wa+/E6sB+cdfVjMLI7n51C2VVKvrjMQILqbdBfIr1mq7BkhQpdDi3LVet4vUo2v4eVe1
-         NElQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777944192; x=1778548992;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=cCXrAWmoAymL9ifKCG4c/wEuHOu5FPfo6N65MqG9vPs=;
-        b=Nvsj5n1kgmfynJlJUBQUopEyprdKUX0I7zcPqsZh5d0z1N3QTW6RcuMOR1537y6DHG
-         9mtrO6pWjI1UVX/qsbk2+HONmttO+SXxoL6Pg+dnmmjTuh0cxrnRPONQ1i3aOF0a06ZU
-         SGbnT8pAW/aLCmmw+iYHOAlCt2JTpsfXT5Xq992qDn8Y6or/Oa8D55CyfUsHa5v5ywJl
-         CCY7unS4vCmlI8alvbTMGp52FXZEQ2nXR4QQ1yPdICanE2zeFg9wJn8h3n3Xn86PDyKh
-         50SYoueKaj5rcUCHpkx4o22SdjXp0siqff1D+UStuqDyR1sl5Lv1oFTXUGjb37OtCSEf
-         vjyQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/dLDpXlb1QjH5x6/oWgjxz82qbOcGoH72A5SFVlOjWF16pxA57BaWkFczWK+oTc/thwPW1W5I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyb5xt/Pdlfr25D0xfK+QkzNNm/A6q8L6P6MWMR1mSzejuQxe1S
-	0IoegaL5uP4GNGAFvLoWgKCU7Uy+EpwLZVu/oJrY5oBuLUb3+9QFoZ4p2dNk7dCDzTaAN8P38lR
-	MlaeOMch0YY5DaDjAmdnTjdid42BONcQ=
-X-Gm-Gg: AeBDiet2yyYCtyViyIe2dcaD2WJb/DFPega5S2eXPp/L0Qin+sxXxeGrZJT64NZ4lMn
-	8ovodr5pMgAY0hegonXU+0lH/SeXjoxNI93olaN95gCK/kUF1uAKYTmq6qcU62W7vEOsdXrEO1R
-	cxycmsgzIGqatUYK3wJ+mFbxfBstXqwvagpvC2bHhTUq5yifequaZinx3LX5nsgEH8mqRa7aY9z
-	ZQE3xc26I808lr5OwedZ1g8GLnMYuBvAQnl/GVz0iU8GgGw2EBHrC0Q70rTPJfzkchIP9TaSB4s
-	wfezaf6iCWf/IEXg1tU=
-X-Received: by 2002:aa7:c904:0:b0:66e:43ef:2951 with SMTP id
- 4fb4d7f45d1cf-67c19929fdamr4132069a12.4.1777944191864; Mon, 04 May 2026
- 18:23:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D1BEEBB;
+	Tue,  5 May 2026 01:26:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777944397; cv=none; b=H6/ztxESIs0iS2pxNV2K47HDN3hBufp6s6Izdr5rc9ZtntEL+v2AI1x06i3QHNQOO4eL7myB6fo4Kwe5J8lnhrKtaNVUc/BRfD2WETT9x90ExzuNvn4StDkLScfXASfpeWJVtvn4V39m9jZVDfxRNA3bQE4KbubZSJGi8jnsbew=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777944397; c=relaxed/simple;
+	bh=wmOzGc/Fp8zFwcVA/+EiRdoheVyhK7v5Xvoe5ybKfxQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ReTJUlHOwcOa5L4msxxYlv/wE8/cdx/hYnhkZHJp9DtrBqpBiUdtP8vt2hS4m3Yd/X9gTHpNfv2lYjX/w+bVZDs+V513CuGr6TwEWYngCT4fTLLTBZcumUHVVxj36mLfRqlKxMK78ZoEQEQLKfP7t95DITcV780SzU7QFJJhv2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s4rT0w84; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D3D2C2BCB8;
+	Tue,  5 May 2026 01:26:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777944397;
+	bh=wmOzGc/Fp8zFwcVA/+EiRdoheVyhK7v5Xvoe5ybKfxQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=s4rT0w84GV4YzmmCoUnJ5+KNl6+u6rX0I4juDTIJjtzGadKYVLDfCHW/TosEisKMw
+	 eTqpXGgMExH3eVJtfOtVuW8ks3O5oJB+JQ5Uaij5ezWdtwlHSmuVumb1cuHT2xPlzU
+	 t9jJM/ntS+0miFv8BaizcRRMvuLf3maGUV7i+96TcCSOUQSIOrPETj2IitohTXL0Sv
+	 vx44UnA9sb9PT5kforhtsIgnhM9vM6ZeMbdTkNqfRVsdS34YD+np6E8pOnvZ5TdbKn
+	 jCtjOOy42x3BHBSd6SiZgdw+VCbutpJ/VFJLoYpbq1+fQ6XOCVyIGcZrWxv2d3BLHE
+	 CQaKH+E2p5DTA==
+Date: Mon, 4 May 2026 18:26:35 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jon Kohler <jon@nutanix.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, "intel-wired-lan@lists.osuosl.org"
+ <intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] e1000e: ethtool: add get_channels support
+Message-ID: <20260504182635.39e1b7a6@kernel.org>
+In-Reply-To: <D670011F-AA11-4AFF-A70B-4DFF03C5F049@nutanix.com>
+References: <20260504154823.2535612-1-jon@nutanix.com>
+	<20260504164901.7b3a737b@kernel.org>
+	<6F0C5872-0388-47AF-8CD9-1D116EA13224@nutanix.com>
+	<20260504180656.62539d96@kernel.org>
+	<D670011F-AA11-4AFF-A70B-4DFF03C5F049@nutanix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260505-seg6-mobile-v2-0-9e8022bdfdb6@gmail.com> <20260504163915.4a8b028e@kernel.org>
-In-Reply-To: <20260504163915.4a8b028e@kernel.org>
-From: Yuya Kusakabe <yuya.kusakabe@gmail.com>
-Date: Tue, 5 May 2026 10:22:58 +0900
-X-Gm-Features: AVHnY4Ks42sm_qgbhHJDSLEyR_36W-fEa54mnTPR5nGVrmyYGFlRodbG56Qn8nQ
-Message-ID: <CAGCJULP83NnaX6HAqwb3umDXsxN8LH48_gPpJ_3gG8_xA96QNQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/7] seg6: add SRv6 Mobile User Plane (RFC 9433) behaviors
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Andrea Mayer <andrea.mayer@uniroma2.it>, Shuah Khan <shuah@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, 
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: DBBC14C5BAC
+X-Rspamd-Queue-Id: B1A874C5BE5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284148-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yuyakusakabe@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-284149-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[]
 
-2026=E5=B9=B45=E6=9C=885=E6=97=A5=E7=81=AB=E6=9B=9C=E6=97=A5 Jakub Kicinski=
- <kuba@kernel.org>:
-> Could you switch to posting this as an RFC until you gather some review
-> tags? Our CI require manual intervention to add the necessary iproute2
-> patches, I suspect there may be some uAPI changes therefore requiring
-> iproute2 changes here.
+On Tue, 5 May 2026 01:12:29 +0000 Jon Kohler wrote:
+> > On May 4, 2026, at 9:06=E2=80=AFPM, Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+> >=20
+> > On Tue, 5 May 2026 00:59:40 +0000 Jon Kohler wrote: =20
+>  [...] =20
+>  [...] =20
+>  [...] =20
+> >>=20
+> >> Perhaps, but I=E2=80=99m not sure that is a guarantee. A good relevant=
+ example
+> >> is when I added get_channels support to enic, which supports all sorts
+> >> of channels, so I don=E2=80=99t think EOPNOTSUP can be 100% consider r=
+eliable
+> >> in that case. Meaning, if it just so happens that the original author(=
+s)
+> >> didn't put in get_channels, that doesn=E2=80=99t necessarily mean ther=
+e is only
+> >> one queue.
+> >>=20
+> >> And in this case, there is an "other" queue as as well too, as far as
+> >> I can tell, so the output is at least semi-interesting. =20
+> >=20
+> > Sorry I wasn't clear enough - if you have an actual, real life use case
+> > why you need queue count of 1 to be explicitly reported - please explain
+> > it and put it in the commit message.
+> >=20
+> > If you don't - please don't send patches for the sake of it. =20
+>=20
+> Ah, ok, sorry I misread your message, this isn=E2=80=99t a patch for the =
+sake of
+> a patch. Long story short, we=E2=80=99ve got a user space part of our con=
+trol plane
+> that reads in the output of ethtool -l as part of some broader queue
+> management code. On systems with an e1000e device present, this specific
+> component goes into a crash loop as it expects all NIC(s) to at least
+> give it some sort of output.
+>=20
+> That crash loop is easy enough to fix to ignore unsupported outputs;
+> however, my thought here is a simply defense in depth fixup, especially
+> since the kernel patch is quite trivial.
 
-Will do.  Yes, this series adds new SEG6_LOCAL_* / SEG6_LOCAL_MOBILE_*
-uAPI in include/uapi/linux/seg6_local.h; the matching iproute2-next
-series is posted separately:
+Got it, thanks for explaining.
 
-  https://lore.kernel.org/netdev/20260505-seg6-mobile-v2-0-93291b7b0134@gma=
-il.com/
+My concern is that if we are expected to always report channel counts
+we're signing up for a major whack-a-mole with the existing drivers.
+Most drivers don't implement it. The networking stack does report
+the number of queues the device asked for via rtnetlink:
 
-Just to confirm the workflow you'd prefer: should I repost the
-current series immediately as [PATCH RFC net-next v3 ...], or wait
-for technical review on v2 to land and fold it into a v3 RFC?
+ip -j -d li show dev $ifc | jq '.[].num_rx_queues'
 
-Thanks,
-Yuya
+but in your case I'd personally lean towards user space fix.
 
