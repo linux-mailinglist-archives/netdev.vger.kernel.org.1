@@ -1,231 +1,285 @@
-Return-Path: <netdev+bounces-284501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284502-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2GroBr8X+mlYJQMAu9opvQ
-	(envelope-from <netdev+bounces-284501-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 18:15:59 +0200
+	id MDaiBtUX+mlYJQMAu9opvQ
+	(envelope-from <netdev+bounces-284502-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 18:16:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A95BB4D1136
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 18:15:58 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EFF94D1153
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 18:16:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D86343060CF8
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 16:09:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 29EE5300D145
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 16:10:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1EDD48AE39;
-	Tue,  5 May 2026 16:09:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 941CF481FB8;
+	Tue,  5 May 2026 16:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AqXqj9eY"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="bMOsNSIP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05E248AE30;
-	Tue,  5 May 2026 16:09:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FFCA48095A
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 16:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.52
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777997357; cv=fail; b=VVhthVk8kFJpOXWFFmcZL06fWUpIqUgRVeN1i+D8NJSbEOgkrg0qRveN56FUPYyrsqzVTStKjfTyj09eA1dPxTATDtQbPM9tFXnYjyvDdPyosNr05iK0bHixoklZL/hh4LcNYNMKNcOfdO61XHwbHgt6yIiT+Ci+EmZtmJZx+0I=
+	t=1777997419; cv=pass; b=eo9RfPmKMr9XXwzHhDDKR/lzFV53G46dxo5tNeV7mnqhnUXlWjVJ8Tgmb/8gZimDqYPmGvBlBGBcT9iNX3ldhOLVrCM38PkXRTkRqPNcgvC0kw3ectZ9SZ0TAYMdPisLFKze8LeP8B9lSBUBnwwe0XybtMiRiyPZirrII58Kyok=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777997357; c=relaxed/simple;
-	bh=zwrQ5xwiHGCBlm3D6XOoc2wRMLfyKqFDhum1WRjD9UA=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=A19SeAs0il+YmlkmuBPsX2UAOIFsXrZfOclZlzUJEpUpAEYXgc2LyMvgRb1LRTLu7YHhWEkhUOgimzu3fk6J556VTpnUmaAX/x965yhSDKTQ8YkawpvmnonwVPhgPKbVAkixEHCMuvHLKpCc2cDvahoaF1ExLBWPCpIR3xY7KH4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AqXqj9eY; arc=fail smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777997355; x=1809533355;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=zwrQ5xwiHGCBlm3D6XOoc2wRMLfyKqFDhum1WRjD9UA=;
-  b=AqXqj9eYAs8v7SfaNAt6DxEHf1881f24Jd6Heay1bnKK7sbbSzYHGDoN
-   BlbHA24LHO+cNu/tzeRm4c4fYE/HO0W4mjBQa0979gX8y+H9y4wF66ncA
-   e1yvuJ92dCBNrwL9BOkOkO2VVJAy3IjWaCa8l3XPbsyocEQO6kpHWAT2M
-   ArU/uo6L29ZXVqFiDUfSnTrnolxRDZpLp4LO2RzDoi/iMFC1SKgqWbnRv
-   4IfP4iMKXfWtCdNovmLo6XCiTutlkvYQgD8aOfZIa8g1XNgeKyANBFbMs
-   UtR0jrq+1daoLHmDxB5aME4xItQvoD0Bs6NsLN76XZDhomueezH9rt1l/
-   A==;
-X-CSE-ConnectionGUID: 54B1XTWnQkm7n53yrc2shA==
-X-CSE-MsgGUID: LXyi7e1hTDC7/z+/vr5zcA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11777"; a="81434143"
-X-IronPort-AV: E=Sophos;i="6.23,217,1770624000"; 
-   d="scan'208";a="81434143"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2026 09:09:14 -0700
-X-CSE-ConnectionGUID: cbDzjHYRQeWbrN8OlhYmug==
-X-CSE-MsgGUID: ll5vdo65RC2zFohVbFax+g==
-X-ExtLoop1: 1
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2026 09:09:14 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 5 May 2026 09:09:14 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Tue, 5 May 2026 09:09:14 -0700
-Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.15) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 5 May 2026 09:09:13 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SrymHWBvZAsTrN9HEt1btjiCdHHJuGzSMDpVPRHtMXt3E2RUZCuCoY1SIZwsKoY0d4GH4v8fDpmrUPmW/znhveVdSdTLE8zrzeoCu0LtCi8+mnDgfMutZdLfWsmEra7BCcgMy80yL2vZ2o/De5EOx77+Q/66E+0y5YSBX6UKNO+EphHwnDM0OvsLBwqeKFp2YL91czrpBL1B6a7LhPmCSLDUw4nehSpzoXUaaY8Cj/flWDFCPMDIPDu/x+bBCVcj869Sqx/VTd6Ydmn6AsWTjUZqOM/Y2q6g/xMR2pe5soxocvGE6YEeHZnuLYu/60yxx47rSXUQMCgnm8Gn3z6ibA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BE0w/sd8mFCcuuITJCZ/m7VkTFNFVKl6kzgYtsHLL4I=;
- b=ds3cNtkgzIRi5R1Pz23f+bm6ivDxqkvb/m7aOmHC2BNE4VHP2UK1jdEjg3EiZCZa4oKdYi7MrIAkPqGp+dAYJWRXQKAc5CayDxy9Yj/IFwHj3hLlWFmsrla1H6BFJpWSom1uZnfkNmM5iBcfwaouo4x3nKdY5CejZrh205nD48IfnMROUpGDxjuuaM9FAfXl37ry20QfI2Y/eUYRFuEGpFQiS4lUYj+8DGWUwhI7u5rXGSE8+EP2iIhC7CAbIGC1R3caYRgHFkis+tdFeqbnIym3VwMB0+HoUq/OxpdJ3zhsn1UJMp3MyFFRp7NcqZ0jpkbUiwnRqVAK2Dt4zY1/3w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by PH8PR11MB9829.namprd11.prod.outlook.com (2603:10b6:510:3c3::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Tue, 5 May
- 2026 16:09:11 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::6aa:411d:4bfa:619c]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::6aa:411d:4bfa:619c%5]) with mapi id 15.20.9891.008; Tue, 5 May 2026
- 16:09:11 +0000
-Message-ID: <dacc8ed8-ad35-4458-b9be-dbc5d738edb7@intel.com>
-Date: Tue, 5 May 2026 18:08:05 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] gve: Use generic power management
-To: Vaibhav Gupta <vaibhavgupta40@gmail.com>
-CC: Joshua Washington <joshwash@google.com>, Harshitha Ramamurthy
-	<hramamurthy@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Willem de
- Bruijn <willemb@google.com>, Ankit Garg <nktgrg@google.com>, Tim Hostetler
-	<thostet@google.com>, Alok Tiwari <alok.a.tiwari@oracle.com>, John Fraker
-	<jfraker@google.com>, Matt Olson <maolson@google.com>, Praveen Kaligineedi
-	<pkaligineedi@google.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20260504182139.604925-1-vaibhavgupta40@gmail.com>
-Content-Language: en-US
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <20260504182139.604925-1-vaibhavgupta40@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: VI1P194CA0047.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:803:3c::36) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	s=arc-20240116; t=1777997419; c=relaxed/simple;
+	bh=Z0rIC/cx5i0Js1KOIk9f3HJePiP8tqlo7jKj0hmDWVU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BHAaQxY54clmxQ7GTZkjYkXdk5dneAxZBPOQdrmDxC8OHvGRgmCfc4lX2WSB1hF6Ml0DUXXeXDBdzpCDCWuemEr624G9xuwLd3xbqQejasGIDDnpS0LVM1QnB4FlP6aMCfd7xKivgbvdKR6LijYMFB923bx0SyepRt4iNDg9xqM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=bMOsNSIP; arc=pass smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b936331786dso649386166b.3
+        for <netdev@vger.kernel.org>; Tue, 05 May 2026 09:10:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777997416; cv=none;
+        d=google.com; s=arc-20240605;
+        b=IMPlc8Sy6RapXMbjo00+qR/uWC3NrPglSoxzt6hoeS/xYRHVxuu+/QVzVknrCw73AU
+         qAm0vDEHRodcsJXIjKSGPIELkvT4ymYsLZ2peD8DCBJPURH9FNUfpnypGxt120ItJG2m
+         h77VNdUfHjp/nxzDAniy/Rd6HQ3w3c7iBZCFfL9D/TS2H3dzqAmcnqCRByHNS7OCPtrq
+         mzuIs23BQi8RpIvAfxhyTmoZzqkJuGv2JiIrzYGFFUrJxo2cdQvsmbgWfY+896w4jT9h
+         vdQeM/3+atdq+uqOJwNVk3HOGkrMyycfFZNwBmo9KQHNKhvjlh7DSxPXQ8JCRMG9CPqa
+         daTQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Yt5OWwUWDVV4Zqx76acGWCtdqRNXgLDKgAdlP1bWoas=;
+        fh=pkIXUcn01GGiDFnfP6H/CpcnxExCcINNWxTzJY6qJpo=;
+        b=Tuc3z/AtF56iap+hjZwQdfZZEnq9FHDGvN/KODXCrC3jWm45FHI5Rr1OLjfWBrFkXx
+         Cx7mpI1gVDUdM3Y3KoRIHMRSqmdCNBKRDDArM+gCMwdaoFOpKFXA6PUbhQawRbrpWkjG
+         RBcKPDvW1gH7sO1BZt5c9H/nzw0DU99gHmcIVbxPdZFVuOE5KmwsqLyD6bTunbde/PFB
+         cZ9XvOKYT7dFEU/8ASvodyq15hwT+K5JgKrrgihVZFFr2cKNGnFDJthLPg6w79aIszba
+         /q+en81p4tY5xL6QhdR67V8cRBBADMwp+MwiVrBqABl5zMVEIUaZ+8/979LmPshskzJV
+         wAwA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1777997416; x=1778602216; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Yt5OWwUWDVV4Zqx76acGWCtdqRNXgLDKgAdlP1bWoas=;
+        b=bMOsNSIPM6Mh8d5X2eKxUp/1WkB0cnShbiWf5oHuJC/Gl0KSnOHUknm8jnqk8Xvakn
+         DM271jjT509U38qKUFVk41dU6m5lWdbkZP8d1mZRB5bmPr+MfUaQrDH0qd5UZk/dTxcN
+         WSYCwkLZ18YfDITCiZ/jrc+7fbqsp9OPcXvgqjKorizUyeOAhKkn6l90cMFdiydNXhJV
+         dnM3bnC5qh3r5lcWL6xIblCYkXiDEVp73UdWj3k4JYXXSFXyZXxyV64c0AtFHetXXCgF
+         IXbZ8QGYhF1WDk7JjKct1ng4ei3boMCk8bxf41wDQyOnmigg3DUxIqGddgN/M1gfVNsb
+         K66w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777997416; x=1778602216;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Yt5OWwUWDVV4Zqx76acGWCtdqRNXgLDKgAdlP1bWoas=;
+        b=qw6Fjx2LEzXwu5S1EjHbishXj+7K8yTWwrgeOUFy7XkJesIhCfGXi9QHOtZ0Zwti+9
+         pwF9jHitsHtbYbMBU5XD+auyT8WIpyo/xjXdlcMf3GBdZuYQudUbbCmEnLRxkIMXM46M
+         D/DMTl93DL+LnIRZoukHxeURKhok/KGJ3Wg3y79MtfWby+Hv3X1xEts+KSWFa60Qo7Wh
+         p8vGzRyOkDi239EQjx72rJ9k8lE0EUV7vhaQSLVxBYOnfDygAJO1R4aFNRL9XcQhYJuO
+         rqEGn5XnGI63v9iLhJywdfwlxH54MxQ0IXP7RqyYEyxSFusnmdn4IQQVQ450rP8JvyQ8
+         ZXGg==
+X-Gm-Message-State: AOJu0Yx//+hJraBhLcSENN1T8rNSA59V2zirUH1ONbLBgepghVEGSCLG
+	nBR0CQIhBeSa9IZSNR6V/TNGqcBZz0nnrhQx+t6MpLJSp3gAZ15jWcOA7vMflhzNpUKjIt7nkPY
+	haorcJLA5EKUB3oGKfljMsxYmvqrxdtWxZWxWIHisgA==
+X-Gm-Gg: AeBDies/47Lt2spxgIMxV7sTaj3HJY8zDbMCEoO1mrmRRrE3ludmJzbOxfCC4x1dd0s
+	kRBoByoc4pANdC54ljSRzXqqEME2ycKOLVLF4zlYGwHceQI8AMdUIez4+O2xI9uS7ppvTDMDVAO
+	KlvrlcbDPHuhCDkMji+mBlTzSu2rT8lIEtMZ4Tou/ItoPAiJGWQJY3LVFJtCWQxsHrgi5DSNgmS
+	b384wYXx70jgcvrqnP6s8nKA1YDLcSBOjNv8TZupOsB3jBLEBiLCClsnUMEMpVDELyNlJ1V7zdU
+	U2waG6SjqWYR6MnS
+X-Received: by 2002:a17:907:742:b0:ba3:e9be:f77e with SMTP id
+ a640c23a62f3a-bbffbf77da5mr851028066b.38.1777997415541; Tue, 05 May 2026
+ 09:10:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|PH8PR11MB9829:EE_
-X-MS-Office365-Filtering-Correlation-Id: 21d1321f-15be-40f3-c013-08deaac0a4d5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|18002099003|56012099003|22082099003;
-X-Microsoft-Antispam-Message-Info: /ts/TjQTgGocKldOxayglSOZB0w6g1sUa0PKVuAS3OD5L+YV7jx0YaN5fjeZkwE6nesF0jOQnv2wd4TQdDH75cxUg4xbhIO8/Yz6dSX7uUCJWwa1F3R0D2UWeiFUiupnRl9W0blgIuJmb3OJcDQ9+o+GVi11kly70I1Ke7JGrX23RnZ2IuJXJd/GCeoFfPLlf+TKeiin53cSUaTDZoTGnlpajAC1ofaLa4b5hCmIkUUwj6L0Ep+Fr+wpdYjwFzGZM/Q3kJLT9rOKzlT9gU90Wg5oa+BAiVpDfEmbJs6L9rpOCKStKw+bASO8wO7SDJvXmfh2IuUjmxJSX47pgTfj8U8irGPyEOvQ16MezXGnxKf+7hBxt6O63iv/AycnPuy5z8W0nFMBoOyEzTgKEUl18CMUjDSMoyMonVdWysOTgc8ORWZU16LBG3np59AT++jzEqoGFI9zQiEQTWGLgx455gosVnkBa49YV2sTrNlYwSQQggh8KtQUzRKKpVR09rlgU5B0aYP1cHYWDc7D25wz/zHAc+AxDvaCJ3JEqAs1tIYm7fGbUHNEwnEUf/td7Wd8WAnJhdiVcujSby1tKK86LKjvnJk5Gco/TSBTbHp0cw8Whcxo3AcaSy2beR27py7RDbw4r/YgiDIg7Xxmpe22Cof8XROppZyFKatyUxgE+ky4NTRo4rneZnXI3+bBuOhs
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RTFSTlFKbWpBbmorUlVDMEFucWVYSTZySHkxeDhURm1YOFF1Z28xRG5xYjFK?=
- =?utf-8?B?ZklFUTNiWGE2b2I1Yjhtbk9xUSt5ek84enhlczBTOE5yK29uOGdZQ0pZSXc2?=
- =?utf-8?B?ZkU0UTRpUndTSjZ6bjJIdlRyU3dVK0xScnkraENpYkhWbEJtWVBpUW84eVFy?=
- =?utf-8?B?dlF2QnBjQkVmQmU0MDNZRStZZE5TUzhJSGpjTDlPMG92dkc2NWRMVG1HZnRo?=
- =?utf-8?B?djFQTjgrakk5WUxCcGw1NDF2L00wS3hTeExMWnJkRllCSnpsa3ZBL1ZySEVV?=
- =?utf-8?B?S3d6S0w1UXVlWEJveGhHd0h2M096Umt4aGVDcGZDY0NQenFtbTZvaEpiQmYr?=
- =?utf-8?B?UldDRkM2RzV1NkYxS3RiSUE3bU5vaHRxcHhqdDJvck1hdVdvcC82ZmorcXRl?=
- =?utf-8?B?K2RRNHR3Wk1rdWJoSmFQUHB3RmxkdVlacXM5a003WXpDNmVXOWZaM2xMeFBB?=
- =?utf-8?B?N0hxcExkZDFlMnhUazN4RzQ3OXN5Z3VTYW5WNzBwNi9yZktCNUsxRnVseXZP?=
- =?utf-8?B?cmZ3dk1wYklLRmJOYmV6Z0ZPK05DK0ZDTUYvV1E0cE1NWThESDIrbmk1L0J3?=
- =?utf-8?B?bGF1Qld1aVhqdVNCWXRDeHVxemRRVHlEWTJsTWo3MWZDR2U2NjBQb3hpTWxj?=
- =?utf-8?B?SWNTcUg0UC96d005U3I5YVhYWDhod1BIQW9ISlpLQzhZUTVBUzZ1Z2EzZk9s?=
- =?utf-8?B?YjBRYmZsbFUvYXh2UWFrcGpPQTRQUFBuajJaUzRRQUFOVUNvMHpNanlwejhB?=
- =?utf-8?B?bklTaVJyTlFiaFBrZXdQNVdEYXljQ2Z5MTlnc3BEVzB3aWtUc1FobVh0OHNj?=
- =?utf-8?B?bDBNZ0hYS0FyV3RmM0p0TjhtK1dhTFZ0OU1JKzdLOW5pc1BDUDBlcnVjeTdO?=
- =?utf-8?B?MFRHNUg1SWorODFQa1dwWXZXUW83YVRySWMyL1hTcmgrRGt0Zy9uRDRPQTRr?=
- =?utf-8?B?bzVkekVYNlhvRkVXWEE1cUxOb2I1T1lRbis0b1N2MFMzT0o2VjFSVkJJVHdF?=
- =?utf-8?B?MkxqRzBEcVEyRlRQejhNUzI5WlIxdGhoYkZKd3hYSENWeXovR2dETkJSZFFo?=
- =?utf-8?B?NGFMY2VwVWU4REhqZmpoMzQ3c3FOWFNGaVI3UDI4NW9hQmVoWitrVThDNjc2?=
- =?utf-8?B?WVJqWFNsWi9mS2thR0ZjZzdLUHY0MmllNHNrRG0rcVl6U0lMc09GTzBkK1F1?=
- =?utf-8?B?WEdtT3c4eEVxeWg5K25mYkgxTjBBRk40RGc1Qmx6alJNVVk1dHFIbnZqQlIv?=
- =?utf-8?B?V2czclRKa2twQ0ozUUZ3UWV4M3B3VTkyZTI3NWNlcXhNemtFa3RXbVVJR1Nw?=
- =?utf-8?B?eUlmNHB2ZFY4b2xCNU1aV25LaG83WGtPc05NbVloY2JYYXBtaUxHeVVOcXlB?=
- =?utf-8?B?UzZUaFkxUTBZRmZzMkJqQzBVQ1I5eSszV3RHSXM5bEQ5blRpOEtBdk5PYlRT?=
- =?utf-8?B?RVJNTStPK1VlZEQxQi9qY0xUZ3RabGJhZHc5REdRVENwWCs1TjZPWDVyUkVU?=
- =?utf-8?B?ajlGa2FrYlRiRU53dm9KVGhlM29WQXBSeEdPY01WY05IMzJFZU95akd4bHpt?=
- =?utf-8?B?cVlDSUVRdE1jTFZRbklKTWo5UHVLbE1TZU9IR25mdXo2ck13TElIdkZRQTFh?=
- =?utf-8?B?MzR2QmJaS0hvcmRwNUhsdWlQZzhtSkcwTjFobjdETGt2UWRTQkY4VXFpSXJF?=
- =?utf-8?B?bnp6UzZlL2xnVXFnSjBvSzBBSWIrRVM5QzNxU3p2ejJoelVsemhzOHc4MUVK?=
- =?utf-8?B?V3kreElVYm5rMXB6WTAvRlhObXFaOElqTHVuRkJKVTVCeGFXLy9IUEdzb2R2?=
- =?utf-8?B?SUhjdHlaLzRwZTgvT2JJaHM5NUVldUdSWEEzS3ZyL1REQkdMOGU5ZEM4UlM2?=
- =?utf-8?B?cXF0STdFNlpNQkpMS2hMb09SRWY1amJaeG9IWGFmMWYyaUxQNG5uK0JFUnhE?=
- =?utf-8?B?dDAxWWpNV05PMWhEejRzV1U2S2gxZjNaSkQxODFEWmYzelJ6NnRsc21jVEJB?=
- =?utf-8?B?ZlpkaFU1R3lQclRWYVI0QU01VkY2UUl1SjBFU0ZDYTQ4SEZ0aXJ3YnpQNFE0?=
- =?utf-8?B?azdEUjRTTE9aTnordnJqaXpsK0p4Y0tyc2ZBOVkyYmhwUU9CYnFQdDBVYytR?=
- =?utf-8?B?ekNBRXNEbkFVeVdpODdsMEFuTjkvVnRPMytkSWJsdHZnL0s0YWJpdUhEWVh6?=
- =?utf-8?B?ZEIzNWovd2xYNHh5akNlbThCclVNZGxUWDFIZ2Zuc0JtT0JuUnh6UmNhbWdm?=
- =?utf-8?B?YXpuaU9RWU5odmtXcjFueXlqR3B1ZDBDaEQ1Wi85SDZuazFzY2Q5d1JOYVdB?=
- =?utf-8?B?NUNxY1BLR1hKdXlkNml2OTR3SkhrNlF6SUFubmg0eXlkRWhLV252S2RPNjNP?=
- =?utf-8?Q?nxu+SH0nARpLxVZY=3D?=
-X-Exchange-RoutingPolicyChecked: Ci31pGUV01eEg0DoMk5qBnCS/xIGwfnwJ+Z2wol6B2/zVdemnVzdod62sONjk16/12u80s5J0gfSc0g0tMXHSvF/4qtluvdiIXxyLGKQ31pDABTwynCvqPrXMl/GxoGPMx936RxqaPdcOTw/KefZzvlBrOD36iBbaGW7KwNzKkxHKyrBTpxycBgaG5vTA8AsHuHP/561SmJPsrEyf+xrZx2GQnP9CUCz9ilmiAP0wq86FxtopAIJt4YhME+FARRE9rIFlgsdAprTm4ADrfYrGiYb9CB7v06/2AVgVnjxrzxfN1ZUdBnQeKAjTE9/QEneya8Bnj0hjIPYJoRhkN/xQg==
-X-MS-Exchange-CrossTenant-Network-Message-Id: 21d1321f-15be-40f3-c013-08deaac0a4d5
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 May 2026 16:09:11.1750
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Uo0i2JXZArGyTrd7SQRwNmxRiOIZRM74urLn8mEkkmubH1c38sEcfRlC+eL1z8qTJVEaQNMXOtFNUDs+8ZDHuDLWzCPODWAMO57jPl30Tr8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB9829
-X-OriginatorOrg: intel.com
-X-Rspamd-Queue-Id: A95BB4D1136
+References: <20260417140505.3860237-1-louis.scalbert@6wind.com>
+ <20260417140505.3860237-4-louis.scalbert@6wind.com> <1142168.1776974419@famine>
+In-Reply-To: <1142168.1776974419@famine>
+From: Louis Scalbert <louis.scalbert@6wind.com>
+Date: Tue, 5 May 2026 18:10:04 +0200
+X-Gm-Features: AVHnY4JT26pesWizPg_88wuvRwsKEYrh0N3Gph8Is5s4oiC37EEKQZgTz_V54gw
+Message-ID: <CAJ5u_OdCjZJLYr8OhfskTxavuW83dYSFx1_bTto9wezTn60nfA@mail.gmail.com>
+Subject: Re: [PATCH net v4 3/4] bonding: 3ad: fix mux port state on oper down
+To: Jay Vosburgh <jv@jvosburgh.net>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org, andrew+netdev@lunn.ch, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, fbl@redhat.com, 
+	andy@greyhouse.net, shemminger@vyatta.com, maheshb@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 6EFF94D1153
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
+	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284501-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-284502-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[6wind.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksander.lobakin@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FROM_NEQ_ENVFROM(0.00)[louis.scalbert@6wind.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-From: Vaibhav Gupta <vaibhavgupta40@gmail.com>
-Date: Mon,  4 May 2026 18:21:32 +0000
+Hello Jay,
 
-> Switch to the generic power management and remove the usage of legacy
-> (pci_driver) hooks.
-> 
-> Signed-off-by: Vaibhav Gupta <vaibhavgupta40@gmail.com>
+Sorry for the late reply. I=E2=80=99ve been busy with another project these
+past few days.
 
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+Le jeu. 23 avr. 2026 =C3=A0 22:00, Jay Vosburgh <jv@jvosburgh.net> a =C3=A9=
+crit :
+>
+> Louis Scalbert <louis.scalbert@6wind.com> wrote:
+>
+> >When the bonding interface has carrier down due to the absence of
+> >usable slaves and a slave transitions from down to up, the bonding
+> >interface briefly goes carrier up, then down again, and finally up
+> >once LACP negotiates collecting and distributing on the port.
+> >
+> >When lacp_strict mode is on, the interface should not transition to
+> >carrier up until LACP negotiation is complete.
+> >
+> >This happens because the actor and partner port states remain in
+> >Collecting_Distributing when the port goes down. When the port
+> >comes back up, it temporarily remains in this state until LACP
+> >renegotiation occurs.
+> >
+> >Previously this was mostly cosmetic, but since the bonding carrier
+> >state may depend on the LACP negotiation state, it causes the
+> >interface to flap.
+> >
+> >Move an operationally down port to the Mux WAITING state and clear the
+> >Synchronization, Collecting, and Distributing states, in accordance with
+> >the 802.1AX Mux state machine diagram.
+> >
+> >Fixes: 655f8919d549 ("bonding: add min links parameter to 802.3ad")
+> >Signed-off-by: Louis Scalbert <louis.scalbert@6wind.com>
+> >---
+> > drivers/net/bonding/bond_3ad.c | 7 +++++++
+> > 1 file changed, 7 insertions(+)
+> >
+> >diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3=
+ad.c
+> >index 9cf064243d58..bc2964ea11f5 100644
+> >--- a/drivers/net/bonding/bond_3ad.c
+> >+++ b/drivers/net/bonding/bond_3ad.c
+> >@@ -1053,6 +1053,8 @@ static void ad_mux_machine(struct port *port, bool=
+ *update_slave_arr)
+> >
+> >       if (port->sm_vars & AD_PORT_BEGIN) {
+> >               port->sm_mux_state =3D AD_MUX_DETACHED;
+> >+      } else if (!port->is_enabled && port->sm_mux_state !=3D AD_MUX_DE=
+TACHED) {
+> >+              port->sm_mux_state =3D AD_MUX_WAITING;
+>
+>         Technically, this is not exactly following the state machines.
+>
+>         The mux machine should transition to WAITING from DETACHED when
+> Selected =3D=3D SELECTED or STANDBY, not for !is_enabled ("port_enabled" =
+in
+> the standard).
 
+The MUX machine still transitions from DETACHED to WAITING; this
+happens a few lines later and is unchanged.
+
+The relevant code is:
+
+} else if (!port->is_enabled && port->sm_mux_state !=3D AD_MUX_DETACHED) {
+    port->sm_mux_state =3D AD_MUX_WAITING;
+} else {
+     switch (port->sm_mux_state) {
+     case AD_MUX_DETACHED:
+          if ((port->sm_vars & AD_PORT_SELECTED)
+              || (port->sm_vars & AD_PORT_STANDBY))
+          /* if SELECTED or STANDBY */
+          port->sm_mux_state =3D AD_MUX_WAITING;
+          break;
+
+My change is for NOT is_enabled AND NOT AD_MUX_DETACHED.
+
+> The check for !is_enabled happens in the receive
+> machine, and it would transition to PORT_DISABLED state (which clears
+> Synchronization).
+
+I agree with that statement. However, clearing Synchronization is not
+sufficient: the purpose of the fix is to clear Collecting and
+Distributing.
+
+I noticed that is_enabled is defined in the 802.3ad-2000 standard, while
+Port_Operational is defined in 802.1AX-2020. I am not sure about
+802.1AX-2014, as I do not have access to that version.
+
+The 802.1AX-2020 standard uses a different MUX state diagram. Compared to
+802.3ad, the ATTACHED state has been split into ATTACH and ATTACHED.
+There is no longer a WAITING state; it has been replaced by
+ATTACHED_WTR.
+
+The new standard says that the MUX machine should transition to
+ATTACHED_WTR when Port_Operational is FALSE and the current state is
+not DETACHED.
+
+So, in my opinion, the change is correct, at least with respect to
+802.1AX-2020.
+
+>
+>         I'm not sure if this is actually an issue or not; I need to read
+> the relevant bits again to make sure I understand how it's supposed to
+> work.
+
+Please confirm what you want me to do: should I keep the fix as it is ?
+
+best regards,
+
+Louis Scalbert
+>
+>         -J
+>
+> >       } else {
+> >               switch (port->sm_mux_state) {
+> >               case AD_MUX_DETACHED:
+> >@@ -1200,6 +1202,11 @@ static void ad_mux_machine(struct port *port, boo=
+l *update_slave_arr)
+> >                       break;
+> >               case AD_MUX_WAITING:
+> >                       port->sm_mux_timer_counter =3D __ad_timer_to_tick=
+s(AD_WAIT_WHILE_TIMER, 0);
+> >+                      port->actor_oper_port_state &=3D ~LACP_STATE_SYNC=
+HRONIZATION;
+> >+                      ad_disable_collecting_distributing(port,
+> >+                                                         update_slave_a=
+rr);
+> >+                      port->actor_oper_port_state &=3D ~LACP_STATE_COLL=
+ECTING;
+> >+                      port->actor_oper_port_state &=3D ~LACP_STATE_DIST=
+RIBUTING;
+> >                       break;
+> >               case AD_MUX_ATTACHED:
+> >                       if (port->aggregator->is_active)
+> >--
+> >2.39.2
+> >
+>
 > ---
->  drivers/net/ethernet/google/gve/gve_main.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
-Thanks,
-Olek
+>         -Jay Vosburgh, jv@jvosburgh.net
 
