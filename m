@@ -1,51 +1,70 @@
-Return-Path: <netdev+bounces-284340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284341-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YBDFAerO+WlHEQMAu9opvQ
-	(envelope-from <netdev+bounces-284340-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 13:05:14 +0200
+	id aENIL9HT+Wk1EgMAu9opvQ
+	(envelope-from <netdev+bounces-284341-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 13:26:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51E184CC251
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 13:05:13 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74BD14CC976
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 13:26:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3533B3019B85
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 10:53:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 31452322B79D
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 11:05:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A130937FF7F;
-	Tue,  5 May 2026 10:53:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s8vHvdRa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F287F42B737;
+	Tue,  5 May 2026 11:01:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f66.google.com (mail-ej1-f66.google.com [209.85.218.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA3837F8A9;
-	Tue,  5 May 2026 10:53:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5962742B75E
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 11:01:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777978419; cv=none; b=FpukNLTZYnLiA83T+kGvWMidPRgWERpU2aqWzkliWbmjNSUQRhpZHjWDM8OaAJnoCOBAcbmVlQ9aN5wyEMnUOXYYlElqg3/D9i13skF2mN2q/ddbmC6X2BGkVAspOE7IKEcd+yzr2owC7VtAEsE6zxU2DnryJ0bigy/4wZ8ez0E=
+	t=1777978875; cv=none; b=Zn5aVgWKwbTdJuiQ17sYvsrVuSw1P4QPQgHZsqHITBKQsD+kUAUWQEAK2SrpxR9UMNwpo9F2B53VjWj6zBQvqdLZ6TCFLEIQJIaz2Su1xueqTBuMhbemCxdjbdWTQZSr5qPGQamB0VkNi7AKN6tKx6+/hh6iPZAcRfJxG3uqeH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777978419; c=relaxed/simple;
-	bh=KnbhoE0I3ur7S4TEiFuzxCqvEtZyRA7GqwIvsBNPZNY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bIaRY2RwJAqDFlmZ0LIVOA1mP6QYsUsoQdQVgRvQ04QZkEZMGSDiqMG2C0LKw6rsGmqmLaEUiAHv/4d3jmfD+UzqzAO1tpUdqSqQokrO79rqe0tQrZ4lAGczSce0ox+nqueOjZcJ/InJ5MQyPuFlDA8nIACGosFUQYt1XZjPAjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s8vHvdRa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D83EC2BCB4;
-	Tue,  5 May 2026 10:53:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777978419;
-	bh=KnbhoE0I3ur7S4TEiFuzxCqvEtZyRA7GqwIvsBNPZNY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=s8vHvdRak07XxK44RE8ppW82HVQsCQKcP+fKBxBOr1EsyVdnhK6GSs8k/Y0PxWtZY
-	 F6lTsJPDCSvxl0nmZM6yCrSDgCFf5+/peU9RzxB8JF1FBqYHPTwoeOCqfWWYrkeiNA
-	 y0enlnuqWncFo4TSbyMuXIWGhU9LpujvxWIqVhvx+V3rse4PrcK/sO6Cx0Ai6Lu1a3
-	 /lpewou5wRo7loNYjLa/sNUUQ15qX35aUjAg0LX9Utr5ujemSKuAG7SzMGLzkbopAr
-	 Y7AaYQOLdKQzkdlzmjQKWvgCJ1PdVwMdp0xp9B7Mci3gYOzgjT3/y7XJIOhUQLA90H
-	 wqQwSnlNBigOw==
-Message-ID: <8d3fbb91-65c4-4d15-ac38-3e6372eb0ffa@kernel.org>
-Date: Tue, 5 May 2026 12:53:32 +0200
+	s=arc-20240116; t=1777978875; c=relaxed/simple;
+	bh=yZHX2zu6pRXp/aiFpcnEVJYoWFJl2mSPRNnA8tmDQVs=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=boLOCdXrv91S8BWTwRG/kLXABcNjl0WLE2VvBaKAN0ZQLezUKTMPyV/Iag/51rlqkPBcc1IuLBg730fYMbCcUwDfyCyjNQMM1/Z9IVFRJNHbSZq83QsaRbvUBUI8Ydkyl9dzCTDIs7+5gvRIjH22u7g61lXPvPVoPH8oO1Lw0H4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f66.google.com with SMTP id a640c23a62f3a-b9c603ec2dfso711027466b.1
+        for <netdev@vger.kernel.org>; Tue, 05 May 2026 04:01:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777978871; x=1778583671;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:cc:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DArCLHy5i8lXdAo5MW+nZY6yAncYzCTVpd/mPRM7974=;
+        b=d/QIemBm1CGl559dr1vBJC9AmV3Aqy6WqHMxt5cRywiChs8TmtQzwscy+DbZZulE4p
+         +fQi3L9Xr7FE4pdeZw1lWFwkeahmlx9RkqIA6c5y+jw3w8lx0swSWONQIRiPUOamgVE/
+         TRSuqlmjVk3g1Vq2ihdjVmlrVip3axi22UqoaTXoS+EkWc8+dpbRU2BVYDiiiXRuOwCb
+         VA9wvzPn/4+UwwFDVqh/F/OJB5x0+dpTK2W5lW3ZWMg5eQXOAe1K8y9q1eXBT6pXV18U
+         YCNK9dlJwDldHzwUC4G6BBM1PmnTFAo2ZAx3qG55MgcVs8XC0eo2afRBg534Mhi0BAWg
+         rthg==
+X-Forwarded-Encrypted: i=1; AFNElJ8R6dbHxjh1xo7MPIPMUuJDz6FaeNt3Ug7gN24qFkWYftzg+NW4tcpoPhTuLW6FWphUyOBlcj0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLlTGsPT9mYa1o5C2/BJBoNPIHR9nfEz1Sibgs9teY002ueShx
+	NvdDQcBcHTZYwKV46Y//vb/C/89lq7mmWaWTgDom1WtO9irxZk4/dE2/
+X-Gm-Gg: AeBDiet/yTks4P1veylR3FjkF+sEghPzOmfikHVBUJX4mTW33xHq5rFlObZYTsFrHYn
+	tSVsX4wNLbFqPoRHQJGKRGT/vDx5a2optcis5C4lAN945PQj9MelqUWDFK+Mke2eo2NUROzkrTU
+	xnaLsov1+TNNydjI0lS1yIvWbX57xyceK4fxe4cfIO/YBUfrbGeOK8EdQwcQev/SI+f8KkNS62S
+	aQqEChgJXTIdejZL827+ldJQhGbglAZTxI4/ap3lIqMjAs+SkradzvZ9RFk6y+hVFVyEtGPxpOF
+	oxQXyrDD2F53VjHY6Wbz3p/0loSUcPsGuW2wAvEoSHDwu1GJdikuVEFOlOG9BdmF7+sRZwFWAPp
+	AKQh8yOpitFdxUik+a6v32fyLGGuhnYwh2Gyxc/pfwjmdS+rZNCH67WNziwF9/NrQLpgZdZLfcM
+	XhsDBSEwkNA/bW7GvNr/I8NYKPB4JMBeN9YKSa/tzutm+5wws+L56CkZS/CIFiwaw+Lw==
+X-Received: by 2002:a17:906:9f87:b0:b9b:ddb2:b1c1 with SMTP id a640c23a62f3a-bbffcf7eb2amr739165066b.21.1777978870741;
+        Tue, 05 May 2026 04:01:10 -0700 (PDT)
+Received: from [192.168.88.241] (37-48-40-237.nat.epc.tmcz.cz. [37.48.40.237])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bc4b921a277sm14495866b.3.2026.05.05.04.01.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 May 2026 04:01:10 -0700 (PDT)
+Message-ID: <fdd012a9-9ab7-4da2-b9f2-0a8e6c254186@ovn.org>
+Date: Tue, 5 May 2026 13:01:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,169 +72,204 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/6] SUNRPC: Address remaining cache_check_rcu() UAF in
- cache content files
-To: Calum Mackay <calum.mackay@oracle.com>,
- Misbah Anjum N <misanjum@linux.ibm.com>, Jeff Layton <jlayton@kernel.org>,
- NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>,
- Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
- Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Yang Erkun <yangerkun@huawei.com>
-Cc: linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, Chuck Lever <chuck.lever@oracle.com>,
- alexandr.alexandrov@oracle.com
-References: <20260501-cache-uaf-fix-v1-0-a49928bf4817@oracle.com>
- <daa6461b-d8d6-42ad-adac-ac0df58c3b6e@oracle.com>
-From: Chuck Lever <cel@kernel.org>
+Cc: i.maximets@ovn.org, netfilter-devel@vger.kernel.org, fw@strlen.de,
+ davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, horms@kernel.org,
+ Eelco Chaudron <echaudro@redhat.com>, Aaron Conole <aconole@redhat.com>
+Subject: Re: [PATCH net 06/12] netfilter: nf_conntrack_expect: honor
+ expectation helper field
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+References: <20260326125153.685915-1-pablo@netfilter.org>
+ <20260326125153.685915-7-pablo@netfilter.org>
+ <8fd5d3a3-d1d7-4542-a0db-1678989940d4@ovn.org> <afSCXEg-X-ieL9cY@chamomile>
+ <ef01005e-d867-4936-b138-b98f37e5f394@ovn.org> <afkosr2fDEPA_jX9@chamomile>
 Content-Language: en-US
-Organization: kernel.org
-In-Reply-To: <daa6461b-d8d6-42ad-adac-ac0df58c3b6e@oracle.com>
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <afkosr2fDEPA_jX9@chamomile>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 51E184CC251
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 74BD14CC976
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284340-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284341-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[ovn.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oracle.com:email]
+	NEURAL_HAM(-0.00)[-0.986];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ovn.org:mid,netfilter.org:email,strlen.de:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On 5/5/26 12:49 PM, Calum Mackay wrote:
-> On 01/05/2026 3:51 pm, Chuck Lever wrote:
->> Misbah Anjum reported a use-after-free in cache_check_rcu()
->> reached through e_show() while sosreport was reading
->> /proc/fs/nfsd/exports on ppc64le.  Two fixes for that report
->> landed in v7.0:
->>
->>    48db892356d6 ("NFSD: Defer sub-object cleanup in export put
->> callbacks")
->>    e7fcf179b82d ("NFSD: Hold net reference for the lifetime of /proc/
->> fs/nfs/exports fd")
->>
->> The original e_show() repro is now fixed.  However, the same
->> sosreport workload still reproduces a closely related fault on
->> post-v7.0 mainline (Misbah, ppc64le) and on master.20260424
->> (internal report, aarch64).  In both cases the fault is in
->> cache_check_rcu() reached through c_show() rather than e_show(),
->> and the cache_head pointer is plain garbage:
->>
->>    pc : cache_check_rcu+0x40 [sunrpc]
->>    lr : c_show+0x60 [sunrpc]
->>    ...faulting on h->flags off h = 0x0000000200000000
->>
->> c_show() is the generic show callback used by
->> /proc/net/rpc/<cd>/content for every per-net cache_detail
->> (auth.unix.ip, auth.unix.gid, nfsd.fh, nfsd.export).  Two
->> bugs combine in that path:
->>
->> 1. cache_unregister_net() / cache_destroy_net() free cd and
->>     cd->hash_table synchronously when the namespace exits.  The
->>     /proc/net/rpc/.../content open path takes only a module
->>     reference, so a fd kept open across a netns exit walks a
->>     freed hash_table and returns garbage cache_head pointers.
->>     This is the same hazard that e7fcf179b82d closed for the
->>     /proc/fs/nfs/exports file alone.
->>
->> 2. ip_map_put() drops auth_domain_put() before kfree_rcu(), so
->>     sub-objects can be freed before the RCU grace period -- the
->>     same hazard that 48db892356d6 fixed for svc_export_put() and
->>     expkey_put().  unix_gid_put() does not have this bug
->>     structurally (its put_group_info() runs inside the call_rcu()
->>     callback) but it uses a separate idiom from the other three
->>     caches.
->>
->> This series replaces the v1 narrow fixes with shared
->> infrastructure that covers all four cache_detail .put paths
->> and all three per-cache file types:
->>
->> Patch 1 hoists nfsd_export_wq up to the sunrpc layer as
->> sunrpc_cache_wq, exposed through sunrpc_cache_queue_release()
->> and sunrpc_cache_drain() so all four put callbacks share one
->> workqueue and one drain primitive.
->>
->> Patch 2 converts ip_map_put() to the queue_rcu_work() pattern,
->> moving auth_domain_put() into a deferred ip_map_release() that
->> runs after the RCU grace period.
->>
->> Patch 3 unifies unix_gid_put() onto the same pattern for
->> consistency (not a bug fix on its own).
->>
->> Patch 4 takes a get_net(cd->net) in content_open(), cache_open(),
->> and open_flush() and drops it in the matching release helpers,
->> so cache_destroy_net() cannot run while a sunrpc cache fd is
->> open.
->>
->> Series has been compile-tested only.
->>
->> ---
->> Chuck Lever (6):
->>        SUNRPC: Move cache_initialize() declaration to sunrpc-private
->> header
->>        SUNRPC: Provide a shared workqueue for cache release callbacks
->>        SUNRPC: Defer ip_map sub-object cleanup past RCU grace period
->>        SUNRPC: Use shared release pattern for the unix_gid cache
->>        SUNRPC: Hold cd->net for the lifetime of cache files
->>        NFSD: Convert nfsd_export_shutdown() to sunrpc_cache_destroy_net()
->>
->>   fs/nfsd/export.c             | 45 ++--------------------
->>   fs/nfsd/export.h             |  2 -
->>   fs/nfsd/nfsctl.c             |  8 +---
->>   include/linux/sunrpc/cache.h |  3 +-
->>   net/sunrpc/cache.c           | 90 ++++++++++++++++++++++++++++++++++
->> ++++++++--
->>   net/sunrpc/sunrpc.h          |  2 +
->>   net/sunrpc/sunrpc_syms.c     | 23 ++++++-----
->>   net/sunrpc/svcauth_unix.c    | 46 ++++++++++++----------
->>   8 files changed, 135 insertions(+), 84 deletions(-)
->> ---
->> base-commit: f3a313ecd1fdab1f5da119db355363b13af6fcac
->> change-id: 20260430-cache-uaf-fix-a13000f67c37
->>
->> Best regards,
->> -- 
->> Chuck Lever
->>
->>
+On 5/5/26 1:16 AM, Pablo Neira Ayuso wrote:
+> Hi Ilya,
 > 
-> Looks good Chuck, thanks very much.
+> On Mon, May 04, 2026 at 02:19:20PM +0200, Ilya Maximets wrote:
+>> On 5/1/26 12:37 PM, Pablo Neira Ayuso wrote:
+>>> Hi Ilya,
+>>>
+>>> On Thu, Apr 30, 2026 at 10:58:38PM +0200, Ilya Maximets wrote:
+>>>> On 3/26/26 1:51 PM, Pablo Neira Ayuso wrote:
+>>>>> The expectation helper field is mostly unused. As a result, the
+>>>>> netfilter codebase relies on accessing the helper through exp->master.
+>>>>>
+>>>>> Always set on the expectation helper field so it can be used to reach
+>>>>> the helper.
+>>>>>
+>>>>> nf_ct_expect_init() is called from packet path where the skb owns
+>>>>> the ct object, therefore accessing exp->master for the newly created
+>>>>> expectation is safe. This saves a lot of updates in all callsites
+>>>>> to pass the ct object as parameter to nf_ct_expect_init().
+>>>>>
+>>>>> This is a preparation patches for follow up fixes.
+>>>>>
+>>>>> Signed-off-by: Florian Westphal <fw@strlen.de>
+>>>>> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+>>>>> ---
+>>>>
+>>>> Hi, Pablo and Florian.
+>>>>
+>>>> I was investigating FTP test failures in OVS with 7.0 kernel and bisected
+>>>> the issue down to this commit.  AFAIU, with this change all the related
+>>>> connections over time gain their parents' helpers,.  This is causing a change
+>>>> visible to the userspace, because FTP data connections are now reported to
+>>>> have helpers in the conntrack dump:
+>>>>
+>>>> # conntrack -L
+>>>> tcp      6 119 TIME_WAIT src=10.1.1.1 dst=10.1.1.2 sport=59534 dport=21 \
+>>>>                          src=10.1.1.2 dst=10.1.1.1 sport=21    dport=59534 \
+>>>>            [ASSURED] mark=0 helper=ftp use=2
+>>>> tcp      6 119 TIME_WAIT src=10.1.1.2 dst=10.1.1.1 sport=52709 dport=52381 \
+>>>>                          src=10.1.1.1 dst=10.1.1.2 sport=52381 dport=52709 \
+>>>>            [ASSURED] mark=0 helper=ftp use=1
+>>>>
+>>>> Before this commit only the control connection had helper=ftp reported in
+>>>> the dump.  The traffic seems to work fine, but our tests fail because we
+>>>> do not expect the helper attached.
+>>>>
+>>>> AFAIU, it's generally not something that should be happening, as helpers
+>>>> on data connections do not really make much sense.  But I'm just trying to
+>>>> figure out if you would consider this as a regression and fix in the kernel
+>>>> or if we should adjust our userspace components for this new dump content,
+>>>> which would not be very straightforward to do if we want to be able to run
+>>>> tests on both old and the new versions.
+>>>>
+>>>> What do you think?
+>>>
+>>> It seems previous behaviour to 9c42bc9db90a was inconsistent, ie. only
+>>> the h323 helper sets on exp->helper, then it shows helper= in expected
+>>> connections via ctnetlink. I guess this is for debugging given that
+>>> h323 is actually a family of helpers.
+>>>
+>>> To consistently skip dumping this for expected connections, probably
+>>> this is the way to do:
+>>>
+>>> diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conn
+>>> index eda5fe4a75c8..9491ae9e080e 100644
+>>> --- a/net/netfilter/nf_conntrack_netlink.c
+>>> +++ b/net/netfilter/nf_conntrack_netlink.c
+>>> @@ -226,7 +226,7 @@ static int ctnetlink_dump_helpinfo(struct sk_buff *sk
+>>>         const struct nf_conn_help *help = nfct_help(ct);
+>>>         struct nf_conntrack_helper *helper;
+>>>  
+>>> -       if (!help)
+>>> +       if (!help || ct->status & IPS_EXPECTED)
+>>>                 return 0;
+>>>  
+>>>         rcu_read_lock();
+>>
+>> I'm not sure.  I tried this change and it fixed one case but broke another.
+>> Looking at what we're testing, the old behavior (at least for FTP) was:
+>> "if helper was committed - report it, if not - don't".  i.e. it's not really
+>> about the connection being expected it's about if the user committed the
+>> helper for the connection or not.
+>>
+>> Let me explain a few scenarios that we have in the OVS system tests and what
+>> I see with the old kernel (6.19), the new (7.0) and the patch above.
+>>
+>> A) The first scenario has the following OpenFlow rules (simplified):
+>>
+>>   table=0,in_port=1,tcp,action=ct(alg=ftp,commit),2
+>>   table=0,in_port=2,tcp,action=ct(table=1)
+>>   table=1,in_port=2,tcp,ct_state=+trk+est,action=1
+>>   table=1,in_port=2,tcp,ct_state=+trk+rel,action=1
+>>
+>> This set of rule blindly commits every packet coming from port 1 with the
+>> helper and sends to port 2.  Packets from port 2 are passed through ct and
+>> only related or established traffic is passed to port 1.  This is a very
+>> rudimentary setup that users can make to allow ftp from port 1 towards port 2,
+>> but not in the opposite direction.
+>>
+>> For this scenario regardless of the kernel version or the patch above I see
+>> that both the data and the control connections have a helper reported in the
+>> ctnetlink dump.
 > 
-> With these patches, testing shows no crashes, sosreport no longer hangs,
-> no seq_file errors.
-> 
-> Tested-by: Alexandr Alexandrov <alexandr.alexandrov@oracle.com>
-> 
-> cheers,
-> c.
-> 
+> This ruleset then is attached the conntrack helper to data connection,
+> that is, ALG is inspecting the FTP data connection but it will just
+> find no patterns because it is only the FTP control connection that
+> creates expectations?
 
-Excellent; pushed with Jeff's R-b and Alexandr's T-b.
+Yes.  It's just a "lazy" way to make the traffic work, we do not expect
+the helper on the data connection to do anything useful in this scenario.
 
-
--- 
-Chuck Lever
+Best regards, Ilya Maximets.
 
