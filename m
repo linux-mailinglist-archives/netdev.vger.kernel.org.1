@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-284441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284442-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yEV6O1z/+WkqFwMAu9opvQ
-	(envelope-from <netdev+bounces-284441-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 16:31:56 +0200
+	id aG5oJW7++WkqFwMAu9opvQ
+	(envelope-from <netdev+bounces-284442-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 16:27:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 771EF4CF709
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 16:31:56 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3715D4CF62E
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 16:27:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A6D2A309F26A
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 14:26:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8B19C3026E91
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 14:26:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A63BF481ABE;
-	Tue,  5 May 2026 14:25:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7A02481FBB;
+	Tue,  5 May 2026 14:25:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PoMxpjUP"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="aibqIcsT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 679EB480357
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 14:25:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7D747F2F3;
+	Tue,  5 May 2026 14:25:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777991134; cv=none; b=lUDiNIJ/pEFMVXN6INjK2ZUHV8ne8elnXyv7PYT4Jd39ROHHyvSkxYveuiKqswa7wTMAivVkhB4Fsk6Ub00cbR3M14TAlrl0BlXSIa9DDRBiRyxxFyddZb6NYiFovwrrCE/s7+YcEDVqv6JHiDzGx9XmyEbjKt4JRszM/sNDAps=
+	t=1777991135; cv=none; b=ICx/SwTopDSiHGvVKji0OEhRn2xpg4cnhacOSRqfi9Ns0IenTOxGLbpfn45iiguOj0zIcW+Oh3jBD2JxnyhuLhVzoGZITRcNN4qSyiu5+5oYJ6RmlDN2fqFTalk+eNYlPacyqSJVtPUrKNp5IOO8FhFv3InFeC+wwKZ8a9sE4Kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777991134; c=relaxed/simple;
-	bh=fZZoRc5mzNdkCS4RdqcBdQ10gR1IJ4ozw6vGH/k+MTs=;
+	s=arc-20240116; t=1777991135; c=relaxed/simple;
+	bh=8jz8tYeSWIROM17x0GWQBuJQ/3o2BnZyxeI2jrIszWo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=E2AQn0dZuozLGWbz0ZaYDhRovuu+nsFsG9kSgusThOQCUgud7CgJ47lIi2zoCARCM6ZsqEjpTUoBM1oENwxrQEjXcQyzt4cQ2hq5MHp8vzKvycwHRsiAnj2SMpKMIU3SrH6bAvhvVvrLpCkKsoiybnvPqRW0/TUGMdR8CHE6XgA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PoMxpjUP; arc=none smtp.client-ip=185.171.202.116
+	 In-Reply-To:To:Cc; b=twVA7N+YPeuJLucJH4e7RjCbP1n8cTYyAfOR3h4qh4JAFcX69TvWdMOfbzPoPrKW+LoP0kLNEXvCk0pc9h3r8FsVLsGzW37owWW6Qwzyw4hsfEc2Zmt+QuEp0dnYzjn0ndz9+xqTZyIPjFQI9QovKh3loCYGX85CM529+/FzIJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=aibqIcsT; arc=none smtp.client-ip=185.171.202.116
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id D9E2EC5CD40;
-	Tue,  5 May 2026 14:26:16 +0000 (UTC)
+	by smtpout-04.galae.net (Postfix) with ESMTPS id E4BC0C5D739;
+	Tue,  5 May 2026 14:26:18 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 0A0F36053C;
-	Tue,  5 May 2026 14:25:30 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1BC3111AD0247;
-	Tue,  5 May 2026 16:25:26 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 15C336053C;
+	Tue,  5 May 2026 14:25:32 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 206EC11AD024D;
+	Tue,  5 May 2026 16:25:29 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1777991128; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1777991131; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=1QxfhcDiWl1zUizvqG2lvFv0tO3RiDLHy/e6u5z0xpI=;
-	b=PoMxpjUPPGAm+NC0f6RLCUVneBz9DTy03noBwFBYnU9izScRL8j/jIyDkk6OPWiTB/GRCn
-	EJsbstH9ihqv3O0r57m6NQRlZVtvvPGlGbT1znRnRAtkwfwxTlo8wKqNZQPpgU2Vt9/f6P
-	GR1Csy4lXLkxt3vBCKEqi27Es491gDg4YLwwDEXLugGq26UmkwFHAhPqm1n6l+jQFpdg2j
-	Qgv5rJL1dY17Fa6PmGOrsgci1SuO4nVsJ5Oqp71/TDr29WkmFK+d3W4AVo77IitrYBnMVQ
-	AP5SDsLRkHcvsI6+6upR/tHfvKalIIPLQ53f3VNl99vinYHdj3A4/EQqx2BM/g==
+	bh=dN8OTOz2CBIZVO4HdWgUL6ssubbJ9fWY50uiLEocxyg=;
+	b=aibqIcsT/aGX+fjvkJiBpvHLnwK+ZK7GXTphdki98leqS3/mfuUl8kzp7TTPq1vtRO3zPV
+	EjrtKFs15zrE/syRWVb5VCBOQiMra0VHA+YJaFdVTnCVRDkf1JFpuNsuV8eKqFFo2zS1O+
+	XrntDo4p8HsoFr3F5Ydhcadc+pA435N/hagf7UAgEo52sKjz6QcDW/ouEVsfErAs2HoU8M
+	aYeg9gCAqK0IIE/NojeHOPb9jx5B0ExaAt+WWDFpdhcCb1bj21/vd8GnIFR3p1gK4hvHZ2
+	IepxpGLOx/oLde+dchAYdhCBQKMxm+8HPXm9EzDqrtpYNts/kOxLqb+fAS2wcQ==
 From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-Date: Tue, 05 May 2026 16:25:07 +0200
-Subject: [PATCH net-next 7/9] net: dsa: microchip: hook up
- ksz_switch_alloc() to chip-specific dsa_switch_ops
+Date: Tue, 05 May 2026 16:25:08 +0200
+Subject: [PATCH net-next 8/9] net: dsa: microchip: split
+ ksz_get_tag_protocol()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260505-clean-ksz-driver-v1-7-05d70fa42461@bootlin.com>
+Message-Id: <20260505-clean-ksz-driver-v1-8-05d70fa42461@bootlin.com>
 References: <20260505-clean-ksz-driver-v1-0-05d70fa42461@bootlin.com>
 In-Reply-To: <20260505-clean-ksz-driver-v1-0-05d70fa42461@bootlin.com>
 To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
@@ -81,18 +81,18 @@ Cc: Pascal Eberhard <pascal.eberhard@se.com>,
  Vladimir Oltean <vladimir.oltean@nxp.com>
 X-Mailer: b4 0.14.3
 X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: 771EF4CF709
+X-Rspamd-Queue-Id: 3715D4CF62E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284441-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-284442-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk];
@@ -101,7 +101,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
@@ -111,197 +111,215 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:email,bootlin.com:email,bootlin.com:dkim,bootlin.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,bootlin.com:email,bootlin.com:dkim,bootlin.com:mid]
 
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Now that each switch driver has its own dsa_switch_ops (currently a copy
-of ksz_switch_ops), we no longer need ksz_switch_ops and can remove it.
+All the switch families use a common function to implement
+.get_tag_protocol(). This function then returns the relevant protocol
+depending on the chip ID.
 
-Get to the driver-specific dsa_switch_ops through the ksz_chip_data
-structure.
-Reorder the alloc()/get_match_data() calls such as to have that
-pointer available.
+Make the protocol to dsa_switch_ops association a little bit more
+obvious by having separate implementations.
+
+Change made by manually checking which chip id has which dsa_switch_ops
+assigned to it, then filtering the common ksz_get_tag_protocol() for
+just those chip IDs pertaining to it.
+
+As an important benefit, we no longer have that weird-looking
+DSA_TAG_PROTO_NONE fallback which was never actually returned.
 
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
 ---
- drivers/net/dsa/microchip/ksz8863_smi.c |  8 ++--
- drivers/net/dsa/microchip/ksz9477_i2c.c |  8 ++--
- drivers/net/dsa/microchip/ksz_common.c  | 67 ++-------------------------------
- drivers/net/dsa/microchip/ksz_common.h  |  4 +-
- drivers/net/dsa/microchip/ksz_spi.c     |  8 ++--
- 5 files changed, 19 insertions(+), 76 deletions(-)
+ drivers/net/dsa/microchip/ksz8.c         | 32 +++++++++++++++++++++++++++++---
+ drivers/net/dsa/microchip/ksz9477.c      | 16 +++++++++++++++-
+ drivers/net/dsa/microchip/ksz_common.c   | 31 -------------------------------
+ drivers/net/dsa/microchip/ksz_common.h   |  3 ---
+ drivers/net/dsa/microchip/lan937x_main.c |  9 ++++++++-
+ 5 files changed, 52 insertions(+), 39 deletions(-)
 
-diff --git a/drivers/net/dsa/microchip/ksz8863_smi.c b/drivers/net/dsa/microchip/ksz8863_smi.c
-index a8bfcd917bf70..ba08d2cf8e99f 100644
---- a/drivers/net/dsa/microchip/ksz8863_smi.c
-+++ b/drivers/net/dsa/microchip/ksz8863_smi.c
-@@ -140,14 +140,14 @@ static int ksz8863_smi_probe(struct mdio_device *mdiodev)
- 	int ret;
- 	int i;
+diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
+index f7801269b11a4..fa2e1256323c2 100644
+--- a/drivers/net/dsa/microchip/ksz8.c
++++ b/drivers/net/dsa/microchip/ksz8.c
+@@ -2100,6 +2100,32 @@ static void ksz8_switch_exit(struct ksz_device *dev)
+ 	ksz8_reset_switch(dev);
+ }
  
--	dev = ksz_switch_alloc(&mdiodev->dev, mdiodev);
--	if (!dev)
--		return -ENOMEM;
--
- 	chip = device_get_match_data(ddev);
- 	if (!chip)
- 		return -EINVAL;
- 
-+	dev = ksz_switch_alloc(&mdiodev->dev, chip, mdiodev);
-+	if (!dev)
-+		return -ENOMEM;
++static enum dsa_tag_protocol ksz8463_get_tag_protocol(struct dsa_switch *ds,
++						      int port,
++						      enum dsa_tag_protocol mp)
++{
++	return DSA_TAG_PROTO_KSZ9893;
++}
 +
- 	for (i = 0; i < __KSZ_NUM_REGMAPS; i++) {
- 		rc = ksz8863_regmap_config[i];
- 		rc.lock_arg = &dev->regmap_mutex;
-diff --git a/drivers/net/dsa/microchip/ksz9477_i2c.c b/drivers/net/dsa/microchip/ksz9477_i2c.c
-index a2beb27459f18..8e9d08f2e1d65 100644
---- a/drivers/net/dsa/microchip/ksz9477_i2c.c
-+++ b/drivers/net/dsa/microchip/ksz9477_i2c.c
-@@ -22,14 +22,14 @@ static int ksz9477_i2c_probe(struct i2c_client *i2c)
- 	struct ksz_device *dev;
- 	int i, ret;
- 
--	dev = ksz_switch_alloc(&i2c->dev, i2c);
--	if (!dev)
--		return -ENOMEM;
--
- 	chip = device_get_match_data(ddev);
- 	if (!chip)
- 		return -EINVAL;
- 
-+	dev = ksz_switch_alloc(&i2c->dev, chip, i2c);
-+	if (!dev)
-+		return -ENOMEM;
++static enum dsa_tag_protocol ksz87xx_get_tag_protocol(struct dsa_switch *ds,
++						      int port,
++						      enum dsa_tag_protocol mp)
++{
++	return DSA_TAG_PROTO_KSZ8795;
++}
 +
- 	/* Save chip id to do special initialization when probing. */
- 	dev->chip_id = chip->chip_id;
- 	for (i = 0; i < __KSZ_NUM_REGMAPS; i++) {
++static enum dsa_tag_protocol ksz88xx_get_tag_protocol(struct dsa_switch *ds,
++						      int port,
++						      enum dsa_tag_protocol mp)
++{
++	struct ksz_device *dev = ds->priv;
++
++	if (ksz_is_8895_family(dev)) /* KSZ8864, KSZ8895 */
++		return DSA_TAG_PROTO_KSZ8795;
++
++	return DSA_TAG_PROTO_KSZ9893;
++}
++
+ static void ksz88x3_phylink_mac_config(struct phylink_config *config,
+ 				       unsigned int mode,
+ 				       const struct phylink_link_state *state)
+@@ -2229,7 +2255,7 @@ const struct ksz_dev_ops ksz88xx_dev_ops = {
+ };
+ 
+ const struct dsa_switch_ops ksz8463_switch_ops = {
+-	.get_tag_protocol	= ksz_get_tag_protocol,
++	.get_tag_protocol	= ksz8463_get_tag_protocol,
+ 	.connect_tag_protocol   = ksz_connect_tag_protocol,
+ 	.get_phy_flags		= ksz_get_phy_flags,
+ 	.setup			= ksz_setup,
+@@ -2290,7 +2316,7 @@ const struct dsa_switch_ops ksz8463_switch_ops = {
+ };
+ 
+ const struct dsa_switch_ops ksz87xx_switch_ops = {
+-	.get_tag_protocol	= ksz_get_tag_protocol,
++	.get_tag_protocol	= ksz87xx_get_tag_protocol,
+ 	.connect_tag_protocol   = ksz_connect_tag_protocol,
+ 	.get_phy_flags		= ksz_get_phy_flags,
+ 	.setup			= ksz_setup,
+@@ -2351,7 +2377,7 @@ const struct dsa_switch_ops ksz87xx_switch_ops = {
+ };
+ 
+ const struct dsa_switch_ops ksz88xx_switch_ops = {
+-	.get_tag_protocol	= ksz_get_tag_protocol,
++	.get_tag_protocol	= ksz88xx_get_tag_protocol,
+ 	.connect_tag_protocol   = ksz_connect_tag_protocol,
+ 	.get_phy_flags		= ksz_get_phy_flags,
+ 	.setup			= ksz_setup,
+diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
+index 9fb0169b5e29e..9bac95bb079ff 100644
+--- a/drivers/net/dsa/microchip/ksz9477.c
++++ b/drivers/net/dsa/microchip/ksz9477.c
+@@ -1610,6 +1610,20 @@ static void ksz9477_switch_exit(struct ksz_device *dev)
+ 	ksz9477_reset_switch(dev);
+ }
+ 
++static enum dsa_tag_protocol ksz9477_get_tag_protocol(struct dsa_switch *ds,
++						      int port,
++						      enum dsa_tag_protocol mp)
++{
++	struct ksz_device *dev = ds->priv;
++
++	if (dev->chip_id == KSZ8563_CHIP_ID ||
++	    dev->chip_id == KSZ9893_CHIP_ID ||
++	    dev->chip_id == KSZ9563_CHIP_ID)
++		return DSA_TAG_PROTO_KSZ9893;
++
++	return DSA_TAG_PROTO_KSZ9477;
++}
++
+ static void ksz9477_set_gbit(struct ksz_device *dev, int port, bool gbit)
+ {
+ 	const u8 *bitval = dev->info->xmii_ctrl1;
+@@ -1775,7 +1789,7 @@ const struct ksz_dev_ops ksz9477_dev_ops = {
+ };
+ 
+ const struct dsa_switch_ops ksz9477_switch_ops = {
+-	.get_tag_protocol	= ksz_get_tag_protocol,
++	.get_tag_protocol	= ksz9477_get_tag_protocol,
+ 	.connect_tag_protocol   = ksz_connect_tag_protocol,
+ 	.get_phy_flags		= ksz_get_phy_flags,
+ 	.setup			= ksz_setup,
 diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index e48b9d5c06301..37e575bf4e14d 100644
+index 37e575bf4e14d..1be055d3f1994 100644
 --- a/drivers/net/dsa/microchip/ksz_common.c
 +++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -4640,68 +4640,9 @@ int ksz_resume(struct dsa_switch *ds)
+@@ -3304,37 +3304,6 @@ int ksz_port_bridge_flags(struct dsa_switch *ds, int port,
  	return 0;
  }
  
--static const struct dsa_switch_ops ksz_switch_ops = {
--	.get_tag_protocol	= ksz_get_tag_protocol,
--	.connect_tag_protocol   = ksz_connect_tag_protocol,
--	.get_phy_flags		= ksz_get_phy_flags,
--	.setup			= ksz_setup,
--	.teardown		= ksz_teardown,
--	.phy_read		= ksz_phy_read16,
--	.phy_write		= ksz_phy_write16,
--	.phylink_get_caps	= ksz_phylink_get_caps,
--	.port_setup		= ksz_port_setup,
--	.set_ageing_time	= ksz_set_ageing_time,
--	.get_strings		= ksz_get_strings,
--	.get_ethtool_stats	= ksz_get_ethtool_stats,
--	.get_sset_count		= ksz_sset_count,
--	.port_bridge_join	= ksz_port_bridge_join,
--	.port_bridge_leave	= ksz_port_bridge_leave,
--	.port_hsr_join		= ksz_hsr_join,
--	.port_hsr_leave		= ksz_hsr_leave,
--	.port_set_mac_address	= ksz_port_set_mac_address,
--	.port_stp_state_set	= ksz_port_stp_state_set,
--	.port_teardown		= ksz_port_teardown,
--	.port_pre_bridge_flags	= ksz_port_pre_bridge_flags,
--	.port_bridge_flags	= ksz_port_bridge_flags,
--	.port_fast_age		= ksz_port_fast_age,
--	.port_vlan_filtering	= ksz_port_vlan_filtering,
--	.port_vlan_add		= ksz_port_vlan_add,
--	.port_vlan_del		= ksz_port_vlan_del,
--	.port_fdb_dump		= ksz_port_fdb_dump,
--	.port_fdb_add		= ksz_port_fdb_add,
--	.port_fdb_del		= ksz_port_fdb_del,
--	.port_mdb_add           = ksz_port_mdb_add,
--	.port_mdb_del           = ksz_port_mdb_del,
--	.port_mirror_add	= ksz_port_mirror_add,
--	.port_mirror_del	= ksz_port_mirror_del,
--	.get_stats64		= ksz_get_stats64,
--	.get_pause_stats	= ksz_get_pause_stats,
--	.port_change_mtu	= ksz_change_mtu,
--	.port_max_mtu		= ksz_max_mtu,
--	.get_wol		= ksz_get_wol,
--	.set_wol		= ksz_set_wol,
--	.suspend		= ksz_suspend,
--	.resume			= ksz_resume,
--	.get_ts_info		= ksz_get_ts_info,
--	.port_hwtstamp_get	= ksz_hwtstamp_get,
--	.port_hwtstamp_set	= ksz_hwtstamp_set,
--	.port_txtstamp		= ksz_port_txtstamp,
--	.port_rxtstamp		= ksz_port_rxtstamp,
--	.cls_flower_add		= ksz_cls_flower_add,
--	.cls_flower_del		= ksz_cls_flower_del,
--	.port_setup_tc		= ksz_setup_tc,
--	.support_eee		= ksz_support_eee,
--	.set_mac_eee		= ksz_set_mac_eee,
--	.port_get_default_prio	= ksz_port_get_default_prio,
--	.port_set_default_prio	= ksz_port_set_default_prio,
--	.port_get_dscp_prio	= ksz_port_get_dscp_prio,
--	.port_add_dscp_prio	= ksz_port_add_dscp_prio,
--	.port_del_dscp_prio	= ksz_port_del_dscp_prio,
--	.port_get_apptrust	= ksz_port_get_apptrust,
--	.port_set_apptrust	= ksz_port_set_apptrust,
--};
+-enum dsa_tag_protocol ksz_get_tag_protocol(struct dsa_switch *ds,
+-					   int port,
+-					   enum dsa_tag_protocol mp)
+-{
+-	struct ksz_device *dev = ds->priv;
+-	enum dsa_tag_protocol proto = DSA_TAG_PROTO_NONE;
 -
--struct ksz_device *ksz_switch_alloc(struct device *base, void *priv)
-+struct ksz_device *ksz_switch_alloc(struct device *base,
-+				    const struct ksz_chip_data *chip,
-+				    void *priv)
+-	if (ksz_is_ksz87xx(dev) || ksz_is_8895_family(dev))
+-		proto = DSA_TAG_PROTO_KSZ8795;
+-
+-	if (dev->chip_id == KSZ88X3_CHIP_ID ||
+-	    dev->chip_id == KSZ8463_CHIP_ID ||
+-	    dev->chip_id == KSZ8563_CHIP_ID ||
+-	    dev->chip_id == KSZ9893_CHIP_ID ||
+-	    dev->chip_id == KSZ9563_CHIP_ID)
+-		proto = DSA_TAG_PROTO_KSZ9893;
+-
+-	if (dev->chip_id == KSZ8567_CHIP_ID ||
+-	    dev->chip_id == KSZ9477_CHIP_ID ||
+-	    dev->chip_id == KSZ9896_CHIP_ID ||
+-	    dev->chip_id == KSZ9897_CHIP_ID ||
+-	    dev->chip_id == KSZ9567_CHIP_ID ||
+-	    dev->chip_id == LAN9646_CHIP_ID)
+-		proto = DSA_TAG_PROTO_KSZ9477;
+-
+-	if (is_lan937x(dev))
+-		proto = DSA_TAG_PROTO_LAN937X;
+-
+-	return proto;
+-}
+-
+ int ksz_connect_tag_protocol(struct dsa_switch *ds,
+ 			     enum dsa_tag_protocol proto)
  {
- 	struct dsa_switch *ds;
- 	struct ksz_device *swdev;
-@@ -4712,7 +4653,7 @@ struct ksz_device *ksz_switch_alloc(struct device *base, void *priv)
- 
- 	ds->dev = base;
- 	ds->num_ports = DSA_MAX_PORTS;
--	ds->ops = &ksz_switch_ops;
-+	ds->ops = chip->switch_ops;
- 
- 	swdev = devm_kzalloc(base, sizeof(*swdev), GFP_KERNEL);
- 	if (!swdev)
 diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index 125740deb5a21..37923a1c43d80 100644
+index 37923a1c43d80..39486b5571bd6 100644
 --- a/drivers/net/dsa/microchip/ksz_common.h
 +++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -460,7 +460,9 @@ struct ksz_dev_ops {
- 	int (*pcs_create)(struct ksz_device *dev);
+@@ -473,9 +473,6 @@ void ksz_teardown(struct dsa_switch *ds);
+ int ksz_port_setup(struct dsa_switch *ds, int port);
+ void ksz_port_teardown(struct dsa_switch *ds, int port);
+ 
+-enum dsa_tag_protocol ksz_get_tag_protocol(struct dsa_switch *ds,
+-					   int port,
+-					   enum dsa_tag_protocol mp);
+ int ksz_connect_tag_protocol(struct dsa_switch *ds,
+ 			     enum dsa_tag_protocol proto);
+ void ksz_init_mib_timer(struct ksz_device *dev);
+diff --git a/drivers/net/dsa/microchip/lan937x_main.c b/drivers/net/dsa/microchip/lan937x_main.c
+index ff931b1143a52..c39be6eb50121 100644
+--- a/drivers/net/dsa/microchip/lan937x_main.c
++++ b/drivers/net/dsa/microchip/lan937x_main.c
+@@ -667,6 +667,13 @@ static void lan937x_switch_exit(struct ksz_device *dev)
+ 	lan937x_reset_switch(dev);
+ }
+ 
++static enum dsa_tag_protocol lan937x_get_tag_protocol(struct dsa_switch *ds,
++						      int port,
++						      enum dsa_tag_protocol mp)
++{
++	return DSA_TAG_PROTO_LAN937X;
++}
++
+ const struct phylink_mac_ops lan937x_phylink_mac_ops = {
+ 	.mac_config	= ksz_phylink_mac_config,
+ 	.mac_link_down	= ksz_phylink_mac_link_down,
+@@ -714,7 +721,7 @@ const struct ksz_dev_ops lan937x_dev_ops = {
  };
  
--struct ksz_device *ksz_switch_alloc(struct device *base, void *priv);
-+struct ksz_device *ksz_switch_alloc(struct device *base,
-+				    const struct ksz_chip_data *chip,
-+				    void *priv);
- int ksz_switch_register(struct ksz_device *dev);
- void ksz_switch_remove(struct ksz_device *dev);
- int ksz_switch_suspend(struct device *dev);
-diff --git a/drivers/net/dsa/microchip/ksz_spi.c b/drivers/net/dsa/microchip/ksz_spi.c
-index d8001734b0574..373e9054947cb 100644
---- a/drivers/net/dsa/microchip/ksz_spi.c
-+++ b/drivers/net/dsa/microchip/ksz_spi.c
-@@ -143,14 +143,14 @@ static int ksz_spi_probe(struct spi_device *spi)
- 	struct ksz_device *dev;
- 	int i, ret = 0;
- 
--	dev = ksz_switch_alloc(&spi->dev, spi);
--	if (!dev)
--		return -ENOMEM;
--
- 	chip = device_get_match_data(ddev);
- 	if (!chip)
- 		return -EINVAL;
- 
-+	dev = ksz_switch_alloc(&spi->dev, chip, spi);
-+	if (!dev)
-+		return -ENOMEM;
-+
- 	/* Save chip id to do special initialization when probing. */
- 	dev->chip_id = chip->chip_id;
- 	if (chip->chip_id == KSZ88X3_CHIP_ID)
+ const struct dsa_switch_ops lan937x_switch_ops = {
+-	.get_tag_protocol	= ksz_get_tag_protocol,
++	.get_tag_protocol	= lan937x_get_tag_protocol,
+ 	.connect_tag_protocol   = ksz_connect_tag_protocol,
+ 	.get_phy_flags		= ksz_get_phy_flags,
+ 	.setup			= ksz_setup,
 
 -- 
 2.53.0
