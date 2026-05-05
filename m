@@ -1,312 +1,199 @@
-Return-Path: <netdev+bounces-284276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284277-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AI8yDOa2+Wn5CAMAu9opvQ
-	(envelope-from <netdev+bounces-284276-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:22:46 +0200
+	id c749Mvm1+WmvBAMAu9opvQ
+	(envelope-from <netdev+bounces-284277-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:18:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A2704C988A
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:22:45 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id BACB94C974C
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:18:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B86FA3019463
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 09:11:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7DE92301F48B
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 09:18:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC82330E0E5;
-	Tue,  5 May 2026 09:11:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90038246778;
+	Tue,  5 May 2026 09:18:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kusEpXTk"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b="GXdQ65Ke"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2155EEADC
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 09:11:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC9B2DB7BA;
+	Tue,  5 May 2026 09:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777972298; cv=none; b=U3uTKx/MWPtkPUVsdrccOHp1e5a60661EVgfpoEjELHnDWnOF0sbyp2I3wyfAE4OtB41fJYsopUtHz4dyXwlmUB/cCru6uUMG5fdlgY1xN9zGxeFoJybUVEci81tjKktwylhFtepwenmwKhLhtdTDiZ0vAV7MgqUMykQdNMvOrU=
+	t=1777972725; cv=none; b=TqPNLdVxItGC9r6Z8RYXL112BQ1FYVDeuP2rvZ/wljtqX1zhjamQ+0N5xrSqDbPAUBZKOqkaaEMSEgsjqOjpV4jBPfSLto6OuOPIy9riZJPq9xyhjqduuSCdzGUbeCxFTA420r//z133ntIyYjEyVsRJZrSXYqFwcnrl4uK9f8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777972298; c=relaxed/simple;
-	bh=89xwW3QhR6efNl4utEyD/0BLwfFnqIuvYDrkbCDzsmc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=LXOh/kckEupB98R5NGubZ2lPQPuF0PNLC6DYB5dVEluv10cXXI6M2wZZFEH54u8RqEoS3fhhEpId4STm5rbeI+cHor8xtPyHuZ07rN2XNDhifq6MP04ZBytGjKoplFgMIYEKmtRM5ySWpJKVjkohbo+W2P1ITPyjlG0RrU1ZMec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kusEpXTk; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-7bdaa2677aeso16771007b3.2
-        for <netdev@vger.kernel.org>; Tue, 05 May 2026 02:11:36 -0700 (PDT)
+	s=arc-20240116; t=1777972725; c=relaxed/simple;
+	bh=9SNRQ96W42J5zCIfhW/YTNFrj8QMT4xG0K9xiri0yyk=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=kXj1kH0yJ8pN6G1vbdkhfKhB+9ddAePj96p5rDBw1lm/JbXvFSEirrPix3S3Kze28dz3yQs62xRc1iOD2dJLb+oX2Ydim/BOMPVhQBczL9K7641QFPpGlK+vnZtEMUbBw634aoa8QUecXQLoLK2uqWDhsQ1jtyLhgOIXCUF+1eM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn; spf=pass smtp.mailfrom=std.uestc.edu.cn; dkim=fail (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b=GXdQ65Ke reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=std.uestc.edu.cn
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777972296; x=1778577096; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=IeOtToVikcSaiFkoX6KNMaxHioQ2c/ejDKaU5caUKLA=;
-        b=kusEpXTk6hQWGGKSypNcTydn57fWbVshttyabEe9MebCa5aY76kpuhgFHIs2eAjV8+
-         GHoRIB0cqW48ExatOBRigSEEcRDGt9lhJ+FK5Rdd5Pnm3oN2mKF4lkAZ5OYNUOB8NYWy
-         wM/SVPM7uscugxUaWSJKwdtQUVfodnVwU2gLwv859qBgsdF8HFkkC0HFUFfZfRWRet9a
-         wiJh0RI8jSauBLY0tDwHGrNiEWAFSDfNvqJp+gJjyfyJgWUajxhdbADbJJwm4dDXjBR/
-         9tTOPG/LH80TWqosk5ZPRUI3502v5z3mabQDesskbBLllkgHXxuFIchdBDhPpY74HnPv
-         TdLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777972296; x=1778577096;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IeOtToVikcSaiFkoX6KNMaxHioQ2c/ejDKaU5caUKLA=;
-        b=oR7VycTlJblFLLTlRskSrK6zKpPyB3qXEKRw76QEVaz3F083c4jh476VkYdHVSBK/A
-         08cBbfXhCGXfwRlZ39eZkt3M4nFz6E6+7eh1HFW6ZvAFkdcJK8IKsX/zreGX6XFsEkqI
-         UY7MXKyy1y/cNdE4GFIDr3o4s941nXK3rH6BxsB422EK531Vdy894pLV2CalIpBhpP61
-         //CjMz9ZQH46jlJxFiJ8yfMRv3OVcp+bL8JBr70AjBT6EJ5OGbWX01otAxqJPQinuMFq
-         W+7D0ZlDCAXUsttoYozWfpnH1NCCCfFgWwYOkgMpa266kYzF9DtNBsACYMlT5GqPm/iB
-         Qvlw==
-X-Forwarded-Encrypted: i=1; AFNElJ8tLVkCrM/RdkvNgxIbJMVC9/Uk+JklxoyEszoMdMR6XgOOdtLFQugIK1s4vu8z/ZwOEMDkq0o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoRIHGVOQjesYY/jlHgaxxaC1Vze+jPy6157wYXIqBdcGOJ7hw
-	C0Njcgn8LD+4s6MRNgBdYN+ovABXj+XZXsRx+V9tB4LRSfvFA3TLfkNPRbPLQMsw1IKmQt0y43V
-	LORC9p1lkbxciNA==
-X-Received: from ywbet12.prod.google.com ([2002:a05:690c:2e0c:b0:7bd:6453:bb33])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:690c:95:b0:7b8:1b67:2571 with SMTP id 00721157ae682-7bd771304a4mr140615927b3.42.1777972295812;
- Tue, 05 May 2026 02:11:35 -0700 (PDT)
-Date: Tue,  5 May 2026 09:11:33 +0000
+	d=std.uestc.edu.cn; s=dkim; h=Received:Message-ID:Date:
+	MIME-Version:User-Agent:From:Subject:To:Cc:Content-Type:
+	Content-Transfer-Encoding; bh=/aXJtrqXl1XXzWhV4If7NN+Y9lfxYLoMa8
+	LrVHQmIl4=; b=GXdQ65KeeOgnfYw5ErQfYJDXjNoCQzg3VAQomD+LEar6YFvn9E
+	s3YQRdvIGFrClymYqjfS9zA+BYJLpXlbDdoG4e+yaX0KOY01fB3xEyE+9lCUAcBz
+	aoyrmnOH8V6e5L75BEZDAdfiFPhrN5elOkaJ0NXYaRrDll7fu4LZn4kfA=
+Received: from [IPV6:240c:c983:9:4350:6499:1928:c2e4:4a99] (unknown [240c:c983:9:4350:6499:1928:c2e4:4a99])
+	by hzbj-edu-front-3.icoremail.net (Coremail) with SMTP id BbQMCkD2GjXqtflpMevqAQ--.45991S3;
+	Tue, 05 May 2026 17:18:37 +0800 (CST)
+Message-ID: <15e69058-da2e-4a4d-8bda-ad89da0ae6f7@std.uestc.edu.cn>
+Date: Tue, 5 May 2026 17:18:34 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260505091133.2452510-1-edumazet@google.com>
-Subject: [PATCH v2 net] net/sched: sch_sfq: annotate data-races from sfq_dump_class_stats()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 7A2704C988A
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: Quan Sun <2022090917019@std.uestc.edu.cn>
+Subject: Vulnerability Report: Logical Error in 6LoWPAN Multicast Context
+ Address Compression
+To: linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+Cc: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:BbQMCkD2GjXqtflpMevqAQ--.45991S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxAr4xAryUtw4xWryfGF15Arb_yoW5uF4Dpr
+	WrG39Yyr97Xr13A3yvyr4v9r1xZrs5tr1UKry8C3s09a1Ygr1IvF4DKFy8Aa45Ar1ru34q
+	vw4Uu398AwsIkaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvqb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwV
+	C2z280aVCY1x0267AKxVW8Jr0_Cr1UM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq
+	07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r
+	18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41l
+	c7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
+	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
+	14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
+	IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
+	87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0x
+	ZFpf9x07boE_iUUUUU=
+X-CM-SenderInfo: asqsjiyzqzilqqrzq21wgo3vxvwfhvlgxou0/
+X-Rspamd-Queue-Id: BACB94C974C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	DMARC_POLICY_QUARANTINE(1.50)[uestc.edu.cn : SPF not aligned (relaxed),quarantine];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com,google.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-284277-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284276-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_THREE(0.00)[4];
+	R_DKIM_PERMFAIL(0.00)[std.uestc.edu.cn:s=dkim];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[]
+	DKIM_TRACE(0.00)[std.uestc.edu.cn:~];
+	FROM_HAS_DN(0.00)[];
+	NEURAL_SPAM(0.00)[0.269];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[2022090917019@std.uestc.edu.cn,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-sfq_dump_class_stats() runs locklessly, add needed READ_ONCE()
-and WRITE_ONCE() annotations.
+## 1. Summary
+A logical vulnerability exists in the 6LoWPAN IPHC (IP Header 
+Compression) subsystem of the Linux kernel, specifically within the 
+`lowpan_iphc_mcast_ctx_addr_compress` function in `net/6lowpan/iphc.c`.
 
-Fixes: edb09eb17ed8 ("net: sched: do not acquire qdisc spinlock in qdisc/class stats dump")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
-v2: fix logic error in sfq_dec()
+The function uses incorrect memory offsets during the `memcpy` 
+operations intended to compress an IPv6 multicast address. This mismatch 
+in offsets results in an incorrectly formed compressed address being 
+transmitted over the network, which is incompatible with the 
+corresponding decompression logic. Consequently, context-based multicast 
+address compression in 6LoWPAN is broken and fails to operate as defined 
+by the protocol.
 
- net/sched/sch_sfq.c | 48 +++++++++++++++++++++++----------------------
- 1 file changed, 25 insertions(+), 23 deletions(-)
+## 2. Vulnerability Details
 
-diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
-index c3f3181dba5424eb9d26362a1628653bb9392e89..f39822babf88bee9d52cac9f39637d38ec36994f 100644
---- a/net/sched/sch_sfq.c
-+++ b/net/sched/sch_sfq.c
-@@ -225,7 +225,8 @@ static inline void sfq_dec(struct sfq_sched_data *q, sfq_index x)
- 
- 	sfq_unlink(q, x, n, p);
- 
--	d = q->slots[x].qlen--;
-+	d = q->slots[x].qlen;
-+	WRITE_ONCE(q->slots[x].qlen, d - 1);
- 	if (n == p && q->cur_depth == d)
- 		q->cur_depth--;
- 	sfq_link(q, x);
-@@ -238,7 +239,8 @@ static inline void sfq_inc(struct sfq_sched_data *q, sfq_index x)
- 
- 	sfq_unlink(q, x, n, p);
- 
--	d = ++q->slots[x].qlen;
-+	d = q->slots[x].qlen + 1;
-+	WRITE_ONCE(q->slots[x].qlen, d);
- 	if (q->cur_depth < d)
- 		q->cur_depth = d;
- 	sfq_link(q, x);
-@@ -298,7 +300,7 @@ static unsigned int sfq_drop(struct Qdisc *sch, struct sk_buff **to_free)
- drop:
- 		skb = q->headdrop ? slot_dequeue_head(slot) : slot_dequeue_tail(slot);
- 		len = qdisc_pkt_len(skb);
--		slot->backlog -= len;
-+		WRITE_ONCE(slot->backlog, slot->backlog - len);
- 		sfq_dec(q, x);
- 		sch->q.qlen--;
- 		qdisc_qstats_backlog_dec(sch, skb);
-@@ -314,7 +316,7 @@ static unsigned int sfq_drop(struct Qdisc *sch, struct sk_buff **to_free)
- 			q->tail = NULL; /* no more active slots */
- 		else
- 			q->tail->next = slot->next;
--		q->ht[slot->hash] = SFQ_EMPTY_SLOT;
-+		WRITE_ONCE(q->ht[slot->hash], SFQ_EMPTY_SLOT);
- 		goto drop;
- 	}
- 
-@@ -364,10 +366,10 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
- 		x = q->dep[0].next; /* get a free slot */
- 		if (x >= SFQ_MAX_FLOWS)
- 			return qdisc_drop_reason(skb, sch, to_free, QDISC_DROP_MAXFLOWS);
--		q->ht[hash] = x;
-+		WRITE_ONCE(q->ht[hash], x);
- 		slot = &q->slots[x];
- 		slot->hash = hash;
--		slot->backlog = 0; /* should already be 0 anyway... */
-+		WRITE_ONCE(slot->backlog, 0); /* should already be 0 anyway... */
- 		red_set_vars(&slot->vars);
- 		goto enqueue;
- 	}
-@@ -426,7 +428,7 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
- 		head = slot_dequeue_head(slot);
- 		delta = qdisc_pkt_len(head) - qdisc_pkt_len(skb);
- 		sch->qstats.backlog -= delta;
--		slot->backlog -= delta;
-+		WRITE_ONCE(slot->backlog, slot->backlog - delta);
- 		qdisc_drop_reason(head, sch, to_free, QDISC_DROP_FLOW_LIMIT);
- 
- 		slot_queue_add(slot, skb);
-@@ -436,7 +438,7 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
- 
- enqueue:
- 	qdisc_qstats_backlog_inc(sch, skb);
--	slot->backlog += qdisc_pkt_len(skb);
-+	WRITE_ONCE(slot->backlog, slot->backlog + qdisc_pkt_len(skb));
- 	slot_queue_add(slot, skb);
- 	sfq_inc(q, x);
- 	if (slot->qlen == 1) {		/* The flow is new */
-@@ -452,7 +454,7 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
- 		 */
- 		q->tail = slot;
- 		/* We could use a bigger initial quantum for new flows */
--		slot->allot = q->quantum;
-+		WRITE_ONCE(slot->allot, q->quantum);
- 	}
- 	if (++sch->q.qlen <= q->limit)
- 		return NET_XMIT_SUCCESS;
-@@ -489,7 +491,7 @@ sfq_dequeue(struct Qdisc *sch)
- 	slot = &q->slots[a];
- 	if (slot->allot <= 0) {
- 		q->tail = slot;
--		slot->allot += q->quantum;
-+		WRITE_ONCE(slot->allot, slot->allot + q->quantum);
- 		goto next_slot;
- 	}
- 	skb = slot_dequeue_head(slot);
-@@ -497,10 +499,10 @@ sfq_dequeue(struct Qdisc *sch)
- 	qdisc_bstats_update(sch, skb);
- 	sch->q.qlen--;
- 	qdisc_qstats_backlog_dec(sch, skb);
--	slot->backlog -= qdisc_pkt_len(skb);
-+	WRITE_ONCE(slot->backlog, slot->backlog - qdisc_pkt_len(skb));
- 	/* Is the slot empty? */
- 	if (slot->qlen == 0) {
--		q->ht[slot->hash] = SFQ_EMPTY_SLOT;
-+		WRITE_ONCE(q->ht[slot->hash], SFQ_EMPTY_SLOT);
- 		next_a = slot->next;
- 		if (a == next_a) {
- 			q->tail = NULL; /* no more active slots */
-@@ -508,7 +510,7 @@ sfq_dequeue(struct Qdisc *sch)
- 		}
- 		q->tail->next = next_a;
- 	} else {
--		slot->allot -= qdisc_pkt_len(skb);
-+		WRITE_ONCE(slot->allot, slot->allot - qdisc_pkt_len(skb));
- 	}
- 	return skb;
- }
-@@ -549,9 +551,9 @@ static void sfq_rehash(struct Qdisc *sch)
- 			sfq_dec(q, i);
- 			__skb_queue_tail(&list, skb);
- 		}
--		slot->backlog = 0;
-+		WRITE_ONCE(slot->backlog, 0);
- 		red_set_vars(&slot->vars);
--		q->ht[slot->hash] = SFQ_EMPTY_SLOT;
-+		WRITE_ONCE(q->ht[slot->hash], SFQ_EMPTY_SLOT);
- 	}
- 	q->tail = NULL;
- 
-@@ -570,7 +572,7 @@ static void sfq_rehash(struct Qdisc *sch)
- 				dropped++;
- 				continue;
- 			}
--			q->ht[hash] = x;
-+			WRITE_ONCE(q->ht[hash], x);
- 			slot = &q->slots[x];
- 			slot->hash = hash;
- 		}
-@@ -581,7 +583,7 @@ static void sfq_rehash(struct Qdisc *sch)
- 			slot->vars.qavg = red_calc_qavg(q->red_parms,
- 							&slot->vars,
- 							slot->backlog);
--		slot->backlog += qdisc_pkt_len(skb);
-+		WRITE_ONCE(slot->backlog, slot->backlog + qdisc_pkt_len(skb));
- 		sfq_inc(q, x);
- 		if (slot->qlen == 1) {		/* The flow is new */
- 			if (q->tail == NULL) {	/* It is the first flow */
-@@ -591,7 +593,7 @@ static void sfq_rehash(struct Qdisc *sch)
- 				q->tail->next = x;
- 			}
- 			q->tail = slot;
--			slot->allot = q->quantum;
-+			WRITE_ONCE(slot->allot, q->quantum);
- 		}
- 	}
- 	sch->q.qlen -= dropped;
-@@ -905,16 +907,16 @@ static int sfq_dump_class_stats(struct Qdisc *sch, unsigned long cl,
- 				struct gnet_dump *d)
- {
- 	struct sfq_sched_data *q = qdisc_priv(sch);
--	sfq_index idx = q->ht[cl - 1];
-+	sfq_index idx = READ_ONCE(q->ht[cl - 1]);
- 	struct gnet_stats_queue qs = { 0 };
- 	struct tc_sfq_xstats xstats = { 0 };
- 
- 	if (idx != SFQ_EMPTY_SLOT) {
- 		const struct sfq_slot *slot = &q->slots[idx];
- 
--		xstats.allot = slot->allot;
--		qs.qlen = slot->qlen;
--		qs.backlog = slot->backlog;
-+		xstats.allot = READ_ONCE(slot->allot);
-+		qs.qlen = READ_ONCE(slot->qlen);
-+		qs.backlog = READ_ONCE(slot->backlog);
- 	}
- 	if (gnet_stats_copy_queue(d, NULL, &qs, qs.qlen) < 0)
- 		return -1;
-@@ -930,7 +932,7 @@ static void sfq_walk(struct Qdisc *sch, struct qdisc_walker *arg)
- 		return;
- 
- 	for (i = 0; i < q->divisor; i++) {
--		if (q->ht[i] == SFQ_EMPTY_SLOT) {
-+		if (READ_ONCE(q->ht[i]) == SFQ_EMPTY_SLOT) {
- 			arg->count++;
- 			continue;
- 		}
--- 
-2.54.0.545.g6539524ca2-goog
+According to 6LoWPAN address compression standards (and aligning with 
+the decompression function `lowpan_uncompress_multicast_ctx_daddr`), a 
+context-based compressed multicast address should be represented by 
+exactly 6 bytes:
+*   **Bytes 0-1:** Derived from `s6_addr[1]` and `s6_addr[2]` (Flags, 
+Scope, and Reserved bits).
+*   **Bytes 2-5:** Derived from `s6_addr[12]` to `s6_addr[15]` (The 
+4-byte Group ID).
+
+However, in the compression function 
+`lowpan_iphc_mcast_ctx_addr_compress`, the offsets provided to the 
+`memcpy` calls are flawed:
+
+```c
+static u8 lowpan_iphc_mcast_ctx_addr_compress(u8 **hc_ptr,
+					      const struct lowpan_iphc_ctx *ctx,
+					      const struct in6_addr *ipaddr)
+{
+	u8 data[6];
+
+	/* flags/scope, reserved (RIID) */
+	memcpy(data, &ipaddr->s6_addr[1], 2);
+	/* group ID */
+	memcpy(&data[1], &ipaddr->s6_addr[11], 4);
+	lowpan_push_hc_data(hc_ptr, data, 6);
+
+	return LOWPAN_IPHC_DAM_00;
+}
+```
+
+### Analysis of the Error:
+1.  **Incorrect Destination Offset:** The second `memcpy` writes to 
+`&data[1]` instead of `&data[2]`. This overwrites the byte previously 
+copied from `s6_addr[2]` into `data[1]`.
+2.  **Incorrect Source Offset:** The source address is specified as 
+`&ipaddr->s6_addr[11]` instead of `&ipaddr->s6_addr[12]`. This means it 
+begins reading from the last byte of the network prefix rather than the 
+start of the 4-byte Group ID.
+
+Because the compression formatting does not match the expected structure 
+required by the decompression function, multicast packets utilizing 
+context-based compression will be corrupted upon transmission.
+
+## 3. Impact
+This vulnerability breaks the Context-Based Multicast Address 
+Compression feature (`LOWPAN_IPHC_DAM_00` when `M` and `DAC` bits are 
+set) in 6LoWPAN networks. Nodes receiving these packets will incorrectly 
+decompress the destination multicast address, leading to dropped packets 
+and communication failures within the multicast group.
+
+## 4. Suggested Fix
+The fix requires adjusting both the destination and source offsets in 
+the second `memcpy` call to correctly place the 4-byte Group ID into the 
+compressed `data` buffer.
+
+### Proposed Patch:
+
+```diff
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -1084,9 +1084,9 @@ static u8 lowpan_iphc_mcast_ctx_addr_compress(u8 
+**hc_ptr,
+  	u8 data[6];
+
+  	/* flags/scope, reserved (RIID) */
+  	memcpy(data, &ipaddr->s6_addr[1], 2);
+  	/* group ID */
+-	memcpy(&data[1], &ipaddr->s6_addr[11], 4);
++	memcpy(&data[2], &ipaddr->s6_addr[12], 4);
+  	lowpan_push_hc_data(hc_ptr, data, 6);
+
+  	return LOWPAN_IPHC_DAM_00;
+  }
+```
 
 
