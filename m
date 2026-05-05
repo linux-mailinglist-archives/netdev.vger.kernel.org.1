@@ -1,179 +1,153 @@
-Return-Path: <netdev+bounces-284278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284279-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KFnZBAq3+WmNBAMAu9opvQ
-	(envelope-from <netdev+bounces-284278-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:23:22 +0200
+	id 0OF0MzW3+WmNBAMAu9opvQ
+	(envelope-from <netdev+bounces-284279-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:24:05 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61E1F4C98A4
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:23:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 488844C98EF
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:24:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AF3B43084ADA
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 09:18:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 12BE63051ABF
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 09:19:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB0B308F36;
-	Tue,  5 May 2026 09:18:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018D630AACD;
+	Tue,  5 May 2026 09:19:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="nvvez64D"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="nO44IJFL"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F6A1EFF8D
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 09:18:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CBB4309F1D;
+	Tue,  5 May 2026 09:19:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777972730; cv=none; b=CRUB/ja27DCcuo1HQEsw9GDK7H/kXab8WvPrkFwE7IhNgfEPMvPnN9jEUkLjfs+itj3J8YnmEEaMcB3QhIvDcQSXhFNwL+dxHSUT2VCDKx0BsRihiQrQUwIpZHNdQ3EFnAxgul61bwebZhGSk80hftt7vfYco+seskiEPgGXZYc=
+	t=1777972765; cv=none; b=JARL8b4o00Z3eUjyjDmIzN71hAv60jo7O/keG0+XExq2qS3Mn8fpH8lLW+gtwKGk5fMSiJv3bVzVjd4b7nnRWI6DrSyjtF6pZwdjwup5F6KDGVUW+QZOpbCGbC5++PsRRJOh90Wl5SXUPhsHLaGFkdyiBUtur+0mM/yfOai8iww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777972730; c=relaxed/simple;
-	bh=fbaH5tqfWHy6Xd+b5dPwSbbhuawugoyvUcdleOfhvhk=;
+	s=arc-20240116; t=1777972765; c=relaxed/simple;
+	bh=Sa1cZpOj2vBVDkew0f+0GqoneqbSh2eHUpErybrPNVQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PmIqQvqjVIs4KG9SpwEx0ABrBhYUXbHwuGq2wQb0MkL/+mbff4pETAVvK8IyasccRRUuzSGfawWJv+yzzXSYk87YGPPQ/WyYDQoX53AitFt8WetYNhJCESFREeskHlnxMfczdIBteoqgeM7fmYs47RmkR02nS0vdZ8fYakVo8xE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=nvvez64D; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=JWIYkX9BKeWAsCEgZ/rd1TTkuyCi2pBwyW9ZwolVWIk=; 
-	b=nvvez64DENLqwQwQbb7bP1EL+uWeLiRnQDkInhwa7dawJmo3Zs90lJeyQ9Nql337N5bIBXpLLxV
-	PmDK2t4wKxMZBcVbfsN/LjmIiRF/G+UfMaXyQHZBYLhmxmxdSq3VYA8D5MvrTtt5Vejc725qvacAV
-	2fhpRpCut+R29zYnTYG3JZV7PvOYCaCD+8f1+AJEsYhgmkZch5dlV4ZkJDHEGK933jyWV9MnWId4I
-	KtL/swiPiQHv/EuBz22QS6T8sie5AHntAsR6EdtSCbrWyc1CfANRm+FYvxE29XM4PFxve+fNDN4+H
-	PECWDI7jypZj+cxocyA9y3trsC5otSeIacWg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wKBvO-00BNfR-0X;
-	Tue, 05 May 2026 17:18:43 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 05 May 2026 17:18:42 +0800
-Date: Tue, 5 May 2026 17:18:42 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ren Wei <n05ec@lzu.edu.cn>
-Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com,
+	 Content-Type:Content-Disposition:In-Reply-To; b=k74Vg9A+110Z61hjWpT07Raw2csYb6e0QgLdY9l40CKuPpRldNwNq0mvbY/MTSBLDGjOTkZYnKrXePz2+cWhbxhMQLuhliboomgY7qydcQQu8F9L6qT89qyZcvnpr8UbL6ctsU34XtMKEuiB0MIs/B8DcTcTYR8EyuzwNsYdx+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=nO44IJFL; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 32E6F600B5;
+	Tue,  5 May 2026 11:19:21 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1777972761;
+	bh=/jvsMDAng95ZDXouFnr0lTKBoKIcHWdA0+U30YrDN0A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nO44IJFLaNffpH/icrQrgPj74VxOP1bbmvcMCae7UClnGEkGSWi9gZ4GxQMJo0NUA
+	 mKAQXnYMuTBspoN3b0PQgJxjAKIa/lsyosa4RQa9a6jxvN8OpM65ZIT7Z7DX7PDSeZ
+	 3bLlykSBup06TzgXRTiMavS589KX/CCwQoy1rhrJE74UdA20iUVrlz/8skaWeny0u+
+	 LyG/VgDqC6oI+6faWZ4h8rcgku5p6Pjj8qI5854JwemLKDvx7bJt9TDS9tFBKF3L0m
+	 mTANgiJJ/i3VkDhbSkPkgnUv3hpcvMwSUdCA4DB9LEOrh3N++yZwDs4Z8Ksdi/uLEg
+	 LtRFTH9oVvspg==
+Date: Tue, 5 May 2026 11:19:18 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Pratham Gupta <pratham36gupta@gmail.com>
+Cc: netfilter-devel@vger.kernel.org, fw@strlen.de, phil@nwl.cc,
 	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, yuantan098@gmail.com,
-	yifanwucs@gmail.com, tomapufckgml@gmail.com, bird@lzu.edu.cn,
-	ronbogo@outlook.com, zylzyl2333@gmail.com
-Subject: [v2 PATCH] xfrm: ipcomp: Free destination pages on acomp errors
-Message-ID: <afm18k8_CKGOl0oT@gondor.apana.org.au>
-References: <cover.1777923646.git.zylzyl2333@gmail.com>
- <8c304d9250d947b94cebc1cb1f85c73aa2bf0414.1777923646.git.zylzyl2333@gmail.com>
+	pabeni@redhat.com, horms@kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net] netfilter: ctnetlink: use nf_ct_exp_net() in
+ expectation dump
+Message-ID: <afm2FhEytJzShYhk@chamomile>
+References: <20260505051157.3895177-1-pratham36gupta@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <8c304d9250d947b94cebc1cb1f85c73aa2bf0414.1777923646.git.zylzyl2333@gmail.com>
-X-Rspamd-Queue-Id: 61E1F4C98A4
+In-Reply-To: <20260505051157.3895177-1-pratham36gupta@gmail.com>
+X-Rspamd-Queue-Id: 488844C98EF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[apana.org.au,quarantine];
-	R_DKIM_ALLOW(-0.20)[gondor.apana.org.au:s=h01];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,secunet.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lzu.edu.cn,outlook.com];
+	DMARC_NA(0.00)[netfilter.org];
+	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[gondor.apana.org.au:+];
-	TAGGED_FROM(0.00)[bounces-284278-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284279-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[herbert@gondor.apana.org.au,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[netfilter.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[]
 
-On Tue, May 05, 2026 at 04:52:59PM +0800, Ren Wei wrote:
-> From: Yilin Zhu <zylzyl2333@gmail.com>
+Hi,
+
+This is nf-next material.
+
+On Mon, May 04, 2026 at 10:11:57PM -0700, Pratham Gupta wrote:
+> Commit 02a3231b6d82 ("netfilter: nf_conntrack_expect: store netns and zone in expectation")
+> introduced exp->net so RCU-only expectation paths no longer need to
+> dereference exp->master for netns lookups.
 > 
-> ipcomp_setup_req() allocates destination pages for the acomp output
-> scatterlist. On successful completion, ipcomp_post_acomp() attaches the
-> used pages to the skb and frees any unused pages.
-> 
-> On an acomp error, ipcomp_post_acomp() skips directly to freeing the
-> request. acomp_request_free() only releases the request itself, so the
-> caller-allocated destination pages are left allocated.
-> 
-> Track the number of destination pages allocated for the request and free
-> them on the error path before releasing the request.
-> 
-> Fixes: eb2953d26971 ("xfrm: ipcomp: Use crypto_acomp interface")
-> Cc: stable@kernel.org
-> Reported-by: Yuan Tan <yuantan098@gmail.com>
-> Reported-by: Yifan Wu <yifanwucs@gmail.com>
-> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-> Reported-by: Xin Liu <bird@lzu.edu.cn>
-> Co-developed-by: Peihan Liu <ronbogo@outlook.com>
-> Signed-off-by: Peihan Liu <ronbogo@outlook.com>
-> Signed-off-by: Yilin Zhu <zylzyl2333@gmail.com>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> Commit 3db5647984de ("netfilter: nf_conntrack_expect: skip expectations in other netns via proc")
+> updated the proc path accordingly, but ctnetlink_exp_dump_table() still
+> compares against nf_ct_net(exp->master).
+
+There was no check in the /proc path.
+
+> Use nf_ct_exp_net(exp) here as well so the netlink dump path matches
+> the rest of the March 2026 expectation netns/RCU cleanup.
+
+yes, this is a leftover, but it is safe to access 
+
+> Fixes: 02a3231b6d82 ("netfilter: nf_conntrack_expect: store netns and zone in expectation")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Pratham Gupta <pratham36gupta@gmail.com>
 > ---
->  net/xfrm/xfrm_ipcomp.c | 16 +++++++++++++++-
->  1 file changed, 15 insertions(+), 1 deletion(-)
+> Tested expectation create/dump/delete on the host and in fresh Ubuntu 24.04
+> Docker userspace. Concurrent namespace churn/dump testing did not reproduce
+> a cross-netns leak.
 
-Thanks for the patch! How about just moving the out_free_req label:
+What cross-netns leak are you refering? This is simply using the
+conntrack netns instead of exp->netns which was added in 02a3231b6d82.
 
----8<---
-Move the out_free_req label up by a couple of lines so that the
-allocated dst SG list gets freed on error as well as success.
+This is nf-next material.
 
-Fixes: eb2953d26971 ("xfrm: ipcomp: Use crypto_acomp interface")
-Cc: stable@kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/net/xfrm/xfrm_ipcomp.c b/net/xfrm/xfrm_ipcomp.c
-index 5f38dff16177..2947321b043d 100644
---- a/net/xfrm/xfrm_ipcomp.c
-+++ b/net/xfrm/xfrm_ipcomp.c
-@@ -51,11 +51,12 @@ static int ipcomp_post_acomp(struct sk_buff *skb, int err, int hlen)
- 	struct scatterlist *dsg;
- 	int len, dlen;
- 
-+	extra = acomp_request_extra(req);
-+	dsg = extra->sg;
-+
- 	if (unlikely(err))
- 		goto out_free_req;
- 
--	extra = acomp_request_extra(req);
--	dsg = extra->sg;
- 	dlen = req->dlen;
- 
- 	pskb_trim_unique(skb, 0);
-@@ -84,10 +85,10 @@ static int ipcomp_post_acomp(struct sk_buff *skb, int err, int hlen)
- 		skb_shinfo(skb)->nr_frags++;
- 	} while ((dlen -= len));
- 
-+out_free_req:
- 	for (; dsg; dsg = sg_next(dsg))
- 		__free_page(sg_page(dsg));
- 
--out_free_req:
- 	acomp_request_free(req);
- 	return err;
- }
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>  net/netfilter/nf_conntrack_netlink.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conntrack_netlink.c
+> index eda5fe4a75c8..8ae3f6acc2d2 100644
+> --- a/net/netfilter/nf_conntrack_netlink.c
+> +++ b/net/netfilter/nf_conntrack_netlink.c
+> @@ -3158,7 +3158,7 @@ ctnetlink_exp_dump_table(struct sk_buff *skb, struct netlink_callback *cb)
+>  			if (l3proto && exp->tuple.src.l3num != l3proto)
+>  				continue;
+>  
+> -			if (!net_eq(nf_ct_net(exp->master), net))
+> +			if (!net_eq(nf_ct_exp_net(exp), net))
+>  				continue;
+>  
+>  			if (cb->args[1]) {
+> -- 
+> 2.43.0
+> 
 
