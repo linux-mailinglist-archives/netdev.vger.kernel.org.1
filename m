@@ -1,244 +1,386 @@
-Return-Path: <netdev+bounces-284290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284291-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0LL4BuS7+WmTCwMAu9opvQ
-	(envelope-from <netdev+bounces-284290-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:44:04 +0200
+	id 0JelH92++WkmDAMAu9opvQ
+	(envelope-from <netdev+bounces-284291-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:56:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B385F4CA040
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:44:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D457C4CA3C5
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:56:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 244CA300E038
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 09:44:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4607C30AC238
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 09:52:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB983290A9;
-	Tue,  5 May 2026 09:44:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDF7331716F;
+	Tue,  5 May 2026 09:52:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dmaJ5jtd";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="FQYWJjS3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F8pic0AT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DDB3264F1
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 09:43:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95FF3128CC;
+	Tue,  5 May 2026 09:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777974241; cv=none; b=S/REGmtT6PucsR1BqfP/NDhrVExU0/5EkScSDhFsECMV1xFeGAqGwu+b4R2lUFAswc+U34zG5Yr2oKKLvvCWOdonQsF9zaivoXjQG5s/kenYirVU4DJVbkKw2SnIDp4Nd585ygnWNaMK8QBN1bUA3ksVVCIGzodPyUXxW734Zlo=
+	t=1777974733; cv=none; b=MHsTbGmqu6gSQvpdvjMjvoUkKv8NXKrj63Tjv0eLIeSBrE+7iJnRUG701je4lF6/ZJCbfxNxhiTbEj/1THP+WnbT00RB10QyCaK3SfTkAviasAVAOi9PVJwU6J0buQIMkH5MkMT+8FdYNDk3ob6PzG1AvUhCa4I0k++HrU1Aw7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777974241; c=relaxed/simple;
-	bh=GB2zSiCiH2B2MkSpdmM8X1Yz2rkioSL551rkMUaheIg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NlY8HVjvpQipnQ6NeuqziRpfivuXNxY0jRvCluWF3OVnZsv1yZ8KGlSqqE8Fy6Wh45YMrka1brcbc5Jo1ycVSfnIz9wHJJYUJZi+bNmaauWoh7hMrJXrEVKYgQXy+0KLi3MGVQr+zo4YIUYe5CnJ8IDw3byahZgVd327fMm9p2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dmaJ5jtd; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=FQYWJjS3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777974237;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kmyJRtAdai9pCgAp5lRpf5bBAJMr8C8LzYPKP+rHxUU=;
-	b=dmaJ5jtdLJSdH9PZjrm+u5GTvfAiIM5WnJ5pZV7AxMxDAp13oCSR8MJ4clZAMBaG11nIxF
-	V8XMZmIbxNu7zOPnMlIOHDZK7ycUwLxFzLNaCnf7FSzL37NXYkdnocz5I9Li2F5gCgDaou
-	iKWnxA73AGYgd16jh6XY0Wxns1UJyno=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-541-x9Ri8rMGOuSVGS5hWQFBBg-1; Tue, 05 May 2026 05:43:55 -0400
-X-MC-Unique: x9Ri8rMGOuSVGS5hWQFBBg-1
-X-Mimecast-MFC-AGG-ID: x9Ri8rMGOuSVGS5hWQFBBg_1777974235
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-48d127eb013so6930695e9.1
-        for <netdev@vger.kernel.org>; Tue, 05 May 2026 02:43:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1777974234; x=1778579034; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kmyJRtAdai9pCgAp5lRpf5bBAJMr8C8LzYPKP+rHxUU=;
-        b=FQYWJjS3v2WEH+plSmUPAOCpl+CPb17MvLD/Gv0ckl1+pqCH/mlb39gPruKPAZz3Ki
-         EOkg3OzbKDqzpN+doqBiKtDsRNgROu+AtR2tOY3XlKTaZNxlGnVXQ43jsG/sYYwoagvZ
-         SUtXK13rv0xonDZ5RAtdfv3m6aXoyuWaOM/UhTBf3WJekWwzzOgFAK71+xKy/UGT0wU0
-         8f7Y0rRtjQ6eEI+PSiS+cyu58DaPXVt9bn7o/GwUFgZESq4Po5KGslIGbVCu+7yamyy/
-         1SnA1iaIC12NXgVJ6n2BF1WOx5HHM3YclgMDF8TEOPL8IVm6t9/L0bOlc9tNmUvRyqpG
-         inOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777974234; x=1778579034;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kmyJRtAdai9pCgAp5lRpf5bBAJMr8C8LzYPKP+rHxUU=;
-        b=mrIqMEM7Jn3yjI7S+kzah4ZTdtiHqcNXr+anxyD98CFtB2jvrnLKxx2wNc+igOi7oG
-         guQOjNU86hFJxWTbaoWtQbKAo6Y0MOCJzhgghFr8cgLKuGb+goLpSMEhZ3FDOSQmGrH5
-         gKeQFVUuNfnmesddRwMI9+uDSlKNpaI95EXq4dhCYMARwuclFBRP3+qitjF44S4KFDbe
-         l1i+KULH0Tt2WzYzPa6WcMiQi0NdwSpNb8Q9R3V8soTk9x6AiWM/Qjz0TWsYDtwQhEBv
-         4tLv58sbpo1xOShiXubJAXQIxnL6gxLcTYNjuYHX33kfGooxfxEUmcoG4Px6K4WsDjy6
-         CMFg==
-X-Gm-Message-State: AOJu0YxQrUBoVnhfs2Hb+LnLwV6yuIAej0EFWUrtViOGSg3e3ZQtbHJ1
-	aB3eToUD3Bt/YR5kq4tixt4eP9C9L1v8ZNULzvX46UOGJWacJn1Yvn6x0lC/QjajWmxOfxChQvD
-	3jLzIX8Y4pSX1AGu5lc62pf8PTZcZrFx88iwXP2Xz+7eAjLpKaKjrTh+H4A==
-X-Gm-Gg: AeBDievz6IAQTbtNrlgtYS2E2wkEhEPbLdhdmMqswVcIV7QwG3ptLqtk9LqGp67Srr7
-	wR84Z7eBaOQI7ol7pu9rbBvSIkbf3PSyyZTHGBV7wd6jqXX22zaRTn+jdubksEikOr7IaabD9vz
-	TQn4s1ZQrM0yjHqPsMSQin+sjeC0Z8TlQRvgwuScowK3JslB2jRJ0AzdgpRKnrIo5TcIM+h7Xw7
-	Bq80j3DP/4f/n32oJsHmwWPCvlNtzXCo9ojbEyPQYsz3twYzVhq6b8NTInn/tVX63gxm2scDO6F
-	p0gD73yDnDdUI3iR0U+7G8UDC73wnxPhapqt/Kta0RhE074+bzNJvRkFPEjrHMPY9DUXg+u/zrd
-	m9htKdtE/6MFJ/WKQQu24d3a17rjDwqwhs7EOtr228K+mhyFVXNEXM3E8U1EjxNle9aQ=
-X-Received: by 2002:a05:600c:46d1:b0:489:1d74:56d with SMTP id 5b1f17b1804b1-48a988ca441mr218126855e9.29.1777974234576;
-        Tue, 05 May 2026 02:43:54 -0700 (PDT)
-X-Received: by 2002:a05:600c:46d1:b0:489:1d74:56d with SMTP id 5b1f17b1804b1-48a988ca441mr218126385e9.29.1777974234170;
-        Tue, 05 May 2026 02:43:54 -0700 (PDT)
-Received: from [192.168.88.32] ([212.105.155.47])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a8eb69698sm603894855e9.1.2026.05.05.02.43.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 May 2026 02:43:53 -0700 (PDT)
-Message-ID: <37382811-ba47-4432-9911-6c39acea4f86@redhat.com>
-Date: Tue, 5 May 2026 11:43:51 +0200
+	s=arc-20240116; t=1777974733; c=relaxed/simple;
+	bh=b8EmRXYUHhHpMi2mh0G8JaV05ulaXXDdg5z3WQYkrtU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SmDJKrBjbQ1pBbWnF+CpJpvymDASwogBDXlEkZ/xw344D66TpsvInJJqy2J1wlNB9ZGpG3EPEsaza+yMEb9dcM9BJzyVTt63WYJwBQrZsXpyV7I0djusv2H7Pksk1LiT66kPJVlcZHOWu4xHgjJzxBuG+neInBEiyn9g0Bx1oNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F8pic0AT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42160C2BCB4;
+	Tue,  5 May 2026 09:52:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777974733;
+	bh=b8EmRXYUHhHpMi2mh0G8JaV05ulaXXDdg5z3WQYkrtU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=F8pic0ATB1pkJGvgbGQ0MMKCKtUhphyuJWHKgCWIwXghQKfFGRlCQTLcdwjewEP2F
+	 2DnohjvNlQnSlvApJnYNpAEVZvSIu0Yy3odheLa1XHZOA8K4ah3ZfLahvlTdtEefKA
+	 8sVTgF5267fLz+zaKUSAWunwR2NJJj958RZBUVSzpaWkQDiSAEiX8nne7ldbXPerXO
+	 63wab5KLIS7lQpz6Otwj9ihJis+vq7uqkw1tvHIUjIgYwmcjK/72m7/Lm/usjIJdeU
+	 cmHaaBQeor1l/jDHpKDjM5c4cZjgDqFsjoB02XGN7XsegiU/v5uava5V0hiG/hDNIw
+	 r+JfjfUgTQnIw==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Ivan Vecera <ivecera@redhat.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Petr Oros <poros@redhat.com>,
+	Alexander Nowlin <alexander.nowlin@intel.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sasha Levin <sashal@kernel.org>,
+	jiri@resnulli.us,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH AUTOSEL 7.0] dpll: export __dpll_pin_change_ntf() for use under dpll_lock
+Date: Tue,  5 May 2026 05:51:23 -0400
+Message-ID: <20260505095149.512052-7-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260505095149.512052-1-sashal@kernel.org>
+References: <20260505095149.512052-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 net-next 15/15] net: dsa: netc: add support for ethtool
- private statistics
-To: Wei Fang <wei.fang@nxp.com>, claudiu.manoil@nxp.com,
- vladimir.oltean@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, f.fainelli@gmail.com,
- frank.li@nxp.com, chleroy@kernel.org, horms@kernel.org, linux@armlinux.org.uk
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- linux-arm-kernel@lists.infradead.org, imx@lists.linux.dev
-References: <20260430024945.3413973-1-wei.fang@nxp.com>
- <20260430024945.3413973-16-wei.fang@nxp.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260430024945.3413973-16-wei.fang@nxp.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 7.0.3
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: B385F4CA040
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: D457C4CA3C5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284290-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,gmail.com,armlinux.org.uk];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_FROM(0.00)[bounces-284291-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,linux.dev:email,msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On 4/30/26 4:49 AM, Wei Fang wrote:
-> Implement the ethtool private statistics interface to expose additional
-> port-level and MAC-level counters that are not covered by the standard
-> IEEE 802.3 statistics. The pMAC counters are only reported when the port
-> supports Frame Preemption (802.1Qbu/802.3br).
-> 
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> ---
->  drivers/net/dsa/netc/netc_ethtool.c   | 107 ++++++++++++++++++++++++++
->  drivers/net/dsa/netc/netc_main.c      |   3 +
->  drivers/net/dsa/netc/netc_switch.h    |   9 +++
->  drivers/net/dsa/netc/netc_switch_hw.h |  58 ++++++++++++++
->  4 files changed, 177 insertions(+)
-> 
-> diff --git a/drivers/net/dsa/netc/netc_ethtool.c b/drivers/net/dsa/netc/netc_ethtool.c
-> index ac8940b5a85c..8d04db534347 100644
-> --- a/drivers/net/dsa/netc/netc_ethtool.c
-> +++ b/drivers/net/dsa/netc/netc_ethtool.c
-> @@ -19,6 +19,56 @@ static const struct ethtool_rmon_hist_range netc_rmon_ranges[] = {
->  	{ }
->  };
->  
-> +static const struct netc_port_stat netc_port_counters[] = {
-> +	{ NETC_PTGSLACR,	"port gate late arrival frames" },
-> +	{ NETC_PSDFTCR,	"port SDF transmit frames" },
-> +	{ NETC_PSDFDDCR,	"port SDF drop duplicate frames" },
-> +	{ NETC_PRXDCR,		"port rx discard frames" },
-> +	{ NETC_PRXDCRRR,	"port rx discard read-reset" },
-> +	{ NETC_PRXDCRR0,	"port rx discard reason 0" },
-> +	{ NETC_PRXDCRR1,	"port rx discard reason 1" },
-> +	{ NETC_PTXDCR,		"port tx discard frames" },
-> +	{ NETC_PTXDCRRR,	"port tx discard read-reset" },
-> +	{ NETC_PTXDCRR0,	"port tx discard reason 0" },
-> +	{ NETC_PTXDCRR1,	"port tx discard reason 1" },
-> +	{ NETC_BPDCR,		"bridge port discard frames" },
-> +	{ NETC_BPDCRRR,	"bridge port discard read-reset" },
-> +	{ NETC_BPDCRR0,	"bridge port discard reason 0" },
-> +	{ NETC_BPDCRR1,	"bridge port discard reason 1" },
-> +};
-> +
-> +static const struct netc_port_stat netc_emac_counters[] = {
-> +	{ NETC_PM_ROCT(0),	"eMAC rx octets" },
-> +	{ NETC_PM_RVLAN(0),	"eMAC rx VLAN frames" },
-> +	{ NETC_PM_RERR(0),	"eMAC rx frame errors" },
-> +	{ NETC_PM_RUCA(0),	"eMAC rx unicast frames" },
-> +	{ NETC_PM_RDRP(0),	"eMAC rx dropped packets" },
-> +	{ NETC_PM_RPKT(0),	"eMAC rx packets" },
-> +	{ NETC_PM_TOCT(0),	"eMAC tx octets" },
-> +	{ NETC_PM_TVLAN(0),	"eMAC tx VLAN frames" },
-> +	{ NETC_PM_TFCS(0),	"eMAC tx FCS errors" },
-> +	{ NETC_PM_TUCA(0),	"eMAC tx unicast frames" },
-> +	{ NETC_PM_TPKT(0),	"eMAC tx packets" },
-> +	{ NETC_PM_TUND(0),	"eMAC tx undersized packets" },
-> +	{ NETC_PM_TIOCT(0),	"eMAC tx invalid octets" },
-> +};
-> +
-> +static const struct netc_port_stat netc_pmac_counters[] = {
-> +	{ NETC_PM_ROCT(1),	"pMAC rx octets" },
-> +	{ NETC_PM_RVLAN(1),	"pMAC rx VLAN frames" },
-> +	{ NETC_PM_RERR(1),	"pMAC rx frame errors" },
-> +	{ NETC_PM_RUCA(1),	"pMAC rx unicast frames" },
-> +	{ NETC_PM_RDRP(1),	"pMAC rx dropped packets" },
-> +	{ NETC_PM_RPKT(1),	"pMAC rx packets" },
-> +	{ NETC_PM_TOCT(1),	"pMAC tx octets" },
-> +	{ NETC_PM_TVLAN(1),	"pMAC tx VLAN frames" },
-> +	{ NETC_PM_TFCS(1),	"pMAC tx FCS errors" },
-> +	{ NETC_PM_TUCA(1),	"pMAC tx unicast frames" },
-> +	{ NETC_PM_TPKT(1),	"pMAC tx packets" },
-> +	{ NETC_PM_TUND(1),	"pMAC tx undersized packets" },
-> +	{ NETC_PM_TIOCT(1),	"pMAC tx invalid octets" },
-> +};
+From: Ivan Vecera <ivecera@redhat.com>
 
-Sashiko says:
+[ Upstream commit 620055cb1036a6125fd912e7a14b47a6572b809b ]
 
-Are these standard MAC and interface statistics being duplicated in the
-driver-private ethtool strings?
-The networking subsystem guidelines indicate that statistics which have
-a standard uAPI must not be duplicated in ethtool -S. Standard
-interfaces like struct rtnl_link_stats64 or struct ethtool_eth_mac_stats
-already exist for counters such as rx octets, rx packets, dropped
-packets, and FCS errors.
-Could these metrics be exposed through the standardized interfaces
-rather than adding them to the private string sets?
+Export __dpll_pin_change_ntf() so that drivers can send pin change
+notifications from within pin callbacks, which are already called
+under dpll_lock. Using dpll_pin_change_ntf() in that context would
+deadlock.
 
-Other comments are AFAICS false positives.
+Add lockdep_assert_held() to catch misuse without the lock held.
 
-/P
+Acked-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+Signed-off-by: Petr Oros <poros@redhat.com>
+Tested-by: Alexander Nowlin <alexander.nowlin@intel.com>
+Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Link: https://patch.msgid.link/20260427-jk-iwl-net-petr-oros-fixes-v1-9-cdcb48303fd8@intel.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+
+LLM Generated explanations, may be completely bogus:
+
+## Phase 1: Commit Message Forensics
+Step 1.1 Record: subsystem `dpll`; action verb `export`; intent is to
+expose `__dpll_pin_change_ntf()` so drivers can notify pin changes while
+already under `dpll_lock`.
+
+Step 1.2 Record: tags present: `Acked-by: Vadim Fedorenko`; `Signed-off-
+by: Ivan Vecera`; `Signed-off-by: Petr Oros`; `Tested-by: Alexander
+Nowlin`; `Reviewed-by: Arkadiusz Kubalewski`; `Signed-off-by: Jacob
+Keller`; `Link: https://patch.msgid.link/20260427-jk-iwl-net-petr-oros-
+fixes-v1-9-cdcb48303fd8@intel.com`; `Signed-off-by: Paolo Abeni`. No
+`Fixes:`, `Reported-by:`, or `Cc: stable`.
+
+Step 1.3 Record: the message describes a real locking problem: pin
+callbacks are already invoked with `dpll_lock` held, and calling
+exported `dpll_pin_change_ntf()` there would try to acquire the same
+mutex again and deadlock. It adds a lockdep assertion to catch misuse.
+
+Step 1.4 Record: this is a hidden/preparatory bug fix. Alone it mostly
+exports an internal helper, but in the verified series it enables the
+following ice fix to send peer DPLL notifications without self-
+deadlocking.
+
+## Phase 2: Diff Analysis
+Step 2.1 Record: files changed are `drivers/dpll/dpll_netlink.c` `+10`,
+`drivers/dpll/dpll_netlink.h` `-2`, and `include/linux/dpll.h` `+1`;
+total `11 insertions, 2 deletions`. Modified function:
+`__dpll_pin_change_ntf()`. Scope is small and contained.
+
+Step 2.2 Record: before, only `dpll_pin_change_ntf()` was exported and
+it always acquired `dpll_lock`; the unlocked helper was internal. After,
+the helper is documented, asserts `dpll_lock` is held, is exported GPL-
+only, and its declaration moves from private dpll header to public
+kernel dpll header.
+
+Step 2.3 Record: bug category is synchronization/deadlock avoidance plus
+prerequisite API exposure for a driver bug fix. The specific mechanism
+is avoiding recursive acquisition of non-recursive `dpll_lock` from
+callbacks already reached through `dpll_pin_pre_doit()`.
+
+Step 2.4 Record: fix quality is good: minimal, obvious, lockdep-guarded,
+no userspace ABI, no broad refactor. Regression risk is low; the main
+concern is that it is useful only with the dependent ice fixes.
+
+## Phase 3: Git History Investigation
+Step 3.1 Record: `git blame` showed `dpll_pin_change_ntf()` came from
+`9d71b54b65b1` in v6.7-era dpll netlink code; `__dpll_pin_change_ntf()`
+declaration was added by `58256a26bfb3`, first in v6.17. The ice bug
+being fixed by the dependent commits was introduced by `2dd5d03c77e2`,
+first in v6.17.
+
+Step 3.2 Record: candidate has no `Fixes:` tag. Related follow-up
+commits `1a41b58fd4dc` and `9e5dead140af` both fix `2dd5d03c77e2 ("ice:
+redesign dpll sma/u.fl pins control")`.
+
+Step 3.3 Record: recent history shows this is immediately followed by
+`ice: fix missing dpll notifications for SW pins` and `ice: add dpll
+peer notification for paired SMA and U.FL pins`; it is part of that fix
+series and is a prerequisite for the third patch.
+
+Step 3.4 Record: Ivan Vecera has multiple recent dpll commits in this
+area; Petr Oros and Intel reviewers are active in the dpll/ice code. The
+patch was committed through Paolo Abeni’s net tree path.
+
+Step 3.5 Record: dependency found: the real user-visible fix needs the
+two following ice commits. For older stable trees before v7.0, the patch
+also needs a small backport adjustment because `dpll: Add notifier chain
+for dpll events` is absent.
+
+## Phase 4: Mailing List And External Research
+Step 4.1 Record: `b4 dig -c 620055cb1036a` found the original applied
+submission as `[PATCH net 09/11]` at `20260427-jk-iwl-net-petr-oros-
+fixes-v1-9-cdcb48303fd8@intel.com`. `b4 dig -a` showed earlier v4-v7
+iterations of the ice DPLL fix series; v7 split the ice fix as requested
+by review.
+
+Step 4.2 Record: `b4 dig -w` showed netdev maintainers and relevant
+Intel/dpll reviewers were CC’d, including David Miller, Eric Dumazet,
+Jakub Kicinski, Paolo Abeni, Jiri Pirko, Vadim Fedorenko, Arkadiusz
+Kubalewski, Jacob Keller, Intel wired LAN, and netdev.
+
+Step 4.3 Record: lore mirror confirmed the series purpose: SMA/U.FL
+software-controlled pins missed DPLL notifications, and userspace
+consumers such as `synce4l` would not learn about state/phase-offset
+changes. Alexander Nowlin provided `Tested-by`; Arkadiusz Kubalewski
+reviewed.
+
+Step 4.4 Record: related patches are the following two ice commits;
+patch 3 specifically calls `__dpll_pin_change_ntf()` from dpll pin
+callbacks because `dpll_lock` remains held.
+
+Step 4.5 Record: direct lore stable search via WebFetch was blocked by
+Anubis; web search found no stable-specific objection or discussion.
+
+## Phase 5: Code Semantic Analysis
+Step 5.1 Record: modified function is `__dpll_pin_change_ntf()`.
+
+Step 5.2 Record: callers are `dpll_pin_change_ntf()`, internal dpll
+netlink setters, dpll core ref-sync code, and after the dependent patch,
+`ice_dpll_sw_pin_notify_peer()`.
+
+Step 5.3 Record: callees are `lockdep_assert_held(&dpll_lock)`,
+`dpll_pin_notify()` on v7.0+, and `dpll_pin_event_send()`.
+
+Step 5.4 Record: user reachability is through generic netlink
+`DPLL_CMD_PIN_SET`, which uses `dpll_pin_pre_doit()` and
+`dpll_pin_post_doit()` around the operation. The netlink operation is
+admin-permission gated, so this is not an unprivileged trigger.
+
+Step 5.5 Record: existing internal `__dpll_pin_change_ntf()` callers are
+in dpll code under dpll locking. The problematic missing pattern was an
+exported helper for already-locked driver callback context.
+
+## Phase 6: Stable Tree Analysis
+Step 6.1 Record: affected stable trees are v6.17+, because
+`2dd5d03c77e2` exists in `stable/linux-6.17.y`, `6.18.y`, `6.19.y`, and
+`7.0.y`. It is absent from `6.12.y` and older checked branches;
+`drivers/dpll` is absent in `6.6.y`.
+
+Step 6.2 Record: current `7.0.y` accepts the patch with `git apply
+--check`. `git merge-tree` showed `6.17.y`-`6.19.y` need minor backport
+adjustment because they lack the dpll notifier-chain change; `7.0.y` is
+straightforward.
+
+Step 6.3 Record: stable branches checked do not contain this candidate
+or the dependent two ice fixes.
+
+## Phase 7: Subsystem And Maintainer Context
+Step 7.1 Record: subsystem is dpll core plus Intel ice networking driver
+context. Criticality is important but hardware/config-specific: users of
+DPLL-capable Intel ice devices and DPLL netlink consumers.
+
+Step 7.2 Record: dpll and ice DPLL code are actively developed; recent
+history shows several related dpll/ice fixes, including missing SMA
+initialization and paired-pin state fixes.
+
+## Phase 8: Impact And Risk
+Step 8.1 Record: affected population is driver-specific: DPLL-capable
+Intel ice hardware using SMA/U.FL software-controlled pins.
+
+Step 8.2 Record: trigger is DPLL pin state/direction changes or periodic
+DPLL updates on affected hardware. Userspace impact is missed netlink
+notifications and stale phase-offset reporting; triggering netlink
+changes requires admin privileges.
+
+Step 8.3 Record: failure mode severity is medium for the user-visible
+bug: time-sync management software can miss DPLL pin transitions/phase-
+offset changes. The locking issue would be a deadlock if the public
+helper were used in the already-locked callback path.
+
+Step 8.4 Record: benefit is medium-high for affected hardware and
+required for the real ice fix; risk is low because the change is tiny,
+GPL-only, lockdep-guarded, and does not alter userspace ABI.
+
+## Phase 9: Final Synthesis
+Evidence for backporting: it is a small, reviewed, tested prerequisite
+for real ice DPLL notification fixes; it prevents a concrete self-
+deadlock in the callback context verified through `dpll_pin_pre_doit()`
+locking; affected stable trees contain the buggy ice redesign from v6.17
+onward.
+
+Evidence against backporting: by itself it is mostly an exported in-
+kernel helper, so it should not be backported alone for standalone
+value. Older affected stable trees need a minor manual backport due to
+missing dpll notifier-chain code.
+
+Stable rules checklist: obviously correct and tested: yes; fixes/enables
+fix for real user-visible bug: yes, as part of the series; important
+issue: medium functional correctness and deadlock avoidance; small and
+contained: yes; no userspace API: yes; applies: clean on `7.0.y`, minor
+backport for `6.17.y`-`6.19.y`.
+
+Exception category: not a device ID or quirk. This is an acceptable
+prerequisite/helper export for a stable-worthy driver fix series.
+
+Verification:
+- Phase 1: parsed `git show 620055cb1036a`; confirmed tags and no
+  `Fixes:`.
+- Phase 2: inspected diff; confirmed `11 insertions, 2 deletions` across
+  three files.
+- Phase 3: ran `git blame` and `git show` for `9d71b54b65b1`,
+  `58256a26bfb3`, `2dd5d03c77e2`.
+- Phase 4: ran `b4 dig -c`, `-a`, `-w`; fetched lore mirror thread
+  showing v7 review, `Tested-by`, and `Reviewed-by`.
+- Phase 5: searched callers and dpll netlink ops; verified
+  `DPLL_CMD_PIN_SET` uses `dpll_pin_pre_doit()` and callbacks run while
+  `dpll_lock` is held.
+- Phase 6: checked stable branches for `2dd5d03c77e2`, candidate
+  absence, dependent fix absence, and merge-tree/apply behavior.
+- Phase 7: reviewed recent dpll and ice DPLL history.
+- Phase 8: verified trigger/user impact from the dependent ice commit
+  messages and diffs.
+
+Backport recommendation: backport this commit to affected stable trees
+together with `1a41b58fd4dc` and `9e5dead140af`; do not take it alone
+unless it is queued as that prerequisite.
+
+**YES**
+
+ drivers/dpll/dpll_netlink.c | 10 ++++++++++
+ drivers/dpll/dpll_netlink.h |  2 --
+ include/linux/dpll.h        |  1 +
+ 3 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+index 83cbd64abf5a4..95ae786e98aab 100644
+--- a/drivers/dpll/dpll_netlink.c
++++ b/drivers/dpll/dpll_netlink.c
+@@ -842,11 +842,21 @@ int dpll_pin_delete_ntf(struct dpll_pin *pin)
+ 	return dpll_pin_event_send(DPLL_CMD_PIN_DELETE_NTF, pin);
+ }
+ 
++/**
++ * __dpll_pin_change_ntf - notify that the pin has been changed
++ * @pin: registered pin pointer
++ *
++ * Context: caller must hold dpll_lock. Suitable for use inside pin
++ *          callbacks which are already invoked under dpll_lock.
++ * Return: 0 if succeeds, error code otherwise.
++ */
+ int __dpll_pin_change_ntf(struct dpll_pin *pin)
+ {
++	lockdep_assert_held(&dpll_lock);
+ 	dpll_pin_notify(pin, DPLL_PIN_CHANGED);
+ 	return dpll_pin_event_send(DPLL_CMD_PIN_CHANGE_NTF, pin);
+ }
++EXPORT_SYMBOL_GPL(__dpll_pin_change_ntf);
+ 
+ /**
+  * dpll_pin_change_ntf - notify that the pin has been changed
+diff --git a/drivers/dpll/dpll_netlink.h b/drivers/dpll/dpll_netlink.h
+index dd28b56d27c56..a9cfd55f57fc4 100644
+--- a/drivers/dpll/dpll_netlink.h
++++ b/drivers/dpll/dpll_netlink.h
+@@ -11,5 +11,3 @@ int dpll_device_delete_ntf(struct dpll_device *dpll);
+ int dpll_pin_create_ntf(struct dpll_pin *pin);
+ 
+ int dpll_pin_delete_ntf(struct dpll_pin *pin);
+-
+-int __dpll_pin_change_ntf(struct dpll_pin *pin);
+diff --git a/include/linux/dpll.h b/include/linux/dpll.h
+index 2ce295b46b8cd..8f97120ee7b37 100644
+--- a/include/linux/dpll.h
++++ b/include/linux/dpll.h
+@@ -276,6 +276,7 @@ int dpll_pin_ref_sync_pair_add(struct dpll_pin *pin,
+ 
+ int dpll_device_change_ntf(struct dpll_device *dpll);
+ 
++int __dpll_pin_change_ntf(struct dpll_pin *pin);
+ int dpll_pin_change_ntf(struct dpll_pin *pin);
+ 
+ int register_dpll_notifier(struct notifier_block *nb);
+-- 
+2.53.0
 
 
