@@ -1,53 +1,103 @@
-Return-Path: <netdev+bounces-284410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284411-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GM22CYTw+WmcFQMAu9opvQ
-	(envelope-from <netdev+bounces-284410-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 15:28:36 +0200
+	id kIhzGdjx+WmcFQMAu9opvQ
+	(envelope-from <netdev+bounces-284411-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 15:34:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8833E4CE7C7
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 15:28:35 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73A9D4CE972
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 15:34:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5447230A4DF9
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 13:24:12 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8F5BD301997A
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 13:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B2E392C32;
-	Tue,  5 May 2026 13:24:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33EA2429838;
+	Tue,  5 May 2026 13:25:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="XJJEck8P"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F/rQKfw4";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="RSbAZWNK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBBC30B50C;
-	Tue,  5 May 2026 13:24:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F93E426ED2
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 13:25:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777987446; cv=none; b=WDD0IiG/YFufUY9yooxCM0ZpMfEveftpWy+olGnDnh2Vp8aOscBM2m0vs0FoIhd3YUoED4bvuI89tBnqHUQ4/xbbwdoqj/C+BIah1qxqCNXwXTYPvODOCl75U011Xf97iLlrivqbptoPboRfgb2Y6vzUZPpQAxSVhntAGCrNaGU=
+	t=1777987514; cv=none; b=uu+6aTuprrENodbfLYVRf9oVKdsPlo4on1VZfLhlvLEaIRrp6hLV/rHPN42Pxfnj6b8EBeEWTZAbg7s+HeUglRReXoG5a4xuxijCALUrEWmPZ/0V+GPUmeKzXVDC3jAFlnkL14B+L+68mUVu21cwi6+4/M/Iv+FSQYTLs20yRUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777987446; c=relaxed/simple;
-	bh=cJGE+uHkMo2XrKSdJQRlK06JSeRZS1FPVrMTVzfg3ck=;
+	s=arc-20240116; t=1777987514; c=relaxed/simple;
+	bh=jjZLXZ3VotsREl0DsXpKQ2oakkN57MTZvYPzwH0Ls2k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W6PPS/3JMolW6iC2oX/46EsQvJDlguBcF3ag56ToXMkP/oNGIeVDaEsmu6puw/8KDnneE6kkmuBa02MYNReOjJa4TvQBmkNo+fLZGfW/XbUFXA7SCiq5K2Pkjfn8fYpzwZNbxUfmmYeKNHsOvXRlF4XzpnIdbgIFBLTpgaUMVRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=XJJEck8P; arc=none smtp.client-ip=178.251.229.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id AC6991137E5;
-	Tue,  5 May 2026 15:23:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
-	s=dkim; t=1777987442;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=1vizPUW0FlszOfHJLst6PwlnlTyCSMe3aajO8GaMzRc=;
-	b=XJJEck8PJkysg8ZavW/iEdtUH4t0zkIgMi86HcHzupwD4CWnoj4y3BVfgbUfjWnfmNb0PD
-	0HYfCl4jbFy9lpi36BPYlZGc7L51wR7j8+8Vw9+9SsiR4Nh3PnXr+SIXO5wjXacoZIhjDl
-	fFBPk3u23uguJUUI0r6al1UiEaL4YMCPWPHBn7gJFWfMTOnOMf+oOtGcsC8K6EJSZ5lrUX
-	madFIdeq9QYbMVTfP03jzl+eaAEvb4OjOeTNRroIvUyQQRpR3mlaWpei0DC14WFUQ4pIt8
-	CR2g7VU4r/Vguo+kneJ75/e28Urp1Q1pK7d/WHysur9Rau1cdUhWHmxJQ/P+XA==
-Message-ID: <6c3b4490-c618-4650-8b3d-7bb71da196d3@nabladev.com>
-Date: Tue, 5 May 2026 15:23:57 +0200
+	 In-Reply-To:Content-Type; b=LVesiooPvMk3uYIxUCdiTUsxu41Exp3A7PK7fCl2NA1rIbsHKqcOFXCsUjmXGYl0lHBcivG2ZVRDD/2synVfRpGVCj8k/gZ6NnJKfigKbwuLCEiybQLHe2XFAAuFDDOTRnt3OesrtN+BpOhppeJyhG6CX13+suGxKIQxNX6clrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F/rQKfw4; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=RSbAZWNK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777987510;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NP4rX7b9FZY0fbLuEXjv0M/HU/D303qx0QGgZMGR6PY=;
+	b=F/rQKfw44ND0UxQx4zU36JjWTX2WGK54KXd4A4bqIp5FoffPtt3lW0Eaq25SnZCCTEBb7N
+	7a++H+y3H30vR+/cjFPmXQ87O/L4HnRM/kZvERp8pM1s+cFeeY2Xs1YouNz8WXcL7fvjqE
+	TrGxeY3UaSvyY+isg+TxUhTlfmHfSw0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-355-E8h082_QPmSv7VFllYAwRA-1; Tue, 05 May 2026 09:25:09 -0400
+X-MC-Unique: E8h082_QPmSv7VFllYAwRA-1
+X-Mimecast-MFC-AGG-ID: E8h082_QPmSv7VFllYAwRA_1777987508
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-48a5952c635so56514735e9.2
+        for <netdev@vger.kernel.org>; Tue, 05 May 2026 06:25:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1777987508; x=1778592308; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NP4rX7b9FZY0fbLuEXjv0M/HU/D303qx0QGgZMGR6PY=;
+        b=RSbAZWNKOBtk1YZfL2WtNVTZ5LEzuj/UPWoewmvx11gZ+L+IvudxwavgNIgnsFPgf4
+         lLFoJeDtBic3Qy81NlU3/mVEEYrsM+RfcPF1tUUWgW0HdMyVspLdQWGDpPu0/CtJFHr3
+         h7V0jgDr8uhOxwKrgxatkId2EKz5eMmshuH1NDFcZD+p63i1gLydhdbzjQtVlKkpc5dS
+         RO2aShSCW/ANHQtIecEmGo2NFFCRI0S7WaT/1jhGQNFEfDO6OopMrzvl7a+52tQY+iyO
+         cqzaz09TbTcAzvFkIgoEayXeBMZCBj4GW3Nt87sF0cS+6Xi9trzBOsjDd7abXp5OpERa
+         bp5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777987508; x=1778592308;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NP4rX7b9FZY0fbLuEXjv0M/HU/D303qx0QGgZMGR6PY=;
+        b=J0VEvaBVGbV3gKg0Nl/hs45I6freeL3iopYfKS20Fr6d9LnbCrhR+wkGr47g71jOp3
+         RqSh9nOeJuLPzFb1iXF1Kqvf9i7uhduhpYp5LOorI5pQ/rJLYuS7MeQu6EWwcdat+ANU
+         5WkzIy/T/6mOIqC1XyJLRAjuS0fvBSsMqFIZVSRCiYhGBvWVVNT8JoaSw9SGxRrC3kBy
+         guAdaBEVk8B4IC7pXoiHyckaehnyfOV2dEjLiTUnHrLR5GldHEcwR/iQrmB5lCUHFeo0
+         Ur/8Yp7nBguIBqo/nZqbDrYkJSRk2neMGVG3t/R6yYP/lI1E9dEZXtFxSc3vIw7xZ7ed
+         dLGw==
+X-Forwarded-Encrypted: i=1; AFNElJ/ggUJJIW7TeeTLzm/rrNXaGgDFcgPWDD0Z0X/04FFUjd8v7jHlvO152KIW3h68UxYx3CLv8Lw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCpws18nTe0biw73HxM1Ewgx9ou8kVXAw636CiRZ7vBL+YDbgl
+	MeJ+OHQvcXq0jwV9D+84FmevL8oJBP2+j44gRb+bR/Cb74690ddO2O970ZIGjF/LzwCU/uNqupK
+	cs1gX7E5tW/xk75mI57Xkq6Cru9k4TDYx4glyNIYbJdPPF36BfAYfuH83MQ==
+X-Gm-Gg: AeBDieuuMzlc4D0te7XXNgquUZpYOIgsEMiejHMdUtPcU6xnnDrLwfMV+BGFpprxmeU
+	1VvWyDtwDkvh0oe15TDrM81eReGdvPrISr0we8esw1MYD91onkrLYkn1RJTj1BteYx/ilLfNEnA
+	Bb/lpSSaa+nvkbpnpN2WAMFVcL2bJCkN66buBijCOD318psTPLJfNvp9yr6tOZahiK+URslgfdn
+	9feAigyKE2DM8+LXNhtaLC2CzxVT5vqUM8x56Z38S8e/wzlH1RzKCCgz8JDkqdv/WvDGEMtk65t
+	OBmpOHQuEiMcF4rlbBCu8c0BCGLdlDl9QMhgAd5Unuq4gLDqn9Vn7p/8IAbIZBBkQJVPl1TSX98
+	zoKAEK8zyv8DaWJodGt9YqGw+J3veixiy6uev4ZSftv7P4kfERylRIDr5KbjeuIvF25I=
+X-Received: by 2002:a05:600c:4f47:b0:488:b8bc:6a32 with SMTP id 5b1f17b1804b1-48a988be27dmr259135655e9.23.1777987507829;
+        Tue, 05 May 2026 06:25:07 -0700 (PDT)
+X-Received: by 2002:a05:600c:4f47:b0:488:b8bc:6a32 with SMTP id 5b1f17b1804b1-48a988be27dmr259134965e9.23.1777987507268;
+        Tue, 05 May 2026 06:25:07 -0700 (PDT)
+Received: from [192.168.88.32] ([212.105.155.47])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a82308d77sm464849375e9.14.2026.05.05.06.25.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 May 2026 06:25:06 -0700 (PDT)
+Message-ID: <0f5da49c-7ed6-4547-9f89-bb3c3d62c3c3@redhat.com>
+Date: Tue, 5 May 2026 15:25:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,140 +105,98 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 1/3] net: dsa: microchip: implement KSZ87xx Module 3
- low-loss cable errata
-To: Fidelio Lawson <lawson.fidelio@gmail.com>,
- Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+Subject: Re: [PATCH net v2 2/2] selftests: openvswitch: add tests for tunnel
+ vport refcounting
+To: Ilya Maximets <i.maximets@ovn.org>, netdev@vger.kernel.org
+Cc: Aaron Conole <aconole@redhat.com>, Eelco Chaudron <echaudro@redhat.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Marek Vasut <marex@denx.de>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Tristram Ha <Tristram.Ha@microchip.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Fidelio Lawson <fidelio.lawson@exotec.com>
-References: <20260505-ksz87xx_errata_low_loss_connections-v5-0-da4002b21c42@exotec.com>
- <20260505-ksz87xx_errata_low_loss_connections-v5-1-da4002b21c42@exotec.com>
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Yuan Tan <tanyuan98@outlook.com>,
+ Yang Yang <n05ec@lzu.edu.cn>, dev@openvswitch.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20260430233848.440994-1-i.maximets@ovn.org>
+ <20260430233848.440994-3-i.maximets@ovn.org>
 Content-Language: en-US
-From: Marek Vasut <marex@nabladev.com>
-In-Reply-To: <20260505-ksz87xx_errata_low_loss_connections-v5-1-da4002b21c42@exotec.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260430233848.440994-3-i.maximets@ovn.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: 8833E4CE7C7
+X-Rspamd-Queue-Id: 73A9D4CE972
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
-	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284410-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,denx.de,bootlin.com,armlinux.org.uk];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,google.com,kernel.org,outlook.com,lzu.edu.cn,openvswitch.org,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284411-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marex@nabladev.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[nabladev.com:+];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nabladev.com:dkim,nabladev.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-On 5/5/26 1:42 PM, Fidelio Lawson wrote:
-
-[...]
-
-> @@ -2096,11 +2141,39 @@ int ksz8463_w_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 val)
->   	return 0;
->   }
-
-Nitpick, either turn the "Apply the Microchip..." code comment into a 
-kerneldoc for this function, or use netdev style multi-line comment.
-
-> +int ksz87xx_apply_low_loss_preset(struct ksz_device *dev, bool enable)
-> +{
-> +	/* Apply the Microchip erratum short-cable preset (LPF 62 MHz, EQ init 0) */
-> +	/* providing a conservative configuration for short or low-loss cables. */
-> +	u8 lpf_bw, eq_init;
-> +	int ret;
+On 5/1/26 1:38 AM, Ilya Maximets wrote:
+> @@ -830,6 +831,42 @@ test_tunnel_metadata() {
+>  	return 0
+>  }
+>  
+> +test_tunnel_refcount() {
+> +	sbxname="test_tunnel_refcount"
+> +	sbx_add "${sbxname}" || return 1
 > +
-> +	lpf_bw = KSZ87XX_PHY_LPF_62MHZ;
-> +	eq_init = KSZ87XX_DSP_EQ_INIT_LOW_LOSS;
+> +	ovs_sbx "${sbxname}" ip netns add trefns || return 1
+> +	on_exit "ovs_sbx ${sbxname} ip netns del trefns"
 > +
-> +	if (!ksz_is_ksz87xx(dev))
-> +		return -EOPNOTSUPP;
-
-Please add newline here.
-
-> +	if (!enable)
-> +		return 0;
-
-Please add newline here.
-
-> +	ret = ksz8_ind_write8(dev, TABLE_LINK_MD, KSZ87XX_REG_PHY_LPF, lpf_bw);
-> +	if (ret)
-> +		return ret;
-
-Please add newline here.
-
-> +	dev->lpf_bw = lpf_bw;
-> +	ret = ksz8_ind_write8(dev, TABLE_LINK_MD, KSZ87XX_REG_DSP_EQ, eq_init);
-> +	if (ret)
-> +		return ret;
-
-Please add newline here.
-
-> +	dev->eq_init = eq_init;
+> +	for tun_type in gre vxlan geneve; do
+> +		info "testing ${tun_type} tunnel vport refcount"
 > +
-> +	return ret;
-> +}
+> +		ovs_sbx "${sbxname}" ip netns exec trefns \
+> +			python3 $ovs_base/ovs-dpctl.py \
+> +			add-dp dp-${tun_type} || return 1
 > +
-
-[...]
-
-> diff --git a/drivers/net/dsa/microchip/ksz8_reg.h b/drivers/net/dsa/microchip/ksz8_reg.h
-> index 332408567b47..cd41214f874e 100644
-> --- a/drivers/net/dsa/microchip/ksz8_reg.h
-> +++ b/drivers/net/dsa/microchip/ksz8_reg.h
-
-[...]
-
-> @@ -729,6 +736,21 @@
->   #define PHY_POWER_SAVING_ENABLE		BIT(2)
->   #define PHY_REMOTE_LOOPBACK		BIT(1)
->   
-> +/* Vendor-specific Clause 22 PHY registers (virtualized) */
-> +#define PHY_REG_KSZ87XX_SHORT_CABLE		0x1A
-> +#define PHY_REG_KSZ87XX_LPF_BW			0x1B
-> +#define PHY_REG_KSZ87XX_EQ_INIT			0x1C
+> +		ovs_sbx "${sbxname}" ip netns exec trefns \
+> +			python3 $ovs_base/ovs-dpctl.py \
+> +			add-if --no-lwt -t ${tun_type} \
+> +			dp-${tun_type} ovs-${tun_type}0 || return 1
 > +
-> +/* LPF bandwidth bits [7:6]: 00 = 90MHz (default), 01 = 62MHz, 10 = 55MHz, 11 = 44MHz  */
-> +#define KSZ87XX_PHY_LPF_90MHZ          0x00
-> +#define KSZ87XX_PHY_LPF_62MHZ          0x40
-> +#define KSZ87XX_PHY_LPF_55MHZ          0x80
-> +#define KSZ87XX_PHY_LPF_44MHZ          0xC0
+> +		ovs_wait ip -netns trefns link show \
+> +			ovs-${tun_type}0 >/dev/null 2>&1 || return 1
+> +
+> +		info "deleting dp - may hang if reference counting is broken"
+> +		ovs_sbx "${sbxname}" ip netns exec trefns \
+> +			python3 $ovs_base/ovs-dpctl.py \
+> +			del-dp dp-${tun_type} &
+> +
+> +		dev_removed() {
+> +			! ip -netns trefns link show "$1" >/dev/null 2>&1
+> +		}
+> +		ovs_wait dev_removed dp-${tun_type} || return 1
+> +		ovs_wait dev_removed ovs-${tun_type}0 || return 1
 
-You could use GENMASK_U32() and FIELD_PREP() for these bitfields:
+FTR, here sashiko laments that if the reference counting is broken and
+the del-dp process hangs, this could leave the background del-dp python
+process running indefinitely.
 
-#define KSZ87XX_PHY_LPF_MASK     GENMASK(7, 6)
-#define KSZ87XX_PHY_LPF_90MHZ    FIELD_PREP(KSZ87XX_PHY_LPF_MASK, 0)
-#define KSZ87XX_PHY_LPF_62MHZ    FIELD_PREP(KSZ87XX_PHY_LPF_MASK, 1)
-...
+I guess that if reference counting is broken inside the kernel, very
+likely an host/VM reboot is needed, and the above does not matter.
 
-[...]
+/P
+
 
