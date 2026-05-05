@@ -1,518 +1,181 @@
-Return-Path: <netdev+bounces-284545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284547-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8A5uAZk1+mlLKwMAu9opvQ
-	(envelope-from <netdev+bounces-284545-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 20:23:21 +0200
+	id yCwYEYw3+mnHKwMAu9opvQ
+	(envelope-from <netdev+bounces-284547-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 20:31:40 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A7184D2989
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 20:23:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E39874D2B5B
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 20:31:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5F5A03075C57
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 18:22:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E245F3100E4D
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 18:27:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C55F4A3409;
-	Tue,  5 May 2026 18:22:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B745F4ADD89;
+	Tue,  5 May 2026 18:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oba6GodD"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="TWlmJD/f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-pg1-f226.google.com (mail-pg1-f226.google.com [209.85.215.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA97366806
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 18:22:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778005377; cv=pass; b=IvyXsePrLs1iVAQoE4mwhQo+PtQNvedRKuREBBy4FFICJ5lNvDRZy48fx7k0eA7BsbzodrkXqKhQ10u7ioHzq7kplmIBOdIdFjsH0LyETE9RIzYlTJIS1ObacjBc8FoOHaMBHVuo92KIjCo7CpTcyl5VxWlU8WqiFGpGkEevNHg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778005377; c=relaxed/simple;
-	bh=rjQ1i4u63lQ0EGSLxJQhStTaQJscyIFfd18jGNDogFo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kBdrVGfyMZTLSSWbwHAgIsblltKQl31Hmm8K7vDKzSiLHoL4iAN6TG4bM3ofJI4TCdz3mzK1HWJmFGG3wNe+23cdzFQ7AG4R/79AzKKAenb69liwOrmivB6bsCsnyyki+UiguaxiYGCn0LIjaEk5HBLfIY+7U9ntc7nXliOMSm0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oba6GodD; arc=pass smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-67c1eea6b4dso1512a12.1
-        for <netdev@vger.kernel.org>; Tue, 05 May 2026 11:22:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778005374; cv=none;
-        d=google.com; s=arc-20240605;
-        b=XHQuawTg1yUWGYCLb7jbDgcy19GcQwGMdWbrcym8ZAH5+GIDhwZaMO2+7uf7EFoKkJ
-         3tlauHYDRVx6ZRSg2DIexVwjITsgrbMGXXtKzGX9B1J3jN4um86jw+yFhJQRGVcBcBTw
-         ou+69E4JEQHhrVhTv9Hi6QtG8FIDYhlnmqOIujKkjFID+FUgOLq6HOw06bXFQm8knDcL
-         /tigns3WtpSnPuCeldRm98sNsKKXnK0xeT6trkILExgM9xC1XWrLoTYCyA/r6jc1w/cT
-         C6P0eNdL0WOf+6hC09jh03rI3jWYevFPNotaGI+6rFNQklcVJ8MfLHASp+SmilduUz5s
-         WySw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=vHuYwjeFgy3ZNH7ekjqQdiihoIbVuPzvmMv5WkHoGlw=;
-        fh=iGAv/3O511uanvqWMqNp7QxpDVhp2Mo13I7dXo9ZdhQ=;
-        b=H04k16n+KKnm4hSVTXErAe6iX/GkEAtM8aEqUwevaD3Yz2aI3VbmN55Mg4kt5MMLyt
-         rghWgfkRWlqJjZpoRvXzdp6VvKKhkgxmzzc+ZnG5syedklfXQxTu2bZEqtmg8bJBEilh
-         ziXQnnhHdvMdNHQj7oGXtDHmPrq6FIqZw/vBuWfKt4M5uDJFopYJOaV54BYWVRf21uve
-         sKgFz4To1kRPnQtWOJRvgb5z4UYgG08RNv4lV5IU2IAZztmwWjQGLCsmjjCVfGo/OfSn
-         80zoIdNEnjkeMCu+xSgSLfn+rIxXS1wKgKAHZCzhMjTkKUgWPCncIu8rP5sAPdY5UU0G
-         ZJAA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778005374; x=1778610174; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vHuYwjeFgy3ZNH7ekjqQdiihoIbVuPzvmMv5WkHoGlw=;
-        b=oba6GodDdUAq4mLevWI27R1f5VNwy0/xvLsu85syftCl051OIx+hXv9J+a14F+tY+L
-         GB4ro4xLAJjPZPwKXgNfgkzI7nRCOtuW4cqVJaxe54KUvbYRPIdw/mqTXSqIFG7DItgy
-         SWGgRiIR/H3fT3kP3LO9RQFZj5G5d2DbB1e+DyX/YAyAcphLrGBxxA/Ne73xavnKtrRb
-         g/uMT4iP7E/QgmKnjlqJGCcAq3R8EWlHPuLoH5g02L5CxclSOy7xBMtrtLmFccrNhujH
-         d7Iqe+wESrr0UhdtJzuWQw5nkEj4nJdGEjTGU7Sr4RKCiXBAe2ezXV/MUyJgd43VMbiC
-         AQFA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F625492195
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 18:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.226
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778005646; cv=none; b=EDOvi6/EHTishsK7tGhnV9QDNDAVWg/tw9wVZEh/FQGah8aDfTe+gUgP1N1OnLec3b2N1Rq75PACLoevG4Suyc/yyr7jJkIWn9SDkcEs1hee8BS+C1GslMCz3JNQ6lY7NpwGntPXWuTQqUkTZhO0PYr1+qL5flkZFZ5cf2g27Co=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778005646; c=relaxed/simple;
+	bh=h2AlK+8MmYvPuW3IDG1cxyc7bUV8nvXUFzn2jnDpp6A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qz9sBMkMiFK5nBzdctSZVhrxgsxUEvZb7lLCp0pypBwKtinC/7cSAYVBS+T1zNM3GFsWgOYgJwGXe0hTrgsPgXLapulqo7c3LEjKZY67eu5LlKt/XIpiBz0Zjknd17Q0OLq8sqteUDGmCdTcc0+it5uJPd1esIB+aA85G5mSGRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=TWlmJD/f; arc=none smtp.client-ip=209.85.215.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pg1-f226.google.com with SMTP id 41be03b00d2f7-c8006f8ab97so110950a12.3
+        for <netdev@vger.kernel.org>; Tue, 05 May 2026 11:27:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778005374; x=1778610174;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=vHuYwjeFgy3ZNH7ekjqQdiihoIbVuPzvmMv5WkHoGlw=;
-        b=mUF/G/DRWpjM70MtQq7KIRElymJ6/r2Nzrp1D1PgaGgQO1HWda9Zbx55+FvE2oXnr7
-         CZ6aBs5wKuDPKgkYryb6rVMnrkcCeiikw/sDXBa5C3UlGQs7jCC0tmEq0rWew2ajeWw4
-         rQ/EsLjHlgLS8mtdY3WoLgagoVOAqjEnyUVDImSozmJfk27ak6JQndJIhhIe6GuPnmvR
-         DeQ/m44kNwC5vaW8XRhq3EQloC/1b+Eov8tjmXGz418ykY3ua3vr/IXJf4dwWNK3ZYm7
-         lcpR2wB6s3us6yB0TaAq1t4+50of69YBbyLQsyVI0ZP9STs4icNFv+0vMi+fwKeK9SGB
-         WcfQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9a0hYZzH/6rVv9gBOaW+Fdgak+u8fVS+JeC6BSFeq+SEfz9ssGmVHOJU+nvYfChFZlKNRemqg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGX/X1WLTXT4jhjxC69z5A5WhWEklyB38AgNN4VLe0x3l+nXyq
-	CsIFc4SpjhUKA05FIModVll/aY4JLLV7ZibdxE3byXxM7tDq9Gs+N4iN0u56R37oa+MJ0cQOyeE
-	q/K9UtBtlsQ/vUQpIxniV7N9XNN+T0UzY9xT29Xkl
-X-Gm-Gg: AeBDietOkz73wv323OIRmv+we9sYA0Go8DlbXLDf0/jBbH0VEv7bJf5DhHsJQiukyTy
-	P9ODsqN7xj/WoYFsgsbREL4z6gxg8GoYgbaj02zxk4k/vp18gmS+kjpDo3dLdJolPRczjfZKM7y
-	ZY3+ECH8cxUAFpyllXHGVrVmCRHs3rAXiva3yg26To+JgOUfOREPWlkQJjx80jwk0xCXWWyJN+d
-	QMuPZtTQCHToWTJ/AZvlKDZtgLrRqvjwP8n1m2lf+/UjBsX3ob0Ht/AoA/xfy9AJ/mTowhAMHd9
-	KIzbb+Gnsc7+Ogjjrg6W7nEsG2k9bg==
-X-Received: by 2002:a05:6402:20d3:10b0:66b:e078:5934 with SMTP id
- 4fb4d7f45d1cf-67d4fda5cc5mr7920a12.12.1778005373232; Tue, 05 May 2026
- 11:22:53 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1778005644; x=1778610444;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nGNm7c854bmsEYSmmRpo3hBYxzAKRiuBt/6viyvE9RM=;
+        b=oZdQ5RnSBRdIbkkN3//ozlJwMCDfxpJKdNE5GwE5G6Bp17C3qUqtN8RFqnuEsPh6gp
+         2vPP+7KjerJR7vJxjsos5LQk2sH1lElBstZPC5ITNav4wKBN/ou9kI3gWds0cDgNnVcC
+         +su4ab0AMRvO2A43bCVqYeCaEVlS8/seXl6NyKlByHsYvguMXizvizB+L6SafPJopujr
+         0PVQYVB0yNhFjxpAlhibGJ/yaIaqeruL6OjpBb1pbnh9u9loQkjFdR0Qe9LrhA/2oBfG
+         xCsl+9mjt0BrjQpBOsCZjehhpcIBlsjrlytW6lmnBh4/OVwfIsBO7QCpsW0gpwZPXScP
+         wTFA==
+X-Forwarded-Encrypted: i=1; AFNElJ+oQej5hA9GIobYeT2e0tQDtDDwcQOYMOtK8shEIIzsAR7pKb1NsHOCVvZ5nX6GkPJG80f7hJU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywg2nGFYcIZaGNdfa38WpJk9mDByzSSqzbRXfz7t3m9mm/td9gC
+	5PPalgR4DiuqNKrwTwt+/vIzuvb2i34BG8i6IamN+UtR2FxNPYYj6rtRVLg0YwTovsAguXICEkw
+	HMeJaGb0yO52yUU74JqbOcOSJjOHLq9YTwtLQrlAST8+XJg4h9i4SgMRg1MMx17OckEJmrtDQ4G
+	pX5e8cqBwIGrSmd5wfyJ719uAisXpwEjYseLrTSlz40gULtlnm3FXCr7C4c9T/FIc9GO2hp1eS8
+	LKXngaWYKCkRfs=
+X-Gm-Gg: AeBDieuyRbr94yfncqW4OLuJx1hQADLuP6Ype6QhTAv7phxqS4f5S3RKtO5J8RTugpu
+	5Gwt6NUh6H5tJv2mOzKjuB3gX+RmeZwppmK2RFj2o9vvXo9fEP1EPKrG577vo7WuM/i0xwXUdN+
+	h1cTiYpYl4yIIPRYwtZGsldzcsxUe33r3DUOrKbEnys95LVAV1HWdGqNlVymHlf1GiOlGNx2cdQ
+	qmbW2frPR5usE0eqq2m9T/VNhOWaTaRUVaDLPm8dwlIISJF2IxGMZrffOJ60Qmq6/qMp8CMKQDP
+	k9HXtIdeKkHBJrikBDKWEA1yvlCkJALVsdsxinECl1BnkTLCDHiK1OaLS4OhOcoQsPQtKZ7RHaq
+	mgn5ranY9qCUyh26Ou61uSZG/Ls/AdEWhUiw50+5bhMvlOqLfPwUmlYznNgX4IldIeAzK3SNR6C
+	XyT+wF/1bcmxquK0+FrSh4GWl9MqOUNGnEZzs6dyIhGkf3vcKL+3jf8LhooM+7VjUiP5nv
+X-Received: by 2002:a17:902:f78a:b0:2b9:5926:d057 with SMTP id d9443c01a7336-2ba78510042mr947065ad.0.1778005644313;
+        Tue, 05 May 2026 11:27:24 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-16.dlp.protect.broadcom.com. [144.49.247.16])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2b9ca9f517csm8552105ad.23.2026.05.05.11.27.23
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 05 May 2026 11:27:24 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-8954b9b5da7so7973626d6.2
+        for <netdev@vger.kernel.org>; Tue, 05 May 2026 11:27:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1778005642; x=1778610442; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nGNm7c854bmsEYSmmRpo3hBYxzAKRiuBt/6viyvE9RM=;
+        b=TWlmJD/fcJT1MZPj75aqWVeWnzjzrf6PsNjZmvGHMuhHCGMgQ0Ul72gJK4GuNMb9DX
+         MiHzWxZIhfZ+UHr/XNXZ7eHEz9WcT0Wk2H9YTlNUi5AWfJ1HgYHQTUgI8IB4A/3Gz/gM
+         +VFic31X8XOafKkvaXvkgq41i04VvcC3gWWMo=
+X-Forwarded-Encrypted: i=1; AFNElJ9bc4jv9pkG/LFhag744f9guemgKqH6qj+mhAgR7vgahHUnhTxdLa6n4FntoywqcMOt8cfcpQA=@vger.kernel.org
+X-Received: by 2002:ad4:5d4d:0:b0:8ac:afca:a68f with SMTP id 6a1803df08f44-8baf24a16a3mr45786806d6.1.1778005642413;
+        Tue, 05 May 2026 11:27:22 -0700 (PDT)
+X-Received: by 2002:ad4:5d4d:0:b0:8ac:afca:a68f with SMTP id 6a1803df08f44-8baf24a16a3mr45786396d6.1.1778005641958;
+        Tue, 05 May 2026 11:27:21 -0700 (PDT)
+Received: from photon-d7fac424c0d3 ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b53c6b688csm170263516d6.33.2026.05.05.11.27.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 May 2026 11:27:21 -0700 (PDT)
+From: Ankit Jain <ankit-aj.jain@broadcom.com>
+To: edumazet@google.com
+Cc: kuba@kernel.org,
+	netdev@vger.kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	ncardwell@google.com,
+	kuniyu@google.com,
+	horms@kernel.org,
+	shuah@kernel.org,
+	quic_subashab@quicinc.com,
+	quic_stranche@quicinc.com,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	karen.badiryan@broadcom.com,
+	ajay.kaher@broadcom.com,
+	alexey.makhalov@broadcom.com,
+	vamsi-krishna.brahmajosyula@broadcom.com,
+	yin.ding@broadcom.com,
+	tapas.kundu@broadcom.com
+Subject: Re: [PATCH net v2 2/2] selftests/net: add packetdrill test for locked SO_RCVBUF SWS
+Date: Tue,  5 May 2026 18:23:29 +0000
+Message-ID: <20260505182329.15353-1-ankit-aj.jain@broadcom.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <CANn89iK_SrGx4UuN-_h8LY0DFBwf8+hStba7vdjFnEogvo=N7A@mail.gmail.com>
+References: <CANn89iK_SrGx4UuN-_h8LY0DFBwf8+hStba7vdjFnEogvo=N7A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260429012819.3102675-1-hramamurthy@google.com>
- <20260429012819.3102675-4-hramamurthy@google.com> <6259cf59-b054-42bb-9dad-5f62a54a2bc0@redhat.com>
-In-Reply-To: <6259cf59-b054-42bb-9dad-5f62a54a2bc0@redhat.com>
-From: Jordan Rhee <jordanrhee@google.com>
-Date: Tue, 5 May 2026 11:22:40 -0700
-X-Gm-Features: AVHnY4IAoroOPu7hBYuxPhHUkQznsJmSZoNh1l1jUG-ZAUzojb1nOpkfhD4Jpl8
-Message-ID: <CA+mzVttNJ5ka5msxOtR1_wzt47FYUbO=yejNDTLef7PwVe9sMA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 3/3] gve: implement PTP gettimex64
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Harshitha Ramamurthy <hramamurthy@google.com>, netdev@vger.kernel.org, joshwash@google.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, richardcochran@gmail.com, jstultz@google.com, 
-	tglx@kernel.org, sboyd@kernel.org, willemb@google.com, nktgrg@google.com, 
-	jfraker@google.com, ziweixiao@google.com, maolson@google.com, 
-	thostet@google.com, alok.a.tiwari@oracle.com, pkaligineedi@google.com, 
-	horms@kernel.org, dwmw2@infradead.org, jacob.e.keller@intel.com, 
-	yyd@google.com, linux-kernel@vger.kernel.org, 
-	Naman Gulati <namangulati@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 7A7184D2989
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+X-Rspamd-Queue-Id: E39874D2B5B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-284547-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284545-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	FREEMAIL_CC(0.00)[google.com,vger.kernel.org,lunn.ch,davemloft.net,kernel.org,gmail.com,oracle.com,infradead.org,intel.com];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[ankit-aj.jain@broadcom.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jordanrhee@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:dkim,broadcom.com:mid];
+	DKIM_TRACE(0.00)[broadcom.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
 
-On Tue, May 5, 2026 at 1:08=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On 4/29/26 3:28 AM, Harshitha Ramamurthy wrote:
-> > From: Jordan Rhee <jordanrhee@google.com>
-> >
-> > Enable chrony and phc2sys to synchronize system clock to NIC clock.
-> >
-> > The system cycle counters are sampled by the device to minimize the
-> > uncertainty window. If the system times are sampled in the host, the
-> > delta between pre and post readings is 100us or more due to AQ command
-> > latency. The system times returned by the device have a delta of ~1us,
-> > which enables significantly more accurate clock synchronization.
-> >
-> > Reviewed-by: Willem de Bruijn <willemb@google.com>
-> > Reviewed-by: Kevin Yang <yyd@google.com>
-> > Reviewed-by: Naman Gulati <namangulati@google.com>
-> > Signed-off-by: Jordan Rhee <jordanrhee@google.com>
-> > Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
-> > ---
-> > Changes in v5:
-> > - Reformulate retry loop in terms of total timeout (Jakub Kicinski)
-> >
-> > Changes in v3:
-> > - Take system time snapshot inside the mutex
-> > - Return -EOPNOTSUPP if cross-timestamp is requested on an arch other
-> >   than x86 or arm64
-> >
-> > Changes in v2:
-> >  - fix compilation warning on ARM by casting cycles_t to u64
-> > ---
-> >  drivers/net/ethernet/google/gve/gve_adminq.h |   4 +-
-> >  drivers/net/ethernet/google/gve/gve_ptp.c    | 196 ++++++++++++++++++-
-> >  2 files changed, 191 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/google/gve/gve_adminq.h b/drivers/net=
-/ethernet/google/gve/gve_adminq.h
-> > index 22a74b6aa17e..e6dcf6da9091 100644
-> > --- a/drivers/net/ethernet/google/gve/gve_adminq.h
-> > +++ b/drivers/net/ethernet/google/gve/gve_adminq.h
-> > @@ -411,8 +411,8 @@ static_assert(sizeof(struct gve_adminq_report_nic_t=
-s) =3D=3D 16);
-> >
-> >  struct gve_nic_ts_report {
-> >       __be64 nic_timestamp; /* NIC clock in nanoseconds */
-> > -     __be64 reserved1;
-> > -     __be64 reserved2;
-> > +     __be64 pre_cycles; /* System cycle counter before NIC clock read =
-*/
-> > +     __be64 post_cycles; /* System cycle counter after NIC clock read =
-*/
-> >       __be64 reserved3;
-> >       __be64 reserved4;
-> >  };
-> > diff --git a/drivers/net/ethernet/google/gve/gve_ptp.c b/drivers/net/et=
-hernet/google/gve/gve_ptp.c
-> > index ad15f1209a83..c6c98ef825aa 100644
-> > --- a/drivers/net/ethernet/google/gve/gve_ptp.c
-> > +++ b/drivers/net/ethernet/google/gve/gve_ptp.c
-> > @@ -10,28 +10,210 @@
-> >  /* Interval to schedule a nic timestamp calibration, 250ms. */
-> >  #define GVE_NIC_TS_SYNC_INTERVAL_MS 250
-> >
-> > +/*
-> > + * Stores cycle counter samples in get_cycles() units from a
-> > + * sandwiched NIC clock read
-> > + */
-> > +struct gve_sysclock_sample {
-> > +     /* system time snapshot taken just before issuing AdminQ command =
-*/
-> > +     struct system_time_snapshot snapshot;
-> > +     /* Cycle counter from NIC before clock read */
-> > +     u64 nic_pre_cycles;
-> > +     /* Cycle counter from NIC after clock read */
-> > +     u64 nic_post_cycles;
-> > +     /* Cycle counter from host before issuing AQ command */
-> > +     cycles_t host_pre_cycles;
-> > +     /* Cycle counter from host after AQ command returns */
-> > +     cycles_t host_post_cycles;
-> > +};
-> > +
-> > +/*
-> > + * Read NIC clock by issuing the AQ command. The command is subject to
-> > + * rate limiting and may need to be retried. Requires nic_ts_read_lock
-> > + * to be held.
-> > + */
-> > +static int gve_ptp_read_timestamp(struct gve_ptp *ptp, cycles_t *pre_c=
-ycles,
-> > +                               cycles_t *post_cycles,
-> > +                               struct system_time_snapshot *snap)
-> > +{
-> > +     unsigned long deadline =3D jiffies + msecs_to_jiffies(100);
-> > +     unsigned long delay_us =3D 1000;
-> > +     int err;
-> > +
-> > +     lockdep_assert_held(&ptp->nic_ts_read_lock);
-> > +
-> > +     do {
-> > +             if (snap)
-> > +                     ktime_get_snapshot(snap);
-> > +
-> > +             *pre_cycles =3D get_cycles();
-> > +             err =3D gve_adminq_report_nic_ts(ptp->priv,
-> > +                                            ptp->nic_ts_report_bus);
-> > +
-> > +             /* Prevent get_cycles() from being speculatively executed
-> > +              * before the AdminQ command
-> > +              */
-> > +             rmb();
-> > +             *post_cycles =3D get_cycles();
-> > +             if (likely(err !=3D -EAGAIN))
-> > +                     return err;
-> > +
-> > +             fsleep(delay_us);
-> > +
-> > +             /* Exponential backoff */
-> > +             delay_us *=3D 2;
-> > +     } while (time_before(jiffies, deadline));
-> > +
-> > +     return -ETIMEDOUT;
-> > +}
-> > +
-> >  /* Read the nic timestamp from hardware via the admin queue. */
-> > -static int gve_clock_nic_ts_read(struct gve_ptp *ptp, u64 *nic_raw)
-> > +static int gve_clock_nic_ts_read(struct gve_ptp *ptp, u64 *nic_raw,
-> > +                              struct gve_sysclock_sample *sysclock)
-> >  {
-> > +     cycles_t host_pre_cycles, host_post_cycles;
-> > +     struct gve_nic_ts_report *ts_report;
-> >       int err;
-> >
-> >       mutex_lock(&ptp->nic_ts_read_lock);
-> > -     err =3D gve_adminq_report_nic_ts(ptp->priv, ptp->nic_ts_report_bu=
-s);
-> > -     if (err)
-> > +     err =3D gve_ptp_read_timestamp(ptp, &host_pre_cycles, &host_post_=
-cycles,
-> > +                                  sysclock ? &sysclock->snapshot : NUL=
-L);
-> > +     if (err) {
-> > +             dev_err_ratelimited(&ptp->priv->pdev->dev,
-> > +                                 "AdminQ timestamp read failed: %d\n",=
- err);
-> >               goto out;
-> > +     }
-> >
-> > -     *nic_raw =3D be64_to_cpu(ptp->nic_ts_report->nic_timestamp);
-> > +     ts_report =3D ptp->nic_ts_report;
-> > +     *nic_raw =3D be64_to_cpu(ts_report->nic_timestamp);
-> > +
-> > +     if (sysclock) {
-> > +             sysclock->nic_pre_cycles =3D be64_to_cpu(ts_report->pre_c=
-ycles);
-> > +             sysclock->nic_post_cycles =3D be64_to_cpu(ts_report->post=
-_cycles);
-> > +             sysclock->host_pre_cycles =3D host_pre_cycles;
-> > +             sysclock->host_post_cycles =3D host_post_cycles;
-> > +     }
-> >
-> >  out:
-> >       mutex_unlock(&ptp->nic_ts_read_lock);
-> >       return err;
-> >  }
-> >
-> > +struct gve_cycles_to_clock_callback_ctx {
-> > +     u64 cycles;
-> > +};
-> > +
-> > +static int gve_cycles_to_clock_fn(ktime_t *device_time,
-> > +                               struct system_counterval_t *system_coun=
-terval,
-> > +                               void *ctx)
-> > +{
-> > +     struct gve_cycles_to_clock_callback_ctx *context =3D ctx;
-> > +
-> > +     *device_time =3D 0;
-> > +
-> > +     system_counterval->cycles =3D context->cycles;
-> > +     system_counterval->use_nsecs =3D false;
-> > +
-> > +     if (IS_ENABLED(CONFIG_X86))
-> > +             system_counterval->cs_id =3D CSID_X86_TSC;
-> > +     else if (IS_ENABLED(CONFIG_ARM64))
-> > +             system_counterval->cs_id =3D CSID_ARM_ARCH_COUNTER;
-> > +     else
-> > +             return -EOPNOTSUPP;
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +/*
-> > + * Convert a raw cycle count (e.g. from get_cycles()) to the system cl=
-ock
-> > + * type specified by clockid. The system_time_snapshot must be taken b=
-efore
-> > + * the cycle counter is sampled.
-> > + */
-> > +static int gve_cycles_to_timespec64(struct gve_priv *priv, clockid_t c=
-lockid,
-> > +                                 struct system_time_snapshot *snap,
-> > +                                 u64 cycles, struct timespec64 *ts)
-> > +{
-> > +     struct gve_cycles_to_clock_callback_ctx ctx =3D {0};
-> > +     struct system_device_crosststamp xtstamp;
-> > +     int err;
-> > +
-> > +     ctx.cycles =3D cycles;
-> > +     err =3D get_device_system_crosststamp(gve_cycles_to_clock_fn, &ct=
-x, snap,
-> > +                                         &xtstamp);
-> > +     if (err) {
-> > +             dev_err_ratelimited(&priv->pdev->dev,
-> > +                                 "get_device_system_crosststamp() fail=
-ed to convert %lld cycles to system time: %d\n",
-> > +                                 cycles,
-> > +                                 err);
-> > +             return err;
-> > +     }
-> > +
-> > +     switch (clockid) {
-> > +     case CLOCK_REALTIME:
-> > +             *ts =3D ktime_to_timespec64(xtstamp.sys_realtime);
-> > +             break;
-> > +     case CLOCK_MONOTONIC_RAW:
-> > +             *ts =3D ktime_to_timespec64(xtstamp.sys_monoraw);
-> > +             break;
-> > +     default:
-> > +             dev_err_ratelimited(&priv->pdev->dev,
-> > +                                 "Cycle count conversion to clockid %d=
- not supported\n",
-> > +                                 clockid);
-> > +             return -EOPNOTSUPP;
-> > +     }
-> > +
-> > +     return 0;
-> > +}
-> > +
-> >  static int gve_ptp_gettimex64(struct ptp_clock_info *info,
-> >                             struct timespec64 *ts,
-> >                             struct ptp_system_timestamp *sts)
-> >  {
-> > -     return -EOPNOTSUPP;
-> > +     struct gve_ptp *ptp =3D container_of(info, struct gve_ptp, info);
-> > +     struct gve_sysclock_sample sysclock =3D {0};
-> > +     struct gve_priv *priv =3D ptp->priv;
-> > +     u64 nic_ts;
-> > +     int err;
-> > +
-> > +     if (sts && !(IS_ENABLED(CONFIG_X86) || IS_ENABLED(CONFIG_ARM64)))
-> > +             return -EOPNOTSUPP;
-> > +
-> > +     err =3D gve_clock_nic_ts_read(ptp, &nic_ts, sts ? &sysclock : NUL=
-L);
-> > +     if (err)
-> > +             return err;
-> > +
-> > +     if (sts) {
-> > +             /* Reject samples with out of order system clock values *=
-/
-> > +             if (!(sysclock.host_pre_cycles <=3D sysclock.nic_pre_cycl=
-es &&
-> > +                   sysclock.nic_pre_cycles  <=3D sysclock.nic_post_cyc=
-les &&
-> > +                   sysclock.nic_post_cycles <=3D sysclock.host_post_cy=
-cles)) {
-> > +                     dev_err_ratelimited(&priv->pdev->dev,
-> > +                                         "AdminQ system clock cycle co=
-unts out of order. Expecting %llu <=3D %llu <=3D %llu <=3D %llu\n",
-> > +                                         (u64)sysclock.host_pre_cycles=
-,
-> > +                                         sysclock.nic_pre_cycles,
-> > +                                         sysclock.nic_post_cycles,
-> > +                                         (u64)sysclock.host_post_cycle=
-s);
-> > +                     return -EBADMSG;
->
-> Sashiko/gemini is reporting the following:
->
-> ---
-> If older firmware does not support this feature and returns 0 for the
-> pre_cycles and post_cycles fields, won't host_pre_cycles <=3D
-> nic_pre_cycles evaluate to false since get_cycles() will be greater than
-> 0? If this occurs, the driver returns -EBADMSG instead of -EOPNOTSUPP.
-> Does returning -EBADMSG prevent userspace tools from gracefully falling
-> back to legacy PTP ioctls like PTP_SYS_OFFSET, causing PTP
-> synchronization to fail completely on older firmwares?
-> ---
->
-> which looks legit to me, or am I missing something? Note that
-> proactively triaging sashiko comments would help maintainers a lot.
->
-> Thanks,
->
-> Paolo
->
+Thanks for the review.
 
-Hi Paolo, my apologies for not addressing this proactively.
+> I do not see the SWS effect you want to avoid in the first place.
+> 
+> This test is an ad-hoc test about your change, but I still do not see
+> why recomputing tp->ratio every time the rcvmss is increased is an
+> issue on loopback interface.
 
-Firmware is not allowed to return 0 for pre/post cycles. This would
-violate the API contract, so returning failure is the appropriate
-response.
+For the packetdrill script, it is taking more time. To actually show
+the window dropping to 0, I have to write a long script with many
+packets and application reads. This is because TCP does not shrink the
+right edge of an already open window.
 
-The kernel PTP stack has no special handling for EBADMSG vs
-EOPNOTSUPP, and neither does Chrony
-(https://github.com/mlichvar/chrony/blob/866bedef0b648fdd6cc68f8cb4d75e4303=
-244c76/sys_linux.c#L959).
-Returning EOPNOTSUPP instead of EBADMSG would not change the behavior
-of upper layers.
+Since the C-code fix in Patch 1 is tested and working fine, should I
+send v3 with just the code fix first? I can work on the packetdrill
+script and send it later in a separate patch. Or should I wait and
+send both together?
 
-> > +
-> > + err =3D gve_cycles_to_timespec64(priv, sts->clockid,
-> > +        &sysclock.snapshot,
-> > +        sysclock.nic_pre_cycles,
-> > +        &sts->pre_ts);
-> > + if (err)
-> > + return err;
->
-> Sashiko writes:
->
-> Looking at gve_cycles_to_timespec64(), it relies on
-> get_device_system_crosststamp() which hardcodes the clocksource to
-> CSID_X86_TSC or CSID_ARM_ARCH_COUNTER.
->
-> If the guest timekeeper clocksource is something else, such as kvm-clock,
-> get_device_system_crosststamp() will return -ENODEV which is propagated h=
-ere.
->
-> Since userspace generally only falls back to legacy PTP ioctls when recei=
-ving
-> -EOPNOTSUPP or -ENOTTY, will returning -ENODEV cause the extended ioctl t=
-o
-> fatally fail and break synchronization? Should we intercept these errors =
-and
-> return -EOPNOTSUPP instead to preserve the fallback behavior?
+Kindly suggest how I should proceed.
 
-The system clocksource returned by the callback does not need to match
-the current system clocksource. get_device_system_crosststamp()
-converts the supplied value to the system clocksource using
-convert_base_to_cs(). I've validated that cross-timestamp still works
-when system clocksource is kvm-clock:
-
-$ cat /sys/devices/system/clocksource/clocksource0/current_clocksource
-tsc
-$ cat /sys/devices/system/clocksource/clocksource0/available_clocksource
-tsc kvm-clock acpi_pm
-$ echo "kvm-clock" | sudo tee
-/sys/devices/system/clocksource/clocksource0/current_clocksource
-kvm-clock
-$ cat /sys/devices/system/clocksource/clocksource0/current_clocksource
-kvm-clock
-$ sudo systemctl start chrony
-$ chronyc tracking
-Reference ID    : 50484330 (PHC0)
-Stratum         : 1
-Ref time (UTC)  : Tue May 05 18:18:20 2026
-System time     : 0.000000703 seconds fast of NTP time
-Last offset     : +0.000001757 seconds
-RMS offset      : 0.000004796 seconds
-Frequency       : 0.164 ppm fast
-Residual freq   : +0.046 ppm
-Skew            : 3.106 ppm
-Root delay      : 0.000000001 seconds
-Root dispersion : 0.000013117 seconds
-Update interval : 0.5 seconds
-Leap status     : Normal
+Thanks,
+Ankit
 
