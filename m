@@ -1,185 +1,171 @@
-Return-Path: <netdev+bounces-284245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284246-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0GyFKRWg+WmQ+QIAu9opvQ
-	(envelope-from <netdev+bounces-284245-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 09:45:25 +0200
+	id QOApGr6i+WnR+QIAu9opvQ
+	(envelope-from <netdev+bounces-284246-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 09:56:46 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 231DB4C82C8
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 09:45:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D5B614C85A1
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 09:56:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0ECAD303EE87
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 07:44:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9CB4330D53A8
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 07:48:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 425FD3DDDA3;
-	Tue,  5 May 2026 07:43:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1000B3EC2E2;
+	Tue,  5 May 2026 07:47:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J+ZKe6df"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A68603DDDD1
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 07:43:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78B5E3EAC90
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 07:47:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777967039; cv=none; b=GVDdb/+Yq6MCX4l+tIErrxV23USDgxgHqP9d5HucrtN79E38PnbVJ62Gm3KVRVIdFVibwRPrjGMJDdRwJknvt2D5bgDJuiWv0gQGej+/1aebXaLJChDQu+MuDE9VLbGAuX1+ldISqnm0ECcZk2FhL0qRBpsrsVAn4wmzU69CZkM=
+	t=1777967263; cv=none; b=czejTWwRkqSkSNeZ6RN0I6kGDIPZlzMkmiDfF5O/KZ//AeUH0NIP0mmf48e3yXs5lwpzpNx1gRT4yHRT7gY1+bkf4SlRFYXmws5eDpsY62VEkbplM3GsK/R7b2X8sDEtiB09fl1ppmeQlOKKfOJFC1twcpNktxlm852o4PHw6T4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777967039; c=relaxed/simple;
-	bh=Q3aLbLV9y/ki6JG9scyklXU4QHub6I9VOt7nf73uR2w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lET0oNIpj/mt7RhmEc7lMVQ/228+EHgNnZTrnxRZEyz6loeNyCM3DTKmsj4ZBqIctckson0jBL8Ada2BRHcduWv2rbopJZaIMaclRqW/jogxGSUTrVwjKU8zoAz/r/Y8q5ppAAHt2Iwdf1PuG/yZ7d6Rb1VZe/l9pI+en6oMJQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+	s=arc-20240116; t=1777967263; c=relaxed/simple;
+	bh=YHsc3xQ1QDh3wysRC+94d47hYC5ygS3eQHirSNAVcO0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AeuJGincesnQNYOhLnvs4Z/DX7KhaosN1TjcBy339HIGv6ea2n/BdYLnX3e6CmBKWpxi1uVorUKI5JjcEmXdNx2nJgqPAy3eHJwt20vhiBUq3kBdKeVDN9zYZdUWRh62ZdSH5LWZ9epdusmZ2duaFP7WkKrDstxtoUAtZH/wHBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J+ZKe6df; arc=none smtp.client-ip=209.85.215.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-95ce0cf2d4bso2255546241.0
-        for <netdev@vger.kernel.org>; Tue, 05 May 2026 00:43:57 -0700 (PDT)
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-c6dd5b01e14so1639418a12.0
+        for <netdev@vger.kernel.org>; Tue, 05 May 2026 00:47:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777967262; x=1778572062; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jrXH8YnPwNKHXnbJs+WEopyj0kRSAn4kPV0vpzyDE5Y=;
+        b=J+ZKe6df00DRPg7+sJzbUxFSwB2Xjus3t/kYkUEenRSskzf4xx1Gm1B3NRbQFH/d9/
+         KQ28XdacvVwygva+ZAcyE70ERBbXLoFd4udxW2+8SgLIPOvpz5Ko6DfPL6T3cBDKAhCs
+         mveA227Mp+NHu0+XnUPdq0WGIVsUcGsWxpAyt3OS5ROvM74pJ2OngPFmXt+3EI4joOFo
+         Z/aZgFC+xqSvuyK3AKLMwskwnmrywyNo+z0A6X0mxXgik3HaD/GRaR6cqUK/4yHuOxRJ
+         qtibbisxXjSEZyVt6TmrqBb7QbpaIfrb1E3cjtbv6RDAT3KCd4/JKPvAX25/UYQolO9Q
+         6FhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777967036; x=1778571836;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1777967262; x=1778572062;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VoHams0THP6xHqBQZRrSzuHD9mE8YcqxXe3rwyOjojQ=;
-        b=nyFc14EKWd1YOaJWenTPom58NZWYgscX5tv4oorRGbj3ZtuFEhT3dAVvBAE2ttAZF1
-         uA6brFK2l1U/T/3tNbnRc/qjZIUIHD/d95r8U8crvqA+xdPxyR1drYEy917VNoZRBJEF
-         mb7YYPWDt6CQzUhDkwf3aaLIOHPZukr+OyHFN6dj7+wN4cbRHbKn0x2zrYvh3YJTFtWC
-         luQFrtt8yGwQ/KfSpDLEGK+S0WfvjSt3evXRVdORt6l8RI5nXJT+o8df2LKoZlRwT3R8
-         /T7p04wWIELBKVJCCVgvc3H/2vkhnyFiTEEUB3pCZa5EPEah9Ed5UZFoBfNU6FU9xvXE
-         UMXA==
-X-Forwarded-Encrypted: i=1; AFNElJ+LK3QJmptxtD0o0DBPMaiBhUpanilZAt4AREPy5s7XewuUo8uuLk9hwPz2rDk7cSHXG8YEliY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiyfBXJthqEHVO8HEDWDkVy2pH/4J4qxDeXmaBStx1PafooLlM
-	XC14GgdKHVkrJYU61C+pMc3yPWDeyOPNlKS+AMiH6qPdt509bNYQ8uzwUaE03gT6
-X-Gm-Gg: AeBDiesp1xHZnO3fKiHisa/QMG1aeGBDzSqxUfZvrRw7IlZHAFvlVsPY4i70LwyYW8E
-	ZZr3Z3CWF16B9QVr7XPW5Py9gvIR3AO+6vmUnGVERffVI4hMBPpj6KHOThL9KWYaSpqtXQC7/3y
-	noGfLUNb+eqqe9z56/miBgtTeaIY97JpvxKy8UmUSdp6n0cthw8SteLMBdsP1HeC3WJ3M+H6TG+
-	fIjeXzaqBI6EJD36hDrKLzom4oVU3RHxHAy6sLrZTCyJ5WsDmAMcXU/xXJkaMv14QOpH7PWYQcD
-	RWRwoZlmochudrglINFLjhf7+42RFkoF2O+nzH1mxyq9SgBTqdQlghjx9FgPR5pQmdVWYSTA3L9
-	lvkIGuSN08/MuQQM/iOnNp6Kgu7uDS07BWb6vFlPF3xC4r73yPJuiER7QD016hM8+SPamtrxL8e
-	wW50dbnWgqYiD+kzLqD/L4cnR5w9Vx8zck4A4fHDld9xBGu4t8vZ9fs8r7hBch6WUezv1ziWKDW
-	A98M0XLOVIkpg==
-X-Received: by 2002:a05:6102:5112:b0:613:3fff:febc with SMTP id ada2fe7eead31-62f557cdc08mr1081938137.2.1777967036542;
-        Tue, 05 May 2026 00:43:56 -0700 (PDT)
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com. [209.85.221.173])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-62f49c49cdbsm1930716137.12.2026.05.05.00.43.55
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 May 2026 00:43:55 -0700 (PDT)
-Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-56f72d27e7eso5393676e0c.0
-        for <netdev@vger.kernel.org>; Tue, 05 May 2026 00:43:55 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ9pRH1wWFO/I+hb+DMmUwOc5awutWprxLryTBfJsnsLXImpPJgHMYkJLEZFFiMYP1jcROl+pNI=@vger.kernel.org
-X-Received: by 2002:a05:6122:8106:b0:56f:b831:909c with SMTP id
- 71dfb90a1353d-57544474e1emr1023308e0c.1.1777967035606; Tue, 05 May 2026
- 00:43:55 -0700 (PDT)
+        bh=jrXH8YnPwNKHXnbJs+WEopyj0kRSAn4kPV0vpzyDE5Y=;
+        b=oUtrT17gq0FGadp4DBkw3Xk1NkMn1jchH3hoPb2rBNUzDp4LQi7j20ZtLOxT3IrEzV
+         cbAdsuISf7x1+U/j44GFmMmICMdlLjthhySu3ALh7XeKLOCJpoBn8ki8ti0DOj/SeaxR
+         2zLDXhQVJeX1+Ifhhvhw8G0f+Q2thT/QihbozhjLV708I2wThI2Yd/SLaEtahiZhkGi6
+         zrjJYixYJm/9XcXDgxuIDIHnT/V6x/rFFJM+DX/RTXEKwmp9ol68Kn/4gyMebHslgc8N
+         idYqk5oi4bUC+hCDTYYKopG/+XtwJJcf1OldAotKKvh+ZDZ/N2+qbO1XB2pzKu/zrTol
+         8Lng==
+X-Forwarded-Encrypted: i=1; AFNElJ/F7DTqCWH79GB0pt1fxdRSKIUf944IB7mL8GFRCb7I7sH2qa0g2vBxdSRglPxrmtOj5m5JMxg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyexNrRUfFEob9aknaxi2rDzWhPUdlg/ncEojViRBTcXIYYE1cr
+	0SEAhEdKHXioKtZ6A7s/RH8oIaZ5DK+oGySrqDLf60QdEKuvTN6Zhfmb
+X-Gm-Gg: AeBDietfw1cQp5fraprELKstYB4wLalbckM1WQnOZyqpXo+QUuKjrOkA8NK+e1BmzCm
+	pOgUMdpyk8vGwsQXBEQaTO7BAa3YfwVyFSlM8OymKiOpoggqV97aKn7S/bg03kSNM2tEitfU0Ho
+	f0ELoEMHTT0ktkHMYXQJpg+v/7o0ab90BxO8JonabiXAqWd6weL57aGKOoPiGYqFOzhw/aWdNyo
+	/2Eo1rFpFVNgQB6i218ygVaC1je7FLOE2tkIeEHNT21W4Rsde9qsm3cGsbY4t4DcLM1wWNCBdlX
+	ky3l9UWvZKnQVrJAFsJyGY6q8NBCRBDxWwOIr1kDAKlN4dq/iOaSq4PjpE2r53pKbc8Q4hpmJMw
+	7/nI2w1sH9iMFpSAWbNFcYRbDWUzNwPNYQywCtBBrDC70A9oTx7ppXlB/fusPFkCPpTBn6SBdYg
+	pfhb51cBgORTTlqA4LNSfehWrX++Ih/6XWyOCxElCWxPFPGvq8NOtMgbPwV3PAo39U/vUfBSTMY
+	on2+Cs=
+X-Received: by 2002:a05:6a20:3944:b0:3a2:bd1d:d67c with SMTP id adf61e73a8af0-3a7f1f1faa1mr13682082637.46.1777967261529;
+        Tue, 05 May 2026 00:47:41 -0700 (PDT)
+Received: from arch.lan ([2409:40e1:3007:cefc:472f:1ad7:13a6:92d7])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c7ffbca2c49sm11833960a12.26.2026.05.05.00.47.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 May 2026 00:47:40 -0700 (PDT)
+From: Aadarsh Chandra <aadarsh.official.xz@gmail.com>
+To: razor@blackwall.org,
+	idosch@nvidia.com
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	bridge@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Aadarsh Chandra <aadarsh.official.xz@gmail.com>
+Subject: [PATCH net-next v2] net: bridge: replace simple_strtoul with kstrtoul
+Date: Tue,  5 May 2026 13:15:15 +0530
+Message-ID: <20260505074515.636244-1-aadarsh.official.xz@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260504200356.3529873-1-shitalkumar.gandhi@cambiumnetworks.com>
-In-Reply-To: <20260504200356.3529873-1-shitalkumar.gandhi@cambiumnetworks.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 5 May 2026 09:43:44 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdVzkRqdRBr1z9Gi2MXUZZBpVnVSkG0Jh6uG+VCdKbN=ZA@mail.gmail.com>
-X-Gm-Features: AVHnY4JoVV9GX0gOfo6gHy4jhoN4HUM1LvIjejFvK9-P6xXjmnQOxuy5FcVEKn0
-Message-ID: <CAMuHMdVzkRqdRBr1z9Gi2MXUZZBpVnVSkG0Jh6uG+VCdKbN=ZA@mail.gmail.com>
-Subject: Re: [PATCH net] net: rtsn: fix mdio_node leak in rtsn_mdio_alloc()
-To: Shitalkumar Gandhi <shital.gandhi45@gmail.com>
-Cc: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 231DB4C82C8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: D5B614C85A1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284245-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[linux-m68k.org];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284246-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,vger.kernel.org,lists.linux.dev,gmail.com];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[aadarshofficialxz@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-0.989];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.995];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux-m68k.org:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,glider.be:email,cambiumnetworks.com:email,mail.gmail.com:mid]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-Hi Shitalkumar,
+The simple_strtoul() function is deprecated. It does not handle
+errors or overflows correctly. Replace it with kstrtoul() in
+brport_store() to ensure that invalid user input is caught and
+returned as an error.
 
-On Mon, 4 May 2026 at 22:05, Shitalkumar Gandhi
-<shital.gandhi45@gmail.com> wrote:
-> of_get_child_by_name() takes a reference. The rtsn_reset() and
-> rtsn_change_mode() failure paths jump to out_free_bus and leak
-> mdio_node.
->
-> Add out_put_node to drop it before falling through.
->
-> Fixes: b0d3969d2b4d ("net: ethernet: rtsn: Add support for Renesas Ethernet-TSN")
-> Signed-off-by: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+v2: target net-next and simplify by reusing the ret variable as
+    suggested by Nikolay Aleksandrov.
 
-Thanks for your patch!
+Signed-off-by: Aadarsh Chandra <aadarsh.official.xz@gmail.com>
+---
+ net/bridge/br_sysfs_if.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-> --- a/drivers/net/ethernet/renesas/rtsn.c
-> +++ b/drivers/net/ethernet/renesas/rtsn.c
-> @@ -797,11 +797,11 @@ static int rtsn_mdio_alloc(struct rtsn_private *priv)
->         /* Enter config mode before registering the MDIO bus */
->         ret = rtsn_reset(priv);
->         if (ret)
-> -               goto out_free_bus;
-> +               goto out_put_node;
->
->         ret = rtsn_change_mode(priv, OCR_OPC_CONFIG);
->         if (ret)
-> -               goto out_free_bus;
-> +               goto out_put_node;
->
->         rtsn_modify(priv, MPIC, MPIC_PSMCS_MASK | MPIC_PSMHT_MASK,
->                     MPIC_PSMCS_DEFAULT | MPIC_PSMHT_DEFAULT);
-> @@ -823,7 +823,8 @@ static int rtsn_mdio_alloc(struct rtsn_private *priv)
->         priv->mii = mii;
->
->         return 0;
-> -
-
-Please keep this blank line, as it serves as a clear separation between
-success and failure paths.
-
-> +out_put_node:
-> +       of_node_put(mdio_node);
->  out_free_bus:
->         mdiobus_free(mii);
->         return ret;
-
-For the logical change:
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
+diff --git a/net/bridge/br_sysfs_if.c b/net/bridge/br_sysfs_if.c
+index 1f57c36a7fc0..cdecc7d1260c 100644
+--- a/net/bridge/br_sysfs_if.c
++++ b/net/bridge/br_sysfs_if.c
+@@ -318,7 +318,6 @@ static ssize_t brport_store(struct kobject *kobj,
+ 	struct net_bridge_port *p = kobj_to_brport(kobj);
+ 	ssize_t ret = -EINVAL;
+ 	unsigned long val;
+-	char *endp;
+ 
+ 	if (!ns_capable(dev_net(p->dev)->user_ns, CAP_NET_ADMIN))
+ 		return -EPERM;
+@@ -339,8 +338,8 @@ static ssize_t brport_store(struct kobject *kobj,
+ 		spin_unlock_bh(&p->br->lock);
+ 		kfree(buf_copy);
+ 	} else if (brport_attr->store) {
+-		val = simple_strtoul(buf, &endp, 0);
+-		if (endp == buf)
++		ret = kstrtoul(buf, 0, &val);
++		if (ret)
+ 			goto out_unlock;
+ 		spin_lock_bh(&p->br->lock);
+ 		ret = brport_attr->store(p, val);
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+2.54.0
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
 
