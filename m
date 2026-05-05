@@ -1,71 +1,53 @@
-Return-Path: <netdev+bounces-284342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284343-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gPv5L8fR+WlHEQMAu9opvQ
-	(envelope-from <netdev+bounces-284342-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 13:17:27 +0200
+	id aN4gIAHV+Wk1EgMAu9opvQ
+	(envelope-from <netdev+bounces-284343-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 13:31:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 241254CC5EB
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 13:17:26 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6B994CCAB8
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 13:31:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F03EA31F317E
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 11:05:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 556963183D3F
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 11:10:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6596C436344;
-	Tue,  5 May 2026 11:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9AC317176;
+	Tue,  5 May 2026 11:08:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="gjXYnDtm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f66.google.com (mail-ed1-f66.google.com [209.85.208.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E48406283
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 11:01:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA78324B2C
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 11:08:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777978888; cv=none; b=Wiwqz4n/NKEl156b2IgkEx0OC8nbCj8oDrs+K9YGmi8Pnu7of2aiscyzaUjINXjtAT+Oksu399zdwKJy1MgZXeiSaG6pzKNJEz/AI3DDkY0jra3zgZlDkYvaC6BkeAxygBP5jSmo+h9P/4BtLA5VubvMblXaIT7lOU73H4GBTjc=
+	t=1777979282; cv=none; b=CBXfUzlTEAg1b5cJudM0Dmipc/wTs16DorO1m3/R7HfZX6NxKKCE+4IRyr+IatObman92KjYZ+ZrWRnVsa4pVEtqo9qCZO2XRmEmi8mX9YxetqQ5LZF4qsKiQHZy+q25Nm8e7MRX9zxLiLmiqSJTdV/dG2dSg0ouFe3tBQbZM0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777978888; c=relaxed/simple;
-	bh=4N1YT3iSFCxvJQ1DuuuZveWCkqLKVXrBB4j6/ijkuFw=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Hm0R6QrWbX42aKxLtWcfXGKyzltAc2VVn1YRXcKBSij7Qnjvhn3iVlMe8EFulVL/4QWWEGuHW58T8Gqjmykd0wykNThq2FnE0C+zR5q6OAxXbL7SArCpp+wTEmuShX9v+U6UQHIM1oDkGwwzYn7N2oDQozskbHbJwxtdrUeNlw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f66.google.com with SMTP id 4fb4d7f45d1cf-67b8d9c26bbso6898500a12.2
-        for <netdev@vger.kernel.org>; Tue, 05 May 2026 04:01:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777978885; x=1778583685;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:cc:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W/+4JVLEopn+EOqTkHHwu2qSAR1YvdVY7AK9mw+2P7k=;
-        b=AKErDNK1q/F21VR535qhXoS8sEk/tf8sVMS8tkWyfZUcBh7+G57gYL2o+lPvj3tYju
-         I1V5IfzZ4lKZ8yAewnjmdj/rjSd0ohxqvfhjgVopbxa7ADFkdRZBpwSdFlW14Px63iyA
-         F194tE0D3OBnbvzOt+23uLmdcXZSZZ/mi4WOjt/uVFBDvNJ5gaEYT6R0bTA1MSh3i99J
-         ZkvpYl5HjxvN7GMqnJySxvKxNQxJ1qXjiULczDjU4hKkQ77pA1ZYFsXUi01LB+/NH3PZ
-         pL8tclV72S5vljl52pOtHVwzzyabxiELcFFyZ8uyb+mXCoMXZlZMhmX6xLvfWjlF42uv
-         4uNw==
-X-Forwarded-Encrypted: i=1; AFNElJ99lO6wR2Rg1jusjQ7/2g08RTQsuKOjZizqg870h+CWpK0gwfS3FSv2ssO9qJKZ7b1rreVxA3k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7E80si4DcvaF00ZKA/5YswyLvKVhdHyH2nWFaweFfk7WQrEkN
-	IUx+m7YvbcF2BGdNrTyZnTn5qBxgkzOjw7R+EKJFmJTbpWenA8sg1dN8
-X-Gm-Gg: AeBDies6ChnVsnXt6vA+wGkwkIYsNPW9crS4ui8Tu47GzH6H2GtI+CRpoBBL5drFaOp
-	isUoq/tBhVWE2+P3h9wJVEGaFlfDNgM2Nx9sCT+MMKnay6yoRdw+H9VXPcTzTntWFkk7t2nJhiz
-	aifUmOy0b/vxttDOvkTuqgZJyNXG8i4QjnjyR7V9M3euitu7E9GpUYtphvi7T6V3R5dbbPcdXEy
-	AkkRMUSIpdutRxftfi342gAAOf3hNZJSl5I1oxr+A2Gp0llspc71y5aJhcxGLXyjEIu+Q7TSiAZ
-	jC0VREBWxG4enHTEfvRtn/OXsG33LRJT5gY3aXw/mXM1qYDsNPW7jSrcZ7Z2BhTSY2JdXHit+hL
-	IFOlabYSVmDNMJAW85Itszz8+P2F2YJaTF/Z3KgWRcqyjc6iB8FhG9EphSSDqi9re8d9ht44d0j
-	U4R+/OVUCbnoU0gwmEV8NrMDGVeTS6E/XaaVRx3DO56obUEIzuHdQNUb1JUEGO0MA0RwuZfAe7V
-	+KU
-X-Received: by 2002:a17:907:a01:b0:ba7:670b:f074 with SMTP id a640c23a62f3a-bbffa02ca02mr768977366b.2.1777978885143;
-        Tue, 05 May 2026 04:01:25 -0700 (PDT)
-Received: from [192.168.88.241] (37-48-40-237.nat.epc.tmcz.cz. [37.48.40.237])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bbe6d66c90dsm483751466b.43.2026.05.05.04.01.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 May 2026 04:01:23 -0700 (PDT)
-Message-ID: <f0557cdd-738b-4d19-969d-94310b553d0b@ovn.org>
-Date: Tue, 5 May 2026 13:01:22 +0200
+	s=arc-20240116; t=1777979282; c=relaxed/simple;
+	bh=Fii/dsbfAyXWJL7iw+03+orRhArbE2fhaoRBiGFLhGA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RtDMCp7NObMwt6t9sbqxoa0j1iJIBFs4VRfd4eiUjFkfLMJUK29rdBdl+F95WM6bKFQ9SxZJdpaouSRM+Anyf//a6WqOxxDwiXmrJNZIf78OPo6oiIQIDXTmI8Mv4gTdqRHEVdub/kNXD8AHjOolveHKAJipQsOEKXVPlquPVMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=gjXYnDtm; arc=none smtp.client-ip=178.251.229.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 659F01127D0;
+	Tue,  5 May 2026 13:07:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
+	s=dkim; t=1777979272;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=zWUvHbmQg2gLg9orv/4xYL+TetgUltH2/efGS+YxUmE=;
+	b=gjXYnDtmlWGdogF8E40yOAx1IlLmTxNveXGIzfIGNnejnFHIrchBOrN5l0nOXX3o0qbXTh
+	BFDEijiyEXXnTC97InXdx/yT8ippKvKCkuqTmcUWKJUXg2m5DfaPI+zV+8j518MsAlsYic
+	3as7tjdHV0UZZrKhB67e7YoobtsfixiIhuae1eL9CNefCTj7BG1dBku/eMwPzJNVm6Si3C
+	CSJwDYiSesa//OSYi+jALaQ3zkPEiz444XP0B5yxMQAwb3633q3r0O+SbgdJsX0HcsNb/s
+	JWneHQs0we32Xt3/c4edM4hFdkmNww4rcPV9Umprka7VjYFTntCXRV1Q6Yt6mA==
+Message-ID: <8b77f257-6fed-4429-ae8e-6a2bf266a0ab@nabladev.com>
+Date: Tue, 5 May 2026 13:07:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,109 +55,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, netfilter-devel@vger.kernel.org, fw@strlen.de,
- davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, horms@kernel.org,
- Eelco Chaudron <echaudro@redhat.com>, Aaron Conole <aconole@redhat.com>
-Subject: Re: [PATCH net 06/12] netfilter: nf_conntrack_expect: honor
- expectation helper field
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-References: <20260326125153.685915-1-pablo@netfilter.org>
- <20260326125153.685915-7-pablo@netfilter.org>
- <8fd5d3a3-d1d7-4542-a0db-1678989940d4@ovn.org> <afSCXEg-X-ieL9cY@chamomile>
- <ef01005e-d867-4936-b138-b98f37e5f394@ovn.org> <afkosr2fDEPA_jX9@chamomile>
- <afkuhbWieFXRTirN@chamomile>
+Subject: Re: [PATCH] fixup! net: dsa: microchip: implement KSZ87xx Module 3
+ low-loss cable errata
+To: Fidelio LAWSON <lawson.fidelio@gmail.com>,
+ Sai Krishna Gajula <saikrishnag@marvell.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Woojung Huh <woojung.huh@microchip.com>,
+ Fidelio Lawson <fidelio.lawson@exotec.com>
+References: <20260417-ksz87xx_errata_low_loss_connections-v4-1-6c7044ec4363@exotec.com>
+ <20260417155025.488290-1-fidelio.lawson@exotec.com>
+ <BYAPR18MB3735885B13017500E153FEA2A0202@BYAPR18MB3735.namprd18.prod.outlook.com>
+ <18cfeb86-9879-4644-b2f8-ab7775287b1e@gmail.com>
 Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- xsFNBF77bOMBEADVZQ4iajIECGfH3hpQMQjhIQlyKX4hIB3OccKl5XvB/JqVPJWuZQRuqNQG
- /B70MP6km95KnWLZ4H1/5YOJK2l7VN7nO+tyF+I+srcKq8Ai6S3vyiP9zPCrZkYvhqChNOCF
- pNqdWBEmTvLZeVPmfdrjmzCLXVLi5De9HpIZQFg/Ztgj1AZENNQjYjtDdObMHuJQNJ6ubPIW
- cvOOn4WBr8NsP4a2OuHSTdVyAJwcDhu+WrS/Bj3KlQXIdPv3Zm5x9u/56NmCn1tSkLrEgi0i
- /nJNeH5QhPdYGtNzPixKgPmCKz54/LDxU61AmBvyRve+U80ukS+5vWk8zvnCGvL0ms7kx5sA
- tETpbKEV3d7CB3sQEym8B8gl0Ux9KzGp5lbhxxO995KWzZWWokVUcevGBKsAx4a/C0wTVOpP
- FbQsq6xEpTKBZwlCpxyJi3/PbZQJ95T8Uw6tlJkPmNx8CasiqNy2872gD1nN/WOP8m+cIQNu
- o6NOiz6VzNcowhEihE8Nkw9V+zfCxC8SzSBuYCiVX6FpgKzY/Tx+v2uO4f/8FoZj2trzXdLk
- BaIiyqnE0mtmTQE8jRa29qdh+s5DNArYAchJdeKuLQYnxy+9U1SMMzJoNUX5uRy6/3KrMoC/
- 7zhn44x77gSoe7XVM6mr/mK+ViVB7v9JfqlZuiHDkJnS3yxKPwARAQABzSJJbHlhIE1heGlt
- ZXRzIDxpLm1heGltZXRzQG92bi5vcmc+wsGUBBMBCAA+AhsDBQsJCAcCBhUKCQgLAgQWAgMB
- Ah4BAheAFiEEh+ma1RKWrHCY821auffsd8gpv5YFAmfB9JAFCQyI7q0ACgkQuffsd8gpv5YQ
- og/8DXt1UOznvjdXRHVydbU6Ws+1iUrxlwnFH4WckoFgH4jAabt25yTa1Z4YX8Vz0mbRhTPX
- M/j1uORyObLem3of4YCd4ymh7nSu++KdKnNsZVHxMcoiic9ILPIaWYa8kTvyIDT2AEVfn9M+
- vskM0yDbKa6TAHgr/0jCxbS+mvN0ZzDuR/LHTgy3e58097SWJohj0h3Dpu+XfuNiZCLCZ1/G
- AbBCPMw+r7baH/0evkX33RCBZwvh6tKu+rCatVGk72qRYNLCwF0YcGuNBsJiN9Aa/7ipkrA7
- Xp7YvY3Y1OrKnQfdjp3mSXmknqPtwqnWzXvdfkWkZKShu0xSk+AjdFWCV3NOzQaH3CJ67NXm
- aPjJCIykoTOoQ7eEP6+m3WcgpRVkn9bGK9ng03MLSymTPmdINhC5pjOqBP7hLqYi89GN0MIT
- Ly2zD4m/8T8wPV9yo7GRk4kkwD0yN05PV2IzJECdOXSSStsf5JWObTwzhKyXJxQE+Kb67Wwa
- LYJgltFjpByF5GEO4Xe7iYTjwEoSSOfaR0kokUVM9pxIkZlzG1mwiytPadBt+VcmPQWcO5pi
- WxUI7biRYt4aLriuKeRpk94ai9+52KAk7Lz3KUWoyRwdZINqkI/aDZL6meWmcrOJWCUMW73e
- 4cMqK5XFnGqolhK4RQu+8IHkSXtmWui7LUeEvO/OwU0EXvts4wEQANCXyDOic0j2QKeyj/ga
- OD1oKl44JQfOgcyLVDZGYyEnyl6b/tV1mNb57y/YQYr33fwMS1hMj9eqY6tlMTNz+ciGZZWV
- YkPNHA+aFuPTzCLrapLiz829M5LctB2448bsgxFq0TPrr5KYx6AkuWzOVq/X5wYEM6djbWLc
- VWgJ3o0QBOI4/uB89xTf7mgcIcbwEf6yb/86Cs+jaHcUtJcLsVuzW5RVMVf9F+Sf/b98Lzrr
- 2/mIB7clOXZJSgtV79Alxym4H0cEZabwiXnigjjsLsp4ojhGgakgCwftLkhAnQT3oBLH/6ix
- 87ahawG3qlyIB8ZZKHsvTxbWte6c6xE5dmmLIDN44SajAdmjt1i7SbAwFIFjuFJGpsnfdQv1
- OiIVzJ44kdRJG8kQWPPua/k+AtwJt/gjCxv5p8sKVXTNtIP/sd3EMs2xwbF8McebLE9JCDQ1
- RXVHceAmPWVCq3WrFuX9dSlgf3RWTqNiWZC0a8Hn6fNDp26TzLbdo9mnxbU4I/3BbcAJZI9p
- 9ELaE9rw3LU8esKqRIfaZqPtrdm1C+e5gZa2gkmEzG+WEsS0MKtJyOFnuglGl1ZBxR1uFvbU
- VXhewCNoviXxkkPk/DanIgYB1nUtkPC+BHkJJYCyf9Kfl33s/bai34aaxkGXqpKv+CInARg3
- fCikcHzYYWKaXS6HABEBAAHCwXwEGAEIACYCGwwWIQSH6ZrVEpascJjzbVq59+x3yCm/lgUC
- Z8H0qQUJDIjuxgAKCRC59+x3yCm/loAdD/wJCOhPp9711J18B9c4f+eNAk5vrC9Cj3RyOusH
- Hebb9HtSFm155Zz3xiizw70MSyOVikjbTocFAJo5VhkyuN0QJIP678SWzriwym+EG0B5P97h
- FSLBlRsTi4KD8f1Ll3OT03lD3o/5Qt37zFgD4mCD6OxAShPxhI3gkVHBuA0GxF01MadJEjMu
- jWgZoj75rCLG9sC6L4r28GEGqUFlTKjseYehLw0s3iR53LxS7HfJVHcFBX3rUcKFJBhuO6Ha
- /GggRvTbn3PXxR5UIgiBMjUlqxzYH4fe7pYR7z1m4nQcaFWW+JhY/BYHJyMGLfnqTn1FsIwP
- dbhEjYbFnJE9Vzvf+RJcRQVyLDn/TfWbETf0bLGHeF2GUPvNXYEu7oKddvnUvJK5U/BuwQXy
- TRFbae4Ie96QMcPBL9ZLX8M2K4XUydZBeHw+9lP1J6NJrQiX7MzexpkKNy4ukDzPrRE/ruui
- yWOKeCw9bCZX4a/uFw77TZMEq3upjeq21oi6NMTwvvWWMYuEKNi0340yZRrBdcDhbXkl9x/o
- skB2IbnvSB8iikbPng1ihCTXpA2yxioUQ96Akb+WEGopPWzlxTTK+T03G2ljOtspjZXKuywV
- Wu/eHyqHMyTu8UVcMRR44ki8wam0LMs+fH4dRxw5ck69AkV+JsYQVfI7tdOu7+r465LUfg==
-In-Reply-To: <afkuhbWieFXRTirN@chamomile>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 241254CC5EB
+From: Marek Vasut <marex@nabladev.com>
+In-Reply-To: <18cfeb86-9879-4644-b2f8-ab7775287b1e@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: E6B994CCAB8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284342-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[ovn.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	SUBJECT_HAS_EXCLAIM(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,marvell.com,vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[nabladev.com:+];
+	RCPT_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	NEURAL_HAM(-0.00)[-0.988];
+	FROM_NEQ_ENVFROM(0.00)[marex@nabladev.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-284343-lists,netdev=lfdr.de];
 	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On 5/5/26 1:40 AM, Pablo Neira Ayuso wrote:
-> On Tue, May 05, 2026 at 01:16:05AM +0200, Pablo Neira Ayuso wrote:
->> Thanks for the detailed report. It seems I changed the semantics of
->> exp->helper, this used to be use to set a new helper for an expected
->> connection, which is the case for sip and h323.
+On 4/17/26 6:30 PM, Fidelio LAWSON wrote:
+> On 4/17/26 18:10, Sai Krishna Gajula wrote:
+>>> -----Original Message-----
+>>> From: Fidelio Lawson <lawson.fidelio@gmail.com>
+>>> Sent: Friday, April 17, 2026 9:20 PM
+>>> To: netdev@vger.kernel.org
+>>> Cc: Marek Vasut <marex@nabladev.com>; Andrew Lunn <andrew@lunn.ch>;
+>>> Woojung Huh <woojung.huh@microchip.com>; Fidelio Lawson
+>>> <fidelio.lawson@exotec.com>
+>>> Subject: [PATCH] fixup! net: dsa: microchip: implement KSZ87xx
+>>> Module 3 low-loss cable errata
 >>
->> Would this patch help address the issue you are observing?
+>> Since this errata is a fix and pushed to "net", adding fixes tag may 
+>> be required.
+>>
 > 
-> Actually, this needs to set to NULL the new exp->assign_helper field,
-> see new patch, untested.
+> Good point, thanks for spotting this.
+> I’ll add an appropriate fixes tag referencing the commit that introduced
+> the KSZ87xx support, and follow up with an updated fixup.
+Could you maybe collect the fixes and send a V5 ?
 
-I ran this through OVS system tests and all passed.  So, this restores
-the old behavior, at least for FTP (we do not support sip/h323).  For
-that part:
-
-Tested-by: Ilya Maximets <i.maximets@ovn.org>
+Thank you !
 
