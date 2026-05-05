@@ -1,210 +1,109 @@
-Return-Path: <netdev+bounces-284372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284373-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6Hz0D8jl+Wn2EwMAu9opvQ
-	(envelope-from <netdev+bounces-284372-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 14:42:48 +0200
+	id uLpbJxbn+Wl1FAMAu9opvQ
+	(envelope-from <netdev+bounces-284373-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 14:48:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F35C4CDC2E
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 14:42:47 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DDA04CDE38
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 14:48:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B856130599DB
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 12:41:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A69AA301F356
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 12:43:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E49242B724;
-	Tue,  5 May 2026 12:41:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807B842B74B;
+	Tue,  5 May 2026 12:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aZgitXAQ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="w2PYEaL9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A6B382F23;
-	Tue,  5 May 2026 12:41:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162A842B75A;
+	Tue,  5 May 2026 12:43:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777984860; cv=none; b=dgsCXS2SVqQ8AE0QgW5gj5vur3j186u7PdKLArBIfKS4h9N5kVWplpEcc+PvuBnD0HZvgLeqwqn+Zjj+mBBp3idM2DVh41me+iVRRjK/UKrfDvySqJ0fX6ThnSdfDWirvPTUbcUq/qVfqAHu4cPUAd23atOJd+ByULLcSI2qsnU=
+	t=1777984991; cv=none; b=mxy2E5GaR55jfkFtz/+fIIncxB+RCPAjxa5NYfMK9S667wqY1zXpML2qAx17BnY8qrxgJBbf2QOd4PEORUehsqSO8k3sifEvH20qEeitTEE9sTg+Zn/gIWZ1YnD0FLyRzS5IePcDnxRx1Vk5+YfAQFDs9a+ZvEaA2KrV05cTyEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777984860; c=relaxed/simple;
-	bh=xSeupnuvJlm1SCUwSLTr6zr3hWRgUFyf0/4uoYJZNaI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=S9Au2SglrDL+8AhNKd/YwG+gIy35pg6TF4W1IWl6nbqcZ2aG7smAe4ihbi7D2lzQwwmeod4+sxbf06bi1Y3Ms5dIxcEdUUwtsjF25GiMle9WDd6tmAx+T3SBSLoGrjgBhAs4wIA9PTADFhYlREIQBzYHzvqzlR0PW4vLaLYCe2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aZgitXAQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23959C2BCB4;
-	Tue,  5 May 2026 12:40:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777984859;
-	bh=xSeupnuvJlm1SCUwSLTr6zr3hWRgUFyf0/4uoYJZNaI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=aZgitXAQKnW8uvL01qWyAO8epkmapRR+vivO7oPD4fKv9/nkYvrQ+aO/slBm5f88/
-	 QZTDO48wpznV2zMZUJLQ4fxkCKqYciPLGFUf69yd4J8scVI45m1Cc21jAUiTsDTSUz
-	 J8g6LLCuC357F0VkIUPeiPKoFjs20PODZ6jmcw26u+w6eJu7+BXxsDH21QKjK6gCd6
-	 f0aK4gasN5dT0zd+L59XUVA64VNl7JTnZOc2hgy3Lk3xHGSwNIyJb2k8451k4tehkz
-	 IyAQERUtR9xEMDBPHx98qVih9IJW72p62eJ4UtkSnHZxDmt7SBAFAv4MAs4IkEgq5v
-	 fG55DM5de+v/Q==
-Message-ID: <0737c71e-0614-4ecf-9801-a7e71be198d4@kernel.org>
-Date: Tue, 5 May 2026 14:40:56 +0200
+	s=arc-20240116; t=1777984991; c=relaxed/simple;
+	bh=4JJUcxwtYOrFHVzJKTqiChj5J6VZoMXekUm3MDGptv8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tyvSFl3fevkbAlXBIcsPGySa2vjrXQumBpOxz/H+NlxGNxuXvS+FYpdwajfXCRfoxcjdyl5Se5F1/HN3AhGHvG4+UCdjGWy7wrnttGbEbJD40F7grudLX8eO16479mqPfDQCBdVlU2ZXwVF7NVPGxPdBqCMYuU9KWeGed09FcdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=w2PYEaL9; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=NIy8pE8jBgSGFZN/xDRHGpTV/4Ex9tWgIJn+y/jBZ84=; b=w2PYEaL9xQU9moZKYTFC3A069k
+	2dvm4XTQIaRGI+2wywno4k9ImtDaf2lHAnT/UitjZELUh161/Yj+7GXkQ5oYbjoCcO4CfWsABL1eJ
+	lFMa5UMrzy5j0+H3TKB9sFJP/e+su/Bc4vPdqJOTuIoKP2z4MiuwgYmDYPIHjYV5/uzc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wKF7B-001SU3-VP; Tue, 05 May 2026 14:43:05 +0200
+Date: Tue, 5 May 2026 14:43:05 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	horms@kernel.org, pkshih@realtek.com, larry.chiu@realtek.com
+Subject: Re: [PATCH net-next v2] rtase: Fix flow control configuration
+Message-ID: <889e8dd8-ce1e-4abd-98e5-2801ed134a7d@lunn.ch>
+References: <20260505064121.31286-1-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 2/4] veth: implement Byte Queue Limits (BQL)
- for latency reduction
-To: sashiko@lists.linux.dev
-Cc: bpf@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
- Jakub Kicinski <kuba@kernel.org>, kernel-team <kernel-team@cloudflare.com>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-References: <20260501071633.644353-3-hawk@kernel.org>
- <20260502071828.616C3C19425@smtp.kernel.org>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20260502071828.616C3C19425@smtp.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 9F35C4CDC2E
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260505064121.31286-1-justinlai0215@realtek.com>
+X-Rspamd-Queue-Id: 6DDA04CDE38
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284372-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284373-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,lunn.ch:dkim,lunn.ch:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
+On Tue, May 05, 2026 at 02:41:21PM +0800, Justin Lai wrote:
+> The hardware has two sets of registers controlling TX/RX flow control.
+> The effective flow control state is determined by the logical OR of
+> these two sets of bits.
 
+Odd design.
 
-On 02/05/2026 09.18, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
-> - [Critical] Out-of-bounds array access on peer_dev->_tx in veth_poll() when local RX queues exceed peer TX queues.
-> - [High] Disabling XDP permanently stops peer TX queues if they were backpressured (DRV_XOFF leak).
-> --
-> 
-> commit 9bc3ed022846dda6dd5cc131e798f949f63f491f
-> Author: Jesper Dangaard Brouer <hawk@kernel.org>
-> 
-> veth: implement Byte Queue Limits (BQL) for latency reduction
-> 
-> This commit adds byte queue limits support to the veth driver to provide
-> qdiscs with feedback and reduce latency. It charges a fixed unit per
-> packet rather than byte-based charging.
-> 
->> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
->> index e35df717e65e2..3de25ba34a906 100644
->> --- a/drivers/net/veth.c
->> +++ b/drivers/net/veth.c
-> 
-> [ ... ]
-> 
->> @@ -975,7 +1016,7 @@ static int veth_poll(struct napi_struct *napi, int budget)
->>   	peer_txq = peer_dev ? netdev_get_tx_queue(peer_dev, queue_idx) : NULL;
->>   
->>   	xdp_set_return_frame_no_direct();
->> -	done = veth_xdp_rcv(rq, budget, &bq, &stats);
->> +	done = veth_xdp_rcv(rq, budget, &bq, &stats, peer_txq);
-> 
-> Could this lead to an out-of-bounds array access on the peer device's
-> transmit queues?
-> 
-> If a veth pair is configured asymmetrically, the local device might have
-> more receive queues than the peer has transmit queues.
-> 
-> If packets are redirected from another interface into a higher-indexed
-> receive queue, the poll function will run with a queue_idx greater than or
-> equal to peer_dev->real_num_tx_queues.
-> 
-> Since netdev_get_tx_queue() performs a direct array access without bounds
-> checking, peer_txq would point out-of-bounds. This out-of-bounds pointer is
-> then passed into the new veth_xdp_rcv() code paths and accessed by
-> netif_tx_queue_stopped().
-> 
-> Should queue_idx be checked against peer_dev->real_num_tx_queues before
-> fetching the transmit queue?
-Yes, for the XDP redirect code path, which enqueues frames into the
-peer's ptr_ring using smp_processor_id() % peer->real_num_rx_queues
-as the ring index.  Then this is actually possible.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-It is not a bug introduced in this patchset, but given we access
-peer_txq a bit earlier, then a fix for this is needed as part of this
-patchset. I have prepared a patch that fixes this.
-
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index e35df717e65e..0cfb19b760dd 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -972,7 +972,8 @@ static int veth_poll(struct napi_struct *napi, int 
-budget)
-
-         /* NAPI functions as RCU section */
-         peer_dev = rcu_dereference_check(priv->peer, 
-rcu_read_lock_bh_held());
--       peer_txq = peer_dev ? netdev_get_tx_queue(peer_dev, queue_idx) : 
-NULL;
-+       peer_txq = (peer_dev && queue_idx < peer_dev->real_num_tx_queues) ?
-+                  netdev_get_tx_queue(peer_dev, queue_idx) : NULL;
-
-
-
-> [ ... ]
-> 
->> @@ -1091,6 +1133,17 @@ static void veth_napi_del_range(struct net_device *dev, int start, int end)
->>   		ptr_ring_cleanup(&rq->xdp_ring, veth_ptr_free);
->>   	}
->>   
->> +	/* Reset BQL on peer's txqs: remaining ring items were freed above
->> +	 * without BQL completion, so DQL state must be reset.
->> +	 */
->> +	peer = rtnl_dereference(priv->peer);
->> +	if (peer) {
->> +		int peer_end = min(end, (int)peer->real_num_tx_queues);
->> +
->> +		for (i = start; i < peer_end; i++)
->> +			netdev_tx_reset_queue(netdev_get_tx_queue(peer, i));
->> +	}
-> 
-> Does this cleanup leave peer transmit queues permanently stopped if they
-> were backpressured when xdp was disabled?
-> 
-> When the ptr_ring is full, veth_xmit() stops the transmit queue using
-> netif_tx_stop_queue(), which sets the __QUEUE_STATE_DRV_XOFF flag.
-> 
-> While netdev_tx_reset_queue() successfully clears the newly added
-> __QUEUE_STATE_STACK_XOFF flag, it does not clear __QUEUE_STATE_DRV_XOFF.
-> If a queue was backpressured exactly when xdp is disabled, it appears it
-> would remain locked forever.
-> 
-> Would it be appropriate to wake the queues using netif_tx_wake_queue() or
-> explicitly clear the __QUEUE_STATE_DRV_XOFF flag during this cleanup?
-
-The watchdog timer in this patchset will call netif_tx_wake_queue().
-So, we would recover from this unlikely case.  I guess there is no harm
-in adding a netif_tx_wake_queue() call here (but we should likely guard
-it with netif_running(dev)).
-
---Jesper
-
+    Andrew
+	
 
