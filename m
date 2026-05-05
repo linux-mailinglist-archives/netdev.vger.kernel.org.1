@@ -1,204 +1,260 @@
-Return-Path: <netdev+bounces-284567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284568-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WFxFC/lC+mlJLgMAu9opvQ
-	(envelope-from <netdev+bounces-284567-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 21:20:25 +0200
+	id ODXsN0dE+mn6LgMAu9opvQ
+	(envelope-from <netdev+bounces-284568-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 21:25:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 858B24D3128
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 21:20:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43BAC4D3162
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 21:25:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 23552303C4FC
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 19:20:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5D83B3045033
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 19:25:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B15BC3CF685;
-	Tue,  5 May 2026 19:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B606B3D332E;
+	Tue,  5 May 2026 19:25:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="H+mWYVdd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VSxGIkVY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6F330F816
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 19:20:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B0E3D34AD
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 19:25:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778008822; cv=none; b=iRE2jQCXlOcPk+/jJ0DYWE0K2/y3ZGtAM55J+uQE7d5h5ubYWp8z8GRILfJA4FoZpqWi28+iXrZwTOeZPLaU54QNWptTxGgSG+G9tBbXNy44LF5H2gx6NmLy8iwFNLaQ5Ygq4jt3eFRViuQOBFCQF7S5yQEvuIXIHMcPo68IWqQ=
+	t=1778009155; cv=none; b=UItkq/7WU6UwIxwu8KBRMrZfTDyhxoxwpS7p4M61Vn/4K5dNjKNv1qynPbo1PZp6ns9G8HkTjQBRqq2CBQcukJkcsLe/JXUl4t7XB7SLnx1g4elr0juMtAPiwKjHXpbdASIwQOegnAj+J63YOKS8FtSRQclNWIG1NAxt4zR2FH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778008822; c=relaxed/simple;
-	bh=1Qwi0af4BH6IkT3YJ+ZsYrbcpFt9i8xrRjxJe9RkfKU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DY8KQUR1cCkOkKND18brLhU1SpmLqvtfJvQt+GWJuNVbGeMKY4xrJ+NP7gsuKiFQzAC0iHfvzU5kTyAO17ggQhpNLZf6WSaNOV7c4peCf+SDgS8Zd7pvw62FInS7G0Fheou2LVvBMHRJ51YmsK9EH+xId+wbOqCTx9+RZA4FWU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=H+mWYVdd; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-8cbc593a67aso499303685a.2
-        for <netdev@vger.kernel.org>; Tue, 05 May 2026 12:20:21 -0700 (PDT)
+	s=arc-20240116; t=1778009155; c=relaxed/simple;
+	bh=unBc1izWQJseF9wJ3T2Q53dX1S/hGOrqtWiG9Y2//f8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QELY2unO8nSBYTDlg7tix6zHIdFPIvAZFM/I/wimmcSBsobgxcwIfBKk0/+FmkHG2cuZ5ugv7xzp/gEbfsJdP9r1pHpQuE8UE5CVvOcVq30XWdeCMyyPJRT+QJVA1Kx1rB5MAcIlAi3kTENJ2GRpjCL+jEqjqcAefD6oMNYsuQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VSxGIkVY; arc=none smtp.client-ip=209.85.128.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-488ac04e13dso5768655e9.1
+        for <netdev@vger.kernel.org>; Tue, 05 May 2026 12:25:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1778008820; x=1778613620; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=d+p+m5LyLcdSJgnUuUV0CVhwhDpBiPQanJlO5X06IFI=;
-        b=H+mWYVddPSRmQwHKE8xqtSqHaQx0O3vyd/ZlLkQ1x5h8GUhVv1LXSW5iihKzzBDMGz
-         Y2s4eIODerWr9umZKNZHIdnAQw1HGmTLw/ZKZHXqhDz+RGRZO7lbFCmJDaAYR8hf6KZi
-         ooVO76zaBrBV5ErIOEH4pnejWzwW01ia+u/GWMDlVncCi6IEmVmjuGQ0v4P3qc1bEYm6
-         hNsOdM0wESiHk60fOVDDH9QR8MRMm/u3cRCh6AQuIlObqWaiUkRVtOaKR+x2vG+OgZNK
-         PW/RC8aPbNCUlBjkJCudOhdXfhBbS7SNkhUXhnAQS77qibfJmMy/lRLhABOomenxTONN
-         H9oQ==
+        d=gmail.com; s=20251104; t=1778009152; x=1778613952; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rw0vHPpNopaX1nqR86+8y1EaQp5vpOse0ZUubitLk/c=;
+        b=VSxGIkVYHscls+Guqlo597A3cyPgniakbNFJwVtJEEr0C61hBoKfFG4LFFbUYfGkxA
+         Oq9DY8NaXEEMmOrx/D95uWLrjdM+FDD/EDEIM+2n6UKZZ9ndalbWCua5P3MffYUBdmqT
+         Ss9MziyOrHmKhz/HQ+8Ir1oyPwLY1QWw7RWkbqFcARBULa4OtR9G4oUc8o/m6nzmNUvG
+         +ZPvI964SBOeg1ShMOGWCPZYovIIJl+QbUG2bnhCaw+DrFuuJnb+/6tJ/liuMRzS6GEX
+         21uMp2a8lPwPNSUTJofDtK5LOppSESm1WfPzsZ42V4gVEXLaoMIf9dYOSZjBrd04hTxJ
+         bs1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778008820; x=1778613620;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1778009152; x=1778613952;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=d+p+m5LyLcdSJgnUuUV0CVhwhDpBiPQanJlO5X06IFI=;
-        b=o6rNp9oinzWBHGSj0eUUI8B0YVwR7P731a1iSnqgSk0rqYbX4RaR6hRbKPlLqIVMfN
-         SYoMCvKziZI+eLzrMUjrF7vq0DAvzMuI8r9QhB79aCZC04Q2cgZ4nM+VlfAsWeutxdNw
-         wv1d9NFz9+jpbesgkTAYkLdQvpkw4uzo4LFusmfaGIg2XY/xnKcrOjCRqqcRHrZPFM9d
-         tOVNmtYxofM5MpXqeJIz2mlxMzQC5qwPiOCmlD5b6YXWljdnPKmee6bc5KZn0x8VGVBe
-         hq4S9ARSWoaMKpz4kF11yL9vokb+K6RPgj3YKDNYlA1N1WPdtqkyeAhRkEEtMunAVdBw
-         cWBg==
-X-Gm-Message-State: AOJu0Yxzjh2iqA/8oPnKW5DUZkilhCjX5N6M7cS+OuONQiYhw5k3dA2e
-	VoG+rGDaF79kAxoe18ZSJXlEG0CmQdX31n2BddRHuvQ40Hu0CUjgMSrY3G4jTdUVmo0r3VoYrms
-	Z3H3NOqvrSOsaL1VV6K6k9ps130/3QZVY917nevbZpga9Be1Btem1WJdfkIYzsZHrEq0=
-X-Gm-Gg: AeBDieshjN5RbbeqatLePF6cBODpOCxzte8w9/CCIQC1u5BXKLpJr7NOj/hqQkc1gVs
-	VkJs1GLFwYmL1kl2zqa9teOf6NIeg3IIASO87fA+/46lsI9+fH3UMLlNoAiV2gDKLyfIllUgNJL
-	wdP/7gWl/18oVgnPoJkFnFNGHL7yjydkmRxPy4xS0iLP+9sDT0qC8/jzlxmSjkeCyW759DDt8KV
-	LKJsc2uX2OCFSbOI8mgQEklz8TvbwrZsA1A88+LECMeYevLCdQRVAkpULx7vpAib5/R+HK6J6oq
-	il/6ifnz/QRYwGsq3txSmruuS1trokeJjWVzjGPwfEyUbXG9/fCbMxudVoFmSdRN3k0wwVvO0u9
-	JVLD/Tc9403XtAnBx6mfBr+uqPwt7GBo93mKUKhjeFmP//rMiAP/+SFhfabCiRFx8hm7R76MRPv
-	3vwePfl1Gsm9L74EsigXZ9vHCAjIcyZOSTszz90IAziXwAq9z5nvhoHjTdLBuV7Hs20crZPJiA
-X-Received: by 2002:a05:620a:2699:b0:8fb:1acb:c907 with SMTP id af79cd13be357-904d3cb86a1mr63368885a.12.1778008819735;
-        Tue, 05 May 2026 12:20:19 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:39a8:9413:9de0:76ef? ([2001:67c:2fbc:1:39a8:9413:9de0:76ef])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8fc2938e7f8sm1419381985a.7.2026.05.05.12.20.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 May 2026 12:20:19 -0700 (PDT)
-Message-ID: <92b24c57-ccc6-45db-99db-31596ba3f5d3@openvpn.net>
-Date: Tue, 5 May 2026 21:20:16 +0200
+        bh=rw0vHPpNopaX1nqR86+8y1EaQp5vpOse0ZUubitLk/c=;
+        b=sE4Jh8sE2yaU6UGoc8uc5ch/A/gpHE92JPC7C4o06CrmcU6wZLVNXVYKH5dq+18R7q
+         GC4bzHuhvTctPs95ws20LA6PHpCVwGijqSDY/yBFfByJGimOFYcUK4C4GqtUWId0oTm/
+         nts9V8R12A4PBJ5LwkaS2Fdqd1VBI6vyhn9JGjbU+SJQSXS7qbeLu9Fb330wexC4wIzt
+         T367F6R8SNG2ARauSknbOOy6a7iuCgykjROoO5siqDawRlcGcF/yZ9dFVqahQ0Pf0xRe
+         qvJ3KQmBZ3omqIHXbw9GwrZgjg2hOAM8ndHWalDV2SI+EqEMQlfOsLD15M4jFBfeuy5G
+         XLKg==
+X-Forwarded-Encrypted: i=1; AFNElJ+tIB9RlWpgDf2hx1jQwBEjpxwPwkx0wLQJM9MfU3DO7FQt5jS/83+OqTGL66WZeNi22+SBZjQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1tqPsXczYuHxP2Z13k+h9MzGKXCW6//YSDG1uyryek9FAaF9X
+	fSz/vwiWZO3MZnODJJcEQZM+fXYZu9pT0ewj5GNkCl/lj4lG+Ycml3Ek
+X-Gm-Gg: AeBDies39OElYdcjKdtGhp3OMkA9AW7ZFOQq702CixCKlyR+phJjWqwe3YMUyaWAgC+
+	8nBntwz5AcCgz0OMU1cUlFvKG17T8scbNIOXuqpCOcQ1MZktwf4hY6RDkg9hvf1S60H6Z6s12+t
+	bgzCw7cQ4DPSx8aUb/H7kqfEF7gkUXUSm0cbNYZvNsyOVSpk4PGHst9IHlAIzXP31gJT0qXMdbC
+	zpmV2ngd3ZWLD4DuXVWLxeMMf0LlCW0UJjL3Ij3x3wuMw/Snd6E0+fGfv9covqQef/RjSVkX5JN
+	LlmsthHvuXw3W4zM+pleYTLyARxi475g7Y8FOOwtYdZZy/17KIKXnX819PQ9I9H29+6kS9HvHTj
+	ZWuFimIW4VN1qD4ILyumegtj99O4830pTlVDP42rHloYPHFdo8mr5n7caVd8tPT8NoEXMtzjfvi
+	BZWx5u5ZmP9YZmCx5JPiOr
+X-Received: by 2002:a05:600c:c494:b0:489:1c1f:35e5 with SMTP id 5b1f17b1804b1-48e51f395f6mr3696525e9.6.1778009151995;
+        Tue, 05 May 2026 12:25:51 -0700 (PDT)
+Received: from lucas ([2a01:e0a:354:c290:234c:5dad:48b0:9188])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a81b99127sm408695405e9.0.2026.05.05.12.25.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 May 2026 12:25:51 -0700 (PDT)
+From: Lucas Poupeau <lucasp.linux@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Lucas Poupeau <lucasp.linux@gmail.com>
+Subject: [PATCH] llc: fix coding style and memory barrier documentation
+Date: Tue,  5 May 2026 21:25:49 +0200
+Message-ID: <20260505192549.74382-1-lucasp.linux@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net] ovpn: fix race between deleting interface and adding
- new peer
-To: netdev@vger.kernel.org, kuba@kernel.org
-Cc: ralf@mandelbit.com, Hyunwoo Kim <imv4bel@gmail.com>,
- Sabrina Dubroca <sd@queasysnail.net>
-References: <20260504142033.2327646-1-antonio@openvpn.net>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <20260504142033.2327646-1-antonio@openvpn.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 858B24D3128
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 43BAC4D3162
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
-	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[mandelbit.com,gmail.com,queasysnail.net];
-	TAGGED_FROM(0.00)[bounces-284567-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	HAS_ORG_HEADER(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[openvpn.net:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284568-lists,netdev=lfdr.de];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[lucasplinux@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.989];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5]
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[]
 
-On 04/05/2026 16:20, Antonio Quartulli wrote:
-> This patch is sent as RFC to give the AI a chance to review it once
-> again, since it was able to spot a new race condition in its
-> previous version.
+Fix multiple style issues reported by checkpatch.pl to improve code
+maintainability and compliance with kernel standards.
 
-So we got a "critical" report from sashiko-gemini.
+Changes included:
+- Add mandatory explanatory comments to memory barriers, specifying
+  the reasoning and pairing context.
+- Insert missing blank lines after variable declarations to improve
+  readability.
+- Relocate EXPORT_SYMBOL macros to immediately follow their respective
+  function definitions as per the modern kernel coding style.
 
-The AI analyzed what happens along the error path, by backtracking all 
-callers and checking for potential problems.
+Note: Some indentation warnings from checkpatch.pl persist in this
+commit. Despite several attempts to align them, the tool remains
+capricious regarding these specific blocks, and further manual
+refinement proved counterproductive.
 
-It found a potential UAF due to a worker not being disabled when 
-free'ing the peer in this early stage.
+Reported-by: checkpatch.pl
+Signed-off-by: Lucas Poupeau <lucasp.linux@gmail.com>
+---
+ net/llc/llc_input.c | 27 +++++++++++++++------------
+ 1 file changed, 15 insertions(+), 12 deletions(-)
 
-The analysis seems sound and I will deepen it.
-
-However, this bug is not introduced by this patch.
-It just happened that sashiko investigated the error path due to this 
-patch introducing a "return -ENODEV".
-But the problem existed before because we have other spots where an 
-error can be returned.
-
-For this reason this patch now seems to be ok and to cover all issues we 
-have found so far.
-
-Once my outstanding PR for net is merged, I will send a new one with 
-this fix (and maybe the UAF fix too).
-
-
-Thanks a lot.
-
-Regards,
-
+diff --git a/net/llc/llc_input.c b/net/llc/llc_input.c
+index 61b0159b2fbe..500621d1bd75 100644
+--- a/net/llc/llc_input.c
++++ b/net/llc/llc_input.c
+@@ -1,8 +1,9 @@
++// SPDX-License-Identifier: GPL-2.0-only
+ /*
+  * llc_input.c - Minimal input path for LLC
+  *
+  * Copyright (c) 1997 by Procom Technology, Inc.
+- * 		 2001-2003 by Arnaldo Carvalho de Melo <acme@conectiva.com.br>
++ * 2001-2003 by Arnaldo Carvalho de Melo <acme@conectiva.com.br>
+  *
+  * This program can be redistributed or modified under the terms of the
+  * GNU General Public License as published by the Free Software Foundation.
+@@ -19,11 +20,6 @@
+ #include <net/llc_pdu.h>
+ #include <net/llc_sap.h>
+ 
+-#if 0
+-#define dprintk(args...) printk(KERN_DEBUG args)
+-#else
+-#define dprintk(args...)
+-#endif
+ 
+ /*
+  * Packet handler for the station, registerable because in the minimal
+@@ -46,6 +42,7 @@ void llc_add_pack(int type, void (*handler)(struct llc_sap *sap,
+ 	if (type == LLC_DEST_SAP || type == LLC_DEST_CONN)
+ 		llc_type_handlers[type - 1] = handler;
+ }
++EXPORT_SYMBOL(llc_add_pack);
+ 
+ void llc_remove_pack(int type)
+ {
+@@ -53,11 +50,17 @@ void llc_remove_pack(int type)
+ 		llc_type_handlers[type - 1] = NULL;
+ 	synchronize_net();
+ }
++EXPORT_SYMBOL(llc_remove_pack);
+ 
+ void llc_set_station_handler(void (*handler)(struct sk_buff *skb))
+ {
+ 	/* Ensure initialisation is complete before it's called */
+ 	if (handler)
++    /*
++     * This barrier ensures that any previous memory operations
++     * are visible before the handler is executed.
++     * Pairs with the smp_wmb() in [indiquez ici la fonction ou le fichier].
++     */
+ 		smp_wmb();
+ 
+ 	llc_station_handler = handler;
+@@ -65,6 +68,7 @@ void llc_set_station_handler(void (*handler)(struct sk_buff *skb))
+ 	if (!handler)
+ 		synchronize_net();
+ }
++EXPORT_SYMBOL(llc_set_station_handler);
+ 
+ /**
+  *	llc_pdu_type - returns which LLC component must handle for PDU
+@@ -72,7 +76,7 @@ void llc_set_station_handler(void (*handler)(struct sk_buff *skb))
+  *
+  *	This function returns which LLC component must handle this PDU.
+  */
+-static __inline__ int llc_pdu_type(struct sk_buff *skb)
++static inline int llc_pdu_type(struct sk_buff *skb)
+ {
+ 	int type = LLC_DEST_CONN; /* I-PDU or S-PDU type */
+ 	struct llc_pdu_sn *pdu = llc_pdu_sn_hdr(skb);
+@@ -164,8 +168,8 @@ int llc_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	struct llc_sap *sap;
+ 	struct llc_pdu_sn *pdu;
+ 	int dest;
+-	int (*rcv)(struct sk_buff *, struct net_device *,
+-		   struct packet_type *, struct net_device *);
++	int (*rcv)(struct sk_buff *skb, struct net_device *dev,
++		   struct packet_type *pt, struct net_device *orig_dev);
+ 	void (*sta_handler)(struct sk_buff *skb);
+ 	void (*sap_handler)(struct llc_sap *sap, struct sk_buff *skb);
+ 
+@@ -206,6 +210,7 @@ int llc_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	} else {
+ 		if (rcv) {
+ 			struct sk_buff *cskb = skb_clone(skb, GFP_ATOMIC);
++
+ 			if (cskb)
+ 				rcv(cskb, dev, pt, orig_dev);
+ 		}
+@@ -217,6 +222,7 @@ int llc_rcv(struct sk_buff *skb, struct net_device *dev,
+ drop:
+ 	kfree_skb(skb);
+ 	goto out;
++
+ handle_station:
+ 	sta_handler = READ_ONCE(llc_station_handler);
+ 	if (!sta_handler)
+@@ -225,6 +231,3 @@ int llc_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	goto out;
+ }
+ 
+-EXPORT_SYMBOL(llc_add_pack);
+-EXPORT_SYMBOL(llc_remove_pack);
+-EXPORT_SYMBOL(llc_set_station_handler);
 -- 
-Antonio Quartulli
-OpenVPN Inc.
+2.54.0
 
 
