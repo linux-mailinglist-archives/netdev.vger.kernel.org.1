@@ -1,63 +1,81 @@
-Return-Path: <netdev+bounces-284286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284287-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OGHgHFm6+WlICwMAu9opvQ
-	(envelope-from <netdev+bounces-284286-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:37:29 +0200
+	id sIM9DD26+WmNBAMAu9opvQ
+	(envelope-from <netdev+bounces-284287-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:37:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7DE04C9E65
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:37:28 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA2184C9E29
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:37:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D66F5306320D
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 09:31:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AD58B305EA20
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 09:34:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC92321457;
-	Tue,  5 May 2026 09:31:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D30B3242A9;
+	Tue,  5 May 2026 09:34:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="kML8cfP9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bzlZ+xBK"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86548322B8C;
-	Tue,  5 May 2026 09:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3474D40DFA7;
+	Tue,  5 May 2026 09:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777973502; cv=none; b=XAahC1F78Pu+jX5yg8piEuGdhzUb1NHDPllw4PAroaFnfzXB+SirsCXEjIMLJAt7n9cJtlNWEgmVv7c8DGcuGTNzI0nNgXKYMYqT2ss/GzyBfV+jbknuOq1JoTOaSh3GuD7iKHdDNA16pnF0GJ2+S0khX2TqcGJ5vMwWHJbEXX0=
+	t=1777973693; cv=none; b=Cx21wpr1R3G9Y0zjss0D6Zrb60TNL2RnVGf2TvQjog8ILJyEftmm8jny7mMobzQErNpg65gFlvPFc/8M+RKHmZkZLJgPecakfD6b0ikSsqOLR6XQHrwdYsgNHP/xI+514mOytBSL5BaxzIO6wngWFMl2i5+038HkDRlZkHf7Ybc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777973502; c=relaxed/simple;
-	bh=cME2hSJQqjfurAz5kjr4W5BW8rqhIkE2CuEBZ53GFmQ=;
+	s=arc-20240116; t=1777973693; c=relaxed/simple;
+	bh=n/qxDvkG2vkc1gOFrFlJwX1Zjz72itXV5m0YGqL9gLg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FuyZRL62NVKJL1BHjfdK8xj1q9aHdpQHqRG3GCXU5XxdU9iRiQS1a5pf9O7FDUrPzeQ3BZTeYdw1axw7EvcgGENoqwZ+yC0eN0YRnymdc3zxuwnrRfuSYVTIDyPfjL3tzdesDM+SrnpVpDs+lJyZQq/CiUSDJ75UpoRw7Twq1M4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=kML8cfP9; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=z1TRjgIEbNPZv6Gwi/aF2FIRkUXsdYr0MZ9HGwOOiCM=; 
-	b=kML8cfP9wYceaQS27Psot/ntjVnGxUK7ZASWegz+tma/X3sJNATlPDagPhyR1UsGI/zlTUUgQw5
-	faqK29K+4vEwizgmOOBjoeVcbG1ojT94rXPIHq90HUPm11gdLzph1cl/lupz/mYECY/7ulL6QixzY
-	+dFVnD7Nra467US0BKQ4YwE33pFVzAmfKibbVEV9o5X0JhkpPb2VHqy32WkyrPqJIlRpLrZWlp8nA
-	WBsj5LVkq5CEcrn6bEr31komfpfLPpuysaAVW9G+lX8IP+6psVf6l5QkPtLRi3PReP21Cis23mVL5
-	pZROiHY042Zs2iq14vcO6XwC+DeDD2eIpVig==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wKC7s-00BO46-0h;
-	Tue, 05 May 2026 17:31:37 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 05 May 2026 17:31:36 +0800
-Date: Tue, 5 May 2026 17:31:36 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-api@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
-Message-ID: <afm4-F1_MCPi3RwE@gondor.apana.org.au>
-References: <20260430011544.31823-1-ebiggers@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DTjbO4q2VluULJxGoK+nnp7FyJV9PDG7WghPe30OSJKKkYN8jfsa+v4ZszuzPjt61+Sj3SQpxhP8aG/QWNsImeDf50WRb1eMtlM5+5MXwvlJedLXzUpjp46Am4nIISD81hlY9UWLNM0jIeueqMSvEdmZ1lcOP9SlR4izHkKAgLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bzlZ+xBK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53BD9C2BCB4;
+	Tue,  5 May 2026 09:34:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777973693;
+	bh=n/qxDvkG2vkc1gOFrFlJwX1Zjz72itXV5m0YGqL9gLg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bzlZ+xBKVsfK6+TmSv91sVWuiQN2p+bpjK9NjglCAbuEMjvFEBlYSF+f3EV8Ta3mm
+	 7SzrhhBOBfHT7WQl0JIEquZ62cLOzQz+aSf6ScymudKlZoQzlPiNBO0+3INDDoDiBG
+	 V+8Ha3PjDc0KPQ02c1fpuO7lxoD16jlgychTMm1Vsh8Hr+vuCO0BMOS5LBwRTfPc4x
+	 2bAKEvM03QaKAeSmPfiNc4+g46jFsvINbLoNF7GkaXqfV22dNNEajPF7VeUj/BB8Ya
+	 gNe4SHhyAgEsKm5oBO3sRpJiEZ5dXWZ3dJAe18k2ltkxtPvESliRjsNaV8w2+Qb90+
+	 rRmQRFTBx52ow==
+Date: Tue, 5 May 2026 10:34:44 +0100
+From: Simon Horman <horms@kernel.org>
+To: Arthur Kiyanovski <akiyano@amazon.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Miroslav Lichvar <mlichvar@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	David Woodhouse <dwmw@amazon.com>,
+	Yonatan Sarna <ysarna@amazon.com>,
+	Zorik Machulsky <zorik@amazon.com>,
+	Alexander Matushevsky <matua@amazon.com>,
+	Saeed Bshara <saeedb@amazon.com>, Matt Wilson <msw@amazon.com>,
+	Anthony Liguori <aliguori@amazon.com>,
+	Nafea Bshara <nafea@amazon.com>,
+	Evgeny Schmeilin <evgenys@amazon.com>,
+	Netanel Belgazal <netanel@amazon.com>,
+	Ali Saidi <alisaidi@amazon.com>,
+	Benjamin Herrenschmidt <benh@amazon.com>,
+	Noam Dagan <ndagan@amazon.com>, David Arinzon <darinzon@amazon.com>,
+	Evgeny Ostrovsky <evostrov@amazon.com>,
+	Ofir Tabachnik <ofirt@amazon.com>,
+	Amit Bernstein <amitbern@amazon.com>,
+	linux-kselftest@vger.kernel.org, shuah@kernel.org,
+	vadim.fedorenko@linux.dev
+Subject: Re: [PATCH v2 net-next 0/8] ptp: Add PHC timestamp quality attributes
+Message-ID: <20260505093444.GQ15617@horms.kernel.org>
+References: <20260430032507.11586-1-akiyano@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,72 +84,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260430011544.31823-1-ebiggers@kernel.org>
-X-Rspamd-Queue-Id: C7DE04C9E65
+In-Reply-To: <20260430032507.11586-1-akiyano@amazon.com>
+X-Rspamd-Queue-Id: DA2184C9E29
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[apana.org.au,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gondor.apana.org.au:s=h01];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[gondor.apana.org.au:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284287-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284286-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,vger.kernel.org,gmail.com,google.com,redhat.com,infradead.org,linutronix.de,lunn.ch,linux.alibaba.com,amazon.com,linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[herbert@gondor.apana.org.au,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[gondor.apana.org.au:dkim,gondor.apana.org.au:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,apana.org.au:url,apana.org.au:email,copy.fail:url]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,horms.kernel.org:mid,sashiko.dev:url]
 
-On Wed, Apr 29, 2026 at 06:15:44PM -0700, Eric Biggers wrote:
-> AF_ALG is almost completely unnecessary, and it exposes a massive attack
-> surface that hasn't been standing up to modern vulnerability discovery
-> tools.  The latest one even has its own website, providing a small
-> Python script that reliably roots most Linux distros: https://copy.fail/
-> 
-> This isn't sustainable, especially as LLMs have accelerated the rate the
-> vulnerabilities are coming in.  The effort that is being put into this
-> thing is vastly disproportional to the few programs that actually use
-> it, and those programs would be better served by userspace code anyway.
-> 
-> These issues have been noted in many mailing list discussions already.
-> But until now they haven't been reflected in the documentation or
-> kconfig menu itself, and the vulnerabilities are still coming in.
-> 
-> Let's go ahead and document the deprecation.
-> 
-> This isn't intended to change anything overnight.  After all, most Linux
-> distros won't be able to disable the kconfig options quite yet, mainly
-> because of iwd.  But this should create a bit more impetus for these
-> userspace programs to be fixed, and the documentation update should also
-> help prevent more users from appearing.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
-> 
-> This patch is targeting crypto/master
-> 
->  Documentation/crypto/userspace-if.rst | 82 ++++++++++++++++++++-------
->  crypto/Kconfig                        | 69 ++++++++++++++++------
->  2 files changed, 113 insertions(+), 38 deletions(-)
+On Thu, Apr 30, 2026 at 03:24:57AM +0000, Arthur Kiyanovski wrote:
+> This series adds quality attributes to PTP Hardware Clock (PHC)
+> timestamps, allowing userspace to obtain error bound, clock status,
+> timescale, and raw counter values alongside timestamps in a single
+> call.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Hi Arthur,
+
+There is an extensive AI generated review of this patchset available
+on sashiko.dev. I would appreciate it if you could look over that as
+it does seem to me that many of the issues raised are relevant
+to the progress of this patchset.
+
+...
 
