@@ -1,385 +1,173 @@
-Return-Path: <netdev+bounces-284577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284578-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iDScLq1O+mndMAMAu9opvQ
-	(envelope-from <netdev+bounces-284577-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 22:10:21 +0200
+	id GMp4CXdR+mnyMQMAu9opvQ
+	(envelope-from <netdev+bounces-284578-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 22:22:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 554B34D3783
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 22:10:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8081D4D39C4
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 22:22:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A217730545AA
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 20:07:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3C7D4300A389
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 20:16:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D40F247F2EE;
-	Tue,  5 May 2026 20:06:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04D1C38F942;
+	Tue,  5 May 2026 20:16:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H3C1alNf"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xh14gR5A";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="mm10QH9Z";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="KeSHvNa8";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ctv9iLuE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 026773DC4A2
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 20:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B51237B014
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 20:16:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778011618; cv=none; b=MEjYqjkQ1IFFhNqdCoFRLkpUuizflPv73RJrvk2RYOdWIQ0XpbT74aZY8/KT4Mc3qulto5DsaqnuHR2cX+OW4Mlex+IryOdms85oQjbINVVmHJJHCpXcmgDVQ2HY0eO0d+DMWrwfF+sCh/s2E64TTCzG/5i/7CB8vWgLW8ct/dk=
+	t=1778012211; cv=none; b=mUXbj5fL7Gt978oo3tYCgAGUkuwQN9frs/TBIFQIavGGlx0HQBNwxkPtXS9TpAkJlIBU1XMFeZSqVl/za4FYAku4UsbTFAlHMHg68+nASqIqiB/c3xvoYEKQ6zP4BO8sowqB2J1h14YrbKB/34kx2BNC/AfKDVhLANPMN5bDR2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778011618; c=relaxed/simple;
-	bh=/6dzk1jr+79SJHIdMSRwnwDs2x3cGknf33OZc7Jj+l0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GPdq1Wa+EDI8yiY5/fy3c8q+SvzzstQrvvcQXU/2KYwXuomPUHvaj6vJFKG07StMzc+fXqBS3kPimTe/FZXhvrq9q/QmNJhSm7NSDJ/HdesYt4T9p8FvpsHcrJn4+hSi5mA6AKu83oI8Q4nUCA+R4XpQONQp+882JPARTXhufjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H3C1alNf; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-488ff90d6c7so54305895e9.2
-        for <netdev@vger.kernel.org>; Tue, 05 May 2026 13:06:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778011615; x=1778616415; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dvQM/tenYkxEUMoprI80x3BX3qXYZMNrSMzU+mvDCJQ=;
-        b=H3C1alNflMKw5MIArki5Shn5gi7c9vQarm8Q7DDUyhWmKPP2tqXzvvrt35FZl5Et9s
-         o4fO+5hykYfARy9DrO85mxa+h/69Ier5jDkRIV0MZKaDX7m3FDhtOn3BgeeNmToL8drk
-         6vbCqATui69QjKmghUtpnnlZrGzXUheEeSs7EL5jj7+nNvLRLOTQmRynWTWqaEoM/iwi
-         x+VncmYQRwEQia2cSFWIVemxWzkzw7P+w1MAyJNFAwxmCLNzPNvnQevR9bgX2O8YPRQu
-         SdCvZ4LGNlROdPi453MZDCbWvONAFQUCgU5j2UhAkcXPACQ3yd3VogMbNXfn2QXE7Nr0
-         /3WA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778011615; x=1778616415;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=dvQM/tenYkxEUMoprI80x3BX3qXYZMNrSMzU+mvDCJQ=;
-        b=MAP9P5Cy0UyTK819sAYyB0r0z3WpVaj1sUTp7KDdE++XXGBNqSqehw9YT9vC4sNyO6
-         /bl1TqGT6c06kA8tTm2IZ/R5o01jdMCi4pLAaNc5j16KzBhuAGnW6EnxxxLUj1DIDPh6
-         ZdIUm8fgwVupnSOvCeIcdcBOUQdL4NNmuC3qQFeeUmxZ8lzfCr8LWLUoamFt9gpZykpv
-         onjvvqpt7r/WA3J5vrm3Zvfk2UFFd9sdPmO/pXqpSkOgyPX+30vN5ZK9kDoljIAC4+0E
-         VIsgAO0abfFgK2lmT/7NdmsGxwTgjSG+Fseq7Z+wWMhPHI0u75BOHd4hHcyMrkTTnYU4
-         JcOQ==
-X-Gm-Message-State: AOJu0YxNSAHx1pTb+pJc4Y2NWfVEYPkME5BhlSOupni0Lp0yhsAXyKXO
-	HDGpGdVl9YKkXrFzVelOhwChmcHQ9Ff51VwMAYbVYY76FKRSY4nWDDKZ
-X-Gm-Gg: AeBDieuU0uMefn3h9wIVra0934ZIE3tI6Cn9p3YMZFFQoc8dChPY4Lwf7r++CQrBtvo
-	tBUHYF5YUnd4QBJXUejfg98zj4u8NFt6hasmzjloNTG9lepk7VNRZIrAdiwyIPkvbjcqL0CtCq5
-	c1eiCzWWXo7Bz12KH6QQMKA6I4+SPLFK0ZqqMRIG8nujZk4dRgxxyva3yrZX0xIEFeCf6x1iyc3
-	QmLYwfcrf41Jk/HOg5el+N58NkF/wUi03FVrTK7YEz/bkqElwATObcagPY4WglrDmVEyQARfWBx
-	JJNjB3zqUPMWKQV3l7eWbvGa6qPNZCsJC496m0p94rIKjD5GiVRvw7I4aWRqG95Kp527eeoYIdF
-	A0gfECk5HFgp4OdH6PVMxPFCBpyzmhBJZvyERXxqzWGoqk9hcXP0H3iWxPDzhVuuv3+hSeb1iz+
-	hx+2dOh2yVCP3J5CKBq+HHekSwPh3IPyJPqomR
-X-Received: by 2002:a05:600c:8485:b0:488:af7f:775f with SMTP id 5b1f17b1804b1-48e51f32a64mr11647685e9.18.1778011615158;
-        Tue, 05 May 2026 13:06:55 -0700 (PDT)
-Received: from builder ([2001:9e8:f130:ed16:be24:11ff:fe30:5d85])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45055f2203csm7049511f8f.37.2026.05.05.13.06.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 May 2026 13:06:54 -0700 (PDT)
-From: Jonas Jelonek <jelonek.jonas@gmail.com>
-To: Russell King <linux@armlinux.org.uk>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
-	Jonas Jelonek <jelonek.jonas@gmail.com>
-Subject: [PATCH net-next v6 2/2] net: sfp: extend SMBus support
-Date: Tue,  5 May 2026 20:06:47 +0000
-Message-ID: <20260505200647.1125311-3-jelonek.jonas@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260505200647.1125311-1-jelonek.jonas@gmail.com>
-References: <20260505200647.1125311-1-jelonek.jonas@gmail.com>
+	s=arc-20240116; t=1778012211; c=relaxed/simple;
+	bh=GXAqV88x5Xb+YY4JsTGo8ZAGmXq01eSpP5hn0qhUHXQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SuqHMeBiQNXzJA5d4vGgcIR+d5+yGck1NCYQmCIzy9c72lPjEhpzzvbSQQhqa+HeZBuPJj8PwGCHb3LWQjlD75AqLG+5a/ol0a76fgjh09bAslIupMhbibma+LiPlt70Pa8GlIX12xGdrA1Iw+p1dg7bLH2eEXXmcHcyWZS6HVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xh14gR5A; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=mm10QH9Z; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=KeSHvNa8; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ctv9iLuE; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 49BDF5CCC6;
+	Tue,  5 May 2026 20:16:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1778012208; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5H3oEICDII07SLyMpBM+uO6NZsICwMRuPSRu6pSEqWM=;
+	b=xh14gR5AcwfnWFZQfOX6HVafj0vcAwTxYS8f3h+p1UTCssW3eq+g5BrpTKofEShb2yrQ3r
+	KtbziU3370CCf2XegAYcpwFefLbRR9o94r51JV3znPkwKIN7kXe9tgjKDy2pt4aDyp3pxv
+	lQkWrtmx1q2Un7TtUa9ivI7HlvJHPD8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1778012208;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5H3oEICDII07SLyMpBM+uO6NZsICwMRuPSRu6pSEqWM=;
+	b=mm10QH9Zpfs3Ty/kaAR8qTH9De4AOtSY5ACu5ywVkLhfF3Nzgvpi9dtEzouVTwZTF5i5Mz
+	0GCnYaMMcX4nuGDQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1778012207; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5H3oEICDII07SLyMpBM+uO6NZsICwMRuPSRu6pSEqWM=;
+	b=KeSHvNa8BA/831WPfwi44f0T1Lko13m+9yTOi+7k07PE2vUt/7IOR9niMNQF3Ekj4laDBy
+	5Wx8h4Qnc6QiOLU1T/j1M1hzU3Dp9PatWyJrsC9uuvfk5iWH+tJ4mN6OpJng+AMrP8SHvg
+	8ku08bvlUDeU2AmvGbfg9ib7XsHbrkE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1778012207;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5H3oEICDII07SLyMpBM+uO6NZsICwMRuPSRu6pSEqWM=;
+	b=ctv9iLuE2s/RHJWMS/FR0kAKUUcThHis9ls2avIYzm0FyIt2fR5I85Rj598qeVcHf8MN8u
+	9oOXIRgR1Z3S/3DQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9C05D593A3;
+	Tue,  5 May 2026 20:16:46 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id oDOkIi5Q+mmmYwAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Tue, 05 May 2026 20:16:46 +0000
+Message-ID: <f88004e6-4a92-4c32-8259-1aea572eb6d6@suse.de>
+Date: Tue, 5 May 2026 22:16:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 554B34D3783
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] ipv6: default IPV6_SIT to m
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Alyssa Ross <hi@alyssa.is>, "David S. Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ =?UTF-8?Q?Ricardo_B_=2E_Marli=C3=A8re?= <rbm@suse.com>,
+ Krzysztof Kozlowski <krzk@kernel.org>
+References: <20260503192515.290900-2-hi@alyssa.is>
+ <5f676587-fcdd-4704-9523-07a7fd98455a@suse.de> <878q9zdz6s.fsf@alyssa.is>
+ <d299649e-d01e-451a-b604-76c8662f1ecc@suse.de>
+ <20260504170912.174235db@kernel.org>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260504170912.174235db@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Rspamd-Queue-Id: 8081D4D39C4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-284577-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[armlinux.org.uk,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,mork.no,gmail.com];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.de:+];
+	TAGGED_FROM(0.00)[bounces-284578-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.996];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	BLOCKLISTDE_FAIL(0.00)[10.150.64.97:server fail,2a07:de40:b281:106:10:150:64:167:server fail,195.135.223.131:server fail,100.90.174.1:server fail,2600:3c0a:e001:db::12fc:5321:server fail];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Commit 7662abf4db94 ("net: phy: sfp: Add support for SMBus module access")
-added SMBus access for SFP modules, but limited it to single-byte
-transfers. As a side effect, hwmon is disabled (16-bit reads cannot be
-guaranteed atomic) and a warning is printed.
+On 5/5/26 2:09 AM, Jakub Kicinski wrote:
+> On Mon, 4 May 2026 17:01:43 +0200 Fernando Fernandez Mancera wrote:
+>>> Yes, it appears you're right.  I had only tested on ARM.  In that case,
+>>> perhaps it make sense to instead set this to m in the arm64 defconfig, to
+>>> preserve the previous situation, but I can also see the value in
+>>> reducing platform discongruity by letting it change to y on arm64 too.
+>>
+>> Changing it on arm64 defconfig would make sense to me too. We should
+>> probably visit other configs that might be in the same situation. That
+>> in my opinion would qualify a net tree fix as you proposed initially.
+> 
+> Right. I think the fix as posted makes sense. Tunnel drivers should
+> be =m. If other arches default to =y that's likely an oversight.
+> Fedora and I suspect all other distros (and "prod kernels") set SIT=m.
+> 
 
-Many SMBus-only I2C controllers in the wild support more than just
-byte access, and SFP cages are often wired to such controllers
-rather than to a full-featured I2C controller -- e.g. the SMBus
-controllers in the Realtek longan and mango SoCs, which advertise
-word access and I2C block reads. Today, they cannot drive an SFP at
-all without falling back to the byte-only path.
-
-Extend sfp_smbus_read()/sfp_smbus_write() so that, in addition to
-the existing byte access, they also use SMBus word access and SMBus
-I2C block access whenever the adapter advertises them. Both
-directions are handled in a single read and a single write helper
-that pick the largest supported transfer per chunk and fall back as
-needed.
-
-I2C-block is preferred unconditionally when available: the protocol
-carries any length 1..32, so it can serve every chunk -- including
-the 1- and 2-byte tails -- without help from word or byte access.
-Note that this requires I2C_FUNC_SMBUS_I2C_BLOCK, which reads a
-caller-specified number of bytes. This deviates from the official
-SMBus Block Read (length is supplied by the slave) but is widely
-supported by Linux I2C controllers/drivers.
-
-Capability matrix this implementation supports:
-
-  - BYTE only:                  works (unchanged behaviour); 1-byte
-                                xfers, hwmon disabled.
-  - BYTE + WORD:                word for >=2-byte chunks, byte for
-                                trailing odd byte.
-  - I2C_BLOCK present (with or
-    without BYTE/WORD):         block as the universal transport for
-                                every chunk.
-  - WORD only (no BYTE/BLOCK):  accepted with WARN_ONCE. Even-length
-                                transfers work; odd-length transfers
-                                (e.g. the 3-byte cotsworks fixup
-                                write) hit the BYTE branch which the
-                                adapter does not implement, so the
-                                xfer returns an error and the
-                                operation is aborted. No mainline
-                                I2C driver was found to advertise
-                                WORD without BYTE; the warning lets
-                                us learn about it if it ever shows
-                                up.
-
-Adapters with asymmetric R/W capabilities (e.g. only READ_I2C_BLOCK
-but not WRITE_I2C_BLOCK) remain functionally correct -- the
-per-iteration fallback uses the direction-specific bits -- but the
-shared i2c_max_block_size is sized by the all-bits-set check, so a
-transfer in the better-supported direction is not upgraded. None of
-the mainline I2C bus drivers surveyed during review advertise such
-asymmetry; promoting i2c_max_block_size to per-direction sizes can
-be revisited if needed.
-
-Signed-off-by: Jonas Jelonek <jelonek.jonas@gmail.com>
----
- drivers/net/phy/sfp.c | 134 +++++++++++++++++++++++++++++++++---------
- 1 file changed, 107 insertions(+), 27 deletions(-)
-
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index e58e29a1e8d2..8ad650cbe862 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -14,6 +14,7 @@
- #include <linux/platform_device.h>
- #include <linux/rtnetlink.h>
- #include <linux/slab.h>
-+#include <linux/unaligned.h>
- #include <linux/workqueue.h>
- 
- #include "sfp.h"
-@@ -756,50 +757,110 @@ static int sfp_i2c_write(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
- 	return ret == ARRAY_SIZE(msgs) ? len : 0;
- }
- 
--static int sfp_smbus_byte_read(struct sfp *sfp, bool a2, u8 dev_addr,
--			       void *buf, size_t len)
-+static int sfp_smbus_read(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
-+			  size_t len)
- {
- 	union i2c_smbus_data smbus_data;
- 	u8 bus_addr = a2 ? 0x51 : 0x50;
-+	size_t this_len, transferred;
-+	u32 functionality;
- 	u8 *data = buf;
- 	int ret;
- 
--	while (len) {
--		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
--				     I2C_SMBUS_READ, dev_addr,
--				     I2C_SMBUS_BYTE_DATA, &smbus_data);
--		if (ret < 0)
--			return ret;
-+	functionality = i2c_get_functionality(sfp->i2c);
- 
--		*data = smbus_data.byte;
-+	while (len) {
-+		this_len = min(len, sfp->i2c_max_block_size);
-+
-+		if (functionality & I2C_FUNC_SMBUS_READ_I2C_BLOCK) {
-+			smbus_data.block[0] = this_len;
-+			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-+					     I2C_SMBUS_READ, dev_addr,
-+					     I2C_SMBUS_I2C_BLOCK_DATA, &smbus_data);
-+			if (ret < 0)
-+				return ret;
-+
-+			memcpy(data, &smbus_data.block[1], this_len);
-+			transferred = this_len;
-+		} else if (this_len >= 2 &&
-+			   (functionality & I2C_FUNC_SMBUS_READ_WORD_DATA)) {
-+			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-+					     I2C_SMBUS_READ, dev_addr,
-+					     I2C_SMBUS_WORD_DATA, &smbus_data);
-+			if (ret < 0)
-+				return ret;
-+
-+			put_unaligned_le16(smbus_data.word, data);
-+			transferred = 2;
-+		} else {
-+			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-+					     I2C_SMBUS_READ, dev_addr,
-+					     I2C_SMBUS_BYTE_DATA, &smbus_data);
-+			if (ret < 0)
-+				return ret;
-+
-+			*data = smbus_data.byte;
-+			transferred = 1;
-+		}
- 
--		len--;
--		data++;
--		dev_addr++;
-+		data += transferred;
-+		len -= transferred;
-+		dev_addr += transferred;
- 	}
- 
- 	return data - (u8 *)buf;
- }
- 
--static int sfp_smbus_byte_write(struct sfp *sfp, bool a2, u8 dev_addr,
--				void *buf, size_t len)
-+static int sfp_smbus_write(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
-+			   size_t len)
- {
- 	union i2c_smbus_data smbus_data;
- 	u8 bus_addr = a2 ? 0x51 : 0x50;
-+	size_t this_len, transferred;
-+	u32 functionality;
- 	u8 *data = buf;
- 	int ret;
- 
-+	functionality = i2c_get_functionality(sfp->i2c);
-+
- 	while (len) {
--		smbus_data.byte = *data;
--		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
--				     I2C_SMBUS_WRITE, dev_addr,
--				     I2C_SMBUS_BYTE_DATA, &smbus_data);
--		if (ret)
--			return ret;
-+		this_len = min(len, sfp->i2c_max_block_size);
-+
-+		if (functionality & I2C_FUNC_SMBUS_WRITE_I2C_BLOCK) {
-+			smbus_data.block[0] = this_len;
-+			memcpy(&smbus_data.block[1], data, this_len);
-+
-+			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-+					     I2C_SMBUS_WRITE, dev_addr,
-+					     I2C_SMBUS_I2C_BLOCK_DATA, &smbus_data);
-+			if (ret < 0)
-+				return ret;
-+
-+			transferred = this_len;
-+		} else if (this_len >= 2 &&
-+			   (functionality & I2C_FUNC_SMBUS_WRITE_WORD_DATA)) {
-+			smbus_data.word = get_unaligned_le16(data);
-+			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-+					     I2C_SMBUS_WRITE, dev_addr,
-+					     I2C_SMBUS_WORD_DATA, &smbus_data);
-+			if (ret < 0)
-+				return ret;
-+
-+			transferred = 2;
-+		} else {
-+			smbus_data.byte = *data;
-+			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-+					     I2C_SMBUS_WRITE, dev_addr,
-+					     I2C_SMBUS_BYTE_DATA, &smbus_data);
-+			if (ret < 0)
-+				return ret;
-+
-+			transferred = 1;
-+		}
- 
--		len--;
--		data++;
--		dev_addr++;
-+		data += transferred;
-+		len -= transferred;
-+		dev_addr += transferred;
- 	}
- 
- 	return data - (u8 *)buf;
-@@ -815,10 +876,29 @@ static int sfp_i2c_configure(struct sfp *sfp, struct i2c_adapter *i2c)
- 		sfp->read = sfp_i2c_read;
- 		sfp->write = sfp_i2c_write;
- 		max_block_size = SFP_EEPROM_BLOCK_SIZE;
--	} else if (i2c_check_functionality(i2c, I2C_FUNC_SMBUS_BYTE_DATA)) {
--		sfp->read = sfp_smbus_byte_read;
--		sfp->write = sfp_smbus_byte_write;
--		max_block_size = 1;
-+	} else if (i2c_check_functionality(i2c, I2C_FUNC_SMBUS_BYTE_DATA) ||
-+		   i2c_check_functionality(i2c, I2C_FUNC_SMBUS_I2C_BLOCK)) {
-+		/* I2C-block carries any length 1..32, byte serves the
-+		 * 1-byte tail when block is absent: either alone is a
-+		 * complete transport.
-+		 */
-+		sfp->read = sfp_smbus_read;
-+		sfp->write = sfp_smbus_write;
-+
-+		if (i2c_check_functionality(i2c, I2C_FUNC_SMBUS_I2C_BLOCK))
-+			max_block_size = SFP_EEPROM_BLOCK_SIZE;
-+		else if (i2c_check_functionality(i2c, I2C_FUNC_SMBUS_WORD_DATA))
-+			max_block_size = 2;
-+		else
-+			max_block_size = 1;
-+	} else if (i2c_check_functionality(i2c, I2C_FUNC_SMBUS_WORD_DATA)) {
-+		/* Word-only: even-length xfers work; odd-length xfers
-+		 * will error out at i2c_smbus_xfer().
-+		 */
-+		WARN_ONCE(1, "sfp: SMBus word-only adapter; odd-length transfers will fail\n");
-+		sfp->read = sfp_smbus_read;
-+		sfp->write = sfp_smbus_write;
-+		max_block_size = 2;
- 	} else {
- 		sfp->i2c = NULL;
- 		return -EINVAL;
--- 
-2.51.0
-
+Yes. I checked and every distro I saw is setting this. This make sense, 
+thanks Jakub.
 
