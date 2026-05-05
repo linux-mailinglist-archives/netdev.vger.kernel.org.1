@@ -1,386 +1,244 @@
-Return-Path: <netdev+bounces-284291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284292-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0JelH92++WkmDAMAu9opvQ
-	(envelope-from <netdev+bounces-284291-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:56:45 +0200
+	id aG8qF3S++WnxCwMAu9opvQ
+	(envelope-from <netdev+bounces-284292-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:55:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D457C4CA3C5
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:56:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D001F4CA347
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:54:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4607C30AC238
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 09:52:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 431D030847AF
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 09:52:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDF7331716F;
-	Tue,  5 May 2026 09:52:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4089D3368AC;
+	Tue,  5 May 2026 09:52:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F8pic0AT"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="reJO5yV5";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="aVgCylbr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95FF3128CC;
-	Tue,  5 May 2026 09:52:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA23336EDA
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 09:52:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777974733; cv=none; b=MHsTbGmqu6gSQvpdvjMjvoUkKv8NXKrj63Tjv0eLIeSBrE+7iJnRUG701je4lF6/ZJCbfxNxhiTbEj/1THP+WnbT00RB10QyCaK3SfTkAviasAVAOi9PVJwU6J0buQIMkH5MkMT+8FdYNDk3ob6PzG1AvUhCa4I0k++HrU1Aw7I=
+	t=1777974742; cv=none; b=QBVSFuqWk9ivaSlJGGLYa3c9RMGwTgvjT2W6l2x63C00PcbGZNkLJxE6Kkq5J3DnrblRpq1ZGKzK+C/unOg8m6xWbuos1kgYZhb19hm0c2d8vK9UYHug8WWtZ74kh4nMymS10FORWB+Pe1Ghz/tb+wSCg8xQj+j48ViLKnldc6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777974733; c=relaxed/simple;
-	bh=b8EmRXYUHhHpMi2mh0G8JaV05ulaXXDdg5z3WQYkrtU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SmDJKrBjbQ1pBbWnF+CpJpvymDASwogBDXlEkZ/xw344D66TpsvInJJqy2J1wlNB9ZGpG3EPEsaza+yMEb9dcM9BJzyVTt63WYJwBQrZsXpyV7I0djusv2H7Pksk1LiT66kPJVlcZHOWu4xHgjJzxBuG+neInBEiyn9g0Bx1oNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F8pic0AT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42160C2BCB4;
-	Tue,  5 May 2026 09:52:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777974733;
-	bh=b8EmRXYUHhHpMi2mh0G8JaV05ulaXXDdg5z3WQYkrtU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=F8pic0ATB1pkJGvgbGQ0MMKCKtUhphyuJWHKgCWIwXghQKfFGRlCQTLcdwjewEP2F
-	 2DnohjvNlQnSlvApJnYNpAEVZvSIu0Yy3odheLa1XHZOA8K4ah3ZfLahvlTdtEefKA
-	 8sVTgF5267fLz+zaKUSAWunwR2NJJj958RZBUVSzpaWkQDiSAEiX8nne7ldbXPerXO
-	 63wab5KLIS7lQpz6Otwj9ihJis+vq7uqkw1tvHIUjIgYwmcjK/72m7/Lm/usjIJdeU
-	 cmHaaBQeor1l/jDHpKDjM5c4cZjgDqFsjoB02XGN7XsegiU/v5uava5V0hiG/hDNIw
-	 r+JfjfUgTQnIw==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Ivan Vecera <ivecera@redhat.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Petr Oros <poros@redhat.com>,
-	Alexander Nowlin <alexander.nowlin@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sasha Levin <sashal@kernel.org>,
-	jiri@resnulli.us,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 7.0] dpll: export __dpll_pin_change_ntf() for use under dpll_lock
-Date: Tue,  5 May 2026 05:51:23 -0400
-Message-ID: <20260505095149.512052-7-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260505095149.512052-1-sashal@kernel.org>
-References: <20260505095149.512052-1-sashal@kernel.org>
+	s=arc-20240116; t=1777974742; c=relaxed/simple;
+	bh=mRPZME3LM56e0lzSeM5pxALY5cGtdBF6z/L1d+RxwbM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n7yFnQw0CBuR3wV5WTG78/wNewn3fFhj1MmMkUqwWGlXESPVLEkdHuy22du77spjLI8/aW8TZCGIPtiAcPwRC7F5bY3+ciOlMdLaYZsyNJVAEzoHQgUb6AWkGUSMrI2jzSXdJLraUhuzwKyIrIeY5bV4hGJZ7qXHjMUnDTtZ9mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=reJO5yV5; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=aVgCylbr; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Tue, 5 May 2026 11:52:16 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1777974738;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U8eMmdkipJzE7eL4KAxso7/4fu2d+k1GeL2q3lF/Jnk=;
+	b=reJO5yV5gcxlKrcvYoTAPEjxpC6yDVZjKXMBLf0QQIcaRe/X6PuLFwTuignss2aseJ/Lkp
+	tt5aKILJKTglnBkQ05+c7i0S1gpPUw8wEM0qv7qvGalEBAsNYi3pxrO2zHkHO+zTvlrLUF
+	MNXQIWAKrLXFi3J3xd64UaSr9+seKdOZdekRFR3f3fzzW013SukDS/m6B2A5bwmKaMXVFm
+	7kTR2ull1sf0xEmJr5XZhRhnHDD7kxAe43Y30m8jABCBYeDj9pQ0uGVtfqB6lMrSAKAlYl
+	ntGQFrKywYVqKnYE2g2WjIF8eAypP+h8adSso+VB0w/4fUmbnHKM0EX5OW6/5A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1777974738;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U8eMmdkipJzE7eL4KAxso7/4fu2d+k1GeL2q3lF/Jnk=;
+	b=aVgCylbrpBIcGLTZe0J4JtiYVcLTfNITiz+Knu6Ku5+ZpMemNSXfN3oxsqY6atHIPd6In5
+	FulRJsYTJyS8osCQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Chintan Vankar <c-vankar@ti.com>, Danish Anwar <danishanwar@ti.com>,
+	Daolin Qiu <d-qiu@ti.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Felix Maurer <fmaurer@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Neelima Muralidharan <neelima@ti.com>,
+	Paolo Abeni <pabeni@redhat.com>, Praneeth Bajjuri <praneeth@ti.com>,
+	Pratheesh Gangadhar TK <pratheesh@ti.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Vignesh Raghavendra <vigneshr@ti.com>
+Subject: Re: [PATCH RFC net-next v3] hsr: Allow to send a specific port and
+ with HSR header
+Message-ID: <20260505095216.T02Z4R1T@linutronix.de>
+References: <20260429-hsr_ptp-v3-1-afbf8f200f48@linutronix.de>
+ <willemdebruijn.kernel.31592d82701e5@gmail.com>
+ <20260504085911.nLZLRjPF@linutronix.de>
+ <willemdebruijn.kernel.22897601ad5fe@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 7.0.3
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: D457C4CA3C5
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <willemdebruijn.kernel.22897601ad5fe@gmail.com>
+X-Rspamd-Queue-Id: D001F4CA347
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284291-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-284292-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,ti.com,davemloft.net,google.com,redhat.com,kernel.org,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,linux.dev:email,msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linutronix.de:dkim,linutronix.de:mid]
 
-From: Ivan Vecera <ivecera@redhat.com>
+On 2026-05-04 13:08:04 [-0400], Willem de Bruijn wrote:
+> > > > +#define HSR_INLINE_HDR	0xaf485352
+> > > > +struct hsr_inline_header {
+> > > > +	uint8_t tx_port;
+> > > > +	uint8_t hsr_hdr;
+> > > > +	uint8_t __pad0[4];
+> > > > +	uint32_t magic;
+> > > > +	uint8_t __pad1[2];
+> > > > +	uint16_t eth_type;
+> > > > +} __packed;
+> > > > +
+> > > 
+> > > No specific need to make this header ethhdr like?
+> > 
+> > What do you mean? eth_type is at the same spot or do you mean it should
+> > be named h_proto?
+> 
+> I mean there is no reason your fake header needs to be 14B or
+> or otherwise resemble an Ethernet header.
+> 
+> That ties into my last comment to use sizeof(struct hsr_inline_header)
+> where working with that header, rather than ETH_HLEN. It is an
+> independent header.
 
-[ Upstream commit 620055cb1036a6125fd912e7a14b47a6572b809b ]
+But I can't expect that the header is always there. A random ping/ arp
+packet goes via the same flow. At the same time I don't want to make it
+mandatory for all AF_PACKET users by checking the skb's socket.
 
-Export __dpll_pin_change_ntf() so that drivers can send pin change
-notifications from within pin callbacks, which are already called
-under dpll_lock. Using dpll_pin_change_ntf() in that context would
-deadlock.
+The skb starts always with the ethernet header. To avoid collisions with
+a regular packet that looks similar I use the ether-type of the ethernet
+frame and it has to match PTP. It makes no sense to send a PTP packet via
+HSR. Since ether-type is at the end, I can't make it smaller than 14b.
+So eth-type is safeguard #1 and the second is SRC-MAC with a multicast
+sender bit set which is usually not the case.
 
-Add lockdep_assert_held() to catch misuse without the lock held.
+> This padding and packing is unnecessary.
 
-Acked-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-Signed-off-by: Petr Oros <poros@redhat.com>
-Tested-by: Alexander Nowlin <alexander.nowlin@intel.com>
-Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Link: https://patch.msgid.link/20260427-jk-iwl-net-petr-oros-fixes-v1-9-cdcb48303fd8@intel.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
+The padding is needed to match the ethernet-type and restrict it to PTP
+only. Then packing is needed so it is not aligned by the compiler.
 
-LLM Generated explanations, may be completely bogus:
+> > > > diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
+> > > > index 5555b71ab19b5..ac39b2347aa0f 100644
+> > > > --- a/net/hsr/hsr_device.c
+> > > > +++ b/net/hsr/hsr_device.c
+> > > > @@ -228,20 +228,51 @@ static netdev_tx_t hsr_dev_xmit(struct sk_buff *skb, struct net_device *dev)
+> > > >  
+> > > >  	rcu_read_lock();
+> > > >  	master = hsr_port_get_hsr(hsr, HSR_PT_MASTER);
+> > > > -	if (master) {
+> > > > -		skb->dev = master->dev;
+> > > > -		skb_reset_mac_header(skb);
+> > > > -		skb_reset_mac_len(skb);
+> > > > -		spin_lock_bh(&hsr->seqnr_lock);
+> > > > -		hsr_forward_skb(skb, master);
+> > > > -		spin_unlock_bh(&hsr->seqnr_lock);
+> > > > -	} else {
+> > > > -		dev_core_stats_tx_dropped_inc(dev);
+> > > > -		dev_kfree_skb_any(skb);
+> > > > +	if (!master)
+> > > > +		goto drop;
+> > > > +
+> > > > +	skb->dev = master->dev;
+> > > > +	if (skb->len > ETH_HLEN * 2) {
+> > > > +		struct hsr_inline_header *hsr_opt;
+> > > > +
+> > > > +		BUILD_BUG_ON(sizeof(struct hsr_inline_header) != sizeof(struct ethhdr));
+> > > > +		hsr_opt = (struct hsr_inline_header *)skb_mac_header(skb);
+> > > > +		if (hsr_opt->eth_type == htons(ETH_P_1588) &&
+> > > > +		    hsr_opt->magic == htonl(HSR_INLINE_HDR)) {
+> > > > +			enum hsr_port_type tx_port;
+> > > > +			bool has_header;
+> > > > +
+> > > > +			has_header = hsr_opt->hsr_hdr;
+> > > > +			tx_port = hsr_opt->tx_port;
+> > > > +			if (tx_port != HSR_PT_SLAVE_A && tx_port != HSR_PT_SLAVE_B)
+> > > > +				goto drop;
+> > > > +
+> > > > +			if (!hsr_skb_add_header_port(skb, has_header, tx_port))
+> > > > +				goto drop;
+> > > 
+> > > All use of this information happens in the context of this ndo_start_xmit?
+> > 
+> > I receive it from af_packet in HSR's ndo_start_xmit, yes. Then
+> > hsr_xmit() is forwarding it to the slave device via dev_queue_xmit().
+> > Here the skb->cb information gets overwritten.
+> > 
+> > I need this hint in the slave eth driver in case there is hsr-offloading
+> > available. 
+> 
+> This assumes that the slave device is somehow HSR aware. But standard
+> net_devices are not?
 
-## Phase 1: Commit Message Forensics
-Step 1.1 Record: subsystem `dpll`; action verb `export`; intent is to
-expose `__dpll_pin_change_ntf()` so drivers can notify pin changes while
-already under `dpll_lock`.
+Yes, standard devices are not hsr-aware. It is just your average
+ethernet device that sends everything as-is.
+But you can have devices with HSR-offload capabilities such as
+NETIF_F_HW_HSR_FWD, NETIF_F_HW_HSR_DUP, NETIF_F_HW_HSR_TAG_INS,
+NETIF_F_HW_HSR_TAG_RM.
 
-Step 1.2 Record: tags present: `Acked-by: Vadim Fedorenko`; `Signed-off-
-by: Ivan Vecera`; `Signed-off-by: Petr Oros`; `Tested-by: Alexander
-Nowlin`; `Reviewed-by: Arkadiusz Kubalewski`; `Signed-off-by: Jacob
-Keller`; `Link: https://patch.msgid.link/20260427-jk-iwl-net-petr-oros-
-fixes-v1-9-cdcb48303fd8@intel.com`; `Signed-off-by: Paolo Abeni`. No
-`Fixes:`, `Reported-by:`, or `Cc: stable`.
+So if a device provides NETIF_F_HW_HSR_TAG_INS and it is enabled
+(via ethtool -K) then the HSR stack will pass regular skb and the device
+will prepend the HSR-header (and maintain the HSR-sequence number and so
+on) before putting it on the wire.
+Also, the HSR stack will send a skb on both slave interfaces which are
+regular ethernet devices. But with NETIF_F_HW_HSR_DUP enabled it will
+pass it only to the first slave and expect the underlying device to
+forward it also via the other slave interface.
 
-Step 1.3 Record: the message describes a real locking problem: pin
-callbacks are already invoked with `dpll_lock` held, and calling
-exported `dpll_pin_change_ntf()` there would try to acquire the same
-mutex again and deadlock. It adds a lockdep assertion to catch misuse.
+So I need to pass skb which is can be sent by a dumb device but at the
+same time a device which does offload needs to be able to know when it
+should not do it.
 
-Step 1.4 Record: this is a hidden/preparatory bug fix. Alone it mostly
-exports an internal helper, but in the verified series it enables the
-following ice fix to send peer DPLL notifications without self-
-deadlocking.
+> Isn't it HSR's ndo_start_xmit that selects which slave to forward to,
+> based on the information in this header?
 
-## Phase 2: Diff Analysis
-Step 2.1 Record: files changed are `drivers/dpll/dpll_netlink.c` `+10`,
-`drivers/dpll/dpll_netlink.h` `-2`, and `include/linux/dpll.h` `+1`;
-total `11 insertions, 2 deletions`. Modified function:
-`__dpll_pin_change_ntf()`. Scope is small and contained.
+Yes, this is correct. I needed to verify that the slave device with
+offload capabilities does not send the skb on both ports and add a
+HSR header while doing so. The non-offloading devices are not an issue,
+it sends packets as-is.
+I managed to rework it and it works without the skb-ext. I just track
+the HSR mode (HSR vs PRP) and then parse the packet for its type and
+decide what needs to be done.
+This works now. Once we settle on the header I can repost it.
 
-Step 2.2 Record: before, only `dpll_pin_change_ntf()` was exported and
-it always acquired `dpll_lock`; the unlocked helper was internal. After,
-the helper is documented, asserts `dpll_lock` is held, is exported GPL-
-only, and its declaration moves from private dpll header to public
-kernel dpll header.
-
-Step 2.3 Record: bug category is synchronization/deadlock avoidance plus
-prerequisite API exposure for a driver bug fix. The specific mechanism
-is avoiding recursive acquisition of non-recursive `dpll_lock` from
-callbacks already reached through `dpll_pin_pre_doit()`.
-
-Step 2.4 Record: fix quality is good: minimal, obvious, lockdep-guarded,
-no userspace ABI, no broad refactor. Regression risk is low; the main
-concern is that it is useful only with the dependent ice fixes.
-
-## Phase 3: Git History Investigation
-Step 3.1 Record: `git blame` showed `dpll_pin_change_ntf()` came from
-`9d71b54b65b1` in v6.7-era dpll netlink code; `__dpll_pin_change_ntf()`
-declaration was added by `58256a26bfb3`, first in v6.17. The ice bug
-being fixed by the dependent commits was introduced by `2dd5d03c77e2`,
-first in v6.17.
-
-Step 3.2 Record: candidate has no `Fixes:` tag. Related follow-up
-commits `1a41b58fd4dc` and `9e5dead140af` both fix `2dd5d03c77e2 ("ice:
-redesign dpll sma/u.fl pins control")`.
-
-Step 3.3 Record: recent history shows this is immediately followed by
-`ice: fix missing dpll notifications for SW pins` and `ice: add dpll
-peer notification for paired SMA and U.FL pins`; it is part of that fix
-series and is a prerequisite for the third patch.
-
-Step 3.4 Record: Ivan Vecera has multiple recent dpll commits in this
-area; Petr Oros and Intel reviewers are active in the dpll/ice code. The
-patch was committed through Paolo Abeni’s net tree path.
-
-Step 3.5 Record: dependency found: the real user-visible fix needs the
-two following ice commits. For older stable trees before v7.0, the patch
-also needs a small backport adjustment because `dpll: Add notifier chain
-for dpll events` is absent.
-
-## Phase 4: Mailing List And External Research
-Step 4.1 Record: `b4 dig -c 620055cb1036a` found the original applied
-submission as `[PATCH net 09/11]` at `20260427-jk-iwl-net-petr-oros-
-fixes-v1-9-cdcb48303fd8@intel.com`. `b4 dig -a` showed earlier v4-v7
-iterations of the ice DPLL fix series; v7 split the ice fix as requested
-by review.
-
-Step 4.2 Record: `b4 dig -w` showed netdev maintainers and relevant
-Intel/dpll reviewers were CC’d, including David Miller, Eric Dumazet,
-Jakub Kicinski, Paolo Abeni, Jiri Pirko, Vadim Fedorenko, Arkadiusz
-Kubalewski, Jacob Keller, Intel wired LAN, and netdev.
-
-Step 4.3 Record: lore mirror confirmed the series purpose: SMA/U.FL
-software-controlled pins missed DPLL notifications, and userspace
-consumers such as `synce4l` would not learn about state/phase-offset
-changes. Alexander Nowlin provided `Tested-by`; Arkadiusz Kubalewski
-reviewed.
-
-Step 4.4 Record: related patches are the following two ice commits;
-patch 3 specifically calls `__dpll_pin_change_ntf()` from dpll pin
-callbacks because `dpll_lock` remains held.
-
-Step 4.5 Record: direct lore stable search via WebFetch was blocked by
-Anubis; web search found no stable-specific objection or discussion.
-
-## Phase 5: Code Semantic Analysis
-Step 5.1 Record: modified function is `__dpll_pin_change_ntf()`.
-
-Step 5.2 Record: callers are `dpll_pin_change_ntf()`, internal dpll
-netlink setters, dpll core ref-sync code, and after the dependent patch,
-`ice_dpll_sw_pin_notify_peer()`.
-
-Step 5.3 Record: callees are `lockdep_assert_held(&dpll_lock)`,
-`dpll_pin_notify()` on v7.0+, and `dpll_pin_event_send()`.
-
-Step 5.4 Record: user reachability is through generic netlink
-`DPLL_CMD_PIN_SET`, which uses `dpll_pin_pre_doit()` and
-`dpll_pin_post_doit()` around the operation. The netlink operation is
-admin-permission gated, so this is not an unprivileged trigger.
-
-Step 5.5 Record: existing internal `__dpll_pin_change_ntf()` callers are
-in dpll code under dpll locking. The problematic missing pattern was an
-exported helper for already-locked driver callback context.
-
-## Phase 6: Stable Tree Analysis
-Step 6.1 Record: affected stable trees are v6.17+, because
-`2dd5d03c77e2` exists in `stable/linux-6.17.y`, `6.18.y`, `6.19.y`, and
-`7.0.y`. It is absent from `6.12.y` and older checked branches;
-`drivers/dpll` is absent in `6.6.y`.
-
-Step 6.2 Record: current `7.0.y` accepts the patch with `git apply
---check`. `git merge-tree` showed `6.17.y`-`6.19.y` need minor backport
-adjustment because they lack the dpll notifier-chain change; `7.0.y` is
-straightforward.
-
-Step 6.3 Record: stable branches checked do not contain this candidate
-or the dependent two ice fixes.
-
-## Phase 7: Subsystem And Maintainer Context
-Step 7.1 Record: subsystem is dpll core plus Intel ice networking driver
-context. Criticality is important but hardware/config-specific: users of
-DPLL-capable Intel ice devices and DPLL netlink consumers.
-
-Step 7.2 Record: dpll and ice DPLL code are actively developed; recent
-history shows several related dpll/ice fixes, including missing SMA
-initialization and paired-pin state fixes.
-
-## Phase 8: Impact And Risk
-Step 8.1 Record: affected population is driver-specific: DPLL-capable
-Intel ice hardware using SMA/U.FL software-controlled pins.
-
-Step 8.2 Record: trigger is DPLL pin state/direction changes or periodic
-DPLL updates on affected hardware. Userspace impact is missed netlink
-notifications and stale phase-offset reporting; triggering netlink
-changes requires admin privileges.
-
-Step 8.3 Record: failure mode severity is medium for the user-visible
-bug: time-sync management software can miss DPLL pin transitions/phase-
-offset changes. The locking issue would be a deadlock if the public
-helper were used in the already-locked callback path.
-
-Step 8.4 Record: benefit is medium-high for affected hardware and
-required for the real ice fix; risk is low because the change is tiny,
-GPL-only, lockdep-guarded, and does not alter userspace ABI.
-
-## Phase 9: Final Synthesis
-Evidence for backporting: it is a small, reviewed, tested prerequisite
-for real ice DPLL notification fixes; it prevents a concrete self-
-deadlock in the callback context verified through `dpll_pin_pre_doit()`
-locking; affected stable trees contain the buggy ice redesign from v6.17
-onward.
-
-Evidence against backporting: by itself it is mostly an exported in-
-kernel helper, so it should not be backported alone for standalone
-value. Older affected stable trees need a minor manual backport due to
-missing dpll notifier-chain code.
-
-Stable rules checklist: obviously correct and tested: yes; fixes/enables
-fix for real user-visible bug: yes, as part of the series; important
-issue: medium functional correctness and deadlock avoidance; small and
-contained: yes; no userspace API: yes; applies: clean on `7.0.y`, minor
-backport for `6.17.y`-`6.19.y`.
-
-Exception category: not a device ID or quirk. This is an acceptable
-prerequisite/helper export for a stable-worthy driver fix series.
-
-Verification:
-- Phase 1: parsed `git show 620055cb1036a`; confirmed tags and no
-  `Fixes:`.
-- Phase 2: inspected diff; confirmed `11 insertions, 2 deletions` across
-  three files.
-- Phase 3: ran `git blame` and `git show` for `9d71b54b65b1`,
-  `58256a26bfb3`, `2dd5d03c77e2`.
-- Phase 4: ran `b4 dig -c`, `-a`, `-w`; fetched lore mirror thread
-  showing v7 review, `Tested-by`, and `Reviewed-by`.
-- Phase 5: searched callers and dpll netlink ops; verified
-  `DPLL_CMD_PIN_SET` uses `dpll_pin_pre_doit()` and callbacks run while
-  `dpll_lock` is held.
-- Phase 6: checked stable branches for `2dd5d03c77e2`, candidate
-  absence, dependent fix absence, and merge-tree/apply behavior.
-- Phase 7: reviewed recent dpll and ice DPLL history.
-- Phase 8: verified trigger/user impact from the dependent ice commit
-  messages and diffs.
-
-Backport recommendation: backport this commit to affected stable trees
-together with `1a41b58fd4dc` and `9e5dead140af`; do not take it alone
-unless it is queued as that prerequisite.
-
-**YES**
-
- drivers/dpll/dpll_netlink.c | 10 ++++++++++
- drivers/dpll/dpll_netlink.h |  2 --
- include/linux/dpll.h        |  1 +
- 3 files changed, 11 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
-index 83cbd64abf5a4..95ae786e98aab 100644
---- a/drivers/dpll/dpll_netlink.c
-+++ b/drivers/dpll/dpll_netlink.c
-@@ -842,11 +842,21 @@ int dpll_pin_delete_ntf(struct dpll_pin *pin)
- 	return dpll_pin_event_send(DPLL_CMD_PIN_DELETE_NTF, pin);
- }
- 
-+/**
-+ * __dpll_pin_change_ntf - notify that the pin has been changed
-+ * @pin: registered pin pointer
-+ *
-+ * Context: caller must hold dpll_lock. Suitable for use inside pin
-+ *          callbacks which are already invoked under dpll_lock.
-+ * Return: 0 if succeeds, error code otherwise.
-+ */
- int __dpll_pin_change_ntf(struct dpll_pin *pin)
- {
-+	lockdep_assert_held(&dpll_lock);
- 	dpll_pin_notify(pin, DPLL_PIN_CHANGED);
- 	return dpll_pin_event_send(DPLL_CMD_PIN_CHANGE_NTF, pin);
- }
-+EXPORT_SYMBOL_GPL(__dpll_pin_change_ntf);
- 
- /**
-  * dpll_pin_change_ntf - notify that the pin has been changed
-diff --git a/drivers/dpll/dpll_netlink.h b/drivers/dpll/dpll_netlink.h
-index dd28b56d27c56..a9cfd55f57fc4 100644
---- a/drivers/dpll/dpll_netlink.h
-+++ b/drivers/dpll/dpll_netlink.h
-@@ -11,5 +11,3 @@ int dpll_device_delete_ntf(struct dpll_device *dpll);
- int dpll_pin_create_ntf(struct dpll_pin *pin);
- 
- int dpll_pin_delete_ntf(struct dpll_pin *pin);
--
--int __dpll_pin_change_ntf(struct dpll_pin *pin);
-diff --git a/include/linux/dpll.h b/include/linux/dpll.h
-index 2ce295b46b8cd..8f97120ee7b37 100644
---- a/include/linux/dpll.h
-+++ b/include/linux/dpll.h
-@@ -276,6 +276,7 @@ int dpll_pin_ref_sync_pair_add(struct dpll_pin *pin,
- 
- int dpll_device_change_ntf(struct dpll_device *dpll);
- 
-+int __dpll_pin_change_ntf(struct dpll_pin *pin);
- int dpll_pin_change_ntf(struct dpll_pin *pin);
- 
- int register_dpll_notifier(struct notifier_block *nb);
--- 
-2.53.0
-
+Sebastian
 
