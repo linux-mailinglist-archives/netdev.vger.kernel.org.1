@@ -1,159 +1,171 @@
-Return-Path: <netdev+bounces-284147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284148-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WA3EOhZG+Wki7gIAu9opvQ
-	(envelope-from <netdev+bounces-284147-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 03:21:26 +0200
+	id UM7KIIVG+Wki7gIAu9opvQ
+	(envelope-from <netdev+bounces-284148-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 03:23:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 889894C5B8C
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 03:21:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBBC14C5BAC
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 03:23:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F1F893009098
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 01:21:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 97DBE3010B8E
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 01:23:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEBD3317143;
-	Tue,  5 May 2026 01:21:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16FE5332621;
+	Tue,  5 May 2026 01:23:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HHSaAKe3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KL4gnMYl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9F430FC26;
-	Tue,  5 May 2026 01:21:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777944084; cv=none; b=QTR70IVPGF8syBT+vEgyzZLaSsH2b+o1hYtDyrATxHY4DRUfnkLbZjoXdqBe1FOXex7QtAq0ZYaBPyydZF3NHwU5ZvpP9DIWRa/8N1vnH8ij0DIAX+1pY5wRc3+ePnhsxkwPxXik/1IeQnu/aUDJ3T8f20R31rbbEVYYaYSf2ik=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777944084; c=relaxed/simple;
-	bh=WFjVRf1GxXlnia9YSNKUChMaNSiPGz8MkXkFb/g359A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UVh9J8PhHdv0eIWQn28nq9aQ0jKxAvoPr3OxCplQ+D4gcEGmWS0Ed2TRsrt3iOhjJqVvtowpHbq0BuVMxcyRJO68Szdbxbc+0UhWl6DWQKZ6O8zKmOfdEguZZJUv0Qj0NMdqEdNHeYVJBtBRxD3phf1TusI1GOfQcUnAA/yQelc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HHSaAKe3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30F9FC2BCB8;
-	Tue,  5 May 2026 01:21:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777944084;
-	bh=WFjVRf1GxXlnia9YSNKUChMaNSiPGz8MkXkFb/g359A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HHSaAKe3Lvevpp9ukIS8pu43GTcOlDXPBXk4kZAfqJ5uPLx9cGKcudfMCfdXt9dOu
-	 bQLgjOTAne3LS+CNOKX2keDrtCJfxZE8AjxP7OMHRXMiKlYM/P4zqkAoEyLZtJ9spa
-	 ByYrhpigZlvF+tZ+qr02Xyv7M2X2tvqByAdp4ATplY5Hbnhrf3BzQy8U8cwHgyBd8g
-	 tebi87vk+hL1ZqqD5yM1KIFZ/QJw0+xb+G6KloZdtBIeuurghRY5WyqA/nGjamkP2i
-	 lmtspc8HFGWk+s9ytolI5fS+Nr4ujKFU3ocQPHWOwzYYoEcFJCwFzGbwbAIiFaeZ8n
-	 qC0EXobeSG4wg==
-Date: Mon, 4 May 2026 18:21:22 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Leon Romanovsky <leon@kernel.org>,
- Jason Gunthorpe <jgg@ziepe.ca>, Saeed Mahameed <saeedm@nvidia.com>, Shay
- Drory <shayd@nvidia.com>, Or Har-Toov <ohartoov@nvidia.com>, Edward Srouji
- <edwards@nvidia.com>, Maher Sanalla <msanalla@nvidia.com>, Simon Horman
- <horms@kernel.org>, Gerd Bayer <gbayer@linux.ibm.com>, Moshe Shemesh
- <moshe@nvidia.com>, Kees Cook <kees@kernel.org>, Patrisious Haddad
- <phaddad@nvidia.com>, Parav Pandit <parav@nvidia.com>, Carolina Jubran
- <cjubran@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, Gal Pressman <gal@nvidia.com>, Dragos Tatulea
- <dtatulea@nvidia.com>
-Subject: Re: [PATCH net-next V2 7/7] net/mlx5: Add profile to auto-enable
- switchdev mode at device init
-Message-ID: <20260504182122.08efb41e@kernel.org>
-In-Reply-To: <cc01cca2-0e5d-4db2-81e4-7ea9fe525320@nvidia.com>
-References: <20260501041633.231662-1-tariqt@nvidia.com>
-	<20260501041633.231662-8-tariqt@nvidia.com>
-	<421e8885-5849-4390-8956-9bc344fa0bf0@nvidia.com>
-	<20260502184153.4fd8d06f@kernel.org>
-	<cc01cca2-0e5d-4db2-81e4-7ea9fe525320@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2565C613
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 01:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777944195; cv=pass; b=pKPTCb27J8JcGzjjfNY+KZKe0w6TvzBW8WWKYRrPK7rcz38NOSK+Nozrn3c8VsyKzDtl2MMsTIyh5EZ/LsY46z9gdmKPgxzFm9c3x8VLlmcc/1Uff3PwlOyy8fc94GxbFM0G56Qm3tXixM3RFDzHHLfU/zq5diosOGmRjBkroKk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777944195; c=relaxed/simple;
+	bh=Rr3wU4+uo7PsSxYrNtmT6CjW/2oWhP4X5/7X8ZQP0tA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=L1Qu7Y8b6jorxxuO0cawEws3HWk4kZBIQen7WUjskq3ewR26uysyQHCuKZdoBDCyhBDVt6mtEDODdk2sjDEGZEKL0VK2E8iHk0cwY9o44Yght8mzmxCYq6wm0pAjRRsvHRlDTlQL+7YWqc8NwvFRFRh+uG8XTORzoUMR+jAzVus=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KL4gnMYl; arc=pass smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-67b8d9c26bbso6145045a12.2
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 18:23:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777944192; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ZFkikmQC80QjgMd96VNiIBwTGCozFw5JlfbVR2OonwMTjeu1OCkHXzQ62i06WYWpJM
+         45v1wW0zEkUAq7XWAALpDXf584nS0VpLHqcozGPLEnNDM3Y2xvLiP8R8Q+UKVclJcWp/
+         klsJOY9tOo6RZAkLm877w50bY1UtiaMNBir5zBkP08Kv/oZ0kZRCbJORczjtIf6kGK0k
+         bOOa5EpisUZkHZmCrd5DR9WV3YDbgjKEcT480RZxFFE8fX5m7elp1B11Q6o7YXaWejnp
+         OIwe4HG11vJzNFjuDq6rn6fLj0BlGAR7OeQ8qIqZy3HVn58wqrgxcgNKpeHMPiTMm182
+         BkRg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=cCXrAWmoAymL9ifKCG4c/wEuHOu5FPfo6N65MqG9vPs=;
+        fh=iuRHt7dolYZH6iFBvp8zeByKnv36cRFQjsgFAkZBaeE=;
+        b=CPch1yAiQkeXvL5nyuzFRfGsHTERBDmDd3ytoqzieQbNwcJsnVq/8kFwaOXRRZt79E
+         Dn4h4o/YCrpay+OiH5dqOEIQXKIdi7PthFZ6u1sl0hrsruqoR7TMdq3ky2a2ddb5qkVC
+         zoi0dxZUBi38YjxH0BPgoCaZxf037aJDhzS3R+809i4MwqUvzbxaJgpUGTcBque35giX
+         hdsnO21z7LLe9n0dXQsOCRtmXEDQWWDSUfR4ThFj5Bzdm6ogCfHbADiC2YkWUNcbJ1wG
+         sXh++5h4yVns9ckYg2hLzCMeEz25pAOvHIicDJcxdr33wKzk2e4UctYuiK1xLFiT9rpl
+         SlDQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777944192; x=1778548992; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cCXrAWmoAymL9ifKCG4c/wEuHOu5FPfo6N65MqG9vPs=;
+        b=KL4gnMYlcA1PF8bTf7kOe2sd5FK3/paFvLZPyIrGLO/mpUp05Wk357vRzuAVydpSzX
+         fHLbvt2C2I7+x8Nc83g56+DwMz2fIJ4bxIC0suemFM5i9FulLwqe7Nb/3xHpaMeHl03b
+         9IDX+bvC2KLMQDPuSD7PwNN7SqpfDQ+iKXase/bJmSEFlYE7g8eKnc5qSVvJCTAHEbKQ
+         m7iixZKURyplgTeE24eOIsNftklf9pyN2rR/PDdm4fHlwp0l1KSIStQf3pIxV2cY++Qs
+         Wa+/E6sB+cdfVjMLI7n51C2VVKvrjMQILqbdBfIr1mq7BkhQpdDi3LVet4vUo2v4eVe1
+         NElQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777944192; x=1778548992;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=cCXrAWmoAymL9ifKCG4c/wEuHOu5FPfo6N65MqG9vPs=;
+        b=Nvsj5n1kgmfynJlJUBQUopEyprdKUX0I7zcPqsZh5d0z1N3QTW6RcuMOR1537y6DHG
+         9mtrO6pWjI1UVX/qsbk2+HONmttO+SXxoL6Pg+dnmmjTuh0cxrnRPONQ1i3aOF0a06ZU
+         SGbnT8pAW/aLCmmw+iYHOAlCt2JTpsfXT5Xq992qDn8Y6or/Oa8D55CyfUsHa5v5ywJl
+         CCY7unS4vCmlI8alvbTMGp52FXZEQ2nXR4QQ1yPdICanE2zeFg9wJn8h3n3Xn86PDyKh
+         50SYoueKaj5rcUCHpkx4o22SdjXp0siqff1D+UStuqDyR1sl5Lv1oFTXUGjb37OtCSEf
+         vjyQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/dLDpXlb1QjH5x6/oWgjxz82qbOcGoH72A5SFVlOjWF16pxA57BaWkFczWK+oTc/thwPW1W5I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyb5xt/Pdlfr25D0xfK+QkzNNm/A6q8L6P6MWMR1mSzejuQxe1S
+	0IoegaL5uP4GNGAFvLoWgKCU7Uy+EpwLZVu/oJrY5oBuLUb3+9QFoZ4p2dNk7dCDzTaAN8P38lR
+	MlaeOMch0YY5DaDjAmdnTjdid42BONcQ=
+X-Gm-Gg: AeBDiet2yyYCtyViyIe2dcaD2WJb/DFPega5S2eXPp/L0Qin+sxXxeGrZJT64NZ4lMn
+	8ovodr5pMgAY0hegonXU+0lH/SeXjoxNI93olaN95gCK/kUF1uAKYTmq6qcU62W7vEOsdXrEO1R
+	cxycmsgzIGqatUYK3wJ+mFbxfBstXqwvagpvC2bHhTUq5yifequaZinx3LX5nsgEH8mqRa7aY9z
+	ZQE3xc26I808lr5OwedZ1g8GLnMYuBvAQnl/GVz0iU8GgGw2EBHrC0Q70rTPJfzkchIP9TaSB4s
+	wfezaf6iCWf/IEXg1tU=
+X-Received: by 2002:aa7:c904:0:b0:66e:43ef:2951 with SMTP id
+ 4fb4d7f45d1cf-67c19929fdamr4132069a12.4.1777944191864; Mon, 04 May 2026
+ 18:23:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20260505-seg6-mobile-v2-0-9e8022bdfdb6@gmail.com> <20260504163915.4a8b028e@kernel.org>
+In-Reply-To: <20260504163915.4a8b028e@kernel.org>
+From: Yuya Kusakabe <yuya.kusakabe@gmail.com>
+Date: Tue, 5 May 2026 10:22:58 +0900
+X-Gm-Features: AVHnY4Ks42sm_qgbhHJDSLEyR_36W-fEa54mnTPR5nGVrmyYGFlRodbG56Qn8nQ
+Message-ID: <CAGCJULP83NnaX6HAqwb3umDXsxN8LH48_gPpJ_3gG8_xA96QNQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/7] seg6: add SRv6 Mobile User Plane (RFC 9433) behaviors
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Andrea Mayer <andrea.mayer@uniroma2.it>, Shuah Khan <shuah@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, 
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 889894C5B8C
+X-Rspamd-Queue-Id: DBBC14C5BAC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284147-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-284148-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[yuyakusakabe@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[26];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[]
 
-On Sun, 3 May 2026 10:51:06 +0300 Mark Bloch wrote:
-> On 03/05/2026 4:41, Jakub Kicinski wrote:
-> > On Sat, 2 May 2026 23:08:43 +0300 Mark Bloch wrote: =20
-> >> Before I respin for the unrelated MR_CACHE cleanup, I=E2=80=99d like t=
-o confirm
-> >> whether the opt-in profile approach is acceptable at all. Regardless
-> >> of this last patch, the first 6 patches fix real representor/LAG locki=
-ng
-> >> issues and are needed independently, so I=E2=80=99d like to keep those=
- moving toward
-> >> acceptance as soon as possible. =20
-> >=20
-> > For probe-time config module param is probably our only option.
-> > I'd obviously prefer to have a devlink-level knob for this, instead=20
-> > of a mlx5 specific one. Can we come up with some format that'd apply
-> > more broadly? devlink=3D[$bfd:]flag1 ? so devlink=3D[$bdf:]switchdev-mo=
-de ? =20
->=20
-> I=E2=80=99m not convinced this is really a generic devlink knob problem.
+2026=E5=B9=B45=E6=9C=885=E6=97=A5=E7=81=AB=E6=9B=9C=E6=97=A5 Jakub Kicinski=
+ <kuba@kernel.org>:
+> Could you switch to posting this as an RFC until you gather some review
+> tags? Our CI require manual intervention to add the necessary iproute2
+> patches, I suspect there may be some uAPI changes therefore requiring
+> iproute2 changes here.
 
-I'm surprised you say that. Anyone using switchdev mode could benefit.
-Having the probe in one mode and switch adds to boot time. Whether it's
-a DPU or not is quite secondary.
+Will do.  Yes, this series adds new SEG6_LOCAL_* / SEG6_LOCAL_MOBILE_*
+uAPI in include/uapi/linux/seg6_local.h; the matching iproute2-next
+series is posted separately:
 
-Unless there's another deeper reason which makes the DPU incapable of
-running in the non-switchdev mode. But not sure that squares with the
-code you posted AFAICT.
+  https://lore.kernel.org/netdev/20260505-seg6-mobile-v2-0-93291b7b0134@gma=
+il.com/
 
-> A device should probe in its selected/default configuration. For DPU
-> deployments switchdev is the expected operating mode. mlx5 just made the
-> wrong default choice historically, and this profile is a way to move away
-> from that without forcing it on everyone at once. I expect/hope to move
-> quickly from this flag to simply making switchdev the driver default for
-> all DPU configs.
->=20
-> A generic cmdline format also gets complicated quickly: vendor-specific
-> flags, ordering/dependencies between flags, hotplug timing, and whether a
-> BDF rule should apply when a device is passed into a VM after boot.
-> Userspace scripts are probably better for that kind of policy because
-> they can carry real site specific logic.
->=20
-> I=E2=80=99ll drop this last patch from the series for now so the represen=
-tor/LAG
-> locking fixes can move independently and we can continue the default
-> switchdev discussion separately. I can always submit that as a standalone
-> patch later in the cycle if needed.
+Just to confirm the workflow you'd prefer: should I repost the
+current series immediately as [PATCH RFC net-next v3 ...], or wait
+for technical review on v2 to land and fold it into a v3 RFC?
 
-SG
+Thanks,
+Yuya
 
