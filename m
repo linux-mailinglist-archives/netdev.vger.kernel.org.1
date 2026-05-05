@@ -1,65 +1,66 @@
-Return-Path: <netdev+bounces-284472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284473-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0HVXJikN+mntIgMAu9opvQ
-	(envelope-from <netdev+bounces-284472-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 17:30:49 +0200
+	id UIKJJkAN+mkRIwMAu9opvQ
+	(envelope-from <netdev+bounces-284473-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 17:31:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 897AF4D037C
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 17:30:48 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1068D4D03AA
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 17:31:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C85E1301020F
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 15:30:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2FA08305E8A1
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 15:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68D88481AA4;
-	Tue,  5 May 2026 15:30:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAE4B481FBD;
+	Tue,  5 May 2026 15:30:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fw5Zm5p6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QTKWyuTY"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0483AA4EF;
-	Tue,  5 May 2026 15:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52736481FD9;
+	Tue,  5 May 2026 15:30:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777995038; cv=none; b=PnXb368dVAx77xpe9M4vk6X53fKlR/07URJ2nXE35UBxBHXzyHMXW7l4xhbqWwWFD9RbkrUMfN3g48ppbDBvCphzxmkjW4YX1pH1t4MefxcXaxUKh2t+UV5inmjqdfUhJrH/yZu6WUnRBs0mx9AXBu1lh++s+p27ZRd2gHvjAG0=
+	t=1777995042; cv=none; b=tAbbkj/aqes6Br70eRDnTrgW7z4LMsBo8X9BkL0tvjvtWrQs75dFVMYJ4jSJKB6Nip5foZYwrfsMaqHKXr4IeUzn42RcEIzEzlG0nrufLzyOP3IpA4JFFb0iOvySutiJESrqzLogduwkhKPu9jo5N21keUou0TCzfPNwt8u3Yhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777995038; c=relaxed/simple;
-	bh=Ok+4ECv3s+pYujUHLo68Z1g1L6HzzFD6IgmwTokVWG0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ef6I5/A80LO/0JwaSa16OBOl2bycOl+mUMhnWQgbOrc6RdrwZuLX/znNj0nLSt5LvVthKO287eMqNr0r5kOiv1IgC67CQRywdRyI8V5ZMi1nXx5iSUxdJbzWzIO9eJev5Qp90twXXbsubFd1KgfdHWB7808mwaLLJBPwnglXc3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fw5Zm5p6; arc=none smtp.client-ip=192.198.163.7
+	s=arc-20240116; t=1777995042; c=relaxed/simple;
+	bh=kWcwf0Pqoi1nF34RkwExtM44zrZTcgqZcEE8ex7b8QM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=bmrr2MY1iooP3qLZY74vgBDcmMxU3McvYSb85UzeAD2U2b7852a+8nLgOjCBEYmVF0x0TyuAN8ItZXdRRMOqce446OdsAbvX8HHLybqpDZYKCGbd+0Z0msu3D/BLG4LDDmNDP5TpUE9cvCgg/z7s5JKE/WRnsM6L92GdWT9zZ8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QTKWyuTY; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777995037; x=1809531037;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Ok+4ECv3s+pYujUHLo68Z1g1L6HzzFD6IgmwTokVWG0=;
-  b=fw5Zm5p6F7P6VRdPkTcpI2d9OrMSx3RcU6TmW4BT22y8/qhqVXnCG2kx
-   Sb1vuJSm1SR8Je3nO4+AhmEwzKrGKfSCrs3xJNdnnhLaWwtBeMyfcDUq1
-   +iUFPzFom/m7UU0Ywym4HJvHKn+L2zhiDyjV/HJ5g+UtbFFM6BBEgJthI
-   S1yd4qYjbTTx5VhRAHoJpfQwTSykQFZVzIaTlgouoo3qq30MRkvr7hCZZ
-   VuXu48EUCcYDnoKSclfiHj6ZHkoU2BME+qalXmUcIoZug7myANY0dPx28
-   y91ENYp5Fx2KaG4zkgiRI7X6G4XVhVGKMxxZ3U/Cxm6Z3b5mOwnTi2uOP
+  t=1777995041; x=1809531041;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=kWcwf0Pqoi1nF34RkwExtM44zrZTcgqZcEE8ex7b8QM=;
+  b=QTKWyuTY8hf7JT4YsMmsV13Gqz99Y958G/PLTJdyJMmvcL3Ggzu7Q4dD
+   Joi1turKKeb7TPfC1GLoVsfHJvyigBE5KMD5NaagJraMSeq6BssuNO+4T
+   4j8B7MYItKICmlWrMRTV4Pg/EGiM2aY4uVJwyL+EnUTAYAIybA/j2clzR
+   be//5ZLLsfWR8xmYExmDfqEG2h902tBsWvyFJ0+EWPxHmsqv6OQYXP7CF
+   58maczYvagMk/IW3VeSdER7ztwRpYRNzLoSzh3Vc/qdqZ09q6MlZ25Kvv
+   FVLajz53h8H47MzqtRDOk4Tty0tHehlnyu3lrMjNbitc1NqpWUFTfXxB7
    A==;
-X-CSE-ConnectionGUID: VU57b7lnQFO44pWszhKGVg==
-X-CSE-MsgGUID: g1QCqkP2RHyi7axWcfmI5w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11777"; a="104316976"
+X-CSE-ConnectionGUID: RdEXO2izRZiO7zqXNWialg==
+X-CSE-MsgGUID: zWCz20TFR7S2tuCE/fH7CA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11777"; a="104316986"
 X-IronPort-AV: E=Sophos;i="6.23,217,1770624000"; 
-   d="scan'208";a="104316976"
+   d="scan'208";a="104316986"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2026 08:30:36 -0700
-X-CSE-ConnectionGUID: DgEFnLZkSteLllHdnnS9Yg==
-X-CSE-MsgGUID: QztnzmU6Smi7nhtc0Z+reQ==
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2026 08:30:40 -0700
+X-CSE-ConnectionGUID: DPpiulblQlSzb/mGUFNU0A==
+X-CSE-MsgGUID: /Zc38cuQQ0iWTsCfszR98g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,217,1770624000"; 
-   d="scan'208";a="234971504"
+   d="scan'208";a="234971544"
 Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by orviesa010.jf.intel.com with ESMTP; 05 May 2026 08:30:33 -0700
+  by orviesa010.jf.intel.com with ESMTP; 05 May 2026 08:30:37 -0700
 From: Alexander Lobakin <aleksander.lobakin@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
@@ -77,10 +78,12 @@ Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
 	nxne.cnse.osdt.itp.upstreaming@intel.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-next v5 0/5] ice: add support for devmem/io_uring Rx and Tx
-Date: Tue,  5 May 2026 17:29:18 +0200
-Message-ID: <20260505152923.1040589-1-aleksander.lobakin@intel.com>
+Subject: [PATCH iwl-next v5 1/5] libeth: pass Rx queue index to PP when creating a fill queue
+Date: Tue,  5 May 2026 17:29:19 +0200
+Message-ID: <20260505152923.1040589-2-aleksander.lobakin@intel.com>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260505152923.1040589-1-aleksander.lobakin@intel.com>
+References: <20260505152923.1040589-1-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,7 +91,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 897AF4D037C
+X-Rspamd-Queue-Id: 1068D4D03AA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -98,7 +101,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -106,8 +109,8 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-284472-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-284473-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[aleksander.lobakin@intel.com,netdev@vger.kernel.org];
@@ -117,83 +120,160 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-0.998];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,iou-zcrx.py:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
 
-Now that ice uses libeth for managing Rx buffers and supports
-configurable header split, it's ready to get support for sending
-and receiving packets with unreadable (to the kernel) frags.
+Since recently, page_pool_create() accepts optional stack index of
+the Rx queue which the pool will be created for. It can then be
+used on control path for stuff like memory providers.
+Add the same field to libeth_fq and pass the index from all the
+drivers using libeth for managing Rx to simplify implementing MP
+support later.
+idpf has one libeth_fq per buffer/fill queue and each Rx queue has
+two fill queues, but since fill queues can never be shared, we can
+store the corresponding Rx queue index there during the
+initialization to pass it to libeth.
 
-Extend libeth just a little bit to allow creating PPs with custom
-memory providers and make sure ice works correctly with the netdev
-ops locking. Then add the full set of queue_mgmt_ops and don't
-unmap unreadable frags on Tx completion.
-No perf regressions for the regular flows and no code duplication
-implied.
-
-Credits to the fbnic developers, whose code helped me understand
-the memory providers and queue_mgmt_ops logics and served as
-a reference.
-
-Alexander Lobakin (5):
-  libeth: pass Rx queue index to PP when creating a fill queue
-  libeth: handle creating pools with unreadable buffers
-  ice: migrate to netdev ops lock
-  ice: implement Rx queue management ops
-  ice: add support for transmitting unreadable frags
-
- drivers/net/ethernet/intel/ice/ice_base.h    |   2 +
- drivers/net/ethernet/intel/ice/ice_lib.h     |  18 +-
- drivers/net/ethernet/intel/ice/ice_txrx.h    |   2 +
- drivers/net/ethernet/intel/idpf/idpf_txrx.h  |   2 +
- include/net/libeth/rx.h                      |   2 +
- include/net/libeth/tx.h                      |   2 +-
- drivers/net/ethernet/intel/iavf/iavf_txrx.c  |   1 +
- drivers/net/ethernet/intel/ice/ice_base.c    | 247 +++++++++++++++----
- drivers/net/ethernet/intel/ice/ice_dcb_lib.c |  15 +-
- drivers/net/ethernet/intel/ice/ice_eswitch.c |  26 +-
- drivers/net/ethernet/intel/ice/ice_lib.c     | 227 +++++++++++++----
- drivers/net/ethernet/intel/ice/ice_main.c    |  79 +++---
- drivers/net/ethernet/intel/ice/ice_sf_eth.c  |   4 +
- drivers/net/ethernet/intel/ice/ice_txrx.c    |  43 +++-
- drivers/net/ethernet/intel/ice/ice_xsk.c     |   4 +-
- drivers/net/ethernet/intel/idpf/idpf_txrx.c  |  13 +
- drivers/net/ethernet/intel/libeth/rx.c       |  43 ++++
- 17 files changed, 566 insertions(+), 164 deletions(-)
-
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 ---
-Note: apply to net-next, not Tony's next-queue (ready to be sent as
-a PR).
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h |  2 ++
+ include/net/libeth/rx.h                     |  2 ++
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c |  1 +
+ drivers/net/ethernet/intel/ice/ice_base.c   |  2 ++
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c | 13 +++++++++++++
+ drivers/net/ethernet/intel/libeth/rx.c      |  1 +
+ 6 files changed, 21 insertions(+)
 
-From v4[0]:
-* rebase on top of the latest net-next;
-* 3/5: fix the last [hopefully] missing netdev lock (E-Switch code,
-       Simon), rechecked with our internal Intel's Sashiko setup;
-* 3/5: pick fixes for .ndo_bpf() and safe mode from Kohei.
-
-From v3[1]:
-* rebase on top of recent Larysa's changes;
-* 3/5: fix the last locking inconsistencies (Jakub);
-* 3/5: pick a kdoc fix from Tony.
-
-From v2[2]:
-* rebase on top of net-next-7.0;
-* 3/5: fix [hopefully] all inconsistent locking (Jakub, Tony);
-* 4/5: pick a hotfix from Kohei.
-
-From v1[3]:
-* rebase on top of the latest next-queue;
-* fix a typo 'rxq_ixd' -> 'rxq_idx' (Tony).
-
-Testing hints:
-* regular Rx and Tx for regressions;
-* <kernel root>/tools/testing/selftests/drivers/net/hw/ contains
-  scripts for testing netmem Rx and Tx, namely devmem.py and
-  iou-zcrx.py (read the documentation first).
-
-[0] https://lore.kernel.org/intel-wired-lan/20260318163505.31765-1-aleksander.lobakin@intel.com
-[1] https://lore.kernel.org/intel-wired-lan/20260224174618.2780516-1-aleksander.lobakin@intel.com
-[2] https://lore.kernel.org/intel-wired-lan/20251204155133.2437621-1-aleksander.lobakin@intel.com
-[3] https://lore.kernel.org/intel-wired-lan/20251125173603.3834486-1-aleksander.lobakin@intel.com
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
+index 4be5b3b6d3ed..a0d92adf11c4 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
+@@ -748,6 +748,7 @@ libeth_cacheline_set_assert(struct idpf_tx_queue, 64,
+  * @size: Length of descriptor ring in bytes
+  * @dma: Physical address of ring
+  * @q_vector: Backreference to associated vector
++ * @rxq_idx: stack index of the corresponding Rx queue
+  * @rx_buffer_low_watermark: RX buffer low watermark
+  * @rx_hbuf_size: Header buffer size
+  * @rx_buf_size: Buffer size
+@@ -791,6 +792,7 @@ struct idpf_buf_queue {
+ 	dma_addr_t dma;
+ 
+ 	struct idpf_q_vector *q_vector;
++	u16 rxq_idx;
+ 
+ 	u16 rx_buffer_low_watermark;
+ 	u16 rx_hbuf_size;
+diff --git a/include/net/libeth/rx.h b/include/net/libeth/rx.h
+index 5d991404845e..3b3d7acd13c9 100644
+--- a/include/net/libeth/rx.h
++++ b/include/net/libeth/rx.h
+@@ -71,6 +71,7 @@ enum libeth_fqe_type {
+  * @xdp: flag indicating whether XDP is enabled
+  * @buf_len: HW-writeable length per each buffer
+  * @nid: ID of the closest NUMA node with memory
++ * @idx: stack index of the corresponding Rx queue
+  */
+ struct libeth_fq {
+ 	struct_group_tagged(libeth_fq_fp, fp,
+@@ -88,6 +89,7 @@ struct libeth_fq {
+ 
+ 	u32			buf_len;
+ 	int			nid;
++	u32			idx;
+ };
+ 
+ int libeth_rx_fq_create(struct libeth_fq *fq, struct napi_struct *napi);
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.c b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
+index 363c42bf3dcf..d3c68659162b 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_txrx.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
+@@ -771,6 +771,7 @@ int iavf_setup_rx_descriptors(struct iavf_ring *rx_ring)
+ 		.count		= rx_ring->count,
+ 		.buf_len	= LIBIE_MAX_RX_BUF_LEN,
+ 		.nid		= NUMA_NO_NODE,
++		.idx		= rx_ring->queue_index,
+ 	};
+ 	int ret;
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
+index 1667f686ff75..f162cdfc62a7 100644
+--- a/drivers/net/ethernet/intel/ice/ice_base.c
++++ b/drivers/net/ethernet/intel/ice/ice_base.c
+@@ -609,6 +609,7 @@ static int ice_rxq_pp_create(struct ice_rx_ring *rq)
+ 	struct libeth_fq fq = {
+ 		.count		= rq->count,
+ 		.nid		= NUMA_NO_NODE,
++		.idx		= rq->q_index,
+ 		.hsplit		= rq->vsi->hsplit,
+ 		.xdp		= ice_is_xdp_ena_vsi(rq->vsi),
+ 		.buf_len	= LIBIE_MAX_RX_BUF_LEN,
+@@ -631,6 +632,7 @@ static int ice_rxq_pp_create(struct ice_rx_ring *rq)
+ 		.count		= rq->count,
+ 		.type		= LIBETH_FQE_HDR,
+ 		.nid		= NUMA_NO_NODE,
++		.idx		= rq->q_index,
+ 		.xdp		= ice_is_xdp_ena_vsi(rq->vsi),
+ 	};
+ 
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index f6b3b15364ff..95930edc566f 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -557,6 +557,7 @@ static int idpf_rx_hdr_buf_alloc_all(struct idpf_buf_queue *bufq)
+ 		.type	= LIBETH_FQE_HDR,
+ 		.xdp	= idpf_xdp_enabled(bufq->q_vector->vport),
+ 		.nid	= idpf_q_vector_to_mem(bufq->q_vector),
++		.idx	= bufq->rxq_idx,
+ 	};
+ 	int ret;
+ 
+@@ -699,6 +700,7 @@ static int idpf_rx_bufs_init_singleq(struct idpf_rx_queue *rxq)
+ 		.type		= LIBETH_FQE_MTU,
+ 		.buf_len	= IDPF_RX_MAX_BUF_SZ,
+ 		.nid		= idpf_q_vector_to_mem(rxq->q_vector),
++		.idx		= rxq->idx,
+ 	};
+ 	int ret;
+ 
+@@ -759,6 +761,7 @@ static int idpf_rx_bufs_init(struct idpf_buf_queue *bufq,
+ 		.hsplit		= idpf_queue_has(HSPLIT_EN, bufq),
+ 		.xdp		= idpf_xdp_enabled(bufq->q_vector->vport),
+ 		.nid		= idpf_q_vector_to_mem(bufq->q_vector),
++		.idx		= bufq->rxq_idx,
+ 	};
+ 	int ret;
+ 
+@@ -1913,6 +1916,16 @@ static int idpf_rxq_group_alloc(struct idpf_vport *vport,
+ 							LIBETH_RX_LL_LEN;
+ 			idpf_rxq_set_descids(rsrc, q);
+ 		}
++
++		if (!idpf_is_queue_model_split(rsrc->rxq_model))
++			continue;
++
++		for (u32 j = 0; j < rsrc->num_bufqs_per_qgrp; j++) {
++			struct idpf_buf_queue *bufq;
++
++			bufq = &rx_qgrp->splitq.bufq_sets[j].bufq;
++			bufq->rxq_idx = rx_qgrp->splitq.rxq_sets[0]->rxq.idx;
++		}
+ 	}
+ 
+ err_alloc:
+diff --git a/drivers/net/ethernet/intel/libeth/rx.c b/drivers/net/ethernet/intel/libeth/rx.c
+index 62521a1f4ec9..8874b714cdcc 100644
+--- a/drivers/net/ethernet/intel/libeth/rx.c
++++ b/drivers/net/ethernet/intel/libeth/rx.c
+@@ -156,6 +156,7 @@ int libeth_rx_fq_create(struct libeth_fq *fq, struct napi_struct *napi)
+ 		.order		= LIBETH_RX_PAGE_ORDER,
+ 		.pool_size	= fq->count,
+ 		.nid		= fq->nid,
++		.queue_idx	= fq->idx,
+ 		.dev		= napi->dev->dev.parent,
+ 		.netdev		= napi->dev,
+ 		.napi		= napi,
 -- 
 2.54.0
 
