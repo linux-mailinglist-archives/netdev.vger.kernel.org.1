@@ -1,238 +1,156 @@
-Return-Path: <netdev+bounces-284514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284515-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uAb2J80c+mkJJgMAu9opvQ
-	(envelope-from <netdev+bounces-284514-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 18:37:33 +0200
+	id IP0+Fw4d+mkJJgMAu9opvQ
+	(envelope-from <netdev+bounces-284515-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 18:38:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26F734D16DB
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 18:37:32 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11FF04D1728
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 18:38:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 01359300C00A
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 16:37:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5DFEE3006823
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 16:38:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47778481FAE;
-	Tue,  5 May 2026 16:37:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5589E3DDDD2;
+	Tue,  5 May 2026 16:38:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UnwjTQNv"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UTvLib4J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B023D48C8BB
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 16:37:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2305E48C8CB
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 16:38:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777999050; cv=none; b=b7ssX1xs2EDvSv91fg6ZF/Ah7biS4yp1we/IzLBw9r6df0ThfoMGS2/xkZSQ33puTKWv/SP1bYQPxJdMPpReFpum8w6VmmN90A8I1DK8OM5N9fEa6ViCWMUwy7I2r1fwpmCPIaVDa2ND1IF5w3F4Wz/u+/zqDoog13gdsKe+3z0=
+	t=1777999108; cv=none; b=ols7NNDV/o1tpJ5289xYXFKFGnff4Hui10kXbSyJ/iJR8QTNYEIdqk3fjqCk23skB+nfAIbGrtPLNgeHKP/7+1nBVIT593NG/Sb63IJ7oplAm5lv24m+lMTf2Pm4HXBD/DAQ8kOIJ//4anz63SwucBSoTAeTou0bnJTVprJ8quI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777999050; c=relaxed/simple;
-	bh=2vNM4P2xnGuAG3lTftkwlu0d8ky0Pc81tFLomdyLZA8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qHg22ovZu2qnaI1TYFWDiZJtEr15nrxw9nceRZ/rKC4cIeUMb/Lx+vBCFuL17xo4HCcvlpTds5/tFR9m4QZrib/w7nLjxJkQ8p+8oLK5alUNZW/o8dmHajsk2A9e7IlWml6nAsWlaEDZqasKgsVoqRysBoSX7MUYiXXPt7cd9Wk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UnwjTQNv; arc=none smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-7b23713eac9so59669147b3.2
-        for <netdev@vger.kernel.org>; Tue, 05 May 2026 09:37:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777999047; x=1778603847; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=PMfEZkH6rxvYX9869GT2iOu8sbvJpC6I3W7itO6JEjI=;
-        b=UnwjTQNvq/r4beqLgkxxKUEWpEqcq3/5/5P9HzTdLDbUdvdM6TqcZ9a2FCgt9EP8Vh
-         tpSAmdxVfuciSI0T5myAKGxtHcVxrocZoG6cz/cyVRGzj2d2uiFbDAEOoOs6kYShvjyY
-         BBlbVoHGzjfLyg5uNMdeBNpMeiwkDXgPInA3t5PeHP7c17rOVOnwbgYSvvoHTm5WtkRD
-         CDqemvSe6xheG+0qw8+mevVQnDuccrHfuA1xizPVrAiYqF0s2aAXc14NkhWeczP+R274
-         Gt15ZKWwDWZ5BBng/gsbIhG2cPkT/5MxKJqyc67BkHJ/h8bAyrHvBFUhPs97cYo7E0dl
-         3I+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777999047; x=1778603847;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PMfEZkH6rxvYX9869GT2iOu8sbvJpC6I3W7itO6JEjI=;
-        b=a1AbJHT26H7JJ9xrtCvAUG6WY/03XS1oQnx5YrzvGAnrxPVtvviGi9V3lJBbMIkyYb
-         pu1ukBU9BsEXOzBzSUbt3v9RF958lwyMVrNB3NlyMxH87LXFhFoS/NU8QLtjgqt4rZoC
-         XP2hHqvxVoSImjnsndv4XIXINjYZKLqNzzdWPD2n0QRGUBScgwUwJadTsRM8uPyUCyQT
-         yhg2OUUEWF0SSUT/SNheFkO5xNMMD6Z9gH+ckEUtm2pM5v8Lbs1CII3Jzlj+8Ujjoi4M
-         U7IddFBnlu2AuF/oUlIZ3RRVq/kA0ZrhACtiP6E0pmjY/Stx7F13LPlTNoiAoluO7mg9
-         b/Dw==
-X-Forwarded-Encrypted: i=1; AFNElJ82D/ok4+e+zepJbgDa/d8ZP2rH/xRm0fCM6LlXkvK4y2ydVVgnPCn8OH3n8EQYuvaBBmgI6tM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw96cvNuUgkRLfLfZu+8W65zGqBkPXr7i5Oumno9OCfAsdONpWr
-	v5Y42KdqAOW5UEseGFj2GTI/J0SoWFntKBIg8QiaHBx3MJc/Aj82n4eJ
-X-Gm-Gg: AeBDiescuPGGGxdiAulbHgzVfG2BCa4t8LU84vaOm34IF6Fft8rmz0fazR+uMeejaOq
-	AVEAgm5DpwbuzOr8wT1WwSlTe4cSdW/3FW2gET0pHVCCrjDHIJQFTmgtyaLVUM/s3EFKuxBy/Y8
-	kY145VhsJ1O4d0AQY/BcLQ8lzPJiTnz50f31Wdk0qgDq1zo4q50CD+6hOliGOEHgcwA9BEG4mMM
-	qltiLn1yBPoVIXEq126vkSkdvg7VugC856D0pMKBb0G5iSqYEH/2kLBKZhxSyDyg4cKFzVgTCzB
-	u1+UF5gurcB69L0W3y1Y8W/GuPk3Ls6vfmJgu+F83EVxnNzWhrBtU7+O2N+lM4yOV92kCdju87+
-	Okk9ceJI6HpPrSYkJO8Xiy7AGKOeACRDa6VLnMyAoeEPACl6YJQiNT6BMJsoBt09iLK+sBdi5ok
-	TNXT5HJykOngfuCI8K6nAPth0sLggsCER7ke6nlLPvSr628QfYH4ibzU8=
-X-Received: by 2002:a05:690c:a018:b0:7b3:6c50:2e8f with SMTP id 00721157ae682-7bd77109d77mr140515237b3.41.1777999047308;
-        Tue, 05 May 2026 09:37:27 -0700 (PDT)
-Received: from devvm29614.prn0.facebook.com ([2a03:2880:ff:70::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7bd66525651sm66719897b3.3.2026.05.05.09.37.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 May 2026 09:37:26 -0700 (PDT)
-Date: Tue, 5 May 2026 09:37:22 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Eric Dumazet <edumazet@google.com>,
-	Arseniy Krasnov <avkrasnov@salutedevices.com>,
-	Bobby Eshleman <bobbyeshleman@meta.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com, Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev
-Subject: Re: [PATCH net] vsock/virtio: fix potential unbounded skb queue
-Message-ID: <afocwkfBHJ5u10rx@devvm29614.prn0.facebook.com>
-References: <20260430122653.554058-1-edumazet@google.com>
- <afn0ZdvZWswBuDMm@sgarzare-redhat>
- <CANn89iLs8DOWJwDpf_ARoMrV+6b2tbhEJ=VVzeC8gCm5dRGaig@mail.gmail.com>
- <afoF_cHfl6ygcupM@sgarzare-redhat>
+	s=arc-20240116; t=1777999108; c=relaxed/simple;
+	bh=Fru+Doydi5oOoq+fd5J4KkwdTW03WWtS9TIjctDj33w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I3GtT5/a3dQZfYdcG3LZKzGjUcGedUlUrv5V91zWQPweWLHyxPcPdmLeFmP2q3bZWhwRjrhH0Hdaj7SddSbITx/4hdxapKwW2b/fQiEL38lWnR20QVj8+uTT7m2tExYcqKjraqXKXtGcRKG82T2bTnnFTQoRhrzXxRP+uRYik1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UTvLib4J; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <b2fc7480-dd88-4ddd-9e6e-239ba80dd879@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1777999103;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/m7swAUBiFHy0R/mrY0rl3l6yUSatDE/tHhm5isz340=;
+	b=UTvLib4JWAC4Qr3Ei92PnoxTIT+I4iwfPMFykB8UJ019m5PZo1Zrph31pSYzLqIOLAO9Ux
+	W1kN95da+6RMlFPBsvkrIqSrta6DGR4/ArFBBb9mHHaConkvOIBIvWgq/Pukd/CkPbOKaS
+	+aTmADuH3T3WP/mlptWYwa0mFGEsouY=
+Date: Tue, 5 May 2026 17:38:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <afoF_cHfl6ygcupM@sgarzare-redhat>
-X-Rspamd-Queue-Id: 26F734D16DB
+Subject: Re: [PATCH v5 net-next 3/3] selftests:net: Implement ptp4l sync test
+ using netdevsim
+To: Maciek Machnikowski <maciek@machnikowski.net>,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+ richardcochran@gmail.com, milena.olech@intel.com,
+ willemdebruijn.kernel@gmail.com, horms@kernel.org
+References: <20260503074747.1321-1-maciek@machnikowski.net>
+ <20260503074747.1321-4-maciek@machnikowski.net>
+ <20260504100753.7cc193cc@kernel.org>
+ <b2ceffa3-a1d3-4124-b640-68fc11996f51@machnikowski.net>
+ <9c7eecee-f0c2-4ee3-95cf-ae9965191902@lunn.ch>
+ <aa5798db-51b1-4d44-abec-c55b0560ec21@machnikowski.net>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <aa5798db-51b1-4d44-abec-c55b0560ec21@machnikowski.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 11FF04D1728
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284514-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[google.com,salutedevices.com,meta.com,redhat.com,davemloft.net,kernel.org,vger.kernel.org,gmail.com,sberdevices.ru,linux.alibaba.com,lists.linux.dev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,intel.com];
+	TAGGED_FROM(0.00)[bounces-284515-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oasis-open.org:url,alibaba.com:email,linux.dev:email,sberdevices.ru:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,devvm29614.prn0.facebook.com:mid]
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,nscl.name:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-On Tue, May 05, 2026 at 06:11:13PM +0200, Stefano Garzarella wrote:
-> On Tue, May 05, 2026 at 07:14:36AM -0700, Eric Dumazet wrote:
-> > On Tue, May 5, 2026 at 6:52 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
-> > > 
-> > > On Thu, Apr 30, 2026 at 12:26:52PM +0000, Eric Dumazet wrote:
-> > > >virtio_transport_inc_rx_pkt() checks vvs->rx_bytes + len > vvs->buf_alloc.
-> > > >
-> > > >virtio_transport_recv_enqueue() skips coalescing for packets
-> > > >with VIRTIO_VSOCK_SEQ_EOM.
-> > > >
-> > > >If fed with packets with len == 0 and VIRTIO_VSOCK_SEQ_EOM,
-> > > >a very large number of packets can be queued
-> > > >because vvs->rx_bytes stays at 0.
-> > > >
-> > > >Fix this by estimating the skb metadata size:
-> > > >
-> > > >       (Number of skbs in the queue) * SKB_TRUESIZE(0)
-> > > >
-> > > >Fixes: 077706165717 ("virtio/vsock: don't use skbuff state to account credit")
-> > > >Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > > >Cc: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-> > > >Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> > > >Cc: Stefano Garzarella <sgarzare@redhat.com>
-> > > >Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > > >Cc: Jason Wang <jasowang@redhat.com>
-> > > >Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > >Cc: "Eugenio Pérez" <eperezma@redhat.com>
-> > > >Cc: kvm@vger.kernel.org
-> > > >Cc: virtualization@lists.linux.dev
-> > > >---
-> > > > net/vmw_vsock/virtio_transport_common.c | 4 +++-
-> > > > 1 file changed, 3 insertions(+), 1 deletion(-)
-> > > >
-> > > >diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> > > >index 416d533f493d7b07e9c77c43f741d28cfcd0953e..9b8014516f4fb1130ae184635fbba4dfee58bd64 100644
-> > > >--- a/net/vmw_vsock/virtio_transport_common.c
-> > > >+++ b/net/vmw_vsock/virtio_transport_common.c
-> > > >@@ -447,7 +447,9 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
-> > > > static bool virtio_transport_inc_rx_pkt(struct virtio_vsock_sock *vvs,
-> > > >                                       u32 len)
-> > > > {
-> > > >-      if (vvs->buf_used + len > vvs->buf_alloc)
-> > > >+      u64 skb_overhead = (skb_queue_len(&vvs->rx_queue) + 1) * SKB_TRUESIZE(0);
-> > > >+
-> > > >+      if (skb_overhead + vvs->buf_used + len > vvs->buf_alloc)
-> > > >               return false;
-> > > 
-> > > I'm not sure about this fix, I mean that maybe this is incomplete.
-> > > In virtio-vsock, there is a credit mechanism between the two peers:
-> > > https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html#x1-4850003
-> > > 
-> > > This takes only the payload into account, so it’s true that this problem
-> > > exists; however, perhaps we should also inform the other peer of a lower
-> > > credit balance, otherwise the other peer will believe it has much more
-> > > credit than it actually does, send a large payload, and then the packet
-> > > will be discarded and the data lost (there are no retransmissions,
-> > > etc.).
-> > 
-> > I dunno, perhaps revert 077706165717 ("virtio/vsock: don't use skbuff
-> > state to account credit")
-> > and find a better fix then?
-> 
-> IIRC the same issue was there before the commit fixed by that one (commit
-> 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")), so
-> not sure about reverting it TBH.
-> 
-> CCing Arseniy and Bobby.
-> 
-> > 
-> > There is always a discrepancy between skb->len and skb->truesize.
-> > You will not be able to announce a 1MB window, and accept one milliion
-> > skb of 1-byte each.
-> > 
-> > This kind of contract is broken.
-> > 
-> 
-> Yep, I agree, but before we start discarding data (and losing it), IMHO we
-> should at least inform the other peer that we're out of space.
-> 
-> @Stefan, @Michael, do you think we can do something in the spec to avoid
-> this issue and in some way take into account also the metadata in the
-> credit. I mean to avoid the 1-byte packets flooding.
-> 
-> Thanks,
-> Stefano
+On 05/05/2026 17:22, Maciek Machnikowski wrote:
 > 
 > 
+> On 05/05/2026 14:22, Andrew Lunn wrote:
+>> On Tue, May 05, 2026 at 09:36:30AM +0200, Maciek Machnikowski wrote:
+>>>
+>>>
+>>> On 04/05/2026 19:07, Jakub Kicinski wrote:
+>>>> On Sun,  3 May 2026 09:47:47 +0200 Maciek Machnikowski wrote:
+>>>>> Add PTP synchronization test using ptp4l and netdevsim.
+>>>>>
+>>>>> The test creates two netdevsim adapters, links them together
+>>>>> and runs the ptp4l leader and ptp4l follower on two ends
+>>>>> of the netdevsim link and waits for the follower to report the
+>>>>> synchronized state (s2) in its output log.
+>>>>>
+>>>>> This implementation runs the test runs over IPv4 link.
+>>>>
+>>>> Doesn't seem to pass on netdevsim for us:
+>>>>
+>>>> # 41.13 [+40.95] # ptp4l follower did not reach locked state (s2) within 40s
+>>>> # 41.13 [+0.00] # Follower log (last 10 lines): ptp4l[2179.605]: ioctl SIOCETHTOOL failed: Operation not supported | ptp4l[2179.607]: interface 'eth0' does not support requested timestamping mode | failed to create a clock
+>>>> # 41.15 [+0.02] # Check| At /srv/vmksft/testing/wt-2/tools/testing/selftests/net/./ptp.py, line 173, in ptp_sync_test:
+>>>> # 41.15 [+0.01] # Check|     _run_ptp4l_wait_sync(nsimsv.ifname, nsimcl.ifname, nssv.name, nscl.name)
+>>>> # 41.16 [+0.01] # Check| At /srv/vmksft/testing/wt-2/tools/testing/selftests/net/./ptp.py, line 99, in _run_ptp4l_wait_sync:
+>>>> # 41.17 [+0.01] # Check|     ksft_true(False, "PTP sync timeout")
+>>>> # 41.17 [+0.00] # Check failed False does not eval to True PTP sync timeout
+>>>> # 41.32 [+0.16] not ok 1 ptp.ptp_sync_test
+>>>> # 41.33 [+0.00] # Totals: pass:0 fail:1 xfail:0 xpass:0 skip:0 error:0
+>>>>
+>>>> Anything we need to do?
+>>>
+>>> Can you share the config file you used? Seems the PTP clock was not
+>>> found which may lead to PTP_1588_CLOCK_MOCK not being enabled?
+>>
+>> Shouldn't the configuration file be part of the test?
+>>
+>> 	Andrew
+> 
+> I meant the kernel config. The PTP emulation requires PTP Mock to be
+> enabled, as that's the backbone for generating timestamps. If it's
+> disabled - netdevsim netdevs will report no timestamping support, as in
+> the example above.
+> - Maciek
 
-Indeed the old pre-fix skb code would have the same issue.
+tools/testing/selftests/drivers/net/netdevsim/config has
+CONFIG_PTP_1588_CLOCK_MOCK=y
 
-I can't think of any way around this without extending the spec.
-
-Best,
-Bobby
+but maybe no CONFIG_PTP_1588_CLOCK ?
 
