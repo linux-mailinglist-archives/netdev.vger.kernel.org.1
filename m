@@ -1,137 +1,163 @@
-Return-Path: <netdev+bounces-284512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284513-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AE8SIY4b+mkJJgMAu9opvQ
-	(envelope-from <netdev+bounces-284512-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 18:32:14 +0200
+	id oPz4GSUf+mkJJgMAu9opvQ
+	(envelope-from <netdev+bounces-284513-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 18:47:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 087164D1578
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 18:32:13 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D06184D19AD
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 18:47:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E16A13058E33
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 16:28:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1FAD7300EC98
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 16:32:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E88A48C403;
-	Tue,  5 May 2026 16:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA24948C8BD;
+	Tue,  5 May 2026 16:32:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="PUJNa2RE"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b="iMaRd/U0"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 676DF48B367;
-	Tue,  5 May 2026 16:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2CC48B373;
+	Tue,  5 May 2026 16:32:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777998534; cv=none; b=C1aMZxqOv2kOkoUdS3QQ9FaOTHRK6cGFF7l6AT0rc9ro5J5KlIkFX9zIn7T2oXpUilu3t8kzwrl5GS6MoFffXNuTClNCl4adpGhii+i1wF0+Nh4C0q1m5DxtFMe/+JjX7YzBKu/4wbVl/8YgP7P5lL1F0b5TrZfsvCgsYpd58TM=
+	t=1777998737; cv=none; b=si7ujyMRfgZdRrdKC0t1C6CNHO6VSenryi8y3IX59htXta1YIpw1UY4ZIwy/qgHcQ327Dgcfhfei6NVRK2wWIPzR+cWrDViCRn9p9VWjA5neHMYGpYt5WXmYrNzh63vvJWyGYFaEaXGhISpUqkYwVNqN3mMJjVL5KZKstXj44k4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777998534; c=relaxed/simple;
-	bh=qpP5JJexx5FbkH/P8mJ5gw7/jHOXkN/yHbJmFS6aZK8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eJNBNeFiRIB/EVcxeiA2voKFKBrowI+jAADxH2Rl0ELQKUcHqFVn7yulQlw/TffBKHeMTIpVgKhnLhtHaAiWM3ZDAd2NuCG7WvTvUZl+k6+3QGW4mG/Rr17ZUjJHdvoG8Z822vZRYyx8ShWpckCtpNAmI3NGFgF4qD2N7aCTfHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=PUJNa2RE; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1204)
-	id E9B0F20B7168; Tue,  5 May 2026 09:28:50 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E9B0F20B7168
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1777998530;
-	bh=yQ9B0+Murk+liHcUEGFo3TbZqnJLciO6uudJWzl4OMg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PUJNa2REUMiWBad5gobyGUkXEJmQrPQDFgxtkL4tffBQtp/cN0EBDpCTv3zE/LJWz
-	 8+SdQNQ5E6OEs5/4komCyIQ7DrLGLDJ3OQcY3u2+YQBt89Rhg4c5sbYf2bGIJjJnO0
-	 pYwQ9owHP7vaWFWdWrxfjMJsPkKM5etMsiO2R5V4=
-Date: Tue, 5 May 2026 09:28:50 -0700
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, leon@kernel.org,
-	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
-	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	stephen@networkplumber.org, jacob.e.keller@intel.com,
-	dipayanroy@microsoft.com, leitao@debian.org, kees@kernel.org,
-	john.fastabend@gmail.com, hawk@kernel.org, bpf@vger.kernel.org,
-	daniel@iogearbox.net, ast@kernel.org, sdf@fomichev.me,
-	yury.norov@gmail.com
-Subject: Re: [PATCH net, v3] net: mana: Fix crash from unvalidated SHM offset
- read from BAR0 during FLR
-Message-ID: <afoawjLcpe++Cjsu@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <afQUMClyjmBVfD+u@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <30f588ad-cf80-432b-bde3-13b3c0d5a124@redhat.com>
+	s=arc-20240116; t=1777998737; c=relaxed/simple;
+	bh=+vyMnTr6IFtuhr4rM71FSbUsO13s44dHnGjiFObo7C0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=asOYsvp5VIfSgXRmKQN65UPGP0L3OOxMMci7GnZJ41UCQdJXIlK1fQxyzmuoZkPyMS0ozEWoweM+Uy4O3Bf+Dl+LY+v9SM7IxDF3jDkSfHLwI3vny43HLaTjB3BdT5xmszojS1YVL0Evq3hAKQrBv7jvO+qvXC5olLCnqUr/uC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn; spf=pass smtp.mailfrom=std.uestc.edu.cn; dkim=fail (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b=iMaRd/U0 reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=std.uestc.edu.cn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=std.uestc.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:Date:
+	Message-ID:MIME-Version:Content-Transfer-Encoding; bh=9XCk0dD/T5
+	M1QjuGGaDOicMCn8hxUlDRWh0a8bw58Jg=; b=iMaRd/U0wG0TjU9d175Q+NLaiT
+	MgOixab8wJpKhyiOyUaBFb8hT/RlGQBY399Q+0D51xTc+Mq97lNaR9nk1BcytHe1
+	yfoRGjxCD++Ib660XQF2wDnFdAPaT/cVuTr6jaby72bWbiqaN8uxAltwW9rCwmjD
+	W8z6ID71v8DpDb3cA=
+Received: from hotaru.tailb307d0.ts.net (unknown [183.94.22.109])
+	by hzbj-edu-front-2.icoremail.net (Coremail) with SMTP id BLQMCkCWfLx_G_ppCgHsAQ--.28515S2;
+	Wed, 06 May 2026 00:32:00 +0800 (CST)
+From: Quan Sun <2022090917019@std.uestc.edu.cn>
+To: linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: alex.aring@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	andrew@lunn.ch,
+	Quan Sun <2022090917019@std.uestc.edu.cn>
+Subject: [PATCH] net: iphc: fix offset errors in multicast context compression
+Date: Wed,  6 May 2026 00:31:46 +0800
+Message-ID: <20260505163146.432309-1-2022090917019@std.uestc.edu.cn>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <30f588ad-cf80-432b-bde3-13b3c0d5a124@redhat.com>
-X-Rspamd-Queue-Id: 087164D1578
-X-Rspamd-Action: no action
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:BLQMCkCWfLx_G_ppCgHsAQ--.28515S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7CFykCr1kury7Zr4rKF17Wrg_yoW8Aw47pr
+	WxG3y0yFZ7Jw15C393Kr4vvr17ZFs5Jr1jgFW8C3WFk3W3Krna9F1qkry8GasFvr4rZ34q
+	gry5KrZ8AanakFDanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9v14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
+	4UJwAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
+	rcIFxwCY1x0262kKe7AKxVWUAVWUtwCY02Avz4vE14v_JwCF04k20xvY0x0EwIxGrwCFx2
+	IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v2
+	6r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67
+	AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IY
+	s7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr
+	0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUUmhF7UUUUU==
+X-CM-SenderInfo: asqsjiyzqzilqqrzq21wgo3vxvwfhvlgxou0/
+X-Rspamd-Queue-Id: D06184D19AD
+X-Rspamd-Action: add header
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [7.84 / 15.00];
+	SEM_URIBL(3.50)[uestc.edu.cn:email];
+	DMARC_POLICY_QUARANTINE(1.50)[uestc.edu.cn : SPF not aligned (relaxed),quarantine];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	MAILLIST(-0.15)[generic];
+	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284512-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[33];
-	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	R_DKIM_PERMFAIL(0.00)[std.uestc.edu.cn:s=dkim];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,lunn.ch,std.uestc.edu.cn];
+	TAGGED_FROM(0.00)[bounces-284513-lists,netdev=lfdr.de];
+	GREYLIST(0.00)[pass,body];
+	RCVD_COUNT_THREE(0.00)[4];
+	NEURAL_SPAM(0.00)[0.864];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	FROM_NEQ_ENVFROM(0.00)[2022090917019@std.uestc.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[std.uestc.edu.cn:~];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid,linux.microsoft.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(0.00)[+ip4:172.105.105.114:c];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,uestc.edu.cn:email,std.uestc.edu.cn:mid]
+X-Spam: Yes
 
-On Tue, May 05, 2026 at 03:42:46PM +0200, Paolo Abeni wrote:
-> On 5/1/26 4:47 AM, Dipayaan Roy wrote:
-> > @@ -73,10 +74,28 @@ static int mana_gd_init_pf_regs(struct pci_dev *pdev)
-> >  	gc->phys_db_page_base = gc->bar0_pa + gc->db_page_off;
-> >  
-> >  	sriov_base_off = mana_gd_r64(gc, GDMA_SRIOV_REG_CFG_BASE_OFF);
-> > +	if (sriov_base_off >= gc->bar0_size ||
-> > +	    gc->bar0_size - sriov_base_off <
-> > +		GDMA_PF_REG_SHM_OFF + sizeof(u64) ||
-> > +	    !IS_ALIGNED(sriov_base_off, sizeof(u64))) {
-> > +		dev_err(gc->dev,
-> > +			"SRIOV base offset 0x%llx out of range or unaligned (BAR0 size 0x%llx)\n",
-> > +			sriov_base_off, (u64)gc->bar0_size);
-> > +		return -EPROTO;
-> > +	}
-> 
-> I think that the additional fix suggested by sashiko is really worthy,
-> but should go in a separate patch. @Dipayaan: please follow-up on that
-> one, thanks!
-> 
-> Paolo
->
-Hi Paolo,
+The function lowpan_iphc_mcast_ctx_addr_compress() contains two offset
+errors that break context-based multicast address compression
+(LOWPAN_IPHC_DAM_00).
 
-Thanks for reviewing, and I will cross check and send out a separate patch for
-issue pointed out by Sashiko(un-related to the current issue).
+When compressing the multicast address, the compressed format expects
+exactly 6 bytes:
+  - Bytes 0-1: Flags, scope, and reserved bits (from s6_addr[1..2])
+  - Bytes 2-5: The 4-byte Group ID (from s6_addr[12..15])
 
-Regards
-Dipayaan Roy
+Currently, the memcpy() operations use incorrect offsets:
+1. The destination offset for the Group ID is &data[1] instead of
+   &data[2]. This overwrites the previously copied scope byte.
+2. The source offset for the Group ID is &ipaddr->s6_addr[11] instead
+   of &ipaddr->s6_addr[12].
 
+This mismatch results in a corrupted compressed address being
+transmitted. Consequently, the receiving side fails to reconstruct the
+original IPv6 address via lowpan_uncompress_multicast_ctx_daddr() since
+it expects the Group ID to start at data[2].
+
+Fix the logic by correcting both the destination and source offsets
+so that the 6-byte compressed representation is assembled correctly.
+
+Signed-off-by: Quan Sun <2022090917019@std.uestc.edu.cn>
+---
+ net/6lowpan/iphc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index e116d308a8df6..29ae68ca3ec15 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -1091,7 +1091,7 @@ static u8 lowpan_iphc_mcast_ctx_addr_compress(u8 **hc_ptr,
+ 	/* flags/scope, reserved (RIID) */
+ 	memcpy(data, &ipaddr->s6_addr[1], 2);
+ 	/* group ID */
+-	memcpy(&data[1], &ipaddr->s6_addr[11], 4);
++	memcpy(&data[2], &ipaddr->s6_addr[12], 4);
+ 	lowpan_push_hc_data(hc_ptr, data, 6);
+ 
+ 	return LOWPAN_IPHC_DAM_00;
+
+base-commit: 95084f1883a760e0d4290698346759d58e2b944a
+-- 
+2.43.0
 
 
