@@ -1,153 +1,173 @@
-Return-Path: <netdev+bounces-284200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284202-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qFIWHC12+WmT8wIAu9opvQ
-	(envelope-from <netdev+bounces-284200-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 06:46:37 +0200
+	id cMuqMg54+WnV8wIAu9opvQ
+	(envelope-from <netdev+bounces-284202-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 06:54:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F3964C6913
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 06:46:36 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41FFE4C6965
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 06:54:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 577C130093AF
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 04:46:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 218C0301CFE1
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 04:54:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AEC33B27DC;
-	Tue,  5 May 2026 04:46:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62B323B9DA9;
+	Tue,  5 May 2026 04:54:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="YzV3P21e"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gY4ssn3Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B572C392C28;
-	Tue,  5 May 2026 04:46:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B3D3B38BD;
+	Tue,  5 May 2026 04:54:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777956388; cv=none; b=tg7YPe1zQ4jywmV1i3JT3ScghgD9xb7Xfj82t7Gv1E7hmYGqNdGUSgEiuccyzbhEMb2UEbzGWtvfQOms9Ejm9ADIWn8jREU7FnM0TQa8tk8eYk0BskPsV5oxUT02d5jfwSmz70S4o4i0ZQO3/g0V67JbSPP7fR5iLHwYSVb5VP0=
+	t=1777956874; cv=none; b=p18GyeHOnBv6LYXJgOJdh3uHUUXej1XaQnRk2dlVSGYKsnTe7R9keQKy0F7S637+QZ8NaGzjIXJDZH+UNi0gxNr0AA/r0hLXSqwhWs5YBCA866P6YDhBx4PXuk4ZZxrI/HKd+23bcARtVnkhuwqnZbKnYMM2xrb0v2HjL4BZr2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777956388; c=relaxed/simple;
-	bh=Q4JxA29skf0GIQSLZ8ul5/f8J9TVzHjReQZqn3sXZTY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jwOREHMi0hYlOQdAxaUOxyE2a4zHwu5YUQGNfCQIE7r62CXUnTMQXzjDFlvbwuRUFfxM28QArtpKgfUmzeKPNbamYGRk1ZNTPY3wbzJbi9e9mF3IvesYqZ5L5qCC1G9rI+ju2r1BalIuQJbFQn5kBr61gtNOyk3EbhA0Kx0S6WY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=YzV3P21e; arc=none smtp.client-ip=213.160.73.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
-Received: by dvalin.narfation.org (Postfix) id B2E581FF78;
-	Tue, 05 May 2026 04:46:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
-	s=20121; t=1777956384;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Lq6R9rd8X8jTXmZ6W1O/me6//zs6LOkcxvOUChwvpvw=;
-	b=YzV3P21eoDduZjvYFi0AM/ra7GXV2nL0o9zDwbJ3Kf5/T7DyxoTghKEAsmG6i/YBr0okZA
-	Mez7utpOKU+kOVcERyy6N506CIzLvD5n4euF8FkHFy78T1arp0V++P3Xcu3sOxkqDb+1R7
-	2ayjrGbRh+CBLVXFdagVe2eh3/uH0m8=
-From: Sven Eckelmann <sven@narfation.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Marek Lindner <marek.lindner@mailbox.org>,
- Simon Wunderlich <sw@simonwunderlich.de>,
- Antonio Quartulli <antonio@mandelbit.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Ao Zhou <n05ec@lzu.edu.cn>,
- Haoze Xie <royenheart@gmail.com>, Jiexun Wang <wangjiexun2025@gmail.com>,
- Juefei Pu <tomapufckgml@gmail.com>, Luxing Yin <tr0jan@lzu.edu.cn>,
- Ruide Cao <caoruide123@gmail.com>, Xin Liu <bird@lzu.edu.cn>,
- Yifan Wu <yifanwucs@gmail.com>, Yuan Tan <yuantan098@gmail.com>,
- stable@kernel.org
-Subject: Re: [PATCH batadv 0/8] batman-adv: follow up fixes
-Date: Tue, 05 May 2026 06:46:11 +0200
-Message-ID: <5990011.DvuYhMxLoT@sven-l14>
-In-Reply-To: <20260504171051.2b3e47ef@kernel.org>
-References:
- <20260503-fixes-followup-v1-0-4313278918d3@narfation.org>
- <20260504171051.2b3e47ef@kernel.org>
+	s=arc-20240116; t=1777956874; c=relaxed/simple;
+	bh=haGfBtENmV6eMb2MDh7r4FacDapZcB1kOYJ0JXEc/T0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ONWLFcEXjXRe2nkldu6In03vecLn/aOSr6TMQhMaYsnVXtbV6y2Hy5fqZwqzubLIx5SuoyJiE6WY9dM6bbXcQRfJupw7vCV7Y42Om2oyMPUJM04CCWLYAPPI7OFf3yQFE0kMb5VS0EOHVYxh2V9MSSEpQP7Z0E+XKwxcTxQreOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gY4ssn3Z; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777956873; x=1809492873;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=haGfBtENmV6eMb2MDh7r4FacDapZcB1kOYJ0JXEc/T0=;
+  b=gY4ssn3Z8J+99dIKHCt3SGuoswykZe9LnFgBPl1WXM6Z3QK192k/KeuE
+   9bTtRKRFGClGLmUsHOmDaZAZIpsoY+xb1iRTR4kr10vbWUFpcZvQJkT/S
+   Z1TpQJl65F2qDhzCAvRusKqaMqi+T1/14FXFUps/xjY0QHW4UcwtoVl9t
+   24GEJP4ZMFBMU1LLLCCNSXw6jL/JOPz8BMsT3uv/P0vOXYACEoEY8XS45
+   LwSKh0CitNzLb9hODsDJk+KB8jpPPmnLZn2beYw6Woq5oJ9hntqZaw9TQ
+   ZxNNu7XQTt9B8rkZsM/vjn4aLshLL4xQLDIR4SOss7DFHCjEAp5rnwhtA
+   g==;
+X-CSE-ConnectionGUID: PjoD6E8uRtW+wyYkC6fkqw==
+X-CSE-MsgGUID: UmvSDB8hTYOASVmrT7dHZA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11776"; a="78811204"
+X-IronPort-AV: E=Sophos;i="6.23,216,1770624000"; 
+   d="scan'208";a="78811204"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 21:54:33 -0700
+X-CSE-ConnectionGUID: Vqp4Pl8nRO6OlvbL2x0gwg==
+X-CSE-MsgGUID: CZ9rPXnqRk6R00egKJMMGw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,216,1770624000"; 
+   d="scan'208";a="273829281"
+Received: from vpanait-mobl.ger.corp.intel.com (HELO localhost) ([10.245.244.5])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 21:54:29 -0700
+Date: Tue, 5 May 2026 07:54:27 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>
+Subject: Re: [PATCH net-next v1 0/5] net: mdiobus: HIde ACPI implementation
+Message-ID: <afl4A48uIZPJmMeG@ashevche-desk.local>
+References: <20260504074610.40799-1-andriy.shevchenko@linux.intel.com>
+ <aee27459-387c-46ce-9c06-3de66309c8d6@lunn.ch>
+ <afij7wOkQUGUN0kM@ashevche-desk.local>
+ <28a4ebd7-2670-439d-836b-14559a916ed0@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart6264035.lOV4Wx5bFT";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
-X-Rspamd-Queue-Id: 7F3964C6913
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <28a4ebd7-2670-439d-836b-14559a916ed0@lunn.ch>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
+X-Rspamd-Queue-Id: 41FFE4C6965
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-3.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[narfation.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[narfation.org:s=20121];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284200-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
+	TAGGED_FROM(0.00)[bounces-284202-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FREEMAIL_CC(0.00)[mailbox.org,simonwunderlich.de,mandelbit.com,davemloft.net,google.com,redhat.com,kernel.org,lists.open-mesh.org,vger.kernel.org,lzu.edu.cn,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sven@narfation.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[narfation.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,narfation.org:dkim]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ashevche-desk.local:mid]
 
---nextPart6264035.lOV4Wx5bFT
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
-From: Sven Eckelmann <sven@narfation.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH batadv 0/8] batman-adv: follow up fixes
-Date: Tue, 05 May 2026 06:46:11 +0200
-Message-ID: <5990011.DvuYhMxLoT@sven-l14>
-In-Reply-To: <20260504171051.2b3e47ef@kernel.org>
-MIME-Version: 1.0
-
-On Tuesday, 5 May 2026 02:10:51 CEST Jakub Kicinski wrote:
-> On Sun, 03 May 2026 14:22:33 +0200 Sven Eckelmann wrote:
-> > While reviewing the fixes submitted to batman-adv in the recent weeks,
-> > further problems in similar or adjecent code was identified. This was either
-> > noticed in the manual review or reported by sashiko.dev.
+On Mon, May 04, 2026 at 05:16:57PM +0200, Andrew Lunn wrote:
+> On Mon, May 04, 2026 at 04:49:35PM +0300, Andy Shevchenko wrote:
+> > On Mon, May 04, 2026 at 03:02:54PM +0200, Andrew Lunn wrote:
+> > > On Mon, May 04, 2026 at 09:29:51AM +0200, Andy Shevchenko wrote:
+> > > > This mini-series is dedicated to hiding ACPI implementation details
+> > > > from the wider users as they (as of today) do not need to know that.
+> > > 
+> > > Please could you expand on that. ACPI != OF. They have different
+> > > bindings, so you need different implementations.
+> > 
+> > As of today the users that want ACPI also have the OF support. Even without
+> > that if the device is pure ACPI supported one (and somehow never going to DT)
+> > the proposed API (see the first patch) will be no-op in case when CONFIG_ACPI=n
+> > or when it's a non-ACPI platform with no support of the device. Hence, the
+> > pure ACPI (and actually OF as well) do not need to be exposed. The decision is
+> > made based on the type of firmware node.
 > 
-> Are you CCing netdev to get this reviewed by Sashiko?
-> Please don't..
-> We delegate code to sub-sub-systems to lower the patch volume :(
+> I see two different things here:
 > 
+> You are refactoring code into a helper, so reducing the amount of
+> duplicated code. That in itself is good.
+> 
+> However, we have the problem in general that developers think that OF
+> and ACPI do the same thing. And that is not true. OF MDIO busses have
+> support for a GPIO used as a reset. In retrospect, that was a bad
+> idea. The documented ACPI binding does not have this, and if anybody
+> was to suggest adding it, i want to NACK it.
+> 
+> Having OF code and ACPI code to instantiate the MDIO bus makes it
+> clearer they are different things. fwnode gives the impression they
+> are the same, which is not true. Hence i don't like fwnode at this
+> level.
+> 
+> Where fwnode makes sense is deeper down in the implementation of the
+> bindings, for properties which are the same in both bindings.  Then
+> you can use fwnode_ for the shared properties, of_ for the OF only
+> properties, and acpi_ for the ACPI only properties.
+> 
+> So although i like the reduction in duplicated code, i think overall
+> it makes the code worse because developers are more likely to wrongly
+> understand it.
 
-Because of `b4 prep --auto-to-cc`. Will now manually remove you.
+OK.
+Thanks for review.
 
-Regards,
-	Sven
-
---nextPart6264035.lOV4Wx5bFT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCafl2FAAKCRBND3cr0xT1
-y7meAP46UTEv5pX9jnioel/mvqL1JOLHs7Mw9LA1N0MojSw4rAD+ImjhYl7DEAgI
-5WdexqiK2V/tFuzPyqNBbcYevZJK7wc=
-=U/YX
------END PGP SIGNATURE-----
-
---nextPart6264035.lOV4Wx5bFT--
-
+-- 
+With Best Regards,
+Andy Shevchenko
 
 
 
