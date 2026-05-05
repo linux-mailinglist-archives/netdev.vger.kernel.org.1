@@ -1,68 +1,53 @@
-Return-Path: <netdev+bounces-284155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284157-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6ImKCM1O+WkV7wIAu9opvQ
-	(envelope-from <netdev+bounces-284155-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 03:58:37 +0200
+	id gDdFDWlP+WkV7wIAu9opvQ
+	(envelope-from <netdev+bounces-284157-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 04:01:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE9CD4C5DCA
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 03:58:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A98C24C5E01
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 04:01:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8DF20302C0E3
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 01:58:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4ADF6301E592
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 02:00:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3B93624BC;
-	Tue,  5 May 2026 01:58:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E00FB285060;
+	Tue,  5 May 2026 02:00:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mxNlxZLF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cUX9vngn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C73B3603C0;
-	Tue,  5 May 2026 01:58:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD421175A98
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 02:00:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777946281; cv=none; b=krjXx4RYz/gbktPOHxax/UvTPyieBfgEsL+gX+0pq/v+ra0howxeOwnCu3fdEaJChKB5//rTmDsK3IidU/DfQKqDb3nTscqTNUC4k88NMXcufQgBo0g+dGwzmcwdQEQUSMetEttXtj9y/9PjKFARQrZ9rl28ocUBHsco3G2XUCg=
+	t=1777946456; cv=none; b=fZ6Yr3CqRBzJT+1zg/1dN6Bx9hzfd2Litnu3xZ9t9r26kNBdDJfelA4GOON+eqHcAlPYodoV595D7h5glaeDqNYDLPeKPZXiu0zdCjjHgxFlHvGS24+lhI4TA15ttnpOM9k50RWctnHqu0m/QuZ07BWHg5i0UjtVTRlw1eMqsCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777946281; c=relaxed/simple;
-	bh=XrGa0jeT1NNmKT1hqZ/4WdmXOGRVamulJd8DWdE7XkY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mBku+ZeqTYUq89fPi14TnZbIuytd23zzEYdR0/u67pTeXOvjBEwypKynUw1pobD7pYe5hJpZfxFelZ9kmwYl15rq0DyQFXyZTyxsb1N9BKNTVw+xdhSh2+rg7H9WowR59MJYrmYR0cmC4kVMumNOoZND+GKtMEP2Gju2cG6qN1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mxNlxZLF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C0C0C2BCB8;
-	Tue,  5 May 2026 01:58:00 +0000 (UTC)
+	s=arc-20240116; t=1777946456; c=relaxed/simple;
+	bh=Xq4SPB8L4DOs1+B+LJB0mFLC4BqJepp6yEOZqHGZnOA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Er5glYoybusg9fVy6zaBo43b+AFkzDVHHyiGTL6JBvHIc56+6MZ7E4OKt3rIMHAj1ZrHsBBwoofg15EKkRFaZAuFzJSTVsE4pIc8wDo8i6Qt0521k6giXJp4a8XEh7hcyQBNb/8rCm0bkGnk8ItuP693ESll6c0imYsCF713xTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cUX9vngn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7514FC2BCB8;
+	Tue,  5 May 2026 02:00:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777946280;
-	bh=XrGa0jeT1NNmKT1hqZ/4WdmXOGRVamulJd8DWdE7XkY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mxNlxZLFbwpggoGJWmzn6FaEGfFLTY4Y35idjv+ta0NUmB1B3B+XJN2yZQ+mKd5Ps
-	 zzmZxWJqs/TB9XGaHo+WSmn3n4INR1SlSUFntKC+5VURwlcg4a9NhnHv0xzASY9hQT
-	 K9evC+Ekg61vU1JIMWYrhLHyMHyi0JcxIYmpAPV48/JOix5of0F9Sevp21ROGWeqov
-	 kWt8ZQd+ucRK303juIhxI9ww0nSb18csQ4g7/jz9bHlRmnbmLWF9/a++7RIG8rG5fX
-	 GJFMzh90e2ny4lCSO7GqTJQ+jqRuL/QdoaOoYjdCq7Xzm1YXO5v1HV1Ix2x4S7AvIb
-	 HU4rGMeUtphzw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: github@szelinsky.de
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	o.rempel@pengutronix.de,
-	kory.maincent@bootlin.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	krzk@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-leds@vger.kernel.org
-Subject: Re: [PATCH net-next v5 2/2] net: pse-pd: add LED trigger support via notification path
-Date: Mon,  4 May 2026 18:57:59 -0700
-Message-ID: <20260505015759.831393-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260429213224.1747410-3-github@szelinsky.de>
-References: <20260429213224.1747410-3-github@szelinsky.de>
+	s=k20201202; t=1777946456;
+	bh=Xq4SPB8L4DOs1+B+LJB0mFLC4BqJepp6yEOZqHGZnOA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cUX9vngnH0H4fbf2UHGRBTVmLKozgtJhPEz9Qazoc1RDKzBmLJRgSWzy1jcRbtwC4
+	 2iB+c7MAPoRQFixTaUPtJ13tMsIPyigSM6bIwImg4a3v97qIbNQbLVNhcXNO9GEPuf
+	 EvdwgF+h18qCBdkTPklZ6ZA+bkdt+WtL7KttICMjFPzHMt7SbfmAzvOehK0ElX0GaW
+	 VpemVo5cY5gMWg0nC49O7ifgMcIeeXec67pdfHHL3gcLDP3uTjsljEbe6CyxXZtO6d
+	 F92RJMajvcmBFdEAJu7Dfmr8hcU7kz751XSge2JnjL3zapx9EnWpLoxlB4/QmL1R4b
+	 96J9Oq8fSz8tA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CF0B3930197;
+	Tue,  5 May 2026 02:00:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,183 +55,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: BE9CD4C5DCA
+Subject: Re: [PATCH v1 net] af_unix: Set gc_in_progress to true in unix_gc().
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177794640704.1386640.10843392163753585620.git-patchwork-notify@kernel.org>
+Date: Tue, 05 May 2026 02:00:07 +0000
+References: <20260501073945.1884564-1-kuniyu@google.com>
+In-Reply-To: <20260501073945.1884564-1-kuniyu@google.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, kuni1840@gmail.com,
+ netdev@vger.kernel.org, sysroot314@gmail.com
+X-Rspamd-Queue-Id: A98C24C5E01
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-284155-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284157-lists,netdev=lfdr.de,netdevbpf];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-net: pse-pd: add LED trigger support via notification path
+Hello:
 
-This commit adds per-PI LED triggers to the PSE core subsystem to reflect
-delivering and enabled states. The LED state is updated during hardware
-events and administrative state changes via ethtool.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Link: https://lore.kernel.org/oe-kbuild-all/202603251254.o5PqMBRU-lkp@intel.com/
-Link: https://lore.kernel.org/oe-kbuild-all/202603251250.cuMCk5Yv-lkp@intel.com/
+On Fri,  1 May 2026 07:39:41 +0000 you wrote:
+> Igor Ushakov reported that unix_gc() could run with gc_in_progress
+> being false if the work is scheduled while running:
+> 
+>   Thread 1         Thread 2                     Thread 3
+>   --------         --------                     --------
+>                    unix_schedule_gc()           unix_schedule_gc()
+>                    `- if (!gc_in_progress)      `- if (!gc_in_progress)
+>                       |- gc_in_progress = true     |
+>                       `- queue_work()              |
+>   unix_gc() <----------------/                     |
+>   |                                                |- gc_in_progress = true
+>   ...                                              `- queue_work()
+>   |                                                       |
+>   `- gc_in_progress = false                               |
+>                                                           |
+>   unix_gc() <---------------------------------------------'
+>   |
+>   ... /* gc_in_progress == false */
+>   |
+>   `- gc_in_progress = false
+> 
+> [...]
 
-> diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
-> index b7ffec0c942c..bff97211ae22 100644
-> --- a/drivers/net/pse-pd/pse_core.c
-> +++ b/drivers/net/pse-pd/pse_core.c
+Here is the summary with links:
+  - [v1,net] af_unix: Set gc_in_progress to true in unix_gc().
+    https://git.kernel.org/netdev/net/c/d82ba05263c6
 
-[ ... ]
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> @@ -669,6 +670,168 @@ static int _pse_pi_delivery_power_sw_pw_ctrl(struct pse_controller_dev *pcdev,
->  	return 0;
->  }
->  
-> +#if IS_ENABLED(CONFIG_LEDS_TRIGGERS)
 
-[ ... ]
-
-> +static int pse_led_triggers_register(struct pse_controller_dev *pcdev)
-> +{
-> +	struct device *dev = pcdev->dev;
-> +	const char *dev_id;
-> +	int i, ret;
-> +
-> +	dev_id = dev_name(dev);
-> +
-> +	pcdev->pi_led_trigs = devm_kcalloc(dev, pcdev->nr_lines,
-> +					   sizeof(*pcdev->pi_led_trigs),
-> +					   GFP_KERNEL);
-
-Since devm resources are released in strict LIFO order, and pi_led_trigs
-is allocated here after the regulators are registered in
-pse_controller_register(), will the pi_led_trigs array be freed before
-the regulators are unregistered on driver unbind?
-
-When the regulator core later unregisters the regulators and flushes
-pending disables, could it invoke pse_pi_disable() and call pse_led_update(),
-dereferencing the dangling pcdev->pi_led_trigs pointer?
-
-> +	if (!pcdev->pi_led_trigs)
-> +		return -ENOMEM;
-> +
-> +	for (i = 0; i < pcdev->nr_lines; i++) {
-> +		struct pse_pi_led_triggers *trigs = &pcdev->pi_led_trigs[i];
-> +
-> +		/* Skip PIs not described in device tree */
-> +		if (!pcdev->no_of_pse_pi && !pcdev->pi[i].np)
-> +			continue;
-> +
-> +		trigs->delivering.name = devm_kasprintf(dev, GFP_KERNEL,
-> +							"pse-%s:port%d:delivering",
-> +							dev_id, i);
-> +		if (!trigs->delivering.name)
-> +			return -ENOMEM;
-> +		trigs->delivering.activate = pse_led_delivering_activate;
-> +
-> +		ret = devm_led_trigger_register(dev, &trigs->delivering);
-
-Regulators are exposed before this code runs in pse_controller_register().
-What happens if a consumer calls regulator_enable() concurrently?
-
-If a concurrent pse_pi_enable() calls pse_led_update() right after
-trigs->delivering.name is set but before devm_led_trigger_register() executes:
-
-pse_led_update() sees pcdev->pi_led_trigs and trigs->delivering.name are
-both non-NULL, and proceeds to call led_trigger_event().
-
-Since devm_led_trigger_register() hasn't initialized the trigger's internal
-led_cdevs list head yet, will led_trigger_event() attempt to iterate a
-zeroed memory list and cause a NULL pointer dereference?
-
-> +		if (ret) {
-> +			trigs->delivering.name = NULL;
-> +			return ret;
-> +		}
-
-[ ... ]
-
-> @@ -1107,6 +1273,31 @@ int pse_controller_register(struct pse_controller_dev *pcdev)
->  	if (ret)
->  		return ret;
->  
-> +	ret = pse_led_triggers_register(pcdev);
-> +	if (ret) {
-> +		/* LED triggers are non-essential for power delivery; warn
-> +		 * and continue. NULL out the array so pse_led_update()'s
-> +		 * early-return guard short-circuits any later calls onto
-> +		 * partially-registered triggers.
-> +		 */
-> +		dev_warn(pcdev->dev, "Failed to register LED triggers: %d\n",
-> +			 ret);
-> +		pcdev->pi_led_trigs = NULL;
-> +	}
-
-If pse_led_triggers_register() fails halfway through, the device probe still
-succeeds, which means devm cleanup will not run. Could the successfully
-registered LED triggers from earlier loop iterations remain registered
-indefinitely with the LED subsystem?
-
-Since pcdev->pi_led_trigs is NULLed, pse_led_update() will short-circuit.
-Does this leave these globally visible triggers permanently orphaned without
-ever receiving state updates?
-
-> +
-> +	/* Query initial LED state for all PIs so already-active ports
-> +	 * are reflected immediately without waiting for a hardware event.
-> +	 * Hold pcdev->lock: regulators are already exposed and a
-> +	 * concurrent regulator_enable() would race on the hw callbacks
-> +	 * and on last_delivering / last_enabled.
-> +	 */
-> +	mutex_lock(&pcdev->lock);
-
-[ ... ]
-
-> @@ -1267,7 +1458,14 @@ static void pse_handle_events(struct pse_controller_dev *pcdev,
->  		struct pse_ntf ntf = {};
->  		int ret;
->  
-> -		/* Do nothing PI not described */
-> +		/* Update LEDs for described PIs regardless of consumer state.
-> +		 * LED triggers are registered at controller init, before any
-> +		 * PHY claims a PSE control, so rdev may still be NULL here.
-> +		 */
-> +		if (pcdev->no_of_pse_pi || pcdev->pi[i].np)
-> +			pse_led_update(pcdev, i);
-
-The docstring for pse_led_update() requires it to be called with pcdev->lock
-held. Does calling it here locklessly inside the event handler violate
-that locking contract?
-
-Could this lack of synchronization cause data races on the cached state
-variables, or allow concurrent execution of the hardware callbacks
-(pi_get_pw_status and pi_get_admin_state) if they are invoked at the same
-time by other paths?
-
-> +
-> +		/* Skip regulator/netlink path for PIs without consumers */
->  		if (!pcdev->pi[i].rdev)
->  			continue;
 
