@@ -1,231 +1,218 @@
-Return-Path: <netdev+bounces-284574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284575-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qFBXLZlM+mndMAMAu9opvQ
-	(envelope-from <netdev+bounces-284574-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 22:01:29 +0200
+	id sPS7IS1P+mndMAMAu9opvQ
+	(envelope-from <netdev+bounces-284575-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 22:12:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24FB44D35A5
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 22:01:28 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BDBC4D380F
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 22:12:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D99E930D31E5
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 19:55:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EAA9C305421F
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 20:07:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 884904C956A;
-	Tue,  5 May 2026 19:53:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E75523DBD7D;
+	Tue,  5 May 2026 20:06:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="o/vrWz5y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OKIITUVf"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013057.outbound.protection.outlook.com [40.107.201.57])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E769B4C9543
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 19:53:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778010813; cv=fail; b=cOmZk3uv9RhOOHbn/+6R6SCXhxmMhlMWNvpbV9gQA5nkEBWdkU37oTPOoyK+mM6HwzcUzAv8eQTwcBmTvKlnikdMLTFkPkHlsvXVJeId7xKtk8yE83Fd9uB8gRXKP/xypvxuHYWTToLsoI03csL11cD5Jgzb4/Dx/m/W2uPSfTU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778010813; c=relaxed/simple;
-	bh=44E/Pyzeor4BMTj5JC3YJWg+NGmLBCzmxXJPFHiamjA=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=WB75SkuFRgQsztaciFQLDF77jGhTsHie5s+bAAqLLUV/DyIlF3LbbzARimFOph1R5cmkOSNlJGBfSEDI9Sphey6O6UEihP44KbAxFb9G9ivAxrsQWS7Q12hI96f7mGJZb4kGiKlyvvqqUQ4NBMU9JFsB/4EXiMpHtTnofT4Pl80=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=o/vrWz5y; arc=fail smtp.client-ip=40.107.201.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gGafkktI50XvcJWta/Aychvk5ahiS8V3u23nEnTNTd6kWOEOPA/hBomxtwH6IbAeMRCns2WPN0zEKIvbPI7QC8jLYQ7TjgjSpl5aN10/Z5JPuE6U8j4jfahNnd0ooeADIBHDPRqQcoXLUrKYwREdu6/AaeBADhKs4C6jNWgUSDLWJXNY+VU8iFBlANgd4hIurGVMjXRmGgx729WLGAMNBhGO0bH7v1Ck/39kiEjyKP/ZJaWbW6RPGCN6/p277lKat8LkaIY8Vb+AWJ84yLSav5qYZh4PPujswiyRpzUXzgeXT8pdu1NPaLMQvGDG7z+QCYfq9s+vSLB8NkDaSc9zjg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2yedqp78z9jASY/VUbCUhXRsOWC7jCY2JtK1x2U4BXs=;
- b=eEf5WssyR4fSiM2kx09vYjj3cEmJ9xhuf3zAgzf58dogHiwUQUQiTrWOPG9CXF6mHu/Lg0FIFuLlGKbPg+PyNOlxKhJJGpEO+rHgTQclzYB9YJtF/xVF0OYWZVRDv6UPJBP8l0ZCTDP7EHJgrcUQnlGi9sFP1gHbNc+90dliuSPTyPBEw54gb9zCHMHlcCCR11a6q0oGhc3cb2WJvvyzkUGVbZX6SCKiE11usTKW/h5HKm5Hx8AEVeeSSLgyvz1gTWuqHyP66keNmZsh1cqMCtzMPJIuskblEd9WDoZhqBsyrbXt0TvbHFP/YFxcPZDr5A/H3paJ6cC8HujP6CP7JA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2yedqp78z9jASY/VUbCUhXRsOWC7jCY2JtK1x2U4BXs=;
- b=o/vrWz5ynqJx1GxuxrjdsSVOW6sSqA65gg7VPvlTF1ARbH2wTB8zQ0i7HwSL7jpgRKd/HiYBf0F93FDDDleuu7PMeuZL4/kot8P33fJb9S9NO2/ZF1uehvNyZaEDAnNl6T0K4mmPt0Pc4mXFWK02er3/sxpEeP32uWNIF6u/Vdg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS4PR12MB9708.namprd12.prod.outlook.com (2603:10b6:8:278::7) by
- DS0PR12MB7770.namprd12.prod.outlook.com (2603:10b6:8:138::18) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9870.27; Tue, 5 May 2026 19:53:28 +0000
-Received: from DS4PR12MB9708.namprd12.prod.outlook.com
- ([fe80::8570:d817:2f81:c62a]) by DS4PR12MB9708.namprd12.prod.outlook.com
- ([fe80::8570:d817:2f81:c62a%6]) with mapi id 15.20.9870.023; Tue, 5 May 2026
- 19:53:28 +0000
-Message-ID: <a1a9ebf6-fde7-40bf-ada4-7b032a5fdafb@amd.com>
-Date: Tue, 5 May 2026 12:53:26 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/5] ionic: Report "link_down_events_phy" in
- ethtool statistics
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Brett Creeley <brett.creeley@amd.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>
-References: <20260501031555.43259-1-eric.joyner@amd.com>
- <20260501031555.43259-3-eric.joyner@amd.com>
- <20260501163951.0e0b7e97@kernel.org>
-Content-Language: en-US
-From: Eric Joyner <eric.joyner@amd.com>
-In-Reply-To: <20260501163951.0e0b7e97@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR13CA0156.namprd13.prod.outlook.com
- (2603:10b6:a03:2c7::11) To DS4PR12MB9708.namprd12.prod.outlook.com
- (2603:10b6:8:278::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A6A3DA5B5
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 20:06:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778011616; cv=none; b=bmw42SoNMwAruGNL72VHnmW78YZft+qrJASZik7oQsTDtFVXKwMmnct7c/aNv/hAMlRjBceNDhsk1wdGA2qkSawM10Rfzitb2p4JDpqKbYTbDi4erSRRlkuhDZWWqm4lHCu3fJQV6oX5FOSViTCvVMVIgJeuVSyUlt5I7QaihIc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778011616; c=relaxed/simple;
+	bh=yxQQFbPDX0UTtERpG0VWGDpOZ1IZ+Hpgmk0WiA0iRi8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nybelQ5UJZZUzdUuGE6UXYOZ2eKDlNnP99Crv50NVEiDbJis8BlE2nVeSJtTnfVQcLmvoznMr21RlLKwcERorDEGDxqlZujNKk7t+XhKS130r6lABnGddoZk7nPnWpVfiYHcWoCXe6WoM0NgfO+lJH6VYvrFmyWz5K/w/Ip5q9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OKIITUVf; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-44ccbd3290aso2649158f8f.2
+        for <netdev@vger.kernel.org>; Tue, 05 May 2026 13:06:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778011614; x=1778616414; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=U69pDkFx0w5rkGimfNd3UP42FE6wKyks8vJvY493nVM=;
+        b=OKIITUVfuGpumt1b6vraWTOw4OafPe3gjzI3eJAmtt+6a3qfQOd62AOxj4HeG2s0g6
+         lNitogTXq3It4vdekGSUasfcRCGSJePT+cISWaJZcleW30mJ8RamGmacv2P7JQdw3enA
+         miGhoBO6WhBlYg5Xfhpcje/jWvNPoeYr9oXttK71cEa3ey/F89CNRKJeY9XxJGDcDacj
+         l2OVHsIvUEpdQxmRA5ZTrkekcad0NalNJEoxqaNPVBIbN4Stlo2cdCMilTNeUaYmbYX4
+         yBd6HROh1mLrqH4fqSSFxGGEnmNk64DVkRckzCcz0YODoqjRIBWIpdxXRkH60Zfyq2yQ
+         KmUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778011614; x=1778616414;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U69pDkFx0w5rkGimfNd3UP42FE6wKyks8vJvY493nVM=;
+        b=OtmZ6CyVANoofVGm76rnlsgqTlOCLNAGeu2U3MuCPTKChw/qqs53gie+mk1+r5HL0q
+         tLButotUuFBcDX8O1kM8/uugynVSL9WKPp1ZIJ1oQauR8dsOzTPMx1viOs9iA/aak2Th
+         ffMzv4ahcMV7ivaz1QEcixJMYS/zpLKnjGa/w0kOH4Q+LBliTm61uukLW6bCtAUOChtN
+         8QtHVWD5crRGrVXUFvLWOf2wc+RzK4AeHD5RYHvH3RlpuNPaC6XULhv4H34LvFV7i8fp
+         SLTNAGrexawI2CdszjhRYnMuOPEUUDcGW2JWup6jURq6u+PIE5Ddp/vYUBrNmjRuNq7/
+         juXA==
+X-Gm-Message-State: AOJu0YyMD/vJEBLFqgqYUT+QxcqI0584EsPJTEkMgn/HhT+fc43arr6p
+	WRsLOnxJO2Ig+OpkZ81WpHw2B5ie2wB/wy8L8+IoBZ4xThSxzKz4PUKH
+X-Gm-Gg: AeBDieuR9omN/GgM+ttQU1+DpGb0xBmxEkTM66AB4uDGhRLt15jBr/VMqFXPYdEuH75
+	8lnd/toe8iIUih8xnTJ+Nqs7NbKzUOiOHkSBkm1l+fc408drg4wRTpS2jRawXtYrnWRELqZhKZ7
+	x6aiGA2NgEUMsrM3c40o/NhKMCKK8zznhAEJyIYGr+c0gkKMmdsbGvLU/Aefcf26Io5WPi0xXbc
+	dl4+tvhv7YB0+Sw1o4PtI4qtYOQ/IASRsXOPLQtKQ8VIcPimcwbc8T3qawXro8vjYx+3y2sDgzb
+	RXbmrZZ6zV9VORTcetNcvpvWXI4cy5KpZgJic1ZPwr62lD8+5VNr3Me1uQOVjvXwOKjJ7hyiAWm
+	KA380OK6PYtj4H73pZhXfBi4gm731hlqdj2kJl4HPOOcmBy/pSkrllT6sgpmkBoMFs3TUY7/+my
+	vCzCncFt4jkGx1TpOCR7wiDgy2jfHoHPbAbL0L8hI2DuheHJo=
+X-Received: by 2002:a05:6000:144c:b0:43c:4810:dc4a with SMTP id ffacd0b85a97d-4515da9619bmr861987f8f.38.1778011613478;
+        Tue, 05 May 2026 13:06:53 -0700 (PDT)
+Received: from builder ([2001:9e8:f130:ed16:be24:11ff:fe30:5d85])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45055f2203csm7049511f8f.37.2026.05.05.13.06.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 May 2026 13:06:52 -0700 (PDT)
+From: Jonas Jelonek <jelonek.jonas@gmail.com>
+To: Russell King <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
+	Jonas Jelonek <jelonek.jonas@gmail.com>
+Subject: [PATCH net-next v6 0/2] net: sfp: extend SMBus support
+Date: Tue,  5 May 2026 20:06:45 +0000
+Message-ID: <20260505200647.1125311-1-jelonek.jonas@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS4PR12MB9708:EE_|DS0PR12MB7770:EE_
-X-MS-Office365-Filtering-Correlation-Id: ad91aaa9-9f06-44fb-7d9f-08deaadffa10
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|376014|56012099003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	1zPrfVRC4CFFCEQKQtm98s1Fp7otLMoc6miBZDYwRLrlVkor2gJBeOQFjcVoD+UI9DJDJYqKCC99u0kHG7mev3vHVTfRYzR/ai8Q+M6OG83CQAz1iroIa+KcncG4JdYH7rC8o3SYUhzncLpE8bHMwGWaVBjJ0oNocNUBL6OurD1IsBQNpkHexIXKP3HGDcxOG06Mx5kVrUuyJiIle7fujyc6AVgdCxkI/LxpbNQFmcVPn1FKSS/GyXwrp8ByRzxR2GglTB6rLwPl9CuoT1iwioijMmyyC11d162hzeTtU1LmthNz5+atkMJRrpuZyd2IYqPa0MTE9sTCOCj7KaKcZHzkqSwxekZg8i5p/L80JJSNWE6VElRBxtkMJHbkFdHJADfFxv8Qc5Qq5mYveCQmE4lyA+8EDl7JwV1gcfDtUjRPzkvGX4eFsxjgM3eiodf52YC0gnBkx+ZYsRLbefteH20mutLeswdJl4TwkvdbPYjuew9r+qCOGh3mY0QLNeFCQIXCLrQR1hXFunrqlIyKyqFimFPV4cCfO6ygWKLrqz91ejBWjpYJpxNzFRuXhOVupOyMUWdL96nY7FB9K+wWSAmAROdnUf/PGkXsvNx4TXJPVkwtm58oFtFH80IqaTP2nmImMlVxCuuYt/J4AXPSpscLIAbVXHGoNsrgQojOWi7LPE0D445YCxDf/CppRwGf
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS4PR12MB9708.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SjJiTFZOQXA3c0k2WFJiV0NaSmZxcFRZQkFTM2RoRTlzWUNFczJ1TEN0aVY3?=
- =?utf-8?B?Ukx6Ykt2bGU0OVFTZXV2U0NEUDhjWDlZbjVYUmE3T2VUTnlHa3ZEL1Q4TnBZ?=
- =?utf-8?B?OXRqUzFqcGxnZ2hlSTEzSkFLQm0rVTlWc1B6UmZ3V2JDNFJOMW9JZ2FibDVr?=
- =?utf-8?B?a3ZOV2dZQjAxem5xVHFLUFNDTWMwV251Z2pzeVc4YlBqSE1IS0l2VHlQaURj?=
- =?utf-8?B?K1ZkbVo5c0ZLbmp3TWRKaWFVT08xbXV4aGs3dGl1bjVZbFhwdGZDTUlDd3N6?=
- =?utf-8?B?dDFyS2JyNnFOZ3NrcXJ0MVd1Z3dsNEs1bjhLbWZSV21wNkpJZzJjSUVVQnl4?=
- =?utf-8?B?TWZJVnRQUitnYmx6QUpocHlBbHA5N1MvREVhblh6K3pLeTIyZFZ0dG9nMDRZ?=
- =?utf-8?B?YVpWSzhsQUtmSEpMQkMzYkxNRC9LcjdQRStvSXZ5TW83VHEyVlhRS3psK3Bt?=
- =?utf-8?B?SFlxVmtreDVjblZOaFdKRFJzazFYRmZ6NDdCbk9uZlRaRkVYMUtQbVFOeUVU?=
- =?utf-8?B?anNMY1hMN1lwVlBORUhpWGhJQTRpM3o4dUZuRmFWUnhnZ2ZOWnppY1VpbGFE?=
- =?utf-8?B?bEt3LzVxSHJZTzFHT3Y0V3JiT015MHMwSlRZdnBmbTZtQTdKMHZ2aXBVNmI3?=
- =?utf-8?B?eG5Fb09jU1RYb1d1ZkI2bThBc3RCVy9TRkk4TUZmL3k3WCtEOUx0NkVEQmpC?=
- =?utf-8?B?UG15S2dmWmhiVW5jWDN5cGJBckJkdVZSTktaZXc1V1dFbWRwYkFOdTl2Q2lU?=
- =?utf-8?B?UStTSjljM3N6aXNjdmxDdVZjdnFRT3Ivc0VFWWh0N1VCTmxiWHNoQnZiNC9W?=
- =?utf-8?B?eEJib08xTGRuZVplaisyNk9KK0p3d3JYTm5yYmxhY3VoSTZvSlhGYUtxc0JM?=
- =?utf-8?B?S0kzT2pud0JyTC9OTUdXejUrQ01sdHNmR0twZEdmRDl6a0VCZEpocXZWc0Rt?=
- =?utf-8?B?SlNDT0F3YjBiR0RZeit3REZaRnBrVUdIQTY0TWUvS2xYL2oyZUVOdXB4Tnlr?=
- =?utf-8?B?bUI0TkordW96OU5yUmQ4VXFDNUJROFFxcWhwcXdqSmJSTVNWRnJ6NGRod053?=
- =?utf-8?B?YkVRalVQaVo0ZVRqdE5FWjgweEo1UzdTSG1waWJYbHJMR2s4LzB2NEpNQzNu?=
- =?utf-8?B?UU81NU9HNVRvK1VuczRzK2JJNmJPVG1ncElPUWh3NVhiclVvMWM1RXU1a0RC?=
- =?utf-8?B?UTBtV3BQWFREYlJpbVNYR1pOYmJ6ZVhBdGowMXJCanlEczZzbnVjdzh0c2Yw?=
- =?utf-8?B?cG1sbDNtSTUyRytsTTk2Q1g5OCtVT2M3aDBxZG85b3ROUHVMb1FsWGFOTXFO?=
- =?utf-8?B?bTFERzZpWGFrYWYzMWx2dmQ1UjdpNEw0THA5Qy9zeHVvQjRrTEJYUUxtVUxT?=
- =?utf-8?B?UGdGU3ZEU01kY0JRVTZSamNvZzFyVUxqWTZPR1FMQ1dZZWpZMGVhUTRCKzNY?=
- =?utf-8?B?ZnY1eDVscjhick9aWGdZb1hCbVBjc2sxb0JraFJVc25MSGpEdDFNT1E4djlS?=
- =?utf-8?B?NXFsanMxeG9xaFdmOUExM3BTanlxYitibnlobXNZM3J0b2F5UzdOaGltcElG?=
- =?utf-8?B?aXkyYnI2REJaWjJ5NkVDaGk4WUtoTUM4SVZZYmtldXI1WHlSdUY2SWlqcSt6?=
- =?utf-8?B?dzF5UHBBRkpoWHV5TnBQcGV1N013RkI1MkRIVG9ZRDFtQURpeVFIZkE0d1Mw?=
- =?utf-8?B?ZzU2TTZ4VUdlU25EZVNOZkgwajRRNmZOZ2Y4QjJac0hhUnB0TXVqcW55T2Jz?=
- =?utf-8?B?cVp6QkdMeXA1RVdLS0c5WFNUUXF4TkI1bWhFcUFHejNORXRjS0M0NG5XZVFS?=
- =?utf-8?B?ZXIwYXJoNU9ya09NdVJXamVGYVZDaWsxMmF1c2l4Z1FYc0lzcnRlS05tTGw1?=
- =?utf-8?B?TUcxdzRyU1pNNzdRYmllMksrSVN5eWVQNnJxWXduVmpvZG9DQm5NYndkRDhV?=
- =?utf-8?B?NHhMNklCSjdiMlR2UUQvc2ZZR05wQzlva1VGQ2piaW83Mk5Lc1dCZWU3ZHdE?=
- =?utf-8?B?Vm1aUWNNcmFsZm55eTExTUVEM21wdjRKQThnc0E4Q2MrejM4eUpIWDdROUps?=
- =?utf-8?B?aXQrckY2L3dnaTNrT2NYWllnR3N3QkFCNy9oMmNlakF3ZjdRUXk3ajVFLy9S?=
- =?utf-8?B?RG16SVZoYzZPbE9DREk4VUNxS1FrakIvS2NaQjdDWENqQmY0aktHTFRkbHRp?=
- =?utf-8?B?YkptRmZ3RjVOemtPNk9WTDFQazR2cDNxaVdRZEFGNVNjQlNSUk96REJ3b3Z2?=
- =?utf-8?B?QjR5U3hnNjBFS1NtNVl6bVA1VlNlYlkxcEJzbTdmcWxwNWZibThhaDNTNGhP?=
- =?utf-8?Q?XaCxXlBBOYgatqLzQN?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ad91aaa9-9f06-44fb-7d9f-08deaadffa10
-X-MS-Exchange-CrossTenant-AuthSource: DS4PR12MB9708.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 May 2026 19:53:28.4445
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: V48hZYx+PP6aRrMSzjNgrqcorT3oSKSN89pDAsRuGVynYbataGbYzFuSGRK/onTs
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7770
-X-Rspamd-Queue-Id: 24FB44D35A5
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 8BDBC4D380F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284574-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-284575-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[eric.joyner@amd.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,mork.no,gmail.com];
+	FREEMAIL_TO(0.00)[armlinux.org.uk,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.998];
+	BLOCKLISTDE_FAIL(0.00)[100.90.174.1:server fail,209.85.221.41:server fail,2001:9e8:f130:ed16:be24:11ff:fe30:5d85:server fail,104.64.211.4:server fail];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amd.com:dkim,amd.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-On 5/1/2026 4:39 PM, Jakub Kicinski wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
-> 
-> 
-> On Thu, 30 Apr 2026 20:15:52 -0700 Eric Joyner wrote:
->> The number of times that link has gone down at the port level is tracked
->> by the firmware and sent to the driver via regular DMA writes to an
->> instance of struct ionic_port_status in the driver's memory.
->>
->> This statistic was never reported, but it is useful for diagnostics, so
->> add it to the "ethtool -S` stats output, grouped with the other
->> port-level stats that are contained in struct ionic_port_stats.
-> 
-> We have a standard stat for this:
-> 
-> struct ethtool_link_ext_stats {
->         /* Custom Linux statistic for PHY level link down events.
->          * In a simpler world it should be equal to netdev->carrier_down_count
->          * unfortunately netdev also counts local reconfigurations which don't
->          * actually take the physical link down, not to mention NC-SI which,
->          * if present, keeps the link up regardless of host state.
->          * This statistic counts when PHY _actually_ went down, or lost link.
->          *
->          * Note that we need u64 for ethtool_stats_init() and comparisons
->          * to ETHTOOL_STAT_NOT_SET, but only u32 is exposed to the user.
->          */
->         u64 link_down_events;
-> };
-> 
-> 
-> IOW the definition of this stat is - ignoring asymetric link faults
-> this counter should match between link partners.
+Today, the SFP driver only drives I2C adapters that advertise full
+I2C_FUNC_I2C, or SMBus-only adapters via single-byte transfers (with
+hwmon disabled). Several SoCs ship I2C/SMBus-only controllers that
+support more than just byte access -- e.g. word and I2C block -- and
+have SFP cages wired to them. Today, those adapters either work
+poorly or not at all.
 
-So, this is a little awkward to talk about -- we are already filling out that
-field with a stat that's calculated by the driver; there's a task that monitors
-link transitions and increments it.
+This series teaches the SFP driver to use the larger SMBus access
+modes when the adapter advertises them, and along the way starts
+honoring i2c_adapter quirks on read/write length so adapters that
+cap below the SFP block size are handled correctly. Patch 1 is a
+small prep doing only the quirks handling; patch 2 extends the
+SMBus path itself.
 
-But, I'm not sure if that method exists because of older firmwares or cards not
-tracking the link_down_event count for us. So, I didn't want to just overwrite
-this stat with the value from firmware because then we'd lose the count on cards
-running firmware that doesn't do that counting for us.
+Capability matrix supported by patch 2:
+  - BYTE only:                   single-byte access (unchanged).
+  - BYTE + WORD:                 word for >=2-byte chunks, byte tail.
+  - I2C_BLOCK present:           block as the universal transport.
+  - WORD only (no BYTE/BLOCK):   accepted with WARN_ONCE; works for
+                                 even-length transfers, odd-length
+                                 transfers will error at xfer time.
 
-So that's one reason why I put the stat in the generic ethtool stats output, and
-gave it the slightly different name "link_down_events_phy" to distinguish it
-(this also matches Mellanox's name for consistency) from this stat in the struct
-you posted. Though reading the doc comment you posted, this new stat really does
-belong there.
+Adapters with asymmetric R/W capabilities (e.g. only READ_I2C_BLOCK
+without WRITE_I2C_BLOCK) remain functionally correct but use the
+worse-supported direction's max for both directions, since
+i2c_max_block_size is a single field. No mainline I2C driver was
+seen advertising such asymmetry; per-direction sizes can be added
+later if needed.
 
-- Eric
+---
+
+v5 -> v6:
+  - Split adapter-quirks handling into a separate prep patch (1/2).
+  - Use I2C_SMBUS_I2C_BLOCK_DATA in the block-write branch (was
+    I2C_SMBUS_WORD_DATA), so block writes actually transfer this_len
+    bytes (also flagged by Jakub's AI bot review).
+  - In sfp_smbus_read/write, check i2c_smbus_xfer() return before
+    copying smbus_data into the caller's buffer.
+  - Use I2C_BLOCK as the universal transport when available (carries
+    any length 1..32); drop the this_len > 2 guard on the block
+    branches.
+  - Broaden the SMBus gate to also accept BLOCK-only adapters
+    (Russell).
+  - Accept word-only adapters with WARN_ONCE rather than rejecting
+    them (Andrew).
+  - Add a short comment in sfp_i2c_configure() explaining the access
+    hierarchy (Maxime).
+  - Use the all-bits-set form via i2c_check_functionality() for the
+    composite I2C_FUNC_SMBUS_* checks (Russell).
+v5: https://lore.kernel.org/netdev/20260116113105.244592-1-jelonek.jonas@gmail.com/
+
+v4 -> v5:
+  - made a more general approach, also covering word access
+v4: https://lore.kernel.org/netdev/20260109101321.2804-1-jelonek.jonas@gmail.com/
+
+v3 -> v4:
+  - fix formal issues
+v3: https://lore.kernel.org/netdev/20260105161242.578487-1-jelonek.jonas@gmail.com/
+
+v2 -> v3:
+  - fix previous attempt of v2 to fix return value
+v2: https://lore.kernel.org/netdev/20260105154653.575397-1-jelonek.jonas@gmail.com/
+
+v1 -> v2:
+  - return number of written bytes instead of zero
+v1: https://lore.kernel.org/netdev/20251228213331.472887-1-jelonek.jonas@gmail.com/
+
+---
+
+Jonas Jelonek (2):
+  net: sfp: apply I2C adapter quirks to limit block size
+  net: sfp: extend SMBus support
+
+ drivers/net/phy/sfp.c | 144 ++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 116 insertions(+), 28 deletions(-)
+
+
+base-commit: 8c699be3dad7bba87cdda485dc099226cfc2f706
+-- 
+2.51.0
+
 
