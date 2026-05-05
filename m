@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-284256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284257-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eEgGNLSn+WnF+gIAu9opvQ
-	(envelope-from <netdev+bounces-284256-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 10:17:56 +0200
+	id MKQ0ON+n+WnF+gIAu9opvQ
+	(envelope-from <netdev+bounces-284257-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 10:18:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 743FF4C88BD
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 10:17:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41ADA4C88E9
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 10:18:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D0BB330144C1
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 08:17:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8C5B03029253
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 08:18:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E95A43EAC82;
-	Tue,  5 May 2026 08:17:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59A6E3E9F71;
+	Tue,  5 May 2026 08:18:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="UR8KAD6q"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LVpq/Bn7"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011032.outbound.protection.outlook.com [40.93.194.32])
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012043.outbound.protection.outlook.com [52.101.43.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C033E928E
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 08:17:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD7013DD53C
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 08:18:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.43
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777969074; cv=fail; b=k8NU7YKWdlDp0S8OrcobT+vL8zjKEd0jSyu4qf5UwqBIdRbyvu4nc2BTsUicH+D0HiRLSjEAKehE4M7Ia8E+BYMf98SCPhfNic7bnmpEbJ4lauSJDhDPaabuhxJA8A+tOud7SvUtUyVQIi5Bia3EnZW18b3vtK7W3NwwSmdsdF0=
+	t=1777969085; cv=fail; b=Nphrx0uSgaaZdoDQWsE+cDIGna7rDHTOD/oZr0px02r+CXIYhQmNC876PPaJnCSTaU2aP4IFoQvp+VgCWYbYa+otGQdIh6ibW99vskTWdKh/sag2SWwQd3k7k6CAkbbza74ixEYHewwHeXfaSFagEls7R333KcCVhAYfvSmCmbQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777969074; c=relaxed/simple;
-	bh=Et/TfnunoUx9fWtMXSLbtSjm39AYJeiyX8vdV1sZxCs=;
+	s=arc-20240116; t=1777969085; c=relaxed/simple;
+	bh=2QXn5SZB+EbhxZoOV08ML1WpVrXBjsPjmRE3QFQwj1I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=fludl6++Oz0XLHU3QBgJLE0fMq5EHi7mL+ZJUuoVYiLdq0xwbFgO4UcZkrCRWpFHB7N+IRYDa1o3U0M/+g6eO8cyKDdSJL/XIRB4qL7cr3aQwGM2EdNWJOJiBFTk7EXlnxV2a3kIe3cjoyiBm9tNY/p1lXaLOvDjftV7WNCkkaI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=UR8KAD6q; arc=fail smtp.client-ip=40.93.194.32
+	 Content-Type:MIME-Version; b=o4cY+mPH1pXESz9Cs108e6w1yFItP7DRdaVZj6vjRCFe/lCatFNioqEsXz8ryXs3J6JXiSzJBUTFFO33h3U1AWetJGlf8UoedS/iBYwV39R+mImFiHL1P9enhYP6RUB+2IJNBMALqwj8mbCUaaVHTzvr4MN2Mx7Vm0i2om00QKY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=LVpq/Bn7; arc=fail smtp.client-ip=52.101.43.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bauNizCoTUB8fpbJSabVL+oAcUKkD9VAmKpgbHDhgn+ncFWJbbHOeAiXQivXo2zxVoAM9cQaHw91jA2u46LBeJXUvc7sdrg4g8ZyH35jwrvmBn/1XVMpqW+0jdzF9aQGJabMiLU8X6EQOgRDU35PG4ExbW2eyEkPMtYTRqrrY9ShAnXkxqzJyUq30IZU7GY8muVezopMckulpJli/ITcEMt1mm2fe7zTdYuBTmzr30T0XEJC7VOxnkU67GZEhvMasXv+97+Dyrxu4gQzojHkrDf8rKo1P4/eTMy9CSpg+YYFBzNaI6yFp53OD874t7h4pKj/pEBTaINGz8dbAk6vfA==
+ b=oks2sHa/EqXRopduQL4aPkvBl+esLuvZFMLXcpcqqHGBf7KjrbfwYzeQ11X1O5oqAl45xaJBdCqDWzkCyORl4AAjul0lGsowhxxWg8eWcF0vz/z/rYyQSV9Oizs8DI4EmarqKH/sz5cvC/vYUiDovZVaFN5yrLYXD6FmBTlLHcy10wZKxcX+dmCxelZKXdLeb8i8LhVMprkb5yMIUYwe28cvvzS64JMM3jiNI24sPcSGdHralNgjUNJh/DA3crB5B0HlGvQK+8KMnWQz6nvMpBvp4QOMsgycXxpy6eGrJGOYIdWtbX8VsZTnNvckuJugsqKbjBLPa6IX2+FKbhqIjw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=I0UoGNp7qBiEAcouNQvuK/CdICIZHDtAc5/12gXH5Pg=;
- b=MYbs22Xs7nengxga0s3XRjh/FvSG1oUB6aHSGXYGMuQzUj4iaRqhJ5lnk+np8ZWxK5eLnxVaulgF+ROG3NWsvihCHP556qOijWhuWarUbMkZgtvOkGe3Op9Q5jkErX1xsfbneNy8Ve1HzIfgrIcicVjp42Kr3oENaXj4GyuZlCH2hooMAllh4ZKQ4VTfTAc2bNM026ciFyuJR+7xb5UnFA+gxoBxiTcudPzBrvJlJvF+DWUTFDNSR0QNVQKvWwii9ordICkrYzLlQiIy1t/t9wJFrkn6Df9waQijpIfwryaBSNWny2xV9BmRaySlMcGlvekeooZ5KYZaC8fX+Eo0og==
+ bh=mcGaDIoGhU2nEI9M7iGulUn2fm4v3hf7VujY+QfMOz0=;
+ b=ljY6lb7Vb6EYMt4bvb8600C4BQWArKBWm3Ru085KvWbCuuv5GxtHVxVMSY9JgXgCjtcVhp8IZ5DDZTK9U6IdDkVrE5YVd3VPAjxDQmhxL3oE1V7JZv7A7ppmc9v1slOQ9MrYWepzYYe6p5XD1p7KCXbcdOPHJIY5y8wgE/Na01D7+6lWujGp8ZVVl7+8G1wKIK73Mud/QXOoBs6JqYIDoCmYmgQXlk+IT5L5/sC93vH2G4LWP4g3mFyQdunCNN0dBPCfreOllGl+Kx3PoUNAnYrYWXS5Fwc+sVCmKUDi2uw0OkXHuvO2shJh7LXj2bY4ri/Kfi7HOjfU+wkOuGsYmA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I0UoGNp7qBiEAcouNQvuK/CdICIZHDtAc5/12gXH5Pg=;
- b=UR8KAD6qbiPqSFp300Ot991BqBdJAAgqe2eBgkCnb5louH1cmOfSzev6SsuP87JzWghe0eLIypI2Knr0Js0t+FExX5O2ZeLnYRdycKpUs7E4OKkGmrqNjjkcQ3h/2oprmUBLLF0zM8CLltihWm5xNplWOK9RWE+6vtzKH16vjq62exf/++EN0L5EKhnu3djREZKoP7G+FinyPoOhtRZ5FDiVRtiI9v8ph90gAmPCoOC1ErYlgGczlJvVV0LlewtSRGbahMxs5rj00qyOMRFhP8yT36RdARlCu6bkVGEDKw28B39PFjmzPyvv0lPaEDdWqUUs0KIedDFnX5d6jCVoeQ==
+ bh=mcGaDIoGhU2nEI9M7iGulUn2fm4v3hf7VujY+QfMOz0=;
+ b=LVpq/Bn7O02MNHvsiWjySNvQwESYX5A00TO5rXjHAoADiyEROFatlmFSYKgIk5YG5mastGeCIrHMVh5uKlx2fuA3HoUQV5rA+9EKvS8V/XICqcMLAXP4CDRSZO3JCwnqfSbFExk5JIm7e693kSU+pwTmOEm8Q0Q5y9hpw4tlA9r8r4K/c5L31lpIsJMUrS3w/E+HuZLMS0r+L8yAlWraYGGWuOMV3Fm+iZJnJQZc1TARjn7Y/ULRPPhXjuRe9HU5uYoktC3TLEBltksqY45NmbVv6x7O5jF4Xhy9lzEtPdo4h7teACE6ia0cTRSrVINnaXyqh5AMlE8HSMbN4Mc3Zw==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
  by CY8PR12MB7564.namprd12.prod.outlook.com (2603:10b6:930:97::8) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.27; Tue, 5 May
- 2026 08:17:50 +0000
+ 2026 08:18:00 +0000
 Received: from SA3PR12MB7901.namprd12.prod.outlook.com
  ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
  ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.20.9870.023; Tue, 5 May 2026
- 08:17:49 +0000
+ 08:18:00 +0000
 From: Ido Schimmel <idosch@nvidia.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -69,16 +69,16 @@ Cc: davem@davemloft.net,
 	horms@kernel.org,
 	petrm@nvidia.com,
 	Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net-next v2 2/3] net: Do not unconditionally turn on carrier when turning off protodown
-Date: Tue,  5 May 2026 11:16:54 +0300
-Message-ID: <20260505081656.463158-3-idosch@nvidia.com>
+Subject: [PATCH net-next v2 3/3] selftests: net: Add protodown tests
+Date: Tue,  5 May 2026 11:16:55 +0300
+Message-ID: <20260505081656.463158-4-idosch@nvidia.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260505081656.463158-1-idosch@nvidia.com>
 References: <20260505081656.463158-1-idosch@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: FR2P281CA0166.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:99::13) To SA3PR12MB7901.namprd12.prod.outlook.com
+X-ClientProxiedBy: FR2P281CA0150.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:98::11) To SA3PR12MB7901.namprd12.prod.outlook.com
  (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -88,58 +88,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|CY8PR12MB7564:EE_
-X-MS-Office365-Filtering-Correlation-Id: a43608e9-4992-4a80-1238-08deaa7ecbd0
+X-MS-Office365-Filtering-Correlation-Id: 92d03e16-9731-4768-071d-08deaa7ed257
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|366016|376014|1800799024|56012099003|22082099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	PhNIsCwnF+YKj40OViRgS1NraoGnwWdYi2RfYSrZy8qsDJYj2YpeJ2c1cq/vH9/hG/V1ME2v8H9a8W6ZBD8Xn8owUrtu9F1T2Q+0+LGpzpHvngJ3/uDGEOtOmwgIRqYmdEI67l6c/rHo3Jbe1zW4PaBkFaGWY3vIJRUreTGmREafWeQSKLpQh9PzQxCO6A31XD+8wTMTR6V+MrC/JLwA3tVOlKQuLswANtiulOAZh/CpYGQx3zaofmS7p0Nnb7BcPHrZcHExhpdVFw2yidWKsq2yqjttEet/KVDuNWFQWYrBRSoYMSnntOGUpl5aQtikOuyKeWY27N8R0WZKWPDZzf8f5+PxQ01xXvkbKgTNDG7frENGjBrVtoxOi1979DbfTBEO6NVZP1HpHPKDv8swyzlkTMcHcr++NS3LP2H8ivoX9M2TkfLkzJxFsL8gtxGiYJQnD9SCtMgUjHSzq+Lx5nW3IgNa/z+rrsi3wfM/fYa+EUYEaJEBbxct8A9Om25XCEO9SzuKKlALsj/YRugfmbVSC05BXWxZaXb38HRunwdttW79NZnnCCtWZGVJB3QpzWJyT/nPIKzGEhbdyTiEyoPVJapT4vm/bEfhHVcJU5oXTeyCJwTfL8HCgA2OaxjTXHXJ9tc7UQZgBwNUrAeDJoKJXVv5922xZ0oB5H3MVY4DrVhbsb/MNVPyHsydSCu0
+	23exasqInHCXFDbOdN0q2zA33KIMCmBCR4eTXpLeE1s+6FgH6aulvoj0R0AWvbZaldF3sf5nslW/hA0DJqukMdzqRlCg/tIRj1CM6vLL1AoSYifjB3hCMePw6viPP5G9QQlFOQt4TQRCIDQGB2eFEDv84OBy6i2q8unLcGWGKgKwOMVZZ0bKBHiesVExSz7EkuoRVpG9dmTyVPSiuCroVwrnxzy0H5f7Cun/JTUywRdIHaflej6evCEMEn5R0GFqo8I4fjbdApn/QYbxopRtDjCHYcQkqabTt9A20IkEL1orMmrF80hcyT7+4aGh+qC/sOyH7brhi2KFBNTl4GRSj1gYWcggLt0+WOUdK/JQ3N+I2PBfs2RtbyklKEJY14DG/CN2dwGxfYKcxNNZVNe00R1aHUQCZ/mWB+M3OZzCJagPor1lXO4eeVb2Kg/kX4tZUKSj8XeBrGe4gKVSGXkXkfcAteAiuKxkeud3YMSagVGdsB2tzOBm/Cw9QnJ6bzp8SwnD05fTttQL3xICyRCTqRWMwH8XAzfywIX7U3O8BP8ETKnUB+6Ve3ZITlCeZmkSV6+t0REUflloCxTmN9KF/qDs+ndRMw2Sm8ivDUUD808ZvtOs3LL5bh9Sg89KZafqiz5ew8k8jE1I+STtvUK1M99KL9eCpHdMAQkFfAqZ8HbmreoFzkJEwmyQz0JKtzUE
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?gKG/e0nqLAbpEPQv7clxfrR1PnNqAMr7XXXAVLFI2ZWFzpUOyjzKVT/3LbmJ?=
- =?us-ascii?Q?o8ka13eyyfSo6EPcvIlhTlowmaC2Zh6jXhA3CGl/EzOK7ji1kIHgLTCnhQ+O?=
- =?us-ascii?Q?QzRg450I4sGWLW9bNAlQq/Ae6xfcGX6qHZ3MNNy/BpeFjLNJrvLWAvM9sqwL?=
- =?us-ascii?Q?06KckOp+1AHNvy/TkHDcNxZOJD2YmMUb2SifLmfYzfCj0kvjHMXSfSC/4Eer?=
- =?us-ascii?Q?asWO75YYXKl/f19QHCOMHU1hEszjwa7BCqmXO0JK2SmWrZ4eRMAOmoY3YLQv?=
- =?us-ascii?Q?Sz03I+e0HyAuUzQWNfRC7Own9ys9X2uLZNfDaPXCY9YK5bF8KUQ3qhQBTttW?=
- =?us-ascii?Q?D31UL/L7ODfLTTA85dcbByiRn4gs48SguHwhvFdyfvbFoO3jZE/4EFJyEaTk?=
- =?us-ascii?Q?5GMflcqa5ryLkZm0J0mLsLeyfcBUfBJcUbBEz9xdHM5+SpA+DRoYk6Lh7wDa?=
- =?us-ascii?Q?zUx0CVkUVeVYD4q0EOhnsCw7sqBus4o+NS3eBjTEZ0X4ytZsDtnX2xl50HRr?=
- =?us-ascii?Q?dvqHg60P11PCG0GDC2hJTTC9a8rnEkjq8ZUNdfo1bLJGyeeaKr2wwkdtpj8a?=
- =?us-ascii?Q?P+SvA4z6DHp603sxUfWB+/jlBoyPXzBgjaeZb0je/UCJmW3EGxUv4ixYcxi3?=
- =?us-ascii?Q?GCQPc6QRCEjovLU2OQnEp6Btcv2TKN9JGGJ9Mc/Tk0yWWdRc9frjsq3+Ecus?=
- =?us-ascii?Q?Cm61FD0dlt82SaIuZxkuCLpu4iWGuoO01z5gAQ3+QJ/I7Ps/umk0qOXKL0WO?=
- =?us-ascii?Q?derH8r4lUvr382NRJZkiFuYLPiOIRJpS3+rtH84+GRUpkT36bUGp56Mas1c0?=
- =?us-ascii?Q?z5YJGPiBaxmK8VfHVDjqUtsNNhzUMIBLRv/YbW5xQjIJK0HxTRSLN9wKHiL7?=
- =?us-ascii?Q?YAEhFuW6GQ0AO1ayLDrA+vN7+rVk1wKfa68g81GGAkbaeCeDf4BtgmawcIHm?=
- =?us-ascii?Q?UeD4hoJF/d1LzGsnEIlj7QrdChG5hLesBnP1TNoVLri8HrI9sox6FcgsjGg/?=
- =?us-ascii?Q?HsmSdeXy2oiDN9JwzYy94RYNYust0s+k9HsveZ+SAiWmiKODkObpw5RIm82D?=
- =?us-ascii?Q?/C1VorE/fujznpGEK2PSGN3gCQH4P56KXyfSCVL2isHOgBCmt/HKgE+1kkIQ?=
- =?us-ascii?Q?lxSMuaY/LQZnCUyh6r6b/FywE2Fw2XDIhhC1xzDLAIpD6hMhxMIAvZ3IZXX6?=
- =?us-ascii?Q?DITrjMiCiVBI0Ho58DcitmNVONAv6n0IYWfvlhtbGax0j9ynACbB7MA2SAYF?=
- =?us-ascii?Q?1ShwJZOPtfTfVuI4mVnaoNCWaoUT7dW5Awt/auR5wH8FV3/aIsQsfrTTqoxT?=
- =?us-ascii?Q?ehtKblGGEDVHbOJ/ogIYVxwvcVTvDgdPvzkOdQLsU+j0zgdJ/DfS05K4XtMH?=
- =?us-ascii?Q?Ljud3ocICee+zODf69hUD4y9R86NuQ1sk4rFkBM7qlREsRRMO0VkIGazkJCA?=
- =?us-ascii?Q?N82O4Ho+UQqQUyVOmevBF0I3JEVaHCjsEgPhRnqWC0NI15bz6bv43w1iGaM5?=
- =?us-ascii?Q?XeJCF0Ecl/P+rTjEQNYEEnP7Kq5bWUVyNoxp5lZ7d+Xb9F62mC6zdFg46a30?=
- =?us-ascii?Q?q9qwUNcfui6UW+7NaOkVT+OvOQbz06wqk4HBt4XDug+zPnim06N5qQN2K8+l?=
- =?us-ascii?Q?JibzLvqH0InkyQx2i/ovN6rSQhQBakG+wMQpPThRxlcjGfurgW2W/dL5ncSg?=
- =?us-ascii?Q?4tRJxtvcmr2cZteHTfzqHMjq6XEijY6GYJqBj48SqfRxDV6y?=
+	=?us-ascii?Q?pnZlN9v3yO2lFR0bO88tpeP7NYVNyKbRy6A4z0qLAepsCTbFrrVYF0FRf0nk?=
+ =?us-ascii?Q?jJQJINzd/oxQIpkNdBt/8YNbNKBzIF+pQ4k9QOYWuEVJHNfR9+hfMbZh9Xjj?=
+ =?us-ascii?Q?lUoSniT6IHTf9ST3GGFtlTpQRBDXX0kvjpEJFtbbiBUW5lsRXbtPa3ptaHY5?=
+ =?us-ascii?Q?gqyqdUXbUSP/rONrbpzs0dU4Us+xn7N+nWHpYrCb4dhrGel+oZ25x6/PmFIV?=
+ =?us-ascii?Q?4GFvvqks/aW/3ZAA32HZgnIUBtxiGU4fF/Xa7ohXCXwDQ4XMk6lHnAXjTLYj?=
+ =?us-ascii?Q?DxpE60AhMquRfdMaLjYyuPYAS5kY0zrVoebuxwcPxTHhTO90CWOKy6JHf9W8?=
+ =?us-ascii?Q?vAS9THVgHOU/7tE3UuqETq7S84MUs9y1PMPB4zWWi4te4v2tinL+g3XmiJ0t?=
+ =?us-ascii?Q?weaJA865LT4L1uHzHGkpJwUO4rMSNQVvSIAMb4V6+/Wn0ReQgB9rl86QaVUz?=
+ =?us-ascii?Q?CBDxTLM+B6kzcQnSKKCNvkOb79aSDLo6qoc00SlPYgnYFTAss+Ke9mNAdI1k?=
+ =?us-ascii?Q?Uk02zQGJIZtjVmw2tCcsFOeksasCnZ8vNJndVfQuT2691CQGNIjl0TaQypaW?=
+ =?us-ascii?Q?72A59OqVMYNxxxw5eJ0CWzN7eTSI5lvz3cjxN1HNafnCibRYTzkgKm6mc+Af?=
+ =?us-ascii?Q?f9kVRKU13jwAFXd/HFgS5jB1OcBJoBFsm7kWXJfQl4EoRVcpjx8FWyCdSO4b?=
+ =?us-ascii?Q?dQpolr9K/dzcEbzzqvMijQRXs49ApmmQxXD3bQO8fA9Anc/yg0IQ5qBwxYsm?=
+ =?us-ascii?Q?5juLn3WRwzAavO4TjAapSc6Q5Bn8Z1J0jTTsoIEjuqKei9rMhxh95bEdXSZ1?=
+ =?us-ascii?Q?aGDnUN6Cn8/ZS53ikhSSDtJRzsVmMTHmSAFT6bFLjQfBZ83H9PC0OQOvJK70?=
+ =?us-ascii?Q?5z1J721AXmADIF33nwhx2aW8bUCMqaphK7iNGQh1EzWCC2JxqsRA1j9uRU2b?=
+ =?us-ascii?Q?K4olooKcO4OR4QRrBAR5sFN8VtpQzFCNdcCfGjno6rkDxmw6qf3JxlvQ0XcQ?=
+ =?us-ascii?Q?oBHYjDxJy4OnGJuIsFtY3SkHsxa8Ow1Fn01Ab0v9jk3G1o9zUnN/fydgROwf?=
+ =?us-ascii?Q?0x/3npkn9qXHYtBvAiYXWuFqmiAkToVauPxLXjdXQe5a8QK/mhIDhc59N5iB?=
+ =?us-ascii?Q?5e6SC00EjSU+HO14+OlFpaP0QylLctwhDG0aV0l7Un+GkyvBxXo1DENxVEp2?=
+ =?us-ascii?Q?gydmzodJEE0WOQVZ5E+Tsk65H2rZVKul1GakZLJXw/589VHY1BVsitgsUiy8?=
+ =?us-ascii?Q?UqYDAyP8tc2gJDHwXHxXdjJao81R4DGmxgY4gNs4YerDORtVJGGKa9rDpC0y?=
+ =?us-ascii?Q?z1gTFXPME+cuGM63d+U/hKkROk0Ehs+A9I6MCFpkg8OhTbd0jTbLOCENXs1u?=
+ =?us-ascii?Q?dQxyiVdt3fiLd7KwN5ttFrQVAm32dBerZ11bdD6z/FOmuT8MbIP/Qdb0OdgT?=
+ =?us-ascii?Q?Rti+J05KsXv0bXnB8uJBvgu9byrJmoAwfaZsBzkHGn2Kzqp5aXUunfz53XuJ?=
+ =?us-ascii?Q?ocMjxeI7owEMGk+f8nU6Qi0q2g0M8CqZO7ZWaLBe8zDV1KK4bDqNMU3T7935?=
+ =?us-ascii?Q?aKzHnEG97KD5QrBiVA1CF8feRU1g8kxuEtBnpYeTq1cbo/CGHgT1B2jUQZlA?=
+ =?us-ascii?Q?Xhs/qPbKcRZs+04nZx11Qrk0Eua1N26FvJjltoCc9ioofB6ASw2Kd7MkCtRg?=
+ =?us-ascii?Q?48MOaXX/j0DFplluwfYAKwSZ9x+ZddpDScr7X6pj0gyL6Lyu?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a43608e9-4992-4a80-1238-08deaa7ecbd0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 92d03e16-9731-4768-071d-08deaa7ed257
 X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 May 2026 08:17:49.7380
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 May 2026 08:18:00.6459
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Lqx8cLt4VFjFxC2UZwllErPnx6yDW/IH0uUwmbG1WcNTyKkRQJDiTlSRPPrUC9zJik0TtKMnQkFFgJSq5sDZzg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: mFGBtRV8ymW0Tuo7D6LBVnXAThAlvCfUsSdSSAwBM8mjrX+egy3zBsY/Xnh8kZ7GScZM7HVtD5NLuSv62jeijw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7564
-X-Rspamd-Queue-Id: 743FF4C88BD
+X-Rspamd-Queue-Id: 41ADA4C88E9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.34 / 15.00];
@@ -148,16 +148,16 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
 	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284256-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-284257-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[Nvidia.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
@@ -168,116 +168,248 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_HAS_DN(0.00)[]
 
-The protodown functionality allows user space to turn off the carrier of
-a net device:
+Add a selftest for the protodown mechanism.
 
- # ip link add name dummy1 up type dummy
- # ip link add name macvlan1 up link dummy1 type macvlan mode bridge
- # ip link set dev macvlan1 protodown on
- $ ip -br link show dev macvlan1
- macvlan1@dummy1  DOWN           0a:5c:a3:05:c7:86 <NO-CARRIER,BROADCAST,MULTICAST,UP>
+Five test cases are included:
 
-When protodown is turned off, the core unconditionally turns on the
-carrier of the net device:
+1. Basic protodown toggling: Verify that setting protodown on macvlan
+   results in DOWN operational state and clearing it restores UP.
 
- # ip link set dev macvlan1 protodown off
- $ ip -br link show dev macvlan1
- macvlan1@dummy1  UP             0a:5c:a3:05:c7:86 <BROADCAST,MULTICAST,UP,LOWER_UP>
+2. Same as the previous test case, but with vxlan.
 
-This is wrong as it means that a macvlan can end up with a carrier when
-its lower device does not have a carrier:
+3. Protodown reasons: Verify that protodown cannot be cleared while
+   there are active protodown reasons, but can be cleared once all
+   reasons are removed.
 
- # ip link set dev dummy1 carrier off
- $ ip -br link show dev macvlan1
- macvlan1@dummy1  LOWERLAYERDOWN 0a:5c:a3:05:c7:86 <NO-CARRIER,BROADCAST,MULTICAST,UP>
- # ip link set dev macvlan1 protodown on
- # ip link set dev macvlan1 protodown off
- $ ip -br link show dev macvlan1
- macvlan1@dummy1  UP             0a:5c:a3:05:c7:86 <BROADCAST,MULTICAST,UP,LOWER_UP>
+4. Operational state inheritance: Verify that toggling the lower
+   device's carrier while protodown is on does not cause the macvlan to
+   inherit the UP operational state.
 
-Solve this by resolving the linked net device and if one exists, inherit
-its operational state when protodown is turned off. Otherwise, as
-before, simply turn on the carrier. Set 'dev->proto_down' before calling
-netif_stacked_transfer_operstate() as this function is a NOP when
-protodown is turned on.
+5. Lower layer down: Verify that toggling protodown while the lower
+   device has no carrier does not cause the macvlan to transition to UP
+   operational state.
 
-Resolve the linked net device using a new helper and have it return the
-device itself (in a similar fashion to dev_get_iflink()) if the device
-does not implement both ndo_get_iflink() and get_link_net(). If the
-latter is not implemented, it is unclear in which network namespace we
-should look up the linked net device. Currently, this helper is only
-used for net devices that support protodown (macvlan and vxlan) and for
-both it returns the correct result.
+Note that the last two test cases fail without "net: Do not inherit
+operational state when protodown is on" and "net: Do not unconditionally
+turn on carrier when turning off protodown":
 
-Output with the patch:
+ # ./protodown.sh
+ TEST: Basic protodown on/off with macvlan                           [ OK ]
+ TEST: Basic protodown on/off with vxlan                             [ OK ]
+ TEST: Protodown reasons                                             [ OK ]
+ TEST: Inheriting operational state with protodown                   [FAIL]
+         Macvlan operational state is not DOWN despite protodown
+ TEST: Protodown with lower layer down                               [FAIL]
+         Macvlan is not LOWERLAYERDOWN after clearing protodown
 
- # ip link add name dummy1 up type dummy
- # ip link add name macvlan1 up link dummy1 type macvlan mode bridge
- # ip link set dev dummy1 carrier off
- $ ip -br link show dev macvlan1
- macvlan1@dummy1  LOWERLAYERDOWN 0a:5c:a3:05:c7:86 <NO-CARRIER,BROADCAST,MULTICAST,UP>
- # ip link set dev macvlan1 protodown on
- # ip link set dev macvlan1 protodown off
- $ ip -br link show dev macvlan1
- macvlan1@dummy1  LOWERLAYERDOWN 0a:5c:a3:05:c7:86 <NO-CARRIER,BROADCAST,MULTICAST,UP>
- # ip link set dev dummy1 carrier on
- $ ip -br link show dev macvlan1
- macvlan1@dummy1  UP             0a:5c:a3:05:c7:86 <BROADCAST,MULTICAST,UP,LOWER_UP>
- # ip link set dev macvlan1 protodown on
- # ip link set dev macvlan1 protodown off
- $ ip -br link show dev macvlan1
- macvlan1@dummy1  UP             0a:5c:a3:05:c7:86 <BROADCAST,MULTICAST,UP,LOWER_UP>
-
+Assisted-by: Claude:claude-opus-4-6
 Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 ---
- net/core/dev.c | 25 +++++++++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
+ tools/testing/selftests/net/Makefile     |   1 +
+ tools/testing/selftests/net/protodown.sh | 182 +++++++++++++++++++++++
+ 2 files changed, 183 insertions(+)
+ create mode 100755 tools/testing/selftests/net/protodown.sh
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index bfb0f297b234..46f8a2efd982 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -10141,17 +10141,38 @@ bool netdev_port_same_parent_id(struct net_device *a, struct net_device *b)
- }
- EXPORT_SYMBOL(netdev_port_same_parent_id);
- 
-+static struct net_device *dev_get_iflink_dev(struct net_device *dev)
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index baa30287cf22..c6ff7b504e97 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -69,6 +69,7 @@ TEST_PROGS := \
+ 	nl_netdev.py \
+ 	nl_nlctrl.py \
+ 	pmtu.sh \
++	protodown.sh \
+ 	psock_snd.sh \
+ 	reuseaddr_ports_exhausted.sh \
+ 	reuseport_addr_any.sh \
+diff --git a/tools/testing/selftests/net/protodown.sh b/tools/testing/selftests/net/protodown.sh
+new file mode 100755
+index 000000000000..de6ab90c521a
+--- /dev/null
++++ b/tools/testing/selftests/net/protodown.sh
+@@ -0,0 +1,182 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++#
++# Test the "protodown" mechanism. Verify basic protodown toggling, protodown
++# reasons, operational state inheritance when the lower device carrier changes,
++# and correct operational state when the lower device has no carrier.
++
++# shellcheck disable=SC1091,SC2034,SC2154,SC2317
++source lib.sh
++
++require_command jq
++
++ALL_TESTS="
++	protodown_basic_macvlan
++	protodown_basic_vxlan
++	protodown_reasons
++	protodown_inherit_operstate
++	protodown_lower_layer_down
++"
++
++operstate_get()
 +{
-+	struct net *net;
++	local ns=$1; shift
++	local dev=$1; shift
 +
-+	ASSERT_RTNL();
-+
-+	if (!dev->netdev_ops->ndo_get_iflink || !dev->rtnl_link_ops ||
-+	    !dev->rtnl_link_ops->get_link_net)
-+		return dev;
-+
-+	net = dev->rtnl_link_ops->get_link_net(dev);
-+	return __dev_get_by_index(net, dev_get_iflink(dev));
++	ip -n "$ns" -j link show dev "$dev" | jq -r '.[].operstate'
 +}
 +
- int netif_change_proto_down(struct net_device *dev, bool proto_down)
- {
-+	struct net_device *iflink_dev;
++operstate_check()
++{
++	local ns=$1; shift
++	local dev=$1; shift
++	local expected=$1; shift
 +
- 	if (!dev->change_proto_down)
- 		return -EOPNOTSUPP;
- 	if (!netif_device_present(dev))
- 		return -ENODEV;
-+	iflink_dev = dev_get_iflink_dev(dev);
-+	if (!iflink_dev)
-+		return -ENODEV;
-+	WRITE_ONCE(dev->proto_down, proto_down);
- 	if (proto_down)
- 		netif_carrier_off(dev);
--	else
-+	else if (dev == iflink_dev)
- 		netif_carrier_on(dev);
--	WRITE_ONCE(dev->proto_down, proto_down);
-+	else
-+		netif_stacked_transfer_operstate(iflink_dev, dev);
- 	return 0;
- }
- 
++	local current
++	current=$(operstate_get "$ns" "$dev")
++
++	[ "$current" = "$expected" ]
++}
++
++setup_prepare()
++{
++	setup_ns NS
++	defer cleanup_all_ns
++
++	ip -n "$NS" link add name dummy0 up type dummy
++
++	ip -n "$NS" link add name macvlan0 link dummy0 up type macvlan mode bridge
++
++	ip -n "$NS" link add name vxlan0 up type vxlan id 10010 dstport 4789
++}
++
++protodown_basic()
++{
++	local dev=$1; shift
++
++	ip -n "$NS" link set dev "$dev" protodown on
++	check_err $? "Failed to set protodown on"
++
++	busywait "$BUSYWAIT_TIMEOUT" operstate_check "$NS" "$dev" DOWN
++	check_err $? "Operational state is not DOWN after setting protodown"
++
++	ip -n "$NS" link set dev "$dev" protodown off
++	check_err $? "Failed to set protodown off"
++
++	busywait "$BUSYWAIT_TIMEOUT" operstate_check "$NS" "$dev" UP
++	check_err $? "Operational state is not UP after clearing protodown"
++}
++
++protodown_basic_macvlan()
++{
++	RET=0
++
++	protodown_basic macvlan0
++
++	log_test "Basic protodown on/off with macvlan"
++}
++
++protodown_basic_vxlan()
++{
++	RET=0
++
++	protodown_basic vxlan0
++
++	log_test "Basic protodown on/off with vxlan"
++}
++
++protodown_reasons()
++{
++	RET=0
++
++	ip -n "$NS" link set dev macvlan0 protodown on
++
++	ip -n "$NS" link set dev macvlan0 protodown_reason 0 on
++	check_err $? "Failed to set protodown reason bit 0"
++
++	# Cannot clear protodown while reasons are active.
++	ip -n "$NS" link set dev macvlan0 protodown off 2>/dev/null
++	check_fail $? "Clearing protodown succeeded with active reasons"
++
++	ip -n "$NS" link set dev macvlan0 protodown_reason 0 off
++	check_err $? "Failed to clear protodown reason bit 0"
++
++	# Can clear protodown when no reasons are active.
++	ip -n "$NS" link set dev macvlan0 protodown off
++	check_err $? "Failed to clear protodown with no active reasons"
++
++	busywait "$BUSYWAIT_TIMEOUT" operstate_check "$NS" macvlan0 UP
++	check_err $? "Operational state is not UP after clearing protodown"
++
++	log_test "Protodown reasons"
++}
++
++protodown_inherit_operstate()
++{
++	RET=0
++
++	ip -n "$NS" link set dev macvlan0 protodown on
++
++	busywait "$BUSYWAIT_TIMEOUT" operstate_check "$NS" macvlan0 DOWN
++	check_err $? "Operational state is not DOWN after setting protodown"
++
++	# Toggle carrier on the lower device. The macvlan should stay DOWN
++	# because protodown is on.
++	ip -n "$NS" link set dev dummy0 carrier off
++	ip -n "$NS" link set dev dummy0 carrier on
++
++	busywait "$BUSYWAIT_TIMEOUT" operstate_check "$NS" dummy0 UP
++	check_err $? "Lower device is not UP after carrier on"
++
++	busywait "$BUSYWAIT_TIMEOUT" operstate_check "$NS" macvlan0 DOWN
++	check_err $? "Macvlan operational state is not DOWN despite protodown"
++
++	# Clear protodown and verify the macvlan comes back up.
++	ip -n "$NS" link set dev macvlan0 protodown off
++
++	busywait "$BUSYWAIT_TIMEOUT" operstate_check "$NS" macvlan0 UP
++	check_err $? "Operational state is not UP after clearing protodown"
++
++	log_test "Inheriting operational state with protodown"
++}
++
++protodown_lower_layer_down()
++{
++	RET=0
++
++	# Bring the lower device carrier down first.
++	ip -n "$NS" link set dev dummy0 carrier off
++
++	busywait "$BUSYWAIT_TIMEOUT" operstate_check "$NS" macvlan0 LOWERLAYERDOWN
++	check_err $? "Macvlan is not LOWERLAYERDOWN with lower carrier off"
++
++	# Toggle protodown on and off while lower has no carrier. The macvlan
++	# should not transition to UP.
++	ip -n "$NS" link set dev macvlan0 protodown on
++
++	busywait "$BUSYWAIT_TIMEOUT" operstate_check "$NS" macvlan0 LOWERLAYERDOWN
++	check_err $? "Macvlan is not LOWERLAYERDOWN after setting protodown"
++
++	ip -n "$NS" link set dev macvlan0 protodown off
++
++	busywait "$BUSYWAIT_TIMEOUT" operstate_check "$NS" macvlan0 LOWERLAYERDOWN
++	check_err $? "Macvlan is not LOWERLAYERDOWN after clearing protodown"
++
++	# Bring the lower device carrier up. The macvlan should transition to
++	# UP.
++	ip -n "$NS" link set dev dummy0 carrier on
++
++	busywait "$BUSYWAIT_TIMEOUT" operstate_check "$NS" dummy0 UP
++	check_err $? "Lower device is not UP after carrier on"
++
++	busywait "$BUSYWAIT_TIMEOUT" operstate_check "$NS" macvlan0 UP
++	check_err $? "Macvlan is not UP after lower device is UP"
++
++	log_test "Protodown with lower layer down"
++}
++
++trap defer_scopes_cleanup EXIT
++setup_prepare
++tests_run
++
++exit "$EXIT_STATUS"
 -- 
 2.54.0
 
