@@ -1,206 +1,162 @@
-Return-Path: <netdev+bounces-284492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284495-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6C6aNTkV+mlRJAMAu9opvQ
-	(envelope-from <netdev+bounces-284492-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 18:05:13 +0200
+	id KKLJFrQV+mlRJAMAu9opvQ
+	(envelope-from <netdev+bounces-284495-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 18:07:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9F704D0DA1
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 18:05:11 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 747274D0E0E
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 18:07:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8BF2630422B2
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 15:56:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id F091A301FB34
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 15:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C7DA48B388;
-	Tue,  5 May 2026 15:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2D4A33064D;
+	Tue,  5 May 2026 15:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="gZy73bsS";
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="Vvj1h9Y6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SRLB5fuK"
 X-Original-To: netdev@vger.kernel.org
-Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C322748B375;
-	Tue,  5 May 2026 15:56:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777996604; cv=none; b=WAxdWmCNr0+EGvzRx+impsqNUq1CMhGg6g9RHMehG9I+xj4LyNTY8ttrSmtXzHdmi/3c7c3rxdgfwHum5PUB9BJA0JU7o2SWjQclmxTyQ6/DW049FyDNBnPDeAheVMwzzU+2jd8UjJ9kgfabkCsD0ADMm7bY6FlcwoBYtir+9Ag=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777996604; c=relaxed/simple;
-	bh=P/nWth4JdW9U9oijroHIeR3esaQQeQ+oA9kKEBeJmFg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WTdQJA/ZNw9g1eg/3eQ1UdfynG3zm+Du/HKPf6oGJZOVdSuYkiIxzAf7Zc8TfjPgiHAchhVnVfuttK24cXwm1D8zsJCdM43IA5dhwRdPZTWtgRBJlEhf6H23mb+K4z5zGJc/gQAf9hdsAAir7vx0DHoVa9O8zqsMRnXQ3n1zLFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=gZy73bsS; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=Vvj1h9Y6; arc=none smtp.client-ip=23.88.97.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1777996601;
-	bh=P/nWth4JdW9U9oijroHIeR3esaQQeQ+oA9kKEBeJmFg=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=gZy73bsSTAq6574LDxLmLYrhytj6+9zI4qQEzgHDAWGfCYRoR+1zCH5UxG7UlIAZT
-	 Rv9M63yW/r1h4sKZprrBx0haXf79KgFpD2wKsKLxnE9aZ/xGPqJy5Y19M6iSdMe1rM
-	 eT6CZotcbVqYolprg6K7L9YL8X2twMdaPTtn2ohPqwtjBHk3FlW6O9SsM9XgrDihDb
-	 XVB4ldUciAejrjVUtLAMGfdZKvOpyz20BGq3ajoSbOdl3S9Z7pTurkfYm9rcE/6YC1
-	 JVwMqzGQFRPrj4pJiSb0gRwvBbBd2VJ0+EGBqcJ+FQNjEWmUgM/tVRd26FnId3AYOq
-	 CDmGmQCcCgcsg==
-Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
-	id 40E41425FD; Tue,  5 May 2026 15:56:41 +0000 (UTC)
-X-Spam-Level: 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1777996598;
-	bh=P/nWth4JdW9U9oijroHIeR3esaQQeQ+oA9kKEBeJmFg=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Vvj1h9Y6hu/NGgWJpf52X5wlIIGScNAU4CKAUn8ZgWntQJo+jiEYTCUkNWpZ+JTH1
-	 OL6hIB8xspxqMmjqUOyckO5qKnPoByirigs/Ed0lTC+BxshNtr+Zu8lYs4iN5VIcMx
-	 R70IDajwUUZHNzOBWzOJ1EBuq0fnlHBPg5givZH045mj8HI0wi7oh/swSrZEBRcg5j
-	 29gtbiyRA6oMLH09bIkiICw2ngDtIo9tRskBWce4blFb7S1EabVksZQTcoNRTxaSqz
-	 L73TVLvwxDDc350vTkTdDQ1aFB6g9eVkvGUyT1lXEu95XfPyb1WeO3njewQ5gD2ML0
-	 b4AHgfxIPnxWg==
-Received: from AMDDesktop.lan (unknown [IPv6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb])
-	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 0EA8142498;
-	Tue,  5 May 2026 15:56:38 +0000 (UTC)
-From: Birger Koblitz <mail@birger-koblitz.de>
-Date: Tue, 05 May 2026 17:56:35 +0200
-Subject: [PATCH net-next v4 3/3] r8152: Add firmware upload capability for
- RTL8157/RTL8159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04AA472760
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 15:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777996656; cv=pass; b=U1VgcqGwzvDllJtiRmifvHhK7sGedbZDcsWH0/EO+4SZioOLFtekzGeOrxeqSRBocxneujdNUKwkJhbVr8f2L3Pm+foi0Urhaq0ot5faF8WgocP8RA91adIydIkMEz0DIAPeS9/1CjgpzAOXkTuBTzx7o8HPH8xjlT39gGAQ8vA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777996656; c=relaxed/simple;
+	bh=LDNzA0ktaQOd9EO9z8tWH2U9AqQnquf4cSGKsb1TqKY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=msGpOHdHhH1o7RE9a+Cb4Ez0z5hPD9AD0OMs6/lcf6PKCy/dnPQVmSOFOtmtasKNn6VWQgZPIJTn4ssL2tmWGUDNQ5708BKONekJ+cjkyg9Y7LnA8gLTYJo7jufQCQccR3I7DIsKjHzcexjqW/QnE99AV/dta7XVP90FZtf38ys=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SRLB5fuK; arc=pass smtp.client-ip=74.125.82.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-130b2295ed0so2446425c88.0
+        for <netdev@vger.kernel.org>; Tue, 05 May 2026 08:57:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777996654; cv=none;
+        d=google.com; s=arc-20240605;
+        b=VVyBZmWuJ3Tuebn/S5iDF0WyHDBQULW0MjG4jDCCJxJQ2NpwDfqAgLQV74sJoFSrTm
+         3lxQdR+irFUPmFTt8xFrIen2g3JP7+sfUWrnQRMCfMSXfZGL5FmZL66qIrBbJjBHgHCF
+         wtD1PDnvfiRlFRD52sbsynPjvgyJNxvUq+XsoX8t/zGr7PpNhV18DtACTiamyXlaTt4b
+         zuszq4BpRuQul2NWhOdac2GAsxn1u8g+zwb+uIKbJ+N/xKe3ozWNjuiwpOOrG+eNBACJ
+         heK3xURCRmoFvmM8HTKy1gqBAHYKi61oY8Ml1jMp82PZ9GKGgWjijPlud65B9w4ZoXZ7
+         kLnA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=LDNzA0ktaQOd9EO9z8tWH2U9AqQnquf4cSGKsb1TqKY=;
+        fh=KUeV0kbfmQC+LH24dk5qyBO0VSscQETtYAGNrnCHZnI=;
+        b=ZYhFWu3B6N24B0BGDxwoVaChbqowLIswSUjKiDfSphSqBcdJDjHKsDUJSfQmW4fEZs
+         H7k4O3fFo7PvLvsqGwQ2wzLwSoavqbCb4/5vWPKpES/qGp85rUOkzHTUaq9pXfhudCsF
+         774tLRHSdmkx6JUHKFs3ZsjLoXok3VK6N+7xmloKu0nG7hIK5yJgm4Odml4ApuvVeoU8
+         mNp945HR8HajGyuzC2rpbh0zPA8rJ1xT5De64sP1+XUT1bojdVXycD+1uLzDMe3FPYOd
+         yAkqF5dZweKpFFY9rLLoJ6MPGt01tFW29LMutgxfyWnVN8FE+TDHMt3OMvWR4aP0+tvY
+         ds6A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777996654; x=1778601454; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LDNzA0ktaQOd9EO9z8tWH2U9AqQnquf4cSGKsb1TqKY=;
+        b=SRLB5fuK+rlRbRhR19pBwry7cLZbvtRVEXUjGHjYwtc7Am201qdkI/9ScVbPpVQdvn
+         o2+lMM+mNjjwpz3ySgVFsMjc05G/Bf52ulrCsBdX7D1k+oOdBGuX+Blizi0Db0U0DQZl
+         gTtzzuxGExcSNZrIP+LJ2Fy65AuAcfV4gP3yHMpJbf3+WcmoeJqfp/YykIkfmeW/Wmog
+         axaqM/d0gMoaPtVMeQtHkwwIP31E8UzAem7dL8aR/VWks1SJMK1r5/UMEOZGfd7wFjgH
+         sQRJNkzol8SOmXs5P68i43fKcXV8qkp6/l/nsK5WGFQAENusU/Bf/XPf15vZX5LuAXTU
+         yTjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777996654; x=1778601454;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=LDNzA0ktaQOd9EO9z8tWH2U9AqQnquf4cSGKsb1TqKY=;
+        b=NJmmMP7m4fpEQGf7nGDIrRBaOlB1OGjEXBsSe4Xal0T+Ohf2LcZF8jmkaFuAsuGJT1
+         SOWpx4TN3kSjwZKhrICRiW88AWldjy00pnXqlNsnR9+QQMd+m8lYarsjp1OeuUuR5h+1
+         CH42xt7k8Or2/txdB3WUyP6R1IfukrBc1gsAtFKG3MuDqmOAwLhHdYSzYnLr7wCMCzG1
+         lfknKD/qByNUuubOXJyOgIGGqyxYImXBd0zAanB507bCFaQELoBCUYqUBCAguzZsaD/u
+         d0EiEicrkHx58JTbScZUefxZki4HJltAA6eE4KQ3La65Zg9LjdC2FnCcvmcPYdhswk4c
+         i+uw==
+X-Forwarded-Encrypted: i=1; AFNElJ/wlIsCpb5uRTSqr4nghhOkTrK1/wZdqI1/5awXwuH/pMkTQ9+whyUnWfyFpqsYNuYeaoM/DO4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz13tHlD8jJLJw51qr0Kg6iOMXt2Qzoxoh9se9uUgp3VZAuiZ+e
+	C5k06Ilyq6YsCz/rBALQjpnz1vnA4nkEj5O/zsSRjNYIcGvqE6AmRDDzy7bq8wud4FhUgbpdsqR
+	z38/lg/Tos+OVcAhOhfGT2dX6b3qvvMfPAfQfMbP6
+X-Gm-Gg: AeBDievUlKMGbnAF8MgwqJsEOdTed1eDEUofq2Notm4D/PueOGekhFsCT9tO9hxYGNk
+	clFprziBdL8/rkOG2wzGS7YnPYavL18USCtir99NVczL0NZ3/9PtvTnAHsfWUUpc0dCx+K4wUKP
+	eUTbDe2PiIlrhXsOGf5q+mpK9+aR166hCCcdi3jA0pW0YjkyP/V0OOOMxZW1A+mC5Cm08YdSNSV
+	otc40oBMhuC1BN7jg5T8MMYjymZsnMvzTkKpD114eHlgKsNtI03G+k/cJNBExQB+N3tf78daI+R
+	BrrGUbFX5VDV3o+RQppiL38Vu6jJmA==
+X-Received: by 2002:a05:7022:b8c:b0:128:d34a:320f with SMTP id
+ a92af1059eb24-130b173badamr2261604c88.12.1777996653500; Tue, 05 May 2026
+ 08:57:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260505-rtl8159_net_next-v4-3-1a648a9c4d8d@birger-koblitz.de>
-References: <20260505-rtl8159_net_next-v4-0-1a648a9c4d8d@birger-koblitz.de>
-In-Reply-To: <20260505-rtl8159_net_next-v4-0-1a648a9c4d8d@birger-koblitz.de>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Chih Kai Hsu <hsu.chih.kai@realtek.com>, 
- Birger Koblitz <mail@birger-koblitz.de>, 
- Aleksander Jan Bajkowski <olek2@wp.pl>
-X-Mailer: b4 0.14.2
-X-Rspamd-Queue-Id: D9F704D0DA1
+References: <0-v1-dc5fa250ca1d+3213-mlx5st_jgg@nvidia.com> <CALzav=ci8bi3=sY+F3HJTB5sOQ_pJ8Lm+kz0CDBBWVXry5P98w@mail.gmail.com>
+ <20260501164314.GA1381708@nvidia.com> <afkjkBq8B-4KjhS_@google.com> <afoR1izCEe9y0MZA@nvidia.com>
+In-Reply-To: <afoR1izCEe9y0MZA@nvidia.com>
+From: David Matlack <dmatlack@google.com>
+Date: Tue, 5 May 2026 08:57:06 -0700
+X-Gm-Features: AVHnY4JrW8dKYzLI7vKq9aNciL3ihCmWQQqvYeVf-qNxqF1RpyWt82ID73cuiLw
+Message-ID: <CALzav=d7a-55mg01MEfaonsU-+4QxbRE3QXpZLskteF28tdaUg@mail.gmail.com>
+Subject: Re: [PATCH 00/11] mlx5 support for VFIO self test
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Alex Williamson <alex@shazbot.org>, kvm@vger.kernel.org, 
+	Leon Romanovsky <leon@kernel.org>, linux-kselftest@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org, 
+	Saeed Mahameed <saeedm@nvidia.com>, Shuah Khan <shuah@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
+	patches@lists.linux.dev, Josh Hilke <jrhilke@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 747274D0E0E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,realtek.com,birger-koblitz.de,wp.pl];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284492-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[birger-koblitz.de];
-	DKIM_TRACE(0.00)[birger-koblitz.de:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284495-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[dmatlack@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[wp.pl:email,birger-koblitz.de:email,birger-koblitz.de:dkim,birger-koblitz.de:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
 
-The RTL8159 (RTL_VER_17) requires firmware for its PHY in order to work
-at connection speeds > 5GBit. Add support for uploading firmware for
-the PHY using the existing rtl8152_apply_firmware() function
-in r8157_hw_phy_cfg() and set up the correct names for the firmware
-files.
+On Tue, May 5, 2026 at 8:50=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com> wro=
+te:
+>
+> On Mon, May 04, 2026 at 10:54:08PM +0000, David Matlack wrote:
+> > > The PF support flow requires a bunch more complicated stuff.
+> >
+> > Do you think it's worth supporting PFs? If anyone with a CX NIC can
+> > enable SR-IOV and run selftests on a VF then we can keep the driver
+> > somewhat simpler.
+>
+> It turns out my test system cannot enable SR-IOV due to iommu_group
+> problems so I rather prefer to have this :) I had to hack a kernel up
+> to do the initial testing and it was very annoying.
 
-This also adds support for uploading firmware for the RTL8157
-(RTL_VER_16) PHY, for which firmware is however not strictly necessary
-to work. Still, this allows to upload newer versions of the firmware used
-by this chip, e.g. to improve interoperability.
-
-If no firmware is found, both the RTL8157 and the RTL8159 will continue
-to work.
-
-Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
-Tested-by: Aleksander Jan Bajkowski <olek2@wp.pl>
----
- drivers/net/usb/r8152.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index 1e7f20348ac6def85106f1e8bab93a377980c77d..d281ad5ed78eded01876c6064aed95e1f78cfc05 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -4663,10 +4663,11 @@ static bool rtl8152_is_fw_phy_speed_up_ok(struct r8152 *tp, struct fw_phy_speed_
- 	case RTL_VER_11:
- 	case RTL_VER_12:
- 	case RTL_VER_14:
--	case RTL_VER_16:
- 		goto out;
- 	case RTL_VER_13:
- 	case RTL_VER_15:
-+	case RTL_VER_16:
-+	case RTL_VER_17:
- 	default:
- 		break;
- 	}
-@@ -7982,12 +7983,14 @@ static void r8157_hw_phy_cfg(struct r8152 *tp)
- 	data = r8153_phy_status(tp, 0);
- 	switch (data) {
- 	case PHY_STAT_EXT_INIT:
-+		rtl8152_apply_firmware(tp, true);
- 		ocp_reg_clr_bits(tp, 0xa466, BIT(0));
- 		ocp_reg_clr_bits(tp, 0xa468, BIT(3) | BIT(1));
- 		break;
- 	case PHY_STAT_LAN_ON:
- 	case PHY_STAT_PWRDN:
- 	default:
-+		rtl8152_apply_firmware(tp, false);
- 		break;
- 	}
- 
-@@ -9926,6 +9929,8 @@ static int rtl_ops_init(struct r8152 *tp)
- #define FIRMWARE_8153C_1	"rtl_nic/rtl8153c-1.fw"
- #define FIRMWARE_8156A_2	"rtl_nic/rtl8156a-2.fw"
- #define FIRMWARE_8156B_2	"rtl_nic/rtl8156b-2.fw"
-+#define FIRMWARE_8157_1		"rtl_nic/rtl8157-1.fw"
-+#define FIRMWARE_8159_1		"rtl_nic/rtl8159-1.fw"
- 
- MODULE_FIRMWARE(FIRMWARE_8153A_2);
- MODULE_FIRMWARE(FIRMWARE_8153A_3);
-@@ -9934,6 +9939,8 @@ MODULE_FIRMWARE(FIRMWARE_8153B_2);
- MODULE_FIRMWARE(FIRMWARE_8153C_1);
- MODULE_FIRMWARE(FIRMWARE_8156A_2);
- MODULE_FIRMWARE(FIRMWARE_8156B_2);
-+MODULE_FIRMWARE(FIRMWARE_8157_1);
-+MODULE_FIRMWARE(FIRMWARE_8159_1);
- 
- static int rtl_fw_init(struct r8152 *tp)
- {
-@@ -9972,6 +9979,12 @@ static int rtl_fw_init(struct r8152 *tp)
- 		rtl_fw->pre_fw		= r8153b_pre_firmware_1;
- 		rtl_fw->post_fw		= r8153c_post_firmware_1;
- 		break;
-+	case RTL_VER_16:
-+		rtl_fw->fw_name		= FIRMWARE_8157_1;
-+		break;
-+	case RTL_VER_17:
-+		rtl_fw->fw_name		= FIRMWARE_8159_1;
-+		break;
- 	default:
- 		break;
- 	}
-
--- 
-2.47.3
-
+Ok sounds good.
 
