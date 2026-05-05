@@ -1,204 +1,209 @@
-Return-Path: <netdev+bounces-284487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284488-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cNKmL0wT+mlRJAMAu9opvQ
-	(envelope-from <netdev+bounces-284487-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 17:57:00 +0200
+	id qJ14FKQT+mlRJAMAu9opvQ
+	(envelope-from <netdev+bounces-284488-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 17:58:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 237764D0BB5
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 17:57:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C21F4D0C1A
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 17:58:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E95BA30115AF
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 15:53:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A75D0302E33F
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 15:54:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C251548AE0C;
-	Tue,  5 May 2026 15:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89DD648AE1C;
+	Tue,  5 May 2026 15:54:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lziqa25C"
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="oHMtNo/z";
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="rawzbc3c"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012013.outbound.protection.outlook.com [40.93.195.13])
+Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E9E48A2CD;
-	Tue,  5 May 2026 15:53:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777996420; cv=fail; b=sBWuuXzayl509whV9Lr7oAlOBCt0Y5p9SksVci0q//ZDpSO1vzXmx6xHlsuU+kr+EhvSCFeTwuVe3ZcQJiSl2+k72Qx7NnWbJl4k1cyAl+Yeeq62mhx3icWpqWnm/1NJy5jGjxU2fk+w4twFF4Oy7aMHy8LxnwPyM+qx2fQcJZA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777996420; c=relaxed/simple;
-	bh=bCSUGQ4kht6h9WyGM+IOw44jWI65miEVoLA9Fw9oL3A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=hMUudFlhfY85+TAGiGSgYwKVRaqIfAJiq3q0tCvJ5j+bDAEJ52HRl/Tx5RDQMycxODi+8OjK00Frd5trnGl/6+BHdaXziS/bPY0WKRJkFkCSVdQqOL8lV1BD3W7cSof3mDD72N38y1Zu645AwvHUraFfF5wNJVWLYecj3bko62s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lziqa25C; arc=fail smtp.client-ip=40.93.195.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=N+RFvGcRrVJuMLGfGX6WOXWBoeaIlNVV+pMN7BA4zk+QYnkq89YFvX06NBGIg7lUbrGppnQd6CgdkQupeABPSekTvNkwHx/9B6Yh9rOWFYpYm8xP0A9qv9AJ2GTHMW4k3gJNkG8GbokX2HT5+fB52RMK5FMgF0XVoe37ZpHrfwnHOhhVi2ClxlUZ7vHZjFRQHokgDTtdFTczMSuj/P2vdj0j3bq8WyMjJtbgLmabV04L7S0pHfJfFYywGwhuK0WRzhY8PQsu4UZzNu7bDRBOtWx/LKf2iGl3nglCMEER7Uae/oPs1xb4uEJcHrtqfqfisT2bGd3H81CTB1hu7X79mA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+tjTRlnBXCISp5MSzdfPsSD8kTaGRaGdfz4QgLQNEdM=;
- b=uGnhJg6724WqYBwABNWA/Fl9oR9qIYiVGuO9OhhO37pdD4Xtn9Yj6r/f+eDyhXqi/4LZAUscRflgWBpWQf2F2fYtU+ggDseECfT8rfUvgKV1G6K0o1VE3LHV6Hxt0wv8WlmM0CYS5des8Xu5PekhANlSqdK6U8TViuWluzbWtb1YRMNHUZ+9IrAgz74Zq84K83tq4wvhGHP3u7yR9cZ5Ke3h5t83rc5Yh+9QN4cb+IKH+p9O+009ZlbMzwkoa2VOdEEC4azaEnTuEoAChVHOsDhSzjTgPcqDlQNVmpceyDnw/slm+/8H3Z+89bUHomRAVhYRNfYByCGlVq84tFNo3g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+tjTRlnBXCISp5MSzdfPsSD8kTaGRaGdfz4QgLQNEdM=;
- b=lziqa25CyNhvKsoshYflIVMK5kHY8+aXiV9kC90OtEz2A9DJoGQSiolnii10ztV+56LSpTgZJoRoA3qPx8t5bTTVGrvnS4s3AAieGDCTpFhR4a/XO9qJtMYaqDSRuMxvXl2AYcDA1WX6Zl5IYjcSJYCprlSPLh6TeHruOByLXLc0e7Gi5tEQ6S+SrjYAwZvzbQ3WPp70LvmcxetpsqiOMmxaImgYoGO7PdEQmFTXeOrcnxM+DMZpEyxjddW6tsLnT092WEuERbkH+98RWWa15mdTEax6uIpT+PyNGSVF3GuFomspYN4WD7wiGcjJsXNEMJYxK/h96nBDwrlmtBy7dg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV8PR12MB9620.namprd12.prod.outlook.com (2603:10b6:408:2a1::19)
- by IA1PR12MB7567.namprd12.prod.outlook.com (2603:10b6:208:42d::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Tue, 5 May
- 2026 15:53:35 +0000
-Received: from LV8PR12MB9620.namprd12.prod.outlook.com
- ([fe80::299d:f5e0:3550:1528]) by LV8PR12MB9620.namprd12.prod.outlook.com
- ([fe80::299d:f5e0:3550:1528%5]) with mapi id 15.20.9870.023; Tue, 5 May 2026
- 15:53:35 +0000
-Date: Tue, 5 May 2026 12:53:32 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: David Matlack <dmatlack@google.com>
-Cc: Alex Williamson <alex@shazbot.org>, kvm@vger.kernel.org,
-	Leon Romanovsky <leon@kernel.org>, linux-kselftest@vger.kernel.org,
-	linux-rdma@vger.kernel.org, Mark Bloch <mbloch@nvidia.com>,
-	netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
-	Shuah Khan <shuah@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-	patches@lists.linux.dev
-Subject: Re: [PATCH 08/11] vfio: selftests: Add dev_dbg
-Message-ID: <afoSfAj13MhbP30p@nvidia.com>
-References: <0-v1-dc5fa250ca1d+3213-mlx5st_jgg@nvidia.com>
- <8-v1-dc5fa250ca1d+3213-mlx5st_jgg@nvidia.com>
- <afkMenQ_gfmLUJIy@google.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <afkMenQ_gfmLUJIy@google.com>
-X-ClientProxiedBy: VI1PR06CA0133.eurprd06.prod.outlook.com
- (2603:10a6:803:a0::26) To LV8PR12MB9620.namprd12.prod.outlook.com
- (2603:10b6:408:2a1::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D5E48AE01;
+	Tue,  5 May 2026 15:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777996468; cv=none; b=NksGwhrBo7VukLIOSn7Z1yasI/cSPcttdCh5F1t3SFc8unvc0r7A9YN1nxpfnwNIWRlAuSZmeYVxID0SadOBsKvkmKMQomqY5Tj3bI5BrBA5DcWIJSD/KRIS/f8b7+vlknq2lIaTTvpw7e4+lEHdFcoeiCppMPcQptPiCEvVjHQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777996468; c=relaxed/simple;
+	bh=d3jSNFU4odcki8bw1xHCG7IfNPbfF8hlOZzKbcXN3Sc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KB6/6v+HJvw0SXPw3T8DVO8+6BJev4S8UO2zBTBiH+8pjeywo+R+QIyvbNtGDrvcZzRdYURwdPbRvEJ7O/jgs4ptoDXsn4vcNpL7ArBvcDJJGOkaPa4ARLDi0/JKVnQ/Q2fXm5EvdKkx4jsZdRXiD6TPPjZxpFKqTZNoFBZ6Z+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=oHMtNo/z; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=rawzbc3c; arc=none smtp.client-ip=23.88.97.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1777996459;
+	bh=d3jSNFU4odcki8bw1xHCG7IfNPbfF8hlOZzKbcXN3Sc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=oHMtNo/zmqyDWJXW16kIFUCaEl8G8NeTvdasgoHqoQGJzn2qjx96E20PQjifPeEsl
+	 mUBLvWWuaJlbhcLJkMuLnSVbXMGhI0phwb6EJVqSf78xonyPy3VWCAcX/ml1DVlo+X
+	 ACIRvf2oVe1RXkRrzWZqitMeFmhHxlm5BVz3j86aeP0ND5jeky0XMlhtdUq16/+sid
+	 kFlrHzL0k0Z9mh+1hQtft77DKkpB/vZTje6fajcWAOPm32yIZhJI5pzI7A0wcK+8WS
+	 Oaf2F3IKtGxEQGj/Z+138lhjxmEUrWWfHBTYJB90z2DAxZVjFzJ06ZKaHWIA/8wOt4
+	 SV3Krxm4BKcNA==
+Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
+	id 58EC542541; Tue,  5 May 2026 15:54:19 +0000 (UTC)
+X-Spam-Level: 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1777996456;
+	bh=d3jSNFU4odcki8bw1xHCG7IfNPbfF8hlOZzKbcXN3Sc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=rawzbc3ckh/At9WZOAKPoqLPgegIk69gmyZigm/NfEz2ptwuYUTt9CLnKj6ZWxsoT
+	 BmaWAKiHmD1sMn5XLRU0cH9/6Pev5QmCl7ZLyNyAo6KRAbqDZELYamZbx4yWCYRKOP
+	 bAFi1qbSnzXwqTRq7J3lM81rehOVnlWAIof3BzVBzhRdCPHyhiCF7aksFtBAuUHokU
+	 zbzuql8w98Z++0oRnCAjxVKQY0Jk2zSffgB94A1y8OUFY1rhqdeRNjXc4B4/qA+mnm
+	 xuiyOGM4nYwnibFOfxOTTIxc0brcP5MdiMAByZhqfBKIz2NZiCxm4ZJRiLNZlST7b+
+	 elro2oil83BVQ==
+Received: from [IPV6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb] (unknown [IPv6:2a00:6020:47a3:e800:271c:c6c5:9fde:77cb])
+	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 7615642464;
+	Tue,  5 May 2026 15:54:16 +0000 (UTC)
+Message-ID: <ba452675-9ced-4ff2-867c-3ece80919267@birger-koblitz.de>
+Date: Tue, 5 May 2026 17:54:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV8PR12MB9620:EE_|IA1PR12MB7567:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3bd25c72-3e39-4874-cae3-08deaabe7703
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|56012099003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	DMSU5TrQRItHiwx/nD8yUlaIx8JVI7EIOR4vceQZsm/PJXFTLevb/IkI+1eyqR+1AodKOTfvaPiR3u5BK74+w4aBCSUAPHqOOWu+CMPwsjdrvNX/IDVFYAuOJWyaOIikLJhFRvzPPT6//Ze3BFGkk6cEUwbMMWrufDsTGm2/0iXjej14PHfM04QG0iqyjkyIIagHCidROujsn71Weerhcrgvfxq8nvB2h6zRXSLBQqGO6T1n78BGGp1gbKrTs5EPWaed5+VKT2Entypj7IURpmw1efeVN2/wfYlObvwFkrOkkfga14LQLCu8lLmup6mKd60Oj+7QxQ5zrK6sx4d92HmOHwDHf9EP2x1m1QW2xCSsc9kCRRBjoesVnO4kLbnvDO6iLtuX4yGZOKdKPLQtQhbMItLat9n3vPdKdZTzRHXCBA43sFUGLRhb6RH/XivvfnGiXi5UsxNrnfnkA2Sik+KagqesDfVVsngBAPOLyMSBi0zeFH6vY8G37YGiUgB74loUIgKCmgNoONU2wB+HmDKpMkeBL3kMLJyLxEGcUWyEiqTD20QhI2f+G5NoTqxvGuox2Z/4n4+qsV00gUVGHDMohQZ/YZWCYGmaBiQPWrTdMjMfLvJJy5LuqmbMF5Fygu5iorcqYVEzyY8PLWc5FEAjNzaPZrldXM6CQ1FbQR5gWDQCy/f/dYQTd8TfrM0k
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR12MB9620.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?0Du3jSWpnxPxGAWx0/lO5onr4FHotQh30AbLQWSAFrLubcw0DViiP+nGluB2?=
- =?us-ascii?Q?eX9h+fooKrIRNnKi5Q4+xqq+fvop43ykwQJ1UxyY9SBBEc41OWvhu51A4YUX?=
- =?us-ascii?Q?lg+xWCe1IjRUhDIHB5d2n+bfa5VFBLucWzGEC6eGIoWUuoVE6XCTVWzyYpUj?=
- =?us-ascii?Q?o1qOcIf4qnLPT88kBa0vRXN0N9eA4M1kYLK+nXg5hDvN4llX7TBd5UjpMMsF?=
- =?us-ascii?Q?tBmqLoS8JiWpH4OVchImbLRzEcirGc9ITLv/GWxdE2PkEDn7+AIuei4BBoPO?=
- =?us-ascii?Q?PXMkOkK6nr+45aFSgfoahlvUNZxYQ/rYnBFNvbXDupm1VVNXfY0wnJj1XLDI?=
- =?us-ascii?Q?V9r7IzO9yx9ljTLLwU5wGxC71IttlrnHRthjlSNZGYVMl2LpB4fbNWAFa5ma?=
- =?us-ascii?Q?v5mI1wLF/P1CUixAKujAUamUryPI30DTLvjDrwh3jaEkmisjFpc6t8QkPdei?=
- =?us-ascii?Q?ffQ86EyT7jkEBqgQMyl0OgmChwPrW2H4OJyFuKzgLdnhIhMMU4NCooN9lW/5?=
- =?us-ascii?Q?L4i6QwMLfDZfQ6f8MdjcnebtEqysvr58c58E6rlEQ39Y590wZvUh/o7XI5FS?=
- =?us-ascii?Q?SLHWBFTkUbBHIQe0e4+QPSE44HqAvUW9R8Q33EFQG5h/WsjVl+x70aR/gon7?=
- =?us-ascii?Q?EtmAAw3pweAdIU8GqUSE6vrCogx48AB0LpZe6TEoj6pKZEBcA6IY4KhUHMDQ?=
- =?us-ascii?Q?J4xidNkoDA0e5aECt2Xan01YSn2io6SL2fB/DHC6cxql8ibTevrM2ooTmsJT?=
- =?us-ascii?Q?YSqM+VhV4VePppYJHPJrqfdWHXRe1eGvE17fdfoUl/7WRaB+Oui2rWPvKGjy?=
- =?us-ascii?Q?kOlJgVi4ifJ/EcZmbhUsTuGH3EQWWpTyiH6qIbFPHOgOyQSf3WQfkkcqfeXm?=
- =?us-ascii?Q?ib6o1t+tsgyLxm52nSQnEHRwK+OmuDHh0M/QfLjoTPHviul+HHw0aKpR40VZ?=
- =?us-ascii?Q?YYBDS1c6AgmknyqLfFVts1at6PGXFoCLue+CVmmWbfQASnYGWcHAOkWuJ6xY?=
- =?us-ascii?Q?gAY4oPdZYcTMZ0z62oPe4Gf+1jEzKtgUc2OkGJJI7NcL9A7NZcVDQLSigQ/0?=
- =?us-ascii?Q?u6F4lGV0W3TC/NwOTqhkmKQyJQv4hGeRsFNJgm3JnSGwQhyZoFJCbszGYa0D?=
- =?us-ascii?Q?PAXrOEIxk1xbKyMhpM+Ma5td2uf3xymMNSzEYsolsP09RJJcTuSiOx/AcKYq?=
- =?us-ascii?Q?55Z/rbIObdpxswbBh6f01vlWLUBVMGsU3oIs5iyxXK01KOsvIWA/JQiHp0wg?=
- =?us-ascii?Q?lhIeBlcihTuGugF/go2doTVzX9pfF6Iry78T77wN9ThPelINOXQa7nZeOCXg?=
- =?us-ascii?Q?1deGhaPOK8IEgMIL634q/JvlxbGrgXNwPVW4O3938Miyb2s6ZDzjmEh+bVt2?=
- =?us-ascii?Q?5U0I1+Y3uHC6jhlAh9VCpzRuz9U3uD2OMTsn0UamgZeDKs5wWL2eDcqhLR/q?=
- =?us-ascii?Q?AYDMYR4lCApVYmG3g1RFgfbMUk2hfPB6q6G74d8lu9WJWr5E9EXEASEmtdjs?=
- =?us-ascii?Q?36FxV4JhIDpLw2iae0N8cC7XNPHEWxxEMuVPlmUYQ++1jDMB2rhtbDFLiruA?=
- =?us-ascii?Q?ZVvv+pkYOJftFkwL/66Z9FElaK0KfQlbYP5YxpRY1Xsf2O4f0W7bmK0orL7v?=
- =?us-ascii?Q?bwwbN71XN6uYatd/HOifN0ruPz3F6+XiQPCUDrYIv5amsF+tQ+YQz3KY2bb7?=
- =?us-ascii?Q?d2aKoA8yXikD4eoH7/wObrXvDiQnEdoFL6oGME1hAgxNIaEd?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3bd25c72-3e39-4874-cae3-08deaabe7703
-X-MS-Exchange-CrossTenant-AuthSource: LV8PR12MB9620.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 May 2026 15:53:35.2100
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RTwW3R+8cMXC1bpAIDkUBBxht+VxuklNeFpJgzbeK3UCRpSrMGt1SXTgu3W2ctEg
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7567
-X-Rspamd-Queue-Id: 237764D0BB5
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 2/3] r8152: Add support for the RTL8159 chip
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, hsu.chih.kai@realtek.com, olek2@wp.pl
+References: <20260502-rtl8159_net_next-v3-2-12c895d46cd6@birger-koblitz.de>
+ <20260505023022.877676-1-kuba@kernel.org>
+From: Birger Koblitz <mail@birger-koblitz.de>
+Content-Language: en-US
+In-Reply-To: <20260505023022.877676-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 9C21F4D0C1A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284487-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,realtek.com,wp.pl];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284488-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[birger-koblitz.de];
+	DKIM_TRACE(0.00)[birger-koblitz.de:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@nvidia.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:mid,nvidia.com:email]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[birger-koblitz.de:dkim,birger-koblitz.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Mon, May 04, 2026 at 09:15:38PM +0000, David Matlack wrote:
-> On 2026-04-30 09:08 PM, Jason Gunthorpe wrote:
-> > Enable it with a #define DEBUG at the top of the file. Allows leaving
-> > behind debugging prints that are useful in case future changes are
-> > required.
-> > 
-> > Assisted-by: Claude:claude-opus-4.6
-> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > ---
-> >  .../selftests/vfio/lib/include/libvfio/vfio_pci_device.h    | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h b/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
-> > index bb4525abd01a22..2d587b988c09fa 100644
-> > --- a/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
-> > +++ b/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
-> > @@ -38,6 +38,12 @@ struct vfio_pci_device {
-> >  #define dev_info(_dev, _fmt, ...) printf("%s: " _fmt, (_dev)->bdf, ##__VA_ARGS__)
-> >  #define dev_err(_dev, _fmt, ...) fprintf(stderr, "%s: " _fmt, (_dev)->bdf, ##__VA_ARGS__)
-> >  
-> > +#ifdef DEBUG
-> > +#define dev_dbg dev_info
-> > +#else
-> > +#define dev_dbg(_dev, _fmt, ...) do { } while (0)
+On 05/05/2026 4:30 am, Jakub Kicinski wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> ---
+> r8152: Add support for the RTL8159 chip
 > 
-> Can you add something to make sure the format strings are still
-> validated by the compiler even if DEBUG is not defined? (since it
-> will almost never be defined). e.g.
+> This patch adds support for the RTL8159 chip as RTL_VER_17, reusing the
+> RTL8157 initialization and USB power management paths. The bulk of the
+> new code lives in r8157_hw_phy_cfg() to configure the RTL8159 PHY, and
+> the USB product ID 0x815a is added to the device table.
 
-Yeah, I did this with the usual "if (false) printk()" technique
+> Is the leading space before ocp_byte_clr_bits here intentional?  The rest
+> of the switch statement uses a single tab for indentation.  checkpatch.pl
+> should catch this.
+No, will fix in v4. Interesting, that checkpatch does not find this. I 
+am very sure I ran b4 prep --check before, it is near impossible to omit 
+that step before sending.
 
-Jason
+> 
+> Small typo, "nomal" -> "normal".
+Will fix.
+
+>> +		/* close Sparse NEC, improve connect 5EUU calble performace */
+>                                                        ^^^^^  ^^^^^^^^^
+> 
+> Two typos here, "calble" -> "cable" and "performace" -> "performance".
+Will fix.
+
+> Is this "will include in v10" comment a reference to an internal Realtek
+> source-tree revision?  It does not appear to have meaning in the upstream
+> tree and could be dropped or rephrased.
+I will drop this.
+
+>> @@ -8201,6 +8407,11 @@ static void r8156_init(struct r8152 *tp)
+>>   			return;
+>>   	}
+>>   
+>> +	if (tp->version == RTL_VER_17 && r8159_wait_backup_restore(tp)) {
+>> +		dev_err(&tp->intf->dev, "init failed, backup-restore timed out\n");
+>> +		return;
+>> +	}
+>> +
+> 
+> Should this path also set RTL8152_INACCESSIBLE on tp->flags, or should the
+> init callback be changed to return an error that probe can honor, so that
+> a half-initialized device is not exposed to userspace?
+
+I'll set RTL8152_INACCESSIBLE in line with what is done already in the 
+rest of r8156_init()
+
+
+>> @@ -8274,7 +8485,10 @@ static void r8156_init(struct r8152 *tp)
+>>   	set_bit(GREEN_ETHERNET, &tp->flags);
+>>   
+>>   	/* rx aggregation / 16 bytes Rx descriptor */
+>> -	if (tp->version == RTL_VER_16)
+>> +	if (tp->version == RTL_VER_17)
+>> +		ocp_word_clr_bits(tp, MCU_TYPE_USB, USB_USB_CTRL,
+>> +				  RX_AGG_DISABLE | RX_DESC_16B | BIT(11));
+>                                                                   ^^^^^^
+> 
+> What does BIT(11) in USB_USB_CTRL correspond to here, and is it
+> RTL8159-specific?
+> 
+> The commit message says the RTL8159 "reuses hardware features of the
+> RTL8157 (RTL_VER_16)", but this path clears an extra bit that the
+> RTL_VER_16 path does not.  Since there is no symbolic name or comment,
+> it is hard to tell whether RTL_VER_16 is missing this clear, whether
+> RTL_VER_17 should not be clearing it, or whether it really is an
+> RTL8159-only quirk.
+> 
+> Could a named define and/or a short comment be added to describe what
+> this bit does?
+
+
+This was brought up before, and unfortunately, there is no documentation
+whatsoever for this bit. Any guess at a name may turn out to be misleading.
+But I will change the comment to read:
+
+/* RX aggregation / 16 bytes RX descriptor
+  * BIT(11) is specific to RTL8159, with unknown meaning
+  */
+if (tp->version == RTL_VER_17)
+	ocp_word_clr_bits(tp, MCU_TYPE_USB, USB_USB_CTRL,
+			  RX_AGG_DISABLE | RX_DESC_16B | BIT(11));
+else if (tp->version == RTL_VER_16)
+	ocp_word_clr_bits(tp, MCU_TYPE_USB, USB_USB_CTRL, RX_AGG_DISABLE | 
+RX_DESC_16B);
+else ...
+
+Birger
+
 
