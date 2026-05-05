@@ -1,105 +1,110 @@
-Return-Path: <netdev+bounces-284524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284525-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0ILaNt4k+mkzKQMAu9opvQ
-	(envelope-from <netdev+bounces-284524-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 19:11:58 +0200
+	id uDl1B44n+mmHKQMAu9opvQ
+	(envelope-from <netdev+bounces-284525-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 19:23:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8DB14D1DF3
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 19:11:57 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81AF74D1FAC
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 19:23:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 48AE9303675D
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 17:11:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5B36530182A0
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 17:23:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C419249550A;
-	Tue,  5 May 2026 17:11:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 972F248B389;
+	Tue,  5 May 2026 17:23:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fYb9v66c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ExlZqUEW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F4F43CEE4
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 17:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B04F480947
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 17:23:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778001091; cv=none; b=SPVAwdIKcM5uIWzlO3PFltOLyfty9NEe1S3QjWtUHMYxEslATKxWKBJKuowTGZb3ttnxjqg+Ym4FM+ZWPohYIHQJKX9/nTBfRlTAExi/h1nvqlcpDZfYSE1bNSgWzG+K3qTfajaLdazZldWI7RBq26n0duHIMpv2tbnQqqX7CTg=
+	t=1778001803; cv=none; b=VIe1FGlifb+tSmRq4/9MNJCATEDVtE0OBwdnQup+UXkpJCNOP3Z1qYMGoOOX8HoySji/jkueptZ4ec2Jj05d80hc8qIZMxsNBnx9A5lXg/2v3b0kMTiZ7pLA0HZZKzXvsciptVlPw4S+nTj2fy5l2muKqzSx+LKIjqvSi6WqyfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778001091; c=relaxed/simple;
-	bh=grWeBb5Acpoj/AANpNcSWJEWoN06WMNxgQBBa2TtiI8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RIxzMrUGEsOnXRwVvqC0Nb0eucU07H8UYFc7fXTVwQ5gLi0SiGqGUZlKLUv1nXgZQhwev/mS01Fz6RmCFE5rr1USYJcQVNqaeL8NT0F10B9Vyg5dnDguGIcpxH94mB5tekMJCzNIW07+cJnEO57QP/lv0LpP+WQBIpA5L+h0lfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fYb9v66c; arc=none smtp.client-ip=209.85.221.49
+	s=arc-20240116; t=1778001803; c=relaxed/simple;
+	bh=Y5bLVVloBrHuY31C/zxBnNyepp93KwqIPYKR5Ilb3Yo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Myv+jYvdtpEOQlvncWJXQU/PsTSKAHDY8Qp2/7glBtH4n1Ab70gQ8qR84xaBq+yQrd38CvGXCvr+qz7L8VuyXmIgfFdifhqlVHdzvNMqhvrhmBbJjq7O08tBLni8z1cZWOxG0CAoleV5Cclbkn6+W7IVnfjCkPgz8n/7qnUBrIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ExlZqUEW; arc=none smtp.client-ip=209.85.160.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-44e1ebb3122so1259625f8f.2
-        for <netdev@vger.kernel.org>; Tue, 05 May 2026 10:11:29 -0700 (PDT)
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-5102582e237so43343721cf.2
+        for <netdev@vger.kernel.org>; Tue, 05 May 2026 10:23:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778001088; x=1778605888; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=90Ls8GApRUBmoDVuDYw/y92UxlHRPn/jnTHMFBfdrfA=;
-        b=fYb9v66cPVDW1BNpmOrPETAezGO32yiL/SQV7fq6+gMWdRI5ZEsGequeLmDSxFeVM1
-         LutN5IZNX/D5nK1mW8EiiJTwikfSsWTymKsUYuU8SKcatVzSA9JX+vLTUR1mhSD1smh/
-         PjiR+8bd7wxUVU9CMrqZY288ekYde21Y9btI5m32cwSYnYil81B36FcXI5lQ6hz//qKn
-         MOooZv2dz3EJC4XRux42+F3yEn2jIhFZYnk1rhZF6/Aje4H8iLJCNrGK2btlVAfFt7Rr
-         Y+XLwsY1rlUUVNuXtmYDzEGSzfbtWU06dhtLkApf6JGpCURVc2AC8EiFkzMv3y+fJwO6
-         TEDg==
+        d=gmail.com; s=20251104; t=1778001801; x=1778606601; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=j8SEhPhIOwl62QRDNb5gW7sJOyHfLJWGfBR0DJXT+P8=;
+        b=ExlZqUEW5osa2F2CRVnBNHp1mzi6fwF5E8xi3N1nO1BjHHFqoddiFY8h5zhCMvqE2x
+         1NjsMlYoGnXfulv8AfEKXabPhbueBqowuTjFC07mjwVU7ivtqdmflQeGK8Yz2o7mIopi
+         XOU/r8/HoJIYqEgGRVMvt8X7kpPLATp7Qbn/YtiLQ2H+MwWFMlRYO9ZSydeDqstIgjVz
+         UjHb+wsmEIgCCi7WDEOvWCo4otkysFeXQqu8BJT3q5M4bc7CoGm5E7eJvwHE4pa721tl
+         y+p1aMaqOBD9AF6UBE0683Ta69cyPK9j1qRxSH0tKS0iHlVr+fobUMi2YLBP5UGacP1o
+         zDjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778001088; x=1778605888;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=90Ls8GApRUBmoDVuDYw/y92UxlHRPn/jnTHMFBfdrfA=;
-        b=oNVl2BsC8/BEUDRV+UTvb1XLxALjaEpF41yfuKAencf3azs/4jP9aS5rieODYs7IOE
-         gZB0bq9+aVyVxqI+2xxjgxFy2fhe+gUJn2lifi+y06zJPdSLhOwj291b++5/3V3nvgEq
-         VRzJ6kaRwIeXBgmbPyjFGdwxE8Ovj2gmB9CJRoClcaqvHac8M+XmWEFW31C01Sy3a1z+
-         IkSO8NTH/SOdDETH3iTbtsDmXX/+YhiV2i2hE+EBh+WdAeHYIJw4MMFZOxMHqi2oLH85
-         8X8N8Gr/Fsqc9nF8X76TTxhsiOvnXbi8VavJ0d3PKfDbU85E28Pt4t+a8a1/HW6gQPrI
-         4+GQ==
-X-Forwarded-Encrypted: i=1; AFNElJ88AION4ylsMX2l8kaGmtptcv4YfGuRjh3U+Si/hubE3sz1FisECWsgqlVnOnuZwmWNyqCgBOw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0TQt0WAIZDp/fDVNvGDyZOZT5kTawzxK3xgzigGwrjAeFfcEP
-	RYvirPyYJa4jGyXg4srfKQ4xZapteOH6b0iJN9f7H2KwbCpaZr5V0njL
-X-Gm-Gg: AeBDieuTBRZ1AA9UvhDsunjlIAvUk+vSqCwuHN22GRArPqerDVz7z4d2Q15WUW3OCOB
-	P8sdVx4h09fX4h1o4XaoxQqzA4WXVatPAuAWgLQnkUPPYopOxR0hqMMW5wrSQx5f8E8RxLyj2+4
-	4BG5+CAqZSUKMfgrZp/1FE2HzinWvg2qLBOgyyoOR1LuweVMAW/g+FaIhj+nYv7yLlBL/kYh+M1
-	5t/hig8Lasx7y/csxN+r/WwnAIbXL5dd4wzikG5SGAZwjzSdEwrjUKWCdZBj0qfCWycimRPqlyl
-	tddvoqTlwI8IYAL6UK6UgW/F3j3MlTWEZ3IUuDTAQXBRavLkGyjFqzV0y5EhuyJZKu/w2sEzlyZ
-	SfOqIkCyoe7ruwCfmD1KKG2UCSYr16r6JrSVILu9426CCS/VS3nIuFghWCUnKxZXTbr8H+mMGSJ
-	KtjUeu+3GJBqtALyZGN1p9LdnhKD20jd4eW1LNV5lP05rcZ0+N95qHSkmbqFfBLJ57jnL0BmSTh
-	qQCh9HXaSLMnyfJwZxsRgk7tD0=
-X-Received: by 2002:a05:6000:2586:b0:43d:762e:76c6 with SMTP id ffacd0b85a97d-45003914f85mr7030717f8f.7.1778001087889;
-        Tue, 05 May 2026 10:11:27 -0700 (PDT)
-Received: from ?IPV6:2a02:a03f:a75e:9a00:dda1:a178:34b7:3d68? ([2a02:a03f:a75e:9a00:dda1:a178:34b7:3d68])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-450524834eesm5606320f8f.4.2026.05.05.10.11.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 May 2026 10:11:27 -0700 (PDT)
-Message-ID: <e8e6c910-c9a4-4633-82d2-973e79137d9a@gmail.com>
-Date: Tue, 5 May 2026 19:11:26 +0200
+        d=1e100.net; s=20251104; t=1778001801; x=1778606601;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j8SEhPhIOwl62QRDNb5gW7sJOyHfLJWGfBR0DJXT+P8=;
+        b=RULPt+JJXg/VVYn1EBlk8ajjiG8fXc/ufgAWdV1jQtaKrBI2tP6akoWt2O/Q86dCq3
+         J3rW3rn3/xKebMUvqW3GLmR3/y1vrPvCgE51711tT3YBfSugzgrLPJNpcFDIMq0yBPjK
+         +bgQl1YuY1zp0HYIxQijJyU9FE9BOidH14woryviBlg6jYrPtvJFlCCVPa5P8vTOMxJ3
+         CJ2OTYFxPLY7j+xdXh86RcEcGy6ZYtcrMQoWnqPlj1VNt7q5/fhq8x4mlcaZTdbEiWBd
+         TJgFoW+9XnK1wNJFy8TBl+Y/mop9GHsdwlKI1hsVgOxtT6bIrXfJ2MlL+/OHCklbV9e2
+         pv1A==
+X-Forwarded-Encrypted: i=1; AFNElJ8Q17ToM0vxSK8ZVglqBYVsq1qySmrFBAD+CHQYY+4X+6xasjaKZ5snQPIZfl6gX5juPSsBofg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIY8zgbVnjbFkjxoSrSEduH0JrdzIxLebUxtFHCwAyYEV4hXYL
+	3ee7uMz8nAF3g62Vce6isZNyH0ExqtlUyiTpapX9DfZLbruqV8fD0cK/
+X-Gm-Gg: AeBDiesWh0iGiHuCf0YJwv/QO0cWnSKcbqO2UEh4+aABOqjjQD6vg/NyqlffVEgbLtf
+	ZUCfYe2aQz8CFZSxZf/S0iJvDjdIwg92SGTw2vooQnfDEpDFTpeoZn8okixpSPyA2UX5EdXOE3z
+	YLHe99sh0C4dEPWn2yYtsmzJIO2PZZyUO/tjFBAOdRyxsAiNjgHCIt/+hMlHAP++9+1XR3jp7zD
+	eOTp3LXK2pYhVJ237Tk5NEuvIBFFthVTXOj0gRFm80Q7Yj84m00TVjpv68hDrG9n6k6zLqw3BUr
+	8TMIJTERHIFa3AejogVkspyZVvktpu5A/hLDZFyK3zu1M9A8LuXZY4ljVVgB/ZuTVYN9krPrhHJ
+	Awa0x7Izoxxv3ts1BQlkNOS11yp+V+nNAsYwvkChYDoGhYlm5RpZVcQ2yRa2QGwf3kmCUvp3XxY
+	U6+9Ydx+BUyvtlC4WXuMDK+dEMqpxwk2qKgk+agk/fFGBW5ZMShpiUAht40JNehRWL+Jg=
+X-Received: by 2002:a05:622a:4d43:b0:50f:c26d:f309 with SMTP id d75a77b69052e-5104be2e082mr214591201cf.9.1778001800961;
+        Tue, 05 May 2026 10:23:20 -0700 (PDT)
+Received: from PF5YBGDS.localdomain ([163.114.130.6])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51043c1b8fdsm143087571cf.6.2026.05.05.10.23.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 May 2026 10:23:20 -0700 (PDT)
+Date: Tue, 5 May 2026 13:23:18 -0400
+From: Mike Marciniszyn <mike.marciniszyn@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Duyck <alexanderduyck@fb.com>,
+	Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Mohsin Bashir <mohsin.bashr@gmail.com>, Lee Trager <lee@trager.us>,
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 3/3] net: eth: fbnic: Add pma read and write
+ access
+Message-ID: <afonhgxwfuv1fYUy@PF5YBGDS.localdomain>
+References: <20260430150802.3521-1-mike.marciniszyn@gmail.com>
+ <20260430150802.3521-4-mike.marciniszyn@gmail.com>
+ <7d657e09-1037-4f0d-b0f6-70228a4acccd@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 00/10] ipv6: Address ext hdr DoS
- vulnerabilities
-To: Tom Herbert <tom@herbertland.com>, davem@davemloft.net, kuba@kernel.org,
- netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com, pabeni@redhat.com,
- horms@kernel.org
-Cc: Tom Herbert <tom@xdpnet.ai>
-References: <20260504185122.50642-1-tom@xdpnet.ai>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@gmail.com>
-In-Reply-To: <20260504185122.50642-1-tom@xdpnet.ai>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: E8DB14D1DF3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7d657e09-1037-4f0d-b0f6-70228a4acccd@redhat.com>
+X-Rspamd-Queue-Id: 81AF74D1FAC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -107,230 +112,97 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284524-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-284525-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[herbertland.com,davemloft.net,kernel.org,vger.kernel.org,gmail.com,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[fb.com,kernel.org,meta.com,lunn.ch,davemloft.net,google.com,gmail.com,armlinux.org.uk,intel.com,trager.us,vger.kernel.org];
 	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justiniurman@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[mikemarciniszyn@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,eh_limits.sh:url]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On 5/4/26 20:51, Tom Herbert wrote:
-> IPv6 extension headers are defined to be quite open ended with few
-> limits. For instance, RFC8200 requires a receiver to process any
-> number of extension headers in a packet in any order. This flexibility
-> comes at the cost of a potential Denial of Service attack. The only
-> thing that might mitigate the DoS attacks is the fact that packets
-> with extension headers experience high drop rates on the Internet so
-> that a DoS attack based on extension wouldn't be very effective at
-> Internet scale.
-> 
-> This patch set addresses some of the more egregious vulnerabilities
-> of extension headers to DoS attack.
-> 
-> - If sysctl.max_dst_opts_cnt or hbh_opts_cnt are set to 0 then that
->    disallows packets with Destination Options or Hop-by-Hop Options even
->    if the packet contain zero non-padding options
-> 
-> - Add a case for IPV6_TLV_TNL_ENCAP_LIMIT in the switch on TLV type
->    in ip6_parse_tlv function. This TLV is handled in tunnel processing,
->    however it needs to be detected in ip6_parse_tlv to properly account
->    for it as recognized non-padding option
-> 
-> - Move IPV6_TLV_TNL_ENCAP_LIMIT to uapi/linux/in6.h so that all the
->    TLV definitions are in one place
-> 
-> - Set the default limits of non-padding Hop-by-Hop and Destination
->    options to 2. This means that if a packet contains more then two
->    non-padding options then it will be dropped. The previous limit
->    was 8, but that was too liberal considering that the stack only
->    support two Destination Options and the most Hop-by-Hop options
->    likely to ever be in the same packet are IOAM and JUMBO. The limit
->    can be increased via sysctl for private use and experimentation
-> 
-> - Enforce RFC8200 recommended ordering of Extension Headers. This
->    also enforces that any Extension Header occurs at most once
->    in a packet except for Destination Options that may appear
->    twice. The enforce_ext_hdr_order sysctl controls enforcement. If
->    it's set to true then order is enforced, if it's set to false then
->    neither order nor number of occurrences are enforced.
-> 
->    The enforced ordering is:
-> 
->      IPv6 header
->      Hop-by-Hop Options header
->      Destination Options before the Routing header
->      Routing header
->      Fragment header
->      Authentication header
->      Encapsulating Security Payload header
->      Destination Options header
->      Upper-Layer header
-> 
-> --- Background
-> 
-> We selected the default value of eight in RFC8504 based on an
-> expectation that there might be new options defined and that the
-> Internet would be fixed to reliably support extension headers
-> including those with options. I do not believe either of those are
-> going to happen.
-> 
-> Hop-by-Hop Options are ostensibly the right way to do network to host
-> and host to network signaling.The only HBH options that might get any
-> substantial deployment are Router Alert option and IOAM. The Router
-> Alert option is being deprecated and IOAM is at best a "nice to
-> have". The best use case of Hop-by-Hop options is congestion
-> signaling, unfortunately the die was cast when CSIG authors decided to
-> place the information in VLANs at L2 and cajole the information to be
-> routable through a switch. IMO, the miss on CSIG pretty much is the
-> nail in the coffin for Hop-by-Hop options to ever be widely deployed
-> (https://www.ietf.org/archive/id/draft-ravi-ippm-csig-01.txt).
-> 
-> Destination Options have proven even less useful than Hop-by-Hop
-> Options. The only Destination Options supported by the stack is the
-> Tunnel Encap Limit option and Home Address Options. The Tunnel Encap
-> Option was buried in the v6 tunnel code which is why it wasn't obvious
-> it was supported in the first version of the patch set.  I'll assume
-> that might be useful, so this patch set cleans up the code for it. I
-> don't believe there's any use of Home Address Option.
-> 
-> A major problem with DestOpts, HBH, Routing Header, and Fragment
-> header is that they have no inherent security. Their use presents a
-> security risk especially when sent over untrusted networks including
-> the Internet. Given that and that the high drop rates of extension
-> headers on the Internet, I am proposing that Extension header except
-> for ESP being deprecated on the Internet
-> (https://www.ietf.org/archive/id/draft-herbert-deprecate-eh-01.txt).
-> 
-> An update to RFC8200 is being proposed in IETF to allow enforcement of
-> extension header ordering and number of occurences. An I-D is in
-> https://www.ietf.org/archive/id/draft-iurman-6man-eh-occurrences-00.txt
-> 
-> --- Testing
-> 
-> Add selftest eh_limits.sh. Tested by running:
-> 
-> $ sudo ./eh_limits.sh
->      TEST: EH-limits - default sysctls                            [ OK ]
->      TEST: EH-limits - modified sysctls                           [ OK ]
-> 
-> Tests passed:   2
-> Tests failed:   0
-> 
-> $ sudo ./eh_limits.sh -v
->>>>>> Default
-> TEST: Two non-padding options in HBH and DestOpts: Received as expected
-> TEST: Big destination option: Received as expected
-> TEST: Almost Big HBH option: Received as expected
-> TEST: Big HBH option: Received as expected
-> TEST: Too much HBH padding: Didn't receive as expected
-> TEST: Too much DestOpt padding: Didn't receive as expected
-> TEST: Too much DestOpt padding #2: Didn't receive as expected
-> TEST: Too much DestOpt padding #3: Didn't receive as expected
-> TEST: Almost too much DestOpt padding #2: Received as expected
-> TEST: Two Dest Ops: Didn't receive as expected
-> TEST: OOO Routing header: Didn't receive as expected
-> TEST: Two Routing headers: Didn't receive as expected
-> TEST: Two Destination options okay: Received as expected
-> TEST: Two Destination options: Didn't receive as expected
-> TEST: Two Destination options after RH: Didn't receive as expected
-> TEST: Many EH OOO: Didn't receive as expected
-> TEST: Two fragment Headers: Didn't receive as expected
-> 
->      TEST: EH-limits - default sysctls                            [ OK ]
->>>>>> No order enforce, 8 options, 66 length limit
-> TEST: Two non-padding options in HBH and DestOpts: Received as expected
-> TEST: Big destination option: Didn't receive as expected
-> TEST: Almost Big HBH option: Received as expected
-> TEST: Big HBH option: Didn't receive as expected
-> TEST: Too much HBH padding: Didn't receive as expected
-> TEST: Too much DestOpt padding: Didn't receive as expected
-> TEST: Too much DestOpt padding #2: Didn't receive as expected
-> TEST: Too much DestOpt padding #3: Didn't receive as expected
-> TEST: Almost too much DestOpt padding #2: Received as expected
-> TEST: Two Dest Ops: Received as expected
-> TEST: OOO Routing header: Received as expected
-> TEST: Two Routing headers: Received as expected
-> TEST: Two Destination options okay: Received as expected
-> TEST: Two Destination options: Received as expected
-> TEST: Two Destination options after RH: Received as expected
-> TEST: Many EH OOO: Received as expected
-> TEST: Two fragment Headers: Didn't receive as expected
-> 
->      TEST: EH-limits - modified sysctls                           [ OK ]
-> 
-> Tests passed:   2
-> Tests failed:   0
-> 
-> V4: Switch order of patches to avoid transient build failure
-> V5: Allow Destination Options before the Routing header, fixes
->      suggested by Justin Iurman
-> v6: Fix a bug and create a test for extension header limits
-> v7: Run pylint on new Python file, run shellcheck on new bash file,
->      Make fixes as needed
-> v8: Repost
-> v9: Fix subject prefix
-> v10: Lint fixes in selftest scripts suggested by Simon Horman
-> 
-> Tom Herbert (10):
->    ipv6: Check of max HBH or DestOp sysctl is zero and drop if it is
->    ipv6: Cleanup IPv6 TLV definitions
->    ipv6: Add case for IPV6_TLV_TNL_ENCAP_LIMIT in EH TLV switch
->    ipv6: Set HBH and DestOpt limits to 2
->    ipv6: Document defaults for max_{dst|hbh}_opts_number sysctls
->    ipv6: Enforce Extension Header ordering
->    ipv6: Document enforce_ext_hdr_order sysctl
->    test: Add proto_nums.py in networking selftests
->    test: Add ext_hdr.py in networking selftests
->    test: Add networking selftest for eh limits
-> 
->   Documentation/networking/ip-sysctl.rst    |  52 ++-
->   include/net/ipv6.h                        |   9 +-
->   include/net/netns/ipv6.h                  |   1 +
->   include/net/protocol.h                    |  14 +
->   include/uapi/linux/in6.h                  |  21 +-
->   include/uapi/linux/ip6_tunnel.h           |   1 -
->   net/ipv6/af_inet6.c                       |   1 +
->   net/ipv6/exthdrs.c                        |  32 +-
->   net/ipv6/ip6_input.c                      |  42 +++
->   net/ipv6/reassembly.c                     |   1 +
->   net/ipv6/sysctl_net_ipv6.c                |   7 +
->   net/ipv6/xfrm6_protocol.c                 |   2 +
->   tools/testing/selftests/net/Makefile      |   4 +
->   tools/testing/selftests/net/eh_limits.py  | 349 ++++++++++++++++++++
->   tools/testing/selftests/net/eh_limits.sh  | 210 ++++++++++++
->   tools/testing/selftests/net/ext_hdr.py    | 385 ++++++++++++++++++++++
->   tools/testing/selftests/net/proto_nums.py | 231 +++++++++++++
->   17 files changed, 1334 insertions(+), 28 deletions(-)
->   create mode 100755 tools/testing/selftests/net/eh_limits.py
->   create mode 100755 tools/testing/selftests/net/eh_limits.sh
->   create mode 100755 tools/testing/selftests/net/ext_hdr.py
->   create mode 100644 tools/testing/selftests/net/proto_nums.py
-> 
+On Tue, May 05, 2026 at 02:40:18PM +0200, Paolo Abeni wrote:
+> On 4/30/26 5:08 PM, mike.marciniszyn@gmail.com wrote:
+> > From: "Mike Marciniszyn (Meta)" <mike.marciniszyn@gmail.com>
+> >
+> > Document the MDIO interface topology with an ASCII diagram
+> > showing the MAC, PCS (MMD 3), FEC, Separated PMA (MMD 8), and PMD
+> > (MMD 1) blocks and their interconnects. The diagram illustrates how
+> > 4 lanes connect the MAC through PCS, FEC, and PMA, then narrow to
+> > 2 lanes at the PMD.
+> >
+> > The c45 read and write routines are enhanced to support
+> > read and write of the separated PMA for the fbnic.
+> >
+> > Co-developed-by: Alexander Duyck <alexanderduyck@fb.com>
+> > Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
+> > Signed-off-by: Mike Marciniszyn (Meta) <mike.marciniszyn@gmail.com>
+> > ---
+> > v2:
+> >   - no changes
+> > v1: https://lore.kernel.org/all/20260428172810.175077-5-mike.marciniszyn@gmail.com/
+> >
+> >  drivers/net/ethernet/meta/fbnic/fbnic_csr.h  |  1 +
+> >  drivers/net/ethernet/meta/fbnic/fbnic_mdio.c | 71 ++++++++++++++++++++
+> >  2 files changed, 72 insertions(+)
+> >
+> > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
+> > index 81794bd326e1..64b958df7774 100644
+> > --- a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
+> > +++ b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
+> > @@ -805,6 +805,7 @@ enum {
+> >  #define FBNIC_CSR_END_PCS		0x10668 /* CSR section delimiter */
+> >
+> >  #define FBNIC_CSR_START_RSFEC		0x10800 /* CSR section delimiter */
+> > +#define FBNIC_RSFEC_CONTROL(n)	(0x10800 + 8 * (n))	/* 0x42000 + 32*n */
+>
+> Sashiko says:
+>
+> ---
+> With the introduction of the RSFEC memory space at 0x10800, does the bounds
+> check in fbnic_mdio_write_pcs() need to be updated to prevent clobbering
+> these new registers?
+> While not introduced by this patch, fbnic_mdio_write_pcs() currently
+> contains:
+>     /* Allow access to both halves of PCS for 50R2 config */
+>     if (addr > 2)
+>         return;
+> When addr is 2, FBNIC_PCS_PAGE(2) evaluates to 0x10000 + 0x400 * 2, which
+> is 0x10800.
+> Since this overlaps with FBNIC_CSR_START_RSFEC, an MDIO write to MMD 3
+> (PCS) at address 2 could silently overwrite the newly managed RSFEC
+> control registers.
+> The read function fbnic_mdio_read_pcs() correctly uses if (addr >= 2) to
+> prevent this. Should the write function be updated to match?
+> ---
+>
+> Does not look blocking to me, but a follow-up could be needed.
+>
+> /P
+>
 
-Hi Tom,
+The patch that fixes this issue should have preceded the three patches.
 
-While at it, should we also take care of ip6_tnl_parse_tlv_enc_lim(), 
-ipv6_skip_exthdr(), and ipv6_find_hdr(), so that we remain consistent 
-with recent merged fixes 3744b0964d52 and 076b8cad77aa ?
+Here is the patchwork link: https://patchwork.kernel.org/project/netdevbpf/patch/20260504135815.44226-2-mike.marciniszyn@gmail.com/
 
-Cheers,
-Justin
+I don't see that you actually pulled that patch or that it has been
+accepted?
+
+Mike
 
