@@ -1,165 +1,148 @@
-Return-Path: <netdev+bounces-284234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284235-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2L86MjKR+Wmh9wIAu9opvQ
-	(envelope-from <netdev+bounces-284234-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 08:41:54 +0200
+	id QEWMNJSR+Wmh9wIAu9opvQ
+	(envelope-from <netdev+bounces-284235-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 08:43:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 363A34C7491
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 08:41:53 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51B274C74A7
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 08:43:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 387A1301CA60
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 06:41:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B80163004621
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 06:43:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C52043C4547;
-	Tue,  5 May 2026 06:41:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E0323CA488;
+	Tue,  5 May 2026 06:43:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="lWNtwTnb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DkPo3bU/"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84C33AEF51;
-	Tue,  5 May 2026 06:41:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D392D3C4547;
+	Tue,  5 May 2026 06:43:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777963308; cv=none; b=OCGzP6ZQFCHgRlC2Mw5+R/oZgZIAA2iCWH1X9Tcxw4Uk7GHFaNgdqF9qZDXQXEFQRjCO6RVwS+fzqMBjDzl5DU/R5TxWfELqnS+JUfb1yL5Italk9wiUj1KyHUEdrGC05/WndjpaOSW3ub3jauOxv8bu0/GgMM0xBRfEhfdvCGE=
+	t=1777963409; cv=none; b=KBq+a3VRuGe3Ttxn/kOje3PokziajRjfwykwxhLfzZZvYd+iIzRyx7b9T684o08l1ObYELllraVF289n6bCKPEia3LrCr3ba0iUHoWifcm6brN1ytGg/qVOnxUWuSLHclMDddMAI/mv5/Mnet0OFetTTagsEmW5350lVCO+RooA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777963308; c=relaxed/simple;
-	bh=bd8HXVzKt09cazmBut29dDGWpM6jev+aRdtNqHSOPdU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hh6kdHCyxaGGOCU6sKYprJnxt5ItYUXr8EPHE8J7TegTWKJe8LkA3RiUlkLnq1/ZDeweDm4O91TZM0+PAzqouK4u7h377a1eqpXPHabos8JOj+4TAcplwGoFt1+J3VgpPvD0kNFhj8bj0Oqmy4iXHlvDvVcFTjlKuc+2msCpIjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=lWNtwTnb; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6456fN1111054291, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1777963283; bh=y+eLeNqDY5wDt54smZX4UeBsdpOUB49t/62TAoSFw0s=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=lWNtwTnb8WqE9C1x0l8bMkcwapMDigJLoSSbaCzOnJzvM//kx85f15gMRy+pWFPDZ
-	 RubnoOEAh3f1CG42u5yR9jyQfTLQVG1QWMIvlxceUpfUXdH7oEuHOybTVnorgjGewp
-	 C1glV0JzYEtWBWvuu5POjrmpG+9iZlwTqMHuJvzqLehpr/b8bcLqAr3SJryYbSZVh2
-	 wFR97zl4GEqfo2XH16Jkshwb0GKZ7EbAX4mdYjarUKySVcCommZd+pKIVD+7zj7kik
-	 YrkrbD4kMVBaUz18xPg0XgCm1Cx1uZI8rU+PY2WsvPQdYvO8KfcwV8qwJXXJzZlDAB
-	 qMptSh0nhKPlg==
-Received: from mail.realtek.com (rtkexhmbs03.realtek.com.tw[10.21.1.53])
-	by rtits2.realtek.com.tw (8.15.2/3.27/5.94) with ESMTPS id 6456fN1111054291
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 5 May 2026 14:41:23 +0800
-Received: from RTKEXHMBS04.realtek.com.tw (10.21.1.54) by
- RTKEXHMBS03.realtek.com.tw (10.21.1.53) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Tue, 5 May 2026 14:41:23 +0800
-Received: from RTDOMAIN (172.21.42.225) by RTKEXHMBS04.realtek.com.tw
- (10.21.1.54) with Microsoft SMTP Server id 15.2.1748.10 via Frontend
- Transport; Tue, 5 May 2026 14:41:23 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
-        <larry.chiu@realtek.com>, Justin Lai <justinlai0215@realtek.com>
-Subject: [PATCH net-next v2] rtase: Fix flow control configuration
-Date: Tue, 5 May 2026 14:41:21 +0800
-Message-ID: <20260505064121.31286-1-justinlai0215@realtek.com>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1777963409; c=relaxed/simple;
+	bh=b/K78SLDsaYn8UcX8zw2dpPLo0sAfurOR0cSeqL6BuM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L7Q2jYAB8/tZLavLTEZ+OJAwifXvmldo3vf7XQd9bRBhmw9DJKMQ79mT4OgUaMKxwRtkA0b1frhyODeMJkU06TaxRlxJHjFDNNQ7MByYV9qHFcHcJGUVGQI7Jk2MINe4Pk2kKqN7HuGra44uFdZktI5CkprTZOknDsvmhdNhLNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DkPo3bU/; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777963408; x=1809499408;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=b/K78SLDsaYn8UcX8zw2dpPLo0sAfurOR0cSeqL6BuM=;
+  b=DkPo3bU/gsZJUq5sgb0HgPWrGg0cAiG23aYLHe1O492lKNqeQ3mAyFNr
+   23XwI8gtmj+FXdyioc8Tj284Q3lBv8HI7lDn+m0BX2R8bofDXrtG1lw3a
+   mwa8KenasPZJlAflK+igsQSh49Zjus9+efSJmGzS3xc1l2NLksiKX2ElK
+   OkbLt6uZnkDnTqHBEKfYdb8fdPUhK7JEUIglvxZi0LJ6WjyC2ofCqNLq7
+   o08KfJh/t7cdF4A2g8h8LfsRokAtxCsTmeHFgq2A05ztJAKTPvZKX29Xo
+   80l1wyjcRk++QJjjwffGpPmGWcmKn37NNYqNhN6J9mimpXAiXgCUkOe6E
+   w==;
+X-CSE-ConnectionGUID: a8l8ZeDwRDyFd/J0eOuvjg==
+X-CSE-MsgGUID: DuKTLgDRQTmk72uZlpZqlA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11776"; a="66354988"
+X-IronPort-AV: E=Sophos;i="6.23,217,1770624000"; 
+   d="scan'208";a="66354988"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 23:43:27 -0700
+X-CSE-ConnectionGUID: 61tlT+o/QcOXcOweNtWJPg==
+X-CSE-MsgGUID: wiD/NJYQQfmvuL1e1Wx/sw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,217,1770624000"; 
+   d="scan'208";a="237506227"
+Received: from vpanait-mobl.ger.corp.intel.com (HELO localhost) ([10.245.244.5])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 23:43:25 -0700
+Date: Tue, 5 May 2026 09:43:22 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH net-next] net: usb: mcs7830: fix typo in module
+ description and clarify it
+Message-ID: <afmRigJK0yPrJZYy@ashevche-desk.local>
+References: <20260505013504.45975-1-enelsonmoore@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Rspamd-Queue-Id: 363A34C7491
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260505013504.45975-1-enelsonmoore@gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
+X-Rspamd-Queue-Id: 51B274C74A7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-284235-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284234-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	HAS_ORG_HEADER(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[realtek.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[realtek.com:email,realtek.com:dkim,realtek.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim,ashevche-desk.local:mid]
 
-The hardware has two sets of registers controlling TX/RX flow control.
-The effective flow control state is determined by the logical OR of
-these two sets of bits.
+On Mon, May 04, 2026 at 06:34:59PM -0700, Ethan Nelson-Moore wrote:
+> The mcs7830 driver's MODULE_DESCRIPTION has an errant parenthesis
 
-RTASE_FORCE_TXFLOW_EN and RTASE_FORCE_RXFLOW_EN in RTASE_CPLUS_CMD are
-the bits used by the driver to control TX/RX flow control according to
-the ethtool pause configuration.
+MODULE_DESCRIPTION()
 
-RTASE_TXFLOW_EN and RTASE_RXFLOW_EN in RTASE_GPHY_STD_00 are another
-set of TX/RX flow control enable bits. Clear them by default so they do
-not keep flow control enabled independently of the driver setting.
+> and does not indicate that the device is an Ethernet adapter. Remove
+> the parenthesis and improve the description.
 
-With the RTASE_GPHY_STD_00 bits cleared, the effective flow control
-state is controlled through RTASE_CPLUS_CMD, so the ethtool setting can
-take effect correctly.
+...
 
-Signed-off-by: Justin Lai <justinlai0215@realtek.com>
----
-v1 -> v2:
-- Rebase onto net-next.
-- Expand commit message.
----
- drivers/net/ethernet/realtek/rtase/rtase.h      | 4 ++++
- drivers/net/ethernet/realtek/rtase/rtase_main.c | 3 +++
- 2 files changed, 7 insertions(+)
+> -MODULE_DESCRIPTION("USB to network adapter MCS7830)");
+> +MODULE_DESCRIPTION("MCS7830 USB to Ethernet adapter driver");
 
-diff --git a/drivers/net/ethernet/realtek/rtase/rtase.h b/drivers/net/ethernet/realtek/rtase/rtase.h
-index b9209eb6ea73..9bd6872474c1 100644
---- a/drivers/net/ethernet/realtek/rtase/rtase.h
-+++ b/drivers/net/ethernet/realtek/rtase/rtase.h
-@@ -153,6 +153,10 @@ enum rtase_registers {
- #define RTASE_FORCE_TXFLOW_EN BIT(10)
- #define RTASE_RX_CHKSUM       BIT(5)
- 
-+	RTASE_GPHY_STD_00 = 0x6024,
-+#define RTASE_RXFLOW_EN BIT(7)
-+#define RTASE_TXFLOW_EN BIT(6)
-+
- 	RTASE_Q0_RX_DESC_ADDR0 = 0x00E4,
- 	RTASE_Q0_RX_DESC_ADDR4 = 0x00E8,
- 	RTASE_Q1_RX_DESC_ADDR0 = 0x4000,
-diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-index ef13109c49cf..bde9bccfb5a9 100644
---- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-+++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-@@ -974,6 +974,9 @@ static void rtase_hw_config(struct net_device *dev)
- 	rtase_hw_set_features(dev, dev->features);
- 
- 	/* enable flow control */
-+	reg_data16 = rtase_r16(tp, RTASE_GPHY_STD_00);
-+	reg_data16 &= ~(RTASE_TXFLOW_EN | RTASE_RXFLOW_EN);
-+	rtase_w16(tp, RTASE_GPHY_STD_00, reg_data16);
- 	reg_data16 = rtase_r16(tp, RTASE_CPLUS_CMD);
- 	reg_data16 |= (RTASE_FORCE_TXFLOW_EN | RTASE_FORCE_RXFLOW_EN);
- 	rtase_w16(tp, RTASE_CPLUS_CMD, reg_data16);
+It's better to align this with the top comment
+
+ * MOSCHIP MCS7830 based (7730/7830/7832) USB 2.0 Ethernet Devices
+
+Another option is to align to Kconfig help
+
+	tristate "MosChip MCS7830 based Ethernet adapters"
+
+(ideally all three should be the same).
+
 -- 
-2.40.1
+With Best Regards,
+Andy Shevchenko
+
 
 
