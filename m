@@ -1,96 +1,68 @@
-Return-Path: <netdev+bounces-284153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284154-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mFG7Nx1M+Wnt7gIAu9opvQ
-	(envelope-from <netdev+bounces-284153-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 03:47:09 +0200
+	id uE81GKpO+WkV7wIAu9opvQ
+	(envelope-from <netdev+bounces-284154-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 03:58:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD43D4C5D3D
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 03:47:08 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B73694C5DB1
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 03:58:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A7C803009393
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 01:47:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4ED73301E965
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 01:58:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D9BC3101CE;
-	Tue,  5 May 2026 01:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C60A3603C2;
+	Tue,  5 May 2026 01:57:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="il85HRkE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="axa9EvNI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f66.google.com (mail-dl1-f66.google.com [74.125.82.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04861DED5B
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 01:47:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4695A26E6F2;
+	Tue,  5 May 2026 01:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777945624; cv=none; b=h5dpKeBXVkTLpce5hMGokBOmh5xK/h3vMoSs+xz1jK0vepwRA7/n32rcbM61RlCRn4bruk4XUgRuym0xIcMlrAsGqbYNXdPIzMPuc0s9X+q1PxDXw1dvRnafiNo+WEyZYyM6qeTAoYZ0ggoH5kAGIVDnI9RCi6wha6aumIix8SM=
+	t=1777946279; cv=none; b=rOXVtq0EJcNQpMBX3yZv+SFSRLUD1jaEpo9RwNSbktYjo2AzmXKKrX6/c58jVBbanraXlQRd2It0ouAR58csgfa2KW9btbE2HyucLVf+n5xcHVPmzJidun5MOb3+/TFocTyXanbJz5MvpkdGMaPSAmts+hdAymnt/2/op9PMhVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777945624; c=relaxed/simple;
-	bh=xaD8YBLyzNsHJm9/b7lK3y9pjsbIP17mG8EUOH9QUJM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FTlnlwDVRnVXy0e0yYXNlQwbGMiXwDnepXIEC0vqVuDMyf6heCrPQzEPMjjaqkkvkoK/eYIlNSZgo1UVmsWPv927WyH80SExAIFUCCyOPpVC+/jRuXrdSo1Qf7bSP9asaEx+h6SEQV4k1yVVH0HbxQ0eBB6ICD8vp/V4LsA8Lx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=il85HRkE; arc=none smtp.client-ip=74.125.82.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f66.google.com with SMTP id a92af1059eb24-12c8ccc7755so6735808c88.0
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 18:47:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777945622; x=1778550422; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1prNxGjvUSN5AMOPmrkHQUe6tyhve21JS0LFJgrx/Ek=;
-        b=il85HRkEwD/oFc7eIJz3rKHamNOf9cyQ/MGNsCzRIQCtxhl8ZPXc0k0Jo1lha43n9E
-         EnWhjMo95Y4O2bA3ZUDlgt0D8VegitR8787yPNEIP8vAlmWt938GyMkLSJJG0VgubBQj
-         ilXRLi4W8555cbv3IPV3ZkVpoIuPEQeVcHeQewj4SfO/XBL1tYXZXPTiTrXwvPsirJtC
-         UBQBgJWMSfMHsq8qrnsLSuWDvWkFWBvS/mjKwtssI5wJFq7mrqIs/ncYXtAvTox81cQe
-         WmDQJVU+WAZ6cAeGc6EVQWTSykEpnolWoYyBNvfCDjzrH1CWvU9usdmlM8Yo783IZUE8
-         pXSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777945622; x=1778550422;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1prNxGjvUSN5AMOPmrkHQUe6tyhve21JS0LFJgrx/Ek=;
-        b=sLT4beKmMu9NYYr+4YAVUk+aFr9tMwKGoJcdXWR2Pl5iy7HR6521LxhIf1roOu99EP
-         txfcW4J9s/9nASnXisSPUu+MSl9TK+CnW94QS5EZJK2oReZTEV2TzFksw5vL4i12PKvq
-         NPHfASU+udFLZL6QMEInxh2H5s3ozDV9deorf6BuUwR+4IXkKtxa8805rh3QB4Cw9obe
-         jPssyC3iLRz+6OmCt3ArDOsrZ1ppNlrvuCmXjBxyF622tF+32oDlJCGSKpVN0MmKghk8
-         7Ar6X5dpsX0cDkUFCI1CRYleF8SD/+hJmS26qp+/bk1epMV+Oc9QDgvBgZeqx83mnoSO
-         jwSw==
-X-Forwarded-Encrypted: i=1; AFNElJ+OGNex6cJDFPGAzHhhLhMYB+OFXZit8OeauECDVQFnviuQyMSNaWeIQcTUQVRgSQyfB0y3RnM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVniKY2q/IJNKz+1TsDup03wnep/C4gjw094aw2v1DWUNBVjCO
-	+lGUI+miH/+oMvLrnOWDDwa5x6jPElHWOjLqtMWSUpT9NkVHbgCbNpv4
-X-Gm-Gg: AeBDietQYSEPDnG3AfCKNdDK+gbIzcZg1OA5nIaeaidNcIc8hIKbreo7y9Uzr7hfARo
-	Q3qWVVEsLRcPUf9x0wczbugORIQ9nF/2au+FPd6okMSXZoUY2BvhOnfASIt0zwKUj/IW46jScQU
-	ecI1ieymwDvJae09asHSFlWl/1Q2T8XebR7dmkUJQPGNbLg8pQBuQR0ImyJNPJdTNbQDMNIZPYb
-	Vq5k8NS21ijmNHozEy95NtnhuMTbfCOALCYQEgBeAMZH4LxpgRcEj8tdtxHcCI4hhtKLO5MwmeR
-	D4/6DqT4RFC3/j5Meom8XWHEkgj6nPbu8H/KbkAhw1mKhdWZAsYMv18hypcJj9KE4eGkRvoHcX2
-	udlyUS9OrXqvcjgGDssOfT1/L6dRA44O0qH/YL/gt4xoz0ClPitsE0gmD0o/r+j3sQVbjP1lk4W
-	s8+U7gb/bhwBSGL4zTZYDcuHXSBfGJT4mXE6gEOwPD+EQqwbxO23FGRrnuwmKjmt8QcjYAnzQ/W
-	amVuviZQ8m3JWsCz7BidbBKoNtnLZJrN2FpL1afgWitJ9kLUoJ1ENWfo9YKByDojBrJu7foyTbr
-	ZRomSGoNXWX/m6IH9mvdP1pf1x+8
-X-Received: by 2002:a05:7022:6093:b0:119:e56c:18b1 with SMTP id a92af1059eb24-12dfd821b1bmr5903248c88.25.1777945621785;
-        Mon, 04 May 2026 18:47:01 -0700 (PDT)
-Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ee38d79eb9sm24874944eec.8.2026.05.04.18.47.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2026 18:47:01 -0700 (PDT)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Peter Korsgaard <peter@korsgaard.com>
-Subject: [PATCH net-next] net: usb: mcs7830: adjust incorrect comment implying a vulnerability
-Date: Mon,  4 May 2026 18:46:30 -0700
-Message-ID: <20260505014634.49100-1-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1777946279; c=relaxed/simple;
+	bh=Fyiur2XAhvk5O8V7IrEnGOrDuAqm81WoJNB0CmzryLw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OWd4pSZH0Cfyllfxmkpka4jl9FbhQLJAFqhFrlJDcbXYFuDcHwQn5Ur5zLTnAm61V4gaiK/BVNPVv+iw9X3+X1Dxjd0enGS7Wa/idHGWja89LHJn9WKjfs7+gHiUUvN5LMd1I/ebHtBPgfqCKXd75/SZ959vy3B/nbinw0kApek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=axa9EvNI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 651B1C2BCB8;
+	Tue,  5 May 2026 01:57:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777946278;
+	bh=Fyiur2XAhvk5O8V7IrEnGOrDuAqm81WoJNB0CmzryLw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=axa9EvNIzS9COtHGZzbXp+936O+s1IsW+sLcvYWwf3MtrYNLjUlK3fcjkSav73ixf
+	 kw9ZvWn9uiSO73rJ4LPxjAy+1huucD4F+rD8cxfgQmF6DM9bIN6PenKPiuJIUaTHP1
+	 h9JYDFiTGFE+ISI8DrFjPkZi8IcRWOVOYJjzLF+3GsHooHZlvj3Lpny8RVmNpsRc2d
+	 2CDuFmw20XmZPs3y/Xs2Uwikqg+CJthf6wthWKGBClLrYqMTj/EFr3sa69dmf+7cDL
+	 CurtZFIhAAy2bX5SU3iiNoj3GKh7aHQTBLvBXFOS7ACU65wU8fp1qX9hiYmihq4JpI
+	 +DQ1BDjrYf8ag==
+From: Jakub Kicinski <kuba@kernel.org>
+To: github@szelinsky.de
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	o.rempel@pengutronix.de,
+	kory.maincent@bootlin.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	krzk@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-leds@vger.kernel.org
+Subject: Re: [PATCH net-next v5 1/2] net: pse-pd: add devm_pse_poll_helper()
+Date: Mon,  4 May 2026 18:57:57 -0700
+Message-ID: <20260505015757.831372-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260429213224.1747410-2-github@szelinsky.de>
+References: <20260429213224.1747410-2-github@szelinsky.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,67 +70,115 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: DD43D4C5D3D
+X-Rspamd-Queue-Id: B73694C5DB1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.intel.com,korsgaard.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284153-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-284154-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.995];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_HAS_DN(0.00)[]
 
-The mcs7830 driver contains a comment indicating that mcs7830_get_regs
-leaks uninitialized memory to user space on some devices. If true, this
-would indicate a security vulnerability. However, I investigated the
-issue and found that it is not true because ethtool_get_regs (in
-net/ethtool/ioctl.c) uses vzalloc to allocate its buffer, which zeroes
-the memory. Update the comment to explain this behavior.
-
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 ---
- drivers/net/usb/mcs7830.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+    net: pse-pd: add devm_pse_poll_helper()
 
-diff --git a/drivers/net/usb/mcs7830.c b/drivers/net/usb/mcs7830.c
-index d6698f30218d..dfdc7bd74166 100644
---- a/drivers/net/usb/mcs7830.c
-+++ b/drivers/net/usb/mcs7830.c
-@@ -22,7 +22,8 @@
-  * - implement get_eeprom/[set_eeprom]
-  * - switch PHY on/off on ifup/ifdown (perhaps in usbnet.c, via MII)
-  * - mcs7830_get_regs() handling is weird: for rev 2 we return 32 regs,
-- *   can access only ~ 24, remaining user buffer is uninitialized garbage
-+ *   can access only ~ 24; this is not a security vulnerability because
-+ *   ethtool_get_regs allocates a zeroed buffer
-  * - anything else?
-  */
- 
--- 
-2.43.0
+This patch extracts the common event handling loop from pse_isr() into a
+shared function and adds a poll-based alternative for PSE controllers
+that lack interrupt support.
 
+> diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
+> index 87aa4f4e9724..b7ffec0c942c 100644
+> --- a/drivers/net/pse-pd/pse_core.c
+> +++ b/drivers/net/pse-pd/pse_core.c
+[ ... ]
+> @@ -1118,6 +1125,8 @@ void pse_controller_unregister(struct pse_controller_dev *pcdev)
+>  	pse_release_pis(pcdev);
+>  	if (pcdev->irq)
+>  		disable_irq(pcdev->irq);
+> +	if (pcdev->polling)
+> +		cancel_delayed_work_sync(&pcdev->poll_work);
+
+Because pse_release_pis() executes kfree(pcdev->pi) before the delayed work
+is cancelled, can pse_poll_worker() run concurrently and access the freed
+pcdev->pi array inside pse_handle_events() before the cancellation completes?
+
+[ ... ]
+> @@ -1356,6 +1403,54 @@ int devm_pse_irq_helper(struct pse_controller_dev *pcdev, int irq,
+>  }
+>  EXPORT_SYMBOL_GPL(devm_pse_irq_helper);
+>  
+> +/**
+> + * devm_pse_poll_helper - Register poll-based PSE event notifier
+> + * @pcdev: a pointer to the PSE controller device
+> + * @d: PSE event description (uses same pse_irq_desc as IRQ path)
+[ ... ]
+> +int devm_pse_poll_helper(struct pse_controller_dev *pcdev,
+> +			 const struct pse_irq_desc *d)
+> +{
+> +	struct device *dev = pcdev->dev;
+> +
+> +	if (!d || !d->map_event || !d->name)
+> +		return -EINVAL;
+> +
+> +	pcdev->poll_desc = *d;
+> +	pcdev->poll_notifs = devm_kcalloc(dev, pcdev->nr_lines,
+> +					  sizeof(*pcdev->poll_notifs),
+> +					  GFP_KERNEL);
+> +	if (!pcdev->poll_notifs)
+> +		return -ENOMEM;
+> +
+> +	pcdev->poll_notifs_mask = devm_bitmap_zalloc(dev, pcdev->nr_lines,
+> +						     GFP_KERNEL);
+> +	if (!pcdev->poll_notifs_mask)
+> +		return -ENOMEM;
+> +
+> +	if (!pcdev->poll_interval_ms)
+> +		pcdev->poll_interval_ms = PSE_DEFAULT_POLL_INTERVAL_MS;
+> +
+> +	INIT_DELAYED_WORK(&pcdev->poll_work, pse_poll_worker);
+> +	pcdev->polling = true;
+> +
+> +	queue_delayed_work(system_freezable_wq, &pcdev->poll_work,
+> +			   msecs_to_jiffies(pcdev->poll_interval_ms));
+
+Since memory is allocated with devm_ helpers but no devm cleanup action is
+registered to cancel the delayed work, what happens if a driver's probe
+function encounters an error after calling this helper? Will devres free the
+pcdev structure while the system workqueue still has the delayed work armed,
+leading to a use-after-free when the timer expires?
+
+The commit message mentions that drivers typically set up the helper before
+registering the controller. If queue_delayed_work() schedules the worker
+to run before devm_pse_controller_register() completes, will
+pse_poll_worker() attempt to acquire pcdev->lock and push events into
+pcdev->ntf_fifo before they are initialized?
+
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(devm_pse_poll_helper);
 
