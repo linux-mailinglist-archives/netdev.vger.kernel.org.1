@@ -1,132 +1,181 @@
-Return-Path: <netdev+bounces-284343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284346-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aN4gIAHV+Wk1EgMAu9opvQ
-	(envelope-from <netdev+bounces-284343-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 13:31:13 +0200
+	id SE6LECDR+WnpEQMAu9opvQ
+	(envelope-from <netdev+bounces-284346-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 13:14:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6B994CCAB8
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 13:31:12 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AE8D4CC514
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 13:14:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 556963183D3F
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 11:10:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 406403028639
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 11:13:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9AC317176;
-	Tue,  5 May 2026 11:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112373E6397;
+	Tue,  5 May 2026 11:13:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="gjXYnDtm"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="ThN/7tRt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA78324B2C
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 11:08:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4FA32BF44;
+	Tue,  5 May 2026 11:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777979282; cv=none; b=CBXfUzlTEAg1b5cJudM0Dmipc/wTs16DorO1m3/R7HfZX6NxKKCE+4IRyr+IatObman92KjYZ+ZrWRnVsa4pVEtqo9qCZO2XRmEmi8mX9YxetqQ5LZF4qsKiQHZy+q25Nm8e7MRX9zxLiLmiqSJTdV/dG2dSg0ouFe3tBQbZM0w=
+	t=1777979592; cv=none; b=tOACmE8xIyZ6cPWww0KQB8m+xxq4jlHWDX/S2tNRgwaQEbTgK/CmPRcHv4JPJnvf/7v+OVev6F3tpvwJ1kWl0dJu322hpIDUINLXkzr/1feZ+XSBLWvo4nPdRSTQxlfyW9jPEMCqbphCOiX7SCCnLrmfIbSLcZx+QTcKQzaMvVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777979282; c=relaxed/simple;
-	bh=Fii/dsbfAyXWJL7iw+03+orRhArbE2fhaoRBiGFLhGA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RtDMCp7NObMwt6t9sbqxoa0j1iJIBFs4VRfd4eiUjFkfLMJUK29rdBdl+F95WM6bKFQ9SxZJdpaouSRM+Anyf//a6WqOxxDwiXmrJNZIf78OPo6oiIQIDXTmI8Mv4gTdqRHEVdub/kNXD8AHjOolveHKAJipQsOEKXVPlquPVMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=gjXYnDtm; arc=none smtp.client-ip=178.251.229.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 659F01127D0;
-	Tue,  5 May 2026 13:07:50 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
-	s=dkim; t=1777979272;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=zWUvHbmQg2gLg9orv/4xYL+TetgUltH2/efGS+YxUmE=;
-	b=gjXYnDtmlWGdogF8E40yOAx1IlLmTxNveXGIzfIGNnejnFHIrchBOrN5l0nOXX3o0qbXTh
-	BFDEijiyEXXnTC97InXdx/yT8ippKvKCkuqTmcUWKJUXg2m5DfaPI+zV+8j518MsAlsYic
-	3as7tjdHV0UZZrKhB67e7YoobtsfixiIhuae1eL9CNefCTj7BG1dBku/eMwPzJNVm6Si3C
-	CSJwDYiSesa//OSYi+jALaQ3zkPEiz444XP0B5yxMQAwb3633q3r0O+SbgdJsX0HcsNb/s
-	JWneHQs0we32Xt3/c4edM4hFdkmNww4rcPV9Umprka7VjYFTntCXRV1Q6Yt6mA==
-Message-ID: <8b77f257-6fed-4429-ae8e-6a2bf266a0ab@nabladev.com>
-Date: Tue, 5 May 2026 13:07:49 +0200
+	s=arc-20240116; t=1777979592; c=relaxed/simple;
+	bh=mGVAnLGtOPFV27xFwEwfReeld+RFhURreIS7Dh6s01M=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=jL1e7Wf+x0JbjoZTNMWBikAnQ00RRmQW8W/uOSeQoDLkrua/x6ONUBy29XbGhVhmphjey12KxnHNYV5I7zT2G22KeUBF7JN8sEZBFWiOviH9eGU/hGlH0tr/fpHenHejYLU9Aufqhtt0JBYcelzhgPJvZM/D5ko9LEpCgB+8wBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=ThN/7tRt; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:Message-Id:Date:Subject:From:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=ZtK5G7nzJTsIuWFqmlMXMSaUIsWUgRKDSRorndPCA2M=; b=ThN/7tRtM3Dc61pJKFGRiP4L8R
+	UyFNSZKHwZcYr4Z9xnHBJgY+UrIU8ZhqBzWXDODSHT+k/GPdQBjPHg4ZgO9syUxVUtYKSO9yF4ND0
+	kUXE+FK28Ne7X3/xSVmLuRRHpKtQcnyzt3osZD+Ojs2V4W7URS+ZM9JoPzPZGvbpBahoFMycTcGyh
+	HGGAtfXMyMFofto8hNweKJ287q2z/mW92zWfEHF2nV4kb2+OAI/hTn/WFwEB1DA6BoFDYvR8PSu1N
+	L9tMx5wbujm29wjQsI+NZsmYwPKsT8VUozkHXXTd6S4MECNVeCRoB8GhpCrayPvbR+NfjyhVuNimP
+	Sr7vBM8Q==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1wKDht-002lXj-14;
+	Tue, 05 May 2026 11:12:53 +0000
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next 0/5] net: convert four more protocols to
+ getsockopt_iter
+Date: Tue, 05 May 2026 04:12:37 -0700
+Message-Id: <20260505-getsock_two-v1-0-4cb0738950e0@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] fixup! net: dsa: microchip: implement KSZ87xx Module 3
- low-loss cable errata
-To: Fidelio LAWSON <lawson.fidelio@gmail.com>,
- Sai Krishna Gajula <saikrishnag@marvell.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Woojung Huh <woojung.huh@microchip.com>,
- Fidelio Lawson <fidelio.lawson@exotec.com>
-References: <20260417-ksz87xx_errata_low_loss_connections-v4-1-6c7044ec4363@exotec.com>
- <20260417155025.488290-1-fidelio.lawson@exotec.com>
- <BYAPR18MB3735885B13017500E153FEA2A0202@BYAPR18MB3735.namprd18.prod.outlook.com>
- <18cfeb86-9879-4644-b2f8-ab7775287b1e@gmail.com>
-Content-Language: en-US
-From: Marek Vasut <marex@nabladev.com>
-In-Reply-To: <18cfeb86-9879-4644-b2f8-ab7775287b1e@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: E6B994CCAB8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAKXQ+WkC/yXM0QqCMBQG4Fc5/NcOpstBe5UImfNkK9hiO5Ugv
+ nto1x98KyqXyBWOVhT+xBpzgqO2IYS7TzOrOMEROt1Z3etezSw1h+cg36z86Kf2bE/GGIuG8Cp
+ 8i8uxXZBYVOJFcP1LfY8PDrJn2LYftd7AfnkAAAA=
+X-Change-ID: 20260505-getsock_two-abad19643336
+To: Oliver Hartkopp <socketcan@hartkopp.net>, 
+ Marc Kleine-Budde <mkl@pengutronix.de>, 
+ Robin van der Gracht <robin@protonic.nl>, 
+ Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de, 
+ Jeremy Kerr <jk@codeconstruct.com.au>, 
+ Matt Johnston <matt@codeconstruct.com.au>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc: linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ Breno Leitao <leitao@debian.org>, kernel-team@meta.com, 
+ Stanislav Fomichev <sdf@fomichev.me>, 
+ Bobby Eshleman <bobbyeshleman@meta.com>
+X-Mailer: b4 0.16-dev-453a6
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2043; i=leitao@debian.org;
+ h=from:subject:message-id; bh=mGVAnLGtOPFV27xFwEwfReeld+RFhURreIS7Dh6s01M=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBp+dCvA8oeaVvEBD/Zk8jGOTXQcSnc9oIylXxLh
+ yCuApmiAF+JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCafnQrwAKCRA1o5Of/Hh3
+ bc03D/9n7CBr8dOO0qZP1q4lDp3vkAY7d99GQ7MYvercgNQqjLPyrFCHtTmyPBTmETmJzY6iTcZ
+ vy04WrG31AO5F7ObpliQfb16ms4NPS0FZ48o1E5tssB9CtPj4R+4cXQKYowwvnQoUHyOri79iuq
+ xbPOcZBOBK4RgC7+VrzViahq7nGOSLlUwopX+MTOnDHqEWM7fjoPy7Qhi5KhNN0hl0JvaYG3UTN
+ atlS2PS0AGJwSJ828VNBXRQOIVL54vpDjDv3ya41TpiZDHeqhwhiK/GALCQrXv9rAP/rE5KpkZV
+ 7mMI881JullQ9P8bghU92qkFNoWQBC14TMSaqUEfe6vqiYzg1wcG0wnHRGwXag8ulzZOi+rPhhf
+ /j2lLWH9bM10NIKTnPcD82sZdseB6yOyThWTqSBwNlbuwZTn9caFowsD1hNtGKL2A1JYgx2brFL
+ 85mkNlPBVFLB80VTzSQXD0+Fh8/DNa5A5zNX04MDOkaA2bEX/+iyt7NBE5QJg/y8efg4Q4rlcXF
+ fTD5GdxTAV2GBrfKx01s0CTmiBf8t1sES1+OuuwxhqMuzw5r63GlQqRr3sN0Av2GZxnNmuMJxF0
+ FOyKwK26D6TkTvCG3BmnCkY5+xlyKyKMhpsNIvQ5m42EhwB7zPkkuz7n1VN0yT8/uFaoSHK1p0b
+ 4EXObHpTwuhKzvA==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+X-Debian-User: leitao
+X-Rspamd-Queue-Id: 2AE8D4CC514
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	SUBJECT_HAS_EXCLAIM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,marvell.com,vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[nabladev.com:+];
-	RCPT_COUNT_FIVE(0.00)[6];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marex@nabladev.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-284343-lists,netdev=lfdr.de];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284346-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[debian.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-On 4/17/26 6:30 PM, Fidelio LAWSON wrote:
-> On 4/17/26 18:10, Sai Krishna Gajula wrote:
->>> -----Original Message-----
->>> From: Fidelio Lawson <lawson.fidelio@gmail.com>
->>> Sent: Friday, April 17, 2026 9:20 PM
->>> To: netdev@vger.kernel.org
->>> Cc: Marek Vasut <marex@nabladev.com>; Andrew Lunn <andrew@lunn.ch>;
->>> Woojung Huh <woojung.huh@microchip.com>; Fidelio Lawson
->>> <fidelio.lawson@exotec.com>
->>> Subject: [PATCH] fixup! net: dsa: microchip: implement KSZ87xx
->>> Module 3 low-loss cable errata
->>
->> Since this errata is a fix and pushed to "net", adding fixes tag may 
->> be required.
->>
-> 
-> Good point, thanks for spotting this.
-> I’ll add an appropriate fixes tag referencing the commit that introduced
-> the KSZ87xx support, and follow up with an updated fixup.
-Could you maybe collect the fixes and send a V5 ?
+Continue the work to convert protocols to the new getsockopt_iter API.
 
-Thank you !
+Convert four additional getsockopt implementations to the new
+sockopt_t/getsockopt_iter callback:
+
+  - CAN ISO-TP
+  - MCTP
+  - CAN J1939
+  - LLC
+
+These are mechanical, ABI-preserving conversions following the same
+pattern as the previously converted protocols (af_packet, can/raw,
+af_netlink, af_vsock): the (char __user *optval, int __user *optlen)
+pair is replaced with a single sockopt_t *opt that carries the buffer
+length on input and the returned size on output, and exposes an iov_iter
+for the copy-out path. put_user()/copy_to_user() pairs are replaced with
+a single copy_to_iter() per option, and the wrapper in
+do_sock_getsockopt() handles writing optlen back to userspace.
+
+I picked these four because each is small and self-contained, with only
+one getsockopt callback and a handful of options, so the conversions are
+easy to audit individually.
+
+NOTE: optlen is always updated (returned to userspace) even when optval
+fails to copy. I.e, userspace will get the "new" optlen even when the
+getsockop() fails. That seems wrong, but, this just preserve the
+previous behaviour, not changing it.
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Breno Leitao (5):
+      can: isotp: convert to getsockopt_iter
+      can: j1939: convert to getsockopt_iter
+      mctp: convert to getsockopt_iter
+      llc: convert to getsockopt_iter
+      selftests: net: getsockopt_iter: address review nits
+
+ net/can/isotp.c                               |  12 ++-
+ net/can/j1939/socket.c                        |  21 +++--
+ net/llc/af_llc.c                              |  15 ++--
+ net/mctp/af_mctp.c                            |  10 +--
+ tools/testing/selftests/net/getsockopt_iter.c | 109 +++++++++++++++++++++++---
+ 5 files changed, 128 insertions(+), 39 deletions(-)
+---
+base-commit: c1e5127b577c6b88fa48e532616932ae978528d5
+change-id: 20260505-getsock_two-abad19643336
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
+
 
