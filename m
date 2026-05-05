@@ -1,149 +1,284 @@
-Return-Path: <netdev+bounces-284130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284131-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IMLsDY85+Wni6wIAu9opvQ
-	(envelope-from <netdev+bounces-284130-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 02:27:59 +0200
+	id UBtdCo46+Wkn7AIAu9opvQ
+	(envelope-from <netdev+bounces-284131-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 02:32:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C8394C559F
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 02:27:58 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC5364C571D
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 02:32:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D913B3058E35
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 00:25:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EFB423057605
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 00:28:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4A2E279355;
-	Tue,  5 May 2026 00:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 903F1287254;
+	Tue,  5 May 2026 00:27:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="iZ6gW5W5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZF5ujoyL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395FD27AC57
-	for <netdev@vger.kernel.org>; Tue,  5 May 2026 00:25:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A82282F1D
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 00:27:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777940742; cv=none; b=MKpDl9sCXC8oiwO7H0iG7mR/U5Qz4I03pjbuu501khig2NR0cRCumQ3TewOeqF1xK6ULgd2ROEgCDztmy7dyyjlYjQC2r2svfb+0RipAHUJNGXClIIAYOiwh7WyCv4gWXkOs/o9WNCk0fgtyn5OqWIZVaPLPhu2D5bOIXjIpvlE=
+	t=1777940879; cv=none; b=UCaXEXEB95IbpLXi3EYsUqM6kcEj+NXgEPsrQbqZULbphj9AbAiWFfp/ZfQ7zxGPZHir5lcc8/fPDV76hTsHezIuB+cNEKf0beRVcnu3gAzgYON0VSfyvmEj1klu7TmSvGYX54yur40ptzQ57lmvz6sYjHMBM7dL8jj5RTK4fZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777940742; c=relaxed/simple;
-	bh=CfNZ21j/ytOI11/o9nTzKxqdiP+E+HudmFUHHeI0zkE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=REot1UZvQVbrwOWJyPq94lVAjRJyKQdX6UhRhY0ivkI4vf69iiRB94ZgGnA6TSHmmpaDJRL9qBhwGkta4noRsELsJaiTnSIal5IXYEIxxx2OYwH9/VmVDYJSNdvZUnaB0evF0gq3VN51amNbTyj7Q05SV3hmnkyr/OYR4ST7WE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=iZ6gW5W5; arc=none smtp.client-ip=209.85.210.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7de4ed0593fso2865313a34.1
-        for <netdev@vger.kernel.org>; Mon, 04 May 2026 17:25:40 -0700 (PDT)
+	s=arc-20240116; t=1777940879; c=relaxed/simple;
+	bh=pNsIQOAsnUZLadZjxtsEIhlUHKk8eNroI5hNQSVKV1M=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=LPGH7UH5nyLma6pgSpdW9qvfp3e2lX+xjf2KmqlV4SP3eSsY9bNjl6N7n3sdDa2fjYHMG8qkkOltbYswdnX1i9wAt2pK0fs4dOjgKmBAnV1+z5GeeNZ4hoQkGsampz0gLcLwieLkMSykqDcG1RXDah/l1A8XB+umLYvEHneStc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZF5ujoyL; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-50d880e6fbbso53497421cf.0
+        for <netdev@vger.kernel.org>; Mon, 04 May 2026 17:27:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1777940740; x=1778545540; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CF9jZOMoPMQrHLZjiJYbpYprix2/+SHujxlOxM3kN78=;
-        b=iZ6gW5W58kwzlUHBzrBixfSKccBozvHcZaMQx5YK10u5bKvnUbS9cT8Kaomz9RybKP
-         za4r+YHmwET8mIggEKlPLXn9mlpeetypUlf+b/Zh7+cSaG/0UThI0RO57tA6c+ZUxBBG
-         thVehn+cXvG4GJsYZTU5zPDxhWf6Bb+ofKmhHmmZiQHumsdPGtKXYKDrTQNQlX3P8utC
-         wHkmToBKetasA3Pypbm6+8bVFlJ1S1ADC9uSSv/M1UFWyMgTyEhJg0DYkqKGXaK58dCb
-         etirJyLjst/M/bBweP3CbNh85ROP8TY85Uhktv7JC5DZlh1y8c1TwhB0lJ7M1k+g8uED
-         Qogw==
+        d=gmail.com; s=20251104; t=1777940876; x=1778545676; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9ejfZ0eQkRqkBmGphamNmL7mRqqqgKWnD1nR5omUniw=;
+        b=ZF5ujoyLwDRVqaSPvXnqPALE5hZrMeyHESmI+Vxy1FPFN4WJk9mjuNHebCOcZI40lh
+         dbCKSydTpEAIGRRlW4x2uuXosITL+jttsgr8Xn7RpRnOPzyht050u0S2fS4RIhc3lekd
+         TvXYTnuM+ISUnYpBz+wpUX+tvZqOMJKj4oY7cuC9FzxzqadJvfAuJZftWOMQ/9+aieOC
+         FvwohwZ2vXaTHgitQqbzDqqU6X2LDOjhJLCD/ITYeMWxItyuYKdE97xvB5ptOK3bFmdu
+         SIf1X6nBzH8VkPkQ1yBW2eMat5w8v7dJvWLq7MZi2eww3u4dgthiA4hDbLvGrEgxjhSp
+         TmLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777940740; x=1778545540;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=CF9jZOMoPMQrHLZjiJYbpYprix2/+SHujxlOxM3kN78=;
-        b=rhZA7gG7J4X6eM18QNYd5IldWaNkaaH77aAdAKhQY7pnkpQpVQ5Dh3gXQh01RLDSm5
-         if5gnT5mhKKE3308YZJFjzzDBnrKzmDtIVvlnpeoG00nAYXuMzp5Kbzyqx6pXvTxk87a
-         OqOzRIUQQzhRWBRMcBq7ASswijyDcxRLrUiZ+7LmRpaaWmhTcXVVcJrHSRFDbyYjT8RL
-         rLgzszxqcy+Fq1MESMOzo0ycdIWuneSv3pzq0e+OdGAtckcPGbl2Ds+Gt0W977TNyMg+
-         CeB/mv2YPA/UyF+X8gI6q/UzuGBmygZxPE0rmiMu6Vd3zXxdTG13vVe5p7dLJVrF1jWE
-         InnQ==
-X-Gm-Message-State: AOJu0YxV37y6NikXQ2ALqwRjaNXjkugcNHK2MxZ9cP4I/ieWBGptf19O
-	yKhUclkIkrJL0omzVeRo2NV2cR6c+jHsSXrL4Yz2Rd13rsgL5spYqP7VnxD1M/8JjF+wk5swg7Z
-	5auQ4
-X-Gm-Gg: AeBDieuqCl0G4R4fY2Miz6NTYB05Bgq5BsF2+9d3g9/sfHn8+rIsKj0Bx6r3RwEnbPq
-	oFq+0mNjkELBsZtV+Rlts9O22mI75m0cPikdkHXfYoVarIIX6e6BgQeasiU4mLzDPU4povvimfk
-	YoC1Pg/zglteq/rJKTskKjfgLLtDZSk6AcELl+C7fi5uGkoV+2rh+AsCaxgqXyYs5v6UJ9EQei/
-	wagMkLg7AIv1djoAPPfU6DYxVEUrlD60GQvP4LLnMWH057ri6j/wUru29iPgonIc8EPrTk4Uqrd
-	gcyntAlONHnTp8SpO5VR1ROrkc+to+DSIlGl+4gifZKmM0Jq7Cfkn643wCRT2mBZ+bLA9uzNswt
-	8sYLJDDWOIEl76AtzN8FTb30KttkM839kGNq5q1UrE+Yr5gTWmP3EU0fFIqWEpAMIlxehdu4xp5
-	wNFzMPmrqFUnkPrE0Tk7RxI8nkWhDbADKjmSvNE1ie/sXzvg==
-X-Received: by 2002:a4a:e914:0:b0:696:2cdf:15e2 with SMTP id 006d021491bc7-6998a599dd7mr421335eaf.7.1777940740134;
-        Mon, 04 May 2026 17:25:40 -0700 (PDT)
-Received: from phoenix.local ([104.202.41.210])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69689479359sm7507216eaf.7.2026.05.04.17.25.39
+        d=1e100.net; s=20251104; t=1777940876; x=1778545676;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9ejfZ0eQkRqkBmGphamNmL7mRqqqgKWnD1nR5omUniw=;
+        b=m2gUeNRI5DJBKkROx4Whhxq/aCVrwcveIE2k8xmdNZBtj6iF6NhrkWv5cg2pQ1orny
+         2wUqm294DXcBEsql3rV6CzyhNSF5C+HIazax/CBfa/pRtHHI6lEzhGnEZCZ8tQxiI97O
+         BVPOFj0DpKc+hHiK+JC1e5hB36pgbKqDEQ3uj7pve45xq10x+ww4ys7zBADMtOOAG09e
+         XorLJzDxGZbPklCG030cTZWbhNUgW2T2Vnv6CnvPS07fsenibHvKUmpn57LyGBkeFfXr
+         Z1kW3tRM1EM699dM3CHMPINSsJGI5lNQAH1o8QCVnS7A00Kh/weWfgOkX7UGRuSV9uZH
+         /k2Q==
+X-Gm-Message-State: AOJu0Yy39V7BfMQ6lSM1J/G1nYVtvhYsu5+lBYCHqOd5kFy+evaHEfeE
+	2B2/nMnfjq4z+N8YqP6Tms+2CcuM50tPpf3luQ3gPv4hcgKCFU4OtkyI
+X-Gm-Gg: AeBDieuphzgOF4qgj+pwpGATKdqF2bWKKrY/BZwb+4yfZiiztlko5D93vnD37EQrDVy
+	9K0gBXl4OeBbNFQH4uak8YqcB5zYu+0SKLs+tNzXvW9T2R6IO+fgfLiS+x5DUtMqdDEvkzZ1p+A
+	dxydXj7kIqGoxwgkbsowFB6Pu3uUWfZb38ek2WgJLA4UYaW3RQPC2hddT8x/vYGIzlV9kamKazT
+	bgcGScDJEHlKPh47F9PVyp+KJo641MVWt9RuXtZOr7519tCqtKpvG3lUZhOOXYA2T5XnyxxRLpC
+	+1Tn/QJSi9SQtzdse+Cn/LABBfYCn+lObjqXBU6V2F1oJ0DfDyRy8YL+xb/RieirFLzWAmxGHb4
+	A22mZlH0qIYI9YF7j1pSNJGz3jcr8lDrOkRNTi3Rj0bqFaU29jvuY6KSkxtSL5QZ4dhsfFux+3Z
+	uVEWAy36qETc+uL/dbwJAX46jdnFgP9ev9mMDMZQ2nYXc=
+X-Received: by 2002:a05:622a:24f:b0:50e:61ea:d8e0 with SMTP id d75a77b69052e-51305333e7amr22940221cf.21.1777940876408;
+        Mon, 04 May 2026 17:27:56 -0700 (PDT)
+Received: from localhost ([2a03:2880:f800:2f::])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51040b5d1f8sm108925301cf.22.2026.05.04.17.27.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2026 17:25:39 -0700 (PDT)
-Date: Mon, 4 May 2026 17:25:37 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com, jiri@resnulli.us
-Subject: Re: [PATCH net-next v2 5/5] net/sched: netem: handle multi-segment
- skb in corruption
-Message-ID: <20260504172537.36d8dd69@phoenix.local>
-In-Reply-To: <20260503195348.521225-6-stephen@networkplumber.org>
-References: <20260503195348.521225-1-stephen@networkplumber.org>
-	<20260503195348.521225-6-stephen@networkplumber.org>
+        Mon, 04 May 2026 17:27:55 -0700 (PDT)
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+Subject: [PATCH net-next v2 0/6] net: devmem: support devmem with netkit
+ devices
+Date: Mon, 04 May 2026 17:27:47 -0700
+Message-Id: <20260504-tcp-dm-netkit-v2-0-56d52ac72fd4@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 8C8394C559F
+X-B4-Tracking: v=1; b=H4sIAIQ5+WkC/x3MUQrCMAwG4KuE/3mBksocvYr44NaoQYyjDTIYu
+ 7vgd4BvR9dm2lFoR9Ovdfs4CslAWJ43fyhbRSFIkjGdJHMsK9c3u8bLgmWu52ke81RzwkBYm95
+ t+38XuAa7boHrcfwAYs/y7mkAAAA=
+X-Change-ID: 20260423-tcp-dm-netkit-2bd78b638d30
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+ Shuah Khan <skhan@linuxfoundation.org>, Alex Shi <alexs@kernel.org>, 
+ Yanteng Si <si.yanteng@linux.dev>, Dongliang Mu <dzm91@hust.edu.cn>, 
+ Michael Chan <michael.chan@broadcom.com>, 
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+ Joshua Washington <joshwash@google.com>, 
+ Harshitha Ramamurthy <hramamurthy@google.com>, 
+ Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, 
+ Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+ Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Nikolay Aleksandrov <razor@blackwall.org>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ Stanislav Fomichev <sdf@fomichev.me>, Mina Almasry <almasrymina@google.com>, 
+ Bobby Eshleman <bobbyeshleman@meta.com>
+X-Mailer: b4 0.14.3
+X-Rspamd-Queue-Id: BC5364C571D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.56 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284130-lists,netdev=lfdr.de];
-	RCPT_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284131-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber.org:email,phoenix.local:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-On Sun,  3 May 2026 12:52:03 -0700
-Stephen Hemminger <stephen@networkplumber.org> wrote:
+This series enables TCP devmem TX through netkit devices.
 
-> The packet corruption code only flipped bits in the linear
-> header portion of the skb, skipping corruption when
-> skb_headlen() was zero.
-> 
-> Use skb_header_pointer() and skb_store_bits() to access the
-> full packet data, allowing any bit in the packet to be
-> corrupted regardless of how the skb is laid out.
-> 
-> Replaces d64cb81dcbd5 ("net/sched: sch_netem: fix out-of-bounds access
-> in packet corruption") with a more general solution.
-> 
-> Only count the number of packets that were actually corrupted.
-> 
-> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
-> ---
+Netkit now supports queue leasing. A physical NIC's RX queue can be
+leased to a netkit guest interface inside a container namespace. This
+gives the container a devmem-capable data path on the RX side (bind-rx,
+etc...). On the TX side, the container process binds to its netkit guest
+interface and sends traffic that netkit redirects (via BPF or ip
+forwarding) to the physical NIC for DMA.
 
-There are problems with this since it doesn't handle zero copy 
-correctly. Needs to make full copy.
+Two things in the existing devmem TX path prevent this from working:
+
+1. validate_xmit_unreadable_skb() requires dev->netmem_tx before it will
+   forward a dmabuf-backed (unreadable) skb. This protects skbs from
+   landing on devices that don't have the IOMMU mappings for the backing
+   dmabuf or that don't speak netmem. Netkit, however, does not support
+   DMA, doesn't attempt to read unreadable skb pages and so doesn't
+   break netmem (it is pure skb routing and redirection). It is
+   functionally capable of routing unreadable skbs, but there is no way
+   for the TX validation pathway to distinguish between a device that
+   will actually attempt DMA-ing the skb and another device
+   (like netkit) that does not DMA but also does not break
+   netmem.
+
+2. bind_tx_doit uses the bound device as the DMA device.  When the user
+   binds devmem TX to the netkit guest, the bind handler attempts to
+   create DMA mappings against netkit, which has no DMA capability and
+   no IOMMU mappings.
+
+This series solves these problems as follows:
+
+1. Extend netmem_tx to two bits, assigned to one of three values:
+
+   NETMEM_TX_NONE   - netmem not supported
+   NETMEM_TX_DMA    - netmem supported and performs DMA
+   NETMEM_TX_NO_DMA - netmem supported, but does not DMA
+
+   With these bits, phys devices can set NETMEM_TX_DMA and devices like
+   netkit set NETMEM_TX_NO_DMA. The validation TX path ensures that any
+   DMA-capable netdev exactly matches the bound device, guarantee the
+   correct mapping of the bound dmabuf. The validation TX path also
+   allows devices with NETMEM_TX_NO_DMA to pass, knowing these devices
+   will not misuse netmem or run into IOMMU faults. After redirection or
+   routing and the skb finally makes its way through the stack to a
+   physical device's TX path, the above NETMEM_TX_DMA check is performed
+   again to guarantee the device has the appropriate binding/mappings.
+
+2. On TX bind, the bind handler recognizes NETMEM_TX_NO_DMA devices and
+   finds the phys TX device and binds to that instead. For the netkit
+   case, if it has been leased a queue from a DMA-capable device
+   already, then the bind action is performed on the DMA-capable device
+   instead and the dmabuf is mapped correctly.
+
+---
+Changes in v2:
+- Squash driver conversion patches (2-5) into patch 1 (Jakub)
+- In validate_xmit_unreadable_skb() to check netmem_tx mode before inspecting
+  frags (Jakub)
+- Lock bind_dev around netdev_queue_get_dma_dev() when bind_dev != netdev to
+  fix lockdep (Sashiko)
+- Move require_devmem() into individual test functions so KsftSkipEx goes up to
+  ksft_run() (Sashiko)
+- Add nk_devmem.py to TEST_PROGS in Makefile (Sashiko)
+- Link to v1:
+  https://lore.kernel.org/all/20260428-tcp-dm-netkit-v1-0-719280eba4d2@meta.com/
+
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+To: David S. Miller <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Simon Horman <horms@kernel.org>
+To: Jonathan Corbet <corbet@lwn.net>
+To: Shuah Khan <skhan@linuxfoundation.org>
+To: Alex Shi <alexs@kernel.org>
+To: Yanteng Si <si.yanteng@linux.dev>
+To: Dongliang Mu <dzm91@hust.edu.cn>
+To: Michael Chan <michael.chan@broadcom.com>
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>
+To: Joshua Washington <joshwash@google.com>
+To: Harshitha Ramamurthy <hramamurthy@google.com>
+To: Saeed Mahameed <saeedm@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+To: Mark Bloch <mbloch@nvidia.com>
+To: Leon Romanovsky <leon@kernel.org>
+To: Alexander Duyck <alexanderduyck@fb.com>
+To: kernel-team@meta.com
+To: Daniel Borkmann <daniel@iogearbox.net>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+To: Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org
+Cc: linux-doc@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-rdma@vger.kernel.org
+Cc: bpf@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
+Cc: Stanislav Fomichev <sdf@fomichev.me>
+Cc: Mina Almasry <almasrymina@google.com>
+Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+
+---
+Bobby Eshleman (6):
+      net: add netmem_tx modes that indicate dma capability
+      net: devmem: support TX over NETMEM_TX_NO_DMA devices
+      selftests: drv-net: ncdevmem: add -n flag to skip NIC configuration
+      selftests: drv-net: refactor devmem command builders into lib module
+      selftests: drv-net: add primary_rx_redirect support to NetDrvContEnv
+      selftests: drv-net: add netkit devmem tests
+
+ .../networking/net_cachelines/net_device.rst       |   2 +-
+ Documentation/networking/netmem.rst                |   8 +-
+ .../translations/zh_CN/networking/netmem.rst       |   7 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c          |   2 +-
+ drivers/net/ethernet/google/gve/gve_main.c         |   2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c  |   2 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.c     |   2 +-
+ drivers/net/netkit.c                               |   1 +
+ include/linux/netdevice.h                          |  11 +-
+ net/core/dev.c                                     |  21 +-
+ net/core/devmem.c                                  |   6 +-
+ net/core/devmem.h                                  |   9 +-
+ net/core/netdev-genl.c                             |  57 +++++-
+ tools/testing/selftests/drivers/net/hw/Makefile    |   1 +
+ tools/testing/selftests/drivers/net/hw/devmem.py   |  73 +------
+ .../selftests/drivers/net/hw/lib/py/devmem.py      | 222 +++++++++++++++++++++
+ tools/testing/selftests/drivers/net/hw/ncdevmem.c  |  58 +++---
+ .../testing/selftests/drivers/net/hw/nk_devmem.py  |  40 ++++
+ .../drivers/net/hw/nk_primary_rx_redirect.bpf.c    |  41 ++++
+ tools/testing/selftests/drivers/net/lib/py/env.py  |  67 +++++--
+ 20 files changed, 507 insertions(+), 125 deletions(-)
+---
+base-commit: 790ead9394860e7d70c5e0e50a35b243e909a618
+change-id: 20260423-tcp-dm-netkit-2bd78b638d30
+
+Best regards,
+-- 
+Bobby Eshleman <bobbyeshleman@meta.com>
+
 
