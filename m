@@ -1,199 +1,179 @@
-Return-Path: <netdev+bounces-284277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284278-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id c749Mvm1+WmvBAMAu9opvQ
-	(envelope-from <netdev+bounces-284277-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:18:49 +0200
+	id KFnZBAq3+WmNBAMAu9opvQ
+	(envelope-from <netdev+bounces-284278-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:23:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BACB94C974C
-	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:18:47 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61E1F4C98A4
+	for <lists+netdev@lfdr.de>; Tue, 05 May 2026 11:23:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7DE92301F48B
-	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 09:18:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AF3B43084ADA
+	for <lists+netdev@lfdr.de>; Tue,  5 May 2026 09:18:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90038246778;
-	Tue,  5 May 2026 09:18:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB0B308F36;
+	Tue,  5 May 2026 09:18:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b="GXdQ65Ke"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="nvvez64D"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC9B2DB7BA;
-	Tue,  5 May 2026 09:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F6A1EFF8D
+	for <netdev@vger.kernel.org>; Tue,  5 May 2026 09:18:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777972725; cv=none; b=TqPNLdVxItGC9r6Z8RYXL112BQ1FYVDeuP2rvZ/wljtqX1zhjamQ+0N5xrSqDbPAUBZKOqkaaEMSEgsjqOjpV4jBPfSLto6OuOPIy9riZJPq9xyhjqduuSCdzGUbeCxFTA420r//z133ntIyYjEyVsRJZrSXYqFwcnrl4uK9f8w=
+	t=1777972730; cv=none; b=CRUB/ja27DCcuo1HQEsw9GDK7H/kXab8WvPrkFwE7IhNgfEPMvPnN9jEUkLjfs+itj3J8YnmEEaMcB3QhIvDcQSXhFNwL+dxHSUT2VCDKx0BsRihiQrQUwIpZHNdQ3EFnAxgul61bwebZhGSk80hftt7vfYco+seskiEPgGXZYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777972725; c=relaxed/simple;
-	bh=9SNRQ96W42J5zCIfhW/YTNFrj8QMT4xG0K9xiri0yyk=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=kXj1kH0yJ8pN6G1vbdkhfKhB+9ddAePj96p5rDBw1lm/JbXvFSEirrPix3S3Kze28dz3yQs62xRc1iOD2dJLb+oX2Ydim/BOMPVhQBczL9K7641QFPpGlK+vnZtEMUbBw634aoa8QUecXQLoLK2uqWDhsQ1jtyLhgOIXCUF+1eM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn; spf=pass smtp.mailfrom=std.uestc.edu.cn; dkim=fail (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b=GXdQ65Ke reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=std.uestc.edu.cn
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=std.uestc.edu.cn; s=dkim; h=Received:Message-ID:Date:
-	MIME-Version:User-Agent:From:Subject:To:Cc:Content-Type:
-	Content-Transfer-Encoding; bh=/aXJtrqXl1XXzWhV4If7NN+Y9lfxYLoMa8
-	LrVHQmIl4=; b=GXdQ65KeeOgnfYw5ErQfYJDXjNoCQzg3VAQomD+LEar6YFvn9E
-	s3YQRdvIGFrClymYqjfS9zA+BYJLpXlbDdoG4e+yaX0KOY01fB3xEyE+9lCUAcBz
-	aoyrmnOH8V6e5L75BEZDAdfiFPhrN5elOkaJ0NXYaRrDll7fu4LZn4kfA=
-Received: from [IPV6:240c:c983:9:4350:6499:1928:c2e4:4a99] (unknown [240c:c983:9:4350:6499:1928:c2e4:4a99])
-	by hzbj-edu-front-3.icoremail.net (Coremail) with SMTP id BbQMCkD2GjXqtflpMevqAQ--.45991S3;
-	Tue, 05 May 2026 17:18:37 +0800 (CST)
-Message-ID: <15e69058-da2e-4a4d-8bda-ad89da0ae6f7@std.uestc.edu.cn>
-Date: Tue, 5 May 2026 17:18:34 +0800
+	s=arc-20240116; t=1777972730; c=relaxed/simple;
+	bh=fbaH5tqfWHy6Xd+b5dPwSbbhuawugoyvUcdleOfhvhk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PmIqQvqjVIs4KG9SpwEx0ABrBhYUXbHwuGq2wQb0MkL/+mbff4pETAVvK8IyasccRRUuzSGfawWJv+yzzXSYk87YGPPQ/WyYDQoX53AitFt8WetYNhJCESFREeskHlnxMfczdIBteoqgeM7fmYs47RmkR02nS0vdZ8fYakVo8xE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=nvvez64D; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=JWIYkX9BKeWAsCEgZ/rd1TTkuyCi2pBwyW9ZwolVWIk=; 
+	b=nvvez64DENLqwQwQbb7bP1EL+uWeLiRnQDkInhwa7dawJmo3Zs90lJeyQ9Nql337N5bIBXpLLxV
+	PmDK2t4wKxMZBcVbfsN/LjmIiRF/G+UfMaXyQHZBYLhmxmxdSq3VYA8D5MvrTtt5Vejc725qvacAV
+	2fhpRpCut+R29zYnTYG3JZV7PvOYCaCD+8f1+AJEsYhgmkZch5dlV4ZkJDHEGK933jyWV9MnWId4I
+	KtL/swiPiQHv/EuBz22QS6T8sie5AHntAsR6EdtSCbrWyc1CfANRm+FYvxE29XM4PFxve+fNDN4+H
+	PECWDI7jypZj+cxocyA9y3trsC5otSeIacWg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1wKBvO-00BNfR-0X;
+	Tue, 05 May 2026 17:18:43 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 05 May 2026 17:18:42 +0800
+Date: Tue, 5 May 2026 17:18:42 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Ren Wei <n05ec@lzu.edu.cn>
+Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, yuantan098@gmail.com,
+	yifanwucs@gmail.com, tomapufckgml@gmail.com, bird@lzu.edu.cn,
+	ronbogo@outlook.com, zylzyl2333@gmail.com
+Subject: [v2 PATCH] xfrm: ipcomp: Free destination pages on acomp errors
+Message-ID: <afm18k8_CKGOl0oT@gondor.apana.org.au>
+References: <cover.1777923646.git.zylzyl2333@gmail.com>
+ <8c304d9250d947b94cebc1cb1f85c73aa2bf0414.1777923646.git.zylzyl2333@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Quan Sun <2022090917019@std.uestc.edu.cn>
-Subject: Vulnerability Report: Logical Error in 6LoWPAN Multicast Context
- Address Compression
-To: linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-Cc: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:BbQMCkD2GjXqtflpMevqAQ--.45991S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxAr4xAryUtw4xWryfGF15Arb_yoW5uF4Dpr
-	WrG39Yyr97Xr13A3yvyr4v9r1xZrs5tr1UKry8C3s09a1Ygr1IvF4DKFy8Aa45Ar1ru34q
-	vw4Uu398AwsIkaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvqb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwV
-	C2z280aVCY1x0267AKxVW8Jr0_Cr1UM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq
-	07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r
-	18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41l
-	c7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
-	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
-	14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
-	IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
-	87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0x
-	ZFpf9x07boE_iUUUUU=
-X-CM-SenderInfo: asqsjiyzqzilqqrzq21wgo3vxvwfhvlgxou0/
-X-Rspamd-Queue-Id: BACB94C974C
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8c304d9250d947b94cebc1cb1f85c73aa2bf0414.1777923646.git.zylzyl2333@gmail.com>
+X-Rspamd-Queue-Id: 61E1F4C98A4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.54 / 15.00];
-	DMARC_POLICY_QUARANTINE(1.50)[uestc.edu.cn : SPF not aligned (relaxed),quarantine];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[apana.org.au,quarantine];
+	R_DKIM_ALLOW(-0.20)[gondor.apana.org.au:s=h01];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284277-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	R_DKIM_PERMFAIL(0.00)[std.uestc.edu.cn:s=dkim];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[std.uestc.edu.cn:~];
 	FROM_HAS_DN(0.00)[];
-	NEURAL_SPAM(0.00)[0.269];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[2022090917019@std.uestc.edu.cn,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,secunet.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lzu.edu.cn,outlook.com];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[gondor.apana.org.au:+];
+	TAGGED_FROM(0.00)[bounces-284278-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[herbert@gondor.apana.org.au,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[]
 
-## 1. Summary
-A logical vulnerability exists in the 6LoWPAN IPHC (IP Header 
-Compression) subsystem of the Linux kernel, specifically within the 
-`lowpan_iphc_mcast_ctx_addr_compress` function in `net/6lowpan/iphc.c`.
+On Tue, May 05, 2026 at 04:52:59PM +0800, Ren Wei wrote:
+> From: Yilin Zhu <zylzyl2333@gmail.com>
+> 
+> ipcomp_setup_req() allocates destination pages for the acomp output
+> scatterlist. On successful completion, ipcomp_post_acomp() attaches the
+> used pages to the skb and frees any unused pages.
+> 
+> On an acomp error, ipcomp_post_acomp() skips directly to freeing the
+> request. acomp_request_free() only releases the request itself, so the
+> caller-allocated destination pages are left allocated.
+> 
+> Track the number of destination pages allocated for the request and free
+> them on the error path before releasing the request.
+> 
+> Fixes: eb2953d26971 ("xfrm: ipcomp: Use crypto_acomp interface")
+> Cc: stable@kernel.org
+> Reported-by: Yuan Tan <yuantan098@gmail.com>
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Reported-by: Xin Liu <bird@lzu.edu.cn>
+> Co-developed-by: Peihan Liu <ronbogo@outlook.com>
+> Signed-off-by: Peihan Liu <ronbogo@outlook.com>
+> Signed-off-by: Yilin Zhu <zylzyl2333@gmail.com>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> ---
+>  net/xfrm/xfrm_ipcomp.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
 
-The function uses incorrect memory offsets during the `memcpy` 
-operations intended to compress an IPv6 multicast address. This mismatch 
-in offsets results in an incorrectly formed compressed address being 
-transmitted over the network, which is incompatible with the 
-corresponding decompression logic. Consequently, context-based multicast 
-address compression in 6LoWPAN is broken and fails to operate as defined 
-by the protocol.
+Thanks for the patch! How about just moving the out_free_req label:
 
-## 2. Vulnerability Details
+---8<---
+Move the out_free_req label up by a couple of lines so that the
+allocated dst SG list gets freed on error as well as success.
 
-According to 6LoWPAN address compression standards (and aligning with 
-the decompression function `lowpan_uncompress_multicast_ctx_daddr`), a 
-context-based compressed multicast address should be represented by 
-exactly 6 bytes:
-*   **Bytes 0-1:** Derived from `s6_addr[1]` and `s6_addr[2]` (Flags, 
-Scope, and Reserved bits).
-*   **Bytes 2-5:** Derived from `s6_addr[12]` to `s6_addr[15]` (The 
-4-byte Group ID).
+Fixes: eb2953d26971 ("xfrm: ipcomp: Use crypto_acomp interface")
+Cc: stable@kernel.org
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-However, in the compression function 
-`lowpan_iphc_mcast_ctx_addr_compress`, the offsets provided to the 
-`memcpy` calls are flawed:
-
-```c
-static u8 lowpan_iphc_mcast_ctx_addr_compress(u8 **hc_ptr,
-					      const struct lowpan_iphc_ctx *ctx,
-					      const struct in6_addr *ipaddr)
-{
-	u8 data[6];
-
-	/* flags/scope, reserved (RIID) */
-	memcpy(data, &ipaddr->s6_addr[1], 2);
-	/* group ID */
-	memcpy(&data[1], &ipaddr->s6_addr[11], 4);
-	lowpan_push_hc_data(hc_ptr, data, 6);
-
-	return LOWPAN_IPHC_DAM_00;
-}
-```
-
-### Analysis of the Error:
-1.  **Incorrect Destination Offset:** The second `memcpy` writes to 
-`&data[1]` instead of `&data[2]`. This overwrites the byte previously 
-copied from `s6_addr[2]` into `data[1]`.
-2.  **Incorrect Source Offset:** The source address is specified as 
-`&ipaddr->s6_addr[11]` instead of `&ipaddr->s6_addr[12]`. This means it 
-begins reading from the last byte of the network prefix rather than the 
-start of the 4-byte Group ID.
-
-Because the compression formatting does not match the expected structure 
-required by the decompression function, multicast packets utilizing 
-context-based compression will be corrupted upon transmission.
-
-## 3. Impact
-This vulnerability breaks the Context-Based Multicast Address 
-Compression feature (`LOWPAN_IPHC_DAM_00` when `M` and `DAC` bits are 
-set) in 6LoWPAN networks. Nodes receiving these packets will incorrectly 
-decompress the destination multicast address, leading to dropped packets 
-and communication failures within the multicast group.
-
-## 4. Suggested Fix
-The fix requires adjusting both the destination and source offsets in 
-the second `memcpy` call to correctly place the 4-byte Group ID into the 
-compressed `data` buffer.
-
-### Proposed Patch:
-
-```diff
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -1084,9 +1084,9 @@ static u8 lowpan_iphc_mcast_ctx_addr_compress(u8 
-**hc_ptr,
-  	u8 data[6];
-
-  	/* flags/scope, reserved (RIID) */
-  	memcpy(data, &ipaddr->s6_addr[1], 2);
-  	/* group ID */
--	memcpy(&data[1], &ipaddr->s6_addr[11], 4);
-+	memcpy(&data[2], &ipaddr->s6_addr[12], 4);
-  	lowpan_push_hc_data(hc_ptr, data, 6);
-
-  	return LOWPAN_IPHC_DAM_00;
-  }
-```
-
+diff --git a/net/xfrm/xfrm_ipcomp.c b/net/xfrm/xfrm_ipcomp.c
+index 5f38dff16177..2947321b043d 100644
+--- a/net/xfrm/xfrm_ipcomp.c
++++ b/net/xfrm/xfrm_ipcomp.c
+@@ -51,11 +51,12 @@ static int ipcomp_post_acomp(struct sk_buff *skb, int err, int hlen)
+ 	struct scatterlist *dsg;
+ 	int len, dlen;
+ 
++	extra = acomp_request_extra(req);
++	dsg = extra->sg;
++
+ 	if (unlikely(err))
+ 		goto out_free_req;
+ 
+-	extra = acomp_request_extra(req);
+-	dsg = extra->sg;
+ 	dlen = req->dlen;
+ 
+ 	pskb_trim_unique(skb, 0);
+@@ -84,10 +85,10 @@ static int ipcomp_post_acomp(struct sk_buff *skb, int err, int hlen)
+ 		skb_shinfo(skb)->nr_frags++;
+ 	} while ((dlen -= len));
+ 
++out_free_req:
+ 	for (; dsg; dsg = sg_next(dsg))
+ 		__free_page(sg_page(dsg));
+ 
+-out_free_req:
+ 	acomp_request_free(req);
+ 	return err;
+ }
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
