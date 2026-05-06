@@ -1,160 +1,301 @@
-Return-Path: <netdev+bounces-285021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285022-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2Lm6CNCi+2mvegMAu9opvQ
-	(envelope-from <netdev+bounces-285021-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 22:21:36 +0200
+	id IPvSL6Cj+2mvegMAu9opvQ
+	(envelope-from <netdev+bounces-285022-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 22:25:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF40A4E01F6
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 22:21:35 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C46964E0255
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 22:25:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id ED0333009CFA
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 20:21:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BF5B8300868D
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 20:24:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6852346E47;
-	Wed,  6 May 2026 20:21:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4220B34D398;
+	Wed,  6 May 2026 20:24:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K34bdA0x"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AAy8Z+vI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A9031E831
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 20:21:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C402305E3B;
+	Wed,  6 May 2026 20:24:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778098891; cv=pass; b=X+l743MqNOOFOGkTBBTjPi8BH66eRllwJ62m76m0sWzahxLXVibdSm+8X7wbny4My3rIR29gdZCWatavEncmEMmyJj2UvUO09dZ7OYVz+G+FHKFAZ8C+UhBpTy+t4nw/9bkK+YwA2rmyMQdarvRTK2O0LQjPgAxb+7BjUjCfhWI=
+	t=1778099095; cv=fail; b=lE8RFGHGSSn35GC6tHcPLgo62dqxA/X3ZWfYAwcgCVIuOq8GmZpOi8cKCyxtkN7u86DFdKzODy9CKSJfQOUUGBkDWWibrXbsK0tweO5r12ya5dom3nnX3FKgIhSsuc+aTUi9fh91pJwI6U+uB5qWknQ3QDE+ZknvM5g0l5BW8jg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778098891; c=relaxed/simple;
-	bh=QAqsL+P/EADi7i+Ad2gryAbkt9BAPf51xGRCB34VjX8=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=iaTZ5CwcFPBi+KZCYPZaS9Mx/4QsngyALjRR7DY0E3ltF+wcJqIWhMgfzI3ZBtOWuIwSnGINBxRqULh0FGiQy/LCQEdAqWKd6dQNlTNyi6svg+C/YWnIUAAdXoHIKsxUDtzlY4w8DEvtyaDBl47PE9A5XO0WCkE24Hd7AYwIDjI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K34bdA0x; arc=pass smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-7bb0d18c7f9so700047b3.0
-        for <netdev@vger.kernel.org>; Wed, 06 May 2026 13:21:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778098889; cv=none;
-        d=google.com; s=arc-20240605;
-        b=R5vORGK4FdOMUz2olaaQERlsXumoJsevQcSg6i4BHzU21hgNHyDlCLQyRYgyhsExEq
-         Sz+TtEbHDGnNnYTToXIa5elDpWz+IdQ25ipg7vp5WeJQJC2FH0B6C3Mj2uFN1+DBaGZK
-         03VuUpY+knVs+LdRhcHdhcQkZxH33KCHybpqkasrZfDUnIkGMfB4Z0RIrU+IJSiL5xmh
-         rySbqXkNrRqnUR8fNmKE5Vhj4W+0hCfh9TXnHlE1foGEGOifFS4AYikxQCwaD+L/3veS
-         7pnBWQxCkJQaMDpca4rDthT+TLOD23zwxWp+8Gfp9dMx+q8jVkeRo0RhDHjcp7TI8avj
-         9C2g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=QAqsL+P/EADi7i+Ad2gryAbkt9BAPf51xGRCB34VjX8=;
-        fh=dcVxwJA/j6dv2elbHLlvH74hf1891TMHOuctm5VwxCQ=;
-        b=Rc/pqs5U+eWh0JWwyEGUe0gu9BjQSxAALoRWy59dhR24105Bs5axMG4VZ8vmAFn2SI
-         Mwj26ygymjR2HvlABYyGjyVexMFV9JvM+4Gb75yACeOokyiNCAATe+uFdWkLbDDOUq+H
-         xOVxurL66rVwLYvURxCNxVlIpseblL1EByunsXdZ/S+KT3YqXXRTJn+C9Xxg1IMApqir
-         cRnxvZ1LZorPe/yFp5lEcIvC1rRVWDNbHYTrxt/vYdAAGISqvbddR3bKZcMTtwm4ijey
-         PYcbC/Ssfmz7Gnpo7MQ2Wckr90l9gxadeJ7XrpdSx1Bp3tgawPx3/3OgiKgM3tOjrnJL
-         jHsw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778098889; x=1778703689; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QAqsL+P/EADi7i+Ad2gryAbkt9BAPf51xGRCB34VjX8=;
-        b=K34bdA0xZfjembZQ0UZFzUqgKEfqLXMDfVZciVNVIK/sgWYAsedwcOTRB2pXOoNmrR
-         wTQZUHuIQLxrtIUDo/ZX0d6Up62i9gXC3oQGiaTtG7N/Ne5jYbLM6PkKs7iREEF4+KvQ
-         qVNrIzPztwnxlY55D7wNHFkNCQDsSoMNBhaCf0Htfl2EOUiWcOlPTYFIQVcHXgMaCE84
-         GtsNWn7QhNBdQ/LKnFirEPDRlbCfYZMBCvvMGZkiF3K0yAlHyFtwmzeCKKYowRbzp4if
-         jsqUeZFEt6A1o+C0TdgTJYnm4rTWy9qcGt0+Ilpd09Yh3aSkYsLyRDyPT/jfJTzl84W4
-         SjWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778098889; x=1778703689;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QAqsL+P/EADi7i+Ad2gryAbkt9BAPf51xGRCB34VjX8=;
-        b=I394qHbS79MsC9809812jHVjs/fvLqYrOLR0hom1FrDPoe+t11ARnIUCuYtS54nDzp
-         eEo34iDBmA40WAOiidC0qlN7MRcPtFsBY56mwfyaqHH8Q8g/jFO0QocpF2vquRaaxdjk
-         mNSSAgzO8H+ICWHk9mssotJfVfpqCjXW8dEc1sRAOO+q20uZ/f7PfYy8nTMS7aT/GMAB
-         QwkSH53ShIshdWrlo06yNi1oZmM7w2aXbRUxW9hHB8XKhNh63ot6D8WxIXoIXrcHNdht
-         +0bkQkI0YssHO/JwprWYFLtlCYSXdGjL8dskRfYiimwsy8GgvuhSO7UgxWACueM0VQCe
-         zU+w==
-X-Gm-Message-State: AOJu0Yz6pHCIVVN4wolSDJpyj52zFWNPDXQYR2yRTSwHUy3uGw+W+tjO
-	2K+z8HWd6W/0ToyZRWpyBGrjRPufc+viGQmx2PioXHh82FoR1LGv3tVjUNcZmkJc/+0WbFtDV5N
-	Eg6ayWlUEpcyYOYxksMBqtuq7JZs8KkMLdxWtaXA=
-X-Gm-Gg: AeBDieus619joL7/pG6irwHoMAryc8trg0Z2CIlfyWgYZ9mL8+1YHy4x+Q5gN3JDF0m
-	MyLYoHDonGcgOvPqUYw7/efA0i9L+EspHjM49Gc6+Jz4rAISGp5NcjLToVuW5ph2ZmBzyY0uV7F
-	72onoTXXEewV1c8Svjt9vOfXGOS9JdWzThKfJRjkLmU6vCqIpxeo9ZWBLdotJMpVK21AuAz76/T
-	xgC7VXi6AbfxhoUQluyFxn5BeMxn7Ng5y3h4wrtgTEkh1QBnWnRvehOxhmM+OVjTAsKjBUrgpG0
-	74/KhU+QnJBISqyAwAYw0M/Tg48a/10=
-X-Received: by 2002:a05:690c:92:b0:7bd:8752:cdc7 with SMTP id
- 00721157ae682-7bdf5ed03edmr57314817b3.39.1778098889546; Wed, 06 May 2026
- 13:21:29 -0700 (PDT)
+	s=arc-20240116; t=1778099095; c=relaxed/simple;
+	bh=xXWwqrkmRPW4jzZQ/5NRQQQ9HcurHMfHMmzlLQCHDS0=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=AKlXm/B4mX2YCiR+iQNcIKPY6YIbtwjzOUkHLLVKhbUE9s0Q6E38gjF/ShyknfKc39oiAUFd+jgFN1h3zCk8tCn1R1RLOTCSO4L2nzPlwlU1pboUf3MCiHuyMRDSLggxcP7Rs5D8TUeQ0svo5FGsD2jQyfmKOHhIfetFKSiGNHg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AAy8Z+vI; arc=fail smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778099093; x=1809635093;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=xXWwqrkmRPW4jzZQ/5NRQQQ9HcurHMfHMmzlLQCHDS0=;
+  b=AAy8Z+vIdKXaRi68NNCRDHc5kfzUdubWHhUNHOf87JqkS4675tKgIYJe
+   +DrJYCfi42h0vea1jV1z/DTRr5LdnJPpf7ZeFrE+XP2vxWl+rshn2hxj8
+   BEMhukcWDooI8lxGydePs5Hdpr274TJ5bcy91/5X/u6UDWM2hddp1aKwU
+   5hzmK9/yNlbsTdgtZcHWkpk7WTfQwpyyfP5ZAzYj/udo655+oOHgsN7ix
+   q7VxbpgKAlhMIY56rS0zsBngkKZkJ5aMqUtGk4g8qPFnCmYl5n8gOiRQ8
+   YlI+vGPXuL7JN070IreqlB8ThG4hpR8DtkKvD5WOqahlk51MBmw9pjwyW
+   g==;
+X-CSE-ConnectionGUID: SXmAnMsqQj+YOl6AdKOfww==
+X-CSE-MsgGUID: FYndPBbUTOSj81bjtn/Q6A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11778"; a="90142906"
+X-IronPort-AV: E=Sophos;i="6.23,220,1770624000"; 
+   d="scan'208";a="90142906"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2026 13:24:52 -0700
+X-CSE-ConnectionGUID: rHn2yHDyQyaS8oQjCQdxAw==
+X-CSE-MsgGUID: lenBa2khSiqnf2ztxS7CGA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,220,1770624000"; 
+   d="scan'208";a="274368870"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2026 13:24:52 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 6 May 2026 13:24:51 -0700
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Wed, 6 May 2026 13:24:51 -0700
+Received: from BYAPR05CU005.outbound.protection.outlook.com (52.101.85.16) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 6 May 2026 13:24:51 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RxuKegt1FGfYibSqDivA3Q5PcZ/mTfGR+/9OaOyJAytluYER8B/IV1TSLo4TFKLfEpnxex6HjnvfoObVEROT6tezJdTkxJU+A9By5jlU/vtkpRXMqpyHSUufapiVdEEjow9e4g96qRhkbFojMaQHtrlOgD9xAEdPwZTrdYRZV1VSE3LmbZAIwRKZqtqWgT06TuJFghdoAmw7BJk8fY9C5c6vJHQLzA/hDv6a/orEEYvdNxSdIRQULJmf3IoQDvTLwEnDt8QY0buEjCKWQ6Hje8Ie96MqyaY+4sUVoRUA3nP8+T4KSBcXQcibBDcr8J1vYDNKjA3MTFnnS09R9VCh7Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=e1rR4syI6y3TEkiGzGV36j7XzzDtb00goNFn67cFRw8=;
+ b=TXrP0CHO5kACEefoJjxQrAnVhziTbJvQ2iQq/7wPNHNiJjj4gevuOgeC2Cvm6UD/2v5j262DHZGKy0qZ32par99Xp8UDbdMvW2sJl248GejPo0joL7Vn44ewszm6ieKvaC9Tc1GiFID4Em9eXx6OGuDgomUlJiJtcQAwRP1OxYrFkDKRfuT7g8CteokzcxnGS7SToO1sIrQNII+doBMYIZqGKQL4y87as2yfJax+3Z23RRgQWkos1zO6HsbK9vyh6oGIN16xN0FeBT4HMHiZCRcuFhy1CwbohfvjZVsJVdnwwmPhtHVPUzdDh8q7ipBZ+WaXTrB3h6lrQ7uT2Fpu/w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7592.namprd11.prod.outlook.com (2603:10b6:806:343::16)
+ by IA1PR11MB6345.namprd11.prod.outlook.com (2603:10b6:208:38b::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.15; Wed, 6 May
+ 2026 20:24:48 +0000
+Received: from SN7PR11MB7592.namprd11.prod.outlook.com
+ ([fe80::3e09:8700:df72:37b6]) by SN7PR11MB7592.namprd11.prod.outlook.com
+ ([fe80::3e09:8700:df72:37b6%6]) with mapi id 15.20.9891.008; Wed, 6 May 2026
+ 20:24:47 +0000
+Message-ID: <30de916a-2f74-4f8f-8054-2f2037831bfa@intel.com>
+Date: Wed, 6 May 2026 13:24:44 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 01/13] i40e: Cleanup PTP registration on probe failure
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>, Arkadiusz Kubalewski
+	<arkadiusz.kubalewski@intel.com>, Maciej Fijalkowski
+	<maciej.fijalkowski@intel.com>, Michal Kubiak <michal.kubiak@intel.com>,
+	Joshua Hay <joshua.a.hay@intel.com>, Madhu Chittim <madhu.chittim@intel.com>,
+	Willem de Bruijn <willemb@google.com>, Dave Ertman
+	<david.m.ertman@intel.com>, Ivan Vecera <ivecera@redhat.com>, Grzegorz Nitka
+	<grzegorz.nitka@intel.com>
+CC: <netdev@vger.kernel.org>, <stable@vger.kernel.org>, Matt Vollrath
+	<tactii@gmail.com>, Sunitha Mekala <sunithax.d.mekala@intel.com>
+References: <20260504-jk-iwl-net-2026-05-04-v1-0-a222a88bd962@intel.com>
+ <20260504-jk-iwl-net-2026-05-04-v1-1-a222a88bd962@intel.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20260504-jk-iwl-net-2026-05-04-v1-1-a222a88bd962@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0336.namprd04.prod.outlook.com
+ (2603:10b6:303:8a::11) To SN7PR11MB7592.namprd11.prod.outlook.com
+ (2603:10b6:806:343::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Jorge Mayorga <mayorvlf@gmail.com>
-Date: Wed, 6 May 2026 14:21:17 -0600
-X-Gm-Features: AVHnY4KmODo-emmWNrM3WYgqpixKknjVjoIsDpk2RHha45bWNLj5eq5bXX3aMmM
-Message-ID: <CAGK_M0RWxDBY4CP-M9PxMf2codLim-xXdZ4BH158vW+FTq+8Ng@mail.gmail.com>
-Subject: [BUG] EM9293 PCIe (MHI) WWAN RX path broken on kernel 7.0
-To: netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: AF40A4E01F6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7592:EE_|IA1PR11MB6345:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6fda96b3-a345-4769-39ef-08deabad84a0
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016|921020|18002099003|56012099003|22082099003;
+X-Microsoft-Antispam-Message-Info: kY03CU/jW3jQxY0N/VwTJEwfHeWxHoI+3nxNdzYPG9oCD7klYprlJ8BRx9lyzepa7LU5mDojEuqJpSVa05xjWXNmS6q+LH2HMPQKE8ws7L3A3E9C9/L3tJ5Zj2qY8tPF+l8gAvzH7ITCgeDoml2/b9AsoDnG7kxKJ+aBZ2RbWEho9bkkea5pFnGfw3zTQLIeO2bPPnuZTWiOq4F0rn6ocOIw/IcWEs/H6kMjybyR+Y4Tu1cxfEFKOIWD79ZZqeEVCeNfztMXF3Oj8q36bP7RAbSvAiGzOoLqsCcgFAVohUkPymXyvRfKOU/ZQlPCRgjsCFSZvF4pxTOQBCGIHikdqQWpGRBFqbF2u2qT2VPXqPU3D0Y92hUyEdkoftOtLVJAd7pY2oGodjiCughGsys+Svy4OximxjXfp3AFewn6Mqn9nERtYJU1u95NRmIr1goZsn8wOHOHACsjy4GrVGip1hu6IsXqa8Y1Bn2/zcAgNqJMvgw606neP+hboEAvOvHav9BcqCCyWO3ORRhDvIu2DreYyh6H/aI5XOMvk9ha8+g8O9S+vz2CiHD0K1otQH58wnglok0nnLZu2YLT09WkTWj2KhQHynIL+zha5WxsqPGOp+yB2/THSn3dmfT8lZ09zRTzyTZ9pjkd95A1tt7npj/hDksl9ova+i+X2cg+GZs376tVJ4hBXm6lDF0gJOlKF3dglgVfoZ8w3baBAkOQ/4XcgHPMw8TeI6fRwyQ6d+g=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7592.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016)(921020)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?R2lpT0ZPWG9QSS9VekVRbnREQjFlclVYdlNTbVFkTlB1aHd1YzZuYStndWd3?=
+ =?utf-8?B?ajdDS2lkREQzVmJjSWJSYzF1dkhGVW9XVzM4VnpaOTU4b1JnMW04SGVDWXFK?=
+ =?utf-8?B?bWJtd1NqdEJEUUxqVEZGczlqeE9pZmNGSFdZOGh6NjFsSFlQbUNFS1EyVGZN?=
+ =?utf-8?B?M3RXT1lBbGNrenZJNXpIRXIxQVhKR0xwZXdnZm9MS0d6NmJoWnd5M0RqR3NM?=
+ =?utf-8?B?L2NZaDVxdlk3b3Z6R1pXdWRMUkJ2bFlUWDZrM1ZLSVVLK0xMdEcxOW1ldUUx?=
+ =?utf-8?B?cGJjcWN5QmIwdEthQUJJa3hIUHgrdU42RmV1bmpWSzZLQzl4Q1BCOGZPWmF3?=
+ =?utf-8?B?ZGRXaXM4UGppWGErQlUxRmhDaTNqR1cwYzV5bHpCTHUvZmZvdlZrb1cxZ0c1?=
+ =?utf-8?B?TnNhUXhjNTV0MHdzVU9DZUxRelAxZSs4bDU1Vzd6NlV1RjhNa3RiU01heHhY?=
+ =?utf-8?B?d2xmczRPUW83ZkxLYVZ0V3EwMGE3QlRCdWZsT1VVQkxSL3cwbENxeHZuS0NK?=
+ =?utf-8?B?Uk4yenZDc2h0TWROYjQxbW43TVZ0bVY3NGxMb0daczBiVEhmTEFhOUtkVkNE?=
+ =?utf-8?B?b2JTVmZKR1pwR1p6YjQxZFU5cDZQOVE0YkhMLzdVZ3d6MTMrbHZxSzhZWXJZ?=
+ =?utf-8?B?aGhzeU0rYnQ2UTZDdmF3ZktpSnEwNGtVWkgvYWRGOStKb2xUT3orSGpqR08w?=
+ =?utf-8?B?Zll1amhMRFdMdG0vYzd6d2NyQzhNUzdxeXpESHV3OFlDNjVyZmpyM2hVWXhS?=
+ =?utf-8?B?ejRRWmtVd2ptSGFNaWxhTnJpajA2RGJDRjY1OThmQkNvckJtaTN6V3g2czFP?=
+ =?utf-8?B?LzFuM01FaUNBK2tPMHZKZzZzSEtQa2h6bHdnUmUzc0RNY1Z4UTFpbWhYY2xP?=
+ =?utf-8?B?Q1NNSjJua2FObE4yUytyZW1mRzJ1NWJQNVdBenVrVGdJdFlJZVlNczVVc3RU?=
+ =?utf-8?B?TW1HQkdtcVhiQlIyN243UGRBdkgvSFJ3OHJ3cTF6Y0o5KzV3SElkL2dXbVZ2?=
+ =?utf-8?B?MTJnd21RT1h1RGRMaitvRG4yUmVueXdJKzcwenBZSlpEemFjL3o5YVJ2VENl?=
+ =?utf-8?B?WjZ0bktXaWk0UkdwSmNGMFczZWFpTFJBdjJCTEZBTS9KM3VvUFRRZ25ucnhO?=
+ =?utf-8?B?eEVoVi9PV3U5UTZYVEtsT2FXS0JXbUtCZVphL1h1dVZCMlNzUHJUVjQybFhH?=
+ =?utf-8?B?RllkaEJ0bU16bEZFVjUwaHpRNmxkWXlqQ0ZmTFhoZWcwNzE0UlROSmR0Z0o4?=
+ =?utf-8?B?YkJ4dXJkbEE5MWp2czcrUTl6RUFET25TVFBmbVBEY0hFYVVoYStRL0VTYVR3?=
+ =?utf-8?B?dHZyUFFWdFFqK1AxWjc1SEZqV1NHUzh5eUpCS0xJaXd3RXdlOEJoeWMzNyti?=
+ =?utf-8?B?N2tWZ2RRY2hHY0tVSjY2cHNpb3VBTEdLK0ZpYysyVUtPR1ZYYjh6SGlMNVk3?=
+ =?utf-8?B?d3dxODhFWEVId3YwNmlWVTBVRUwycEZBaU55OWZTcGZ3OFZnbDFreUhHdjJY?=
+ =?utf-8?B?YkJ5SE8rT3MrY3V2Z3FkTmhDbUt6ZVZZcURaOGhuT2ZZVlNXL3ZNKzQveE9U?=
+ =?utf-8?B?QkxrTGR1eW9lcHE3VXBsT05wK25VcmVaLzhHNURVQUhGNUZubTBGbmczYklw?=
+ =?utf-8?B?Z09RL0ErTFJFYmdBUlMwSk1uTndrbkh6OFMyVmNKUWRkSFBSTXZEa0tzQldY?=
+ =?utf-8?B?OUpGV29JUlpIVFF3ZlIzUHJVdTN2bDVsa1NXT0V6Y1F6Y05zd0M4SnlycUhj?=
+ =?utf-8?B?citxRVF5dWlDakxhVXNpVi9uQkw1bTI5RGpZVlgzOUtVdjNMUDJkMy9qQmd1?=
+ =?utf-8?B?dVNOWHl0MVoxcGcyOUJvOVVWR2o1RUdIWVA5UXF3Q0FEMnVBSGdiOHJLNFhU?=
+ =?utf-8?B?VHhQaFU5OGZVVEhveGExbzhpREMzSnY4NFlML3B0VTdQNEU3KytURnR4emlK?=
+ =?utf-8?B?bGROYjVvTG10ZjVpMDFDSnBKTG1GNjIrZU1oZVFDdllTNUZ2NVo2SFNvU0ox?=
+ =?utf-8?B?VTRYa0l1aW9qNFN6REhXYUw4NDdHZ0NYYWdQaUltTXBESFJLOWtockNyR1Np?=
+ =?utf-8?B?dWp0VDZPNkpoK2dPaW12ZG5EZ3hMZy9YQ2VmSEJaVUZmbllTd0s4em5WdDht?=
+ =?utf-8?B?VjcrUGoybUtUNm10WHF0dWV5dHZ2ZWNUbDlwYUR2ZjhMeUhyTmdpVUZmS0sv?=
+ =?utf-8?B?RTJ1bTQvVm9GRlpkQVZNc2RpRkdERFJaRGlMYzVvUUFVcFlDWGpLbTBVU2tv?=
+ =?utf-8?B?MnV4ekFORDFVR1ViUlBQR1lJNG5pN1g4SkZhcXVoY0dxSkw1QkdwTHMrK0sr?=
+ =?utf-8?B?Z1dKQTZUM2k3bWd5dDRCY2NXa0Z5U3NsekpITWZBbVNleElnNnhQSytzU3Ri?=
+ =?utf-8?Q?0/dbz1Efvxh2XxOc=3D?=
+X-Exchange-RoutingPolicyChecked: Vr0ReovO0ghQOjWDV9s9NVqp9nhYQtdffZOmK6rt49L3HJprCeZvf6H/3x/x9W/c4bfVneJeXjsZPPWBPOcjy9eZwMmuyC9i/BXfcocgNWuEvK4dDP+pd4mFgiL9kH2Y0mh03oy/tl0CD6d64Le+Kynr0VVB7w10Rw8h8y66MHAqIg4qcWPrxMOmXKQZvxZrjJd19ya+ALWIgIZ+sKM+Llls8uTL07NlofUnr7l8D+NCOVJ4VOLpv4HV5hkth5wENDyWp10gJCmrT3Wz4Om6wZvALxb+SJu8kgEyHqpdQme7JGhrZecTQ8W129xtrbS6GLRMrxDXG6QJeET6Q60olg==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6fda96b3-a345-4769-39ef-08deabad84a0
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7592.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2026 20:24:47.7715
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xQq5hngtoLoQsvjrc75DA3jQR/e9+0ZvEJMFifx8j4AFautK8V9N/32pLJ8doNOPwkHYP52Hv6ByXlLI1s3KxGwLwuDBph4LPuJzR+RqhFI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6345
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: C46964E0255
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285021-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285022-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,intel.com];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mayorvlf@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[3];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.997];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 
-Hello, We are observing a data-plane failure with a PCIe-based WWAN
-modem (Sierra Wireless EM9293) using the MHI subsystem on Linux kernel
-7.0. Environment: Kernel: 7.0.0-15-generic OS: Ubuntu 26.04
-ModemManager: 1.25.95 Modem: Sierra Wireless EM9293 Bus: PCIe (MHI)
-Driver: mhi_net, mhi-pci-generic Issue summary: Two distinct failure
-modes depending on protocol: 1. MBIM mode Interface created: mhi_hwip0
-State: UP, LOWER_UP, POINTOPOINT, NOARP IP assigned correctly Traffic:
-TX packets increase normally RX packets remain near zero Ping: 100%
-packet loss Counters: TX: ~15000 packets RX: ~7 packets This indicates
-TX path is functional but RX path is not working. 2. QMI multiplexed
-mode Interface qmapmux0.0 is created Traffic works briefly Interface
-is removed shortly after connection Interpretation: MBIM: control
-plane OK TX OK RX not functional QMI: data path partially works netdev
-lifecycle unstable Low-level interpretation: TX path: host -> mhi_net
--> modem OK RX path: modem -> mhi_net -> host FAIL Additional
-observations: No routing issues No firewall interference No userspace
-misconfiguration Same failure persists regardless of routing setup USB
-(cdc_mbim) works correctly on same hardware This appears to be a
-kernel-level issue in the MHI WWAN data path. Likely areas: mhi_net RX
-handling downlink channel setup rmnet/qmap lifecycle possible race
-condition in netdev teardown Request: Any guidance on debugging the RX
-path in mhi_net would be appreciated. Also confirming whether current
-MHI WWAN support is expected to fully support RX on PCIe devices like
-EM9293. Thanks
+On 5/4/2026 10:14 PM, Jacob Keller wrote:
+> From: Matt Vollrath <tactii@gmail.com>
+> 
+> Fix two conditions which would leak PTP registration on probe failure:
+> 
+> 1. i40e_setup_pf_switch can encounter an error in
+>    i40e_setup_pf_filter_control, call i40e_ptp_init, then return
+>    non-zero, sending i40e_probe to err_vsis.
+> 
+> 2. i40e_setup_misc_vector can return non-zero, sending i40e_probe to
+>    err_vsis.
+> 
+> Both of these conditions have been present since PTP was introduced in
+> this driver.
+> 
+> Found with coccinelle.
+> 
+> Fixes: beb0dff1251db ("i40e: enable PTP")
+> Signed-off-by: Matt Vollrath <tactii@gmail.com>
+> Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_main.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> index 028bd500603a..f06fcef644e5 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -16108,6 +16108,7 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	/* Unwind what we've done if something failed in the setup */
+>  err_vsis:
+>  	set_bit(__I40E_DOWN, pf->state);
+> +	i40e_ptp_stop(pf);
+>  	i40e_clear_interrupt_scheme(pf);
+>  	kfree(pf->vsi);
+>  err_switch_setup:
+> 
+
+Sashiko points out two possible issues, both of which I think are better
+served by follow-up fixes:
+
+> This isn't a bug introduced by this patch, but is it safe to use
+> i40e_ptp_stop() in this error path without canceling its workqueue task?
+> The PTP initialization logic initializes a background work item
+> pf->ptp_extts0_work, which is scheduled asynchronously by the hardware
+> interrupt handler. The i40e_ptp_stop() function disables hardware
+> interrupts and unregisters the clock without calling
+> cancel_work_sync(&pf->ptp_extts0_work). 
+> Could this leave the work item pending if an event fires right before
+> interrupts are disabled, leading to a use-after-free when the module
+> teardown frees the pf structure?
+
+
+I think we need to double check that extts0_work is cancelled properly
+when stopping PTP. Or confirm that it won't cause a problem as-is.
+
+Sashiko also says:
+
+> This isn't a bug introduced by this patch, but does this error path leak VSI
+> structures and leave netdevs registered?
+> If i40e_setup_pf_switch() fails late, the main VSI has already been
+> allocated and its netdev registered via register_netdev(). The err_vsis
+> cleanup block only executes kfree(pf->vsi), which frees the array of
+> pointers but fails to invoke i40e_vsi_release(vsi) or unregister the netdev.
+> Since the driver then proceeds to i40e_free_pf(pf) and frees the underlying
+> driver structure, could subsequent userspace operations on the
+> still-registered netdev execute driver callbacks that dereference the freed
+> pf structure?
+
+The only way that the function can fail late appears to be if
+i40e_validate_filter_settings() fails.. but that has a comment around
+i40e_setup_pf_filter_control() which claims that we shouldn't the probe
+just because that failed.. so I think there is maybe an issue but I'm
+not 100% sure how to resolve it properly.. It does seem like there may
+be a pre-existing issue in the i40e probe error cleanup.
+
 
