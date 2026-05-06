@@ -1,346 +1,156 @@
-Return-Path: <netdev+bounces-284794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284795-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MCJjGIkp+2lAXAMAu9opvQ
-	(envelope-from <netdev+bounces-284794-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 13:44:09 +0200
+	id 4KzNBMcp+2lAXAMAu9opvQ
+	(envelope-from <netdev+bounces-284795-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 13:45:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 971744D9D0F
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 13:44:08 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 700944D9D44
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 13:45:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 231C530221CC
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 11:44:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 65F783022F43
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 11:45:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1E3743D516;
-	Wed,  6 May 2026 11:44:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2CC43DA5D;
+	Wed,  6 May 2026 11:45:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JK9Rzoig"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C16D43CEE7;
-	Wed,  6 May 2026 11:43:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1175B426686;
+	Wed,  6 May 2026 11:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778067843; cv=none; b=aGuY8MCodOM2b2Gq6QJoJZr0mq1wUG0jSH9JLKA6OjsgPyAdkxHtbIk9Tx1mbm5loMhpiwjUWRPZQ9WANlbGVTapJQXfzXqPPerXV8nOceQ/ulcILrLPZHylKDphLDmavXuZ0VMkBtZoalRprMi4vXuG7hVOAJ5SihIiYJoslcc=
+	t=1778067908; cv=none; b=unnZQDwjJH85Z06A4YOq4wY0ZuAvvsy1SHriXhP4cOA7kGqjXrcR7ffH+b9bOcnFTsviJsT4WZA1wegQwJdAD/X9d7+81FqgmzAJ5TA4DrdLn206l1XFmlDy1Sb/XqJWOc4ISVtyDchFK1ayg56XGNbSaFmnWgC8uOzQ5mds3T4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778067843; c=relaxed/simple;
-	bh=KKzJ9iEALP6XEtSFo3DPsuQ7YVgewsn/CxWeQv/NcyQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pf5cZ1NtzYYTxEy9pVNdN0eIGKeX/Sz0uFCCknso662AdgzGDeN9mtkcRXTxlC+t2Lhxm4WqioOS//a4V8M1v8d2v0x3cIgS92MazHhaPJQ/XKnLAx9NH2Sirx4zQ1zk3oIPoZf2p8M1gKbUDLFHeIVogXKji7q7ilgUy0Q52fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=206.189.21.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app2 (Coremail) with SMTP id zQmowAAHnIJrKftpUPlKAA--.420S2;
-	Wed, 06 May 2026 19:43:39 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	jannh@google.com,
-	yuantan098@gmail.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	bird@lzu.edu.cn,
-	wangjiexun2025@gmail.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH v4] Bluetooth: serialize accept_q access
-Date: Wed,  6 May 2026 19:43:30 +0800
-Message-ID: <20260506114338.2873496-1-n05ec@lzu.edu.cn>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1778067908; c=relaxed/simple;
+	bh=hhTrGP4S/BXwCHAiPhtKUBT3aM5H12HQDgaM3WyB8SM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YwaRt/WL54xGv3z5pz4pvrBJB7sBMmGQxySIPpq32nimsnDU5kTNXf5TU367gHC2gav1yu9zSM0hTRjP7e2wFe9gKYtVnzU4q0l2CeXxv5yVK/75yUu5JRwbhbOPNCKI56mXWE2+FY2b8lRUlyIn6SiC1dT266q0vG1fQBMQaPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JK9Rzoig; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E248C2BCB8;
+	Wed,  6 May 2026 11:44:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778067907;
+	bh=hhTrGP4S/BXwCHAiPhtKUBT3aM5H12HQDgaM3WyB8SM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JK9RzoigiB1D3DXGs/HNMPpy5luVXNjQDMJ/gNJwQwvD3QX5cwaaDXLByrbYh0rD7
+	 unldqglV7SpdVuXWY+NgLy2tFLcj1HLkdrYiuAfhotSgVMFmyVebpugEr32x4ihMc0
+	 /tOg24M8MPx0qFmabWfnU+kelwaO+lTgzJKEa2z6qkJ7YGiJg6aNwzN4jGpgCTc8oc
+	 NVhfIHljXCC/NcCUwAOnt7rBjjzZnbCv+41BW+iXoF7z+oYkX7+01Kuy8XgtzhiqEs
+	 2wR7jxsdr6NctbnKkN145c3AfMYB1T4A8mwdhnVOx2bukV3wZrjpRg2SdK/mGdfwkf
+	 QLBVpImLnNOrQ==
+Date: Wed, 6 May 2026 17:14:50 +0530
+From: Sumit Garg <sumit.garg@kernel.org>
+To: Jeff Johnson <jeff.johnson@oss.qualcomm.com>
+Cc: andersson@kernel.org, konradybcio@kernel.org,
+	Sowmiya Sree Elavalagan <sowmiya.elavalagan@oss.qualcomm.com>,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+	linux-media@vger.kernel.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
+	linux-remoteproc@vger.kernel.org, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org,
+	robin.clark@oss.qualcomm.com, sean@poorly.run,
+	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
+	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
+	airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
+	dikshita.agarwal@oss.qualcomm.com, bod@kernel.org,
+	mchehab@kernel.org, elder@kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, jjohnson@kernel.org, mathieu.poirier@linaro.org,
+	trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
+	pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
+	tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
+	srinivas.kandagatla@oss.qualcomm.com,
+	amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
+	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
+	skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
+	Sumit Garg <sumit.garg@oss.qualcomm.com>
+Subject: Re: [PATCH v5 14/16] wifi: ath12k: Switch to generic PAS TZ APIs
+Message-ID: <afspsrA8zT8Fb4z-@sumit-xelite>
+References: <20260504130603.1474043-1-sumit.garg@kernel.org>
+ <20260504130603.1474043-15-sumit.garg@kernel.org>
+ <3bfdc11c-115f-45ab-b0ab-75ad88dc6f31@oss.qualcomm.com>
+ <ae68bdb3-d683-4e7a-a27f-739214656ce2@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQmowAAHnIJrKftpUPlKAA--.420S2
-X-Coremail-Antispam: 1UD129KBjvJXoW3Jw47CryUKFy5Ar1UCw4kJFb_yoW3GrWxpF
-	yUCFZ8GFWkJw4Uuw17tayDurWSyw4rWr43GayFvas5Ar9agF4Fqr12yayjvr1ayrZrCF4f
-	tF4jgwnxCr4UC3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBj1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
-	jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52
-	x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWU
-	GwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
-	8JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kK
-	e7AKxVWUtVW8ZwCY02Avz4vE-syl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8V
-	W8GwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
-	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7
-	IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k2
-	6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
-	AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQsTCWn7AGQEHAAAs+
-X-Rspamd-Queue-Id: 971744D9D0F
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ae68bdb3-d683-4e7a-a27f-739214656ce2@oss.qualcomm.com>
+X-Rspamd-Queue-Id: 700944D9D44
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.54 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284794-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,oss.qualcomm.com,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	TAGGED_FROM(0.00)[bounces-284795-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[holtmann.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,lzu.edu.cn];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[51];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.936];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[]
 
-From: Jiexun Wang <wangjiexun2025@gmail.com>
+On Tue, May 05, 2026 at 07:50:03AM -0700, Jeff Johnson wrote:
+> On 5/5/2026 7:27 AM, Jeff Johnson wrote:
+> > On 5/4/2026 6:06 AM, Sumit Garg wrote:
+> >> @@ -485,9 +485,9 @@ static void ath12k_ahb_power_down(struct ath12k_base *ab, bool is_suspend)
+> >>  		pasid = (u32_encode_bits(ab_ahb->userpd_id, ATH12K_USERPD_ID_MASK)) |
+> >>  			 ATH12K_AHB_UPD_SWID;
+> >>  		/* Release the firmware */
+> >> -		ret = qcom_scm_pas_shutdown(pasid);
+> >> +		ret = qcom_pas_shutdown(pasid);
+> >>  		if (ret)
+> >> -			ath12k_err(ab, "scm pas shutdown failed for userPD%d\n",
+> >> +			ath12k_err(ab, "pas shutdown failed for userPD%d: %d\n",
+> >>  				   ab_ahb->userpd_id);
+> > 
+> > at some point the "ret" param was dropped, and this now generates build warnings
+> The 'ret' param was dropped by:
+> 8fb66931fe31 ("wifi: ath12k: Enable IPQ5424 WiFi device support")
+> 
+> Not sure if that was on purpose or accidental. Sowmiya?
+> 
+> -       if (ret)
+> -               ath12k_err(ab, "scm pas shutdown failed for userPD%d: %d\n",
+> -                          ab_ahb->userpd_id, ret);
+> ...
+> +               if (ret)
+> +                       ath12k_err(ab, "scm pas shutdown failed for userPD%d\n",
+> +                                  ab_ahb->userpd_id);
+>
 
-bt_sock_poll() walks the accept queue without synchronization, while
-child teardown can unlink the same socket and drop its last reference.
-The unsynchronized accept queue walk has existed since the initial
-Bluetooth import.
+Ah I see, not sure why I didn't see any build issues in the defconfig
+builds. Maybe this driver isn't enabled there?
 
-Protect accept_q with a dedicated lock for queue updates and polling.
-Also rework bt_accept_dequeue() to take temporary child references under
-the queue lock before dropping it and locking the child socket.
+Anyhow I can add the "ret" back here.
 
-Fixes: 1da177e4c3f41524e886b7f1b8a0c1fc7321cac2 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
-Reported-by: Jann Horn <jannh@google.com>
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Signed-off-by: Jiexun Wang <wangjiexun2025@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
-Changes in v4:
-- no functional changes
-- clarify that the race dates back to the initial Bluetooth import
-- update trailers
-  I noticed Jann also proposed a fix at
-  https://patchwork.kernel.org/project/bluetooth/patch/20260504-bluetooth-accept-uaf-fix-v1-1-1ca63c0efadd@google.com/,
-  so we're adding his Reported-by tag here. Please let us know if this
-  isn't appropriate.
-- v3 Link: https://lore.kernel.org/all/20260404162324.2789862-1-n05ec@lzu.edu.cn/
-
-Changes in v3:
-- move sk_acceptq_added()/sk_acceptq_removed() inside accept_q_lock
-  critical sections to serialize sk_ack_backlog updates with accept_q
-  operations
-- v2 Link: https://lore.kernel.org/all/06a6b4549acba207847ce532dedbf1c95ab22d13.1774925231.git.wangjiexun2025@gmail.com/
-
-Changes in v2:
-- add Tested-by: Ren Wei <enjou1224z@gmail.com>
-- resend to the public Bluetooth/netdev lists
-
- include/net/bluetooth/bluetooth.h |  1 +
- net/bluetooth/af_bluetooth.c      | 87 +++++++++++++++++++++++--------
- 2 files changed, 66 insertions(+), 22 deletions(-)
-
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 69eed69f7f26..3faea66b1979 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -398,6 +398,7 @@ void baswap(bdaddr_t *dst, const bdaddr_t *src);
- struct bt_sock {
- 	struct sock sk;
- 	struct list_head accept_q;
-+	spinlock_t accept_q_lock; /* protects accept_q */
- 	struct sock *parent;
- 	unsigned long flags;
- 	void (*skb_msg_name)(struct sk_buff *, void *, int *);
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 2b94e2077203..fa14b9a915eb 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -154,6 +154,7 @@ struct sock *bt_sock_alloc(struct net *net, struct socket *sock,
- 
- 	sock_init_data(sock, sk);
- 	INIT_LIST_HEAD(&bt_sk(sk)->accept_q);
-+	spin_lock_init(&bt_sk(sk)->accept_q_lock);
- 
- 	sock_reset_flag(sk, SOCK_ZAPPED);
- 
-@@ -214,6 +215,7 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk, bool bh)
- {
- 	const struct cred *old_cred;
- 	struct pid *old_pid;
-+	struct bt_sock *par = bt_sk(parent);
- 
- 	BT_DBG("parent %p, sk %p", parent, sk);
- 
-@@ -224,9 +226,13 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk, bool bh)
- 	else
- 		lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
- 
--	list_add_tail(&bt_sk(sk)->accept_q, &bt_sk(parent)->accept_q);
- 	bt_sk(sk)->parent = parent;
- 
-+	spin_lock_bh(&par->accept_q_lock);
-+	list_add_tail(&bt_sk(sk)->accept_q, &par->accept_q);
-+	sk_acceptq_added(parent);
-+	spin_unlock_bh(&par->accept_q_lock);
-+
- 	/* Copy credentials from parent since for incoming connections the
- 	 * socket is allocated by the kernel.
- 	 */
-@@ -244,8 +250,6 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk, bool bh)
- 		bh_unlock_sock(sk);
- 	else
- 		release_sock(sk);
--
--	sk_acceptq_added(parent);
- }
- EXPORT_SYMBOL(bt_accept_enqueue);
- 
-@@ -254,45 +258,72 @@ EXPORT_SYMBOL(bt_accept_enqueue);
-  */
- void bt_accept_unlink(struct sock *sk)
- {
-+	struct sock *parent = bt_sk(sk)->parent;
-+
- 	BT_DBG("sk %p state %d", sk, sk->sk_state);
- 
-+	spin_lock_bh(&bt_sk(parent)->accept_q_lock);
- 	list_del_init(&bt_sk(sk)->accept_q);
--	sk_acceptq_removed(bt_sk(sk)->parent);
-+	sk_acceptq_removed(parent);
-+	spin_unlock_bh(&bt_sk(parent)->accept_q_lock);
- 	bt_sk(sk)->parent = NULL;
- 	sock_put(sk);
- }
- EXPORT_SYMBOL(bt_accept_unlink);
- 
-+static struct sock *bt_accept_get(struct sock *parent, struct sock *sk)
-+{
-+	struct bt_sock *bt = bt_sk(parent);
-+	struct sock *next = NULL;
-+
-+	/* accept_q is modified from child teardown paths too, so take a
-+	 * temporary reference before dropping the queue lock.
-+	 */
-+	spin_lock_bh(&bt->accept_q_lock);
-+
-+	if (sk) {
-+		if (bt_sk(sk)->parent != parent)
-+			goto out;
-+
-+		if (!list_is_last(&bt_sk(sk)->accept_q, &bt->accept_q)) {
-+			next = &list_next_entry(bt_sk(sk), accept_q)->sk;
-+			sock_hold(next);
-+		}
-+	} else if (!list_empty(&bt->accept_q)) {
-+		next = &list_first_entry(&bt->accept_q,
-+					 struct bt_sock, accept_q)->sk;
-+		sock_hold(next);
-+	}
-+
-+out:
-+	spin_unlock_bh(&bt->accept_q_lock);
-+	return next;
-+}
-+
- struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
- {
--	struct bt_sock *s, *n;
--	struct sock *sk;
-+	struct sock *sk, *next;
- 
- 	BT_DBG("parent %p", parent);
- 
- restart:
--	list_for_each_entry_safe(s, n, &bt_sk(parent)->accept_q, accept_q) {
--		sk = (struct sock *)s;
--
-+	for (sk = bt_accept_get(parent, NULL); sk; sk = next) {
- 		/* Prevent early freeing of sk due to unlink and sock_kill */
--		sock_hold(sk);
- 		lock_sock(sk);
- 
- 		/* Check sk has not already been unlinked via
- 		 * bt_accept_unlink() due to serialisation caused by sk locking
- 		 */
--		if (!bt_sk(sk)->parent) {
-+		if (bt_sk(sk)->parent != parent) {
- 			BT_DBG("sk %p, already unlinked", sk);
- 			release_sock(sk);
- 			sock_put(sk);
- 
--			/* Restart the loop as sk is no longer in the list
--			 * and also avoid a potential infinite loop because
--			 * list_for_each_entry_safe() is not thread safe.
--			 */
- 			goto restart;
- 		}
- 
-+		next = bt_accept_get(parent, sk);
-+
- 		/* sk is safely in the parent list so reduce reference count */
- 		sock_put(sk);
- 
-@@ -310,6 +341,8 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
- 				sock_graft(sk, newsock);
- 
- 			release_sock(sk);
-+			if (next)
-+				sock_put(next);
- 			return sk;
- 		}
- 
-@@ -518,18 +551,28 @@ EXPORT_SYMBOL(bt_sock_stream_recvmsg);
- 
- static inline __poll_t bt_accept_poll(struct sock *parent)
- {
--	struct bt_sock *s, *n;
-+	struct bt_sock *bt = bt_sk(parent);
-+	struct bt_sock *s;
- 	struct sock *sk;
-+	__poll_t mask = 0;
-+
-+	spin_lock_bh(&bt->accept_q_lock);
-+	list_for_each_entry(s, &bt->accept_q, accept_q) {
-+		int state;
- 
--	list_for_each_entry_safe(s, n, &bt_sk(parent)->accept_q, accept_q) {
- 		sk = (struct sock *)s;
--		if (sk->sk_state == BT_CONNECTED ||
--		    (test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags) &&
--		     sk->sk_state == BT_CONNECT2))
--			return EPOLLIN | EPOLLRDNORM;
-+		state = READ_ONCE(sk->sk_state);
-+
-+		if (state == BT_CONNECTED ||
-+		    (test_bit(BT_SK_DEFER_SETUP, &bt->flags) &&
-+		     state == BT_CONNECT2)) {
-+			mask = EPOLLIN | EPOLLRDNORM;
-+			break;
-+		}
- 	}
-+	spin_unlock_bh(&bt->accept_q_lock);
- 
--	return 0;
-+	return mask;
- }
- 
- __poll_t bt_sock_poll(struct file *file, struct socket *sock,
--- 
-2.34.1
-
+-Sumit
 
