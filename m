@@ -1,127 +1,79 @@
-Return-Path: <netdev+bounces-285024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285025-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QB1pNJek+2mvegMAu9opvQ
-	(envelope-from <netdev+bounces-285024-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 22:29:11 +0200
+	id 4NT7Fyun+2lXewMAu9opvQ
+	(envelope-from <netdev+bounces-285025-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 22:40:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C95B4E02F3
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 22:29:11 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF90A4E03C9
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 22:40:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1E928301A141
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 20:29:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BBF6F301370B
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 20:40:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15D5537F8BD;
-	Wed,  6 May 2026 20:29:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 086693AE71C;
+	Wed,  6 May 2026 20:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EgK+uJa3"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ftDki4vY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012028.outbound.protection.outlook.com [52.101.48.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A658437F727;
-	Wed,  6 May 2026 20:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D27531714F
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 20:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.28
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778099348; cv=fail; b=X00CndN++s56gVQUmmdwdcPI/vSGRBsPC66YeFXvCrySMJWUmHLiTZ9l76I6yS+VrTmT0lwmHQ2nahaM3UTdnDJsBydq4daadDAW1m+A+HpDOjK0g/16GgYFEqB8UllnYrYx8HLC91tFyQ4dWfuhYbUkg7pIqFvVHdAIWKYwg9Q=
+	t=1778100006; cv=fail; b=fRPSzrp7PunDVKzKjvZevOJTAAt2SJB9jVwpCMoqE4nktDgB4oIWJ9CSgQKiUcApb9LavYocU6hL+d1DkzRpjixHu9r2GjXADAmrb/PiI2lOF7XU3CyjhSGqsYArejSUteaACEDlSZkqwkn+AaTJO2UTAGQgAYxHztMJrLwMx6k=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778099348; c=relaxed/simple;
-	bh=SevNimjACyZ1/dsu9YTCzw9lfOgEIpLlCOpHwtc+c0g=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=HcfOGZrWzNdbYE0YyvfhmiPmCdGt1NQy7zAA3yswOhGuQ6+1pAS8sJw/lsXuRFaO5oAT0qhqmVUdgFSjIK2zD7rM7Dsk+zgeJyOzF0AddKUEaD0QB5taulwHu+m+fTjIGYNIgxkjvP6Ng5njpDdSWz8l+D+aa8RuzQTjIL5X/gY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EgK+uJa3; arc=fail smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778099346; x=1809635346;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=SevNimjACyZ1/dsu9YTCzw9lfOgEIpLlCOpHwtc+c0g=;
-  b=EgK+uJa3DsFY6T9oW10TKZVoNePB/SR1Ot7Sta+wT/SKSFk72Rt9cu7P
-   yeVYhJ9wHz//mJwfOTF+aXV3/Tb4ljQlOpP6fqyvCyxuxxZgLMsg+7moa
-   uhEJi6SUgmQYRRJNbn0hBqsSmYJPW8Fnid4AAsWIHIPye/uFv73CIz6XW
-   k5K0uAoDNOHQWEwZr3PSyHH971XiUwAiPPFvAN5yfNrRIh0xdSpZaGmgZ
-   bEcOoUjrZJ3tkNqtyTGmWJ/8uNaEz0C1u5/BGQ67/eTFCnlgf3aKAMPR8
-   iyITJRg/lTRMJV2uvBWrSvKd/0EAvcCNKmU32NQo0D/AjRajJdnrIdEO1
-   Q==;
-X-CSE-ConnectionGUID: dJO05w0YSM60I8wUyDQDBg==
-X-CSE-MsgGUID: HH7uue0nRwKybyGixSbmPw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11778"; a="89740784"
-X-IronPort-AV: E=Sophos;i="6.23,220,1770624000"; 
-   d="scan'208";a="89740784"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2026 13:29:05 -0700
-X-CSE-ConnectionGUID: rsjT+KmhRIWZBtdD+HqKRA==
-X-CSE-MsgGUID: 4NJeZOoWRmu/osL4vpvSUQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,220,1770624000"; 
-   d="scan'208";a="240577787"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2026 13:29:05 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Wed, 6 May 2026 13:29:04 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Wed, 6 May 2026 13:29:04 -0700
-Received: from BYAPR05CU005.outbound.protection.outlook.com (52.101.85.37) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Wed, 6 May 2026 13:29:03 -0700
+	s=arc-20240116; t=1778100006; c=relaxed/simple;
+	bh=SHURpKi4cjk8GVChKo05u3qzfpsRRa0mxKAydPxmwVM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=NnppWFCmeuCQrE2ndVp6es3AXD4J5+Sfs9d1r9R8t+A1uLK4XgFsBzhWeh5UZhWUrnjzcYwHHhbofqBwIso5cu0jB63zZQ3IGp+y2swjMvn5v2B1Gmnr7WOXm8asHAnuh+9hXOWCrza440wHdkXvFz/gqDxMS5y5tuFUSEsx+bo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ftDki4vY; arc=fail smtp.client-ip=52.101.48.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QHSChagz3eNohH4Fyhy6aolETPuivtYXtuzG7RQOC7wsqTeRm4uHamwG165b4T11ULe1pumBnAzvZrZHES2P0e5S0jPOMyPpO5fjWmLTo0QuM14f0O/29//RZpbVl3FZCMVlN7yzFMilNVYOUdPoRspKUBdZxwhxgDenT81WrjrBsAmymxDcKZ+qTgPUcYxORyihHeJqtmd7ykpGMGR6sT59H1CDBuCKCrMU3pBOLYR3EhWf1KugFrhlcXAshIo59wPfArpKh5N0VYuI6fpHuhaceUVduaCHcw1VxqElOSRRNbb/NiCgRlPBtmeZz6HpbOphdKVnj8R/GeS+bcuO9Q==
+ b=ChKb8ArRYkdnqqILSic2RbVfuD5Wk7QG25xVWDltyxhSsdUupn0Nt1FgrJemW72EHqi9ihi6V+x6r4Nznn05jD9RUwHU/IJ+SqOu3OR2g8OVnK6XHvnx4ojqhgKOY1hFtAouAw8IKfacnTPo+1a+vpl84GVs5sgkbWOEpL2N712+gR9UHOspjQZzLnNjM149mgFqtNElaZwgxi5zXlcoUJyaBEWiCfN+SN7f7TQsZBTlBywZWxcMBATL3MplntcJKqV/3kRbg7SNOZF2F1xGPZ8DlsTJw7ul0/Nxq4QG9GIOD3tzZLkg0kFFf7YaDhyvVP6M4FuvDJz2JZsqFciOhg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iwdf6y1OcUkjGOVTanzxUFGaYLl++wOhcj37NWYNr80=;
- b=EYYXo34Wq5n56Sbqt2unoQnt6jqRH2Uec71Kt0eawiYPZduHprYynyv7tdTbQnAgfrndOl2Rwjm2OeZB49KSUF+y8nTgaMwyyDDFWFMDOpYqUl2CBbSsMnaRsmz/6u1cyA7H6k09BcE2wwSdSAe2RFSDPAQHOUavgZ0TPYHlNo1+I1/eD86xV907yj5t8p9o5H/87oIS3Ln7OfqXtXtBWd8S0CJfJiiTg5UyYcgSYri1fKv9JLO17RmnZ623PEhfo3jd1E0yawrZ4o3PwqkftItYWA0ieXe2n9ocja7ZCQtIXTbvhy8ZyGC9BlRUhFp5QGZhMWnH76+7+GcZPknHfw==
+ bh=jtnD2tdL5KQcoW2ADImy7pBlHyL72/cVWItuBZl1VwE=;
+ b=XYjRa/DhEvxhXl+uHopi9hN2vA8+hhF6laZa1kz6GmWzFgIbvXTQmdjc7lVSw5yB943+aaa/qzP2nBrIozDjmxQiEg8vhL0sYWu7EsABpANrLVZbDTsKWSgYWtE6i3ItHwgKbdMesB4tvVEzuJnVsIH+JPrkq89ePszJQnu6XplzPU8NFx1e4kcfK2Iiz9r54P47BC5Aai+D/QPyRF7K3jAvc94nUZB7LuvuLgSeoWs3xy+kBemLmGZiyd6qbdOGxl99RnV9Pu+b5r4CY6E05hMh/rOmbLLCuqXhfVV0nNwG454eOtwzYwxNOv5HsXlJCi8oiHAydFWBmL9yQ7Y4rA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jtnD2tdL5KQcoW2ADImy7pBlHyL72/cVWItuBZl1VwE=;
+ b=ftDki4vYcamkIlMifKSTx4gIlVpnaKZo0iUuSLAPmXBumOtkxCNB3IENpyLIBO8r4GGf6qZtaefMSWhSapugd7Ik5iqjMkegilePUvwzkgQv8T12VlSaqGOAN4NzBXhzGeRgRsviAN+pLR0BVX+xOjbymU0HPmoIvIelwAKuXjQpIcDeDg/0FTFmF2ndMQ+PhDVFODZRb00duob3xDYjFIpW7EAG+pnhn/5DBrJbxhTf5uoKQTrbYEmzfclY9bnRRbmDbjWFVkebcmeaH1PUStfyeMmeow4SpDU8+l20buAzinHaD5dxjqSIXCAp5wGiszQqAdcNogP3b2vYHWso4Q==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7592.namprd11.prod.outlook.com (2603:10b6:806:343::16)
- by DS4PPF691668CDD.namprd11.prod.outlook.com (2603:10b6:f:fc02::2a) with
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by MN2PR12MB4046.namprd12.prod.outlook.com (2603:10b6:208:1da::23) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.15; Wed, 6 May
- 2026 20:28:54 +0000
-Received: from SN7PR11MB7592.namprd11.prod.outlook.com
- ([fe80::3e09:8700:df72:37b6]) by SN7PR11MB7592.namprd11.prod.outlook.com
- ([fe80::3e09:8700:df72:37b6%6]) with mapi id 15.20.9891.008; Wed, 6 May 2026
- 20:28:54 +0000
-Message-ID: <c2ac2c41-46a8-4cca-99b0-3e423114c91b@intel.com>
-Date: Wed, 6 May 2026 13:28:51 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 02/13] i40e: Cleanup PTP pins on probe failure
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>, Arkadiusz Kubalewski
-	<arkadiusz.kubalewski@intel.com>, Maciej Fijalkowski
-	<maciej.fijalkowski@intel.com>, Michal Kubiak <michal.kubiak@intel.com>,
-	Joshua Hay <joshua.a.hay@intel.com>, Madhu Chittim <madhu.chittim@intel.com>,
-	Willem de Bruijn <willemb@google.com>, Dave Ertman
-	<david.m.ertman@intel.com>, Ivan Vecera <ivecera@redhat.com>, Grzegorz Nitka
-	<grzegorz.nitka@intel.com>
-CC: <netdev@vger.kernel.org>, <stable@vger.kernel.org>, Matt Vollrath
-	<tactii@gmail.com>, Kohei Enju <kohei@enjuk.jp>, Paul Menzel
-	<pmenzel@molgen.mpg.de>, Sunitha Mekala <sunithax.d.mekala@intel.com>
-References: <20260504-jk-iwl-net-2026-05-04-v1-0-a222a88bd962@intel.com>
- <20260504-jk-iwl-net-2026-05-04-v1-2-a222a88bd962@intel.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20260504-jk-iwl-net-2026-05-04-v1-2-a222a88bd962@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0355.namprd04.prod.outlook.com
- (2603:10b6:303:8a::30) To SN7PR11MB7592.namprd11.prod.outlook.com
- (2603:10b6:806:343::16)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.27; Wed, 6 May
+ 2026 20:40:01 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.20.9891.008; Wed, 6 May 2026
+ 20:40:01 +0000
+Date: Wed, 6 May 2026 23:39:49 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, horms@kernel.org, petrm@nvidia.com
+Subject: Re: [PATCH net-next v2 0/3] net: Fix protodown with macvlan
+Message-ID: <20260506203949.GA805568@shredder>
+References: <20260505081656.463158-1-idosch@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260505081656.463158-1-idosch@nvidia.com>
+X-ClientProxiedBy: FR2P281CA0045.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:92::17) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -129,157 +81,170 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7592:EE_|DS4PPF691668CDD:EE_
-X-MS-Office365-Filtering-Correlation-Id: fbfc245c-4e56-4497-d74a-08deabae17c2
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|MN2PR12MB4046:EE_
+X-MS-Office365-Filtering-Correlation-Id: b2f4abdb-a489-4b58-e271-08deabafa539
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016|921020|18002099003|56012099003|22082099003;
-X-Microsoft-Antispam-Message-Info: JYD4OeuPkcmnDxSRSOC95fMdpxKWfKiJqIiKzXZZLE0cLd/+B+Dxcarc6eNDiiiXnaA/2cbr4o+v/pd7y8zZ9aZSaV9g1A1SkBahxU72GFQ3z1ZWSzjtqaKRCVuV/IWXPIQZ2JnFWtXg77rWRFs/QvdE8CUJEEsM0tuWU8WgNRMbfWEW5+MZy/6hZ5O05RXo580C8iLH66aY+X3F4DQmwaBAAfN/VgdLrfLw1afy1RGhOjIVW7JEueRoxhC82QArGYioGR472uFhgzXLfv5cw2LBk0+NBPNqVtvgTcacdeY5E/W+Dqv3NzX1CXOC922Ix8t9vf0KmzbpyBHon5m9n8qlmD+zoaQsxsS3SjzmNyVfm9W/ktAm9k44+P2YfXfjr4MQg1qxcGkPY8XuzbYK8ahDcqVIB+f1Go69fINfkgfd8VU2c2E2D7LeCFK8w/xHGuqVrZcOWiUGd6+RovKlEGofC/CXu/vaMSF5w4vN3SWzumRHfSolHTgPxb9kKm0hztif7we3HglxbMffe60r/PMTyxcrjv4WUSMHqiBE3hlRgD1qZye0+kyaC/1kcS2swAt+77zZHl2akSTKkapJGefJBCDPBHQ/S1fkXKplUEs5E1w11vCS8F0EjCWCt3Ban/TEoJC+YypMahNsGXtQveVze8vX0GBQ/XGbfwen1j3xQznH4yOLBRaGzNpJtUiXzS0fArV1HKk9N/tRujIQ6xYMNWCg2yQlF4zEWixiQoY=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7592.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016)(921020)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|1800799024|18002099003|22082099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	JvUgzL64uaqITnjEJhQHqOuFArFYgh00hCHKDUN+sj/MkcjMzyFT49uF6HwWRwVfgo0GsDkZltJM7VLcqKBJZfJ3P2Uk0BFp/0AQckY1LQA+DRRye0M5M1WwTpJ2bg0NHoCCeBuRKsKigBjMB+r3rYOsD2SzyIzheCxE6eI+2pjJs0yUkN0G1v7R9gb0Auf/VneZemok9iqZoniq7IqXdmqRTgG+GAN/9ZP/EbrZknd9MeGfr9xD9NJ4XV5Q98bR7QkkXIB3wBPjuLLOrSEzvNpb6Z5SlX3/kSLy9xy+SHJ+5BXdI+/h6RXC8eoyrYYlkFWH0IJoFpSWP3o1EjDDu8l43ZTRBgz53nHad6YhFLXG0VpIaWsrCs8CxAuJk4aIzxx4isfbSBcRGTFTaTir+NsSfzNzUpjy/zvGyFvBk7FN97znbl4G1ifox8Jp7RmOFKnrHrCAK73SWdJt3//OH5T5Jqfr0cVDu73ecbmVuiDpZChtNVsTOQR5S0hahvTMyRLNyCdYtRRWoZVxjjya+Z4iljA/X/7XHgHAQytQjF0PYu1sIOBvQRNwAHI84UL79U1Vv7YHViEiB5dBO4m2JEX50PXXqWw68NhXjXBISiCL+jQzIzj1IA1FtPdhttSVhoG6mDAasl86ctFm/W4B++GNtljfpcP4A2XMGaT6ZejgJ2X+oM2Wpv5OI0CC28tR
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SFhrTW9FTmE1bTBBL3pBYk5sSTN2MW4vWGRXd2RTajVqaHpwUVgwelNmcmdt?=
- =?utf-8?B?Wm5lNVVudzlJcUZCTW5HSDhoeldjRFp6aXRhb3RWSVhnOGg2TVM2WE1wUDRL?=
- =?utf-8?B?U2YzMVBoRC8zdm9EY1gzMHZ1YWpGeklNUHduM0tVYjFsTzZKaUQ4Z0RYNHBw?=
- =?utf-8?B?dlZXRFJPWmltaUhqcEJlaUhPNEhUeWJYSFdNRk11bFZGc1dBSlV0NFRIY2VS?=
- =?utf-8?B?ckFMM0JMQlIrNS9jWWZUbjBmZlVZRTdCNGRQR29LRjdIcXpZekRHVUpwQTJl?=
- =?utf-8?B?RVhNVjJrWlhXdnkyZjFJKzdrVXlLYUxCd0JvTlRPM0RGN1JmRXBpT2c0OE1J?=
- =?utf-8?B?TG9iOFFsSHNrL2k2QzM3S09PVmdodU51RXlMWEhnd0dlcUpMb3NBUnA0ZzNj?=
- =?utf-8?B?VjU3amxQcStYM09peFowNDZXNU9BUjg1UUJuZ3pYZ05uNEZyNjRoSWFnL3pM?=
- =?utf-8?B?US9qZXZaejVOaEtORU4vMWdOQmRmTlBVY0lTbFZCbFI2amdaVXpndDhKUmxP?=
- =?utf-8?B?MENXTkdISkh0NXlWU25OaTZHMXF0MEVjWGQ0VjBEU0d6VUFOQUZadlNNSjhB?=
- =?utf-8?B?MHNJcW5zR21kNWtpNnUzT0tHL1BKamdMWFJVMnB6SW5NOERPcCtyVnZ4dlR6?=
- =?utf-8?B?ZmJPUTc0cFgzb0JmWUJZMTA5T2NYelJFRDZFNzdHVXJsWm9UQXo2dUk4NEFq?=
- =?utf-8?B?eUhWY2ZWSWRyTjVhbisvNmplKzA1YXNva2wyUnVwVW5ZL1FjVjNjUm9qQlJG?=
- =?utf-8?B?TVFZYlJkbXQ0Q0xnQktvZGJrM2JLbnpsanlEb0tGZXoxaHFUTEptVzZIVC9z?=
- =?utf-8?B?ZTdCakJnaW1Denl1U3UrVDJVN0lMRmp4Sm9YZ2ZYVE8xQnhMR1RtbCtuaUZ2?=
- =?utf-8?B?Y2k2OTJhbnAyY1FYNFVoSUpTZndzSjU0dk5zTXFZbk0wekJLZTMzZDliZnBW?=
- =?utf-8?B?NmVJc0FpdUVoYzZaczJxazhLSERzRTN1Y0p1VHMwNEpZb01Jb1pkWGZVeDFu?=
- =?utf-8?B?RjNGQkxNQUIxZGFPQW04VmRhK1QxMTd4UXJLbnVoWmdiMWpoZ3AxVnBsTUdW?=
- =?utf-8?B?cEpLQ28zVzFGamlSMExKeWRHaGFFSFFkNWhaS2ZZOEV1aExyY1ZnT0JmYUFp?=
- =?utf-8?B?Q0MrQVUzSVFiSjdDdGlRRkNKK0EzOHVaTGhRTjZnSUNPTkdNV3dDaThGRHdG?=
- =?utf-8?B?cm9WNXdtdDROMGZyMjZkK0tNT1hlcUhiUTJEZ05WbHlacVRhaWlFcmRiYVox?=
- =?utf-8?B?UExNWStucGtHanRicGQ2dXdhOFJGNjBIdEpjMWtua0pXUjZZblJFTHVKMWI0?=
- =?utf-8?B?S1BSTTFLbG5LcjhlWnIyNm41dDYwbHh4NDk4ckxqUEZ5Q2xnVENvdy9EcnJG?=
- =?utf-8?B?bzZnNVE2ay90TFlERXkzTU9PYkExcStqS2U5bTJxZ2RlNXhJMDhSdGNyc0NY?=
- =?utf-8?B?TDgzZlhBSjg1YXRZR2o2SlRMMUl3ZGNycFVpZlROYnorcFB0Z3BOd2I5dnNr?=
- =?utf-8?B?K2Rqd2ovQ0dHcktibEtsNzc0NmtqMWZHSmpjWGpqNDUyZTJWWmIzODNXNkcx?=
- =?utf-8?B?d2VzbzQxd2ZPMFB5SUJRK2ZCZXpLVDFWOEhBdXZ0VjMxWUNBbldtcHdacHUx?=
- =?utf-8?B?T3ZLTm4vV0F0UVBoRWpQME9qZHhsNVV5cWJ0cjJkaEZXK0F1RHVZRkVheUpR?=
- =?utf-8?B?YXNMVXRWZ3FVa1VVMXd5YkpDQkpyd2htVnl0RDJMNDlSTmZnNmVXbGozR2x2?=
- =?utf-8?B?VURYOVUvUWx2NXJaZlRZeHpSbEdDOHhXdVNYYWdMWS82Y25uSmE2UmJUNDFO?=
- =?utf-8?B?UFpHWERUTFBLVDB3YjJiNHVMT251cnVDSGRxU0kzNW1KV21HM2xCdjJyeVdR?=
- =?utf-8?B?RHlzUVRpY01pUU5iWThlOUl4amZWcUFLWlpQRWcxemZtLzRML2dKR2N1cDdT?=
- =?utf-8?B?RkEvNXlyVXVTS3BqK3pKSVhSa3VCTXNOZmVmeFhKR2NldktpTEQvbzhMRWtL?=
- =?utf-8?B?OGdNQ0ZuZG1DSGZKTzRxWVFrc0RiZSt0QWhtNnZPT05zRllmNHJ2WlAvRXRP?=
- =?utf-8?B?bDU5WHNwUWEzVnM2YkgyU3dXbHBnQ2g4eVZHVUhxdTV6c01DN0VjL29LRzBI?=
- =?utf-8?B?UWFtQzhqakFYaTVNclFRVktCeXdxOWFkZDJFdm9EV1N0U0VOaTI2OUN5M2t0?=
- =?utf-8?B?OE5qM2R5MytsaHBzYlVCb2N4VnVTUElXZHZQYi9GTjg5ZERuZ2haMUFMbnZk?=
- =?utf-8?B?bUQ5b2RlRlBqbnJKajdUcjNqYUI0Tk81UVpiazdFamh1VnY3RTJYVUFuNXVQ?=
- =?utf-8?B?YTZGY1BqcEZvQVMwbFhDVnd5bVc0aksvYzc3S1UzY3dac0lidE9tVGxVRWZW?=
- =?utf-8?Q?LpF97sAvZj0bIZdM=3D?=
-X-Exchange-RoutingPolicyChecked: LHJCuVmO3nJLJsxO93s2zbGA9ojXFhZ2yqREpmVE3CdoyFZU+wlOwrWtVG1IouhawlJvFzW/k2QOkF0fa8igl5kkPYgssRbpCv1Pc7SmGrVYg8oErfZRosE2XWhdjvOQ4H64UNJBX0YqpplVqU44Hk8q34mBgh19a+w78WhKSCJ/P0ryQsPL3jfMWnubtZPtOGHlDSympVzbc7SaziqJt6+N31OraqWdGAJg+JIQdgggEXnP/6tSF5tVsLQ3AISTZz1GFp5yL9OoJoAuAhWKLhDMG2fc2RlNZ1/RreSTnN5VApTgMcLTWUTtX0D1OYVqb7pO+ZYNJ/uYYV20PfqVhQ==
-X-MS-Exchange-CrossTenant-Network-Message-Id: fbfc245c-4e56-4497-d74a-08deabae17c2
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7592.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?UqllebiLgeg5OwLacWsRoPUCxbBE9dIcA+sLRpKr1O0gGwNoDb1kZPJrXfEO?=
+ =?us-ascii?Q?EfJp/TvbvtAoqG7cUIEaLZqxwGbDni/wzwjpx713s6iTAlah3k2uaQ5D6O0G?=
+ =?us-ascii?Q?puqI/GKxtqmZUJ68wDzsv116stj0f8b8ksLBAAvd0gwXGpfV+CherngvMOrg?=
+ =?us-ascii?Q?jC52uQncM/tHOqvhbG7Fzhk5LG22RoQiGv7mglEivefZCJqsSTd7+gm1DacN?=
+ =?us-ascii?Q?5o0/bKiOyDOUhWmbXE2nLaz8ZlPkhIc0v76//qL2OX4/7/AgU+fCEsrHqFMB?=
+ =?us-ascii?Q?H7qto9a3Kq4PtTlyuD68pHPO8uuNlW4w6dKj3sVasej6MmPxem65ajIn68ZS?=
+ =?us-ascii?Q?BTUbH8iaq+AWleofJPvXsIcLqLy01bXJuR9otU1TyftLTit/XnINWeWfEZWL?=
+ =?us-ascii?Q?hGZOAhg7bIG2hpm2bFsL4C4rtrX7U/KFuIoPnIqdHVgQC0iEu7ymy3S+qDK7?=
+ =?us-ascii?Q?H4PQZy1/TCD98nhJCHjxkd+EksMMcr2OFPoEBUfoHnlmSPLgylLW/b5B2qTD?=
+ =?us-ascii?Q?K3UYGhgOn2kjSCp/IfbqyNIp9OHocQV3qVkl8NoyAN4kYhEgUigSkV5rBAMn?=
+ =?us-ascii?Q?P0uHi6ZyRfmVx35yL85i4JU7Sz0HdTVxL6tGdYnaD1sy3xpQaGSY0mrKkYMG?=
+ =?us-ascii?Q?BnYftCj5QVoNHXK1fAebW6SGS+aQhfW4SGszbWu2ULArQz/IvRbCaKEclnJB?=
+ =?us-ascii?Q?cn2zQsPG+Psal/WMYiHUji1BrHpNB/1XuwQ6fbmNFcAzHVc11qCjVWxf4787?=
+ =?us-ascii?Q?ZhWN9m6S0n6hK7PCf8G37ha6wmcmBAwf0MFtp0N7Gpa2Tn3AFRLYBmhaOpKm?=
+ =?us-ascii?Q?KNfYWGFT5RO2TcVEO3TvWcFzX3DAKZ6tXuhNTDSYBTqAXNUwIHu3E7nyjI+G?=
+ =?us-ascii?Q?QLvTKKIW5O6NZQfP75fb+msIMd7DETC5Iu6QoD8F/SMSw9HP3+yLO+trroXe?=
+ =?us-ascii?Q?gBPfDVZdVCIYf+x95l9PedB60EsydMk0osBGIrBHG09aqxGtkyhmV/+wRYG+?=
+ =?us-ascii?Q?WHan5JggljXsH80XI58ida9Jv0a1Jc5ORkN1Yw6ayBqYgxO/Ip1FN4IGC/3d?=
+ =?us-ascii?Q?t6HL/T6YxSfjto0chxieN0tWVv2CwMRHCCltqCygDyNyiTOz18nUiFHDJxr/?=
+ =?us-ascii?Q?oXONxd/OnV8wIrU9fOtrZp2nQLYn/zhAwfQPTK16d3y5rdmJhOSLI6q3Z326?=
+ =?us-ascii?Q?Ay0cpPrsOv7/2k2OHWj/SXiK+nDtiSY1GMDKyp9RSBy/Xd3wBQRLG1CPIHmh?=
+ =?us-ascii?Q?N6DGdrNqsifKYAozCTlfgclD9BYW3ZhUFQzZJGpZwK+DzlaHEOx+xRkolM1k?=
+ =?us-ascii?Q?rZtFrzp2A6kkz55uoPHsGDOP6x1H6xuaYXPwHcXufXEdiaRWhGuisxvQ3ytg?=
+ =?us-ascii?Q?CU2pWVrADGR57mAdX7dxuvaHyEMfn5tZC207MKjH4lYL/vJDlHibpcLuyNLD?=
+ =?us-ascii?Q?vNULN5YX6XmD3e2sf0j6EnmcYTdszwTdYesycFgak8AsJ4xp4NL65AU4jSMI?=
+ =?us-ascii?Q?5qW9+4lqGWJSaYapcJ1qeuBf+fKj1z3xkhQrBCmzSInkMii+4Vp9rwzhw0Be?=
+ =?us-ascii?Q?tNDnyF88C2YV3+pati+g7NjS9cqmVj7zTV799LfWh51Rxaf30dKcierOQ8It?=
+ =?us-ascii?Q?+ffMZcqialYjAe1stxOsp6qJOpE6yws0eGTZgY3h9VAgKZxYpu6LDPJG9M/y?=
+ =?us-ascii?Q?iFKoIUB2161SLSrCM8Y6Ju71Amd2e9b3SeymEZEqOWMrch64xA+1NqLbCsmE?=
+ =?us-ascii?Q?dpotbKWqDQ=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b2f4abdb-a489-4b58-e271-08deabafa539
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2026 20:28:54.6450
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2026 20:40:01.6334
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DbD6MJr/tESAPjEzUf/bNjP5Q3duK4RWUJOa4L2hJBj4EHkuMVkOr7FHoS+uIWdGq5yryRhwowH39fqtX3YyPAPpH3eI0wv0ousZSrk+9a8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PPF691668CDD
-X-OriginatorOrg: intel.com
-X-Rspamd-Queue-Id: 4C95B4E02F3
+X-MS-Exchange-CrossTenant-UserPrincipalName: /QHprRtbliquDxaRa0SErPWA+tB8h/KeYzzbpFi6b9chMB1bTEhu9KzFCuxVdQ3q7rwAeZh2sEUpSae65bL28w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4046
+X-Rspamd-Queue-Id: CF90A4E03C9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285024-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,enjuk.jp,molgen.mpg.de,intel.com];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid,enjuk.jp:email,mpg.de:email];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-285025-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,Nvidia.com:dkim]
 
-On 5/4/2026 10:14 PM, Jacob Keller wrote:
-> From: Matt Vollrath <tactii@gmail.com>
+On Tue, May 05, 2026 at 11:16:52AM +0300, Ido Schimmel wrote:
+> When protodown is enabled on a macvlan, two bugs cause the macvlan to
+> incorrectly report an UP operational state:
 > 
-> PTP pin structs are allocated early in probe, but never cleaned up.
+> 1. Toggling the lower device's carrier while protodown is enabled on the
+> macvlan causes the macvlan to inherit the UP operational state,
+> effectively bypassing the protodown mechanism.
 > 
-> Fix this by calling i40e_ptp_free_pins in the error path.
+> 2. Toggling protodown on and then off on the macvlan while the lower
+> device has no carrier causes the macvlan to report UP instead of
+> LOWERLAYERDOWN, since netif_change_proto_down() unconditionally turns
+> the carrier on.
 > 
-> To support this, i40e_ptp_free_pins is added to the header and
-> pin_config is correctly nullified after being freed.
+> Patch #1 solves the first problem by making
+> netif_stacked_transfer_operstate() return early when protodown is on.
 > 
-> This has been an issue since i40e_ptp_alloc_pins was introduced.
+> Patch #2 solves the second problem by calling
+> netif_stacked_transfer_operstate() instead of netif_carrier_on() when
+> protodown is disabled on a net device that has a linked net device.
 > 
-> Fixes: 1050713026a08 ("i40e: add support for PTP external synchronization clock")
-> Reported-by: Kohei Enju <kohei@enjuk.jp>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Matt Vollrath <tactii@gmail.com>
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Reviewed-by: Kohei Enju <kohei@enjuk.jp>
-> Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com>
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> ---
->  drivers/net/ethernet/intel/i40e/i40e.h      | 1 +
->  drivers/net/ethernet/intel/i40e/i40e_main.c | 1 +
->  drivers/net/ethernet/intel/i40e/i40e_ptp.c  | 3 ++-
->  3 files changed, 4 insertions(+), 1 deletion(-)
+> Patch #3 adds a selftest covering both bugs and the basic protodown
+> functionality.
 > 
-Sashiko points out some issues which are related but pre-existing this fix:
+> Targeting at net-next since these are not regressions (i.e., never
+> worked).
+> 
+> Note that while these changes are in the core, they should only affect
+> macvlan as protodown is only supported by macvlan and vxlan and only the
+> former has a linked net device.
+> 
+> v2:
+> - Move protodown handling away from drivers to the core (Jakub).
+> - Add a new test case for vxlan.
+> v1: https://lore.kernel.org/netdev/20260429124624.835335-1-idosch@nvidia.com/
 
-> This isn't a bug in this patch, but looking at i40e_probe(), the return
-> value of i40e_ptp_alloc_pins() is ignored earlier in the probe sequence.
-> If the memory allocation fails, pf->ptp_pins remains NULL, but the probe
-> routine continues successfully.
-> Later, if a user attempts to configure the PTP pins via the PTP clock ioctl
-> (such as PTP_EXTTS_REQUEST), i40e_ptp_enable_pin() unconditionally dereferences
-> the pointer:
-> drivers/net/ethernet/intel/i40e/i40e_ptp.c:i40e_ptp_enable_pin() {
->     ...
-> 	pins.sdp3_2 = pf->ptp_pins->sdp3_2;
->     ...
-> }
-> Could this lead to a NULL pointer dereference panic triggered by userspace?
+I thought about this again and since protodown is only about carrier, I
+think it's best to avoid netif_stacked_transfer_operstate(). Instead,
+make netif_carrier_on() a NOP when protodown is turned on and when
+protodown is turned off, only turn on the carrier if the linked net
+device (assuming it exists) also has a carrier.
 
+IOW, I will make these changes for v3:
 
-Probably we just need to add an error handling of the pin allocation
-since failure to allocate memory is likely to hit a lot of other places
-as well. This is also a pre-existing issue.
-
-> This isn't a bug in this patch, but while looking at PTP cleanup, it appears
-> the pf->ptp_extts0_work work item is never canceled during device removal.
-> In i40e_remove(), i40e_ptp_stop() masks the PTP event interrupts, but it
-> doesn't call cancel_work_sync(&pf->ptp_extts0_work) to flush any already-queued
-> work.
-> i40e_remove() later cancels service_task but completely omits ptp_extts0_work.
-> If an interrupt triggers and schedules the work immediately before the teardown
-> path masks the interrupt, will the work item execute after the pf structure is
-> completely freed, resulting in a use-after-free?
-
-This is also a pre-existing issue in the PTP teardown that was reported
-on patch 1/13 as well: we need to cancel the extts0_work item.
-
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 46f8a2efd982..0c272f6e9aaa 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -10169,10 +10169,8 @@ int netif_change_proto_down(struct net_device *dev, bool proto_down)
+ 	WRITE_ONCE(dev->proto_down, proto_down);
+ 	if (proto_down)
+ 		netif_carrier_off(dev);
+-	else if (dev == iflink_dev)
++	else if (dev == iflink_dev || netif_carrier_ok(iflink_dev))
+ 		netif_carrier_on(dev);
+-	else
+-		netif_stacked_transfer_operstate(iflink_dev, dev);
+ 	return 0;
+ }
+ 
+@@ -11134,9 +11132,6 @@ EXPORT_SYMBOL(netdev_change_features);
+ void netif_stacked_transfer_operstate(const struct net_device *rootdev,
+ 					struct net_device *dev)
+ {
+-	if (dev->proto_down)
+-		return;
+-
+ 	if (rootdev->operstate == IF_OPER_DORMANT)
+ 		netif_dormant_on(dev);
+ 	else
+diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+index a93321db8fd7..05c250c483f0 100644
+--- a/net/sched/sch_generic.c
++++ b/net/sched/sch_generic.c
+@@ -609,6 +609,9 @@ static void netdev_watchdog_down(struct net_device *dev)
+  */
+ void netif_carrier_on(struct net_device *dev)
+ {
++	if (READ_ONCE(dev->proto_down))
++		return;
++
+ 	if (test_and_clear_bit(__LINK_STATE_NOCARRIER, &dev->state)) {
+ 		if (dev->reg_state == NETREG_UNINITIALIZED)
+ 			return;
 
