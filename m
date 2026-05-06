@@ -1,121 +1,179 @@
-Return-Path: <netdev+bounces-284804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284805-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kMF9NR0y+2n/XgMAu9opvQ
-	(envelope-from <netdev+bounces-284804-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:20:45 +0200
+	id YEtLLNky+2nfXgMAu9opvQ
+	(envelope-from <netdev+bounces-284805-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:23:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 583F84DA1E8
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:20:44 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6E744DA253
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:23:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DDD1430162BB
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 12:20:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 66D163007299
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 12:23:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 367794418D7;
-	Wed,  6 May 2026 12:20:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91320423A85;
+	Wed,  6 May 2026 12:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="nEmWZZmt"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="v0XnQs4t"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE15D4218B3;
-	Wed,  6 May 2026 12:20:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4870C31A7E4
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 12:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778070041; cv=none; b=uxKHblMBQ9TZ1TFbc2A6rKkCzBfkIzAtQnFMIfm6jpRudz3o5Nmc8ySGd/CYhY2wq0KQeEKNEhGIdKHCGErUO5FeZXl9ZX+HIGyBrmyZR94b/BubHX+PVZaO5x9WuZIJlidbJspMovsG2bv9I038J3+KzBGE/5J+7gUmTzipz/s=
+	t=1778070226; cv=none; b=kpmNI0dOHEOiHSX2BUwkG+YG+RqwWG/3kukltxpG8MIUtphRQZcv0WfLQIREQzR7eq4bO0kWAK1vWwdSm7td4lXtVEoECWKRVKhRyU8rkr4H77HS0OwcgdI5LLM8wyyfGVXRpk255obrjHsPBOIe9C4UPLVuH5ZlSPEYj/rbOHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778070041; c=relaxed/simple;
-	bh=Y1K9R2yWFNNKwNhN1mxkmLD2soiEXuCLKYgKNjk0OxQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HfehK8EPfUh9Jfj3ZqzAKM4acIcmIDyGA5eIT0mT8yHO6XnihxwgTd80jin0Jh9J/eIDH7OK2iNqZkzLDtVn//battTVvuCnwXkdw+krY2QGtrD+xreUKbeAa/5EXMF2+QRVtcKWYO0e/mFs9flrewtplkSkMlO+E7E6HjJU7Sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=nEmWZZmt; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=pSniqUov44vUMNTsXdR0qPTGsobWMLAF5+gjv4sfAbw=; b=nEmWZZmtU1LbR7368IubWu6P4G
-	8nKIdRMit8QMkZ00lZNxah+wXK1nxOXq57ZPtMVgdtlB75tRKGKdTONbJuZv0H1zCc5K5IR+xJCv3
-	mHLd4bBk1RbSXivXTMZIfIb9EU+q42/GoyX5QJiNne1IwWlSNXoH6WXQkTbFDC+8gqUM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wKbEu-001dK6-2t; Wed, 06 May 2026 14:20:32 +0200
-Date: Wed, 6 May 2026 14:20:32 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "chunzhi.lin" <linchunzhi0@gmail.com>
-Cc: netdev@vger.kernel.org, Frank.Sae@motor-comm.com, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, davem@davemloft.net,
-	linux-acpi@vger.kernel.org, rafael@kernel.org, lenb@kernel.org
-Subject: Re: [PATCH 2/2] docs: acpi: dsd: add Motorcomm yt8xxx PHY properties
-Message-ID: <d24c2a38-ec63-4973-91c8-357853d837b3@lunn.ch>
-References: <20260506021813.3658669-1-linchunzhi0@gmail.com>
- <20260506021813.3658669-3-linchunzhi0@gmail.com>
+	s=arc-20240116; t=1778070226; c=relaxed/simple;
+	bh=2SteAAkEUtZDgJA5+hodfPhtLV0H6R5KS2vYu3bBuMA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IJKWQq5yH6gn47ZusZ6ZSgnkXhuZJ4I32P9oUYXzSpF8Kjcub0iX8TPN3SPJjXQuX5Mvng8w4a7YL1sR1f8SHGSQQXmveuc6ObbRM4I1/pKh6haFEV6luQXGJVXx/c2wW0KaFUxZdjIfk2s+zEmtqLPmGj76HJxAWQX8G4hySwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=v0XnQs4t; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id B53D64E42C09;
+	Wed,  6 May 2026 12:23:42 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 824A36053C;
+	Wed,  6 May 2026 12:23:42 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1A718102F249F;
+	Wed,  6 May 2026 14:23:38 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1778070221; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=eqxpajZ1KJZ+fC2W9FonpNivxhioR1fe6eN8ln+Yq1Y=;
+	b=v0XnQs4toe4T3jcgM/mxWh0mXCg/v7YWT40L0Tr4qlweQhaPkqgmDXkbabLXVSrwk0ijOu
+	lowsTi0RQm88iqIhMZ+P/JsuwjeLSSM7DxKVjNpppLdpoCBzO4nPtSIOP0excKhTZzk8Qq
+	c5iNZD7knhHzJjDQj4b2/W3g7XA8JfBkb0kjGEblfrFfDCImH39J29HPngL8PMyqn6WzJ2
+	q5QFzazDV/DMlcmmo+MfGxQtrxNQYo+WWrc4dRY/nuUJdiy7/rZoLdMnj22XpT60Vh+ICv
+	IMffHz6dRmLcCjzwSsSwfXd6auIIPx20Ue5dIOWJuTujlIE8lx7quP8/evtXNg==
+Message-ID: <08d60afc-56ee-49d1-b124-4d8f6191afcd@bootlin.com>
+Date: Wed, 6 May 2026 14:23:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260506021813.3658669-3-linchunzhi0@gmail.com>
-X-Rspamd-Queue-Id: 583F84DA1E8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: ethtool: fix NULL pointer dereference in
+ phy_reply_size
+To: Quan Sun <2022090917019@std.uestc.edu.cn>, netdev@vger.kernel.org,
+ andrew@lunn.ch
+Cc: kuba@kernel.org, edumazet@google.com, pabeni@redhat.com
+References: <20260506120131.767679-1-2022090917019@std.uestc.edu.cn>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260506120131.767679-1-2022090917019@std.uestc.edu.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: B6E744DA253
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [3.34 / 15.00];
+	SEM_URIBL(3.50)[uestc.edu.cn:email];
 	MAILLIST(-0.15)[generic];
+	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284804-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,motor-comm.com,gmail.com,armlinux.org.uk,kernel.org,redhat.com,google.com,davemloft.net];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[bootlin.com,reject];
+	TAGGED_FROM(0.00)[bounces-284805-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	R_DKIM_ALLOW(0.00)[bootlin.com:s=dkim];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	RCPT_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-0.743];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	R_SPF_ALLOW(0.00)[+ip4:104.64.211.4:c];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,uestc.edu.cn:email]
 
-> diff --git a/Documentation/firmware-guide/acpi/index.rst b/Documentation/firmware-guide/acpi/index.rst
-> index b246902f523f..3cd38bb4de15 100644
-> --- a/Documentation/firmware-guide/acpi/index.rst
-> +++ b/Documentation/firmware-guide/acpi/index.rst
-> @@ -12,6 +12,7 @@ ACPI Support
->     dsd/data-node-references
->     dsd/leds
->     dsd/phy
-> +   dsd/motorcomm-yt8xxx-phy
->     enumeration
->     osi
+Hi,
 
-Please keep this sorted within dsd/. Yes, graph is in the wrong place,
-but lets not make it worse.
+On 06/05/2026 14:01, Quan Sun wrote:
+> In phy_prepare_data(), the strings rep_data->name and rep_data->drvname
+> are allocated using kstrdup(). However, the return values of these
+> allocations are not checked.
+> 
+> If kstrdup() fails to allocate memory, it returns NULL. The function
+> phy_prepare_data() will still return 0 (success). Subsequently, the
+> handler ethnl_default_doit() continues the execution flow and calls
+> phy_reply_size() to calculate the size of the reply message. This
+> unconditionally executes strlen(rep_data->name), leading to a kernel
+> NULL pointer dereference and panic.
+> 
+> Fix this by properly checking the return values of kstrdup() for both
+> `name` and `drvname`, and returning -ENOMEM if the allocation fails.
+> 
+> Signed-off-by: Quan Sun <2022090917019@std.uestc.edu.cn>
 
-Apart from that, this looks good.
+Thanks for the fix :)
 
-    Andrew
+You're missing the Fixes: tag however.
 
----
-pw-bot: cr
+Can you please add it ?
+
+> ---
+>  net/ethtool/phy.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/net/ethtool/phy.c b/net/ethtool/phy.c
+> index d4e6887055ab1..6cf3df1df8659 100644
+> --- a/net/ethtool/phy.c
+> +++ b/net/ethtool/phy.c
+> @@ -88,8 +88,17 @@ static int phy_prepare_data(const struct ethnl_req_info *req_info,
+>  		return -EOPNOTSUPP;
+>  
+>  	rep_data->phyindex = phydev->phyindex;
+> +
+>  	rep_data->name = kstrdup(dev_name(&phydev->mdio.dev), GFP_KERNEL);
+> +	if (!rep_data->name)
+> +		return -ENOMEM;
+> +
+>  	rep_data->drvname = kstrdup(phydev->drv->name, GFP_KERNEL);
+> +	if (!rep_data->drvname) {
+> +		kfree(rep_data->name);
+> +		return -ENOMEM;
+> +	}
+> +
+>  	rep_data->upstream_type = pdn->upstream_type;
+>  
+>  	if (pdn->upstream_type == PHY_UPSTREAM_PHY) {
+
+There's a similar problem a few lines below with :
+
+  rep_data->upstream_sfp_name
+
+and
+
+  rep_data->downstream_sfp_name
+
+The only problematic case really is rep_data->name, as all the other
+strings are checked for being NULL upon accessing them.
+
+So either we only fix the rep_data->name allocation checks, or all the
+string allocations :)
+
+Can you address this in V2 ?
+
+Thanks,
+
+Maxime
 
