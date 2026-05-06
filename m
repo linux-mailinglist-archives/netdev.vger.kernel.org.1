@@ -1,131 +1,140 @@
-Return-Path: <netdev+bounces-284727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284728-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SIR7JoHp+mlIUAMAu9opvQ
-	(envelope-from <netdev+bounces-284727-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 09:10:57 +0200
+	id iM3bAA/t+mn3UQMAu9opvQ
+	(envelope-from <netdev+bounces-284728-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 09:26:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D421A4D7099
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 09:10:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 607A74D7328
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 09:26:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A233A30144F5
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 07:10:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DE9A73059599
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 07:21:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B99F36E496;
-	Wed,  6 May 2026 07:10:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E34374758;
+	Wed,  6 May 2026 07:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ntu.edu.sg header.i=@ntu.edu.sg header.b="D/ANbBkp"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="GzCxyydy"
 X-Original-To: netdev@vger.kernel.org
-Received: from TYDPR03CU002.outbound.protection.outlook.com (mail-japaneastazon11013036.outbound.protection.outlook.com [52.101.127.36])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011063.outbound.protection.outlook.com [52.101.65.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897B936DA0D;
-	Wed,  6 May 2026 07:10:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.127.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C7F37416B;
+	Wed,  6 May 2026 07:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.63
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778051452; cv=fail; b=KMlp8aFjZIEECsEapgUS9mvILKhfXMa/MEB3TJNZSMW8ldij5zW4Shi3JsHEVxHo+2IRUkLUVkgVYLsv0LSbLmNk9zBojwc3+3IbppJsuuEovAEZJt/NkGIGoYOC2CwUP8y7AbDgRIKC8tYj43hmjdHNUZ6Bpey1uibF0X96PYI=
+	t=1778052079; cv=fail; b=A7JTECfudo0Faman6aClW4D36aIVVdxlA8fwX1XWKy5DIq8hoiJpLvETVXWxD2uQi4Ntk1SFrUxwjfGci6WhokHW/1bS8UU1rJTf4tThDMCoZcTBjPCUAq7N90JLPeqchUkeZI8QY98ZPhyc30We8r4wapuS1XFa/VCiPG9DvA4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778051452; c=relaxed/simple;
-	bh=mxQC6m9q5YTbH1rJhlVRLgPr3gc8AL27RxoRQtlMdi0=;
+	s=arc-20240116; t=1778052079; c=relaxed/simple;
+	bh=L5Q2Ojy8pvRUhtFQq8Lk2ik0UFoPoNcHITGEp0s7OUU=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Htc8TVwYsK5VCMjjK23GiC1EMWW4KmemriSy4AteBDwMJJ2WYjt4ksmnIeD7fo/B36lCV7OoDPSY9rYUJMdXOPy1qRGNcAX4fTu7OGXdc2zbVGFBrXgbKo+H+J0yO9r9jaRhNaBnON+H8ivImnBLT8anerNIWu/LFJOpz9Hng4s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ntu.edu.sg; spf=pass smtp.mailfrom=ntu.edu.sg; dkim=pass (2048-bit key) header.d=ntu.edu.sg header.i=@ntu.edu.sg header.b=D/ANbBkp; arc=fail smtp.client-ip=52.101.127.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ntu.edu.sg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ntu.edu.sg
+	 Content-Type:MIME-Version; b=qKYUZZltZhcZUIZ9KxFF1kHV1uYfm7/xwEaiCVIEf9Ys7m7IR5Or8k9rk1iboFRhlgmKayjaimx1Xd4HpmKJjRMhGEy3DJr0Hhc7oo0o6ajb1r2VZutDnp5mrcfMbgGHgwva2yncv22Shg26Mf2sZlQkzAuVKlQSZivLXoI7030=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=GzCxyydy; arc=fail smtp.client-ip=52.101.65.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=b50z987M7w6Ypggx/GyFV2ajuJoJyUxUwhcirPb6P0+pOB5wKd751QV1N62av9GEFxUsLYKiat+kGMvv5RzFzOauU3fAJ3p1xI/Sju9bzQsj+2vlWVOrnAhxfbDsgEp+wqruC7n9PkpAkpWEDiEq03iyZPXnGoyeAfEeyqmm2ECFrPNjsCyxrp9I7cfJHs3pyemuUxucDPhpzqWupV24Tv4kY5pkhk2wWDdx02+5o21rcSwL6ACh0b20zJdG5sbv4AUnatLfE6czBEdR7b1MMX577KXgsqLV41HnlOHjXN0kpzuLeyD01HON+XxdvKf0CBXDaFcTQjzRnWlKhXNFng==
+ b=mGoR4tFpvr+2WrYzHY3vlFf4L2I6ZyzTnrnQQBXttNbIu8xDdOo8fmUc4BGbNs3TCQRXei5TpA82Wtv/LR7IibHlwcp19yDh7SBU37L41eyAAgHsqVSmuoOp5lros1GMyS0JEANudeQd57na6lCGvW8Ba5MQZ/UedReFOX4WaO+g8goDAAJ71Bpeh41MKGqa/+jTrYCaFmSxmspnkNGo5HRNr+UM1pER6MspVhsjXcnTnATl9n5xV9qDWwSdxX2Uvta7CtcwwK0fvHle0zEviEGhAENPuZBDayC7KbY4XhPcNX00hJYjEu+x73EgI8AVaQ/OxX591VV9+1npN+XhqA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PIs9gerk/MjduIN/eh/+DBbnWpzlY00tLB7L8d27yGk=;
- b=EEjn9XeLTIyCbMnTc/FPWJiaLmZCFNWx1Pugn7fDWSvZzKjEZjcSD+uuXhEhLEK/P47JVgaZbsokWylryh2OcbsuxIVPQoFv3vfwp7ZO95vcNNumgqn1PAemmPMrP00FHqVxswTFBnyjO9PPMewpY6Pny785cUR0QTFIWVpvMMm0cEOj6lsRsemsQosxbz69Zp+vocQJyXpkeeYS/E2zqRw3/cH3mhFXUG6N7JRxfxrfAwsTZuV4BggkHtof92ioQLxrN5PcDxIzB/0J92/dFSOptE+vnsj6Aro+Kw9xJIHvkxfmJ19qBQ1KLv6SR63XrsvYnzeRlVbP96Yx+I0pMw==
+ bh=FRIMfFBwB5qjEkjy+MVoP/dubLHzL7QTTzDJW8peLog=;
+ b=pNGwsZtM8XDFBA+ePOgxbX1wT3f6Zn7G1nxJZy7vxFUhYRtm3OWVVaWYykRyfsRGV8MnllKrtP44nlZi+mN2fz2WzsZUOI1KvSEs+yUZWmGXxuSDOnTCMlDTeggJbtBylUaROg+zAgiB93QhsVfLU6qs1JcZN1bLWn0XyaZvaJ5HpPxpVpZJzSLW4rik7qjliYpMjqlruWB4Bjp+U0PMDPiGG20Q2jC9OZqFqyzgbOaRNZ7KjPqdJu8r52BpAWo6H5//SsKUvlJrL9gmpVSI55ZubI/hE91gSPCylkZ3VqMo8OhyHSmA0yA8SBWG//9ZgYgpOhHNCE+iHl578FLAzw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=ntu.edu.sg; dmarc=pass action=none header.from=ntu.edu.sg;
- dkim=pass header.d=ntu.edu.sg; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ntu.edu.sg;
- s=selector1;
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PIs9gerk/MjduIN/eh/+DBbnWpzlY00tLB7L8d27yGk=;
- b=D/ANbBkp3rTnr6jKSWmYUckGUEop5CfJ6RuUw0AEFy0XO4Xrea/lzizs+8Hsa1+I3FNF1A1WZt0ypMLxOeqayLz6paSRl5EcdkEiIjrXEE1QgNX6wFKiDvtigCZD6SpHMIwpCRc0UQdKhYUmOm38FZE4UQ2XDNzmU5xKKDzmL38xzLoqbjSo4SOAIvumshywu/oCugaGWrAhcIGogGreJulvMUoBh/Blsw0eUByK1b5e48ncmWFbcmbZ0KPXEMDR7ZC/xxeQsKHN3ERk3YbY6IuHJpvmSJCzqHfTuWiTYYrpZDRXxM5/FPy6IbIceEYfHLNdxW0kohwLaH0xb9dOVw==
-Received: from TYZPR01MB6758.apcprd01.prod.exchangelabs.com
- (2603:1096:405:a2::6) by SEZPR01MB6107.apcprd01.prod.exchangelabs.com
- (2603:1096:101:21f::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.15; Wed, 6 May
- 2026 07:10:43 +0000
-Received: from TYZPR01MB6758.apcprd01.prod.exchangelabs.com
- ([fe80::bbb1:1ecd:fe69:9743]) by TYZPR01MB6758.apcprd01.prod.exchangelabs.com
- ([fe80::bbb1:1ecd:fe69:9743%4]) with mapi id 15.20.9870.023; Wed, 6 May 2026
- 07:10:43 +0000
-From: Xie Maoyi <maoyi.xie@ntu.edu.sg>
-To: Allison Henderson <achender@kernel.org>
+ bh=FRIMfFBwB5qjEkjy+MVoP/dubLHzL7QTTzDJW8peLog=;
+ b=GzCxyydyTPswr2PoWPWRKZDtNBhHKua6vZQb+wXYPrNLENxP094mMHEabLPQ9ONVb/Q6EFqtdbEoDfFZ+IW4ay8LjrqMklbqzumpDHAzss4Lm77j1PMo6dibwIAjWn7V6eTFZS34SUNe59y7Figjt+Qoo0Df1On953hTEkFvk9nN3tOkRx5BiaGpCIjzj0J4qU14fHtyOafb4WkLxwh3joQ4DyKFdlJfmvFUISee6/ibf1JTbp3p4D7zCcAVGTedNRQIhBlxR8M67eRSdL9iY594YBuqqyyflqA0hD/zP55FEgfNdy4Y46tYxtmsDqcDaom07Y76tFrHP/qyPDFNBQ==
+Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
+ by VI0PR04MB10710.eurprd04.prod.outlook.com (2603:10a6:800:260::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Wed, 6 May
+ 2026 07:21:11 +0000
+Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
+ ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
+ ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.20.9891.008; Wed, 6 May 2026
+ 07:21:11 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
+	<vladimir.oltean@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
+	<krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"f.fainelli@gmail.com" <f.fainelli@gmail.com>, Frank Li <frank.li@nxp.com>,
+	"chleroy@kernel.org" <chleroy@kernel.org>, "horms@kernel.org"
+	<horms@kernel.org>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>
 CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>
-Subject: Re: rds: possible cross netns leak via RDS_INFO_* getsockopt
-Thread-Topic: rds: possible cross netns leak via RDS_INFO_* getsockopt
-Thread-Index: AQHc3GmNFjglT8RFCkaEpGWQP2W0QbX//mWAgACXNTc=
-Date: Wed, 6 May 2026 07:10:43 +0000
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "imx@lists.linux.dev"
+	<imx@lists.linux.dev>
+Subject: RE: [PATCH v5 net-next 06/15] net: enetc: add support for the
+ "Update" operation to buffer pool table
+Thread-Topic: [PATCH v5 net-next 06/15] net: enetc: add support for the
+ "Update" operation to buffer pool table
+Thread-Index: AQHc2EvGYQLCqoBg/E+Cc4krWk1Fi7YAnjaA
+Date: Wed, 6 May 2026 07:21:11 +0000
 Message-ID:
- <TYZPR01MB6758F66A06980DCE70C7F75CDC3F2@TYZPR01MB6758.apcprd01.prod.exchangelabs.com>
-References:
- <TYZPR01MB6758F43459242F22946A8192DC3E2@TYZPR01MB6758.apcprd01.prod.exchangelabs.com>
- <2962d0cbd5313ab482ece5543bafa0d2f0c32cc3.camel@kernel.org>
-In-Reply-To: <2962d0cbd5313ab482ece5543bafa0d2f0c32cc3.camel@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-GB
+ <DBBPR04MB7500426432361E0957AC1E86883F2@DBBPR04MB7500.eurprd04.prod.outlook.com>
+References: <20260430024945.3413973-1-wei.fang@nxp.com>
+ <20260430024945.3413973-7-wei.fang@nxp.com>
+In-Reply-To: <20260430024945.3413973-7-wei.fang@nxp.com>
+Accept-Language: en-US
+Content-Language: en-US
 X-MS-Has-Attach:
 X-MS-TNEF-Correlator:
-msip_labels:
 authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=ntu.edu.sg;
+ header.d=none;dmarc=none action=none header.from=nxp.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TYZPR01MB6758:EE_|SEZPR01MB6107:EE_
-x-ms-office365-filtering-correlation-id: e8b568c7-9964-4ea6-a48d-08deab3e969d
-x-o365: NTU-OFF365
+x-ms-traffictypediagnostic: DBBPR04MB7500:EE_|VI0PR04MB10710:EE_
+x-ms-office365-filtering-correlation-id: 1f6b8b1a-1c39-435d-5591-08deab400cba
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|1800799024|786006|366016|38070700021|56012099003|18002099003|22082099003;
+ BCL:0;ARA:13230040|1800799024|19092799006|376014|7416014|366016|921020|38070700021|18002099003|56012099003|22082099003;
 x-microsoft-antispam-message-info:
- tm2him3B0GNzkzk4JJt8SECgnEsF8PUALMY7KYFHBbQMdG95Jqrh4819x+RI+e1aAsicbyzgrB9nN/54kFVfONa1x5LDyejOUhQiuL4GNA6KPUwcb6k+r9e8LDA29tIrtmx32EjK0B8Aq79l8U/Uj2QA60Jqm04FADZeAqYWLoou3OEmGxa+fLMLE1ctgdYcF0gvmFTXImNUiD8DPpinOHOE0wsRO6+mXjPFxr4bA+PypnRo4S3mF92SekabvX71bZZzrzYYzHl7D5DEAn/TJzpDZNRoDwVr5JmgkhozU9wkMZZKn0CU1Ejz/lObnv+ylbJpeRgOKt3ZWPstBVhqpC+ZkeJGvjSaBiNBktth57YYUtIgdtk31iAHh62ecLvOk2BYhV687PmnD/R8UoC1k4hcJnMsx5rI3LlPoOnKJvuTi1BXPLYop7+fugvdceSCQTFx70OaZDgrKE7Zppfx/Ja7+QE0WZcUL5k/uoMek9FmfrU5Jom7ou7LzUcA9g3ucMF3+TeS8Chkh3zmO7EJm/EPaKFfB72I9MYnWLRctav1ALvYl0PLge/efQ3+7vDYxb8BS9ODbpAw6URdBfxKaf3K3Wt+jwxm98aabSCqna+KJ9QBJhJhdNAatByZ+2HB23BaDK+bYwJ0rtdpB9WKdg4dl4YTg765ccQTPCkg8X/o2saZ7NRAGOEJPx+W/vax
+ u7/lyvpjO6UvVGx7oKLupgDZHyYpMZbQJNv2fMTeKT3u7YzODtGcXMOjBxIWKPk8IwaTGySxZtYeu9tgYdohWHNyh62PZ7vmG7578Pb2mPNiRV5CUsrTi5nw+BxT0NurKgF3gbIDXO7+02cwiDmVjrvIo1meL3vWqkIbTRwSz+jga6D3Qch9vFTHCzTojTWBaBT/BeWZJJ5qxG3dP4lWQye59uGLLYPwEbnMRsHbARY27eIeOM+qABebQ1V/uBFVjSxs+FbRmAIX2ZQp1GaST5SffHPkQVFJUNhT8Z8G33GVpKu8rIIaOTUKXMWuNdInFgYxF7/qa2EpzJPqCSL+MPlROUNGm/9as/Blq5J+50RjtN5VAJnZcucBPUcqWWrvFt9St9lEGTHKUWkZwf1wuaq0fd9HthtMJVIrZbUrbWF4D5SghOKeCUT/Wsl50Tyb0Kokg9VfRppJQzHBaiYChwP5rUr2WRfyZ4CHpEQ9b3jG8b6R1DAmVEaHTSVXCU1500vs5/m4FjgR0+8/Q5rbDQoc1XFAP9CAAr3+e3LYb8c4I/qEEFu7kvi+y5MGu+ppa4loqY0U9aHatZ9gSbaj+Qwg9nTaKrQnQUBYZS/fulePIlJv+utGTZp3ytf66LqK/YBsLeBp8TxJLWqitbu77pANWAfrfFI5O+AKPwcMlRf/UyS3f4RzQoILJD8Rqnbfzgh/RfeUJZdqxDk8jYVqD8Yp21Ybq7yKOJMfcucdj1lYnFjNe3G11p1Zk8LOXRNfHgmvhpEFI8f+CjiOzUeefA==
 x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYZPR01MB6758.apcprd01.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(786006)(366016)(38070700021)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(19092799006)(376014)(7416014)(366016)(921020)(38070700021)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
 x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?WcGVIE/gIypcu0Sd+hjRug32y4+IQELY4m8YI0AJm8sCN1Jv7eVDr7fJOY?=
- =?iso-8859-1?Q?niCfCL6wul7RvPBZYgUbNQOh0qSpD5SZvzIc66lV3KSTkVHDsbuEscB7K7?=
- =?iso-8859-1?Q?cAlXxtj1FCpsDorlLVyw+AvWZr1mkn/tyK0Cij40twV2BOc6MlBLOV2/oE?=
- =?iso-8859-1?Q?Mw3QMThk7/Db+Ummr8we7Zq11B58uk5tIOi2K1HutaXIinj+TcQ7/YcYFD?=
- =?iso-8859-1?Q?Sc9HRDj4eW8QYlreaNVVaj/N1vDlcHpvsTLciruPwGmjHnozZ+2EDjE65c?=
- =?iso-8859-1?Q?+LqavSC9JcqD3oWtdGCNt5WQ9Bl9WP7kRDpm1RQ5zf4tlVPp0VnjaRB2HR?=
- =?iso-8859-1?Q?2GwwAfs5LoyIxzFn5+edRzwjwhFqBXvoIrmzNYukSnBN5k7ydK0HOo07z+?=
- =?iso-8859-1?Q?TYnH5J5auLpwP+vHuEsvB2G1dnaBWhJ7ee+uetRUjRi7ppZex/mtxI8Mk7?=
- =?iso-8859-1?Q?r5Fr7vfGER8F0ES+WKI2erF4a6nC+0DbdpNlzywWHGQe4lfMvGM5bmY+sq?=
- =?iso-8859-1?Q?nXyd4msicOenaWmylbLcL8UDAmUn9TkrSyMh2VJwMy6Ey/G3YB/EygxP97?=
- =?iso-8859-1?Q?bTeTCq/edficejixmNGCsXy+YY2xWUeYsrP0nyhlPLCFKf8/L8Ns5291JP?=
- =?iso-8859-1?Q?v/UYlTCYdUYXMIZi0v+dwspPgmcqLxq9SozL3ufQHhWLSm/SQc8l1B4VS1?=
- =?iso-8859-1?Q?92rRS9ZpDSbD1LpE04AcUaluReaFqriZl85q9jMEpTLoYRsVqulDJpv5ye?=
- =?iso-8859-1?Q?JtrUQLsOYu/wcHwZsX4dFwLdLVAlb6ZLi+zDHd+Nan9GJuJSJ3dNZrr/iI?=
- =?iso-8859-1?Q?OTGkX5lEyEDtkX3dNZ6qX/u2+s/t4O+4n73qwUCa4WhlYfa7Kuw2SY/oBc?=
- =?iso-8859-1?Q?HhT5mk8B8iFyajISY2dz4AHY8Vw7nxZx/DGNG8Zro5r9W69CFcETvPzYjb?=
- =?iso-8859-1?Q?47UnE3fSyWbDmp9auAfGs//4pPJtD4JTyjfTOJFoC+wE5iRlZiDQUDRiVX?=
- =?iso-8859-1?Q?LmFMRRGYSMq8xP8BBXOBNb+vc5WJ5JST16gh/cDU29uplpgvdZIqGf04ac?=
- =?iso-8859-1?Q?maZ2RNpPx5RP0C54cBQ9Es4ewcxj6unPgC8QqTjgOqI+38yv6G46PNpkpz?=
- =?iso-8859-1?Q?Fxqxy7MMHNM9zDrBfJr9w4p3QYfzZVnl2KCd1sj9OHy1kGFGRWEZuKEyY1?=
- =?iso-8859-1?Q?8/jmBbPJtX4O1E0EUEJBdYg6AzKxnEAQ72fEEOv6/8LVGXguQWYZzOCgHC?=
- =?iso-8859-1?Q?i6FdKDlTt0J7L6kgP/38m8o8wfOP2dqQb1hQE92W8IFsol93HwDF6mb6bC?=
- =?iso-8859-1?Q?LpIEf1pqZI36eoGpCJEyhgkS4ydUq6LG/Y+QOPQKz4SA5QS3LC4BrJf5sj?=
- =?iso-8859-1?Q?dPjcO98KwCmqP8u+89ARzZgxbclaBhPujiy4q3ALcPGdUL3CLGtx1A2ozU?=
- =?iso-8859-1?Q?5U9mfd7De19h0w7VXYnZfCx3u8Jn/sAhwUNrnjoexNyfrDuE9WDtmx+oUB?=
- =?iso-8859-1?Q?weyXcW5+vyWaww+M+0Z/BSEpMEAxYAa1MMxBqn5UFQiZrrVDo7McmpIaEr?=
- =?iso-8859-1?Q?v5/Ffc1d5T/LnLXiK0LoScz8DgnMd1Ar50zE/9hCj+WrBwV2vYwzj4DVWo?=
- =?iso-8859-1?Q?L5biCe2pWLhNQ3/myWv3bSxKxNuvNOh8pqfelNtntU1I9B0foevQ9AHudF?=
- =?iso-8859-1?Q?j48vEd/x5zt94quMA1D+cRQqRymGaCyfYWGVHq3qLpxY4zkUoSuhw8y5Tm?=
- =?iso-8859-1?Q?ipE6idF6xFQll5PZXj9GlvFSYoowIDHDbK/MHKKlhL2Ue0GDJBuC1PwMbg?=
- =?iso-8859-1?Q?KEu15dZzwuqfQzmKR+oc5UUQ3YgMb3U=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
+ =?us-ascii?Q?2BcVrHN84Je1d3VHpXIQasW1lQB7Ix7zNcgJNggcvh5DL509adIBSdK2G0Kk?=
+ =?us-ascii?Q?Q5OhwyPG9PbqYxNqh9TOyydWct9bhaiCv9xHsYY+PJQGsaG11A4cVKFYGjiT?=
+ =?us-ascii?Q?ccQBJSdN5oW/ome5ruv02QNTp5O+3FhJlfxMRYSFQ4cQCd+pEOXf1SpuU43R?=
+ =?us-ascii?Q?13oY8lwVZozvowxQAhVPr7wo0YPA8Jjf3Nq1UCHHrx3mPaFysAdtBybTEeWo?=
+ =?us-ascii?Q?Ms92uTsp8yevyQI6r5yzAVzpxMk/FWNe9c7XzN6t8NoW1GpXPF6nM3SdsL27?=
+ =?us-ascii?Q?MqNxicrghYolnl5OVt7rrTOVnW57//2I7RHrNJf/9NZZ1WwJIpow546yeli1?=
+ =?us-ascii?Q?IJMp67Ek5O4E7iekA2zXE4cu2cTrT2+cy5t9h+hbX/Nw8vI26t+IJ8SnbYZ4?=
+ =?us-ascii?Q?v6MSrXTUanzdYh8oOex7iOj8BTRSRNBUPsgKsi0pxzavPYwC2Ynfh3/Ek6su?=
+ =?us-ascii?Q?zIoWYP3XOOOSTjsblHL79TTLDd/rYVBaPaLvJB6Az4UjSl7CpFzoyd61uNLi?=
+ =?us-ascii?Q?J27g5ZRUBhjgybZs1RHqvrX9gQ1+CX6AX/9GkkouE/pFWL99Czx2BYVF1C40?=
+ =?us-ascii?Q?4vQAg9xuQe4JT7k9r5Wd/d/wbufALijKE3lCadBPi1pJ1hqwWvHiFzpBEmV0?=
+ =?us-ascii?Q?4O19oQJqzRD0w3ZFgerW0DGpykMsjqWxCGOt1IdZYM78yknZQHk4/DMMvltH?=
+ =?us-ascii?Q?Q8efDpmAFvXGhMO0S6khMJ4fjjxtByYap/UB/Favh+xW6NlFtnQ775MnlPXH?=
+ =?us-ascii?Q?z5ND3GqOdV/TuoW2/fKjdCbemxw0tvGGEfmQvfN2Mh8LxsAV8p/BdhChsdDs?=
+ =?us-ascii?Q?eZF3YGTy5jYxqRcYLGa8+HjX57sBggKooVpomRXxjPtNaDauTJABooStvsoX?=
+ =?us-ascii?Q?JsvZnpUQiGDUbr33blt/VPzpVKZDp+9No7lkTVLmDtp3J9yImqlavopelwHY?=
+ =?us-ascii?Q?i0Ri9gRbUrdeJi+2fFMNu7OHjUNzNvuvVyDrKvXNIJaReFlsUuSS94ebZfuG?=
+ =?us-ascii?Q?FMOVTh7M8a3er0YQwIuGXsEtd9Tlzk3gafr/B17WWb5yYrxZBL3b+LxNemN4?=
+ =?us-ascii?Q?IFUdGyZW7570sGwdWrjMX6SxmjBMtqFPgGzVXpeDn9ilBaaQWy9GPjjhylZv?=
+ =?us-ascii?Q?KGcE7DSBqRKYpi01kl6mzv4Zt09V1W2wRket8FOTvc+8FGpPxKsO7qXPxhG8?=
+ =?us-ascii?Q?fa5wTinl3lB347VoP3hxblpji/O2H7SK4dQHsDjx02w/5mKjfbtiRgQ83IQ1?=
+ =?us-ascii?Q?Ws38UPe/YNaAkL2h/mLunGvR5rC5ZmWf/G31B3yAKxx04BQBZ7+lbxGMGCI4?=
+ =?us-ascii?Q?PqUS/F/zJeposBp8X3r/pG+Qcozdtukj6uqBSMU6gO3sDJRyq1UcMrIX0p+9?=
+ =?us-ascii?Q?kgHzdCITxL/Rm/N3UwHG0mAvQxJy52OAqJYnRkZxP03cJIv/LBbmdvO13NZW?=
+ =?us-ascii?Q?MYWVepvrNccy8JV/w7c9rQ3kVLkaEd1SDOh9mUY+l7CY6rs4L0jvDpPFdaev?=
+ =?us-ascii?Q?0RjsCN5v6TjEjiSUdbSS9+GpLqzl8tKS2nBQ1eA6IBAOIaUWlEdU4TUEGYxK?=
+ =?us-ascii?Q?Ldl0jbJF8Nr1B8DThiLXcuEg+89LB5Exw1v+SUe8a8RS4Gdg/qXOr2i89Z81?=
+ =?us-ascii?Q?oXLHoFPdbHdRhxxQwYl0G0bN9bv7X44KrOI4FxhljiY0hA3u1pR4Bnb5QpXJ?=
+ =?us-ascii?Q?+KRltrevMerSJCEjlovLhdYYgHLvTGc+BaFaABPtMuqB6slt?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -133,82 +142,107 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: ntu.edu.sg
+X-OriginatorOrg: nxp.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TYZPR01MB6758.apcprd01.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e8b568c7-9964-4ea6-a48d-08deab3e969d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 May 2026 07:10:43.5951
+X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1f6b8b1a-1c39-435d-5591-08deab400cba
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 May 2026 07:21:11.2707
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 15ce9348-be2a-462b-8fc0-e1765a9b204a
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ZEVnSAR433LCqFNSDTMcyEzHUvodEzeW+q/sO1wINDICeYd/2xoIEB11YgbQeWopy3Kh0vn+r3hE9brEIOpsAxOkwgGU93BOCZwICgfNetY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR01MB6107
-X-Rspamd-Queue-Id: D421A4D7099
+X-MS-Exchange-CrossTenant-userprincipalname: TQrs10N44/VdtADJW+GYogerv7N/FfVCpv9P+5EIN0J2M8x78RDjufHCYiTbmtN2gD+WDUuk76kUdbVH3s0uPA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR04MB10710
+X-Rspamd-Queue-Id: 607A74D7328
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[ntu.edu.sg,quarantine];
-	R_DKIM_ALLOW(-0.20)[ntu.edu.sg:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284727-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284728-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[ntu.edu.sg:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maoyi.xie@ntu.edu.sg,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[maoyixie.com:url,ntu.edu.sg:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[DBBPR04MB7500.eurprd04.prod.outlook.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:dkim]
 
-Hi Allison,
+> +int ntmp_bpt_update_entry(struct ntmp_user *user, u32 entry_id,
+> +			  const struct bpt_cfge_data *cfge)
+> +{
+> +	struct bpt_req_update *req;
+> +	struct netc_swcbd swcbd;
+> +	struct netc_cbdr *cbdr;
+> +	union netc_cbd cbd;
+> +	int err;
+> +
+> +	swcbd.size =3D sizeof(*req);
+> +	err =3D ntmp_alloc_data_mem(user->dev, &swcbd, (void **)&req);
+> +	if (err)
+> +		return err;
+> +
+> +	ntmp_fill_crd_eid(&req->rbe, user->tbl.bpt_ver, 0,
+> +			  NTMP_GEN_UA_CFGEU | BPT_UA_BPSEU, entry_id);
 
-Thanks for confirming the direction.
+Below is the comment from Sashiko.
 
-We will rewrite the patch as a per entry netns filter in each
-of the affected handlers, instead of the init_net gate in
-rds_info_getsockopt() that we mentioned. Concretely:
+Will setting the BPT_UA_BPSEU flag cause issues here?
 
-  rds_sock_info / rds6_sock_info: skip rds_sock_list entries
-    whose socket netns does not match the caller's netns.
-  rds_tcp_tc_info / rds6_tcp_tc_info: skip rds_tcp_tc_list
-    entries the same way.
-  rds_conn_info / rds6_conn_info and the *_message_info_*
-    variants: skip rds_conn_hash[] entries whose c_net does
-    not match the caller's netns.
+The BPT_UA_BPSEU flag instructs the hardware to update the Buffer Pool Stat=
+us
+Entry (BPSE), but the allocated request buffer (struct bpt_req_update) only
+contains the configuration data (struct bpt_cfge_data), entirely omitting t=
+he
+status data (struct bpt_bpse_data):
+drivers/net/ethernet/freescale/enetc/ntmp_private.h:
+struct bpt_req_update {
+	struct ntmp_req_by_eid rbe;
+	struct bpt_cfge_data cfge;
+};
 
-This preserves the rds-tcp behaviour where a caller outside
-init_net with legitimate connections in their own netns can
-still see them.
+Because the length passed to the hardware is only
+sizeof(struct bpt_req_update), will the hardware either reject the command
+due to a length mismatch, or read past the end of the cfge structure and
+write garbage into the hardware buffer pool's operational status fields?
 
-We will send the patch as a separate reply once it is ready
-and verified against the same PoC.
+This is a false positive, BPSEU flag indicates buffer pool state element
+update. The state information is maintained by the table's internal buffer,
+the table will clear the information if BPSEU flag is set.
 
-Thanks,
+> +	req->cfge =3D *cfge;
+> +	ntmp_fill_request_hdr(&cbd, swcbd.dma, NTMP_LEN(swcbd.size, 0),
+> +			      NTMP_BPT_ID, NTMP_CMD_UPDATE,
+> NTMP_AM_ENTRY_ID);
+> +
+> +	ntmp_select_and_lock_cbdr(user, &cbdr);
+> +	err =3D netc_xmit_ntmp_cmd(cbdr, &cbd, &swcbd);
+> +	if (err)
+> +		dev_err(user->dev,
+> +			"Failed to update %s entry 0x%x, err: %pe\n",
+> +			ntmp_table_name(NTMP_BPT_ID), entry_id, ERR_PTR(err));
+> +
+> +	ntmp_unlock_cbdr(cbdr);
+> +
+> +	return err;
+> +}
+> +EXPORT_SYMBOL_GPL(ntmp_bpt_update_entry);
 
-Maoyi Xie and Praveen Kakkolangara
-
-Maoyi Xie
-Nanyang Technological University
-https://maoyixie.com/
-________________________________
-
-CONFIDENTIALITY: This email is intended solely for the person(s) named and =
-may be confidential and/or privileged. If you are not the intended recipien=
-t, please delete it, notify us and do not copy, use, or disclose its conten=
-ts.
-Towards a sustainable earth: Print only when necessary. Thank you.
 
