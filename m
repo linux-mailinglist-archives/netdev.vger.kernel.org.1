@@ -1,238 +1,192 @@
-Return-Path: <netdev+bounces-284701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284702-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mC4BFTrF+mkzSgMAu9opvQ
-	(envelope-from <netdev+bounces-284701-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 06:36:10 +0200
+	id sI35HSLO+mnMSwMAu9opvQ
+	(envelope-from <netdev+bounces-284702-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 07:14:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31A574D622A
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 06:36:10 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AC804D6410
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 07:14:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7896B3023519
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 04:35:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3FDFE301A2F2
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 05:14:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFF093016F2;
-	Wed,  6 May 2026 04:35:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E11A2FC00D;
+	Wed,  6 May 2026 05:14:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="WaVTkfKo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hruDdlSH"
 X-Original-To: netdev@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010012.outbound.protection.outlook.com [52.101.46.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5391F2E8897
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 04:35:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778042150; cv=fail; b=dJ0nHXwTQnw5AmFGOlc5ZrBU0WHLiJTWHLYSM1R6bET4GOKerwd4clMwF9un/S/AC+aKKCwVAGjpM/nxCuZd5F/gAPLUqqaCnIJhviKRNaLFt8PSuvrxJsRuaeD9WTrExNui8951xMI8noa0rh1u+hUU6QAcRk+F3mxS73B/ugI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778042150; c=relaxed/simple;
-	bh=Gld89w0EXioHsQFx+EoQzLNqqU2OvESYIlcOMopR5YU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hfm3eD5RkRMqjlRd6dEM7JZYopVKokanjQTsYbisO8eO9ECYZQKMNjHsztRZl3irWnegMTrbl1WdRbYginxXsXzKmKBnl2v9IJvUiFMN/9dT+Vq9cGrkHp6aef1VUkULWivYDqO1a+tNXwW5UQU9kzL2GvcuwssFnAEQzstZ620=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=WaVTkfKo; arc=fail smtp.client-ip=52.101.46.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=quyreIBV2xiv8dj9kPSO5LGNriRthuzr6znX2DfEP5R1TNloMzyb5R1h77a7iK1xmwcMD8yePpp2AYtzKTvMSExOrPvPsdQ+G3DXSd1L3X0+T855cVblcBUtxYQuyUdEh7x5xzOLrY74W7uI+phmW4lmHdAIU8nb7DfDcId0Wy/nX1dpJVa2viQiv7dOV1rjCRM2oo3cC3YGW39YXeMP3Anlz10CBuJhEuXIf8Oxz4cP840yoTzZbcHWhm2XKI/ttIuuUktmcsx8Cx4pVISQSplb5LUNI+no7vbTKmNkOyPQ/lkbb4rVJMpLJrxAM6pjRDbU3/hsejhUqmDZVEnBAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wH0m5UEZeovyEyEUkv4DaRY1iiaqDDIT0/ml5aYs2Io=;
- b=xh+BgXfuIl2wifngNfJ8AsNRfVwCj6bmT97C+JYTo3NPH1hZUSI3Jh6ARZ3MgxeRhFfaF5INQwBCZVR7+2k1VCT89lscqfAvJ1hD9ocCvkR6xHa7ynkeoQ7aQl0y0KWRbdtIHhM9xePnzSMNPFxJs60qGXFaxZdK8isugffQbciMawR0oCW7X8HER/xsAeOFgQ/BCh1RRSdrSz8bXp0EMP+iFnEjcsDdhYiRGFGqF5h/mammEfRaAGNh3GZ9gP2iL04a21ZD/eEr+zjxfbWu8wKMTu8CYxfrkeiRfzzSeo8Jsi58ikBkcNXUoZthwB0ceCbRCjkebzNXCJbnt4xOPg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wH0m5UEZeovyEyEUkv4DaRY1iiaqDDIT0/ml5aYs2Io=;
- b=WaVTkfKoZIlpHLREyoAskDYqn+6IMh8ytmfOI485OEH7aBMAIxSJ8w4B+AGCOxhITmuJCkHNaV5ZO3uA8CRea0zXyKXHjM4Sw0cvH+ttwF7bvaATPVskeU5OTU7psqcBhmm5SEtTkAk+qdSQ0e3y+lAzi+NlsU6jszhfsEuhBrE=
-Received: from SJ0PR03CA0028.namprd03.prod.outlook.com (2603:10b6:a03:33a::33)
- by DS0PR12MB999103.namprd12.prod.outlook.com (2603:10b6:8:2fe::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.27; Wed, 6 May
- 2026 04:35:44 +0000
-Received: from SJ5PEPF000001C8.namprd05.prod.outlook.com
- (2603:10b6:a03:33a:cafe::e6) by SJ0PR03CA0028.outlook.office365.com
- (2603:10b6:a03:33a::33) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9870.27 via Frontend Transport; Wed,
- 6 May 2026 04:35:44 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- SJ5PEPF000001C8.mail.protection.outlook.com (10.167.242.36) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9891.9 via Frontend Transport; Wed, 6 May 2026 04:35:43 +0000
-Received: from driver-dev1.pensando.io (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 5 May
- 2026 23:35:42 -0500
-From: Eric Joyner <eric.joyner@amd.com>
-To: <netdev@vger.kernel.org>
-CC: Brett Creeley <brett.creeley@amd.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Eric Joyner <eric.joyner@amd.com>
-Subject: [PATCH net-next v2 5/5] ionic: Add .get_fec_stats ethtool handler
-Date: Tue, 5 May 2026 21:35:25 -0700
-Message-ID: <20260506043526.64301-6-eric.joyner@amd.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20260506043526.64301-1-eric.joyner@amd.com>
-References: <20260506043526.64301-1-eric.joyner@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160BC23E342
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 05:14:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778044444; cv=none; b=fh0yBXD1Zv+j+EZijTlxdJnQKegbQJB/4SqEIyTOknN0gUbGCardfp4OLM6GgWqtpZVWEeGjDD3dIKLBQIHcG6t+hQMSl4VGj17Q8B1iC3r/hzPhaX/mvUJdrxpOR6MZ38Cp5MEnEtWWuIzEKKu5krORc6UtK2TANj+//SWRXC4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778044444; c=relaxed/simple;
+	bh=3mPDjpz9UoYLq//zME7f0LLK/FYBp27tbNuZ0h5zQJs=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=pw0o35CsqKk/P2R9av0zeTxPeEe1CMM3BJemkf3FhZEL92nuj0gyd1QKWB6VaQrP7vlvBkousth8yAYUf8A/uo4SDy5rV1e79qFc94MWfOJoJaFjck1hTnsZj2CO34GPGjIgvp6Uo5bQn+R6ZVV2H5If0X4ZiGctCCa81hk09c4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hruDdlSH; arc=none smtp.client-ip=74.125.82.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-130c653cce4so3316541c88.1
+        for <netdev@vger.kernel.org>; Tue, 05 May 2026 22:14:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778044441; x=1778649241; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ne6d3NPP/xf4CWREwfa7zTxmf8SmALy0wsZD1GHfx/w=;
+        b=hruDdlSHHK/zBbWb8HtnaCSF5yAXUC3YmU7AckgiyHTkCOxCnmkn2PyrFQ9QBYivgw
+         zi1zbk6YvxPLBk6gAdW3N6L0eOAhracP+6Yn0ySETPKmeDIo1ZWq+yaiDdtEzJLisQcT
+         ijdPMpdUiyh+JtQHiQndtKZFslyd5ey9K34oy5PyKk7NwsEWTb41WHcBLjUJaVPasdGm
+         Sl6kV4z4ht4qCPrJlPtml2tXpB0fiVNZ2kYBi0IUBab2hhFIs/qE03RWR1MUTgcAPxRa
+         izgb5xzBGnz88M7ZHCIGSgYxrcnB2v8GJhv5kHBWgGzLoIVBNqrpyNKZtxCSWz5NZi/a
+         tH/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778044441; x=1778649241;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ne6d3NPP/xf4CWREwfa7zTxmf8SmALy0wsZD1GHfx/w=;
+        b=EC0/y8AfWYyYmetfBpCv1krjTF09OpJFptnZnpSvdMgTvmBfjjHXQnWzzZUj4mr+8M
+         7YFdWtch9PdzIjFDnIGw6D1DiK0iGn6qaQdUiJ7mKG4Rz2OrN8y7PtkmRa4KoKwC2qOM
+         Gne3RD1I3hapQOXxmJybVWf0IfJt6JeC86C63eYsCm4Dfbt1V1lPHfwvIqiI3cQzfSTl
+         dnGSG+UO51mRJitbs+h/HfG+gxSn4MtkdAVmAxkzh1QmbxdpgtXOHvMVDNqTizjVA105
+         exKV13jNFgEPl2EqYyBhnjf0tBonVcw6QHjHqtJntajsWosQt5R1OTFZUhbNqxCMMiWI
+         yj2w==
+X-Forwarded-Encrypted: i=1; AFNElJ8gWFF+BABboKxUdxoH8XfiaCgFfjEpjsxy67VcjA8+uzTO6GZLsjWfJDcLGpc1fZTj/36y0VI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywv69SeNxo0dQ0kvWCyvCLZqg+hkzSKeE+iFnzPMta7HFpq/BOw
+	fKeYrIPq/n+X6YdHLIx04i2E9aTug5jcQTg2Rt0O+ggFKDBTzfmeTbTH
+X-Gm-Gg: AeBDiesrdUYK+QugxNfs7vqRSw4DNvlEzZVCkJl2kJx/q5YaxeuTZuxvTsN4mk5LKi0
+	yDsCOvJqR2wvOh5drPB8MvVUs0zG4oJdMtbdtKrPbk3Nuctp0YxjPyshREGKLPhc5LBR+/UYAud
+	ZCsR6BthzwtW5bMxeJXRI3LYF2Aln/lRSTboR1vgnARRiRkRY9OfMRcUrgY8M6lH7A/gWVHb9yJ
+	/GwY+EmrN3ZLvYujyIDXxPTQGmgaMQL7VxWDy85a/bva7/cok3fEtfDMIbCY+Oob4sHLAKBhurS
+	EbCY4tQdnaypfHstPfFO7+wVGVUhup2uTAFAgGajDDb053kijPSqH4U4CJhrd2rpftdYvvd2Ei/
+	W0yKKKtrvyka5oQ7dwp/faIrcNUro+IbF4qdE6Fqt/dY2T/9V1inKQq95Ir9i1ZqV1KWD0uexJ/
+	MCL1xfwfpB+COY4EdbTrWzDIEPRin3UKScriT9ghLfkriF6CzcsxlfVRfkLliKyeqe/+OZWCSmE
+	COe6MlpZW+2Lk8rQp0jPv8=
+X-Received: by 2002:a05:7300:ec11:b0:2e5:5bf4:8869 with SMTP id 5a478bee46e88-2f54c87cd18mr1071089eec.21.1778044441041;
+        Tue, 05 May 2026 22:14:01 -0700 (PDT)
+Received: from [192.168.1.18] (177-4-161-87.user3p.v-tal.net.br. [177.4.161.87])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2f56fd8fa8csm1701041eec.21.2026.05.05.22.13.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 May 2026 22:14:00 -0700 (PDT)
+From: =?utf-8?q?C=C3=A1ssio_Gabriel?= <cassiogabrielcontato@gmail.com>
+Date: Wed, 06 May 2026 02:13:45 -0300
+Subject: [PATCH net] tipc: avoid sending zero-length stream messages
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001C8:EE_|DS0PR12MB999103:EE_
-X-MS-Office365-Filtering-Correlation-Id: de7eb102-8df8-49ba-223a-08deab28ef9f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|376014|1800799024|82310400026|22082099003|18002099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	8Jqeh6LvlAo5/Q/cGWL1ujrfMZxp9NYqTqn+TE6a7VRKKx7BAr5jSjGivwi9nnv1S3GjdtQGEPCoIdlGCgyo5gQRfHBLl8gaiQUQth76Qo64aAcPyWnVnRDXsJBd16Rp+SZMTc00a+ncSRNs6muj9L46PqLgJhlt0RFEKeKWnx+zF3Mzyjzj5cL2l9txdE92/RX/SrlDUVs9qIGFsG8RkoJzWiOuE3Ct+GBQlGehdGbcxZmKs7hVs67yqZYz8uIyGe4LnOd5zHxuhS4KufNZcbumNH2wjqntW3Exv1ODj5OCAvNpIV6j5vBMS5AI6eirFt2DDqM0AnjkM667tlIFZ5sjIFLkJrtFzYGHvUIf462vpQCXYzR6QN2x2aFRDA0Y9zA1ZClvXj5XqVTpshkudTh04a3XINApqBiH5lOYwuikmrnrtH4EkK9ZWP7D62Db+Kr+/TyWIHZxcN1Oz3WOU7pka7CDKs7XydEZOPsQ/9Wqfzislr7zl/p490W95ObZFcrRlNQ4xT+PvU6dPvLqtlu+Ha3QOtbAll8uDNhvHryD0G2PS6S6RWUcBvqY1gfWdz4TUQh0gazW/OIVRLAkhsnrOqkJ1LqVO5ssrg8cCdOOFH0re6dEW/BpJRjed+9X5RrBuOeu1MB34W4cdRa2eMS5qVZAnC1DgI2IM05ncZZVLUdT9IxDIQoPln9YZHfR1XGOQJKcSx6WunhT28G8o3f8zjGk1Os4PEy7vWgPXeg=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(376014)(1800799024)(82310400026)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	yKFLxUC/M61VJg1mYCgZcmP9NezoIGhEMXr70RpFAC/3b+oWZdCtemORRtRv89HKnz0TZ/tSD/9CaQRQ3T0KZWAE0d8+X5nHShVlNaLgkhuk1owbcyq/PYSCxG/dS1eGcxCSXBRKTUO2Jp90f1Sr2WmjFb2b1jYepVach60qsmlLSknWE6x7pAGv3P2ZFSl8ZjDzmG/+scqpHEtVzYmXFDPOhBWkF5U99KPEBFuHeHUmEAk6nCRu2IqiYdOkRSgXvMxX8eNawGS4gkdUmAlzw35PHnNGg6oRmZf8cgSnuy9zzxTO+QqRHkeYevQKZU4+fLfsIuf7Btz839wXmcTmd8oUoO6Ifc5XvupnmbxbDDquFM+NmtBQgW11Z+SXucW5mJu2NP2kjgBKdn0jUsl7Wjxx0I34xURWpjjVlIuIux97Wqc5MYLy3skNy4X+WBtI
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2026 04:35:43.9066
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: de7eb102-8df8-49ba-223a-08deab28ef9f
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001C8.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB999103
-X-Rspamd-Queue-Id: 31A574D622A
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20260506-tipc-zero-length-stream-stall-v1-1-5d75f202227b@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMwQ6CMBCE4Vche3aTUkSjr2I8lGWENbWQthoD4
+ d2tepr8c/hWSoiKROdqpYiXJp1CiXpXkYwuDGDtS5M19mBa03LWWXhBnNgjDHnklCPco4zznq0
+ 0x33dw8qpoWLMETd9//wLBWS6/s/07O6Q/JVp2z7BsX93hgAAAA==
+X-Change-ID: 20260505-tipc-zero-length-stream-stall-2c3741de2c93
+To: Jon Maloy <jmaloy@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Ying Xue <ying.xue@windriver.com>, 
+ Parthasarathy Bhuvaragan <parthasarathy.bhuvaragan@ericsson.com>
+Cc: Jon Paul Maloy <jon.maloy@ericsson.com>, netdev@vger.kernel.org, 
+ tipc-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org, 
+ syzbot+aa7d098bd6fa788fae8e@syzkaller.appspotmail.com, 
+ =?utf-8?q?C=C3=A1ssio_Gabriel?= <cassiogabrielcontato@gmail.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1829;
+ i=cassiogabrielcontato@gmail.com; h=from:subject:message-id;
+ bh=3mPDjpz9UoYLq//zME7f0LLK/FYBp27tbNuZ0h5zQJs=;
+ b=owGbwMvMwCV2IdZeKur/u2bG02pJDJm/zolsfyX8tXyhaf4/2exTZgqV4edNkotv/wkqaytYe
+ Mq/5k5JRykLgxgXg6yYIsvqpEWWe7oeXK2PW+EBM4eVCWQIAxenAEzklTQjw9RT2lZRq45cOtos
+ WXo1zHf3z9ub/y48vXSK3KWZJYs/LJzB8D8wLT1C+7bQ2qvlEgITgnesffT0hvbaBe6KbQHBYX7
+ mz7kA
+X-Developer-Key: i=cassiogabrielcontato@gmail.com; a=openpgp;
+ fpr=AB62A239BC8AE0D57F5EA848D05D3F1A5AFFEE83
+X-Rspamd-Queue-Id: 7AC804D6410
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-284702-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284701-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,amd.com:email,amd.com:dkim,amd.com:mid];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[eric.joyner@amd.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[ericsson.com,vger.kernel.org,lists.sourceforge.net,syzkaller.appspotmail.com,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cassiogabrielcontato@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev,aa7d098bd6fa788fae8e];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-Several FEC error statistics being collected can be reported in a
-dedicated ethtool callback for FEC errors, so implement the handler that
-does so. This includes 802.3ck FEC histogram data that some newer
-hardware collects.
+TIPC stream send currently enters the transmit loop even when the
+user payload length is zero. This can build and transmit a
+header-only connection message.
 
-Assisted-by: Claude:claude-4.6-sonnet
-Signed-off-by: Eric Joyner <eric.joyner@amd.com>
+For local TIPC sockets, such messages are delivered synchronously
+through the loopback receive path. When this happens while socket
+backlog processing is being flushed, reply transmission can re-enter
+TIPC receive processing repeatedly and trigger an RCU stall.
+
+Make zero-length sends on connected SOCK_STREAM TIPC sockets a no-op
+after the existing connection/congestion wait has succeeded. Leave
+implicit connection setup and SOCK_SEQPACKET behavior unchanged.
+
+Fixes: 365ad353c256 ("tipc: reduce risk of user starvation during link congestion")
+Cc: stable@vger.kernel.org
+Reported-by: syzbot+aa7d098bd6fa788fae8e@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/000000000000cedbc405ae81531f@google.com/
+Closes: https://syzkaller.appspot.com/bug?extid=aa7d098bd6fa788fae8e
+Signed-off-by: Cássio Gabriel <cassiogabrielcontato@gmail.com>
 ---
- .../ethernet/pensando/ionic/ionic_ethtool.c   | 52 +++++++++++++++++++
- 1 file changed, 52 insertions(+)
+ net/tipc/socket.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c b/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
-index af0c4cc8ad8e..b0d7b5a9d189 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
-@@ -419,6 +419,57 @@ static int ionic_get_fecparam(struct net_device *netdev,
- 	return 0;
- }
- 
-+static const struct ethtool_fec_hist_range ionic_fec_ranges[] = {
-+	{ 0, 0},
-+	{ 1, 1},
-+	{ 2, 2},
-+	{ 3, 3},
-+	{ 4, 4},
-+	{ 5, 5},
-+	{ 6, 6},
-+	{ 7, 7},
-+	{ 8, 8},
-+	{ 9, 9},
-+	{ 10, 10},
-+	{ 11, 11},
-+	{ 12, 12},
-+	{ 13, 13},
-+	{ 14, 14},
-+	{ 15, 15},
-+	{ 0, 0},
-+};
-+
-+static void
-+ionic_fill_fec_hist(const struct ionic_port_extra_stats *extra_stats,
-+		    struct ethtool_fec_hist *hist)
-+{
-+	int i;
-+
-+	hist->ranges = ionic_fec_ranges;
-+	for (i = 0; i < ETHTOOL_FEC_HIST_MAX - 1; i++)
-+		hist->values[i].sum =
-+			le64_to_cpu(extra_stats->fec_codeword_error_bin[i]);
-+}
-+
-+static void ionic_get_fec_stats(struct net_device *netdev,
-+				struct ethtool_fec_stats *fec_stats,
-+				struct ethtool_fec_hist *hist)
-+{
-+	struct ionic_port_extra_stats *extra_stats;
-+	struct ionic_lif *lif = netdev_priv(netdev);
-+
-+	extra_stats = &lif->ionic->idev.port_info->extra_stats;
-+
-+	fec_stats->corrected_blocks.total =
-+		le64_to_cpu(extra_stats->rsfec_correctable_blocks);
-+	fec_stats->uncorrectable_blocks.total =
-+		le64_to_cpu(extra_stats->rsfec_uncorrectable_blocks);
-+	fec_stats->corrected_bits.total =
-+		le64_to_cpu(extra_stats->fec_corrected_bits_total);
-+
-+	ionic_fill_fec_hist(extra_stats, hist);
-+}
-+
- static int ionic_set_fecparam(struct net_device *netdev,
- 			      struct ethtool_fecparam *fec)
- {
-@@ -1155,6 +1206,7 @@ static const struct ethtool_ops ionic_ethtool_ops = {
- 	.get_module_eeprom_by_page	= ionic_get_module_eeprom_by_page,
- 	.get_pauseparam		= ionic_get_pauseparam,
- 	.set_pauseparam		= ionic_set_pauseparam,
-+	.get_fec_stats		= ionic_get_fec_stats,
- 	.get_fecparam		= ionic_get_fecparam,
- 	.set_fecparam		= ionic_set_fecparam,
- 	.get_ts_info		= ionic_get_ts_info,
--- 
-2.17.1
+diff --git a/net/tipc/socket.c b/net/tipc/socket.c
+index 9329919fb07f..3c7838713d74 100644
+--- a/net/tipc/socket.c
++++ b/net/tipc/socket.c
+@@ -1585,6 +1585,8 @@ static int __tipc_sendstream(struct socket *sock, struct msghdr *m, size_t dlen)
+ 					 tipc_sk_connected(sk)));
+ 		if (unlikely(rc))
+ 			break;
++		if (unlikely(!dlen && sk->sk_type == SOCK_STREAM))
++			break;
+ 		send = min_t(size_t, dlen - sent, TIPC_MAX_USER_MSG_SIZE);
+ 		blocks = tsk->snd_backlog;
+ 		if (tsk->oneway++ >= tsk->nagle_start && maxnagle &&
+
+---
+base-commit: 95084f1883a760e0d4290698346759d58e2b944a
+change-id: 20260505-tipc-zero-length-stream-stall-2c3741de2c93
+
+Best regards,
+--  
+Cássio Gabriel <cassiogabrielcontato@gmail.com>
 
 
