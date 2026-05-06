@@ -1,376 +1,218 @@
-Return-Path: <netdev+bounces-284783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284784-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id hjmDOY0X+2l3WgMAu9opvQ
-	(envelope-from <netdev+bounces-284783-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 12:27:25 +0200
+	id 4KvoA4sa+2mtWgMAu9opvQ
+	(envelope-from <netdev+bounces-284784-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 12:40:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EFF04D94E8
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 12:27:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3054F4D9665
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 12:40:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 038F4300E707
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 10:27:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4BA8D305B45A
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 10:37:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 716873F54C0;
-	Wed,  6 May 2026 10:27:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80C303E9F9E;
+	Wed,  6 May 2026 10:37:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Q+TKpOTs"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="TWdksrvX";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="NpRM3IwW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E25E3F2115;
-	Wed,  6 May 2026 10:27:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA573E928E
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 10:37:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778063243; cv=none; b=fMOb9GWopFAgo7rh6Iy9rUuk22oaw19Q20AxeLBsSY8qVAhwRn5gRiu+KWra3q+k+4b7uD8uBdkkYGxf6hzumRTKC7fSBzxtu5Xif/EzeWyT470xB+/SGyb5F9hcHMhpjS3MTznBNg/Cg/H/AwVQdNJCAkvNUbipf76EyHEzKdM=
+	t=1778063863; cv=none; b=UrLJT8i9HvyXIP2m0wrIKGiqDfXViSSmhZ72dhX0a8ApKiZrScSDNB0fjrwozehWTdgTn6VxnvsR3SedpiRO2k0K3KFj05zJfAHfjz3i2mlF/eyJ6le+ZDuKHk7uDp0m2FduZCdan73flXAXtEBE4g89P4BS7iy80UDnKpLP8Hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778063243; c=relaxed/simple;
-	bh=5uroEs9phCoYBtDMntP9oW+5QHXkldm00TKOjwuiSGQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n9ulDN2dT22onMAE0eAQxX3WhSA1uW40WlK4X6c3fjZjfnxt0pcfX1TIwb0eXS/N4RcTqiA96wlHAkWiUuLmemKUO9iBh3/dn8Wsm5kpu985GXUM1Kb+Wp9HpFlRxujZeNQY3tpzur6Ckx14Xjry8aLRGHPK+KM43EA9bECrtds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Q+TKpOTs; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 8E3F91A3542;
-	Wed,  6 May 2026 10:27:18 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 4FE076053C;
-	Wed,  6 May 2026 10:27:18 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7C7CA102F248F;
-	Wed,  6 May 2026 12:27:12 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1778063237; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=hZlsHugSqqYOr+1oMZj7vNSBKyOY249Wjj8osuKy56w=;
-	b=Q+TKpOTsvphmvT1MAoxsIjZVlD31vswUGAoSdOJv2QxtygooCK752jCpR8AA2NiGWG9J56
-	/MIihqOIQ2MRvssGRUwGuTVfwluU726wgvouFFqzOH+kRgegpEncwMqMmm4o4omhzkPjAP
-	wvsE3cB49VzLWqK1BtxS9y5z6fLTidrwii21G5FZVZGDiyNEQ2w3rIZYwI2Q+fxR34CGjX
-	y66suPsc160/eV26VpKMoPPG2ibyJaJjEXJ8fUaerjfmJndz1Xd9A4xhqcNoqW8heaK+uJ
-	VNxBrCPlh6ylsbk0vNgHK9VqnPqklOLU4AulpZTbmR+rPjE1V4fo6mgL7Z/wNw==
-Message-ID: <3415b009-69e5-40e2-bd3e-5a05cb7a1442@bootlin.com>
-Date: Wed, 6 May 2026 12:27:11 +0200
+	s=arc-20240116; t=1778063863; c=relaxed/simple;
+	bh=biJ3LHoFgrAWOZjyZVAaLvaFFUj3TGFGsDB+WdUA54E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oB/xWACm9aQxT2TeY6uOGABuxDgv9qj8pWfZNT/1FETLGa9zYgdHa8yTgnlSVaOkTY5Hj98Jf6Kf3lw8rvlf4+PZI4kSKvdoltbNM24cWksZsr5gM5x7eBCitLnHXheYUjZh52J3KPu5ivIoJI8GtUszZF3jTOTXGT15dgZ8Cyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=TWdksrvX; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=NpRM3IwW; arc=none smtp.client-ip=103.168.172.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfout.phl.internal (Postfix) with ESMTP id 01AB6EC0093;
+	Wed,  6 May 2026 06:37:38 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Wed, 06 May 2026 06:37:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1778063857; x=
+	1778150257; bh=frVuoQFLdboaKoDRBOxAsVGzqw0B/EOSMqbitjEfcnI=; b=T
+	WdksrvX0z2sbcN61De3kmejcak/RrgozRk1zhc17wUk+CGih9At5stqi5mj0p8D6
+	ae2z/OkPD8hkRFs/F+tXLidBb393VoO0TYTm30fuXsUwge9E9YzL/R/CfP21KZ2a
+	GjESPnWoK10NFTRM8ignXTyRsEL6bFGzosB8Mm9B5NMeuQwEVh/M/ZG+UFisHmmM
+	pjr4jnrZA3MeTc9OeZmkKbM7T6C45h7Nw+JcE4dXfxkWtVD/gSeX8nhyXZFLt14z
+	J23SQpAMmPqCSfADb3tgyyM66eG/P6DMLVdmct6HWHkAyOaA5ycmN79eRu5ufsK/
+	ur0mOhDIeLqkRy6Y3q6ZQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1778063857; x=1778150257; bh=frVuoQFLdboaKoDRBOxAsVGzqw0B/EOSMqb
+	itjEfcnI=; b=NpRM3IwWFvXArb4NQR24cCuMkmffY96mYSxmlQ5R+T4Zss/uy9Y
+	5oPes9d/9mrg4OHPx6050rnfkSYzujX6k8KQSorZAPWA0eq2+mJWv/sAng0vgtvn
+	2lGX0Be3xzdlq+OnaIieNlKxPKXL4DX/v9Of30gU7ZgdT+QhyGTamhEgtkJ8eBXZ
+	E/elgc472IpHPZGDNFTYLWpiELma7FYE7beoZVwNOWuFjWoLezJzQXZdKsmLM6Jd
+	cNuuNMCOxC5MmBNzdLL5+QckqyIpuvotj1a7Dk//SYlasvu2QNaPKNZcGGRkEF98
+	HEFNnHTeZC7n7xk7IHhiL4D2FmDJHyq7iRg==
+X-ME-Sender: <xms:8Rn7acKdDfdgmB4AGhtfAdWPbS7j0J7vMKHr-WgyNnhhdDa-1R9VXA>
+    <xme:8Rn7aX_ikdTY6JNs5bEUJsJfwMjU1gM9m13TsGUGxTjWW0hg0YF-BkK4FVwzMNwc_
+    45YNjkrlc2pOlnl03z2txUG41gNKiblWAgU8IdXhQth20BAzuH2K9c>
+X-ME-Received: <xmr:8Rn7aYHDAEt-_8-_oH3YH_EwIl8JiFPmgJrYM46HeHtv9II-fsBAzo8k3UoR>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddutdegfeejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduvddpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+    dprhgtphhtthhopehrjhgvthhhfigrnhhisehpuhhrvghsthhorhgrghgvrdgtohhmpdhr
+    tghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
+    epshgrvggvughmsehnvhhiughirgdrtghomhdprhgtphhtthhopehtrghrihhqthesnhhv
+    ihguihgrrdgtohhmpdhrtghpthhtohepmhgslhhotghhsehnvhhiughirgdrtghomhdprh
+    gtphhtthhopegsohhrihhsphesnhhvihguihgrrdgtohhmpdhrtghpthhtohepjhhohhhn
+    rdhfrghsthgrsggvnhgusehgmhgrihhlrdgtohhmpdhrtghpthhtohepkhhusggrsehkvg
+    hrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:8Rn7aS5hk-rdl_PE50ueaFE3bQrV9LClAURWUEdfgoMwRQgS_2HKww>
+    <xmx:8Rn7aRZLAgsOOaajVjFs6C-hWum8zMv9WU3QDTJnXEv6GIf2lMDaxw>
+    <xmx:8Rn7aQiOtjbvMBqDLPts5Oh08V_AVzTKBkFY23sDsh9alOcNY0N9jA>
+    <xmx:8Rn7aTe3Tvhaugn61I7pJoolnuvsCdi-cyOCSeZRCJm294gX_5_XbQ>
+    <xmx:8Rn7aR8Zcc_zHNSMJuNX0N28k1beMmVH3FtGYb7n8QKPn2hCDwYNcB7o>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 6 May 2026 06:37:37 -0400 (EDT)
+Date: Wed, 6 May 2026 12:37:35 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Rishikesh Jethwani <rjethwani@purestorage.com>, netdev@vger.kernel.org,
+	saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com,
+	borisp@nvidia.com, john.fastabend@gmail.com, kuba@kernel.org,
+	davem@davemloft.net, edumazet@google.com, leon@kernel.org
+Subject: Re: [PATCH v13 5/6] tls: add hardware offload key update support
+Message-ID: <afsZ74sn1DUHxM18@krikkit>
+References: <20260429181016.3164935-1-rjethwani@purestorage.com>
+ <20260429181016.3164935-6-rjethwani@purestorage.com>
+ <64d71f18-f86b-4fd7-a6bd-02243eed0492@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 2/2] net: sfp: extend SMBus support
-To: Jonas Jelonek <jelonek.jonas@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
-References: <20260505200647.1125311-1-jelonek.jonas@gmail.com>
- <20260505200647.1125311-3-jelonek.jonas@gmail.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20260505200647.1125311-3-jelonek.jonas@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: 4EFF04D94E8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <64d71f18-f86b-4fd7-a6bd-02243eed0492@redhat.com>
+X-Rspamd-Queue-Id: 3054F4D9665
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284783-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,armlinux.org.uk,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	TAGGED_FROM(0.00)[bounces-284784-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[purestorage.com,vger.kernel.org,nvidia.com,gmail.com,kernel.org,davemloft.net,google.com];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:dkim,bootlin.com:mid]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Hi Jonas,
-
-On 05/05/2026 22:06, Jonas Jelonek wrote:
-> Commit 7662abf4db94 ("net: phy: sfp: Add support for SMBus module access")
-> added SMBus access for SFP modules, but limited it to single-byte
-> transfers. As a side effect, hwmon is disabled (16-bit reads cannot be
-> guaranteed atomic) and a warning is printed.
+2026-05-05, 10:40:41 +0200, Paolo Abeni wrote:
+> On 4/29/26 8:10 PM, Rishikesh Jethwani wrote:
+> > On TX, the NIC key cannot be replaced while HW-offloaded records
+> > are still unacked. tls_dev_start_rekey() installs a temporary SW
+> > context with the new key and redirects sendmsg through
+> > tls_sw_sendmsg_locked. If no records are pending,
+> > tls_dev_complete_rekey() runs inline during setsockopt; otherwise
+> > clean_acked sets REKEY_READY once all old-key records are ACKed
+> > and the next sendmsg completes the rekey, flushing SW records and
+> > reinstalling HW offload at the current write_seq. A KeyUpdate
+> > arriving while one is pending re-keys the SW AEAD in place; if the
+> > HW reinstall fails the socket stays in SW mode (REKEY_FAILED).
+> > 
+> > On RX, the NIC may have already decrypted in-flight records with
+> > the old key before the peer's KeyUpdate is parsed, so the old
+> > AEAD, IV and rec_seq are retained on tls_offload_context_rx.
+> > tls_check_pending_rekey() invokes tls_device_rx_del_key() to drop
+> > the NIC key; otherwise post-KeyUpdate records (carrying new-key
+> > wire encryption) would be XOR'd with the retired key.
+> > tls_device_decrypted() classifies records by old_nic_boundary:
+> > 
+> >   - after the boundary: new-key record; drop the old key.
+> >   - before, fully encrypted: advance old_rec_seq, let SW AEAD decrypt.
+> >   - before, (partially) decrypted: reencrypt with the old key so SW
+> >     AEAD can decrypt with the new key.
+> > 
+> > For mixed records skb->decrypted flags can be wrong (NIC clears
+> > them on auth failure); on -EBADMSG, tls_rx_rekey_retry() toggles
+> > those flags, decrements old_rec_seq to reuse the nonce, and
+> > retries once (gated by old_key_reencrypted).
+> > 
+> > The new key's tls_dev_add is deferred until the old key is fully
+> > consumed: tls_set_device_offload_rx() sets dev_add_pending while
+> > old_aead_recv is retained, and tls_device_deferred_dev_add()
+> > installs the new key once copied_seq crosses old_nic_boundary.
+> > 
+> > Tested on Mellanox ConnectX-6 Dx (Crypto Enabled) with multiple
+> > TLS 1.3 TX and RX KeyUpdate cycles.
+> > 
+> > Signed-off-by: Rishikesh Jethwani <rjethwani@purestorage.com>
+> > ---
+> >  include/net/tls.h             |  84 +++-
+> >  include/uapi/linux/snmp.h     |   2 +
+> >  net/tls/tls.h                 |  29 +-
+> >  net/tls/tls_device.c          | 753 +++++++++++++++++++++++++++++++---
+> >  net/tls/tls_device_fallback.c |  24 ++
+> >  net/tls/tls_main.c            |  92 +++--
+> >  net/tls/tls_proc.c            |   2 +
+> >  net/tls/tls_sw.c              |  76 +++-
+> >  net/tls/trace.h               |  79 ++++
 > 
-> Many SMBus-only I2C controllers in the wild support more than just
-> byte access, and SFP cages are often wired to such controllers
-> rather than to a full-featured I2C controller -- e.g. the SMBus
-> controllers in the Realtek longan and mango SoCs, which advertise
-> word access and I2C block reads. Today, they cannot drive an SFP at
-> all without falling back to the byte-only path.
+> This patch is really big and complex and you should break it to help
+> reviewers.
 > 
-> Extend sfp_smbus_read()/sfp_smbus_write() so that, in addition to
-> the existing byte access, they also use SMBus word access and SMBus
-> I2C block access whenever the adapter advertises them. Both
-> directions are handled in a single read and a single write helper
-> that pick the largest supported transfer per chunk and fall back as
-> needed.
-> 
-> I2C-block is preferred unconditionally when available: the protocol
-> carries any length 1..32, so it can serve every chunk -- including
-> the 1- and 2-byte tails -- without help from word or byte access.
-> Note that this requires I2C_FUNC_SMBUS_I2C_BLOCK, which reads a
-> caller-specified number of bytes. This deviates from the official
-> SMBus Block Read (length is supplied by the slave) but is widely
-> supported by Linux I2C controllers/drivers.
-> 
-> Capability matrix this implementation supports:
-> 
->   - BYTE only:                  works (unchanged behaviour); 1-byte
->                                 xfers, hwmon disabled.
->   - BYTE + WORD:                word for >=2-byte chunks, byte for
->                                 trailing odd byte.
->   - I2C_BLOCK present (with or
->     without BYTE/WORD):         block as the universal transport for
->                                 every chunk.
->   - WORD only (no BYTE/BLOCK):  accepted with WARN_ONCE. Even-length
->                                 transfers work; odd-length transfers
->                                 (e.g. the 3-byte cotsworks fixup
->                                 write) hit the BYTE branch which the
->                                 adapter does not implement, so the
->                                 xfer returns an error and the
->                                 operation is aborted. No mainline
->                                 I2C driver was found to advertise
->                                 WORD without BYTE; the warning lets
->                                 us learn about it if it ever shows
->                                 up.
-> 
-> Adapters with asymmetric R/W capabilities (e.g. only READ_I2C_BLOCK
-> but not WRITE_I2C_BLOCK) remain functionally correct -- the
-> per-iteration fallback uses the direction-specific bits -- but the
-> shared i2c_max_block_size is sized by the all-bits-set check, so a
-> transfer in the better-supported direction is not upgraded. None of
-> the mainline I2C bus drivers surveyed during review advertise such
-> asymmetry; promoting i2c_max_block_size to per-direction sizes can
-> be revisited if needed.
-> 
-> Signed-off-by: Jonas Jelonek <jelonek.jonas@gmail.com>
+> At very least you can split out the tracing bits and the trivial
+> refactor moving around declaration and definitions to separate patches.
 
-This looks great, I've given this some testing and so far it works well :) I do have some comment though :
+True, that would make review of the refactorings easier, and then the
+changes for rekey would be more obvious.
 
-> ---
->  drivers/net/phy/sfp.c | 134 +++++++++++++++++++++++++++++++++---------
->  1 file changed, 107 insertions(+), 27 deletions(-)
-> 
-> diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-> index e58e29a1e8d2..8ad650cbe862 100644
-> --- a/drivers/net/phy/sfp.c
-> +++ b/drivers/net/phy/sfp.c
-> @@ -14,6 +14,7 @@
->  #include <linux/platform_device.h>
->  #include <linux/rtnetlink.h>
->  #include <linux/slab.h>
-> +#include <linux/unaligned.h>
->  #include <linux/workqueue.h>
->  
->  #include "sfp.h"
-> @@ -756,50 +757,110 @@ static int sfp_i2c_write(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
->  	return ret == ARRAY_SIZE(msgs) ? len : 0;
->  }
->  
-> -static int sfp_smbus_byte_read(struct sfp *sfp, bool a2, u8 dev_addr,
-> -			       void *buf, size_t len)
-> +static int sfp_smbus_read(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
-> +			  size_t len)
->  {
->  	union i2c_smbus_data smbus_data;
->  	u8 bus_addr = a2 ? 0x51 : 0x50;
-> +	size_t this_len, transferred;
-> +	u32 functionality;
->  	u8 *data = buf;
->  	int ret;
->  
-> -	while (len) {
-> -		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> -				     I2C_SMBUS_READ, dev_addr,
-> -				     I2C_SMBUS_BYTE_DATA, &smbus_data);
-> -		if (ret < 0)
-> -			return ret;
-> +	functionality = i2c_get_functionality(sfp->i2c);
->  
-> -		*data = smbus_data.byte;
-> +	while (len) {
-> +		this_len = min(len, sfp->i2c_max_block_size);
+Things like tls_sw_ctx_tx_init, adding/using tls_tx_cipher_ctx and
+others helpers, function renames, splitting of
+tls_set_device_offload*, maybe others.
 
-You should be using sfp->i2c_block_size here and not i2c_max_block_size
-to account for the modules that require a specific access size.
+Based on this, I won't review the whole rekey code this time around (I
+think it will be much easier to follow the logic after the split), but
+I have some comments that I'll send out today.
 
-> +
-> +		if (functionality & I2C_FUNC_SMBUS_READ_I2C_BLOCK) {
-> +			smbus_data.block[0] = this_len;
-> +			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> +					     I2C_SMBUS_READ, dev_addr,
-> +					     I2C_SMBUS_I2C_BLOCK_DATA, &smbus_data);
-> +			if (ret < 0)
-> +				return ret;
-> +
-> +			memcpy(data, &smbus_data.block[1], this_len);
-> +			transferred = this_len;
-> +		} else if (this_len >= 2 &&
-> +			   (functionality & I2C_FUNC_SMBUS_READ_WORD_DATA)) {
-> +			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> +					     I2C_SMBUS_READ, dev_addr,
-> +					     I2C_SMBUS_WORD_DATA, &smbus_data);
-> +			if (ret < 0)
-> +				return ret;
-> +
-> +			put_unaligned_le16(smbus_data.word, data);
-> +			transferred = 2;
-> +		} else {
-> +			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> +					     I2C_SMBUS_READ, dev_addr,
-> +					     I2C_SMBUS_BYTE_DATA, &smbus_data);
-> +			if (ret < 0)
-> +				return ret;
-> +
-> +			*data = smbus_data.byte;
-> +			transferred = 1;
-> +		}
->  
-> -		len--;
-> -		data++;
-> -		dev_addr++;
-> +		data += transferred;
-> +		len -= transferred;
-> +		dev_addr += transferred;
->  	}
->  
->  	return data - (u8 *)buf;
->  }
->  
-> -static int sfp_smbus_byte_write(struct sfp *sfp, bool a2, u8 dev_addr,
-> -				void *buf, size_t len)
-> +static int sfp_smbus_write(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
-> +			   size_t len)
->  {
->  	union i2c_smbus_data smbus_data;
->  	u8 bus_addr = a2 ? 0x51 : 0x50;
-> +	size_t this_len, transferred;
-> +	u32 functionality;
->  	u8 *data = buf;
->  	int ret;
->  
-> +	functionality = i2c_get_functionality(sfp->i2c);
-> +
->  	while (len) {
-> -		smbus_data.byte = *data;
-> -		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> -				     I2C_SMBUS_WRITE, dev_addr,
-> -				     I2C_SMBUS_BYTE_DATA, &smbus_data);
-> -		if (ret)
-> -			return ret;
-> +		this_len = min(len, sfp->i2c_max_block_size);
-> +
-> +		if (functionality & I2C_FUNC_SMBUS_WRITE_I2C_BLOCK) {
-> +			smbus_data.block[0] = this_len;
-> +			memcpy(&smbus_data.block[1], data, this_len);
-> +
-> +			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> +					     I2C_SMBUS_WRITE, dev_addr,
-> +					     I2C_SMBUS_I2C_BLOCK_DATA, &smbus_data);
-> +			if (ret < 0)
-> +				return ret;
-> +
-> +			transferred = this_len;
-> +		} else if (this_len >= 2 &&
-> +			   (functionality & I2C_FUNC_SMBUS_WRITE_WORD_DATA)) {
-> +			smbus_data.word = get_unaligned_le16(data);
-> +			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> +					     I2C_SMBUS_WRITE, dev_addr,
-> +					     I2C_SMBUS_WORD_DATA, &smbus_data);
-> +			if (ret < 0)
-> +				return ret;
-> +
-> +			transferred = 2;
-> +		} else {
-> +			smbus_data.byte = *data;
-> +			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> +					     I2C_SMBUS_WRITE, dev_addr,
-> +					     I2C_SMBUS_BYTE_DATA, &smbus_data);
-> +			if (ret < 0)
-> +				return ret;
-> +
-> +			transferred = 1;
-> +		}
->  
-> -		len--;
-> -		data++;
-> -		dev_addr++;
-> +		data += transferred;
-> +		len -= transferred;
-> +		dev_addr += transferred;
->  	}
->  
->  	return data - (u8 *)buf;
-> @@ -815,10 +876,29 @@ static int sfp_i2c_configure(struct sfp *sfp, struct i2c_adapter *i2c)
->  		sfp->read = sfp_i2c_read;
->  		sfp->write = sfp_i2c_write;
->  		max_block_size = SFP_EEPROM_BLOCK_SIZE;
-> -	} else if (i2c_check_functionality(i2c, I2C_FUNC_SMBUS_BYTE_DATA)) {
-> -		sfp->read = sfp_smbus_byte_read;
-> -		sfp->write = sfp_smbus_byte_write;
-> -		max_block_size = 1;
-> +	} else if (i2c_check_functionality(i2c, I2C_FUNC_SMBUS_BYTE_DATA) ||
-> +		   i2c_check_functionality(i2c, I2C_FUNC_SMBUS_I2C_BLOCK)) {
-> +		/* I2C-block carries any length 1..32, byte serves the
-> +		 * 1-byte tail when block is absent: either alone is a
-> +		 * complete transport.
-> +		 */
-> +		sfp->read = sfp_smbus_read;
-> +		sfp->write = sfp_smbus_write;
-> +
-> +		if (i2c_check_functionality(i2c, I2C_FUNC_SMBUS_I2C_BLOCK))
-> +			max_block_size = SFP_EEPROM_BLOCK_SIZE;
-> +		else if (i2c_check_functionality(i2c, I2C_FUNC_SMBUS_WORD_DATA))
-> +			max_block_size = 2;
-> +		else
-> +			max_block_size = 1;
-> +	} else if (i2c_check_functionality(i2c, I2C_FUNC_SMBUS_WORD_DATA)) {
-> +		/* Word-only: even-length xfers work; odd-length xfers
-> +		 * will error out at i2c_smbus_xfer().
-> +		 */
-> +		WARN_ONCE(1, "sfp: SMBus word-only adapter; odd-length transfers will fail\n");
-
-I think this WARN_ONCE can be moved directly into the
-"else if ()" check
-
-
-> +		sfp->read = sfp_smbus_read;
-> +		sfp->write = sfp_smbus_write;
-> +		max_block_size = 2;
->  	} else {
->  		sfp->i2c = NULL;
->  		return -EINVAL;
-
-The rest looks good to me :)
-
-Thanks !
-
-Maxime
+-- 
+Sabrina
 
