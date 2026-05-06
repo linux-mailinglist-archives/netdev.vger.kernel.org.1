@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-284669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284670-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OCMsGZSl+mm7QwMAu9opvQ
-	(envelope-from <netdev+bounces-284669-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 04:21:08 +0200
+	id QNfOHrml+mm7QwMAu9opvQ
+	(envelope-from <netdev+bounces-284670-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 04:21:45 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3B164D59E7
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 04:21:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9FAC4D59F6
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 04:21:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 38E5D3021731
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 02:21:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A6CDE3037DE2
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 02:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B14D024A076;
-	Wed,  6 May 2026 02:21:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7DE12C21F4;
+	Wed,  6 May 2026 02:21:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="db/en0jk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MtUyASib"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE6B3D544;
-	Wed,  6 May 2026 02:21:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F9F2C11E7;
+	Wed,  6 May 2026 02:21:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778034063; cv=none; b=mb70ylOfzHLqsN+KrBwWT9iDY2aBdDWA4IWmTF9vvAORoAUGCJw/Sj7nquiOrGC39B4xy6UcDAHKrTocFmytiISFe6L2xRY3vJeGzd4oxf7TvncDIk7Dc5jouVsIEkjN+fZWgg588TUEcduJR6kbpU8hJPgSwxqVQ/4S5/Ey6Oc=
+	t=1778034064; cv=none; b=XoBlsXm8pHAowoq4YsCq1hfce3t7wIeWotKF5aVFV/0DymA5jllRXoKOGG6FDaDM1SQ4ShWBZI7U0/LsFQlYwoAOXSGDeNlYn4tihfTyRilX3Gw5AyX3d0qMay4NhAlixo0rkxIJ2S2QTBzks3qCLRpvVNzgfFk0cieYExnf3DE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778034063; c=relaxed/simple;
-	bh=c0k6ikNWaJJQXZADZuc6qsuJuBiSPfQ2PnBNVo+U2/M=;
+	s=arc-20240116; t=1778034064; c=relaxed/simple;
+	bh=uak8MiPsNhbw8749asyyjd79ZMTu9zFU8nIh0UuRbXw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=U/uXdizmcAEyAHsrbdRDuRqOHCUDT0bnRtQ87jjxETwQnCslMOhjq8WbhdQ5GO2hmv2SjFyKtZWa0FRVLKQSznPBUPNdHBYyPANZAjOY4JaqeiWJTE4HAd+ltqKPPyV+SmHdjb5E/S5os+4Rctb0sALE79DLO4vTYgYmIkpyT/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=db/en0jk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29DD4C2BCB4;
-	Wed,  6 May 2026 02:21:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=G5dk2Ocv48KV9OsqoG02pSrU8Mp1lsqhaeu816xpR3RCV9kHgvTWXhDbIpAZPp1k7j3AxXAGu1X+8LsQGS5F0nfV+jHmdIolC6kL0yeGBojeHoihlTUfvfEhAuO85eoO8rL4zZXBEe8IJQvh0nbS+2N3kXw3RH/99M2tx9QC+nI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MtUyASib; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B758C2BCB4;
+	Wed,  6 May 2026 02:21:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778034063;
-	bh=c0k6ikNWaJJQXZADZuc6qsuJuBiSPfQ2PnBNVo+U2/M=;
+	s=k20201202; t=1778034064;
+	bh=uak8MiPsNhbw8749asyyjd79ZMTu9zFU8nIh0UuRbXw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=db/en0jkAXb0n2sQE1cmE0Si9r2El5d4PX+P+/zN9clUr5FTN3OsYgKO+jdztTrLU
-	 yN8S+XjBSqqBURIcarMEv8ygL115hRr/2aPGhDuNKVAmYJkSDdVvxgLJ0DBb8b7/TQ
-	 abCb5ZjdDtrP4TaBlWxZ7ROKues1fvb6vttjSoGGvP5YBu7t0sWqTPbyc9dQbwNYEF
-	 Z0ds/BRYbabMchNGo2HbdQGPLbKjD05wersApO9WShRdT3GXSvkjuUTrKGYCMNGl34
-	 89TFsHPE9sAZV5iJ4+JYCobKmIQl1iC6PkqKVwDUl1ONThmfwXrfLXrMu5cKWth5nX
-	 ivLeun0vZWx8g==
+	b=MtUyASibegxpQ2Zxb9Mv4RYEdyofyLW47pS9EuqSSRJct5qV1+WSbEUSpzDeq/Vuk
+	 BbIDGMX5xgzrjt5d/8SIO3KNDXwTPdHiW5kClU1F7GzfV97xMe6sfQpShx+c+W/iyf
+	 5HEd90MDvyqkisyTEBysWwFusoAaGVpZy6DxB/PIwfmJPY0dsK4+opFzN8yWq3Egzb
+	 Zsj9KVvmEgB9oWv3JKNgsQj5dinXBteacWVMTuB+z6Q0Jyt9a32jseckfaVVvl2sI6
+	 dmENIs2tKHHA7E3ZKn1gBS8to2tj3IONDUI4+Dza5Onx7D+5/GNg+J2jKnmB5AGV+T
+	 jX/oLGXw/RNKA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CD443930780;
-	Wed,  6 May 2026 02:20:14 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9DF23930780;
+	Wed,  6 May 2026 02:20:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,26 +55,22 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net V3 0/3] net/mlx5e: PSP fixes
+Subject: Re: [PATCH v6] net: wwan: t7xx: validate port_count against message
+ length in t7xx_port_enum_msg_handler
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177803401330.2352352.15778480397241073113.git-patchwork-notify@kernel.org>
-Date: Wed, 06 May 2026 02:20:13 +0000
-References: <20260504181100.269334-1-tariqt@nvidia.com>
-In-Reply-To: <20260504181100.269334-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, borisp@nvidia.com,
- saeedm@nvidia.com, leon@kernel.org, mbloch@nvidia.com,
- daniel.zahka@gmail.com, willemdebruijn.kernel@gmail.com, cratiu@nvidia.com,
- raeds@nvidia.com, rrameshbabu@nvidia.com, dtatulea@nvidia.com,
- kees@kernel.org, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, gal@nvidia.com
-X-Rspamd-Queue-Id: C3B164D59E7
+ <177803401454.2352352.1722198141421516263.git-patchwork-notify@kernel.org>
+Date: Wed, 06 May 2026 02:20:14 +0000
+References: <20260501110713.145563-1-jhapavitra98@gmail.com>
+In-Reply-To: <20260501110713.145563-1-jhapavitra98@gmail.com>
+To: Pavitra Jha <jhapavitra98@gmail.com>
+Cc: w@1wt.eu, pabeni@redhat.com, horms@kernel.org,
+ chandrashekar.devegowda@intel.com, linux-wwan@lists.linux.dev,
+ netdev@vger.kernel.org, stable@vger.kernel.org
+X-Rspamd-Queue-Id: C9FAC4D59F6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
@@ -82,49 +78,46 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284669-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,lunn.ch,davemloft.net,nvidia.com,gmail.com,vger.kernel.org];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284670-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 4 May 2026 21:10:57 +0300 you wrote:
-> Hi,
+On Fri,  1 May 2026 07:07:12 -0400 you wrote:
+> t7xx_port_enum_msg_handler() uses the modem-supplied port_count field as
+> a loop bound over port_msg->data[] without checking that the message buffer
+> contains sufficient data. A modem sending port_count=65535 in a 12-byte
+> buffer triggers a slab-out-of-bounds read of up to 262140 bytes.
 > 
-> This patchset provides bug fixes from Cosmin to the mlx5e PSP feature.
-> 
-> Thanks,
-> Tariq.
+> Add a sizeof(*port_msg) check before accessing the port message header
+> fields to guard against undersized messages.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,V3,1/3] net/mlx5e: psp: Fix invalid access on PSP dev registration fail
-    https://git.kernel.org/netdev/net/c/ae9582cd0b9c
-  - [net,V3,2/3] net/mlx5e: psp: Expose only a fully initialized priv->psp
-    https://git.kernel.org/netdev/net/c/50690733db59
-  - [net,V3,3/3] net/mlx5e: psp: Hook PSP dev reg/unreg to profile enable/disable
-    https://git.kernel.org/netdev/net/c/c4a5c46199b5
+  - [v6] net: wwan: t7xx: validate port_count against message length in t7xx_port_enum_msg_handler
+    https://git.kernel.org/netdev/net/c/0e7c074cfcd9
 
 You are awesome, thank you!
 -- 
