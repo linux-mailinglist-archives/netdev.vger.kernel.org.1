@@ -1,61 +1,86 @@
-Return-Path: <netdev+bounces-284790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284791-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0IKnABMi+2lvWwMAu9opvQ
-	(envelope-from <netdev+bounces-284790-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 13:12:19 +0200
+	id uM9QCfUi+2lvWwMAu9opvQ
+	(envelope-from <netdev+bounces-284791-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 13:16:05 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 570214D99FC
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 13:12:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 77F5C4D9A75
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 13:16:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 39C5F3014C26
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 11:11:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AC4C83014572
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 11:15:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 982153FB06F;
-	Wed,  6 May 2026 11:11:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6F0A31716F;
+	Wed,  6 May 2026 11:15:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="RHB6GYfb"
+	dkim=pass (1024-bit key) header.d=hitachienergy.com header.i=@hitachienergy.com header.b="DYhWXfGE";
+	dkim=pass (2048-bit key) header.d=outbound.mailhop.org header.i=@outbound.mailhop.org header.b="ck1vH9MK"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from out-ip0052.fra.mailhop.org (out-ip0052.fra.mailhop.org [18.158.144.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFF2261B8A;
-	Wed,  6 May 2026 11:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6029F246778
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 11:15:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.158.144.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778065918; cv=none; b=JZmynwBNXqPbS9a4+7W1+7hE7CZRa+FuduRcnUza7YcRpy9xu6Qruzvpr1TdAHb0B60SI8vwTaUO9/rvclPXfRWq841AR41KjrH26Kaf24Vs0uCubahC1eeYVf6Wmr2UJxl36H+czgPwftgoVVdNbRfnuFbNaJryS6FGe/DhDao=
+	t=1778066150; cv=none; b=mD0x5lqr6/KOPuRFomCYksVTVHa/ajlL1748BI7yhJwZ/AX1ugkJFGHgs2u7hHkg1dLm1eTWktGcv2hrQlpLho/mpo+6nhYWeVUUSCeFgY1+nWsAubYSTaXov0s1KH1va1lbutX/V44rK5SMzZhmTMv4GB2BxevE7LEILYVuIys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778065918; c=relaxed/simple;
-	bh=5SbMrUO1/BH186Ltdhzmss0ewABnG6zEQjPAfqD3jZA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TTjvud152iFJFHxnh0GDdmDdCOX9jZQIvsg74GkrkWZJe8ud7ElScpVAsTVlh3v0bBzw6Atnz79qjNC7Gix9DRsWHmHsJPs8cop5bo/b/PHfSnbzVigi6QTxe3ybIxerO7pmqe4Z8ptAnnBgRdOQ8s8TvL7mFXhQDhA69QKkVDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net; spf=none smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=RHB6GYfb; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=qAU32mP6xDFhYq+ntPKcXAMPvmKgxIkZege7PIzIp7M=; t=1778065916; x=1779275516; 
-	b=RHB6GYfb+GhUBAug5dCsoB/NiLi8rJPWKrrd3FlVBYQm8oHcSX0VQBJOj/6AXIDtE7HfdRFIaLR
-	SVELyQf3Gu7xmE/JGw4OExidnzR4XkDstNYqSTWymhmQOrG8SsuuzcWpSxEPt1jf/VL4vj47/SZoo
-	U0MfMFjJNpYTeQmIpv/1yq6TkFWgkOZO75fTRc/dxBnCCBtvC7zG1q1abZx1fpt9KIa04+01tIgzF
-	U8zrs0n+0+jmicxLJgF6dSJgKmh6wOBrlEk2UtpuC1uY8IAxuyO1B9ZEygP5Fx1sPhu/D9slbH3rb
-	0eiK15dNIuEKBVXuQKrvrUkoLWwBB6fEs5Ug==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1wKaAU-00000000zTw-1c18;
-	Wed, 06 May 2026 13:11:54 +0200
-From: Johannes Berg <johannes@sipsolutions.net>
+	s=arc-20240116; t=1778066150; c=relaxed/simple;
+	bh=8Lmvqbu4qQ4lUb+7e2rO7fhHnvQ/F6uZ+YoU+WtzL4A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s1wyB1eVNe424DHwAhHmaU+2LsDxcnAj2P1om71oEl/NroJj+eUSq42asxkSolJlhPe+1NQ+FQ/KcOEyiuI7yCDKMhkwPm5kQ/mWX8xEEFrE7DW+pY1SzSjXqtSnvbAPOBBU35lTdyRgycBk+7pX5s42YWMCh4HYS/dDe7Gv5SA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hitachienergy.com; spf=pass smtp.mailfrom=hitachienergy.com; dkim=pass (1024-bit key) header.d=hitachienergy.com header.i=@hitachienergy.com header.b=DYhWXfGE; dkim=pass (2048-bit key) header.d=outbound.mailhop.org header.i=@outbound.mailhop.org header.b=ck1vH9MK; arc=none smtp.client-ip=18.158.144.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hitachienergy.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hitachienergy.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=hitachienergy.com; s=duo-1630306886989-947ac67a;
+	h=content-transfer-encoding:mime-version:message-id:date:subject:cc:to:from:
+	 cfbl-address:cfbl-feedback-id:from;
+	bh=mzUCgE4R9ZBXTM/Zus2HFTCm9+5cChUmtqF1FgPd4FU=;
+	b=DYhWXfGEoctLK+Qi9qqFGgDuAz7DMuhfwSA4j4SXWTgoZ309AexLFoEGF3fB1+JEQoAwjVVTgOJjL
+	 ujTZm6er/0UWhIk/zpuSiOIvl/bR8bEez4EuGez5HRAw26AG4Q9WffczdFx4q3j5pwvnCfFAI/9YpH
+	 aWdfPrazCt0xlhqM=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=outbound.mailhop.org; s=dkim-high;
+	h=content-transfer-encoding:mime-version:message-id:date:subject:cc:to:from:
+	 cfbl-address:cfbl-feedback-id:from;
+	bh=mzUCgE4R9ZBXTM/Zus2HFTCm9+5cChUmtqF1FgPd4FU=;
+	b=ck1vH9MKZbrduQMh8rGhDVni8Z8iq3K0Q+TD1wdsaJeDEE/bN7lDDJtPkw+JPr1XUF5ZkL+96Xu1u
+	 lAEhUS0OGtWwN4wpvOJVMKJ2KToCiFU0t9m20ma+H4yKzVrrj21zvY7mBULD+pSBMl4KSUgUsT81qd
+	 NXmJ9fHPprhIZ8r3Yzf86S3fBqxWkdAcjf2kVcmdRyZrX3lMKC3FA5uxFcauoaH9Z+aUZ8dbRSnvVO
+	 ImifNNufxWiW9ozF032+m9jbwd+wfOg4sexPNBUICEzIJSo+E2ZfNtYYDwThNMiEjaeNmeEK+X4m/h
+	 /gmooY3Lv8FDjP5btuBPwpBY3MjZf6g==
+X-MHO-RoutePath: aGVkY3NtdHA=
+X-MHO-User: e4f9875c-493c-11f1-8f51-f54febe22707
+X-Report-Abuse-To: https://support.duocircle.com/support/solutions/articles/5000540958-duocircle-standard-smtp-abuse-information
+X-Mail-Handler: DuoCircle Outbound SMTP
+CFBL-Feedback-ID: e4f9875c-493c-11f1-8f51-f54febe22707:15
+CFBL-Address: prvs=058643e936=abuse@outbound.mailhop.org; report=arf
+Received: from HPG0000000426.corp.hitachi-powergrids.com (unknown [20.82.50.241])
+	by outbound3.eu.mailhop.org (Halon) with ESMTPSA
+	id e4f9875c-493c-11f1-8f51-f54febe22707;
+	Wed, 06 May 2026 11:15:32 +0000 (UTC)
+Received: from gitsiv.hitachienergy.com (unknown [10.54.139.14])
+	by HPG0000000426.corp.hitachi-powergrids.com (Postfix) with ESMTP id 47A9F80525F;
+	Wed,  6 May 2026 11:15:31 +0000 (UTC)
+Received: from chbrn3-p-dev015.keymile.net (chbrn3-p-dev015.keymile.net [172.31.41.201])
+	by gitsiv.hitachienergy.com (Postfix) with ESMTP id 19A6B60B7D47;
+	Wed,  6 May 2026 13:15:31 +0200 (CEST)
+From: Holger Brunck <holger.brunck@hitachienergy.com>
 To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Subject: [GIT PULL] wireless-next-2026-05-06
-Date: Wed,  6 May 2026 13:10:53 +0200
-Message-ID: <20260506111147.224296-3-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.53.0
+Cc: linuxppc-dev@lists.ozlabs.org,
+	andrew+netdev@lunn.ch,
+	chleroy@kernel.org,
+	qiang.zhao@nxp.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	Holger Brunck <holger.brunck@hitachienergy.com>
+Subject: [PATCH v2 net] net: wan: fsl_ucc_hdlc: free tx_skbuff in uhdlc_memclean
+Date: Wed,  6 May 2026 13:15:29 +0200
+Message-ID: <20260506111529.2919079-1-holger.brunck@hitachienergy.com>
+X-Mailer: git-send-email 2.52.0.120.gb31ab939fe
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,218 +88,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 570214D99FC
+X-Rspamd-Queue-Id: 77F5C4D9A75
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[hitachienergy.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[hitachienergy.com:s=duo-1630306886989-947ac67a,outbound.mailhop.org:s=dkim-high];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FROM_NEQ_ENVFROM(0.00)[holger.brunck@hitachienergy.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284791-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	DMARC_NA(0.00)[sipsolutions.net: no valid DMARC record];
-	TAGGED_FROM(0.00)[bounces-284790-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	DKIM_TRACE(0.00)[sipsolutions.net:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-0.999];
+	DKIM_TRACE(0.00)[hitachienergy.com:+,outbound.mailhop.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sipsolutions.net:dkim,sipsolutions.net:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
 
-Hi,
+When the device is removed all allocated resources should be freed.
+In uhdlc_memclean the netdev transmit queue was already stopped. But at
+this point we may have pending skb in the transmit queue which must be
+freed. Therefore iterate over the tx_skbuff pointers and free all
+pending skb. The issue was discovered by sashiko.
 
-More content for next, as below. I'm sending this now
-in hopes that we'll get net merged into net-next after
-it all lands, because I'm annoyed by the use-after-free
-issue that somehow we never noticed and now hits all
-the time.
+https://sashiko.dev/#/patchset/20260429114208.941011-1-holger.brunck%40hitachienergy.com
+Fixes: c19b6d246a35 ("drivers/net: support hdlc function for QE-UCC")
+Signed-off-by: Holger Brunck <holger.brunck@hitachienergy.com>
+---
+v2: - use dev_kfree_skb instead of kfree
+    - improve commit message
+    - add missing paramter in for statement
+v1: https://lore.kernel.org/linuxppc-dev/20260504161145.2217950-1-holger.brunck@hitachienergy.com/
 
-Please pull and let us know if there's any problem.
+ drivers/net/wan/fsl_ucc_hdlc.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Thanks,
-johannes
+diff --git a/drivers/net/wan/fsl_ucc_hdlc.c b/drivers/net/wan/fsl_ucc_hdlc.c
+index bc7c2e9e6554..417e8e4c111f 100644
+--- a/drivers/net/wan/fsl_ucc_hdlc.c
++++ b/drivers/net/wan/fsl_ucc_hdlc.c
+@@ -739,6 +739,8 @@ static int uhdlc_open(struct net_device *dev)
+ 
+ static void uhdlc_memclean(struct ucc_hdlc_private *priv)
+ {
++	int i;
++
+ 	qe_muram_free(ioread16be(&priv->ucc_pram->riptr));
+ 	qe_muram_free(ioread16be(&priv->ucc_pram->tiptr));
+ 
+@@ -769,6 +771,11 @@ static void uhdlc_memclean(struct ucc_hdlc_private *priv)
+ 	kfree(priv->rx_skbuff);
+ 	priv->rx_skbuff = NULL;
+ 
++	for (i = 0; i < TX_BD_RING_LEN; i++) {
++		dev_kfree_skb(priv->tx_skbuff[i]);
++		priv->tx_skbuff[i] = NULL;
++	}
++
+ 	kfree(priv->tx_skbuff);
+ 	priv->tx_skbuff = NULL;
+ 
+-- 
+2.52.0.120.gb31ab939fe
 
-
-
-The following changes since commit 6855a52318b3a8c33031209e38bef497c971ef17:
-
-  Merge tag 'wireless-next-2026-04-30' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next (2026-04-30 17:10:21 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git tags/wireless-next-2026-05-06
-
-for you to fetch changes up to 89e367a90c1a877ca9c5d75d3848582d80fd0e60:
-
-  wifi: mac80211: explicitly disable FTM responder on AP stop (2026-05-06 11:52:14 +0200)
-
-----------------------------------------------------------------
-Lots of new content in cfg80211/mac80211, notably
- - more NAN work, mostly complete now (also hwsim)
- - more UHR work (e.g. non-primary channel access),
-   this will continue for a while
- - FTM ranging APIs
-
-----------------------------------------------------------------
-Andrei Otcheretianski (1):
-      wifi: mac80211: Fix a kernel panic in ieee80211_encrypt_tx_skb()
-
-Avraham Stern (1):
-      wifi: mac80211: accept protected frames for NAN device
-
-Benjamin Berg (13):
-      wifi: mac80211_hwsim: remove unused nan_vif struct member
-      wifi: mac80211_hwsim: move NAN related variables into a struct
-      wifi: mac80211_hwsim: split NAN handling into separate file
-      wifi: mac80211_hwsim: rename and switch simulation time to boottime
-      wifi: mac80211_hwsim: move timestamp writing later in the datapath
-      wifi: mac80211_hwsim: register beacon timer by calculating TBTT
-      wifi: mac80211_hwsim: refactor NAN timer handling
-      wifi: mac80211_hwsim: switch to use TXQs
-      wifi: mac80211_hwsim: limit TX of frames to the NAN DW
-      wifi: mac80211_hwsim: select NAN TX channel based on current TSF
-      wifi: mac80211_hwsim: only RX on NAN when active on a slot
-      wifi: mac80211_hwsim: protect tsf_offset using a spinlock
-      wifi: mac80211_hwsim: implement NAN synchronization
-
-Daniel Gabay (7):
-      wifi: mac80211_hwsim: add NAN_DATA interface limits
-      wifi: mac80211_hwsim: add NAN PHY capabilities
-      wifi: mac80211_hwsim: implement NAN schedule callbacks
-      wifi: mac80211_hwsim: set HAS_RATE_CONTROL when using NAN
-      wifi: mac80211_hwsim: add NAN data path TX/RX support
-      wifi: mac80211_hwsim: Declare support for secure NAN
-      wifi: mac80211_hwsim: enable NAN_DATA interface simulation support
-
-Emmanuel Grumbach (1):
-      wifi: iwlwifi: don't blindly start the responder upon BSS_CHANGED_FTM_RESPONDER
-
-Ilan Peer (4):
-      wifi: mac80211: allow userspace TX/RX over NAN Data interfaces
-      wifi: mac80211: Allow setting MAC address on interface creation
-      wifi: mac80211_hwsim: Do not declare support for NDPE
-      wifi: mac80211_hwsim: Support Tx of multicast data on NAN
-
-Israel Kozitz (1):
-      wifi: cfg80211: fix max_channel_switch_time documentation unit
-
-Johannes Berg (23):
-      wifi: mac80211: move frame RX handling to type files
-      wifi: mac80211: update UHR capabilities field order
-      wifi: ieee80211: define UHR ML-PM extended MLD capability
-      wifi: mac80211: track AP's extended MLD capa/ops
-      wifi: cfg80211: ensure UHR ML-PM flag is consistent
-      wifi: cfg80211: allow devices to advertise extended MLD capa/ops
-      wifi: mac80211: mlme: advertise driver's extended MLD capa/ops
-      wifi: mac80211: use struct for ieee80211_determine_ap_chan() args
-      wifi: mac80211: move ieee80211_chandef_usable() up
-      wifi: mac80211: carry element parsing frame type/from_ap
-      wifi: cfg80211: allow representing NPCA in chandef
-      wifi: cfg80211: add helper for parsing NPCA to chandef
-      wifi: mac80211: use NPCA in chandef for validation
-      wifi: mac80211: remove NPCA during chandef downgrade
-      wifi: mac80211: add NPCA to chandef tracing
-      wifi: mac80211: allow only AP chanctx sharing with NPCA
-      wifi: mac80211: mlme: use NPCA chandef if capable
-      wifi: mac80211: set AP NPCA parameters in bss_conf
-      wifi: cfg80211: separate NPCA validity from chandef validity
-      wifi: mac80211: don't parse full UHR operation from beacons
-      wifi: mac80211: check AP using NPCA has NPCA capability
-      wifi: mac80211_hwsim: claim HT STBC capability
-      wifi: mac80211: explicitly disable FTM responder on AP stop
-
-Kavita Kavita (3):
-      wifi: cfg80211: indicate (Re)Association frame encryption to userspace
-      wifi: mac80211: set assoc_encrypted for EPP associations
-      wifi: mac80211_hwsim: Add support for extended FTM ranging
-
-Miri Korenblit (4):
-      wifi: mac80211: track the id of the NAN cluster we joined
-      wifi: mac80211: avoid out-of-bounds access in monitor
-      wifi: mac80211: add NAN channel evacuation support
-      wifi: cfg80211: don't allow NAN DATA on multi radio devices
-
-Peddolla Harshavardhan Reddy (12):
-      wifi: cfg80211: restrict LMR feedback check to TB and non-TB ranging
-      wifi: cfg80211: Add MAC address filter to remain_on_channel
-      wifi: cfg80211/mac80211: Add NL80211_IFTYPE_PD for PD PASN and PMSR operations
-      wifi: cfg80211: add start/stop proximity detection commands
-      wifi: cfg80211: add proximity detection capabilities to PMSR
-      wifi: cfg80211: add NTB continuous ranging and FTM request type support
-      wifi: cfg80211: extend PMSR FTM response for proximity ranging
-      wifi: cfg80211: add role-based peer limits to FTM capabilities
-      wifi: cfg80211: add ingress/egress distance thresholds for FTM
-      wifi: cfg80211: add PD-specific preamble and bandwidth capabilities
-      wifi: cfg80211: allow suppressing FTM result reporting for PD requests
-      wifi: cfg80211: add LTF keyseed support for secure ranging
-
- MAINTAINERS                                        |    2 +-
- drivers/net/wireless/ath/ath6kl/cfg80211.c         |    3 +-
- drivers/net/wireless/ath/wil6210/cfg80211.c        |    3 +-
- .../net/wireless/broadcom/brcm80211/brcmfmac/p2p.c |    4 +-
- .../net/wireless/broadcom/brcm80211/brcmfmac/p2p.h |    3 +-
- drivers/net/wireless/intel/iwlwifi/mvm/mac80211.c  |    4 +-
- .../net/wireless/intel/iwlwifi/mvm/mld-mac80211.c  |    4 +-
- drivers/net/wireless/marvell/mwifiex/cfg80211.c    |    3 +-
- drivers/net/wireless/microchip/wilc1000/cfg80211.c |    3 +-
- drivers/net/wireless/virtual/Makefile              |    2 +
- drivers/net/wireless/virtual/mac80211_hwsim_i.h    |  168 +++
- .../{mac80211_hwsim.c => mac80211_hwsim_main.c}    |  974 +++++++-------
- drivers/net/wireless/virtual/mac80211_hwsim_nan.c  | 1346 ++++++++++++++++++++
- drivers/net/wireless/virtual/mac80211_hwsim_nan.h  |  102 ++
- include/linux/ieee80211-eht.h                      |   14 +-
- include/linux/ieee80211-uhr.h                      |   55 +-
- include/linux/ieee80211.h                          |    1 +
- include/net/cfg80211.h                             |  251 +++-
- include/net/mac80211.h                             |   64 +
- include/uapi/linux/nl80211.h                       |  293 ++++-
- net/mac80211/Makefile                              |    2 +-
- net/mac80211/ap.c                                  |  207 +++
- net/mac80211/cfg.c                                 |   77 +-
- net/mac80211/chan.c                                |  102 +-
- net/mac80211/eht.c                                 |  174 ---
- net/mac80211/ieee80211_i.h                         |   28 +-
- net/mac80211/iface.c                               |   62 +-
- net/mac80211/main.c                                |    7 +-
- net/mac80211/mlme.c                                |  579 +++++----
- net/mac80211/nan.c                                 |  126 ++
- net/mac80211/offchannel.c                          |   13 +-
- net/mac80211/parse.c                               |    3 +
- net/mac80211/rx.c                                  |   33 +-
- net/mac80211/status.c                              |    9 +-
- net/mac80211/trace.h                               |   14 +-
- net/mac80211/tx.c                                  |   18 +-
- net/mac80211/uhr.c                                 |    5 +-
- net/mac80211/util.c                                |   11 +-
- net/wireless/chan.c                                |  124 +-
- net/wireless/core.c                                |   36 +-
- net/wireless/core.h                                |    2 +
- net/wireless/mlme.c                                |   11 +-
- net/wireless/nl80211.c                             |  368 +++++-
- net/wireless/nl80211.h                             |    5 +-
- net/wireless/pmsr.c                                |  190 ++-
- net/wireless/rdev-ops.h                            |   26 +-
- net/wireless/reg.c                                 |    3 +
- net/wireless/sme.c                                 |    1 +
- net/wireless/trace.h                               |   38 +-
- net/wireless/util.c                                |   19 +-
- 50 files changed, 4520 insertions(+), 1072 deletions(-)
- create mode 100644 drivers/net/wireless/virtual/mac80211_hwsim_i.h
- rename drivers/net/wireless/virtual/{mac80211_hwsim.c => mac80211_hwsim_main.c} (91%)
- create mode 100644 drivers/net/wireless/virtual/mac80211_hwsim_nan.c
- create mode 100644 drivers/net/wireless/virtual/mac80211_hwsim_nan.h
- create mode 100644 net/mac80211/ap.c
 
