@@ -1,144 +1,136 @@
-Return-Path: <netdev+bounces-284623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284624-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YhkLO2qI+mmYPgMAu9opvQ
-	(envelope-from <netdev+bounces-284623-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 02:16:42 +0200
+	id AHC9Dq6I+mmYPgMAu9opvQ
+	(envelope-from <netdev+bounces-284624-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 02:17:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C65F4D4F08
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 02:16:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF7CC4D4F21
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 02:17:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D1060303ACEC
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 00:16:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8D4EC304B93D
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 00:17:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD1671917F0;
-	Wed,  6 May 2026 00:16:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AA221CAA78;
+	Wed,  6 May 2026 00:17:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XglWJqmZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cc5LrKpR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897F34C97;
-	Wed,  6 May 2026 00:16:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13F18E555;
+	Wed,  6 May 2026 00:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778026599; cv=none; b=oJQkTh4/uNMp1E8i/HrQ75zeX0GUXaH//Br9lDDwC1qY5UwE6SBPfdYACM8rQb/TprpuUflnedtwui9uhvIpdv71z/c6yUECilzC6Rf9J7eSmGfwJfVm8DOey5Dzh26EcHlqrubViyGaU3Qlr2Eon33w/chK+3Ag2ofo7pT+T44=
+	t=1778026664; cv=none; b=jT97GM1EJZvKXpdyAvUxBaYGxiRhzUvjFzK+tgr6XJ+UygjEJH+C4ZR8PTkcOfDxJ0JRRdBU29kwMWR5MCyEY84+mwkSa001A6ybrysKLxcnFxKcabOYt8j9lSI4biCMPB87dtYhZLKcnVxVPKMJ/jAQms/4tFdEqyZSZx5EN0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778026599; c=relaxed/simple;
-	bh=dvIk5huHsVcx4vNcUm/MtflXiy2orveWIsPJCGlqLsc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZBNEn4KpjQHxyBHCutj/ydoBMgt+9zwA17eis/+0r+o1bJFlNNyQOkjnYB3DRT18/n/qloM2FUB5pQVBFn48HWJyadYC8k0CEbZJcN6G9WoyHdPHLZmZ48ELQTJMSdmkL5WjElxxtylFvm2wvsgyMEapKpqfAgY4RIFVTvjxpJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XglWJqmZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60165C2BCB4;
-	Wed,  6 May 2026 00:16:38 +0000 (UTC)
+	s=arc-20240116; t=1778026664; c=relaxed/simple;
+	bh=6foGj3Qcoh1WnIWLVeql78W0P57rxlrScla5/6G7PdY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aXRVrP8RFRski/Q74f0u6PInFjWo8PeZO3BaMtjacP8kl4D6jwqoGakkQPjhbETgv72awrJIgG0O67wEp5i2+b6zv7A5DdO7A5t1VBGAlPQ1xtZkE08twT3CKtmv2JAzlUV95Br1qvnFLnFhU//pEhUBa/SaJR0IYYs+hBz7OSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cc5LrKpR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BA02C2BCB4;
+	Wed,  6 May 2026 00:17:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778026599;
-	bh=dvIk5huHsVcx4vNcUm/MtflXiy2orveWIsPJCGlqLsc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XglWJqmZd6Tp27XgkturLavhUn3s85nQlYdmjGmpqz7JUmPNrFh0Bk+wpCFN2VRuB
-	 wDl36J4uSZS0tjFBBJ6wJZECKM7N9gr6CXkveox0o024wWxWTxqjNPhOYqayvVxRIq
-	 lAJToHJ4dAr9qriYZFd28ZA+fpsoJuZdy/iiKwRTr+5RFA0L0fd5I4oSm+KPaCSfg7
-	 tb8NSda7uIFJNQNv4TjkTWPgfaCS5nAV3bFuSrBJ8MsLWnXoLLLzKyEM0XsNjbpPlh
-	 YJVx6d6vCRVqvtsy8b2Q6E5IsCrqr49kf6GUsHFPCBmluHXwYI752F665FhhpT1nTr
-	 guZPtXMcT2uvQ==
-Date: Tue, 5 May 2026 17:16:37 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: Carlos Llamas <cmllamas@google.com>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Andrew Lunn <andrew@lunn.ch>, Donald Hunter
- <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Matthew Maurer <mmaurer@google.com>, Miguel
- Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo
- <gary@garyguo.net>, "=?UTF-8?B?QmrDtnJu?= Roy Baron"
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Andreas
- Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, Danilo
- Krummrich <dakr@kernel.org>, Christian Brauner <brauner@kernel.org>,
- linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH v4 2/4] ynl_gen: generate Rust files from yaml files
-Message-ID: <20260505171637.17e20b98@kernel.org>
-In-Reply-To: <afmz-dgqXjuIntRM@google.com>
-References: <20260504-binder-netlink-v4-0-601b41cd25b2@google.com>
-	<20260504-binder-netlink-v4-2-601b41cd25b2@google.com>
-	<20260504165858.4882730b@kernel.org>
-	<afmz-dgqXjuIntRM@google.com>
+	s=k20201202; t=1778026663;
+	bh=6foGj3Qcoh1WnIWLVeql78W0P57rxlrScla5/6G7PdY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cc5LrKpRw18DZUcURk0QrCcMgCDOrkNDvobCxAp0hYVyGq141EoLh+eZB5eXVrPU/
+	 jfv0Ft1jPNwlAjbNjnqmffQ0SCqggFEqVLionwzMswFPt0K2SoV5U0/IiofaaYSL1h
+	 YWyWVoh1mU10mUhxdtP8umxEogs9K52o8DoHbhh2qSgISDLDL7k5zGtUQoSGUvxzKe
+	 TOlm67Ggls4xcy8m5S4LRGipMT5+LJfI8B/zMm3j9YKWyulHBfPt5pjdwF2h0AIP76
+	 hYavL7WOJoxGX0lVaxLbp8jRFYhgEzTSQTYn0Tx5F66KgYPPqPeLhucE15kEX9mN5F
+	 BtOKAlHx5H6ew==
+Date: Tue, 5 May 2026 17:17:40 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Andy Lutomirski <luto@amacapital.net>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-doc@vger.kernel.org, linux-api@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
+Message-ID: <20260506001740.GA67098@quark>
+References: <20260430011544.31823-1-ebiggers@kernel.org>
+ <CALCETrVqG+1yErRJjkxvJrf=A+Vu84HTR4Bx1Pcd8G1C0PJcMA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 5C65F4D4F08
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALCETrVqG+1yErRJjkxvJrf=A+Vu84HTR4Bx1Pcd8G1C0PJcMA@mail.gmail.com>
+X-Rspamd-Queue-Id: AF7CC4D4F21
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-284624-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284623-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	FREEMAIL_CC(0.00)[google.com,linuxfoundation.org,lunn.ch,gmail.com,davemloft.net,redhat.com,kernel.org,garyguo.net,protonmail.com,umich.edu,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ebiggers@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[copy.fail:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On Tue, 5 May 2026 09:10:17 +0000 Alice Ryhl wrote:
-> On Mon, May 04, 2026 at 04:58:58PM -0700, Jakub Kicinski wrote:
-> > On Mon, 04 May 2026 09:04:55 +0000 Alice Ryhl wrote:  
-> > >  tools/net/ynl/pyynl/ynl_gen_c.py | 139 ++++++++++++++++++++++++++++++++++++++-  
-> > 
-> > No. Rust. In. This. File.
-> > 
-> > Just commit the artifacts. I truly hope that this is the only Netlink
-> > family we will have in Rust.  
+On Tue, May 05, 2026 at 04:17:18PM -0700, Andy Lutomirski wrote:
+> > On Apr 29, 2026, at 6:19 PM, Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > ﻿AF_ALG is almost completely unnecessary, and it exposes a massive attack
+> > surface that hasn't been standing up to modern vulnerability discovery
+> > tools.  The latest one even has its own website, providing a small
+> > Python script that reliably roots most Linux distros: https://copy.fail/
 > 
-> There's no reason to react like this. I have not ignored your concern.
-> Last time we discussed this, the discussion ended on splitting the file
-> into ynl_gen_c.py and ynl_gen_rust.py, which you did not reply to, and I
-> actually spent some time working on that. However, I felt the change was
-> non-trivial and I wanted to discuss whether that was the correct way
-> forward before spending more time on it. Therefore, I kept this patch
-> as-is for now and noted why it was non-trivial (sharing of CodeWriter)
-> in the commit message, until we could discuss further.
+> How about adding a configuration option, defaulted on, that requires
+> capable(CAP_SYS_ADMIN) to create the socket (and maybe also to bind /
+> connect it).  And a sysctl to allow the administrator to override this
+> in the unlikely event that it’s needed.
 > 
-> I think you are probably right that just comitting the artifacts is the
-> simplest way forward for now. Especially since Donald is apparently
-> working on splitting up the file for strace [1]. On the off-chance that
-> a second Netlink family is ever added, hopefully Donald's work has
-> already completed and we can easily add this support in a new file when
-> the time comes.
-> 
-> I guess another way forward is to commit a copy of the python script
-> with the Rust support to drivers/android/binder/ and I can run it
-> manually if the Binder yaml file is ever updated.
+> IIRC cryptsetup used to and maybe even still does require these
+> sockets sometimes and this would let it keep working.  And there's all
+> the FIPS stuff downthread.
 
-Could you _please_ do what I'm asking you to do instead inventing your
-own solutions. Just commit the generated files and leave the script out.
-We lived without Netlink code gen for 30 years.
+Yes, I'd like to add a default-on requirement to hold a capability in
+the initial user namespace.  We're trying to figure out the details.
+
+It sounds like iwd runs with CAP_NET_ADMIN, not necessarily
+CAP_SYS_ADMIN.  So it may need to be:
+
+    has_capability_noaudit(current, CAP_NET_ADMIN) || capable(CAP_SYS_ADMIN)
+
+iwd is being discussed in the thread
+https://lore.kernel.org/linux-crypto/bcbbef00-5881-421b-8892-7be6c04b832d@gmail.com/
+
+cryptsetup is normally run with CAP_SYS_ADMIN, but not always (e.g.,
+'cryptsetup benchmark').  It might be acceptable for users to add sudo
+in the exceptional cases.  cryptsetup is being discussed in the thread
+https://lore.kernel.org/linux-crypto/5dd3be22-13fb-41fb-b469-1ae6472200b1@gmail.com/
+
+bluez needs investigation.
+
+- Eric
 
