@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-284884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284885-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kOj5ALRT+2n+ZQMAu9opvQ
-	(envelope-from <netdev+bounces-284884-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 16:44:04 +0200
+	id UC56Fs1Q+2mSZQMAu9opvQ
+	(envelope-from <netdev+bounces-284885-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 16:31:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 466E44DC770
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 16:44:03 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E13414DC3C3
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 16:31:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9511D3085010
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 14:28:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C97613048287
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 14:28:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E28BB481A86;
-	Wed,  6 May 2026 14:27:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48FC7481A84;
+	Wed,  6 May 2026 14:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sOXhKIC5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WTAbnybn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C3748033F
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 14:27:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87B24481FB6
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 14:27:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778077656; cv=none; b=V0wNuoVUIESKPA2GBcLB+oQnyH4B8M1bCcA8rcRguw9jKl46O1vvwjpKRFc0D0ZDDFj8n5XkB96BrQefVqBvzsdqu2+myjrCwvRjz9WCrtM46lUMXvkHZJ8B5ldR47H776EcR9dOvU02/Jolo9uKF/z94txxuKFK78Eo+9VyHRM=
+	t=1778077660; cv=none; b=r6kpcXnI+2UhR9kM9ORfVb5zIiVna4FaBry46bWhxdVlwSf17MVakr0rWIhcHC+u00mFHSV3unpASN+fPInXwHnXPh9qSSRIknrtzYS9uZS0w/Q/1NfBVcXoN5epkto/qNcxtNsj7zSTYdG7H27WSHMO+c0ftpM74fUsLDUmLnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778077656; c=relaxed/simple;
-	bh=PknOxEDwYtUiqcGb0yzibJrOc5+DQljK442foDX9DdI=;
+	s=arc-20240116; t=1778077660; c=relaxed/simple;
+	bh=1Ps2Uvl/LPepHMBDlUY4AENnqrCBZ/NnJ3wO3wlwrJ0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XFplo3ZeyAU1L9LxW8Fa2a5P3KETnpRCSwBK0EBq4w7r1m/4M3BbyVHR4CS196m8Bd8JfXW8SdNmvxW0POb4+rWrggR/DpIJCy/p9PXPO90llRxewY8RAZNFEl9iZJK5BcMPSM06bbl8BZNZo00h7qrTaxHKtf86o19EVfIOVPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sOXhKIC5; arc=none smtp.client-ip=209.85.219.53
+	 MIME-Version; b=p51po2g8T9hbv8Q2KmH6QWSfnO+fvZR0QzPpvt7+M9Ym7Bl8Dfcp5LPCPDPcGicsR3ro8/UK5bu457Y+4H3PgBqbEVaDNgh6XtcaFrYOpu/vDARMGe1iIl5z4lcxobpja1r5kuuNHnj0vIpgd8XnlO2YwykzjXil4yCDUAE38rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WTAbnybn; arc=none smtp.client-ip=209.85.219.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-8b6c9fdb68cso37530976d6.2
-        for <netdev@vger.kernel.org>; Wed, 06 May 2026 07:27:32 -0700 (PDT)
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-8b3d6b215cfso103958446d6.3
+        for <netdev@vger.kernel.org>; Wed, 06 May 2026 07:27:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778077650; x=1778682450; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778077652; x=1778682452; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=W3JwDD8aGgyvCwm8+kdBrl7zPnFCzfcvcvpFjrxGXsM=;
-        b=sOXhKIC53iy2LlqKNQlbwpmItJMdZUSYAqkstnxPSbgPbbEj+qtmZqlYH76pJJJZ8u
-         0c7Y0yUABEwKJDishuFnLfzdQx6Cdd8icb+PI8QXDAkg9CkVsX4xwpiacFIjVB/MzZvc
-         mLvJ9ESg/FIOw3LYmcR/7fLj65DGXcCUY1l/EVkITLeIwtQWUS1SwwrTxHkJLWNwZpVs
-         YF+JisImh6zmRxEf3mi7LQZdrWC5lu1hmnr1XN6u1HHdleunjDD7i32PL9zNg6aFLSCr
-         EiD55zA6bcjaopteU6tNHhhgHuyoM0QuZz+KZqqleb4sYrQEOHUa9IrRL6mdh+ruYavc
-         1JWw==
+        bh=5rJWz1pDbyoadWp6yHfOeNQO0FWEwox+z1MU3VR8Pqg=;
+        b=WTAbnybn/LrcxfqTiSrW6OpRXTGN5588k34bvZtuiUVAK7xLCDfvdr9L1V8L8o+wSC
+         PzNwdZVJnX5TFHlbi/iMI7rCM2lf19hNY5abPmfR71FZBqpDFTR19mQW9hXN1k1yesyG
+         p8vR6mrk8MjEPpzsncOpIRyh6YP8hlApDLA+4m8f/KeYks+3QSkMJ8PXeAqF1gc83ZkI
+         WJD4BC1aYNM3O6XTkWgSd0zFHgQ3WK2HzbeRHAgUJxsDHRGVM6y9t3AQrbZF7WE99rCt
+         Vw+nOhADWiN7XiHPOYS83kNyhacLNak2qVcHH8v42DfZYQNhBk0mBajIgqyrQbyx+jZB
+         svBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778077650; x=1778682450;
+        d=1e100.net; s=20251104; t=1778077652; x=1778682452;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=W3JwDD8aGgyvCwm8+kdBrl7zPnFCzfcvcvpFjrxGXsM=;
-        b=aJJ95gs7CGzA/eEqpcnf3OSqijA2pCUNZSSHaUFUA+N94is39do2TXXkNyqfUni0Ap
-         RnRwpUXHz7ZHE3GCY2OVZoQ4VKI6MS/O43dKm/IaB0dUW3b+38cnsGMvBT7OdOmIQwQp
-         b5UqONdKwjLPG2xa2fvVEx50RcOqgJ0LtZikU3y8XaFT1UsGycr5uvNoc0sqctaoGW6Z
-         5ksy5Cl9jGAPyMCKclZQmxyCd7C4eAALDEuILbpDNugxSFfpOAzTdT/96WKSD89xoAjA
-         Oo5W4x769ztTQBKNjujlBX6rYLgd59CG81F4V8gG0zFlVFH3X3uBEenb8KjqJJIAy8/V
-         TTpw==
-X-Gm-Message-State: AOJu0Yx3qj1xLtN5mrHcKBwNzNp43dbPpOOsoilh35vEEWaVBRvTxWNg
-	dHhvdLhndM1LYKHPqjlDGWH0+U6v/BN6L6HNDz9mJj6jzyHv6Wu0K7xf
-X-Gm-Gg: AeBDies4JwsPn+celCS78OT/v4fKLF8sRqyScw/d13ywBeg3H6rNwRySEPVN0cbCN7t
-	gB91/+rQS95SMVlVJzfu+hS/mvetCKi6cOF2nfC45aREjGKmbPc/nXCl9m3cTWJHSvJ2yxgL4kt
-	Jd8cZmPwZYSbSUJ6hM5napi4mt54cqNE+6YQt/KwH7ksfIPLyGEGEX0UuLHHBkx8OQVKOu/0e96
-	rJJO10AR82oh5BnxynJXnn+hmkezLRi1Z7RAMojWVU9jBDJQEphFe1zuVQKuiXLyX++eJB1iYpz
-	fmUyeqr2+Ycxwyhv7kJydXBtrd8hbM8L0Z/Gtiz9jzP+OlIz0hM51Cqug1U4dgy6kRktRyRjE4y
-	Kl0PgcglqbrHYbjN980zPFDRCIM4Qa7t5LnoCTAZyWH375kH7zzsSTUh02z9Aov6SsqPra86kCC
-	tgBAJf3HA5LL4g96qC/4gam36RuWI=
-X-Received: by 2002:a05:6214:3986:b0:8bc:81:c1db with SMTP id 6a1803df08f44-8bc45e1e978mr52051896d6.43.1778077650485;
-        Wed, 06 May 2026 07:27:30 -0700 (PDT)
-Received: from localhost ([2a03:2880:f800:40::])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b53c1dce68sm184282176d6.24.2026.05.06.07.27.30
+        bh=5rJWz1pDbyoadWp6yHfOeNQO0FWEwox+z1MU3VR8Pqg=;
+        b=UNWyoKYWpLhOmbVd+zct7AKg9vjwATaDzFea/mSNxc1IQ6+SmWQ/+XjxI18MWhMUbn
+         VfrSJNeMm9uwv7d5s0R2LlgPPX5mxDUzGRVQQ2FOhd5y58QApBViNLbHeZh6SOJ2VyYT
+         TvzKdteKdXkwNS5RavPfmyCBFgltg9NCNpSf6u4E4yC5s88TQiRCaU/S8rshy3yQM5fV
+         0JuyYC2+s6NAUmBLgm60vHSOXV9Ylgx9goHf/nPoYrGO0T9glCVPrk2Tg1AkrlKXSq5h
+         WcYW/Rdjez70t6ksu6EF8MXjRgRCHhexJbSGxqyEioSeQcQ5wU1aGp+cCUKg1qf8LhVA
+         4pSw==
+X-Gm-Message-State: AOJu0Yz7Gf3NYf/hiouXdha9PvgoWYas8nl9xEl1WqryNqT1pOMZUJCc
+	LqxINXVILdf3jAXor50t+JVilCKSZ9qP2d6oWahMUYaKWeqYe2wloPzK
+X-Gm-Gg: AeBDievp5TIIIOuosso4zIBGVya1eb0/BDTVJkZ6GttRUfgBVTbEXPedRPWpeGnWx+V
+	90HlgsYsoqqiPXFxZZACKXL+ceRJyxFr0SBR7dRlQnLVOtHQcV8X6wkj1va7qBtpyT4Lj/3ysmp
+	zR4Pw0o0aMtGfT8upd1VCHoeGyhBimlu4D/JSGOwd8QKQ9q0ADKnbDMTWkb5S/hmOuT0dX3mKyq
+	RNku0X/w4WbwgdsshsTylpgOwM+sZdCxuGn34n1JBn47lk6pIkvtORaO06FFUcSmbgkYJk+6uaT
+	iwz+Y9fFYVt4ahIbnn5HnntLDrVcU9xKc0MklZ9L1/gvyYRaw9XrYO4dy3JwFZPINj4oZxuAhPl
+	gOnBZQK9jnijoeyKM6Ym+VioTKgrdNxhDtGfImCLkXttrVw6qSWOX1z0D2Qfmeei19vPEbdayDl
+	kMvOoka9FM664Vote3lTJ/URya+RKbhddzLcU=
+X-Received: by 2002:a05:6214:4c87:b0:89a:629:2203 with SMTP id 6a1803df08f44-8bc429754fdmr44284996d6.11.1778077651996;
+        Wed, 06 May 2026 07:27:31 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:70::])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b53c0e7ebdsm201474186d6.29.2026.05.06.07.27.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2026 07:27:30 -0700 (PDT)
+        Wed, 06 May 2026 07:27:31 -0700 (PDT)
 From: Amery Hung <ameryhung@gmail.com>
 To: bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org,
@@ -87,9 +87,9 @@ Cc: netdev@vger.kernel.org,
 	mykyta.yatsenko5@gmail.com,
 	ameryhung@gmail.com,
 	kernel-team@meta.com
-Subject: [PATCH bpf-next v4 11/12] selftests/bpf: Test using slice after invalidating dynptr clone
-Date: Wed,  6 May 2026 07:27:07 -0700
-Message-ID: <20260506142709.2298255-12-ameryhung@gmail.com>
+Subject: [PATCH bpf-next v4 12/12] selftests/bpf: Test using file dynptr after the reference on file is dropped
+Date: Wed,  6 May 2026 07:27:08 -0700
+Message-ID: <20260506142709.2298255-13-ameryhung@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260506142709.2298255-1-ameryhung@gmail.com>
 References: <20260506142709.2298255-1-ameryhung@gmail.com>
@@ -100,151 +100,119 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 466E44DC770
+X-Rspamd-Queue-Id: E13414DC3C3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284884-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284885-lists,netdev=lfdr.de];
 	TO_DN_NONE(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_HAS_DN(0.00)[]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-The parent object of a cloned dynptr is skb not the original dynptr.
-Invalidate the original dynptr should not prevent the program from
-using the slice derived from the cloned dynptr.
+File dynptr and slice should be invalidated when the parent file's
+reference is dropped in the program. Without the verifier tracking
+dyntpr's parent referenced object, the dynptr would continute to be
+incorrectly used even if the underlying file is being tear down or gone.
 
 Signed-off-by: Amery Hung <ameryhung@gmail.com>
 ---
- .../selftests/bpf/prog_tests/bpf_qdisc.c      |  2 +
- ..._qdisc_dynptr_use_after_invalidate_clone.c | 74 +++++++++++++++++++
- 2 files changed, 76 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_dynptr_use_after_invalidate_clone.c
+ .../selftests/bpf/progs/file_reader_fail.c    | 60 +++++++++++++++++++
+ 1 file changed, 60 insertions(+)
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
-index 65277c8fc887..77f1c0550c9b 100644
---- a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
-+++ b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
-@@ -11,6 +11,7 @@
- #include "bpf_qdisc_fail__invalid_dynptr.skel.h"
- #include "bpf_qdisc_fail__invalid_dynptr_slice.skel.h"
- #include "bpf_qdisc_fail__invalid_dynptr_cross_frame.skel.h"
-+#include "bpf_qdisc_dynptr_use_after_invalidate_clone.skel.h"
- 
- #define LO_IFINDEX 1
- 
-@@ -229,6 +230,7 @@ void test_ns_bpf_qdisc(void)
- 	RUN_TESTS(bpf_qdisc_fail__invalid_dynptr);
- 	RUN_TESTS(bpf_qdisc_fail__invalid_dynptr_cross_frame);
- 	RUN_TESTS(bpf_qdisc_fail__invalid_dynptr_slice);
-+	RUN_TESTS(bpf_qdisc_dynptr_use_after_invalidate_clone);
+diff --git a/tools/testing/selftests/bpf/progs/file_reader_fail.c b/tools/testing/selftests/bpf/progs/file_reader_fail.c
+index 0739620dea8a..d5fae5e4cf9a 100644
+--- a/tools/testing/selftests/bpf/progs/file_reader_fail.c
++++ b/tools/testing/selftests/bpf/progs/file_reader_fail.c
+@@ -50,3 +50,63 @@ int xdp_no_dynptr_type(struct xdp_md *xdp)
+ 	bpf_dynptr_file_discard(&dynptr);
+ 	return 0;
  }
- 
- void serial_test_bpf_qdisc_default(void)
-diff --git a/tools/testing/selftests/bpf/progs/bpf_qdisc_dynptr_use_after_invalidate_clone.c b/tools/testing/selftests/bpf/progs/bpf_qdisc_dynptr_use_after_invalidate_clone.c
-new file mode 100644
-index 000000000000..ac626cfa2a98
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/bpf_qdisc_dynptr_use_after_invalidate_clone.c
-@@ -0,0 +1,74 @@
-+// SPDX-License-Identifier: GPL-2.0
 +
-+#include <vmlinux.h>
-+#include "bpf_experimental.h"
-+#include "bpf_qdisc_common.h"
-+#include "bpf_misc.h"
-+
-+char _license[] SEC("license") = "GPL";
-+
-+int proto;
-+
-+SEC("struct_ops")
-+__success
-+int BPF_PROG(dynptr_use_after_invalidate_clone, struct sk_buff *skb, struct Qdisc *sch,
-+	     struct bpf_sk_buff_ptr *to_free)
++SEC("lsm/file_open")
++__failure
++__msg("Leaking reference id={{[0-9]+}} alloc_insn={{[0-9]+}}. Release it first.")
++int use_file_dynptr_after_put_file(void *ctx)
 +{
-+	struct bpf_dynptr ptr, ptr_clone;
-+	struct ethhdr *hdr;
++	struct task_struct *task = bpf_get_current_task_btf();
++	struct file *file = bpf_get_task_exe_file(task);
++	struct bpf_dynptr dynptr;
++	char buf[64];
 +
-+	bpf_dynptr_from_skb((struct __sk_buff *)skb, 0, &ptr);
++	if (!file)
++		return 0;
 +
-+	bpf_dynptr_clone(&ptr, &ptr_clone);
++	if (bpf_dynptr_from_file(file, 0, &dynptr))
++		goto out;
 +
-+	hdr = bpf_dynptr_slice(&ptr_clone, 0, NULL, sizeof(*hdr));
-+	if (!hdr) {
-+		bpf_qdisc_skb_drop(skb, to_free);
-+		return NET_XMIT_DROP;
-+	}
++	/* this should fail - file dynptr should be discarded first to prevent resource leak */
++	bpf_put_file(file);
 +
-+	*(int *)&ptr = 0;
++	bpf_dynptr_read(buf, sizeof(buf), &dynptr, 0, 0);
++	return 0;
 +
-+	proto = hdr->h_proto;
-+
-+	bpf_qdisc_skb_drop(skb, to_free);
-+
-+	return NET_XMIT_DROP;
-+}
-+
-+SEC("struct_ops")
-+__auxiliary
-+struct sk_buff *BPF_PROG(bpf_qdisc_test_dequeue, struct Qdisc *sch)
-+{
-+	return NULL;
-+}
-+
-+SEC("struct_ops")
-+__auxiliary
-+int BPF_PROG(bpf_qdisc_test_init, struct Qdisc *sch, struct nlattr *opt,
-+	     struct netlink_ext_ack *extack)
-+{
++out:
++	bpf_dynptr_file_discard(&dynptr);
++	bpf_put_file(file);
 +	return 0;
 +}
 +
-+SEC("struct_ops")
-+__auxiliary
-+void BPF_PROG(bpf_qdisc_test_reset, struct Qdisc *sch)
++SEC("lsm/file_open")
++__failure
++__msg("Leaking reference id={{[0-9]+}} alloc_insn={{[0-9]+}}. Release it first.")
++int use_file_dynptr_slice_after_put_file(void *ctx)
 +{
-+}
++	struct task_struct *task = bpf_get_current_task_btf();
++	struct file *file = bpf_get_task_exe_file(task);
++	struct bpf_dynptr dynptr;
++	char *data;
 +
-+SEC("struct_ops")
-+__auxiliary
-+void BPF_PROG(bpf_qdisc_test_destroy, struct Qdisc *sch)
-+{
-+}
++	if (!file)
++		return 0;
 +
-+SEC(".struct_ops")
-+struct Qdisc_ops test = {
-+	.enqueue   = (void *)dynptr_use_after_invalidate_clone,
-+	.dequeue   = (void *)bpf_qdisc_test_dequeue,
-+	.init      = (void *)bpf_qdisc_test_init,
-+	.reset     = (void *)bpf_qdisc_test_reset,
-+	.destroy   = (void *)bpf_qdisc_test_destroy,
-+	.id        = "bpf_qdisc_test",
-+};
++	if (bpf_dynptr_from_file(file, 0, &dynptr))
++		goto out;
++
++	data = bpf_dynptr_data(&dynptr, 0, 1);
++	if (!data)
++		goto out;
++
++	/* this should fail - file dynptr should be discarded first to prevent resource leak */
++	bpf_put_file(file);
++
++	*data = 'x';
++	return 0;
++
++out:
++	bpf_dynptr_file_discard(&dynptr);
++	bpf_put_file(file);
++	return 0;
++}
 -- 
 2.52.0
 
