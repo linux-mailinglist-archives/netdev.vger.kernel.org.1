@@ -1,516 +1,271 @@
-Return-Path: <netdev+bounces-284941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284943-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SKHTGkhp+2miawMAu9opvQ
-	(envelope-from <netdev+bounces-284941-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 18:16:08 +0200
+	id SNWDGIVr+2miawMAu9opvQ
+	(envelope-from <netdev+bounces-284943-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 18:25:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7BFC4DDF47
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 18:16:07 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FD744DE139
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 18:25:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 675A030080BD
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 16:12:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 58E32306A2BA
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 16:17:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96FC847B422;
-	Wed,  6 May 2026 16:12:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5BB848122C;
+	Wed,  6 May 2026 16:17:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="eYASu66j"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="s4diYnpu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f99.google.com (mail-ed1-f99.google.com [209.85.208.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010051.outbound.protection.outlook.com [52.101.61.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 714ED3F23B3
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 16:11:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.99
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778083921; cv=none; b=Er/6rSjkUNnBqElO6ZRgmIOyen2BRF3XdtV/hpnLc9q/LIN2yVPVGK9NS0Uf6HFT69PHwyCLjmguub44n7r83qt4k0aMtgvp6NJbSrSkiEN4JeXgxgoLYqmrEhEjAiu6m2wybUceJw/BwqahvRzSXYPIGJgqoX1Dwrh010QwBmE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778083921; c=relaxed/simple;
-	bh=XnibljOkJ+gA/Z8kg0cbeSqT1BsPLUjFC6BnELx/Hog=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=noKCHCuyMKmX1Gfn0JfYKj0fFPNlxJ7JW5IS92/7ADuXALXSMDEJ8GkxMpyoBCtGELZSrmekkP/4nXjeQ9VeCB6hr7154wbi013gEZUh0gneC9lVeq3gaA4mpZkZR5bu6yWmf33clHJvavA7mca+e0/ZGfNETBr+Fj1jED4hHVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=eYASu66j; arc=none smtp.client-ip=209.85.208.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-ed1-f99.google.com with SMTP id 4fb4d7f45d1cf-67c3cb1433cso6686354a12.0
-        for <netdev@vger.kernel.org>; Wed, 06 May 2026 09:11:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1778083908; x=1778688708; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RbPYOWikWqoc2xW+7bVcJ7b6D7Zqq65ZLobWBPrtpW8=;
-        b=eYASu66j0KlQ2rMPEeXAeep3yu0LqSV5KcJqG25QIQzhNL5bqa82Yz+JxyWFUbPOog
-         xlN0E7SqDvZzqN4mrw5ofEuD4Wo3NSnwP9lCtHwCqLp49Kn61lHBGeMkygFXOxcQI6yY
-         WEBA251ageEGDpgZF7G9RuWpygYXez1IfmJeVtFSI+cpEd+xD6Z7apXztVTlCadergm2
-         J79YOcuY6GtuP2qp9SxmHQDbLHJYtbxweLV5TtiCicSXQSS/YCzb3c8/TwZNQGN3O0yI
-         sR7rju4lOLjKl/E+Jz3De+JUKNG0hSJkQQ6pneeFjmALBFPYfu6CFqQWB3Z3MjvhERb6
-         fPPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778083908; x=1778688708;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=RbPYOWikWqoc2xW+7bVcJ7b6D7Zqq65ZLobWBPrtpW8=;
-        b=ZIr7Kph5xh/9YMUEkgWU4/YqWeYCRWqbdr1ZkgCW7FRfc6w+PHC1YyTQ2WMY1vZUPQ
-         onBa8AfSDKrmcV9gyr72GeWBTkDiUggm7EysYf1cPNbrfrD1Zk7uWqTbjWKtds/Vj/kP
-         d+q1vlHAlbPD6hlVPkvFAnsOJBL7Ex+oh0HPOwtzdOH9Q8W2V8HTFrgiKVGTPD5njwWg
-         w+jjxy/RtZqUktUEZky+701R3hRsFqCG+iiRNmkKWRBwcLc+zi0QlRkK25RnK9Fkaplg
-         PCCS/VckWrvrGN+9xUTxCvuZqQx/KfwPHRdC+NQucER40WS2fw3VNTNgVBQ2mb3VieeP
-         VhAA==
-X-Gm-Message-State: AOJu0Yxr6zXE3lyICrFmVXMBe6D4A7k052euxXnGOtL0XTGGubaIWnFS
-	q/9YbEwwvLzrbgCNlhj1Ll/NvmiDljHiAsG6gNCAo6RN/wPMjmBkjhgX+tcj6NZxTK/2RcAyLIM
-	qcgO/wlTPh7zrRFLRKd+BT0yBZPZOUIPd7xCQ
-X-Gm-Gg: AeBDievNibT34BnjNYdrHyHd/XOHqTNamJx1OgjMV8VEdYFdMhaRMwnghOw8WgMi58D
-	MySUAyMmwjRvGLzlSD7nqBN/AKThZUZZyQq+hJpSzyRuaBtC98P4wDYVXFLIqeWwulOTPFvBMyV
-	56S4K0KaP/rHAPQ1e3ZdI+Axa2SihPrvVVAuIVAaKxvmBxurEur64seedAOSejt+ZxqGabzQeux
-	hQ2vFoxnpzecMhwFaYhuOOb2bAht3c0BxGh6d0GiE8bq5flrwHNp96PEkmTHu966S5o5w7N2MHd
-	oaaBqldU4LrswxkNF9IVxqlEOV2qEClsNTR53mIJ6Eg2LwfHgttw99vFmC3uozEGWM/ZUWKsIXc
-	SfeUUjeKXJYy5RB4RtW49PP6fkMoqAgrUp1oyKr23EI39mIMWujYi6hVhCv+o/zk=
-X-Received: by 2002:a17:907:9689:b0:bc3:782c:da7a with SMTP id a640c23a62f3a-bc56a6470ddmr243353266b.5.1778083908328;
-        Wed, 06 May 2026 09:11:48 -0700 (PDT)
-Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id a640c23a62f3a-bc55f3144efsm16540066b.39.2026.05.06.09.11.48;
-        Wed, 06 May 2026 09:11:48 -0700 (PDT)
-X-Relaying-Domain: 6wind.com
-Received: from stryper.dev.6wind.com (stryper.dev.6wind.com [10.17.2.5])
-	by smtpservice.6wind.com (Postfix) with ESMTP id 2DB061755F;
-	Wed,  6 May 2026 18:11:48 +0200 (CEST)
-From: Louis Scalbert <louis.scalbert@6wind.com>
-To: netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch,
-	jv@jvosburgh.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	fbl@redhat.com,
-	andy@greyhouse.net,
-	shemminger@vyatta.com,
-	maheshb@google.com,
-	jonas.gorski@gmail.com,
-	Louis Scalbert <louis.scalbert@6wind.com>
-Subject: [PATCH net v5 4/4] selftests: bonding: add test for lacp_strict mode
-Date: Wed,  6 May 2026 18:11:44 +0200
-Message-Id: <20260506161144.465485-5-louis.scalbert@6wind.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20260506161144.465485-1-louis.scalbert@6wind.com>
-References: <20260506161144.465485-1-louis.scalbert@6wind.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79744248F72
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 16:17:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778084239; cv=fail; b=qzcS49EWb0/evG26+3c5M7TxlxZSbUMXJ4sgc1GCs7yOJGrXIe9T2cBjgeeE57gJCHT+pfiYPZKFPnfTt0Kkk4sT0PKw1K4QlIxNZYcNuiyXR4lvl3PGUJDhAS1714ucUtwQoVRtEr5cgN72P58YxjdcYVK0NqLewsd3kK2j4Cw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778084239; c=relaxed/simple;
+	bh=YHVGHpKllli8sG5rq8BrqahYboBCPVyxw/zNCAtjXZ4=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=uTD4ev+n605wkSQwrs4wV2pVhxR9PIoT0H4IRydcEHJ+nWIerqbXkIFI233beGI2fP65y/4rDXp9N/NlvJX9/g13otDJ2cepVCW3Jbk5YmgWblnW+5LEVIMEPNhyiZMNCojtKifm44H2o7vXe+s4DuI7azq33y4LnaaPOHNGLzU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=s4diYnpu; arc=fail smtp.client-ip=52.101.61.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xAywPH9veZJFX7qcO76ufXhBSyiQRcJW2FOHMyMEmlzkkpci0yy2CJOgJ/UthJR/qQ0aPdKyv6cen0VGihJVFc0mArxqazvdC0VmVABZ7SEfL+NzJ2LVjKT48NGjt2wOhYLwyPtyTiMYv9Kmy70HETTzJ0gq6OL/rZir25xEI4AYdanFQWhri82GXcEOZs4p8VJ5Ej3UFNem7spMsrCftmKiFH8cT7e76F/ox9jCbRX2NOWUSfDLWvUu9hzV5CXSIZZcyBLh+fWTAQR2LaQi2Y0ED4Ft+d9RyJFLutnznBxXprF6gXQWiUjbzhyYVi/lO+8W1GvKAi1CpbOSTDa79A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fBfrZmwOpnL7BL9RS6soBewAoYMKO8NKux43U8DdWFg=;
+ b=IOsEgdkWnwI9F4TGC2cB0cjnfnSk3BGmGgafMdphNfRDFWmyjoHZRDWxQjZF8pHg9VUP8rgCgeCgRgNwmXhJNBeEMvXM4DkV3MSRyCOVsq4tv9PjBMx4H9oW6wWVbpHA1Z8zl0jCJI2t6/h7eOhDePkitpdgRAGIe6+CNrXKSSvS4IFqXprdZE8fh3mYFoGaej/4xFdzK7uEfUx0KQcsRVXJgVPkXnJnO6KTfeGhS0bGIIHibbULoGWrIMbVIxmF+NXOavhbwWzUZAbyn/ZKvf5lr2bm2KQHTKqU9FLYR3Ck1yrrXfB1Ub8hpGxqnSHNMuEFM4QxZoBS5yDBp0HJYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fBfrZmwOpnL7BL9RS6soBewAoYMKO8NKux43U8DdWFg=;
+ b=s4diYnpu25mi+g7HutvDny9Kc8uyKbYKUlSpXHa45xOwi9AZLSQE0a6RAFnsO3HENKg6VtvC4XOorXWHIpOxyJAgUsbCHY3SuxHRMOCbjXp3vtGMCRRmQ+kPDfNkJ5fxyfhRyYGvsrw/PunMVuOAlYniAHmxExwPKbgPw/t4odI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS4PR12MB9708.namprd12.prod.outlook.com (2603:10b6:8:278::7) by
+ DSWPR12MB999127.namprd12.prod.outlook.com (2603:10b6:8:36c::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9891.15; Wed, 6 May 2026 16:17:13 +0000
+Received: from DS4PR12MB9708.namprd12.prod.outlook.com
+ ([fe80::8570:d817:2f81:c62a]) by DS4PR12MB9708.namprd12.prod.outlook.com
+ ([fe80::8570:d817:2f81:c62a%6]) with mapi id 15.20.9891.008; Wed, 6 May 2026
+ 16:17:13 +0000
+Message-ID: <88195eaf-a767-4107-86db-24fe46962f3a@amd.com>
+Date: Wed, 6 May 2026 09:17:10 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 5/5] ionic: Add .get_fec_stats ethtool handler
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org
+Cc: Brett Creeley <brett.creeley@amd.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20260501031555.43259-1-eric.joyner@amd.com>
+ <20260501031555.43259-6-eric.joyner@amd.com>
+ <6eabe3df-08b2-4237-a989-a8e3a9bdf37f@linux.dev>
+ <e5d3c314-e6b0-4f18-b17e-752fea4dcb16@amd.com>
+ <45677056-ff03-442f-a7dd-19d34c7b612d@linux.dev>
+Content-Language: en-US
+From: Eric Joyner <eric.joyner@amd.com>
+In-Reply-To: <45677056-ff03-442f-a7dd-19d34c7b612d@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SJ0PR03CA0101.namprd03.prod.outlook.com
+ (2603:10b6:a03:333::16) To DS4PR12MB9708.namprd12.prod.outlook.com
+ (2603:10b6:8:278::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: D7BFC4DDF47
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS4PR12MB9708:EE_|DSWPR12MB999127:EE_
+X-MS-Office365-Filtering-Correlation-Id: 70255a1e-7ac7-406e-e3a6-08deab8aee78
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|366016|13003099007|22082099003|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	7WRHDotYqzVvhBHZLzQtR3muP11qIeEH7BSJheIbaiFrPDtYSRmFKFXLEUoQwSjjcostd2eHiNwAOw73u1XjIgsPG3r96yY6txHWUOPx1DW5xs8ltIWCUYLORc8ADgqnGQhUeKugLEYFIMyerF90m32/hJQNhp97v2iBcM280RZJjUPxCIDhvkNJdIH70ugCr/l0C2c6ER0Slql9IRhMwWJBQDQTD0AfpjVY1B7Xp+TXoSWACPoVAVhWGXJZpMIN1By31b901UkvoU22Y8ndFBkVMhkCOMwCk576k7hInv3v0wq3g2vE4eXtRi4JM+vM+yOWPFPQZM80Ex4QfABHcstNNJT0NqHJrjzm2C8UdfQ6I0ibpd8mQAOCVz/2bbksm6OQn28CbhWTGydeFHqZeOQNpLunRDVjgkqa2+FdPonak19XQtJ0x+v5o0BEv06cokrFLOvxedPWFN63FAZ/HfHmRDKO8BlpfF8hdgLnVGY2nkgbn04YwXphg7MqSVHagGagvxOCbMAL2x6fY/1FqZMvO1gapIxoOSbnSpvsL7mKzBtl50Igt+oQxNlhbMUG6cTX/fDhcQs0oPGUI6Jsd6M4DwQtf/jbH21eRIpiEaFNmB2Qk2pnMTEKr82hruxONu22/YHBeDLwT8OLJE0mlWBYQei+MPOez8mym955KokP3NGR68rYMojoqcNXWtWN
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS4PR12MB9708.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(13003099007)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?QVhaQzFONlRKcmdjaDRyWE8xZWhBdzVTdW9zd1hESEdqRGk0TW9SRmN4MWVJ?=
+ =?utf-8?B?eVN4ZlhnQ1dGSXVjbllibkZWU2tVZmFUMmZvZTQycURWaXJiYUZ5ajFUSTZJ?=
+ =?utf-8?B?SGdLa0l1cjI0UmltWHdVR0RzcDBkTTkya1dzWW0zOHM3Wmp2dzFvN25teDBT?=
+ =?utf-8?B?THJaMTJzRnhzRkVwTVhDTTZkVnF0eXBoeVZOSHNuK2hYRVliNXZJWkd0Rmpr?=
+ =?utf-8?B?RTlodVhMdXZGelN5dlQ3VEdKb3V2Vkl0NWxORHM5bjRaT1dwckdSb05vcjdE?=
+ =?utf-8?B?dExTY1JoRUR2d01sazdZR2FGVWxBbENhb1hoT2tQMStHTkMzWjBIYjR3L2o0?=
+ =?utf-8?B?SWMwZ2NxTW5MRFRPTm40Z01OdmdqaWMvT1JJMzJkZ3NFMmRRemhXcU9Xb3pQ?=
+ =?utf-8?B?VWZ0RFNZVUV5Q21ZN0pZcGpGanRqenZjTjgrQWY0Q0k1c0dPRGd5TVlQelJs?=
+ =?utf-8?B?V0lFTjdiUDhHbE9RYi9Ja21PNTJBcTVNa01oMzNMd2l2Smt5ZGh3SHk4eUhE?=
+ =?utf-8?B?L3JFRVZVbmpHRHZqTFZaYzRPbFJ4eFhlc295UER0QmtaMHcxbzA2dXhtczJE?=
+ =?utf-8?B?UGpFTEs1R01zUW16eG9jd0ZhcUoyWDl6YjFJOEpOcEFrTi93V3RBLzJDVWV4?=
+ =?utf-8?B?YVdua0FkZjVUcjMrRkUrZFZDTHBRRDNydVJjcHhMcUk1cjF6WWE4ckx3YWVB?=
+ =?utf-8?B?RjBmRDJ1Z0xQeWNZOTRYTko5UzhEdjJYdUtDczd1OTFVZnRiL1BuUXh0RFJK?=
+ =?utf-8?B?bVhrUTQxMXZ0YzNmRVlqR1VyK1dDQUdydkl0TWdmcmNIdjlBR3FPamFhYnRi?=
+ =?utf-8?B?ZzZacGxBdHJONUxmSUN0SDVZRGVmanFkbTMzNjNjbHFiamh5Nmx2UHlJL0tY?=
+ =?utf-8?B?TUU0TlVEb05hRFFTQ3pCWFpubHpwcWZud1JkVThDMTlqRjJvbFUybUFQWGdG?=
+ =?utf-8?B?WHhjUWhWaExWWEt4QmRsQmgycytkbENjQzZGTDdLMVdpZGlGc00vNEtkMkQ5?=
+ =?utf-8?B?QzBXblJxbkVYSkdub1RNeldvWVhYTmg2cENmUkNWZm8rdEpRWC9TNDN5MWd2?=
+ =?utf-8?B?ZDFBT3krTGZBSnA5NWdaSGw0emhYSHR4dGRpMC9URTRjQUEzc0NNeklwQXdS?=
+ =?utf-8?B?U0VYeDFEOU9wdUQzdFhtOTZtVGNoeHBOSklSMXNxQ0FGUDNPdjFjRTE4ZjNG?=
+ =?utf-8?B?aGVGTjhGRXh6RFVwQm9WYmhxbjZCZmlWVXoxVEV0TkpLZjVBaFFBMUdMYVVv?=
+ =?utf-8?B?aW9wRHNWVlp5NVdpQTE5YlRCbllwbzNRemY1MDl2Y0tRK05GS0pHekRPbzZS?=
+ =?utf-8?B?K01BR3pmU3RWbkxDQ0N1VHJ2V1Q3V01JVnkyUENaSzFHTGp2YnZMTEVUMmdh?=
+ =?utf-8?B?UGFabjRtNkR0ZnVuZXZqV0R0UFBKcU56a0VEK0ZhTUpJZkRBamxCRVN1RWc5?=
+ =?utf-8?B?b0NGam9oM1lBMi9VTnFqR1NKVEFPa0FpbE5ROUt2dDg2cTN0WlNlaWZjNWVF?=
+ =?utf-8?B?VkFrNU5hdTYzdFRFMWtwQWR3akI0bEUzbVZPeXZoN3dhVlhPT1dpQTVCemJI?=
+ =?utf-8?B?d1ZMOWNER1BqUEtaYkRtUXlROFJ0SnEyb1RBNGxtRkR1UnlyNVVLTC9rclAr?=
+ =?utf-8?B?ZUJuZnpkQ0NDTkpiVUdDRjdNbjMxZnBmbVhJMkVwZ0VaNjhXK2t1LzRGTS9I?=
+ =?utf-8?B?VzFidk4xVUVYOUoreXFmMDQzdm14T3UxWFVoQ2JldDVPamp0dFJ0Q3NOcUJt?=
+ =?utf-8?B?T2dvSzFsWG84alRLdTJpR2VpN3N5UytYY3lsci9wblN5cUhSZW5wZGZNMTE2?=
+ =?utf-8?B?S0h0MmhZU1o2aWhuNXlhbWxTQnIvSjRtNEJiQmZ1VVh5WVJYVUZGQ3JaUkVw?=
+ =?utf-8?B?K25HbjZMc3NwR3I1L0NXY0JWTi9xeTAxMHo0OVUrL3QycXZ4RHc0ek1rL3Qw?=
+ =?utf-8?B?dnpTYVVSTmF5OGFVRVhBazU4dzZZNkF5TFVmU3BxajNPK2RpVFFPVlc4Wlpz?=
+ =?utf-8?B?bFhCa2xmanYzVEd1RjgrVTNkNGdyVFA0c2tpcm1YUTFWNWpYeG1ZS1ZrZE5h?=
+ =?utf-8?B?a0I2aXFNQzRVUUdIUGV6S1Z0SFgxdWp0ZVZDNk9oWjZ0ZEdxUStKeE5za3NF?=
+ =?utf-8?B?NGJiUGpvb3d1ZzFEY1JOSHIxQlUyWm9CMDhJTmEvUTNKVUtWb3ErQngyTzFK?=
+ =?utf-8?B?dHNPMXJzT2xMNzJhQmlnVXNXMW1RbFUyb1VvbmJ5Wko4UitHQ3h1UDlUZVJr?=
+ =?utf-8?B?YWVmdlUxV21STC90akZ1aFI2TUZBbUEvNEhiUjM1VFdQVlJtMWVqOGthdWNH?=
+ =?utf-8?Q?73DiGh71YZcfkuWAC9?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 70255a1e-7ac7-406e-e3a6-08deab8aee78
+X-MS-Exchange-CrossTenant-AuthSource: DS4PR12MB9708.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2026 16:17:12.9417
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GwIwNtGcCki5qIZDO0m7dhxH8x6oL7O0NICRIB2oLjBEl6JxX+LAnAw8zuaNSAGF
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DSWPR12MB999127
+X-Rspamd-Queue-Id: 5FD744DE139
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,jvosburgh.net,google.com,kernel.org,redhat.com,greyhouse.net,vyatta.com,gmail.com,6wind.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-284941-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[amd.com:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284943-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[louis.scalbert@6wind.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[6wind.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[eric.joyner@amd.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	REDIRECTOR_URL(0.00)[aka.ms];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.995];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[6wind.com:email,6wind.com:dkim,6wind.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bond_lacp_strict.sh:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,aka.ms:url,amd.com:email,amd.com:dkim,amd.com:mid]
 
-Add a test for the bonding lacp_strict mode.
+On 5/6/2026 3:00 AM, Vadim Fedorenko wrote:
+> [You don't often get email from vadim.fedorenko@linux.dev. Learn why this is
+> important at https://aka.ms/LearnAboutSenderIdentification ]
+> 
+> Caution: This message originated from an External Source. Use proper caution
+> when opening attachments, clicking links, or responding.
+> 
+> 
+> On 05/05/2026 20:43, Eric Joyner wrote:
+>> On 5/5/2026 6:54 AM, Vadim Fedorenko wrote:
+>>> [You don't often get email from vadim.fedorenko@linux.dev. Learn why this is
+>>> important at https://aka.ms/LearnAboutSenderIdentification ]
+>>>
+>>> Caution: This message originated from an External Source. Use proper caution
+>>> when opening attachments, clicking links, or responding.
+>>>
+>>>
+>>> On 01/05/2026 04:15, Eric Joyner wrote:
+>>>> Several FEC error statistics being collected can be reported in a
+>>>> dedicated ethtool callback for FEC errors, so implement the handler that
+>>>> does so. This includes 802.3ck FEC histogram data that some newer
+>>>> hardware collects.
+>>>>
+>>>> Assisted-by: Claude:claude-4.6-sonnet
+>>>> Signed-off-by: Eric Joyner <eric.joyner@amd.com>
+>>>> ---
+>>>>    .../ethernet/pensando/ionic/ionic_ethtool.c   | 51 +++++++++++++++++++
+>>>>    1 file changed, 51 insertions(+)
+>>>>
+>>>> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c b/drivers/
+>>>> net/ethernet/pensando/ionic/ionic_ethtool.c
+>>>> index 78a802eb159f..fe1f753b6115 100644
+>>>> --- a/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
+>>>> +++ b/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
+>>>> @@ -418,6 +418,56 @@ static int ionic_get_fecparam(struct net_device *netdev,
+>>>>        return 0;
+>>>>    }
+>>>>
+>>>> +static const struct ethtool_fec_hist_range ionic_fec_ranges[] = {
+>>>> +     { 0, 0},
+>>>> +     { 1, 1},
+>>>> +     { 2, 2},
+>>>> +     { 3, 3},
+>>>> +     { 4, 4},
+>>>> +     { 5, 5},
+>>>> +     { 6, 6},
+>>>> +     { 7, 7},
+>>>> +     { 8, 8},
+>>>> +     { 9, 9},
+>>>> +     { 10, 10},
+>>>> +     { 11, 11},
+>>>> +     { 12, 12},
+>>>> +     { 13, 13},
+>>>> +     { 14, 14},
+>>>> +     { 15, 15},
+>>>> +     { 0, 0},
+>>>> +};
+>>>> +
+>>>> +static void
+>>>> +ionic_fill_fec_hist(const struct ionic_port_extra_stats *extra_stats,
+>>>> +                 struct ethtool_fec_hist *hist)
+>>>> +{
+>>>> +     int i;
+>>>> +
+>>>> +     hist->ranges = ionic_fec_ranges;
+>>>> +     for (i = 0; i < ETHTOOL_FEC_HIST_MAX - 1; i++)
+>>>> +             hist->values[i].sum = extra_stats->fec_codeword_error_bin[i];
+>>>> +}
+>>>
+>>> ETHTOOL_FEC_HIST_MAX = 17, you defined 16 bins, but iterating over 15 of
+>>> them. Looks like bin {15, 15} will be lost in stats.
+>>>
+>>>
+>>
+>> This looks correct to me -- (ETHTOOL_FEC_HIST_MAX - 1) = 16, so starting with
+>> i=0, it'll iterate through the 16 bins and ignore the 17th end marker bin. Bin
+>> 15 does get included and gets its sum set.
+> 
+> Ahh, yeah, you're right, smth was wrong with my math yesterday. btw, how
+> does it work for different FEC? RS(528, 514) will not give you 16 bins..
+> 
+> 
 
-Signed-off-by: Louis Scalbert <louis.scalbert@6wind.com>
----
- .../selftests/drivers/net/bonding/Makefile    |   1 +
- .../drivers/net/bonding/bond_lacp_strict.sh   | 347 ++++++++++++++++++
- 2 files changed, 348 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/bonding/bond_lacp_strict.sh
+According to the datasheet for the device that does support reporting these
+histogram bins, there's no support for "Clause 91 RS(528,514) "KR4" FEC for
+100GbE". I only see support for PAM4 and not NRZ.
 
-diff --git a/tools/testing/selftests/drivers/net/bonding/Makefile b/tools/testing/selftests/drivers/net/bonding/Makefile
-index 9af5f84edd37..91269e7ceb63 100644
---- a/tools/testing/selftests/drivers/net/bonding/Makefile
-+++ b/tools/testing/selftests/drivers/net/bonding/Makefile
-@@ -7,6 +7,7 @@ TEST_PROGS := \
- 	bond-eth-type-change.sh \
- 	bond-lladdr-target.sh \
- 	bond_ipsec_offload.sh \
-+	bond_lacp_strict.sh \
- 	bond_lacp_prio.sh \
- 	bond_macvlan_ipvlan.sh \
- 	bond_options.sh \
-diff --git a/tools/testing/selftests/drivers/net/bonding/bond_lacp_strict.sh b/tools/testing/selftests/drivers/net/bonding/bond_lacp_strict.sh
-new file mode 100755
-index 000000000000..f1a93a1d952f
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/bonding/bond_lacp_strict.sh
-@@ -0,0 +1,347 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Testing if bond lacp_strict works
-+#
-+#          Partner (p_ns)
-+#  +--------------------------+
-+#  |          bond0           |
-+#  |            +             |
-+#  |      eth0  |  eth1       |
-+#  |        +---+---+         |
-+#  |        |       |         |
-+#  +--------------------------+
-+#  |        | eth0  | eth1    |
-+#  |        |       |         |
-+#  |(br_ns) | br0   | br1     |
-+#  |        |       |         |
-+#  |        | eth2  | eth3    |
-+#  +--------------------------+
-+#  |        |       |         |
-+#  |        +---+---+         |
-+#  |      eth0  |  eth1       |
-+#  |            +             |
-+#  |          bond0           |
-+#  +--------------------------+
-+#         Dut (d_ns)
-+
-+lib_dir=$(dirname "$0")
-+# shellcheck disable=SC1090
-+source "$lib_dir"/../../../net/lib.sh
-+
-+COLLECTING_DISTRIBUTING_MASK=48
-+COLLECTING_DISTRIBUTING=48
-+FAILED=0
-+
-+setup_links()
-+{
-+	# shellcheck disable=SC2154
-+	ip -n "${p_ns}" link add eth0 type veth peer name eth0 netns "${br_ns}"
-+	ip -n "${p_ns}" link add eth1 type veth peer name eth1 netns "${br_ns}"
-+	ip -n "${d_ns}" link add eth0 type veth peer name eth2 netns "${br_ns}"
-+	ip -n "${d_ns}" link add eth1 type veth peer name eth3 netns "${br_ns}"
-+
-+	ip -n "${br_ns}" link add br0 type bridge
-+	ip -n "${br_ns}" link add br1 type bridge
-+
-+	ip -n "${br_ns}" link set dev br0 type bridge stp_state 0
-+	ip -n "${br_ns}" link set dev br1 type bridge stp_state 0
-+
-+	ip -n "${br_ns}" link set eth0 master br0
-+	ip -n "${br_ns}" link set eth2 master br0
-+	ip -n "${br_ns}" link set eth1 master br1
-+	ip -n "${br_ns}" link set eth3 master br1
-+
-+	# Allow LACP trames forwarding on bridge ports
-+	ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br0/brif/eth0/group_fwd_mask"
-+	ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br1/brif/eth1/group_fwd_mask"
-+	ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br0/brif/eth2/group_fwd_mask"
-+	ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br1/brif/eth3/group_fwd_mask"
-+
-+	ip -n "${br_ns}" link set eth0 up
-+	ip -n "${br_ns}" link set eth2 up
-+	ip -n "${br_ns}" link set eth1 up
-+	ip -n "${br_ns}" link set eth3 up
-+
-+	ip -n "${br_ns}" link set br0 up
-+	ip -n "${br_ns}" link set br1 up
-+
-+	ip -n "${d_ns}" link add bond0 type bond mode 802.3ad miimon 100 \
-+		lacp_rate fast min_links 1
-+	ip -n "${p_ns}" link add bond0 type bond mode 802.3ad miimon 100 \
-+		lacp_rate fast min_links 1
-+
-+	ip -n "${d_ns}" link set eth0 master bond0
-+	ip -n "${d_ns}" link set eth1 master bond0
-+	ip -n "${p_ns}" link set eth0 master bond0
-+	ip -n "${p_ns}" link set eth1 master bond0
-+
-+	ip -n "${d_ns}" link set bond0 up
-+	ip -n "${p_ns}" link set bond0 up
-+}
-+
-+test_master_carrier() {
-+	local expected=$1
-+	local mode_name=$2
-+	local carrier
-+
-+	carrier=$(ip netns exec "${d_ns}" cat /sys/class/net/bond0/carrier)
-+	[ "$carrier" == "1" ] && carrier="up" || carrier="down"
-+
-+	[ "$carrier" == "$expected" ] && return
-+
-+	echo "FAIL: Expected carrier $expected in lacp_strict $mode_name mode, got $carrier"
-+
-+	RET=1
-+
-+}
-+
-+compare_state() {
-+	local actual_state=$1
-+	local expected_state=$2
-+	local iface=$3
-+	local last_attempt=$4
-+
-+    [ $((actual_state & COLLECTING_DISTRIBUTING_MASK)) -eq "$expected_state" ] \
-+		&& return 0
-+
-+	[ "$last_attempt" -ne 1 ] && return 1
-+
-+	printf "FAIL: Expected LACP %s actor state to " "$iface"
-+	if [ "$expected_state" -eq $COLLECTING_DISTRIBUTING ]; then
-+		echo "be in Collecting/Distributing state"
-+	else
-+		echo "have neither Collecting nor Distributing set."
-+	fi
-+
-+	return 1
-+}
-+
-+_test_lacp_port_state() {
-+	local interface=$1
-+	local expected=$2
-+	local last_attempt=$3
-+	local eth0_actor_state eth1_actor_state
-+	local ret=0
-+
-+	# shellcheck disable=SC2016
-+	while IFS='=' read -r k v; do
-+		printf -v "$k" '%s' "$v"
-+	done < <(
-+		ip netns exec "${d_ns}" awk '
-+		/^Slave Interface: / { iface=$3 }
-+		/details actor lacp pdu:/ { ctx="actor" }
-+		/details partner lacp pdu:/ { ctx="partner" }
-+		/^[[:space:]]+port state: / {
-+			if (ctx == "actor") {
-+				gsub(":", "", iface)
-+				printf "%s_%s_state=%s\n", iface, ctx, $3
-+			}
-+		}
-+		' /proc/net/bonding/bond0
-+	)
-+
-+	if [ "$interface" == "eth0" ] || [ "$interface" == "both" ]; then
-+		compare_state "$eth0_actor_state" "$expected" eth0 "$last_attempt" || ret=1
-+	fi
-+
-+	if [ "$interface" == "eth1" ] || [ "$interface" == "both" ]; then
-+		compare_state "$eth1_actor_state" "$expected" eth1 "$last_attempt" || ret=1
-+	fi
-+
-+	return $ret
-+}
-+
-+test_lacp_port_state() {
-+	local interface=$1
-+	local expected=$2
-+	local retry=$3
-+	local last_attempt=0
-+	local attempt=1
-+	local ret=1
-+
-+	while [ $attempt -le $((retry + 1)) ]; do
-+		[ $attempt -eq $((retry + 1)) ] && last_attempt=1
-+		_test_lacp_port_state "$interface" "$expected" "$last_attempt" && return
-+		((attempt++))
-+		sleep 1
-+	done
-+
-+	RET=1
-+}
-+
-+
-+trap cleanup_all_ns EXIT
-+setup_ns d_ns p_ns br_ns
-+setup_links
-+
-+# Initial state
-+RET=0
-+mode=off
-+test_lacp_port_state both $COLLECTING_DISTRIBUTING 3
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 up"
-+
-+# partner eth0 down, eth1 up
-+# (replicate eth0 state to dut eth0 by shutting a bridge port)
-+RET=0
-+ip -n "${p_ns}" link set eth0 down
-+ip -n "${br_ns}" link set eth2 down
-+test_lacp_port_state eth0 $FAILED 5
-+test_lacp_port_state eth1 $COLLECTING_DISTRIBUTING 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 down"
-+
-+# partner eth0 and eth1 down
-+RET=0
-+ip -n "${p_ns}" link set eth1 down
-+ip -n "${br_ns}" link set eth3 down
-+test_lacp_port_state both $FAILED 5
-+test_master_carrier down $mode # down because of min_links
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 down"
-+
-+# partner eth0 up, eth1 down
-+RET=0
-+ip -n "${p_ns}" link set eth0 up
-+ip -n "${br_ns}" link set eth2 up
-+test_lacp_port_state eth0 $COLLECTING_DISTRIBUTING 60
-+test_lacp_port_state eth1 $FAILED 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 up, eth1 down"
-+
-+# partner eth0 and eth1 up
-+RET=0
-+ip -n "${p_ns}" link set eth1 up
-+ip -n "${br_ns}" link set eth3 up
-+test_lacp_port_state both $COLLECTING_DISTRIBUTING 60
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 up"
-+
-+# partner eth0 stops LACP and eth1 up
-+RET=0
-+ip netns exec "${br_ns}" sh -c "echo 0 > /sys/class/net/br0/brif/eth0/group_fwd_mask"
-+ip netns exec "${br_ns}" sh -c "echo 0 > /sys/class/net/br0/brif/eth2/group_fwd_mask"
-+test_lacp_port_state eth0 $FAILED 5
-+test_lacp_port_state eth1 $COLLECTING_DISTRIBUTING 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 stopped sending LACP"
-+
-+# partner eth0 and eth1 stop LACP
-+RET=0
-+ip netns exec "${br_ns}" sh -c "echo 0 > /sys/class/net/br1/brif/eth1/group_fwd_mask"
-+ip netns exec "${br_ns}" sh -c "echo 0 > /sys/class/net/br1/brif/eth3/group_fwd_mask"
-+test_lacp_port_state both $FAILED 5
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 stopped sending LACP"
-+
-+# switch to lacp_strict on
-+RET=0
-+mode=on
-+ip -n "${d_ns}" link set dev bond0 type bond lacp_strict $mode
-+test_lacp_port_state both $FAILED 1
-+test_master_carrier down $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 stopped sending LACP"
-+
-+# switch back to lacp_strict off mode
-+RET=0
-+mode=off
-+ip -n "${d_ns}" link set dev bond0 type bond lacp_strict $mode
-+test_lacp_port_state both $FAILED 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 stopped sending LACP"
-+
-+# eth0 recovers LACP
-+RET=0
-+ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br0/brif/eth0/group_fwd_mask"
-+ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br0/brif/eth2/group_fwd_mask"
-+test_lacp_port_state eth0 $COLLECTING_DISTRIBUTING 60
-+test_lacp_port_state eth1 $FAILED 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 recovered and eth1 stopped sending LACP"
-+
-+# eth1 recovers LACP
-+RET=0
-+ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br1/brif/eth1/group_fwd_mask"
-+ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br1/brif/eth3/group_fwd_mask"
-+test_lacp_port_state both $COLLECTING_DISTRIBUTING 60
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 recovered LACP"
-+
-+# switch to lacp_strict on
-+RET=0
-+mode=on
-+ip -n "${d_ns}" link set dev bond0 type bond lacp_strict $mode
-+test_lacp_port_state both $COLLECTING_DISTRIBUTING 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 up"
-+
-+# partner eth0 down, eth1 up
-+RET=0
-+ip -n "${p_ns}" link set eth0 down
-+ip -n "${br_ns}" link set eth2 down
-+test_lacp_port_state eth0 $FAILED 5
-+test_lacp_port_state eth1 $COLLECTING_DISTRIBUTING 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 down"
-+
-+# partner eth0 and eth1 down
-+RET=0
-+ip -n "${p_ns}" link set eth1 down
-+ip -n "${br_ns}" link set eth3 down
-+test_lacp_port_state both $FAILED 5
-+test_master_carrier down $mode # down because of min_links
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 down"
-+
-+# partner eth0 up, eth1 down
-+RET=0
-+ip -n "${p_ns}" link set eth0 up
-+ip -n "${br_ns}" link set eth2 up
-+test_lacp_port_state eth0 $COLLECTING_DISTRIBUTING 60
-+test_lacp_port_state eth1 $FAILED 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 up, eth1 down"
-+
-+# partner eth0 and eth1 up
-+RET=0
-+ip -n "${p_ns}" link set eth1 up
-+ip -n "${br_ns}" link set eth3 up
-+test_lacp_port_state both $COLLECTING_DISTRIBUTING 60
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 up"
-+
-+# partner eth0 stops LACP and eth1 up
-+RET=0
-+ip netns exec "${br_ns}" sh -c "echo 0 > /sys/class/net/br0/brif/eth0/group_fwd_mask"
-+ip netns exec "${br_ns}" sh -c "echo 0 > /sys/class/net/br0/brif/eth2/group_fwd_mask"
-+test_lacp_port_state eth0 $FAILED 5
-+test_lacp_port_state eth1 $COLLECTING_DISTRIBUTING 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 stopped sending LACP"
-+
-+# partner eth0 and eth1 stop LACP
-+RET=0
-+ip netns exec "${br_ns}" sh -c "echo 0 > /sys/class/net/br1/brif/eth1/group_fwd_mask"
-+ip netns exec "${br_ns}" sh -c "echo 0 > /sys/class/net/br1/brif/eth3/group_fwd_mask"
-+test_lacp_port_state both $FAILED 5
-+test_master_carrier down $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 stopped sending LACP"
-+
-+# eth0 recovers LACP
-+RET=0
-+ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br0/brif/eth0/group_fwd_mask"
-+ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br0/brif/eth2/group_fwd_mask"
-+test_lacp_port_state eth0 $COLLECTING_DISTRIBUTING 60
-+test_lacp_port_state eth1 $FAILED 1
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 recovered and eth1 stopped sending LACP"
-+
-+# eth1 recovers LACP
-+# shellcheck disable=SC2034
-+RET=0
-+ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br1/brif/eth1/group_fwd_mask"
-+ip netns exec "${br_ns}" sh -c "echo 4 > /sys/class/net/br1/brif/eth3/group_fwd_mask"
-+test_lacp_port_state both $COLLECTING_DISTRIBUTING 60
-+test_master_carrier up $mode
-+log_test "bond LACP" "lacp_strict $mode - eth0 and eth1 recovered LACP"
-+
-+exit "${EXIT_STATUS}"
--- 
-2.39.2
-
+- Eric
 
