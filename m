@@ -1,276 +1,200 @@
-Return-Path: <netdev+bounces-284680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284681-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cFwOGw66+mnASAMAu9opvQ
-	(envelope-from <netdev+bounces-284680-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 05:48:30 +0200
+	id i49/N867+mknSQMAu9opvQ
+	(envelope-from <netdev+bounces-284681-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 05:55:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54F514D600A
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 05:48:30 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D71A4D602A
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 05:55:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0711A30234EE
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 03:48:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2D3B2304298E
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 03:55:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B2DA2E1EFC;
-	Wed,  6 May 2026 03:48:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D5C2D63E8;
+	Wed,  6 May 2026 03:55:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iTaaf2p0"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="IF4vC/p/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011060.outbound.protection.outlook.com [40.93.194.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38EE32D837C;
-	Wed,  6 May 2026 03:48:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778039305; cv=none; b=BhZEHqvn6+pdIchFB92nWLAn1YmjW+4hAUdFtrSmPei6hABdV7UtahVUvG6TqebnU2fzH1EwPgyK0HyC5qJgON3Bc3dkeDjCCmXenW+8GnlTw7D77RJ6qmyfKSxURrudQGo6keszFnzvpIWwacZWmjRqiMiTdN+FEBg1RZleZ58=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778039305; c=relaxed/simple;
-	bh=ykCTtBq8SINm08DR+LJ7xSso/DvgbtTJ05mRiQz/nlU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QHF/MqwbYzMpQZwdaV1A7VxUS6YWTBfuRaRXX3Ph3mgsnL56TZ/OMvIImhlvG0R4nHOST08idgrZhFVFT8zd+wROaVnwpZbOoAbMQO6GGuaB+kXCgzbCl0YI8VMCjtY95+zTuvELguHTdsal2cXMDRJD0UvsMeOWpXr54VbSUkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iTaaf2p0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D611C2BCC4;
-	Wed,  6 May 2026 03:48:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778039305;
-	bh=ykCTtBq8SINm08DR+LJ7xSso/DvgbtTJ05mRiQz/nlU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iTaaf2p0DyXw3VuIpjGvyY7SiPbpfxaVDjAPj35JCCszDPzJ/KsBGsy3lS3UKfOXk
-	 xntyC2rhc6cs4QzJyf0warLqS1iDpjufy/wESBbLPeYYg0/HIII4FKYelYEgnI0XbE
-	 Js8lCBfDuayPrmeVv7AtcAEJt/RuUhXt27cvhdQDiKnM918uEBqZYti0iRMpxSZqKN
-	 0RtzXZKS+6N53i+0cGgV0oZM/k5wt2tUdBW/Hl9kQ9YIOjO6Fs4ivOnjrjAqLY95fC
-	 2nL59MS5tyNFUhuYygbzOgBRyzrbAzZ0Oxqru6D1zPp5fujqTo8Dg13aO1kbESPOL5
-	 3HKnrgP+9bpOg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v3 2/2] selftests: net: add tests for filtered dumps of page pool
-Date: Tue,  5 May 2026 20:48:21 -0700
-Message-ID: <20260506034821.1710113-2-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260506034821.1710113-1-kuba@kernel.org>
-References: <20260506034821.1710113-1-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08249463
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 03:55:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.60
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778039755; cv=fail; b=lKzMyft0FBf9yw6OO/m57GSrnQOPyiXdt4sCI5VV2AHeK3/b6hko+k9bl/nV1Zkrl5cgiPSPuCn77+4uwVdK09+T/8yO6vvLAnUpHHFm8x4yfViD4CjulH5vlXjzyYkP7nqRdj8WLG6K87mtJdOMo/2qrqayAXYKV6b9YzpRBq8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778039755; c=relaxed/simple;
+	bh=LHXVWb1tQoiOaW4uJlDBRiZpbzDXi+ZtOHqTtCYwr64=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=TTxK+s57CN4Iqq+xh0uHwi6Ft642VjmkXTLNP9tIgntZXy40ZxWlisQ5G7k8TM4Spt0UaHHLZ9gcgHubZzp82971O3FutbcZ6FCphYuzo7SVimgXuhdd69tCBLsq5Tkej8TLxlW5VQc6zkt7UvA7o+pkk/YOTvH2VcJ+BZEAsbs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=IF4vC/p/; arc=fail smtp.client-ip=40.93.194.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ROEe9sZcIK2EADy8vF2jOl47U8V5ImswElJNG2QzBFhL/9b+llTNi8fQ9uOeN7xh+i5BWeEnmuc7aWq5tatCI2GJmJ+ajr4TzZw2cwwMp32m3YngP38FILDIDCstOmUIU4EfvmMHw4IH4xvRGACGYzcCpE6eVCg2tPCT/1CnENRK49h4K5AtVDN1fElCegl2YdGt9PIP0cC5vXT3k1H5foiRKt0YvevjpTTzOr2XCuPOXII5chtGQsfH17G+li3BGEpks+Z7NqmVQ63Fg7vLHhHN4ntInvGtzc0SfqabZaAJgWG4b8IJHYJiO+8kEeVYkX3sAx85V6/rT0pnNYCMAQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=r/aOLYh+CC64y6BeXwVb8FGPWodie/MBT5b6snKgZXQ=;
+ b=CojUf3ivHaVSmvXtAtJLk+ogkLKkOGh4oUHSqUF8KlEBOWdwW2pgSyvo6y5fJNv+zQ2DRQWEY8lNzNb4poWfLDHuvdYhHZI59Brd7bwl0YhUqgmx4We+Ig8/xZZd0i9UhpQCeT1xGMhN5UAsCOLym8/KjlKXEZA+CdI4uQZLgAkSBsaHCVIcrYH235jI7b4cT3aqs3JN/f3liKywHfGtNFVwyl0YPT+EQ2IZIsQsH/kMQyQk4NYKXdsZDtoAaQBjI4HrYYWeWWjytshgzgxAI92S4TT6G3r9xEsUScOwOG95rvavolrpqRdw3Xveg1MWy83gNRhxcD3MaKYNmLIUdw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=r/aOLYh+CC64y6BeXwVb8FGPWodie/MBT5b6snKgZXQ=;
+ b=IF4vC/p/yKkGPs5weqRL33Px6vlrXPYniELx8TzaB1xWgn64tQHBvcSZFX8D+EgTT1Dk4ZRDe/mqLxnci1PaYEdhDRDzUwJID1lJLiyULZZGMSWDKaUqk0iEXsUZX2l9lFzg0IrXRi8AZYPH7aLbLZlMI5+oUnABsmXSMBCaETc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5184.namprd12.prod.outlook.com (2603:10b6:5:397::18)
+ by DM3PR12MB9327.namprd12.prod.outlook.com (2603:10b6:0:42::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Wed, 6 May
+ 2026 03:55:52 +0000
+Received: from DM4PR12MB5184.namprd12.prod.outlook.com
+ ([fe80::f927:9cb7:cf3a:e741]) by DM4PR12MB5184.namprd12.prod.outlook.com
+ ([fe80::f927:9cb7:cf3a:e741%5]) with mapi id 15.20.9891.008; Wed, 6 May 2026
+ 03:55:52 +0000
+Message-ID: <fa98f520-7539-42c0-a8f4-1858553946fe@amd.com>
+Date: Wed, 6 May 2026 09:25:47 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: CL37 autonegotiation not working on amd-xgbe
+To: Jakub Kicinski <kuba@kernel.org>, PrashanthKumar.K.R@amd.com,
+ Madhu.Banavara@amd.com
+Cc: Patrick Oppenlander <patrick.oppenlander@gmail.com>,
+ netdev@vger.kernel.org
+References: <CAEg67GmFS0Q4oSZkz8zWdOzckSth9_vBPiOy6a7-d697C2w2Xg@mail.gmail.com>
+ <20260427162839.350135c8@kernel.org>
+Content-Language: en-US
+From: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+In-Reply-To: <20260427162839.350135c8@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MA5P287CA0028.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:a01:17a::12) To DM4PR12MB5184.namprd12.prod.outlook.com
+ (2603:10b6:5:397::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 54F514D600A
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5184:EE_|DM3PR12MB9327:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6fd16458-2d7c-40ba-2357-08deab235dd6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|366016|56012099003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	ejRceS3QrS3IidL8q5es0H4oqApGtfXPW44YNdb6Bi4jWcNdnXHBSIOqLPI0uUlZNLPMggcpbA0aCg3vAxD4P8dt+fCKMfDEHD4qUgv97bXKNMkraGlVRDRP2UpnS088MTW/e4RT9DDk9pDGpXfKeRBhND7YQRSvnGkpHzQBYySuIbQpZVuTROi19x+tsdQI0bix+zt9TBnQ+P7OSs8A4XnI/WFVWgJYK/4GCBQ/tHRDr8gkcIA939WAElEZjTCXSbid4NWQtRCa86bmJBxNncDn/KymR1dgOXLD9zgETlWLUjA27dDr3SLWZqe2btHq/c/RXBNoJre/WagzGKUnAIUy/Dj3MQC8xSlSRn9VQZkHFkk5cRmYC3CrFiztAjMjeenYtmJvclGkdsJthmE8rz3EMtMaTuBQWnWbQln/DZXY0rLpFDKT8LpbFbksKs2l7PvwWOwefQ88XisOB79fVns8s4L1kqQOApk6tK80RqPO34mTA3uMuXj4F9wbnYfH6O61+AQfhNjUY0j0/vunKYzlnb1hkT4iCHqwK2SwLR7AYKkh4o6ZVO9kMyfyBaZUY1ERU/L5M2ZCTU3PURxwjfTSGUnsRhsV/49F0U/TNeNvkiDqIzMKj6PbZXNQRr3DSxF+4z++gzdXNLLENNp/CRsm2x/fSgINHtTTxh6dLQDtiSfcMDsC9RPi2Uh8Iw3K
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5184.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ajZsVk5KRjlCUi9SVjJWN1NTR24xNTBnTlY4VHpqaW1mL1pIQjFNNGdhOHhR?=
+ =?utf-8?B?NVdBRTVjNzh3Y1B2REtUZW9Qd0YyQVRHOUplNkQ3clBGcmhIbjZWb0tIb0pX?=
+ =?utf-8?B?WjV3c0pvWUx6bzlLbTJNb2hnTWVPWnlqcEx5THZuakRWdFg3OGZpTytqSG1V?=
+ =?utf-8?B?WVBIV01YN09PMnduYzZRTDlCK0cvcEM3ZSswWCtabmlERU9SWTNoQjZIbnhK?=
+ =?utf-8?B?NDVXL3F2U2M0Z1BLN2krYlFGa0UxNTBnMXV0dk81R3I1NDNrS1dSV2p4SWU3?=
+ =?utf-8?B?STVqZnN3VSthMmY4ZDFIWXlzalBDcFBjNXR6dE5WSkhvMlErdlJjWXlzOHdF?=
+ =?utf-8?B?VG8raWFiWVRyMTZhRXByd0QvNjFGK0doY1dTSUcwR0RibTIwRW1BdXB5SVNG?=
+ =?utf-8?B?QVdoSkJuWlBudURVTHNOYWZiNkJJb3Rzc3JhWnRBWkN3bEY0ZHV2VjIwTnB6?=
+ =?utf-8?B?VkxWak1KM3l3azFoM3pubDBNclZoN2tiR0VpaGIzdFNTQVQwU3pJRVc5czhH?=
+ =?utf-8?B?M3lXZlZ0Q3BUaE85amJQd01UeWM4Q0NxM0dRcGVLSnRBRUc2T2RyNzJoZE14?=
+ =?utf-8?B?ekNNMGxSR2U5ODlMM1U3YWxVVzlxQXZqRlRXaXNHK0E0ajl5RnQvTHRONTZp?=
+ =?utf-8?B?Y2w5K2VxUXNVL21RcXlpNXdOdC9xcnJkc0d5MDNla3BmTlZSbHBrVm0xMG5a?=
+ =?utf-8?B?U2hJMTQ2S3pYeS9KNzdDL3ZvUFdXMkd6TGVGNW95Wk9iUEoxWW84UzZDUFB0?=
+ =?utf-8?B?bXRCT25NTTZYMVRFWmxOdW1ydi9uWkIweVRxM0JzOVErWXNiQW1FM0w3NFh1?=
+ =?utf-8?B?UHIyVGJhaHV5V3N3QkJtbHZYUXRNWThQc0pxcGtkMnRneGkxc3Urak5pMWps?=
+ =?utf-8?B?dHg1UTNyQ2lwU05CN0d5V3NjeTZKQUF3bG4vdm1sVXFXNkFoak1qdzNKcVor?=
+ =?utf-8?B?Z0U0L2hmYnJUZ1JXeHpWSzU4SzY1QnRLVXpEYnNndkd1OGxQUXZJZmFzeUM5?=
+ =?utf-8?B?N3RsZ1I0U2NVWjJhS0JWN3RUYmViMU9jQ2FXN1EvU1M5NXR5OXVpbnpndG1y?=
+ =?utf-8?B?VDZwMGc3SEJPbFlGUHo5R2QySHByd0Z4VWVhRTZ3em8zNDlVdnQ1NnRWaUNB?=
+ =?utf-8?B?ODFSUHA1akpPekRhUEVMdktaSlo1V0dPUncwVThtYmxjR1RLbDUvaGZhSEd3?=
+ =?utf-8?B?Uld4MjMvU3RDSVQ0UDRHeDZOUHRkajB5OHFvRlRMVkJqZFpCY0pvYXFHMm9N?=
+ =?utf-8?B?eWQ2djJhRjdWcjAzYmZOM2Fack91R0ZsR1lLSmJVTFpFSVo1MGY0bStteEIx?=
+ =?utf-8?B?aU9uTXpnemRuUC9wcXVNSVg5K0U0ekk3NDI5NmVlYm1YRDJQenNhWlRMcGs1?=
+ =?utf-8?B?T3RDWFJMVXBXM0ZEejJXVG1hM0xFaVUwK0tCd2U5UWdOMFIyYkUwYTdNY24y?=
+ =?utf-8?B?UWtlSjVGN1YxVnd4Ny9SdnZuTlJDajdRT2FDS2xubmVYR2g0QXpxZ1BNU3VC?=
+ =?utf-8?B?V2Z1VjREMU1kRHhOdEZaYjgyNEltV3VFLzNmN0oyRTRFNThTREY2R2NoUm9q?=
+ =?utf-8?B?ZVVCZURNdnhPTkszMW5JTm5jY2dPc1MydGhOYVA5allwVUNyMDVvRzd4R05q?=
+ =?utf-8?B?YzNzNzI4VWxseThsdS9jc3ptcWRYa1k4NllMSEQzOGNDKzNHNi9XMU54cUFB?=
+ =?utf-8?B?dXVSV0ZmZGgrMEZEc0t5T2VpSlNieVdvS2RXNzgrenZzdVMxbW4zQjhqUmZZ?=
+ =?utf-8?B?d1JUOUx6VHB5ZVZMQnkvZzA2WmFYekRzY3hGeGZNVUl6THNxbGVweVVGZEVT?=
+ =?utf-8?B?Zms2S3RSOXBFRDZ2Mm5kTlNxT0tTSDZqajB1ci9pUm50bUtNM1hrcVRKYzdZ?=
+ =?utf-8?B?bGw5MjQ5WTRFZ2VyZ2xGL0dxUzB0cnJiR1kwTGg0RW9HSHZ6bndxaS85YUVF?=
+ =?utf-8?B?NEdtZFRqbUd0U2M3UWtQdGdCK0plUW44OGViZlQvRjlzMXNvQUdiOEs3YkNj?=
+ =?utf-8?B?aXc1U3FndU9QYkR0TTE0TklKS2xYbFVIK1lUS2pvTzR4cnY0RDgvU0toOUhS?=
+ =?utf-8?B?M1NWbFMvd2YxcDJ0QlpFOXZTZm9YVXRacUpYaTVaTGxNeWlVNTFQcXhmTVJ3?=
+ =?utf-8?B?Z3VZb09yNWcvRERSUTB4Z1dsNEl1S1ZGTXVuaVZPSzRFaHR3d0d1TlltdStL?=
+ =?utf-8?B?ZzFHNzJKTW5uNWJLWmt1QU5DQUxKZXpMZWczUzZzN2pmRXNscGgvbXpiRVFM?=
+ =?utf-8?B?dDBYY0M3N1NrZkxVWW9XV2hQRm11RTZzTXRIM1BxaktmbHBSY1JvMDNsOS9E?=
+ =?utf-8?B?c29hKzFQRzV6R1JxL014S25kL3pabkN4M05XMGdUQnNsMk0zVWRTdz09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6fd16458-2d7c-40ba-2357-08deab235dd6
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5184.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2026 03:55:52.3048
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7qd8CZFzrzipIi2q4vQgAFxVZiKUeSxyYuIYZlscJ9zjGXx6ubHyYXoPN6syOSTlnDkSq7bjHHhkR1HygtqPwQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR12MB9327
+X-Rspamd-Queue-Id: 4D71A4D602A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284680-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284681-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Shyam-sundar.S-k@amd.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[amd.com:+];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[info.id:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lib.py:url]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:dkim,amd.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-Add tests for page pool dumps of a specific ifindex.
++ Prashanth
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v2:
- - add CONFIG_PAGE_POOL_STATS=y to the config
-v1: https://lore.kernel.org/20260319035649.2396137-2-kuba@kernel.org
----
-CC: shuah@kernel.org
-CC: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/net/config       |   1 +
- tools/testing/selftests/net/nl_netdev.py | 119 ++++++++++++++++++++++-
- 2 files changed, 118 insertions(+), 2 deletions(-)
+On 4/28/2026 04:58, Jakub Kicinski wrote:
+> On Thu, 23 Apr 2026 10:18:49 +1000 Patrick Oppenlander wrote:
+>> A recent change [1] stopped CL37 autonegotiation from working on
+>> amd-xgbe hardware.
+> 
+> Hi Raju! Are you looking into this report?
 
-diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
-index 94d722770420..d07c5ac5cab7 100644
---- a/tools/testing/selftests/net/config
-+++ b/tools/testing/selftests/net/config
-@@ -117,6 +117,7 @@ CONFIG_OPENVSWITCH=m
- CONFIG_OPENVSWITCH_GENEVE=m
- CONFIG_OPENVSWITCH_GRE=m
- CONFIG_OPENVSWITCH_VXLAN=m
-+CONFIG_PAGE_POOL_STATS=y
- CONFIG_PROC_SYSCTL=y
- CONFIG_PSAMPLE=m
- CONFIG_RPS=y
-diff --git a/tools/testing/selftests/net/nl_netdev.py b/tools/testing/selftests/net/nl_netdev.py
-index eff55c64a012..ceb44c8e1fec 100755
---- a/tools/testing/selftests/net/nl_netdev.py
-+++ b/tools/testing/selftests/net/nl_netdev.py
-@@ -9,7 +9,7 @@ import errno
- from os import system
- from lib.py import ksft_run, ksft_exit
- from lib.py import ksft_eq, ksft_ge, ksft_ne, ksft_raises, ksft_busy_wait
--from lib.py import NetdevFamily, NetdevSimDev, NlError, ip
-+from lib.py import NetdevFamily, NetdevSimDev, NlError, defer, ip
- 
- 
- def empty_check(nf) -> None:
-@@ -255,6 +255,117 @@ from lib.py import NetdevFamily, NetdevSimDev, NlError, ip
-         nsim.dfs_write("pp_hold", "y")
- 
- 
-+def page_pool_dump_ifindex(nf) -> None:
-+    """Test page pool dump filtering by ifindex."""
-+    nsimdev1 = NetdevSimDev(queue_count=3)
-+    rm_nsim1 = defer(nsimdev1.remove)
-+    nsimdev2 = NetdevSimDev(queue_count=5)
-+    defer(nsimdev2.remove)
-+
-+    nsim1 = nsimdev1.nsims[0]
-+    nsim2 = nsimdev2.nsims[0]
-+
-+    ip(f"link set dev {nsim1.ifname} up")
-+    ip(f"link set dev {nsim2.ifname} up")
-+
-+    # Unfiltered dump should have pools from both devices
-+    all_pp = nf.page_pool_get({}, dump=True)
-+    pp1_all = [pp for pp in all_pp
-+               if pp.get("ifindex") == nsim1.ifindex]
-+    pp2_all = [pp for pp in all_pp
-+               if pp.get("ifindex") == nsim2.ifindex]
-+    ksft_ge(len(pp1_all), 1)
-+    ksft_ge(len(pp2_all), 1)
-+
-+    # Filtered dump should only return pools for that device
-+    pp1_flt = nf.page_pool_get({'ifindex': nsim1.ifindex}, dump=True)
-+    ksft_eq(pp1_flt, pp1_all)
-+
-+    pp2_flt = nf.page_pool_get({'ifindex': nsim2.ifindex}, dump=True)
-+    ksft_eq(pp2_flt, pp2_all)
-+
-+    # Non-existent ifindex should return empty dump
-+    pp_none = nf.page_pool_get({'ifindex': 12345678}, dump=True)
-+    ksft_eq(len(pp_none), 0)
-+
-+    # Device down - no pools for that ifindex
-+    ip(f"link set dev {nsim1.ifname} down")
-+    pp1_down = nf.page_pool_get({'ifindex': nsim1.ifindex}, dump=True)
-+    ksft_eq(len(pp1_down), 0)
-+
-+    # Remove device, dump by its old ifindex should return empty
-+    old_ifindex = nsim1.ifindex
-+    rm_nsim1.exec()
-+    pp1_gone = nf.page_pool_get({'ifindex': old_ifindex}, dump=True)
-+    ksft_eq(len(pp1_gone), 0)
-+
-+
-+def page_pool_ifindex_leak_check(nf) -> None:
-+    """Test that zombie page pools don't show up under the original ifindex."""
-+    nsimdev = NetdevSimDev()
-+    rm_nsim = defer(nsimdev.remove)
-+    nsim = nsimdev.nsims[0]
-+
-+    ip(f"link set dev {nsim.ifname} up")
-+    nsim.dfs_write("pp_hold", "y")
-+
-+    pp_up = nf.page_pool_get({'ifindex': nsim.ifindex}, dump=True)
-+    ksft_ge(len(pp_up), 1)
-+
-+    # Remove device with leaked page - pool becomes zombie (orphaned to lo)
-+    old_ifindex = nsim.ifindex
-+    rm_nsim.exec()
-+
-+    # Zombie pool should NOT appear under the original device
-+    pp_down = nf.page_pool_get({'ifindex': old_ifindex}, dump=True)
-+    ksft_eq(len(pp_down), 0)
-+
-+    # But it should appear in an unfiltered dump (under loopback)
-+    pp_all = nf.page_pool_get({}, dump=True)
-+    orphans = [pp for pp in pp_all
-+               if "detach-time" in pp and "ifindex" not in pp]
-+    ksft_ge(len(orphans), 1)
-+
-+
-+def page_pool_stats_ifindex_check(nf) -> None:
-+    """Test page pool stats dump filtering by ifindex."""
-+    nsimdev1 = NetdevSimDev(queue_count=3)
-+    defer(nsimdev1.remove)
-+    nsimdev2 = NetdevSimDev(queue_count=5)
-+    defer(nsimdev2.remove)
-+
-+    nsim1 = nsimdev1.nsims[0]
-+    nsim2 = nsimdev2.nsims[0]
-+
-+    ip(f"link set dev {nsim1.ifname} up")
-+    ip(f"link set dev {nsim2.ifname} up")
-+
-+    # Unfiltered stats dump
-+    all_stats = nf.page_pool_stats_get({}, dump=True)
-+    s1_all = [s for s in all_stats
-+              if s.get("info", {}).get("ifindex") == nsim1.ifindex]
-+    s2_all = [s for s in all_stats
-+              if s.get("info", {}).get("ifindex") == nsim2.ifindex]
-+    ksft_ge(len(s1_all), 1)
-+    ksft_ge(len(s2_all), 1)
-+
-+    # Filtered stats dump
-+    s1_flt = nf.page_pool_stats_get({'info': {'ifindex': nsim1.ifindex}},
-+                                    dump=True)
-+    ksft_eq(s1_flt, s1_all)
-+
-+    # Non-existent ifindex should return empty
-+    s_none = nf.page_pool_stats_get({'info': {'ifindex': 12345678}}, dump=True)
-+    ksft_eq(len(s_none), 0)
-+
-+    # info.id should be rejected for stats dump
-+    with ksft_raises(NlError) as cm:
-+        nf.page_pool_stats_get({'info': {'id': s1_all[0]['info']['id']}},
-+                               dump=True)
-+    ksft_eq(cm.exception.nl_msg.error, -errno.EINVAL)
-+    ksft_eq(cm.exception.nl_msg.extack['bad-attr'], '.info.id')
-+
-+
- def main() -> None:
-     """ Ksft boiler plate main """
-     nf = NetdevFamily()
-@@ -265,7 +376,11 @@ from lib.py import NetdevFamily, NetdevSimDev, NlError, ip
-               napi_set_threaded,
-               dev_set_threaded,
-               nsim_rxq_reset_down,
--              page_pool_check],
-+              page_pool_check,
-+              page_pool_dump_ifindex,
-+              page_pool_ifindex_leak_check,
-+              page_pool_stats_ifindex_check
-+              ],
-              args=(nf, ))
-     ksft_exit()
- 
--- 
-2.54.0
+Dropping Raju as he is no longer with AMD.
+
+Thanks for the bug report. Prashanth will maintain this driver going
+forward.
+
+Prashanth, can you address this bug? Also, please update the
+MAINTAINERS list by dropping Raju's name.
+
+Thanks,
+Shyam
 
 
