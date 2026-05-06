@@ -1,740 +1,174 @@
-Return-Path: <netdev+bounces-285008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285011-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IEd/LXeW+2ladAMAu9opvQ
-	(envelope-from <netdev+bounces-285008-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 21:28:55 +0200
+	id 8CDgLC+X+2ladAMAu9opvQ
+	(envelope-from <netdev+bounces-285011-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 21:31:59 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DB3F4DFC7A
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 21:28:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59BC34DFCB7
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 21:31:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5BA66300F519
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 19:28:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 225DD300A600
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 19:30:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BFE431A805;
-	Wed,  6 May 2026 19:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5CC631A072;
+	Wed,  6 May 2026 19:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="QMNO4b4V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OyCe8NJD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout4.routing.net (mxout4.routing.net [134.0.28.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB993318BB3;
-	Wed,  6 May 2026 19:28:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101AA275B03
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 19:30:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778095707; cv=none; b=WKGtQWV3ZCrahXiFz2tokJO5Cj/e0A2VkZkmXTZr+wMI3RGkEcFIGc1aphFCUma5bppUi5E9TUMT/DRV/bOCNDICqt/0azUN4MQu1PNEy4pbXLRxSUfYXsaa8+47yFuJJvABw5Z4k5K8ifKImDG8Ae9lglL7LAySP+rjwGVxOhE=
+	t=1778095811; cv=none; b=Zhi0rsRgztfDib3BQ1jKIdWFJGSkVBrIfqYBwZuSTee7EebOj6z/1lZZQkDI3YfzfqQQTtwxfMDyNmKA81tXLJBLoqHTPddHnaWk7eb2jzY1jMOIhn2HvMaADhpoX+09z8G6D4sh5r2fBNRuTI6gGi4kOhFVsIvSHWDGoRSlu+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778095707; c=relaxed/simple;
-	bh=FW/K0Ch+5OkjU9+sOHxfNpXa1YIsaRF8k+2PKAEKnzI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eHHjSqO2u/0rgh5DUKKJYu++fKA8Hi+/+yC9D5RxXcIfeg3ZSFZBbipkf0+ZfxlsnNnfS6jQC1c2lzU2j+HWNABmDLsHtBJWxs5AYK6TtAHS8tmnPehiYteLRPDrH+INy8SohUZ9yFyqUt+kqHQkhU7hEbCp0CBcjA7NnygYeKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=QMNO4b4V; arc=none smtp.client-ip=134.0.28.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
-Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
-	by mxout4.routing.net (Postfix) with ESMTP id DB92F1013EC;
-	Wed,  6 May 2026 19:28:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=routing; t=1778095697;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pe/35GHt0GGUlqdC6M1xfqxH9+eIUbSBIk6ceC+kDRk=;
-	b=QMNO4b4Vv25tvtJRC8/pqiJJmuG1zgPfrZxWeW6s0HokGGDgHAN6wvWVOkm7i9vA/vK8ud
-	+W7sgwu/vGD8fvRliphBHy0Q8BnJXISVLqaobkASojNBpeciiyyxEQnmmRPQekjyrM7KuW
-	YKsiZprGqq121By2DdnelRAeGMZ9T/o=
-Received: from frank-u24.. (unknown [217.61.157.0])
-	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id 9BA0C1226F3;
-	Wed,  6 May 2026 19:28:16 +0000 (UTC)
-From: Frank Wunderlich <linux@fw-web.de>
-To: Felix Fietkau <nbd@nbd.name>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: Frank Wunderlich <frank-w@public-files.de>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Mason Chang <mason-cw.chang@mediatek.com>,
-	Daniel Golle <daniel@makrotopia.org>
-Subject: [net-next v7 3/3] net: ethernet: mtk_eth_soc: Add LRO support
-Date: Wed,  6 May 2026 21:28:03 +0200
-Message-ID: <20260506192806.143725-4-linux@fw-web.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260506192806.143725-1-linux@fw-web.de>
-References: <20260506192806.143725-1-linux@fw-web.de>
+	s=arc-20240116; t=1778095811; c=relaxed/simple;
+	bh=T/Z0ue1NjRjnHIwvygpPdlK10J9GktOfORG2BaFoOP8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Cg3Z3TcgXc94unohgxWgozuHGJvRD+WGeNoMt4qiP/KoaWcfsYxQya9QbC8k89lech3KUXIuWLial9tpK74kNYNrcozwvrudAdScq2wppWnBV2DAelmLXAUloWJZsXS1o9y7TnQyg/AXPls+rzjRR/yJbC3ga88nCMz6uiysUUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OyCe8NJD; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-7bb0d18c7f9so197727b3.0
+        for <netdev@vger.kernel.org>; Wed, 06 May 2026 12:30:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778095809; x=1778700609; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/PObqSo3yI/weBtZ6Fr+3JYSL4ynGoc1gJ3FrdqU23g=;
+        b=OyCe8NJDhKG+n/pZc7dWnp6m1nfSIu5MPq33xP3SCXVD41LLstakkV96WP+zY5de6O
+         25dhc67NFcBvrfVVPH6tEQXqWs86SNPz8fORCJtulgTzKpMvktzGdX4u7awITY6oYeBS
+         vmSXd/BH3eh+I/8cPIflDI/9khdlPvFhujWBV77O4Oi+OsVTKLwpMX5sQtKcaqYlfFGg
+         YDVC98oUi7kd35TRd4mkou1ztHlccc2zGw6o5iKKHerwZSMvtBtkZyWmx/GCkWZ1CGGj
+         jJVNPqeU9b03yEnt7Kdcn9wudIS7lPfBqi/tj6Q0n4qTxglMk5eSl00edsIO80fNYV6p
+         Vg5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778095809; x=1778700609;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/PObqSo3yI/weBtZ6Fr+3JYSL4ynGoc1gJ3FrdqU23g=;
+        b=lnjAML21h+n2g7eCkkL1Lhc+cfceDWN+dU9zYLqEY/Kb9vpgnAeY4zjpxJzZMyNByd
+         5X4pVMZkjeNgE3dwZGZurxgmcBWCNaNsmA+BpqiH/2Epx4+jz9uq6/2OE24Q2ip9SdQj
+         bASyufTvQHOMaESMNys5eF5jDUg8EeRNq6hF84rBV8wnhR/db0fDiecTjRf2A8tdO4ar
+         TQmejexCQg2FvaNgKO8wchhwikpTNSzLA82wnrKkOn3VOYF5J/mUXH00WzC8BxnL00zz
+         Lc7TBLNl8SKCf7pNI3LfJ3wXLDBfYtQpuIRfmMCfrMA/EO4OIRfZDfM8J8F75Laf8RH/
+         KMZw==
+X-Gm-Message-State: AOJu0YwL56xgN3T0iR6jFgodpzOjRVo77/9/PzBsck78+rnIyU48Cf7h
+	wZ4FXIP/W+26LSx6Y+FT4E2eBAZlnoXEZuIzVuCC1Wkj5cShXIveDkgO
+X-Gm-Gg: AeBDiesgnpU/pD1FEWMjpiVhZO9uBb1ncNBa0Zu2tdx/wKr8LI6pozjBAeQFXqCMG6U
+	AXB2peb7nk6745zWn/kHch2lC26gaXddFrDJSLvW4wBf0HnZoyVAIac2cMydsXs2ZkGEhG/R56M
+	bMV2kCO4ZaXLn7KECiAzOO5T+YJjXrFbRJ8kQXHtBGTC1U0lxzUXWSLsVnEhgo5wrloujWdQgi6
+	GPlFbe7UCPA2QL98yGuDyA8987jFWdVoPx711hGhheT88Z5G+NfcEJAcD59zRchvH1Q2LKUdAF3
+	QVMGVHORuD77Zz6kjKiLzLf0jK62L8nltKF/6MsFjgj+/qMV3BF0dJBGJaual19ht0QMZm1yeum
+	POovnKS+F8tEZLxkxG0t9OdTSpKoErTTRLoiqWx/Pj8zm40HDjkVWBwAJDSCpxvNUEh1H9WTn8E
+	1lXG6/kaAHRXoRviF9KQ9LxSZMhKjcrdEe4Idjeyz1Cy0kCHHSn8acyI/fORK2tKvyBK9WBnZQk
+	HtxwqnsXiovYPQ=
+X-Received: by 2002:a05:690c:4510:b0:7bf:27e:66ae with SMTP id 00721157ae682-7bf027e70acmr4609997b3.30.1778095808985;
+        Wed, 06 May 2026 12:30:08 -0700 (PDT)
+Received: from gmail.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7bd66527421sm82466277b3.2.2026.05.06.12.30.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 May 2026 12:30:07 -0700 (PDT)
+Date: Wed, 06 May 2026 15:30:06 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Daniel Zahka <daniel.zahka@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.1dcf55066b2e@gmail.com>
+In-Reply-To: <20260505-psd-rcu-v1-1-a8f69ec1ab96@gmail.com>
+References: <20260505-psd-rcu-v1-0-a8f69ec1ab96@gmail.com>
+ <20260505-psd-rcu-v1-1-a8f69ec1ab96@gmail.com>
+Subject: Re: [PATCH net 1/3] netdevsim: psp: only call nsim_psp_uninit() on
+ PFs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 2DB3F4DFC7A
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 59BC34DFCB7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[mailerdienst.de:s=routing];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285008-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[nbd.name,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,collabora.com,armlinux.org.uk];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[public-files.de,vger.kernel.org,lists.infradead.org,mediatek.com,makrotopia.org];
-	DMARC_NA(0.00)[fw-web.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linux@fw-web.de,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-285011-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mailerdienst.de:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,public-files.de:email,fw-web.de:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-From: Mason Chang <mason-cw.chang@mediatek.com>
+Daniel Zahka wrote:
+> VFs go through nsim_init_netdevsim_vf() which never calls
+> nsim_psp_init(), so ns->psp.dev stays NULL. nsim_psp_uninit() guards
+> with !IS_ERR(ns->psp.dev), so destroying a VF reaches
+> psp_dev_unregister(NULL) and dereferences NULL on the first
+> mutex_lock(&psd->lock):
+> 
+>   BUG: kernel NULL pointer dereference, address: 0000000000000020
+>   RIP: 0010:mutex_lock+0x1c/0x30
+>   Call Trace:
+>    psp_dev_unregister+0x2a/0x1a0
+>    nsim_psp_uninit+0x1f/0x40 [netdevsim]
+>    nsim_destroy+0x61/0x1e0 [netdevsim]
+>    __nsim_dev_port_del+0x47/0x90 [netdevsim]
+>    nsim_drv_configure_vfs+0xc9/0x130 [netdevsim]
+>    nsim_bus_dev_numvfs_store+0x79/0xb0 [netdevsim]
+> 
+> Gate nsim_psp_uninit() on nsim_dev_port_is_pf(), matching the pattern
+> already used for nsim_exit_netdevsim() and the bpf/ipsec/macsec/queue
+> teardowns.
+> 
+> Reproducer:
+>   modprobe netdevsim
+>   echo "10 1" > /sys/bus/netdevsim/new_device
+>   echo 1 > /sys/bus/netdevsim/devices/netdevsim10/sriov_numvfs
+>   devlink dev eswitch set netdevsim/netdevsim10 mode switchdev
+>   echo 0 > /sys/bus/netdevsim/devices/netdevsim10/sriov_numvfs
+> 
+> Fixes: f857478d6206 ("netdevsim: a basic test PSP implementation")
+> Assisted-by: Claude:claude-opus-4.6
+> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 
-Add Large Receive Offload support to mediatek ethernet driver and
-activate it for MT7988.
-
-Signed-off-by: Mason Chang <mason-cw.chang@mediatek.com>
-Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
----
-v7:
-- fix u32 vs. be32 reported by patchwork check
-- add L4 PSH check
-  https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/7521c42b0bd5be20d52e20b110daea8c756fc069%5E%21/#F1
-- Add HW LRO max 4-depth VLAN support including switch special tag.
-  https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/35490cec6a2e5982532935fb0a1c884f7c4efdb0%5E%21/#F2
-
-v6:
-- fix some Macro argument '...' may be better as '(...)' to avoid precedence issues for LRO
-- drop unused MTK_CTRL_DW0_SDL_MASK
-
-v5:
-- fix too long lines reported by checkpatch
-  MTK_LRO_RING_RELINQUISH_REQ
-  MTK_LRO_RING_RELINQUISH_DONE
-  irq handling (MTK_HW_LRO_IRQ + MTK_HW_LRO_RING)
-
-v4:
-- fix lro reverse christmas tree and LRO params suggested by andrew
-- drop mtk_hwlro_stats_ebl and unused IS_HW_LRO_RING (only used in
-  properitary debugfs)
-
-v2:
-- drop link to commit for 6.6 patch
----
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 251 +++++++++++++++++---
- drivers/net/ethernet/mediatek/mtk_eth_soc.h |  51 ++--
- 2 files changed, 247 insertions(+), 55 deletions(-)
-
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 908fd88287ac..3ffd89aa7727 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -2793,7 +2793,7 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int ring_no, int rx_flag)
- 
- 	if (rx_flag == MTK_RX_FLAGS_HWLRO) {
- 		rx_data_len = MTK_MAX_LRO_RX_LENGTH;
--		rx_dma_size = MTK_HW_LRO_DMA_SIZE;
-+		rx_dma_size = MTK_HW_LRO_DMA_SIZE(eth);
- 	} else {
- 		rx_data_len = ETH_DATA_LEN;
- 		rx_dma_size = soc->rx.dma_size;
-@@ -2806,7 +2806,7 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int ring_no, int rx_flag)
- 	if (!ring->data)
- 		return -ENOMEM;
- 
--	if (mtk_page_pool_enabled(eth)) {
-+	if (mtk_page_pool_enabled(eth) && rcu_access_pointer(eth->prog))  {
- 		struct page_pool *pp;
- 
- 		pp = mtk_create_page_pool(eth, &ring->xdp_q, ring_no,
-@@ -2952,10 +2952,11 @@ static void mtk_rx_clean(struct mtk_eth *eth, struct mtk_rx_ring *ring, bool in_
- 
- static int mtk_hwlro_rx_init(struct mtk_eth *eth)
- {
--	const struct mtk_reg_map *reg_map = eth->soc->reg_map;
--	int i;
- 	u32 ring_ctrl_dw1 = 0, ring_ctrl_dw2 = 0, ring_ctrl_dw3 = 0;
-+	const struct mtk_reg_map *reg_map = eth->soc->reg_map;
-+	const struct mtk_soc_data *soc = eth->soc;
- 	u32 lro_ctrl_dw0 = 0, lro_ctrl_dw3 = 0;
-+	int i, val;
- 
- 	/* set LRO rings to auto-learn modes */
- 	ring_ctrl_dw2 |= MTK_RING_AUTO_LERAN_MODE;
-@@ -2974,30 +2975,50 @@ static int mtk_hwlro_rx_init(struct mtk_eth *eth)
- 	ring_ctrl_dw2 |= MTK_RING_MAX_AGG_CNT_L;
- 	ring_ctrl_dw3 |= MTK_RING_MAX_AGG_CNT_H;
- 
--	for (i = 1; i < MTK_MAX_RX_RING_NUM; i++) {
-+	for (i = 1; i <= MTK_HW_LRO_RING_NUM(eth); i++) {
- 		mtk_w32(eth, ring_ctrl_dw1, MTK_LRO_CTRL_DW1_CFG(reg_map, i));
- 		mtk_w32(eth, ring_ctrl_dw2, MTK_LRO_CTRL_DW2_CFG(reg_map, i));
- 		mtk_w32(eth, ring_ctrl_dw3, MTK_LRO_CTRL_DW3_CFG(reg_map, i));
- 	}
- 
- 	/* IPv4 checksum update enable */
--	lro_ctrl_dw0 |= MTK_L3_CKS_UPD_EN;
-+	lro_ctrl_dw0 |= MTK_L3_CKS_UPD_EN(eth);
- 
- 	/* switch priority comparison to packet count mode */
- 	lro_ctrl_dw0 |= MTK_LRO_ALT_PKT_CNT_MODE;
- 
-+	/* enable L4 PSH flag check */
-+	lro_ctrl_dw0 |= MTK_LRO_L4_CTRL_PSH_EN;
-+
- 	/* bandwidth threshold setting */
--	mtk_w32(eth, MTK_HW_LRO_BW_THRE, MTK_PDMA_LRO_CTRL_DW2);
-+	mtk_w32(eth, MTK_HW_LRO_BW_THRE, MTK_PDMA_LRO_CTRL_DW2(reg_map));
- 
- 	/* auto-learn score delta setting */
--	mtk_w32(eth, MTK_HW_LRO_REPLACE_DELTA, MTK_PDMA_LRO_ALT_SCORE_DELTA);
-+	mtk_w32(eth, MTK_HW_LRO_REPLACE_DELTA, MTK_PDMA_LRO_ALT_SCORE_DELTA(reg_map));
- 
- 	/* set refresh timer for altering flows to 1 sec. (unit: 20us) */
- 	mtk_w32(eth, (MTK_HW_LRO_TIMER_UNIT << 16) | MTK_HW_LRO_REFRESH_TIME,
- 		MTK_PDMA_LRO_ALT_REFRESH_TIMER);
- 
--	/* set HW LRO mode & the max aggregation count for rx packets */
--	lro_ctrl_dw3 |= MTK_ADMA_MODE | (MTK_HW_LRO_MAX_AGG_CNT & 0xff);
-+	if (mtk_is_netsys_v3_or_greater(eth)) {
-+		val = mtk_r32(eth, reg_map->pdma.rx_cfg);
-+		mtk_w32(eth, val | ((MTK_PDMA_LRO_SDL + MTK_MAX_RX_LENGTH) <<
-+			MTK_RX_CFG_SDL_OFFSET), reg_map->pdma.rx_cfg);
-+
-+		lro_ctrl_dw0 |= MTK_PDMA_LRO_SDL << MTK_CTRL_DW0_SDL_OFFSET;
-+
-+		/* enable cpu reason black list */
-+		lro_ctrl_dw0 |= MTK_LRO_CRSN_BNW(eth);
-+
-+		/* no use PPE cpu reason */
-+		mtk_w32(eth, 0xffffffff, MTK_PDMA_LRO_CTRL_DW1(reg_map));
-+	} else {
-+		/* set HW LRO mode & the max aggregation count for rx packets */
-+		lro_ctrl_dw3 |= MTK_ADMA_MODE | (MTK_HW_LRO_MAX_AGG_CNT & 0xff);
-+	}
-+
-+	/* enable max 4-depth VLAN support including switch special tag */
-+	lro_ctrl_dw3 |= MTK_LRO_VLAN_VID_CMP_DEPTH | MTK_LRO_VLAN_EN;
- 
- 	/* the minimal remaining room of SDL0 in RXD for lro aggregation */
- 	lro_ctrl_dw3 |= MTK_LRO_MIN_RXD_SDL;
-@@ -3005,8 +3026,19 @@ static int mtk_hwlro_rx_init(struct mtk_eth *eth)
- 	/* enable HW LRO */
- 	lro_ctrl_dw0 |= MTK_LRO_EN;
- 
--	mtk_w32(eth, lro_ctrl_dw3, MTK_PDMA_LRO_CTRL_DW3);
--	mtk_w32(eth, lro_ctrl_dw0, MTK_PDMA_LRO_CTRL_DW0);
-+	mtk_w32(eth, lro_ctrl_dw3, MTK_PDMA_LRO_CTRL_DW3(reg_map));
-+	mtk_w32(eth, lro_ctrl_dw0, MTK_PDMA_LRO_CTRL_DW0(reg_map));
-+
-+	if (mtk_is_netsys_v2_or_greater(eth)) {
-+		i = (soc->rx.desc_size == sizeof(struct mtk_rx_dma_v2)) ? 1 : 0;
-+		mtk_m32(eth, MTK_RX_DONE_INT(eth, MTK_HW_LRO_RING(eth, i)),
-+			MTK_RX_DONE_INT(eth, MTK_HW_LRO_RING(eth, i)), reg_map->pdma.int_grp);
-+		mtk_m32(eth, MTK_RX_DONE_INT(eth, MTK_HW_LRO_RING(eth, i + 1)),
-+			MTK_RX_DONE_INT(eth, MTK_HW_LRO_RING(eth, i + 1)),
-+			reg_map->pdma.int_grp + 0x4);
-+		mtk_m32(eth, MTK_RX_DONE_INT(eth, MTK_HW_LRO_RING(eth, i + 2)),
-+			MTK_RX_DONE_INT(eth, MTK_HW_LRO_RING(eth, i + 2)), reg_map->pdma.int_grp3);
-+	}
- 
- 	return 0;
- }
-@@ -3014,16 +3046,16 @@ static int mtk_hwlro_rx_init(struct mtk_eth *eth)
- static void mtk_hwlro_rx_uninit(struct mtk_eth *eth)
- {
- 	const struct mtk_reg_map *reg_map = eth->soc->reg_map;
--	int i;
- 	u32 val;
-+	int i;
- 
- 	/* relinquish lro rings, flush aggregated packets */
--	mtk_w32(eth, MTK_LRO_RING_RELINQUISH_REQ, MTK_PDMA_LRO_CTRL_DW0);
-+	mtk_w32(eth, MTK_LRO_RING_RELINQUISH_REQ(eth), MTK_PDMA_LRO_CTRL_DW0(reg_map));
- 
- 	/* wait for relinquishments done */
- 	for (i = 0; i < 10; i++) {
--		val = mtk_r32(eth, MTK_PDMA_LRO_CTRL_DW0);
--		if (val & MTK_LRO_RING_RELINQUISH_DONE) {
-+		val = mtk_r32(eth, MTK_PDMA_LRO_CTRL_DW0(reg_map));
-+		if (val & MTK_LRO_RING_RELINQUISH_DONE(eth)) {
- 			msleep(20);
- 			continue;
- 		}
-@@ -3031,11 +3063,11 @@ static void mtk_hwlro_rx_uninit(struct mtk_eth *eth)
- 	}
- 
- 	/* invalidate lro rings */
--	for (i = 1; i < MTK_MAX_RX_RING_NUM; i++)
-+	for (i = 1; i <= MTK_HW_LRO_RING_NUM(eth); i++)
- 		mtk_w32(eth, 0, MTK_LRO_CTRL_DW2_CFG(reg_map, i));
- 
- 	/* disable HW LRO */
--	mtk_w32(eth, 0, MTK_PDMA_LRO_CTRL_DW0);
-+	mtk_w32(eth, 0, MTK_PDMA_LRO_CTRL_DW0(reg_map));
- }
- 
- static void mtk_hwlro_val_ipaddr(struct mtk_eth *eth, int idx, __be32 ip)
-@@ -3048,7 +3080,7 @@ static void mtk_hwlro_val_ipaddr(struct mtk_eth *eth, int idx, __be32 ip)
- 	/* invalidate the IP setting */
- 	mtk_w32(eth, (reg_val & ~MTK_RING_MYIP_VLD), MTK_LRO_CTRL_DW2_CFG(reg_map, idx));
- 
--	mtk_w32(eth, ip, MTK_LRO_DIP_DW0_CFG(idx));
-+	mtk_w32(eth, ip, MTK_LRO_DIP_DW0_CFG(reg_map, idx));
- 
- 	/* validate the IP setting */
- 	mtk_w32(eth, (reg_val | MTK_RING_MYIP_VLD), MTK_LRO_CTRL_DW2_CFG(reg_map, idx));
-@@ -3064,7 +3096,7 @@ static void mtk_hwlro_inval_ipaddr(struct mtk_eth *eth, int idx)
- 	/* invalidate the IP setting */
- 	mtk_w32(eth, (reg_val & ~MTK_RING_MYIP_VLD), MTK_LRO_CTRL_DW2_CFG(reg_map, idx));
- 
--	mtk_w32(eth, 0, MTK_LRO_DIP_DW0_CFG(idx));
-+	mtk_w32(eth, 0, MTK_LRO_DIP_DW0_CFG(reg_map, idx));
- }
- 
- static int mtk_hwlro_get_ip_cnt(struct mtk_mac *mac)
-@@ -3080,6 +3112,65 @@ static int mtk_hwlro_get_ip_cnt(struct mtk_mac *mac)
- 	return cnt;
- }
- 
-+static int mtk_hwlro_add_ipaddr_idx(struct net_device *dev, u32 ip4dst)
-+{
-+	struct mtk_mac *mac = netdev_priv(dev);
-+	const struct mtk_reg_map *reg_map;
-+	struct mtk_eth *eth = mac->hw;
-+	u32 reg_val;
-+	int i;
-+
-+	reg_map = eth->soc->reg_map;
-+
-+	/* check for duplicate IP address in the current DIP list */
-+	for (i = 1; i <= MTK_HW_LRO_DIP_NUM(eth); i++) {
-+		reg_val = mtk_r32(eth, MTK_LRO_DIP_DW0_CFG(reg_map, i));
-+		if (reg_val == ip4dst)
-+			break;
-+	}
-+
-+	if (i < MTK_HW_LRO_DIP_NUM(eth) + 1) {
-+		netdev_warn(dev, "Duplicate IP address at DIP(%d)!\n", i);
-+		return -EEXIST;
-+	}
-+
-+	/* find out available DIP index */
-+	for (i = 1; i <= MTK_HW_LRO_DIP_NUM(eth); i++) {
-+		reg_val = mtk_r32(eth, MTK_LRO_DIP_DW0_CFG(reg_map, i));
-+		if (reg_val == 0UL)
-+			break;
-+	}
-+
-+	if (i >= MTK_HW_LRO_DIP_NUM(eth) + 1) {
-+		netdev_warn(dev, "DIP index is currently out of resource!\n");
-+		return -EBUSY;
-+	}
-+
-+	return i;
-+}
-+
-+static int mtk_hwlro_get_ipaddr_idx(struct net_device *dev, u32 ip4dst)
-+{
-+	struct mtk_mac *mac = netdev_priv(dev);
-+	struct mtk_eth *eth = mac->hw;
-+	u32 reg_val;
-+	int i;
-+
-+	/* find out DIP index that matches the given IP address */
-+	for (i = 1; i <= MTK_HW_LRO_DIP_NUM(eth); i++) {
-+		reg_val = mtk_r32(eth, MTK_LRO_DIP_DW0_CFG(eth->soc->reg_map, i));
-+		if (reg_val == ip4dst)
-+			break;
-+	}
-+
-+	if (i >= MTK_HW_LRO_DIP_NUM(eth) + 1) {
-+		netdev_warn(dev, "DIP address is not exist!\n");
-+		return -ENOENT;
-+	}
-+
-+	return i;
-+}
-+
- static int mtk_hwlro_add_ipaddr(struct net_device *dev,
- 				struct ethtool_rxnfc *cmd)
- {
-@@ -3088,15 +3179,19 @@ static int mtk_hwlro_add_ipaddr(struct net_device *dev,
- 	struct mtk_mac *mac = netdev_priv(dev);
- 	struct mtk_eth *eth = mac->hw;
- 	int hwlro_idx;
-+	__be32 ip4dst;
- 
- 	if ((fsp->flow_type != TCP_V4_FLOW) ||
- 	    (!fsp->h_u.tcp_ip4_spec.ip4dst) ||
- 	    (fsp->location > 1))
- 		return -EINVAL;
- 
--	mac->hwlro_ip[fsp->location] = htonl(fsp->h_u.tcp_ip4_spec.ip4dst);
--	hwlro_idx = (mac->id * MTK_MAX_LRO_IP_CNT) + fsp->location;
-+	ip4dst = htonl(fsp->h_u.tcp_ip4_spec.ip4dst);
-+	hwlro_idx = mtk_hwlro_add_ipaddr_idx(dev, ip4dst);
-+	if (hwlro_idx < 0)
-+		return hwlro_idx;
- 
-+	mac->hwlro_ip[fsp->location] = ip4dst;
- 	mac->hwlro_ip_cnt = mtk_hwlro_get_ip_cnt(mac);
- 
- 	mtk_hwlro_val_ipaddr(eth, hwlro_idx, mac->hwlro_ip[fsp->location]);
-@@ -3112,13 +3207,17 @@ static int mtk_hwlro_del_ipaddr(struct net_device *dev,
- 	struct mtk_mac *mac = netdev_priv(dev);
- 	struct mtk_eth *eth = mac->hw;
- 	int hwlro_idx;
-+	__be32 ip4dst;
- 
- 	if (fsp->location > 1)
- 		return -EINVAL;
- 
--	mac->hwlro_ip[fsp->location] = 0;
--	hwlro_idx = (mac->id * MTK_MAX_LRO_IP_CNT) + fsp->location;
-+	ip4dst = mac->hwlro_ip[fsp->location];
-+	hwlro_idx = mtk_hwlro_get_ipaddr_idx(dev, ip4dst);
-+	if (hwlro_idx < 0)
-+		return hwlro_idx;
- 
-+	mac->hwlro_ip[fsp->location] = 0;
- 	mac->hwlro_ip_cnt = mtk_hwlro_get_ip_cnt(mac);
- 
- 	mtk_hwlro_inval_ipaddr(eth, hwlro_idx);
-@@ -3126,6 +3225,24 @@ static int mtk_hwlro_del_ipaddr(struct net_device *dev,
- 	return 0;
- }
- 
-+static void mtk_hwlro_netdev_enable(struct net_device *dev)
-+{
-+	struct mtk_mac *mac = netdev_priv(dev);
-+	struct mtk_eth *eth = mac->hw;
-+	int i, hwlro_idx;
-+
-+	for (i = 0; i < MTK_MAX_LRO_IP_CNT; i++) {
-+		if (mac->hwlro_ip[i] == 0)
-+			continue;
-+
-+		hwlro_idx = mtk_hwlro_get_ipaddr_idx(dev, mac->hwlro_ip[i]);
-+		if (hwlro_idx < 0)
-+			continue;
-+
-+		mtk_hwlro_val_ipaddr(eth, hwlro_idx, mac->hwlro_ip[i]);
-+	}
-+}
-+
- static void mtk_hwlro_netdev_disable(struct net_device *dev)
- {
- 	struct mtk_mac *mac = netdev_priv(dev);
-@@ -3133,8 +3250,14 @@ static void mtk_hwlro_netdev_disable(struct net_device *dev)
- 	int i, hwlro_idx;
- 
- 	for (i = 0; i < MTK_MAX_LRO_IP_CNT; i++) {
-+		if (mac->hwlro_ip[i] == 0)
-+			continue;
-+
-+		hwlro_idx = mtk_hwlro_get_ipaddr_idx(dev, mac->hwlro_ip[i]);
-+		if (hwlro_idx < 0)
-+			continue;
-+
- 		mac->hwlro_ip[i] = 0;
--		hwlro_idx = (mac->id * MTK_MAX_LRO_IP_CNT) + i;
- 
- 		mtk_hwlro_inval_ipaddr(eth, hwlro_idx);
- 	}
-@@ -3314,6 +3437,8 @@ static int mtk_set_features(struct net_device *dev, netdev_features_t features)
- 
- 	if ((diff & NETIF_F_LRO) && !(features & NETIF_F_LRO))
- 		mtk_hwlro_netdev_disable(dev);
-+	else if ((diff & NETIF_F_LRO) && (features & NETIF_F_LRO))
-+		mtk_hwlro_netdev_enable(dev);
- 
- 	return 0;
- }
-@@ -3371,8 +3496,8 @@ static int mtk_dma_init(struct mtk_eth *eth)
- 		return err;
- 
- 	if (eth->hwlro) {
--		for (i = 1; i < MTK_MAX_RX_RING_NUM; i++) {
--			err = mtk_rx_alloc(eth, i, MTK_RX_FLAGS_HWLRO);
-+		for (i = 0; i < MTK_HW_LRO_RING_NUM(eth); i++) {
-+			err = mtk_rx_alloc(eth, MTK_HW_LRO_RING(eth, i), MTK_RX_FLAGS_HWLRO);
- 			if (err)
- 				return err;
- 		}
-@@ -3434,8 +3559,8 @@ static void mtk_dma_free(struct mtk_eth *eth)
- 
- 	if (eth->hwlro) {
- 		mtk_hwlro_rx_uninit(eth);
--		for (i = 1; i < MTK_MAX_RX_RING_NUM; i++)
--			mtk_rx_clean(eth, &eth->rx_ring[i], false);
-+		for (i = 0; i < MTK_HW_LRO_RING_NUM(eth); i++)
-+			mtk_rx_clean(eth, &eth->rx_ring[MTK_HW_LRO_RING(eth, i)], false);
- 	}
- 
- 	if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSS)) {
-@@ -3630,16 +3755,21 @@ static int mtk_start_dma(struct mtk_eth *eth)
- 			val |= MTK_RX_BT_32DWORDS;
- 		mtk_w32(eth, val, reg_map->qdma.glo_cfg);
- 
--		mtk_w32(eth,
--			MTK_RX_DMA_EN | rx_2b_offset |
--			MTK_RX_BT_32DWORDS | MTK_MULTI_EN,
--			reg_map->pdma.glo_cfg);
-+		val = mtk_r32(eth, reg_map->pdma.glo_cfg);
-+		val |= MTK_RX_DMA_EN | rx_2b_offset |
-+		       MTK_RX_BT_32DWORDS | MTK_MULTI_EN;
-+		mtk_w32(eth, val, reg_map->pdma.glo_cfg);
- 	} else {
- 		mtk_w32(eth, MTK_TX_WB_DDONE | MTK_TX_DMA_EN | MTK_RX_DMA_EN |
- 			MTK_MULTI_EN | MTK_PDMA_SIZE_8DWORDS,
- 			reg_map->pdma.glo_cfg);
- 	}
- 
-+	if (eth->hwlro && mtk_is_netsys_v3_or_greater(eth)) {
-+		val = mtk_r32(eth, reg_map->pdma.glo_cfg);
-+		mtk_w32(eth, val | MTK_RX_DMA_LRO_EN, reg_map->pdma.glo_cfg);
-+	}
-+
- 	return 0;
- }
- 
-@@ -3798,6 +3928,14 @@ static int mtk_open(struct net_device *dev)
- 			}
- 		}
- 
-+		if (eth->hwlro) {
-+			for (i = 0; i < MTK_HW_LRO_RING_NUM(eth); i++) {
-+				napi_enable(&eth->rx_napi[MTK_HW_LRO_RING(eth, i)].napi);
-+				mtk_rx_irq_enable(eth, MTK_RX_DONE_INT(eth,
-+								       MTK_HW_LRO_RING(eth, i)));
-+			}
-+		}
-+
- 		refcount_set(&eth->dma_refcnt, 1);
- 	} else {
- 		refcount_inc(&eth->dma_refcnt);
-@@ -3893,6 +4031,14 @@ static int mtk_stop(struct net_device *dev)
- 		}
- 	}
- 
-+	if (eth->hwlro) {
-+		for (i = 0; i < MTK_HW_LRO_RING_NUM(eth); i++) {
-+			mtk_rx_irq_disable(eth, MTK_RX_DONE_INT(eth, MTK_HW_LRO_RING(eth, i)));
-+			napi_synchronize(&eth->rx_napi[MTK_HW_LRO_RING(eth, i)].napi);
-+			napi_disable(&eth->rx_napi[MTK_HW_LRO_RING(eth, i)].napi);
-+		}
-+	}
-+
- 	cancel_work_sync(&eth->rx_dim.work);
- 	cancel_work_sync(&eth->tx_dim.work);
- 
-@@ -4301,6 +4447,14 @@ static int mtk_napi_init(struct mtk_eth *eth)
- 		}
- 	}
- 
-+	if (eth->hwlro) {
-+		for (i = 0; i < MTK_HW_LRO_RING_NUM(eth); i++) {
-+			rx_napi = &eth->rx_napi[MTK_HW_LRO_RING(eth, i)];
-+			rx_napi->eth = eth;
-+			rx_napi->rx_ring = &eth->rx_ring[MTK_HW_LRO_RING(eth, i)];
-+		}
-+	}
-+
- 	return 0;
- }
- 
-@@ -5352,6 +5506,7 @@ static int mtk_probe(struct platform_device *pdev)
- {
- 	struct resource *res = NULL;
- 	struct device_node *mac_np;
-+	u8 lro_irq, lro_ring;
- 	struct mtk_eth *eth;
- 	char *irqname;
- 	int err, i;
-@@ -5577,6 +5732,23 @@ static int mtk_probe(struct platform_device *pdev)
- 						goto err_free_dev;
- 				}
- 			}
-+
-+			if (eth->hwlro) {
-+				for (i = 0; i < MTK_HW_LRO_RING_NUM(eth); i++) {
-+					lro_irq = MTK_HW_LRO_IRQ(eth, i);
-+					lro_ring = MTK_HW_LRO_RING(eth, i);
-+					irqname = devm_kasprintf(eth->dev, GFP_KERNEL,
-+								 "%s LRO RX %d",
-+								 dev_name(eth->dev), i);
-+					err = devm_request_irq(eth->dev,
-+							       eth->irq_pdma[lro_irq],
-+							       mtk_handle_irq_rx, IRQF_SHARED,
-+							       irqname,
-+							       &eth->rx_napi[lro_ring]);
-+					if (err)
-+						goto err_free_dev;
-+				}
-+			}
- 		} else {
- 			irqname = devm_kasprintf(eth->dev, GFP_KERNEL, "%s RX",
- 						 dev_name(eth->dev));
-@@ -5648,6 +5820,13 @@ static int mtk_probe(struct platform_device *pdev)
- 				       mtk_napi_rx);
- 	}
- 
-+	if (eth->hwlro) {
-+		for (i = 0; i < MTK_HW_LRO_RING_NUM(eth); i++) {
-+			netif_napi_add(eth->dummy_dev, &eth->rx_napi[MTK_HW_LRO_RING(eth, i)].napi,
-+				       mtk_napi_rx);
-+		}
-+	}
-+
- 	platform_set_drvdata(pdev, eth);
- 	schedule_delayed_work(&eth->reset.monitor_work,
- 			      MTK_DMA_MONITOR_TIMEOUT);
-@@ -5696,6 +5875,12 @@ static void mtk_remove(struct platform_device *pdev)
- 		for (i = 1; i < MTK_RX_RSS_NUM(eth); i++)
- 			netif_napi_del(&eth->rx_napi[MTK_RSS_RING(i)].napi);
- 	}
-+
-+	if (eth->hwlro) {
-+		for (i = 0; i < MTK_HW_LRO_RING_NUM(eth); i++)
-+			netif_napi_del(&eth->rx_napi[MTK_HW_LRO_RING(eth, i)].napi);
-+	}
-+
- 	mtk_cleanup(eth);
- 	free_netdev(eth->dummy_dev);
- 	mtk_mdio_cleanup(eth);
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-index 378cf47913ef..d4fe42a935b1 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-@@ -35,7 +35,7 @@
- #define MTK_DMA_SIZE(x)		(SZ_##x)
- #define MTK_FQ_DMA_HEAD		32
- #define MTK_FQ_DMA_LENGTH	2048
--#define MTK_RX_ETH_HLEN		(ETH_HLEN + ETH_FCS_LEN)
-+#define MTK_RX_ETH_HLEN		(VLAN_ETH_HLEN + VLAN_HLEN + ETH_FCS_LEN)
- #define MTK_RX_HLEN		(NET_SKB_PAD + MTK_RX_ETH_HLEN + NET_IP_ALIGN)
- #define MTK_DMA_DUMMY_DESC	0xffffffff
- #define MTK_DEFAULT_MSG_ENABLE	(NETIF_MSG_DRV | \
-@@ -63,10 +63,9 @@
- 
- #define MTK_QRX_OFFSET		0x10
- 
--#define MTK_MAX_RX_RING_NUM	4
--#define MTK_HW_LRO_DMA_SIZE	8
--
--#define	MTK_MAX_LRO_RX_LENGTH		(4096 * 3)
-+#define MTK_MAX_RX_RING_NUM	(8)
-+#define MTK_HW_LRO_DMA_SIZE(eth)	(mtk_is_netsys_v3_or_greater(eth) ? 64 : 8)
-+#define	MTK_MAX_LRO_RX_LENGTH		(4096 * 3 + MTK_MAX_RX_LENGTH)
- #define	MTK_MAX_LRO_IP_CNT		2
- #define	MTK_HW_LRO_TIMER_UNIT		1	/* 20 us */
- #define	MTK_HW_LRO_REFRESH_TIME		50000	/* 1 sec. */
-@@ -182,31 +181,39 @@
- #define MTK_CDMM_THRES		0x165c
- 
- /* PDMA HW LRO Control Registers */
--#define MTK_PDMA_LRO_CTRL_DW0	0x980
--#define MTK_HW_LRO_RING_NUM(eth)		(mtk_is_netsys_v3_or_greater(eth) ? 4 : 3)
-+#define MTK_HW_LRO_DIP_NUM(eth)		(mtk_is_netsys_v3_or_greater(eth) ? 4 : 3)
-+#define MTK_HW_LRO_RING_NUM(eth)	(mtk_is_netsys_v3_or_greater(eth) ? 4 : 3)
-+#define MTK_HW_LRO_RING(eth, x)		((x) + (mtk_is_netsys_v3_or_greater(eth) ? 4 : 1))
-+#define MTK_HW_LRO_IRQ(eth, x)		((x) + (mtk_is_netsys_v3_or_greater(eth) ? 0 : 1))
-+#define MTK_LRO_CRSN_BNW(eth)		BIT((mtk_is_netsys_v3_or_greater(eth) ? 22 : 6))
- #define MTK_LRO_EN			BIT(0)
- #define MTK_NON_LRO_MULTI_EN		BIT(2)
- #define MTK_LRO_DLY_INT_EN		BIT(5)
--#define MTK_L3_CKS_UPD_EN		BIT(7)
--#define MTK_L3_CKS_UPD_EN_V2		BIT(19)
-+#define MTK_L3_CKS_UPD_EN(eth)		BIT(mtk_is_netsys_v3_or_greater(eth) ? 19 : 7)
- #define MTK_LRO_ALT_PKT_CNT_MODE	BIT(21)
--#define MTK_LRO_RING_RELINQUISH_REQ	(0x7 << 26)
--#define MTK_LRO_RING_RELINQUISH_REQ_V2	(0xf << 24)
--#define MTK_LRO_RING_RELINQUISH_DONE	(0x7 << 29)
--#define MTK_LRO_RING_RELINQUISH_DONE_V2	(0xf << 28)
--
--#define MTK_PDMA_LRO_CTRL_DW1	0x984
--#define MTK_PDMA_LRO_CTRL_DW2	0x988
--#define MTK_PDMA_LRO_CTRL_DW3	0x98c
-+#define MTK_LRO_RING_RELINQUISH_REQ(eth)	(mtk_is_netsys_v3_or_greater(eth) ? \
-+						0xf << 24 : 0x7 << 26)
-+#define MTK_LRO_RING_RELINQUISH_DONE(eth)	(mtk_is_netsys_v3_or_greater(eth) ? \
-+						0xf << 28 : 0x7 << 29)
-+
-+#define MTK_PDMA_LRO_CTRL_DW0(reg_map)	((reg_map)->pdma.lro_ctrl_dw0)
-+#define MTK_PDMA_LRO_CTRL_DW1(reg_map)	((reg_map)->pdma.lro_ctrl_dw0 + 0x04)
-+#define MTK_PDMA_LRO_CTRL_DW2(reg_map)	((reg_map)->pdma.lro_ctrl_dw0 + 0x08)
-+#define MTK_PDMA_LRO_CTRL_DW3(reg_map)	((reg_map)->pdma.lro_ctrl_dw0 + 0x0c)
-+#define MTK_LRO_VLAN_EN			(0xf << 8)
-+#define MTK_LRO_VLAN_VID_CMP_DEPTH	(0x3 << 12)
-+#define MTK_LRO_L4_CTRL_PSH_EN		BIT(23)
- #define MTK_ADMA_MODE		BIT(15)
- #define MTK_LRO_MIN_RXD_SDL	(MTK_HW_LRO_SDL_REMAIN_ROOM << 16)
- 
-+#define MTK_CTRL_DW0_SDL_OFFSET	(3)
-+
- #define MTK_RX_DMA_LRO_EN	BIT(8)
- #define MTK_MULTI_EN		BIT(10)
- #define MTK_PDMA_SIZE_8DWORDS	(1 << 4)
- 
- /* PDMA RSS Control Registers */
--#define MTK_RX_NAPI_NUM			(4)
-+#define MTK_RX_NAPI_NUM			(8)
- #define MTK_RX_RSS_NUM(eth)		((eth)->soc->rss_num)
- #define MTK_RSS_RING(x)			(x)
- #define MTK_RSS_EN			BIT(0)
-@@ -242,11 +249,10 @@
- #define MTK_PDMA_DELAY_PTIME_MASK	0xff
- 
- /* PDMA HW LRO Alter Flow Delta Register */
--#define MTK_PDMA_LRO_ALT_SCORE_DELTA	0xa4c
-+#define MTK_PDMA_LRO_ALT_SCORE_DELTA(reg_map)	((reg_map)->pdma.lro_alt_score_delta)
- 
- /* PDMA HW LRO IP Setting Registers */
--#define MTK_LRO_RX_RING0_DIP_DW0	0xb04
--#define MTK_LRO_DIP_DW0_CFG(x)		(MTK_LRO_RX_RING0_DIP_DW0 + (x * 0x40))
-+#define MTK_LRO_DIP_DW0_CFG(reg_map, x)	((reg_map)->pdma.lro_ring_dip_dw0 + ((x) * 0x40))
- #define MTK_RING_MYIP_VLD		BIT(9)
- 
- /* PDMA HW LRO Ring Control Registers */
-@@ -1187,7 +1193,8 @@ enum mkt_eth_capabilities {
- 
- #define MT7988_CAPS  (MTK_36BIT_DMA | MTK_GDM1_ESW | MTK_GMAC2_2P5GPHY | \
- 		      MTK_MUX_GMAC2_TO_2P5GPHY | MTK_QDMA | MTK_RSTCTRL_PPE1 | \
--		      MTK_RSTCTRL_PPE2 | MTK_SRAM | MTK_PDMA_INT | MTK_RSS)
-+		      MTK_RSTCTRL_PPE2 | MTK_SRAM | MTK_PDMA_INT | MTK_RSS | \
-+		      MTK_HWLRO)
- 
- struct mtk_tx_dma_desc_info {
- 	dma_addr_t	addr;
--- 
-2.43.0
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
