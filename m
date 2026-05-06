@@ -1,130 +1,166 @@
-Return-Path: <netdev+bounces-284944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284945-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UPz9Mnhq+2miawMAu9opvQ
-	(envelope-from <netdev+bounces-284944-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 18:21:12 +0200
+	id cEzVHa9s+2miawMAu9opvQ
+	(envelope-from <netdev+bounces-284945-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 18:30:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CC744DE06B
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 18:21:12 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 755C84DE1FE
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 18:30:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8E17A30094F6
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 16:19:45 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 653EF3009800
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 16:21:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78C373F7A87;
-	Wed,  6 May 2026 16:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398BD4014A0;
+	Wed,  6 May 2026 16:21:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gc7UH9QK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mTHr2St8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563DB3ED5A4;
-	Wed,  6 May 2026 16:19:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1B03F7A87
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 16:21:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778084383; cv=none; b=JHWljbFaDOUKdDIdxnaTLUxv9f+rFpnnP/HegzAAlcgBKiU4TtfzeKOZTaZXZ31qXOW7ADT+GbW/VG7EbvJRMPW9TDYL5DpgX9rtEn0U4GQ4aGYWpkAwRofTlNq8+ycgP8elr314QI3T4W9BWEf3Bg0C3Gx66/V6chqtouLyEkY=
+	t=1778084500; cv=none; b=LEMfcwemzKyw3FsRCmBvU/BQOov/aoGCwtsfe83bu0w21TgFpsKor/4MEXA+lnkVlcQ2XqyjIK/85AfNHsgwK4m/V98v3mLm1CLdeBohCXB0z1mX74N1/05v5coDRegg52S08tiTEEBNw1Kc8NY5S3BCL5Saw1kOqSi0Z+fraGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778084383; c=relaxed/simple;
-	bh=KxrJo9HIKQ5v92YrAXsTCL1iGTqmCBCRvaj4KwvmXX4=;
+	s=arc-20240116; t=1778084500; c=relaxed/simple;
+	bh=xq0ncLQqbBgMKmiqv0iCAyodq62iUAP3pn+orp6uLWc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WtskTIcvvhAMMaz3Xpc5AbP8MeVoSVbjXXOT5uYs/P2FQ4xdzrM6rvhHvdd9z9RRlIhYlPG//1xT1b/fbCDrccujYVNE9pwvpaFTtFW29l1crByaq1GQsfOLM4rSsaRIlTVC6l7iIw2YP0r01t83/EdeEfyEtMWTjTaKsOwhBGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gc7UH9QK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48872C2BCC7;
-	Wed,  6 May 2026 16:19:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778084383;
-	bh=KxrJo9HIKQ5v92YrAXsTCL1iGTqmCBCRvaj4KwvmXX4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gc7UH9QKKiLcURFRJRwTGZyyLw7gU6wb5avu6ND3MiT+BSfR66hKp+VCWkRZPYX+U
-	 2UTp9kWOEccsYKdTLGAfQu5jgPQsXaVvn++UJE8dpSGJWOwK0aAfH5Ljtm6kT/aEst
-	 PkANt6zGoghF5DxRhKFR4e4ssUuE5Qrg3A8iVwPDuRq0MGhtCU1BL1QvCKCsVx6gM/
-	 qyaNj/+FnycTOm0qHnkFyvKvYEgcciQldNqwl+PCuPQ4v0VQb9SVXpO7rqQvHAmeL6
-	 PyPLCrhQxhYQhr98ysrPYt/ljf15Hjn7SR7MecpwBcKYhTq05ZpFGkdws3iNy1ZM0w
-	 q+MdIhMGDkPGg==
-Date: Wed, 6 May 2026 17:19:38 +0100
-From: Simon Horman <horms@kernel.org>
-To: Satish Kharat <satishkh@cisco.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=eTGRyUdx3ColnGqj1uurzJcU9lFZKW9u9KZuXSt4kC/Xrmaz1tdsB0wZuYs3LrXk1B6yOeleU/Ap/dmJ4R4KKZsAcD44C8rLO1a6TR5h2mOaIkeATmgT8zomzgaDt9atY1CLYDZUctpyPU2h3Z+EV/Ictpw9Pit/oDuQa36KYMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mTHr2St8; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-488b8bc6bc9so42476065e9.3
+        for <netdev@vger.kernel.org>; Wed, 06 May 2026 09:21:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778084497; x=1778689297; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CRMNJQwpy4JLabii5FgqNhMAFtCk786EvStmSIccUWs=;
+        b=mTHr2St8Br0Kfq1WYhl35C20KtE4sj7z1HFpFiD7uXDI34QiKIwNcf4yhReyWPagT+
+         a31KLi6Mr8yAdJeSV8rUfaGAWRCeEIv+0xoUupIHKRSK8EfHiur5nDua3rM5vogDUzQs
+         DjKg/XBvxacZYQsUDfYuOhfIgPPGCNQX3VjNrGhBSszI2mv/7nngQ5DG+KxgBddb4PJ/
+         GdxsZ6ItB8J7ie4spA0aJyq5mQpxhsE1lKMf32EYtFgkVENR2yPQh8lgfp9ZmpKsTe/s
+         OAmkFTHiUqTLTHUf1/5Am6VeV5RbnOydb+G/P5mwx/gAosCSzuTKQ0U9OjmERe2K/RX/
+         /mzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778084497; x=1778689297;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CRMNJQwpy4JLabii5FgqNhMAFtCk786EvStmSIccUWs=;
+        b=phNzMqQ42Uz40WSDEGp8mm29qt1eTGvkocBoPuDmsgvdcX133RCLOR9dm91o6vXOEC
+         L3MPsRKNYsrEpbXsxVAwVAMMJA+utonMBgoX5LvaMyDrXUpF2avaviBa2cVWU5dUgUQM
+         226VYsz2pglUjYVeCu3fL58GhYacD3blMgpo6CQ90UlnI/a6qxVSJ0eTaqmKJ0xmBoUX
+         Hnck7HNu6KCvXbVeTxLX0VCWQlHDbKZqMN7k9Tv6JpDsx+SrP6/uDq2L5WeXZyDMbAG4
+         IcOwwYKDt4oC6mMIICgQnZYWafJkaYWZ+4R8HzyCg3mHXVHFZgiZcVRpKA5amIVPW6s/
+         /wLQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/NOrU1SjA2fN8KLTy+JEF1FPw/youjcgwcVVpudeQRQfCiLl78R2EjiXBqVfV1cAdBVOQ/Aqo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw812fwGoNHWeA+sUAFqLyuSp/SK2VX9Zm2N7eugeQ+wS8AezEP
+	hCKPGV2XRPVQo5dZfvFLsFTRKRybka9QfCz5RTFREEeBCbImxceuZ1HK
+X-Gm-Gg: AeBDietw4hrLffv+QzCv7iamqtth+FMQHDi+DUR1YxXuJZCS1vyTgqjeiJw+6hYZily
+	nMcogkwkHNFOIJXS0Ivb6os12oDoRTyjVrGSy9dU8SeTpsQC+08TLg/cEUYgo0cgO/o0jEN5ElP
+	YObqL7S86JSr9kDXXfFzoYSdAjKFClvIbQYi0SXtswiD41S0CCGMT1ENEIseSEuREWrXa68jgvW
+	VMftuaRz7SGdBaxv9nSFJoZWXJcYqwwqZO5mCQ7drUAlw1TpkJHAGKK3xeZth0MDNwKbBs0h0+i
+	/gSQkDgdQMMN13QhsxE8d6CGoe12QKioPfC6upzujd53kWsIkhr0zm2JuqnseizLzx7YsgNW03t
+	5mwR2WoWIahFPuvmUm5zte7etKbh3v2eEQkqUIU5G1bnhRLzBOvNHtpSzce0ou5Qz4V+cs3ZBdu
+	X0oH0GQWIm8NxjBnw9BR/fqYMF0FCWnWykLJA=
+X-Received: by 2002:a05:600c:3548:b0:48a:7aad:4425 with SMTP id 5b1f17b1804b1-48e51e097fcmr71523485e9.3.1778084496987;
+        Wed, 06 May 2026 09:21:36 -0700 (PDT)
+Received: from gmail.com ([51.154.251.79])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4505285e765sm13179992f8f.10.2026.05.06.09.21.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 May 2026 09:21:36 -0700 (PDT)
+Date: Wed, 6 May 2026 16:21:34 +0000
+From: Vaibhav Gupta <vaibhavgupta40@gmail.com>
+To: Harshitha Ramamurthy <hramamurthy@google.com>
+Cc: Joshua Washington <joshwash@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Sesidhar Baddela <sebaddel@cisco.com>,
-	Breno Leitao <leitao@debian.org>
-Subject: Re: [PATCH net-next v6 00/10] enic: SR-IOV V2 admin channel and MBOX
- protocol
-Message-ID: <20260506161938.GS15617@horms.kernel.org>
-References: <20260503-enic-sriov-v2-admin-channel-v2-v6-0-0af4fbc2d86d@cisco.com>
+	Willem de Bruijn <willemb@google.com>,
+	Ankit Garg <nktgrg@google.com>, Tim Hostetler <thostet@google.com>,
+	Alok Tiwari <alok.a.tiwari@oracle.com>,
+	John Fraker <jfraker@google.com>, Matt Olson <maolson@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] gve: Use generic power management
+Message-ID: <aftqjk7YOQJGh0e3@gmail.com>
+References: <20260504182139.604925-1-vaibhavgupta40@gmail.com>
+ <CAEAWyHf3x=sCefMKkUvRq6hq8qd_ALM=MPvnN57xmyE5VCN+CA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260503-enic-sriov-v2-admin-channel-v2-v6-0-0af4fbc2d86d@cisco.com>
-X-Rspamd-Queue-Id: 4CC744DE06B
+In-Reply-To: <CAEAWyHf3x=sCefMKkUvRq6hq8qd_ALM=MPvnN57xmyE5VCN+CA@mail.gmail.com>
+X-Rspamd-Queue-Id: 755C84DE1FE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284944-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-284945-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vaibhavgupta40@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[cisco.com:email,linux.dev:url,sashiko.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,horms.kernel.org:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 
-On Sun, May 03, 2026 at 04:22:37AM -0700, Satish Kharat wrote:
-> This series adds the admin channel infrastructure and mailbox (MBOX)
-> protocol needed for V2 SR-IOV support in the enic driver.
+> > -       .suspend        = gve_suspend,
+> > -       .resume         = gve_resume,
+> > -#endif
+> > +       .driver.pm      = &gve_pm_ops,
 > 
-> The V2 SR-IOV design uses a direct PF-VF communication channel built on
-> dedicated WQ/RQ/CQ hardware resources and an MSI-X interrupt.
+> Thanks for the patch! A minor suggestion: could you wrap this in pm_sleep_ptr()?
 > 
-> Firmware capability and admin channel infrastructure (patches 1-4):
->   - Probe-time firmware feature check for V2 SR-IOV support
->   - Admin channel open/close, RQ buffer management, CQ service
->     with MSI-X interrupt and NAPI polling
+> Also, please include the net-next prefix in the subject line when posting v2.
 > 
-> MBOX protocol and VF enable (patches 5-10):
->   - MBOX message types, core send/receive, PF and VF handlers
->   - V2 SR-IOV enable wiring with admin channel setup
->   - V2 VF probe with admin channel and PF registration
+> With those changes, feel free to add:
+> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
 > 
-> Signed-off-by: Satish Kharat <satishkh@cisco.com>
+> Thanks,
+> Harshitha
+> 
+Thanks for your input Harshitha! I have made the suggested amends, and I will
+send the v2 in reply to my v1 patch, as I have to include the review tag of
+Alexander as well.
 
-Hi Satish,
-
-There is are AI-generated reviews of this patch available at both
-https://netdev-ai.bots.linux.dev/sashiko/ and https://sashiko.dev/
-And it seems to me that some of the issues raised there do warrant
-investigation. I'd appreciate it if you could do so with
-a view to addressing any issues that are not pre-existing in v7.
-
-...
+Thanks
+Vaibhav
+> >  };
+> >
+> >  module_pci_driver(gve_driver);
+> 
+> > --
+> > 2.53.0
+> >
 
