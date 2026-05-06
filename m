@@ -1,255 +1,202 @@
-Return-Path: <netdev+bounces-284834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284835-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uG93GrE/+2nTYQMAu9opvQ
-	(envelope-from <netdev+bounces-284834-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 15:18:41 +0200
+	id wO5PFec/+2nTYQMAu9opvQ
+	(envelope-from <netdev+bounces-284835-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 15:19:35 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B57C44DADE9
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 15:18:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AA9424DAE0E
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 15:19:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 40E0A30B6D4A
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 13:13:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B9D2A300274E
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 13:15:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E3047884D;
-	Wed,  6 May 2026 13:12:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E4C14657CC;
+	Wed,  6 May 2026 13:15:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ndtEbbpy"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3oARnPBY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD4A4779BE
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 13:12:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C8C466B5D
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 13:15:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778073171; cv=none; b=Re3/IV2BQbp4/e+6FRvoQ8J9wZoZZFk1TsRFoB4Vr8Qd4QgE9QGIYWFDfqJgP957ke+KKg3hvG8aGR7eUpr1WzTHad2pzjnLmusn+QkUGynXveZfcg8o/bN/yB3YioUaiA+ew47XYwBLZuv6pLmXFluklnKqKVPUQSi7e4wlMaA=
+	t=1778073308; cv=none; b=lf6KyXm0YU2CmCxRJFe5SQZE6CvcNkbfaYJDdIqrMB6fn3XjLQUho3oKpeQxpmDV+XoxGDQ2L6hePz3gmv4aiyMpqLCQkCkuELzgFJysXz3e/ZmFqBLXTukTRx6oUH8v53yXLFqxCfaLC6MLrtAW7aXgCl/C4v9TuBMy+4WFSJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778073171; c=relaxed/simple;
-	bh=7anuFwbxVPib5Qwdrz+mL3upuMV9kt6FzTMasaXomEY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Uxh6LzttX/3wQO/sDQPiwOioPQJYopavEgJqMPX0TofZHucjQ4cmWMS7n6fo6O//OpIJbq1dDslbis+vZSB5egO/I/jlEiupMAU1f3tDwZB5Px/8uSlOxE8HqY0EH6hyC4oBzTeteKA0p5aHl/7wS3zuiceC3QojePIrwYSQxT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ndtEbbpy; arc=none smtp.client-ip=209.85.160.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-408778a8ec4so3669084fac.0
-        for <netdev@vger.kernel.org>; Wed, 06 May 2026 06:12:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778073169; x=1778677969; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TtDHstlKXDMwZVDImgv2Go/2LwRbeKrLJRmqWEJNiDM=;
-        b=ndtEbbpyjL6PTXhGzuuXUUNYgkpn41uTsrQGl96ZzWth1JedXi82z/MV7y/CWRkfLY
-         yLJ0Suk7lsfSJrOWqEuWxkHv8wN/8uhAAYS8rY+U5HBuSlqEtoAFyPDsW8EdYiSTTsHP
-         +8eW5XDBXIoxNY0nUcbafblovAtET+oV3wjHGEVEPCedkIGHaU3F25rnFEwzVxu0DzsI
-         DYn9XvYaJWVHpz1MGANLgMpOX/iC/r7A98KdkWsoWvvUQr5laCmeJVwkPE0S2Pc7yfp9
-         Pzo2flvKcUBJ+dtajWe/rziU8/usCKaYm8YOK/ZbO7p6wGsi6diarzyN/dlB5Vn7J4mB
-         hN1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778073169; x=1778677969;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=TtDHstlKXDMwZVDImgv2Go/2LwRbeKrLJRmqWEJNiDM=;
-        b=YoYbyBRUUDD2GWGQgdjpM/mX7Stzl865oWWbymSF4qWzontTV5TsBw7vN80ZCQ+Pxb
-         2GRT7pXre04T/sSCpQO7BEqSZKYfMW4tiIDwFFVLqnu+NL2SYHW5OJOjgkB0qW6GCVUf
-         wGU9r0Zm7iKucHSJkPmybLIRHDG3IcRI/syLTgA5vuRlbda6ZfN1y6cZhbOjXnK4xA0f
-         VXN+Bku66fcCp5Qohlr4mSspUydEhrAzdx8i8eWrV3MqR1tPFBA4zImicrBwRI80gg5+
-         cgYfs6zuC8iAWRbX8dEmLPGrUt+8nPlDTxV32eehcMJl6dnEfZi2ilWWOOmmoELZFOwZ
-         pQiA==
-X-Gm-Message-State: AOJu0Yyi/FlNzpVbsdI03JAUxmi9w4Sd+jBiditTr37i9PK8aZi7K9b4
-	5tgCOoYeopoGJPPcxaHPW8zhewRVZt/kl3Pc3w0cvZrbcgv8o7zX1eZzCmIEPn/PKaxPpA==
-X-Gm-Gg: AeBDietuNQDkqN9u1eq00aMxUj79NakCBHkVooGqX++z3JDOkIl0cdLddunHiO2sVn+
-	/f2tZFoEyzO9tnMTggMOJffFOPrEOPUtEBgxvbcl/e91l5OYtSena/L+cxoj9pszOyjrpQNy3yB
-	hB7s+83X0D+hBg1rf/umGH59qkyia/o8XKS6KdeppTcIn7j4ifqjviyvxd7dKyd+HWEodq4+1zu
-	VTA4ZHbDJ284nUlthYFgBj9/dA+FWxK5w0fGZWyitJ9fwAIhlh+DGMQA67OddZjIYh8PtHJW4fb
-	j0+TvGJsExoKTomC80RzyzXIdFoduntc3QO9vau3yShaiq/rt79uRfLq1Xas15fPrV8wno56X8y
-	MwWdRKGLhCM6kBgztSZ23ht0rjKowirudlBBoBa+h4No1D5lnyHRS/vc79ybP50x64o4oJSd2/h
-	RGItdedQUC1ATZYKadgxCwlvuFIQ==
-X-Received: by 2002:a05:6870:c18e:b0:42d:c200:4214 with SMTP id 586e51a60fabf-434f663b9ecmr1936790fac.18.1778073169035;
-        Wed, 06 May 2026 06:12:49 -0700 (PDT)
-Received: from houminxi ([72.244.37.221])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-434548d9decsm17327859fac.3.2026.05.06.06.12.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2026 06:12:48 -0700 (PDT)
-From: Minxi Hou <houminxi@gmail.com>
-To: netdev@vger.kernel.org
-Cc: aconole@redhat.com,
-	echaudro@redhat.com,
-	i.maximets@ovn.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org,
-	dev@openvswitch.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Minxi Hou <houminxi@gmail.com>
-Subject: [PATCH net-next v6 2/2] selftests: openvswitch: add pop_vlan test
-Date: Wed,  6 May 2026 21:12:18 +0800
-Message-ID: <20260506131218.1880852-3-houminxi@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260506131218.1880852-1-houminxi@gmail.com>
-References: <20260506131218.1880852-1-houminxi@gmail.com>
+	s=arc-20240116; t=1778073308; c=relaxed/simple;
+	bh=uhlvBHBEsSJPAcugSTKHQXub6ODMuHhfUaUGppSSoXY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AeZvpsd3MxWTcP0IptGi7FOnjAv3jTbTsvml9Tk5Fo5/fdBwg1QfNtPBA9h5Vv3tsG+bdKmI3VZcS6jFtXojA1cEPNu3loGvO7Ir6AqHZRhssqOT+7T4cn/fuhV8orkbQo1uc08sQPkK7/4JoyyZBHNvbYv2+w84A/vCpE5tL1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3oARnPBY; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=U1Sjflo8J81hRRHhJZ+A7NOVh8ubvCNRRZyjAypgCLc=; b=3oARnPBY70bmjXzO8SDZqgK1xo
+	dkYh5iDr+LIRAKAQfEHwORcqfhMePoDlaEqFAd49bZ5e3kjo7ghg838OfMGY8FDPZIW9YT7WNrGr6
+	xFJAItrj5WjGc5FBXeCwEUicpSndXT79V2wIkgpSBB/3iC1d8G0I9wM0W24OSNUc1nfI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wKc5h-001dmr-1o; Wed, 06 May 2026 15:15:05 +0200
+Date: Wed, 6 May 2026 15:15:05 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sven Schuchmann <schuchmann@schleissheimer.de>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: assert in phylink.c with lan7801 and dp83tc811 since kernel 6.18
+Message-ID: <62b15f5f-c9db-4443-b0ee-ac7044459c08@lunn.ch>
+References: <BEZP281MB224533D524B27CFC6E47B447D93E2@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
+ <57fb63c2-7a05-4bbe-ba2d-fc61ce1e3ba1@lunn.ch>
+ <BEZP281MB22458F571CC8251C141D933CD93F2@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: B57C44DADE9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BEZP281MB22458F571CC8251C141D933CD93F2@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
+X-Rspamd-Queue-Id: AA9424DAE0E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[redhat.com,ovn.org,davemloft.net,google.com,kernel.org,openvswitch.org,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-284834-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWO(0.00)[2];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284835-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,lunn.ch:dkim,lunn.ch:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Add test_pop_vlan() to verify OVS kernel datapath pop_vlan action
-correctly strips 802.1Q VLAN tags from frames.
+> [    2.339481] lan78xx 1-1.3:1.0 (unnamed net_device) (uninitialized): can't attach PHY to usb-001:003, error -EINVAL
 
-Test structure:
-- Baseline: untagged forwarding validates basic connectivity.
-- Negative: forward without pop_vlan, tagged frame is invisible
-  to ns2 (no VLAN sub-interface), ping fails.
-- Positive: pop_vlan strips tag on forward path, push_vlan
-  restores tag on return path, ping succeeds.
+static int lan78xx_phy_init(struct lan78xx_net *dev)
+{
+...
 
-Use static ARP entries to avoid VLAN-tagged ARP complexity.
-Rely on ping success/failure for verification -- no tcpdump or
-pcap files needed.
+       ret = phylink_connect_phy(dev->phylink, phydev);
+        if (ret) {
+                netdev_err(dev->net, "can't attach PHY to %s, error %pe\n",
+                           dev->mdiobus->id, ERR_PTR(ret));
+                goto phylink_uninit;
+        }
 
-Signed-off-by: Minxi Hou <houminxi@gmail.com>
+This is the error message we see.
+
+phylink_uninit:
+        lan78xx_phy_uninit(dev);
+
+        return ret;
+}
+
+and
+
+static void lan78xx_phy_uninit(struct lan78xx_net *dev)
+{
+        if (dev->phylink) {
+                phylink_disconnect_phy(dev->phylink);
+                phylink_destroy(dev->phylink);
+                dev->phylink = NULL;
+        }
+}
+
+We see the error message because phylink_connect_phy() failed. If
+connect failed, you should not call disconnect.
+
+The general pattern in Linux is that you undo what went correctly at
+the end of the function.
+
+Please try this patch.
+
+       Andrew
+
+From ea55645b23092a0de7aa3ab0eaf7bcb73a7fb0e1 Mon Sep 17 00:00:00 2001
+From: Andrew Lunn <andrew@lunn.ch>
+Date: Wed, 6 May 2026 08:10:29 -0500
+Subject: [PATCH] net: usb: lan78xx: Fix cleanup in lan78xx_phy_init
+
+If phylink_connect_phy() fails, phylink_disconnect() should not be
+called. Rather than use lan78xx_phy_uninit() which does too much, add
+the cleanup at the end of the function and only undo what was
+successfully done.
+
+Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 ---
- .../selftests/net/openvswitch/openvswitch.sh  | 77 +++++++++++++++++++
- 1 file changed, 77 insertions(+)
+ drivers/net/usb/lan78xx.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index b327d3061ed5..a5636881760b 100755
---- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-+++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -27,6 +27,7 @@ tests="
- 	upcall_interfaces			ovs: test the upcall interfaces
- 	tunnel_metadata				ovs: test extraction of tunnel metadata
- 	drop_reason				drop: test drop reasons are emitted
-+	pop_vlan				vlan: POP_VLAN action strips tag
- 	psample					psample: Sampling packets with psample"
+diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
+index bcf293ea1bd3..9cfc122d76ef 100644
+--- a/drivers/net/usb/lan78xx.c
++++ b/drivers/net/usb/lan78xx.c
+@@ -2842,7 +2842,7 @@ static int lan78xx_phy_init(struct lan78xx_net *dev)
  
- info() {
-@@ -830,6 +831,82 @@ test_tunnel_metadata() {
- 	return 0
+ 	ret = lan78xx_mac_prepare_for_phy(dev);
+ 	if (ret < 0)
+-		goto phylink_uninit;
++		goto destroy_phylink;
+ 
+ 	/* If no PHY is found, set up a fixed link. It is very specific to
+ 	 * the LAN7801 and is used in special cases like EVB-KSZ9897-1 where
+@@ -2852,7 +2852,7 @@ static int lan78xx_phy_init(struct lan78xx_net *dev)
+ 	if (!phydev) {
+ 		ret = lan78xx_set_fixed_link(dev);
+ 		if (ret < 0)
+-			goto phylink_uninit;
++			goto destroy_phylink;
+ 
+ 		/* No PHY found, so set up a fixed link and return early.
+ 		 * No need to configure PHY IRQ or attach to phylink.
+@@ -2871,17 +2871,19 @@ static int lan78xx_phy_init(struct lan78xx_net *dev)
+ 	if (ret) {
+ 		netdev_err(dev->net, "can't attach PHY to %s, error %pe\n",
+ 			   dev->mdiobus->id, ERR_PTR(ret));
+-		goto phylink_uninit;
++		goto destroy_phylink;
+ 	}
+ 
+ 	ret = lan78xx_configure_leds_from_dt(dev, phydev);
+ 	if (ret < 0)
+-		goto phylink_uninit;
++		goto disconnect_phylink;
+ 
+ 	return 0;
+ 
+-phylink_uninit:
+-	lan78xx_phy_uninit(dev);
++disconnect_phylink:
++	phylink_disconnect_phy(dev->phylink);
++destroy_phylink:
++	phylink_destroy(dev->phylink);
+ 
+ 	return ret;
  }
- 
-+test_pop_vlan() {
-+	modprobe -q 8021q 2>/dev/null || true
-+	[ -d /sys/module/8021q ] || \
-+		{ info "CONFIG_VLAN_8021Q missing"; return $ksft_skip; }
-+
-+	local sbx="test_pop_vlan"
-+	sbx_add "$sbx" || return $?
-+	ovs_add_dp "$sbx" vlandp || return 1
-+
-+	ovs_add_netns_and_veths "$sbx" vlandp \
-+		ns1 veth1 ns1veth 192.0.2.1/24 || return 1
-+	ovs_add_netns_and_veths "$sbx" vlandp \
-+		ns2 veth2 ns2veth 192.0.2.2/24 || return 1
-+
-+	# Baseline: untagged bidirectional forwarding
-+	ovs_add_flow "$sbx" vlandp \
-+		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
-+	ovs_add_flow "$sbx" vlandp \
-+		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
-+	ovs_add_flow "$sbx" vlandp \
-+		'in_port(1),eth(),eth_type(0x0800),ipv4()' '2' || return 1
-+	ovs_add_flow "$sbx" vlandp \
-+		'in_port(2),eth(),eth_type(0x0800),ipv4()' '1' || return 1
-+	ovs_sbx "$sbx" ip netns exec ns1 ping -c 3 -W 2 \
-+		192.0.2.2 || return 1
-+
-+	# VLAN topology: ns1 uses VLAN sub-interface, ns2 is plain
-+	ip -n ns1 link add link ns1veth name ns1veth.10 \
-+		type vlan id 10 || return 1
-+	on_exit "ip -n ns1 link del ns1veth.10 2>/dev/null"
-+	ip -n ns1 addr add 198.51.100.1/24 dev ns1veth.10 || return 1
-+	ip -n ns1 link set ns1veth.10 up || return 1
-+	ip -n ns2 addr add 198.51.100.2/24 dev ns2veth || return 1
-+
-+	ovs_del_flows "$sbx" vlandp
-+
-+	# Static ARP: avoids VLAN-tagged ARP complexity
-+	local ns1veth10mac ns2mac
-+	ns1veth10mac=$(ip -n ns1 link show ns1veth.10 \
-+		| awk '/link\/ether/ {print $2}')
-+	ns2mac=$(ip -n ns2 link show ns2veth \
-+		| awk '/link\/ether/ {print $2}')
-+	ip -n ns1 neigh replace 198.51.100.2 lladdr "$ns2mac" \
-+		dev ns1veth.10 nud permanent || return 1
-+	ip -n ns2 neigh replace 198.51.100.1 \
-+		lladdr "$ns1veth10mac" \
-+		dev ns2veth nud permanent || return 1
-+
-+	local vlan_match='in_port(1),eth(),eth_type(0x8100),'
-+	vlan_match+='vlan(vid=10),'
-+	vlan_match+='encap(eth_type(0x0800),'
-+	vlan_match+='ipv4(src=198.51.100.1,proto=1),icmp())'
-+
-+	# Negative: forward without pop_vlan -- tagged frame
-+	# is invisible to ns2 (no VLAN sub-interface), ping fails
-+	ovs_add_flow "$sbx" vlandp "$vlan_match" '2' || return 1
-+	ovs_sbx "$sbx" ip netns exec ns1 ping -I ns1veth.10 \
-+		-c 3 -W 1 198.51.100.2 >/dev/null 2>&1 \
-+		&& { info "FAIL: ping should fail without pop_vlan"
-+		     return 1; }
-+
-+	ovs_del_flows "$sbx" vlandp
-+
-+	# Positive: pop_vlan strips tag on forward path,
-+	# push_vlan restores tag on return path -- ping succeeds
-+	ovs_add_flow "$sbx" vlandp \
-+		"$vlan_match" 'pop_vlan,2' || return 1
-+	ovs_add_flow "$sbx" vlandp \
-+		'in_port(2),eth(),eth_type(0x0800),ipv4()' \
-+		'push_vlan(vid=10,pcp=0,tpid=0x8100),1' || return 1
-+	ovs_sbx "$sbx" ip netns exec ns1 ping -I ns1veth.10 \
-+		-c 3 -W 2 198.51.100.2 || return 1
-+
-+	return 0
-+}
-+
- run_test() {
- 	(
- 	tname="$1"
 -- 
 2.53.0
 
