@@ -1,157 +1,144 @@
-Return-Path: <netdev+bounces-284797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284799-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0IrlLfot+2npXAMAu9opvQ
-	(envelope-from <netdev+bounces-284797-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:03:06 +0200
+	id oNHeIokw+2lxXQMAu9opvQ
+	(envelope-from <netdev+bounces-284799-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:14:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D2384D9F3D
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:03:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 275514DA052
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:14:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1B9E23036736
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 12:02:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E184330293C9
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 12:13:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB0032DCF45;
-	Wed,  6 May 2026 12:02:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA6944418CC;
+	Wed,  6 May 2026 12:13:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b="ZVk0Z7gS"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BpbUx1wH"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 120E932860B
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 12:02:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8FEF507
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 12:13:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778068957; cv=none; b=kbWJmB4DKEqIIM6ArrLRDODINOnesIeGDETs8yG3amHMUfeURggjzO/gTnCfeyMZ5yhlBZlvJBbCNfvXeU5K3tCRaz3B5DAueKNpiFKZd8HK9fSLNHLXnjatQKASbLMkRNEgrqxRrk/3IGR7oKMJH8rpXILcFaCnOAz4Ow6Eg30=
+	t=1778069604; cv=none; b=QIuil3ujJPKeXQ804XcNEvlJ3V4oZ/pT8KCWbMNYs0IPV9wV9V+XzJmw6XTSockmX7E61iWSNkLphmv7evWhvOITByyDsVH7ldk8YutKBajAAeaxIRqQyeyGbkOFdkarGu6u0tAUD/mSkryJYSzvtwAFLO0klo4bsilULwKqJCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778068957; c=relaxed/simple;
-	bh=JevKvqEoCV5HOOmeRsFLrsJ/B/S3ZF7ioy1uOuAeA5U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uu2ZgACl4ROC8OerU8AW/pPP0ly0hj5qRPryKgfPJdrnyuwYa8HXLU8ublmWnpqLgtpcuuk4rS7BrM6RFzlYi2bCJS7laDxdg6XMEi9Eb0j5++a2UX0DZInVk0huSOBM1W8qgfXsKLtId01XvCLsPg5oeICWYcO9aUBof8+p83c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn; spf=pass smtp.mailfrom=std.uestc.edu.cn; dkim=fail (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b=ZVk0Z7gS reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=std.uestc.edu.cn
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=std.uestc.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:Date:
-	Message-ID:MIME-Version:Content-Transfer-Encoding; bh=YCH4/Oh1h7
-	ugBA6on6GNy/JNOCllkQ7/BlsuNW96NkU=; b=ZVk0Z7gS0L/4t9eVt3A/Klsrvu
-	QKPsOpkS0vVuVt+3oNgGjUy1I2MLsjt1Wfuu8BtxwH8MlrQLQNUnD7rtAE6tgqHO
-	LS55AqeB8sQg9Cptdi+D28eQt2YW+Su84c2R1A5gK3hs+/fP9nM6gbmXsMdEHiMP
-	ZcuFbX3ICfYKk11gM=
-Received: from hotaru.tailb307d0.ts.net (unknown [183.94.22.109])
-	by hzbj-edu-front-4.icoremail.net (Coremail) with SMTP id BrQMCkAmzLe1LftporfvAQ--.14752S2;
-	Wed, 06 May 2026 20:01:58 +0800 (CST)
-From: Quan Sun <2022090917019@std.uestc.edu.cn>
-To: netdev@vger.kernel.org,
-	maxime.chevallier@bootlin.com,
-	andrew@lunn.ch
-Cc: kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Quan Sun <2022090917019@std.uestc.edu.cn>
-Subject: [PATCH net] net: ethtool: fix NULL pointer dereference in phy_reply_size
-Date: Wed,  6 May 2026 20:01:31 +0800
-Message-ID: <20260506120131.767679-1-2022090917019@std.uestc.edu.cn>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1778069604; c=relaxed/simple;
+	bh=6BJoT21okPC2svqqJmM994ukAh1veI+pOrQYZfGGSpY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=IP7M0wnAfr+3EPxBGHQ8Gy6hUyyKW7OftfsTi7jIjGYBeUxcna6BciTeCnPyuFeyDSjhlfWpOPEPKUjzUtynCtFJXhvcQ2oPdph1QEiWYoLRI/PddmlYNELFXBFpd9OTKP2EVQgsZ2pcwwqS1o+B6W4rdFfI2iwRGPoBkup7N0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BpbUx1wH; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 3A3B51A354C;
+	Wed,  6 May 2026 12:13:17 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 008846053C;
+	Wed,  6 May 2026 12:13:17 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 00927102F24F4;
+	Wed,  6 May 2026 14:13:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1778069595; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=Vd35ht/9TSjl6+pyCixaHialcFScMPkKoQR0kl6TV64=;
+	b=BpbUx1wHl4l/vykUGLe1EPapL9UV0maolQ+M/WmDdcFypq0gbewdaJQr0W0XqQKmPn+p5I
+	41Ys+CLOqKWZsenpy2Vuh2cQbBmQatytU5Vf/PI2yjIv+e9zpf5oOmVXC8zwkNeEecPPcU
+	Qd8K0f9JUxkUG8/U9hsCkKRsoDNBQTjNdVGDXZ4TAxRr2t8dgepeySmfObarBVT1gd4/Vy
+	LtTd2wf27IariUqWU38IJJEu8eL9dDnLoTC1RcTQLkpaHIXN6mAwiOIFbU6Rmud2toYoxQ
+	ImojO6QNt6sYEotnLfcVXy+0JjHBoVQfeVZPsKotDZmPL8Jp4CqpxlGEHTApbA==
+From: Thomas Richard <thomas.richard@bootlin.com>
+Subject: [PATCH v2 0/2] Add USB Ethernet controller (LAN7500) node in
+ VAR-SOM-OM44 devicetree
+Date: Wed, 06 May 2026 14:13:02 +0200
+Message-Id: <20260506-b4-var-som-om44-lan7500-v2-0-b8af59ab877c@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:BrQMCkAmzLe1LftporfvAQ--.14752S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7AFyDZFW3ZFWkWFyrZFyUtrb_yoW8XFWxpr
-	W5AFWFqr97twnrXr17Jw4rCryYkFs7C3W3ta4jkw1fZr13WrW8Xr45Kr10gayrZrZ5ua4j
-	qF4Fqas0v3ZrCFUanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9G14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
-	0_GcWlnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lc7CjxVAaw2AFwI0_JF0_Jw1lc2xSY4AK67AK6ryUMxAIw28IcxkI7VAKI48JMx
-	C20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAF
-	wI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20x
-	vE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v2
-	0xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxV
-	W8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbFksDUUUUU==
-X-CM-SenderInfo: asqsjiyzqzilqqrzq21wgo3vxvwfhvlgxou0/
-X-Rspamd-Queue-Id: 6D2384D9F3D
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAE4w+2kC/3XNQQ6CMBCF4auQWTtmSouIK+9hWBRapAl0SEsaD
+ eHuVly7/F8y32wQbXA2wq3YINjkomOfozwV0I/aPy06kxtKKi8kJWGnMOmAkWfkWSmctK8rIqT
+ GDKavhTSygXy9BDu41yE/2tyjiyuH9/Eoie/6MxXJv2YSmGGjjbHXioSS9455nZw/9zxDu+/7B
+ 1z82mXAAAAA
+X-Change-ID: 20260330-b4-var-som-om44-lan7500-09dfdc713d39
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Aaro Koskinen <aaro.koskinen@iki.fi>, 
+ Andreas Kemnade <andreas@kemnade.info>, Kevin Hilman <khilman@baylibre.com>, 
+ Roger Quadros <rogerq@kernel.org>, Tony Lindgren <tony@atomide.com>, 
+ Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-omap@vger.kernel.org, Thomas Richard <thomas.richard@bootlin.com>, 
+ Nicolai Buchwitz <nb@tipi-net.de>
+X-Mailer: b4 0.14.3
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: 275514DA052
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.54 / 15.00];
-	DMARC_POLICY_QUARANTINE(1.50)[uestc.edu.cn : SPF not aligned (relaxed),quarantine];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[std.uestc.edu.cn:~];
-	TO_DN_SOME(0.00)[];
-	R_DKIM_PERMFAIL(0.00)[std.uestc.edu.cn:s=dkim];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284797-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[2022090917019@std.uestc.edu.cn,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-284799-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	NEURAL_SPAM(0.00)[0.718];
-	SEM_URIBL_FRESH15_UNKNOWN_FAIL(0.00)[uestc.edu.cn:query timed out];
-	SEM_URIBL_UNKNOWN_FAIL(0.00)[uestc.edu.cn:query timed out];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[uestc.edu.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[thomas.richard@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:dkim,bootlin.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-In phy_prepare_data(), the strings rep_data->name and rep_data->drvname
-are allocated using kstrdup(). However, the return values of these
-allocations are not checked.
+In this second version I added LAN7500 and LAN7505 definitions in
+microchip,lan95xx.yaml as requested by Krzysztof. I also added Nicolai's RB
+tag in devicetree patch.
 
-If kstrdup() fails to allocate memory, it returns NULL. The function
-phy_prepare_data() will still return 0 (success). Subsequently, the
-handler ethnl_default_doit() continues the execution flow and calls
-phy_reply_size() to calculate the size of the reply message. This
-unconditionally executes strlen(rep_data->name), leading to a kernel
-NULL pointer dereference and panic.
-
-Fix this by properly checking the return values of kstrdup() for both
-`name` and `drvname`, and returning -ENOMEM if the allocation fails.
-
-Signed-off-by: Quan Sun <2022090917019@std.uestc.edu.cn>
+Signed-off-by: Thomas Richard <thomas.richard@bootlin.com>
 ---
- net/ethtool/phy.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Changes in v2:
+- add Nicolai's RB tag in patch 2/2.
+- add LAN7500 and LAN7505 in microchip,lan95xx.yaml instead of creating a
+  new file.
+- Link to v1: https://lore.kernel.org/r/20260403-b4-var-som-om44-lan7500-v1-0-0dadde850143@bootlin.com
 
-diff --git a/net/ethtool/phy.c b/net/ethtool/phy.c
-index d4e6887055ab1..6cf3df1df8659 100644
---- a/net/ethtool/phy.c
-+++ b/net/ethtool/phy.c
-@@ -88,8 +88,17 @@ static int phy_prepare_data(const struct ethnl_req_info *req_info,
- 		return -EOPNOTSUPP;
- 
- 	rep_data->phyindex = phydev->phyindex;
-+
- 	rep_data->name = kstrdup(dev_name(&phydev->mdio.dev), GFP_KERNEL);
-+	if (!rep_data->name)
-+		return -ENOMEM;
-+
- 	rep_data->drvname = kstrdup(phydev->drv->name, GFP_KERNEL);
-+	if (!rep_data->drvname) {
-+		kfree(rep_data->name);
-+		return -ENOMEM;
-+	}
-+
- 	rep_data->upstream_type = pdn->upstream_type;
- 
- 	if (pdn->upstream_type == PHY_UPSTREAM_PHY) {
+---
+Thomas Richard (2):
+      dt-bindings: net: microchip: Add LAN7500 and LAN7505 devices
+      ARM: dts: ti: var-som-om44: Add USB Ethernet controller node
+
+ .../devicetree/bindings/net/microchip,lan95xx.yaml         |  2 ++
+ arch/arm/boot/dts/ti/omap/omap4-var-som-om44.dtsi          | 14 ++++++++++++++
+ 2 files changed, 16 insertions(+)
+---
+base-commit: b50159d9eaefd95ad4e58bb94bc797761aeb9d8f
+change-id: 20260330-b4-var-som-om44-lan7500-09dfdc713d39
+
+Best regards,
 -- 
-2.43.0
+Thomas Richard <thomas.richard@bootlin.com>
 
 
