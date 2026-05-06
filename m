@@ -1,256 +1,270 @@
-Return-Path: <netdev+bounces-284988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284989-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2OXzINCE+2nXcAMAu9opvQ
-	(envelope-from <netdev+bounces-284988-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 20:13:36 +0200
+	id sE5fLumG+2kscQMAu9opvQ
+	(envelope-from <netdev+bounces-284989-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 20:22:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED6564DF2BC
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 20:13:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C7814DF438
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 20:22:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7667D3021D0C
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 18:13:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 86536300695B
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 18:21:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D16294A2E0A;
-	Wed,  6 May 2026 18:13:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F68C4BC004;
+	Wed,  6 May 2026 18:21:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="WohxvzDB"
+	dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b="MXQ1ByoQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3D53ED5C8
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 18:13:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.145.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778091211; cv=fail; b=Gt1vkmPpwDXQoSqUxA8Z/ptHg4aD9CotWzwS+Bb+bIJsd7fer8GE5iqedZK3RXJHA4Ot8NYIQ7PI3+6RndwA9pN+7Gb9XavLcfgwzZUVImRplplxL/cHN+G0X49IKVNk34SphA/PFTMSbzHVyqa2+GJk+zi5UCIzNY6RPhQUtJ0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778091211; c=relaxed/simple;
-	bh=iwJF8kNlzSONi72wttB9cdvYDDohgwHHTCevGMN+7M0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l490v7BdGu5+e75dzdCzOgvnqRj3Kk39LAQ/z7AzVkgV3f8DM5B1agHlz+XWxceuVR/xMQP1Mp4FUF5rklOBY1oqmCwRd0YL3c6Y5AdzAADOeckiCzr/vQpoUlUg2iIUOhOQA/vHgbEfbJvs3eQ2N625qwsoOm5HxzmOfzoLCYY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=WohxvzDB; arc=fail smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6466tnCk2489734
-	for <netdev@vger.kernel.org>; Wed, 6 May 2026 11:13:29 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=bsbBvRMYnEJLwO6vFciq2lgaf49YRFfLC0382/bbMDg=; b=WohxvzDB7qU8
-	o2wqk7WXisIZ2+qX8jjaoaehtsTVUyToiY5UVloN7qizzETPowd5S4Zb8nsC9EMl
-	ULfRCe+eyS5F3L7XFUvewUEdAC5eCpjIHy/fSU0RKXCPBgxqLmVKOK5uz4d1xyua
-	Eke9sevlGUcg5bDSN2idKRVF5h0mP8Krj1GJ0bk7ZFEuvrRJTHCQyy6EslL8rHDc
-	eY2QYB8+Y7raLFdBngjmOlFSqJJ7pt4TUuOaX0mcx7wJ+l1lJ5lGdJpHSXCX+lte
-	R3HEpqoAP35QuGsNrP9kQzHI0fvkMtoI/VDJafYjIWur8zAzA/LlV1Ml+TglKNA0
-	ju/vhonoEw==
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com [209.85.210.70])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4dwck1tg3t-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Wed, 06 May 2026 11:13:29 -0700 (PDT)
-Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-7de442b3402so7998a34.3
-        for <netdev@vger.kernel.org>; Wed, 06 May 2026 11:13:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778091208; cv=none;
-        d=google.com; s=arc-20240605;
-        b=V/1DqbnA7PHcqvb15WG3p9H/UqNUSZ+ZiOOdyeYQ9MyTnzYyuYCSe0sVJF2+U/4+h5
-         RLGmJLtD2h/mWViBiImu57T0uy+iURLVaBmOt92UWlVDK2YIvT6bKs4pRDRh3fl0k+Bk
-         yMi/CwNw6eflu3p0FEHZdN7bobBlT9JYmPfy8+GBMkeTuz8sehEp3qABgJtRJOoi6OpD
-         EhazyODudOBx+rflYaIWAdQC8AJCSHLISgcXiElQjXy9hKPkGEGtpGUfoPPz0iFf9wEk
-         Eur34cEbFNQpMIVcCNBrPM7cCPW07kUVrKCFz2SlFbrEKgcK6mr5iBsicgYNL9yBpl1v
-         u7NA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version;
-        bh=3NDxADxfe9nDq1onSpJIot5yt/9B+/JmRFYIwD1lbrE=;
-        fh=dlj0lRvBubJOIhE3kJgOaxduP0yIxOpMVs8F1/Nf49E=;
-        b=YDpgF9d64KjxRNeFPyLI20a7XJL14STFtaEb8qEgVuFVYW7oQ3KUGHdVsPijf9c+id
-         5CTMMFmCNWDkYkXPRxQZrrHAeDTZdy8cmcxRKtST+qxlKcDjpv+iy7i9rkL85yo/gdVs
-         9r3klOCHZuli3fnXx9WUH1wB6v2I9++zjtT2ry7+NwJOLFtKruwW0WTlXtb6htqGsfRu
-         EmTXvKsYHa/s65LyuyzT/uej8MepraUKkEWcIMSY5+MUVhddFIxbC1RlrlaJt7IdCyMK
-         gzBebVx2TxRQ+/m5nP8DUgt1cZ9TKMAT+LT5aMW+eoAhQR9cDQsaLudclpz07bk8IkFN
-         g09w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639A9299931
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 18:21:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778091695; cv=none; b=QNIUXuBWqkfw/9AzTQDLfs8N4vROjSzfUltE+Wp3S1uLjDsQPyK7BnEz+/E0it8xH5kNwuaVofVCrbLlvdkaXe2QUqoU6hKu/9VOIjJxbtTxzCgSbCtgfcCRjM8aUYta4pPyC6wVW5gc7gTpFggAH4gG528VapyAsP+CAbAmcYk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778091695; c=relaxed/simple;
+	bh=l9RL6ffZ0V6p/nZhYhiJ/k+Ncl3ace6QHYzBN675cRE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VxBl1Amk410itfZKMsDfqZ1RfX+1w5NUiXMOnM6uzEfvYS/+oPwFxwBVyA/aAcWxS+PCnx6ZZ1UNLp4gCtHnK5kij8sqOTeLUDJ7TzcnWdHBMZh5yBJkgyClSzvndZjo0CZ0W6vTRm4msU/jPwQPONh5sBVMrAVmtWY0NvAHrQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com; spf=pass smtp.mailfrom=riscstar.com; dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b=MXQ1ByoQ; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riscstar.com
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8ee62a19730so744902885a.3
+        for <netdev@vger.kernel.org>; Wed, 06 May 2026 11:21:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=riscstar-com.20251104.gappssmtp.com; s=20251104; t=1778091693; x=1778696493; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5oBqOeQFggE8v+cavTTn16m1Xk99yYA0Xp28tAkW6v4=;
+        b=MXQ1ByoQInRWPvTL/VCZ1IQuPvW37sz9uZec9IY6HESSYPe434OaNktzL4FV46P8hy
+         GUHNPZdb3PM+G9O981LjNDaf5vwazehHtDvvz3JMB4QTAFsTeVjeN0c8Y9ebS64Zwkx+
+         CrQoawpsKZHIL3PepkgbpA5SemfLG/37+pA7nvC0UnvYN/kw9kY1icXlnELq6tkGiPs4
+         yBxYhbZqdPumQCerXDNlJlqHnb9GnlMkvq3oHVRKbjDVWkYoCIrr+80sI1ReDp94/9Ig
+         SYYiZqxGJiZmFPHseAQ49nWXI7UuneIUnVf4t3XyDYo/rg/4vkeJMPgIar/acqRQOZF6
+         cpxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778091208; x=1778696008;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3NDxADxfe9nDq1onSpJIot5yt/9B+/JmRFYIwD1lbrE=;
-        b=EF2Qao7VkpXqFXdvDKTRxll0Wd4mbcJPapw1B0P0Lv5Toc7vWbDdaYhKN+sRXXOP1S
-         iITM4gVJ9qNVnT/YQ92Hv0FRzRp725O2zhz3X2IjvWQCLAQ8pkqpwD3F0x8QR6fDloWi
-         52FzQdCp8w21jn8lKlexxrwu3EAY2ZvqgCkj1HcBlyW3D646kQ4HLYtatf8nnzKMedxP
-         PaIrn//FZIYG+uhPmp9lO79s/7I2CNJW1pFuWNb5KmxMswshnaErK0byJ8hzhjjU7x6e
-         xewbdx8LX8Z1sZSev/wcx1aGf96WObe2L5twTN7sUY1Xskuy8cx9Zz5Gt+BkkXVVDyRc
-         mj+A==
-X-Forwarded-Encrypted: i=1; AFNElJ/lW9sWjIHlOdGIlNEIbjEt7eARpqMN+Fjm6lkC4XqM2h+fgPaeIm6vxyD5igOjUrXBPNYhED8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwraVNq0Yb8kNK9Jo263g740C2D5YB1jOK6V5FrT/kaYuJYhPdO
-	TcZiNiYOuiDtA4mllI9t65c7G+Y9X5ouR6FTb2H6MNOeO8cRSRuOqbMaOeqIIVmtpUPOd5ToQ4R
-	MNj2mwJXKZfmwRFzdfSAYFG2Sk/fNNLPYbiTvhieJDfjxM5L484C12TjnhPDhI+FtUfS2+7Bv5Y
-	/PswM/QOmnJxu8M6kLjXV0DeT1tGBv2b0=
-X-Gm-Gg: AeBDietBlcPrImrDLlssklA5FZmjedba+8MZvZ8R66o2fHxppkVhpf5oMuZ6KGUqg13
-	CIB6kFo4+Wq/bE5yfJOrAUwiHaXtiZ6tEcfI54+UdQ8eA+Hx63WJqcEU0vinhCCVHp3L9K/BTUS
-	fRB2yigOctpLxX3U/SH2//t6QPdIg9TzDysqXwsmNW+ifdiwAqTFqDNfIwnyxhGE5RZYS9UT2cW
-	ygLjqS2Bcl7nj+cDCDv6JheiXoZkAYr
-X-Received: by 2002:a05:6830:6615:b0:7dc:da80:42c5 with SMTP id 46e09a7af769-7e1df2863femr2542395a34.28.1778091208387;
-        Wed, 06 May 2026 11:13:28 -0700 (PDT)
-X-Received: by 2002:a05:6830:6615:b0:7dc:da80:42c5 with SMTP id
- 46e09a7af769-7e1df2863femr2542358a34.28.1778091207771; Wed, 06 May 2026
- 11:13:27 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1778091693; x=1778696493;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5oBqOeQFggE8v+cavTTn16m1Xk99yYA0Xp28tAkW6v4=;
+        b=dL6Ql4VNus7FSRrS/YSKoJgORcQyibYA9WmcN6d+SOSWpK3ui6mam/izAI45ge0jHU
+         ALb7f70wojnA3G+ueb26EzbBYwW+HpdF+60js6fgMNwKMqkVj9WuwcLIh/KuBOPC4D+C
+         qTPY/fW6jlXZJ1XRwzzJHYqvvLJdgQ5Zh1H+FoT48I48HWEsxwyD4dGUauU0CM9PXLNZ
+         XaPsUtIAuD47NVNiDVWnvJN5sSJl0mSUPQH0Skk3pSydGmSVaRdxq0xCW+FhGMsSKxzL
+         W/8fy80gAW9m4H+whQwRhT7+b43/ju/UyX7dgnL7/9KrURV8jzqH/fNaI0rhMHb1zMUp
+         IDFg==
+X-Forwarded-Encrypted: i=1; AFNElJ+fIrUO2/+hOgNX33u1xGCC8QfW4TNGjSVJZfKXj1Sh5xf8AmRfjfv6SM++5zUQPDssOcogwwU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YywLiaaPWM3FPVRgXao7RpqvvmCj2IV6PyJv1gvZOrLST44F6sm
+	rrBpTVI4vWtTYDEi/bFmpShmfIN9YZCIxrBw8aqiUqf4rZnPWyMBxPWzUkS1ZjTRA74=
+X-Gm-Gg: AeBDieuOyGsdm9eXrPYSB7cNTFPi77By4FAFHQ8YS+UKTldli/RAka5SQj8rCZeaBCn
+	FR397piRafbZsT+Q9YRykRq/Ni7SYCxgmoscECvPWBZ/dWdTq65pUkR/s8Adgep+08NkpCOc9WC
+	rBEyd2zoYpDn/0DYg3tWjZWiYTxds/QlZ07+d8gtY3wElHmyUzfO7o5nxVP4uquPL/REUFPy+uf
+	L60DJXVPf4FP604ZleQCFQ1GcmLBV+b520RAmB5ojWTH/zZquNvpeHoRM7j9thqpjQBIWoiC18U
+	/uhHkeFEnziA4EHCHEHu7JjdW4FHfoxw7g+UeEWgmB9QlBdnJoKtLiWl9jpAu6vad6amBh5HDuy
+	mdk/PsFx8qWncl54ZnsKNqpz/JX8xIQWcOexI+PjvfOwJIKQhEls8i4OPF8TnR/f89aTLbbK85W
+	sd6FX2sQ1JTwvxIPXown+2FxMTVVQKA00wU2blBmgvy+dfQsWHMdCQQ68RybDyCNcIxEhUhPhOL
+	g==
+X-Received: by 2002:a05:620a:29c1:b0:8ef:12de:1337 with SMTP id af79cd13be357-904d60f5233mr705172585a.38.1778091693050;
+        Wed, 06 May 2026 11:21:33 -0700 (PDT)
+Received: from [172.22.22.28] (c-75-72-117-212.hsd1.mn.comcast.net. [75.72.117.212])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8fc2cd057acsm1895096485a.47.2026.05.06.11.21.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 May 2026 11:21:32 -0700 (PDT)
+Message-ID: <0751a051-9894-45be-92d6-0d46f2c39293@riscstar.com>
+Date: Wed, 6 May 2026 13:21:29 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260430200704.352228-1-zhipingz@meta.com> <20260430200704.352228-3-zhipingz@meta.com>
- <a63179d7-28b1-4269-9ef2-c20368d0b91c@huawei.com>
-In-Reply-To: <a63179d7-28b1-4269-9ef2-c20368d0b91c@huawei.com>
-From: Zhiping Zhang <zhipingz@meta.com>
-Date: Wed, 6 May 2026 11:13:16 -0700
-X-Gm-Features: AVHnY4IkP9FyuA_XByk4LxkXqiqZTgspyYe5GlY8B_-IOTQbxE0OcjjDWm1D7Xc
-Message-ID: <CAH3zFs0zAf0=kxxMfyxuBF0Mw+0FTFANHDG5C9d7-vQ9dFO0Qg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] RDMA/mlx5: get tph for p2p access when registering
- dma-buf mr
-To: fengchengwen <fengchengwen@huawei.com>
-Cc: Alex Williamson <alex@shazbot.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <helgaas@kernel.org>,
-        linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        Keith Busch <kbusch@kernel.org>, Yochai Cohen <yochai@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-ORIG-GUID: LcZzMVBd5UfRc283rh3TjXo6HmVNyB3S
-X-Proofpoint-GUID: LcZzMVBd5UfRc283rh3TjXo6HmVNyB3S
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTA2MDE3OCBTYWx0ZWRfX1LuEvSlte8gs
- 4hNxlVKb638P6ZmEo2Cqbqu3DEwLOOFoWFeYSIS3FAeC1gfZThuC7DwSkPSZAXoNdn37hsYc9or
- gF18/k9h8k8mKvh8QyKFy5IjHhr+dlytWk/Ylw6QWvZbiCoowDE8fCAfv9f7LbjPE8nkDjKze05
- 58CU5F7pPd7AXiZ1Ax7/IxO4BglOt+9aOvhFvw4Q9XxjjV8/0L00dCCDJVlma6u5pycJcCj1GGM
- XYGp7TVJD1/6G0GQB10HYwNjo9orYzVSdCefsTCK8q9Jxipn/ZGNl8+Va7xsnwjIDQL8+DxEWMP
- W9DkbEMFhxluOhpjFQn6COiKDaiWty5gVkjViVmtIOrmT//+bGjcwe2VR4CmYbMZ+a9F9nZn1eX
- FtzI+8TNI9/qJrf3yfnZLm2sYZ8m2tA36A+2FNbMC4jMV5bOyh1veY9OIINAYcGsevaJWr2T+KT
- 8fqYbBnPHAxj9h0jt4g==
-X-Authority-Analysis: v=2.4 cv=Pu+jqQM3 c=1 sm=1 tr=0 ts=69fb84c9 cx=c_pps
- a=7uPEO8VhqeOX8vTJ3z8K6Q==:117 a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22 a=8elwO82fXORLTBIkMd32:22
- a=i0EeH86SAAAA:8 a=VabnemYjAAAA:8 a=kFoJLRxUVyBjw7Himy0A:9 a=QEXdDO2ut3YA:10
- a=EXS-LbY8YePsIyqnH6vw:22 a=gKebqoRLp9LExxC7YDUY:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-06_01,2026-05-06_01,2025-10-01_01
-X-Rspamd-Queue-Id: ED6564DF2BC
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 09/12] gpio: tc956x: add TC956x/QPS615 support
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, maxime.chevallier@bootlin.com,
+ rmk+kernel@armlinux.org.uk, andersson@kernel.org, konradybcio@kernel.org,
+ robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, linusw@kernel.org,
+ brgl@kernel.org, arnd@arndb.de, gregkh@linuxfoundation.org,
+ daniel@riscstar.com, mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com,
+ alexandre.torgue@foss.st.com, ast@kernel.org, boon.khai.ng@altera.com,
+ chenchuangyu@xiaomi.com, chenhuacai@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, hkallweit1@gmail.com, inochiama@gmail.com,
+ john.fastabend@gmail.com, julianbraha@gmail.com, livelycarpet87@gmail.com,
+ matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
+ prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
+ rohan.g.thomas@altera.com, sdf@fomichev.me, siyanteng@cqsoftware.com.cn,
+ weishangjuan@eswincomputing.com, wens@kernel.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20260501155421.3329862-1-elder@riscstar.com>
+ <20260501155421.3329862-10-elder@riscstar.com>
+ <736fb3b7-c88a-4ec4-96ad-d1b79cc48d30@lunn.ch>
+ <30cec7dd-ac3c-47ab-896a-c29992bd5ba5@riscstar.com>
+ <3666e3e6-e6f3-4cbf-b9fe-caa394fbab7c@lunn.ch>
+Content-Language: en-US
+From: Alex Elder <elder@riscstar.com>
+In-Reply-To: <3666e3e6-e6f3-4cbf-b9fe-caa394fbab7c@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 1C7814DF438
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
-	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-0.06 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[riscstar-com.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[riscstar.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284988-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,riscstar.com,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[meta.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhipingz@meta.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-284989-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[riscstar-com.20251104.gappssmtp.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,meta.com:dkim,meta.com:email]
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[elder@riscstar.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_GT_50(0.00)[50];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,riscstar.com:mid]
 
-On Wed, May 6, 2026 at 12:04=E2=80=AFAM fengchengwen <fengchengwen@huawei.c=
-om> wrote:
->
-> >
-> On 5/1/2026 4:06 AM, Zhiping Zhang wrote:
-> > Query dma-buf TPH metadata when registering a dma-buf MR for peer to
-> > peer access and translate the raw steering tag into an mlx5 steering tag
-> > index. Factor mlx5_st_alloc_index() so callers that already have a raw
-> > steering tag can allocate the corresponding mlx5 index directly. Keep t=
-he
-> > DMAH path as the first priority and only fall back to dma-buf metadata =
-when
-> > no DMAH is supplied.
-> >
-> > Pass the device's supported ST width (8 or 16 bit, derived from
-> > pdev->tph_req_type) to get_tph() so the exporter can reject tags that
-> > exceed the consumer's capability. Initialize ret in mlx5_st_create() so=
- the
-> > cached steering-tag path returns success cleanly under clang builds.
-> >
-> > Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
-> >
-> > diff --git a/drivers/infiniband/hw/mlx5/mr.c b/drivers/infiniband/hw/ml=
-x5/mr.c
-> > --- a/drivers/infiniband/hw/mlx5/mr.c
-> > +++ b/drivers/infiniband/hw/mlx5/mr.c
-> > @@ -46,6 +46,8 @@
-> >  #include "data_direct.h"
-> >  #include "dmah.h"
-> >
-> > +MODULE_IMPORT_NS("DMA_BUF");
-> > +
-> >  static int mkey_max_umr_order(struct mlx5_ib_dev *dev)
-> >  {
-> >       if (MLX5_CAP_GEN(dev->mdev, umr_extended_translation_offset))
-> > @@ -899,6 +901,40 @@ static struct dma_buf_attach_ops mlx5_ib_dmabuf_at=
-tach_ops =3D {
-> >       .invalidate_mappings =3D mlx5_ib_dmabuf_invalidate_cb,
-> >  };
-> >
-> > +static void get_tph_mr_dmabuf(struct mlx5_ib_dev *dev, int fd, u16 *st=
-_index,
-> > +                           u8 *ph)
-> > +{
-> > +     struct pci_dev *pdev =3D dev->mdev->pdev;
-> > +     struct dma_buf *dmabuf;
-> > +     u16 steering_tag;
-> > +     u8 st_width;
-> > +     int ret;
-> > +
-> > +     st_width =3D (pdev->tph_req_type =3D=3D PCI_TPH_REQ_EXT_TPH) ? 16=
- : 8;
->
-> The tph_req_type is defined under CONFIG_PCIE_TPH, how about add a wrap f=
-unction
-> to query it.
->
-Good catch!
-so the direct dereference here will break the build when TPH is
-disabled. I'll add a small
-wrapper in include/linux/pci-tph.h alongside the existing helpers, e.g.:
+On 5/2/26 10:05 PM, Andrew Lunn wrote:
+> On Sat, May 02, 2026 at 08:45:48PM -0500, Alex Elder wrote:
+>> On 5/1/26 1:36 PM, Andrew Lunn wrote:
+>>>> + * There is a TC956X PCI power controller driver that accesses the
+>>>> + * direction and output value registers for GPIOs 2 and 3.  These
+>>>> + * GPIOs control the reset signal for the two downstream PCIe ports.
+>>>> + * Their values will never change during operation of this driver, and
+>>>> + * this driver reserves these two GPIOS.
+>>>
+>>> Why doesn't this power controller driver actually use this driver to
+>>> control the GPIOs? Chicken/egg?
+>>
+>> I am not the one with authority on this, but yes, that's my
+>> understanding.  *Something* about this chip requires that the
+>> PCIe ports need to have some configuration done on them *before*
+>> PCIe is powered up.  So that driver uses the I2C interface to
+>> apply these settings.  Meanwhile this driver uses the PCIe-mapped
+>> memory to manage the GPIO registers.
+> 
+> The diagram you have is:
+> 
+> 
+>                ----------------------------------
+>                |              Host              |
+>                ------+...+----------+........+---
+>                      |i2c|          |  PCIe  |
+>      ----------------+...+----------+........+------
+>      | TC956x        |I2C|          |upstream|     |
+>      |               -----        --+--------+---  |
+>      |  -----  ------  -------    | PCIe switch |  |
+>      |  |SPI|  |GPIO|  |reset|    |             |  |
+>      |  -----  ------  |clock|    | DS3 DS2 DS1 |  |
+>      |                 -------    ---++--++--++--  |
+>      |  -----  ------     downstream//    \\  \\   |  downstream
+>      |  |MCU|  |SRAM|    /==========/      \\  \===== PCIe port 1
+>      |  -----  ------   //PCIe port 3       \\     |
+>      |                  ||                   \======= downstream
+>      |  ----+-----------++-----------+----         |  PCIe port 2
+>      |  | M | internal PCIe endpoint | M |         |
+>      |  | S |------------------------| S |  ------ |
+>      |  | I |   PCIe   |  |   PCIe   | I |  |UART| |
+>      |  | G |function 0|  |function 1| G |  ------ |
+>      |  | E |----++----|  |----++----| E |         |
+>      |  | N |  eMAC 0  |  |  eMAC 1  | N |         |
+>      --------+.......+------+.....+-----------------
+>              |USXGMII|      |SGMII|
+>            --+.......+--  --+.....+--
+>            |  ARQ113C  |  | QEP8121 |
+>            |    PHY    |  |   PHY   |
+>            -------------  -----------
+> 
+> The two Ethernet controllers are hanging off port 3 of the
+> switch. However, the GPIO block is just floating in space. What
+> address space is it in?
 
-  #ifdef CONFIG_PCIE_TPH
-  u8 pcie_tph_get_st_width(struct pci_dev *pdev);
-  #else
-  static inline u8 pcie_tph_get_st_width(struct pci_dev *pdev) { return 0; }
-  #endif
+Well, that isn't easily representable.
 
-  with the implementation
-in drivers/pci/pcie/tph.c returning 16 for PCI_TPH_REQ_EXT_TPH and 8 otherw=
-ise.
-Then get_tph_mr_dmabuf() becomes:
+In fact, the GPIO (and UART and eMACs, etc.) is accessible
+multiple ways.   They are in a single "SFR" range of memory
+within the TC956x, which is partitioned into sub-ranges for
+the separate IP blocks.
 
-  st_width =3D pcie_tph_get_st_width(pdev);
-  if (!st_width)
-      goto end_dbuf_put;
+E.g:
+0x40000000	Bootup config registers (size 0x1000)
+0x40006000	UART registers (size 0x1000)
+0x40020000	PCIe registerfs (size 0x00010000)
+0x40040000	EMAC0 (size 0x8000)
+and others.
 
-which also gives us a clean early-out when TPH isn't supported on the
-device. Will fix in v3.
+The MCU has access to this SFR space.  The host CPU can
+access it via the I2C interface (as the PCIe power control
+driver does).  The PCIe power control driver actually
+touches the GPIO registers to be able to assert reset
+on the two downstream PCIe ports.
 
-Thanks,
-Zhiping
+In addition, BAR4 for both PCIe functions has access to the
+same SFR space.  So in fact, both of these functions are
+capable of controlling GPIOs.  We are having just one of
+them (function 0) be responsible for that.
+
+> I'm wondering if the GPIO controller should be a device/driver of its
+> own? It probes first. The PCI power controller driver then probes, and
+> has phandles to the GPIO controller so it can activate ports 1 and
+> 2. Parallel to that the Ethernet driver(s) can probe, also using
+> phandles to the GPIO they need.
+> 
+> Looking at this diagram, putting the GPIO controller within one of the
+> port 3 functions is wrong. But maybe the diagram is not accurate.
+
+When the PCIe power controller was implemented, the GPIO
+functionality was not separated out.  That driver simply
+touches two registers to manage asserting reset on the two
+downstream PCIe ports.  (It changes these only during the
+appropriate times during power-up and power-down of the ports.)
+
+It's possible *that* work could have implemented a separate
+GPIO driver.  We did not pursue modifying the power control
+driver to work that way.
+
+Instead, we modeled it starting with the STMMAC driver (which
+is how the Toshiba vendor driver works).  But we separated
+the GPIO functionality into a separate (auxiliary) device,
+which has its own driver.
+
+Because the internal endpoint won't operate until the PCIe
+power controller has enabled power, this GPIO driver and
+the PCIe power control driver won't interfere with each
+other's access to the shared registers.
+
+In short, because this "SFR" space is available in various
+ways, there are several ways the GPIO (and other) IP can
+be managed and represented.
+
+					-Alex
+
+> 
+>       Andrew
+
 
