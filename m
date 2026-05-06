@@ -1,456 +1,250 @@
-Return-Path: <netdev+bounces-284706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284707-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CA8IBP/W+mkRTQMAu9opvQ
-	(envelope-from <netdev+bounces-284706-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 07:51:59 +0200
+	id iLu5G1vX+mkRTQMAu9opvQ
+	(envelope-from <netdev+bounces-284707-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 07:53:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9A4A4D65AC
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 07:51:58 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5C924D6607
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 07:53:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8FDAB300D978
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 05:51:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0CE063019CA0
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 05:52:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93E7C305E3B;
-	Wed,  6 May 2026 05:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655612F4A15;
+	Wed,  6 May 2026 05:52:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="fnFclocA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P5HEA4qO"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 100BB1F94F;
-	Wed,  6 May 2026 05:51:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778046715; cv=none; b=JlIp3kiEcJHkDyenR8/d3jQIBiDo45N9icwJemkx58PJ7/7WJUkQd9bAz9MCHaXch/Tf0x2rzhwhLipCu+Qkb9KrbbACbr1Pfwo6S3hWfEiTbTlGz0SNLlOCEuiQt1ZzIU+B6C/h/8F/FwqEsfnYUR2A/LrKb8qtEM3R44ULmww=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778046715; c=relaxed/simple;
-	bh=441Bs0UO4rInYT8PIEv6n08YlhCJhONS6W0GguwghSw=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=SzXWIo9ZPJLuHUSdjRSkcGbWvIiJuSZN7uT2mz5hBZ1U3o5QFvxcy01DPbPwScLP4zbD43Wsj2DrsbthG0eak24EFwZxllv8F+aIggnu/lUNLj55QoqhX0BP0ZKhjbrOCtkRF1wt79mzyGMqeyedOwR7x3RaWiHlvZADs51+SBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=fnFclocA; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id 82A5120B7165; Tue,  5 May 2026 22:51:51 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 82A5120B7165
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1778046711;
-	bh=GUfu2I1LmD0om4t0q130LxsaDD6WzeGgC5biY3ECyoU=;
-	h=From:To:Subject:Date:From;
-	b=fnFclocAe7cfB0RClyKbIJLtHUWGItLiJUQuELsXxzLpKVig9JaA8VaIyWyoEPOV4
-	 tozjXZpzInkMUav5Iq+/n6nTzk4tOyM5tdaak30/IydhiHotFqm5gzOIbBdXTgWz3T
-	 ALNU+2tRX/d50CqhHMva4T64A190NUENDFW0ZH1s=
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	longli@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kotaranov@microsoft.com,
-	horms@kernel.org,
-	shradhagupta@linux.microsoft.com,
-	ernis@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com,
-	shirazsaleem@microsoft.com,
-	yury.norov@gmail.com,
-	kees@kernel.org,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH net-next v8] net: mana: Expose hardware diagnostic info via debugfs
-Date: Tue,  5 May 2026 22:51:15 -0700
-Message-ID: <20260506055128.291494-1-ernis@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.7
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D3B1A6820;
+	Wed,  6 May 2026 05:52:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778046751; cv=fail; b=JHMHcAdYtw54DgMibQjhUi/Iy2MwM/eCQO3K5TJgptIU3rk4qeu7o6OXk3RCrN4GOwrH6hCVzBVAYJnUDl854CbBVlbY1f6XUbnQlM9hLL06NG1g3B6m1CUag6zHI1y5pLO0+k9cOwvDVZEX8DhVztw+J7ABhe0gfOzozfqIY+4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778046751; c=relaxed/simple;
+	bh=mGVxIUtIkWZfUJ4BDJrb6WHru29uYbubGxpBx2gzsZw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=uMZ2Hy5x/HZa7Z/6GxRFvlQaJoqOXnaQJn2kvW6n9ENZALk7QPqIL8kSsRwfUinwWK+MV3AfHKPFNNLt+NlWbQj+Sz5WmS9Sve/17KnXB3XuFzu3vMSJVKiggMYtN8SfmZ0o5tPZwwJKKDMiThPHQ79ud09HBda+OA8Yr4PT8a0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P5HEA4qO; arc=fail smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778046750; x=1809582750;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=mGVxIUtIkWZfUJ4BDJrb6WHru29uYbubGxpBx2gzsZw=;
+  b=P5HEA4qO4T0yMrBzSYUmkE2IuRGrnoYVdorPh77Y/fZrgNzDK6HY/IHa
+   57r/dna6dIVwFwH1kvH1gcxc8ZJEzk5SJ4qfSS8OZRJJ7imTbMymtK+ed
+   vYBNDJGjDBFdbbmG4i4jhxMBbNJsJgH8+H14NbOXgFVsaCLiI8I1G8Gyt
+   oFwvcKhQOItJYe5aElhTwFSgBu3n33UcTfVDXi945AphD0JJE004x6aNj
+   3dutsBxQNB62INQ4V+8lT0VAeyyF9gh3JQNoUon1TTc/C6Ax3LexK6N0w
+   xrledRz7O+8oYOHjSwEnk3SVUekromowqOpDbDiwP1F6k7yurqkdxuhUG
+   A==;
+X-CSE-ConnectionGUID: 8iA8rz3HSvGvSc+JWO4xWw==
+X-CSE-MsgGUID: /A6KqugRTWm2giK+/WNXRA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11777"; a="78959088"
+X-IronPort-AV: E=Sophos;i="6.23,219,1770624000"; 
+   d="scan'208";a="78959088"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2026 22:52:30 -0700
+X-CSE-ConnectionGUID: 7KJehnIuTCSvUcT1G/U70Q==
+X-CSE-MsgGUID: YNIPwmqwQ4mCsKKeVrz1lg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,219,1770624000"; 
+   d="scan'208";a="236285604"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2026 22:52:30 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Tue, 5 May 2026 22:52:29 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Tue, 5 May 2026 22:52:29 -0700
+Received: from PH8PR06CU001.outbound.protection.outlook.com (40.107.209.58) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Tue, 5 May 2026 22:52:28 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZfZKJE6j1oixSatJfIBYyF1iBUEvRHQPofqz+7k9MuNQF3ocGBfdFGMHBCm2BAxhUPc/UIANhiwXjIiM4pczO2ikLmYbO4viLBbqO6vVEQ/ubBW/wTDD1PbqH5dehl1k7Qxia1lgqLgSwOgAUehmpFymDhMI7ItID1Q7DyDRLLOrZybJgHGO3NWV1BvMh7XJNfeYU528TWtrJEjMBAL7oKx6lTDb39+mXYAlh9SCXnW7o5qTmCddI7xA2POYdgAA96AVcWw54l63HNLiIDTVzMKNfQFfoL5wQHC/P6q8UqAT3EVJEm9oZ6+WPreMnPeS0dqy0LciFgCaBzzGk1+3bQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RLo4ePiaGgesABUVQPCRR5T7zkJL49BDNzzZ1eCUGU8=;
+ b=n08Fp10VcjaEEJtmWoQCWZJt05nOCv3th8EPKnRY6CfdwN5i67sxFR4uvIdm6nU1UHp565Y0rhK/pguCjHiDFZklE+NGmI1LEpxdNqB5jhMIvMiw+V/Hg3adCPr8wp2dI7FEigskAMllz50kw0WqENn29YmiTTuEUjQ/+m5FcaqmunAnhTGSN9A+nPjVJXklSzeU4h26+fML6Cvq9mFroR1ugfgGo4GUgDZa4R9ekY0KafW3DsxFaav5586KsDn6KMC12YhcqK7kKe+tkFcyXiJZ9gfq0V9otXnkjQL7zhqMzdo29h1AB9blP08/C4SnLQIf6rlhHPKoPJdQdUFjWA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW4PR11MB7162.namprd11.prod.outlook.com (2603:10b6:303:212::8)
+ by SA3PR11MB7488.namprd11.prod.outlook.com (2603:10b6:806:313::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Wed, 6 May
+ 2026 05:52:21 +0000
+Received: from MW4PR11MB7162.namprd11.prod.outlook.com
+ ([fe80::5472:a155:fff6:c934]) by MW4PR11MB7162.namprd11.prod.outlook.com
+ ([fe80::5472:a155:fff6:c934%3]) with mapi id 15.20.9870.023; Wed, 6 May 2026
+ 05:52:21 +0000
+From: "Arland, ArpanaX" <arpanax.arland@intel.com>
+To: Aaron Esau <aaron1esau@gmail.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Kubalewski, Arkadiusz"
+	<arkadiusz.kubalewski@intel.com>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>
+Subject: RE: [Intel-wired-lan] [PATCH net] i40e: fix memcmp of pointer in
+ i40e_hw_set_dcb_config()
+Thread-Topic: [Intel-wired-lan] [PATCH net] i40e: fix memcmp of pointer in
+ i40e_hw_set_dcb_config()
+Thread-Index: AQHcwFpUjuPe/PIRz02HTh8gyj9OcbYAtmlQ
+Date: Wed, 6 May 2026 05:52:21 +0000
+Message-ID: <MW4PR11MB71627D461E5E291F1B4C1227803F2@MW4PR11MB7162.namprd11.prod.outlook.com>
+References: <20260329162151.2043655-1-aaron1esau@gmail.com>
+In-Reply-To: <20260329162151.2043655-1-aaron1esau@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW4PR11MB7162:EE_|SA3PR11MB7488:EE_
+x-ms-office365-filtering-correlation-id: fcfeafd6-2089-41cc-950b-08deab33a3b8
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|10070799003|1800799024|18002099003|56012099003|22082099003|38070700021;
+x-microsoft-antispam-message-info: Sl2wS1FdIbf1SvxI/76Oe0fe3eejIAS0+HvjUwQogFP0lbrmzuF1jXan1sgvHX2tS6UBN0j0qYqjXaVP5ZD8z4TEDB0J+HMskbsQp2O66ax6x8axAHgAd+NNdUQDX+sIqPcg8Uz7eC+zMfyWnspbuKuztjR2JfNWk5l8oLof2b3RPNCZKHT2EGj1jOdE1BZuqTQn9jXMuliQgrNTbTjxp7C9ECTa1i9yRHRNC97nzYLz3qNEHNUI+o8hOtNU3SKcNre5nSOjWYAlIAqlLy8MFeBFgDuCx37qKrPyoHaNsUF14/P2ENUWuMxX7Df+YlYJK3hPnxpztusg7TKQKs1Or6BJifbuV8LKsVlxd/h/Bzj+AMu2+tQ2PWzGyRHx3XktlAaK4OwTiHRwBtZoXEbZfypstdN6EksqNtwoon5v7xiia5HoYkMLglSaOVfXOjMNuoJ8f2kXJnkaZhQii7JJsv+Dq5pV7AeZLBKLFIrl/hEWtcXaFTxVXd72GL6Hc0UYeb0g3H628ydf26EO9PiyUeuhZrEvFzUqNd1n9lIponlKC31sb93iisd45uEczsJeIayyaaVTpjGKi3Lxzuu1rn2RFC2MJNJpLBLm/fYaBuCyDlLIpOC3bg1+yjsahaI4guSs3BbUmbJYwyC9Sbd/ukN729vWM96Sgp9Sv31e88/ug3hTFLO0nYvcSugRx3d7C+Ti+5In3ha+R9rn0JnE0BhsUBw22I1L3OEJtjqnLqIVgZrCsvjLhj++NcJxaHYL
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB7162.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(10070799003)(1800799024)(18002099003)(56012099003)(22082099003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 2
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?h1Co7ZEvufGt0dpoZZoareNQmahL3xJ1M8iFX1TeOvBCfeKelz+qYRj/AvP3?=
+ =?us-ascii?Q?1H6Yxl5FEnyDWisk08qtefjKgUdLPozeb7hNS+rmacEDx3ycelhxXvJjrYpa?=
+ =?us-ascii?Q?HLxvrFBteWehXk81Ld0jV65YQKUkT+sy/vwJjd7P23LG/DjBYnXZCbJZPTyM?=
+ =?us-ascii?Q?bwmula0LqBXXjExTwwqj24MdvfnA9h0n2F2aiSA7cAq/qsxsAeMtVb8F3w2U?=
+ =?us-ascii?Q?Nszx3+IsnDSTJi3HiFJKO0W36WBRNvRMLIg6R4rNDMR7NmYq5T3sfixpFWaQ?=
+ =?us-ascii?Q?FLUwMXhpvGUHzZXak87VvzLoQ+2+vzS2rkItg4MLJsUnOgEYL//Yy1ZDsDE5?=
+ =?us-ascii?Q?2ZSNrNkHRARO4JZrSFVZe8WUrPD1QkEIdW8YVIgR6CBrEB7v1WM4yH2babOQ?=
+ =?us-ascii?Q?3lSAYfvszjZL7871ESjf2D1zClWgTYO85vdMLRcD+OtZyndxyM7QvUxpVFqa?=
+ =?us-ascii?Q?PbHboINwgLbPDAvk/uK5A2oBCnNCs25EXqWz0qHdy6Hte4JKjsj+Meo90nBE?=
+ =?us-ascii?Q?F8G991q18nCwDxbm4d65Ot2H+5gi77ZsOqlsnF9hNDV0jt0ULtDBXrMRnb9T?=
+ =?us-ascii?Q?/Zz4GpQI4eVkB8uxVpq0vXf3iM2iVNh/VyNPHty7uPDEyN8Gl5tlNUCKaXt1?=
+ =?us-ascii?Q?H9MV2LJw9NN5UdcUQT8gk4LasDMLNNTNdjonypV63qRuI0aEX0kV+HZtStpn?=
+ =?us-ascii?Q?DSRmKbWBO7+VWqgDZg3A+koALBrLbOPCWKPOWeZ72JKFNI/dIeBFW1SU1lkY?=
+ =?us-ascii?Q?ZmAgw4N6XRLiTITBYz1p/CtwnRwAxC5C8W7XRrbeJIQhVivaAe39dokYT5n4?=
+ =?us-ascii?Q?SLPHaft9fvk9HaQVNG7ftc1A4dQmB/1xpUglvabz9ejZXSwjoTK4TQNxchIY?=
+ =?us-ascii?Q?o8rcpg2Ns9HzlE0jAupAhzaAhwPbvvrxkMTKlYSkLI0pF1lj5ICEKCdCk9B5?=
+ =?us-ascii?Q?OLHcnBiT+bro34iQjL24Pn1ZUi3EiDe4QPR/0sGZd4CLMbKv/Yj8kBirva7H?=
+ =?us-ascii?Q?lssEVLi/4ZKLE5DPQOX1GiNpqUyXWD7Dm4im7IGPoBmUg2J1CQMr1l7rRv57?=
+ =?us-ascii?Q?IApc0Kcq+KhfQ47fZBCcM8vnZnXrsFLA7vu8Hz8cj7M2iv+1FFNONFKEpgaW?=
+ =?us-ascii?Q?r3amOK61AdcVKsi1hRWesOG5cWYgpkVgnotfWSG95BgvvQ/zvvuIKth3B7al?=
+ =?us-ascii?Q?UdfIPDpQU+0Un53fvmwsrVJb+Q6oCfudr5IwMT95+qz59D+LeI9/ikKtnuJh?=
+ =?us-ascii?Q?OM56urY07Ufwx2Ukqkn+tcY4MUmHaLvlNdGa7XKpEUg3rSxVm6ASQJhmkuD6?=
+ =?us-ascii?Q?uD1NRQXocsX1r2wQ6vorwAuLdMC2rVcmzR1u8uwudddtQK1Y5htdUJly3G0y?=
+ =?us-ascii?Q?JLXhAOq0MiXmn5BaRUP9MKYPPEJ0QhFMi0xel3P7mN3vhyFhcmVe8hrmn8DK?=
+ =?us-ascii?Q?iEf2Xwx5YFW1OHh5ItfonN6i3KRf4+3Ac47pAjGuBrVN8aZPlroZMuuW03qG?=
+ =?us-ascii?Q?C6YV+DMViOBXysoVur+K4+qyYutqtnvGwMTI9ki1L7mfHx2iQ84MSHrt1y6T?=
+ =?us-ascii?Q?6hJIy7xW4g2/2Z9dTqWvYMfIixgFWXa7lsj09YFdK39En+MQoj4QpU7X+lU5?=
+ =?us-ascii?Q?Lr4oUluoAn7N7OaSPpawTaeIe3bFF5sX+LSfn+WWUCPKXVnpNe8A/64uPmlS?=
+ =?us-ascii?Q?JkN+j9gUM1VGF8QmR3jy7XMGP7gehbVJNBu3opCGDB5HKjDDpqlXEzzQAXCj?=
+ =?us-ascii?Q?Cme5z1s3t2eltF1jf11jzqWUPnCCyXOWl/AZeo2g0h9WoHg+sjY87m5yFXY/?=
+x-ms-exchange-antispam-messagedata-1: eRq/aWt/BABIIQ==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: A9A4A4D65AC
+X-Exchange-RoutingPolicyChecked: R3mYhDdKII4en5MXUnlNcv+ipr/N0j2P1QmTiCtZS9MRhoA3povxcy4rwB3fPaIR31I0g89zaxxLD2zfKLGmE4KpgOW51O76iyditsFi9xM0YGIzYtMx03eBEgUygJmstEI4aewO8iud8rqsoD+TZ8NKZQztPXKqfoWU87q6wREJhOySm0cTafI8UnibpGKNon+u/Ati0eAf1kPo3TjqSD8UVye/se9qLa8lOhZp7cFlHMT+PGKeUYPgfrLCawJrLGAenLSN8G36Mzg0AyjNoAkogImtKiZ6tL33uqTlXGkH+95s9wdS+ceXXE3XsuFpEKhjYbDLv2s7aLIPpLO5Lw==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB7162.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fcfeafd6-2089-41cc-950b-08deab33a3b8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 May 2026 05:52:21.1080
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: tzmn7ZmwZYQGfl7tTEI5PE2Aa+SmxeLuWMEw+2LfAC85o3SIS3KYG9AgM1rZgxTWF4apeGiAMgOTHh+No78OVBOT4z6wCJmKOnICkAwxNbQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR11MB7488
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: B5C924D6607
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,osuosl.org:email];
+	TAGGED_FROM(0.00)[bounces-284707-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284706-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,gmail.com,vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com,lists.osuosl.org];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[arpanax.arland@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.microsoft.com:dkim,linux.microsoft.com:mid]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 
-Add debugfs entries to expose hardware configuration and diagnostic
-information that aids in debugging driver initialization and runtime
-operations without adding noise to dmesg.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of A=
+aron Esau
+> Sent: Sunday, March 29, 2026 9:52 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Nguyen, Anthony L <anthony.l.nguyen@intel.com=
+>; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; Kubalewski, Arkadius=
+z <arkadiusz.kubalewski@intel.com>; stable@vger.kernel.org; Aaron Esau <aar=
+on1esau@gmail.com>
+> Subject: [Intel-wired-lan] [PATCH net] i40e: fix memcmp of pointer in i40=
+e_hw_set_dcb_config()
+>
+> In i40e_hw_set_dcb_config(), both new_cfg and old_cfg are pointers to str=
+uct i40e_dcbx_config, so sizeof(new_cfg) evaluates to the size of a pointer=
+ (8 bytes on 64-bit) rather than the size of the struct. > Likewise, &new_c=
+fg and &old_cfg are the addresses of the pointer variables on the stack, no=
+t the addresses of the actual config structs.
+>
+> As a result, the memcmp never compares the actual configuration data, mea=
+ning the "no change needed" early return never fires. Every call to this fu=
+nction performs a full DCB reconfiguration (quiescing > all VSIs, reprogram=
+ming via "Set LLDP MIB" AQC, and reconfiguring VEB/VSIs) even when the conf=
+iguration has not changed.
+>
+> Fix this by comparing the structs themselves rather than the pointers.
+>
+> Fixes: 4b208eaa8078 ("i40e: Add init and default config of software based=
+ DCB")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Aaron Esau <aaron1esau@gmail.com>
+> ---
+>
+> Found using Coccinelle/spatch with a semantic patch that matches
+> sizeof(ptr) and &ptr used together where ptr is a pointer type.
+>
+>  drivers/net/ethernet/intel/i40e/i40e_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
 
-The debugfs directory for each PCI device is named using pci_name()
-(the unique BDF address), and its creation and removal is integrated
-into mana_gd_setup() and mana_gd_cleanup_device() respectively, so
-that all callers (probe, remove, suspend, resume, shutdown) share a
-single code path.
-
-Device-level entries (under /sys/kernel/debug/mana/<BDF>/):
-  - num_msix_usable, max_num_queues: Max resources from hardware
-  - gdma_protocol_ver, pf_cap_flags1: VF version negotiation results
-  - num_vports, bm_hostmode: Device configuration
-
-Per-vPort entries (under /sys/kernel/debug/mana/<BDF>/vportN/):
-  - port_handle: Hardware vPort handle
-  - max_sq, max_rq: Max queues from vPort config
-  - indir_table_sz: Indirection table size
-  - steer_rx, steer_rss, steer_update_tab, steer_cqe_coalescing:
-    Last applied steering configuration parameters
-
-Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
----
-Changes in v8:
-* Move debugfs_create_u16("num_vports", ...) and
-  debugfs_create_u8("bm_hostmode", ...) to after ac->num_ports has been
-  assigned and clamped to MAX_PORTS_IN_MANA_DEV, so the value exposed
-  via debugfs always reflects the final, hardware-reported count
-  rather than a transient zero or unclamped value.
-* Update the stale comment above mana_gd_resume() to reflect the new
-  rollback-on-failure behavior.
-Changes in v7:
-* Rebase to latest main.
-Changes in v6:
-* Move out of patchset and create a separate patch.
-Changes in v5:
-* Update commit message.
-* Fix conflicts to align with the new patches.
-* Make it part of patchset.
-Changes in v4:
-* Rebase and fix conflicts.
-Changes in v3:
-* Rename mana_gd_cleanup to mana_gd_cleanup_device.
-* Add creation of debugfs entries in mana_gd_setup.
-* Add removal of debugfs entries in mana_gd_cleanup_device.
-* Remove bm_hostmode and num_vports from debugfs in mana_remove itself,
-  because "ac" gets freed before debugfs_remove_recursive, to avoid
-  Use-After-Free error.
-* Add "goto out:" in mana_cfg_vport_steering to avoid populating apc
-  values when resp.hdr.status is not NULL.
-Changes in v2:
-* Add debugfs_remove_recursice for gc>mana_pci_debugfs in
-  mana_gd_suspend to handle multiple duplicates creation in
-  mana_gd_setup and mana_gd_resume path.
-* Move debugfs creation for num_vports and bm_hostmode out of
-  if(!resuming) condition since we have to create it again even for
-  resume.
-* Recreate mana_pci_debugfs in mana_gd_resume.
----
- .../net/ethernet/microsoft/mana/gdma_main.c   | 73 +++++++++++--------
- drivers/net/ethernet/microsoft/mana/mana_en.c | 33 +++++++++
- include/net/mana/gdma.h                       |  1 +
- include/net/mana/mana.h                       |  8 ++
- 4 files changed, 83 insertions(+), 32 deletions(-)
-
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 098fbda0d128..9e9a97eef7f0 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -194,6 +194,11 @@ static int mana_gd_query_max_resources(struct pci_dev *pdev)
- 	if (gc->max_num_queues > gc->num_msix_usable - 1)
- 		gc->max_num_queues = gc->num_msix_usable - 1;
- 
-+	debugfs_create_u32("num_msix_usable", 0400, gc->mana_pci_debugfs,
-+			   &gc->num_msix_usable);
-+	debugfs_create_u32("max_num_queues", 0400, gc->mana_pci_debugfs,
-+			   &gc->max_num_queues);
-+
- 	return 0;
- }
- 
-@@ -1264,6 +1269,13 @@ int mana_gd_verify_vf_version(struct pci_dev *pdev)
- 		return err ? err : -EPROTO;
- 	}
- 	gc->pf_cap_flags1 = resp.pf_cap_flags1;
-+	gc->gdma_protocol_ver = resp.gdma_protocol_ver;
-+
-+	debugfs_create_x64("gdma_protocol_ver", 0400, gc->mana_pci_debugfs,
-+			   &gc->gdma_protocol_ver);
-+	debugfs_create_x64("pf_cap_flags1", 0400, gc->mana_pci_debugfs,
-+			   &gc->pf_cap_flags1);
-+
- 	if (resp.pf_cap_flags1 & GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG) {
- 		err = mana_gd_query_hwc_timeout(pdev, &hwc->hwc_timeout);
- 		if (err) {
-@@ -1943,15 +1955,20 @@ static int mana_gd_setup(struct pci_dev *pdev)
- 	struct gdma_context *gc = pci_get_drvdata(pdev);
- 	int err;
- 
-+	gc->mana_pci_debugfs = debugfs_create_dir(pci_name(pdev),
-+						  mana_debugfs_root);
-+
- 	err = mana_gd_init_registers(pdev);
- 	if (err)
--		return err;
-+		goto remove_debugfs;
- 
- 	mana_smc_init(&gc->shm_channel, gc->dev, gc->shm_base);
- 
- 	gc->service_wq = alloc_ordered_workqueue("gdma_service_wq", 0);
--	if (!gc->service_wq)
--		return -ENOMEM;
-+	if (!gc->service_wq) {
-+		err = -ENOMEM;
-+		goto remove_debugfs;
-+	}
- 
- 	err = mana_gd_setup_hwc_irqs(pdev);
- 	if (err) {
-@@ -1992,11 +2009,14 @@ static int mana_gd_setup(struct pci_dev *pdev)
- free_workqueue:
- 	destroy_workqueue(gc->service_wq);
- 	gc->service_wq = NULL;
-+remove_debugfs:
-+	debugfs_remove_recursive(gc->mana_pci_debugfs);
-+	gc->mana_pci_debugfs = NULL;
- 	dev_err(&pdev->dev, "%s failed (error %d)\n", __func__, err);
- 	return err;
- }
- 
--static void mana_gd_cleanup(struct pci_dev *pdev)
-+static void mana_gd_cleanup_device(struct pci_dev *pdev)
- {
- 	struct gdma_context *gc = pci_get_drvdata(pdev);
- 
-@@ -2008,6 +2028,10 @@ static void mana_gd_cleanup(struct pci_dev *pdev)
- 		destroy_workqueue(gc->service_wq);
- 		gc->service_wq = NULL;
- 	}
-+
-+	debugfs_remove_recursive(gc->mana_pci_debugfs);
-+	gc->mana_pci_debugfs = NULL;
-+
- 	dev_dbg(&pdev->dev, "mana gdma cleanup successful\n");
- }
- 
-@@ -2065,9 +2089,6 @@ static int mana_gd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	gc->dev = &pdev->dev;
- 	xa_init(&gc->irq_contexts);
- 
--	gc->mana_pci_debugfs = debugfs_create_dir(pci_name(pdev),
--						  mana_debugfs_root);
--
- 	err = mana_gd_setup(pdev);
- 	if (err)
- 		goto unmap_bar;
-@@ -2096,16 +2117,8 @@ static int mana_gd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- cleanup_mana:
- 	mana_remove(&gc->mana, false);
- cleanup_gd:
--	mana_gd_cleanup(pdev);
-+	mana_gd_cleanup_device(pdev);
- unmap_bar:
--	/*
--	 * at this point we know that the other debugfs child dir/files
--	 * are either not yet created or are already cleaned up.
--	 * The pci debugfs folder clean-up now, will only be cleaning up
--	 * adapter-MTU file and apc->mana_pci_debugfs folder.
--	 */
--	debugfs_remove_recursive(gc->mana_pci_debugfs);
--	gc->mana_pci_debugfs = NULL;
- 	xa_destroy(&gc->irq_contexts);
- 	pci_iounmap(pdev, bar0_va);
- free_gc:
-@@ -2155,11 +2168,7 @@ static void mana_gd_remove(struct pci_dev *pdev)
- 	mana_rdma_remove(&gc->mana_ib);
- 	mana_remove(&gc->mana, false);
- 
--	mana_gd_cleanup(pdev);
--
--	debugfs_remove_recursive(gc->mana_pci_debugfs);
--
--	gc->mana_pci_debugfs = NULL;
-+	mana_gd_cleanup_device(pdev);
- 
- 	xa_destroy(&gc->irq_contexts);
- 
-@@ -2181,14 +2190,13 @@ int mana_gd_suspend(struct pci_dev *pdev, pm_message_t state)
- 	mana_rdma_remove(&gc->mana_ib);
- 	mana_remove(&gc->mana, true);
- 
--	mana_gd_cleanup(pdev);
-+	mana_gd_cleanup_device(pdev);
- 
- 	return 0;
- }
- 
--/* In case the NIC hardware stops working, the suspend and resume callbacks will
-- * fail -- if this happens, it's safer to just report an error than try to undo
-- * what has been done.
-+/* If resume fails partway through, roll back any setup that completed so
-+ * the device is left in a clean state and resources are not leaked.
-  */
- int mana_gd_resume(struct pci_dev *pdev)
- {
-@@ -2201,13 +2209,18 @@ int mana_gd_resume(struct pci_dev *pdev)
- 
- 	err = mana_probe(&gc->mana, true);
- 	if (err)
--		return err;
-+		goto cleanup_gd;
- 
- 	err = mana_rdma_probe(&gc->mana_ib);
- 	if (err)
--		return err;
-+		goto cleanup_mana;
- 
- 	return 0;
-+cleanup_mana:
-+	mana_remove(&gc->mana, true);
-+cleanup_gd:
-+	mana_gd_cleanup_device(pdev);
-+	return err;
- }
- 
- /* Quiesce the device for kexec. This is also called upon reboot/shutdown. */
-@@ -2220,11 +2233,7 @@ static void mana_gd_shutdown(struct pci_dev *pdev)
- 	mana_rdma_remove(&gc->mana_ib);
- 	mana_remove(&gc->mana, true);
- 
--	mana_gd_cleanup(pdev);
--
--	debugfs_remove_recursive(gc->mana_pci_debugfs);
--
--	gc->mana_pci_debugfs = NULL;
-+	mana_gd_cleanup_device(pdev);
- 
- 	pci_disable_device(pdev);
- }
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index a654b3699c4c..26bd3d270b5e 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -1276,6 +1276,9 @@ static int mana_query_vport_cfg(struct mana_port_context *apc, u32 vport_index,
- 	apc->port_handle = resp.vport;
- 	ether_addr_copy(apc->mac_addr, resp.mac_addr);
- 
-+	apc->vport_max_sq = *max_sq;
-+	apc->vport_max_rq = *max_rq;
-+
- 	return 0;
- }
- 
-@@ -1430,6 +1433,11 @@ static int mana_cfg_vport_steering(struct mana_port_context *apc,
- 
- 	netdev_info(ndev, "Configured steering vPort %llu entries %u\n",
- 		    apc->port_handle, apc->indir_table_sz);
-+
-+	apc->steer_rx = rx;
-+	apc->steer_rss = apc->rss_state;
-+	apc->steer_update_tab = update_tab;
-+	apc->steer_cqe_coalescing = req->cqe_coalescing_enable;
- out:
- 	kfree(req);
- 	return err;
-@@ -3161,6 +3169,23 @@ static int mana_init_port(struct net_device *ndev)
- 	eth_hw_addr_set(ndev, apc->mac_addr);
- 	sprintf(vport, "vport%d", port_idx);
- 	apc->mana_port_debugfs = debugfs_create_dir(vport, gc->mana_pci_debugfs);
-+
-+	debugfs_create_u64("port_handle", 0400, apc->mana_port_debugfs,
-+			   &apc->port_handle);
-+	debugfs_create_u32("max_sq", 0400, apc->mana_port_debugfs,
-+			   &apc->vport_max_sq);
-+	debugfs_create_u32("max_rq", 0400, apc->mana_port_debugfs,
-+			   &apc->vport_max_rq);
-+	debugfs_create_u32("indir_table_sz", 0400, apc->mana_port_debugfs,
-+			   &apc->indir_table_sz);
-+	debugfs_create_u32("steer_rx", 0400, apc->mana_port_debugfs,
-+			   &apc->steer_rx);
-+	debugfs_create_u32("steer_rss", 0400, apc->mana_port_debugfs,
-+			   &apc->steer_rss);
-+	debugfs_create_u32("steer_update_tab", 0400, apc->mana_port_debugfs,
-+			   &apc->steer_update_tab);
-+	debugfs_create_u32("steer_cqe_coalescing", 0400, apc->mana_port_debugfs,
-+			   &apc->steer_cqe_coalescing);
- 	debugfs_create_u32("current_speed", 0400, apc->mana_port_debugfs,
- 			   &apc->speed);
- 	return 0;
-@@ -3678,6 +3703,11 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
- 	if (ac->num_ports > MAX_PORTS_IN_MANA_DEV)
- 		ac->num_ports = MAX_PORTS_IN_MANA_DEV;
- 
-+	debugfs_create_u16("num_vports", 0400, gc->mana_pci_debugfs,
-+			   &ac->num_ports);
-+	debugfs_create_u8("bm_hostmode", 0400, gc->mana_pci_debugfs,
-+			  &ac->bm_hostmode);
-+
- 	ac->per_port_queue_reset_wq =
- 		create_singlethread_workqueue("mana_per_port_queue_reset_wq");
- 	if (!ac->per_port_queue_reset_wq) {
-@@ -3800,6 +3830,9 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
- 
- 	mana_gd_deregister_device(gd);
- 
-+	debugfs_lookup_and_remove("bm_hostmode", gc->mana_pci_debugfs);
-+	debugfs_lookup_and_remove("num_vports", gc->mana_pci_debugfs);
-+
- 	if (suspending)
- 		return;
- 
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index 6d836060976a..70d62bc32837 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -442,6 +442,7 @@ struct gdma_context {
- 	struct gdma_dev		mana_ib;
- 
- 	u64 pf_cap_flags1;
-+	u64 gdma_protocol_ver;
- 
- 	struct workqueue_struct *service_wq;
- 
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index 8f721cd4e4a7..18215388d2c7 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -568,6 +568,14 @@ struct mana_port_context {
- 
- 	/* Debugfs */
- 	struct dentry *mana_port_debugfs;
-+
-+	/* Cached vport/steering config for debugfs */
-+	u32 vport_max_sq;
-+	u32 vport_max_rq;
-+	u32 steer_rx;
-+	u32 steer_rss;
-+	u32 steer_update_tab;
-+	u32 steer_cqe_coalescing;
- };
- 
- netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev);
--- 
-2.34.1
-
+Tested-by: Arpana Arland <arpanax.arland@intel.com> (A Contingent worker at=
+ Intel)
 
