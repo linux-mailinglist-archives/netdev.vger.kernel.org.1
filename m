@@ -1,205 +1,141 @@
-Return-Path: <netdev+bounces-284609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284610-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ZSI1CAaG+mlCPgMAu9opvQ
-	(envelope-from <netdev+bounces-284609-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 02:06:30 +0200
+	id OBBRAg6G+mlCPgMAu9opvQ
+	(envelope-from <netdev+bounces-284610-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 02:06:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D1214D4E11
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 02:06:29 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4C514D4E18
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 02:06:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DF41F3030753
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 00:06:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 002F0301FF3E
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 00:06:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C71EB40DFAB;
-	Wed,  6 May 2026 00:06:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4B4A13AF2;
+	Wed,  6 May 2026 00:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ww/0+EVl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UJ/WYYQr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 773A8191
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 00:06:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778025985; cv=pass; b=q7w2Wg4JwmioANZ3O4nqm4PIi1Wpq0jIUt8+4Nw9QFYJcBgk1LO3sBVLIa4QV0w210FhTYnBajVJaw+tMTlM5xjBMUU6YDWJgRgx+6gf8K+lucCokMF1tr4wkLdvEztmRs+hDcUaqf4rb1OrtvcDXgE4OfA/4kdh3hleMTliBak=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778025985; c=relaxed/simple;
-	bh=jJFV7gISVLnwI1o8I+G/vM591i5R7XvOSd0NwHqxk48=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BPBRy9gTzYZ1GvF/rU3jkvOhI5sgSf2sDfimCyCgBhvbr7RxzyIh37yAsQ8D8P28Mw2l+IZQiEfM5nxG/mRW7hCOqXwcSQaZRmHXmtqwkkX1112ex93bLAOMNo+n+8In8205/pXDNbfyVgWr6gvHQDBxoFpMI/wGEi9jgVGx1HM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ww/0+EVl; arc=pass smtp.client-ip=209.85.210.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7dbbf1e1058so902919a34.0
-        for <netdev@vger.kernel.org>; Tue, 05 May 2026 17:06:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778025983; cv=none;
-        d=google.com; s=arc-20240605;
-        b=KbrpF27PbDnW31F77JDF2qtvR5YOGQLSTmiHQDMX8R+TPcXN9HCedjV09JDRgF+W1K
-         lb/kEzzxcvyvigY49UonkDiECQur8Pb6tL1t70Dnngbq15VqsRCBc/AQBCgsHHBiLvz2
-         +dmzv4Oq5h4vba14X0xlKGX80ytRFTTbtHsi1O/qMp13RKFEQcZTne+uF4LR8N1VTm2N
-         vvDhYK6Fg9zgPEs0O+KKsQoMw6vPmTBE5dAEwO8jwg+B2K9zpueLgOZtZHnPwmuNmU53
-         OFN04BXzFPxHSbu2NiTESHZRdAw7YYV4g3Z1w18Jg3klWVV4w8mUh8hpQ1Hz+rfnN99F
-         /vIQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=3I5jQfOhWB0uFpNtzYf3auDroditYNnhwisk4NEQ+8w=;
-        fh=xrPkI+UW/L/BnRuxOshTaPP3rweM3fEZqvOksB5ZbNY=;
-        b=bbrzFs2RAts3ggrcihOlpFlKicX0C3wGHVMhd7OqgSnUrnuoTNF9XHuvfca/LYOBt6
-         /HVDYecpiDUioaSF0840/clxlb0XK0609K8rPMa4ub36m9JTAaIDfwuXCf018UgctGgh
-         Bt6eYzs9TnxZJc3r93AZTIkmkzFnMahupI5SgNkr+Wew8pwxIvXxxR6LcAR3cJ3q2B+w
-         hRHZ0qHzQCQ6J3eCZoyGBNKfexW4QX32GXB9k3zF+Wi+jlxQ/6Pq50ML2q6FY3mwylH6
-         sWh7Vq9RPp/A1aYmQPG3daw1zBBmItsKCRJVx540up9yk823/RMj+lQezMlkjEwLdlpn
-         qrTw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778025983; x=1778630783; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3I5jQfOhWB0uFpNtzYf3auDroditYNnhwisk4NEQ+8w=;
-        b=Ww/0+EVl51W0dqlCRuIxsbb4gqsBcD8rL0PKc2901NVUB7Je3ENIvZsZy5ed1vM+wc
-         WltFkxg6i5XpBbzTF0LSmlt8R3r5MPZmOMIBXOR2TwOV1+c7UFJknn2DktV1PG7j1eLl
-         pTdv2qK/j93TJTSBPG/c2oCsM6o9zVjbCMHmPLiBXQmx2cY6Btoui3wFrWRsEF6tjtOx
-         HQwodHul+cc7/zM1Fz2qcMppqNhs76i+w+7/r5x7IrNgimdyVheeeQv5Y5k084DDmKFN
-         ocGJEozasXnlncsv/uPkDCNsL0S1jQvF8siPHIEwL/Vmmv8E4fD1Pv5aHdZ33W6woOHo
-         aCbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778025983; x=1778630783;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3I5jQfOhWB0uFpNtzYf3auDroditYNnhwisk4NEQ+8w=;
-        b=sHkg7ong64uehjoHRkXHyOyNuy6dy6Z0EIgXtYcyYn0NxnCCfbad+j8AguXQPGJYfR
-         CgxDKzTD8jL9yniWgJx1rTa/tUuhKjuodKnJgtujPMJt3BiKJI9O1jtYMM+zs3lqPKlc
-         AQbwu84v8n/hLBTrUNSko+MBtWWWzIhMTmZWSFmxnlSfpfeXS7jx2lc/D5dtmO0GmLCq
-         aty0kzgFbj4qCYXcZ8UCMMQFgaEQwAC4PESwnQO0s2hLKFeuiFkqupA/BqKrK44kUrQ8
-         LSGE/aOfczP8V2m2LJOo9DRISJBZ3FRHGrg3zErnutGOhVzg3i5fx1uPpfZFeIt3WgWa
-         MR9A==
-X-Gm-Message-State: AOJu0Yw+NO3lpAXN65TuAeYiZ19fJtvS3UXeqromqBQqv2YcnpZA5gJY
-	ACU6ypQZZ1+pr5dcmt9k4zermt6S/1FDjS5euXfMIRjyY/EXrBdRGzUS8G1deW9Lnd5TWe6V1jk
-	yHVEjgJLJuyZ7C6P6JsBrG/0wsXM+6k0=
-X-Gm-Gg: AeBDietv4xFtz2Ph3574qZubOT5Mwr1+vB5DW7AWtw70fCV617lBs8cz8V3aq1xqXAG
-	wnlpUHR6aTjQboNmrPXjHQcn7LbJJ7a+EZyw3k1Wm3Jg9FDQiT3yoRWFta1ILJUBwyuPAyclmiq
-	4RALsFiMUB+/N/4Nyjk5wQkj8MPeUFKBm6WqZhe4LZrbSbhrU0TYQgjNlHoJIhOHDjxkETvCEC0
-	30kzLpzrG92CajvcwZ3UmPPZODGGPuK19FswVfXqzNuVt3WK1NAiW46gZI3m8SwnYN7Us/0NWud
-	nMbmGoW1La36UoVHw2l0yMih9eqKK6Y=
-X-Received: by 2002:a05:6808:6f8f:b0:47b:c703:423f with SMTP id
- 5614622812f47-48044a75b2cmr368163b6e.0.1778025983380; Tue, 05 May 2026
- 17:06:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0374C8EB;
+	Wed,  6 May 2026 00:06:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778025993; cv=none; b=Kp56kjaQoAIN6KxwdnjBvKftSkv0wngZUHN1l10+p8+tboh3Xbv/KdtZweoDBckmpx3DjDPM/roRwbNETzdG2mfkSr1kk8tlXtiF9Fcp8IrqH5xvxz++TTDtgxq1IqUTi0HKRfLCKxVyTgC9MhZ15tBt/g5jlwiJ2Upo9iu50ZI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778025993; c=relaxed/simple;
+	bh=ONwt/hlRuteP/FkMOQdRkcff0d/hObda8RQUYRWno7w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UPXdcgJ6rHWpc8PdDwcZnS9CquBePgUfbGm4nZy1txAEnjuVHEdMTuqaycrVzP1HiNLfIAjbRm0MRMi74b3Zq/pL47lw6lS+mfWh43wOM8wWqzqA4c9HdTurwqxJxRKwu55AfTX/M5FoOu/yuxyf/7D7jKl6XLSGiYuRCAS5dyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UJ/WYYQr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1BCDC2BCB4;
+	Wed,  6 May 2026 00:06:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778025993;
+	bh=ONwt/hlRuteP/FkMOQdRkcff0d/hObda8RQUYRWno7w=;
+	h=From:To:Cc:Subject:Date:From;
+	b=UJ/WYYQr2x1iQ7ksU+iKro534IEeURnxyXy2gaCMX/a4zuoxsaKDaZwCq90duD+YP
+	 LMfpcVRTh9Bkxi6qVDWQd5Cy2EAuI5R1PWZyaNydvw4X3GB9ZQzFZqU6n42tWj4G1Q
+	 j+mGgkGYlymu5Mbl1+f9IBq776wGGiEKeMi8JtrZE1KqjC7uzjuYO1kYY62iTLFs6V
+	 qj/1Gi/Qwu4jVYGt5v5rxOakvwj7XLh7xjA/GRCnIXc/w04NChT8FBHnN1lDnFDyLP
+	 1r2ZJHHm07c59eENRuSzbjjGzOMxdkMFLC0R2g8dbZqVB7KJKXLyqY663NOG3+Zwph
+	 6TrlWYf7M8Jpg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net 00/12] net: shaper: fix various minor bugs
+Date: Tue,  5 May 2026 17:06:16 -0700
+Message-ID: <20260506000628.1501691-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260504230056.917415-1-weibunny.kernel@gmail.com>
- <20260504230056.917415-3-weibunny.kernel@gmail.com> <12f11785-0bd5-400e-8acc-f47b92271e33@gmail.com>
-In-Reply-To: <12f11785-0bd5-400e-8acc-f47b92271e33@gmail.com>
-From: Wei Wang <weibunny.kernel@gmail.com>
-Date: Tue, 5 May 2026 17:06:12 -0700
-X-Gm-Features: AVHnY4JJ5RGn_SuGjHxsx2Axz2OrzMDaMf_ZS5v6FDtlRC6QTAsq5FZnBHPs0Ds
-Message-ID: <CAGqc4nU2fOycS7hg0SzqP6p30doBScGPXRspnbL_4JKcE8CJcA@mail.gmail.com>
-Subject: Re: [PATCH v13 net-next 2/5] psp: add new netlink cmd for dev-assoc
- and dev-disassoc
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Wei <dw@davidwei.uk>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Wei Wang <weibunny@fb.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 7D1214D4E11
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: A4C514D4E18
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284609-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com,redhat.com,fb.com];
+	TAGGED_FROM(0.00)[bounces-284610-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[weibunnykernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-On Tue, May 5, 2026 at 7:07=E2=80=AFAM Daniel Zahka <daniel.zahka@gmail.com=
-> wrote:
->
->
-> On 5/4/26 7:00 PM, Wei Wang wrote:
-> > @@ -281,6 +318,34 @@ operations:
-> >           post: psp-device-unlock
-> >         dump:
-> >           reply: *stats-all
-> > +    -
-> > +      name: dev-assoc
-> > +      doc: Associate a network device with a PSP device.
-> > +      attribute-set: dev
-> > +      do:
-> > +        request:
-> > +          attributes:
-> > +            - id
-> > +            - ifindex
-> > +            - nsid
-> > +        reply:
-> > +          attributes: []
-> > +        pre: psp-device-get-locked
-> > +        post: psp-device-unlock
-> > +    -
-> > +      name: dev-disassoc
-> > +      doc: Disassociate a network device from a PSP device.
-> > +      attribute-set: dev
-> > +      do:
-> > +        request:
-> > +          attributes:
-> > +            - id
-> > +            - ifindex
-> > +            - nsid
-> > +        reply:
-> > +          attributes: []
-> > +        pre: psp-device-get-locked
-> > +        post: psp-device-unlock
->
->
-> Should these require flags: [admin-perm] and/or psp-device-get-locked-adm=
-in?
->
+Fix various minor bugs in the net shaper API.
 
-It might be worth adding admin-perm so only admin users can do
-dev-assoc and dev-disassoc in its own netns.
-But it should use psp-device-get-locked because this allows callers
-within its own netns to do assoc/disassoc with the PSD in the
-different netns.
+First 4 changes are a bit hairy. The readers are currently under
+RCU so we need to be careful how we update and insert the nodes.
+Patch 4 is a bit of a cop-out. Pre-allocating replacement nodes
+is complex. If the workaround is not acceptable I'd seriously
+consider making the readers take the instance lock.
 
-I will add admin-perm in the next version.
+Only other patch of note is patch 10. We want to add a Netlink
+policy check on the handle ID. This necessitates patch 9.
 
->
+The rest are simple and self-explanatory.
+
+Jakub Kicinski (12):
+  net: shaper: drop redundant xa_lock() bracketing
+  net: shaper: flip the polarity of the valid flag
+  net: shaper: fix trivial ordering issue in net_shaper_commit()
+  net: shaper: try to avoid violating RCU
+  net: shaper: reject duplicate leaves in GROUP request
+  selftests: drv-net: add shaper test for duplicate leaves
+  net: shaper: set ret to -ENOMEM when genlmsg_new() fails in group_doit
+  net: shaper: fix undersized reply skb allocation in GROUP command
+  tools: ynl: add scope qualifier for definitions
+  net: shaper: reject handle IDs exceeding internal bit-width
+  net: shaper: enforce singleton NETDEV scope with id 0
+  net: shaper: reject QUEUE scope handle with missing id
+
+ Documentation/netlink/genetlink-c.yaml        |   9 +
+ Documentation/netlink/genetlink-legacy.yaml   |   9 +
+ Documentation/netlink/genetlink.yaml          |   9 +
+ Documentation/netlink/specs/net_shaper.yaml   |   7 +
+ net/shaper/shaper_nl_gen.h                    |   2 +
+ net/shaper/shaper.c                           | 171 +++++++++++++-----
+ net/shaper/shaper_nl_gen.c                    |   7 +-
+ tools/net/ynl/pyynl/ynl_gen_c.py              |  31 +++-
+ tools/testing/selftests/drivers/net/shaper.py |  25 ++-
+ 9 files changed, 216 insertions(+), 54 deletions(-)
+
+-- 
+2.54.0
+
 
