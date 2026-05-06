@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-284653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284654-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QOMwOHmd+mk+QQMAu9opvQ
-	(envelope-from <netdev+bounces-284653-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 03:46:33 +0200
+	id IKYUFqWd+mk+QQMAu9opvQ
+	(envelope-from <netdev+bounces-284654-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 03:47:17 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 480054D5657
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 03:46:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE7854D5678
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 03:47:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 02183303F053
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 01:45:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EB3FE3032672
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 01:46:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8CF2280325;
-	Wed,  6 May 2026 01:45:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 523C423C368;
+	Wed,  6 May 2026 01:46:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SI8fD7N3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qWvs2Le9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84CCA27FD49;
-	Wed,  6 May 2026 01:45:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F95D1A9FB0;
+	Wed,  6 May 2026 01:46:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778031957; cv=none; b=bizeA+fBmi+ZUVEJjhENtawAQ/68xbY4LdlvNdAp/U1Zid/VUE4BKSsQLnUDdmrMwacy/hl/zfwT0kF/+nGTLsTfyjKnrA/3faL4bOaYHRmpu8hQD5wZxXMN1fD3Vvozs7HPd/Jh77qFMHM4g78RobiB/fwmdRn4rk2mckofL24=
+	t=1778031972; cv=none; b=PMIobVjNy91tN3KKt9ZH5S44TbiEGGjKYRe7/wmfsg6UYZA4UWC/2xmX99oHcoyiWoO1OS/yL4ray9Eyd/4lgEzc+VrzEf1X2D5FUh7iL//q/vD38avkg0rGfTu5h8m0K0lk7JhXRDgZS9RSljZQEqzemqnNzPV3DXUuEmEcHPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778031957; c=relaxed/simple;
-	bh=J8HiwRQgEJs3xRquXR3TNrdCUXYnZuF7/eaDi1afRuc=;
+	s=arc-20240116; t=1778031972; c=relaxed/simple;
+	bh=ConUqpuXV5m6p0GyI5XqoUJSLDZ8f+XikS9Af51LKfU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oNLNgcTjVIHHoxhfAUO08Ft7KJgjy1pNB9LcCJ73qdQrQ9R0mFvSGuqPSy+Hcn2fuiUPIQMbSK01Eppekp8koP6kvQJnLJGdsxP746hsZHqV7vqkduNd7sp2nZ5Ubm/BrvTai2EHzA085fJ88EgnCFRihB93JsAAu5DmNuGmYtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SI8fD7N3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78C22C2BCB9;
-	Wed,  6 May 2026 01:45:56 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ugYzDlIQquEWLXovq+1YuKUO50TiAeMFU05LcZGx14s2ehtuLoQA4t79Xioa60hCiS/pRNJXHP+ngrNDSpKoC/bgmTb2ATNanB/7BgGy2oKUMvG/ubqqHnSmuEqJCXPh5RqxaGEai66KYg7cNGnFm4PpPmqPGM254jUUQAeXGvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qWvs2Le9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00C9EC2BCB4;
+	Wed,  6 May 2026 01:46:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778031957;
-	bh=J8HiwRQgEJs3xRquXR3TNrdCUXYnZuF7/eaDi1afRuc=;
+	s=k20201202; t=1778031971;
+	bh=ConUqpuXV5m6p0GyI5XqoUJSLDZ8f+XikS9Af51LKfU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SI8fD7N3i+Pm8twjPez31E9Q5hb5Q9Q2vZ5HeBed8pgnwSUMJP9ZDAH6czO+fBTUk
-	 UaMB0JuWXVOjZJoIqfbOEJB4xI7wDGMu2nVs76pKuh7+Ufd4zV3Bhp0XhlhW+ypVgw
-	 emcE89asv69lVxsmzrKEfzPHOJ6yXua4CBJAKSjieTPgs+j7VHm+2IKtAml0Nn4yjR
-	 Myca/AuIutW0vJZl6YKfDlvLwsMFCw0Yhoj2khMd3G95OTxMNKwSScQGSjCW5khJAA
-	 6zKz1QZAGHWNaLwOor+l53oQDqiApWSUHDgd/cy7NWrujUql3/erMFW0oRcYZ6sEOi
-	 B01TpPfN/jJzA==
+	b=qWvs2Le9yeRK4GGUTv5gbWugf24G4FAAu4VpI4suNcQqsmUP1i3HkgDsCTzFGzqnE
+	 6oNH45pn71LAmShj7qYYA+evdio9BMUXorOvx0Z0Y069mi8zyMqvqZNhlXr+n1LxGU
+	 mjQrcF9sx8rMwWPqynzZfiIAzgQswEPKGi3MclZiw8MCWbCQq0wTkFyQR/zCf9KjYx
+	 Am7NZnR//lUEEyo0XOKNVWfuoq5ASLx7PPyEUvG9ujOiCSF1awqRYXBGre1RoXPxfJ
+	 HKFxl+SNdEBA26W2GAeM1HEwL4gfrG5PfdmGRGTMg39jTYAP9oUxr7EPOlUU5udI9U
+	 iiRDDp2Yaa+zg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: jensemil.schulzostergaard@microchip.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -64,46 +64,46 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v4 4/9] net: dsa: lan9645x: add basic dsa driver for LAN9645X
-Date: Tue,  5 May 2026 18:45:55 -0700
-Message-ID: <20260506014555.1616575-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v4 5/9] net: dsa: lan9645x: add bridge support
+Date: Tue,  5 May 2026 18:46:08 -0700
+Message-ID: <20260506014609.1616782-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260430-dsa_lan9645x_switch_driver_base-v4-4-f1b6005fa8b7@microchip.com>
-References: <20260430-dsa_lan9645x_switch_driver_base-v4-4-f1b6005fa8b7@microchip.com>
+In-Reply-To: <20260430-dsa_lan9645x_switch_driver_base-v4-5-f1b6005fa8b7@microchip.com>
+References: <20260430-dsa_lan9645x_switch_driver_base-v4-5-f1b6005fa8b7@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 480054D5657
+X-Rspamd-Queue-Id: AE7854D5678
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284654-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_FROM(0.00)[bounces-284653-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk,vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
@@ -113,296 +113,171 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-net: dsa: lan9645x: add basic dsa driver for LAN9645X
+net: dsa: lan9645x: add bridge support
 
-This patch introduces a new DSA driver for the Microchip LAN9645X switch
-family, covering probe/setup/teardown, NPI CPU port wiring, per-port
-initialisation, and phylink MAC integration. A few questions inline.
-
-> diff --git a/drivers/net/dsa/microchip/lan9645x/Kconfig b/drivers/net/dsa/microchip/lan9645x/Kconfig
-> new file mode 100644
-> index 000000000000..4d9fdf34104e
-> --- /dev/null
-> +++ b/drivers/net/dsa/microchip/lan9645x/Kconfig
-> @@ -0,0 +1,11 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +config NET_DSA_MICROCHIP_LAN9645X
-> +	tristate "Microchip Lan9645x switch support"
-> +	depends on NET_DSA
-> +	select NET_DSA_TAG_LAN9645X
-> +	help
-> +	  This driver adds DSA support for Microchip Lan9645x switch chips.
-
-The driver is non-functional without a parent MFD that registers the named
-regmaps ("gcb", "qs", "chip_top", "rew", "sys", "hsio", "dev", "dev1" ..
-"dev8", "qsys", "afi", "ana") consumed by lan9645x_request_target_regmaps().
-
-Should this Kconfig depend on the parent provider symbol so that selecting
-this option without the parent driver does not produce a module whose probe
-always fails?
-
-Is there a companion parent-driver patch this patch depends on? If so,
-would it be worth naming it in the commit message and documenting the
-ordering?
+This patch adds hardware offload support for a single bridge device in
+the lan9645x DSA driver. It introduces the fwd_domain_lock mutex and an
+ordered workqueue, and wires up the bridge-integration switch ops.
 
 > diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-> new file mode 100644
-> index 000000000000..6fd66ea67cfd
-> --- /dev/null
+> index 6fd66ea67cfd..70f6a11f0753 100644
+> --- a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
 > +++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-> @@ -0,0 +1,423 @@
+> @@ -67,7 +67,9 @@ static void lan9645x_teardown(struct dsa_switch *ds)
+>  {
+>  	struct lan9645x *lan9645x = ds->priv;
+>  
+> +	destroy_workqueue(lan9645x->owq);
+>  	lan9645x_npi_port_deinit(lan9645x, lan9645x->npi);
+> +	mutex_destroy(&lan9645x->fwd_domain_lock);
+>  }
 
 [ ... ]
 
-> +static const char *lan9645x_resource_names[NUM_TARGETS + 1] = {
-> +	[TARGET_GCB]          = "gcb",
-> +	[TARGET_QS]           = "qs",
-> +	[TARGET_CHIP_TOP]     = "chip_top",
-> +	[TARGET_REW]          = "rew",
-> +	[TARGET_SYS]          = "sys",
-> +	[TARGET_HSIO]         = "hsio",
-> +	[TARGET_DEV]          = "dev",
-> +	[TARGET_DEV + 1]      = "dev1",
-> +	[TARGET_DEV + 2]      = "dev2",
-> +	[TARGET_DEV + 3]      = "dev3",
-> +	[TARGET_DEV + 4]      = "dev4",
-> +	[TARGET_DEV + 5]      = "dev5",
-> +	[TARGET_DEV + 6]      = "dev6",
-> +	[TARGET_DEV + 7]      = "dev7",
-> +	[TARGET_DEV + 8]      = "dev8",
-
-The first DEV instance is named "dev", while the rest are "dev1" through
-"dev8". Is this asymmetry intentional, or should the first be "dev0" to
-match the natural per-port numbering? Without the parent driver available
-in this series, it is hard to tell which naming scheme the parent actually
-registers.
-
-If the parent registers "dev0".."dev8" then dev_get_regmap(parent, "dev")
-returns NULL and probe fails with -ENODEV.
-
-[ ... ]
-
-> +static void lan9645x_set_feat_dis(struct lan9645x *lan9645x)
-> +{
-> +	u32 feat_dis;
+> @@ -133,6 +135,8 @@ static int lan9645x_setup(struct dsa_switch *ds)
+>  		return err;
+>  	}
+>  
+> +	mutex_init(&lan9645x->fwd_domain_lock);
 > +
-> +	/* The features which can be physically disabled on some SKUs are:
-> +	 * 1) Number of ports can be 5, 7 or 9. Any ports can be used, the chip
-> +	 *    tracks how many are active.
-> +	 * 2) HSR/PRP. The duplicate discard table can be disabled.
-> +	 * 3) TAS, frame preemption and PSFP can be disabled.
+>  	/* Link Aggregation Mode: NETDEV_LAG_HASH_L2 */
+>  	lan_wr(ANA_AGGR_CFG_AC_SMAC_ENA |
+>  	       ANA_AGGR_CFG_AC_DMAC_ENA,
+
+[ ... ]
+
+> @@ -239,6 +243,11 @@ static int lan9645x_setup(struct dsa_switch *ds)
+>  
+>  	lan9645x_port_set_tail_drop_wm(lan9645x);
+>  
+> +	lan9645x->owq = alloc_ordered_workqueue("%s-owq", 0,
+> +						dev_name(lan9645x->dev));
+> +	if (!lan9645x->owq)
+> +		return -ENOMEM;
+> +
+
+Does this error path leak the fwd_domain_lock initialization and the
+NPI port setup?
+
+When alloc_ordered_workqueue() fails, lan9645x_setup() returns -ENOMEM
+directly.  In DSA, dsa_switch_setup() handles a failed ds->ops->setup()
+by jumping past the teardown label:
+
+    err = ds->ops->setup(ds);
+    if (err < 0)
+        goto unregister_notifier;
+
+So lan9645x_teardown() is never invoked on the setup failure path, and
+the mutex_destroy(&lan9645x->fwd_domain_lock) and
+lan9645x_npi_port_deinit() calls it contains are skipped.
+
+With CONFIG_DEBUG_MUTEXES or lockdep enabled, the mutex debug state is
+left dangling against devm-managed memory, and the NPI port hardware
+configuration performed by lan9645x_tag_npi_setup() is left in place
+until the next reset_switch().
+
+Should the failure path of lan9645x_setup() unwind the mutex_init()
+and lan9645x_tag_npi_setup() it performed earlier?
+
+>  	ds->mtu_enforcement_ingress = true;
+>  	ds->assisted_learning_on_cpu_port = true;
+>  	ds->fdb_isolation = true;
+> @@ -257,6 +266,272 @@ static void lan9645x_port_phylink_get_caps(struct dsa_switch *ds, int port,
+>  	lan9645x_phylink_get_caps(ds->priv, port, config);
+>  }
+>  
+> +static int lan9645x_set_ageing_time(struct dsa_switch *ds, unsigned int msecs)
+> +{
+> +	u32 age_secs = max(1, msecs / MSEC_PER_SEC / 2);
+> +	struct lan9645x *lan9645x = ds->priv;
+> +
+> +	/* Entry is must suffer two aging scans before it is removed, so it is
+> +	 * aged after 2*AGE_PERIOD, and the unit is in seconds.
+> +	 * An age period of 0 disables automatic aging.
 > +	 */
-> +	feat_dis = lan_rd(lan9645x, GCB_FEAT_DISABLE);
-> +
-> +	lan9645x->num_port_dis =
-> +		GCB_FEAT_DISABLE_FEAT_NUM_PORTS_DIS_GET(feat_dis);
-> +	lan9645x->dd_dis = GCB_FEAT_DISABLE_FEAT_DD_DIS_GET(feat_dis);
-> +	lan9645x->tsn_dis = GCB_FEAT_DISABLE_FEAT_TSN_DIS_GET(feat_dis);
-> +}
-
-Where are num_port_dis, dd_dis and tsn_dis consulted after this read?
-
-ds->num_ports is hardcoded to NUM_PHYS_PORTS (9) in lan9645x_probe(), and
-there does not appear to be any rejection of TSN or HSR/PRP configuration
-on SKUs where tsn_dis=1 or dd_dis=1 in this patch. On a 5-port SKU
-(num_port_dis=4), would the driver still register 9 DSA ports and allow
-DT to bring up a fused-off port?
-
-> +static int lan9645x_setup(struct dsa_switch *ds)
-> +{
-
-[ ... ]
-
-> +	dev_info(lan9645x->dev,
-> +		 "SKU features: tsn_dis=%d hsr_dis=%d max_ports=%d\n",
-> +		 lan9645x->tsn_dis, lan9645x->dd_dis,
-> +		 lan9645x->num_phys_ports - lan9645x->num_port_dis);
-
-The log prints the field called dd_dis in struct lan9645x under the name
-hsr_dis. Should the label in the format string match the struct field
-name, or should the field be renamed?
-
-[ ... ]
-
-> diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_phylink.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_phylink.c
-> new file mode 100644
-> index 000000000000..9eac32ca342c
-> --- /dev/null
-> +++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_phylink.c
-> @@ -0,0 +1,383 @@
-
-[ ... ]
-
-> +/* Port 4 or 7 is RGMII_0 and port 8 is RGMII_1 */
-> +#define RGMII_IDX(port) ((port) == 8 ? 1 : 0)
-> +
-> +void lan9645x_phylink_get_caps(struct lan9645x *lan9645x, int port,
-> +			       struct phylink_config *c)
-> +{
-> +	c->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE | MAC_10 |
-> +			      MAC_100 | MAC_1000FD | MAC_2500FD;
-> +
-> +	switch (port) {
-> +	case 0 ... 3:
-> +		__set_bit(PHY_INTERFACE_MODE_GMII, c->supported_interfaces);
-> +		break;
-> +	case 4:
-> +		__set_bit(PHY_INTERFACE_MODE_GMII, c->supported_interfaces);
-> +		phy_interface_set_rgmii(c->supported_interfaces);
-> +		break;
-> +	case 5 ... 6:
-> +		/* SerDes ports: QSGMII/SGMII/1000BASEX/2500BASEX modes
-> +		 * require PCS support which is not yet implemented.
-> +		 */
-> +		break;
-> +	case 7 ... 8:
-> +		/* QSGMII mode on ports 7-8 requires SerDes PCS support,
-> +		 * which is not yet implemented.
-> +		 */
-> +		phy_interface_set_rgmii(c->supported_interfaces);
-> +		break;
-> +	default:
-> +		break;
-> +	}
-> +}
-
-mac_capabilities advertises MAC_2500FD for every port, but none of the
-supported_interfaces entries allow negotiating 2.5 Gb/s. GMII and RGMII
-do not carry 2.5 Gb/s, and ports 5-6 have an empty supported_interfaces
-bitmap. Should MAC_2500FD be dropped until a PCS-capable interface is
-added, or should it be set only on ports that will actually support it?
-
-For ports 5 and 6, supported_interfaces is left empty. Will phylink_create()
-succeed for those ports given no interface mode is permitted, or will they
-be silently unusable?
-
-The commit message states:
-
-    The lan9645x switch is a multi-port Gigabit AVB/TSN Ethernet Switch
-    with five integrated 10/100/1000Base-T PHYs. In addition to the
-    integrated PHYs, it supports up to 2 RGMII/RMII, up to 2
-    BASE-X/SERDES/2.5GBASE-X and one Quad-SGMII/Quad-USGMII interfaces.
-
-Given ports 5-6 have no supported_interfaces and ports 7-8 expose only
-RGMII in this patch, would it help to note in the commit message that
-SerDes, QSGMII/USGMII and 2.5GBASE-X are not wired up yet?
-
-[ ... ]
-
-> +static int lan9645x_phylink_mac_prepare(struct phylink_config *config,
-> +					unsigned int mode,
-> +					phy_interface_t iface)
-> +{
-> +	struct lan9645x_port *p = lan9645x_phylink_config_to_port(config);
-> +	struct lan9645x *lan9645x = p->lan9645x;
-> +	int port = p->chip_port;
-> +	bool is_rgmii;
-> +	u32 mask;
-> +
-> +	if (port == 5 || port == 6 || port > 8)
-> +		return -EINVAL;
-> +
-> +	mask = HSIO_HW_CFG_GMII_ENA_SET(BIT(port));
-> +	lan_rmw(mask, mask, lan9645x, HSIO_HW_CFG);
-> +
-> +	is_rgmii = phy_interface_mode_is_rgmii(iface);
-> +	if (port == 4)
-> +		lan_rmw(HSIO_HW_CFG_RGMII_0_CFG_SET(is_rgmii),
-> +			HSIO_HW_CFG_RGMII_0_CFG,
-> +			lan9645x, HSIO_HW_CFG);
-> +
+> +	lan_rmw(ANA_AUTOAGE_AGE_PERIOD_SET(msecs ? age_secs : 0),
+> +		ANA_AUTOAGE_AGE_PERIOD,
+> +		lan9645x, ANA_AUTOAGE);
 > +	return 0;
 > +}
 
-The HSIO_HW_CFG_RGMII_0_CFG bit is only written when port == 4, but the
-comment above RGMII_IDX() states:
+Can this silently truncate user-supplied ageing times that exceed the
+hardware field?
 
-    /* Port 4 or 7 is RGMII_0 and port 8 is RGMII_1 */
-    #define RGMII_IDX(port) ((port) == 8 ? 1 : 0)
+ANA_AUTOAGE_AGE_PERIOD is GENMASK(20, 1), so the maximum representable
+age_secs is 2^20 - 1 = 1048575.  ANA_AUTOAGE_AGE_PERIOD_SET() expands
+to FIELD_PREP(), whose runtime path in include/linux/bitfield.h is:
 
-Port 7 also maps to RGMII_0. If port 7 is configured for RGMII, does the
-RGMII_0 mux ever get routed to port 7? And if port 4 is later configured
-in GMII mode, the write HSIO_HW_CFG_RGMII_0_CFG_SET(0) would run and
-appear to reroute RGMII_0 away from port 7.
+    ((typeof(_mask))(_val) << __bf_shf(_mask)) & (_mask)
 
-Is there meant to be mutual-exclusion between port 4 and port 7 in RGMII
-mode, and a write path for port 7 as well?
+which masks the value without any range check or warning.
 
-> +static void lan9645x_rgmii_dll_config(struct lan9645x_port *p)
-> +{
-> +	u32 rx_idx, tx_idx;
-> +
-> +	/* DLL register layout:
-> +	 * (N*2):   RGMII_N_RX
-> +	 * (N*2)+1: RGMII_N_TX
-> +	 */
-> +	rx_idx = RGMII_IDX(p->chip_port) * 2;
-> +	tx_idx = RGMII_IDX(p->chip_port) * 2 + 1;
-> +
-> +	/* Enable DLL in RGMII clock paths, deassert DLL reset, and start the
-> +	 * delay tune FSM.
-> +	 */
-> +	lan_rmw(HSIO_DLL_CFG_DLL_CLK_ENA_SET(1) |
-> +		HSIO_DLL_CFG_DLL_RST_SET(0) |
-> +		HSIO_DLL_CFG_DLL_ENA_SET(p->rx_internal_delay) |
-> +		HSIO_DLL_CFG_DELAY_ENA_SET(p->rx_internal_delay),
-> +		HSIO_DLL_CFG_DLL_CLK_ENA |
-> +		HSIO_DLL_CFG_DLL_RST |
-> +		HSIO_DLL_CFG_DLL_ENA |
-> +		HSIO_DLL_CFG_DELAY_ENA,
-> +		p->lan9645x, HSIO_DLL_CFG(rx_idx));
-> +
-> +	lan_rmw(HSIO_DLL_CFG_DLL_CLK_ENA_SET(1) |
-> +		HSIO_DLL_CFG_DLL_RST_SET(0) |
-> +		HSIO_DLL_CFG_DLL_ENA_SET(p->tx_internal_delay) |
-> +		HSIO_DLL_CFG_DELAY_ENA_SET(p->tx_internal_delay),
-> +		HSIO_DLL_CFG_DLL_CLK_ENA |
-> +		HSIO_DLL_CFG_DLL_RST |
-> +		HSIO_DLL_CFG_DLL_ENA |
-> +		HSIO_DLL_CFG_DELAY_ENA,
-> +		p->lan9645x, HSIO_DLL_CFG(tx_idx));
-> +}
+The driver does not populate ds->ageing_time_min or ds->ageing_time_max,
+and dsa_switch_ageing_time() gates its -ERANGE checks on those being
+non-zero:
 
-This function consults only p->rx_internal_delay and p->tx_internal_delay
-and never looks at the phy_interface_t. Phylink expects the MAC to apply
-internal delay only when the interface is RGMII_ID, RGMII_TXID or
-RGMII_RXID, and not when the interface is plain PHY_INTERFACE_MODE_RGMII
-(where the PHY provides delay).
+    if (ds->ageing_time_min && ageing_time < ds->ageing_time_min)
+        return -ERANGE;
+    if (ds->ageing_time_max && ageing_time > ds->ageing_time_max)
+        return -ERANGE;
 
-With a DT that specifies phy-mode = "rgmii" and nonzero
-rx-internal-delay-ps, will both the PHY and the MAC add delay?
-
-And with phy-mode = "rgmii-id" but no {rx,tx}-internal-delay-ps property
-in DT, will the MAC fail to add delay on either side?
-
-> diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c
-> new file mode 100644
-> index 000000000000..394a20ee678f
-> --- /dev/null
-> +++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c
+so a large ageing time set via "ip link set br0 type bridge ageing_time
+<large>" reaches this callback and is silently truncated to a short
+period.  Should lan9645x set ageing_time_min/max so out-of-range values
+are rejected instead?
 
 [ ... ]
 
-> +int lan9645x_port_setup(struct dsa_switch *ds, int port)
+> +static void lan9645x_host_flood_work_fn(struct work_struct *work)
 > +{
-> +	struct dsa_port *dp = dsa_to_port(ds, port);
+> +	struct lan9645x_port *p = container_of(work, struct lan9645x_port,
+> +					       host_flood_work);
+> +	struct lan9645x *lan9645x = p->lan9645x;
+> +
+> +	mutex_lock(&lan9645x->fwd_domain_lock);
+> +	__lan9645x_port_mark_host_flood(lan9645x, p->chip_port,
+> +					p->host_flood_uc, p->host_flood_mc);
+> +	__lan9645x_port_set_host_flood(lan9645x);
+> +	mutex_unlock(&lan9645x->fwd_domain_lock);
+> +}
+> +
+> +/* Called in atomic context. */
+> +static void lan9645x_port_set_host_flood(struct dsa_switch *ds, int port,
+> +					 bool uc, bool mc)
+> +{
 > +	struct lan9645x *lan9645x = ds->priv;
 > +	struct lan9645x_port *p;
 > +
 > +	p = lan9645x_to_port(lan9645x, port);
 > +
-> +	if (dp->dn) {
-> +		u32 val;
-> +
-> +		if (!of_property_read_u32(dp->dn, "rx-internal-delay-ps", &val))
-> +			p->rx_internal_delay = val > 0;
-> +
-> +		if (!of_property_read_u32(dp->dn, "tx-internal-delay-ps", &val))
-> +			p->tx_internal_delay = val > 0;
-> +	}
+> +	p->host_flood_uc = uc;
+> +	p->host_flood_mc = mc;
+> +	queue_work(lan9645x->owq, &p->host_flood_work);
+> +}
 
-The u32 picosecond value from DT is collapsed to a boolean via "val > 0",
-discarding the tap selection. Is the discarded precision intentional, and
-if so, why read the value as u32 in the first place rather than using
-of_property_read_bool() on a differently-named property?
+Can the worker observe a mixed (uc, mc) tuple that no caller requested?
+
+The atomic-context writer stores p->host_flood_uc and p->host_flood_mc
+as two independent unsynchronized writes and then queues the work.  The
+worker takes fwd_domain_lock and reads both, but the writer never takes
+that lock (it cannot — it is called in atomic context, and fwd_domain_lock
+is a mutex).
+
+If a second update arrives between the worker's two reads, the worker
+can program PGID_UC/MC/MCIPV4/MCIPV6 on the CPU port with a combination
+that was never requested by either call.  The state converges on the
+next work run triggered by the second queue_work(), but the hardware is
+transiently programmed with a tuple nobody asked for.
+
+Would it be safer to bundle both booleans into a single atomic word, or
+to use a spinlock that can be taken in atomic context to protect the
+pair of stores?
+
+> +
+> +static int lan9645x_port_bridge_join(struct dsa_switch *ds, int port,
+> +				     struct dsa_bridge bridge,
+> +				     bool *tx_fwd_offload,
+> +				     struct netlink_ext_ack *extack)
+
+[ ... ]
 
