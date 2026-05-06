@@ -1,208 +1,177 @@
-Return-Path: <netdev+bounces-284931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284932-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EI1TGYJi+2kuaQMAu9opvQ
-	(envelope-from <netdev+bounces-284931-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:47:14 +0200
+	id 0MyHJk9k+2kuaQMAu9opvQ
+	(envelope-from <netdev+bounces-284932-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:54:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1DC64DD8A0
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:47:13 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E3CE4DDACB
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:54:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9E0A83006811
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 15:45:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9CB70301BEED
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 15:49:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D371A393DE0;
-	Wed,  6 May 2026 15:45:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F0F3F0AB7;
+	Wed,  6 May 2026 15:49:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NscI5gwT";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="NubWE80K"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 368F547DD65;
-	Wed,  6 May 2026 15:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0CB46AF0F
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 15:49:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778082328; cv=none; b=r0qpRPjH9RflHXHbWRCGjgyuNETuPeQ7WDd7P35plWmU40oChKLRT1t6WUhsn1zaGooQSKBzFQI4HrYs1a0hEATZS+FHrhvp885ZQeVcHS5MXpOd9UGZA1PW7ypqfbJqgrxrE7j5f37FzU83UYymeRjVqjTG9JPgNh2XsTLmHSY=
+	t=1778082577; cv=none; b=WFDkuoN3AhXD7RkTD0oPbhi2wz0cmvm/XHOzOs0ZbKuoinlNe6ZUNRPfLTb0pIxvxsg2TzgtTPXuiLpW19SYyx/1PNJtX+Q1Et/9a5rHXsqi9nQ494pVONsXRG7oxUVVHEiXrGYe2TmZlVccGycJ06nQs+L4S8SAm9/igyYLpRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778082328; c=relaxed/simple;
-	bh=cLst7TIrzB2EttSm/QmnT/2eZbnvabiG+RpImWplrts=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CjdwVBRfo7ay8xcRFijGb48ydeTsp0acLKOm++O0yltb9fX2MMJLAQaH+lJVnDtX1mLbwjlXCuvZwbxcBTkkqB1FCrjgERAxmcVziyx2E2ohnXOpUdHTgL9AHIUFnsIPPbtmX17jhrPqVvFfTnKCB6wsxgWXzVOobghUr1WU528=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=radxa.com; spf=pass smtp.mailfrom=radxa.com; arc=none smtp.client-ip=54.254.200.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=radxa.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=radxa.com
-X-QQ-mid: zesmtpsz7t1778082303tad718e7d
-X-QQ-Originating-IP: IUbeVjFMUOeWOYng8sGFzDDtrsWNZj3aHK3Nzskz1o8=
-Received: from [127.0.0.1] ( [116.234.74.217])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 06 May 2026 23:44:57 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 7158039803468193792
-Message-ID: <549BE66F62F1470F+a489d4fd-10ab-484c-9b55-6aecfd05d383@radxa.com>
-Date: Wed, 6 May 2026 23:44:55 +0800
+	s=arc-20240116; t=1778082577; c=relaxed/simple;
+	bh=OFk6u9sPQNb/lVBSlnQi4dTa2C8rYPWBoQllv2zqLfU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kmp5NpkewMi4/FLqk9QpJlwUoBDKMQUIDt9/MWL4JoqpBuYtVhux1AmlPlr1rZ/lg//9UOtOBVPOG8SE5a7lej9LjGgqWIAsvXT89ZEd7xsdug3uOfObT6GaQzM5mQZwhyyYNdtfk21wNiRVVrKJrPJYb4xJE+sXakkzKHsO6eU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NscI5gwT; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=NubWE80K; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778082573;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AQK7jK9fWfmI6EGpDkjX16iWpfsGamzwE3Vp7aLO0Yw=;
+	b=NscI5gwTLPAh45sycHgBiydMFCZEdN6PdXHP0EbgIY1HfkJVpDe/9gA2uVwbTwtc9RTzkU
+	VIaS8rer4pGTwZUlAFlPbE2WoLxsUAEUltf8VhfBuVVNrvpHp6eWpOGz51YJ2twqb7HuAn
+	LawYDZtYeTdjR6zEDj5uXOURaxQgfyI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-342-I23jjczTNUyk0X05daPj4A-1; Wed, 06 May 2026 11:49:24 -0400
+X-MC-Unique: I23jjczTNUyk0X05daPj4A-1
+X-Mimecast-MFC-AGG-ID: I23jjczTNUyk0X05daPj4A_1778082563
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-44b186b715aso3202790f8f.0
+        for <netdev@vger.kernel.org>; Wed, 06 May 2026 08:49:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1778082563; x=1778687363; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=AQK7jK9fWfmI6EGpDkjX16iWpfsGamzwE3Vp7aLO0Yw=;
+        b=NubWE80KJ0iw2U4LMjZ+DGnRx7jzzADXYmR8af6aeWZJwyWH3tVs98ZSENOG+QLN2X
+         spM1cw1o9xS7QqbhuMKsiW54txf0WT+J2gNd5JIE19aRGZY0ZIN+1TMS9Xxi2JzuD4TI
+         8X9msN+J1boiYHWBYag4XilkPX6KRt4Cp9K96TiEBcjjkfnHoY0do19FiwdjgZCcJJBA
+         fU2PFcLMo4K0hEpVEXeVRoANNfNlGpv/MwJ58iMr0JeYDsjSGEIDnP07VpJ4OfFeJKeG
+         vvDSWZ9Wcrb/GqIGRV6ykHcTuJojzd+lporm4rFhO1IWDhJS6QPn4vuDmfz9IZYxiS14
+         z72A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778082563; x=1778687363;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AQK7jK9fWfmI6EGpDkjX16iWpfsGamzwE3Vp7aLO0Yw=;
+        b=hw+b1gPIgXF9TWJsKy5R4vLGdl6JXVpbpWeH6T5wfFOqfwOcJPbnR6plV5c2u2syTi
+         rhh2EQg9S61KR7ARozp43yx30unX85R3pp3VjZXMMaHk/4vu8ulrTK2XwWBKmrw+Tslh
+         QZ/+PbRjjxDti70/refgYqyAsA5uElpxKtuAxta9Ppj15KPYzcoHvxZcRu9DC4SitPY5
+         D8xgP4B8sJhMNbbWYvT8Amdq3Ui7yU5VCd74db+JhRqw9KFhXmh3XKmYTY/hnc0gG5UZ
+         Orizc3cC5FeauOhlYP8Fog8g1ZqV102BiNVLYAYnBYsvxuMYrRVUahC4A2HVHglg2n/X
+         kxpg==
+X-Forwarded-Encrypted: i=1; AFNElJ/7r3v8sfj3qRgmcab/aSFAaUgnMJwLAGc2jXHi05yedVUcLNod0KPyu1UYdA9s8V1FteEmguY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWYs0YyOn6X7N0zLtJhhxYmKu6wtfJUl6P6nleMFTgvtUGpCdR
+	1a2gSlYQQnqrtmYkXivo1w9sOseffFRpylo0U9roeiGKIa3r6ki3dyglsS+LA3Ipk5atrSFtf//
+	ng6gsO0cL5MWqMPmf9awhO9zOCW+KnYJrYTKc4K7BbtDRc57anUe3KSuOIA==
+X-Gm-Gg: AeBDietksSwZNEuVpnOBe2gUu6zhyzF06HAGg+WrlR4/rwdiw9QixAJKsA8zzz0++JZ
+	yf/+kCM4o2J6wzo0F5Ioe5dk+AG//Krtgleti6hbHi29AIwJHe9y0VboK3OVEeF99FatKy/KZHC
+	EQrhqto6ZORN2jZPkYiehWPeCPqvy2VnLOr75eSLfc7/8l8nZUggpUscinDVrO+nbCBbLp34GO2
+	mzxC1dR3ZSDBa1oSvXgGdCF4S2az3iVmJHpV6OoqIKlMqUfSoh4ebVMDDCPaCEvlsw2YAG6A9yo
+	KxW0H9adfiQOtcnMJCrnRTJw9Zu+Pw0LEPU7+Pu2aOfqMNIygzxV/o66CZ2xzDSFdbgJzYEs6mb
+	MGRE0/FgMx7yLUiTy5uz7A2fq8D85hpTG+06pDmqePBjQYtTlc60=
+X-Received: by 2002:a05:600c:b8a:b0:48a:5333:811e with SMTP id 5b1f17b1804b1-48e51f2f91cmr68975615e9.15.1778082563107;
+        Wed, 06 May 2026 08:49:23 -0700 (PDT)
+X-Received: by 2002:a05:600c:b8a:b0:48a:5333:811e with SMTP id 5b1f17b1804b1-48e51f2f91cmr68975055e9.15.1778082562568;
+        Wed, 06 May 2026 08:49:22 -0700 (PDT)
+Received: from redhat.com (IGLD-80-230-48-7.inter.net.il. [80.230.48.7])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e52f5d299sm31638085e9.0.2026.05.06.08.49.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 May 2026 08:49:22 -0700 (PDT)
+Date: Wed, 6 May 2026 11:49:18 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev
+Subject: Re: [PATCH net] vsock/virtio: fix potential unbounded skb queue
+Message-ID: <20260506114213-mutt-send-email-mst@kernel.org>
+References: <20260430122653.554058-1-edumazet@google.com>
+ <afn0ZdvZWswBuDMm@sgarzare-redhat>
+ <CANn89iLs8DOWJwDpf_ARoMrV+6b2tbhEJ=VVzeC8gCm5dRGaig@mail.gmail.com>
+ <20260506111507-mutt-send-email-mst@kernel.org>
+ <CANn89iKWhJp2N-60FC4JpX2Dw0sK8-vk2WrHkDOnkgC_c8nbHA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 10/12] net: stmmac: tc956x: add TC956x/QPS615
- support
-To: Daniel Thompson <daniel@riscstar.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Alex Elder <elder@riscstar.com>,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, maxime.chevallier@bootlin.com,
- rmk+kernel@armlinux.org.uk, andersson@kernel.org, konradybcio@kernel.org,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, linusw@kernel.org,
- brgl@kernel.org, arnd@arndb.de, gregkh@linuxfoundation.org,
- mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com,
- alexandre.torgue@foss.st.com, ast@kernel.org, boon.khai.ng@altera.com,
- chenchuangyu@xiaomi.com, chenhuacai@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, hkallweit1@gmail.com, inochiama@gmail.com,
- john.fastabend@gmail.com, julianbraha@gmail.com, livelycarpet87@gmail.com,
- matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
- prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
- rohan.g.thomas@altera.com, sdf@fomichev.me, siyanteng@cqsoftware.com.cn,
- weishangjuan@eswincomputing.com, wens@kernel.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20260501155421.3329862-1-elder@riscstar.com>
- <20260501155421.3329862-11-elder@riscstar.com>
- <224E233C593EF171+8c8a43dd-5061-40f8-9eb7-f360eabf2ecc@radxa.com>
- <4015f47a-af62-441d-b1b8-a8598f963970@lunn.ch>
- <4C0D95BC59F1A4ED+53f3be85-2cdd-4058-8950-57970027d481@radxa.com>
- <aftgorkah-Hjrvq2@aspen.lan>
-Content-Language: en-US
-From: Xilin Wu <sophon@radxa.com>
-In-Reply-To: <aftgorkah-Hjrvq2@aspen.lan>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:radxa.com:qybglogicsvrsz:qybglogicsvrsz3b-0
-X-QQ-XMAILINFO: MGxrRyrvqqSAJPtm9+Xn8xQ2xA1AHSxENunW+ehiuhpYbHNZNVX+5I77
-	wfEoPZdY8rSSnBMxbOMBAUXrcxyTiHvHjYdLIruNFlVs5lr5HDLEQ1ApU0cFLR+6YfK0cxl
-	xLQwQUO7Tb69bQylEOxrNQ6mWphQKFg/TiXsZ1gi+FVTHjgIg/Fr6j8Q457nWfpG48XAJzc
-	5XvJ2E6Usyo8kQ57Bnnqm+krfqblXcs7i1vUPim1nujyUIPBIbi8cwlBm36UDmFh3srxEhE
-	+Ryb56EQI1VkDQa2KKpshuWjq99XGYnWUOM/1rx4F2kFuyYWa2Z4COGGN9BC+ALkqj5ePLH
-	gbFiAWQ8TibPnvNKMS36uWka8lMqh7bKXZxLD/k8uLcy/PVK3UWVekpSyAFTm1MafcK88MG
-	VoAWmLFZ2mggMy2AuIU7+qsCwNCuVdY5sg3BJB51QtMSyOfS2mUsq0m/v0hpmk3xADo5kK9
-	8FlW7z8nbMx8jvr66nXsWSoEdREevD5+5Xmy1nAdvuGWktXcGQhVnd2CZKJbVVfuaT1pf/4
-	C3cwwkAyC54RvT6IWnn9HShasbW724+bTFuNBJfsSCilvctGMH6syQbfTBK5OXQKvmIw3x4
-	qarzR6NdI1hR994C8uKTsqpkUrueoQnqMFptlxAEM7X3jvvwwKbXzDc48sHQUQXwZ7B7aMa
-	Nal6lzE8DmjyGk461b4kkEEATnaV8ntovq9/27lotTr1/xibXNTV9+AqsNiPkHXhoiDZ9aS
-	/5rpNyFTXrtTnE6OsWnPwjzI8uFcL7V3DeIY3PENtYZLgjn2hABGOpP/FpulKp01zIu/AgG
-	ENVE8OEgHs0pcexza2gSGkY1zJzV2iyqswTeiiqJ8XKL1yVdsmIBIFWYLyEqYOWPqPJzIhi
-	Tre2PFAPTXsrW8c0g33qtsnMjdlCxTQcbWps7nfZCdy4bU05lSAE96EcWRLkNu1O4Z27qV+
-	h9nrlUOx7j5H/UqAO0ENqXCkAmY5Rkmwfe7kIlC8UklVOo4ZAc5o6kI8cPsw3yP2N8BQ1fh
-	aBu0P+aQQ0sAvHSKc2povYS6tafFYhOZCJpENmhXfoKDGX96f5QE0Jx3VZ2z0/w7bZde9Wc
-	Lu07ZB4YcFxuQPT4Rqx3Cjt7S1VQoSk0g==
-X-QQ-XMRINFO: Mp0Kj//9VHAxzExpfF+O8yhSrljjwrznVg==
-X-QQ-RECHKSPAM: 0
-X-Rspamd-Queue-Id: F1DC64DD8A0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iKWhJp2N-60FC4JpX2Dw0sK8-vk2WrHkDOnkgC_c8nbHA@mail.gmail.com>
+X-Rspamd-Queue-Id: 5E3CE4DDACB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[radxa.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284931-lists,netdev=lfdr.de];
-	FORGED_MUA_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284932-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,kernel.org,vger.kernel.org,gmail.com,sberdevices.ru,linux.alibaba.com,lists.linux.dev];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,riscstar.com,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[51];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sophon@radxa.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.982];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,radxa.com:mid,radxa.com:email]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On 5/6/2026 11:39 PM, Daniel Thompson wrote:
-> On Wed, May 06, 2026 at 10:35:18PM +0800, Xilin Wu wrote:
->> On 5/6/2026 10:19 PM, Andrew Lunn wrote:
->>> On Wed, May 06, 2026 at 08:59:01PM +0800, Xilin Wu wrote:
->>>> On 5/1/2026 11:54 PM, Alex Elder wrote:
->>>>> +	/* AXI Configuration */
->>>>> +	axi = &td->axi;
->>>>> +	axi->axi_lpi_en = 1;
->>>>> +	axi->axi_wr_osr_lmt = 31;
->>>>> +	axi->axi_rd_osr_lmt = 31;
->>>>> +	/* All sizes (2^2..2^8) are supported */
->>>>> +	axi->axi_blen_regval = DMA_AXI_BLEN_MASK;
->>>>> +	plat->axi = axi;
->>>>> +
->>>>> +	plat->mac_port_sel_speed = speed;
->>>>> +	plat->flags = STMMAC_FLAG_MULTI_MSI_EN | STMMAC_FLAG_TSO_EN;
->>>>
->>>> I got WoL working only after adding STMMAC_FLAG_USE_PHY_WOL here. I guess
->>>> it's required, since the driver clocks down the MAC/PMA/XPCS in its suspend
->>>> hook?
->>>
->>> Nice to see somebody testing WoL.
->>>
->>> In your testing, is it the PHY doing the WoL, or the MAC? I assume
->>> PHY.
->>>
->>> If i remember the DT correctly, the PHY interrupt is connected to a
->>> SoC GPIO, not a GPIO of this chip. So for your board, it is the SoCs
->>> GPIO controllers ability to perform the wake which is
->>> important. However, where the PHY interrupt is connected is a board
->>> design issue. Could the PHY interrupt be connected to the chip? Would
->>> the chip be able to wake the system? Should STMMAC_FLAG_USE_PHY_WOL be
->>> conditional?
->>
->> Yes, the PHY is doing the WoL. And I guess this makes sense as it allows the
->> MAC to power down during suspend to save power.
->>
->> The INTN pin of QCA8081 is connected to the ETH_0_INT_N of QPS615. And the
->> INTN_WOL pin is connected to a SoC GPIO.
+On Wed, May 06, 2026 at 08:38:39AM -0700, Eric Dumazet wrote:
+> On Wed, May 6, 2026 at 8:15 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Tue, May 05, 2026 at 07:14:36AM -0700, Eric Dumazet wrote:
+> > > There is always a discrepancy between skb->len and skb->truesize.
+> > > You will not be able to announce a 1MB window, and accept one milliion
+> > > skb of 1-byte each.
+> >
+> > We can if we copy.
 > 
-> Interesting. That is different to RB3gen2 where INTN is routed to both
-> (although there is a do-not-fit 0ohm resistor option that could change
-> that).
-> 
-> Does that mean you don't get phy interrupts reported in /proc/interrupts
-> before any suspend happens?
-> 
+> You mean, ignore VIRTIO_VSOCK_SEQ_EOM?
 
-No. The phy works in polling mode AFAIK.
+No I mean saving it in a compact form.
+If packet boundaries are the only concern, the overhead
+needn't exceed 50% even for 1 byte messages. asn.1 ber, for
+an over-engineered example?
 
-> 
->> Without this change, I can't get WoL to work. I have a working branch for
->> our board here:
->> https://github.com/strongtz/linux-radxa-qcom/commits/v7.0.2-8280-wip/
-> 
-> I took a quick look at the DT and I noticed you have an SGMII PHY
-> attached to both eMAC0 and eMAC1 on your board. This is something we
-> think should work but were unable to test. Are you able to use both
-> eMACs concurrently? Would be great to see that confirmed!
-> 
-> 
-> Daniel.
-> 
-
-Yes, both eMACs can be used concurrently. And they can reach 2.5Gbps 
-under iperf3 testing.
-
--- 
-Best regards,
-Xilin Wu <sophon@radxa.com>
 
