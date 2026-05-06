@@ -1,247 +1,409 @@
-Return-Path: <netdev+bounces-284862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284860-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6N2lFlhM+2nWYwMAu9opvQ
-	(envelope-from <netdev+bounces-284862-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 16:12:40 +0200
+	id +N9zDmBM+2nWYwMAu9opvQ
+	(envelope-from <netdev+bounces-284860-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 16:12:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A62164DBD78
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 16:12:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8919B4DBD7F
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 16:12:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 19BF9308466D
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 14:03:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D3243304DCBE
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 14:02:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54F5F47798B;
-	Wed,  6 May 2026 14:03:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD60C47798B;
+	Wed,  6 May 2026 14:02:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JYcVgVHP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SwYPWgFe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4667466B73
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 14:03:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D283EC2DB
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 14:02:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778076220; cv=fail; b=IqzWe1HA0nJG4CtA074I/J5nL+S0X6V1eiXnr69cTa/JZFV1ZyrKo6sL45egSRClgkdsuxE6OXujbCtnqrRpycqDaldfSvruTXZI9iHu50GHTzGVfaBVmyUgR5zpSQIQtS7VMEvw9to0IE4gq9PI7ZrFTCI6T4HlT9+CPmhhr6E=
+	t=1778076165; cv=pass; b=eG55kh1ZYWRFTZ9ciW2X6OvU5HNxivdBZsIErW5pL1XhR7IJTtUmw770OO9G2tMPFsgV8/lyBLkSQ7XTglmuhPwEx1F3/PDBdnMcPdgqMzvYUEmOSFWTYsUu8/TVK06c8U5/houEs90n2/vY1Z6On8Oz4c3NHfHlADbTQGqmbHM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778076220; c=relaxed/simple;
-	bh=nKP8hBmuNLwkwKDUV2XDaCYv1zMrUJkgNxuCMX3LtSM=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=usplV9Qhkv3MhJDuHD2L/ET+H3uHh71TWJGTCOoe55meeP5yc5RvlWB6kmKfwAxWo6cCXPPyER4qRWHWTm9W1nUcPPWPFq4eyB3Kg+P7B1uJBVJ5WFFWoFHEa8ZoUtKyt1CmI362noV3WMhfp0+xQtyzn/yQW8CUZwbdYRsfXJU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JYcVgVHP; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778076218; x=1809612218;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=nKP8hBmuNLwkwKDUV2XDaCYv1zMrUJkgNxuCMX3LtSM=;
-  b=JYcVgVHPOSwlF8slMpOPOTJV9PVq6HymRtnMDd2r3wInlMvfkBBLB8ug
-   pSCQ+0r9B/jdvYhTZb4z0W7sP1Iq2MDT3+3onk6KIdi+CA/2yUyNF7mFo
-   1XU81pkbIP1xR6WNCqX0pbzsUMkXgPptlVok+Bt8ZVpq0ZdXBK7zvLGSX
-   Snp3f+HVNPUVnD7KopQ25H5oVjFCGP4WCqAfOsylQmfhLXmG8f9kT7gQY
-   JO6T5J+WNdZ3ToQqInIywOxiikWwv7inINrD6Eo4OWvZTVPrMQMr+R0bK
-   w9Wo2f+VcicZ/CAEFdH+owGrbhcnIaQ0Elo00rXXDcQRCc2K53evt0c2z
-   w==;
-X-CSE-ConnectionGUID: mfvB5mtaQm6UnaeFW8MdGw==
-X-CSE-MsgGUID: ieM4qNDVTUeCOSKsP/CGCA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11777"; a="96576052"
-X-IronPort-AV: E=Sophos;i="6.23,219,1770624000"; 
-   d="scan'208";a="96576052"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2026 07:03:34 -0700
-X-CSE-ConnectionGUID: ftX7kKV/QMGvcaOkCmWPgw==
-X-CSE-MsgGUID: sO7QFEZ+QaCEVl78BYDrEg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,219,1770624000"; 
-   d="scan'208";a="259579124"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2026 07:03:31 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Wed, 6 May 2026 07:03:30 -0700
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Wed, 6 May 2026 07:03:30 -0700
-Received: from PH8PR06CU001.outbound.protection.outlook.com (40.107.209.2) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Wed, 6 May 2026 07:03:30 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kAW6j6FKGkYq6WkXMeqRJcRMeRtOOU7wMuqKSKxGMD2A+ENYYIBXB/Q93Qy0EAPeMLMliWk5rEFeiCEw8XW/9vjfSOFT0OURQ/H8MH1EfbPHIWNviCq9kW71WX1D1YaFxr6u1vV81s6j1Sn7VuJummgw4+Kh/R7rg8GcjhjF27htnWK7zh0och1V5xSKrmCdYr9X4tlSnWDhW+40dMF0K3NV3qFRcupCzGi5ndEOcC0lQxMhm0ZVJasSiRRtRLvPSMDMyvpI3otvMIDuCsxcHibvjZp7TuGD3SCAS9czV8qXtls/EH7w8E1IWsBem+wh6oYF4QoJQgCoJ3rv9zdr7g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qKjqysjpRhusQ9m0SqltFbI06d+le1siYeVKt8QtnHQ=;
- b=VCv/rKiE8N3wURuWllKrmriv77g2j2ZjDXRIIwzRm2tHNKEH+QePLQEoac2d0mTZJsa4RVZ9mQHwhNnQ3tH0vH20Rr4v2s+fswHp5PkCjHdoHiT7G8X0oBLN/IK8k5ifEKuKbhWSQwSmh/cClfWmRQlDpwcJs9lnBYSJJw8Fa8nCDBxAYcJt3EVfZHDdqdCKxIQdFBPuqiDdr1Jd8V33PFzt9nOV2RrtNDFLGOyzS0+o6hBM8LD8rn9CD85Mlgf9clET/ImzdHxJfZCDdjdFnDMp2ygda4uZupgZtT70/PYY+k+MYv3AEKimR5HkDcT761vABkkc5zdLjCvciZI4bw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by MN0PR11MB6036.namprd11.prod.outlook.com (2603:10b6:208:377::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.27; Wed, 6 May
- 2026 14:03:26 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::6aa:411d:4bfa:619c]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::6aa:411d:4bfa:619c%5]) with mapi id 15.20.9891.015; Wed, 6 May 2026
- 14:03:24 +0000
-Message-ID: <487444fc-7de1-4b57-9733-23e728b85f72@intel.com>
-Date: Wed, 6 May 2026 16:02:12 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net: ethernet: cortina: Drop half-assembled SKB
-To: Linus Walleij <linusw@kernel.org>
-CC: Hans Ulli Kroll <ulli.kroll@googlemail.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?=
-	<mirq-linux@rere.qmqm.pl>, Li Xiasong <lixiasong1@huawei.com>,
-	<netdev@vger.kernel.org>, Andreas Haarmann-Thiemann <eitschman@nebelreich.de>
-References: <20260505-gemini-ethernet-fix-v2-1-997c31d06079@kernel.org>
-Content-Language: en-US
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <20260505-gemini-ethernet-fix-v2-1-997c31d06079@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DU7P250CA0017.EURP250.PROD.OUTLOOK.COM
- (2603:10a6:10:54f::20) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	s=arc-20240116; t=1778076165; c=relaxed/simple;
+	bh=fgAwzIJcDQ8eNqIftM+Ys2qYzkhzF8+UPWzFGRtBbTk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bVmtB0ls8wO+/lVyOaWkSuWadrBWq/AnZgvXMRZt9YWVx90FTrad0ry4l2jBTLZ7cAzDOr6UcL4C/q62jVM0ENR9VIbzo5sZPYYSVMwSEoyIqp/wBGNfU0gdj1FRvxxg+VSpuY1AohpeNXfBw+xx2HOT58M+Kwb5y8AElLqOshU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SwYPWgFe; arc=pass smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-36525730172so4033889a91.1
+        for <netdev@vger.kernel.org>; Wed, 06 May 2026 07:02:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778076163; cv=none;
+        d=google.com; s=arc-20240605;
+        b=XrlQazDbTPdrV4WqAEnzZbN70H5OE72u4cM5dHcuivoqJI7PuS7jDOJQoO52K7R942
+         Sp2fa3dG/lVJ66cple103KI+rA0O6ClffzyMVfF8TLu26i3E1Y4PpKS3GFGFZHuLfSNk
+         qVK/LMLnh0uxnomRF3wik8Gzbr8fQVPl/znbIFY17g1HUBK5DQEYGBBR1x4uhs27VKHr
+         jkPjz/mC9lVCozUXWu4nSvcjaZftQDVs5ZiMDOufu6/TEzT8rGqTADI9V0ahTgSbZoFh
+         4s/cCaepzYzv5brdjOTjACByhmGOW0QqN8dqqYbZJC4YiWpQd7l8/gFz6G116121XR0c
+         +10A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=UdovNLCYq0IbWq5PxDP9Dzxis1pH8PCkS+QQzY6zAqE=;
+        fh=jYJDHi4NdICWqQzg5Jurx0EQskNgPT427lGzYVi3h+k=;
+        b=YDKE8IXVgQq0tsbfR+3WviP6RLcn4LTIcu0f5PgkDoAXHV3JTPEcJi8iQ0E67sQqR8
+         VaAOT2H9j9Wj5tfffaVN6oBnkQjEgTok3A3x2vKPMcLIdciqkIVedZG67hV3X69ZC3aD
+         WR+hjFrsDCAroJeh7kLXM+SlfiGoKhYfDBQVX2+2FTOCTGmnQrm2zk4BnKdLs3W/L/JA
+         4gpGS0W0od13wQsnpfkLpIc8bGY7MfDNcW9hZSbKIhA9W+S/D5LMBWGc3S1qgZkdgQho
+         o8ySomZUjUSmTwqB70UXkoyxykDAYw/NTXUlM6SY8rcqZRI4brqj5iQXIfzRePEo4SYI
+         Z4Mg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778076163; x=1778680963; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UdovNLCYq0IbWq5PxDP9Dzxis1pH8PCkS+QQzY6zAqE=;
+        b=SwYPWgFe0htU6QIOL81aMLf4m6nnXCSdz9e42eoWi+cnAXmvdvfaXmlQm/1XDoaEuj
+         EKNlLj0ur7okd91Q0p8wRRbKNR1FzExkBfWnohoBkdPrNR0enufNr+ROJY6dGalTwu1j
+         huUFpZEQcH2A5Zq44g4vn/OGy/FOIBCPE3ieWeZCKU2s+p8UbFGIc9Ujmmb2uTdF/MY6
+         mCOXIQqMrWabeGircrlAJyeMAOv3elEptNHdP8Xq5NItdh5ne/XTJz3VxcHhIXVibfMo
+         EJVfYddaZs+K47QZgMDkYsdTTfMTBb8GGipGXMnbDHbg60wA7Xt+hXM8qa6HsB/pzgMF
+         XTOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778076163; x=1778680963;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=UdovNLCYq0IbWq5PxDP9Dzxis1pH8PCkS+QQzY6zAqE=;
+        b=YxlgSFsrRSEBNoZkFf1SAGw8InVcGgI9maSbYsKDt5BmV+O9G9KnldgSzJGW6aZU/K
+         VBG5J0FqydNwxDEu6XJ1kCU38ewd7H+KKM92jjSVVpT+U3AvheN8e3l7Sv8cVVGsDBht
+         vmDR6uUDPCM9ZpXHWlwrw/LbSFoAbPFMHKelYYm+jZ2Z4roL+QJmdFj7frNBm5UCNsQI
+         DtD04CscfsJXMOSGwWNw2ACC9GpEUn0WYQH7Bwuj3t5CxOuAQEfmogXyUPBZPXBXWHX/
+         oMiP8IiAzFmX9570wh4yY9HZckXq9eUi+Xsw0oIHxpj5rslPpEORzemswXTz5VG7qitV
+         ek0A==
+X-Forwarded-Encrypted: i=1; AFNElJ/Q+tyt+soVJvlrpU4ypPLehRn4bni9R7XINP4ZPsNavRREK9WDgIt4daWT7gl+y1oNgoxl0yQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw59ZDsZgdKt31wWGxhM9/mJ6MRV/hiYI166xjRMGJIa8gpP/vw
+	aGPaunAYqLhpl6G0ksQmVf057gF8H/kUB/7AOvjzOumeRDNaVPSljduknI3BxCCsQ+x6qEGRlsA
+	U/ai0WBR6JO3bXVmcwKQesUpQHLpn1QI=
+X-Gm-Gg: AeBDievGateePtrN3epRa5ySHTDoyUZNuzWX2GpIVsolhNPj267EI4WuhV3vnHBdvm4
+	R948qhgySfucFsNGgX8dn9ZnGJgXrAzg7Zfea4AK8q1NdBjWNabkBpKsAI//PB8qd+87kVsRd0w
+	eA1YeDtxZjBhWAFEn1r+etZ0qNn1jSRwHtzO8KjtMhKaoiWsL8FK1nkZUrrNLx+N/AQU+OCGJfQ
+	i1aPa8naVasAgE4H86/iaJ4jS3Seu0ONIUgWqFyytpSiWEe/B/fXp79+/+ls5rAdBZDhuZ6Al06
+	3UhI2qFzrhcUBJByOxlzy75xvlQ2aQ==
+X-Received: by 2002:a17:90a:d886:b0:35b:8d89:719b with SMTP id
+ 98e67ed59e1d1-365ab3e592amr3779857a91.1.1778076161345; Wed, 06 May 2026
+ 07:02:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|MN0PR11MB6036:EE_
-X-MS-Office365-Filtering-Correlation-Id: fd653da9-951b-4868-07ca-08deab783ccd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|18002099003|56012099003|22082099003;
-X-Microsoft-Antispam-Message-Info: H3j2Cn/OC4HWID6U8anQ4V6enayIsTIV3PancUToTjMCLkuzP93G19VPgg+F//VEjhL+IKQbvaMrUew4Nfild1lJqFWEDyPS/zMgZ7Sa4pG4B+FdElwbaKwZQV7+5+ujdk9P/BlnXNu2DnAZhTd7fqSQhQLqlFuY031urzxSaBR6TMPEErN0DG6/1YCodrYgfLjDNX2s2Uv0PIm0+IG8iZK0eMC+ryQlETDpOBMdJ1Tv0liTii5IulncfiEEHMXP/OEFuwEFzt89y+kRj0kYhmAALlkReqd7BgsLzcuq9HXI0Ki1eoEcYcWQPkgdZlQF7tYn4hKzUu4guvMwa321HkF9kjDz2P431UeEKILVLLxwJr0Mi0GoTvV4W0blsULWvJzaZzgiW/YE7t+knppNw5yHiuU+J3wazpTmALEeDfI55/l+trcl4rLtkU51J9bTv0h4/gX20IBN4pq3Wjv1AaiZwCgksb6k9mEmO2/WWExHIMUNsCfn5YreJJaf6Sxx0KaXF3KM3qPQaI+oXyhKEl7oZOqdnPf3lpVjMs+hzM98gJDDhpLncCnDUNsRwKa+a29WI/FrKtrqz9bLVjkkVo7PfWY+woHJH/V7nfqAZCCbpPVVlxQSOzNIGYEl3f7R4rgvSwGfhFT32DTU26DhZOhrMzCX78inqDWtBEEQoQgMrbT650D+Bu0plHeYj0vMjXdUduG87fSWFvN1zMde+A==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eXFxZ0ZMOXdWNmZHdS9HdlYyaEdXa0NRTTVvdjlKamtQQU91TGhFYjdCZ2wy?=
- =?utf-8?B?M21LNTBSR2haLzY0a0hEUmh0VDhlSTNWaml0OWVnT1FxNzBUSXJXVEg3K0p5?=
- =?utf-8?B?dnlyME1icUN4SENVdGFxU3dSVFkwVWNHN1dMLzNyclN1YjBacjh4VXVqRUI4?=
- =?utf-8?B?Zm5Bc1JKVEp2Z0NBZjBpaC9ZSVk5WHZBSDRweEh0bWo2ZWJKWVlidVQweU5B?=
- =?utf-8?B?clN4dWRGTVhsQVgyN3JFU1BhR1haZTNjYmtiWVRWSnFhWHB2K21HaWpqcXNJ?=
- =?utf-8?B?Slh4RjIxOGhqbjlhUEd6KzljRThlcnErL1ArS2xqR1EvVWNKSDdmQlJYc3pG?=
- =?utf-8?B?SFcwM2NuK0hWMVFtY3QvTlkwLy9meTdvZEFPZFNIRTZvMExoN1g5L0M4NjBE?=
- =?utf-8?B?Q1R2bVF4M3pOZGZZNVhNSXMyVi81ZWxqek9UNEMzd3hPR05Ic0Fta0ZXWG5S?=
- =?utf-8?B?U2k0NHBrU2hMbmZOQ1FIdDNXaThJeWFWMGVGRWp3Ym84Y1VoOW5hL0pvQVpF?=
- =?utf-8?B?MW9UZVYrZFA0OVR4bXNIU1BRZ0VPL1FDSXVZYkgvMFhhdFdMNUV2c1Rac3pE?=
- =?utf-8?B?bWprMzB1S3oycVdrcFRQUGhyZEoveUx3c0tJWFlVcGNzakljd25JOHlWY3VG?=
- =?utf-8?B?ZXZqc2lYTGl2aHE4Y3VuVnZiRjVsMVRwemtJaDNOampocW0yTkprS2xiNDB4?=
- =?utf-8?B?eGkrSGdtdVpGRUIzVjRERExadDBadDNUMGMxT0ZVSEtXN2pDaTRtS2hmVFJP?=
- =?utf-8?B?b2NKcC9CQ2VKZFFTc1FFWXdvRm85S2VRRThSbkd3YTRDaldUZ2dQeHBZam5O?=
- =?utf-8?B?TnFNRjlSVitlY3JLR3Y1ZHR6OC9yaUU5bkQzSzVnZnVndnNYd0lrT2M2ME1a?=
- =?utf-8?B?U0dyMS8yWUs0Q0s3RWhDcDRHM1crSHlWbDFvSExSb1pYRk5BUEpDQU45cVBm?=
- =?utf-8?B?VU9jbGxMclQ5WjdTRkQwRlN1SHo2YWdBSWpyL2Z3UEtpZkczVmJkNU1uZ0kx?=
- =?utf-8?B?UnlMUnFmb25vZ0F0bzhKK2pNMXVEakFPRkE0UldHRExPb3lrWGppY0owRG9q?=
- =?utf-8?B?eFNVeDhxeWxvVEFCSGQvV1pwY1RNckJqdjVXaXhucEl3WjE3TmUybzdBV1h3?=
- =?utf-8?B?M2RwZitKeFVrdkdRZXI3VUxyTklsb3owa2xWOWtRNzRTaHRRSmlPajd1OHZ5?=
- =?utf-8?B?NStkaThHQzhpOGw3OVBPV3pZTDMrOS83QU8zamdUeWVTQ2tjSmI2NHVYWVVO?=
- =?utf-8?B?MVZJa2pxa2xqWUl1T0J1djgwelVKbmZsRFNuZDU4L3lDSlJGM3VTcXRmVDRM?=
- =?utf-8?B?UVcxaFlncEQwVk1mNWZPMDNZalVVMUR3akgySGU3bnh4UWZCMTB3aStENEsz?=
- =?utf-8?B?TkNaenZ4bWFoNUg3bzhFNjRpU3JONjM5Q1Q4QW5neEIzcFBGa25nR09mRnJq?=
- =?utf-8?B?STNMaEZXRXJrTVc3a3Z1T1FnWnVpaFhlcnMvZUE0MEhLbE93MzJKNURjVkkr?=
- =?utf-8?B?WWtxYXVvSU5iRmZVd0MrbzBmOGE2a3ZZU0lBeU1XeUtybitSSVp2OWZHM04x?=
- =?utf-8?B?YmtwRUhBOTkzdWNjRlR6MFowQTlKVWJyMWQwOWR1UU9FT2dzNXRCNjJ3Qmx5?=
- =?utf-8?B?Z0p4cFpkQkdJNGNQRHdyc0ZxSkZBNEdVb0hJRzg4YVdLZkIwTiszQmhNRHV4?=
- =?utf-8?B?b1l6b0pibUMzS3RFN0M4SGRnMm4xUW04ZThVenhFSTh2dzFpRDFGRmRiTzE0?=
- =?utf-8?B?UDd3eW9qVnFDSC9STzdoVnNjRzlRQ1VBZFhEL0VwNEE3ZXNBU3VERU9za1g1?=
- =?utf-8?B?YWpJdERGLytxQUxEQkJ4SDNiSXVLK2kzMDYvKzBxMVZRM0ttYVpqM3lIL2Rz?=
- =?utf-8?B?eUtqV1ZxTHROS09qUDdnejR4SVBMVzBtYy9Nc1ZaTHdVSlJmZmkxYm1SOUFJ?=
- =?utf-8?B?YXJkQThOcHVFK3doS05QM3RvTHRoeGtwYzFIVTcxczlYM2ROWFRsU2ZXZ0Zo?=
- =?utf-8?B?SnFZWFQ4MWpJc2FvMUlyY2tBM0kwK2ViTXV3STQ1NWttemJva0E2bUZRL3Nr?=
- =?utf-8?B?ZzdkVlJZNjl6Q3pEeEdpK0lvQzZyV2ZrZjROMjlmdWRGTkJEZUlYN0dyTVFR?=
- =?utf-8?B?SEl6M3VRVXdHQW5ySktZT0VLelkvTkRCRmJ3aVV0YnZzY3Nsb1VpMU9QeGlv?=
- =?utf-8?B?TnYrTkM2V0cxOEJSOWd1cC9kUVZwQ3VUTkJ0NnhWWTdLaG90YzQ1bnFYbU5N?=
- =?utf-8?B?V0RIdWUxNzhhMGhhZGlVdEJaakRYTEVQR2xUOG1kSU5nLzBlaDlERlhjc2Ex?=
- =?utf-8?B?d0RVOTFvaE9KZWcxeWU1ejRrQzlUOG0ydHA1YWFKYUhZZk9oTWlvNjE5Zkha?=
- =?utf-8?Q?v7r40ZLyXiM/Hrak=3D?=
-X-Exchange-RoutingPolicyChecked: fIvxR1u6IHDA3wL33n7xPSgW5fcM7mpT7TtZ34hGlPa+o63c1ZWrdgr1ozPBnH8ngDa2jOkZjn+/256SKSh4qKtN26JSmNEt6E8m1ehdo0qv/rT6AqteDww+uKCgoHm372OzPWJMUu6mC5QAg7rqBe4t63587jRMDLC71RVcO+0frAfCqi4/gr8WjlGlbhvtc0vDo05mHS9G+snM7CXqSUFkn3CuK0ouRKuvCPqU9n1BmARKMLWm1zWfmnGmO6w4HjxH/APiMDnU0Fq5of0ttT26taJD2F5NbDi3b2toY0/Dbp1Pi2EScQdnmeVnf4+rlmc5q7o8/J3gjo/XwbNfwA==
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd653da9-951b-4868-07ca-08deab783ccd
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2026 14:03:23.9999
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KxPPMEKGT6ZXatLj9EhJpqUM/MAkS7LOJFWyYQpvCAzCGYPDX5ez2q3e8xc/0lto/fmB+jXe2VYapBfzD4DeLRVArTUoxlCAMP8SxV9zxGo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6036
-X-OriginatorOrg: intel.com
-X-Rspamd-Queue-Id: A62164DBD78
+References: <20260428025505.768-1-nashuiliang@gmail.com> <CANn89i+H=gPo22v0ApLges0ScjMOgAcVsDQLwkr2iAEu+M7B7w@mail.gmail.com>
+In-Reply-To: <CANn89i+H=gPo22v0ApLges0ScjMOgAcVsDQLwkr2iAEu+M7B7w@mail.gmail.com>
+From: chuang <nashuiliang@gmail.com>
+Date: Wed, 6 May 2026 22:02:30 +0800
+X-Gm-Features: AVHnY4KdFSvevuoRYT8lkecAzuDQZ98GwOODC3CPttbJ3x58n9wJ11HQfYS9GCA
+Message-ID: <CACueBy7PGP6YG8cM8ZJP8bU9TMa0OZPXg8sVSdZVuzyMKNo-xw@mail.gmail.com>
+Subject: Re: [PATCH net-next v3] net: reduce RFS/ARFS flow updates by checking
+ LLC affinity
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Samiullah Khawaja <skhawaja@google.com>, Hangbin Liu <liuhangbin@gmail.com>, 
+	Krishna Kumar <krikku@gmail.com>, Neal Cardwell <ncardwell@google.com>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 8919B4DBD7F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284862-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-284860-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[googlemail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,rere.qmqm.pl,huawei.com,vger.kernel.org,nebelreich.de];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,fomichev.me,google.com,gmail.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksander.lobakin@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nashuiliang@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[]
 
-From: Linus Walleij <linusw@kernel.org>
-Date: Tue, 05 May 2026 23:52:17 +0200
+On Tue, Apr 28, 2026 at 1:09=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Mon, Apr 27, 2026 at 7:56=E2=80=AFPM Chuang Wang <nashuiliang@gmail.co=
+m> wrote:
+> >
+> > The current implementation of rps_record_sock_flow() updates the flow
+> > table every time a socket is processed on a different CPU. In high-load
+> > scenarios, especially with Accelerated RFS (ARFS), this triggers
+> > frequent flow steering updates via ndo_rx_flow_steer.
+> >
+> > For drivers like mlx5 that implement hardware flow steering, these
+> > constant updates lead to significant contention on internal driver lock=
+s
+> > (e.g., arfs_lock). This contention often becomes a performance
+> > bottleneck that outweighs the steering benefits.
+> >
+> > This patch introduces a cache-aware update strategy: the flow record is
+> > only updated if the flow migrates across Last Level Cache (LLC)
+> > boundaries. This minimizes expensive hardware reconfigurations while
+> > preserving cache locality for the application. A new sysctl,
+> > net.core.rps_feat_llc_affinity, is added to toggle this feature.
+> >
+> > Performance Test Results:
+> > The patch was tested in a K8s environment (AMD CPU 128*2, 16-core Pod
+> > with CPU pinning, mlx5 NIC) using brpc[1] echo_server and rpc_press.
+> >
+> > rpc_press Commands:
+> >
+> >   for i in {1..8}; do
+> >     ./rpc_press -proto=3D./echo.proto -method=3Dexample.EchoService.Ech=
+o
+> >     -server=3D<IP>:8000 -input=3D'{"message":"hello"}'
+> >     -qps=3D0 -thread_num=3D512 -connection_type=3Dpooled &
+> >   done
+> >
+> > Monitor mlx5e_rx_flow_steer frequency:
+> >
+> >   /usr/share/bcc/tools/funccount -i 1 mlx5e_rx_flow_steer
+> >
+> > Frequency of mlx5e_rx_flow_steer (via funccount[2]):
+> >
+> >   Before: ~335,000 counts/sec
+> >   After:   ~23,000 counts/sec (reduced by ~93%)
+> >
+> > System Metrics (after enabling rps_feat_llc_affinity):
+> >
+> >   CPU Utilization: 38% -> 32%
+> >   CPU PSI (Pressure Stall Information): 20% -> 10%
+> >
+> > These results demonstrate that filtering updates by LLC affinity
+> > significantly reduces driver lock contention and improves overall
+> > CPU efficiency under heavy network load.
+> >
+> > [1] https://github.com/apache/brpc/
+> > [2] https://github.com/iovisor/bcc/blob/master/tools/funccount.py
+> >
+> > Signed-off-by: Chuang Wang <nashuiliang@gmail.com>
+> > ---
+> > v2 -> v3: patch net -> net-next
+> > v1 -> v2: add rps_feat_llc_affinity; add brpc tests
+> >
+> >  include/net/rps.h          | 18 ++--------
+> >  net/core/dev.c             | 72 ++++++++++++++++++++++++++++++++++++++
+> >  net/core/sysctl_net_core.c | 34 ++++++++++++++++++
+> >  3 files changed, 108 insertions(+), 16 deletions(-)
+> >
+> > diff --git a/include/net/rps.h b/include/net/rps.h
+> > index e33c6a2fa8bb..37bbb7009c36 100644
+> > --- a/include/net/rps.h
+> > +++ b/include/net/rps.h
+> > @@ -12,6 +12,7 @@
+> >
+> >  extern struct static_key_false rps_needed;
+> >  extern struct static_key_false rfs_needed;
+> > +extern struct static_key_false rps_feat_llc_affinity;
+> >
+> >  /*
+> >   * This structure holds an RPS map which can be of variable length.  T=
+he
+> > @@ -55,22 +56,7 @@ struct rps_sock_flow_table {
+> >
+> >  #define RPS_NO_CPU 0xffff
+> >
+> > -static inline void rps_record_sock_flow(rps_tag_ptr tag_ptr, u32 hash)
+> > -{
+> > -       unsigned int index =3D hash & rps_tag_to_mask(tag_ptr);
+> > -       u32 val =3D hash & ~net_hotdata.rps_cpu_mask;
+> > -       struct rps_sock_flow_table *table;
+> > -
+> > -       /* We only give a hint, preemption can change CPU under us */
+> > -       val |=3D raw_smp_processor_id();
+> > -
+> > -       table =3D rps_tag_to_table(tag_ptr);
+> > -       /* The following WRITE_ONCE() is paired with the READ_ONCE()
+> > -        * here, and another one in get_rps_cpu().
+> > -        */
+> > -       if (READ_ONCE(table[index].ent) !=3D val)
+> > -               WRITE_ONCE(table[index].ent, val);
+> > -}
+> > +void rps_record_sock_flow(rps_tag_ptr tag_ptr, u32 hash);
+> >
+> >  static inline void _sock_rps_record_flow_hash(__u32 hash)
+> >  {
+> > diff --git a/net/core/dev.c b/net/core/dev.c
+> > index 203dc36aaed5..630a7f21d8de 100644
+> > --- a/net/core/dev.c
+> > +++ b/net/core/dev.c
+> > @@ -4964,6 +4964,8 @@ struct static_key_false rps_needed __read_mostly;
+> >  EXPORT_SYMBOL(rps_needed);
+> >  struct static_key_false rfs_needed __read_mostly;
+> >  EXPORT_SYMBOL(rfs_needed);
+> > +struct static_key_false rps_feat_llc_affinity __read_mostly;
+> > +EXPORT_SYMBOL(rps_feat_llc_affinity);
+> >
+> >  static u32 rfs_slot(u32 hash, rps_tag_ptr tag_ptr)
+> >  {
+> > @@ -5175,6 +5177,76 @@ static int get_rps_cpu(struct net_device *dev, s=
+truct sk_buff *skb,
+> >         return cpu;
+> >  }
+> >
+> > +/**
+> > + * rps_record_cond - Determine if RPS flow table should be updated
+> > + * @old_val: Previous flow record value
+> > + * @new_val: Target flow record value
+> > + *
+> > + * Returns true if the record needs an update.
+> > + */
+> > +static inline bool rps_record_cond(u32 old_val, u32 new_val)
+> > +{
+> > +       u32 old_cpu =3D old_val & ~net_hotdata.rps_cpu_mask;
+> > +       u32 new_cpu =3D new_val & ~net_hotdata.rps_cpu_mask;
+> > +
+> > +       if (old_val =3D=3D new_val)
+> > +               return false;
+> > +
+> > +       /*
+> > +        * RPS LLC Affinity Feature:
+> > +        * Reduce RFS/ARFS flow updates by checking LLC affinity.
+> > +        *
+> > +        * Frequent flow table updates can trigger constant hardware st=
+eering
+> > +        * reconfigurations (e.g., ndo_rx_flow_steer), leading to signi=
+ficant
+> > +        * contention on driver internal locks (like mlx5's arfs_lock).
+> > +        *
+> > +        * This strategy only updates the flow record if it migrates ac=
+ross LLC
+> > +        * boundaries. This minimizes expensive hardware updates while =
+preserving
+> > +        * cache locality for the application.
+> > +        */
+> > +       if (static_branch_unlikely(&rps_feat_llc_affinity)) {
+> > +               /* Force update if the recorded CPU is invalid or has g=
+one offline */
+> > +               if (old_cpu >=3D nr_cpu_ids || !cpu_active(old_cpu))
+> > +                       return true;
+> > +
+> > +               /*
+> > +                * Force an update if the current task is no longer per=
+mitted
+> > +                * to run on the old_cpu.
+> > +                */
+> > +               if (!cpumask_test_cpu(old_cpu, current->cpus_ptr))
+> > +                       return true;
+> > +
+> > +               /*
+> > +                * If CPUs do not share a cache, allow the update to pr=
+event
+> > +                * expensive remote memory accesses and cache misses.
+> > +                */
+> > +               if (!cpus_share_cache(old_cpu, new_cpu))
+> > +                       return true;
+> > +
+> > +               return false;
+> > +       }
+> > +
+> > +       return true;
+> > +}
+> > +
+> > +void rps_record_sock_flow(rps_tag_ptr tag_ptr, u32 hash)
+> > +{
+> > +       unsigned int index =3D hash & rps_tag_to_mask(tag_ptr);
+> > +       u32 val =3D hash & ~net_hotdata.rps_cpu_mask;
+> > +       struct rps_sock_flow_table *table;
+> > +
+> > +       /* We only give a hint, preemption can change CPU under us */
+> > +       val |=3D raw_smp_processor_id();
+> > +
+> > +       table =3D rps_tag_to_table(tag_ptr);
+> > +       /* The following WRITE_ONCE() is paired with the READ_ONCE()
+> > +        * here, and another one in get_rps_cpu().
+> > +        */
+> > +       if (rps_record_cond(READ_ONCE(table[index].ent), val))
+> > +               WRITE_ONCE(table[index].ent, val);
+> > +}
+> > +EXPORT_SYMBOL(rps_record_sock_flow);
+>
+> We do not want to put rps_record_sock_flow out of line.
+> rps_llc_check() is probably fine, it should not be called often.
+>
 
-> From: Andreas Haarmann-Thiemann <eitschman@nebelreich.de>
-> 
-> In gmac_rx() (drivers/net/ethernet/cortina/gemini.c), when
-> gmac_get_queue_page() returns NULL for the second page of a multi-page
-> fragment, the driver logs an error and continues — but does not free the
-> partially assembled skb that was being assembled via napi_build_skb() /
-> napi_get_frags().
-> 
-> Free the in-progress partially assembled skb via napi_free_frags()
-> and increase the number of dropped frames appropriately
-> and assign the skb pointer NULL to make sure it is not lingering
-> around, matching the pattern already used elsewhere in the driver.
-> 
-> Fixes: 4d5ae32f5e1e ("net: ethernet: Add a driver for Gemini gigabit ethernet")
-> Signed-off-by: Andreas Haarmann-Thiemann <eitschman@nebelreich.de>
-> Signed-off-by: Linus Walleij <linusw@kernel.org>
+The same issue reported in:
+https://lore.kernel.org/netdev/CACueBy4KyU8DjwtLM6pzjQNTbiy2M+ZhZdO7Ag=3Dss=
+qWq00CJ7w@mail.gmail.com/
+The reason is that 'tun' uses sock_rps_record_flow_hash() in
+tun_flow_update(), which triggers the following compilation error due
+to symbol visibility when CONFIG_TUN is built as a module:
 
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+ERROR: modpost: "rps_llc_check" [drivers/net/tun.ko] undefined!
+make[2]: *** [scripts/Makefile.modpost:147: Module.symvers] Error 1
 
-> ---
-> Changes in v2:
-> - Fix up the commit message so it is clear what the patch is doing.
-> - Also increase the number of dropped frames as noted by Li Xiasong.
-> - Link to v1: https://lore.kernel.org/r/20260330-gemini-ethernet-fix-v1-1-18783a45d13a@kernel.org
-> ---
->  drivers/net/ethernet/cortina/gemini.c | 5 +++++
->  1 file changed, 5 insertions(+)
+To resolve this, it seems more appropriate to export
+sock_rps_record_flow_hash in net/core/dev.c:
 
-Thanks,
-Olek
++void sock_rps_record_flow_hash(__u32 hash)
++{
++#ifdef CONFIG_RPS
++       if (!rfs_is_needed())
++               return;
++
++       _sock_rps_record_flow_hash(hash);
++#endif
++}
++EXPORT_SYMBOL(sock_rps_record_flow_hash);
++
+
+> diff --git a/include/net/rps.h b/include/net/rps.h
+> index e33c6a2fa8bbca3555ecccbbf9132d01cc433c36..7e98918d8751eb824b7057cca=
+9e5d40c28e5f18a
+> 100644
+> --- a/include/net/rps.h
+> +++ b/include/net/rps.h
+> @@ -55,10 +55,12 @@ struct rps_sock_flow_table {
+>
+>  #define RPS_NO_CPU 0xffff
+>
+> +bool rps_llc_check(u32 old_val, u32 new_val);
+> +
+>  static inline void rps_record_sock_flow(rps_tag_ptr tag_ptr, u32 hash)
+>  {
+>         unsigned int index =3D hash & rps_tag_to_mask(tag_ptr);
+> -       u32 val =3D hash & ~net_hotdata.rps_cpu_mask;
+> +       u32 old_val, val =3D hash & ~net_hotdata.rps_cpu_mask;
+>         struct rps_sock_flow_table *table;
+>
+>         /* We only give a hint, preemption can change CPU under us */
+> @@ -68,7 +70,8 @@ static inline void rps_record_sock_flow(rps_tag_ptr
+> tag_ptr, u32 hash)
+>         /* The following WRITE_ONCE() is paired with the READ_ONCE()
+>          * here, and another one in get_rps_cpu().
+>          */
+> -       if (READ_ONCE(table[index].ent) !=3D val)
+> +       old_val =3D READ_ONCE(table[index].ent);
+> +       if (old_val !=3D val && rps_llc_check(old_val, val))
+>                 WRITE_ONCE(table[index].ent, val);
+>  }
 
