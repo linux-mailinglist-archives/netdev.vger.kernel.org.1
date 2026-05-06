@@ -1,235 +1,277 @@
-Return-Path: <netdev+bounces-284703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284704-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ffu7H3LR+mk2TAMAu9opvQ
-	(envelope-from <netdev+bounces-284703-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 07:28:18 +0200
+	id eLQGMXTU+mmzTAMAu9opvQ
+	(envelope-from <netdev+bounces-284704-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 07:41:08 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C281E4D64AA
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 07:28:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E63E4D64FA
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 07:41:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F066E3012E89
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 05:28:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1DEB6301A70D
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 05:41:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA43E2FE074;
-	Wed,  6 May 2026 05:28:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9BB72E9757;
+	Wed,  6 May 2026 05:41:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AZaCWRu1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FXX/hnXV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-dl1-f65.google.com (mail-dl1-f65.google.com [74.125.82.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8135C2D1907
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 05:28:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F531A6820
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 05:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778045294; cv=none; b=b4hTl8MyQ0wCPOCk0AJT/K8tzSzYqCQ6yQUP45CBNCospdrXFYoLi4utLFSiyFVvp1Oj8rRacYOHHKPSHLMMlzIySZSP+S2fp8S6rLcmuihVhbHnqRDNH8qeS8+AMcj9m5QryrbK4EetwJW0Bkts0QZghF8OVqh2oAg2dg7j6h0=
+	t=1778046065; cv=none; b=Q9Hz2vz/5ja7wFlw7a8tcPWFj3VcWVCLSKWY7LKtIlI+1NX02oWnxHiDau2T1POybjSuGXq/wTBuCtZds3BGigrpHH05U5QJN8q0jSHbY9Ylej+A4Ga5q1cS0mUywl9hDIRTQ8JLvHvpnq9gQHALBMPaes/pqa0l90BqKangNtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778045294; c=relaxed/simple;
-	bh=R4/Nb55H82dxLsUwa93a1bVV1PnW+s3jp/QrCouACwk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MpxXKcwwS9B69vQNKaNLHvW7W4Je/JCILrMbXuze01WENwQDWkgVkKhYnopotHTMmT8jGrC2c8Ji1NgKdpYTa3wDct1gbccVAdYsJMG+jS0ee2ZhlZdG04ijl0P65uoj+5VdlvGJPPEws1wnZ99v8ysE+PNR0EAhjmP3hX0lfq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AZaCWRu1; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-35fbaada2f3so11108144a91.0
-        for <netdev@vger.kernel.org>; Tue, 05 May 2026 22:28:13 -0700 (PDT)
+	s=arc-20240116; t=1778046065; c=relaxed/simple;
+	bh=HgTqDrjaFmojVMegDqrAcL9i2ahUILl1SyB5IOPWn3g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eZe8JwKr21xTZNZODZFIw0NFMwQ0LznoxMod9w1yCG37mjIhxk6yzfc7ZmMFhlMJO2VtXY1hkJmYfcR1Wkd0J0taA3/xK/toYmz7UyNiRys2NswC3/4YtnFvH+c9/TRAvDFrcDI+gRUxPgzI2JhKrqTCvpWJs+9ZIY9rm9NVG9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FXX/hnXV; arc=none smtp.client-ip=74.125.82.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f65.google.com with SMTP id a92af1059eb24-1309f4ee973so2610480c88.1
+        for <netdev@vger.kernel.org>; Tue, 05 May 2026 22:41:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778045293; x=1778650093; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=f0m47zHgEiDR9fbW1scQRVClIJzCPKz1PBLPZ9osVCg=;
-        b=AZaCWRu1S5Vb4XoDL5qmOWQOZNh2f2LCD9wcjfiKmQ537qcAoLt3r6TDGwk/tT1bqu
-         mVQGlR1rUKsfK/ak8Su24ZjcnOFx/QqpxxNy80Lgyn6iPJr+JCxYFKIK5y+/Lac8bmKg
-         aJW+7PqhHQZEl5Gs9cS1mWcL+pw4Waz3Ma/PZv6YMLGSuHYvdIL+1+OM4spw9DdgGOJD
-         IFYdV64X023IFJVV9mPJy56TbYYKptcrbrS+/NR498XFeTlSWyO9Tkts/wEJZWgYX9DY
-         vRcKB1kOQAOdzR6eGgTmaV+P51zLFfe/yUI1FI+Na4s3l7I0hvvXyKDPJpPL/WJ6oD2/
-         iXAg==
+        d=gmail.com; s=20251104; t=1778046063; x=1778650863; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8tkEpCpVXVNaZh3Ord5fVcdYhnryscR7qFZjdq29w8Y=;
+        b=FXX/hnXVqYqSzOzEuE6UyeeTZSpkTV0sPKMv5p8lyGWzvVN+Qbpmnu6lPkJBUu+lug
+         As9Hc1nV/TyaU9kfqAoENaTAopJrXtnhuZ/DhsS5q3y119NfScZhUaS0g+oo+B3wC5ub
+         stHBVPv6H7H0qi5WmhMfpLcsbOdDTn+0FFFxJOZfjzVuoEsrqRGOKiz4pygO+jCrGW43
+         Fk5VkTsJq59r4Y/8MkEzTsnYyjkk2kacxrqs4MFNgxGHLD1b7zcO6w1DTL5f0SRYwC5L
+         xLlGf8IdBR7DuMt+g/WJuPrao1qE0r9+eeS3cZpngnlbq78YUmYthsRh7RvX3/GVcxEe
+         l+mQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778045293; x=1778650093;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f0m47zHgEiDR9fbW1scQRVClIJzCPKz1PBLPZ9osVCg=;
-        b=ZVsXXFANa+IZt0vU04pxoHqZfuStAtLRPyS+nm9uTiWBO/L/5tw1mmO/0Qb5wrPC8Y
-         8qC8pytwxL3pf1xaFQdJbS3h8EgMD7Tfi6ofOxSeSnhxUCAef5uJiExGbdCa594agT9n
-         hgd/m+bGltNyKUgapoKMfITqyIG28HmPJTYj5LOUwIp+P0cojc70XGNGy/9augKp397J
-         BnmKipbPWf8Da4v3u3E+0g2Q2zybUo9ZMHzKKBXaQnyaIBcZ9OuerUwWVsXShG+8KDEi
-         1PZORzlvjdRiaVblg+nizCyss6+ezGJXRpRoMz8ADdyEHAwcKoyk7/naae9WMuDd8/HZ
-         tqtQ==
-X-Forwarded-Encrypted: i=1; AFNElJ81AwVliFMK/VE90vSt5q0UQGWubbFmi/0ksIVEtiuUC22CGIZeYP5JHzcFPprqfvsVKMWbEzc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyH79cALQGxu/tOe8lMbKFC8yT+/5lvgOBasaSahdomwYliuvym
-	e3Rpw9XpD0uDSXqlx1yqh1LR5F5SjCWsbsAuAjEi9YfyKwVqjDlRwuCdKVddAj0CM0U2TlckLkh
-	ZT+VuPA==
-X-Received: from pjbcx22.prod.google.com ([2002:a17:90a:fd96:b0:364:df06:9c9e])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2e49:b0:361:423d:203d
- with SMTP id 98e67ed59e1d1-365ab9d9fb6mr1697790a91.8.1778045292634; Tue, 05
- May 2026 22:28:12 -0700 (PDT)
-Date: Wed,  6 May 2026 05:26:56 +0000
-In-Reply-To: <20260504133626.4155933-1-cratiu@nvidia.com>
+        d=1e100.net; s=20251104; t=1778046063; x=1778650863;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8tkEpCpVXVNaZh3Ord5fVcdYhnryscR7qFZjdq29w8Y=;
+        b=r/3cuYa24UGKijGprkMxiGm9yE1YoZXRoEgKRJGzhLLBbJ7zJc2cst+CGLQWqjeQKC
+         fAxWtmoRSW2iqHkt0/FSjhotA4ugIFS3mzHBA48RKZAU63zvas1wHHucqoGfNfwrREYe
+         uu1L44UEq4gtrLVpAAFBidsqej7hevUs1hY/9+KG+PTYb275kNhfaR3ltIFY3OQcMulW
+         S2VaFHynSO06QqRzIq/8lijEl3TwCzLqNQyY9Meq+brPEr+ZXBXKJX2tABdKqX5qC5Wa
+         TGJlArFcV2ssdP5TvpVSOrMfApdBBATO3Nwco+tA59v7CxHDfJu2t5eNciSLTjXPSWMA
+         /E4A==
+X-Gm-Message-State: AOJu0YyY4iN2GFrv/3rIrxDegXWzD1HyvtLF3A0T3YJMZzjVzUN6F/Eg
+	Vir6H/6m3+E3bjZs7s9E8qQRxUSaLAubX/v9OR8GXJ2mEPmdBJAY/pdUclft2cZM
+X-Gm-Gg: AeBDiesrr9G4HSug7c90JBCiJpuitnTs1OwpCLFVIJM6pxRZs5xOa+bNk9QRMjeorU0
+	YAfYbATRNq8FYCntK1d0AZuTZf3Wqb0PjRU0/G3Gla8gMaaX3eOasRYNZ2hSZLU6TOu8x6iqb3m
+	S3jmwX0Ox04XoavmSZPzugmTG7tX4sNCiD3G3ZjZvdpmOKnwdem6EJtfXwlOuRd0e/Mb4SCnaho
+	iNtq5f3uJ0mmuYdOrwsWpkfyIur4Z95wkI6ho5h5DQdMt0vHX3vS4sxlpE1NRgltR4bdLtbG1WD
+	CPGMlL+OjNCJ1ziOiJK44VRZyYBIjkJae0gDh+7LIP7VBwLbOOboO8Dq0jBV9/eHa6U7d0Rvgdj
+	3x9bSEZIo1fAsO5DZsb3ymW9rAf/JsX21m8kCiMOQr27TQezKPVDS3tCJocHK5qqpCfEgwILiex
+	GIcxkzlwq+441Xs4zSQrWdtUc2s0yvu5yhg3qTUuZWadmSrobAI5IVF8dws5HTwm0J21PholhmN
+	xkNdO5k0BKTW3nasOUOa4lXx5HrbYJAf99+fH1Ttxox7mOZ8mT+yIhHSjZV8IEr2mNQDuzJwHuq
+	j6ezERP6fadLYZ+ERoU8jrDlHlDb
+X-Received: by 2002:a05:7022:fa9:b0:12f:1f67:e744 with SMTP id a92af1059eb24-1318eb518a7mr1026037c88.44.1778046063087;
+        Tue, 05 May 2026 22:41:03 -0700 (PDT)
+Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-131f9789e3dsm2134047c88.8.2026.05.05.22.41.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 May 2026 22:41:02 -0700 (PDT)
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	Chris Snook <chris.snook@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ingo Molnar <mingo@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>
+Subject: [PATCH net-next] net: ethernet: atheros: atl2: remove kernel backward-compatibility code
+Date: Tue,  5 May 2026 22:40:27 -0700
+Message-ID: <20260506054035.23710-1-enelsonmoore@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260504133626.4155933-1-cratiu@nvidia.com>
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260506052809.1613281-1-kuniyu@google.com>
-Subject: Re: [PATCH net-next] ipv4: Flush the FIB once per dev nexthop removal
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: cratiu@nvidia.com
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	Kuniyuki Iwashima <kuniyu@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: C281E4D64AA
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 2E63E4D64FA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284703-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-284704-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-From: Cosmin Ratiu <cratiu@nvidia.com>
-Date: Mon, 4 May 2026 16:36:26 +0300
-> When a device is going down, all nexthops on it are removed, and for
-> each nexthop being removed the FIB table is flushed, which does a full
-> trie traversal looking for entries marked RTNH_F_DEAD and removing them.
-> The performance of this is O(N x R), with N being number of dev nexthops
-> and R being number of IPv4 routes.
-> 
-> The RTNL is held the entire time.
-> 
-> When there are many nexthops to be removed and many routing entries,
-> this can result in the RTNL being held for multiple minutes, which
-> causes unhappiness in other processes trying to acquire the RTNL (e.g.
-> systemd-networkd for DHCP renewals).
-> 
-> In a complicated deployment with multiple vxlan devices, each having
-> 16K nexthops and a total of 128K ipv4 routes, this is exactly what
-> happens:
-> 
-> nexthop_flush_dev()                # loops over 16K nexthops
->   -> remove_nexthop()
->     -> __remove_nexthop()
->       -> __remove_nexthop_fib()    # marks fi->fib_flags |= RTNH_F_DEAD
->         -> fib_flush()             # for EACH nexthop!
-> 	  -> fib_table_flush()     # walks the ENTIRE FIB, 128K entries
-> 
-> Change that so that a nexthop_flush_dev() does a single fib_flush()
-> after all nexthops are removed. This is done with:
-> - __remove_nexthop_fib() no longer flushes the FIB, instead returns
->   whether a flush is needed and is marked with __must_check.
-> - __remove_nexthop() and remove_nexthop() propagate this return value up
->   with __must_check.
-> - A new wrapper is defined, remove_one_nexthop() which calls
->   remove_nexthop() and flushes if necessary.
-> - The two direct callers of __remove_nexthop() get a WARN_ON, since the
->   nh about to be removed should not have any FIB entries referencing it
->   when replacing or inserting a new one.
-> - Callers which need to remove a single nexthop were migrated to
->   remove_one_nexthop().
-> - Callers which need to remove multiple nexthops keep track in a local
->   bool whether a flush is needed and call flush once at the end.
-> - This is plumbed through group removal as well, so when removing a leaf
->   nh causes a parent group to lose its last member, the group's flush is
->   also deferred, accumulated via remove_nexthop_from_groups() ->
->   remove_nh_grp_entry() -> remove_nexthop(). remove_nh_grp_entry() gets
->   a __must_check as well.
-> 
-> This dramatically improves performance from O(N x R) to O(N + R).
-> 
-> Releasing a nexthop reference in remove_nexthop() now no longer frees
-> it. Instead, it is deleted when the last fib_info pointing to it gets
-> freed via free_fib_info_rcu(). All routing code is already careful not
-> to take into consideration routes marked with RTNH_F_DEAD.
-> 
-> Tested with:
-> DEV=eth2
-> ip link set up dev $DEV
-> ip link add testnh0 link $DEV type macvlan mode bridge
-> ip addr add 198.51.100.1/24 dev testnh0
-> ip link set testnh0 up
-> 
-> seq 1 65536 | \
-> sed 's/.*/nexthop add id & via 198.51.100.2 dev testnh0/' | \
-> ip -batch -
-> 
-> i=1
-> for a in $(seq 0 255); do
->   for b in $(seq 0 255); do
->     echo "route add 10.${a}.${b}.0/32 nhid $i"
->     i=$((i + 1))
->   done
-> done | ip -batch -
-> 
-> time ip link set testnh0 down
-> ip link del testnh0
-> 
-> Without this patch:
-> real	0m32.601s
-> user	0m0.000s
-> sys	0m32.511s
-> 
-> With this patch:
-> real	0m0.209s
-> user	0m0.000s
-> sys	0m0.153s
-> 
-> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+The atl2 driver contains code for compatibility with old kernels that
+do not support module_param_array. Backward compatibility is
+irrelevant because this driver is in-tree. Remove this unreachable
+code to simplify the driver's handling of module parameters.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+---
+ drivers/net/ethernet/atheros/atlx/atl2.c | 37 ++----------------------
+ 1 file changed, 3 insertions(+), 34 deletions(-)
 
-Looks good, 3 nits below.
+diff --git a/drivers/net/ethernet/atheros/atlx/atl2.c b/drivers/net/ethernet/atheros/atlx/atl2.c
+index 280e2f5f4aa5..5560d5cc3169 100644
+--- a/drivers/net/ethernet/atheros/atlx/atl2.c
++++ b/drivers/net/ethernet/atheros/atlx/atl2.c
+@@ -2756,10 +2756,8 @@ static void atl2_force_ps(struct atl2_hw *hw)
+ /* All parameters are treated the same, as an integer array of values.
+  * This macro just reduces the need to repeat the same declaration code
+  * over and over (plus this helps to avoid typo bugs).
+- */
+-#define ATL2_PARAM_INIT {[0 ... ATL2_MAX_NIC] = OPTION_UNSET}
+-#ifndef module_param_array
+-/* Module Parameters are always initialized to -1, so that the driver
++ *
++ * Module parameters are always initialized to -1, so that the driver
+  * can tell the difference between no user specified value or the
+  * user asking for the default value.
+  * The true default values are loaded in when atl2_check_options is called.
+@@ -2770,16 +2768,10 @@ static void atl2_force_ps(struct atl2_hw *hw)
+  */
+ 
+ #define ATL2_PARAM(X, desc) \
+-    static const int X[ATL2_MAX_NIC + 1] = ATL2_PARAM_INIT; \
+-    MODULE_PARM(X, "1-" __MODULE_STRING(ATL2_MAX_NIC) "i"); \
+-    MODULE_PARM_DESC(X, desc);
+-#else
+-#define ATL2_PARAM(X, desc) \
+-    static int X[ATL2_MAX_NIC+1] = ATL2_PARAM_INIT; \
++    static int X[ATL2_MAX_NIC+1] = {[0 ... ATL2_MAX_NIC] = OPTION_UNSET}; \
+     static unsigned int num_##X; \
+     module_param_array_named(X, X, int, &num_##X, 0); \
+     MODULE_PARM_DESC(X, desc);
+-#endif
+ 
+ /*
+  * Transmit Memory Size
+@@ -2924,9 +2916,6 @@ static void atl2_check_options(struct atl2_adapter *adapter)
+ 		printk(KERN_NOTICE "Warning: no configuration for board #%i\n",
+ 			bd);
+ 		printk(KERN_NOTICE "Using defaults for all values\n");
+-#ifndef module_param_array
+-		bd = ATL2_MAX_NIC;
+-#endif
+ 	}
+ 
+ 	/* Bytes of Transmit Memory */
+@@ -2936,16 +2925,12 @@ static void atl2_check_options(struct atl2_adapter *adapter)
+ 	opt.def = ATL2_DEFAULT_TX_MEMSIZE;
+ 	opt.arg.r.min = ATL2_MIN_TX_MEMSIZE;
+ 	opt.arg.r.max = ATL2_MAX_TX_MEMSIZE;
+-#ifdef module_param_array
+ 	if (num_TxMemSize > bd) {
+-#endif
+ 		val = TxMemSize[bd];
+ 		atl2_validate_option(&val, &opt);
+ 		adapter->txd_ring_size = ((u32) val) * 1024;
+-#ifdef module_param_array
+ 	} else
+ 		adapter->txd_ring_size = ((u32)opt.def) * 1024;
+-#endif
+ 	/* txs ring size: */
+ 	adapter->txs_ring_size = adapter->txd_ring_size / 128;
+ 	if (adapter->txs_ring_size > 160)
+@@ -2958,18 +2943,14 @@ static void atl2_check_options(struct atl2_adapter *adapter)
+ 	opt.def = ATL2_DEFAULT_RXD_COUNT;
+ 	opt.arg.r.min = ATL2_MIN_RXD_COUNT;
+ 	opt.arg.r.max = ATL2_MAX_RXD_COUNT;
+-#ifdef module_param_array
+ 	if (num_RxMemBlock > bd) {
+-#endif
+ 		val = RxMemBlock[bd];
+ 		atl2_validate_option(&val, &opt);
+ 		adapter->rxd_ring_size = (u32)val;
+ 		/* FIXME */
+ 		/* ((u16)val)&~1; */	/* even number */
+-#ifdef module_param_array
+ 	} else
+ 		adapter->rxd_ring_size = (u32)opt.def;
+-#endif
+ 	/* init RXD Flow control value */
+ 	adapter->hw.fc_rxd_hi = (adapter->rxd_ring_size / 8) * 7;
+ 	adapter->hw.fc_rxd_lo = (ATL2_MIN_RXD_COUNT / 8) >
+@@ -2983,16 +2964,12 @@ static void atl2_check_options(struct atl2_adapter *adapter)
+ 	opt.def = INT_MOD_DEFAULT_CNT;
+ 	opt.arg.r.min = INT_MOD_MIN_CNT;
+ 	opt.arg.r.max = INT_MOD_MAX_CNT;
+-#ifdef module_param_array
+ 	if (num_IntModTimer > bd) {
+-#endif
+ 		val = IntModTimer[bd];
+ 		atl2_validate_option(&val, &opt);
+ 		adapter->imt = (u16) val;
+-#ifdef module_param_array
+ 	} else
+ 		adapter->imt = (u16)(opt.def);
+-#endif
+ 	/* Flash Vendor */
+ 	opt.type = range_option;
+ 	opt.name = "SPI Flash Vendor";
+@@ -3000,16 +2977,12 @@ static void atl2_check_options(struct atl2_adapter *adapter)
+ 	opt.def = FLASH_VENDOR_DEFAULT;
+ 	opt.arg.r.min = FLASH_VENDOR_MIN;
+ 	opt.arg.r.max = FLASH_VENDOR_MAX;
+-#ifdef module_param_array
+ 	if (num_FlashVendor > bd) {
+-#endif
+ 		val = FlashVendor[bd];
+ 		atl2_validate_option(&val, &opt);
+ 		adapter->hw.flash_vendor = (u8) val;
+-#ifdef module_param_array
+ 	} else
+ 		adapter->hw.flash_vendor = (u8)(opt.def);
+-#endif
+ 	/* MediaType */
+ 	opt.type = range_option;
+ 	opt.name = "Speed/Duplex Selection";
+@@ -3017,14 +2990,10 @@ static void atl2_check_options(struct atl2_adapter *adapter)
+ 	opt.def = MEDIA_TYPE_AUTO_SENSOR;
+ 	opt.arg.r.min = MEDIA_TYPE_AUTO_SENSOR;
+ 	opt.arg.r.max = MEDIA_TYPE_10M_HALF;
+-#ifdef module_param_array
+ 	if (num_MediaType > bd) {
+-#endif
+ 		val = MediaType[bd];
+ 		atl2_validate_option(&val, &opt);
+ 		adapter->hw.MediaType = (u16) val;
+-#ifdef module_param_array
+ 	} else
+ 		adapter->hw.MediaType = (u16)(opt.def);
+-#endif
+ }
+-- 
+2.43.0
 
-
-[...]
-> -static void remove_nexthop_from_groups(struct net *net, struct nexthop *nh,
-> +static bool remove_nexthop_from_groups(struct net *net, struct nexthop *nh,
->  				       struct nl_info *nlinfo)
-
-Since you added __must_check to other functions,
-remove_nexthop_from_groups() should have it too.
-
-
->  {
->  	struct nh_grp_entry *nhge, *tmp;
-> +	bool need_flush = false;
->  	LIST_HEAD(deferred_free);
-
-Please keep reverse xmas tree order here,
-
-
-[...]
-> @@ -2701,6 +2717,7 @@ static void nexthop_flush_dev(struct net_device *dev, unsigned long event)
->  	struct hlist_head *head = &net->nexthop.devhash[hash];
->  	struct hlist_node *n;
->  	struct nh_info *nhi;
-> +	bool need_flush = false;
-
-and here.
 
