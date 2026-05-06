@@ -1,234 +1,150 @@
-Return-Path: <netdev+bounces-284786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284787-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mDLFEBog+2kgWwMAu9opvQ
-	(envelope-from <netdev+bounces-284786-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 13:03:54 +0200
+	id nHTQHlQh+2lvWwMAu9opvQ
+	(envelope-from <netdev+bounces-284787-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 13:09:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 972D54D993B
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 13:03:53 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9F0B4D9999
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 13:09:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B032F3013790
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 11:03:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 73F5030157E2
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 11:09:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C11BC3D904E;
-	Wed,  6 May 2026 11:03:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72CFB3F54A4;
+	Wed,  6 May 2026 11:09:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="vhU3Cb/a"
+	dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b="1uXMC9Hw"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from ixit.cz (ixit.cz [185.100.197.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8234D3242D4;
-	Wed,  6 May 2026 11:03:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25843EB813;
+	Wed,  6 May 2026 11:09:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.100.197.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778065418; cv=none; b=nKrG1rMOBaed86ty73LZ7H5E9qlooA9XI/37Uz6TUFc6cdstphE3R1D7c1XAorguTWKeh6Qee/NaW7pDi2SLZ5gQDOJJVHnxU98muFuFA8oP4M/MMikj/HpN61/BuHPlhsUhPStkD10woAhnDlCGix1kRp6VrD3LWC592dlStVk=
+	t=1778065743; cv=none; b=RpEE2n9oeelllO6rm/Rq3Hx92jbzLbeE+Y2VISdRLu7bUvRwV2JnI6NCWEFTLhwBBQ3ARsZLIA/g2GzxMi6goIS2hCDp1aFdnsnFNzmKXHDNnehyWjWSG5RJ/nqafAV8K3aG4p+btEK1nx7Sj7bIAE1Dl3qkQfauSQag+zQVhgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778065418; c=relaxed/simple;
-	bh=zJr9SqqlFI5ReysBiBKbxWRqkPNdI0+Vp2XCnwSy1u4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BRZwMIUrTK3hQLBPny4XUX9pTXGb1I6P5S2XJMzViCU0ZAl+ALkYp8ug3A1xZuD1hFy6FZwO4JypmmFiLNe9PsJfwpYatzrdLYbsdZ0jpjHxIiyJ+5UdZZZvIoiPZcYSOUpAbbE/e0YnSe+BVUYYhlzEvKGYeAPTd5YdhTtMbPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net; spf=none smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=vhU3Cb/a; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=JlEr0rOa2USNOpEJAh1sMDlA42EkeWQIdKE09IQgiRQ=; t=1778065416; x=1779275016; 
-	b=vhU3Cb/ahziU4/JR/bcV/bUGc2qFlFNoYJyVaMUSPQMCXIma01xsTVU822y+IgJtANIB1ophADw
-	CNVgFycLQW13g1Gm+X6WgP1wDiSDXVdd6Z+ldtmXUy3W0YgkGVIgiJCUPuMwO7BVi6IaZQRxILR/c
-	gTUS8DfNbImimVxxv2uxRUaQN7YZfy/YICCJ77erztEs0X4P99sAvrMKKkclC+HP/pSoCvQUMeq0b
-	fQC5oCcLqAS1GE410e3IqkSHwlm3OHCd7qoHL/mPUnRC4n7POfFyjvRRxVg9iRZ2wXBZMWzD51Y4A
-	oXK6J2wJ8GxxerVV9Y4w/xYI6Y6GjyPCoKVQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1wKa2K-00000000yOR-1qQh;
-	Wed, 06 May 2026 13:03:28 +0200
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Subject: [GIT PULL] wireless-2026-05-06
-Date: Wed,  6 May 2026 13:01:56 +0200
-Message-ID: <20260506110325.219675-3-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1778065743; c=relaxed/simple;
+	bh=C21UES+I40tjFBD2O4bQaaiN8Rh9gVhdJ6kwnCRUMWc=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=bH6o3MmgrTVHXsD1tCLRFloSK19LDvWc0FWJLIuVlHVeabUWJjActAo25I7K0Q5LSdHX4tZ2YmHVyjPHb4EbnaAB9x2vPeYzo2wwnZlO6lol5zo01tU4MYJocRSg2/PJ/tS/hQge/o+wY02C86scdbE13Ot6X92VReeW1Jwp/zQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=1uXMC9Hw; arc=none smtp.client-ip=185.100.197.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ixit.cz
+Received: from ehlo.thunderbird.net (unknown [193.96.224.60])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ixit.cz (Postfix) with ESMTPSA id AE85853414AC;
+	Wed, 06 May 2026 13:08:48 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
+	t=1778065729;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5DVO//G3TKWIp172nJp3YBO1FcCFLDzW/DktqIattPs=;
+	b=1uXMC9HwGDCuQkG7nLQsJC7ngtgA2K0qVBJ+qWXqua9jsHBc+IK7m6FS1gO9dj4u+HcwXn
+	4LBhMZS7VOhhtyegpyNzVAddhMdABC3E8mLZU1/DQSh6LcJ7ZcKkO+70GwbU7qYmmqj96u
+	f1oBPpvjFJllfMky75CY8nizrw4c8pQ=
+Date: Wed, 06 May 2026 11:08:44 +0000
+From: David Heidelberg <david@ixit.cz>
+To: Lee Jones <lee@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+CC: David Heidelberg <david+nfc@ixit.cz>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Kees Cook <kees@kernel.org>, Junxi Qian <qjx1298677004@gmail.com>,
+ Ingo Molnar <mingo@kernel.org>, Samuel Ortiz <sameo@linux.intel.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] nfc: llcp: Fix use-after-free in llcp_sock_release()
+In-Reply-To: <20260506081145.GA305027@google.com>
+References: <20260429134115.3558604-1-lee@kernel.org> <20260501162759.06ef164b@kernel.org> <20260506081145.GA305027@google.com>
+Message-ID: <F9112727-E4DF-4884-807A-015809EA5DC7@ixit.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 972D54D993B
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: D9F0B4D9999
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
+	DMARC_POLICY_ALLOW(-0.50)[ixit.cz,quarantine];
+	R_DKIM_ALLOW(-0.20)[ixit.cz:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-284787-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	DMARC_NA(0.00)[sipsolutions.net: no valid DMARC record];
-	TAGGED_FROM(0.00)[bounces-284786-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	DKIM_TRACE(0.00)[sipsolutions.net:+];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[ixit.cz,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,linux.intel.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[david@ixit.cz,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ixit.cz:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sipsolutions.net:dkim,sipsolutions.net:mid]
+	TAGGED_RCPT(0.00)[netdev,nfc];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,ixit.cz:email,ixit.cz:dkim,ixit.cz:mid]
 
-Hi,
+Hello Lee=2E
 
-More content given last week's kunit failure, but I've fixed
-that now, sorry about that. Things are all over really.
+Yeah, I think today these should hit the linux-next integration tree, and =
+I need to setup the Thank you email to work in `b4 review` :)
 
-Please pull and let us know if there's any problem.
-
-Thanks,
-johannes
-
+David
 
 
-The following changes since commit 254f49634ee16a731174d2ae34bc50bd5f45e731:
+-------- Original Message --------
+From: Lee Jones <lee@kernel=2Eorg>
+Sent: 6 May 2026 08:11:45 UTC
+To: Jakub Kicinski <kuba@kernel=2Eorg>
+Cc: David Heidelberg <david+nfc@ixit=2Ecz>, "David S=2E Miller" <davem@dav=
+emloft=2Enet>, Eric Dumazet <edumazet@google=2Ecom>, Paolo Abeni <pabeni@re=
+dhat=2Ecom>, Simon Horman <horms@kernel=2Eorg>, Kuniyuki Iwashima <kuniyu@g=
+oogle=2Ecom>, Kees Cook <kees@kernel=2Eorg>, Junxi Qian <qjx1298677004@gmai=
+l=2Ecom>, Ingo Molnar <mingo@kernel=2Eorg>, Samuel Ortiz <sameo@linux=2Eint=
+el=2Ecom>, netdev@vger=2Ekernel=2Eorg, linux-kernel@vger=2Ekernel=2Eorg
+Subject: Re: [PATCH 1/2] nfc: llcp: Fix use-after-free in llcp_sock_releas=
+e()
 
-  Linux 7.1-rc1 (2026-04-26 14:19:00 -0700)
+On Fri, 01 May 2026, Jakub Kicinski wrote:
 
-are available in the Git repository at:
+> On Wed, 29 Apr 2026 13:40:41 +0000 Lee Jones wrote:
+> > llcp_sock_release() unconditionally unlinks the socket from the local
+> > sockets list=2E  However, if the socket is still in connecting state, =
+it
+> > is on the connecting list=2E
+> >=20
+> > Fix this by checking the socket state and unlinking from the correct l=
+ist=2E
+> >=20
+> > Fixes: b4011239a08e ("NFC: llcp: Fix non blocking sockets connections"=
+)
+> > Signed-off-by: Lee Jones <lee@kernel=2Eorg>
+>=20
+> Adding David H and dropping from netdev's patchwork=2E=2E
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2026-05-06
+Is anyone looking at these please?
 
-for you to fetch changes up to 79240f3f6d766b342b57c32397d643e1cfa26b81:
+These are pretty important=2E
 
-  wifi: nl80211: re-check wiphy netns in nl80211_prepare_wdev_dump() continuation (2026-05-06 11:08:41 +0200)
-
-----------------------------------------------------------------
-Quite a number of fixes now:
- - mac80211
-   - remove HT NSS validation to work with broken APs
-     (with a kunit fix now)
-   - remove 'static' that could cause races
-   - check station link lookup before further processing
-   - fix use-after-free due to delete in list iteration
-   - remove AP station on assoc failures to fix crashes
- - ath12k
-   - fix OF node refcount imbalance
-   - fix queue flush ("REO update") in MLO
-   - fix RCU assert
- - ath12k:
-   - fix Kconfig with POWER_SEQUENCING
-   - fix WMI buffer leaks on error conditions
-   - don't use uninitialized stack data when processing RSSI events
-   - fix logic for determining the peer ID in the RX path
- - ath5k: fix a potential stack buffer overwrite
- - rsi: fix thread lifetime race
- - brcmfmac: fix potential UAF
- - nl80211:
-   - stricter permissions/checks for PMK and netns
-   - fix netlink policy vs. code type confusion
- - cw1200: revert a broken locking change
- - various fixes to not trust values from firmware
-
-----------------------------------------------------------------
-Aaradhana Sahu (1):
-      wifi: ath12k: fix OF node refcount imbalance in WSI graph traversal
-
-Amir Mohammad Jahangirzad (1):
-      wifi: libertas: fix integer underflow in process_cmdrequest()
-
-Baochen Qiang (2):
-      wifi: ath12k: prepare REO update element only for primary link
-      wifi: ath12k: fix peer_id usage in normal RX path
-
-Bart Van Assche (1):
-      wifi: cw1200: Revert "Fix locking in error paths"
-
-Benjamin Berg (1):
-      wifi: mac80211: use safe list iteration in radar detect work
-
-Catherine (1):
-      wifi: mac80211: drop stray 'static' from fast-RX rx_result
-
-Dmitry Baryshkov (1):
-      wifi: ath10k: snoc: select POWER_SEQUENCING
-
-Jakov Novak (1):
-      wifi: libertas: notify firmware load wait on disconnect
-
-Jeongjun Park (1):
-      wifi: rsi: fix kthread lifetime race between self-exit and external-stop
-
-Jiri Slaby (SUSE) (1):
-      wifi: ath5k: do not access array OOB
-
-Johannes Berg (5):
-      Merge tag 'ath-current-20260427' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
-      wifi: mac80211: tests: mark HT check strict
-      Merge tag 'ath-current-20260505' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
-      wifi: mac80211: remove station if connection prep fails
-      wifi: nl80211: fix NL80211_PMSR_FTM_REQ_ATTR_FTMS_PER_BURST usage
-
-Maoyi Xie (2):
-      wifi: nl80211: require CAP_NET_ADMIN over the target netns in SET_WIPHY_NETNS
-      wifi: nl80211: re-check wiphy netns in nl80211_prepare_wdev_dump() continuation
-
-Marek Szyprowski (1):
-      wifi: brcmfmac: Fix potential use-after-free issue when stopping watchdog task
-
-Michael Bommarito (2):
-      wifi: nl80211: require admin perm on SET_PMK / DEL_PMK
-      wifi: mac80211: check ieee80211_rx_data_set_link return in pubsta MLO path
-
-Nicolas Escande (1):
-      wifi: ath12k: fix leak in some ath12k_wmi_xxx() functions
-
-Rameshkumar Sundaram (1):
-      wifi: ath12k: initialize RSSI dBm conversion event state
-
-Rio Liu (1):
-      wifi: mac80211: skip ieee80211_verify_sta_ht_mcs_support check in non-strict mode
-
-Tristan Madani (2):
-      wifi: b43: enforce bounds check on firmware key index in b43_rx()
-      wifi: b43legacy: enforce bounds check on firmware key index in RX path
-
-Yu-Hsiang Tseng (1):
-      wifi: ath12k: use lockdep_assert_in_rcu_read_lock() for RCU assertions
-
- drivers/net/wireless/ath/ath10k/Kconfig            |   1 +
- drivers/net/wireless/ath/ath12k/core.c             |  77 +++++++++------
- drivers/net/wireless/ath/ath12k/dp_rx.c            |   5 +-
- drivers/net/wireless/ath/ath12k/mac.c              |   2 +-
- drivers/net/wireless/ath/ath12k/p2p.c              |   2 +-
- drivers/net/wireless/ath/ath12k/wmi.c              | 105 +++++++++++++++++----
- drivers/net/wireless/ath/ath5k/base.c              |   3 +-
- drivers/net/wireless/broadcom/b43/xmit.c           |   3 +-
- drivers/net/wireless/broadcom/b43legacy/xmit.c     |   3 +-
- .../wireless/broadcom/brcm80211/brcmfmac/sdio.c    |   6 +-
- drivers/net/wireless/marvell/libertas/if_usb.c     |   6 +-
- drivers/net/wireless/rsi/rsi_common.h              |   5 +-
- drivers/net/wireless/st/cw1200/pm.c                |   2 -
- net/mac80211/mlme.c                                |  18 +++-
- net/mac80211/rx.c                                  |   6 +-
- net/mac80211/tests/chan-mode.c                     |   1 +
- net/mac80211/util.c                                |   4 +-
- net/wireless/nl80211.c                             |  27 ++++++
- net/wireless/pmsr.c                                |   2 +-
- 19 files changed, 208 insertions(+), 70 deletions(-)
 
