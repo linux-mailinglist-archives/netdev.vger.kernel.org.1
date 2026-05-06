@@ -1,165 +1,130 @@
-Return-Path: <netdev+bounces-284802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284803-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UHJAAocx+2nfXgMAu9opvQ
-	(envelope-from <netdev+bounces-284802-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:18:15 +0200
+	id UBzoGZoy+2nfXgMAu9opvQ
+	(envelope-from <netdev+bounces-284803-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:22:50 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B6024DA158
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:18:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7E784DA235
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:22:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 36F58303102A
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 12:15:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B161E300422B
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 12:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF4A44104A;
-	Wed,  6 May 2026 12:15:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5148441054;
+	Wed,  6 May 2026 12:19:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RhqdXZ1M"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jMvFFgWg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484DD3DFC68;
-	Wed,  6 May 2026 12:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4589631716F;
+	Wed,  6 May 2026 12:19:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778069702; cv=none; b=jB92CO7QHpUM0JDK/yVY/8GWQAzS8uNAFxwFADqgc9fkxuKyj0XxPTgUxYSQcXvTcLzXdnN2du4k83EyRWjQVlJcrfFrLfaeMWyns+cCzYlt9/uHOXQExHrdBFPhLwOuyHCNiHWdwv2RQqBDA0OieK57AbwdwP4Ck1Mag9DaC18=
+	t=1778069944; cv=none; b=P6ue1Rd2D5Z64nDvpbcZ/gyrKKrbpedVPSDIJbjYCv/a0vDODx3J5e/IonFNrGh1/oUFt4bvMnjqKvn4tC2kLA9d5TUypXHwr/dOo6wN4/uLDcA/sF/UCqMQMnc2gcjcOu7Ka+eMRrdkl3ewmkKk47n8qSHvL8T5t13juldiPu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778069702; c=relaxed/simple;
-	bh=W/kdTc73sAr9ywWuVImHdr8H4/gzoh0lhVnQZ432zjc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oN0+oKvfEKSpyl/DZO517IoqyLZXiYQZoNlhlL5XsO0lD7VKtQDYMD37V2AGcRcJC9VeCPtmFA0Iak1cuA5bkiE3J3K1myAWfNzadK011XEyNMo4rKb1BRZqol3tOk9VKfAeKqf9P1mVnt7leSEx/4+S0m9pxHCqCdz4xrrQ6CQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RhqdXZ1M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCED0C2BCB8;
-	Wed,  6 May 2026 12:14:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778069702;
-	bh=W/kdTc73sAr9ywWuVImHdr8H4/gzoh0lhVnQZ432zjc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RhqdXZ1MC0+rmdSLPBFDfHc6SiLyVuOvXyjoGyzEQ0rkw2tdH4KTyHxWdlMHoiMPh
-	 XBBijHoUTnPyWNDFvhP2UW9hss/Qd/1yp/qbGUaPjbKJx//FfkD8tEkJaOraleVMGO
-	 IAZiNAlgsJpqr/0pifNeK2RxsDJkm9ZLs70P7CQyoM2yxZvneLUETGsmznnOK4MvNS
-	 pr03WfTd3atEml1CLrVDJ8FMsa7blxXOcervTTSWv0+ADWmNfKcN8ln+YqMlvfjk8X
-	 G8Za0xWxp8XaSMi0MN06odvGkyADJWTK7lqUo2ssdkjlBS1zas6Bk7PVj+aGZfZN0P
-	 ORFun/9As8QRw==
-From: Simon Horman <horms@kernel.org>
-To: qingfang.deng@linux.dev
-Cc: 'Simon Horman' <horms@kernel.org>,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	willemb@google.com,
-	petrm@nvidia.com,
-	anubhavsinggh@google.com,
-	richardbgobert@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-ppp@vger.kernel.org
-Subject: Re: [PATCH net-next v8 2/2] selftests: net: test PPPoE packets in gro.sh
-Date: Wed,  6 May 2026 13:14:54 +0100
-Message-ID: <20260506121454.652034-1-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260501035102.293031-2-qingfang.deng@linux.dev>
-References: <20260501035102.293031-2-qingfang.deng@linux.dev>
+	s=arc-20240116; t=1778069944; c=relaxed/simple;
+	bh=TVosckRMj9sotc+r9onO1GprqoVfjJ+m3ME2L21FObI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZLbESZcgq6Tu7qm3AOD1gwYjYLWXy9lWIygGBrz+agv9KEnmZ0ophAqJAtkrDpFyAP6bsH2G47diLd1gXS4S3680ohG3BVvptTPQ/0gBmMq7YVF5H748Tq4BbzFvxKmTyn9nzuxIgQhXHO8mKjaRk+0mDDtNKlvu8LpEsVCYZE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jMvFFgWg; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=5A9HcZx92YaaISTe948RP7Oj0YmqPRmTGkH92yS7uAg=; b=jMvFFgWgojVlxvN7UyP7TAVOy1
+	BpFkTprjTeJPzrxXkWHHVQXrclkTJRw+H+g8ehvfJYg/a/68K+84xDzto0cjZKbjy6UqLg/mQbJmp
+	2I2yQhN0MKbdj78I5ZTRtC7ZXdClWSn/A3qXPWR6PAy/yH6uVIIpZLROXte36kGVJHaY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wKbDE-001dJ4-B8; Wed, 06 May 2026 14:18:48 +0200
+Date: Wed, 6 May 2026 14:18:48 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "chunzhi.lin" <linchunzhi0@gmail.com>
+Cc: netdev@vger.kernel.org, Frank.Sae@motor-comm.com, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, davem@davemloft.net,
+	linux-acpi@vger.kernel.org, rafael@kernel.org, lenb@kernel.org
+Subject: Re: [PATCH 1/2] net: phy: motorcomm: use device properties for
+ firmware tuning
+Message-ID: <7d209b85-6ea3-4b83-b710-28ce39dfecff@lunn.ch>
+References: <20260506021813.3658669-1-linchunzhi0@gmail.com>
+ <20260506021813.3658669-2-linchunzhi0@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 5B6024DA158
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260506021813.3658669-2-linchunzhi0@gmail.com>
+X-Rspamd-Queue-Id: B7E784DA235
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,nvidia.com,gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-284803-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,motor-comm.com,gmail.com,armlinux.org.uk,kernel.org,redhat.com,google.com,davemloft.net];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-284802-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:email,lunn.ch:dkim,lunn.ch:mid]
 
-From: 'Simon Horman' <horms@kernel.org>
+On Wed, May 06, 2026 at 10:18:12AM +0800, chunzhi.lin wrote:
+> The Motorcomm PHY driver reads optional firmware properties via
+> of_property_read_*() from phydev->mdio.dev.of_node. This works for
+> Device Tree based systems, but causes ACPI platforms to ignore the same
+> properties when they are supplied through _DSD.
+> 
+> As a result, ACPI-described Motorcomm PHY devices fall back to default
+> settings instead of applying firmware-provided tuning such as
+> rx/tx internal delay, drive strength, clock output frequency, and
+> optional boolean controls like auto-sleep-disabled,
+> keep-pll-enabled, and tx clock inversion.
+> 
+> Switch these lookups to device_property_read_*() so the driver uses the
+> generic firmware node interface and can consume the same property names
+> from either Device Tree or ACPI.
+> 
+> This keeps the existing DT behavior unchanged while allowing ACPI
+> platforms to honor PHY configuration from firmware.
+> 
+> We have completed testing on Sophgo RISC-V architecture server SD3-10.
+> This server has a 64-core Thead C920 CPU whose DWMAC is connected to
+> Motorcomm's PHY YT8531. This server supports UEFI boot and it would like
+> to use the ACPI table.
+> 
+> Signed-off-by: chunzhi.lin <linchunzhi0@gmail.com>
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-selftests: net: test PPPoE packets in gro.sh
-    
-This commit adds PPPoE test-cases to the GRO selftest and a new "pppoe_sid"
-test case to verify that packets with different PPPoE session IDs are correctly
-identified as separate flows.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-> diff --git a/tools/testing/selftests/net/lib/gro.c b/tools/testing/selftests/net/lib/gro.c
-> index 11b16ae5f0e83..4ffb0491c0da7 100644
-> --- a/tools/testing/selftests/net/lib/gro.c
-> +++ b/tools/testing/selftests/net/lib/gro.c
-
-[ ... ]
-
-> @@ -1071,6 +1095,20 @@ static void send_fragment6(int fd, struct sockaddr_ll *daddr)
->  	write_packet(fd, buf, bufpkt_len, daddr);
->  }
->  
-> +static void send_changed_pppoe_sid(int fd, struct sockaddr_ll *daddr)
-> +{
-> +	static char buf[L2_HLEN_MAX + PAYLOAD_LEN];
-> +	int pkt_size = total_hdr_len + PAYLOAD_LEN;
-> +	struct pppoe_hdr *hdr = (struct pppoe_hdr *)(buf + ETH_HLEN);
-> +
-> +	create_packet(buf, 0, 0, PAYLOAD_LEN, 0);
-
-Will this write past the end of the buffer?
-
-When create_packet() is called, it writes total_hdr_len + PAYLOAD_LEN bytes:
-
-tools/testing/selftests/net/lib/gro.c:create_packet() {
-    ...
-    memset(buf, 0, total_hdr_len);
-    memset(buf + total_hdr_len, 'a', payload_len);
-    ...
-}
-
-However, buf is only sized for L2_HLEN_MAX + PAYLOAD_LEN. L2_HLEN_MAX
-evaluates to 22 bytes (ETH_HLEN + PPPOE_SES_HLEN). For IPv6 PPPoE packets,
-total_hdr_len can be up to 82 bytes (14 ETH + 8 PPPoE + 40 IPv6 + 20 TCP).
-
-Does this result in an out-of-bounds write of 60 bytes when setting up the
-IPv6 test case?
-
-> +	write_packet(fd, buf, pkt_size, daddr);
-> +
-> +	create_packet(buf, PAYLOAD_LEN, 0, PAYLOAD_LEN, 0);
-> +	hdr->sid = htons(0x4321);
-> +	write_packet(fd, buf, pkt_size, daddr);
-> +}
+    Andrew
 
