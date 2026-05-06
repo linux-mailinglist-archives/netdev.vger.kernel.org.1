@@ -1,166 +1,122 @@
-Return-Path: <netdev+bounces-284945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284946-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cEzVHa9s+2miawMAu9opvQ
-	(envelope-from <netdev+bounces-284945-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 18:30:39 +0200
+	id 4JWMDJVs+2miawMAu9opvQ
+	(envelope-from <netdev+bounces-284946-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 18:30:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 755C84DE1FE
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 18:30:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 870004DE1F0
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 18:30:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 653EF3009800
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 16:21:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F27AA3028351
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 16:26:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398BD4014A0;
-	Wed,  6 May 2026 16:21:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 523223FADE4;
+	Wed,  6 May 2026 16:26:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mTHr2St8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tewpDFka"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1B03F7A87
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 16:21:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB2F3E121F
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 16:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778084500; cv=none; b=LEMfcwemzKyw3FsRCmBvU/BQOov/aoGCwtsfe83bu0w21TgFpsKor/4MEXA+lnkVlcQ2XqyjIK/85AfNHsgwK4m/V98v3mLm1CLdeBohCXB0z1mX74N1/05v5coDRegg52S08tiTEEBNw1Kc8NY5S3BCL5Saw1kOqSi0Z+fraGk=
+	t=1778084762; cv=none; b=M+O/mH1L5+k7bripKR3giNw7X+nnQnTBfmsiKliRiTNnIvuWhAQtsnTgZkKk6btY2+55OG9SkbaJYqfaEhha2KEEImMwSJvVYqOEYxqHznh3olyLud4SCpSAoSB2A/vH5Xrg3g533RGouCca0aNuVzCp7u9cMly4ZEvso8NES/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778084500; c=relaxed/simple;
-	bh=xq0ncLQqbBgMKmiqv0iCAyodq62iUAP3pn+orp6uLWc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eTGRyUdx3ColnGqj1uurzJcU9lFZKW9u9KZuXSt4kC/Xrmaz1tdsB0wZuYs3LrXk1B6yOeleU/Ap/dmJ4R4KKZsAcD44C8rLO1a6TR5h2mOaIkeATmgT8zomzgaDt9atY1CLYDZUctpyPU2h3Z+EV/Ictpw9Pit/oDuQa36KYMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mTHr2St8; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-488b8bc6bc9so42476065e9.3
-        for <netdev@vger.kernel.org>; Wed, 06 May 2026 09:21:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778084497; x=1778689297; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CRMNJQwpy4JLabii5FgqNhMAFtCk786EvStmSIccUWs=;
-        b=mTHr2St8Br0Kfq1WYhl35C20KtE4sj7z1HFpFiD7uXDI34QiKIwNcf4yhReyWPagT+
-         a31KLi6Mr8yAdJeSV8rUfaGAWRCeEIv+0xoUupIHKRSK8EfHiur5nDua3rM5vogDUzQs
-         DjKg/XBvxacZYQsUDfYuOhfIgPPGCNQX3VjNrGhBSszI2mv/7nngQ5DG+KxgBddb4PJ/
-         GdxsZ6ItB8J7ie4spA0aJyq5mQpxhsE1lKMf32EYtFgkVENR2yPQh8lgfp9ZmpKsTe/s
-         OAmkFTHiUqTLTHUf1/5Am6VeV5RbnOydb+G/P5mwx/gAosCSzuTKQ0U9OjmERe2K/RX/
-         /mzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778084497; x=1778689297;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CRMNJQwpy4JLabii5FgqNhMAFtCk786EvStmSIccUWs=;
-        b=phNzMqQ42Uz40WSDEGp8mm29qt1eTGvkocBoPuDmsgvdcX133RCLOR9dm91o6vXOEC
-         L3MPsRKNYsrEpbXsxVAwVAMMJA+utonMBgoX5LvaMyDrXUpF2avaviBa2cVWU5dUgUQM
-         226VYsz2pglUjYVeCu3fL58GhYacD3blMgpo6CQ90UlnI/a6qxVSJ0eTaqmKJ0xmBoUX
-         Hnck7HNu6KCvXbVeTxLX0VCWQlHDbKZqMN7k9Tv6JpDsx+SrP6/uDq2L5WeXZyDMbAG4
-         IcOwwYKDt4oC6mMIICgQnZYWafJkaYWZ+4R8HzyCg3mHXVHFZgiZcVRpKA5amIVPW6s/
-         /wLQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/NOrU1SjA2fN8KLTy+JEF1FPw/youjcgwcVVpudeQRQfCiLl78R2EjiXBqVfV1cAdBVOQ/Aqo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw812fwGoNHWeA+sUAFqLyuSp/SK2VX9Zm2N7eugeQ+wS8AezEP
-	hCKPGV2XRPVQo5dZfvFLsFTRKRybka9QfCz5RTFREEeBCbImxceuZ1HK
-X-Gm-Gg: AeBDietw4hrLffv+QzCv7iamqtth+FMQHDi+DUR1YxXuJZCS1vyTgqjeiJw+6hYZily
-	nMcogkwkHNFOIJXS0Ivb6os12oDoRTyjVrGSy9dU8SeTpsQC+08TLg/cEUYgo0cgO/o0jEN5ElP
-	YObqL7S86JSr9kDXXfFzoYSdAjKFClvIbQYi0SXtswiD41S0CCGMT1ENEIseSEuREWrXa68jgvW
-	VMftuaRz7SGdBaxv9nSFJoZWXJcYqwwqZO5mCQ7drUAlw1TpkJHAGKK3xeZth0MDNwKbBs0h0+i
-	/gSQkDgdQMMN13QhsxE8d6CGoe12QKioPfC6upzujd53kWsIkhr0zm2JuqnseizLzx7YsgNW03t
-	5mwR2WoWIahFPuvmUm5zte7etKbh3v2eEQkqUIU5G1bnhRLzBOvNHtpSzce0ou5Qz4V+cs3ZBdu
-	X0oH0GQWIm8NxjBnw9BR/fqYMF0FCWnWykLJA=
-X-Received: by 2002:a05:600c:3548:b0:48a:7aad:4425 with SMTP id 5b1f17b1804b1-48e51e097fcmr71523485e9.3.1778084496987;
-        Wed, 06 May 2026 09:21:36 -0700 (PDT)
-Received: from gmail.com ([51.154.251.79])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4505285e765sm13179992f8f.10.2026.05.06.09.21.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2026 09:21:36 -0700 (PDT)
-Date: Wed, 6 May 2026 16:21:34 +0000
-From: Vaibhav Gupta <vaibhavgupta40@gmail.com>
-To: Harshitha Ramamurthy <hramamurthy@google.com>
-Cc: Joshua Washington <joshwash@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Ankit Garg <nktgrg@google.com>, Tim Hostetler <thostet@google.com>,
-	Alok Tiwari <alok.a.tiwari@oracle.com>,
-	John Fraker <jfraker@google.com>, Matt Olson <maolson@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1] gve: Use generic power management
-Message-ID: <aftqjk7YOQJGh0e3@gmail.com>
-References: <20260504182139.604925-1-vaibhavgupta40@gmail.com>
- <CAEAWyHf3x=sCefMKkUvRq6hq8qd_ALM=MPvnN57xmyE5VCN+CA@mail.gmail.com>
+	s=arc-20240116; t=1778084762; c=relaxed/simple;
+	bh=YqyMalZi5DSTtksJkRVfptq2Zozm+Kferg/NhNg2mNY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qak+4aU4d9e7ARuKcPJ4grLKgQUNXHL7uQgsL0CliyUe0soT0c5iCyjXNONUEjWXEy6dEIo0ASaOOd73Vw04MpFN/+I9tFMKMojV7uiyX7K010EcQ9e/gALOc/lWgvS2Y9EvAULiXld7NUjel+c00UBKzUKaeRIpANRojfXtcIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tewpDFka; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89E2AC2BCB0;
+	Wed,  6 May 2026 16:26:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778084761;
+	bh=YqyMalZi5DSTtksJkRVfptq2Zozm+Kferg/NhNg2mNY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=tewpDFkaPGCI8qCVd3jAeNSewmC4I9+yUeYg9ZgMjFjDo+CNodYVKpRyB969lz47y
+	 cJdXduk6tSM330GDGOHplVWjO+cYjiRpjkjfpL/ygBRqL+jS3xd8nb/9fhi9wuu9kp
+	 4HJuOp2LB2Qj8VuqeOBrSI4kaIJXo6Sa4uC1uII92+BZOuP/d4YtnnXioiCoCioZoW
+	 WbfCWfDC0nXq4RYG6s/2ewSFYwAzaMcnD49wxsyT1VlSCjxxQYsoLCu03lKTZJpxn2
+	 1HdAI6YjIV8bq6gu7xYctQWZUQQl8fqpbtgjGNmVAsCKLH0cWfDoYhT/Yqr8q5oGye
+	 IHMzg3NAnUvHw==
+Message-ID: <8fea4084-c9ec-472a-b8ab-ecc87e537216@kernel.org>
+Date: Wed, 6 May 2026 10:26:00 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAEAWyHf3x=sCefMKkUvRq6hq8qd_ALM=MPvnN57xmyE5VCN+CA@mail.gmail.com>
-X-Rspamd-Queue-Id: 755C84DE1FE
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] ipv4: Flush the FIB once per dev nexthop
+ removal
+Content-Language: en-US
+To: Ido Schimmel <idosch@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20260506092704.150349-1-cratiu@nvidia.com>
+ <20260506130129.GA665477@shredder>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20260506130129.GA665477@shredder>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 870004DE1F0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284945-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-284946-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vaibhavgupta40@gmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-> > -       .suspend        = gve_suspend,
-> > -       .resume         = gve_resume,
-> > -#endif
-> > +       .driver.pm      = &gve_pm_ops,
+On 5/6/26 7:01 AM, Ido Schimmel wrote:
+> ... it would have been easier to review if split into
+> multiple patches (not saying you should do it). Something like:
 > 
-> Thanks for the patch! A minor suggestion: could you wrap this in pm_sleep_ptr()?
+> 1. Change the various nexthop remove functions to return an indication if
+> flushing is required, but keep doing the flushing in
+> __remove_nexthop_fib(). Referring to these functions:
 > 
-> Also, please include the net-next prefix in the subject line when posting v2.
+> remove_nexthop()
+> __remove_nexthop()
+> __remove_nexthop_fib()
+> remove_nexthop_from_groups()
+> remove_nh_grp_entry()
 > 
-> With those changes, feel free to add:
-> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> 2. Act upon the flushing indication in the various callers of
+> remove_nexthop() and remove the flushing from __remove_nexthop_fib().
 > 
-> Thanks,
-> Harshitha
+> 3. Add __must_check annotations.
 > 
-Thanks for your input Harshitha! I have made the suggested amends, and I will
-send the v2 in reply to my v1 patch, as I have to include the review tag of
-Alexander as well.
 
-Thanks
-Vaibhav
-> >  };
-> >
-> >  module_pci_driver(gve_driver);
-> 
-> > --
-> > 2.53.0
-> >
++1. Always send the smallest patches possible to evolve the code. Make
+it easy for reviewers - and yourself should you introduce an intended
+side effect.
 
