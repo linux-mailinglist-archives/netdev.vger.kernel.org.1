@@ -1,188 +1,136 @@
-Return-Path: <netdev+bounces-284915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284916-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6PN+DuJg+2kuaQMAu9opvQ
-	(envelope-from <netdev+bounces-284915-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:40:18 +0200
+	id COmINcNf+2kuaQMAu9opvQ
+	(envelope-from <netdev+bounces-284916-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:35:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 289864DD6D8
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:40:17 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 736724DD580
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:35:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5E0F5306E98C
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 15:27:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5D0E73025C55
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 15:27:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B7CB481A92;
-	Wed,  6 May 2026 15:27:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D8448C40D;
+	Wed,  6 May 2026 15:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UfeYdcQX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ec+PuHRY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4984132A3C9
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 15:27:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F3948C3FB;
+	Wed,  6 May 2026 15:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778081233; cv=none; b=pDY+AgAUEk7kyA9OhLWPUujCddU/5gRJCqz/uO2fFsJYH5N1qQ0sfoP4KEN6hc1/xYPrf3x8j+HPj3S02rwyPG97SW2AhLtVvjeKKwka9DqD5NuiyS6dPjZPE7AG0j5Awg+h3Vq+ExuBUOsO4LVlsJ5ddNbexRmOSQo0sopO6ZU=
+	t=1778081245; cv=none; b=gcSFxNw/ISwqpjUM1Sta1b9W9V18U7+05VMYTs2mXWbNNOOj/8WmUUg0N9rE1+0YHBPla1qtUzqbzOuRyPxB3jJdYmcgX4+PovlA3czfMDWZEfMQx/hcJzYowQwRRBaOBRuKJKLiKxkCzrv93cuJYWZoMu3pw/4mA4TwuWBFuZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778081233; c=relaxed/simple;
-	bh=SkBOX6fDWuILt3NDIue2RThsK+F/RfZ0aMZvoLyOuwU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V5neseK9WlOhwJ0LyPmyGXGWttH9Sxt8rAHQkKDVyTangx6L4SHi/QtKT6WrTMi/YQVo2eE9DXPybsM4VoEWiYmxLxmq6NGzXADSVXP+DcipGFTmJsfmQnaroG9G/1lSmHzgiPKXY88GXEArzBvNsDqJvPjSde0Zl+q6t4Qgk4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UfeYdcQX; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-36534668247so3879956a91.1
-        for <netdev@vger.kernel.org>; Wed, 06 May 2026 08:27:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778081232; x=1778686032; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZC6Xht6xACWuhXxwl0DvhLfosR4WdiVXz/heDFGTozk=;
-        b=UfeYdcQXldx8Jbc3SVMOcnl1Q4v4/tLKcsmlYXHXP6AtsFOeKZP+kweeSo904BC64I
-         7jMoj9DC0HbddB7dH/tOmoLBr2VIfmCUxgB+Jopo08SKxCa68//XPhlgoTNdc044pq5p
-         FGAR8nOidpMHWS9G7I7x7eOrL1fgUA/SNoKyLcBbe/u+zEaZ7/ShCJKO6pNHncoU+SQ8
-         GmF6g6dH+bcmY5oE1VVB23AJLgwVtA8+AGtIH0l9toESPvS5oyAGxcWdwR0fiRA6Zb1P
-         Ejqdb1n0qRuF1snk8f8BGnUMwtXBr4hZbLjHk4pjfWZ9oQlPoqsXrjYMkWLS9cYHQwNs
-         +yxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778081232; x=1778686032;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZC6Xht6xACWuhXxwl0DvhLfosR4WdiVXz/heDFGTozk=;
-        b=Y0Aei0sQ1Y+aa76INjxsRLfbN0mEWnTTE7v1urLqpPu+RJOfPCj4Y+BzjKB0stJc4J
-         uPH8yBewiodY9DNfN5oxgiHHA4XawIahI56d9dVJtBYB4inL+7PYS4xMqSZN8qRGO/Ny
-         drDPRWWvOBcNUPBO5go6Szp3LsUzlc8aGiy0DohL3RPTUKe7GLvBErIHWXW35tZoCNkN
-         yraTVLFETReldIH5a5+AmCt4LVnG+m3wafrUhhe5/7WPSewlKGcjWiWaygO7wdJBgVSr
-         4cqiyrhdxkSwzGglvxQCnSNuNKmiv3gA5uZLFPbro8yBw1NidYpkyRsMk4oDyaHZWMym
-         seGw==
-X-Forwarded-Encrypted: i=1; AFNElJ8P7vkiGdGvWRrrR56ZtBX9Rm0Dfd3VjdcA8kQUtU5U8T1JFYzfGk+7rrNWFlYeDHZ5F0eor3w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlhI/2UyAozg5jGVXCVy+bZPNH0skhvKGkI6LIuU+nEHhNgyha
-	dSAeB4rLs5DnoYHWNq7rWx/5nFrnAd2nwhIfl4Ae2MTN5pLsCezSS+er
-X-Gm-Gg: AeBDieuxy9rLFypBt0vTMBnkwx7VJYPX3yDtAmJC9E/5gGuwTU+L6RPSVJuTL2vkkNb
-	O54nekQMdxutb5Tr1LqQYjaYgeL1P1gi4YB+dubzkQcbO+zYimh1lqMcoiFS8evbWpJJFXlELrF
-	zhkspSrUYxBu6JZyfpWm4N6Ue3ESgxAmgPc+DcsjCevuvxoCByd4yojtldapxjnrPdI64FyZr/J
-	fZu+VwcLHo4XAKAg7mZdL7Bt3sSAZEC/NTHFq7wjWnHYUhUDY7CqNx7L0y+VCwBRWHgdo0PGEc/
-	lAUt4C+AxuJVmx8ePy75W1Dh6zdaptM32axHg7epVCal7+KSa7Bok1XjOcoHW1cufHpNEv8/RIh
-	+336ZfHdQcnAP05WCZn5IcbTbYg/xzoF1dkaAYco7K/LjpWpenAcjF6AzVbEYt8c6Y6lHcDuEh/
-	N9DoSjN/H2T8ftlJN6okFEkt7LsJEsZMUJtnfEDihlmzU/BqNY3sU=
-X-Received: by 2002:a17:90b:4b87:b0:35c:1f29:712f with SMTP id 98e67ed59e1d1-365ac76bae1mr3949539a91.24.1778081231591;
-        Wed, 06 May 2026 08:27:11 -0700 (PDT)
-Received: from localhost.localdomain ([106.0.57.242])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c8242ab8bf4sm2484894a12.4.2026.05.06.08.27.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2026 08:27:10 -0700 (PDT)
-From: Sajal Gupta <sajal2005gupta@gmail.com>
-To: petkan@nucleusys.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Sajal Gupta <sajal2005gupta@gmail.com>
-Subject: [PATCH net-next] net: usb: pegasus: replace simple_strtoul with kstrtouint
-Date: Wed,  6 May 2026 20:56:36 +0530
-Message-ID: <20260506152653.52329-1-sajal2005gupta@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1778081245; c=relaxed/simple;
+	bh=E/wBMWyg5ITF+73x7jx0/FTQEvjOe5VW+C9miyOx3Rg=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=TJ2aDYLTUupyW1tIx2vWP1qrxdrSIJycpxlT9fO92IhOdph8uDji0OiuG+DpZcjU2XYZ/+C8MmQANe1e/LPrjvZQw4VlZ9wQKkvO4yz4wUhyvBQRtknp0J1tLcAo0kozOs2CBTOnLOuuQPKPchQrLwBN/KrSMhCo1DwEGgtccuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ec+PuHRY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C1C1C2BCB0;
+	Wed,  6 May 2026 15:27:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778081245;
+	bh=E/wBMWyg5ITF+73x7jx0/FTQEvjOe5VW+C9miyOx3Rg=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=Ec+PuHRY3GrZ6DkM4jGjD1tdPpxruRo4o98ea+IhgQC0GAQuw52IUbbat0oDyIPh4
+	 urFYBPhF748DXnznr9I8y6uLC9w+Rz02wa82vyY6LsAkam+thfvolBQ3pd4Ov+Vfly
+	 eHU15G/lGcYibmch7R5tOd8ilDwdHHZRUcmbAS6DFRSGTBY7tRQu6AGEgn3b89Zf6b
+	 GvK6OLGcQ9lelE6tL3qiGj65fwGe0tFMFrdkI5+GHTelt1rYyDJWmYfKRoQKnDHABS
+	 jmwr6Xs/rhIdC/QyJZrnPWJ8d7UxztODHg/MkExA6AbmdK5Y7bLlS3ThfN2P/V9iKE
+	 /N5xbRRc2pvqQ==
+Content-Type: multipart/mixed; boundary="===============3941001768256425371=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 289864DD6D8
+Message-Id: <6083c00dc3cc6e72f6a4d0d2ad6632f0950bf12b5c09e873d614128db8758cd9@mail.kernel.org>
+In-Reply-To: <20260506142709.2298255-3-ameryhung@gmail.com>
+References: <20260506142709.2298255-3-ameryhung@gmail.com>
+Subject: Re: [PATCH bpf-next v4 02/12] bpf: Unify dynptr handling in the verifier
+From: bot+bpf-ci@kernel.org
+To: ameryhung@gmail.com,bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,eddyz87@gmail.com,memxor@gmail.com,martin.lau@kernel.org,mykyta.yatsenko5@gmail.com,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Wed,  6 May 2026 15:27:25 +0000 (UTC)
+X-Rspamd-Queue-Id: 736724DD580
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-284916-lists,netdev=lfdr.de,bpf-ci];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com,linux.dev];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284915-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	NEURAL_HAM(-0.00)[-0.998];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sajal2005gupta@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.999];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.kernel.org:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-simple_strtoul() is deprecated as it has no error checking. Replace it
-with kstrtouint() which returns an error code on invalid input, and add
-appropriate error handling.
+--===============3941001768256425371==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Also add a NULL check before parsing flags, since strsep() can set id
-to NULL if the input has fewer tokens than expected.
+> diff --git a/include/linux/bpf_verifier.h b/include/linux/bpf_verifier.h
+> index 976e2b2f40e8..f330e9cf297e 100644
+> --- a/include/linux/bpf_verifier.h
+> +++ b/include/linux/bpf_verifier.h
+> @@ -1376,6 +1376,13 @@ struct bpf_map_desc {
+>  	int uid;
+>  };
+>
+> +/* The last initialized dynptr; Populated by process_dynptr_func() */
+> +struct bpf_dynptr_desc {
+> +	enum bpf_dynptr_type type;
+> +	u32 id;
+> +	u32 ref_obj_id;
+> +};
+> +
 
-Signed-off-by: Sajal Gupta <sajal2005gupta@gmail.com>
+A review comment from Mykyta Yatsenko requested that a comment be added
+to the ref_obj_id field explaining what it's for:
+
+  https://lore.kernel.org/bpf/87ikb2tkta.fsf@gmail.com/
+
+The author mentioned in v3 that comments for id, ref_obj_id, and parent_id
+would be added in a later refactor patch. However, should this struct have
+inline documentation now for clarity, particularly for the ref_obj_id field?
+
+[ ... ]
+
+
 ---
- drivers/net/usb/pegasus.c | 26 ++++++++++++++++++++------
- 1 file changed, 20 insertions(+), 6 deletions(-)
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-diff --git a/drivers/net/usb/pegasus.c b/drivers/net/usb/pegasus.c
-index db85f40734d7..d45f08f8f22e 100644
---- a/drivers/net/usb/pegasus.c
-+++ b/drivers/net/usb/pegasus.c
-@@ -1327,15 +1327,29 @@ static void __init parse_id(char *id)
- {
- 	unsigned int vendor_id = 0, device_id = 0, flags = 0, i = 0;
- 	char *token, *name = NULL;
-+	int err;
- 
--	if ((token = strsep(&id, ":")) != NULL)
-+	token = strsep(&id, ":");
-+	if (token)
- 		name = token;
- 	/* name now points to a null terminated string*/
--	if ((token = strsep(&id, ":")) != NULL)
--		vendor_id = simple_strtoul(token, NULL, 16);
--	if ((token = strsep(&id, ":")) != NULL)
--		device_id = simple_strtoul(token, NULL, 16);
--	flags = simple_strtoul(id, NULL, 16);
-+	token = strsep(&id, ":");
-+	if (token) {
-+		err = kstrtouint(token, 16, &vendor_id);
-+		if (err)
-+			return;
-+	}
-+	token = strsep(&id, ":");
-+	if (token) {
-+		err = kstrtouint(token, 16, &device_id);
-+		if (err)
-+			return;
-+	}
-+	if (id) {
-+		err = kstrtouint(id, 16, &flags);
-+		if (err)
-+			return;
-+	}
- 	pr_info("%s: new device %s, vendor ID 0x%04x, device ID 0x%04x, flags: 0x%x\n",
- 		driver_name, name, vendor_id, device_id, flags);
- 
--- 
-2.54.0
-
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/25442456702
+--===============3941001768256425371==--
 
