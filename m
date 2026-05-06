@@ -1,255 +1,217 @@
-Return-Path: <netdev+bounces-284934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284936-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CNIaBqFn+2llawMAu9opvQ
-	(envelope-from <netdev+bounces-284934-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 18:09:05 +0200
+	id qJbcB3Bn+2kbawMAu9opvQ
+	(envelope-from <netdev+bounces-284936-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 18:08:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 178C24DDE1C
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 18:09:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 825764DDDEC
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 18:08:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 71BC33002908
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 16:01:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2B5603016527
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 16:07:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E104963B5;
-	Wed,  6 May 2026 16:01:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D2A148C40F;
+	Wed,  6 May 2026 16:07:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=schleissheimer.onmicrosoft.com header.i=@schleissheimer.onmicrosoft.com header.b="MfxWccBf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CMxz76PW"
 X-Original-To: netdev@vger.kernel.org
-Received: from BEUP281CU002.outbound.protection.outlook.com (mail-germanynorthazon11020140.outbound.protection.outlook.com [52.101.169.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f201.google.com (mail-oi1-f201.google.com [209.85.167.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B50328C2BF
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 16:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.169.140
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778083262; cv=fail; b=gCAJa0MACYGLFBcu3+ZsfdEMBaweKt49bTixldqsxrJEfvbk7+yVpeCbYpiy4RrwnyBIrG+Dm+7VDNhhGtklevYCyMvECJ5vxfQDC/dFxI3OWpayTAsXkwFfYk2T/9toDcLIN2cqF9HaLloRPOx2K6jfSuBDctulZ6Jm7BUxXxw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778083262; c=relaxed/simple;
-	bh=yS163YX2syupouvSZ+Dus8rL9OKH1oR2K5kxKCK2uGw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=OBXL+R05xp5YqCkcXRk/NVSR+zypScYbDnD11Ue1iRRVo3a4M4979MC+7J0XUbzvMDFgxvPVvLeZgFwoXXreG/e/IFomANNypn+4pL7xAE3iIGfX3E3DWthqJlGm0U4y/jGc+DNcFacSB0kbcSs73LVnDFXdHmVBGg9luKmmcIU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schleissheimer.de; spf=pass smtp.mailfrom=schleissheimer.de; dkim=pass (1024-bit key) header.d=schleissheimer.onmicrosoft.com header.i=@schleissheimer.onmicrosoft.com header.b=MfxWccBf; arc=fail smtp.client-ip=52.101.169.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schleissheimer.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=schleissheimer.de
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GDDXLdMgELBOAT98DfUXUbQ4ZLv8maEoSvlUiOX7VOcuEnCR1BEEL6YafNw4+BUGE0QvUYt3dV2YBR4K+ZT+RJJiKOmTn0eVGL/t6g6xkcHNxvEQ1NXRreV/kgGW4500bTNqaJoNJS7WVRb/Z/EgVUcj+cP9bkFOgNXswLNQcGboFzgEZWncQEQC2qIG/up9xoMsaPoP0uiLnlvkFKqCgAbsBQKdC7RF+EHP2zRYi9ztQscNZyGrL+iMOVhWoLSSr3ENYqWcUt8ZksHoShZwlEDOlpOWCCP/zi8106EqA2fWq91TxGLekV/P8mEx1GaQaUlUyh/PO3QlhIDFlZS/KQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/Muq5Uw54jCQqAEhxSdGgOQylBNpDzea+2mrlK2wMzY=;
- b=iK7JcpbLrIpquBCfTc6ZMtWloMoFY1gs5ll6pvr2K12PRjcj+j3QB5zUvE1cKOoKLPRTC+3UelPzo5S/rMTzKQrqc2rVu8IY7K0du/r/XsE431xutPezta+/Km5CbRdkBgxM6wN8KGPpTEdX4ksuo6R7aqkcon0epBIzZrXIIajH/Lx4tFt6n/hDFKWsiBuU8p7y3E6pTplWQaNsXajTB+nLcEbm+Hg/BZ4W1Lm61vuPXji3ZCs+7W8g1QT3+ZEfgADanIuvf4L7OYqtXX7jRhyVJa5TCNJOC4tG8EWf24AQv0LMU0d5bAzGYushWJmDOUPZlokLX3wR/LC9uw3Mng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=schleissheimer.de; dmarc=pass action=none
- header.from=schleissheimer.de; dkim=pass header.d=schleissheimer.de; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1593481AA2
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 16:06:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778083627; cv=none; b=CpyKd9ozKIaBMltlY7efiMFpkMO81CEU2BqJmMbETr0O3j5cNh9jR8NqaHjNoF/4yusTubAdEAYwb8VMLsywDr1j8Ey0V53DcQFRhIpNzHofjf326qgwcLqgvlWiJUfRIFzr228xbJTN6V19mbkeh0GeDceo0Wkg9uDek+6s4Tk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778083627; c=relaxed/simple;
+	bh=ykwMHUEd0hsIyfIsVZwiYaZbec66DLJgY2YZ0eTBX1g=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=RDfBicAl7eIWdG/AKW/Dq6I1y3odMDNFOBA/1G71saJ41ONM16QJsvACjzfBOuaCeR2RMeYAWNriePQ8yMmxDV29rDmRIH8Ixw9JLwI3YgBBmFy/gN29tjP/9Y5o3iy2WcYbHpGSynzbLWzEUmtJQxlvN8fqieiWB1whUsbdMiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CMxz76PW; arc=none smtp.client-ip=209.85.167.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-oi1-f201.google.com with SMTP id 5614622812f47-4718a1723a5so9455221b6e.3
+        for <netdev@vger.kernel.org>; Wed, 06 May 2026 09:06:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=schleissheimer.onmicrosoft.com; s=selector1-schleissheimer-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/Muq5Uw54jCQqAEhxSdGgOQylBNpDzea+2mrlK2wMzY=;
- b=MfxWccBfndvQiA46jwI3mAk41qdMhqYKvqm+L9+IBaOppB+1bbVQC2KbQPLAzfYYp6cOTZy47NyhLZiO607dYj0UA/n+3kaB0Fx96i7CJZPjQbmHv1mfAkSjHRjNbKeZzmuXSstamAwWmwbPNoEzuJXrhSTmM5jzoJlSacOLliw=
-Received: from BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM (2603:10a6:b10:52::10)
- by FR4P281MB4481.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:128::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.15; Wed, 6 May
- 2026 16:00:51 +0000
-Received: from BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM
- ([fe80::2bc1:32a6:153:c3e9]) by BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM
- ([fe80::2bc1:32a6:153:c3e9%4]) with mapi id 15.20.9891.008; Wed, 6 May 2026
- 16:00:51 +0000
-From: Sven Schuchmann <schuchmann@schleissheimer.de>
-To: Andrew Lunn <andrew@lunn.ch>, Maxime Chevallier
-	<maxime.chevallier@bootlin.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: AW: assert in phylink.c with lan7801 and dp83tc811 since kernel 6.18
-Thread-Topic: assert in phylink.c with lan7801 and dp83tc811 since kernel 6.18
-Thread-Index:
- AQHc3HSt2FaNRg+Hc0Clgdk/8rilD7X/aQMAgAEuzo+AAFoaAIAABvoAgAAD+ICAACpjCQ==
-Date: Wed, 6 May 2026 16:00:51 +0000
-Message-ID:
- <BEZP281MB22457317618130F28E84E3B4D93F2@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
-References:
- <BEZP281MB224533D524B27CFC6E47B447D93E2@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
- <57fb63c2-7a05-4bbe-ba2d-fc61ce1e3ba1@lunn.ch>
- <BEZP281MB22458F571CC8251C141D933CD93F2@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
- <7778cd41-cf36-4524-a347-408a8fb0bde0@lunn.ch>
- <f9b8840d-94ba-4bde-9ace-fb81eb733ff9@bootlin.com>
- <eba96f21-78e6-42bf-938a-6d4037d0a305@lunn.ch>
-In-Reply-To: <eba96f21-78e6-42bf-938a-6d4037d0a305@lunn.ch>
-Accept-Language: de-DE, en-US
-Content-Language: de-DE
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=schleissheimer.de;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BEZP281MB2245:EE_|FR4P281MB4481:EE_
-x-ms-office365-filtering-correlation-id: 37ab51ba-daa2-461d-45c1-08deab88a593
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|38070700021|22082099003|56012099003|18002099003;
-x-microsoft-antispam-message-info:
- uAFz6YnSLsjU/Ig2P5oxed59Qm5N3bopjuCUWhU9UpPNp1UoqHePWhS392tg1/Gt0vwl9u6J9aVXtnSWAWZm8NF9CVQxoiwY0TnO9L4wLQ5nZrOsY03UYYBlOrCdr/912Gi+lB7jOO88bOIa/aydYo9b50LN+ogc0p5GkKb7KoiH2/hvkJNFBvt73maOewbv/svVsVYLi2Y8SVlMfSaG8xzA/eIszCiAWHhWVSPykgfcSc1ulOL5eNHGpV5g9zcQ4xDAdYJy7SjDdBjzYmB9OQ8bEsdFj6AtBz8kWAE9032QqIb+0YFDgVikjrMcmTxNtJSrt5UC6qRn7ZSDmI+46AKxXPVXALsP0ewkMKvN35bF3eCx0OUoIQFuJ9CUkbwoSEP8BBOz9ZAINqMZVEJPLNvxwFFunWpfAlJSB4TRuby4RYHDJUK7vpahNcFIF/T7JW79ZXDqkvr1mWYBHqW+u7BZyahEd7CQtpIHgvL5ABYr/rKjyBQKekpdI6E0cJJwfMlZa67P1YGXJYeP1NrsmyPBWQGKJd6PnxQIqULiRwPjjGCmhD9x+F5pJ2zJkvkiip83VkYJuKsnyiXb5rlUGHjh2fSs7Rr3ZzVfIgJzF+BPBckaPDGVf1Tj3R2EUEw8EcZbMBaVa1l4iOPqzoPhzFMD1RVhE1rrUX2AXQ13TVQUcrhuFASxuJYh5N3mM41KOH0MW2ibVJzQCTyH2zI9qQKmPg9pd6tfHpQCKn4QzU7ddBvEI2ziKVRSLH5hwAPR
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700021)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?JN0Kye8UzkDs8kK8h6qymIBmb9XdkFI//9DZOfgISW+cPgADixNSVEhxSH?=
- =?iso-8859-1?Q?ln4BKJ2M97NjLAZlICs1zhVrvdu4xHojzsnr4D2O0MPH2K21ZA2K1mPbGx?=
- =?iso-8859-1?Q?n81QsCtNtw2M/ZHeIvtAqiVBy1vRIxdZktCioIxabPtsmv1XKHEZ9Eu7v7?=
- =?iso-8859-1?Q?NgPC2gmwiYDHiBk8w0ODr1zp+md5Dozu/AlDK5BFUZGPphI2f1PtJ53vvn?=
- =?iso-8859-1?Q?fBOH02sRAWRcGV2Hgi/RTanZG8bPwfqbykpIvDqM5oNc1OSsA0EU+sgRO5?=
- =?iso-8859-1?Q?+ITBCpvbVrrD9yDCSUZSnrhDtXGIKWfEbBIJaSqTIxNyQc5O5KPU7Jbl1y?=
- =?iso-8859-1?Q?xAzFtu1qEDJmZw627F9sYY3ib14U8YLnP4zwgBh1QronFpb5kL17qjKk39?=
- =?iso-8859-1?Q?0ZMHY0X0pjlblDtZ0/edheTnjlsyVOO/qbUfO6gQN2WoBLl732iwRubHoX?=
- =?iso-8859-1?Q?1fP11naLHifjHeYW9P2lzAVLoblwE8kvL9FAzMEj5LtbbRChd9fD/61Oc1?=
- =?iso-8859-1?Q?kayJtUucZc4dwbbmYQvR3TnghCQ0X2Hj5co5NWaCHyQsYVBn189P2rZanf?=
- =?iso-8859-1?Q?AehnQaU9BaIeiO814G6kbQ0NRvu1xbLkU2ET47eH0IG3aNFqwgKtJgL+kD?=
- =?iso-8859-1?Q?6RovT9mEFGStMzHV6/sJ3TICc6XyP9kPuR6u7yebim+Z8DuqrYpNg/To7q?=
- =?iso-8859-1?Q?R/WZxZ1fBBGAII0cSCDZNwNF7KS09bGS2umIxu417ZM3EkwHFDbvIIh2ci?=
- =?iso-8859-1?Q?f4UCg5Du/E1tHK7egHkwe/xMqGOrxroyqIO70zbz/1/Ck6vApUbwIQqeoi?=
- =?iso-8859-1?Q?/0py4EW/UvxctA21dpPvZDZHAsFqO38F8pytsEmZ9LBtQynlSnkFsyzoMI?=
- =?iso-8859-1?Q?DL9y6wDwZcwUXhDuHoFTxP04EH5DU3s5eJENxwbMjjdKsSwe1HDKkDdHJE?=
- =?iso-8859-1?Q?BqfV5TbAFn6K/0KkTB2Jlpeb7GyBXXXn/E/h0qh2mSw5N6eWNbo3OQWRK6?=
- =?iso-8859-1?Q?nkL3O2r89Gv+eHXHTh4+Zwdh+NtVkKLJjmPhvUI2Nv5UKmgyJZUKrXGwDg?=
- =?iso-8859-1?Q?DwClOMxBbpCBzhnutsLJOxniQmsYGI1dFlZVN8Y5JnpVhPNro9xO5s6RJv?=
- =?iso-8859-1?Q?ygXqjygZO1vYsa4hjR/ETRkwZyxtEBl8uKDjIFQ+TC8lfzvW+l/D8/MRc/?=
- =?iso-8859-1?Q?m2TfuC6BvGRFKqfXpf7KI5rqVB9lS0BWexGJl1IivqBMepnilSJdO4GpDY?=
- =?iso-8859-1?Q?6D1umqiZWdSlAXLWDYYvDwRAut4P+kqvSg+tlq+8u7SZ2gKtlQZBhf5mr8?=
- =?iso-8859-1?Q?Q5JoDN/1ceB1KEvhC7x7ayWHALhSbnLtr/ta4/2VJHCl7nf03uUbXZAwMa?=
- =?iso-8859-1?Q?CXE1RanUGqhqhFh80n6+Yks4ObJkZiefIKx1Rxg3bZtnz6mO7AQWRHLX3B?=
- =?iso-8859-1?Q?cOKBa5Z/Y1DRPxZC06aV4Q3LJ6TTm/lhZGQqjhYQR6SxxBWVDBK/6z37HR?=
- =?iso-8859-1?Q?l5cSILiQynDrAevJi0UDmUn7IO8EmDG13Z1clbKMf6ULTReJDqX1fWU6U8?=
- =?iso-8859-1?Q?j4wtB+8bZRn9+GNjJge7WFfjFIW0UqqRkw5vJoHoVZLKYrsy4z9mAbJZSh?=
- =?iso-8859-1?Q?bQuqzV5o9qRi9uEXQcdeyOLgOUTlOLcX5Vi1rpPPEUxkx+QBpt5hJ9E7R1?=
- =?iso-8859-1?Q?Lx9GLslq3rcEmzGu1z8FNyd2UUcKzkSFb8hpCQZvQd9eoMeEbcDUhE/Rli?=
- =?iso-8859-1?Q?fWDVcWuvyeqCz7K63UKX+v4k+5cADwA40eQnEzox6BGjJ+lj/SK8SPVa/R?=
- =?iso-8859-1?Q?34bSV+LSgQ=3D=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        d=google.com; s=20251104; t=1778083617; x=1778688417; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+4NHUHEJqF969q6P59ZGW3RHrZHMnY13I01mZVqdn1Q=;
+        b=CMxz76PWKLXCtZrpelQPn+p8Lf4ATWa4EaKeJhmUq7CFMCImE+t4a86LSRRmdaQASY
+         xGIGTeKPi5ftmVow6mNRgmV3mPWFBOJWALMI8cTAKLkqZ7whCjf+iROTYQqDAH3yVT6b
+         kM0EysVMn1Z4viShL9JZYNdlDKu8gfRWraRhDmt/keNDmlkMn9dERuv2QEWcSnz0HxOr
+         GNz0JOMBOgrldW3gb+Xo81LoYtbdKiuB13HdvvQmuIkbz2zJJYRFQ7ezmQWLFfvKUNEB
+         lod+Qlyk96yIi4nzKeETjUyv4j/NPYhJDLEFy12qGX5phdY6ibAFicVkwcrVOkSin5Xe
+         qOXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778083617; x=1778688417;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+4NHUHEJqF969q6P59ZGW3RHrZHMnY13I01mZVqdn1Q=;
+        b=AtAK9OvtJeWl3wioMpJpPpsLTwP/pBrXdfIgs4lhEYbXomKRd0pq+iAxYMkJKjNnsX
+         Rwd95/7XR6vb2zFsd052CwGqtfdvLRq9M/SGbghLkm25NZCxJIqLXppobu5jrx8kDyQf
+         rJPqh8tgdR78J2Xw2Ob81Ki2PXiIP0fr7yjfqb4+kqBTVt9xjeuhgsQcGWwCFJ4+F8Gu
+         J82v4CZa4VNkBHPb6KKGVkBFEXLxgeVsm0q5vK8lip4xBDQ/R+udj2EAq/boX/mHdu7O
+         OHqMwfNaaR/AfPIfvfHbO+5WpVlqSgOZVdTuQan6kuNr5lVeZG/5HIJwxccCBcuff3T9
+         Y93w==
+X-Forwarded-Encrypted: i=1; AFNElJ/+RuReNoP+3/MmCCAthKxgsQ6zSi7mcnALgWMRTlJW/vg9aAomNtgH7+W/is++y/DeWTWvDq0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfaxFFSLfGA0zpg5MLI5xlRizAruOkFEZPbjnn9rcDyLSmU0Nd
+	BliyeOX8rXK2o6rczCq48VHX2E7T8OLW1FYMJMSAD5BNdQrx8oV1/8fjTL4mn8qgSUDxl2j6r+w
+	vrVIZKul9SOHBCg==
+X-Received: from qthg9.prod.google.com ([2002:ac8:709:0:b0:50e:5ae2:8868])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6808:4e8e:b0:46a:d8b7:1101 with SMTP id 5614622812f47-480424aa8damr1575613b6e.41.1778083617189;
+ Wed, 06 May 2026 09:06:57 -0700 (PDT)
+Date: Wed,  6 May 2026 16:06:56 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: schleissheimer.de
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 37ab51ba-daa2-461d-45c1-08deab88a593
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 May 2026 16:00:51.4382
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: ba05321a-a007-44df-8805-c7e62d5887b5
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 5rJCIFCdlsz4TfChiXHgwc5MZolYccnfhQhUGJjaECIMqP4p7pp+kbFpYeLZxG8/Y4XDDvgI1k/lwZMHya3HQyxjbcDWkrOulNUQucOkkT8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: FR4P281MB4481
-X-Rspamd-Queue-Id: 178C24DDE1C
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
+Message-ID: <20260506160656.1226077-1-edumazet@google.com>
+Subject: [PATCH iproute2-next] tc/class: use rtnl_dump_request_n() in tc_class_list()
+From: Eric Dumazet <edumazet@google.com>
+To: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Jamal Hadi Salim <jhs@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 825764DDDEC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.44 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_DKIM_ALLOW(-0.20)[schleissheimer.onmicrosoft.com:s=selector1-schleissheimer-onmicrosoft-com];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[schleissheimer.de : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284934-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,google.com,mojatatu.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[schleissheimer.onmicrosoft.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284936-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[schuchmann@schleissheimer.de,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[3];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,schleissheimer.de:email,lunn.ch:email,schleissheimer.onmicrosoft.com:dkim]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mojatatu.com:email]
 
-Hi,=0A=
-=0A=
-> > Von:=A0Andrew Lunn <andrew@lunn.ch>=0A=
-> > Gesendet:=A0Mittwoch, 06. Mai 2026 15:18=0A=
-> > An:=A0Maxime Chevallier <maxime.chevallier@bootlin.com>=0A=
-> > Cc:=A0Sven Schuchmann <schuchmann@schleissheimer.de>; netdev@vger.kerne=
-l.org <netdev@vger.kernel.org>=0A=
-> > Betreff:=A0Re: assert in phylink.c with lan7801 and dp83tc811 since ker=
-nel 6.18=0A=
-> =0A=
-> On Wed, May 06, 2026 at 03:04:42PM +0200, Maxime Chevallier wrote:=0A=
-> > On 06/05/2026 14:39, Andrew Lunn wrote:=0A=
-> > >> So for me it somewhere happens in phylink_validate_mac_and_pcs()=0A=
-> > > I was expecting to see more debug output, but reading the code, i was=
-=0A=
-> > > also thinking we need to look at phylink_validate_mac_and_pcs().=0A=
-> > > You are going in the correct direction putting lots of printk() in th=
-e=0A=
-> > > code. We need to find where it returns EINVAL:=0A=
-> > [...]=0A=
-> > > In the end, we are probably going to find that what the MAC says its=
-=0A=
-> =0A=
-> > > capabilities are don't match what the PCS says it can do.=0A=
-> > > Thinking about that, it says phy mode RGMII. You generally don't use =
-a=0A=
-> > > PCS with RGMII, so that is suspicious.=0A=
-=0A=
-> > Another thing to consider is that in this case, we're attaching to a=0A=
-> > dp83tc811, so a 100BaseT1 PHY. Does the PHY driver correctly populates=
-=0A=
-> > the supported features ?=0A=
-=0A=
-> Using RGMII to connect to a 100BaseT is also odd. It does happen, but=0A=
-> it is a bit of a corner case, and something could be going wrong here.=0A=
-=0A=
-What I can at least say that it was working with kernel 6.12 on =0A=
-the same hardware. But I do not know about the supported features populatio=
-n.=0A=
-=0A=
-I added some debug code to the end of phylink_validate_mac_and_pcs():=0A=
-=0A=
-	/* Then validate the link parameters with the MAC */=0A=
-	if (pl->mac_ops->mac_get_caps)=0A=
-		capabilities =3D pl->mac_ops->mac_get_caps(pl->config,=0A=
-							 state->interface);=0A=
-	else=0A=
-		capabilities =3D pl->config->mac_capabilities;=0A=
-=0A=
-	phylink_validate_mask_caps(supported, state, capabilities);=0A=
-=0A=
-	phylink_dbg(pl, "phy: --3.4 supported    0x%x\n", supported);=0A=
-	phylink_dbg(pl, "phy: --3.4 capabilities 0x%x\n", capabilities);=0A=
-=0A=
-	int retval =3D phylink_is_empty_linkmode(supported) ? -EINVAL : 0;=0A=
-	phylink_dbg(pl, "phy: --3.5-- %d\n", retval);=0A=
-	return retval;=0A=
-}=0A=
-=0A=
-and the output I get is:=0A=
-[    2.771602] lan78xx 1-1.4:1.0 (unnamed net_device) (uninitialized): phy:=
- --3.4 supported    0x80cf3430=0A=
-[    2.771607] lan78xx 1-1.4:1.0 (unnamed net_device) (uninitialized): phy:=
- --3.4 capabilities 0xbf=0A=
-[    2.771611] lan78xx 1-1.4:1.0 (unnamed net_device) (uninitialized): phy:=
- --3.5-- -22=0A=
-[    2.771616] lan78xx 1-1.4:1.0 (unnamed net_device) (uninitialized): vali=
-dation of rgmii-id with support 00000000,00000000,00000000,00006280 and adv=
-ertisement 00000000,00000000,00000000,00006280 failed: -EINVAL=0A=
-=0A=
-But I do not get what phylink_is_empty_linkmode() is doing...=0A=
-=0A=
-Regards,=0A=
-=0A=
-   Sven=0A=
+strace tc -s class sh dev eth1 parent 2:
+
+strace is fooled with rtnl_dump_request() way:
+
+sendmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000},
+        msg_namelen=12,
+	msg_iov=[{iov_base={nlmsg_len=36,
+			nlmsg_type=RTM_GETTCLASS,
+			nlmsg_flags=NLM_F_REQUEST|NLM_F_DUMP,
+			nlmsg_seq=1778082626, nlmsg_pid=0},
+			iov_len=16},
+		{iov_base={nlmsg_len=0, nlmsg_type=NLMSG_NOOP, nlmsg_flags=0, nlmsg_seq=0, nlmsg_pid=131072},
+		        iov_len=20}],
+		msg_iovlen=2, msg_controllen=0, msg_flags=0}, 0) = 36
+
+With rtnl_dump_request_n() we get instead:
+
+sendmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000},
+	msg_namelen=12,
+	msg_iov=[{iov_base=[{nlmsg_len=36,
+			nlmsg_type=RTM_GETTCLASS,
+			nlmsg_flags=NLM_F_REQUEST|NLM_F_DUMP,
+			nlmsg_seq=1778082790, nlmsg_pid=0},
+		{tcm_family=AF_UNSPEC,
+		 tcm_ifindex=if_nametoindex("eth1"), tcm_handle=0, tcm_parent=131072, tcm_info=0}],
+		iov_len=36}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, 0) = 36
+
+This will also permit future attribute additions, like skip stats.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+---
+ tc/tc_class.c | 25 ++++++++++++++++---------
+ 1 file changed, 16 insertions(+), 9 deletions(-)
+
+diff --git a/tc/tc_class.c b/tc/tc_class.c
+index 310514ce560ab6c1b42665cb6c75314e45b84cd6..82f0f85ee39a335bc7e1c3bea2e3ea9571ea155f 100644
+--- a/tc/tc_class.c
++++ b/tc/tc_class.c
+@@ -386,7 +386,14 @@ int print_class(struct nlmsghdr *n, void *arg)
+ 
+ static int tc_class_list(int argc, char **argv)
+ {
+-	struct tcmsg t = { .tcm_family = AF_UNSPEC };
++	struct {
++		struct nlmsghdr n;
++		struct tcmsg t;
++	} req = {
++		.n.nlmsg_type = RTM_GETTCLASS,
++		.n.nlmsg_len = NLMSG_LENGTH(sizeof(struct tcmsg)),
++		.t.tcm_family = AF_UNSPEC,
++	};
+ 	char d[IFNAMSIZ] = {};
+ 	char buf[1024] = {0};
+ 
+@@ -412,20 +419,20 @@ static int tc_class_list(int argc, char **argv)
+ 			if (get_tc_classid(&filter_classid, *argv))
+ 				invarg("invalid class ID", *argv);
+ 		} else if (strcmp(*argv, "root") == 0) {
+-			if (t.tcm_parent) {
++			if (req.t.tcm_parent) {
+ 				fprintf(stderr, "Error: \"root\" is duplicate parent ID\n");
+ 				return -1;
+ 			}
+-			t.tcm_parent = TC_H_ROOT;
++			req.t.tcm_parent = TC_H_ROOT;
+ 		} else if (strcmp(*argv, "parent") == 0) {
+ 			__u32 handle;
+ 
+-			if (t.tcm_parent)
++			if (req.t.tcm_parent)
+ 				duparg("parent", *argv);
+ 			NEXT_ARG();
+ 			if (get_tc_classid(&handle, *argv))
+ 				invarg("invalid parent ID", *argv);
+-			t.tcm_parent = handle;
++			req.t.tcm_parent = handle;
+ 		} else if (matches(*argv, "help") == 0) {
+ 			usage();
+ 		} else {
+@@ -437,13 +444,13 @@ static int tc_class_list(int argc, char **argv)
+ 	}
+ 
+ 	if (d[0]) {
+-		t.tcm_ifindex = ll_name_to_index(d);
+-		if (!t.tcm_ifindex)
++		req.t.tcm_ifindex = ll_name_to_index(d);
++		if (!req.t.tcm_ifindex)
+ 			return -nodev(d);
+-		filter_ifindex = t.tcm_ifindex;
++		filter_ifindex = req.t.tcm_ifindex;
+ 	}
+ 
+-	if (rtnl_dump_request(&rth, RTM_GETTCLASS, &t, sizeof(t)) < 0) {
++	if (rtnl_dump_request_n(&rth, &req.n) < 0) {
+ 		perror("Cannot send dump request");
+ 		return 1;
+ 	}
+-- 
+2.54.0.545.g6539524ca2-goog
+
 
