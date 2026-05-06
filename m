@@ -1,169 +1,162 @@
-Return-Path: <netdev+bounces-284791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284792-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uM9QCfUi+2lvWwMAu9opvQ
-	(envelope-from <netdev+bounces-284791-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 13:16:05 +0200
+	id IPHhEZEj+2mQWwMAu9opvQ
+	(envelope-from <netdev+bounces-284792-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 13:18:41 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77F5C4D9A75
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 13:16:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A676E4D9AA5
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 13:18:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC4C83014572
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 11:15:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DD6D9300D15D
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 11:18:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6F0A31716F;
-	Wed,  6 May 2026 11:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55BEE368275;
+	Wed,  6 May 2026 11:18:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hitachienergy.com header.i=@hitachienergy.com header.b="DYhWXfGE";
-	dkim=pass (2048-bit key) header.d=outbound.mailhop.org header.i=@outbound.mailhop.org header.b="ck1vH9MK"
+	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="rf3U4Sl6"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-ip0052.fra.mailhop.org (out-ip0052.fra.mailhop.org [18.158.144.38])
+Received: from sender4-of-o54.zoho.com (sender4-of-o54.zoho.com [136.143.188.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6029F246778
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 11:15:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.158.144.38
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778066150; cv=none; b=mD0x5lqr6/KOPuRFomCYksVTVHa/ajlL1748BI7yhJwZ/AX1ugkJFGHgs2u7hHkg1dLm1eTWktGcv2hrQlpLho/mpo+6nhYWeVUUSCeFgY1+nWsAubYSTaXov0s1KH1va1lbutX/V44rK5SMzZhmTMv4GB2BxevE7LEILYVuIys=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778066150; c=relaxed/simple;
-	bh=8Lmvqbu4qQ4lUb+7e2rO7fhHnvQ/F6uZ+YoU+WtzL4A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s1wyB1eVNe424DHwAhHmaU+2LsDxcnAj2P1om71oEl/NroJj+eUSq42asxkSolJlhPe+1NQ+FQ/KcOEyiuI7yCDKMhkwPm5kQ/mWX8xEEFrE7DW+pY1SzSjXqtSnvbAPOBBU35lTdyRgycBk+7pX5s42YWMCh4HYS/dDe7Gv5SA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hitachienergy.com; spf=pass smtp.mailfrom=hitachienergy.com; dkim=pass (1024-bit key) header.d=hitachienergy.com header.i=@hitachienergy.com header.b=DYhWXfGE; dkim=pass (2048-bit key) header.d=outbound.mailhop.org header.i=@outbound.mailhop.org header.b=ck1vH9MK; arc=none smtp.client-ip=18.158.144.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hitachienergy.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hitachienergy.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=hitachienergy.com; s=duo-1630306886989-947ac67a;
-	h=content-transfer-encoding:mime-version:message-id:date:subject:cc:to:from:
-	 cfbl-address:cfbl-feedback-id:from;
-	bh=mzUCgE4R9ZBXTM/Zus2HFTCm9+5cChUmtqF1FgPd4FU=;
-	b=DYhWXfGEoctLK+Qi9qqFGgDuAz7DMuhfwSA4j4SXWTgoZ309AexLFoEGF3fB1+JEQoAwjVVTgOJjL
-	 ujTZm6er/0UWhIk/zpuSiOIvl/bR8bEez4EuGez5HRAw26AG4Q9WffczdFx4q3j5pwvnCfFAI/9YpH
-	 aWdfPrazCt0xlhqM=
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=outbound.mailhop.org; s=dkim-high;
-	h=content-transfer-encoding:mime-version:message-id:date:subject:cc:to:from:
-	 cfbl-address:cfbl-feedback-id:from;
-	bh=mzUCgE4R9ZBXTM/Zus2HFTCm9+5cChUmtqF1FgPd4FU=;
-	b=ck1vH9MKZbrduQMh8rGhDVni8Z8iq3K0Q+TD1wdsaJeDEE/bN7lDDJtPkw+JPr1XUF5ZkL+96Xu1u
-	 lAEhUS0OGtWwN4wpvOJVMKJ2KToCiFU0t9m20ma+H4yKzVrrj21zvY7mBULD+pSBMl4KSUgUsT81qd
-	 NXmJ9fHPprhIZ8r3Yzf86S3fBqxWkdAcjf2kVcmdRyZrX3lMKC3FA5uxFcauoaH9Z+aUZ8dbRSnvVO
-	 ImifNNufxWiW9ozF032+m9jbwd+wfOg4sexPNBUICEzIJSo+E2ZfNtYYDwThNMiEjaeNmeEK+X4m/h
-	 /gmooY3Lv8FDjP5btuBPwpBY3MjZf6g==
-X-MHO-RoutePath: aGVkY3NtdHA=
-X-MHO-User: e4f9875c-493c-11f1-8f51-f54febe22707
-X-Report-Abuse-To: https://support.duocircle.com/support/solutions/articles/5000540958-duocircle-standard-smtp-abuse-information
-X-Mail-Handler: DuoCircle Outbound SMTP
-CFBL-Feedback-ID: e4f9875c-493c-11f1-8f51-f54febe22707:15
-CFBL-Address: prvs=058643e936=abuse@outbound.mailhop.org; report=arf
-Received: from HPG0000000426.corp.hitachi-powergrids.com (unknown [20.82.50.241])
-	by outbound3.eu.mailhop.org (Halon) with ESMTPSA
-	id e4f9875c-493c-11f1-8f51-f54febe22707;
-	Wed, 06 May 2026 11:15:32 +0000 (UTC)
-Received: from gitsiv.hitachienergy.com (unknown [10.54.139.14])
-	by HPG0000000426.corp.hitachi-powergrids.com (Postfix) with ESMTP id 47A9F80525F;
-	Wed,  6 May 2026 11:15:31 +0000 (UTC)
-Received: from chbrn3-p-dev015.keymile.net (chbrn3-p-dev015.keymile.net [172.31.41.201])
-	by gitsiv.hitachienergy.com (Postfix) with ESMTP id 19A6B60B7D47;
-	Wed,  6 May 2026 13:15:31 +0200 (CEST)
-From: Holger Brunck <holger.brunck@hitachienergy.com>
-To: netdev@vger.kernel.org
-Cc: linuxppc-dev@lists.ozlabs.org,
-	andrew+netdev@lunn.ch,
-	chleroy@kernel.org,
-	qiang.zhao@nxp.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	Holger Brunck <holger.brunck@hitachienergy.com>
-Subject: [PATCH v2 net] net: wan: fsl_ucc_hdlc: free tx_skbuff in uhdlc_memclean
-Date: Wed,  6 May 2026 13:15:29 +0200
-Message-ID: <20260506111529.2919079-1-holger.brunck@hitachienergy.com>
-X-Mailer: git-send-email 2.52.0.120.gb31ab939fe
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC3113469E0
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 11:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778066318; cv=pass; b=UbBv6X0kFgRAtLFP01vDJILeMWImF45wYD8CZ6HV66wRyrXA8bGtjhdtYtgE4p7emGSZG7dl2QZfO08HqSe7pUkdn1ADtaDBR1yEz9YTWVfUOdbmL4cZg8QyRlSSa3mcu1G9g/UnREgMRq1Y6h0h4CRwMb3w+m6PQYYJpyeY1Vo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778066318; c=relaxed/simple;
+	bh=1ssYjzuVWIdnYCaye4Kkr2TBcRhyyFLVRe3BgMhzN9k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QecEwfUQAMHRFnusP5t6hPOTv9X8rm6l0XOmM2mmY81B79iBjRHSIYkkPTPldsrXb8N0xYyBcDmARCC4kHxQ9Oj7b5j97enmjlKcNnUdb/V8LvgwCQVSK1O3OQya7mVGrn924H0pCOJ2RhTutungiYFfsoAao05mqFM0vLI9dfE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=rf3U4Sl6; arc=pass smtp.client-ip=136.143.188.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=machnikowski.net
+ARC-Seal: i=1; a=rsa-sha256; t=1778066288; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=NH8i/ogrQV6CNFuplDlVjzlqJnE3m42v9ZyhUyyoDHVwQuOzNWuusuV8s2cJMVQ9i8tKmvGcjTiYH0uYzzIax/vqmULpCYm0kGMqWgM3uKL6jbVcDhzceaP8zwoEiijKOqz19T8KPxgv9EPkTLt4vKDsAcfeI7+HqpslaSyU9u8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1778066288; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=R3oPaIkp4nS29Lkr8+uLYS7keKwoJxX56jFTR99zYkc=; 
+	b=S1B+7Unp/Qb/7x5Eaq23RzbH4RMSpP61R4Nwgy/Wpmozj3SjySZ2dlukh3ft9piL2q1NfZ3OXPU79C0Ncl+C2j3pT+ufk63hBq1ctjwzvk98BqWCRJC9P757glRMAdYmv1CqF+getvBEeHUjDh3QV2p4kp3J/XI6/tl1CfzrGoo=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=machnikowski.net;
+	spf=pass  smtp.mailfrom=maciek@machnikowski.net;
+	dmarc=pass header.from=<maciek@machnikowski.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1778066288;
+	s=zoho; d=machnikowski.net; i=maciek@machnikowski.net;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=R3oPaIkp4nS29Lkr8+uLYS7keKwoJxX56jFTR99zYkc=;
+	b=rf3U4Sl6pHdRN5zX7JwsYkz4r7FuU03iw8/D2CiBWUtD7BLUNPXcEcGPDdaAvyDy
+	P0cg1Ag1yqqIe5M34+CVPP5uCYgY0EJLiySF+wrmZJwLCxaqIfZcgZ1Vgpl1GfAAtB6
+	h/RvEQOw2vA+80GkaS3Syva7+5Wf3wEKwFTftghGxfKg99UDj/2Lrg0aNAWTVbohzpR
+	wDUK5R7/Lfikc0xtwx33rCWNxGn38vHMQVYlz9xXCYPfcLtZlpSwxgmRpxDJkpBAltX
+	uzFoxScWZZV2n2jUqqzj95tWAQQgJjdPcfEB0vLbK2yi6XrwPplhoeGtqJK6KUVg2c+
+	wIkiAwTa7A==
+Received: by mx.zohomail.com with SMTPS id 17780662844593.1625433326158827;
+	Wed, 6 May 2026 04:18:04 -0700 (PDT)
+Message-ID: <7fc0a457-7153-4b22-b3c9-2c6298b75d73@machnikowski.net>
+Date: Wed, 6 May 2026 13:18:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 77F5C4D9A75
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 net-next 3/3] selftests:net: Implement ptp4l sync test
+ using netdevsim
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, richardcochran@gmail.com, milena.olech@intel.com,
+ willemdebruijn.kernel@gmail.com, andrew@lunn.ch, vadim.fedorenko@linux.dev,
+ horms@kernel.org
+References: <20260503074747.1321-1-maciek@machnikowski.net>
+ <20260503074747.1321-4-maciek@machnikowski.net>
+ <20260504100753.7cc193cc@kernel.org>
+ <b2ceffa3-a1d3-4124-b640-68fc11996f51@machnikowski.net>
+ <20260505172234.3348a81b@kernel.org> <20260505172317.089fb380@kernel.org>
+Content-Language: en-US
+From: Maciek Machnikowski <maciek@machnikowski.net>
+In-Reply-To: <20260505172317.089fb380@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
+X-Rspamd-Queue-Id: A676E4D9AA5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[hitachienergy.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[hitachienergy.com:s=duo-1630306886989-947ac67a,outbound.mailhop.org:s=dkim-high];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[machnikowski.net:s=zoho];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[holger.brunck@hitachienergy.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284791-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-284792-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-0.999];
-	DKIM_TRACE(0.00)[hitachienergy.com:+,outbound.mailhop.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[machnikowski.net];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,intel.com,lunn.ch,linux.dev,kernel.org];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maciek@machnikowski.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[machnikowski.net:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,machnikowski.net:dkim,machnikowski.net:mid]
 
-When the device is removed all allocated resources should be freed.
-In uhdlc_memclean the netdev transmit queue was already stopped. But at
-this point we may have pending skb in the transmit queue which must be
-freed. Therefore iterate over the tx_skbuff pointers and free all
-pending skb. The issue was discovered by sashiko.
 
-https://sashiko.dev/#/patchset/20260429114208.941011-1-holger.brunck%40hitachienergy.com
-Fixes: c19b6d246a35 ("drivers/net: support hdlc function for QE-UCC")
-Signed-off-by: Holger Brunck <holger.brunck@hitachienergy.com>
----
-v2: - use dev_kfree_skb instead of kfree
-    - improve commit message
-    - add missing paramter in for statement
-v1: https://lore.kernel.org/linuxppc-dev/20260504161145.2217950-1-holger.brunck@hitachienergy.com/
 
- drivers/net/wan/fsl_ucc_hdlc.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+On 06/05/2026 02:23, Jakub Kicinski wrote:
+> On Tue, 5 May 2026 17:22:34 -0700 Jakub Kicinski wrote:
+>> On Tue, 5 May 2026 09:36:30 +0200 Maciek Machnikowski wrote:
+>>> On 04/05/2026 19:07, Jakub Kicinski wrote:  
+>>>> On Sun,  3 May 2026 09:47:47 +0200 Maciek Machnikowski wrote:    
+>>>> Doesn't seem to pass on netdevsim for us:
+>>>>
+>>>> # 41.13 [+40.95] # ptp4l follower did not reach locked state (s2) within 40s
+>>>> # 41.13 [+0.00] # Follower log (last 10 lines): ptp4l[2179.605]: ioctl SIOCETHTOOL failed: Operation not supported | ptp4l[2179.607]: interface 'eth0' does not support requested timestamping mode | failed to create a clock
+>>>> # 41.15 [+0.02] # Check| At /srv/vmksft/testing/wt-2/tools/testing/selftests/net/./ptp.py, line 173, in ptp_sync_test:
+>>>> # 41.15 [+0.01] # Check|     _run_ptp4l_wait_sync(nsimsv.ifname, nsimcl.ifname, nssv.name, nscl.name)
+>>>> # 41.16 [+0.01] # Check| At /srv/vmksft/testing/wt-2/tools/testing/selftests/net/./ptp.py, line 99, in _run_ptp4l_wait_sync:
+>>>> # 41.17 [+0.01] # Check|     ksft_true(False, "PTP sync timeout")
+>>>> # 41.17 [+0.00] # Check failed False does not eval to True PTP sync timeout
+>>>> # 41.32 [+0.16] not ok 1 ptp.ptp_sync_test
+>>>> # 41.33 [+0.00] # Totals: pass:0 fail:1 xfail:0 xpass:0 skip:0 error:0
+>>>>
+>>>> Anything we need to do?    
+>>>
+>>> Can you share the config file you used? Seems the PTP clock was not
+>>> found which may lead to PTP_1588_CLOCK_MOCK not being enabled?  
+>>
+>> You have to add it to the relevant config.
+>>
+>> Please read: github.com/linux-netdev/nipa/wiki/Netdev-CI-system
+> 
+> Sorry, wrong link, this:
+> 
+> https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
+I did follow the guid, ran the test on the vng environment and it still
+passed the test. Is there more debuggability on the CI system? Can you
+share the .config file it generated while running the test? Or the
+commands it tries to run so I can verify them locally?
 
-diff --git a/drivers/net/wan/fsl_ucc_hdlc.c b/drivers/net/wan/fsl_ucc_hdlc.c
-index bc7c2e9e6554..417e8e4c111f 100644
---- a/drivers/net/wan/fsl_ucc_hdlc.c
-+++ b/drivers/net/wan/fsl_ucc_hdlc.c
-@@ -739,6 +739,8 @@ static int uhdlc_open(struct net_device *dev)
- 
- static void uhdlc_memclean(struct ucc_hdlc_private *priv)
- {
-+	int i;
-+
- 	qe_muram_free(ioread16be(&priv->ucc_pram->riptr));
- 	qe_muram_free(ioread16be(&priv->ucc_pram->tiptr));
- 
-@@ -769,6 +771,11 @@ static void uhdlc_memclean(struct ucc_hdlc_private *priv)
- 	kfree(priv->rx_skbuff);
- 	priv->rx_skbuff = NULL;
- 
-+	for (i = 0; i < TX_BD_RING_LEN; i++) {
-+		dev_kfree_skb(priv->tx_skbuff[i]);
-+		priv->tx_skbuff[i] = NULL;
-+	}
-+
- 	kfree(priv->tx_skbuff);
- 	priv->tx_skbuff = NULL;
- 
--- 
-2.52.0.120.gb31ab939fe
 
+The commands I ran were:
+
+make mrproper
+vng --build  --config tools/testing/selftests/drivers/net/netdevsim/config
+vng -v --run . --user root --cpus 4 -- tools/testing/selftests/net/ptp.py
+
+The tests were done on the ARM64 Fedora 44 with the default kernel
+6.19.14-300.fc44.aarch64 running inside the Parallels Desktop VM.
 
