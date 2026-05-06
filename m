@@ -1,222 +1,183 @@
-Return-Path: <netdev+bounces-284720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284721-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6gKNKvPm+mlIUAMAu9opvQ
-	(envelope-from <netdev+bounces-284720-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 09:00:03 +0200
+	id 8B9+K8nn+mlIUAMAu9opvQ
+	(envelope-from <netdev+bounces-284721-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 09:03:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28BAA4D6E68
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 09:00:02 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC1FA4D6EEB
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 09:03:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8D1953004923
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 07:00:01 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 56BEF301A3D9
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 07:03:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AADF346760;
-	Wed,  6 May 2026 06:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D2F036B06F;
+	Wed,  6 May 2026 07:03:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ukh5HSID"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GUDt4Gdy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B68CC270540
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 06:59:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778050799; cv=none; b=AbJCaespj4d2ws0yXaAqnHmbLBmPsgPgL1j8crxMh9G4uVbfZoQAOioUObwScOQTZzycJl5EbgtQgTknL+FSdDsqiRSGxcOGjeB38g4YtItlNclLpgNnLZANtThExJKM+XuNrz1nUBaBvoU42ZLi5wlm6V0QXqM+dft/9oA+4MU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778050799; c=relaxed/simple;
-	bh=J5E0Z9EfzX69aBt+O2QjZkhOuiGsptGo9y8y8l9QZns=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=UuWc2UXE4OwGhh7iyrYFGH3PJMTtAOCFAr4e5CoaHlK74yBIPZDXqmff+B4cMuN80Cdp4RfR9QH3h2znpAttWPWYw0rDth1+MyJXaWWLeOY+fx3wxr+OiyI9/tQig45DxOzAxZs/XwwWrfQuWx30cxQltBzLrucVunFhNMlMD7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ukh5HSID; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2b2d83e7461so113032375ad.3
-        for <netdev@vger.kernel.org>; Tue, 05 May 2026 23:59:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97EB336C598
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 07:03:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778051000; cv=pass; b=vBl5ORifSKLbtnAMHD3NeLu6n1kWUQhNRkkNVL+hGfNP/lj8SwwxhgLzpVejzxG124XPUWU0Y+JzsPElmISz+nP5cMApVpRw2rllGcYHA35wbwu62oWQYMUoyChOR36NpiL4UxkLiwlWvFlkQktNGkRxTneoaQxB9PcmWzZ/3Jk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778051000; c=relaxed/simple;
+	bh=msWHq9oWGgdNM2kAFrrJd2OcOR7l/yhU403EI6PSLDo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ujUfKKFTvSBdVInHurjq2Zn3H9+75aBmZR3ahgJKvb7lC4TN7Q2vT4a+cL6OsixqbnxrcSL+E8UFN5W0iNB00UDI0QP+2PwelhA7VQydiIuUTD5D13OaODCerd5CAsBzZlcZz5GsZA0zpcsi9YD84dPjldM1epiDpHguH3ZPa5I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GUDt4Gdy; arc=pass smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-449e96a8a80so3609467f8f.3
+        for <netdev@vger.kernel.org>; Wed, 06 May 2026 00:03:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778050997; cv=none;
+        d=google.com; s=arc-20240605;
+        b=QHCDhpBAUjz0q0vPDbMXLIVCDgTqdXJi7y7U9E2vqkILM+IJY6IOgIUZSXGJfmOPKs
+         7fISJ3ev6eM/+LAUr3DOYF+bDUOo++TQIQW0T3s1FaKdCJIhH13EwvlVv1x8ZjHuhS9T
+         5A1ONSAZRnI0iMXccCbobyCdpi7xp7s9DPfwZdoT9G/JF4UEKP37PXxc22jvFAvyunyR
+         jmW5KC3EF+j4C05cop9dp34bAniWVhLj82BmtjSxfElSc4UhFaDD60Dmi+QqmAgPw5ML
+         3+nqZRqROa6b08SgycTbZA+6hfnLN/CcIdeb2Qwk+8JbjCG2Xv929EmUkl60P4AslFfB
+         ycmg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=msWHq9oWGgdNM2kAFrrJd2OcOR7l/yhU403EI6PSLDo=;
+        fh=7v3oj6RdPPeGLwgO4rr4evHUhXi4g7A8/aYVRbz/i3E=;
+        b=IcPy3EXg6EmJ9uCmWHXbk1BYYlXdVTT6Y+ecQH/zGa9miqxJN5wsfUSRDPGKfWbqQD
+         4/sWT9ecyDhey3przYD3kdAPRT5NmnRAj2vlswwYmoSIdwR0XNAyo51WX8Plcox3iEqD
+         X6dTfXgw1XlAp1kh1c/9JBEaH6e4gzi/ifAylJXAQ7oU3i3Fd40xDAIUvjBf8kyQUs9d
+         1Q4lOa+ijpwVnBaiCXBuS+JV2hMvzFzL38Ew1u0653K8DDOBEBewmDzRJW2uAIBwJdW2
+         qMdOr+4pTN3UJkuhw0dArnz0j4vrYUD3W9aEY7ITZ2Uzzio4VUlabSWRhmHDLHGzdnvz
+         LwvQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778050797; x=1778655597; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=WJUsARZvVwbWMC3vo755HAyzMP2leXxye2JnHo/ZcMY=;
-        b=Ukh5HSIDEJkLKFDYskkB2tOWF2yoFk2R/c+iUkkyFTfHoDnfbV8EYbU00cQTwm+czH
-         yhbmd6cCBuk4i3cqHseoFBBTsoRbqdLv6R02LjZVQsVrF1grmw8LjkhRnHQSLi7OnGUS
-         Nbb7/N4B9+Oe0q4fHELt6DaIy7MxczJXN2Fnx0eUrKLaVVLL9Ba//M14wXFX3a+g5kDO
-         U12mQhbkjbi0IW0RXThT/oHd5Q9Em3d+NQAh2F4dBA/K8H1CJpqoMTsVZPDRE2KRQYBC
-         7x0VgQD6wiOH6vf6M0gyLLq7zfde2iLvHNbvhh8j8WZ9f3Bpp1NWFmQidrQs6mbLMRLR
-         wMZw==
+        d=gmail.com; s=20251104; t=1778050997; x=1778655797; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=msWHq9oWGgdNM2kAFrrJd2OcOR7l/yhU403EI6PSLDo=;
+        b=GUDt4GdyLfOXR6KMg8cIsn9NhlmXb7oTG0V9cc7WmzGIfDgRmW8hAwjGYtBiJDDM2d
+         krv4Kh+0Pt96y9UfJpNJL964eyLmTdpDn89L3+2YbWdH65NsCUdGXTvg0icCtEPYu53r
+         uZrE3QW6GiH6lfvAowsNRJieHXcKbA0TvoG9UBifXNCzatFC/tICCtIy2+B0aiq3bst/
+         i98fxfcLIbpYeRqvqw75sJf1wc6KUa6koS19RGyc4uyGpl8g/26PbJvxuFqUJD4NftOK
+         D8GEOpGe0E6QEBt1eQKcUJsCA0whWi6MM12W7xWFxKDB5i93rOKrqaTFI6geyBIwPOaA
+         /wWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778050797; x=1778655597;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WJUsARZvVwbWMC3vo755HAyzMP2leXxye2JnHo/ZcMY=;
-        b=QOXAS3syxejX776ZhUVwuTUer1p2rE4AW9Klnz2nTX2Ha3sZ9eEWw1qDCPkvQ7B7Rm
-         PY+Fh4Kd11bXDkjMM/hgqu327jR+Nn6eSVwhtWL7qJzmMC5cIggd2LYeihIvN1iEt26R
-         8EKdf3B/GdrhTEmMwwAFZZuJxYi5rojLhVCqnpWQ1Q3eVD4E0bHLfxN5WaD4++YRxgvk
-         2Y5IAC3ZYFaIE49+5c4PgA+GeReViDE6S9FdGG19HU8TM/9eqLUOUwEFvWw5t3O2JjHX
-         Z15UNffGxM8DLwUl4IOTYJD22IqdeWKdm1ghBkdap7Jxkai9pE8MzhWO7UcPch+tzDsr
-         0Cng==
-X-Forwarded-Encrypted: i=1; AFNElJ8VSBEFcTyJ6/K3kMVBbMni99AxKOFpY3aavoO0oDClo7ciaRb2lsWNr6jdYqAaXOCqN8e+Z5Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyo+8wYfChDGDFgiwEw2EKBnbNWa8Q4oqiU3Y+pPTMggSfPHrbm
-	RFPiw1PQXRAIS/MioQgUMOKrSTvCOi6a4Jq6V2uRxvT0hjjUzGZRnpIe8SGcPkobs+CODNvjvVe
-	Mlux/7g==
-X-Received: from plbll14.prod.google.com ([2002:a17:903:90e:b0:2ba:2916:59da])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:390d:b0:2ba:7181:7059
- with SMTP id d9443c01a7336-2ba798a9773mr21301225ad.27.1778050796946; Tue, 05
- May 2026 23:59:56 -0700 (PDT)
-Date: Wed,  6 May 2026 06:59:53 +0000
+        d=1e100.net; s=20251104; t=1778050997; x=1778655797;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=msWHq9oWGgdNM2kAFrrJd2OcOR7l/yhU403EI6PSLDo=;
+        b=JnSTaT2R9Af/Z/XQ8kwCiR4Vgs9m0vGCpZAgEmH/hfec5KpIfuFsO7OvMYDTK6vd6Y
+         HjRusXpDkjuUTUqiriM0RGLsXahhn2DV4IcxEMdRWUT8UH5Ylkg9Oqy9ub+C3JXmTNaD
+         NPErFFiF/vGlEDCZg4qygU+n/GY3eR1ydKEvHDygzprgoP88W0e5UjKDV1TIOTbrhJXb
+         Urt216+5NYWnNTDOblwQJbDbfos1QIQGbGUJ4ks2D29ca4+UcEY1HWq3U0euj63i1MDy
+         4FIK1rh6dcirEQH3JSSTk7h+BJSru4sNZQPo4vvoj7I1M2+tnakQDh1bUpUkP3y9PUJG
+         HSmw==
+X-Forwarded-Encrypted: i=1; AFNElJ85jf0ESHB12AhSycklN3T6fVZqCNV+TPXgzmDAOBesNvxQz3v1Kv2YU0jrvQ8AKZGNjVeb8j0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiX/5erPAApWs0NDWiCGQArj2QmwvBQtfImtoFL93b14Hg3u0J
+	SN0Pe87uE3u30Yckzyd9x5OjdC+LuLRsIJOHVGjoHoZnKtqylWd8EVIOUjnvHc7jUwAQBuTKww0
+	KiN/DrdBN3YhxBfZgiO9sEhtpSH4JDuM=
+X-Gm-Gg: AeBDievcLxmri1i7tN2/7u+IONJFMftSWPoqYPUaDJxZdFFkYcd+zTCPZ94BBxSOxXz
+	YPQfQC3pGcBvLwnO27pYoMf384civwlDzykNVfJdWgaYygmLz8oi/OgGJIPO3yPr4O3p5LTE0rw
+	gt3XxEZqJw5b12EcYT0fP56D1lOxN14vEvq2tQRQ6WKUTw6zkOjANYnEvKhTrW4Tz0Exx9mJnmy
+	OLbEBEK55XiVI0RauVkGS/3/dKGx8L4MzhYw8EZpXetxjzFr0xn8j5ulfVCn5I5zB/xOGhhLLTd
+	Qk2UDzGSo6ZaHR463g==
+X-Received: by 2002:a05:6000:22c6:b0:44e:7284:5f21 with SMTP id
+ ffacd0b85a97d-4515b9f4c7fmr3577789f8f.18.1778050996944; Wed, 06 May 2026
+ 00:03:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260506065955.1695753-1-kuniyu@google.com>
-Subject: [PATCH v1 net] ipmr: Call ipmr_fib_lookup() under RCU.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	syzkaller <syzkaller@googlegroups.com>, Yi Lai <yi1.lai@intel.com>
+MIME-Version: 1.0
+References: <20260505072015.1672730-1-maoyi.xie@ntu.edu.sg>
+ <20260505072015.1672730-2-maoyi.xie@ntu.edu.sg> <willemdebruijn.kernel.2b6abb6aae1d8@gmail.com>
+In-Reply-To: <willemdebruijn.kernel.2b6abb6aae1d8@gmail.com>
+From: Maoyi Xie <maoyixie.tju@gmail.com>
+Date: Wed, 6 May 2026 15:03:05 +0800
+X-Gm-Features: AVHnY4IHYi6g460Zc-J1tqBob_f27_Zqaq9yQz8MiephHqEYYoxSoyau9SBzTWU
+Message-ID: <CAHPEe=HRsdOeWEUTmJ48nqjrwfOzgo5ruAcNyR=LHR5MNRCF2Q@mail.gmail.com>
+Subject: Re: [PATCH net v7 1/2] ipv6: flowlabel: take ip6_fl_lock across
+ mem_check and fl_intern
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
+	David Ahern <dsahern@kernel.org>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, 
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 28BAA4D6E68
+X-Rspamd-Queue-Id: DC1FA4D6EEB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-284721-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284720-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	SEM_URIBL_UNKNOWN_FAIL(0.00)[maoyixie.com:server fail,ntu.edu.sg:server fail];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org,googlegroups.com,intel.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	SEM_URIBL_FRESH15_UNKNOWN_FAIL(0.00)[ntu.edu.sg:server fail,maoyixie.com:server fail];
+	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RBL_SEM_FAIL(0.00)[104.64.211.4:server fail];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,googlegroups.com:email]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,maoyixie.com:url,ntu.edu.sg:email,mail.gmail.com:mid]
 
-Yi Lai reported RCU splat in reg_vif_xmit() below. [0]
+Hi Willem,
 
-When CONFIG_IP_MROUTE_MULTIPLE_TABLES=n, ipmr_fib_lookup()
-uses rcu_dereference() without explicit rcu_read_lock().
+Thanks for the review on both, and for the Reviewed-by tags.
 
-Although rcu_read_lock_bh() is already held by the caller
-__dev_queue_xmit(), lockdep requires explicit rcu_read_lock()
-for rcu_dereference().
+>> Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
+> Please update either your git config name or Signed-off-by to
+> make sure that the two are the same.
 
-Let's move up rcu_read_lock() in reg_vif_xmit() to
-cover ipmr_fib_lookup().
+Sorry for the noise. We sent the series through Gmail because
+our NTU SMTP does not accept git send-email, and Gmail rewrote
+the From header of the resulting mail. v8 will set the email
+header From to the Gmail address and inject an in-body From: line
+with the NTU address, so the trailer matches the author.
 
-[0]:
-WARNING: suspicious RCU usage
-7.1.0-rc2-next-20260504-9d0d467c3572 #1 Not tainted
- -----------------------------
-net/ipv4/ipmr.c:329 suspicious rcu_dereference_check() usage!
+>> +/* Caller must hold ip6_fl_lock. */
+> nit: lockdep_assert_held as used below is preferable over
+> comments
 
-other info that might help us debug this:
+Will replace the comment with lockdep_assert_held(&ip6_fl_lock)
+at the top of fl_intern() in v8.
 
-rcu_scheduler_active = 2, debug_locks = 1
-2 locks held by syz.2.17/1779:
- #0: ffffffff87896440 (rcu_read_lock_bh){....}-{1:3}, at: local_bh_disable include/linux/bottom_half.h:20 [inline]
- #0: ffffffff87896440 (rcu_read_lock_bh){....}-{1:3}, at: rcu_read_lock_bh include/linux/rcupdate.h:891 [inline]
- #0: ffffffff87896440 (rcu_read_lock_bh){....}-{1:3}, at: __dev_queue_xmit+0x239/0x4140 net/core/dev.c:4792
- #1: ffff88801a199d18 (_xmit_PIMREG#2){+...}-{3:3}, at: spin_lock include/linux/spinlock.h:342 [inline]
- #1: ffff88801a199d18 (_xmit_PIMREG#2){+...}-{3:3}, at: __netif_tx_lock include/linux/netdevice.h:4795 [inline]
- #1: ffff88801a199d18 (_xmit_PIMREG#2){+...}-{3:3}, at: __dev_queue_xmit+0x1d5d/0x4140 net/core/dev.c:4865
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 
-stack backtrace:
-CPU: 1 UID: 0 PID: 1779 Comm: syz.2.17 Not tainted 7.1.0-rc2-next-20260504-9d0d467c3572 #1 PREEMPT(lazy)
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x121/0x150 lib/dump_stack.c:120
- dump_stack+0x19/0x20 lib/dump_stack.c:129
- lockdep_rcu_suspicious+0x15b/0x1f0 kernel/locking/lockdep.c:6878
- ipmr_fib_lookup net/ipv4/ipmr.c:329 [inline]
- reg_vif_xmit+0x2ee/0x3c0 net/ipv4/ipmr.c:540
- __netdev_start_xmit include/linux/netdevice.h:5382 [inline]
- netdev_start_xmit include/linux/netdevice.h:5391 [inline]
- xmit_one net/core/dev.c:3889 [inline]
- dev_hard_start_xmit+0x170/0x700 net/core/dev.c:3905
- __dev_queue_xmit+0x1df1/0x4140 net/core/dev.c:4871
- dev_queue_xmit include/linux/netdevice.h:3423 [inline]
- packet_xmit+0x252/0x370 net/packet/af_packet.c:276
- packet_snd net/packet/af_packet.c:3082 [inline]
- packet_sendmsg+0x39ad/0x5650 net/packet/af_packet.c:3114
- sock_sendmsg_nosec net/socket.c:797 [inline]
- __sock_sendmsg net/socket.c:812 [inline]
- ____sys_sendmsg+0xa21/0xba0 net/socket.c:2716
- ___sys_sendmsg+0x121/0x1c0 net/socket.c:2770
- __sys_sendmsg+0x177/0x220 net/socket.c:2802
- __do_sys_sendmsg net/socket.c:2807 [inline]
- __se_sys_sendmsg net/socket.c:2805 [inline]
- __x64_sys_sendmsg+0x80/0xc0 net/socket.c:2805
- x64_sys_call+0x1d9c/0x21c0 arch/x86/include/generated/asm/syscalls_64.h:47
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xc1/0x1020 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
-RIP: 0033:0x7f37e563ee5d
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 93 af 1b 00 f7 d8 64 89 01 48
-RSP: 002b:00007ffe5caa7fa8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00000000005c5fa0 RCX: 00007f37e563ee5d
-RDX: 0000000000000000 RSI: 00002000000012c0 RDI: 0000000000000004
-RBP: 00000000005c5fa0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00000000005c5fac R15: 00000000005c5fa0
- </TASK>
+Will add the same Fixes trailer to 1/2 in v8.
 
-Fixes: b3b6babf4751 ("ipmr: Free mr_table after RCU grace period.")
-Reported-by: syzkaller <syzkaller@googlegroups.com>
-Reported-by: Yi Lai <yi1.lai@intel.com>
-Closes: https://lore.kernel.org/netdev/afrY34dLXNUboevf@ly-workstation/
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- net/ipv4/ipmr.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+We will respin as v8 after the 24h netdev window.
 
-diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index 05fb6eefe0be..2628cd3a93a6 100644
---- a/net/ipv4/ipmr.c
-+++ b/net/ipv4/ipmr.c
-@@ -537,15 +537,16 @@ static netdev_tx_t reg_vif_xmit(struct sk_buff *skb, struct net_device *dev)
- 	};
- 	int err;
- 
-+	rcu_read_lock();
- 	err = ipmr_fib_lookup(net, &fl4, &mrt);
- 	if (err < 0) {
-+		rcu_read_unlock();
- 		kfree_skb(skb);
- 		return err;
- 	}
- 
- 	DEV_STATS_ADD(dev, tx_bytes, skb->len);
- 	DEV_STATS_INC(dev, tx_packets);
--	rcu_read_lock();
- 
- 	/* Pairs with WRITE_ONCE() in vif_add() and vif_delete() */
- 	ipmr_cache_report(mrt, skb, READ_ONCE(mrt->mroute_reg_vif_num),
--- 
-2.54.0.545.g6539524ca2-goog
-
+Maoyi
+Nanyang Technological University
+https://maoyixie.com/
 
