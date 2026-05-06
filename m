@@ -1,136 +1,129 @@
-Return-Path: <netdev+bounces-284624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284625-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AHC9Dq6I+mmYPgMAu9opvQ
-	(envelope-from <netdev+bounces-284624-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 02:17:50 +0200
+	id ZwVPIEeJ+mm1PgMAu9opvQ
+	(envelope-from <netdev+bounces-284625-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 02:20:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF7CC4D4F21
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 02:17:49 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4F434D4F43
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 02:20:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8D4EC304B93D
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 00:17:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5151F303B4F9
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 00:20:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AA221CAA78;
-	Wed,  6 May 2026 00:17:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0A8C1C8603;
+	Wed,  6 May 2026 00:20:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cc5LrKpR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YhP8M1a+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13F18E555;
-	Wed,  6 May 2026 00:17:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D5717262E;
+	Wed,  6 May 2026 00:20:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778026664; cv=none; b=jT97GM1EJZvKXpdyAvUxBaYGxiRhzUvjFzK+tgr6XJ+UygjEJH+C4ZR8PTkcOfDxJ0JRRdBU29kwMWR5MCyEY84+mwkSa001A6ybrysKLxcnFxKcabOYt8j9lSI4biCMPB87dtYhZLKcnVxVPKMJ/jAQms/4tFdEqyZSZx5EN0k=
+	t=1778026819; cv=none; b=J8oH6BPjLOcs2urHu/RjkgTDINVdbG+ZZRnwDiDOfWwMOrdIbTTl9V7tQ54YhDIlxUmLt/AyW0TsMtT1KPJJ5rEDsduFr3pjz9H7idA1K6bO6bmphbBu00qCsLn0cQC+WLRpmLVBwABDnNuUu68QO0gsJW8yIfLBDzR+8L4haE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778026664; c=relaxed/simple;
-	bh=6foGj3Qcoh1WnIWLVeql78W0P57rxlrScla5/6G7PdY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aXRVrP8RFRski/Q74f0u6PInFjWo8PeZO3BaMtjacP8kl4D6jwqoGakkQPjhbETgv72awrJIgG0O67wEp5i2+b6zv7A5DdO7A5t1VBGAlPQ1xtZkE08twT3CKtmv2JAzlUV95Br1qvnFLnFhU//pEhUBa/SaJR0IYYs+hBz7OSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cc5LrKpR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BA02C2BCB4;
-	Wed,  6 May 2026 00:17:43 +0000 (UTC)
+	s=arc-20240116; t=1778026819; c=relaxed/simple;
+	bh=vYax8JSZ0er4C7oSsAtrxOvM9sWuGJ0NNDFrdh9Hbq4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sVwW2L4rwoSOSRuAs3z23HV8zeEB/GE9SMpdUhZEwFZV9HypJpI1gYnUw52ALmYcVRKve59Ubsb80elf7kbm8vjRlZa+9RP2y0YC4/VPVwusU4p+smhwDqYmYXPb6FeayMx2FqXb7zMMmJ1VvXz+ezz7Qo4R5iiG61/oK17WxZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YhP8M1a+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 669EAC2BCB4;
+	Wed,  6 May 2026 00:20:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778026663;
-	bh=6foGj3Qcoh1WnIWLVeql78W0P57rxlrScla5/6G7PdY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cc5LrKpRw18DZUcURk0QrCcMgCDOrkNDvobCxAp0hYVyGq141EoLh+eZB5eXVrPU/
-	 jfv0Ft1jPNwlAjbNjnqmffQ0SCqggFEqVLionwzMswFPt0K2SoV5U0/IiofaaYSL1h
-	 YWyWVoh1mU10mUhxdtP8umxEogs9K52o8DoHbhh2qSgISDLDL7k5zGtUQoSGUvxzKe
-	 TOlm67Ggls4xcy8m5S4LRGipMT5+LJfI8B/zMm3j9YKWyulHBfPt5pjdwF2h0AIP76
-	 hYavL7WOJoxGX0lVaxLbp8jRFYhgEzTSQTYn0Tx5F66KgYPPqPeLhucE15kEX9mN5F
-	 BtOKAlHx5H6ew==
-Date: Tue, 5 May 2026 17:17:40 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Andy Lutomirski <luto@amacapital.net>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-doc@vger.kernel.org, linux-api@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
-Message-ID: <20260506001740.GA67098@quark>
-References: <20260430011544.31823-1-ebiggers@kernel.org>
- <CALCETrVqG+1yErRJjkxvJrf=A+Vu84HTR4Bx1Pcd8G1C0PJcMA@mail.gmail.com>
+	s=k20201202; t=1778026819;
+	bh=vYax8JSZ0er4C7oSsAtrxOvM9sWuGJ0NNDFrdh9Hbq4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YhP8M1a+9928xQWiO3gXJPrLYm1pVeIm8DDYtGoQ5ASM2eo6NKiow1lTV/0wiEmx8
+	 VZz5MPes/YaBH3ocnwoygvkFPL8aYKLlOmNgF0r4TyVsjOH+bvxE2Ivp4hPF+jEj6k
+	 g68a4S2L6kvAC24YZfsq1wrz1keViHAipbOmf+BKxRAP7G8b/5hPceWPVs/G97L13V
+	 EbdPHN6oG0PpHwiWYlftk1A9xQEDHx8sss6Qjev8DCo3FN5rcj75S56hXVBUC8UMN9
+	 0H+pCH7NCNnCeTYlDnr7A5yk07GCqdpe4ikABvD2/iz5uxbsbsSms468z9X1/L/1K+
+	 +HuzmhVNllnbQ==
+Date: Tue, 5 May 2026 17:20:17 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sven Eckelmann <sven@narfation.org>
+Cc: Marek Lindner <marek.lindner@mailbox.org>, Simon Wunderlich
+ <sw@simonwunderlich.de>, Antonio Quartulli <antonio@mandelbit.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Ao Zhou <n05ec@lzu.edu.cn>, Haoze Xie
+ <royenheart@gmail.com>, Jiexun Wang <wangjiexun2025@gmail.com>, Juefei Pu
+ <tomapufckgml@gmail.com>, Luxing Yin <tr0jan@lzu.edu.cn>, Ruide Cao
+ <caoruide123@gmail.com>, Xin Liu <bird@lzu.edu.cn>, Yifan Wu
+ <yifanwucs@gmail.com>, Yuan Tan <yuantan098@gmail.com>, stable@kernel.org
+Subject: Re: [PATCH batadv 0/8] batman-adv: follow up fixes
+Message-ID: <20260505172017.6caf7347@kernel.org>
+In-Reply-To: <5990011.DvuYhMxLoT@sven-l14>
+References: <20260503-fixes-followup-v1-0-4313278918d3@narfation.org>
+	<20260504171051.2b3e47ef@kernel.org>
+	<5990011.DvuYhMxLoT@sven-l14>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALCETrVqG+1yErRJjkxvJrf=A+Vu84HTR4Bx1Pcd8G1C0PJcMA@mail.gmail.com>
-X-Rspamd-Queue-Id: AF7CC4D4F21
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: E4F434D4F43
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284624-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-284625-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	FREEMAIL_CC(0.00)[mailbox.org,simonwunderlich.de,mandelbit.com,davemloft.net,google.com,redhat.com,kernel.org,lists.open-mesh.org,vger.kernel.org,lzu.edu.cn,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ebiggers@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[copy.fail:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-On Tue, May 05, 2026 at 04:17:18PM -0700, Andy Lutomirski wrote:
-> > On Apr 29, 2026, at 6:19 PM, Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > ﻿AF_ALG is almost completely unnecessary, and it exposes a massive attack
-> > surface that hasn't been standing up to modern vulnerability discovery
-> > tools.  The latest one even has its own website, providing a small
-> > Python script that reliably roots most Linux distros: https://copy.fail/
+On Tue, 05 May 2026 06:46:11 +0200 Sven Eckelmann wrote:
+> On Tuesday, 5 May 2026 02:10:51 CEST Jakub Kicinski wrote:
+> > On Sun, 03 May 2026 14:22:33 +0200 Sven Eckelmann wrote:  
+> > > While reviewing the fixes submitted to batman-adv in the recent weeks,
+> > > further problems in similar or adjecent code was identified. This was either
+> > > noticed in the manual review or reported by sashiko.dev.  
+> > 
+> > Are you CCing netdev to get this reviewed by Sashiko?
+> > Please don't..
+> > We delegate code to sub-sub-systems to lower the patch volume :(
 > 
-> How about adding a configuration option, defaulted on, that requires
-> capable(CAP_SYS_ADMIN) to create the socket (and maybe also to bind /
-> connect it).  And a sysctl to allow the administrator to override this
-> in the unlikely event that it’s needed.
-> 
-> IIRC cryptsetup used to and maybe even still does require these
-> sockets sometimes and this would let it keep working.  And there's all
-> the FIPS stuff downthread.
+> Because of `b4 prep --auto-to-cc`. Will now manually remove you.
 
-Yes, I'd like to add a default-on requirement to hold a capability in
-the initial user namespace.  We're trying to figure out the details.
+Ah, I see. I was asking because I don't recall us getting much batadv
+patches CCed to netdev. Maybe it's simply because there wasn't that
+many of them to begin with.
 
-It sounds like iwd runs with CAP_NET_ADMIN, not necessarily
-CAP_SYS_ADMIN.  So it may need to be:
-
-    has_capability_noaudit(current, CAP_NET_ADMIN) || capable(CAP_SYS_ADMIN)
-
-iwd is being discussed in the thread
-https://lore.kernel.org/linux-crypto/bcbbef00-5881-421b-8892-7be6c04b832d@gmail.com/
-
-cryptsetup is normally run with CAP_SYS_ADMIN, but not always (e.g.,
-'cryptsetup benchmark').  It might be acceptable for users to add sudo
-in the exceptional cases.  cryptsetup is being discussed in the thread
-https://lore.kernel.org/linux-crypto/5dd3be22-13fb-41fb-b469-1ae6472200b1@gmail.com/
-
-bluez needs investigation.
-
-- Eric
+If the rate keeps up let's add an X: to MAINTAINERS to avoid
+netdev@ being CCed. IDK if that's what X is supposed to be used for 
+but we use it for wireless and bluetooth already. The PRs still
+flow thru networking tree, but there's no need for netdev to be CCed
+on 99% of the patch submissions.
 
