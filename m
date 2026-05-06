@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-284909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284911-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WM4+CRFc+2mUaAMAu9opvQ
-	(envelope-from <netdev+bounces-284909-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:19:45 +0200
+	id yKaFM3pd+2n2aAMAu9opvQ
+	(envelope-from <netdev+bounces-284911-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:25:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F5304DD0D6
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:19:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55DF84DD29C
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:25:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C78BF3026F39
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 15:18:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B7B9A30C0337
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 15:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DF2448C8A4;
-	Wed,  6 May 2026 15:16:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD7B84A1382;
+	Wed,  6 May 2026 15:16:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="AjQd7V6h"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="QPg3RxdE"
 X-Original-To: netdev@vger.kernel.org
 Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013048.outbound.protection.outlook.com [40.107.159.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E359F265CDD;
-	Wed,  6 May 2026 15:16:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC99C44D682;
+	Wed,  6 May 2026 15:16:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778080612; cv=fail; b=IiFnqtSsUq5m9ezfrssatA+36f+vwJCuIGS8j6Eg/JwXCIKaYD887bPnRoFCORYGa4bY6Qt91NN2M/x4F/Iiu33AQYD1WDc1SrY79BUbXqR+ZzQSWLLvDsoS66XgxG6ArXyRTed4pvTT+T93G10hkThx5oulNGz1T9fRASdzxv8=
+	t=1778080618; cv=fail; b=oNK2vbea610EIqY7hCyfEAiSX+gmw4EZ+myKOekgbUNFuzt/Sw62wGKNuKX219N4RW5fRyL+Nkz8XgjilMyFN5EDGIWWz4gFBxv1iY0mZUMqfLnMzuUWgDotV7MWiDw5fYEkzweJfXz/PKzOshtsHvv4Zh6uZR4qdny2glufEfE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778080612; c=relaxed/simple;
-	bh=YgcrTSMTk7eB5IevlVW5At5th05TAWdV0/1eW/JKyx0=;
+	s=arc-20240116; t=1778080618; c=relaxed/simple;
+	bh=kaCVpVisCRnXRpMOlsx/LRSJjpaWC15a6PgtYCfRUmM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Kt5O3WWQ1MaSA2Y2KWD6IGvGPx+enn7jAAAflHQgT2YF0OCO4h94ZXqNwkutS/1xRjnJTbGcJvy2IgYS/yrpw48XFveLNcydYkNqXKP7TwsT0/9cMViscjGnKQTeA9GVc/N0a4HP5E+6WzAY+V1Xd1uzU6F2zx8bY12CcFxnbkM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=AjQd7V6h; arc=fail smtp.client-ip=40.107.159.48
+	 Content-Type:MIME-Version; b=S0XxoZIJ4vE9/YLXwtIlt9AmEPiLgHUTaGVaUYTHsQlvpfKvFfUEN4kY9U/zyUMsJIDPFPJfZOHOxRY8SfJ7gnpH6xDXytiBK1HJsrORvD05sCTsyiDjo9KJTDxdVrGONNT7UdmoWEz+zxiwAiUXRIe4iYGe10S5kaGeKETPweg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=QPg3RxdE; arc=fail smtp.client-ip=40.107.159.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qPmnIQUpMR0X9CPeP4HQCZg8SiWgFSR0i/K6TrJIv4LljF+JxAeRF2DxeG16aQZPhlzFgXPdqp1YPIikTgo3g+CoDk7Hz1LxjUgasjAEwz2RpkdPhOFdd6zA4LLykmfUVKXzp53da2F0L/RAwCnjVDmOqgmnTu4V6vb9So83ztmEGQ8j4Z7T5tDaCI49j8Mt3qLmTaioKlS5+prDYCkyF+2yeHqr33jlhm3nURV4Sh4Y7hiofnk36DfFRSnuFJSIkyXWqj4wUfh/7O5d9sOgHefEG2hkOQ7hbzCaOenkjjj9ikLBTeAa46vxTmNBlQBZR5i2lsQl27IGeN3x6SPM4w==
+ b=NHOpiJIfHKysxdK611uL1Zq7SPJp+K2pvlCii9Ett3I+77lORUt4C4RMCkt1Ndd29688CrAK3sPp5Q6n5pJjuNeLwq0dyFkYoyut/q2ns2eImqpfuUQkNbrWptmWAXgOS2ixoOhUN1qqfbJsxI3IsmYqc2WXMt/U6ERC0HvJPeFcc46OhT5SZy7SMjvwjSPp+pTWRZr8w7Y9iOx0BG7Q0sXI/MkmyO5HdPd9AFPuGO8s3jsaeUz+wmWGPTQBqKCmLjSkc7Lf2ykZpa6w+RLOZqQYNyQLbiMKPsegly0pETE7wlmVn+LFdhcWP5CyPfH46k+ddUiNstEe7cRbQ8zKKw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Tz/gRczS5DKRZlrDs3aDB+Jv8vPV10Hry+3iKAcQdFQ=;
- b=EZM8rCSVg9ujeIt3MORjqZCHpwjE8nu/lrB2Y5OPZIA/Q6Tewb+as5nwPHjFNZzbvIOvkDzsb5T0bHxwb2mE7wq/l1Uu0bOuBUX//5ZlN592tyZGVFd882mrQb7zWeqlOBwO2WPBO/NnlTRNSiTwMmqUGxgl87fMcSKgAx4pnT1au4MRYapnEdtMV4EQEALESYDTt9ceiWGg4hod0ys6jbYSgllNNHAoTtj30EQHk17msJ2ZPK2uL8tPoMUKM8sU4B00xI2UiLf07YgR8cqnmyiv1SAnTK251qlZu1uZRLTGDIYataKKQYyoEs4og8fOLaJV8I/nOpJOK5UcpAcqug==
+ bh=lsQI5sNqmaWyFD8qYkVhIibUwIAgjyJnYZUFCIgncQg=;
+ b=tLCTCapiHuvXDXRadqAlz3SfJvVEmv4orD92hYPZcCBNf2TEnT31NmbDpl36QY1cmfSzzdFI9VL5gMx/9YzKwfYhLBjNDKglGUCChFflQsoJ0eaR7WEbIahS4chnI7efxX8jhv+qJXizoGf1JomIrOZpuQ9NIEvtcd57rfbU3EKnuWpiOjeYEl2nCkmupTaeu/XysEv4c4jAUkj6LfQcGSuW1uw905OREY7Ks0qqE8ZPa38u4hnhCMvM/Q/QRXBUrCFfhoV04igONGq87bZxLfmrbXbe6tXquSNz9wYG6F3szjnmuNVeDgt19vP3MOiojDg7JdfPa6muOVxW9E57AQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Tz/gRczS5DKRZlrDs3aDB+Jv8vPV10Hry+3iKAcQdFQ=;
- b=AjQd7V6hTuwUXXSvdDvzKOKBCpeY1TooNe5bjgqHNZ9232tCdrGL7wCRkpKWQMf6ols+BqevZbVkz7Ajh2OxW0YxWIpCDBGtwrrvgXKNcbfjuPaCOTWcPmzOOsrL38sR5GgbA8ziDf7YMXIfSJDqohUxNiBUlD3riPEooyvVtpIjn4RKtn3b2X7aThVkCBIUAz3xzDNe2gfVezlZl/K9oJGS6ZFlI2sl3x8T9/sof4tu9O5n6jqdoSje8utMSVFqjEAdWB5YqAPX1ESr8VXVN0z5k8KetxC6uqZYzDmXQMpKsWDl4J17I1xoCk9QFaXsvJPns2sWul9sxPzO7LkDNA==
+ bh=lsQI5sNqmaWyFD8qYkVhIibUwIAgjyJnYZUFCIgncQg=;
+ b=QPg3RxdEw2uSTb+ctGBHZ1qybGsrzmJJL9B8n7pvg165UOT7iqrPr14zOB9pxmxvMDV+Fzok9Fr9I5AjrxrN7Faxrq+737uzBV5amBe/PQHZ2n10Oe4gVtJHdDgbYPrrtawGx9KZjRdX8aPNGDsR8qnCBBTLLunP3Lbfs6Jrmru3LElaOHwx2M5OSfGMpb6SfUPmvSD4uDrHifKLXRev9m2lEZe0HvhNhsdSlRcTZHFvAvrul1tX3PpkjfO8gNFcCaM8Mq7q1jgoO30H7vmcyrQnEkoCCC1h1wNEFf5VooTlTQeY/4mRhe2DKW1EkTFu3JfOmYjaRgd1k+pVKDct0A==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from VI0PR04MB11503.eurprd04.prod.outlook.com
  (2603:10a6:800:2c7::16) by AS8PR04MB8277.eurprd04.prod.outlook.com
  (2603:10a6:20b:3fc::15) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Wed, 6 May
- 2026 15:16:26 +0000
+ 2026 15:16:29 +0000
 Received: from VI0PR04MB11503.eurprd04.prod.outlook.com
  ([fe80::cbe9:4c03:71b6:359f]) by VI0PR04MB11503.eurprd04.prod.outlook.com
  ([fe80::cbe9:4c03:71b6:359f%6]) with mapi id 15.20.9870.023; Wed, 6 May 2026
- 15:16:26 +0000
+ 15:16:29 +0000
 From: Ioana Ciornei <ioana.ciornei@nxp.com>
 To: andrew+netdev@lunn.ch,
 	davem@davemloft.net,
@@ -67,16 +67,16 @@ To: andrew+netdev@lunn.ch,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 12/13] dpaa2-switch: add support for imprecise source port
-Date: Wed,  6 May 2026 18:15:39 +0300
-Message-Id: <20260506151540.1242997-13-ioana.ciornei@nxp.com>
+Subject: [PATCH net-next 13/13] dpaa2-switch: do not error out when the same VLAN is installed multiple times
+Date: Wed,  6 May 2026 18:15:40 +0300
+Message-Id: <20260506151540.1242997-14-ioana.ciornei@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260506151540.1242997-1-ioana.ciornei@nxp.com>
 References: <20260506151540.1242997-1-ioana.ciornei@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: AS4PR09CA0017.eurprd09.prod.outlook.com
- (2603:10a6:20b:5d4::11) To VI0PR04MB11503.eurprd04.prod.outlook.com
+X-ClientProxiedBy: AS4PR09CA0024.eurprd09.prod.outlook.com
+ (2603:10a6:20b:5d4::12) To VI0PR04MB11503.eurprd04.prod.outlook.com
  (2603:10a6:800:2c7::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -86,59 +86,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: VI0PR04MB11503:EE_|AS8PR04MB8277:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8ca6c88e-85a3-4d60-a513-08deab8270e3
+X-MS-Office365-Filtering-Correlation-Id: a501dc6b-507e-43f4-6eaf-08deab827282
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|366016|1800799024|376014|19092799006|18002099003|56012099003|22082099003;
 X-Microsoft-Antispam-Message-Info:
-	24/TQvgZ38gdGaSHpzlwbUQZON5t+A3p2qm5RSNcvETsRiW4efpN2krlKUkYyHzPOjN7bY9pruRWHiH21R+WbPtUMzNLLDOBVelHGa3RStV2SL33JnOsCcf+MpaaKKvIzIz7Q4xPz9KdiGUq0DmjSRh/fI+ViEiRm8KUNTz0Gcjlm/EQIwz1HcPZEU2KyeY+4K5JhcxJVzMdTEj/AHPIQ85MlzDvmvCFwhHIP0VQ+7W9ObZXWMDXezt3TzYCNodMr9VYoCLpT1mpqCNe+I00fh41nNYJcWhTZOnRosGW2ZkgXMEjRiLqpC+8HiW699d+c+HvqPyWcHNdzSWKAJCvX2BjjxEu+IMmX6T3yhcUbEGwPCX0HHgsWhOlmhV+2nOcFQ3ZJBno7EaiDIG4VjEfExtpPsl9ERKveZbKRbshsAXCeh0hQpWqbf6v/m0DIYawCA/JQTzl+F1KMOHMbP4vV5bvkwG679xZaCrg7wmjEBGxvubPfGmOpbWakKYNc/PqeheBiDU45HEd5YJ2V+xcTTlcA4jmWbpErlF8IJBOlyzzz3ScTvzWNbsLOgJ49Kd/umdoWiEF1vxUTJWFZomraPAHEdOvehsLS8nNIxs5Em9fiqjKZh5BuL7x2yXEMGjzTReWC2ulpulgV5kO2QjjnNr54ooNUpUtU7oH1EShguz/g/vrXDsSnSKsDzcPjwaz
+	4K7e2BxPZklPiGX3yC3YmbaGV4LDekdFPO1TFazzgZ4k4QxNLJrWbfPj11ZJX9R55XlgtKTiZLA//xrX4s23JwjRJobnkqCqk0OAnpaou4DrroEP7g6OHm8AWsg0baFndXEI1xdAlLQszs+DFtj6r7P/U+zFBpL/bz/5cFEFwb56hbUo/+gG7yvjeW0uWLjUzA/B0qX1QyUfb2ttPU/da0eApHW5OmxyjvcfdasLrARysi6wQ3BhIeGRRxwnlUogIA/OdtSZZSeg5Ub2DC9vNIfze/+hhoW3r2FXWZ3TFzCa8fYaQNv8a+lrZfzOwIYTrdLx9/So79eb8tWyn2aHy3/gKQfg2dTTuKDbaGzwPAtwLt/HVE7Ii5iwUM/nJmFnb0Sso2kTn1Eb3+LXO+Kt2kyS+/93JwlNpFjvhMVSJ/Wz4RhuxwLCx/cAge+Jqw7CxlFyIq2KZ43q+vKdGYNhnr+8rmgLy/XhZ/K0TOTzIc7IxxlPqRN1U2+ZpXt2Db9Rx5U2i1uuJoWyosbgJfjH40+SWPojD6G8SJEP7gMW5+7YG7aHdNoNUGDyUeXKOmGFQRoE8p67/6ifBpBD2lo1Qxw7DJt3qL2GFcEMfmjfscIWvUCE4dk3p8N3pkj3Szov2dVMWDleVKSec4gsGsFyfcGLDdxcHgxmU6OGVmmpHwDPQPFFZuGcG6ZbKfBj0ndg
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI0PR04MB11503.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(19092799006)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?J1taDOKGReszsfV2/S6ZBlA4dhsS42ZyG29CRsBcU0I/3OlGI/UJCkFo7vZU?=
- =?us-ascii?Q?05pzOVBqFpXJBfQXgDzI6WLKdXNmN503Inocl99PNbV7FvUHb9AlSjzqK+B7?=
- =?us-ascii?Q?eiUhnEy8rZWD/4MQlTRHWzZxIKooS2CpGptAZW/nfSK3235yQGYq+cBp3rbD?=
- =?us-ascii?Q?hBRf6CUNbZGxMC+G4S0bxLQF6UtAia3VTDdbfKM9b/7Vh++QDlWwzGDVslSd?=
- =?us-ascii?Q?uWFuEOYgcyal39pTXtdo+5sJmG5i9P6MOJK+6MR+4M35Qk1Bjn3HNZAGuzqR?=
- =?us-ascii?Q?c6mWLveYHCDi/WZweePbfNuzS2i2SvrsjUqzy23ZPp1kTwzSCKxBSVWXvhL1?=
- =?us-ascii?Q?5G7j8rUkdxIDBCYm7aiLq4dT1dPughV0PZo7zvti6F2mCHHMlYSH1gorr+Lq?=
- =?us-ascii?Q?D/b0q5GvqXcXTRYZL2bROt3OEetQifIA5oNXEKWy5NSTsQlWbo4MF7ulIDql?=
- =?us-ascii?Q?PwrVfl+UGuMIUgws8U3JHQa4O/RSDXfLHzgV2Vm0tOo3p1rVMi94ST0VSoXT?=
- =?us-ascii?Q?dd4nEeh8Vh9mmw/v9onixHml2SH5ewk5nhylik9UWWzRfG6UukTKh1UemjCv?=
- =?us-ascii?Q?qn/QZptrhN8FdHWdwx2fQFXx2rdKkQXWYksGFg/dywJsWVgEqX0HcD0q4Era?=
- =?us-ascii?Q?6ARgqvboxsdqXRNDnAqq9DNo0LAW97uRP4Q6ByiWZCrjy+kV95ksoV8Ia+Hk?=
- =?us-ascii?Q?vyYN19W0w4gBIzmMrOYtr1osumpls0WRrzP4RTDa6eBfoJ5bso4EZp3omAdN?=
- =?us-ascii?Q?xMYkBr4orAANZhcpcrJ5idcQpOUgNSAOR4IuO8K6MVhBVzAyCedCOOFI1vQP?=
- =?us-ascii?Q?QnC01Tf7T/IuVYrHICG/47+GZ/Bb4Hbv6Dq+Ba7b7eOOmCd9nqJROySBSod+?=
- =?us-ascii?Q?FdbfEqIEpPayXdL80HOunwd5BjI3+LEhOx+PiRY+/dtI3v2stBuGXM6fCudA?=
- =?us-ascii?Q?Yh73C2AnV9WajSQII+onKh6ekqIzmDWytsLFad/YNqYK19q8h9UKW7+TUMWj?=
- =?us-ascii?Q?QrGo8DC9E2c19Oq3nxj9AmdPB0OaoGJviAzdnOFAeSEaapseMSyRLrP1eDum?=
- =?us-ascii?Q?POjDeTPD2Y9G9Esvt0l38HBYUkwYx5IS1px8b72kySj4ExCUIqBORhLc6G7H?=
- =?us-ascii?Q?cFR5caMxcF2VuKtTtXAwKqesKKDbabK6ySDkuJVtfE8eXfEVbLQstecxylUD?=
- =?us-ascii?Q?D8vioKyEhuMocmeGbAWQTOyFQ10pWapIfEc8BwWkYGyXV2NUZ0CwmveLm296?=
- =?us-ascii?Q?ZMJ8Z1sgM5eNErRO31RbzBHJuRRSgj5BwRaB1hb8IzLnu2rMJdiCTpGeXA/A?=
- =?us-ascii?Q?So8ZnJGiafH10SC3Mqtvr4GAGxuR/zeWQXDcO09hLinDIQH8ZK1fgZBRGVwV?=
- =?us-ascii?Q?kF5Zs9pMwfVrsQsuCcOdf9QSCxN0cu3yTdmTDUa7rpCOX8tHagTQZaCidxFb?=
- =?us-ascii?Q?yKZNNl5zx7NXf9mlElR6kjwT0UuPt2jDm4swBOUWySeop0fIwq9cnrqjHyhl?=
- =?us-ascii?Q?Q2Ss/ji4pCKX8vbNbcJ/ielxwaNLyRDhny43xVIUz++JWozJYFuEGhvCs3qW?=
- =?us-ascii?Q?cXajkR6Jiw2dIpCnsQwkkNut+GcIB6J3Uy+EMrpXmOJ5zGtWJ3Qv6PJyz8Zd?=
- =?us-ascii?Q?pFnKUlpaj59ENm5CQBuVFZ9sp2NVsqO/qfCAdOwxxNj96cH/qNbg5gOJIDqc?=
- =?us-ascii?Q?you8yBAnDV4T0JexcKtgFyuOsDNK+6IX8KeJLJYwlyme2pSovk4TAvBI9gg4?=
- =?us-ascii?Q?9Gzc/B5Mgg=3D=3D?=
+	=?us-ascii?Q?jxl13nVTlA3XwvjJxAcc9w7//59L/XrDs4Eiezht18uyCWgiRelR4gOdCtgv?=
+ =?us-ascii?Q?D70+AdcUznGY2ZhHztD6/1RMQo7zRFtUJi4R1Fq6MUEHzdNrKJ2BfYowIZBq?=
+ =?us-ascii?Q?hnnUB1EtltZ/DGnmIF1XoQDQltSKqOBYMlWIdSq+1v4aqxyDg2e0PF9sgbw5?=
+ =?us-ascii?Q?ZcbuAoOZo88SFkT7WeDcbe6JR1NzLk5izTJdssbHOPvSzrpmLGHbio/g23dh?=
+ =?us-ascii?Q?CdIbd4TKJrqz6QoOlrpSAO/bCyHNXV7zoKZEjaXb1WQPdwEpXRpI8V1ZRt+K?=
+ =?us-ascii?Q?gWwmCqVGLoO9fCll1Vj6YgG1IHMc7sciHROr0kgjf637caOQ1Ca3ZGMsaiQe?=
+ =?us-ascii?Q?ZkBPXv5grH05sxcfuqTR4YhajavalJ2ntaSg89RudfoUzYfMfRi6zRBBjmUl?=
+ =?us-ascii?Q?cno94Ee5H62Nbn0RCUinOeyZowBWbtCTqW89cTGV338MrFDolHqyg1jVNqxe?=
+ =?us-ascii?Q?prhlYKxFpDjdLxwljix3RWFQUKPGPXBekgp9pn/Kb46lkfOd+v2bB6VT/qvE?=
+ =?us-ascii?Q?VrNHkJ+eDw+VnDL6oQKQ+OPRrha8HCKtKE3aO0WC7hBzgrCfJl5gA2/IpNkV?=
+ =?us-ascii?Q?rnsO/ebC7Yy57lQNVuI/YEf+vd1cn0fuD00b2pI9/5xk6XhHFXbOZiTdgZjM?=
+ =?us-ascii?Q?Ir7uu2LYzq413UJGaeBEYr+Gap77JTE+ssEgnRH3uyqwUs6z31kRCyrt6Dnk?=
+ =?us-ascii?Q?lFhDkY9aQ2bE5d2Aq8mA8tuGHMOcBqGk2IDPwlUFF1C2HLuwrVtD5vrWGgiS?=
+ =?us-ascii?Q?xSw2dkiYS/6+HQbpskUBje5rZPhpT8nq8oJ/TUgZ45uXIaxywERXbo5QupTg?=
+ =?us-ascii?Q?8KFW8GzBm4EQLE6zsLm8zJfIXdcIevJYJxcd9rfwprshyVqdoiJdTbqKru0/?=
+ =?us-ascii?Q?cFEVxkII5WJN+lpPrdrBPq/IoUUGM//zC87Mz0Q+YUfQRbfTti2JGOVtnRKA?=
+ =?us-ascii?Q?5Ll39+5td6vHF9qbR1oEOOdZOMwk1TVWglIlL0y9Ow1KQJwEq3uOoa2h2i/B?=
+ =?us-ascii?Q?cCnwHO4iQcvXi/+UF3ONKXC/is2MuduWvZaUh0SnYH+ixNCAkxsepQrqAcL6?=
+ =?us-ascii?Q?AZgHAFEbKf6FH2LL1PbHMpPGRelYlNGhIAREnl0ALdXd/E3R0GKxZiMlzDU2?=
+ =?us-ascii?Q?jplUlVFqreNNBb/TJImIrZ2UAviVgUKIDLEKXUctSZI/ghBn6IzqHsaucDLi?=
+ =?us-ascii?Q?P/eroVo6RQwCRi3gnPX/iK9oKYcJRypY6QKMsGLVzWD/NfQS86xhPjmeKFMW?=
+ =?us-ascii?Q?7ex1/+g1DHv489B4I+PmUT7lIEXxOdzZ+Hox7hv/Sdcn7Pt0BQHbqSp5VrMN?=
+ =?us-ascii?Q?Atrz/pmQQn6yX4qGeKOYUKSUOyzVrTQIoRiwc0FDmwTaXAmzybetfqXo1ITY?=
+ =?us-ascii?Q?g/U1WDA0xdPNpEgRfbmaaym9BMulzzXUgG1ftO+jbTbOEmr+vDB6iR/wKikq?=
+ =?us-ascii?Q?4cRO0v1srr6ghzdq94g58C7LE5omiFyaIW47aqN4XvxcckBmomi0DMydg4Zn?=
+ =?us-ascii?Q?mX0cbqH0qmh5L2pbpQng3dTEKz6+XB7xvmEmOebUC+v7x+jhlVPuTIIhj9U+?=
+ =?us-ascii?Q?KcYZ1vfHjdn9w6hN2LXD3ETjBv0kLHHq6kv0MMOMNDj8Pzst07Cn3EpKI67z?=
+ =?us-ascii?Q?l6P8UffS1vAni+X9G//F3FNsd8qgJn45Xy3IpdRdtPieUtV96DCLxkLc+FYN?=
+ =?us-ascii?Q?gA1bHAmBuzhcD6aVBhRljm/oHVMBsIeasM7UoWvBwnWK/dMUL+J13tx+5th0?=
+ =?us-ascii?Q?UERQzPIUbw=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8ca6c88e-85a3-4d60-a513-08deab8270e3
+X-MS-Exchange-CrossTenant-Network-Message-Id: a501dc6b-507e-43f4-6eaf-08deab827282
 X-MS-Exchange-CrossTenant-AuthSource: VI0PR04MB11503.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2026 15:16:26.3205
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2026 15:16:29.0872
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DMWiF6VOS7nfld9o2KvRmUktz8M0MRTEaf+ZSoU560c7Yeq4ebyF/1ylr1In+SM0SRKt8ZKuuF/4/izvKbICeA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: ACU3hJYqTyXD4sij7kJsYqsGNWEjG9IS2/OF/wZakiJUrdBb7OgLxRX/quGRDs5tTiOtSMkBSqXyfnu8fXvGZA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8277
-X-Rspamd-Queue-Id: 3F5304DD0D6
+X-Rspamd-Queue-Id: 55DF84DD29C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [2.84 / 15.00];
@@ -148,12 +148,12 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
 	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_SEVEN(0.00)[7];
-	TAGGED_FROM(0.00)[bounces-284909-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-284911-lists,netdev=lfdr.de];
 	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -166,70 +166,78 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	TO_DN_NONE(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nxp.com:email,nxp.com:dkim,nxp.com:mid]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,nxp.com:dkim,nxp.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-Switch ports configured as part of a LAG group are not able to provide
-a precise source port for all packets which reach the control interface.
+With the addition of the LAG offload support it has become apparent that
+depending on the order in which a bridged bond setup is created, the
+driver could be requested to add the same VLAN twice, once through the
+802.1q filters and then through switchdev.
 
-The only frames which will have a precise source port are those that are
-explicitly trapped, for example STP and LCAP frames. For any other
-frames (for example, those which are flooded) we can only know the
-ingress LAG group.
+This is because any VLANs already installed on the bond device when the
+bond_enslave() operation happens will also be installed on the switch
+port through the .ndo_vlan_rx_add_vid() callback. Once the bond device
+becomes offloaded, the same VLANs will get replayed and installed
+through switchdev.
 
-Take into account the DPAA2_ETHSW_FLC_IMPRECISE_IF_ID bit and based on
-its value target the bond device or the specific source netdevice.
+ $ ip link set dev eth4 master bond1
+ [  165.008131] fsl_dpaa2_switch dpsw.0 eth4: configuring for inband/usxgmii link mode
+ [  165.021020] 8021q: adding VLAN 0 to HW filter on device eth4
+ [  165.083351] fsl_dpaa2_switch dpsw.0 eth4: VLAN 100 already configured
+ RTNETLINK answers: File exists
+
+Avoid this by not erroring out when the same VLAN is installed or
+removed multiple times so that we avoid the above issue. Also remove the
+netdev_err() since there isn't anything that the user can do to prevent
+this behavior.
 
 Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
 ---
- drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c | 10 ++++++++--
- drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.h |  3 +++
- 2 files changed, 11 insertions(+), 2 deletions(-)
+ .../net/ethernet/freescale/dpaa2/dpaa2-switch.c | 17 +++++------------
+ 1 file changed, 5 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-index 59ed06ed7ef6..8353d2230c72 100644
+index 8353d2230c72..644f720a7ec7 100644
 --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
 +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-@@ -3075,9 +3075,12 @@ static void dpaa2_switch_rx(struct dpaa2_switch_fq *fq,
- 	struct sk_buff *skb;
- 	u16 vlan_tci, vid;
- 	int if_id, err;
-+	u64 flc;
-+
-+	flc = dpaa2_fd_get_flc(fd);
+@@ -372,10 +372,8 @@ static int dpaa2_switch_port_add_vlan(struct ethsw_port_priv *port_priv,
+ 	struct dpsw_vlan_if_cfg vcfg = {0};
+ 	int err;
  
- 	/* get switch ingress interface ID */
--	if_id = upper_32_bits(dpaa2_fd_get_flc(fd)) & 0x0000FFFF;
-+	if_id = DPAA2_ETHSW_FLC_IF_ID(flc);
+-	if (port_priv->vlans[vid]) {
+-		netdev_err(netdev, "VLAN %d already configured\n", vid);
+-		return -EEXIST;
+-	}
++	if (port_priv->vlans[vid])
++		return 0;
  
- 	if (if_id >= ethsw->sw_attr.num_ifs) {
- 		dev_err(ethsw->dev, "Frame received from unknown interface!\n");
-@@ -3116,7 +3119,10 @@ static void dpaa2_switch_rx(struct dpaa2_switch_fq *fq,
- 		}
- 	}
+ 	/* If hit, this VLAN rule will lead the packet into the FDB table
+ 	 * specified in the vlan configuration below
+@@ -1993,13 +1991,8 @@ int dpaa2_switch_port_vlans_add(struct net_device *netdev,
+ 	struct dpsw_attr *attr = &ethsw->sw_attr;
+ 	int err = 0;
  
--	skb->dev = netdev;
-+	if (DPAA2_ETHSW_FLC_IMPRECISE_IF_ID(flc) && port_priv->lag)
-+		skb->dev = port_priv->lag->bond_dev;
-+	else
-+		skb->dev = netdev;
- 	skb->protocol = eth_type_trans(skb, skb->dev);
+-	/* Make sure that the VLAN is not already configured
+-	 * on the switch port
+-	 */
+-	if (port_priv->vlans[vlan->vid] & ETHSW_VLAN_MEMBER) {
+-		netdev_err(netdev, "VLAN %d already configured\n", vlan->vid);
+-		return -EEXIST;
+-	}
++	if (port_priv->vlans[vlan->vid] & ETHSW_VLAN_MEMBER)
++		return 0;
  
- 	/* Setup the offload_fwd_mark only if the port is under a bridge
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.h b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.h
-index 96d780980d77..6d7a503f9be7 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.h
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.h
-@@ -87,6 +87,9 @@
+ 	/* Check if there is space for a new VLAN */
+ 	err = dpsw_get_attributes(ethsw->mc_io, 0, ethsw->dpsw_handle,
+@@ -2115,7 +2108,7 @@ static int dpaa2_switch_port_del_vlan(struct ethsw_port_priv *port_priv, u16 vid
+ 	int i, err;
  
- #define DPAA2_ETHSW_PORT_ACL_CMD_BUF_SIZE	256
+ 	if (!port_priv->vlans[vid])
+-		return -ENOENT;
++		return 0;
  
-+#define DPAA2_ETHSW_FLC_IF_ID(flc)		(((flc) >> 32) & GENMASK(15, 0))
-+#define DPAA2_ETHSW_FLC_IMPRECISE_IF_ID(flc)	((flc) & BIT(63))
-+
- extern const struct ethtool_ops dpaa2_switch_port_ethtool_ops;
- 
- struct ethsw_core;
+ 	if (port_priv->vlans[vid] & ETHSW_VLAN_PVID) {
+ 		/* If we are deleting the PVID of a port, use VLAN 4095 instead
 -- 
 2.25.1
 
