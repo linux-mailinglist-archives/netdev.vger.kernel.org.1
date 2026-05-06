@@ -1,183 +1,163 @@
-Return-Path: <netdev+bounces-284926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284927-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UI5SGolh+2kuaQMAu9opvQ
-	(envelope-from <netdev+bounces-284926-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:43:05 +0200
+	id eH+jAMFg+2kuaQMAu9opvQ
+	(envelope-from <netdev+bounces-284927-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:39:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB5554DD79D
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:43:04 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A71684DD6B4
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:39:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AC540301683E
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 15:38:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 954A8301F347
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 15:39:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96ED648BD26;
-	Wed,  6 May 2026 15:38:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCF54494A1A;
+	Wed,  6 May 2026 15:38:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vI/leYgS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 564F93EE1FD;
-	Wed,  6 May 2026 15:38:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778081931; cv=none; b=gBfzbcVSrw0gszrcW9xrlL8kser/M8khauOIghtcoTReynXhJTIUyIuKW0btyaOchCP7hlVcHSdL0aPo1FVDAujR887KUZJmmm41mjBq2e3bT5iI3ifJy0wRLDri+kHowSggO1nOtb0akOxYqycaIj9GYUtFtArf7VyWNw2iEaI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778081931; c=relaxed/simple;
-	bh=6sQcvJ02EAB9Lz/kHFbKX/FUadBZAXtEZqWiVpfYz4E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IZ7chOJdLt5ErZt3+Y65KZpxiWWjKUwgaGmk1RypLw8Qgz/zTT/sCwq0vq/0kSAaaI4ZddUmYmG/IuONs4vwwmAxb0ZIsB/h7Z1W8oZW6VP5N+fCB7vh6d2Rcdtm0FfFOWF7TxL25LeRS5AGHEM4ae7gTdSvIWxM0ShTfGzzj2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=radxa.com; spf=pass smtp.mailfrom=radxa.com; arc=none smtp.client-ip=54.254.200.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=radxa.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=radxa.com
-X-QQ-mid: esmtpsz20t1778081905t5dc8af55
-X-QQ-Originating-IP: 66bIYIjIjPtDUf7ZMQLWTQPiTh7x0N6Cl1Fw8/bZasU=
-Received: from [127.0.0.1] ( [116.234.74.217])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 06 May 2026 23:38:19 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 4295684557063516514
-Message-ID: <859776B5671B36B9+577c19e4-3e66-4036-b26f-fe20287a1d43@radxa.com>
-Date: Wed, 6 May 2026 23:38:17 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693124949FF
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 15:38:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.179
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778081936; cv=pass; b=fr4/hGKPzmq5JGo3GqQpwJn0NhYVReT9U8819SgvBD30xuqbJVTPn+4KwQmtDrJUf0VFiYdWOg3TXhXJH0ug8wlknllvnnbAfZaXjV7ytCjuTaI3lL1HwggY0Bo4zv7JS/EqX2H/alm5AstBBgCeeOgEDcycXjWUuowbuYEQRV8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778081936; c=relaxed/simple;
+	bh=dj8Od94gXs2mTNR9n3Oo5435WG5jBWGZOlSkFoLcNBM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Xz9QHsGCJtV2Kek3ehCbhbim7F4JfmAHq5Nzos26ZUSHj+ufWQO45Cbgydothm5B6TeYDO+Rl5wMi3AGk1iQCgLqU+b7bhPEH+6a3K2w3iuwbAtRsoW/49NFA0NcQzRvQCIOjybTXsqssLxOz4+vec0tcwX7NAnuwM/w7S7m1Mo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vI/leYgS; arc=pass smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-50d87c138e1so66300081cf.1
+        for <netdev@vger.kernel.org>; Wed, 06 May 2026 08:38:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778081933; cv=none;
+        d=google.com; s=arc-20240605;
+        b=lK00ksvnHaC9Dp/ZqXJ2HUnbYmjanIPOSKr1jn/ZDjOh7EBDGcz4Qk9Tw2spKx8AcE
+         +fEWjPZm+wYzudv0LUz5JWlkSUIglMogb3JE02O0KoovQB70LvjczqIXvzmHlceDZ5ag
+         Zt+LYKGzp84l2biYKZiEI8CwIvrSFPCTFbzMpSfMTlNvLEnzxgWW0UzQwWeI1+JKcLGt
+         rmwZVjOWPqA2jFklVbF2jn7kqAk2MDpoRx0SbJz3cdVQvPyX7PG4tjjJZyQaInX74KqT
+         909SsW8DORfNtNLAxgZmZL4O3ANE/cf0s/4uijkfVUespb7HwZi+h9vR496lTmCnzCEq
+         OeqQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=dj8Od94gXs2mTNR9n3Oo5435WG5jBWGZOlSkFoLcNBM=;
+        fh=rQG1hGpDKSkXcH5SmPABDfA6hSKHIC+bBENDHwQecbQ=;
+        b=bb3RJYDrmThB3M+bI1OH5gvIS5bx/YI369m6oa6QeXgY37MpWaFbDyFca4zde5CE9S
+         8hs68EXJK18s6QaGQRAEEcE8aRltXqzRVOB9jWuW9Q8e7NBA0g5Ok5OaZxmHCJFxmZkF
+         KYuCB3IHc6PiAaD+Wqvc663F/yFECpzEns4JzIIKpf5HuwibOTne5M/Brq+/sSMvFfqp
+         b0Py21+JVGvwC7To915mIFYlERibB5xcsxzne54b+487f79V11mrUjohnTYS5hJnx3ki
+         bPhZ3H+cWnr9lk9XsQ9+HZaFPFHhW5SEOaEogx2elECgoJdt6gQzrcZnE89CDdoCuxvx
+         Eu5Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1778081933; x=1778686733; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dj8Od94gXs2mTNR9n3Oo5435WG5jBWGZOlSkFoLcNBM=;
+        b=vI/leYgSKSdkGtCHzOOsfZzB8bQLoTLFlSFqzokAA5W0A15tHkce7hD4vReh3yOTs+
+         SYMWzDap8utv3MtQcOrLDVwZdRF2NB2UsMEPUzKLc+8Y4ehBQWdqhTC3ujgUOhNRg7ZY
+         4Le+rUsb0rVIdi17jnVCKz1ptNKCw8FX57dfh01XV/AORmzlx6TETrf+U93kTvPXIXkt
+         MA/gJhEEbqwHuxIAgFmTjQ8T2HzmF1dfvrSmb2USgH5LaZJWI+FaTLaqSVCA4pHrYp2l
+         NWHHoqM9XX3b8j0BT5Ep4zazCL2mxAxZm5X+xUNK8Og47C2O4bXYTVrCjdr+O7ARwkoK
+         ykSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778081933; x=1778686733;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=dj8Od94gXs2mTNR9n3Oo5435WG5jBWGZOlSkFoLcNBM=;
+        b=lEyI7Rdc0bErv8XSBoVAsNsLTPYBO2CeGb0v0zxtYbabPdo2/d1nV507oXAdsdZl0P
+         OQ0xdHJjd1m9hw9+v0dY1QQ8Kvq8+LQVcXnIrSHKSS5TycgtfwzIbNxTPrOJaZpuoqdq
+         XEPLhaZet3ipPffPNToLlO/0Qqs6ZZqeDEMvGPaafr3TX1LyhNTP+9EOtg792xQkkgmh
+         tpvUkxEl6IDsXfwLorXd8i4YwkxFiXqXIO6+aJbMULFusijJ8Ssz7JWvAMAZT71pcfIo
+         hbH89lvQLwvMkO0WDaHIdFpjMdY8vDjzl9lZmRbkYMc6sVjcjGa+bz6RPj+DyVDzmN7I
+         ziBg==
+X-Forwarded-Encrypted: i=1; AFNElJ+FYLohy8FbQsp5uKXJj+2GAOScl/ja0mG5dKUpeTE4ECiW8cvTsUg9xubQ6OIC+GkJw1aM1jY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCHUqo7O2WkCbWxRQ/X86O0KpsKSh1/CibrY7B7+EOKsGMDZ1D
+	Z5kkxCixTUEkFpmq6ghrlU9V+e0WBHbrbkryIC1oDUq5Ghkuwc4FSHaUGgJYRTfbJhAf85iqXS6
+	+q5hWWd3ipigIfduMpMX9FsKOjSZbQKQB80GsGEj/
+X-Gm-Gg: AeBDietCRlc3pW79bm6pr6SW+BQR2Lrj35MfvRhC67C9mJcYw6rVFgT1MSnq3CeImMu
+	x0nnvecEu35BHXkw2524e+5JQwOSiLS72sdM06l6f0rZ2faX2BY9SoqARM8g+PCEr08DAxaY9bl
+	EcFf7yv+tuVW36qaJ1Mx5QAytNqMEPT7Sw0tnl9/MR6pvYMSgVLeHzvMHxFvmG8AFYJ43c6oYqb
+	NGUjyLUBWl/9vzocymOdoAYLtHsXgJkC+C3qi6AFukzpgcg3+Nbi6uEYFVbww//tpSGxXRYDss5
+	B3M+0O1VKcPueHzOcNM3SNtVz0c9z2cA558+5PsGhioQhErzYBaW8e82dCmgFrU7m0RftAHgD6k
+	BfUOjSRVD/7uBBqnKHHPSJPhXnoU+ivy2Kdv+h1M=
+X-Received: by 2002:a05:622a:48c:b0:50d:e298:8f1c with SMTP id
+ d75a77b69052e-51461fce4d5mr53275791cf.32.1778081930259; Wed, 06 May 2026
+ 08:38:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 10/12] net: stmmac: tc956x: add TC956x/QPS615
- support
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alex Elder <elder@riscstar.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, maxime.chevallier@bootlin.com,
- rmk+kernel@armlinux.org.uk, andersson@kernel.org, konradybcio@kernel.org,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, linusw@kernel.org,
- brgl@kernel.org, arnd@arndb.de, gregkh@linuxfoundation.org,
- Daniel Thompson <daniel@riscstar.com>, mohd.anwar@oss.qualcomm.com,
- a0987203069@gmail.com, alexandre.torgue@foss.st.com, ast@kernel.org,
- boon.khai.ng@altera.com, chenchuangyu@xiaomi.com, chenhuacai@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, hkallweit1@gmail.com,
- inochiama@gmail.com, john.fastabend@gmail.com, julianbraha@gmail.com,
- livelycarpet87@gmail.com, matthew.gerlach@altera.com,
- mcoquelin.stm32@gmail.com, me@ziyao.cc,
- prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
- rohan.g.thomas@altera.com, sdf@fomichev.me, siyanteng@cqsoftware.com.cn,
- weishangjuan@eswincomputing.com, wens@kernel.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20260501155421.3329862-1-elder@riscstar.com>
- <20260501155421.3329862-11-elder@riscstar.com>
- <224E233C593EF171+8c8a43dd-5061-40f8-9eb7-f360eabf2ecc@radxa.com>
- <4015f47a-af62-441d-b1b8-a8598f963970@lunn.ch>
- <4C0D95BC59F1A4ED+53f3be85-2cdd-4058-8950-57970027d481@radxa.com>
- <2af0fee3-d3d6-4434-847f-3fd2fbb841d3@lunn.ch>
-Content-Language: en-US
-From: Xilin Wu <sophon@radxa.com>
-In-Reply-To: <2af0fee3-d3d6-4434-847f-3fd2fbb841d3@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:radxa.com:qybglogicsvrsz:qybglogicsvrsz3b-0
-X-QQ-XMAILINFO: NMth3b25qZ/y3GsZOZbTcTtn7ivxtNnfDwhten1J2cIhmuHszCIWDEp5
-	62vFagLVkDtj/ihAfFxqCDAkwPknNTQ8rt2JdPO3DntsuJvxTDZwhwn6v9Q2Zr3fexxrdav
-	Z8tOqhADpYyVy9j/gfNlM6y7qT+IPNVQIh9ISw9xH2humwR+0QuQgfl/S6YVNPcViexfzng
-	Tu0rFdlhN+wyFpLgg5vpKp26j9ufuc6yKDetrb4Ryuw7818jy3rdUpAnCorwW/EAkH7GC45
-	9sHsQ0R5GNdl9foXYGG8tVWqi46VBH2HlSGhx+89L9ZEqbHo1NLEErlzEuRkNG3xqWER7V5
-	xHAS00ExpjcrZcs2qHWpfE/7l1GfoyFa/+5zYjXotwBHkWlBP0uJxiOf01OCq9uFnyyXzpb
-	OeRyO4nGN5aYqgEjRrsxivJFb6rJNwBktM1YIPpoCA2CwJtV6zvB9XDvhjuDv5ZYgiwB29H
-	gGz3Qd1kYxiEFMNOgAJK2zvON05qEvjOLsSde0Vo+LL6YZHv4M+VlHospu6p2a+wEMuEmHF
-	Jc2st9+8GhXzqMowizoLQAL9VnQzdAOXMjWoyRvsXqT7B4Vc0LM4XecnPl0Ziru2BKirpPA
-	qHkI1zSenEcKZXkvc23ex+ZqmzUztSiU4e/RZIrZsvktRyV/SbBD38JEeWOcNI+nTpBNslx
-	iSwfov58UuPq6538i53SLFp+W5xh7QCd1qKPQXAOljWV5AvuAyaKKulKBGYDttswirvo6r0
-	0oNQl9z2qpNBc/OtuZcFmGLL4vpn7ILM/Y7dCPvMO85opK0XJce6YlVCCUTeh04dthfKACl
-	k+pLhAPReZWtmYTjow9htBMh3OFHZxmVd7cppGF6kZYVWO2OeK+mNL2+FOSTHHcxXshpWZb
-	vErub9eGThX/A8VngZnkNdzGFFh+kutCnJM/uiHn4Af2yNS/MOKLin5rNs1vHhv3TxdC4hu
-	PJzWLeXYsrFARDQrb66jMt7nTlS2mT9f+K/V7dpZw3LpyIDgi3kTgwqwerOn2yClL/iZKrv
-	DZbuWNVc60wjyJ2QSJx9V51Y+lE9LALFS636snRufTrAe5eLiCLWBoPPg2wB9ETWOt9C2EA
-	ghCObbyLYQElz+mAyIcubIu/ppF34Od5oZzNMZsR0f9
-X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
-X-QQ-RECHKSPAM: 0
-X-Rspamd-Queue-Id: BB5554DD79D
+References: <20260430122653.554058-1-edumazet@google.com> <afn0ZdvZWswBuDMm@sgarzare-redhat>
+ <CANn89iLs8DOWJwDpf_ARoMrV+6b2tbhEJ=VVzeC8gCm5dRGaig@mail.gmail.com> <20260506111507-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20260506111507-mutt-send-email-mst@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 6 May 2026 08:38:39 -0700
+X-Gm-Features: AVHnY4JGcss5DSvVQJ4HSN2zeUaBN69s0ioWUQVWnh7DFq6P70Z49QIoeMVTrAA
+Message-ID: <CANn89iKWhJp2N-60FC4JpX2Dw0sK8-vk2WrHkDOnkgC_c8nbHA@mail.gmail.com>
+Subject: Re: [PATCH net] vsock/virtio: fix potential unbounded skb queue
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Arseniy Krasnov <AVKrasnov@sberdevices.ru>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: A71684DD6B4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[radxa.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-284926-lists,netdev=lfdr.de];
-	FORGED_MUA_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284927-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[riscstar.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[51];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sophon@radxa.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,kernel.org,vger.kernel.org,gmail.com,sberdevices.ru,linux.alibaba.com,lists.linux.dev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.980];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,radxa.com:mid,radxa.com:email]
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-On 5/6/2026 10:45 PM, Andrew Lunn wrote:
->> Hi Andrew,
->>
->> Yes, the PHY is doing the WoL. And I guess this makes sense as it allows the
->> MAC to power down during suspend to save power.
->>
->> The INTN pin of QCA8081 is connected to the ETH_0_INT_N of QPS615. And the
->> INTN_WOL pin is connected to a SoC GPIO.
->>
->> Without this change, I can't get WoL to work. I have a working branch for
->> our board here:
->> https://github.com/strongtz/linux-radxa-qcom/commits/v7.0.2-8280-wip/
-> 
-> Please take a look at commit
-> 
-> commit 6911308d7d111a9c367293b52f2dc265819f2b60
-> Author: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> Date:   Thu Oct 23 10:16:50 2025 +0100
-> 
->      net: stmmac: convert to phylink-managed Wake-on-Lan
-> 
-> In particular:
-> 
->      When STMMAC_FLAG_USE_PHY_WOL is not set, we provide the MAC's WoL
->      capabilities to phylink, which then allows phylink to choose between
->      the PHY and MAC for WoL depending on their individual capabilities
->      as described in the phylink commit. This only augments the WoL
->      functionality with PHYs that declare to the driver model that they are
->      wake-up capable. Currently, very few PHY drivers support this.
->      
-> Could you actually patch the PHY driver to make it list its
-> capabilities. That is the direction we want to go in the long term,
-> and not use STMMAC_FLAG_USE_PHY_WOL.
-> 
->      Andrew
-> 
+On Wed, May 6, 2026 at 8:15=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com> =
+wrote:
+>
+> On Tue, May 05, 2026 at 07:14:36AM -0700, Eric Dumazet wrote:
+> > There is always a discrepancy between skb->len and skb->truesize.
+> > You will not be able to announce a 1MB window, and accept one milliion
+> > skb of 1-byte each.
+>
+> We can if we copy.
 
-Thanks for pointing this out! You are right that I should patch the PHY 
-driver. I have made WoL work without the change in the tc956x driver.
-
--- 
-Best regards,
-Xilin Wu <sophon@radxa.com>
-
+You mean, ignore VIRTIO_VSOCK_SEQ_EOM?
 
