@@ -1,219 +1,230 @@
-Return-Path: <netdev+bounces-284885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284887-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UC56Fs1Q+2mSZQMAu9opvQ
-	(envelope-from <netdev+bounces-284885-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 16:31:41 +0200
+	id 0OLpHC5R+2mSZQMAu9opvQ
+	(envelope-from <netdev+bounces-284887-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 16:33:18 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E13414DC3C3
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 16:31:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 104454DC417
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 16:33:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C97613048287
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 14:28:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B0DCD30570D7
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 14:29:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48FC7481A84;
-	Wed,  6 May 2026 14:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71150481A89;
+	Wed,  6 May 2026 14:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WTAbnybn"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZmrxhBnP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87B24481FB6
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 14:27:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D89481649
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 14:28:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778077660; cv=none; b=r6kpcXnI+2UhR9kM9ORfVb5zIiVna4FaBry46bWhxdVlwSf17MVakr0rWIhcHC+u00mFHSV3unpASN+fPInXwHnXPh9qSSRIknrtzYS9uZS0w/Q/1NfBVcXoN5epkto/qNcxtNsj7zSTYdG7H27WSHMO+c0ftpM74fUsLDUmLnE=
+	t=1778077711; cv=none; b=ho7k3N8fWhug4aKsee1LPldCtfHb+MLF62x8CvddrsxosebEbvvV5sH2BE2A5588NprvqfxFUios8yZZrbHyvYeaRSNPXfy5uX5eHkf2ozcvVV5L20JrsMN5CVjhd0Sr+MB0a6ytdW5Q4j5W4u0RKmWw+SykGvokKWHOEARCTfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778077660; c=relaxed/simple;
-	bh=1Ps2Uvl/LPepHMBDlUY4AENnqrCBZ/NnJ3wO3wlwrJ0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p51po2g8T9hbv8Q2KmH6QWSfnO+fvZR0QzPpvt7+M9Ym7Bl8Dfcp5LPCPDPcGicsR3ro8/UK5bu457Y+4H3PgBqbEVaDNgh6XtcaFrYOpu/vDARMGe1iIl5z4lcxobpja1r5kuuNHnj0vIpgd8XnlO2YwykzjXil4yCDUAE38rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WTAbnybn; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-8b3d6b215cfso103958446d6.3
-        for <netdev@vger.kernel.org>; Wed, 06 May 2026 07:27:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778077652; x=1778682452; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5rJWz1pDbyoadWp6yHfOeNQO0FWEwox+z1MU3VR8Pqg=;
-        b=WTAbnybn/LrcxfqTiSrW6OpRXTGN5588k34bvZtuiUVAK7xLCDfvdr9L1V8L8o+wSC
-         PzNwdZVJnX5TFHlbi/iMI7rCM2lf19hNY5abPmfR71FZBqpDFTR19mQW9hXN1k1yesyG
-         p8vR6mrk8MjEPpzsncOpIRyh6YP8hlApDLA+4m8f/KeYks+3QSkMJ8PXeAqF1gc83ZkI
-         WJD4BC1aYNM3O6XTkWgSd0zFHgQ3WK2HzbeRHAgUJxsDHRGVM6y9t3AQrbZF7WE99rCt
-         Vw+nOhADWiN7XiHPOYS83kNyhacLNak2qVcHH8v42DfZYQNhBk0mBajIgqyrQbyx+jZB
-         svBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778077652; x=1778682452;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=5rJWz1pDbyoadWp6yHfOeNQO0FWEwox+z1MU3VR8Pqg=;
-        b=UNWyoKYWpLhOmbVd+zct7AKg9vjwATaDzFea/mSNxc1IQ6+SmWQ/+XjxI18MWhMUbn
-         VfrSJNeMm9uwv7d5s0R2LlgPPX5mxDUzGRVQQ2FOhd5y58QApBViNLbHeZh6SOJ2VyYT
-         TvzKdteKdXkwNS5RavPfmyCBFgltg9NCNpSf6u4E4yC5s88TQiRCaU/S8rshy3yQM5fV
-         0JuyYC2+s6NAUmBLgm60vHSOXV9Ylgx9goHf/nPoYrGO0T9glCVPrk2Tg1AkrlKXSq5h
-         WcYW/Rdjez70t6ksu6EF8MXjRgRCHhexJbSGxqyEioSeQcQ5wU1aGp+cCUKg1qf8LhVA
-         4pSw==
-X-Gm-Message-State: AOJu0Yz7Gf3NYf/hiouXdha9PvgoWYas8nl9xEl1WqryNqT1pOMZUJCc
-	LqxINXVILdf3jAXor50t+JVilCKSZ9qP2d6oWahMUYaKWeqYe2wloPzK
-X-Gm-Gg: AeBDievp5TIIIOuosso4zIBGVya1eb0/BDTVJkZ6GttRUfgBVTbEXPedRPWpeGnWx+V
-	90HlgsYsoqqiPXFxZZACKXL+ceRJyxFr0SBR7dRlQnLVOtHQcV8X6wkj1va7qBtpyT4Lj/3ysmp
-	zR4Pw0o0aMtGfT8upd1VCHoeGyhBimlu4D/JSGOwd8QKQ9q0ADKnbDMTWkb5S/hmOuT0dX3mKyq
-	RNku0X/w4WbwgdsshsTylpgOwM+sZdCxuGn34n1JBn47lk6pIkvtORaO06FFUcSmbgkYJk+6uaT
-	iwz+Y9fFYVt4ahIbnn5HnntLDrVcU9xKc0MklZ9L1/gvyYRaw9XrYO4dy3JwFZPINj4oZxuAhPl
-	gOnBZQK9jnijoeyKM6Ym+VioTKgrdNxhDtGfImCLkXttrVw6qSWOX1z0D2Qfmeei19vPEbdayDl
-	kMvOoka9FM664Vote3lTJ/URya+RKbhddzLcU=
-X-Received: by 2002:a05:6214:4c87:b0:89a:629:2203 with SMTP id 6a1803df08f44-8bc429754fdmr44284996d6.11.1778077651996;
-        Wed, 06 May 2026 07:27:31 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:70::])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b53c0e7ebdsm201474186d6.29.2026.05.06.07.27.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2026 07:27:31 -0700 (PDT)
-From: Amery Hung <ameryhung@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	eddyz87@gmail.com,
-	memxor@gmail.com,
-	martin.lau@kernel.org,
-	mykyta.yatsenko5@gmail.com,
-	ameryhung@gmail.com,
-	kernel-team@meta.com
-Subject: [PATCH bpf-next v4 12/12] selftests/bpf: Test using file dynptr after the reference on file is dropped
-Date: Wed,  6 May 2026 07:27:08 -0700
-Message-ID: <20260506142709.2298255-13-ameryhung@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260506142709.2298255-1-ameryhung@gmail.com>
-References: <20260506142709.2298255-1-ameryhung@gmail.com>
+	s=arc-20240116; t=1778077711; c=relaxed/simple;
+	bh=5ZU21tRIlqXoH9jIFxronPOEdmNOHwLE03547/Jek1U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=VNBAElfJPoQiDgf9trL9+6FGdifDRgOFuyeGmzh6mhA2XYYDmH9xjYTHQa/3jkWfwPNpYtvdDqs7A82vPZP3jaO7KzemJivjPFLMDaK5JG2Uyl44fKpUlXeqL4ss9KXJnAhHQGxYo3Es3xk9JNQRsUwjugJB+ShBzB8GntYm0M4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZmrxhBnP; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <78183562-ff83-4b7a-9c7b-b3cb92676ee8@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1778077696;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Vuoq7yYRR946Z2PaAByJyOtutD5hvIdtunJIHpdgfA8=;
+	b=ZmrxhBnP6yTe33insjP4W9UIy+jxXJFkVZPd54uf85RoC/rbEvobOZhrLa6t/KPtTAr91/
+	v5n3n4meLok1Wh7lBsWjmu2JCRD6ERfbRu9u4uuwtB0uTWFlSbD5I1tLxDrzwR4KHI9nD8
+	iJn4H7Q5zmwuLCjpVxDI+Iu5T13XxDA=
+Date: Wed, 6 May 2026 07:28:10 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [syzbot] [rdma] general protection fault in kernel_sock_shutdown
+ (4)
+To: syzbot <syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com>,
+ akpm@linux-foundation.org, arjan@linux.intel.com, davem@davemloft.net,
+ dsahern@kernel.org, edumazet@google.com, horms@kernel.org, jgg@ziepe.ca,
+ kuba@kernel.org, kuni1840@gmail.com, kuniyu@google.com, leon@kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com,
+ zyjzyj2000@gmail.com
+References: <69fb46ae.a00a0220.387fc1.0002.GAE@google.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <69fb46ae.a00a0220.387fc1.0002.GAE@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: E13414DC3C3
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 104454DC417
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=59da38148f3a3d24];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-284887-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284885-lists,netdev=lfdr.de];
-	TO_DN_NONE(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
+	FREEMAIL_TO(0.00)[syzkaller.appspotmail.com,linux-foundation.org,linux.intel.com,davemloft.net,kernel.org,google.com,ziepe.ca,gmail.com,vger.kernel.org,redhat.com,googlegroups.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yanjun.zhu@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,d8f76778263ab65c2b21];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid,appspotmail.com:email,storage.googleapis.com:url,syzkaller.appspot.com:url]
 
-File dynptr and slice should be invalidated when the parent file's
-reference is dropped in the program. Without the verifier tracking
-dyntpr's parent referenced object, the dynptr would continute to be
-incorrectly used even if the underlying file is being tear down or gone.
 
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
----
- .../selftests/bpf/progs/file_reader_fail.c    | 60 +++++++++++++++++++
- 1 file changed, 60 insertions(+)
+在 2026/5/6 6:48, syzbot 写道:
+> syzbot has found a reproducer for the following issue on:
+>
+> HEAD commit:    74fe02ce122a Merge tag 'wq-for-7.1-rc2-fixes' of git://git..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=16e895ce580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=59da38148f3a3d24
+> dashboard link: https://syzkaller.appspot.com/bug?extid=d8f76778263ab65c2b21
+> compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13a613ba580000
+>
+> Downloadable assets:
+> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-74fe02ce.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/c0a591d96864/vmlinux-74fe02ce.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/9f94fb623cd1/bzImage-74fe02ce.xz
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com
+>
+> Oops: general protection fault, probably for non-canonical address 0xdffffc000000000d: 0000 [#1] SMP KASAN NOPTI
+> KASAN: null-ptr-deref in range [0x0000000000000068-0x000000000000006f]
 
-diff --git a/tools/testing/selftests/bpf/progs/file_reader_fail.c b/tools/testing/selftests/bpf/progs/file_reader_fail.c
-index 0739620dea8a..d5fae5e4cf9a 100644
---- a/tools/testing/selftests/bpf/progs/file_reader_fail.c
-+++ b/tools/testing/selftests/bpf/progs/file_reader_fail.c
-@@ -50,3 +50,63 @@ int xdp_no_dynptr_type(struct xdp_md *xdp)
- 	bpf_dynptr_file_discard(&dynptr);
- 	return 0;
- }
-+
-+SEC("lsm/file_open")
-+__failure
-+__msg("Leaking reference id={{[0-9]+}} alloc_insn={{[0-9]+}}. Release it first.")
-+int use_file_dynptr_after_put_file(void *ctx)
-+{
-+	struct task_struct *task = bpf_get_current_task_btf();
-+	struct file *file = bpf_get_task_exe_file(task);
-+	struct bpf_dynptr dynptr;
-+	char buf[64];
-+
-+	if (!file)
-+		return 0;
-+
-+	if (bpf_dynptr_from_file(file, 0, &dynptr))
-+		goto out;
-+
-+	/* this should fail - file dynptr should be discarded first to prevent resource leak */
-+	bpf_put_file(file);
-+
-+	bpf_dynptr_read(buf, sizeof(buf), &dynptr, 0, 0);
-+	return 0;
-+
-+out:
-+	bpf_dynptr_file_discard(&dynptr);
-+	bpf_put_file(file);
-+	return 0;
-+}
-+
-+SEC("lsm/file_open")
-+__failure
-+__msg("Leaking reference id={{[0-9]+}} alloc_insn={{[0-9]+}}. Release it first.")
-+int use_file_dynptr_slice_after_put_file(void *ctx)
-+{
-+	struct task_struct *task = bpf_get_current_task_btf();
-+	struct file *file = bpf_get_task_exe_file(task);
-+	struct bpf_dynptr dynptr;
-+	char *data;
-+
-+	if (!file)
-+		return 0;
-+
-+	if (bpf_dynptr_from_file(file, 0, &dynptr))
-+		goto out;
-+
-+	data = bpf_dynptr_data(&dynptr, 0, 1);
-+	if (!data)
-+		goto out;
-+
-+	/* this should fail - file dynptr should be discarded first to prevent resource leak */
-+	bpf_put_file(file);
-+
-+	*data = 'x';
-+	return 0;
-+
-+out:
-+	bpf_dynptr_file_discard(&dynptr);
-+	bpf_put_file(file);
-+	return 0;
-+}
+Thanks a lot. IIRC, this problem is in process. The link is 
+https://patchwork.kernel.org/project/linux-rdma/patch/20260424013759.728288-1-kuniyu@google.com/
+
+Hi, Kuniyuki Iwashima
+
+I think you are fixing this problem. I hope that we can see your commit 
+very soon.
+
+Zhu Yanjun
+
+> CPU: 3 UID: 0 PID: 5986 Comm: syz.3.20 Not tainted syzkaller #0 PREEMPT(full)
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+> RIP: 0010:kernel_sock_shutdown+0x47/0x70 net/socket.c:3785
+> Code: fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 33 48 b8 00 00 00 00 00 fc ff df 4c 8b 63 20 49 8d 7c 24 68 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 1a 49 8b 44 24 68 89 ee 48 89 df 5b 5d 41 5c ff e0
+> RSP: 0018:ffffc9000391f180 EFLAGS: 00010202
+> RAX: dffffc0000000000 RBX: ffff88802a2a0040 RCX: ffffffff8b8b72bd
+> RDX: 000000000000000d RSI: ffffffff89553b32 RDI: 0000000000000068
+> RBP: 0000000000000002 R08: 0000000000000001 R09: fffff52000723dfc
+> R10: ffffc9000391efe7 R11: 0000000000000000 R12: 0000000000000000
+> R13: ffff8880311b8000 R14: 0000000000000002 R15: 0000000000000018
+> FS:  00007f602d1fe6c0(0000) GS:ffff8880d6675000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000561c522a6000 CR3: 000000002e99e000 CR4: 0000000000352ef0
+> Call Trace:
+>   <TASK>
+>   udp_tunnel_sock_release+0x68/0x80 net/ipv4/udp_tunnel_core.c:202
+>   rxe_release_udp_tunnel drivers/infiniband/sw/rxe/rxe_net.c:294 [inline]
+>   rxe_sock_put+0xae/0x130 drivers/infiniband/sw/rxe/rxe_net.c:639
+>   rxe_net_del+0x83/0x120 drivers/infiniband/sw/rxe/rxe_net.c:660
+>   rxe_dellink+0x15/0x20 drivers/infiniband/sw/rxe/rxe.c:254
+>   nldev_dellink+0x289/0x3c0 drivers/infiniband/core/nldev.c:1849
+>   rdma_nl_rcv_msg+0x392/0x6f0 drivers/infiniband/core/netlink.c:195
+>   rdma_nl_rcv_skb.constprop.0.isra.0+0x2cb/0x410 drivers/infiniband/core/netlink.c:239
+>   netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+>   netlink_unicast+0x585/0x850 net/netlink/af_netlink.c:1344
+>   netlink_sendmsg+0x8b0/0xda0 net/netlink/af_netlink.c:1894
+>   sock_sendmsg_nosec net/socket.c:787 [inline]
+>   __sock_sendmsg net/socket.c:802 [inline]
+>   ____sys_sendmsg+0x9e1/0xb70 net/socket.c:2698
+>   ___sys_sendmsg+0x190/0x1e0 net/socket.c:2752
+>   __sys_sendmsg+0x170/0x220 net/socket.c:2784
+>   do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>   do_syscall_64+0x10b/0xf80 arch/x86/entry/syscall_64.c:94
+>   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7f602db9cdd9
+> Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007f602d1fe028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 00007f602de16090 RCX: 00007f602db9cdd9
+> RDX: 0000000000000000 RSI: 00002000000002c0 RDI: 0000000000000007
+> RBP: 00007f602dc32d69 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 00007f602de16128 R14: 00007f602de16090 R15: 00007ffc1d89c428
+>   </TASK>
+> Modules linked in:
+> ---[ end trace 0000000000000000 ]---
+> RIP: 0010:kernel_sock_shutdown+0x47/0x70 net/socket.c:3785
+> Code: fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 33 48 b8 00 00 00 00 00 fc ff df 4c 8b 63 20 49 8d 7c 24 68 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 1a 49 8b 44 24 68 89 ee 48 89 df 5b 5d 41 5c ff e0
+> RSP: 0018:ffffc9000391f180 EFLAGS: 00010202
+>
+> RAX: dffffc0000000000 RBX: ffff88802a2a0040 RCX: ffffffff8b8b72bd
+> RDX: 000000000000000d RSI: ffffffff89553b32 RDI: 0000000000000068
+> RBP: 0000000000000002 R08: 0000000000000001 R09: fffff52000723dfc
+> R10: ffffc9000391efe7 R11: 0000000000000000 R12: 0000000000000000
+> R13: ffff8880311b8000 R14: 0000000000000002 R15: 0000000000000018
+> FS:  00007f602d1fe6c0(0000) GS:ffff8880d6675000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000561c522a6000 CR3: 000000002e99e000 CR4: 0000000000352ef0
+> ----------------
+> Code disassembly (best guess):
+>     0:	fc                   	cld
+>     1:	ff                   	lcall  (bad)
+>     2:	df 48 89             	fisttps -0x77(%rax)
+>     5:	fa                   	cli
+>     6:	48 c1 ea 03          	shr    $0x3,%rdx
+>     a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
+>     e:	75 33                	jne    0x43
+>    10:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+>    17:	fc ff df
+>    1a:	4c 8b 63 20          	mov    0x20(%rbx),%r12
+>    1e:	49 8d 7c 24 68       	lea    0x68(%r12),%rdi
+>    23:	48 89 fa             	mov    %rdi,%rdx
+>    26:	48 c1 ea 03          	shr    $0x3,%rdx
+> * 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+>    2e:	75 1a                	jne    0x4a
+>    30:	49 8b 44 24 68       	mov    0x68(%r12),%rax
+>    35:	89 ee                	mov    %ebp,%esi
+>    37:	48 89 df             	mov    %rbx,%rdi
+>    3a:	5b                   	pop    %rbx
+>    3b:	5d                   	pop    %rbp
+>    3c:	41 5c                	pop    %r12
+>    3e:	ff e0                	jmp    *%rax
+>
+>
+> ---
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
+
 -- 
-2.52.0
+Best Regards,
+Yanjun.Zhu
 
 
