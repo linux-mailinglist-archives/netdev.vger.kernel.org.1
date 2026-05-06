@@ -1,214 +1,256 @@
-Return-Path: <netdev+bounces-285066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285067-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2FVrEUjE+2kREgAAu9opvQ
-	(envelope-from <netdev+bounces-285066-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 00:44:24 +0200
+	id 4H2UNTzE+2keEgAAu9opvQ
+	(envelope-from <netdev+bounces-285067-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 00:44:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CA534E15E2
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 00:44:23 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BE3A4E15DB
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 00:44:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id BB1AB300EC7C
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 22:43:58 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E79AD300BBA4
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 22:44:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35F7B3B9D91;
-	Wed,  6 May 2026 22:43:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D4413BAD95;
+	Wed,  6 May 2026 22:43:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uWUB+XW7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C6TIPh53"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16F0372670
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 22:43:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778107423; cv=none; b=aJHHO3qo3eLTjN546aD/vbvlGHNavQIKgDfDLk8tmB4R4m6doC7OLfycS4XiPmAl6BiI7hSOp88kAb00HW8Uj0+ixytURputfC1Qwp6IzKY7gXDKZhAijnzsqKSP/fj7p3tT15RGu2wGZs9K8ZSpCU/S/0eU30Iro2JAKAUu7Uw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778107423; c=relaxed/simple;
-	bh=tixKAEDJAnYdVt3di29GXUTaszKwxFSltvbjtrfu3uc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IoXkhG0p9C6HFy9oUgSreXgDDwhb5Je9xhjjONTyrMqVqY1qozV68W4ce692TXrQ7MMCPNA/SIRDotxAEOJcVcMuu3dtu79bkMxQbjTetlayJ+O29vS6H+s4Y5PWKnhHAWy4BZoQU+20IuOzwwwUEHe5PoBmgw+JNZ+ZOQMsih0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uWUB+XW7; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <2a15199c-d48f-4034-a907-6efa883d5d99@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1778107403;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yURQSTjJQ+qtbFe3jellE7Q5DOMcjnDhP6Zyx8QZf7w=;
-	b=uWUB+XW7QNy+t0c5a8ftjrI2v2EcXg2o0Hla2P7R52SadZ7zoeb5GnylS/VJBDmCL2sDIl
-	t8TZ6ubt3gSz0uiQglvNMC4GORponHP9vhxzZlkdHNOpzMQ2tpmzIZT4DD3a7lpy8dPZh2
-	SUb6RWrCnG2FpUR/suDy6EcNG7slaVo=
-Date: Wed, 6 May 2026 23:43:19 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 969BD3B19C6;
+	Wed,  6 May 2026 22:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778107428; cv=fail; b=gwPups+L2f4s0whDSf6OJa3HqZXxWv2mZKegTRJA7BWJ1I2F3qun7F0ZaDiRTYsSMlKjqE2EsP3F1E7IhR/9a8ltP6F+BFYwqjG0BmcHcTsH1cVt9iBXMagCN0mOve9M7GPCq3xctTInox3cJk2C/SbCCnxS3uytl2tY4xEb1KQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778107428; c=relaxed/simple;
+	bh=ow9BlXjNLakMKH8JJcCqZ8kfVixg9Pz6G4DfmBTVsFU=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Cgup62C2+a3mFFBL7QsZyier/kAvYEgjZspK81sry4NvQA8kqFvct8ZmE+Go2xMvdHTZPbXNlydkcawJkc5nPyX/lNJD6yb9ae+aP947dg1X7PXpwZ08MGaPqknm5UiAVuEL2tb2iYELFFQGdMRXgHaXE9v9DzIUBPbTKQC+Nmw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C6TIPh53; arc=fail smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778107424; x=1809643424;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ow9BlXjNLakMKH8JJcCqZ8kfVixg9Pz6G4DfmBTVsFU=;
+  b=C6TIPh53hs81LXTv6l0JSjU28MIpv1CykVtiIM4bMzBiQ20i+ELURR1b
+   O9BYxrEpf2+7y5H/w/8t/TFj9o9UxclwVcb/rUCqRBBseWR6BQHPXNqV3
+   FuDWMxSbV+CIvX8mPqkR3Zekj3CQVv6YskFhY17lr4UdyHKuMRzfSU+35
+   tOZveEtsr0EG7RS6Go72YYOPOoCIblswxNqfjawFHh+946RW9CqJyZCbu
+   yYxuekl06pZ+SiO8OU5MoF9efPM5s0+5+hc+AHHM+67mm6DDb/eEWPZ9/
+   qGWwmDijIs5HszRhj0sItFH4iqLFia+h00zPtMSGNzXsb9sMx4OAzGpMN
+   Q==;
+X-CSE-ConnectionGUID: 9D3g9TaqRBuRfnA27ZzjBQ==
+X-CSE-MsgGUID: s8fwdk/qQZyToGYt9L+vZg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11778"; a="89640248"
+X-IronPort-AV: E=Sophos;i="6.23,220,1770624000"; 
+   d="scan'208";a="89640248"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2026 15:43:38 -0700
+X-CSE-ConnectionGUID: 6B8RdbRvR2CwxSMIqGcU7g==
+X-CSE-MsgGUID: mCP9XNIKT8mjPcfQpgThfw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,220,1770624000"; 
+   d="scan'208";a="266650518"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2026 15:43:37 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 6 May 2026 15:43:36 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Wed, 6 May 2026 15:43:36 -0700
+Received: from DM1PR04CU001.outbound.protection.outlook.com (52.101.61.49) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 6 May 2026 15:43:35 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lZspGEBsvj+br4J6YOmC3w5z+Mt5+0emaOuioHgj/EMbRw6B9KcEk/lBNeZ0IrlO5avOWshF+APyycH6winp6vFWTHWp2NIRQtio/uS0Ektwis8smgApIY09ZdE8GdZhUoo6XkEGpMgSKQy1ESu7OATmOT57KNfflL6Uckit+ky2AdycCnoglaFnGo+NWaWBQOR7yY3SH3hwoGDIMtOI/qAu86PUTG+47NJsH32VWdlvxdnJpdEq+wwmjnBFdIUCnNEXuK3rUOkVlh6UKnVwmlE8/roc0kbMKp5jfmrk78qa39c9kQqPksc3fOI1bFVfuY9WkctpByCD6SYuHpOJew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LOTP+lTIJ6o6HcDSDU2GHWdZzRw39cQSOaVwv0ywKEk=;
+ b=fsbKJIhkw6ofwsOFU5r0wK0vnL7aVMVe2P48l08vobp2jvT/GHT0nNv1akdCztlLXCV8TNZVRzb+V2H14vJbx8qLXr5KUcDo06fGWgmjShVG0nqlArOusgAHLsta+cX2xNi0KyH3Qbe3Nq5BCtD3na7eEgbOnmgGstjUp54eOCE7uLh8rRUVleTC9C+haSm9lViERTvDy9v8G2RDQvRLSPBeKRL5jKreGROHSszXbxXpKa23IVZ9eWR5mTPCHzILTmrXdsP7bIwGvZB7xlfJr6dZ8zUmVDCYPuTUdDae1UYb4zS7sE30eIgDku3FTjykC4OtbcBBbWwzSbxZvFuDog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7592.namprd11.prod.outlook.com (2603:10b6:806:343::16)
+ by SA2PR11MB4924.namprd11.prod.outlook.com (2603:10b6:806:113::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.15; Wed, 6 May
+ 2026 22:43:28 +0000
+Received: from SN7PR11MB7592.namprd11.prod.outlook.com
+ ([fe80::3e09:8700:df72:37b6]) by SN7PR11MB7592.namprd11.prod.outlook.com
+ ([fe80::3e09:8700:df72:37b6%6]) with mapi id 15.20.9891.008; Wed, 6 May 2026
+ 22:43:28 +0000
+Message-ID: <3d229a69-cdf9-4e89-af1e-454b6d6912bd@intel.com>
+Date: Wed, 6 May 2026 15:43:25 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH v4] ice: wait for reset completion in
+ ice_resume()
+To: Aaron Ma <aaron.ma@canonical.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: Akeem G Abodunrin <akeem.g.abodunrin@intel.com>, Jesse Brandeburg
+	<jesse.brandeburg@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+	<aleksandr.loktionov@intel.com>, <kohei@enjuk.jp>, Paul Menzel
+	<pmenzel@molgen.mpg.de>
+References: <20260429034849.1686650-1-aaron.ma@canonical.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20260429034849.1686650-1-aaron.ma@canonical.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0357.namprd03.prod.outlook.com
+ (2603:10b6:303:dc::32) To SN7PR11MB7592.namprd11.prod.outlook.com
+ (2603:10b6:806:343::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 6/9] net: atlantic: implement AQC113 L2/L3/L4 RX
- filter management filter management management
-To: sukhdeeps@marvell.com, netdev@vger.kernel.org
-Cc: irusskikh@marvell.com, epomozov@marvell.com, richardcochran@gmail.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org
-References: <20260506135706.2834-1-sukhdeeps@marvell.com>
- <20260506135706.2834-7-sukhdeeps@marvell.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260506135706.2834-7-sukhdeeps@marvell.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 4CA534E15E2
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7592:EE_|SA2PR11MB4924:EE_
+X-MS-Office365-Filtering-Correlation-Id: 540ca098-355f-480a-994a-08deabc0e405
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024|56012099003|18002099003|22082099003|921020;
+X-Microsoft-Antispam-Message-Info: XAWv978a9YfobYEf8fTtyp+EZ8J25OdNeHyi+7wddorkJb8irGJrwcVfPL/fkJEi1v/CpzMlmN4Eh/zMQtZWzDBGECZwEj05Oe/Wt/2ChcXa2od9Dy4slUq5HjCEauLahC7BvqNgY0N5vodT7mq3hKGaMr7MuAGDioPvi4J1C/HIFGL95GlP7kXjsDNar0SrEgtv2gJLEjm3OFrxTbV/9eCIW+3Vw2glfwv6mEGY1/VycOme9um10o+mjpNYj7s0qTH926bzH6ExjSmYRneOm3ifSYGFK52S4cLgM+ZFgx9vgNaMx3iop96E0NZp6/iXNfdxEl0VTqLkIpsAaMN1MpqLFrL2H7Vt09Uu2I9zd5gSVAVywPXPfQ/viSPLqdArusbS83yfE01ehur37DN9Bx5go6KA3/Kv6uWXWw/TrLyo9Fu1LomjemOpzrqh27lCtQ0d31GXzZNNeaeCZxUlcjr/VlTDB126PQv0tDsICgZzXibqzIPQFZ8bcLyFc8J8rw0mQ4DS0yW5P9IHQE95gFHylp2C9kyo/lh7mIydwXTgrakd5Lo1TXT61GyG6edcb/WIecvHMnU3D2vWUMTRGkUQdzZtqo7g8+szNIXs6FIB6HQpSgc6MiNQrxEBjteH0WY+1YHEPFrypwaZokOsuV1KnlYSylJCjBquA+RsRCrQzdcZlQt78ZmyiFqoEE2UroBp7tcuz9q/9q00Nkh+Yr3nu5SF8XEAvx/FGVgmE9U=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7592.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(56012099003)(18002099003)(22082099003)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WEorZXlVYXlCa0MxK1ZPV2VYcUdWaEtJN2VKRmlRMmkrWHFMZHBvSVFCUDZh?=
+ =?utf-8?B?eS9SemRRaU1rVXRLaGlBTWIxRFk3STlJUTl1NzhVVzV1KzhuTUFkU3BSdHFJ?=
+ =?utf-8?B?YlRsOG9tZVQxZW1QS1lLZE1KTkJoL3VWQzErdjVYcFV0YTlzZWVLUmVjWnFH?=
+ =?utf-8?B?dCtNaUJvSzJvbC9pSU5DbU1NVE1BZFZlejVhaG1wY2NqOGROV3g4UWJxU3dH?=
+ =?utf-8?B?dkJpWXlrV1ZFTkxKWjE5NEI2c2xaRXRFTkxYcXNJL0VSdmFMNFUyQTVLckIw?=
+ =?utf-8?B?bEFiOFRMdm5FUU10SkF1NldmK3hoVk0wUXYrekJWbXgrQzdENTRHZTludmxF?=
+ =?utf-8?B?V011RCt3MFBCU1pwM0owdXZ6d1lTT2JqVWd3d0RaSGIvcXJRVDAxQXQ0UXZW?=
+ =?utf-8?B?azkyMEp2RTBQYjNrVjJEdjNvRG9SMWRWVTZHWGRvaWxLdW1rai9VdDFVY0RK?=
+ =?utf-8?B?WTR4SXU2Q2M3RldQL0dCNmV6ZHdFYnZUc0M5QTUrblE1WUpFM3VVUDBLL3BS?=
+ =?utf-8?B?M1dyVnhrczFiWFp1V0N6ZHN2bFA3Q29maVNXaUtBMlFiN09nR2FWZDlHbE5n?=
+ =?utf-8?B?Q3U4eWFwdUUzbnBEdVNRdmxDa1I4UVhkdml6UTZxTlcrcmJBT2pGcng5aDB1?=
+ =?utf-8?B?QXFZa2lha2pYSWFvTFp1dDMzVFVWNTdIcnFNdDNHL2FOYzJSMzkrNFRLNmxi?=
+ =?utf-8?B?NXk0RWIzR1FXQk80Z3JQQ1pPeXhWMXFGWWcyazRUeGI5RlBjR3RZV3dQVVF2?=
+ =?utf-8?B?Z2JpMC9jUXZET29GUC95NDRWbE1pMmorU0JxWWt6eVlSZWEyUXlndmRJUm1p?=
+ =?utf-8?B?blpmRGorejdqdUtLZ2R5NlRDK1FUb2lBdDFUeVdsYU92QkpDNUdnOU5kZkNp?=
+ =?utf-8?B?djkvNVE0YUhoWGhFSXBhQW9VTERFMEY5bUxUck1aMHlibmY5bFhYVVcyUEo4?=
+ =?utf-8?B?Qm0zS0JpN1BzaHU2U0o5cUZnSWxiaWlWSCsrUVpXMGIzeUgxRTBVbmE0VzFr?=
+ =?utf-8?B?OWdXSXp1NE9TVjFsNHlLT2FiSEF6RTN1OVNEalJlaE9WVTFaN0FLWloweDNY?=
+ =?utf-8?B?OS8rYXB6MHhmRVVTYzFGTjkyZS9sWkxIL041eERSbjIrRmRyNFIwWGR0bUlm?=
+ =?utf-8?B?eEVjMXZRUE9VZjU0VXVlQlN3Vkdjd3d6N1lsMnFld2wxUTB5OEJVanBRM2Y3?=
+ =?utf-8?B?STdwdVB1VGNycVNlOHBDbFJBQU4rY0xXVVk4UUtNQjdWR0Fxb05RRzVOTU1v?=
+ =?utf-8?B?VURsMDVhWEUzVUV0RHFQbEdDTmpkRENLbmFLNjA0QzB5TDJlaURNdFJpTjJM?=
+ =?utf-8?B?ZVlzK0p4anVCMnNHd0ZBTCtzTklkYjlmVkN4aUk2QzRJU0RwQSsvN2djVW15?=
+ =?utf-8?B?dTM5Z0VtL1R5ZnZZNGg2U3hqclhCMDZXcXZIeHIveXRwTmxPTUtMekpBSnpr?=
+ =?utf-8?B?Szd1T1RMek9pMGU3V3c2d05jNmEwMWZyaU5lOG4xS0FPM0F3N2pYRDJySjJs?=
+ =?utf-8?B?QXAzeWU5V2xxZDhFNzNqQXFWK2pQU0N5Mm1ET2hYZURwSXU1RmVCY2xVTExW?=
+ =?utf-8?B?YzN5bTFQUGVDSGR5OHc1bm9BakM1SUdVR000akhVaWI0MTFxS2VtTWdIWGQz?=
+ =?utf-8?B?Q1lBRkhDZDRsY21sWCtpSHptRTA0MlBmMnFtREFmUXVnc2o2OG02KytSTGpL?=
+ =?utf-8?B?bU4zUEJVa3NkTW93OTFxK2c1UkV4T0IxYWgvYWFDMmZhMTlEc1hkemNpN2pB?=
+ =?utf-8?B?V1c1VGVGTXM2Um5vWnlyVERVczBianlZaDhPcE5KcUUwQytoUjBQZS9admpY?=
+ =?utf-8?B?ZERyYld1bHduOUlEeENTNjVNYUROeFpVZ1JyS2RSa3FDN1JBckJqeWFscStl?=
+ =?utf-8?B?dWkvQVBsMjN6dld3dzVLaEZ3R3hibzU1NjFBakZueEI0S2xhWTlRQmh1YjdW?=
+ =?utf-8?B?eUkzc0JETXpjWGRyVHNpMGcvSWZubUp6ellHUmVlR2xTeG0xVkUzZ3ZuMEZK?=
+ =?utf-8?B?V2RCelRoWlNBOWtUbEFaY04yVWVqQk5JL3o2TGR5SGZqUFV5aDdzN0tzSEUx?=
+ =?utf-8?B?ZjhwYzVlaS8za09ZVmZIMGx4Rno4NlpienJ6MTFneDNBdDhiNXZuTnQwTHBE?=
+ =?utf-8?B?WTNVb1lZcFE3YW5hZXNkcE1mR00xdVNMYUxmRjM3N21hQmI0K21tajRoM3Ir?=
+ =?utf-8?B?Z2Y5QXpMeVE2QVBvWStjbVc5cUVUOGVMU3IzNmRHbllkM01FN2kwdWF3aFV4?=
+ =?utf-8?B?Q05oeW1TR1Nhb3l0OFlsNy9nZTg4VmhieWRxbnNFenZoUHNXVXV6cFRVTzk2?=
+ =?utf-8?B?dVI1NTE0RW5KcitZbDQyaWVlcmVTVGJVSCtuNGJ4ZEFZS0oya0c0aFJmNnAy?=
+ =?utf-8?Q?cAUnmnNQtcp8/71Q=3D?=
+X-Exchange-RoutingPolicyChecked: PEXtiS896hja8/63p+uRZ7PIs0VxitKdt+wWyzuTe6ljdKhZNODEnufRc/ydgV1M9nsqaGaax0BFHdgLCDuMI7vPEc342R4eVpvJNyaLh5Tzy6kG4Qs2tvzWmUUEJZRyc5DY7m0gblvFZl/FPipYMxat0EDIC0LhEY63CopK0SdqxP5qZXVQSZoa5wX/4TjDL0HZ8v8Rp08dIdf41hfhnCzOX8Xyd8EIiKlek7cOmufwFTcu8rBxaAvJOGnbtgsio9V/q/ZaVXGdK45wfSkTYYlzL+doNMKzZRqr2cwCJBeuBaiwoEOYlWl0DtVV7BBIoWcrRFMqVEmPMtcHF/2bsA==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 540ca098-355f-480a-994a-08deabc0e405
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7592.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2026 22:43:28.2080
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: pRyKaiIT0mXGZ3rjJKBu1uThJWr3Wnl9Swzt+qJh1BqQus1DZaNzTMHGhoKHSpB5Mm6FoQCXiBBSt7YL7TxR32iuVH9OzhvdfJO5oO1UopE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4924
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: 7BE3A4E15DB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[marvell.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	TAGGED_FROM(0.00)[bounces-285066-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-285067-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:mid,intel.com:dkim,canonical.com:email,enjuk.jp:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,marvell.com:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Action: no action
 
-On 06/05/2026 14:57, sukhdeeps@marvell.com wrote:
-> From: Sukhdeep Singh <sukhdeeps@marvell.com>
+On 4/28/2026 8:48 PM, Aaron Ma via Intel-wired-lan wrote:
+> ice_resume() schedules an asynchronous PF reset and returns
+> immediately. The reset runs later in ice_service_task(). If
+> userspace tries to bring up the net device before the reset
+> finishes, ice_open() fails with -EBUSY:
 > 
-> Implement complete RX filter management for AQC113 hardware:
+>   ice_resume()
+>     ice_schedule_reset()          # sets ICE_PFR_REQ, returns
+>   ...
+>   ice_open()
+>     ice_is_reset_in_progress()    # ICE_PFR_REQ still set, -EBUSY
+>   ...
+>   ice_service_task()
+>     ice_do_reset()
+>       ice_rebuild()               # clears ICE_PFR_REQ, too late
 > 
-> - Add tag-based filter policy with reference-counted sharing, allowing
->    multiple filter rules to share the same L3 or L4 hardware filter
->    when their match criteria are identical.
-> - Implement L3 (IPv4/IPv6 source/destination address and protocol)
->    filter find, get (program HW and increment refcount), and put
->    (decrement refcount and clear HW when last user releases).
-> - Implement L4 (TCP/UDP/SCTP source/destination port) filter
->    management with the same find/get/put pattern.
-> - Add combined L3L4 filter configuration that translates legacy
->    aq_rx_filter_l3l4 commands into AQC113 separate L3+L4 filter
->    programming with Action Resolver Table (ART) entries.
-> - Add L2 ethertype filter set/clear with tag-based ART integration.
-> - Add MAC address setup using firmware-provided L2 filter base index.
+> Reproduced on E800 series NICs during suspend/resume with irdma
+> enabled, where the aux device probe widens the race window.
 > 
-> Update hardware initialization:
-> - Use firmware-reported ART section base and count instead of
->    hardcoded 0xFFFF section enable.
-> - Enable L3 v6/v4 select mode for simultaneous IPv4/IPv6 filtering.
-> - Initialize L3L4 filter indices to -1 on reset.
+>   ice 0000:81:00.0: can't open net device while reset is in progress
 > 
-> Wire up hw_filter_l2_set, hw_filter_l2_clear, hw_filter_l3l4_set,
-> hw_set_mac_address, hw_get_version, and hw_get_regs in hw_atl2_ops.
+> Add a best-effort wait (10s timeout, matching ice_devlink_info_get())
+> for the reset to complete before returning from ice_resume(). In
+> practice the reset completes in ~300ms.
 > 
-> Signed-off-by: Sukhdeep Singh <sukhdeeps@marvell.com>
-> ---
->   .../net/ethernet/aquantia/atlantic/aq_hw.h    |   2 +
->   .../aquantia/atlantic/hw_atl2/hw_atl2.c       | 582 +++++++++++++++++-
->   2 files changed, 580 insertions(+), 4 deletions(-)
+> Fixes: 769c500dcc1e ("ice: Add advanced power mgmt for WoL")
+> Cc: stable@vger.kernel.org
+> Reviewed-by: Kohei Enju <kohei@enjuk.jp>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Aaron Ma <aaron.ma@canonical.com>
 
-[...]
+This doesn't specify a tree target, but given the cc to stable and the
+fixes tag, I think this belongs on net, so I'll queue it for the iwl-net
+dev-queue.
 
->   
-> @@ -380,6 +422,9 @@ static void hw_atl2_hw_init_new_rx_filters(struct aq_hw_s *self)
->   {
->   	u8 *prio_tc_map = self->aq_nic_cfg->prio_tc_map;
->   	struct hw_atl2_priv *priv = self->priv;
-> +	u32 art_first_sec, art_last_sec;
-> +	u32 art_sections;
-> +	u32 art_mask = 0;
-
-no need to init variable which is overwritten later ...
-
->   	u16 action;
->   	u8 index;
->   	int i;
-> @@ -394,9 +439,14 @@ static void hw_atl2_hw_init_new_rx_filters(struct aq_hw_s *self)
->   	 * REC entry is used for further processing. If multiple entries match,
->   	 * the lowest REC entry, Action field will be selected.
->   	 */
-> -	hw_atl2_rpf_act_rslvr_section_en_set(self, 0xFFFF);
-> +	art_last_sec = priv->art_base_index / 8 + priv->art_count / 8;
-> +	art_first_sec = priv->art_base_index / 8;
-> +	art_mask = (BIT(art_last_sec) - 1) - (BIT(art_first_sec) - 1);
-
-... here
-
-> +	art_sections = hw_atl2_rpf_act_rslvr_section_en_get(self) | art_mask;
-> +	hw_atl2_rpf_act_rslvr_section_en_set(self, art_sections);
-> +	hw_atl2_rpf_l3_v6_v4_select_set(self, 1);
->   	hw_atl2_rpfl2_uc_flr_tag_set(self, HW_ATL2_RPF_TAG_BASE_UC,
-> -				     HW_ATL2_MAC_UC);
-> +				     priv->l2_filters_base_index);
->   	hw_atl2_rpfl2_bc_flr_tag_set(self, HW_ATL2_RPF_TAG_BASE_UC);
->   
->   	/* FW reserves the beginning of ART, thus all driver entries must
-> @@ -530,6 +580,35 @@ static int hw_atl2_hw_init_rx_path(struct aq_hw_s *self)
->   	return aq_hw_err_from_flags(self);
->   }
->   
-> +static int hw_atl2_hw_mac_addr_set(struct aq_hw_s *self, const u8 *mac_addr)
-> +{
-> +	struct hw_atl2_priv *priv = self->priv;
-> +	u32 location = priv->l2_filters_base_index;
-> +	unsigned int h = 0U;
-> +	unsigned int l = 0U;
-> +	int err = 0;
-
-here again, h, l and err are not used with init values.
-
-> +
-> +	if (!mac_addr) {
-> +		err = -EINVAL;
-> +		goto err_exit;
-> +	}
-> +	h = (mac_addr[0] << 8) | (mac_addr[1]);
-> +	l = (mac_addr[2] << 24) | (mac_addr[3] << 16) |
-> +		(mac_addr[4] << 8) | mac_addr[5];
-> +
-> +	hw_atl_rpfl2_uc_flr_en_set(self, 0U, location);
-> +	hw_atl_rpfl2unicast_dest_addresslsw_set(self, l, location);
-> +	hw_atl_rpfl2unicast_dest_addressmsw_set(self, h, location);
-> +	hw_atl_rpfl2unicast_flr_act_set(self, 1U, location);
-> +	hw_atl2_rpfl2_uc_flr_tag_set(self, HW_ATL2_RPF_TAG_BASE_UC, location);
-> +	hw_atl_rpfl2_uc_flr_en_set(self, 1U, location);
-> +
-> +	err = aq_hw_err_from_flags(self);
-> +
-> +err_exit:
-> +	return err;
-> +}
-> +
->   static int hw_atl2_hw_init(struct aq_hw_s *self, const u8 *mac_addr)
->   {
->   	static u32 aq_hw_atl2_igcr_table_[4][2] = {
-
-[...]
-
+Thanks,
+Jake
 
