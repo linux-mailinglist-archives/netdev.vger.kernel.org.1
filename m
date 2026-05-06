@@ -1,48 +1,49 @@
-Return-Path: <netdev+bounces-284679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284680-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aIsyBw26+mnASAMAu9opvQ
-	(envelope-from <netdev+bounces-284679-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 05:48:29 +0200
+	id cFwOGw66+mnASAMAu9opvQ
+	(envelope-from <netdev+bounces-284680-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 05:48:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 831DF4D5FFC
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 05:48:28 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54F514D600A
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 05:48:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0B758304185E
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 03:48:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0711A30234EE
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 03:48:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A4829E10B;
-	Wed,  6 May 2026 03:48:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B2DA2E1EFC;
+	Wed,  6 May 2026 03:48:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mOo/QlY9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iTaaf2p0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B5A23E320
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 03:48:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38EE32D837C;
+	Wed,  6 May 2026 03:48:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778039304; cv=none; b=cYvRM1emRllIhZdkaVu2VPfIcguPAkIRmnMF4jrQtcRWuSIzmyGdrQlwf/KOOXuhcVpTfqsT/M/PJVJg/nKh29KdjKsrqgodu9sWkaYv+8yb4AzyUMDTIlpkYvuZ/UpPCAR+ZiC1dwkXdD5zFQ0I6e3lSQ24XlzZiNw4vL4lzoU=
+	t=1778039305; cv=none; b=BhZEHqvn6+pdIchFB92nWLAn1YmjW+4hAUdFtrSmPei6hABdV7UtahVUvG6TqebnU2fzH1EwPgyK0HyC5qJgON3Bc3dkeDjCCmXenW+8GnlTw7D77RJ6qmyfKSxURrudQGo6keszFnzvpIWwacZWmjRqiMiTdN+FEBg1RZleZ58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778039304; c=relaxed/simple;
-	bh=kp9EmaELtFznK3tqcaykRyvjjiDWJWp6ZOMzJ57Cvl4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ThteeIJjhVWmuQ4oznFGALwb5txlWqfj7kiRqYE3YxgaVN/cTblUWxQHe4UgtqFU4bdb3YY6HSSQBa+uROZNNL+Lu7HHHDg9FFl1EXYjlJKx5MAfLAWjmoyaNpizQ9speGqntLcvquqrV9pniXqxHg89F6E8N44xaHV5oc4V8WI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mOo/QlY9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFC18C2BCB8;
-	Wed,  6 May 2026 03:48:23 +0000 (UTC)
+	s=arc-20240116; t=1778039305; c=relaxed/simple;
+	bh=ykCTtBq8SINm08DR+LJ7xSso/DvgbtTJ05mRiQz/nlU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=QHF/MqwbYzMpQZwdaV1A7VxUS6YWTBfuRaRXX3Ph3mgsnL56TZ/OMvIImhlvG0R4nHOST08idgrZhFVFT8zd+wROaVnwpZbOoAbMQO6GGuaB+kXCgzbCl0YI8VMCjtY95+zTuvELguHTdsal2cXMDRJD0UvsMeOWpXr54VbSUkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iTaaf2p0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D611C2BCC4;
+	Wed,  6 May 2026 03:48:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778039304;
-	bh=kp9EmaELtFznK3tqcaykRyvjjiDWJWp6ZOMzJ57Cvl4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=mOo/QlY9F/RNJxDXZeCMe+2ndaufVSuM3LOS4b3aCWPoB8eW9ETY49Xc7Iy/OF8lu
-	 nB51wNotZdgVjK1938OO+Oy2u6mKIJFvL4QobkoMNyHF9y0WhKK4BxCyr9Qp5LNhV3
-	 eD20zyXxiNe6RGchNRsLByl1k2NKBCkECjfWfj2J0lRbX2oyfku+64Qs6gpUlQRS1w
-	 7ehl2Y+BGfj+mEU2SOy3+RPs0AzT0d+91xbJVDIyuQZvR3KCE8mIvQ6HyF8TiiSnY2
-	 O65322LZRmRuOMr+5UIWV+LtluuFwLTCTiYUsHyBj57VqX4QCSh8jGKvE124OuHZCx
-	 M50cGLJGtsz4w==
+	s=k20201202; t=1778039305;
+	bh=ykCTtBq8SINm08DR+LJ7xSso/DvgbtTJ05mRiQz/nlU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=iTaaf2p0DyXw3VuIpjGvyY7SiPbpfxaVDjAPj35JCCszDPzJ/KsBGsy3lS3UKfOXk
+	 xntyC2rhc6cs4QzJyf0warLqS1iDpjufy/wESBbLPeYYg0/HIII4FKYelYEgnI0XbE
+	 Js8lCBfDuayPrmeVv7AtcAEJt/RuUhXt27cvhdQDiKnM918uEBqZYti0iRMpxSZqKN
+	 0RtzXZKS+6N53i+0cGgV0oZM/k5wt2tUdBW/Hl9kQ9YIOjO6Fs4ivOnjrjAqLY95fC
+	 2nL59MS5tyNFUhuYygbzOgBRyzrbAzZ0Oxqru6D1zPp5fujqTo8Dg13aO1kbESPOL5
+	 3HKnrgP+9bpOg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -51,17 +52,14 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	horms@kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
-	donald.hunter@gmail.com,
-	matttbe@kernel.org,
-	chuck.lever@oracle.com,
-	daniel@iogearbox.net,
-	skhawaja@google.com,
-	sdf@fomichev.me,
-	hawk@kernel.org
-Subject: [PATCH net-next v3 1/2] net: page_pool: support dumping pps of a specific ifindex via Netlink
-Date: Tue,  5 May 2026 20:48:20 -0700
-Message-ID: <20260506034821.1710113-1-kuba@kernel.org>
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next v3 2/2] selftests: net: add tests for filtered dumps of page pool
+Date: Tue,  5 May 2026 20:48:21 -0700
+Message-ID: <20260506034821.1710113-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260506034821.1710113-1-kuba@kernel.org>
+References: <20260506034821.1710113-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,283 +67,209 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 831DF4D5FFC
+X-Rspamd-Queue-Id: 54F514D600A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,oracle.com,iogearbox.net,fomichev.me];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-284679-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284680-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,iogearbox.net:email,fomichev.me:email]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[info.id:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lib.py:url]
 
-NIPA tries to make sure that HW tests don't modify system state.
-It saves the state of page pools, too. Now that I write this commit
-message I realize that this is impractical since page pool IDs and
-state will get legitimately changed by the tests. But I already
-spent a couple of hours implementing the filtering, so..
+Add tests for page pool dumps of a specific ifindex.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-v3:
- - regen with latest YNL
-v2: https://lore.kernel.org/20260504214336.613107-1-kuba@kernel.org
- - adjust ynltool to pass empty req pointer now
-v1: https://lore.kernel.org/20260319035649.2396137-1-kuba@kernel.org
+v2:
+ - add CONFIG_PAGE_POOL_STATS=y to the config
+v1: https://lore.kernel.org/20260319035649.2396137-2-kuba@kernel.org
 ---
-CC: donald.hunter@gmail.com
-CC: matttbe@kernel.org
-CC: chuck.lever@oracle.com
-CC: daniel@iogearbox.net
-CC: skhawaja@google.com
-CC: sdf@fomichev.me
-CC: hawk@kernel.org
+CC: shuah@kernel.org
+CC: linux-kselftest@vger.kernel.org
 ---
- Documentation/netlink/specs/netdev.yaml |  6 ++++
- net/core/netdev-genl-gen.c              | 38 ++++++++++++++------
- net/core/page_pool_user.c               | 47 +++++++++++++++++++++++--
- tools/net/ynl/ynltool/page-pool.c       |  6 ++--
- 4 files changed, 82 insertions(+), 15 deletions(-)
+ tools/testing/selftests/net/config       |   1 +
+ tools/testing/selftests/net/nl_netdev.py | 119 ++++++++++++++++++++++-
+ 2 files changed, 118 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index b93beb247a11..a1f4c5a561e9 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -649,6 +649,9 @@ doc: >-
-             - dmabuf
-             - io-uring
-       dump:
-+        request:
-+          attributes:
-+            - ifindex
-         reply: *pp-reply
-       config-cond: page-pool
-     -
-@@ -692,6 +695,9 @@ doc: >-
-             - recycle-ring-full
-             - recycle-released-refcnt
-       dump:
-+        request:
-+          attributes:
-+            - info
-         reply: *pp-stats-reply
-       config-cond: page-pool-stats
-     -
-diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
-index 81aecb5d3bc5..c7e138bfe345 100644
---- a/net/core/netdev-genl-gen.c
-+++ b/net/core/netdev-genl-gen.c
-@@ -51,14 +51,28 @@ static const struct nla_policy netdev_dev_get_nl_policy[NETDEV_A_DEV_IFINDEX + 1
+diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
+index 94d722770420..d07c5ac5cab7 100644
+--- a/tools/testing/selftests/net/config
++++ b/tools/testing/selftests/net/config
+@@ -117,6 +117,7 @@ CONFIG_OPENVSWITCH=m
+ CONFIG_OPENVSWITCH_GENEVE=m
+ CONFIG_OPENVSWITCH_GRE=m
+ CONFIG_OPENVSWITCH_VXLAN=m
++CONFIG_PAGE_POOL_STATS=y
+ CONFIG_PROC_SYSCTL=y
+ CONFIG_PSAMPLE=m
+ CONFIG_RPS=y
+diff --git a/tools/testing/selftests/net/nl_netdev.py b/tools/testing/selftests/net/nl_netdev.py
+index eff55c64a012..ceb44c8e1fec 100755
+--- a/tools/testing/selftests/net/nl_netdev.py
++++ b/tools/testing/selftests/net/nl_netdev.py
+@@ -9,7 +9,7 @@ import errno
+ from os import system
+ from lib.py import ksft_run, ksft_exit
+ from lib.py import ksft_eq, ksft_ge, ksft_ne, ksft_raises, ksft_busy_wait
+-from lib.py import NetdevFamily, NetdevSimDev, NlError, ip
++from lib.py import NetdevFamily, NetdevSimDev, NlError, defer, ip
  
- /* NETDEV_CMD_PAGE_POOL_GET - do */
- #ifdef CONFIG_PAGE_POOL
--static const struct nla_policy netdev_page_pool_get_nl_policy[NETDEV_A_PAGE_POOL_ID + 1] = {
-+static const struct nla_policy netdev_page_pool_get_do_nl_policy[NETDEV_A_PAGE_POOL_ID + 1] = {
- 	[NETDEV_A_PAGE_POOL_ID] = NLA_POLICY_FULL_RANGE(NLA_UINT, &netdev_a_page_pool_id_range),
- };
- #endif /* CONFIG_PAGE_POOL */
  
-+/* NETDEV_CMD_PAGE_POOL_GET - dump */
-+#ifdef CONFIG_PAGE_POOL
-+static const struct nla_policy netdev_page_pool_get_dump_nl_policy[NETDEV_A_PAGE_POOL_IFINDEX + 1] = {
-+	[NETDEV_A_PAGE_POOL_IFINDEX] = NLA_POLICY_FULL_RANGE(NLA_U32, &netdev_a_page_pool_ifindex_range),
-+};
-+#endif /* CONFIG_PAGE_POOL */
-+
- /* NETDEV_CMD_PAGE_POOL_STATS_GET - do */
- #ifdef CONFIG_PAGE_POOL_STATS
--static const struct nla_policy netdev_page_pool_stats_get_nl_policy[NETDEV_A_PAGE_POOL_STATS_INFO + 1] = {
-+static const struct nla_policy netdev_page_pool_stats_get_do_nl_policy[NETDEV_A_PAGE_POOL_STATS_INFO + 1] = {
-+	[NETDEV_A_PAGE_POOL_STATS_INFO] = NLA_POLICY_NESTED(netdev_page_pool_info_nl_policy),
-+};
-+#endif /* CONFIG_PAGE_POOL_STATS */
-+
-+/* NETDEV_CMD_PAGE_POOL_STATS_GET - dump */
-+#ifdef CONFIG_PAGE_POOL_STATS
-+static const struct nla_policy netdev_page_pool_stats_get_dump_nl_policy[NETDEV_A_PAGE_POOL_STATS_INFO + 1] = {
- 	[NETDEV_A_PAGE_POOL_STATS_INFO] = NLA_POLICY_NESTED(netdev_page_pool_info_nl_policy),
- };
- #endif /* CONFIG_PAGE_POOL_STATS */
-@@ -138,28 +152,32 @@ static const struct genl_split_ops netdev_nl_ops[] = {
- 	{
- 		.cmd		= NETDEV_CMD_PAGE_POOL_GET,
- 		.doit		= netdev_nl_page_pool_get_doit,
--		.policy		= netdev_page_pool_get_nl_policy,
-+		.policy		= netdev_page_pool_get_do_nl_policy,
- 		.maxattr	= NETDEV_A_PAGE_POOL_ID,
- 		.flags		= GENL_CMD_CAP_DO,
- 	},
- 	{
--		.cmd	= NETDEV_CMD_PAGE_POOL_GET,
--		.dumpit	= netdev_nl_page_pool_get_dumpit,
--		.flags	= GENL_CMD_CAP_DUMP,
-+		.cmd		= NETDEV_CMD_PAGE_POOL_GET,
-+		.dumpit		= netdev_nl_page_pool_get_dumpit,
-+		.policy		= netdev_page_pool_get_dump_nl_policy,
-+		.maxattr	= NETDEV_A_PAGE_POOL_IFINDEX,
-+		.flags		= GENL_CMD_CAP_DUMP,
- 	},
- #endif /* CONFIG_PAGE_POOL */
- #ifdef CONFIG_PAGE_POOL_STATS
- 	{
- 		.cmd		= NETDEV_CMD_PAGE_POOL_STATS_GET,
- 		.doit		= netdev_nl_page_pool_stats_get_doit,
--		.policy		= netdev_page_pool_stats_get_nl_policy,
-+		.policy		= netdev_page_pool_stats_get_do_nl_policy,
- 		.maxattr	= NETDEV_A_PAGE_POOL_STATS_INFO,
- 		.flags		= GENL_CMD_CAP_DO,
- 	},
- 	{
--		.cmd	= NETDEV_CMD_PAGE_POOL_STATS_GET,
--		.dumpit	= netdev_nl_page_pool_stats_get_dumpit,
--		.flags	= GENL_CMD_CAP_DUMP,
-+		.cmd		= NETDEV_CMD_PAGE_POOL_STATS_GET,
-+		.dumpit		= netdev_nl_page_pool_stats_get_dumpit,
-+		.policy		= netdev_page_pool_stats_get_dump_nl_policy,
-+		.maxattr	= NETDEV_A_PAGE_POOL_STATS_INFO,
-+		.flags		= GENL_CMD_CAP_DUMP,
- 	},
- #endif /* CONFIG_PAGE_POOL_STATS */
- 	{
-diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
-index ee5060d8eec0..01509d1b3cba 100644
---- a/net/core/page_pool_user.c
-+++ b/net/core/page_pool_user.c
-@@ -79,7 +79,7 @@ struct page_pool_dump_cb {
+ def empty_check(nf) -> None:
+@@ -255,6 +255,117 @@ from lib.py import NetdevFamily, NetdevSimDev, NlError, ip
+         nsim.dfs_write("pp_hold", "y")
  
- static int
- netdev_nl_page_pool_get_dump(struct sk_buff *skb, struct netlink_callback *cb,
--			     pp_nl_fill_cb fill)
-+			     pp_nl_fill_cb fill, struct nlattr *ifindex_attr)
- {
- 	struct page_pool_dump_cb *state = (void *)cb->ctx;
- 	const struct genl_info *info = genl_info_dump(cb);
-@@ -88,9 +88,17 @@ netdev_nl_page_pool_get_dump(struct sk_buff *skb, struct netlink_callback *cb,
- 	struct page_pool *pool;
- 	int err = 0;
  
-+	if (ifindex_attr)
-+		state->ifindex = nla_get_u32(ifindex_attr);
++def page_pool_dump_ifindex(nf) -> None:
++    """Test page pool dump filtering by ifindex."""
++    nsimdev1 = NetdevSimDev(queue_count=3)
++    rm_nsim1 = defer(nsimdev1.remove)
++    nsimdev2 = NetdevSimDev(queue_count=5)
++    defer(nsimdev2.remove)
 +
- 	rtnl_lock();
- 	mutex_lock(&page_pools_lock);
- 	for_each_netdev_dump(net, netdev, state->ifindex) {
-+		/* Either the provided ifindex doesn't exist or done dumping */
-+		if (ifindex_attr &&
-+		    netdev->ifindex != nla_get_u32(ifindex_attr))
-+			break;
++    nsim1 = nsimdev1.nsims[0]
++    nsim2 = nsimdev2.nsims[0]
 +
- 		hlist_for_each_entry(pool, &netdev->page_pools, user.list) {
- 			if (state->pp_id && state->pp_id < pool->user.id)
- 				continue;
-@@ -206,10 +214,40 @@ int netdev_nl_page_pool_stats_get_doit(struct sk_buff *skb,
- 	return netdev_nl_page_pool_get_do(info, id, page_pool_nl_stats_fill);
- }
++    ip(f"link set dev {nsim1.ifname} up")
++    ip(f"link set dev {nsim2.ifname} up")
++
++    # Unfiltered dump should have pools from both devices
++    all_pp = nf.page_pool_get({}, dump=True)
++    pp1_all = [pp for pp in all_pp
++               if pp.get("ifindex") == nsim1.ifindex]
++    pp2_all = [pp for pp in all_pp
++               if pp.get("ifindex") == nsim2.ifindex]
++    ksft_ge(len(pp1_all), 1)
++    ksft_ge(len(pp2_all), 1)
++
++    # Filtered dump should only return pools for that device
++    pp1_flt = nf.page_pool_get({'ifindex': nsim1.ifindex}, dump=True)
++    ksft_eq(pp1_flt, pp1_all)
++
++    pp2_flt = nf.page_pool_get({'ifindex': nsim2.ifindex}, dump=True)
++    ksft_eq(pp2_flt, pp2_all)
++
++    # Non-existent ifindex should return empty dump
++    pp_none = nf.page_pool_get({'ifindex': 12345678}, dump=True)
++    ksft_eq(len(pp_none), 0)
++
++    # Device down - no pools for that ifindex
++    ip(f"link set dev {nsim1.ifname} down")
++    pp1_down = nf.page_pool_get({'ifindex': nsim1.ifindex}, dump=True)
++    ksft_eq(len(pp1_down), 0)
++
++    # Remove device, dump by its old ifindex should return empty
++    old_ifindex = nsim1.ifindex
++    rm_nsim1.exec()
++    pp1_gone = nf.page_pool_get({'ifindex': old_ifindex}, dump=True)
++    ksft_eq(len(pp1_gone), 0)
++
++
++def page_pool_ifindex_leak_check(nf) -> None:
++    """Test that zombie page pools don't show up under the original ifindex."""
++    nsimdev = NetdevSimDev()
++    rm_nsim = defer(nsimdev.remove)
++    nsim = nsimdev.nsims[0]
++
++    ip(f"link set dev {nsim.ifname} up")
++    nsim.dfs_write("pp_hold", "y")
++
++    pp_up = nf.page_pool_get({'ifindex': nsim.ifindex}, dump=True)
++    ksft_ge(len(pp_up), 1)
++
++    # Remove device with leaked page - pool becomes zombie (orphaned to lo)
++    old_ifindex = nsim.ifindex
++    rm_nsim.exec()
++
++    # Zombie pool should NOT appear under the original device
++    pp_down = nf.page_pool_get({'ifindex': old_ifindex}, dump=True)
++    ksft_eq(len(pp_down), 0)
++
++    # But it should appear in an unfiltered dump (under loopback)
++    pp_all = nf.page_pool_get({}, dump=True)
++    orphans = [pp for pp in pp_all
++               if "detach-time" in pp and "ifindex" not in pp]
++    ksft_ge(len(orphans), 1)
++
++
++def page_pool_stats_ifindex_check(nf) -> None:
++    """Test page pool stats dump filtering by ifindex."""
++    nsimdev1 = NetdevSimDev(queue_count=3)
++    defer(nsimdev1.remove)
++    nsimdev2 = NetdevSimDev(queue_count=5)
++    defer(nsimdev2.remove)
++
++    nsim1 = nsimdev1.nsims[0]
++    nsim2 = nsimdev2.nsims[0]
++
++    ip(f"link set dev {nsim1.ifname} up")
++    ip(f"link set dev {nsim2.ifname} up")
++
++    # Unfiltered stats dump
++    all_stats = nf.page_pool_stats_get({}, dump=True)
++    s1_all = [s for s in all_stats
++              if s.get("info", {}).get("ifindex") == nsim1.ifindex]
++    s2_all = [s for s in all_stats
++              if s.get("info", {}).get("ifindex") == nsim2.ifindex]
++    ksft_ge(len(s1_all), 1)
++    ksft_ge(len(s2_all), 1)
++
++    # Filtered stats dump
++    s1_flt = nf.page_pool_stats_get({'info': {'ifindex': nsim1.ifindex}},
++                                    dump=True)
++    ksft_eq(s1_flt, s1_all)
++
++    # Non-existent ifindex should return empty
++    s_none = nf.page_pool_stats_get({'info': {'ifindex': 12345678}}, dump=True)
++    ksft_eq(len(s_none), 0)
++
++    # info.id should be rejected for stats dump
++    with ksft_raises(NlError) as cm:
++        nf.page_pool_stats_get({'info': {'id': s1_all[0]['info']['id']}},
++                               dump=True)
++    ksft_eq(cm.exception.nl_msg.error, -errno.EINVAL)
++    ksft_eq(cm.exception.nl_msg.extack['bad-attr'], '.info.id')
++
++
+ def main() -> None:
+     """ Ksft boiler plate main """
+     nf = NetdevFamily()
+@@ -265,7 +376,11 @@ from lib.py import NetdevFamily, NetdevSimDev, NlError, ip
+               napi_set_threaded,
+               dev_set_threaded,
+               nsim_rxq_reset_down,
+-              page_pool_check],
++              page_pool_check,
++              page_pool_dump_ifindex,
++              page_pool_ifindex_leak_check,
++              page_pool_stats_ifindex_check
++              ],
+              args=(nf, ))
+     ksft_exit()
  
-+static const struct netlink_range_validation page_pool_ifindex_range = {
-+	.min	= 1ULL,
-+	.max	= S32_MAX,
-+};
-+
-+static const struct nla_policy
-+page_pool_stat_info_policy[NETDEV_A_PAGE_POOL_IFINDEX + 1] = {
-+	[NETDEV_A_PAGE_POOL_IFINDEX] =
-+		NLA_POLICY_FULL_RANGE(NLA_U32, &page_pool_ifindex_range),
-+};
-+
- int netdev_nl_page_pool_stats_get_dumpit(struct sk_buff *skb,
- 					 struct netlink_callback *cb)
- {
--	return netdev_nl_page_pool_get_dump(skb, cb, page_pool_nl_stats_fill);
-+	struct nlattr *tb[ARRAY_SIZE(page_pool_stat_info_policy)];
-+	const struct genl_info *info = genl_info_dump(cb);
-+	struct nlattr *ifindex_attr = NULL;
-+
-+	if (info->attrs[NETDEV_A_PAGE_POOL_STATS_INFO]) {
-+		struct nlattr *nest;
-+		int err;
-+
-+		nest = info->attrs[NETDEV_A_PAGE_POOL_STATS_INFO];
-+		err = nla_parse_nested(tb, ARRAY_SIZE(tb) - 1, nest,
-+				       page_pool_stat_info_policy,
-+				       info->extack);
-+		if (err)
-+			return err;
-+
-+		ifindex_attr = tb[NETDEV_A_PAGE_POOL_IFINDEX];
-+	}
-+
-+	return netdev_nl_page_pool_get_dump(skb, cb, page_pool_nl_stats_fill,
-+					    ifindex_attr);
- }
- 
- static int
-@@ -305,7 +343,10 @@ int netdev_nl_page_pool_get_doit(struct sk_buff *skb, struct genl_info *info)
- int netdev_nl_page_pool_get_dumpit(struct sk_buff *skb,
- 				   struct netlink_callback *cb)
- {
--	return netdev_nl_page_pool_get_dump(skb, cb, page_pool_nl_fill);
-+	const struct genl_info *info = genl_info_dump(cb);
-+
-+	return netdev_nl_page_pool_get_dump(skb, cb, page_pool_nl_fill,
-+					    info->attrs[NETDEV_A_PAGE_POOL_IFINDEX]);
- }
- 
- int page_pool_list(struct page_pool *pool)
-diff --git a/tools/net/ynl/ynltool/page-pool.c b/tools/net/ynl/ynltool/page-pool.c
-index 4b24492abab7..9487eda6b3aa 100644
---- a/tools/net/ynl/ynltool/page-pool.c
-+++ b/tools/net/ynl/ynltool/page-pool.c
-@@ -327,7 +327,9 @@ static void aggregate_device_stats(struct pp_stats_array *a,
- 
- static int do_stats(int argc, char **argv)
- {
-+	struct netdev_page_pool_stats_get_req_dump pp_stat_req = {};
- 	struct netdev_page_pool_stats_get_list *pp_stats;
-+	struct netdev_page_pool_get_req_dump pp_req = {};
- 	struct netdev_page_pool_get_list *pools;
- 	enum {
- 		GROUP_BY_DEVICE,
-@@ -374,14 +376,14 @@ static int do_stats(int argc, char **argv)
- 		return -1;
- 	}
- 
--	pools = netdev_page_pool_get_dump(ys);
-+	pools = netdev_page_pool_get_dump(ys, &pp_req);
- 	if (!pools) {
- 		p_err("failed to get page pools: %s", ys->err.msg);
- 		ret = -1;
- 		goto exit_close;
- 	}
- 
--	pp_stats = netdev_page_pool_stats_get_dump(ys);
-+	pp_stats = netdev_page_pool_stats_get_dump(ys, &pp_stat_req);
- 	if (!pp_stats) {
- 		p_err("failed to get page pool stats: %s", ys->err.msg);
- 		ret = -1;
 -- 
 2.54.0
 
