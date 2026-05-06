@@ -1,166 +1,192 @@
-Return-Path: <netdev+bounces-284913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284914-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0IfuNqxc+2nbaAMAu9opvQ
-	(envelope-from <netdev+bounces-284913-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:22:20 +0200
+	id IBObDrBc+2mUaAMAu9opvQ
+	(envelope-from <netdev+bounces-284914-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:22:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8A094DD19F
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:22:20 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB5A34DD1A6
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 17:22:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3E9083001302
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 15:22:17 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1B19B30041CC
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 15:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B204B44CF59;
-	Wed,  6 May 2026 15:22:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A1C48166E;
+	Wed,  6 May 2026 15:22:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="au/g5mo3";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="RMpeRqDx"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b="q1H8/0zx"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E94303EE1F4
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 15:22:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9523E48C404
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 15:22:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778080934; cv=none; b=gR+i08OfNEeRWTW7fHkjWSSbkDZSEmYOqSfakoUbFOiwwlNc6pnNqfF4/yCR3DC3Bfpm6Bte2VGKDLXdfoxv38A2/OpObK8KfjYtZzn8rVDmsNlwQ53bvquJeMwkCHztEef4BCNyidJBm3TJIxi8a41DC1BDS4SfQvC9e6D5XNg=
+	t=1778080936; cv=none; b=iIZvAtVNoDXSAoYb6oCfv+91e85jCJuDyKmIMtfMqgTm+WdcluILWtgu6Yzq7zn5HdTgJMRhlcPL+vHVuo/0p6u/12EJjTadVn2gscbIUIpNc/uybPRHOwEFm/KGvy3QkcCCsZXTCKZ28tqJropAB7vbGmPanMnNga+zw+padUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778080934; c=relaxed/simple;
-	bh=GU+rpeFvu/c+ECLaLtY3bH6GaOKIvSDEkZsrPMB5ACQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kNjsva3obqqUKzYFEu2MA1jJvupBUpbKgFxZgaLXupokIrFfZdKJOy1G1QI56eiNbiYCoupfzrp1dyrRxhyx58eJ58CYx/0SPFMiX2q5Pdz5fCU0IKLbV2DgmyJyejKF40djehzoKauxuVK+ByhqULuvbg0O2VT5jaGHOssXebk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=au/g5mo3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=RMpeRqDx; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778080927;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4lOFmECujKVw6rBnTfWmHI4ViWK6rRKv7cPq5umz4ds=;
-	b=au/g5mo3wwUH5JtNwtC6kqWLpNlEzZ7IP+HpbJ5WZyck36AyC/4Vbn5otneUdRhZ8CXLlK
-	HpnRGFEE6JYhrszD0BNMR2KaatQ/3gTQiZBLYMboWN8+Qy6h6sV+zUQ+jD7jFvWkNu/O6S
-	F5mAvJBBPVs7+TpogNvyzhuOBYm5vjU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-99-5J8OdfCSNWiD3Ye5wp9UFw-1; Wed, 06 May 2026 11:22:05 -0400
-X-MC-Unique: 5J8OdfCSNWiD3Ye5wp9UFw-1
-X-Mimecast-MFC-AGG-ID: 5J8OdfCSNWiD3Ye5wp9UFw_1778080924
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-43d7730e9e3so4127230f8f.2
-        for <netdev@vger.kernel.org>; Wed, 06 May 2026 08:22:05 -0700 (PDT)
+	s=arc-20240116; t=1778080936; c=relaxed/simple;
+	bh=PZt87gsUS+Wgo4zfaqwWXZGdWegl3vlb2EK9YGH238M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lnxQhugULHrrB1PrQoyrFVaDNw4S4OEGNnLN67JNUvuwp+8ZT9fljkTk/8S7Jc0ENDWy0EFsn0H5EL4rIqY0s2Z4dCv5d4vatOGAbxOdfzgTKjNZIdwN0jEseV7nHk3hVLFe+PtZcL78BU1oF26lMPeB/11ErJQbwSkQtcfjRm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=q1H8/0zx; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-488a8ca4aadso69525355e9.3
+        for <netdev@vger.kernel.org>; Wed, 06 May 2026 08:22:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1778080924; x=1778685724; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4lOFmECujKVw6rBnTfWmHI4ViWK6rRKv7cPq5umz4ds=;
-        b=RMpeRqDx0Xyi0yMSuDMb74nxP20oXt5s7Il9R9RJ401qSOz11FkQz3HwsywimuMjCc
-         IaGxpyUItI7pcHXEJkF6sFHiD+Jl5bsq/WNgJ4VqPj9QNAMSaEYKJDanSGyHc7s78lAe
-         Z9iuO4szijc7nf7AKzuds7QJ+iNr3vipUR1qc3LAkcB5rNFPK0fcm2Xyl6qQIuxQKelf
-         oIMr24vVJzkcLf92uU8dq6yTUWuzzmFFEhKxsb0EKc3bKb31VlHom+4IVwcF2++5qQim
-         otyssSgKXl7dQRPb56d9dhZI4HMjTONVAo0pSmkYdjU5JbR84s8o8w6ulgk7OP15ikJl
-         Q6BQ==
+        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1778080927; x=1778685727; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=f2otLqzL5UIwKJGEw7GU0/viRo2RnqRLXcAGMdCXHaA=;
+        b=q1H8/0zxTASA4aBVYQKqHcEePfrxTpKDgm7SM4meO4nF/VtG5mRlWWg769m8cnyJpd
+         UKNz0ti95hz5Bp8K+souRyejdRtmHNS5v/W9vE8bUi32krABp1iE1H7lxsuJxUzsBerh
+         oiYYHm2yR0nkl5on7Xm/zqLTaXq/J7M0OsyhmbiAMU6UAK/4nKNXeKzltC/Gcb3rVCcJ
+         ixD3vYj1DoWgY1/D+fL+q2jPvmAKkFI5J0lxZVxspIWkF2hn2cjNinY4QtKlPcW1SfZ9
+         OqzVonpDqa323pF2Cvjpc0hKhy+Q3syiuJD7ZRIqc9mudLk7m7eyDQ8nAyW2eF1t4/pu
+         zm3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778080924; x=1778685724;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4lOFmECujKVw6rBnTfWmHI4ViWK6rRKv7cPq5umz4ds=;
-        b=mVkJfkctZQ83gWC2ywlTJLpjMUgtqKFOV+SiNuUuWRxJQSZIa6fQcRwoWDEEf9/8Nl
-         Jq877f76Tfitb4VZAzi2W/CRb2VvzuuRd28q9CCP4jtlY6bGjLFIMXUPjGfWjZm2iNv+
-         QW4VOIyctVKGcjurZQ64h/qAKSKlIvK1nntkDsPv95ToCCI12zdqvP3TeYUUfF+fFJZX
-         swt+mkW77pOiVnbVv7RL1H1N5RvxeSi9Jb31H+uxHrgkB0G4hsG4feQmRwbxhcuWdBYp
-         mR996vU8k1qYA8ic5jNA/TzlPqrwb1Fr2bA5qVAbXJwgzvHWrMhFCjekqIKwcLtSz+Ka
-         ryRg==
-X-Gm-Message-State: AOJu0Yz1n0VnW/Osx1e+Rs6eJzwSB+ne7XbrYQA/JZzA4dpxfRqSJXv9
-	jb3gxTUpr8DwTvJ95+Yv5SIAzGYbqSIHPJDP21+oY9gfNNPQ3TMzXRHpvsTRgV8SJUtj9Jk24SD
-	q8/0B3OxhQcxq39+t9SiL6L3B8oRibJUGR8/dv78jiUwLieZPJQ0shZx1Vg==
-X-Gm-Gg: AeBDietL6zfuiKMFa+zibSL7yKKrQyQLS38i8KYedRaR+ojAd6sJHP7/uPn53Z9qDO/
-	l4dGrUaXtjymr6rqoTchvczomenvEwwpuMF5ORME4CKbeLggrQN6Z2JpRyCVAMQV9r4dU5ObWMp
-	KyybAvzgiMwjaxkBh8PlA4gJrJC40uO3iONvkTSvRbMSvRCIlVJhyI5GdH8x+4Df5DprKIguarW
-	4ScjvqfR5NN7M6X7FXl+ETlFT6EChgYzEHuvkA0ndzURuuXwdeI6QXZEJMSZn9tjLs0gA35NoQl
-	E4JB+pD2UJZVxm7sbO4aCljs3ag2Uac4QzqEDXoLDyqmyXkZQ17REPDkCJKZkGdVOkcv0uSraas
-	VYNzaBXRaAjoI0aiE5mY0OqUEwe0ELJ+RysSRShKMJntxIlfrrjMBbUjFk/7r77b3G6c=
-X-Received: by 2002:a05:6000:4010:b0:441:1fa5:457c with SMTP id ffacd0b85a97d-4515a6c2a13mr6722866f8f.5.1778080924406;
-        Wed, 06 May 2026 08:22:04 -0700 (PDT)
-X-Received: by 2002:a05:6000:4010:b0:441:1fa5:457c with SMTP id ffacd0b85a97d-4515a6c2a13mr6722802f8f.5.1778080923927;
-        Wed, 06 May 2026 08:22:03 -0700 (PDT)
-Received: from [192.168.88.32] ([150.228.25.151])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4504f4857ffsm12837888f8f.0.2026.05.06.08.22.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 May 2026 08:22:03 -0700 (PDT)
-Message-ID: <59b26f1e-efd5-488e-8738-15e96b9c79e4@redhat.com>
-Date: Wed, 6 May 2026 17:22:01 +0200
+        d=1e100.net; s=20251104; t=1778080927; x=1778685727;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f2otLqzL5UIwKJGEw7GU0/viRo2RnqRLXcAGMdCXHaA=;
+        b=nCvA2OGodQHMZszfw3DNUS2JbEwR03y58NZZmic/Nx66NZUjbRa7fUPlrygbywQH//
+         dYWGQ+KIAqIL3X/gTXrLM0EgR/0DDTFW7AiKFfe3M56BeAznAe+YI4IJzwdcax+jtRx9
+         +AckPdW93gyEU2ZfW5JKTFA6Es6jPIalvFI+1y1eKy0JJkNVC3dQxudGQ2vHGSoDTs8p
+         hurSC3P6QaWW+iRPUOy4zM6kmst+mFC9l4PUKEPI5txzPDMZw/vA5wSS6wJNLmoyNX0A
+         w9LUxO5tYdWRDaUZqamPFvXMi3raoyAJaUPuWXkssbWjhG5i5qZq/vl1wD4golyLS+0Z
+         9DJg==
+X-Forwarded-Encrypted: i=1; AFNElJ9KceSyLyEPG51BaIbS/iTnhdBPo8SL8LB+Xn9UdOZrExm3Nc3AwDUVzkz8RD/aymjEgB2yILk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhCDIx/SzAiO1n3xwQ1l2QuDDDwbUUoTEXvZLdewvwOzrw/4mp
+	gq7CIoImrcC+9nIh0yx3WbE6Twb0GB/GwvMJ7ZSPXCTkPfcPe/Ux/RTtjPYcRAldNp9eyvvyDPP
+	Ngnu3iHQ=
+X-Gm-Gg: AeBDietLWwv8nsJsouM1HI0y8gAD6p5fasL9jwQWtDybdczQCUy4unfRcGcjrcGaUff
+	hAg0A9jzJMnEd1b1rYbBLYVm0pwnRxROJI+iXybeW6mUsVYjQfIQIfhOs47E3auj+HGy1sk3uZV
+	ZmBMJukhERLkTzHh7PcHjt/D1jHcpD5xUhhSMoMZ2I5w1ylx06zfP9UynoBuPpNgrkeS8q/gIbH
+	6lzCh0BSDiO/IfhZj3RfRo2Mbchc+QCQeuhZEGZyc/ViCOKxuUznF45r+Y3FngaGxRGOQwAiqpw
+	WMGTUrdjFUho3DkC5I0DTnDA+7MboDGzE3pj+K05ghSDGxYvcVQHNFzVre/qFlp4kg+t1Q0K4Ov
+	rRKgimg2a7CcaCJFVqsqtleBhp1tO8nRruZSJs/FOxrcZM+QzDXu2hLBNouonW0mbpYni3bAkV/
+	a2iHuR26x02/asNWFWt7e07pxyvkv9bGWxAg7FI5ouBVemMAaJuK6jbw==
+X-Received: by 2002:a05:600c:a111:b0:489:19e9:b139 with SMTP id 5b1f17b1804b1-48e51e0bb78mr54150665e9.1.1778080927453;
+        Wed, 06 May 2026 08:22:07 -0700 (PDT)
+Received: from FV6GYCPJ69 ([2001:1ae9:6084:ab00:8c0b:afdd:3d9d:e976])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4504f4857ffsm12838076f8f.0.2026.05.06.08.22.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 May 2026 08:22:06 -0700 (PDT)
+Date: Wed, 6 May 2026 17:22:03 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Mark Bloch <mbloch@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Simon Horman <horms@kernel.org>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	Tariq Toukan <tariqt@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	"Borislav Petkov (AMD)" <bp@alien8.de>, Randy Dunlap <rdunlap@infradead.org>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Christian Brauner <brauner@kernel.org>, 
+	Petr Mladek <pmladek@suse.com>, "Peter Zijlstra (Intel)" <peterz@infradead.org>, 
+	Thomas Gleixner <tglx@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
+	Dapeng Mi <dapeng1.mi@linux.intel.com>, Kees Cook <kees@kernel.org>, Marco Elver <elver@google.com>, 
+	Eric Biggers <ebiggers@kernel.org>, Li RongQing <lirongqing@baidu.com>, 
+	"Paul E. McKenney" <paulmck@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [RFC net-next 0/4] devlink: Add boot-time defaults
+Message-ID: <aftaW-irGmkfA7FS@FV6GYCPJ69>
+References: <20260506123739.1959770-1-mbloch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 04/12] net: shaper: try to avoid violating RCU
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
- horms@kernel.org, shuah@kernel.org, linux-kselftest@vger.kernel.org
-References: <20260506000628.1501691-1-kuba@kernel.org>
- <20260506000628.1501691-5-kuba@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260506000628.1501691-5-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: C8A094DD19F
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260506123739.1959770-1-mbloch@nvidia.com>
+X-Rspamd-Queue-Id: AB5A34DD1A6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284913-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-284914-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[resnulli.us];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[31];
+	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 
-On 5/6/26 2:06 AM, Jakub Kicinski wrote:
-> net_shaper_commit() overrides nodes which may be concurrently read
-> under RCU. This is not a huge deal since the entries only contain
-> config, worst case user will see inconsistent config params. But
-> we should try to avoid this obvious RCU violation. Try to allocate
-> a new node. Since commit() can't fail fall back to overriding.
-> 
-> Full fix is probably not worth the complexity, struct net_shaper
-> is around 80B, and the allocation is with GFP_KERNEL.
+Wed, May 06, 2026 at 02:37:35PM +0200, mbloch@nvidia.com wrote:
+>This series adds a devlink= kernel command line parameter for applying
+>selected devlink settings during device initialization.
+>
+>Following a discussion with Jakub[1], I am sending this RFC to get the
+>conversation moving. I started from Jakub's example/request and extended
+>it to cover requirements from production systems and configurations that
+>customers use.
+>
+>One important caveat is that the parsing logic in this RFC was written
+>with AI assistance. I am also not sure whether the resulting syntax and
+>parser are too complex for a kernel command line interface. This is part
+>of why I am sending it as an RFC: to understand what direction and level
+>of complexity would be acceptable to people.
+>
+>The implementation is intended to support the following properties:
+>
+>- A system may have multiple devlink devices that usually need the same
+>  configuration. For a configuration such as eswitch mode switchdev, a
+>  user should be able to specify multiple devices to which that
+>  configuration applies.
+>
+>- There may be ordering dependencies between options. For example, in
+>  mlx5, flow_steering_mode should be set before moving to switchdev.
+>  With this in mind, defaults are applied per device in the left-to-right
+>  order in which they appear on the command line.
+>
+>The intent is to let deployments set devlink defaults before normal
+>userspace orchestration runs, while still using devlink concepts and
 
-I'm not sure if even this variant is worthy?!? The scheduler tree dump
-could be still inconsistent, as the dump is not atomic. IMHO e.g.
-inconsistent weights in the same WRR group would be as bad as
-inconsistent values inside the single shaper.
+"defaults before normal userspace orchestrarion". I read it as config
+before config, which eventually could be skipped.
 
-/P
 
+>driver callbacks rather than adding driver-specific module parameters.
+>A default is scoped to one or more devlink handles, for example:
+>
+>  devlink=[pci/0000:08:00.0]:esw:mode:switchdev
+>  devlink=[pci/0000:08:00.0]:param:flow_steering_mode:smfs
+>  devlink=[pci/0000:08:00.0,pci/0000:08:00.1]:param:flow_steering_mode:hmfs,[pci/0000:08:00.0,pci/0000:08:00.1]:esw:mode:switchdev
+
+I don't like this. What you do, you are basically introducing user
+configuration tool on kernel cmdline.
+
+The same you would achieve with a proper userspace tool/daemon.
+I did try to come up with it and push it here:
+https://github.com/systemd/systemd/pull/37393
+That didn't get merged for unknown reason, but the idea is sound. You
+provide configuration files for devlink object and systemd-devlinkd
+will apply when they appear. Wouldn't this help your case?
+
+[..]
 
