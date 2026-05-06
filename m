@@ -1,73 +1,96 @@
-Return-Path: <netdev+bounces-284818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284819-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ELcQIw44+2nUXwMAu9opvQ
-	(envelope-from <netdev+bounces-284818-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:46:06 +0200
+	id sK5tKVk4+2nUXwMAu9opvQ
+	(envelope-from <netdev+bounces-284819-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:47:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16F8E4DA708
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:46:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A6C14DA760
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:47:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B229C3083691
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 12:40:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 13BF23041875
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 12:43:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F96244105E;
-	Wed,  6 May 2026 12:40:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD6BE44D033;
+	Wed,  6 May 2026 12:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VuQpGZ29"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pzuRiT4O"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2F230C62D
-	for <netdev@vger.kernel.org>; Wed,  6 May 2026 12:40:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18A744CF5F
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 12:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778071236; cv=none; b=VCN6ucO6/92sBnIEjHVK7Xl3p6KEtV5aWYfsY4e8UyPBUVTAiWBiiMUfOHEx5crRnY+IjX8Uz8YkhWQsF607gISmF87LGrD8Amm7/FHC27JmSyCKx7GhbQivnJDQIZ1wxyK5FQYDomEbRyvbM0feRYZ1fK4BFRCI0Mt0Klog1ww=
+	t=1778071419; cv=none; b=WnkTPyfJUXZFOsg1NI77+CEQAHOk19GN83ZglUMjwSPNZPcuolO8SOlquWRxsrfRUFYQvnrjAsQ+u9nRmBJZfXdZWmi1kCWNPVb4Kji67D1U2ML30TTKKOolC/kYZs2Bnpm7HwW2kL3VV3ImdcBjcHg3BvZj8KBQi5ewj1DWtcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778071236; c=relaxed/simple;
-	bh=HPJqgvmSRfiKw78LZ5qA65mNKPFtkuVJT9wIyurZU5w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hu+NWWoqg9tXfgb01mqjSRrmcRA8pTPmxaVIustygNs4bdcyH9eYZusvz3Kh38N9HP68gopgwMVgJlcn4RBJU9rBZkVfx9hl66gZXai+r0+ySfnapc+NNs5Zj9xfqi2jlzmPoVQLh2MCfc6UGFupveIeiOF6TbjFt3GgBUhmnzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VuQpGZ29; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0050EC2BCC4;
-	Wed,  6 May 2026 12:40:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778071236;
-	bh=HPJqgvmSRfiKw78LZ5qA65mNKPFtkuVJT9wIyurZU5w=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VuQpGZ29fQWmFDVFMgiCaABL86t7aTqBqCCXFaMk+SdkvuAEXkMUXBOhGGCYbhU1+
-	 ok1/bu8AiUY05XqjEpJ1DaSzgqHCl3LLZ+QFVa6gHDDJEU/X2Y0dP9Hb/lIE1XPfhs
-	 G0Smo7U3ED2Y3smvGNtTlbApLCtppX2XrpFdMuRzaGjSFL+YdKcVYl0Db5nKYQ6XL7
-	 PY0oeEX9Qk3jKb61Rbth1CUyDx8pX5T9GKslFK1QR20OFvvIs5w92WXYX4QgdbatOw
-	 nf99+8/tCVxVzVvKbuGYn2zoX2JZH9Ha4NdcRQLOvX0UcnyZvafXvO7chGVoGkxPEk
-	 85ANHeZ0EnS2g==
-From: Simon Horman <horms@kernel.org>
-To: n05ec@lzu.edu.cn
-Cc: 'Simon Horman' <horms@kernel.org>,
-	b.a.t.m.a.n@lists.open-mesh.org,
+	s=arc-20240116; t=1778071419; c=relaxed/simple;
+	bh=mGOYEqfn586cSv4mV7+ZkGjx2bX/Zy9gk3rZ2ZmOLzY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c598FWZCSAwLUiMwhH28bA/6JzRQdqi3xhMnxHW4tf0xA0F90a00Usl/kh/BOi0E/z3y3hwHCZu/jKV/xajI0QSojWwxPlB5aoVTLXZJxp2DEEw3ie4LklsmeoWPWEspkhian8P7yN5LGHETGe37XHqxLigiPhhTINpY+Gpd0P4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pzuRiT4O; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2ba0714574fso19734545ad.2
+        for <netdev@vger.kernel.org>; Wed, 06 May 2026 05:43:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778071418; x=1778676218; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XjgFoHcWtK3L/DYpi08j6irqA8vaezo7mFY7YSCvdu8=;
+        b=pzuRiT4OWOqH/tHakt9I6dQEE8+DO+ZjYPdO5y5sL/Gd/00CncmnwXFJewKXFQnenR
+         iRicSfEPIvDvkDEVxo7vOh4sYQGi8ml1NRran4ieRhC6cBImG7obK3RIPc0t0kBI7pMu
+         eC/g669SHYoGKMtUmmgVh6y16MEKN/hMAtI0Be44ahheEPo3Xqfr2QRUS86cxHuPKKK8
+         8CRoZmecq3AQb/Km/y5o9unKiOFau+KKnU9oQU+Bo/SvoMJYUnA36xUnicFIzSBHa0EG
+         niBwc+Zx7WA23Fw7Lt7qmjt8X6iKOiJSoAaSVfeF7jkNvmU4BC0ZmU/lkuZMclcXpxM3
+         vFYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778071418; x=1778676218;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XjgFoHcWtK3L/DYpi08j6irqA8vaezo7mFY7YSCvdu8=;
+        b=AVDpzMVL5nBO5O1FSU/dRVvwS/87jZtNEgI141aXVVfCYinlvTkQ7QpSLsLsWHP69+
+         sWg662LAoGxpd3F5sm6wVNURRFte/iHNp8b2w9l/wkvwGwVtLiNDaQM3kIUW/ScpgB6n
+         loPbNLrhHT6YeSbkOmDSK2nriJ+ZzVO8LKKwdW5iF24EftRosnykwBDJOeNaOfGoNEgk
+         fxT8KtoFGJOSeDaGZ+qxoT3puU2BBVTfvuePIBDcsc3TBvnkGOJFI1i5+b1ooSJ0QOp0
+         XTtc8NzAm8LqcsFdXFYRF9kVnc9T8sszT99TLk2ErJfQKkULUbpfeA4kF1nb6D9YT7/G
+         7w1w==
+X-Forwarded-Encrypted: i=1; AFNElJ+pvdoXIdTVZBaV3wtWej7u6r0I2jJZAMeVIz4akr6RGI20yphu5y7HImF1JhVyes0ayTKFr88=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9Euh2bERI6Lab7OU2hOgMLcBFUWdqWjxjrsr0X9zubeU/LzHd
+	zorX/La6yzU5IaLpHttFQAdIRnK3AjbWEYwYLjTCNE6o2jIPwbv6BrU=
+X-Gm-Gg: AeBDiev519BkOkW7vuoQ4AQxmGM4rbWE1r0esTg1WaHyO0DMq2G+4zkc5A2xGbdl2Xa
+	5MnFatHaSBBuQy0zoMH3WgE7aNNB9B7VUHIFqlpRwKt3jPyLmwSgTg+aH715L0JEZbDoSrSGobs
+	8Dbrxhl4m05B7ZYuK8/Vb8FgbS+B3rQRdWup7dRwD1iAtMDzFv249JfeICgDBuC5qanTPMf+q3I
+	61V3YjKZqHENpV4z0UbKEHuR9q7hsvWR8obnE03aKjOyRrxq35G3PYWlmJ0tz5Uvk269oWTh6HX
+	57LzL8iAfPJwwc1evRFPQXceYS8ZI3/Qvst1mXpGTxnYZNlaGvoOYFr1k8eW1NFMZ7JU5j5CGFk
+	oa0dKDq2nwz8vjbxwU7CW/7cSOp+Edwm+mcBPXriYYo7OpOq6bMjIwBfKNaizhME5jF1tRNlq8v
+	ia3o6KcybfPr8yxI1EXXFdwTJeWxlNJeV+FLBVWjieEVN00mAbG/W0HL/t+Hom0pPkxD/JOG9Ys
+	QYd3bUN3Q==
+X-Received: by 2002:a17:903:90e:b0:2b0:b016:773f with SMTP id d9443c01a7336-2ba7908443cmr33626045ad.11.1778071418029;
+        Wed, 06 May 2026 05:43:38 -0700 (PDT)
+Received: from localhost.localdomain ([1.226.165.54])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ba7c9e16f2sm25584615ad.45.2026.05.06.05.43.35
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 06 May 2026 05:43:37 -0700 (PDT)
+From: Myeonghun Pak <mhun512@gmail.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ijae Kim <ae878000@gmail.com>
+Cc: Myeonghun Pak <mhun512@gmail.com>,
 	netdev@vger.kernel.org,
-	marek.lindner@mailbox.org,
-	sw@simonwunderlich.de,
-	antonio@mandelbit.com,
-	sven@narfation.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	yuantan098@gmail.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	bird@lzu.edu.cn,
-	wangjiexun2025@gmail.com
-Subject: Re: [PATCH net 1/1] batman-adv: stop caching unowned originator pointers in BAT IV
-Date: Wed,  6 May 2026 13:39:46 +0100
-Message-ID: <20260506123952.671718-3-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <e12a51ee998808be6381780d6aaf32e093dc7d1e.1777692024.git.wangjiexun2025@gmail.com>
-References: <e12a51ee998808be6381780d6aaf32e093dc7d1e.1777692024.git.wangjiexun2025@gmail.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3] net: lan966x: avoid unregistering netdev on register failure
+Date: Wed,  6 May 2026 21:43:11 +0900
+Message-ID: <20260506124331.31945-1-mhun512@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,172 +98,101 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 16F8E4DA708
+X-Rspamd-Queue-Id: 3A6C14DA760
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,lists.open-mesh.org,vger.kernel.org,mailbox.org,simonwunderlich.de,mandelbit.com,narfation.org,davemloft.net,google.com,redhat.com,gmail.com,lzu.edu.cn];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-284818-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-284819-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[mhun512@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url,linux.dev:url]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-From: 'Simon Horman' <horms@kernel.org>
+lan966x_probe_port() stores the newly allocated net_device in the
+port before calling register_netdev(). If register_netdev() fails,
+the probe error path calls lan966x_cleanup_ports(), which sees
+port->dev and calls unregister_netdev() for a device that was never
+registered.
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+Destroy the phylink instance created for this port and clear port->dev
+before returning the registration error. The common cleanup path now skips
+ports without port->dev before reaching the registered netdev cleanup, so
+it only handles ports that reached the registered-netdev lifetime.
 
-I do have concerns that this review needs to be addressed in
-order for this patch to progress.
+This also avoids treating an uninitialized FDMA netdev and the failed port
+as a NULL == NULL match in the common cleanup path.
 
-OTOH, there is another AI-generated review of this patch available at
-https://sashiko.dev. In that case, I believe the review relates to
-a pre-existing condition, and addressing that (or not) can be treated
-as a follow-up.
-
+Fixes: d28d6d2e37d1 ("net: lan966x: add port module support")
+Co-developed-by: Ijae Kim <ae878000@gmail.com>
+Signed-off-by: Ijae Kim <ae878000@gmail.com>
+Signed-off-by: Myeonghun Pak <mhun512@gmail.com>
 ---
-batman-adv: stop caching unowned originator pointers in BAT IV
+Changes in v3:
+- Make lan966x_cleanup_ports() skip ports without port->dev, so the
+  common cleanup path does not run registered-netdev, XDP, FDMA, or
+  phylink cleanup for a port whose netdev registration failed.
+- Keep the register_netdev() failure path responsible for destroying the
+  newly created phylink and clearing port->dev before returning.
 
-This patch removes the orig_node back-pointer cached inside each BAT IV
-neigh_node and resolves the originator on demand via batadv_orig_hash_find()
-from the stored neighbor address. Tagged Fixes: c6c8fea29769 and
-Cc: stable@kernel.org.
+Changes in v2:
+- Require port->dev to be non-NULL before calling the FDMA netdev cleanup
+  path, avoiding a NULL == NULL match when register_netdev() fails before
+  FDMA NAPI has been initialized.
 
-> diff --git a/net/batman-adv/bat_iv_ogm.c b/net/batman-adv/bat_iv_ogm.c
-> index f28e9cbf8ad5..168b413dd18b 100644
-> --- a/net/batman-adv/bat_iv_ogm.c
-> +++ b/net/batman-adv/bat_iv_ogm.c
+ drivers/net/ethernet/microchip/lan966x/lan966x_main.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-[ ... ]
-
-> @@ -1372,8 +1380,8 @@ batadv_iv_ogm_process_per_outif(const struct sk_buff *skb, int ogm_offset,
->  
->  	router = batadv_orig_router_get(orig_node, if_outgoing);
->  	if (router) {
-> -		router_router = batadv_orig_router_get(router->orig_node,
-> -						       if_outgoing);
-> +		router_router = batadv_orig_to_router(bat_priv, router->addr,
-> +						      if_outgoing);
->  		router_ifinfo = batadv_neigh_ifinfo_get(router, if_outgoing);
->  	}
-
-Is this replacement semantically equivalent to the original call?
-
-The previous code used batadv_orig_router_get() on the cached orig_node to
-fetch router_router. The new code calls batadv_orig_to_router(), which
-internally runs batadv_find_router():
-
-    net/batman-adv/originator.c:batadv_orig_to_router() {
-        orig_node = batadv_orig_hash_find(bat_priv, orig_addr);
-        ...
-        neigh_node = batadv_find_router(bat_priv, orig_node, if_outgoing);
-        ...
-    }
-
-batadv_find_router() has a bonding path that is taken when
-recv_if == BATADV_IF_DEFAULT and bonding is enabled:
-
-    net/batman-adv/routing.c:batadv_find_router() {
-        ...
-        if (!(recv_if == BATADV_IF_DEFAULT &&
-              atomic_read(&bat_priv->bonding)))
-            return router;
-
-        /* bonding: loop through the list of possible routers ... */
-        ...
-        if (next_candidate) {
-            ...
-            batadv_last_bonding_replace(orig_node, next_candidate);
-        } else if (first_candidate) {
-            ...
-            batadv_last_bonding_replace(orig_node, first_candidate);
-        } else {
-            batadv_last_bonding_replace(orig_node, NULL);
-        }
-        ...
-    }
-
-batadv_iv_ogm_process() invokes batadv_iv_ogm_process_per_outif() once with
-BATADV_IF_DEFAULT per received OGM:
-
-    net/batman-adv/bat_iv_ogm.c:batadv_iv_ogm_process() {
-        ...
-        batadv_iv_ogm_process_per_outif(skb, ogm_offset, orig_node,
-                                        if_incoming, BATADV_IF_DEFAULT);
-        ...
-    }
-
-With bonding enabled, does every received OGM now rotate
-orig_node->last_bonding_candidate on the last-hop neighbor's originator via
-batadv_last_bonding_replace(), where previously that state was advanced only
-from forwarding paths?
-
-And can the bonding candidate selection return a different router_router than
-batadv_orig_router_get() would have, which then feeds the subsequent
-loop-avoidance check?
-
-    if (router && router_router &&
-        (batadv_compare_eth(router->addr, prev_sender)) &&
-        !(batadv_compare_eth(ogm_packet->orig, prev_sender)) &&
-        (batadv_compare_eth(router->addr, router_router->addr))) {
-        ...
-        goto out;
-    }
-
-The sister helper added by this same patch, batadv_iv_ogm_neigh_ifinfo_sum(),
-uses batadv_orig_hash_find() followed by batadv_iv_orig_ifinfo_sum() rather
-than batadv_orig_to_router():
-
-> +static u8 batadv_iv_ogm_neigh_ifinfo_sum(struct batadv_priv *bat_priv,
-> +					 const struct batadv_neigh_node *neigh_node)
-> +{
-> +	struct batadv_orig_node *orig_neigh;
-> +	u8 sum;
-> +
-> +	orig_neigh = batadv_orig_hash_find(bat_priv, neigh_node->addr);
-> +	if (!orig_neigh)
-> +		return 0;
-> +
-> +	sum = batadv_iv_orig_ifinfo_sum(orig_neigh, neigh_node->if_incoming);
-> +	batadv_orig_node_put(orig_neigh);
-> +
-> +	return sum;
-> +}
-
-Would a similar pattern work here, something like:
-
-    orig = batadv_orig_hash_find(bat_priv, router->addr);
-    router_router = batadv_orig_router_get(orig, if_outgoing);
-    batadv_orig_node_put(orig);
-
-so that the lookup avoids invoking the bonding candidate machinery from the
-OGM processing path?
-
-The commit message describes only removing an unowned cached originator
-pointer and does not mention a routing or bonding behavior change. Is the
-change in router_router resolution intentional, and if so could the commit
-message call it out?
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+index 47752d3fde..1179a6e127 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+@@ -749,11 +749,10 @@ static void lan966x_cleanup_ports(struct lan966x *lan966x)
+ 
+ 	for (p = 0; p < lan966x->num_phys_ports; p++) {
+ 		port = lan966x->ports[p];
+-		if (!port)
++		if (!port || !port->dev)
+ 			continue;
+ 
+-		if (port->dev)
+-			unregister_netdev(port->dev);
++		unregister_netdev(port->dev);
+ 
+ 		lan966x_xdp_port_deinit(port);
+ 		if (lan966x->fdma && lan966x->fdma_ndev == port->dev)
+@@ -873,6 +872,9 @@ static int lan966x_probe_port(struct lan966x *lan966x, u32 p,
+ 	err = register_netdev(dev);
+ 	if (err) {
+ 		dev_err(lan966x->dev, "register_netdev failed\n");
++		phylink_destroy(phylink);
++		port->phylink = NULL;
++		port->dev = NULL;
+ 		return err;
+ 	}
+ 
 
