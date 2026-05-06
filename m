@@ -1,153 +1,206 @@
-Return-Path: <netdev+bounces-284798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284801-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SKieNHkw+2lxXQMAu9opvQ
-	(envelope-from <netdev+bounces-284798-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:13:45 +0200
+	id qCe1Gxgx+2lxXQMAu9opvQ
+	(envelope-from <netdev+bounces-284801-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:16:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 732C54DA042
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:13:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8BCA4DA0C7
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 14:16:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 02EEE301877A
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 12:13:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8C47F30057A2
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 12:14:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5094F441030;
-	Wed,  6 May 2026 12:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A43A413237;
+	Wed,  6 May 2026 12:14:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YYomtWi+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G6VKFf6T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D163E43E48A;
-	Wed,  6 May 2026 12:13:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 440753368B7;
+	Wed,  6 May 2026 12:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778069604; cv=none; b=s7vuK9eNo5SwvNVxQiYTB5VRTuZ5zrqZ19/J7g2184U0MmHl8bHMRcvwEIuo3agQOhdqyBFrUwf5hI2iisRHpBV6aMyrp4DfONEwpBi/OViogLtXqxyKCGcnV/VtY/U0HVfUNEV9lg0wNUuZAHkWLvWpbjSTXlKNl+uO1bmP3OQ=
+	t=1778069657; cv=none; b=ZjZPILo+4TOQE19nyKu2hWHvIJ6fjiR//1nBSjEGhJbB7u/yUV3KmzDAYxv3i+YoVIC8o/C9qT8SqLHprl5G8+xwaCPJE93kd4FjP39bIZQVtLAcLmFv1EkPIbM1vSlRU+j8t7lZSqCS8dyIuoxkna/q7FhZl6jg+z7lqu0pnII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778069604; c=relaxed/simple;
-	bh=AbgaqMlY8wz59xHBG2bGUq3n4kCOawW5putw5NBuBb0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=vB4P54aLUy2MzG4ogKwEAq6bciZ31xjxf9bIJmwZeyxjiJMXyZtQuRAWrkrCSwrUbp6tVOOSgOtcC8L974B9my0dj1ffOcsSp1zpAN98imvDt2OSBF1CqkwqCTxbhumnUpCnkOXZHDyQF1dKEpHfqTzqx8Upxibfw/Fu7mJnRZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YYomtWi+; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 8A48A1A3541;
-	Wed,  6 May 2026 12:13:21 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 5FD2C6053C;
-	Wed,  6 May 2026 12:13:21 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3AB4B102F24CF;
-	Wed,  6 May 2026 14:13:18 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1778069600; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=BediO3/S4l8G16E9hVv9C+1Tjoz4d/x+7MVR9kWDJF0=;
-	b=YYomtWi+mfVKhj/kqvcvf9ofTPciHa4WBhrKSFyo++2sZ17ZdZC6lwq8nYfkbOqE9tlJRB
-	QLafsoeC45+OXHbcGKv+O3KoZk13a4vGiIOakz3tTP9zWbZkKbP5dtOMh7Ho13t/ayXuIB
-	pwtzTQUrE43fX+DiDYbvrKNc/fbiru8BMYsor5IoVsYtGG0te9tH2PqmH8C7qblsl6v2Rf
-	0QHf3ftmZcYJLk9bVvdE/lFwbS/t+WoPZO8UBmTu8oc6S1GFvfSBPreop9nZJInM/XfP7o
-	pinMhhXBKZStZhyMSDQv/V3wzAdMuFcykOf57u5EB2miZPk9pcm6qsBbrJaD9Q==
-From: Thomas Richard <thomas.richard@bootlin.com>
-Date: Wed, 06 May 2026 14:13:04 +0200
-Subject: [PATCH v2 2/2] ARM: dts: ti: var-som-om44: Add USB Ethernet
- controller node
+	s=arc-20240116; t=1778069657; c=relaxed/simple;
+	bh=tPtGxWRosLrlwCndxfo3VTI0LuICQw7db3oOBpfe1dk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=VQITHS799aQUsOjT6HfbclUAaWH2fVGVm8oQtKiGOLOcNKXuFd68M4s3b5hY83wTABF4FlNi/eYM0wxE28M+VtDdXwr/2nFGT6APmiP/j0kkzSdKNWVFYbDs8SzS7LrSGz+BA4IPGqFtTX7+HozpH8raoqlsXezM9bKwzyPTw+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G6VKFf6T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6BACC2BCB8;
+	Wed,  6 May 2026 12:14:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778069656;
+	bh=tPtGxWRosLrlwCndxfo3VTI0LuICQw7db3oOBpfe1dk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=G6VKFf6TsZGaPvAILfKboCR7usJIF2c9WZ8UoNTsmUQivTbbVnIB0ow/1kjRQYZGT
+	 fyd0sOMRUGG59NWWGrQSUOYDCzAUifuDMLVxIJm4TLKISiSQ33TKR1xuuoet1yVw/M
+	 lXg1VXQdgptj8bIfyAK1Bgc9RLSdVyQcLJX4PTa0DznjF6EwJ/HsLpNDLj1XC11U2M
+	 SkS2NggVq/QlT9HfKhbhOpfnBna1Nxx0YtAsiHq8FYmiVbTdshMO3tS8gnx8qdRmp2
+	 8zE5yP+3S1yXQbsrdBngjLjlnPuqnuFyuWNpCHtuATRsWdHxi8INCzvZRIg9nXRcI2
+	 PEOB7SiC6OERQ==
+From: Simon Horman <horms@kernel.org>
+To: qingfang.deng@linux.dev
+Cc: 'Simon Horman' <horms@kernel.org>,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	willemb@google.com,
+	petrm@nvidia.com,
+	anubhavsinggh@google.com,
+	richardbgobert@gmail.com,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-ppp@vger.kernel.org
+Subject: Re: [PATCH net-next v8 1/2] net: pppoe: implement GRO/GSO support
+Date: Wed,  6 May 2026 13:14:01 +0100
+Message-ID: <20260506121401.651540-1-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260501035102.293031-1-qingfang.deng@linux.dev>
+References: <20260501035102.293031-1-qingfang.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260506-b4-var-som-om44-lan7500-v2-2-b8af59ab877c@bootlin.com>
-References: <20260506-b4-var-som-om44-lan7500-v2-0-b8af59ab877c@bootlin.com>
-In-Reply-To: <20260506-b4-var-som-om44-lan7500-v2-0-b8af59ab877c@bootlin.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Aaro Koskinen <aaro.koskinen@iki.fi>, 
- Andreas Kemnade <andreas@kemnade.info>, Kevin Hilman <khilman@baylibre.com>, 
- Roger Quadros <rogerq@kernel.org>, Tony Lindgren <tony@atomide.com>, 
- Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-omap@vger.kernel.org, Thomas Richard <thomas.richard@bootlin.com>, 
- Nicolai Buchwitz <nb@tipi-net.de>
-X-Mailer: b4 0.14.3
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: 732C54DA042
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: B8BCA4DA0C7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,nvidia.com,gmail.com,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-284801-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[21];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284798-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[thomas.richard@bootlin.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_PROHIBIT(0.00)[0.0.0.1:email,0.0.0.3:email];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.998];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:dkim,bootlin.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tipi-net.de:email]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
 
-Add USB tree description, including the Gigabit Ethernet controller
-(LAN7500). Adding the LAN7500 node will allow the bootloader to patch the
-devicetree and set the MAC address.
+From: 'Simon Horman' <horms@kernel.org>
 
-Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
-Signed-off-by: Thomas Richard <thomas.richard@bootlin.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
 ---
- arch/arm/boot/dts/ti/omap/omap4-var-som-om44.dtsi | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+net: pppoe: implement GRO/GSO support
 
-diff --git a/arch/arm/boot/dts/ti/omap/omap4-var-som-om44.dtsi b/arch/arm/boot/dts/ti/omap/omap4-var-som-om44.dtsi
-index 37d56b3010cf..9e04aa70f982 100644
---- a/arch/arm/boot/dts/ti/omap/omap4-var-som-om44.dtsi
-+++ b/arch/arm/boot/dts/ti/omap/omap4-var-som-om44.dtsi
-@@ -322,4 +322,18 @@ &usbhshost {
- 
- &usbhsehci {
- 	phys = <&hsusb1_phy>;
-+	#address-cells = <1>;
-+	#size-cells = <0>;
-+
-+	usbhub: hub@1 {
-+		compatible = "usb424,2514";
-+		reg = <1>;
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+
-+		ethernet: ethernet@3 {
-+			compatible = "usb424,7500";
-+			reg = <3>;
-+		};
-+	};
- };
+This commit adds GRO and GSO support for PPPoE, which improves rx throughput
+significantly by handling packets where the pppoe header length field matches
+the exact packet length.
 
+> diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
+> index bdd61c504a1c4..363204e0c49a1 100644
+> --- a/drivers/net/ppp/pppoe.c
+> +++ b/drivers/net/ppp/pppoe.c
+[ ... ]
+> @@ -1103,6 +1104,164 @@ static struct pernet_operations pppoe_net_ops = {
+>  	.size = sizeof(struct pppoe_net),
+>  };
+>  
+> +static u16
+> +compare_pppoe_header(const struct pppoe_hdr *phdr,
+> +		     const struct pppoe_hdr *phdr2)
+> +{
+> +	__be16 proto = *(const __be16 *)(phdr + 1);
+
+Because struct pppoe_hdr is packed, the compiler assigns it 1-byte alignment
+semantics, which phdr + 1 inherits.
+
+Does explicitly casting this to __be16 * bypass the compiler's unaligned access
+protections?
+
+If skb->data has an odd alignment from the NIC, this could trigger a fatal
+unaligned memory access exception on strict-alignment architectures. Would it
+be safer to use get_unaligned() here?
+
+> +	__be16 proto2 = *(const __be16 *)(phdr2 + 1);
+> +
+> +	return (__force u16)((phdr->sid ^ phdr2->sid) | (proto ^ proto2));
+> +}
+> +
+> +static __be16 pppoe_hdr_proto(const struct pppoe_hdr *phdr)
+> +{
+> +	__be16 proto = *(const __be16 *)(phdr + 1);
+
+Could this also result in an unaligned access regression for the same reason?
+
+[ ... ]
+> +static struct sk_buff *pppoe_gro_receive(struct list_head *head,
+> +					 struct sk_buff *skb)
+> +{
+[ ... ]
+> +	off_pppoe = skb_gro_offset(skb);
+> +	hlen = off_pppoe + PPPOE_SES_HLEN;
+> +	phdr = skb_gro_header(skb, hlen, off_pppoe);
+> +	if (unlikely(!phdr))
+> +		goto out;
+> +
+> +	/* filter for session packets (type:1, ver:1, code:0) */
+> +	if (*(const __be16 *)phdr != cpu_to_be16(0x1100))
+
+Is it possible this cast could similarly trigger an unaligned access exception
+if the header offset is oddly aligned?
+
+[ ... ]
+> +static struct sk_buff *pppoe_gso_segment(struct sk_buff *skb,
+> +					 netdev_features_t features)
+> +{
+[ ... ]
+> +	segs = ptype->callbacks.gso_segment(skb, features);
+> +	if (IS_ERR_OR_NULL(segs)) {
+> +		skb_gso_error_unwind(skb, orig_type, PPPOE_SES_HLEN, mac_offset,
+> +				     mac_len);
+
+If the inner protocol's gso_segment callback returns NULL (indicating the
+hardware can natively offload the segmentation), skb_gso_error_unwind() will
+be called.
+
+skb_gso_error_unwind() unconditionally sets skb->encapsulation = 1. However,
+PPPoE does not configure the inner header offsets (such as
+skb->inner_network_header).
+
+When the driver sees skb->encapsulation == 1, could it attempt to read the
+uninitialized inner header offsets, parsing the outer MAC header as an inner
+IP header and misprogramming the hardware TSO context?
+
+Does PPPoE need to explicitly clear TSO features before calling the inner
+segmentation to force software segmentation, avoiding the need for
+skb_gso_error_unwind() here entirely?
+
+> +		goto out;
+> +	}
+[ ... ]
 -- 
-2.53.0
-
+pw-bot: changes-requested
 
