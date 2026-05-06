@@ -1,72 +1,53 @@
-Return-Path: <netdev+bounces-284637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284638-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IAudAPqU+mnqPwMAu9opvQ
-	(envelope-from <netdev+bounces-284637-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 03:10:18 +0200
+	id +HaIA0CV+mnqPwMAu9opvQ
+	(envelope-from <netdev+bounces-284638-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 03:11:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 092274D5290
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 03:10:16 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 768534D52BC
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 03:11:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B67E8301A908
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 01:10:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ABE9830598C6
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 01:11:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BCF32264C7;
-	Wed,  6 May 2026 01:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B74325A321;
+	Wed,  6 May 2026 01:11:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=soslab.tu-darmstadt.de header.i=@soslab.tu-darmstadt.de header.b="Jj+1HVRm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ll7K5q0A"
 X-Original-To: netdev@vger.kernel.org
-Received: from b2682.mx.srv.dfn.de (b2682.mx.srv.dfn.de [194.95.235.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC25C2FF;
-	Wed,  6 May 2026 01:10:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.95.235.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07179149C6F;
+	Wed,  6 May 2026 01:11:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778029810; cv=none; b=O4V0wbPindy1qd8F3sD7kIxRUIPO2yVAOZBOmy/C8ylHVzWSgzgIfHZGv9QoS/+SVQuEgGdUgPGkLP3ovB8uIvL6rmVKC/frp7caU7vO0MBWvFvmx0mEsf5IULLA8h/WkSNHfMYFvoIf7ayy7sUH4EguPYS+G6b6hX8tdx7/KeE=
+	t=1778029866; cv=none; b=IgXHtoZM1i8paLrBRrGnKZp6Do2pV/NuT1xohbm0qW0DqW0Vt65jyTqUz2UbUtuFViP0UqBI87ggpNdoZKGud1cilVfC9SbX+8zo+IKr99YaucVEjHOOfbh9PguHgCXZmAci2todFKUL8GSwYfFl08cmCxx7l4nBOc6qCtpNZ0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778029810; c=relaxed/simple;
-	bh=KRBLQQniWdVBGFlggN0DOG8w40a6ggoj4/AvXMfCcMc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sF3+mzpm4glv28+RO6Gt6ywhfXPcItmBXFfnX1veF1YrkoioKkjkzXZT9e8pj2OaFIeHIE44tXxtkrY7MjJiImQ+LbR7yvbO6dHsqv19n1PrAUUZJ5rYnaKyXY6znSH1veoLEfIpLPcOtcop/hONuU/6DqXm7lN+e8RkPLMsk6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=soslab.tu-darmstadt.de; spf=pass smtp.mailfrom=soslab.tu-darmstadt.de; dkim=pass (1024-bit key) header.d=soslab.tu-darmstadt.de header.i=@soslab.tu-darmstadt.de header.b=Jj+1HVRm; arc=none smtp.client-ip=194.95.235.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=soslab.tu-darmstadt.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soslab.tu-darmstadt.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-	soslab.tu-darmstadt.de; h=content-transfer-encoding:mime-version
-	:message-id:date:date:subject:subject:from:from:received; s=s1;
-	 t=1778029459; x=1779843860; bh=KRBLQQniWdVBGFlggN0DOG8w40a6ggoj
-	4/AvXMfCcMc=; b=Jj+1HVRm8vZmN5SI4kGnjBjN6m4vGjZU9EIG5XmKkQQXzX/G
-	S3nvcnku+i9FDEqCFlFOV8qBQzW2Ha6AYAYjfJrRTwHgl8GzY4lU7xtzMf8qFrJE
-	8OSlDg6NpNpSjhFjwJTf4jFVIbhMBxuqK225hFpp3YU1d0NM5PHw78d2p5M=
-Received: from mail-relay152.hrz.tu-darmstadt.de (mail-relay152.hrz.tu-darmstadt.de [130.83.252.152])
-	by b2682.mx.srv.dfn.de (Postfix) with ESMTPS id BCAC63A0112;
-	Wed,  6 May 2026 03:04:16 +0200 (CEST)
-Received: from smtp.tu-darmstadt.de (mail-relay238.hrz.tu-darmstadt.de [130.83.156.238])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits)
-	 client-signature RSA-PSS (4096 bits))
-	(Client CN "mail-relay238.hrz.tu-darmstadt.de", Issuer "GEANT TLS RSA 1" (not verified))
-	by mail-relay152.hrz.tu-darmstadt.de (Postfix) with ESMTPS id 4g9HG70TbSz442D;
-	Wed,  6 May 2026 03:04:15 +0200 (CEST)
-From: Markus Baier <Markus.Baier@soslab.tu-darmstadt.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	Miaoqian Lin <linmq006@gmail.com>,
-	linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Markus Baier <Markus.Baier@soslab.tu-darmstadt.de>
-Subject: [PATCH net] net: usb: asix: ax88772: replace usbnet_link_change() with queue_work() and usbnet_unlink_rx_urbs()
-Date: Wed,  6 May 2026 03:03:44 +0200
-Message-ID: <20260506010344.184636-1-Markus.Baier@soslab.tu-darmstadt.de>
+	s=arc-20240116; t=1778029866; c=relaxed/simple;
+	bh=goToXI9H6Xp4VYMlJrLNpWDyb6Q1NyOxaY3l0jvHZ9s=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=D2ap8Mg8cAqtcYgd2C6ishrlW6PVZK7wE2ShqjUbSsbg2jV8My7JNZ0rhQCG8wRhPtMuzJCi0RjS5n1g3sHzOgMf8uct+U8YTTq2XHxjUosDVsAaVqvX2YwiIDy6Cp9s5ZVOjEZarojDUBdCHcJvqMkZcp91THH9nsqs6SraXrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ll7K5q0A; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98C2CC2BCB4;
+	Wed,  6 May 2026 01:11:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778029865;
+	bh=goToXI9H6Xp4VYMlJrLNpWDyb6Q1NyOxaY3l0jvHZ9s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ll7K5q0AzEM8gZ03P8Zu9Iy83m25lcvK13DpZYmtJjKs9HncXSk07va3ENwxysglP
+	 7HAf/HcvIx+wrPhVX8gXO27HB4KXvG6qMcZMvRSdbKNr23cK8PmjM/EDcKXbisd0NR
+	 JfI3GAzO1Ur3Lmg6axtsVCX9ALISuv6BIu34orHQ4L75yZtiM/7VPNMvgTkiMBLx6k
+	 ce0jQcbBpWc6HyHZ6MFNKd0cAzZT2dIClq3CkutKgsBHH0FA8QJXaD+p2HJvZ+6rPj
+	 Z/b1p/ERHLFxN/SOje03s7axT+sJdABYAKdnT5aWjYzj3oG/kE/IhcAsq4KbeD72La
+	 1LKXGTnGjDFow==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02D343930780;
+	Wed,  6 May 2026 01:10:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,123 +55,92 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Header-TUDa: <X1qhTH9GVSVqlQq3atM0WKFwVN9uDwkBY9TBSEJJNbxcGN2t4lQ1ds1dJw5lITIP7ddAtyOj9zJBY2o2FpFo1I2i6zXYZmJS54q5.1778029456>
-X-TUDa-Umlauf: 1
-X-Rspamd-Queue-Id: 092274D5290
+Subject: Re: [PATCH net 1/8] ipvs: fixes for the new ip_vs_status info
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177802981580.2332967.9254644733543379445.git-patchwork-notify@kernel.org>
+Date: Wed, 06 May 2026 01:10:15 +0000
+References: <20260505001648.360569-2-pablo@netfilter.org>
+In-Reply-To: <20260505001648.360569-2-pablo@netfilter.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, fw@strlen.de, horms@kernel.org, ja@ssi.bg,
+ longman@redhat.com, lvs-devel@vger.kernel.org
+X-Rspamd-Queue-Id: 768534D52BC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[tu-darmstadt.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[soslab.tu-darmstadt.de:s=s1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,soslab.tu-darmstadt.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-284637-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284638-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Markus.Baier@soslab.tu-darmstadt.de,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[soslab.tu-darmstadt.de:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tu-darmstadt.de:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 
-Commit 36bdc0e815b4 ("net: usb: asix: ax88772: re-add usbnet_link_change()
-in phylink callbacks") restored the link-change notification that was
-lost during the phylink migration, by calling usbnet_link_change() from
-the phylink mac_link_up() / mac_link_down() callbacks.
+Hello:
 
-While this fixed the original symptom (RX URB submission not being
-initiated after link up), usbnet_link_change() also calls
-netif_carrier_off() on link-down, which is redundant in a phylink-based
-driver because phylink manages the carrier state itself.
+This series was applied to netdev/net.git (main)
+by Pablo Neira Ayuso <pablo@netfilter.org>:
 
-Replace the usbnet_link_change() calls with the minimal operations:
+On Tue,  5 May 2026 02:16:41 +0200 you wrote:
+> From: Julian Anastasov <ja@ssi.bg>
+> 
+> Sashiko reports some problems for the recently added
+> /proc/net/ip_vs_status:
+> 
+> * ip_vs_status_show() as a table reader may run long after the
+> conn_tab and svc_table table are released. While ip_vs_conn_flush()
+> properly changes the conn_tab_changes counter when conn_tab is removed,
+> ip_vs_del_service() and ip_vs_flush() were missing such change for
+> the svc_table_changes counter. As result, readers like
+> ip_vs_dst_event() and ip_vs_status_show() may continue to use
+> a freed table after a cond_resched_rcu() call.
+> 
+> [...]
 
-  - In ax88772_mac_link_up(), schedule dev->bh_work directly via
-    queue_work(system_bh_wq, &dev->bh_work). This is the same
-    mechanism usbnet_open() uses to schedule the bottom-half
-    that submits RX URBs.
+Here is the summary with links:
+  - [net,1/8] ipvs: fixes for the new ip_vs_status info
+    https://git.kernel.org/netdev/net/c/afbd961305eb
+  - [net,2/8] ipvs: fix races around the conn_lfactor and svc_lfactor sysctl vars
+    https://git.kernel.org/netdev/net/c/f2da9a96abb4
+  - [net,3/8] ipvs: fix the spin_lock usage for RT build
+    https://git.kernel.org/netdev/net/c/d493d9de1c21
+  - [net,4/8] ipvs: do not leak dest after get from dest trash
+    https://git.kernel.org/netdev/net/c/fbe1e01e818e
+  - [net,5/8] ipvs: fix races around est_mutex and est_cpulist
+    https://git.kernel.org/netdev/net/c/2fd109238925
+  - [net,6/8] ipvs: fix shift-out-of-bounds in ip_vs_rht_desired_size
+    https://git.kernel.org/netdev/net/c/4ee52b7021a7
+  - [net,7/8] ipvs: Guard access of HK_TYPE_KTHREAD cpumask with RCU
+    https://git.kernel.org/netdev/net/c/aa6065206987
+  - [net,8/8] sched/isolation: Make HK_TYPE_KTHREAD an alias of HK_TYPE_DOMAIN
+    https://git.kernel.org/netdev/net/c/8f78b749f3da
 
-  - In ax88772_mac_link_down(), call usbnet_unlink_rx_urbs() to
-    return any in-flight RX URBs to the host controller.
-    This releases USB bandwidth and avoids keeping unused buffers
-    queued while the link is down. This is the symmetric
-    counterpart to scheduling new RX URBs on link up.
-
-Tested with the Apple A1277 USB Ethernet Adapter (05ac:1402,
-AX88772A based) on a Banana Pro (Allwinner A20).
-
-Fixes: 36bdc0e815b4 ("net: usb: asix: ax88772: re-add usbnet_link_change() in phylink callbacks")
-Assisted-by: Claude:claude-opus-4-7
-Signed-off-by: Markus Baier <Markus.Baier@soslab.tu-darmstadt.de>
----
-
-Transparency notice: The English formulation of this commit message
-was prepared with AI assistance. The actual system testing and
-verification of the issue were performed manually without AI
-involvement.
-
-This is a follow-up to commit 36bdc0e815b4 (just applied to net.git).
-While that patch correctly restored the missing RX URB submission,
-I realized during further analysis that usbnet_link_change() carries
-side effects (notably calling netif_carrier_off() on link-down) that
-are redundant in a phylink-based driver. After studying how
-usbnet_open() handles the same task (direct queue_work() call), this
-minimal approach better matches the existing usbnet patterns.
-
-I am sending this now rather than waiting, because the previous patch
-just landed and I would like the cleanup to be considered before it
-propagates further into stable kernels via the Fixes: tag.
-
- drivers/net/usb/asix_devices.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
-index 293ef80c4e30..4230ff611c4b 100644
---- a/drivers/net/usb/asix_devices.c
-+++ b/drivers/net/usb/asix_devices.c
-@@ -756,7 +756,11 @@ static void ax88772_mac_link_down(struct phylink_config *config,
- 	struct usbnet *dev = netdev_priv(to_net_dev(config->dev));
- 
- 	asix_write_medium_mode(dev, 0, 0);
--	usbnet_link_change(dev, false, false);
-+
-+	/* Phylink will call netif_carrier_off(), but we should explicitly
-+	 * stop RX URBs to save USB bandwidth.
-+	 */
-+	usbnet_unlink_rx_urbs(dev);
- }
- 
- static void ax88772_mac_link_up(struct phylink_config *config,
-@@ -787,7 +791,11 @@ static void ax88772_mac_link_up(struct phylink_config *config,
- 		m |= AX_MEDIUM_RFC;
- 
- 	asix_write_medium_mode(dev, m, 0);
--	usbnet_link_change(dev, true, false);
-+
-+	/* Phylink will call netif_carrier_on(), but we need to explicitly
-+	 * kick off RX URB submission in usbnet.
-+	 */
-+	queue_work(system_bh_wq, &dev->bh_work);
- }
- 
- static const struct phylink_mac_ops ax88772_phylink_mac_ops = {
+You are awesome, thank you!
 -- 
-2.52.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
