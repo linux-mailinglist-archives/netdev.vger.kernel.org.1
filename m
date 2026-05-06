@@ -1,231 +1,156 @@
-Return-Path: <netdev+bounces-284974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-284971-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aKO3BVp6+2n0bgMAu9opvQ
-	(envelope-from <netdev+bounces-284974-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 19:28:58 +0200
+	id MFz5Lqh6+2n0bgMAu9opvQ
+	(envelope-from <netdev+bounces-284971-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 19:30:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E562B4DED5B
-	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 19:28:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C2A64DEDA7
+	for <lists+netdev@lfdr.de>; Wed, 06 May 2026 19:30:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3A0F030059AD
-	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 17:28:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E0383303A8C0
+	for <lists+netdev@lfdr.de>; Wed,  6 May 2026 17:28:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34CE34BCAB3;
-	Wed,  6 May 2026 17:28:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35EE84B8DDF;
+	Wed,  6 May 2026 17:28:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t/JJutyF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y0+XbFPC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B9E74BCACB;
-	Wed,  6 May 2026 17:28:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E844BC02C
+	for <netdev@vger.kernel.org>; Wed,  6 May 2026 17:28:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778088523; cv=none; b=HqUqa6yYuty12H81wAHVAJjWoWAodpHDgFh5VkOVzjSwMq/WKIwDFznUMZagb1kgQPp1IrK0B7FRQCG3/r9d85Rfgpq+nC3WovBc+Gxs+UciUuVr2Xqv8282l76Oh4ipIT+H8WzGmqPeH1IHcuPOCOPfPHc+jl/ahC8kX3cqaq4=
+	t=1778088515; cv=none; b=kUxhTyCCFj1qQXw10rBtzJMXHkz50cNap8v3Z3T0arRSfh4G2aNHdsCAwKhRjGv/8Qv0IRzAvoNIug+OgyxNi8KoDogh8+joqC73gLQjxaW7DV17hAXQV2GV1sxHw3c0cVU8UO8kL0GrZzFTcFpFzSLXIQpjKC2sHNn5PKiuN6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778088523; c=relaxed/simple;
-	bh=nG5MSbEtJnJ3VjKmGgmeUZikkFX/7RM7ASOLsgkhen0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Cw7XMdNEyKzHWE/QDIT17JMugwCaFo/5PjaboaSitQSK+SC4Z7WLGTFtFbJSc+tCrOxVAw9D+6KTE+u+R7wqR8aIJmOiScp9jlnfyvGzpf683yeu6oa2floLh5ZafAxTSb1DhZBl3PBxwu+Fj3znvbRUif41fUkuBOOT3ml0gaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t/JJutyF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 405A9C2BCB0;
-	Wed,  6 May 2026 17:28:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778088522;
-	bh=nG5MSbEtJnJ3VjKmGgmeUZikkFX/7RM7ASOLsgkhen0=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=t/JJutyF0hz3rVAXbGzBl0SsGu7bmtn1WearY2at+HjJCg1Sh9vma9hD/d3oqMttZ
-	 FFUaLbGwDnUEmiwzJl/uXF6Y8/V4YuYV7/lMYykJA3JLWrwHwq3B7944/CLbt1oLQ6
-	 4EOS4T75nWxA3Ywq2rOBDBZCLadWzt1yg/sIaMOCSZmZVQGxvsUg8k4Ou+qDdWHmhZ
-	 /bnsC85wmN6fa9nC2DkZ/Z7J8QhomiDp6JL1VIdTiXBe1XrFLHsTxGH2L36SKY0gqu
-	 3bj39ZJOrgsSy8WeI299LSvQxxips61g4uxbRahEVW7N1msIy9DyyiIkMiNUaF//P7
-	 RZLP/3NI8xCfA==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Wed, 06 May 2026 19:27:37 +0200
-Subject: [PATCH nf-next v2 6/6] selftests: netfilter: nft_flowtable.sh: Add
- SIT flowtable selftest
+	s=arc-20240116; t=1778088515; c=relaxed/simple;
+	bh=+JAXBcfFApk6Q1vHjE+qSmpo8KhHDmH9Knu8S6+KEc8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Fgw3LAHW9w9Vwp6c9ISp2+XfYbep7/I7Oj9b0PGbNKrcpDTnEQR1bxfagxPeFtWSM+eLDVsYQp8i7NXL2EDH6+stPHO8Q3P7mjsyBknwrDX959YEX7pgvZScg2clZD5BkN30SoNeHfS7POr32EUOrP8EFGFSjLTV35d3wVAJLoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y0+XbFPC; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c81ed67fcbcso1449694a12.3
+        for <netdev@vger.kernel.org>; Wed, 06 May 2026 10:28:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1778088512; x=1778693312; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=9kWUktZAxModxM8jEbJ03797Z+amFhbRsI8XzY9spwk=;
+        b=Y0+XbFPCzQrgLsjkMGy0ocYFcjC2CGBmkWXC71YA7ceGN8wHRnyMHIR53FT740cTFY
+         N+NvJC3RX6P1snMmGCX3tMDLIoyyuhSC4/R3t9gNqvBYhtgsXA58lMAs+laB6/b+w7zt
+         f5a1do03CUyNVAdLDIHy4VzkDQbzSJsbRqTZcBtV1tn4cahSEbzVCaILDfjLuP02G66F
+         qAyuYsPCz2H5Hj4iQU44UZwov3bsl6c1dMQvhMIvmBAJUOyvlZa7A5Acr7IF9SZn5fQ8
+         yKXuzBxK/IGEii/Z54rIHKS7sA95XUjzxnHYL+AA1Razk1JvPn1qxChJY/6RPtJOsEyn
+         4kZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778088512; x=1778693312;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9kWUktZAxModxM8jEbJ03797Z+amFhbRsI8XzY9spwk=;
+        b=d+fvVbrjSX9MJZnX12Y1M77d8AWNY/FL1LZEWZqlEZEIQEOj4b7+6pJgF/XQQ52sTW
+         QYQ6CyLuoSLCKfHvo4BhduY3mb+Te1HAlueokiWNhwWwAIxdk9CpeLuIkVhTDAOFEiu2
+         9XyHlQUde2mcoZUKUGIfubqQ0hHgg0+RlRXPpJnjYIR73pG+8JnG9GZR2twPwv9qR02D
+         U3qoFw1XjoXhT5gCi1OWCCWRHNj48xbdXa0BhQpjg458DY85IYJkw52rM9BWCqjGkIOK
+         FozamxZEM/Tar3E0BI8/Q2BLjk7pFPui2zcSrnO04/IxY4gdPy2c2vFkjtYX1JUhbXu5
+         t0PA==
+X-Forwarded-Encrypted: i=1; AFNElJ8/pTunbgwj+Fw+pIcHrBGExCVnPozjloDhhwn25Nf7FP6wHFXopZhwyGH+oAmsvlYPRJV1UKY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvHo6MaYTXxoBMVN4fxoygfdbSQ/fAPE1bzY8o5Zd5WeWxBcPK
+	8BSRFK1V4M4Ef0bT+s9bbAqLYL7wHarbUnsyYkarN8R4wENtqMW2DYQYEtVGoFJc2TUliBW4vr0
+	kplyY1A==
+X-Received: from pfbim15.prod.google.com ([2002:a05:6a00:8d8f:b0:835:3df8:d72])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:938c:b0:398:bda8:d8cd
+ with SMTP id adf61e73a8af0-3aa5a6e9281mr4801432637.7.1778088511969; Wed, 06
+ May 2026 10:28:31 -0700 (PDT)
+Date: Wed,  6 May 2026 17:28:28 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260506-b4-flowtable-sw-accel-ip6ip-v2-6-439fd427726e@kernel.org>
-References: <20260506-b4-flowtable-sw-accel-ip6ip-v2-0-439fd427726e@kernel.org>
-In-Reply-To: <20260506-b4-flowtable-sw-accel-ip6ip-v2-0-439fd427726e@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Felix Fietkau <nbd@nbd.name>, Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
- Ido Schimmel <idosch@nvidia.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
- Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, 
- Shuah Khan <shuah@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
- linux-kselftest@vger.kernel.org
-X-Mailer: b4 0.14.3
-X-Rspamd-Queue-Id: E562B4DED5B
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
+Message-ID: <20260506172830.2237574-1-kuniyu@google.com>
+Subject: [PATCH v1 net] tcp: Fix out-of-bounds access for twsk in tcp_ao_established_key().
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Dmitry Safonov <0x7f454c46@gmail.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	Damiano Melotti <melotti@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 2C2A64DEDA7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_CONTAINS_FROM(1.00)[];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-284974-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,nbd.name,gmail.com,collabora.com,nvidia.com,netfilter.org,strlen.de,nwl.cc];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-284971-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,google.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nft_flowtable.sh:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 
-Similar to IPIP, IP6IP6 and IPv4 over IPv6, introduce specific selftest
-for SIT flowtable sw acceleration in nft_flowtable.sh
+lockdep_sock_is_held() was added in tcp_ao_established_key()
+by the cited commit.
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+It can be called from tcp_v[46]_timewait_ack() with twsk.
+
+Since it does not have sk->sk_lock, the lockdep annotation
+results in out-of-bound access.
+
+  $ pahole -C tcp_timewait_sock vmlinux | grep size
+  	/* size: 288, cachelines: 5, members: 8 */
+  $ pahole -C sock vmlinux | grep sk_lock
+  	socket_lock_t              sk_lock;              /*   440   192 */
+
+Let's not use lockdep_sock_is_held() for TCP_TIME_WAIT.
+
+Fixes: 6b2d11e2d8fc ("net/tcp: Add missing lockdep annotations for TCP-AO hlist traversals")
+Reported-by: Damiano Melotti <melotti@google.com>
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- tools/testing/selftests/net/netfilter/config       |  1 +
- .../selftests/net/netfilter/nft_flowtable.sh       | 45 ++++++++++++++++++++++
- 2 files changed, 46 insertions(+)
+ net/ipv4/tcp_ao.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/netfilter/config b/tools/testing/selftests/net/netfilter/config
-index 979cff56e1f5..c46604574653 100644
---- a/tools/testing/selftests/net/netfilter/config
-+++ b/tools/testing/selftests/net/netfilter/config
-@@ -30,6 +30,7 @@ CONFIG_IP_SCTP=m
- CONFIG_IPV6=y
- CONFIG_IPV6_MULTIPLE_TABLES=y
- CONFIG_IPV6_TUNNEL=m
-+CONFIG_IPV6_SIT=m
- CONFIG_IP_VS=m
- CONFIG_IP_VS_PROTO_TCP=y
- CONFIG_IP_VS_RR=m
-diff --git a/tools/testing/selftests/net/netfilter/nft_flowtable.sh b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-index 219339dbaf6e..6527e27b9121 100755
---- a/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-+++ b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-@@ -597,6 +597,10 @@ ip -net "$nsr1" addr add 192.168.210.1/24 dev tun6
- ip -net "$nsr1" addr add fee1:3::1/64 dev tun6 nodad
- ip netns exec "$nsr1" sysctl net.ipv4.conf.tun6.forwarding=1 > /dev/null
+diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+index a97cdf3e6af4..e2720233e36b 100644
+--- a/net/ipv4/tcp_ao.c
++++ b/net/ipv4/tcp_ao.c
+@@ -116,7 +116,9 @@ struct tcp_ao_key *tcp_ao_established_key(const struct sock *sk,
+ {
+ 	struct tcp_ao_key *key;
  
-+ip -net "$nsr1" link add name sit1 type sit local 192.168.10.1 remote 192.168.10.2 ttl 255
-+ip -net "$nsr1" link set sit1 up
-+ip -net "$nsr1" addr add fe01:3::1/64 dev sit1 nodad
-+
- ip -net "$nsr2" link add name tun0 type ipip local 192.168.10.2 remote 192.168.10.1
- ip -net "$nsr2" link set tun0 up
- ip -net "$nsr2" addr add 192.168.100.2/24 dev tun0
-@@ -608,6 +612,10 @@ ip -net "$nsr2" addr add 192.168.210.2/24 dev tun6
- ip -net "$nsr2" addr add fee1:3::2/64 dev tun6 nodad
- ip netns exec "$nsr2" sysctl net.ipv4.conf.tun6.forwarding=1 > /dev/null
- 
-+ip -net "$nsr2" link add name sit1 type sit local 192.168.10.2 remote 192.168.10.1 ttl 255
-+ip -net "$nsr2" link set sit1 up
-+ip -net "$nsr2" addr add fe01:3::2/64 dev sit1 nodad
-+
- ip -net "$nsr1" route change default via 192.168.100.2
- ip -net "$nsr2" route change default via 192.168.100.1
- 
-@@ -622,6 +630,7 @@ ip -6 -net "$ns2" route add default via dead:2::1
- 
- ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif tun0 accept'
- ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif tun6 accept'
-+ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif sit1 accept'
- ip netns exec "$nsr1" nft -a insert rule inet filter forward \
- 	'meta oif "veth0" tcp sport 12345 ct mark set 1 flow add @f1 counter name routed_repl accept'
- 
-@@ -648,6 +657,19 @@ if ! test_tcp_forwarding_nat "$ns1" "$ns2" 1 "IP6IP4 tunnel"; then
- 	ret=1
- fi
- 
-+ip -6 -net "$nsr1" route delete default
-+ip -6 -net "$nsr1" route add default via fe01:3::2
-+ip -6 -net "$nsr2" route delete default
-+ip -6 -net "$nsr2" route add default via fe01:3::1
-+
-+if test_tcp_forwarding "$ns1" "$ns2" 1 6 "[dead:2::99]" 12345; then
-+	echo "PASS: flow offload for ns1/ns2 SIT tunnel"
-+else
-+	echo "FAIL: flow offload for ns1/ns2 with SIT tunnel" 1>&2
-+	ip netns exec "$nsr1" nft list ruleset
-+	ret=1
-+fi
-+
- # Create vlan tagged devices for IPIP traffic.
- ip -net "$nsr1" link add link veth1 name veth1.10 type vlan id 10
- ip -net "$nsr1" link set veth1.10 up
-@@ -672,6 +694,11 @@ ip -6 -net "$nsr1" route delete default
- ip -6 -net "$nsr1" route add default via fee1:5::2
- ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif tun6.10 accept'
- 
-+ip -net "$nsr1" link add name sit1.10 type sit local 192.168.20.1 remote 192.168.20.2 ttl 255
-+ip -net "$nsr1" link set sit1.10 up
-+ip -net "$nsr1" addr add fe01:5::1/64 dev sit1.10 nodad
-+ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif sit1.10 accept'
-+
- ip -net "$nsr2" link add link veth0 name veth0.10 type vlan id 10
- ip -net "$nsr2" link set veth0.10 up
- ip -net "$nsr2" addr add 192.168.20.2/24 dev veth0.10
-@@ -689,6 +716,11 @@ ip -net "$nsr2" link set tun6.10 up
- ip -net "$nsr2" addr add 192.168.220.2/24 dev tun6.10
- ip -net "$nsr2" addr add fee1:5::2/64 dev tun6.10 nodad
- ip netns exec "$nsr2" sysctl net.ipv4.conf.tun6/10.forwarding=1 > /dev/null
-+
-+ip -net "$nsr2" link add name sit1.10 type sit local 192.168.20.2 remote 192.168.20.1 ttl 255
-+ip -net "$nsr2" link set sit1.10 up
-+ip -net "$nsr2" addr add fe01:5::2/64 dev sit1.10 nodad
-+
- ip -6 -net "$nsr2" route delete default
- ip -6 -net "$nsr2" route add default via fee1:5::1
- 
-@@ -715,6 +747,19 @@ if ! test_tcp_forwarding_nat "$ns1" "$ns2" 1 "IP6IP4 tunnel over vlan"; then
- 	ret=1
- fi
- 
-+ip -6 -net "$nsr1" route delete default
-+ip -6 -net "$nsr1" route add default via fe01:5::2
-+ip -6 -net "$nsr2" route delete default
-+ip -6 -net "$nsr2" route add default via fe01:5::1
-+
-+if test_tcp_forwarding "$ns1" "$ns2" 1 6 "[dead:2::99]" 12345; then
-+	echo "PASS: flow offload for ns1/ns2 SIT tunnel over vlan"
-+else
-+	echo "FAIL: flow offload for ns1/ns2 with SIT tunnel over vlan" 1>&2
-+	ip netns exec "$nsr1" nft list ruleset
-+	ret=1
-+fi
-+
- # Restore the previous configuration
- ip -net "$nsr1" route change default via 192.168.10.2
- ip -net "$nsr2" route change default via 192.168.10.1
-
+-	hlist_for_each_entry_rcu(key, &ao->head, node, lockdep_sock_is_held(sk)) {
++	hlist_for_each_entry_rcu(key, &ao->head, node,
++				 sk->sk_state == TCP_TIME_WAIT ||
++				 lockdep_sock_is_held(sk)) {
+ 		if ((sndid >= 0 && key->sndid != sndid) ||
+ 		    (rcvid >= 0 && key->rcvid != rcvid))
+ 			continue;
 -- 
-2.54.0
+2.54.0.545.g6539524ca2-goog
 
 
