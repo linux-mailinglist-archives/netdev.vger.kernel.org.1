@@ -1,189 +1,224 @@
-Return-Path: <netdev+bounces-285212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285263-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6BQFF29e/Gm7OwAAu9opvQ
-	(envelope-from <netdev+bounces-285212-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 11:42:07 +0200
+	id OOeUHqN1/GmdQQAAu9opvQ
+	(envelope-from <netdev+bounces-285263-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:21:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D77784E629B
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 11:42:06 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68BFD4E759F
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:21:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1E67B303980F
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 09:34:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B9FBA300443A
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 11:13:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 559763C4542;
-	Thu,  7 May 2026 09:34:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=readmodwrite-com.20251104.gappssmtp.com header.i=@readmodwrite-com.20251104.gappssmtp.com header.b="UJ4ENShi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEB703128B6;
+	Thu,  7 May 2026 11:13:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CHN02-SH0-obe.outbound.protection.partner.outlook.cn (mail-sh0chn02on2113.outbound.protection.partner.outlook.cn [139.219.146.113])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA8038E5C4
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 09:34:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778146460; cv=none; b=Ct1d01wuMgl3HzvsMPOhFdPsLHGR96c1IF/yT3dGLQQezulHDngi1KgbHQySBgFnwBetVBoEN9EsW4wpClUW9ZjDUKOUeC5ZmhftET83C5lyUs1WkShOLMt47vcMnEyeHNSDuHIpKqNB/CBu800N2hs0I1dQq211ampB0j/LObU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778146460; c=relaxed/simple;
-	bh=SiL0I7BTqDmOrEYB/RwFyieTxl0aty4XtD8WXRHHt7E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tWMVn8OiapLuvY0v/Owz1a/lgxn2fYfuUS+jOuZwZPvHIKKVPA9E7sv30sSpSe4rC0GiLofqTagIJDTb1Xw46E0JDGzSWitvrBrQNFrg9nmIq2RFSCeBq+/qbcJrxhkpYfQBTGnvvv3/lUjcvVZ4JXMmdMlp0WIraZ/Li0rwjVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=readmodwrite.com; spf=none smtp.mailfrom=readmodwrite.com; dkim=pass (2048-bit key) header.d=readmodwrite-com.20251104.gappssmtp.com header.i=@readmodwrite-com.20251104.gappssmtp.com header.b=UJ4ENShi; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=readmodwrite.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=readmodwrite.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-43fe3e22e33so383861f8f.0
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 02:34:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=readmodwrite-com.20251104.gappssmtp.com; s=20251104; t=1778146457; x=1778751257; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0RDPZxyyoA+nLVJX1tOhu7GRz/OpeQnLIvnlbEm9kx4=;
-        b=UJ4ENShiWepzea3FlvSbyVzkrxv06OS9rK195BomMZJaYNxNPMVdIPKql8eg8tyMYM
-         kfb0+VCzq+YZqC1FbDpCc5nwHABPrK4p9Sjc4oiaxEn6ehyovW11UxYlU9hBZdiqrQAu
-         JXNy2bbCM9b2Q89RDFEL+pz9Hp5r0zOU3HF+qHFgSH4o4Qy7S/cS8Nv1pwDkVdPqaR7q
-         RVoLoJph4XG9HBvebMI19zuhTawA0WQ7YdMtnAzBsL2xLTyFfQflSRB/D7nG8SF+c8R9
-         XEvNCGk1qCFdv4aT3H+zGN90jsUZb9v2UfxKMBd5pOD1tt68SpAUmdDG88po5IsRpsbp
-         susA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778146457; x=1778751257;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0RDPZxyyoA+nLVJX1tOhu7GRz/OpeQnLIvnlbEm9kx4=;
-        b=O2toy959OYNx6g3N+ILr+RV79GhCSNymxt5FD64xlFFlnq0xd0uDhR/0trAiJGpUdd
-         ohagweJaVOuDVHXGsisry5NnUkAVd23GGwQiKZzih1VTFDvSEZo0dYXXNbyeso4R6Xcc
-         yz4WQEEcwJu9OjrWF729moQFfyxjf8EiYvSVn73YzlB6wf1SM40zydIdRBZUPxoZhlS6
-         WRmvIuZdIIsv0wsDHi/0dVhpRuu9o3fx+1FKrrNlxvr8cfKKjnSxbQSuMiBabDhKZxKU
-         hzlMYVqqJv04dhpjgpCg+/pNwHXu7aaC+RPqbljo1azItdJKpkIXH/zYbMdgJslKWVq4
-         V8Ag==
-X-Forwarded-Encrypted: i=1; AFNElJ/GmXce57UR23QG2a8zqsY/S1k+Re9dGal4ZEdS2StZXDdfzuACiUcsAnozZ8Y0JFGVWxjal2Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+6H3dLX2Z37CRE6vcEKp6VnGUNSPvr5zPMT8w/4c4YMeqyJ6v
-	x0UUhNx7pJYSW5xqnjP18QLTD1KoXnXmiGP51NId7giTsjjWiSU3bnQhqv5j+o7JU3Y=
-X-Gm-Gg: AeBDieunl0b5sD12u1W+clbyrgdLa4li2pHT6SLqYOhexMe55h2/2uC7O65uQ3tAMt5
-	0iL3CMbe52911/x+Pxg9KD2DC0Jqqtdag910axaXXv854y7r/+FfTvLlh5D2t7S4emy9KdjxZXI
-	jvyab0o8PtXdEdGXTaiJ5RStNDo8cCp++1873jCFI5n0JmSWDOKHIUF6S1xHXnsfNEVgzFc7p7J
-	zpjM6Smq+67ss/zGFI0vPRy1yqMlOAU4MT2R8bwLz7qVdKOWU/Jczpng7uqZAexmt9dED5CjXIN
-	PdJUIsfWDqZToRveNlh8Pju+tlUrUgHWP3dljACDhsr1Q/tOL6Imms/uhDMNGmNy6q9N3RZIbk/
-	kZXsClMp+a3DhO7c9QFewX/NDrV4jGbpSXeVvQ+X0wTR0tltzFoGHTzA8USVp34xJu1a7UACSAv
-	BcWLgDy5Wyxc/fq2VJkeU5
-X-Received: by 2002:a05:6000:2c0c:b0:43d:7e11:1b72 with SMTP id ffacd0b85a97d-4515a6c32dfmr11386364f8f.9.1778146456983;
-        Thu, 07 May 2026 02:34:16 -0700 (PDT)
-Received: from localhost ([2a09:bac6:37a8:294b::41d:50])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4505238e7c0sm17157280f8f.3.2026.05.07.02.34.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2026 02:34:16 -0700 (PDT)
-Date: Thu, 7 May 2026 10:34:15 +0100
-From: Matt Fleming <matt@readmodwrite.com>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>, kernel-team@cloudflare.com, 
-	Matt Fleming <mfleming@cloudflare.com>, stable@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Eric Joyner <eric.joyner@intel.com>, Paul Greenwalt <paul.greenwalt@intel.com>, 
-	Alice Michael <alice.michael@intel.com>, intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH net v2] ice: Fix missing 1's complement
- negation in GCS raw checksum
-Message-ID: <afxbZjldi1OC3HmS@matt-Precision-5490>
-References: <20260501095717.1032151-1-matt@readmodwrite.com>
- <531aec13-c33f-4e77-ab48-de8861f9b6c6@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34AD82D1931;
+	Thu,  7 May 2026 11:13:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.146.113
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778152399; cv=fail; b=mfnllGNUZkrFy0q4om9kBlCOe0pCP2JqWAlmFp3Oq+mFvhwKN3yscXZA26B/tlpsKwZ9FuMI7+2VPxkFO729fSLRSitVzP/C8nOQl05VXIOIfu6GRU8/CltOhbeFo/ucYKdOWFsDnSKpqqCe6v3RxQ99140GDN6MKjU1eLHYMK4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778152399; c=relaxed/simple;
+	bh=nCnrTvzax/CALVg/+VUAEQl/BmR764vYvvy+FxRHtUQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=L16eZ7AZvyx5TGrkSSyjETYJ+PXu4u0f/5mGKqQLwvgCisbBlnY3ZVPwrgCfu8rk2AI5B/Kh984X1MVdM/MX8TN0B7Elqs6Hvtf28FzBc/9IulbficxkZIG53s4jo15qLQPOIIdTlvjAfrm5OJuomaEn/yiL41t97pBTVCXNZf8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.146.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RQPZvRKRoK3ZdRubD9eiwWcBS26Vw6kxFP1YIab5nmVo2ZklTrrX7YO1g/B53L1f7pUMuVQUHYrTVC1tYVLflFqScbJxO2W+rCONnIgXJ9tMhkGjuFBo3eqVzwBA1/bMIrP8NzT0C2pFMjRHIqfg/NBdR2Iz6CSgOwex0UbHXS2QnECtMC+4A5CJ7DVqCntBKUNegsTb2pEFe3esHykDLQIaGgvZSGwuO1LioE+Yo+CWgnX9RTOxEBDa4oY1jGVmFt9FPOMvQZAKenfvzyHVHk/v/ezO/R12PMmuh17aWKGT01WE7u6wZIFKWT3jAH0TXxtyBQb+bB+5a6l6QKvaTQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XNRxJ9ND+8NrtjQFwg8Qo/jph/f8sCAees6AhSTwoS4=;
+ b=UjlxBRBDsA3QFTTlCj2WQV+c3u+o30rH6BGpJpcJpZdJ1RdhyPLbwWPMP0mfevp40gB+E+GJ3YV186km6dtpM6Y/5RgYMnrWD32WvFYgEeHLH+VwPwRieHbzdwExzGGTl98K/DpqtJNMcg9ghXo7aHnmn6g+LPlQPjJeAROW4b8vPyCdCSvsXadKNiHF9jzFujQluq9TUJZvifEVuammfrXD9c5Kfy0/wbGBpu0pI8TDk9P8+xR1Skql17VKdbhvvdJ4CKyVz8LAinHdnRbTkLIy6mROFFlAO2wHgS4ZveOF75cpJAJ9d8Q2jnpDMSNXfXfY0ug/y/q1OuC5e/h6xA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=starfivetech.com; dmarc=pass action=none
+ header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=starfivetech.com;
+Received: from BJXPR01MB0855.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c211:18::12) by BJXPR01MB0870.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c211:14::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.17; Thu, 7 May
+ 2026 09:41:24 +0000
+Received: from BJXPR01MB0855.CHNPR01.prod.partner.outlook.cn
+ ([fe80::e2de:92aa:4c1c:a829]) by
+ BJXPR01MB0855.CHNPR01.prod.partner.outlook.cn ([fe80::e2de:92aa:4c1c:a829%6])
+ with mapi id 15.20.9846.025; Thu, 7 May 2026 09:41:24 +0000
+From: Minda Chen <minda.chen@starfivetech.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor@kernel.org>,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	devicetree@vger.kernel.org,
+	Minda Chen <minda.chen@starfivetech.com>
+Subject: [net-next v3 0/5] Add StarFive jhb100 soc SGMII GMAC support
+Date: Thu,  7 May 2026 17:41:10 +0800
+Message-Id: <20260507094115.8355-1-minda.chen@starfivetech.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-ClientProxiedBy: SHXPR01CA0013.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c311:1b::22) To BJXPR01MB0855.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c211:18::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <531aec13-c33f-4e77-ab48-de8861f9b6c6@intel.com>
-X-Rspamd-Queue-Id: D77784E629B
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BJXPR01MB0855:EE_|BJXPR01MB0870:EE_
+X-MS-Office365-Filtering-Correlation-Id: fd8851d6-7052-477c-9cc9-08deac1ccd91
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|52116014|921020|38350700014|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	iNdPKEr4FHG9j8+c9BddGy5IAB59LtjvuBuAfQWVab8opLQSWtE1CV8ASM9qtb+uo/hNxiXLsNFrA2gxFH0JZ99iA0hrT7GSboypkA3DqM4X2HSIhWx0A9vxJL+D0CBHlDXGSVf6Q3m3IPV5Rg+ntEYPUTK0WthANI23aqZOYA5WTyJlUQ2pmuBpkrc0Vd28EDVJluF5+BN3qD5DHGPweWhcXYaXq3zDto0GvsCS9b5CzikDtiOoYaQMGVnDA/VNa/AtEEBrdUYhnOzAvSM9FFCZAGBx6zw5JVtlOD+op4WTSQSwS/PKt9BDUDyBk3owwQy36nMy+RKv6W0Kw20j3viexakGEEshVCw74eiOev2xSnsm6vDnmtTu44w41ig2qJGlG52+UvNJmRU2VPt5Q6Wu/3mZUYNMceybURSDPqgz0UbWn3NVWDA9YN+byzv1mJszBmSZtaUbCWQX8bCF2B1JcaZyDpo0SeBt22Gi2GqhYl7Kq/xyvNr+N+mCZemsqJpN0f2FRgybM7WMPw7BL1KdgYdIGaZ+mKnSaw4ZO3B/3MTho5ilv09fqS6Yzi/dHnjDXa84BOAWQPBfgyLvHw==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BJXPR01MB0855.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(52116014)(921020)(38350700014)(56012099003)(18002099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?dTgiKbQtoIG4D6SNATsXuRjkY+QeztWojhbTulxc2EJexii8Iyt/qBRLCd6L?=
+ =?us-ascii?Q?2Fsc0UW6cLvlPUUIjwOvdzh481Ymsv75ObOPLtk513QEy4q5xRs8WXpiSmre?=
+ =?us-ascii?Q?F1mwVG+DZ2wcu0KTfhfKi9slQsET8wSWSm3xMGWMVtqGS9sxn63hgLhhghVN?=
+ =?us-ascii?Q?HAMlFpyzKMpxLP5RAh6XMQzG8f0FJTcAK89a9w6kUkYmRQOe0K7FLXVJk3oA?=
+ =?us-ascii?Q?wTFcj3V0HKkxw99rR+L6w+mPNbnBNaSb8SXyvi35N9Ark8opX+x4/sLZXncl?=
+ =?us-ascii?Q?07YfQHXmWYqocy0ZMag9WtLuotsOm3bDjYdF5gADwLLUppHeX33goEWsnfAy?=
+ =?us-ascii?Q?/99mmJa9SXXRVA/GfARADWFb3JZ8lt3XGs+aNLpPF52KsQPjXv4Iszyz1K2P?=
+ =?us-ascii?Q?KoWI/OJG932SiWihk/kQql0Z9s/rGpwHnxfdcAuD1GNusw5MIaxShYOBvBdN?=
+ =?us-ascii?Q?I15ErYxk1Z0QDjO/R0JGMLbCFume5ZFA/EFKBZfDWuIt2DS/lt6tFvV4YoKt?=
+ =?us-ascii?Q?9kZ/xnoYwS0tyPwN/k86bqq38XhWEuAvhT64wg4b1vyuOYXTPodXk73Z3D9n?=
+ =?us-ascii?Q?dqeESRVcS/4Q1IsYnwWUt32rzfJyfjyYgQ7q30sKabfI3yv5JRLk2z+6ej19?=
+ =?us-ascii?Q?TZsf5VuMAAo4h+r1QRN3ODsaG1DX71BmSKsxUIh+a9VgDch7IBhDUvSp1EB3?=
+ =?us-ascii?Q?rCF4s77I2rzCq/TFPZRQSDA8ct2HnoLLgK+A9NdnSirBECxYA6tOl538Lkxp?=
+ =?us-ascii?Q?XfEjg/QhiFfSEt7poiRBeoKtrIBgMepC20dbpoARJlnXgXk38ZN+OmqDjutG?=
+ =?us-ascii?Q?uUZ2kCsUbj+NuYJHkm7SlqIBb+pkpXB33JL+GIHkobtocGKalcQZmAuC6WFs?=
+ =?us-ascii?Q?D8UKFEWl6QCKoNNqhaZeTfMy36XhPQXFou9H6neD+qbsNJ3BTj2DjceRA2MT?=
+ =?us-ascii?Q?RtC6C6oYjWvvAqkd4Ys7Xv18UWxUoI05SIe3jbmlGvI2a4N+qefsHFELDlLi?=
+ =?us-ascii?Q?TLchIuzwfHcgfsmiO1yTkmqRMdr0rePLFBHSwFJ26/ompUKibRUP+p6oJvEJ?=
+ =?us-ascii?Q?d1kg+W7uiCO3Nfocr2mHONAhGhbR0ChYhuxYQE4JP0TPtGWxRSu3evf8EqEp?=
+ =?us-ascii?Q?uktN9mpV5FRdmNRTIutL0SGODmaNPhfq8RoyAGYDI49pq9tPlOeHoXg+94TL?=
+ =?us-ascii?Q?uwUp9kXvzuL20+2Ko1e+1rZ/+aPJzu84Vdp9AJztBeBnrbBuk9e2PKdsBQrM?=
+ =?us-ascii?Q?pcDrFkoxuFZVLndzmrx5lfF88PcV2wNoXYE3BoY8zt9eN0RRxHktFWbLLU1o?=
+ =?us-ascii?Q?6nYxdk0ZSCIJgKZ1erOW+Kcu6iMp0VjqaVKtHOBvDpK0czxTEblG9AF4fPvX?=
+ =?us-ascii?Q?/8GALvWIDGgmURgoGVqTwZkKEi87IImLpDOsrIRWQJlJhxg5ISs6Cfvf5cNP?=
+ =?us-ascii?Q?Cc3kh6RgqWq88l3Mk85S1XuBnZLjVCF9Aq9PrXPaN0nR1GlSmh9AULcWgPQu?=
+ =?us-ascii?Q?1Svm/PwZp12FRgHXWbfQRS/u8bZ7QxP1bx4PVnwZrKV5pMuKVZ0wrOj6aYqu?=
+ =?us-ascii?Q?GWzmISTlmrFWm07g7MFbH77ezr+q7SOx9t5QqFHCHSDydbKcMFwGiu+/fsuU?=
+ =?us-ascii?Q?Kt7jeGOsq3YG6RaLCDVlfHi+egYgRtvGvqEBt6Hf7e0SehZNjz7grE5OfKJD?=
+ =?us-ascii?Q?c26JcaXpH8OMKHsRmx+78UlV5p71Uz7sTwOL5tDtyVB44EmUkFOznPBOglj5?=
+ =?us-ascii?Q?AkNS6RKKvuoo/bqUjMMjTeDoZ0e5iA8=3D?=
+X-OriginatorOrg: starfivetech.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fd8851d6-7052-477c-9cc9-08deac1ccd91
+X-MS-Exchange-CrossTenant-AuthSource: BJXPR01MB0855.CHNPR01.prod.partner.outlook.cn
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2026 09:41:24.3758
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IZPzGByx7KePp/A1rRdTQTkk/1l42dUlh5MS21tk1DnSM/jY55NidFIkPobsS0qUKQ3W+Tjaq4ma9v/2O2CRCX7VNeYWD90Wy/Gx1i5oYvE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BJXPR01MB0870
+X-Rspamd-Queue-Id: 68BFD4E759F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [5.04 / 15.00];
+	DMARC_POLICY_QUARANTINE(1.50)[starfivetech.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[readmodwrite-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_TO(0.00)[foss.st.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,canonical.com,vger.kernel.org];
+	GREYLIST(0.00)[pass,body];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[readmodwrite.com];
-	TAGGED_FROM(0.00)[bounces-285212-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-285263-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matt@readmodwrite.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[readmodwrite-com.20251104.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.642];
+	FROM_NEQ_ENVFROM(0.00)[minda.chen@starfivetech.com,netdev@vger.kernel.org];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[readmodwrite-com.20251104.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[starfivetech.com:mid]
 X-Rspamd-Action: no action
 
-On Mon, May 04, 2026 at 05:10:23PM -0700, Jacob Keller wrote:
-> 
-> Hi,
-> 
-> Based on your patch description, I assume that you've tested this on
-> real hardware.
-> 
-> I dug a little through some of our internal changes history and sawe
-> that it looks like the hardware has a register setting in its
-> GL_RDPU_CNTRL register which determines whether the checksum value
-> reported is inverted or not. In E830 hardware, it is supposed to be off
-> (i.e. the checksum value reported already matches the expected setting.
-> 
-> Perhaps your device somehow got the GL_RDPU_CNTRL register set to the
-> wrong mode and that results in the swap being necessary. Hmm.
-> 
-> I'll ask the team to see if they can confirm this behavior.
+jhb100 is a Starfive new RISC-V SoC for datacenter BMC (BaseBoard
+Managent Controller). Similar with Aspeed 27x0.
 
-Hi Jake,
+The jhb100 minimal system upstream is in progress:
+https://patchwork.kernel.org/project/linux-riscv/cover/20260403054945.467700-1-changhuang.liang@starfivetech.com/
 
-Thanks for digging into this.
+jhb100 GMAC still using designware GMAC core like JH7100 and JH7110,
+and contains 2 SGMII interfaces, 1 RGMII/RMII interface, 1 RMII
+interface. In JH7100/JH7110 dwmac-starfive.c have supported RGMII/RMII
+interface. So require to add SGMII support to dwmac-starfive.c for JHB100.
 
-I read GL_RDPU_CNTRL on our affected E830 and the value is the same on
-both ports of the NIC:
+SGMII serdes PHY has been integrated in JHB100 and do not have driver
+setting.
 
-  0000:c1:00.0: GL_RDPU_CNTRL = 0x0020a275
-  0000:c1:00.1: GL_RDPU_CNTRL = 0x0020a275
+In JHB100 EVB board, SGMII connect with motorcomm YT8531s external PHY
+and support RJ45 ethernet port.
 
-Decoding bit 22 (E830_GL_RDPU_CNTRL_CHECKSUM_COMPLETE_INV) gives 0,
-i.e. the hardware is supposedly in "not inverted" mode, which matches
-the default you described.
+The patch base in 7.1-rc2
 
-However, looking at the data on the wire I see:
+previous patch link:
+v2: https://patchwork.kernel.org/project/netdevbpf/cover/20260417024523.107786-1-minda.chen@starfivetech.com/
 
-  - netdev_rx_csum_fault fires ~65 000 times/sec on this host.
-  - bpftrace at fexit:ice_process_skb_fields shows skb->csum =
-    swab16(raw_csum) directly (no negation), e.g. raw_csum=0xfb4f
-    -> skb->csum=0x4ffb.
-  - At fentry:__skb_checksum_complete the upper 16 bits of skb->csum
-    are 0xFFFF on every TCP/UDP packet -- the signature of nf_ip_checksum
-    adding the pseudo-header to a value that was the un-negated raw_csum.
-  - fold2(skb->csum_at_fentry + skb_checksum(skb,0,len,0)) ≈ 0xFFFF
-    for every packet, which means the two values are ones-complement
-    complements of each other, i.e. the driver stored S where the
-    stack expects ~S.
+changes
+v3:
+patch2: Add jhb100 attach to jh7110 compatibible, remove redundant commit
+message. just descript the jhb100 hardware.
+patch3: Add oneOf 5 clocks / 6 clocks to claim the clocks and make it
+pass yaml test.
+patch4: Add review tag and unused tag to phy interface.
 
-Negating the checksum makes the failures go away.
+v2:
+1. patch1 Add the remove reason
+2. patch2 rename rx clock to sgmii_rx
+3. patch4 confirm sgmii rx clock exist, or will probe error
+   sgmii will not call starfive_dwmac_set_mode() 
 
-Thanks,
-Matt
+
+Minda Chen (5):
+  dt-bindings: net: starfive,jh7110-dwmac: Remove jh8100
+  dt-bindings: net: starfive,jh7110-dwmac: Add jhb100 support
+  dt-bindings: net: starfive,jh7110-dwmac: Add jhb100 sgmii rx clk
+  net: stmmac: starfive: Add jhb100 SGMII interface
+  net: stmmac: starfive: Add STMMAC_FLAG_SPH_DISABLE flag
+
+ .../bindings/net/starfive,jh7110-dwmac.yaml   | 67 ++++++++++++++-----
+ .../ethernet/stmicro/stmmac/dwmac-starfive.c  | 59 ++++++++++++----
+ 2 files changed, 96 insertions(+), 30 deletions(-)
+
+
+base-commit: 74fe02ce122a6103f207d29fafc8b3a53de6abaf
+-- 
+2.17.1
+
 
