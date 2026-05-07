@@ -1,173 +1,146 @@
-Return-Path: <netdev+bounces-285295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285296-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aI3KOut//GkcQwAAu9opvQ
-	(envelope-from <netdev+bounces-285295-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:04:59 +0200
+	id ILKJFx6A/GkcQwAAu9opvQ
+	(envelope-from <netdev+bounces-285296-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:05:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 769714E7F43
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:04:55 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8D7C4E7F68
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:05:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 68CD030056E9
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 12:04:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B358030068FF
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 12:05:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78C293ED5C8;
-	Thu,  7 May 2026 12:04:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0617339A7E7;
+	Thu,  7 May 2026 12:05:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="oDl0EX7P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f68.google.com (mail-ed1-f68.google.com [209.85.208.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A59C35B633
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 12:04:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB763B8BC4;
+	Thu,  7 May 2026 12:05:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778155492; cv=none; b=OXcgGGI06jKPrtCCeoYkx40/qx6HfdQfM903Oh4u5xHoZeIGHnT1IjSvLz2luDwG5FsDXGCKyHzUKXkD6DmaFtiTzOESHFf0E/2t4YuJTyOk3ptcGEuyo4KYvL50L6oV3vCcRQQg4qR9a6fDEJ9dE43fyEpOP+e5Kw42B6gDEDQ=
+	t=1778155542; cv=none; b=vFWoPjg9VKVw1XhWs00nck4ef/c7eeAMXt7910uafpHytxitTsl3fQsh8hmfmS2OL6vZQm89kd58vFUqjreSE5vtGq0tQgO3PQCEMdUFkFm7kmW1ZHxMTdzlMCy2/MIfgfpp12uvZHZtERIagsfYELcFpVjVTJ4sPh+SawPexgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778155492; c=relaxed/simple;
-	bh=hSUG09nHENB3l3k2WSy3g2qFr4tySgF/qi/LSfVUZ/M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eUGC37wqDfHeRcpcKA8Ma/7lH/J+6u5G+GZo1cl8Qb1uTrmeEDpUAp9jZwzs12EaucvGdvghmbI/eNtu6KlRcTqrk0FUY/1KGjfbOI+CbAr6bKOpwOQu7Y3nKIFK7gE5SiHUkuRvyjaHzDESiOeu5s5odwBsh3ojUOCBD4fbf34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f68.google.com with SMTP id 4fb4d7f45d1cf-67b7c77865dso1154452a12.2
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 05:04:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778155484; x=1778760284;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6VSQz3qWSBmu4rhZHr1DZdjiE1xIcn8ousLUryflVY8=;
-        b=FZYyV+OqBLLPCw1zF7gTLouCvuYU8uYqDSq11Ktpm/l318ctiNGRvd1ieCRAL9831b
-         Zlb+CL/VZAJl0X3SsdAvYBSIV4Yd8keobdRWZO4tP1HhcxnfM8ZCyCsWmkVBS50XSloq
-         uMrEBxhMFFwtlKlRgKxXmfSYk/iBNQUmtVCMjoKCnbcjPIF+BWWiSOjuGHLIJhmZPR6P
-         ksS+fY0RjHeYIlEGblQB39S5jV2F/e7gQlhV1ckC4s3CdQgHIrxkWmX+Iv8Pu9I1eHHT
-         Dgxendr0d1+GLLC/vOJT6JiSdf+nrMfa6JGLATeirfwhoiE8Gpzruh/eZHjkKBjcr0xj
-         RP5A==
-X-Gm-Message-State: AOJu0YyvjZI93mlmDGBtsUBDWWtvohP5SeyhiesbIrrSwFuht420DoGH
-	E235ZqFbCv/pQGInN/14oWNoJaWBUdmZYZMu8d4TrA30DJFIuEQDQiKdThqV8Syh
-X-Gm-Gg: AeBDieskcUHcy/cNKjrHaf/7OZMcNQgaW7r+VzCoCOx9Gu0UmY2wE59SidDUfIABSIt
-	KEWyAo8KIyvQ+81a++3spEcdThFhqSO+Zmf5ftidvlBP90jP2enkiic7xGbpK39LycKmWHdFWw7
-	Ow+4wDKn1K77vxNMRRMIdh1NwPXb1p4GbsacuKND1+YIs7oxgMuNsFnJ0e9ImIfBCoctGJn/mI1
-	OEY1Iznl9/wOkSVrYQZ+bf+LZe6n8TNWTB6PB4H0yHGoTwd4o7CnI8BkF7+l+KVqx5G9Dm3boA/
-	h9vnrNJp+Xgp1EIJJ/Iki8bjsWyC7dYkMygatUo6CZc/owOwOCeb+1FC0e5CZ6ZZvF/aOBUvg83
-	M4fGdsr6LHEWgRrSx6GvKyvH+wuzGo7HlW7TwQCGT+0gRJ4bZLvHg4DtUjvVfTeCmu7TjpO29Ai
-	YcoRhHV9JwhlRD7EhCEQkCTqhRaUvbqTBjR3chDd/XJyeBYLQdxZKoksl0iF/1aPkaI5atWpapm
-	cgcEkrb1bkSRiknTKk=
-X-Received: by 2002:a05:6402:e07:b0:676:54d5:bc5b with SMTP id 4fb4d7f45d1cf-67d6489d7c1mr3837204a12.18.1778155483468;
-        Thu, 07 May 2026 05:04:43 -0700 (PDT)
-Received: from im-t490s.redhat.com (89-24-32-159.nat.epc.tmcz.cz. [89.24.32.159])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-67cd90efee1sm2006365a12.11.2026.05.07.05.04.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2026 05:04:43 -0700 (PDT)
-From: Ilya Maximets <i.maximets@ovn.org>
-To: netdev@vger.kernel.org
-Cc: Aaron Conole <aconole@redhat.com>,
-	Eelco Chaudron <echaudro@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jiri Benc <jbenc@redhat.com>,
-	Yi Yang <yi.y.yang@intel.com>,
-	dev@openvswitch.org,
-	linux-kernel@vger.kernel.org,
-	Ilya Maximets <i.maximets@ovn.org>
-Subject: [PATCH net] net: nsh: fix incorrect header length macros
-Date: Thu,  7 May 2026 14:04:26 +0200
-Message-ID: <20260507120434.2962505-1-i.maximets@ovn.org>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1778155542; c=relaxed/simple;
+	bh=EslzJJMqkthcUMFMyk8m6chx1s41wR3exbqWEeSABcI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=I/o9kVqOEGFBJbmgCUrjV/S4liy23mp3uSRnUGYhaP0odrWnTRqy010sfcmmjzq2/cmYOupWTvKSMMqlX6WGsJ0ZYaMXxyuJWOHXUtA5lePlvMmexV4bqLiIce5iXbmIDlCMoHMd6+mkJVRCo2GjNRSAJiXJuYVWtjh6jVF57Dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=oDl0EX7P; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1778155540; x=1809691540;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=EslzJJMqkthcUMFMyk8m6chx1s41wR3exbqWEeSABcI=;
+  b=oDl0EX7PQCPdo00zhdWsO2rU5feOIH2senzwarx3HO2o9Zv3Navrh9H7
+   sgq3w8hq0MVF2H3jb3gWluAq3qY+GA+8l1G7DdxuRWbM5/H9ULX0UFb5y
+   WvrPcW+0rdt0L91dleQxJ0Lt109QJfTHjOTMfw1vY9L0SI8ZHrMM+dnaH
+   6bRO/x9B/qkjdbMsUaWccqANwuEw7rD+vAlmz5aM4rVAwbVB/H/e6ar71
+   3ZhpYth5rvBNQUPSslSXDeybW/+3gto1tI6tMct3GksU0MdnIUJCQ66bQ
+   J8rZId0HWRf99OHi8P/hUZd4QmbXc2eSDdNuJxSeN4rsuTn3eUg635b8Y
+   A==;
+X-CSE-ConnectionGUID: yBpSBo4qQtCNmd1ecBacGA==
+X-CSE-MsgGUID: tpTIs552R8K2d6BHX5VvgQ==
+X-IronPort-AV: E=Sophos;i="6.23,221,1770620400"; 
+   d="scan'208";a="224414037"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 May 2026 05:05:39 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Thu, 7 May 2026 05:05:38 -0700
+Received: from ROU-LL-M43238.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Thu, 7 May 2026 05:05:35 -0700
+From: <nicolas.ferre@microchip.com>
+To: <theo.lebrun@bootlin.com>, <conor.dooley@microchip.com>, Claudiu Beznea
+	<claudiu.beznea@tuxon.dev>, <netdev@vger.kernel.org>
+CC: Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>
+Subject: [PATCH] MAINTAINERS: change maintainers for macb Ethernet driver
+Date: Thu, 7 May 2026 14:04:44 +0200
+Message-ID: <20260507120444.9733-1-nicolas.ferre@microchip.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 769714E7F43
+X-Rspamd-Queue-Id: C8D7C4E7F68
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-285295-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[ovn.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285296-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[nicolas.ferre@microchip.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.980];
-	RCVD_COUNT_FIVE(0.00)[5];
-	R_DKIM_NA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ozlabs.org:url,ovn.org:email,ovn.org:mid]
+	DKIM_TRACE(0.00)[microchip.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:email]
 X-Rspamd-Action: no action
 
-NSH header length is a 6-bit field that encodes the total length of
-the header in 4-byte words.  So the maximum length is 0b111111 * 4,
-which is 252 and not 256.  The maximum context length is the same
-number minus the length of the base header (8), so 244.
+From: Nicolas Ferre <nicolas.ferre@microchip.com>
 
-These macros are used to validate push_nsh() action in openvswitch.
-Miscalculation here doesn't cause any real issues.  In the worst case
-the oversized context is truncated while building the header, so we'll
-construct and send a broken packet, which is not a big problem, as any
-receiver should validate the fields.  No invalid memory accesses will
-happen during the header push.  But we should fix the macros to reject
-the incorrect actions in the first place.
+I would like to hand over the macb maintenance to Théo, as I'm unable to
+keep up with the recent flow of patches for this driver. After speaking
+with Claudiu, he indicated that he is in the same position as me.
+To help with this work, Conor has agreed to act as a reviewer.
 
-Using previously defined values and calculating the length instead
-of defining numbers directly, so it's easier to understand where they
-come from and harder to make a mistake.
+I was given responsibility for this driver years ago, and I'm glad to
+see it continue with talented developers.
 
-Fixes: 1f0b7744c505 ("net: add NSH header structures and helpers")
-Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
+Signed-off-by: Nicolas Ferre <nicolas.ferre@microchip.com>
 ---
-
-These macros were fixed in the userspace variant of this header some
-years ago (by just adjusting the numbers though):
-  https://patchwork.ozlabs.org/project/openvswitch/patch/1540503710-23597-1-git-send-email-pkusunyifeng@gmail.com/
-And there was a patch a few weeks ago with the attempt to change the
-validation for push_nsh() instead of fixing the macros:
-  https://lore.kernel.org/all/9d2b5c6127e149ebd35094d662bfd008c20347c2.1777120226.git.ldy3087146292@gmail.com/
-I haven't heard back from the author, so sending this patch myself
-to cross it out of my todo list.  It's not a v2, as it's more of a
-separate change, even though the outcome is similar.
-
- include/net/nsh.h | 4 ++--
+ MAINTAINERS | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/nsh.h b/include/net/nsh.h
-index 16a7510938969..15a26c5908151 100644
---- a/include/net/nsh.h
-+++ b/include/net/nsh.h
-@@ -247,10 +247,10 @@ struct nshhdr {
- #define NSH_M_TYPE1_LEN   24
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 37b105a443dd..ad60104f30a1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4181,8 +4181,8 @@ F:	include/uapi/linux/sonet.h
+ F:	net/atm/
  
- /* NSH header maximum Length. */
--#define NSH_HDR_MAX_LEN 256
-+#define NSH_HDR_MAX_LEN ((NSH_LEN_MASK >> NSH_LEN_SHIFT) * 4)
+ ATMEL MACB ETHERNET DRIVER
+-M:	Nicolas Ferre <nicolas.ferre@microchip.com>
+-M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
++M:	Théo Lebrun <theo.lebrun@bootlin.com>
++R:	Conor Dooley <conor.dooley@microchip.com>
+ S:	Maintained
+ F:	drivers/net/ethernet/cadence/
  
- /* NSH context headers maximum Length. */
--#define NSH_CTX_HDRS_MAX_LEN 248
-+#define NSH_CTX_HDRS_MAX_LEN (NSH_HDR_MAX_LEN - NSH_BASE_HDR_LEN)
- 
- static inline struct nshhdr *nsh_hdr(struct sk_buff *skb)
- {
 -- 
-2.53.0
+2.43.0
 
 
