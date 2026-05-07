@@ -1,169 +1,241 @@
-Return-Path: <netdev+bounces-285454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285455-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KAkiAkXR/GlhTwAAu9opvQ
-	(envelope-from <netdev+bounces-285454-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 19:52:05 +0200
+	id YIKTG2vV/GlvUQAAu9opvQ
+	(envelope-from <netdev+bounces-285455-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 20:09:47 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D1904ED146
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 19:52:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CAEC34ED3CA
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 20:09:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8ED163020015
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 17:47:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9DE09301FA6D
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 18:09:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA91845BD7A;
-	Thu,  7 May 2026 17:47:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FAAD43E9FF;
+	Thu,  7 May 2026 18:09:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CT6eV0Uk"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="jgEc5w9Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.245.243.92])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 336474611E1
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 17:47:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2799B327BFB;
+	Thu,  7 May 2026 18:09:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=44.245.243.92
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778176036; cv=pass; b=SwkeIUBSsfc6Wx54OFC0UMhwzyu5TkW4d1Ri6hWjN9iZ+/W5qq4cDwsNUV+kJiAVARDuwrWTZ9KSX0OE9MyYzBlZYK28e/XxNWpM51gF0EER6N5fTVfmLmnhgZbbHQQXxayuoiT4GfVk3PA7fivGw9mDsuVmi3HYMrlGats8ybo=
+	t=1778177376; cv=fail; b=S+LFKXXhH6hpBCZN4/Hj3aB6PRxeYwlfmL0fGw6LKb5DzrNKeBcHVPoXfrnGCOcqHE7SqpYgan6ZhUkLVEbhIChGJKbh3I5Vh5cXmVYi7xYEHkx3IV8YtH4FL7m7aZRdXKOkUG4YBENuB9QrQTSygu1apBnYtIA5ZGjJnYHSHRc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778176036; c=relaxed/simple;
-	bh=3Zn30fkFKlJSdP2LvpHGyWzzLtY8CCnDkyZEefTVO8c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eyANcquguVIHYmjiSH64OQS4gB94SjxCTQVYEJFGhWXCc904BV3tFjVpmmP3TS1m1tyDqVpohYcMDyyRfvVCqeJcG9W0iG5W6kijoQIlyMQGdZCcDIN/341akY6cYHYKSQ3slFuNQ4flIds0FXHorX6kyDuAELf4ze79/E8mb7c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CT6eV0Uk; arc=pass smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-8cb40149037so105183185a.2
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 10:47:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778176031; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DVOb10QFhVqsW0le/GAFQ1MyhyX6X9t6dIo2+W7Jp4zsG6xgL7YtLAUn1xoG1q/pmd
-         ZGSWuko87AoO0wDJwcJXcClYu0Q2/7O+npEYicQhufliQOg3ZGLtH6krr/MRMoyE33aa
-         vaZ5AFWz6eAXmmPnj9s5IySnQX+MXfx5Wq8TW2Wnw2f6166pbCr7a9Ug7wSblXddtq3d
-         /5oJIkrFdKpJswdlWMWv8dsx5VJ4fowOgvKCt1182RLL1wgf0eN0ErvmC6yrsVqSgtOE
-         04MSKihEpa8pOgAxYQOk5gnlYgyfmr0u602B9UDjE0pSqBUR/OhBfjy+1HL0Y6js5Q+u
-         22YA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=3Zn30fkFKlJSdP2LvpHGyWzzLtY8CCnDkyZEefTVO8c=;
-        fh=A/8zJ2w1upap/OR0Q7dHKRTHOV4kvEvzDr7dXBgIrcA=;
-        b=ScJiyHSFqccR26BeD/cMzUzLRxECAMRRr23vVDdkol0PcJrjw8Xr9/znVuaAqP8IRe
-         NKP9yopuTbctWFkVyDR1YcRwwY+/wC2ucVBoIfpw2actebgVntuSXWVLAEcErzbT9QeT
-         1ezP5WtoiCks54lerMmmbtThmf50Sx4ZF/weaj4p2tjrhrNlH8oxV7Bv/J5Pv4xIVAKV
-         dGQySRIk7lGPzW/IecNSzt0stwEGgL/J3zSaHwKtN94jgBL+CSnB3KRWQ7iaB9X/cZgA
-         z3Xe/esSuoTcsI0QGaLS+FlP7InzymMh17fpg56/8CyEA/tthAkmeFsUSYGgHTh3ikdv
-         xyFw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	s=arc-20240116; t=1778177376; c=relaxed/simple;
+	bh=R578UJCnKdrVIN5iipNpotPSWXB/3rILaBAN8Q2aYbs=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=njhJOKzdxURyCI/v68/ISsFAAOpm5NBEQMX4Dt0u2BIrlhPT9mtILeh+eranRLWZSCs6FXqlGCR//+Idp6nEgaPjgK6IfkuR12yl8h4W6DfZfuOnaWMuvOIogLHetRCUaGuGAOdlxvzAQwSsCKUkPng3wOQh8pLUV0Un9LLWZ8I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=jgEc5w9Z; arc=fail smtp.client-ip=44.245.243.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778176031; x=1778780831; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3Zn30fkFKlJSdP2LvpHGyWzzLtY8CCnDkyZEefTVO8c=;
-        b=CT6eV0UkWkYNuo0AI1NbHF8bvSYvplbg/7hjC7cmDt1MWnuIZONXeTBkbK/2ssnaDu
-         a0VHMEzT6r2rX8NQRvAW/I8d1Daw85PYUN9r5noNv90rfGszDt66LfeC9xMrnaoRJzdR
-         eiH/QoCKArjcTiGsbY897Kel8xn3oFWZQ1ndJeHDEuIhxnH4tJ7rimIMtRprj0NRbeOv
-         Z5aNNYT6XyY6d0DgATen5uX90fIStivCfn+tnMgl6Nr6pP3nzN2we/e86IyDjpdVakTV
-         VsiVzxfLcyW8nCqo1Ql3BmqZpk0cOEv704Ucw1MeZsZGtuWXTd49ZG4w1yHzKAlyzplB
-         mlPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778176031; x=1778780831;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3Zn30fkFKlJSdP2LvpHGyWzzLtY8CCnDkyZEefTVO8c=;
-        b=R0IYE5IRtkyM1PNUbtEndsOLxSulEudPhdSLk7YNEGGkB/C8ivDIZFXXq4CD2V8Q0Z
-         XJFf6F3KSRYOUAT4yJv1+P8F56ewGjQyFbkFIUqQc0cng9SB89cCj/zEXBzD6WwujtIu
-         ToUlCqvFPXm31tafjPE19wmU7HTdlQ4n8iYEDwGxVr8wokCYlIJoNTEcGaZy1OQztsqS
-         g4wplY3ZzhXGgesuJOyUWDdYyMDct1jMhsm6bdf53WrKhSivdpM0z86z9Bnrg/5Vf9oP
-         4vxc6aoaHHzjko1364Jg/EXFeoZINH3xorrq3jKgAJIRAh8wIqQzwr9nvJGNL9yvExdK
-         LirA==
-X-Forwarded-Encrypted: i=1; AFNElJ+qUxrzSJ4CU4MwuTPi/yLXng1YhOtxtU8DBYi7i0r32cddapKqDwbylPOLsIYtthwFtDkOZVQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YycOf/ISg8OVcC+0CtE571S4GL3KxVYlePZ8VMRP3hq2omhgdxK
-	ZDzEt2Nv/FM4ngInZ+YkGlhpSEjAw/3N0ii4NQIsC43Fd6bw5b/xA8qAhROwtOF42okdpYgUUm2
-	zijYFo0/+bChOTQWUztGhhzYm9zF7fhkOsfzavG1P
-X-Gm-Gg: AeBDiesZEN16zHzBaUuss2ip6iemQJKQzurgqgDHuGoC2XtO0WQjmDa2iUGIc3jCI4m
-	ErqzRwQf24ohSawjrS2dV8LMbeuZaa/TMGxUhAMOhnFSOREZb53vv8hJHYOhP9yERO/MUzWbWal
-	Q0z1oNBibtoXoBy5sRh3rjzDYbVSb8WCcre1ZniObXPK45nbQdJweDMmdvQRIpB4YrAsZSPSpp7
-	pxMT0BRTismR4qClhZPG7J0VAFseWaJQW41F+jVSgSjrna8q2/TCaYA0PnOIDt8AmI8/MMGVO0U
-	EQbxujBMVyFASM+tGJiPOQSWT7qwktxqIkIk73ndoZM51fKwlK2wWzeVZVvnxOwhSz/9yPe2I3N
-	0BvNtxcZVKuBMwhjmApvufIxNJb9BXLM=
-X-Received: by 2002:ac8:7f85:0:b0:509:127d:ee06 with SMTP id
- d75a77b69052e-514621efd89mr121415031cf.58.1778176030762; Thu, 07 May 2026
- 10:47:10 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1778177375; x=1809713375;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=R578UJCnKdrVIN5iipNpotPSWXB/3rILaBAN8Q2aYbs=;
+  b=jgEc5w9ZNkB4qtVNvpI4UUei/w0QCWivF3kG+/qR6ER9TPTbnV4tJxCX
+   vxkE20O6RCuaE52WTyxs5XLx6YOP8xnNYP7ldenogOx2Slc13X2mcFm4t
+   Hu7px/+N6sPmtzaQyW2UQ3qscN1jlskFckSNmHrHjiBIvwvRWhGXdaH37
+   qBCDTljWEck0PIctEhb8OQYDi3Kfy1MWvmqdpcpmhCco8RLtR/VQgSQO5
+   wU4XHD5aabdI7xVRNyAYRq8x6QuyBmFAbi7l7ai8eQenTG5XzKcmZyBOu
+   Rra/gX4BxR+9LfembfU1QzFMSdBlhJk4WQsXw+xXzmtE6jYcFpl2efYvd
+   Q==;
+X-CSE-ConnectionGUID: 6LuIPEgxTC2Vw0YWm13wCw==
+X-CSE-MsgGUID: yT4wB25mR/ijw/HwP9/eMw==
+X-IronPort-AV: E=Sophos;i="6.23,221,1770595200"; 
+   d="scan'208";a="18630738"
+Subject: RE: [PATCH net] net: ena: PHC: Check return code before setting timestamp
+ output
+Thread-Topic: [PATCH net] net: ena: PHC: Check return code before setting timestamp output
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 18:09:31 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:13984]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.42:2525] with esmtp (Farcaster)
+ id 0103a352-40b3-4c35-9b10-616e220c3d7d; Thu, 7 May 2026 18:09:31 +0000 (UTC)
+X-Farcaster-Flow-ID: 0103a352-40b3-4c35-9b10-616e220c3d7d
+Received: from EX19EXOUWB001.ant.amazon.com (10.250.64.229) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Thu, 7 May 2026 18:09:31 +0000
+Received: from EX19EXOUWC002.ant.amazon.com (10.250.64.172) by
+ EX19EXOUWB001.ant.amazon.com (10.250.64.229) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Thu, 7 May 2026 18:09:30 +0000
+Received: from CO1PR08CU001.outbound.protection.outlook.com (10.250.64.206) by
+ EX19EXOUWC002.ant.amazon.com (10.250.64.172) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37
+ via Frontend Transport; Thu, 7 May 2026 18:09:30 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XJTTHaBxnexGENSRmvKLTG4r+0L46omTxl8IwYoEa3qZxa0YrTG99V13DForA5PqCs0xyFIUVom0FzA5EsjILCRRP9xSU5xdsOMRXkGYemaPwMnoV7t/LbJN2lA8aakYAHO5NCSQNbWRB6iEKGC/XA36cj4KSsqaNLLOqC+r52Dl/nsBOi2KODjbj4jAfrODO1ZHSsd7n2mh8oSH7D8uNm4UHgJVAn6nIrALvqDopOY75hQSFPK5hWwcC+HkoaBf16Qa4dzsA6cNAJ0M8FqDGVtSWhUue5N+eLJnCt574ccfPszC5fXLDmOEjrVHjukqEUScf0fTZhSQMFZ36Fb+Ag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=R578UJCnKdrVIN5iipNpotPSWXB/3rILaBAN8Q2aYbs=;
+ b=FnPlUvdxF/h92c+19z49US6Mgo8zAwXAdbZzZzwtffX2VsnDvzJ43EpmrkYzupbajAQWv5pkkrGZlzqonMmuURr9uZJNv5ydo5APs9ABmATW+RjcdHH5PuvYZVfygElxsJ5eLRLzfEyveiztHC6zSR/U9WgYi4R1zLBQCwO4Fv/WQIFL5bqjkSwWsV91ry4ikL+eTc3GZX9pMCgP7SbEHqAQ8bLsIUG9VnQqb3YlAGDKioMv9foFfwx5s3YoTINR9mdIfJJCDkrG8we0SYTEzJnPpNqAbbJEW0LpIxlOASdiUFOf16Lr/QnVuZYj+gRZ/qqQ1It0FFV/6+1CqHZWCg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amazon.com; dmarc=pass action=none header.from=amazon.com;
+ dkim=pass header.d=amazon.com; arc=none
+Received: from SA1PR18MB4664.namprd18.prod.outlook.com (2603:10b6:806:1d7::5)
+ by CH0PR18MB5481.namprd18.prod.outlook.com (2603:10b6:610:18b::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.17; Thu, 7 May
+ 2026 18:09:22 +0000
+Received: from SA1PR18MB4664.namprd18.prod.outlook.com
+ ([fe80::972c:f0e:7126:9112]) by SA1PR18MB4664.namprd18.prod.outlook.com
+ ([fe80::972c:f0e:7126:9112%6]) with mapi id 15.20.9846.016; Thu, 7 May 2026
+ 18:09:22 +0000
+From: "Kiyanovski, Arthur" <akiyano@amazon.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, David Miller
+	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+CC: Richard Cochran <richardcochran@gmail.com>, Eric Dumazet
+	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, David Woodhouse
+	<dwmw2@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Miroslav Lichvar
+	<mlichvar@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Wen Gu
+	<guwen@linux.alibaba.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"Woodhouse, David" <dwmw@amazon.co.uk>, "Sarna, Yuval" <ysarna@amazon.com>,
+	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
+	<matua@amazon.com>, "Bshara, Saeed" <saeedb@amazon.com>, "Wilson, Matt"
+	<msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
+	<nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
+ Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
+	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Dagan, Noam"
+	<ndagan@amazon.com>, "Arinzon, David" <darinzon@amazon.com>, "Ostrovsky,
+ Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>,
+	"Bernstein, Amit" <amitbern@amazon.com>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>
+Thread-Index: AQHc3blxxl08Jw15aEuVMUz4ywsvgbYCX7mAgAB8D3A=
+Date: Thu, 7 May 2026 18:09:03 +0000
+Deferred-Delivery: Thu, 7 May 2026 18:08:54 +0000
+Message-ID: <SA1PR18MB46642D5E1B1C507A7C282E90D93C2@SA1PR18MB4664.namprd18.prod.outlook.com>
+References: <20260507003518.22554-1-akiyano@amazon.com>
+ <6511ab18-250b-436a-a11c-f50e78334666@linux.dev>
+In-Reply-To: <6511ab18-250b-436a-a11c-f50e78334666@linux.dev>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amazon.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR18MB4664:EE_|CH0PR18MB5481:EE_
+x-ms-office365-filtering-correlation-id: 7176f7ee-3007-469a-cd52-08deac63c3c8
+x-ld-processed: 5280104a-472d-4538-9ccf-1e1d0efe8b1b,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700021|22082099003|56012099003|18002099003|3023799003;
+x-microsoft-antispam-message-info: cA8YkTAcrtKLigjYElpBSyuGtaS51Eh7nlK5hHj6yRKyZ5Q4AsvInD56yZ3UmDQca7BhaIxMNe1EKNfDYHIBNP87zBQ/fsGCUWFV+T+rt+LNnWG4Lv3D4v1NgGASsPlGarsJ9/2P+15zTixbObfwsSR6p0urp2if/YCNB3f1DKNY1S/3LXGLNZwqiJQsSr7Q5IOAO9YBsx25DccApgSCZImLHPKChGkELBM9IfE6b20nk8t9OU3kas9UGDUelC94hIpgt2BkO55FOPSk2qYA/aHbX9g4P9RvSkEDLB3KbKHDUd5W3puWMD6VPmDYXjLrG5A29OHqvSsKkWC3pnwOwZ+e0A+tWGhVgmVcrDynwyNMw5Xr1HNWacMAEtE0z/bs6mjbZR0kFZlPrj4fEDK2tBu6jO8Klmx9suNeWLtsuD26L00Z8z/TryS2RxfZAOEpuANaETXbQX+VRQ//on99966G4BYv3vZbYm66tLF88h6tS7fLbJqscm+cAXCoRk85Un0heruTYi3U8BJwMOFEFpOqOyjCtGqUfigD5cY0G1vSYm+opizMkL7uiyvxwcvp3T+MDvgwG4yg3dkyR9TyHILMG1rIvIbum9JcjO/mQIZPA7cHPb1oL1ZbeOvW7LlNl/+l2c+r93CsWS8WaDkarbGoYq6cdzkcq1y60N6h9rnt11txYf5kuX+h8qVv6GrY9jLnz9jVsVab+0EkWF16nAH+oVyyNlEX0RqrpEUfSiyIPNRXQkeG2sMZNKtdHrFe
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR18MB4664.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700021)(22082099003)(56012099003)(18002099003)(3023799003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?bG1xencySEtLRDF1VlZtWnZlSVlkVFJ0ajljWVJ3Um9IR0c1cFdkcFVZQVBi?=
+ =?utf-8?B?ZXBHbzI3MlcvS2pIUHlEOXVKN3o4OTFWZHNkajFJdWU3djN6alMwVFV2VWlR?=
+ =?utf-8?B?QnA1OTlBWHdnSXdmYlBBRVRVbm41VVF6VjFReTBSanRkTis1NFVFMVhzUEM1?=
+ =?utf-8?B?bC8xMWsreTVrejRHeGtyS3l3d0IxQWluRFpvQ2ptaFhNVjB3L2szQWNvZURu?=
+ =?utf-8?B?enlUWG5YSEE4NVp0SytzcDRsalRsdDhPK1R0NURSejZPRm5DeWljMlRRODZP?=
+ =?utf-8?B?NWNCZXhMVWoxaCtHc3Y0T3hkaGZaRE5yV0laSXhZcDRrdStTNVROK0ZBeWtm?=
+ =?utf-8?B?WVdIdVgydHhIL2Q5UFZENmhMWlpvT2hzR0RZQUZpT0lXSXBYd2dOaGJ1MS82?=
+ =?utf-8?B?bzZVdFE5aHV6UlNPbkFkZG9selU2bzNUcDN4cDJIMWlNNy9sTUkxV25icHJx?=
+ =?utf-8?B?QlJsN2pIUE9SVHRScWlOVnVlZlJnNEV3dDR2WlozbG1xUVNWTUZqR0hnMFpQ?=
+ =?utf-8?B?cnNITDhWVUZYWnYxQ0VqdHRRTCtKL0lPa004VmhhKzNvZFdyUkp3cW40K0Ft?=
+ =?utf-8?B?RnZpNkpRamxTVDZ5THlKazh5MVpwMTl6Q1FEaTdlS3BSMy81ckdqMkQ0ZkpS?=
+ =?utf-8?B?WHNjdEllQUFSVTdaVHdZTXI0VThtWDgxY3pRVnlzbUI5RzVPMVVXTzNqUlIw?=
+ =?utf-8?B?anFVVTdlTzM3YVNoT2VGNFpXb1phK29LZmxLNHFOS29yajNuQ3QrMGJLM2d0?=
+ =?utf-8?B?d0gwbWJ2TzBTNEFLZ0xSMTQzTmxKVHJrYzQzaHpBbkIvK21KdmRIbVVMekhn?=
+ =?utf-8?B?UDFrN1JoL0VGVzNGL0Z1QkU0N0JMc0ZUSi9QcDVJaDNhc1VZa0tnUXFkYjll?=
+ =?utf-8?B?R0ZmMklXeTBIZm4wVk9rN3VFWGVDR2JIbUIxVzBQSUhvM2Y4MW5SdXgyK0c1?=
+ =?utf-8?B?alFZM1JYbkVJM0czQUhpd1FKcFo4b3FpQmVNYzZsWlNma2hxOUprQ0tLK3Mz?=
+ =?utf-8?B?cmU1ejZFeUxxLzRpNnRGc2xKazI1YkRGeStvaEdQc3oycW42U25KdWVyZGZp?=
+ =?utf-8?B?ekl2TmhqMVhvTS9uMDVpOGQ0QmZHbXVhME42eEdHNkNldUIvS2J4akRKMFJE?=
+ =?utf-8?B?RW9sc3FrSHo5aTdCblpwek91RFVDWDlqaGxjd1FWejYra0gyYmMrZDNiYS9i?=
+ =?utf-8?B?Q1cySXVSRjduS2Z2a3VjSlpJbFNYRlJPc1lQdTh3RnFNOEhzZjl3Undxbkxp?=
+ =?utf-8?B?b0ozTFBMN1VsTzhMdFltdTRGYm1WRHRVRW5FZFN0YXlqdXhjaUJCMi9QSFUz?=
+ =?utf-8?B?KzRDMUFESk1ZQm1qeXI2bDVqcTJldDlPVmNMT1lTVitTdUx2akk0Ti9nRExK?=
+ =?utf-8?B?ZVFFcVVVVWxndXpNSStYUkNuYVk4NnJ4SExLQ2hiTUpIUXlLaUNFSndmeVIx?=
+ =?utf-8?B?VU90QnE4c3lydnVYaE1lcjdVSWFGeU5NL1krekJKTHNKbmIrcGVqUXZnT1ll?=
+ =?utf-8?B?TG5vUjhENEhuTmtWYnRpckFyY2VVU3dZUG81dFl2NlVlTEo5NTM0cXdnYktF?=
+ =?utf-8?B?bFFMOVg1MGtHQnpwbXlvcmE0VHJVak5IWEVQR1l2bDNZeVhwNm8vV3RVWE1K?=
+ =?utf-8?B?USs1RFRhU1hkc2lqbVpDL1hOVWdVM0U3aGFwVld5QVcrdExYc3huSzIySFhI?=
+ =?utf-8?B?QWxYNlRXMFhnWC94b2UxamZGRC9GRXJtNUhvN01RM3RRSGQwa1VUUXVWNHZF?=
+ =?utf-8?B?aHZHa2xuT2F2VGUrcWpPaTZET1ZPWXIwbXJQK0tQbE5jelVGUGxGNFBKLzNI?=
+ =?utf-8?B?cmhOb0JJQytiQUxyOEVKdExKN1RnTHJrSmJHcGxrUUlZVWFUOWs2UjBDeC9N?=
+ =?utf-8?B?eW1seWVlYnBabEtXbnU0aHZsWldpc2VxRVpObEU0blR6dkQvVTVXdXRBQXA3?=
+ =?utf-8?B?dzdZaTZsbjdxaFhpK3hjNmNFM0huM3lJV0R1Zmk3KzBFSEUraVlXSWZwd0t6?=
+ =?utf-8?B?alNsNngyczRhUmRVVDN2QnhiUmRWQVJqbzIybHpubHpjb1hIM3RnUi9zbXVO?=
+ =?utf-8?B?YXlXTmdkNSszRFBra0ozUW1HQkxMemQ5aEQvTUg4Und5WjZ5bzlrYnZzVENw?=
+ =?utf-8?B?NWptaW05UUhiK3hUVVlxVUg3S0h0aEw1aTQ0clFMeVA3TjF4NVhhMEVDQTdi?=
+ =?utf-8?B?S1o1eG5XRXlOdkRLUHBrTEQzREUvRUFSei9hLzVxLzFaNjJ4Y2VId1JOaVNR?=
+ =?utf-8?B?VHN0TG55WWttNi9sTjNJaUEvQ2JBcmZyU2RYRzF3ajNEcmZZRFVab0crM05E?=
+ =?utf-8?B?WDhrV3g5aVVqeVJ6TmJDeUhQRzFjRDRtTEsyUTFjQUV6eE91RDJQZz09?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260507174547.4125412-1-edumazet@google.com>
-In-Reply-To: <20260507174547.4125412-1-edumazet@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 7 May 2026 10:46:59 -0700
-X-Gm-Features: AVHnY4IjxS8iMOOA69UbCBHRqo6SjCvjxaPYPK90TV3gaaG-LM2ITBP8exr7ngg
-Message-ID: <CANn89iLJBtqdzzo-Ei3kvWcZ=kB-t=Fy=5hDTOKu73foJUk_5A@mail.gmail.com>
-Subject: Re: [PATCH net] rtnetlink: add RTEXT_FILTER_TERSE_DUMP support
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 6D1904ED146
+X-Exchange-RoutingPolicyChecked: OhVrP4EtbkJO2/mSLxMGiTPUSdFnzr12JBdUOROlG2G0W7v8becD0u7KlvjMBI5y5ZVUSIXMHV84yRU/MZd6S95DvawaXbTfVjktl/sQ4GMwpJr+/68AF/As+nTzk1Bw/hXc1g9FukJEgXJump500RQbAQTtFn5g4/d1lYj9cNgL1LrB8OLfXdkhdAvehmq4FZKwZJkLwISnGQCibHxxrHvjldzXTZI6TqhpQycmQyUoTsyccy9qr7qb2vZluYdWmDzw/gNkRjfLd4nu1J1uE5nntbh0YETHVgQjd0SyfG+AQxVVaz5ieON8t/KzpMEI6MJxEn5LxoxuAZ6fVM95DQ==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR18MB4664.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7176f7ee-3007-469a-cd52-08deac63c3c8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 May 2026 18:09:21.9336
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 5280104a-472d-4538-9ccf-1e1d0efe8b1b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 6zfLpDDynDJhWyvQAnwg4jssYGAGajhWqS3NxEjxmx6lMyhV3g2cKt3akhM9+FTXlHuInht1LzBbb/0uIylwtw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR18MB5481
+X-OriginatorOrg: amazon.com
+X-Rspamd-Queue-Id: CAEC34ED3CA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-4.56 / 15.00];
+	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-285455-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-285454-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[31];
+	FREEMAIL_CC(0.00)[gmail.com,google.com,redhat.com,infradead.org,linutronix.de,lunn.ch,linux.alibaba.com,amazon.co.uk,amazon.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[akiyano@amazon.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[amazon.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Action: no action
 
-On Thu, May 7, 2026 at 10:45=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> iproute2 can spend considerable amount of time in ll_init_map()
-> or ll_link_get() to dump verbose netdev attributes, contributing
-> to RTNL pressure.
->
-> Add RTEXT_FILTER_TERSE_DUMP new flag so that rtnl_fill_ifinfo()
-> limits its output to:
->
-> - struct nlmsghdr
-> - IFLA_IFNAME
-> - IFLA_PROP_LIST
->
-> We can later avoid using RTNL when RTEXT_FILTER_TERSE_DUMP
-> is requested, as none of these attributes need RTNL.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-
-Wrong patch title, this targets net-next tree (obviously).
-
-Thanks.
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFZhZGltIEZlZG9yZW5rbyA8
+dmFkaW0uZmVkb3JlbmtvQGxpbnV4LmRldj4NCj4gU2VudDogVGh1cnNkYXksIE1heSA3LCAyMDI2
+IDM6MzggQU0NCj4gU3ViamVjdDogUkU6IFtFWFRFUk5BTF0gW1BBVENIIG5ldF0gbmV0OiBlbmE6
+IFBIQzogQ2hlY2sgcmV0dXJuIGNvZGUgYmVmb3JlDQo+IHNldHRpbmcgdGltZXN0YW1wIG91dHB1
+dA0KPiAuLi4NCj4gSnVzdCBhbiBvYnNlcnZhdGlvbiB3aGlsZSByZXZpZXdpbmcgLSB0aGUgaWRl
+YSBvZiB0YWtpbmcgMiBzcGlubG9ja3Mgd2hpbGUNCj4gcmVhZGluZyB0aW1lc3RhbXAgZG9lc24n
+dCBsb29rIGdyZWF0IGFuZCBjYW4gcG90ZW50aWFsbHkgYmUgQ1BVLWV4cGVuc2l2ZS4NCj4gUGxl
+YXNlLCBjb25zaWRlciByZWZhY3RvcmluZyBpbnRvIFJDVS1zdHlsZS4uLg0KDQpOb3RlZCwgdGhh
+bmtzIGZvciB0aGUgcmV2aWV3LiBXZSdsbCBldmFsdWF0ZSB3aGV0aGVyIGFuIFJDVS1iYXNlZCBh
+cHByb2FjaCBpcyBhcHByb3ByaWF0ZSBoZXJlLg0KDQpBcnRodXINCg==
 
