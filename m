@@ -1,306 +1,214 @@
-Return-Path: <netdev+bounces-285139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285140-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oEi3FGIK/GkAKQAAu9opvQ
-	(envelope-from <netdev+bounces-285139-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:43:30 +0200
+	id iJxLCIcM/Gm8KQAAu9opvQ
+	(envelope-from <netdev+bounces-285140-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:52:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB3D64E2B47
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:43:29 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D28C4E2BA5
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:52:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E8CF43008D40
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 03:43:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EAF5530074F6
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 03:52:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 017162E6CC0;
-	Thu,  7 May 2026 03:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VIHh0qzp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 403F02E285C;
+	Thu,  7 May 2026 03:52:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+Received: from mail-ot1-f77.google.com (mail-ot1-f77.google.com [209.85.210.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EB5F2DC792
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 03:43:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778125407; cv=pass; b=nXxi3SCWB3FXcKhUf7zyXcRusTi8Wa6kJ6cwvzB21QSHclUJREbwO32rECxZnyp2J5JhA5l7vaYliO3E5vDKRtla/7RGM8EKECF6vJeR2aQJ6nYnJzKAMkO/oOGovL3Nd+VfNbVRPH4ByHPzoBEUGF4kE1iLH3Ey8ALmHHKek1g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778125407; c=relaxed/simple;
-	bh=aRKnidp3Q05VqBbc2S/w3FeyyaWE66PWhaoPodWVk2U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qngAgqbX9+hJjgu8vL80N58D1Png3gLt7vu1GYy8JVPMnYy/PHiUaNYnk2LHuFXZBaj7t5t/TTRQ8IUwT3N9/VfEkS2MWPxWoMqC/SYPOSgj0pHPjAbK81c5R65E+BK4QpH0Zu74Hu8QHQ+kZuzhmMhx/xEfMgVm9U0kYSzWqpc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VIHh0qzp; arc=pass smtp.client-ip=209.85.210.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7dbcb467f2bso365156a34.3
-        for <netdev@vger.kernel.org>; Wed, 06 May 2026 20:43:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778125405; cv=none;
-        d=google.com; s=arc-20240605;
-        b=EoBA9PMCdMo3243FPkMsxPI37yTt00JGiwJe4NpwLS5tzprOwM+BZgMM3Lb8TnC3nS
-         bXvk2j1bX5cMFk0KxSoS4uT3pNoGwuJysoeI9DCrSrsgJXlH/TKR0vPM19wy7EObwz1m
-         UHkbkPtd9z7XnaANAZbMuvEUiFOb8klw35h8khFBPP86W/eyqhrKt+bHCbVbetCasazQ
-         BYz4oXHK5BcxoLrFc9J+juLXldSVTKbytS65gtsjqO5m+RFSrU3iO3Z/70jrggfYg0hq
-         ho+VByW7Y1D5oz8XUPjMsn92OE139kn9FlYGTBL2ORI8Y+DaiWEVD+UIzB9AHikPEjiN
-         +d8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=q3i1ZjGdgGDQWTUc11ULCcW0c9KwcFuhUwitu00k0gE=;
-        fh=sa0LY2vE9y9xkMqaND7GbekOJRgA3esgoYAjYMZBkEo=;
-        b=M8xP8nVx9/c5DAkOF6aZMqnJiWqlciLhUxCzpDIrtbm0/e9DeaE9d9rcH5tp9nsMwQ
-         ld7Ftlsa1vqa78tn8xeEb809gBpv+dk0z6FPefcykjAMJA9l++NUTyVEedrLyDFHkyHY
-         7Tt4WRV5vPVHcycJN7fXpEhRwdGetUzH1M1ljwlQDAG6MiT2rC41GWdVtOk929Yeo6Gi
-         qI2B5TZ+Mz/eWS1MC7tRNynjAhc1sdhWQ3a7wQ7JCMO0KaUzib7lckYSHu/Uz612By3y
-         9TjWMQ0mYK7UIy/z72GS2K/8dKZHHuQ9+UKCLHWF83uic9ZuWg9gQsGE3tHWm5LPTZso
-         Watw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778125405; x=1778730205; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q3i1ZjGdgGDQWTUc11ULCcW0c9KwcFuhUwitu00k0gE=;
-        b=VIHh0qzpUfuJSivPHbNLpX6MgWvyquIOxAc2k8mXczVRB7/GYtTvPTno1Lgn6orF/J
-         5J2DHdX8HgcVDXSkT2Ci+OkKfNAsbm88uWPsgYzBiInFhzKq4jAFEZ7M3bFZ/EgH0Bxu
-         AfM3vcEvCta4hjKdCuVHLw2/oqy/6qV4VlXnotGbwIiXU5ha9/JYzoHuCrz7URIX5Gex
-         sMQ9s87KGK0NUe5dbCn2lbEaaFtUv4TNIHFTzYsl2fhFlopDiUG3LYiQ/E+ddEO0i+zS
-         qTM/R2o32oFOhCclktNTk3hzFUIgXy4tGphyaQSwhA8wgZEGgf4my2JT2/8FHFj4A1IX
-         eNXg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACD322BE65F
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 03:52:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.77
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778125951; cv=none; b=N5g4RU35Llik1N63bZLYsfoOTGSlguPcHGQCD2eFohadzSuRnT9VPNM42hkQkBs+dFk70tGQ5MGM8EpBw2sb0xIgV26lxM9Hd2Jf+uKLiW78Jsq2atlvtiYGB0LTpV7thKMF7MTO1N+pGad+ZWw2cy6p3/A19eRKSqTgzlb+XU4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778125951; c=relaxed/simple;
+	bh=oMEUOwDU16568+OG0pwZfM+8KOgH72u9aq6R9tT6z/c=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=sFk6H2eJKBNmZxNNAa9axCrrF6bosTdW2ncDEuSuUDu9ek0Ifxwy1+XVAGSt93zqFy5SWQU9cYctFaz3HGfjoANRRAjGtTyWT8Ux5hcVdl/iMUvrwNrKGYeoNDA173Qp1VRuSaLVLl/JjZoRZM/uZsrIkbxcHCVTvqqxuNdTJQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f77.google.com with SMTP id 46e09a7af769-7dbd4fe0e15so1030073a34.3
+        for <netdev@vger.kernel.org>; Wed, 06 May 2026 20:52:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778125405; x=1778730205;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=q3i1ZjGdgGDQWTUc11ULCcW0c9KwcFuhUwitu00k0gE=;
-        b=BnRMag58fAi3C9FUWruF9fmBOnclCAz//4rcLuyXNwybepSP5ZDCD3zoYsXVBmtqZJ
-         RfzqhapQh3BVcjha6K6XjGJeUXw0PDJ+6SuxSnWsUcpswoutW1SAnCYGst86ymWR93UY
-         aK2O4gW9WPloGj6KQBWABcDSGYfKUod9ZUP+W2b0RngC2zIGC/9RoMZF5rvnBI9sPbBo
-         NhgenRCgURqgWcTRn5LBd2+0MGjMcSOrF1f7DC5idg2ohqE6VDtaK+bZ3XYOj65Z+PUG
-         yDul1uMVMFwNOUjhDc8IsV4bKu6+7Na/ZjCyCybUjlghohTKzhxZmEu13mqhFMxgYBDF
-         CIBQ==
-X-Gm-Message-State: AOJu0YwgLCbzqpc0Tw3yJsXASr2SrEJGPsRm+rRdtrrYEG3ItcWmx6Ta
-	ALhugA06H3ooDO14+7d8dlbrM11nCwQscheq0on67ASlokSrk0ZHVf+6r6eCOVWISjvhUIll/k8
-	fLm5sjReMhFAu1QYPuZ29trJsP25WP5k=
-X-Gm-Gg: AeBDiesG1KowGP/XIg18r/whaQGjtLesXmVaY9TEyhrqSKNOTHdmSmQDTVcU3q6LoWe
-	gvekzQ6cEvHjhPVJpvd9i8SK4P4uhYdfZFbrlYlUYx+IUE12oqthgJDWIqzyVNXPAUBypSkr+Lu
-	T3b4F8NOfJCARdUGQNHTf6TRLW/VP5ADRxUbyz1bZZnjeomoPkhcoA56d1LkGcSxZuHvmF+tZg2
-	PRxSAguny5sEokTs2LYxb4Stvit8VNUlc5ex/5/skAGvjK6J56QJlVsGfXb2C1fLbUevtwrHeUl
-	11qsrMJUZKUr7Y6cJsd737BEYv5eV4ER0TLe1Iy6Hyc5Q5rDhtoLYEpZytgh
-X-Received: by 2002:a05:6820:1793:b0:696:6d2c:92b with SMTP id
- 006d021491bc7-69998d1d63amr3177652eaf.33.1778125405313; Wed, 06 May 2026
- 20:43:25 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1778125948; x=1778730748;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=H0HSrMiYkrVuEd7IGCn11W+YArojUCdXH93mpX8mgVU=;
+        b=mWUDkeQ+pceGOMCgP8aYqtlQwoEClfG/FQ2YqwJ/V0aQo7RHE/FUF7lMG8j33G/tl1
+         N0WQN2jYlAIsZSPax+y4DpOWYh6oT0cl/ZwDuus2ZQOr10u1QoknufPhh6V42VkrvxsM
+         XVZ0q7r3FgRb5/T3QLJJFpBB1nrxhUNzCJlSO1+CKWMhyTS9spvHUjl+0G8ARH77n8Z4
+         wGJaF2VTBAQjLi8Lzu1iPzjxEukL0/4p5/G8lznL0Ow+D62zaeqjQMhBtSRtlhNeQPL3
+         SABSVAKEA8MkFYBai2UcZlPjZMOTuLw0aYC5oZ/kkrnyrP2PADooT3jQnULpSF2Kj1Jh
+         sliw==
+X-Forwarded-Encrypted: i=1; AFNElJ8XWn9OrCQCKMjvjPgkMfh6M8f0pvFiorZQ4sYu6nIGBI75bXSBvnr9gGAp9Lf7AcIsMaBrpvY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgwwRY0mZVr01wUFbvqSdHy6Bhp1Usam36ZyU6GU2XDH7VT1+J
+	odTXtd1YYheETMwou0Nd2w1WSSY2g7pA2Lf74Tw512sqCzBskxm2RdhXSScfoOVaEHVmdHp9nsZ
+	x+ZvfKF2wFOQZBKlelhnb3jvBDZ6XkD+FvBOJwo+K3hfPMqEcy/zKwEn00aQ=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260504101258.1608004-4-mmyangfl@gmail.com> <20260507012311.2187979-1-kuba@kernel.org>
-In-Reply-To: <20260507012311.2187979-1-kuba@kernel.org>
-From: David Yang <mmyangfl@gmail.com>
-Date: Thu, 7 May 2026 11:42:49 +0800
-X-Gm-Features: AVHnY4Kz2DpjSwL-PW9Ijw012NoML73jqi_gVdxwhybBru6xUf40tWsz3WruDnk
-Message-ID: <CAAXyoMNRAs0+Hmy7TFAcsRcxM94=pgWFdLw4twEcXs3w6aR6wA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 3/3] net: dsa: yt921x: Add port qdisc tbf support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, olteanv@gmail.com, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, jhs@mojatatu.com, 
-	jiri@resnulli.us, horms@kernel.org, linux-kernel@vger.kernel.org
+X-Received: by 2002:a05:6820:612:b0:696:7867:c3a6 with SMTP id
+ 006d021491bc7-69998ccbf4amr3573196eaf.25.1778125948663; Wed, 06 May 2026
+ 20:52:28 -0700 (PDT)
+Date: Wed, 06 May 2026 20:52:28 -0700
+In-Reply-To: <69ea344f.a00a0220.17a17.0040.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69fc0c7c.a00a0220.387fc1.0006.GAE@google.com>
+Subject: Re: [syzbot] [rdma] general protection fault in kernel_sock_shutdown (4)
+From: syzbot <syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com>
+To: akpm@linux-foundation.org, arjan@linux.intel.com, davem@davemloft.net, 
+	dsahern@kernel.org, edumazet@google.com, hdanton@sina.com, horms@kernel.org, 
+	jgg@ziepe.ca, kuba@kernel.org, kuni1840@gmail.com, kuniyu@google.com, 
+	leon@kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	yanjun.zhu@linux.dev, zyjzyj2000@gmail.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: EB3D64E2B47
+X-Rspamd-Queue-Id: 1D28C4E2BA5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [-0.36 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=a88880f0f312e277];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285139-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,mojatatu.com,resnulli.us,kernel.org];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285140-lists,netdev=lfdr.de,d8f76778263ab65c2b21];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[linux-foundation.org,linux.intel.com,davemloft.net,kernel.org,google.com,sina.com,ziepe.ca,gmail.com,vger.kernel.org,redhat.com,googlegroups.com,linux.dev];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,syzkaller.appspot.com:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Thu, May 7, 2026 at 9:23=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
-> > +                     NL_SET_ERR_MSG_MOD(extack,
-> > +                                        "Offload not supported when mt=
-u/peakrate is configured");
-> > +                     return -EOPNOTSUPP;
-> > +             }
-> > +
-> > +             if (!p->rate.mpu) {
->
-> Does this code miss validation for p->rate.overhead?
->
-> The TC TBF layer allows configuring overhead to account for additional
-> headers. If the hardware relies on fixed wire frame sizes and the driver
-> ignores p->rate.overhead, could this lead to a silent misconfiguration
-> where the hardware shapes traffic at a different effective rate than
-> requested?
+syzbot has found a reproducer for the following issue on:
 
-I didn't see it can be non-zero while testing with tc-tbf(8).
+HEAD commit:    735d2f48cada Add linux-next specific files for 20260506
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=14f0e56a580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a88880f0f312e277
+dashboard link: https://syzkaller.appspot.com/bug?extid=d8f76778263ab65c2b21
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=125c9f6c580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=166580ec580000
 
-> > @@ -1378,6 +1390,112 @@ yt921x_dsa_port_policer_add(struct dsa_switch *=
-ds, int port,
-> >       return res;
-> >  }
-> >
-> > +static int
-> > +yt921x_tbf_validate(struct yt921x_priv *priv,
-> > +                 const struct tc_tbf_qopt_offload *qopt)
-> > +{
-> > +     struct netlink_ext_ack *extack =3D qopt->extack;
-> > +
-> > +     if (qopt->parent !=3D TC_H_ROOT) {
-> > +             NL_SET_ERR_MSG_MOD(extack, "Parent should be \"root\"");
-> > +             return -EOPNOTSUPP;
-> > +     }
-> > +
-> > +     switch (qopt->command) {
-> > +     case TC_TBF_REPLACE: {
-> > +             const struct tc_tbf_qopt_offload_replace_params *p;
-> > +
-> > +             p =3D &qopt->replace_params;
-> > +
-> > +             if (p->mtu || p->peak.rate_bytes_ps) {
-> > +                     NL_SET_ERR_MSG_MOD(extack,
-> > +                                        "Offload not supported when mt=
-u/peakrate is configured");
-> > +                     return -EOPNOTSUPP;
-> > +             }
->
-> Is the p->mtu check overly broad here?  tbf_change() in
-> net/sched/sch_tbf.c sets q->mtu from the user-supplied qopt->mtu whenever
-> TCA_TBF_PBURST is absent, so p->mtu can be non-zero even when no peakrate
-> has been requested.  A user that explicitly passes the mtu parameter to
-> tc would then be denied offload with an error that attributes the failure
-> to mtu/peakrate together.
->
-> Would gating only on p->peak.rate_bytes_ps better reflect what the
-> hardware cannot do?
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/e65b731bdb98/disk-735d2f48.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/60db2f3d3f2f/vmlinux-735d2f48.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/55da282f7ab4/bzImage-735d2f48.xz
 
-IIRC I have checked that with tc-tbf(8) (or I used the wrong series);
-will check that later.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com
 
-> > +
-> > +             if (!p->rate.mpu) {
-> > +                     NL_SET_ERR_MSG_MOD(extack, "Assuming mpu =3D 64")=
-;
-> > +             } else if (p->rate.mpu !=3D 64) {
-> > +                     NL_SET_ERR_MSG_MOD(extack,
-> > +                                        "Offload not supported when mp=
-u is other than 64");
-> > +                     return -EOPNOTSUPP;
-> > +             }
->
-> Is setting an extack message on the success path intentional?
-> psched_ratecfg_precompute() leaves mpu at 0 by default, so the common
-> tc qdisc add ... tbf rate X burst Y invocation will hit the first branch,
-> return 0, and iproute2 will then print:
->
->     Warning: yt921x: Assuming mpu =3D 64.
->
-> on every TBF replace.
+rdma_rxe: rxe_newlink: failed to add lo
+Oops: gen[  127.022080][ T5982] Oops: general protection fault, probably for non-canonical address 0xdffffc0000000004: 0000 [#1] SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000020-0x0000000000000027]
+CPU: 1 UID: 0 PID: 5982 Comm: syz.3.20 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+RIP: 0010:kernel_sock_shutdown+0x2a/0x70 net/socket.c:3803
+Code: f3 0f 1e fa 41 57 41 56 41 54 53 89 f3 49 89 fe 49 bc 00 00 00 00 00 fc ff df e8 e1 25 c5 f8 4d 8d 7e 20 4c 89 f8 48 c1 e8 03 <42> 80 3c 20 00 74 08 4c 89 ff e8 27 bf 2e f9 4d 8b 3f 49 83 c7 68
+RSP: 0018:ffffc900015ef090 EFLAGS: 00010202
+RAX: 0000000000000004 RBX: 0000000000000002 RCX: ffff88802dd89ec0
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000001 R08: 0000000000000000 R09: 0000000000000000
+R10: dffffc0000000000 R11: ffffed1007cc8979 R12: dffffc0000000000
+R13: dffffc0000000000 R14: 0000000000000000 R15: 0000000000000020
+FS:  000055556d432500(0000) GS:ffff888125dca000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b34563fff CR3: 0000000042b1c000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ udp_tunnel_sock_release+0x6d/0x80 net/ipv4/udp_tunnel_core.c:197
+ rxe_release_udp_tunnel drivers/infiniband/sw/rxe/rxe_net.c:294 [inline]
+ rxe_sock_put drivers/infiniband/sw/rxe/rxe_net.c:639 [inline]
+ rxe_net_del+0xfb/0x290 drivers/infiniband/sw/rxe/rxe_net.c:660
+ rxe_dellink+0x15/0x20 drivers/infiniband/sw/rxe/rxe.c:254
+ nldev_dellink+0x304/0x3d0 drivers/infiniband/core/nldev.c:1849
+ rdma_nl_rcv_msg drivers/infiniband/core/netlink.c:-1 [inline]
+ rdma_nl_rcv_skb drivers/infiniband/core/netlink.c:239 [inline]
+ rdma_nl_rcv+0x6d7/0xa10 drivers/infiniband/core/netlink.c:259
+ netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+ netlink_unicast+0x780/0x920 net/netlink/af_netlink.c:1345
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1895
+ sock_sendmsg_nosec+0x112/0x150 net/socket.c:797
+ __sock_sendmsg net/socket.c:812 [inline]
+ ____sys_sendmsg+0x55c/0x870 net/socket.c:2716
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2770
+ __sys_sendmsg net/socket.c:2802 [inline]
+ __do_sys_sendmsg net/socket.c:2807 [inline]
+ __se_sys_sendmsg net/socket.c:2805 [inline]
+ __x64_sys_sendmsg+0x1c3/0x2a0 net/socket.c:2805
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f89172fcdd9
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe8bf8c018 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f8917575fa0 RCX: 00007f89172fcdd9
+RDX: 0000000000000000 RSI: 00002000000002c0 RDI: 0000000000000006
+RBP: 00007f8917392d69 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f8917575fac R14: 00007f8917575fa0 R15: 00007f8917575fa0
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:kernel_sock_shutdown+0x2a/0x70 net/socket.c:3803
+Code: f3 0f 1e fa 41 57 41 56 41 54 53 89 f3 49 89 fe 49 bc 00 00 00 00 00 fc ff df e8 e1 25 c5 f8 4d 8d 7e 20 4c 89 f8 48 c1 e8 03 <42> 80 3c 20 00 74 08 4c 89 ff e8 27 bf 2e f9 4d 8b 3f 49 83 c7 68
+RSP: 0018:ffffc900015ef090 EFLAGS: 00010202
+RAX: 0000000000000004 RBX: 0000000000000002 RCX: ffff88802dd89ec0
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000001 R08: 0000000000000000 R09: 0000000000000000
+R10: dffffc0000000000 R11: ffffed1007cc8979 R12: dffffc0000000000
+R13: dffffc0000000000 R14: 0000000000000000 R15: 0000000000000020
+FS:  000055556d432500(0000) GS:ffff888125dca000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000008 CR3: 0000000042b1c000 CR4: 00000000003526f0
+----------------
+Code disassembly (best guess):
+   0:	f3 0f 1e fa          	endbr64
+   4:	41 57                	push   %r15
+   6:	41 56                	push   %r14
+   8:	41 54                	push   %r12
+   a:	53                   	push   %rbx
+   b:	89 f3                	mov    %esi,%ebx
+   d:	49 89 fe             	mov    %rdi,%r14
+  10:	49 bc 00 00 00 00 00 	movabs $0xdffffc0000000000,%r12
+  17:	fc ff df
+  1a:	e8 e1 25 c5 f8       	call   0xf8c52600
+  1f:	4d 8d 7e 20          	lea    0x20(%r14),%r15
+  23:	4c 89 f8             	mov    %r15,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	42 80 3c 20 00       	cmpb   $0x0,(%rax,%r12,1) <-- trapping instruction
+  2f:	74 08                	je     0x39
+  31:	4c 89 ff             	mov    %r15,%rdi
+  34:	e8 27 bf 2e f9       	call   0xf92ebf60
+  39:	4d 8b 3f             	mov    (%r15),%r15
+  3c:	49 83 c7 68          	add    $0x68,%r15
 
-https://lore.kernel.org/all/20260413153248.0588690b@kernel.org/
-...BTW we can use extack for "warnings" like this, too
 
-> Also, is the assumption actually enforced anywhere?  yt921x_marker_tfm_sh=
-ape()
-> and yt921x_marker_tfm() do not appear to compensate the rate computation
-> for a 64-byte MPU, so the message seems to document an assumption that is
-> not modelled by the transform.
-
-tc-tbf(8): "For ethernet, no packet uses less than 64 bytes." I don't
-see a need for rate computation unless I get it wrong.
-
-> > +
-> > +             break;
-> > +     }
-> > +     default:
-> > +             break;
-> > +     }
-> > +
-> > +     return 0;
-> > +}
->
-> Would it be clearer to have yt921x_tbf_validate() return -EOPNOTSUPP for
-> commands the handler cannot service, so the supported command set is
-> stated once?  The default arm here returns 0 for every command other than
-> TC_TBF_REPLACE (including TC_TBF_STATS and TC_TBF_GRAFT) while
-> yt921x_dsa_port_setup_tc_tbf_port() below returns -EOPNOTSUPP for those
-> same commands.  There is no observable bug today, but if the validator is
-> ever used on its own the two lists can drift.
->
-> > +
-> > +static int
-> > +yt921x_dsa_port_setup_tc_tbf_port(struct dsa_switch *ds, int port,
-> > +                               const struct tc_tbf_qopt_offload *qopt)
-> > +{
-> > +     struct yt921x_priv *priv =3D to_yt921x_priv(ds);
-> > +     struct netlink_ext_ack *extack =3D qopt->extack;
-> > +     u32 ctrls[2];
-> > +     int res;
-> > +
-> > +     switch (qopt->command) {
-> > +     case TC_TBF_DESTROY:
-> > +             ctrls[0] =3D 0;
-> > +             ctrls[1] =3D 0;
-> > +             break;
->
-> Is there a concern about the write ordering on teardown?
-> yt921x_reg64_write() -> yt921x_regs_write() performs two independent
-> register writes (reg+0 then reg+4).  On TC_TBF_DESTROY the first write
-> sets CIR=3D0 and CBS=3D0 while the previously programmed EN bit in ctrls[=
-1]
-> is still set; only the second write clears EN.  The REPLACE path writes
-> configuration before arming EN, but the inverse is not followed here.
->
-> Would writing ctrls[1]=3D0 first (or clearing EN via a read-modify-write
-> before zeroing CIR/CBS) be safer for the hardware state machine?
-
-The AI got confused on register operations; see comment for multi-word
-registers.
-
-> > +     case TC_TBF_REPLACE: {
-> [ ... ]
-> > +             ctrls[0] =3D YT921X_PORT_SHAPE_CTRLa_CIR(marker.cir) |
-> > +                        YT921X_PORT_SHAPE_CTRLa_CBS(marker.cbs);
-> > +             ctrls[1] =3D YT921X_PORT_SHAPE_CTRLb_UNIT(marker.unit) |
-> > +                        YT921X_PORT_SHAPE_CTRLb_EN;
-> > +             break;
-> > +     }
-> > +     default:
-> > +             return -EOPNOTSUPP;
-> > +     }
->
-> Does returning -EOPNOTSUPP for TC_TBF_STATS defeat the hw offload
-> indicator?  qdisc_offload_dump_helper() in net/sched/sch_api.c first
-> clears TCQ_F_OFFLOADED, then calls into the driver, and only re-sets the
-> flag on a zero return:
-
-No one else did that; mt753x_tc_setup_qdisc_tbf().
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
