@@ -1,163 +1,228 @@
-Return-Path: <netdev+bounces-285491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285492-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iLJYIfX//GmxVwAAu9opvQ
-	(envelope-from <netdev+bounces-285491-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 23:11:17 +0200
+	id 0NNIGGsA/WmxVwAAu9opvQ
+	(envelope-from <netdev+bounces-285492-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 23:13:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FB524EF241
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 23:11:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B47104EF25F
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 23:13:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 71C563037E7D
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 21:10:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E24FA3031106
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 21:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D536B340281;
-	Thu,  7 May 2026 21:10:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5689434028F;
+	Thu,  7 May 2026 21:13:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nRmSSZ8r"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="andQxdg0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0822C0F81
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 21:10:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2373191BD
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 21:13:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778188237; cv=none; b=f4hRhZ+MJpKZM8vmfOpeLn0LvyMSDIGkfbup9qzUHarVvIfV3YqXc122FAuypBeepFyQWi961qsvdFRvVNVai26P91xRXh3emtamMi4OI4H/GRr0MZfr1L3nxnJDohuq9qi5PY1s/pvrG7aAFvqdJ8Y5V3qJ88hiZ+sS8mWm5ng=
+	t=1778188389; cv=none; b=NqO+w0rTyNoRzUj7Cl2E/eSiqnV/upSUoansxCgHNW3Z9L+7X5GrHAhArZmYwi4Ibmqqen+xuAOajjSet/7TP+FSDBDfNsV16F+nmPeBS/0ymxkeQQqp9lXQ5R4zugbErMrnYDl2s8M1sErzAczgxJDdCab9v8ef4Gjq6yW5f+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778188237; c=relaxed/simple;
-	bh=C1egXataboGD8V7S8nUM75Vxl9j4LaRqMZQEa8H73cA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eBU1UuQ50+SDPf6QV1ID8mbyfaVinSL9Ly0IIvCqymLrf18Pd5500EIZXsvmWmolnT7+tRBt4jnIVdEmiwFxzL4OuXtfiMIafmDWGl0OWwtboAtgzGSrnabMz1a0v6AyqzJcfJmxiqco78jqFGKY45P8LPVrOINv7kS5q98HiP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nRmSSZ8r; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-488a8ca4aadso12209745e9.3
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 14:10:36 -0700 (PDT)
+	s=arc-20240116; t=1778188389; c=relaxed/simple;
+	bh=D9p/C5MXnaQ/+ytu22UzPKs9RYe50xHiDaYg/+9M5Jo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=L13IZi8xZaojCIRSwT2uvhdti+u08SiZkKsKOyRX06Qqee8IaEA01r8M4FP2XPprQw0RU8e+n7LPg+f5Mlr7KFMoRXShA7rfzE0Brv6T6/SYvvFef3HYeU/LRP89nB4/x9m2GFqTN6lXCRyBmIyOJp1bIdzACVcYtMAoewJE/Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=andQxdg0; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c802922d230so677241a12.0
+        for <netdev@vger.kernel.org>; Thu, 07 May 2026 14:13:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778188235; x=1778793035; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SDB2kynTXrWcwphsOwn0vQehydK3h/uhiBsQVkQ58dY=;
-        b=nRmSSZ8rgeaWkfeK8d84rCgBx91kU8mWWx+q7ksIvWdQzTkzTpMh20Q2If44XGtKZ6
-         sD60MREIWzhHlV3qMrq0/V928m2g9KVJLxBkOsadK1GNo65/A63G1M0NGoCX4wTVXWBl
-         AicguXBfkBgUl9AhA3Pc7VIBrhqmG5KMuW6sYnJ5zLPI2pY1/lQJb0glKKbB5k4KUW+T
-         ypXiuDBsDB2X/NmCYaormQ/9I8FRUT8PF5ue/RN2KlPr1Eu8KMVq1Ox/apHN0lnGcWxt
-         fqewyT1GNUryFjzvtoqxAXGa/rWcSxIamM0Apkdkp2ug+bQs1WCmimnI5xgtzkz3XgSa
-         wjfg==
+        d=google.com; s=20251104; t=1778188387; x=1778793187; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Ixm7G3TAnvosLUs13uatdzo91/06h+mlLbPUGhU267I=;
+        b=andQxdg0hSBI0T0dshWd8NYAcOYtkaXsl9+U/aXV/qttUGHBQWY6VWy+4kF3UfnyeJ
+         1N3NZ+F2V7hBCOhPll5WhAOkKKUFHUMxN7YD39qbvXWNSCKS0osSj6JeGet2RQiQziaV
+         wULJ+vrRlINha2ZmlVGS989HBJRKNrTWYjwAgbw090XIv3NjvVwUfUZKkDZiPhkvVyBS
+         c01tIF9YHFwBqHGRYY3xzzKm41qgNP6KAh4gxU+gnu8ExIYWXyV3ZY8BpArA7ps/mEyH
+         +0uxbDgzcHnW0B3UMiYPP6obMZgNEL9ARuTfBdhNPfRgB/XBtzMFEApc9/5GEdD06R9T
+         VqGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778188235; x=1778793035;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=SDB2kynTXrWcwphsOwn0vQehydK3h/uhiBsQVkQ58dY=;
-        b=QxBiUK872zwsuh6FXUmJsb+Uo3fMot2oc6ttgpTgjhdqPCaxzU6AEI2Nt+UR2S0gVf
-         2bpQ5oN0K06suTesMm1S2/YnHG/MeisiI0a8ji4iyfl3DNnjjIqRGXxzeUy6JNLn5UWh
-         pPmNNBzTFTDWoNnmZHB/9aeJU0PZLYq+9GuTB3LJ9Sj43MTDxpbifEo7QrKwMI86i1UK
-         Qz2sGxovFM1ACVs7bDNSsvv2reNwBfFb19PC5xQixv5H0Dl1aGPhPQWkF2A5YUh5Chnx
-         qWD3bfcXf5uLJdPHTOAZr4EyBJz7IpMH69dOpwjAARkvcVjQ6MbVnJtLURJ8JSEitTG8
-         s6QA==
-X-Forwarded-Encrypted: i=1; AFNElJ9U5UTgndjY4bG2ujakMQmth60TsQgSrCPEkR9BDIHRKrlQMMbKhrw8q9OgMtVn+3ktXtzs07I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHE5E54PhA66NnTlNGJPCY/HA0fDl9vQTLM6yu4XHcnyO6QmuL
-	Pd0x0J9eU5EyrGfzDYqFROnjtvJcbreL73yRbEuZOuFqcN7KJlRZIe/E
-X-Gm-Gg: AeBDiet1ZR52guSgwyZ56HhJ0j2VrU/Zv9o0DkGL78QbScwSSARcpnJQSQzc37IdXj/
-	+chjIc50nU/tIabjxv5HzYXXCK1OXySHWeHesn/ZQ6jhr5/R/QGuRM0xXb8uwC0zBlu9pKb5GUt
-	TKmqqjKChDDD0N40vHDmFeb5Fw28L6ARjkUTNzzC0Nr3wwRzVTB5oqs73F3KSzBfMu8TmHU2al+
-	ZlIDzcDY7KXtieF3AGCOFkv9PqKRVQSOaesgbXH8XpT+9jTeFSxGEOuTTrJ+1/3UWw5/RzMiKNo
-	W2CnUVcrauzB8+AHzsVxIYRGcCdlr1dWUOFzey61IGY244XBWACpjXHC+xdwFFlAfhs0oTO7Gde
-	Wv58CEKbVgMUu0LH2SkvHDiklr++2Y1j6phBZBBlu2Jr06lgoCbVfbBlLuwTa3K27ZKIh1r/zKd
-	mGpVPy+SzGYfA/FX/xt1+qwD7H48zY4SoPhRRuxRsZm1zvnb94Akp0oUF5jAWo5E1xB4vTx9dOD
-	FA=
-X-Received: by 2002:a05:600c:696:b0:489:1c1f:35df with SMTP id 5b1f17b1804b1-48e51e215a4mr87304385e9.10.1778188234385;
-        Thu, 07 May 2026 14:10:34 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e6616481asm6938195e9.3.2026.05.07.14.10.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2026 14:10:34 -0700 (PDT)
-Date: Thu, 7 May 2026 22:10:32 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: =?UTF-8?B?w4FsdmFybw==?= Costa <alvaroc.dev@gmail.com>,
- jiri@resnulli.us, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, netdev@vger.kernel.org (open list:DEVLINK),
- linux-kernel@vger.kernel.org (open list)
-Subject: Re: [PATCH] devlink/param: replace deprecated strcpy() with
- strscpy()
-Message-ID: <20260507221032.059b29a7@pumpkin>
-In-Reply-To: <20260507075234.1630060f@kernel.org>
-References: <20260506211415.16343-1-alvaroc.dev@gmail.com>
-	<20260507090445.3448d536@pumpkin>
-	<20260507075234.1630060f@kernel.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        d=1e100.net; s=20251104; t=1778188387; x=1778793187;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ixm7G3TAnvosLUs13uatdzo91/06h+mlLbPUGhU267I=;
+        b=BIyU2A9wLhuLhuvqTXhV9dNzh3DTbbBI5JMC8Uh2IT4rpxv5wY/7AZyVKXp6LmPdQN
+         T+YBPKzW2/TX7hiYyx7cnVtssKANNahNTa7403MhzydNFwrtwQfi/shCM13tBVMV+fOv
+         HgmmmFli1MFCtqyaFn2zmjF3iu0Pu8W0FZFgdeuD3EIIBn90Ol0QfwmUix2H1+NukZgp
+         h42Yc3c3T5/3lpogW6IHggnTP/vMVnjUhx5R54A871Fu5OSR87x/XtvfajszpE9RqGMB
+         4+v2TQl8q/rxX2Pitq7jqNA9e0S53K+tapIRWX6SRShrnTsWB0pdPjdFYmmYuk2eXZs/
+         lShA==
+X-Gm-Message-State: AOJu0Yw+gNrEYnUtJSQYhrOF2A5vZfoBxAFmAH5Ly3NRglbbktS0h4Dn
+	k61kTSf337iIHp/YGKMpxE5eblVxAsnGy59NvOwY6bc8OR2YOb6b9rujSWLuKOuA9tZ9L1hTxmi
+	MBeHv3SMAv2BXPMxIFqYb6MihujZx5xJ+XBGzYjyeo+Dm8MgpRduIONxKfczRw9/nPBPiad1gPy
+	hsYAslK/ovx9tQtP38QfWOnYExLeZ8XK8jp5VAEkkawSKTyDVsHBb6qSfs0FwHWEQ=
+X-Received: from pgar12.prod.google.com ([2002:a05:6a02:2e8c:b0:c76:fe7d:119])
+ (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a20:5483:b0:39b:e1e5:a101 with SMTP id adf61e73a8af0-3aab17d1626mr13512637.43.1778188386448;
+ Thu, 07 May 2026 14:13:06 -0700 (PDT)
+Date: Thu,  7 May 2026 21:13:01 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 0FB524EF241
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
+Message-ID: <20260507211304.3046526-1-hramamurthy@google.com>
+Subject: [PATCH net-next v6 0/3] gve: add support for PTP gettimex64
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+To: netdev@vger.kernel.org
+Cc: joshwash@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	richardcochran@gmail.com, jstultz@google.com, tglx@kernel.org, 
+	sboyd@kernel.org, willemb@google.com, nktgrg@google.com, jfraker@google.com, 
+	ziweixiao@google.com, maolson@google.com, jordanrhee@google.com, 
+	thostet@google.com, alok.a.tiwari@oracle.com, pkaligineedi@google.com, 
+	horms@kernel.org, dwmw2@infradead.org, jacob.e.keller@intel.com, 
+	yyd@google.com, jefrogers@google.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: B47104EF25F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-285491-lists,netdev=lfdr.de];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FREEMAIL_CC(0.00)[gmail.com,resnulli.us,davemloft.net,google.com,redhat.com,kernel.org,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-285492-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,gmail.com,oracle.com,infradead.org,intel.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_TWELVE(0.00)[27];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com]
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Thu, 7 May 2026 07:52:34 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
+From: Jordan Rhee <jordanrhee@google.com>
 
-> On Thu, 7 May 2026 09:04:45 +0100 David Laight wrote:
-> > >  	case DEVLINK_PARAM_TYPE_STRING:
-> > > -		len = strnlen(nla_data(param_data), nla_len(param_data));
-> > > -		if (len == nla_len(param_data) ||
-> > > -		    len >= __DEVLINK_PARAM_MAX_STRING_VALUE)
-> > > +		len = strscpy(value->vstr, nla_data(param_data));
-> > > +		if (len < 0)
-> > >  			return -EINVAL;
-> > > -		strcpy(value->vstr, nla_data(param_data));    
-> > 
-> > The only sensible thing here is to replace the strcpy() with:
-> > 		memcpy(value->vstr, nla_data(param_data), len + 1);  
-> 
-> That'd probably be a good move, to avoid getting the broken strscpy()
-> conversion submissions. Care to send a patch?
+This patch series adds support to obtain near-simultaneous NIC and
+system timestamps with gettimex64. This enables daemons like
+chrony and phc2sys to synchronize the system clock to the NIC clock.
 
-I'll lob one in soon.
+GVE does not have direct register access to the NIC hardware clock, so
+it must issue an AdminQ command to read the NIC clock. Two paths
+for obtaining a cross-timestamp are implemented: a precise path using
+system counter values sampled by the device, and a fallback path using
+system counter values sampled in the driver using
+ptp_read_system_prets()/postts().
 
-I'm working my way through a compile that errors strcpy() except for
-constant strings into arrays (ie the safe ones).
-Why is it that the worst examples is in the 'secerity code' :-)
+To use the precise path, the current system clocksource must match the
+units returned by the device, which on x86 is X86_TSC and on ARM64 is
+ARM_ARCH_COUNTER. The clockid requested for the cross-timestamp must
+be either CLOCK_REALTIME or CLOCK_MONOTONIC_RAW. These conditions hold
+by default on GCP VMs using Chrony, so we expect the precise path to be
+used the vast majority of the time. If the system clocksource is changed
+to kvm-clock, it activates the fallback path. Ethtool counters have been
+added to count how many times each path is used.
 
--- David
+The uncertainty window in the precise path is typically around 1-2us,
+while in the fallback path is around 60-80us. This table shows a
+comparison in chrony tracking statistics between the precise path and
+fallback path. The RMS offset is nearly 4 orders of magnitude smaller
+in the precise path.
+
+|                 | Fallback Path         | Precise path             |
+| --------------- | --------------------- | ------------------------ |
+| System time     | 0.000000005 s slow    | 0.000000001 s fast       |
+| Last offset     | +0.000005606 seconds  | +0.000000001 seconds     |
+| RMS offset      | 0.000009020 seconds   | 0.000000002 seconds      |
+| Frequency       | 4.115 ppm fast        | 0.362 ppm fast           |
+| Residual freq   | +2.515 ppm            | +0.000 ppm               |
+| Skew            | 18.480 ppm            | 0.001 ppm                |
+| Root delay      | 0.000000001 seconds   | 0.000000001 seconds      |
+| Root dispersion | 0.000081905 seconds   | 0.000001169 seconds      |
+| Update interval | 0.5 seconds           | 0.5 seconds              |
+| Leap status     | Normal                | Normal                   |
+
+The first two patches pave the way for the PTP implementation by
+quieting excessive logging and refactoring an existing routine for
+thread safety.
+
+---
+Changelog:
+V6:
+- Added a fallback to driver-sampled time sandwich that is used when
+  the following conditions are not met:
+  - The system clock source is X86_TSC or ARM_ARCH_COUNTER
+  - The requested clockid is CLOCK_REALTIME or CLOCK_MONOTONIC_RAW
+  - The architecture is x86 or ARM64
+- Added ethtool statistics to count how many cross-timestamps used the
+  precise path versus fallback path.
+- Fixed printf format specifier.
+- Added stub implementions of adjtime and adjfine to prevent NULL
+  dereference when phc2sys tries to adjust clock.
+- Moved system time snapshot back to gve_ptp_gettimex64() so we can get
+  the current system clock source from it. It is OK for it to be outside
+  the mutex and retry loop because lock contention and retries should be
+  extremely rare, and chrony filters out bad samples.
+- Link to v5: https://lore.kernel.org/netdev/20260429012819.3102675-1-hramamurthy@google.com/
+
+V5:
+- Reformulate retry loop in terms of total timeout instead of retry
+  count (Jakub Kicinski)
+- Link to v4: https://lore.kernel.org/netdev/20260406234002.3610542-1-hramamurthy@google.com/
+
+V4:
+- Call out change to dev_err_ratelimited() in patch 1 commit message (Jacob Keller)
+- Ensure only one log is emitted when command returns GVE_ADMINQ_COMMAND_UNSET (Jacob Keller)
+- Link to v3: https://lore.kernel.org/netdev/20260403194427.1830609-1-hramamurthy@google.com/
+
+V3:
+- Take system time snapshot inside the mutex
+- Return -EOPNOTSUPP if cross-timestamp is requested on an arch other
+  than x86 or arm64
+- Fix initialization to only register PTP clock once all data is
+  initialized
+- Link to v2: https://lore.kernel.org/netdev/20260326224527.1044097-1-hramamurthy@google.com/
+
+V2:
+- Fixed compilation warning on ARM by casting to u64
+- Link to v1: https://lore.kernel.org/netdev/20260323234829.3185051-1-hramamurthy@google.com/
+---
+
+Ankit Garg (1):
+  gve: make nic clock reads thread safe
+
+Jordan Rhee (2):
+  gve: skip error logging for retryable AdminQ commands
+  gve: implement PTP gettimex64
+
+ drivers/net/ethernet/google/gve/gve.h         |  20 +-
+ drivers/net/ethernet/google/gve/gve_adminq.c  |  27 +-
+ drivers/net/ethernet/google/gve/gve_adminq.h  |   4 +-
+ drivers/net/ethernet/google/gve/gve_ethtool.c |   6 +-
+ drivers/net/ethernet/google/gve/gve_ptp.c     | 357 ++++++++++++++----
+ 5 files changed, 319 insertions(+), 95 deletions(-)
+
+
+base-commit: 8c699be3dad7bba87cdda485dc099226cfc2f706
+-- 
+2.54.0.545.g6539524ca2-goog
+
 
