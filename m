@@ -1,205 +1,198 @@
-Return-Path: <netdev+bounces-285137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285138-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qAYYAu0F/GkpKAAAu9opvQ
-	(envelope-from <netdev+bounces-285137-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:24:29 +0200
+	id MEEYNcgI/Gm3KAAAu9opvQ
+	(envelope-from <netdev+bounces-285138-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:36:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BD2E4E2940
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:24:27 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D99724E2AB6
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:36:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8EE2B300D16A
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 03:24:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BB032300514E
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 03:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EEE92D0C62;
-	Thu,  7 May 2026 03:24:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C6342DC792;
+	Thu,  7 May 2026 03:36:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CeqJqr1b"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="P4gzZask"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93BAE1C6FF5
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 03:24:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778124266; cv=pass; b=tuivNNGgCd+lxasHvpjsvRnl9QWc8tln/F/OHCwy6jypiCuyZfRFe4A7a07ARxlj4h9raYjsUneEnF6dzmAnEm4GFnINYv/SOekhcE1hLtmRY5qIsKrybGEyQDy82sCYxRlEP7LLijGDeHDm49m1M9U/ZvLlXhHhtLTggSx6cro=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778124266; c=relaxed/simple;
-	bh=xhtkEjsWQvked7D/5ZjZKOaVudZtm2Lj2kaM1sTHzp0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uwUDaH+H8uVBn7QxomJqB4atl0VWvHAhsQT6LB4t8BqeemdwHxOFURG0RzpiXcr/qeAAzB5/th2rarwfNndIIGnadSVcnvnafHyVlalIOd7UGP32U+QLpx2t202tGHFOSREl+/Y4e13vDDAwFIYgfls6OXClucOwzraCdp2AIE4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CeqJqr1b; arc=pass smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b936331786dso36852966b.3
-        for <netdev@vger.kernel.org>; Wed, 06 May 2026 20:24:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778124263; cv=none;
-        d=google.com; s=arc-20240605;
-        b=KVP1e0czTt1bCqUEE+0Z5CNVfCYMyfjpo47rU7OugTXByu16i4Xak9HU5RoSjI9tTH
-         VF0JUE45WOWDg0UtoYt8HQPtZdGuCRNUP3JMPc2onydiG7Ygylp4vDnZ3uKZZQiYqnEq
-         /QjIbYsv0hoMzA6SlCI//MptZCDH6EF7sVB9EHo244OukCpglBf3LPw/N9VI+ppEAWq5
-         rpFOvwYmIoKmXEy5Lp7MLHM1+SWg+VgT3C1QoIW30A7u3y4ixw27aP/m7VNjfnfuZ8UM
-         efmmLbGQCkWsWEpJdTKXL8pQoijLM2g8zusM2M/oF4/AgEINaKKaQ14y/hipJFJAAM5+
-         TEKQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=SyJU6gW4FlWMbUSkvNwEGK+wID8AKdNL6lGsIUjUEWI=;
-        fh=7dXxcCTkxsqkphrKyArnf6zs55GnaKkj1qHA0O9FFZQ=;
-        b=QgDvXEz3ALd03UGzn4b1GXb++ujzFPL0Xseum6meHeSiBB3I4rhK/ud62oHEgGRfrp
-         BnhO343NgwplsI5lZ8Ni5rPgWWTP/XHJU188KqrqxgEcTERo9jCeomISCcQe3cTcinNB
-         nM5BKEqS64VfvUxPSjoswREkxbQ3qGIOqdnmOMTJ4Dd2wVcU5blLrHq2YD5Mm/wwg8Cw
-         Iesugb3Kvq+G17Ulv9aqSXlroWelkwHRE+kBPsx4I/xymw0Et5yflHqb4TrlvXLkBJ4z
-         BBEM1l/SXfoRg+ktoklJ7rwA97aOQgVRDzvG9sVxujNFIH7d5aM+K0aUWALh7ZKRzyjj
-         Y2fw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778124263; x=1778729063; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=SyJU6gW4FlWMbUSkvNwEGK+wID8AKdNL6lGsIUjUEWI=;
-        b=CeqJqr1bjpMWiVgXTorGr2debjBZzUmPwoUFQBYIcM1qgyHCKphKhWAFOeyOnjltug
-         fjN1sIh47+FhxsQJ8sEcuLjvMC2F3E7FWSH0JCyXhOiDeFx5vOP/bqZ5L4g0rwWj2aVN
-         4PtJnrJRzKcF+GisLo/3Nx86zsPD6pYBJNJCIdrdKtrX/ontyuNgYRBC9J7HTPknpmmq
-         +rX+Zx3jtngTED0vIRtiOT12Kp6Ud7TyrBoXCJ1kKNA6k/FBzbcDHm4+8Xbf2nlXr0CF
-         0/qz4lDB+sb3WKJCOT4SmSJZTIQyfKExUYjo+3UAU2d9HFtmYBJ4CGmnEkQVKcHKdel8
-         KQkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778124263; x=1778729063;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SyJU6gW4FlWMbUSkvNwEGK+wID8AKdNL6lGsIUjUEWI=;
-        b=exW07zpD3QbP92Lj/pMY1KEOsFZA0fyMeHSflENw35DBlk8GOpFjAlXVHjvZpJx4dI
-         7htvO0+8xjxBmWr0qHOE60prtJXFnh5q7oCAVHhqKcjzMhecxOu+ONQv2WuNyAKfpBPM
-         rHrdKaBLwRSkYpQ7GPa6FZf4EZr75aMPQMiQeA+gLHQHrDe3oTCPhH2Yh1DtCZEgUwcd
-         CwH1R2TSgPZwwEqUg2UzbGpAgEa3lVTz7mHEm1tmJjTcz9uryoe9txWK1K8V8x/NFgUb
-         QeJBvrbCoz3s26lo7HIHI0UiOrbN9Q4dHvREUmP9kgzM4ZkvI/Wu13HuMAuIUP9/XANZ
-         prxA==
-X-Forwarded-Encrypted: i=1; AFNElJ8VjdgjPTo6TwF4y37rNoUfmEV9vCVnJQ7+OyVib3ezWIGTUhB8ju4MwBDixqmQfmdZu/Gd5Pk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzA5wPVa9r3CMkfLh9CqGhC6FLNFDJ8daXLPXqwKuNQRF5Al4Wt
-	80DSmf7GsQA2wbXhmN6Gf8F/7bHUwV5XGWDaVDRJ6xjq+MbtnenqwfHHWgbQ0rzsaoRH9cUPW0v
-	E2jvzxgAW3fn0N1Px16Ha6NKM93N+zjc=
-X-Gm-Gg: AeBDietEgfxJAGj2bzJBtUha3RiGoR4G5Q7ft3wTP4mOn4e4B1jABrJJkeCt8S/M6rR
-	EdAFZ2Wsc3bMLKXDqwTjkLSxVIEUvPiN2YIVw5t/UGCaQIhwZb5RHJjbMLRCEQVn7zmU4IrGAuN
-	WMQtzA+4J8fzQueI7KQFu04JkdU4pIBgmjVgnGkbrPkD3RQjfPgY88Tvybt9BHcbdzHaB6tZLvb
-	DdfIqDaA7Z1rMm6BFJM1wMqJEG87rq7/wwjuvNGsAiq2Ee9JOyPFMykNA56GN97c1u+PCizUXlk
-	X4hgjjx/Fmps2Now+NjIg0QPeW6DgmO5S5jLUDLuBKOYsABDYkA=
-X-Received: by 2002:a17:907:7ba6:b0:bc3:d996:684f with SMTP id
- a640c23a62f3a-bc56dd129famr337839066b.42.1778124262624; Wed, 06 May 2026
- 20:24:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A662D9ED1
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 03:36:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778124995; cv=none; b=ltKIGYBWBD4Usv5s/I4tISajar7NP/68pD59UtGcpFOUJ6b2cy4enpAONYRCLNSXgWk/sN+STtoRH4B7f5nTqW2BfaT+DyM9HbzcQVZyoECTC3V57BDXlSUwyn41Onjyvu1/Qws10xszTn+tMBz0tWG7/Zx1SVRfMgS8l3opOoo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778124995; c=relaxed/simple;
+	bh=GBppuMyDcFUH6AcO/8jCDVx0V066lCT1uU4JkvVwwpE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OfesOWiNUUaSVqcQvxc5drx80eF9SBSpGMykmk7XL2fUaA/F72aAUlaVraP3ohDOKPc2pcPXfNDf7sI2sL4uVOsKbfnF5jKGTrBmWtJf1Br2qfgbbnXz2o382ya/yPHDG6NG+ykd7n2+iS0YzXNtuwBrHTIsj7YY5r2RM+lkL5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=P4gzZask; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <63cb7820-bea0-446a-928d-c37597f5506a@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1778124981;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=k3iJ5c6RrR/ATLy0Lin604yvTNl5sBXww4Jltc9j1SY=;
+	b=P4gzZaskJFsuEukboSKaeQqBmP8YdqOOVn4oWOQCBRYwUs3h/qDPEryWmdz2HjYS5tqiSq
+	dORwBIJsjjidNCnMYyMNkBHEYkm/B2rwq7ZeT6Mksol/jTxyApBJK0E4jOiLyb0+UDqN+E
+	qoF3Kh+fUwW//SyVBlE+1bZDxFUmtcY=
+Date: Thu, 7 May 2026 11:36:11 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <05921e1f-693b-4322-a762-c8f03c386a78.ref@yahoo.com> <05921e1f-693b-4322-a762-c8f03c386a78@yahoo.com>
-In-Reply-To: <05921e1f-693b-4322-a762-c8f03c386a78@yahoo.com>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Thu, 7 May 2026 00:24:10 -0300
-X-Gm-Features: AVHnY4JxNFbbLXRILKhVvgBqnP3BZk1Lzw9wfHFi8i55wP6YbhXakRkf976Mn14
-Message-ID: <CAJq09z5Uz2Spm5yWe=742C2cxnz9gEkXkV6-ja_oDLnPh3eFCA@mail.gmail.com>
-Subject: Re: [PATCH v2] net: dsa: realtek: rtl8365mb: add support for RTL8367SB
-To: Mieczyslaw Nalewaj <namiltd@yahoo.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 5BD2E4E2940
+Subject: Re: [PATCH net-next v8 1/2] net: pppoe: implement GRO/GSO support
+To: Simon Horman <horms@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org, willemb@google.com,
+ petrm@nvidia.com, anubhavsinggh@google.com, richardbgobert@gmail.com,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org,
+ Pablo Neira Ayuso <pablo@netfilter.org>
+References: <20260501035102.293031-1-qingfang.deng@linux.dev>
+ <20260506121401.651540-1-horms@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Qingfang Deng <qingfang.deng@linux.dev>
+In-Reply-To: <20260506121401.651540-1-horms@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: D99724E2AB6
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285137-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[yahoo.com];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-285138-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,nvidia.com,gmail.com,vger.kernel.org,netfilter.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,jsdelivr.net:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sashiko.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Hi Mieczyslaw,
-
-Thanks for the patch.
-
-> Add chip info entry for the Realtek RTL8367SB switch. This device has
-> chip ID 0x6367 and version 0x0010. It exposes two external interfaces:
-> port 6 supports SGMII and HSGMII, while port 7 supports MII, TMII,
-> RMII and RGMII. Use the existing 8365MB-VC jam table for initialization.
+On 2026/5/6 20:14, Simon Horman wrote:
+> From: 'Simon Horman' <horms@kernel.org>
 >
-> Signed-off-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://sashiko.dev
 > ---
->  drivers/net/dsa/realtek/rtl8365mb.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+> net: pppoe: implement GRO/GSO support
 >
-> diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
-> index 073f12ca8028..84d6fdb94a96 100644
-> --- a/drivers/net/dsa/realtek/rtl8365mb.c
-> +++ b/drivers/net/dsa/realtek/rtl8365mb.c
-> @@ -545,6 +545,18 @@ static const struct rtl8365mb_chip_info
->                 .jam_size = ARRAY_SIZE(rtl8365mb_init_jam_8365mb_vc),
->         },
->         {
-> +               .name = "RTL8367SB",
-> +               .chip_id = 0x6367,
-> +               .chip_ver = 0x0010,
-> +               .extints = {
-> +                       { 6, 1, PHY_INTF(SGMII) | PHY_INTF(HSGMII) },
+> This commit adds GRO and GSO support for PPPoE, which improves rx throughput
+> significantly by handling packets where the pppoe header length field matches
+> the exact packet length.
+>
+>> diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
+>> index bdd61c504a1c4..363204e0c49a1 100644
+>> --- a/drivers/net/ppp/pppoe.c
+>> +++ b/drivers/net/ppp/pppoe.c
+> [ ... ]
+>> @@ -1103,6 +1104,164 @@ static struct pernet_operations pppoe_net_ops = {
+>>   	.size = sizeof(struct pppoe_net),
+>>   };
+>>   
+>> +static u16
+>> +compare_pppoe_header(const struct pppoe_hdr *phdr,
+>> +		     const struct pppoe_hdr *phdr2)
+>> +{
+>> +	__be16 proto = *(const __be16 *)(phdr + 1);
+> Because struct pppoe_hdr is packed, the compiler assigns it 1-byte alignment
+> semantics, which phdr + 1 inherits.
+>
+> Does explicitly casting this to __be16 * bypass the compiler's unaligned access
+> protections?
+>
+> If skb->data has an odd alignment from the NIC, this could trigger a fatal
+> unaligned memory access exception on strict-alignment architectures. Would it
+> be safer to use get_unaligned() here?
+You can disregard all the alignment warnings. On those architectures, 
+drivers are required to 4-byte align the network header, so the PPPoE 
+header will also be aligned.
+>> +	__be16 proto2 = *(const __be16 *)(phdr2 + 1);
+>> +
+>> +	return (__force u16)((phdr->sid ^ phdr2->sid) | (proto ^ proto2));
+>> +}
+>> +
+>> +static __be16 pppoe_hdr_proto(const struct pppoe_hdr *phdr)
+>> +{
+>> +	__be16 proto = *(const __be16 *)(phdr + 1);
+> Could this also result in an unaligned access regression for the same reason?
+>
+> [ ... ]
+>> +static struct sk_buff *pppoe_gro_receive(struct list_head *head,
+>> +					 struct sk_buff *skb)
+>> +{
+> [ ... ]
+>> +	off_pppoe = skb_gro_offset(skb);
+>> +	hlen = off_pppoe + PPPOE_SES_HLEN;
+>> +	phdr = skb_gro_header(skb, hlen, off_pppoe);
+>> +	if (unlikely(!phdr))
+>> +		goto out;
+>> +
+>> +	/* filter for session packets (type:1, ver:1, code:0) */
+>> +	if (*(const __be16 *)phdr != cpu_to_be16(0x1100))
+> Is it possible this cast could similarly trigger an unaligned access exception
+> if the header offset is oddly aligned?
+>
+> [ ... ]
+>> +static struct sk_buff *pppoe_gso_segment(struct sk_buff *skb,
+>> +					 netdev_features_t features)
+>> +{
+> [ ... ]
+>> +	segs = ptype->callbacks.gso_segment(skb, features);
+>> +	if (IS_ERR_OR_NULL(segs)) {
+>> +		skb_gso_error_unwind(skb, orig_type, PPPOE_SES_HLEN, mac_offset,
+>> +				     mac_len);
+> If the inner protocol's gso_segment callback returns NULL (indicating the
+> hardware can natively offload the segmentation), skb_gso_error_unwind() will
+> be called.
+>
+> skb_gso_error_unwind() unconditionally sets skb->encapsulation = 1. However,
+> PPPoE does not configure the inner header offsets (such as
+> skb->inner_network_header).
+>
+> When the driver sees skb->encapsulation == 1, could it attempt to read the
+> uninitialized inner header offsets, parsing the outer MAC header as an inner
+> IP header and misprogramming the hardware TSO context?
+>
+> Does PPPoE need to explicitly clear TSO features before calling the inner
+> segmentation to force software segmentation, avoiding the need for
+> skb_gso_error_unwind() here entirely?
 
-While reviewing the port capabilities, I noticed the description for
-the RTL8367SB is identical to the RTL8367S (which does not make
-sense). Documentation suggests the SB variant is more versatile. The
-RTL8367SB appears to be a functional union of the RTL8367RB-VB and the
-RTL8367S regarding its external interfaces:
+I'm not sure how to test this. Is this what happens when the underlying 
+interface supports TSO?
 
-+----------------+--------------------------+--------------------------+
-| Port ID in API | EXT_PORT0(GMAC1)         | EXT_PORT1(GMAC2)         |
-+----------------+--------------------------+--------------------------+
-| RTL8367RB-VB | MII/TMII/RMII/RGMII | MII/TMII/RMII/RGMII |
-+----------------+--------------------------+--------------------------+
-| RTL8367SB      | MII/TMII/RMII/RGMII      | MII/TMII/RMII/RGMII      |
-|                | SGMII / High-SGMII       |                          |
-+----------------+--------------------------+--------------------------+
-| RTL8367S       | SGMII / High-SGMII       | MII/TMII/RMII/RGMII      |
-+----------------+--------------------------+--------------------------+
-Source: https://cdn.jsdelivr.net/gh/libc0607/Realtek_switch_hacking@files/Realtek_Unmanaged_Switch_ProgrammingGuide.pdf
-(last page)
++Cc: Pablo
 
-It seems GMAC1 (Port 6) on the RTL8367SB actually supports the
-standard (T)MII/RMII/RGMII modes in addition to the SGMII/HSGMII
-modes.
-Could you please double-check the datasheet?
-
-Regards,
-
-Luiz
 
