@@ -1,67 +1,53 @@
-Return-Path: <netdev+bounces-285154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285155-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sJONGkct/GkrMgAAu9opvQ
-	(envelope-from <netdev+bounces-285154-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 08:12:23 +0200
+	id cFHcNGwv/GmNMgAAu9opvQ
+	(envelope-from <netdev+bounces-285155-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 08:21:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECF214E3586
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 08:12:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 541634E3606
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 08:21:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BFD293004F3A
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 06:12:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D0D183017539
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 06:21:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52479335BB4;
-	Thu,  7 May 2026 06:12:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED0B3254A8;
+	Thu,  7 May 2026 06:21:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gj5J/LnS"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="IS6LkxaL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE7F222597
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 06:12:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D96031A06C;
+	Thu,  7 May 2026 06:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778134339; cv=none; b=p8DacGX0yQSKvdbR/hIODjF2OlAx1r++3t6eOM9zClohuVrAfNcYgVEfNxDbgSx7oPxe8uHWl47/3fUqCkT9b4HGhEkdEiIOBOnJ79nPRByI6+hyeO4CCVKWyauLbYyFzqQ6F5TtWHkCaMBE7PpB/G9jzUL7k39W0ZP6lPTBeM8=
+	t=1778134890; cv=none; b=LhahVKFEx34v36FG1uwqQVcMPo1xVfyl3FfVI4mVMEkWLOpuRRsDYTRSgpu1lgfmXkt+lnaefPTsvZfeRJAwFY+q/QofWhAA1V2vGnyg8ZztePVNnZ0ffy/nFUmlS1LV/FF4jHden2h/9ogmC5SwwPxf21MoVO333I5jXVmoEpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778134339; c=relaxed/simple;
-	bh=1zyYR98aRtky49y+0ToQ6v4Qbh4/TzygLpF1ZcyWWaI=;
+	s=arc-20240116; t=1778134890; c=relaxed/simple;
+	bh=bAfRx8MTP4otvqLdq24l/rWBQ+12/mrECjVG4Qcyxy4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ruZ5Jvvw0HK/a5BeZ4ozBG2JPlp3LQ7nZ63PlGOkQqholAt0jvED1HvQCRRtgE2auq1md6m72nrJGndinjm78Alk7wL7isHEHuhDKu+EmA9qA80UYgt+PGGA1MwnoHgN34C+yWWc3/5iUVTXZ43KY2/mMVA0AqNkX/MZGCfP9m4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gj5J/LnS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778134336;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=A+7yZVAPKgBe5zd8mBYO+jhWo6nMd/MCriq7JgRzg1k=;
-	b=gj5J/LnShPd3GDIGPpMZoQ8OVU3JtMWxdDBo4zPpVEf23QU0Nb5oYvvb2/TQmvS3lfKH7j
-	s16Ln60CB1t6flJu3Y3GKQwIviTJMGN9hFnQd6xC5JSzAbTYcNvvc8cXw0TH3Oi1Ed/DqR
-	fIyJBQdHNcu4ob8Q+cnoQia8Y++xdX8=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-21-BtlojZnwMyiT6rXL9Gd5bA-1; Thu,
- 07 May 2026 02:12:12 -0400
-X-MC-Unique: BtlojZnwMyiT6rXL9Gd5bA-1
-X-Mimecast-MFC-AGG-ID: BtlojZnwMyiT6rXL9Gd5bA_1778134330
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4D41218002E9;
-	Thu,  7 May 2026 06:12:09 +0000 (UTC)
-Received: from [10.44.32.223] (unknown [10.44.32.223])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EDA93300019F;
-	Thu,  7 May 2026 06:12:02 +0000 (UTC)
-Message-ID: <541f767d-222b-4dfa-a95a-19a5ed7a46bf@redhat.com>
-Date: Thu, 7 May 2026 08:12:01 +0200
+	 In-Reply-To:Content-Type; b=EvYi3jlNvkP+jsNakAS4NL99ymVSsG11RV2NHuLXVslwwyDmwndAc61h/8QYwnyDMPmngCKC2Hmw91AUQSdPv0iT6uMggfVqv0aX7O3tY/HviWekUgy+4NENjNOorgvYzv4F52EKOHu/ZrMPeidoywSCUGnOUNQfE2QgpfyNkJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=IS6LkxaL; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1778134875;
+	bh=bAfRx8MTP4otvqLdq24l/rWBQ+12/mrECjVG4Qcyxy4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=IS6LkxaL9dUFmma2OMHGlnWRRRRbJPORdRGQDZS5ZQx3KgJ8BkWGXxmuZ9hcLTKy5
+	 q/kBtemCpgmkfh/+a7jiBAkOqReyVTgrMKnI1Ca05ST2b/v2eWydaorxcLLB/sM6e1
+	 sUyG2zzhNMj60z74+50gBNXVKgKAWumm+E+Jb++w=
+Received: from [129.217.186.46] ([129.217.186.46])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.19.0.1/8.19.0.1) with ESMTPSA id 6476LEwj008340
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 7 May 2026 08:21:14 +0200 (CEST)
+Message-ID: <98090610-e389-4b4f-b1a9-6dceadedd372@tu-dortmund.de>
+Date: Thu, 7 May 2026 08:21:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,111 +55,226 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 1/2] dpll: add fractional frequency offset to
- pin-parent-device
-To: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- "David S. Miller" <davem@davemloft.net>,
- Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
- Jonathan Corbet <corbet@lwn.net>, Leon Romanovsky <leon@kernel.org>,
- Mark Bloch <mbloch@nvidia.com>, Michal Schmidt <mschmidt@redhat.com>,
- Paolo Abeni <pabeni@redhat.com>, Pasi Vaananen <pvaanane@redhat.com>,
- Petr Oros <poros@redhat.com>, Prathosh Satish
- <Prathosh.Satish@microchip.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Shuah Khan <skhan@linuxfoundation.org>, Simon Horman <horms@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Vadim Fedorenko
- <vadim.fedorenko@linux.dev>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <20260504155340.411063-1-ivecera@redhat.com>
- <20260504155340.411063-2-ivecera@redhat.com>
- <20260506183342.767b5fbc@kernel.org>
+Subject: Re: [PATCH net-next v10 1/4] tun/tap: add ptr_ring consume helper
+ with netdev queue wakeup
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <20260506141033.180450-1-simon.schippers@tu-dortmund.de>
+ <20260506141033.180450-2-simon.schippers@tu-dortmund.de>
+ <20260506181556-mutt-send-email-mst@kernel.org>
 Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <20260506183342.767b5fbc@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Rspamd-Queue-Id: ECF214E3586
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <20260506181556-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 541634E3606
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
+	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285154-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,intel.com,davemloft.net,gmail.com,google.com,lwn.net,kernel.org,nvidia.com,redhat.com,microchip.com,linuxfoundation.org,linux.dev];
+	TAGGED_FROM(0.00)[bounces-285155-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tu-dortmund.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,tu-dortmund.de:email,tu-dortmund.de:mid,tu-dortmund.de:dkim]
 X-Rspamd-Action: no action
 
-On 5/7/26 3:33 AM, Jakub Kicinski wrote:
-> On Mon,  4 May 2026 17:53:39 +0200 Ivan Vecera wrote:
->> +          At top level this represents the RX vs TX symbol rate
->> +          offset on the media associated with the pin.
-> 
-> Isn't this a hacky hack? I'd think that pin is in or out.
-> Having a freq offset between two pins or pin and parent's
-> ref lock makes sense. This new interpretation sounds like
-> we are trying to shove a difference between two pins into one?
-
-The "RX vs TX symbol rate offset" description is not something I
-introduced — it is the original documentation of the
-fractional-frequency-offset attribute as defined by Jiri. The -ppt
-variant was added later purely for higher precision. This patch just
-unifies the documentation of both attributes.
-
-I'm not sure I fully understand what the original "RX vs TX" semantics
-were meant to capture. Jiri, could you clarify what you had in mind
-and whether we should keep or change that description?
-
->> @@ -299,6 +299,10 @@ zl3073x_dpll_input_pin_ffo_get(const struct dpll_pin *dpll_pin, void *pin_priv,
->>   {
->>   	struct zl3073x_dpll_pin *pin = pin_priv;
->>   
->> +	/* Only rx vs tx symbol rate FFO is supported */
->> +	if (dpll)
->> +		return -ENODATA;
+On 5/7/26 00:18, Michael S. Tsirkin wrote:
+> On Wed, May 06, 2026 at 04:10:30PM +0200, Simon Schippers wrote:
+>> Introduce tun_ring_consume() that wraps ptr_ring_consume() and calls
+>> __tun_wake_queue(). The latter wakes the stopped netdev subqueue once
+>> half of the ring capacity has been consumed, tracked via the new
+>> cons_cnt field in tun_file. cons_cnt is updated while holding the ring
+>> consumer lock, avoiding races. As a safety net, the queue is also woken
+>> when the ring becomes empty. The point is to allow the queue to be
+>> stopped when it gets full, which is required for traffic shaping -
+>> implemented by the following "avoid ptr_ring tail-drop when a qdisc
+>> is present". That patch also explains the pairing of the smp_mb()
+>> of __tun_wake_queue().
+>>
+>> Without the corresponding queue stopping, this patch alone causes no
+>> regression for a tap setup sending to a qemu VM: 1.132 Mpps
+>> to 1.144 Mpps.
+>>
+>> Details: AMD Ryzen 5 5600X at 4.3 GHz, 3200 MHz RAM, isolated QEMU
+>> threads, pktgen sender; Avg over 50 runs @ 100,000,000 packets;
+>> SRSO and spectre v2 mitigations disabled.
+>>
+>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>> ---
+>>  drivers/net/tun.c | 54 +++++++++++++++++++++++++++++++++++++++++++----
+>>  1 file changed, 50 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>> index b183189f1853..00ecf128fe8e 100644
+>> --- a/drivers/net/tun.c
+>> +++ b/drivers/net/tun.c
+>> @@ -145,6 +145,7 @@ struct tun_file {
+>>  	struct list_head next;
+>>  	struct tun_struct *detached;
+>>  	struct ptr_ring tx_ring;
+>> +	int cons_cnt;
+>>  	struct xdp_rxq_info xdp_rxq;
+>>  };
+>>  
+>> @@ -557,6 +558,13 @@ void tun_ptr_free(void *ptr)
+>>  }
+>>  EXPORT_SYMBOL_GPL(tun_ptr_free);
+>>  
+>> +static void tun_reset_cons_cnt(struct tun_file *tfile)
+>> +{
+>> +	spin_lock(&tfile->tx_ring.consumer_lock);
+>> +	tfile->cons_cnt = 0;
+>> +	spin_unlock(&tfile->tx_ring.consumer_lock);
+>> +}
 >> +
->>   	*ffo = pin->freq_offset;
+>>  static void tun_queue_purge(struct tun_file *tfile)
+>>  {
+>>  	void *ptr;
+>> @@ -564,6 +572,7 @@ static void tun_queue_purge(struct tun_file *tfile)
+>>  	while ((ptr = ptr_ring_consume(&tfile->tx_ring)) != NULL)
+>>  		tun_ptr_free(ptr);
+>>  
+>> +	tun_reset_cons_cnt(tfile);
+>>  	skb_queue_purge(&tfile->sk.sk_write_queue);
+>>  	skb_queue_purge(&tfile->sk.sk_error_queue);
+>>  }
+>> @@ -730,6 +739,7 @@ static int tun_attach(struct tun_struct *tun, struct file *file,
+>>  		goto out;
+>>  	}
+>>  
+>> +	tun_reset_cons_cnt(tfile);
+>>  	tfile->queue_index = tun->numqueues;
+>>  	tfile->socket.sk->sk_shutdown &= ~RCV_SHUTDOWN;
+>>  
+>> @@ -2115,13 +2125,46 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+>>  	return total;
+>>  }
+>>  
+>> -static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>> +/* Callers must hold ring.consumer_lock */
+>> +static void __tun_wake_queue(struct tun_struct *tun,
+>> +			     struct tun_file *tfile, int consumed)
+>> +{
+>> +	struct netdev_queue *txq = netdev_get_tx_queue(tun->dev,
+>> +						tfile->queue_index);
+>> +
+>> +	/* Paired with smp_mb__after_atomic() in tun_net_xmit() */
+>> +	smp_mb();
+>> +	if (netif_tx_queue_stopped(txq)) {
+>> +		tfile->cons_cnt += consumed;
+>> +		if (tfile->cons_cnt >= tfile->tx_ring.size / 2 ||
+>> +		    __ptr_ring_empty(&tfile->tx_ring)) {
+>> +			netif_tx_wake_queue(txq);
+>> +			tfile->cons_cnt = 0;
+>> +		}
+>> +	}
+>> +}
+>> +
+>> +static void *tun_ring_consume(struct tun_struct *tun, struct tun_file *tfile)
+>> +{
+>> +	void *ptr;
+>> +
+>> +	spin_lock(&tfile->tx_ring.consumer_lock);
+>> +	ptr = __ptr_ring_consume(&tfile->tx_ring);
+>> +	if (ptr)
+>> +		__tun_wake_queue(tun, tfile, 1);
+>> +
+>> +	spin_unlock(&tfile->tx_ring.consumer_lock);
+>> +	return ptr;
+>> +}
+>> +
+>> +static void *tun_ring_recv(struct tun_struct *tun, struct tun_file *tfile,
+>> +			   int noblock, int *err)
+>>  {
+>>  	DECLARE_WAITQUEUE(wait, current);
+>>  	void *ptr = NULL;
+>>  	int error = 0;
+>>  
+>> -	ptr = ptr_ring_consume(&tfile->tx_ring);
+>> +	ptr = tun_ring_consume(tun, tfile);
+>>  	if (ptr)
+>>  		goto out;
+>>  	if (noblock) {
+>> @@ -2133,7 +2176,7 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>>  
+>>  	while (1) {
+>>  		set_current_state(TASK_INTERRUPTIBLE);
+>> -		ptr = ptr_ring_consume(&tfile->tx_ring);
+>> +		ptr = tun_ring_consume(tun, tfile);
+>>  		if (ptr)
+>>  			break;
+>>  		if (signal_pending(current)) {
 > 
-> It's easy for driver authors to forget this sort of validation.
-> We should fail close, so it's better to have some "capability"
-> bits or something for the driver to opt into getting given format
-> of the call.
+> 
+> So based on commit log I expected all calls to ptr_ring_consume to
+> be replaced with tun_ring_consume, but it looks like tun_queue_purge
+> still calls ptr_ring_consume.
+> I suspect that together with patch 4 it can sometimes leave us stuck
+> with a stopped queue and an empty ring, forever.
+> 
 
-Regarding the fail-close concern — I agree that relying on drivers
-to check dpll==NULL is fragile. A capability bit alone wouldn't help
-though, since the driver still needs to distinguish which FFO context
-is being requested.
+I see. I will replace ptr_ring_consume() with tun_ring_consume().
 
-I can think of two approaches:
-1. An explicit bool parameter (e.g. `bool per_parent`) instead of
-    overloading the dpll pointer for context distinction.
-2. Separate callbacks for each FFO context (e.g. ffo_get for the
-    top-level and ffo_parent_get for the per-parent).
-
-Do you have a preference, or something else in mind?
-
-Thanks,
-Ivan
-
+> 
+> 
+> 
+> 
+>> @@ -2170,7 +2213,7 @@ static ssize_t tun_do_read(struct tun_struct *tun, struct tun_file *tfile,
+>>  
+>>  	if (!ptr) {
+>>  		/* Read frames from ring */
+>> -		ptr = tun_ring_recv(tfile, noblock, &err);
+>> +		ptr = tun_ring_recv(tun, tfile, noblock, &err);
+>>  		if (!ptr)
+>>  			return err;
+>>  	}
+>> @@ -3406,6 +3449,8 @@ static int tun_chr_open(struct inode *inode, struct file * file)
+>>  		return -ENOMEM;
+>>  	}
+>>  
+>> +	tun_reset_cons_cnt(tfile);
+>> +
+>>  	mutex_init(&tfile->napi_mutex);
+>>  	RCU_INIT_POINTER(tfile->tun, NULL);
+>>  	tfile->flags = 0;
+>> @@ -3614,6 +3659,7 @@ static int tun_queue_resize(struct tun_struct *tun)
+>>  	for (i = 0; i < tun->numqueues; i++) {
+>>  		tfile = rtnl_dereference(tun->tfiles[i]);
+>>  		rings[i] = &tfile->tx_ring;
+>> +		tun_reset_cons_cnt(tfile);
+>>  	}
+>>  	list_for_each_entry(tfile, &tun->disabled, next)
+>>  		rings[i++] = &tfile->tx_ring;
+>> -- 
+>> 2.43.0
+> 
 
