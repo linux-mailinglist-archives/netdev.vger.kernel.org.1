@@ -1,224 +1,430 @@
-Return-Path: <netdev+bounces-285160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285159-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UGaUHso3/GmUMwAAu9opvQ
-	(envelope-from <netdev+bounces-285160-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 08:57:14 +0200
+	id YHXsEJg3/GmUMwAAu9opvQ
+	(envelope-from <netdev+bounces-285159-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 08:56:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9B1F4E3CA9
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 08:57:13 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96FF94E3CA1
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 08:56:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B70BA3029AC0
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 06:55:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2A422300E701
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 06:54:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 102EA33D4FA;
-	Thu,  7 May 2026 06:55:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41F2534678C;
+	Thu,  7 May 2026 06:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="a5FRYbvu"
+	dkim=pass (2048-bit key) header.d=schippers-hamm.de header.i=simon@schippers-hamm.de header.b="iJnVQPgO"
 X-Original-To: netdev@vger.kernel.org
-Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011047.outbound.protection.outlook.com [52.101.57.47])
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B0134104B;
-	Thu,  7 May 2026 06:55:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778136902; cv=fail; b=O7xgC4OECLq7qAuZXAJknt4sjOErm98nE+vWh2s2qvfpIulrdvw1dqhJ5qZis7hDtTQ1UGOmJQa3Vqsdiog0Va4cXNkcbgr5fKAkbk9mdCXiuBk7xKzsY3cE2suP6MnrZHejcvmPDjo63AFautJXM8WmxrvYHVI+xQLJcIStaoE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778136902; c=relaxed/simple;
-	bh=WRZLf4BLH0w7STBzRSOfxkB9QvW53gQdpxap2mm+29c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Kb5I6FpLgPNVvTHhrCGudIf1D4Y+nz3RNVof2X28mKyRkNXG50b7YELngKR3Q4oBVJyIbIkQ8l2d8ot8WcKJs/wHOTve3rU2HBEfmj6HpkVnnvAYFk/ZRkUx6eFiG4eLzg1GFXwLzWeryoYt2I70e4DccC/kSOu8w8HAlSbykfc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=a5FRYbvu; arc=fail smtp.client-ip=52.101.57.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=X1NGqUbdHfQtRaKSgRbGTE4EMd+pstymxDPuDDKy/1sSuAdDNgSCGvegiu70kxT0LZ9wWhYdAOLvcFyX6U/lbhfG2A7MhY5RLd4QCXiv/x7e4JCSJZxXTtGWFx3GOlFpZkjjXHcQDVufwuf+dadmbA863ABMMYe0dPdaDZnmdYBBfcThn/W4aBzdr1ZZj0/1gjdIVVt0XKhQtP7X79AomYWM9GpehHTPKXfDcsJq10Ig5ICiuTTJnI+GYq+YinOMr27UEgeLoY2EvfUomZpRpZKVXS1plHq390rItyJfGKePcIsLLmP3Ai73v7+EkS4QxHnnBQa5/uJ7XrblS4F6BA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=flpPY0ChfI3UoWYIspv8MaxGIljScFMnzNPU6ygroww=;
- b=WMzvYaXOPbtez4aKMP26L67OIj8oHVncKurZMx1hdiC+VYsrVDvuevJxeQYliH2NaI/HS1G9D7VslVp2uFabENaumhfdFEN2GZ73XASbgZS6+LcP6fNqDeCkxDSXOCW1ND3v9UL0X2nHz5zl91K7xCzP96tPAW21onu9XGVn/Uviqs2ZwE7FgbH2Y5tA8k/RaR0KEBwf3z8TMEl5+YuEnUAb0GiuNTyYvPrVTQCqGxKqNMgpj3YpWtd+oX+BM8nQQmCZ2bDfuS3WYCNhZxN/MzIU9m78g+UH1701WckH12me3GBg3O0cLxo2VWHNOw9dxBi13gh75tzWHfum6XTy7w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=flpPY0ChfI3UoWYIspv8MaxGIljScFMnzNPU6ygroww=;
- b=a5FRYbvupO2dxk1NRGbXOqcK8VuaIH/ObeGznlqND7Ja6duVms0uEe823vAVqpb18Yai/o7jRyGUJziM7zuHAAY0LvIoQGl2DnZxYBr1oBlq8Myur2IiSB0VTaJzWMHTdrsuq6prURiM8dKzi6LF8ZZpBycqt9TagBNh9T8zodVFDG3VHNxCXwTLUDaoCw24Ba8lpf5NqUQtZ7ybfTiZyV3ZJvpBeAIWjDLUi4GWdrXICbm9HQGLGHjrULZFSnKIR5y3RQf7sEPkTDY8p5ZPPlbvcGgn6mrsMbW+20B1v1vRuN8HyORg0ZfgLXh74C4iEgjEku1/WqJSPtVmFDjtHQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS0PR12MB7900.namprd12.prod.outlook.com (2603:10b6:8:14e::10)
- by MW3PR12MB4347.namprd12.prod.outlook.com (2603:10b6:303:2e::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.15; Thu, 7 May
- 2026 06:54:57 +0000
-Received: from DS0PR12MB7900.namprd12.prod.outlook.com
- ([fe80::3033:67fc:3646:c62f]) by DS0PR12MB7900.namprd12.prod.outlook.com
- ([fe80::3033:67fc:3646:c62f%5]) with mapi id 15.20.9891.016; Thu, 7 May 2026
- 06:54:57 +0000
-Date: Thu, 7 May 2026 09:54:03 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Danielle Ratson <danieller@nvidia.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"donald.hunter@gmail.com" <donald.hunter@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"razor@blackwall.org" <razor@blackwall.org>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"shuah@kernel.org" <shuah@kernel.org>,
-	"ast@fiberby.net" <ast@fiberby.net>,
-	"liuhangbin@gmail.com" <liuhangbin@gmail.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	Andy Roulin <aroulin@nvidia.com>,
-	"fmaurer@redhat.com" <fmaurer@redhat.com>,
-	"sdf.kernel@gmail.com" <sdf.kernel@gmail.com>,
-	"sd@queasysnail.net" <sd@queasysnail.net>,
-	"kees@kernel.org" <kees@kernel.org>,
-	"nickgarlis@gmail.com" <nickgarlis@gmail.com>,
-	"amorenoz@redhat.com" <amorenoz@redhat.com>,
-	"alasdair@mcwilliam.dev" <alasdair@mcwilliam.dev>,
-	"johannes.wiesboeck@aisec.fraunhofer.de" <johannes.wiesboeck@aisec.fraunhofer.de>,
-	Petr Machata <petrm@nvidia.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"bridge@lists.linux.dev" <bridge@lists.linux.dev>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next 1/6] bridge: uapi: Add neigh_forward_grat
- netlink attributes
-Message-ID: <20260507065403.GA815358@shredder>
-References: <20260503073532.2138165-1-danieller@nvidia.com>
- <20260503073532.2138165-2-danieller@nvidia.com>
- <20260505190044.0608dfb1@kernel.org>
- <20260506070334.GA617302@shredder>
- <DM6PR12MB45167562767CFC70DA9AE8D0D83F2@DM6PR12MB4516.namprd12.prod.outlook.com>
- <20260506150556.4e540854@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260506150556.4e540854@kernel.org>
-X-ClientProxiedBy: FR2P281CA0005.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a::15) To SA3PR12MB7901.namprd12.prod.outlook.com
- (2603:10b6:806:306::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD752F12DA;
+	Thu,  7 May 2026 06:54:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.75
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778136871; cv=none; b=Fcmx56ljmwJ+2DG/U8zVgLqoa8I3CW3nlsKIBEQZ5Eh1nK98ardalHcLFEChUVkxUMqLUzE5ouQa/d4UddA9KXjPGs+pHcEJSlcs7DI6IRvNo6ViEEGcs+d1cuNhlXJxuP6Sg24xT0eixOVLB2WkgKq4JBNzx0FyYx1hne9xn7Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778136871; c=relaxed/simple;
+	bh=8SAmx8Ok1JK3fepgR6uqWCUWeULEgKNuV0+B6q85Fj8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hUAQ48A/grOWKyST4pnolyjdAJ94XvfiLUkN+FMya9ngS6zGoyxcboCe6zy1cqnTMZkTMC5lHbwfgEuUarKpE8HAzqYy96oSETYHmbAYGXP+Brdq5N0/J6/v5i7nSDeTMMe8Phuq2xXnbxpqQp68AJSnPV8CXO7kOCcNj0icAjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schippers-hamm.de; spf=pass smtp.mailfrom=schippers-hamm.de; dkim=pass (2048-bit key) header.d=schippers-hamm.de header.i=simon@schippers-hamm.de header.b=iJnVQPgO; arc=none smtp.client-ip=217.72.192.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schippers-hamm.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=schippers-hamm.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=schippers-hamm.de;
+	s=s1-ionos; t=1778136860; x=1778741660; i=simon@schippers-hamm.de;
+	bh=0s0anbYrKCWTkGQXUN0hZBGeLkkRLnTSX3TgI/yhcOQ=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=iJnVQPgOqVgBmY1TqYIQPJ7Qz7pSX2b+qV7vzJaL8oE9j2opwz8e8BTC91H7zwb0
+	 6r3aLpRlbiGMZGODWfSV2B2jKvCOh+7kAN+UxSAQ4F3RBkRpS/yhvZKH98dd0LHfF
+	 liEOt6OFsE91fuqYjt8I7gtRTxx8kubj8od5gQwnTcwlleyup+TVV59mGAH/XoHNh
+	 e/Ee9eSe6Sxuoxdm2KK5sAob4EoovZ9Oyb/N7+GmyxMxpLMCAXiFU3alioZHhFlAU
+	 +zAKEom8eVsv7WL9DSTEYvLReURnvnxJO4TWvgOT+qDiksCwo4PUo1bHKcOdle/ia
+	 WR3TJAZa7JMhCXcIYQ==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue107
+ [212.227.15.152]) with ESMTPSA (Nemesis) id 1MJn4B-1w1QtZ2xtR-00MMe9; Thu, 07
+ May 2026 08:54:20 +0200
+Message-ID: <ee275aa6-af27-4dac-9afa-da88abde312b@schippers-hamm.de>
+Date: Thu, 7 May 2026 08:54:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB7900:EE_|MW3PR12MB4347:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8abc5bd5-8e1d-42a0-40d6-08deac05848b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|1800799024|366016|22082099003|56012099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	SPoeygqzgmp2jUqzpsXTDKGXnCpDi1kfZQwqn8E9H+XiJsUqv7VN7WI/KpiLvfo0dttBDdYnthZ+vadW1W0IFZ7WVsojocvEvc+C2MvkjJn0k69mlzo5Y+Qfwe3Y9T6NMJ9kKVm6ULhO8kAZvrFwmpP0Iq4kh/abMmBCVPFw5nG/Gez+UJw7gZngAiNozVNVSif5Xn6rrmWre1yf9XFVFMD6EoDZdlTO2hLpcCtTsTJu8Z68W0tKJQiL49M61PQdbZp0hwI2dCivT6nRmlb9jrhtuYJ4yCH47HAQm2PTDoD5srqFwbHSLg3uYlh9ueCOt48uh2dkECAtQj7Fwa2lI4a/Jgee4CJOy6WdO3wobnjP/RzqHQtJHHja48CadSZfHN/YzePqj6/YWcRq7ZrOOaRgj2sGLhFvVFrfxdSUle71ETgMR15r18CGqyz8n5HfKvUHL+5PJN8yiYfQR6QG/sTypMvYNeuk1xtRdR8qSZt1PZg7ol3RMFZmoDuN0/mfHMTOqqreWRJeJbLrihSmS+C0mlus+ngFXb0OYxLTesI1I/UhNRsupN7NTQPX5s5JW4K/jPXSfN7s3GeQbloxlxw9bdRP9Z5DKxodiYXBBDvc7AGEq2nmGYIuRTBFZ6L/wEE3sRUplx0r+syPYE9sZrfqjJfF9783kLgG7xBvA06ofB7hwkbEznzLpwRopbfm
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB7900.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?vBQ759M2iUAT9p2lOCQm+VjkUh3eZSjE+LNz9dHdRetTKFUnzv/HnBgCni9Z?=
- =?us-ascii?Q?mtRB0zevxDdrIC50sqlc61I5OQi2q3wAZPj1giTaPuR3TL+z1tS40OZd9gJk?=
- =?us-ascii?Q?m5BzAEwCqTI148HwZsClKf7Aj+zKzGPO3hbyylE/r7EsdX49QxXYOBGnNd/c?=
- =?us-ascii?Q?gxDZIYdMdQV2HbK7WAWsz3nn2+RFcbPQou3BtdEeb+t1egmzXpUGA6HOc0YK?=
- =?us-ascii?Q?iCPJeL2a+HLKsBI6V/MFgsbU6tf4ywpCtyoVQWe+gvdGzqqq7MMmrZTFTElN?=
- =?us-ascii?Q?jA9MplOp3Ps1AwipsPe2qXqI2ePzT0gnUAU3EQ2L3pGYRwh9b2y+IVqdL2h3?=
- =?us-ascii?Q?CpHj93T+3k3PVukRUlhZ8GzUUR/rtzt3E7z4K9iB2eXNRqRLIm8ve1Bk1jqw?=
- =?us-ascii?Q?Ytg0DGE2c9Z1d61NveqoRj8DYt54fB1mqlZOBEMeg/aqdhhdnZScYr4cHDp/?=
- =?us-ascii?Q?sY1hoZFTR6evnY0+NPgldIl8QLUHB44exSHoOK5wMhygDDpsLIgCHjywfNFK?=
- =?us-ascii?Q?BgL9d+5vz9BJUzE7o5JMRojEXqz+jVS2eBR/ggAH8tkG//7RDDPnT+gnrddv?=
- =?us-ascii?Q?FcEtUakE8a3jOSaoXQYjbS2D1KgysQ4l7Y7q3ofojh4CpVyLn9iNUm10PBeL?=
- =?us-ascii?Q?uzZX0DgHQEqD767ZhklvWWXOaN6IStO9v2PwC3ZdghSxluQr5k3wNgDPdiL2?=
- =?us-ascii?Q?PKFFnxVHuPH0+lLIdyX+UO/mLuzSb4VDNGn+lryokjhdGl6HrNj3g8vIqMvy?=
- =?us-ascii?Q?Kh3ekTfGHK+Uhpg62grh1YvznoRL9zbPerHDVdOEZkNTGP+REq1rfr35kOR/?=
- =?us-ascii?Q?eqz540Afv01KsFTLcsTItCiIeyfA2ofH3AwQHgbMvB2DH/G4ltoZzXNw+IxZ?=
- =?us-ascii?Q?MpIasB41xwnz4U0AMDMXiYSZtzPs0pdPxMbbCxBPkmV/sbJpo76hMOPMmZtm?=
- =?us-ascii?Q?Mo//ikAwCCh36qG7/Hg2ejSAX67m0RjLkQhbbZWA88QuKbzgQzoem2e90y5u?=
- =?us-ascii?Q?h8M3AlDuuuqVj/WkkcG5Ptt6njGP+rM+mzdi3Uc77KOqX5+gh7uLhYmxXYP+?=
- =?us-ascii?Q?FXoUin2kx4yIyN3VLwtk43hN3B6gM70uygBoJwFsbIpHJGwOxhQe5JWyaeu5?=
- =?us-ascii?Q?h4tCqgvdKOd3K7GwPOAhfZvZTSV42550SGxj8vaDIAjXu0eAcKRdJwnsoo0S?=
- =?us-ascii?Q?i5I38XfIbyXBomsrDugO9oVFWWx3XD6XhrLahz0z21S7OYIKl9uET4WB410U?=
- =?us-ascii?Q?BNjC1I7eQFtTkfW8ssvZJsLFega0Sg20b4hmx1WRuk3xam1iIfMNJv9mcaIK?=
- =?us-ascii?Q?iOHzVnM0Xnd2XDJHPKpjfdzfYcUZ24uPeGaHWvS2qQ6gKV651XLkysG0IYcr?=
- =?us-ascii?Q?7NX1hJ9aiHvIO68H3TcGW/5QmPfVFO8bQ5WszZoM/v7IecPetOHJYgpUScA/?=
- =?us-ascii?Q?fYNsVgCWxOn/bhuDPWpAWVEvoTJb5S+XYh9v2dHMDHnd/OhTVtSZiKf7VyMs?=
- =?us-ascii?Q?F2yWdzh6VnK6kIFxwtGzXof745q3g6wI8E1lRO4IGv44FKexIpEk5lV6Zr/U?=
- =?us-ascii?Q?Eirian4pD6UDo8i4DhzXS7bFikRANwr/cEq0YjTu0qOGn3lnL1lGJz9wvMFz?=
- =?us-ascii?Q?IpeZ1uW6tl0PqzGWMk+3G74+hz6CgpwRQqGlNBoGp+7R4je9tHoj9ekNp/v9?=
- =?us-ascii?Q?uV4UozcU45M1C9yBNwLMerKKva9LuHzDSW1ETYxHjlZWtTJ/?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8abc5bd5-8e1d-42a0-40d6-08deac05848b
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2026 06:54:57.4782
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zyUkb1/cjjpUWWtxt06XjnH0EHJ5YH/uNImDr7XlK072dSYrGKtTqpxuml0DL4vm3Bfc1xnBouvNly7e+A1k2g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4347
-X-Rspamd-Queue-Id: C9B1F4E3CA9
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 3/5] veth: implement Byte Queue Limits (BQL)
+ for latency reduction
+To: hawk@kernel.org, netdev@vger.kernel.org
+Cc: kernel-team@cloudflare.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20260505132159.241305-1-hawk@kernel.org>
+ <20260505132159.241305-4-hawk@kernel.org>
+Content-Language: en-US
+From: Simon Schippers <simon@schippers-hamm.de>
+In-Reply-To: <20260505132159.241305-4-hawk@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:xLLwt4XY0mBO0B//rPm46MMNitIhIIuGJyuK0d+Zp3/COd9D3Yq
+ NsBVD6qoAjX3cSbdQIl74TEWkl7khC4qfI3/A1sY/9pUPJXCrNetbNNm3Ipd9xxE0OxW8PL
+ PVy18dwRVll2/hls2fcJiKzEU9X4yCrPGqalZKFNqElUd8iuqyDcY+Qv5bEl8eomGuh3sLu
+ 0h56njnwzcE0har0sI9NA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:+GwmJoW9sDc=;QLbKVJXyZlf0ZOP4Y51en+Ojso5
+ 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
+ WDP4j21AFHuNykPlkCSqvLQfhKZwgFaR
+X-Rspamd-Queue-Id: 96FF94E3CA1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[schippers-hamm.de,none];
+	R_DKIM_ALLOW(-0.20)[schippers-hamm.de:s=s1-ionos];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	FREEMAIL_CC(0.00)[nvidia.com,vger.kernel.org,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,blackwall.org,lunn.ch,fiberby.net,iogearbox.net,queasysnail.net,mcwilliam.dev,aisec.fraunhofer.de,lists.linux.dev];
-	TAGGED_FROM(0.00)[bounces-285160-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285159-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[cloudflare.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[simon@schippers-hamm.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[schippers-hamm.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,Nvidia.com:dkim,sashiko.dev:url]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Wed, May 06, 2026 at 03:05:56PM -0700, Jakub Kicinski wrote:
-> > > Related: The AI also did not catch that the spec was missing (easy
-> > > to forget for rtnetlink). Do you think it's worth adding to
-> > > review-prompts?  
-> 
-> I assumed Sashiko missed this because it doesn't spent too much time on
-> the series as a whole right now (I was going to tweak that but looks
-> like Claude is having another meltdown, crazy inference latency,
-> patches backlogging for review..)
-> 
-> Are you saying that the review prompts-based test is also not catching
-> this even if you give it the range of commits that form the series?
+On 5/5/26 15:21, hawk@kernel.org wrote:
+> From: Jesper Dangaard Brouer <hawk@kernel.org>
+>=20
+> Commit dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring to
+> reduce TX drops") gave qdiscs control over veth by returning
+> NETDEV_TX_BUSY when the ptr_ring is full (DRV_XOFF).  That commit noted
+> a known limitation: the 256-entry ptr_ring sits in front of the qdisc as
+> a dark buffer, adding base latency because the qdisc has no visibility
+> into how many bytes are already queued there.
+>=20
+> Add BQL support so the qdisc gets feedback and can begin shaping traffic
+> before the ring fills.  In testing with fq_codel, BQL reduces ping RTT
+> under UDP load from ~6.61ms to ~0.36ms (18x).
+>=20
+> Charge a fixed VETH_BQL_UNIT (1) per packet rather than skb->len, so
+> the DQL limit tracks packets-in-flight.  Unlike a physical NIC, veth
+> has no link speed -- the ptr_ring drains at CPU speed and is
+> packet-indexed, not byte-indexed, so bytes are not the natural unit.
+> With byte-based charging, small packets sneak many more entries into
+> the ring before STACK_XOFF fires, deepening the dark buffer under
+> mixed-size workloads.  Testing with a concurrent min-size packet flood
+> shows 3.7x ping RTT degradation with skb->len charging versus no
+> change with fixed-unit charging.
+>=20
+> Charge BQL inside veth_xdp_rx() under the ptr_ring producer_lock, after
+> confirming the ring is not full.  The charge must precede the produce
+> because the NAPI consumer can run on another CPU and complete the SKB
+> the instant it becomes visible in the ring.  Doing both under the same
+> lock avoids a pre-charge/undo pattern -- BQL is only charged when
+> produce is guaranteed to succeed.
+>=20
+> BQL is enabled only when a real qdisc is attached (guarded by
+> !qdisc_txq_has_no_queue), as HARD_TX_LOCK provides serialization
+> for TXQ modification like dql_queued(). For lltx devices, like veth,
+> this HARD_TX_LOCK serialization isn't provided.  The ptr_ring
+> producer_lock provides additional serialization that would allow
+> BQL to work correctly even with noqueue, though that combination
+> is not currently enabled, as the netstack will drop and warn.
+>=20
+> Track per-SKB BQL state via a VETH_BQL_FLAG pointer tag in the ptr_ring
+> entry.  This is necessary because the qdisc can be replaced live while
+> SKBs are in-flight -- each SKB must carry the charge decision made at
+> enqueue time rather than re-checking the peer's qdisc at completion.
+>=20
+> Complete per-SKB in veth_xdp_rcv() rather than in bulk, so STACK_XOFF
+> clears promptly when producer and consumer run on different CPUs.
+>=20
+> BQL introduces a second independent queue-stop mechanism (STACK_XOFF)
+> alongside the existing DRV_XOFF (ring full).  Both must be clear for
+> the queue to transmit.  Reset BQL state in veth_napi_del_range() after
+> synchronize_net() to avoid racing with in-flight veth_poll() calls.
+> Clamp the reset loop to the peer's real_num_tx_queues, since the peer
+> may have fewer TX queues than the local device has RX queues (e.g. when
+> veth is enslaved to a bond with XDP attached).
+>=20
+> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> ---
+>  drivers/net/veth.c | 86 ++++++++++++++++++++++++++++++++++++++++------
+>  1 file changed, 75 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+> index 0cfb19b760dd..86b78900c48e 100644
+> --- a/drivers/net/veth.c
+> +++ b/drivers/net/veth.c
+> @@ -34,9 +34,13 @@
+>  #define DRV_VERSION	"1.0"
+> =20
+>  #define VETH_XDP_FLAG		BIT(0)
+> +#define VETH_BQL_FLAG		BIT(1)
+>  #define VETH_RING_SIZE		256
+>  #define VETH_XDP_HEADROOM	(XDP_PACKET_HEADROOM + NET_IP_ALIGN)
+> =20
+> +/* Fixed BQL charge: DQL limit tracks packets-in-flight, not bytes */
+> +#define VETH_BQL_UNIT		1
+> +
+>  #define VETH_XDP_TX_BULK_SIZE	16
+>  #define VETH_XDP_BATCH		16
+> =20
+> @@ -280,6 +284,21 @@ static bool veth_is_xdp_frame(void *ptr)
+>  	return (unsigned long)ptr & VETH_XDP_FLAG;
+>  }
+> =20
+> +static bool veth_ptr_is_bql(void *ptr)
+> +{
+> +	return (unsigned long)ptr & VETH_BQL_FLAG;
+> +}
+> +
+> +static struct sk_buff *veth_ptr_to_skb(void *ptr)
+> +{
+> +	return (void *)((unsigned long)ptr & ~VETH_BQL_FLAG);
+> +}
+> +
+> +static void *veth_skb_to_ptr(struct sk_buff *skb, bool bql)
+> +{
+> +	return bql ? (void *)((unsigned long)skb | VETH_BQL_FLAG) : skb;
+> +}
+> +
+>  static struct xdp_frame *veth_ptr_to_xdp(void *ptr)
+>  {
+>  	return (void *)((unsigned long)ptr & ~VETH_XDP_FLAG);
+> @@ -295,7 +314,7 @@ static void veth_ptr_free(void *ptr)
+>  	if (veth_is_xdp_frame(ptr))
+>  		xdp_return_frame(veth_ptr_to_xdp(ptr));
+>  	else
+> -		kfree_skb(ptr);
+> +		kfree_skb(veth_ptr_to_skb(ptr));
+>  }
+> =20
+>  static void __veth_xdp_flush(struct veth_rq *rq)
+> @@ -309,19 +328,33 @@ static void __veth_xdp_flush(struct veth_rq *rq)
+>  	}
+>  }
+> =20
+> -static int veth_xdp_rx(struct veth_rq *rq, struct sk_buff *skb)
+> +static int veth_xdp_rx(struct veth_rq *rq, struct sk_buff *skb, bool do=
+_bql,
+> +		       struct netdev_queue *txq)
+>  {
+> -	if (unlikely(ptr_ring_produce(&rq->xdp_ring, skb)))
+> +	struct ptr_ring *ring =3D &rq->xdp_ring;
+> +
+> +	spin_lock(&ring->producer_lock);
+> +	if (unlikely(!ring->size) || __ptr_ring_full(ring)) {
+> +		spin_unlock(&ring->producer_lock);
+>  		return NETDEV_TX_BUSY; /* signal qdisc layer */
+> +	}
+> +
+> +	/* BQL charge before produce; consumer cannot see entry yet */
+> +	if (do_bql)
+> +		netdev_tx_sent_queue(txq, VETH_BQL_UNIT);
+> +
+> +	__ptr_ring_produce(ring, veth_skb_to_ptr(skb, do_bql));
+> +	spin_unlock(&ring->producer_lock);
+> =20
+>  	return NET_RX_SUCCESS; /* same as NETDEV_TX_OK */
+>  }
+> =20
+>  static int veth_forward_skb(struct net_device *dev, struct sk_buff *skb=
+,
+> -			    struct veth_rq *rq, bool xdp)
+> +			    struct veth_rq *rq, bool xdp, bool do_bql,
+> +			    struct netdev_queue *txq)
+>  {
+>  	return __dev_forward_skb(dev, skb) ?: xdp ?
+> -		veth_xdp_rx(rq, skb) :
+> +		veth_xdp_rx(rq, skb, do_bql, txq) :
+>  		__netif_rx(skb);
+>  }
+> =20
+> @@ -348,10 +381,11 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, =
+struct net_device *dev)
+>  {
+>  	struct veth_priv *rcv_priv, *priv =3D netdev_priv(dev);
+>  	struct veth_rq *rq =3D NULL;
+> -	struct netdev_queue *txq;
+> +	struct netdev_queue *txq =3D NULL;
+>  	struct net_device *rcv;
+>  	int length =3D skb->len;
+>  	bool use_napi =3D false;
+> +	bool do_bql =3D false;
+>  	int ret, rxq;
+> =20
+>  	rcu_read_lock();
+> @@ -375,8 +409,12 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, s=
+truct net_device *dev)
+>  	}
+> =20
+>  	skb_tx_timestamp(skb);
+> -
+> -	ret =3D veth_forward_skb(rcv, skb, rq, use_napi);
+> +	if (rxq < dev->real_num_tx_queues) {
+> +		txq =3D netdev_get_tx_queue(dev, rxq);
+> +		/* BQL charge happens inside veth_xdp_rx() under producer_lock */
+> +		do_bql =3D use_napi && !qdisc_txq_has_no_queue(txq);
+> +	}
+> +	ret =3D veth_forward_skb(rcv, skb, rq, use_napi, do_bql, txq);
+>  	switch (ret) {
+>  	case NET_RX_SUCCESS: /* same as NETDEV_TX_OK */
+>  		if (!use_napi)
+> @@ -412,6 +450,7 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, st=
+ruct net_device *dev)
+>  		net_crit_ratelimited("%s(%s): Invalid return code(%d)",
+>  				     __func__, dev->name, ret);
+>  	}
+> +
+>  	rcu_read_unlock();
+> =20
+>  	return ret;
+> @@ -900,7 +939,8 @@ static struct sk_buff *veth_xdp_rcv_skb(struct veth_=
+rq *rq,
+> =20
+>  static int veth_xdp_rcv(struct veth_rq *rq, int budget,
+>  			struct veth_xdp_tx_bq *bq,
+> -			struct veth_stats *stats)
+> +			struct veth_stats *stats,
+> +			struct netdev_queue *peer_txq)
+>  {
+>  	int i, done =3D 0, n_xdpf =3D 0;
+>  	void *xdpf[VETH_XDP_BATCH];
+> @@ -928,9 +968,13 @@ static int veth_xdp_rcv(struct veth_rq *rq, int bud=
+get,
+>  			}
+>  		} else {
+>  			/* ndo_start_xmit */
+> -			struct sk_buff *skb =3D ptr;
+> +			bool bql_charged =3D veth_ptr_is_bql(ptr);
+> +			struct sk_buff *skb =3D veth_ptr_to_skb(ptr);
+> =20
+>  			stats->xdp_bytes +=3D skb->len;
+> +			if (peer_txq && bql_charged)
+> +				netdev_tx_completed_queue(peer_txq, 1, VETH_BQL_UNIT);
 
-Yes. I noticed this during the STP mode review:
+In the discussion with Jonas [1], I left a comment explaining why I think
+this doesn=E2=80=99t work.
 
-https://lore.kernel.org/netdev/20260324200051.GA572287@shredder/
+I still think first that adding an option to modify the hard-coded
+VETH_RING_SIZE is the way to go.
 
-Where the entire code changes are in a single patch.
+Thanks!
 
-AI review of this patch:
+[1] Link: https://lore.kernel.org/netdev/e8cdba04-aa9a-45c6-9807-8274b6292=
+0df@tu-dortmund.de/
 
-https://sashiko.dev/#/patchset/20260324184942.2828691-1-aroulin%40nvidia.com
-https://netdev-ai.bots.linux.dev/ai-review.html?id=d0cd7a7e-a803-45df-8121-555484a45315#patch-0
-
-We can try to add this to the review-prompts and see if it helps.
+> +
+>  			skb =3D veth_xdp_rcv_skb(rq, skb, bq, stats);
+>  			if (skb) {
+>  				if (skb_shared(skb) || skb_unclone(skb, GFP_ATOMIC))
+> @@ -976,7 +1020,7 @@ static int veth_poll(struct napi_struct *napi, int =
+budget)
+>  		   netdev_get_tx_queue(peer_dev, queue_idx) : NULL;
+> =20
+>  	xdp_set_return_frame_no_direct();
+> -	done =3D veth_xdp_rcv(rq, budget, &bq, &stats);
+> +	done =3D veth_xdp_rcv(rq, budget, &bq, &stats, peer_txq);
+> =20
+>  	if (stats.xdp_redirect > 0)
+>  		xdp_do_flush();
+> @@ -1074,6 +1118,7 @@ static int __veth_napi_enable(struct net_device *d=
+ev)
+>  static void veth_napi_del_range(struct net_device *dev, int start, int =
+end)
+>  {
+>  	struct veth_priv *priv =3D netdev_priv(dev);
+> +	struct net_device *peer;
+>  	int i;
+> =20
+>  	for (i =3D start; i < end; i++) {
+> @@ -1092,6 +1137,24 @@ static void veth_napi_del_range(struct net_device=
+ *dev, int start, int end)
+>  		ptr_ring_cleanup(&rq->xdp_ring, veth_ptr_free);
+>  	}
+> =20
+> +	/* Reset BQL and wake stopped peer txqs.  A concurrent veth_xmit()
+> +	 * may have set DRV_XOFF between rcu_assign_pointer(napi, NULL) and
+> +	 * synchronize_net(), and NAPI can no longer clear it.
+> +	 * Only wake when the device is still up.
+> +	 */
+> +	peer =3D rtnl_dereference(priv->peer);
+> +	if (peer) {
+> +		int peer_end =3D min_t(int, end, peer->real_num_tx_queues);
+> +
+> +		for (i =3D start; i < peer_end; i++) {
+> +			struct netdev_queue *txq =3D netdev_get_tx_queue(peer, i);
+> +
+> +			netdev_tx_reset_queue(txq);
+> +			if (netif_running(dev))
+> +				netif_tx_wake_queue(txq);
+> +		}
+> +	}
+> +
+>  	for (i =3D start; i < end; i++) {
+>  		page_pool_destroy(priv->rq[i].page_pool);
+>  		priv->rq[i].page_pool =3D NULL;
+> @@ -1741,6 +1804,7 @@ static void veth_setup(struct net_device *dev)
+>  	dev->priv_flags |=3D IFF_PHONY_HEADROOM;
+>  	dev->priv_flags |=3D IFF_DISABLE_NETPOLL;
+>  	dev->lltx =3D true;
+> +	dev->bql =3D true;
+> =20
+>  	dev->netdev_ops =3D &veth_netdev_ops;
+>  	dev->xdp_metadata_ops =3D &veth_xdp_metadata_ops;
 
