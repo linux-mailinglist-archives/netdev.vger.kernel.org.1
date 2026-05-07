@@ -1,217 +1,161 @@
-Return-Path: <netdev+bounces-285298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285299-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WDXMAI+A/GkcQwAAu9opvQ
-	(envelope-from <netdev+bounces-285298-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:07:43 +0200
+	id KE70JsGB/GkcQwAAu9opvQ
+	(envelope-from <netdev+bounces-285299-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:12:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BEB24E7FCC
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:07:42 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C5754E808B
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:12:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 055AD3006150
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 12:07:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1136B30065DD
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 12:12:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C2753A7584;
-	Thu,  7 May 2026 12:07:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A4DB3EDAD6;
+	Thu,  7 May 2026 12:12:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="eR58poj/";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="LdQIQl85";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="eR58poj/";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="LdQIQl85"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=louisalexis.eyraud@collabora.com header.b="Z25JEbRA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B6C379EDF
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 12:07:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778155659; cv=none; b=peQWrkx5L5q4DMXHMDn5UVeTJkrbizzf6blZZhZLCXdAWRVtP+yfyvWwXJ09aw4E8KYxueaPjSWPCZyKGWai9IDJsOup17xcrG0EIuL6ZC3PTHbBF3ssMkSu49ZszecG+EdEx7zo22wKRNLuUxbMl0SgRHro6bd4x+iBSlI2SC0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778155659; c=relaxed/simple;
-	bh=+fUUhPZeNFV3P55GU6f2uAVhCRbsf/GQ5bx4jFrbUgs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eOu9ddTWjAaBa+6Ne4bCR8zY7HA9lktYWC8hkkih1WQPEdmroLOHStq0SIEH8jTzP4/5Z85sS7s01VI436i/2w3ntKb9P0DGPwmkT/KPEbf2tyMyRFwHaCi5MMuyfp5V0uaMZfcL1ATbm7bd5rnm5Gpf4GDZ1O41AhGFzJv3Cpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=eR58poj/; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=LdQIQl85; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=eR58poj/; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=LdQIQl85; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from lion.mk-sys.cz (unknown [10.149.218.202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 6963F6C2E6;
-	Thu,  7 May 2026 12:07:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1778155656; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=II893x9pv21BNu8DzYEbQrpAQwkDCQdRE03nONT/+l0=;
-	b=eR58poj/CBeswVinjLEPpM0uv8HzcysUFo5dP0qT5a0J/sAT8iIHEx4/TuNml/pUSyrA2Q
-	rD7u0bqwGnGhTUd4T/WMmPG63UxFD3jz6g/JQmBwvrc8334HPtRpEFbeM/iQ2AXVl4V8vf
-	hXOzNyN9OSTkW8109NiM5q10uBGPNow=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1778155656;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=II893x9pv21BNu8DzYEbQrpAQwkDCQdRE03nONT/+l0=;
-	b=LdQIQl85Yw5zfgaJv09UPTgTvqRYQ1pt1EH/Zp0YPh8jLeOExEqLz58hGQdZdV5HD6Kvhw
-	ssjxy8OBYlKwVFAg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1778155656; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=II893x9pv21BNu8DzYEbQrpAQwkDCQdRE03nONT/+l0=;
-	b=eR58poj/CBeswVinjLEPpM0uv8HzcysUFo5dP0qT5a0J/sAT8iIHEx4/TuNml/pUSyrA2Q
-	rD7u0bqwGnGhTUd4T/WMmPG63UxFD3jz6g/JQmBwvrc8334HPtRpEFbeM/iQ2AXVl4V8vf
-	hXOzNyN9OSTkW8109NiM5q10uBGPNow=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1778155656;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=II893x9pv21BNu8DzYEbQrpAQwkDCQdRE03nONT/+l0=;
-	b=LdQIQl85Yw5zfgaJv09UPTgTvqRYQ1pt1EH/Zp0YPh8jLeOExEqLz58hGQdZdV5HD6Kvhw
-	ssjxy8OBYlKwVFAg==
-Received: by lion.mk-sys.cz (Postfix, from userid 1000)
-	id 3FADA2008C; Thu, 07 May 2026 14:07:36 +0200 (CEST)
-Date: Thu, 7 May 2026 14:07:36 +0200
-From: Michal Kubecek <mkubecek@suse.cz>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: netdev@vger.kernel.org, idosch@nvidia.com, petrm@nvidia.com
-Subject: Re: [PATCH ethtool-next 0/5] ethtool: Add 'pages on|off' option for
- module EEROM hex dump
-Message-ID: <4chkrvenxrbc2tylrbob6vdo3uyjzbwbhbup25yvnohrccvotv@fd7rqasq4btv>
-References: <20260507114721.3409128-1-danieller@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0193399375;
+	Thu,  7 May 2026 12:12:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778155963; cv=pass; b=EwErx0395Aff2PBa2j72t0X3LA4KeR/d+8YsWgzBu/bvv0lsSkcleDV5KgLPyyYdsE/TRQK+lXWuTer/yJqG9ZFvyNZPREKfZ0Rux6QwkjMkWLMo5dKdRVPquHyM9wcmQVHlo761P+AZWh73DB5AUDfDTx7m0UMQWMo2Lz5F13o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778155963; c=relaxed/simple;
+	bh=KGezB8CFKk6umGZCllHLAZYg1/rr7fGfklybicq5nXo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=AdrYoHbaD6hmPhRMSp9LtI1Aff2PP2STFo7D6pHPscoxyAZw4U4rNkqyH9Wt6WP9jLVbzkYExofKCXWt0Pl9MqmsD3JEusdoPgQpeHBs511U1UlMk1Hqkpu4/1hU3xNHTG13eNQI3Ok2Vb9n5XS6jbsx64MrB9XLImrzrTMmWSg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=louisalexis.eyraud@collabora.com header.b=Z25JEbRA; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1778155922; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=SDqglZccFbVPk9LWQ0GXBIIjb5MTR7/+sA4n+fjXZXzD2J20OQUNcGzzI8P2ThMpfbxK0suJSqw8KJoBxUETcpz+Zc1EsGX5POHky3de0r5e5g2HHPRZpf/A66O4+k6/I53xMY74F7R0YsQ7AfWTkzcr6RKxCUardLqYkuBWWMo=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1778155922; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=ZrnqX96u+Flxd2Q9FYBoadC2ai7BMu/bBuPcHTaRBc8=; 
+	b=LYk7OweCiBXGFeROcxl94OQydGvYw21aGDkgLo+D1qZw4lSgNAKmsD4LBq99l0c5nxOdVNjUcxb0ZORrKWKRllaWvWOfa0SAtujSYSDKZH9OzQ6BH22mvkJUimyAsUyQzusXbCKMgQ88pUXTz/BGOjLc2qrjZW5lRU70bdIpoIM=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=louisalexis.eyraud@collabora.com;
+	dmarc=pass header.from=<louisalexis.eyraud@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1778155922;
+	s=zohomail; d=collabora.com; i=louisalexis.eyraud@collabora.com;
+	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
+	bh=ZrnqX96u+Flxd2Q9FYBoadC2ai7BMu/bBuPcHTaRBc8=;
+	b=Z25JEbRAuz4jHpuHjKB0FLBVYYQUt9rboPSOl82e/pL+qjfex4RSH2vRvdYw63Ix
+	zq4cfxq08lheqbLqpsL6cC/SUNOrT3BXqQr9WSwsjFWj+f5KbYlmn6rw960vb09NAzS
+	ER90yeFBhvryN8yxHZfczpNpOZdDwFMWxNGocsm4=
+Received: by mx.zohomail.com with SMTPS id 1778155920789528.3783773258275;
+	Thu, 7 May 2026 05:12:00 -0700 (PDT)
+Message-ID: <9f569ba00b959b701a7a51bcd7347c1a108a15ee.camel@collabora.com>
+Subject: Re: [PATCH net-next v2 3/4] net: phy: air_phy_lib: Factorize
+ BuckPBus register accessors
+From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley	
+ <conor+dt@kernel.org>, AngeloGioacchino Del Regno	
+ <angelogioacchino.delregno@collabora.com>, Heiner Kallweit	
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	kevin-kw.huang@airoha.com, macpaul.lin@mediatek.com,
+ matthias.bgg@gmail.com, 	kernel@collabora.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, 	linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, 	linux-kernel@vger.kernel.org
+Date: Thu, 07 May 2026 14:11:54 +0200
+In-Reply-To: <3bd7803d-4c4a-4f61-9434-a6bf25627b58@lunn.ch>
+References: 
+	<20260326-add-airoha-an8801-support-v2-0-1a42d6b6050f@collabora.com>
+	 <20260326-add-airoha-an8801-support-v2-3-1a42d6b6050f@collabora.com>
+	 <3bd7803d-4c4a-4f61-9434-a6bf25627b58@lunn.ch>
+Organization: Collabora Ltd
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="tbokijsiy3mioc57"
-Content-Disposition: inline
-In-Reply-To: <20260507114721.3409128-1-danieller@nvidia.com>
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: -5.90
-X-Rspamd-Queue-Id: 9BEB24E7FCC
+X-ZohoMailClient: External
+X-Rspamd-Queue-Id: 3C5754E808B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-3.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[collabora.com,none];
+	R_DKIM_ALLOW(-0.20)[collabora.com:s=zohomail];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-285299-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285298-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[suse.cz];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	RCVD_COUNT_THREE(0.00)[4];
+	HAS_ORG_HEADER(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,collabora.com,gmail.com,armlinux.org.uk,airoha.com,mediatek.com,vger.kernel.org,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mkubecek@suse.cz,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,suse.cz:dkim]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[louisalexis.eyraud@collabora.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[collabora.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,collabora.com:mid,collabora.com:dkim]
 X-Rspamd-Action: no action
 
+Hi=C2=A0Andrew,
 
---tbokijsiy3mioc57
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, May 07, 2026 at 02:47:16PM GMT, Danielle Ratson wrote:
-> The existing 'ethtool -m' command can dump module EEPROM data either as
-> a parsed pretty-print or as a raw/hex dump. The pretty-printer reads
-> multiple pages per module type, but decodes only specific fields from the=
-m.
+On Thu, 2026-03-26 at 13:30 +0100, Andrew Lunn wrote:
+> > @@ -480,8 +287,8 @@ static int en8811h_wait_mcu_ready(struct
+> > phy_device *phydev)
+> > =C2=A0{
+> > =C2=A0	int ret, reg_value;
+> > =C2=A0
+> > -	ret =3D air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
+> > -				=C2=A0=C2=A0=C2=A0=C2=A0 EN8811H_FW_CTRL_1_FINISH);
+> > +	ret =3D air_phy_buckpbus_reg_write(phydev,
+> > EN8811H_FW_CTRL_1,
+> > +				=09
+> > EN8811H_FW_CTRL_1_FINISH);
 >=20
-> In practice, both outputs are often needed together for offline debugging:
-> the pretty-print to identify the module type and decoded fields, and the
-> hex dump for fields the pretty-printer does not decode. However, there is
-> no single command that provides the raw hex dump of all relevant pages,
-> organized by page boundary. This is especially problematic for CMIS
-> transceivers where the existing hex dump does not provide Upper Pages
-> beyond Page 02h, let alone banked pages.
+> Is a rename required? Is the namespace air_buckpbus_ used somewhere
+> else?
 >=20
-> This series adds 'pages on|off' sub-option to 'hex on|off' for
-> 'ethtool -m':
-> $ ethtool -m hex on pages on
->=20
-> That produces a hex dump organized by page, matching exactly the pages re=
-ad
-> by the pretty-printer for each module type.
+> 	Andrew
+Sorry for the delay.
 
-Do we need the "pages on|off" switch? Is there a reason not to show the
-full dump always (whenever possible) but only when requested explicitly?
+The air_buckpbus_ namespace is only used in the air_en8811h driver.
+It seemed better to me that in the new air_phy_lib, all functions (the
+buckpbus accessors and air_phy_read/write_page functions) started with
+the same prefix. That is the reason I renamed them, even if not
+required.
 
-Michal
+As an alternative, to avoid renaming those buckpbus function calls on
+air_en8811h driver and reduce this patch changes, I can add macros at
+the beginning of the file such as:
+```
+#define air_buckpbus_reg_write(_phydev, _pbus_address, _pbus_data) \
+	air_phy_buckpbus_reg_write(_phydev, _pbus_address, _pbus_data)
+```
 
-> Each page is preceded by a header identifying the page number and, for
-> banked modules, the bank number. For SFP, where the two memory regions
-> are separate I2C addresses rather than pages, the header shows the I2C
-> address instead.
->=20
-> Output example (values zeroed to omit vendor-specific identifiers):
->=20
-> $ ethtool -m swp61 hex on pages on
-> Page: 0x0
->=20
-> Offset          Values
-> ------          ------
-> 0x0000:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x0010:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x0020:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x0030:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x0040:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x0050:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x0060:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x0070:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->=20
-> Page: 0x0
->=20
-> Offset          Values
-> ------          ------
-> 0x0080:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x0090:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x00a0:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x00b0:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x00c0:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x00d0:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x00e0:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x00f0:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Would it be okay?
 
---tbokijsiy3mioc57
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmn8gIIACgkQ538sG/LR
-dpWGaAf6A/4bRm9fL2fQyJ0qBcB7oPWa131mNPLyeuxUIpnCVaF9OKOzkXfKbair
-bDyqL6UBpMqUQVhHIK4AC83hBvkFdawwkaMbAYguVeXQQEkuIQRDRIX+to1FDLYK
-BzMBjfEJ9Ng85PTs1hCWA/jcOSYFtVL8Cl+Q5Oalh5KCNndQ61gQZ9c1gkCugqIg
-cyw7OtY0GhyUAkWUw0FYm/oP4Cq4Zxo/h+qWB00H0lSP1Oei7yqSOIUCgEAPlnFu
-vHAP/3gxiR65UvCJmGYAX1ITnOU4Nf/EOVOAMhFpEmQSRaVfMmLtK48wd69CpEcS
-Y9ULzvOqPURjMd5J/y6HZiUoN15Vbw==
-=9aAw
------END PGP SIGNATURE-----
-
---tbokijsiy3mioc57--
+Best regards,
+Louis-Alexis
 
