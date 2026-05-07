@@ -1,147 +1,182 @@
-Return-Path: <netdev+bounces-285431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285433-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kDJjJae9/GnSTAAAu9opvQ
-	(envelope-from <netdev+bounces-285431-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:28:23 +0200
+	id GKrzJvm+/GnSTAAAu9opvQ
+	(envelope-from <netdev+bounces-285433-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:34:01 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 952844EC314
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:28:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D9B014EC4A9
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:34:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id CAA113014D9E
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 16:20:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 74FF6300BC97
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 16:30:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A4F33B584A;
-	Thu,  7 May 2026 16:20:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B6594218A1;
+	Thu,  7 May 2026 16:30:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EM3sTvvw"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="iWVScX3t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92D439FCCC
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 16:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B87037269F;
+	Thu,  7 May 2026 16:30:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778170853; cv=none; b=PJ++Xo8txLO8lOZKLCJhqF690ujzpi1FCQASqOqYXUyMkTCDYQz55vCEHGr+EDXTWL/bFON+N2f119x3/6eYN2u03iwdypxLrvUmOJQfUu0Ropqg8LsEjyiiYZpjl3Z7QqymeNSKqlvlvuDugyUlt+G+1ZLUP6jsdCPFBqgGZhg=
+	t=1778171414; cv=none; b=p+O275LvhTwAFrvBhr8lc/pnzcBSwm5n2zDum2EJpj4cMGNKg7BNvnQG0YWGJwzOJqVfLR22q55w9pc48aQ2T+60fMy7kI5ZjpzWn3IFcZgFZF2I02WegptOm6UFqpG18+Cx7wUB4gIpQJKQEHSw1ebdZbVQBfHEk5wmFnNVKjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778170853; c=relaxed/simple;
-	bh=zkf1WUEwq0NJqP7pNprYQYYYZC5d0HmnjXBi/YyVyEw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cycFIhFcusNdP/g4yIMPvBaVWE/6J6K1IhgcwaBoqZYrSZ5ACuSeqbZS+gdg11wufotOMxdC2pkt+5R/Rn/+A6EMP/dPO73inNJ6LxWb+8/PwOZT/xyjCjZaJM9NuVPY/cgujZAl7sEcUajZPR3IDG2PEcPI62OGKiebTkADZdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EM3sTvvw; arc=none smtp.client-ip=209.85.167.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-479d37e7d7fso357905b6e.1
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 09:20:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778170851; x=1778775651; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zkf1WUEwq0NJqP7pNprYQYYYZC5d0HmnjXBi/YyVyEw=;
-        b=EM3sTvvwaE48pwBN7Qrw4Kkjl+Q2zByQrdWiRoHghhHRX6udpNWWMgWjCkeWC6uL1/
-         kuf3iRiCWsTP/pvUrmKqjhgolGohLwZm0rdRHePvJOvcMdOAikzCVbsX+3sIiNhZ/pkk
-         jDp9hK2J0KRlx5vMXWdHvwRp6pbOs/m9E/d0WCYOWyA89pFMrnydIdDanfMGu48pT6rk
-         nP8LsjbFkl7TWJVJeqHW4vfuNMdseFnK3r1ZfAW8PBL96hlfUE/5iQyGkjmFA9/kdmTA
-         BlykieDzHVAJaATTGSzqyNB2Byg9DP41RB/1D1NLDU7aTv2ejun+beZUqrc8HD4ca2jb
-         Z6Pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778170851; x=1778775651;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zkf1WUEwq0NJqP7pNprYQYYYZC5d0HmnjXBi/YyVyEw=;
-        b=Lw8zgrHK1VsIGJy+z0bHx9rHH1IyVSWc1q6QERTslV55aw1SOGo4U9RfDF4IJviVHp
-         oP1V97H4hGHnd0HJYj2z8Nb84Ch+q24GOpYvZXT4em+wdqg0JeSa5JiaPWL4i3l4yw2O
-         m8zLSYmUlVxWAYZan65Um2/EBbBVOwgeE5sGZ8RNkEaZI40qjOlCmVivqqm7ozMqVVK6
-         JuCy/tKNPDs7TiKrUtjyoEsWQLXoMJCvAhxWKislNJOt8si0LhGmVHYtk4tXsqWMzR5P
-         YCabMwjD9T8sMI3jWimMKI0JimY64iain3c/TAatmUbWdnjwBh2SwIalxo5K3PI9Z+xB
-         qLGQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9K0mekLbqiJdoEMEvoR2b5QYbJHKNkqlE0boQn31RSjLowOwK1OA7HZdwSskN92KUQ9fVMDUA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWwt+6okbsU+DuSd2w5y8eQdZk4U5yREeROkpQqKK8hpriBQGL
-	YGQwMlcZkbPMNIYlW6aDQZ6vBt6Eqpe+N8zdrso1biPJAkQy5f/mJxLF
-X-Gm-Gg: AeBDiesr0s9R+mXDXdzYwwG1FgLRDgozMa0Sm/GQDubqLQn7bExifLK6tbyPyPTQLR0
-	Ss7ZEnWCMHtoAwqDj4S7jPogMwZS1mmdTOTqi+VGo3mxM7DJK1DVbAI4Z2hN0ou51DLdPAWyOst
-	gBlcGPA7xulKKcS3spUKBmXxP/ufl/eq9BP9fREyjH/3psNtwr7+sLjS49SolhBsyuZP/3cfqD5
-	SzPDLg3IMzemwbP1ODQtnqUGv4hZxTcXfdwkAfx9KN4FPK4muI3tP2qHOhClgAEAcZEjeC1rtAe
-	Np6fpHUUDK4c8ST6I0SWhG9lxTyxPfN1mBFBTjs8Y3408ICHS5mi/jtc/tD4M48RkOuV/8CvdpT
-	uw3tGd+FaYHD1JC3ec667h1zaihtDCX+gBYO1rsRoD/L2pVCruGyl38zPAF1z3ugbYljX2ZU7M2
-	g0MBa4DPMP7UeKy5nxY2oyF+PDuRMZOdf0IWNS6XJQQuUZnvR+B7FkSAVY54cFdsIvReQ4B+Eh9
-	EWcXRmSTECGxsZaweeWsxX5y7bb
-X-Received: by 2002:a05:6808:d4b:b0:479:e7c7:dc71 with SMTP id 5614622812f47-4804251eb3amr4874509b6e.38.1778170851608;
-        Thu, 07 May 2026 09:20:51 -0700 (PDT)
-Received: from ?IPV6:2601:282:1e02:1040:44c7:fa6e:bd21:8ab6? ([2601:282:1e02:1040:44c7:fa6e:bd21:8ab6])
-        by smtp.googlemail.com with ESMTPSA id 5614622812f47-48061e6eb84sm1599617b6e.0.2026.05.07.09.20.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 May 2026 09:20:50 -0700 (PDT)
-Message-ID: <3cf0dcca-9a3f-4cee-83d7-f058f33bcc04@gmail.com>
-Date: Thu, 7 May 2026 10:20:49 -0600
+	s=arc-20240116; t=1778171414; c=relaxed/simple;
+	bh=JF5H04WoSuU8ZS1WCukHF3QcigcJRhlCF8unmAcPvLQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GjlabwShmS5O7rDipjRxg+UKSrkwcZFp6fktdFYVnZW08bsrZuD1XhHgew5csPp6xLwkzlF52qTG7stW+uAC03TFypXNv51pEupw8+/oOyTrnim2Jz+3hhTGOz1f5wLwxV6c02sXQM7cKbmyB6KLiZZFf4CIgTcYBhqR9iKVPp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iWVScX3t; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=kYKaL1jQ8LGdN9smjIQLGtIx8ZielLRVj4GVygHNyZw=; b=iWVScX3t1Vr7jT65EBijDEZtTC
+	xR/IYFApXe/XCCjv6FXei/9xmMjJxEdUZzW87RUeUyhJcv+B3eVHQz9NAIK/eJD4bXgOtQg4e8bFF
+	6Q7shNjm3ibz3YIv1APpxKSOp0zLPRl0qLPCWLDITqKG+x6Yq2AcgJxHUp5giJaS4zUk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wL1b9-001qT0-IB; Thu, 07 May 2026 18:29:15 +0200
+Date: Thu, 7 May 2026 18:29:15 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Daniel Thompson <daniel@riscstar.com>
+Cc: Alex Elder <elder@riscstar.com>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, maxime.chevallier@bootlin.com,
+	rmk+kernel@armlinux.org.uk, andersson@kernel.org,
+	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org,
+	arnd@arndb.de, gregkh@linuxfoundation.org,
+	mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com,
+	alexandre.torgue@foss.st.com, ast@kernel.org,
+	boon.khai.ng@altera.com, chenchuangyu@xiaomi.com,
+	chenhuacai@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	hkallweit1@gmail.com, inochiama@gmail.com, john.fastabend@gmail.com,
+	julianbraha@gmail.com, livelycarpet87@gmail.com,
+	matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
+	prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
+	rohan.g.thomas@altera.com, sdf@fomichev.me,
+	siyanteng@cqsoftware.com.cn, weishangjuan@eswincomputing.com,
+	wens@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 10/12] net: stmmac: tc956x: add TC956x/QPS615
+ support
+Message-ID: <ef6df85f-11ac-404d-958a-8cf69b3b6bb6@lunn.ch>
+References: <20260501155421.3329862-1-elder@riscstar.com>
+ <20260501155421.3329862-11-elder@riscstar.com>
+ <2ce5897d-5bbb-486a-b0f0-0e30e54b451a@lunn.ch>
+ <afy34kj2hPxIlArO@aspen.lan>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 iproute2-next 1/4] rdma: Update headers
-Content-Language: en-US
-To: Chiara Meiohas <cmeiohas@nvidia.com>,
- Stephen Hemminger <stephen@networkplumber.org>
-Cc: leon@kernel.org, michaelgur@nvidia.com, jgg@nvidia.com,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- Patrisious Haddad <phaddad@nvidia.com>
-References: <20260330173118.766885-1-cmeiohas@nvidia.com>
- <20260330173118.766885-2-cmeiohas@nvidia.com>
- <20260427112505.684c21f3@phoenix.local>
- <77e1a762-e204-497b-b7cb-40d5a93f8ec7@gmail.com>
- <98c17c60-6747-4c2b-bfe4-ce9bbe560f6d@nvidia.com>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <98c17c60-6747-4c2b-bfe4-ce9bbe560f6d@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 952844EC314
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <afy34kj2hPxIlArO@aspen.lan>
+X-Rspamd-Queue-Id: D9B014EC4A9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_CC(0.00)[riscstar.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-285433-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285431-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[50];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dsahern@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	FREEMAIL_FROM(0.00)[gmail.com]
+	TAGGED_RCPT(0.00)[netdev,kernel,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-On 4/28/26 4:05 AM, Chiara Meiohas wrote:
-> We will prepare a sync patch to align the names with the kernel and send
-> it shortly.
+On Thu, May 07, 2026 at 05:03:46PM +0100, Daniel Thompson wrote:
+> On Fri, May 01, 2026 at 09:04:58PM +0200, Andrew Lunn wrote:
+> > > +static struct tc956x_mac_speed mac_speed[] = {
+> > > +	{ PHY_INTERFACE_MODE_2500BASEX,	SPEED_2500,  SP_SEL_SGMII_2500M, },
+> > > +	{ PHY_INTERFACE_MODE_SGMII,	SPEED_2500,  SP_SEL_SGMII_2500M, },
+> > > +	{ PHY_INTERFACE_MODE_SGMII,	SPEED_1000,  SP_SEL_SGMII_1000M, },
+> >
+> > That looks odd. Some vendors implemented 2500BaseX using SGMII
+> > overclocked. But that is not strictly 2500BaseX. Having the 2500BASEX
+> > entry suggests you have real 2500BASEX, so why have an SGMII entry
+> > with SPEED_2500?
+> 
+> This is a consequence of the code that uses this lookup table being
+> called both during initialization and from the fix_mac_speed() callback.
+> 
+> During initialization we only have the value in plat->phy_interface to
+> go on so we run the lookup table using plat->phy_interface (which is
+> typically PHY_INTERFACE_MODE_SGMII) and with the maximum permitted
+> speed.
 
-what happened to this request? I see that Stephen had to post a patch
-(not yet applied) to address this problem:
+Something sounds wrong here. SGMII only supports 10/100/1G. You should
+never be asked to do SGMII at 2500. It should ask for 2500BaseX.
 
-https://patchwork.kernel.org/project/netdevbpf/patch/20260505181045.748088-1-stephen@networkplumber.org/
+> I haven't got detailed enough notes to allow me to double check but I
+> think there were problems completing the initial MAC reset if we didn't
+> write something sensible to the hardware during initialization.
 
-We allow rdma to have separate uapi headers for convenience. Responses
-to mistakes need to be timely.
+> During fix_max_speed() we get told to adopt 2500base-x. Reviewing the
+> code I can see we don't propagate that and just use
+> plat->phy_interface for fix_mac_speed(). I will fix the code to that
+> the requested interface propagates properly to the lookup table but I
+> think we would still rely on the SGMII entry to get sane initial values
+> to write to the hardware.
+
+Getting sane values into the hardware is good, but 2500 SGMII is not
+sane :-(
+
+> > Doesn't that break any other dwxgmac301 in the system? Shouldn't you
+> > be making a copy of the global structure, and then making
+> > modifications to your copy? mac->dma then points to your copy?
+> 
+> That's exactly what this code does.
+> 
+> `*dma = dwxgmac301_dma_ops` is a structure copy, we never take a pointer
+> to dwxgmac301_dma_ops (and if we did, dwxgmac301_dma_ops is const so I
+> think we'd get a kernel oops if we tried to write to rodata).
+> 
+> Would to code be easier to read if we dropped the local `dma` variable
+> since that would make it clearer that td->dma is not a pointer? More
+> like:
+
+> +       /* dwxgmac301_dma_ops needs extending to provide DMA address translation */
+> +       td->dma = dwxgmac301_dma_ops;
+> +       td->dma.init_rx_chan = tc956x_dma_init_rx_chan;
+> +       td->dma.init_tx_chan = tc956x_dma_init_tx_chan;
+> +       mac->dma = &dma;
+
+Yes, that is better. I also think it is partially my problem. You
+don't often see structure assignments, just pointer assignments. So
+i'm somewhat blind to them.
+
+	Andrew
 
