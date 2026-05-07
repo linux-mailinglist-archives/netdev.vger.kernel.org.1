@@ -1,87 +1,86 @@
-Return-Path: <netdev+bounces-285203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285204-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AGvYG/5X/GlOOAAAu9opvQ
-	(envelope-from <netdev+bounces-285203-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 11:14:38 +0200
+	id +IWIDdBZ/GndOQAAu9opvQ
+	(envelope-from <netdev+bounces-285204-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 11:22:24 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A1A04E59F9
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 11:14:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C7AD84E5BBD
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 11:22:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 45387301F175
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 09:12:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 257913001BDE
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 09:22:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88ED3BED19;
-	Thu,  7 May 2026 09:12:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADFD93C343D;
+	Thu,  7 May 2026 09:22:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="HLiDjvEU"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="g9y4kQ6g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746013A783C;
-	Thu,  7 May 2026 09:12:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0345339B4A1;
+	Thu,  7 May 2026 09:21:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778145156; cv=none; b=quISsd6iGRG3+dpPg4wUVCrZB9ZrNPtPMDi4Mz90vG1Ub0sxBzDn3mChs+vJjKB49IQL6t7VgiKj8Q/ZoeHybHuglV+LJECB1f7iukW1zWmebDz5S9I6CXVB9EcFTcc1hwoqIGKoYiXxmFcXllAWNLk8aMPH4Or/XLJFB61d5ng=
+	t=1778145726; cv=none; b=fR0HbDanS2YuZbDKNCM/fwFcBj8Lr2VrH6OJze/wtfabyc2nl1phWaC7iNdeytCLFsr6wqFlPoR7cow6/40LmMzKWj9nQkoTXtDbNvDfc3W1zWqcXBefO4kU4W+lmL7O5w4jfOzcwbRUJUWftdd1T8Pj2xeq4Vt+GEvw76MaopM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778145156; c=relaxed/simple;
-	bh=TpAH4ly1JvzSBPKPKez3qwvO9mLMoA6jZXSQAGqWwJs=;
+	s=arc-20240116; t=1778145726; c=relaxed/simple;
+	bh=59tWzzAtxTcAUWtxPg7MT4meYExWqFkXq0PcIIC22U8=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gTsZ6r9BugahesEqzrru2EZvXkhxS+RGuY7doDGRpKBYvE1qSo1q2KgRZQs8AkHAHY3QVhZqjC8DQBgo8H1yxitonzldGmW3sXaSPoyPXQPp+MjWouGNzUqGXQo/WNmdEAzjkX+IugEnguW2ZcJcMehFqYkYRZdxxmRnQKcCJ8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=HLiDjvEU; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 1E093207BE;
-	Thu,  7 May 2026 11:12:23 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id L46hcP1uUZqt; Thu,  7 May 2026 11:12:22 +0200 (CEST)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 57AB320538;
-	Thu,  7 May 2026 11:12:22 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 57AB320538
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1778145142;
-	bh=a5m+ellgDoNWmkgUOHOlkJbkKAnPK7OIv3NtKD+YVYM=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=HLiDjvEURj3ZZ5A52+qlzNbT0c1HHlrFlaa2Mo1fbn9Oq41ZlKIroh4agYnqsua7y
-	 uBaXUIB8zf1JT/WTbjrvL706dDIh2Jjp5K3MGfp+w4bNgQ3/yKFMoaACsgV7w8ijyF
-	 84yv0YVMbs4c3K9tf4jSFR9J8ol123aQCic+Rouxp10zN4nnbFvL2ryW/gfI8p3BO1
-	 J23gzwFfy+qrwJRKjNdjVnF/1O5Pkmd6WpAxLV04OqZvT286YAi+0dScTxfAn9LPGl
-	 2p0dFeYwvu8VSAUVp7GSTulZmTX9xgs1iuiBc8m3x6QV6oDOo1fspXvyfvKh0AGZwE
-	 55JgJBLiohkiQ==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 7 May
- 2026 11:12:20 +0200
-Received: (nullmailer pid 1495340 invoked by uid 1000);
-	Thu, 07 May 2026 09:12:19 -0000
-Date: Thu, 7 May 2026 11:12:19 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Antony Antony <antony.antony@secunet.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
+	 Content-Type:Content-Disposition:In-Reply-To; b=OMxd/oQJ33YdE6AT80qbUT2k+wM4cd20VQCcZEcH9y8wGaH4HccNDBc18BdE5JT0MCOhquPb7Ng5/ApOEn27eSpp2EgUl3G5vR8kASA22Y2VeyOZf5lei7vEqh/VocvZNbwatoxMf8gq9qovSnV2Esysfq0KgzGgbYDB0eEQk3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=g9y4kQ6g; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1778145722; x=1809681722;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=59tWzzAtxTcAUWtxPg7MT4meYExWqFkXq0PcIIC22U8=;
+  b=g9y4kQ6gFiYW33DsWEzlXYceI0q7j/DgUhmouwckCDRexjobV5GsbPuW
+   WqE5GCHsnPQtlwlUub5RI+b7WPI7dGMeYIE7Nc9X8k2lPo4FH7LxnlVq5
+   UM7H2b4qx77ZrmgvdXfqIIeyAX/fjfcTrd6TRRkq4JMTJjLGtlZGlsdt1
+   aFICESoosTIVJ1nPw0xwRd6ywFc+IPIoiACfR2OVnyXTqlPqn8eZzIKKa
+   7Hulup+NQXbykTQRSFwNAla4H/EiVDYElnrCbpzXG4TWx+veu3n7993kK
+   6a/xqs+uNGmfqAnuOdDPG13wo5UqOTtfuDmfxCu4G/viyvGho2624N0rs
+   A==;
+X-CSE-ConnectionGUID: omU3fqXoTGyYlhpuglZLEQ==
+X-CSE-MsgGUID: e1bn+2lrSq6R0TTCN/0y/Q==
+X-IronPort-AV: E=Sophos;i="6.23,221,1770620400"; 
+   d="scan'208";a="57571463"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 02:21:57 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
+ chn-vm-ex3.mchp-main.com (10.10.87.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.37; Thu, 7 May 2026 02:21:56 -0700
+Received: from DEN-DL-M70577.microsemi.net (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Thu, 7 May 2026 02:21:53 -0700
+Date: Thu, 7 May 2026 11:21:52 +0200
+From: Daniel Machon <daniel.machon@microchip.com>
+To: Paolo Abeni <pabeni@redhat.com>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
 	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, David Ahern <dsahern@kernel.org>, Masahide NAKAMURA
-	<nakam@linux-ipv6.org>, Paul Moore <paul@paul-moore.com>, Stephen Smalley
-	<stephen.smalley.work@gmail.com>, Ondrej Mosnacek <omosnace@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
-	Sabrina Dubroca <sd@queasysnail.net>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <selinux@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, Chiachang Wang <chiachangwang@google.com>, Yan
- Yan <evitayan@google.com>, <devel@linux-ipsec.org>
-Subject: Re: [PATCH ipsec-next v8 12/14] xfrm: add XFRM_MSG_MIGRATE_STATE for
- single SA migration
-Message-ID: <afxXc2T3lOWuhyvq@secunet.com>
-References: <migrate-state-v8-0-4578fb016965@secunet.com>
- <migrate-state-v8-12-4578fb016965@secunet.com>
+	<kuba@kernel.org>, Horatiu Vultur <horatiu.vultur@microchip.com>, "Steen
+ Hegelund" <steen.hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, "Herve
+ Codina" <herve.codina@bootlin.com>, Arnd Bergmann <arnd@arndb.de>, "Greg
+ Kroah-Hartman" <gregkh@linuxfoundation.org>, Mohsin Bashir
+	<mohsin.bashr@gmail.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH net-next v3 09/13] net: lan966x: add PCIe FDMA support
+Message-ID: <20260507092152.paw7bfv2d2mh5ris@DEN-DL-M70577.microsemi.net>
+References: <20260504-lan966x-pci-fdma-v3-0-a56f5740d870@microchip.com>
+ <20260504-lan966x-pci-fdma-v3-9-a56f5740d870@microchip.com>
+ <b7399930-ea04-4899-a760-ca1410065aac@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,124 +89,98 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <migrate-state-v8-12-4578fb016965@secunet.com>
-X-ClientProxiedBy: EXCH-04.secunet.de (10.32.0.184) To EXCH-01.secunet.de
- (10.32.0.171)
-X-Rspamd-Queue-Id: 1A1A04E59F9
+In-Reply-To: <b7399930-ea04-4899-a760-ca1410065aac@redhat.com>
+X-Rspamd-Queue-Id: C7AD84E5BBD
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285203-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gondor.apana.org.au,davemloft.net,google.com,kernel.org,redhat.com,linux-ipv6.org,paul-moore.com,gmail.com,lwn.net,linuxfoundation.org,queasysnail.net,vger.kernel.org,linux-ipsec.org];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_FROM(0.00)[bounces-285204-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,microchip.com,iogearbox.net,gmail.com,fomichev.me,bootlin.com,arndb.de,linuxfoundation.org,vger.kernel.org,lists.infradead.org];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel.machon@microchip.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,microchip.com:dkim]
 X-Rspamd-Action: no action
 
-On Tue, May 05, 2026 at 06:34:29AM +0200, Antony Antony wrote:
-> Add a new netlink method to migrate a single xfrm_state.
-> Unlike the existing migration mechanism (SA + policy), this
-> supports migrating only the SA and allows changing the reqid.
+> On 5/4/26 4:23 PM, Daniel Machon wrote:
+> > +static int lan966x_fdma_pci_rx_check_frame(struct lan966x_rx *rx, u64 *src_port)
+> > +{
+> > +     struct lan966x *lan966x = rx->lan966x;
+> > +     struct fdma *fdma = &rx->fdma;
+> > +     struct lan966x_port *port;
+> > +     struct fdma_db *db;
+> > +     void *virt_addr;
+> > +     u32 blockl;
+> > +
+> > +     /* virt_addr points to the IFH. */
+> > +     virt_addr = fdma_dataptr_virt_addr_contiguous(fdma,
+> > +                                                   fdma->dcb_index,
+> > +                                                   fdma->db_index);
+> > +
+> > +     lan966x_ifh_get_src_port(virt_addr, src_port);
+> > +
+> > +     if (WARN_ON(*src_port >= lan966x->num_phys_ports))
+> > +             return FDMA_ERROR;
+> > +
+> > +     port = lan966x->ports[*src_port];
+> > +     if (!port)
+> > +             return FDMA_ERROR;
+> > +
+> > +     db = fdma_db_next_get(fdma);
+> > +
+> > +     /* BLOCKL is a 16-bit HW-populated field; reject obviously-bad
+> > +      * values before they feed memcpy/XDP sizes.
+> > +      */
+> > +     blockl = FDMA_DCB_STATUS_BLOCKL(db->status);
+> > +     if (blockl < IFH_LEN_BYTES + ETH_FCS_LEN || blockl > fdma->db_size)
+> > +             return FDMA_ERROR;
 > 
-> The SA is looked up via xfrm_usersa_id, which uniquely
-> identifies it, so old_saddr is not needed. old_daddr is carried in
-> xfrm_usersa_id.daddr.
+> Pre-existing issues reported by sashiko (most of them actually) can be
+> safely ignored/postponed to follow-ups, but the above OOB (and in patch
+> 11/13) access looks real and IMHO should be addressed.
 > 
-> The reqid is invariant in the old migration.
-> 
-> Signed-off-by: Antony Antony <antony.antony@secunet.com>
-> 
-> ---
-> v7->v8: - removed the unknown-flags validation block
-> v6->v7: - add flags field to xfrm_user_migrate_state (based on Sabrina's feedback)
->   - add XFRM_MIGRATE_STATE_NO_OFFLOAD (bit 0): suppresses offload
->   - omit-to-inherit; mutually exclusive with XFRMA_OFFLOAD_DEV
->   - zero-initialize struct xfrm_migrate m[XFRM_MAX_DEPTH]
->   - add struct xfrm_selector new_sel to xfrm_user_migrate_state
->   - add XFRM_MIGRATE_STATE_UPDATE_SEL: derive new selector
->     from SA addresses when old selector is a single-host match
-> v5->v6: - (Feedback from Sabrina's review)
->   - reqid change: use xfrm_state_add, not xfrm_state_insert
->   - encap and xuo: use nla_data() directly, no kmemdup needed
->   - notification failure is non-fatal: set extack warning, return 0
->   - drop state direction, x->dir, check, not required
->   - reverse xmas tree local variable ordering
->   - use NL_SET_ERR_MSG_WEAK for clone failure message
->   - fix implicit padding in xfrm_user_migrate_state uapi struct
->   - support XFRMA_SET_MARK/XFRMA_SET_MARK_MASK in XFRM_MSG_MIGRATE_STATE
-> v4->v5: - set portid, seq in XFRM_MSG_MIGRATE_STATE netlink notification
->   - rename error label to out for clarity
->   - add locking and synchronize after cloning
->   - change some if(x) to if(!x) for clarity
->   - call __xfrm_state_delete() inside the lock
->   - return error from xfrm_send_migrate_state() instead of always returning 0
-> v3->v4: preserve reqid invariant for each state migrated
-> v2->v3: free the skb on the error path
-> v1->v2: merged next patch here to fix use uninitialized value
->   - removed unnecessary inline
->   - added const when possible
-> ---
->  include/net/xfrm.h          |  16 ++-
->  include/uapi/linux/xfrm.h   |  21 ++++
->  net/xfrm/xfrm_device.c      |   2 +-
->  net/xfrm/xfrm_policy.c      |  19 +++
->  net/xfrm/xfrm_state.c       |  29 +++--
->  net/xfrm/xfrm_user.c        | 281 +++++++++++++++++++++++++++++++++++++++++++-
->  security/selinux/nlmsgtab.c |   3 +-
->  7 files changed, 357 insertions(+), 14 deletions(-)
+> /P
+>
 
-...
+This one looks right. The check ought to be: blockl > fdma->db_size -
+XDP_PACKET_HEADROOM.
 
-> +static unsigned int xfrm_migrate_state_msgsize(const struct xfrm_migrate *m,
-> +					       u8 dir)
-> +{
-> +	return NLMSG_ALIGN(sizeof(struct xfrm_user_migrate_state)) +
-> +		(m->encap ? nla_total_size(sizeof(struct xfrm_encap_tmpl)) : 0) +
-> +		(m->xuo ? nla_total_size(sizeof(struct xfrm_user_offload)) : 0) +
-> +		(m->new_mark ? nla_total_size(sizeof(struct xfrm_mark)) : 0) +
-> +		(m->smark.v ? nla_total_size(sizeof(u32)) * 2 : 0) + /* SET_MARK + SET_MARK_MASK */
+For patch #11, which issue are you referring to? If its the sashiko-gemini
+critical issue:
 
-xfrm_smark_put() checks (m->v | m->m), maybe you should
-do (m->smark.v | m->smark.m) here.
+  > +xdp_init_buff(&xdp, fdma->db_size, &port->xdp_rxq);
+  >    +
+  > +/* Headroom includes the IFH; BPF may grow into it via adjust_he ad.
+  > + * The IFH is rebuilt on XDP_TX and unread on XDP_PASS.
+  > + */      
+  > +xdp_prepare_buff(&xdp,
+  > + data - XDP_PACKET_HEADROOM,
+  > + XDP_PACKET_HEADROOM + IFH_LEN_BYTES,
+  > + data_len,
+  > + false);   
 
-> +		(m->mapping_maxage ? nla_total_size(sizeof(u32)) : 0) +
-> +		(m->nat_keepalive_interval ? nla_total_size(sizeof(u32)) : 0) +
-> +		(dir ? nla_total_size(sizeof(u8)) : 0); /* XFRMA_SA_DIR */
-> +}
+Then no, this is a false-positive. The data pointer is already offset by
+XDP_PACKET_HEADROOM, so the hard_start lands correctly at offset 0.
 
-Also, the function is not really readable.
-
-> +
-> +static int xfrm_send_migrate_state(const struct xfrm_user_migrate_state *um,
-> +				   const struct xfrm_migrate *m,
-> +				   u8 dir, u32 portid, u32 seq)
-> +{
-> +	int err;
-> +	struct sk_buff *skb;
-> +	struct net *net = &init_net;
-
-This is wrong. I know we had this in the tree for ages, but I now have
-a fix in ipsec/testing for it. We need to make this namespace aware.
+/Daniel
 
 
