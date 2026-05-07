@@ -1,229 +1,267 @@
-Return-Path: <netdev+bounces-285363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285367-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gMd7AOym/GniSQAAu9opvQ
-	(envelope-from <netdev+bounces-285363-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 16:51:24 +0200
+	id kOCHL+uo/GkNSgAAu9opvQ
+	(envelope-from <netdev+bounces-285367-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 16:59:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AD744EA924
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 16:51:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3304C4EAB5E
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 16:59:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 12329302AC81
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 14:49:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7088E30C09DB
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 14:53:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FA753B7B7F;
-	Thu,  7 May 2026 14:49:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E5C33B2FC9;
+	Thu,  7 May 2026 14:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=louisalexis.eyraud@collabora.com header.b="fOdineQx"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B42463A1A3C
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 14:49:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778165366; cv=none; b=s2WWjZCMSjMzqUaN3V1/2qKseoWWu03QvJmtQbdX1D9BLMdsBR97pPHE/ph+lXTn7+NlGZWA2wLKmpQ0tQZV/H/9493eLxWOSfW9+I+00l2dEsglgksOWVJdI2KOkxxhzzTcQYKeBfS64fwrmt9IShw2NndWnZ3RBB9ee0MjWA0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778165366; c=relaxed/simple;
-	bh=0UEQFqnl250j7u4bGJcBxutylZ1Mf5pF7DjU6CUdE8M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DkuoSp4sySwIRSHkqtaQzITdoPWHnZre32xbSSgzuEhKXWZYGlP4TWFY2AubMji3RTfS/E0tWv06MX57ALq1KmzL2tBSanAITWTZSZfjziQMkn67yP26NR1cwV+LGCRCfLOnnpE6lLDuNSs3j+56LaoH5RWakkHjt+9G/ax3bpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1wL01i-0001Vq-3i; Thu, 07 May 2026 16:48:34 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1wL01Z-000wEM-1k;
-	Thu, 07 May 2026 16:48:26 +0200
-Received: from pengutronix.de (p4ffb2dc6.dip0.t-ipconnect.de [79.251.45.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 264265306B3;
-	Thu, 07 May 2026 14:48:25 +0000 (UTC)
-Date: Thu, 7 May 2026 16:48:24 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Uwe =?utf-8?Q?Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
-Cc: Michael Grzeschik <mgr@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Vincent Mailhol <mailhol@kernel.org>, 
-	Krzysztof Halasa <khc@pm.waw.pl>, Johannes Berg <johannes@sipsolutions.net>, 
-	Steffen Klassert <klassert@kernel.org>, David Dillow <dave@thedillows.org>, 
-	Ion Badulescu <ionut@badula.org>, Mark Einon <mark.einon@gmail.com>, 
-	Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com, 
-	Manish Chopra <manishc@marvell.com>, Potnuri Bharat Teja <bharat@chelsio.com>, 
-	Denis Kirjanov <kirjanov@gmail.com>, Jijie Shao <shaojijie@huawei.com>, 
-	Jian Shen <shenjian15@huawei.com>, Cai Huoqing <cai.huoqing@linux.dev>, 
-	Fan Gong <gongfan1@huawei.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Tariq Toukan <tariqt@nvidia.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Mark Bloch <mbloch@nvidia.com>, Ido Schimmel <idosch@nvidia.com>, 
-	Petr Machata <petrm@nvidia.com>, Yibo Dong <dong100@mucse.com>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com, Jiri Pirko <jiri@resnulli.us>, 
-	Francois Romieu <romieu@fr.zoreil.com>, Daniele Venzano <venza@brownhat.org>, 
-	Samuel Chessman <chessman@tux.org>, Jiawen Wu <jiawenwu@trustnetic.com>, 
-	Mengyuan Lou <mengyuanlou@net-swift.com>, Kevin Curtis <kevin.curtis@farsite.co.uk>, 
-	Arend van Spriel <arend.vanspriel@broadcom.com>, Stanislav Yakovlev <stas.yakovlev@gmail.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Kees Cook <kees@kernel.org>, 
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>, Thomas Gleixner <tglx@kernel.org>, 
-	Jacob Keller <jacob.e.keller@intel.com>, Thomas Fourier <fourier.thomas@gmail.com>, 
-	Ingo Molnar <mingo@kernel.org>, Kory Maincent <kory.maincent@bootlin.com>, 
-	Zilin Guan <zilin@seu.edu.cn>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Marco Crivellari <marco.crivellari@suse.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	David Arinzon <darinzon@amazon.com>, Yeounsu Moon <yyyynoom@gmail.com>, 
-	Denis Benato <benato.denis96@gmail.com>, Yonglong Liu <liuyonglong@huawei.com>, 
-	Andy Shevchenko <andriy.shevchenko@intel.com>, Randy Dunlap <rdunlap@infradead.org>, 
-	Yicong Hui <yiconghui@gmail.com>, MD Danish Anwar <danishanwar@ti.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Ethan Nelson-Moore <enelsonmoore@gmail.com>, 
-	Larysa Zaremba <larysa.zaremba@intel.com>, Ian Lin <ian.lin@infineon.com>, 
-	Colin Ian King <colin.i.king@gmail.com>, Double Lo <double.lo@cypress.com>, 
-	Markus Schneider-Pargmann <msp@baylibre.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-can@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org, oss-drivers@corigine.com, 
-	linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com
-Subject: Re: [PATCH net-next v2 1/2] net: Consistently define pci_device_ids
- using named initializers
-Message-ID: <20260507-dangerous-manipulative-guan-bfd474-mkl@pengutronix.de>
-X-AI: stop_reason: "refusal"
-References: <cover.1778149923.git.u.kleine-koenig@baylibre.com>
- <76da4f44d48bdde84580963862bf9616bee5c9e9.1778149923.git.u.kleine-koenig@baylibre.com>
- <20260507-healthy-gainful-fox-500552-mkl@pengutronix.de>
- <afyfa4E4rNbkMYTk@monoceros>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 178EE31715F;
+	Thu,  7 May 2026 14:53:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778165582; cv=pass; b=qN3sZJP8djz+1mPzGDfjJFZwbnoDde/eBJ8W1OeT2OG3d7lbJJ9NLn7K4qF64f3AAL6xDPfMiTNiF7fnhFU8OennslbyFX3nrRPL1AA+E6F8rtPdhdQVXCVSxdaseBK8n/uhmBVQu7OktKRo1qx6hio9EQY0E4lxJtvvScc/lyM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778165582; c=relaxed/simple;
+	bh=j5a4eQdwTuHiYaO1bzwW5AlyiL1sg8LGVa9SISVvtmI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ZKWd75P8P+kFmZBYQLo6KBK0uSnUT9/GFJhzhFMDBEcdDjOia9ErANJbIFsWqswMzhz/Ow0zdSiEwXDiqBsglBE1fVIAwVILR4abR/nByh/8N2pFsXbQ6hBMOY9uD6RUSWyaj43n9HlJhoe5mzNWWYthJF+lfzLWrXd1IdEkaRY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=louisalexis.eyraud@collabora.com header.b=fOdineQx; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1778165549; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=gnoQamEnOtplYB0I+IAslgQbn8pbGYB69jQehTFsGfodQdyEq9N8s+8IaNQKwXL/NDNsawSM/Z24cn1OYsoIL42X1HyPLDQRnaqTCp8EbXe1KuvMvk5LtH+mEi7GRXP3W5KPsCWtActawG/STVReMfEy/yqHt7lFbvRLBwzGCUM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1778165549; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=mD80HyVHazAI7zY5u5ppiXiv/kRQLmFGurqGNhp1Zzg=; 
+	b=AhxTDMRqMIdHYGdQlIxOWo/w5Yz5yPQybWfRB7KQ1G+XgIQR5AJA3uWTDk39YfBwadzwFfM+oo75B9ALzq5a14hn5rLGvoIvrTx3fI+FWIlw96uB17G4kVkwssUehgccD4OFIVq/EeR8ESEfE98d1Z0/BybHWz4mqdIF6H4BYTo=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=louisalexis.eyraud@collabora.com;
+	dmarc=pass header.from=<louisalexis.eyraud@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1778165549;
+	s=zohomail; d=collabora.com; i=louisalexis.eyraud@collabora.com;
+	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
+	bh=mD80HyVHazAI7zY5u5ppiXiv/kRQLmFGurqGNhp1Zzg=;
+	b=fOdineQxBdsWNaByWoVgw199d+7PDlanFfm3mIwEsyWRlUH/RmGfoI/q97LzGnFF
+	Pmgf2QzTPK0zhkSxGjMMGx7TbjLzXoS0N7L2tSBhWBqurBEKHhmumI2uDwqlYmkXsm6
+	ki/LIERCJEAVU8uJ1GOsXQbZSpcwpdfMack/cvjY=
+Received: by mx.zohomail.com with SMTPS id 1778165548105701.1379238259724;
+	Thu, 7 May 2026 07:52:28 -0700 (PDT)
+Message-ID: <2c441d51f6a865ddb6e67b63cd26a651ed3ff058.camel@collabora.com>
+Subject: Re: [PATCH net-next v2 4/4] net: phy: Introduce Airoha AN8801/R
+ Gigabit Ethernet PHY driver
+From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley	
+ <conor+dt@kernel.org>, AngeloGioacchino Del Regno	
+ <angelogioacchino.delregno@collabora.com>, Heiner Kallweit	
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	kevin-kw.huang@airoha.com, macpaul.lin@mediatek.com,
+ matthias.bgg@gmail.com, 	kernel@collabora.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, 	linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, 	linux-kernel@vger.kernel.org
+Date: Thu, 07 May 2026 16:52:22 +0200
+In-Reply-To: <3688a285-7f98-4afa-80ad-697094cd7b97@lunn.ch>
+References: 
+	<20260326-add-airoha-an8801-support-v2-0-1a42d6b6050f@collabora.com>
+	 <20260326-add-airoha-an8801-support-v2-4-1a42d6b6050f@collabora.com>
+	 <3688a285-7f98-4afa-80ad-697094cd7b97@lunn.ch>
+Organization: Collabora Ltd
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="3r5cznssyoe7scuq"
-Content-Disposition: inline
-In-Reply-To: <afyfa4E4rNbkMYTk@monoceros>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Rspamd-Queue-Id: 9AD744EA924
+X-ZohoMailClient: External
+X-Rspamd-Queue-Id: 3304C4EAB5E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.06 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[collabora.com,none];
+	R_DKIM_ALLOW(-0.20)[collabora.com:s=zohomail];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,pm.waw.pl,sipsolutions.net,thedillows.org,badula.org,gmail.com,marvell.com,chelsio.com,huawei.com,linux.dev,intel.com,nvidia.com,mucse.com,realtek.com,resnulli.us,fr.zoreil.com,brownhat.org,tux.org,trustnetic.com,net-swift.com,farsite.co.uk,broadcom.com,bootlin.com,seu.edu.cn,suse.com,amazon.com,infradead.org,ti.com,infineon.com,cypress.com,baylibre.com,vger.kernel.org,lists.osuosl.org,corigine.com,lists.linux.dev];
-	TAGGED_FROM(0.00)[bounces-285363-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285367-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	HAS_ORG_HEADER(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,collabora.com,gmail.com,armlinux.org.uk,airoha.com,mediatek.com,vger.kernel.org,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mkl@pengutronix.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_GT_50(0.00)[81];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.995];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,pengutronix.de:email,pengutronix.de:mid,pengutronix.de:url]
+	FROM_NEQ_ENVFROM(0.00)[louisalexis.eyraud@collabora.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[collabora.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[collabora.com:mid,collabora.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
+Hi Andrew,
 
---3r5cznssyoe7scuq
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net-next v2 1/2] net: Consistently define pci_device_ids
- using named initializers
-MIME-Version: 1.0
+On Thu, 2026-03-26 at 13:47 +0100, Andrew Lunn wrote:
+> > +static int an8801r_led_blink_set(struct phy_device *phydev, u8
+> > index,
+> > +				 unsigned long *delay_on,
+> > +				 unsigned long *delay_off)
+> > +{
+>=20
+> ...
+>=20
+> > +	ret =3D phy_modify_mmd(phydev, MDIO_MMD_VEND2,
+> > LED_ON_CTRL(index),
+> > +			=C2=A0=C2=A0=C2=A0=C2=A0 LED_ON_EN, blink ? LED_ON_EN : 0);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	return 0;
+>=20
+> Just
+>=20
+>=20
+> 	return phy_modify_mmd(phydev, MDIO_MMD_VEND2,
+> LED_ON_CTRL(index),
+> 			=C2=A0=C2=A0=C2=A0=C2=A0 LED_ON_EN, blink ? LED_ON_EN : 0);
+>=20
+> > +		if (!led_trigger)
+> > +			continue;
+> > +
+> > +		ret =3D an8801r_led_hw_control_set(phydev, led_id,
+> > led_trigger);
+> > +		if (ret)
+> > +			return ret;
+> > +	}
+> > +	return 0;
+> > +}
+>=20
+>=20
+> Please take a look at all your functions. Can the last error check be
+> removed and just use return ret, etc.
+I'll fix this in the next version.
 
-On 07.05.2026 16:23:43, Uwe Kleine-K=C3=B6nig (The Capable Hub) wrote:
-> Hello Marc,
->
-> On Thu, May 07, 2026 at 12:55:45PM +0200, Marc Kleine-Budde wrote:
-> > > +	}, {
-> > >  		/* ASEM Dual CAN raw -new model */
-> > > -		ASEM_RAW_CAN_VENDOR_ID, ASEM_RAW_CAN_DEVICE_ID,
-> > > -		ASEM_RAW_CAN_SUB_VENDOR_ID, ASEM_RAW_CAN_SUB_DEVICE_ID_BIS,
-> > > -		0, 0,
-> > > -		(kernel_ulong_t)&plx_pci_card_info_asem_dual_can
-> > > +		PCI_DEVICE_SUB(ASEM_RAW_CAN_VENDOR_ID, ASEM_RAW_CAN_DEVICE_ID,
-> > > +			       ASEM_RAW_CAN_SUB_VENDOR_ID, ASEM_RAW_CAN_SUB_DEVICE_ID_BIS=
-),
-> > > +		.driver_data =3D (kernel_ulong_t)&plx_pci_card_info_asem_dual_can,
-> > >  	},
-> > > -	{ 0,}
-> > > +	{ }
-> >
-> > Nitpick: can you convert the terminating entry to follow the same style
-> > as the rest of the driver:
-> >
-> > diff --git a/drivers/net/can/sja1000/plx_pci.c b/drivers/net/can/sja100=
-0/plx_pci.c
-> > index a03553b80a5d..d69ff0ccfd94 100644
-> > --- a/drivers/net/can/sja1000/plx_pci.c
-> > +++ b/drivers/net/can/sja1000/plx_pci.c
-> > @@ -353,8 +353,8 @@ static const struct pci_device_id plx_pci_tbl[] =3D=
- {
-> >                  PCI_DEVICE_SUB(ASEM_RAW_CAN_VENDOR_ID, ASEM_RAW_CAN_DE=
-VICE_ID,
-> >                                 ASEM_RAW_CAN_SUB_VENDOR_ID, ASEM_RAW_CA=
-N_SUB_DEVICE_ID_BIS),
-> >                  .driver_data =3D (kernel_ulong_t)&plx_pci_card_info_as=
-em_dual_can,
-> > -        },
-> > -        { }
-> > +        }, {
-> > +        }
-> >  };
-> >  MODULE_DEVICE_TABLE(pci, plx_pci_tbl);
->
-> After the conversation in the v1 thread it was unclear to me if you
-> stand by your opinion, so I kept the format as it was. I interpret your
-> repetition of the nitpick as request to rework the can drivers for the
-> next revision (if that happens).
+>=20
+> > +static int an8801r_of_init_leds(struct phy_device *phydev, u8
+> > *led_cfg)
+> > +{
+> > +	struct device *dev =3D &phydev->mdio.dev;
+> > +	struct device_node *np =3D dev->of_node;
+> > +	struct device_node *leds;
+> > +	u32 function_enum_idx;
+> > +	int ret;
+> > +
+> > +	if (!np)
+> > +		return 0;
+> > +
+> > +	/* If devicetree is present, leds configuration is
+> > required */
+> > +	leds =3D of_get_child_by_name(np, "leds");
+> > +	if (!leds)
+> > +		return 0;
+> > +
+> > +	for_each_available_child_of_node_scoped(leds, led) {
+> > +		u32 led_idx;
+> > +
+> > +		ret =3D of_property_read_u32(led, "reg", &led_idx);
+> > +		if (ret)
+> > +			goto out;
+> > +
+> > +		if (led_idx >=3D AN8801R_NUM_LEDS) {
+> > +			ret =3D -EINVAL;
+> > +			goto out;
+> > +		}
+> > +
+> > +		ret =3D of_property_read_u32(led, "function-
+> > enumerator",
+> > +					=C2=A0=C2=A0 &function_enum_idx);
+> > +		if (ret)
+> > +			function_enum_idx =3D AN8801R_LED_FN_NONE;
+> > +
+>=20
+> What is this doing? Is this documented in the binding?
+The `function-enumerator` property is only documented in the led common
+dt-binding file. The an8801 dt-bindings inherits this property from the
+ethernet-phy dt-bindings.
 
-Doh - Yes, right, we discussed this already. Keep it as is and add my:
+We aimed to have this PHY have its led behaviour (how many to enable
+and what their role shall be) configurable using devicetree and not to
+rely on a default configuration, hard-coded in the driver (like the
+air_en8811h driver did) and also make use of the led hardware
+offloading (for functions like 100/1000, activity blinking, and others)
+that this PHY is capable of.
 
-Acked-by: Marc Kleine-Budde <mkl@pengutronix.de> # for drivers/net/can
+From the available property list for the led node, this one seems to be
+appropriate to distinguish between the possible LAN functions, that=20
+would mean that a specific LED has either a link or RX/Tx activity=20
+role.=C2=A0That is why we used it but we could be wrong.
 
-regards,
-Marc
+The an8801 dt-bindings (in patch 1) misses the possible values and
+should improved in that regard and I'll fix them in next version if
+this implementation seems acceptable to you.
+>=20
+> > +		if (function_enum_idx >=3D AN8801R_LED_FN_MAX) {
+> > +			ret =3D -EINVAL;
+> > +			goto out;
+> > +		}
+> > +
+> > +		led_cfg[led_idx] =3D function_enum_idx;
+> > +	}
+> > +out:
+> > +	of_node_put(leds);
+> > +	return ret;
+> > +}
+>=20
+> > +static int an8801r_read_status(struct phy_device *phydev)
+> > +{
+> > +	int prev_speed, ret;
+> > +	u32 val;
+> > +
+> > +	prev_speed =3D phydev->speed;
+> > +
+> > +	ret =3D genphy_read_status(phydev);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	if (phydev->link && prev_speed !=3D phydev->speed) {
+> > +		val =3D phydev->speed =3D=3D SPEED_1000 ?
+> > +		=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 AN8801_BPBUS_LINK_MODE_1000 : 0;
+> > +
+> > +		return an8801_buckpbus_reg_rmw(phydev,
+> > +					=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
+> > AN8801_BPBUS_REG_LINK_MODE,
+> > +					=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
+> > AN8801_BPBUS_LINK_MODE_1000,
+> > +					=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 val);
+> > +	};
+>=20
+> This is unusual. What is it doing? Please add a comment.
+This call is to ensure that the PHY switches to the expected 1Gbps=20
+speed when available.=C2=A0
+I'll confirm it and add a comment in v3.
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---3r5cznssyoe7scuq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSl+MghEFFAdY3pYJLMOmT6rpmt0gUCafymNgAKCRDMOmT6rpmt
-0nq+AQDxBatA6k3wbRiLlE0iYqFi1UszWzbE6VspAxP9GaL27AEAvpxnHmYAF7Ba
-NGRZfHI9sLbcPJXvBj/FLuPCtchoBwQ=
-=GAHD
------END PGP SIGNATURE-----
-
---3r5cznssyoe7scuq--
+Best regards,
+Louis-Alexis
+>=20
+> 	Andrew
 
