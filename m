@@ -1,129 +1,119 @@
-Return-Path: <netdev+bounces-285392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285393-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gGJvK0ax/GnlSgAAu9opvQ
-	(envelope-from <netdev+bounces-285392-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:35:34 +0200
+	id 0LCjMDGx/GnlSgAAu9opvQ
+	(envelope-from <netdev+bounces-285393-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:35:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2D664EB276
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:35:33 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 685ED4EB252
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:35:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id ED3713019970
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 15:31:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E1C9C300AB15
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 15:35:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D44AD3A9D93;
-	Thu,  7 May 2026 15:31:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 859B137C91A;
+	Thu,  7 May 2026 15:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RudNYnex"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WcWBKvcp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C412D29C7
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 15:31:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638B21A316E
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 15:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778167862; cv=none; b=L87TeSPgt43w0mzfN55GCRyCOBzuc7GN4Pi/CUOk57V5m07ErSDPb17XWAuN9+gbvW/2EGPvU855rDUgc6s/D2ARiV3WwZIxbhj2iUH42kX/iLH+lQzRwhCybYu+y+UT9Mm4AN0jj0j6IspjU320M+1AUbrxq1Yzb5L624C5GBU=
+	t=1778168110; cv=none; b=PAtFMMSYxlSKonwWq1TJ+FcKa4V1IcQKWkU1WAheiY/FUZms/ruiv8UdksH82GeekV+BzzRbgeLXiyIawE9cqQ3QTVIWGeXRIl6Nt8gyaJVgcgtsygXucaDoxHtniuYN13IIvDo2MLTtTpEzKtlTcD34p2Ve5pbP6VjufoV13GA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778167862; c=relaxed/simple;
-	bh=jC9HXGtAaoXlhMQJZ1xcYXk9vWMu7Bm9xf2PCGUKPiA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ag0o65g5wdJVFrRbgsbShPKiklpNB3Or6hJFk0SZgsg7hcRb3HwxEZbSxygftsuerg+AP3PNeGjiDDmLM29Ne67WfCoPqGTEveq6mSbYsRgQcGmHYnWqnvaj4h7lykBixCGNGMtluTdBzI1KWkuuLC7j1LMgTyoa4qOKKCCUnDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RudNYnex; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56301C2BCB2;
-	Thu,  7 May 2026 15:31:02 +0000 (UTC)
+	s=arc-20240116; t=1778168110; c=relaxed/simple;
+	bh=rzn+mXwuxuGBqeL9f0zlEdgdDoITVl3qMXqi0a/HbI4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=m3XVqw+TFXh0IRka2qL5U9TszkKg1sjXiRXO8ONftI7DLi7ywxvRJa32azlTJjo0NTxQELpnaMEvow0M650icEtZ1jRjD6YZ8hzc+Z1NMymA5AyIMeeaCyhoy8aEc7cCh+02OdTEREsjMoESuw4RuzPxCd/ZGwp+k24uRDm/+NY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WcWBKvcp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6A07C2BCB2;
+	Thu,  7 May 2026 15:35:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778167862;
-	bh=jC9HXGtAaoXlhMQJZ1xcYXk9vWMu7Bm9xf2PCGUKPiA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RudNYnex+a6OGWEu1ZcXCf4KIBNAsodThAQPSDcimvcAv4DJ2wEFChtg8aRmqb8CS
-	 /yeRCDTf/XRL00QrtTydCkfOzm/uXqqnwt+0FCXcaQwjM4h9PZZp9OtT28TnyG+RVS
-	 1Qz44f7xTEyV0b+O7FA2/q2zFJQPs067/hEwbCX/FDqbXbF/XEPDcBWdLwl/SZcS3E
-	 B8ePmnUmumHlG+O+s0EdXfFGLdithR7xZL4PaOgQuviMnSKoIDLrOhNN14yclfdzgO
-	 byjxSXGwv0caWJn7PP/Aw9EnHaiSGKlBeXthL3w8N8qEaCQniox+q+nyE5/jfu+eLn
-	 IkWfQgquxoHJg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9FB13930906;
-	Thu,  7 May 2026 15:30:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1778168110;
+	bh=rzn+mXwuxuGBqeL9f0zlEdgdDoITVl3qMXqi0a/HbI4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WcWBKvcpSgYbkBNyr6JNT1JrlsNQNjuDcOrxP9Q04JR7iG1SGc53yJH9QuWx5bU6x
+	 V3bLy879FPuVi32guDbf+7BM6eD2rG0QsVrSlIBxJHWhd6nwvx/fOu6yjzWxUC7lsf
+	 ppTsFMDsQK6dNf9+DRUSOd4udu7qMWEQZ7ICQIc9NUqxdGbHEgFSC35l5T9xjZTsNS
+	 l4W6WgDn9gxuCsAeA9SdmMeOdmR8pfwnBXaWyeo3hLoxjnlKlKKRQE58NzxMwvsLRV
+	 OBQl58iKhbpDNK1WmaUAz0L0ER1vrXEEI+o6c88vRJ1twtcyZiK8t6jU3Do5lOnVhB
+	 ZNuiPLuNt/Row==
+Date: Thu, 7 May 2026 08:35:08 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Holger Brunck <holger.brunck@hitachienergy.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "chleroy@kernel.org"
+ <chleroy@kernel.org>, "qiang.zhao@nxp.com" <qiang.zhao@nxp.com>,
+ "horms@kernel.org" <horms@kernel.org>
+Subject: Re: [PATCH v2 net] net: wan: fsl_ucc_hdlc: free tx_skbuff in
+ uhdlc_memclean
+Message-ID: <20260507083508.681108f1@kernel.org>
+In-Reply-To: <AM0PR06MB1039657EB2FADD7BDAD4159D5F73C2@AM0PR06MB10396.eurprd06.prod.outlook.com>
+References: <20260506111529.2919079-1-holger.brunck@hitachienergy.com>
+	<20260506161629.5488a643@kernel.org>
+	<AM0PR06MB1039657EB2FADD7BDAD4159D5F73C2@AM0PR06MB10396.eurprd06.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next v3 0/2] dpll: phase unit display and
- frequency
- monitoring
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177816781160.4040424.13608923962799018672.git-patchwork-notify@kernel.org>
-Date: Thu, 07 May 2026 15:30:11 +0000
-References: <20260504163014.416317-1-ivecera@redhat.com>
-In-Reply-To: <20260504163014.416317-1-ivecera@redhat.com>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, poros@redhat.com, dsahern@kernel.org,
- stephen@networkplumber.org
-X-Rspamd-Queue-Id: B2D664EB276
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 685ED4EB252
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285392-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-285393-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Hello:
-
-This series was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
-
-On Mon,  4 May 2026 18:30:12 +0200 you wrote:
-> This series improves dpll pin output formatting and adds support for
-> the frequency monitoring feature.
+On Thu, 7 May 2026 15:07:35 +0000 Holger Brunck wrote:
+> > On Wed,  6 May 2026 13:15:29 +0200 Holger Brunck wrote:  
+> > > When the device is removed all allocated resources should be freed.
+> > > In uhdlc_memclean the netdev transmit queue was already stopped. But
+> > > at this point we may have pending skb in the transmit queue which must
+> > > be freed. Therefore iterate over the tx_skbuff pointers and free all
+> > > pending skb. The issue was discovered by sashiko.  
+> > 
+> > And you tested this how?
+> > 
+> > Given the questionable v1 I'm highly hesitant to accept patches from you if you
+> > can't test them.  
 > 
-> Patch 1 adds picosecond unit to phase-adjust-min, phase-adjust-max
-> and phase-adjust attributes. It also introduces dpll_pr_phase_offset()
-> helper that properly formats phase-offset as fractional picoseconds by
-> dividing the raw kernel value by DPLL_PHASE_OFFSET_DIVIDER.
-> 
-> [...]
+> I tested the patch on a ls1043a board running HDLC in busmode on kernel 6.12
 
-Here is the summary with links:
-  - [iproute2-next,v3,1/2] dpll: add ps unit to phase-related pin attributes
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=410888eea295
-  - [iproute2-next,v3,2/2] dpll: add frequency monitoring support
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=12954bc7d2c3
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Please add this to the commit message, as previously requested.
 
