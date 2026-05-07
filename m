@@ -1,118 +1,177 @@
-Return-Path: <netdev+bounces-285398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285399-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OLtxLKay/GnlSgAAu9opvQ
-	(envelope-from <netdev+bounces-285398-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:41:26 +0200
+	id 6F8sBFGz/GnlSgAAu9opvQ
+	(envelope-from <netdev+bounces-285399-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:44:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 317BA4EB3E5
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:41:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71B344EB45C
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:44:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 34EE830094C3
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 15:41:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 998EE301CCEF
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 15:42:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AF653F166D;
-	Thu,  7 May 2026 15:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B42F436373;
+	Thu,  7 May 2026 15:42:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="et/iSjAf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NulYzmp8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6631F31E846;
-	Thu,  7 May 2026 15:41:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E785931E846
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 15:42:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778168484; cv=none; b=IEimu0uJ/0gJbD1tXC+svetcSw7v9tsklQXdsGcMRWEkaNry4nRhQcQXOgQ7HAGE4/Tfi5WvGDe83Iwwkc6L4jql7ld+46fQhL29HPC0DxsWn5kHdDtsXnikrJBGHuJvY5DqCtXW1/RHKSNtp+nTie28BiPKlm/ifLDHcnOZ1Zs=
+	t=1778168528; cv=none; b=M6HDSpYEYaocuSO6/9w+yb62wNfcMnJ95NYtCpvqaP7V2Ao+esR24hB436rqpJ7yma/83kBBNcJhIXZ77Yd+IqNOWJ56atuMc4D17omGNR7wTOaDQJTTHVnkQcT3vrZNxrhizH2C37nlcuB4UMTZlqjmwcQMU4AYUIvJBKyZfYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778168484; c=relaxed/simple;
-	bh=zeQbU2EFNu7YKS+F/os+rENcPRDMTeAnTD5kmnxzeHo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ks4Q2rSKiK6Dkf4256AsU/fwOlzhymCDaIe/pRu8kuzGdgEx+uVUHjI6yOyg92k6f9bZJqGfPqb4wEem9xLKFDpAwx7g7HbJRcBcWOGz/XkAS3TgM/97Ecps37OB0YfM0MdTJouzU256LBtmjIWMNOGcd+ehAsksFjAd/sK6C04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=et/iSjAf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAEACC2BCB2;
-	Thu,  7 May 2026 15:41:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778168484;
-	bh=zeQbU2EFNu7YKS+F/os+rENcPRDMTeAnTD5kmnxzeHo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=et/iSjAf9YdFaNPo62Wj8zHq/wYFlGRKrcF7Be2bJKnAk2tT8NDkZpr0FqGAVt9Ix
-	 z+B4bZVf2kqYVPbtT0j7hXBrvfHdZzZVAgIAmNqvjTes8AF5cIdWkix11q5bp/3Ro+
-	 DIoQ7DIC738q0Vn92/y+4jC2sRAWVr+VhyVq8HZ0N/CaRssGP8MAjI55zfGhdPcpG4
-	 XQC6b82d8zX64TNZzD1JuiN+DUT/gtbZFsSMBYStrjHXaTdWZy9uqAuMPx6vVMAC3s
-	 atwhOt3InD/r407qt6T+71n7sQ4wnv8Cay/h5d1qrpr2FIF0w778gP86MCrnTEJRWA
-	 /Hbs8kuMNW3ZA==
-Date: Thu, 7 May 2026 10:41:21 -0500
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Linus Walleij <linusw@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1778168528; c=relaxed/simple;
+	bh=kWMsC60KuOenv/OhjsZywQS1is+m2U13eftrFS6m3XU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XJ2zDrITcSW1Z5fRJc/Un7Omu9/J9qzka0FxjM0oxqnKthuIvZA05n81J1W86bJ3+PTeM+aTgBwQnIw5r5AITAvCKdiz+lLZooQv3T1rNUVk4lkKi7M+ydGYXmEiWjZGbaAwTzAe6sZGTX9+dQu8osDK2ugLmHFPqsIrEhMUHZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NulYzmp8; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-8d67a483d3eso111930685a.1
+        for <netdev@vger.kernel.org>; Thu, 07 May 2026 08:42:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778168526; x=1778773326; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JHHH4P/NGTGaNyvY8S1ryGT52QZc8oMkXSg9F92YVIA=;
+        b=NulYzmp8GedNunKdEpq+7bRuXeJ5APBdyxCpJ/X6EHijeFKQsZv6vkIStdW1aHifiv
+         kH6x0iEfTgwnxeRYhQpqkPoy8nWjf3NiPe4iwxgqa3cWcBHLNnqECEM5IvUqDVAt7sZD
+         PCNweZNjkyoSUz8FmXX9Zow93qwK9tLwN0e2rZXFnUSPKJvdj7w0nsqARX1GQ/p8RfTm
+         /DiZ9Evrd/oVx7NnRD4FDoE7XZkJPRYWg/szpORp0omQZ19eHinuPot/XWdYjtmsuvWD
+         k1SZyuLq/hNxQ2+wUHyVpkWWrMQTTabnV76td+bNtJlilxbP4WBfLU8tlBS5L0+GUw1A
+         DSPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778168526; x=1778773326;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JHHH4P/NGTGaNyvY8S1ryGT52QZc8oMkXSg9F92YVIA=;
+        b=cCdUNmq1hUpBVsVcCLtWfqrZW1daC8eOsqondfO2ZIDR/ACOaT57WWSV6Gq+1jIWaG
+         ZDF+aMtCEDc7RZORnwioANceLSI873IouMi4bd29cmBOqVl0uByvTYXdxrfx5NITW7A0
+         lIYb/JokuvEqeF58Ep05HvZeKDyxsxCdKNJ+fzfm5cTLTb3MP0ax+QlyhlPULgwJJrBI
+         V6lvztahrbXHk+ih5OwJahaJrTMGfBQ7w620n2zKbnfAE0phbfNN4RLwjPjhV3gwKy/w
+         qAC+rI+vLcJ8J6/0akpcdxilII984RqqDKKyq9YDqx4zbGrfRRknVKkEeRKb2Q5J8rv1
+         p7Mw==
+X-Forwarded-Encrypted: i=1; AFNElJ/2c8nbUQERpEBmJydSkIxACrDDgVmLXs1Lab2v/u7W0ZJNUkkxNj4w3O5XtSzR/UZn6ZZNF1Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdUJ+cumlwrdFgEu7GDqaj7f/dPuxrqQpZH6OW0jZ3Gt80k7O1
+	l1eBbeStHrmt02WiIB3nl/RQPKnYnUllSDU/EYtOiLt0SRjIe/V+Au7r
+X-Gm-Gg: AeBDieugPlhYPEC53Lwm5EDCyVZv4bzlHFvVGLQdfp1PDyls5dJskfJNO8sU9F5v311
+	JS0/Tyu4c+ndBDl6pkz396aPduKSrS7x2da92KdPR2j5Av3AHsGascQVfcE76nOrx0TzfrsywEg
+	ftBebe0HZDRp9X7C+Bbcj/aEUEBJIqseLDBovAxN0hOpX3nw1nUyCL1wojkzD4ftK7Tpgt8sy5a
+	X60m2BJZnH7YaGoygiywst9l6JTHzoFL495AjMGgyuMcynq1llKl4OWyzhn2VTOihsq5WgQxHye
+	fCvHGkTHmFQMfM1h3JEpcMlptqLXyF8weCMWWk/qw1U6UFDZHgBdvKUHYGRzHEomc9LDBUf8jWD
+	SOU9a27Za2TI/1N0GWy7GnFjyZsBzzdQYjcSeqXFI8ErK+Dbs5ySI74Q3JJAfGl3upM4rBZpm2g
+	JJul8XUsKiHFbh5YOAD5v1ixhK19HaSWPbPk/7VqsTZ8haEI9F+AsBUv8GD+d0Madd34BYW13cJ
+	xnmwg==
+X-Received: by 2002:a05:620a:454d:b0:8ed:d6df:c778 with SMTP id af79cd13be357-904d5ffbb46mr1206673285a.37.1778168525682;
+        Thu, 07 May 2026 08:42:05 -0700 (PDT)
+Received: from PF5YBGDS.localdomain ([163.114.130.6])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8fc29383c15sm1996496685a.6.2026.05.07.08.42.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 May 2026 08:42:04 -0700 (PDT)
+From: mike.marciniszyn@gmail.com
+To: Alexander Duyck <alexanderduyck@fb.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	kernel-team@meta.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Herve Codina <herve.codina@bootlin.com>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org
-Subject: Re: [PATCH] dt-bindings: net: lan966x: Accept standard ethernet
- prefixes
-Message-ID: <177816848057.1797986.18240361881148751528.robh@kernel.org>
-References: <20260507-lan966-binding-v1-1-e99293d2a4ec@kernel.org>
+	Andrew Lunn <andrew@lunn.ch>
+Cc: mike.marciniszyn@gmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3] net: eth: fbnic: Fix addr validation in pcs write
+Date: Thu,  7 May 2026 11:42:03 -0400
+Message-ID: <20260507154203.3667-1-mike.marciniszyn@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260507-lan966-binding-v1-1-e99293d2a4ec@kernel.org>
-X-Rspamd-Queue-Id: 317BA4EB3E5
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 71B344EB45C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285398-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285399-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[mikemarciniszyn@gmail.com,netdev@vger.kernel.org];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:email]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
+From: "Mike Marciniszyn (Meta)" <mike.marciniszyn@gmail.com>
 
-On Thu, 07 May 2026 11:26:01 +0200, Linus Walleij wrote:
-> The dsa.yaml and ethernet-switch.yaml bindings recommend
-> prefixing ethernet switches and ports with "ethernet-" so
-> make the LAN966x do the same.
-> 
-> Reported-by: Herve Codina <herve.codina@bootlin.com>
-> Signed-off-by: Linus Walleij <linusw@kernel.org>
-> ---
->  .../devicetree/bindings/net/microchip,lan966x-switch.yaml      | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
+The DW IP has two distinct PCS address ranges cooresponding
+to the C45 PCS registers.
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+The shim translates the PCS addr/regno into specific CSR writes
+into one of those two zero-relative ranges.
+
+This patch fixes a one off in the test that could allow an invalid
+CSR write if an addr == 2 was called.
+
+There are is of yet, no real impact for the bug as no PCS writes are
+present.
+
+Signed-off-by: Mike Marciniszyn (Meta) <mike.marciniszyn@gmail.com>
+---
+v3:
+  - put back into the series based on https://lore.kernel.org/all/9ec11642-8035-419c-a896-52f902020bb8@lunn.ch/
+  - revised commit message will additional details
+v2:
+  - omitted from patch series
+v1: https://lore.kernel.org/all/20260428172810.175077-2-mike.marciniszyn@gmail.com/
+
+ drivers/net/ethernet/meta/fbnic/fbnic_mdio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c b/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
+index 709041f7fc43..d6a124889f52 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
+@@ -125,7 +125,7 @@ fbnic_mdio_write_pcs(struct fbnic_dev *fbd, int addr, int regnum, u16 val)
+ 		addr, regnum, val);
+
+ 	/* Allow access to both halves of PCS for 50R2 config */
+-	if (addr > 2)
++	if (addr >= 2)
+ 		return;
+
+ 	/* Skip write for reserved registers */
+--
+2.43.0
 
 
