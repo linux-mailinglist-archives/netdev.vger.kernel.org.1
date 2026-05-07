@@ -1,206 +1,275 @@
-Return-Path: <netdev+bounces-285282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285283-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gFmTBh57/GkwQgAAu9opvQ
-	(envelope-from <netdev+bounces-285282-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:44:30 +0200
+	id 2EY1EFR7/GkwQgAAu9opvQ
+	(envelope-from <netdev+bounces-285283-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:45:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF8CF4E7A73
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:44:29 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD7804E7A93
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:45:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 52AB3301983B
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 11:42:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 39A88300F75A
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 11:45:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1D43DCD88;
-	Thu,  7 May 2026 11:42:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8464F3ECBD0;
+	Thu,  7 May 2026 11:45:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="GEg7wxS3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M7Yiu727";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="MNhdAlWq"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010008.outbound.protection.outlook.com [52.101.69.8])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF6A3176FD;
-	Thu,  7 May 2026 11:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778154154; cv=fail; b=sBTGVEpBM2MeKqLyLoiPzY41i0xblXMCCzZIasZ/e29pJhvm1k7qQp8pfn6VA5ll0NblOCyvEkaLDK/RXPbnDc6jt0X3ZvOrW+vT2kyU6nfA+xC5NahB2CjpZb3mVx8OTJlDFatDdj234sPWehbE62fHihEps8HZu+GVNMO1RgY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778154154; c=relaxed/simple;
-	bh=MvTkW1bPUTSr5Uay+MYB9NkPTCmVFwlvktO7jqLnNHI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=StXiq8+A2EvKb7d0szBxCXDkE8vPzCKPYDCSWg8/Fk+As2yvXGggilwKEYYdoXHsY/QcIO4SztBW5xlP9VLjqTI1oirI50rPdyW4J5jW08wFxGAg3z2ypucFZTHjjp3Y8FU7GXmh1NCugzuzXfFU4hCVXVZC1NqA8esVeUmUuwc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=GEg7wxS3; arc=fail smtp.client-ip=52.101.69.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=L6/s/u6pCi+isPcj9qkyePVbv//Kx9mX1HtgjejFXzjh9O0qjw3RUgnQ1gRdziZ+xEeXIR1LoLx3Ba02O7ycid1YZAlGfsH7aOzAH0wjSH+dQiq0nG14QKUrf6lFR0LQdT7e/AfUX/vJDVa+Hap9AStCCnFwmLoN/FZoClqpCznhK/z87MPDxSU/WH+UzRUeBV8wojBidQuDfXqoBSWq6+mCka3SPRMZM2Chc4a3/qgB9kMQ1rsB7HBuDGW5ldVZFun8xZ+KrlEBzwLGe/8isGKcVpqHX2Xbl+4g3fbUX7hCeRDpPptdve1KDcCxjDhI5HU4gYouR/xbms5oI3Bj1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wLe2WlC5apNLiJwGvfSqNqUJPVLE3OOeg5XKKaMuuIE=;
- b=xXI2gtiOhFxswqresdoIwaSE5pa4S9v5O0ogOQM/nbF6axSEu6QSrVyD5g5tgG7YagUp9khrH2OlH2hun+cP7y1IIOhMnl8lk4/lqCzi8cU8YpromApIQzVam/P9BrPa2qmHxNXe/7wYBeabWhEEwBVIlCDadXK2Qrlclf0uBeLdTolr65WMem51POmiJh5AL+DFR1+e5h4pnk8PyO4fktuIw0CLkwx0Vv3FuhKlg7tETuhNbCyPT5+z9kJV6Mdcgq/9AsVJaPM9Nm+BomYCHbIsHjWoitH4EEBxRVy1+RuVjDPUO3lwo78bbzXDBnORpQ/1THkP+63k1x4LR7hpnA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wLe2WlC5apNLiJwGvfSqNqUJPVLE3OOeg5XKKaMuuIE=;
- b=GEg7wxS33uxehZlTkf1jXp5wxcqifxOV/o1GeYNPIRghR3N0Aq26lm5amMUWPoLe7M4b+99mvZ9/n0HVnHq2OiznohXHaj1V4C73EjItrdAJRHQ8j/8RqDZ3sgIBJ1KJ7Z1sGctDDD/l8QUqa1Ntqc3BXJdwiMNnSJfeTYyRphDKee6nSZnlxgizqOUbmFpRdxsdUQA5VU2PPnA9UWUpYgcyXDaADwRj22o+tPXDUNTnYBmk5dq6/Jy5cINLRnsbcsHNDLzjVF1M51dXopGzZ+of7q+IfC47m+q3xQR5temiXrbQppKnAazJ2IBn9Rci4A6eIRBD6aYNNCi6o5y6NQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from VI0PR04MB11503.eurprd04.prod.outlook.com
- (2603:10a6:800:2c7::16) by GV2PR04MB11933.eurprd04.prod.outlook.com
- (2603:10a6:150:2f4::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.17; Thu, 7 May
- 2026 11:42:29 +0000
-Received: from VI0PR04MB11503.eurprd04.prod.outlook.com
- ([fe80::cbe9:4c03:71b6:359f]) by VI0PR04MB11503.eurprd04.prod.outlook.com
- ([fe80::cbe9:4c03:71b6:359f%6]) with mapi id 15.20.9891.008; Thu, 7 May 2026
- 11:42:29 +0000
-Date: Thu, 7 May 2026 14:42:25 +0300
-From: Ioana Ciornei <ioana.ciornei@nxp.com>
-To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 12/13] dpaa2-switch: add support for imprecise
- source port
-Message-ID: <bz43o57memx674fovfxmgulqolrigq7jcpreh26nkv2rhao4fb@mjq3hqaqojrc>
-References: <20260506151540.1242997-1-ioana.ciornei@nxp.com>
- <20260506151540.1242997-13-ioana.ciornei@nxp.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260506151540.1242997-13-ioana.ciornei@nxp.com>
-X-ClientProxiedBy: FR4P281CA0202.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:e5::12) To VI0PR04MB11503.eurprd04.prod.outlook.com
- (2603:10a6:800:2c7::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D546C311959
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 11:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778154321; cv=none; b=dR4CvhnR3MeLx/NteVACVIzApjOvvzHcoUM8Md0iuCn6f2X49cr9T5WiTB8C0Q6CKzvjeHrHG9BH+IUxeyriPm/P/F8fCz6P3BnUalHgAeZK2a2vr8bgZTAHziRv8EXH9voXSe74fCY0GSrHTuTj9mvfQnYK2LX3dMxR+Je3ljY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778154321; c=relaxed/simple;
+	bh=lvuRrcMHuxAF9URp6OhLBiPGZ+f4f+w8cDaxKKzlWH0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k73670l6S2XvH2kjwES5YPfyLWOKGwUgS3DfhnhsyRs3qO1YHAhB1o8GKSwLAw/XnB3nF4u4tHaPdW2wOdlajaqFaoitI3Il0jBff0mIlVqD4+HNMTBiPTII5I6J1Yhc332FRRzlENim4XiSGQV0SgkdXBnqLTpCwfBKqvR18H8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M7Yiu727; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=MNhdAlWq; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778154318;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3XB8uKgfriwIOrN1HH+uQzFZrRsNz6/XjSTKr5IkjkA=;
+	b=M7Yiu727hNp03W51NM/iY+wvZKynYmQ/PukJUHOhrsWNDN7XxlukYCCS5zs31in12jWjI5
+	kGJojC0Bjo7RdEsCKKuj98nFlsOZhEKm0tcDwGlKg5wnu78jS26LkZJPqRB/uNaYUIRJcG
+	F4dq98ZnmwkKhTx6vCDHRiMWJc4S6UM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-257-b4CDeESeOzGcWw5KyfJbow-1; Thu, 07 May 2026 07:45:16 -0400
+X-MC-Unique: b4CDeESeOzGcWw5KyfJbow-1
+X-Mimecast-MFC-AGG-ID: b4CDeESeOzGcWw5KyfJbow_1778154315
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-44f56d5523eso612001f8f.1
+        for <netdev@vger.kernel.org>; Thu, 07 May 2026 04:45:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1778154315; x=1778759115; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3XB8uKgfriwIOrN1HH+uQzFZrRsNz6/XjSTKr5IkjkA=;
+        b=MNhdAlWqr/A9z8eNgbbotqQHpSYXSAwOKVmAZFEJl6n7MJ8HA0JfURdrImmJqiJM4B
+         WHnDI7MUySwIPt++D05HvpDmW+tBiDpqL67h9eAutI5m4zVJFj07hsaiQTfLUdMTy/Jh
+         UoJG/FcAKmBIwveKbk3T/gdoGBTzKv1eiyyjkz7HPuKxWmj/X5Y3kauS/RE/wc9Op6kF
+         Bup+csZIgeiJIN6ly/Yj2zfrty7ojbTHZ48AAuHNm+wtyQDOZAQ5SVnunJWy6hCz00nq
+         IGaLP0opY27jZe787tTAnonpNMSMEv71mfuLjo6Xq2aLfF6tbx8rnPgG0BcEphjdoEvU
+         1fHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778154315; x=1778759115;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3XB8uKgfriwIOrN1HH+uQzFZrRsNz6/XjSTKr5IkjkA=;
+        b=B7j3Z/wTf1LPt8ehahvJURO134TyNIm1aensM6nkngFQkpOAzyTr7D+tpD6mMtSkoC
+         ifTQ1A4sbAa3Gz5rRsV7RApnb3B8/DIfcugDgWX0eoEF52z7GpRRmQTIaKJXNQO+kk+w
+         h84Zyz8qTtDXwp8Gi3b8DYD3PXWqua3eYsz7GSQp8hX/55qwZtREBFdX5v9VPfwG4G05
+         i+T57r9ha19IxFDnJOxeN5pwBmB/xVUBKrajSWfY6dLbt6rMsXMcBLCLJMsPeOasxz/k
+         35u2hmnF4ydl4eLY8orjSm4spiCI4xjnvMcNuUsmEz/aThQ5NqJB++2XIZ9C9DsMmUsq
+         +RnQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/YGBpz8AJiEAp+BimtXm5Z0CgFodjxKUOVRQlUFzOXGREXDnNCcjWlq2kpWforUcvaL0V8Rqo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxl0soL/dXEirK8fjkEsgopHp9Fozm5tS2SDjKtsJ+CBhWzz9uZ
+	U7nzaI9lCfFhHoG/Nm1ATisTGEf6KsRyKlCoUD3gc2S7dU0EZ47eCTgA+kkLeFDXmlSTyZw3oQ4
+	3Ufd2qc1uGihBE6rvCIrkkWqk21Bsy5XNiFsllz3gthDUY1LHSN7TMEuAyA==
+X-Gm-Gg: AeBDiesQcyizh+zmzA2xuVlq7sTQSIGwi6oWIdT08KSQhw9cMCkdxb4l18k9oq9Bz8D
+	A+npNrTTvwmAtBDjbehdHnQjaZ+CQKOdOOZ045vnaHJnKF9FC4/wCeKK9lAlwt4ojdCGWe1Uhta
+	nlMQlfz5f96YUKtBLcBXLAgPd8sWxqWPxXlyJLsv+FHKO8w1IZDJCZ/iCNnMxS7YMsF1/78QeSQ
+	pb/62qa2/AKqGqpLsqC4M9LAPH3G6cFhvdKP+bFKnZrJyvMVdkZ9FGj+XO52jp6FK94LTOQK22T
+	TYwNjiLhLMMvXbiljauTjGfkFHBhjnafl10vRTTsXlpmgc6B/PG54HiA8hjBvs1aprJDbNuTiip
+	Pa6Kou/FnOHaEdjtPjlabMShY5DTsehiKXKyjbTM6JyCNe/w0pSs=
+X-Received: by 2002:a05:6000:200b:b0:43d:7b85:6c95 with SMTP id ffacd0b85a97d-4515d5c567emr12448720f8f.33.1778154315111;
+        Thu, 07 May 2026 04:45:15 -0700 (PDT)
+X-Received: by 2002:a05:6000:200b:b0:43d:7b85:6c95 with SMTP id ffacd0b85a97d-4515d5c567emr12448641f8f.33.1778154314419;
+        Thu, 07 May 2026 04:45:14 -0700 (PDT)
+Received: from redhat.com (IGLD-80-230-48-7.inter.net.il. [80.230.48.7])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45055960fd6sm20870119f8f.31.2026.05.07.04.45.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 May 2026 04:45:13 -0700 (PDT)
+Date: Thu, 7 May 2026 07:45:10 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Arseniy Krasnov <avkrasnov@salutedevices.com>,
+	Bobby Eshleman <bobbyeshleman@meta.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev
+Subject: Re: [PATCH net] vsock/virtio: fix potential unbounded skb queue
+Message-ID: <20260507074113-mutt-send-email-mst@kernel.org>
+References: <20260430122653.554058-1-edumazet@google.com>
+ <afn0ZdvZWswBuDMm@sgarzare-redhat>
+ <CANn89iLs8DOWJwDpf_ARoMrV+6b2tbhEJ=VVzeC8gCm5dRGaig@mail.gmail.com>
+ <afoF_cHfl6ygcupM@sgarzare-redhat>
+ <20260506113554-mutt-send-email-mst@kernel.org>
+ <afxVH2So9BbZ3Gta@sgarzare-redhat>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VI0PR04MB11503:EE_|GV2PR04MB11933:EE_
-X-MS-Office365-Filtering-Correlation-Id: d65341a6-9a1d-4a75-9ac3-08deac2db7d1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|366016|19092799006|1800799024|56012099003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	I3+jATT9malf+eFr2UB7Kpm/9HnWEfolUD5Mvo9s+xdsnP0NnFiQDoVnIdw7YVi0kzTFRex3Amk/MwI+LixSmdXlVMnPKbH+y4i/JoiZsyF55cqlSBV3Q+GaV0CcxORNT2CX+xUZ2QWqtKGb8oyCS+Mdoho44+jP/YupB5JlFcIVKAmRSdIxUIPgzLG6GcCq88ffl3bry4v4GoT58ZL5HYNKJCeY12UxmbMyWUd6DGds5KzWeaX4/0OZfD4KkAlcPXzLIt/9GeyEeZLVICknRRoodyO31gMLI6xDUgIe+ONJIbD56gJ1GSr9MjswxJ0udSf9z6qFvswdxALw9aIOzB44wra6/3t8Q8i8vs0vVbeDb6PcjVZFJ+dAUI/e2n0D8A5zPT+D3X2qeo7Z2/dVSqSlJjey0OZ67Asjed45eiRwIs7yjAbf3ZimXhyAUVlRMaA/wDeJ4O1M/vQ7ebTD1H0Jx6L2UKYhFE4nNouFQVxqI8Pa/S7x3XdSAp4e/u2vkdkxuK4GwcpH46uwtcBdl86iDtXvWe9AwP5Z6V+BASA9FCbdLWfmMm5OF1C0100z1Li4JwkPaFSwi4x8bDUIZePXZhIjJHrbbpnN6qlRB3gHZbL1XLm8l6BzSG0HYHmWQmDlUMX3z1ic0PuHVE6nkjfM773joQy8Fdq3W+V3DOxyXW/YInvEnc+yzrfGObjL
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI0PR04MB11503.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(19092799006)(1800799024)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?2Fbk/79R6ZN6Y0VtAIrVUr5pfber9MA2l6cWCajmZSmntO/Pr9nb056Ih0UX?=
- =?us-ascii?Q?gL1EzQCvLJQgBKnSsM2Us9MdOkhNWeXHIDM4i0DpBIgjViW2YASFyF94WtJc?=
- =?us-ascii?Q?XgThm2ByhPnDN5o9s5b55Y3d9iDs5ESY6VgtuTWIUpABADg8dP7enKUnPIiB?=
- =?us-ascii?Q?U2DmL1d2p6K2XG21Gn5Cic9/Z/mOAwyUKITBC/TN4D5WV81521zjNggDJ3qC?=
- =?us-ascii?Q?UUz8anPtHf5aFOU5fVkICCpJkr1cDY6Y2VcSptaik+ZCfR8f3kIfGp0bO/fg?=
- =?us-ascii?Q?WZXwd0Nw1sXEQVCnnYr2Mr9KLmvfttnw2Bsv3EfQ0JsLcc/NAhc4q4xl6a5M?=
- =?us-ascii?Q?+xTOr/g2QLnsKZ90E+4oJPluhW1BUWW1+tWfn9H+p5JiN4zc6uCT3XtU+6YH?=
- =?us-ascii?Q?0cV/BWW2z+lFduuyh6HSWCeuomJGIvH5CtJSoZ33kW9Q5ogRKo5Tqgum8hkZ?=
- =?us-ascii?Q?xMtW4cWuwPNZ4OhUALk2cJ0pWTtNZYVkfMWI//KebMtu8F8BVBmrIDuLb2Fz?=
- =?us-ascii?Q?UD9380vgOdahM8CPfiEy6Y/TH1GTxAJy1axzX+fPs6P70XYTLKlQrAdWT5uk?=
- =?us-ascii?Q?MtiWNAuxHfBqaZBX2g51loIzqWqZu9tbmZMOzxGIj0+4MY7VgfOOzYsoWcqo?=
- =?us-ascii?Q?sSqfDQv/MXe5qjPw4d/pmZuSM+OlVGygABeUG76KX/Mka0/w8nGgam/gf6l2?=
- =?us-ascii?Q?IAlQMjttPaRUqOXVoIURRUzaaMzNCYlIDA6kE5CalDNcarqPw2MPucKC6qIP?=
- =?us-ascii?Q?yjSd+0UkoakcNpI7CrXAeD6gvtkisHxQWwsVPWaU38W6hnlbVxZnX9rMbNap?=
- =?us-ascii?Q?qeaVUnbCrFwuMfKaNRdwpQeJzCOMvCwQFh2OaJ/jMRalvs704GbQy1M7mfsb?=
- =?us-ascii?Q?jrpu8OfkwhN3ektB81tCK0QwIKnh1/yj0nUnl6ZjCGEah+JuCUAC020Zdisx?=
- =?us-ascii?Q?/MKv4lmPz9Pq3kEp/yPI/zG4dLAuOS5XSfPqpmwzHmFDPCEUWZhe8Bi7q8B0?=
- =?us-ascii?Q?TavxG+pslqyltwsaksUBA/gyis8y7DdArrSfuTDipJRqHcH4bg8+oh0pMIpj?=
- =?us-ascii?Q?qCxGmQqCSpcRFtZLzUU0ADXD0+16LsJlD4TxKZqxLdj6C8oX7CLp0ilUHbO4?=
- =?us-ascii?Q?ayMgCMdMsgSDdNiRU119Eg2cO8rThP80d/aOKSk4dJXJvm1/AAZ9Ayrg2aw+?=
- =?us-ascii?Q?OUQOM37ep1wIF2yeZVFGzdTGmdaaJmnUTY+jpXY6hbJECnSjVv+M8vq7wh5W?=
- =?us-ascii?Q?vJSARsKR+6/8DgGz5DhB77+2/PmJ3iwLw7rCVVSDkXpR9y8nATE5qIB1d+Gm?=
- =?us-ascii?Q?2/o2rHwJU/Dt04sHd0m0a5+HvrFjcLZqQFHx8j9h+KWjdQZpJXTdcgjjq3kH?=
- =?us-ascii?Q?RwotVSFL2Ewi7lp+ECmMS8udGUIKhrCAw9cU9jGs4LKLlg7dzQJ3CWqYBG0m?=
- =?us-ascii?Q?PrRQlw3Cvk1aOhxGm7mNuB6ye7O4zhaNOhIR14d63RIEZSbwhTrY0irgKROU?=
- =?us-ascii?Q?ZeX5ZfgVfUEnVxwKvRF1opKBem7xQa+Um4QmO7OtkRFSZ0xi6RTKXYe0VEmt?=
- =?us-ascii?Q?c8H5heFJzZzsflWUHcR2GtnB4Xq2QFjZUUU+f8D8zXRult/vi8czrL8+cUkh?=
- =?us-ascii?Q?pdqg9FcKRgXODJzoSKHGp8dScgKnZWOWZhci30EnIdmRGbpP9OC529/DcSL6?=
- =?us-ascii?Q?J7lqkR512vMKpffZHmXLmuKuDZdl6S9UhQuiag2PdIqAvFlkwiKkiFjUsabN?=
- =?us-ascii?Q?aGWFRWSaKg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d65341a6-9a1d-4a75-9ac3-08deac2db7d1
-X-MS-Exchange-CrossTenant-AuthSource: VI0PR04MB11503.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2026 11:42:29.3154
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hUgQ2s3xwhi7ucZI+LOXav1AWRI4f8qbt8KvztStirsJsRFUzTtMdKf2SzhKfniIhfl5eATwWxq/YLFlHl4k3w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR04MB11933
-X-Rspamd-Queue-Id: AF8CF4E7A73
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <afxVH2So9BbZ3Gta@sgarzare-redhat>
+X-Rspamd-Queue-Id: CD7804E7A93
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-285283-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[google.com,salutedevices.com,meta.com,redhat.com,davemloft.net,kernel.org,vger.kernel.org,gmail.com,sberdevices.ru,linux.alibaba.com,lists.linux.dev];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	TAGGED_FROM(0.00)[bounces-285282-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,nxp.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:email,sberdevices.ru:email,oasis-open.org:url]
 X-Rspamd-Action: no action
 
-On Wed, May 06, 2026 at 06:15:39PM +0300, Ioana Ciornei wrote:
-> Switch ports configured as part of a LAG group are not able to provide
-> a precise source port for all packets which reach the control interface.
+On Thu, May 07, 2026 at 11:09:47AM +0200, Stefano Garzarella wrote:
+> On Wed, May 06, 2026 at 11:37:45AM -0400, Michael S. Tsirkin wrote:
+> > On Tue, May 05, 2026 at 06:11:13PM +0200, Stefano Garzarella wrote:
+> > > On Tue, May 05, 2026 at 07:14:36AM -0700, Eric Dumazet wrote:
+> > > > On Tue, May 5, 2026 at 6:52 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
+> > > > >
+> > > > > On Thu, Apr 30, 2026 at 12:26:52PM +0000, Eric Dumazet wrote:
+> > > > > >virtio_transport_inc_rx_pkt() checks vvs->rx_bytes + len > vvs->buf_alloc.
+> > > > > >
+> > > > > >virtio_transport_recv_enqueue() skips coalescing for packets
+> > > > > >with VIRTIO_VSOCK_SEQ_EOM.
+> > > > > >
+> > > > > >If fed with packets with len == 0 and VIRTIO_VSOCK_SEQ_EOM,
+> > > > > >a very large number of packets can be queued
+> > > > > >because vvs->rx_bytes stays at 0.
+> > > > > >
+> > > > > >Fix this by estimating the skb metadata size:
+> > > > > >
+> > > > > >       (Number of skbs in the queue) * SKB_TRUESIZE(0)
+> > > > > >
+> > > > > >Fixes: 077706165717 ("virtio/vsock: don't use skbuff state to account credit")
+> > > > > >Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > > > >Cc: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+> > > > > >Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> > > > > >Cc: Stefano Garzarella <sgarzare@redhat.com>
+> > > > > >Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > > > > >Cc: Jason Wang <jasowang@redhat.com>
+> > > > > >Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > >Cc: "Eugenio Pérez" <eperezma@redhat.com>
+> > > > > >Cc: kvm@vger.kernel.org
+> > > > > >Cc: virtualization@lists.linux.dev
+> > > > > >---
+> > > > > > net/vmw_vsock/virtio_transport_common.c | 4 +++-
+> > > > > > 1 file changed, 3 insertions(+), 1 deletion(-)
+> > > > > >
+> > > > > >diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > > > > >index 416d533f493d7b07e9c77c43f741d28cfcd0953e..9b8014516f4fb1130ae184635fbba4dfee58bd64 100644
+> > > > > >--- a/net/vmw_vsock/virtio_transport_common.c
+> > > > > >+++ b/net/vmw_vsock/virtio_transport_common.c
+> > > > > >@@ -447,7 +447,9 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+> > > > > > static bool virtio_transport_inc_rx_pkt(struct virtio_vsock_sock *vvs,
+> > > > > >                                       u32 len)
+> > > > > > {
+> > > > > >-      if (vvs->buf_used + len > vvs->buf_alloc)
+> > > > > >+      u64 skb_overhead = (skb_queue_len(&vvs->rx_queue) + 1) * SKB_TRUESIZE(0);
+> > > > > >+
+> > > > > >+      if (skb_overhead + vvs->buf_used + len > vvs->buf_alloc)
+> > > > > >               return false;
+> > > > >
+> > > > > I'm not sure about this fix, I mean that maybe this is incomplete.
+> > > > > In virtio-vsock, there is a credit mechanism between the two peers:
+> > > > > https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html#x1-4850003
+> > > > >
+> > > > > This takes only the payload into account, so it’s true that this problem
+> > > > > exists; however, perhaps we should also inform the other peer of a lower
+> > > > > credit balance, otherwise the other peer will believe it has much more
+> > > > > credit than it actually does, send a large payload, and then the packet
+> > > > > will be discarded and the data lost (there are no retransmissions,
+> > > > > etc.).
+> > > >
+> > > > I dunno, perhaps revert 077706165717 ("virtio/vsock: don't use skbuff
+> > > > state to account credit")
+> > > > and find a better fix then?
+> > > 
+> > > IIRC the same issue was there before the commit fixed by that one (commit
+> > > 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")), so
+> > > not sure about reverting it TBH.
+> > > 
+> > > CCing Arseniy and Bobby.
+> > > 
+> > > >
+> > > > There is always a discrepancy between skb->len and skb->truesize.
+> > > > You will not be able to announce a 1MB window, and accept one milliion
+> > > > skb of 1-byte each.
+> > > >
+> > > > This kind of contract is broken.
+> > > >
+> > > 
+> > > Yep, I agree, but before we start discarding data (and losing it), IMHO we
+> > > should at least inform the other peer that we're out of space.
+> > > 
+> > > @Stefan, @Michael, do you think we can do something in the spec to avoid
+> > > this issue and in some way take into account also the metadata in the
+> > > credit. I mean to avoid the 1-byte packets flooding.
+> > > 
+> > > Thanks,
+> > > Stefano
+> > 
+> > Why do we need the metadata? Just don't keep it around if you begin
+> > running low on memory.
 > 
-> The only frames which will have a precise source port are those that are
-> explicitly trapped, for example STP and LCAP frames. For any other
-> frames (for example, those which are flooded) we can only know the
-> ingress LAG group.
+> I don't think removing the skuffs will be easy; we added them for ebpf,
+> zero-copy, and seqpacket as well.
+
+You do not need to remove them completely.
+
+> For now, we're already doing something:
+> merging the skuffs if they don't have EOM set.
+
+
+Right that's good. You could go further and merge with EOM too
+if you stick the info about message boundaries somewhere else.
+
+> As a quick fix, I'm thinking of reducing the `buf_alloc` value to account
+> for the overhead and notifying the other peer, at least until we find a
+> better solution.
 > 
-> Take into account the DPAA2_ETHSW_FLC_IMPRECISE_IF_ID bit and based on
-> its value target the bond device or the specific source netdevice.
-> 
-> Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
-> ---
->  drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c | 10 ++++++++--
->  drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.h |  3 +++
->  2 files changed, 11 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> index 59ed06ed7ef6..8353d2230c72 100644
+> Stefano
 
-(...)
+well if you want to support pathological cases such as 1 byte messages
+that would mean like 100x reduction no?
 
-> --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.h
-> +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.h
-> @@ -87,6 +87,9 @@
->  
->  #define DPAA2_ETHSW_PORT_ACL_CMD_BUF_SIZE	256
->  
-> +#define DPAA2_ETHSW_FLC_IF_ID(flc)		(((flc) >> 32) & GENMASK(15, 0))
-> +#define DPAA2_ETHSW_FLC_IMPRECISE_IF_ID(flc)	((flc) & BIT(63))
-
-I saw the patchwork test - this breaks the build_32bit test.
-
-I will use BIT_ULL in the next version.
-
-Ioana
 
