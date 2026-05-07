@@ -1,427 +1,322 @@
-Return-Path: <netdev+bounces-285134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285135-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sNXKDlgB/GnjJgAAu9opvQ
-	(envelope-from <netdev+bounces-285134-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:04:56 +0200
+	id oCCUFGcB/GnjJgAAu9opvQ
+	(envelope-from <netdev+bounces-285135-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:05:11 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D54CB4E28A8
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:04:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A9D084E28AF
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:05:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6BF8B306BA9F
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 02:59:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8DA8D3015E05
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 03:02:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0A842D46C0;
-	Thu,  7 May 2026 02:59:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD370261B9C;
+	Thu,  7 May 2026 03:02:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YZ/RakGV"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="Ws4EChti"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F962D0C9D
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 02:59:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21E6A230BD5;
+	Thu,  7 May 2026 03:02:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778122760; cv=none; b=n6Ni11OwKUpGu6eQG6VSdGEl3sbdDLrEUxFK7OqEhiBeDM0CvQ8r1BNbA9iY7/vWOGkECY/FmAMUYzqTjDOV5NOfSQhlQIXtto2uz2JFbOR8OprwN6OWbeXzEy2wf8boZwcHDMAFVlhRm3iIPDmC9IXUThF4j0N058OaGHCSaQA=
+	t=1778122968; cv=none; b=FOEjmUMpIrBQIo/U0MUz6WTeAsyI59mLZaYyC2MlKPuVTVV15t0RZl4veV85zd6+3V4xsnDyECEhKAXIu3c/j88P7Tw7qLhSYuZI7/u//p6gGUEAdYCImHqgi1BSRUpPz6sC/SBHZhbE8yiJXdv1HZbjGjmmE581m+leyka7MBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778122760; c=relaxed/simple;
-	bh=gsNVAasOa2kyqzEFgmIeOCGt/Y5xW8cjyxY/iP3JyqU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=uzDQFKBWRGSsPS86C7ko1qxSWMNoy2wtAjzFb9UU8lIU0MrLLH9aHqOAxFDYl25yEwuOGBkB0hZa21aADhgcuzvKY0OtxHVTUv2zNCDZA11tfaJ1c+ThjpTds3ijqjcfReRKygu0sRGzLBHzvpSmhsnFobzcndda1L8qnaGfLbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YZ/RakGV; arc=none smtp.client-ip=74.125.82.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-2c156c4a9efso485846eec.1
-        for <netdev@vger.kernel.org>; Wed, 06 May 2026 19:59:17 -0700 (PDT)
+	s=arc-20240116; t=1778122968; c=relaxed/simple;
+	bh=L2Nt9kI/E40Y9oOdBaBThbSHJ1mhE61SqnkYDUwso4M=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=RPzHImoSbosaKSA3Lk8L9yPDfwboRd20B/zqhqkUatAB3X97frUENiaN9+UsEY+HQhd4e1o4NvOC01Ak+sQ5awozSgOq/Tz4+J0QSIp+dFN+vyUKi6e1KKgpLTVleMaNP11GTaxw/x0nJdFv4RnTk+v68k8rhY2QsfpPYdOHR5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=Ws4EChti; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778122757; x=1778727557; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WmniFmDEvFEvs0R/r59gg+M8uec2nY+P8sIy7+kzUAI=;
-        b=YZ/RakGV2bmpgr+wpx7SCp0eRL//9BRCPYAYDYTjM4YpNaCyWrTzxg0+cA60WM1JFR
-         MER3YTXaUACMFai/8EBibw0rGAjIPcjg8Mlgk5drDXsVSrnopMn9SiQEiRMzMz0uY2Tp
-         hVvz4Bk1ibQjjBi65mJGbK4lP63LwY+B2XpO3zoaDphWIpOPdn2n9It1q6tW8pNPOnTe
-         k+VLY68pg+8ryfjc4ypLmeexnhwZt1MukdlmdrizooFlGNAuru9heU95Knmul0hE2Q+x
-         kxJobnsL/qDqZZw/CR1XHH5RhHQZEWZt9zUftAX32qm78xFhFpDVzsGNb5dgeO0Zfya+
-         YPFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778122757; x=1778727557;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=WmniFmDEvFEvs0R/r59gg+M8uec2nY+P8sIy7+kzUAI=;
-        b=R1nNu2RcjZC41PwIKD7ts+CAeULamFzYJlMf9MXOippETTULlEZhXBlOnrHL7Rhv1q
-         dUFWOHQyZw2BCa197b2MTZ8f9N3pLVLgz2BVF839amZ/g9e7s4kROC/MotMuzFRo9QrA
-         0Rya3cjRMgxAtGYwvkwyU4OcduVvCraWWg8FycuaaUjR8J9qZJ6n1r0NvpqxGLlkY3ut
-         nob+VZCiTDwDncMiK+vrGd5JGrw8O6vQvcfbiBcECcuz08WTuoIsN5Y9L/W86YUr6k38
-         lOFT/4BmI7bPuL7PBrJYtz2WBTWthB1NzzLuHo4bfOmIBqEGf8fojfDZ93cqloMi4nSX
-         W6bQ==
-X-Gm-Message-State: AOJu0Yw+IGstQx6RDedsaV2+YPgP15W9LtxbqiIxSZQ1rkk2lr8hIJuP
-	JkUvfDaGUCxG6y5q4L2WovEJjV9iCJb3U5iVEJR8WTmJae5ktn+GAshl
-X-Gm-Gg: AeBDies4MojcMBjcIZd0nmPX3qgzvZI/a0ljcP6PWRXJ4bQX24me6t/Nl4H4mRc6Feq
-	3ZnHZ5uYRQ1pfEkVqCjz5w3DG7y2wowKCYwLkI4AGZRlWlISHh+a6+EGHo6L/k/70ivTe2qjqHk
-	oW2JV8XzlyAbz7xO9yhcxrHr4IZmG1F2vyuPou3UiyKhZMKpsl//v2vEqaTmT8L9SfF450wi+p0
-	zunpJJhZzyBV5mCv8+tT5eD9b2cTy9dxxkLhFWIfbsWGytoHBAac7pOzcKt41yYkIs/9+KnAhYc
-	IHRshSu/ADR8B79yptIgXPIczTLGKQn3jOkTRfUK2kIp9FUc7qP60XsNslxYEFN26D0r9aFqKxL
-	5RbW5zXOQk15uSjBYoHikSQuHvTTyPIV4Ens1z891tcAezIkj67x3z02mcTFSJoNd5W/l/4r51p
-	LcVUqAIWB83MUQqJ7miHkzbMwzTmvwYYLQOBSf0mrxXVlj14Us1Q==
-X-Received: by 2002:a05:7022:3881:b0:12d:de3f:f3ec with SMTP id a92af1059eb24-131a6af4638mr3072063c88.44.1778122756892;
-        Wed, 06 May 2026 19:59:16 -0700 (PDT)
-Received: from tresc054937.tre-sc.gov.br ([187.65.210.13])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-131f9789e3dsm6561267c88.8.2026.05.06.19.59.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2026 19:59:15 -0700 (PDT)
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Wed, 06 May 2026 23:58:25 -0300
-Subject: [net-next PATCH v3 8/8] net: dsa: realtek: rtl8365mb: add bridge
- port flags
+	d=codeconstruct.com.au; s=2022a; t=1778122963;
+	bh=L2Nt9kI/E40Y9oOdBaBThbSHJ1mhE61SqnkYDUwso4M=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=Ws4EChtivOxi8vYhnfWB29r8url4ec7zCv0vTSYznyQ4lT0x7Wfjm3HyvQfjS2YAN
+	 W9aYMH+GwxucThqa25939m1goeOyBq/UXOC3tHYPl4KWOzHbk3aLr9RTWydjy41AID
+	 VAhnyZsGdV7iiKmWrxekGUihtHvAsT6xk9P4NLR8W1TAeqy8Dt2oa6TcNf5lwLiumQ
+	 xT2JotD0sGZYdhNXtqoXN35byIw9pUzsNSk3WJ8F12Fzz3axYM7mfG+Fbup/vvdqpJ
+	 4PAfhSOJzfh8q1TJ5HrNpzdPfAKIyAehYcxt3umiR8H6aIVE/LZAfJFvz/Fr/Pjia2
+	 OkCscfGwugo1Q==
+Received: from [192.168.72.167] (210-10-213-150.per.static-ipl.aapt.com.au [210.10.213.150])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 5EA19604AF;
+	Thu,  7 May 2026 11:02:42 +0800 (AWST)
+Message-ID: <04015745fb7223f6d7dc262ae505daf0272586fb.camel@codeconstruct.com.au>
+Subject: Re: [net-next v39] mctp pcc: Implement MCTP over PCC Transport
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Adam Young <admiyo@os.amperecomputing.com>, Matt Johnston
+ <matt@codeconstruct.com.au>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Sudeep Holla
+	 <sudeep.holla@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
+	Huisong Li <lihuisong@huawei.com>
+Date: Thu, 07 May 2026 11:02:42 +0800
+In-Reply-To: <20260506214327.276069-1-admiyo@os.amperecomputing.com>
+References: <20260506214327.276069-1-admiyo@os.amperecomputing.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.46.4-2+deb12u1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260506-realtek_forward-v3-8-1d87c5f85a3b@gmail.com>
-References: <20260506-realtek_forward-v3-0-1d87c5f85a3b@gmail.com>
-In-Reply-To: <20260506-realtek_forward-v3-0-1d87c5f85a3b@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Linus Walleij <linusw@kernel.org>, 
- =?utf-8?q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
- Yury Norov <yury.norov@gmail.com>, 
- Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
- Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Luiz Angelo Daros de Luca <luizluca@gmail.com>
-X-Mailer: b4 0.15.2
-X-Rspamd-Queue-Id: D54CB4E28A8
+X-Rspamd-Queue-Id: A9D084E28AF
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.56 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285134-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk];
+	TAGGED_FROM(0.00)[bounces-285135-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bang-olufsen.dk:email,linaro.org:email]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[codeconstruct.com.au:mid,codeconstruct.com.au:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-From: Alvin Šipraga <alsi@bang-olufsen.dk>
-
-Implement support for bridge port flags to control learning and flooding
-behavior. This patch maps hardware functionalities to the following
-bridge flags:
-
-- BR_LEARNING
-- BR_FLOOD
-- BR_MCAST_FLOOD
-- BR_BCAST_FLOOD
-
-By default, all flooding types are enabled during port setup to ensure
-standard bridge behavior.
-
-Co-developed-by: Alvin Šipraga <alsi@bang-olufsen.dk>
-Signed-off-by: Alvin Šipraga <alsi@bang-olufsen.dk>
-Reviewed-by: Linus Walleij <linusw@kernel.org>
-Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
----
- drivers/net/dsa/realtek/realtek.h        |   8 +++
- drivers/net/dsa/realtek/rtl8365mb_main.c |  69 +++++++++++++++++++++
- drivers/net/dsa/realtek/rtl83xx.c        | 100 +++++++++++++++++++++++++++++++
- drivers/net/dsa/realtek/rtl83xx.h        |   4 ++
- 4 files changed, 181 insertions(+)
-
-diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
-index ef2d3ddfef60..e78113f050dc 100644
---- a/drivers/net/dsa/realtek/realtek.h
-+++ b/drivers/net/dsa/realtek/realtek.h
-@@ -140,6 +140,14 @@ struct realtek_ops {
- 	int	(*l2_del_mc)(struct realtek_priv *priv, int port,
- 			     const unsigned char addr[ETH_ALEN], u16 vid);
- 	int	(*l2_flush)(struct realtek_priv *priv, int port, u16 vid);
-+	int	(*port_set_learning)(struct realtek_priv *priv, int port,
-+				     bool enable);
-+	int	(*port_set_ucast_flood)(struct realtek_priv *priv, int port,
-+					bool enable);
-+	int	(*port_set_mcast_flood)(struct realtek_priv *priv, int port,
-+					bool enable);
-+	int	(*port_set_bcast_flood)(struct realtek_priv *priv, int port,
-+					bool enable);
- 	int	(*phy_read)(struct realtek_priv *priv, int phy, int regnum);
- 	int	(*phy_write)(struct realtek_priv *priv, int phy, int regnum,
- 			     u16 val);
-diff --git a/drivers/net/dsa/realtek/rtl8365mb_main.c b/drivers/net/dsa/realtek/rtl8365mb_main.c
-index 1b8034311b17..7c296f6a0a05 100644
---- a/drivers/net/dsa/realtek/rtl8365mb_main.c
-+++ b/drivers/net/dsa/realtek/rtl8365mb_main.c
-@@ -304,6 +304,21 @@
- #define   RTL8365MB_MSTI_CTRL_PORT_STATE_MASK(_physport) \
- 		(0x3 << RTL8365MB_MSTI_CTRL_PORT_STATE_OFFSET((_physport)))
- 
-+/* Unknown unicast DA flooding port mask */
-+#define RTL8365MB_UNKNOWN_UNICAST_FLOODING_PMASK_REG		0x0890
-+#define   RTL8365MB_UNKNOWN_UNICAST_FLOODING_PMASK_MASK		0x07FF
-+
-+/* Unknown multicast DA flooding port mask */
-+#define RTL8365MB_UNKNOWN_MULTICAST_FLOODING_PMASK_REG		0x0891
-+#define   RTL8365MB_UNKNOWN_MULTICAST_FLOODING_PMASK_MASK	0x07FF
-+
-+/* Broadcast flooding port mask */
-+#define RTL8365MB_UNKNOWN_BROADCAST_FLOODING_PMASK_REG		0x0892
-+#define   RTL8365MB_UNKNOWN_BROADCAST_FLOODING_PMASK_MASK	0x07FF
-+
-+#define RTL8365MB_SUPPORTED_BRIDGE_FLAGS \
-+	    (BR_LEARNING | BR_FLOOD | BR_MCAST_FLOOD | BR_BCAST_FLOOD)
-+
- /* Miscellaneous port configuration register, incl. VLAN egress mode */
- #define RTL8365MB_PORT_MISC_CFG_REG_BASE			0x000E
- #define RTL8365MB_PORT_MISC_CFG_REG(_p) \
-@@ -1450,6 +1465,49 @@ static int rtl8365mb_port_set_learning(struct realtek_priv *priv, int port,
- 			    enable ? RTL8365MB_LEARN_LIMIT_MAX : 0);
- }
- 
-+static int rtl8365mb_port_set_ucast_flood(struct realtek_priv *priv, int port,
-+					  bool enable)
-+{
-+	/* Frames with unknown unicast DA will be flooded to a programmable
-+	 * port mask that by default includes all ports. Add or remove
-+	 * the specified port from this port mask accordingly.
-+	 */
-+	return regmap_update_bits(priv->map,
-+				  RTL8365MB_UNKNOWN_UNICAST_FLOODING_PMASK_REG,
-+				  BIT(port), enable ? BIT(port) : 0);
-+}
-+
-+static int rtl8365mb_port_set_mcast_flood(struct realtek_priv *priv, int port,
-+					  bool enable)
-+{
-+	return regmap_update_bits(priv->map,
-+			RTL8365MB_UNKNOWN_MULTICAST_FLOODING_PMASK_REG,
-+			BIT(port), enable ? BIT(port) : 0);
-+}
-+
-+static int rtl8365mb_port_set_bcast_flood(struct realtek_priv *priv, int port,
-+					  bool enable)
-+{
-+	return regmap_update_bits(priv->map,
-+			RTL8365MB_UNKNOWN_BROADCAST_FLOODING_PMASK_REG,
-+			BIT(port), enable ? BIT(port) : 0);
-+}
-+
-+static int rtl8365mb_port_pre_bridge_flags(struct dsa_switch *ds, int port,
-+					   struct switchdev_brport_flags flags,
-+					   struct netlink_ext_ack *extack)
-+{
-+	struct realtek_priv *priv = ds->priv;
-+
-+	dev_dbg(priv->dev, "pre_bridge_flags port:%d flags:%lx supported:%lx",
-+		port, flags.mask, RTL8365MB_SUPPORTED_BRIDGE_FLAGS);
-+
-+	if (flags.mask & ~RTL8365MB_SUPPORTED_BRIDGE_FLAGS)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
- static int rtl8365mb_port_set_efid(struct realtek_priv *priv, int port,
- 				   u32 efid)
- {
-@@ -2280,6 +2338,11 @@ static int rtl8365mb_setup(struct dsa_switch *ds)
- 		if (ret)
- 			goto out_teardown_irq;
- 
-+		/* Enable all types of flooding */
-+		ret = rtl83xx_setup_port_flood_control(priv, dp->index);
-+		if (ret)
-+			goto out_teardown_irq;
-+
- 		/* Set up per-port private data */
- 		p->priv = priv;
- 		p->index = dp->index;
-@@ -2447,6 +2510,8 @@ static const struct dsa_switch_ops rtl8365mb_switch_ops = {
- 	.phylink_get_caps = rtl8365mb_phylink_get_caps,
- 	.port_bridge_join = rtl83xx_port_bridge_join,
- 	.port_bridge_leave = rtl83xx_port_bridge_leave,
-+	.port_pre_bridge_flags = rtl8365mb_port_pre_bridge_flags,
-+	.port_bridge_flags = rtl83xx_port_bridge_flags,
- 	.port_stp_state_set = rtl8365mb_port_stp_state_set,
- 	.port_fast_age = rtl83xx_port_fast_age,
- 	.port_fdb_add = rtl83xx_port_fdb_add,
-@@ -2481,6 +2546,10 @@ static const struct realtek_ops rtl8365mb_ops = {
- 	.l2_add_mc = rtl8365mb_l2_add_mc,
- 	.l2_del_mc = rtl8365mb_l2_del_mc,
- 	.l2_flush = rtl8365mb_l2_flush,
-+	.port_set_learning = rtl8365mb_port_set_learning,
-+	.port_set_ucast_flood = rtl8365mb_port_set_ucast_flood,
-+	.port_set_mcast_flood = rtl8365mb_port_set_mcast_flood,
-+	.port_set_bcast_flood = rtl8365mb_port_set_bcast_flood,
- 	.phy_read = rtl8365mb_phy_read,
- 	.phy_write = rtl8365mb_phy_write,
- };
-diff --git a/drivers/net/dsa/realtek/rtl83xx.c b/drivers/net/dsa/realtek/rtl83xx.c
-index 36158209a192..fc01eb262fcf 100644
---- a/drivers/net/dsa/realtek/rtl83xx.c
-+++ b/drivers/net/dsa/realtek/rtl83xx.c
-@@ -3,6 +3,7 @@
- #include <linux/module.h>
- #include <linux/regmap.h>
- #include <linux/of_mdio.h>
-+#include <linux/if_bridge.h>
- 
- #include "realtek.h"
- #include "rtl83xx.h"
-@@ -707,6 +708,105 @@ int rtl83xx_port_mdb_del(struct dsa_switch *ds, int port,
- }
- EXPORT_SYMBOL_NS_GPL(rtl83xx_port_mdb_del, "REALTEK_DSA");
- 
-+/**
-+ * rtl83xx_port_bridge_flags() - set port bridge flags
-+ * @ds: DSA switch instance
-+ * @port: port index
-+ * @flags: bridge port flags
-+ * @extack: netlink extended ack for reporting errors
-+ *
-+ * This function handles setting bridge port flags like learning and flooding.
-+ *
-+ * Context: Can sleep.
-+ * Return: 0 on success, negative value for failure.
-+ */
-+int rtl83xx_port_bridge_flags(struct dsa_switch *ds, int port,
-+			      struct switchdev_brport_flags flags,
-+			      struct netlink_ext_ack *extack)
-+{
-+	struct realtek_priv *priv = ds->priv;
-+	int ret;
-+
-+	if (flags.mask & BR_LEARNING) {
-+		if (!priv->ops->port_set_learning)
-+			return -EOPNOTSUPP;
-+
-+		ret = priv->ops->port_set_learning(priv, port,
-+						   !!(flags.val & BR_LEARNING));
-+		if (ret)
-+			return ret;
-+	}
-+
-+	if (flags.mask & BR_FLOOD) {
-+		if (!priv->ops->port_set_ucast_flood)
-+			return -EOPNOTSUPP;
-+
-+		ret = priv->ops->port_set_ucast_flood(priv, port,
-+						      !!(flags.val & BR_FLOOD));
-+		if (ret)
-+			return ret;
-+	}
-+
-+	if (flags.mask & BR_MCAST_FLOOD) {
-+		if (!priv->ops->port_set_mcast_flood)
-+			return -EOPNOTSUPP;
-+
-+		ret = priv->ops->port_set_mcast_flood(priv, port,
-+						      !!(flags.val & BR_MCAST_FLOOD));
-+		if (ret)
-+			return ret;
-+	}
-+
-+	if (flags.mask & BR_BCAST_FLOOD) {
-+		if (!priv->ops->port_set_bcast_flood)
-+			return -EOPNOTSUPP;
-+
-+		ret = priv->ops->port_set_bcast_flood(priv, port,
-+						      !!(flags.val & BR_BCAST_FLOOD));
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_NS_GPL(rtl83xx_port_bridge_flags, "REALTEK_DSA");
-+
-+/**
-+ * rtl83xx_setup_port_flood_control() - setup default flood control for a port
-+ * @priv: realtek_priv pointer
-+ * @port: port index
-+ *
-+ * This function enables flooding for a given port.
-+ *
-+ * Context: Can sleep.
-+ * Return: 0 on success, negative value for failure.
-+ */
-+int rtl83xx_setup_port_flood_control(struct realtek_priv *priv, int port)
-+{
-+	int ret;
-+
-+	if (priv->ops->port_set_ucast_flood) {
-+		ret = priv->ops->port_set_ucast_flood(priv, port, true);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	if (priv->ops->port_set_mcast_flood) {
-+		ret = priv->ops->port_set_mcast_flood(priv, port, true);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	if (priv->ops->port_set_bcast_flood) {
-+		ret = priv->ops->port_set_bcast_flood(priv, port, true);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_NS_GPL(rtl83xx_setup_port_flood_control, "REALTEK_DSA");
-+
- MODULE_AUTHOR("Luiz Angelo Daros de Luca <luizluca@gmail.com>");
- MODULE_AUTHOR("Linus Walleij <linus.walleij@linaro.org>");
- MODULE_DESCRIPTION("Realtek DSA switches common module");
-diff --git a/drivers/net/dsa/realtek/rtl83xx.h b/drivers/net/dsa/realtek/rtl83xx.h
-index dcb819fe567f..d86447121276 100644
---- a/drivers/net/dsa/realtek/rtl83xx.h
-+++ b/drivers/net/dsa/realtek/rtl83xx.h
-@@ -27,6 +27,10 @@ int rtl83xx_port_bridge_join(struct dsa_switch *ds, int port,
- 			     struct netlink_ext_ack *extack);
- void rtl83xx_port_bridge_leave(struct dsa_switch *ds, int port,
- 			       struct dsa_bridge bridge);
-+int rtl83xx_port_bridge_flags(struct dsa_switch *ds, int port,
-+			      struct switchdev_brport_flags flags,
-+			      struct netlink_ext_ack *extack);
-+int rtl83xx_setup_port_flood_control(struct realtek_priv *priv, int port);
- 
- void rtl83xx_port_fast_age(struct dsa_switch *ds, int port);
- int rtl83xx_port_fdb_add(struct dsa_switch *ds, int port,
-
--- 
-2.54.0
+SGkgQWRhbSwKCj4gK3N0YXRpYyB2b2lkIG1jdHBfcGNjX2NsaWVudF9yeF9jYWxsYmFjayhzdHJ1
+Y3QgbWJveF9jbGllbnQgKmNsLCB2b2lkICptc3NnKQo+ICt7Cj4gK8KgwqDCoMKgwqDCoMKgc3Ry
+dWN0IGFjcGlfcGNjdF9leHRfcGNjX3NoYXJlZF9tZW1vcnkgcGNjX2hlYWRlcjsKPiArwqDCoMKg
+wqDCoMKgwqBzdHJ1Y3QgbWN0cF9wY2NfbmRldiAqbWN0cF9wY2NfbmRldjsKPiArwqDCoMKgwqDC
+oMKgwqBzdHJ1Y3QgbWN0cF9wY2NfbWFpbGJveCAqaW5ib3g7Cj4gK8KgwqDCoMKgwqDCoMKgc3Ry
+dWN0IG1jdHBfc2tiX2NiICpjYjsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3Qgc2tfYnVmZiAqc2ti
+Owo+ICvCoMKgwqDCoMKgwqDCoHUzMiBoZWFkZXJfbGVuZ3RoOwo+ICvCoMKgwqDCoMKgwqDCoGlu
+dCBzaXplOwo+ICsKPiArwqDCoMKgwqDCoMKgwqBtY3RwX3BjY19uZGV2ID0gY29udGFpbmVyX29m
+KGNsLCBzdHJ1Y3QgbWN0cF9wY2NfbmRldiwgaW5ib3guY2xpZW50KTsKPiArwqDCoMKgwqDCoMKg
+wqBpbmJveCA9ICZtY3RwX3BjY19uZGV2LT5pbmJveDsKPiArwqDCoMKgwqDCoMKgwqBtZW1jcHlf
+ZnJvbWlvKCZwY2NfaGVhZGVyLCBpbmJveC0+Y2hhbi0+c2htZW0sIHNpemVvZihwY2NfaGVhZGVy
+KSk7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoC8vIFRoZSBtZXNzYWdlIG11c3QgYXQgbGVhc3QgaGF2
+ZSB0aGUgUENDIGNvbW1hbmQgaW5kaWNhdGluZyBpdCBpcyBhbiBNQ1RQCj4gK8KgwqDCoMKgwqDC
+oMKgLy8gbWVzc2FnZSBmb2xsb3dlZCBieSB0aGUgTUNUUCBoZWFkZXIsIG9yIHdlIGhhdmUgYSBt
+YWxmb3JtZWQgbWVzc2FnZS4KPiArwqDCoMKgwqDCoMKgwqAvLyBUaGlzIG1heSBiZSBydW4gb24g
+YmlnIGVuZGlhbiBzeXN0ZW0sIGJ1dCB0aGUgZGF0YSBpbiB0aGUgYnVmZmVyIGlzCj4gK8KgwqDC
+oMKgwqDCoMKgLy8gZXhwbGljaXRseSBsaXR0bGUgZW5kaWFuLgo+ICvCoMKgwqDCoMKgwqDCoGhl
+YWRlcl9sZW5ndGggPSBsZTMyX3RvX2NwdShwY2NfaGVhZGVyLmxlbmd0aCk7Cj4gK8KgwqDCoMKg
+wqDCoMKgaWYgKGhlYWRlcl9sZW5ndGggPCBzaXplb2YocGNjX2hlYWRlci5jb21tYW5kKSArIHNp
+emVvZihzdHJ1Y3QgbWN0cF9oZHIpKSB7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oGRldl9kc3RhdHNfcnhfZHJvcHBlZChtY3RwX3BjY19uZGV2LT5uZGV2KTsKPiArwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuOwo+ICvCoMKgwqDCoMKgwqDCoH0KPiArwqDCoMKg
+wqDCoMKgwqAvLyBJZiB0aGUgcmVwb3J0ZWQgc2l6ZSBpcyBsYXJnZXIgdGhhbiB0aGUgc2hhcmVk
+IG1lbW9yeSBtaW51cyBoZWFkZXJzLAo+ICvCoMKgwqDCoMKgwqDCoC8vIHNvbWV0aGluZyBpcyB3
+cm9uZyBhbmQgdHJlYXQgdGhlIGJ1ZmZlciBhcyBjb3JydXB0ZWQgZGF0YS4KPiArwqDCoMKgwqDC
+oMKgwqBpZiAoaGVhZGVyX2xlbmd0aCA+IGluYm94LT5jaGFuLT5zaG1lbV9zaXplIC0gUENDX0VY
+VFJBX0xFTikgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBkZXZfZHN0YXRzX3J4
+X2Ryb3BwZWQobWN0cF9wY2NfbmRldi0+bmRldik7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoHJldHVybjsKPiArwqDCoMKgwqDCoMKgwqB9Cj4gK8KgwqDCoMKgwqDCoMKgaWYgKG1l
+bWNtcCgmcGNjX2hlYWRlci5jb21tYW5kLCBNQ1RQX1NJR05BVFVSRSwgTUNUUF9TSUdOQVRVUkVf
+TEVOR1RIKSAhPSAwKSB7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGRldl9kc3Rh
+dHNfcnhfZHJvcHBlZChtY3RwX3BjY19uZGV2LT5uZGV2KTsKPiArwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgcmV0dXJuOwo+ICvCoMKgwqDCoMKgwqDCoH0KPiArCj4gK8KgwqDCoMKgwqDC
+oMKgc2l6ZSA9IGhlYWRlcl9sZW5ndGggKyBQQ0NfRVhUUkFfTEVOOwo+ICvCoMKgwqDCoMKgwqDC
+oHNrYiA9IG5ldGRldl9hbGxvY19za2IobWN0cF9wY2NfbmRldi0+bmRldiwgc2l6ZSk7Cj4gK8Kg
+wqDCoMKgwqDCoMKgaWYgKCFza2IpIHsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+ZGV2X2RzdGF0c19yeF9kcm9wcGVkKG1jdHBfcGNjX25kZXYtPm5kZXYpOwo+ICvCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm47Cj4gK8KgwqDCoMKgwqDCoMKgfQoKTWlub3IsIGJ1
+dCB5b3UgaGF2ZSBmb3VyIGluc3RhbmNlcyBvZiB0aGUgZHN0YXRzX3J4X2Ryb3BwZWQgY2FsbCwg
+dGhhdAptYXkgd29yayBhcyBhIHNoYXJlZCBlcnJvciBwYXRoLgoKPiArwqDCoMKgwqDCoMKgwqBz
+a2JfcHV0KHNrYiwgc2l6ZSk7Cj4gK8KgwqDCoMKgwqDCoMKgc2tiLT5wcm90b2NvbCA9IGh0b25z
+KEVUSF9QX01DVFApOwo+ICvCoMKgwqDCoMKgwqDCoG1lbWNweV9mcm9taW8oc2tiLT5kYXRhLCBp
+bmJveC0+Y2hhbi0+c2htZW0sIHNpemUpOwo+ICvCoMKgwqDCoMKgwqDCoGRldl9kc3RhdHNfcnhf
+YWRkKG1jdHBfcGNjX25kZXYtPm5kZXYsIHNpemUpOwo+ICvCoMKgwqDCoMKgwqDCoHNrYl9wdWxs
+KHNrYiwgc2l6ZW9mKHBjY19oZWFkZXIpKTsKPiArwqDCoMKgwqDCoMKgwqBza2JfcmVzZXRfbWFj
+X2hlYWRlcihza2IpOwo+ICvCoMKgwqDCoMKgwqDCoHNrYl9yZXNldF9uZXR3b3JrX2hlYWRlcihz
+a2IpOwo+ICvCoMKgwqDCoMKgwqDCoGNiID0gX19tY3RwX2NiKHNrYik7Cj4gK8KgwqDCoMKgwqDC
+oMKgY2ItPmhhbGVuID0gMDsKPiArwqDCoMKgwqDCoMKgwqBuZXRpZl9yeChza2IpOwo+ICt9Cj4g
+Kwo+ICtzdGF0aWMgbmV0ZGV2X3R4X3QgbWN0cF9wY2NfdHgoc3RydWN0IHNrX2J1ZmYgKnNrYiwg
+c3RydWN0IG5ldF9kZXZpY2UgKm5kZXYpCj4gK3sKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgYWNw
+aV9wY2N0X2V4dF9wY2Nfc2hhcmVkX21lbW9yeSAqcGNjX2hlYWRlcjsKPiArwqDCoMKgwqDCoMKg
+wqBzdHJ1Y3QgbWN0cF9wY2NfbmRldiAqbXBuZCA9IG5ldGRldl9wcml2KG5kZXYpOwo+ICvCoMKg
+wqDCoMKgwqDCoGludCBsZW4gPSBza2ItPmxlbjsKPiArCj4gK8KgwqDCoMKgwqDCoMKgLyogQ29u
+c29saWRhdGVkIGEgZnJhZ21lbnRlZCBwYWNrZXQgaW50byBjb250aWd1b3VzIG1lbW9yeSAqLwo+
+ICvCoMKgwqDCoMKgwqDCoGlmIChza2JfaXNfbm9ubGluZWFyKHNrYikpIHsKPiArwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKHNrYl9saW5lYXJpemUoc2tiKSkKPiArwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gZXJyb3I7Cj4gK8KgwqDC
+oMKgwqDCoMKgfQoKc2tiX2xpbmVhcml6ZSgpIGFscmVhZHkgaGFzIHRoZSBza2JfaXNfbm9ubGlu
+ZWFyKCkgY2hlY2suCgpIb3dldmVyLCB5b3UgZG9uJ3QgbmVlZCB0byBjYWxsIHNrYl9saW5lYXJp
+emUoKSBhbnl3YXksIGFzIHRoYXQgd2lsbApoYXBwZW4gZm9yIHlvdSBpbiB2YWxpZGF0ZV94bWl0
+X3NrYigpLCBzaW5jZSB0aGUgZHJpdmVyIGRvZXMgbm90CmFkdmVydGlzZSBzdXBwb3J0IGZvciBu
+b25saW5lYXIgc2ticy4KCj4gKwo+ICvCoMKgwqDCoMKgwqDCoGlmIChza2JfY293X2hlYWQoc2ti
+LCBzaXplb2YoKnBjY19oZWFkZXIpKSkKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+Z290byBlcnJvcjsKPiArCj4gK8KgwqDCoMKgwqDCoMKgLyoqCj4gK8KgwqDCoMKgwqDCoMKgICog
+VGhpcyBjb2RlIGNvdWxkIHBvdGVudGlhbGx5IGJlIHJ1biBvbiBBIEJpZyBFbmRpYW4KPiArwqDC
+oMKgwqDCoMKgwqAgKiBTeXN0ZW0uwqAgVGhlIEFDUEkgc3BlY2lmaWNhdGlvbiByZXF1aXJlcyB0
+aGF0IHZhbHVlcwo+ICvCoMKgwqDCoMKgwqDCoCAqIGluIHRoZSBzaGFyZWQgYnVmZmVyIGJlIGxp
+dHRsZSBlbmRpYW4uCj4gK8KgwqDCoMKgwqDCoMKgICovCgpNaW5vciwgYnV0IEkgZG9uJ3QgdGhp
+bmsgdGhpcyBjb21tZW50IGlzIG5lY2Vzc2FyeS4KCk1vcmUgaW1wb3J0YW50bHkgdGhvdWdoLCB5
+b3UncmUgZ2V0dGluZyBhIGJ1bmNoIG9mIHdhcm5pbmdzIGZyb20gdGhlIHVzZQpvZiB0aGVzZSBl
+bmRpYW4gaGVscGVyczoKCiAgZHJpdmVycy9uZXQvbWN0cC9tY3RwLXBjYy5jOjcwOjI1OiB3YXJu
+aW5nOiBjYXN0IHRvIHJlc3RyaWN0ZWQgX19sZTMyCiAgZHJpdmVycy9uZXQvbWN0cC9tY3RwLXBj
+Yy5jOjEyNTozMTogd2FybmluZzogaW5jb3JyZWN0IHR5cGUgaW4gYXNzaWdubWVudCAoZGlmZmVy
+ZW50IGJhc2UgdHlwZXMpCiAgZHJpdmVycy9uZXQvbWN0cC9tY3RwLXBjYy5jOjEyNTozMTogICAg
+ZXhwZWN0ZWQgdW5zaWduZWQgaW50IFt1c2VydHlwZV0gc2lnbmF0dXJlCiAgZHJpdmVycy9uZXQv
+bWN0cC9tY3RwLXBjYy5jOjEyNTozMTogICAgZ290IHJlc3RyaWN0ZWQgX19sZTMyIFt1c2VydHlw
+ZV0KICBkcml2ZXJzL25ldC9tY3RwL21jdHAtcGNjLmM6MTI2OjI3OiB3YXJuaW5nOiBpbmNvcnJl
+Y3QgdHlwZSBpbiBhc3NpZ25tZW50IChkaWZmZXJlbnQgYmFzZSB0eXBlcykKICBkcml2ZXJzL25l
+dC9tY3RwL21jdHAtcGNjLmM6MTI2OjI3OiAgICBleHBlY3RlZCB1bnNpZ25lZCBpbnQgW3VzZXJ0
+eXBlXSBmbGFncwogIGRyaXZlcnMvbmV0L21jdHAvbWN0cC1wY2MuYzoxMjY6Mjc6ICAgIGdvdCBy
+ZXN0cmljdGVkIF9fbGUzMiBbdXNlcnR5cGVdCiAgZHJpdmVycy9uZXQvbWN0cC9tY3RwLXBjYy5j
+OjEyODoyODogd2FybmluZzogaW5jb3JyZWN0IHR5cGUgaW4gYXNzaWdubWVudCAoZGlmZmVyZW50
+IGJhc2UgdHlwZXMpCiAgZHJpdmVycy9uZXQvbWN0cC9tY3RwLXBjYy5jOjEyODoyODogICAgZXhw
+ZWN0ZWQgdW5zaWduZWQgaW50IFt1c2VydHlwZV0gbGVuZ3RoCiAgZHJpdmVycy9uZXQvbWN0cC9t
+Y3RwLXBjYy5jOjEyODoyODogICAgZ290IHJlc3RyaWN0ZWQgX19sZTMyIFt1c2VydHlwZV0KCkxv
+b2tzIGxpa2Ugc3RydWN0IGFjcGlfcGNjdF9leHRfcGNjX3NoYXJlZF9tZW1vcnkgZG9lcyBub3Qg
+c3BlY2lmeQpmaWVsZHMgYXMgbGl0dGxlIGVuZGlhbiwgYnV0IGhvc3QgZW5kaWFuLgoKWW91IGNv
+dWxkIGNoYW5nZSB0byBlbmRpYW4tYW5ub3RhdGVkIHR5cGVzIHRvIHRob3NlIEFDUEkgc3RydWN0
+cywgYnV0CnRoZXJlIGFyZSBwcm9iYWJseSByZWFzb25zIHdoeSB0aGF0J3Mgbm90IGFscmVhZHkg
+ZG9uZS4gVGhpcyBtaWdodCBiZSBhbgppbmRpY2F0aW9uIHRoYXQgdGhlcmUgYXJlIG5vIGJpZy1l
+bmRpYW4gQUNQSSBwbGF0Zm9ybXMsIHNvIHlvdSBkb24ndApuZWVkIHRoZSBlbmRpYW4gY29udmVy
+c2lvbnM/Cgo+ICvCoMKgwqDCoMKgwqDCoHBjY19oZWFkZXIgPSBza2JfcHVzaChza2IsIHNpemVv
+ZigqcGNjX2hlYWRlcikpOwo+ICvCoMKgwqDCoMKgwqDCoHBjY19oZWFkZXItPnNpZ25hdHVyZSA9
+IGNwdV90b19sZTMyKFBDQ19TSUdOQVRVUkUgfCBtcG5kLT5vdXRib3guaW5kZXgpOwo+ICvCoMKg
+wqDCoMKgwqDCoHBjY19oZWFkZXItPmZsYWdzID0gY3B1X3RvX2xlMzIoUENDX0NNRF9DT01QTEVU
+SU9OX05PVElGWSk7Cj4gK8KgwqDCoMKgwqDCoMKgbWVtY3B5KCZwY2NfaGVhZGVyLT5jb21tYW5k
+LCBNQ1RQX1NJR05BVFVSRSwgTUNUUF9TSUdOQVRVUkVfTEVOR1RIKTsKPiArwqDCoMKgwqDCoMKg
+wqBwY2NfaGVhZGVyLT5sZW5ndGggPcKgIGNwdV90b19sZTMyKGxlbiArIE1DVFBfU0lHTkFUVVJF
+X0xFTkdUSCk7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoGlmIChtYm94X3NlbmRfbWVzc2FnZShtcG5k
+LT5vdXRib3guY2hhbi0+bWNoYW4sIHNrYikgPCAwKSB7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoC8vIFJlbW92ZSB0aGUgaGVhZGVyIGluIGNhc2UgaXQgZ2V0cyBzZW50IGFnYWlu
+Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHNrYl9wdWxsKHNrYiwgc2l6ZW9mKCpw
+Y2NfaGVhZGVyKSk7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoG5ldGlmX3N0b3Bf
+cXVldWUobmRldik7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybiBORVRE
+RVZfVFhfQlVTWTsKPiArwqDCoMKgwqDCoMKgwqB9Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoHJldHVy
+biBORVRERVZfVFhfT0s7Cj4gK2Vycm9yOgo+ICvCoMKgwqDCoMKgwqDCoGRldl9kc3RhdHNfdHhf
+ZHJvcHBlZChuZGV2KTsKPiArwqDCoMKgwqDCoMKgwqBrZnJlZV9za2Ioc2tiKTsKPiArwqDCoMKg
+wqDCoMKgwqByZXR1cm4gTkVUREVWX1RYX09LOwo+ICt9Cj4gKwo+ICtzdGF0aWMgdm9pZCBtY3Rw
+X3BjY190eF9wcmVwYXJlKHN0cnVjdCBtYm94X2NsaWVudCAqY2wsIHZvaWQgKm1zc2cpCj4gK3sK
+PiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbWN0cF9wY2NfbmRldiAqbWN0cF9wY2NfbmRldjsKPiAr
+wqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbWN0cF9wY2NfbWFpbGJveCAqb3V0Ym94Owo+ICvCoMKgwqDC
+oMKgwqDCoHN0cnVjdCBza19idWZmICpza2IgPSBtc3NnOwo+ICsKPiArwqDCoMKgwqDCoMKgwqBt
+Y3RwX3BjY19uZGV2ID0gY29udGFpbmVyX29mKGNsLCBzdHJ1Y3QgbWN0cF9wY2NfbmRldiwgb3V0
+Ym94LmNsaWVudCk7Cj4gK8KgwqDCoMKgwqDCoMKgb3V0Ym94ID0gJm1jdHBfcGNjX25kZXYtPm91
+dGJveDsKPiArCj4gK8KgwqDCoMKgwqDCoMKgLyogVGhlIFBDQyBNYWlsYm94IHR5cGljYWxseSBk
+b2VzIG5vdCBtYWtlIHVzZSBvZiB0aGUgbXNzZyBwb2ludGVyCj4gK8KgwqDCoMKgwqDCoMKgICog
+VGhlIG1jdHAtb3ZlciBwY2MgZHJpdmVyIGlzIHRoZSBvbmx5IGNsaWVudCB0aGF0IHVzZXMgaXQu
+Cj4gK8KgwqDCoMKgwqDCoMKgICogVGhpcyB2YWx1ZSBzaG91bGQgYWx3YXlzIGJlIG5vbi1udWxs
+OyBpdCBpcyBwb3NzaWJsZQo+ICvCoMKgwqDCoMKgwqDCoCAqIHRoYXQgYSBjaGFuZ2UgaW4gdGhl
+IE1haWxib3ggbGV2ZWwgd2lsbCBicmVhayB0aGF0IGFzc3VtcHRpb24uCj4gK8KgwqDCoMKgwqDC
+oMKgICovCj4gK8KgwqDCoMKgwqDCoMKgaWYgKCFza2IpIHsKPiArwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgV0FSTl9PTkNFKCFza2IsICIlcyBjYWxsZWQgd2l0aCBudWxsIG1lc3NhZ2Uu
+XG4iLCBfX2Z1bmNfXyk7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybjsK
+PiArwqDCoMKgwqDCoMKgwqB9CgpJJ2Qgc3VnZ2VzdCBuZXRkZXZfd2Fybl9vbmNlKCksIHNvIHdl
+IGtub3cgd2hpY2ggZGV2aWNlIGlzIGNhdXNpbmcgdGhpcy4KCj4gKwo+ICvCoMKgwqDCoMKgwqDC
+oGlmIChza2ItPmxlbiA+IG91dGJveC0+Y2hhbi0+c2htZW1fc2l6ZSkgewo+ICvCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqBkZXZfZHN0YXRzX3R4X2Ryb3BwZWQobWN0cF9wY2NfbmRldi0+
+bmRldik7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybjsKPiArwqDCoMKg
+wqDCoMKgwqB9Cj4gK8KgwqDCoMKgwqDCoMKgbWVtY3B5X3RvaW8ob3V0Ym94LT5jaGFuLT5zaG1l
+bSzCoCBza2ItPmRhdGEsIHNrYi0+bGVuKTsKClN1cGVyIG1pbm9yOiBkb3VibGUgc3BhY2UgYmVm
+b3JlIHNrYi0+ZGF0YSB0aGVyZS4KCj4gK8KgwqDCoMKgwqDCoMKgZGV2X2RzdGF0c190eF9hZGQo
+bWN0cF9wY2NfbmRldi0+bmRldiwgc2tiLT5sZW4pOwo+ICt9Cj4gKwo+ICtzdGF0aWMgdm9pZCBt
+Y3RwX3BjY190eF9kb25lKHN0cnVjdCBtYm94X2NsaWVudCAqYywgdm9pZCAqbXNzZywgaW50IHIp
+Cj4gK3sKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbWN0cF9wY2NfbmRldiAqbWN0cF9wY2NfbmRl
+djsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3Qgc2tfYnVmZiAqc2tiID0gbXNzZzsKPiArCj4gK8Kg
+wqDCoMKgwqDCoMKgLyoKPiArwqDCoMKgwqDCoMKgwqAgKiBJZiB0aGVyZSBpcyBhIHBhY2tldCBp
+biBmbGlnaHQgZHVyaW5nIGRyaXZlciBjbGVhbnVwCj4gK8KgwqDCoMKgwqDCoMKgICogSXQgbWF5
+IGhhdmUgYmVlbiBmcmVlZCBhbHJlYWR5Lgo+ICvCoMKgwqDCoMKgwqDCoCAqLwo+ICvCoMKgwqDC
+oMKgwqDCoGlmICghbXNzZykKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0dXJu
+Owo+ICvCoMKgwqDCoMKgwqDCoC8qCj4gK8KgwqDCoMKgwqDCoMKgICogSWYgdGhlIHJldHVybiBj
+b2RlIGlzIG5vbi16ZXJvLCB3ZSBzaG91bGQgbm90IHJlcG9ydCB0aGUgcGFja2V0Cj4gK8KgwqDC
+oMKgwqDCoMKgICogYXMgdHJhbnNtaXR0ZWQuwqAgSG93ZXZlciwgd2UgYXJlIGluIElSUSBjb250
+ZXh0IHJpZ2h0IG5vdywgYW5kIHdlCj4gK8KgwqDCoMKgwqDCoMKgICogY2Fubm90IHNhZmVseSB3
+cml0ZSB0cmFuc21pc3Npb24gc3RhdGlzdGljcy4KPiArwqDCoMKgwqDCoMKgwqAgKi8KClRoaXMg
+cmVhZHMgYXMgaWYgeW91J3JlIG5vdCB1cGRhdGluZyBzdGF0cyBhdCBhbGwsIGJ1dCB5b3UgZG8g
+c28gaW4KbWN0cF9wY2NfdHhfcHJlcGFyZSgpLiBJIGRvbid0IHRoaW5rIHRoaXMgY29tbWVudCBp
+cyBuZWNlc3NhcnkgLSBpZgp5b3UgcmVhbGx5IHdhbnQgdG8gbWVudGlvbiB0aGlzLCBhZGQgYSBj
+b21tZW50IG9uIHRoZQpkZXZfZHN0YXRzX3R4X2FkZCgpIHRvIGluZGljYXRlIHdoeSB5b3UncmUg
+Y2FsbGluZyBpdCBlYXJseS4KCj4gK8KgwqDCoMKgwqDCoMKgbWN0cF9wY2NfbmRldiA9IGNvbnRh
+aW5lcl9vZihjLCBzdHJ1Y3QgbWN0cF9wY2NfbmRldiwgb3V0Ym94LmNsaWVudCk7Cj4gK8KgwqDC
+oMKgwqDCoMKgZGV2X2NvbnN1bWVfc2tiX2FueShza2IpOwo+ICvCoMKgwqDCoMKgwqDCoG5ldGlm
+X3dha2VfcXVldWUobWN0cF9wY2NfbmRldi0+bmRldik7Cj4gK30KPiArCj4gK3N0YXRpYyBpbnQg
+bWN0cF9wY2Nfb3BlbihzdHJ1Y3QgbmV0X2RldmljZSAqbmRldikKPiArewo+ICvCoMKgwqDCoMKg
+wqDCoHN0cnVjdCBtY3RwX3BjY19uZGV2ICptY3RwX3BjY19uZGV2ID0gbmV0ZGV2X3ByaXYobmRl
+dik7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBfcGNjX21haWxib3ggKm91dGJveCwgKmlu
+Ym94Owo+ICsKPiArwqDCoMKgwqDCoMKgwqBvdXRib3ggPSAmbWN0cF9wY2NfbmRldi0+b3V0Ym94
+Owo+ICvCoMKgwqDCoMKgwqDCoGluYm94ID0gJm1jdHBfcGNjX25kZXYtPmluYm94Owo+ICsKPiAr
+wqDCoMKgwqDCoMKgwqBvdXRib3gtPmNoYW4gPSBwY2NfbWJveF9yZXF1ZXN0X2NoYW5uZWwoJm91
+dGJveC0+Y2xpZW50LCBvdXRib3gtPmluZGV4KTsKPiArwqDCoMKgwqDCoMKgwqBpZiAoSVNfRVJS
+KG91dGJveC0+Y2hhbikpCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybiBQ
+VFJfRVJSKG91dGJveC0+Y2hhbik7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoGlmIChvdXRib3gtPmNo
+YW4tPnNobWVtX3NpemXCoCA8wqAgTUNUUF9QQ0NfTUlOX1NJWkUpIHsKCk1pbm9yOiBvZGQgc3Bh
+Y2luZyBoZXJlLgoKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcGNjX21ib3hfZnJl
+ZV9jaGFubmVsKG91dGJveC0+Y2hhbik7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oHJldHVybiAtRUlOVkFMOwo+ICvCoMKgwqDCoMKgwqDCoH0KPiArCj4gK8KgwqDCoMKgwqDCoMKg
+aW5ib3gtPmNsaWVudC5yeF9jYWxsYmFjayA9IG1jdHBfcGNjX2NsaWVudF9yeF9jYWxsYmFjazsK
+PiArwqDCoMKgwqDCoMKgwqBpbmJveC0+Y2hhbiA9IHBjY19tYm94X3JlcXVlc3RfY2hhbm5lbCgm
+aW5ib3gtPmNsaWVudCwgaW5ib3gtPmluZGV4KTsKPiArwqDCoMKgwqDCoMKgwqBpZiAoSVNfRVJS
+KGluYm94LT5jaGFuKSkgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBwY2NfbWJv
+eF9mcmVlX2NoYW5uZWwob3V0Ym94LT5jaGFuKTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgcmV0dXJuIFBUUl9FUlIoaW5ib3gtPmNoYW4pOwo+ICvCoMKgwqDCoMKgwqDCoH0KPiAr
+wqDCoMKgwqDCoMKgwqBpZiAoaW5ib3gtPmNoYW4tPnNobWVtX3NpemUgPCBNQ1RQX1BDQ19NSU5f
+U0laRSkgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBwY2NfbWJveF9mcmVlX2No
+YW5uZWwob3V0Ym94LT5jaGFuKTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcGNj
+X21ib3hfZnJlZV9jaGFubmVsKGluYm94LT5jaGFuKTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgcmV0dXJuIC1FSU5WQUw7Cj4gK8KgwqDCoMKgwqDCoMKgfQo+ICvCoMKgwqDCoMKg
+wqDCoHJldHVybiAwOwo+ICt9Cj4gKwo+ICtzdGF0aWMgaW50IG1jdHBfcGNjX3N0b3Aoc3RydWN0
+IG5ldF9kZXZpY2UgKm5kZXYpCj4gK3sKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbWN0cF9wY2Nf
+bmRldiAqbWN0cF9wY2NfbmRldjsKPiArwqDCoMKgwqDCoMKgwqB1bnNpZ25lZCBpbnQgY291bnQs
+IGlkeDsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbWJveF9jaGFuICpjaGFuOwo+ICvCoMKgwqDC
+oMKgwqDCoHN0cnVjdCBza19idWZmICpza2I7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoG1jdHBfcGNj
+X25kZXYgPSBuZXRkZXZfcHJpdihuZGV2KTsKPiArwqDCoMKgwqDCoMKgwqBjaGFuID0gbWN0cF9w
+Y2NfbmRldi0+b3V0Ym94LmNoYW4tPm1jaGFuOwo+ICvCoMKgwqDCoMKgwqDCoHBjY19tYm94X2Zy
+ZWVfY2hhbm5lbChtY3RwX3BjY19uZGV2LT5pbmJveC5jaGFuKTsKPiArwqDCoMKgwqDCoMKgwqBz
+Y29wZWRfZ3VhcmQoc3BpbmxvY2tfaXJxc2F2ZSwgJmNoYW4tPmxvY2spIHsKPiArwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgc2tiID0gY2hhbi0+YWN0aXZlX3JlcTsKPiArwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgY2hhbi0+YWN0aXZlX3JlcSA9IE5VTEw7Cj4gK8KgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmIChza2IpIHsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGRldl9kc3RhdHNfdHhfZHJvcHBlZChuZGV2KTsKPiAr
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGRldl9jb25zdW1l
+X3NrYl9hbnkoc2tiKTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgfQo+ICvCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB3aGlsZSAoY2hhbi0+bXNnX2NvdW50ID4gMCkgewo+
+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgY291bnQgPSBj
+aGFuLT5tc2dfY291bnQ7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqBpZHggPSBjaGFuLT5tc2dfZnJlZTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmIChpZHggPj0gY291bnQpCj4gK8KgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWR4IC09IGNv
+dW50Owo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZWxz
+ZQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoGlkeCArPSBNQk9YX1RYX1FVRVVFX0xFTiAtIGNvdW50Owo+ICvCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgc2tiID0gY2hhbi0+bXNnX2RhdGFb
+aWR4XTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGRl
+dl9kc3RhdHNfdHhfZHJvcHBlZChuZGV2KTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoGRldl9jb25zdW1lX3NrYl9hbnkoc2tiKTsKPiArwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGNoYW4tPm1zZ19jb3VudC0tOwo+
+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB9Cj4gK8KgwqDCoMKgwqDCoMKgfQoKSSdt
+IGdvaW5nIHRvIGFzc3VtZSB0aGlzIGlzIGFsbCBPSyB3aXRoIHJlc3BlY3QgdG8gUENDIGNoYW5u
+ZWwgYWN0aXZpdHkuCgo+ICvCoMKgwqDCoMKgwqDCoHBjY19tYm94X2ZyZWVfY2hhbm5lbChtY3Rw
+X3BjY19uZGV2LT5vdXRib3guY2hhbik7Cj4gK8KgwqDCoMKgwqDCoMKgcmV0dXJuIDA7Cj4gK30K
+PiArCj4gK3N0YXRpYyBpbnQgbWN0cF9wY2NfY2hhbmdlX210dShzdHJ1Y3QgbmV0X2RldmljZSAq
+ZGV2LCBpbnQgbmV3X210dSkKPiArewo+ICvCoMKgwqDCoMKgwqDCoGlmIChuZXdfbXR1ID4gZGV2
+LT5tYXhfbXR1KQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gLUVJTlZB
+TDsKPiArwqDCoMKgwqDCoMKgwqBpZiAobmV3X210dSA8IE1DVFBfTUlOX01UVSkKPiArwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIC1FSU5WQUw7Cj4gK8KgwqDCoMKgwqDCoMKg
+cmV0dXJuIDA7Cj4gK30KClRoZSBjb3JlIGFscmVhZHkgZG9lcyB0aGVzZSBjaGVja3MsIEkgZG9u
+J3QgdGhpbmsgeW91IG5lZWQgYQpuZG9fY2hhbmdlX210dSBjYWxsYmFjayBhdCBhbGwuCgpDaGVl
+cnMsCgoKSmVyZW15Cg==
 
 
