@@ -1,113 +1,94 @@
-Return-Path: <netdev+bounces-285335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285336-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AKlLFbyU/Gn3RQAAu9opvQ
-	(envelope-from <netdev+bounces-285335-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 15:33:48 +0200
+	id UH+mAk+W/Gn3RQAAu9opvQ
+	(envelope-from <netdev+bounces-285336-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 15:40:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF4814E94F8
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 15:33:47 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31FFF4E9662
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 15:40:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D3AEE30686FB
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 13:28:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 88E403003D04
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 13:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D20D3F9F27;
-	Thu,  7 May 2026 13:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CFAF3F0AB2;
+	Thu,  7 May 2026 13:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="LsBAqdKf";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="nZO3DErO";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="LsBAqdKf";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="nZO3DErO"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="I5AsX48K"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E96AF3EB7E5
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 13:28:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90EE3F54D5;
+	Thu,  7 May 2026 13:40:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778160527; cv=none; b=djTuQM9zgZDoyi6EvN3DBOTjkQ/+ZqrYt0NcpDU6iWBGmj/vOFUIYPgnxAMRWFm+8C+mW27z7umpFg1voVthPACQeTlS/wDuKhfPD2/nEb9CwYsl2C8RVMnedtf3uDfHhRRn1OXNfKgMSTzD6faENgqv7BuxDZyoyKBvB2UIWU4=
+	t=1778161226; cv=none; b=l+BqH5YWsl0+Dnm6wJ+5hhUvAsa6CNgM/ZFmvJ3cxDbhk8oujUQqJcOsjogue20QFeEkil0Am2bevgXmvuAgNShUR3S0jas+anF7k57SSYN8FCyHVfKak4ETVYjMJuse44q/fZKh0tscUdg8LTXj7jbpnL5c687ECoNpcFAjmfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778160527; c=relaxed/simple;
-	bh=xoRzczstH8+FsGG7i75t2z/jmfGj5UewfUUSOee2QZU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D2k+eQl6LJcq9BYvdP/e/HwGRHOkrOX0Br/L1ZKz4PdJKw33h+0QYQcyx2kCJMeCvoCsB8fxuC2h4gKi6su+7qq/sGmxHcxyRY40rvVLNShpuH81L+UJ2lsMwmDmW+/SAQX4Rr9aiMw1nbmUAWh0kCCD+57FH+kCMasPOarsDvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=LsBAqdKf; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=nZO3DErO; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=LsBAqdKf; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=nZO3DErO; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id A21976BDF6;
-	Thu,  7 May 2026 13:28:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1778160513; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r9mbyS9qoa8mR+MvrwsXX94w+0qs5WmlqiGoNWsdFGM=;
-	b=LsBAqdKf9mqGuoRqCiWNxKKwwuP1sm2L660efeH3xibrftEzFpt/pWJiZDdyCDm48l2rs8
-	9OxY4Tf3aWN36DNcHopP5MTai0bicCeRYlgCqJlNZODId/u2btw2lJKeT2ue+tMeu4Wgxe
-	cM3Dh/PKpVWZWWAWgkMaP4rrou+65KI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1778160513;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r9mbyS9qoa8mR+MvrwsXX94w+0qs5WmlqiGoNWsdFGM=;
-	b=nZO3DErOqwfTGtJdhie4P0EN0zBwo/pJaVL+UxaszxxgidYsPiD5WHt21VZ/KEdX6tzQIL
-	Ukvv/HNoeuV2wODA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1778160513; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r9mbyS9qoa8mR+MvrwsXX94w+0qs5WmlqiGoNWsdFGM=;
-	b=LsBAqdKf9mqGuoRqCiWNxKKwwuP1sm2L660efeH3xibrftEzFpt/pWJiZDdyCDm48l2rs8
-	9OxY4Tf3aWN36DNcHopP5MTai0bicCeRYlgCqJlNZODId/u2btw2lJKeT2ue+tMeu4Wgxe
-	cM3Dh/PKpVWZWWAWgkMaP4rrou+65KI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1778160513;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r9mbyS9qoa8mR+MvrwsXX94w+0qs5WmlqiGoNWsdFGM=;
-	b=nZO3DErOqwfTGtJdhie4P0EN0zBwo/pJaVL+UxaszxxgidYsPiD5WHt21VZ/KEdX6tzQIL
-	Ukvv/HNoeuV2wODA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 159AD593A7;
-	Thu,  7 May 2026 13:28:33 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 4CeHAoGT/GlAdgAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Thu, 07 May 2026 13:28:33 +0000
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-To: netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
+	s=arc-20240116; t=1778161226; c=relaxed/simple;
+	bh=vQKlqoTGSV7Dk9rTcYshSvUcl7TYgWZf2yGyW9A30yo=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=cW7YjsisbXloou8Wz5gBwKSgjdQ39fLKi8/3JU9BU2xft0pf9Bz15H3OGbRaGha4iordiEK+od8ZE1n3/uPFsdwBq0KoWUv34Osvzr3wDXlkfBD18hBZmA4DPs720HMMlmEJC0myTHE4FYdgPfP3TQtmqJRAXRUO7ylmvOCRoRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=I5AsX48K; arc=none smtp.client-ip=43.163.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1778161211; bh=yh4K8iCkn4uRuUMWFiPkLL+C08zpCASkp5Atth0VSPo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=I5AsX48KZJU610HonA92fFqu/4F6OhnULEWl2PBDir6M9jMS9FGLauL+9qpJelSsq
+	 BPmxhTZ66psrTFm3leiDk6L/LMRu8BqzMfeKcH/ugj7wFZ6OjtKZ+0MzwUPIX2C6YC
+	 zgochhGEQiHU3+eNFmMZEx5hZOXVOYxNou5fSwAQ=
+Received: from lxu-ped-host.. ([111.198.231.89])
+	by newxmesmtplogicsvrszb51-0.qq.com (NewEsmtp) with SMTP
+	id A06264FF; Thu, 07 May 2026 21:40:06 +0800
+X-QQ-mid: xmsmtpt1778161206tqgk9slia
+Message-ID: <tencent_D175A964A3A32452D77DB76B66C2B3730305@qq.com>
+X-QQ-XMAILINFO: OATpkVjS499uNXgQ2jef7WoftjrHLGeA8ybk5nomzW+LDFPFsTu1YsivxQWeJ+
+	 Ge9Jo7RQ1tFxN2CZKoQFC8mA29NRBgVlUig58DaTDZwtBzFIavPBZ/CMeWeCdh3WMFWIBpR1/5M3
+	 ABfsy+gE1DA01E9XhsEEhdqFbcUj4IMwGnM9O8OkBqqGAfbyJpvb9fZacWQkDZ7ckiPF1CSP0UGk
+	 4XGlszbLYGpd9c4lNtNmtAQ5BQQsxUI8/sMRsj4aeK47fWHPVzAjeHyUiPj8BNEMBtSLwWiTe5oo
+	 lO4/rYvoPo/nu0zrAmCtb6e3Vzbs81LAq6qsh+yKM7pnXP8SXi4cJ5hmgx9/b+qZ7/nGOst9lTCj
+	 kv79KuSEq0Eex/Lo+HGunhbQQTsWrG0z+Ote48WwByk2UUJ3etTXhHyIFsCB+4AFTM+HLRdaiCSN
+	 XxLgC9vCl2gIN9VfdWYIviCyGGR8gMooYWCfezFljH6t+2qkA4lKEOhVKnC63GvUqUJMGG7Q87qp
+	 /4Su+lZaufk1J2dUCDG8QgwTF6T0Yb8519y5Erv+A0htYnYMxlFxu4rwI/hyy04DZ+mtLRaYYE3D
+	 uI+bdw2LEAc5Z03WBupD6w/1avXQVgRthRa2ombThCOVJuuRaQLqQVV7ZtSmuaNSeYReCpT5dTnw
+	 MoIWdKHqYrOHwvW0eHpBrYWewCNf2WgxJlxb9E4vmwZ74P0wu9hnxrzDxf+JskW1/Icl2S975N5X
+	 ag2+xt5BDB57OlLtk5bQWxUM0NnBKPTq+pK2wJwVL/l0Ip41hBmgWJJvRNFKO1VVb/xqmr9mHuVO
+	 Sa1pMHTfmnYcesgyAmN8j07/a0pW9GbThayk5LSfMH0Jn0xcLvgtqZ4j/nNmLTxH2yh+Ya9IWJZY
+	 Pyi9jlENvHzL4jMe/ImErFY8MmSLbilgpVhfye7gwcc9qYGAN3ftNSJmgStEzi26nguWqgyVMb2l
+	 Ie4DRFO+PavMy97j5ZS8JXa/aHAyc5qEMQMUeAnYqjsfIgrTljpMste6FJVjHTEY5jL5L6vGcAZw
+	 Ou5yD65xzTxHJ5D0VD3Aiy9szYEcPxErbw7+cubiONggrAyBb9I4hH6ASz5egLx9R25HlQvg==
+X-QQ-XMRINFO: MPJ6Tf5t3I/ylTmHUqvI8+Wpn+Gzalws3A==
+From: Edward Adam Davis <eadavis@qq.com>
+To: yanjun.zhu@linux.dev
+Cc: akpm@linux-foundation.org,
+	arjan@linux.intel.com,
 	davem@davemloft.net,
-	idosch@nvidia.com,
 	dsahern@kernel.org,
-	Fernando Fernandez Mancera <fmancera@suse.de>
-Subject: [PATCH 2/2 net v3] selftests: fib_tests: add temporary IPv6 address renewal test
-Date: Thu,  7 May 2026 15:28:28 +0200
-Message-ID: <20260507132828.3923-2-fmancera@suse.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260507132828.3923-1-fmancera@suse.de>
-References: <20260507132828.3923-1-fmancera@suse.de>
+	eadavis@qq.com,
+	edumazet@google.com,
+	hdanton@sina.com,
+	horms@kernel.org,
+	jgg@ziepe.ca,
+	kuba@kernel.org,
+	kuni1840@gmail.com,
+	kuniyu@google.com,
+	leon@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com,
+	zyjzyj2000@gmail.com
+Subject: Re: [PATCH] RDMA/nldev: add mutual exclusion in nldev_dellink()
+Date: Thu,  7 May 2026 21:40:06 +0800
+X-OQ-MSGID: <20260507134005.112613-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <3c4264e6-2e93-4121-a8ec-5ac20e5cc213@linux.dev>
+References: <3c4264e6-2e93-4121-a8ec-5ac20e5cc213@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -115,140 +96,64 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -6.80
-X-Spam-Level: 
-X-Rspamd-Queue-Id: AF4814E94F8
+X-Rspamd-Queue-Id: 31FFF4E9662
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DMARC_POLICY_ALLOW(-0.50)[qq.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[qq.com:s=s201512];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285335-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285336-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linux-foundation.org,linux.intel.com,davemloft.net,kernel.org,qq.com,google.com,sina.com,ziepe.ca,gmail.com,vger.kernel.org,redhat.com,syzkaller.appspotmail.com,googlegroups.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[eadavis@qq.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,suse.de:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DKIM_TRACE(0.00)[qq.com:+];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	FREEMAIL_FROM(0.00)[qq.com];
+	TAGGED_RCPT(0.00)[netdev,d8f76778263ab65c2b21];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,appspotmail.com:email,qq.com:email,qq.com:mid,qq.com:dkim]
 X-Rspamd-Action: no action
 
-Add a test to check that temporary IPv6 address is regenerated properly
-after the base prefix is deprecated and restored.
+On Thu, 7 May 2026 06:25:54 -0700, Zhu Yanjun wrote:
+> > We must serialize calls to nldev_dellink() or risk a crash as syzbot
+> > reported:
+> >
+> > KASAN: null-ptr-deref in range [0x0000000000000020-0x0000000000000027]
+> > Call Trace:
+> >   udp_tunnel_sock_release+0x6d/0x80 net/ipv4/udp_tunnel_core.c:197
+> >   rxe_release_udp_tunnel drivers/infiniband/sw/rxe/rxe_net.c:294 [inline]
+> >   rxe_sock_put drivers/infiniband/sw/rxe/rxe_net.c:639 [inline]
+> >   rxe_net_del+0xfb/0x290 drivers/infiniband/sw/rxe/rxe_net.c:660
+> >   rxe_dellink+0x15/0x20 drivers/infiniband/sw/rxe/rxe.c:254
+> >
+> > Fixes: a60e3f3d6fba ("RDMA/nldev: Add dellink function pointer")
+> > Reported-by: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com
+> > Closes: https://syzkaller.appspot.com/bug?extid=d8f76778263ab65c2b21
+> > Tested-by: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com
+> > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> 
+> Thanks a lot. This looks like a good solution. Since the issue is
+> reproducible,
+> 
+> have you sent this commit to syzbot for verification?
+The patch has been verified by syzbot.
 
-Fib6 temporary address renewal test
-    TEST: IPv6 temporary address cleanly deprecated and regenerated     [ OK ]
-
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
----
-v2: adjusted the sleep so there is enough time for the issue to trigger,
-added cleanup at the end
-v3: no changes
----
- tools/testing/selftests/net/fib_tests.sh | 59 +++++++++++++++++++++++-
- 1 file changed, 58 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
-index af64f93bb2e1..8f10de0eb985 100755
---- a/tools/testing/selftests/net/fib_tests.sh
-+++ b/tools/testing/selftests/net/fib_tests.sh
-@@ -12,7 +12,7 @@ TESTS="unregister down carrier nexthop suppress ipv6_notify ipv4_notify \
-        ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr \
-        ipv6_del_addr ipv4_mangle ipv6_mangle ipv4_bcast_neigh fib6_gc_test \
-        ipv4_mpath_list ipv6_mpath_list ipv4_mpath_balance ipv6_mpath_balance \
--       ipv4_mpath_balance_preferred fib6_ra_to_static"
-+       ipv4_mpath_balance_preferred fib6_ra_to_static fib6_temp_addr_renewal"
- 
- VERBOSE=0
- PAUSE_ON_FAIL=no
-@@ -1611,6 +1611,62 @@ fib6_ra_to_static()
- 	cleanup &> /dev/null
- }
- 
-+fib6_temp_addr_renewal() {
-+	setup
-+
-+	echo
-+	echo "Fib6 temporary address renewal test"
-+	set -e
-+
-+	# ra6 is required for the test. (ipv6toolkit)
-+	if [ ! -x "$(command -v ra6)" ]; then
-+	    echo "SKIP: ra6 not found."
-+	    set +e
-+	    cleanup &> /dev/null
-+	    return
-+	fi
-+
-+	# Create a pair of veth devices to send a RA message from one
-+	# device to another.
-+	$IP link add veth1 type veth peer name veth2
-+	$IP link set dev veth1 up
-+	$IP link set dev veth2 up
-+
-+	# Make veth1 ready to receive RA messages.
-+	$NS_EXEC sysctl -wq net.ipv6.conf.veth1.accept_ra=2
-+	$NS_EXEC sysctl -wq net.ipv6.conf.veth1.use_tempaddr=2
-+	$NS_EXEC sysctl -wq net.ipv6.conf.veth1.temp_prefered_lft=15
-+	$NS_EXEC sysctl -wq net.ipv6.conf.veth1.max_desync_factor=0
-+
-+	# Send a RA message with a prefix from veth2.
-+	$NS_EXEC ra6 -i veth2 -s fe80::1 -d ff02::1 -P 2001:12::/64\#LA\#3600\#3600 -e
-+	sleep 3
-+
-+	# Deprecate it
-+	$NS_EXEC ra6 -i veth2 -s fe80::1 -d ff02::1 -P 2001:12::/64\#LA\#3600\#0 -e
-+	sleep 3
-+
-+	# Restore it
-+	$NS_EXEC ra6 -i veth2 -s fe80::1 -d ff02::1 -P 2001:12::/64\#LA\#3600\#3600 -e
-+
-+	ret=1
-+	for i in $(seq 1 25); do
-+		sleep 1
-+		num_dep="$($IP -6 addr | grep -c "temporary deprecated" || true)"
-+		num_tot="$($IP -6 addr | grep -c "temporary" || true)"
-+
-+		if [ "$num_dep" -eq 1 ] && [ "$num_tot" -ge 2 ]; then
-+			ret=0
-+			break
-+		fi
-+	done
-+	log_test "$ret" 0 "IPv6 temporary address cleanly deprecated and regenerated"
-+
-+	set +e
-+
-+	cleanup &> /dev/null
-+}
-+
- # add route for a prefix, flushing any existing routes first
- # expected to be the first step of a test
- add_route()
-@@ -3002,6 +3058,7 @@ do
- 	ipv6_mpath_balance)		ipv6_mpath_balance_test;;
- 	ipv4_mpath_balance_preferred)	ipv4_mpath_balance_preferred_test;;
- 	fib6_ra_to_static)		fib6_ra_to_static;;
-+	fib6_temp_addr_renewal)		fib6_temp_addr_renewal;;
- 
- 	help) echo "Test names: $TESTS"; exit 0;;
- 	esac
--- 
-2.53.0
+BR,
+Edward
 
 
