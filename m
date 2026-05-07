@@ -1,146 +1,172 @@
-Return-Path: <netdev+bounces-285544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285545-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Fq3Njsh/WmGYAAAu9opvQ
-	(envelope-from <netdev+bounces-285544-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 01:33:15 +0200
+	id mFN5O8ki/WmGYAAAu9opvQ
+	(envelope-from <netdev+bounces-285545-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 01:39:53 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48F514F0201
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 01:33:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 56C334F02DA
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 01:39:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4EC973046E97
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 23:32:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C72593026C3A
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 23:39:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F75337C924;
-	Thu,  7 May 2026 23:32:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA94D36F43F;
+	Thu,  7 May 2026 23:39:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NlwC/r+r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QvtxiuAs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AC0936CE14;
-	Thu,  7 May 2026 23:32:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7CD1340281
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 23:39:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778196737; cv=none; b=hKqirF/oiG15k3a5hFrAmlB+UpFqcC5Nsbpm4MLTMU5F5uBAQTLr/5+9MiLlT1DjpTnfTwaIHSWIZTNoPrqXF3eOWVmSG9YMQmlAefNBTB12QuZ6blBKUoBm05T9LGBNhnLVc5xhCL6TxK2V192TCtgWD0a5EnSl9c+zTZ3qv8k=
+	t=1778197190; cv=none; b=me8Dk7RY7MVj6fOovt22ERLTPt2GlE2vqC1WY4sUgN/ii+gUPKSjoRoaJf81fEb78r+dqpx2eT4a7K4Zxc1DTCg+m8FuWmFH9JbAOiV1lM5hjpF5ZSvtegX7ep2N9aIVbK+GmkTsf68HfntsEKhxEdMvluAMnFYWGk90LLCZoFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778196737; c=relaxed/simple;
-	bh=ppY6DUORpINH5dqwkso43tlKxT17Gv+DdjmLvzqz8aE=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dLaLKCVWuldMkL4DLricoCLbZe95iGbjysjWgtHUcGl8oTEtCI7H0URLvXLZpT0rsNdp6mVYzYe975IrAMdoHdYdGwdCc7FSygTv3LPn8nMCimiWRB7M4R6aebV+kQyMyo+qDcmE0RPyb5H/UISUEWWNwKD3veGFP/Z7DH+mIQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NlwC/r+r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5275EC2BCB2;
-	Thu,  7 May 2026 23:32:16 +0000 (UTC)
+	s=arc-20240116; t=1778197190; c=relaxed/simple;
+	bh=vFH+WCKmJFo+oFxj5WEkyqvJ7Aj4l64pwYaHYcrT4og=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=V4cLHbkJxgnJcUsZzh3IHebhHyj1PesKkFiJ2mLxjVY3sA2rUnVWA6vz1Wk4mpRB3jukUEW4/ar8GNSxHAzi9xG+hpv7jquKOz2l/VRwi1Uhx9sWZUTAIjjzmI8KhJkh/NDOrgiXiyZD1IQ5TLi8rtp87jv5fRBZ2HKYTUmlBV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QvtxiuAs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89D72C2BCFD
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 23:39:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778196736;
-	bh=ppY6DUORpINH5dqwkso43tlKxT17Gv+DdjmLvzqz8aE=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=NlwC/r+r/qLmnBZ+6nn42Vs78xP5ByrtQoHSUguk2MyiP1Y0TZWxUgjA+hVySJfym
-	 D2GrjA8f6ryWm/efbXzVp50dJJM9RB3irLexKCkN/rcR7hnOBY4uOc4lm0bNEP2r9g
-	 VfZf54m60rlcVrKAgzRYXKq/GdeOvnwNSYLvf0+V9NFastoPPuaVZaztL4ancD7JHV
-	 5aNqz0ZRNR5DOzz3YAoM481xuAjJdfIPqOqtn3sQQLmNrn5Og7dc0gBqhshXuexj/i
-	 0+5UXlXEut3ufrjUDzY5dafkgFhoGv31XC7HCPBPwdLAxkL9UVQUZsYbknrsch2iSd
-	 LqBqxu7ibNw9A==
-From: Allison Henderson <achender@kernel.org>
-To: netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	achender@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	shuah@kernel.org
-Subject: [PATCH net-next v1 3/3] selftests: rds: Disarm signal alarm on test completion
-Date: Thu,  7 May 2026 16:32:13 -0700
-Message-Id: <20260507233213.556182-4-achender@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260507233213.556182-1-achender@kernel.org>
-References: <20260507233213.556182-1-achender@kernel.org>
+	s=k20201202; t=1778197190;
+	bh=vFH+WCKmJFo+oFxj5WEkyqvJ7Aj4l64pwYaHYcrT4og=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=QvtxiuAs5eVQPns7jJlqtGTfdl0EJbsvK9NI8npq8OMLSMiSWuCojWaz5XpXCmsan
+	 Wrki/Tmn5sP1n1hrh9a2tAMgBvgvMEetyZYlRhkxOrQVeYBuNqQAl5EXhaTsb/gSNR
+	 N3tDJQnEgUpi+Ise+Rk6oQ7UnD9f6R7jz6KRO3R1A/xImq8iYtkSFjrHRyKlIJgIL5
+	 ASW+UJLGkyWDkDPCeYIjie9iYtMbF/4k/99cseI+aVLIVKfYiQesyhpsoJ+guYxgOD
+	 it0716QbosCqZPJKCq+d0pprmnZzhD3cOjygZs+ebux/Q4N4ntZL4+fwJKlOkXvmkE
+	 QFWR3BZF83oDA==
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-67e2498f3a7so2005731a12.2
+        for <netdev@vger.kernel.org>; Thu, 07 May 2026 16:39:50 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ/EQuriUOdDciNozCQcR1bH60Ep0QrwUk+/oTIQjhw5vDYtF+hwXVG22YQfgjVyWq45x86WC2U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxVLaZp7YkhIc1hDhhXT6FtnMGhvdsTgddL3sJmDsHzc8HtJlr
+	kTpXOGxAR1Bmwjr+KuKvPOtHaBoWp+xNLw01XBB3VqG1d8G2VyPgaldH0L6S/rZAVR2xpwSWwgE
+	utXRPt5/4R3URNzQ/lZ8oFAXAN9wQ5A==
+X-Received: by 2002:a05:6402:2113:b0:67c:1ed6:2793 with SMTP id
+ 4fb4d7f45d1cf-67d648a74e5mr5797376a12.22.1778197188726; Thu, 07 May 2026
+ 16:39:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 48F514F0201
+References: <20260501155421.3329862-1-elder@riscstar.com> <20260501155421.3329862-9-elder@riscstar.com>
+ <1f34cbce-e2dd-4e80-b136-55d0efa50002@lunn.ch> <967c1d96-9a48-48de-b7d9-58b63e782aee@riscstar.com>
+In-Reply-To: <967c1d96-9a48-48de-b7d9-58b63e782aee@riscstar.com>
+From: Rob Herring <robh@kernel.org>
+Date: Thu, 7 May 2026 18:39:37 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqKayEDa2-FDoxM_JU3Yvevd-Gs_eFKCQ8NY8A8oBsD13w@mail.gmail.com>
+X-Gm-Features: AVHnY4K23N33ivg6cLD9mNxL7odw3uUNL3DiEAJ7jfws_C2Zwld0dAM-keay8pI
+Message-ID: <CAL_JsqKayEDa2-FDoxM_JU3Yvevd-Gs_eFKCQ8NY8A8oBsD13w@mail.gmail.com>
+Subject: Re: [PATCH net-next 08/12] dt-bindings: net: toshiba,tc965x-dwmac:
+ add TC956x Ethernet bridge
+To: Alex Elder <elder@riscstar.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	maxime.chevallier@bootlin.com, rmk+kernel@armlinux.org.uk, 
+	andersson@kernel.org, konradybcio@kernel.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org, arnd@arndb.de, 
+	gregkh@linuxfoundation.org, Daniel Thompson <daniel@riscstar.com>, 
+	mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com, 
+	alexandre.torgue@foss.st.com, ast@kernel.org, boon.khai.ng@altera.com, 
+	chenchuangyu@xiaomi.com, chenhuacai@kernel.org, daniel@iogearbox.net, 
+	hawk@kernel.org, hkallweit1@gmail.com, inochiama@gmail.com, 
+	john.fastabend@gmail.com, julianbraha@gmail.com, livelycarpet87@gmail.com, 
+	matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc, 
+	prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com, 
+	rohan.g.thomas@altera.com, sdf@fomichev.me, siyanteng@cqsoftware.com.cn, 
+	weishangjuan@eswincomputing.com, wens@kernel.org, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 56C334F02DA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [4.84 / 15.00];
+	SEM_URIBL(3.50)[0.0.0.0:email];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MAILLIST(-0.15)[generic];
+	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285544-lists,netdev=lfdr.de];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TAGGED_FROM(0.00)[bounces-285545-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,riscstar.com,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_ALLOW(0.00)[kernel.org:s=k20201202];
+	GREYLIST(0.00)[pass,meta];
 	MIME_TRACE(0.00)[0:+];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_SPAM(0.00)[0.133];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_GT_50(0.00)[50];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel,dt];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.0:email,mail.gmail.com:mid,riscstar.com:email,1c:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-A race in stop_pcaps is possible if the test completes and then
-times out while waiting for the tcpdump process to exit.  The
-signal handler may fire again and needlessly call stop_pcap a
-second time.  Fix this by disabling the alarm after normal
-test completion.
+On Thu, May 7, 2026 at 5:17=E2=80=AFPM Alex Elder <elder@riscstar.com> wrot=
+e:
+>
+> On 5/1/26 12:38 PM, Andrew Lunn wrote:
+> > Why not add an subnodes for the ethernet interfaces?
+>
+> We will define "ethernet" devicetree subnodes of the PCIe functions
+> in the next version of the series.  Something like what's below.
 
-Also if there are no tcpdump processes to wait on, stop_pcaps can
-just exit.  This avoids misleading prints when there are no procs
-to collect dumps from.
+Are they PCIe functions? As in bus, dev, function addresses. How to do
+functions is already defined by the PCI binding.
 
-Signed-off-by: Allison Henderson <achender@kernel.org>
----
- tools/testing/selftests/net/rds/test.py | 8 ++++++++
- 1 file changed, 8 insertions(+)
+>                                         -Alex
+>
+> pci@0,1 {
 
-diff --git a/tools/testing/selftests/net/rds/test.py b/tools/testing/selftests/net/rds/test.py
-index e1813e43fb4e..6db606779231 100755
---- a/tools/testing/selftests/net/rds/test.py
-+++ b/tools/testing/selftests/net/rds/test.py
-@@ -77,6 +77,10 @@ def stop_pcaps():
-     completes after the signal handler is fired.  List will be empty
-     if logdir is not set
-     """
-+
-+    if not tcpdump_procs:
-+        return
-+
-     ksft_pr("Stopping network packet captures")
-     while tcpdump_procs:
-         proc = tcpdump_procs.pop()
-@@ -279,6 +283,10 @@ for s in sockets:
-                 pass
- 
- ksft_pr(f"getsockopt(): {nr_success}/{nr_error}")
-+
-+# cancel timeout
-+signal.alarm(0)
-+
- stop_pcaps()
- 
- # We're done sending and receiving stuff, now let's check if what
--- 
-2.25.1
+The 0 here is devnum and the 1 is function.
 
+>          compatible =3D "pci1179,0220";
+>          reg =3D <0x50100 0x0 0x0 0x0 0x0>;
+>          #address-cells =3D <3>;
+>          #size-cells =3D <2>;
+>          device_type =3D "pci";
+>          ranges;
+>
+>          ethernet {
+>                  phy-mode =3D "sgmii";
+>                  phy-handle =3D <&tc956x_emac1_phy>;
+>
+>                  mdio {
+>                          compatible =3D "snps,dwmac-mdio";
+>                          #address-cells =3D <1>;
+>                          #size-cells =3D <0>;
+>
+>                          tc956x_emac1_phy: ethernet-phy@1c {
+>                                  compatible =3D "ethernet-phy-id004d.d101=
+";
+>                                 ...
+>                         };
+>                 };
+>         };
+> };
 
