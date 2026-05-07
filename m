@@ -1,197 +1,238 @@
-Return-Path: <netdev+bounces-285366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285361-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6JKXEF6o/Gn5SQAAu9opvQ
-	(envelope-from <netdev+bounces-285366-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 16:57:34 +0200
+	id +Ln3APSl/GmwSQAAu9opvQ
+	(envelope-from <netdev+bounces-285361-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 16:47:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCB384EAAEB
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 16:57:33 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F4854EA775
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 16:47:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EB29A308A883
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 14:52:53 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E935830055AC
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 14:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5EB53EDAA0;
-	Thu,  7 May 2026 14:52:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16C77402BBD;
+	Thu,  7 May 2026 14:47:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=schippers-hamm.de header.i=simon@schippers-hamm.de header.b="xXKDUTPl"
+	dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b="y6sHvENc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FEA03BD643;
-	Thu,  7 May 2026 14:52:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D49D3FBEDF
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 14:47:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778165570; cv=none; b=a59V8N7LZUYX9pAWziARNHP1lT1XLZEz7/wfTrFh1LF9nF60K+A1urChwo5zqJD5iijrcK7LfR6uhlzSFaqWPp7z9AFVZ4uES3mELdW1UneZWpH5Rk796Czt9AMen53C+gPk8uDMPe43LVeD+37lAfsb0bBbvt3TmHqV+OQ85zc=
+	t=1778165234; cv=none; b=IVvEXUOFFmrqk9dhqpRCS9o+cbg8jt4DB+OS0SUTxvIVBXpMfkMIfwFVw4zDA1iCQYh7tCAA0g9S6dMZGsOC7s7T+yeMFsKtDHsx8wZjyAZYymKUckVWhG88JWGbU2V81cHEhV27lu8gqgZoNem2ATGVPeBZB8OBI/U3UxP9lRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778165570; c=relaxed/simple;
-	bh=FpYeOAyis8m6Y2Clv0tM7NciA1U9CPYpox8KmfiFYIs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WmGFHEQGZDGdaZy43vP7/MfOeUzVQoXjysY38gNnTJ6DG68ohLKWI0ltLklutrsCMb3gidm9ChIopGoO6bWGuqW7OMlCJckiNWVkRlW4y9AIXJlHwZNkMhHNyhGsBRSn59Waqv7azOOTk9uTAeQtdfsrugIpEGYElbLpi+Rj3X8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schippers-hamm.de; spf=pass smtp.mailfrom=schippers-hamm.de; dkim=pass (2048-bit key) header.d=schippers-hamm.de header.i=simon@schippers-hamm.de header.b=xXKDUTPl; arc=none smtp.client-ip=212.227.126.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schippers-hamm.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=schippers-hamm.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=schippers-hamm.de;
-	s=s1-ionos; t=1778165561; x=1778770361; i=simon@schippers-hamm.de;
-	bh=SCuXleXqrC6ZPqhNX1oQ525cQB6TaYVm/6eDNN0AOKE=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=xXKDUTPlCmVLxFj77VKeKnWV0cEWpObauI28cfewl/N1mNCaWUXODqHy7VVdP8ze
-	 gbKOa6i69e/ctAYMhZQO+5EfyE5tkJUr07vUZ2JU/qqrXMfLjQFtylwxQoCtfXQX7
-	 rz1tOcEOKKbEYS1bbzQ1K5d3RCgsiYaN3kTKugdBvupmNsogihVWXOVCfguwfJ0Pq
-	 qmjILW+qFXEFeIdv4vuLS7HrFLxLQmsLn85L0SvouFLzD+8IZi0C6KsOFWSOomuiS
-	 iLETPG0uIK/jNGdT5LjZtBaOfXf+dG4mHmySjBoSGpI0gn748jzYJ2ExOp5uQjYt4
-	 zu9728NOlFW9pbmSEg==
-X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue011
- [212.227.15.136]) with ESMTPSA (Nemesis) id 1MDQRy-1wBc503KOU-00Fay7; Thu, 07
- May 2026 16:46:40 +0200
-Message-ID: <e3a91545-13cd-4f87-8375-d707865bdbca@schippers-hamm.de>
-Date: Thu, 7 May 2026 16:46:33 +0200
+	s=arc-20240116; t=1778165234; c=relaxed/simple;
+	bh=/OysdnbnOtECLkkSa00qUIDUT8c+z8rBTm0QaKE643Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gyTTxOGJ20zd+WLN86YdZJcs3YTJPBpmYKxZNa7SZqE0UJI+2/Ue5OriGW8tWznZ9NgVGXQz1bbd/0KyqJl6YDF6bkQO5u6Dr2bq3frDQwisPyKmxRbRqWn57G/4oxduNdrl7Os6M4xty7AFnRldViWczcVt0xR77EVidjTdbtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com; spf=pass smtp.mailfrom=riscstar.com; dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b=y6sHvENc; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riscstar.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4852b81c73aso9138085e9.3
+        for <netdev@vger.kernel.org>; Thu, 07 May 2026 07:47:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=riscstar-com.20251104.gappssmtp.com; s=20251104; t=1778165230; x=1778770030; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QZB38wJGIZd42iBI3srRP0pjjAxDTyyGTqCWJp8RgtQ=;
+        b=y6sHvENcFjVQHrSBavIoyq7oFwxMGglGYH82YKxB3rYUBU2WXPRYsxMkRmjaL8UJtJ
+         8qCHl9DPDYrsxc98WoBL2OVnRxquMXDR7DJkEJ9EsIq4AZGGHrWcAHRBS18gya1ZxKtR
+         EnlmuxisPmWVI/FCv2UT17Z2tvp0mlc86/WG39g8c3YrEIGrOiRRn5f3rGEvIAe9NK4M
+         G3PU4X1W2bs7CtqpYJU4OLJ9+/f8MTwSAHunB19JS2FigfTQbWc1FjXIgGDLFSsZnLYJ
+         srSccQtsHw2YSHp5ap4GUnDf1aUWOpktSnhkWm07DoTgrs60aRygAE7qvb6LOWLgEOL6
+         oFLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778165230; x=1778770030;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QZB38wJGIZd42iBI3srRP0pjjAxDTyyGTqCWJp8RgtQ=;
+        b=QnKHjNaEyOhvyaM/s8mHP36RdeZcpMYweXD1Y6tQGZs19szCsZhsQoae1e0PsiBtvP
+         ftXHSBwQcutiH3wRPWfVljSCeDAh+oTD3rClB+RyZlBBt2NaqJA+HuEgGIASS6meL2Ag
+         vyOsiYj0eDnR2WRtcs7ApvjsFcVjlc9px35woN2YS2slWcj2NQpJP+MsJtwBG9u30cpG
+         oD27K4j+/HTBMrkrNjG+60C3KeAYe/P4oHfPtSCfLajq0O8trUDFFiLD0+gf8rQSXx4s
+         bsugbgd6Vf9R0t9bLH7JGV7yNSBWUJWLcArnX8m7vG9LFqspPGJECSwkRkhlos6Tjetc
+         tYCA==
+X-Forwarded-Encrypted: i=1; AFNElJ+V7DVUJGaXbSZia7nVnZNu/c/0/MpHRvq/7EZMjSiNQlJg+nzsrg7aLskumY6CFGPl3Fcx7tY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymeNPD9DuVT75Km4icVYMyobsYdQjkx0IqZ1Fm2olJF7Q0mVlg
+	jEIrrRx0OaI/A+FFU0s2kS8JWS8bSDJX2Pm3cFvVdxPq8Q+swo+Q7JBBz0ktu1PEFcM=
+X-Gm-Gg: AeBDievXzPnn6jGWbSugeiNPL/VH1pwRfxgytLNVngFKiLGDuzoPBq04pJHTvGTHITx
+	GL/XNrSJmjed0qD+Xb/BoOU9nv1fht9F8NOFy2A96/nvG2piIXr6TezCaV25XYeLbAqWv3CwG/6
+	CWqeIrbUpI4Op38XLKs8Gcoy+DM8aIhzLCJwnVwXn/R4wILLnmwe0J2iFWPbLtCroK+0ikv0K/I
+	7rSpaHGZcUE+I9bGWuoj7kVRzlvxyXGH/CEMAJodPktU05JYGPbSLqqKE4i8LyS+A9KAPp6sQYd
+	pd5/+flbMvs2DFDiV8oK4I6WYKYaB/ZddWn5zS2ALxcSL//TJ1zy5+YxBF1SSZ/m+SIYG4CVaCj
+	3RQGbde0w+P0HpUQ8lzBn/axQO7rQy2bdy1HLHqiRFVNGweiDL/3l57/r2Iq1qZQBcNiu1mZ8ao
+	zGXCm7gS9ihexpdVybWOE6ZIf/ff766aCmxD09skvtXp8QJDdzPvZIZiEGOsmBVIiZAXILmQhoi
+	uBwCNpD8KhyhvggLUmged78WWatkGXElJj2tHJcKK64V/TntUpWn5DhgSb7qfFp5s8WcnA2rkrH
+	Imq0D4QyWe9G1wTv5Tc=
+X-Received: by 2002:a05:600c:a317:b0:488:a977:8d6 with SMTP id 5b1f17b1804b1-48e52bd4f32mr100824405e9.19.1778165230150;
+        Thu, 07 May 2026 07:47:10 -0700 (PDT)
+Received: from aspen.lan (aztw-34-b2-v4wan-166919-cust780.vm26.cable.virginm.net. [82.37.195.13])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e538a5486sm134813275e9.6.2026.05.07.07.47.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 May 2026 07:47:09 -0700 (PDT)
+Date: Thu, 7 May 2026 15:47:06 +0100
+From: Daniel Thompson <daniel@riscstar.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Alex Elder <elder@riscstar.com>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, maxime.chevallier@bootlin.com,
+	rmk+kernel@armlinux.org.uk, andersson@kernel.org,
+	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org,
+	arnd@arndb.de, gregkh@linuxfoundation.org,
+	mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com,
+	alexandre.torgue@foss.st.com, ast@kernel.org,
+	boon.khai.ng@altera.com, chenchuangyu@xiaomi.com,
+	chenhuacai@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	hkallweit1@gmail.com, inochiama@gmail.com, john.fastabend@gmail.com,
+	julianbraha@gmail.com, livelycarpet87@gmail.com,
+	matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
+	prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
+	rohan.g.thomas@altera.com, sdf@fomichev.me,
+	siyanteng@cqsoftware.com.cn, weishangjuan@eswincomputing.com,
+	wens@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 08/12] dt-bindings: net: toshiba,tc965x-dwmac:
+ add TC956x Ethernet bridge
+Message-ID: <afyl6gpHLlAnxir7@aspen.lan>
+References: <20260501155421.3329862-1-elder@riscstar.com>
+ <20260501155421.3329862-9-elder@riscstar.com>
+ <20260504-fascinating-teal-tarsier-b116c8@quoll>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 3/5] veth: implement Byte Queue Limits (BQL)
- for latency reduction
-To: Paolo Abeni <pabeni@redhat.com>, hawk@kernel.org, netdev@vger.kernel.org
-Cc: kernel-team@cloudflare.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20260505132159.241305-1-hawk@kernel.org>
- <20260505132159.241305-4-hawk@kernel.org>
- <ee275aa6-af27-4dac-9afa-da88abde312b@schippers-hamm.de>
- <8f2f7f2e-6aa2-4e5b-b52d-0025b2525579@redhat.com>
-Content-Language: en-US
-From: Simon Schippers <simon@schippers-hamm.de>
-In-Reply-To: <8f2f7f2e-6aa2-4e5b-b52d-0025b2525579@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:sNPBPySUhNmmnBE6atM+k+bbsLAB6+xRJMmtae7kiZ0Cntv9b8j
- IbGCzldlSRJ/+O2RdBvTsuM9cCjiZGFP4i3oXIssD6eVHIJRIGZ/qBYip82yK2MbXnw6uYf
- VjOz84ku0JPpbKDdaA8LbSN20DzvL4TU5FhGlA3JFUZ1CY5Q2G79QE98o5yxRgbbDyg7Haj
- 3R3ef0pT+EdEB5F/UXlZg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:GKx629lf1hA=;6wDalD/MxFjWiE/j36A6Pubvo16
- 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
- nlDRg9ZEEbi8YF2Ihq2kemZV+CnXQSoC
-X-Rspamd-Queue-Id: CCB384EAAEB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260504-fascinating-teal-tarsier-b116c8@quoll>
+X-Rspamd-Queue-Id: 8F4854EA775
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [4.94 / 15.00];
+	SEM_URIBL(3.50)[0.0.0.0:email];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[schippers-hamm.de,none];
-	R_DKIM_ALLOW(-0.20)[schippers-hamm.de:s=s1-ionos];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
+	BAD_REP_POLICIES(0.10)[];
+	DMARC_POLICY_SOFTFAIL(0.10)[riscstar.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285366-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[cloudflare.com,lunn.ch,davemloft.net,google.com,kernel.org,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-285361-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[riscstar.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	RCVD_TLS_LAST(0.00)[];
+	GREYLIST(0.00)[pass,meta];
+	R_DKIM_ALLOW(0.00)[riscstar-com.20251104.gappssmtp.com:s=20251104];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[riscstar-com.20251104.gappssmtp.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_GT_50(0.00)[50];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon@schippers-hamm.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[schippers-hamm.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@riscstar.com,netdev@vger.kernel.org];
+	NEURAL_SPAM(0.00)[0.567];
+	TAGGED_RCPT(0.00)[netdev,kernel,dt];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	R_SPF_ALLOW(0.00)[+ip4:172.232.135.74:c];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[aspen.lan:mid,0.0.0.0:email]
 X-Rspamd-Action: no action
 
+On Mon, May 04, 2026 at 01:00:07PM +0200, Krzysztof Kozlowski wrote:
+> On Fri, May 01, 2026 at 10:54:16AM -0500, Alex Elder wrote:
+> > From: Daniel Thompson <daniel@riscstar.com>
+> >
+> > Add devicetree bindings for the Toshiba TC956x family of Ethernet-AVB/TSN
+> > bridges.
+> >
+> > Signed-off-by: Daniel Thompson <daniel@riscstar.com>
+> > Signed-off-by: Alex Elder <elder@riscstar.com>
+
+Alex already replied to most of your comments but on this one
+specifically...
 
 
-On 5/7/26 16:34, Paolo Abeni wrote:
-> On 5/7/26 8:54 AM, Simon Schippers wrote:
->> On 5/5/26 15:21, hawk@kernel.org wrote:
->>> @@ -928,9 +968,13 @@ static int veth_xdp_rcv(struct veth_rq *rq, int b=
-udget,
->>>  			}
->>>  		} else {
->>>  			/* ndo_start_xmit */
->>> -			struct sk_buff *skb =3D ptr;
->>> +			bool bql_charged =3D veth_ptr_is_bql(ptr);
->>> +			struct sk_buff *skb =3D veth_ptr_to_skb(ptr);
->>> =20
->>>  			stats->xdp_bytes +=3D skb->len;
->>> +			if (peer_txq && bql_charged)
->>> +				netdev_tx_completed_queue(peer_txq, 1, VETH_BQL_UNIT);
->>
->> In the discussion with Jonas [1], I left a comment explaining why I thi=
-nk
->> this doesn=E2=80=99t work.
->>
->> I still think first that adding an option to modify the hard-coded
->> VETH_RING_SIZE is the way to go.
->>
->> Thanks!
->>
->> [1] Link: https://lore.kernel.org/netdev/e8cdba04-aa9a-45c6-9807-8274b6=
-2920df@tu-dortmund.de/
-> In the above discussion a 20% regression is reported, which IMHO can't
-> be ignored. Still the tput figures in the data are extremely low,
-> something is possibly off?!? I would expect a few Mpps with pktgen on
-> top of veth, while the reported data is ~20-30Kpps.
->=20
-> /P
->=20
+> > ---
+> >  .../bindings/net/toshiba,tc956x-dwmac.yaml    | 111 ++++++++++++++++++
+> >  1 file changed, 111 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.yaml
+> >
+> > diff --git a/Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.yaml b/Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.yaml
+> > new file mode 100644
+> > index 0000000000000..d95d22a3761da
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.yaml
+> > @@ -0,0 +1,111 @@
+> > <snip>
+> > +examples:
+> > +  - |
+> > +    pcie {
+> > +      #address-cells = <3>;
+> > +      #size-cells = <2>;
+> > +
+> > +      tc956x_emac0: pci@0,0 {
+> > +        compatible = "pci1179,0220";
+> > +        reg = <0x50000 0x0 0x0 0x0 0x0>;
+> > +        #address-cells = <3>;
+> > +        #size-cells = <2>;
+> > +        device_type = "pci";
+> > +        ranges;
+> > +
+> > +        gpio-controller;
+> > +        #gpio-cells = <2>;
+> > +
+> > +        phy-mode = "10gbase-r";
+> > +        phy-handle = <&tc956x_emac0_phy>;
+> > +
+> > +        mdio {
+> > +          compatible = "snps,dwmac-mdio";
+> > +          #address-cells = <1>;
+> > +          #size-cells = <0>;
+> > +
+> > +          tc956x_emac0_phy: ethernet-phy@1c {
+> > +            compatible = "ethernet-phy-id311c.1c12";
+> > +            reg = <0x1c>;
+> > +          };
+> > +        };
+> > +      };
+>
+> Keep only one example, unless you have different properties (not their
+> values, but their presence),
 
-The ~20-30Kpps occur when thousands of iptables rules are applied and
-an UDP userspace application is sending.
+At some point I simplified the example by stripping out excess
+properties from each ethernet-phy. In the process it looks like I
+removed too much and eliminated reason I thought it important to
+include both PCI functions in the example!
 
-And there is a 20% pktgen regression (no iptables rules applied).
+Each ethernet-phy will typically describe a reset gpio but we expect
+only eMAC0 to act as a gpio-controller. For that reason I wanted to
+show that. You can see part of that that in the current example because
+tc956x_emac1 is not a gpio-controller.
 
-I am pretty sure the reason is because the BQL limit is stuck at 2
-packets (because the completed queue is always called with 1 packet
-and not in a interrupt/timer with multiple packets...).
+In other words tc956x_emac**1**_phy will, in the real world, include a
+reset-gpios property that references tc956x_emac**0**. For example:
 
+    reset-gpios = <&tc956x_emac0 1 GPIO_ACTIVE_LOW>
+
+
+So... is it better to strip it back the example to describe only a
+single PCI function or should I add back the reset-gpios that I
+accidentally removed?
+
+
+Daniel.
 
