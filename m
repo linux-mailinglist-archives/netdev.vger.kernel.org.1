@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-285450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285452-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OFvaMnXQ/GlhTwAAu9opvQ
-	(envelope-from <netdev+bounces-285450-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 19:48:37 +0200
+	id 2BFTCR3Q/GlhTwAAu9opvQ
+	(envelope-from <netdev+bounces-285452-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 19:47:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5573A4ED0EC
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 19:48:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 908E64ED0BF
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 19:47:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 61E0E30C2F40
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 17:43:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CC6E33008E0B
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 17:44:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1152F44D00A;
-	Thu,  7 May 2026 17:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE6A45BD7C;
+	Thu,  7 May 2026 17:44:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gkv6slKm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="POMVGRId"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0BA33EFD39;
-	Thu,  7 May 2026 17:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA86D45BD41;
+	Thu,  7 May 2026 17:44:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778175780; cv=none; b=PjQ4ndnEeVcwYkn+9C7HVC+/t3Tp2/vZlQi2kRmcnDxsq5KQ8ZdgX2cP+nQvwuzvO0KUxo2xveIx5QKm1vFsOsOwjHg/vv6vrTGjus+yjq2rF/oQnbnZQ86RUU58zuI/yT2WN5QHYmwB06WLOC4ztCUvZD2T5wUpkeFYXR1b+ec=
+	t=1778175877; cv=none; b=XsYhiEym8+QUotOK5jReT6y33GVSCegRMQSMBNlHsgVahAa396VLSexSLQl4hfKWel+q0NDSJFJQdtQAhT0qb0Sg0lLGkTKpM9y/s2QXjLWbycN6Y4fpnxYUhz2AlmCZsSTtd9U3jRB9XRkldvUWmsBTuXT7WvD/ryQFvUtqK8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778175780; c=relaxed/simple;
-	bh=Hdn4fgFuvQvR+BcNGi93NiwRUkK+Dd4Y63XEjaXRKw0=;
+	s=arc-20240116; t=1778175877; c=relaxed/simple;
+	bh=qjeD8hwp10GbaUexdP3erEb8CkTqb7qN9kMATj2u9A0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=luMd4EOyLR4520oFh0dUcJwdR8Wrrgk/yYj3hX95DERFqtOqNt6KKxvCnmqF449v4OqDJdUs7JSfkMpj1Bt/0DVTLid1LlnjjQThsU8L6qBFAcnX+9yf080VTUwRiVYNKmTokbicnvUsVAbYOYHqFef0tovai7CR4tHwz6fpDi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gkv6slKm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02438C2BCC4;
-	Thu,  7 May 2026 17:42:56 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=fpdKGQRwLLpBf5eVUBl71k/YW8fs+eW2NbI1gjfb734pSFSbA4ABLeexJKXeadEr32TU5qAt9PswVzhf50W6kqEIjD0AE8ORE3oxfaxv7MZBoOOmVg2n8KjcXQgIcQwGKhRxBm1Uw3DgPzrqH416uySKAiInQ1kZ1k+HzzbfmyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=POMVGRId; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90F8BC2BCB2;
+	Thu,  7 May 2026 17:44:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778175779;
-	bh=Hdn4fgFuvQvR+BcNGi93NiwRUkK+Dd4Y63XEjaXRKw0=;
+	s=k20201202; t=1778175877;
+	bh=qjeD8hwp10GbaUexdP3erEb8CkTqb7qN9kMATj2u9A0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gkv6slKm5dDmlFDare54WePGajFEFla4RICXDY9tA7CbCdkZr1K9DDGNZzizOPhkQ
-	 xw+dnscnNv8ATDBpxd60UsgJnAfhyhldBfBayLDyw+XEKyJqFvH3Ihp5+CPpwASXt/
-	 AC0x+hkl5PlY96HEC3JpQZ4FC2Uxh+jLe2xeM7Ny+zPeh1RrddlHWJBtalL38NXjNe
-	 +2NzmCWIcoaMNPdkevFW2hMoF99WjNw7PNHMn+JJ6ejP5n7jgNuwfY2a61wfJ3GdL7
-	 RUhwTBpO8lDWeLgMFCJH85fEdtt9z6OVvFMyvN22+NvZ20vCcYuNv6j78B2+bWJFYv
-	 aGVPmvjdQKW5A==
-Date: Thu, 7 May 2026 18:42:54 +0100
+	b=POMVGRIdkWwa5YAIcc6/YW+UFL/EarFcJyCTGvJtfSFu7mPXkvW0PM4X7LRwpWLd8
+	 pRO7xunP05JlEo8v0sU8f4n4Ip/t8Sor1L77NUWT0MqK58boyV102UJ9hFnfnoAzSh
+	 +mrEUd+jy2KOMQH7DUsUKMRvWOiyZhZ3rsvtOoo1FiyU/SKSK9KtllR9b+Ei/HTD3k
+	 1V2/y3CCa372LXgS786YFkQ7pCRS+B2tOykuhhcmbpDGND+vXhjdJuoPbVGb+bY2kj
+	 kUum3KXYTxEUGYOVdbzuXRa/09bXsIZwuzAwF0a2FYVd6wxqUtdUbOh2+iczpIffPx
+	 QAo4RrcJqbD6Q==
+Date: Thu, 7 May 2026 18:44:32 +0100
 From: Conor Dooley <conor@kernel.org>
 To: Minda Chen <minda.chen@starfivetech.com>
 Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
@@ -59,11 +59,11 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	linux-kernel@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	devicetree@vger.kernel.org
-Subject: Re: [net-next v3 3/5] dt-bindings: net: starfive,jh7110-dwmac: Add
- jhb100 sgmii rx clk
-Message-ID: <20260507-annotate-cleat-52614476a8f7@spud>
+Subject: Re: [net-next v3 4/5] net: stmmac: starfive: Add jhb100 SGMII
+ interface
+Message-ID: <20260507-reoccur-underfoot-bac75e8e454d@spud>
 References: <20260507094115.8355-1-minda.chen@starfivetech.com>
- <20260507094115.8355-4-minda.chen@starfivetech.com>
+ <20260507094115.8355-5-minda.chen@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,10 +71,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="emyOGXNpEJM9Td6n"
+	protocol="application/pgp-signature"; boundary="1y8BhspTTm66m592"
 Content-Disposition: inline
-In-Reply-To: <20260507094115.8355-4-minda.chen@starfivetech.com>
-X-Rspamd-Queue-Id: 5573A4ED0EC
+In-Reply-To: <20260507094115.8355-5-minda.chen@starfivetech.com>
+X-Rspamd-Queue-Id: 908E64ED0BF
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.26 / 15.00];
 	SIGNED_PGP(-2.00)[];
@@ -84,11 +84,11 @@ X-Spamd-Result: default: False [-2.26 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285450-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285452-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+,1:+,2:~];
@@ -102,145 +102,53 @@ X-Spamd-Result: default: False [-2.26 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[starfivetech.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,starfivetech.com:email,marvell.com:email]
 X-Rspamd-Action: no action
 
 
---emyOGXNpEJM9Td6n
+--1y8BhspTTm66m592
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 07, 2026 at 05:41:13PM +0800, Minda Chen wrote:
-> jhb100 SGMII interface tx/rx mac clock is split and require to
-> set clock rate in 10M/100M/1000M speed. So dts need to add a
-> new rx clock in code, dts and dt binding doc.
-> So in jhb100 SGMII interface contain 6 clocks, RMII/RGMII
-> interface still contail 5 clocks.
-
-Why is this not being done in the commit adding the jhb100 in the first
-place?
-
+On Thu, May 07, 2026 at 05:41:14PM +0800, Minda Chen wrote:
+> Add jhb100 compatible and SGMII support. jhb100 soc contains
+> 2 SGMII interfaces and integrated with serdes PHY. SGMII with
+> split TX/RX MAC clock and need to set 2.5M/25M/125M TX/RX clock
+> rate in 10M/100M/1000M speed mode.
 >=20
 > Signed-off-by: Minda Chen <minda.chen@starfivetech.com>
-> ---
->  .../bindings/net/starfive,jh7110-dwmac.yaml   | 42 ++++++++++++++++---
->  1 file changed, 36 insertions(+), 6 deletions(-)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.=
-yaml b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
-> index 06aeaa0f6f00..af160a8dedb8 100644
-> --- a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
-> @@ -39,20 +39,18 @@ properties:
->      maxItems: 1
-> =20
->    clocks:
-> +    minItems: 5
->      items:
->        - description: GMAC main clock
->        - description: GMAC AHB clock
->        - description: PTP clock
->        - description: TX clock
->        - description: GTX clock
-> +      - description: SGMII RX clock
-> =20
->    clock-names:
-> -    items:
-> -      - const: stmmaceth
-> -      - const: pclk
-> -      - const: ptp_ref
-> -      - const: tx
-> -      - const: gtx
-> +    minItems: 5
-> +    maxItems: 6
-> =20
->    starfive,tx-use-rgmii-clk:
->      description:
-> @@ -99,6 +97,18 @@ allOf:
->            minItems: 2
->            maxItems: 2
-> =20
-> +        clocks:
-> +          minItems: 5
-> +          maxItems: 5
+> Reviewed-by: Sai Krishna <saikrishnag@marvell.com>
+> @@ -130,6 +160,7 @@ static const struct starfive_dwmac_data jh7100_data =
+=3D {
+>  static const struct of_device_id starfive_dwmac_match[] =3D {
+>  	{ .compatible =3D "starfive,jh7100-dwmac", .data =3D &jh7100_data },
+>  	{ .compatible =3D "starfive,jh7110-dwmac" },
+> +	{ .compatible =3D "starfive,jhb100-dwmac" },
 
-This can just be "maxItems: 5", since minItems is set outside the
-conditional to 5.
+You've declared compatibility with the jh7110, why do you also need to
+add the new comaptible?
 
-> +
-> +        clock-names:
-> +          items:
-> +            - const: stmmaceth
-> +            - const: pclk
-> +            - const: ptp_ref
-> +            - const: tx
-> +            - const: gtx
-> +
->          resets:
->            maxItems: 1
-> =20
-> @@ -111,6 +121,26 @@ allOf:
->            contains:
->              const: starfive,jh7110-dwmac
->      then:
-> +      properties:
-> +        clocks:
-> +          minItems: 5
-> +          maxItems: 6
-
-Remove these constraints, since they don't do anything more than the
-outside ones do.
-
-> +
-> +        clock-names:
-> +          oneOf:
-> +            - items:
-> +                - const: stmmaceth
-> +                - const: pclk
-> +                - const: ptp_ref
-> +                - const: tx
-> +                - const: gtx
-> +            - items:
-> +                - const: stmmaceth
-> +                - const: pclk
-> +                - const: ptp_ref
-> +                - const: tx
-> +                - const: gtx
-> +                - const: sgmii_rx
-
-Can't you just leave this list outside the conditional section, and add
-the extra item to the end? The only difference appears to be the
-sgmii_rx clock, and it's at the end.
-
-I'm also not really convinced that this flexibility is required, unless
-there are some controllers on the platform that do not support sgmii.
-
-pw-bot: changes-requested
-
-Cheers,
-Conor.
-
->        if:
->          properties:
->            compatible:
+>  	{ /* sentinel */ }
+>  };
+>  MODULE_DEVICE_TABLE(of, starfive_dwmac_match);
 > --=20
 > 2.17.1
 >=20
 
---emyOGXNpEJM9Td6n
+--1y8BhspTTm66m592
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCafzPHgAKCRB4tDGHoIJi
-0qWPAP48Jg7iBluYVxnNt04nxXmKXO247a10w2+hLujxSn9HWgEA9gbP8K+wMHbv
-4T0T79bjT/5vtx7DKuvOy2+uUcAKtAE=
-=2Yti
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCafzPgAAKCRB4tDGHoIJi
+0s5kAPwJ8DNl1Z9mFplSHREfjOFAs8yQ3/t/xZYhY07C2sfSTwEAj5xXufiXBr2V
+FZqP1AY1cu9s2+ucvq127NGSJLJ7xgs=
+=YCco
 -----END PGP SIGNATURE-----
 
---emyOGXNpEJM9Td6n--
+--1y8BhspTTm66m592--
 
