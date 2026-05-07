@@ -1,98 +1,112 @@
-Return-Path: <netdev+bounces-285394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285395-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qMSFMESx/GnlSgAAu9opvQ
-	(envelope-from <netdev+bounces-285394-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:35:32 +0200
+	id yAvrDpmy/GnlSgAAu9opvQ
+	(envelope-from <netdev+bounces-285395-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:41:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 678704EB268
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:35:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF0894EB3D5
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:41:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C452030087CD
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 15:35:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 39D073037E6A
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 15:39:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C98A93EFD2E;
-	Thu,  7 May 2026 15:35:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36EB843E488;
+	Thu,  7 May 2026 15:39:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hZCfRbnZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lELMVwd2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0771D5ADE
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 15:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78E1A3F54AD
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 15:39:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778168130; cv=none; b=ecJHUocw3kigFPUECXkkcyNf6dHaS2bAfm3TfJEdZAUQ1uY7h5Ply6zZC+xcj8LsUupX/K8WASnDNE6YDC8qh8vmMiwYVrfHlxMVc2AuROZtaDeA92ukDk0E439MY2s5OYEmQZhMHp7YF4ROApu5O4+lt0+KeawUKjDbbqTjFVo=
+	t=1778168347; cv=none; b=tZWVDF3epn6q6P3sBbA2YTuD3L4obeezXuYkFfDyp266SbTTI1MpdyCW1De2MSO4E2qOr2GFIzqzBaPR91Ufs9FTur3AXlzfWeA4Zja35YMp3tTUtf3YrLLuOHUL8E/Kf5gacr5rELdcVW8h50k0H8WLMf3VhmHCTBUPUz8xan4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778168130; c=relaxed/simple;
-	bh=Pf3cEONmceo9EAPIZp1eVwPY624ZEYL8N3t3BTs37aU=;
+	s=arc-20240116; t=1778168347; c=relaxed/simple;
+	bh=I7bHVcUPCbFavnPQE9NIAPWTbSlQISkdMWu7R9FX+Ss=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jv86mS0rrZf5up5Mp+Gh0RPGTuJIYfUvlLQywzfsZ6DyBBWvWsJuU51VkSS2K8HiJk95K66sd8zsD/ZgLj5LmaMHjQhFXiQgF+05QZT9p3sYGDlRK6nUR4S+gFQtMPL06Bp/2Rkw9QIX7Tbdj5+UXU4eWG5C7GDogw/J48DtekE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hZCfRbnZ; arc=none smtp.client-ip=209.85.219.51
+	 Content-Type:Content-Disposition:In-Reply-To; b=bZvYyCAF6QpVe6qR97mZIJ/ddFWd584bJbFN/tyoXrEemgOCH7JIQ4cO1Mi5TnbZFojbRCDQjMhbzyVNsiHWvGwiWjOr4zcc0sKRTsqAGNfvMJCozqmIE5fJZ28bQxn6k1v/HcfBMc0V8JBjwEa3L3NBMP/IGDZIvdgdXB234uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lELMVwd2; arc=none smtp.client-ip=209.85.222.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-8acae26e564so9496156d6.2
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 08:35:29 -0700 (PDT)
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-8ef2118b478so100241885a.0
+        for <netdev@vger.kernel.org>; Thu, 07 May 2026 08:39:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778168128; x=1778772928; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778168344; x=1778773144; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QCGA1ZpwQj/GZHpiJE1rMqROq1Bndf3dTrA4o7QgiSI=;
-        b=hZCfRbnZTzbhkugEH7npCsS/Lu+0i3JSfjt0JsvrTyzeerLxNgbGdII/E0BX54Yio8
-         06btZy4oBfGKAaATqwUraSilSXkwd2YjGNhGbHdgjrEo1O9pRFeObzG7BdSJc9gLDym+
-         Y/9rt5f1F8Viu1jXL7qkdAtDV7SF0rNgV3gyUfMcFXdzlupGLuf+SeX8sQcAAy+I8b7W
-         xPKun1c72J/mf+ZPXjXCTH1qCGxGPlm0f7zxDyBo1mwD94kykg4P4PsSbgT4U8hfYraX
-         Eb5k6uwhAPq4bL0/cU8SZkkoKxCOTT5V/BhhcULwLncEQ+mUPG3W0fn1jRY6/edHbziS
-         bjFw==
+        bh=hQASz0K9bAEWsvTANOg3uGMuZOgruzesi2JgdTAVAkE=;
+        b=lELMVwd2v+v3Y2UjmN0rjzuYIZkTeRK8VqQUHf+rI68gGfgcG8NCRLWnzDSU7Ejg3a
+         Fkw6my+S6bAF/4E4hCUawNWJPvhr1TNcPhPRWjqkvLDfn3aOBNptDGyNH86WSvyJo283
+         sWtpk53zfbttBN4gwE+xdhjPtewc4RWBahS89D/lN22YvuzFwhbBxwkjAQV+wl+AgeCk
+         lXNzb4qXqs00gTDv0uytVS0ClClxoEGzxVnEniq0d3y4Gw9GHs0fmfn66iThHtOpR7TJ
+         l3wCy1J1YODPtn2r0c+N3ZstW4mN3WeMU4SFG3zlY2trp4eE2dESUXTSK8mMG8ZRqvme
+         3PWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778168128; x=1778772928;
+        d=1e100.net; s=20251104; t=1778168344; x=1778773144;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QCGA1ZpwQj/GZHpiJE1rMqROq1Bndf3dTrA4o7QgiSI=;
-        b=V+LCn34Ot7I+jyDF0xA0T+6K5d+Tivm79AIxf7Y8zMnaXrO367uFNFatL5bQh+sNnX
-         doFNovNDGxAI0eMCACtpe0HkKD5iyI62Bnk+dJZoXIgjyVK6TnCVC8xZEMe0v5yymvTi
-         ldNEAWAurzI+GAdw0JOV/e85rHfCIg8tTaChcQhVa/0zXVbogHaYFxalQ6/WqRUCPoIW
-         DMnkseO0siWZsQq6Xq1m50DM3KpBel/hmYTORApJBifaUH+LBG3vwYgbaCLHNqa30eU4
-         929Ux8bliILlrAKobdhuLtuYr/LK+mafALgp1p5Z3eSr1fDqzVjzHeIrOxjwrYcEKCe7
-         1Vgw==
-X-Forwarded-Encrypted: i=1; AFNElJ/03J9UwF3ityDbJowN8MIMpvDcX76EpRw1/J7IUbl9BRtQ9Zhy7RsBCgP8qiTKMme1LvpNx0Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfIaBaDRUMrqQ7hezDpUSNfbLq/YeT+JQoVh53c/oFqA6umLCg
-	XvFivxsA88dX5x8I8lMuVrwoCD26pqI7T71ZsR152fhRbZ4M2Yx27oEZ
-X-Gm-Gg: AeBDies3UcyYGVVD0IqFodjgP/FdYlcnTbfQFqCLyPg/n2VdhWBovWETZcFqbTVec19
-	per/G0LpvvHcgvDloNy5Mt/RtExDmeB531GhErO988wiP50pZ6KmObW6LKEkHkthSpA44Thl30A
-	9ExMfxv3mlJQGpt23k22Vlk/u7h+AkBaKZ56WWjMxmVCrnP7YXwAx4PLGomCmNrcZ8DEQToT+0y
-	zHp6Z54l2W4gxSd3Yx4H5Z1fUY84IGgKFj8cQAm539dCi8XBDjq79LC/tl2BdnG72iuC8Hwa+sP
-	Xm3X6cRJbgT/G+r/sP0IQtdklV68AKzHBr2ok+90qo2Po3szwBocxDAmorKHaN+JYMZoFFmUOM4
-	jJNDSDq9hoYQNsQAjaEyuTrBV6y5Z6pOkFKmOUR2KBaPu30wtB68VT7NSx5SOKxPa0wuLoAdwYC
-	eXY51wKE5DgDjbw4xSM6pco/9LsVsL4iuA8ELavwQVGO3sLiXFYKI3yqwGG7xJSiielw==
-X-Received: by 2002:a05:6214:5901:b0:8ae:680c:81cf with SMTP id 6a1803df08f44-8bc43620490mr133080686d6.21.1778168128237;
-        Thu, 07 May 2026 08:35:28 -0700 (PDT)
-Received: from devvm29614.prn0.facebook.com ([2a03:2880:ff:70::])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b53c6b8092sm228462556d6.34.2026.05.07.08.35.26
+        bh=hQASz0K9bAEWsvTANOg3uGMuZOgruzesi2JgdTAVAkE=;
+        b=cyIhPdK8MYAD1V/ZBnyFbsR/Ge01+gvE6wk5p1a5eeES28tJLCtt/cdtGl6kqZIeMX
+         vD5l0A4qYPm4QfKCuSTRr/jPp3fHuYikgNIow7iF0X9a4qQyrnQBfaYjXC1OkWc/4wTy
+         769URWEaLsLO9vP2G1VmlJ/YCeg7Q5Q+2uxGnqMpkJv7GQzGvU+BxokIIIjNGBOpFBu7
+         iYEfZsIC/5IwDPgL/dGnmAcW5ruvh6ApvjFUHBe9N6UJVrl0EYq/jBEGka6XZP22djBA
+         grFo5P4nlHALl6dr1qJXCbtXzVsInNMafp2Kwh5P1VvG8c00Vh9hRbf54SWvzYU28RjT
+         s2tQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+VK0oZfkN0d2rthPkP95yBsjdskvUEDw3mQKbLyiEf0y8QGZPPyWzVx5ILYAk0xzGM6HYfgTI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCF06GyQ+pCC6i6hVy9Su7u3l+9vZbYjuqdLi251mv96hNg0Z5
+	kUpPU+pMMm05KZk9xqfd0XG5zCI248Rli43QLkenHoSTHXk33mqKvQo0
+X-Gm-Gg: AeBDiesRvpotSR58xKJ6S+cYU+mILNp9IsxRGIReB99AwfLl0Qwj9NLjT+m5RbzANFf
+	+sSQl56Unt7UfPshb/xV0Qng8aSrDMoMmOe5xcG5Sc2oL8gsR4mH2IG3BHtZUrKghSrJ7P0556f
+	CYcrMPKMirzWh4dmPKj3hdcs3KHylEyacEn0w1uFSTG2ATw30uAAC1JAUDIUEA5smM2GvWcNDWm
+	TAwA09UDSo07uBpsyOC17EyEdEYLWeZ9takr1Q0+c/reYtM7T+FVrS+KCYuDtZB9vXuvOudIO1W
+	upSbapKoVIUPhwmkLnv/IIuXgw61A31MGqUqM/mnHJDxxyomtLYZ4BRUl5h3F7YIlmYIaxc4bKS
+	6cNoc26sMOaEfZ8s+aOZ5d3/FX6koaFjbbOoeT//jKYKizcug311wI+1/NHTV4rYz9K/RSK7V7Z
+	cnrYTz93EB6E18gB3qoD7RpCKd9bnDBM1t+aQrHxghjetcqgQ88CVRYb1INA==
+X-Received: by 2002:a05:620a:440f:b0:8ed:11b9:1ecb with SMTP id af79cd13be357-904d4b58929mr1205520185a.20.1778168344205;
+        Thu, 07 May 2026 08:39:04 -0700 (PDT)
+Received: from devvm29614.prn0.facebook.com ([2a03:2880:f800:13::])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8fc293837b5sm2153539785a.10.2026.05.07.08.38.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2026 08:35:27 -0700 (PDT)
-Date: Thu, 7 May 2026 08:35:21 -0700
+        Thu, 07 May 2026 08:39:02 -0700 (PDT)
+Date: Thu, 7 May 2026 08:38:56 -0700
 From: Bobby Eshleman <bobbyeshleman@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>, Alex Shi <alexs@kernel.org>,
+	Yanteng Si <si.yanteng@linux.dev>, Dongliang Mu <dzm91@hust.edu.cn>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Joshua Washington <joshwash@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Mina Almasry <almasrymina@google.com>,
 	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net v2] eth: fbnic: fix double-free of PCS on phylink
- creation failure
-Message-ID: <afyxOaFhFzEKDK//@devvm29614.prn0.facebook.com>
-References: <20260504-fbnic-pcs-fix-v2-1-de45192821d9@meta.com>
- <6cec0c03-5bdc-4131-9899-bc5c77fba198@redhat.com>
- <20260507072453.5eec7051@kernel.org>
- <20260507072954.263ae8dd@kernel.org>
+Subject: Re: [PATCH net-next v2 2/6] net: devmem: support TX over
+ NETMEM_TX_NO_DMA devices
+Message-ID: <afyyEJNbrBem8igi@devvm29614.prn0.facebook.com>
+References: <20260504-tcp-dm-netkit-v2-0-56d52ac72fd4@meta.com>
+ <20260504-tcp-dm-netkit-v2-2-56d52ac72fd4@meta.com>
+ <20260506193420.575e1806@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,81 +115,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260507072954.263ae8dd@kernel.org>
-X-Rspamd-Queue-Id: 678704EB268
+In-Reply-To: <20260506193420.575e1806@kernel.org>
+X-Rspamd-Queue-Id: CF0894EB3D5
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285394-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285395-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_FROM(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,devvm29614.prn0.facebook.com:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,devvm29614.prn0.facebook.com:mid]
 X-Rspamd-Action: no action
 
-On Thu, May 07, 2026 at 07:29:54AM -0700, Jakub Kicinski wrote:
-> On Thu, 7 May 2026 07:24:53 -0700 Jakub Kicinski wrote:
-> > On Thu, 7 May 2026 12:34:24 +0200 Paolo Abeni wrote:
-> > > > Clearing fbd->netdev to NULL avoids UAF in init_failure_mode where
-> > > > callers guard by checking !fbd->netdev, such as fbnic_mdio_read_pmd().
-> > > > These callers remain active even after a failed probe, so fdb->netdev
-> > > > still needs to be cleared.
-> > > > 
-> > > > Fixes: d0fe7104c795 ("fbnic: Replace use of internal PCS w/ Designware XPCS")
-> > > > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>    
-> > > 
-> > > Note that sashiko-gemini spotted a pre-existing issue:
-> > > 
-> > > https://sashiko.dev/#/patchset/20260504-fbnic-pcs-fix-v2-1-de45192821d9%40meta.com
-> > > 
-> > > does not block this patch but could deserve a follow-up.  
-> > 
-> > fbd is a devlink priv, not netdev priv, touching it after free_netdev()
-> > is perfectly fine. I wish Gemini tried a *little* harder instead of
-> > guessing :| Sorry for not commenting earlier.
+On Wed, May 06, 2026 at 07:34:20PM -0700, Jakub Kicinski wrote:
+> On Mon, 04 May 2026 17:27:49 -0700 Bobby Eshleman wrote:
+> > +	if (bind_dev != netdev)
+> > +		netdev_lock(bind_dev);
+> > +	dma_dev = netdev_queue_get_dma_dev(bind_dev, 0, NETDEV_QUEUE_TYPE_TX);
+> > +	if (bind_dev != netdev)
+> > +		netdev_unlock(bind_dev);
+> > +	binding = net_devmem_bind_dmabuf(bind_dev,
+> > +					 bind_dev != netdev ? netdev : NULL,
+> > +					 dma_dev, DMA_TO_DEVICE, dmabuf_fd,
+> > +					 priv, info->extack);
 > 
-> Ugh, not enough coffee. It's complaining about MDIO reads, I think
-> that's valid.
+> Not sure if it matters but are we intentionally releasing the bind_dev
+> lock before calling net_devmem_bind_dmabuf() ? Previously more code here
+> was covered by the physical netdev's lock.
 
-It is, but I think the race pre-exists.
-
-static int
-fbnic_mdio_read_pmd(struct fbnic_dev *fbd, int addr, int regnum)
-[...]
-	if (fbd->netdev) {
-		fbn = netdev_priv(fbd->netdev);
-		if (fbn->aui < FBNIC_AUI_UNKNOWN)
-			aui = fbn->aui;
-	}
-
-
-Definitely possible that ->netdev gets freed concurrently with
-fbd->netdev evaluating to true... but fbnic_netdev_free() faces the same
-race.
-
-I'm open to fixing this all at once, if preferred. Probably need to look
-at some of the other fbnic_net ptr guards too.
+True, lock needs to be held at least until after binding. I have this
+fixed in the next rev.
 
 Best,
 Bobby
