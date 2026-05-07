@@ -1,170 +1,189 @@
-Return-Path: <netdev+bounces-285179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285180-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YOwEIjRJ/GmBNwAAu9opvQ
-	(envelope-from <netdev+bounces-285179-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 10:11:32 +0200
+	id mCgTJ8hJ/GmBNwAAu9opvQ
+	(envelope-from <netdev+bounces-285180-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 10:14:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B79D4E48DC
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 10:11:31 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F0554E4984
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 10:13:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F17E030934B9
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 08:06:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1BE5630772BE
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 08:11:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5700F335BBB;
-	Thu,  7 May 2026 08:06:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D5BD3368A0;
+	Thu,  7 May 2026 08:11:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MCbYiUtw";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="rqwL8mvt"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="doLNwnGc";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="G2DVBMhc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E7F4332EA2
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 08:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92E433B6F8
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 08:11:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778141193; cv=none; b=mE9J6/RXCR7SAf1eE4WfGFM1maPl6NcqrdGiNRYTzlbmk0IH40gE9yX62onEIXtRpIgW4Wb38sZy/nKaO7udaqw6pf65zYR/ULC1BXCW65uOvkcxGnmzM/stI2BNWJGsZ/9KFI6H0hOD5ncy+aDdFwYrbOuiOIxADgPhQzadznQ=
+	t=1778141504; cv=none; b=Foh635bfYFEZADvDARN8cxcVzkZ3f1Lf5aceNW6k28wP6+YUK5mP5rf/kYZc0t7+jEjOX2Y2entJO0m+lYF5p76j9pQBFxSvtudzCUhiyegLq+ajyuOgKsenXAbcOhZpa3mHfUnt3KWzBukQQW9VcQ2eBiWxr04IF0grrqIAYVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778141193; c=relaxed/simple;
-	bh=Zw9brY5wV+GxdZBOypdnRURlfwgBntEB0ZE6QRw/jAY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XSkOZRklulL2XCbVcaWSLiZMwLkfdBBOYKEDwF9qgYxTDWC8zFd1S5YwZDT1xEo0C6xz5/L6lzwZ6CeXiiXWM0CCbBLEMQTuQNMZOwj1mjniXMAVMYLA35N5V40W1BeJnMafCScVhb0kGiEwFaPWC946SVKBFsjkGRnYSscvbP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MCbYiUtw; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=rqwL8mvt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778141190;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l3bMSG0lPJSM2Emf2ZOLqrh1ujP+L6IYLdvVg0ZZk+s=;
-	b=MCbYiUtwFRR53oe+BktYZj3WQcxol0VdWMDklxutRfWUsases2Zz56i9pTRGWTNN4UcF7K
-	AK5j+/r+/XYKqs4+/iKY22cHtuVTqDeurmK7LiluSlDGVn2yRjY/wIcJU+W10Jogdt74c9
-	PATnVf3vRtuaoBYj4qGUN36x1896Axs=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-121-Lh1nNlaJNVuKt8eYcW5oXQ-1; Thu, 07 May 2026 04:06:28 -0400
-X-MC-Unique: Lh1nNlaJNVuKt8eYcW5oXQ-1
-X-Mimecast-MFC-AGG-ID: Lh1nNlaJNVuKt8eYcW5oXQ_1778141188
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-4497a0e3acaso477292f8f.0
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 01:06:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1778141187; x=1778745987; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=l3bMSG0lPJSM2Emf2ZOLqrh1ujP+L6IYLdvVg0ZZk+s=;
-        b=rqwL8mvtNVE0H3CIGMoOeZycl9e8OxxlFV6cMmrKG3cqIqxok98QeMRoXRffIBlUHl
-         0N75s0A5W5grhBNwupZhh9FZbc8wHHANLD3FAvQX0cYo8Fa9PYudUm4is6fCLTp6s50p
-         Wh7uoz4/iDLpnht5978bG4XJbZjGlF/iggZztG50eSnzSm35fWEmgY2BK0GykSCSlJfQ
-         UmLqlLsSP4ZMmV6WmXy8rems8sXgGI6V1+wu8diSJH7TIVmJ3F8vC0cr6bC5JiWTf90i
-         axxHrNE8QpfS0omFMkKury2pVh4cvHko0S/6HlNEiOO0jehDYDOt46agAlwuWcpJ/a5g
-         bhkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778141187; x=1778745987;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l3bMSG0lPJSM2Emf2ZOLqrh1ujP+L6IYLdvVg0ZZk+s=;
-        b=R2z9bGoGkWEW8KmcRNC4UF+mvEeMiyRj6oe3bxTnHOTk1/KnpqH6HX1D9B2QudYJ8n
-         fMAWEe+XcA1NMzN0yeOyACNXIsLgfma/K0rkPYUOl6GerEVeUDKXPjRvUiLgDamMmybG
-         rtszhsk4Ner+W9YNXTAN2hwyZcWi5amQqbd5tpJA/Ps7LS+FDAH7H+HyvElQWulkgUtc
-         YJDq0Je0PDUhQWu9YkiVn9ZTQ5Oyr7FiCfwuE4lbRHQlGrluoHdAnmwwBGF8yqKOv/F7
-         jhFaQUuET/+QnYdRWkvuan9Rb5Oy28ta8UPkRt/kDJqxcCRsdRAwnLe4FYfkV6kzlFdQ
-         nB2A==
-X-Gm-Message-State: AOJu0YyB+7Glpjw8gFFH7yzdAMEX8lLJ2MwcEyCwF/nY8gncvVEL9wkN
-	hdQ4gj6tzDKoH4uCoxcq73TNpB3WqY/iEFfeDLdoEZ+DH1ReVIWXeIgToBj4JXrbYwwkdAL9u4q
-	T8XukU7aeg31c8PCuf1ijXVYGgIk7qQu9OWHPm95qLABBWIYG8Kkc5B0/PA==
-X-Gm-Gg: AeBDies+x5AeT+Xw+9eEpmuFNC7joYUe43SJBFmITVb3FzmV8qObN/53S9Yuz4MCQyn
-	ZAjHxFcBKacSqmwaG6dblwrLntV4B4UP/eUUcvs/uKTh4FZ0YzGZvpx2dqq8xhb6f4lLXO+Dl7+
-	pMVoIu3SMkcswnzL4rlK5pGvGg5K1uct6LL5jhK9AZSuVEYIVPaa4Y5BigQ4jLIqss6sIbAmMNz
-	yqsGMwuUlhI0Sl0sFz0ysS9WejQI4vxSCuh/N44v6Iuy8WSpSBLm/42Fhg46aqExyndRGGLxlwV
-	ML2k67bGlcrLM9dg6yYuivBMIjiQUVx3rigc8rCc+pkUt9ZC/up6SGY3qi0wwB5XLLjn8Z5Ek4D
-	YVvWdauidfxtCN4RFOEH0fSzGDCNZP2oW8gzRzRix0JAKL4yRP5QQsPibxyUgxi07Cw==
-X-Received: by 2002:a05:600c:3548:b0:489:1b0c:8b43 with SMTP id 5b1f17b1804b1-48e51e0969fmr109472195e9.1.1778141186242;
-        Thu, 07 May 2026 01:06:26 -0700 (PDT)
-X-Received: by 2002:a05:600c:3548:b0:489:1b0c:8b43 with SMTP id 5b1f17b1804b1-48e51e0969fmr109471655e9.1.1778141185741;
-        Thu, 07 May 2026 01:06:25 -0700 (PDT)
-Received: from [192.168.88.32] ([150.228.93.82])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e5310930esm48943405e9.7.2026.05.07.01.06.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 May 2026 01:06:25 -0700 (PDT)
-Message-ID: <dd67b956-b06b-4ebc-8688-ccb5c17c9d61@redhat.com>
-Date: Thu, 7 May 2026 10:06:24 +0200
+	s=arc-20240116; t=1778141504; c=relaxed/simple;
+	bh=3ozMjKpppRGvvbTRjdoNYpjkFprFrybNQ7yOdh10jkI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZfL8F4F/m6kmq/AIolg5zyGLue3dKkMiA0LKz9WqkSopEPuW7pVI5DdqPi27HJQl/FEwtPhPwewTgUsmVGAkjOHMx55hmYYW1Hz21xuSQdSeRaJ8bLnxDbBt4dHoppoN/Q4dYqs2GLZEOYW0ljIJ03Ibn5rRgsPrjD4zWIuny1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=doLNwnGc; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=G2DVBMhc; arc=none smtp.client-ip=103.168.172.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id D0ABA140005D;
+	Thu,  7 May 2026 04:11:39 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Thu, 07 May 2026 04:11:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1778141499; x=
+	1778227899; bh=ecvl6UsZ+uzv0jP9MGnDukDCsf+i9MaMhXJB73hjAFw=; b=d
+	oLNwnGcGPtriJIQrRlL7ef0FnSYXN1+zq+X12k4y3yhRpOaayX2CnjNnjTeA/+Gt
+	b7tytXRPOKPly7T1rEKM2pYUsmLit8oUXYuFXhzoR708L/9HL1JkXcdtY2KzFWwA
+	NHLl7xsD1MUdz5WeT8csEZ7kRXqWYpxZUGAXKHynO5gyPFcyFnA01mVDewMD+LX9
+	RoiYy1LCAJ/htAYVRQQzlkWdCFjAYquEh1pkqqF69L4JWbI8RKp7xMH2HXaBjpKR
+	F+IG4dFXIGDJt1MxMWUT3sOCs13HKbMYyV5ZO2oaHHZMINzBW/aWEJKl5HzVwv8J
+	iaEAW0hoCcCt0KjMT2hsg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1778141499; x=1778227899; bh=ecvl6UsZ+uzv0jP9MGnDukDCsf+i9MaMhXJ
+	B73hjAFw=; b=G2DVBMhcOWjjFzkNSGciQj1p6Q2+llvUJ35Q3pdi2lc2LoGp/D0
+	9ixzsvGnTTBLzlwRFjg9BS29nijduaqGzyN2OLv9vPavaYeMJgKBJRkSCkos4uC7
+	LwwYHd+16rsmBp8bgueGNiEJZdgVqf9CrbhxMzDFjJvTUlB0vXHWt0qcZjxEEEv9
+	nNUE+IdU3m2Ixwgm+NK6cDO70s5ddQsgQ0ogzcco4XzAotgtRWOp2wuq+ViarJEK
+	n6cJWJ8sOQjTKNYYiy6i9ARBZCqB+oEvf4jiD1RjB22q7VrZv6OVZLAj5iF7+hst
+	aoa2/I0W8XwXVc9xTZClX2k7Agsx4nFG9eg==
+X-ME-Sender: <xms:O0n8ac93KPrALkUYV_MN0FzR6zQ7ofyD0_QVAaKatIm_idhS0kBQXw>
+    <xme:O0n8abu94TY6xUJuPrQ4cU93TikcI1U_hHPdDsNidKqJ-XU3RjZnQrrzx1IyvGHr0
+    7eVvfjtwCdjjKKg8VEfrRXH-OGiZNAHN4-hZx2z6lDUFP7Z22ZuKWM>
+X-ME-Received: <xmr:O0n8aXDY4a7Tm4LPEBqNU7pxiB_MaGIaBo1J7p2tkzaa9i7gZFMSExsgF_fR>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddutdeileehucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeegpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnhiesphhhvghnohhmvgdrohhrgh
+    dprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgvtghunhgvthdrtgho
+    mhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtph
+    htthhopeguvghvvghlsehlihhnuhigqdhiphhsvggtrdhorhhg
+X-ME-Proxy: <xmx:O0n8abXV_d51KHLqNIAPgm6QRIrcSVOQS0-mL24tUIVOncNLKiPziQ>
+    <xmx:O0n8adDRMabmHpGe6syZZyQElNspcjI6f9-WPW_ozUmLt1AtyFpZ9w>
+    <xmx:O0n8aW-DDaAnYL33vTrXHmUDS2YeQS4AKn9wbrIzVSch5Xh0TCMUiw>
+    <xmx:O0n8acHDFT6gROaThG1PK-aEWQf71ll2SpJcTV5JQql3e8iigGFPlg>
+    <xmx:O0n8ab8P5YWxUphHca4O9lXKqL9aEvelY2JzGfRjTZ35pCOnYehNGZHx>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 7 May 2026 04:11:38 -0400 (EDT)
+Date: Thu, 7 May 2026 10:11:36 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antony Antony <antony@phenome.org>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org,
+	devel@linux-ipsec.org
+Subject: Re: [PATCH ipsec-next] xfrm: Use regular error handling instead of
+ BUG_ON() in the netlink API.
+Message-ID: <afxJOGtMkRK5FrvG@krikkit>
+References: <aftnl6d59WUM_Dfm@secunet.com>
+ <afwhdRPx-Mko28yM@Antony2201.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 04/10] enic: add admin CQ service with MSI-X
- interrupt and NAPI polling
-To: Satish Kharat <satishkh@cisco.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Sesidhar Baddela <sebaddel@cisco.com>
-References: <20260503-enic-sriov-v2-admin-channel-v2-v6-0-0af4fbc2d86d@cisco.com>
- <20260503-enic-sriov-v2-admin-channel-v2-v6-4-0af4fbc2d86d@cisco.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260503-enic-sriov-v2-admin-channel-v2-v6-4-0af4fbc2d86d@cisco.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 0B79D4E48DC
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <afwhdRPx-Mko28yM@Antony2201.local>
+X-Rspamd-Queue-Id: 0F0554E4984
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	TAGGED_FROM(0.00)[bounces-285180-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_FROM(0.00)[bounces-285179-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-On 5/3/26 1:22 PM, Satish Kharat wrote:
-> @@ -197,13 +429,47 @@ static void enic_admin_free_resources(struct enic *enic)
->  
->  static void enic_admin_init_resources(struct enic *enic)
->  {
-> +	unsigned int intr_offset = enic->admin_intr_index;
-> +
->  	vnic_wq_init(&enic->admin_wq, 0, 0, 0);
->  	vnic_rq_init(&enic->admin_rq, 1, 0, 0);
-> -	vnic_cq_init(&enic->admin_cq[0], 0, 1, 0, 0, 1, 0, 1, 0, 0, 0);
-> -	vnic_cq_init(&enic->admin_cq[1], 0, 1, 0, 0, 1, 0, 1, 0, 0, 0);
-> +	vnic_cq_init(&enic->admin_cq[0],
-> +		     0 /* flow_control_enable */,
+2026-05-07, 06:21:57 +0100, Antony Antony wrote:
+> wHi Steffen,
+> 
+> Thanks Steffen, I was hit by this in the new XFRM_MIGRATE_STATE I am adding.
+> I am glad to see we are addressing this.
+> 
+> On Wed, May 06, 2026 at 06:08:55PM +0200, Steffen Klassert via Devel wrote:
+> > The xfrm netlink API uses BUG_ON() on failures since it exists.
+> > However all these error are uncritical and can be handled
+> > with regular error handling. This fixes machine crashes
+> > in situations where an emergency break is not needed.
+> 
+> While BUG_ON is an extreme measure for a recoverable netlink error, it does
+> have diagnostic value: it leaves a stack trace. The patch trades
+> a crash + stack trace for a silent error return, which loses observability.
+> 
+> Would you consider using WARN_ONCE instead of a bare if (err < 0)?
+> 
+> -     BUG_ON(err < 0);
+> +     if (WARN_ONCE(err < 0, "xfrm: build_spdinfo failed: %d\n", err)) {
+> +         kfree_skb(r_skb);
+> +         return err;
+> +     }
 
-Replacing magic numbers with macro with significant names would make the
-code more readable with no need for additional comments.
+OTOH we already have a bunch of functions doing something similar
+without using BUG_ON/WARN_ON, so at least with this patch it becomes
+consistent.
 
-/P
+xfrm_notify_userpolicy
+xfrm_get_default
+xfrm_get_ae
+xfrm_exp_state_notify
+xfrm_notify_sa_flush
+xfrm_notify_sa
+xfrm_notify_policy
+xfrm_notify_policy_flush
 
+
+(I'm looking into generic ways to avoid this split getsize/fill that
+always becomes inconsistent in areas where new attributes are added
+frequently, but nothing to share yet)
+
+> Something like the above would preserve the "shouldn't happen" signal with a 
+> stack trace on first occurrence, without panicking the machine.
+> Or are there better signaling  styles in Kernel?
+
+Maybe DEBUG_NET_WARN_ON_ONCE so that only developers see those messages.
+
+-- 
+Sabrina
 
