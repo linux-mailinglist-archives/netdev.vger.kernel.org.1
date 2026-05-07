@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-285376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285377-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4J6ZFDGr/GkNSgAAu9opvQ
-	(envelope-from <netdev+bounces-285376-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:09:37 +0200
+	id KPWZNA+r/GkNSgAAu9opvQ
+	(envelope-from <netdev+bounces-285377-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:09:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C52B44EAD28
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:09:36 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64B6B4EAD12
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:09:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5D7D930048EC
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 15:08:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D46073017EDE
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 15:08:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 973CF43E49D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C55E443E4BB;
 	Thu,  7 May 2026 15:08:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K4gOXSxr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Abe3n7iz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7365B43E481;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A187443E4A1;
 	Thu,  7 May 2026 15:08:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778166520; cv=none; b=adBIXQuv4FgiAyVYGTZE+Jgohzfs8ywVLG35GVqIo167ZjJGLu55Q0SjY7DXyZWJDbS8QoueGv+6Kuxsd7YSmyRH22b1DWnUgRckPmMjPAOHSu+qmn+mXwXVzAi0sBcOxnkOaMosks9Jn8KjQDKkzF7K6IfO+ztc/P2xlVvD6VQ=
+	t=1778166520; cv=none; b=nvmI46mv4g4/vmilR+ymJjZ7eNB4UyXffIxrj+SrFitOx6baVNUTYR01UScmJg+0QI3TPe0uddOB7KtoIqPWuuQcK57unxHHtMHAeQPDqlk+skkFjjxnS61vrEg7AW6rv8ldLupOzb/AS3bAfJXGaTlq6wM5R4b+F3AUdShY6pI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1778166520; c=relaxed/simple;
-	bh=iF9kuhnxAnmPx5XML2Y1Qp+IYKRZ0mubdjQbOH4ja9o=;
+	bh=h3hcqBUbH6jetT+kZMUgXWTqXe6P9tvY9fQw/yBySvo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=az5kiLwpfv8lsdU1GkxK1qMlk1OXYLH2W5Fz0CDYdOfDOK9KviS+lrD34MnxO1IN92CYrN3RT8LoTElMPXFV6WJ3lAhYk4jRs46Qjslve4SN1Ap9O43MgI6PZ/7No8stJFgBe0Va7QhI1THP7Nt8+pkODWMRN+at2+69H1NWGUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K4gOXSxr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC76AC2BCC4;
-	Thu,  7 May 2026 15:08:39 +0000 (UTC)
+	 MIME-Version; b=YnJdV5XV7G2W6fbHFb4PMVPxZrNLV5uJTrMzZKSMN+g458xx0B/SXxPNZc/5dcLeJ2z7R2MdnJYvEgNI+DMDw3GrvLAZbMW/Kx9g76SVFqP6qUOnBotLOsqammuYOoCf/IbHUyyf79rJPW0NrC9ARMi3nPXiwWGBABKIRkvJHRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Abe3n7iz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DF67C2BCB8;
+	Thu,  7 May 2026 15:08:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1778166520;
-	bh=iF9kuhnxAnmPx5XML2Y1Qp+IYKRZ0mubdjQbOH4ja9o=;
+	bh=h3hcqBUbH6jetT+kZMUgXWTqXe6P9tvY9fQw/yBySvo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=K4gOXSxrPwVzqG8nWz4ip87rRp4zqvQbrRKCfCZq32KH2IxjBec2cSmKvbdLZCJF/
-	 2CDDIgS+yxqcKVi9L4RzMju7g2hfPwJjk62GQABu8Ip20emvkUDR6RUj93lQzSRFpq
-	 SD/TLFnvuqkHPXIUlHUiodjVCWYizeBy9bP9Jtp+oe+lMo3Xjk0AMB9yf8SjXFXsjL
-	 715zOasQ23Ssk0kKgvjWmaFc/0pMwG5/r2E39LMqwlJ0MYI/nWQkagrtiWf667miKh
-	 jIK8q+PKuU9D+GoS44n4MA+sOfS3TQwn+0sb5ydUL05S6bQX2ONCfTSQGiANLc2Oaz
-	 H7GrZJmuj2csw==
+	b=Abe3n7iztnI6wS00ew3Kag/pw9RsbzbEbmizqBsOmmYcDiF9cXaAfcsEK7DPlY9Uj
+	 kjN40pfVibhX9lR2BlGq9w/XARA2loR5da8X4iXvqaGx9uoNvsAudhrzVoFu0o2yv2
+	 b2p4Y5bas4ZyE78Gdr+0E3sY9hOKRjBbrgc+BoEToLL/hnJDVSEPKPVsmg5ksH1aaP
+	 Vdlu04In2LNO9NdvvJhdZj7vU/sYmwlnast1IXDl5FOvEMrBZVMKU+67fk58V7gn9p
+	 DvhBQPhKHIs+NzKFVtEKJ5oS6aZqqteFRPIXppCHM++upz+PRL7b9RfKj85wh/cOCE
+	 E0Vf0dPSaEGRA==
 From: David Ahern <dsahern@kernel.org>
 To: stephen@networkplumber.org
 Cc: netdev@vger.kernel.org,
 	leonro@nvidia.com,
 	linux-rdma@vger.kernel.org,
 	David Ahern <dahern@nvidia.com>
-Subject: [PATCH iproute2-next 3/4] rdma: Allow netns to be specified by pid
-Date: Thu,  7 May 2026 09:08:34 -0600
-Message-ID: <20260507150836.28105-4-dsahern@kernel.org>
+Subject: [PATCH iproute2-next 4/4] rdma-dev: Update man page to reflect netns as a pid
+Date: Thu,  7 May 2026 09:08:35 -0600
+Message-ID: <20260507150836.28105-5-dsahern@kernel.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20260507150836.28105-1-dsahern@kernel.org>
 References: <20260507150836.28105-1-dsahern@kernel.org>
@@ -63,25 +63,25 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: C52B44EAD28
+X-Rspamd-Queue-Id: 64B6B4EAD12
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285376-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285377-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
@@ -91,78 +91,37 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nvidia.com:email]
 X-Rspamd-Action: no action
 
 From: David Ahern <dahern@nvidia.com>
 
-Update rdma dev to work like ip link where the netns can be a
-name or a pid.
-
-Update dev_set_netns to use netns_get_fd instead of open coding
-use of NETNS_RUN_DIR. If netns_get_fd fails, try netns_get_fd_pid.
-
 Signed-off-by: David Ahern <dahern@nvidia.com>
 ---
- rdma/dev.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ man/man8/rdma-dev.8 | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/rdma/dev.c b/rdma/dev.c
-index fd60c1a0..f9b782eb 100644
---- a/rdma/dev.c
-+++ b/rdma/dev.c
-@@ -6,6 +6,7 @@
+diff --git a/man/man8/rdma-dev.8 b/man/man8/rdma-dev.8
+index abc9f405..9ddad2dd 100644
+--- a/man/man8/rdma-dev.8
++++ b/man/man8/rdma-dev.8
+@@ -32,7 +32,7 @@ rdma-dev \- RDMA device configuration
+ .B rdma dev set
+ .RI "[ " DEV " ]"
+ .BR netns
+-.BR NSNAME
++.BR { NSNAME | PID }
  
- #include <fcntl.h>
- #include "rdma.h"
-+#include "namespace.h"
- 
- static int dev_help(struct rd *rd)
- {
-@@ -13,7 +14,7 @@ static int dev_help(struct rd *rd)
- 	pr_out("       %s dev add DEVNAME type TYPE parent PARENT_DEVNAME\n", rd->filename);
- 	pr_out("       %s dev delete DEVNAME\n", rd->filename);
- 	pr_out("       %s dev set [DEV] name DEVNAME\n", rd->filename);
--	pr_out("       %s dev set [DEV] netns NSNAME\n", rd->filename);
-+	pr_out("       %s dev set [DEV] netns { NSNAME | PID }\n", rd->filename);
- 	pr_out("       %s dev set [DEV] adaptive-moderation [on|off]\n", rd->filename);
- 	return 0;
- }
-@@ -311,9 +312,9 @@ static int dev_set_name(struct rd *rd)
- 
- static int dev_set_netns(struct rd *rd)
- {
--	char *netns_path;
-+	char *arg = rd_argv(rd);
-+	int netns, pid;
- 	uint32_t seq;
--	int netns;
- 	int ret;
- 
- 	if (rd_no_arg(rd)) {
-@@ -321,10 +322,11 @@ static int dev_set_netns(struct rd *rd)
- 		return -EINVAL;
- 	}
- 
--	if (asprintf(&netns_path, "%s/%s", NETNS_RUN_DIR, rd_argv(rd)) < 0)
--		return -ENOMEM;
-+	/* try by name then by pid */
-+	netns = netns_get_fd(arg);
-+	if (netns < 0)
-+		netns = netns_get_fd_pid(arg);
- 
--	netns = open(netns_path, O_RDONLY | O_CLOEXEC);
- 	if (netns < 0) {
- 		fprintf(stderr, "Cannot open network namespace \"%s\": %s\n",
- 			rd_argv(rd), strerror(errno));
-@@ -339,7 +341,6 @@ static int dev_set_netns(struct rd *rd)
- 	ret = rd_sendrecv_msg(rd, seq);
- 	close(netns);
- done:
--	free(netns_path);
- 	return ret;
- }
- 
+ .ti -8
+ .B rdma dev set
+@@ -104,6 +104,7 @@ Renames the mlx5_3 device to rdma_0.
+ .RE
+ .PP
+ rdma dev set mlx5_3 netns foo
++rdma dev set mlx5_3 netns 1234
+ .RS 4
+ Changes the network namespace of RDMA device to foo where foo was
+ previously created using the iproute2 ip command.
 -- 
 2.50.1 (Apple Git-155)
 
