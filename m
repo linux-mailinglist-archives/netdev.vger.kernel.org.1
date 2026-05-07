@@ -1,172 +1,213 @@
-Return-Path: <netdev+bounces-285327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285328-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uAmOGbyQ/Gn3RQAAu9opvQ
-	(envelope-from <netdev+bounces-285327-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 15:16:44 +0200
+	id IElVLR6S/Gn3RQAAu9opvQ
+	(envelope-from <netdev+bounces-285328-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 15:22:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0CFD4E9133
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 15:16:43 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35CE14E92B8
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 15:22:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 94AFD300130F
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 13:16:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9F1F1305899B
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 13:19:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652B23F1660;
-	Thu,  7 May 2026 13:16:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06CD83EE1E2;
+	Thu,  7 May 2026 13:19:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LR3/57vo"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b="jhrE80Ck"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 785B13F54B4
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 13:16:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64A3C3EF0C6
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 13:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778159801; cv=none; b=IGzE67xRAADvfkvhOoCRgG5wLrMUhkbQy/nPI/Ue5+4UofbW9M7QXjh3ZFQkuOrNhsmEdllEbiikVZ4v/zPkYhClkc24L95JWhNc2YsqXw/eHy+jeg/eJ9esW3V3alVaB0x7XN5na4OiI7KZHLJPTeMn281q5HtyWeC0SLCh0Y8=
+	t=1778159946; cv=none; b=Frji+OnPKShoRhIvrJUxgWf4ChjW8EQGsAbSxJQgW9a8bU/QqX77R6hWhcKHgdNJF0BMTzFNuqbkHUpLvH7A5j80B4aL9Vhp0YmF0B+LL7hkzJRv8xcvYUhxRS4cSzmIE2HCbB/nHLq4MCZ3waALgG+64skYwMNCABfzTRxICaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778159801; c=relaxed/simple;
-	bh=e2NO9S2CUv0l/kJNqVzdSn/oCiFZneGT+/6/s5hgRZ4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X/vJQVVH4Q/Na9TBnxAAmu63E7dZiAQ8jE1WGRyFKUcziAlfg3xve7vjMP5nOeIYCS+wevIJgxuSAhMbYSkJ+CMxnoqUmPKQGB06Wk/T1fWpIoJTzVkPOOkxb8p1h3Thy1pQW7RRrsFzRYySf7+4yDiDzK9d0AEw0XTDE2FouYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LR3/57vo; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id E5BD64E42C2E;
-	Thu,  7 May 2026 13:16:37 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id A976160495;
-	Thu,  7 May 2026 13:16:37 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8CAC9108193CD;
-	Thu,  7 May 2026 15:16:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1778159797; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=XODxyG0t34liTUxM6lR0h9aJjLL9z8JcMy1OM1KkZ8M=;
-	b=LR3/57vo3wtfAcr5IQ61vpLoU4u/Tr0bWWTZEBy2a0gmvY9PSTfClfGLTLXYlXJY/L9z/S
-	sfD5EImCF/jCxOvEYKFXkLP4UsEJg8ijSQMCOH4ZxIZiE4xCiyF2A42soz5S9KPkxq+fdo
-	gn4gH6Pv9lrKk+ABxBmTnHWDZdRcseRea1RvavSqZh+tUYwrPYCgQPaEr/4GzphrKtN7H5
-	0vlap56tEL0lSiRKnHmcKQrFhd/HKdNSJEDbzLq1YXLZAgRi7eoBKYk26xprMudzXdmjzH
-	UyD9JDMaiORq5GMtyGYcI9So3T5aHBnOfeXHGyBQtO6dtbJowT0a3UaYwpbnTg==
-Message-ID: <a43833c5-797e-4487-87c5-a489e12e730b@bootlin.com>
-Date: Thu, 7 May 2026 15:16:33 +0200
+	s=arc-20240116; t=1778159946; c=relaxed/simple;
+	bh=O2Ko6MMDPswq+2WaGJcwYPfRmAJ4xzGSNytJFy3ZRYE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Oo4OTvydzdTtAeVo1fV1ownCVmX+x+G35CgeKheUxBEKlE+IetigO6G5upVtGIMVhvi8y4zCnvpQQkoaSvDfIX8HHfcImTO3n6vjXzEp8hTSqI9z3hlDElSb7ac3iYeDy6D2xVaXR/5BTylFbQEto7e9IGgcL5ieVPLtuMzOgk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn; spf=pass smtp.mailfrom=std.uestc.edu.cn; dkim=fail (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b=jhrE80Ck reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=std.uestc.edu.cn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=std.uestc.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:Date:
+	Message-ID:MIME-Version:Content-Transfer-Encoding; bh=IWxnW7r6EJ
+	ztc7KWkI3CWk9w5pZdQa0xURcl43HTPuY=; b=jhrE80CkWZocdcKomi91Sgp7cp
+	9IUmpuOSjmewJt3oCtRuPKtfme/r4d+PqZZtfKSUMG9pFITjSUbFPQMPITZ014Ls
+	ueRcp6NTNZw9JspG4h+Mw0S9N7H6Ianm+rmqx6uhCOfRJIIhaHFWpQbmwZeizPSq
+	HSVlq8C9bYJ7sLVIA=
+Received: from hotaru.tailb307d0.ts.net (unknown [58.19.27.109])
+	by hzbj-edu-front-4.icoremail.net (Coremail) with SMTP id BrQMCkBW+bQokfxpvpbzAQ--.4741S2;
+	Thu, 07 May 2026 21:18:33 +0800 (CST)
+From: Quan Sun <2022090917019@std.uestc.edu.cn>
+To: netdev@vger.kernel.org,
+	maxime.chevallier@bootlin.com,
+	andrew@lunn.ch
+Cc: kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Quan Sun <2022090917019@std.uestc.edu.cn>
+Subject: [PATCH net v2] net: ethtool: fix NULL pointer dereference in phy_reply_size
+Date: Thu,  7 May 2026 21:17:38 +0800
+Message-ID: <20260507131738.1173835-1-2022090917019@std.uestc.edu.cn>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION] stmmac: Random DMA reset failure on RK3399 since
- v6.18
-To: Jensen Huang <jensenhuang@friendlyarm.com>,
- Thorsten Leemhuis <regressions@leemhuis.info>
-Cc: Russell King <linux@armlinux.org.uk>,
- Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- regressions@lists.linux.dev, netdev@vger.kernel.org,
- LKML <linux-kernel@vger.kernel.org>
-References: <CAMpZ1qEwNOqR-KQD4kEqd93aB-TpHnG6WdQc2tXUF0aXMmw_SA@mail.gmail.com>
- <198e2ce4-07e1-46c0-818d-1eb18645aca0@leemhuis.info>
- <CAMpZ1qGEOiPj7cApnWJnojSyEpDmXfco=No5n1VfyTCoNyCyFQ@mail.gmail.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <CAMpZ1qGEOiPj7cApnWJnojSyEpDmXfco=No5n1VfyTCoNyCyFQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: A0CFD4E9133
+X-CM-TRANSID:BrQMCkBW+bQokfxpvpbzAQ--.4741S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxCrW5Zw1UKr43Ar1kJw4DXFb_yoW5ZrWkpa
+	yUGaySqrWxJwnrJrsxJw45CryYvF4fCa45t3y2k3yfAr13WrWFqFWUKF18t34F9rykXF43
+	XF4rJa90gwnrCFUanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
+	0_GcWlnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
+	648v4I1lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
+	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
+	1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
+	AIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
+	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxh
+	VjvjDU0xZFpf9x0JUvg4fUUUUU=
+X-CM-SenderInfo: asqsjiyzqzilqqrzq21wgo3vxvwfhvlgxou0/
+X-Rspamd-Queue-Id: 35CE14E92B8
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+X-Spamd-Result: default: False [6.34 / 15.00];
+	SEM_URIBL(3.50)[uestc.edu.cn:email];
+	DMARC_POLICY_QUARANTINE(1.50)[uestc.edu.cn : SPF not aligned (relaxed),quarantine];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,gmail.com,lunn.ch,lists.linux.dev,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-285327-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285328-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	GREYLIST(0.00)[pass,meta];
+	R_DKIM_PERMFAIL(0.00)[std.uestc.edu.cn:s=dkim];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[std.uestc.edu.cn:~];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_SPAM(0.00)[0.992];
+	R_SPF_ALLOW(0.00)[+ip4:172.105.105.114:c];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,bootlin.com:mid,bootlin.com:dkim,leemhuis.info:email]
-X-Rspamd-Action: no action
+	RCPT_COUNT_SEVEN(0.00)[7];
+	PRECEDENCE_BULK(0.00)[];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[2022090917019@std.uestc.edu.cn,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Action: add header
+X-Spam: Yes
 
-Hi,
+In phy_prepare_data(), several strings such as 'name', 'drvname',
+'upstream_sfp_name', and 'downstream_sfp_name' are allocated using
+kstrdup(). However, these allocations were not checked  for failure.
 
-On 07/05/2026 14:49, Jensen Huang wrote:
-> On Tue, May 5, 2026 at 4:26 PM Thorsten Leemhuis
-> <regressions@leemhuis.info> wrote:
->>
->> [Jumping in here, as there are no replies yet]
->>
->> BTW, Russel, just in case you missed this: looks like this regressions
->> caused by a change of yours.
+If kstrdup() fails for 'name', it returns NULL while the function
+continues. This leads to a kernel NULL pointer dereference and panic
+later in phy_reply_size() when it unconditionally calls strlen() on
+the NULL pointer.
 
-I think Russell is dealing with unpleasant personal stuff, let's see if we
-can figure this out while he's away.
+While other strings like 'upstream_sfp_name' might be checked before
+access in certain code paths, failing to handle these allocations
+consistently can lead to incomplete data reporting or hidden bugs.
 
->>
->> On 4/29/26 14:53, Jensen Huang wrote:
->>>
->>> I'm reporting a regression on RK3399 (stmmac) observed in v6.18.24.
->>> When a network cable is connected during boot, the DMA reset
->>> occasionally fails with the error message: "Failed to reset the dma".
->>>
->>> This appears to be a timing issue related to the EEE RX clock-stop
->>> logic. Based on my investigation with the RTL8211E PHY, I monitored
->>> the PHY register PS1R (MMD device 3, address 0x01) and observed a
->>> value of 0x0f40. This indicates that the PHY is in LPI mode and the RX
->>> clock may have already stopped.
+Fix this by adding proper NULL checks for all kstrdup() calls in
+phy_prepare_data() and implement a centralized error handling path
+using goto labels to ensure all previously allocated resources are
+freed on failure.
 
-From what I get, your current hypthesis is that it takes a while for that
-clock to stabilize and therefore we're accessing the DMA registers too soon ?
+Fixes: 9dd2ad5e92b9 ("net: ethtool: phy: Convert the PHY_GET command to generic phy dump")
+Signed-off-by: Quan Sun <2022090917019@std.uestc.edu.cn>
+---
+Changes in v2:
+- Add Fixes: tag.
+- Expand the fix to cover all kstrdup() allocations in the function.
+- Use goto labels for a cleaner and more robust error handling path.
+---
+ net/ethtool/phy.c | 32 ++++++++++++++++++++++++++++++--
+ 1 file changed, 30 insertions(+), 2 deletions(-)
 
-Can you confirm that with the addition of a small delay ?
-
->>>
->>> While commit dd557266cf5f ("net: stmmac: block PHY RXC clock-stop")
->>
->> Just wondering: have you tried if mainline (e.g. 7.1-rc1) is still
->> affected? This is something that is always a good advisable (some people
->> would call it required). In this case even more, as it since a while
->> contains a fix for the change you mentioned, that wasn't backported:
->> c171e679ee66d7 ("net: stmmac: Disable EEE RX clock stop when VLAN is
->> enabled"). But this is not my area of expertise (and in different area
->> of the code), so that fix might be unrelated to your issue.
-> 
-> Thanks for the pointer.
-> As you suggested, I have tested the mainline and confirmed that the
-> issue is not present in v7.1-rc2, nor as early as v6.19-rc1. However,
-> I verified that the issue persists in the latest stable v6.18.26.
-> I performed a git bisect and the result pointed exactly to the commit
-> you mentioned: c171e679ee66d7 ("net: stmmac: Disable EEE RX clock stop
-> when VLAN is enabled").
-
-Do you mean that c171e679ee66d7 ("net: stmmac: Disable EEE RX clock stop
-when VLAN is enabled") introduces the bug on 6.18.26 ?
-
-do you have the possibility of bisecting to verify when exactly the issue
-was solved between v6.18 and v6.19 ?
-
-Maxime
-
+diff --git a/net/ethtool/phy.c b/net/ethtool/phy.c
+index d4e6887055ab1..f76d94d848d6d 100644
+--- a/net/ethtool/phy.c
++++ b/net/ethtool/phy.c
+@@ -76,6 +76,7 @@ static int phy_prepare_data(const struct ethnl_req_info *req_info,
+ 	struct nlattr **tb = info->attrs;
+ 	struct phy_device_node *pdn;
+ 	struct phy_device *phydev;
++	int ret;
+ 
+ 	/* RTNL is held by the caller */
+ 	phydev = ethnl_req_get_phydev(req_info, tb, ETHTOOL_A_PHY_HEADER,
+@@ -88,8 +89,17 @@ static int phy_prepare_data(const struct ethnl_req_info *req_info,
+ 		return -EOPNOTSUPP;
+ 
+ 	rep_data->phyindex = phydev->phyindex;
++
+ 	rep_data->name = kstrdup(dev_name(&phydev->mdio.dev), GFP_KERNEL);
++	if (!rep_data->name)
++		return -ENOMEM;
++
+ 	rep_data->drvname = kstrdup(phydev->drv->name, GFP_KERNEL);
++	if (!rep_data->drvname) {
++		ret = -ENOMEM;
++		goto err_free_name;
++	}
++
+ 	rep_data->upstream_type = pdn->upstream_type;
+ 
+ 	if (pdn->upstream_type == PHY_UPSTREAM_PHY) {
+@@ -97,15 +107,33 @@ static int phy_prepare_data(const struct ethnl_req_info *req_info,
+ 		rep_data->upstream_index = upstream->phyindex;
+ 	}
+ 
+-	if (pdn->parent_sfp_bus)
++	if (pdn->parent_sfp_bus) {
+ 		rep_data->upstream_sfp_name = kstrdup(sfp_get_name(pdn->parent_sfp_bus),
+ 						      GFP_KERNEL);
++		if (!rep_data->upstream_sfp_name) {
++			ret = -ENOMEM;
++			goto err_free_drvname;
++		}
++	}
+ 
+-	if (phydev->sfp_bus)
++	if (phydev->sfp_bus) {
+ 		rep_data->downstream_sfp_name = kstrdup(sfp_get_name(phydev->sfp_bus),
+ 							GFP_KERNEL);
++		if (!rep_data->downstream_sfp_name) {
++			ret = -ENOMEM;
++			goto err_free_upstream_sfp;
++		}
++	}
+ 
+ 	return 0;
++
++err_free_upstream_sfp:
++	kfree(rep_data->upstream_sfp_name);
++err_free_drvname:
++	kfree(rep_data->drvname);
++err_free_name:
++	kfree(rep_data->name);
++	return ret;
+ }
+ 
+ static int phy_fill_reply(struct sk_buff *skb,
+-- 
+2.43.0
 
 
