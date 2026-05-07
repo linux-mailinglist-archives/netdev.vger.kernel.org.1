@@ -1,130 +1,209 @@
-Return-Path: <netdev+bounces-285284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285286-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cMzwDnt7/GllQgAAu9opvQ
-	(envelope-from <netdev+bounces-285284-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:46:03 +0200
+	id +MWIJzJ8/Gl0QgAAu9opvQ
+	(envelope-from <netdev+bounces-285286-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:49:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 620164E7AD1
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:46:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0E6B4E7B9E
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:49:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9A1A8300F9C5
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 11:45:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EAEAD303A263
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 11:47:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0934311959;
-	Thu,  7 May 2026 11:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BFDB37189B;
+	Thu,  7 May 2026 11:47:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AxDvMBSR"
 X-Original-To: netdev@vger.kernel.org
-Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5D983D812C;
-	Thu,  7 May 2026 11:45:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.133.224.34
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39ED1391E4B
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 11:47:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778154327; cv=none; b=t2aXhxx1h9trNdniZdeZgDnLch7rNp87T3Qd+b76Un8BT/KWEd1WPE22cTAKzvIyeugzCd3Gm3l8wNjRzDEVOrbGkTCSZhGvV46PE7CPCJfIUqeQQ6qgwqk5QU+f8BpNgoQN4ggEkzP//tJtKCJp/7S4voiAfGF581letJzwyOs=
+	t=1778154422; cv=none; b=a2D55cFoapPkd7VCXihvdPgClrm7gJpdY28tHT8OfCFBiNXMl/TPt1ZKv6KgHGSxN1VnjUhy7ojJy4NMk5ivbEvtt3Xi35jZ7QQCq99SFkhaB/LA+MlzACvW2FllYayctfDcvarHpKq6y3dz9bXUzEGEGsUZqjjdS1PLAWdkN4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778154327; c=relaxed/simple;
-	bh=y88ANMEB1Rz96O0OTRK0xxZCVFv7ypteibGlSq5EQks=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=brPyksKMI4bY2cU9XOxg+f37JW0U5BFBBwZGR9hUI6CEYcgdjcvq7PAQClPKfOdraV1KoEJ7HJcPf8xsts0WpJ2pwQ5Zmpca6ibjArgjri/Wmu61WIh5p9OvDugG4HWZFIp+TlJsd17tpXj8LNMp54kMPlcBRY8ZjzIVDJIvXNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=orcam.me.uk
-Received: by angie.orcam.me.uk (Postfix, from userid 500)
-	id 4E42692009C; Thu,  7 May 2026 13:45:22 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by angie.orcam.me.uk (Postfix) with ESMTP id 4B0C192009B;
-	Thu,  7 May 2026 12:45:22 +0100 (BST)
-Date: Thu, 7 May 2026 12:45:22 +0100 (BST)
-From: "Maciej W. Rozycki" <macro@orcam.me.uk>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-cc: netdev@vger.kernel.org, linux-mips@vger.kernel.org, 
-    Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2] declance: Remove IRQF_ONESHOT
-In-Reply-To: <20260507073427.atoJ5zsY@linutronix.de>
-Message-ID: <alpine.DEB.2.21.2605071211350.46195@angie.orcam.me.uk>
-References: <20260127165430.7ui_LGkg@linutronix.de> <alpine.DEB.2.21.2601271739250.40317@angie.orcam.me.uk> <alpine.DEB.2.21.2603292037020.60268@angie.orcam.me.uk> <alpine.DEB.2.21.2605042332070.46195@angie.orcam.me.uk> <20260505072954.Ov2t-FGt@linutronix.de>
- <alpine.DEB.2.21.2605051233210.46195@angie.orcam.me.uk> <20260505123203.jifiaxEL@linutronix.de> <alpine.DEB.2.21.2605051410280.46195@angie.orcam.me.uk> <20260505152450.1KYVS2pr@linutronix.de> <alpine.DEB.2.21.2605060040230.46195@angie.orcam.me.uk>
- <20260507073427.atoJ5zsY@linutronix.de>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+	s=arc-20240116; t=1778154422; c=relaxed/simple;
+	bh=h3EAL/S01YS8fybSqcWD1qgy/RTvjx3UPUp6EuoYrGg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KirtJG4UTFFoczD6DtsN2CsMirSk7qRC+QarYnilCRzn6Jxy2LAJK45HB13iGWeBzFjJBrvNWG6tYtvsMPyAsAeVMwsufjNkRqpUCjMSaamBZe7EYqHxLRnMOabLXNi48tYhphnkWJ1Ra33JStuL2UZ1VK0e3MRU8uBBSY1UFXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AxDvMBSR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8E2FC2BCC7;
+	Thu,  7 May 2026 11:47:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778154421;
+	bh=h3EAL/S01YS8fybSqcWD1qgy/RTvjx3UPUp6EuoYrGg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=AxDvMBSR+KTVU1wY7BS+di8mIKjFNZru+csLiT0ysg0yGADHxFtdeA7CuPOmKoLLo
+	 6fXBWGJKD4IpvUZWC8WWNamvfglBJG27bdFHeng9mLttN2ESB5nvTWdtwihqJIYH+P
+	 xyRRNc0hmAysyI8Jy75wPwKVZqBAn67IPGQyDlBic1a4Q1cVbxPJK9Lw4Ktnu0uSCG
+	 9BgSEaZ7XcFy2ku0TIUU5kqTD4eHO06nb8z9EOMagvsgqG7dP0Er2deoOgHxBV3mxL
+	 BG/bCxf5osAiRtzWJaaiysuMGSXN0H2P4ZvjCmtSKTheLJYJJdJ4m6QPgv8Gp1vG9G
+	 guUCimo/JV6EA==
+From: Simon Horman <horms@kernel.org>
+To: aleksandr.loktionov@intel.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next v2 5/5] ice: use element-by-element comparison for DCB config changes
+Date: Thu,  7 May 2026 12:46:54 +0100
+Message-ID: <20260507114654.916528-1-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260504142451.4161845-6-aleksandr.loktionov@intel.com>
+References: <20260504142451.4161845-6-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-Rspamd-Queue-Id: 620164E7AD1
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: F0E6B4E7B9E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	CTE_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285284-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[orcam.me.uk];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[macro@orcam.me.uk,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-285286-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.948];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	R_DKIM_NA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,angie.orcam.me.uk:mid]
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Thu, 7 May 2026, Sebastian Andrzej Siewior wrote:
+From: 'Simon Horman' <horms@kernel.org>
 
-> >  The interrupt is exceedingly rare, I've only seen it actually fire maybe 
-> > a dozen times across all my systems in 25+ years.  It happens when there 
-> > is a memory read error on DMA, such as an uncorrected ECC or parity error 
-> > (depending on the system variant), or a bus timeout.
-> 
-> I assumed you have other interrupts on that hw, cascaded/ operating the
-> same way. But otherwise…
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+Subject: ice: use element-by-element comparison for DCB config changes
 
- Hardware does have such stuff, but we don't make use of any other sources 
-right now.
+This commit replaces the use of memcmp() for DCB configurations with an
+element-by-element comparison using ice_dcb_need_recfg(). It exports this
+function and applies it to the SW DCB netlink setters to prevent issues
+with uninitialized padding bytes.
 
- We don't use DMA with the SCC serial ports -- I've had plans to wire that 
-even for asynchronous operation, because with the 3-entry only input FIFO 
-it's quite easy for characters to get lost at higher baud rates; we have 
-no driver support for the synchronous modes with these systems although 
-hardware has all the necessary circuitry and external port connections.
+> diff --git a/drivers/net/ethernet/intel/ice/ice_dcb_nl.c b/drivers/net/ethernet/intel/ice/ice_dcb_nl.c
+> index a10c1c8d86977..13a52c1a4da3e 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_dcb_nl.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_dcb_nl.c
+> @@ -108,11 +108,17 @@ static int ice_dcbnl_setets(struct net_device *netdev, struct ieee_ets *ets)
+>  	if (!bwrec)
+>  		new_cfg->etsrec.tcbwtable[0] = 100;
+>  
+> +	if (!ice_dcb_need_recfg(pf, &pf->hw.port_info->qos_cfg.local_dcbx_cfg,
+> +				new_cfg)) {
+> +		err = ICE_DCB_NO_HW_CHG;
+> +		goto ets_out;
+> +	}
 
- And the driver for the ESP SCSI interface was sadly lost in a conversion 
-many years ago when I got stuck due to a peculiarity with the hardware and 
-never completed it, which is a shame, but there you go -- I still hope to 
-do that one day, and that I consider much higher priority than DMA for the 
-SCC.
+Does ice_dcb_need_recfg() correctly detect bandwidth changes?
 
- Another system model, the Personal DECstation, also has ISDN and sound 
-interfaces wired for DMA, but no driver was ever written/ported for either 
-and no one running Linux seems to have a specimen available anymore.  I 
-think NetBSD guys have full support for that system.
+Looking at the implementation of ice_dcb_need_recfg(), it only logs a debug
+message but doesn't set need_reconfig to true when only the ETS Bandwidth
+Table or TSA Table changes:
 
- So yeah, right now it's only LANCE that makes use of any of the DMA IRQs, 
-and it's actually the least complext arrangement of all the devices: LANCE 
-makes use of 1 DMA IRQ, ESP makes use of 3 and the SCC ports make use of 4 
-each.  Each has one IRQ dedicated to memory read errors, and ESP and SCC 
-also have one each for overrun errors.  The remaining IRQs are for regular 
-DMA operation, i.e. buffer flipping, which LANCE does not do as it makes 
-use of the usual DMA descriptor ring arrangement instead.
+drivers/net/ethernet/intel/ice/ice_dcb_lib.c:ice_dcb_need_recfg() {
+    ...
+    if (memcmp(&new_cfg->etscfg.tcbwtable,
+               &old_cfg->etscfg.tcbwtable,
+               sizeof(new_cfg->etscfg.tcbwtable)))
+        dev_dbg(dev, "ETS TC BW Table changed.\n");
+    ...
+}
 
-  Maciej
+Since the function returns false, will this cause ice_dcbnl_setets() to
+abort early and silently drop user-requested bandwidth modifications?
+
+Also, since new_cfg points to the shared desired_dcbx_cfg state, does this
+early return leave uncommitted modifications in the software state?
+
+If a subsequent unrelated operation (like setting PFC) correctly returns
+true from ice_dcb_need_recfg(), it appears it could unintentionally push
+these abandoned ETS bandwidth changes to the hardware.
+
+>  	err = ice_pf_dcb_cfg(pf, new_cfg, true);
+>  	/* return of zero indicates new cfg applied */
+> -	if (err == ICE_DCB_HW_CHG_RST)
+> +	if (!err)
+>  		ice_dcbnl_devreset(netdev);
+
+This isn't a bug introduced by this patch, but can ice_dcbnl_devreset()
+cause a deadlock against hardware reset tasks?
+
+The ice_dcbnl_devreset() function spins in a usleep_range() loop while
+ice_is_reset_in_progress() is true.
+
+Since DCBNL callbacks like ice_dcbnl_setets() run with the global
+rtnl_lock held, and a concurrent hardware or PCIe reset worker likely
+requires rtnl_lock to complete the reset, will the reset task block
+forever while this thread waits for it?
+
+> -	if (err == ICE_DCB_NO_HW_CHG)
+> +	else if (err == ICE_DCB_NO_HW_CHG)
+>  		err = ICE_DCB_HW_CHG_RST;
+>  
+>  ets_out:
+
+Does this change cause the function to return a positive error code to
+userspace when applying an identical configuration?
+
+By bypassing the translation from ICE_DCB_NO_HW_CHG (which is 1) to
+ICE_DCB_HW_CHG_RST (which evaluates to 0) in the early goto added
+above, err remains 1 at the ets_out label.
+
+The DCBNL core evaluates any non-zero return value as an error:
+
+net/dcb/dcbnl.c:dcbnl_ieee_set() {
+    ...
+    err = netdev->dcbnl_ops->ieee_setets(netdev, ets);
+    if (err)
+        goto err;
+    ...
+}
+
+Will this cause tools like lldptool to fail when configuring an
+existing setup?
+
+[ ... ]
+
+> @@ -845,6 +858,12 @@ static int ice_dcbnl_setapp(struct net_device *netdev, struct dcb_app *app)
+>  	new_cfg->dscp_map[app->protocol] = app->priority;
+>  	new_cfg->app[new_cfg->numapps++] = new_app;
+
+This isn't a bug introduced by this patch, but does this array append
+lack bounds checking against ICE_DCBX_MAX_APPS?
+
+The app array has a capacity of 64. The function restricts duplicate
+DSCP protocols using the dscp_mapped bitmap, but since DSCP_MAX is also
+64, a user could map all 64 unique values.
+
+If numapps starts greater than 0 due to existing EtherType applications,
+adding 64 valid DSCP mappings would cause numapps to exceed 64, leading
+to an out-of-bounds write that overwrites the adjacent dscp_mapped
+bitmap.
 
