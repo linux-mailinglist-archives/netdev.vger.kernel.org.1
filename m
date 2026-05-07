@@ -1,115 +1,184 @@
-Return-Path: <netdev+bounces-285424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285425-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MDqPEG28/GnSTAAAu9opvQ
-	(envelope-from <netdev+bounces-285424-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:23:09 +0200
+	id CDebG2u7/Gl2TAAAu9opvQ
+	(envelope-from <netdev+bounces-285425-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:18:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 452EF4EC20B
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:23:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3CBD4EC121
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:18:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4C83F30B73E6
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 16:09:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5C49F30D434A
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 16:09:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11C6A3EF64A;
-	Thu,  7 May 2026 16:08:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9A394508E5;
+	Thu,  7 May 2026 16:08:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZXrsRXuK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fTEeTm4r"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B42283FCE;
-	Thu,  7 May 2026 16:08:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859B73B38A4;
+	Thu,  7 May 2026 16:08:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778170092; cv=none; b=g1S5zNINkDESHSfJi/iPaAZIJ7plKtPHhZ/sc5mpTM1cr2isuSDLFY5H+oCR9dvi4PRabK8r6erD2bGLi5bmcmgk2OovugapIULk10Ib6vflWi5cQ3Xy6kz8QP9QDp9a8jlgLX9JLCUQxu3AHJMkwsKP+NApbgIHjgXhExVmKHo=
+	t=1778170118; cv=none; b=fDoq7SZCvl+fYSNz/9Ahjcq+tlwbhfgZAAvUrTdyVYQIObK0RONZS5Tgy/eWXwbMVTiJFU5WOlSryqgUWmBnkI0tjKT0HXlCUGZ9G+Zy9d3SqKH/2eYRQgpMgsT1337HfUbDKLmZBkBac8mBGjNP/XPBbWBMLl7jtGmvJtwECYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778170092; c=relaxed/simple;
-	bh=rdy5PtRz/HkDIo5L6Ua+6U739iTp3/ZnRsbhHuHjN8M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BlUaBzsvsuOTHNvnpXQ9dJ5XW5zT5RJrYmnkf0PVJliclVw8iPII0iz5gpA6bOASwizC3ECkwzA1kJMw5frh1Bxx/lCoFdPjSwKFaKrh9+NdiMPRdyVfcUrLnOsKyoiHgpr1mJ8zj4VmnLUUtW8gxnm3Xf3I2IjlX45kN9J++uU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZXrsRXuK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 032ABC2BCB2;
-	Thu,  7 May 2026 16:08:10 +0000 (UTC)
+	s=arc-20240116; t=1778170118; c=relaxed/simple;
+	bh=RY3ZhrJkHje4r1jufnaEPJRII5OPlMz9wlkUozkjHvs=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=ZQD723zpGQ2mNhWamJsTeJqzop4FiIm82QvwrIP3k9qqsXBC1jHRTWbPofdUQQr2fWgNR1WbOxKPMhVGVXkJd1j1Z0wNtLh+eqra0U9iDDfHy80AbPjTUNhNhepClELGKMXQFu+YNBJePrl7cKAmsyF3+COXBiovt7fFApFmb1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fTEeTm4r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86B49C2BCC9;
+	Thu,  7 May 2026 16:08:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778170091;
-	bh=rdy5PtRz/HkDIo5L6Ua+6U739iTp3/ZnRsbhHuHjN8M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZXrsRXuKTrmWAAJUa/ZIgyYSyMYUwzsrAWEGTT9WgtinnjihNNt5J1INMOcC5Tlem
-	 8gOuJNJ7PQHkv0Srns0u6bacUCy6qOnXpPznj6aJvQ2HiBEM7xB82cIFNkKOlVKLG0
-	 QXSaW964r2JHVTGrZROhhEviR+vhEMrhsQbC2CxSj43S8k9zj6APVJK2K2qAoG3nsI
-	 kROWk7pxQXJ/t8LyEWDRCsK5mKEmVRfytDKhjmLKOH1PBe9LkiM1Wo8dsiRhKEmxHS
-	 Qx3cK4tJQHi8yFgf/j2nr7C9nJoQVpdoA4BpMuSpkYH77ZeG+Q44AijNGPS1kacAt1
-	 rR2rJz7j26lWw==
-Date: Thu, 7 May 2026 09:08:10 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Machon <daniel.machon@microchip.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Steen Hegelund <Steen.Hegelund@microchip.com>,
- <UNGLinuxDriver@microchip.com>, "Sebastian Andrzej Siewior"
- <bigeasy@linutronix.de>, Clark Williams <clrkwllms@kernel.org>, Steven
- Rostedt <rostedt@goodmis.org>, Bjarni Jonasson
- <bjarni.jonasson@microchip.com>, Lars Povlsen <lars.povlsen@microchip.com>,
- Philipp Zabel <p.zabel@pengutronix.de>, <kees@kernel.org>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>, <linux-rt-devel@lists.linux.dev>
-Subject: Re: [PATCH net v2 1/4] net: sparx5: defer VCAP debugfs creation
- until after netdev registration
-Message-ID: <20260507090810.53e66ef6@kernel.org>
-In-Reply-To: <20260506-misc-fixes-sparx5-lan969x-v2-1-fb236aa96908@microchip.com>
-References: <20260506-misc-fixes-sparx5-lan969x-v2-0-fb236aa96908@microchip.com>
-	<20260506-misc-fixes-sparx5-lan969x-v2-1-fb236aa96908@microchip.com>
+	s=k20201202; t=1778170118;
+	bh=RY3ZhrJkHje4r1jufnaEPJRII5OPlMz9wlkUozkjHvs=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=fTEeTm4rpKFCG9FTUGob3ijEpxLuoDpyd1b9sNaBqW1o6F3HroHYw/FFlknHL02As
+	 hLrzx/Lj5WxqV/ip6kOeGso9w/Sk00mlyApkLEr1SdEP089DgRhbsLeDKgJCdjfrBw
+	 +jNIFupmthUGDLRmOXjLy4Bt85bm/2nlRBZWhDAVzeLgI0OUXBkxtgjomQW1S6dp2g
+	 FJUw3nkZQDWXqK12onkhnJFLfImgcqaGeyGqJjZ0QUR1Ty00HRHttO1ej2QOFbbCBp
+	 3WRyHymmJ8dAVpilFmUDc8L0Xfv90vgdnC5OIiTTz9oinKXpHgckwKAqeQ8TFfq04T
+	 2xx9HRlOJeWWg==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 97A6BF4006B;
+	Thu,  7 May 2026 12:08:36 -0400 (EDT)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Thu, 07 May 2026 12:08:36 -0400
+X-ME-Sender: <xms:BLn8af-LYH9Iff5iFRbrdGDSksCah1ZBv_EXgZ-Is2l2k7VN7msIWw>
+    <xme:BLn8aWiJhQa78EEMhGsU-1NqyZLnjtEnMl2Ew7nKg8hv3Y77WrEnJHU_hwrpLcm9M
+    ebxJG7cDgf0hTtWADhuCeWd9ZSUhSBBOaZDOAwHtLkMIs_glwvGLYg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddutdejleduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdejnecuhfhrohhmpedfvehhuhgt
+    khcunfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
+    hnpeegheduieeiveevheelheelueeghffhtddtheelhfdutddtheeileetkeelvedtjeen
+    ucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomheptghhuhgtkhhlvghvvghrodhmvghsmhhtphgruhht
+    hhhpvghrshhonhgrlhhithihqdduieefgeelleelheelqdefvdelkeeggedvfedqtggvlh
+    eppehkvghrnhgvlhdrohhrghesfhgrshhtmhgrihhlrdgtohhmpdhnsggprhgtphhtthho
+    pedvvddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepnhgvihhlsegsrhhofihnrd
+    hnrghmvgdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghp
+    thhtohepjhhirghnghhshhgrnhhlrghisehgmhgrihhlrdgtohhmpdhrtghpthhtohepvg
+    guuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopegrnhhnrgeskhgvrhhn
+    vghlrdhorhhgpdhrtghpthhtohepfhhrvgguvghrihgtsehkvghrnhgvlhdrohhrghdprh
+    gtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehjlhgrhiht
+    ohhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorh
+    hg
+X-ME-Proxy: <xmx:BLn8aUsnDqb65XljD9YpArGILeP1n53qoFoIIQ7Jsi7uQgRMoHUM8A>
+    <xmx:BLn8aR7k5MlUwPuYnCi8PCL2VnYG6-7HEzG_4WHdaWWF9J9fGPuyKQ>
+    <xmx:BLn8aVNYzr8RfPSS6Uhj4IiZbgQlnFr_KgI5IuLLtUkXBM8MF5MkjQ>
+    <xmx:BLn8aVKE8opzgthiEpQBPFgCo_lt4EgMu2QZN-TsKK3MBq7an98vsQ>
+    <xmx:BLn8aYx7cxttl21BTOmNcqr6SsKeJYff9skFqz3MfaqMKK6bbjXnmbom>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 61786780077; Thu,  7 May 2026 12:08:36 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 452EF4EC20B
+X-ThreadId: AJo0cZWtw0Z3
+Date: Thu, 07 May 2026 18:08:16 +0200
+From: "Chuck Lever" <cel@kernel.org>
+To: "Marco Crivellari" <marco.crivellari@suse.com>,
+ linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: "Tejun Heo" <tj@kernel.org>, "Lai Jiangshan" <jiangshanlai@gmail.com>,
+ "Frederic Weisbecker" <frederic@kernel.org>,
+ "Sebastian Andrzej Siewior" <bigeasy@linutronix.de>,
+ "Michal Hocko" <mhocko@suse.com>, "Trond Myklebust" <trondmy@kernel.org>,
+ "Anna Schumaker" <anna@kernel.org>, "Chuck Lever" <chuck.lever@oracle.com>,
+ "Jeff Layton" <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
+ "Olga Kornievskaia" <okorniev@redhat.com>, "Dai Ngo" <Dai.Ngo@oracle.com>,
+ "Tom Talpey" <tom@talpey.com>, "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>
+Message-Id: <38019ee1-4a2e-40d3-81fe-f29551cca309@app.fastmail.com>
+In-Reply-To: <20260507130117.252825-1-marco.crivellari@suse.com>
+References: <20260507130117.252825-1-marco.crivellari@suse.com>
+Subject: Re: [PATCH v2] xprtrdma: Move long delayed work on system_dfl_long_wq
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: C3CBD4EC121
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.15 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285424-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
+	XM_UA_NO_VERSION(0.01)[];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-285425-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linutronix.de,suse.com,oracle.com,brown.name,redhat.com,talpey.com,davemloft.net,google.com];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TO_DN_SOME(0.00)[]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-On Wed, 6 May 2026 09:25:36 +0200 Daniel Machon wrote:
-> Move the debugfs setup into a new sparx5_debugfs() helper in
-> sparx5_debugfs.c, invoked after sparx5_register_notifier_blocks()
-> succeeds so the netdev names are finalized. sparx5_vcap_init() now
-> only deals with VCAP state. The sparx5/ debugfs root is created in
-> the new helper as well.
 
-netdev names are never final :( User can change them at any time.
-The best practice is to name the debugfs file by some stable hw-related
-property, bus, port number etc.
+On Thu, May 7, 2026, at 3:01 PM, Marco Crivellari wrote:
+> Currently the code enqueue work items using {queue|mod}_delayed_work(),
+> using system_long_wq. This workqueue should be used when long works are
+> expected and it is a per-cpu workqueue.
+>
+> The function(s) end up calling __queue_delayed_work(), which set a glo=
+bal
+> timer that could fire anywhere, enqueuing the work where the timer fir=
+ed.
+>
+> Unbound works could benefit from scheduler task placement, to optimize
+> performance and power consumption. Long work shouldn't stick to a sing=
+le
+> CPU.
+>
+> Recently, a new unbound workqueue specific for long running work has
+> been added:
+>
+> =C2=A0=C2=A0=C2=A0=C2=A0c116737e972e ("workqueue: Add system_dfl_long_=
+wq for long unbound works")
+>
+> Since the workqueue work doesn't rely on per-cpu variables, there is no
+> obvious reason that justify the use of a per-cpu workqueue. So change
+> system_long_wq with system_dfl_long_wq so that the work may benefit fr=
+om
+> scheduler task placement.
+>
+> Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
+> ---
+> Changes in v2:
+> - Commit log improvements
+>
+> - Rebase on v7.1-rc2
+>
+> Link to v1:=20
+> https://lore.kernel.org/all/20260430085412.96961-1-marco.crivellari@su=
+se.com/
+
+Reviewed-by: Chuck Lever <chuck.lever@oracle.com>
+
+
+--=20
+Chuck Lever
 
