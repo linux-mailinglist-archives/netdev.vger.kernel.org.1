@@ -1,212 +1,205 @@
-Return-Path: <netdev+bounces-285136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285137-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sMBHGisD/GmxJwAAu9opvQ
-	(envelope-from <netdev+bounces-285136-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:12:43 +0200
+	id qAYYAu0F/GkpKAAAu9opvQ
+	(envelope-from <netdev+bounces-285137-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:24:29 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5FF54E28E5
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:12:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BD2E4E2940
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:24:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B4D3E300D94F
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 03:12:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8EE2B300D16A
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 03:24:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377512C0F6D;
-	Thu,  7 May 2026 03:12:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EEE92D0C62;
+	Thu,  7 May 2026 03:24:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LfdFzrZU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CeqJqr1b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C426E283C87
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 03:12:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93BAE1C6FF5
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 03:24:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.52
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778123558; cv=pass; b=V9Sfwvt9LJf8ykI08RcUHtiVGY0PICAtvJRSF+8YbN9pT1CarcBD3BoQ6IyEUcitlzXq1tmzOl+IUNCt2yKzIRip5xuP337uMktonAbAXbEzMQKZ65U9GWLmwejtCZiZ79ciAOtjljDmerOTmpkP5zKn/hve0//ZwCW7cC/v0pI=
+	t=1778124266; cv=pass; b=tuivNNGgCd+lxasHvpjsvRnl9QWc8tln/F/OHCwy6jypiCuyZfRFe4A7a07ARxlj4h9raYjsUneEnF6dzmAnEm4GFnINYv/SOekhcE1hLtmRY5qIsKrybGEyQDy82sCYxRlEP7LLijGDeHDm49m1M9U/ZvLlXhHhtLTggSx6cro=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778123558; c=relaxed/simple;
-	bh=t8EcPkbMkdoqxSEskUGLBEnkfdCmwpUfrxysv+5GqbU=;
+	s=arc-20240116; t=1778124266; c=relaxed/simple;
+	bh=xhtkEjsWQvked7D/5ZjZKOaVudZtm2Lj2kaM1sTHzp0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S0+Nb5owbnWWCQx+oEkFTSVlyqnFKItcp64kiAvTAbjUx+O+/fCZ1iGC+J2Zfly/8oZtlUa7r4zzSQFGU1bsoFBTXHvVOLcIUIdcG5mZ9fHvNd5YM2mJteYI4e5zVjmIYOsWQWcIHQj7kJAAHSWVAwtTVgk5IBnCqYN1drAfuxM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LfdFzrZU; arc=pass smtp.client-ip=209.85.210.52
+	 To:Cc:Content-Type; b=uwUDaH+H8uVBn7QxomJqB4atl0VWvHAhsQT6LB4t8BqeemdwHxOFURG0RzpiXcr/qeAAzB5/th2rarwfNndIIGnadSVcnvnafHyVlalIOd7UGP32U+QLpx2t202tGHFOSREl+/Y4e13vDDAwFIYgfls6OXClucOwzraCdp2AIE4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CeqJqr1b; arc=pass smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7dbec19732eso282915a34.3
-        for <netdev@vger.kernel.org>; Wed, 06 May 2026 20:12:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778123556; cv=none;
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b936331786dso36852966b.3
+        for <netdev@vger.kernel.org>; Wed, 06 May 2026 20:24:24 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778124263; cv=none;
         d=google.com; s=arc-20240605;
-        b=HVcYBndAKn0D5PYvngKrQsz/b/VXMrRx+dtGV6nrAzaQV1XUvkIfE7mv7d/S2Hwy4L
-         fDjaP+Hc3RgfasTk9trD4QjSKzYr0jRiHEsNHD7fyFJzFO5MPUiSwnaIGLfD/WHPc+KO
-         2L/udcfmUhA9YwJsVac6ZWaE6q76Sq00oGJBZFp97i8+nD5hE/03ZRFbJWvw33Q/oViv
-         IP/meSQIhNojUZeDj/bNLi+3eEgDM6dbGRjFOuYdT1esmRt6aUhpeeSt9HMSkU7aiwLJ
-         yEWhsY4FpK4gNjWI4UQwkLTeu7nQgXQMeFWBDxIAAo7H5PnjaKzBVSc6CLnzuA+z7DjN
-         OIzQ==
+        b=KVP1e0czTt1bCqUEE+0Z5CNVfCYMyfjpo47rU7OugTXByu16i4Xak9HU5RoSjI9tTH
+         VF0JUE45WOWDg0UtoYt8HQPtZdGuCRNUP3JMPc2onydiG7Ygylp4vDnZ3uKZZQiYqnEq
+         /QjIbYsv0hoMzA6SlCI//MptZCDH6EF7sVB9EHo244OukCpglBf3LPw/N9VI+ppEAWq5
+         rpFOvwYmIoKmXEy5Lp7MLHM1+SWg+VgT3C1QoIW30A7u3y4ixw27aP/m7VNjfnfuZ8UM
+         efmmLbGQCkWsWEpJdTKXL8pQoijLM2g8zusM2M/oF4/AgEINaKKaQ14y/hipJFJAAM5+
+         TEKQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=8s+sgSUpkyzy1t4IZ6P1H+j3krIb9xw33fvGDbko/5w=;
-        fh=sa0LY2vE9y9xkMqaND7GbekOJRgA3esgoYAjYMZBkEo=;
-        b=fJ7Ow8Faph5cMIkQST+yK7c51GNZOcu6IR7gr3JBH8aSiYb+Jy9EBQQAGW8zUpF7Xt
-         04rsmimp7eCWIiSWs/LvMC9byf5pwpOY5QzWpDjIiEVPrUUtLW7soDYSR74+h8Fwwq2i
-         heDZcVvDIZLgpxpyaMvdE3MmvdduUx9nbylu0HMzd+8wSDDnc2kSe7ZV09AgHZeZM9pD
-         lD4CI8LBL4byZcgUjAWZKrsGCGDDB2QRCl5E4QNhsWUcdUmZbGP9wzqZKA76r2cmfMeL
-         GjIklMPU9/PNYkR+HtcGn88oPXSAtCkYKTALCbuJfX2Zr95MA7e+snhDCk3PZmepSar2
-         oY/Q==;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=SyJU6gW4FlWMbUSkvNwEGK+wID8AKdNL6lGsIUjUEWI=;
+        fh=7dXxcCTkxsqkphrKyArnf6zs55GnaKkj1qHA0O9FFZQ=;
+        b=QgDvXEz3ALd03UGzn4b1GXb++ujzFPL0Xseum6meHeSiBB3I4rhK/ud62oHEgGRfrp
+         BnhO343NgwplsI5lZ8Ni5rPgWWTP/XHJU188KqrqxgEcTERo9jCeomISCcQe3cTcinNB
+         nM5BKEqS64VfvUxPSjoswREkxbQ3qGIOqdnmOMTJ4Dd2wVcU5blLrHq2YD5Mm/wwg8Cw
+         Iesugb3Kvq+G17Ulv9aqSXlroWelkwHRE+kBPsx4I/xymw0Et5yflHqb4TrlvXLkBJ4z
+         BBEM1l/SXfoRg+ktoklJ7rwA97aOQgVRDzvG9sVxujNFIH7d5aM+K0aUWALh7ZKRzyjj
+         Y2fw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778123556; x=1778728356; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8s+sgSUpkyzy1t4IZ6P1H+j3krIb9xw33fvGDbko/5w=;
-        b=LfdFzrZUyzD5SWtm5Fz2AqwCpg6pvIlpi6kp49Bd/TidFo/9aE6OL3THUHctANGoKM
-         RoUi0tDoTsTcYKXbh0AsFlwkMIH7dMSLZLdi7/l4R5MhW2/nvTltF+YiLY2Y7SIh+hJg
-         BCvFg4h9/tii+caKw1yq/7BR0kq+qhdaFKs1RmdGxe2t0a4sjM9XMgQXWa8lQYI5lcHB
-         ihXVHtciqvfZBqp4D8RqneVwvaOWkvpgCkPa0cURHZvKWgOmUX7ps9aa+SjqHPpEDEUa
-         vjnHbsuoHg8nYGJjZkUcc/Z279Rditp4cJPYR/nbYIcfFbWhkr2LuFdeLEDI/Ywvbj2d
-         hReQ==
+        d=gmail.com; s=20251104; t=1778124263; x=1778729063; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=SyJU6gW4FlWMbUSkvNwEGK+wID8AKdNL6lGsIUjUEWI=;
+        b=CeqJqr1bjpMWiVgXTorGr2debjBZzUmPwoUFQBYIcM1qgyHCKphKhWAFOeyOnjltug
+         fjN1sIh47+FhxsQJ8sEcuLjvMC2F3E7FWSH0JCyXhOiDeFx5vOP/bqZ5L4g0rwWj2aVN
+         4PtJnrJRzKcF+GisLo/3Nx86zsPD6pYBJNJCIdrdKtrX/ontyuNgYRBC9J7HTPknpmmq
+         +rX+Zx3jtngTED0vIRtiOT12Kp6Ud7TyrBoXCJ1kKNA6k/FBzbcDHm4+8Xbf2nlXr0CF
+         0/qz4lDB+sb3WKJCOT4SmSJZTIQyfKExUYjo+3UAU2d9HFtmYBJ4CGmnEkQVKcHKdel8
+         KQkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778123556; x=1778728356;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=8s+sgSUpkyzy1t4IZ6P1H+j3krIb9xw33fvGDbko/5w=;
-        b=MdUIvfbhXBBi4vqw61e4ln2dfz6xCF4RoksuZMUAn5BzB5t/HcvWK1era1svMzmeez
-         1I0iCcNeaLQvEfL9eC7UQ0LbVxSu+RDADGLy5FnUynx3eq4A8DpkvKahZIQewV7z0P6U
-         kJ/jUJOB1NlOSDyjYsGt/8ferwMk02+RTu7KPfTHqBWQfPIgcwTOQMCyVLy+9upaq841
-         kwAI0PdmiToi22Z/Fxw/NabARDT9a444hqx7f67A7h6oUzE+wtUDZ5iD6FlUJ2tT/278
-         YLx39sWISogiyLLJFqSzQbC11yYd8R8gPvPHdqR7LgyuRO3KtB7duR3vg1Mp+cA/G0XR
-         O+Lw==
-X-Gm-Message-State: AOJu0YzUQ5KQ6l/w3DXokhqeWb5N4M8iujVIMJoCw+UsTM0jtaFAETy1
-	R++t4jPcr1vH1kwLpb8DkSbDn3KSOvH17D2BwObTRpo1nrzg0k+YzbcVolKAmHtbsNBeNVhX0FY
-	0RybKXBzOOLsnnnGqynGgy2Ks2HA+yGE=
-X-Gm-Gg: AeBDieutIWIaP9L8yqqpC3U4In+RLANFv0rdqYsb8hIW2AxeqVgfCqd0dy1jglKReem
-	G81TJVllPuBeHKqOG7AgeyYTsJUfEkmvRJFQ5OZLDDHvTBSN7fvPMc7ks3OgjR4kcZnif7cKOMU
-	E+Anm0CPJO+RE2Qf1EX/bK275xDRbwjeqhOjo2a3Uv8FsR9073n1W2rXlM9rGfAnYmjbDaWlyur
-	0cA3T4FRJuHU8LIcJjoxA5zLkX/8yhFl++wYtnF68FUZ4QxjbhDHOY6ivz3xAWJh2/J3nKhXxK/
-	yCzfAJzj+khC30liQfZ+DDM81pf8J9lSRmAQD6yrQMrUgbm9ntrBtLqPGfzN
-X-Received: by 2002:a05:6820:220d:b0:686:d107:2856 with SMTP id
- 006d021491bc7-69998d5251dmr3656437eaf.51.1778123555725; Wed, 06 May 2026
- 20:12:35 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1778124263; x=1778729063;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SyJU6gW4FlWMbUSkvNwEGK+wID8AKdNL6lGsIUjUEWI=;
+        b=exW07zpD3QbP92Lj/pMY1KEOsFZA0fyMeHSflENw35DBlk8GOpFjAlXVHjvZpJx4dI
+         7htvO0+8xjxBmWr0qHOE60prtJXFnh5q7oCAVHhqKcjzMhecxOu+ONQv2WuNyAKfpBPM
+         rHrdKaBLwRSkYpQ7GPa6FZf4EZr75aMPQMiQeA+gLHQHrDe3oTCPhH2Yh1DtCZEgUwcd
+         CwH1R2TSgPZwwEqUg2UzbGpAgEa3lVTz7mHEm1tmJjTcz9uryoe9txWK1K8V8x/NFgUb
+         QeJBvrbCoz3s26lo7HIHI0UiOrbN9Q4dHvREUmP9kgzM4ZkvI/Wu13HuMAuIUP9/XANZ
+         prxA==
+X-Forwarded-Encrypted: i=1; AFNElJ8VjdgjPTo6TwF4y37rNoUfmEV9vCVnJQ7+OyVib3ezWIGTUhB8ju4MwBDixqmQfmdZu/Gd5Pk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzA5wPVa9r3CMkfLh9CqGhC6FLNFDJ8daXLPXqwKuNQRF5Al4Wt
+	80DSmf7GsQA2wbXhmN6Gf8F/7bHUwV5XGWDaVDRJ6xjq+MbtnenqwfHHWgbQ0rzsaoRH9cUPW0v
+	E2jvzxgAW3fn0N1Px16Ha6NKM93N+zjc=
+X-Gm-Gg: AeBDietEgfxJAGj2bzJBtUha3RiGoR4G5Q7ft3wTP4mOn4e4B1jABrJJkeCt8S/M6rR
+	EdAFZ2Wsc3bMLKXDqwTjkLSxVIEUvPiN2YIVw5t/UGCaQIhwZb5RHJjbMLRCEQVn7zmU4IrGAuN
+	WMQtzA+4J8fzQueI7KQFu04JkdU4pIBgmjVgnGkbrPkD3RQjfPgY88Tvybt9BHcbdzHaB6tZLvb
+	DdfIqDaA7Z1rMm6BFJM1wMqJEG87rq7/wwjuvNGsAiq2Ee9JOyPFMykNA56GN97c1u+PCizUXlk
+	X4hgjjx/Fmps2Now+NjIg0QPeW6DgmO5S5jLUDLuBKOYsABDYkA=
+X-Received: by 2002:a17:907:7ba6:b0:bc3:d996:684f with SMTP id
+ a640c23a62f3a-bc56dd129famr337839066b.42.1778124262624; Wed, 06 May 2026
+ 20:24:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260504101258.1608004-3-mmyangfl@gmail.com> <20260507012306.2187935-1-kuba@kernel.org>
-In-Reply-To: <20260507012306.2187935-1-kuba@kernel.org>
-From: David Yang <mmyangfl@gmail.com>
-Date: Thu, 7 May 2026 11:11:58 +0800
-X-Gm-Features: AVHnY4Io7tH2DZdfq5zzXT3e2RKqkbqnGO2JDlNxYdUTjM1Wr6KQ0-UdNZMlxI4
-Message-ID: <CAAXyoMP3RNFWG+n39ZtCYb3Aq66KvpEjMhKr_2zU85mah0czrg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 2/3] net: sched: tbf: pass all params to
- offload users
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, olteanv@gmail.com, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, jhs@mojatatu.com, 
-	jiri@resnulli.us, horms@kernel.org, linux-kernel@vger.kernel.org
+References: <05921e1f-693b-4322-a762-c8f03c386a78.ref@yahoo.com> <05921e1f-693b-4322-a762-c8f03c386a78@yahoo.com>
+In-Reply-To: <05921e1f-693b-4322-a762-c8f03c386a78@yahoo.com>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Thu, 7 May 2026 00:24:10 -0300
+X-Gm-Features: AVHnY4JxNFbbLXRILKhVvgBqnP3BZk1Lzw9wfHFi8i55wP6YbhXakRkf976Mn14
+Message-ID: <CAJq09z5Uz2Spm5yWe=742C2cxnz9gEkXkV6-ja_oDLnPh3eFCA@mail.gmail.com>
+Subject: Re: [PATCH v2] net: dsa: realtek: rtl8365mb: add support for RTL8367SB
+To: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: B5FF54E28E5
+X-Rspamd-Queue-Id: 5BD2E4E2940
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285136-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,mojatatu.com,resnulli.us,kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285137-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[yahoo.com];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,jsdelivr.net:url]
 X-Rspamd-Action: no action
 
-On Thu, May 7, 2026 at 9:23=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
-> >       qopt.command =3D TC_TBF_REPLACE;
-> >       qopt.handle =3D sch->handle;
-> >       qopt.parent =3D sch->parent;
-> > -     qopt.replace_params.rate =3D q->rate;
-> > +     qopt.replace_params.limit =3D q->limit;
-> >       qopt.replace_params.max_size =3D q->max_size;
->
-> Does passing q->max_size here provide the driver with the original burst =
-size?
->
-> The software TBF overwrites q->max_size with min(burst, pburst) when a pe=
-ak
-> rate is configured. As a result, the offload API only passes this overwri=
-tten
-> value, meaning a driver attempting to offload a dual-rate TBF is not give=
-n
-> the original burst size in bytes and would have to reverse-engineer it fr=
-om
-> the nanosecond buffer value.
+Hi Mieczyslaw,
 
-I'm not an expert on TBF so I don't know if it's fine to expose the
-internal of schedulers to the drivers, also this would require changes
-on struct tbf_sched_data.
+Thanks for the patch.
 
-> >  struct tc_tbf_qopt_offload_replace_params {
-> > +     u32             limit;
-> > +     u32             max_size;
-> > +     s64             buffer;
-> > +     s64             mtu;
+> Add chip info entry for the Realtek RTL8367SB switch. This device has
+> chip ID 0x6367 and version 0x0010. It exposes two external interfaces:
+> port 6 supports SGMII and HSGMII, while port 7 supports MII, TMII,
+> RMII and RGMII. Use the existing 8365MB-VC jam table for initialization.
 >
-> The buffer and mtu fields are stored in tbf_sched_data in nanoseconds
-> (see tbf_change() in net/sched/sch_tbf.c where they are derived via
-> PSCHED_TICKS2NS(qopt->buffer) and psched_l2t_ns()), but they are
-> exposed here as bare s64 buffer / s64 mtu right next to max_size
-> which is a byte count.
+> Signed-off-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+> ---
+>  drivers/net/dsa/realtek/rtl8365mb.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 >
-> Would it be worth renaming these to buffer_ns / mtu_ns, or adding
-> kerneldoc to describe their unit?
->
-> A driver author reading this struct and seeing mtu adjacent to
-> max_size might reasonably assume mtu is a byte MTU and program
-> hardware accordingly.
+> diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
+> index 073f12ca8028..84d6fdb94a96 100644
+> --- a/drivers/net/dsa/realtek/rtl8365mb.c
+> +++ b/drivers/net/dsa/realtek/rtl8365mb.c
+> @@ -545,6 +545,18 @@ static const struct rtl8365mb_chip_info
+>                 .jam_size = ARRAY_SIZE(rtl8365mb_init_jam_8365mb_vc),
+>         },
+>         {
+> +               .name = "RTL8367SB",
+> +               .chip_id = 0x6367,
+> +               .chip_ver = 0x0010,
+> +               .extints = {
+> +                       { 6, 1, PHY_INTF(SGMII) | PHY_INTF(HSGMII) },
 
-These are carbon copies of struct tbf_sched_data, I see no reason to
-rename just here.
+While reviewing the port capabilities, I noticed the description for
+the RTL8367SB is identical to the RTL8367S (which does not make
+sense). Documentation suggests the SB variant is more versatile. The
+RTL8367SB appears to be a functional union of the RTL8367RB-VB and the
+RTL8367S regarding its external interfaces:
 
-> >       struct psched_ratecfg rate;
-> > -     u32 max_size;
-> > +     struct psched_ratecfg peak;
->
-> tbf_change() does memset(&peak, 0, sizeof(peak)) when no peakrate is
-> configured, and the qdisc internally uses tbf_peak_present(q) which
-> checks q->peak.rate_bytes_ps !=3D 0 to distinguish absent from present.
->
-> With peak exposed to offload drivers, every driver now has to
-> reproduce this convention implicitly (e.g. by checking
-> p->peak.rate_bytes_ps).
->
-> Would an explicit indicator such as a bool peak_present field, or at
-> least kerneldoc spelling out the rate_bytes_ps =3D=3D 0 means absent
-> contract, make this safer for future offload consumers?
++----------------+--------------------------+--------------------------+
+| Port ID in API | EXT_PORT0(GMAC1)         | EXT_PORT1(GMAC2)         |
++----------------+--------------------------+--------------------------+
+| RTL8367RB-VB | MII/TMII/RMII/RGMII | MII/TMII/RMII/RGMII |
++----------------+--------------------------+--------------------------+
+| RTL8367SB      | MII/TMII/RMII/RGMII      | MII/TMII/RMII/RGMII      |
+|                | SGMII / High-SGMII       |                          |
++----------------+--------------------------+--------------------------+
+| RTL8367S       | SGMII / High-SGMII       | MII/TMII/RMII/RGMII      |
++----------------+--------------------------+--------------------------+
+Source: https://cdn.jsdelivr.net/gh/libc0607/Realtek_switch_hacking@files/Realtek_Unmanaged_Switch_ProgrammingGuide.pdf
+(last page)
 
-No similar logic is found for struct flow_action_police.
+It seems GMAC1 (Port 6) on the RTL8367SB actually supports the
+standard (T)MII/RMII/RGMII modes in addition to the SGMII/HSGMII
+modes.
+Could you please double-check the datasheet?
+
+Regards,
+
+Luiz
 
