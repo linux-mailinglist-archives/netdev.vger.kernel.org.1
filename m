@@ -1,122 +1,57 @@
-Return-Path: <netdev+bounces-285411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285402-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +AiqMfu2/GkNTAAAu9opvQ
-	(envelope-from <netdev+bounces-285411-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:59:55 +0200
+	id wB3sEqq1/Gm0SwAAu9opvQ
+	(envelope-from <netdev+bounces-285402-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:54:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 459364EBB61
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:59:55 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA9014EB858
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:54:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9289D30F0250
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 15:52:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 04EF33098D06
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 15:50:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D30544CF4A;
-	Thu,  7 May 2026 15:51:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FVziDCaZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FB273F0756;
+	Thu,  7 May 2026 15:50:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f99.google.com (mail-qv1-f99.google.com [209.85.219.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE148449EB2
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 15:51:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.99
+Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A6EE29ACD7
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 15:50:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.161.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778169116; cv=none; b=seTQyLR1kxDtVjRiaKOaWRxgI7O0B57robg2RnAVcjYTtd0fgs20MWI1BfAQnydyrECj468qSjblpoG6vDo04DmsGpbTAiSLmg4GRNwUV+Wn6J3cVJGg/fBIQviXIeSyaOAA+KAieU0tidGNX0VK2fGu0CZSj4NUNL4/WkYGU3Q=
+	t=1778169022; cv=none; b=DTjwkTdOdGclMYuvVrleOdoAYA8+RZ6p7EfpO+O0O4AQReLbaIh49mPKtLRvZCFCwMe61TnDEAvL3A11hwyiaPT+OEIIBui9NxCmyzLFpyFVkEZjsaiUxFuyq5f3TO4zb8w0+doPcV/EdqsdOvDLcTi3DonYRIzSJvyim0aGxzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778169116; c=relaxed/simple;
-	bh=N/c5QH2LpQTCnVMZjv55xEfP1S6t/HG0AX5pqSkBqBE=;
+	s=arc-20240116; t=1778169022; c=relaxed/simple;
+	bh=YLWJ6QxnbLdpajrFC8EChZJz0lSvoCu2aHQXT9WK6CY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HD88bFrleMJwde27Yib726k5KrlTGjPr4N4hqFOpEx4K9qr37VC/dmf72vtOEbMYEXTw8I7UHAAoEz0Y6XPpvW5zyT/TBxor+MIrk2wRXBdV9zdeuabqeSqfdG4au7EE2o21+kzlFM/9nUP7qjoXZqiSrHMmcNyT/KhPcQ27FeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FVziDCaZ; arc=none smtp.client-ip=209.85.219.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qv1-f99.google.com with SMTP id 6a1803df08f44-8aca6a68de3so1305036d6.2
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 08:51:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778169114; x=1778773914;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3Gej9rC0V5wj21YK/OT0tP6dMq4zLV0oZtuZHtg6JDU=;
-        b=LRlh048yoOPNkKrfReA4HkJ8guHFzMrJCDeb5nq+aW9h5mE+rTltsE/AVEDrkZAZkR
-         mzOmEshFqKJzQ+J/jgFOgDBVSYJ4AmauoBlmLL76Rb+ZaD+lgt59JDfy/yfwAYOYXpKy
-         jLzynu0AHd3wgopsdSrdyLISMWW0IHctkT2Xm9+uJnppSw6GUDAD5vH8v7hqKH/QSX34
-         291NVYSol0IGc6yIRfoV6HPNAUydVkPdfdRIuGZCWDz/r8i0enQhqKQ8RWnjQdpB5Pc8
-         ILkZ8NnkU3GaCrZrgh7Cado+DGsCx0tNkZZx2Wzc4pXYUp4Tw1x1Dh6Jsl5SHgMbSPNj
-         b9LQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+kWWGiNckQkbzHFgoXwxDXsG3DcWg++L/v+kxSBLDqCP7iEWKjOguZtgEfv5PCkJC7szpeRAY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy69atwPZFFrTWjX2JfC6Ok5a5lnxST7LpqYdWjI6pp53PMSzTl
-	Oo+AFhNyJVgvt6Bkbn8zKwcjmgyLgE4yiw64I2txJZA+5HKavjDGYQVRqy2KEGQfQq09fkscVtn
-	YRlwpH3/xwey0W+T2mWe+FmcTZgVemui26IW3Ak82N0uYpZ4K1FA3/wzjzlk3ZJikjXmwRtC3Ej
-	P4Ws03xVJ5IrFtzgTKm0lsGcLnIFbiwaz7RidQ4ov2XD2m7Y/bNYyUSETTbOh8qRbIFW2VEQWNU
-	fShF/9juQC7Dw4=
-X-Gm-Gg: AeBDietwfYRJyIiAcZEPKApGTi3DDquroDGYBck5Im58NrSJxl+uwEpJIbkMHfXDPlG
-	XVQm95CLdF/ISZFjfkK6TmnCOXjGsRDuTSmyevvYmTmSopiU8mY9pyv/di6NlzUcbFzN81JCfgj
-	nkM1Wxs8bkzLTOAOXLT+sJY5zlxPBQOOChcdXQxD7Uu+AF8pngdOn5RLfatmEahgkZ9iUnDpSzy
-	qrBBWbqRpZ2w9UXM2WEdj/3EBupI8rjdikYOunMfz1rEZmN5iVgbs8BJrZ4szmokTcIbkuKCQRd
-	8g76i3h4Q6fC6yGpCxCb21MexvIPuCDdSL2qkFsnxs0+qpPSdsEjdcjtm9occ+MwO0I7uJFKqb6
-	26PCJ3gpL5bIvLe3JQkjzz0WHo0HRtuBSUKRGJY/pN5r/p8rkhuvfBhX+VC16pknTZ3QdI07cK5
-	JMhjgkM/fkMJZzQlCX1WEXzw1wTqjAhF+7MNujBnoaAsT2So8h6aaDcRSaQ0DlyEagTvHL
-X-Received: by 2002:ad4:5ecb:0:b0:8ae:65b7:1b0a with SMTP id 6a1803df08f44-8bc42f54d50mr84919686d6.2.1778169113753;
-        Thu, 07 May 2026 08:51:53 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-21.dlp.protect.broadcom.com. [144.49.247.21])
-        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-8b5393d4cedsm16908546d6.12.2026.05.07.08.51.53
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 07 May 2026 08:51:53 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-8eab57f0e8bso27614385a.0
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 08:51:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1778169113; x=1778773913; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3Gej9rC0V5wj21YK/OT0tP6dMq4zLV0oZtuZHtg6JDU=;
-        b=FVziDCaZt9A7Icol0tsQQITtIfwOK/o7xP5yLgiX2GJVx+0cqGOBw+GuDXuJGQJiPx
-         yLRqm5IoYHFUSl/29gYTFci8pnlywIs463JIHfdb5x2n6OI313D+T26Qcy/Kt5XeCm1W
-         XI+SffGrUPe3r470jHOz0HeKFKa+dRG0IgMTw=
-X-Forwarded-Encrypted: i=1; AFNElJ+xXSHA4oAXFwZUo/ciLdQR/EwHnrr5m57uH6hrk1GAdol/pq/1elASViCCZdZ9mcEKwWZW2iQ=@vger.kernel.org
-X-Received: by 2002:a05:620a:3195:b0:8ea:c7a8:5065 with SMTP id af79cd13be357-904d4392205mr887326885a.2.1778169112836;
-        Thu, 07 May 2026 08:51:52 -0700 (PDT)
-X-Received: by 2002:a05:620a:3195:b0:8ea:c7a8:5065 with SMTP id af79cd13be357-904d4392205mr887320985a.2.1778169112144;
-        Thu, 07 May 2026 08:51:52 -0700 (PDT)
-Received: from photon-d7fac424c0d3 ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-90642b76d39sm240711885a.2.2026.05.07.08.51.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2026 08:51:51 -0700 (PDT)
-From: Ankit Jain <ankit-aj.jain@broadcom.com>
-To: edumazet@google.com,
+	 MIME-Version; b=UOAwxRoNBJ2S3tcMj3fxd0poaZjjIeYSoZXqWvKRBfuC8rdGeOguMJy82aing1sa4jy82txYKjcW94bRym55v/Z5tusnmoBGwan8qmatMlT2uz9ov9Vaao507W88tZ9Ub3/E7R+HJXil6cG2sy0FBSf04HGwPA7AHAmLP7wo9S8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=162.243.161.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowACXCvuetPxpV6T8AA--.700S3;
+	Thu, 07 May 2026 23:49:54 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: b.a.t.m.a.n@lists.open-mesh.org,
 	netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	ncardwell@google.com,
-	kuniyu@google.com,
-	horms@kernel.org,
-	shuah@kernel.org,
-	quic_subashab@quicinc.com,
-	quic_stranche@quicinc.com,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	karen.badiryan@broadcom.com,
-	ajay.kaher@broadcom.com,
-	alexey.makhalov@broadcom.com,
-	vamsi-krishna.brahmajosyula@broadcom.com,
-	yin.ding@broadcom.com,
-	tapas.kundu@broadcom.com,
-	Ankit Jain <ankit-aj.jain@broadcom.com>
-Subject: [PATCH net v3 2/2] selftests/net: add packetdrill test for locked SO_RCVBUF SWS
-Date: Thu,  7 May 2026 15:48:06 +0000
-Message-ID: <20260507154806.18635-3-ankit-aj.jain@broadcom.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260507154806.18635-1-ankit-aj.jain@broadcom.com>
-References: <20260507154806.18635-1-ankit-aj.jain@broadcom.com>
+Cc: marek.lindner@mailbox.org,
+	sw@simonwunderlich.de,
+	antonio@mandelbit.com,
+	sven@narfation.org,
+	yuantan098@gmail.com,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	bird@lzu.edu.cn,
+	rakukuip@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH batadv 1/1] batman-adv: fix tp_meter counter underflow during shutdown
+Date: Thu,  7 May 2026 23:49:46 +0800
+Message-ID: <df73e607bda0c84b22d64d80f8ac887190242baf.1778118303.git.rakukuip@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1778118303.git.rakukuip@gmail.com>
+References: <cover.1778118303.git.rakukuip@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -124,88 +59,93 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Rspamd-Queue-Id: 459364EBB61
+X-CM-TRANSID:ygmowACXCvuetPxpV6T8AA--.700S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cw18GFyruw4kCw1fKryfJFb_yoW8Wrykpr
+	WfWr17Kr97Xw4DAa4qyrySvryUAw4xXFW7GanrKr13ZFs8KrWSqryrKFyIvF1FvayqkFsx
+	Zw4j9a47AayDArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBj1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
+	jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52
+	x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWU
+	GwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
+	8JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kK
+	e7AKxVWUtVW8ZwCY02Avz4vE-syl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8V
+	W8GwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
+	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7
+	IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k2
+	6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
+	AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQAACWn8UeQJBAAAsl
+X-Rspamd-Queue-Id: BA9014EB858
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285411-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:email,broadcom.com:mid,broadcom.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FROM_NEQ_ENVFROM(0.00)[ankit-aj.jain@broadcom.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285402-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[mailbox.org,simonwunderlich.de,mandelbit.com,narfation.org,gmail.com,lzu.edu.cn];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-0.726];
+	TO_DN_NONE(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lzu.edu.cn:email]
 X-Rspamd-Action: no action
 
-Add a packetdrill test to verify that locked SO_RCVBUF sockets do not
-suffer from scaling_ratio truesize penalties.
+From: Luxiao Xu <rakukuip@gmail.com>
 
-The test uses a standard 1460 MSS and sends medium-sized packets
-(600, 700, 800 bytes) to trigger the recalculation logic. It checks
-that the internal window clamp (tcpi_rcv_ssthresh) does not drop
-unexpectedly.
+batadv_tp_sender_shutdown() unconditionally decrements the "sending"
+atomic counter. If multiple paths (e.g. timeout, user cancel, and
+normal finish) call this function, the counter can underflow to -1.
 
-Signed-off-by: Ankit Jain <ankit-aj.jain@broadcom.com>
+Since the sender logic treats any non-zero value as "still sending",
+a negative value causes the sender kthread to loop indefinitely.
+This leads to a use-after-free when the interface is removed while
+the zombie thread is still active.
+
+Fix this by using atomic_xchg() to ensure the counter only transitions
+from 1 to 0 once.
+
+Fixes: 33a3bb4a3345 ("batman-adv: throughput meter implementation")
+Cc: stable@kernel.org
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Signed-off-by: Luxiao Xu <rakukuip@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 ---
- .../net/packetdrill/tcp_locked_rcvbuf_sws.pkt | 29 +++++++++++++++++++
- 1 file changed, 29 insertions(+)
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_locked_rcvbuf_sws.pkt
+ net/batman-adv/tp_meter.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/packetdrill/tcp_locked_rcvbuf_sws.pkt b/tools/testing/selftests/net/packetdrill/tcp_locked_rcvbuf_sws.pkt
-new file mode 100644
-index 000000000000..43e1d00d5f26
---- /dev/null
-+++ b/tools/testing/selftests/net/packetdrill/tcp_locked_rcvbuf_sws.pkt
-@@ -0,0 +1,29 @@
-+// SPDX-License-Identifier: GPL-2.0
-+// Test that TCP does not reduce scaling_ratio for locked SO_RCVBUF.
-+
-+0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
-++0 setsockopt(3, SOL_SOCKET, SO_RCVBUF, [32768], 4) = 0
-++0 bind(3, ..., ...) = 0
-++0 listen(3, 1) = 0
-+
-+// Establish connection with standard MSS.
-++0 < S 0:0(0) win 65535 <mss 1460,nop,wscale 8>
-++0 > S. 0:0(0) ack 1 <...>
-++0 < . 1:1(0) ack 1 win 65535
-++0 accept(3, ..., ...) = 4
-+
-+// Inject varying payload sizes to force scaling_ratio recalculation.
-++0.1 < P. 1:601(600) ack 1 win 65535
-++0 > . 1:1(0) ack 601 <...>
-+
-++0.1 < P. 601:1301(700) ack 1 win 65535
-++0 > . 1:1(0) ack 1301 <...>
-+
-++0.1 < P. 1301:2101(800) ack 1 win 65535
-++0 > . 1:1(0) ack 2101 <...>
-+
-+// Check that truesize penalty did not reduce the window clamp.
-+// On unpatched kernels, rcv_ssthresh drops to ~22K.
-++0.1 %{
-+assert tcpi_rcv_ssthresh > 28000, f"rcv_ssthresh dropped unexpectedly: {tcpi_rcv_ssthresh}"
-+}%
+diff --git a/net/batman-adv/tp_meter.c b/net/batman-adv/tp_meter.c
+index 2e42f6b348c8..4c582443f67c 100644
+--- a/net/batman-adv/tp_meter.c
++++ b/net/batman-adv/tp_meter.c
+@@ -435,7 +435,7 @@ static void batadv_tp_sender_end(struct batadv_priv *bat_priv,
+ static void batadv_tp_sender_shutdown(struct batadv_tp_vars *tp_vars,
+ 				      enum batadv_tp_meter_reason reason)
+ {
+-	if (!atomic_dec_and_test(&tp_vars->sending))
++	if (atomic_xchg(&tp_vars->sending, 0) != 1)
+ 		return;
+ 
+ 	tp_vars->reason = reason;
 -- 
-2.53.0
+2.43.0
 
 
