@@ -1,169 +1,182 @@
-Return-Path: <netdev+bounces-285187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285268-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UHzAHYZO/GlOOAAAu9opvQ
-	(envelope-from <netdev+bounces-285187-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 10:34:14 +0200
+	id UFhiBIF2/Gm3QQAAu9opvQ
+	(envelope-from <netdev+bounces-285268-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:24:49 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2CC94E4E5E
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 10:34:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 67AA84E76BD
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:24:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0833D3094AF8
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 08:21:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9A8F5301CF97
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 11:23:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CEC5346FCA;
-	Thu,  7 May 2026 08:20:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Tm8vK2ar"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DB543B7776;
+	Thu,  7 May 2026 11:23:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1AA331F98C;
-	Thu,  7 May 2026 08:20:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B7637D13E
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 11:23:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778142057; cv=none; b=c710MZIdwO9/nzuTr5BQOgkOzzr9J3PYXbn3ZLvZ5exbklAplj7sG7SF70C/x3EeDoY9EfvUqr2ElKeXIO95jWX/06QyfAbsGkhzZcNddwOYuHJpuiCpkzg330kU/uDqlBxwbonOdzZBH1UIHSkXHOHP6ECShXlcfu4ybbLhWy0=
+	t=1778153010; cv=none; b=SI+BhVISPGKVfoH3HXYEQJvsKy064hO4m3+FhNy39y0llMflQCrFIkuldn++EF7LDKGsMhSWmbFLgjKCsqDp4xq6w7oGnZLCR4cPRq4acwAZqpWATrwreMexRwzfYjzQbITpWIAQ9QhG3dIbyCLChbv+zyWxfdh1rcwmxofXY6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778142057; c=relaxed/simple;
-	bh=xvtPRT9MCdePBI34IJ/ECAcSUUPQ6pENCScaz1ZCrHc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mm9067S8Q+bwCXa2C2DRgBeC9VHfDwv6Gqb8GtZpGEaOhgxpYXoC79xLG/eHgihxCfawfof9QdxaJ78SmNqT6S1OPrnE06yWCbHBP6U9vQeSU25v6px92nkSULvkDsk0kTyxSJjXiV3ALtLIKqcn3gSdSV323SaYTGbBkfbh5Hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Tm8vK2ar; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778142055; x=1809678055;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=xvtPRT9MCdePBI34IJ/ECAcSUUPQ6pENCScaz1ZCrHc=;
-  b=Tm8vK2armfTcCk5eErMmj8wRpaFmmU2gleZTSO54XcnPYukz85sQ0k6+
-   A9GE1UTuQVXXm7yWc2TGTLQqfRnwRHw9bqgVwpIELnGnmM1M94wdBk6lq
-   paSM2zfN8aOWy4dvqFv4Rhue1x1hwl8NQjn8HUcKZNCBWj8sx5WZ4RGlk
-   MueAmRsVYDJ6w5JGQN06kPqTb4McMg+cO/2KIH1JztCB9rO64rgb9KlJi
-   GXp2kFAKihEDFK+KFoTUj4dX3GNwO6+kBY+GP3JW+kRBEmJy2mDUuhGZT
-   2oYl4vVMkJc+Ee0s/GP7+cWUY+K90ZZ7CRbv+ZP0Wnaxlb93rMMltngJs
-   w==;
-X-CSE-ConnectionGUID: 4NSfcFxRQv6zL4V8QGbs9g==
-X-CSE-MsgGUID: w9bILCCZTHy6kDSqy9Hliw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11778"; a="79195480"
-X-IronPort-AV: E=Sophos;i="6.23,221,1770624000"; 
-   d="scan'208";a="79195480"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 01:20:55 -0700
-X-CSE-ConnectionGUID: Chid+uljQye2m9hbixrtTg==
-X-CSE-MsgGUID: WGCoWU2rQ9KCy5x/wg+CMQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,221,1770624000"; 
-   d="scan'208";a="241379129"
-Received: from gklab-003-001.igk.intel.com ([10.91.173.48])
-  by fmviesa005.fm.intel.com with ESMTP; 07 May 2026 01:20:52 -0700
-From: Grzegorz Nitka <grzegorz.nitka@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
+	s=arc-20240116; t=1778153010; c=relaxed/simple;
+	bh=mUOYDX69Yo2Cey6LzU6C+AKQLmkzTJl6hjB+pZR5lyk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lI2qLP2IOmkf4GXjn+KN86K6f9Ldm5iBiOjIJcSymKfa29W6+Xqy2rj3y/h0VDpuhMR8xDNhIFAiqgy88zF2POTbRfmktbyQybza8fG6OqbFmGZU0/NI1c1yflnmbIPqzZ87pNO745gcj9u7lCtpjW8QB45Z+PmsInzWXHBJoeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1wKwp9-0002vi-Kp; Thu, 07 May 2026 13:23:23 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1wKwp8-000ufc-2Z;
+	Thu, 07 May 2026 13:23:23 +0200
+Received: from blackshift.org (p4ffb2dc6.dip0.t-ipconnect.de [79.251.45.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519MLKEM768 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id F3CCB530405;
+	Thu, 07 May 2026 11:23:22 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	richardcochran@gmail.com,
-	jacob.e.keller@intel.com,
-	linux-kernel@vger.kernel.org,
-	Grzegorz Nitka <grzegorz.nitka@intel.com>,
-	stable@vger.kernel.org,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH iwl-net] ice: restore PTP Rx timestamp config after ethtool  set-channels
-Date: Thu,  7 May 2026 10:16:53 +0200
-Message-Id: <20260507081653.1717172-1-grzegorz.nitka@intel.com>
-X-Mailer: git-send-email 2.39.3
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net 0/6] pull-request: can 2026-05-07
+Date: Thu,  7 May 2026 10:22:22 +0200
+Message-ID: <20260507112321.439968-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: D2CC94E4E5E
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Rspamd-Queue-Id: 67AA84E76BD
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-285187-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[grzegorz.nitka@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285268-lists,netdev=lfdr.de];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[pengutronix.de];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mkl@pengutronix.de,netdev@vger.kernel.org];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[pengutronix.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-When ethtool -L changes queue counts, ice_vsi_recfg_qs() closes and
-rebuilds the VSI, reallocating Rx rings. The newly allocated rings have
-ptp_rx cleared, so RX hardware timestamps are no longer attached to skb
-until hwtstamp configuration is applied again.
+Hello netdev-team,
 
-Restore timestamp mode after ice_vsi_open() in the queue reconfiguration
-path, matching reset/rebuild behavior and ensuring newly rebuilt Rx rings
-have PTP RX timestamping re-enabled.
+this is a pull request of 6 patches for net/main.
 
-Testing hints:
-- run ptp4l application in client synchronization mode:
-	 ptp4l -i ethX -m -s
-- run PTP traffic
-- change queue number on ethX netdev interface:
-	ethtool -L ethX combined new_queue_size
-- observe ptp4l output
-- expected result: no "received DELAY_REQ without timestamp" messages
+The first patch is by Oliver Hartkopp and adds missing locking to the
+raw_setsockopt() function in the CAN raw protocol.
 
-Fixes: 77a781155a65 ("ice: enable receive hardware timestamping")
-Cc: stable@vger.kernel.org
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+A patch by Lee Jones fixes a hrtimer Use-After-Free in the CAN
+broadcast manager protocol.
+
+Alexander Hölzl's patch fixes the RX timeout for CTS holds messages in
+the CAN J1939 protocol.
+
+Shuhao Fu contributes a patch that adds missing locking to the
+local-destination check in the CAN J1939 protocol.
+
+Stéphane Grosjean's patch updates his email address.
+
+The last patch is by Ciprian Marian Costea and consistently
+disables/enables the all IRQ lines while writing the IRQ enable
+registers.
+
+regards,
+Marc
+
 ---
- drivers/net/ethernet/intel/ice/ice_main.c | 6 ++++++
- 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 79f2906eda99..b87accaf7d14 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -4110,6 +4110,12 @@ int ice_vsi_recfg_qs(struct ice_vsi *vsi, int new_rx, int new_tx, bool locked)
- 	}
- 	ice_pf_dcb_recfg(pf, locked);
- 	ice_vsi_open(vsi);
-+	/* Rx rings are reallocated during VSI rebuild and lose their ptp_rx
-+	 * flag. Restore timestamp mode so newly allocated rings are set up
-+	 * for hardware Rx timestamping.
-+	 */
-+	if (test_bit(ICE_FLAG_PTP_SUPPORTED, pf->flags))
-+		ice_ptp_restore_timestamp_mode(pf);
- 	goto done;
- 
- rebuild_err:
+The following changes since commit b266bacba796ff5c4dcd2ae2fc08aacf7ab39153:
 
-base-commit: f0cfdedb42fe64b06fd048bd490ef835beeda658
--- 
-2.39.3
+  net: ethernet: cortina: Drop half-assembled SKB (2026-05-06 18:43:41 -0700)
 
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-7.1-20260507
+
+for you to fetch changes up to f22a636357d5ff4fd2bb10d8079d851ccb320438:
+
+  can: flexcan: disable all IRQ lines in flexcan_chip_interrupts_enable() (2026-05-07 10:05:55 +0200)
+
+----------------------------------------------------------------
+linux-can-fixes-for-7.1-20260507
+
+----------------------------------------------------------------
+Alexander Hölzl (1):
+      can: j1939: fix wrong RX timeout for CTS hold messages
+
+Ciprian Marian Costea (1):
+      can: flexcan: disable all IRQ lines in flexcan_chip_interrupts_enable()
+
+Lee Jones (1):
+      can: bcm: prevent thrtimer UAF in rx path by checking RX_NO_AUTOTIMER
+
+Oliver Hartkopp (1):
+      can: raw: add locking for raw flags bitfield
+
+Shuhao Fu (1):
+      can: j1939: fix lockless local-destination check
+
+Stéphane Grosjean (1):
+      can: peak: Modification of references to email accounts being deleted
+
+ .mailmap                                      |  4 +-
+ drivers/net/can/flexcan/flexcan-core.c        | 14 ++++++
+ drivers/net/can/peak_canfd/peak_canfd.c       |  2 +-
+ drivers/net/can/peak_canfd/peak_canfd_user.h  |  2 +-
+ drivers/net/can/peak_canfd/peak_pciefd_main.c |  4 +-
+ drivers/net/can/sja1000/peak_pci.c            |  4 +-
+ drivers/net/can/sja1000/peak_pcmcia.c         |  4 +-
+ drivers/net/can/usb/peak_usb/pcan_usb.c       |  2 +-
+ drivers/net/can/usb/peak_usb/pcan_usb_core.c  |  4 +-
+ drivers/net/can/usb/peak_usb/pcan_usb_core.h  |  2 +-
+ drivers/net/can/usb/peak_usb/pcan_usb_fd.c    |  2 +-
+ drivers/net/can/usb/peak_usb/pcan_usb_pro.c   |  2 +-
+ drivers/net/can/usb/peak_usb/pcan_usb_pro.h   |  2 +-
+ include/linux/can/dev/peak_canfd.h            |  2 +-
+ net/can/bcm.c                                 |  6 +++
+ net/can/j1939/transport.c                     | 20 ++++++--
+ net/can/raw.c                                 | 66 ++++++++++++---------------
+ 17 files changed, 83 insertions(+), 59 deletions(-)
 
