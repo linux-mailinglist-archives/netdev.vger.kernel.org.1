@@ -1,282 +1,257 @@
-Return-Path: <netdev+bounces-285143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285144-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yM5nKeIO/GnsKgAAu9opvQ
-	(envelope-from <netdev+bounces-285143-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 06:02:42 +0200
+	id EB5zNvYS/GkjLAAAu9opvQ
+	(envelope-from <netdev+bounces-285144-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 06:20:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50D254E2C16
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 06:02:42 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE9E24E2DB1
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 06:20:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A55B43009CF8
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 04:02:41 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D652B3001A4B
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 04:20:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11FC731815D;
-	Thu,  7 May 2026 04:02:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136BB2D0610;
+	Thu,  7 May 2026 04:20:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RL2LuZGw"
+	dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b="ELzT0XEi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010023.outbound.protection.outlook.com [40.93.198.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E8B31A7E4
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 04:02:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778126561; cv=none; b=DrUxGqmomG82R1cEyrEfOP0NbDIcqir4cnoYYBDulH6LHFfYWB6x+s5GkGXJDKGIHMQZxPK+SITULCuUs88x7zHCI+McsLzsmSXA5mIzLtV47l6vhPlM8Mikjq/BSol7QaUBiAgh0Q0rNA5af7Llwwf1H1fGRWGbBrKDd4CcmF4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778126561; c=relaxed/simple;
-	bh=Ll5t8GG+HHemlVZ/dlzGil/rBZk5oSgZbVxAUeRxn+8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JYlTR1M6WJr6NnTZK3KCPxRW8lp3OFzgKkVk/cCx8BmWHSa4zgXhmH5ZiD74QiapSF0hYFrlF/TCeCIztKFs801o8iJbY+hRC6VIUnlGBHEJov36e31PXM83YTM4ugRNHn9k3yfuoBhraIbigiBpYnFts6BGBW4ZEMAv5FwOpMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RL2LuZGw; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-3660ab73adbso130953a91.1
-        for <netdev@vger.kernel.org>; Wed, 06 May 2026 21:02:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778126557; x=1778731357; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Jq5gyYRLK16pcO2llT+UUfUWubla4yLA0GVq02udlXI=;
-        b=RL2LuZGwYfTHFPP9NJzBHUOyErQiI5dLc0Wm4BNfPAOqZBzInj4DvHJK+HAaQkYS85
-         cbxCvtE2effJedExPyIcmLObxJPL2fVcK6P/52AZo4fK4H13aGZm/VdUZpW56yYye0jy
-         pw62lQI3lr80jDFoKoVnWwFBzoXWb+N26svryuTWAxI4fs+ZMZgbWzd0NxV6pWAAbcVT
-         JQgnlByNqmEpWuOfkM7tv93sMhWiHXVOo2wgDNxGivfuAsuNN9yFL5ZLvAWxb72+2tVq
-         PDyHCsac6uneXgRpfpLOat89XVTH/nvgvAs262hgHFv9qvkxoDgSsbb/M5cm5san5Eyg
-         vx4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778126557; x=1778731357;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Jq5gyYRLK16pcO2llT+UUfUWubla4yLA0GVq02udlXI=;
-        b=QoskAyOHstkjSL+9SHmkJF+d1bHBr6/9JK0rRVEPEVVa+haVHFqUaQuLoXxmYwqTY7
-         g5Rm2YeAdjc+h6tX7FM8OF95aJ4udIlXu93MWR5yDxp3+rhVXoCaMgs6kVQxHlVWpRs0
-         ZnAsRxOf54JFI1du3BmIawWXy10e5V9XsPGKzY4Js4miC+zPi5XVxlh6qv+HM1f1+S3+
-         Zp7CVVmLh64AievGYdnD2Cd/eG3PK0e+++GPEOGBdfjPmO6GlfSQmI/JTJyAE0LrlWQU
-         jAMgbmQCE8+qhCxchvJJBA6UxxgIVEnxTDDFjLlO1ikcmluENOexa35K1BZOMpiR4ZNS
-         +L1w==
-X-Gm-Message-State: AOJu0YyOAN4/AxQI1W4xO3q8IaYhgvHGoaKBW9btOveplO/7vZJJ9ENW
-	GRAJn79wUArH2dsqI3UKeYNMXJogwEKLG+EgWlnzraRbLj8miE1Wt3k0uJfW/mZe
-X-Gm-Gg: AeBDieuPemcQcMtK8r/Yw/507K9xRDWa+T+jPIN6eGYRhjppRozKM4Av+ojoiKh8Hrv
-	6gM3NVyTplrupVzwSQ7iLtTL1vtHMF9fm7lLkvvKDsTu/Q6bD+92oCS/y+/BwyO6DeFarCADpOu
-	1v1mlCqo694gQVEsyo7nfslBDtWP9M2gaO8+eh0bAosgTToLP/TIO0QuRcBOgvcImZV5YX9uHr0
-	cGbLvyk69hw84gLzAWz1Nx62ecNNhY2c2WEvVXwDm0bQ19sKrWh0M0idd0HVeLyOCUJWxYJVvpT
-	JkXZqt3uIWDncNRiLvTlWzHMAjP1Bw0tJG+Y9/qRIXtaGnvncoQ/7GoqUlJ8C4Y9flts/JByjZN
-	iDhH3VWmHVAiqoBGuzAGplMYlw1xWH6kQ51aZEvW/Dacex9AWwhlg9ioORIkKb2Sox/vnOD/2zf
-	mAsk0nVVCIcPay7c6uUZ62w07wqcn4hB31J/+Zi7yDE5Vf6/9ph3m2zQ==
-X-Received: by 2002:a17:90b:37ce:b0:35e:579a:7e9a with SMTP id 98e67ed59e1d1-366053f7f37mr1026290a91.7.1778126557333;
-        Wed, 06 May 2026 21:02:37 -0700 (PDT)
-Received: from ampere-server.example.org ([103.68.183.118])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-365d8e3dad8sm2536182a91.1.2026.05.06.21.02.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2026 21:02:37 -0700 (PDT)
-From: "chunzhi.lin" <linchunzhi0@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936992C0F75;
+	Thu,  7 May 2026 04:19:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.23
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778127601; cv=fail; b=bQxLYVL9gS7v81mp13dvBpXSadexEo112iZGQhmzCHVfC6gHsKWnZ1EdPF3gw2RCDPRd9uYAP9Wal4/B9Uraz5Ryhp4Z/3jR1Yp7egb+ClFpDlKL4lTZ/YNsSpDOL9X/QarBy5DCmkgMCwIpulPmdc1De52/T7zvOVqmVeEBlHs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778127601; c=relaxed/simple;
+	bh=Tq6axefYy7EVn1HDCHwTyrAvC2jFkF7f5XpqSh6fBIQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=oY53S4cOEkWVajU+okkyorDbkJtS9gOHQq1IxXmhKFsmm18DnjiCB6wlss95a2u3cCPtNMz8QG4Q2za1P2R4eLZXadQ3GJ7Hv05zYGmgiWwHjNvgs4FuMraaBPHs9SiPuHfRtiHovCv18mPiVtXpL1M9AZ9f9OiE242dgUC1D3M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=ELzT0XEi; arc=fail smtp.client-ip=40.93.198.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altera.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=sDF4UOes67ViwNGUm0Wm81NRnPwxcbHeo/0LUHhUVU63JCa2mNs48ZehS0IdLRsHcAj3e78JUGoQDsAK9iBCv0Mo+hOJMfqRWp5DOme1Fcgdbhn4o8CAi8zULmq2z9P3V3nBiI49r6w2l6nH4zdlEIo3g34onsPF10NLy+UxxXFAOroNt7tU5CzYDViANvcc2QYVF5czXc8L8GkQX6/W8+j4wFaQWJD2Gs1+4058y0vkdMv5Z7PAff6hQj08/eFNHkrU9OTRktR1xH7YS0+9tf/LB8YK/4Y7fj/a6F9MGpzwsYNmK6TcIM+IO5nB9UvYuJrd888lC+0hqQR5GZvv/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=T6rIKtwbBTjCCCss43G7gPPtd++DcQPNFh0/UziJGhI=;
+ b=Qek0NQH5woelIVowmxUVxJTytuMKYqYCcIhjpvIWPtSHCI9Swb6AAZjqyjsnNlqDLv/d0VWcaujr3dfOdFhxhdd7q8gVgdEQoc2dWN7AxW/yaz2NUAGO5oxZlVxXCrgxbj05QdxND0W3LOm+J2Jj0svz13P9trjYdLPKWaIAtAAJwKcyQLJFF9Liouge56o/Ve4h5Xx+gK536IAAtwE9r/qW+t3Zq54PQouRz6cEHU4V0AQW6CShTp+wyV61YRTVb/fZKqClQJpO/H46sakvdjOopzU5AIsH03LoR/ts9aJYDPv5EpElMvS1nC9oBqCCBIQXtEnuDuBT91dvToLFfg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
+ dkim=pass header.d=altera.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T6rIKtwbBTjCCCss43G7gPPtd++DcQPNFh0/UziJGhI=;
+ b=ELzT0XEieizQ1jBlLJVPmszqRvsWRvBvLJFy1QPYYHyRPZlkB63lkiVf+2vlM8PrvbZsgScAKSxFlO46Iz+HJuc34P2GNpI3X2DgKzngGl58nSqSFdnjjAEEFPy6wH7nunyK8et8fCQhwkhIDPd3thojExijUSLxNx/2Xpnn+iKDcLnGcPCWWko0vUj+ECXkMQFm4KIwGUemt/TOHZs7xzrrW8z0YVcZsOponFYSQlgF5is64UU9j0WKrkG3NZzFDSclC/ZlB1v82oG9YxK0GDlSVmCy9TmhxZD/LQsf2YRS+HBg/4O0eIKcdPLRrzOWyLyexwWmT4vAbIbiysogiw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=altera.com;
+Received: from SJ0PR03MB6964.namprd03.prod.outlook.com (2603:10b6:a03:432::18)
+ by SJ0PR03MB7050.namprd03.prod.outlook.com (2603:10b6:a03:4d6::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.17; Thu, 7 May
+ 2026 04:19:56 +0000
+Received: from SJ0PR03MB6964.namprd03.prod.outlook.com
+ ([fe80::b965:bfa8:58fb:e775]) by SJ0PR03MB6964.namprd03.prod.outlook.com
+ ([fe80::b965:bfa8:58fb:e775%6]) with mapi id 15.20.9870.023; Thu, 7 May 2026
+ 04:19:56 +0000
+From: muhammad.nazim.amirul.nazle.asmade@altera.com
 To: netdev@vger.kernel.org
-Cc: Frank.Sae@motor-comm.com,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
+Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	edumazet@google.com,
-	davem@davemloft.net,
-	linux-acpi@vger.kernel.org,
-	rafael@kernel.org,
-	lenb@kernel.org,
-	"chunzhi.lin" <linchunzhi0@gmail.com>
-Subject: [PATCH v2 2/2] docs: acpi: dsd: add Motorcomm yt8xxx PHY properties
-Date: Thu,  7 May 2026 12:02:21 +0800
-Message-Id: <20260507040221.3679454-3-linchunzhi0@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260507040221.3679454-1-linchunzhi0@gmail.com>
-References: <20260507040221.3679454-1-linchunzhi0@gmail.com>
+	andrew+netdev@lunn.ch,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3] net: stmmac: Add support for TX/RX channel interrupt
+Date: Wed,  6 May 2026 21:19:54 -0700
+Message-ID: <20260507041954.25198-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
+X-Mailer: git-send-email 2.43.7
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR13CA0014.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c0::19) To SJ0PR03MB6964.namprd03.prod.outlook.com
+ (2603:10b6:a03:432::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 50D254E2C16
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ0PR03MB6964:EE_|SJ0PR03MB7050:EE_
+X-MS-Office365-Filtering-Correlation-Id: e9b2e863-ced3-4c02-1fc7-08deabefe4e0
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|55112099003|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	1kvTJ/jeznDLp2ibxvqarnWcUXNFM8Vb7SneCbbnJHSjXHm9u2CAS3hklY85rHDkPCb3hl41u4Nlbd2pI4zaX9HUPEze1NjGvZDs7O6shmQ8/Koyt+MZAwWWZ1w+jetD7PRP0GbsOz1GAEzUUKLnh8j/0iTFWi7HzhMk5yuMeQuYqRm9RROuP5gfzjsNoge1KgfMjREKR+xu7zwtysjjSqJ5dsiJiGjlMjBbpnhkW1qUzQ4y1eZiIBzN8qj1+5xhzVj3glYLHtCUlvKRbZkguJyEBm9bTOo4VtuNEsy38/vBuxwsqDA1SEYMkFDfMvpFJhfSIT90Wursm7FgmwIUNfzYUoffLgYbgSwWUcGKGd3VLvc5TLRW8spMlKY+Dmw+60ZWnLenKZ6K868e1igpvKJdwqyj2rQuEtOogWNBOHWiINodtYY1XvEMIkThOwFEFxKP+Mre6/JFhGaaUFMtos0xk/iwb07VxL0ShPmRD7XRopWNv83UCR5Lbg4aMEN78D1DlCy4wIRQflB023oBXn6dxDXaP56yCUNqQ68nea4ldIkNDOH+FAT++PBdzZcIMLP3hy4QPR32NAr/pifZaVKzTFJx1PzYcXS4gO5LB6tE0Bp8SKnoyrSv4Js0v31i4LUt0WoMy2QXNLkbg0eZnPzviSzt+SjGW4r5ojzNMOHPfNllew+8Gco8qmASnr+d
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR03MB6964.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(55112099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?DEhUTti8RYU6hTPmb9ioap4cBVvSaKCY6xownMugk8S730TJOEqPgOnRvv7l?=
+ =?us-ascii?Q?d1TOmVsZ/mI+xWXfmUUm+owYo0G00gk9akWR6GEwapy5SLWXd+UCTFWLzmic?=
+ =?us-ascii?Q?/obCmXWLCEj3ge4UnCpFh3EjPTTqfxwNiuXJ1OHaYRTtJ7M61SNec5KV7Kx9?=
+ =?us-ascii?Q?c7L/SjIGTg6Te1Fls9GMkX+yT9ICzZeRdZ/tCLt/k/EyQKtdmD1njrk9vv2L?=
+ =?us-ascii?Q?NQ98rbI615/D4FRjZB3OddkNA+do0BgGjN57GSM7K1ZxjhCPFqQPuKh6aInn?=
+ =?us-ascii?Q?8gOwjjrr4oZx4cE9EMl14mykXZbeDKKvCuHWT7cQycmLDjvayf2UxQAR8+kJ?=
+ =?us-ascii?Q?mzMtpYb8dHZ7KgTxNWUH9Cbsn8vLFAfaMkN/eW37NO9Yr9svMkbwPFKbH2mD?=
+ =?us-ascii?Q?ZaIQKjuBP/rp/zLJiYpPUMPiYrZ7HtIAlOCzWYeBDkAHxWiajSLmlxofr3Qn?=
+ =?us-ascii?Q?Wp7RSrPR0pE7RNbH8481MBfnDZyC/wMWF0lg/KpQ1MRGFywgHZ/jxJyBlTqf?=
+ =?us-ascii?Q?AX6iRoyf4b/apz5FmxhMdZQYuxCdjvoruSSvn0vD7vsJHd3a3hXNcbTkqhMX?=
+ =?us-ascii?Q?2/6Y6m1Yikw3InJ2NWKGXl4BnJd2fLBOjV7PvPlkDB9xwHiRxSLIsV2TQkuc?=
+ =?us-ascii?Q?VjottzZyyIQ3y6MSzJ11fKJYCUX1uwyc8r7WpF7h7e7lzzkhj2UFL3VHZw1Q?=
+ =?us-ascii?Q?4elg9NeEvh7nT3b7ZWYm+Yigq8yOLx5d1kfk1M0JucaT5Z2hUHRAZe9LqMM5?=
+ =?us-ascii?Q?tlpGOXzbxGx+0uvTVJXngUATDjmygyxM+wraeIqOBhjns/1Cjb4j81ChIvDv?=
+ =?us-ascii?Q?aXeHzyyTLgxruxscVHjcSD/SYTrB/weYsO2eHRPQHc4aqx00c+4ACeWzU4Mb?=
+ =?us-ascii?Q?FSqvMV8B1BILZtbg44AGe52tyyarxF6mQUc4FX8rEANXZhpOP5YrDwTYPbOM?=
+ =?us-ascii?Q?PeoexaHaS30eyI/VXPRNnwkwm6CgfDuRr7tChcS0K3ddsk3VCC7XNxR2dfO2?=
+ =?us-ascii?Q?unl0pU5eUiG5+H6UEdrucNfHy3GVS5GADSu8//mmUiOGjFn8PmkfeChVnngB?=
+ =?us-ascii?Q?qfC2yZpohRTQFyA495XsbLkVRgNd+mopOAHdgZw50FZOOZnftJbfHs42KVt3?=
+ =?us-ascii?Q?cTtEzpDKixaUTqGkWEKnDGxyB3+HqG6slpUSEgkWLUl8AKcV8KZvFlKGLWJh?=
+ =?us-ascii?Q?Z8/DHe/VqAGUNxJExQ7B4lD4sfC+qtEeNt+TLbFfcoMzch/WLT9ec0kcbOA5?=
+ =?us-ascii?Q?27f2EVPWGCjMEb2EBLYwRpE3uXagPTjEk2ADUbi2Y5yvLgqGW1pePkKsQsRM?=
+ =?us-ascii?Q?9YMlMy51ddhJ9mNzOnJvdk3u+u1WgtZ+PcjleDED7eNqEoV0bPlEbN7RXt/K?=
+ =?us-ascii?Q?6pVpu3NFsrOGoDxu74AoWrhZiAywQY3NG0ICFx0/ULYegfJlzDzaE8B5ubJI?=
+ =?us-ascii?Q?5zH7nYqIUdoDXR7vRsAxvrkU/4E00g+9jjriM2qnX6x+Vo/vDiCI5zmYqBLz?=
+ =?us-ascii?Q?vBhAm2EJ37ThsnJFZPJ5qLhPpcXYCXuWyM4rCJw6Qf9x6ljfP2vWDFhJOoLY?=
+ =?us-ascii?Q?9IwbTPyWd3jCsx51SPOXF8U5/CwYXB18zVxv2BBVK47fyDyFErAwnL/a+nSy?=
+ =?us-ascii?Q?4CNmyHpTpUaVdZeWPGSnMG1QNsq3xf5Im7v96wlsYtpJeOxhr2MiuPTaB4FR?=
+ =?us-ascii?Q?Ra74bOqyKN0MSVlZUcLVGFoHd0TEJCDaU42V1p3Bj7CZCXaotmK6wv/HHKux?=
+ =?us-ascii?Q?ztkYuxkABgfTUxaVTXcWJdzFlfNb2xG7R7CxCuXtqW8zfsEAMTOTzYDWJhvI?=
+X-MS-Exchange-AntiSpam-MessageData-1: 1lf500ngiz0eJg==
+X-OriginatorOrg: altera.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e9b2e863-ced3-4c02-1fc7-08deabefe4e0
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR03MB6964.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2026 04:19:56.0518
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xNJZX2K/7Tg1DRDLW/3rWqLSJ8JtBq/OCM9OcqS9Ai0ZD6vUGOTXwgGmJvE7kUkATT2LLClGd6Ia1O9Qioc524d/tsAbgEgqFvgKXpaklT5S6S9yzp0H0QcBq1vmw12UUFqU3wioof1o9/PB4knvtg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR03MB7050
+X-Rspamd-Queue-Id: DE9E24E2DB1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[altera.com,reject];
+	R_DKIM_ALLOW(-0.20)[altera.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[motor-comm.com,lunn.ch,gmail.com,armlinux.org.uk,kernel.org,redhat.com,google.com,davemloft.net,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-285143-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DKIM_TRACE(0.00)[altera.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285144-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linchunzhi0@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
+	FROM_NO_DN(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Document Motorcomm yt8xxx PHY ACPI _DSD properties consumed by
-the motorcomm PHY driver.
+From: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
 
-Describe property placement, UUID usage, and reference the DT binding
-for value constraints and defaults.
+Enable TX/RX channel interrupt registration for MAC that interrupts CPU
+through shared peripheral interrupt (SPI).
 
-Signed-off-by: chunzhi.lin <linchunzhi0@gmail.com>
+Per-channel interrupts and interrupt-names are registered as follows,
+e.g. 4 TX and 4 RX channels:
+interrupts = <GIC_SPI 100 IRQ_TYPE_LEVEL_HIGH>,
+             <GIC_SPI 101 IRQ_TYPE_LEVEL_HIGH>,
+             <GIC_SPI 102 IRQ_TYPE_LEVEL_HIGH>,
+             <GIC_SPI 103 IRQ_TYPE_LEVEL_HIGH>,
+             <GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>,
+             <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>,
+             <GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>,
+             <GIC_SPI 107 IRQ_TYPE_LEVEL_HIGH>;
+interrupt-names = "dma_tx0",
+                  "dma_tx1",
+                  "dma_tx2",
+                  "dma_tx3",
+                  "dma_rx0",
+                  "dma_rx1",
+                  "dma_rx2",
+                  "dma_rx3";
+
+Signed-off-by: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
+---
+Changes in v3:
+- Add net-next tree prefix to subject line.
+- Fix variable declarations to follow Reverse Christmas Tree order.
 
 Changes in v2:
-- Keep dsd/ entries sorted in Documentation/firmware-guide/acpi/index.rst
+- Use -ENXIO to detect when interrupt name is not present,
+  and return any other negative error code to the caller.
 ---
- .../acpi/dsd/motorcomm-yt8xxx-phy.rst         | 107 ++++++++++++++++++
- Documentation/firmware-guide/acpi/index.rst   |   1 +
- 2 files changed, 108 insertions(+)
- create mode 100644 Documentation/firmware-guide/acpi/dsd/motorcomm-yt8xxx-phy.rst
+ .../ethernet/stmicro/stmmac/stmmac_platform.c | 27 +++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/Documentation/firmware-guide/acpi/dsd/motorcomm-yt8xxx-phy.rst b/Documentation/firmware-guide/acpi/dsd/motorcomm-yt8xxx-phy.rst
-new file mode 100644
-index 000000000000..d64a396fac81
---- /dev/null
-+++ b/Documentation/firmware-guide/acpi/dsd/motorcomm-yt8xxx-phy.rst
-@@ -0,0 +1,107 @@
-+.. SPDX-License-Identifier: GPL-2.0
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 5cae2aa72906..9039e207ddbd 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -732,6 +732,9 @@ static int stmmac_pltfr_get_irq_array(struct platform_device *pdev,
+ int stmmac_get_platform_resources(struct platform_device *pdev,
+ 				  struct stmmac_resources *stmmac_res)
+ {
++	char irq_name[9];
++	int ret;
++	int irq;
++	int i;
+ 
+ 	memset(stmmac_res, 0, sizeof(*stmmac_res));
+@@ -767,6 +770,30 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
+ 		dev_info(&pdev->dev, "IRQ sfty not found\n");
+ 	}
+ 
++	/* For RX Channel */
++	for (i = 0; i < MTL_MAX_RX_QUEUES; i++) {
++		snprintf(irq_name, sizeof(irq_name), "dma_rx%i", i);
++		irq = platform_get_irq_byname_optional(pdev, irq_name);
++		if (irq == -ENXIO)
++			break;
++		else if (irq < 0)
++			return irq;
 +
-+======================================
-+Motorcomm yt8xxx PHY properties (_DSD)
-+======================================
-+
-+This document describes ACPI _DSD device properties for Motorcomm yt8xxx
-+Ethernet PHYs supported by the in-kernel driver in
-+``drivers/net/phy/motorcomm.c``.
-+
-+The properties are exposed on the PHY device object under the MDIO bus ACPI
-+device (the same objects that are registered via
-+``fwnode_mdiobus_register_phy()``). MAC-side connection properties such as
-+``phy-handle`` and ``phy-mode`` are documented in [acpi-mdio-phy]_.
-+
-+Property names and semantics are intentionally aligned with the Devicetree
-+binding [motorcomm-yt8xxx]_ so that the same driver code path
-+(``device_property_*`` on ``&phydev->mdio.dev``) can consume firmware
-+described either as Devicetree or ACPI _DSD.
-+
-+UUID and placement
-+==================
-+
-+Per [acpi-dsd-properties-rules]_ and [acpi-mdio-phy]_, properties must be
-+placed in an _DSD package using the standard Device Properties UUID::
-+
-+	ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301")
-+
-+Properties
-+==========
-+
-+Unless noted otherwise, integer properties use the same allowed values and
-+defaults as [motorcomm-yt8xxx]_.
-+
-+``rx-internal-delay-ps`` (u32, optional)
-+  RGMII RX internal delay in picoseconds. Only meaningful when the link is
-+  using RGMII modes with RX internal delay; see [motorcomm-yt8xxx]_.
-+
-+``tx-internal-delay-ps`` (u32, optional)
-+  RGMII TX internal delay in picoseconds. Only meaningful when the link is
-+  using RGMII modes with TX internal delay; see [motorcomm-yt8xxx]_.
-+
-+``motorcomm,clk-out-frequency-hz`` (u32, optional)
-+  Clock output frequency on the PHY clock output pin. Allowed values and
-+  default are defined in [motorcomm-yt8xxx]_.
-+
-+``motorcomm,keep-pll-enabled`` (boolean, optional)
-+  If true, keep the PLL enabled even when there is no link (useful for using
-+  the clock output without an Ethernet link). See [motorcomm-yt8xxx]_.
-+
-+``motorcomm,auto-sleep-disabled`` (boolean, optional)
-+  If true, disable the PHY auto-sleep behavior described in
-+  [motorcomm-yt8xxx]_.
-+
-+``motorcomm,rx-clk-drv-microamp`` (u32, optional)
-+  Drive strength for the ``rx_clk`` RGMII pad in microamps. Allowed values
-+  depend on the configured RGMII LDO voltage; see [motorcomm-yt8xxx]_.
-+
-+``motorcomm,rx-data-drv-microamp`` (u32, optional)
-+  Drive strength for the ``rx_data`` and ``rx_ctl`` RGMII pads in microamps.
-+  See [motorcomm-yt8xxx]_.
-+
-+``motorcomm,tx-clk-adj-enabled`` (boolean, optional)
-+  Enables adjustments related to ``motorcomm,tx-clk-*-inverted`` usage; see
-+  [motorcomm-yt8xxx]_.
-+
-+``motorcomm,tx-clk-10-inverted`` (boolean, optional)
-+``motorcomm,tx-clk-100-inverted`` (boolean, optional)
-+``motorcomm,tx-clk-1000-inverted`` (boolean, optional)
-+  Per-speed TX clock inversion options; see [motorcomm-yt8xxx]_.
-+
-+ASL example (illustrative)
-+==========================
-+
-+The example below only shows PHY-local _DSD properties. A real platform
-+still needs a MAC ``phy-handle`` and ``phy-mode`` package as in
-+[acpi-mdio-phy]_.
-+
-+.. code-block:: none
-+
-+	Scope (\_SB.MDI0)
-+	{
-+		Device (PHY4)
-+		{
-+			Name (_ADR, 0x4)
-+
-+			Name (_DSD, Package () {
-+				ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
-+				Package () {
-+					Package (2) { "rx-internal-delay-ps", 2100 },
-+					Package (2) { "tx-internal-delay-ps", 150 },
-+					Package (2) { "motorcomm,clk-out-frequency-hz", 0 },
-+					Package (2) { "motorcomm,keep-pll-enabled", 1 },
-+					Package (2) { "motorcomm,auto-sleep-disabled", 1 },
-+				}
-+			})
-+		}
++		stmmac_res->rx_irq[i] = irq;
 +	}
 +
-+References
-+==========
++	/* For TX Channel */
++	for (i = 0; i < MTL_MAX_TX_QUEUES; i++) {
++		snprintf(irq_name, sizeof(irq_name), "dma_tx%i", i);
++		irq = platform_get_irq_byname_optional(pdev, irq_name);
++		if (irq == -ENXIO)
++			break;
++		else if (irq < 0)
++			return irq;
 +
-+.. [acpi-mdio-phy] Documentation/firmware-guide/acpi/dsd/phy.rst
-+.. [acpi-dsd-properties-rules]
-+   Documentation/firmware-guide/acpi/DSD-properties-rules.rst
-+.. [motorcomm-yt8xxx]
-+   Documentation/devicetree/bindings/net/motorcomm,yt8xxx.yaml
-diff --git a/Documentation/firmware-guide/acpi/index.rst b/Documentation/firmware-guide/acpi/index.rst
-index b246902f523f..db9eb7229948 100644
---- a/Documentation/firmware-guide/acpi/index.rst
-+++ b/Documentation/firmware-guide/acpi/index.rst
-@@ -11,6 +11,7 @@ ACPI Support
-    dsd/graph
-    dsd/data-node-references
-    dsd/leds
-+   dsd/motorcomm-yt8xxx-phy
-    dsd/phy
-    enumeration
-    osi
++		stmmac_res->tx_irq[i] = irq;
++	}
++
+ 	stmmac_res->addr = devm_platform_ioremap_resource(pdev, 0);
+ 
+ 	if (IS_ERR(stmmac_res->addr))
 -- 
-2.34.1
+2.43.7
 
 
