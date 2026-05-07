@@ -1,68 +1,103 @@
-Return-Path: <netdev+bounces-285435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285436-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uFqEDiPF/Gk8TgAAu9opvQ
-	(envelope-from <netdev+bounces-285435-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 19:00:19 +0200
+	id C2PMOpTH/Gn1TgAAu9opvQ
+	(envelope-from <netdev+bounces-285436-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 19:10:44 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AE9A4EC951
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 19:00:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 728C04ECB32
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 19:10:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 44C2F3041AB4
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 16:59:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E5DBF3044A6B
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 17:08:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C51243E481;
-	Thu,  7 May 2026 16:59:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69FB03E7151;
+	Thu,  7 May 2026 17:08:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mLZ+/sT4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ieUmIgrG";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vb12oJn6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F1AE31F983;
-	Thu,  7 May 2026 16:59:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B4729827E
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 17:08:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778173167; cv=none; b=cnHD7Hk7eciFRnhAAX9S+GA4q51p04FmnEZicPlEGQD/vEkuR1X703OSVKGsgpw9//SX5nBBiuVPikHOfu1xinf9awvcjuJL+ttO/CZrAGx46nbCzyii2H9hBg7NVMG07SFxFXd8WPHSbgMAgZSR1VVoRYEeOHr1nSqhLWFH9/s=
+	t=1778173722; cv=none; b=pZp5+nQ6FGOGq/BEm9djNbyuAptxNSml8+tfb/YCC01o7eaKo79Ibqd+WjsbYxW5nAcG8TF+nny8EsuxY2vaFAmChjY1rDAGWOb5DJpbwI6zgHNKPznBlTLC7na43Q905HLF+yKkPjoeXE5UIQjWz1Ql2m9rybCEvJjQSlR825s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778173167; c=relaxed/simple;
-	bh=pazXxEd7A1cd1sWGeu/YHbddxLF5r07GBKYjKOW2Pzc=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Pippnx6hyCVA2bzwIVT1egb35y5UJB5caFDhuqbXZgeGpJlJz6BsTKC+nhBEurlLhcHpEZGTGN9jScY0FllAmUXmKJbyAzjPx+5HivEx7FEGhVfdSQ9EPqDoTvqcX0gbmOc2wilEAM1jDGqWZUpjt0vPHb9BswmmeNV2HL7/gr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mLZ+/sT4; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778173163; x=1809709163;
-  h=message-id:date:mime-version:subject:from:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=pazXxEd7A1cd1sWGeu/YHbddxLF5r07GBKYjKOW2Pzc=;
-  b=mLZ+/sT4r6BRCyRVo8iiS89p4A832B5LkLnGF/VNpITpd45T8YBJavrr
-   imw5kTRI94dRoujppDiM1R5bSsy6/rAmIwR+ITF76F7vIr6eHoMOl18/e
-   Vhd2r+eXBpO+0qiieBtOZR2GsVQJLU/MaevK6aqo1ClWyYyDaWI2n9o6/
-   SX7w3Q0oNY37WcxgGWDYzrBF2moWrXx2zngg5ASNh0JB0z52iCFqRJDLL
-   /ZSnw/OuG7IL7ZjE/vAZ85SYGRTTuNv/wzjDqgmsYeIufbzMHKMuUrYCs
-   vZFF9xqVhq5k8Dl4196h+uorJaN7DuyA6sKz9gFFoASoobDYCMEryQYtO
-   Q==;
-X-CSE-ConnectionGUID: c8rJnQjfR9ux+o3jqGUflw==
-X-CSE-MsgGUID: N6aEvWlET5ywoTap9Jpaww==
-X-IronPort-AV: E=McAfee;i="6800,10657,11779"; a="82975389"
-X-IronPort-AV: E=Sophos;i="6.23,221,1770624000"; 
-   d="scan'208";a="82975389"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 09:59:18 -0700
-X-CSE-ConnectionGUID: A/1g4vxpRaeXQt2eYX0VBw==
-X-CSE-MsgGUID: 1zqVMEuqTBCtM0Sus+wYDw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,221,1770624000"; 
-   d="scan'208";a="259952125"
-Received: from mszycik-mobl1.ger.corp.intel.com (HELO [10.246.20.168]) ([10.246.20.168])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 09:59:14 -0700
-Message-ID: <3abb7d8f-82eb-46e8-8243-fc6f596ab84c@linux.intel.com>
-Date: Thu, 7 May 2026 18:59:11 +0200
+	s=arc-20240116; t=1778173722; c=relaxed/simple;
+	bh=k5L9T9HuspKLeaPcV4E6F4xntMBi1FakBcE91U1GjXc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I50deE1UG17Ppv5dlKd3vfsIdp4ABiCsmLVZKpbinCwj0XHapKTsIV5bNPP5PGvqcfUX2yo9Rwct8c2uXZjPmeLyC/D5nMqtX9eh/GbvDp06oBsrMtGK9K9ZD36R+ozJXLDhUmwsOlWz6wJF3H/vKOWz1WXEBWUGGzTquczwAE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ieUmIgrG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vb12oJn6; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778173719;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0g8BZOUIqwFMf5MczCTWS57/QZes3BdStmRaQBqy/OM=;
+	b=ieUmIgrGp0qdnGGLJ5aXXJ1WbFPv9CTo3dB1qYW576s5AM/SVK1Z8Sb4DS17IN2jsDIBLx
+	/0ZsIsetdsf/gFGycEIOZDsqHmyToEnj6R1S8OOj2vAoVZOk7rIPgcopxAMfcww1/g1ZfD
+	8HD4JTUX7Uht/gZv3DIZwBMs0QDTzzA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-599-ukS0AcrtMOSkDmCN9gA_KA-1; Thu, 07 May 2026 13:08:38 -0400
+X-MC-Unique: ukS0AcrtMOSkDmCN9gA_KA-1
+X-Mimecast-MFC-AGG-ID: ukS0AcrtMOSkDmCN9gA_KA_1778173717
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-48a7994e8ddso7756275e9.0
+        for <netdev@vger.kernel.org>; Thu, 07 May 2026 10:08:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1778173717; x=1778778517; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0g8BZOUIqwFMf5MczCTWS57/QZes3BdStmRaQBqy/OM=;
+        b=Vb12oJn6O8xgf75lpVlNhN2tOaSohb/WvVg4aKzBbmbj6/0YSmRWY8/2+XzeV8sDFJ
+         KFSBpdbg7Q8q0uNFen4ut543HbG5rfeNXEP9CBafZmPAYuhiHENkWSP1U2cWEKgDjias
+         NJVjiX+nGaCmNjvGJZtxruJCkCCDGCRWvmI8WGZObF4BVoCNDK8ahHOnaApwEWdyqQqf
+         hqprGvd5iuH/f5xcwPQeOtAY5u3dR1kC6oO0V+GFbFxl9ws+vtq9kfSa60BCId9oOJuG
+         z6xFfZ6YLh0XDg3LCnkOQzFEPuXSouwPiS2lRMcHFM+QaR2jD4YBuUJJe9KTJ+8UWsSl
+         QTlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778173717; x=1778778517;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0g8BZOUIqwFMf5MczCTWS57/QZes3BdStmRaQBqy/OM=;
+        b=WS9b2Pwu6AcM3DBLLPxu5LNX2snJva8RYBCWzhF1XBpjZNb9wZFutlfeMcbpdZoeoi
+         khkaotTfsFxLuanK5o+RQttGpwGWf5weMt6xEloV4iNh1ldayk2kDN55NSIYvDhPwiAH
+         NKMZBLbepamdG3nIA5nzItJHwLl2xjlbTE4eTV6vFmpqT+1+kaxFvtCm0TCLyx5Zw6jk
+         afk0Kwwv1K5uCt+xVmjFzX2lm4f5RUl//95YaDZBdUI+9O/xFFwkrqRGLNLrcU2V6+6Z
+         jKGUIE4v8UnH7FgVas6M+GpfNf0pA9yajj0qO2BSTVzlBiUR0xw3r6BIrDMKiRo5aCSq
+         CvSA==
+X-Forwarded-Encrypted: i=1; AFNElJ/LehyhLFqUMTq8fWXZlaxp4F/+Uj3qKD4Ox+MgXrkp0e5ncBKqA2PhEZQeFYjcPLyutTjAm5U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxN8JliXcsFM5Rfu8hkfRUH2iYBby/ys0h6KbMAiAz3stllMvEv
+	/fuT6c0MAzOI21Wbkf9dlCanBZ0UtNiU2s0Y3fZ2iPehkW+ExDM4/WSisRXRcYlTFhGQw7QxqSz
+	prMRepret+7+pPbbYdUV1eO5PZYlT0TJUeOont6qo5hcOxvH6i3nBrfT7EQ==
+X-Gm-Gg: AeBDiev6rsSKRoUtKXfCrqTYOEIot1tqDejBc0zXmNX7n931XAiXF3hZTSpJelmr7oj
+	NnqSqquR8DCqyIzY2zCjOprD1QyL0imQOziQ9jtejLP+I9PACtgx0TsgzrbsRZan27wxikHNDnq
+	ns1TE78qnz0QqmFjSq2Q+SVdIAeE+x0ObKPtMpnhDye76WYrNjGBaj9YDJPXNbYk1FDus/7L2P2
+	BrzMjBSRCRVxqyjJ1mii/sfa3BUmbOpD9IgmyO8RRfbG8N140RYjvoka/GDB6YyC/nyiO0jQo0M
+	s8ITC5R8MJ83IplMnVglwVFnoV4iJ8DFli5bC4EHLe9N9P+EwB8KEBFK1BwSLgau6doDLYmlhho
+	tyQ2Tz08CXsAkvXVmCyy3/4pHpjQ0/IGp3uV2cromDhJxPkKyO4vHybY=
+X-Received: by 2002:a05:600c:8485:b0:48a:76a3:2b9b with SMTP id 5b1f17b1804b1-48e51f32811mr149911035e9.17.1778173716950;
+        Thu, 07 May 2026 10:08:36 -0700 (PDT)
+X-Received: by 2002:a05:600c:8485:b0:48a:76a3:2b9b with SMTP id 5b1f17b1804b1-48e51f32811mr149910515e9.17.1778173716440;
+        Thu, 07 May 2026 10:08:36 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.93.82])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45417bb92ebsm329213f8f.37.2026.05.07.10.08.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 May 2026 10:08:35 -0700 (PDT)
+Message-ID: <b04ca1cb-6247-4a6d-9c86-d86648a7a4e0@redhat.com>
+Date: Thu, 7 May 2026 19:08:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,184 +105,127 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 09/13] ice: fix setting RSS VSI hash for E830
-From: Marcin Szycik <marcin.szycik@linux.intel.com>
-To: Jacob Keller <jacob.e.keller@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Joshua Hay <joshua.a.hay@intel.com>, Madhu Chittim
- <madhu.chittim@intel.com>, Willem de Bruijn <willemb@google.com>,
- Dave Ertman <david.m.ertman@intel.com>, Ivan Vecera <ivecera@redhat.com>,
- Grzegorz Nitka <grzegorz.nitka@intel.com>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org
-References: <20260504-jk-iwl-net-2026-05-04-v1-0-a222a88bd962@intel.com>
- <20260504-jk-iwl-net-2026-05-04-v1-9-a222a88bd962@intel.com>
- <068a5266-4721-4496-b027-3b32da3e02ea@intel.com>
- <56e52628-d029-4919-95dd-aa6da13f3b08@linux.intel.com>
+Subject: Re: [PATCH] mptcp: serialize subflow->closing with RX path
+To: Kalpan Jani <kalpan.jani@mpiricsoftware.com>, matttbe@kernel.org,
+ martineau@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: shardul.b@mpiricsoftware.com, janak@mpiric.us, kalpanjani009@gmail.com,
+ shardulsb08@gmail.com
+References: <20260507072802.612125-1-kalpan.jani@mpiricsoftware.com>
+From: Paolo Abeni <pabeni@redhat.com>
 Content-Language: en-US
-In-Reply-To: <56e52628-d029-4919-95dd-aa6da13f3b08@linux.intel.com>
+In-Reply-To: <20260507072802.612125-1-kalpan.jani@mpiricsoftware.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 9AE9A4EC951
+X-Rspamd-Queue-Id: 728C04ECB32
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285435-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FREEMAIL_CC(0.00)[mpiricsoftware.com,mpiric.us,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285436-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marcin.szycik@linux.intel.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
+On 5/7/26 9:28 AM, Kalpan Jani wrote:
+> There is a race between mptcp_data_ready() (RX path) and
+> mptcp_close_ssk() (teardown path) when accessing subflow->closing.
+> 
+> Currently, mptcp_data_ready() checks subflow->closing before acquiring
+> mptcp_data_lock(), while mptcp_close_ssk() may concurrently set
+> subflow->closing and 
 
+Are you sure this race can really happen? both the relevant part of 
+__mptcp_close_ssk() and mptcp_data_ready() run under the ssk socket
+lock.
 
-On 07.05.2026 13:47, Marcin Szycik wrote:
-> 
-> 
-> On 06.05.2026 23:06, Jacob Keller wrote:
->> On 5/4/2026 10:14 PM, Jacob Keller wrote:
->>> From: Marcin Szycik <marcin.szycik@linux.intel.com>
->>>
->>> ice_set_rss_hfunc() performs a VSI update, in which it sets hashing
->>> function, leaving other VSI options unchanged. However, ::q_opt_flags is
->>> mistakenly set to the value of another field, instead of its original
->>> value, probably due to a typo. What happens next is hardware-dependent:
->>>
->>> On E810, only the first bit is meaningful (see
->>> ICE_AQ_VSI_Q_OPT_PE_FLTR_EN) and can potentially end up in a different
->>> state than before VSI update.
->>>
->>> On E830, some of the remaining bits are not reserved. Setting them
->>> to some unrelated values can cause the firmware to reject the update
->>> because of invalid settings, or worse - succeed.
->>>
->>> Reproducer:
->>>   sudo ethtool -X $PF1 equal 8
->>>
->>> Output in dmesg:
->>>   Failed to configure RSS hash for VSI 6, error -5
->>>
->>> Fixes: 352e9bf23813 ("ice: enable symmetric-xor RSS for Toeplitz hash function")
->>> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
->>> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->>> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
->>> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
->>> ---
->>>  drivers/net/ethernet/intel/ice/ice_main.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
->>> index 1d1947a7fe11..c52c465280f7 100644
->>> --- a/drivers/net/ethernet/intel/ice/ice_main.c
->>> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
->>> @@ -8046,7 +8046,7 @@ int ice_set_rss_hfunc(struct ice_vsi *vsi, u8 hfunc)
->>>  	ctx->info.q_opt_rss |=
->>>  		FIELD_PREP(ICE_AQ_VSI_Q_OPT_RSS_HASH_M, hfunc);
->>>  	ctx->info.q_opt_tc = vsi->info.q_opt_tc;
->>> -	ctx->info.q_opt_flags = vsi->info.q_opt_rss;
->>> +	ctx->info.q_opt_flags = vsi->info.q_opt_flags;
->>>  
->>>  	err = ice_update_vsi(hw, vsi->idx, ctx, NULL);
->>>  	if (err) {
->>>
->>
->> Sashiko complains about ice_set_rss_hfunc() but it is unrelated to this fix:
->>
->>> While looking at this function, I noticed a pre-existing issue regarding the
->>> hardware cache. Does calling ice_update_vsi() with a local context leave the
->>> global hw->vsi_ctx[vsi->idx] out of sync?
->>> If ice_update_vsi() succeeds, vsi->info.q_opt_rss is updated, but
->>> hw->vsi_ctx[vsi->idx]->info.q_opt_rss is not.
->>> When an unrelated feature such as RDMA filtering is subsequently toggled via
->>> ice_cfg_rdma_fltr(), could it retrieve this stale cached context via
->>> ice_get_vsi_ctx() and copy the stale q_opt_rss value back into its command
->>> buffer?
-> 
-> Yes.
-> 
->>> Could this cause the firmware to silently revert the RSS hash function to its
->>> previous configuration during the next ice_update_vsi() call?
-> 
-> No, because the context object passed to ice_update_vsi() only sets
-> ctx->info.valid_sections for the sections it wants to update, so unrelated
-> values are not updated in HW.
-> 
-> Looking at other ice_update_vsi() calls, most of the times the context object is
-> being allocated, not taken from cache. It's not immediately clear to me what
-> purpose does hw->vsi_ctx[] serve - it only appears to be used in
-> ice_cfg_rdma_fltr() (correct me if I'm wrong), where options from the cached
-> context are being read to fill the unchanged fields in the updated section.
-> This seems to be the equivalent of keeping track of context values in vsi->info,
-> which is what almost all ice_update_vsi() callers do.
-> If I had to guess, I'd say hw->vsi_ctx[] could probably be removed and vsi->info
-> used instead, but maybe I'm missing something.
-> 
-> TLDR I think this is just old, inconsistent code that could be improved, but it
-> needs some investigation. Until we don't have a clear signal that there's a bug,
-> I wouldn't touch it.
-> 
->>> There also appears to be a pre-existing issue with state desynchronization
->>> when handling failures. After ice_update_vsi() succeeds, vsi->rss_hfunc
->>> is updated, but ice_set_rss_hfunc() then calls ice_set_rss_cfg_symm() at the
->>> end of the function:
->>> ice_set_rss_hfunc() {
->>>         ...
->>>         err = ice_update_vsi(hw, vsi->idx, ctx, NULL);
->>>         if (err) {
->>>                 ...
->>>         } else {
->>>                 vsi->info.q_opt_rss = ctx->info.q_opt_rss;
->>>                 vsi->rss_hfunc = hfunc;
->>>                 ...
->>>         }
->>>         ...
->>>         return ice_set_rss_cfg_symm(hw, vsi, symm);
->>> }
->>> If ice_set_rss_cfg_symm() fails, the error is returned but vsi->rss_hfunc
->>> remains updated. If the user retries the command, the early check:
->>> if (hfunc == vsi->rss_hfunc)
->>>         return 0;
->>> evaluates to true and returns success immediately.
->>> Could this skip the ice_set_rss_cfg_symm() retry entirely, leaving the
->>> hardware's flow director rules in a non-symmetric state permanently while
->>> falsely reporting success?
-> 
-> This looks valid.
+> @@ -2653,9 +2673,12 @@ void mptcp_close_ssk(struct sock *sk, struct sock *ssk,
+>  	if (sk->sk_state == TCP_ESTABLISHED)
+>  		mptcp_event(MPTCP_EVENT_SUB_CLOSED, mptcp_sk(sk), ssk, GFP_KERNEL);
+>  
+> -	/* Remove any reference from the backlog to this ssk; backlog skbs consume
+> +	/* Remove any reference from the backlog to this ssk.
+> +	 * Serialize cleanup with RX-side enqueue using mptcp_data_lock().
+> +	 * Backlog skbs consume
+>  	 * space in the msk receive queue, no need to touch sk->sk_rmem_alloc
+>  	 */
+> +	mptcp_data_lock(sk);
+>  	list_for_each_entry(skb, &msk->backlog_list, list) {
+>  		if (skb->sk != ssk)
+>  			continue;
 
-On second thought, if we decide to rollback changes to VSI on ice_set_rss_cfg_symm()
-fail, we must call ice_update_vsi(), which then can also fail, still leaving us with
-hfunc programmed and symmetry not set. I'm not sure if it's worth adding rollback
-that can fail and still leave us with the original problem. User would just see 2 errors
-instead of 1.
-> Thanks,
-> Marcin
-> 
->> Someone from the ice team should look into this and determine whether or
->> not its valid.
+The real problem is here: the backlog is currently traversed without the
+data lock (wrong: the mptcp_data_lock() protects backlog updates), while
+the ssk is still possibly open, unlocked and can keep receiving packets
+and adding them to the BL.
 
+A better solution would be something alike the following patch (completely
+untested):
+---
+diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+index 718e910ff23f..68d97926cb81 100644
+--- a/net/mptcp/protocol.c
++++ b/net/mptcp/protocol.c
+@@ -2550,6 +2550,21 @@ static void __mptcp_close_ssk(struct sock *sk, struct sock *ssk,
+ 	lock_sock_nested(ssk, SINGLE_DEPTH_NESTING);
+ 	subflow->closing = 1;
+ 
++	/* Remove any reference from the backlog to this ssk; backlog skbs consume
++	 * space in the msk receive queue, no need to touch sk->sk_rmem_alloc
++	 */
++	if (flags & MPTCP_CF_PUSH) {
++		mptcp_data_lock(sk);
++		list_for_each_entry(skb, &msk->backlog_list, list) {
++			if (skb->sk != ssk)
++				continue;
++
++			atomic_sub(skb->truesize, &skb->sk->sk_rmem_alloc);
++			skb->sk = NULL;
++		}
++		mptcp_data_unlock(sk);
++	}
++
+ 	/* Borrow the fwd allocated page left-over; fwd memory for the subflow
+ 	 * could be negative at this point, but will be reach zero soon - when
+ 	 * the data allocated using such fragment will be freed.
+@@ -2653,17 +2668,6 @@ void mptcp_close_ssk(struct sock *sk, struct sock *ssk,
+ 	if (sk->sk_state == TCP_ESTABLISHED)
+ 		mptcp_event(MPTCP_EVENT_SUB_CLOSED, mptcp_sk(sk), ssk, GFP_KERNEL);
+ 
+-	/* Remove any reference from the backlog to this ssk; backlog skbs consume
+-	 * space in the msk receive queue, no need to touch sk->sk_rmem_alloc
+-	 */
+-	list_for_each_entry(skb, &msk->backlog_list, list) {
+-		if (skb->sk != ssk)
+-			continue;
+-
+-		atomic_sub(skb->truesize, &skb->sk->sk_rmem_alloc);
+-		skb->sk = NULL;
+-	}
+-
+ 	/* subflow aborted before reaching the fully_established status
+ 	 * attempt the creation of the next subflow
+ 	 */
 
 
