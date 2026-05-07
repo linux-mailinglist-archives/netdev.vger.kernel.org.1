@@ -1,167 +1,186 @@
-Return-Path: <netdev+bounces-285331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285332-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aD3aAuyT/Gn3RQAAu9opvQ
-	(envelope-from <netdev+bounces-285331-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 15:30:20 +0200
+	id 4CyCG82T/Gn3RQAAu9opvQ
+	(envelope-from <netdev+bounces-285332-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 15:29:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 599F84E9453
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 15:30:18 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A79D4E9436
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 15:29:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3A69F30115A2
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 13:26:33 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1571C301C8A7
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 13:27:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 229C23F7A98;
-	Thu,  7 May 2026 13:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F903F7A93;
+	Thu,  7 May 2026 13:26:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iA0O7bKl"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="E5dbnpw1";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="KR30JmtT"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from flow-b2-smtp.messagingengine.com (flow-b2-smtp.messagingengine.com [202.12.124.137])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B43A303A32
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 13:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557EE3FA5CD;
+	Thu,  7 May 2026 13:26:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.137
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778160391; cv=none; b=FpFcCTMZCu0QFlj2KXEdu2jowyrXky9rblSrbdYRnUWsZJaJt996ZdpMcNHQTmOwgUXjqdYJN8oc7WdvA7VJ6YoJBTAsrFfmc1P4twDVZtYhF3jzCB6PRoRCtHzXXAlhH7myULvjfYoLonkZyWVglYc9ApDd5gTrCF5R8/cFetQ=
+	t=1778160419; cv=none; b=ev1tnpa2b6ldNflKluixLb5P6Zs90r78Spi/a+D+CFR/8IydBhe7Os8SOc2aRKaa8qkC5wCOg10wyF7OdtiyE1tG+8xaYE0IiXl6Yixuj3ESmVxAEj29oyw7lnUmVWvElOteyad3u80IEu6fpRW0y/un/HLRDj2FyDN9QjVK4Q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778160391; c=relaxed/simple;
-	bh=teBo4pWM6ORgn7mwTyHWhxDt88H/ovpdKT1vaScnHxU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NMUS6wP7ag6f9PXDHI38BveEnue3PDEwQ1TD1aPEBGbPCkiD9lg5SzxlU7xHoTs1Za5dh11kHhQ60Bit9gJwx1Al4mW/2S4Ps4B2ByhEtRV16uG1pyB4F3D9EwC1RGxUzEP8Kbih+4qcmZdUaS1EP28ZbiAr5mP73T44AW2BREg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iA0O7bKl; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3c4264e6-2e93-4121-a8ec-5ac20e5cc213@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1778160387;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I3RRKyrlA+EuBul+O3/If9p20xxaCg6XI4XR6i54fFc=;
-	b=iA0O7bKl+FP2PWd51Zg1ARCqLwIR+59jHRVDFUExTqLUtLF1cYEQDq21HFi2WZ/5NoS5v+
-	pdfk9TxEFAtBY0+dhDGVCmo5airOE2zt0MIXCYpoWxh5JOy8iF4rlUodhnmdREJIMxjfLE
-	0c7PQar4E3t4SybRk0+jksdLw14w5n4=
-Date: Thu, 7 May 2026 06:25:54 -0700
+	s=arc-20240116; t=1778160419; c=relaxed/simple;
+	bh=e7cI2CRlGxOIqCNZGeZpROA7pHpYAzCWZEjE0OEXs6g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UyBAYEiPNUuSFvCMiCPZU/BXVuo835z9BCIGUulrgWKYv0LhoSTPSl3dxZAkfrmQxasJFjvNIxCH0TEKnHkz3j2SzqAYSaM8Moc7pOiCWGY7uZ1f9HcLg/7uk3k82s4IjZWQ0TPUZaeWAw2jJ1yxuU14TOQJhuVOfBdBg9iUbD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=E5dbnpw1; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=KR30JmtT; arc=none smtp.client-ip=202.12.124.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailflow.stl.internal (Postfix) with ESMTP id 691701300336;
+	Thu,  7 May 2026 09:26:53 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Thu, 07 May 2026 09:26:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1778160413; x=
+	1778167613; bh=RtFbl6Ia2yXhJKiRS1RPNkHNw34xJHyi2Bt4SAeOI5o=; b=E
+	5dbnpw1tjZsUkI9HqshhE12c10a3iko46kATp5d/KUO6y7Ei6CmUNQwxPXEdY1ID
+	uIwodgnpxzoyAWSItHqrNnER5h1hwk0aUBET+rmklAcoeuIUamhJzzjloqHqNfOa
+	9KPAZgB/Xj8Ys9z2aJh9X1LU4DsPNX+QTp1Ugugx1eYSV4chFiJ8HnUZ5BYzW1J6
+	y+RNgYNh2GGQb66gjMuTGqQLWZjElkX1QP8ceE9gJNoZ2U3SdiXWXATWn2fffoX1
+	H6WlsvnaKPK8WVr1CMPH0oTIOZH1DEpdlc0KMnvQOsqtojQmOISVCrmLo4YcVzin
+	t0itBnbCqzARz9yycP2wQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1778160413; x=1778167613; bh=RtFbl6Ia2yXhJKiRS1RPNkHNw34xJHyi2Bt
+	4SAeOI5o=; b=KR30JmtTSDfz9l6OGsWUPh0/yu79ihWHxqAE4IG9T+p6O/0QJtA
+	FGA+MoxLXHTkHtWFGu2+GWU0Vkpwa1w8d9xzIZsQ70sFF9dJSn3utQZyQ4tInfIG
+	OBB7awf7dFcicwGGxZRk7dL3gDkTk4hF0hktAjUSSPncNaBsq7Rrzheh6fHID1gs
+	PJmXt5h8XufwPxIPwf47MD8xHTthej+zxw6C5gTrFboIu0O+RT+PJ61a3cEWvnx1
+	4jf414tnBN0JHJb6r/qkwik4cSOogwYG9bdKPzSYt/naXZsubqiUfs7SJf2lNkWV
+	164QPBAV7atcL0Xqr4u5spsW/YHpqiDoIdw==
+X-ME-Sender: <xms:HJP8acELhSxUnoUS7tUiyqrBCwJyMwWAeTfbHiZayH3sU9m5EPvtlA>
+    <xme:HJP8aW9u6sa0hZWrVNr7KWfs3GK-sRg3VlRD_5uRSnetFAcfIrnWGkYJFzMysECJB
+    ClfYTJPILV9bpgVcmvanHOc1ipzcuRfn9zZZ8nzxWMHUr0NsxBv2Dw>
+X-ME-Received: <xmr:HJP8aaOkHsj5_7QEdPwmiegwZ5gVDE7fZW6SwKGC_WpCNnXLaoKyRLak4MY5>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddutdejheelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedvvddpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnthhonhihrdgrnhhtohhnhiesshgvtg
+    hunhgvthdrtghomhdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgv
+    tghunhgvthdrtghomhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprg
+    hnrgdrohhrghdrrghupdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgv
+    thdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoh
+    epkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughh
+    rghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpth
+    htohepughsrghhvghrnheskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:HJP8aUgyTKN4mQxPSB1eipEbWLj7M2tBi6SrSnz-C3-ySugmBbsE9Q>
+    <xmx:HJP8aRS1-JQ7pW3mZZGH9lWa5mKBNJM-l4DUm3VCUuZT_YL05GcZSw>
+    <xmx:HJP8afoEVimLLWN3HZhogc9Ve8f-rJT-UPjuza35Vizhk513oXaGzg>
+    <xmx:HJP8aUbLvJw1--j2LkZKDR--wKanLfHyHBsyrMCmwkz1E8M04bFrbw>
+    <xmx:HZP8aWbY1UjMssSJB3tYI__51NNZPiuhEx9aPgJwdCI07hDwUyOgQ4EX>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 7 May 2026 09:26:51 -0400 (EDT)
+Date: Thu, 7 May 2026 15:26:50 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antony Antony <antony.antony@secunet.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Masahide NAKAMURA <nakam@linux-ipv6.org>,
+	Paul Moore <paul@paul-moore.com>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, selinux@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Chiachang Wang <chiachangwang@google.com>,
+	Yan Yan <evitayan@google.com>, devel@linux-ipsec.org
+Subject: Re: [PATCH ipsec-next v8 10/14] xfrm: move encap and xuo into struct
+ xfrm_migrate
+Message-ID: <afyTGssXu6Jl3SYH@krikkit>
+References: <migrate-state-v8-0-4578fb016965@secunet.com>
+ <migrate-state-v8-10-4578fb016965@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] RDMA/nldev: add mutual exclusion in nldev_dellink()
-To: Edward Adam Davis <eadavis@qq.com>,
- syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com,
- "yanjun.zhu@linux.dev" <yanjun.zhu@linux.dev>
-Cc: akpm@linux-foundation.org, arjan@linux.intel.com, davem@davemloft.net,
- dsahern@kernel.org, edumazet@google.com, hdanton@sina.com, horms@kernel.org,
- jgg@ziepe.ca, kuba@kernel.org, kuni1840@gmail.com, kuniyu@google.com,
- leon@kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com,
- zyjzyj2000@gmail.com
-References: <69fc0c7c.a00a0220.387fc1.0006.GAE@google.com>
- <tencent_611BEB4B141B1A2526BAA3BBB2335F9E9108@qq.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <tencent_611BEB4B141B1A2526BAA3BBB2335F9E9108@qq.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 599F84E9453
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <migrate-state-v8-10-4578fb016965@secunet.com>
+X-Rspamd-Queue-Id: 6A79D4E9436
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285331-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_TO(0.00)[qq.com,syzkaller.appspotmail.com,linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FREEMAIL_CC(0.00)[linux-foundation.org,linux.intel.com,davemloft.net,kernel.org,google.com,sina.com,ziepe.ca,gmail.com,vger.kernel.org,redhat.com,googlegroups.com];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yanjun.zhu@linux.dev,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-285332-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,d8f76778263ab65c2b21];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_CC(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,google.com,kernel.org,redhat.com,linux-ipv6.org,paul-moore.com,gmail.com,lwn.net,linuxfoundation.org,vger.kernel.org,linux-ipsec.org];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim,syzkaller.appspot.com:url,qq.com:email]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,queasysnail.net:email,queasysnail.net:dkim,secunet.com:email,messagingengine.com:dkim]
 X-Rspamd-Action: no action
 
-
-在 2026/5/7 5:50, Edward Adam Davis 写道:
-> We must serialize calls to nldev_dellink() or risk a crash as syzbot
-> reported:
->
-> KASAN: null-ptr-deref in range [0x0000000000000020-0x0000000000000027]
-> Call Trace:
->   udp_tunnel_sock_release+0x6d/0x80 net/ipv4/udp_tunnel_core.c:197
->   rxe_release_udp_tunnel drivers/infiniband/sw/rxe/rxe_net.c:294 [inline]
->   rxe_sock_put drivers/infiniband/sw/rxe/rxe_net.c:639 [inline]
->   rxe_net_del+0xfb/0x290 drivers/infiniband/sw/rxe/rxe_net.c:660
->   rxe_dellink+0x15/0x20 drivers/infiniband/sw/rxe/rxe.c:254
->   
-> Fixes: a60e3f3d6fba ("RDMA/nldev: Add dellink function pointer")
-> Reported-by: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=d8f76778263ab65c2b21
-> Tested-by: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com
-> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-
-Thanks a lot. This looks like a good solution. Since the issue is 
-reproducible,
-
-have you sent this commit to syzbot for verification?
-
-Thanks,
-
-Zhu Yanjun
-
+2026-05-05, 06:34:04 +0200, Antony Antony wrote:
+> In preparation for an upcoming patch, move the xfrm_encap_tmpl and
+> xfrm_user_offload pointers from separate parameters into struct
+> xfrm_migrate, reducing the parameter count of
+> xfrm_state_migrate_create(), xfrm_state_migrate_install(), and
+> xfrm_state_migrate().
+> 
+> The fields are placed after the four xfrm_address_t members where
+> the struct is naturally 8-byte aligned, avoiding padding.
+> 
+> No functional change.
+> 
+> Signed-off-by: Antony Antony <antony.antony@secunet.com>
+> 
 > ---
->   drivers/infiniband/core/nldev.c | 4 ++++
->   1 file changed, 4 insertions(+)
->
-> diff --git a/drivers/infiniband/core/nldev.c b/drivers/infiniband/core/nldev.c
-> index 96c745d5bac4..3cb3cb7629fe 100644
-> --- a/drivers/infiniband/core/nldev.c
-> +++ b/drivers/infiniband/core/nldev.c
-> @@ -1816,6 +1816,8 @@ static int nldev_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
->   	return err;
->   }
->   
-> +static DEFINE_MUTEX(nldev_dellink_mutex);
-> +
->   static int nldev_dellink(struct sk_buff *skb, struct nlmsghdr *nlh,
->   			  struct netlink_ext_ack *extack)
->   {
-> @@ -1846,7 +1848,9 @@ static int nldev_dellink(struct sk_buff *skb, struct nlmsghdr *nlh,
->   	 * implicitly scoped to the driver supporting dynamic link deletion like RXE.
->   	 */
->   	if (device->link_ops && device->link_ops->dellink) {
-> +		mutex_lock(&nldev_dellink_mutex);
->   		err = device->link_ops->dellink(device);
-> +		mutex_unlock(&nldev_dellink_mutex);
->   		if (err)
->   			return err;
->   	}
+> v5->v6: added this patch.
+> ---
+>  include/net/xfrm.h     |  7 ++-----
+>  net/xfrm/xfrm_policy.c |  4 +++-
+>  net/xfrm/xfrm_state.c  | 20 +++++++-------------
+>  3 files changed, 12 insertions(+), 19 deletions(-)
+
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
 -- 
-Best Regards,
-Yanjun.Zhu
-
+Sabrina
 
