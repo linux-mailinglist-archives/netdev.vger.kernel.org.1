@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-285126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285127-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ALgnJd7/+2njJgAAu9opvQ
-	(envelope-from <netdev+bounces-285126-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 04:58:38 +0200
+	id cKO9KVAA/GnjJgAAu9opvQ
+	(envelope-from <netdev+bounces-285127-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:00:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 223B34E281B
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 04:58:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AECB4E285D
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:00:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1A4C8300A309
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 02:58:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4ACC73012C7D
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 02:58:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AAF62BE03C;
-	Thu,  7 May 2026 02:58:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCC832C0261;
+	Thu,  7 May 2026 02:58:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cbri7+/R"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oBTPYBvM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f42.google.com (mail-dl1-f42.google.com [74.125.82.42])
+Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B123921D3E4
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 02:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A8A2D1907
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 02:58:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778122716; cv=none; b=LyXLX8Skbkw02PezXgl0yQrww3VyrGCaBq30vGTi8vkWSd8oYnIWXKNaTIYPAXlrf938jQuSBds3CIRdVttyLx1Ql5e81vq7CAp7QEe7NT1tspmuFWOB1GnS6ZFDwbaFnAHX5+JeFCHiyrQHJZaLsXn0qtfvrZKPPQ64YeN7HoQ=
+	t=1778122720; cv=none; b=QfMr9Krve735yLllj3hEJdxZ0roRKx5GOiSvC23Zb3F+d/4KjrZJndmgmOX+YMyBZovYeWKdTYnoYFt5t852whKv29Wqns/1/5aCBLmV1suGh/VKy0pKwvEPPLQJWW+RLh54vvrcFJi6ryt/4uHM1gKvtjmHD7eUTDf27/uORtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778122716; c=relaxed/simple;
-	bh=9UIIckWAkaBet6+X4R1cryCE7+hKS5+Dl6gBJSH9zeE=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=W0y6XrDUvYaFdCIfFsmrwRh7fOuETtuMhyz4FS5cvBhWh5JO24I7qHtgP4fVVAgYcTXYn8G9F6HqulOr88oWAGnmmkzdbPQN5UbXdkiM0lFErBhc/cUjYvrtyn8XGlgdc30xofzkNRPds7i47eRkRmel6BR0ZI3pc+zOODCSDZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cbri7+/R; arc=none smtp.client-ip=74.125.82.42
+	s=arc-20240116; t=1778122720; c=relaxed/simple;
+	bh=n/9wL+EzxOeVLUDw+TuXzntXGa/ukJOkqD/4rI9oPps=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=hj4VKZ94vnKTz38+1nCPTrwnndp3F4SH66zt4NYWePC977IIWGKgioVw8sVQqL6qJ2ISCeqEZkfBDD/xicynWhUpthx5RCyyuFlzFpE940LMyWlORUdaIm27sGCl/Z06ajb1aM5UN8/57Roy9xWQEA8XUQJMKtcP6BIwu1If/48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oBTPYBvM; arc=none smtp.client-ip=74.125.82.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f42.google.com with SMTP id a92af1059eb24-1309f4ee97fso588693c88.1
-        for <netdev@vger.kernel.org>; Wed, 06 May 2026 19:58:34 -0700 (PDT)
+Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-12c19d23b19so735186c88.0
+        for <netdev@vger.kernel.org>; Wed, 06 May 2026 19:58:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778122714; x=1778727514; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4fZOePm/WIEX3od4IgMSmtqRgXfakcmRFfXc30LyJmg=;
-        b=Cbri7+/RjhI+0gd0NhiXOIR1GKlfDFMSwBe0D4/HfW0yu6V22g5+tUTnvJHifeTWk+
-         Z851J/okK5wIp9GwBwDssMa6R8276IoHzgQG1p+fPDw3Zbxl2IIa+GuC/pe1/1Ul8xqi
-         mYx5/NBUMesK3OvBDnp29spCxokTNNytzOL+pm/P22LlKHsdf9JohOBlzCZvMFF5mCRu
-         Q9xj9VhBDt0v2FHJB2VCpywfY6tFpIgUBlwPwenWXzM2iKwHgLNv/KgWSGfITbz/dtlT
-         93kDVDX8cO+vpeY+NcOMH/RCjCOK+t6E/46Lqd/pnDKqcdVfLpgmpmBS/IIL4vY6FalE
-         cedA==
+        d=gmail.com; s=20251104; t=1778122719; x=1778727519; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xdWapj7nZPh2nnXNORR4M7t33366rcLzDB4tv9BjBYc=;
+        b=oBTPYBvMO0yJgEEXb95s+NGO6OoquJam/f5F3pbGIbVzwMXtbK0MuqFRf/1yt0zdw4
+         qAiTG8cbNzsta+DvlVapDGN1W8gGutSws4lD+h9rWEkrSNSwLnCsDPFznTROAHqngcmR
+         /mDXaMJ2J5mvaiM776R9u9l6rbGFWgGcOzcGqO1AIwA8K0JeKP+2enyersJB0WPLYmZ0
+         JnKp8a618Ne/UMEj+nFVKoLvXFCtrdwWYyhI1LIfKH/2X+lo8zmyYP87230TAHeAUmYS
+         6VodKat/AbanDFDGDMufxjnoDHKhb83vVKFG/MKdDCGw3+kYNc9fZBgA3HwLVs1yqfTN
+         7h3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778122714; x=1778727514;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4fZOePm/WIEX3od4IgMSmtqRgXfakcmRFfXc30LyJmg=;
-        b=gWVqBJwLtMtNc6ICy/0RbrkxBTM6tYvIFkv2vQa8+SEUCqPBW/Anb1+B7OVudG/fKi
-         P/mss1jP+jx0t6JORhIXy8rGI33c4pk2o7DRTgOyEpXC/9V6Fn1NH2pvOakpphwkJkLF
-         zXgVw0LcvYYMmVQw3tatPpzpFmwmcfun6SycGwfBy241j4dRQ220YapukiaJyo4gUrsf
-         US1AQ8rAMm1vdkiIA7qBT3fvlEUpBmMSt0H9N84NzS6kBVQDY3tnELlU9n88tAR/BUet
-         qA36gW0D/vYDiohDrQUcDqlkzJ2w0qcrJh1RFz+4K1rZ8tbvK03HXq4pNT5UltxJvIax
-         xQrA==
-X-Gm-Message-State: AOJu0Yz7OjwbrnkzA+w2ydEr6B0u7d6JTtGdQcYLu3AobN9Jje/QX849
-	GD0CtpMWNZgErpFRrqUtkTxvIwmGUNCjDajkqSGspu3Zknu7adLSM7CC
-X-Gm-Gg: AeBDiev6LRVanufixIz843Ad9hYdldZXxBXhF9sySVIW1XVL/fT94ZxMLudQnARS3Fi
-	ugGmCsjpmomu78IlFTXZFdMSilXG1dbf4VQVwb/z0o575JefCPb+QYS4RBbj9nk+t/SK2z9yAyR
-	1YGYp55LNQZwT7QC/3x0exRwpobk5iZI+z3+T5rLs8ewoxg88S/Rg4DF5bXq9ZufRMu+QyYKa1E
-	9qQOVw75jecMH70AeXFox5AFYaIe1b/tbmLRCEP6OJ8Z394kAyP6KTf5XL8AoCU2T8VHFf1IIoH
-	3kY0bYhYaLEyzrdxxlfz4UU7zb/NSmMHG9G606aWfOCTt3+eRyQx3kUIsqEDorzrl19He+6Ry74
-	kVFoKbjJwAEIA8Qwr+IXwkfLZWrL5o5ZAbWaU304+uYPE2fPdk7WcZk5K/vs2Ap+dLrQLRssCeY
-	Qn6Mz+/fvygPByyLg161bfm8L5xVM7GjDwzfFHLyej0VOzFYvrSw==
-X-Received: by 2002:a05:7022:914:b0:122:2f4:b285 with SMTP id a92af1059eb24-1319cf59324mr3296977c88.25.1778122713600;
-        Wed, 06 May 2026 19:58:33 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1778122719; x=1778727519;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xdWapj7nZPh2nnXNORR4M7t33366rcLzDB4tv9BjBYc=;
+        b=dBNcq/Rs8gdUeOnQF+6605pPuvBrgbjkMGkL1syBQtZsiVrR9ehok9Y/PJTfOTgbRp
+         chBiF0rO4Q7d6IPHrpPW3WjU3I/K9KyPh+YWyldUitTZ/wnJU+MnLKeJtPjpvBb/DIiE
+         0nAQZCVy+xL7CNgnyn4kTWkRhjQKfLrrYU+D1voYD2fa4p0M4K5xmIF+VfmXaAqIyIlX
+         BA2sRpbRQMKE9TkJJBEzXco4A2cerQNcGVNnkY0RpKELpmrnkX35I9oSSILWLiOgMjsJ
+         dutZaYAPz9O66vsltV770gNWc3cvGhbzDg4EOBSl0zM96AKA8VFG8KhM40HnpVWLyz0t
+         Y6Ew==
+X-Gm-Message-State: AOJu0Yye+HNjzE3jlCaZlBGU4PCiqCz+HlAabnmat0OsUMMvlBlSP3uz
+	Wc6XT8/k/i2Pb1ZFSbsQ9cN26jGaB4qJjIUrtOW0wxIu1+3sbPunxV3N
+X-Gm-Gg: AeBDievdsCg4Me1wkPvofCoc8zhSuzyUzrbo9CZ93BkQbig96RAhHYaM2JEQTI0UQ6x
+	FMw1ie99Ji3Dq4lxzUQDO85twIdio9w6+IkK7Ir0xinohKxUuINSDl+COfPI+6fQBUS5jIAz/Mo
+	t0cguvYOg8wZhvhTWANC66xZzUy0dSmE6RBZv7QsB7KMzvhkmVwYEsc3VNvDMNUvgCl6AEtmCyT
+	gEfMLtP+QUSEoBKXoBS3KKDaNkzEkmdZ1zaEofZl+iHfX4svH/YOo3H4W+Y9uC6G7JlVTwXj8+e
+	flcyw7SUz8eb1lL5KUtWh0feCr4Xep/XbKsGPqaCg8Q2ciUfOuYmAouBe3TLBbSH+gBmKt1bqTh
+	AoiLa7WogDVoOzRFy+b5OpSIc5h64SIJqHr0eAcR5Ed3WLswhhktLvi1dgZfPDzRLyWFBgAzB3q
+	hoUmaBcCBmBxZmvE+7AhXeMie/uEzw2yQb51fG2pM9k80WQjkHooufqLnOIckg
+X-Received: by 2002:a05:7022:43a6:b0:130:c9cc:3384 with SMTP id a92af1059eb24-1319d14e094mr2506293c88.30.1778122718543;
+        Wed, 06 May 2026 19:58:38 -0700 (PDT)
 Received: from tresc054937.tre-sc.gov.br ([187.65.210.13])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-131f9789e3dsm6561267c88.8.2026.05.06.19.58.28
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-131f9789e3dsm6561267c88.8.2026.05.06.19.58.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2026 19:58:32 -0700 (PDT)
+        Wed, 06 May 2026 19:58:37 -0700 (PDT)
 From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Subject: [net-next PATCH v3 0/8] net: dsa: realtek: rtl8365mb: bridge
- offloading and VLAN support
-Date: Wed, 06 May 2026 23:58:17 -0300
-Message-Id: <20260506-realtek_forward-v3-0-1d87c5f85a3b@gmail.com>
+Date: Wed, 06 May 2026 23:58:18 -0300
+Subject: [net-next PATCH v3 1/8] net: dsa: realtek: rtl8365mb: use ERR_PTR
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,12 +85,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-B4-Tracking: v=1; b=H4sIAMr/+2kC/2WOXwvCIBRHv8rwOcN/Oeqp7xER6u42aWmo2GLsu
- yf2ULDHH4dz7l1QhGAholOzoADZRutdGXzXIDMqNwC2XdmIESYJZxwHUFOC+6334aVCh6lWhqu
- 2NVIKVKxngN7OtXhBDhJ2MCd0LWS0Mfnwrqcyrfxb5XRTzRQTLESvJS9ct3AeHspOe+MftZXZz
- z+Q7VeZFb8jUgBjRPMj/ffXdf0ACCylBPgAAAA=
-X-Change-ID: 20260323-realtek_forward-1bac3a77c664
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260506-realtek_forward-v3-1-1d87c5f85a3b@gmail.com>
+References: <20260506-realtek_forward-v3-0-1d87c5f85a3b@gmail.com>
+In-Reply-To: <20260506-realtek_forward-v3-0-1d87c5f85a3b@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -100,28 +98,26 @@ To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
  Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
  Russell King <linux@armlinux.org.uk>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Luiz Angelo Daros de Luca <luizluca@gmail.com>, 
- Abdulkader Alrezej <abdulkader.alrezej@gmail.com>, 
- Yury Norov <ynorov@nvidia.com>
+ Luiz Angelo Daros de Luca <luizluca@gmail.com>
 X-Mailer: b4 0.15.2
-X-Rspamd-Queue-Id: 223B34E281B
+X-Rspamd-Queue-Id: 0AECB4E285D
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285126-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285127-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,nvidia.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -133,97 +129,142 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,davemloft.net:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-This series introduces bridge offloading, FDB management, and VLAN support
-for the Realtek rtl8365mb DSA switch driver. The primary goal is to
-enable hardware frame forwarding between bridge ports, reducing CPU
-overhead and providing advanced features like VLAN and FDB isolation.
+Convert numeric error codes into human-readable strings by
+using %pe together with ERR_PTR() in dev_err() messages.
 
-Some of these patches are based on original work by Alvin Šipraga,
-subsequently adapted and updated for the current net-next state.
-
+Reviewed-by: Linus Walleij <linusw@kernel.org>
+Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 ---
-I attempted to reach Alvin for review of the final version but was
-unable to establish contact. Any regressions in this version are my
-responsibility.
+ drivers/net/dsa/realtek/rtl8365mb.c | 40 ++++++++++++++++++++-----------------
+ 1 file changed, 22 insertions(+), 18 deletions(-)
 
-Changes in v3:
-- Fixed kernel-doc warnings
-- Removed unnecessary defensive checks
-- Link to v2: https://patch.msgid.link/20260503-realtek_forward-v2-0-d064e220b391@gmail.com
+diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
+index c35cef01ec26..edbc16345d0d 100644
+--- a/drivers/net/dsa/realtek/rtl8365mb.c
++++ b/drivers/net/dsa/realtek/rtl8365mb.c
+@@ -789,8 +789,8 @@ static int rtl8365mb_phy_read(struct realtek_priv *priv, int phy, int regnum)
+ 	ret = rtl8365mb_phy_ocp_read(priv, phy, ocp_addr, &val);
+ 	if (ret) {
+ 		dev_err(priv->dev,
+-			"failed to read PHY%d reg %02x @ %04x, ret %d\n", phy,
+-			regnum, ocp_addr, ret);
++			"failed to read PHY%d reg %02x @ %04x, ret %pe\n", phy,
++			regnum, ocp_addr, ERR_PTR(ret));
+ 		return ret;
+ 	}
+ 
+@@ -817,8 +817,8 @@ static int rtl8365mb_phy_write(struct realtek_priv *priv, int phy, int regnum,
+ 	ret = rtl8365mb_phy_ocp_write(priv, phy, ocp_addr, val);
+ 	if (ret) {
+ 		dev_err(priv->dev,
+-			"failed to write PHY%d reg %02x @ %04x, ret %d\n", phy,
+-			regnum, ocp_addr, ret);
++			"failed to write PHY%d reg %02x @ %04x, ret %pe\n", phy,
++			regnum, ocp_addr, ERR_PTR(ret));
+ 		return ret;
+ 	}
+ 
+@@ -1068,8 +1068,8 @@ static void rtl8365mb_phylink_mac_config(struct phylink_config *config,
+ 		ret = rtl8365mb_ext_config_rgmii(priv, port, state->interface);
+ 		if (ret)
+ 			dev_err(priv->dev,
+-				"failed to configure RGMII mode on port %d: %d\n",
+-				port, ret);
++				"failed to configure RGMII mode on port %d: %pe\n",
++				port, ERR_PTR(ret));
+ 		return;
+ 	}
+ 
+@@ -1098,8 +1098,8 @@ static void rtl8365mb_phylink_mac_link_down(struct phylink_config *config,
+ 						     false, false);
+ 		if (ret)
+ 			dev_err(priv->dev,
+-				"failed to reset forced mode on port %d: %d\n",
+-				port, ret);
++				"failed to reset forced mode on port %d: %pe\n",
++				port, ERR_PTR(ret));
+ 
+ 		return;
+ 	}
+@@ -1129,8 +1129,8 @@ static void rtl8365mb_phylink_mac_link_up(struct phylink_config *config,
+ 						     rx_pause);
+ 		if (ret)
+ 			dev_err(priv->dev,
+-				"failed to force mode on port %d: %d\n", port,
+-				ret);
++				"failed to force mode on port %d: %pe\n", port,
++				ERR_PTR(ret));
+ 
+ 		return;
+ 	}
+@@ -1285,8 +1285,8 @@ static void rtl8365mb_get_ethtool_stats(struct dsa_switch *ds, int port, u64 *da
+ 						 mib->length, &data[i]);
+ 		if (ret) {
+ 			dev_err(priv->dev,
+-				"failed to read port %d counters: %d\n", port,
+-				ret);
++				"failed to read port %d counters: %pe\n", port,
++				ERR_PTR(ret));
+ 			break;
+ 		}
+ 	}
+@@ -1638,7 +1638,8 @@ static irqreturn_t rtl8365mb_irq(int irq, void *data)
+ 	return IRQ_HANDLED;
+ 
+ out_error:
+-	dev_err(priv->dev, "failed to read interrupt status: %d\n", ret);
++	dev_err(priv->dev, "failed to read interrupt status: %pe\n",
++		ERR_PTR(ret));
+ 
+ out_none:
+ 	return IRQ_NONE;
+@@ -1776,7 +1777,8 @@ static int rtl8365mb_irq_setup(struct realtek_priv *priv)
+ 	ret = request_threaded_irq(irq, NULL, rtl8365mb_irq, IRQF_ONESHOT,
+ 				   "rtl8365mb", priv);
+ 	if (ret) {
+-		dev_err(priv->dev, "failed to request irq: %d\n", ret);
++		dev_err(priv->dev, "failed to request irq: %pe\n",
++			ERR_PTR(ret));
+ 		goto out_remove_irqdomain;
+ 	}
+ 
+@@ -1952,14 +1954,16 @@ static int rtl8365mb_setup(struct dsa_switch *ds)
+ 
+ 	ret = rtl8365mb_reset_chip(priv);
+ 	if (ret) {
+-		dev_err(priv->dev, "failed to reset chip: %d\n", ret);
++		dev_err(priv->dev, "failed to reset chip: %pe\n",
++			ERR_PTR(ret));
+ 		goto out_error;
+ 	}
+ 
+ 	/* Configure switch to vendor-defined initial state */
+ 	ret = rtl8365mb_switch_init(priv);
+ 	if (ret) {
+-		dev_err(priv->dev, "failed to initialize switch: %d\n", ret);
++		dev_err(priv->dev, "failed to initialize switch: %pe\n",
++			ERR_PTR(ret));
+ 		goto out_error;
+ 	}
+ 
+@@ -2077,8 +2081,8 @@ static int rtl8365mb_detect(struct realtek_priv *priv)
+ 
+ 	ret = rtl8365mb_get_chip_id_and_ver(priv->map, &chip_id, &chip_ver);
+ 	if (ret) {
+-		dev_err(priv->dev, "failed to read chip id and version: %d\n",
+-			ret);
++		dev_err(priv->dev, "failed to read chip id and version: %pe\n",
++			ERR_PTR(ret));
+ 		return ret;
+ 	}
+ 
 
-Changes in v2:
-- added patch to use ERR_PTR()
-- dropped bitfield patch. Use FIELD_PREP instead. Suggested by Yury
-  Norov
-- tag_rtl8_4 patches were submitted on its own series (already accepted)
-- dropped rtl8365mb_vlan_mc_port_{add,del}(). rtl8365mb_vlan_mc_port_set
-  is now called directly from PVID methods.
-- reordered methods in rtl8365mb_vlan.c
-- use dsa_switch_for_each_user_port() instead of simple for in bridge
-  port join/leave
-- PVID check now uses dsa_switch_for_each_available_port instead of
-  dsa_switch_for_each_port
-- set EFID of user ports to 0 at setup(), although it is the expected
-  state after reset
-- STP patch was dropped and replaced by a more extensive one that
-  disables all ports (including unused ones) before setting CPU and user
-  ports. It also extended the CPU port isolation to include all user
-  ports.
-- refactored bridge, FDB, and MDB port operations into the common
-  rtl83xx module, introducing new realtek_ops callbacks to abstract the
-  hardware access
-- Collected Reviewed-by and Suggested-by tags
-- Link to v1:
-  https://patch.msgid.link/20260331-realtek_forward-v1-0-44fb63033b7e@gmail.com
-
-To: Linus Walleij <linusw@kernel.org>
-To: Alvin Šipraga <alsi@bang-olufsen.dk>
-To: Andrew Lunn <andrew@lunn.ch>
-To: Vladimir Oltean <olteanv@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>
-To: Eric Dumazet <edumazet@google.com>
-To: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-To: Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-
----
-Alvin Šipraga (6):
-      net: dsa: realtek: rtl8365mb: prepare for multiple source files
-      net: dsa: realtek: rtl8365mb: add table lookup interface
-      net: dsa: realtek: rtl8365mb: add VLAN support
-      net: dsa: realtek: rtl8365mb: add port_bridge_{join,leave}
-      net: dsa: realtek: rtl8365mb: add FDB support
-      net: dsa: realtek: rtl8365mb: add bridge port flags
-
-Luiz Angelo Daros de Luca (2):
-      net: dsa: realtek: rtl8365mb: use ERR_PTR
-      net: dsa: realtek: rtl8365mb: use dsa helpers for port iteration
-
- drivers/net/dsa/realtek/Makefile                   |   4 +
- drivers/net/dsa/realtek/realtek.h                  |  42 ++
- drivers/net/dsa/realtek/rtl8365mb_l2.c             | 493 +++++++++++++
- drivers/net/dsa/realtek/rtl8365mb_l2.h             |  32 +
- .../dsa/realtek/{rtl8365mb.c => rtl8365mb_main.c}  | 548 ++++++++++++--
- drivers/net/dsa/realtek/rtl8365mb_table.c          | 214 ++++++
- drivers/net/dsa/realtek/rtl8365mb_table.h          | 131 ++++
- drivers/net/dsa/realtek/rtl8365mb_vlan.c           | 797 +++++++++++++++++++++
- drivers/net/dsa/realtek/rtl8365mb_vlan.h           |  25 +
- drivers/net/dsa/realtek/rtl83xx.c                  | 482 +++++++++++++
- drivers/net/dsa/realtek/rtl83xx.h                  |  27 +
- 11 files changed, 2727 insertions(+), 68 deletions(-)
----
-base-commit: edf4bee4215a173c0534d1851d7523d827149f9e
-change-id: 20260323-realtek_forward-1bac3a77c664
-
-Best regards,
---  
-Luiz Angelo Daros de Luca <luizluca@gmail.com>
+-- 
+2.54.0
 
 
