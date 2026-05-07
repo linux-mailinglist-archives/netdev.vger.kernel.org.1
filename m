@@ -1,157 +1,208 @@
-Return-Path: <netdev+bounces-285371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285372-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OM4pNOGp/GkNSgAAu9opvQ
-	(envelope-from <netdev+bounces-285371-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:04:01 +0200
+	id aFnCId2q/GkNSgAAu9opvQ
+	(envelope-from <netdev+bounces-285372-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:08:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 779C24EAC21
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:04:01 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19BED4EACE5
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:08:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 50FDF3014FEA
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 15:03:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 557BB30027FC
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 15:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F29643DA52;
-	Thu,  7 May 2026 15:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5643E7141;
+	Thu,  7 May 2026 15:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="B8vURC+N"
+	dkim=pass (2048-bit key) header.d=hitachienergy.com header.i=@hitachienergy.com header.b="JuCSiuTp"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011065.outbound.protection.outlook.com [40.107.130.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B142237AA82;
-	Thu,  7 May 2026 15:03:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778166218; cv=none; b=T/5q/S5AYNFj//DvKjrUqTcUvZuqFK/Uvk4RJ3uFd3wCuuxodnLI4jGRawYbXMLKuGttrfgMcdEdw3Wqj4+sFmZqX7ICKocF7vtWPinURtDKUr8xmxBNe+CajLlhTGYr3AWyRxy2mxfINdQWcwbXT1BJjobNFxAuM2jAEl7y1Ag=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778166218; c=relaxed/simple;
-	bh=RqqEmSAYe5uO5yFHnV/lHGnWfVJKUcwk0oQAySoPpuc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FoMOodpENxa2Jxgxed3PhTxEDCETxLzB6wG3mBW+dhffP1eCQ/Uko+GFc0qwwUQE3iuLrlVDuhqgiGWCzXbacWVMixAHB1wEQMsBWApkiuTYxeXwVdU1Q00qEEKqsrjjG60ENTM06u97RWeam5UphesW4dzVTi4hre4urJ3up5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=B8vURC+N; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1778166203; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=gN0R7K+mFD2y2ohlTCIAYE5Mk6fJmoCLJCQhnJ8zqCc=;
-	b=B8vURC+NgyV//UevGjIZ6Wn/v9i3r84zHtcypYdxhakVbMP6oidxv5F4rYfGbASJZS6GW2Nt7vIF6s8D47ysQhlpQ6z+PAuZOWiAiC9gwIMYMI735PlXt1IdeSISSRqMRwvcecDnclCAFm5kakrqcawjYJZ20YIvm7f+gA3FfK8=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0X2Uqj2g_1778166201;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0X2Uqj2g_1778166201 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 07 May 2026 23:03:22 +0800
-Date: Thu, 7 May 2026 23:03:21 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: "D. Wythe" <alibuda@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: Karsten Graul <kgraul@linux.ibm.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
-	Ursula Braun <ubraun@linux.ibm.com>,
-	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, oliver.yang@linux.alibaba.com,
-	pasic@linux.ibm.com
-Subject: Re: [PATCH net] net/smc: fix missing sk_err when TCP handshake fails
-Message-ID: <afypuUy5ZAXVQPuI@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20260506014105.27093-1-alibuda@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA4283EDAD6
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 15:07:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778166460; cv=fail; b=hOZAU+dGEL51Pdz1N1oVSIAJgBn6HwBvTWcPE22CAU4cuudFJyn+BdG43ws47x4oRNFP9QRmBBO2UFYyCqhvKEADWJJAh3sJGDOqINXlzAPq4cj6CV72WENhxuJzgWuT612r1bv3sFiw1PRi3PsDjlH48SfOimCm45b9sYxEiIk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778166460; c=relaxed/simple;
+	bh=OJ5YYvVVEZPybTGsUR9M8ZDNjo7bP/jMUpVKDS6zjIo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=qfumwG8UM04+29gqszrur0hc0lNfsx43fHJNrAAkyyT473BbOiOBwqiOJt0WaP2AD5TaNl8W3lRcWdcrmbt+hldmgTpb9jStZyxxDiIXSH+OGCT3IFPwvMIhaBH6WcfiLp7/ICoOCBMoVc156BVeT40Azwbv2D/tI8eWDHLTp3g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hitachienergy.com; spf=pass smtp.mailfrom=hitachienergy.com; dkim=pass (2048-bit key) header.d=hitachienergy.com header.i=@hitachienergy.com header.b=JuCSiuTp; arc=fail smtp.client-ip=40.107.130.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hitachienergy.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hitachienergy.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=uwsEYMKxfC027kG9g4CqSyxE491/d05QiWlcL2oGzJlWDo3/PCNxdsIgqflFylcKflRgvi1QkhdweI+VHP2pu7nng/inTSYu8SlZmsFj3EjAet3iTcdao8xUjG5MTkY0aLYueiuCjRdWC1sNnehysQrui9be2QSXJB3VoY9FBH/89y+5/qhEhI2vkbleM7cJ4nzyB/QMa+vbrjSrEEdJHqRYnLgKYpDppw6IRaeFrqu9lH6KV55vW1rEKhZTqfdPn/NQ2M2obffvxbwXq2LlLnrHQg8bVMTX/SN+rmzLY0gq8KyFi8ezSPeukJonZjbCOrta7zIyYpx2VgapQAl9kw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LswTpcupaSdZPPJOs7QBQX8VSwIFYM0YwdGmT7fjYz8=;
+ b=d3H1HhQI6kPsCHnHzF3RZ36qY2idNkG28L2U4x8xbiYOyKVLimpwswzcwkXk99C89bKfPVuPHPkdRSX1FAj6/3bMul3ayQku2YYCWK5Omq8taFRSBWn4wp1UyfQqxneEd/v6DOJIy89jn/EmsW7V7PBFHVWKm0NiWoPLGJB04YFcFpFSnwKZ6IcGmgWypugTU/F6E1jY1WYriIthoudOgZW7HttFMtcUmkXLSVIz4dMElpfmR9wfBWKuoPM++S7LVwwJ72swjjlas10TijHejNXr6a1IQclNny8KGOkUW7CKWchuD+I4hAw3vnXXW8osZQD8cfxbnZyhphxMKDl/8A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=hitachienergy.com; dmarc=pass action=none
+ header.from=hitachienergy.com; dkim=pass header.d=hitachienergy.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hitachienergy.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LswTpcupaSdZPPJOs7QBQX8VSwIFYM0YwdGmT7fjYz8=;
+ b=JuCSiuTpD1xOWykmFSfK1s3qRRIugJGnZDvw85GGAazKDyc58XIXutciywKi6SvOGYp204DxsxH4kfHSnTrjCpgo+FMnhmGVqpubkt07nVlnPClFP7p9i3IgY8e2T0KKy2T0c1s/I7N8DloN/mn99bE0vPhR8k+KnQMYi3nvG32d1SIM5/TXK41VxUF7tH9RTStMXml2DGXFla6HgPiprh7lIAxMqvZdzqSLj1P8UesMcS/GKT6rkTh6qxOkVkWKMM3IMqtzDTbZ2oE/lFxyZ0Yxx/2HAeb13i5VCvme7/GhxH39rEcLs2zbz+xhG/3ugm8SWLCW3aBEDWHYLHDo5A==
+Received: from AM0PR06MB10396.eurprd06.prod.outlook.com (2603:10a6:20b:6fd::9)
+ by PA1PR06MB9379.eurprd06.prod.outlook.com (2603:10a6:102:45f::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.15; Thu, 7 May
+ 2026 15:07:35 +0000
+Received: from AM0PR06MB10396.eurprd06.prod.outlook.com
+ ([fe80::f64e:6a20:6d85:183f]) by AM0PR06MB10396.eurprd06.prod.outlook.com
+ ([fe80::f64e:6a20:6d85:183f%5]) with mapi id 15.20.9891.016; Thu, 7 May 2026
+ 15:07:35 +0000
+From: Holger Brunck <holger.brunck@hitachienergy.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "chleroy@kernel.org"
+	<chleroy@kernel.org>, "qiang.zhao@nxp.com" <qiang.zhao@nxp.com>,
+	"horms@kernel.org" <horms@kernel.org>
+Subject: RE: [PATCH v2 net] net: wan: fsl_ucc_hdlc: free tx_skbuff in
+ uhdlc_memclean
+Thread-Topic: [PATCH v2 net] net: wan: fsl_ucc_hdlc: free tx_skbuff in
+ uhdlc_memclean
+Thread-Index: AQHc3Umw1+noMo6hfE2oruIw7o3WBrYBoimAgADKE5A=
+Date: Thu, 7 May 2026 15:07:35 +0000
+Message-ID:
+ <AM0PR06MB1039657EB2FADD7BDAD4159D5F73C2@AM0PR06MB10396.eurprd06.prod.outlook.com>
+References: <20260506111529.2919079-1-holger.brunck@hitachienergy.com>
+ <20260506161629.5488a643@kernel.org>
+In-Reply-To: <20260506161629.5488a643@kernel.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=hitachienergy.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM0PR06MB10396:EE_|PA1PR06MB9379:EE_
+x-ms-office365-filtering-correlation-id: c86fc915-47c5-4e24-0481-08deac4a5f18
+x-he-o365-outbound: HEO365Out
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|376014|38070700021|22082099003|56012099003|18002099003;
+x-microsoft-antispam-message-info:
+ eSiu0Z4WefdYUlNwMXyAPl+kWe4F1vuzTFcY5zdU0QRLij888EkowoV5gPq3sfl5sYPYDGoA/SAUs6iiOmA1jhGMNwIg0p9zdjl5Sjqt2podtMXXWfeKdxFwY8aizQyk4tB+e5OElLDW2sCG5Sul26eALc/PZVJWZQFkirmiDu2Zk0NAGWlcPkrTy6+RRaOEic9BePJW/QSPQvwJyOtBZfdLTP9TCHsexBYqgs5Qm8IlXi7HYAzDylv5JNuluf++6ul9mqn7OejcqV4+FuUw0qTyYJULNXQOuOvlIqPlh1O6Z/yIngqUyAvIYzzT49cfSj2vGr6k7AZQm7rEiV/esqkAtTEVij2mDAldwfcSIHn+wbzER7jCtfw+SAvqhchaAQ8VLpR2/lOmt591Q5Due8ElgIJ9+gTnBThC4PD3WkIy7zNxQdY2kpvJzkinzO/KeoUnN9IXYsxQeSZLI2GRCH8WoftW9T3k6kpllI/SzQ28kvBPUPlM/hEwxloMal+0u3oJS/E3sCqh8IYTwcJCdQKqJVpOEu5Hfz5UiiN9soQp7iePW/hEo1UgsJSV9JyUVyndLVI/rYskskF4UXlfDtrw7jptU1gTO67mePk5MRWEk7hylacB+Ngo06j1kEqoh4kVW6OHEaQm9DBjV2YZU2ZjpsMQH11kHEjdfX4JrxEOwnyDh8Bv0olA+Kokiu393YSRCqzb1z6FiaVPBWdwBD6cH+ReU2Nj4sgNZRCtx7Zs8WtOHqI/1NZW/Q0plrQg
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR06MB10396.eurprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700021)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?4CyvXtti4zDRaKh/SwgGfftq+b1u+EVoFgYhvJssS2OAFfyQ67wxIJW4pq4D?=
+ =?us-ascii?Q?LnPhrGuK6HSfpgUVhHTA94jr5dbikVa7H09cXXOhkLY6O9W7CbaLCr9RogaP?=
+ =?us-ascii?Q?HZiDq2n2ftydJ1hOhYd0x78N6KHBF8Li319vq+Ys2B8Dq54i+nebbwkqO7Wi?=
+ =?us-ascii?Q?5Q9eqJNafmMyuH0JP5/R912Qe6At9hK9Ffkd3gCioPsYnevrwsoJBpVDfwxP?=
+ =?us-ascii?Q?dGZfo3PorF95LaCqrU1MrsVDl3h5RQxX/bZrBlAymbC47u72PMWC6VSbLmoz?=
+ =?us-ascii?Q?kU5/dqOWHezOLDtcyWGZ3pJ2nJCCpWk16/ujFvjOBRTS6RiRZOM+THv+V5hX?=
+ =?us-ascii?Q?J7BYgKxaUAwxB2J0TZ7xFcf3lnLR1PNW7bu0PrhYOojKn8By3gXsFyj+AHC0?=
+ =?us-ascii?Q?IPYecYQVfoR1QIvFkLgi9vTk6aKhQWc1ciSggQ6JxwI5LXkEPg8cXhfFbMGl?=
+ =?us-ascii?Q?Ccvbyxg5TFl+t5FBo5YZ8cNvdMxFIKDK0UzDl4K2bMcX8RZfWdBXxNyHt5WF?=
+ =?us-ascii?Q?j3aRSdaWsnnMI5RYRprhhno6eV1shwky5pHuI8IY5HSw5y50KdNOaDdyK9oA?=
+ =?us-ascii?Q?CvQCAWM2EDQl2FqkMjet0W0vcLTIbwHzPHSVyl2ywLh4XUDQCkDtAj73gt5X?=
+ =?us-ascii?Q?g9R3zn/YiqN2jLtX4kD+/bSAD6q/+Q8gkuwzoSsUJkJqMzV8m5HGQggZH5Oo?=
+ =?us-ascii?Q?GWevRb9ky3Y/VYI1uBJMj+SIIcrnhdbt1LFtd9laGBWpCTUbQd1jcxKq5ub1?=
+ =?us-ascii?Q?hiQS7+33mzZLQ6ssxf2FrAwyFcPWmzWtYw3t/2aFHHV0Tdd/Ig2wm443LVlF?=
+ =?us-ascii?Q?r3mEPW2LsIukY78DLYogpqZEa2qoXq3ZK+bHtfWVmOzcCdxWRZXYq3lH3y7u?=
+ =?us-ascii?Q?jyNQ0ZTysQ9KFtPryKjBtHNuY1pCuKdGfy3tMLUY7KZAb6znIAFFcIQ80eSQ?=
+ =?us-ascii?Q?hN6+NgIb7kOOl3A6NhczoIiAVRifuOQL7wyan5NOkbeDYH5nBzCriI2Gx6sM?=
+ =?us-ascii?Q?xf4p92NJTHFNAGS+OCA3Vc7rg0zXwKQ7T9jbU0bR+PmjthaWOFD6wsvPAF1L?=
+ =?us-ascii?Q?tmEY2gg2kfRUJ8fwhbHsQGjMmbM2SYFhuVcEtLumTx9fxGXmKsxP8Go8fQnF?=
+ =?us-ascii?Q?mAx72YHDXRcpXm+gmwnOBtqKvPglfgWbKfxjbNiUZgk4AXOlTODvEYU7raM1?=
+ =?us-ascii?Q?lfAKc6/llwSvf7iphdhDSjtu5g2wqhyCcuXHoAoXDgKq0XMpngiwea0rA/2L?=
+ =?us-ascii?Q?qWXO1iwc06IaE2Dm5F9iiCC4cONyRZCLFgTNNWs7gHBY2lJxExk72Y/XuT5R?=
+ =?us-ascii?Q?REwg4yhVnHzmnDHqXPNZTciHScCUQlTG/Dftapw7vcJq/KA/12JuDT3aD3ld?=
+ =?us-ascii?Q?Vn60kxWmWWsn0Ph3hUu0zifSq8Eec1VFW5uos8JZz+xj4OG+nNRFoI//g8ti?=
+ =?us-ascii?Q?S9QFHcHlpgxtGihusuPOtrMUbkC5aHiIerohXLchyMp9waqljesfc7AsVj/Q?=
+ =?us-ascii?Q?JWsVUc3Y8OCg5bXVD++waQf4FTQLrgjdrkaQX9b9nixEOY0q0e1g93DDqyk/?=
+ =?us-ascii?Q?GgH3ibXwQqxjLC8PIdLSR4L0mhX9nSnxAEhCRXW2k8bd4W7mBKnMeYyBpaU/?=
+ =?us-ascii?Q?8BpbtTqEW3ASHF4ORQ/85MCAos3IQ1g5PmyBNnzs82Mgl8YtixqgJf3fIc7o?=
+ =?us-ascii?Q?Rr/CutMYFLtgJG+ibpFEp1Nht+BpKykCBgj32gTYLyjQt9ZreBmVrfohwvvX?=
+ =?us-ascii?Q?fKaCtMvsAZlomn3xZ7inFqKeRg5oWys=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260506014105.27093-1-alibuda@linux.alibaba.com>
-X-Rspamd-Queue-Id: 779C24EAC21
+X-OriginatorOrg: hitachienergy.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR06MB10396.eurprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c86fc915-47c5-4e24-0481-08deac4a5f18
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 May 2026 15:07:35.5558
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 7831e6d9-dc6c-4cd1-9ec6-1dc2b4133195
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: XyiDhN1h8yE0H/5s9aDIUyMjhYVxrKh7zTms34DvVbAsHHSZptz2+Y6JvzbATFOpSnCLmqzCYsTa5hcDhYW50b5+mu1MBAiQO1Em8C0sozQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR06MB9379
+X-Rspamd-Queue-Id: 19BED4EACE5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-9.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[hitachienergy.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[hitachienergy.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	REPLYTO_DOM_EQ_TO_DOM(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285371-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-285372-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[hitachienergy.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	FROM_NEQ_ENVFROM(0.00)[holger.brunck@hitachienergy.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	HAS_REPLYTO(0.00)[dust.li@linux.alibaba.com];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.alibaba.com:mid,linux.alibaba.com:dkim,linux.alibaba.com:replyto]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[AM0PR06MB10396.eurprd06.prod.outlook.com:mid,hitachienergy.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On 2026-05-06 09:41:05, D. Wythe wrote:
->In smc_connect_work(), when the underlying TCP handshake fails, the error
->code (rc) must be propagated to sk_err to ensure userspace can correctly
->retrieve the error status via SO_ERROR. Currently, the code only handles
->a restricted set of error codes (e.g., EPIPE, ECONNREFUSED). If other
->errors occurs, such as EHOSTUNREACH, sk_err remains unset (zero).
->
->This affects applications that rely on SO_ERROR to determine connect
->outcome. For example, higher versions of Go's netpoller treats
->SO_ERROR == 0 combined with a failed getpeername() as a spurious wakeup
->and re-enters epoll_wait(). Under ET mode, no further edge will be
->generated since the socket is already in a terminal state, causing the
->connect to hang indefinitely or until a user-specified timeout, if one
->is set.
->
->Fixes: 50717a37db03 ("net/smc: nonblocking connect rework")
->Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> On Wed,  6 May 2026 13:15:29 +0200 Holger Brunck wrote:
+> > When the device is removed all allocated resources should be freed.
+> > In uhdlc_memclean the netdev transmit queue was already stopped. But
+> > at this point we may have pending skb in the transmit queue which must
+> > be freed. Therefore iterate over the tx_skbuff pointers and free all
+> > pending skb. The issue was discovered by sashiko.
+>=20
+> And you tested this how?
+>=20
+> Given the questionable v1 I'm highly hesitant to accept patches from you =
+if you
+> can't test them.
 
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+I tested the patch on a ls1043a board running HDLC in busmode on kernel 6.1=
+2
 
-Best regards,
-Dust
-
->---
-> net/smc/af_smc.c | 8 ++------
-> 1 file changed, 2 insertions(+), 6 deletions(-)
->
->diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->index 1a565095376a..185dbed7de5d 100644
->--- a/net/smc/af_smc.c
->+++ b/net/smc/af_smc.c
->@@ -1628,12 +1628,8 @@ static void smc_connect_work(struct work_struct *work)
-> 	lock_sock(&smc->sk);
-> 	if (rc != 0 || smc->sk.sk_err) {
-> 		smc->sk.sk_state = SMC_CLOSED;
->-		if (rc == -EPIPE || rc == -EAGAIN)
->-			smc->sk.sk_err = EPIPE;
->-		else if (rc == -ECONNREFUSED)
->-			smc->sk.sk_err = ECONNREFUSED;
->-		else if (signal_pending(current))
->-			smc->sk.sk_err = -sock_intr_errno(timeo);
->+		if (!smc->sk.sk_err)
->+			smc->sk.sk_err = (rc == -EAGAIN) ? EPIPE : -rc;
-> 		sock_put(&smc->sk); /* passive closing */
-> 		goto out;
-> 	}
->-- 
->2.45.0
+I was able to queue some packets in the TX part simply in removing the TX c=
+lock
+for my setup. When I then shutdown the interface and remove the module I ca=
+n
+see that thel sk_buff pointers stored in the priv->tx_skbuff array, are not=
+ freed
+ without the patch in question.
+I am currently not able to run my setup on latest master, but the changes i=
+n the
+driver compared to master are minimal.
+=20
+Best regards
+Holger =20
 
