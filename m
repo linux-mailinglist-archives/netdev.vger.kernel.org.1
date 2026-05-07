@@ -1,128 +1,120 @@
-Return-Path: <netdev+bounces-285377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285378-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KPWZNA+r/GkNSgAAu9opvQ
-	(envelope-from <netdev+bounces-285377-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:09:03 +0200
+	id wLlEAF+s/GkNSgAAu9opvQ
+	(envelope-from <netdev+bounces-285378-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:14:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64B6B4EAD12
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:09:03 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99C4E4EADAB
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:14:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D46073017EDE
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 15:08:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id ADDFF3006175
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 15:14:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C55E443E4BB;
-	Thu,  7 May 2026 15:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 246EF3FB7E9;
+	Thu,  7 May 2026 15:14:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Abe3n7iz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q/8K4M52"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A187443E4A1;
-	Thu,  7 May 2026 15:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019F63F54AD
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 15:14:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778166520; cv=none; b=nvmI46mv4g4/vmilR+ymJjZ7eNB4UyXffIxrj+SrFitOx6baVNUTYR01UScmJg+0QI3TPe0uddOB7KtoIqPWuuQcK57unxHHtMHAeQPDqlk+skkFjjxnS61vrEg7AW6rv8ldLupOzb/AS3bAfJXGaTlq6wM5R4b+F3AUdShY6pI=
+	t=1778166876; cv=none; b=h92J6C9G2ZbxdyLfGeJKfawGgD+RajTdKOCp/GYHX7iqvf9PGbHMwzSgjXpXz8hu54eZCPe5wSWkcC7MfHeDvy0tNgm2aHL/icELKo5+8jtzGqHEUbFhgNXl7+c0BRGYZFzI8v22RUzXEyjUUDcizd4KK07HVeGMYPZ3uhNRsCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778166520; c=relaxed/simple;
-	bh=h3hcqBUbH6jetT+kZMUgXWTqXe6P9tvY9fQw/yBySvo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YnJdV5XV7G2W6fbHFb4PMVPxZrNLV5uJTrMzZKSMN+g458xx0B/SXxPNZc/5dcLeJ2z7R2MdnJYvEgNI+DMDw3GrvLAZbMW/Kx9g76SVFqP6qUOnBotLOsqammuYOoCf/IbHUyyf79rJPW0NrC9ARMi3nPXiwWGBABKIRkvJHRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Abe3n7iz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DF67C2BCB8;
-	Thu,  7 May 2026 15:08:40 +0000 (UTC)
+	s=arc-20240116; t=1778166876; c=relaxed/simple;
+	bh=GHlsdUXYw3KpEdOKltzLJfsfCFEm6ZB6eRem9WLVwyI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hgYVeQNKgPyzuFVYWSHVuhN3BxY8ShNRxCT4EcQDUXJiK03iegr+kYiyksXCYn6cFDQEjFgUe5eYye+RMPTZStdlMEHHK2z+7+e28vbDMRlRi0qiGWZiXRHZGmwlL8gI0qn80ERFhjdTgeBkyo6qz3UDIm3RhCOnoGf7pyr/0QA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q/8K4M52; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 355DDC2BCB8;
+	Thu,  7 May 2026 15:14:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778166520;
-	bh=h3hcqBUbH6jetT+kZMUgXWTqXe6P9tvY9fQw/yBySvo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Abe3n7iztnI6wS00ew3Kag/pw9RsbzbEbmizqBsOmmYcDiF9cXaAfcsEK7DPlY9Uj
-	 kjN40pfVibhX9lR2BlGq9w/XARA2loR5da8X4iXvqaGx9uoNvsAudhrzVoFu0o2yv2
-	 b2p4Y5bas4ZyE78Gdr+0E3sY9hOKRjBbrgc+BoEToLL/hnJDVSEPKPVsmg5ksH1aaP
-	 Vdlu04In2LNO9NdvvJhdZj7vU/sYmwlnast1IXDl5FOvEMrBZVMKU+67fk58V7gn9p
-	 DvhBQPhKHIs+NzKFVtEKJ5oS6aZqqteFRPIXppCHM++upz+PRL7b9RfKj85wh/cOCE
-	 E0Vf0dPSaEGRA==
-From: David Ahern <dsahern@kernel.org>
-To: stephen@networkplumber.org
-Cc: netdev@vger.kernel.org,
-	leonro@nvidia.com,
-	linux-rdma@vger.kernel.org,
-	David Ahern <dahern@nvidia.com>
-Subject: [PATCH iproute2-next 4/4] rdma-dev: Update man page to reflect netns as a pid
-Date: Thu,  7 May 2026 09:08:35 -0600
-Message-ID: <20260507150836.28105-5-dsahern@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20260507150836.28105-1-dsahern@kernel.org>
-References: <20260507150836.28105-1-dsahern@kernel.org>
+	s=k20201202; t=1778166875;
+	bh=GHlsdUXYw3KpEdOKltzLJfsfCFEm6ZB6eRem9WLVwyI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Q/8K4M52TkFcu66z5d5dddREseinyqAdqbiWKoBUE3z+k+vSiu42iAZrP6ocsmj1Q
+	 WYkxaWX1wWlRQ5FR/QqsmM2xcV3BkWkKJXLVSOoNBXt0S44V6ZO2fboqBGV1lKhH2I
+	 z+OU+2nnyNxTTdJ3e9UBqHAgnrvuQOl4oYXsruC9COtUwXnuN0jEVlE+ENTx/LvWv5
+	 148mUJFYWom4HKXH9puMgjAdbGo4DkB6Itf17hH4TWuaivPhdD1G7eVyt24VNn+LZC
+	 ejNqR0pU+ZsE1f+SVcr4Akw4FKiE6G4PMZJNTwpSSIdPaUgekEPAM1Qszvm6V7DZYx
+	 2gjehRVVnA1dw==
+Message-ID: <7e283b95-a96b-4e20-b062-6d43a8164395@kernel.org>
+Date: Thu, 7 May 2026 09:14:33 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 64B6B4EAD12
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/3] net: constify sk_skb_reason_drop() sock
+ parameter
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
+Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
+References: <20260507084305.2506115-1-edumazet@google.com>
+ <20260507084305.2506115-2-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20260507084305.2506115-2-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 99C4E4EADAB
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285377-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,google.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-285378-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nvidia.com:email]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-From: David Ahern <dahern@nvidia.com>
+On 5/7/26 2:43 AM, Eric Dumazet wrote:
+> sk_skb_reason_drop() does not change sock parameter, make it
+> const so that we can call it from TCP stack without a cast
+> on a (const) listener socket.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  include/linux/skbuff.h     | 3 ++-
+>  include/trace/events/skb.h | 4 ++--
+>  net/core/skbuff.c          | 5 +++--
+>  3 files changed, 7 insertions(+), 5 deletions(-)
+> 
+>
 
-Signed-off-by: David Ahern <dahern@nvidia.com>
----
- man/man8/rdma-dev.8 | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-diff --git a/man/man8/rdma-dev.8 b/man/man8/rdma-dev.8
-index abc9f405..9ddad2dd 100644
---- a/man/man8/rdma-dev.8
-+++ b/man/man8/rdma-dev.8
-@@ -32,7 +32,7 @@ rdma-dev \- RDMA device configuration
- .B rdma dev set
- .RI "[ " DEV " ]"
- .BR netns
--.BR NSNAME
-+.BR { NSNAME | PID }
- 
- .ti -8
- .B rdma dev set
-@@ -104,6 +104,7 @@ Renames the mlx5_3 device to rdma_0.
- .RE
- .PP
- rdma dev set mlx5_3 netns foo
-+rdma dev set mlx5_3 netns 1234
- .RS 4
- Changes the network namespace of RDMA device to foo where foo was
- previously created using the iproute2 ip command.
--- 
-2.50.1 (Apple Git-155)
 
 
