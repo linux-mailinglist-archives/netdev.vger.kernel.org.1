@@ -1,68 +1,53 @@
-Return-Path: <netdev+bounces-285099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285100-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eLpNJZvp+2nEHwAAu9opvQ
-	(envelope-from <netdev+bounces-285099-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 03:23:39 +0200
+	id XfijEmfr+2llIQAAu9opvQ
+	(envelope-from <netdev+bounces-285100-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 03:31:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 193D54E1EE2
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 03:23:38 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4FAD4E1F25
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 03:31:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 400EA3006B71
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 01:23:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2398E301DD90
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 01:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66916269CE7;
-	Thu,  7 May 2026 01:23:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CDA01EE01A;
+	Thu,  7 May 2026 01:31:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PvQjUZUa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ss0m+OrS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43975261B8D;
-	Thu,  7 May 2026 01:23:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2557D26AF4;
+	Thu,  7 May 2026 01:31:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778116993; cv=none; b=IPujwdxOc21XeHAQInTGUpocYSxo2KCbaxAGh+zHqJmxoei5xiybrVxMtR49oEFSfTfQfPYfp1dK91/t92tbO1qIl3nEZIYp6Jg26uKlJEVT1Ay08E/XgZwUCTX7ghTgeePAiXaATPabtbw/XF+IH4N77NWm5OVZTODJGYE00tk=
+	t=1778117474; cv=none; b=rRP0p/4l8voms6BbWt0feGUdSwv5rFT9262QAFrxDuBTnJAoMgRcpOpK0zKLpWuug5jMRxkpr5MZDOvgEwfYi24ae3jZjExA28wZRjwK0lpz5hb++yNQm1eyEvDVziSzQ+EPQXuTjFY5fIwv4fEC3+kRV0JuSJQOH7EZY+6hMqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778116993; c=relaxed/simple;
-	bh=t4slTGJ5CXwEJr/pYqlbOeDgFqg88kjT2d34N1OIWMg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iL5rYFB/OTm5G1J/4XkUZ6K0hqVM7vXeBHBJ34PtQOEKpB2jVJPfAj4LFHnLqYfRhv366hvV1Qs2p3ryyYe1vK+Qz1IDFFazwVIlrqMeVDYCePUFfaYmi2jxvZJogcIst/cbKb4vnzF8jzNHetlxNlBX0/JYD/GJOQPZFpR51pI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PvQjUZUa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84AE9C2BCB2;
-	Thu,  7 May 2026 01:23:12 +0000 (UTC)
+	s=arc-20240116; t=1778117474; c=relaxed/simple;
+	bh=KNR/1UcnqVRthTheFUaU76nP9k370T8nKog7TDR6YVc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=paWfzdQ5ADHhZI0nWQWHuyO8RNK1LhEyCA5D9fB8INAip+1GgmXQmjgnGmtHCKFPv3aa1hkRuGHbUP/cWA/3IXYboSzu9mNzgpKKzS+ThrleJsVqnG5L/wzGk2XrQd4Nr8JTSzQ5r/3riV469lMslmlG8Dn79isbiMlxg4W/LD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ss0m+OrS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC48AC2BCB0;
+	Thu,  7 May 2026 01:31:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778116993;
-	bh=t4slTGJ5CXwEJr/pYqlbOeDgFqg88kjT2d34N1OIWMg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PvQjUZUaj4Cec1qKEq+agNzMga5z9Rjg7SsFSdczEC/eI5eHWnik5rQKyR8w00X0a
-	 z9W7vymTFeMFMYfmDA3GxH26htJiDMEd31YgZJ8yuXJsgg+hcy47Jr9ccM7BZjdYsj
-	 xD7u3gdwpNi3oJbqV/vyrqZDLyNmK6AJwFvDzks+91nJcj12rjlPkcjSCDiPvaMYn8
-	 skZ3HCiuM8Sl+Ggn8YNiH88NDT2sSay87/VMs87ft5zCw2tuTkuHKuZl3xanN77TJN
-	 Qu2H8KZSCLzwBMMQ5bL6nMSoZHKHrNZElDR0PNwkV/n8/G/sM+uKD5JobZkC5Oc6Be
-	 S2KwdMXAJrvkg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: mmyangfl@gmail.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	andrew@lunn.ch,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	jhs@mojatatu.com,
-	jiri@resnulli.us,
-	horms@kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 3/3] net: dsa: yt921x: Add port qdisc tbf support
-Date: Wed,  6 May 2026 18:23:11 -0700
-Message-ID: <20260507012311.2187979-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260504101258.1608004-4-mmyangfl@gmail.com>
-References: <20260504101258.1608004-4-mmyangfl@gmail.com>
+	s=k20201202; t=1778117473;
+	bh=KNR/1UcnqVRthTheFUaU76nP9k370T8nKog7TDR6YVc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ss0m+OrShS5624gSh8QZDABIKiwMZsGlm/0Z4nxzaJk4sdqIJ0aQeiwweivL6QfAQ
+	 MOupPZYquHMmZ835FfxQlLb0XAzoeNPIBO55GOVbtHvJaEirjyhGQ+sfl1LEcz77gf
+	 ZeaJdZQ9gFn6mCfzUjBzE89cA+dKgDZEQAULGy1jEyRbIqjiUlX4MKsU+ThBJ7L0Uw
+	 +1y+gZIq7fxgHOLFb7/aUpt7U+Kcqf4s8qRlgH5AhE4rqQDyrYcWRhCK9UqSt9ThpK
+	 r2TR7uH+pC2Bm6+qz494v2noa52ElNsmqzW523m9VSGDaP1/DQ9Bw3KMsERooBpk4d
+	 AdmBi8bFkkmVw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CE39393089F;
+	Thu,  7 May 2026 01:30:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,193 +55,96 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 193D54E1EE2
+Subject: Re: [PATCH net 00/11] mptcp: pm: misc. fixes for v7.1-rc3
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177811742303.3291094.15207378562960024252.git-patchwork-notify@kernel.org>
+Date: Thu, 07 May 2026 01:30:23 +0000
+References: <20260505-net-mptcp-pm-fixes-7-1-rc3-v1-0-fca8091060a4@kernel.org>
+In-Reply-To: 
+ <20260505-net-mptcp-pm-fixes-7-1-rc3-v1-0-fca8091060a4@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: martineau@kernel.org, geliang@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ cpaasch@openai.com, netdev@vger.kernel.org, mptcp@lists.linux.dev,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org
+X-Rspamd-Queue-Id: C4FAD4E1F25
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-285099-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,mojatatu.com,resnulli.us];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-285100-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-net: dsa: yt921x: Add port qdisc tbf support
+Hello:
 
-This commit wires up the port_setup_tc DSA operation to offload a TBF
-qdisc onto the yt921x per-port shaper, adding register definitions for
-the shaper control block and a marker-transform helper that shares the
-existing policer plumbing.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
-> index 42dca9617fb1..dc38e0dd22ee 100644
-> --- a/drivers/net/dsa/yt921x.c
-> +++ b/drivers/net/dsa/yt921x.c
+On Tue, 05 May 2026 17:00:48 +0200 you wrote:
+> Here are various fixes, mainly related to ADD_ADDRs:
+> 
+> - Patch 1: save ADD_ADDR for rtx with ID0 when needed. A fix for v6.1.
+> 
+> - Patch 2: remove unneeded exception for ID 0. A fix for v5.10.
+> 
+> - Patches 3-5: fix potential data-race and leaks during ADD_ADDR rtx. A
+>   fix for v5.10.
+> 
+> [...]
 
-[ ... ]
+Here is the summary with links:
+  - [net,01/11] mptcp: pm: kernel: correctly retransmit ADD_ADDR ID 0
+    https://git.kernel.org/netdev/net/c/b12014d2d36e
+  - [net,02/11] mptcp: pm: ADD_ADDR rtx: allow ID 0
+    https://git.kernel.org/netdev/net/c/03f324f3f1f7
+  - [net,03/11] mptcp: pm: ADD_ADDR rtx: fix potential data-race
+    https://git.kernel.org/netdev/net/c/5cd6e0ad79d2
+  - [net,04/11] mptcp: pm: ADD_ADDR rtx: always decrease sk refcount
+    https://git.kernel.org/netdev/net/c/9634cb35af17
+  - [net,05/11] mptcp: pm: ADD_ADDR rtx: free sk if last
+    https://git.kernel.org/netdev/net/c/b7b9a4615697
+  - [net,06/11] mptcp: pm: ADD_ADDR rtx: resched blocked ADD_ADDR quicker
+    https://git.kernel.org/netdev/net/c/3cf12492891c
+  - [net,07/11] mptcp: pm: ADD_ADDR rtx: skip inactive subflows
+    https://git.kernel.org/netdev/net/c/c6d395e2de13
+  - [net,08/11] mptcp: pm: ADD_ADDR rtx: return early if no retrans
+    https://git.kernel.org/netdev/net/c/62a9b19dce77
+  - [net,09/11] mptcp: pm: prio: skip closed subflows
+    https://git.kernel.org/netdev/net/c/166b78344031
+  - [net,10/11] selftests: mptcp: check output: catch cmd errors
+    https://git.kernel.org/netdev/net/c/65db7b27b90e
+  - [net,11/11] selftests: mptcp: pm: restrict 'unknown' check to pm_nl_ctl
+    https://git.kernel.org/netdev/net/c/53705ddfa184
 
-> @@ -1378,6 +1390,112 @@ yt921x_dsa_port_policer_add(struct dsa_switch *ds, int port,
->  	return res;
->  }
->  
-> +static int
-> +yt921x_tbf_validate(struct yt921x_priv *priv,
-> +		    const struct tc_tbf_qopt_offload *qopt)
-> +{
-> +	struct netlink_ext_ack *extack = qopt->extack;
-> +
-> +	if (qopt->parent != TC_H_ROOT) {
-> +		NL_SET_ERR_MSG_MOD(extack, "Parent should be \"root\"");
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	switch (qopt->command) {
-> +	case TC_TBF_REPLACE: {
-> +		const struct tc_tbf_qopt_offload_replace_params *p;
-> +
-> +		p = &qopt->replace_params;
-> +
-> +		if (p->mtu || p->peak.rate_bytes_ps) {
-> +			NL_SET_ERR_MSG_MOD(extack,
-> +					   "Offload not supported when mtu/peakrate is configured");
-> +			return -EOPNOTSUPP;
-> +		}
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Is the p->mtu check overly broad here?  tbf_change() in
-net/sched/sch_tbf.c sets q->mtu from the user-supplied qopt->mtu whenever
-TCA_TBF_PBURST is absent, so p->mtu can be non-zero even when no peakrate
-has been requested.  A user that explicitly passes the mtu parameter to
-tc would then be denied offload with an error that attributes the failure
-to mtu/peakrate together.
 
-Would gating only on p->peak.rate_bytes_ps better reflect what the
-hardware cannot do?
-
-> +
-> +		if (!p->rate.mpu) {
-> +			NL_SET_ERR_MSG_MOD(extack, "Assuming mpu = 64");
-> +		} else if (p->rate.mpu != 64) {
-> +			NL_SET_ERR_MSG_MOD(extack,
-> +					   "Offload not supported when mpu is other than 64");
-> +			return -EOPNOTSUPP;
-> +		}
-
-Is setting an extack message on the success path intentional?
-psched_ratecfg_precompute() leaves mpu at 0 by default, so the common
-tc qdisc add ... tbf rate X burst Y invocation will hit the first branch,
-return 0, and iproute2 will then print:
-
-    Warning: yt921x: Assuming mpu = 64.
-
-on every TBF replace.
-
-Also, is the assumption actually enforced anywhere?  yt921x_marker_tfm_shape()
-and yt921x_marker_tfm() do not appear to compensate the rate computation
-for a 64-byte MPU, so the message seems to document an assumption that is
-not modelled by the transform.
-
-> +
-> +		break;
-> +	}
-> +	default:
-> +		break;
-> +	}
-> +
-> +	return 0;
-> +}
-
-Would it be clearer to have yt921x_tbf_validate() return -EOPNOTSUPP for
-commands the handler cannot service, so the supported command set is
-stated once?  The default arm here returns 0 for every command other than
-TC_TBF_REPLACE (including TC_TBF_STATS and TC_TBF_GRAFT) while
-yt921x_dsa_port_setup_tc_tbf_port() below returns -EOPNOTSUPP for those
-same commands.  There is no observable bug today, but if the validator is
-ever used on its own the two lists can drift.
-
-> +
-> +static int
-> +yt921x_dsa_port_setup_tc_tbf_port(struct dsa_switch *ds, int port,
-> +				  const struct tc_tbf_qopt_offload *qopt)
-> +{
-> +	struct yt921x_priv *priv = to_yt921x_priv(ds);
-> +	struct netlink_ext_ack *extack = qopt->extack;
-> +	u32 ctrls[2];
-> +	int res;
-> +
-> +	switch (qopt->command) {
-> +	case TC_TBF_DESTROY:
-> +		ctrls[0] = 0;
-> +		ctrls[1] = 0;
-> +		break;
-
-Is there a concern about the write ordering on teardown?
-yt921x_reg64_write() -> yt921x_regs_write() performs two independent
-register writes (reg+0 then reg+4).  On TC_TBF_DESTROY the first write
-sets CIR=0 and CBS=0 while the previously programmed EN bit in ctrls[1]
-is still set; only the second write clears EN.  The REPLACE path writes
-configuration before arming EN, but the inverse is not followed here.
-
-Would writing ctrls[1]=0 first (or clearing EN via a read-modify-write
-before zeroing CIR/CBS) be safer for the hardware state machine?
-
-> +	case TC_TBF_REPLACE: {
-[ ... ]
-> +		ctrls[0] = YT921X_PORT_SHAPE_CTRLa_CIR(marker.cir) |
-> +			   YT921X_PORT_SHAPE_CTRLa_CBS(marker.cbs);
-> +		ctrls[1] = YT921X_PORT_SHAPE_CTRLb_UNIT(marker.unit) |
-> +			   YT921X_PORT_SHAPE_CTRLb_EN;
-> +		break;
-> +	}
-> +	default:
-> +		return -EOPNOTSUPP;
-> +	}
-
-Does returning -EOPNOTSUPP for TC_TBF_STATS defeat the hw offload
-indicator?  qdisc_offload_dump_helper() in net/sched/sch_api.c first
-clears TCQ_F_OFFLOADED, then calls into the driver, and only re-sets the
-flag on a zero return:
-
-    sch->flags &= ~TCQ_F_OFFLOADED;
-    if (!tc_skip_hw(sch->flags))
-        err = qdisc_offload(sch, type, type_data, extack);
-    if (err == -EOPNOTSUPP)
-        return 0;
-    if (err)
-        return err;
-    sch->flags |= TCQ_F_OFFLOADED;
-
-tbf_dump() invokes this path on every dump, so even after a successful
-TC_TBF_REPLACE, tc -s qdisc show would keep reporting offload false and
-tc_fill_qdisc() would emit TCA_HW_OFFLOAD=0.
-
-Would a stub TC_TBF_STATS case that returns 0 (leaving bstats/qstats
-untouched) preserve the flag here?  mlxsw does this in its
-spectrum_qdisc.c.
-
-[ ... ]
 
