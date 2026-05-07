@@ -1,143 +1,178 @@
-Return-Path: <netdev+bounces-285355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285356-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EHxTFkSj/Gn2SAAAu9opvQ
-	(envelope-from <netdev+bounces-285355-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 16:35:48 +0200
+	id eKgiA3Cj/Gn2SAAAu9opvQ
+	(envelope-from <netdev+bounces-285356-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 16:36:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 951134EA4A2
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 16:35:47 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4985F4EA4C5
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 16:36:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3F6733035B6A
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 14:30:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6E37F3006B27
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 14:32:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A589401A09;
-	Thu,  7 May 2026 14:30:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE3F7402B9B;
+	Thu,  7 May 2026 14:32:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pEa3vw2r"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="rNbvERez";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Z8BrZ14T";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="eoDh41dn";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="fl5WbAZA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DEE2E2850;
-	Thu,  7 May 2026 14:30:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE7E3F0763
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 14:32:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778164257; cv=none; b=u4vqPNb8oMbMHnDhEI5yUbX0+7YwZy7GPvncmTKXIUqrTwuhySDClFtEVkaiKLBpCly/zltl8s8NZvTHXf3TqOkVUAqYxo9kwwAJrA6d7P1DL6ESvKjpF+OQ1c7/2EndsOfNO9DdvxGbbvWpIl+cSox1zQfRONVnEWzj7p5hU1s=
+	t=1778164366; cv=none; b=NpZK+Nw9tWEvZAYgVSQCNJ+thJhkAw8/a8+I7HeYUm+KxLAkh0RstwiGvuOitVIOa63Ou9IiY6+5/C8W9Q5FfoxNhIJAE25pbRAVlE21anVxPDqNBGTNlrVV7LITGtl+rips7waZDLyFCbByIJ7JKCMlXlvIeOj7jkRbYS6AZLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778164257; c=relaxed/simple;
-	bh=IFtDFssdahyt1hvVS5/SnAnafeF8Slh0mPRxU2hqVnc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Gs5SgxALz7e1DUqZNxc3kjDN0SYVqb/yIaTCEImE5PlUWtuIznasRF9OmgG8+xVRLKGT/UjJdDLymIGw178AM077PAGQtg0Aemr+cBI/cC5sK9M7OCcVpGFvsVtjYMaOdzyHvkh4DJ3J0PP4SiwSyHq54xxEfIUrci3u35kLfdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pEa3vw2r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10816C2BCB2;
-	Thu,  7 May 2026 14:30:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778164257;
-	bh=IFtDFssdahyt1hvVS5/SnAnafeF8Slh0mPRxU2hqVnc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pEa3vw2rqqlQGP6EXtCvTogZNbjujM7BuU5BPsI8uqh0Jg4SGC7p5SRAeSQM3sIUM
-	 AXRbpIlio9IMgzMZIInJ/rAw9L55G1qe0DAw6q09qQXr6rzRJZO/j+mbyk/Q1/Xapz
-	 ijv0UXuXad9+ajonLy9/cnv9dfNvTOuk1nrl7HXMLISHlr2glgb2RYTVonFnr+OvcI
-	 CfmzNBgW3nNVotP/MkcuBUursHvjvlmBnrzLcyTt4EPUa0gEqSVqfHFN5M0m2gx/jM
-	 XaMsAA1v5SlHTZAZsG11/C9mlo5z1qkO2W76okv+BO+28LAuk0s0LdYe19vRM686qx
-	 dDufajxhCcS0Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CCE33930903;
-	Thu,  7 May 2026 14:30:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1778164366; c=relaxed/simple;
+	bh=5uGawXoDlc4k/fCjW/6XYBM2eIyS0AzpHJoJ1pMOp10=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TN6YoXB6ZEjMD8pqI+TfkDzR9Qfg2YhCkoDlicy1QNFNapNN76ifDDdyv7kVwai91mTDWmn+VWq2MPT4ZSTQ+D4Eu70ajWmzZAJtEU6q0mlD25i8HqNajHOyZ54K9uCwGpSChARMHd4gbqT32pU0/jPGQzOxHIcze2AFf/Gcaao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=rNbvERez; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Z8BrZ14T; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=eoDh41dn; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=fl5WbAZA; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from lion.mk-sys.cz (unknown [10.149.218.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id D64116AAEF;
+	Thu,  7 May 2026 14:32:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1778164361; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5uGawXoDlc4k/fCjW/6XYBM2eIyS0AzpHJoJ1pMOp10=;
+	b=rNbvERezM+K8w521bOSWpKmY4Di2BkGfFOIUQ9fWBSIT/ZI7mB3LTQrRusYm9oMld5+I09
+	TpfXQHU1MrPU7uJr/vAuCtthUAm5Dmm9WSoEfCnJK+m/fBX6ryp8TMSI4JDAdYcUBlfCOz
+	I3tjDndh0/FDTvZsn6EgivJvtJNf7hk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1778164361;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5uGawXoDlc4k/fCjW/6XYBM2eIyS0AzpHJoJ1pMOp10=;
+	b=Z8BrZ14TGH7r4Q2Aq9BYT/4nl1pFa1LOX80uf3VQbMT8WfC6R0AVXpgPHe+QDtFiMMABiq
+	oKSlvcbOv0kk0eDA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1778164360; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5uGawXoDlc4k/fCjW/6XYBM2eIyS0AzpHJoJ1pMOp10=;
+	b=eoDh41dn/9oDTzvTQtZTCpZgVpY1RGdvnZcRekTFAJEAX9UYXSxVc1wkBQh9OFD/ffy6EN
+	G2LHAlgmr+fyBo+TQ7LSQ05C6djogQVptzLjp1eWJqlNfu2W2X0ceg9xxVYBQ4sKxrlfnD
+	kjejVShCZQxcipl4LvtzRurdqXoYmOs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1778164360;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5uGawXoDlc4k/fCjW/6XYBM2eIyS0AzpHJoJ1pMOp10=;
+	b=fl5WbAZA5O6/nJn0cjzFWR2FpfmQtQGZNSvDhc5iXsrYGZG+H9Dnz7PtGlO1fvt06AjTw0
+	+4QL2ZQ+1swQh3DA==
+Received: by lion.mk-sys.cz (Postfix, from userid 1000)
+	id B87202008C; Thu, 07 May 2026 16:32:40 +0200 (CEST)
+Date: Thu, 7 May 2026 16:32:40 +0200
+From: Michal Kubecek <mkubecek@suse.cz>
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>
+Subject: Re: [PATCH ethtool-next 0/5] ethtool: Add 'pages on|off' option for
+ module EEROM hex dump
+Message-ID: <a3hwbnaaomurr7mwbq2xnykaytwp6eblfflkg3mwihkkybnake@wkdxsrodzl5h>
+References: <20260507114721.3409128-1-danieller@nvidia.com>
+ <4chkrvenxrbc2tylrbob6vdo3uyjzbwbhbup25yvnohrccvotv@fd7rqasq4btv>
+ <DM6PR12MB4516FAE7C203C652E10BE801D83C2@DM6PR12MB4516.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/5] veth: add Byte Queue Limits (BQL) support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177816420629.4015158.7466630027933005343.git-patchwork-notify@kernel.org>
-Date: Thu, 07 May 2026 14:30:06 +0000
-References: <20260505132159.241305-1-hawk@kernel.org>
-In-Reply-To: <20260505132159.241305-1-hawk@kernel.org>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: netdev@vger.kernel.org, kernel-team@cloudflare.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- carges@cloudflare.com, mfreemon@cloudflare.com, toke@toke.dk,
- j.koeppeler@tu-berlin.de, leitao@debian.org, simon.schippers@tu-dortmund.de,
- ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
- sdf@fomichev.me, bpf@vger.kernel.org
-X-Rspamd-Queue-Id: 951134EA4A2
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="w7toz5yyfyvw5uuf"
+Content-Disposition: inline
+In-Reply-To: <DM6PR12MB4516FAE7C203C652E10BE801D83C2@DM6PR12MB4516.namprd12.prod.outlook.com>
+X-Spam-Flag: NO
+X-Spam-Score: -5.90
+X-Spam-Level: 
+X-Rspamd-Queue-Id: 4985F4EA4C5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-3.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285355-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[vger.kernel.org,cloudflare.com,davemloft.net,google.com,kernel.org,redhat.com,toke.dk,tu-berlin.de,debian.org,tu-dortmund.de,iogearbox.net,gmail.com,fomichev.me];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285356-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	DMARC_NA(0.00)[suse.cz];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_THREE(0.00)[4];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mkubecek@suse.cz,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Hello:
 
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+--w7toz5yyfyvw5uuf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Tue,  5 May 2026 15:21:52 +0200 you wrote:
-> From: Jesper Dangaard Brouer <hawk@kernel.org>
-> 
-> This series adds BQL (Byte Queue Limits) to the veth driver, reducing
-> latency by dynamically limiting in-flight packets in the ptr_ring and
-> moving buffering into the qdisc where AQM algorithms can act on it.
-> 
-> Problem:
->   veth's 256-entry ptr_ring acts as a "dark buffer" -- packets queued
->   there are invisible to the qdisc's AQM.  Under load, the ring fills
->   completely (DRV_XOFF backpressure), adding up to 256 packets of
->   unmanaged latency before the qdisc even sees congestion.
-> 
-> [...]
+On Thu, May 07, 2026 at 12:37:25PM GMT, Danielle Ratson wrote:
+> The reason for keeping the switch is backward compatibility: today's
+> ethtool -m hex on produces a single flat hex dump, while the
+> page-organized output has a different shape - per-page headers, blank
+> lines and repeated column headers interleaved between hex rows.
+> Scripts that parse today's output could break.
+[...]
+> Since the format changes shape and not just size, we kept it opt-in via pages on so existing consumers are unaffected.
+> Are you OK with this even so it might break some existing usage?
 
-Here is the summary with links:
-  - [net-next,v5,1/5] veth: fix OOB txq access in veth_poll() with asymmetric queue counts
-    https://git.kernel.org/netdev/net/c/08f566e8f83b
-  - [net-next,v5,2/5] net: add dev->bql flag to allow BQL sysfs for IFF_NO_QUEUE devices
-    (no matching commit)
-  - [net-next,v5,3/5] veth: implement Byte Queue Limits (BQL) for latency reduction
-    (no matching commit)
-  - [net-next,v5,4/5] veth: add tx_timeout watchdog as BQL safety net
-    (no matching commit)
-  - [net-next,v5,5/5] net: sched: add timeout count to NETDEV WATCHDOG message
-    (no matching commit)
+Good point, there may indeed be existing scripts that would not handle
+changed (default) output format. While I would personally prever the
+binary dump for machine processing, people often parse text outputs that
+were never meant to be used that way.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I suppose your approach is a safer choice then.
 
+Michal
 
+--w7toz5yyfyvw5uuf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmn8ooQACgkQ538sG/LR
+dpWjoQf/Ta7SNVab2BnWNo88gK0hE7kdHaiKOpRMo6dK4E5pHwpI48wrW+QZ1OeM
+qMHPrKj6aD1u3doxqOCiJrrvSZrdLgqGXPlfg0bOGIaURDRPkHukDSdS+7iCAY9/
+u5hm326r6IXwDq4Dg2yKzd6M6wYatVoPtGqy5sMqkKE4PaOeiYmcVZskkbWrqjxf
+LThglJ2o8hj5a+g16vhDsRijQsGRj+MjdjbKaVGnY+hbMgryzIO6ZXK3Opzi+s9P
+8H/T9aQKFJs4dxi2JWjaqta9r2S9E6d4g4m4pNWcuQf5NT3Yiyi40oZ2YbPPplUI
+Rn4MTATZY2Tw0Dej2kEI2TJ3ITA7Uw==
+=EAsM
+-----END PGP SIGNATURE-----
+
+--w7toz5yyfyvw5uuf--
 
