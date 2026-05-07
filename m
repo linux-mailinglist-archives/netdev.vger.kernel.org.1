@@ -1,220 +1,193 @@
-Return-Path: <netdev+bounces-285116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285117-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id fcVjI6/1+2lNJQAAu9opvQ
-	(envelope-from <netdev+bounces-285116-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 04:15:11 +0200
+	id oO/UDsb2+2l9JQAAu9opvQ
+	(envelope-from <netdev+bounces-285117-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 04:19:50 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBD444E2335
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 04:15:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 547F14E23A7
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 04:19:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0D72F300F120
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 02:15:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DB3BE3009537
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 02:19:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A5829827E;
-	Thu,  7 May 2026 02:15:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F662882C5;
+	Thu,  7 May 2026 02:19:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uB8rTF/M"
+	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="V8JEDcBJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17E122173D;
-	Thu,  7 May 2026 02:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA4A26B74A;
+	Thu,  7 May 2026 02:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778120107; cv=none; b=P3XL22kIuDEV++WlAJgt/AD00wOQlxfUV3VsK4ngs4ECcIDaJ3JtKtyUGkFbMswf9NDWdz63aqLO9dyTe7Ob5/4uLjvBmE2PMA+Vdm+BcxyENw1ZTp8UsIvplcXvYX1eHXq/EE81UaHCIiTCoqOVLlPdgudRB+VXtXK9V3t8mE4=
+	t=1778120378; cv=none; b=nYCgVPgLSrncRuxePF4SJjvuuRJ5KGZL4BQ4Osmbhawi1BWCIbH3m16WovVLeWBwM6UFvIq3u1BC9ZbjlRFdOV/jTfkHFwYLWEajbAiy4xA5UgyhjlftEtSWTTGQYcjtGjCnr2T+vv3slRJb2U535/qftO5mbdUgvJkZAyB3nok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778120107; c=relaxed/simple;
-	bh=XXnfg3Egf/xizqpxi5tqAsC+JRKwFvCCVuI4f/mTprI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MsTJgBbzXdvcZ25Xmz5lk5IEQStEwr5+wBmRvdnCEda5Eim2WEAPc0bPIpknXqWaA/XjpIZG/HhsOua06TIluHacd8DW/ARaPiP3tHUaIV68FiftulHwntyq2fdMLA0lhP94O5uPkDZ4NA83fjNR5ouXd4DkGrD9rp8QA6ADWhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uB8rTF/M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C263FC2BCB0;
-	Thu,  7 May 2026 02:15:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778120107;
-	bh=XXnfg3Egf/xizqpxi5tqAsC+JRKwFvCCVuI4f/mTprI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uB8rTF/MGtz/7/yNleMg07HFtPXDfF5EoxCB+jKKW3JdihygCHGFa92iSIQvVk+uJ
-	 VPaR0eMEnBoSl8IlWm4pqs/lpq8GTBDPahBuK7sWVQVMkzq2SfxmEZBpdn6ERsDPAP
-	 fvwZ9j25/Zc9g/yeLJBWoaaHYfHVys1lRHdRDljmSgtMIeqsIzihRbV0jaxkC2hMFO
-	 lm3syAM7grYIpU0iAXFWnTHB9SJ0ggarRQKlVdFP7So1Jn5R7r+H/K2IjgIBBCCnB+
-	 7xzAoLxf6gfbbRJLmq9A/PFJMqsKL5od2drfou4EssujfFnoUgX5C7vPkMFemOANfq
-	 adCDQueHdU7PQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: Markus.Baier@soslab.tu-darmstadt.de
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	o.rempel@pengutronix.de,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	enelsonmoore@gmail.com,
-	linmq006@gmail.com,
-	linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: usb: asix: ax88772: replace usbnet_link_change() with queue_work() and usbnet_unlink_rx_urbs()
-Date: Wed,  6 May 2026 19:15:05 -0700
-Message-ID: <20260507021505.2271095-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260506010344.184636-1-Markus.Baier@soslab.tu-darmstadt.de>
-References: <20260506010344.184636-1-Markus.Baier@soslab.tu-darmstadt.de>
+	s=arc-20240116; t=1778120378; c=relaxed/simple;
+	bh=qjFilWVss5AY7bYp0brrB/FpWiuO5XUQXaUF82jMcxc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=M6Z875AoijmjfG+CmhRYLhzv55CL66mkvpuIYOKiuVCe7nKVbhc8Frtn8Nyvg10SHdR85V0/qfzvastMmH0XL2C+Z/UtcUbjrdtJBccXcDCtRIuf8G0jHXn9QJkkRIhMHOYmRPJZPFung8ZkI+BYVX8d22J4QmfA0wMOVBc0KSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=V8JEDcBJ; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6472J8gwC2419201, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
+	s=dkim; t=1778120348;
+	bh=qjFilWVss5AY7bYp0brrB/FpWiuO5XUQXaUF82jMcxc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=V8JEDcBJZ+awcYuERjBkSx3LFFTaWc9GQTe10GpISD26gxjGQ6fPDarGANh62ivqV
+	 hnPEDrLAhboIl3GBt+5pmO8ul2KvVNq6DfmaqvA1Iyw+3yeIucEuXwhl/aUFC59tv8
+	 12aENheZ9iPdwp/6TakVAm6N9KnMrSCccqGWS8E1p/OcGtHcQUwAX+DhcECP59wCto
+	 X8NdemzEZa5cSxMGIqCb4WLYtTQtaL0lB2a4sEK3MAoiaWSGbVX6RZOBPkaZ1+KtK6
+	 5V6f8WLTLNnZjDjEthxfk1sWBd+JRgsOEB2ZQe4+5/HC/btYTSns0PSPbuthSh0tyg
+	 kJyQx6LiqmvAA==
+Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
+	by rtits2.realtek.com.tw (8.15.2/3.27/5.94) with ESMTPS id 6472J8gwC2419201
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 7 May 2026 10:19:08 +0800
+Received: from RS-EX-MBS3.realsil.com.cn (172.29.17.103) by
+ RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Thu, 7 May 2026 10:19:07 +0800
+Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) by
+ RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) with mapi id 15.02.2562.017; Thu,
+ 7 May 2026 10:19:07 +0800
+From: Javen <javen_xu@realsil.com.cn>
+To: Heiner Kallweit <hkallweit1@gmail.com>,
+        "nic_swsd@realtek.com"
+	<nic_swsd@realtek.com>,
+        "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "horms@kernel.org"
+	<horms@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [Patch net-next v1 0/7] r8169: add RSS support for RTL8127
+Thread-Topic: [Patch net-next v1 0/7] r8169: add RSS support for RTL8127
+Thread-Index: AQHc3TA4bLhmf8usJUuCTwhJsRu3nrYA9uoAgADVSAA=
+Date: Thu, 7 May 2026 02:19:07 +0000
+Message-ID: <8ac5c803876048eaae2ba597eda63c4d@realsil.com.cn>
+References: <20260506081326.767-1-javen_xu@realsil.com.cn>
+ <bf301c5e-f6a3-459f-8eaa-a4032aaa3aa3@gmail.com>
+In-Reply-To: <bf301c5e-f6a3-459f-8eaa-a4032aaa3aa3@gmail.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: DBD444E2335
+X-Rspamd-Queue-Id: 547F14E23A7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,pengutronix.de,lunn.ch,davemloft.net,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-285116-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285117-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-0.996];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[realsil.com.cn:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,realsil.com.cn:email,realsil.com.cn:mid,realsil.com.cn:dkim,radxa.com:email]
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-Subject: net: usb: asix: ax88772: replace usbnet_link_change() with queue_work() and usbnet_unlink_rx_urbs()
-
-This patch replaces the usbnet_link_change() calls in the ax88772
-phylink mac_link_up()/mac_link_down() callbacks with direct
-queue_work(system_bh_wq, &dev->bh_work) and usbnet_unlink_rx_urbs(),
-with the stated rationale that phylink already manages the carrier
-state. It is tagged Fixes: 36bdc0e815b4 ("net: usb: asix: ax88772:
-re-add usbnet_link_change() in phylink callbacks").
-
-> diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
-> index 293ef80c4e30..4230ff611c4b 100644
-> --- a/drivers/net/usb/asix_devices.c
-> +++ b/drivers/net/usb/asix_devices.c
-
-[ ... mac_link_down hunk snipped, not relevant to the comment below ... ]
-
-> @@ -787,7 +791,11 @@ static void ax88772_mac_link_up(struct phylink_config *config,
->  		m |= AX_MEDIUM_RFC;
->  
->  	asix_write_medium_mode(dev, m, 0);
-> -	usbnet_link_change(dev, true, false);
-> +
-> +	/* Phylink will call netif_carrier_on(), but we need to explicitly
-> +	 * kick off RX URB submission in usbnet.
-> +	 */
-> +	queue_work(system_bh_wq, &dev->bh_work);
->  }
-
-Can this reintroduce the "no RX until first TX" symptom that commit
-805206e66fab ("net: asix: fix 'can't send until first packet is send'
-issue") and the Fixes: target 36bdc0e815b4 addressed?
-
-Looking at the ordering in phylink_link_up() in drivers/net/phy/phylink.c,
-the mac_link_up() callback is invoked before netif_carrier_on():
-
-	pl->mac_ops->mac_link_up(pl->config, pl->phydev, pl->act_link_an_mode,
-				 pl->cur_interface, speed, duplex,
-				 !!(link_state.pause & MLO_PAUSE_TX), rx_pause);
-
-	if (pl->mac_supports_eee && pl->phy_enable_tx_lpi)
-		phylink_activate_lpi(pl);
-
-	if (ndev)
-		netif_carrier_on(ndev);
-
-So when ax88772_mac_link_up() runs queue_work(system_bh_wq, &dev->bh_work),
-the netdev carrier is still off.
-
-system_bh_wq is a WQ_BH workqueue, so queue_work() on it raises
-TASKLET_SOFTIRQ, which can be serviced on the next hard-IRQ exit (or by
-ksoftirqd) before phylink_link_up() reaches netif_carrier_on().
-
-When bh_work runs, usbnet_bh() in drivers/net/usb/usbnet.c gates RX URB
-submission on netif_carrier_ok():
-
-	} else if (netif_running (dev->net) &&
-		   netif_device_present (dev->net) &&
-		   netif_carrier_ok(dev->net) &&
-		   ...
-		   !test_bit(EVENT_RX_HALT, &dev->flags)) {
-		...
-		if (temp < RX_QLEN(dev)) {
-			if (rx_alloc_submit(dev, GFP_ATOMIC) == -ENOLINK)
-				return;
-			...
-			if (dev->rxq.qlen < RX_QLEN(dev))
-				queue_work(system_bh_wq, &dev->bh_work);
-		}
-
-If carrier is still off when usbnet_bh() runs, the rx_alloc_submit()
-branch is skipped and bh_work does not reschedule itself. Once phylink
-eventually calls netif_carrier_on(), nothing kicks bh_work again: the
-in-flight RX URBs were unlinked by the prior ax88772_mac_link_down(),
-so there are no URB completions to re-queue work either.
-
-Does the previous usbnet_link_change() path avoid this race because
-__handle_link_change() in drivers/net/usb/usbnet.c flips the carrier
-before queuing work?
-
-	if (test_and_clear_bit(EVENT_LINK_CARRIER_ON, &dev->flags))
-		netif_carrier_on(dev->net);
-
-	if (!netif_carrier_ok(dev->net)) {
-		/* kill URBs for reading packets to save bus bandwidth */
-		unlink_urbs(dev, &dev->rxq);
-		...
-	} else {
-		/* submitting URBs for reading packets */
-		queue_work(system_bh_wq, &dev->bh_work);
-	}
-
-Here bh_work only runs after carrier_ok() is already true, so the gate
-in usbnet_bh() cannot close on it.
-
-Given the Fixes: tag targets -stable, is there a concern that this
-patch partly reintroduces the original "RX silent until first TX or
-link bounce" regression?
-
-Would scheduling bh_work from a phylink_resolve() follow-up, or keeping
-the usbnet_link_change() path (which sets EVENT_LINK_CARRIER_ON and
-lets __handle_link_change() order carrier-on before queue_work), be a
-safer sequencing?
-
-As a side note, the comment added by this hunk states "Phylink will
-call netif_carrier_on(), but we need to explicitly kick off RX URB
-submission in usbnet." Should the comment reflect that phylink calls
-netif_carrier_on() after this callback returns, rather than before, so
-the ordering assumption is explicit?
--- 
-pw-bot: cr
+Pk9uIDA2LjA1LjIwMjYgMTA6MTMsIGphdmVuIHdyb3RlOg0KPj4gRnJvbTogSmF2ZW4gWHUgPGph
+dmVuX3h1QHJlYWxzaWwuY29tLmNuPg0KPj4NCj4+IFRoaXMgcGF0Y2ggc2VyaWVzIGFkZHMgUlNT
+IChSZWNlaXZlIFNpZGUgU2NhbGluZykgc3VwcG9ydCBmb3IgdGhlDQo+PiByODE2OSBldGhlcm5l
+dCBkcml2ZXIsIHNwZWNpZmljYWxseSBmb3IgUlRMODEyNyAoUlRMX0dJR0FfTUFDX1ZFUl84MCku
+DQo+DQo+U2VyaWVzIGFkZHMgUlNTIHN1cHBvcnQgZm9yIFJUTDgxMjcgb25seS4gSXMgdGhpcyBn
+ZW5lcmljIGVub3VnaCB0byByZXRyb2ZpdCBSU1MNCj5zdXBwb3J0IGZvciBvdGhlciBjaGlwIHZl
+cnNpb25zIGxpa2UgUlRMODEyNiB3L28gYmlnZ2VyIHJlZmFjdG9yaW5nPw0KPg0KWWVzLiBUaGUg
+Y3VycmVudCBpbXBsZW1lbnRhdGlvbiBpcyBnZW5lcmljIGVub3VnaC4gQWxtb3N0IGFsbCB0aGUg
+cmVnaXN0ZXJzIGFyZSBzaGFyZWQgYW5kIGNhbiBiZSByZXVzZWQuIElmIHdlIHdhbnQgdG8gZW5h
+YmxlIHJzcyBmb3IgODEyNS84MTI2IGxhdGVyLCB0aGUgb25seSBuZWNlc3NhcnkgY2hhbmdlIHdv
+dWxkIGJlIHNldHRpbmcgdHAtPmluaXRfcnhfZGVzY190eXBlIHRvIGEgbmV3IHZhbHVlLiBBbmQg
+YWRkIGEgbmV3IHN0cnVjdCByeF9kZXNjIGZvciA4MTI1IG9yIDgxMjYuIEZvciBleGFtcGxlLCB0
+aGlzIGlzIGEgZGVzYyB0eXBlIGZvciA4MTI1Lg0Kc3RydWN0IFJ4RGVzY1YzIHsNCiAgICAgICAg
+dW5pb24gew0KICAgICAgICAgICAgICAgIHN0cnVjdCB7DQogICAgICAgICAgICAgICAgICAgICAg
+ICB1MzIgcnN2MTsNCiAgICAgICAgICAgICAgICAgICAgICAgIHUzMiByc3YyOw0KICAgICAgICAg
+ICAgICAgIH0gUnhEZXNjRERXb3JkMTsNCiAgICAgICAgfTsNCiAgICAgICAgdW5pb24gew0KICAg
+ICAgICAgICAgICAgIHN0cnVjdCB7DQogICAgICAgICAgICAgICAgICAgICAgICB1MzIgUlNTUmVz
+dWx0Ow0KICAgICAgICAgICAgICAgICAgICAgICAgdTE2IEhlYWRlckJ1ZmZlckxlbjsNCiAgICAg
+ICAgICAgICAgICAgICAgICAgIHUxNiBIZWFkZXJJbmZvOw0KICAgICAgICAgICAgICAgIH0gUnhE
+ZXNjTm9ybWFsRERXb3JkMjsNCg0KICAgICAgICAgICAgICAgIHN0cnVjdCB7DQogICAgICAgICAg
+ICAgICAgICAgICAgICB1MzIgcnN2NTsNCiAgICAgICAgICAgICAgICAgICAgICAgIHUzMiByc3Y2
+Ow0KICAgICAgICAgICAgICAgIH0gUnhEZXNjRERXb3JkMjsNCiAgICAgICAgfTsNCiAgICAgICAg
+dW5pb24gew0KICAgICAgICAgICAgICAgIHU2NCAgIGFkZHI7DQoNCiAgICAgICAgICAgICAgICBz
+dHJ1Y3Qgew0KICAgICAgICAgICAgICAgICAgICAgICAgdTMyIFRpbWVTdGFtcExvdzsNCiAgICAg
+ICAgICAgICAgICAgICAgICAgIHUzMiBUaW1lU3RhbXBIaWdoOw0KICAgICAgICAgICAgICAgIH0g
+UnhEZXNjVGltZVN0YW1wOw0KDQogICAgICAgICAgICAgICAgc3RydWN0IHsNCiAgICAgICAgICAg
+ICAgICAgICAgICAgIHUzMiByc3Y4Ow0KICAgICAgICAgICAgICAgICAgICAgICAgdTMyIHJzdjk7
+DQogICAgICAgICAgICAgICAgfSBSeERlc2NERFdvcmQzOw0KICAgICAgICB9Ow0KICAgICAgICB1
+bmlvbiB7DQogICAgICAgICAgICAgICAgc3RydWN0IHsNCiAgICAgICAgICAgICAgICAgICAgICAg
+IHUzMiBvcHRzMjsNCiAgICAgICAgICAgICAgICAgICAgICAgIHUzMiBvcHRzMTsNCiAgICAgICAg
+ICAgICAgICB9IFJ4RGVzY05vcm1hbEREV29yZDQ7DQoNCiAgICAgICAgICAgICAgICBzdHJ1Y3Qg
+ew0KICAgICAgICAgICAgICAgICAgICAgICAgdTE2IFRpbWVTdGFtcEhIaWdoOw0KICAgICAgICAg
+ICAgICAgICAgICAgICAgdTE2IHJzdjExOw0KICAgICAgICAgICAgICAgICAgICAgICAgdTMyIG9w
+dHMxOw0KICAgICAgICAgICAgICAgIH0gUnhEZXNjUFRQRERXb3JkNDsNCiAgICAgICAgfTsNCn07
+DQpUaGlzIGlzIGNvbXBsZXggYmVjYXVzZSBpdCByZXNlcnZlcyBzb21lIHdvcmRzIGZvciBQVFAu
+DQoNClRoYW5rcywNCkJScywNCkphdmVuDQoNCj4+DQo+PiBSU1MgZW5hYmxlcyBwYWNrZXQgZGlz
+dHJpYnV0aW9uIGFjcm9zcyBtdWx0aXBsZSByZWNlaXZlIHF1ZXVlcywgd2hpY2gNCj4+IGNhbiBz
+aWduaWZpY2FudGx5IGltcHJvdmUgbmV0d29yayB0aHJvdWdocHV0IG9uIG11bHRpLWNvcmUgc3lz
+dGVtcyBieQ0KPj4gYWxsb3dpbmcgcGFyYWxsZWwgcHJvY2Vzc2luZyBvZiBpbmNvbWluZyBwYWNr
+ZXRzLg0KPj4NCj4+IEtleSBmZWF0dXJlczoNCj4+IC0gTXVsdGktcXVldWUgUlggc3VwcG9ydCAo
+dXAgdG8gOCBxdWV1ZXMpDQo+PiAtIE1TSS1YIGludGVycnVwdCB3aXRoIHZlY3RvciBtYXBwaW5n
+DQo+PiAtIER5bmFtaWMgcXVldWUgY29uZmlndXJhdGlvbiB2aWEgZXRodG9vbCAoLUwpDQo+PiAt
+IFJTUyBoYXNoIGNvbXB1dGF0aW9uIGZvciBmbG93IGNsYXNzaWZpY2F0aW9uDQo+Pg0KPj4gRXhw
+ZXJpbWVudHM6DQo+PiBQbGF0Zm9ybTogQU1EIFJ5emVuIEVtYmVkZGVkIFIyNTE0IHdpdGggUmFk
+ZW9uIEdyYXBoaWNzKDQgQ29yZXMvOA0KPj4gVGhyZWFkcykNCj4+IEFyY2g6IHg4Nl82NA0KPj4g
+VGVzdCBjb21tYW5kOg0KPj4gICBTZXJ2ZXI6IGlwZXJmMyAtcw0KPj4gICBDbGllbnQ6IGlwZXJm
+MyAtYyAxOTIuMTY4LjIuMSAtUCAyMCAtdCAzNjAwDQo+PiBNb25pdG9yOiBtcHN0YXQgLVAgQUxM
+IDENCj4+DQo+PiBCZWZvcmUgdGhpcyBwYXRjaCAoV2l0aG91dCBSU1MpOg0KPj4gICBUaHJvdWdo
+cHV0OiBVbnN0YWJsZSwgZmx1Y3R1YXRpbmcgYmV0d2VlbiAzLjc2IEdiaXRzL3NlYyBhbmQNCj4+
+ICAgOC4yIEdiaXRzL3NlYy4NCj4+ICAgQ1BVIFVzYWdlOiBBIHNpbmdsZSBDUFUgY29yZSBpcyBm
+dWxseSBvY2N1cGllZCB3aXRoIHNvZnRpcnEgcmVhY2hpbmcNCj4+ICAgdXAgdG8gOTYlLg0KPj4N
+Cj4+IEFmdGVyIHRoaXMgcGF0Y2ggKFdpdGggUlNTIGVuYWJsZWQpOg0KPj4gICBUaHJvdWdocHV0
+OiBTdGFibGUgYXQgOS40MiBHYml0cy9zZWMuDQo+PiAgIENQVSBVc2FnZTogVGhlIHRyYWZmaWMg
+bG9hZCBpcyBldmVubHkgZGlzdHJpYnV0ZWQgYWNyb3NzIG11bHRpcGxlIENQVQ0KPj4gICBjb3Jl
+cy4gVGhlIG1heGltdW0gc29mdGlycSBvbiBhIHNpbmdsZSBjb3JlIGRyb3BwZWQgdG8gNjMlLg0K
+Pj4NCj4+IE90aGVyIEV4cGVyaW1lbnRzOg0KPj4gTGluazoNCj4+IGh0dHBzOi8vbG9yZS5rZXJu
+ZWwub3JnL25ldGRldi8wQTUyNzk5NTNEODFCQjlDK2Y1MGM5YjQ5LTNlNWQtNDY3Zi0NCj5iNjkN
+Cj4+IGEtN2U0OWVkMjIzMzgzQHJhZHhhLmNvbS8NCj4+DQo+PiBKYXZlbiBYdSAoNyk6DQo+PiAg
+IHI4MTY5OiBhZGQgc3VwcG9ydCBmb3IgbXVsdGkgaXJxcw0KPj4gICByODE2OTogYWRkIHN1cHBv
+cnQgZm9yIG11bHRpIHJ4IHF1ZXVlcw0KPj4gICByODE2OTogYWRkIHN1cHBvcnQgZm9yIG5ldyBp
+bnRlcnJ1cHQgbWFwcGluZw0KPj4gICByODE2OTogZW5hYmxlIG5ldyBpbnRlcnJ1cHQgbWFwcGlu
+Zw0KPj4gICByODE2OTogYWRkIHN1cHBvcnQgYW5kIGVuYWJsZSByc3MNCj4+ICAgcjgxNjk6IG1v
+dmUgc3RydWN0IGV0aHRvb2xfb3BzDQo+PiAgIHI4MTY5OiBhZGQgc3VwcG9ydCBmb3IgZXRodG9v
+bA0KPj4NCj4+ICBkcml2ZXJzL25ldC9ldGhlcm5ldC9yZWFsdGVrL3I4MTY5X21haW4uYyB8IDEy
+MDINCj4+ICsrKysrKysrKysrKysrKysrKy0tLQ0KPj4gIDEgZmlsZSBjaGFuZ2VkLCAxMDgwIGlu
+c2VydGlvbnMoKyksIDEyMiBkZWxldGlvbnMoLSkNCj4+DQoNCg==
 
