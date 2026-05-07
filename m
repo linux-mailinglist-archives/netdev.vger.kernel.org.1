@@ -1,252 +1,186 @@
-Return-Path: <netdev+bounces-285242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285244-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AO3TNLZu/GknQAAAu9opvQ
-	(envelope-from <netdev+bounces-285242-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 12:51:34 +0200
+	id 8GLbK9pw/GmkQAAAu9opvQ
+	(envelope-from <netdev+bounces-285244-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:00:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D471E4E70AE
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 12:51:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D8324E7271
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:00:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4B571300AD84
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 10:50:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8306630479CA
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 10:56:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB42E3ED117;
-	Thu,  7 May 2026 10:50:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF1973EC2E0;
+	Thu,  7 May 2026 10:56:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20251104.gappssmtp.com header.i=@baylibre-com.20251104.gappssmtp.com header.b="VuLnmV1m"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="nL0d5s49"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012024.outbound.protection.outlook.com [40.107.200.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5D473ED12B
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 10:50:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778151051; cv=none; b=HQdrTGkSWfpR6yowSulIv8u5OFwD3leeuNlpMJx5bCtxDZe3tIBPH3Xnnayephdy+vFrbLNBzTQrIN+XXG16oU5G3p/o9Cngm8rIfW7ilsHWclK539kF+h9spJnFwVolur6gzSxn4tyf7pGl8TK9nuihYQ02b6hTwwDhYB3oG4g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778151051; c=relaxed/simple;
-	bh=QBDRVKMHiC38ua/WqXZfu2WimUgpapC8UXjmRJjp8tY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fUDFNozE7UvkY83ET9fWa2zZGIDJjrRIGZzJtmuzTkPtavhp00Z3+LzYosDieV02tehG5lI08QQf2M9PGauuAIrnhRAjJ6pXAdkxydaR1Ot2VYFLynSUk1t1bm5s5VOlzDH44CPlLZQNIbxMBGBOEgVrmqbNjtcZxDfhjAu7B9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20251104.gappssmtp.com header.i=@baylibre-com.20251104.gappssmtp.com header.b=VuLnmV1m; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-488e1a8ac40so6686285e9.2
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 03:50:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20251104.gappssmtp.com; s=20251104; t=1778151034; x=1778755834; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OKPIZuTHrD4PJDRdCBm3rauwc6LXlrUOHX/U9Kam4Uc=;
-        b=VuLnmV1mnDHKKFGC0xBoyTtgclWAKs5Be6MWs+tLY/A2nqzNoC6IMXSG0bWH4He4FZ
-         IK4BORmn+XJTDrT52MaUXyKspkDWGy3ckaCRgG6xBPz6px1qjVKbRive8QSAOdmWSjt5
-         ep40EtjBj08VxnVU/zzYT/o6H3TE+BgBmSWntuH0+uJcYXU3z0b5CS6zPQDV3TE4tine
-         PIYWGkGF09kh/RwaZ1BU6Stp3qUwdDclqIt+8RYcRV6VBcBI2xZqXEMc6Z8U/74JU+o0
-         0DSYh3NRc+gv0+A5FVLEkZISHTqKa8apy4p6ycAXTKm4X1SGDGacCkTIAgdt9evJz9fV
-         DD2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778151034; x=1778755834;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OKPIZuTHrD4PJDRdCBm3rauwc6LXlrUOHX/U9Kam4Uc=;
-        b=CexVKesuiq3yGQZv2BmZ1bywCOpk4t/K6WzaO34ag4NUqgSD+spXEEGDPUthj326fm
-         n2hmKm8gK6F/IzUdGw8RpPJuUACjLonRnkLvGlmGY3aR7RlSAJHah0NaW2kD2aHJDbM0
-         Qn+rmwdgKb99lVjvVf/ppg5d8xIN3K+45FaAnyMeixHQcYgmXQwDz2TpDHnzHZh/3EJ/
-         n5QTlVUf05xR1qAvoog2H+rs2FG/pXKxY8etUNqKLcDWXmzLg1V1LrIeCWzhcZuClHjd
-         cbnMhAT+itfq5/lFIkngkUFZONpvwrRrWTVgoixW5TZeKaiJQaVMfVDB7GOvSa1GQLmH
-         kTJA==
-X-Forwarded-Encrypted: i=1; AFNElJ85TRoDb9DdqZxnwmYo4BUE7GHGiKWsbE6zY8BFhHvZLD4I7XQu+S9H+kQtFw82s0rB5E9aSOM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRZ3eKgW/8LJLM8QpMCCe+aIKFebJDKenZFRZORZauwV/UjsQX
-	RUVJNY6v7rU5zbbjuDQMer6cxqtw9VL+Ich90/h5yT5nzFQfWg4BZUbCjiyVxiyK1LE=
-X-Gm-Gg: AeBDieuJ0lNM9PBa8rXSNO/VQxtZqNp+WbXDHMzeoD3OVOPmr1HaBPEqvS7i8j3bM09
-	pQef1sN1u1b9HVdVy94KG3/Y5JmmZvCjz5BrJrxwS4XuyPopJhUXYV7woK7No5vd9eoGS0WeVcq
-	Dqjn8j0IkD+ZQDL9oD+qlWxQ36jOH/9xQTikbLZ7jCskOOOlLrJTd4Kz/PMKxNntIQ9Zrb14Qef
-	Sj4VhaeHbHWxx4ECpdYV0KinP9sDL4SoGsAz5R4NmCjDsdS1Wv0bUby2VY+cy5+voXSEr6YApYx
-	uwjTNFbc3iK+Cq/em8FLXNE3qZt4lDcwBCG66VCKkiz9cjLMCb8aez8HxPx3E/ZoFVk96fsYuPK
-	hRXg3y5aeXtjhPO/m1pFdOfleWS8SP/bFba/a/30jPhlXHAnXNmLy64IMcUJ93J7PR0rQDAC1ZT
-	nuMU7CbupICUyYzwo8me0IWVOgzSeAndCfOicJzBAT6oDEqml4sKTgv7SJriNJe+w72rxf6x1a2
-	cA9GE8cErBv0HKh+oILVpUDxWc/jVdBRDKE
-X-Received: by 2002:a05:600c:c11c:b0:488:9e54:94c0 with SMTP id 5b1f17b1804b1-48e51f2a79bmr87390495e9.8.1778151034179;
-        Thu, 07 May 2026 03:50:34 -0700 (PDT)
-Received: from localhost (p200300f65f114e08ac341e0bb79e5496.dip0.t-ipconnect.de. [2003:f6:5f11:4e08:ac34:1e0b:b79e:5496])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-48e530b05d9sm52669025e9.3.2026.05.07.03.50.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2026 03:50:33 -0700 (PDT)
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Petr Machata <petrm@nvidia.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Arend van Spriel <arend.vanspriel@broadcom.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Kees Cook <kees@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	oss-drivers@corigine.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Markus Schneider-Pargmann <msp@baylibre.com>
-Subject: [PATCH net-next v2 2/2] net: nfp: Drop PCI class entries with .class_mask = 0
-Date: Thu,  7 May 2026 12:50:20 +0200
-Message-ID:  <e853a41d232ca831a93a84545dab322cbe5d49f9.1778149923.git.u.kleine-koenig@baylibre.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <cover.1778149923.git.u.kleine-koenig@baylibre.com>
-References: <cover.1778149923.git.u.kleine-koenig@baylibre.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50CD92DF136;
+	Thu,  7 May 2026 10:55:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.24
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778151371; cv=fail; b=N7mU/vEtb1urajls0nHyPZo7ikzEkrtygrR0Jfy1Pqrs9CWzXaxfYqlnkd+nTHWI81IOGNYixxuq1wEnLmXgKkG3EmB2RvDyBS5Jb7fuTgS68v05wk4uXB2G9O9QSx8cztfwQ/Jq0l+8zPM2+i1TPRRtrsCia6f6FNQ/InaqdOc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778151371; c=relaxed/simple;
+	bh=q7V88fgP0LO+AWiCawboINHkUxwUD1r79w4+kG/TEUw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=IMCt3FzGu+3obx+aBczhS1vEqzD2OThILiEpYxcOyXlR5Vq8RIhPPnrlUfdWXE3DIW+hq+m+o43V+T8jth8FhShD14APaavgyqLsYVwcv/+r5YWweVhl1AQYB5Ovlhvo1w+n8hQpRyOo+MswDxM57+BFQd33cSXYlBQjegjjNW4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=nL0d5s49; arc=fail smtp.client-ip=40.107.200.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lWoDW+xso8Thxbkuob4fLCvIp7tCIOVzIFkvNWApJfdHQ3z6sH+dMbU6uuG6kI6BfvNkeL8SsAThLZeFP8cJOvgXhyV0Ic2VaBe70J7yGrCsA4T2cQT6lS7jcXrMCA1hm+Q25QfgBM/WBM8uuoToP5WN0QkPOSW6RDKkdLr5Zw8i9R50bXVRS+BxQDlX9SA3/D/YyW7EhuRtD6xVsbB2FQeaf0VSi9tUVpQxglQt5cedZKB2vf5EpcObFue3zz9VdZQzf0bOpRKt0wzydrn4Vww8fu0kM3+jVpSFWUBZYcGPR8l2fcmHvZnp16B9dVqCStdz0aQJI/BTMXBgyXJC9g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vhj6ydLyNz93vJ5EO/izu11icAaFwK6uVJdyKuDKkGc=;
+ b=IU5++pLSj1Nf8PIhBQ6nxlvQmR7LRJDziIriTl7I2d89RLEX6v7yBR1j77e9UG2EUcnsA3SAJ3pvmjE22WhwZotm44NnooCtFvKv3HbW3G2D7ECkK18QCAYymQqv1QU8jdxS02acbxvByWxeGPy5m5hfMW3bomlvwP+TkUJZb1DjkNSSGICENEXKSMNs3gaeA/HnlkehZw5Qvf25mtHD6vYa3b3EeqGtU2N0FXQF9itwwjKNqD9z+MzPbQW+bIhKU5kUOwWRrqm3A25E+Xfyl4WeSeBpuvGucdtNz6SDhP+VT0CfPuq8HS5lXX3vK7DdAUzcnKN4TVeqH0UFbrayWA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=gmail.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vhj6ydLyNz93vJ5EO/izu11icAaFwK6uVJdyKuDKkGc=;
+ b=nL0d5s49GQkQLeNz6JBjLaOqLnsy45dX6BoB9U2cuLdKFJjm3q2eIhjUBzBu0enCvCVmUuLsM4CCTMmSsm89NdFAXu7TAoSFLoTVh/LeoG79sHh45lM1gh54GCnhz3jcbCo30nFDesZS17C5u0xiNO/6XldPN/ApRU2RO9QAaFqB6btizpEd4fg12/G7VWHIARCiN3Mi+61BUqVtng6+xvxXUGxc5wg9MFN8OKvJ0PxHbwINkQSk/0kgrBabrEjYNPAriz+EGGAfRBeiryMLOPMVoJFiPrOhsjL+ezfo/7GOo+L/ejsouc+g9IbIYIbZqqFY8yDjdQQIMPYD/ygDPA==
+Received: from MN0PR05CA0017.namprd05.prod.outlook.com (2603:10b6:208:52c::21)
+ by SA1PR12MB7270.namprd12.prod.outlook.com (2603:10b6:806:2b9::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.17; Thu, 7 May
+ 2026 10:55:49 +0000
+Received: from BN1PEPF00005FFD.namprd05.prod.outlook.com
+ (2603:10b6:208:52c:cafe::71) by MN0PR05CA0017.outlook.office365.com
+ (2603:10b6:208:52c::21) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9913.7 via Frontend Transport; Thu, 7
+ May 2026 10:55:49 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN1PEPF00005FFD.mail.protection.outlook.com (10.167.243.229) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9891.9 via Frontend Transport; Thu, 7 May 2026 10:55:48 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 7 May
+ 2026 03:55:29 -0700
+Received: from [10.242.157.67] (10.126.231.37) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 7 May
+ 2026 03:55:27 -0700
+Message-ID: <1d7235ce-8354-44bd-8f2d-fb3eca35bb65@nvidia.com>
+Date: Thu, 7 May 2026 13:55:24 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3859; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=QBDRVKMHiC38ua/WqXZfu2WimUgpapC8UXjmRJjp8tY=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBp/G5vd/uWszppDdCGFbGwoudF8gIUzzL0bwcRn 94WxpDvJTWJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCafxubwAKCRCPgPtYfRL+ TqdxCAC2/jElg2cWBDtgrUyOeGF/xeGQNVHpIDiGLPUPtE2h3ImAtHV7qzYD9HCcmyS1JglkUBf tPQds3Y6QhMrIjEz9dBHXyI8sPn6nSSp8IYNom5/yxSvwvmcGav3UMaQ8HRur9OCGjhGAsGPV2G yD+47PKTTJYPiUhB36WhhHOAPV66lr6Wf+hhG/xC0vA2Lltb9NcfUX7qhMo2t/NX+xTk5BeyrQJ c5f2xLyPXetEjnWrUkp+GihEbylLHcvKC1bTnruWN/M2srdEBZKGcht6qvWHZ7bRs3ZgPkxfWWY 5zSKiTEouZ70vF4qfKVwEY4/vJJGq0UGQhyCRU/4wiFofoth
-X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: D471E4E70AE
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v1] net/mlx5: Fix HWS action unwind NULL dereference
+To: Prathamesh Deshpande <prathameshdeshpande7@gmail.com>, Saeed Mahameed
+	<saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>
+CC: Tariq Toukan <tariqt@nvidia.com>, Yevgeny Kliteynik <kliteyn@nvidia.com>,
+	Jakub Kicinski <kuba@kernel.org>, <netdev@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20260504220725.46686-1-prathameshdeshpande7@gmail.com>
+Content-Language: en-US
+From: Moshe Shemesh <moshe@nvidia.com>
+In-Reply-To: <20260504220725.46686-1-prathameshdeshpande7@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF00005FFD:EE_|SA1PR12MB7270:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8c3909e1-8de0-4a04-2ff7-08deac2732ed
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700016|376014|82310400026|1800799024|18002099003|22082099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	zhGhBTEu+CvEYmoxZwMb05PuUd7RDKEMKTkHKpueYRu+yMfVlp3/ULsYUAbNgW6Kr2I2C3PoMXZdzViY5hJISKEIJYOdgP8iDmWUpb9waYSaEJeRQtShyZd8oLuBMSgJBW6RJQe+CCCdpQeko0ey6EazCqGTWIZPPbDPYbClCXNiWKP4yXBI4zoSApCGX2N/+rj2837HISmaRFzsskRGOpQWRApzIsnly/p9Ra6LeKSxhhbgpI5OerNfTXTpi0rINXjK1ty0Key2XZkAewFAfVUxW9UIvmvgT6VC8hFdd2YQsGjfE9GdXuoKBcXAKZI/dIaS25AI3G9k34IKkFI7Yioa4mLUQqP7c9H3lpKeWKmGMahBIJG7Hfyp6P3qa7+fOdqpzy4JkUjSD5WRrhkT8gp8nPhjzAGCBKLgP1VLfxwEEpKUF6YcDRJbOLM5nn/qE9CppU2iJr1cd4AdxffAEpUPYlw+32MuO18+GG+0FXiVZUbbVvRBno1ps/vkAETNgGA9imW5fUaYHe/KTsZF+07fWDR6hxp1JHi3BufBuyt/wondSxuYP5NOKyREg6rVuo/XGW+NmHzhprEv+WujfnCCmhy+mLJv3tbu6OREPwbubZ527YYXBNjsTaSs+U7wpiwGqLvWdPnYntgdzvzNYQnAD1Ud0lHXh72smBOsTbBaZCgfbUHuiPtYL6lzTywe98WEGtbGrHptn9/v2oB1WIxOvOv4ASWaZC/U52BM3Jg=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(376014)(82310400026)(1800799024)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	a6QUC+Yn3o8LvjcD0Tt4/4MdD+7CxVWgblD6YcgsHeklzgHRNkzq/o6fZWc3HWq+u++Y6uRHqj6I4LfWGReocvWFOLcVbgb/DfIihCiMqhQ/mVSdYrD1qJpL9Cpl+DfVWeEbxD/HCabk2AvGmN2xOsWkppOMsTuvQ2WmDTyb19uv7y+AJcKC0hgexQMFlICahcljbUHuotXbAPTwXH+/+JkdpDczqcuaLyeJ+4Ye9P7MeAia0SB3/83TgjRMjFsc5Eb7tjEefuEGibZYm2dxoXgMsrBsKLnNmGfIhQpC2CvTGjBoHb59+ZC2K9U/91A3L1Aa75nYLcTIhpxLhxrV3eO3xVBHr6hH2JrqVZjIA84KavEFZzfuTRffnLGCa1Vj+ACEkcrumf1wJJCb81qL60idSJbz+YrkqONYLeXL/a3YO54mxN9NayKKHt7pl8oU
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2026 10:55:48.9351
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8c3909e1-8de0-4a04-2ff7-08deac2732ed
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF00005FFD.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7270
+X-Rspamd-Queue-Id: 0D8324E7271
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_DKIM_ALLOW(-0.20)[baylibre-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-285244-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285242-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[baylibre.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,nvidia.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,Nvidia.com:dkim];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_TO(0.00)[gmail.com,nvidia.com,kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[baylibre-com.20251104.gappssmtp.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[moshe@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,baylibre-com.20251104.gappssmtp.com:dkim]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Action: no action
 
-With .class_mask being zero the value of .class doesn't matter because
-to check if a pci_device_id entry matches a given device the expression
 
-	(id->class ^ dev->class) & id->class_mask
 
-is checked for being zero (see pci_match_one_device()). So drop the
-useless assignment for .class and .class_mask to match what (I think)
-all other drivers are doing.
+On 5/5/2026 1:06 AM, Prathamesh Deshpande wrote:
+> mlx5_fs_fte_get_hws_actions() stores some destination actions in
+> fs_actions[] before checking whether action creation succeeded.
+> 
+> If creating a table-number or range destination action fails, or if
+> fetching a sampler destination action fails, dest_action is NULL but
+> num_fs_actions has already been incremented. The shared error path then
+> calls mlx5_fs_destroy_fs_action(), which dereferences fs_action->action
+> to get the HWS action type, causing a NULL pointer dereference while
+> unwinding the original failure.
+> 
+> Track whether the current destination action needs fs_actions[] cleanup,
+> but append it only after dest_action has been validated.
+> 
+> Fixes: 2ec6786ad0a6b ("net/mlx5: fs, add HWS fte API functions")
+> Fixes: 32e658c84b6d ("net/mlx5: fs, add support for dest flow sampler HWS action")
+> Signed-off-by: Prathamesh Deshpande<prathameshdeshpande7@gmail.com>
 
-This also resolves an ambiguity because PCI_VDEVICE_SUB() already
-contains values for .class and .class_mask (which gcc ignores in the
-presence of the named initializer).
+Acked-by: Moshe Shemesh <moshe@nvidia.com>
 
-Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
----
- drivers/net/ethernet/netronome/nfp/nfp_main.c    | 16 ----------------
- .../net/ethernet/netronome/nfp/nfp_netvf_main.c  |  8 --------
- 2 files changed, 24 deletions(-)
-
-diff --git a/drivers/net/ethernet/netronome/nfp/nfp_main.c b/drivers/net/ethernet/netronome/nfp/nfp_main.c
-index e8e4b84d505a..5a9fb5bad405 100644
---- a/drivers/net/ethernet/netronome/nfp/nfp_main.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfp_main.c
-@@ -36,50 +36,34 @@ static const struct pci_device_id nfp_pci_device_ids[] = {
- 	{
- 		PCI_VDEVICE_SUB(NETRONOME, PCI_DEVICE_ID_NFP3800,
- 				PCI_VENDOR_ID_NETRONOME, PCI_ANY_ID),
--		.class = PCI_ANY_ID,
--		.class_mask = 0,
- 		.driver_data = NFP_DEV_NFP3800,
- 	}, {
- 		PCI_VDEVICE_SUB(NETRONOME, PCI_DEVICE_ID_NFP4000,
- 				PCI_VENDOR_ID_NETRONOME, PCI_ANY_ID),
--		.class = PCI_ANY_ID,
--		.class_mask = 0,
- 		.driver_data = NFP_DEV_NFP6000,
- 	}, {
- 		PCI_VDEVICE_SUB(NETRONOME, PCI_DEVICE_ID_NFP5000,
- 				PCI_VENDOR_ID_NETRONOME, PCI_ANY_ID),
--		.class = PCI_ANY_ID,
--		.class_mask = 0,
- 		.driver_data = NFP_DEV_NFP6000,
- 	}, {
- 		PCI_VDEVICE_SUB(NETRONOME, PCI_DEVICE_ID_NFP6000,
- 				PCI_VENDOR_ID_NETRONOME, PCI_ANY_ID),
--		.class = PCI_ANY_ID,
--		.class_mask = 0,
- 		.driver_data = NFP_DEV_NFP6000,
- 	}, {
- 		PCI_VDEVICE_SUB(CORIGINE, PCI_DEVICE_ID_NFP3800,
- 				PCI_VENDOR_ID_CORIGINE, PCI_ANY_ID),
--		.class = PCI_ANY_ID,
--		.class_mask = 0,
- 		.driver_data = NFP_DEV_NFP3800,
- 	}, {
- 		PCI_VDEVICE_SUB(CORIGINE, PCI_DEVICE_ID_NFP4000,
- 				PCI_VENDOR_ID_CORIGINE, PCI_ANY_ID),
--		.class = PCI_ANY_ID,
--		.class_mask = 0,
- 		.driver_data = NFP_DEV_NFP6000,
- 	}, {
- 		PCI_VDEVICE_SUB(CORIGINE, PCI_DEVICE_ID_NFP5000,
- 				PCI_VENDOR_ID_CORIGINE, PCI_ANY_ID),
--		.class = PCI_ANY_ID,
--		.class_mask = 0,
- 		.driver_data = NFP_DEV_NFP6000,
- 	}, {
- 		PCI_VDEVICE_SUB(CORIGINE, PCI_DEVICE_ID_NFP6000,
- 				PCI_VENDOR_ID_CORIGINE, PCI_ANY_ID),
--		.class = PCI_ANY_ID,
--		.class_mask = 0,
- 		.driver_data = NFP_DEV_NFP6000,
- 	},
- 	{ } /* Required last entry. */
-diff --git a/drivers/net/ethernet/netronome/nfp/nfp_netvf_main.c b/drivers/net/ethernet/netronome/nfp/nfp_netvf_main.c
-index cf557e0ce011..6c8f3321048a 100644
---- a/drivers/net/ethernet/netronome/nfp/nfp_netvf_main.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfp_netvf_main.c
-@@ -41,26 +41,18 @@ static const struct pci_device_id nfp_netvf_pci_device_ids[] = {
- 	{
- 		PCI_VDEVICE_SUB(NETRONOME, PCI_DEVICE_ID_NFP3800_VF,
- 				PCI_VENDOR_ID_NETRONOME, PCI_ANY_ID),
--		.class = PCI_ANY_ID,
--		.class_mask = 0,
- 		.driver_data = NFP_DEV_NFP3800_VF,
- 	}, {
- 		PCI_VDEVICE_SUB(NETRONOME, PCI_DEVICE_ID_NFP6000_VF,
- 				PCI_VENDOR_ID_NETRONOME, PCI_ANY_ID),
--		.class = PCI_ANY_ID,
--		.class_mask = 0,
- 		.driver_data = NFP_DEV_NFP6000_VF,
- 	}, {
- 		PCI_VDEVICE_SUB(CORIGINE, PCI_DEVICE_ID_NFP3800_VF,
- 				PCI_VENDOR_ID_CORIGINE, PCI_ANY_ID),
--		.class = PCI_ANY_ID,
--		.class_mask = 0,
- 		.driver_data = NFP_DEV_NFP3800_VF,
- 	}, {
- 		PCI_VDEVICE_SUB(CORIGINE, PCI_DEVICE_ID_NFP6000_VF,
- 				PCI_VENDOR_ID_CORIGINE, PCI_ANY_ID),
--		.class = PCI_ANY_ID,
--		.class_mask = 0,
- 		.driver_data = NFP_DEV_NFP6000_VF,
- 	},
- 	{ } /* Required last entry. */
--- 
-2.47.3
+> ---
+>   .../mellanox/mlx5/core/steering/hws/fs_hws.c     | 16 +++++++++++-----
+>   1 file changed, 11 insertions(+), 5 deletions(-)
 
 
