@@ -1,182 +1,211 @@
-Return-Path: <netdev+bounces-285433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285434-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GKrzJvm+/GnSTAAAu9opvQ
-	(envelope-from <netdev+bounces-285433-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:34:01 +0200
+	id KMThGAe//GnSTAAAu9opvQ
+	(envelope-from <netdev+bounces-285434-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:34:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9B014EC4A9
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:34:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF37F4EC4B1
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:34:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 74FF6300BC97
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 16:30:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 94D403034E17
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 16:32:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B6594218A1;
-	Thu,  7 May 2026 16:30:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B6C3B7B8E;
+	Thu,  7 May 2026 16:32:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="iWVScX3t"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AgmDunZI"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B87037269F;
-	Thu,  7 May 2026 16:30:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778171414; cv=none; b=p+O275LvhTwAFrvBhr8lc/pnzcBSwm5n2zDum2EJpj4cMGNKg7BNvnQG0YWGJwzOJqVfLR22q55w9pc48aQ2T+60fMy7kI5ZjpzWn3IFcZgFZF2I02WegptOm6UFqpG18+Cx7wUB4gIpQJKQEHSw1ebdZbVQBfHEk5wmFnNVKjo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778171414; c=relaxed/simple;
-	bh=JF5H04WoSuU8ZS1WCukHF3QcigcJRhlCF8unmAcPvLQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GjlabwShmS5O7rDipjRxg+UKSrkwcZFp6fktdFYVnZW08bsrZuD1XhHgew5csPp6xLwkzlF52qTG7stW+uAC03TFypXNv51pEupw8+/oOyTrnim2Jz+3hhTGOz1f5wLwxV6c02sXQM7cKbmyB6KLiZZFf4CIgTcYBhqR9iKVPp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iWVScX3t; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kYKaL1jQ8LGdN9smjIQLGtIx8ZielLRVj4GVygHNyZw=; b=iWVScX3t1Vr7jT65EBijDEZtTC
-	xR/IYFApXe/XCCjv6FXei/9xmMjJxEdUZzW87RUeUyhJcv+B3eVHQz9NAIK/eJD4bXgOtQg4e8bFF
-	6Q7shNjm3ibz3YIv1APpxKSOp0zLPRl0qLPCWLDITqKG+x6Yq2AcgJxHUp5giJaS4zUk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wL1b9-001qT0-IB; Thu, 07 May 2026 18:29:15 +0200
-Date: Thu, 7 May 2026 18:29:15 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Thompson <daniel@riscstar.com>
-Cc: Alex Elder <elder@riscstar.com>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, maxime.chevallier@bootlin.com,
-	rmk+kernel@armlinux.org.uk, andersson@kernel.org,
-	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org,
-	arnd@arndb.de, gregkh@linuxfoundation.org,
-	mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com,
-	alexandre.torgue@foss.st.com, ast@kernel.org,
-	boon.khai.ng@altera.com, chenchuangyu@xiaomi.com,
-	chenhuacai@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	hkallweit1@gmail.com, inochiama@gmail.com, john.fastabend@gmail.com,
-	julianbraha@gmail.com, livelycarpet87@gmail.com,
-	matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
-	prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
-	rohan.g.thomas@altera.com, sdf@fomichev.me,
-	siyanteng@cqsoftware.com.cn, weishangjuan@eswincomputing.com,
-	wens@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 10/12] net: stmmac: tc956x: add TC956x/QPS615
- support
-Message-ID: <ef6df85f-11ac-404d-958a-8cf69b3b6bb6@lunn.ch>
-References: <20260501155421.3329862-1-elder@riscstar.com>
- <20260501155421.3329862-11-elder@riscstar.com>
- <2ce5897d-5bbb-486a-b0f0-0e30e54b451a@lunn.ch>
- <afy34kj2hPxIlArO@aspen.lan>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5962235B633
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 16:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778171558; cv=pass; b=JABkT6ma0MQggjJSXU5Czu5sG8QhbpbB4MInRgMubZbgNXymtwyu0X7HKptPyNCmm1xEIrAWKpuS1WmNwdUn+e4I2gquJoLoL/bJws+SgZNEPKeAemcK5cmkEZmjJIZBsaeimQviMOas5Z/lTZM0M+mTZ4eY/rMFylMeal7XiU0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778171558; c=relaxed/simple;
+	bh=8VRBFuEjBtdNxMc+0CLtM7mNvR9Ak+SZIaiiqsTAXjc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fs0zzyLwXN8yFGTYVeldlAqKLT90V+19uoYP+rfNiWTZAf8RzhpgSAyrNWdv0JV/BPxnjLERT3zokxZ0UnbsIad8QC7dwoGr6HFES9g91/ZjCQ48npbCt/V/giH1lQLXjR6xGbTJmilcLAI/xaNM8gplFcQk4vQaIYisSgrKEwk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AgmDunZI; arc=pass smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-51306c9f2e1so10063871cf.0
+        for <netdev@vger.kernel.org>; Thu, 07 May 2026 09:32:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778171556; cv=none;
+        d=google.com; s=arc-20240605;
+        b=LROr3wwLUGpckzbyadwWoJqgW2S3iAMCDIo5rv50rXYKCMfygES4CUyF9X43Bk4Vpn
+         +4J0kiQIXAZsfWlN66SlSEHNClWNWfYAwE8DUrBya8YP3Dq1a/J91T8+DGHgqwMOIUlV
+         EPzlDj+qDPo46cyMF3vH5V3DyynHbTsy3uIqdmTwB200alsuchg7r9xFuTLnE/aZux5h
+         HCX0djTs3lCZEuZ6E7Kgbz91RjhWiRIgPYnAj2XxrKlmKUGoTg87MXeNI+2plbH85X5Y
+         nW5MjNMJlQswmXzgtquezlkgiKtmcPNbfBKxz/m6TVf6eD+rHy73rYf/sLAUc6/8qqN/
+         X3iw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=9c9Ph+69ZwWpRAxYxtwXGr1jYxWNZFenTXWLY82Jkf0=;
+        fh=sST8+kxjdm//vFcDN4FlrOFeuZV28w9mXyTZNnGvdnY=;
+        b=Q1MMX/INTySBiqsURKSbX/9Ne/rRpr6wL87e7yPXfNv1sBmzy5IE16t9WfxufKZK0j
+         zozv99uINOtemLfk50f5hvoo2GZBdGqczpJHbIfvVfNNFv4b2mCtG/ZWvhMIKbUDqUnB
+         lDoRVi6+7eLspSvpErMmOKRW/8n4e8iaTjtE7mcjZFOCUpXPhiZHA0316QF0To2jsMZk
+         Y22xtk1B557pdBp0JGJ2/yAL0luvpPgXu/S/3WABPC/VlqEv5IUYZoyN1aem84BCExiT
+         vjItaJ4lD1YTyp0qFmAiv9VsVjRYTsHEES2tpIE68GR4eWQgefnI1rg6oTLyhcQZr0qo
+         8BMg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1778171556; x=1778776356; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9c9Ph+69ZwWpRAxYxtwXGr1jYxWNZFenTXWLY82Jkf0=;
+        b=AgmDunZIeLxTvkfSftkJV1MA1H5hfDJybGp7pUaJOtM1cja7LqZa4CE86yykJLa1hT
+         hhU96IW63o8S4v/q/qYz1lilge6PSccenNx459D26SvbyVqaIAQAxKjODmeEecsPDUe2
+         oFFkivASQ2ACt0BrzC4oGidF8gpg77RRI2odqmlCLW9/a+H7Jm17cEmNVbJ8c9pYIbR1
+         Rhc/24tSHuYZRdcpO6GG6ppgi9Bcymb/QQMW+02Jbf9RjkCoe0ALt3Vr3qRsoBWJjPMl
+         NvZbe0fhgkQJHnsPin1ZRivJSq42rKmgDnudgIaJsmDg5PUZavlhfMALZ7Cgfo+OVQTk
+         XK2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778171556; x=1778776356;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=9c9Ph+69ZwWpRAxYxtwXGr1jYxWNZFenTXWLY82Jkf0=;
+        b=T3TYezHdKxZNVbyn1tLjjVTsTLjQJ0rlbk4DSKsp2HhzFM0CH3USr3QZBNMjQhzk5v
+         9BJ7cmF+H6czSueOXPoOgH44SUogCNkaFCZg/+OWgjV7nl3Et05+SSwlkrgKmWvaK7QY
+         UsebehEYMX8hLMb+l4G3vHOIqGVrbRF1v+kqANBw5lNB2wQOAb4nti+U3dNdHSE8hd9R
+         IjnakT6DDhRHeFRjvO9jtrdlrn1BfbUg0urpsgcdt7NaT822woB0aB71MnF/IDEO4pIk
+         GE0TypC7I4Vr/inHc0B2JhrnoOLKAle+MnSMSj7znuG+USsJwtr64Chc+Y9a0qrE9T+K
+         5BfA==
+X-Forwarded-Encrypted: i=1; AFNElJ/2KHUFIKm43h1qEqQR1hnYyA8BJQXV9uHBYuyV32dP6mkzTaZv/xpapBOZaX6+iUh+2eEVVb8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxP/rJTZ8ubaX9BinE10/UJ3OJ0PvcRlxSsO8dW+BIrr+ILTLId
+	r+LfUeHctbnV5NgWQcau5+OiKiYdoSeak5kYOgnyLX/HUP3DSRC+R829gRlDMbyrORXGrIkHNNn
+	udAbTdt0dK69Wdrgc2qlqHMTRcKfKM6EhSHdTGFUP
+X-Gm-Gg: AeBDietehW3W7ZkE8U25xUp5xTnE3ACuapZFSY1ZWaVe7XPtVmBBtGcHtXbxFOtACnH
+	qqEfohRgG6FEYd89l9tOBDS++pKUChhdaF3YKWx9sKba705SLOhLOhKR8wayCLNST8rHiDHQGsO
+	UcCw6bOhpEeVltTvoP2DkIvy5G7jYYvysysSg5k7inz3De0yVMT3XV8091xMmFxfFqaRIdBBp0U
+	WlEE3CtEa3lZ18EO6xyEMMEF3iMdMOYmB2bjE74RF0GDyzuOFAmzAMl749GAARCWZmwJrYzwhLC
+	di5ygmixAs3AmXZZdpO6h3SrJAr9Jf1KpfdwB0dyKT+WviFkhj8F/UjSQB6P3WP3WDA8Yhgy7WR
+	el8WzIfIihCLYPY4sq9UlbvtymkeHc5g=
+X-Received: by 2002:ac8:5a16:0:b0:50d:9b07:9c46 with SMTP id
+ d75a77b69052e-51461fa0213mr115677391cf.33.1778171555577; Thu, 07 May 2026
+ 09:32:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <afy34kj2hPxIlArO@aspen.lan>
-X-Rspamd-Queue-Id: D9B014EC4A9
+References: <20260430122653.554058-1-edumazet@google.com> <afn0ZdvZWswBuDMm@sgarzare-redhat>
+ <CANn89iLs8DOWJwDpf_ARoMrV+6b2tbhEJ=VVzeC8gCm5dRGaig@mail.gmail.com>
+ <afoF_cHfl6ygcupM@sgarzare-redhat> <20260506113554-mutt-send-email-mst@kernel.org>
+ <afxVH2So9BbZ3Gta@sgarzare-redhat> <20260507074113-mutt-send-email-mst@kernel.org>
+ <afyMCyBvZpzWrLtO@sgarzare-redhat> <20260507073340.0604667d@kernel.org> <afyy9CeniTBF3o2I@sgarzare-redhat>
+In-Reply-To: <afyy9CeniTBF3o2I@sgarzare-redhat>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 7 May 2026 09:32:24 -0700
+X-Gm-Features: AVHnY4K43sQ5GiXATqMbu7KFCF7zUxmTlewiAWXiJfdc41BJ0Cit2Qu3K7HJSFU
+Message-ID: <CANn89iJ+qOFPSUACvda7djOVKGM8t+FfwdA5Ymjxe+g_tJtmnA@mail.gmail.com>
+Subject: Re: [PATCH net] vsock/virtio: fix potential unbounded skb queue
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Arseniy Krasnov <avkrasnov@salutedevices.com>, Bobby Eshleman <bobbyeshleman@meta.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "David S . Miller" <davem@davemloft.net>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Arseniy Krasnov <AVKrasnov@sberdevices.ru>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: AF37F4EC4B1
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[riscstar.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-285433-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[50];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285434-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,salutedevices.com,meta.com,davemloft.net,vger.kernel.org,gmail.com,sberdevices.ru,linux.alibaba.com,lists.linux.dev];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-On Thu, May 07, 2026 at 05:03:46PM +0100, Daniel Thompson wrote:
-> On Fri, May 01, 2026 at 09:04:58PM +0200, Andrew Lunn wrote:
-> > > +static struct tc956x_mac_speed mac_speed[] = {
-> > > +	{ PHY_INTERFACE_MODE_2500BASEX,	SPEED_2500,  SP_SEL_SGMII_2500M, },
-> > > +	{ PHY_INTERFACE_MODE_SGMII,	SPEED_2500,  SP_SEL_SGMII_2500M, },
-> > > +	{ PHY_INTERFACE_MODE_SGMII,	SPEED_1000,  SP_SEL_SGMII_1000M, },
+On Thu, May 7, 2026 at 9:05=E2=80=AFAM Stefano Garzarella <sgarzare@redhat.=
+com> wrote:
+>
+> On Thu, May 07, 2026 at 07:33:40AM -0700, Jakub Kicinski wrote:
+> >On Thu, 7 May 2026 14:59:13 +0200 Stefano Garzarella wrote:
+> >> >well if you want to support pathological cases such as 1 byte message=
+s
+> >> >that would mean like 100x reduction no?
+> >>
+> >> Yep, but since this patch is already merged, IMHO that is better than
+> >> losing data in those pathological cases.
 > >
-> > That looks odd. Some vendors implemented 2500BaseX using SGMII
-> > overclocked. But that is not strictly 2500BaseX. Having the 2500BASEX
-> > entry suggests you have real 2500BASEX, so why have an SGMII entry
-> > with SPEED_2500?
-> 
-> This is a consequence of the code that uses this lookup table being
-> called both during initialization and from the fix_mac_speed() callback.
-> 
-> During initialization we only have the value in plat->phy_interface to
-> go on so we run the lookup table using plat->phy_interface (which is
-> typically PHY_INTERFACE_MODE_SGMII) and with the maximum permitted
-> speed.
+> >We can revert if you think that the risk of regression is high..
+> >Please LMK soon, we can do it before patch reaches Linus.
+> >
+>
+> Some tests in tools/testing/vsock/vsock_test.c are failing with this
+> patch applied.
+>
+> Test 18 are failing sometime in this way (I guess because we are
+> dropping packets):
+>
+> 18 - SOCK_STREAM MSG_ZEROCOPY...hash mismatch
+>
+> Test 22 is failing 100% in this way:
+>
+> 22 - SOCK_STREAM virtio credit update + SO_RCVLOWAT...send failed:
+> Resource temporarily unavailable
+>
+>
+> With my followup patch adding also advertisement to the other peer
+> (still draft locally, waiting for Michael proposal) I saw 22 failing,
+> because tests expects that can use the entire buf_alloc, but now we are
+> reducing it.  So IMO we should do like in `__sock_set_rcvbuf()` and
+> double the buffer size, or at least digest an overhead equal to the
+> buffer size set by the user via SO_VM_SOCKETS_BUFFER_SIZE (yeah,
+> AF_VSOCK has it owns sockopt since the beginning :-().
+>
+> With that approach tests are passing, but I'd like to stress a bit more
+> that patch. I'll send it tomorrow as fixup of this patch, or if you
+> prefer to revert, I'll send as standalone.
+>
 
-Something sounds wrong here. SGMII only supports 10/100/1G. You should
-never be asked to do SGMII at 2500. It should ask for 2500BaseX.
+A plain revert is a big issue, now users now how to crash hypervisors.
 
-> I haven't got detailed enough notes to allow me to double check but I
-> think there were problems completing the initial MAC reset if we didn't
-> write something sensible to the hardware during initialization.
+This vulnerability allows a compromised guest (controlling
+virtio_vsock_hdr fields)
+to continuously flood the host's vsock receive queue without
+triggering any memory
+ accounting limits or reader wakeups, resulting in unbounded host
+kernel memory consumption (Host DoS via OOM).
 
-> During fix_max_speed() we get told to adopt 2500base-x. Reviewing the
-> code I can see we don't propagate that and just use
-> plat->phy_interface for fix_mac_speed(). I will fix the code to that
-> the requested interface propagates properly to the lookup table but I
-> think we would still rely on the SGMII entry to get sane initial values
-> to write to the hardware.
+A vulnerability where a KVM guest can crash or deadlock its host is
+classified as a KVM DoS.
 
-Getting sane values into the hardware is good, but 2500 SGMII is not
-sane :-(
-
-> > Doesn't that break any other dwxgmac301 in the system? Shouldn't you
-> > be making a copy of the global structure, and then making
-> > modifications to your copy? mac->dma then points to your copy?
-> 
-> That's exactly what this code does.
-> 
-> `*dma = dwxgmac301_dma_ops` is a structure copy, we never take a pointer
-> to dwxgmac301_dma_ops (and if we did, dwxgmac301_dma_ops is const so I
-> think we'd get a kernel oops if we tried to write to rodata).
-> 
-> Would to code be easier to read if we dropped the local `dma` variable
-> since that would make it clearer that td->dma is not a pointer? More
-> like:
-
-> +       /* dwxgmac301_dma_ops needs extending to provide DMA address translation */
-> +       td->dma = dwxgmac301_dma_ops;
-> +       td->dma.init_rx_chan = tc956x_dma_init_rx_chan;
-> +       td->dma.init_tx_chan = tc956x_dma_init_tx_chan;
-> +       mac->dma = &dma;
-
-Yes, that is better. I also think it is partially my problem. You
-don't often see structure assignments, just pointer assignments. So
-i'm somewhat blind to them.
-
-	Andrew
+Am I missing something?
 
