@@ -1,211 +1,253 @@
-Return-Path: <netdev+bounces-285434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285435-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KMThGAe//GnSTAAAu9opvQ
-	(envelope-from <netdev+bounces-285434-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:34:15 +0200
+	id uFqEDiPF/Gk8TgAAu9opvQ
+	(envelope-from <netdev+bounces-285435-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 19:00:19 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF37F4EC4B1
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:34:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AE9A4EC951
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 19:00:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 94D403034E17
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 16:32:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 44C2F3041AB4
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 16:59:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B6C3B7B8E;
-	Thu,  7 May 2026 16:32:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C51243E481;
+	Thu,  7 May 2026 16:59:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AgmDunZI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mLZ+/sT4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5962235B633
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 16:32:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778171558; cv=pass; b=JABkT6ma0MQggjJSXU5Czu5sG8QhbpbB4MInRgMubZbgNXymtwyu0X7HKptPyNCmm1xEIrAWKpuS1WmNwdUn+e4I2gquJoLoL/bJws+SgZNEPKeAemcK5cmkEZmjJIZBsaeimQviMOas5Z/lTZM0M+mTZ4eY/rMFylMeal7XiU0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778171558; c=relaxed/simple;
-	bh=8VRBFuEjBtdNxMc+0CLtM7mNvR9Ak+SZIaiiqsTAXjc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fs0zzyLwXN8yFGTYVeldlAqKLT90V+19uoYP+rfNiWTZAf8RzhpgSAyrNWdv0JV/BPxnjLERT3zokxZ0UnbsIad8QC7dwoGr6HFES9g91/ZjCQ48npbCt/V/giH1lQLXjR6xGbTJmilcLAI/xaNM8gplFcQk4vQaIYisSgrKEwk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AgmDunZI; arc=pass smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-51306c9f2e1so10063871cf.0
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 09:32:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778171556; cv=none;
-        d=google.com; s=arc-20240605;
-        b=LROr3wwLUGpckzbyadwWoJqgW2S3iAMCDIo5rv50rXYKCMfygES4CUyF9X43Bk4Vpn
-         +4J0kiQIXAZsfWlN66SlSEHNClWNWfYAwE8DUrBya8YP3Dq1a/J91T8+DGHgqwMOIUlV
-         EPzlDj+qDPo46cyMF3vH5V3DyynHbTsy3uIqdmTwB200alsuchg7r9xFuTLnE/aZux5h
-         HCX0djTs3lCZEuZ6E7Kgbz91RjhWiRIgPYnAj2XxrKlmKUGoTg87MXeNI+2plbH85X5Y
-         nW5MjNMJlQswmXzgtquezlkgiKtmcPNbfBKxz/m6TVf6eD+rHy73rYf/sLAUc6/8qqN/
-         X3iw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=9c9Ph+69ZwWpRAxYxtwXGr1jYxWNZFenTXWLY82Jkf0=;
-        fh=sST8+kxjdm//vFcDN4FlrOFeuZV28w9mXyTZNnGvdnY=;
-        b=Q1MMX/INTySBiqsURKSbX/9Ne/rRpr6wL87e7yPXfNv1sBmzy5IE16t9WfxufKZK0j
-         zozv99uINOtemLfk50f5hvoo2GZBdGqczpJHbIfvVfNNFv4b2mCtG/ZWvhMIKbUDqUnB
-         lDoRVi6+7eLspSvpErMmOKRW/8n4e8iaTjtE7mcjZFOCUpXPhiZHA0316QF0To2jsMZk
-         Y22xtk1B557pdBp0JGJ2/yAL0luvpPgXu/S/3WABPC/VlqEv5IUYZoyN1aem84BCExiT
-         vjItaJ4lD1YTyp0qFmAiv9VsVjRYTsHEES2tpIE68GR4eWQgefnI1rg6oTLyhcQZr0qo
-         8BMg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778171556; x=1778776356; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9c9Ph+69ZwWpRAxYxtwXGr1jYxWNZFenTXWLY82Jkf0=;
-        b=AgmDunZIeLxTvkfSftkJV1MA1H5hfDJybGp7pUaJOtM1cja7LqZa4CE86yykJLa1hT
-         hhU96IW63o8S4v/q/qYz1lilge6PSccenNx459D26SvbyVqaIAQAxKjODmeEecsPDUe2
-         oFFkivASQ2ACt0BrzC4oGidF8gpg77RRI2odqmlCLW9/a+H7Jm17cEmNVbJ8c9pYIbR1
-         Rhc/24tSHuYZRdcpO6GG6ppgi9Bcymb/QQMW+02Jbf9RjkCoe0ALt3Vr3qRsoBWJjPMl
-         NvZbe0fhgkQJHnsPin1ZRivJSq42rKmgDnudgIaJsmDg5PUZavlhfMALZ7Cgfo+OVQTk
-         XK2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778171556; x=1778776356;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=9c9Ph+69ZwWpRAxYxtwXGr1jYxWNZFenTXWLY82Jkf0=;
-        b=T3TYezHdKxZNVbyn1tLjjVTsTLjQJ0rlbk4DSKsp2HhzFM0CH3USr3QZBNMjQhzk5v
-         9BJ7cmF+H6czSueOXPoOgH44SUogCNkaFCZg/+OWgjV7nl3Et05+SSwlkrgKmWvaK7QY
-         UsebehEYMX8hLMb+l4G3vHOIqGVrbRF1v+kqANBw5lNB2wQOAb4nti+U3dNdHSE8hd9R
-         IjnakT6DDhRHeFRjvO9jtrdlrn1BfbUg0urpsgcdt7NaT822woB0aB71MnF/IDEO4pIk
-         GE0TypC7I4Vr/inHc0B2JhrnoOLKAle+MnSMSj7znuG+USsJwtr64Chc+Y9a0qrE9T+K
-         5BfA==
-X-Forwarded-Encrypted: i=1; AFNElJ/2KHUFIKm43h1qEqQR1hnYyA8BJQXV9uHBYuyV32dP6mkzTaZv/xpapBOZaX6+iUh+2eEVVb8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxP/rJTZ8ubaX9BinE10/UJ3OJ0PvcRlxSsO8dW+BIrr+ILTLId
-	r+LfUeHctbnV5NgWQcau5+OiKiYdoSeak5kYOgnyLX/HUP3DSRC+R829gRlDMbyrORXGrIkHNNn
-	udAbTdt0dK69Wdrgc2qlqHMTRcKfKM6EhSHdTGFUP
-X-Gm-Gg: AeBDietehW3W7ZkE8U25xUp5xTnE3ACuapZFSY1ZWaVe7XPtVmBBtGcHtXbxFOtACnH
-	qqEfohRgG6FEYd89l9tOBDS++pKUChhdaF3YKWx9sKba705SLOhLOhKR8wayCLNST8rHiDHQGsO
-	UcCw6bOhpEeVltTvoP2DkIvy5G7jYYvysysSg5k7inz3De0yVMT3XV8091xMmFxfFqaRIdBBp0U
-	WlEE3CtEa3lZ18EO6xyEMMEF3iMdMOYmB2bjE74RF0GDyzuOFAmzAMl749GAARCWZmwJrYzwhLC
-	di5ygmixAs3AmXZZdpO6h3SrJAr9Jf1KpfdwB0dyKT+WviFkhj8F/UjSQB6P3WP3WDA8Yhgy7WR
-	el8WzIfIihCLYPY4sq9UlbvtymkeHc5g=
-X-Received: by 2002:ac8:5a16:0:b0:50d:9b07:9c46 with SMTP id
- d75a77b69052e-51461fa0213mr115677391cf.33.1778171555577; Thu, 07 May 2026
- 09:32:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F1AE31F983;
+	Thu,  7 May 2026 16:59:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778173167; cv=none; b=cnHD7Hk7eciFRnhAAX9S+GA4q51p04FmnEZicPlEGQD/vEkuR1X703OSVKGsgpw9//SX5nBBiuVPikHOfu1xinf9awvcjuJL+ttO/CZrAGx46nbCzyii2H9hBg7NVMG07SFxFXd8WPHSbgMAgZSR1VVoRYEeOHr1nSqhLWFH9/s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778173167; c=relaxed/simple;
+	bh=pazXxEd7A1cd1sWGeu/YHbddxLF5r07GBKYjKOW2Pzc=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Pippnx6hyCVA2bzwIVT1egb35y5UJB5caFDhuqbXZgeGpJlJz6BsTKC+nhBEurlLhcHpEZGTGN9jScY0FllAmUXmKJbyAzjPx+5HivEx7FEGhVfdSQ9EPqDoTvqcX0gbmOc2wilEAM1jDGqWZUpjt0vPHb9BswmmeNV2HL7/gr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mLZ+/sT4; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778173163; x=1809709163;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=pazXxEd7A1cd1sWGeu/YHbddxLF5r07GBKYjKOW2Pzc=;
+  b=mLZ+/sT4r6BRCyRVo8iiS89p4A832B5LkLnGF/VNpITpd45T8YBJavrr
+   imw5kTRI94dRoujppDiM1R5bSsy6/rAmIwR+ITF76F7vIr6eHoMOl18/e
+   Vhd2r+eXBpO+0qiieBtOZR2GsVQJLU/MaevK6aqo1ClWyYyDaWI2n9o6/
+   SX7w3Q0oNY37WcxgGWDYzrBF2moWrXx2zngg5ASNh0JB0z52iCFqRJDLL
+   /ZSnw/OuG7IL7ZjE/vAZ85SYGRTTuNv/wzjDqgmsYeIufbzMHKMuUrYCs
+   vZFF9xqVhq5k8Dl4196h+uorJaN7DuyA6sKz9gFFoASoobDYCMEryQYtO
+   Q==;
+X-CSE-ConnectionGUID: c8rJnQjfR9ux+o3jqGUflw==
+X-CSE-MsgGUID: N6aEvWlET5ywoTap9Jpaww==
+X-IronPort-AV: E=McAfee;i="6800,10657,11779"; a="82975389"
+X-IronPort-AV: E=Sophos;i="6.23,221,1770624000"; 
+   d="scan'208";a="82975389"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 09:59:18 -0700
+X-CSE-ConnectionGUID: A/1g4vxpRaeXQt2eYX0VBw==
+X-CSE-MsgGUID: 1zqVMEuqTBCtM0Sus+wYDw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,221,1770624000"; 
+   d="scan'208";a="259952125"
+Received: from mszycik-mobl1.ger.corp.intel.com (HELO [10.246.20.168]) ([10.246.20.168])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 09:59:14 -0700
+Message-ID: <3abb7d8f-82eb-46e8-8243-fc6f596ab84c@linux.intel.com>
+Date: Thu, 7 May 2026 18:59:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260430122653.554058-1-edumazet@google.com> <afn0ZdvZWswBuDMm@sgarzare-redhat>
- <CANn89iLs8DOWJwDpf_ARoMrV+6b2tbhEJ=VVzeC8gCm5dRGaig@mail.gmail.com>
- <afoF_cHfl6ygcupM@sgarzare-redhat> <20260506113554-mutt-send-email-mst@kernel.org>
- <afxVH2So9BbZ3Gta@sgarzare-redhat> <20260507074113-mutt-send-email-mst@kernel.org>
- <afyMCyBvZpzWrLtO@sgarzare-redhat> <20260507073340.0604667d@kernel.org> <afyy9CeniTBF3o2I@sgarzare-redhat>
-In-Reply-To: <afyy9CeniTBF3o2I@sgarzare-redhat>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 7 May 2026 09:32:24 -0700
-X-Gm-Features: AVHnY4K43sQ5GiXATqMbu7KFCF7zUxmTlewiAWXiJfdc41BJ0Cit2Qu3K7HJSFU
-Message-ID: <CANn89iJ+qOFPSUACvda7djOVKGM8t+FfwdA5Ymjxe+g_tJtmnA@mail.gmail.com>
-Subject: Re: [PATCH net] vsock/virtio: fix potential unbounded skb queue
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Arseniy Krasnov <avkrasnov@salutedevices.com>, Bobby Eshleman <bobbyeshleman@meta.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "David S . Miller" <davem@davemloft.net>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Arseniy Krasnov <AVKrasnov@sberdevices.ru>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: AF37F4EC4B1
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 09/13] ice: fix setting RSS VSI hash for E830
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+To: Jacob Keller <jacob.e.keller@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Joshua Hay <joshua.a.hay@intel.com>, Madhu Chittim
+ <madhu.chittim@intel.com>, Willem de Bruijn <willemb@google.com>,
+ Dave Ertman <david.m.ertman@intel.com>, Ivan Vecera <ivecera@redhat.com>,
+ Grzegorz Nitka <grzegorz.nitka@intel.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org
+References: <20260504-jk-iwl-net-2026-05-04-v1-0-a222a88bd962@intel.com>
+ <20260504-jk-iwl-net-2026-05-04-v1-9-a222a88bd962@intel.com>
+ <068a5266-4721-4496-b027-3b32da3e02ea@intel.com>
+ <56e52628-d029-4919-95dd-aa6da13f3b08@linux.intel.com>
+Content-Language: en-US
+In-Reply-To: <56e52628-d029-4919-95dd-aa6da13f3b08@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 9AE9A4EC951
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285434-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[kernel.org,redhat.com,salutedevices.com,meta.com,davemloft.net,vger.kernel.org,gmail.com,sberdevices.ru,linux.alibaba.com,lists.linux.dev];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285435-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[marcin.szycik@linux.intel.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-On Thu, May 7, 2026 at 9:05=E2=80=AFAM Stefano Garzarella <sgarzare@redhat.=
-com> wrote:
->
-> On Thu, May 07, 2026 at 07:33:40AM -0700, Jakub Kicinski wrote:
-> >On Thu, 7 May 2026 14:59:13 +0200 Stefano Garzarella wrote:
-> >> >well if you want to support pathological cases such as 1 byte message=
-s
-> >> >that would mean like 100x reduction no?
-> >>
-> >> Yep, but since this patch is already merged, IMHO that is better than
-> >> losing data in those pathological cases.
-> >
-> >We can revert if you think that the risk of regression is high..
-> >Please LMK soon, we can do it before patch reaches Linus.
-> >
->
-> Some tests in tools/testing/vsock/vsock_test.c are failing with this
-> patch applied.
->
-> Test 18 are failing sometime in this way (I guess because we are
-> dropping packets):
->
-> 18 - SOCK_STREAM MSG_ZEROCOPY...hash mismatch
->
-> Test 22 is failing 100% in this way:
->
-> 22 - SOCK_STREAM virtio credit update + SO_RCVLOWAT...send failed:
-> Resource temporarily unavailable
->
->
-> With my followup patch adding also advertisement to the other peer
-> (still draft locally, waiting for Michael proposal) I saw 22 failing,
-> because tests expects that can use the entire buf_alloc, but now we are
-> reducing it.  So IMO we should do like in `__sock_set_rcvbuf()` and
-> double the buffer size, or at least digest an overhead equal to the
-> buffer size set by the user via SO_VM_SOCKETS_BUFFER_SIZE (yeah,
-> AF_VSOCK has it owns sockopt since the beginning :-().
->
-> With that approach tests are passing, but I'd like to stress a bit more
-> that patch. I'll send it tomorrow as fixup of this patch, or if you
-> prefer to revert, I'll send as standalone.
->
 
-A plain revert is a big issue, now users now how to crash hypervisors.
 
-This vulnerability allows a compromised guest (controlling
-virtio_vsock_hdr fields)
-to continuously flood the host's vsock receive queue without
-triggering any memory
- accounting limits or reader wakeups, resulting in unbounded host
-kernel memory consumption (Host DoS via OOM).
+On 07.05.2026 13:47, Marcin Szycik wrote:
+> 
+> 
+> On 06.05.2026 23:06, Jacob Keller wrote:
+>> On 5/4/2026 10:14 PM, Jacob Keller wrote:
+>>> From: Marcin Szycik <marcin.szycik@linux.intel.com>
+>>>
+>>> ice_set_rss_hfunc() performs a VSI update, in which it sets hashing
+>>> function, leaving other VSI options unchanged. However, ::q_opt_flags is
+>>> mistakenly set to the value of another field, instead of its original
+>>> value, probably due to a typo. What happens next is hardware-dependent:
+>>>
+>>> On E810, only the first bit is meaningful (see
+>>> ICE_AQ_VSI_Q_OPT_PE_FLTR_EN) and can potentially end up in a different
+>>> state than before VSI update.
+>>>
+>>> On E830, some of the remaining bits are not reserved. Setting them
+>>> to some unrelated values can cause the firmware to reject the update
+>>> because of invalid settings, or worse - succeed.
+>>>
+>>> Reproducer:
+>>>   sudo ethtool -X $PF1 equal 8
+>>>
+>>> Output in dmesg:
+>>>   Failed to configure RSS hash for VSI 6, error -5
+>>>
+>>> Fixes: 352e9bf23813 ("ice: enable symmetric-xor RSS for Toeplitz hash function")
+>>> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+>>> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>>> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+>>> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+>>> ---
+>>>  drivers/net/ethernet/intel/ice/ice_main.c | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+>>> index 1d1947a7fe11..c52c465280f7 100644
+>>> --- a/drivers/net/ethernet/intel/ice/ice_main.c
+>>> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+>>> @@ -8046,7 +8046,7 @@ int ice_set_rss_hfunc(struct ice_vsi *vsi, u8 hfunc)
+>>>  	ctx->info.q_opt_rss |=
+>>>  		FIELD_PREP(ICE_AQ_VSI_Q_OPT_RSS_HASH_M, hfunc);
+>>>  	ctx->info.q_opt_tc = vsi->info.q_opt_tc;
+>>> -	ctx->info.q_opt_flags = vsi->info.q_opt_rss;
+>>> +	ctx->info.q_opt_flags = vsi->info.q_opt_flags;
+>>>  
+>>>  	err = ice_update_vsi(hw, vsi->idx, ctx, NULL);
+>>>  	if (err) {
+>>>
+>>
+>> Sashiko complains about ice_set_rss_hfunc() but it is unrelated to this fix:
+>>
+>>> While looking at this function, I noticed a pre-existing issue regarding the
+>>> hardware cache. Does calling ice_update_vsi() with a local context leave the
+>>> global hw->vsi_ctx[vsi->idx] out of sync?
+>>> If ice_update_vsi() succeeds, vsi->info.q_opt_rss is updated, but
+>>> hw->vsi_ctx[vsi->idx]->info.q_opt_rss is not.
+>>> When an unrelated feature such as RDMA filtering is subsequently toggled via
+>>> ice_cfg_rdma_fltr(), could it retrieve this stale cached context via
+>>> ice_get_vsi_ctx() and copy the stale q_opt_rss value back into its command
+>>> buffer?
+> 
+> Yes.
+> 
+>>> Could this cause the firmware to silently revert the RSS hash function to its
+>>> previous configuration during the next ice_update_vsi() call?
+> 
+> No, because the context object passed to ice_update_vsi() only sets
+> ctx->info.valid_sections for the sections it wants to update, so unrelated
+> values are not updated in HW.
+> 
+> Looking at other ice_update_vsi() calls, most of the times the context object is
+> being allocated, not taken from cache. It's not immediately clear to me what
+> purpose does hw->vsi_ctx[] serve - it only appears to be used in
+> ice_cfg_rdma_fltr() (correct me if I'm wrong), where options from the cached
+> context are being read to fill the unchanged fields in the updated section.
+> This seems to be the equivalent of keeping track of context values in vsi->info,
+> which is what almost all ice_update_vsi() callers do.
+> If I had to guess, I'd say hw->vsi_ctx[] could probably be removed and vsi->info
+> used instead, but maybe I'm missing something.
+> 
+> TLDR I think this is just old, inconsistent code that could be improved, but it
+> needs some investigation. Until we don't have a clear signal that there's a bug,
+> I wouldn't touch it.
+> 
+>>> There also appears to be a pre-existing issue with state desynchronization
+>>> when handling failures. After ice_update_vsi() succeeds, vsi->rss_hfunc
+>>> is updated, but ice_set_rss_hfunc() then calls ice_set_rss_cfg_symm() at the
+>>> end of the function:
+>>> ice_set_rss_hfunc() {
+>>>         ...
+>>>         err = ice_update_vsi(hw, vsi->idx, ctx, NULL);
+>>>         if (err) {
+>>>                 ...
+>>>         } else {
+>>>                 vsi->info.q_opt_rss = ctx->info.q_opt_rss;
+>>>                 vsi->rss_hfunc = hfunc;
+>>>                 ...
+>>>         }
+>>>         ...
+>>>         return ice_set_rss_cfg_symm(hw, vsi, symm);
+>>> }
+>>> If ice_set_rss_cfg_symm() fails, the error is returned but vsi->rss_hfunc
+>>> remains updated. If the user retries the command, the early check:
+>>> if (hfunc == vsi->rss_hfunc)
+>>>         return 0;
+>>> evaluates to true and returns success immediately.
+>>> Could this skip the ice_set_rss_cfg_symm() retry entirely, leaving the
+>>> hardware's flow director rules in a non-symmetric state permanently while
+>>> falsely reporting success?
+> 
+> This looks valid.
 
-A vulnerability where a KVM guest can crash or deadlock its host is
-classified as a KVM DoS.
+On second thought, if we decide to rollback changes to VSI on ice_set_rss_cfg_symm()
+fail, we must call ice_update_vsi(), which then can also fail, still leaving us with
+hfunc programmed and symmetry not set. I'm not sure if it's worth adding rollback
+that can fail and still leave us with the original problem. User would just see 2 errors
+instead of 1.
+> Thanks,
+> Marcin
+> 
+>> Someone from the ice team should look into this and determine whether or
+>> not its valid.
 
-Am I missing something?
+
 
