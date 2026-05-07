@@ -1,162 +1,130 @@
-Return-Path: <netdev+bounces-285370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285368-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QLrFCJuq/GkNSgAAu9opvQ
-	(envelope-from <netdev+bounces-285370-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:07:07 +0200
+	id +MuIEkao/Gn5SQAAu9opvQ
+	(envelope-from <netdev+bounces-285368-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 16:57:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 764A14EAC91
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 17:07:06 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA5CD4EAAB7
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 16:57:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2F0D3304D273
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 15:03:18 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CB21B3003624
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 14:57:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7CA33FE340;
-	Thu,  7 May 2026 15:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0491335BBB;
+	Thu,  7 May 2026 14:57:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="wAEReb+L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eDs9EUZ8"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward205a.mail.yandex.net (forward205a.mail.yandex.net [178.154.239.88])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB2B37475D;
-	Thu,  7 May 2026 15:03:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDBB3306B37
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 14:57:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778166195; cv=none; b=J6HuKwcWkMh3qIDYk/3IiSArH9Nte/8e8LWEw4msD5OZM9SXkvU5AGGWOM6ZFczLw9UgUQZlnHlYj0vxXKaKTnEzEcywZ4Shhb+cp6hS6fLiAKLk3AtotBfk9hq65vSrip9un7ghGImt6x/NkwiFO/+ClA2dAVPbC/MBRd9uPnI=
+	t=1778165827; cv=none; b=JhAHyB/ANmbm0cO5EX8x1Mb3pwBJyJbQMDLG3rOpOG8lKD+V0YA74kIzQPsnPzpJl/XK9TITHI054wzdXl5iWWGARji98Z4+WdCpTsJMKIOkduK0Wh/Kql6DzPc6fMQmGyahGKF/bmE+3qIiXnd3zvU/IWxF+tqmR/jva6kYXAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778166195; c=relaxed/simple;
-	bh=iCcwHn3PwyBnBSZad+nWC2DF+AwUR6rNxGVyppWXBJM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CoiAm/+2OwWLd2LFjx6DIrq2zBwAHo5cPtWv3RBwgzbtNDrf91bXsmjJTTwnu8W3jHVMw3NHHBkiHnKgE3oU/vbcHXHvGqCWUO53JdNk6AKv08InnmAy9jhOSOvOK2SVZnbFf5+s6vVf7MZoZR9aww9QoC7rlTrJkDrpibq7HRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=wAEReb+L; arc=none smtp.client-ip=178.154.239.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from forward102a.mail.yandex.net (forward102a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d102])
-	by forward205a.mail.yandex.net (Yandex) with ESMTPS id 37107C438F;
-	Thu, 07 May 2026 17:55:58 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-92.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-92.vla.yp-c.yandex.net [IPv6:2a02:6b8:c1f:251b:0:640:cb7f:0])
-	by forward102a.mail.yandex.net (Yandex) with ESMTPS id E769AC00A3;
-	Thu, 07 May 2026 17:55:49 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-92.vla.yp-c.yandex.net (smtp) with ESMTPSA id etGDd1BR6Os0-sxH9wjHG;
-	Thu, 07 May 2026 17:55:48 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1778165749; bh=gBiLkkqLS1qi99jQalgMcLGIABwjmzVWsvCQuE6QxgA=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=wAEReb+LJ51rEjGaOWxY52rmq6fNaXfrgevXRMoh4nrQaN3lPSKVuP9CiRyxj9QVt
-	 XLrbmiKcvlzicyG+SEUgQ3ouK1MOR/9MAez86k1ap3hmEMPLuntIkgAfdA4HgNsUEO
-	 S7tZgzJMfnls3ggp4Rp3m6mAe9KJ4JSA1bYMnnBM=
-Authentication-Results: mail-nwsmtp-smtp-production-main-92.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-From: Evgenii Burenchev <evg28bur@yandex.ru>
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Evgenii Burenchev <evg28bur@yandex.ru>,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kees@kernel.org,
-	horms@kernel.org,
-	bhelgaas@google.com,
-	darinzon@amazon.com,
-	Yuval.Mintz@qlogic.com,
-	manish.chopra@qlogic.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH net v2] qed: fix division by zero in qed_init_wfq_param when all vports are configured
-Date: Thu,  7 May 2026 17:55:17 +0300
-Message-ID: <20260507145520.23106-1-evg28bur@yandex.ru>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1778165827; c=relaxed/simple;
+	bh=PvLSEysbifg565g3DA6jS+loymliEvUT/DPan/JtIj8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fxWgVq+VGV+bc/J1j8YcSLt2N7syBBaFIP/37y21zFx6I88lwjO8gO0CGlKC07hodoAHradFyJtHrLc07q5zjSqKe+5hTX+yac/DuNWphGIeXU0smlsb12p2ifedZ5aGZb4EDpKrPjMhBJiRYNNmfZ6XhyxE9ZwzXcu0YRkzBCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eDs9EUZ8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F36CEC2BCB2;
+	Thu,  7 May 2026 14:57:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778165827;
+	bh=PvLSEysbifg565g3DA6jS+loymliEvUT/DPan/JtIj8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=eDs9EUZ8Bz5yN1EJbllC0ymG+SIounyLI9S/E36E1dOqlrM0/AwtfhYrbVrnK6ipt
+	 AJMYDS9kkYC7YKl2V8qdS3U8E1uhQgZ2ct+wGA+MjeVVH8HglufD9xsowrUyRNN/FX
+	 pJPXrr5gqFqYDyccCOp9ZGMhOEMDtO4KLYPhvOpVurKyduhJfCMGdtQsuue0Y36S5K
+	 lLDtJ4kCRyVKiVSB0N9H4mx1asfASuX7woi1Td0GA/3iKC73ydLJeWLrrJQr+6mbID
+	 qrtsRE/bbjhem2h7KMJ6+ObLWDIfM/CP5vOcqsdLrPXinPUd58PSuJ9o0p0gRdF9LC
+	 Iko+KIE65J3rg==
+Message-ID: <749c97fa-9836-47af-a7ee-76b15bf54e21@kernel.org>
+Date: Thu, 7 May 2026 08:57:06 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 764A14EAC91
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 0/3] ipv4: Flush the FIB once on multiple
+ nexthop removal
+Content-Language: en-US
+To: Cosmin Ratiu <cratiu@nvidia.com>, netdev@vger.kernel.org
+Cc: Ido Schimmel <idosch@nvidia.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20260507075606.322405-1-cratiu@nvidia.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20260507075606.322405-1-cratiu@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: DA5CD4EAAB7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[yandex.ru,none];
-	R_DKIM_ALLOW(-0.20)[yandex.ru:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[yandex.ru,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,amazon.com,qlogic.com,vger.kernel.org,linuxtesting.org];
+	TAGGED_FROM(0.00)[bounces-285368-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[yandex.ru];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-285370-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[evg28bur@yandex.ru,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[yandex.ru:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-In qed_init_wfq_param(), variable non_requested_count can become zero
-when the number of vports with the configured flag set (including the
-current vport being configured) equals total num_vports. This happens
-when configuring the last unconfigured vport or when re-configuring
-an already configured vport.
+On 5/7/26 1:56 AM, Cosmin Ratiu wrote:
+> This series optimizes multiple nexthop removal performance from having
+> to do a FIB flush for each nexthop being removed to only doing a single
+> FIB flush after all nexthops are removed.
+> 
+> This dramatically improves performance in scenarios where there are
+> many nexthops and many ipv4 routes. Please see individual patches for
+> more details and for a test scenario.
+> 
+> V2 -> V3: https://lore.kernel.org/netdev/8fea4084-c9ec-472a-b8ab-ecc87e537216@kernel.org/T/#t
+> - Split the patch into 3 (Ido Schimmel, David Ahern)
+> - Used WARN_ON_ONCE instead of WARN_ON (Ido Schimmel)
+> 
+> V1 -> V2:
+> - Fixes xmas tree in a couple places (Kuniyuki Iwashima)
+> - Added __must_check to remove_nexthop_from_groups() (Kuniyuki Iwashima)
+> 
+> Cosmin Ratiu (3):
+>   ipv4: Provide a FIB flushing signal from nexthop removal functions
+>   ipv4: Flush the FIB once on multiple nexthop removal
+>   ipv4: Add __must_check to nexthop removal functions
+> 
+>  net/ipv4/nexthop.c | 88 +++++++++++++++++++++++++++++-----------------
+>  1 file changed, 56 insertions(+), 32 deletions(-)
+> 
 
-The function then calculates left_rate_per_vp = total_left_rate /
-non_requested_count, which causes division by zero.
+Much easier to follow. Thank you.
 
-Fix this by skipping the division when non_requested_count is zero.
-In that case, there is no remaining bandwidth to distribute, so just
-record the configuration for the current vport and return success.
-
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
-
-Fixes: bcd197c81f63 ("qed: Add vport WFQ configuration APIs")
-Signed-off-by: Evgenii Burenchev <evg28bur@yandex.ru>
----
-Changes in v2:
-- Return success instead of -EINVAL when non_requested_count is zero
-- Add Fixes tag
-- Clarify commit message: explain both scenarios that lead to non_requested_count == 0
----
- drivers/net/ethernet/qlogic/qed/qed_dev.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_dev.c b/drivers/net/ethernet/qlogic/qed/qed_dev.c
-index 42c6dcfb1f0f..dd75c47758e1 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_dev.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_dev.c
-@@ -5103,6 +5103,13 @@ static int qed_init_wfq_param(struct qed_hwfn *p_hwfn,
- 		return -EINVAL;
- 	}
- 
-+	/* All vports are already or become configured, nothing to distribute */
-+	if (non_requested_count == 0) {
-+		p_hwfn->qm_info.wfq_data[vport_id].min_speed = req_rate;
-+		p_hwfn->qm_info.wfq_data[vport_id].configured = true;
-+		return 0;
-+	}
-+
- 	total_left_rate	= min_pf_rate - total_req_min_rate;
- 
- 	left_rate_per_vp = total_left_rate / non_requested_count;
--- 
-2.43.0
+For the set:
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
 
