@@ -1,69 +1,65 @@
-Return-Path: <netdev+bounces-285269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285188-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CJ/vGJx2/Gm3QQAAu9opvQ
-	(envelope-from <netdev+bounces-285269-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:25:16 +0200
+	id IG9tIclP/GlOOAAAu9opvQ
+	(envelope-from <netdev+bounces-285188-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 10:39:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 074734E76E3
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:25:16 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 064654E4F73
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 10:39:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 910B03031E91
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 11:23:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EC6E930ADE74
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 08:31:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03D543BE164;
-	Thu,  7 May 2026 11:23:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2D139DBC2;
+	Thu,  7 May 2026 08:31:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A494A3C457C
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 11:23:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [207.46.229.174])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D47AF38F247;
+	Thu,  7 May 2026 08:31:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.46.229.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778153012; cv=none; b=AvNh3UO1p8EKYvHrXMr8wLEd1bNpU7z6Cf2HCmo7JQSB3RvuQadVrLbFYvGxulsdI6hsQNrbNOz7VLpem2HQ6WoyOH/ERjnad5/1hd585acPrOecUDI0qgWMEsJBsphSXW1IuTL3/l8YtvCe+rbUOmAcnL6KoV3BaMHylxjIFRI=
+	t=1778142685; cv=none; b=fxHr9LWj23sAdzOW1Sagqqn1nJbhhdAsJXgKrluDvElXQlMSnR67KBIdJZRBGw8aksFPzgvi8BPCJEKiIht6EmXEs3nzpnI/Nv8zZ8eqX6Z4mQcyiK959hVWgRp05RBRS6W1wwEgz7fqA/21za3VGYodqlAucoN0U4OBe8zykXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778153012; c=relaxed/simple;
-	bh=cqQ3bd1BbIIz1RvSUCEvedVw8QOoXwyj7R7QNKLoSpU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T3OUqqIGRRkQilsYET8Pqtl0O7WtmN3kW+i/16HuVpNpGryhH60laGijAVphbpqaySsqo8DzA9NQ6eTaQJVeZ4V5ef0IdATEaaKq/qYs3rLp4QMCvYsGi4fQRuuNkGgawKyZF8TAEiZqGFyj6uJBnCB7Xml4kcw55dTGJ7c9aQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1wKwp9-0002vu-Vp; Thu, 07 May 2026 13:23:23 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1wKwp9-000ufp-0i;
-	Thu, 07 May 2026 13:23:23 +0200
-Received: from blackshift.org (p4ffb2dc6.dip0.t-ipconnect.de [79.251.45.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519MLKEM768 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 6D0C553040B;
-	Thu, 07 May 2026 11:23:23 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
+	s=arc-20240116; t=1778142685; c=relaxed/simple;
+	bh=XrtsCq/rDtxFPG2DkwPBIpSilAw7decXavNehd5BZ1U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Qf8sz8kGZR1uvvJs+3PLRPrPkamZbobOUcCixamwTJ9jWxxTckpvFboWeu1fisDervWrK/ADRHMWUKoMmDXlA4j4vD+3mJPZLdjKdosF5mar0q1ccGmUhy58pSf8WX7slcexoVROc1Pq8lA4zi1mVjnTVetOKDAktqWHy7Yva+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=207.46.229.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
+Received: from E0004057DT.eswin.cn (unknown [10.11.96.26])
+	by app2 (Coremail) with SMTP id TQJkCgBHXqG0Tfxps3kXAA--.38748S2;
+	Thu, 07 May 2026 16:30:45 +0800 (CST)
+From: lizhi2@eswincomputing.com
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
 	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net 6/6] can: flexcan: disable all IRQ lines in flexcan_chip_interrupts_enable()
-Date: Thu,  7 May 2026 10:22:28 +0200
-Message-ID: <20260507112321.439968-7-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260507112321.439968-1-mkl@pengutronix.de>
-References: <20260507112321.439968-1-mkl@pengutronix.de>
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	rmk+kernel@armlinux.org.uk,
+	maxime.chevallier@bootlin.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Cc: ningyu@eswincomputing.com,
+	linmin@eswincomputing.com,
+	pinkesh.vaghela@einfochips.com,
+	pritesh.patel@einfochips.com,
+	weishangjuan@eswincomputing.com,
+	Zhi Li <lizhi2@eswincomputing.com>
+Subject: [PATCH net v1 0/2] net: stmmac: eic7700: fix delay calculation and initialization ordering
+Date: Thu,  7 May 2026 16:30:36 +0800
+Message-ID: <20260507083037.152-1-lizhi2@eswincomputing.com>
+X-Mailer: git-send-email 2.52.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,93 +67,108 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Rspamd-Queue-Id: 074734E76E3
+X-CM-TRANSID:TQJkCgBHXqG0Tfxps3kXAA--.38748S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7ur47uFy3Kw4UAr1UCF4UArb_yoW8Kryxpa
+	95Kr15t340qFyxGwn2vF1Iqa4rXay8Ga15Cr1rXr95Z3Z8CF9Yyr1xKw4DuFy7Ar4xZF1Y
+	vryjq3Z8Ca4qyaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBv14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxkF7I0En4kS14v26r4a6rW5MxkIecxEwVCm-wCF04
+	k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18
+	MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr4
+	1lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1l
+	IxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4
+	A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRkwIhUUUUU=
+X-CM-SenderInfo: xol2xx2s6h245lqf0zpsxwx03jof0z/
+X-Rspamd-Queue-Id: 064654E4F73
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_FROM(0.00)[bounces-285269-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
+	DMARC_NA(0.00)[eswincomputing.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,st-md-mailman.stormreply.com,lists.infradead.org];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[mkl@pengutronix.de,netdev@vger.kernel.org];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	TAGGED_FROM(0.00)[bounces-285188-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-0.966];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[pengutronix.de:email,pengutronix.de:mid,nxp.com:email,msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	FROM_NEQ_ENVFROM(0.00)[lizhi2@eswincomputing.com,netdev@vger.kernel.org]
 X-Rspamd-Action: no action
 
-From: Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
+From: Zhi Li <lizhi2@eswincomputing.com>
 
-flexcan_chip_interrupts_enable() disables only the primary IRQ line while
-writing to the IMASK and CTRL registers.
+This series fixes several issues in the EIC7700 DWMAC glue driver
+affecting existing eth0 functionality due to incorrect delay programming
+and initialization ordering.
 
-On multi-IRQ platforms (S32G2, MCF5441X), the additional IRQ lines (boff,
-err, secondary-mb) remain active so their handlers can fire while
-registers are inconsistent.
+The previous implementation used an incorrect delay step (100 ps),
+while the hardware operates with 20 ps granularity. This resulted in
+incorrect programming of RX/TX delay values relative to the actual
+hardware timing model.
 
-Disable all registered IRQ lines around the IMASK/CTRL writes. This
-also fixes the resume path, which calls this function.
+In addition, the driver did not guarantee that clocks were enabled
+before accessing HSP CSR registers, and did not explicitly clear
+TXD/RXD delay registers, which may leave residual configuration from
+the bootloader and affect RGMII timing determinism.
 
-Signed-off-by: Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
-Link: https://patch.msgid.link/20260326135825.3428856-3-ciprianmarian.costea@oss.nxp.com
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/flexcan/flexcan-core.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+The device tree binding is updated to reflect the actual hardware delay
+model and to clarify the semantics of MAC-side delay configuration,
+aligning it with the real programming model without changing the
+intended semantic meaning of the properties.
 
-diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/flexcan/flexcan-core.c
-index f5d22c61503f..b3bb9acc5a2c 100644
---- a/drivers/net/can/flexcan/flexcan-core.c
-+++ b/drivers/net/can/flexcan/flexcan-core.c
-@@ -1430,14 +1430,28 @@ static void flexcan_chip_interrupts_enable(const struct net_device *dev)
- {
- 	const struct flexcan_priv *priv = netdev_priv(dev);
- 	struct flexcan_regs __iomem *regs = priv->regs;
-+	u32 quirks = priv->devtype_data.quirks;
- 	u64 reg_imask;
- 
- 	disable_irq(dev->irq);
-+	if (quirks & FLEXCAN_QUIRK_NR_IRQ_3) {
-+		disable_irq(priv->irq_boff);
-+		disable_irq(priv->irq_err);
-+	}
-+	if (quirks & FLEXCAN_QUIRK_SECONDARY_MB_IRQ)
-+		disable_irq(priv->irq_secondary_mb);
-+
- 	priv->write(priv->reg_ctrl_default, &regs->ctrl);
- 	reg_imask = priv->rx_mask | priv->tx_mask;
- 	priv->write(upper_32_bits(reg_imask), &regs->imask2);
- 	priv->write(lower_32_bits(reg_imask), &regs->imask1);
- 	enable_irq(dev->irq);
-+	if (quirks & FLEXCAN_QUIRK_SECONDARY_MB_IRQ)
-+		enable_irq(priv->irq_secondary_mb);
-+	if (quirks & FLEXCAN_QUIRK_NR_IRQ_3) {
-+		enable_irq(priv->irq_boff);
-+		enable_irq(priv->irq_err);
-+	}
- }
- 
- static void flexcan_chip_interrupts_disable(const struct net_device *dev)
+Changes in this series:
+  - Correct delay step from 100 ps to 20 ps and validate input range
+  - Ensure clocks are enabled before CSR access
+  - Clear TXD/RXD delay registers during initialization
+  - Update dt-binding to use range-based constraints (0-2540 ps, 20 ps step)
+  - Make delay properties optional depending on RGMII mode
+  - Clarify MAC-side delay semantics in binding documentation
+
+These changes correct eth0 behavior and hardware programming correctness
+for existing usage.
+
+The previous revisions (v1-v7) mixed bug fixes and new functionality.
+Based on review feedback, the changes are now split, and this series
+contains only fixes targeting the net tree. Eth1 enablement will be
+submitted separately to net-next.
+
+Previous discussion:
+  https://lore.kernel.org/lkml/20260427072353.1114-1-lizhi2@eswincomputing.com/
+
+This binding update is safe as there are currently no in-tree users
+relying on the previous enum-based representation.
+
+Zhi Li (2):
+  dt-bindings: ethernet: eswin: refine delay model and HSP register
+    description
+  net: stmmac: eic7700: fix delay step calculation and ensure safe
+    register initialization
+
+ .../bindings/net/eswin,eic7700-eth.yaml       |  50 ++++--
+ .../ethernet/stmicro/stmmac/dwmac-eic7700.c   | 154 +++++++++++++-----
+ 2 files changed, 148 insertions(+), 56 deletions(-)
+
 -- 
-2.53.0
+2.25.1
 
 
