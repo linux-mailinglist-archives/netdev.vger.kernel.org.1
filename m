@@ -1,224 +1,235 @@
-Return-Path: <netdev+bounces-285230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285231-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gALwLT5q/Gn0PgAAu9opvQ
-	(envelope-from <netdev+bounces-285230-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 12:32:30 +0200
+	id cIfPC8Nq/Gn0PgAAu9opvQ
+	(envelope-from <netdev+bounces-285231-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 12:34:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 574274E6CF0
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 12:32:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8230C4E6D68
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 12:34:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9CF2E300C0EA
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 10:32:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6DEF1300FC4D
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 10:34:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDB5E3DA5BE;
-	Thu,  7 May 2026 10:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B10983E8C59;
+	Thu,  7 May 2026 10:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e/1dKtL6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NXATEYnn";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="GryFukaL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1F062809;
-	Thu,  7 May 2026 10:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183D23E95A9
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 10:34:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778149946; cv=none; b=YwYKN2x0soMXIobgrWVM0THfrWDJU5mBqb/C7whdWJLfBnGNi21+xc8IgmSHvr2VNQ2f/zf2eotjn5EviDEGGkcwvBNorIKPqyMDaaxZTLEKuSIy9whm0h97OE6XTFkF8JTG+1Wz9vAtosfeo9ZsBFv7xIJpBCCNsdEexqdlF/w=
+	t=1778150071; cv=none; b=OmxlS6Ctaoei58cgO1QLZ6N/0IQm7FTAggYeDkpWVCZJj0GEasgCSxp4FMvxv6PUGmnM/+EEMQDmIgO0z24onZptC+sfnkI6ihmLCtRwMnv4cLCVyNVe+euKCVDUCPNeRtsS6NBc9tiz2DDpRKFWu9OAyR631AmeO5tjMJf41S0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778149946; c=relaxed/simple;
-	bh=in0biBZ5KRChoMmc9KgpTQGWMkI7BtYNg69sNv8gMbM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k+qM8JAmC8jbEpIQ2023WZalgF9rR/Z8/6avsKUJs7x3UInSqk+0tY+rkcsBY484cSidKYA+OdzVbFrVktS7WYr7yJQL8H1T0nzcMEHF5H1lRvN8ZxLduo5rfhQ+/n3m2Ax3hmVNCRv0mWk3/sPyBrfDosTmGBIsGkX5Emxs0BE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e/1dKtL6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E57C8C2BCB2;
-	Thu,  7 May 2026 10:32:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778149946;
-	bh=in0biBZ5KRChoMmc9KgpTQGWMkI7BtYNg69sNv8gMbM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=e/1dKtL6ySpO2w2Lvwj17bD1ZI8PA1dnyseT03SJBkRPtKo/mrJY1kRM4HcJiO03V
-	 wjjfiquumMnB2b3CC+aOCIXRSyHayGreDdpKcj1kjIYzfZPqqRyKl6nW4VBi3Yoss5
-	 h063FuRFRDHVsfHhYTp8j5u8qwf+7FvOfYAyXlLrrLbPNKCIq9oDn1dGgnEndd2qKn
-	 rhohUhUZ/G3zWvy+jn4Ac0izYHMXJ5/4VP2uUfJu8al9Lunc0mmxL4P/gYo9ZH80LU
-	 d0Amo3Beeg57poW1W8S/zo3m1JnHeLC1zNKv0SPltuxX7biTckHAmyAkrKyEtdc/3B
-	 wD+V+0XcpFa7A==
-Date: Thu, 7 May 2026 11:32:21 +0100
-From: Simon Horman <horms@kernel.org>
-To: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
-Cc: khai.wen.tan@linux.intel.com, anthony.l.nguyen@intel.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, faizal.abdul.rahim@intel.com,
-	hong.aun.looi@intel.com, khai.wen.tan@intel.com
-Subject: Re: [PATCH iwl-next v4 3/3] igc: add support for forcing link speed
- without autonegotiation
-Message-ID: <20260507103221.GJ15617@horms.kernel.org>
-References: <20260428060009.311393-4-khai.wen.tan@linux.intel.com>
- <20260430135057.1653330-1-horms@kernel.org>
- <16b18088-8fe3-4a38-9eb9-d39842e6b94f@linux.intel.com>
+	s=arc-20240116; t=1778150071; c=relaxed/simple;
+	bh=Gwjd0XD6/QbMMm4Izy0RkPLTGA2CEqD3rsj6B1S4mP0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KX2aRY6x0BHlpVV6/dVAWA/X0VZxksEJpM/Y8EYKIJUnXDdqzzgJlgXfjsdLvOEkOBGJBjH+eTWdsn6njR9D1m3/V3fmCzbO6Wkha+oPYZXQZJjXLYS0aOjlFmJ7smUISIth/tzSXCO8P+OuEYRKckFZLa9T4HfN2YAxv2L5vGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NXATEYnn; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=GryFukaL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778150069;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/kRzfpi6h8be8cBkbFeSW4gWzrbliYroPfK4BwMv/Uw=;
+	b=NXATEYnnQSZMEzrR5EIt1YGyxHOknbpvbrQ/Ejpydgte5KRq9IFY089JLIELmrFOikQIW4
+	sQkaRUlal9FEA5uvpg6bLUBDzOMSTlqXToaQWklvg4k7WrEB1u4gavYZ8KTVq3LOijVEpO
+	bs+GPN8Qb1COcLFjGbbnE8HVf366CNE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-136-tGXf7MMrOEO4nfczGwbj3w-1; Thu, 07 May 2026 06:34:27 -0400
+X-MC-Unique: tGXf7MMrOEO4nfczGwbj3w-1
+X-Mimecast-MFC-AGG-ID: tGXf7MMrOEO4nfczGwbj3w_1778150067
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-48d121738feso5715515e9.2
+        for <netdev@vger.kernel.org>; Thu, 07 May 2026 03:34:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1778150067; x=1778754867; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/kRzfpi6h8be8cBkbFeSW4gWzrbliYroPfK4BwMv/Uw=;
+        b=GryFukaLoqiy8mFOGmiL4v6b05m70gJvPUioRBAQfdiA7/js7XsSguEtiBnSqgh8wn
+         ALgwJDgy9uII+67ylUf0gEGT4Tv2M8tmCGGxGd9MkKVeyR8d1ofD0oeBGSxdunlJS2m6
+         sSVFe6JlhUue9mEdYR69fNKFAakcdvtn2Haq+qnjjpfUl94e7H7clHOcij4PDss8+4GH
+         0sqCUkNKSrtOnwEFeu3rhU/qjARO1oVmTzNijKR0xCSrB6O2iXLMnw4seh5tSR44Lcjz
+         u6ZHTG04S53a63hLdDUnm2bow01Yh+X8W4LDbBkBfjTMeKU5N4toGG+UomlZovGAeBPt
+         UyQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778150067; x=1778754867;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/kRzfpi6h8be8cBkbFeSW4gWzrbliYroPfK4BwMv/Uw=;
+        b=H91VU72uTR5344iyeP0Q0ohJp65j33tuqlu9pOy2Sxf60Zla3w8BODd13l9YJxT4VF
+         YxNiDjcY6HEE4ew7krNHmqktTyMvLGu0ys/M4NO6vME2JNfnPhhxajwVvjebiqwk+8Vk
+         WxIHg2zXGvqA/u3E/bpXhvGFzlcx86ShUsr8KW/wFXLkzg8GKw0yvF19IAAlzbqXPEj8
+         VLvvcBQ4exwhCsAtLYyHik4begjFvCI35fvqKhR7tcw1ZMvnD4/bQB9EK12QGtM6AdYM
+         mkc4rF/8btSDmnvUW7AsUILue/eMFh5SaCzHQ/3P7ZrONNC7SIGpwS9XWlA0Q/WllFyZ
+         1Ncg==
+X-Gm-Message-State: AOJu0Yxj6DttAEpR48ua3zFO8ecoTkSiUwwukGjju0x8HSQ1WICZqSYx
+	8YvF89OnPad7lzkRJoz0MLdh5x+NEqPZalUdXKIDGRvCySHsaMMuuO7BMIO+01eslUySKiLc1hD
+	qCW13sJ/0HICVnFq8dtBZrdp5aOtbY+4qqryXjZXCqv9BBR+Usgm549Rxag==
+X-Gm-Gg: AeBDiesocBtmsDn+Kinx1M81Ey546cfsZ9jZjl8fdmWU+OYkoIyw8baGXyzdsnzep5k
+	Kc54Ej6jJt4njsvvxaOuPJaFb0f5wzxLJSztkxWKYaUatthXDMMjHV6qUhfs/OG3ZNoloD9mA3W
+	cIDPd+0zc6RbBw7hmblYGJom99/HBzjfCt/BKbmIUHjDILBXk6UV4b+f3b947Bt6zLVje0lQ8Ee
+	lyEF0nNxmPL74O2E5/HuCMTh3wirnbPJz7hX8LvbwhJHEenS0RZCAtPD261bQhtv79hrpt4MvFV
+	VFOsEjp0oTM/xUo59T5IrKLcgoC7UrDsYXu9ovFwUZqEHNAGe4s2vdIU6CTMiKpx8vXj3XpN7pY
+	T4oGEnfinkIeYqUXx/QLsKx50PLsb47s3Zj3eSbA2luXiZU5rNC5gQOjzQQyM2rKKrg==
+X-Received: by 2002:a05:600c:871b:b0:483:709e:f238 with SMTP id 5b1f17b1804b1-48e51f4652fmr124504025e9.29.1778150066549;
+        Thu, 07 May 2026 03:34:26 -0700 (PDT)
+X-Received: by 2002:a05:600c:871b:b0:483:709e:f238 with SMTP id 5b1f17b1804b1-48e51f4652fmr124503325e9.29.1778150065969;
+        Thu, 07 May 2026 03:34:25 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.93.82])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45052a48b23sm20028528f8f.14.2026.05.07.03.34.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 May 2026 03:34:25 -0700 (PDT)
+Message-ID: <6cec0c03-5bdc-4131-9899-bc5c77fba198@redhat.com>
+Date: Thu, 7 May 2026 12:34:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <16b18088-8fe3-4a38-9eb9-d39842e6b94f@linux.intel.com>
-X-Rspamd-Queue-Id: 574274E6CF0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] eth: fbnic: fix double-free of PCS on phylink
+ creation failure
+To: Bobby Eshleman <bobbyeshleman@gmail.com>,
+ Alexander Duyck <alexanderduyck@fb.com>, Jakub Kicinski <kuba@kernel.org>,
+ kernel-team@meta.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Bobby Eshleman <bobbyeshleman@meta.com>
+References: <20260504-fbnic-pcs-fix-v2-1-de45192821d9@meta.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260504-fbnic-pcs-fix-v2-1-de45192821d9@meta.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 8230C4E6D68
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285230-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,fb.com,kernel.org,meta.com,lunn.ch,davemloft.net,google.com,armlinux.org.uk];
+	TAGGED_FROM(0.00)[bounces-285231-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
 X-Rspamd-Action: no action
 
-On Wed, May 06, 2026 at 02:25:23PM +0800, Abdul Rahim, Faizal wrote:
+On 5/5/26 3:42 AM, Bobby Eshleman wrote:
+> From: Bobby Eshleman <bobbyeshleman@meta.com>
 > 
+> fbnic_phylink_create() stores the newly allocated PCS in fbn->pcs and
+> then calls phylink_create(). When phylink_create() fails, the error path
+> correctly destroys the PCS via xpcs_destroy_pcs(), but the caller,
+> fbnic_netdev_alloc(), responds by invoking fbnic_netdev_free() which
+> calls fbnic_phylink_destroy(). That function finds fbn->pcs non-NULL and
+> calls xpcs_destroy_pcs() a second time on the already-freed object,
+> triggering a refcount underflow use-after-free:
 > 
-> On 30/4/2026 9:50 pm, Simon Horman wrote:
-> > From: 'Simon Horman' <horms@kernel.org>
-> > 
-> > This is an AI-generated review of your patch. The human sending this
-> > email has considered the AI review valid, or at least plausible.
-> > Full review at: https://sashiko.dev
-> > ---
-> > igc: add support for forcing link speed without autonegotiation
-> > 
-> > This commit allows users to force 10/100 Mb/s link speed and duplex via
-> > ethtool when autonegotiation is disabled. Previously, the driver rejected
-> > these requests.
-> > 
-> >> diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-> >> index cfcbf2fdad6e..9997ebbdf778 100644
-> >> --- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-> >> +++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-> > [ ... ]
-> >> @@ -2000,6 +2013,41 @@ static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
-> >>  	return 0;
-> >>  }
-> >>  
-> >> +/**
-> >> + * igc_handle_autoneg_disabled - Configure forced speed/duplex settings
-> >> + * @adapter: private driver structure
-> >> + * @speed: requested speed (must be SPEED_10 or SPEED_100)
-> >> + * @duplex: requested duplex
-> >> + *
-> >> + * Records forced speed/duplex when autoneg is disabled.
-> >> + * Caller must validate speed before calling this function.
-> >> + */
-> >> +static void igc_handle_autoneg_disabled(struct igc_adapter *adapter, u32 speed,
-> >> +					u8 duplex)
-> >> +{
-> >> +	struct igc_mac_info *mac = &adapter->hw.mac;
-> >> +
-> >> +	switch (speed) {
-> >> +	case SPEED_10:
-> >> +		mac->forced_speed_duplex = (duplex == DUPLEX_FULL) ?
-> >> +			IGC_FORCED_10F : IGC_FORCED_10H;
-> >> +		break;
-> >> +	case SPEED_100:
-> >> +		mac->forced_speed_duplex = (duplex == DUPLEX_FULL) ?
-> >> +			IGC_FORCED_100F : IGC_FORCED_100H;
-> >> +		break;
-> >> +	default:
-> >> +		WARN_ONCE(1, "Unsupported speed %u\n", speed);
-> >> +		return;
-> >> +	}
-> >> +
-> >> +	mac->autoneg_enabled = false;
-> >> +
-> >> +	/* Half-duplex cannot support flow control per IEEE 802.3 */
-> >> +	if (duplex != DUPLEX_FULL)
-> >> +		adapter->hw.fc.requested_mode = igc_fc_none;
-> > 
-> > Does this permanently overwrite the user's flow control preference?
-> > 
-> > If half-duplex is requested, requested_mode is set to igc_fc_none. Because
-> > requested_mode represents the persistent state for the user's flow control
-> > preference, the user might permanently lose their configuration. If they later
-> > switch back to full-duplex, requested_mode remains igc_fc_none, and flow
-> > control stays disabled.
-> > 
-> > Would it be better to dynamically override hw->fc.current_mode to
-> > igc_fc_none during link configuration instead of mutating requested_mode?
-> > 
+> [   1.934973] fbnic 0000:01:00.0: Failed to create Phylink interface, err: -22
+> [   1.935103] ------------[ cut here ]------------
+> [   1.935179] refcount_t: underflow; use-after-free.
+> [   1.935252] WARNING: lib/refcount.c:28 at refcount_warn_saturate+0x59/0x90, CPU#0: swapper/0/1
+> [   1.935389] Modules linked in:
+> [   1.935484] CPU: 0 UID: 0 PID: 1 Comm: swapper/0 Not tainted 7.0.0-virtme-04244-g1f5ffc672165-dirty #1 PREEMPT(lazy)
+> [   1.935661] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+> [   1.935826] RIP: 0010:refcount_warn_saturate+0x59/0x90
+> [   1.935931] Code: 44 48 8d 3d 49 f9 a7 01 67 48 0f b9 3a e9 bf 1e 96 00 48 8d 3d 48 f9 a7 01 67 48 0f b9 3a c3 cc cc cc cc 48 8d 3d 47 f9 a7 01 <67> 48 0f b9 3a c3 cc cc cc cc 48 8d 3d 46 f9 a7 01 67 48 0f b9 3a
+> [   1.936274] RSP: 0000:ffffd0d440013c58 EFLAGS: 00010246
+> [   1.936376] RAX: 0000000000000000 RBX: ffff8f39c188c278 RCX: 000000000000002b
+> [   1.936524] RDX: ffff8f39c004f000 RSI: 0000000000000003 RDI: ffffffff96abab00
+> [   1.936692] RBP: ffff8f39c188c240 R08: ffffffff96988e88 R09: 00000000ffffdfff
+> [   1.936835] R10: ffffffff96878ea0 R11: 0000000000000187 R12: 0000000000000000
+> [   1.936970] R13: ffff8f39c0cef0c8 R14: ffff8f39c1ac01c0 R15: 0000000000000000
+> [   1.937114] FS:  0000000000000000(0000) GS:ffff8f3ba08b4000(0000) knlGS:0000000000000000
+> [   1.937273] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [   1.937382] CR2: ffff8f3b3ffff000 CR3: 0000000172642001 CR4: 0000000000372ef0
+> [   1.937540] Call Trace:
+> [   1.937619]  <TASK>
+> [   1.937698]  xpcs_destroy_pcs+0x25/0x40
+> [   1.937783]  fbnic_netdev_alloc+0x1e5/0x200
+> [   1.937859]  fbnic_probe+0x230/0x370
+> [   1.937939]  local_pci_probe+0x3e/0x90
+> [   1.938013]  pci_device_probe+0xbb/0x1e0
+> [   1.938091]  ? sysfs_do_create_link_sd+0x6d/0xe0
+> [   1.938188]  really_probe+0xc1/0x2b0
+> [   1.938282]  __driver_probe_device+0x73/0x120
+> [   1.938371]  driver_probe_device+0x1e/0xe0
+> [   1.938466]  __driver_attach+0x8d/0x190
+> [   1.938560]  ? __pfx___driver_attach+0x10/0x10
+> [   1.938663]  bus_for_each_dev+0x7b/0xd0
+> [   1.938758]  bus_add_driver+0xe8/0x210
+> [   1.938854]  driver_register+0x60/0x120
+> [   1.938929]  ? __pfx_fbnic_init_module+0x10/0x10
+> [   1.939026]  fbnic_init_module+0x25/0x60
+> [   1.939109]  do_one_initcall+0x49/0x220
+> [   1.939202]  ? rdinit_setup+0x20/0x40
+> [   1.939304]  kernel_init_freeable+0x1b0/0x310
+> [   1.939449]  ? __pfx_kernel_init+0x10/0x10
+> [   1.939560]  kernel_init+0x1a/0x1c0
+> [   1.939640]  ret_from_fork+0x1ed/0x240
+> [   1.939730]  ? __pfx_kernel_init+0x10/0x10
+> [   1.939805]  ret_from_fork_asm+0x1a/0x30
+> [   1.939886]  </TASK>
+> [   1.939927] ---[ end trace 0000000000000000 ]---
+> [   1.940184] fbnic 0000:01:00.0: Netdev allocation failed
 > 
-> Yes you're right, thanks, will update.
+> Instead of calling fbnic_phylink_destroy(), the prior initialization of
+> netdev should just be unrolled with free_netdev() and clearing
+> fbd->netdev.
 > 
-> >> +}
-> > [ ... ]
-> >> @@ -2071,14 +2126,20 @@ igc_ethtool_set_link_ksettings(struct net_device *netdev,
-> >>  		}
-> >>  	}
-> >>  
-> >> +	if (cmd->base.autoneg == AUTONEG_DISABLE &&
-> >> +	    cmd->base.speed != SPEED_10 && cmd->base.speed != SPEED_100) {
-> >> +		netdev_info(dev, "Unsupported speed for forced link\n");
-> >> +		return -EINVAL;
-> >> +	}
-> >> +
-> > 
-> > Should we also validate cmd->base.duplex here to prevent a fallback to
-> > half-duplex?
-> > 
-> > If a user runs a command like "ethtool -s eth0 speed 100 autoneg off" while
-> > the link is down, ethtool queries and preserves the current duplex value,
-> > which is DUPLEX_UNKNOWN (0xff).
-> > 
-> > In igc_handle_autoneg_disabled(), the code checks if duplex == DUPLEX_FULL,
-> > which evaluates to false, and forces the interface to 100 Mbps half-duplex.
-> > 
-> > Could we explicitly check that cmd->base.duplex is either DUPLEX_HALF or
-> > DUPLEX_FULL and return -EINVAL otherwise?
+> Clearing fbd->netdev to NULL avoids UAF in init_failure_mode where
+> callers guard by checking !fbd->netdev, such as fbnic_mdio_read_pmd().
+> These callers remain active even after a failed probe, so fdb->netdev
+> still needs to be cleared.
 > 
-> Will update.
-> 
-> > 
-> >>  	while (test_and_set_bit(__IGC_RESETTING, &adapter->state))
-> >>  		usleep_range(1000, 2000);
-> > 
-> > This isn't a bug introduced by this patch, but does this ad-hoc
-> > synchronization loop reimplement locking without fairness or lockdep support?
-> > 
-> > According to the Networking Subsystem Guidelines, using bit operations as a
-> > substitute for real locks violates core kernel locking rules and introduces
-> > potential races.
-> > 
-> > Could this be replaced with a proper concurrency mechanism such as a mutex?
-> > 
-> 
-> Hi Simon, you've raised this issue in v2, and after discussion, you've
-> agreed that this change doesn't belong in this patch series.
-> 
-> Not sure if I missed anything?
+> Fixes: d0fe7104c795 ("fbnic: Replace use of internal PCS w/ Designware XPCS")
+> Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
 
-Sorry, my bad. I missed that we'd already covered this one.
+Note that sashiko-gemini spotted a pre-existing issue:
+
+https://sashiko.dev/#/patchset/20260504-fbnic-pcs-fix-v2-1-de45192821d9%40meta.com
+
+does not block this patch but could deserve a follow-up.
+
+Thanks,
+
+Paolo
+
 
