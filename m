@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-285348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285349-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gCpEEaSe/Gn3RwAAu9opvQ
-	(envelope-from <netdev+bounces-285348-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 16:16:04 +0200
+	id UBddGNeg/Gm1SAAAu9opvQ
+	(envelope-from <netdev+bounces-285349-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 16:25:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB5384E9F38
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 16:16:03 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 689694EA1F1
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 16:25:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E62B4301BA5C
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 14:15:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9ED0D300F611
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 14:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7B8F3FA5CD;
-	Thu,  7 May 2026 14:15:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 828143FE64C;
+	Thu,  7 May 2026 14:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oUE8EmsR"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RXDlSnav"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F79E3F1655;
-	Thu,  7 May 2026 14:15:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C76E02DF136;
+	Thu,  7 May 2026 14:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778163334; cv=none; b=ZPRIXC3v+dORADT6m6+KmmSciUeEGzsowWH4W43sq3EH6VPWpmdab5k+dsaqBayQLDSIsOH/IHNm48qENrfVLN8HhBCrIyciAuKWPJnWl/Z90yr1WYoEFq+5ZIOgYA4hCQcDW3gcaNIEWRuresOFYPWSuLxlcZhs/3Y9Zk3LID4=
+	t=1778163625; cv=none; b=m2PxZlgoUIlBGzYEv7bJp/rUVzl8a2wKfDmVlrODNZeHXb/rpex7EJzuzwJXwexEIeaMv1kCSRttc1D3Ts3pf9ZExB4RmD7VWLbjOEGiKot7ZeZVy7Px2IhUWIknFcgTuy5dXfb/CHPeEx5XYMc/YMTpyw6WWZjfhl/3+93b5Hs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778163334; c=relaxed/simple;
-	bh=70KuMfzku9PDiHjjD3qQPJ/Ug0jo/by7mUF2gnZbFd4=;
+	s=arc-20240116; t=1778163625; c=relaxed/simple;
+	bh=175SwSjONIXhz7mZzTqzpPckhsU0KJZXzP0Fos5zqLU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rjTrlhpP3TDesRbHqyRsRgSODvB6Xdr5DSg/kPeZBWoGb434raHAadAt8Nttg7CQqhDvEodOmCJFSGmWm3g6WDi4YQlkwsriwKyhDVVMebUKuDMakxSYgfE7lXjV7GvFCQSYCzXU71NMC9WvdJuunvhS+ZlHas0f1CNaucSi+yo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oUE8EmsR; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q7OsCF7u3+Nr1sVeNhHxTPuvXRtAgL8xlq7QJcY0mWgcH48TrPMpdv2z18vKfO1ohCMcfqhTPo06DoZRno5wOzKQXtyOAMTkqCEyjTrFM0l+jsKg1jDXt0RA56KlrkwuCozpfUbPQxkYHHWSSiUQc0dmvmPzp1h2Xc9ZgzLfxB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RXDlSnav; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,22 +39,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Jd92XsB5WE/g/etZHxA6nzPWEIbD+MK9uEeWSt6AGi4=; b=oUE8EmsRYnljUPNuD/yv/W2iSf
-	ILVAFslXORF0Xh0CDF17xDATwzEFAIR5bBKd5RsG3TIfePMBbH3P5BwJP1jwprPfhpstyU8Byr5e/
-	fw8Xeh94ss0mEpQtJUlhJmGqmRYdPO3xQTBFk0ctWwU6uCuKIXfm6us/azi5sDIAGxh8=;
+	bh=O6o+MI/ZaM7g5pL3TAM9qsBbo3OL8m3K0Zwub5rjDwA=; b=RXDlSnav06k7nFOhKPGZ7itZ7C
+	rkFKUXEKJ8+qXT7SE1YL4j1NFqq7pw5k5xp93U5sMldxJF0z/V/zEoMwxZgiG2G/PQifQZfcshZYi
+	roROI7HvlHzQBSzX/+Lkv8U1qMTmVDq7716Bx4k6sLN7cH0HOCIOdH2MRu7k03V/sDCY=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1wKzUx-001p6o-HA; Thu, 07 May 2026 16:14:43 +0200
-Date: Thu, 7 May 2026 16:14:43 +0200
+	id 1wKzZt-001p9d-3e; Thu, 07 May 2026 16:19:49 +0200
+Date: Thu, 7 May 2026 16:19:49 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Xilin Wu <sophon@radxa.com>
+To: Bjorn Andersson <andersson@kernel.org>
 Cc: Alex Elder <elder@riscstar.com>, andrew+netdev@lunn.ch,
 	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	pabeni@redhat.com, maxime.chevallier@bootlin.com,
-	rmk+kernel@armlinux.org.uk, andersson@kernel.org,
-	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org,
-	arnd@arndb.de, gregkh@linuxfoundation.org,
+	rmk+kernel@armlinux.org.uk, konradybcio@kernel.org, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, linusw@kernel.org,
+	brgl@kernel.org, arnd@arndb.de, gregkh@linuxfoundation.org,
 	Daniel Thompson <daniel@riscstar.com>, mohd.anwar@oss.qualcomm.com,
 	a0987203069@gmail.com, alexandre.torgue@foss.st.com, ast@kernel.org,
 	boon.khai.ng@altera.com, chenchuangyu@xiaomi.com,
@@ -70,14 +69,12 @@ Cc: Alex Elder <elder@riscstar.com>, andrew+netdev@lunn.ch,
 	linux-gpio@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 10/12] net: stmmac: tc956x: add TC956x/QPS615
- support
-Message-ID: <fd839de4-0312-45aa-8e6a-4c7c199d9264@lunn.ch>
+Subject: Re: [PATCH net-next 08/12] dt-bindings: net: toshiba,tc965x-dwmac:
+ add TC956x Ethernet bridge
+Message-ID: <0de89be0-d842-46f4-8a23-d7e6cc62bcc4@lunn.ch>
 References: <20260501155421.3329862-1-elder@riscstar.com>
- <20260501155421.3329862-11-elder@riscstar.com>
- <DD71CDEABC7C16D5+02d052ff-13bb-4712-a847-91416f76c578@radxa.com>
- <7f3a0f16-5159-4bbc-8b15-9b5841603bf6@riscstar.com>
- <3A5C0389E7C0D241+21a4f16b-1af8-46ac-8831-0c1b49694df0@radxa.com>
+ <20260501155421.3329862-9-elder@riscstar.com>
+ <afycOwz5TpkegkZd@baldur>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,20 +83,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3A5C0389E7C0D241+21a4f16b-1af8-46ac-8831-0c1b49694df0@radxa.com>
-X-Rspamd-Queue-Id: AB5384E9F38
+In-Reply-To: <afycOwz5TpkegkZd@baldur>
+X-Rspamd-Queue-Id: 689694EA1F1
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[riscstar.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	TAGGED_FROM(0.00)[bounces-285348-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285349-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
@@ -108,47 +105,36 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DKIM_TRACE(0.00)[lunn.ch:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[51];
+	RCPT_COUNT_GT_50(0.00)[50];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev,kernel,dt];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
 X-Rspamd-Action: no action
 
-> Hi Alex,
-> 
-> Do you think if a shutdown callback like this is required? It looks like the
-> driver sometimes does a MDIO MMIO read when the PCIe link is down, causing
-> the board to reset due to SoC side PCIe NoC timeout.
-> 
-> After this change, the board can always shutdown gracefully.
-> 
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-tc956x.c
-> b/drivers/net/ethernet/stmicro/stmmac/dwmac-tc956x.c
-> index 4e8b4a185583..34b8e3fe1b51 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-tc956x.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-tc956x.c
-> @@ -767,6 +767,17 @@ static void tc956x_dwmac_remove(struct auxiliary_device
-> *adev)
->         tc956x_mac_disable(td);
->  }
-> 
-> +static void tc956x_dwmac_shutdown(struct auxiliary_device *adev)
-> +{
-> +       struct device *dev = &adev->dev;
-> +       int ret;
-> +
-> +       ret = stmmac_suspend(dev);
+> Are there other consumers of these TC956x gpios which would result in a
+> board designer (and hence dts author) to ever reference this
+> gpio-controller in a different way?
 
-It seems odd to do a suspend in shutdown.
+This Ethernet device could driver an SFP cage. Such cages typically
+have a number of pins connect to GPIOs, so you can tell when there is
+a module in the cage, enable the transmit laser, know if light is
+entering the module from the link peer, etc.
 
-But lets backtrack. Why is the PCIe link down?
+    sfp2: sfp {
+      compatible = "sff,sfp";
+      i2c-bus = <&sfp_i2c>;
+      los-gpios = <&cps_gpio1 28 GPIO_ACTIVE_HIGH>;
+      mod-def0-gpios = <&cps_gpio1 27 GPIO_ACTIVE_LOW>;
+      pinctrl-names = "default";
+      pinctrl-0 = <&cps_sfpp0_pins>;
+      tx-disable-gpios = <&cps_gpio1 29 GPIO_ACTIVE_HIGH>;
+      tx-fault-gpios = <&cps_gpio1 26 GPIO_ACTIVE_HIGH>;
+    };
 
 	Andrew
-
 
