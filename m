@@ -1,199 +1,211 @@
-Return-Path: <netdev+bounces-285546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285547-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sENYLFEj/Wn6YAAAu9opvQ
-	(envelope-from <netdev+bounces-285546-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 01:42:09 +0200
+	id 2MtYA54j/Wn6YAAAu9opvQ
+	(envelope-from <netdev+bounces-285547-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 01:43:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57F0B4F0303
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 01:42:09 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C3344F0332
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 01:43:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BF2E8300A304
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 23:42:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D22CE30046BF
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 23:43:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAE46374E4E;
-	Thu,  7 May 2026 23:42:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72016348465;
+	Thu,  7 May 2026 23:43:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XVSXDHrp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HrnB57p0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D73370D55
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 23:42:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0222F326942
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 23:43:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778197324; cv=none; b=imswCLO21ZkBRi00P09Fvp68kVBZO5tGVvB6WxBzpfpLSgPOeGTytWQfqO1zvjuhHAICDgrPi8krUoYebvPev1rJaPrUNOSZ0IcZE+JsRQ7MPwqkYZ0+pX2aiEwLHY62qA9L+hI/RBZ0IYAqyzUkkgNjvHkQVEZ8CLQISpOkIAg=
+	t=1778197399; cv=none; b=gx6hZWuKQTmf23CEmUtjRkxqE03PGcnocKXtX5hgMxy4d6GbxftGPZFPSZDDPm+pHx5Bikh1bOe8/hKgrq6fcyYBBV5tMaNcHtUHjZwZzAJ0ULCR4vGKcRiYAQ/y9fMNvIKIomriUiv0Ry2ZhOEhPeNSPMQC1yT5vIeSmIaRqN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778197324; c=relaxed/simple;
-	bh=p7Rx6qNuAwgaIK8zmFad1PXiQo0SfDFYMCJz06kHD8g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j5plIRglc1u/Jjd6EpvqAOfLgMz91XO8CwnUwcNkuHb7fyqXib0iuE8ThyGoC8ZWICzmotlNoFpcP+ADLyh3Dpw/XrNwGNXcWEyLGuUokulxgm8Rcn8+vcp6k5lEnhqRN/lWRz8tu72fcoQgJlgVGksC0hfcV4TLiyNDqlgytn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XVSXDHrp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA57FC2BCFB
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 23:42:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778197324;
-	bh=p7Rx6qNuAwgaIK8zmFad1PXiQo0SfDFYMCJz06kHD8g=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=XVSXDHrpJKD3xum7FnwZCCrA8iQEYbbX5GpPhqtER+Kb6ORUOY3o6PbYdaH27ErrQ
-	 kOT8v1aEKkqxk3pXWvcFlkpl9WqFtXYrCXYyzwY9QlBKenIv8N4ArqaqEbDr34fGlc
-	 v6s6uH/QYfdQQkmL6JKXVMxYqW1O2LOnJAsCod7JH6RB4mWoJSrBAIcwEzGXRaVPa6
-	 9V2lo8OCSID8OvbS0r0xvh7WvOtEv0WIpowa09YfkGNLYVEfEfbosRNN2LybFa7EfU
-	 UsV+GtnDWNlb2e/HbImt4blT9TVNkcaoufYLk3uCSmoQJLcp/3Fwxc2xjxD0jGNocb
-	 Tq1eNGpBaQ4ZA==
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-67cd93d8affso1655087a12.2
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 16:42:04 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ8FCzkbIIzovSOgvHIwXLc91TWBXp3SS+/faoXIhv8JboyzbOya+oCq/Sl5qSSP6faXo4yplsQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YweO+PfX0ODIE53Bx7uNDCtv4SjLA8MavWC6ATCdYr2mp8lhSzR
-	plxjFo01lzR1FhDdpPL2nLBXzXWJlHQbQjpmHXxUAQLSUXo4FDwMBOythFUhyNYMOw25BTR9R8k
-	PKB0vQCqmnsKBoYEQT13tWSRpb+6NJA==
-X-Received: by 2002:aa7:da02:0:b0:66e:e024:1a08 with SMTP id
- 4fb4d7f45d1cf-67d646b082bmr4114635a12.24.1778197322778; Thu, 07 May 2026
- 16:42:02 -0700 (PDT)
+	s=arc-20240116; t=1778197399; c=relaxed/simple;
+	bh=qkkBF3RQ7Ixw5ubxnV9KnZdzbMduZO2yaLLmTe4UUp8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=f5FBq7spliEnBt5gOWWlI+DUT/Xw+o8bqHmQomeN6TCPPRA1Q8/ufYWhZ1hhRGOKuLrXRCB4qDccreR4XiUot+3wZ7v1SuAdLq3wN4Cplk1b5ZufHJ1KsGt5wiPh7gyEx8TeZRpLXCeyOfpcjjSB947gvxAQ7XWEyec457bfqqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HrnB57p0; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778197398; x=1809733398;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:to:cc;
+  bh=qkkBF3RQ7Ixw5ubxnV9KnZdzbMduZO2yaLLmTe4UUp8=;
+  b=HrnB57p0F0Ab0ULmC6Xv4M72Xe/V9QByspdYMQ9mB8BTG5QjZC7vxnkO
+   bUH3bb+uvywTdhR3SJjxebgbuYz+nNCW0jImz/lPMiK7lStNZxjQKxmbD
+   lpsEE95AO3zzGzBWUMVK0ThZ+7IgxQuEsCuqhW3lxWM+bdt2U+oRUkMeL
+   iY4CzvVYk0JaG3Rocz+p71SsrWMAjRdEw23dIBqEJQUaQOEFc2xXeT847
+   P1djXCQ8SWAOUO7iw9/Uqb/qX/7S/ZzcTmZoBG30KkjWe1Q2ua5B+Tl0p
+   iZ494hTfRqoG35EftWVAAlNVOgh05yOFGhC8FZdIvJr/a0EcAQCTnm4+u
+   w==;
+X-CSE-ConnectionGUID: kuvDSzfWSM6/k4wGfxxOTQ==
+X-CSE-MsgGUID: C9J5V1r1SR+tGZ46HwzN9w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11779"; a="96731672"
+X-IronPort-AV: E=Sophos;i="6.23,222,1770624000"; 
+   d="scan'208";a="96731672"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 16:43:17 -0700
+X-CSE-ConnectionGUID: T2szzNHETRyDLJMrNKxu5Q==
+X-CSE-MsgGUID: +LgbT6PPQiWCt0i2uah7ug==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,222,1770624000"; 
+   d="scan'208";a="241616007"
+Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.109]) ([10.166.28.109])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 16:43:18 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Date: Thu, 07 May 2026 16:42:42 -0700
+Subject: [PATCH net-next] ixgbe: E610: do not fill EEE lp_advertised from
+ local PHY caps
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260501155421.3329862-1-elder@riscstar.com> <20260501155421.3329862-9-elder@riscstar.com>
-In-Reply-To: <20260501155421.3329862-9-elder@riscstar.com>
-From: Rob Herring <robh@kernel.org>
-Date: Thu, 7 May 2026 18:41:49 -0500
-X-Gmail-Original-Message-ID: <CAL_Jsq+GY5O-ygTHDOA8pVBDi_aKcmcJ0yt-3Rv4a4=Ygk66uQ@mail.gmail.com>
-X-Gm-Features: AVHnY4JOM9jN3mcHfPknCHd75ZrjDOMLe5cKzgxlMhp-0Ek9NIaM4mPgQRK3hWI
-Message-ID: <CAL_Jsq+GY5O-ygTHDOA8pVBDi_aKcmcJ0yt-3Rv4a4=Ygk66uQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 08/12] dt-bindings: net: toshiba,tc965x-dwmac:
- add TC956x Ethernet bridge
-To: Alex Elder <elder@riscstar.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, maxime.chevallier@bootlin.com, 
-	rmk+kernel@armlinux.org.uk, andersson@kernel.org, konradybcio@kernel.org, 
-	krzk+dt@kernel.org, conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org, 
-	arnd@arndb.de, gregkh@linuxfoundation.org, 
-	Daniel Thompson <daniel@riscstar.com>, mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com, 
-	alexandre.torgue@foss.st.com, ast@kernel.org, boon.khai.ng@altera.com, 
-	chenchuangyu@xiaomi.com, chenhuacai@kernel.org, daniel@iogearbox.net, 
-	hawk@kernel.org, hkallweit1@gmail.com, inochiama@gmail.com, 
-	john.fastabend@gmail.com, julianbraha@gmail.com, livelycarpet87@gmail.com, 
-	matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc, 
-	prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com, 
-	rohan.g.thomas@altera.com, sdf@fomichev.me, siyanteng@cqsoftware.com.cn, 
-	weishangjuan@eswincomputing.com, wens@kernel.org, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 57F0B4F0303
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260507-jk-iwl-next-fix-eee-ixgbe-v1-1-62bc1d197d1d@intel.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWM0Q6CMBAEf4Xcs5cUCCD+ivEB6oKHppq2QhPCv
+ 3vC42RndqUALwh0yVbymCXI2ynkp4zso3MjWO7KVJiiNpVpeHqyLC92SJEHSQyoksYeXJq2zWt
+ bocGZtP94qLB/X8kh7g3djiV8+wk2/q9p237aQrOlhwAAAA==
+X-Change-ID: 20260507-jk-iwl-next-fix-eee-ixgbe-309916c5e7e8
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Jedrzej Jagielski <jedrzej.jagielski@intel.com>, 
+ Jacob Keller <jacob.e.keller@intel.com>
+Cc: netdev@vger.kernel.org, David Carlier <devnexen@gmail.com>
+X-Mailer: b4 0.16-dev-ea14f
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3205;
+ i=jacob.e.keller@intel.com; h=from:subject:message-id;
+ bh=AR4mTTPloZw3fj31XNVXYIZcxf5GESK0zZLITIJsQGg=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhsy/yhP3zNLsUl66fkoAW7p/dnWUnuSOUzHiXcavAlYu/
+ BH2WGZ3RykLgxgXg6yYIouCQ8jK68YTwrTeOMvBzGFlAhnCwMUpABM56cbwT3dKr+YdjvqXiieW
+ f9mv6N9y9D9DjNyj7rDznK03uN4KPmD4nyOxTb3yd95OXdvK2+yb2x/NrvjvaCRUzXtx8gpO6c0
+ 1XAA=
+X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
+ fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
+X-Rspamd-Queue-Id: 0C3344F0332
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285546-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,riscstar.com,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[49];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-285547-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,riscstar.com:email,devicetree.org:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email,intel.com:mid,intel.com:dkim]
 X-Rspamd-Action: no action
 
-On Fri, May 1, 2026 at 10:55=E2=80=AFAM Alex Elder <elder@riscstar.com> wro=
-te:
->
-> From: Daniel Thompson <daniel@riscstar.com>
->
-> Add devicetree bindings for the Toshiba TC956x family of Ethernet-AVB/TSN
-> bridges.
->
-> Signed-off-by: Daniel Thompson <daniel@riscstar.com>
-> Signed-off-by: Alex Elder <elder@riscstar.com>
-> ---
->  .../bindings/net/toshiba,tc956x-dwmac.yaml    | 111 ++++++++++++++++++
->  1 file changed, 111 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/toshiba,tc956x-=
-dwmac.yaml
->
-> diff --git a/Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.y=
-aml b/Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.yaml
-> new file mode 100644
-> index 0000000000000..d95d22a3761da
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.yaml
-> @@ -0,0 +1,111 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/toshiba,tc956x-dwmac.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Toshiba TC956x Ethernet-AVB/TSN Controller
-> +
-> +maintainers:
-> +  - Alex Elder <elder@riscstar.com>
-> +  - Daniel Thompson <daniel@riscstar.com>
-> +
-> +description: |
-> +  This node provides properties for configuring the Ethernet PCI functio=
-ns
-> +  that are attached to the internal downstream port of the TC956x's PCIe
-> +  switch.
-> +
-> +  TC956x are a family of Ethernet-AVB/TSN bridge chips that combine a PC=
-Ie
-> +  switch together with a number of Ethernet controllers. These bindings
-> +  cover only the Ethernet functions of these devices.
-> +
-> +allOf:
-> +  - $ref: /schemas/pci/pci-bus-common.yaml#
-> +  - $ref: /schemas/pci/pci-device.yaml#
-> +
-> +unevaluatedProperties: false
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - pci1179,0220 # Toshiba TC9564 (a.k.a. Qualcomm QPS615)
-> +
-> +  "#gpio-cells":
-> +    const: 2
-> +
-> +  gpio-controller: true
-> +
-> +  # We can't allOf reference Ethernet-controller.yaml because we end up =
-with
-> +  # contradictory $nodename rules (`ethernet@` versus `pci@`). Happily o=
-nly a
-> +  # small number of the properties are useful on TC956x so we can just r=
-eference
-> +  # what we need.
+From: David Carlier <devnexen@gmail.com>
 
-That would be due to the error sashiko pointed out. 'pci' is for PCI
-bridges (host or PCI-PCI).
+ixgbe_get_eee_e610() fills kedata->lp_advertised from pcaps.eee_cap
+returned by ixgbe_aci_get_phy_caps() with IXGBE_ACI_REPORT_ACTIVE_CFG.
+That report mode (and the other IXGBE_ACI_REPORT_* modes) describe the
+local PHY only, not the link partner. The X550 path uses a separate
+FW_PHY_ACT_UD_2 activity for partner data; the E610 ACI has no
+equivalent.
 
-Rob
+Leave lp_advertised zeroed via the existing linkmode_zero() and drop
+the now-unused ixgbe_eee_cap_map[]. eee_active/eee_enabled are
+unaffected (sourced from link.eee_status).
+
+Fixes: b61dbdeff3a9 ("ixgbe: E610: add EEE support")
+Signed-off-by: David Carlier <devnexen@gmail.com>
+Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+I'm sending this to next now since it fixes the recently merged EEE support
+for ixgbe, which was merged last week (see [1]). It is a fix, but the
+offending code is only on net-next currently.
+
+[1]: https://lore.kernel.org/netdev/177777482779.3993534.10771712863528181433.git-patchwork-notify@kernel.org/
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c | 20 --------------------
+ 1 file changed, 20 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+index 6990fe53f049..36e43b5e88d1 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+@@ -3558,17 +3558,6 @@ static const struct {
+ 	{ FW_PHY_ACT_UD_2_10G_KR_EEE, ETHTOOL_LINK_MODE_10000baseKR_Full_BIT},
+ };
+ 
+-static const struct {
+-	u16 eee_cap_bit;
+-	u32 link_mode;
+-} ixgbe_eee_cap_map[] = {
+-	{ IXGBE_ACI_PHY_EEE_EN_100BASE_TX, ETHTOOL_LINK_MODE_100baseT_Full_BIT },
+-	{ IXGBE_ACI_PHY_EEE_EN_1000BASE_T, ETHTOOL_LINK_MODE_1000baseT_Full_BIT },
+-	{ IXGBE_ACI_PHY_EEE_EN_10GBASE_T, ETHTOOL_LINK_MODE_10000baseT_Full_BIT },
+-	{ IXGBE_ACI_PHY_EEE_EN_5GBASE_T, ETHTOOL_LINK_MODE_5000baseT_Full_BIT },
+-	{ IXGBE_ACI_PHY_EEE_EN_2_5GBASE_T, ETHTOOL_LINK_MODE_2500baseT_Full_BIT },
+-};
+-
+ static int ixgbe_validate_keee(struct net_device *netdev,
+ 			       struct ethtool_keee *keee_requested)
+ {
+@@ -3645,7 +3634,6 @@ static int ixgbe_get_eee_e610(struct net_device *netdev,
+ 	struct ixgbe_aci_cmd_get_phy_caps_data pcaps;
+ 	struct ixgbe_hw *hw = &adapter->hw;
+ 	struct ixgbe_link_status link;
+-	u16 eee_cap;
+ 	int err;
+ 
+ 	linkmode_zero(kedata->lp_advertised);
+@@ -3670,14 +3658,6 @@ static int ixgbe_get_eee_e610(struct net_device *netdev,
+ 	if (kedata->eee_enabled)
+ 		kedata->tx_lpi_timer = le16_to_cpu(pcaps.eee_entry_delay);
+ 
+-	eee_cap = le16_to_cpu(pcaps.eee_cap);
+-
+-	for (int i = 0; i < ARRAY_SIZE(ixgbe_eee_cap_map); i++) {
+-		if (eee_cap & ixgbe_eee_cap_map[i].eee_cap_bit)
+-			linkmode_set_bit(ixgbe_eee_cap_map[i].link_mode,
+-					 kedata->lp_advertised);
+-	}
+-
+ 	for (int i = 0; i < ARRAY_SIZE(ixgbe_ls_map); i++) {
+ 		if (hw->phy.eee_speeds_supported &
+ 		    ixgbe_ls_map[i].mac_speed)
+
+---
+base-commit: 6a4c4656b0d2d4056a1f0c35442db4e8a5cf8021
+change-id: 20260507-jk-iwl-next-fix-eee-ixgbe-309916c5e7e8
+
+Best regards,
+--  
+Jacob Keller <jacob.e.keller@intel.com>
+
 
