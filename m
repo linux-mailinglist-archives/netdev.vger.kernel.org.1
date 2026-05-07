@@ -1,93 +1,72 @@
-Return-Path: <netdev+bounces-285318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285320-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cL30LUGL/GleRAAAu9opvQ
-	(envelope-from <netdev+bounces-285318-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:53:21 +0200
+	id YAgGKGWM/GkjRQAAu9opvQ
+	(envelope-from <netdev+bounces-285320-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:58:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 368064E884D
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:53:21 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3790D4E89BA
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:58:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DA98C30309E4
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 12:50:43 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1EF8130041C7
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 12:58:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 533FA3BED23;
-	Thu,  7 May 2026 12:50:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F6133CAE76;
+	Thu,  7 May 2026 12:58:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="rr7OduyM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MC5yDTjV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-221.mail.qq.com (out203-205-221-221.mail.qq.com [203.205.221.221])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B45483B6BF0;
-	Thu,  7 May 2026 12:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 374792DF136;
+	Thu,  7 May 2026 12:58:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778158241; cv=none; b=hhhbHWLTpNlg8eCtBObYuU3L/ZvXMol4sIgbfm2JRs/5RODkNhVjZ0LM4KJAN59B40bwK9EZni3vCBzIEt7dX854AqJS6xPkpwH9Sv+WRgSAk0IELUOXeAxNFBoXgSJ0SnVBXWTRe9tly0mSl1r9cVAw+iwLFxi8RLOMdTVsF9o=
+	t=1778158690; cv=none; b=SVF/g2VzDg7/i8l3r1p4tU9xHt+NA211FNStVLQEcnJaxlZfzI8oK+b1gBOKzytmjnXOkUaa+JHlXQsbZntEKuXYfVW6dmNpdFeS4vYm+yEvRGJyqgB8igoC8I/D9M45PE6Nk+V07zUwhCo4XWrZ60JJGlhRxKKasmxanENu8b0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778158241; c=relaxed/simple;
-	bh=uHD2uCjN1UTQoraWvVy/fg6kCqbQLIutJoDWTGlKUVM=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=SmadXXDsSGY/h09N5atpi6bhJeVDM4g8MnccMAR0R9dn+FBv8JhEQBY0/j1sTPvb1qROOiR+qGxwfYQRM5I3eCXJBg1Bs2V9UsUqA6nyTpEfq+2R/8bO1Wo69LbFk8VWMh1WzOCCDIEsyvdQtjLdFWIooHTrXrTuO1ee2e8cRc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=rr7OduyM; arc=none smtp.client-ip=203.205.221.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1778158214; bh=5ub2YWhxmtbkh6ASBeqDgX465/eiGKDulnfevlmT57E=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=rr7OduyMYU4DXf7DmYjESFygDNWM7qnufZc27RENxNvqlkwpby6oIZhvSGbd1KB5+
-	 OBtwMjCn8gjiOiRK8iN/KvdQgP0fgUXd42ryHHfR7CJM6/aQwelZUJ/uNqxBMMoL20
-	 yHYJxVI3WSmrSxLf3MY/isKmbZY6DVOiJdY3mr7s=
-Received: from lxu-ped-host.. ([111.198.231.89])
-	by newxmesmtplogicsvrsza73-0.qq.com (NewEsmtp) with SMTP
-	id C8A1B40D; Thu, 07 May 2026 20:50:10 +0800
-X-QQ-mid: xmsmtpt1778158210t5p0eskuj
-Message-ID: <tencent_611BEB4B141B1A2526BAA3BBB2335F9E9108@qq.com>
-X-QQ-XMAILINFO: OPDQNGCUQ3qLkaFh7YH4cP0ef7dTVev+OCC4NTAATZsdIfJe5MGyfHz+BKAuMe
-	 25RPII7oaKWNy97i06WpbHAUvoC5MxYIU5A3cshYS3tpyIPgpZZxsKICdfDMRSll03lCGDV4iH3h
-	 PeGYuJJGMbuhytycfvHEhmMorKD/h9ol3uLQUe0yiBhp9ptEzUS9wb15obY0FGrJ0B+5fGGhkOL0
-	 zpgFd+TJZ1BtJ2loj2+jiQ6hrCzDeJJnA5Z14C03O+Fsvgpsp0CNOqyLhmGahbZxktH83MJJBGEp
-	 ZyfBmNOHxAiv14RkSg4YiDlKoAa3uAPbwxPLdg/oF3WIdcLmL5S1vlvM6AP9aQaYaD2iF/hSJ2VG
-	 9C7O4DDZl2j6AfCEuekmU7c5ifXjGaZuaOeMhm5ifKc51s1SLZIXw6M4JeLQMTK0/sYrPyGfazMe
-	 IBzI+KOc2uWkP3Ka+LQyu62pdFcplBjlWWX0Q/2Hk/cGhuKVVj9ZgAKtY+4fxmeWkTVGsWHnzMmA
-	 j7Xa4kdm/7XkSqpC2iGBgo/3BZBdLAxuvInt8SKB+l5SSoyyX2VGen9ieUlxnoFrXpcHdu2++/dp
-	 +H1JlYMZTzEoAihrdgLN7hrrwS4dT+RDH/fXtFyarOvYxYWIvrpH5dAKP7B2/rbVPbzwsCnNl6gF
-	 AieCei0FZM34dGFURjSUPV4rZgR8ML3qrnptpvXhwFWmA30UOYnYrOglUo8efGEh4uymIeXaTx+L
-	 CJYUgTibcL4yI3cLXcqqXfcR01CnQMf4VsKRDHkHoDZlMfM53ZvvAGTVG2NhEpVK+JuxRsAyIA08
-	 +aaw5Lbv8wirV6EkLYzKPZG+HEezhBbmJbuyWnGUt4QTNwjUDro84KjM1tM6NeTq2nxzKMiZZ9EV
-	 XfyZSEofBSj7rG7zUKjEWRTpFfxydNLWBemMntq75imA+ZzEt/cERcStm5evq2yXQ+IkfH1U74Ns
-	 nsc7H5afldZoonbXWX3veCwtAFW6CO9h8yUKgT092qSz7Jlw2ti1E7HyEdH3HuXuQ8u3qu7ebAUJ
-	 EypQS8rYRR2AItdtmlOYlSl4qUKwI=
-X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
-From: Edward Adam Davis <eadavis@qq.com>
-To: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com
-Cc: akpm@linux-foundation.org,
-	arjan@linux.intel.com,
+	s=arc-20240116; t=1778158690; c=relaxed/simple;
+	bh=WDjhH006pjr7DO1odgRVIbkbsVw1XbJABURX23J9bC8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ksOsKFyHv0mB+ggVJ6QalOQ8iIX07bJWHu2Daqqma0h1g6Xgo4wq3+r0VZrhZ7rlmaZk6CsXF/W3btu5DNOuXsQ+8O4uwSEBd9ZkQFUkqz7KPAJoMQEsUdwoa6BhjpWcUJ9nRm4J1NVjHInQSscaxSMPlwgQ78/5LIvQ6vnR4KM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MC5yDTjV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA6BDC2BCB2;
+	Thu,  7 May 2026 12:58:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778158689;
+	bh=WDjhH006pjr7DO1odgRVIbkbsVw1XbJABURX23J9bC8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=MC5yDTjVffa9Vy/D/mKcZft6etWRgTFNpxHsSa0fT7lqvB3QMgusLbDCsNCtSg0EB
+	 gSb87FVTAcrr+15ntAazrE5yIZhnLooOS6iakT9MpNTPWg2hOnaLsrHKltGCh9hRaa
+	 DCWNCqjrUgPK6WCGspntCMOxg+52vSM5n/ZkQ29NgTeOPBGy+ztBrCWZSxR4PWyyaX
+	 6ML3pW0OnLGr7//mffaVCCzcdDGx7r4L1FYpZjb8/AaQPYWjnuXlj0cHozXbt2tGNh
+	 VHMvXJSO50Y9W4H7UjKo1bmNuOZxVgaX08zSw34NhZmdq+2rVa2FlCWEfQxW393Ggz
+	 2MQlN2Ap+VCyQ==
+From: Simon Horman <horms@kernel.org>
+To: larysa.zaremba@intel.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	intel-wired-lan@lists.osuosl.org,
+	jacob.e.keller@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
-	dsahern@kernel.org,
 	edumazet@google.com,
-	hdanton@sina.com,
-	horms@kernel.org,
-	jgg@ziepe.ca,
 	kuba@kernel.org,
-	kuni1840@gmail.com,
-	kuniyu@google.com,
-	leon@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
 	pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com,
-	yanjun.zhu@linux.dev,
-	zyjzyj2000@gmail.com
-Subject: [PATCH] RDMA/nldev: add mutual exclusion in nldev_dellink()
-Date: Thu,  7 May 2026 20:50:10 +0800
-X-OQ-MSGID: <20260507125009.109737-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <69fc0c7c.a00a0220.387fc1.0006.GAE@google.com>
-References: <69fc0c7c.a00a0220.387fc1.0006.GAE@google.com>
+	joshua.a.hay@intel.com,
+	willemb@google.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	aleksandr.loktionov@intel.com,
+	anthony.l.nguyen@intel.com
+Subject: Re: [PATCH iwl-net v2] idpf: fix RSS LUT memcpy size
+Date: Thu,  7 May 2026 13:54:32 +0100
+Message-ID: <20260507125431.947371-2-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260504144345.293219-1-larysa.zaremba@intel.com>
+References: <20260504144345.293219-1-larysa.zaremba@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,82 +74,103 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 368064E884D
+X-Rspamd-Queue-Id: 3790D4E89BA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[qq.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[qq.com:s=s201512];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285318-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-285320-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[linux-foundation.org,linux.intel.com,davemloft.net,kernel.org,google.com,sina.com,ziepe.ca,gmail.com,vger.kernel.org,redhat.com,googlegroups.com,linux.dev];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[qq.com];
-	TO_DN_NONE(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[eadavis@qq.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[qq.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev,d8f76778263ab65c2b21];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
-We must serialize calls to nldev_dellink() or risk a crash as syzbot
-reported:
+From: 'Simon Horman' <horms@kernel.org>
 
-KASAN: null-ptr-deref in range [0x0000000000000020-0x0000000000000027]
-Call Trace:
- udp_tunnel_sock_release+0x6d/0x80 net/ipv4/udp_tunnel_core.c:197
- rxe_release_udp_tunnel drivers/infiniband/sw/rxe/rxe_net.c:294 [inline]
- rxe_sock_put drivers/infiniband/sw/rxe/rxe_net.c:639 [inline]
- rxe_net_del+0xfb/0x290 drivers/infiniband/sw/rxe/rxe_net.c:660
- rxe_dellink+0x15/0x20 drivers/infiniband/sw/rxe/rxe.c:254
- 
-Fixes: a60e3f3d6fba ("RDMA/nldev: Add dellink function pointer")
-Reported-by: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=d8f76778263ab65c2b21
-Tested-by: syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
 ---
- drivers/infiniband/core/nldev.c | 4 ++++
- 1 file changed, 4 insertions(+)
+idpf: fix RSS LUT memcpy size
 
-diff --git a/drivers/infiniband/core/nldev.c b/drivers/infiniband/core/nldev.c
-index 96c745d5bac4..3cb3cb7629fe 100644
---- a/drivers/infiniband/core/nldev.c
-+++ b/drivers/infiniband/core/nldev.c
-@@ -1816,6 +1816,8 @@ static int nldev_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	return err;
- }
- 
-+static DEFINE_MUTEX(nldev_dellink_mutex);
-+
- static int nldev_dellink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			  struct netlink_ext_ack *extack)
- {
-@@ -1846,7 +1848,9 @@ static int nldev_dellink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	 * implicitly scoped to the driver supporting dynamic link deletion like RXE.
- 	 */
- 	if (device->link_ops && device->link_ops->dellink) {
-+		mutex_lock(&nldev_dellink_mutex);
- 		err = device->link_ops->dellink(device);
-+		mutex_unlock(&nldev_dellink_mutex);
- 		if (err)
- 			return err;
- 	}
--- 
-2.43.0
+This commit increases the memcpy size when retrieving the RSS lookup table
+to account for the full buffer size rather than just the number of entries.
+It also adjusts the required Rx buffer size check to include the structure
+size.
 
+Link: https://sashiko.dev/#/patchset/20260323174052.5355-1-larysa.zaremba%40intel.com?part=8
+
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> index be66f9b2e101c..0fc7c68447f83 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> @@ -2915,8 +2915,9 @@ int idpf_send_get_set_rss_lut_msg(struct idpf_adapter *adapter,
+>  	if (reply_sz < sizeof(struct virtchnl2_rss_lut))
+>  		return -EIO;
+>  
+> -	lut_buf_size = le16_to_cpu(recv_rl->lut_entries) * sizeof(u32);
+> -	if (reply_sz < lut_buf_size)
+> +	lut_buf_size = flex_array_size(recv_rl, lut,
+> +				       le16_to_cpu(recv_rl->lut_entries));
+> +	if (reply_sz < lut_buf_size + sizeof(struct virtchnl2_rss_lut))
+>  		return -EIO;
+
+Could this cause an out-of-bounds read if the message size exceeds the
+allocated buffer?
+
+Looking at the allocation of recv_rl earlier in this function, it has a
+fixed size:
+
+    recv_rl = kzalloc(IDPF_CTLQ_MAX_BUF_LEN, GFP_KERNEL);
+
+If the hardware-controlled recv_rl->lut_entries yields a calculated structure
+size larger than IDPF_CTLQ_MAX_BUF_LEN, reply_sz may also exceed
+IDPF_CTLQ_MAX_BUF_LEN.
+
+While this check ensures reply_sz is large enough for lut_buf_size, does it
+ensure we don't read past the end of the IDPF_CTLQ_MAX_BUF_LEN allocation
+during the memcpy?
+
+[ ... ]
+> @@ -2933,7 +2934,7 @@ int idpf_send_get_set_rss_lut_msg(struct idpf_adapter *adapter,
+>  	}
+>  
+>  do_memcpy:
+> -	memcpy(rss_data->rss_lut, recv_rl->lut, rss_data->rss_lut_size);
+> +	memcpy(rss_data->rss_lut, recv_rl->lut, lut_buf_size);
+
+Does this copy skip necessary byte-order conversions?
+
+The hardware response recv_rl->lut contains __le32 (little-endian) values,
+but the destination rss_data->rss_lut is an array of host-order u32
+integers.
+
+The set path correctly applies cpu_to_le32() to elements before sending
+them:
+
+    rl->lut[i] = rxhash_ena ? cpu_to_le32(rss_data->rss_lut[i]) : 0;
+
+On big-endian architectures, copying little-endian bytes directly with
+memcpy() will result in byte-swapped queue indices. Does the driver need to
+iterate over the entries and convert each using le32_to_cpu() instead?
 
