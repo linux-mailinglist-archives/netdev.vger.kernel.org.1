@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-285532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285533-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qNTXFGUQ/WmwXAAAu9opvQ
-	(envelope-from <netdev+bounces-285532-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 00:21:25 +0200
+	id uHmxF2gQ/WmwXAAAu9opvQ
+	(envelope-from <netdev+bounces-285533-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 00:21:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A43D04EFBBD
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 00:21:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F16664EFBC4
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 00:21:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 324A1305A8A0
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 22:20:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D088C305B5B0
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 22:20:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3019438B12E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AAB438E5FE;
 	Thu,  7 May 2026 22:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d1B5ZAFb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nTJlOrk0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE7D33876C7
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 22:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BDF38AC93
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 22:20:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778192406; cv=none; b=aMhbbMP8oTileKh1M1uw/U7qKIdedr4DQPrtkn1zGdDFvE7fs2Q7M9Z0bx8YrB2fmvcenWm1sy6oec0Lq5zOcUDX/ZoTBA0HrvP27kPZuBxWWbQTkllLow4XqMXDuXF2aWluRSLh2FRNk51acXlpxapXGJfzIVxwUWfWqiP8PvE=
+	t=1778192406; cv=none; b=CjB6CzBMgtMZHruX05RrQOcxSg6/yE8fQ2Fb91p9LcjpPOwSFNJ9lVidcxuXUgisjj9I2xvkwkLOolhP3gEzlQGBNON8kKK9skN6KTszyXrCrB9UABGaaHlbY0IIiSXfoWg/xaeQL3WkT6G1nCuOSAsE+FlycY8fd8DcJP4IDVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1778192406; c=relaxed/simple;
-	bh=K6ASptgGMj5y6Cm2Fh6jCLZ482ONxk1H3khYcyUD/X0=;
+	bh=SVDpdpPO/wWkIG/9Y1oxy/FBvgGE+o/2cI/bfc9q1tM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CcnDeq3LF/FfXePTzT2EkbScHBDD7zwsSsdGlpgaBehXoNPHxMRHmih/vzFbOgEOLoxiA068xItvwo5C01iC8RlDipw+a8wcDuHxspdRLICeCG5ks0EWjoFOXkVs5gHYMytm9916zSHy4hNurTVd11t2VsWCOk7Yq+oClz/VYVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d1B5ZAFb; arc=none smtp.client-ip=209.85.160.202
+	 To:Cc:Content-Type; b=W/EmU9s1YA3X/hLcsNYbpZ8G2toRHebra9NsnPWfoLo4bc4PciXA17W+2zAXEw48I93PvWGV9BLYb1yLJOJVfm3XnBEqIp9/rYUzzsNxNsg4VRIl49escKI+dVuUtbEoHisI8VBf9qvYXO1b7kRjjQSzU4GZsWN5syUrSgSQ2VA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nTJlOrk0; arc=none smtp.client-ip=209.85.219.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-50d8e8c47a3so32696021cf.0
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 15:20:02 -0700 (PDT)
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-8b7a1ea06bfso31691186d6.3
+        for <netdev@vger.kernel.org>; Thu, 07 May 2026 15:20:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778192400; x=1778797200; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1778192402; x=1778797202; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NM6EScnofZJShhaM40UXCi7ciLCoadKWU/UpJJa0ce0=;
-        b=d1B5ZAFbVyap4X2G1JLJVwx6HOdGHJ6D63HAbc63Zx3gSJl7ZQVmgQA9fG8ASgfTUe
-         NQQBAaukAHSj4d0SmKd06vTvUlD0qIgruR9gZ6HbXDCIxg5SL+Fa9k0FV33IzrqLdlsJ
-         9HfKArWX9Ea3eLEJBrKMA81b9yncMdI8jxV2mHArpl9/o3xpccioIyhG3e1zuCH2vrys
-         loPLv7IhsXLmbs++vmUk1Wdfw6JAkkzH9NecRTwCc5bVkPV3slvG8Mx4pRtvwQKLajlB
-         ZkpQDCcy+7D7cRtlpik3GWai6rzlCMIt0/ilx2O5wrAnzQ7NfgQX9ZcTARC8EkbvSZnl
-         Z0CQ==
+        bh=zsX6PwaabWUu6HNeM5JhB6N/YAWOfl5EmJ+qeQzPIFg=;
+        b=nTJlOrk0IDF/mVKkWnrk0h3Lrf4W6GX6vTPJbMW5N0QZ4CNOWcbGDLoy8TG0017mKv
+         k8vc0NFe5lHsjk5aykGOXGlMN9Zu6wZ9VhZFYqwA8ToCJ8+H6ffUznGm/840xluzGIOa
+         hzXGHGtR1Fl5UBc1uV+vU1fl+zmX6IZH6kRjpV0QYq7ISZErdgOLaeCuW/gf8EVfTikG
+         xUbp3ifApgBQwQhr2kGxmd03PNtxnBgHnDpQcSKM49YaGD04YjwaJx+ZlVA4b+YEQKVL
+         ayqUHL2iJqzFQAObO/k/ZQCkK3epG4kObioAwQzLewsI5YTVZvEDRjxzUZOR8T4kBa8u
+         yoMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778192400; x=1778797200;
+        d=1e100.net; s=20251104; t=1778192402; x=1778797202;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NM6EScnofZJShhaM40UXCi7ciLCoadKWU/UpJJa0ce0=;
-        b=HVtRwKgWeg/mW2ryoGcI/t4Zi7MWRsAFNMSlFh8vKrspBMbJDGZKNrgDEV/ucJodUD
-         il2IQHnVrU5/2aHyuhqrRjbsgFubjQDHrM2ISMvDgcT3xyKpFwyy1Fkjvgz+T2FBBYZG
-         TTA992X+hxvVmm2CGWbaNl5Mg/5wFaY2+DKFUr4XgI339FSKwLfgViqueKMup5H0z3/o
-         NkIkUKkv/8E5OfHK7IQJqkUkgVyylasJQXBUwaZwotIW1BdXBfyfAGcAtiHyseUSD2Is
-         kjYnYWujjiIJIoC2c4vhkQq+aYYrnsLyUZxeavz4hFWPW8M4cCiOPV6OjIFLzTuUgrTv
-         sVTQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9JwwY5jdpGAncIkEKk4Cs/zor4w4iv3s6/YGU76objNxlhCvQ1Wr4CA+RHw13msECsl4BArRw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+fo97t1LKBOMnzYG38uGiy/m4RH27gINAfcxlRHmerklSG9AO
-	qaY71QZuuQrivNQ3zTCkxBceE5eZh+oItsjY12QrfwhhKMhl6fOp3zqp6v62Q1J+MEqWEcTSO/E
-	U8DjXI298WJeqwg==
-X-Received: from qtwy8.prod.google.com ([2002:a05:622a:48:b0:50e:629c:1a31])
+        bh=zsX6PwaabWUu6HNeM5JhB6N/YAWOfl5EmJ+qeQzPIFg=;
+        b=InnAZ0ZPbH7gqLb7z/ylNbcqYBfGgJkQxkcUaC2R7CtoCG8bf4FEFluA/tbG5IEg6L
+         m7JN5Cr+047DsFV8QRkafVpIY2chLWgFyhb1abcjbDXT13FMEdPmtCvQOub/CSZwOBc+
+         8DJsOP/VN+SklvSi1vq+TbE2JHg5MMkEd3GEX/JZQ2hXedYba0nFayDckjVBoPxdKPtk
+         M6AuPP3xtMNfy4AZXP3rnbSIGMeJR9F9Bc8aIxnWB4mFMrXBTEKPel0lE6x1p4aqcfta
+         DKh7ejpNyP7cL5+gHD6f6mZ0hfPq8J5AbN6OHpvogVSMRmXRO3rASfsTns73IUecuZom
+         gYcg==
+X-Forwarded-Encrypted: i=1; AFNElJ82uJUWPEU57Qef/YZs1I8ukNbYjC1+nnfd1Q583akjbC0gy7ytcVNys/F3OgTdb1YiBeXKgpo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYD+7jrleQs4blw8W2bhEh1NfPB+SILrl5BOydvVoOytB6xdqF
+	660jGZCejjzJRqUiidoxzxI1bFtjdNWi76HTLRVr2Oi0AoA8vU9FcQMAjGVCG9R5xLAY7XPcYJH
+	xeF6GejJpBqj/QA==
+X-Received: from qtb21.prod.google.com ([2002:a05:622a:8d15:b0:50e:5c76:d605])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:1a93:b0:50f:135e:d68 with SMTP id d75a77b69052e-514621c6e3cmr141519891cf.58.1778192400202;
- Thu, 07 May 2026 15:20:00 -0700 (PDT)
-Date: Thu,  7 May 2026 22:19:47 +0000
+ 2002:ac8:5a47:0:b0:50f:ae44:515b with SMTP id d75a77b69052e-5148e95029amr973331cf.37.1778192401750;
+ Thu, 07 May 2026 15:20:01 -0700 (PDT)
+Date: Thu,  7 May 2026 22:19:48 +0000
 In-Reply-To: <20260507221948.335726-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260507221948.335726-1-edumazet@google.com>
 X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
-Message-ID: <20260507221948.335726-8-edumazet@google.com>
-Subject: [PATCH net-next 7/8] net/sched: mq_prio: no longer acquire qdisc
- spinlocks in mqprio_dump()
+Message-ID: <20260507221948.335726-9-edumazet@google.com>
+Subject: [PATCH net-next 8/8] net/sched: mq_prio: no longer acquire qdisc
+ spinlocks in mqprio_dump_class_stats()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -86,7 +86,7 @@ Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri P
 	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: A43D04EFBBD
+X-Rspamd-Queue-Id: F16664EFBC4
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -95,12 +95,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285532-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285533-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -115,82 +115,94 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Prepare mqprio_dump() for RTNL avoidance.
+Prepare mqprio_dump_class_stats() for RTNL avoidance.
 
 Use RCU instead of RTNL, and no longer acquire each children spinlock.
 
+As a bonus we no longer have to release/acquire d->lock.
+
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/sched/sch_mqprio.c | 35 +++++++++++++++++++++++------------
- 1 file changed, 23 insertions(+), 12 deletions(-)
+ net/sched/sch_mqprio.c | 35 ++++++++++++++---------------------
+ 1 file changed, 14 insertions(+), 21 deletions(-)
 
 diff --git a/net/sched/sch_mqprio.c b/net/sched/sch_mqprio.c
-index 3b4881c389c535368687454ea268bec892ecb942..37756932d4917caa7c3b96dff1999e30623fe953 100644
+index 37756932d4917caa7c3b96dff1999e30623fe953..6eb1db7b5d67548643b3e84f254cc1e034d1e6c7 100644
 --- a/net/sched/sch_mqprio.c
 +++ b/net/sched/sch_mqprio.c
-@@ -551,35 +551,46 @@ static int mqprio_dump_tc_entries(struct mqprio_sched *priv,
+@@ -672,9 +672,9 @@ static int mqprio_dump_class(struct Qdisc *sch, unsigned long cl,
  
- static int mqprio_dump(struct Qdisc *sch, struct sk_buff *skb)
+ static int mqprio_dump_class_stats(struct Qdisc *sch, unsigned long cl,
+ 				   struct gnet_dump *d)
+-	__releases(d->lock)
+-	__acquires(d->lock)
  {
--	struct net_device *dev = qdisc_dev(sch);
--	struct mqprio_sched *priv = qdisc_priv(sch);
- 	struct nlattr *nla = (struct nlattr *)skb_tail_pointer(skb);
-+	struct mqprio_sched *priv = qdisc_priv(sch);
-+	struct net_device *dev = qdisc_dev(sch);
-+	struct gnet_stats_queue qstats = { 0 };
-+	struct gnet_stats_basic_sync bstats;
- 	struct tc_mqprio_qopt opt = { 0 };
 +	const struct Qdisc *qdisc;
- 	unsigned int qlen = 0;
--	struct Qdisc *qdisc;
- 	unsigned int ntx;
++
+ 	if (cl >= TC_H_MIN_PRIORITY) {
+ 		struct net_device *dev = qdisc_dev(sch);
+ 		struct netdev_tc_txq tc = dev->tc_to_txq[cl & TC_BITMASK];
+@@ -684,44 +684,37 @@ static int mqprio_dump_class_stats(struct Qdisc *sch, unsigned long cl,
+ 		int i;
  
--	qlen = 0;
--	gnet_stats_basic_sync_init(&sch->bstats);
--	memset(&sch->qstats, 0, sizeof(sch->qstats));
-+	gnet_stats_basic_sync_init(&bstats);
+ 		gnet_stats_basic_sync_init(&bstats);
+-		/* Drop lock here it will be reclaimed before touching
+-		 * statistics this is required because the d->lock we
+-		 * hold here is the look on dev_queue->qdisc_sleeping
+-		 * also acquired below.
+-		 */
+-		if (d->lock)
+-			spin_unlock_bh(d->lock);
  
- 	/* MQ supports lockless qdiscs. However, statistics accounting needs
- 	 * to account for all, none, or a mix of locked and unlocked child
- 	 * qdiscs. Percpu stats are added to counters in-band and locking
- 	 * qdisc totals are added at end.
- 	 */
-+	rcu_read_lock();
- 	for (ntx = 0; ntx < dev->num_tx_queues; ntx++) {
--		qdisc = rtnl_dereference(netdev_get_tx_queue(dev, ntx)->qdisc_sleeping);
--		spin_lock_bh(qdisc_lock(qdisc));
-+		qdisc = rcu_dereference(netdev_get_tx_queue(dev, ntx)->qdisc_sleeping);
- 
--		gnet_stats_add_basic(&sch->bstats, qdisc->cpu_bstats,
-+		gnet_stats_add_basic(&bstats, qdisc->cpu_bstats,
- 				     &qdisc->bstats, false);
--		gnet_stats_add_queue(&sch->qstats, qdisc->cpu_qstats,
-+		gnet_stats_add_queue(&qstats, qdisc->cpu_qstats,
- 				     &qdisc->qstats);
- 		qlen += qdisc_qlen_lockless(qdisc);
++		rcu_read_lock();
+ 		for (i = tc.offset; i < tc.offset + tc.count; i++) {
+ 			struct netdev_queue *q = netdev_get_tx_queue(dev, i);
+-			struct Qdisc *qdisc = rtnl_dereference(q->qdisc);
 -
--		spin_unlock_bh(qdisc_lock(qdisc));
- 	}
-+	rcu_read_unlock();
-+
-+	spin_lock_bh(qdisc_lock(sch));
-+	_bstats_set(&sch->bstats, u64_stats_read(&bstats.bytes),
-+		    u64_stats_read(&bstats.packets));
-+	spin_unlock_bh(qdisc_lock(sch));
-+
-+	WRITE_ONCE(sch->qstats.qlen, qstats.qlen);
-+	WRITE_ONCE(sch->qstats.backlog, qstats.backlog);
-+	WRITE_ONCE(sch->qstats.drops, qstats.drops);
-+	WRITE_ONCE(sch->qstats.requeues, qstats.requeues);
-+	WRITE_ONCE(sch->qstats.overlimits, qstats.overlimits);
-+
- 	WRITE_ONCE(sch->q.qlen, qlen);
+-			spin_lock_bh(qdisc_lock(qdisc));
  
- 	mqprio_qopt_reconstruct(dev, &opt);
++			qdisc = rcu_dereference(q->qdisc);
+ 			gnet_stats_add_basic(&bstats, qdisc->cpu_bstats,
+ 					     &qdisc->bstats, false);
+ 			gnet_stats_add_queue(&qstats, qdisc->cpu_qstats,
+ 					     &qdisc->qstats);
+ 			qlen += qdisc_qlen_lockless(qdisc);
+-
+-			spin_unlock_bh(qdisc_lock(qdisc));
+ 		}
++		rcu_read_unlock();
++
+ 		qlen = qlen + qstats.qlen;
+ 
+-		/* Reclaim root sleeping lock before completing stats */
+-		if (d->lock)
+-			spin_lock_bh(d->lock);
+ 		if (gnet_stats_copy_basic(d, NULL, &bstats, false) < 0 ||
+ 		    gnet_stats_copy_queue(d, NULL, &qstats, qlen) < 0)
+ 			return -1;
+ 	} else {
+ 		struct netdev_queue *dev_queue = mqprio_queue_get(sch, cl);
++		int res = 0;
+ 
+-		sch = rtnl_dereference(dev_queue->qdisc_sleeping);
+-		if (gnet_stats_copy_basic(d, sch->cpu_bstats,
+-					  &sch->bstats, true) < 0 ||
++		rcu_read_lock();
++		qdisc = rcu_dereference(dev_queue->qdisc_sleeping);
++		if (gnet_stats_copy_basic(d, qdisc->cpu_bstats,
++					  &qdisc->bstats, true) < 0 ||
+ 		    qdisc_qstats_copy(d, sch) < 0)
+-			return -1;
++			res = -1;
++		rcu_read_unlock();
++		return res;
+ 	}
+ 	return 0;
+ }
 -- 
 2.54.0.563.g4f69b47b94-goog
 
