@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-285096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285097-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UCcTFlbp+2nEHwAAu9opvQ
-	(envelope-from <netdev+bounces-285096-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 03:22:30 +0200
+	id CPi6DW/p+2nEHwAAu9opvQ
+	(envelope-from <netdev+bounces-285097-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 03:22:55 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C28EB4E1EAD
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 03:22:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A30304E1EC4
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 03:22:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B94E1301AA94
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 01:22:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D852E302A7E6
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 01:22:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA45524728F;
-	Thu,  7 May 2026 01:22:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A6FD2475CB;
+	Thu,  7 May 2026 01:22:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ffA6rzon"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BaOK8f/1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8730C23183C;
-	Thu,  7 May 2026 01:22:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB5AD23183C;
+	Thu,  7 May 2026 01:22:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778116945; cv=none; b=spjLG4yrXuGyoVScis5XVtjRKqvSRJk8ZS26dM9oBkWO4XlrdcdQosyzHHMhjpSeNO0Ay1RgI6AVDlssfMTz3j88tbQXa1hlFrp6DYn5V9ot1sAGGt0VX/z+ZkG/idaTR4r+2u6o1IsaBoMGYHHIpooL/sTvL47aeG60PllZXX8=
+	t=1778116950; cv=none; b=iow0c9/gmbO2K8CdGSatHKPkuFeSIekmSgm+NQfN1ZiBr4T8eV3pha3icM8oZwxIIW+Er9+g7Pnp3bwpSUXhqRpJEV4KmmBQdNn4grZZuNKHby8ihiVh85KswX4W5u0Vw4nDFfZDCyzaz2Hu4/q/QafZF8HSm4IqS1PwSvFB+wU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778116945; c=relaxed/simple;
-	bh=aw2zFfCleGJ90e2jS6JvB8CmUvvOcZHPi/HznuFLJnw=;
+	s=arc-20240116; t=1778116950; c=relaxed/simple;
+	bh=xwORKowaxjuo4NhXFRj/zliM3jrO13CzQdxT7viE+jk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dgAB6W5PitAluQjVVEujtj/JPGOu3K9B7J0spyL6Q53zxkNyNOEjL6m7mu5tqU5ct1DAz72KmojKIq6bvqnTQUbtcW4B3p2tKSUUbsacNEBfyNqwaQprMvXiIfzRgQDovlGHpO7FSaP19D3UHrQ/AzJc2I3jyERW5ThDlZ3smUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ffA6rzon; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B6C2C2BCB0;
-	Thu,  7 May 2026 01:22:24 +0000 (UTC)
+	 MIME-Version; b=dM7R6dFCN/Iy8OlcG0NnE0fu9fuFIt+8KwgOdsIM50cUpoHT9TbwXELA5SKeUgdFkaPBbUOgMusQ16INh+uBUU9MDUKfRRRj/lY38ca/x4sKHcX1FC6F9v4bU/YvI9ikIYjZEmMTKO5GLj3tcrOo7wLyyJeXssxOJ17STKK/DRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BaOK8f/1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26284C2BCB0;
+	Thu,  7 May 2026 01:22:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778116945;
-	bh=aw2zFfCleGJ90e2jS6JvB8CmUvvOcZHPi/HznuFLJnw=;
+	s=k20201202; t=1778116949;
+	bh=xwORKowaxjuo4NhXFRj/zliM3jrO13CzQdxT7viE+jk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ffA6rzondcY02g7jNJbvoJ3FwBKQWyNmMFZTJpfVeuUOrsJ4FUNGEJrFzrT9v2yyB
-	 e91mECRh0oCT1F60/VhG1Bw/Vdw9mYZOC29XXAELvzNuODOXZ8E+DV8DqzRF6K81U/
-	 SFvl0gaZQxf9gE744b5b1bblqIBOggB2dXLLVjjy0ATJDqyxmuDlTkT7B2KYHYx1QH
-	 j5WyePMH//udw7D6w2ezpgLDj5Bt1f9G0I7Z1C0xQ0lOrIyRxUnFl+wTtsWAvL7cVS
-	 IqPuXkqrcxohpXC89/fU72ehVG6HkS5/U+Hrg4Gl5adyU4y3klEzd7M+2ZczIaSpSK
-	 Cknc2Hw62Jvqw==
+	b=BaOK8f/1k5Ese7y43owYdudJe8Tpen+IwWuqK42TCmzTTAGJPhtlNCioJFbEvGVGj
+	 TRQ5jDAi0RNgOvGHiRnbyss/xyQGjjeq3WlN8PTSvafH/M4TgGuaJqJzbOSj6Hf5b1
+	 /VQhhD3FNXtK3CDCYUlM5CuixtT0o4SH6FfPZr1T1D5V6kxLsg2QZTm/p/QdJphe3L
+	 SvDmj3MY+0qo76UlyB8opxcYEIlKNCQXhFo4EDZbORd+9BvIqHaSUEE0RwYZgSdt3k
+	 z4/FeKd5VJc1GiMmd7tWjF7aMLnIGZiVNazi+jqHv12g47lAxjqKoV3lcAJ01vSa67
+	 ZlycQwnnoOCuQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: mmyangfl@gmail.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -57,12 +57,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	jiri@resnulli.us,
 	horms@kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/3] net: sched: tbf: pass all params to offload users
-Date: Wed,  6 May 2026 18:22:16 -0700
-Message-ID: <20260507012217.2187429-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v2 3/3] net: dsa: yt921x: Add port qdisc tbf support
+Date: Wed,  6 May 2026 18:22:25 -0700
+Message-ID: <20260507012225.2187535-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260504101258.1608004-3-mmyangfl@gmail.com>
-References: <20260504101258.1608004-3-mmyangfl@gmail.com>
+In-Reply-To: <20260504101258.1608004-4-mmyangfl@gmail.com>
+References: <20260504101258.1608004-4-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,7 +70,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: C28EB4E1EAD
+X-Rspamd-Queue-Id: A30304E1EC4
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
@@ -83,7 +83,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-285096-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285097-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,mojatatu.com,resnulli.us];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
@@ -106,79 +106,56 @@ X-Rspamd-Action: no action
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-net: sched: tbf: pass all params to offload users
+net: dsa: yt921x: Add port qdisc tbf support
 
-This commit exposes additional TBF parameters (limit, buffer, mtu, and peak
-rate) to hardware offload drivers so they have finer-grained control over
-queue configuration.
+This patch enables port shaping and adds support for limiting the rate of
+outgoing traffic using the TBF qdisc offload.
 
-> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
-> index 3bd08d7f39c1..d73c04e3d919 100644
-> --- a/include/net/pkt_cls.h
-> +++ b/include/net/pkt_cls.h
-> @@ -1040,8 +1040,12 @@ enum tc_tbf_command {
->  };
->  
->  struct tc_tbf_qopt_offload_replace_params {
-> +	u32		limit;
-> +	u32		max_size;
-> +	s64		buffer;
-> +	s64		mtu;
-
-Are buffer and mtu the most clear variable names for the offload API? 
-
-In sch_tbf.c, these fields store token bucket depths converted to nanoseconds,
-rather than raw configuration bytes. Exposing time values under names that
-typically imply byte sizes could mislead driver authors.
-
->  	struct psched_ratecfg rate;
-> -	u32 max_size;
-> +	struct psched_ratecfg peak;
->  	struct gnet_stats_queue *qstats;
->  };
-
+> diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
+> index 42dca9617fb1..dc38e0dd22ee 100644
+> --- a/drivers/net/dsa/yt921x.c
+> +++ b/drivers/net/dsa/yt921x.c
 [ ... ]
-
-> diff --git a/net/sched/sch_tbf.c b/net/sched/sch_tbf.c
-> index 4576111fe075..8a1110d59dec 100644
-> --- a/net/sched/sch_tbf.c
-> +++ b/net/sched/sch_tbf.c
-> @@ -153,8 +153,12 @@ static void tbf_offload_change(struct Qdisc *sch,
->  	qopt.command = TC_TBF_REPLACE;
->  	qopt.handle = sch->handle;
->  	qopt.parent = sch->parent;
-> -	qopt.replace_params.rate = q->rate;
-> +	qopt.replace_params.limit = q->limit;
->  	qopt.replace_params.max_size = q->max_size;
-
-Does passing q->max_size here provide the driver with the original burst size?
-
-The software TBF overwrites q->max_size with min(burst, pburst) when a peak
-rate is configured. As a result, the offload API only passes this overwritten
-value, meaning a driver attempting to offload a dual-rate TBF is not given
-the original burst size in bytes and would have to reverse-engineer it from
-the nanosecond buffer value.
-
-> +	qopt.replace_params.buffer = q->buffer;
-> +	qopt.replace_params.mtu = q->mtu;
-
-Will this cause the yt921x offload (introduced in the next patch) to
-unconditionally reject all offloads?
-
-The yt921x driver attempts to reject dual-rate offloads by checking if p->mtu
-or p->peak.rate_bytes_ps are set. However, the tc userspace tool always
-populates the mtu parameter with a default value (like 2047 bytes) for legacy
-rate table compatibility.
-
-Since tc always sets mtu, q->mtu will be non-zero, causing the yt921x driver
-to return -EOPNOTSUPP and reject the configuration. 
-
-Should the offload API explicitly pass the raw burst and pburst parameters in
-bytes instead?
-
-> +	qopt.replace_params.rate = q->rate;
-> +	qopt.replace_params.peak = q->peak;
->  	qopt.replace_params.qstats = &sch->qstats;
+> @@ -1378,6 +1390,112 @@ yt921x_dsa_port_policer_add(struct dsa_switch *ds, int port,
+>  	return res;
+>  }
 >  
->  	dev->netdev_ops->ndo_setup_tc(dev, TC_SETUP_QDISC_TBF, &qopt);
+> +static int
+> +yt921x_tbf_validate(struct yt921x_priv *priv,
+> +		    const struct tc_tbf_qopt_offload *qopt)
+> +{
+[ ... ]
+> +	switch (qopt->command) {
+> +	case TC_TBF_REPLACE: {
+> +		const struct tc_tbf_qopt_offload_replace_params *p;
+> +
+> +		p = &qopt->replace_params;
+> +
+> +		if (p->mtu || p->peak.rate_bytes_ps) {
+
+The userspace tc utility unconditionally sets a default MTU (typically 2047)
+when adding a TBF qdisc, which is passed to the driver via p->mtu. Since
+p->mtu is never zero, will this unconditionally reject all offload requests?
+
+> +			NL_SET_ERR_MSG_MOD(extack,
+> +					   "Offload not supported when mtu/peakrate is configured");
+> +			return -EOPNOTSUPP;
+> +		}
+> +
+> +		if (!p->rate.mpu) {
+
+Does this code miss validation for p->rate.overhead?
+
+The TC TBF layer allows configuring overhead to account for additional
+headers. If the hardware relies on fixed wire frame sizes and the driver
+ignores p->rate.overhead, could this lead to a silent misconfiguration
+where the hardware shapes traffic at a different effective rate than
+requested?
+
+> +			NL_SET_ERR_MSG_MOD(extack, "Assuming mpu = 64");
+> +		} else if (p->rate.mpu != 64) {
+> +			NL_SET_ERR_MSG_MOD(extack,
+> +					   "Offload not supported when mpu is other than 64");
+> +			return -EOPNOTSUPP;
+> +		}
 
