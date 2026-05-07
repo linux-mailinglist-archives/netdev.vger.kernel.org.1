@@ -1,81 +1,86 @@
-Return-Path: <netdev+bounces-285169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285170-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AIvpOotA/GlMNgAAu9opvQ
-	(envelope-from <netdev+bounces-285169-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 09:34:35 +0200
+	id uF6UJzRC/GlYNgAAu9opvQ
+	(envelope-from <netdev+bounces-285170-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 09:41:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93EF64E418E
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 09:34:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02ACD4E4314
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 09:41:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 091733006122
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 07:34:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E1A94300D16C
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 07:40:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D839B32D43C;
-	Thu,  7 May 2026 07:34:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AAB836404E;
+	Thu,  7 May 2026 07:40:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="sEOC+Yt3";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ht4P6rCC"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0oCZPEWl";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="zLkk9fDV"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926AB32D441;
-	Thu,  7 May 2026 07:34:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7FEA33B6F9;
+	Thu,  7 May 2026 07:40:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778139271; cv=none; b=jvX3q1HHpXVWAZIjstxa36EofSH5PTBBKN8l0mNI9u8OwzpJscof/h71hB4Z9Z6fSuDq/eNZtvVINmMEHW9obbMA/puQsayer4EsiHFnFMUXrUKFeoiZd+rlh/jjE8TNLLkWmJk0pLo+MeV5pAXQ8+eLz5ATSL/IZDlWUSDt8T4=
+	t=1778139655; cv=none; b=TcSE6kyCejjRWtQ12iRD5p16l76EJwxIJSd/nT8OTxBDkCGOB3WINs7V6oE8TA3PXBhJVA2xEznCgxqOK0imUXXnEZ+GkDG8tS7h1EnB2sV9BJv5/szPJaYyqOSIqjtx3p7lKjSDSuUSlMtcJoaSVtOVPLa5jGGfToQKBgGb6iA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778139271; c=relaxed/simple;
-	bh=1BWhZEj5wjEI7Zr/301s1oCCVafsmJSbsyZyk7tgBVY=;
+	s=arc-20240116; t=1778139655; c=relaxed/simple;
+	bh=o+LnA4jeP3t3ewYiAbawcbRTEZKZpSvcElrTCJ7WZ4A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ICwJ73KkuQcllhpENonG/TVuUd2d6lgCnyesfhvYxpLlbukAv5uAsO7rp5HeRSQ1clwRnURvnWTgQzJMQgRb4xn92KTGbNjzyJC10nW6qEvYlhdzdtQjv7MqBNIEvF/XsKBd5m+yo1sy0p7xvnDywIKsNwOxJaJrdFMVH6mlk2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=sEOC+Yt3; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ht4P6rCC; arc=none smtp.client-ip=193.142.43.55
+	 Content-Type:Content-Disposition:In-Reply-To; b=mUNmKaMR8KUdAeIsQEQqui+M2eW+ilLR+KYb2REFjSaYWZ+WZF5sy5I4GtcOMsAEdd8TCwbnPzQLGehB5bUOB3hmgpOUg45wAFcHi6efi/JfvWWb/feTUrnKGdQULPxXJhc5YYpeO1jPzs/gVVlXZ0nVeaU06+kpYuMGWkJ7SjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0oCZPEWl; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=zLkk9fDV; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 7 May 2026 09:34:27 +0200
+Date: Thu, 7 May 2026 09:40:51 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1778139269;
+	s=2020; t=1778139653;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=M3TFmwYRSkODm0VVYgNgy2av15i1ufVLpD3DudaLP68=;
-	b=sEOC+Yt3SWpyUKymT/rHCeyQseEYPHvMRgZmEYF7nDvQJr24oizHsPz8c+ZoW7tNFDB5++
-	76CiZA17dIJBZUSyXwl9YRjy4lmPmzAl2tHQ+p+62BGvijbzxZ1c2wdWbou+ldqLk1Kcis
-	o/DnUaLNNbk5XFdsYvldugno6Lxtys+qC+xd2xez5J02iCaaR3AH5oouPwYxRNf+jZAQei
-	wOSbvCqS7e3rNEkrpuIHlvHXYDNoIuybl8cFSOodNunYGDGX6wAm8RXKo1ahyAk8VdtOoQ
-	Xv7gDZai2y9pS88XDqEu3aiwDyW8lO8bNkCdtarQ1tz/XmsWfFCozKrF603eEA==
+	bh=o+LnA4jeP3t3ewYiAbawcbRTEZKZpSvcElrTCJ7WZ4A=;
+	b=0oCZPEWlaug3h8RTl81RQMj3VPRLLHxomb8NtddxGstnlrH8iccIro4YhGq+YTVXTb8gkc
+	0oXwNf9gDTbO/8it3oKV5zJSa6+bXIRxLvLf11hZVXEpYPWfvZYTKh5IBfc/IrigDVRAkd
+	AAIGupi5kcxMKfv34seC6jeg1rdwOGuvikA6hmtN5+TnxkX6WHpRgSkuj7TjxnhPuFGaLw
+	VGUGbme1OsKzXLI1NFzv4OC6toJmPDOmTv65UJ5nHwqYLRlVUkFKBym/Kcmp7fhdfj5KOJ
+	PJHitp8ACo8Ep7JXYfx9dKEMOg2I/jaf1sozJ+GZFAaJcYzMt5mtkNT0EF2U8A==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1778139269;
+	s=2020e; t=1778139653;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=M3TFmwYRSkODm0VVYgNgy2av15i1ufVLpD3DudaLP68=;
-	b=ht4P6rCCDd4KXzUXl3WNOk6Js8oA2jdpMMT7z/gSSj0NkVWvit3nZO6R07jMYiKzvKRQS+
-	nNC/9qyBm2az7RCQ==
+	bh=o+LnA4jeP3t3ewYiAbawcbRTEZKZpSvcElrTCJ7WZ4A=;
+	b=zLkk9fDV4nxwu9n6abRNR4RuBgxwnWqHPkh79MYH7CL7hOjijFXi0/e7GuyQlAx8Fdt5rY
+	kTW0oJwPng0/LHBw==
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: "Maciej W. Rozycki" <macro@orcam.me.uk>
-Cc: netdev@vger.kernel.org, linux-mips@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+To: Qingfang Deng <qingfang.deng@linux.dev>
+Cc: Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2] declance: Remove IRQF_ONESHOT
-Message-ID: <20260507073427.atoJ5zsY@linutronix.de>
-References: <20260127165430.7ui_LGkg@linutronix.de>
- <alpine.DEB.2.21.2601271739250.40317@angie.orcam.me.uk>
- <alpine.DEB.2.21.2603292037020.60268@angie.orcam.me.uk>
- <alpine.DEB.2.21.2605042332070.46195@angie.orcam.me.uk>
- <20260505072954.Ov2t-FGt@linutronix.de>
- <alpine.DEB.2.21.2605051233210.46195@angie.orcam.me.uk>
- <20260505123203.jifiaxEL@linutronix.de>
- <alpine.DEB.2.21.2605051410280.46195@angie.orcam.me.uk>
- <20260505152450.1KYVS2pr@linutronix.de>
- <alpine.DEB.2.21.2605060040230.46195@angie.orcam.me.uk>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jiri Kosina <jikos@kernel.org>,
+	David Sterba <dsterba@suse.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Mitchell Blank Jr <mitch@sfgoth.com>,
+	Chas Williams <3chas3@gmail.com>, Simon Horman <horms@kernel.org>,
+	James Chapman <jchapman@katalix.com>, Kees Cook <kees@kernel.org>,
+	Taegu Ha <hataegu0826@gmail.com>,
+	Guillaume Nault <gnault@redhat.com>,
+	Eric Woudstra <ericwouds@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
+	Dawid Osuchowski <dawid.osuchowski@linux.intel.com>,
+	Breno Leitao <leitao@debian.org>, linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-atm-general@lists.sourceforge.net
+Subject: Re: [PATCH net-next 2/3] ppp: unify two channel structs
+Message-ID: <20260507074051.mqO5DaWL@linutronix.de>
+References: <20260430090532.244758-1-qingfang.deng@linux.dev>
+ <20260430090532.244758-2-qingfang.deng@linux.dev>
+ <590d7931-02b0-45d6-8f43-ef909c9bde89@redhat.com>
+ <c9993ee6-4023-4331-a1c1-4e30952146fe@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,76 +89,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <alpine.DEB.2.21.2605060040230.46195@angie.orcam.me.uk>
-X-Rspamd-Queue-Id: 93EF64E418E
+In-Reply-To: <c9993ee6-4023-4331-a1c1-4e30952146fe@linux.dev>
+X-Rspamd-Queue-Id: 02ACD4E4314
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	TAGGED_FROM(0.00)[bounces-285169-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,suse.com,linuxfoundation.org,sfgoth.com,gmail.com,katalix.com,arndb.de,linux.intel.com,debian.org,vger.kernel.org,lists.sourceforge.net];
+	TAGGED_FROM(0.00)[bounces-285170-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	DKIM_TRACE(0.00)[linutronix.de:+];
 	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[26];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-On 2026-05-06 10:25:02 [+0100], Maciej W. Rozycki wrote:
-> On Tue, 5 May 2026, Sebastian Andrzej Siewior wrote:
->=20
-> > I'm not if sure if you may need to change the primary handler if the
-> > interrupt flow is EOI and cascading based on what you wrote. If you have
-> > access to the HW then you it should be easy to test given the
-> > `threadirqs' argument should expose problems.
->=20
->  The interrupt is exceedingly rare, I've only seen it actually fire maybe=
-=20
-> a dozen times across all my systems in 25+ years.  It happens when there=
-=20
-> is a memory read error on DMA, such as an uncorrected ECC or parity error=
-=20
-> (depending on the system variant), or a bus timeout.
+On 2026-05-07 13:53:30 [+0800], Qingfang Deng wrote:
+> > This patch is IMHO a bit too big and should be split. Also this kind of
+> > refactor looks very invasive and potentially regression prone. I think
+> > it should include a signficant self-test coverage increase.
+> This is indeed too big. But how do I split it without breaking the build?
 
-I assumed you have other interrupts on that hw, cascaded/ operating the
-same way. But otherwise=E2=80=A6
-
->  It should be possible to orchestrate it, such as by making the LANCE DMA=
-=20
-> pointer register refer an unpopulated location in the system address map;=
-=20
-> memory ECC errors can be induced too by the DRAM controller's diagnostic=
-=20
-> feature.  It seems enough hassle though I'd rather get things right by th=
-e=20
-> spec.
-
-Oh, yeah. That should do it.
-
->  Thanks for the hint as to the `threadirqs' facility though, it may come=
-=20
-> up helpful sometime.
-
-:)
-
->   Maciej
+The current ppp tests would yell if you accidentally broke something?
 
 Sebastian
 
