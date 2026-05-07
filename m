@@ -1,158 +1,135 @@
-Return-Path: <netdev+bounces-285150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285151-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wNZIAgsp/GmXMAAAu9opvQ
-	(envelope-from <netdev+bounces-285150-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 07:54:19 +0200
+	id 0OHlNQgp/GmXMAAAu9opvQ
+	(envelope-from <netdev+bounces-285151-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 07:54:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63D9E4E342E
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 07:54:18 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9DBA4E3427
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 07:54:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CD1B2301E3EF
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 05:54:00 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 733CC3005148
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 05:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C93D2EC57C;
-	Thu,  7 May 2026 05:53:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 346FC33032B;
+	Thu,  7 May 2026 05:54:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Vgr/HUtB"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="RdW8erXR"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D70F8327C0D
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 05:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDB2432F764
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 05:54:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778133239; cv=none; b=tUbgMksTPAQZ+P2brjGfd8xCDaCK5JlZNL7H6v5LedByK32xHn03QPdiguDRAP6XV5tQm/cog6h+jHv7biIolbuwME9qU6DIXZS6oBbThabfiQVZuyBUqe81xH1Pp5HWU0wvRMQNvC9ucwfi546EuoGILj9cBEI9QBxeFJGGShc=
+	t=1778133251; cv=none; b=C/sXa9suO/qb19D8R9lKM78hIkQnDZqNlxKNmYpeh1IpAifqHfydYGg/zIKpEjhDKA2pYjbTxAk/gGijf6oM17zuj2BYkFSzi8YrPRf1vcg9rzLRnMjgj+3qrMpdOZa5TBASwK44UMyTtyMLGlUJM0fAmICVDk27OO+W13YdJtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778133239; c=relaxed/simple;
-	bh=1LrW5qCIbYeb/bX6ybBGiV+9rPWAOJqaKbnrQSaIt9A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=ILxpJeDoEteRaeE4tYAY+nTn+9rSmXmMf0Irw+oWH6X+vOvKtWAWjlmt9l5alGuKmyMIcwI4kwIkBW0VV5+taUgUFghw/bYGqEwtpFJjDhvNiTjvIVXWlt40WRvgkb959EapM0BIHH0HKGsbW+xa33rHjWpcwiYNP+A+qu2TvgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Vgr/HUtB; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <c9993ee6-4023-4331-a1c1-4e30952146fe@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1778133225;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VbGSu/85g0XblWRuECFeslO9kenoVrjTmkH45UYo96U=;
-	b=Vgr/HUtB+VnkFQX0dQtT03258riDXLlIM9m/PeTvG3tf1tRlGkqkkuu0qewifW6W/hABie
-	yJESxF+JatKhHcsZbl7utDYkhuEBB4/Li+Tn8KWQc6cIAOvILsmQtsBXgEsMMx1LyBo7k6
-	J95Oa8iIXKmPJJu8cCe5YBss+U9bqEc=
-Date: Thu, 7 May 2026 13:53:30 +0800
+	s=arc-20240116; t=1778133251; c=relaxed/simple;
+	bh=vdUDKyEsmWH2y93zh2rXtHiWIuuWuDw3ES4ekFbLdrY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QEyLLFTeXJrGAImSzGd/fZyhg67jfsqVU4kUzjLH8egk8F7Bs/0Bze43b6j/sB9MJ/BFyC5mJQgfIEYtR8CqRopd/zHHyxjkYRFjWRXfxIa+cAWgXcPwU7rh+cbRelWgEcYh/oQTdn1GdQ391tOYhGlwiRaA/ip9K+ri5VhYL1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=RdW8erXR; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 9E4A2206DF;
+	Thu,  7 May 2026 07:54:06 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id P9Pes1OaK0xk; Thu,  7 May 2026 07:54:05 +0200 (CEST)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 05A462067A;
+	Thu,  7 May 2026 07:54:05 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 05A462067A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1778133245;
+	bh=bKwPfNu6eXE8thNJCiuhb2gb/Y3wZqs+ChZtr4i0GlQ=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=RdW8erXReECdZqdF0nv7ctNKatoCvUlI8lSJeocV3WebIFktZsty9EJX7g3Fi3yfG
+	 VEAAIFm+GhihPLo98Cg3Cj2ACBJWKQj1kt7Ucypw1RHam/uM2z5O6nfolMwHVdbNAO
+	 PDfb2dZU9s6AYVa04HaPoPva/nHbaPdEIuLmpbZk2NhrHLUdHmLmImrvpefxWC2rdW
+	 P2BA6Ts1zU8d4fltyB7X2BLY1vHm1IgY/s5K/WTR2J0/Z+V/D3mtXV3mlK/nfUUOve
+	 t79jFevPRqjQ0LvVmX5npjwzzw79kvZtTvFaqZ4bd2E3vVLyL5aNKJWFR1/1aTCMSh
+	 9i8ruEn5wMEXg==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 7 May
+ 2026 07:54:04 +0200
+Received: (nullmailer pid 1286833 invoked by uid 1000);
+	Thu, 07 May 2026 05:54:04 -0000
+Date: Thu, 7 May 2026 07:54:04 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: David Miller <davem@davemloft.net>, Herbert Xu
+	<herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH 0/8] pull request (net): ipsec 2026-05-05
+Message-ID: <afwo_DsMkYzL2AG9@secunet.com>
+References: <20260505132326.1362733-1-steffen.klassert@secunet.com>
+ <20260506165035.61964333@kernel.org>
+ <20260506165149.12e30102@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 2/3] ppp: unify two channel structs
-To: Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Jiri Kosina <jikos@kernel.org>,
- David Sterba <dsterba@suse.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Jiri Slaby <jirislaby@kernel.org>, Mitchell Blank Jr <mitch@sfgoth.com>,
- Chas Williams <3chas3@gmail.com>, Simon Horman <horms@kernel.org>,
- James Chapman <jchapman@katalix.com>, Kees Cook <kees@kernel.org>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Taegu Ha <hataegu0826@gmail.com>, Guillaume Nault <gnault@redhat.com>,
- Eric Woudstra <ericwouds@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
- Dawid Osuchowski <dawid.osuchowski@linux.intel.com>,
- Breno Leitao <leitao@debian.org>, linux-ppp@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-serial@vger.kernel.org, linux-atm-general@lists.sourceforge.net
-References: <20260430090532.244758-1-qingfang.deng@linux.dev>
- <20260430090532.244758-2-qingfang.deng@linux.dev>
- <590d7931-02b0-45d6-8f43-ef909c9bde89@redhat.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Qingfang Deng <qingfang.deng@linux.dev>
-In-Reply-To: <590d7931-02b0-45d6-8f43-ef909c9bde89@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 63D9E4E342E
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260506165149.12e30102@kernel.org>
+X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
+ (10.32.0.171)
+X-Rspamd-Queue-Id: D9DBA4E3427
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285150-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,suse.com,linuxfoundation.org,sfgoth.com,gmail.com,katalix.com,linutronix.de,arndb.de,linux.intel.com,debian.org,vger.kernel.org,lists.sourceforge.net];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:url,secunet.com:mid,secunet.com:dkim];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-285151-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:mid,linux.dev:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-On 2026/5/5 19:16, Paolo Abeni wrote:
-> On 4/30/26 11:05 AM, Qingfang Deng wrote:
->> Historically, PPP maintained two separate structures for a channel:
->> 'struct channel' was internal to ppp_generic.c, while 'struct ppp_channel'
->> was the public interface that drivers were required to embed. This
->> duplication was redundant and forced drivers to manage the lifecycle of
->> the public structure.
->>
->> Unify these two structures into a single 'struct ppp_channel', which is
->> now internal to ppp_generic.c. Drivers now use a 'ppp_channel_conf'
->> structure to specify registration parameters and receive an opaque
->> pointer to the allocated channel.
->>
->> Key changes:
->> - ppp_register_channel() and ppp_register_net_channel() now return
->>    a 'struct ppp_channel *' instead of taking a pointer to a driver-
->>    embedded structure.
->> - 'struct ppp_channel_ops' methods now take the driver's 'private'
->>    pointer directly as their first argument, simplifying driver logic.
->> - ppp_unregister_channel() now takes the opaque pointer.
->> - Multilink-specific fields are unified and handled via the new
->>    configuration structure.
->>
->> This cleanup simplifies the driver interface and makes the channel
->> lifecycle management more robust by centralizing allocation in the PPP
->> generic layer.
->>
->> Assisted-by: Gemini:gemini-3-flash
->> Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
->> ---
->>   drivers/net/ppp/ppp_async.c      |  51 +++++-----
->>   drivers/net/ppp/ppp_generic.c    | 161 +++++++++++++++----------------
->>   drivers/net/ppp/ppp_synctty.c    |  51 +++++-----
->>   drivers/net/ppp/pppoe.c          |  34 ++++---
->>   drivers/net/ppp/pppox.c          |   4 +-
->>   drivers/net/ppp/pptp.c           |  40 ++++----
->>   drivers/tty/ipwireless/network.c |  30 +++---
->>   include/linux/if_pppox.h         |   2 +-
->>   include/linux/ppp_channel.h      |  49 ++++++----
->>   net/atm/pppoatm.c                |  61 ++++++------
->>   net/l2tp/l2tp_ppp.c              |  34 ++++---
->>   11 files changed, 271 insertions(+), 246 deletions(-)
-> This patch is IMHO a bit too big and should be split. Also this kind of
-> refactor looks very invasive and potentially regression prone. I think
-> it should include a signficant self-test coverage increase.
-This is indeed too big. But how do I split it without breaking the build?
+On Wed, May 06, 2026 at 04:51:49PM -0700, Jakub Kicinski wrote:
+> On Wed, 6 May 2026 16:50:35 -0700 Jakub Kicinski wrote:
+> > On Tue, 5 May 2026 15:22:56 +0200 Steffen Klassert wrote:
+> > > 5. Harden __xfrm_state_delete() against repeated or inconsistent unhashing
+> > >    of state list nodes by keying the removal on actual list membership and
+> > >    using delete-and-init helpers. From Michal Kosiorek.  
+> > 
+> > Sashiko seems to have extra comments for this but I suspect follow up
+> > is the way to go there.
+> 
+> I should have made it clear - Claude-shiko:
+> 
+> https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260505132326.1362733-4-steffen.klassert@secunet.com
+
+I think the races Sashiko reveals here don't exist. __xfrm_state_delete()
+is always called with the xfrm_state lock held, so there can't be a
+second __xfrm_state_delete() on the same xfrm_state.
 
