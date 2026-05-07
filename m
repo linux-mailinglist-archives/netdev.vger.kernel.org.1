@@ -1,271 +1,219 @@
-Return-Path: <netdev+bounces-285482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285483-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mJ7LDC3y/GlmVgAAu9opvQ
-	(envelope-from <netdev+bounces-285482-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 22:12:29 +0200
+	id gHlENV7y/GlmVgAAu9opvQ
+	(envelope-from <netdev+bounces-285483-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 22:13:18 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D97E4EE45C
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 22:12:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4155E4EE479
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 22:13:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6EC143031E89
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 20:12:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DF9A930297B0
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 20:12:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEED436AB77;
-	Thu,  7 May 2026 20:12:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB3A36EAAE;
+	Thu,  7 May 2026 20:12:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=schippers-hamm.de header.i=simon@schippers-hamm.de header.b="hGLgMPXl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T/g/ge06"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6026035E950;
-	Thu,  7 May 2026 20:12:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DF135B644
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 20:12:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778184735; cv=none; b=HcNhKoLtaW8jANX02YdZaFAc9voQHRihqBFu/UbAxiQGRkpJDsfSgc9n9whTO4Qa5eGDeSAHhd6TudDlJvungedHNVqz3Wpv1MCvH60fPIVdoc0WkKKZrJTzIWfX1mK6ve6HcQmzpde/e600qdGWZt3Jn9MEH0WR3I6rtZHL5RI=
+	t=1778184762; cv=none; b=b8NA2Vv81B5a61ohJQDo1TVMKboS1sAzUtm0EXiju+d8Yu53AMU9HIl5HuyhiJyoqwRqBHFfGHGZPabr/8Lc/rgjY3ReapTv1xdDFQd9nM8ex6/+WKbZ9h/Ybfa83GGKpbfLVz+iW2lxbzd48P9rVISiXNWJ+WPYZASGz99+VeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778184735; c=relaxed/simple;
-	bh=7s/4adQpQg3g9cdxL1pqHwK0tsim71iGO8AnG9gX20M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SQ8u3bwaCEqwFaxuIxBNjP06nEGLM2F/sfFGsThNp2rbTqyCE4K6oxnUSt2v78OGTBDnYwGOyqMbgtwFHDicQri8ZO7JwdYCaFB5sgNySli/fY7jZheTfrdyoQSqozvCW+ne9cOzjhbSl/sgtIG7eqr1iu9gHcdAmDK4dzcj6Kg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schippers-hamm.de; spf=pass smtp.mailfrom=schippers-hamm.de; dkim=pass (2048-bit key) header.d=schippers-hamm.de header.i=simon@schippers-hamm.de header.b=hGLgMPXl; arc=none smtp.client-ip=212.227.126.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schippers-hamm.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=schippers-hamm.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=schippers-hamm.de;
-	s=s1-ionos; t=1778184727; x=1778789527; i=simon@schippers-hamm.de;
-	bh=5OMntRvUYVrF4y3sfizXFvoNLUAkQ7WvIogA+XQ/6VM=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=hGLgMPXlX5F33ZmNKxoTCrlF899OeSLxlCdk7xOMNnq5TJlM6Q/MRDJ1CKxi4Ng/
-	 FHIvuDf6uLnbHfiZOJrGg+WjCIEAisSD+GC5cYK+KYQh7gMFOtrFCaPPEUneoGS35
-	 2HzfLj26WVCbif+980q+mWxTo+diPm6xAOIRWN/TqG/BxuUsjIerH9xiKUw3xwX2w
-	 wWkoal4o5FMR2IDcZ9T/DGuwwwdwbGao2e6OJ2CE5J+yIMOQrgK9EHSEgYUHu74v4
-	 DzaavFNArCp79i3l2jg+MAgHJXY/uGgvrUvXJSxD5x7XuFtWIa9k5CaSkEJNmbnx1
-	 Dy+k18Oqvt3UoGBAFg==
-X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue009
- [212.227.17.165]) with ESMTPSA (Nemesis) id 1M8QNs-1wGfDy3kxc-00AIPQ; Thu, 07
- May 2026 22:12:07 +0200
-Message-ID: <68223314-1a44-4aee-8207-57437ef9f3ab@schippers-hamm.de>
-Date: Thu, 7 May 2026 22:12:00 +0200
+	s=arc-20240116; t=1778184762; c=relaxed/simple;
+	bh=YiA1eEseDRCOb+C4MPisetZeRtex0Ar8vxo2COhJHQM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E2IsjUgm9oBlMIF0RISeq04T05fjcAZaKqnwn/aJ03dv4yGBdWHtCgvlbgXZmmcBoM0zhaMoh80pxl8PL9MTFtfHXuAgmBAnvZbDf2X57d2OmA74c5KAtHQr2YfwqvCGFry2u9qRlV5dHBZUeMJD4GcWlv2B7yFLKhw12G1F9P4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T/g/ge06; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-8ec37d52c0dso178716685a.0
+        for <netdev@vger.kernel.org>; Thu, 07 May 2026 13:12:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778184760; x=1778789560; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CufiyOMzWgsZjfa0uu9olo/GL0CEznYyMUEZlGLNhMU=;
+        b=T/g/ge061pRx5t3ffnUhKYtUO1RKS8vcp/2PZ57Ge6G/H/wCYga5KeuVfgq4E/8WZj
+         mqTxGJPqx0Vg9m/Q/tcgRtOMaca503DSeo1ZGJAZjrstg9VYO6MuHTyFdyQjw3ByD+XA
+         P9Muo/iBBht1PhJdjiUfJABtnlwNlONhVlNNnVlNWnnUSjQKQSNA8S5kKGTKbeGwACBd
+         QcmBXc1xlKiyJsDe1EG4sfjPcsTxbSAIOWXNtB3L7v/2AO2c4Wmnrs6xByPM0mFpBlAL
+         rM9HL3Y0ubuZw1ZmmGLpodyBmSVbaNBlANnOXopMMh6NThpaktkZTSSOkoByIJYJ3GjM
+         S9Vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778184760; x=1778789560;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CufiyOMzWgsZjfa0uu9olo/GL0CEznYyMUEZlGLNhMU=;
+        b=hXANrwRvcr3VPYrKUgnTCug+hfw4KT5MVRW7huLMTeQsm6xlH3/+pTlzWZBWJAmOLQ
+         piNDhfwVpmo8pPNMB7ijSolIQUXyFF+lBxUOtx4XD85OXDKiP67Ib6w5BTYYG0MHkohR
+         ssRa7t1fBp9ZWWGFUgK0hpeZdMI/uozgbe+eIok4nXnahruae4YV93a6IutH+VCgS7Z+
+         n68TK7VS7OXgPe6QOI0uVW1BnCNETzDvMzbMFyp1mNBlgYvxnwszULfSMLHeRtpasGjo
+         tCQNsEaqb9mrSCnWb9J2x9FEwqomoUF4hO92abgAPzQZlVw1qo3Y9EHda7c9Jm8cYiMh
+         9n0w==
+X-Forwarded-Encrypted: i=1; AFNElJ+5J+j2Ab8iZa2v6K8P2AkcFvx0tffHiuw9R1+1kFdFCGnvD3NEYwxdwY1v/uLkL7YIheKlfNs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBbzd5KN7Mx3KXRSAxRbqcRMey9IMwKciuDXYosTvIfHbpsQLg
+	PYgo846aonl5C6KQkQrVtzCd4MytnQFHwXG3wIKJ26Di3GNAWLm69JpE
+X-Gm-Gg: AeBDieuXNQmEvC2ah32tlRDdzyLRe7XMiUZpYlI2O0SNdiQU1lWF0gC3YFEYUtcixyK
+	kcfUEeudc37PR9bJpKGjxbSFxByYomeMSz7aTWrUb6b9MtuX6HTMt0aS8YczJNW/yrEHNn9oBlL
+	u6vrasv7urSnD+E2qy689rjupu81G1Tu0jf/FiqR/cxE4j1vRzyeEAtkxdeNppnqcNI2QV1JMsb
+	WV/jRa3uuZiyrNmlaya/AVoeRLZuI/IugCQUZMqnqx/OrNO1jUJGrkqEd51w0PrpbkrKA78QFEw
+	rSXp4Zit9Vpu45tsYIk45OWYJEQYaKG/Ueo6Z0gzNAZsvrRUBZfI8j0Mp+CMvZbOH6piDOnQXbh
+	cfMYMkPCFGZoaGLFCOCg6KIWpTZ528KDYeqydrqw5FrM1NUgAZp63KSPwc/eDXeELVoa8UraWO+
+	W+WIRso2A2PA+kKKscfqWVBGU+7Gcppu1LK4q+ss8bm/v1s2E=
+X-Received: by 2002:a05:620a:258e:b0:8ee:3715:2127 with SMTP id af79cd13be357-904d63e7a0amr1428892785a.38.1778184760010;
+        Thu, 07 May 2026 13:12:40 -0700 (PDT)
+Received: from devvm29614.prn0.facebook.com ([2a03:2880:f800:31::])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8fc2c91cd89sm2059382385a.35.2026.05.07.13.12.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 May 2026 13:12:39 -0700 (PDT)
+Date: Thu, 7 May 2026 13:12:35 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	Arseniy Krasnov <avkrasnov@salutedevices.com>,
+	Bobby Eshleman <bobbyeshleman@meta.com>, stefanha@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, horms@kernel.org, Yiqi Sun <sunyiqixm@gmail.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev
+Subject: Re: [PATCH] vsock/virtio: fix vsockmon info leak in non-linear tap
+ copy
+Message-ID: <afzyM6fTTAl0Hnvm@devvm29614.prn0.facebook.com>
+References: <20260430071110.380509-1-sunyiqixm@gmail.com>
+ <f4e52dcd-59ba-4c2e-9936-49cf27528b21@redhat.com>
+ <afnXIGtswspSEk8x@sgarzare-redhat>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 3/5] veth: implement Byte Queue Limits (BQL)
- for latency reduction
-To: Jesper Dangaard Brouer <hawk@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: kernel-team@cloudflare.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20260505132159.241305-1-hawk@kernel.org>
- <20260505132159.241305-4-hawk@kernel.org>
- <ee275aa6-af27-4dac-9afa-da88abde312b@schippers-hamm.de>
- <8f2f7f2e-6aa2-4e5b-b52d-0025b2525579@redhat.com>
- <e3a91545-13cd-4f87-8375-d707865bdbca@schippers-hamm.de>
- <6a597dbd-70bf-4b14-b495-2f7248fd3220@kernel.org>
-Content-Language: en-US
-From: Simon Schippers <simon@schippers-hamm.de>
-In-Reply-To: <6a597dbd-70bf-4b14-b495-2f7248fd3220@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:QCywI0hdiv3Q6UFnj9I4c6dnI+uaxvvcdbGaOz+JnRkI+r0aqtu
- RRImD4uH45u+VbhN5dcvEwQ213WwF++9+RNJsIefj9TrGaIl5rufckc8naupz/FMJWBhU3c
- rqsbHuYXjKS50lbt9cqY4Cjjq/1R3w7hLC2+KWHOQMn6q3L3AfU7nyfb40dB2E//uOkFuiM
- r7XLsQMWNxIeTdV1G/9Cw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:M70IqaqnKkE=;6tWWpHrg8Ntyt7nE38p7yzIvbKZ
- 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
-X-Rspamd-Queue-Id: 8D97E4EE45C
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <afnXIGtswspSEk8x@sgarzare-redhat>
+X-Rspamd-Queue-Id: 4155E4EE479
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[schippers-hamm.de,none];
-	R_DKIM_ALLOW(-0.20)[schippers-hamm.de:s=s1-ionos];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285482-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[cloudflare.com,lunn.ch,davemloft.net,google.com,kernel.org,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[redhat.com,salutedevices.com,meta.com,vger.kernel.org,linux.alibaba.com,davemloft.net,google.com,kernel.org,gmail.com,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-285483-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon@schippers-hamm.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[schippers-hamm.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On 5/7/26 21:09, Jesper Dangaard Brouer wrote:
->=20
->=20
-> On 07/05/2026 16.46, Simon Schippers wrote:
->>
->>
->> On 5/7/26 16:34, Paolo Abeni wrote:
->>> On 5/7/26 8:54 AM, Simon Schippers wrote:
->>>> On 5/5/26 15:21, hawk@kernel.org wrote:
->>>>> @@ -928,9 +968,13 @@ static int veth_xdp_rcv(struct veth_rq *rq, int=
- budget,
->>>>>               }
->>>>>           } else {
->>>>>               /* ndo_start_xmit */
->>>>> -            struct sk_buff *skb =3D ptr;
->>>>> +            bool bql_charged =3D veth_ptr_is_bql(ptr);
->>>>> +            struct sk_buff *skb =3D veth_ptr_to_skb(ptr);
->>>>>                 stats->xdp_bytes +=3D skb->len;
->>>>> +            if (peer_txq && bql_charged)
->>>>> +                netdev_tx_completed_queue(peer_txq, 1, VETH_BQL_UNI=
-T);
->>>>
->>>> In the discussion with Jonas [1], I left a comment explaining why I t=
-hink
->>>> this doesn=E2=80=99t work.
->>>>
->=20
-> I've experimented with doing the "completion" at NAPI-end in
-> veth_poll(), but that resulted in BQL limit being 128 packets, which
-> leads to bad latency results (not acceptable).
-> (See detailed report later)
->=20
->=20
->>>> I still think first that adding an option to modify the hard-coded
->>>> VETH_RING_SIZE is the way to go.
->>>>
->=20
-> Not against being able to modify VETH_RING_SIZE, but I don't think it is
-> the solution here.
->=20
-> The simply solution is the configure BQL limit_min:
->  `/sys/class/net/<dev>/queues/tx-N/byte_queue_limits/limit_min`
->=20
-> My experiments (below) find that limit_min=3D8 is gives good performance=
-.
-> We can simply set default to 8 as this still allows userspace to change
-> this later if lower latency is preferred.
->=20
->>>> Thanks!
->>>>
->>>> [1] Link: https://lore.kernel.org/netdev/e8cdba04-aa9a-45c6-9807-8274=
-b62920df@tu-dortmund.de/
->>>
->>> In the above discussion a 20% regression is reported, which IMHO can't
->>> be ignored. Still the tput figures in the data are extremely low,
->>> something is possibly off?!? I would expect a few Mpps with pktgen on
->>> top of veth, while the reported data is ~20-30Kpps.
->>>
->>> /P
->>>
->>
->> The ~20-30Kpps occur when thousands of iptables rules are applied and
->> an UDP userspace application is sending.
->>
->> And there is a 20% pktgen regression (no iptables rules applied).
->>
->=20
-> The pktgen test is a little dubious/weird and Jonas had to modify pktgen
-> to test this.   John Fastabend added a config to pktgen that allows us
-> to benchmarking egress qdisc path, this might be better to use this.
-> The samples/pktgen/pktgen_bench_xmit_mode_queue_xmit.sh is a demo usage.
->=20
-> If redoing the tests, can you adjust limit_min to see the effect?
->  /sys/class/net/<dev>/queues/tx-N/byte_queue_limits/limit_min
->=20
-> 20% throughput performance regression is of-cause too much, but I will
-> remind us, that adding a qdisc will "cost" some overhead, that is a
-> configuration choice.  Our purpose here is to reduce bufferbloat and
-> latency, not optimize for throughput.
->=20
->=20
->> I am pretty sure the reason is because the BQL limit is stuck at 2
->> packets (because the completed queue is always called with 1 packet
->> and not in a interrupt/timer with multiple packets...).
->>
->=20
-> I've run a lot of experiments, which I made AI write a report over, see =
-attachment.  The TL;DR is that best performance vs latency tradeoff is def=
-aulting BQL/DQL limit_min to be 8 packets.
->=20
-> I fear this patchset will stall forever, if we keep searching for a perf=
-ect solution without any overhead.  The qdisc layer will be a baseline ove=
-rhead.  The limit=3D2 packets is actually the optimal darkbuffer queue siz=
-e, but I acknowledge that this causes too many qdisc requeue events (leadi=
-ng to overhead).  I suggest that I add another patch in V6, that defaults =
-limit_min to 8 (separate patch to make it easier to revert/adjust later).
->=20
-> I've talked with Jonas, and we want to experiment with different solutio=
-ns to make BQL/DQL work better with virtual devices.
->=20
-> This patchset helps our (production) use-case reduce mice-flow latency
-> from approx 22ms to 1.3ms for latency under-load.  Due to the consumer
-> namespace being the bottleneck the requeue overhead is negligible in
-> comparison.
->=20
-> -Jesper
+On Tue, May 05, 2026 at 02:44:16PM +0200, Stefano Garzarella wrote:
+> CCing Arseniy and Bobby.
+> 
+> On Tue, May 05, 2026 at 12:26:21PM +0200, Paolo Abeni wrote:
+> > On 4/30/26 9:11 AM, Yiqi Sun wrote:
+> > > vsockmon mirrors packets through virtio_transport_build_skb(), which
+> > > builds a new skb and copies the payload into it. For non-linear skbs,
+> > > this goes through virtio_transport_copy_nonlinear_skb().
+> > > 
+> > > Helper manually initializes a iov_iter, but leaves iov_iter.count unset.
+> > > As a result, skb_copy_datagram_iter() sees zero writable bytes
+> > > in the destination iterator and copies no payload data.
+> > > 
+> > > This becomes an info leak because virtio_transport_build_skb() has
+> > > already reserved payload_len bytes in the new skb with skb_put(). The
+> > > skb is then returned to the tap path with that payload area still
+> > > uninitialized, so userspace reading from a vsockmon device can observe
+> > > heap contents and potentially kernel address.
+> > > 
+> > > Fix it by initializing iov_iter.count to the number of bytes to copy.
+> > > 
+> > > Fixes: 4b0bf10eb077 ("vsock/virtio: non-linear skb handling for tap")
+> > > Signed-off-by: Yiqi Sun <sunyiqixm@gmail.com>
+> > > ---
+> > >  net/vmw_vsock/virtio_transport_common.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > > index 416d533f493d..6b26ee57ccab 100644
+> > > --- a/net/vmw_vsock/virtio_transport_common.c
+> > > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > > @@ -152,7 +152,7 @@ static void virtio_transport_copy_nonlinear_skb(const struct sk_buff *skb,
+> > >  	iov_iter.nr_segs = 1;
+> > > 
+> > >  	to_copy = min_t(size_t, len, skb->len);
+> > > -
+> > > +	iov_iter.count = to_copy;
+> > >  	skb_copy_datagram_iter(skb, VIRTIO_VSOCK_SKB_CB(skb)->offset,
+> > >  			       &iov_iter, to_copy);
+> > 
+> > @Stefano, @Stefan, the patch LGTM, but sashiko pointed out to a
+> > pre-existing issue you should probably want to address:
+> > 
+> > >  	to_copy = min_t(size_t, len, skb->len);
+> > Does this length calculation account for the offset when a packet is
+> > split across multiple transmissions?
+> > If a packet is requeued, VIRTIO_VSOCK_SKB_CB(skb)->offset is increased,
+> > but to_copy still evaluates to the full length of the skb.
+> 
+> Yep, I just checked and vhost-vsock is the only place where we call
+> virtio_transport_deliver_tap_pkt() wiht an offset != 0, but I agree that we
+> should also fix it.
+> 
+> Looking better in net/vmw_vsock/virtio_transport_common.c I think this is a
+> regression, indeed we have this comment in virtio_transport_build_skb():
+> 
+> 	/* A packet could be split to fit the RX buffer, so we can retrieve
+> 	 * the payload length from the header and the buffer pointer taking
+> 	 * care of the offset in the original packet.
+> 	 */
+> 	pkt_hdr = virtio_vsock_hdr(pkt);
+> 
+> Before commit 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with
+> sk_buff") we read the payload lenght from the header that is always set to
+> the right value before delivering the packet to the tap.
+> 
+> From that commit, we don't to consider the offset anymore since we started
+> to use `len` from the skb, so IMO we should go back to what we did before
+> it, I mean:
+> 
+> 	payload_len = le32_to_cpu(pkt->hdr.len);
+> 
+> @Bobby do you remember why we did that change? Or if you see any issue going
+> back to what we did initially?
 
-First of all thanks for you work and I really see the advantages of
-avoiding bufferbloat :)
+I think this was just one that made it through the cracks. I vaguely
+recall a few other instances where I assumed skb->len could stand-in for
+hdr.len, but it didn't hold.
 
-But the key of the BQL algorithm, which is the *dynamic* adaption of the
-limit, is not working. Always calling netdev_completed_queue() with
-1 packet results in a static limit of 2 packets (as seen by Jonas
-measurements), which you force up to 8 packets.
+Using hdr.len like the original looks correct to me.
 
-So in the end this patchset has the same effect as just setting
-VETH_RING_SIZE to 8 (and giving an option to change this value).
-
+Best,
+Bobby
 
