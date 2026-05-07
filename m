@@ -1,158 +1,132 @@
-Return-Path: <netdev+bounces-285309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285310-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UJInKDCG/GkaRAAAu9opvQ
-	(envelope-from <netdev+bounces-285309-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:31:44 +0200
+	id QBvWFE2G/GkaRAAAu9opvQ
+	(envelope-from <netdev+bounces-285310-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:32:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38D8D4E8380
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:31:43 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B631B4E83A5
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:32:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6479B30074FD
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 12:31:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 28906302DE19
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 12:31:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEF183E958D;
-	Thu,  7 May 2026 12:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 453ED3F0A9F;
+	Thu,  7 May 2026 12:31:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="M/iP/65X"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Wva/me34"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E7D3EF0CF
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 12:31:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375A03EE1FD;
+	Thu,  7 May 2026 12:31:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778157097; cv=none; b=jst7pUPOvKMhmbuMq31YLEGL3i2Quywv8CH241M7FwHk17CsU4CGT6zSUMSAmUomYeOZReZ41rPK1pR2ZDJqdNEFIGPtKoeTb2zZI7UZAOsX9o21i1xmKOoElqars49ntOlNWL/rMddsfSrGblo1RkNv6ZVkit7998WH1wQfb5o=
+	t=1778157100; cv=none; b=t777SRi2fR9hCZgPhUh7SmDhCCRomr0Vkbn7ClbiWcBQz74b0R0mATFkHb2vsBCLKr61yE7dFwZ0fLr+0cFkcn7GlyvlMsKnxjWtiJpLQsKXGTIQdrieGFfgYiwqNfWTtZuIMzQDgpBjPDvMstYlKXRke1aqwKBan+Gji/kOuVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778157097; c=relaxed/simple;
-	bh=abR33LWqDOSHmYqXKopX4dV7qJgCLnKBEHLiDWopmKM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UUP+2Q5HhkpirtIlOlhY0lb9UBuUtkGp9AcJfTUZaTZR9HlamLfIL179jofhgn32YDx5tlhQ2wQ7wbrVQUMm2v8JpV/U9ylZaqrIIK4qaykAvHycIU42PY50Ax1UPuUujItFa4bz+bv7EJDhQT6FHpSflaugzPBecrZKDzJxIpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=M/iP/65X; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <5e9b15c7-5db4-408e-a5bc-75fe5752ed74@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1778157090;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cVcapITppFjdbgWyCIsD7Di3H3M7df4fmIK75pLRWfs=;
-	b=M/iP/65XiomV/0Vr3DDPkszg7lw61MMKsk0KljW6BdM85buVlKRed8fdzcUtbfUkpvMdkg
-	Wne3gpPVMexad+izAogv8xzH/34Ik/w8n72PvHFK1T2PyQaN3HBvIj8n0BmTKeVqoRrl4c
-	VzIT85gl9FPSaSGvhY8yk75NX/VATdo=
-Date: Thu, 7 May 2026 13:30:55 +0100
+	s=arc-20240116; t=1778157100; c=relaxed/simple;
+	bh=3Yt6JhHzchpAW4Vh99X8/iK/VL8KAYS7pJqOoMyR7Xo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jXA2bUl3gwj6gTgF/k8DPerTd6F5fgU619OONi/teZ7cS+GL8O5n+TNR8tyG/pzUuo/Evm4a9ktR3tX4aqueNsx6zNJrX+7GrvkeIMt3jH40EHXodmWzaoit5CZ97XbxxhyqaFyLAqdeJHknem0Tb4JPvBxq6Fr7uWzSdXqq2Fk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Wva/me34; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=g8iedydIV97eBrioDXzPHVBkEBfHLmzG2Io0Mm7NzC0=; b=Wva/me34PHMLuDTp7KeapU9q9+
+	/PQGq1PrUQgsCX84K14I9WF0zM4SL3O0hQJ3Rg7/n7CtdguPvQPzOBH1qc/VGwzF43XqYxiPLjRPL
+	3cDYtnxcH64FJQylmq5jz9/DbOs5J2W0WsZwHmtdXBG/PM1/QzmjmnW2fj/XdUsixnQA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wKxsx-001oIF-Ue; Thu, 07 May 2026 14:31:23 +0200
+Date: Thu, 7 May 2026 14:31:23 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Minda Chen <minda.chen@starfivetech.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	devicetree@vger.kernel.org
+Subject: Re: [net-next v3 0/5] Add StarFive jhb100 soc SGMII GMAC support
+Message-ID: <dcbb2e54-34b6-4257-90d9-a9223d1c4a70@lunn.ch>
+References: <20260507094115.8355-1-minda.chen@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v3 1/4] net: rnpgbe: Add interrupt handling
-To: Dong Yibo <dong100@mucse.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, danishanwar@ti.com, horms@kernel.org
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, yaojun@mucse.com
-References: <20260507081539.171844-1-dong100@mucse.com>
- <20260507081539.171844-2-dong100@mucse.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260507081539.171844-2-dong100@mucse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 38D8D4E8380
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260507094115.8355-1-minda.chen@starfivetech.com>
+X-Rspamd-Queue-Id: B631B4E83A5
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	TAGGED_FROM(0.00)[bounces-285309-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[foss.st.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,canonical.com,vger.kernel.org,st-md-mailman.stormreply.com];
+	TAGGED_FROM(0.00)[bounces-285310-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-On 07/05/2026 09:15, Dong Yibo wrote:
-> Add comprehensive interrupt handling for the RNPGBE driver:
-> - Implement msi-x/msi interrupt configuration and management
-> - Create library functions for interrupt registration and cleanup
+On Thu, May 07, 2026 at 05:41:10PM +0800, Minda Chen wrote:
+> jhb100 is a Starfive new RISC-V SoC for datacenter BMC (BaseBoard
+> Managent Controller). Similar with Aspeed 27x0.
 > 
-> This infrastructure enables proper interrupt handling for the
-> RNPGBE driver.
+> The jhb100 minimal system upstream is in progress:
+> https://patchwork.kernel.org/project/linux-riscv/cover/20260403054945.467700-1-changhuang.liang@starfivetech.com/
 > 
+> jhb100 GMAC still using designware GMAC core like JH7100 and JH7110,
+> and contains 2 SGMII interfaces, 1 RGMII/RMII interface, 1 RMII
+> interface. In JH7100/JH7110 dwmac-starfive.c have supported RGMII/RMII
+> interface. So require to add SGMII support to dwmac-starfive.c for JHB100.
+> 
+> SGMII serdes PHY has been integrated in JHB100 and do not have driver
+> setting.
+> 
+> In JHB100 EVB board, SGMII connect with motorcomm YT8531s external PHY
+> and support RJ45 ethernet port.
+> 
+> The patch base in 7.1-rc2
 
-[...]
+For networking, please base on net-next/main.
 
-> +/**
-> + * rnpgbe_set_interrupt_capability - Set MSI-X or MSI if supported
-> + * @mucse: pointer to private structure
-> + *
-> + * Attempt to configure the interrupts using the best available
-> + * capabilities of the hardware.
-> + *
-> + * @return: 0 on success, negative on failure
-> + **/
-> +static int rnpgbe_set_interrupt_capability(struct mucse *mucse)
-> +{
-> +	int v_budget;
-> +
-> +	v_budget = min_t(int, mucse->num_tx_queues, mucse->num_rx_queues);
-> +	v_budget = min_t(int, v_budget, MAX_Q_VECTORS);
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
 
-these 2 lines can be simplified to
-
-min3(mucse->num_tx_queues, mucse->num_rx_queues, MAX_Q_VECTORS);
-
-> +	v_budget = min_t(int, v_budget, num_online_cpus());
- > +	/* add one vector for mbx */> +	v_budget += 1;
-> +	v_budget = pci_alloc_irq_vectors(mucse->pdev, 1, v_budget,
-> +					 PCI_IRQ_MSI | PCI_IRQ_MSIX);
-> +	if (v_budget < 0)
-> +		return v_budget;
-> +
-> +	if (mucse->pdev->msix_enabled) {
-> +		/* q_vector not include mbx */
-> +		if (v_budget > 1) {
-> +			mucse->flags |= M_FLAG_MSIX_EN;
-> +			mucse->num_q_vectors = v_budget - 1;
-> +		} else {
-> +			mucse->flags |= M_FLAG_MSIX_SINGLE_EN;
-> +			mucse->num_q_vectors = 1;
-> +		}
-> +	} else {
-> +		/* msi use only 1 irq */
-> +		mucse->num_q_vectors = 1;
-> +		mucse->flags |= M_FLAG_MSI_EN;
-> +	}
-
-How will it work in case it's only 1 vector allocated? AFAIU, you need 
-at least 2 irq vectors - 1 for queue processing, another one for mbx.
-
-> +
-> +	return 0;
-> +}
+	Andrew
 
