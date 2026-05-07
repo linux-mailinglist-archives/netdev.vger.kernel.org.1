@@ -1,215 +1,292 @@
-Return-Path: <netdev+bounces-285429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285428-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0PXjGea7/Gm6TAAAu9opvQ
-	(envelope-from <netdev+bounces-285429-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:20:54 +0200
+	id gC+yAgu8/GnSTAAAu9opvQ
+	(envelope-from <netdev+bounces-285428-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:21:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA6614EC1B7
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:20:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83B454EC1E4
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:21:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B5BB6308D939
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 16:13:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 899783059596
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 16:13:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49083EFD39;
-	Thu,  7 May 2026 16:13:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D47353F7A98;
+	Thu,  7 May 2026 16:13:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HrvD8sfY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L2BDwGeA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12F1283FCE;
-	Thu,  7 May 2026 16:13:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B11593EFD2A;
+	Thu,  7 May 2026 16:13:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778170397; cv=none; b=lFO9BBraLIc+NtBeZWh5wLZArq2ZcZWcFT4/0Uut4LYQwb9BUV9PhKUSvLVUUwNm4yX1Ify7cE1owflrNMAQZ/6bxD/sIj9bVNw9B9Kz9E2r57VwnK+P8tMBr18vS4MmYBnlmqEAXzuxfS8p3IauPtrNhpU3pvGjYGOaavI9CzA=
+	t=1778170382; cv=none; b=hFMFJw0ElRlJKmYc1HxqaobaFbNdNlEwSW99S4G1AqvixhgSIE05u/coR/KtppmeLSQwavfBlIw1UZWefG7XdLNBSjXHXfj3xSscL5r+94Mjs6WDwP4gNUAZxP9aAStNn+NSpNh+tuFHQ3FypGiwr/Wlzd5v2mKWgEQScKfaq1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778170397; c=relaxed/simple;
-	bh=PuLUE747uu/IIcMnfH62AU0ZjTeTwo+w0XIMvnAzyr0=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=MvSTs4kj0tV8PrMT6x40fwZ4PLqG55QNaink2gQ0vBxbTPee3V5QNhHSoosU3DMy96Z6pJzzJM3RlDreNnfq9eeASMnymlpE7VM23G3aYAlj4BOL6WMyC3teGb2WwstKmQyD3dBWBBkmiF4FIthGtZ4RoSuNbox4Uv0+vvZgifo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HrvD8sfY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAD96C4AF09;
-	Thu,  7 May 2026 16:13:16 +0000 (UTC)
+	s=arc-20240116; t=1778170382; c=relaxed/simple;
+	bh=ex2k+tQzCOViUN/yUnsO5c6ctZ5+/pBXAtFzWgkCChY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Rty6YNetbdwT6I/f4Wh2EeDV/MJfAdqsX0LYi0o7aZG9Vw4RWP48BirK7iqion/0Un0fbujbnRJ6mZtvJ+L8inZqy1dHNSDT0F5oaOHmLloc+HOzlnzwWeuSSLhGLwpO/0z7QmWALGgoFSgdF343YvUlCfDUHK9wQNQqnfvPhm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L2BDwGeA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34F0FC2BCB2;
+	Thu,  7 May 2026 16:13:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778170397;
-	bh=PuLUE747uu/IIcMnfH62AU0ZjTeTwo+w0XIMvnAzyr0=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=HrvD8sfYP7OKKqnHpvmPeXcr9VILL7X0KLlgehFsP+2TWbbPtSnsZQM+hgpk+HdJF
-	 YWWnkuwyDU4gyXz25f2vYxnSBm4nzZzhcc2mX5nZftTEUv39Mc/wyrTewj72u2Qw8b
-	 VNYWjXI0BnnkhJY2qWqyfrQ59kStKIe/p4RCRNIupNENIKphpNBC4T9wC8/cPRh94y
-	 eP07uAyHKQy+ABLMiBIMB6mH0XVosD5MqdoqEX7yKAUQoHQs7HKtuEdTbO+8b6vAfT
-	 8CCNCUQAJoKgdhnEPOiQhyG9bpeWtyIUroOAscDgjl7jFvx9EeTAqihDORoC0sTtxb
-	 fJk7DeK/Qp0Mw==
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 22899F40069;
-	Thu,  7 May 2026 12:13:16 -0400 (EDT)
-Received: from phl-imap-15 ([10.202.2.104])
-  by phl-compute-10.internal (MEProxy); Thu, 07 May 2026 12:13:16 -0400
-X-ME-Sender: <xms:HLr8af2HgcoJybgixy7KUCibXZBGGe94hczhsC9Dvpmb8exrmphPkw>
-    <xme:HLr8aY4IHzjFXjyOGkeSw4v0Iw0TL8WWyEBO4mARujtRXK_RPBwhK9RbZSC5XXCVK
-    B5vJBHRhJVN1eKQQ8FciiXgC84Ks08xGOkV62NwAARzTOmIixLRpe4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddutdejledvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdejnecuhfhrohhmpedfvehhuhgt
-    khcunfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
-    hnpefghfeguedtieeiveeugfevtdejfedukeevgfeggfeugfetgfeltdetueelleelteen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegthhhutg
-    hklhgvvhgvrhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeifeegleel
-    leehledqfedvleekgeegvdefqdgtvghlpeepkhgvrhhnvghlrdhorhhgsehfrghsthhmrg
-    hilhdrtghomhdpnhgspghrtghpthhtohepudekpdhmohguvgepshhmthhpohhuthdprhgt
-    phhtthhopehnvghilhessghrohifnhdrnhgrmhgvpdhrtghpthhtohepuggrvhgvmhesug
-    grvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgv
-    rdgtohhmpdhrtghpthhtohephigrnhhgvghrkhhunheshhhurgifvghirdgtohhmpdhrtg
-    hpthhtoheprghnnhgrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehhohhrmhhssehk
-    vghrnhgvlhdrohhrghdprhgtphhtthhopehjlhgrhihtohhnsehkvghrnhgvlhdrohhrgh
-    dprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhrohhn
-    ughmhieskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:HLr8acBrK6cE-0sLPicXq_fVwksxmklZc1MFmqcHOdulsC-xnaR6DQ>
-    <xmx:HLr8aScgAqHzMz9UyH0ymGa1-DxWLQhqpfUQrG5vF6e9sHOJCX5_ng>
-    <xmx:HLr8aUJxtfCvQVB-zcURkslwXDzLf5uBWtldayW2x2cnXaz9ovllnQ>
-    <xmx:HLr8aauOgDt8tfUOikE-3mlyORDN45j0Im2IDhBTacoUHRMZjpR0xA>
-    <xmx:HLr8aWa-cborerkNJfEEOl_uXwSj6HcOzA8HD6C_id_0ohxPr8jVOLmG>
-Feedback-ID: ifa6e4810:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id E524C780077; Thu,  7 May 2026 12:13:15 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=k20201202; t=1778170382;
+	bh=ex2k+tQzCOViUN/yUnsO5c6ctZ5+/pBXAtFzWgkCChY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=L2BDwGeA+qWMKfoIi44IilHZ6osHmbOC/wdCJrh4Mdkf5tDKK/tfXpMKGwmQ64745
+	 bWvBT/EFIYqASy7P13+YlU6aWy4tM3e86TYFczDuBJNHJoFstBqlZ7eN6yj8jzKO2t
+	 j+XG6L4YR6MHl7W8bggDAQiBaDrVXpKmUaZU9ijpKhlkz0IVwE4KZSsnC50bbwl68O
+	 7zRdzyHg8hdPoWCbldwlog3y1HUeJVyJak8rz6y09mgnF+DCFKFKwzuD6DTaFSNt3F
+	 zQgB4zerHO9ZEdjbf5ZkDJti5iT89L27WBG4/JCWhQ/EWhaLYquUWcMvvBCmxPscAc
+	 B05nudQhDXT2A==
+Message-ID: <e04af31d-d472-4064-9490-c6554cd9ccc5@kernel.org>
+Date: Thu, 7 May 2026 18:12:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AxcNF55tVgJk
-Date: Thu, 07 May 2026 18:12:55 +0200
-From: "Chuck Lever" <cel@kernel.org>
-To: yangerkun <yangerkun@huawei.com>,
- "Misbah Anjum N" <misanjum@linux.ibm.com>,
- "Jeff Layton" <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
- "Olga Kornievskaia" <okorniev@redhat.com>, "Dai Ngo" <Dai.Ngo@oracle.com>,
- "Tom Talpey" <tom@talpey.com>, "Trond Myklebust" <trondmy@kernel.org>,
- "Anna Schumaker" <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>
-Cc: linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, "Chuck Lever" <chuck.lever@oracle.com>
-Message-Id: <76a10e49-54a6-4813-8b58-b7cd0820fdc6@app.fastmail.com>
-In-Reply-To: <c45779f6-fe6c-4037-bb1c-01cfbbaa8aac@huawei.com>
-References: <20260501-cache-uaf-fix-v1-0-a49928bf4817@oracle.com>
- <c45779f6-fe6c-4037-bb1c-01cfbbaa8aac@huawei.com>
-Subject: Re: [PATCH 0/6] SUNRPC: Address remaining cache_check_rcu() UAF in cache
- content files
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: EA6614EC1B7
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH] mptcp: serialize subflow->closing with RX path
+To: Kalpan Jani <kalpan.jani@mpiricsoftware.com>, martineau@kernel.org,
+ mptcp@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: shardul.b@mpiricsoftware.com, janak@mpiric.us, kalpanjani009@gmail.com,
+ shardulsb08@gmail.com
+References: <20260507072802.612125-1-kalpan.jani@mpiricsoftware.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Content-Language: fr
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20260507072802.612125-1-kalpan.jani@mpiricsoftware.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 83B454EC1E4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.15 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[mpiricsoftware.com,mpiric.us,gmail.com];
+	HAS_ORG_HEADER(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-285429-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-285428-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[]
 X-Rspamd-Action: no action
 
-Hello Erkun -
+Hi Kalpan,
 
-On Thu, May 7, 2026, at 11:09 AM, yangerkun wrote:
-> Hi,
->
-> =E5=9C=A8 2026/5/1 22:51, Chuck Lever =E5=86=99=E9=81=93:
->> Misbah Anjum reported a use-after-free in cache_check_rcu()
->> reached through e_show() while sosreport was reading
->> /proc/fs/nfsd/exports on ppc64le.  Two fixes for that report
->> landed in v7.0:
->>=20
->>    48db892356d6 ("NFSD: Defer sub-object cleanup in export put callba=
-cks")
->>    e7fcf179b82d ("NFSD: Hold net reference for the lifetime of /proc/=
-fs/nfs/exports fd")
->
-> Back to the problem fixed by this patches, I'm a little confused why
-> this UAF can be trigged.
->
-> Before this patches, svc_export_put show as follow:
->
->   368 static void svc_export_put(struct kref *ref)
->   369 {
->   370         struct svc_export *exp =3D container_of(ref, struct=20
-> svc_export, h.ref);
->   371
->   372         path_put(&exp->ex_path);
->   373         auth_domain_put(exp->ex_client);
->   374         call_rcu(&exp->ex_rcu, svc_export_release);
->   375 }
->
-> The auth_domain_put function releases ->name using call_rcu, and
-> path_put may release the dentry also via call_rcu. All of this seems to
-> prevent e_show from causing a UAF. Could you point out which line in
-> d_path triggers the issue?
+On 07/05/2026 09:28, Kalpan Jani wrote:
+> There is a race between mptcp_data_ready() (RX path) and
+> mptcp_close_ssk() (teardown path) when accessing subflow->closing.
 
-The dentry, the mount, and the auth_domain ->name buffer all
-end up RCU-freed (dentry_free() and delayed_free_vfsmnt in
-fs/, svcauth_unix_domain_release_rcu() in svcauth_unix.c).
-The eventual kfree isn't the problem.
+Thank you for sharing this patch!
 
-The problem is the synchronous teardown inside path_put(),
-which runs before svc_export_put() ever reaches its own
-call_rcu():
+Sadly, this patch doesn't apply and looks corrupted:
 
-  path_put(&exp->ex_path)
-    -> dput(dentry)
-       -> __dentry_kill()              [if last ref]
-          -> __d_drop()                /* unhashes */
-          -> dentry_unlink_inode()     /* d_inode =3D NULL */
-          -> d_op->d_release() if set
-          -> drops parent d_lockref    /* may cascade up */
-          -> dentry_free()             /* call_rcu deferred */
-    -> mntput(mnt)                     /* deferred via task_work */
+  Applying: mptcp: serialize subflow->closing with RX path
+  error: corrupt patch at line 44
+  error: could not build fake ancestor
 
-The dentry pointer itself is RCU-safe, so prepend_path()'s walk
-of d_parent and d_name doesn't read freed memory.  But by the
-time the reader gets there, __d_clear_type_and_inode() has
-already stored NULL into d_inode, __d_drop() has broken the
-hash linkage, and the parent's d_lockref has been decremented
--- which can in turn fire __dentry_kill() on the parent, and
-on up the tree.  An e_show() that's still inside its cache RCU
-read section walks into that half-dismantled state through
-seq_path(), and that's the NULL deref Misbah reported.
+Did you manually edit it without changing the line references?
 
-The earlier fix (2530766492ec, "nfsd: fix UAF when access
-ex_uuid or ex_stats") moved the kfree of ex_uuid and ex_stats
-into svc_export_release() so those are RCU-safe now.
-path_put() and auth_domain_put() couldn't go in there because
-both may sleep, and call_rcu callbacks run in softirq context.
-This series uses queue_rcu_work() instead: it defers past the
-grace period AND runs the callback in process context, so the
-sleeping puts move into the deferred path and the window
-closes.
+While at it, please follow the rules from:
 
+  https://docs.kernel.org/process/maintainer-netdev.html
 
---=20
-Chuck Lever
+=> designate your patch to a tree: [PATCH net]
+
+It might be easier if you send new versions only to the MPTCP ML (not
+ccing netdev).
+
+> Currently, mptcp_data_ready() checks subflow->closing before acquiring
+> mptcp_data_lock(), while mptcp_close_ssk() may concurrently set
+> subflow->closing and purge backlog entries. This creates a classic
+> time-of-check vs time-of-use (TOCTOU) race:
+> 
+>   CPU A (close path)              CPU B (RX path)
+>   ----------------------         -------------------------
+>   set closing = 1
+>                                  read closing == 0
+>   purge backlog
+>                                  enqueue skb to backlog
+> 
+> As a result, skb entries referencing the subflow socket (ssk) may be
+> enqueued after the subflow is marked closing and scheduled for cleanup.
+> This can lead to:
+> 
+>   - WARN in inet_sock_destruct() due to non-zero sk_rmem_alloc
+>   - potential use-after-free via stale skb->sk references
+
+By chance, do you have (decoded) calltraces to share in the commit
+message? And even better: a reproducer? Or explaining how you found this
+issue, and eventually which tool helped you find it.
+
+> Fix this by serializing both the closing check and backlog enqueue
+> under mptcp_data_lock(). This ensures that subflow->closing state and
+> backlog operations are observed atomically, preventing new skb from
+> being enqueued once teardown begins.
+> 
+> Also protect backlog cleanup in mptcp_close_ssk() with the same lock
+> to guarantee mutual exclusion with the RX path.
+> 
+> This restores proper synchronization between RX and teardown paths
+> and prevents stale skb references to closing subflows.
+
+Also, for fixes, the "Fixes:" tag is required.
+
+> Signed-off-by: Kalpan Jani <kalpan.jani@mpiricsoftware.com>
+> ---
+>  net/mptcp/protocol.c | 31 ++++++++++++++++++++++++++++---
+>  1 file changed, 28 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+> index 718e910ff..295f8e1c0 100644
+> --- a/net/mptcp/protocol.c
+> +++ b/net/mptcp/protocol.c
+> @@ -910,14 +910,34 @@ void mptcp_data_ready(struct sock *sk, struct sock *ssk)
+>  	struct mptcp_subflow_context *subflow = mptcp_subflow_ctx(ssk);
+>  	struct mptcp_sock *msk = mptcp_sk(sk);
+>  
+> +	/*
+> +	 * The close path can set subflow->closing while we are racing
+> +	 * from BH context here. The old check was done before taking
+> +	 * mptcp_data_lock(), leaving a TOCTOU window:
+> +	 *
+> +	 *   CPU A: close path sets closing = 1 and purges backlog
+> +	 *   CPU B: already observed closing == 0 and later enqueues skb
+> +	 *
+> +	 * That skb keeps skb->sk == ssk and can later trigger:
+> +	 * - WARN in inet_sock_destruct() (ssk->sk_rmem_alloc != 0)
+> +	 * - UAF in backlog purge via stale skb->sk
+> +	 */
+
+I don't think that's useful to add a comment referring an old behaviour.
+
+> +
+>  	/* The peer can send data while we are shutting down this
+>  	 * subflow at subflow destruction time, but we must avoid enqueuing
+>  	 * more data to the msk receive queue
+>  	 */
+
+Instead, I suggest moving this comment below as well, and merge it with
+the new one you added.
+> -	if (unlikely(subflow->closing))
+> -		return;
+>  
+>  	mptcp_data_lock(sk);
+> +
+> +	/* Serialize closing check with backlog enqueue */
+> +	if (unlikely(subflow->closing)) {
+> +		mptcp_data_unlock(sk);
+
+When locks are used, we usually prefer having one exit path: please add
+a new label above mptcp_data_unlock() below, and a goto here.
+
+> +		return;
+> +	}
+> +
+>  	mptcp_rcv_rtt_update(msk, subflow);
+>  	if (!sock_owned_by_user(sk)) {
+>  		/* Wake-up the reader only for in-sequence data */
+> @@ -2653,9 +2673,12 @@ void mptcp_close_ssk(struct sock *sk, struct sock *ssk,
+>  	if (sk->sk_state == TCP_ESTABLISHED)
+>  		mptcp_event(MPTCP_EVENT_SUB_CLOSED, mptcp_sk(sk), ssk, GFP_KERNEL);
+>  
+> -	/* Remove any reference from the backlog to this ssk; backlog skbs consume
+> +	/* Remove any reference from the backlog to this ssk.
+> +	 * Serialize cleanup with RX-side enqueue using mptcp_data_lock().
+
+Easier to add this new line at the end of the comment to reduce the diff.
+
+> +	 * Backlog skbs consume
+>  	 * space in the msk receive queue, no need to touch sk->sk_rmem_alloc
+>  	 */
+> +	mptcp_data_lock(sk);
+>  	list_for_each_entry(skb, &msk->backlog_list, list) {
+>  		if (skb->sk != ssk)
+>  			continue;
+> @@ -2663,6 +2686,8 @@ void mptcp_close_ssk(struct sock *sk, struct sock *ssk,
+>  		atomic_sub(skb->truesize, &skb->sk->sk_rmem_alloc);
+>  		skb->sk = NULL;
+>  	}
+> +	mptcp_data_unlock(sk);
+> +
+>  
+
+No double empty lines. I think 'checkpatch' would tell you that.
+
+>  	/* subflow aborted before reaching the fully_established status
+>  	 * attempt the creation of the next subflow
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
