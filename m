@@ -1,173 +1,125 @@
-Return-Path: <netdev+bounces-285227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285228-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GBSoDWpn/GnPPgAAu9opvQ
-	(envelope-from <netdev+bounces-285227-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 12:20:26 +0200
+	id WGEELvpo/Gn0PgAAu9opvQ
+	(envelope-from <netdev+bounces-285228-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 12:27:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDFFA4E6AE9
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 12:20:25 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FB344E6C52
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 12:27:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C1208300D4D9
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 10:20:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B2F053008E11
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 10:27:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97CB35C19B;
-	Thu,  7 May 2026 10:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7DB73B4E97;
+	Thu,  7 May 2026 10:27:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ceOPKJEz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hNwokZ1h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D743D34AD
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 10:20:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C527A6DCE1;
+	Thu,  7 May 2026 10:27:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778149221; cv=none; b=TjfxNXXyf0BEqaTpXKIn6mLsygg2JewPnAVZnz2BEWnPeo4AjdqaKUsSN142BHbvMY3SJBMZdpl7ZPnboXOR41AL81PKUAUgClaEDmTX1rr+XuWgTjbDZ7eXXqMtlgt/ELxux/+tCyALiR2p2R1QZCxN4G4lhYK2fg7wioW888E=
+	t=1778149621; cv=none; b=PA6JXCoYSLiac67imz15508FCr3hq+kLQ13hrLn5b39LLqEPXrc/VBTC9tpIQDnOcMFjnYeC4Ih0/pdqf/qvZp0aT9UxjV08MYbdNdHZm+PwnutKjZ4yySXU0uZd235F9Wy5Yb7HTVwC/trcAbcKnBJU0ulzkqPahnAco5Nm+zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778149221; c=relaxed/simple;
-	bh=pTIS3ddteKk8VSJJdYgyLW3RXEMjDMZdMeaTc7I0pkM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Wdbp2jJSltcekDnWm+av/S90uFRs+Me0mTRyoNf0QVI71Hgkyp4Xy5k1dAoR5gsOB0tzDS4SKLEQdOFMDVUQO+aIrfX4UfFl8/RXMtcEwwr3Y860R6m9/tWIfCzLwONqeLIGEjMKE1EARH1AzzD9IN3mkgLxKHdscNH4FqeJwZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ceOPKJEz; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2b9ea536877so4493235ad.1
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 03:20:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778149218; x=1778754018; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NGpQTvYvqnOwNGJCeLIE5VPDvaD2U3g1tZqZ1BVFSQk=;
-        b=ceOPKJEztE0Dy8vu6gwu/zO+oKuWv49acEkStOBhD+F2HYDHM7i8lBnP5j5ENEE53X
-         qiIuun/KMKvtebN3mm7x4hQuYWW2VbDHta2FH87b66urEqmPqb9opp6D5tJi8zyyrxf6
-         w2stZJaYY0P0uafjt0cppAlkgZ2yzjuIKs0qSJt7HCdJEVY8QCkLWSq9ZJ05ixhSF/pS
-         q8b88PMil8q/RIfCd3mu2xRjYPosqwg/ZuTYz3TwelqGCh/3m7aelChgohdXoF4/uu2J
-         J5ecywdAVnglIxDuOx5xG1FyXvAJu0D9NuDxhxVTvLqunpc2pvSBUAHMhl5a8GsE0gBh
-         LDAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778149218; x=1778754018;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NGpQTvYvqnOwNGJCeLIE5VPDvaD2U3g1tZqZ1BVFSQk=;
-        b=UllBXUqDWs9uWOzmEVsyoNHh0kVmf3pfaDwi6oiMIn+a1fkcO0dpL7/ULziWoIjxsS
-         S2HSIWgj0ItQKF+6ZogXf+i8fr6fEWRlTnlcXVv548wxK54rrJfTV8/5Sw1/6czWkPJw
-         5pCXi+Kz0S0jtDHo9XpKVpMrU4ggF2Hj9E9UhAnCOqXFSBOGfPmoMb3L+tl34zTSTB4A
-         csxhMZSJGLSit6BdwRvasQR1hs85wnnD0QEalIktg842z0uk6sJ4ab8giBiAV4T5Cb/R
-         qCe9owCfb4Nym3NfUDm2y3qcM1+N7tIw3KZkyb2a+mfmuwyzGdkttx5pYMTbA36wI9LV
-         8w7A==
-X-Gm-Message-State: AOJu0Yxu7sEBgRkf+jMbLzYibXQrZ0mL0GqQmwTyDoSZUT/j7ogJhXGO
-	dBIbk+kjes3hYk4vWC3liXYE6fdD+XcTERYJdjBpy0ApsV4SkgRIAUbAwfSJK3vq+LcbzQ==
-X-Gm-Gg: AeBDiesTzzehpfIFnRDRXM73zuU4c2Sbenizahl3w8D9W6li2P2+wwbgZJvXDesWJfe
-	1fd7MzllV+JLGRDyiZzS73VU3C8vnxxuFldZckUYrKg1W3bRz/n8kFm0LT5m+lWKVtkbvj953t7
-	RI5eFjr7IFaHGkMSpaOgVnoG3XyA00jLUTkytb4u7TapPPHl9oV6qpzk/TvYRGwarojj4opnfmf
-	/lTM9oFpDJrGt47moil6PJ5NHjXUg+VcKK5WNVioKITMzBPgmnIR+CWyWYlBXMOTVGjzgkTYvFv
-	z6ZqX9tAy23bbjlduKAmQsgzaXsueQNLfkYRnq/Eq9naEpg6xHjGbTqltZyFXEauUkDPQQYRbct
-	+dRjL5iaXtlBQtJzjNogysxPb+kTYwJ/4o/OK8nME/VfYSdtSlH7Z78Diq6FWGpNlsvvVhyT7Yh
-	lw49lR3Q7gsDWKII4eUoM7yek06d7onvfJ6Q2hGqc=
-X-Received: by 2002:a17:902:ce0c:b0:2aa:e47d:e3b with SMTP id d9443c01a7336-2babbcf5c72mr23067595ad.0.1778149218103;
-        Thu, 07 May 2026 03:20:18 -0700 (PDT)
-Received: from vini ([2401:4900:8fc9:edb:b9ff:550d:d955:a799])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baba80ac1esm20431505ad.0.2026.05.07.03.20.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2026 03:20:17 -0700 (PDT)
-From: Vineet Agarwal <agarwal.vineet2006@gmail.com>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-kernel@vger.kernel.org,
-	Vineet Agarwal <agarwal.vineet2006@gmail.com>
-Subject: [PATCH] net/sched: sch_dualpi2: annotate lockless accesses in dualpi2_dump_stats()
-Date: Thu,  7 May 2026 15:49:30 +0530
-Message-ID: <20260507102005.263436-1-agarwal.vineet2006@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1778149621; c=relaxed/simple;
+	bh=Qu4E2DzDoxojdEWz4vf7u2rXOgAClLiFxZt/vQe15H4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c+tPiHzad9PYTDyxtI9WONNGBQuaTDvwc7weZsSj/U9vhPITwEUrp6db41fRQ1cortaW/o09+dtRolR2Ekj4iDv9Egy9XTaMAw+FQp0moVfnZdwL6N8bpPb54j5MBEemkSkB/XpFsGSDEqHY9x+qruOrGiDPB1p0LDCWlG4dDdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hNwokZ1h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41586C2BCB2;
+	Thu,  7 May 2026 10:26:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778149621;
+	bh=Qu4E2DzDoxojdEWz4vf7u2rXOgAClLiFxZt/vQe15H4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hNwokZ1hZ3nQ8BbxBdGldJkDmVX+VxYitriqMIroOU2KBfaNF0/eglHu0jrjpk3+m
+	 kQHBsDok81b3LOjXeBevYgFYPxw/XdCSFykKiYtijgNIXE7ejF4pHVJAtSaaSRjIRw
+	 wGoX+oK2HumyehY1p7mdyIeCSPqDtYpSCr7uHOiP65uA7JUkGPtE/EDgJ5Sf/x7MAL
+	 3xqg9is50xc//FxKsyuRDVIobs/cUDYqEwWNR/ab/jPyqxD7sqb9pRwt05ePn9+WwA
+	 Idnefkkn4a++OIg2/xY5iNywFbrlucn1ZF5gVtZ+a33VWx0MWVhTSZdQxQvaAdK8Ao
+	 hfCCHOwQfGOTA==
+Date: Thu, 7 May 2026 11:26:57 +0100
+From: Simon Horman <horms@kernel.org>
+To: Subbaraya Sundeep <sbhatta@marvell.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, sgoutham@marvell.com,
+	gakula@marvell.com, bbhushan2@marvell.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH v5 0/4] octeontx2: CN20K NPA Halo context support
+Message-ID: <20260507102657.GI15617@horms.kernel.org>
+References: <1777879921-15542-1-git-send-email-sbhatta@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: CDFFA4E6AE9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1777879921-15542-1-git-send-email-sbhatta@marvell.com>
+X-Rspamd-Queue-Id: 2FB344E6C52
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285228-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285227-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[mojatatu.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[agarwalvineet2006@gmail.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url,sashiko.dev:url,horms.kernel.org:mid]
 X-Rspamd-Action: no action
 
-dualpi2_dump_stats() is called without holding qdisc lock.
+On Mon, May 04, 2026 at 01:01:57PM +0530, Subbaraya Sundeep wrote:
+> This series adds NPA Halo support for CN20K in the octeontx2 AF and
+> PF drivers. On CN20K, NPA supports a unified "Halo" context that combines
+> aura and pool contexts in a single structure. This is a simplification
+> in hardware so that there is no need to initialize both Aura and Pool
+> contexts for queues. Separate Aura and Pool contexts are needed say if
+> we have to point many Auras to a single pool but we always use 1:1 Aura
+> and Pool map in Octeontx2 netdev driver. Hence for CN20K use Halo
+> context for netdevs.
+> 
+> The series:
+> 
+>   1) Adds Halo context type, mbox handling, and halo_bmap tracking in AF.
+>   2) Adds NPA DPC (diagnostic/performance counters) 32 counters with
+>      per-LF permit registers, mbox alloc/free, and teardown handling.
+>   3) Adds debugfs for Halo (halo_ctx file and NPA context display/write
+>      for HALO ctype).
+>   4) Switches the CN20K PF driver to use the unified Halo context and
+>      allocates a DPC counter for the NPA LF.
 
-Several statistics fields are concurrently updated from enqueue and
-dequeue paths while being read locklessly from dualpi2_dump_stats().
+Hi Subbaraya,
 
-Annotate these accesses with READ_ONCE().
+There are AI generated reviews of this patchset available at both
+https://netdev-ai.bots.linux.dev/sashiko/ and https://sashiko.dev
 
-Signed-off-by: Vineet Agarwal <agarwal.vineet2006@gmail.com>
----
- net/sched/sch_dualpi2.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
-
-diff --git a/net/sched/sch_dualpi2.c b/net/sched/sch_dualpi2.c
-index 241e6a46bd00..fd8d505b4688 100644
---- a/net/sched/sch_dualpi2.c
-+++ b/net/sched/sch_dualpi2.c
-@@ -1046,14 +1046,13 @@ static int dualpi2_dump_stats(struct Qdisc *sch, struct gnet_dump *d)
- 	struct dualpi2_sched_data *q = qdisc_priv(sch);
- 	struct tc_dualpi2_xstats st = {
- 		.prob			= READ_ONCE(q->pi2_prob),
--		.packets_in_c		= q->packets_in_c,
--		.packets_in_l		= q->packets_in_l,
--		.maxq			= q->maxq,
--		.ecn_mark		= q->ecn_mark,
--		.credit			= q->c_protection_credit,
--		.step_marks		= q->step_marks,
--		.memory_used		= q->memory_used,
--		.max_memory_used	= q->max_memory_used,
-+		.packets_in_c		= READ_ONCE(q->packets_in_c),
-+		.packets_in_l		= READ_ONCE(q->packets_in_l),
-+		.maxq			= READ_ONCE(q->maxq),
-+		.ecn_mark		= READ_ONCE(q->ecn_mark),
-+		.step_marks		= READ_ONCE(q->step_marks),
-+		.memory_used		= READ_ONCE(q->memory_used),
-+		.max_memory_used	= READ_ONCE(q->max_memory_used),
- 		.memory_limit		= q->memory_limit,
- 	};
- 	u64 qc, ql;
--- 
-2.54.0
-
+I would appreciate it if you could look over them, as there
+do seem to be issues relevant to the progress of this ptach-set.
 
