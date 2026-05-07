@@ -1,75 +1,53 @@
-Return-Path: <netdev+bounces-285430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285432-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eCchJpO6/Gl2TAAAu9opvQ
-	(envelope-from <netdev+bounces-285430-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:15:15 +0200
+	id OF7pJfK7/Gm6TAAAu9opvQ
+	(envelope-from <netdev+bounces-285432-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:21:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33DB94EC04A
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:15:15 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A5484EC1BF
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 18:21:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 737AB3005A94
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 16:15:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6F3A7300F5F6
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 16:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D14C37268B;
-	Thu,  7 May 2026 16:15:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 933EC3AA4EF;
+	Thu,  7 May 2026 16:20:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DdR6O75I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lc/oZkr1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ABC22EC571
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 16:15:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70559284B4F;
+	Thu,  7 May 2026 16:20:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778170513; cv=none; b=gcVyq/8Oiub6gkS55rzL8yD0sWbGY2XdvJLiuRe3dHmmteDwWCaauDRE0jaAA1fAZLMViIMhIJvo2ygKhItX6lW6x5F/0oOK4Lmm4tgg4QvyNVp25JgN7y2txvYU6jIFTluNykCLNrMq3zO+rIUWI9JosmrlbiTxqgBwitXfoRY=
+	t=1778170858; cv=none; b=fG9qjvsj7vS/aqeMRdjhYOWcMnhOTrNs3JGGSSQ2V79EAyaGANL8XLauBRbH9moOBOrqlzaZIudem8qNqTmOQlP0AbpSGIuHsAtD+AemWLXwk9o4dAOi8ON9GljxXTRF6izHXwpou6ZDCEQacgsn8g2A3NQHHRrah0ALJiDxqCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778170513; c=relaxed/simple;
-	bh=1lg58qmFpF+kSN6JNvbxcvJqXwne0vEgzC4GRZZQXvU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PeZxSJ+8ohJ8GPamIrm9MpqXutQXrhfQuvBbEve7CLgybnI+ONBPAncOx5F/qWwbeGMulHuMLSXCiSlpGF0XQ2U+lSXWxOR3CclG0SiJ7WidUqaS+snUH3dp/dOV5N22DJ2VXhhjgZaQp4GYuCli0LU4GIa++vIgGgMuOg6SQlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DdR6O75I; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778170510;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Pz6cMtzSSg94cOdnzxQctNDQk5hNgCfAncL9FfAgrvc=;
-	b=DdR6O75Ij576XUqA0ECX4vNaV5yy78XsSWMrPQef7ltKpmq3D7TsvNONsW9hWFUuVyWLvi
-	tOqxZ5282XA3hi73O/h63MuGpazxY3ZXnqbH1KPohXKcFCGOmA8ogdBlM/vmSHQc6VbfwC
-	kVWD0P6pbb44SNFJAydW9TdVJ6LlrSo=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-587-cwGTs_B4P16PhRHW9V8EKg-1; Thu,
- 07 May 2026 12:15:06 -0400
-X-MC-Unique: cwGTs_B4P16PhRHW9V8EKg-1
-X-Mimecast-MFC-AGG-ID: cwGTs_B4P16PhRHW9V8EKg_1778170505
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ADABB195608F;
-	Thu,  7 May 2026 16:15:04 +0000 (UTC)
-Received: from dcaratti.users.ipa.redhat.com (unknown [10.44.49.163])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CC7E6300019F;
-	Thu,  7 May 2026 16:15:01 +0000 (UTC)
-From: Davide Caratti <dcaratti@redhat.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org
-Subject: [PATCH net] net/sched: dualpi2: initialize timer earlier in dualpi2_init()
-Date: Thu,  7 May 2026 18:14:10 +0200
-Message-ID: <54f091e66a0aadeaf7ed72e7d1cabde1273a5cc6.1778170196.git.dcaratti@redhat.com>
+	s=arc-20240116; t=1778170858; c=relaxed/simple;
+	bh=urDw1WgtuawgHybQYaJY9BK5m5+/xhvBD524RXgulv4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Ar+zKJj2mR0kKHtDX0YZQhI5yrd8qgkT2uR0vAKVP4kGagp007i54IVOt6/SZIvE/7oOnx4tu9ZbFKhlaMjYDTpKM4B3Cw5zeqseCr1ugBTIq+si0kRu0omZbYcirvJ1GC/80zE4+Vu4PS38w3oIvvuPGt2Cj38y8Rlz/6hV458=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lc/oZkr1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1870EC2BCB2;
+	Thu,  7 May 2026 16:20:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778170858;
+	bh=urDw1WgtuawgHybQYaJY9BK5m5+/xhvBD524RXgulv4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Lc/oZkr1J3RO7L9WW+piFQVUzmBZLF0kAGruYarVuSGl73lhSYPulgQ/sfC7wtoEl
+	 M0naWeCAuDbwxLvPsAcuEDBH2hMPEWGXa3I3oyL82dM0hCETxmj2+xRZHIwIIrcJsu
+	 L90ddb3Nn9UAL60bftHBcGgIQZTVhMajYlwbnn9nE7NSLMlcWYcC1yb2vrd69gqe0q
+	 JjXxG9xmumoOI9K99+ElPKz/ZqdgxzWh2bOm6ijRuq0PJJ3H+ITn/UhOpVRXEUmz03
+	 HEBGs41iaVlauZ3LL+/eYMxW9WTg445KJWBDRiLMgRdYG0XOxQRVtABkXXxbi0mrpB
+	 biIvnpeoL15mQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CE043930909;
+	Thu,  7 May 2026 16:20:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,120 +55,84 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Rspamd-Queue-Id: 33DB94EC04A
+Subject: Re: [PATCH net v2 0/4] net: sparx5: misc fixes for sparx5 and lan969x
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177817080728.4064915.505121017219538235.git-patchwork-notify@kernel.org>
+Date: Thu, 07 May 2026 16:20:07 +0000
+References: 
+ <20260506-misc-fixes-sparx5-lan969x-v2-0-fb236aa96908@microchip.com>
+In-Reply-To: 
+ <20260506-misc-fixes-sparx5-lan969x-v2-0-fb236aa96908@microchip.com>
+To: Daniel Machon <daniel.machon@microchip.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, Steen.Hegelund@microchip.com,
+ UNGLinuxDriver@microchip.com, bigeasy@linutronix.de, clrkwllms@kernel.org,
+ rostedt@goodmis.org, bjarni.jonasson@microchip.com,
+ lars.povlsen@microchip.com, p.zabel@pengutronix.de, kees@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steen.hegelund@microchip.com,
+ linux-rt-devel@lists.linux.dev, andrew@lunn.ch
+X-Rspamd-Queue-Id: 6A5484EC1BF
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_FROM(0.00)[bounces-285430-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-285432-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dcaratti@redhat.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_HAS_DN(0.00)[]
+	RCPT_COUNT_TWELVE(0.00)[21];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-'pi2_timer' needs to be initialized in all error paths of dualpi2_init():
-otherwise, a failure in qdisc_create_dflt() causes the following crash in
-dualpi2_destroy():
+Hello:
 
-  # tc qdisc add dev crash0 handle 1: root dualpi2
-  BUG: kernel NULL pointer dereference, address: 0000000000000010
-  #PF: supervisor read access in kernel mode
-  #PF: error_code(0x0000) - not-present page
-  PGD 0 P4D 0
-  Oops: Oops: 0000 [#1] SMP PTI
-  CPU: 4 UID: 0 PID: 471 Comm: tc Tainted: G            E       7.1.0-rc1-virtme #2 PREEMPT(full)
-  Tainted: [E]=UNSIGNED_MODULE
-  Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-  RIP: 0010:hrtimer_active+0x39/0x60
-  Code: f9 eb 23 0f b6 41 38 3c 01 0f 87 87 64 c0 ff 83 e0 01 75 33 48 39 4a 50 74 28 44 3b 42 10 75 06 48 3b 51 30 74 21 48 8b 51 30 <44> 8b 42 10 41 f6 c0 01 74 cf f3 90 44 8b 42 10 41 f6 c0 01 74 c3
-  RSP: 0018:ffffd0db80b93620 EFLAGS: 00010282
-  RAX: ffffffffc0400320 RBX: ffff8cf24a4c86b8 RCX: ffff8cf24a4c86b8
-  RDX: 0000000000000000 RSI: ffff8cf2429c2ab0 RDI: ffff8cf24a4c86b8
-  RBP: 00000000fffffff4 R08: 0000000000000003 R09: 0000000000000000
-  R10: 0000000000000001 R11: ffff8cf24a39c500 R12: ffff8cf24822c000
-  R13: ffffd0db80b936c0 R14: ffffffffc02cf360 R15: 00000000ffffffff
-  FS:  00007fbc01706580(0000) GS:ffff8cf2dc759000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 0000000000000010 CR3: 0000000008e02003 CR4: 0000000000172ef0
-  Call Trace:
-   <TASK>
-   hrtimer_cancel+0x15/0x40
-   dualpi2_destroy+0x20/0x40 [sch_dualpi2]
-   qdisc_create+0x230/0x570
-   tc_modify_qdisc+0x716/0xc10
-   rtnetlink_rcv_msg+0x188/0x780
-   netlink_rcv_skb+0xcd/0x150
-   netlink_unicast+0x1ba/0x290
-   netlink_sendmsg+0x242/0x4d0
-   ____sys_sendmsg+0x39e/0x3e0
-   ___sys_sendmsg+0xe1/0x130
-   __sys_sendmsg+0xad/0x110
-   do_syscall_64+0x14f/0xf80
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-  RIP: 0033:0x7fbc0188b08e
-  Code: 4d 89 d8 e8 94 bd 00 00 4c 8b 5d f8 41 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 11 c9 c3 0f 1f 80 00 00 00 00 48 8b 45 10 0f 05 <c9> c3 83 e2 39 83 fa 08 75 e7 e8 03 ff ff ff 0f 1f 00 f3 0f 1e fa
-  RSP: 002b:00007fff593260e0 EFLAGS: 00000202 ORIG_RAX: 000000000000002e
-  RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fbc0188b08e
-  RDX: 0000000000000000 RSI: 00007fff59326190 RDI: 0000000000000003
-  RBP: 00007fff593260f0 R08: 0000000000000000 R09: 0000000000000000
-  R10: 0000000000000000 R11: 0000000000000202 R12: 000055f06124f260
-  R13: 0000000069fca043 R14: 000055f061255640 R15: 000055f06124d3f8
-   </TASK>
-  Modules linked in: sch_dualpi2(E)
-  CR2: 0000000000000010
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-[1] https://lore.kernel.org/netdev/2e78e01c504c633ebdff18d041833cf2e079a3a4.1607020450.git.dcaratti@redhat.com/
-[2] https://lore.kernel.org/netdev/20200725201707.16909-1-xiyou.wangcong@gmail.com/
+On Wed, 6 May 2026 09:25:35 +0200 you wrote:
+> This series fixes various issues in the sparx5 driver, which also
+> serves lan969x.
+> 
+> Details are in the individual commit descriptions.
+> 
+> Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+> 
+> [...]
 
-Signed-off-by: Davide Caratti <dcaratti@redhat.com>
----
- net/sched/sch_dualpi2.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Here is the summary with links:
+  - [net,v2,1/4] net: sparx5: defer VCAP debugfs creation until after netdev registration
+    (no matching commit)
+  - [net,v2,2/4] net: sparx5: fix sleep in atomic context in MAC table access
+    (no matching commit)
+  - [net,v2,3/4] net: sparx5: fix wrong chip ids for TSN SKUs
+    https://git.kernel.org/netdev/net/c/b131dc93f7bf
+  - [net,v2,4/4] net: sparx5: configure serdes for 1000BASE-X in sparx5_port_init()
+    https://git.kernel.org/netdev/net/c/41ae14071cd7
 
-diff --git a/net/sched/sch_dualpi2.c b/net/sched/sch_dualpi2.c
-index 6d7e6389758d..dbe4b99955ab 100644
---- a/net/sched/sch_dualpi2.c
-+++ b/net/sched/sch_dualpi2.c
-@@ -917,6 +917,9 @@ static int dualpi2_init(struct Qdisc *sch, struct nlattr *opt,
- 	struct dualpi2_sched_data *q = qdisc_priv(sch);
- 	int err;
- 
-+	hrtimer_setup(&q->pi2_timer, dualpi2_timer, CLOCK_MONOTONIC,
-+		      HRTIMER_MODE_ABS_PINNED_SOFT);
-+
- 	q->l_queue = qdisc_create_dflt(sch->dev_queue, &pfifo_qdisc_ops,
- 				       TC_H_MAKE(sch->handle, 1), extack);
- 	if (!q->l_queue)
-@@ -928,8 +931,6 @@ static int dualpi2_init(struct Qdisc *sch, struct nlattr *opt,
- 
- 	q->sch = sch;
- 	dualpi2_reset_default(sch);
--	hrtimer_setup(&q->pi2_timer, dualpi2_timer, CLOCK_MONOTONIC,
--		      HRTIMER_MODE_ABS_PINNED_SOFT);
- 
- 	if (opt && nla_len(opt)) {
- 		err = dualpi2_change(sch, opt, extack);
+You are awesome, thank you!
 -- 
-2.52.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
