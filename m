@@ -1,173 +1,185 @@
-Return-Path: <netdev+bounces-285205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285206-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aOSEJLda/GndOQAAu9opvQ
-	(envelope-from <netdev+bounces-285205-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 11:26:15 +0200
+	id uBhMLrNc/GlPOwAAu9opvQ
+	(envelope-from <netdev+bounces-285206-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 11:34:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36FF34E5D6B
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 11:26:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F9684E6087
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 11:34:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9FBFB300613A
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 09:26:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 95D313097F5E
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 09:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8E72392802;
-	Thu,  7 May 2026 09:26:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8231C3C0608;
+	Thu,  7 May 2026 09:26:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C8Gt2DPR"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="WQCJ3d3D";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="vB85BIFd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from flow-a2-smtp.messagingengine.com (flow-a2-smtp.messagingengine.com [103.168.172.137])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B619D3624A9;
-	Thu,  7 May 2026 09:26:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26F73C060C;
+	Thu,  7 May 2026 09:26:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.137
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778145971; cv=none; b=EcZrNBUpiHzJzdQFoMM1QJTPlfRECUgARyT91A3CLVEoUPMCoAb71t61in1TpLAa8yHZJSYFqPsW4pMDVB3ndGZeALBDIDHHNW+tQeylmjVW2vwZhbz5aHl6SAAc0IruA3N0ar3qZAOsg6vT9RlKtsAiZfhHRtAlb7fpy6KAKpE=
+	t=1778146016; cv=none; b=qHgX1skkC1N4Mzs6J97D3bvh1rvDn2LB19WiOMMMTmR1iYkZYH2OB3wTbfFq1fKJrhjwzk6T+KoyUx9Ed7SkkcX+r/Qkg4nV9iJjcwGs8UroB0oTtootwuJwzcx1WRq8CFK/P5yTLa4EWmPgZYQIiZvSWkYTh5HqdSH3SJVfHao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778145971; c=relaxed/simple;
-	bh=M8446rQYXm25f4tOwkQac0ktifqMOUyoEgxlb33J5xI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=FHL2gXQVxni4zVOwJ3o/8fksBxeB/kYQVN9+BFDcEqXSriorY/gSMun0tPNYz/igbiuVuGQ7FHvhdIuFzVdFFuUE6SYA0MpROkPtNH03q58mEZwlDsRCAl+x055sge8ZM18HWXUUpNK0+naRvvv/GkBeIVFYIdHxNPM4rjNAueE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C8Gt2DPR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F418C2BCB2;
-	Thu,  7 May 2026 09:26:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778145971;
-	bh=M8446rQYXm25f4tOwkQac0ktifqMOUyoEgxlb33J5xI=;
-	h=From:Date:Subject:To:Cc:From;
-	b=C8Gt2DPR3kPu9HbsqIvVlCRlfeKMKCmKVuEuwoi/496fGmluE36Kc9OSr3bWL636V
-	 JdM9bIMMDkrIJ/aQUaw5t5ahLTRYMDzEYqv4v1+oyP/TvKb3zYZO3Mf7Cs6QDHqVbZ
-	 rNvxvHOhMiCV9S5D6/08zUbK9OGar6p3EFxeOQHsfacD46D/yEt3IwNWtDBDGXJ88d
-	 BRvKU3jRLf7WuFtMvmfpZ3NDPxlmMa+dK8FmfsNmd29irIHoCtIOr5mY57he2L0txs
-	 4IiLEakiKMg2SJ0T8T1jn5b60sQxiXE6Lqm4y+uwyOsMjAG4YJPtMcsw0oserHqk0c
-	 VKhsS2A+ld/ng==
-From: Linus Walleij <linusw@kernel.org>
-Date: Thu, 07 May 2026 11:26:01 +0200
-Subject: [PATCH] dt-bindings: net: lan966x: Accept standard ethernet
- prefixes
+	s=arc-20240116; t=1778146016; c=relaxed/simple;
+	bh=Zo3fg+NFkvKqceewB96F6ZZGnyUTHoGjFxPbcjBusYc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HZBbJF5qfQAJ5tUkH+02ltXNSZtp+ZVp5Anf16n6B6l6BFTESfLS9QF08F6JqscphOYnDHb0lhS4U43pSlBxo800nbwNd84OLfUwGxeWucXonHPOMXGmQmwOh8YZ17IbwwYm6M6VcOkaQDuwv9XP+MasdwXpz9dSzp6VrSFGLLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=WQCJ3d3D; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=vB85BIFd; arc=none smtp.client-ip=103.168.172.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailflow.phl.internal (Postfix) with ESMTP id BF9431380119;
+	Thu,  7 May 2026 05:26:52 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-03.internal (MEProxy); Thu, 07 May 2026 05:26:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1778146012; x=
+	1778153212; bh=dyuIOlvvoXqiYdKWiBRGqggzExiM1Bavzi5yk+4YmzA=; b=W
+	QCJ3d3DH3VDyV6e2/IHHRI4AQ7Ee9A+p0hgPjRWU3ErchVE8OumgDYDT5k4FAeej
+	rVrM4u+c3R7WqRu8TqipEEHPRjhTautvnSRL4lhCtZf4wxrYIPbR4SlvlxXYDHpj
+	GE3TdCEpkpuXYnIm0t9y05cNVUqN1jIe5xT8eE31n7Gs9lq7bZC06+7ommp+Qsqu
+	HYEavYaXXohppvQb40VaR+Ol5TmN3rddua0OxaJvmeOrJGL/CgmgTP6ecTw+W6xY
+	yYae+QPDv5T2b7+g/rbFOkcD8bpb/lUICaEMvYf1TGwPfPz0TleSdi8tK3C4XaUZ
+	57hVQjMPsZDbMVWBz3Eug==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1778146012; x=1778153212; bh=dyuIOlvvoXqiYdKWiBRGqggzExiM1Bavzi5
+	yk+4YmzA=; b=vB85BIFd3VJWCwCvKQXu8I2SG0HmBGNN8AfhIJf/oiZ9cAbhY/b
+	HIPEk76eA3R5AAsbjd6ToildsRirEb8s3KHnFPvlvVZAtG99Z9W4JS3IuobJOkHe
+	dsch1OB1KlrXC92G20BC1CQPLZceF6/U2KlTlUFvMJtivUesOW597OlvsryfDrev
+	hrQ0K/hutj57JivgpNZzRyOwRXfj0elg4kJYY2FLzBkNdOj+z5ynrdHSG8dmGGvW
+	1CqpyTRxtz4d7dDA/VMM+HRyD+TTSUaiwVr3QTLKpkxtmnM0yL+1kOF14Y3dmhT3
+	ywb/9qxiH8qUe512YJGCcsgPk5gTniVxEKw==
+X-ME-Sender: <xms:3Fr8aS_pY1ztldVPsr1ARAA5XkgETcU3vio_l61GI7DzKBeRbGPoJA>
+    <xme:3Fr8aUWKJ-kl-3xtV4YzCO8XfJDuX8UrkQCCW46C8G75248VcxxcsuKvWxkaRdVGF
+    AuljbFtfzSuDnIPtULwSM5cthy4kmvrRyeorujn31qRp0COi6ITUkXA>
+X-ME-Received: <xmr:3Fr8acHCbYCDRhQUoxwfxBgJwRY3AVdAGXXjYJXADXSM5wyom_QLDJgwMAd0>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddutdejudduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedvvddpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnthhonhihrdgrnhhtohhnhiesshgvtg
+    hunhgvthdrtghomhdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgv
+    tghunhgvthdrtghomhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprg
+    hnrgdrohhrghdrrghupdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgv
+    thdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoh
+    epkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughh
+    rghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpth
+    htohepughsrghhvghrnheskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:3Fr8aQ75svl913xXKPMZrSNupQe34Uh7wCpPMv_eXiUdra7ciUn3Hw>
+    <xmx:3Fr8aWI72afoevaAXx_u7J6iWwBknd3Wcs5WVxaADonp_NwDQRu1YQ>
+    <xmx:3Fr8aTBIgV_aIo9-vA8NaVQnvzgzf2W0B3QVju3vqDPNoNts_p50rQ>
+    <xmx:3Fr8aUTtUlUf5Ir-m5jiqiC4bpY2EkUv8DbP5sV1XemksNJ518YQRQ>
+    <xmx:3Fr8aQxd4pkoGHInUl250eRSqBt7Po02ro8psEdG4f12FUUJN5J2KQ1K>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 7 May 2026 05:26:51 -0400 (EDT)
+Date: Thu, 7 May 2026 11:26:49 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antony Antony <antony.antony@secunet.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Masahide NAKAMURA <nakam@linux-ipv6.org>,
+	Paul Moore <paul@paul-moore.com>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, selinux@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Chiachang Wang <chiachangwang@google.com>,
+	Yan Yan <evitayan@google.com>, devel@linux-ipsec.org
+Subject: Re: [PATCH ipsec-next v8 03/14] xfrm: allow migration from UDP
+ encapsulated to non-encapsulated ESP
+Message-ID: <afxa2RNjJGNeD7zf@krikkit>
+References: <migrate-state-v8-0-4578fb016965@secunet.com>
+ <migrate-state-v8-3-4578fb016965@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260507-lan966-binding-v1-1-e99293d2a4ec@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMQQqDMBBA0avIrBsYA4m1V5Euohl1Shklo1II3
- r2xXb7F/xmUEpPCo8qQ6GDlRQrqWwXDHGQiw7EYLFqPDhvzDtJ6b3qWyDIZjKO3Aeu7wxZKtCY
- a+fMbds+/de9fNGzXBc7zC/aDzgNyAAAA
-X-Change-ID: 20260507-lan966-binding-0df62a018509
-To: Herve Codina <herve.codina@bootlin.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- Linus Walleij <linusw@kernel.org>
-X-Mailer: b4 0.15.2
-X-Rspamd-Queue-Id: 36FF34E5D6B
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <migrate-state-v8-3-4578fb016965@secunet.com>
+X-Rspamd-Queue-Id: 1F9684E6087
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [4.84 / 15.00];
-	SEM_URIBL(3.50)[0.0.0.0:email];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285205-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	TAGGED_FROM(0.00)[bounces-285206-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
-	R_DKIM_ALLOW(0.00)[kernel.org:s=k20201202];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	GREYLIST(0.00)[pass,meta];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_SPAM(0.00)[0.254];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_CC(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,google.com,kernel.org,redhat.com,linux-ipv6.org,paul-moore.com,gmail.com,lwn.net,linuxfoundation.org,vger.kernel.org,linux-ipsec.org];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	R_SPF_ALLOW(0.00)[+ip4:172.232.135.74:c];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	TO_DN_SOME(0.00)[]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[queasysnail.net:email,queasysnail.net:dkim,messagingengine.com:dkim,secunet.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-The dsa.yaml and ethernet-switch.yaml bindings recommend
-prefixing ethernet switches and ports with "ethernet-" so
-make the LAN966x do the same.
+2026-05-05, 06:32:30 +0200, Antony Antony wrote:
+> The current code prevents migrating an SA from UDP encapsulation to
+> plain ESP. This is needed when moving from a NATed path to a non-NATed
+> one, for example when switching from IPv4+NAT to IPv6.
+> 
+> Only copy the existing encapsulation during migration if the encap
+> attribute is explicitly provided.
+> 
+> Note: PF_KEY's SADB_X_MIGRATE always passes encap=NULL and never
+> supported encapsulation in migration. PF_KEY is deprecated and was
+> in feature freeze when UDP encapsulation was added to xfrm.
+> 
+> Signed-off-by: Antony Antony <antony.antony@secunet.com>
+> Tested-by: Yan Yan <evitayan@google.com>
+> ---
+>  net/xfrm/xfrm_state.c | 10 ++--------
+>  1 file changed, 2 insertions(+), 8 deletions(-)
 
-Reported-by: Herve Codina <herve.codina@bootlin.com>
-Signed-off-by: Linus Walleij <linusw@kernel.org>
----
- .../devicetree/bindings/net/microchip,lan966x-switch.yaml      | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
-diff --git a/Documentation/devicetree/bindings/net/microchip,lan966x-switch.yaml b/Documentation/devicetree/bindings/net/microchip,lan966x-switch.yaml
-index 306ef9ecf2b9..0f0f35865ef4 100644
---- a/Documentation/devicetree/bindings/net/microchip,lan966x-switch.yaml
-+++ b/Documentation/devicetree/bindings/net/microchip,lan966x-switch.yaml
-@@ -17,7 +17,7 @@ description: |
- 
- properties:
-   $nodename:
--    pattern: "^switch@[0-9a-f]+$"
-+    pattern: "^(ethernet-)?switch@[0-9a-f]+$"
- 
-   compatible:
-     const: microchip,lan966x-switch
-@@ -70,7 +70,7 @@ properties:
-     additionalProperties: false
- 
-     patternProperties:
--      "^port@[0-9a-f]+$":
-+      "^(ethernet-)?port@[0-9a-f]+$":
-         type: object
- 
-         $ref: /schemas/net/ethernet-controller.yaml#
-@@ -138,7 +138,7 @@ additionalProperties: false
- examples:
-   - |
-     #include <dt-bindings/interrupt-controller/arm-gic.h>
--    switch: switch@e0000000 {
-+    switch: ethernet-switch@e0000000 {
-       compatible = "microchip,lan966x-switch";
-       reg =  <0xe0000000 0x0100000>,
-              <0xe2000000 0x0800000>;
-@@ -151,14 +151,14 @@ examples:
-         #address-cells = <1>;
-         #size-cells = <0>;
- 
--        port0: port@0 {
-+        port0: ethernet-port@0 {
-           reg = <0>;
-           phy-handle = <&phy0>;
-           phys = <&serdes 0 0>;
-           phy-mode = "gmii";
-         };
- 
--        port1: port@1 {
-+        port1: ethernet-port@1 {
-           reg = <1>;
-           sfp = <&sfp_eth1>;
-           managed = "in-band-status";
+If someone complains about this we can add a sysctl
+"preserve_old_encap_on_migrate".
 
----
-base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
-change-id: 20260507-lan966-binding-0df62a018509
-
-Best regards,
---  
-Linus Walleij <linusw@kernel.org>
-
+-- 
+Sabrina
 
