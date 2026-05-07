@@ -1,211 +1,239 @@
-Return-Path: <netdev+bounces-285547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285550-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2MtYA54j/Wn6YAAAu9opvQ
-	(envelope-from <netdev+bounces-285547-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 01:43:26 +0200
+	id 0DRZJBsk/Wn6YAAAu9opvQ
+	(envelope-from <netdev+bounces-285550-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 01:45:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C3344F0332
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 01:43:24 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E23F4F035B
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 01:45:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D22CE30046BF
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 23:43:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DE8C23010650
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 23:45:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72016348465;
-	Thu,  7 May 2026 23:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2068361662;
+	Thu,  7 May 2026 23:45:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HrnB57p0"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="uDCXudwa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0222F326942
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 23:43:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270ED330305;
+	Thu,  7 May 2026 23:45:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778197399; cv=none; b=gx6hZWuKQTmf23CEmUtjRkxqE03PGcnocKXtX5hgMxy4d6GbxftGPZFPSZDDPm+pHx5Bikh1bOe8/hKgrq6fcyYBBV5tMaNcHtUHjZwZzAJ0ULCR4vGKcRiYAQ/y9fMNvIKIomriUiv0Ry2ZhOEhPeNSPMQC1yT5vIeSmIaRqN4=
+	t=1778197525; cv=none; b=ao33TJpIzZ3wqHWkMxzznH4fJq7btVULrZxZURP9xj9P+lRr60W6OjmrT88jYUEoM4DxudRA1EDRyQpFAUqfyo25iDiqTzJigTLrbPKInTYmQnhrhf9GzFaIiM93D7pTNrCQG1/brGUPDFPZdhHIJ/2b65pEY11b5y7KcqoN4v8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778197399; c=relaxed/simple;
-	bh=qkkBF3RQ7Ixw5ubxnV9KnZdzbMduZO2yaLLmTe4UUp8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=f5FBq7spliEnBt5gOWWlI+DUT/Xw+o8bqHmQomeN6TCPPRA1Q8/ufYWhZ1hhRGOKuLrXRCB4qDccreR4XiUot+3wZ7v1SuAdLq3wN4Cplk1b5ZufHJ1KsGt5wiPh7gyEx8TeZRpLXCeyOfpcjjSB947gvxAQ7XWEyec457bfqqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HrnB57p0; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778197398; x=1809733398;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:to:cc;
-  bh=qkkBF3RQ7Ixw5ubxnV9KnZdzbMduZO2yaLLmTe4UUp8=;
-  b=HrnB57p0F0Ab0ULmC6Xv4M72Xe/V9QByspdYMQ9mB8BTG5QjZC7vxnkO
-   bUH3bb+uvywTdhR3SJjxebgbuYz+nNCW0jImz/lPMiK7lStNZxjQKxmbD
-   lpsEE95AO3zzGzBWUMVK0ThZ+7IgxQuEsCuqhW3lxWM+bdt2U+oRUkMeL
-   iY4CzvVYk0JaG3Rocz+p71SsrWMAjRdEw23dIBqEJQUaQOEFc2xXeT847
-   P1djXCQ8SWAOUO7iw9/Uqb/qX/7S/ZzcTmZoBG30KkjWe1Q2ua5B+Tl0p
-   iZ494hTfRqoG35EftWVAAlNVOgh05yOFGhC8FZdIvJr/a0EcAQCTnm4+u
-   w==;
-X-CSE-ConnectionGUID: kuvDSzfWSM6/k4wGfxxOTQ==
-X-CSE-MsgGUID: C9J5V1r1SR+tGZ46HwzN9w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11779"; a="96731672"
-X-IronPort-AV: E=Sophos;i="6.23,222,1770624000"; 
-   d="scan'208";a="96731672"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 16:43:17 -0700
-X-CSE-ConnectionGUID: T2szzNHETRyDLJMrNKxu5Q==
-X-CSE-MsgGUID: +LgbT6PPQiWCt0i2uah7ug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,222,1770624000"; 
-   d="scan'208";a="241616007"
-Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.109]) ([10.166.28.109])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 16:43:18 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Thu, 07 May 2026 16:42:42 -0700
-Subject: [PATCH net-next] ixgbe: E610: do not fill EEE lp_advertised from
- local PHY caps
+	s=arc-20240116; t=1778197525; c=relaxed/simple;
+	bh=6313JbgSj3366JDYAEs+/R0pd26r81Du1o4AG3y+t3g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y5OkA0NZMTQtRJn/gv3OtQjm5DdxaCILAaAXotqUbDwSsvI2Qdv6p+lfatBa8/4oa4syd3P8t9y872i7Gv6FzR80FsbWioopcxrV2MwlJILihnAJIhfnnzMV1D2RVI0+aLQp6ZeWz60LXVtaHnas6Zj6VnE+HDmv0kYw3NXnXGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=uDCXudwa; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from localhost.localdomain (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id E8F20600BA;
+	Fri,  8 May 2026 01:45:12 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1778197513;
+	bh=c6PnoKMOyQUzQrF9GqgROkXZMQlV3PBzK7Uphy7GUZU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=uDCXudwa09Cf1NNYYzxSZF0R8tQvC7JwQmASyr/NNek2WkY4wvYZsjpxNUrMT8cSh
+	 6PMi6B7UHMKkPHmQ4N4K0L4JEqmBEfU2cUHR+NfABhSxfpl1L3cRCrnF+0HGM262ie
+	 p0sJxB9FoaJEU9pVSKW72jzLw/0X1kPwcHFvO+zGoXgjLLIHODYOIdyI92BGMJTplI
+	 SHxUA0j/A03emUq1BvieJcDG2RL3St1fxk7o8vpix6C2LQk3oxuApQvVpxSr8q9Yb6
+	 GiK7mOhxcIGeF4pJ3a+93+B7vbGpM6uiSXWAo+/5orXjXdQw/eWgBX4aiXVI7KQcdO
+	 /I5LMG7waLqLg==
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de,
+	horms@kernel.org
+Subject: [PATCH net 00/13] Netfilter fixes for net
+Date: Fri,  8 May 2026 01:44:56 +0200
+Message-ID: <20260507234509.603182-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260507-jk-iwl-next-fix-eee-ixgbe-v1-1-62bc1d197d1d@intel.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWM0Q6CMBAEf4Xcs5cUCCD+ivEB6oKHppq2QhPCv
- 3vC42RndqUALwh0yVbymCXI2ynkp4zso3MjWO7KVJiiNpVpeHqyLC92SJEHSQyoksYeXJq2zWt
- bocGZtP94qLB/X8kh7g3djiV8+wk2/q9p237aQrOlhwAAAA==
-X-Change-ID: 20260507-jk-iwl-next-fix-eee-ixgbe-309916c5e7e8
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Jedrzej Jagielski <jedrzej.jagielski@intel.com>, 
- Jacob Keller <jacob.e.keller@intel.com>
-Cc: netdev@vger.kernel.org, David Carlier <devnexen@gmail.com>
-X-Mailer: b4 0.16-dev-ea14f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3205;
- i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=AR4mTTPloZw3fj31XNVXYIZcxf5GESK0zZLITIJsQGg=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhsy/yhP3zNLsUl66fkoAW7p/dnWUnuSOUzHiXcavAlYu/
- BH2WGZ3RykLgxgXg6yYIouCQ8jK68YTwrTeOMvBzGFlAhnCwMUpABM56cbwT3dKr+YdjvqXiieW
- f9mv6N9y9D9DjNyj7rDznK03uN4KPmD4nyOxTb3yd95OXdvK2+yb2x/NrvjvaCRUzXtx8gpO6c0
- 1XAA=
-X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
- fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
-X-Rspamd-Queue-Id: 0C3344F0332
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 2E23F4F035B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-285547-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TAGGED_FROM(0.00)[bounces-285550-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[netfilter.org];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email,intel.com:mid,intel.com:dkim]
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-From: David Carlier <devnexen@gmail.com>
+Hi,
 
-ixgbe_get_eee_e610() fills kedata->lp_advertised from pcaps.eee_cap
-returned by ixgbe_aci_get_phy_caps() with IXGBE_ACI_REPORT_ACTIVE_CFG.
-That report mode (and the other IXGBE_ACI_REPORT_* modes) describe the
-local PHY only, not the link partner. The X550 path uses a separate
-FW_PHY_ACT_UD_2 activity for partner data; the E610 ACI has no
-equivalent.
+The following batch contains Netfilter fixes for net:
 
-Leave lp_advertised zeroed via the existing linkmode_zero() and drop
-the now-unused ixgbe_eee_cap_map[]. eee_active/eee_enabled are
-unaffected (sourced from link.eee_status).
-
-Fixes: b61dbdeff3a9 ("ixgbe: E610: add EEE support")
-Signed-off-by: David Carlier <devnexen@gmail.com>
-Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
----
-I'm sending this to next now since it fixes the recently merged EEE support
-for ixgbe, which was merged last week (see [1]). It is a fix, but the
-offending code is only on net-next currently.
-
-[1]: https://lore.kernel.org/netdev/177777482779.3993534.10771712863528181433.git-patchwork-notify@kernel.org/
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c | 20 --------------------
- 1 file changed, 20 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-index 6990fe53f049..36e43b5e88d1 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-@@ -3558,17 +3558,6 @@ static const struct {
- 	{ FW_PHY_ACT_UD_2_10G_KR_EEE, ETHTOOL_LINK_MODE_10000baseKR_Full_BIT},
- };
+1) Allow initial x_tables table replacement without emitting an audit
+   log message. Delay the register message until after hooks are wired up
+   to avoid unnecessary unregister logs during error unwinding.
  
--static const struct {
--	u16 eee_cap_bit;
--	u32 link_mode;
--} ixgbe_eee_cap_map[] = {
--	{ IXGBE_ACI_PHY_EEE_EN_100BASE_TX, ETHTOOL_LINK_MODE_100baseT_Full_BIT },
--	{ IXGBE_ACI_PHY_EEE_EN_1000BASE_T, ETHTOOL_LINK_MODE_1000baseT_Full_BIT },
--	{ IXGBE_ACI_PHY_EEE_EN_10GBASE_T, ETHTOOL_LINK_MODE_10000baseT_Full_BIT },
--	{ IXGBE_ACI_PHY_EEE_EN_5GBASE_T, ETHTOOL_LINK_MODE_5000baseT_Full_BIT },
--	{ IXGBE_ACI_PHY_EEE_EN_2_5GBASE_T, ETHTOOL_LINK_MODE_2500baseT_Full_BIT },
--};
--
- static int ixgbe_validate_keee(struct net_device *netdev,
- 			       struct ethtool_keee *keee_requested)
- {
-@@ -3645,7 +3634,6 @@ static int ixgbe_get_eee_e610(struct net_device *netdev,
- 	struct ixgbe_aci_cmd_get_phy_caps_data pcaps;
- 	struct ixgbe_hw *hw = &adapter->hw;
- 	struct ixgbe_link_status link;
--	u16 eee_cap;
- 	int err;
+2) Fix a NULL dereference by allocating hook ops before adding the
+   table to the per-netns list. Use `synchronize_rcu()` during error
+   unwinding to ensure the table stops processing packets before
+   teardown. Defer audit log register message until all operations 
+   succeed.
  
- 	linkmode_zero(kedata->lp_advertised);
-@@ -3670,14 +3658,6 @@ static int ixgbe_get_eee_e610(struct net_device *netdev,
- 	if (kedata->eee_enabled)
- 		kedata->tx_lpi_timer = le16_to_cpu(pcaps.eee_entry_delay);
+3) Refactor xtables to use a single `xt_unregister_table_pre_exit`
+   function. Eliminate code duplication by centralizing table
+   unregistration logic within the xtables core. ebtables cannot be
+   changed due to incompatibility.
  
--	eee_cap = le16_to_cpu(pcaps.eee_cap);
--
--	for (int i = 0; i < ARRAY_SIZE(ixgbe_eee_cap_map); i++) {
--		if (eee_cap & ixgbe_eee_cap_map[i].eee_cap_bit)
--			linkmode_set_bit(ixgbe_eee_cap_map[i].link_mode,
--					 kedata->lp_advertised);
--	}
--
- 	for (int i = 0; i < ARRAY_SIZE(ixgbe_ls_map); i++) {
- 		if (hw->phy.eee_speeds_supported &
- 		    ixgbe_ls_map[i].mac_speed)
+4) Unregister xtables templates before module removal. This prevents
+   a race condition where userspace instantiates a new table after the
+   pernet unreg removed the current table.
+ 
+5) Add `xtables_unregister_table_exit` to fully unregister netfilter
+   tables during module removal. Unlink the table from dying lists,
+   then free hook operations.
+ 
+6) Implement a two-stage removal scheme for ebtables following the
+   x_tables pattern. Assign table->ops while holding the ebt mutex to
+   prevent exposing partially-filled structures.
+ 
+7) Fix ebtables module initialization race. Register the template last
+   in table initialization functions. Prevent table instantiation before
+   pernet operations are available.
+ 
+8) Fix a race condition in x_tables module initialization. Ensure
+   pernet ops are fully set up before exposing the table to userspace.
 
----
-base-commit: 6a4c4656b0d2d4056a1f0c35442db4e8a5cf8021
-change-id: 20260507-jk-iwl-next-fix-eee-ixgbe-309916c5e7e8
+9) Fix a race condition in ebtables module initialization, similar to
+   previous patch.
 
-Best regards,
---  
-Jacob Keller <jacob.e.keller@intel.com>
+10) Restore propagation of helper to expected connection, this is a
+    fix-for-recent-fix.
 
+11) Validate that the expectation tuple and mask netlink attributes are
+    present when adding expectation via nfqueue, this fixes a possible
+    null-ptr-deref.
+
+12) Fix possible rare memleak in the SIP helper in case helper has been
+    detached from conntrack entry, from Li Xiasong.
+
+13) Fix refcount leak in nft_ct when creating custom expectation, also
+    from Li Xiason.
+
+Patches 1-9 from Florian Westphal.
+
+10) Restore propagation of helper to expected connection, this is a
+    fix-for-recent-fix.
+
+11) Check that tuple and mask netlink attributes are set when creating an
+    expectation via nfqueue.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-26-05-08
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit fcee7d82f27d6a8b1ddc5bbefda59b4e441e9bc0:
+
+  Merge tag 'net-7.1-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2026-05-07 10:32:03 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-26-05-08
+
+for you to fetch changes up to 19f94b6fee75b3ef7fbc06f3745b9a771a8a19a4:
+
+  netfilter: nft_ct: fix missing expect put in obj eval (2026-05-08 01:30:17 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 26-05-08
+
+----------------------------------------------------------------
+Florian Westphal (9):
+      netfilter: x_tables: allow initial table replace without emitting audit log message
+      netfilter: x_tables: allocate hook ops while under mutex
+      netfilter: x_tables: add and use xt_unregister_table_pre_exit
+      netfilter: x_tables: unregister the templates first
+      netfilter: x_tables: add and use xtables_unregister_table_exit
+      netfilter: ebtables: move to two-stage removal scheme
+      netfilter: ebtables: close dangling table module init race
+      netfilter: x_tables: close dangling table module init race
+      netfilter: bridge: eb_tables: close module init race
+
+Li Xiasong (2):
+      netfilter: nf_conntrack_sip: get helper before allocating expectation
+      netfilter: nft_ct: fix missing expect put in obj eval
+
+Pablo Neira Ayuso (2):
+      netfilter: nf_conntrack_expect: restore helper propagation via expectation
+      netfilter: ctnetlink: check tuple and mask in expectations created via nfqueue
+
+ include/linux/netfilter/x_tables.h          |   4 +-
+ include/linux/netfilter_arp/arp_tables.h    |   1 -
+ include/linux/netfilter_ipv4/ip_tables.h    |   1 -
+ include/linux/netfilter_ipv6/ip6_tables.h   |   1 -
+ include/net/netfilter/nf_conntrack_expect.h |   5 +-
+ net/bridge/netfilter/ebtable_broute.c       |  14 +--
+ net/bridge/netfilter/ebtable_filter.c       |  14 +--
+ net/bridge/netfilter/ebtable_nat.c          |  12 +-
+ net/bridge/netfilter/ebtables.c             |  71 ++++++-----
+ net/ipv4/netfilter/arp_tables.c             |  53 ++-------
+ net/ipv4/netfilter/arptable_filter.c        |  27 +++--
+ net/ipv4/netfilter/ip_tables.c              |  59 ++--------
+ net/ipv4/netfilter/iptable_filter.c         |  27 +++--
+ net/ipv4/netfilter/iptable_mangle.c         |  29 ++---
+ net/ipv4/netfilter/iptable_nat.c            |   6 +-
+ net/ipv4/netfilter/iptable_raw.c            |  26 ++--
+ net/ipv4/netfilter/iptable_security.c       |  27 +++--
+ net/ipv6/netfilter/ip6_tables.c             |  56 ++-------
+ net/ipv6/netfilter/ip6table_filter.c        |  26 ++--
+ net/ipv6/netfilter/ip6table_mangle.c        |  27 +++--
+ net/ipv6/netfilter/ip6table_nat.c           |   6 +-
+ net/ipv6/netfilter/ip6table_raw.c           |  24 ++--
+ net/ipv6/netfilter/ip6table_security.c      |  27 +++--
+ net/netfilter/nf_conntrack_broadcast.c      |   1 +
+ net/netfilter/nf_conntrack_core.c           |   7 +-
+ net/netfilter/nf_conntrack_expect.c         |   1 +
+ net/netfilter/nf_conntrack_h323_main.c      |  12 +-
+ net/netfilter/nf_conntrack_helper.c         |   5 +
+ net/netfilter/nf_conntrack_netlink.c        |  21 +++-
+ net/netfilter/nf_conntrack_sip.c            |  10 +-
+ net/netfilter/nft_ct.c                      |   2 +
+ net/netfilter/x_tables.c                    | 177 +++++++++++++++++++++++-----
+ 32 files changed, 415 insertions(+), 364 deletions(-)
 
