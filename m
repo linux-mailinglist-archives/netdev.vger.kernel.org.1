@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-285193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285194-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uHHzKHhT/GlnOQAAu9opvQ
-	(envelope-from <netdev+bounces-285193-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 10:55:20 +0200
+	id EPtHEXtT/GlOOAAAu9opvQ
+	(envelope-from <netdev+bounces-285194-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 10:55:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 432BE4E5461
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 10:55:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7B374E5469
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 10:55:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6030130E39F8
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 08:43:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 490CB30E48EF
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 08:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6F2934BA53;
-	Thu,  7 May 2026 08:43:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C48D035DA77;
+	Thu,  7 May 2026 08:43:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g3kAySoN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pxxr2ZIA"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3817238A711
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 08:43:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F742392C57
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 08:43:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778143397; cv=none; b=X6TEay5U4MTZkoK6bBAxxPtgk0udYoCxjBhBz437fIasMuODLuCX2d9CXTjwqXBfJ+huwOAarSdq7N3/fg7RFLOQJGkI+rOTxQXb6tbOsmR4SlaZyimvHUpB+epT+GuB3fPWioV6dvHBQ7V/yv5ljIhd7lScl9fV5pXtX9r975Y=
+	t=1778143400; cv=none; b=HEiVq5I2veVvES8WMm5AMjLvbMU95nPBffGwnRv84D8dx2LhxQdH5Nq/XFW0ohmlSgsl8KTY1SKNJ9rHAb8jMXTIcIguHreQdn7IpPxrWGGfVU5m8E4j3gEeo9QE4VC39E6SFrdcj11RQL1vSCtpzyqW+02yLyT9sUxDWt4xSdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778143397; c=relaxed/simple;
-	bh=ZMAU549aj2S6PZnpoM5zmF/BB8sp9vi6fV00BpWoeUE=;
+	s=arc-20240116; t=1778143400; c=relaxed/simple;
+	bh=/YJ5ZlLhsjx3W/bnw+G9mm567SkVlYapVpFQo7O6bmg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kkwZh1kFZJLR05XeZxAUthyzzpMA7Rlpx8n6V2AlWlVWXPyGrqwbldPEeonpd1aWkc7idqvaF02bomkJy2TDu5aq5qtUsOIBYy3HSk1KNbGAiUZQJ2dkM7U/aDjBGq5A6+BCpxwR1roiciy5D1T5HQSCqm9t83hwLsb5Y6iEc8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g3kAySoN; arc=none smtp.client-ip=209.85.222.201
+	 To:Cc:Content-Type; b=W3aIR14qtkQIQGdTrOpVlg3Z0RqzPTpTnLj/025l4QCpAcvGM9P/Wu1LOZ7jaKWwmcLJX4gVeG19uzTuGuxdYaZSn1lvt2oyOM07ok+vruKS2yb+jK9+gTPS4pwFvWOHgwQvHxSig6ecz9T72/1oX7rMc/3KGhWLynzT1WfwXRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pxxr2ZIA; arc=none smtp.client-ip=209.85.222.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8e8950b3ee1so179401085a.3
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 01:43:12 -0700 (PDT)
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-9012b756f76so131707685a.0
+        for <netdev@vger.kernel.org>; Thu, 07 May 2026 01:43:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778143389; x=1778748189; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1778143390; x=1778748190; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tIpd9DJUk1AnIU7fkmU+5m29Sz2tmvPVJ0G7Dh1iZQQ=;
-        b=g3kAySoNZ19P+5DnqqyIPZS1MOUf2IjYVSodsXwYi3VbM4+bJhnA71Hv5XpW0wyQrN
-         3Fcw27ff5GaS2oVegZUvweDBU5wbnW04esfbDOo8IWSH2aSWth0aRsEZQ7jI9Xe8A+Zb
-         LgaQv90+dtzUAo6fyMPurUdPXpjMMcLITmL/hz/x7ZNQWcYjTAP88kskq7YmqQhTviuH
-         dJNVEvi9rQvIE8Kg/ZErDCTu6rHjkweQs+oDhqu1EIRY1G/o59FqgpJ5Kdh8YOSIDXDn
-         4iC98z6HgW2olE9wW5zlt1LdQlms5nqJvO4K5tBNFrmpSLYbbpYuaNGnEMU6Ro3LT4v/
-         AQcw==
+        bh=ldNX4hjnqPv+69PJqK5nA8PHBAP3lHPK+0x1ATXTw+I=;
+        b=pxxr2ZIAX+Cca+9wLbzAHbFdcA9TOFs0vM5gqgE3Z85aZE+2N1wcrUJq1lA1uq+NNy
+         dWge4noSvd2gL71ZBHMY6UMx+sY6+uD3BR/G9leaE7MFDI4Vs8lVVD9RtD8qzlBsNpD1
+         uYYdhnF4aSy34imrXO/JJdwmNCiuq3iy6GiFCuYhRULYreLz45KZRrgN9iRKmQrx3VD6
+         SRYjhPEobYGMI59othK5Affjb7eJS3eiSlQRnRGYUnuW5oRIdsuoymC/C/lb4bKH4RPm
+         yRkQXxqEVYgyVNn6kr5318OQqty1whu1JjuxYT8nhhMz2yRS3qyIf3zePMxqJtz6PWWw
+         3oUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778143389; x=1778748189;
+        d=1e100.net; s=20251104; t=1778143390; x=1778748190;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tIpd9DJUk1AnIU7fkmU+5m29Sz2tmvPVJ0G7Dh1iZQQ=;
-        b=V/4Ew/tUNJOrEFMp0mbAx9dAPYrbRZ0t0gcDRk81kvWp+j79gqEZteO9no+tYFhyrc
-         ad1eAe7IsT5rTtfrWqdbSNvQqp6cnsbvX2UPF9aPHyZG2FvOse04yWT2xkJtDqsQ391w
-         wL37a8/HfprKjaTmUruh/3yELdFjN9KezNOyfrX8908l2ClT1FJdJ57n57aIhqplTZmi
-         UIfa3h9XcdhwN+XQATG3bdL6mwZjlmpsCmvbPyX5+cB8Trj9hZgrFpr2oS6eKEjHfSwO
-         w4GG45g//pU3MczF2bQ4RfuFGl3F/F5NbKRR2Ul1U2YTjREmMmpJlb/bIcO/SCprxUTI
-         YJEg==
-X-Forwarded-Encrypted: i=1; AFNElJ/xAgp640pbdZxoBfLtoObp+oGs07dNAzf21jNTkAjK4sppEsLfbQraGmjvZlaQ4kjh697oGc8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+biD79yTjOx1vStVRn+mKN6R1oj4lZu0fSFMzGCm7aRzE5BrZ
-	npDKohoM6fKmgo6onplAiakBrug8HfIlpp45G26HM5UhCN2dGAuZs/PvWjzR+Fw6fUfNX4oWVFS
-	FZoAIlsoYSJiHxw==
-X-Received: from qkww18.prod.google.com ([2002:a05:620a:952:b0:8ec:481e:ba3a])
+        bh=ldNX4hjnqPv+69PJqK5nA8PHBAP3lHPK+0x1ATXTw+I=;
+        b=bewa2WWXBMDBd6Iv5kJpXEi+9oFoFYzbAMU7GC9doK3fXCdmq4vk80k7v958ZJznrS
+         oRYpHJkZATXeWUl1dMjN0a5E+DJ8pe/LF/urny8JCa9+Z1zxiNL+53pCXtgmxSP1ig/4
+         C3cqOzDvZrrEna+9N1xKDKwaqC7u/yTi4+YsCR6iasmYkHjqrh2XwPDfj9rZ5Ef8kMFn
+         9IoymLku2n4Mi+v+mkyfsfWhLHrHWLLMAnaStxTpXWCNbNXlgUWzotV9V6E7B4t2JZwS
+         RtzRVDacGUMqJ+ItbgIIuSf5RtDPthW0B7IrKOaZosjo1Yw0mYPMdxtdX+RTxm16yeVt
+         9SrQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/oqqurZH56KE1EHZrnhZ1mHHFsKOmSf2p1N5XT3xIHRlHtwHhvT7DkK5vBFq+laRIjacG7EAw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw19gUDh//DbcxlGbT0GxcY6wRTkw8CXvbdRDlQDz/H2g1Mv1Eq
+	5lM6rdhQv2wQatjsAhprIlw9GR07tX3CbPBPxRLsZSvU3wknNXhMOaEsF6EpkMj96JYWPEEloCL
+	v2V48R1mU8ErScA==
+X-Received: from qknto14.prod.google.com ([2002:a05:620a:4c8e:b0:8eb:29c3:b17b])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:40d0:b0:8ee:630e:3507 with SMTP id af79cd13be357-904d4391035mr1001209585a.1.1778143388784;
- Thu, 07 May 2026 01:43:08 -0700 (PDT)
-Date: Thu,  7 May 2026 08:43:03 +0000
+ 2002:a05:620a:2905:b0:8dc:218b:db92 with SMTP id af79cd13be357-904d5ff953bmr1015226185a.40.1778143390242;
+ Thu, 07 May 2026 01:43:10 -0700 (PDT)
+Date: Thu,  7 May 2026 08:43:04 +0000
 In-Reply-To: <20260507084305.2506115-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260507084305.2506115-1-edumazet@google.com>
 X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
-Message-ID: <20260507084305.2506115-2-edumazet@google.com>
-Subject: [PATCH net-next 1/3] net: constify sk_skb_reason_drop() sock parameter
+Message-ID: <20260507084305.2506115-3-edumazet@google.com>
+Subject: [PATCH net-next 2/3] tcp: use SKB_DROP_REASON_IP_OUTNOROUTES in tcp_v6_send_response()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
@@ -85,7 +85,7 @@ Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
 	David Ahern <dsahern@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 432BE4E5461
+X-Rspamd-Queue-Id: D7B374E5469
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -93,7 +93,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -102,9 +102,9 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285193-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285194-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
@@ -116,75 +116,27 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-sk_skb_reason_drop() does not change sock parameter, make it
-const so that we can call it from TCP stack without a cast
-on a (const) listener socket.
+Replace a bare kfree_skb() with a modern sk_skb_reason_drop() call,
+and provide IP_OUTNOROUTES drop reason.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/linux/skbuff.h     | 3 ++-
- include/trace/events/skb.h | 4 ++--
- net/core/skbuff.c          | 5 +++--
- 3 files changed, 7 insertions(+), 5 deletions(-)
+ net/ipv6/tcp_ipv6.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 2bcf78a4de7b9edb0d1342319d4340c0a9997eeb..746e741a8ef99b3052ad581650e5d0db2a95dbb3 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -1313,7 +1313,8 @@ static inline bool skb_data_unref(const struct sk_buff *skb,
- 	return true;
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index 2c3f7a739709d7b89f376f79b71173e5f2d8e64e..3574b2c28a55182d46657cfcca528a0ac0de99b7 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -980,7 +980,7 @@ static void tcp_v6_send_response(const struct sock *sk, struct sk_buff *skb, u32
+ 		return;
+ 	}
+ 
+-	kfree_skb(buff);
++	sk_skb_reason_drop(sk, buff, SKB_DROP_REASON_IP_OUTNOROUTES);
  }
  
--void __fix_address sk_skb_reason_drop(struct sock *sk, struct sk_buff *skb,
-+void __fix_address sk_skb_reason_drop(const struct sock *sk,
-+				      struct sk_buff *skb,
- 				      enum skb_drop_reason reason);
- 
- static inline void
-diff --git a/include/trace/events/skb.h b/include/trace/events/skb.h
-index b877133cd93a80f6b130fab64f334ecdeab8c8fd..2945aa7fe9a7ded5bdec5be3a67382de95239517 100644
---- a/include/trace/events/skb.h
-+++ b/include/trace/events/skb.h
-@@ -24,14 +24,14 @@ DEFINE_DROP_REASON(FN, FN)
- TRACE_EVENT(kfree_skb,
- 
- 	TP_PROTO(struct sk_buff *skb, void *location,
--		 enum skb_drop_reason reason, struct sock *rx_sk),
-+		 enum skb_drop_reason reason, const struct sock *rx_sk),
- 
- 	TP_ARGS(skb, location, reason, rx_sk),
- 
- 	TP_STRUCT__entry(
- 		__field(void *,		skbaddr)
- 		__field(void *,		location)
--		__field(void *,		rx_sk)
-+		__field(const void *,	rx_sk)
- 		__field(unsigned short,	protocol)
- 		__field(enum skb_drop_reason,	reason)
- 	),
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 7dad68e3b5186cf622a3ed5a6e87c09d46bc3fd6..acca1365672c4f98b004c2548133d70c9cf5ddc1 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -1206,7 +1206,7 @@ void __kfree_skb(struct sk_buff *skb)
- EXPORT_SYMBOL(__kfree_skb);
- 
- static __always_inline
--bool __sk_skb_reason_drop(struct sock *sk, struct sk_buff *skb,
-+bool __sk_skb_reason_drop(const struct sock *sk, struct sk_buff *skb,
- 			  enum skb_drop_reason reason)
- {
- 	if (unlikely(!skb_unref(skb)))
-@@ -1235,7 +1235,8 @@ bool __sk_skb_reason_drop(struct sock *sk, struct sk_buff *skb,
-  *	'kfree_skb' tracepoint.
-  */
- void __fix_address
--sk_skb_reason_drop(struct sock *sk, struct sk_buff *skb, enum skb_drop_reason reason)
-+sk_skb_reason_drop(const struct sock *sk, struct sk_buff *skb,
-+		   enum skb_drop_reason reason)
- {
- 	if (__sk_skb_reason_drop(sk, skb, reason))
- 		__kfree_skb(skb);
+ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb,
 -- 
 2.54.0.563.g4f69b47b94-goog
 
