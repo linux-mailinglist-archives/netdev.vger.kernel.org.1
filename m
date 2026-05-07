@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-285307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285308-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cJIuKTKE/GmOQwAAu9opvQ
-	(envelope-from <netdev+bounces-285307-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:23:14 +0200
+	id 6KvMA6eF/GmOQwAAu9opvQ
+	(envelope-from <netdev+bounces-285308-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:29:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00CE94E824A
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:23:13 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0257C4E830A
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 14:29:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B2D8E30048C9
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 12:23:12 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 17AA7300B9DA
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 12:29:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05D1F3B19BC;
-	Thu,  7 May 2026 12:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4243BE16E;
+	Thu,  7 May 2026 12:29:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GBlkYDUT"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MY/2xBVp"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DD672E7F25
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 12:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66DAA3B7744;
+	Thu,  7 May 2026 12:29:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778156591; cv=none; b=TSKZ9+EhxmMtL5ylubRvSt+i3JhlDGxmzIiONDa+Ayjqr4fTZ3/n9bJYcByFqtlvGIU4UXQsZuJ0BUNOB6tRUBVeyyWUCkiw5c3WTBxTOkn9J1pEKPRNivphoRPj5IJcsnYto0CGmazHkCFLBIUc08Ouxhn/ATcZXvVdVu0s8D4=
+	t=1778156961; cv=none; b=WJ6psgaFJokayiZRcXVx4KVn6LXj8N7r3DY1WIJlsWQJnsAekN7O8ybVsymfM6mQNj4M7Pjapb42RIx/7d6NJUUo/GA55i0afuqHm6M4JxTgM4F5l5AGWZlGRpktoynm2EWd6fLSKdA4fXlI59459Lp06DDV7sUF1LLro/QG1g0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778156591; c=relaxed/simple;
-	bh=pS5zpsOPuov7uxKZpy7pVBccqd6j6SlEJU/WTiBdiio=;
+	s=arc-20240116; t=1778156961; c=relaxed/simple;
+	bh=Y++sXmlSsHai8PAxrMnUKMOgyR38lU9i2YrXRraFovs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ai5bfD0RCd4xIbNX4pn46D7EEGQAbsOfk4F+M4ptZ4MdeC9BIRSjyBiShQgw1rgGZMejfBaVI4kdBg3xYohZsDxtvLXwgwptzTKDLMx7JWu3I8ofTuhtbQrJGz4VYZorQBqaFTfk8znccGMb1pFgohx4a8NRhEAovg8DTIr1Mak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GBlkYDUT; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=bYbp1L1UzOgzsO96MfWajMJ9Gr9hxhFElP35LHJuQfy+/dXEYtoXPgkc/bymc8egHx8X677lKuPPpbtK+EHmdPtjrkRbfFcZmbO1zek5hPg4YL1uLDxBWJFwRuXwQEjaQUdFB1JPn9vfdmxZQz28FxzHaf9PzM0H+QqjpFhmSjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MY/2xBVp; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,21 +39,30 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=33qxqNzgZGHZpStVX0X5eMtbopKkkIOyjYXbT7yHZdE=; b=GBlkYDUTB+Sc6dhtPzHDLvIdGr
-	H4WNmdMAcmDLETSgivuZPyjM77g09SaEaiH3bZWQySTpdJzRZcbNru/aF5x0sNwSdOELE+OuZirEM
-	KjapJwEp6l8eF9RPgxC+DYWyBAnpqm0Qxn8viz2iarxlslfzB5ewXbzePr3dkC+a+muo=;
+	bh=LmEIVv5Hxh+mKmeuHsN7vP/fAMiciYkPlIj13WZ+oiE=; b=MY/2xBVpjxX2ZXH6RhO3LIF2+N
+	x4csJK/N/xl92PKhwsmp0UjPRbRm/Rrtz4SozNtBf6AqtO5BJoH769H2UhBcDCNP470yRW+O/UVsa
+	pyds4D5Cno6Z40QB5+xOuQhW+Sr4uB2BZ2Pl5t32AxN2j3/AVfxPOL/DF5VxOthAVWf0=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1wKxky-001oEG-Ce; Thu, 07 May 2026 14:23:08 +0200
-Date: Thu, 7 May 2026 14:23:08 +0200
+	id 1wKxqo-001oGr-6c; Thu, 07 May 2026 14:29:10 +0200
+Date: Thu, 7 May 2026 14:29:10 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: netdev@vger.kernel.org, mkubecek@suse.cz, idosch@nvidia.com,
-	petrm@nvidia.com
-Subject: Re: [PATCH ethtool-next 0/5] ethtool: Add 'pages on|off' option for
- module EEROM hex dump
-Message-ID: <5114542a-7c7f-4759-b13d-6873494944c6@lunn.ch>
-References: <20260507114721.3409128-1-danieller@nvidia.com>
+To: lizhi2@eswincomputing.com
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+	rmk+kernel@armlinux.org.uk, maxime.chevallier@bootlin.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
+	linmin@eswincomputing.com, pinkesh.vaghela@einfochips.com,
+	pritesh.patel@einfochips.com, weishangjuan@eswincomputing.com
+Subject: Re: [PATCH net v1 1/2] dt-bindings: ethernet: eswin: refine delay
+ model and HSP register description
+Message-ID: <2436c6e9-4aad-4ffd-9fef-0cbbe38dc66d@lunn.ch>
+References: <20260507083037.152-1-lizhi2@eswincomputing.com>
+ <20260507083136.175-1-lizhi2@eswincomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,58 +71,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260507114721.3409128-1-danieller@nvidia.com>
-X-Rspamd-Queue-Id: 00CE94E824A
+In-Reply-To: <20260507083136.175-1-lizhi2@eswincomputing.com>
+X-Rspamd-Queue-Id: 0257C4E830A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285307-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,st-md-mailman.stormreply.com,lists.infradead.org,eswincomputing.com,einfochips.com];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-285308-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	DKIM_TRACE(0.00)[lunn.ch:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[23]
 X-Rspamd-Action: no action
 
-> In practice, both outputs are often needed together for offline debugging:
+>      ethernet@50400000 {
+>          compatible = "eswin,eic7700-qos-eth", "snps,dwmac-5.20";
+>          reg = <0x50400000 0x10000>;
+> -        clocks = <&d0_clock 186>, <&d0_clock 171>, <&d0_clock 40>,
+> -                <&d0_clock 193>;
+> -        clock-names = "axi", "cfg", "stmmaceth", "tx";
+>          interrupt-parent = <&plic>;
+>          interrupts = <61>;
+>          interrupt-names = "macirq";
+> -        phy-mode = "rgmii-id";
+> -        phy-handle = <&phy0>;
+> +        clocks = <&d0_clock 186>, <&d0_clock 171>, <&d0_clock 40>,
+> +                <&d0_clock 193>;
+> +        clock-names = "axi", "cfg", "stmmaceth", "tx";
 
-> Output example (values zeroed to omit vendor-specific identifiers):
-> 
-> $ ethtool -m swp61 hex on pages on
-> Page: 0x0
-> 
-> Offset          Values
-> ------          ------
-> 0x0000:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x0010:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x0020:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x0030:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x0040:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x0050:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x0060:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 0x0070:         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 
-> Page: 0x0
+Please don't move the clocks around, since they have nothing to do
+with RGMII delays.
 
-Maybe also add JSON? That would make machine parsing of this easier.
 
-	Andrew
+>          resets = <&reset 95>;
+>          reset-names = "stmmaceth";
+> -        rx-internal-delay-ps = <200>;
+> -        tx-internal-delay-ps = <200>;
+> -        eswin,hsp-sp-csr = <&hsp_sp_csr 0x100 0x108 0x118>;
+> -        snps,axi-config = <&stmmac_axi_setup>;
+> +        eswin,hsp-sp-csr = <&hsp_sp_csr 0x100 0x108 0x118 0x114 0x11c>;
+> +        phy-handle = <&phy0>;
+> +        phy-mode = "rgmii-id";
+>          snps,aal;
+>          snps,fixed-burst;
+>          snps,tso;
+> -        stmmac_axi_setup: stmmac-axi-config {
+> +        snps,axi-config = <&stmmac_axi_setup_gmac0>;
+> +
+> +        stmmac_axi_setup_gmac0: stmmac-axi-config {
+
+And what do these changes have to do with RGMII delays?
+
+    Andrew
+
+---
+pw-bot: cr
 
