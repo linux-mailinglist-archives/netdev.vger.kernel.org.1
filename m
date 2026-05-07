@@ -1,144 +1,141 @@
-Return-Path: <netdev+bounces-285195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285196-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4NJlN6tQ/GlOOAAAu9opvQ
-	(envelope-from <netdev+bounces-285195-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 10:43:23 +0200
+	id iGEKEYlR/GlOOAAAu9opvQ
+	(envelope-from <netdev+bounces-285196-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 10:47:05 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8D8B4E5020
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 10:43:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC2454E513D
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 10:47:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2310C3007492
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 08:43:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D83E230058E4
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 08:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8A7C388E71;
-	Thu,  7 May 2026 08:43:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 139F23815DB;
+	Thu,  7 May 2026 08:47:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eMjipYNi"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="4hraY3Ym";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="OMPnmoXo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82962371D1E
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 08:43:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF5F237BE9F;
+	Thu,  7 May 2026 08:46:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778143400; cv=none; b=RUj83ijQF2fTb9TsuYxZn1Cfs4WAtJEjNPieOMebJE0ig9hdKqE+sIy+0+B+EIg9CS9TbJ8ejcunqJBG0vUJLMlVTn/HUkVqO67nMBhMmH0DRgk0NodHqqkk7utzBCOlj9OJT4r4qkXW22Ps+tlsC6bbqPeq4w3C8+TX97GOzYc=
+	t=1778143619; cv=none; b=EllQLvEAts5AIhk16h95kiaiqH0DZqcUpcyB3JfqIIJM7Z8ed9kGgvUnfFQpG5/2yfvFuGwXdTfmTRb24lOroVHYcN2pLjGY2Yc/cjs1fvQRy355UM+QcT6e3Ba3hJWKczhvfDrthQQ/IRv0kgz/RgubGaWI+rFwiSLvPlRbrtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778143400; c=relaxed/simple;
-	bh=SHw5P0LAa/XsxtWPaiSpgyWkEZk4GrFd5GvP11BsyU4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gz0skdmHVIv94bGkpfOyWxrDP1Akhk+3eHv7LCqUUnWKrundZZK3ReK4Xx1xX8uSoH2LV1a8U8BRwnS30xrKjn2A9q3WW+8TgYD1V+WECM/T499m7GkZKmgcH2ay7731ZSztxOPsVNCNWnvpTqq0eKQjohcIYQETSY4NUxpAgl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eMjipYNi; arc=none smtp.client-ip=209.85.219.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-8acb85a973cso6539686d6.3
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 01:43:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778143392; x=1778748192; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lRu1fN5aPR4iVOTELoZmdLrAmJwJZXGrgcEXhq13bEY=;
-        b=eMjipYNiDhemQvhFfIzKOawCZBLy5qjWVFZMXcWrZLG9t2b/XSPhe7R1Ij4qZSaFqZ
-         hiOph8MQ70ivKrqJTkUtMqn65UNbqtogm59P7EW21bfcQjehz5HbKVHBF+FCQcBA/c33
-         54tk2pCzXIh3dUn1DZGcl1TtpPMy67fZvYJsD0nHye9eT/ia+PLgAJ3hAdH3SbFIzN1Z
-         /1hPLF3tjHr79HMfK/NAq+eMy6Z6p0VO3EjuGbhJpWF4LPQx4sDccp/d59bqE9TcOht9
-         ISNRFzAxZhO0cCiQNz/xl6LcPVswR2Gw/ldRYRun1eOiB9Lmeb1DKGayaSR4kkxlG1un
-         /23Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778143392; x=1778748192;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lRu1fN5aPR4iVOTELoZmdLrAmJwJZXGrgcEXhq13bEY=;
-        b=ju6K/ZAjdS1s3lh+NAJgZK/nEg0gfnAUiPNQ9Fyi+ghxxLoCwLVKgp/ml6j50Mk3Kj
-         RjrerfH7ScYBSKNXzH2V7pjabWg1Jt76cTWWoaqc3aJ1+15DSFz//Y5MBXxJOAwbCF+U
-         foCC70GTP3vc8BB5Cskd1tQ8oYEPLYAdRR//oFbLLUfVF9gDl5tTXm37pOJUVCDUmjHa
-         wEP/VM7Z5f/PAl/8MMzW0gmcoXp7ut4smuDcM/vDYl/OGuriZDFMsD9TDnYSpoM6qhks
-         //b49DP1emc3o+a1Tw3nGpu+OLBztN9lojVP0C9Xof8U3Fxg1ZXAsIYDvpRC32NQyrde
-         AK/w==
-X-Forwarded-Encrypted: i=1; AFNElJ8GQSxOlERwFFE1pMptOPNQPbOkKvmZdC3RIJ2K4RUSb6DPe14zN2X4cVsGcYQxaCM1F5DG2/4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywsix9A1tqV8TgO1eSSZpgTG0e1Ak0QdpjcgmaVCAgiZO/T1qMY
-	O6Y4NvV65wDFeHh3tcc3QW9p8mz51tgbGG7EhSqyTA7OmBq6iZTxBlwGb7HQL/Ge1Pi2RhgsyAs
-	ezI1JZif5WTfZiA==
-X-Received: from qvsm5.prod.google.com ([2002:a0c:ee45:0:b0:89c:e5f0:8f32])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ad4:5d4e:0:b0:8b3:f911:c1df with SMTP id 6a1803df08f44-8bd8ec82cd8mr42417856d6.21.1778143391772;
- Thu, 07 May 2026 01:43:11 -0700 (PDT)
-Date: Thu,  7 May 2026 08:43:05 +0000
-In-Reply-To: <20260507084305.2506115-1-edumazet@google.com>
+	s=arc-20240116; t=1778143619; c=relaxed/simple;
+	bh=q943uWD9uQdKiWHonP9cE498oVof4h6v+PdwSWtsKBI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GygX2eKpcYpfeAj5UQJeEoEyxkghrV3esj7wGnXkF8fT8SFAuDOZD1DPO4rEaohQ9HQXly/AHBAQ+U1VIkQlJiAILymou5XclnAiKcq+JcmgLxlK9w2MQoNRD6BBDXK/0R8Nybg3Nnsf8qiVrF9neiiAgnpn1FXf0+gGRSWbhJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=4hraY3Ym; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=OMPnmoXo; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 7 May 2026 10:46:45 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1778143606;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q943uWD9uQdKiWHonP9cE498oVof4h6v+PdwSWtsKBI=;
+	b=4hraY3YmfGJcmmP6PPSUCViMGQyIqWoTQEsD2cVGzSQ/hZ4tNGy5QmNitlFr9s+ZPa9d1T
+	OmsL+LAbBgWVw1eanWqAILxK9mRwZ29UYI6Ipi8WSTIwfbkKEmLsxqOoxlFL3VT2eWle9u
+	q/p1Subk3DdwOEMi0XyeLetFMOXWS9pJs8sAbHBdeaG7wkZe/gJKF5axK9LfLz4MrnxvdU
+	zAA9sry/cKpXOUszWfkvOJT/bMYCQGP5fTGCPVd7/7mQo7+ol4isy2lxDlkQTvgb3P1+v2
+	WSYDHnBlEyNSa1UDaVDM1A0mGBCyOvPkN7Rc40yGjBkBBjxfco39ja/cS2i96Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1778143606;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q943uWD9uQdKiWHonP9cE498oVof4h6v+PdwSWtsKBI=;
+	b=OMPnmoXof2uijDCZiWcJlJTo3x94l6ORon5JJVe5rgyFvp5kQKPCq+/F0j22HMj7tP3+z7
+	gtzFy64vCbFlT3DA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Qingfang Deng <qingfang.deng@linux.dev>
+Cc: Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jiri Kosina <jikos@kernel.org>,
+	David Sterba <dsterba@suse.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>, Chas Williams <3chas3@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	James Chapman <jchapman@katalix.com>, Kees Cook <kees@kernel.org>,
+	Taegu Ha <hataegu0826@gmail.com>,
+	Guillaume Nault <gnault@redhat.com>,
+	Eric Woudstra <ericwouds@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
+	Dawid Osuchowski <dawid.osuchowski@linux.intel.com>,
+	Breno Leitao <leitao@debian.org>, linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-atm-general@lists.sourceforge.net
+Subject: Re: [PATCH net-next 2/3] ppp: unify two channel structs
+Message-ID: <20260507084645.mpK7rdPn@linutronix.de>
+References: <20260430090532.244758-1-qingfang.deng@linux.dev>
+ <20260430090532.244758-2-qingfang.deng@linux.dev>
+ <590d7931-02b0-45d6-8f43-ef909c9bde89@redhat.com>
+ <c9993ee6-4023-4331-a1c1-4e30952146fe@linux.dev>
+ <20260507074051.mqO5DaWL@linutronix.de>
+ <a4216fa5-9576-4836-b202-d9c35f0e546a@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260507084305.2506115-1-edumazet@google.com>
-X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
-Message-ID: <20260507084305.2506115-4-edumazet@google.com>
-Subject: [PATCH net-next 3/3] ipv6: use SKB_DROP_REASON_IP_OUTNOROUTES in inet6_csk_xmit()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
-Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
-	David Ahern <dsahern@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: C8D8B4E5020
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a4216fa5-9576-4836-b202-d9c35f0e546a@linux.dev>
+X-Rspamd-Queue-Id: DC2454E513D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,google.com,vger.kernel.org,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285195-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-285196-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,suse.com,linuxfoundation.org,gmail.com,katalix.com,arndb.de,linux.intel.com,debian.org,vger.kernel.org,lists.sourceforge.net];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[]
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linutronix.de:mid,linutronix.de:dkim]
 X-Rspamd-Action: no action
 
-Replace a bare kfree_skb() with a modern sk_skb_reason_drop() call,
-and provide IP_OUTNOROUTES drop reason.
+On 2026-05-07 16:33:36 [+0800], Qingfang Deng wrote:
+> On 2026/5/7 15:40, Sebastian Andrzej Siewior wrote:
+> > On 2026-05-07 13:53:30 [+0800], Qingfang Deng wrote:
+> > > > This patch is IMHO a bit too big and should be split. Also this kind of
+> > > > refactor looks very invasive and potentially regression prone. I think
+> > > > it should include a signficant self-test coverage increase.
+> > > This is indeed too big. But how do I split it without breaking the build?
+> > The current ppp tests would yell if you accidentally broke something?
+> By "breaking the build" I meant compile-time errors (due to API changes).
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv6/inet6_connection_sock.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+If this change would flip the logic somewhere and as such break ppp at
+runtime.
+Would the existing test suite be able to catch it?
 
-diff --git a/net/ipv6/inet6_connection_sock.c b/net/ipv6/inet6_connection_sock.c
-index 37534e1168992c44e1400dacab87e79d04c64a41..4665d84a7380d90b7d180a429017f577fcb6936a 100644
---- a/net/ipv6/inet6_connection_sock.c
-+++ b/net/ipv6/inet6_connection_sock.c
-@@ -102,7 +102,8 @@ int inet6_csk_xmit(struct sock *sk, struct sk_buff *skb, struct flowi *fl_unused
- 		if (IS_ERR(dst)) {
- 			WRITE_ONCE(sk->sk_err_soft, -PTR_ERR(dst));
- 			sk->sk_route_caps = 0;
--			kfree_skb(skb);
-+			sk_skb_reason_drop(sk, skb,
-+					   SKB_DROP_REASON_IP_OUTNOROUTES);
- 			return PTR_ERR(dst);
- 		}
- 		/* Restore final destination back after routing done */
--- 
-2.54.0.563.g4f69b47b94-goog
-
+Sebastian
 
