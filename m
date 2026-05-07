@@ -1,263 +1,272 @@
-Return-Path: <netdev+bounces-285478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285479-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oG+KEKfv/GlKVgAAu9opvQ
-	(envelope-from <netdev+bounces-285478-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 22:01:43 +0200
+	id WPM1BmTw/GlmVgAAu9opvQ
+	(envelope-from <netdev+bounces-285479-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 22:04:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C53B24EE352
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 22:01:42 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C65F4EE389
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 22:04:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 92AF53006458
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 20:01:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 68B2D30247D8
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 20:04:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8E1D3469F5;
-	Thu,  7 May 2026 20:01:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43FE535B644;
+	Thu,  7 May 2026 20:04:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ericsson.com header.i=@ericsson.com header.b="kicT/rUk"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="hXTzLo/P"
 X-Original-To: netdev@vger.kernel.org
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010026.outbound.protection.outlook.com [52.101.84.26])
+Received: from mx4.sberdevices.ru (mx4.sberdevices.ru [152.89.196.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECCB32E62B4;
-	Thu,  7 May 2026 20:01:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.26
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778184099; cv=fail; b=kzNkqsGBxALy3olBnSUutKzo4NUxH9stkRnhAb5g6guUGwJzaezi8NpkHssSxmbxDT2Cvbl3nVH87KrY3HPGLQnoqpEnWxHKpFlAeUWdoJrVsxLkpxrbpzhhJEULdpkdl7wl0J2EkY+N21YYCRM82f/eiF6zwXX8m1+dlfga4fk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778184099; c=relaxed/simple;
-	bh=WCP/t7uUv8P+6yJG1YvcH4dkAPbC8Q4XKJyOfXFU2WA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NgxF2MsOiCukuziiXYFDHOE6HX5CrJ0wxTdjt3mNZjiSngbZpxK+vH0p/fRfyUHyc6chSBVVfN1PPH6+XlxEZEQvll/4u0A6ADi6+dESkPo3m7WwbSZ9iA4ipQgHEVqDyOtfYzlosLyzHGgJrBuU0zydrHSVlDCzj2YxNn1/04w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ericsson.com; spf=pass smtp.mailfrom=ericsson.com; dkim=pass (2048-bit key) header.d=ericsson.com header.i=@ericsson.com header.b=kicT/rUk; arc=fail smtp.client-ip=52.101.84.26
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ericsson.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ericsson.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UyVS11n3jsVaahVl5Jyj0axE4cg85CcopjSW8PTsp4+h+J+TLlpvtd9okICAiCCwj8L8qLlj+AYHDau/rMJB++rqG5AlUgOEbv3RFb7WclPSAT1MZC4oqlvhBICS+v9q9LoF71jiUDaDFfuZgrTWhdW422DK7IrDv4LQj+g1oxU7/mDpJEUFSWms8UME8bQ44vy/wvVW3pq4i1fnNLD1lTXtxPonRKRPxKqsubTsFqPWImESXYp5AJizxTqDfiQn99FV8o6JVSYln8I88gckRBLpDWfNPWmBW7ME7DQqUF9qqGTdKzZQ+SKVCyPcVBuab7Tv/486Lt6FMx5Juyq/Og==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lHkHczDMtIv/UUY1yxo5hUfCNufR3AcfFOAB9N1AkdE=;
- b=cZNaoX7tE7OiENrOs958li1uMTNiDAa5ZG9KCin/l4koOLJNdaeyYCJwmx+bzROj+U/0+vuYvsvnsyywCG0Mpb4aXwBur3wquURcEGyGnI97D9B4ylGhhhJ60DGTd1CQax7pZoj9Bw8O/0dEROtBgEqHEgWVxqYeAgkRpO9ZO4O/dTwWGkuGgevmFURur7dD5P9s186mMJoh/CHb4hhgfj221V/S7/88J4jZGAs/SoAKbAJ9ad0BowTSO1P+GUX+XC2GxdyygO+gjRd/3qOK+5GL8TlIY0aoHSbu+ZhB/sgrAJCzDIk9sUNgS/d7ZK/izbn57sSb0UR86upr9GJwqg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 192.176.1.74) smtp.rcpttodomain=davemloft.net smtp.mailfrom=ericsson.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=ericsson.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ericsson.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lHkHczDMtIv/UUY1yxo5hUfCNufR3AcfFOAB9N1AkdE=;
- b=kicT/rUkEbxOexgFuxmiZ2eNMQz1rKdLjx/7B81LdP7GHU2vl22dLfcLee1lsj9NWJAjFGYb06ggKNs4AIiEoUx1cYS68WvavfV3a/qVP/0FSwbDZUx6VI9xwi/c6c/DnscPn0qSB8TaNGwdQeU/oSZ0QhYWkQmcQ5Z2zAVN9bTdzWw6lcr3AbyGW7hby59GYSoyHzlts1+AsXSf6jzSNLIsjn4G1+CgKTAzHTIu916Y1XD/ZIN7rwMludZuaNMo8xIIfd3O5C6iu1qOmRw3kVnZwAUZzGR5RFesahw7UCtpOZF58EKIDgLCtuYuVByteLo3oTPZN0C7WYwMJhR8Ng==
-Received: from AM8P191CA0029.EURP191.PROD.OUTLOOK.COM (2603:10a6:20b:21a::34)
- by PA1PR07MB10245.eurprd07.prod.outlook.com (2603:10a6:102:4eb::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.15; Thu, 7 May
- 2026 20:01:33 +0000
-Received: from AM4PEPF00025F97.EURPRD83.prod.outlook.com
- (2603:10a6:20b:21a:cafe::a0) by AM8P191CA0029.outlook.office365.com
- (2603:10a6:20b:21a::34) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9891.17 via Frontend Transport; Thu,
- 7 May 2026 20:01:33 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 192.176.1.74)
- smtp.mailfrom=ericsson.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=ericsson.com;
-Received-SPF: Pass (protection.outlook.com: domain of ericsson.com designates
- 192.176.1.74 as permitted sender) receiver=protection.outlook.com;
- client-ip=192.176.1.74; helo=oa.msg.ericsson.com; pr=C
-Received: from oa.msg.ericsson.com (192.176.1.74) by
- AM4PEPF00025F97.mail.protection.outlook.com (10.167.16.6) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.25.1 via Frontend Transport; Thu, 7 May 2026 20:01:32 +0000
-Received: from seroius18814.sero.gic.ericsson.se (153.88.142.248) by
- smtp-central.internal.ericsson.com (100.87.178.64) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Thu, 7 May 2026 22:01:32 +0200
-Received: from seroius06448.sero.gic.ericsson.se (seroius06448.sero.gic.ericsson.se [10.117.92.228])
-	by seroius18814.sero.gic.ericsson.se (Postfix) with ESMTP id 4D3C74020B41;
-	Thu,  7 May 2026 22:01:31 +0200 (CEST)
-Received: by seroius06448.sero.gic.ericsson.se (Postfix, from userid 7434092)
-	id 377491005C88; Thu,  7 May 2026 22:01:31 +0200 (CEST)
-From: Fidan Aliyeva <fidan.aliyeva.ext@ericsson.com>
-To: <marek.behun@nic.cz>
-CC: <andrew@lunn.ch>, <olteanv@gmail.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<thomas.eckerman.ext@ericsson.com>, <fidan.aliyeva.ext@ericsson.com>
-Subject: Re: Re: [PATCH net-next v2 0/2] mv88e6xxx: SERDES on mv88e6321 letter
-Date: Thu, 7 May 2026 22:01:09 +0200
-Message-ID: <20260507200109.3726627-1-fidan.aliyeva.ext@ericsson.com>
-X-Mailer: git-send-email 2.36.0
-In-Reply-To: <dxxmuzte6ntiimozgmafsx75at7zf4mm3kg5k5dgsnlnrfl3eh@yurunqpyb33p>
-References: <dxxmuzte6ntiimozgmafsx75at7zf4mm3kg5k5dgsnlnrfl3eh@yurunqpyb33p>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A63933032B;
+	Thu,  7 May 2026 20:04:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.89.196.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778184261; cv=none; b=KGHU8hYL5yPfj9exk38jQ48jBbpJhZ3ovBOb21jSiO5/AX5+Ep70zJFNAgC3vMLGK8NLwGgt5kt0YyN8j8XliJrNy0R1aVtifVsi3i+dTSfoHeIcqa8uvoqJ/v1SgSqsQaJkkCtnsMaY2aAh3pDdpfLeawaLDRkxcwkR4Q/XqPM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778184261; c=relaxed/simple;
+	bh=x4vxn5CsbkLp6acVGZz+ODOaft347/jl8nkj0kKF5Vs=;
+	h=Message-ID:Date:MIME-Version:In-Reply-To:From:Subject:To:CC:
+	 Content-Type; b=YXz0ub0zJii3UnpPvmaNPgHwdsLDEexzPlielpmbCB1EyrZ2F3iaOEhBvJjEBvT7/vtB23NZS1+ILZnZQRv311qNuHRZ5tOBbSmxaBwMRYdYUWKQr7/e0LmxsZ80mO/UV/dD2bgm3mN9RyPT3tMHAFZBS8L2SARrG5kFg5FpKUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=hXTzLo/P; arc=none smtp.client-ip=152.89.196.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+Received: from p-antispam-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
+	by mx4.sberdevices.ru (Postfix) with ESMTP id B9BC240003;
+	Thu,  7 May 2026 23:04:07 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx4.sberdevices.ru B9BC240003
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=post; t=1778184247;
+	bh=YgPmkTjxoBBbEZCWI8Tkia3A3s5RoljjiPpWZm+RT/g=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type:From;
+	b=hXTzLo/Pzoe2bnKFFKGax6yUoWW7R+YHtHBl703p6DNdu6HyJXvJzSjZiPIu4bpbE
+	 CbIjnNyRAkB299e7NgWGER6/ckr6PoBv9BTCZHeFSGt69HBYatd/QBwzMmboyAEjDO
+	 WmE9aK9+cGQ0+UWJSnZNhbHpsnmh6EJzt1gUjMXhLz7W4S6RGBqlvIpa3avUiy1k5S
+	 VdV4GTktAqJz1pYufLoRTSNwr3yAP+Lpz4siIx+rc9rc18lOpPxzTOWW+mQYZMDF1B
+	 tNhvhSsj2S6jQYoiKAdCFTIoCWa+pxbSbU90ymKaASnn7R9wron3Bee4xC792sFA3Z
+	 8N4l9PZi4dQiw==
+Received: from smtp.sberdevices.ru (p-exch-cas-a-m1.sberdevices.ru [172.24.201.216])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client CN "sberdevices.ru", Issuer "R12" (not verified))
+	by mx4.sberdevices.ru (Postfix) with ESMTPS;
+	Thu,  7 May 2026 23:04:07 +0300 (MSK)
+Message-ID: <a7b95294-3aa6-4bca-9eab-a4bcd0202ae2@salutedevices.com>
+Date: Thu, 7 May 2026 23:03:57 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM4PEPF00025F97:EE_|PA1PR07MB10245:EE_
-X-MS-Office365-Filtering-Correlation-Id: 946ba447-af53-419d-0c94-08deac736f78
-X-SMTP-Server: smtp-central.internal.ericsson.com
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|36860700016|1800799024|56012099003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	EazdjrCXRCa+aJweDLD01ED+/QTmMURx4TpcQNPooC+Sf2dLetAjE00r9qdYLJEcvXPYk6JXcGIeVfZYOeIKrzCdMvA2d0X2rEJr34VvRziJYEDkt/t64AjuMmGDx8gFGUu/ZKTOUGsUOf178Gb+K1/C8Ez82MA7yQtMs7oAyduumDNrtJ22lkyIV3aApwTPH2PWi4fMdJJdmiX6X7A1uVreM/02f0vJkFxacLdeqdN0KF1V512ysu9IUjkgXE0mLoJQ5JTir2ZnN5nyrR4TSm5Wx4ObfF2LqVqob38hyRGp4Qy1any5llvEB2XkZBJgyEjrtVWv9a9OSIB/hMeH+kl4pg7XD6XPpbuvLJb51bp9oMqxJhufF053gYAErcK+2AdKBiLVzt1thJELQzF1366TN/DtIjhYsqzP/YjItaMS1+eRMU510zgYfLmFdhEdqJUZygUNivpVwSla+KIuWRh+cwaWR/Ug7Kcju/rTSCBFBgkjcQT4Pr8cZDFaYTVkTZL00ZxepQCILMA96bJeEp3OLpC4J5GzVco4sEUxEyOQfr996t6edahQx4kdFQYiuhPIU113m5gqCCfm4hwwiOLpPCu9OyHMo8pPQd2BArsB79QRpVg03ohzkkH+teWLNAAbs9nz3ilg9zLgvlaV34Ps8qL7F+l5ULKNvtTpUuujkMEi7UDhVSw5UIgWtduo
-X-Forefront-Antispam-Report:
-	CIP:192.176.1.74;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:oa.msg.ericsson.com;PTR:office365.se.ericsson.net;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700016)(1800799024)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	c59fPNdTEbl/RR959DoIA64i+e9IS2u0AIoHCtUlVYvIm4CQQYJTyXbSNOJnMUDIPbLdwwgPYdE87t+GOt7M4FPh4RzzHuV6cwd9CuYjz+cezpfsZVL0EJXgPZOrH23pbEs3LK5GYNWcheOLAL7DFh6sTyfImNzmYa+XrlOegMB7pj137oqy6EaxnskHp47IHSZVF+6EXgsStcHfNjzuQ3VnOweY3xJ9unCYrdib6aPpjfN/1VbEzgt+PQ/5jJnPg2SxjxySy0pXLMLIxLq/jMccUydPkOcjtqiUWWCcSEmuGkZPr1L1toGmjN/iNGuZzCc1DHHawZ490NrsqKAiVeIx2bVLsT8GDD6HF3SbbAYmDHNAZNF4DWsO/u35lmNz+Xjpue8pH85irp0fK42jJItQ5lJnMLzhr0DS8fGOiqhhwxBXSnC4zY9VINmzpIHs
-X-OriginatorOrg: ericsson.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2026 20:01:32.3977
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 946ba447-af53-419d-0c94-08deac736f78
-X-MS-Exchange-CrossTenant-Id: 92e84ceb-fbfd-47ab-be52-080c6b87953f
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=92e84ceb-fbfd-47ab-be52-080c6b87953f;Ip=[192.176.1.74];Helo=[oa.msg.ericsson.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM4PEPF00025F97.EURPRD83.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR07MB10245
-X-Rspamd-Queue-Id: C53B24EE352
+User-Agent: Mozilla Thunderbird
+Content-Language: ru
+In-Reply-To: <afnXIGtswspSEk8x@sgarzare-redhat>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Subject: Re: [PATCH] vsock/virtio: fix vsockmon info leak in non-linear tap,
+ copy
+To: Paolo Abeni <pabeni@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Michael S.
+ Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
+	<xuanzhuo@linux.alibaba.com>, Yiqi Sun <sunyiqixm@gmail.com>,
+	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: p-exch-cas-s-m1.sberdevices.ru (172.16.210.2) To
+ p-exch-cas-a-m1.sberdevices.ru (172.24.201.216)
+X-KSMG-AntiPhishing: NotDetected
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Info: LuaCore: 104 0.3.104 557b3c2486a74077a103cf2acd83f2ecf4c95118, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;salutedevices.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1, FromAlignment: s
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiSpam-Lua-Profiles: 202959 [May 07 2026]
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Version: 6.1.1.22
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2026/05/07 18:14:00 #28511915
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-KATA-Status: Not Scanned
+X-KSMG-LinksScanning: NotDetected
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 5
+X-Rspamd-Queue-Id: 6C65F4EE389
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[ericsson.com,reject];
-	R_DKIM_ALLOW(-0.20)[ericsson.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[salutedevices.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[salutedevices.com:s=post];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285478-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,ericsson.com];
-	DKIM_TRACE(0.00)[ericsson.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fidan.aliyeva.ext@ericsson.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[salutedevices.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.999];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285479-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,linux.alibaba.com,gmail.com,lists.linux.dev];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[avkrasnov@salutedevices.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-Hi Marek,=0D
-=0D
-Sorry for the late reply; the email has ended up in the secondary inbox.=0D
-=0D
-I am interested in your patches, actually. But since your patches add=0D
-further features, I think, it is better if I push the patches, first and=0D
-then you can rebase.=0D
-=0D
-Best,=0D
-Fidan=0D
-=0D
-> Hello Fidan, Andrew,=0D
-> =0D
-> last year I worked on 6320+6321 serdes support, but never send it due to =
-different workload.=0D
-> =0D
-> Quickly looking at your patches, there are some things I think are missin=
-g in comparison to what I did - I have 5 patches:=0D
-> =0D
-> 1/5: drops serdes methods for 88E6172, which does not have serdes=0D
-> =0D
-> 2/5: is similar to your patch 1/2, adding serdes_get_lane to 6352 family.=
-=0D
->      The difference is the implementation of mv88e6352_serdes_get_lane(),=
-=0D
->      which does not read scratch register. Yours is probably better in=0D
->      this regard, but mv88e6352_g2_scratch_port_has_serdes() is also=0D
->      called in mv88e6352_pcs_init(). So maybe this is redundant?=0D
-> =0D
->      Also, I rename MV88E6352_ADDR_SERDES macro to MV88E6352_SERDES_LANE=
-=0D
->      to be in line with other such macros in serdes.h=0D
-> =0D
-> 3/5: extends 6352 serdes pcs for 6320 family.=0D
->      In addition to your code I also implement .serdes_irq_mapping().=0D
-> =0D
->      These depend on other mv88e6xxx fixes I forgot to send, which I=0D
->      will do now.=0D
-> =0D
-> 4/5: Add hidden register access methods for 6320 and 6352 family.=0D
->      These can be used to change SerDes modes.=0D
-> =0D
-> 5/5: Add support for changing between sgmii and 1000base-x on 6320 family=
-=0D
->      via hidden register acces.=0D
-> =0D
->      This was done by reverse engineering hidden registers (trying=0D
->      different values), since it is not documented correctly.=0D
-> =0D
-> Would you prefer for your patches to be applied first and then I can reba=
-se, or would you rather like to look at my code first?=0D
-> =0D
-> Marek=0D
-> =0D
-> On Thu, Apr 30, 2026 at 02:49:05PM +0200, Fidan Aliyeva wrote:=0D
-> > This patch series add code support to be able to use SERDES feature of=
-=0D
-> > mv88e6321 version of Marvel mv88e6xxx series. mv88e6321 has 2 ports to =
-=0D
-> > support high speed SERDES but the support is lacking in the driver.=0D
-> >=0D
-> > mv88e6321 version has a similar architecture to mv88e6352 version =0D
-> > making it possible to reuse its pcs functions. That's why the patch =0D
-> > series consist of=0D
-> > 2 parts:=0D
-> > 1. Refactor the serdes functions and pcs_init of mv88e6352 to be more =
-=0D
-> > generic 2. Add the SERDES support for mv88e6321 reusing 6352's pcs =0D
-> > functions=0D
-> >=0D
-> > The final code has been built on top of net-next tree and tested on=0D
-> > mv88e6321 ethernet device directly by ip ping tests, performance tests =
-=0D
-> > and also verifying the switch's expected register values.=0D
-> >=0D
-> > Referred document: 88E6321/88E6320 Functional Specification=0D
-> >=0D
-> > Code has been built with allmodconfig and allyesconfig. checkpatch.pl =
-=0D
-> > was also run=0D
-> >=0D
-> > ---=0D
-> > Changes in v2:=0D
-> >   - Removed 6321-specific pcs_init and made 6352's pcs_init more generi=
-c=0D
-> >   as suggested by Andrew Lunn=0D
-> >   - Added the correct mailing list=0D
-> >=0D
-> > ---=0D
-> > Fidan Aliyeva (2):=0D
-> >   mv88e6xxx: Refactor 6352's serdes functions=0D
-> >   mv88e6xxx: Add SERDES Support for mv88e6321=0D
-> >=0D
-> >  drivers/net/dsa/mv88e6xxx/chip.c     |  8 +++=0D
-> >  drivers/net/dsa/mv88e6xxx/pcs-6352.c | 12 ++--=0D
-> >  drivers/net/dsa/mv88e6xxx/serdes.c   | 87 ++++++++++++++++++++++------=
-=0D
-> >  drivers/net/dsa/mv88e6xxx/serdes.h   |  5 ++=0D
-> >  4 files changed, 86 insertions(+), 26 deletions(-)=0D
-> >=0D
-> > --=0D
-> > 2.36.0=0D
-> >=0D
-> >=0D
+>CCing Arseniy and Bobby.
+
+Thanks!
+
+>
+>On Tue, May 05, 2026 at 12:26:21PM +0200, Paolo Abeni wrote:
+>>On 4/30/26 9:11 AM, Yiqi Sun wrote:
+>>> vsockmon mirrors packets through virtio_transport_build_skb(), which
+>>> builds a new skb and copies the payload into it. For non-linear skbs,
+>>> this goes through virtio_transport_copy_nonlinear_skb().
+>>>
+>>> Helper manually initializes a iov_iter, but leaves iov_iter.count unset.
+>>> As a result, skb_copy_datagram_iter() sees zero writable bytes
+>>> in the destination iterator and copies no payload data.
+>>>
+>>> This becomes an info leak because virtio_transport_build_skb() has
+>>> already reserved payload_len bytes in the new skb with skb_put(). The
+>>> skb is then returned to the tap path with that payload area still
+>>> uninitialized, so userspace reading from a vsockmon device can observe
+>>> heap contents and potentially kernel address.
+>>>
+>>> Fix it by initializing iov_iter.count to the number of bytes to copy.
+>>>
+>>> Fixes: 4b0bf10eb077 ("vsock/virtio: non-linear skb handling for tap")
+>>> Signed-off-by: Yiqi Sun <sunyiqixm@gmail.com>
+>>> ---
+>>>  net/vmw_vsock/virtio_transport_common.c | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>> index 416d533f493d..6b26ee57ccab 100644
+>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>> @@ -152,7 +152,7 @@ static void virtio_transport_copy_nonlinear_skb(const struct sk_buff *skb,
+>>>  	iov_iter.nr_segs = 1;
+>>>
+>>>  	to_copy = min_t(size_t, len, skb->len);
+>>> -
+>>> +	iov_iter.count = to_copy;
+>>>  	skb_copy_datagram_iter(skb, VIRTIO_VSOCK_SKB_CB(skb)->offset,
+>>>  			       &iov_iter, to_copy);
+>>
+>>@Stefano, @Stefan, the patch LGTM, but sashiko pointed out to a
+>>pre-existing issue you should probably want to address:
+>>
+>>>  	to_copy = min_t(size_t, len, skb->len);
+>>Does this length calculation account for the offset when a packet is
+>>split across multiple transmissions?
+>>If a packet is requeued, VIRTIO_VSOCK_SKB_CB(skb)->offset is increased,
+>>but to_copy still evaluates to the full length of the skb.
+>
+>Yep, I just checked and vhost-vsock is the only place where we call 
+>virtio_transport_deliver_tap_pkt() wiht an offset != 0, but I agree that 
+>we should also fix it.
+
+Yes, looks like the only place where offset could be non zero is 'vhost_transport_do_send_pkt()'.
+And we set valid length in header every attempt to send it:
+
+                /* Set the correct length in the header */
+                hdr->len = cpu_to_le32(payload_len);
+
+In all other places we call 'virtio_transport_deliver_tap_pkt()' with offset == 0. And thus
+skb->len == hdr->len.
+
+So for me looks ok. E.g. len in header is actual data.
+
+>
+>Looking better in net/vmw_vsock/virtio_transport_common.c I think this 
+>is a regression, indeed we have this comment in 
+>virtio_transport_build_skb():
+>
+>	/* A packet could be split to fit the RX buffer, so we can retrieve
+>	 * the payload length from the header and the buffer pointer taking
+>	 * care of the offset in the original packet.
+>	 */
+>	pkt_hdr = virtio_vsock_hdr(pkt);
+>
+>Before commit 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with 
+>sk_buff") we read the payload lenght from the header that is always set 
+>to the right value before delivering the packet to the tap.
+>
+> From that commit, we don't to consider the offset anymore since we 
+>started to use `len` from the skb, so IMO we should go back to what we 
+>did before it, I mean:
+>
+>	payload_len = le32_to_cpu(pkt->hdr.len);
+>
+>@Bobby do you remember why we did that change? Or if you see any issue 
+>going back to what we did initially?
+>
+>
+>Also IMO we should avoid to set all the iov_iter fields by hand and 
+>start to use iov_iter_kvec(). Plus, we can just use 
+>skb_copy_datagram_iter() in any case, like we already do in vhost-vsock, 
+>since it already handles linear vs non linear.
+>
+>At the end I mean something like this:
+>
+>@@ -171,7 +150,7 @@ static struct sk_buff *virtio_transport_build_skb(void *opaque)
+>  	 * care of the offset in the original packet.
+>  	 */
+>  	pkt_hdr = virtio_vsock_hdr(pkt);
+>-	payload_len = pkt->len;
+>+	payload_len = le32_to_cpu(pkt_hdr->len);
+>
+>  	skb = alloc_skb(sizeof(*hdr) + sizeof(*pkt_hdr) + payload_len,
+>  			GFP_ATOMIC);
+>@@ -214,13 +193,17 @@ static struct sk_buff *virtio_transport_build_skb(void *opaque)
+>  	skb_put_data(skb, pkt_hdr, sizeof(*pkt_hdr));
+>
+>  	if (payload_len) {
+>-		if (skb_is_nonlinear(pkt)) {
+>-			void *data = skb_put(skb, payload_len);
+>+		struct iov_iter iov_iter;
+>+		struct kvec kvec;
+>+		void *data = skb_put(skb, payload_len);
+>
+>-			virtio_transport_copy_nonlinear_skb(pkt, data, payload_len);
+>-		} else {
+>-			skb_put_data(skb, pkt->data, payload_len);
+>-		}
+>+		kvec.iov_base = data;
+>+		kvec.iov_len = payload_len;
+>+		iov_iter_kvec(&iov_iter, READ, &kvec, 1, payload_len);
+>+
+>+		skb_copy_datagram_iter(pkt,
+>+				       VIRTIO_VSOCK_SKB_CB(pkt)->offset,
+>+				       &iov_iter, payload_len);
+>  	}
+>
+>  	return skb;
+>
+>And removing virtio_transport_copy_nonlinear_skb().
+
+Yes, this looks shorter and better.
+
+>
+>If you agree, I can send a proper series with these changes that should 
+>fix the issue reported by Yiqi Sun introduced by commit 4b0bf10eb077 
+>("vsock/virtio: non-linear skb handling for tap") and the issue 
+>introduced by commit 71dc9ec9ac7d ("virtio/vsock: replace 
+>virtio_vsock_pkt with sk_buff").
+>
+>Thanks,
+>Stefano
+
+Thanks
 
