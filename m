@@ -1,393 +1,266 @@
-Return-Path: <netdev+bounces-285245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285246-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oNkYJyJx/GmkQAAAu9opvQ
-	(envelope-from <netdev+bounces-285245-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:01:54 +0200
+	id /P5+Gmlx/GkEQQAAu9opvQ
+	(envelope-from <netdev+bounces-285246-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:03:05 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F11CC4E72AA
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:01:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 981CC4E72D1
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 13:03:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 387F8303675E
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 10:57:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 084E2302000D
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 10:58:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62C243EF0AF;
-	Thu,  7 May 2026 10:57:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948BD3DDDD1;
+	Thu,  7 May 2026 10:58:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="IdvJPeih"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65E53EC2E0
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 10:57:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778151445; cv=none; b=NFB6ApFk8Eoggb5yTkIOqpto+wCSbiux/ufJLybqQbJ5Jom8XzyxRo3Er+2Ct0bnG/qM82lI6j/AwlKD5A3SYcwZZ21hMK4jR9Q48lnSXfvPnaqUN48MGwGrmSW7PBTH5mPYiPfsphYX7X9Jm00wwY+mktsNli5Yf+iQlRkRG7k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778151445; c=relaxed/simple;
-	bh=WMCbfhuXrBYuEWLT18FkbVAMISdQACtlTz7psEBX2BA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uyKk8Vccn/JIQ/pPzZHfU/65Kd6xX7FBy9yQ6+6tOXt/aoFxT4p6PGo8T0MQ/wiAubyAmWbeVrK1huQNU+ahgscu6OTBdci63Ah6N5aPu1yfbvXVvvJlXlMHX+u3UvGzmS0E1uD4DF2me8BsDbg+g0xE+MIF3goLIRw4jWJ8agA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1wKwOz-0001uh-6W; Thu, 07 May 2026 12:56:21 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1wKwOQ-000uFj-2Z;
-	Thu, 07 May 2026 12:55:47 +0200
-Received: from pengutronix.de (p4ffb2dc6.dip0.t-ipconnect.de [79.251.45.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 2374E5302D0;
-	Thu, 07 May 2026 10:55:46 +0000 (UTC)
-Date: Thu, 7 May 2026 12:55:45 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Uwe =?utf-8?Q?Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
-Cc: Michael Grzeschik <mgr@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Vincent Mailhol <mailhol@kernel.org>, 
-	Krzysztof Halasa <khc@pm.waw.pl>, Johannes Berg <johannes@sipsolutions.net>, 
-	Steffen Klassert <klassert@kernel.org>, David Dillow <dave@thedillows.org>, 
-	Ion Badulescu <ionut@badula.org>, Mark Einon <mark.einon@gmail.com>, 
-	Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com, 
-	Manish Chopra <manishc@marvell.com>, Potnuri Bharat Teja <bharat@chelsio.com>, 
-	Denis Kirjanov <kirjanov@gmail.com>, Jijie Shao <shaojijie@huawei.com>, 
-	Jian Shen <shenjian15@huawei.com>, Cai Huoqing <cai.huoqing@linux.dev>, 
-	Fan Gong <gongfan1@huawei.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Tariq Toukan <tariqt@nvidia.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Mark Bloch <mbloch@nvidia.com>, Ido Schimmel <idosch@nvidia.com>, 
-	Petr Machata <petrm@nvidia.com>, Yibo Dong <dong100@mucse.com>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com, Jiri Pirko <jiri@resnulli.us>, 
-	Francois Romieu <romieu@fr.zoreil.com>, Daniele Venzano <venza@brownhat.org>, 
-	Samuel Chessman <chessman@tux.org>, Jiawen Wu <jiawenwu@trustnetic.com>, 
-	Mengyuan Lou <mengyuanlou@net-swift.com>, Kevin Curtis <kevin.curtis@farsite.co.uk>, 
-	Arend van Spriel <arend.vanspriel@broadcom.com>, Stanislav Yakovlev <stas.yakovlev@gmail.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Kees Cook <kees@kernel.org>, 
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>, Thomas Gleixner <tglx@kernel.org>, 
-	Jacob Keller <jacob.e.keller@intel.com>, Thomas Fourier <fourier.thomas@gmail.com>, 
-	Ingo Molnar <mingo@kernel.org>, Kory Maincent <kory.maincent@bootlin.com>, 
-	Zilin Guan <zilin@seu.edu.cn>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Marco Crivellari <marco.crivellari@suse.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	David Arinzon <darinzon@amazon.com>, Yeounsu Moon <yyyynoom@gmail.com>, 
-	Denis Benato <benato.denis96@gmail.com>, Yonglong Liu <liuyonglong@huawei.com>, 
-	Andy Shevchenko <andriy.shevchenko@intel.com>, Randy Dunlap <rdunlap@infradead.org>, 
-	Yicong Hui <yiconghui@gmail.com>, MD Danish Anwar <danishanwar@ti.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Ethan Nelson-Moore <enelsonmoore@gmail.com>, 
-	Larysa Zaremba <larysa.zaremba@intel.com>, Ian Lin <ian.lin@infineon.com>, 
-	Colin Ian King <colin.i.king@gmail.com>, Double Lo <double.lo@cypress.com>, 
-	Markus Schneider-Pargmann <msp@baylibre.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-can@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org, oss-drivers@corigine.com, 
-	linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com
-Subject: Re: [PATCH net-next v2 1/2] net: Consistently define pci_device_ids
- using named initializers
-Message-ID: <20260507-healthy-gainful-fox-500552-mkl@pengutronix.de>
-X-AI: stop_reason: "refusal"
-References: <cover.1778149923.git.u.kleine-koenig@baylibre.com>
- <76da4f44d48bdde84580963862bf9616bee5c9e9.1778149923.git.u.kleine-koenig@baylibre.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEBA73EE1DC
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 10:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778151490; cv=pass; b=XAYMYhVCFMrb2YCnT/NceNpF9rMymWsZwZadYECHk5AAlpswqQPq67Y7hxZx6BmmbPaQuOAc2lENxBw/8EEElRIHhG8CzrNvPRWboEkee/N3OH56qqirrfd18sRkCQokanH5Mlnq97G30CboyRquaDnQGmpdCK4uEEIK9XGKvz4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778151490; c=relaxed/simple;
+	bh=EatwXWiIR9QmGXhIVhQe55PrFCR5KFGzuZXiljgfysU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FmEeYvqQem3r53fPjqypAC/J3BfphpZzl+wttppXR6roWsqK3i2F4tLvPnBsZj9TNUafqoGb05ssV68QkOg4rRRhZDUyRZ8T6BG9CgtPHXA2AncRsqqPcBjmAM+dYH2Eroxvz7fnolPyyidRv45wHGk5v+qhUJpe6q/K/80iSEY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=IdvJPeih; arc=pass smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-83945063f70so874942b3a.0
+        for <netdev@vger.kernel.org>; Thu, 07 May 2026 03:57:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778151475; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ig0MgtdJoB7ohGgWkFrtS6Cc2Rx2vz/I/+2wib70W1LxUQWL/moAQzuearCgjjfHbT
+         /Lr8PaNrqN84v0tUVOUANjrEwiz2d19Hl8E4aDhsl+W7bzGWn38DyQpylgmOTnS1hNDg
+         m3yxJZ800KLXxaLCeHYI1MkTNqOVt+6uZWeC+e9XOfLCvTZLjtRzd7O/3blOl8EtnenU
+         nK3LBSvHYuNZ34ZTEPCn5OiljEpU4albRKCDHeYgv1xbxyv/FUI8apdXVpoLZ6rOAjmU
+         D8aWuPm4aapFRXUdf20Ma/FiuhkR91RTvBT6IEmKblZvwlG0EECNzKiW8/I8omOqA3tK
+         IaZQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=oPVL2GjvrzQhKd8ADnxeiwx1nKks5OaNxUM/54F87FQ=;
+        fh=KBXsfxVG7ixLpXYN6qTwTDy5POs2++zGZSIBEFOgvs4=;
+        b=JQoX99Yq7yKJYm49ItT4F2a27sg3b4cUlxK3ZXw15eKR/er7WpJpQrOPoWaK9+Hz3u
+         jioXGxZBo9T3mAG0r+or1xIHduS43ykUSDVrNt8HW5Qsa5EhJD1Zzm3tgfkdViMsjWwm
+         8fm2mhK0xUanQ2de1jCI7k6mjA73Nu9B4m9l7TCYX59aLO7lFQ7utvP6k7FskZehdRYq
+         Q264boEu38DdfCSvyK8PHVm9qcohvbgj//zdjI9au91apoZkrnrWO8KAWKg+af/YWoz1
+         LeVeKcjLW9kKlJ0Sy5FOndjClALATrsBCHI8Fn5hNK3yYPyTU1XWwEGppLoLV5G8cWLm
+         crKg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1778151475; x=1778756275; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oPVL2GjvrzQhKd8ADnxeiwx1nKks5OaNxUM/54F87FQ=;
+        b=IdvJPeihxAAldA6JHMME8b9vKcYTjMlb0shIJLf8iMbbQvSh8iL6/t6fbvX6HT2wBl
+         C8XovR3QvMtrYlIMgJ4X5iAoi38Ey1enbCP9neifr76uQkPKIUIbd86VqOpK1O7bt6u2
+         ZiZA6wUtCv5MjN1qECRuY/a5ZHDKNmYJJYrw4Am1zZp2uQwZd3GOIjb43o4m8+VJaqr6
+         QtMXKMJFHMNbXl5tHQIJ1fDdrjdKj0HTgyIZb8T7VQPbV8UQZpATSnnfinaODPzDgYvu
+         Rhp5cul8vbx/s95nQO9hZ/F4xXQdyyH7QZ9w4QmXwx+1wGLr4v4Eym3+qvrAPB6GLTgh
+         SJyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778151475; x=1778756275;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=oPVL2GjvrzQhKd8ADnxeiwx1nKks5OaNxUM/54F87FQ=;
+        b=ppfRoVe1D+HJ6Rqtc1YKt7835/F6k9g7fC7O2INHgeEmZM2hDcz+jMOIce9CWRDo3K
+         9AhP2WI4Q2S5CY2SuDGKz4o88rZxwGdR7gNDfa3Rib4PH8YMkGMbEFzTWn5Orrn1e07t
+         kEo2R8o4FW7gFVyYUmwNBuGpPoQdJIyVsglj/WCmbaGJzEkil4zoZYcvrDJ+3ZCnteQ/
+         lD6dZAKSgD3Fd1oPa+rJUZ5dmn1PZ+EZ8+2Jy8SJwJs8glckDIWPTgQkrA46IHtjCZwS
+         KzdtnDqvHyf1GIg1JkW5D5AdnzAT4uUyPjQyokollMUUfXj9E52o9JzmLM+eI/XiKV2f
+         A1Pw==
+X-Forwarded-Encrypted: i=1; AFNElJ/SafvLrH54Zd8BJ3G13Ef+iFvUbZuZ+KL8Cda4CcafLOmECPrhQgfTlvJqFwRaexUIjgV+z94=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQV266NGy2abiO7g+PJN60AufZWnFTiS5A70THn52RzcdtqeYS
+	gez6IpJetcUE4/E3OYdty+jv368euhFvo3F4HuKk5dHAbYTS931xy65Sus79R/HYdCJO17TdyRi
+	Q9bwmn4h0nBblnyMETPTLfNC8agQqHdYrMgKNLBFL
+X-Gm-Gg: AeBDietOwYcK2M9z0Qn4RoufO5m8p0AIFwXmRPEcV2WdsnV2Wnj7laiwnBZ9HHm8zsX
+	wjTuieefax9O1LT/nB8NmKQiwYgnWPLqhlEVbFp8OJJgtFkySMRMe2x3uggyuD2ee9TpYB75Ene
+	hBsU1uneqkno99bhhikNlcMzQXZOOgyOY3ZXr1XaVti9V5VfZ806ET9jm9DvJYuXwSddxb3PLTn
+	pypqqlWvMKIsxL/fFjmJGeIRhBHTmvHvxmpMoa7ULrudN85P4AvgYnRjSHlOSA5hLkh6PYYX7wO
+	opCbj+4vEgfABU/dDjt+Bf4h0h1f3A==
+X-Received: by 2002:a05:6a00:b8f:b0:837:6bb9:acc1 with SMTP id
+ d2e1a72fcca58-83bb6cd842cmr1946259b3a.13.1778151475157; Thu, 07 May 2026
+ 03:57:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="bj6moo23k7mnjddb"
-Content-Disposition: inline
-In-Reply-To: <76da4f44d48bdde84580963862bf9616bee5c9e9.1778149923.git.u.kleine-koenig@baylibre.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Rspamd-Queue-Id: F11CC4E72AA
+References: <20260506160656.1226077-1-edumazet@google.com>
+In-Reply-To: <20260506160656.1226077-1-edumazet@google.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 7 May 2026 06:57:43 -0400
+X-Gm-Features: AVHnY4IlGLW9bqJ19ndvVWahIfUW6qgXhfUgVRkRS2g1TFC1nWSHclHH1IQiMW8
+Message-ID: <CAM0EoMkRwxvoxU5qPmiFr5KGu7adeWe1NmuSHNwZMYYadt+8=w@mail.gmail.com>
+Subject: Re: [PATCH iproute2-next] tc/class: use rtnl_dump_request_n() in tc_class_list()
+To: Eric Dumazet <edumazet@google.com>
+Cc: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, 
+	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 981CC4E72D1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.06 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,pm.waw.pl,sipsolutions.net,thedillows.org,badula.org,gmail.com,marvell.com,chelsio.com,huawei.com,linux.dev,intel.com,nvidia.com,mucse.com,realtek.com,resnulli.us,fr.zoreil.com,brownhat.org,tux.org,trustnetic.com,net-swift.com,farsite.co.uk,broadcom.com,bootlin.com,seu.edu.cn,suse.com,amazon.com,infradead.org,ti.com,infineon.com,cypress.com,baylibre.com,vger.kernel.org,lists.osuosl.org,corigine.com,lists.linux.dev];
-	TAGGED_FROM(0.00)[bounces-285245-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285246-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
+	DMARC_NA(0.00)[mojatatu.com];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,networkplumber.org,davemloft.net,redhat.com,vger.kernel.org,gmail.com];
 	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mkl@pengutronix.de,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_GT_50(0.00)[81];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[pengutronix.de:url,pengutronix.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mojatatu.com:email]
 X-Rspamd-Action: no action
 
+On Wed, May 6, 2026 at 12:06=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> strace tc -s class sh dev eth1 parent 2:
+>
+> strace is fooled with rtnl_dump_request() way:
+>
+> sendmsg(3, {msg_name=3D{sa_family=3DAF_NETLINK, nl_pid=3D0, nl_groups=3D0=
+0000000},
+>         msg_namelen=3D12,
+>         msg_iov=3D[{iov_base=3D{nlmsg_len=3D36,
+>                         nlmsg_type=3DRTM_GETTCLASS,
+>                         nlmsg_flags=3DNLM_F_REQUEST|NLM_F_DUMP,
+>                         nlmsg_seq=3D1778082626, nlmsg_pid=3D0},
+>                         iov_len=3D16},
+>                 {iov_base=3D{nlmsg_len=3D0, nlmsg_type=3DNLMSG_NOOP, nlms=
+g_flags=3D0, nlmsg_seq=3D0, nlmsg_pid=3D131072},
+>                         iov_len=3D20}],
+>                 msg_iovlen=3D2, msg_controllen=3D0, msg_flags=3D0}, 0) =
+=3D 36
+>
+> With rtnl_dump_request_n() we get instead:
+>
+> sendmsg(3, {msg_name=3D{sa_family=3DAF_NETLINK, nl_pid=3D0, nl_groups=3D0=
+0000000},
+>         msg_namelen=3D12,
+>         msg_iov=3D[{iov_base=3D[{nlmsg_len=3D36,
+>                         nlmsg_type=3DRTM_GETTCLASS,
+>                         nlmsg_flags=3DNLM_F_REQUEST|NLM_F_DUMP,
+>                         nlmsg_seq=3D1778082790, nlmsg_pid=3D0},
+>                 {tcm_family=3DAF_UNSPEC,
+>                  tcm_ifindex=3Dif_nametoindex("eth1"), tcm_handle=3D0, tc=
+m_parent=3D131072, tcm_info=3D0}],
+>                 iov_len=3D36}], msg_iovlen=3D1, msg_controllen=3D0, msg_f=
+lags=3D0}, 0) =3D 36
+>
+> This will also permit future attribute additions, like skip stats.
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
---bj6moo23k7mnjddb
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net-next v2 1/2] net: Consistently define pci_device_ids
- using named initializers
-MIME-Version: 1.0
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
-> diff --git a/drivers/net/can/sja1000/plx_pci.c b/drivers/net/can/sja1000/=
-plx_pci.c
-> index 08183833c9bc..a03553b80a5d 100644
-> --- a/drivers/net/can/sja1000/plx_pci.c
-> +++ b/drivers/net/can/sja1000/plx_pci.c
-> @@ -272,124 +272,89 @@ static struct plx_pci_card_info plx_pci_card_info_=
-asem_dual_can =3D {
->  static const struct pci_device_id plx_pci_tbl[] =3D {
->  	{
->  		/* Adlink PCI-7841/cPCI-7841 */
-> -		ADLINK_PCI_VENDOR_ID, ADLINK_PCI_DEVICE_ID,
-> -		PCI_ANY_ID, PCI_ANY_ID,
-> -		PCI_CLASS_NETWORK_OTHER << 8, ~0,
-> -		(kernel_ulong_t)&plx_pci_card_info_adlink
-> -	},
-> -	{
-> +		PCI_DEVICE(ADLINK_PCI_VENDOR_ID, ADLINK_PCI_DEVICE_ID),
-> +		.class =3D PCI_CLASS_NETWORK_OTHER << 8,
-> +		.class_mask =3D ~0,
-> +		.driver_data =3D (kernel_ulong_t)&plx_pci_card_info_adlink,
-> +	}, {
->  		/* Adlink PCI-7841/cPCI-7841 SE */
-> -		ADLINK_PCI_VENDOR_ID, ADLINK_PCI_DEVICE_ID,
-> -		PCI_ANY_ID, PCI_ANY_ID,
-> -		PCI_CLASS_COMMUNICATION_OTHER << 8, ~0,
-> -		(kernel_ulong_t)&plx_pci_card_info_adlink_se
-> -	},
-> -	{
-> +		PCI_DEVICE(ADLINK_PCI_VENDOR_ID, ADLINK_PCI_DEVICE_ID),
-> +		.class =3D PCI_CLASS_COMMUNICATION_OTHER << 8,
-> +		.class_mask =3D ~0,
-> +		.driver_data =3D (kernel_ulong_t)&plx_pci_card_info_adlink_se,
-> +	}, {
->  		/* esd CAN-PCI/200 */
-> -		PCI_VENDOR_ID_PLX, PCI_DEVICE_ID_PLX_9050,
-> -		PCI_VENDOR_ID_ESDGMBH, ESD_PCI_SUB_SYS_ID_PCI200,
-> -		0, 0,
-> -		(kernel_ulong_t)&plx_pci_card_info_esd200
-> -	},
-> -	{
-> +		PCI_VDEVICE_SUB(PLX, PCI_DEVICE_ID_PLX_9050,
-> +				PCI_VENDOR_ID_ESDGMBH, ESD_PCI_SUB_SYS_ID_PCI200),
-> +		.driver_data =3D (kernel_ulong_t)&plx_pci_card_info_esd200,
-> +	}, {
->  		/* esd CAN-CPCI/200 */
-> -		PCI_VENDOR_ID_PLX, PCI_DEVICE_ID_PLX_9030,
-> -		PCI_VENDOR_ID_ESDGMBH, ESD_PCI_SUB_SYS_ID_CPCI200,
-> -		0, 0,
-> -		(kernel_ulong_t)&plx_pci_card_info_esd200
-> -	},
-> -	{
-> +		PCI_VDEVICE_SUB(PLX, PCI_DEVICE_ID_PLX_9030,
-> +				PCI_VENDOR_ID_ESDGMBH, ESD_PCI_SUB_SYS_ID_CPCI200),
-> +		.driver_data =3D (kernel_ulong_t)&plx_pci_card_info_esd200,
-> +	}, {
->  		/* esd CAN-PCI104/200 */
-> -		PCI_VENDOR_ID_PLX, PCI_DEVICE_ID_PLX_9030,
-> -		PCI_VENDOR_ID_ESDGMBH, ESD_PCI_SUB_SYS_ID_PCI104200,
-> -		0, 0,
-> -		(kernel_ulong_t)&plx_pci_card_info_esd200
-> -	},
-> -	{
-> +		PCI_VDEVICE_SUB(PLX, PCI_DEVICE_ID_PLX_9030,
-> +				PCI_VENDOR_ID_ESDGMBH, ESD_PCI_SUB_SYS_ID_PCI104200),
-> +		.driver_data =3D (kernel_ulong_t)&plx_pci_card_info_esd200,
-> +	}, {
->  		/* esd CAN-PCI/266 */
-> -		PCI_VENDOR_ID_PLX, PCI_DEVICE_ID_PLX_9056,
-> -		PCI_VENDOR_ID_ESDGMBH, ESD_PCI_SUB_SYS_ID_PCI266,
-> -		0, 0,
-> -		(kernel_ulong_t)&plx_pci_card_info_esd266
-> -	},
-> -	{
-> +		PCI_VDEVICE_SUB(PLX, PCI_DEVICE_ID_PLX_9056,
-> +				PCI_VENDOR_ID_ESDGMBH, ESD_PCI_SUB_SYS_ID_PCI266),
-> +		.driver_data =3D (kernel_ulong_t)&plx_pci_card_info_esd266,
-> +	}, {
->  		/* esd CAN-PMC/266 */
-> -		PCI_VENDOR_ID_PLX, PCI_DEVICE_ID_PLX_9056,
-> -		PCI_VENDOR_ID_ESDGMBH, ESD_PCI_SUB_SYS_ID_PMC266,
-> -		0, 0,
-> -		(kernel_ulong_t)&plx_pci_card_info_esd266
-> -	},
-> -	{
-> +		PCI_VDEVICE_SUB(PLX, PCI_DEVICE_ID_PLX_9056,
-> +				PCI_VENDOR_ID_ESDGMBH, ESD_PCI_SUB_SYS_ID_PMC266),
-> +		.driver_data =3D (kernel_ulong_t)&plx_pci_card_info_esd266,
-> +	}, {
->  		/* esd CAN-PCIE/2000 */
-> -		PCI_VENDOR_ID_PLX, PCI_DEVICE_ID_PLX_9056,
-> -		PCI_VENDOR_ID_ESDGMBH, ESD_PCI_SUB_SYS_ID_PCIE2000,
-> -		0, 0,
-> -		(kernel_ulong_t)&plx_pci_card_info_esd2000
-> -	},
-> -	{
-> +		PCI_VDEVICE_SUB(PLX, PCI_DEVICE_ID_PLX_9056,
-> +				PCI_VENDOR_ID_ESDGMBH, ESD_PCI_SUB_SYS_ID_PCIE2000),
-> +		.driver_data =3D (kernel_ulong_t)&plx_pci_card_info_esd2000,
-> +	}, {
->  		/* IXXAT PC-I 04/PCI card */
-> -		IXXAT_PCI_VENDOR_ID, IXXAT_PCI_DEVICE_ID,
-> -		PCI_ANY_ID, IXXAT_PCI_SUB_SYS_ID,
-> -		0, 0,
-> -		(kernel_ulong_t)&plx_pci_card_info_ixxat
-> -	},
-> -	{
-> +		PCI_DEVICE_SUB(IXXAT_PCI_VENDOR_ID, IXXAT_PCI_DEVICE_ID,
-> +			       PCI_ANY_ID, IXXAT_PCI_SUB_SYS_ID),
-> +		.driver_data =3D (kernel_ulong_t)&plx_pci_card_info_ixxat,
-> +	}, {
->  		/* Marathon CAN-bus-PCI card */
-> -		PCI_VENDOR_ID_PLX, MARATHON_PCI_DEVICE_ID,
-> -		PCI_ANY_ID, PCI_ANY_ID,
-> -		0, 0,
-> -		(kernel_ulong_t)&plx_pci_card_info_marathon_pci
-> -	},
-> -	{
-> +		PCI_VDEVICE(PLX, MARATHON_PCI_DEVICE_ID),
-> +		.driver_data =3D (kernel_ulong_t)&plx_pci_card_info_marathon_pci,
-> +	}, {
->  		/* Marathon CAN-bus-PCIe card */
-> -		PCI_VENDOR_ID_PLX, MARATHON_PCIE_DEVICE_ID,
-> -		PCI_ANY_ID, PCI_ANY_ID,
-> -		0, 0,
-> -		(kernel_ulong_t)&plx_pci_card_info_marathon_pcie
-> -	},
-> -	{
-> +		PCI_VDEVICE(PLX, MARATHON_PCIE_DEVICE_ID),
-> +		.driver_data =3D (kernel_ulong_t)&plx_pci_card_info_marathon_pcie,
-> +	}, {
->  		/* TEWS TECHNOLOGIES TPMC810 card */
-> -		TEWS_PCI_VENDOR_ID, TEWS_PCI_DEVICE_ID_TMPC810,
-> -		PCI_ANY_ID, PCI_ANY_ID,
-> -		0, 0,
-> -		(kernel_ulong_t)&plx_pci_card_info_tews
-> -	},
-> -	{
-> +		PCI_DEVICE(TEWS_PCI_VENDOR_ID, TEWS_PCI_DEVICE_ID_TMPC810),
-> +		.driver_data =3D (kernel_ulong_t)&plx_pci_card_info_tews,
-> +	}, {
->  		/* Connect Tech Inc. CANpro/104-Plus Opto (CRG001) card */
-> -		PCI_VENDOR_ID_PLX, PCI_DEVICE_ID_PLX_9030,
-> -		PCI_SUBVENDOR_ID_CONNECT_TECH, CTI_PCI_DEVICE_ID_CRG001,
-> -		0, 0,
-> -		(kernel_ulong_t)&plx_pci_card_info_cti
-> -	},
-> -	{
-> +		PCI_VDEVICE_SUB(PLX, PCI_DEVICE_ID_PLX_9030,
-> +				PCI_SUBVENDOR_ID_CONNECT_TECH, CTI_PCI_DEVICE_ID_CRG001),
-> +		.driver_data =3D (kernel_ulong_t)&plx_pci_card_info_cti,
-> +	}, {
->  		/* Elcus CAN-200-PCI */
-> -		CAN200PCI_VENDOR_ID, CAN200PCI_DEVICE_ID,
-> -		CAN200PCI_SUB_VENDOR_ID, CAN200PCI_SUB_DEVICE_ID,
-> -		0, 0,
-> -		(kernel_ulong_t)&plx_pci_card_info_elcus
-> -	},
-> -	{
-> +		PCI_DEVICE_SUB(CAN200PCI_VENDOR_ID, CAN200PCI_DEVICE_ID,
-> +			       CAN200PCI_SUB_VENDOR_ID, CAN200PCI_SUB_DEVICE_ID),
-> +		.driver_data =3D (kernel_ulong_t)&plx_pci_card_info_elcus,
-> +	}, {
->  		/* moxa */
-> -		MOXA_PCI_VENDOR_ID, MOXA_PCI_DEVICE_ID,
-> -		PCI_ANY_ID, PCI_ANY_ID,
-> -		0, 0,
-> -		(kernel_ulong_t)&plx_pci_card_info_moxa
-> -	},
-> -	{
-> +		PCI_DEVICE(MOXA_PCI_VENDOR_ID, MOXA_PCI_DEVICE_ID),
-> +		.driver_data =3D (kernel_ulong_t)&plx_pci_card_info_moxa,
-> +	}, {
->  		/* ASEM Dual CAN raw */
-> -		ASEM_RAW_CAN_VENDOR_ID, ASEM_RAW_CAN_DEVICE_ID,
-> -		ASEM_RAW_CAN_SUB_VENDOR_ID, ASEM_RAW_CAN_SUB_DEVICE_ID,
-> -		0, 0,
-> -		(kernel_ulong_t)&plx_pci_card_info_asem_dual_can
-> -	},
-> -	{
-> +		PCI_DEVICE_SUB(ASEM_RAW_CAN_VENDOR_ID, ASEM_RAW_CAN_DEVICE_ID,
-> +			       ASEM_RAW_CAN_SUB_VENDOR_ID, ASEM_RAW_CAN_SUB_DEVICE_ID),
-> +		.driver_data =3D (kernel_ulong_t)&plx_pci_card_info_asem_dual_can,
-> +	}, {
->  		/* ASEM Dual CAN raw -new model */
-> -		ASEM_RAW_CAN_VENDOR_ID, ASEM_RAW_CAN_DEVICE_ID,
-> -		ASEM_RAW_CAN_SUB_VENDOR_ID, ASEM_RAW_CAN_SUB_DEVICE_ID_BIS,
-> -		0, 0,
-> -		(kernel_ulong_t)&plx_pci_card_info_asem_dual_can
-> +		PCI_DEVICE_SUB(ASEM_RAW_CAN_VENDOR_ID, ASEM_RAW_CAN_DEVICE_ID,
-> +			       ASEM_RAW_CAN_SUB_VENDOR_ID, ASEM_RAW_CAN_SUB_DEVICE_ID_BIS),
-> +		.driver_data =3D (kernel_ulong_t)&plx_pci_card_info_asem_dual_can,
->  	},
-> -	{ 0,}
-> +	{ }
+Did not run tdc tests yet.
+Waiting to see those extra attributes ;->
 
-Nitpick: can you convert the terminating entry to follow the same style
-as the rest of the driver:
-
-diff --git a/drivers/net/can/sja1000/plx_pci.c b/drivers/net/can/sja1000/pl=
-x_pci.c
-index a03553b80a5d..d69ff0ccfd94 100644
---- a/drivers/net/can/sja1000/plx_pci.c
-+++ b/drivers/net/can/sja1000/plx_pci.c
-@@ -353,8 +353,8 @@ static const struct pci_device_id plx_pci_tbl[] =3D {
-                 PCI_DEVICE_SUB(ASEM_RAW_CAN_VENDOR_ID, ASEM_RAW_CAN_DEVICE=
-_ID,
-                                ASEM_RAW_CAN_SUB_VENDOR_ID, ASEM_RAW_CAN_SU=
-B_DEVICE_ID_BIS),
-                 .driver_data =3D (kernel_ulong_t)&plx_pci_card_info_asem_d=
-ual_can,
--        },
--        { }
-+        }, {
-+        }
- };
- MODULE_DEVICE_TABLE(pci, plx_pci_tbl);
-
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---bj6moo23k7mnjddb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSl+MghEFFAdY3pYJLMOmT6rpmt0gUCafxvrQAKCRDMOmT6rpmt
-0pHeAP9XFcWG4TIkfsDgMbSsjB0BDeIaX/oOHy7GN10y7WrRXAD9HGFep6ozobs7
-Ky/tnJ+5OGyoiQeSoshTzXtNkIIEoQA=
-=kV9y
------END PGP SIGNATURE-----
-
---bj6moo23k7mnjddb--
+cheers,
+jamal
+> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+> ---
+>  tc/tc_class.c | 25 ++++++++++++++++---------
+>  1 file changed, 16 insertions(+), 9 deletions(-)
+>
+> diff --git a/tc/tc_class.c b/tc/tc_class.c
+> index 310514ce560ab6c1b42665cb6c75314e45b84cd6..82f0f85ee39a335bc7e1c3bea=
+2e3ea9571ea155f 100644
+> --- a/tc/tc_class.c
+> +++ b/tc/tc_class.c
+> @@ -386,7 +386,14 @@ int print_class(struct nlmsghdr *n, void *arg)
+>
+>  static int tc_class_list(int argc, char **argv)
+>  {
+> -       struct tcmsg t =3D { .tcm_family =3D AF_UNSPEC };
+> +       struct {
+> +               struct nlmsghdr n;
+> +               struct tcmsg t;
+> +       } req =3D {
+> +               .n.nlmsg_type =3D RTM_GETTCLASS,
+> +               .n.nlmsg_len =3D NLMSG_LENGTH(sizeof(struct tcmsg)),
+> +               .t.tcm_family =3D AF_UNSPEC,
+> +       };
+>         char d[IFNAMSIZ] =3D {};
+>         char buf[1024] =3D {0};
+>
+> @@ -412,20 +419,20 @@ static int tc_class_list(int argc, char **argv)
+>                         if (get_tc_classid(&filter_classid, *argv))
+>                                 invarg("invalid class ID", *argv);
+>                 } else if (strcmp(*argv, "root") =3D=3D 0) {
+> -                       if (t.tcm_parent) {
+> +                       if (req.t.tcm_parent) {
+>                                 fprintf(stderr, "Error: \"root\" is dupli=
+cate parent ID\n");
+>                                 return -1;
+>                         }
+> -                       t.tcm_parent =3D TC_H_ROOT;
+> +                       req.t.tcm_parent =3D TC_H_ROOT;
+>                 } else if (strcmp(*argv, "parent") =3D=3D 0) {
+>                         __u32 handle;
+>
+> -                       if (t.tcm_parent)
+> +                       if (req.t.tcm_parent)
+>                                 duparg("parent", *argv);
+>                         NEXT_ARG();
+>                         if (get_tc_classid(&handle, *argv))
+>                                 invarg("invalid parent ID", *argv);
+> -                       t.tcm_parent =3D handle;
+> +                       req.t.tcm_parent =3D handle;
+>                 } else if (matches(*argv, "help") =3D=3D 0) {
+>                         usage();
+>                 } else {
+> @@ -437,13 +444,13 @@ static int tc_class_list(int argc, char **argv)
+>         }
+>
+>         if (d[0]) {
+> -               t.tcm_ifindex =3D ll_name_to_index(d);
+> -               if (!t.tcm_ifindex)
+> +               req.t.tcm_ifindex =3D ll_name_to_index(d);
+> +               if (!req.t.tcm_ifindex)
+>                         return -nodev(d);
+> -               filter_ifindex =3D t.tcm_ifindex;
+> +               filter_ifindex =3D req.t.tcm_ifindex;
+>         }
+>
+> -       if (rtnl_dump_request(&rth, RTM_GETTCLASS, &t, sizeof(t)) < 0) {
+> +       if (rtnl_dump_request_n(&rth, &req.n) < 0) {
+>                 perror("Cannot send dump request");
+>                 return 1;
+>         }
+> --
+> 2.54.0.545.g6539524ca2-goog
+>
 
