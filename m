@@ -1,83 +1,84 @@
-Return-Path: <netdev+bounces-285127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285128-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cKO9KVAA/GnjJgAAu9opvQ
-	(envelope-from <netdev+bounces-285127-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:00:32 +0200
+	id MP9TGO3/+2njJgAAu9opvQ
+	(envelope-from <netdev+bounces-285128-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 04:58:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AECB4E285D
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 05:00:31 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51AA34E2829
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 04:58:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4ACC73012C7D
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 02:58:41 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E82C43007B04
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 02:58:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCC832C0261;
-	Thu,  7 May 2026 02:58:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F702C0261;
+	Thu,  7 May 2026 02:58:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oBTPYBvM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fHk6kbr2"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A8A2D1907
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 02:58:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E5B621D3E4
+	for <netdev@vger.kernel.org>; Thu,  7 May 2026 02:58:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778122720; cv=none; b=QfMr9Krve735yLllj3hEJdxZ0roRKx5GOiSvC23Zb3F+d/4KjrZJndmgmOX+YMyBZovYeWKdTYnoYFt5t852whKv29Wqns/1/5aCBLmV1suGh/VKy0pKwvEPPLQJWW+RLh54vvrcFJi6ryt/4uHM1gKvtjmHD7eUTDf27/uORtA=
+	t=1778122726; cv=none; b=AwMYcsUIshJzX4Yk0xqmWcUOjqBw7+pPviEXcmNIiRKWwG3v9H0KGhudEDwQ5cZmPaanvDaEf1LQV2pj27ulPdGXQy0ov5C3iYdA0yUD6qKEgj9w8JYHHaYg0eWSqFBnjAerTuYz1rfGfznGyB9K3R5aYct0jO7XLeuMbaYPq+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778122720; c=relaxed/simple;
-	bh=n/9wL+EzxOeVLUDw+TuXzntXGa/ukJOkqD/4rI9oPps=;
+	s=arc-20240116; t=1778122726; c=relaxed/simple;
+	bh=dgpQsNkKADGV8s+92naskib3EVb3gkNYU31XNjWFc88=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=hj4VKZ94vnKTz38+1nCPTrwnndp3F4SH66zt4NYWePC977IIWGKgioVw8sVQqL6qJ2ISCeqEZkfBDD/xicynWhUpthx5RCyyuFlzFpE940LMyWlORUdaIm27sGCl/Z06ajb1aM5UN8/57Roy9xWQEA8XUQJMKtcP6BIwu1If/48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oBTPYBvM; arc=none smtp.client-ip=74.125.82.49
+	 In-Reply-To:To:Cc; b=rhze0aeqIabZa/TUZYxPQSDgfqeL/5sIxbZMy84UfXSjE7+JaIAwcri5qttQEFcnpsTNP4MCkpDaNUD2pOGPfXP72UNir+Jg4nmp9P1LpGOt+te6ok/8CzrzoIM7d3AYBGFdK/IkK4YcAQabseeVoFX9AMpVuT2dXS+pscxS/wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fHk6kbr2; arc=none smtp.client-ip=74.125.82.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-12c19d23b19so735186c88.0
-        for <netdev@vger.kernel.org>; Wed, 06 May 2026 19:58:39 -0700 (PDT)
+Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-12c45281a06so685856c88.1
+        for <netdev@vger.kernel.org>; Wed, 06 May 2026 19:58:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778122719; x=1778727519; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778122724; x=1778727524; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=xdWapj7nZPh2nnXNORR4M7t33366rcLzDB4tv9BjBYc=;
-        b=oBTPYBvMO0yJgEEXb95s+NGO6OoquJam/f5F3pbGIbVzwMXtbK0MuqFRf/1yt0zdw4
-         qAiTG8cbNzsta+DvlVapDGN1W8gGutSws4lD+h9rWEkrSNSwLnCsDPFznTROAHqngcmR
-         /mDXaMJ2J5mvaiM776R9u9l6rbGFWgGcOzcGqO1AIwA8K0JeKP+2enyersJB0WPLYmZ0
-         JnKp8a618Ne/UMEj+nFVKoLvXFCtrdwWYyhI1LIfKH/2X+lo8zmyYP87230TAHeAUmYS
-         6VodKat/AbanDFDGDMufxjnoDHKhb83vVKFG/MKdDCGw3+kYNc9fZBgA3HwLVs1yqfTN
-         7h3Q==
+        bh=z4KoOpyEc9o6S/LrD6WQS+XI6ueOOXXtH3KeEmS5GBU=;
+        b=fHk6kbr2thmQPQPiL5mkDmMo7LRhTs8aA2ODt30aFs6mEY8KT8j3l10BFnZ8BwXAsX
+         Clzoiac3DTQAOuPh6jA0WC+1bBiXyxQ3E+PSGb/pQ+aOJOvcb95b/q+WqX/Wk2D8HEbt
+         sI/xIO9wbKuFdKTgv1z6F3zQZyHUKeS3ZF125TCF9+HgoIwSPSKKZEKz6Ax3yL47hymE
+         6Ju7zpNpjkybZTmD4NhL/lPAl9vmrGNOMaQ+RBecAC1CG6EeGaEw532/Qs7Cs1JNYjDl
+         9rE6hpoZnlJfJkBiHEuf1hkaUxg/Ke9UgRiAYrkpjGMkQghHYf6jjdD/g+33TA7f9wYc
+         aBNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778122719; x=1778727519;
+        d=1e100.net; s=20251104; t=1778122724; x=1778727524;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=xdWapj7nZPh2nnXNORR4M7t33366rcLzDB4tv9BjBYc=;
-        b=dBNcq/Rs8gdUeOnQF+6605pPuvBrgbjkMGkL1syBQtZsiVrR9ehok9Y/PJTfOTgbRp
-         chBiF0rO4Q7d6IPHrpPW3WjU3I/K9KyPh+YWyldUitTZ/wnJU+MnLKeJtPjpvBb/DIiE
-         0nAQZCVy+xL7CNgnyn4kTWkRhjQKfLrrYU+D1voYD2fa4p0M4K5xmIF+VfmXaAqIyIlX
-         BA2sRpbRQMKE9TkJJBEzXco4A2cerQNcGVNnkY0RpKELpmrnkX35I9oSSILWLiOgMjsJ
-         dutZaYAPz9O66vsltV770gNWc3cvGhbzDg4EOBSl0zM96AKA8VFG8KhM40HnpVWLyz0t
-         Y6Ew==
-X-Gm-Message-State: AOJu0Yye+HNjzE3jlCaZlBGU4PCiqCz+HlAabnmat0OsUMMvlBlSP3uz
-	Wc6XT8/k/i2Pb1ZFSbsQ9cN26jGaB4qJjIUrtOW0wxIu1+3sbPunxV3N
-X-Gm-Gg: AeBDievdsCg4Me1wkPvofCoc8zhSuzyUzrbo9CZ93BkQbig96RAhHYaM2JEQTI0UQ6x
-	FMw1ie99Ji3Dq4lxzUQDO85twIdio9w6+IkK7Ir0xinohKxUuINSDl+COfPI+6fQBUS5jIAz/Mo
-	t0cguvYOg8wZhvhTWANC66xZzUy0dSmE6RBZv7QsB7KMzvhkmVwYEsc3VNvDMNUvgCl6AEtmCyT
-	gEfMLtP+QUSEoBKXoBS3KKDaNkzEkmdZ1zaEofZl+iHfX4svH/YOo3H4W+Y9uC6G7JlVTwXj8+e
-	flcyw7SUz8eb1lL5KUtWh0feCr4Xep/XbKsGPqaCg8Q2ciUfOuYmAouBe3TLBbSH+gBmKt1bqTh
-	AoiLa7WogDVoOzRFy+b5OpSIc5h64SIJqHr0eAcR5Ed3WLswhhktLvi1dgZfPDzRLyWFBgAzB3q
-	hoUmaBcCBmBxZmvE+7AhXeMie/uEzw2yQb51fG2pM9k80WQjkHooufqLnOIckg
-X-Received: by 2002:a05:7022:43a6:b0:130:c9cc:3384 with SMTP id a92af1059eb24-1319d14e094mr2506293c88.30.1778122718543;
-        Wed, 06 May 2026 19:58:38 -0700 (PDT)
+        bh=z4KoOpyEc9o6S/LrD6WQS+XI6ueOOXXtH3KeEmS5GBU=;
+        b=qRrsQ12PPIPi6x6zr8+in468byaohhmDbs4Q4B2phjddbOH8g4jGZlvUgDbI/raWm7
+         v2m7pfTDwPHKGAJ/lKDcK7LLTUChs0wxdaa0UKMdjkjpv0KUKwXNllkuWsV0Vj9GtHJM
+         HrHRes2xRuHx9OVQmoKglqfsp4Oi1yrdwcobEioR4rsN4/eo3jmc7+/NjFYVNaqBDZML
+         UXRjAIGR5z8TiGA5BML5W+pKs8E6jdcB9WC/D9XLIF9UlgHWXyRmEE75yywEv+4pr5+N
+         LbNfhxQq4Ene/nN17VFEvTNE+MNZqZgC6Pkcuy3x5Cprr218OejtmPW1D2TxFdRYJWVe
+         jTJw==
+X-Gm-Message-State: AOJu0YwJXjD1EfjhU4RSre7TyjHhcKUhF/69iJ7r49VWYfkEn0Is6CCE
+	R6QJqqpp+VKB6APiht9J6CmtPa12/SrHhkM//7qz6XPFuKDVpqtT54Df
+X-Gm-Gg: AeBDietvGX2I+ZHnNQOUjtekrpAAzl6NACz4AYAIwAYml4L5HvDqSmKiuvfdcgfD44P
+	S/n8U1RA95wwMmqHKiqqxTckjV8YNL86IDnR9rSWBkNrfO5eKKjqqp4soJ0BLTJ/E7qqWXg8Z2j
+	p3kuitWXoZKvx2MiS92gbVlL/KrW36HRTrThFwReLwKjkDd2oh44uuE+reqQiLtQV6XgG2Sj9uK
+	MEApOOgrDCZ9of8grSMrC4EY32o5Mb85s26MVWN81JUIsnM/8sDtTs1aY5VUAzMycbnHNtOpTHD
+	3PvqdPhE6mYWd+laL7OLJPQnErCv3/Qt9S/Ki4KOCCCDHImJML4GC94NX6lekh2teeb1QQpRR+d
+	HYOoGiYrXI9lc0inSzdTNroLpfJYG+8XJuxdFGDPWaw1FgoyJZ2Jcj8YPWOyTBzp6GqanGXLMvp
+	laY6N6gsXzrwhrTP2H/6U3AuhL3eiDVW6beraTGqpYGAIIr0brNQ==
+X-Received: by 2002:a05:7022:f005:b0:12c:8b9:7208 with SMTP id a92af1059eb24-1318e811fffmr2977863c88.26.1778122724290;
+        Wed, 06 May 2026 19:58:44 -0700 (PDT)
 Received: from tresc054937.tre-sc.gov.br ([187.65.210.13])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-131f9789e3dsm6561267c88.8.2026.05.06.19.58.33
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-131f9789e3dsm6561267c88.8.2026.05.06.19.58.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2026 19:58:37 -0700 (PDT)
+        Wed, 06 May 2026 19:58:43 -0700 (PDT)
 From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Wed, 06 May 2026 23:58:18 -0300
-Subject: [net-next PATCH v3 1/8] net: dsa: realtek: rtl8365mb: use ERR_PTR
+Date: Wed, 06 May 2026 23:58:19 -0300
+Subject: [net-next PATCH v3 2/8] net: dsa: realtek: rtl8365mb: use dsa
+ helpers for port iteration
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,7 +87,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260506-realtek_forward-v3-1-1d87c5f85a3b@gmail.com>
+Message-Id: <20260506-realtek_forward-v3-2-1d87c5f85a3b@gmail.com>
 References: <20260506-realtek_forward-v3-0-1d87c5f85a3b@gmail.com>
 In-Reply-To: <20260506-realtek_forward-v3-0-1d87c5f85a3b@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
@@ -98,30 +99,30 @@ To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
  Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
  Russell King <linux@armlinux.org.uk>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Abdulkader Alrezej <abdulkader.alrezej@gmail.com>, 
  Luiz Angelo Daros de Luca <luizluca@gmail.com>
 X-Mailer: b4 0.15.2
-X-Rspamd-Queue-Id: 0AECB4E285D
+X-Rspamd-Queue-Id: 51AA34E2829
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285127-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285128-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
@@ -129,140 +130,245 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-Convert numeric error codes into human-readable strings by
-using %pe together with ERR_PTR() in dev_err() messages.
+Use dsa_switch_for_each_*() whenever possible.
 
+For port setup(), a new blocking setup phase was added for all ports,
+including unused ones, before the user and CPU port setup.
+
+CPU isolation now includes all user ports as traffic was being blocked in
+some scenarios (suggested by Abdulkader Alrezej).
+
+Suggested-by: Abdulkader Alrezej <abdulkader.alrezej@gmail.com>
 Reviewed-by: Linus Walleij <linusw@kernel.org>
 Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 ---
- drivers/net/dsa/realtek/rtl8365mb.c | 40 ++++++++++++++++++++-----------------
- 1 file changed, 22 insertions(+), 18 deletions(-)
+ drivers/net/dsa/realtek/rtl8365mb.c | 115 +++++++++++++++++++++---------------
+ 1 file changed, 66 insertions(+), 49 deletions(-)
 
 diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
-index c35cef01ec26..edbc16345d0d 100644
+index edbc16345d0d..7ddb82fcd026 100644
 --- a/drivers/net/dsa/realtek/rtl8365mb.c
 +++ b/drivers/net/dsa/realtek/rtl8365mb.c
-@@ -789,8 +789,8 @@ static int rtl8365mb_phy_read(struct realtek_priv *priv, int phy, int regnum)
- 	ret = rtl8365mb_phy_ocp_read(priv, phy, ocp_addr, &val);
- 	if (ret) {
- 		dev_err(priv->dev,
--			"failed to read PHY%d reg %02x @ %04x, ret %d\n", phy,
--			regnum, ocp_addr, ret);
-+			"failed to read PHY%d reg %02x @ %04x, ret %pe\n", phy,
-+			regnum, ocp_addr, ERR_PTR(ret));
- 		return ret;
+@@ -1540,18 +1540,15 @@ static void rtl8365mb_stats_setup(struct realtek_priv *priv)
+ {
+ 	struct rtl8365mb *mb = priv->chip_data;
+ 	struct dsa_switch *ds = &priv->ds;
+-	int i;
++	struct dsa_port *dp;
+ 
+ 	/* Per-chip global mutex to protect MIB counter access, since doing
+ 	 * so requires accessing a series of registers in a particular order.
+ 	 */
+ 	mutex_init(&mb->mib_lock);
+ 
+-	for (i = 0; i < priv->num_ports; i++) {
+-		struct rtl8365mb_port *p = &mb->ports[i];
+-
+-		if (dsa_is_unused_port(ds, i))
+-			continue;
++	dsa_switch_for_each_available_port(dp, ds) {
++		struct rtl8365mb_port *p = &mb->ports[dp->index];
+ 
+ 		/* Per-port spinlock to protect the stats64 data */
+ 		spin_lock_init(&p->stats_lock);
+@@ -1567,13 +1564,10 @@ static void rtl8365mb_stats_teardown(struct realtek_priv *priv)
+ {
+ 	struct rtl8365mb *mb = priv->chip_data;
+ 	struct dsa_switch *ds = &priv->ds;
+-	int i;
+-
+-	for (i = 0; i < priv->num_ports; i++) {
+-		struct rtl8365mb_port *p = &mb->ports[i];
++	struct dsa_port *dp;
+ 
+-		if (dsa_is_unused_port(ds, i))
+-			continue;
++	dsa_switch_for_each_available_port(dp, ds) {
++		struct rtl8365mb_port *p = &mb->ports[dp->index];
+ 
+ 		cancel_delayed_work_sync(&p->mib_work);
+ 	}
+@@ -1632,6 +1626,9 @@ static irqreturn_t rtl8365mb_irq(int irq, void *data)
+ 	for_each_set_bit(line, &line_changes, priv->num_ports) {
+ 		int child_irq = irq_find_mapping(priv->irqdomain, line);
+ 
++		if (!child_irq)
++			continue;
++
+ 		handle_nested_irq(child_irq);
  	}
  
-@@ -817,8 +817,8 @@ static int rtl8365mb_phy_write(struct realtek_priv *priv, int phy, int regnum,
- 	ret = rtl8365mb_phy_ocp_write(priv, phy, ocp_addr, val);
- 	if (ret) {
- 		dev_err(priv->dev,
--			"failed to write PHY%d reg %02x @ %04x, ret %d\n", phy,
--			regnum, ocp_addr, ret);
-+			"failed to write PHY%d reg %02x @ %04x, ret %pe\n", phy,
-+			regnum, ocp_addr, ERR_PTR(ret));
- 		return ret;
+@@ -1695,13 +1692,14 @@ static int rtl8365mb_irq_disable(struct realtek_priv *priv)
+ static int rtl8365mb_irq_setup(struct realtek_priv *priv)
+ {
+ 	struct rtl8365mb *mb = priv->chip_data;
++	struct dsa_switch *ds = &priv->ds;
+ 	struct device_node *intc;
++	struct dsa_port *dp;
+ 	u32 irq_trig;
+ 	int virq;
+ 	int irq;
+ 	u32 val;
+ 	int ret;
+-	int i;
+ 
+ 	intc = of_get_child_by_name(priv->dev->of_node, "interrupt-controller");
+ 	if (!intc) {
+@@ -1727,8 +1725,8 @@ static int rtl8365mb_irq_setup(struct realtek_priv *priv)
+ 		goto out_put_node;
  	}
  
-@@ -1068,8 +1068,8 @@ static void rtl8365mb_phylink_mac_config(struct phylink_config *config,
- 		ret = rtl8365mb_ext_config_rgmii(priv, port, state->interface);
- 		if (ret)
+-	for (i = 0; i < priv->num_ports; i++) {
+-		virq = irq_create_mapping(priv->irqdomain, i);
++	dsa_switch_for_each_available_port(dp, ds) {
++		virq = irq_create_mapping(priv->irqdomain, dp->index);
+ 		if (!virq) {
  			dev_err(priv->dev,
--				"failed to configure RGMII mode on port %d: %d\n",
--				port, ret);
-+				"failed to configure RGMII mode on port %d: %pe\n",
-+				port, ERR_PTR(ret));
- 		return;
+ 				"failed to create irq domain mapping\n");
+@@ -1798,9 +1796,11 @@ static int rtl8365mb_irq_setup(struct realtek_priv *priv)
+ 	mb->irq = 0;
+ 
+ out_remove_irqdomain:
+-	for (i = 0; i < priv->num_ports; i++) {
+-		virq = irq_find_mapping(priv->irqdomain, i);
+-		irq_dispose_mapping(virq);
++	dsa_switch_for_each_available_port(dp, ds) {
++		virq = irq_find_mapping(priv->irqdomain, dp->index);
++
++		if (virq)
++			irq_dispose_mapping(virq);
  	}
  
-@@ -1098,8 +1098,8 @@ static void rtl8365mb_phylink_mac_link_down(struct phylink_config *config,
- 						     false, false);
- 		if (ret)
- 			dev_err(priv->dev,
--				"failed to reset forced mode on port %d: %d\n",
--				port, ret);
-+				"failed to reset forced mode on port %d: %pe\n",
-+				port, ERR_PTR(ret));
+ 	irq_domain_remove(priv->irqdomain);
+@@ -1815,8 +1815,9 @@ static int rtl8365mb_irq_setup(struct realtek_priv *priv)
+ static void rtl8365mb_irq_teardown(struct realtek_priv *priv)
+ {
+ 	struct rtl8365mb *mb = priv->chip_data;
++	struct dsa_switch *ds = &priv->ds;
++	struct dsa_port *dp;
+ 	int virq;
+-	int i;
  
- 		return;
+ 	if (mb->irq) {
+ 		free_irq(mb->irq, priv);
+@@ -1824,9 +1825,11 @@ static void rtl8365mb_irq_teardown(struct realtek_priv *priv)
  	}
-@@ -1129,8 +1129,8 @@ static void rtl8365mb_phylink_mac_link_up(struct phylink_config *config,
- 						     rx_pause);
- 		if (ret)
- 			dev_err(priv->dev,
--				"failed to force mode on port %d: %d\n", port,
--				ret);
-+				"failed to force mode on port %d: %pe\n", port,
-+				ERR_PTR(ret));
  
- 		return;
- 	}
-@@ -1285,8 +1285,8 @@ static void rtl8365mb_get_ethtool_stats(struct dsa_switch *ds, int port, u64 *da
- 						 mib->length, &data[i]);
- 		if (ret) {
- 			dev_err(priv->dev,
--				"failed to read port %d counters: %d\n", port,
--				ret);
-+				"failed to read port %d counters: %pe\n", port,
-+				ERR_PTR(ret));
- 			break;
+ 	if (priv->irqdomain) {
+-		for (i = 0; i < priv->num_ports; i++) {
+-			virq = irq_find_mapping(priv->irqdomain, i);
+-			irq_dispose_mapping(virq);
++		dsa_switch_for_each_available_port(dp, ds) {
++			virq = irq_find_mapping(priv->irqdomain, dp->index);
++
++			if (virq)
++				irq_dispose_mapping(virq);
  		}
+ 
+ 		irq_domain_remove(priv->irqdomain);
+@@ -1943,11 +1946,11 @@ static int rtl8365mb_reset_chip(struct realtek_priv *priv)
+ static int rtl8365mb_setup(struct dsa_switch *ds)
+ {
+ 	struct realtek_priv *priv = ds->priv;
++	struct dsa_port *cpu_dp, *dp;
+ 	struct rtl8365mb_cpu *cpu;
+-	struct dsa_port *cpu_dp;
+ 	struct rtl8365mb *mb;
++	u32 userports_mask;
+ 	int ret;
+-	int i;
+ 
+ 	mb = priv->chip_data;
+ 	cpu = &mb->cpu;
+@@ -1974,44 +1977,58 @@ static int rtl8365mb_setup(struct dsa_switch *ds)
+ 	else if (ret)
+ 		dev_info(priv->dev, "no interrupt support\n");
+ 
++	/* Start with all ports blocked, including unused ports */
++	dsa_switch_for_each_port(dp, ds) {
++		struct rtl8365mb_port *p = &mb->ports[dp->index];
++
++		/* Set the initial STP state of all ports to DISABLED, otherwise
++		 * ports will still forward frames to the CPU despite being
++		 * administratively down by default.
++		 */
++		rtl8365mb_port_stp_state_set(ds, dp->index, BR_STATE_DISABLED);
++
++		/* Start with all port completely isolated */
++		ret = rtl8365mb_port_set_isolation(priv, dp->index, 0);
++		if (ret)
++			goto out_teardown_irq;
++
++		/* Disable learning */
++		ret = rtl8365mb_port_set_learning(priv, dp->index, false);
++		if (ret)
++			goto out_teardown_irq;
++
++		/* Set up per-port private data */
++		p->priv = priv;
++		p->index = dp->index;
++	}
++
++	userports_mask = dsa_user_ports(ds);
++
+ 	/* Configure CPU tagging */
+ 	dsa_switch_for_each_cpu_port(cpu_dp, ds) {
+-		cpu->mask |= BIT(cpu_dp->index);
+-
++		/* Use the first CPU port as trap_port */
+ 		if (cpu->trap_port == RTL8365MB_MAX_NUM_PORTS)
+ 			cpu->trap_port = cpu_dp->index;
++
++		/* Forward to all user ports */
++		ret = rtl8365mb_port_set_isolation(priv, cpu_dp->index,
++						   userports_mask);
++		if (ret)
++			goto out_teardown_irq;
  	}
-@@ -1638,7 +1638,8 @@ static irqreturn_t rtl8365mb_irq(int irq, void *data)
- 	return IRQ_HANDLED;
++
++	cpu->mask = dsa_cpu_ports(ds);
+ 	cpu->enable = cpu->mask > 0;
+ 	ret = rtl8365mb_cpu_config(priv);
+ 	if (ret)
+ 		goto out_teardown_irq;
  
- out_error:
--	dev_err(priv->dev, "failed to read interrupt status: %d\n", ret);
-+	dev_err(priv->dev, "failed to read interrupt status: %pe\n",
-+		ERR_PTR(ret));
- 
- out_none:
- 	return IRQ_NONE;
-@@ -1776,7 +1777,8 @@ static int rtl8365mb_irq_setup(struct realtek_priv *priv)
- 	ret = request_threaded_irq(irq, NULL, rtl8365mb_irq, IRQF_ONESHOT,
- 				   "rtl8365mb", priv);
- 	if (ret) {
--		dev_err(priv->dev, "failed to request irq: %d\n", ret);
-+		dev_err(priv->dev, "failed to request irq: %pe\n",
-+			ERR_PTR(ret));
- 		goto out_remove_irqdomain;
+-	/* Configure ports */
+-	for (i = 0; i < priv->num_ports; i++) {
+-		struct rtl8365mb_port *p = &mb->ports[i];
+-
+-		if (dsa_is_unused_port(ds, i))
+-			continue;
+-
++	/* Configure user ports */
++	dsa_switch_for_each_user_port(dp, ds) {
+ 		/* Forward only to the CPU */
+-		ret = rtl8365mb_port_set_isolation(priv, i, cpu->mask);
++		ret = rtl8365mb_port_set_isolation(priv, dp->index, cpu->mask);
+ 		if (ret)
+ 			goto out_teardown_irq;
+-
+-		/* Disable learning */
+-		ret = rtl8365mb_port_set_learning(priv, i, false);
+-		if (ret)
+-			goto out_teardown_irq;
+-
+-		/* Set the initial STP state of all ports to DISABLED, otherwise
+-		 * ports will still forward frames to the CPU despite being
+-		 * administratively down by default.
+-		 */
+-		rtl8365mb_port_stp_state_set(ds, i, BR_STATE_DISABLED);
+-
+-		/* Set up per-port private data */
+-		p->priv = priv;
+-		p->index = i;
  	}
  
-@@ -1952,14 +1954,16 @@ static int rtl8365mb_setup(struct dsa_switch *ds)
- 
- 	ret = rtl8365mb_reset_chip(priv);
- 	if (ret) {
--		dev_err(priv->dev, "failed to reset chip: %d\n", ret);
-+		dev_err(priv->dev, "failed to reset chip: %pe\n",
-+			ERR_PTR(ret));
- 		goto out_error;
- 	}
- 
- 	/* Configure switch to vendor-defined initial state */
- 	ret = rtl8365mb_switch_init(priv);
- 	if (ret) {
--		dev_err(priv->dev, "failed to initialize switch: %d\n", ret);
-+		dev_err(priv->dev, "failed to initialize switch: %pe\n",
-+			ERR_PTR(ret));
- 		goto out_error;
- 	}
- 
-@@ -2077,8 +2081,8 @@ static int rtl8365mb_detect(struct realtek_priv *priv)
- 
- 	ret = rtl8365mb_get_chip_id_and_ver(priv->map, &chip_id, &chip_ver);
- 	if (ret) {
--		dev_err(priv->dev, "failed to read chip id and version: %d\n",
--			ret);
-+		dev_err(priv->dev, "failed to read chip id and version: %pe\n",
-+			ERR_PTR(ret));
- 		return ret;
- 	}
- 
+ 	ret = rtl8365mb_port_change_mtu(ds, cpu->trap_port, ETH_DATA_LEN);
 
 -- 
 2.54.0
