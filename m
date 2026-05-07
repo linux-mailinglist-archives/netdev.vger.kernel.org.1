@@ -1,182 +1,458 @@
-Return-Path: <netdev+bounces-285460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285461-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8Fp+GPvd/GlFUwAAu9opvQ
-	(envelope-from <netdev+bounces-285460-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 20:46:19 +0200
+	id kLL8ATXe/GlFUwAAu9opvQ
+	(envelope-from <netdev+bounces-285461-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 20:47:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03C274ED952
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 20:46:18 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 936F84ED979
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 20:47:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A7EBB3046FC3
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 18:44:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8CE2A3006158
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 18:47:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA89C3EFD03;
-	Thu,  7 May 2026 18:44:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C98E233A71B;
+	Thu,  7 May 2026 18:47:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b="XxFN21KK"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rfIAYKHY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010011.outbound.protection.outlook.com [52.101.85.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA5F3C2761
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 18:44:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778179455; cv=none; b=k0IHxCRRPPzjkF1KYY5Ur3gI34lN029dPWPSJiJLkta9qW8yn4sGq+R4OpdY8W58P81fqDckrAiA1/6tPdE+dXtxvIO9cJSy00ceoTjCmAOm8XpHr6eRshdFXGqkSKfRj2K/VSD8vRqf4h6XY1mZL7G+8eYDhjGlDdt/1fywZJc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778179455; c=relaxed/simple;
-	bh=OSzlYQw2h6gcRQVmUKR53Ckl2/E4R/U/cGa1oPYYTlM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hw++V2YIa3FrBy46ixke1djHhGZFtJ+TjYcCefcEc/GKHvJ5EJJtDYwXN5oZTvjbkYSTnU2r0joiSlEr7kc1wq4+vEPbxzOvoC21/w94oRX7M73DCIEm+Wf5xqbn/dZtJ/kIQRX4PPNRkYlSGE/BUVaRY9av8BFhJweDSnX2Rqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com; spf=pass smtp.mailfrom=riscstar.com; dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b=XxFN21KK; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riscstar.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-51306c9f2a8so11012481cf.1
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 11:44:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=riscstar-com.20251104.gappssmtp.com; s=20251104; t=1778179453; x=1778784253; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1OHugVXwVYl4EIQGFzGx4AQVN+wMQGiAhztZolIIb7Q=;
-        b=XxFN21KKeIEUXbAGo/6Ib+7hUGTlZX/8XuZzfJbo4yl6PSap3BZOrtaZqZvc1Woa0x
-         0TvN9aEcZ4+js8z68j+MUt90r3LhtiXIbw6GBdwg9q24mniraMXZ0Vvge1WjQqtz8mQc
-         wnb4NwKJ2So0FhLQ4UU9Ej5D+YrrYrDhweEMM4rfVO5sA+1tuVk7/V+5x72FaCnYpwSY
-         xkoc5EHJoWePAMfv2RAHc4k2vsCVzgkDN8jl02GAzFudANcX7iezGiutl4yi5yWunYrI
-         9pNxEHt5AqTVXWNcfG7GvuP8sOJHtqUQbxIWRmTus46EYlpu0w9nrzY9OcsAahURAauT
-         CcyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778179453; x=1778784253;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1OHugVXwVYl4EIQGFzGx4AQVN+wMQGiAhztZolIIb7Q=;
-        b=C/PvVcPkAggjPv4uvgrBxQC6o6uWnKhfFbZ2HHJ2+NSIxLA/T37utbdgtJuGhwZeJU
-         z/Vb8gunk+hZmew6hsn0SuDcIYMyEsaHktguofokZ/fE2FPpdxSkWAdGC6y3Cye6ZOTK
-         FEYDytLgyjS550eytLDaMx3u9F/aX+YLvmgimpfSM2Z3FTpDpm1td690iIC9MxUhM9Mn
-         gsfht1ioM/XcMY+cUraAN60Oe3qPEkCSbC4HmkZXtNgGuvo3Or9HSrP6gerWzBLdsaoC
-         8hJ/v7a8GeZhB9hst+jQi3JNG7CiNAiGrW4rBGMz4qNon4zJkAtqnGELH7ikuYM0Vk/X
-         MfNw==
-X-Forwarded-Encrypted: i=1; AFNElJ8/CmnnAhHM9cTvXSakv2a1mp+XCfhaoF1+rD8Xo/yF1QjrWI+ubsl1li2ZDgaf0qzbxd03gUY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJeXzjAbXAe7Ff1a98IWRFml1E/waSmViBjtsPP2KbaDJM5piw
-	Nc9pkQByLivSB6XGLEZBy+clV34wNw6wz9EzLJBOrD55jqjQhJr6Gd36y0HNLt8Ti6Y=
-X-Gm-Gg: AeBDies1QFBt9n2lXZtmUalZvYPDtXUDs8jNFc1EOWrMkg41fSnwS534twb2qYgkI3W
-	72dOjzc/2nT1lL2zT0oyOAZ7WqZtQsCzWr1lKlDabIqMVLp1ATfziIh032VKvbcpqfWrgxk6ET/
-	35IqvpyXT+g+ts9ROjJQx+qwHy8MzOJaMhyHYara4978JKy14jxEnVd4f9mk0J+cYr5okE44i2C
-	/9EhdU22DK2v6dBxNNnMXZCle5AK/sUIKMC8HpM8ced+i8ZRdGkXS7JGL/ENYYkY3iuk5NJyZLg
-	fcLchmMOMLVewQhQoCFdsydvHzFSM5HhosZRIYi7LRvkjLAysGRAs3kKVw/E9Yj8tDV07t3kPeU
-	yFx+tylkRyBJ2K+M0sHaDO2YvKfpID5uHXQ7oTuJUYDKaLgXFhCt+PPZL7nBfAHn2yBsNZzHES2
-	25GYY+1H6MCDZNAh2F1eJYp4jJSgFEZbM7nnQatfXVCYXl8+Pcc4WqFXwPAkbl2R61WSbr8jLs4
-	AM=
-X-Received: by 2002:a05:622a:8c7:b0:50e:5fe2:83a9 with SMTP id d75a77b69052e-51461bf0515mr133144421cf.5.1778179453134;
-        Thu, 07 May 2026 11:44:13 -0700 (PDT)
-Received: from [172.22.22.234] (c-75-72-117-212.hsd1.mn.comcast.net. [75.72.117.212])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-514850d0d82sm5022531cf.5.2026.05.07.11.44.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 May 2026 11:44:12 -0700 (PDT)
-Message-ID: <ae90a4c9-f027-4373-a378-d0d4b7796ff3@riscstar.com>
-Date: Thu, 7 May 2026 13:44:09 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11FED18050;
+	Thu,  7 May 2026 18:47:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778179632; cv=fail; b=LtBwM60+mbfkpzoKfqWxh2JwQlWW0oj3b4pJq3DB5SoK5ppXHuKZqAHCxV9w0wDuByPyhwwiIhF7yJHWiUe6rfevFeYqD3ePLD/1XiuJpKRP6NUqpijUCUPV44pdIYhfoulbzsXgOL5GA4IQy6i9b+HymGycH8HApyIXNP0vs0M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778179632; c=relaxed/simple;
+	bh=qwYFXp0hZd9ptAO8fSEYmz/oAX7BOGaIXS1688APZOo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ew6rrzMIcBpZVVfYIu4P9KeOTwel0Lcbr8naMSAr0xk4lolw42mJzBui71r24xINrLtiQJxgHKlojcYlmti3j/GqFUP5NSTI883p6AUCK0yvkYVW+baEqqF6Puw5kzamGLpO8wMQo6NxCCerfBXjuBJKaLqekOTCAImvnqWdaWw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rfIAYKHY; arc=fail smtp.client-ip=52.101.85.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SN9qJmgX9uBpNhUN73lhJLdak1Du11hJSuuP5Kyl7RnEnOvPfAFNHQirkRHY5gZ+XmGfSJ+P1A1gLdGfzMCRyacF+Ar8e1jWjhBiNeEp3f4LuNzucDgkrIMzeOgkB7ujSZQWglwxIs9PlDReB78+Y6AznoCXXEMHb5+wR29ISJqKhuqsKkhCR75NH6x/RDPu1NhWbsTl2UJicegDvOz6KhrRjYOlJAwKwfayrHjy6D1KEeX4LgIii1tGpshPM+NvvbDaDmkS77NiTxPBYspVDXCYdUd9Vu+wMfGdwkc6a3Of4XfiTbtO4Ky373nkEkhBj2o5nqsDrKs5SK+1bCOE8w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=r4v6BXCklsc41QxH/Kdt3UIRmaNlBGYqJoyp9yfChlk=;
+ b=X8ZeHjKQzOa9PeNl48Q1EbkHCDH9wdSfRQ7gswdEuuci8k68GYtIIUHxyE6JMu6DWPUR4ficTelnc7dpoFggbvYL4w33anCRtLcrV2UMOLdYmZVAUmNK7Ged4e2Xw63+SFYvbsD2WrRR1H1F7zP5cdp1gse9GMtv5HbtPAyGzbY7d6jZGwy45jm195FB0lYID8a+ZqkMs77QNkAOoAaxHmRev1cmjwwK0rFMTUz1xH9Oc8iMXcx/UhEiPm+kx8/lpSoWyGEpBZqXbGuwUJria9V3WeM30UpTL/3jfjFcjNtf0Vt9ILEU+UdRx1uchFYCV2DjYyW6OWFbu+I3/w7UrA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=r4v6BXCklsc41QxH/Kdt3UIRmaNlBGYqJoyp9yfChlk=;
+ b=rfIAYKHYUndFsOa4vOezbgU35jcsPAPKVHRnzYp611/xlG1G9Lw64lFCsfQtpfP+fEA9kmP15vZpbdnyVrT26/fw3bedhaJ4TxQrpFXsTAx5H0YnXTeOQv3AmyfuvH8p6JVeX9dq4IZ5LSJoD1+lRCvA7oDYnLZEuvY6N7qeytFae+lwL430Y1FRPGiSC4XtyJnOHO6ujABNFG+ubbNWGViVAPlGd7hBBRg6nXqqEsU+b+qqp8KnzyjSGSGAqfsDBVed4/WCwdj13lKWflarWu88/9S+dFpvVS/l/9yMeXqWzpQOLM1poqt6FXDdP2ljUf8Y0DaEoC1alqBFumzucA==
+Received: from CH0PR04CA0084.namprd04.prod.outlook.com (2603:10b6:610:74::29)
+ by DM4PR12MB8523.namprd12.prod.outlook.com (2603:10b6:8:18e::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.16; Thu, 7 May
+ 2026 18:47:06 +0000
+Received: from DS2PEPF00003445.namprd04.prod.outlook.com
+ (2603:10b6:610:74:cafe::b9) by CH0PR04CA0084.outlook.office365.com
+ (2603:10b6:610:74::29) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9891.17 via Frontend Transport; Thu,
+ 7 May 2026 18:47:06 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DS2PEPF00003445.mail.protection.outlook.com (10.167.17.72) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9891.9 via Frontend Transport; Thu, 7 May 2026 18:47:05 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 7 May
+ 2026 11:46:43 -0700
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 7 May
+ 2026 11:46:42 -0700
+Received: from vdi.nvidia.com (10.127.8.13) by mail.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Thu, 7 May
+ 2026 11:46:40 -0700
+From: Chiara Meiohas <cmeiohas@nvidia.com>
+To: <leon@kernel.org>, <dsahern@gmail.com>, <stephen@networkplumber.org>
+CC: <michaelgur@nvidia.com>, <jgg@nvidia.com>, <linux-rdma@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Chiara Meiohas <cmeiohas@nvidia.com>
+Subject: [PATCH iproute2-next] rdma: Align FRMR pool UAPI names with merged kernel UAPI
+Date: Thu, 7 May 2026 21:46:09 +0300
+Message-ID: <20260507184609.3439875-1-cmeiohas@nvidia.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 10/12] net: stmmac: tc956x: add TC956x/QPS615
- support
-To: Xilin Wu <sophon@radxa.com>, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- maxime.chevallier@bootlin.com, rmk+kernel@armlinux.org.uk,
- andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org,
- arnd@arndb.de, gregkh@linuxfoundation.org
-Cc: Daniel Thompson <daniel@riscstar.com>, mohd.anwar@oss.qualcomm.com,
- a0987203069@gmail.com, alexandre.torgue@foss.st.com, ast@kernel.org,
- boon.khai.ng@altera.com, chenchuangyu@xiaomi.com, chenhuacai@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, hkallweit1@gmail.com,
- inochiama@gmail.com, john.fastabend@gmail.com, julianbraha@gmail.com,
- livelycarpet87@gmail.com, matthew.gerlach@altera.com,
- mcoquelin.stm32@gmail.com, me@ziyao.cc,
- prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
- rohan.g.thomas@altera.com, sdf@fomichev.me, siyanteng@cqsoftware.com.cn,
- weishangjuan@eswincomputing.com, wens@kernel.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20260501155421.3329862-1-elder@riscstar.com>
- <20260501155421.3329862-11-elder@riscstar.com>
- <224E233C593EF171+8c8a43dd-5061-40f8-9eb7-f360eabf2ecc@radxa.com>
-Content-Language: en-US
-From: Alex Elder <elder@riscstar.com>
-In-Reply-To: <224E233C593EF171+8c8a43dd-5061-40f8-9eb7-f360eabf2ecc@radxa.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 03C274ED952
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS2PEPF00003445:EE_|DM4PR12MB8523:EE_
+X-MS-Office365-Filtering-Correlation-Id: cccd7e56-894a-41fc-9a8c-08deac69094f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700016|82310400026|376014|1800799024|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	qBopXLGsj+kl5ABoYyfwF7NF21wZmK0pTcDr9j11YVDkVi8WVwJSU1YIJt99GVofhFvcC1fkk/mg93fpIaQdqvN8rjkSiDtQ0LjKC79YZatXDZAyqIomU8N2haIaEo9zKn8Y2KFgeUkGDGSKyHbQ2y0y8Y8fZvfVVedK12HLPDUFqL/MWYbIH0RQmGPfQ78XaPJMK072fK0QoBAzbDnfLyKIk180S0jV5Q0v41ztr284CwR1TaFRs18EM1i2/01KA6nn/KGf9UksulScBd7AujJ/Cn2Ca0MY9sdQAFitabdblzn6/lqpUvlCnTupxgX8NU6uPel+Y1qUnynSCGnumAXRS9QloRnDB4cWU98Jy2x3ZsoN8AjXsDZDH8h1BQASUMWHR4nzFbyxlUlSsYXsjPO0eub8pinwEfcTtyxjHUHKqsujO+KN4JhRgZ7Ru7ixLLkGUPvHSZHVCWWw4D76MXjZZFks4OAiQVZN/Q+5FmK4cfQrLA9UZ9yEsZTFDOv8o6GPjhZwht+9QFgng35QE+m4NgZhNVSW2FXUWQe6x7teqihACQ3MjGL7X+28Do4cXmvnwJpxS2tilszbXfYV6D1Brctv3JkSnLACVz9WCnobvBhqU+p6n04zUVt/V0T0IkUIOAu+kjchm+DnNRuKiQTUL2nhqegXNEaKzYm/F/XYj9QV/HXqaJpFi31mcKN/DyhBEnF1ALHKIdFaCBRw5mGWw0FUKA3iCPEZJGSKHxg=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(82310400026)(376014)(1800799024)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	Zt39UZgDvOGZqiPHSwnHiMrdoxUoILh1YxhiQ2C82rwc2fEBaSY9fKl+ePYPeiv+N0C2Mnu7zr7fb77WLW1jexUrRKucYENs4jjSmHXp2VAwx7FvMbm3K75zlwEikqppZRidF2yRkJ0ciGINrZRrT9p8gjhKs/rhhC1FMS/yeUIQO+pg1Ume2sT+5OPhESSwkILtE72vOCWEjoTGZz7gSMC/4jmYRMXnEE84tWp+NA7yk0ao93hijU2EM1WA5NfCAHNrPX8cyWcONq3tI9umJr6ZD2GbkaVHbdFdh7S+18Ufj1xsnLLB6WsPFmLbwIV1N9cjTbhoJVfLozrUjkBKXPeNPLTNma3JJgnc7HCxmx7bp3KUXbhlT/fdh8/Y+jyNKA6JY+vUzWu6zyTgLJeaBdA4VpSj7Q55Zp00frX6PwxHPhFHUnvT5pO0W99XXjbI
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2026 18:47:05.9565
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: cccd7e56-894a-41fc-9a8c-08deac69094f
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS2PEPF00003445.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8523
+X-Rspamd-Queue-Id: 936F84ED979
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.06 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[riscstar-com.20251104.gappssmtp.com:s=20251104];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[riscstar.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[riscstar.com,oss.qualcomm.com,gmail.com,foss.st.com,kernel.org,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285460-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[riscstar-com.20251104.gappssmtp.com:+];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[kernel.org,gmail.com,networkplumber.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285461-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[elder@riscstar.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_GT_50(0.00)[50];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cmeiohas@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,Nvidia.com:dkim,nvidia.com:email,nvidia.com:mid];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[riscstar.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,riscstar-com.20251104.gappssmtp.com:dkim]
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Action: no action
 
-On 5/6/26 7:59 AM, Xilin Wu wrote:
-> On 5/1/2026 11:54 PM, Alex Elder wrote:
->> +    /* AXI Configuration */
->> +    axi = &td->axi;
->> +    axi->axi_lpi_en = 1;
->> +    axi->axi_wr_osr_lmt = 31;
->> +    axi->axi_rd_osr_lmt = 31;
->> +    /* All sizes (2^2..2^8) are supported */
->> +    axi->axi_blen_regval = DMA_AXI_BLEN_MASK;
->> +    plat->axi = axi;
->> +
->> +    plat->mac_port_sel_speed = speed;
->> +    plat->flags = STMMAC_FLAG_MULTI_MSI_EN | STMMAC_FLAG_TSO_EN;
-> 
-> I got WoL working only after adding STMMAC_FLAG_USE_PHY_WOL here. I 
-> guess it's required, since the driver clocks down the MAC/PMA/XPCS in 
-> its suspend hook?
+From: Michael Guralnik <michaelgur@nvidia.com>
 
-I just want to respond to this with a summary of our plans.
+The FRMR pools UAPI merged in kernel v7.0-rc1 commit dbd0472fd7a5
+("RDMA/nldev: Expose kernel-internal FRMR pools in netlink")
+uses different identifier names than what the iproute2 FRMR pools
+series was developed against.
 
-We will *not* be implementing wake-on-LAN (WoL) initially.  We
-will work to get support for the eMACs upstream for TC956x, and
-then as a separate step, we will enable WoL.
+Update the vendored copy of RDMA UAPI and all references in the rdma
+tool to match the names that actually shipped in the kernel.
 
-It's great to know you have it working, and our plan is to
-implement it via the PHYs and not involve the MAC.  It seems
-it will be relatively easy, but we have no plans to add it to
-the current series.
+Fixes: 93368ee34528 ("rdma: Update headers")
+Signed-off-by: Michael Guralnik <michaelgur@nvidia.com>
+Signed-off-by: Chiara Meiohas <cmeiohas@nvidia.com>
+---
+ rdma/include/uapi/rdma/rdma_netlink.h | 30 ++++----
+ rdma/res-frmr-pools.c                 | 98 +++++++++++++--------------
+ rdma/res.h                            |  2 +-
+ 3 files changed, 65 insertions(+), 65 deletions(-)
 
-					-Alex
+diff --git a/rdma/include/uapi/rdma/rdma_netlink.h b/rdma/include/uapi/rdma/rdma_netlink.h
+index 8709e558b..4356ec4a1 100644
+--- a/rdma/include/uapi/rdma/rdma_netlink.h
++++ b/rdma/include/uapi/rdma/rdma_netlink.h
+@@ -308,9 +308,9 @@ enum rdma_nldev_command {
+ 
+ 	RDMA_NLDEV_CMD_MONITOR,
+ 
+-	RDMA_NLDEV_CMD_RES_FRMR_POOLS_GET, /* can dump */
++	RDMA_NLDEV_CMD_FRMR_POOLS_GET, /* can dump */
+ 
+-	RDMA_NLDEV_CMD_RES_FRMR_POOLS_SET,
++	RDMA_NLDEV_CMD_FRMR_POOLS_SET,
+ 
+ 	RDMA_NLDEV_NUM_OPS
+ };
+@@ -590,19 +590,19 @@ enum rdma_nldev_attr {
+ 	/*
+ 	 * FRMR Pools attributes
+ 	 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOLS,			/* nested table */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_ENTRY,		/* nested table */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY,		/* nested table */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ATS,		/* u8 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ACCESS_FLAGS,	/* u32 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_VENDOR_KEY,	/* u64 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_NUM_DMA_BLOCKS, /* u64 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_QUEUE_HANDLES,	/* u32 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_MAX_IN_USE,	/* u64 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_IN_USE,		/* u64 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_AGING_PERIOD,	/* u32 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_PINNED,		/* u32 */
+-	RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_KERNEL_VENDOR_KEY, /* u64 */
++	RDMA_NLDEV_ATTR_FRMR_POOLS,		/* nested table */
++	RDMA_NLDEV_ATTR_FRMR_POOL_ENTRY,	/* nested table */
++	RDMA_NLDEV_ATTR_FRMR_POOL_KEY,		/* nested table */
++	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ATS,	/* u8 */
++	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ACCESS_FLAGS,	/* u32 */
++	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_VENDOR_KEY,	/* u64 */
++	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_NUM_DMA_BLOCKS,	/* u64 */
++	RDMA_NLDEV_ATTR_FRMR_POOL_QUEUE_HANDLES,	/* u32 */
++	RDMA_NLDEV_ATTR_FRMR_POOL_MAX_IN_USE,	/* u64 */
++	RDMA_NLDEV_ATTR_FRMR_POOL_IN_USE,	/* u64 */
++	RDMA_NLDEV_ATTR_FRMR_POOLS_AGING_PERIOD,	/* u32 */
++	RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES,	/* u32 */
++	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_KERNEL_VENDOR_KEY,	/* u64 */
+ 
+ 	/*
+ 	 * Always the end
+diff --git a/rdma/res-frmr-pools.c b/rdma/res-frmr-pools.c
+index abcd21884..d5faa5c14 100644
+--- a/rdma/res-frmr-pools.c
++++ b/rdma/res-frmr-pools.c
+@@ -80,83 +80,83 @@ static int res_frmr_pools_line(struct rd *rd, const char *name, int idx,
+ 	char key_str[FRMR_POOL_KEY_MAX_LEN];
+ 	struct frmr_pool_key key = { 0 };
+ 
+-	if (nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY]) {
++	if (nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_KEY]) {
+ 		if (mnl_attr_parse_nested(
+-			    nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY],
++			    nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_KEY],
+ 			    rd_attr_cb, key_tb) != MNL_CB_OK)
+ 			return MNL_CB_ERROR;
+ 
+-		if (key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ATS])
++		if (key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ATS])
+ 			key.ats = mnl_attr_get_u8(
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ATS]);
+-		if (key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ACCESS_FLAGS])
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ATS]);
++		if (key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ACCESS_FLAGS])
+ 			key.access_flags = mnl_attr_get_u32(
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ACCESS_FLAGS]);
+-		if (key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_VENDOR_KEY])
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ACCESS_FLAGS]);
++		if (key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_VENDOR_KEY])
+ 			key.vendor_key = mnl_attr_get_u64(
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_VENDOR_KEY]);
+-		if (key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_NUM_DMA_BLOCKS])
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_VENDOR_KEY]);
++		if (key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_NUM_DMA_BLOCKS])
+ 			key.num_dma_blocks = mnl_attr_get_u64(
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_NUM_DMA_BLOCKS]);
+-		if (key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_KERNEL_VENDOR_KEY])
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_NUM_DMA_BLOCKS]);
++		if (key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_KERNEL_VENDOR_KEY])
+ 			kernel_vendor_key = mnl_attr_get_u64(
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_KERNEL_VENDOR_KEY]);
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_KERNEL_VENDOR_KEY]);
+ 
+ 		if (rd_is_filtered_attr(
+ 			    rd, "ats", key.ats,
+-			    key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ATS]))
++			    key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ATS]))
+ 			goto out;
+ 
+ 		if (rd_is_filtered_attr(
+ 			    rd, "access_flags", key.access_flags,
+-			    key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ACCESS_FLAGS]))
++			    key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ACCESS_FLAGS]))
+ 			goto out;
+ 
+ 		if (rd_is_filtered_attr(
+ 			    rd, "vendor_key", key.vendor_key,
+-			    key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_VENDOR_KEY]))
++			    key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_VENDOR_KEY]))
+ 			goto out;
+ 
+ 		if (rd_is_filtered_attr(
+ 			    rd, "num_dma_blocks", key.num_dma_blocks,
+-			    key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_NUM_DMA_BLOCKS]))
++			    key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_NUM_DMA_BLOCKS]))
+ 			goto out;
+ 	}
+ 
+-	if (nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_QUEUE_HANDLES])
++	if (nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_QUEUE_HANDLES])
+ 		queue_handles = mnl_attr_get_u32(
+-			nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_QUEUE_HANDLES]);
++			nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_QUEUE_HANDLES]);
+ 	if (rd_is_filtered_attr(
+ 		    rd, "queue", queue_handles,
+-		    nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_QUEUE_HANDLES]))
++		    nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_QUEUE_HANDLES]))
+ 		goto out;
+ 
+-	if (nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_IN_USE])
++	if (nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_IN_USE])
+ 		in_use = mnl_attr_get_u64(
+-			nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_IN_USE]);
++			nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_IN_USE]);
+ 	if (rd_is_filtered_attr(rd, "in_use", in_use,
+-				nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_IN_USE]))
++				nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_IN_USE]))
+ 		goto out;
+ 
+-	if (nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_MAX_IN_USE])
++	if (nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_MAX_IN_USE])
+ 		max_in_use = mnl_attr_get_u64(
+-			nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_MAX_IN_USE]);
++			nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_MAX_IN_USE]);
+ 	if (rd_is_filtered_attr(
+ 		    rd, "max_in_use", max_in_use,
+-		    nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_MAX_IN_USE]))
++		    nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_MAX_IN_USE]))
+ 		goto out;
+ 
+-	if (nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_PINNED])
++	if (nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES])
+ 		pinned_handles = mnl_attr_get_u32(
+-			nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_PINNED]);
++			nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES]);
+ 	if (rd_is_filtered_attr(rd, "pinned", pinned_handles,
+-				nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_PINNED]))
++				nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES]))
+ 		goto out;
+ 
+ 	open_json_object(NULL);
+ 	print_dev(idx, name);
+ 
+-	if (nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY]) {
++	if (nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_KEY]) {
+ 		snprintf(key_str, sizeof(key_str),
+ 			 "%" PRIx64 ":%" PRIx64 ":%x:%s",
+ 			 key.vendor_key, key.num_dma_blocks,
+@@ -166,30 +166,30 @@ static int res_frmr_pools_line(struct rd *rd, const char *name, int idx,
+ 		if (rd->show_details) {
+ 			res_print_u32(
+ 				"ats", key.ats,
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ATS]);
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ATS]);
+ 			res_print_u32(
+ 				"access_flags", key.access_flags,
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ACCESS_FLAGS]);
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ACCESS_FLAGS]);
+ 			res_print_u64(
+ 				"vendor_key", key.vendor_key,
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_VENDOR_KEY]);
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_VENDOR_KEY]);
+ 			res_print_u64(
+ 				"num_dma_blocks", key.num_dma_blocks,
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_NUM_DMA_BLOCKS]);
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_NUM_DMA_BLOCKS]);
+ 			res_print_u64(
+ 				"kernel_vendor_key", kernel_vendor_key,
+-				key_tb[RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_KERNEL_VENDOR_KEY]);
++				key_tb[RDMA_NLDEV_ATTR_FRMR_POOL_KEY_KERNEL_VENDOR_KEY]);
+ 		}
+ 	}
+ 
+ 	res_print_u32("queue", queue_handles,
+-		      nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_QUEUE_HANDLES]);
++		      nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_QUEUE_HANDLES]);
+ 	res_print_u64("in_use", in_use,
+-		      nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_IN_USE]);
++		      nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_IN_USE]);
+ 	res_print_u64("max_in_use", max_in_use,
+-		      nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_MAX_IN_USE]);
++		      nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_MAX_IN_USE]);
+ 	res_print_u32("pinned", pinned_handles,
+-		      nla_line[RDMA_NLDEV_ATTR_RES_FRMR_POOL_PINNED]);
++		      nla_line[RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES]);
+ 
+ 	print_driver_table(rd, nla_line[RDMA_NLDEV_ATTR_DRIVER]);
+ 	close_json_object();
+@@ -215,12 +215,12 @@ int res_frmr_pools_parse_cb(const struct nlmsghdr *nlh, void *data)
+ 
+ 	mnl_attr_parse(nlh, 0, rd_attr_cb, tb);
+ 	if (!tb[RDMA_NLDEV_ATTR_DEV_INDEX] || !tb[RDMA_NLDEV_ATTR_DEV_NAME] ||
+-	    !tb[RDMA_NLDEV_ATTR_RES_FRMR_POOLS])
++	    !tb[RDMA_NLDEV_ATTR_FRMR_POOLS])
+ 		return MNL_CB_ERROR;
+ 
+ 	name = mnl_attr_get_str(tb[RDMA_NLDEV_ATTR_DEV_NAME]);
+ 	idx = mnl_attr_get_u32(tb[RDMA_NLDEV_ATTR_DEV_INDEX]);
+-	nla_table = tb[RDMA_NLDEV_ATTR_RES_FRMR_POOLS];
++	nla_table = tb[RDMA_NLDEV_ATTR_FRMR_POOLS];
+ 
+ 	mnl_attr_for_each_nested(nla_entry, nla_table) {
+ 		struct nlattr *nla_line[RDMA_NLDEV_ATTR_MAX] = {};
+@@ -256,10 +256,10 @@ static int res_frmr_pools_one_set_aging(struct rd *rd)
+ 		return -EINVAL;
+ 	}
+ 
+-	rd_prepare_msg(rd, RDMA_NLDEV_CMD_RES_FRMR_POOLS_SET, &seq,
++	rd_prepare_msg(rd, RDMA_NLDEV_CMD_FRMR_POOLS_SET, &seq,
+ 		       (NLM_F_REQUEST | NLM_F_ACK));
+ 	mnl_attr_put_u32(rd->nlh, RDMA_NLDEV_ATTR_DEV_INDEX, rd->dev_idx);
+-	mnl_attr_put_u32(rd->nlh, RDMA_NLDEV_ATTR_RES_FRMR_POOL_AGING_PERIOD,
++	mnl_attr_put_u32(rd->nlh, RDMA_NLDEV_ATTR_FRMR_POOLS_AGING_PERIOD,
+ 			 aging_period);
+ 
+ 	return rd_sendrecv_msg(rd, seq);
+@@ -294,24 +294,24 @@ static int res_frmr_pools_one_set_pinned(struct rd *rd)
+ 		return -EINVAL;
+ 	}
+ 
+-	rd_prepare_msg(rd, RDMA_NLDEV_CMD_RES_FRMR_POOLS_SET, &seq,
++	rd_prepare_msg(rd, RDMA_NLDEV_CMD_FRMR_POOLS_SET, &seq,
+ 		       (NLM_F_REQUEST | NLM_F_ACK));
+ 	mnl_attr_put_u32(rd->nlh, RDMA_NLDEV_ATTR_DEV_INDEX, rd->dev_idx);
+ 
+-	mnl_attr_put_u32(rd->nlh, RDMA_NLDEV_ATTR_RES_FRMR_POOL_PINNED,
++	mnl_attr_put_u32(rd->nlh, RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES,
+ 			 pinned_value);
+ 
+ 	key_attr =
+-		mnl_attr_nest_start(rd->nlh, RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY);
+-	mnl_attr_put_u8(rd->nlh, RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ATS,
++		mnl_attr_nest_start(rd->nlh, RDMA_NLDEV_ATTR_FRMR_POOL_KEY);
++	mnl_attr_put_u8(rd->nlh, RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ATS,
+ 			pool_key.ats);
+ 	mnl_attr_put_u32(rd->nlh,
+-			 RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_ACCESS_FLAGS,
++			 RDMA_NLDEV_ATTR_FRMR_POOL_KEY_ACCESS_FLAGS,
+ 			 pool_key.access_flags);
+-	mnl_attr_put_u64(rd->nlh, RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_VENDOR_KEY,
++	mnl_attr_put_u64(rd->nlh, RDMA_NLDEV_ATTR_FRMR_POOL_KEY_VENDOR_KEY,
+ 			 pool_key.vendor_key);
+ 	mnl_attr_put_u64(rd->nlh,
+-			 RDMA_NLDEV_ATTR_RES_FRMR_POOL_KEY_NUM_DMA_BLOCKS,
++			 RDMA_NLDEV_ATTR_FRMR_POOL_KEY_NUM_DMA_BLOCKS,
+ 			 pool_key.num_dma_blocks);
+ 	mnl_attr_nest_end(rd->nlh, key_attr);
+ 
+diff --git a/rdma/res.h b/rdma/res.h
+index 8d7b4a0bf..1f71115b9 100644
+--- a/rdma/res.h
++++ b/rdma/res.h
+@@ -200,7 +200,7 @@ struct filters frmr_pools_valid_filters[MAX_NUMBER_OF_FILTERS] = {
+ 	{ .name = "pinned", .is_number = true },
+ };
+ 
+-RES_FUNC(res_frmr_pools, RDMA_NLDEV_CMD_RES_FRMR_POOLS_GET,
++RES_FUNC(res_frmr_pools, RDMA_NLDEV_CMD_FRMR_POOLS_GET,
+ 	 frmr_pools_valid_filters, true, 0);
+ 
+ int res_frmr_pools_set(struct rd *rd);
+-- 
+2.38.1
+
 
