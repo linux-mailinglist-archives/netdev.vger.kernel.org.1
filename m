@@ -1,132 +1,186 @@
-Return-Path: <netdev+bounces-285515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285516-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AKmlBmcE/WmIWgAAu9opvQ
-	(envelope-from <netdev+bounces-285515-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 23:30:15 +0200
+	id EPyKLDoF/WnkWgAAu9opvQ
+	(envelope-from <netdev+bounces-285516-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 23:33:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3246F4EF486
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 23:30:13 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D9004EF5A7
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 23:33:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9A7F93006955
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 21:26:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CAC4030B9149
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 21:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2990D344DAD;
-	Thu,  7 May 2026 21:26:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62EBE346776;
+	Thu,  7 May 2026 21:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O40zOUYT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JP+tRaG2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A551E344D86;
-	Thu,  7 May 2026 21:26:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D1530EF88;
+	Thu,  7 May 2026 21:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778189203; cv=none; b=NlB73NsClAoEfga9kTyH/qK5TBH/zMxyPPabuHNuQpti7SaKK4V/G2t66armB4oOEHJ7oBhk0MpSKkxqgQGeyxU5XC4dGHu5DqfxuMghy6YeIs++xarm4iAcldMNrs5c85ECX/5+NIuk3kZGlcAyGaE19hKULyq9iy1Rlo30QxM=
+	t=1778189428; cv=none; b=NuOvzp7frk3GgNeRdJNT8Xq6LkUeynhIh0hFKAckeXTdCHEmfs2fwq40KCuN5y5WMziK5AIoSjjgw5IqkAS2Oc7F1ZE1eRcMulYOPhmiP+jv8cQ8JX8LYG5OZ3EVWABcPISvFHWx/BDM+XbhyKByZzGt7oEaXFx0jhWTuLCNCL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778189203; c=relaxed/simple;
-	bh=rVWiIO8GAMs4uV1pDYNtDWy1Here0ynutD/CS72c9WA=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=Jj8mGDMz6o5ejmDG+1sAUGEPWbt5YFfYAmgdK0lLOWq98VdP17jzxfhC6uZMlzSlOiGO7W93kpFcGBpzuV7myzsPpgOCUstuJ69Dx3Vf1CQqJ3V4SCeEl9zZVw+kD8F3iuR/vFTLRERhiK7bxmOiIyDBN3AasS1GyUj188vj0+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O40zOUYT; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778189201; x=1809725201;
-  h=date:from:to:cc:subject:message-id;
-  bh=rVWiIO8GAMs4uV1pDYNtDWy1Here0ynutD/CS72c9WA=;
-  b=O40zOUYTcH+hms6wjTLccCwrDryO0J/yxxRxEmPF7pSq4q/U7Bp7DGPJ
-   Q+x7gTZg6OmrH8vzLNrGzIy79hMNMUjPWxqvCCENv3aMObYhzuQza2kSP
-   obos6aBg0hAQcsFMd3kP4QWEyVhVcFJsM8UEuPsC4x6Ceqy1iA+wMPFp6
-   C2bBB+wDmR2lIxW0aqLmWQb/J5FZRE5BFS2GLLqkSv1WVVAN8w8qUafOr
-   GP4D8/QPfj7hshiHTjga3mZdIqCsVBL4LrWBteUA5NXAbp0ZLVNDht0+9
-   VVoXYWtFiXvCK7pi55EM/sf3AVuprqR/JxdGYbLPNKno2SrzM8ePXVq/x
-   g==;
-X-CSE-ConnectionGUID: VQwYeBTGShaqK2+iRhMxrg==
-X-CSE-MsgGUID: M4CSJ7vyRaukYiRb+JPlzg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11779"; a="90613776"
-X-IronPort-AV: E=Sophos;i="6.23,222,1770624000"; 
-   d="scan'208";a="90613776"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 14:26:41 -0700
-X-CSE-ConnectionGUID: HAElt25yRx6Li1dwiHrElw==
-X-CSE-MsgGUID: hOQETuFEQCuChI65WnJS2Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,222,1770624000"; 
-   d="scan'208";a="232033842"
-Received: from lkp-server01.sh.intel.com (HELO d6e19f2f5857) ([10.239.97.150])
-  by fmviesa006.fm.intel.com with ESMTP; 07 May 2026 14:26:39 -0700
-Received: from kbuild by d6e19f2f5857 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wL6Ev-000000000SH-0PAu;
-	Thu, 07 May 2026 21:26:37 +0000
-Date: Fri, 08 May 2026 05:26:30 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [mst-vhost:balloon 6/30] Warning: mm/mempolicy.c:2444
- function parameter 'user_addr' not described in '__alloc_pages_mpol'
-Message-ID: <202605080515.6jRN5wN7-lkp@intel.com>
-User-Agent: s-nail v14.9.25
+	s=arc-20240116; t=1778189428; c=relaxed/simple;
+	bh=7E4rp+S4dqE0OVdstaoROQZLQNR9BomvZCyTiVcToKw=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=tD8iW099RBtNn81zRqNKVobqbtKCfUIxFyljkOWb3sfYMPgeD3WyyHgxY7othUJsIcCJzuRyd/njvBobxn7uMUytAy2pPk9yLtsKF9453iUXFsgj9QAf8IMuiEMmxwadWZv/5IU7Fu3YZkB/zWgolamdfClht7ALzLhJM4kbhp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JP+tRaG2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FD30C2BCB2;
+	Thu,  7 May 2026 21:30:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778189427;
+	bh=7E4rp+S4dqE0OVdstaoROQZLQNR9BomvZCyTiVcToKw=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=JP+tRaG2NL8qdE5D6PVSpQ5I6vDQosXt9S2m2W0CXsjlSr61fgsBw3lRkOY6nwgdb
+	 lAhuVEpOL9n+h7bqzbfWCW0GUj4vReohE2r1IoVRn/vZvx6lgxIV/+hd8+HfKTujre
+	 hLmsHYSk0vbcj2jqokpp8rUQ2w7UZprVGEN4ONUcJBIAjb+pWB4efRRM93IjwNMS8D
+	 8SeYJgiqBdZIF4vbGYROv1EahDoxf1wJlCJUlA6LMxJoh52W6DTcjLuv4QmDl2H7xo
+	 IfHOwegNi9DrpP8JSPFkQx44XYkneIdfHWzf5WRgH+GudQdILoxHaNytMrBgR00J+D
+	 4i4mqR6bL8tow==
+Date: Thu, 07 May 2026 16:30:25 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-X-Rspamd-Queue-Id: 3246F4EF486
+MIME-Version: 1.0
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Wolfram Sang <wsa+renesas@sang-engineering.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, linux-kernel@vger.kernel.org, 
+ linux-mmc@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+ devicetree@vger.kernel.org, Johannes Berg <johannes@sipsolutions.net>, 
+ Bjorn Andersson <andersson@kernel.org>, 
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+ linux-arm-kernel@lists.infradead.org, Jeff Johnson <jjohnson@kernel.org>, 
+ linux-pci@vger.kernel.org, Lorenzo Pieralisi <lpieralisi@kernel.org>, 
+ linux-usb@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, 
+ ath11k@lists.infradead.org, linux-spi@vger.kernel.org, 
+ linux-remoteproc@vger.kernel.org, Ulf Hansson <ulfh@kernel.org>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Andi Shyti <andi.shyti@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Mathieu Poirier <mathieu.poirier@linaro.org>, 
+ Maxime Ripard <mripard@kernel.org>, 
+ Sylwester Nawrocki <s.nawrocki@samsung.com>, linux-wireless@vger.kernel.org, 
+ Mark Brown <broonie@kernel.org>, linux-sound@vger.kernel.org, 
+ linux-i2c@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>, 
+ netdev@vger.kernel.org, ath10k@lists.infradead.org, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+In-Reply-To: <20260507201749.2605365-1-robh@kernel.org>
+References: <20260507201749.2605365-1-robh@kernel.org>
+Message-Id: <177818942584.2803269.2192622854542354589.robh@kernel.org>
+Subject: Re: [PATCH v2] dt-bindings: Fix phandle-array constraints, again
+X-Rspamd-Queue-Id: 3D9004EF5A7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285515-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285516-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[38];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:mid,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,renesas,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linuxfoundation.org:email]
 X-Rspamd-Action: no action
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git balloon
-head:   9f56ee36fbf6a6d336dc6a9eaeb4f8a67cb42a31
-commit: c4289f5a4e563611a468b4b5379025a4aa4a7c12 [6/30] mm: thread user_addr through page allocator for cache-friendly zeroing
-config: powerpc-allmodconfig (https://download.01.org/0day-ci/archive/20260508/202605080515.6jRN5wN7-lkp@intel.com/config)
-compiler: powerpc64-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260508/202605080515.6jRN5wN7-lkp@intel.com/reproduce)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202605080515.6jRN5wN7-lkp@intel.com/
+On Thu, 07 May 2026 15:16:00 -0500, Rob Herring (Arm) wrote:
+> The unfortunately named 'phandle-array' property type is really a matrix
+> with phandle and fixed arg cells entries. A matrix property should have 2
+> levels of items constraints.
+> 
+> Acked-by: Mark Brown <broonie@kernel.org>
+> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
+> v2:
+>  - Add proper descriptions for 'qcom,smem-states'. Thanks Krzysztof!
+>  - Fix i2c-parent warning
+>  - Fix extra blank lines
+> ---
+>  .../rockchip/rockchip,rk3399-cdn-dp.yaml       |  2 ++
+>  .../bindings/i2c/i2c-demux-pinctrl.yaml        |  1 +
+>  .../mmc/hisilicon,hi3798cv200-dw-mshc.yaml     |  7 ++++---
+>  .../devicetree/bindings/net/qcom,bam-dmux.yaml | 12 ++++++++++++
+>  .../devicetree/bindings/net/qcom,ipa.yaml      | 12 ++++++++++++
+>  .../bindings/net/wireless/qcom,ath10k.yaml     |  8 +++++++-
+>  .../bindings/net/wireless/qcom,ath11k.yaml     |  8 +++++++-
+>  .../net/wireless/qcom,ipq5332-wifi.yaml        | 18 ++++++++++++++++++
+>  .../bindings/pci/toshiba,tc9563.yaml           |  5 +++--
+>  .../remoteproc/qcom,msm8916-mss-pil.yaml       |  6 ++++++
+>  .../remoteproc/qcom,msm8996-mss-pil.yaml       |  7 +++++++
+>  .../bindings/remoteproc/qcom,pas-common.yaml   |  6 ++++++
+>  .../remoteproc/qcom,qcs404-cdsp-pil.yaml       |  6 ++++++
+>  .../remoteproc/qcom,sc7180-mss-pil.yaml        |  6 ++++++
+>  .../remoteproc/qcom,sc7280-adsp-pil.yaml       |  6 ++++++
+>  .../remoteproc/qcom,sc7280-mss-pil.yaml        |  6 ++++++
+>  .../remoteproc/qcom,sc7280-wpss-pil.yaml       |  6 ++++++
+>  .../remoteproc/qcom,sdm845-adsp-pil.yaml       |  6 ++++++
+>  .../bindings/remoteproc/qcom,wcnss-pil.yaml    |  6 ++++++
+>  .../devicetree/bindings/sound/samsung,tm2.yaml |  8 ++++++--
+>  .../bindings/spi/st,stm32mp25-ospi.yaml        |  5 +++--
+>  .../bindings/usb/chipidea,usb2-common.yaml     |  2 ++
+>  .../devicetree/bindings/usb/ci-hdrc-usb2.yaml  |  7 ++++---
+>  23 files changed, 142 insertions(+), 14 deletions(-)
+> 
 
-All warnings (new ones prefixed by >>):
+My bot found errors running 'make dt_binding_check' on your patch:
 
->> Warning: mm/mempolicy.c:2444 function parameter 'user_addr' not described in '__alloc_pages_mpol'
->> Warning: mm/mempolicy.c:2444 expecting prototype for alloc_pages_mpol(). Prototype was for __alloc_pages_mpol() instead
-   Warning: mm/mempolicy.c:2547 expecting prototype for vma_alloc_folio(). Prototype was for alloc_frozen_pages() instead
+yamllint warnings/errors:
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/i2c/i2c-demux-pinctrl.example.dtb: i2c-mux3 (i2c-demux-pinctrl): i2c-parent:0: [2, 3, 4] is too long
+	from schema $id: http://devicetree.org/schemas/i2c/i2c-demux-pinctrl.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/i2c/i2c-demux-pinctrl.example.dtb: i2c-mux3 (i2c-demux-pinctrl): i2c-parent: [[2, 3, 4]] is too short
+	from schema $id: http://devicetree.org/schemas/i2c/i2c-demux-pinctrl.yaml
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.kernel.org/project/devicetree/patch/20260507201749.2605365-1-robh@kernel.org
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
