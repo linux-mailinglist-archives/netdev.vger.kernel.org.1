@@ -1,362 +1,224 @@
-Return-Path: <netdev+bounces-285158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285160-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kCKPLJw2/GmUMwAAu9opvQ
-	(envelope-from <netdev+bounces-285158-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 08:52:12 +0200
+	id UGaUHso3/GmUMwAAu9opvQ
+	(envelope-from <netdev+bounces-285160-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 08:57:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 290524E3BBA
-	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 08:52:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9B1F4E3CA9
+	for <lists+netdev@lfdr.de>; Thu, 07 May 2026 08:57:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1030E301E7F9
-	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 06:52:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B70BA3029AC0
+	for <lists+netdev@lfdr.de>; Thu,  7 May 2026 06:55:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02901345CC9;
-	Thu,  7 May 2026 06:52:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 102EA33D4FA;
+	Thu,  7 May 2026 06:55:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=schleissheimer.onmicrosoft.com header.i=@schleissheimer.onmicrosoft.com header.b="GCJloFyn"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="a5FRYbvu"
 X-Original-To: netdev@vger.kernel.org
-Received: from FR6P281CU001.outbound.protection.outlook.com (mail-germanywestcentralazon11020102.outbound.protection.outlook.com [52.101.171.102])
+Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011047.outbound.protection.outlook.com [52.101.57.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B7929898B
-	for <netdev@vger.kernel.org>; Thu,  7 May 2026 06:52:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.171.102
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B0134104B;
+	Thu,  7 May 2026 06:55:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.47
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778136729; cv=fail; b=lqBGCNBqWvEm8/Im0qxFGcEYvqMyzRhBWY3r5c4dT/O3IYZ15n3E+sFVx3phYvN+UXGN8X2iuXVleWF2AczgaRgTOTN5baNk3uTwOIv4hcAN797s2fz1i63Tjuf4d9QSVFbOX0u23KK3XLEbSSAKDMUMYK2X+LzqBstDeXJdpnU=
+	t=1778136902; cv=fail; b=O7xgC4OECLq7qAuZXAJknt4sjOErm98nE+vWh2s2qvfpIulrdvw1dqhJ5qZis7hDtTQ1UGOmJQa3Vqsdiog0Va4cXNkcbgr5fKAkbk9mdCXiuBk7xKzsY3cE2suP6MnrZHejcvmPDjo63AFautJXM8WmxrvYHVI+xQLJcIStaoE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778136729; c=relaxed/simple;
-	bh=XNWSpF9q5nlFgAOJWv38DCAEiUAO6YblPaaquNc+jyw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=nuQzMUxMk38sX7o9zOu9O+5YDd19E5KJa07WtwvLzY8zRIijUxBMifrFYGf+0zy7cWb3erxEPwMQ1zyQU4In69gBGywD0GoznJNlrEEg+cAIFBpkc0/A0NmTe/Rz+4A+P64BgyU1GSY/Jtqb8tfVbgXpJCCqOzwaSTs1dJvVuhI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schleissheimer.de; spf=pass smtp.mailfrom=schleissheimer.de; dkim=pass (1024-bit key) header.d=schleissheimer.onmicrosoft.com header.i=@schleissheimer.onmicrosoft.com header.b=GCJloFyn; arc=fail smtp.client-ip=52.101.171.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schleissheimer.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=schleissheimer.de
+	s=arc-20240116; t=1778136902; c=relaxed/simple;
+	bh=WRZLf4BLH0w7STBzRSOfxkB9QvW53gQdpxap2mm+29c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Kb5I6FpLgPNVvTHhrCGudIf1D4Y+nz3RNVof2X28mKyRkNXG50b7YELngKR3Q4oBVJyIbIkQ8l2d8ot8WcKJs/wHOTve3rU2HBEfmj6HpkVnnvAYFk/ZRkUx6eFiG4eLzg1GFXwLzWeryoYt2I70e4DccC/kSOu8w8HAlSbykfc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=a5FRYbvu; arc=fail smtp.client-ip=52.101.57.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jlPF3T17peEM8A107snng2ewguSC62bgfVdEn/3eMTaYjGcWkE54xsvyi4UkkSgxHe/js9AyWT2KHtz+bfLFg2z7oAm8f9oQzy8pQs4NhklPLxescVhF3FxLHtz9NcrlVOwJk6OPHETr83R1tU6QqsIqVwKeTNYJddI7jTOG+5u7USNKoHZdvn+Rh0Ma63tkkRUZrJnTKsItAgBmMf4gUi0yIUZVVx/v/iVMVB/zMQaM0W/qakBY5+BEgThfAINkuWtNYSo+HAaQB34MUNtFsyvD8Pww/k3D9CtgngoqKWW2Fi4Q9yL2jWLpSTnCY5A5SnjP30NJshIJZqcmv/BNLw==
+ b=X1NGqUbdHfQtRaKSgRbGTE4EMd+pstymxDPuDDKy/1sSuAdDNgSCGvegiu70kxT0LZ9wWhYdAOLvcFyX6U/lbhfG2A7MhY5RLd4QCXiv/x7e4JCSJZxXTtGWFx3GOlFpZkjjXHcQDVufwuf+dadmbA863ABMMYe0dPdaDZnmdYBBfcThn/W4aBzdr1ZZj0/1gjdIVVt0XKhQtP7X79AomYWM9GpehHTPKXfDcsJq10Ig5ICiuTTJnI+GYq+YinOMr27UEgeLoY2EvfUomZpRpZKVXS1plHq390rItyJfGKePcIsLLmP3Ai73v7+EkS4QxHnnBQa5/uJ7XrblS4F6BA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Bx9+RXYNESx3nBQTPxbXgDED1v6vWAgNqbZ7aUriAw0=;
- b=nDlFYmnvE9Y02XgXRiwokVMX6OnuqnYAMiLF4rPWD2f1RwEHTv6HEVkBxFD2H+7F59WiHO2yyhrdpGZCMigMtjTOprZGOsiKCoK25heQPwgxNwR4CE6Qp1FG85rNfD2BS27ySWUNzb6rtPgVCRTrjqh9coXDtB9HMAOBjNIzh5Kb3nC8ZM+H61yuU6AeBfwDpZsPyLYWhP1WFHwVxNosfJ+zXeJ10TuDpOV7kTalD0AbwdLVP1S1ADQqcGGQ1HuEfXbt2Jg4Bcmhi4aKGnEIgpQ9+VA1jCvXafJuCZDDkKwRTspCfSoFjrPfrFkVqmUQFznZkid48BseSjNKvZoAVA==
+ bh=flpPY0ChfI3UoWYIspv8MaxGIljScFMnzNPU6ygroww=;
+ b=WMzvYaXOPbtez4aKMP26L67OIj8oHVncKurZMx1hdiC+VYsrVDvuevJxeQYliH2NaI/HS1G9D7VslVp2uFabENaumhfdFEN2GZ73XASbgZS6+LcP6fNqDeCkxDSXOCW1ND3v9UL0X2nHz5zl91K7xCzP96tPAW21onu9XGVn/Uviqs2ZwE7FgbH2Y5tA8k/RaR0KEBwf3z8TMEl5+YuEnUAb0GiuNTyYvPrVTQCqGxKqNMgpj3YpWtd+oX+BM8nQQmCZ2bDfuS3WYCNhZxN/MzIU9m78g+UH1701WckH12me3GBg3O0cLxo2VWHNOw9dxBi13gh75tzWHfum6XTy7w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=schleissheimer.de; dmarc=pass action=none
- header.from=schleissheimer.de; dkim=pass header.d=schleissheimer.de; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=schleissheimer.onmicrosoft.com; s=selector1-schleissheimer-onmicrosoft-com;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Bx9+RXYNESx3nBQTPxbXgDED1v6vWAgNqbZ7aUriAw0=;
- b=GCJloFynkhPDr/kWAAi2wCKwxYg0GzplVm5O82WjGdv55s3XwBswudcu1F/RwUZlWWHPDm1MDxXIUZHoJVII/dakBV85m3mbudCrUGydxfdcQkjCWdaqS5aRckchzcIQdxszp1FjpH735D2HaH7D7uqzVNeWGVRcf7UBEMM5LxY=
-Received: from BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM (2603:10a6:b10:52::10)
- by FR4P281MB4956.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:193::16) with
+ bh=flpPY0ChfI3UoWYIspv8MaxGIljScFMnzNPU6ygroww=;
+ b=a5FRYbvupO2dxk1NRGbXOqcK8VuaIH/ObeGznlqND7Ja6duVms0uEe823vAVqpb18Yai/o7jRyGUJziM7zuHAAY0LvIoQGl2DnZxYBr1oBlq8Myur2IiSB0VTaJzWMHTdrsuq6prURiM8dKzi6LF8ZZpBycqt9TagBNh9T8zodVFDG3VHNxCXwTLUDaoCw24Ba8lpf5NqUQtZ7ybfTiZyV3ZJvpBeAIWjDLUi4GWdrXICbm9HQGLGHjrULZFSnKIR5y3RQf7sEPkTDY8p5ZPPlbvcGgn6mrsMbW+20B1v1vRuN8HyORg0ZfgLXh74C4iEgjEku1/WqJSPtVmFDjtHQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS0PR12MB7900.namprd12.prod.outlook.com (2603:10b6:8:14e::10)
+ by MW3PR12MB4347.namprd12.prod.outlook.com (2603:10b6:303:2e::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.17; Thu, 7 May
- 2026 06:52:03 +0000
-Received: from BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM
- ([fe80::2bc1:32a6:153:c3e9]) by BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM
- ([fe80::2bc1:32a6:153:c3e9%4]) with mapi id 15.20.9891.016; Thu, 7 May 2026
- 06:52:03 +0000
-From: Sven Schuchmann <schuchmann@schleissheimer.de>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: AW: assert in phylink.c with lan7801 and dp83tc811 since kernel 6.18
-Thread-Topic: assert in phylink.c with lan7801 and dp83tc811 since kernel 6.18
-Thread-Index:
- AQHc3HSt2FaNRg+Hc0Clgdk/8rilD7X/aQMAgAEuzo+AAFoaAIAABvoAgAAD+ICAACpjCYAADeQAgADrfv4=
-Date: Thu, 7 May 2026 06:52:03 +0000
-Message-ID:
- <BEZP281MB2245BB0FC7DA18B285BD564CD93C2@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
-References:
- <BEZP281MB224533D524B27CFC6E47B447D93E2@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
- <57fb63c2-7a05-4bbe-ba2d-fc61ce1e3ba1@lunn.ch>
- <BEZP281MB22458F571CC8251C141D933CD93F2@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
- <7778cd41-cf36-4524-a347-408a8fb0bde0@lunn.ch>
- <f9b8840d-94ba-4bde-9ace-fb81eb733ff9@bootlin.com>
- <eba96f21-78e6-42bf-938a-6d4037d0a305@lunn.ch>
- <BEZP281MB22457317618130F28E84E3B4D93F2@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
- <24815161-68ff-4f3e-b0e1-286871b9686a@lunn.ch>
-In-Reply-To: <24815161-68ff-4f3e-b0e1-286871b9686a@lunn.ch>
-Accept-Language: de-DE, en-US
-Content-Language: de-DE
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=schleissheimer.de;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BEZP281MB2245:EE_|FR4P281MB4956:EE_
-x-ms-office365-filtering-correlation-id: 1f6b0b3c-0f3e-40a0-c919-08deac052524
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|1800799024|366016|18002099003|38070700021|56012099003|22082099003;
-x-microsoft-antispam-message-info:
- o60QFQuNC6IMN+QRbRBjz4ap5ok0OC5hdbzrclukPJZJmjM79iWDlRuJIAIEVeUkQqdhgqJHQtDdvIa85ppa9S2P3FWIq6GmWpJLg0xkwkp6qbG9W65nVm3tx2vVtkkMh7Av26Ql1x7bpckogoPGFvzKJdut6+IKdSpeooNqDbIMzohuDrbhRl+1cjG4r0R3ox76lnzDEo70C3TnMoTgEHA20tQITnnzjVAtHsIQxUobjP64zC72Lq7fs0ODvmt/o/duQ2oCK+3C6+SJft04S2AliOLK2LcDOomH8AaiAfeYByGy0XX+WGy/cGmNYmguwSBhQe9yU5O9t2tbGDJY6MAwI/lyjoJsJbXffCrCL4To8E2s2iq4i1yuKqT6K87R6/44YVxJ4n1Vg8A9vTHTmrlbCvCYV4AiOhs8n6zmmKuhdMM1+feF7FI3r3LecDjVTWYaduzpV8ABVyrtD8rmscjm47f0MvsUzlBkJhdcJJrY75akG9derdf8tOGd0SG9ASAj3ubEua/FYaq/OyXRxS0sBSU2fKI3OKRALA6K5R0DB5sgJGVDvq2Oc9gITMWZJPuQeCiUp3W5wJZ7EcYRKE0cBPerortwNpiplTEfjPyFJwpmk2eOownfYVDiFjjgJlfzB5hHGovM50PRLWwR+2D4Unsk/I9D7kzBBcVBb9TTc+GL6PreNYlMsGdTjSSjlcCYoaWKqIC4jx+FuFBkNw==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(18002099003)(38070700021)(56012099003)(22082099003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?gV0RTSj4Y5LfBCthzNPeh+u5JkLfSxWS/gu5jXEUpaJWBIHTwAlN9VeAE+?=
- =?iso-8859-1?Q?4vjpBcqgKu2RhzkCESQlDXK9IIcoYQlF2s+JbblW6yFJfTBf2qfHy2fAlE?=
- =?iso-8859-1?Q?jBy0QfNnZqvwUutSVTAL/0CglnzrAdh4woMtyhLReQUvppEERQ3Pp/dX2Z?=
- =?iso-8859-1?Q?L5IYUR6pCJOPcKNdPQVnMAGFP+nvArmPZNC91Wa0LH0X3Xq4lCzjMYZKCQ?=
- =?iso-8859-1?Q?/2MZtxUpB59R7i1+0WAyZjTPVAFNzFDpO7Kv2F+TdHruFJZvEXsvb6KxMt?=
- =?iso-8859-1?Q?GCFBlKzq13xSO+aqX/AJqD0yUGWJpbtdGD8oGcMqQG8Ve0gHdaPMR6bGNI?=
- =?iso-8859-1?Q?3xg/XyhFbxRaN8xNOAbFcqF7lUTPo46rmHTbWBaWdDgxSwRCKeic618cE1?=
- =?iso-8859-1?Q?SpvlnO7bRH0xABDSVF4xwVRfugGhY8KL8UGkwSUn2/ZBtRdw1YLGP1AJJX?=
- =?iso-8859-1?Q?Ncm+5XFXpsc9jh1HNArtYqYDhajktCdsD6gWnpuiM+Po9ma75EfkUryoNw?=
- =?iso-8859-1?Q?zKF6wbCrbpz42/H3QhhbAQNPm0H4POBB0C9Z7bOEuPupUG3C9/HVtHA3pn?=
- =?iso-8859-1?Q?abIfrDXR7JtSL3GUIvNt/9WOG35JLofA4oAvjwmdJZ19RxBvgQaO1ZWyEv?=
- =?iso-8859-1?Q?AgaalD6bIJkdyZzpTH84jOQkEQ7xGkFwbXbS+s7eurWMVOenZD8IRqVTJZ?=
- =?iso-8859-1?Q?Ur7giZQoKwaCUXALW0NhSaBG0AvSb9Gqv8W25zA6p1M8XI2HYd7F4QFqKW?=
- =?iso-8859-1?Q?lEtG8pyWuw5FORhub6pKyzqQy7YzMrNvY3G8i/oUV/V+ghF8FmFaxdyuQy?=
- =?iso-8859-1?Q?Ibx6liVmHrM1RP/IPNIlwuxm7ry6P9kQsUH1blhN7UHFvCGdcNVes0hcOO?=
- =?iso-8859-1?Q?6wgLbqNWd9hgXKM0K+AoKm0VMdhcvpJD53tfx2fg+sb9eZOD3kzEVbFy/0?=
- =?iso-8859-1?Q?vHNSyI3sqLMBE6RxbucOvaEpD0pzOmd3yQwCA0nzPluEwYv+4VAJOp/R1z?=
- =?iso-8859-1?Q?nDXK8h2U34UzPHcTZBmJABjUBAimTGmI0U1PqVIPadRL2L+xMlWxOzOUoL?=
- =?iso-8859-1?Q?/ArAmkgJZt9HBSlJsmpgyZ+/cIDFvZ0OMsnmTqLhw7HI0ye4IfFAWAuyPH?=
- =?iso-8859-1?Q?NeD8hc+sFlKSOxos+a+P2qsOHGCa9w+8iM7VfFe5CExAqaARy4/wYIGDst?=
- =?iso-8859-1?Q?iBEvszAcLJASWf+xKMKpb1ExLuCobyZkBPT6VM0s0qNHkfd0Z6+X8kZNaA?=
- =?iso-8859-1?Q?BMj8FRtFBQszVOvawweHSImQhtZ/MpQPdmOY/oMRo/CuhHQ+TCuWBSAvPz?=
- =?iso-8859-1?Q?8AyOKIYRyYE8K/TY86lEHdQOgQIT8i0x3dnoIEeN05pBrFS3lylxgekVAw?=
- =?iso-8859-1?Q?GwBYlG9TzaszMa6Ow+OO/Ai3EpJfbS/lPfeIMEw4FI3Fv7RY+nObf3TtZr?=
- =?iso-8859-1?Q?evOkO9mqxcqC1kUhJ0K6z0uaWDZeRfIHFqm+9tvjNgBHuHf7BA1y3A3dMQ?=
- =?iso-8859-1?Q?k3KwDUTYVBPbdmcd7LfJbL4H5C6kC4tq561Jc3UChxS4WlqL0kCxr9b/70?=
- =?iso-8859-1?Q?obrT9OVwOTiN43rnymCBneuJzSwH55lCdtBGUMPgXfseQiP4BAhDEe4Af8?=
- =?iso-8859-1?Q?E/ppqUVdUC/XIhloJ+mEFsrg2s3dgy+g6Hpvvj8Hy4MgiTPyS7lM8o2PrQ?=
- =?iso-8859-1?Q?mTCHBriZbu+F233b0nD+m9QLI5Mrp3xAsLp02XZEIDPPyriDw9h+PoI8hx?=
- =?iso-8859-1?Q?7ZXLtDZ8c0PX9KpQejhPpk0puba/fGsC5+Cg+LLWyK57YyzkJ9OhfhMPy9?=
- =?iso-8859-1?Q?6yudBaUtkQ=3D=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.15; Thu, 7 May
+ 2026 06:54:57 +0000
+Received: from DS0PR12MB7900.namprd12.prod.outlook.com
+ ([fe80::3033:67fc:3646:c62f]) by DS0PR12MB7900.namprd12.prod.outlook.com
+ ([fe80::3033:67fc:3646:c62f%5]) with mapi id 15.20.9891.016; Thu, 7 May 2026
+ 06:54:57 +0000
+Date: Thu, 7 May 2026 09:54:03 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Danielle Ratson <danieller@nvidia.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"donald.hunter@gmail.com" <donald.hunter@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"razor@blackwall.org" <razor@blackwall.org>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"shuah@kernel.org" <shuah@kernel.org>,
+	"ast@fiberby.net" <ast@fiberby.net>,
+	"liuhangbin@gmail.com" <liuhangbin@gmail.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	Andy Roulin <aroulin@nvidia.com>,
+	"fmaurer@redhat.com" <fmaurer@redhat.com>,
+	"sdf.kernel@gmail.com" <sdf.kernel@gmail.com>,
+	"sd@queasysnail.net" <sd@queasysnail.net>,
+	"kees@kernel.org" <kees@kernel.org>,
+	"nickgarlis@gmail.com" <nickgarlis@gmail.com>,
+	"amorenoz@redhat.com" <amorenoz@redhat.com>,
+	"alasdair@mcwilliam.dev" <alasdair@mcwilliam.dev>,
+	"johannes.wiesboeck@aisec.fraunhofer.de" <johannes.wiesboeck@aisec.fraunhofer.de>,
+	Petr Machata <petrm@nvidia.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"bridge@lists.linux.dev" <bridge@lists.linux.dev>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH net-next 1/6] bridge: uapi: Add neigh_forward_grat
+ netlink attributes
+Message-ID: <20260507065403.GA815358@shredder>
+References: <20260503073532.2138165-1-danieller@nvidia.com>
+ <20260503073532.2138165-2-danieller@nvidia.com>
+ <20260505190044.0608dfb1@kernel.org>
+ <20260506070334.GA617302@shredder>
+ <DM6PR12MB45167562767CFC70DA9AE8D0D83F2@DM6PR12MB4516.namprd12.prod.outlook.com>
+ <20260506150556.4e540854@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260506150556.4e540854@kernel.org>
+X-ClientProxiedBy: FR2P281CA0005.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a::15) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: schleissheimer.de
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB7900:EE_|MW3PR12MB4347:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8abc5bd5-8e1d-42a0-40d6-08deac05848b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|1800799024|366016|22082099003|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	SPoeygqzgmp2jUqzpsXTDKGXnCpDi1kfZQwqn8E9H+XiJsUqv7VN7WI/KpiLvfo0dttBDdYnthZ+vadW1W0IFZ7WVsojocvEvc+C2MvkjJn0k69mlzo5Y+Qfwe3Y9T6NMJ9kKVm6ULhO8kAZvrFwmpP0Iq4kh/abMmBCVPFw5nG/Gez+UJw7gZngAiNozVNVSif5Xn6rrmWre1yf9XFVFMD6EoDZdlTO2hLpcCtTsTJu8Z68W0tKJQiL49M61PQdbZp0hwI2dCivT6nRmlb9jrhtuYJ4yCH47HAQm2PTDoD5srqFwbHSLg3uYlh9ueCOt48uh2dkECAtQj7Fwa2lI4a/Jgee4CJOy6WdO3wobnjP/RzqHQtJHHja48CadSZfHN/YzePqj6/YWcRq7ZrOOaRgj2sGLhFvVFrfxdSUle71ETgMR15r18CGqyz8n5HfKvUHL+5PJN8yiYfQR6QG/sTypMvYNeuk1xtRdR8qSZt1PZg7ol3RMFZmoDuN0/mfHMTOqqreWRJeJbLrihSmS+C0mlus+ngFXb0OYxLTesI1I/UhNRsupN7NTQPX5s5JW4K/jPXSfN7s3GeQbloxlxw9bdRP9Z5DKxodiYXBBDvc7AGEq2nmGYIuRTBFZ6L/wEE3sRUplx0r+syPYE9sZrfqjJfF9783kLgG7xBvA06ofB7hwkbEznzLpwRopbfm
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB7900.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?vBQ759M2iUAT9p2lOCQm+VjkUh3eZSjE+LNz9dHdRetTKFUnzv/HnBgCni9Z?=
+ =?us-ascii?Q?mtRB0zevxDdrIC50sqlc61I5OQi2q3wAZPj1giTaPuR3TL+z1tS40OZd9gJk?=
+ =?us-ascii?Q?m5BzAEwCqTI148HwZsClKf7Aj+zKzGPO3hbyylE/r7EsdX49QxXYOBGnNd/c?=
+ =?us-ascii?Q?gxDZIYdMdQV2HbK7WAWsz3nn2+RFcbPQou3BtdEeb+t1egmzXpUGA6HOc0YK?=
+ =?us-ascii?Q?iCPJeL2a+HLKsBI6V/MFgsbU6tf4ywpCtyoVQWe+gvdGzqqq7MMmrZTFTElN?=
+ =?us-ascii?Q?jA9MplOp3Ps1AwipsPe2qXqI2ePzT0gnUAU3EQ2L3pGYRwh9b2y+IVqdL2h3?=
+ =?us-ascii?Q?CpHj93T+3k3PVukRUlhZ8GzUUR/rtzt3E7z4K9iB2eXNRqRLIm8ve1Bk1jqw?=
+ =?us-ascii?Q?Ytg0DGE2c9Z1d61NveqoRj8DYt54fB1mqlZOBEMeg/aqdhhdnZScYr4cHDp/?=
+ =?us-ascii?Q?sY1hoZFTR6evnY0+NPgldIl8QLUHB44exSHoOK5wMhygDDpsLIgCHjywfNFK?=
+ =?us-ascii?Q?BgL9d+5vz9BJUzE7o5JMRojEXqz+jVS2eBR/ggAH8tkG//7RDDPnT+gnrddv?=
+ =?us-ascii?Q?FcEtUakE8a3jOSaoXQYjbS2D1KgysQ4l7Y7q3ofojh4CpVyLn9iNUm10PBeL?=
+ =?us-ascii?Q?uzZX0DgHQEqD767ZhklvWWXOaN6IStO9v2PwC3ZdghSxluQr5k3wNgDPdiL2?=
+ =?us-ascii?Q?PKFFnxVHuPH0+lLIdyX+UO/mLuzSb4VDNGn+lryokjhdGl6HrNj3g8vIqMvy?=
+ =?us-ascii?Q?Kh3ekTfGHK+Uhpg62grh1YvznoRL9zbPerHDVdOEZkNTGP+REq1rfr35kOR/?=
+ =?us-ascii?Q?eqz540Afv01KsFTLcsTItCiIeyfA2ofH3AwQHgbMvB2DH/G4ltoZzXNw+IxZ?=
+ =?us-ascii?Q?MpIasB41xwnz4U0AMDMXiYSZtzPs0pdPxMbbCxBPkmV/sbJpo76hMOPMmZtm?=
+ =?us-ascii?Q?Mo//ikAwCCh36qG7/Hg2ejSAX67m0RjLkQhbbZWA88QuKbzgQzoem2e90y5u?=
+ =?us-ascii?Q?h8M3AlDuuuqVj/WkkcG5Ptt6njGP+rM+mzdi3Uc77KOqX5+gh7uLhYmxXYP+?=
+ =?us-ascii?Q?FXoUin2kx4yIyN3VLwtk43hN3B6gM70uygBoJwFsbIpHJGwOxhQe5JWyaeu5?=
+ =?us-ascii?Q?h4tCqgvdKOd3K7GwPOAhfZvZTSV42550SGxj8vaDIAjXu0eAcKRdJwnsoo0S?=
+ =?us-ascii?Q?i5I38XfIbyXBomsrDugO9oVFWWx3XD6XhrLahz0z21S7OYIKl9uET4WB410U?=
+ =?us-ascii?Q?BNjC1I7eQFtTkfW8ssvZJsLFega0Sg20b4hmx1WRuk3xam1iIfMNJv9mcaIK?=
+ =?us-ascii?Q?iOHzVnM0Xnd2XDJHPKpjfdzfYcUZ24uPeGaHWvS2qQ6gKV651XLkysG0IYcr?=
+ =?us-ascii?Q?7NX1hJ9aiHvIO68H3TcGW/5QmPfVFO8bQ5WszZoM/v7IecPetOHJYgpUScA/?=
+ =?us-ascii?Q?fYNsVgCWxOn/bhuDPWpAWVEvoTJb5S+XYh9v2dHMDHnd/OhTVtSZiKf7VyMs?=
+ =?us-ascii?Q?F2yWdzh6VnK6kIFxwtGzXof745q3g6wI8E1lRO4IGv44FKexIpEk5lV6Zr/U?=
+ =?us-ascii?Q?Eirian4pD6UDo8i4DhzXS7bFikRANwr/cEq0YjTu0qOGn3lnL1lGJz9wvMFz?=
+ =?us-ascii?Q?IpeZ1uW6tl0PqzGWMk+3G74+hz6CgpwRQqGlNBoGp+7R4je9tHoj9ekNp/v9?=
+ =?us-ascii?Q?uV4UozcU45M1C9yBNwLMerKKva9LuHzDSW1ETYxHjlZWtTJ/?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8abc5bd5-8e1d-42a0-40d6-08deac05848b
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1f6b0b3c-0f3e-40a0-c919-08deac052524
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 May 2026 06:52:03.0403
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2026 06:54:57.4782
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: ba05321a-a007-44df-8805-c7e62d5887b5
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 384t2avI8daHW/JD4NMe6V6mixwlWEpAPqzhEQMk09t3gVQ6kJfGvPurrY0rmSw0jHjqghml6yUodGxes3MMGCyT56lcrlMp9VfI6NoN+Vc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: FR4P281MB4956
-X-Rspamd-Queue-Id: 290524E3BBA
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zyUkb1/cjjpUWWtxt06XjnH0EHJ5YH/uNImDr7XlK072dSYrGKtTqpxuml0DL4vm3Bfc1xnBouvNly7e+A1k2g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4347
+X-Rspamd-Queue-Id: C9B1F4E3CA9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.44 / 15.00];
+X-Spamd-Result: default: False [1.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_DKIM_ALLOW(-0.20)[schleissheimer.onmicrosoft.com:s=selector1-schleissheimer-onmicrosoft-com];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[schleissheimer.de : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285158-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	FREEMAIL_CC(0.00)[nvidia.com,vger.kernel.org,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,blackwall.org,lunn.ch,fiberby.net,iogearbox.net,queasysnail.net,mcwilliam.dev,aisec.fraunhofer.de,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-285160-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[schleissheimer.onmicrosoft.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[schuchmann@schleissheimer.de,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[3];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,Nvidia.com:dkim,sashiko.dev:url]
 X-Rspamd-Action: no action
 
-Hi Andew,=0A=
-=0A=
-thanks for the detailed explanation! Indeed adding  =0A=
-.get_features=A0=A0 =3D genphy_c45_pma_read_ext_abilities,=0A=
-to "dp83tc811.c" makes the network work again:=0A=
-=0A=
-[    2.253619] usb 1-1.3: new high-speed USB device number 3 using dwc2=0A=
-[    2.342774] usb 1-1.3: New USB device found, idVendor=3D0424, idProduct=
-=3D7801, bcdDevice=3D 3.00=0A=
-[    2.342810] usb 1-1.3: New USB device strings: Mfr=3D1, Product=3D2, Ser=
-ialNumber=3D3=0A=
-[    2.342820] usb 1-1.3: Product: LAN7801=0A=
-[    2.342828] usb 1-1.3: Manufacturer: Microchip=0A=
-[    2.342835] usb 1-1.3: SerialNumber: 00800F780100=0A=
-[    2.353766] lan78xx 1-1.3:1.0 (unnamed net_device) (uninitialized): defe=
-rred multicast write 0x00007ca0=0A=
-[    2.466961] systemd[1]: System time advanced to timestamp on /var/lib/sy=
-stemd/timesync/clock: Thu 2026-05-07 08:03:39 CEST=0A=
-[    2.500632] lan78xx 1-1.3:1.0 (unnamed net_device) (uninitialized): regi=
-stered mdiobus bus usb-001:003=0A=
-[    2.500675] lan78xx 1-1.3:1.0 (unnamed net_device) (uninitialized): int =
-urb period 64=0A=
-[    2.500877] lan78xx 1-1.3:1.0 (unnamed net_device) (uninitialized): phyd=
-ev->irq =3D 37=0A=
-[    2.511949] lan78xx 1-1.3:1.0 (unnamed net_device) (uninitialized): PHY =
-usb-001:003:00 doesn't supply possible interfaces=0A=
-[    2.511990] lan78xx 1-1.3:1.0 (unnamed net_device) (uninitialized): PHY =
-[usb-001:003:00] driver [TI DP83TC811] (irq=3D37)=0A=
-[    2.512005] lan78xx 1-1.3:1.0 (unnamed net_device) (uninitialized): phy:=
- rgmii-id setting supported 00000000,00000008,00000000,00006000 advertising=
- 00000000,00000008,00000000,00006000=0A=
-[...]=0A=
-[   10.336369] lan78xx 1-1.3:1.0 broadr1: configuring for phy/rgmii-id link=
- mode=0A=
-[   10.336397] lan78xx 1-1.3:1.0 broadr1: major config, requested phy/rgmii=
--id=0A=
-[   10.336422] lan78xx 1-1.3:1.0 broadr1: major config, active phy/none/rgm=
-ii-id=0A=
-[   10.336432] lan78xx 1-1.3:1.0 broadr1: phylink_mac_config: mode=3Dphy/rg=
-mii-id/none adv=3D00000000,00000000,00000000,00000000 pause=3D00=0A=
-[   10.337360] lan78xx 1-1.3:1.0 broadr1: PHY INTR: 0x00020000=0A=
-[   10.341302] lan78xx 1-1.3:1.0 broadr1: receive multicast hash filter=0A=
-[   10.341445] lan78xx 1-1.3:1.0 broadr1: receive multicast hash filter=0A=
-[   10.342409] lan78xx 1-1.3:1.0 broadr1: deferred multicast write 0x00007c=
-a2=0A=
-[   10.345161] lan78xx 1-1.3:1.0 broadr1: phy link up rgmii-id/100Mbps/Full=
-/none/off/nolpi=0A=
-[   10.347681] lan78xx 1-1.3:1.0 broadr1: start tx path=0A=
-[   10.348201] lan78xx 1-1.3:1.0 broadr1: start rx path=0A=
-[   10.348730] lan78xx 1-1.3:1.0 broadr1: Link is Up - 100Mbps/Full - flow =
-control off=0A=
-=0A=
-I think it is worth doing a patch on this also?=0A=
-I am not that experienced in sending kernel patches but I could try...=0A=
-=0A=
-Regards,=0A=
-=0A=
-    Sven=0A=
-=0A=
-=0A=
-________________________________________=0A=
-Von:=A0Andrew Lunn <andrew@lunn.ch>=0A=
-Gesendet:=A0Mittwoch, 06. Mai 2026 18:40=0A=
-An:=A0Sven Schuchmann <schuchmann@schleissheimer.de>=0A=
-Cc:=A0Maxime Chevallier <maxime.chevallier@bootlin.com>; netdev@vger.kernel=
-.org <netdev@vger.kernel.org>=0A=
-Betreff:=A0Re: assert in phylink.c with lan7801 and dp83tc811 since kernel =
-6.18=0A=
-=0A=
-=0A=
->=A0=A0=A0=A0=A0=A0=A0 phylink_dbg(pl, "phy: --3.4 supported=A0=A0=A0 0x%x\=
-n", supported);=0A=
-=0A=
-=0A=
-=0A=
-supported is a pointer, so you cannot get anything useful from=0A=
-=0A=
-printing its value.=0A=
-=0A=
-=0A=
-=0A=
-> [=A0=A0=A0 2.771616] lan78xx 1-1.4:1.0 (unnamed net_device) (uninitialize=
-d): validation of rgmii-id with support 00000000,00000000,00000000,00006280=
- and advertisement 00000000,00000000,00000000,00006280 failed: -EINVAL=0A=
-=0A=
-=A0=0A=
-=0A=
-> But I do not get what phylink_is_empty_linkmode() is doing...=0A=
-=0A=
-=0A=
-=0A=
-The supported value is a combination of a few things. It indicates if=0A=
-=0A=
-the PHY supports auto negotiation, pause, asym pause, if the link is=0A=
-=0A=
-using twisted pair, fibre etc. It also lists the speeds the PHY=0A=
-=0A=
-supports. There is a list here:=0A=
-=0A=
-=0A=
-=0A=
-https://elixir.bootlin.com/linux/v7.0.1/source/include/uapi/linux/ethtool.h=
-#L1963=0A=
-=0A=
-=0A=
-=0A=
-Decoding 00006280 we get:=0A=
-=0A=
-=0A=
-=0A=
-ETHTOOL_LINK_MODE_TP_BIT,=0A=
-=0A=
-ETHTOOL_LINK_MODE_MII_BIT,=0A=
-=0A=
-ETHTOOL_LINK_MODE_Pause_BIT,=0A=
-=0A=
-ETHTOOL_LINK_MODE_Asym_Pause_BIT=0A=
-=0A=
-=0A=
-=0A=
-So Maxime was correct, it is not listing any link speeds. From what i=0A=
-=0A=
-understand, it is a 100BaseT1? So you would expect to see:=0A=
-=0A=
-=0A=
-=0A=
-ETHTOOL_LINK_MODE_100baseT1_Full_BIT=0A=
-=0A=
-=0A=
-=0A=
-which is bit 67.=0A=
-=0A=
-=0A=
-=0A=
-phylib asks the PHY what it can do. For BaseT1 that would be=0A=
-=0A=
-genphy_c45_pma_baset1_read_abilities()=0A=
-=0A=
-=0A=
-=0A=
-https://elixir.bootlin.com/linux/v7.0.1/source/drivers/net/phy/phy-c45.c#L9=
-71=0A=
-=0A=
-=0A=
-=0A=
-either the PHY has the wrong value in its register, or the function is=0A=
-=0A=
-not getting called.=0A=
-=0A=
-=0A=
-=0A=
-The PHY is an dp83tc811?=0A=
-=0A=
-=0A=
-=0A=
-https://elixir.bootlin.com/linux/v7.0.1/source/drivers/net/phy/dp83tc811.c#=
-L387=0A=
-=0A=
-=0A=
-=0A=
-It does not set .get_features. However, dp83tg720.c does:=0A=
-=0A=
-=0A=
-=0A=
-https://elixir.bootlin.com/linux/v7.0.1/source/drivers/net/phy/dp83tg720.c#=
-L654=0A=
-=0A=
-=0A=
-=0A=
-So try adding:=0A=
-=0A=
-=0A=
-=0A=
-=A0=A0=A0=A0=A0=A0=A0 .get_features=A0=A0 =3D genphy_c45_pma_read_ext_abili=
-ties,=0A=
-=0A=
-=0A=
-=0A=
-=A0=A0=A0=A0=A0=A0=A0 Andrew=0A=
-=0A=
+On Wed, May 06, 2026 at 03:05:56PM -0700, Jakub Kicinski wrote:
+> > > Related: The AI also did not catch that the spec was missing (easy
+> > > to forget for rtnetlink). Do you think it's worth adding to
+> > > review-prompts?  
+> 
+> I assumed Sashiko missed this because it doesn't spent too much time on
+> the series as a whole right now (I was going to tweak that but looks
+> like Claude is having another meltdown, crazy inference latency,
+> patches backlogging for review..)
+> 
+> Are you saying that the review prompts-based test is also not catching
+> this even if you give it the range of commits that form the series?
+
+Yes. I noticed this during the STP mode review:
+
+https://lore.kernel.org/netdev/20260324200051.GA572287@shredder/
+
+Where the entire code changes are in a single patch.
+
+AI review of this patch:
+
+https://sashiko.dev/#/patchset/20260324184942.2828691-1-aroulin%40nvidia.com
+https://netdev-ai.bots.linux.dev/ai-review.html?id=d0cd7a7e-a803-45df-8121-555484a45315#patch-0
+
+We can try to add this to the review-prompts and see if it helps.
 
