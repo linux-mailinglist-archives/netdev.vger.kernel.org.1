@@ -1,962 +1,302 @@
-Return-Path: <netdev+bounces-285693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285694-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WJfBDSWT/WnWfgAAu9opvQ
-	(envelope-from <netdev+bounces-285693-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 09:39:17 +0200
+	id oKC/LC2T/WnWfgAAu9opvQ
+	(envelope-from <netdev+bounces-285694-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 09:39:25 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 864664F31EA
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 09:39:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 55F3F4F3208
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 09:39:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AEB77302E404
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 07:34:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C5CE1300F5C5
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 07:35:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC2F0366822;
-	Fri,  8 May 2026 07:34:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFA25347506;
+	Fri,  8 May 2026 07:35:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tVxevzIL"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="PsnmTDLV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7708837EFE8
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 07:34:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D50033D6F7;
+	Fri,  8 May 2026 07:35:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778225664; cv=none; b=hZ5PlgBZn8p9dCwQk4jEUHgAHCHeF6qpwRjkIuyImiPn0/+dZpBej9jDCgYbAjNstXgMV1Zjl2nRURQLUC3tQDIxDoOAS0zqI2LAFStFWvHOOQcGYZZq70xNjJJJYm2wY92kO6371LGd7SJKHmT6nCDoigHZ6LBRbcZrv9X4qZI=
+	t=1778225744; cv=none; b=JxiJplI9Oc5sRUPH/N7yHPqFWKSHIYFnipmFSyutOa4/Ew3aFrXE+v2MuHmL2U0kpB1ppGKj3YyR515Say9I7MRGE5H8MbOlYp4e1afDODgQRYPp8lKVrt2yGbfXG2YiUtSaCzCLywYtwHCeL/ZAIby4CL05+BYukDMvdxNsbqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778225664; c=relaxed/simple;
-	bh=6JWUdpjDi0oJ0SGa+Q120Pc/AWPGzHc8UtsrLrKTdDM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=r88Lhg2eSNxqiSf9gkCD2tNCg+wG0EDjAY8jxKrtSUnpStEIIVvdnxQJD6Q76RWy5BITBACRXxcpdAR1yff71dC1AXRbwUFKOgg83wvulcmHZu+qPchSIWuqSvexgo88wJrk3k+i3FnImrOzbKggLChyB16Vds/fX2VOZ/K704s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tVxevzIL; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c802545ae0eso1135038a12.2
-        for <netdev@vger.kernel.org>; Fri, 08 May 2026 00:34:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778225662; x=1778830462; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PhqXzB57R/DPsKqCyXkcshBdvwEgmUqbGIeTcGNj7EY=;
-        b=tVxevzIL1LgYyPvmxaiE+2f4Q3n1rRd5TheZHVkTpbwaYarbswO0mGTr+TbPGBSASe
-         jVrnUyDiT5p7E44T+aKjS9zExYRyyp8E/8AOVkc9yAenv3/1grRz9ylY7zoOOSim/CgT
-         y3GNO0oLreYH/+NYQ7xUdqYjJ8/PTxR3dIJmHGnAkTJE74W0DgB8hc4gX14c9FjGFggf
-         W2D075GzGhxbgFJFcFYsNB3pFmHHCDte1SYzlnTkZRznT6ubHkkybpLUWSmKJ6gQNrnU
-         FVU35Q+7zgAvBh2FvFidg3soiXcBHVS+PPKscTviXmE7WnXFHPd4ThYwpXscLLwUjajB
-         OEzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778225662; x=1778830462;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PhqXzB57R/DPsKqCyXkcshBdvwEgmUqbGIeTcGNj7EY=;
-        b=NzrOVBuZpDklk4uOPV466tRhXqdo3dRcQDPEpGgfhI/JJyYCCHWYXZO3o12mRLX49x
-         wtofrG8UgGlMyerUayCtfszocjT0eAH92jqrgXpmjcPr7D0mFI6larmDJznbz5x8yLpL
-         4eJsgutqYG2qv31HgbmwITIPV1AQ0nd5bykX2DOPix0DLGoCvYgF2pI6WhfAN9jF7ZJa
-         Izr8EkEeQo+lspEOCRV6QB9NgFJaXaOZh8/CLEsZAu266i6sRVrnOJAFG+0HCITgZXAa
-         dOEc1wyuxBDDEMhJsGoypiz7uZyWUrDmqA/O6t4Zsx+OKYfiSN0GkcwV0mn6ey73dvhn
-         54Og==
-X-Forwarded-Encrypted: i=1; AFNElJ9A6lZXENt0H5FPE7B/tMUCndDwrMczhQHnaxFobSg08Rk/3S6YlOPPtYx9Oa3z5z3Dtmeto94=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaDKkSFSvo7FJN3ezdCrbY1AdQO0lybnuWI8lw/7bmQiUWjf7f
-	ZKwNV1cvrNOb7MaB8Uo+Sic7Unxne9Sg3YYxN97mPIVmwpK8EoVOx7RSx33VOhmXq5/SyklHH7L
-	eGHgMyw==
-X-Received: from pglc17.prod.google.com ([2002:a63:d11:0:b0:c82:2e7d:d13])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3d0e:b0:39e:fb99:d3ff
- with SMTP id adf61e73a8af0-3aa5ab83498mr13044483637.40.1778225661595; Fri, 08
- May 2026 00:34:21 -0700 (PDT)
-Date: Fri,  8 May 2026 07:33:29 +0000
-In-Reply-To: <20260508073355.3916746-1-kuniyu@google.com>
+	s=arc-20240116; t=1778225744; c=relaxed/simple;
+	bh=Nr8rY+OusPEEc01rSRBvclcJfaC8lKx9HLNVPlE8OpQ=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=M4DHAPxqIaAv4COphFoe9wrejQzt0dBRdMt/UywMHOMXs41+TNBEwpEwERPbdDuWOA2rlchVZM428o78++RLs0tiV2ONfHv+bAyJRPdulLVhqUrnJTF73YAYcFAnI+JBB5fBTEjWfdfVZHNyD26Nd7l/rPehqRGzDQWIe84LnM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=PsnmTDLV; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1778225743; x=1809761743;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=Nr8rY+OusPEEc01rSRBvclcJfaC8lKx9HLNVPlE8OpQ=;
+  b=PsnmTDLV4ufuOz6xoVogV74eBX0nT1WL94D/xGkXeZ98rbQVK/5U8izV
+   /hHcm3tUPeXtPnl8EAI5+rgFMP3AYmxvpAZOIrH6XFkD6dCeSe5zTfMPC
+   sLljmrhLn8Jh2Pc5cePPnZaT+Fs/G11GGSktdBL/r94SvsdiNe21yWNFc
+   01mb88iu75jYE/+EWXt7wVMkPyeXLxgbOsMsjzOncmZ6KJpjBYBK7mpYq
+   QVVKNUjbVoHjWNwbprfJZx2iYk9NbskjDZvYc5GdbmZPWj6r4TeuuWGD6
+   pBmIsOUjiHG0XAYVFlPktBiTjk63ie6dwsdI/qiir7vw5yAops4D4qaWz
+   w==;
+X-CSE-ConnectionGUID: OcE2LR1aRmKGx/+1a3EleQ==
+X-CSE-MsgGUID: B2MiumihTcCdEbsB+kA4BQ==
+X-IronPort-AV: E=Sophos;i="6.23,223,1770620400"; 
+   d="scan'208";a="57615655"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 May 2026 00:35:42 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Fri, 8 May 2026 00:35:41 -0700
+Received: from DEN-DL-M70577.microsemi.net (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Fri, 8 May 2026 00:35:38 -0700
+From: Daniel Machon <daniel.machon@microchip.com>
+Subject: [PATCH net-next v4 00/13] net: lan966x: add support for PCIe FDMA
+Date: Fri, 8 May 2026 09:35:24 +0200
+Message-ID: <20260508-lan966x-pci-fdma-v4-0-14e0c89d8d63@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260508073355.3916746-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
-Message-ID: <20260508073355.3916746-9-kuniyu@google.com>
-Subject: [PATCH v1 bpf-next 8/8] selftest: bpf: Add test for BPF_SOCK_OPS_RCVLOWAT_CB.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Cc: Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Eric Dumazet <edumazet@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Tenzin Ukyab <ukyab@berkeley.edu>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 864664F31EA
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIADyS/WkC/23NTQ6CMBAF4KuYrq0Z+ie48h7GRWmnMokUUgjBE
+ O5ugwsTZfny5n2zsAET4cAuh4UlnGigLuagjgfmGhsfyMnnzAQIA7KQ/GljZczMe0c8+NbySqF
+ XpfZCBsvyrE8YaN7IG4s48ojzyO65aWgYu/Tafk3F1n9YAf/sVHDgGLRydVWDU/W1JZc611B/c
+ l27gZP4IkqUO4jIiJfojEEw+W4PkV9Eg9pBZEasNkGfFfjyDL/Iuq5vgCht3UgBAAA=
+X-Change-ID: 20260313-lan966x-pci-fdma-94ed485d23fa
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>, Steen Hegelund
+	<steen.hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	"Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
+	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, Herve
+ Codina <herve.codina@bootlin.com>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Mohsin Bashir
+	<mohsin.bashr@gmail.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<bpf@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+X-Mailer: b4 0.14.3
+X-Rspamd-Queue-Id: 55F3F4F3208
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-285694-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285693-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,iogearbox.net,gmail.com,fomichev.me,bootlin.com,arndb.de,linuxfoundation.org];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[linux.dev,gmail.com,fomichev.me,google.com,berkeley.edu,vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel.machon@microchip.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-The test is roughly divided into two stages, and the sequence
-is as follows:
+When lan966x operates as a PCIe endpoint, the driver currently uses
+register-based I/O for frame injection and extraction. This approach is
+functional but slow, topping out at around 33 Mbps on an Intel x86 host
+with a lan966x PCIe card.
 
-  I) Setup
+This series adds FDMA (Frame DMA) support for the PCIe path. When
+operating as a PCIe endpoint, the internal FDMA engine on lan966x cannot
+directly access host memory, so DMA buffers are allocated as contiguous
+coherent memory and mapped through the PCIe Address Translation Unit
+(ATU). The ATU provides outbound windows that translate internal FDMA
+addresses to PCIe bus addresses, allowing the FDMA engine to read and
+write host memory. Because the ATU requires contiguous address regions,
+page_pool and normal per-page DMA mappings cannot be used. Instead,
+frames are transferred using memcpy between the ATU-mapped buffers and
+the network stack. With this, throughput increases from ~33 Mbps to
+~620 Mbps for default MTU.
 
-    1. Attach two BPF programs to a cgroup
-    2. Establish a TCP connection (@client <-> @child) within the cgroup
-    3. Enable BPF_SOCK_OPS_RCVLOWAT_CB on @child
+Patch 1 adds the shared drivers/net/ethernet/microchip/fdma/ directory
+to the Sparx5 SoC MAINTAINERS entry.
 
- II) RPC frame exchange in various patterns
+Patches 2-3 prepare the shared FDMA library: patch 2 renames the
+contiguous dataptr helpers for clarity, and patch 3 adds PCIe ATU
+region management and coherent DMA allocation with ATU mapping.
 
-    4. Send a partial RPC descriptor from @client to @child
-    5. Verify that epoll does NOT wake up @child
-    6. Send the remaining data of the RPC frame
-    7. Verify that epoll finally wakes up @child
+Patches 4-6 refactor the lan966x FDMA code to support both platform
+and PCIe paths: extracting the LLP register write into a helper,
+exporting shared functions, and introducing an ops dispatch table
+selected at probe time.
 
-During setup, two BPF programs are attached to simulate
-a real-world scenario; one is SOCK_OPS and the other is
-CGROUP_SOCKOPT.
+Patches 7-8 harden the existing FDMA path for the PCIe endpoint
+lifecycle: patch 7 clears latched FDMA error/interrupt stickies after
+the switch reset so they don't assert as soon as interrupts are
+enabled, and patch 8 adds a shutdown() callback that quiesces the
+FDMA engine on host warm reboot (on the PCIe card the FDMA survives
+host reset and would otherwise keep the shared INTx asserted into
+the next probe).
 
-While the SOCK_OPS prog handles the dynamic adjustment of
-sk->sk_rcvlowat, the CGROUP_SOCKOPT prog is used to enable
-BPF_SOCK_OPS_RCVLOWAT_CB via userspace setsockopt() using
-pseudo options:
+Patch 9 adds the core PCIe FDMA implementation with RX/TX using
+contiguous ATU-mapped buffers. Patches 10 and 11 extend it with MTU
+change and XDP support respectively. XDP_PASS, XDP_TX, XDP_DROP and
+XDP_ABORTED are supported; XDP_REDIRECT is deliberately not, because
+the PCIe data path does not use page_pool.
 
-  #define SOL_BPF               0xdeadbeef
-  #define BPF_TCP_AUTOLOWAT     0x8badf00d
+Patches 12-13 update the lan966x PCI device tree overlay to extend the
+cpu register mapping to cover the ATU register space and add the FDMA
+interrupt.
 
-  setsockopt(fd, SOL_BPF, BPF_TCP_AUTOLOWAT, &(int){1}, sizeof(int));
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+To: David S. Miller <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Steen Hegelund <steen.hegelund@microchip.com>
+To: UNGLinuxDriver@microchip.com
+To: Alexei Starovoitov <ast@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+To: John Fastabend <john.fastabend@gmail.com>
+To: Stanislav Fomichev <sdf@fomichev.me>
+To: Herve Codina <herve.codina@bootlin.com>
+To: Arnd Bergmann <arnd@arndb.de>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: bpf@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
 
-This reflects a common production use case where an application
-decides to start parsing RPC frames only at a certain point in
-the stream (e.g., after HTTP Upgrade), rather than immediately
-after TCP 3WHS (BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB, etc).
-
-When BPF_TCP_AUTOLOWAT is enabled, the BPF prog initialises
-sk_local_storage for two sequence numbers to manage its state.
-
-Then, for the RPC frame exchange, this test uses a simple format
-defined as follows
-
-  0        8       16      24       32
-  +--------+--------+-------+--------+ `.
-  |            header size           |  |
-  +--------+--------+-------+--------+   > RPC descriptor (8 bytes)
-  |            payload size          |  |
-  +--------+--------+-------+--------+ .'
-  ~               header             ~
-  +--------+--------+-------+--------+
-  ~               payload            ~
-  +--------+--------+-------+--------+
-
-Every time a new skb is enqueued to sk->sk_receive_queue,
-the SOCK_OPS prog parses it and updates these sequence numbers:
-
-  rpc_desc_seq : the SEQ # of the start of the RPC descriptor
-  rpc_end_seq  : the SEQ # of the end of the RPC frame
-                 => rpc_desc_seq + 8 + header size + payload size
-
-Assume we receive two RPC descriptors in the following pattern:
-
-  1. When we receive skb-1, only a part of RPC descriptor is parsed.
-     rpc_desc_seq is set to the first byte while rpc_end_seq is
-     unknown.  Thus, sk->sk_rcvlowat is set to the size of the RPC
-     descriptor (8 bytes).
-
-   <- skb-1 -> <---- skb-2 ----> <------ skb-3 ----->
-  +-----------+.................+....................+......
-  |  RPC desc 1  |  header + payload  |  RPC desc 2  | ...
-  +-----------+.................+....................+......
-  ^              ^-.
-  `- rpc_desc_seq   `- sk->sk_rcvlowat
-
-  2. Next, we receive skb-2, which completes the first RPC descriptor.
-     Now rpc_end_seq is known, so sk->sk_rcvlowat is advanced to it.
-
-   <- skb-1 -> <---- skb-2 ----> <------ skb-3 ----->
-  +-----------+-----------------+....................+......
-  |  RPC desc 1  |  header + payload  |  RPC desc 2  | ...
-  +-----------+-----------------+....................+......
-  ^                                   ^
-  '- rpc_desc_seq                     '- rpc_end_seq
-                                           & sk->sk_rcvlowat
-
-  3. Once we receive skb-3, which contains the next full RPC descriptor,
-     rpc_desc_seq is advanced and rpc_end_seq is updated according
-     to the size of RPC frame 2.
-
-     Note that sk->sk_rcvlowat is NOT updated to the new rpc_end_seq
-     yet.  This ensures that the application is woken up to read the
-     already complete RPC frame 1.
-
-   <- skb-1 -> <---- skb-2 ----> <------ skb-3 ----->
-  +-----------+-----------------+--------------------+......
-  |  RPC desc 1  |  header + payload  |  RPC desc 2  | ...   |
-  +-----------+-----------------+--------------------+......
-                                      ^                      ^
-              rpc_desc_seq -----------'  rpc_end_seq ----...-'
-                & sk->sk_rcvlowat
-
-This sequence corresponds to the 4th test case in rpc_test_cases[],
-and we can see helpful output if we "#define DEBUG":
-
-  # cat /sys/kernel/tracing/trace_pipe | \
-    awk '{ if ($0 ~ /AF_/) sub(/^.*AF_/, "AF_"); print $0 }' & \
-    BGPID=$!; ./test_progs -t tcp_autolowat; kill -9 -$BGPID
-  ...
-  AF_INET6 rpc_test_cases[3]: Start parsing skb: seq: 0, end_seq: 1, len: 1, rpc_desc_seq: 0, rpc_end_seq: 0, rpc_buff_len: 0
-  AF_INET6 rpc_test_cases[3]: Copied 1 bytes: rpc_desc_buff_len: 1
-  AF_INET6 rpc_test_cases[3]: Setting rcvlowat: tp->copied_seq: 0, rpc_desc_seq: 0, rpc_end_seq: 0, rpc_desc_buff_len: 1
-  AF_INET6 rpc_test_cases[3]: Set rcvlowat: expected: 8, actual: 8
-
-  AF_INET6 rpc_test_cases[3]: Start parsing skb: seq: 1, end_seq: 8, len: 7, rpc_desc_seq: 0, rpc_end_seq: 0, rpc_buff_len: 1
-  AF_INET6 rpc_test_cases[3]: Copied full descriptor: rpc_desc_seq: 0, rpc_end_seq: 258, header_len: 100, payload_len: 150
-  AF_INET6 rpc_test_cases[3]: No more descriptor: rpc_end_seq: 258, end_seq: 8
-  AF_INET6 rpc_test_cases[3]: Setting rcvlowat: tp->copied_seq: 0, rpc_desc_seq: 0, rpc_end_seq: 258, rpc_desc_buff_len: 8
-  AF_INET6 rpc_test_cases[3]: Set rcvlowat: expected: 258, actual: 258
-  ...
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
 ---
- tools/testing/selftests/bpf/bpf_kfuncs.h      |   4 +
- .../selftests/bpf/prog_tests/tcp_autolowat.c  | 350 ++++++++++++++++++
- .../selftests/bpf/progs/bpf_tracing_net.h     |   2 +
- .../selftests/bpf/progs/tcp_autolowat.c       | 316 ++++++++++++++++
- 4 files changed, 672 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/tcp_autolowat.c
- create mode 100644 tools/testing/selftests/bpf/progs/tcp_autolowat.c
+Changes in v4:
+- Consolidate rx size checks into lan966x_fdma_pci_rx_size_fits().
+  Subtract XDP_PACKET_HEADROOM on the max size check, and add ETH_HLEN
+  on the min size check. This fixes potential OOB reads/writes.
+- On xdp_prepare_buff(), update comment to clarify that data is already
+  offset by XDP_PACKET_HEADROOM.
+- Link to v3:
+  https://lore.kernel.org/r/20260504-lan966x-pci-fdma-v3-0-a56f5740d870@microchip.com
 
-diff --git a/tools/testing/selftests/bpf/bpf_kfuncs.h b/tools/testing/selftests/bpf/bpf_kfuncs.h
-index ae71e9b69051..fc4d6f68f247 100644
---- a/tools/testing/selftests/bpf/bpf_kfuncs.h
-+++ b/tools/testing/selftests/bpf/bpf_kfuncs.h
-@@ -64,6 +64,10 @@ struct bpf_tcp_req_attrs;
- extern int bpf_sk_assign_tcp_reqsk(struct __sk_buff *skb, struct sock *sk,
- 				   struct bpf_tcp_req_attrs *attrs, int attrs__sz) __ksym;
- 
-+struct bpf_sock_ops_kern;
-+extern int bpf_sock_ops_tcp_set_rcvlowat(struct bpf_sock_ops_kern *skops_kern,
-+					 int rcvlowat) __ksym;
-+
- void *bpf_cast_to_kern_ctx(void *) __ksym;
- 
- extern void *bpf_rdonly_cast(const void *obj, __u32 btf_id) __ksym __weak;
-diff --git a/tools/testing/selftests/bpf/prog_tests/tcp_autolowat.c b/tools/testing/selftests/bpf/prog_tests/tcp_autolowat.c
-new file mode 100644
-index 000000000000..5e971c42a32a
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/tcp_autolowat.c
-@@ -0,0 +1,350 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2026 Google LLC */
-+#include <sys/epoll.h>
-+
-+#include "test_progs.h"
-+#include "cgroup_helpers.h"
-+#include "network_helpers.h"
-+
-+#include "tcp_autolowat.skel.h"
-+
-+#define SOL_BPF			0xdeadbeef
-+#define BPF_TCP_AUTOLOWAT	0x8badf00d
-+
-+struct rpc_descriptor {
-+	u32 header_len;
-+	u32 payload_len;
-+};
-+
-+enum rpc_event_type {
-+	RPC_EVENT_END,
-+	RPC_EVENT_AUTOLOWAT,
-+	RPC_EVENT_SEND,
-+	RPC_EVENT_RECV,
-+	RPC_EVENT_EPOLL,
-+	RPC_EVENT_RCVLOWAT,
-+};
-+
-+struct rpc_event {
-+	enum rpc_event_type type;
-+	union {
-+		int len;
-+		int nfds;
-+		int val;
-+		int rcvlowat;
-+	};
-+};
-+
-+#define RPC_DESC_SIZE (sizeof(struct rpc_descriptor))
-+
-+struct rpc_test_case {
-+	char data[4096];
-+	struct rpc_descriptor desc[32];
-+	struct rpc_event event[32];
-+} rpc_test_cases[] = {
-+	{
-+		.desc = {
-+			{ .header_len = 100, .payload_len = 150 },
-+		},
-+		.event = {
-+			{ .type = RPC_EVENT_AUTOLOWAT,	.val = 1},
-+			/* Single full RPC message in skb. */
-+			{ .type = RPC_EVENT_SEND,	.len = RPC_DESC_SIZE + 100 + 150},
-+			{ .type = RPC_EVENT_RCVLOWAT,	.rcvlowat = RPC_DESC_SIZE + 100 + 150},
-+			{ .type = RPC_EVENT_EPOLL,	.nfds = 1},
-+		},
-+	},
-+	{
-+		.desc = {
-+			{.header_len = 100, .payload_len = 150},
-+			{.header_len = 100, .payload_len = 150},
-+			{.header_len = 100, .payload_len = 150},
-+		},
-+		.event = {
-+			{ .type = RPC_EVENT_AUTOLOWAT,	.val = 1},
-+			/* Two full RPC messages in skb. */
-+			{.type = RPC_EVENT_SEND,	.len = (RPC_DESC_SIZE + 100 + 150) * 2},
-+			{.type = RPC_EVENT_RCVLOWAT,	.rcvlowat = (RPC_DESC_SIZE + 100 + 150) * 2},
-+			{.type = RPC_EVENT_EPOLL,	.nfds = 1},
-+			/* Single full RPC message in skb. */
-+			{ .type = RPC_EVENT_SEND,	.len = RPC_DESC_SIZE + 100 + 150},
-+			{ .type = RPC_EVENT_RCVLOWAT,	.rcvlowat = (RPC_DESC_SIZE + 100 + 150) * 3},
-+			{ .type = RPC_EVENT_EPOLL,	.nfds = 1},
-+		},
-+	},
-+	{
-+		.desc = {
-+			{.header_len = 100, .payload_len = 150},
-+			{.header_len = 100, .payload_len = 150},
-+			{.header_len = 100, .payload_len = 150},
-+		},
-+		.event = {
-+			{ .type = RPC_EVENT_AUTOLOWAT,	.val = 1},
-+			/* Two full RPC messages in skb. */
-+			{.type = RPC_EVENT_SEND,	.len = (RPC_DESC_SIZE + 100 + 150) * 2},
-+			{.type = RPC_EVENT_RCVLOWAT,	.rcvlowat = (RPC_DESC_SIZE + 100 + 150) * 2},
-+			{.type = RPC_EVENT_EPOLL,	.nfds = 1},
-+			/* Single full RPC message in skb. */
-+			{ .type = RPC_EVENT_SEND,	.len = RPC_DESC_SIZE},
-+			{ .type = RPC_EVENT_RCVLOWAT,	.rcvlowat = (RPC_DESC_SIZE + 100 + 150) * 2},
-+			{ .type = RPC_EVENT_EPOLL,	.nfds = 1},
-+		},
-+	},
-+	{
-+		.desc = {
-+			{.header_len = 100, .payload_len = 150},
-+			{.header_len = 200, .payload_len = 500},
-+		},
-+		.event = {
-+			{ .type = RPC_EVENT_AUTOLOWAT,	.val = 1},
-+			/* The first descriptor is partial. */
-+			{.type = RPC_EVENT_SEND,	.len = 1},
-+			{.type = RPC_EVENT_EPOLL,	.nfds = 0},
-+			{.type = RPC_EVENT_RCVLOWAT,	.rcvlowat = RPC_DESC_SIZE},
-+			/* The first descriptor is available. */
-+			{.type = RPC_EVENT_SEND,	.len = RPC_DESC_SIZE - 1},
-+			{.type = RPC_EVENT_EPOLL,	.nfds = 0},
-+			{.type = RPC_EVENT_RCVLOWAT,	.rcvlowat = RPC_DESC_SIZE + 150 + 100},
-+			/* The first header is ready. */
-+			{.type = RPC_EVENT_SEND,	.len = 100},
-+			{.type = RPC_EVENT_EPOLL,	.nfds = 0},
-+			{.type = RPC_EVENT_RCVLOWAT,	.rcvlowat = RPC_DESC_SIZE + 150 + 100},
-+			/* skb has the first payload and 1 byte of the next descriptor. */
-+			{.type = RPC_EVENT_SEND,	.len = 150 + 1},
-+			{.type = RPC_EVENT_EPOLL,	.nfds = 1},
-+			{.type = RPC_EVENT_RCVLOWAT,	.rcvlowat = RPC_DESC_SIZE + 150 + 100},
-+			/* After reading the first RPC message, SO_RCVLOWAT should be RPC_DESC_SIZE. */
-+			{.type = RPC_EVENT_RECV,	.len = RPC_DESC_SIZE + 150 + 100},
-+			{.type = RPC_EVENT_EPOLL,	.nfds = 0},
-+			{.type = RPC_EVENT_RCVLOWAT,	.rcvlowat = RPC_DESC_SIZE},
-+			/* The second descriptor is available. */
-+			{.type = RPC_EVENT_SEND,	.len = RPC_DESC_SIZE - 1},
-+			{.type = RPC_EVENT_EPOLL,	.nfds = 0},
-+			{.type = RPC_EVENT_RCVLOWAT,	.rcvlowat = RPC_DESC_SIZE + 200 + 500},
-+		},
-+	},
-+};
-+
-+struct tcp_autolowat_test_cb {
-+	int saved_netns;
-+	union {
-+		int fd[4];
-+		struct {
-+			int server, client, child;
-+			int epoll;
-+		};
-+	};
-+};
-+
-+static void tcp_autolowat_teardown_cb(struct tcp_autolowat_test_cb *cb)
-+{
-+	int i, err;
-+
-+	for (i = 0; i < ARRAY_SIZE(cb->fd); i++) {
-+		if (cb->fd[i] != -1)
-+			close(cb->fd[i]);
-+	}
-+
-+	if (cb->saved_netns != -1) {
-+		err = setns(cb->saved_netns, CLONE_NEWNET);
-+		ASSERT_OK(err, "restore netns");
-+
-+		close(cb->saved_netns);
-+	}
-+}
-+
-+static int tcp_autolowat_setup_cb(struct tcp_autolowat_test_cb *cb, int family)
-+{
-+	struct epoll_event ev = {};
-+	int err;
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(cb->fd); i++)
-+		cb->fd[i] = -1;
-+
-+	cb->saved_netns = open("/proc/self/ns/net", O_RDONLY);
-+	if (!ASSERT_NEQ(cb->saved_netns, -1, "save netns"))
-+		goto err;
-+
-+	err = unshare(CLONE_NEWNET);
-+	if (!ASSERT_OK(err, "unshare"))
-+		goto err;
-+
-+	err = system("ip link set dev lo up");
-+	if (!ASSERT_OK(err, "set up lo"))
-+		goto err;
-+
-+	cb->server = start_server(family, SOCK_STREAM, NULL, 0, 0);
-+	if (!ASSERT_NEQ(cb->server, -1, "start_server"))
-+		goto err;
-+
-+	cb->client = connect_to_fd(cb->server, 0);
-+	if (!ASSERT_NEQ(cb->client, -1, "connect_to_fd"))
-+		goto err;
-+
-+	cb->child = accept(cb->server, NULL, NULL);
-+	if (!ASSERT_NEQ(cb->child, -1, "accept"))
-+		goto err;
-+
-+	cb->epoll = epoll_create1(0);
-+	if (!ASSERT_NEQ(cb->epoll, -1, "epoll_create"))
-+		goto err;
-+
-+	ev.events = EPOLLIN;
-+	ev.data.fd = cb->child;
-+
-+	err = epoll_ctl(cb->epoll, EPOLL_CTL_ADD, cb->child, &ev);
-+	if (!ASSERT_OK(err, "epoll_ctl"))
-+		goto err;
-+
-+	return 0;
-+
-+err:
-+	tcp_autolowat_teardown_cb(cb);
-+	return -1;
-+}
-+
-+static int tcp_autolowat_build_data(struct rpc_test_case *test_case)
-+{
-+	struct rpc_descriptor *desc = test_case->desc;
-+	char *ptr = test_case->data;
-+	int rpc_size;
-+
-+	memset(ptr, 0, sizeof(test_case->data));
-+
-+	while (desc->header_len + desc->payload_len) {
-+		rpc_size = sizeof(*desc) + desc->header_len + desc->payload_len;
-+
-+		if (!ASSERT_LE(ptr + rpc_size - test_case->data,
-+			       sizeof(test_case->data), "data overflow"))
-+			return 1;
-+
-+		memcpy(ptr, desc, sizeof(*desc));
-+		ptr += rpc_size;
-+		desc++;
-+	}
-+
-+	if (!ASSERT_GT(ptr - test_case->data, 0, "no data"))
-+		return 1;
-+
-+	return 0;
-+}
-+
-+static void tcp_autolowat_run_rpc_test(struct tcp_autolowat_test_cb *cb,
-+				       struct rpc_test_case *test_case)
-+{
-+	struct rpc_event *event = test_case->event;
-+	char *ptr = test_case->data;
-+	struct epoll_event ev;
-+	socklen_t optlen;
-+	int err, optval;
-+	char buf[4096];
-+
-+	if (tcp_autolowat_build_data(test_case))
-+		return;
-+
-+	while (1) {
-+		switch (event->type) {
-+		case RPC_EVENT_END:
-+			return;
-+		case RPC_EVENT_AUTOLOWAT:
-+			err = setsockopt(cb->child, SOL_BPF, BPF_TCP_AUTOLOWAT,
-+					 &event->val, sizeof(event->val));
-+			if (!ASSERT_OK(err, "setsockopt"))
-+				return;
-+			break;
-+		case RPC_EVENT_SEND:
-+			err = send(cb->client, ptr, event->len, 0);
-+			if (!ASSERT_EQ(err, event->len, "send"))
-+				return;
-+
-+			ptr += event->len;
-+			break;
-+		case RPC_EVENT_RECV:
-+			err = recv(cb->child, buf, event->len, 0);
-+			if (!ASSERT_EQ(err, event->len, "recv"))
-+				return;
-+			break;
-+		case RPC_EVENT_EPOLL:
-+			err = epoll_wait(cb->epoll, &ev, 1, 0);
-+			if (!ASSERT_EQ(err, event->nfds, "epoll_wait"))
-+				return;
-+			break;
-+		case RPC_EVENT_RCVLOWAT:
-+			optval = 0;
-+			optlen = sizeof(optval);
-+
-+			err = getsockopt(cb->child, SOL_SOCKET, SO_RCVLOWAT, &optval, &optlen);
-+			if (!ASSERT_OK(err, "getsockopt") ||
-+			    !ASSERT_EQ(optval, event->rcvlowat, "rcvlowat"))
-+				return;
-+			break;
-+		}
-+
-+		event++;
-+	}
-+}
-+
-+static void tcp_autolowat_run_rpc_tests(struct tcp_autolowat *skel, int family)
-+{
-+	struct tcp_autolowat_test_cb cb;
-+	int err;
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(rpc_test_cases); i++) {
-+		memset(skel->bss->test_name, 0, sizeof(skel->bss->test_name));
-+
-+		snprintf(skel->bss->test_name, sizeof(skel->bss->test_name),
-+			 "AF_INET%c rpc_test_cases[%d]",
-+			 family == AF_INET ? ' ' : '6', i);
-+
-+		if (!test__start_subtest(skel->bss->test_name))
-+			continue;
-+
-+		err = tcp_autolowat_setup_cb(&cb, family);
-+		if (err)
-+			continue;
-+
-+		tcp_autolowat_run_rpc_test(&cb, &rpc_test_cases[i]);
-+		tcp_autolowat_teardown_cb(&cb);
-+	}
-+}
-+
-+static void tcp_autolowat_run_tests(struct tcp_autolowat *skel)
-+{
-+	tcp_autolowat_run_rpc_tests(skel, AF_INET);
-+	tcp_autolowat_run_rpc_tests(skel, AF_INET6);
-+}
-+
-+void test_tcp_autolowat(void)
-+{
-+	struct tcp_autolowat *skel;
-+	struct bpf_link *link[2];
-+	int cgroup;
-+
-+	skel = tcp_autolowat__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open_and_load"))
-+		return;
-+
-+	cgroup = test__join_cgroup("/tcp_autolowat");
-+	if (!ASSERT_GE(cgroup, 0, "join_cgroup"))
-+		goto destroy_skel;
-+
-+	link[0] = bpf_program__attach_cgroup(skel->progs.tcp_autolowat, cgroup);
-+	if (!ASSERT_OK_PTR(link[0], "attach_cgroup(SOCK_OPS)"))
-+		goto close_cgroup;
-+
-+	link[1] = bpf_program__attach_cgroup(skel->progs.tcp_autolowat_setsockopt, cgroup);
-+	if (!ASSERT_OK_PTR(link[1], "attach_cgroup(SETSOCKOPT)"))
-+		goto destroy_sockops;
-+
-+	tcp_autolowat_run_tests(skel);
-+
-+	bpf_link__destroy(link[1]);
-+destroy_sockops:
-+	bpf_link__destroy(link[0]);
-+close_cgroup:
-+	close(cgroup);
-+destroy_skel:
-+	tcp_autolowat__destroy(skel);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/bpf_tracing_net.h b/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-index d8dacef37c16..bdf28d320383 100644
---- a/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-+++ b/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-@@ -74,6 +74,8 @@
- 
- #define NEXTHDR_TCP		6
- 
-+#define TCPHDR_FIN		0x01
-+
- #define TCPOPT_NOP		1
- #define TCPOPT_EOL		0
- #define TCPOPT_MSS		2
-diff --git a/tools/testing/selftests/bpf/progs/tcp_autolowat.c b/tools/testing/selftests/bpf/progs/tcp_autolowat.c
-new file mode 100644
-index 000000000000..86f2af2fe683
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/tcp_autolowat.c
-@@ -0,0 +1,316 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2026 Google LLC */
-+#include "vmlinux.h"
-+
-+#include <string.h>
-+#include <limits.h>
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_core_read.h>
-+
-+#include "bpf_tracing_net.h"
-+
-+#define SOL_BPF			0xdeadbeef
-+#define BPF_TCP_AUTOLOWAT	0x8badf00d
-+
-+//#define DEBUG /* For verbose output. */
-+
-+struct rpc_descriptor {
-+	u32 header_len;
-+	u32 payload_len;
-+};
-+
-+#define RPC_DESC_SIZE		(sizeof(struct rpc_descriptor))
-+#define MAX_RPC_DESC_PER_SKB	100
-+
-+struct tcp_autolowat_cb {
-+	/* Don't put this field at the end; BPF verifier complains. */
-+	char rpc_desc_buf[RPC_DESC_SIZE];
-+	u32 rpc_desc_seq;
-+	u32 rpc_end_seq;
-+#ifdef DEBUG
-+	u32 isn;
-+#endif
-+	u8 rpc_desc_buff_len;
-+};
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_SK_STORAGE);
-+	__uint(map_flags, BPF_F_NO_PREALLOC);
-+	__type(key, int);
-+	__type(value, struct tcp_autolowat_cb);
-+} tcp_autolowat_map SEC(".maps");
-+
-+char test_name[64];
-+
-+#ifdef DEBUG
-+#define LOG(str, ...)							\
-+	bpf_printk("%s: " str, test_name, ##__VA_ARGS__)
-+#else
-+#define LOG(...)
-+#endif
-+
-+#define SEQ(val)				\
-+	(val - cb->isn)
-+#define TP_SEQ(field)				\
-+	(tp->field - cb->isn)
-+#define CB_SEQ(field)				\
-+	(cb->field - cb->isn)
-+
-+static int tcp_parse_descriptor(struct bpf_sock_ops *skops,
-+				struct tcp_autolowat_cb *cb,
-+				u32 seq, u32 end_seq)
-+{
-+	struct rpc_descriptor *rpc_desc;
-+	u32 rpc_copied_seq;
-+	u32 copy_len;
-+	u64 rpc_len;
-+	int err;
-+
-+	rpc_copied_seq = cb->rpc_desc_seq + cb->rpc_desc_buff_len;
-+
-+	if (before(cb->rpc_desc_seq + RPC_DESC_SIZE, end_seq))
-+		copy_len = RPC_DESC_SIZE - cb->rpc_desc_buff_len;
-+	else
-+		copy_len = end_seq - rpc_copied_seq;
-+
-+	/* Since LLVM commit 324e27e8bad83ca23a3cd276d7e2e729b1b0b8c7,
-+	 * clang omits the "copy_len == 0" check below, which is necessary
-+	 * to satisfy the BPF verifier's range check for bpf_skb_load_bytes().
-+	 */
-+	barrier_var(copy_len);
-+
-+	if (copy_len == 0)
-+		goto disable; /* FIN. */
-+	if (copy_len > RPC_DESC_SIZE)
-+		goto disable; /* always false, only for verifier. */
-+	if (cb->rpc_desc_buf + cb->rpc_desc_buff_len >= &cb->rpc_desc_buf[RPC_DESC_SIZE])
-+		goto disable; /* always false, only for verifier. */
-+
-+	err = bpf_skb_load_bytes(skops, rpc_copied_seq - seq,
-+				 cb->rpc_desc_buf + cb->rpc_desc_buff_len, copy_len);
-+	if (err)
-+		goto disable;
-+
-+	cb->rpc_desc_buff_len += copy_len;
-+
-+	if (cb->rpc_desc_buff_len != RPC_DESC_SIZE) {
-+		LOG("Copied %d bytes: rpc_desc_buff_len: %u", copy_len, cb->rpc_desc_buff_len);
-+		goto partial;
-+	}
-+
-+	rpc_desc = (struct rpc_descriptor *)cb->rpc_desc_buf;
-+	rpc_len = RPC_DESC_SIZE + rpc_desc->header_len + rpc_desc->payload_len;
-+
-+	if (rpc_len > INT_MAX)
-+		goto disable;
-+
-+	cb->rpc_end_seq = cb->rpc_desc_seq + rpc_len;
-+
-+	LOG("Copied full descriptor: rpc_desc_seq: %u, rpc_end_seq: %u,"
-+	    " header_len: %u, payload_len: %u",
-+	    CB_SEQ(rpc_desc_seq), CB_SEQ(rpc_end_seq),
-+	    rpc_desc->header_len, rpc_desc->payload_len);
-+
-+	return 0;
-+disable:
-+	return -1;
-+partial:
-+	return 1;
-+}
-+
-+static void tcp_set_autolowat(struct bpf_sock_ops_kern *skops_kern,
-+			      struct tcp_autolowat_cb *cb,
-+			      struct tcp_sock *tp)
-+{
-+	/* To handle wraparound. */
-+	u32 val = 0;
-+
-+	LOG("Setting rcvlowat: tp->copied_seq: %u, rpc_desc_seq: %u, rpc_end_seq: %u, rpc_desc_buff_len: %u",
-+	    TP_SEQ(copied_seq), CB_SEQ(rpc_desc_seq), CB_SEQ(rpc_end_seq), cb->rpc_desc_buff_len);
-+
-+	if (before(tp->copied_seq, cb->rpc_desc_seq))
-+		val = cb->rpc_desc_seq - tp->copied_seq;
-+	else if (cb->rpc_desc_buff_len != RPC_DESC_SIZE)
-+		val = RPC_DESC_SIZE;
-+	else
-+		val = cb->rpc_end_seq - tp->copied_seq;
-+
-+	if (val != tp->inet_conn.icsk_inet.sk.sk_rcvlowat) {
-+		bpf_sock_ops_tcp_set_rcvlowat(skops_kern, val);
-+
-+		LOG("Set rcvlowat: expected: %u, actual: %d\n",
-+		    val, tp->inet_conn.icsk_inet.sk.sk_rcvlowat);
-+	} else {
-+		LOG("No need to set rcvlowat: %u\n", val);
-+	}
-+}
-+
-+static void tcp_disable_autolowat(struct bpf_sock_ops *skops,
-+				  struct bpf_sock_ops_kern *skops_kern)
-+{
-+	int flags;
-+
-+	flags = skops->bpf_sock_ops_cb_flags & ~BPF_SOCK_OPS_RCVLOWAT_CB_FLAG;
-+	bpf_sock_ops_cb_flags_set(skops, flags);
-+
-+	bpf_sock_ops_tcp_set_rcvlowat(skops_kern, 1);
-+
-+	LOG("Disabled autolowat");
-+}
-+
-+static void tcp_do_autolowat(struct bpf_sock_ops *skops,
-+			     struct tcp_autolowat_cb *cb,
-+			     struct tcp_sock *tp)
-+{
-+	struct bpf_sock_ops_kern *skops_kern;
-+	struct tcp_skb_cb *tcb;
-+	struct sk_buff *skb;
-+	u32 seq, end_seq;
-+	int ret = 0, i;
-+
-+	skops_kern = bpf_cast_to_kern_ctx(skops);
-+	skb = skops_kern->skb;
-+
-+	if (!skb)
-+		goto update;
-+
-+	tcb = bpf_core_cast(skb->cb, struct tcp_skb_cb);
-+	seq = tcb->seq;
-+	end_seq = tcb->end_seq - !!(tcb->tcp_flags & TCPHDR_FIN);
-+
-+	LOG("Start parsing skb: seq: %u, end_seq: %u, len: %u, "
-+	    "rpc_desc_seq: %u, rpc_end_seq: %u, rpc_buff_len: %u",
-+	    SEQ(seq), SEQ(end_seq), end_seq - seq,
-+	    CB_SEQ(rpc_desc_seq), CB_SEQ(rpc_end_seq), cb->rpc_desc_buff_len);
-+
-+	if (cb->rpc_desc_buff_len != RPC_DESC_SIZE) {
-+		ret = tcp_parse_descriptor(skops, cb, seq, end_seq);
-+		if (ret)
-+			goto update;
-+	}
-+
-+	i = 0;
-+
-+	while (1) {
-+		if (i++ > MAX_RPC_DESC_PER_SKB) {
-+			ret = -1;
-+			break;
-+		}
-+
-+		if (after(cb->rpc_end_seq, end_seq)) {
-+			LOG("No more descriptor: rpc_end_seq: %u, end_seq: %u",
-+			    CB_SEQ(rpc_end_seq), SEQ(end_seq));
-+			break;
-+		}
-+
-+		cb->rpc_desc_seq = cb->rpc_end_seq;
-+		cb->rpc_desc_buff_len = 0;
-+
-+		if (cb->rpc_end_seq == end_seq)
-+			break;
-+
-+		LOG("Found next descriptor: rpc_end_seq: %u, end_seq: %u, len: %u",
-+		    CB_SEQ(rpc_end_seq), SEQ(end_seq), end_seq - cb->rpc_end_seq);
-+
-+		ret = tcp_parse_descriptor(skops, cb, seq, end_seq);
-+		if (ret)
-+			break;
-+	}
-+
-+update:
-+	if (ret >= 0)
-+		tcp_set_autolowat(skops_kern, cb, tp);
-+	else
-+		tcp_disable_autolowat(skops, skops_kern);
-+}
-+
-+SEC("sockops")
-+int tcp_autolowat(struct bpf_sock_ops *skops)
-+{
-+	struct tcp_autolowat_cb *cb;
-+	struct bpf_sock *bpf_sk;
-+	struct tcp_sock *tp;
-+
-+	if (skops->op != BPF_SOCK_OPS_RCVLOWAT_CB)
-+		goto out;
-+
-+	bpf_sk = skops->sk;
-+	if (!bpf_sk)
-+		goto out; /* always false, only for verifier. */
-+
-+	tp = bpf_skc_to_tcp_sock(bpf_sk);
-+	if (!tp)
-+		goto out; /* always false, only for verifier. */
-+
-+	cb = bpf_sk_storage_get(&tcp_autolowat_map, tp, 0, 0);
-+	if (!cb)
-+		goto out;
-+
-+	tcp_do_autolowat(skops, cb, tp);
-+out:
-+	return 1;
-+}
-+
-+static int tcp_init_autolowat_cb(struct bpf_sockopt *sockopt,
-+				 struct bpf_tcp_sock *btp)
-+{
-+	struct tcp_autolowat_cb *cb;
-+	struct tcp_sock *tp;
-+	int flags;
-+
-+	cb = bpf_sk_storage_get(&tcp_autolowat_map, btp, 0,
-+				BPF_SK_STORAGE_GET_F_CREATE);
-+	if (!cb)
-+		return -1;
-+
-+	tp = bpf_core_cast(btp, struct tcp_sock);
-+	if (!tp)
-+		return -1;
-+
-+	cb->rpc_desc_seq = tp->copied_seq;
-+	cb->rpc_end_seq = tp->copied_seq;
-+#ifdef DEBUG
-+	cb->isn = tp->copied_seq;
-+#endif
-+
-+	if (bpf_getsockopt(sockopt->sk, SOL_TCP, TCP_BPF_SOCK_OPS_CB_FLAGS,
-+			   &flags, sizeof(flags)))
-+		return -1;
-+
-+	flags |= BPF_SOCK_OPS_RCVLOWAT_CB_FLAG;
-+
-+	if (bpf_setsockopt(sockopt->sk, SOL_TCP, TCP_BPF_SOCK_OPS_CB_FLAGS,
-+			   &flags, sizeof(flags)))
-+		return -1;
-+
-+	return 0;
-+}
-+
-+SEC("cgroup/setsockopt")
-+int tcp_autolowat_setsockopt(struct bpf_sockopt *ctx)
-+{
-+	void *optval_end = ctx->optval_end;
-+	int *optval = ctx->optval;
-+	struct bpf_tcp_sock *btp;
-+
-+	if (ctx->level != SOL_BPF || ctx->optname != BPF_TCP_AUTOLOWAT)
-+		goto out;
-+
-+	if (optval + 1 > optval_end)
-+		return 0; /* -EPERM */
-+
-+	btp = bpf_tcp_sock(ctx->sk);
-+	if (!btp)
-+		goto out;
-+
-+	if (*optval && tcp_init_autolowat_cb(ctx, btp))
-+		return 0; /* -EPERM */
-+
-+	ctx->optlen = -1; /* BPF has consumed this option, don't call kernel
-+			   * setsockopt handler.
-+			   */
-+out:
-+	return 1;
-+}
-+
-+char _license[] SEC("license") = "GPL";
+Changes in v3:
+
+Version 3 fixes a number of issues reported by sashiko - mostly
+hardening.
+
+- Fix double use of XDP_PACKET_HEADROOM.
+- Fix ERR_PTR persistence in fdma->atu_region and add missing
+  NULL/ERR_PTR guard in fdma_pci_atu_region_unmap().
+- Reject size <= 0 in fdma_pci_atu_region_map() and return
+  -ENOSPC (was -ENOMEM) when no region is free.
+- Introduce lan966x_fdma_pci_tx_size_fits() that accounts for
+  XDP_PACKET_HEADROOM; use it from both xmit paths to keep
+  bpf_xdp_adjust_tail from writing past the TX slot.
+- Validate BLOCKL in rx_check_frame() (reject < IFH+FCS or
+  > db_size) before it feeds memcpy/XDP sizes.
+- READ_ONCE(port->xdp_prog) inside lan966x_xdp_pci_run() to close
+  a TOCTOU on XDP detach that could deref NULL in
+  bpf_prog_run_xdp().
+- Strip IFH and FCS pre-XDP in rx_check_frame(). After BPF runs
+  the driver cannot tell whether the tail was modified; drop the
+  unconditional skb_pull/skb_trim in rx_get_frame().
+- Account tx_bytes/tx_packets on XDP_TX success and tx_dropped on
+  XDP_TX size reject.
+- Add dma_wmb()/dma_rmb() around DCB status writes and reads in
+  xmit, xmit_xdpf, and napi_poll.
+- Collected Tested-by: Hervé Codina.
+- Link to v2: https://lore.kernel.org/r/20260428-lan966x-pci-fdma-v2-0-d3ec66e06202@microchip.com
+
+Changes in v2:
+
+Version 2 primarily addresses issues with module unload/load, where
+traffic would stop working (Hervé), and XDP head/tail adjust that would be
+discarded (Mohsin).
+
+Apart from that, I ran through issues reported by Sashiko, and fixed a
+number of other issues.
+
+- New patch 1: add drivers/net/ethernet/microchip/fdma/ to the Sparx5
+  SoC MAINTAINERS entry.
+- New patch 7: clear latched FDMA error/interrupt stickies after the
+  switch reset so they don't fire as soon as interrupts are enabled.
+- New patch 8: shutdown() callback, quiescing FDMA on host warm reboot.
+- Replaced the depth-2 dev_is_pci(parent->parent) backend selector
+  with a parent-chain walk.
+- XDP: use xdp.data/xdp.data_end for the post-XDP frame length so that
+  bpf_xdp_adjust_head/tail are respected (Mohsin Bashir)
+- MTU change: drain in-flight xmits with netif_tx_disable() on every
+  port before reallocating rings, waking them again on completion.
+- MTU change: cap the PCIe DCB ring at 256 entries so a full-ring
+  coherent DMA allocation fits in a single MAX_PAGE_ORDER block at
+  jumbo MTU.
+- PCIe ATU: disable the region before clearing its translation on
+  unmap.
+- PCIe FDMA: hold tx_lock in napi_poll around the free-DCB check used
+  to wake stopped netdev queues.
+- PCIe FDMA: return -ENOSPC (not -1) when the DCB ring is exhausted.
+- Link to v1: https://lore.kernel.org/r/20260320-lan966x-pci-fdma-v1-0-ef54cb9b0c4b@microchip.com
+
+---
+Daniel Machon (13):
+      MAINTAINERS: add FDMA library to Sparx5 SoC entry
+      net: microchip: fdma: rename contiguous dataptr helpers
+      net: microchip: fdma: add PCIe ATU support
+      net: lan966x: add FDMA LLP register write helper
+      net: lan966x: export FDMA helpers for reuse
+      net: lan966x: add FDMA ops dispatch for PCIe support
+      net: lan966x: clear FDMA interrupt stickies after switch reset
+      net: lan966x: add shutdown callback to stop FDMA on reboot
+      net: lan966x: add PCIe FDMA support
+      net: lan966x: add PCIe FDMA MTU change support
+      net: lan966x: add PCIe FDMA XDP support
+      misc: lan966x-pci: dts: extend cpu reg to cover PCIE DBI space
+      misc: lan966x-pci: dts: add fdma interrupt to overlay
+
+ MAINTAINERS                                        |   1 +
+ drivers/misc/lan966x_pci.dtso                      |   5 +-
+ drivers/net/ethernet/microchip/fdma/Makefile       |   4 +
+ drivers/net/ethernet/microchip/fdma/fdma_api.c     |  33 +
+ drivers/net/ethernet/microchip/fdma/fdma_api.h     |  25 +-
+ drivers/net/ethernet/microchip/fdma/fdma_pci.c     | 182 ++++++
+ drivers/net/ethernet/microchip/fdma/fdma_pci.h     |  42 ++
+ drivers/net/ethernet/microchip/lan966x/Makefile    |   4 +
+ .../net/ethernet/microchip/lan966x/lan966x_fdma.c  |  51 +-
+ .../ethernet/microchip/lan966x/lan966x_fdma_pci.c  | 663 +++++++++++++++++++++
+ .../net/ethernet/microchip/lan966x/lan966x_main.c  |  74 ++-
+ .../net/ethernet/microchip/lan966x/lan966x_main.h  |  45 ++
+ .../net/ethernet/microchip/lan966x/lan966x_regs.h  |  25 +
+ .../net/ethernet/microchip/lan966x/lan966x_xdp.c   |  10 +
+ 14 files changed, 1124 insertions(+), 40 deletions(-)
+---
+base-commit: 98878ed91b68a3150126fccef125ee7b1bb86ab2
+change-id: 20260313-lan966x-pci-fdma-94ed485d23fa
+
+Best regards,
 -- 
-2.54.0.563.g4f69b47b94-goog
+Daniel Machon <daniel.machon@microchip.com>
 
 
