@@ -1,183 +1,241 @@
-Return-Path: <netdev+bounces-285921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285923-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mL5HL2gH/mkxmQAAu9opvQ
-	(envelope-from <netdev+bounces-285921-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 17:55:20 +0200
+	id KHyZJnUK/mm1mQAAu9opvQ
+	(envelope-from <netdev+bounces-285923-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 18:08:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12EFE4F90B8
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 17:55:19 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2B514F9349
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 18:08:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 810F33033D2D
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 15:55:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1A1A330C2872
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 16:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA08031196F;
-	Fri,  8 May 2026 15:55:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D0B93FFAC3;
+	Fri,  8 May 2026 15:59:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b="r+qYdjAF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YzvUgbr7";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="cWfezEw0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D18E3093DB
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 15:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0B663CF671
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 15:58:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778255700; cv=none; b=uSZ3o7gIkNPfL1Jj8cg+WPC751JX564fMJPTAPjRHts2aHp6Ao8QeZAFieynuD5VmknVcOlVmjIA5KIGM/7V+oHeyP06H6BErEcsngbkG8oW1I2lZBsZDYKwtzzUq/Qm++4C5I/6CMxAm4SyFHcLgONDVr84GUL3wHD4wB9PXc4=
+	t=1778255938; cv=none; b=SP/iJ6FFqG5OWvIuJedQl9MRXXCz/leiTql0LKreeKLif8CyDi7aQJ/+turmtr0/x61/GG7IKIDOnGiAXHkkxDtnK3HK6x5P2PfAI3iqyANy9lOQ+NAsaSCFSgqmJktRspkNunJOo038Wk1P1gNQhpPjHnHgqLMagKrMfaSXGS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778255700; c=relaxed/simple;
-	bh=beGQbSohbqovdwuat6nKIVAFYzmFCR8PUrxcs94i44o=;
+	s=arc-20240116; t=1778255938; c=relaxed/simple;
+	bh=4F7maXO0a9FkT9euxBuc8PxcpOM2bW3TZJpMRTTqC3w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FGN25t4IyuBt2EZPlspRBfZk3/+FgBmH145ixqwfUC74hoeNEBqcFwrIuNY/ALIURlW4nI3zw1xLRTYg1uDyR/wF/OjDUPe901BLoC9t+oeGDhXvFGxJzmblPorT8HM7MvPnqYPFjipgwW1HR2hkt5yPmCADGBb7Kmzodvm38DI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com; spf=pass smtp.mailfrom=riscstar.com; dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b=r+qYdjAF; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riscstar.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-43d73352cf2so1754367f8f.1
-        for <netdev@vger.kernel.org>; Fri, 08 May 2026 08:54:59 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=omloMPbX6z8QMPv1GwGxjCntJvWn/IxZ6q0KHEyI0pUVYZhwpxmvCdkNcyqZdeBRfmujGsmhu+syib2wNoTUoYFOPAPY6UF+7ok0Wm0uYyKDGF7oHXvXHqMUN6uoY7K9HuodpoWQgy0qeLmAe+w2GsayQkVvKiygFk64cPizYuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YzvUgbr7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=cWfezEw0; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778255929;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gt9PkZ1udEZB7A5kTfc6cLitnqLtrOlHUOEwVlvJ/vE=;
+	b=YzvUgbr7oOL7kNHXFkflXdraEvyM5AwgBrrWC23MfbZXtg3XTqy17DivbbWw5D7q08KJGB
+	hhrFFUudUfAX0Dh/6wmB/3J1O05sIfoUZJPCiSUtKvJkYc+eXuMYdvVkNLfUmYpL+GfAna
+	NwSrB5fzdwDGJ7K85ZA5GMD6IyKyf3g=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-375-pHK5sepxNAyRCojP_9p8mQ-1; Fri, 08 May 2026 11:58:47 -0400
+X-MC-Unique: pHK5sepxNAyRCojP_9p8mQ-1
+X-Mimecast-MFC-AGG-ID: pHK5sepxNAyRCojP_9p8mQ_1778255927
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-4518f777225so1406962f8f.1
+        for <netdev@vger.kernel.org>; Fri, 08 May 2026 08:58:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=riscstar-com.20251104.gappssmtp.com; s=20251104; t=1778255698; x=1778860498; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1778255926; x=1778860726; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=beGQbSohbqovdwuat6nKIVAFYzmFCR8PUrxcs94i44o=;
-        b=r+qYdjAFZkJSnq1CvRGaZ/LI0eK8QVoWEZ9b1iPl9bQ4fUagPkJ5pED9ioSpKvlsoO
-         DrvL7Bh6e3tvTGaMBZXU0PYwKOPjbw7Sxw8y8vdeE77aWvjecDLGUuyegp7slaeFmOFc
-         m8b3MlNirSpcUJr7Z89UYmFHcLpaWwjHk3JoHle6AcfeIevgB9PUjiGrTg/M1Lqj8hxx
-         PjZvZhERjKUMRpg7w0l/re/UGKYWkC3uMKgNovGFMng5MGmX24mwGtoGrEHnwpwLAyrb
-         /RbxexjnFUp6MOGJNDbI6hH+pNv1l2PtOczm5KPhE+ZYhNqqtd0WXLpNUXVKFjvbIaXe
-         H2ZA==
+        bh=Gt9PkZ1udEZB7A5kTfc6cLitnqLtrOlHUOEwVlvJ/vE=;
+        b=cWfezEw0FCvu+CqDWzSBR2snnV9vd5blKlgtKebCOl5J8NJ/L9CWTG7A4n8zkj287B
+         lGas1OdPtyjXgm2mFzfTcT9HVonoxyGx7Vr/3POpFcdTh9PLL7+w5GtcUEpV1lRp72YJ
+         D27HP98xD3BvdyjTCbs48VE/PIqh/YEvPjYvvLgv3d/RkV3Kuf2DAbeIYGcZP2ULJBtN
+         tRY2Qm+vdCLaFeeBFsIWz75Clf2Sk+Dy/YwGe15BPbtdzSNHtECDkkrJUtQQt5KGmCbN
+         G5C+42PmzKb1kp06zNG423a6kXtP3sjJI13imUWzi5FbAD41JzpG2emXMiB+TBerpbPR
+         iz2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778255698; x=1778860498;
+        d=1e100.net; s=20251104; t=1778255926; x=1778860726;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=beGQbSohbqovdwuat6nKIVAFYzmFCR8PUrxcs94i44o=;
-        b=iBRndzQJIv9JRC3omkIRLtOI+oztAWDOLj7oAIR51WH80tgfVvRU2J7uwYqO5OjY6F
-         W0LogsPVBBg8kn9FdurhYyC19EcrdCaO5BgTxWWhCrP2EHya2l9TakJEj6hoieU5I/MA
-         7w+Hee4cNXI/mCgYY5OMrWBERA2bc41AaTTYp0T9hZVNeH1wBvih31xunygI/Ff06Rnh
-         eidnAMUJS1KQZjhhqymGanCcReEGH6Rh4K4yv1elAzo7hKBjpgYxnMAN1j62fK8Tawqm
-         moq6Yx2F+9RcSnJxE7zyK297N8i8+da9bYTKS/7VN38PZZ/zbKotQCcsQ4lWJe8K2na9
-         nt+w==
-X-Forwarded-Encrypted: i=1; AFNElJ9D1fSjz0LeoBFuL2Zzcts+IEqGEvbhsXqU/BUYxE6y4nHfbHvqdJsnxzySqBcJtV5TY1oBChA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1b38+h8mKpjg08PzkqCltJG5+UaOvCddFwQexl2V71tbpFVh0
-	HNBYWEMkhpAec8po1/JJDEGKS6WPhyA/8+ADfnl3W1mLr7QIB5jTMqvHmbykrpbOn0E=
-X-Gm-Gg: Acq92OGj6zypafq//ga036Gt2hY70H/vk74otRln2UTJ9JvQg+40eMZCt77oQvyezsB
-	kr1o+LHgYLSuj9lF0OFoCpRGJ5E4kH/utEikXSQMYBWJHDn5JU8twSw79fEZY7pOZ5/VlfXdmdS
-	FXePEssrrolPHtOiC0Z3LQnCkDJpFjkWc7x85UIWdKytmuOP1/uP7zVBDGavpS2B8WIw89RUnI5
-	ZXE2wsSSl70pdRxZd7i3E10vQri+pC+TMxEc3inaHONffUKkF40nj3WHlfHg5rcZ4fXrbC/RhC6
-	8uyutk1N0QKCYOZaWgkSwtHGYTshfdC+J6vHq36NvQKXJcmkVWSCNZN66KqXx3spdfyHurlkC1j
-	d7cCQ0b/sTOCLgj8DWgg6PrCclrXNNLW1oEU8jZvc9ZYIINuMAVrV6IAJ3qmae/cMuC+3igSIVu
-	ZvDVK5n5h0/Z2CyaW3xa1pAgjuopvmrvFHwqM0hY+W21J1YNhX9gVyTA3KzKLPv5C22qsGoDh3N
-	cliIf7RvzvA6I7hZsVORjl76FhptEKumEWm2juaLxRORZ2jeFd6nQPXxLHJ6E7OYYH1IXVBujoS
-	BeXiWL8/
-X-Received: by 2002:a05:6000:22c4:b0:43d:1c21:ead5 with SMTP id ffacd0b85a97d-4515ce1c6bcmr21753628f8f.22.1778255697345;
-        Fri, 08 May 2026 08:54:57 -0700 (PDT)
-Received: from aspen.lan (aztw-34-b2-v4wan-166919-cust780.vm26.cable.virginm.net. [82.37.195.13])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4548eb75c29sm5680163f8f.9.2026.05.08.08.54.55
+        bh=Gt9PkZ1udEZB7A5kTfc6cLitnqLtrOlHUOEwVlvJ/vE=;
+        b=KKp08VX/QFVKEu7qHxpQoQAaWsxf8NAUwHRy8c8y1Ep4ZG8GJfygVuAieqtJe7lWUm
+         bm67wCBN6Va7HnuxI3sBDsZb9JQd02R232Y96AYKkvfy8+V21LBjygK/9nfJMzhsEI3q
+         lUw83k0qvFaVZRwIMCfT1WRJBWdOZ9F9q9iq5rjNYAnfDqUSNzH4whALZszbbXSJZqnD
+         EEc5hyi42Q6th7WU3cx8ksSb8mt15fzdpP/NcngcGWtSzl9oNWpssB7dhNq1XCiCkCfa
+         fIl3FE2FHTYL/Q9olAeyLKgS64TUrfCYSJ9bbGnfVHkB0wuvB1BUnLYkHTKXwV74/RaX
+         g6zw==
+X-Forwarded-Encrypted: i=1; AFNElJ/OZXWXL/FHbadae0aSWqrklXFThbRtndYTIBdahZBN/bP5f0DHkxyGBTEIZ6xnsMKuPU+gp1g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwztlvfRaRnSjOMN0u6NQ6fx+vR2NlJb5gyMm04uDUVY/07afCN
+	LvyuH0d0ucbq1l1edi7kxywySgyyxmBC4YUm3mIaI49SEI0LF9wyy3hviUj7IQPEtcIlBiJH0BH
+	ED5QmTRNHrGgLQciwNR4os1xuTgVui2T9ZLlhXKGjhRZmz91jJ08HN0j4uQ==
+X-Gm-Gg: Acq92OExZl9FoOr+B65LIi5f8fgFI0l0/HCeI3+Af+2L+HcdCpu2WgNhF1EQwyJajmH
+	jQfBUGbKEf/aA06CO85PVTU9O/JzK97U0ZtPHUlVaqgHxnxErFvMRYnnQMXSJVFvNosa3KLProC
+	m0n8JYL80t3dGE43cNBnNW9NHh/B2fbzyYr8UpC7vFVf3fOXJgyVg6T/djRyk03QiVYgLC3DPd9
+	4pacta/TJ/aoBr0G4/mHLPjj5omoLERSSlpP5uYYhR7Cghz6Th/TqMMgMwOZJbqoKZWeExTHvj8
+	pxWzKbDM57ucQt2bsL8rKTSzrDnMepKV/9QZZIoKn00RWS8YtOvXPzxPhFTRtBGn6vlijzpKhYS
+	f3SuOfezAOEw0Bu26xUVoftmhWH/fRn46djiF44T1UOajiR9+xXteof2szpRRCYA4Biv2vK9aPQ
+	==
+X-Received: by 2002:a5d:588b:0:b0:43d:71f4:7ed4 with SMTP id ffacd0b85a97d-4515b525075mr22331108f8f.15.1778255926221;
+        Fri, 08 May 2026 08:58:46 -0700 (PDT)
+X-Received: by 2002:a5d:588b:0:b0:43d:71f4:7ed4 with SMTP id ffacd0b85a97d-4515b525075mr22331047f8f.15.1778255925539;
+        Fri, 08 May 2026 08:58:45 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-11-6-2.retail.telecomitalia.it. [87.11.6.2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4548ec6c79fsm5529634f8f.15.2026.05.08.08.58.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 08:54:56 -0700 (PDT)
-Date: Fri, 8 May 2026 16:54:54 +0100
-From: Daniel Thompson <daniel@riscstar.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alex Elder <elder@riscstar.com>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, maxime.chevallier@bootlin.com,
-	rmk+kernel@armlinux.org.uk, andersson@kernel.org,
-	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org,
-	arnd@arndb.de, gregkh@linuxfoundation.org,
-	mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com,
-	alexandre.torgue@foss.st.com, ast@kernel.org,
-	boon.khai.ng@altera.com, chenchuangyu@xiaomi.com,
-	chenhuacai@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	hkallweit1@gmail.com, inochiama@gmail.com, john.fastabend@gmail.com,
-	julianbraha@gmail.com, livelycarpet87@gmail.com,
-	matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
-	prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
-	rohan.g.thomas@altera.com, sdf@fomichev.me,
-	siyanteng@cqsoftware.com.cn, weishangjuan@eswincomputing.com,
-	wens@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 10/12] net: stmmac: tc956x: add TC956x/QPS615
- support
-Message-ID: <af4HTg5P3j0GsNvt@aspen.lan>
-References: <20260501155421.3329862-1-elder@riscstar.com>
- <20260501155421.3329862-11-elder@riscstar.com>
- <2ce5897d-5bbb-486a-b0f0-0e30e54b451a@lunn.ch>
- <afy34kj2hPxIlArO@aspen.lan>
- <ef6df85f-11ac-404d-958a-8cf69b3b6bb6@lunn.ch>
- <af3IKKkjl0jK8GGB@aspen.lan>
- <f15e2fe2-88c9-409d-b953-cdc94aee4e16@lunn.ch>
+        Fri, 08 May 2026 08:58:44 -0700 (PDT)
+Date: Fri, 8 May 2026 17:58:23 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, 
+	Arseniy Krasnov <avkrasnov@salutedevices.com>, Bobby Eshleman <bobbyeshleman@meta.com>, stefanha@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, mst@redhat.com, 
+	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, horms@kernel.org, 
+	Yiqi Sun <sunyiqixm@gmail.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev
+Subject: Re: [PATCH] vsock/virtio: fix vsockmon info leak in non-linear tap
+ copy
+Message-ID: <af4IAzRUFZdYKvaq@sgarzare-redhat>
+References: <20260430071110.380509-1-sunyiqixm@gmail.com>
+ <f4e52dcd-59ba-4c2e-9936-49cf27528b21@redhat.com>
+ <afnXIGtswspSEk8x@sgarzare-redhat>
+ <afzyM6fTTAl0Hnvm@devvm29614.prn0.facebook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <f15e2fe2-88c9-409d-b953-cdc94aee4e16@lunn.ch>
-X-Rspamd-Queue-Id: 12EFE4F90B8
+In-Reply-To: <afzyM6fTTAl0Hnvm@devvm29614.prn0.facebook.com>
+X-Rspamd-Queue-Id: F2B514F9349
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.06 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[riscstar-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[riscstar.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[riscstar.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	TAGGED_FROM(0.00)[bounces-285921-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[riscstar-com.20251104.gappssmtp.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-285923-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@riscstar.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[redhat.com,salutedevices.com,meta.com,vger.kernel.org,linux.alibaba.com,davemloft.net,google.com,kernel.org,gmail.com,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[50];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[riscstar-com.20251104.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,aspen.lan:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Fri, May 08, 2026 at 03:34:42PM +0200, Andrew Lunn wrote:
-> > BTW if you are bothered by SP_SEL_SGMII_2500M, that name comes directly
-> > from the TRM and I'd prefer to keep it if I can. The enumerated value
-> > we have to write into the SP_SEL for 2500base-X is "SGMII 2500M".
+On Thu, May 07, 2026 at 01:12:35PM -0700, Bobby Eshleman wrote:
+>On Tue, May 05, 2026 at 02:44:16PM +0200, Stefano Garzarella wrote:
+>> CCing Arseniy and Bobby.
+>>
+>> On Tue, May 05, 2026 at 12:26:21PM +0200, Paolo Abeni wrote:
+>> > On 4/30/26 9:11 AM, Yiqi Sun wrote:
+>> > > vsockmon mirrors packets through virtio_transport_build_skb(), which
+>> > > builds a new skb and copies the payload into it. For non-linear skbs,
+>> > > this goes through virtio_transport_copy_nonlinear_skb().
+>> > >
+>> > > Helper manually initializes a iov_iter, but leaves iov_iter.count unset.
+>> > > As a result, skb_copy_datagram_iter() sees zero writable bytes
+>> > > in the destination iterator and copies no payload data.
+>> > >
+>> > > This becomes an info leak because virtio_transport_build_skb() has
+>> > > already reserved payload_len bytes in the new skb with skb_put(). The
+>> > > skb is then returned to the tap path with that payload area still
+>> > > uninitialized, so userspace reading from a vsockmon device can observe
+>> > > heap contents and potentially kernel address.
+>> > >
+>> > > Fix it by initializing iov_iter.count to the number of bytes to copy.
+>> > >
+>> > > Fixes: 4b0bf10eb077 ("vsock/virtio: non-linear skb handling for tap")
+>> > > Signed-off-by: Yiqi Sun <sunyiqixm@gmail.com>
+>> > > ---
+>> > >  net/vmw_vsock/virtio_transport_common.c | 2 +-
+>> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+>> > >
+>> > > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>> > > index 416d533f493d..6b26ee57ccab 100644
+>> > > --- a/net/vmw_vsock/virtio_transport_common.c
+>> > > +++ b/net/vmw_vsock/virtio_transport_common.c
+>> > > @@ -152,7 +152,7 @@ static void virtio_transport_copy_nonlinear_skb(const struct sk_buff *skb,
+>> > >  	iov_iter.nr_segs = 1;
+>> > >
+>> > >  	to_copy = min_t(size_t, len, skb->len);
+>> > > -
+>> > > +	iov_iter.count = to_copy;
+>> > >  	skb_copy_datagram_iter(skb, VIRTIO_VSOCK_SKB_CB(skb)->offset,
+>> > >  			       &iov_iter, to_copy);
+>> >
+>> > @Stefano, @Stefan, the patch LGTM, but sashiko pointed out to a
+>> > pre-existing issue you should probably want to address:
+>> >
+>> > >  	to_copy = min_t(size_t, len, skb->len);
+>> > Does this length calculation account for the offset when a packet is
+>> > split across multiple transmissions?
+>> > If a packet is requeued, VIRTIO_VSOCK_SKB_CB(skb)->offset is increased,
+>> > but to_copy still evaluates to the full length of the skb.
+>>
+>> Yep, I just checked and vhost-vsock is the only place where we call
+>> virtio_transport_deliver_tap_pkt() wiht an offset != 0, but I agree that we
+>> should also fix it.
+>>
+>> Looking better in net/vmw_vsock/virtio_transport_common.c I think this is a
+>> regression, indeed we have this comment in virtio_transport_build_skb():
+>>
+>> 	/* A packet could be split to fit the RX buffer, so we can retrieve
+>> 	 * the payload length from the header and the buffer pointer taking
+>> 	 * care of the offset in the original packet.
+>> 	 */
+>> 	pkt_hdr = virtio_vsock_hdr(pkt);
+>>
+>> Before commit 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with
+>> sk_buff") we read the payload lenght from the header that is always set to
+>> the right value before delivering the packet to the tap.
+>>
+>> From that commit, we don't to consider the offset anymore since we started
+>> to use `len` from the skb, so IMO we should go back to what we did before
+>> it, I mean:
+>>
+>> 	payload_len = le32_to_cpu(pkt->hdr.len);
+>>
+>> @Bobby do you remember why we did that change? Or if you see any issue going
+>> back to what we did initially?
 >
-> We try to avoid anything to do with SGMII and 2500 because it is
-> technically wrong. Cisco never defined SGMII for 2500, it is something
-> silicon vendors have made up, without any foundation in any
-> standardisation. We much prefer to refer to it as 2500BaseX with
-> broken signalling, which is a much more accurate description.
+>I think this was just one that made it through the cracks. I vaguely
+>recall a few other instances where I assumed skb->len could stand-in for
+>hdr.len, but it didn't hold.
 >
-> The TRM is also not a public document. If it was, i could see some
-> value in keeping with the naming, but since ~0 developers have the
-> document, this is less useful.
+>Using hdr.len like the original looks correct to me.
 
-This is a pretty obscure register buried on some of the TC956x glue
-logic (e.g. it's not part of the DWMAC's register set). I take the view
-that if someone is debugging the hardware interactions deeply enough to
-care what this is called then the odds of them having access to the TRM
-are actually pretty good.
+Thanks for confirming, I'll fix it.
 
-However having a different name would be only a minor irritant to the
-poor soul trying to debug the thing! I'll rename to SP_SEL_2500BASEX
-in the next rev of the patchset.
+Stefano
 
-
-Daniel.
 
