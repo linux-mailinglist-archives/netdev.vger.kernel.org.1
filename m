@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-285821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285822-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IP5NEe7e/Wn0jwAAu9opvQ
-	(envelope-from <netdev+bounces-285821-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:02:38 +0200
+	id OJt9HYPe/WmqkAAAu9opvQ
+	(envelope-from <netdev+bounces-285822-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:00:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F28254F6BB1
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:02:36 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 115004F6B5C
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:00:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D2564307B85C
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 13:00:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D7C0F3024D53
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 13:00:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFF943E277B;
-	Fri,  8 May 2026 13:00:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 748CD3E1D14;
+	Fri,  8 May 2026 13:00:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MfGaRppH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QayCxp9/"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0FB3E121D
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 13:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC8953E2779
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 13:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778245205; cv=none; b=bmg5Eum3r3gnDn858BvQ68DcK0Ez2/Ye/z9NzJho2vuhU9mSDFopifdEMxGGx7VKnEFqD2cHh+ThJOwnkxxb6Dj4eafOkOYJNTAnN4AopWh+d9Q/1uDvJfunavffy6ooNrRJbuGEuAYUivk0Y0bNYZG669whVIG+Fho/7NePNzw=
+	t=1778245208; cv=none; b=N7iHFHmL//4P2hdRAWVqtVXh6uAyhT3er7fYupkZiVR71/dWkLBMJszlD55isCtr7pSn8KLaupOBiCqoz5rFrWY6FsxDIFojVJa7FpIKvRn21P/mXfyfToTW//ztsM8IjGMp4oL7Lmfjm7DfsUikAlHVtWttYKKP575w2p376GE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778245205; c=relaxed/simple;
-	bh=NlcT9xFh6hWCogshEOFokLhWIlFsDsMi1nuEY7HZ7iw=;
+	s=arc-20240116; t=1778245208; c=relaxed/simple;
+	bh=MGdbzFFwU6U1zqIT3tFYSxP97PQFNS4VRYoi03Dd5Dc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jyqNOLPXFfRiiwo6f0am+jYV4Ba882x/mt2gGKTyrIVqNppvKElq/EBSszCcYgLCN9ohsMq2lRuc77mSzp4dkWI0ZffDyLzckKyJCETwR1Q9glIGRNyFVAcow7bG7FvOyY4hhbKF+/6cy0tzexCJ/imAg2CYBs2LBoPvW4K7228=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MfGaRppH; arc=none smtp.client-ip=198.175.65.17
+	 MIME-Version; b=qcbGWe081U6/x7R2mKFr4xgyfkS6c9ok+wdUz8wKZm3DrG8R28vpoxXUaN9gT80EAUL9JAtXB53TsryQLfVdCD0iv7yUsb1JWdquyvEvyukfg8+jxspqFFiqpl2yNBLJsFWwHMPPMb4xiDryndoI9JN9W+0TsCYk/Q6c0KLSp/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QayCxp9/; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778245204; x=1809781204;
+  t=1778245206; x=1809781206;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=NlcT9xFh6hWCogshEOFokLhWIlFsDsMi1nuEY7HZ7iw=;
-  b=MfGaRppHZBar2XzMbhm9wqvgZFXdXMk3Nyz6koRJ02tp0nWuuCOlG9T/
-   TMwLqyTI45zoblc7jCzWRTvpOtkADlhQSZ80d7TgpsWuq7tZWYuHEY3uh
-   MxQXDbm/0B0RKfGlxX1xjb+ZTrMvZKsI0OiLGB+YFgcaES4C9udQ8mUXf
-   xJ1TZES5a764TAMDyKIWhZ2Tjk9fot8hgIWLg7C2I4uMDJi7P4F/hFlrp
-   PXLcVDUv8XPHC99+Ylegju1uw3nuE5UG/lD+CDsTGpvgEYb+NtCUmuove
-   xaEYwhCY0SATTzzKJyTtZqYYV3KRx9ca9N7ZeSF9aqjx4CG7hrymnm5uE
-   g==;
-X-CSE-ConnectionGUID: pxnJOro4Q9KSmYAqbzdyrg==
-X-CSE-MsgGUID: pK1YLNiVQmC2CAVFSerIZw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11779"; a="79199984"
+  bh=MGdbzFFwU6U1zqIT3tFYSxP97PQFNS4VRYoi03Dd5Dc=;
+  b=QayCxp9/jB86oIxnkdL2vPcuFegr3385aSjPZCMfhoEv8IAJhXFgVvNS
+   /JF4GfSNhpktRjJGMHzVrRg28EyRvA9DSgoQ1OfGvLsM4scWoe2nLYRNv
+   yXbn/L8YxDiF25pBdJyZq9R7YtcMBs+IFVUBcuVhnv6t7tmO765BCET6+
+   BhwJDvbNhenz2xJ3rBgWKmRTGtYIp7UTvGc+2flZI+BVHmUZS/6wQkM8e
+   3QL6S80tiiciF9dtnlVZK+PRShtnMdavHJ9WVNd+fLtcMWBHu8QoUq0WD
+   +W9TKMJ3a8aYFBg4Hx9imw5upYziNihnDIoq6qD8sC4JwpCBKiElKBYZ8
+   A==;
+X-CSE-ConnectionGUID: +2YnvQcLRDO/+iXRwsBLQg==
+X-CSE-MsgGUID: ZPs37wpcQny/TIEHEwf98Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11779"; a="79199996"
 X-IronPort-AV: E=Sophos;i="6.23,223,1770624000"; 
-   d="scan'208";a="79199984"
+   d="scan'208";a="79199996"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2026 06:00:03 -0700
-X-CSE-ConnectionGUID: K6FcwD4nRSKd5a8e+aoWBw==
-X-CSE-MsgGUID: mFhI437QSkmor8bFyqD6Eg==
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2026 06:00:06 -0700
+X-CSE-ConnectionGUID: +X98ZoFgR8mNLHXVbs+/eg==
+X-CSE-MsgGUID: /7DlEC4wQneWNmGm5XlXhw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,223,1770624000"; 
-   d="scan'208";a="241730183"
+   d="scan'208";a="241730289"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa005.fm.intel.com with ESMTP; 08 May 2026 05:59:57 -0700
+  by fmviesa005.fm.intel.com with ESMTP; 08 May 2026 05:59:59 -0700
 Received: from vecna.igk.intel.com (vecna.igk.intel.com [10.123.220.17])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 904462FC44;
-	Fri,  8 May 2026 13:59:55 +0100 (IST)
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 2E0F22FC40;
+	Fri,  8 May 2026 13:59:57 +0100 (IST)
 From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 To: intel-wired-lan@lists.osuosl.org,
 	Michal Schmidt <mschmidt@redhat.com>,
@@ -90,9 +90,9 @@ Cc: netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Mark Bloch <mbloch@nvidia.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-next v1 13/15] devlink: give user option to allocate resources
-Date: Fri,  8 May 2026 14:42:06 +0200
-Message-Id: <20260508124208.11622-14-przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-next v1 14/15] ice: represent RSS LUTs as devlink resources
+Date: Fri,  8 May 2026 14:42:07 +0200
+Message-Id: <20260508124208.11622-15-przemyslaw.kitszel@intel.com>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20260508124208.11622-1-przemyslaw.kitszel@intel.com>
 References: <20260508124208.11622-1-przemyslaw.kitszel@intel.com>
@@ -103,7 +103,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: F28254F6BB1
+X-Rspamd-Queue-Id: 115004F6B5C
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -112,7 +112,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -120,8 +120,8 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[25];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-285821-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-285822-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
@@ -129,231 +129,841 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
+	NEURAL_HAM(-0.00)[-0.998];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:mid,intel.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:mid,intel.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Current devlink resources are designed as a thing that user could limit,
-but there is not much otherwise that could be done with them.
-Perhaps that's the reason there is no much adoption despite API being
-there for multiple years.
+E800 family offers three kinds of RSS LUTs: VSI LUT (sized 64), GLOBAL LUT
+(sized 256), and PF LUT (sized 2048). Until now the GLOBAL kind was not
+used at all. There are two possible usages for it, subsequent commit will
+give VF option to acquire it, and this one enables PF to switch between PF
+LUT and GLOBAL LUT - switching to smaller one is, again, to make it
+possible for VF to then acquire the former one.
 
-Add new mode of operation, where user could allocate/assign resources
-(from a common pool) to specific devices.
+Devlink resources are used to let user show current usage and change the
+allocation, see examples below.
 
-That requires "occ set" support, triggered by user.
-To support that mode, "occ get" is (only then) turned into a simple
-"get/show" operation, as opposed to "ask driver about current occupation"
-in the "legacy" mode.
+Default state on 8-port card, asking for aggregate "whole device" usage,
+note that there are as many PF LUTs as there is PFs, and, for e810, there
+are 16 GLOBAL LUTs:
+$ devlink resource show devlink_index/11
+devlink_index/11:
+  name rss size 8 unit entry size_min 0 size_max 24 size_gran 1 dpipe_tables none
+    resources:
+      name lut_512 size 0 unit entry size_min 0 size_max 16 size_gran 1 dpipe_tables none
+      name lut_2048 size 8 unit entry size_min 0 size_max 8 size_gran 1 dpipe_tables none
+
+Now let's add GLOBAL LUT for a single PF (on one-port NIC):
+$ sudo devlink resource set pci/0000:18:00.0 path rss/lut_512 size 1
+And show it's resources after that:
+$ devlink resource show pci/0000:18:00.0
+pci/0000:18:00.0:
+  name rss size 2 unit entry size_min 0 size_max 2 size_gran 1 dpipe_tables none
+    resources:
+      name lut_512 size 1 unit entry size_min 0 size_max 1 size_gran 1 dpipe_tables none
+      name lut_2048 size 1 unit entry size_min 0 size_max 1 size_gran 1 dpipe_tables none
+Let's take the PF LUT out of that PF afterwards:
+$ sudo devlink resource set pci/0000:18:00.0 path rss/lut_2048 size 0
+now `ethtool -x $ifacename` will report smaller RSS table.
 
 Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
-RFC, Feb '25
-https://lore.kernel.org/intel-wired-lan/20250219164410.35665-3-przemyslaw.kitszel@intel.com
+ drivers/net/ethernet/intel/ice/Makefile       |   1 +
+ .../net/ethernet/intel/ice/devlink/resource.h |  19 +
+ drivers/net/ethernet/intel/ice/ice_adapter.h  |  40 ++
+ drivers/net/ethernet/intel/ice/ice_common.h   |   1 +
+ .../net/ethernet/intel/ice/devlink/resource.c | 469 ++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_adapter.c  |  12 +-
+ drivers/net/ethernet/intel/ice/ice_common.c   |   2 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c      |  23 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |  14 +-
+ 9 files changed, 573 insertions(+), 8 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ice/devlink/resource.h
+ create mode 100644 drivers/net/ethernet/intel/ice/devlink/resource.c
 
-I have structured code to just choose "the mode" of operation based on
-the presence of .occ_set callback, instead of naming the mode, what,
-even if not the most clear code, avoids the need of naming the modes.
----
- include/net/devlink.h  |  7 +++
- net/devlink/resource.c | 98 +++++++++++++++++++++++++++++++++---------
- 2 files changed, 85 insertions(+), 20 deletions(-)
-
-diff --git a/include/net/devlink.h b/include/net/devlink.h
-index 5d3a1337bfa1..9b777f02beca 100644
---- a/include/net/devlink.h
-+++ b/include/net/devlink.h
-@@ -420,6 +420,8 @@ devlink_resource_size_params_init(struct devlink_resource_size_params *size_para
- }
+diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ethernet/intel/ice/Makefile
+index 7f06d9bafe4a..0217ab6403de 100644
+--- a/drivers/net/ethernet/intel/ice/Makefile
++++ b/drivers/net/ethernet/intel/ice/Makefile
+@@ -37,6 +37,7 @@ ice-y := ice_main.o	\
+ 	 devlink/devlink.o	\
+ 	 devlink/health.o \
+ 	 devlink/port.o \
++	 devlink/resource.o \
+ 	 ice_sf_eth.o	\
+ 	 ice_sf_vsi_vlan_ops.o \
+ 	 ice_ddp.o	\
+diff --git a/drivers/net/ethernet/intel/ice/devlink/resource.h b/drivers/net/ethernet/intel/ice/devlink/resource.h
+new file mode 100644
+index 000000000000..947f77a3cd49
+--- /dev/null
++++ b/drivers/net/ethernet/intel/ice/devlink/resource.h
+@@ -0,0 +1,19 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (c) 2026, Intel Corporation. */
++
++#ifndef _ICE_DEVL_RESOURCE_H_
++#define _ICE_DEVL_RESOURCE_H_
++
++struct devlink;
++struct ice_adapter;
++struct ice_hw;
++struct ice_pf;
++
++void ice_devl_pf_resources_register(struct ice_pf *pf);
++void ice_devl_whole_dev_resources_register(const struct ice_hw *hw,
++					   struct ice_adapter *adapter);
++
++int ice_take_rss_lut_pf(struct ice_pf *pf);
++void ice_free_rss_lut_flr(struct ice_pf *pf);
++
++#endif /* _ICE_DEVL_RESOURCE_H_ */
+diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.h b/drivers/net/ethernet/intel/ice/ice_adapter.h
+index 5539ec5f8515..5a9148eb7b63 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adapter.h
++++ b/drivers/net/ethernet/intel/ice/ice_adapter.h
+@@ -12,6 +12,40 @@
+ struct pci_dev;
+ struct ice_pf;
  
- typedef u64 devlink_resource_occ_get_t(void *priv);
-+typedef int devlink_resource_occ_set_t(u64 size, struct netlink_ext_ack *extack,
-+				       void *priv);
- 
- #define DEVLINK_RESOURCE_ID_PARENT_TOP 0
- 
-@@ -1934,6 +1936,11 @@ void devl_resource_occ_get_register(struct devlink *devlink,
- 				    void *occ_get_priv);
- void devl_resource_occ_get_unregister(struct devlink *devlink,
- 				      u64 resource_id);
-+void devl_resource_occ_set_get_register(struct devlink *devlink,
-+					u64 resource_id,
-+					devlink_resource_occ_set_t *occ_set,
-+					devlink_resource_occ_get_t *occ_get,
-+					void *occ_priv);
- int devl_params_register(struct devlink *devlink,
- 			 const struct devlink_param *params,
- 			 size_t params_count);
-diff --git a/net/devlink/resource.c b/net/devlink/resource.c
-index 3d2f42bc2fb5..2212eff5230d 100644
---- a/net/devlink/resource.c
-+++ b/net/devlink/resource.c
-@@ -19,7 +19,8 @@
-  * @list: parent list
-  * @resource_list: list of child resources
-  * @occ_get: occupancy getter callback
-- * @occ_get_priv: occupancy getter callback priv
-+ * @occ_set: occupancy setter callback
-+ * @occ_priv: occupancy callbacks priv
++enum ice_devl_resource_id {
++	/* keep parent IDs prior to children, because we register in order */
++	ICE_TOP_RESOURCE = DEVLINK_RESOURCE_ID_PARENT_TOP,
++	ICE_RSS_LUT_BOTH,
++	ICE_RSS_LUT_GLOBAL,
++	ICE_RSS_LUT_PF,
++	ICE_DEVL_RESOURCES_COUNT
++};
++
++#define ICE_MAX_DEVL_RESOURCE_UNITS 16
++
++/**
++ * struct ice_devl_resource - driver data for devlink resource, config & runtime
++ *
++ * @owner: entity that owns given resource (like ptr to ice_pf or ice_vf)
++ * @pf_id: on which PF the VF is (or just PF id when PF is the owner)
++ * @name: name of the resource to register it with
++ * @get: occ getter callback
++ * @set: occ setter callback
++ * @start_size: starting size of the resource
++ * @max_size: max size of the resource, to present in the uAPI/validate against
++ * @parent_id: ID of the parent resource
++ */
++struct ice_devl_resource {
++	void *owner[ICE_MAX_DEVL_RESOURCE_UNITS];
++	u8 pf_id[ICE_MAX_DEVL_RESOURCE_UNITS];
++	const char *name;
++	devlink_resource_occ_get_t *get;
++	devlink_resource_occ_set_t *set;
++	u32 start_size;
++	u32 max_size;
++	u32 parent_id;
++};
++
+ /**
+  * struct ice_port_list - data used to store the list of adapter ports
+  *
+@@ -34,6 +68,7 @@ struct ice_port_list {
+  * @txq_ctx_lock: Spinlock protecting access to the GLCOMM_QTX_CNTX_CTL register
+  * @ctrl_pf: Control PF of the adapter
+  * @ports: Ports list
++ * @resources: array of ice's data for devlink resources
   */
- struct devlink_resource {
- 	const char *name;
-@@ -32,7 +33,8 @@ struct devlink_resource {
- 	struct list_head list;
- 	struct list_head resource_list;
- 	devlink_resource_occ_get_t *occ_get;
--	void *occ_get_priv;
-+	devlink_resource_occ_set_t *occ_set;
-+	void *occ_priv;
+ struct ice_adapter {
+ 	struct devlink *devlink;
+@@ -45,9 +80,14 @@ struct ice_adapter {
+ 
+ 	struct ice_pf *ctrl_pf;
+ 	struct ice_port_list ports;
++
++	struct ice_devl_resource resources[ICE_DEVL_RESOURCES_COUNT];
  };
  
- static struct devlink_resource *
-@@ -137,6 +139,9 @@ int devlink_nl_resource_set_doit(struct sk_buff *skb, struct genl_info *info)
- 	if (err)
- 		return err;
+ struct ice_adapter *ice_adapter_get(struct pci_dev *pdev);
+ void ice_adapter_put(struct ice_adapter *adapter);
  
-+	if (resource->occ_set)
-+		return resource->occ_set(size, info->extack, resource->occ_priv);
++DEFINE_GUARD(ice_adapter_devl, struct ice_adapter *,
++	     devl_lock((_T)->devlink), devl_unlock((_T)->devlink))
 +
- 	resource->size_new = size;
- 	devlink_resource_validate_children(resource);
- 	if (resource->parent)
-@@ -162,13 +167,40 @@ devlink_resource_size_params_put(struct devlink_resource *resource,
+ #endif /* _ICE_ADAPTER_H */
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
+index dbb44e9deaf7..c58dd5207da6 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.h
++++ b/drivers/net/ethernet/intel/ice/ice_common.h
+@@ -125,6 +125,7 @@ int ice_read_txq_ctx(struct ice_hw *hw, struct ice_tlan_ctx *tlan_ctx,
+ int ice_write_txq_ctx(struct ice_hw *hw, struct ice_tlan_ctx *tlan_ctx,
+ 		      u32 txq_index);
+ 
++enum ice_lut_size ice_lut_type_to_size(enum ice_lut_type type);
+ int
+ ice_aq_get_rss_lut(struct ice_hw *hw, struct ice_aq_get_set_rss_lut_params *get_params);
+ int
+diff --git a/drivers/net/ethernet/intel/ice/devlink/resource.c b/drivers/net/ethernet/intel/ice/devlink/resource.c
+new file mode 100644
+index 000000000000..42b65730ea52
+--- /dev/null
++++ b/drivers/net/ethernet/intel/ice/devlink/resource.c
+@@ -0,0 +1,469 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) 2026, Intel Corporation. */
++
++#include "resource.h"
++#include "ice_adapter.h"
++#include "ice.h"
++#include "ice_lib.h"
++
++#define ICE_NUM_GLOBAL_LUTS	16
++#define ICE_ANY_SLOT		-1
++
++static u32 ice_devl_res_cnt(const struct ice_adapter *adapter,
++			    enum ice_devl_resource_id res_id)
++{
++	const struct ice_devl_resource *res = &adapter->resources[res_id];
++	u32 sum = 0;
++
++	for (int i = 0; i < res->max_size; i++)
++		sum += res->owner[i] != NULL;
++
++	return sum;
++}
++
++static int ice_devl_res_take(struct ice_pf *pf,
++			     enum ice_devl_resource_id res_id, int slot,
++			     void *owner)
++{
++	struct ice_devl_resource *res = &pf->adapter->resources[res_id];
++	int end = slot == ICE_ANY_SLOT ? res->max_size : slot + 1;
++	int beg = slot == ICE_ANY_SLOT ? 0 : slot;
++	int err, new_id = ICE_ANY_SLOT;
++
++	for (int id = beg; id < end; id++) {
++		if (!res->owner[id]) {
++			new_id = id;
++			break;
++		}
++	}
++	if (new_id == ICE_ANY_SLOT)
++		return -ENOSPC;
++
++	if (res_id == ICE_RSS_LUT_GLOBAL) {
++		struct ice_vsi *vsi;
++		u16 lut_id;
++
++		err = ice_alloc_rss_global_lut(&pf->hw, &lut_id);
++		if (err)
++			return err;
++		if (lut_id != new_id)
++			return -ENOANO;
++
++		if (pf == owner)
++			vsi = ice_get_main_vsi(pf);
++		else
++			vsi = ice_get_vf_vsi(owner);
++
++		vsi->global_lut_id = new_id;
++	}
++
++	res->owner[new_id] = owner;
++	res->pf_id[new_id] = pf->hw.pf_id;
++	return new_id;
++}
++
++static int ice_devl_res_free(struct ice_pf *pf,
++			     enum ice_devl_resource_id res_id, void *owner)
++{
++	struct ice_devl_resource *res = &pf->adapter->resources[res_id];
++	int err = 0, id_to_free = ICE_ANY_SLOT;
++
++	for (int i = 0; i < res->max_size; i++) {
++		if (res->owner[i] == owner) {
++			id_to_free = i;
++			break;
++		}
++	}
++	if (id_to_free == ICE_ANY_SLOT)
++		return 0;
++
++	if (res_id == ICE_RSS_LUT_GLOBAL)
++		err = ice_free_rss_global_lut(&pf->hw, id_to_free);
++
++	res->owner[id_to_free] = NULL;
++	return err;
++}
++
++void ice_free_rss_lut_flr(struct ice_pf *pf)
++{
++	struct ice_devl_resource *res, *resources = pf->adapter->resources;
++	int pf_id = pf->hw.pf_id;
++
++	scoped_guard(ice_adapter_devl, pf->adapter) {
++		resources[ICE_RSS_LUT_PF].owner[pf_id] = NULL;
++		
++		res = &resources[ICE_RSS_LUT_GLOBAL];
++		for (int i = 0; i < res->max_size; i++) {
++			/* On FLR/PFR resources assigned to PF are cleared by
++			 * FW, reflect that in the SW table.
++			 * VFs on given PF must be de-programmed too.
++			 */
++			if (res->pf_id[i] == pf_id)
++				res->owner[i] = NULL;
++		}
++	}		
++}
++
++static int ice_devl_res_owned_idx(struct ice_adapter *adapter,
++				  enum ice_devl_resource_id res_id, void *owner)
++{
++	const struct ice_devl_resource *res = &adapter->resources[res_id];
++
++	for (int i = 0; i < res->max_size; i++) {
++		if (res->owner[i] == owner)
++			return i;
++	}
++
++	return -ENXIO;
++}
++
++static bool ice_is_devl_res_owned_by(struct ice_adapter *adapter,
++				     enum ice_devl_resource_id res_id,
++				     void *owner)
++{
++	return ice_devl_res_owned_idx(adapter, res_id, owner) >= 0;
++}
++
++static u64 ice_rss_lut_whole_dev_occ_get_global(void *priv)
++{
++	struct ice_adapter *adapter = priv;
++
++	return ice_devl_res_cnt(adapter, ICE_RSS_LUT_GLOBAL);
++}
++
++static u64 ice_rss_lut_whole_dev_occ_get_pf(void *priv)
++{
++	struct ice_adapter *adapter = priv;
++
++	return ice_devl_res_cnt(adapter, ICE_RSS_LUT_PF);
++}
++
++static u64 ice_rss_lut_whole_dev_occ_get_both(void *priv)
++{
++	return ice_rss_lut_whole_dev_occ_get_global(priv) +
++	       ice_rss_lut_whole_dev_occ_get_pf(priv);
++}
++
++static u64 ice_rss_lut_pf_occ_get_global(void *priv)
++{
++	struct ice_adapter *adapter;
++	struct ice_pf *pf = priv;
++
++	adapter = pf->adapter;
++	scoped_guard(ice_adapter_devl, adapter)
++		return ice_is_devl_res_owned_by(adapter, ICE_RSS_LUT_GLOBAL, pf);
++}
++
++static u64 ice_rss_lut_pf_occ_get_pf(void *priv)
++{
++	struct ice_adapter *adapter;
++	struct ice_pf *pf = priv;
++
++	adapter = pf->adapter;
++	scoped_guard(ice_adapter_devl, adapter)
++		return ice_is_devl_res_owned_by(adapter, ICE_RSS_LUT_PF, pf);
++}
++
++static u64 ice_rss_lut_pf_occ_get_both(void *priv)
++{
++	struct ice_adapter *adapter;
++	struct ice_pf *pf = priv;
++
++	adapter = pf->adapter;
++	scoped_guard(ice_adapter_devl, adapter)
++		return ice_is_devl_res_owned_by(adapter, ICE_RSS_LUT_PF, pf) +
++		       ice_is_devl_res_owned_by(adapter, ICE_RSS_LUT_GLOBAL, pf);
++}
++
++static int ice_devl_resource_deny_occ_set(u64 size,
++					  struct netlink_ext_ack *extack,
++					  void *priv)
++{
++	NL_SET_ERR_MSG_MOD(extack,
++		"can not change directly, parent/aggregate resource just adds up children data");
++	return -EPERM;
++}
++
++enum ice_rss_lut_resource_state {
++	ICE_HAS_NO_LUT = 0,
++	ICE_HAS_GLOBAL_LUT = BIT(ICE_RSS_LUT_GLOBAL),
++	ICE_HAS_PF_LUT = BIT(ICE_RSS_LUT_PF),
++	ICE_HAS_BOTH_LUTS = ICE_HAS_GLOBAL_LUT | ICE_HAS_PF_LUT,
++};
++
++/** ice_rss_lut_resource_state - compute opaque resource state for given owner
++ * @adapter: the adapter the @owner is on
++ * @owner: the entity to compute state of resources for
++ *
++ * Return: computed current state of the RSS resources the @owner has.
++ */
++static enum ice_rss_lut_resource_state
++ice_rss_lut_resource_state(struct ice_adapter *adapter, void *owner)
++{
++	enum ice_rss_lut_resource_state ret = ICE_HAS_NO_LUT;
++
++	if (ice_is_devl_res_owned_by(adapter, ICE_RSS_LUT_GLOBAL, owner))
++		ret |= ICE_HAS_GLOBAL_LUT;
++	if (ice_is_devl_res_owned_by(adapter, ICE_RSS_LUT_PF, owner))
++		ret |= ICE_HAS_PF_LUT;
++
++	return ret;
++}
++
++static int ice_maybe_change_rss_lut(struct ice_pf *pf, void *owner,
++				    enum ice_rss_lut_resource_state old,
++				    enum ice_rss_lut_resource_state new,
++				    struct netlink_ext_ack *extack)
++{
++	struct ice_aq_get_set_rss_lut_params params = {};
++	struct ice_adapter *adapter = pf->adapter;
++	struct ice_hw *hw = &pf->hw;
++	enum ice_lut_type lut_type;
++	int err, lut_size, lut_id;
++	struct ice_vsi *vsi;
++	u8 *lut;
++
++	if (old & new & ICE_HAS_PF_LUT)
++		return 0;
++
++	if (new & ICE_HAS_PF_LUT) {
++		lut_type = ICE_LUT_PF;
++	} else if (new & ICE_HAS_GLOBAL_LUT) {
++		lut_id = ice_devl_res_owned_idx(adapter, ICE_RSS_LUT_GLOBAL, owner);
++		if (lut_id < 0)
++			return lut_id;
++
++		lut_type = ICE_LUT_GLOBAL;
++		params.global_lut_id = lut_id;
++	} else {
++		lut_type = ICE_LUT_VSI;
++		if (owner == pf) {
++			NL_SET_ERR_MSG_FMT(extack, "cannot change PF to use LUT_VSI (sized 64)");
++			return -EDOM;
++		}
++	}
++
++	if (pf == owner) {
++		vsi = ice_get_main_vsi(pf);
++	} else {
++		return -EOPNOTSUPP;
++	}
++
++	lut_size = ice_lut_type_to_size(lut_type);
++	lut = kmalloc(lut_size, GFP_KERNEL);
++	if (!lut)
++		return -ENOMEM;
++	ice_fill_rss_lut(lut, lut_size, vsi->rss_size);
++	params.lut = lut;
++	params.lut_size = lut_size;
++	params.lut_type = lut_type;
++	params.vsi_handle = vsi->idx;
++	err = ice_aq_set_rss_lut(hw, &params);
++	if (err) {
++		NL_SET_ERR_MSG_FMT(extack, "AQ failed: %s", libie_aq_str(hw->adminq.sq_last_status));
++		goto out;
++	}
++
++	vsi->rss_table_size = lut_size;
++	vsi->rss_lut_type = lut_type;
++out:
++	kfree(lut);
++	return err;
++}
++
++static int ice_devl_res_change(bool take, enum ice_devl_resource_id res_id,
++			       struct ice_pf *pf, void *owner, int slot,
++			       struct netlink_ext_ack *extack)
++{
++	enum ice_rss_lut_resource_state old, new, change;
++	struct ice_adapter *adapter = pf->adapter;
++	int err;
++
++	change = BIT(res_id);
++	old = ice_rss_lut_resource_state(adapter, owner);
++	new = old;
++	if (take)
++		new |= change;
++	else
++		new &= ~change;
++	if (new == old)
++		return 0;
++
++	if (pf == owner && !take && old != ICE_HAS_BOTH_LUTS) {
++		NL_SET_ERR_MSG_MOD(extack,
++			"at least one of 512+ sized LUTs must be assigned to PF device at all times");
++		return -EDOM;
++	}
++
++	if (take) {
++		int slot_id;
++		
++		slot_id = ice_devl_res_take(pf, res_id, slot, owner);
++		if (slot_id < 0)
++			return slot_id;
++	}
++
++	err = ice_maybe_change_rss_lut(pf, owner, old, new, extack);
++	if (err) {
++		NL_SET_ERR_MSG_FMT(extack, "failed to change RSS LUT, err: %d", err);
++		if (!take)
++			/* We have not released the resource, so we don't free
++			 * it, to avoid freeing LUT still in use or assigning it
++			 * to other entity.
++			 */
++			return -EBUSY;
++
++		goto undo_res_take;
++	}
++
++	if (!take) {
++undo_res_take:
++		int rel_err;
++
++		rel_err = ice_devl_res_free(pf, res_id, owner);
++		if (rel_err) {
++			NL_SET_ERR_MSG_FMT(extack,
++				"could not free resource, err: %d", rel_err);
++			if (!err)
++				err = rel_err;
++		}
++	}
++
++	return err;
++}
++
++static int ice_rss_lut_pf_occ_set_pf(u64 size, struct netlink_ext_ack *extack,
++				     void *priv)
++{
++	struct ice_pf *pf = priv;
++	int pf_id = pf->hw.pf_id;
++
++	scoped_guard(ice_adapter_devl, pf->adapter)
++		return ice_devl_res_change(size, ICE_RSS_LUT_PF, pf, pf, pf_id,
++					   extack);
++}
++
++static int ice_rss_lut_pf_occ_set_global(u64 size,
++					 struct netlink_ext_ack *extack,
++					 void *priv)
++{
++	struct ice_pf *pf = priv;
++
++	scoped_guard(ice_adapter_devl, pf->adapter)
++		return ice_devl_res_change(size, ICE_RSS_LUT_GLOBAL, pf, pf,
++					   ICE_ANY_SLOT, extack);
++}
++
++/**
++ * ice_take_rss_lut_pf - allocate PF RSS LUT for PF
++ * @pf: the PF device that PF LUT is physically on, and to allocate it for
++ *
++ * Acquire PF RSS LUT for the caller.
++ *
++ * Return: 0 on success, negative on error.
++ */
++int ice_take_rss_lut_pf(struct ice_pf *pf)
++{
++	int ret, pf_id = pf->hw.pf_id;
++
++	scoped_guard(ice_adapter_devl, pf->adapter) {
++		ret = ice_devl_res_take(pf, ICE_RSS_LUT_PF, pf_id, pf);
++		if (ret >= 0)
++			return 0;
++
++		return ret;
++	}
++}
++
++static void ice_devl_res_register(struct devlink *devlink,
++				  struct ice_devl_resource *resources,
++				  void *occ_priv)
++{
++	struct devlink_resource_size_params size_params;
++
++	devlink_resource_size_params_init(&size_params, 0, 0, 1,
++					  DEVLINK_RESOURCE_UNIT_ENTRY);
++	for (int i = 0; i < ICE_DEVL_RESOURCES_COUNT; i++) {
++		struct ice_devl_resource *res = &resources[i];
++		int err, resource_id = i;
++
++		if (!res->name)
++			continue; /* skip empty entries in config table */
++
++		size_params.size_max = res->max_size;
++		err = devl_resource_register(devlink, res->name,
++					     res->start_size, resource_id,
++					     res->parent_id, &size_params);
++		if (WARN_ONCE(err, "not all resource handlers registered, err: %d, resname: %s\n",
++			      err, res->name))
++			break;
++
++		devl_resource_occ_set_get_register(devlink, resource_id,
++						   res->set, res->get, occ_priv);
++	}
++}
++
++void ice_devl_whole_dev_resources_register(const struct ice_hw *hw,
++					   struct ice_adapter *adapter)
++{
++	struct devlink *devlink = adapter->devlink;
++	int pf_lut_cnt = hw->dev_caps.num_funcs;
++
++	devl_assert_locked(devlink);
++
++	adapter->resources[ICE_RSS_LUT_GLOBAL] = (struct ice_devl_resource) {
++		.name = "lut_512",
++		.parent_id = ICE_RSS_LUT_BOTH,
++		.max_size = ICE_NUM_GLOBAL_LUTS,
++		.get = ice_rss_lut_whole_dev_occ_get_global,
++		.set = ice_devl_resource_deny_occ_set,
++	};
++	adapter->resources[ICE_RSS_LUT_PF] = (struct ice_devl_resource) {
++		.name = "lut_2048",
++		.parent_id = ICE_RSS_LUT_BOTH,
++		.max_size = pf_lut_cnt,
++		.get = ice_rss_lut_whole_dev_occ_get_pf,
++		.set = ice_devl_resource_deny_occ_set,
++	};
++	adapter->resources[ICE_RSS_LUT_BOTH] = (struct ice_devl_resource) {
++		.name = "rss",
++		.parent_id = ICE_TOP_RESOURCE,
++		.max_size = pf_lut_cnt + ICE_NUM_GLOBAL_LUTS,
++		.get = ice_rss_lut_whole_dev_occ_get_both,
++		.set = ice_devl_resource_deny_occ_set,
++	};
++
++	ice_devl_res_register(devlink, adapter->resources, adapter);
++}
++
++void ice_devl_pf_resources_register(struct ice_pf *pf)
++{
++	struct ice_devl_resource pf_resources[ICE_DEVL_RESOURCES_COUNT] = {
++		[ICE_RSS_LUT_GLOBAL] = {
++			.name = "lut_512",
++			.parent_id = ICE_RSS_LUT_BOTH,
++			.max_size = 1,
++			.get = ice_rss_lut_pf_occ_get_global,
++			.set = ice_rss_lut_pf_occ_set_global,
++		},
++		[ICE_RSS_LUT_PF] = {
++			.name = "lut_2048",
++			.parent_id = ICE_RSS_LUT_BOTH,
++			.max_size = 1,
++			.get = ice_rss_lut_pf_occ_get_pf,
++			.set = ice_rss_lut_pf_occ_set_pf,
++			.start_size = 1,
++		},
++		[ICE_RSS_LUT_BOTH] = {
++			.name = "rss",
++			.parent_id = ICE_TOP_RESOURCE,
++			.max_size = 2,
++			.get = ice_rss_lut_pf_occ_get_both,
++			.set = ice_devl_resource_deny_occ_set,
++		},
++	};
++	struct devlink *devlink = priv_to_devlink(pf);
++
++	devl_assert_locked(devlink);
++	ice_devl_res_register(devlink, pf_resources, pf);
++}
+diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
+index d07d349a1692..064cf649714d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adapter.c
++++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
+@@ -8,6 +8,8 @@
+ #include "ice_adapter.h"
+ #include "ice.h"
+ 
++#include "devlink/resource.h"
++
+ #define ICE_ADAPTER_FIXED_INDEX	BIT_ULL(63)
+ 
+ #define ICE_ADAPTER_INDEX_E825C	\
+@@ -37,6 +39,7 @@ static u64 ice_adapter_index(struct pci_dev *pdev)
+ 
+ static int ice_adapter_init(void *priv, void *init_param)
+ {
++	const struct ice_hw *hw = init_param;
+ 	struct ice_adapter *adapter = priv;
+ 	struct devlink *devlink;
+ 
+@@ -49,12 +52,18 @@ static int ice_adapter_init(void *priv, void *init_param)
+ 	mutex_init(&adapter->ports.lock);
+ 	INIT_LIST_HEAD(&adapter->ports.ports);
+ 
++	ice_devl_whole_dev_resources_register(hw, adapter);
++
  	return 0;
  }
  
--static int devlink_resource_occ_put(struct devlink_resource *resource,
--				    struct sk_buff *skb)
-+static int
-+devlink_resource_occ_size_put_legacy(struct devlink_resource *resource,
-+				     struct sk_buff *skb)
+ static void ice_adapter_fini(void *priv)
  {
--	if (!resource->occ_get)
--		return 0;
--	return devlink_nl_put_u64(skb, DEVLINK_ATTR_RESOURCE_OCC,
--				  resource->occ_get(resource->occ_get_priv));
-+	if (devlink_nl_put_u64(skb, DEVLINK_ATTR_RESOURCE_SIZE, resource->size))
-+		goto err;
-+	if (resource->size != resource->size_new &&
-+	    devlink_nl_put_u64(skb, DEVLINK_ATTR_RESOURCE_SIZE_NEW,
-+			       resource->size_new))
-+		goto err;
-+	if (resource->occ_get &&
-+	    devlink_nl_put_u64(skb, DEVLINK_ATTR_RESOURCE_OCC,
-+			       resource->occ_get(resource->occ_priv)))
-+		goto err;
-+	if (nla_put_u8(skb, DEVLINK_ATTR_RESOURCE_SIZE_VALID,
-+		       resource->size_valid))
-+		goto err;
+ 	struct ice_adapter *adapter = priv;
++	struct devlink *devlink;
 +
-+	return 0;
-+err:
-+	return -EMSGSIZE;
-+}
-+
-+static int devlink_resource_occ_size_put(struct devlink_resource *resource,
-+					 struct sk_buff *skb)
-+{
-+	if (!resource->occ_get || !resource->occ_set)
-+		return devlink_resource_occ_size_put_legacy(resource, skb);
-+
-+	if (nla_put_u8(skb, DEVLINK_ATTR_RESOURCE_SIZE_VALID, true))
-+		return -EMSGSIZE;
-+
-+	return devlink_nl_put_u64(skb, DEVLINK_ATTR_RESOURCE_SIZE,
-+				  resource->occ_get(resource->occ_priv));
++	devlink = shd_priv_to_devlink(adapter);
++	devl_resources_unregister(devlink);
+ 
+ 	WARN_ON(!list_empty(&adapter->ports.ports));
+ 	mutex_destroy(&adapter->ports.lock);
+@@ -80,15 +89,16 @@ static const struct devlink_ops ice_adapter_devlink_ops = {
+  */
+ struct ice_adapter *ice_adapter_get(struct pci_dev *pdev)
+ {
++	struct ice_pf *pf = pci_get_drvdata(pdev);
+ 	struct ice_adapter *adapter;
+ 	struct devlink *devlink;
+ 	char devlink_id[32];
+ 	u64 index;
+ 
+ 	index = ice_adapter_index(pdev);
+ 	snprintf(devlink_id, sizeof(devlink_id), "%llx", index);
+ 	devlink = devlink_shd_get(devlink_id, &ice_adapter_devlink_ops,
+-				  sizeof(*adapter), NULL, pdev->dev.driver);
++				  sizeof(*adapter), &pf->hw, pdev->dev.driver);
+ 	if (!devlink)
+ 		return ERR_PTR(-ENOMEM);
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 168890986696..41eae7b0a3db 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -4514,7 +4514,7 @@ ice_aq_sff_eeprom(struct ice_hw *hw, u16 lport, u8 bus_addr,
+ 	return status;
  }
  
- static int devlink_resource_put(struct devlink *devlink, struct sk_buff *skb,
-@@ -183,24 +215,16 @@ static int devlink_resource_put(struct devlink *devlink, struct sk_buff *skb,
- 		return -EMSGSIZE;
+-static enum ice_lut_size ice_lut_type_to_size(enum ice_lut_type type)
++enum ice_lut_size ice_lut_type_to_size(enum ice_lut_type type)
+ {
+ 	switch (type) {
+ 	case ICE_LUT_VSI:
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index 2ac4e23f30b5..e47f2f881701 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -10,6 +10,8 @@
+ #include "ice_type.h"
+ #include "ice_vsi_vlan_ops.h"
  
- 	if (nla_put_string(skb, DEVLINK_ATTR_RESOURCE_NAME, resource->name) ||
--	    devlink_nl_put_u64(skb, DEVLINK_ATTR_RESOURCE_SIZE, resource->size) ||
- 	    devlink_nl_put_u64(skb, DEVLINK_ATTR_RESOURCE_ID, resource->id))
- 		goto nla_put_failure;
--	if (resource->size != resource->size_new &&
--	    devlink_nl_put_u64(skb, DEVLINK_ATTR_RESOURCE_SIZE_NEW,
--			       resource->size_new))
--		goto nla_put_failure;
--	if (devlink_resource_occ_put(resource, skb))
-+	if (devlink_resource_occ_size_put(resource, skb))
- 		goto nla_put_failure;
- 	if (devlink_resource_size_params_put(resource, skb))
- 		goto nla_put_failure;
-+
- 	if (list_empty(&resource->resource_list))
- 		goto out;
- 
--	if (nla_put_u8(skb, DEVLINK_ATTR_RESOURCE_SIZE_VALID,
--		       resource->size_valid))
--		goto nla_put_failure;
--
- 	child_resource_attr = nla_nest_start_noflag(skb,
- 						    DEVLINK_ATTR_RESOURCE_LIST);
- 	if (!child_resource_attr)
-@@ -634,6 +658,39 @@ int devl_resource_size_get(struct devlink *devlink,
- }
- EXPORT_SYMBOL_GPL(devl_resource_size_get);
- 
-+/**
-+ * devl_resource_occ_set_get_register - register occupancy getter and setter
-+ *
-+ * @devlink: devlink
-+ * @resource_id: resource id
-+ * @occ_set: occupancy setter callback
-+ * @occ_get: occupancy getter callback
-+ * @occ_priv: occupancy getter callback priv
-+ *
-+ * Setter will be called when the user wants to change the resource size,
-+ * getter is called to show the user what is current size of the resource.
-+ */
-+void devl_resource_occ_set_get_register(struct devlink *devlink,
-+					u64 resource_id,
-+					devlink_resource_occ_set_t *occ_set,
-+					devlink_resource_occ_get_t *occ_get,
-+					void *occ_priv)
-+{
-+	struct devlink_resource *resource;
-+
-+	lockdep_assert_held(&devlink->lock);
-+
-+	resource = devlink_resource_find(devlink, NULL, resource_id);
-+	if (WARN_ON(!resource))
-+		return;
-+	WARN_ON(resource->occ_get || resource->occ_set);
-+
-+	resource->occ_set = occ_set;
-+	resource->occ_get = occ_get;
-+	resource->occ_priv = occ_priv;
-+}
-+EXPORT_SYMBOL_GPL(devl_resource_occ_set_get_register);
++#include "devlink/resource.h"
 +
  /**
-  * devl_resource_occ_get_register - register occupancy getter
-  *
-@@ -657,7 +714,7 @@ void devl_resource_occ_get_register(struct devlink *devlink,
- 	WARN_ON(resource->occ_get);
- 
- 	resource->occ_get = occ_get;
--	resource->occ_get_priv = occ_get_priv;
-+	resource->occ_priv = occ_get_priv;
+  * ice_vsi_type_str - maps VSI type enum to string equivalents
+  * @vsi_type: VSI type enum
+@@ -885,10 +887,10 @@ static void ice_rss_clean(struct ice_vsi *vsi)
  }
- EXPORT_SYMBOL_GPL(devl_resource_occ_get_register);
  
-@@ -678,9 +735,10 @@ void devl_resource_occ_get_unregister(struct devlink *devlink,
- 	if (WARN_ON(!resource))
- 		return;
- 	WARN_ON(!resource->occ_get);
-+	WARN_ON(resource->occ_set);
+ /**
+- * ice_vsi_set_rss_params - Setup RSS capabilities per VSI type
++ * ice_vsi_set_dflt_rss_params - Setup default RSS capabilities per VSI type
+  * @vsi: the VSI being configured
+  */
+-static void ice_vsi_set_rss_params(struct ice_vsi *vsi)
++static void ice_vsi_set_dflt_rss_params(struct ice_vsi *vsi)
+ {
+ 	struct ice_hw_common_caps *cap;
+ 	struct ice_pf *pf = vsi->back;
+@@ -2352,6 +2354,9 @@ static int ice_vsi_cfg_def(struct ice_vsi *vsi)
  
- 	resource->occ_get = NULL;
--	resource->occ_get_priv = NULL;
-+	resource->occ_priv = NULL;
+ 	vsi->vsw = pf->first_sw;
+ 
++	if (vsi->flags & ICE_VSI_FLAG_INIT)
++		ice_vsi_set_dflt_rss_params(vsi);
++
+ 	ret = ice_vsi_alloc_def(vsi, vsi->ch);
+ 	if (ret)
+ 		return ret;
+@@ -2371,7 +2376,14 @@ static int ice_vsi_cfg_def(struct ice_vsi *vsi)
+ 	}
+ 
+ 	/* set RSS capabilities */
+-	ice_vsi_set_rss_params(vsi);
++	if ((vsi->flags & ICE_VSI_FLAG_INIT) && vsi->type == ICE_VSI_PF) {
++		ret = ice_take_rss_lut_pf(pf);
++		if (ret) {
++			dev_err(dev, "Failed to allocate RSS LUT for PF: %d\n",
++				ret);
++			goto unroll_vsi_alloc_stat;
++		}
++	}
+ 
+ 	/* set TC configuration */
+ 	ice_vsi_set_tc_cfg(vsi);
+@@ -2559,6 +2571,11 @@ void ice_vsi_decfg(struct ice_vsi *vsi)
+ 	ice_vsi_put_qs(vsi);
+ 	ice_vsi_free_arrays(vsi);
+ 
++	if (vsi->flags & ICE_VSI_FLAG_INIT) {
++		if (vsi->type == ICE_VSI_PF)
++			ice_free_rss_lut_flr(pf);
++	}
++
+ 	/* SR-IOV determines needed MSIX resources all at once instead of per
+ 	 * VSI since when VFs are spawned we know how many VFs there are and how
+ 	 * many interrupts each VF needs. SR-IOV MSIX resources are also
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 42d9c4220f43..94232f4a45ad 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -15,6 +15,7 @@
+ #include "ice_dcb_nl.h"
+ #include "devlink/devlink.h"
+ #include "devlink/port.h"
++#include "devlink/resource.h"
+ #include "ice_sf_eth.h"
+ #include "ice_hwmon.h"
+ #include "ice_acl.h"
+@@ -5037,6 +5038,7 @@ static int ice_init_devlink(struct ice_pf *pf)
+ 	ice_devlink_init_regions(pf);
+ 	ice_devlink_register(pf);
+ 	ice_health_init(pf);
++	ice_devl_pf_resources_register(pf);
+ 
+ 	return 0;
  }
- EXPORT_SYMBOL_GPL(devl_resource_occ_get_unregister);
+@@ -5047,6 +5049,7 @@ static void ice_deinit_devlink(struct ice_pf *pf)
+ 	ice_devlink_unregister(pf);
+ 	ice_devlink_destroy_regions(pf);
+ 	ice_devlink_unregister_params(pf);
++	devl_resources_unregister(priv_to_devlink(pf));
+ }
  
+ static int ice_init(struct ice_pf *pf)
+@@ -7972,6 +7975,8 @@ int ice_set_rss_lut(struct ice_vsi *vsi, u8 *lut, u16 lut_size)
+ 	params.lut_size = lut_size;
+ 	params.lut_type = vsi->rss_lut_type;
+ 	params.lut = lut;
++	if (params.lut_type == ICE_LUT_GLOBAL)
++		params.global_lut_id = vsi->global_lut_id;
+ 
+ 	status = ice_aq_set_rss_lut(hw, &params);
+ 	if (status)
+@@ -8025,11 +8030,14 @@ int ice_get_rss_lut(struct ice_vsi *vsi, u8 *lut, u16 lut_size)
+ 	params.lut_size = lut_size;
+ 	params.lut_type = vsi->rss_lut_type;
+ 	params.lut = lut;
++	if (params.lut_type == ICE_LUT_GLOBAL)
++		params.global_lut_id = vsi->global_lut_id;
+ 
+ 	status = ice_aq_get_rss_lut(hw, &params);
+-	if (status)
+-		dev_err(ice_pf_to_dev(vsi->back), "Cannot get RSS lut, err %d aq_err %s\n",
+-			status, libie_aq_str(hw->adminq.sq_last_status));
++	if (status) {
++		dev_err(ice_pf_to_dev(vsi->back), "Cannot get RSS lut, err %d aq_err %s, luttype: %d\n",
++			status, libie_aq_str(hw->adminq.sq_last_status), params.lut_type);
++	}
+ 
+ 	return status;
+ }
 -- 
 2.39.3
 
