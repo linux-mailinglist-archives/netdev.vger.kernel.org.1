@@ -1,133 +1,141 @@
-Return-Path: <netdev+bounces-285911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285914-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wA/hMGcF/mnumAAAu9opvQ
-	(envelope-from <netdev+bounces-285911-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 17:46:47 +0200
+	id +AFDMTgF/mm7mAAAu9opvQ
+	(envelope-from <netdev+bounces-285914-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 17:46:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0918E4F8F42
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 17:46:46 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63BE64F8EFB
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 17:45:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 40D6A301C88B
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 15:43:43 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 37556300336D
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 15:45:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ECBE3FBED0;
-	Fri,  8 May 2026 15:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D7A92D739B;
+	Fri,  8 May 2026 15:45:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b="HekLV+e3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gOfSSsOh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E7933F2110
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 15:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.38.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5F82ECE93
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 15:45:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778255019; cv=none; b=LCdRv/57P9b4k7kznz5jPCUGDpmUTLfrucwccpHyFAeqCkaGYtCIkS1vooyYav0Cax/s7QjnYRtjTg4MIKfJaqPe8aoT2OX+3x3Sx9rMM9NoyN5rv/3YmclHu6IIYs9UdYiWWWVKxOKULJGag/DKTc0/1byxHEONYP8+XJvdLW8=
+	t=1778255158; cv=none; b=k0vwVbUAs39PlTkafQLKAwQHfdx3bV0IJkCgg3EptNdQuwgrnLmjWAlgcyVBys7H1h7PRkeWQrBb4NrOGslQ07ysFyZ6/HU5ZhTlmIE+IkJ2Q0KiugaM0i7HeBBlA1yaay4ygsdfFi6XE716AfZHU4a/QIR9mLrNi9nd1QNnjhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778255019; c=relaxed/simple;
-	bh=HMkUWeQX9FSZ8Awke4lJ+bZaxsMKQ1spLqNUHqMZh54=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D/XoGTXKcsBEcxSvgIuLeanouE0skAH7CCBRpnEx5ogcrSgRWqlGvMfA3GLeO/ba7s+g2TMbUV1JIB8e1BaI6uAX2TM9Bf8kZYl/lQxx4eZ69yNECUbqjjdhKdYGEIK5oganxwvvfmrAp2UPdjb72x4VYhzG/mH+Ltq8a7N050M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=HekLV+e3; arc=none smtp.client-ip=23.88.38.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simonwunderlich.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
-	s=09092022; t=1778255014;
+	s=arc-20240116; t=1778255158; c=relaxed/simple;
+	bh=oEl33Z/vw9llxa/Yt3MmVWX3MitGrgbvbnrf7MvkUuY=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=bgSpV2Z7MLgKApy3WBhXeW24I4Q/f10k8BwpK5QP6UJdC0LI6OirgXactdO3FLsxtcNJH1gPSBb2l/nyBxjO9Y01n5xUdMrLygG2Y/L9XovIrgiSlif5204eKA6EHafTT9DDt28A5XTgoSteE3tU8fZHncj6oKRg4+ewEB/UBs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gOfSSsOh; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778255155;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=t2WVnKodF7OA43BNZg/AbdNpLnEVxLugYisgg7uXA3A=;
-	b=HekLV+e3twos4FvXcDO/PZmGKBhyVJ5u+/IWhNtiWCQeyYwvIYa6Bya9gdOVId7tQ3ZFMW
-	HibHj3QhsCoq2OpA19T7ED93XQuJbrTiiYIFaRv4TA3SaIOiFKKEsUqY53yrkzKuRSkCAL
-	CAxgIg+tCpM+31PzcQ8LfvIAr0VqnjUl8xGxmfwubFMKc1rGE1Gwx7RPqAPK2E/ShpUYx+
-	pjIYgJ/ZadC+RfWwEtPsJkyvZOuQQ2wpBgMoVpy7B25Y8X03fYbSYHaF4rG6Vd5qT5i2I3
-	7RzMIv6AncAu1KKdUy2/TeIk7LqVECu71CRaa2un37U+oviBx/K8Eq3UQpVzvw==
-From: Simon Wunderlich <sw@simonwunderlich.de>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	Sven Eckelmann <sven@narfation.org>,
-	stable@kernel.org,
-	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH net 8/8] batman-adv: bla: put backbone reference on failed claim hash insert
-Date: Fri,  8 May 2026 17:43:14 +0200
-Message-ID: <20260508154314.12817-9-sw@simonwunderlich.de>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260508154314.12817-1-sw@simonwunderlich.de>
-References: <20260508154314.12817-1-sw@simonwunderlich.de>
+	bh=DoqUW4Ab7C8hyJZDCA7GvuscNtP71DqUE4zEpURuA34=;
+	b=gOfSSsOh7BjthZiKF05dTSk+8oKqQrdRL9h7Imi3OIYPPm0MEEo8DR/GTdUT307xVDK3wS
+	Z18oH8rEGW/dn1iUUQz/pDJDwC8BisZDwro80SwxMVIImjJnEl68gIO+dDdpnXhCeMLgOf
+	gRBCrSLiPy60QFa07/BUILU8QBrdTNQ=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-517-Y9P6IGaIOF6YZO5TtyiREg-1; Fri,
+ 08 May 2026 11:45:54 -0400
+X-MC-Unique: Y9P6IGaIOF6YZO5TtyiREg-1
+X-Mimecast-MFC-AGG-ID: Y9P6IGaIOF6YZO5TtyiREg_1778255152
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4E0AC180035D;
+	Fri,  8 May 2026 15:45:52 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.48.83])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 91A9F19560A2;
+	Fri,  8 May 2026 15:45:48 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <af2kdW2F1gJ9U-Gg@v4bel>
+References: <af2kdW2F1gJ9U-Gg@v4bel>
+To: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: dhowells@redhat.com, marc.dionne@auristor.com, davem@davemloft.net,
+    edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+    horms@kernel.org, qingfang.deng@linux.dev, jiayuan.chen@linux.dev,
+    linux-afs@lists.infradead.org, netdev@vger.kernel.org,
+    stable@vger.kernel.org
+Subject: Re: [PATCH net v3] rxrpc: Also unshare DATA/RESPONSE packets when paged frags are present
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 0918E4F8F42
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <195757.1778255147.1@warthog.procyon.org.uk>
+Date: Fri, 08 May 2026 16:45:47 +0100
+Message-ID: <195758.1778255147@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Rspamd-Queue-Id: 63BE64F8EFB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[simonwunderlich.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[simonwunderlich.de:s=09092022];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-285914-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285911-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[simonwunderlich.de:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[simonwunderlich.de:email,simonwunderlich.de:mid,simonwunderlich.de:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,narfation.org:email]
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,warthog.procyon.org.uk:mid]
 X-Rspamd-Action: no action
 
-From: Sven Eckelmann <sven@narfation.org>
+Hyunwoo Kim <imv4bel@gmail.com> wrote:
 
-When batadv_bla_add_claim() fails to insert a new claim into the hash, it
-leaked a reference to the backbone_gw for which the claim was intended.
-Call batadv_backbone_gw_put() on the error path to release the reference
-and avoid leaking the backbone_gw object.
+> The DATA-packet handler in rxrpc_input_call_event() and the RESPONSE
+> handler in rxrpc_verify_response() copy the skb to a linear one before
+> calling into the security ops only when skb_cloned() is true.  An skb
+> that is not cloned but still carries externally-owned paged fragments
+> (e.g. SKBFL_SHARED_FRAG set by splice() into a UDP socket via
+> __ip_append_data, or a chained skb_has_frag_list()) falls through to
+> the in-place decryption path, which binds the frag pages directly into
+> the AEAD/skcipher SGL via skb_to_sgvec().
+> 
+> Extend the gate to also unshare when skb_has_frag_list() or
+> skb_has_shared_frag() is true.  This catches the splice-loopback vector
+> and other externally-shared frag sources while preserving the
+> zero-copy fast path for skbs whose frags are kernel-private (e.g. NIC
+> page_pool RX, GRO).  The OOM/trace handling already in place is reused.
+> 
+> Fixes: d0d5c0cd1e71 ("rxrpc: Use skb_unshare() rather than skb_cow_data()")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
 
-Cc: stable@kernel.org
-Fixes: 3db0decf1185 ("batman-adv: Fix non-atomic bla_claim::backbone_gw access")
-Signed-off-by: Sven Eckelmann <sven@narfation.org>
-Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
----
- net/batman-adv/bridge_loop_avoidance.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/net/batman-adv/bridge_loop_avoidance.c b/net/batman-adv/bridge_loop_avoidance.c
-index 879ab043d57a9..cec11f1251d66 100644
---- a/net/batman-adv/bridge_loop_avoidance.c
-+++ b/net/batman-adv/bridge_loop_avoidance.c
-@@ -723,6 +723,7 @@ static void batadv_bla_add_claim(struct batadv_priv *bat_priv,
- 
- 		if (unlikely(hash_added != 0)) {
- 			/* only local changes happened. */
-+			batadv_backbone_gw_put(backbone_gw);
- 			kfree(claim);
- 			return;
- 		}
--- 
-2.47.3
+Acked-by: David Howells <dhowells@redhat.com>
 
 
