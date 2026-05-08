@@ -1,257 +1,296 @@
-Return-Path: <netdev+bounces-285878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285879-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8NtkON/5/WnYlQAAu9opvQ
-	(envelope-from <netdev+bounces-285878-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:57:35 +0200
+	id 4EaJJyT6/WnYlQAAu9opvQ
+	(envelope-from <netdev+bounces-285879-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:58:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87EF64F831A
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:57:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09E684F834D
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:58:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7A7E8303FF25
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 14:55:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6E5023045EEE
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 14:56:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA8073EE1CC;
-	Fri,  8 May 2026 14:55:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D5A23F787F;
+	Fri,  8 May 2026 14:56:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rjLnu2D1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EJi9pnPw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f195.google.com (mail-pf1-f195.google.com [209.85.210.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B57EA2571C7;
-	Fri,  8 May 2026 14:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C77803F54C7
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 14:56:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778252146; cv=none; b=LtlZvJzNt6KU6JUYVXcGrmkbJjnrn7jTIjWCSsJZn24sPjL0fIyPqO24PjI8g6iRL0A2YoUIQfKi1sWfbR+E0ud/dJfKXNTQ4aMZpRAcvcceflP9hPyLNctsoRZAXDaVrT4dfBtzZLpiDHHxtHihSe+Pq2RSUt3syOt/hu79WVA=
+	t=1778252206; cv=none; b=m7uFgoGSQBEzSLLVM9wFyIcPA4pd/rXmAyuZM4fGhGlufFmAKounFLX/DJc3r7qb3r7vTakwpENh3g2nqqyjm1VYfzqkZAnNwTLFz6SscmGJgzXFynRqsN9B2h5BQEhEBZXVlX56wL4pLf1VmTMLkVhCw7kz8kdDzFJEhOKQYTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778252146; c=relaxed/simple;
-	bh=N869R35gS1hmPx22qrwaifKiqn02BVaqbn9SBybbSpU=;
+	s=arc-20240116; t=1778252206; c=relaxed/simple;
+	bh=ST5lkWfuyXox1p/2s668Qu5NvhdlAzM4i+LjigyNGwY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SiY9PvSZdXXAaqmmgl1FiFiWIEOPFcwjRb7TGnzh+wk7hGp/VxiTYdvl5YHgO+IMv560HOsHdGZaiom+383w6/dPnT/e/QwaYH0Kee7BlWzMjm8R3meZCvjIk2YWeT/iOV7NXdM3pzzCTapRtp8pObAnDtiKeD5V2JxCgDV04oQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rjLnu2D1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AEFAC2BCB0;
-	Fri,  8 May 2026 14:55:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778252146;
-	bh=N869R35gS1hmPx22qrwaifKiqn02BVaqbn9SBybbSpU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rjLnu2D10PWshoFmra/WqT2x/oIazuGIRH8ewIGoBqLvCb8aB9EYk8O+CkpUcagTh
-	 296wobZZiAHV25FyTCp5M3vABi828lVuMnB8U/NAzbSpyD68jS/FZcQVWXjLjyQ70g
-	 uriBMCHtOGT+YTrfC+K9Squ9DQR5y8LcBOGY/NqpOIC+KFYmztke+3TBg/pChX2mlE
-	 sc2R87QeTXzp7dJXNJmrANH6ufElnyNlJ+mqfNI2mbpK2RC6Xmo04EWZ9nXy5a7W6X
-	 0teea2lGgLpGHYqIdSOKndHAo78EixdezGqcPVOtMKhgmYZ1UiDE4tmXDFlIfnsnKQ
-	 +FvNwNzPFsiXA==
-Date: Fri, 8 May 2026 15:55:40 +0100
-From: Conor Dooley <conor@kernel.org>
-To: =?utf-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	rmk+kernel@armlinux.org.uk, maxime.chevallier@bootlin.com,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
-	linmin@eswincomputing.com, pinkesh.vaghela@einfochips.com,
-	pritesh.patel@einfochips.com, weishangjuan@eswincomputing.com
-Subject: Re: Re: [PATCH net v1 1/2] dt-bindings: ethernet: eswin: refine
- delay model and HSP register description
-Message-ID: <20260508-detention-frisk-84cff00cb228@spud>
-References: <20260507083037.152-1-lizhi2@eswincomputing.com>
- <20260507083136.175-1-lizhi2@eswincomputing.com>
- <20260507-mural-moocher-ad6e07ef8ae0@spud>
- <22d09a07.7cfd.19e061cacea.Coremail.lizhi2@eswincomputing.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=R8J6diWQ7+TallD+VaHo7NSyhZ1Lz9Qb3hm9brGzbn16D8bHnbP598P3ltaPNrNPypLBc8SVJZOw9Osk0BWBSq8c8oYrgzMdCvXBNFNQgJGDKfENP4n+we1Rih9GgLzWacTjymvGVrA1zKIb6rZjDHKThB5Kh2eDnzMpofl3Pbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EJi9pnPw; arc=none smtp.client-ip=209.85.210.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f195.google.com with SMTP id d2e1a72fcca58-83538fbd0b2so898667b3a.0
+        for <netdev@vger.kernel.org>; Fri, 08 May 2026 07:56:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778252204; x=1778857004; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=eSWJGa1a8P8ytmqmY0bXOJYZ37jgE6xppZF6e45wgEA=;
+        b=EJi9pnPwCM0Fj4/nh1cAAEl+iwcxt9GixmhXKLamW2OWananPT03KhbOBCMgpXKmXq
+         cdfWlERyxEOgtA4fMzlroijZ3BA8fOpMKruFISgfqQnlV9B608RjULm7DoIBRzq6l9iz
+         hy2Pah6XuFZlrWWRu9OX/BxP4d6cGVQvuf+2jNMSfgcfvl++RNJ8bfV3IcgvUC/usl5C
+         z0MCTH0lGyRAAO3oJH+1cXs1c03p2+yidjCY/yWMlQgJcQdRso5Vbonv071/jwMs8vb1
+         WV37vHkZQ4CAPIHIy3SuI0QgGMUDtspNECNwOkRsXCcO1CKHyD6k2NHkZ5DrCT5q54Ig
+         uZJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778252204; x=1778857004;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eSWJGa1a8P8ytmqmY0bXOJYZ37jgE6xppZF6e45wgEA=;
+        b=FJBrr0RlqqUkwXF2VwO9P+WY3tLYOsWeirvNnbMrK3tHzvbdtqtCOW90DO3ScvRVAR
+         RjBDoSSAqy1o2e1Q6ksfawz8lIc2+oDryQ0lmOG3vtbj0DGqnElnNxRaTm086ZsOZi24
+         2pi1JR6jOzc9PUPWCmSvpxDglQ0962AUIz3BFCGd8rTxr1DSkX1BBXfwf1QNQAwmRrxP
+         pt3msmUQgTK1oy8fO6oclwtuxDSuvHePTXcvhgFlcs4jqA3mDpVMT/+D81riuk8luIRd
+         qODq9UMUSQBz4fO3c96zg0GUhWdbTjBy/kucvITZAqLSJ8k+PHWigysS3tprqf5RM7JA
+         Ecfw==
+X-Forwarded-Encrypted: i=1; AFNElJ+wNPatLyramr4czQgVcMYDxwUK73LoUGCtw5ANAvCo5T+Ol+9tG71l0zjW4ynbPeNuiAfWJnI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjhvBeNpCvs0fBRGRtcWxzYiUsUcuTers38F2G8YtQ2ZbHGqkY
+	EqLkKa6zxFv+N7GEsqatFNj9N7LwAgvDp9jAb0K28+PUgXDBlJSvNNyW
+X-Gm-Gg: Acq92OHobUZLYtxaWkxEJjS5IuDAkgaSA0jnEj8tXoRY20pB+kE7foM2sPHNmc8AE0m
+	x+9R/vWDB8+fh03RQ2zbgDDXLOmlJ0Y0e+0d7uPhtDZbNLS8H4e4F++1yMl8G2SgyWpFOSeS50B
+	lfzGXCwSY2/rQiHCxdqAWeW5CGG1MiKtPRMldaWfNPtOZb8c6cIIslp28NYRujrvUt7Gh/3aHs5
+	iu8jiN0qOYaIGlLkl+A3Xx+TMARO5uCD3k7UJjJ2IcMIoZBZHNGy8U0g9opb+jQDE8B4DGtlZZ+
+	XbhwyHvb/GE0rI2gk88w+WRnpZPT3miehtYhn8N96FH3sPO/K703E/NBvIdIgfSwJAKvykR7Fwb
+	gLNX3d65HUlfUM4F/E8UIKMb1jxmjx/Jg6/MThvvvga165E/Howp/kcvA9O9u2uBqJvHApxtinj
+	90cfoY6WadfsaT6m8u
+X-Received: by 2002:a05:6a00:124d:b0:835:7c0e:b529 with SMTP id d2e1a72fcca58-83a5bcd244cmr12592060b3a.12.1778252204005;
+        Fri, 08 May 2026 07:56:44 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:50::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-839682a272asm12835763b3a.54.2026.05.08.07.56.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 May 2026 07:56:43 -0700 (PDT)
+Date: Fri, 8 May 2026 07:56:42 -0700
+From: Stanislav Fomichev <sdf.kernel@gmail.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
+	Alex Shi <alexs@kernel.org>, Yanteng Si <si.yanteng@linux.dev>, 
+	Dongliang Mu <dzm91@hust.edu.cn>, Michael Chan <michael.chan@broadcom.com>, 
+	Pavan Chebbi <pavan.chebbi@broadcom.com>, Joshua Washington <joshwash@google.com>, 
+	Harshitha Ramamurthy <hramamurthy@google.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com, 
+	Daniel Borkmann <daniel@iogearbox.net>, Nikolay Aleksandrov <razor@blackwall.org>, 
+	Shuah Khan <shuah@kernel.org>, dw@davidwei.uk, mohsin.bashr@gmail.com, willemb@google.com, 
+	jiang.kun2@zte.com.cn, xu.xin16@zte.com.cn, wang.yaxin@zte.com.cn, 
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Stanislav Fomichev <sdf@fomichev.me>, Mina Almasry <almasrymina@google.com>, 
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v3 1/8] net: convert netmem_tx flag to enum
+Message-ID: <af35ekIjYDXIDWVR@devvm7509.cco0.facebook.com>
+References: <20260507-tcp-dm-netkit-v3-0-52821445867c@meta.com>
+ <20260507-tcp-dm-netkit-v3-1-52821445867c@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="z+PhFZ7j1pI5I6B9"
-Content-Disposition: inline
-In-Reply-To: <22d09a07.7cfd.19e061cacea.Coremail.lizhi2@eswincomputing.com>
-X-Rspamd-Queue-Id: 87EF64F831A
-X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	MAILLIST(-0.15)[generic];
-	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285878-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,st-md-mailman.stormreply.com,lists.infradead.org,eswincomputing.com,einfochips.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Action: no action
-
-
---z+PhFZ7j1pI5I6B9
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260507-tcp-dm-netkit-v3-1-52821445867c@meta.com>
+X-Rspamd-Queue-Id: 09E684F834D
+X-Rspamd-Server: lfdr
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
+	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285879-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[40];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,linux.dev,hust.edu.cn,broadcom.com,nvidia.com,fb.com,meta.com,iogearbox.net,blackwall.org,davidwei.uk,gmail.com,zte.com.cn,vger.kernel.org,fomichev.me];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:email,devvm7509.cco0.facebook.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Action: no action
 
-On Fri, May 08, 2026 at 01:43:23PM +0800, =E6=9D=8E=E5=BF=97 wrote:
->=20
->=20
->=20
-> > -----=E5=8E=9F=E5=A7=8B=E9=82=AE=E4=BB=B6-----
-> > =E5=8F=91=E4=BB=B6=E4=BA=BA: "Conor Dooley" <conor@kernel.org>
-> > =E5=8F=91=E9=80=81=E6=97=B6=E9=97=B4:2026-05-08 01:24:02 (=E6=98=9F=E6=
-=9C=9F=E4=BA=94)
-> > =E6=94=B6=E4=BB=B6=E4=BA=BA: lizhi2@eswincomputing.com
-> > =E6=8A=84=E9=80=81: andrew+netdev@lunn.ch, davem@davemloft.net, edumaze=
-t@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@=
-kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org, devicetree@vger.ke=
-rnel.org, linux-kernel@vger.kernel.org, mcoquelin.stm32@gmail.com, alexandr=
-e.torgue@foss.st.com, rmk+kernel@armlinux.org.uk, maxime.chevallier@bootlin=
-=2Ecom, linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.in=
-fradead.org, ningyu@eswincomputing.com, linmin@eswincomputing.com, pinkesh.=
-vaghela@einfochips.com, pritesh.patel@einfochips.com, weishangjuan@eswincom=
-puting.com
-> > =E4=B8=BB=E9=A2=98: Re: [PATCH net v1 1/2] dt-bindings: ethernet: eswin=
-: refine delay model and HSP register description
-> >=20
-> > On Thu, May 07, 2026 at 04:31:36PM +0800, lizhi2@eswincomputing.com wro=
-te:
-> > > From: Zhi Li <lizhi2@eswincomputing.com>
-> > >=20
-> > > Refine the EIC7700 Ethernet dt-binding based on observed hardware beh=
-avior
-> > > and clarify the original delay model for eth0.
-> > >=20
-> > > The previous binding used an enum-based definition for
-> > > rx-internal-delay-ps and tx-internal-delay-ps. Replace it with a
-> > > range-based model using:
-> > >=20
-> > >   - minimum: 0
-> > >   - maximum: 2540
-> > >   - multipleOf: 20
-> > >=20
-> > > This better reflects the actual hardware implementation, which
-> > > supports 20ps granularity delay steps in the MAC RGMII interface.
-> > >=20
-> > > The tx/rx internal delay values are clarified as MAC-side programmable
-> > > delay components applied on the RGMII clock/data path, representing
-> > > the effective delay seen at the MAC interface.
-> > >=20
-> > > This does not change the intended hardware semantics, but aligns the
-> > > binding with the actual hardware implementation.
-> > >=20
-> > > These properties are optional and only required when MAC-side fine
-> > > tuning is needed; otherwise delay alignment is provided by PHY or
-> > > board design.
-> > >=20
-> > > Depending on the selected RGMII timing mode, delay alignment may be
-> > > provided by the PHY (e.g. rgmii-id) or by board/MAC-side configuratio=
-n.
-> > > When PHY or board design already provides the required delay, these
-> > > MAC-side properties may be omitted. When MAC-side fine tuning is
-> > > required, they should be provided to describe the internal RGMII
-> > > timing adjustment.
-> > >=20
-> > > Additionally, extend the description of the HSP subsystem register
-> > > layout used by the MAC glue logic. This includes explicit TXD and RXD
-> > > delay control registers to ensure deterministic initialization and
-> > > to override any residual configuration potentially left by bootloader=
-s.
-> > >=20
-> > > Add reference to the EIC7700X SoC Technical Reference Manual,
-> > > Chapter 10 ("High-Speed Interface"), Part 4 for background of the
-> > > HSP CSR block:
-> > > https://github.com/eswincomputing/EIC7700X-SoC-Technical-Reference-Ma=
-nual/releases
-> > >=20
-> > > There are no in-tree users of this binding, so no ABI impact is
-> > > expected.
-> > >=20
-> > > Fixes: 888bd0eca93c ("dt-bindings: ethernet: eswin: Document for EIC7=
-700 SoC")
-> > > Signed-off-by: Zhi Li <lizhi2@eswincomputing.com>
-> > > ---
-> >=20
-> > While this is v1, it's really v8 and there should therefore be a
-> > changelog that explains where my ack and the new compatible went.
-> >=20
->=20
-> Thanks for the review.
->=20
-> Based on Jakub's feedback on the previous v7 series, I plan to split the
-> changes into two separate series:
->=20
-> - a smaller fix series intended for net,
-> - and a separate eth1 feature series intended for net-next.
->=20
-> After the split, the scope and target trees of the two series will differ
-> from the original combined series, so I plan to restart the revision
-> numbering from v1 for both series.
->=20
-> The additional compatible string and the eth1-specific DT binding
-> extensions will be moved into the separate feature series, and I will
-> reflect this in the v2 cover letter.
->=20
-> The DT binding changes in this fix series v1 are simply extracted from the
-> previous v7 series as part of the split.
->=20
-> Since the series has been restructured, I will drop the previous
-> Acked-by tags.
->=20
-> I will also document the reason for doing so and the impact of the split
-> in the v2 cover letter.
+On 05/07, Bobby Eshleman wrote:
+> From: Bobby Eshleman <bobbyeshleman@meta.com>
+> 
+> Devices that support netmem TX previously set dev->netmem_tx = true.
+> This was checked in validate_xmit_unreadable_skb() to drop unreadable
+> skbs (skbs with dmabuf-backed frags) before they reach drivers that
+> would mishandle them or devices that would not have the iommu mappings
+> for them.
+> 
+> A subsequent patch will introduce a third state for virtual devices
+> that forward unreadable skbs without ever performing DMA on them. To
+> prepare for that, convert the boolean dev->netmem_tx into an enum:
+> 
+> NETMEM_TX_NONE   - no netmem TX support (drop unreadable skbs)
+> NETMEM_TX_DMA    - full support, device does DMA
+> 
+> Update the existing NIC drivers (bnxt, gve, mlx5, fbnic) and the
+> validators in net/core to use the new enum. No functional change.
+> 
+> Acked-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+> ---
+> Changes in v3:
+> - Split NO_DMA changes into subsequent commit (Jakub)
+> - Move !netdev->netmem_tx -> netdev->netmem_tx ==
+>   NETMEM_TX_NONE conversions to this patch (Jakub)
+> 
+> Changes in v2:
+> - Squash driver conversion patches (2-5) into patch 1 (Jakub)
+> ---
+>  Documentation/networking/netmem.rst                    | 5 ++++-
+>  Documentation/translations/zh_CN/networking/netmem.rst | 4 +++-
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c              | 2 +-
+>  drivers/net/ethernet/google/gve/gve_main.c             | 2 +-
+>  drivers/net/ethernet/mellanox/mlx5/core/en_main.c      | 2 +-
+>  drivers/net/ethernet/meta/fbnic/fbnic_netdev.c         | 2 +-
+>  include/linux/netdevice.h                              | 8 +++++++-
+>  net/core/dev.c                                         | 2 +-
+>  net/core/netdev-genl.c                                 | 2 +-
+>  9 files changed, 20 insertions(+), 9 deletions(-)
+> 
+> diff --git a/Documentation/networking/netmem.rst b/Documentation/networking/netmem.rst
+> index b63aded46337..5ccadba4f373 100644
+> --- a/Documentation/networking/netmem.rst
+> +++ b/Documentation/networking/netmem.rst
+> @@ -95,4 +95,7 @@ Driver TX Requirements
+>     netdev@, or reach out to the maintainers and/or almasrymina@google.com for
+>     help adding the netmem API.
+>  
+> -2. Driver should declare support by setting `netdev->netmem_tx = true`
+> +2. Driver should declare support by setting `netdev->netmem_tx` to the
+> +   appropriate mode:
+> +
+> +   - `NETMEM_TX_DMA`: for physical devices that perform DMA.
+> diff --git a/Documentation/translations/zh_CN/networking/netmem.rst b/Documentation/translations/zh_CN/networking/netmem.rst
+> index fe351a240f02..9c84423b7528 100644
+> --- a/Documentation/translations/zh_CN/networking/netmem.rst
+> +++ b/Documentation/translations/zh_CN/networking/netmem.rst
+> @@ -89,4 +89,6 @@ dma-mapping API 去处理。
+>  使用某个还不存在的 netmem API，你可以自行添加并提交到 netdev@，也可以联系维护
+>  人员或者发送邮件至 almasrymina@google.com 寻求帮助。
+>  
+> -2. 驱动程序应通过设置 netdev->netmem_tx = true 来表明自身支持 netmem 功能。
+> +2. 驱动程序应将 `netdev->netmem_tx` 设置为适当的模式：
+> +
+> +   - `NETMEM_TX_DMA`：适用于执行 DMA 的物理设备。
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index 8c55874f44ca..ed9c22dc4a5a 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -17120,7 +17120,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	dev->queue_mgmt_ops = &bnxt_queue_mgmt_ops_unsupp;
+>  	if (BNXT_SUPPORTS_QUEUE_API(bp))
+>  		dev->queue_mgmt_ops = &bnxt_queue_mgmt_ops;
+> -	dev->netmem_tx = true;
+> +	dev->netmem_tx = NETMEM_TX_DMA;
+>  
+>  	rc = register_netdev(dev);
+>  	if (rc)
+> diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
+> index 424d973c97f2..dd2b8f087163 100644
+> --- a/drivers/net/ethernet/google/gve/gve_main.c
+> +++ b/drivers/net/ethernet/google/gve/gve_main.c
+> @@ -2894,7 +2894,7 @@ static int gve_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  		goto abort_with_wq;
+>  
+>  	if (!gve_is_gqi(priv) && !gve_is_qpl(priv))
+> -		dev->netmem_tx = true;
+> +		dev->netmem_tx = NETMEM_TX_DMA;
+>  
+>  	err = register_netdev(dev);
+>  	if (err)
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> index 5a46870c4b74..fc49aae38807 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> @@ -5924,7 +5924,7 @@ static void mlx5e_build_nic_netdev(struct net_device *netdev)
+>  
+>  	netdev->priv_flags       |= IFF_UNICAST_FLT;
+>  
+> -	netdev->netmem_tx = true;
+> +	netdev->netmem_tx = NETMEM_TX_DMA;
+>  
+>  	netif_set_tso_max_size(netdev, GSO_MAX_SIZE);
+>  	mlx5e_set_xdp_feature(priv);
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+> index c406a3b56b37..138e522ef9b9 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+> @@ -752,7 +752,7 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
+>  	netdev->netdev_ops = &fbnic_netdev_ops;
+>  	netdev->stat_ops = &fbnic_stat_ops;
+>  	netdev->queue_mgmt_ops = &fbnic_queue_mgmt_ops;
+> -	netdev->netmem_tx = true;
+> +	netdev->netmem_tx = NETMEM_TX_DMA;
+>  
+>  	fbnic_set_ethtool_ops(netdev);
+>  
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 0e1e581efc5a..580bccb118a0 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -1788,6 +1788,11 @@ enum netdev_stat_type {
+>  	NETDEV_PCPU_STAT_DSTATS, /* struct pcpu_dstats */
+>  };
+>  
+> +enum netmem_tx_mode {
+> +	NETMEM_TX_NONE,		/* no netmem TX support */
+> +	NETMEM_TX_DMA,		/* DMA-capable netmem TX (real HW) */
+> +};
+> +
+>  enum netdev_reg_state {
+>  	NETREG_UNINITIALIZED = 0,
+>  	NETREG_REGISTERED,	/* completed register_netdevice */
+> @@ -1809,7 +1814,8 @@ enum netdev_reg_state {
+>   *	@lltx:		device supports lockless Tx. Deprecated for real HW
+>   *			drivers. Mainly used by logical interfaces, such as
+>   *			bonding and tunnels
+> - *	@netmem_tx:	device support netmem_tx.
+> + *	@netmem_tx:	device netmem TX mode (NETMEM_TX_NONE or
+> + *			NETMEM_TX_DMA).
 
-This isn't what I am looking for. I just want/wanted an explanation for
-why the new compatible has been removed from the patch.
 
->=20
-> If you think the binding changes are still effectively unchanged and the
-> previous Acked-by can still apply, I am happy to retain them or re-apply
-> them as appropriate. Otherwise I will assume a fresh review is preferred.
+nit: if you happen to repost, listing enum values here seems too much?
 
-If the removed compatible is the one for eth1, then
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
+"device netmem TX mode" should be enough
 
-Cheers,
-Conor.
-
->=20
-> Please let me know your preference.
->=20
-> Thanks,
-> Zhi
-
---z+PhFZ7j1pI5I6B9
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaf35awAKCRB4tDGHoIJi
-0gmJAQDr6xhvwtTAQnqP7MMHtuQzQnKum+qSUdWXb8zOKVsrRwD/X6Xp21HqiPK6
-cDQ6QwfRf7AfLBtSYxseFDv4lV/jMQw=
-=T72E
------END PGP SIGNATURE-----
-
---z+PhFZ7j1pI5I6B9--
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
