@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-285791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285795-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IGGeNdXV/Wl2jgAAu9opvQ
-	(envelope-from <netdev+bounces-285791-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:23:49 +0200
+	id kAZeLrXW/Wl2jgAAu9opvQ
+	(envelope-from <netdev+bounces-285795-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:27:33 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 388924F656B
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:23:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 19FFF4F65F0
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:27:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A2A8E3011F2D
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 12:18:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 09FB7307121B
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 12:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 975ED3DCD92;
-	Fri,  8 May 2026 12:18:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB413E1205;
+	Fri,  8 May 2026 12:18:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="sondsaQr"
+	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="EKjiO8F5"
 X-Original-To: netdev@vger.kernel.org
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3112735F162;
-	Fri,  8 May 2026 12:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F4537FF76;
+	Fri,  8 May 2026 12:18:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778242727; cv=none; b=dL6bFEO4LjDONsyWEcAC9c4qWQm7WENvMZJrvfrWjkYbubEMs1UALSHBmBG7boz3pv7Ejl9sUaHQQ9GI+tuot5syNksRJr4CsRfwSsQKk5WCp0kxWRf7134ZLI9la/1i0yn2iFAyX6LVwxHElOaIY7ij7NHBVO9uys2yQHKxT+E=
+	t=1778242728; cv=none; b=W5aTheCuDQOklJoVm8XhTrJIzLqfwI8atGoVnTPle3jio9V9cA8uDcQ75dhZxzeXUOb3x8PpEpra93NKuTUXIULKoUql1H8cIniW752QFDXGToLA/sOGHB3I+OPefMIMdYLEFVZ7Mzbmz2XVi/l2X/jwAVcLYNDeimaGPx4qVUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778242727; c=relaxed/simple;
-	bh=rtyOluR/OaZe3spE8YfkZIL0HNBmyhqNEAERsFKdboc=;
+	s=arc-20240116; t=1778242728; c=relaxed/simple;
+	bh=HzlGzjtblL4jvidgf42n7mKFXydAkszXVaDi9pBg5dw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YaQp97i7RtsiWwY/iEkzQUpzayckFM0Ab0NSiCGVllJSiBod4c13xUe/PQd2EcjNxvwzi3E7rjawMRVT4cuBKzFsdESpnFHInmCbhqOUJcKWB2ROZ/bRRlqp5FAm8QMu6rTDOE2nrM75cEDZ/2L8LWSpfzHqLrzf7Yf8St8SHLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=sondsaQr; arc=none smtp.client-ip=211.75.126.72
+	 MIME-Version:Content-Type; b=lkkAEXUs1thsPrGY9DjrLE9oYq3jnExYSkdVEkiFJMUTkDnngObFby+pSNOQcmxW+mYvJHdEDyKUuvuMpHCDEoATky7OlMyLtImJDiYiM8pHPcv1gTwPzbz9tmjQL7189pq2Eq74VhhdNxue1oOjvMpdV1tWhxLRDhF51KROAhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=EKjiO8F5; arc=none smtp.client-ip=211.75.126.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 648CIDqmC3782632, This message is accepted by code: ctloc85258
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 648CIDqnC3782632, This message is accepted by code: ctloc85258
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
 	s=dkim; t=1778242693;
-	bh=v+9Zr9QNJh1u4ODroYtNunXd8+pJKxQscVZte0iOONE=;
+	bh=xm9GDS7FzUZXxnv14977XSx4BIDEvLx8DPw2T2cAoug=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=sondsaQrAFxiXZrfTRfXaff9xgeC+nB/Ikrb3NsTjMYwcG+TqHOwTtiwNyjclr1CL
-	 k8pXZv9QEpT+3hQ920Gyi1vYufG3/qdBTO86vLVRCYb4IJD9QSNkCAqQmlL1YlJ/ZC
-	 EGpSchmjXmt+p0bJcQ/eayCXfHONcoTxN+Uwki4n4KNsGTjytISN9O7gS3GfBogXKv
-	 1Wi0QrDTOlxnZrIUQy2iFMV6fErlZkLM+eOORhCrs3Xr1Ob99O4v4eYWGps+2W66wn
-	 epwsblIeuJ5ou/7FjPXbYf6CCTE5l8Zo03bZfc7rGNxGs9Ram50XtOg1LLHO3lbmQP
-	 1czwbn6G7Oq+w==
+	b=EKjiO8F5u5t03qUKjYwzNWCsXc1cMvXY/l6O+UKmvoNew8K/CLItfkDElnsnoRka9
+	 ForWZNw2yTpDcy1XhHs26gc03SCNc0nb900Jp/h82wP+amtfEhcmKK7sH9BU4C6Rij
+	 K9khGMU9eeVKtRrZscTamLaJvuR3GN1Xe34DfR2P+n3hzVeMkihidE9hJleIMuRjsR
+	 qJa315GhsAHNzidm2HWo8Yi6zvDyM9SpGgTsjWw0Jk8oMh3LbBgioZuJwniN6dtayP
+	 jrZDV3QQ8HPXdhJ8d7VUEPMAK9SRggg+LD/EtcJZUQ6NUQPe8p0Ob4yFod5HhztYls
+	 A+qH5NDSVT3Zg==
 Received: from RS-EX-MBS1.realsil.com.cn ([172.29.17.101])
-	by rtits2.realtek.com.tw (8.15.2/3.27/5.94) with ESMTPS id 648CIDqmC3782632
+	by rtits2.realtek.com.tw (8.15.2/3.27/5.94) with ESMTPS id 648CIDqnC3782632
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
 	Fri, 8 May 2026 20:18:13 +0800
 Received: from RS-EX-MBS2.realsil.com.cn (172.29.17.102) by
@@ -64,9 +64,9 @@ To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         Javen Xu
 	<javen_xu@realsil.com.cn>
-Subject: [Patch net-next v2 3/7] r8169: add support for new interrupt mapping
-Date: Fri, 8 May 2026 20:17:57 +0800
-Message-ID: <20260508121802.2010-4-javen_xu@realsil.com.cn>
+Subject: [Patch net-next v2 4/7] r8169: enable new interrupt mapping
+Date: Fri, 8 May 2026 20:17:58 +0800
+Message-ID: <20260508121802.2010-5-javen_xu@realsil.com.cn>
 X-Mailer: git-send-email 2.50.1.windows.1
 In-Reply-To: <20260508121802.2010-1-javen_xu@realsil.com.cn>
 References: <20260508121802.2010-1-javen_xu@realsil.com.cn>
@@ -78,7 +78,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Rspamd-Queue-Id: 388924F656B
+X-Rspamd-Queue-Id: 19FFF4F65F0
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -95,7 +95,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-285791-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285795-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[realsil.com.cn:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
@@ -112,288 +112,43 @@ X-Rspamd-Action: no action
 
 From: Javen Xu <javen_xu@realsil.com.cn>
 
-To support RSS, the number of hardware interrupt bits should match the
-interrupt of software. So we add support for new interrupt mapping here.
-ISR_VER_MAP_REG is the hardware register to indicate interrupt status.
-IMR_SET_VEC_MAP_REG is interrupt mask which is set to enable irq.
+This patch enables new interrupt mapping for RTL8127.
 
 Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 158 ++++++++++++++++++++--
- 1 file changed, 147 insertions(+), 11 deletions(-)
+ drivers/net/ethernet/realtek/r8169_main.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 29fcd469eebb..bb72a2030f44 100644
+index bb72a2030f44..0ff0671fc2ac 100644
 --- a/drivers/net/ethernet/realtek/r8169_main.c
 +++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -77,6 +77,7 @@
- #define R8169_TX_STOP_THRS	(MAX_SKB_FRAGS + 1)
- #define R8169_TX_START_THRS	(2 * R8169_TX_STOP_THRS)
- #define R8169_MAX_RX_QUEUES	8
-+#define R8127_MAX_TX_QUEUES	8
- #define R8169_MAX_MSIX_VEC	32
- #define R8127_MAX_RX_QUEUES	8
- #define R8169_DEFAULT_RX_QUEUES	1
-@@ -452,8 +453,13 @@ enum rtl8125_registers {
- 	RSS_CTRL_8125		= 0x4500,
- 	Q_NUM_CTRL_8125		= 0x4800,
- 	EEE_TXIDLE_TIMER_8125	= 0x6048,
-+	IMR_CLEAR_VEC_MAP_REG	= 0x0d00,
-+	ISR_VEC_MAP_REG		= 0x0d04,
-+	IMR_SET_VEC_MAP_REG	= 0x0d0c,
- };
+@@ -3965,6 +3965,15 @@ DECLARE_RTL_COND(rtl_mac_ocp_e00e_cond)
+ 	return r8168_mac_ocp_read(tp, 0xe00e) & BIT(13);
+ }
  
-+#define MSIX_ID_VEC_MAP_LINKCHG	29
-+#define RTL_VEC_MAP_ENABLE	BIT(0)
- #define LEDSEL_MASK_8125	0x23f
- 
- #define RX_VLAN_INNER_8125	BIT(22)
-@@ -584,6 +590,9 @@ enum rtl_register_content {
- 
- 	/* magic enable v2 */
- 	MagicPacket_v2	= (1 << 16),	/* Wake up when receives a Magic Packet */
-+#define	ISRIMR_LINKCHG	BIT(29)
-+#define	ISRIMR_TOK_Q0	BIT(8)
-+#define	ISRIMR_ROK_Q0	BIT(0)
- };
- 
- enum rtl_desc_bit {
-@@ -750,6 +759,7 @@ struct rtl8169_rx_ring {
- struct rtl8169_napi {
- 	struct napi_struct napi;
- 	void *priv;
-+	int index;
- };
- 
- struct rtl8169_irq {
-@@ -787,6 +797,7 @@ struct rtl8169_private {
- 	u8 hw_curr_isr_ver;
- 	u8 irq_nvecs;
- 	bool recheck_desc_ownbit;
-+	unsigned int features;
- 	int irq;
- 	struct clk *clk;
- 
-@@ -1685,26 +1696,36 @@ static u32 rtl_get_events(struct rtl8169_private *tp)
- 
- static void rtl_ack_events(struct rtl8169_private *tp, u32 bits)
++static void rtl8125_hw_set_interrupt_type(struct rtl8169_private *tp)
++{
++	u8 tmp;
++
++	tmp = RTL_R8(tp, INT_CFG0_8125);
++	tmp |= INT_CFG0_ENABLE_8125;
++	RTL_W8(tp, INT_CFG0_8125, tmp);
++}
++
+ static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
  {
--	if (rtl_is_8125(tp))
-+	if (rtl_is_8125(tp)) {
- 		RTL_W32(tp, IntrStatus_8125, bits);
--	else
-+		if (tp->features & RTL_VEC_MAP_ENABLE)
-+			RTL_W32(tp, ISR_VEC_MAP_REG, 0xffffffff);
-+	} else {
- 		RTL_W16(tp, IntrStatus, bits);
-+	}
- }
+ 	rtl_pcie_state_l2l3_disable(tp);
+@@ -3973,6 +3982,9 @@ static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
+ 	RTL_W32(tp, RSS_CTRL_8125, 0);
+ 	RTL_W16(tp, Q_NUM_CTRL_8125, 0);
  
- static void rtl_irq_disable(struct rtl8169_private *tp)
- {
--	if (rtl_is_8125(tp))
-+	if (rtl_is_8125(tp)) {
- 		RTL_W32(tp, IntrMask_8125, 0);
--	else
-+		if (tp->features & RTL_VEC_MAP_ENABLE)
-+			RTL_W32(tp, IMR_CLEAR_VEC_MAP_REG, 0xffffffff);
-+	} else {
- 		RTL_W16(tp, IntrMask, 0);
-+	}
- }
++	if (tp->features & RTL_VEC_MAP_ENABLE)
++		rtl8125_hw_set_interrupt_type(tp);
++
+ 	/* disable UPS */
+ 	r8168_mac_ocp_modify(tp, 0xd40a, 0x0010, 0x0000);
  
- static void rtl_irq_enable(struct rtl8169_private *tp)
- {
--	if (rtl_is_8125(tp))
--		RTL_W32(tp, IntrMask_8125, tp->irq_mask);
--	else
-+	if (rtl_is_8125(tp)) {
-+		if (tp->features & RTL_VEC_MAP_ENABLE)
-+			RTL_W32(tp, IMR_SET_VEC_MAP_REG, tp->irq_mask);
-+		else
-+			RTL_W32(tp, IntrMask_8125, tp->irq_mask);
-+	} else {
- 		RTL_W16(tp, IntrMask, tp->irq_mask);
-+	}
- }
- 
- static void rtl8169_irq_mask_and_ack(struct rtl8169_private *tp)
-@@ -5080,6 +5101,44 @@ static void rtl8169_free_irq(struct rtl8169_private *tp)
- 	}
- }
- 
-+static void rtl8169_disable_hw_interrupt_msix(struct rtl8169_private *tp, int message_id)
-+{
-+	RTL_W32(tp, IMR_CLEAR_VEC_MAP_REG, BIT(message_id));
-+}
-+
-+static void rtl8169_clear_hw_isr(struct rtl8169_private *tp, int message_id)
-+{
-+	RTL_W32(tp, ISR_VEC_MAP_REG, BIT(message_id));
-+}
-+
-+static void rtl8169_enable_hw_interrupt_msix(struct rtl8169_private *tp, int message_id)
-+{
-+	RTL_W32(tp, IMR_SET_VEC_MAP_REG, BIT(message_id));
-+}
-+
-+static irqreturn_t rtl8169_interrupt_msix(int irq, void *dev_instance)
-+{
-+	struct rtl8169_napi *napi = dev_instance;
-+	struct rtl8169_private *tp = napi->priv;
-+	int message_id = napi->index;
-+
-+	rtl8169_disable_hw_interrupt_msix(tp, message_id);
-+
-+	rtl8169_clear_hw_isr(tp, message_id);
-+
-+	if (message_id == MSIX_ID_VEC_MAP_LINKCHG) {
-+		phy_mac_interrupt(tp->phydev);
-+		rtl8169_enable_hw_interrupt_msix(tp, message_id);
-+		return IRQ_HANDLED;
-+	}
-+
-+	tp->recheck_desc_ownbit = true;
-+
-+	napi_schedule(&napi->napi);
-+
-+	return IRQ_HANDLED;
-+}
-+
- static int rtl8169_request_irq(struct rtl8169_private *tp)
- {
- 	struct net_device *dev = tp->dev;
-@@ -5089,8 +5148,11 @@ static int rtl8169_request_irq(struct rtl8169_private *tp)
- 
- 	for (int i = 0; i < tp->irq_nvecs; i++) {
- 		irq = &tp->irq_tbl[i];
-+		if (tp->features & RTL_VEC_MAP_ENABLE && tp->hw_curr_isr_ver > 1)
-+			irq->handler = rtl8169_interrupt_msix;
-+		else
-+			irq->handler = rtl8169_interrupt;
- 		napi = &tp->r8169napi[i];
--		irq->handler = rtl8169_interrupt;
- 		rc = pci_request_irq(tp->pci_dev, i, irq->handler,
- 				     NULL, napi, "%s-%d", dev->name, i);
- 		if (rc)
-@@ -5539,10 +5601,16 @@ static const struct net_device_ops rtl_netdev_ops = {
- 
- static void rtl_set_irq_mask(struct rtl8169_private *tp)
- {
--	tp->irq_mask = RxOK | RxErr | TxOK | TxErr | LinkChg;
-+	if (tp->features & RTL_VEC_MAP_ENABLE) {
-+		tp->irq_mask = ISRIMR_LINKCHG | ISRIMR_TOK_Q0;
-+		for (int i = 0; i < tp->num_rx_rings; i++)
-+			tp->irq_mask |= ISRIMR_ROK_Q0 << i;
-+	} else {
-+		tp->irq_mask = RxOK | RxErr | TxOK | TxErr | LinkChg;
- 
--	if (tp->mac_version <= RTL_GIGA_MAC_VER_06)
--		tp->irq_mask |= SYSErr | RxFIFOOver;
-+		if (tp->mac_version <= RTL_GIGA_MAC_VER_06)
-+			tp->irq_mask |= SYSErr | RxFIFOOver;
-+	}
- }
- 
- static int rtl_alloc_irq(struct rtl8169_private *tp)
-@@ -5573,6 +5641,9 @@ static int rtl_alloc_irq(struct rtl8169_private *tp)
- 	tp->irq = pci_irq_vector(pdev, 0);
- 	tp->irq_nvecs = nvecs;
- 
-+	if (nvecs > 1)
-+		tp->features |= RTL_VEC_MAP_ENABLE;
-+
- 	return 0;
- }
- 
-@@ -5839,6 +5910,53 @@ static bool rtl_aspm_is_safe(struct rtl8169_private *tp)
- 	return false;
- }
- 
-+static int rtl8169_poll_msix_rx(struct napi_struct *napi, int budget)
-+{
-+	struct rtl8169_napi *r8169_napi = container_of(napi, struct rtl8169_napi, napi);
-+	struct rtl8169_private *tp = r8169_napi->priv;
-+	const int message_id = r8169_napi->index;
-+	struct net_device *dev = tp->dev;
-+	int work_done = 0;
-+
-+	if (message_id < tp->num_rx_rings)
-+		work_done += rtl_rx(dev, tp, &tp->rx_ring[message_id], budget);
-+
-+	if (work_done < budget && napi_complete_done(napi, work_done))
-+		rtl8169_enable_hw_interrupt_msix(tp, message_id);
-+
-+	return work_done;
-+}
-+
-+static int rtl8169_poll_msix_tx(struct napi_struct *napi, int budget)
-+{
-+	struct rtl8169_napi *r8169_napi = container_of(napi, struct rtl8169_napi, napi);
-+	struct rtl8169_private *tp = r8169_napi->priv;
-+	const int message_id = r8169_napi->index;
-+	int tx_ring_idx = message_id - 8;
-+	struct net_device *dev = tp->dev;
-+	unsigned int work_done = 0;
-+
-+	if (tx_ring_idx >= 0)
-+		rtl_tx(dev, tp, budget);
-+
-+	if (work_done < budget && napi_complete_done(napi, work_done))
-+		rtl8169_enable_hw_interrupt_msix(tp, message_id);
-+
-+	return work_done;
-+}
-+
-+static int rtl8169_poll_msix_other(struct napi_struct *napi, int budget)
-+{
-+	struct rtl8169_napi *r8169_napi = container_of(napi, struct rtl8169_napi, napi);
-+	struct rtl8169_private *tp = r8169_napi->priv;
-+	const int message_id = r8169_napi->index;
-+
-+	napi_complete_done(napi, budget);
-+	rtl8169_enable_hw_interrupt_msix(tp, message_id);
-+
-+	return 1;
-+}
-+
- static void r8169_init_napi(struct rtl8169_private *tp)
- {
- 	for (int i = 0; i < tp->irq_nvecs; i++) {
-@@ -5846,8 +5964,25 @@ static void r8169_init_napi(struct rtl8169_private *tp)
- 		int (*poll)(struct napi_struct *napi, int budget);
- 
- 		poll = rtl8169_poll;
-+		if (tp->features & RTL_VEC_MAP_ENABLE) {
-+			switch (tp->hw_curr_isr_ver) {
-+			case 6:
-+				if (i < R8127_MAX_RX_QUEUES)
-+					poll = rtl8169_poll_msix_rx;
-+				else if (i >= R8127_MAX_RX_QUEUES &&
-+					 i < (R8127_MAX_RX_QUEUES +
-+					 R8127_MAX_TX_QUEUES))
-+					poll = rtl8169_poll_msix_tx;
-+				else
-+					poll = rtl8169_poll_msix_other;
-+				break;
-+			default:
-+				break;
-+			}
-+		}
- 		netif_napi_add(tp->dev, &r8169napi->napi, poll);
- 		r8169napi->priv = tp;
-+		r8169napi->index = i;
- 	}
- }
- 
-@@ -5975,6 +6110,7 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (!tp->rss_support) {
- 		netif_napi_add(dev, &tp->r8169napi[0].napi, rtl8169_poll);
- 		tp->r8169napi[0].priv = tp;
-+		tp->r8169napi[0].index = 0;
- 	} else {
- 		r8169_init_napi(tp);
- 	}
 -- 
 2.43.0
 
