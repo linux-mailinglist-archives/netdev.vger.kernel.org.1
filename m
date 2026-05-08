@@ -1,317 +1,297 @@
-Return-Path: <netdev+bounces-285859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285858-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CHkMMejw/WlJkwAAu9opvQ
-	(envelope-from <netdev+bounces-285859-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:19:20 +0200
+	id QBrZF9/u/WlJkwAAu9opvQ
+	(envelope-from <netdev+bounces-285858-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:10:39 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2214D4F79EA
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:19:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B579F4F7940
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:10:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 354273015732
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 14:19:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0A278300E250
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 14:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 931C03E7148;
-	Fri,  8 May 2026 14:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C023DF002;
+	Fri,  8 May 2026 14:10:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WbMfbNRl"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="mEEPspf2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013019.outbound.protection.outlook.com [40.107.159.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703971397;
-	Fri,  8 May 2026 14:19:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778249957; cv=none; b=sUTYcVmPKuiOHvs1HIrWYg2+eZB/A2hS0vesHRe9Zlo2fYkJJUtXw4xOApkyWjPBuA+EZ5hxNfEImjwMGQRtmKZ0KM3sIrr7jZbxyuJcVcxhgajS+4gqKAqPCDLqWTou2gKXFfGMSo9+8IeadQP16N96EJKlrUr/Pg3CfvJrfJs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778249957; c=relaxed/simple;
-	bh=U43IRTUeEFC+y+FoudadK4oeMVSSy37ArbZ6hs+eIIg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N2KFoh3mxpKVJM0kM80GuvKS1WL2hEYZ2wmkqFaHQxSTomtUYfj50Iezsa4MgKHO18BzL8+sPrHQbLxJDZE/3/iDqjo2LiNRY8ImPmimNJqAmjJoPKhkW3POCebPCtjqqejs5pSQV4RLRaFSwdenSUIFv1BcxT8yLFlVCwOxUa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WbMfbNRl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DD2DC2BCB0;
-	Fri,  8 May 2026 14:19:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778249957;
-	bh=U43IRTUeEFC+y+FoudadK4oeMVSSy37ArbZ6hs+eIIg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WbMfbNRlW4bsPoDerwDHrarui7U8wGbbxQ/K0zs9bmR8aVX/jqJd8oEO1ysnxjkEy
-	 5hd3J2tsn4+H0lzT3g28Xh2RQiiBgjHZf5ZnZ3h5W8dlipS/D/aGdZhHnQPJxVJWyl
-	 mU5T/XlfoWpwzkpkykOGwiXL80H5MZtCN3TLIZ15qtZFyH2kkS4QMoAfFkrInx55wY
-	 LXFRNG924FoItItZDkqfvp5MH6K6KiOHks0OlZYIh/lHzq4v0wyHKGnICDAdIRzUqK
-	 k4an71xacgInraN530QG29cnc3Q08c0iWCdVCgBFRhM2LWZAQAQ2hgEKwO4L1E29vD
-	 i0EVNe5UfkRnw==
-From: Simon Horman <horms@kernel.org>
-To: aleksander.lobakin@intel.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kohei@enjuk.jp,
-	jacob.e.keller@intel.com,
-	aleksandr.loktionov@intel.com,
-	nxne.cnse.osdt.itp.upstreaming@intel.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v5 4/5] ice: implement Rx queue management ops
-Date: Fri,  8 May 2026 15:08:00 +0100
-Message-ID: <20260508140758.1200568-3-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260505152923.1040589-5-aleksander.lobakin@intel.com>
-References: <20260505152923.1040589-5-aleksander.lobakin@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88D41397;
+	Fri,  8 May 2026 14:10:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778249436; cv=fail; b=lYE8QwmUdJYogN6q9Qs5a3oj8g0Wl+Hap+sO3N+i+yDV64/MR6PUKmtJelrWGPUHHcpfKDktWdBl+qHNU643N4zfJilc8UR6LxoB5nnTl1UKTxX6jzRRPzivz34qArVghm31ckou3cM4TDETwXmM/lmWBGMoo8/4COvePSbS4xo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778249436; c=relaxed/simple;
+	bh=CCAKOKzrlXZVE7YKen9SD3uzbXaoSyxLQHxF0n/Cl08=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=g0arSPzo2OuuztlTLtcb5ZWoQlzXnQ6thvmky1Yp+4aGOkTIPbbq+K7uWeUH5SsFPOY7rNcJbXRDKdBmmKkDAgKwA++BDIxNlPqDxepwOsPJSF6opYveJpM6EsDe1gTutmU2x7Y3WmBj94X+APNtL6nmR5qrqTSgLAXOjYf+hyY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=mEEPspf2; arc=fail smtp.client-ip=40.107.159.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SeSjmOjDcIuA2rDdLYgBMh1R2a92m6p7nkfYS6wiUvv24LhWuh/THrh5P5DRAAbVe8UkSWqebqAaHKNYcLBiSzpBf1prrKBsSHTOqq1OMmnER70ZmXMKntCW7N7gJgXHg7NrmsGeu0q4e31OX5W7arj4Y5x0/N4IT4VJ4QVbBFq9fLoTllF0RziheObW/ZmqbIk53R++C+hAWLZ2VIFsMLbrYD9VT7j3boE3XDnasjnAKgBxHGuZ2dbPLsMJ0aU04Pkw37L9Qo+KTHzLZ6hoUbL0faq1s6ojswVccAS6LEG/2YYdBtBceqnFaeVWojVwKszt+89BxZVzE9Dd7zUejA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bvjKmTovJIl9DduV5d7Cey4OdRpblLVj9PFW9vZtDms=;
+ b=BBEmYkQoU5/E7flop10Q//Su9AnH57BER9c4jDxHGZAz6+7vnrJtG7/eC9/p6Ub0TmIto8t6x7nm8L2seJWdzWmd3vL0FcXGbJ6b1sc3Kbu17Lf/TQ81xaovshX6gUdYsgrqOyqAvgcsX8MTkh2BB5EyxuaZJlglzsWSGo+qBUXto5rbPTvExGUykr2AWGBF6byOV0hxlKUkTZGM6MVIj+JWbL71Z74QWEPp3saNGGryxinOHd3vTPK6ZWK211FNoyEdbPlCDYsVoutVct8L8Pritn7C2DTNMOvEqcVL/WoVysSyBBV8zKPH9E/28eW9TR1+d3As+t8fNfa8QmFCGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bvjKmTovJIl9DduV5d7Cey4OdRpblLVj9PFW9vZtDms=;
+ b=mEEPspf2mc0v2pTnvf+uOysH56uXzqSHt4fpxNTv4FwMKwco75mneltbmOWPxITHU0ksN4RtTSvba0eu0/um+2pGYJR/a2Rp7jaKO2EjveN0n/C1Gcmt9ytdmCGQiTIeu2e1t0AS27+I4JSJNPMzUUdD3HqWsuQu4K+IOtnea8zvX52TQ1nQph2YT+aX6dIa0IvdFzeq38NKdK7PffEthwl7eo4AsYzME+iz059lmDAy7Mf1DJ3zdUfD39OGhf+eLP2Cx7iEn30UYvmMB2f6J3A+OAKQcw4cSbTNeZU8fg/+01IS8WYMU+GhjU6EMKLXcCokpP0FtQiUM3aY2KGvnQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from VI0PR04MB11503.eurprd04.prod.outlook.com
+ (2603:10a6:800:2c7::16) by PAXPR04MB8861.eurprd04.prod.outlook.com
+ (2603:10a6:102:20c::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Fri, 8 May
+ 2026 14:10:31 +0000
+Received: from VI0PR04MB11503.eurprd04.prod.outlook.com
+ ([fe80::cbe9:4c03:71b6:359f]) by VI0PR04MB11503.eurprd04.prod.outlook.com
+ ([fe80::cbe9:4c03:71b6:359f%6]) with mapi id 15.20.9891.008; Fri, 8 May 2026
+ 14:10:31 +0000
+Date: Fri, 8 May 2026 17:10:27 +0300
+From: Ioana Ciornei <ioana.ciornei@nxp.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 05/13] dpaa2-switch: add
+ dpaa2_switch_port_to_bridge_port() helpe
+Message-ID: <4qbqkauqmvm5s55xlce5ax6ltgecvmg6plylwqgfkwqu5qvweh@5muxo7k7jsfw>
+References: <20260506151540.1242997-1-ioana.ciornei@nxp.com>
+ <20260506151540.1242997-6-ioana.ciornei@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260506151540.1242997-6-ioana.ciornei@nxp.com>
+X-ClientProxiedBy: FR4P281CA0417.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:d0::8) To VI0PR04MB11503.eurprd04.prod.outlook.com
+ (2603:10a6:800:2c7::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 2214D4F79EA
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VI0PR04MB11503:EE_|PAXPR04MB8861:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6209171d-dbcc-4206-9419-08dead0b904a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|19092799006|366016|1800799024|376014|56012099003|22082099003|18002099003|3023799003;
+X-Microsoft-Antispam-Message-Info:
+	UXP2oYRZ0ixEgRQJpXmo7cgcsV6Hi1Y8W/95BtxMjOUfTfgt61RdZ3NiTShFhgXEPkM0UNnwnn5KZK1aSrXXjHNKpuIgnJDg9KN8dqYWY+2t9C1mHx1w50ocAhxVK3vVlQZWaWuYUc2xkNrUWFhtf9+rhhK5JTBv2KFsAVlqGyoEW9YSzPaJE0fdgIEVurceQBCiXD+HFN9FRf3fh3x4lGcnk3pZiQBbPEb8gCCe2M88VbIOe1I0vjHJo1KUyWIE/eEisZJ39++lDJ+mGGBGIBPxYtD74fvBAuO7ysquopP5y80RW34ejwEEVe7fbVrK1Rn5toIYag4x10X3coga/+JRshmzdP0q1vZCfMHHBpXHpnrZ2SUZ3VAeGJffwXGOp23n7gRUrOLgToN8KbJ/RKtNPenqttxPaUCwfrEuklsytuU86ZNw8Q+do+hNNuBGMFsWYi+EcfReOBLKB6PjRiVkftUsem35kCBtcEpQ77q3hePCmS92nrcyjyK9Kr+3mjbmWxEdanY1M3YAStytItriYHeGudXyak3HsAwTq3UpikgBQi9voLiV5UTg3oDBW3rTwaLfJNNhOLgE0fbwRfwVOdfbYrmK74U6BKk8YFi+vnb/CJufmDABiE/zskGij0ISpqFBGhyrVDIn9jI40GOecxNdkS9NagLMkqL6vZY02dajL0TZT3EHXU6miUSm
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI0PR04MB11503.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(366016)(1800799024)(376014)(56012099003)(22082099003)(18002099003)(3023799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?drGGDdIFo8I0AayCKZysvpL3C3NPMr6RVc2ZyuRJDYpKYlxWhFuKbR1p6ZHe?=
+ =?us-ascii?Q?xE0ze+ek877RCavqsKRFLrXG8BfXCyFGtSstBIpUKcdT+bA9eb8vNay6xDUs?=
+ =?us-ascii?Q?QgSjp/TdTWrrsy2Ie8t/UCs9WGRwGu5eKV1SPkQnzuv39dARuM3XNrlsgRW+?=
+ =?us-ascii?Q?HlFHcXfKM5xFlnA375Cc+gE+V5TZh1PzhFthsxUHGZEDuZaPlzM4coKwU5ZB?=
+ =?us-ascii?Q?vdSuP5eMnvCLZSjA4zR+ZgyiKkbqyhcsL9mvR5z8oK81KeQZns9IuFFDhwLW?=
+ =?us-ascii?Q?1o9NaU2Mj4VlHYCBbi0tReFT0jhuXp7H6KoxrKXYb9D6LyyL2jha5VqGjNwm?=
+ =?us-ascii?Q?DX4mKA5pLO9PfqkqELqVq/UnL7JSssHY01suUBl6TFdi4HkawS2UWMrn3y3F?=
+ =?us-ascii?Q?A3DIbt840D7LPsEpywVYThoJeCxdI2gomveUsyJiRW1iC8DjwdhBis05SqD+?=
+ =?us-ascii?Q?k/hRQNG/B3m0BdGBbw0XD9aqKA3BOAD7gOuYrZA0FQdroiyX7LHb7RmQ/GCK?=
+ =?us-ascii?Q?VbWvY1fzufZ8xyg/aC+yi75M/0rk1zgjBbEATFOe9UjdGIcsvjJ9Kl/fa5Ls?=
+ =?us-ascii?Q?45Tro6tP2p4R6ppaXQJYdhqqtHedcexOq0P1s9e5urr/VuqA+aYR0X6qTzoH?=
+ =?us-ascii?Q?0TJNSNzTZFri01V0pKd4odPPPiKvHl0M0BCod/3d/0SvbG0RdSXr/yJucJHP?=
+ =?us-ascii?Q?771H9EXbO25QQbolwjiM4igo9efW7Pe9urp5dBTkq+ignrDnpA/z2xiC5uEw?=
+ =?us-ascii?Q?2k7U5iBQV3/RqPY6voOEt6gKCYPdaUK5z6J8aXAOKa/ga2LxdA6o6nVXSUVf?=
+ =?us-ascii?Q?Lk2+o4Jm7xd+butr5ZQ/nO1jSDqAWUHPBAariqN27c8JR1aMgmw7DTlHGGDA?=
+ =?us-ascii?Q?8BVT0BCcBZ2SNpmhoMe4DY+QSorCEXZNU6MyPC1XuSsP9H+Qt8RyWYXjsPHU?=
+ =?us-ascii?Q?2s3mjwhrd+ktGywDLuQzMDkSOLeklplSJDe2dnMxD5tWN51Iv5EwxXPhlYQr?=
+ =?us-ascii?Q?tMOExSOGMeG7xY/QQZ/hD4PrpkEie6uZa9nkkDyjeqvUIxAOZLDM99xdoyr7?=
+ =?us-ascii?Q?mJfkWz1JKe2Fol/lMaXnA9Oe0Ig3Z/3p59elFv/53ySjB6kb7o1RMGdlQGkk?=
+ =?us-ascii?Q?AJd/Tz9Bx5DCMt+3ob+EKW06Z4Ya6N0BeP5vrpgNFFPSfGbB/V9/ypoEU/VE?=
+ =?us-ascii?Q?CkeSMLO37kx5WjLqd4hsqU5UHQi4LMeCWRCVvuudoFCyruglygM4AqIAM5Fd?=
+ =?us-ascii?Q?gFjmLCGLieRCX3908p2xgYtZrPLgRFIVFZfzcTYqwcPtfg6o53EwABUqGtZM?=
+ =?us-ascii?Q?bn3lXs/FASHZdgEKtFQ+2SfD3w+3uKzfueRdjRQBO+xtluiz/heYgqAGc9fA?=
+ =?us-ascii?Q?VizrK3kh0R5ENGN5e1ni/FhRNu0qN74LaXtRZPtZEjtFH02JWtiCkAnDoX2Y?=
+ =?us-ascii?Q?d6QRwDHmhRlRYoHyh2NReKEyk3u4doZ0xLaYJwDPgvKzPSNs7xhBY5DQ9Ec4?=
+ =?us-ascii?Q?/22KbvtegkHVsM+NRUIUfxoPXWl6G9Zu9ZWLyNq52ucdYqtmhHKk2StZQwyx?=
+ =?us-ascii?Q?geiunrOsmcMOyB9CoqS9EMP4+DD5fAn2X5E7LKzXyspG1n3/iIYIAcQyy+qL?=
+ =?us-ascii?Q?zkM5AsYYKb8qVu/ZQZ1usEQ4WDKa7FqaStKTMf7WV+yk/kOingiPw9G+oNdu?=
+ =?us-ascii?Q?Ksco14+n2OGwOLh7QLAhu2AfsCKrJM5aTmEq/YTdc//YHGsgbQp8P3xAVt3Y?=
+ =?us-ascii?Q?Eq7Td/PAow=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6209171d-dbcc-4206-9419-08dead0b904a
+X-MS-Exchange-CrossTenant-AuthSource: VI0PR04MB11503.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2026 14:10:31.1972
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 49fo7qEeD2QY9HtEinS3iuNwAZfk4+vDcIlza7XhhLuqVI4SqLUwI8jIVhOXu0pHA2nZM9M2f/8NGNhBKH+TQw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8861
+X-Rspamd-Queue-Id: B579F4F7940
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-285859-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	TAGGED_FROM(0.00)[bounces-285858-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:email,nxp.com:dkim]
 X-Rspamd-Action: no action
 
-From: 'Simon Horman' <horms@kernel.org>
-
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-ice: implement Rx queue management ops
-
-This commit wires the ice driver into the netdev queue management ops
-framework, reusing the existing per-queue disable/reconfig/enable paths
-originally added for XSk. With it, ice reportedly passes the io_uring
-zcrx selftests.
-
-> diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
-> index 1add82d894bb..4e0b8895c303 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_base.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_base.c
-
-[ ... ]
-
-> @@ -1577,3 +1593,81 @@ int ice_qp_ena(struct ice_vsi *vsi, u16 q_idx)
->
->  	return fail;
+On Wed, May 06, 2026 at 06:15:32PM +0300, Ioana Ciornei wrote:
+> With the addition of offloading support for upper bond devices we have
+> to let the switchdev framework know if a specific bridge port is
+> offloaded or not, even if that port is bond device.
+> 
+> For this to happen, create the dpaa2_switch_port_to_bridge_port function
+> which will determine the bridge port corresponding to a particulat DPAA2
+> switch interface and use it in the switchdev_bridge_port_offload call.
+> 
+> Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
+> ---
+>  .../ethernet/freescale/dpaa2/dpaa2-switch.c   | 26 ++++++++++++++++---
+>  1 file changed, 23 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+> index 9d3a0aef1568..aaa22dc15038 100644
+> --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+> +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+> @@ -2076,6 +2076,18 @@ static int dpaa2_switch_port_attr_set_event(struct net_device *netdev,
+>  	return notifier_from_errno(err);
 >  }
-> +
-> +/**
-> + * ice_qp_ena - Enables a queue pair
-> + * @vsi: VSI of interest
-> + * @q_idx: ring index in array
-> + *
-> + * Returns 0 on success, negative on failure.
-> + */
-> +int ice_qp_ena(struct ice_vsi *vsi, u16 q_idx)
+>  
+> +static struct net_device *
+> +dpaa2_switch_port_to_bridge_port(struct ethsw_port_priv *port_priv)
 > +{
-> +	return __ice_qp_ena(vsi, q_idx, ice_vsi_cfg_single_rxq(vsi, q_idx));
+> +	if (!port_priv->fdb->bridge_dev)
+> +		return NULL;
+> +
+> +	if (port_priv->lag)
+> +		return port_priv->lag->bond_dev;
+> +
+> +	return port_priv->netdev;
 > +}
 > +
-> +static int ice_queue_start(struct net_device *dev,
-> +			   struct netdev_queue_config *qcfg,
-> +			   void *per_queue_mem, int idx)
-> +{
-> +	const struct ice_netdev_priv *priv = netdev_priv(dev);
-> +	struct ice_rx_ring *real = priv->vsi->rx_rings[idx];
-> +	struct ice_rx_ring *new = per_queue_mem;
-> +	struct napi_struct *napi;
-> +	int ret;
+>  static int dpaa2_switch_port_bridge_join(struct net_device *netdev,
+>  					 struct net_device *upper_dev,
+>  					 struct netlink_ext_ack *extack)
+> @@ -2083,6 +2095,7 @@ static int dpaa2_switch_port_bridge_join(struct net_device *netdev,
+>  	struct ethsw_port_priv *port_priv = netdev_priv(netdev);
+>  	struct dpaa2_switch_fdb *old_fdb = port_priv->fdb;
+>  	struct ethsw_core *ethsw = port_priv->ethsw_data;
+> +	struct net_device *brport_dev;
+>  	bool learn_ena;
+>  	int err;
+>  
+> @@ -2094,7 +2107,8 @@ static int dpaa2_switch_port_bridge_join(struct net_device *netdev,
+>  	dpaa2_switch_port_set_fdb(port_priv, upper_dev, true);
+>  
+>  	/* Inherit the initial bridge port learning state */
+> -	learn_ena = br_port_flag_is_set(netdev, BR_LEARNING);
+> +	brport_dev = dpaa2_switch_port_to_bridge_port(port_priv);
+> +	learn_ena = br_port_flag_is_set(brport_dev, BR_LEARNING);
+>  	err = dpaa2_switch_port_set_learning(port_priv, learn_ena);
+>  	port_priv->learn_ena = learn_ena;
+
+Sashiko notes:
+
+	Does this code ignore the return value of
+	dpaa2_switch_port_set_learning()?  If the firmware command
+	fails, the driver will silently ignore it.
+
+	This could leave the port's hardware state desynchronized from
+	the kernel's tracking state (port_priv->learn_ena), which could
+	lead to forwarding anomalies.
+
+True, but the code was there before this patch set. I am leaning towards
+not fixing it in this set since we are already at 13 patches.
+
+>  
+> @@ -2108,7 +2122,8 @@ static int dpaa2_switch_port_bridge_join(struct net_device *netdev,
+>  	if (err)
+>  		goto err_egress_flood;
+>  
+> -	err = switchdev_bridge_port_offload(netdev, netdev, NULL,
+> +	brport_dev = dpaa2_switch_port_to_bridge_port(port_priv);
+> +	err = switchdev_bridge_port_offload(brport_dev, netdev, NULL,
+>  					    NULL, NULL, false, extack);
+>  	if (err)
+>  		goto err_switchdev_offload;
+
+Sashiko notes:
+
+	Are we missing a rollback of the port state in the
+	err_switchdev_offload error path?
+
+The same response as above.
+
+> @@ -2143,7 +2158,12 @@ static int dpaa2_switch_port_restore_rxvlan(struct net_device *vdev, int vid, vo
+>  
+>  static void dpaa2_switch_port_pre_bridge_leave(struct net_device *netdev)
+>  {
+> -	switchdev_bridge_port_unoffload(netdev, NULL, NULL, NULL);
+> +	struct ethsw_port_priv *port_priv = netdev_priv(netdev);
+> +	struct net_device *brport_dev;
 > +
-> +	real->pp = new->pp;
-> +	real->rx_fqes = new->rx_fqes;
-> +	real->hdr_fqes = new->hdr_fqes;
-> +	real->hdr_pp = new->hdr_pp;
+> +	brport_dev = dpaa2_switch_port_to_bridge_port(port_priv);
 > +
-> +	real->hdr_truesize = new->hdr_truesize;
-> +	real->truesize = new->truesize;
-> +	real->rx_hdr_len = new->rx_hdr_len;
-> +	real->rx_buf_len = new->rx_buf_len;
-> +
-> +	memcpy(&real->xdp_rxq, &new->xdp_rxq, sizeof(new->xdp_rxq));
-> +
-> +	ret = ice_setup_rx_ctx(real);
-> +	if (ret)
-> +		return ret;
+> +	switchdev_bridge_port_unoffload(brport_dev, NULL, NULL, NULL);
 
-Simon says: I believe that the issue flagged immediately below is
-            a false positive; the cleanup logic unwinds things correctly.
+Sashiko notes:
 
-	    However, the two other issues flagged further down do seem to be
-	    of concern.
+	Is there a missing switchdev unoffload when a port leaves a bond
+	device that is part of a bridge?
 
-ice_queue_start() eagerly copies new->pp, new->rx_fqes, new->hdr_pp,
-new->hdr_fqes and the entire new->xdp_rxq into real before ice_setup_rx_ctx()
-has succeeded.
+	When a port joins a bond that is part of a bridge,
+	dpaa2_switch_port_bond_join() calls
+	dpaa2_switch_port_bridge_join(), incrementing the bridge's
+	offload_count for the bond device.
 
-If ice_setup_rx_ctx() returns an error here, the function bails out with
-real already pointing at new_mem's page pools and fqes arrays.
+	When the port is later removed from the bond,
+	NETDEV_PRECHANGEUPPER is triggered with !info->linking where
+	upper_dev is the LAG. However,
+	dpaa2_switch_port_prechangeupper() only handles the
+	info->linking case, explicitly ignoring the !info->linking case.
 
-The core netdev_rx_queue_reconfig() rollback then invokes
-ndo_queue_start(dev, qcfg_old, old_mem, rxq_idx), which repeats the same
-eager overwrite using old_mem and calls ice_setup_rx_ctx() again.  If the
-second ice_setup_rx_ctx() also fails, the core proceeds to
-ndo_queue_mem_free(dev, old_mem), and ice_queue_mem_free() will tear down
-the page pools whose pointers real->pp / real->hdr_pp are still aliasing.
+	Thus, dpaa2_switch_port_pre_bridge_leave() is skipped.
+	Subsequently, dpaa2_switch_port_bond_leave() resets the port to
+	standalone mode in hardware but never calls
+	switchdev_bridge_port_unoffload() or
+	dpaa2_switch_port_bridge_leave().
 
-Would it be safer to stash the existing real->pp / real->rx_fqes /
-real->hdr_pp / real->hdr_fqes / real->xdp_rxq on entry and restore them if
-ice_setup_rx_ctx() fails, so that a failed rollback cannot leave real with
-dangling pointers to a pool that ice_queue_mem_free() is about to destroy?
+	Can this completely bypass the software teardown path,
+	permanently leaking the offload_count reference for the bridge
+	port and corrupting the switchdev offload state?
 
-> +
-> +	napi = &real->q_vector->napi;
-> +
-> +	page_pool_enable_direct_recycling(real->pp, napi);
-> +	if (real->hdr_pp)
-> +		page_pool_enable_direct_recycling(real->hdr_pp, napi);
-> +
-> +	ret = ice_alloc_rx_bufs(real, ICE_DESC_UNUSED(real));
-> +
-> +	return __ice_qp_ena(priv->vsi, idx, ret);
-
-ice_alloc_rx_bufs() is declared bool and returns !!cleaned_count, so it
-yields 0 on full success and 1 on partial/failed allocation:
-
-bool ice_alloc_rx_bufs(struct ice_rx_ring *rx_ring, unsigned int cleaned_count)
-{
-    ...
-    return !!cleaned_count;
-}
-
-That bool is then passed straight into __ice_qp_ena()'s fail parameter,
-which only overwrites fail via 'if (!fail) fail = err;', so a value of 1
-propagates unchanged to ice_queue_start()'s return value.
-
-netdev_rx_queue_reconfig() treats any non-zero return as failure and
-propagates it back to userspace (netlink, ethtool, io_uring zcrx install),
-where the callers expect a negative errno.
-
-Before this patch, ice_qp_ena() obtained its fail value from
-ice_vsi_cfg_single_rxq(), which returns a signed errno.
-
-Should this be converted to a proper negative errno before being handed
-to __ice_qp_ena(), for example:
-
-	ret = ice_alloc_rx_bufs(real, ICE_DESC_UNUSED(real)) ? -ENOMEM : 0;
-
-> +}
-> +
-> +static int ice_queue_stop(struct net_device *dev, void *per_queue_mem,
-> +			  int idx)
-> +{
-> +	const struct ice_netdev_priv *priv = netdev_priv(dev);
-> +	struct ice_rx_ring *real = priv->vsi->rx_rings[idx];
-> +	int ret;
-> +
-> +	ret = __ice_qp_dis(priv->vsi, idx);
-> +	if (ret)
-> +		return ret;
-> +
-> +	page_pool_disable_direct_recycling(real->pp);
-> +	if (real->hdr_pp)
-> +		page_pool_disable_direct_recycling(real->hdr_pp);
-> +
-> +	ice_zero_rx_ring(real);
-> +	memcpy(per_queue_mem, real, sizeof(*real));
-> +
-> +	return 0;
-> +}
-
-Can this leak inflight page pool buffers?
-
-ice_zero_rx_ring(real) is called before the memcpy to per_queue_mem, and
-ice_zero_rx_ring() resets both indices:
-
-void ice_zero_rx_ring(struct ice_rx_ring *rx_ring)
-{
-    ...
-    rx_ring->next_to_clean = 0;
-    rx_ring->next_to_use = 0;
-}
-
-So per_queue_mem captures a ring where next_to_clean == next_to_use == 0.
-
-The core then invokes ndo_queue_mem_free(dev, old_mem), and the recycle
-loop in ice_queue_mem_free() is guarded by exactly those two indices:
-
-void ice_queue_mem_free(struct net_device *dev, void *per_queue_mem)
-{
-    ...
-    for (u32 i = rx_ring->next_to_clean; i != rx_ring->next_to_use; ) {
-        libeth_rx_recycle_slow(rx_ring->rx_fqes[i].netmem);
-
-        if (rx_ring->hdr_pp)
-            libeth_rx_recycle_slow(rx_ring->hdr_fqes[i].netmem);
-
-        if (unlikely(++i == rx_ring->count))
-            i = 0;
-    }
-    ...
-    ice_rxq_pp_destroy(rx_ring);
-}
-
-With 0 != 0 false on entry, the loop never runs, so any buffers that were
-in rx_fqes[old_ntc..old_ntu) (and hdr_fqes[] when header split is on) are
-never returned via libeth_rx_recycle_slow().  ice_rxq_pp_destroy() then
-kvfree()s the fqes arrays and calls page_pool_destroy() with outstanding
-inflight references that are no longer tracked anywhere.
-
-The new ice_clean_rx_ring() wrapper keeps the original ordering:
-
-void ice_clean_rx_ring(struct ice_rx_ring *rx_ring)
-{
-    ice_queue_mem_free(rx_ring->netdev, rx_ring);
-    ice_zero_rx_ring(rx_ring);
-}
-
-Should ice_queue_stop() follow the same ordering and perform the memcpy
-before ice_zero_rx_ring(real), so the recycle loop in ice_queue_mem_free()
-sees the real ntc/ntu values?
-
-> +
-> +const struct netdev_queue_mgmt_ops ice_queue_mgmt_ops = {
-> +	.ndo_queue_mem_alloc	= ice_queue_mem_alloc,
-> +	.ndo_queue_mem_free	= ice_queue_mem_free,
-> +	.ndo_queue_mem_size	= sizeof(struct ice_rx_ring),
-> +	.ndo_queue_start	= ice_queue_start,
-> +	.ndo_queue_stop		= ice_queue_stop,
-> +};
-
-[ ... ]
+Yes, I forgot to also call dpaa2_switch_port_bridge_leave() when leaving
+a bond which is a bridge port. Will fix it in the commit managing the
+changeupper events, not in this patch.
 
