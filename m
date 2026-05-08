@@ -1,173 +1,309 @@
-Return-Path: <netdev+bounces-285922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285924-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YD2KFFgK/mm1mQAAu9opvQ
-	(envelope-from <netdev+bounces-285922-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 18:07:52 +0200
+	id KEQCHooL/mm2mQAAu9opvQ
+	(envelope-from <netdev+bounces-285924-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 18:12:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18F284F9334
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 18:07:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D51C14F944A
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 18:12:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DEEAC30BD374
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 16:00:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F2C183057766
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 16:11:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E8B3D75B5;
-	Fri,  8 May 2026 15:58:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61C4B3D8100;
+	Fri,  8 May 2026 16:11:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GqbVe/7Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 234F73FE669
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 15:58:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.75.44.102
+Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A02B33D3339
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 16:11:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778255932; cv=none; b=eZWMgZFmHL06gzBjZfpnp/DyurZv/4NeMHS3HJOLq1T8E+Gzl9oMq+9+ALj0lWBBuOP+ZBj2SVjstljJP6YsUp/GR6xNP3qKIIvPvjma/cHxlNji8t6BD96M+9zLLCb8GgSAkK67bi2+bTuyN2645i521Ktr1uxj3rMuNVVQD4E=
+	t=1778256682; cv=none; b=l+SWOhJD1djTRxFwxDIaBzeqeSJzqXoJjuK39l5aEnrmRSsVqb4yZbDWzI200fgcajE10DicIop5/reeBEv8G11BUFo3txj6Ej0fV3SWuVXsxv6qlhWeJ06qsbgx3uurhp5EmVrcm4L/8tIosFLPiV58pVR31JFXM2E7zTlDddA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778255932; c=relaxed/simple;
-	bh=nck0kZqjMkMaMsNTUP0Bx8WarBnSNZnz+rfVXMAaHpA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WH4lbvV9KxmPRQPJ7NJAZlljyhGCL5lfwqoLkGLzID6wUR3w+moHNjoHuSl/u0KT1CJGKYrbdF22RU8WYMwJMSpgXuMS/64l41NcDXkvlIkFoCqqguXFuj4iYD+EFZnJc9j9BVBWeUViCdWFMmNT8pzcZfv9lPCWDWQziLq2ZP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=13.75.44.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowADXRfYoCP5pHIP+AA--.2636S3;
-	Fri, 08 May 2026 23:58:35 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: linux-afs@lists.infradead.org,
-	netdev@vger.kernel.org
-Cc: dhowells@redhat.com,
-	marc.dionne@auristor.com,
-	yuantan098@gmail.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	bird@lzu.edu.cn,
-	d4n.for.sec@gmail.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net 1/1] rxrpc: serialize kernel accept preallocation with socket teardown
-Date: Fri,  8 May 2026 23:58:28 +0800
-Message-ID: <4e9e2d92be94ed4bcb43b70b36fcc3863414d61e.1778230563.git.d4n.for.sec@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1778230563.git.d4n.for.sec@gmail.com>
-References: <cover.1778230563.git.d4n.for.sec@gmail.com>
+	s=arc-20240116; t=1778256682; c=relaxed/simple;
+	bh=H6Z+8CT3KjwWjNMFY6XYXNpX9S3GKUwrUsjc+V6VlCE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lk+OX9umkJHZL0zeHRwQTo9/9CJJKBxhkZdZoLF0Qvhyohfzf7jaCiHC+PDpnqirIigvcEW/3M+d419YPTN+t0K0ua+20G9gmRCy0d5wSrpkqc7KQqpQX38WehWc8sGaTr5eO0WT2fsV3FIGNGDjlDaxH2+3KDW41W/RpBqjZuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GqbVe/7Y; arc=none smtp.client-ip=209.85.217.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-6313c800372so684386137.0
+        for <netdev@vger.kernel.org>; Fri, 08 May 2026 09:11:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778256679; x=1778861479; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=6vdBcradM8S03iinDWnSXeMPjIWLpbzTHbnVlnltxq4=;
+        b=GqbVe/7YgabRsfx+ARki2K+jqMFHzQAg5niJlng8/wpcze/h3pTF4SoatmMJPyHB7D
+         /qNTHu1lVyE7mH9yKgbdm4ooIC2WUCq3XMpaXC6iH4j5k/vDldGibNvEIqbVNdLxqiPi
+         YH9fqJiGwTGW11itHd7LpOvvPKE1KAXrZK+HUNX6ClakxuHMEw1TnirPzvAhClx7ngGa
+         QtNxIliGYzFR29HuAe1iYaPfpSiaUrMr4e92u35Ne0L/R9XWJpz7nJxbNXKfGFNmiofw
+         QuowoaDCgsZ7lo7H+UD3MPNCMkZKODcRWgr3UT8n2AnLaBFagpAprzK5tjrQKe1dT9Kj
+         d1Kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778256679; x=1778861479;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6vdBcradM8S03iinDWnSXeMPjIWLpbzTHbnVlnltxq4=;
+        b=RQVhyPkOCA2A85NXZIk5amEF2u/GfXlZ4B8swGR4JAHmRysD8d9ekXjFX8pQiEqgqw
+         t16iSW+WLrRDuuMwlRlHFDOBTNh8dfqzE2QwyeTr8bKpxRGDBed6BEcPPNyRS2Gt/y60
+         h49JwjjS+NCCFNPsGamkBMKeFFeY5X8KYEWWGxwlcveWoUnUisj2/y9rU/8zLo8Gm1D8
+         X5AehHgkqZWBC7kt0fQWNqMCjIAUMF9aNp0cHfmMPHL0TYU4c4Fbv//bX/I2rbWexrsn
+         DT1kciFslybBBWbbwicO4Wc+i98C1VsYTpKX2qr0TpBF1lZYOmIoMnleBEwabFlEmk5B
+         XIGQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9Ls8aOy1IHVMnkyJonJybYotK7HbE4hXpPuICiDZd00ctcWs+UYC9UgNPnj4AcSpm9chDmXSY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyK/+Da/zrqfVkRdBdGOBGdbiWqrNV0M+YJ+4O/N69PRD1Hm8Nh
+	L1dloL0XEGqXX98rdyUPk3a25zfNjbAFjbDSko4l8VRxUJ1k1KrdCkyP
+X-Gm-Gg: Acq92OHrFnHH8+h5U3q2MBBed2lqECfNOG/+eq3DrzqLxX7e6CggcqWxiGvHDhSi7Bh
+	G/IVTluzvGne3lGrV+5Vs/D5RFs9ONQh1KkplDIxP4da2ZJFRfc9D2/+6jkehyK4DZD1BH6j5ZN
+	mm2+ZH94YW72cxTBJV0QePYcsA+oG8URPwE+rdzL70ScWz0eMvl1D0kZWrlgLbUP47V6meUuLs5
+	qZgwYPhgSNfO5I/Tk3hxuSftZC7gA4qZZFmZ9LNGSSDzlGUZIu8IGOiw0+d0vI17qcwAGN5t7Lw
+	odoo9LCzy2wD8U4bYI9DlF9RvUb4uejvjD/yEHBknsRtOuQ51QT6uZdNljyRMxDvhdHiSvX7QK0
+	cEzTjRovCNg2IJyYxEEBUjC3WiT0JACWj65Mk8n0j5VymRdkl4Iqt3DRnrl0q5TKneB8U9QpfoF
+	IOgbte07xO+3rmVOvK4ZsjQuWQ9u/6CxLPnoGT4nI9wPs2nu4=
+X-Received: by 2002:a67:e114:0:b0:631:4e9a:ba3 with SMTP id ada2fe7eead31-6314e9a142fmr1065827137.21.1778256679486;
+        Fri, 08 May 2026 09:11:19 -0700 (PDT)
+Received: from devvm29614.prn0.facebook.com ([2a03:2880:f800:35::])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-907b8bae450sm239133785a.21.2026.05.08.09.11.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 May 2026 09:11:18 -0700 (PDT)
+Date: Fri, 8 May 2026 09:11:12 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stanislav Fomichev <sdf.kernel@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>, Alex Shi <alexs@kernel.org>,
+	Yanteng Si <si.yanteng@linux.dev>, Dongliang Mu <dzm91@hust.edu.cn>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Joshua Washington <joshwash@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Shuah Khan <shuah@kernel.org>, dw@davidwei.uk,
+	mohsin.bashr@gmail.com, willemb@google.com, jiang.kun2@zte.com.cn,
+	xu.xin16@zte.com.cn, wang.yaxin@zte.com.cn, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Mina Almasry <almasrymina@google.com>,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v3 1/8] net: convert netmem_tx flag to enum
+Message-ID: <af4LILMY6qEav7Ul@devvm29614.prn0.facebook.com>
+References: <20260507-tcp-dm-netkit-v3-0-52821445867c@meta.com>
+ <20260507-tcp-dm-netkit-v3-1-52821445867c@meta.com>
+ <af35ekIjYDXIDWVR@devvm7509.cco0.facebook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowADXRfYoCP5pHIP+AA--.2636S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7ArykWrW3GFyDCF4kWry3urg_yoW8try8pF
-	WfGw1ftrWkXr1fuFnaqr40grW5Wa18Jr1UJ397Z3ZYkrn29a4aqry8tay2vr15Z3s5GrW3
-	Ar1qka4v9w4xZFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBj1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
-	jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52
-	x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWU
-	GwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
-	8JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kK
-	e7AKxVWUtVW8ZwCY02Avz4vE-syl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8V
-	W8GwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
-	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7
-	IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k2
-	6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
-	AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQEBCWn9o2QIWgAAsJ
-X-Rspamd-Queue-Id: 18F284F9334
+In-Reply-To: <af35ekIjYDXIDWVR@devvm7509.cco0.facebook.com>
+X-Rspamd-Queue-Id: D51C14F944A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.54 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[redhat.com,auristor.com,gmail.com,lzu.edu.cn];
-	TO_DN_NONE(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285922-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285924-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_SPAM(0.00)[0.117];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	DMARC_DNSFAIL(0.00)[lzu.edu.cn : query timed out];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,linux.dev,hust.edu.cn,broadcom.com,nvidia.com,fb.com,meta.com,iogearbox.net,blackwall.org,davidwei.uk,gmail.com,zte.com.cn,vger.kernel.org,fomichev.me];
+	RCPT_COUNT_TWELVE(0.00)[40];
 	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lzu.edu.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[devvm29614.prn0.facebook.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,meta.com:email]
 X-Rspamd-Action: no action
 
-From: Li Daming <d4n.for.sec@gmail.com>
+On Fri, May 08, 2026 at 07:56:42AM -0700, Stanislav Fomichev wrote:
+> On 05/07, Bobby Eshleman wrote:
+> > From: Bobby Eshleman <bobbyeshleman@meta.com>
+> > 
+> > Devices that support netmem TX previously set dev->netmem_tx = true.
+> > This was checked in validate_xmit_unreadable_skb() to drop unreadable
+> > skbs (skbs with dmabuf-backed frags) before they reach drivers that
+> > would mishandle them or devices that would not have the iommu mappings
+> > for them.
+> > 
+> > A subsequent patch will introduce a third state for virtual devices
+> > that forward unreadable skbs without ever performing DMA on them. To
+> > prepare for that, convert the boolean dev->netmem_tx into an enum:
+> > 
+> > NETMEM_TX_NONE   - no netmem TX support (drop unreadable skbs)
+> > NETMEM_TX_DMA    - full support, device does DMA
+> > 
+> > Update the existing NIC drivers (bnxt, gve, mlx5, fbnic) and the
+> > validators in net/core to use the new enum. No functional change.
+> > 
+> > Acked-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+> > ---
+> > Changes in v3:
+> > - Split NO_DMA changes into subsequent commit (Jakub)
+> > - Move !netdev->netmem_tx -> netdev->netmem_tx ==
+> >   NETMEM_TX_NONE conversions to this patch (Jakub)
+> > 
+> > Changes in v2:
+> > - Squash driver conversion patches (2-5) into patch 1 (Jakub)
+> > ---
+> >  Documentation/networking/netmem.rst                    | 5 ++++-
+> >  Documentation/translations/zh_CN/networking/netmem.rst | 4 +++-
+> >  drivers/net/ethernet/broadcom/bnxt/bnxt.c              | 2 +-
+> >  drivers/net/ethernet/google/gve/gve_main.c             | 2 +-
+> >  drivers/net/ethernet/mellanox/mlx5/core/en_main.c      | 2 +-
+> >  drivers/net/ethernet/meta/fbnic/fbnic_netdev.c         | 2 +-
+> >  include/linux/netdevice.h                              | 8 +++++++-
+> >  net/core/dev.c                                         | 2 +-
+> >  net/core/netdev-genl.c                                 | 2 +-
+> >  9 files changed, 20 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/Documentation/networking/netmem.rst b/Documentation/networking/netmem.rst
+> > index b63aded46337..5ccadba4f373 100644
+> > --- a/Documentation/networking/netmem.rst
+> > +++ b/Documentation/networking/netmem.rst
+> > @@ -95,4 +95,7 @@ Driver TX Requirements
+> >     netdev@, or reach out to the maintainers and/or almasrymina@google.com for
+> >     help adding the netmem API.
+> >  
+> > -2. Driver should declare support by setting `netdev->netmem_tx = true`
+> > +2. Driver should declare support by setting `netdev->netmem_tx` to the
+> > +   appropriate mode:
+> > +
+> > +   - `NETMEM_TX_DMA`: for physical devices that perform DMA.
+> > diff --git a/Documentation/translations/zh_CN/networking/netmem.rst b/Documentation/translations/zh_CN/networking/netmem.rst
+> > index fe351a240f02..9c84423b7528 100644
+> > --- a/Documentation/translations/zh_CN/networking/netmem.rst
+> > +++ b/Documentation/translations/zh_CN/networking/netmem.rst
+> > @@ -89,4 +89,6 @@ dma-mapping API 去处理。
+> >  使用某个还不存在的 netmem API，你可以自行添加并提交到 netdev@，也可以联系维护
+> >  人员或者发送邮件至 almasrymina@google.com 寻求帮助。
+> >  
+> > -2. 驱动程序应通过设置 netdev->netmem_tx = true 来表明自身支持 netmem 功能。
+> > +2. 驱动程序应将 `netdev->netmem_tx` 设置为适当的模式：
+> > +
+> > +   - `NETMEM_TX_DMA`：适用于执行 DMA 的物理设备。
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > index 8c55874f44ca..ed9c22dc4a5a 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > @@ -17120,7 +17120,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+> >  	dev->queue_mgmt_ops = &bnxt_queue_mgmt_ops_unsupp;
+> >  	if (BNXT_SUPPORTS_QUEUE_API(bp))
+> >  		dev->queue_mgmt_ops = &bnxt_queue_mgmt_ops;
+> > -	dev->netmem_tx = true;
+> > +	dev->netmem_tx = NETMEM_TX_DMA;
+> >  
+> >  	rc = register_netdev(dev);
+> >  	if (rc)
+> > diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
+> > index 424d973c97f2..dd2b8f087163 100644
+> > --- a/drivers/net/ethernet/google/gve/gve_main.c
+> > +++ b/drivers/net/ethernet/google/gve/gve_main.c
+> > @@ -2894,7 +2894,7 @@ static int gve_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+> >  		goto abort_with_wq;
+> >  
+> >  	if (!gve_is_gqi(priv) && !gve_is_qpl(priv))
+> > -		dev->netmem_tx = true;
+> > +		dev->netmem_tx = NETMEM_TX_DMA;
+> >  
+> >  	err = register_netdev(dev);
+> >  	if (err)
+> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> > index 5a46870c4b74..fc49aae38807 100644
+> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> > @@ -5924,7 +5924,7 @@ static void mlx5e_build_nic_netdev(struct net_device *netdev)
+> >  
+> >  	netdev->priv_flags       |= IFF_UNICAST_FLT;
+> >  
+> > -	netdev->netmem_tx = true;
+> > +	netdev->netmem_tx = NETMEM_TX_DMA;
+> >  
+> >  	netif_set_tso_max_size(netdev, GSO_MAX_SIZE);
+> >  	mlx5e_set_xdp_feature(priv);
+> > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+> > index c406a3b56b37..138e522ef9b9 100644
+> > --- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+> > +++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+> > @@ -752,7 +752,7 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
+> >  	netdev->netdev_ops = &fbnic_netdev_ops;
+> >  	netdev->stat_ops = &fbnic_stat_ops;
+> >  	netdev->queue_mgmt_ops = &fbnic_queue_mgmt_ops;
+> > -	netdev->netmem_tx = true;
+> > +	netdev->netmem_tx = NETMEM_TX_DMA;
+> >  
+> >  	fbnic_set_ethtool_ops(netdev);
+> >  
+> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> > index 0e1e581efc5a..580bccb118a0 100644
+> > --- a/include/linux/netdevice.h
+> > +++ b/include/linux/netdevice.h
+> > @@ -1788,6 +1788,11 @@ enum netdev_stat_type {
+> >  	NETDEV_PCPU_STAT_DSTATS, /* struct pcpu_dstats */
+> >  };
+> >  
+> > +enum netmem_tx_mode {
+> > +	NETMEM_TX_NONE,		/* no netmem TX support */
+> > +	NETMEM_TX_DMA,		/* DMA-capable netmem TX (real HW) */
+> > +};
+> > +
+> >  enum netdev_reg_state {
+> >  	NETREG_UNINITIALIZED = 0,
+> >  	NETREG_REGISTERED,	/* completed register_netdevice */
+> > @@ -1809,7 +1814,8 @@ enum netdev_reg_state {
+> >   *	@lltx:		device supports lockless Tx. Deprecated for real HW
+> >   *			drivers. Mainly used by logical interfaces, such as
+> >   *			bonding and tunnels
+> > - *	@netmem_tx:	device support netmem_tx.
+> > + *	@netmem_tx:	device netmem TX mode (NETMEM_TX_NONE or
+> > + *			NETMEM_TX_DMA).
+> 
+> 
+> nit: if you happen to repost, listing enum values here seems too much?
+> 
+> "device netmem TX mode" should be enough
 
-rxrpc_kernel_charge_accept() reads rx->backlog without any
-socket/backlog synchronization and passes that raw pointer into
-rxrpc_service_prealloc_one(). A concurrent rxrpc_discard_prealloc()
-sets rx->backlog = NULL and frees the backlog rings, so a kernel
-preallocation worker can keep using a freed struct rxrpc_backlog
-while updating *_backlog_head/tail and array slots.
+Will do!
 
-Serialize the state check and backlog lookup with the socket lock,
-and reject kernel preallocation once teardown has disabled
-listening or discarded the service backlog.
-
-Fixes: 00e907127e6f ("rxrpc: Preallocate peers, conns and calls for incoming service requests")
-Cc: stable@kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Signed-off-by: Li Daming <d4n.for.sec@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
- net/rxrpc/call_accept.c | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
-
-diff --git a/net/rxrpc/call_accept.c b/net/rxrpc/call_accept.c
-index ee2d131..4782412 100644
---- a/net/rxrpc/call_accept.c
-+++ b/net/rxrpc/call_accept.c
-@@ -471,13 +471,26 @@ int rxrpc_kernel_charge_accept(struct socket *sock, rxrpc_notify_rx_t notify_rx,
- 			       unsigned long user_call_ID, gfp_t gfp,
- 			       unsigned int debug_id)
- {
--	struct rxrpc_sock *rx = rxrpc_sk(sock->sk);
--	struct rxrpc_backlog *b = rx->backlog;
-+	struct rxrpc_backlog *b;
-+	struct rxrpc_sock *rx;
-+	struct sock *sk;
-+	int ret;
- 
--	if (sock->sk->sk_state == RXRPC_CLOSE)
--		return -ESHUTDOWN;
-+	sk = sock->sk;
-+	rx = rxrpc_sk(sk);
-+
-+	lock_sock(sk);
-+	if (sk->sk_state != RXRPC_SERVER_LISTENING || !rx->backlog) {
-+		ret = -ESHUTDOWN;
-+		goto out;
-+	}
-+
-+	b = rx->backlog;
-+	ret = rxrpc_service_prealloc_one(rx, b, notify_rx, user_call_ID,
-+					 gfp, debug_id);
- 
--	return rxrpc_service_prealloc_one(rx, b, notify_rx, user_call_ID,
--					  gfp, debug_id);
-+out:
-+	release_sock(sk);
-+	return ret;
- }
- EXPORT_SYMBOL(rxrpc_kernel_charge_accept);
--- 
-2.43.0
-
+Thanks,
+Bobby
 
