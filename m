@@ -1,179 +1,152 @@
-Return-Path: <netdev+bounces-285825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285826-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GCx6FJng/WkhkQAAu9opvQ
-	(envelope-from <netdev+bounces-285825-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:09:45 +0200
+	id OFiLIO7g/Wn0jwAAu9opvQ
+	(envelope-from <netdev+bounces-285826-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:11:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CB264F6CD7
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:09:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB5DE4F6D0C
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:11:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 89F183020A67
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 13:09:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E0BA8301C90A
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 13:11:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06D453DDDDB;
-	Fri,  8 May 2026 13:09:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0C37347FE1;
+	Fri,  8 May 2026 13:11:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DuT5yuJL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936C41F8691;
-	Fri,  8 May 2026 13:09:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778245781; cv=none; b=cRID1vfVWmeytbb6zeY9cfEztyJbVK1ejFaS1jH57wpO+538JgrQAtKPefzfoqfP44NpZYTybX9Cr3OC+KHX2EB+Z7jHOd4k3qFa9cnIJUyz3EjpcQeFGVHJPDV1piDEppJGSzzeiNNe+WD66QiYg3PSlBkq0E6qozAl40MlodU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778245781; c=relaxed/simple;
-	bh=6S4huXMF9Eta3Yguft6rRPtDlnuPmLRdDWOyNOIjQWk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Zly17A7dUA3i8SjBCZCD42yJB0qiqzBM/lcDacpaeSUAVI7MeywJg6v4DGWzAKt7RP+JmtPSQ1oC2nvxz/6+EsDm0iVmzUOFz9L0RFst8EgoE42cQHDQNfMwSBs+n1kK8X3cwSBrhy8l41RLDU/2kDoEQ6Smtxmo1kTmSu09q9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=radxa.com; spf=pass smtp.mailfrom=radxa.com; arc=none smtp.client-ip=54.206.16.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=radxa.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=radxa.com
-X-QQ-mid: esmtpsz21t1778245760te8ff9860
-X-QQ-Originating-IP: oDfTC3UmzXvWtX1d3MtBp/Xfjq9qMy3Zm4+IG/bmLQ4=
-Received: from [127.0.0.1] ( [116.234.74.217])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 08 May 2026 21:09:14 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 10512550886452153488
-Message-ID: <6744F8FEFD290FFD+4973b8ba-7d3b-45e4-8478-0b3334b81960@radxa.com>
-Date: Fri, 8 May 2026 21:09:12 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4743512CDBE
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 13:11:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778245866; cv=pass; b=LUGhaNUcAjz/8RXLKEZm7wmYP+/Jg/3W1kRGjE+fB2TN0fXejpS0aXMff7NUSawLVUmCWUxP1PhIzVklEewRopyRG4EA2rO82Zbq0QGlgPk4Qmj9nZG0I7jToCXr1rThCsTLkTzauiacxHjftqU3aV+QL8ivMx3Kac8rPnXlQUY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778245866; c=relaxed/simple;
+	bh=Q2p6RtJ3zfFJHYB0dynXXwUzBesfE7braw4qjAb9U4M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BUkN+DAD4hmQx2xRbCDqcHhFrmh2XnfcL87EnKYD54jYDqzSf9se3X5iXoWsSO56T/rOq+w3REVTdrgz2hbdT8dhzuADwonwYbpZQEvMnJn9LOhzvwlUxsWr3QUA5QCC2Z2RsFj/kHgVWBI6H/OB16x07DKLiz2TkAREwN4PY8U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DuT5yuJL; arc=pass smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-67c3cb1433cso3302370a12.0
+        for <netdev@vger.kernel.org>; Fri, 08 May 2026 06:11:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778245864; cv=none;
+        d=google.com; s=arc-20240605;
+        b=KQ0PBNmWnAWL0K8me9SW7AFWRh2SK98MCPyte4QZKP/PHuBGY3pLx16S4VAJrRodwU
+         sHFWz99qfKaAdWO+Pzv8YAIAgD/lQzIFCVw2REGN4mmxodrXOahWRiR4qnXgg69jRelL
+         vvAoMifxQDlnmhf6IXFkKesdvg3W2T88ho/Likoip6l6HsQcAos6GAq2dOz10oHUZspj
+         gHv8R68R8VX7wp8TTc8NAve75ru/Uh8WAPd3vMfmElNhPMcWbQkj+KDav7YsX6YYiv0n
+         AQbhgFWybcBwS2qGP1MB/d8soasRJ+KdcDjgLD+O9drcQn0B3X56FK86g381HNNivxm3
+         QyqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=Q2p6RtJ3zfFJHYB0dynXXwUzBesfE7braw4qjAb9U4M=;
+        fh=u1iPs+udEhcQv1O+mYQn5KrmvdjyO9dWKBHin3YB0co=;
+        b=jiCTxLJPhUH2jxqYEP+6k4tGzIk6u2vgUw1YT2k3Z07uQj0GtF5IVj4wV5H7bhRYZO
+         dB7sbom78yGqHumcBZ/4U8/iIyUV0/j2ulIq2c7l8QMUTPHQj/fqVN/fDBWaq4Cg06Wt
+         I2KfKLxBbPg6egBJjmDr+y3He8HxD5JfFTtoY/yaDYshvm6jrDC/FmB9gPzwzc/8DzNx
+         1kRIHgNnWf+oS5x6Vy/3iSF/k91/Z/l+qFXhHl6SYSrXNtyG8AOhApluLCf6gsvSMW5u
+         70+ffk03yd8wzx0lE/2U3iyYNp6GKykQwDTZO0Tmi0UxNF+5gBXh645zYTPXHredoALz
+         5o6g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778245864; x=1778850664; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q2p6RtJ3zfFJHYB0dynXXwUzBesfE7braw4qjAb9U4M=;
+        b=DuT5yuJLknczffYtbCoymLJ/2cUnSxA63jdiVUSJ6SPh99hUzmRL8uF0OVzQOdVnHx
+         70wsen5F73RyLH0AQT0ThVAP4OF+i//n6o5hOzXnnLYhyJ780TewW37VvuFligoT4pZB
+         aoNbE+uuCBIITWX3tl53HddcUgoAi3Kf+HIzEVpp6XRmjbJDOlanRMspRusKDkwQQBFc
+         1s8c9jq0NX9NHsTLlEeKfdtUjbLPFOyhBGArr4Q0Ls90Q5x8lN/oQkt5whWRrBC45pXF
+         zpkLDK7B0/CEOxEKAyyvRFzPOAI0xPdIYbwL1X9F1b1Nfj8A1ZrF3Tb9gOa67gz+hlQW
+         TYkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778245864; x=1778850664;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q2p6RtJ3zfFJHYB0dynXXwUzBesfE7braw4qjAb9U4M=;
+        b=W+0g22eHLbO3e+UZEb5DYWh3oioAocLee+1CPUynSX+VQdLIifY29ooDo4GdyZM14C
+         WLPZNYBMUpup1An+4KjxfN2dybTT8L/hGyQ32wWcXW1pede1kqBtq2W4+CzzrgA5Fqoj
+         i98D56Oolf3trRWUOz7kiptZFcH8yxhlvnQEEtBR7TUxLZctzxCTonKl+6xMj9gcsCZI
+         mDSJdJExPTu5CKNmwv9v8fc71EphsNKFUsk8Gm+TK/RxJTchn6iM2p4a4OY+61xX9nv8
+         AxxfIzFgPALNgfwfB58cT7YB6L8TtXifUIkR1Mh+VftD+ZJFI3Qv4MRr0kdjUb3Q1/wo
+         Po7g==
+X-Forwarded-Encrypted: i=1; AFNElJ9t1VBKfazmWA876R738Q8D4u1gp3nXuxsngsirCqPI67fm0+ulUeh2xklNdPoGfONb21EoYLY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxg8UWeVbdMwzYLoBY5wjETUoy1jLyjfA0CFDiyZPgKblmkcTIW
+	yRE+R9HP97D1YdBAhT2ICk2vTnOjnqct/68+norB7My4rR6Bjnnhk9dBeuSb/nknTaEK41aXGPS
+	35XTn474eBB3OakQHNHRKdZcCcPlaHdM=
+X-Gm-Gg: Acq92OETM9zl5Q/o9Tp4srThcoIMMWRc+d/ubNemS3Nhj0DNGniK5HOLshPs5nzwI0E
+	AjhwodBVRNAfRA94e3sKc/PxZaVdfuqNs+tyKmuQUULBxj/OhWDGkipr9w0IWOynKt3MEbyKY4m
+	QmhwD69VcjCYJZq/BYML/o+FzHwNSluPunSVdmhD5oa4fEtfVXF1a/6Qa5oWWeZj46h0Y//K2BS
+	29ofzM7z6FTfiq6QotR4b+JRczd8nrRkh7n+l1RgIGpzmcx5oK/OII+bCVtvnGZXZmLVbxdB0dM
+	2Riww04=
+X-Received: by 2002:aa7:d50e:0:b0:67c:7ffc:c4b with SMTP id
+ 4fb4d7f45d1cf-67d642c35c5mr4852121a12.19.1778245863303; Fri, 08 May 2026
+ 06:11:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 10/12] net: stmmac: tc956x: add TC956x/QPS615
- support
-To: Alex Elder <elder@riscstar.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, maxime.chevallier@bootlin.com,
- rmk+kernel@armlinux.org.uk, andersson@kernel.org, konradybcio@kernel.org,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, linusw@kernel.org,
- brgl@kernel.org, arnd@arndb.de, gregkh@linuxfoundation.org
-Cc: Daniel Thompson <daniel@riscstar.com>, mohd.anwar@oss.qualcomm.com,
- a0987203069@gmail.com, alexandre.torgue@foss.st.com, ast@kernel.org,
- boon.khai.ng@altera.com, chenchuangyu@xiaomi.com, chenhuacai@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, hkallweit1@gmail.com,
- inochiama@gmail.com, john.fastabend@gmail.com, julianbraha@gmail.com,
- livelycarpet87@gmail.com, matthew.gerlach@altera.com,
- mcoquelin.stm32@gmail.com, me@ziyao.cc,
- prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
- rohan.g.thomas@altera.com, sdf@fomichev.me, siyanteng@cqsoftware.com.cn,
- weishangjuan@eswincomputing.com, wens@kernel.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20260501155421.3329862-1-elder@riscstar.com>
- <20260501155421.3329862-11-elder@riscstar.com>
- <224E233C593EF171+8c8a43dd-5061-40f8-9eb7-f360eabf2ecc@radxa.com>
- <ae90a4c9-f027-4373-a378-d0d4b7796ff3@riscstar.com>
-Content-Language: en-US
-From: Xilin Wu <sophon@radxa.com>
-In-Reply-To: <ae90a4c9-f027-4373-a378-d0d4b7796ff3@riscstar.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:radxa.com:qybglogicsvrsz:qybglogicsvrsz3b-0
-X-QQ-XMAILINFO: Nt+z/y60tPnUntNr0h37IREVots3RaLwrPULh0GA79jGtOpfwKEdcvBB
-	vGDhDCFVCVDGkxyRE2OTvoJ3BAC5PxlqIDN/JJD4AXSK/ikl0jyX/GSVQGKFFkz4ENdEUSS
-	jVXeX8iIz18DyrTydrM2dT8KiFby0YfBminxUOL4J5AlH5kCMgkXuyKePKNiHWGlFK+yBQv
-	SRVy4V6iARJyXlvbI1rbJ1Dngayn4XErNHsXR0Kg6smHfZQdkinU29+j+A6LtvM6yZUbS4t
-	QVQptLZzaaJ4WQvRP74OndQJsbw1vv1nmsXyg0PvpJnR4E3kbenRf7lh2UQrWCAfnYWhxcG
-	hTAd64lSERlfpmuk9ijl7MHnkLFb+kT+JhDfn0EbwWHpNLpnzJlzMszqlfuaXd1hwc4nDs4
-	Ptr2Y85lsLV/akVhLZ1+rrmVHL5PiC3YijY+AWaatV34T0VxlBj6F8/QWgEBQSR7nOH8bXQ
-	XHo4x+A7+OOLAYUoEpxHHu2jQBnq4W40kBbHQZFQcx2uX3k9qxLStign4ItRLp83ezdKGG3
-	rXIy7z63D4JRXnth+L/LMCgCOPIZX6UbSeKhC9UhQunoQKllBcQEkKDh5ygpTooEHPICCWN
-	v0NJ3AVXTCKg6RKp5kRQji0h3ubCOuk69Ca/CWOhkExCsuc7W4Gt18DmMOI73hWUNVt/ZpJ
-	Xegb8FAgVlmlXrGb9znklqo0dwEPFirhVlvSBYtwqFD0A+8ja53Su/2ws9tOkRBaTVgwQ8y
-	9A52Vd9IzSmDXvRutmZ56mbDo0QML6AmH+JXOF1+N98BQ6kl+Oroy003IPxqdeoroKdzWoW
-	7ajNQ78e3UhIMmJwN0Vzj9r/TIEN0VSKF89diPqkVlE0OitsvnUNFQHnnw96hl+q0o7uSQx
-	qPUMp9N0FI5EOZQjZweOFJ9azZ8DPpS884uDoNmmdcnERsJD7LQeKa9uc/wF/706zGwfDfE
-	NvYT+qtbE9RcFiJA28y7jSs17ND2F9A/LO72INNmSpnullpo/DF8C5pCvK/V+oUxNUDaK1L
-	Pplxx2FKqdHoQ5JbP002M+X2JYw0kTRtD1WNuV8r1C1HA66FuZ
-X-QQ-XMRINFO: Mp0Kj//9VHAxzExpfF+O8yhSrljjwrznVg==
-X-QQ-RECHKSPAM: 0
-X-Rspamd-Queue-Id: 9CB264F6CD7
+References: <2a52d7a8-3a39-4dd5-a0d5-c746122a9f73.ref@yahoo.com> <2a52d7a8-3a39-4dd5-a0d5-c746122a9f73@yahoo.com>
+In-Reply-To: <2a52d7a8-3a39-4dd5-a0d5-c746122a9f73@yahoo.com>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Fri, 8 May 2026 10:10:50 -0300
+X-Gm-Features: AVHnY4KygSHwEN6JQafxG3zT-YLOiU_k7CQWEMc90CVie7UxuzLB_IEviR89JJ4
+Message-ID: <CAJq09z4vjb6+7QW-CBHecZsLQUg91cKd+9xo4FxPLjOiOUEorA@mail.gmail.com>
+Subject: Re: [PATCH v3] net: dsa: realtek: rtl8365mb: add support for RTL8367SB
+To: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: EB5DE4F6D0C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[radxa.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285825-lists,netdev=lfdr.de];
-	FORGED_MUA_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285826-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[yahoo.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[riscstar.com,oss.qualcomm.com,gmail.com,foss.st.com,kernel.org,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[50];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sophon@radxa.com,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.962];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	SINGLE_SHORT_PART(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-On 5/8/2026 2:44 AM, Alex Elder wrote:
-> On 5/6/26 7:59 AM, Xilin Wu wrote:
->> On 5/1/2026 11:54 PM, Alex Elder wrote:
->>> +    /* AXI Configuration */
->>> +    axi = &td->axi;
->>> +    axi->axi_lpi_en = 1;
->>> +    axi->axi_wr_osr_lmt = 31;
->>> +    axi->axi_rd_osr_lmt = 31;
->>> +    /* All sizes (2^2..2^8) are supported */
->>> +    axi->axi_blen_regval = DMA_AXI_BLEN_MASK;
->>> +    plat->axi = axi;
->>> +
->>> +    plat->mac_port_sel_speed = speed;
->>> +    plat->flags = STMMAC_FLAG_MULTI_MSI_EN | STMMAC_FLAG_TSO_EN;
->>
->> I got WoL working only after adding STMMAC_FLAG_USE_PHY_WOL here. I 
->> guess it's required, since the driver clocks down the MAC/PMA/XPCS in 
->> its suspend hook?
-> 
-> I just want to respond to this with a summary of our plans.
-> 
-> We will *not* be implementing wake-on-LAN (WoL) initially.  We
-> will work to get support for the eMACs upstream for TC956x, and
-> then as a separate step, we will enable WoL.
-> 
-> It's great to know you have it working, and our plan is to
-> implement it via the PHYs and not involve the MAC.  It seems
-> it will be relatively easy, but we have no plans to add it to
-> the current series.
-> 
->                      -Alex
-> 
-
-Hi Alex,
-
-Maybe I missed something, but I already have WoL working *without* 
-changes in the tc956x driver.
-
-https://lore.kernel.org/all/859776B5671B36B9+577c19e4-3e66-4036-b26f-fe20287a1d43@radxa.com/
-
-
--- 
-Best regards,
-Xilin Wu <sophon@radxa.com>
+Reviewed-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 
