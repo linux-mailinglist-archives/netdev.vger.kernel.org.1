@@ -1,124 +1,144 @@
-Return-Path: <netdev+bounces-285710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285711-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8OXULPKV/WmXgAAAu9opvQ
-	(envelope-from <netdev+bounces-285710-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 09:51:14 +0200
+	id eK8ABT6X/WnBgAAAu9opvQ
+	(envelope-from <netdev+bounces-285711-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 09:56:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CEA94F3497
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 09:51:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88E9F4F3675
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 09:56:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 441FA3002D52
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 07:51:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5EA9F30037E8
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 07:56:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4437637DE99;
-	Fri,  8 May 2026 07:51:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D93AE3806A6;
+	Fri,  8 May 2026 07:56:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P7Z6cYON"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE62B37A4AF;
-	Fri,  8 May 2026 07:51:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129AB37FF47
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 07:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778226672; cv=none; b=aVC4svE8up5e00FY3bPYN0bNWB7o+r59Z6dFki0oX3FEWPCateEcpj4BG1c8Je8HLJ0aqC8WhJdh8SU0LUy39MqUQ6MwwkujhllssYcPptirfB7UiVxCrtz07I3sHEXV8cjUaty/m9AgcCOPw4GOA8L0srwFsYS7DrYCu6ySKyk=
+	t=1778226975; cv=none; b=bCqLMWC9Apm9GY7oD367s4M5CsGnTe8I2FUSoUOT0rEQwLpHCdP2xZm/3BKpvl+tDhnLPJUFthpdI3y7KHzgtYB1CAhG4R+jhba4jQUfncD0aVwzr0qApL5oW4xkqHtkNtwGW28xV/msNq2v/voHOTKkBTUtY92HT8KpGdl/7S8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778226672; c=relaxed/simple;
-	bh=ywr9BYG0SsUCA8Xw3Ma+dyznX1/GjYIJ9T7zinYMS58=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MKXCmgrhngWmMB6hZZkQddWw9/6GVzZ19zuWgZ5mOdHxHDarMF14ipy5je6xly/M78IfWfbEtYkkvcckY0x5F89cola0oaAdwNa3AqclMjZkgSR/1ywT2BHkK+2gEaGurfzNztbwr5TFFVGIFpD9d8Rw6hLvYd8BpjsK6WOXoqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25D43C2BCB0;
-	Fri,  8 May 2026 07:51:07 +0000 (UTC)
-Message-ID: <f5158347-3c9f-4c29-bb2f-4beaaca3cd20@tuxon.dev>
-Date: Fri, 8 May 2026 10:51:04 +0300
+	s=arc-20240116; t=1778226975; c=relaxed/simple;
+	bh=QxqWhck90nRyAuLxI/aJEO388vUHtx/+6ylrqU+FxrY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=q242d7M8X1UZx7eMxCm6YtVHuL6Er0xrHotPHM/jV8ji5qAaoehSAwppOpwio9bNLtx3/9+9yaumEApAPvnQ3uxQi0VpQMIVdNNyCMEbLJAVn/BM/OOJgJDZzZWZIMpeQMlxa+WypwhnljfRRJT4GUOItlcnOOiUlN4buk9vu8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P7Z6cYON; arc=none smtp.client-ip=209.85.210.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-7de4e6c5a30so1765164a34.0
+        for <netdev@vger.kernel.org>; Fri, 08 May 2026 00:56:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778226971; x=1778831771; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XHciCBjHg+XtpY+/D0jNffHfXvfNbDr11DUMtmP6X2I=;
+        b=P7Z6cYONWHZEjE/5ED3hchiwYTtT1qHBt2rHxwosDeO4K4SGoGmS7o/66aS3gIzjhy
+         jGYCcyzqXTRjaQVkhLf5zspU1mDxM0R85S+/e/KBnXVh+ywh4ERHw9k0lNspDHHC9YjM
+         bhlyB07anpBkOJxnF0/9oBps7z6L+6pLH1u3W53tuifpgex6soFyZSlkzFmQI/SRWZrg
+         NnJclskyvKrDU4A7ynLoD5PDjNpDBLwuksE9QhyXNfyu7lXEbFqW9XxgTbuCmrh4EZby
+         xhBMYk8+NqOgmfq4sFFq2VTF0xVJWuQjfl9daUHk8+G2P91c9u46DtOKRf7TG2KxzDkX
+         LKuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778226971; x=1778831771;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=XHciCBjHg+XtpY+/D0jNffHfXvfNbDr11DUMtmP6X2I=;
+        b=jL9L3ktUPluKSaPjB/ZPY1DFOs/vadYStV2wGGICifETtuQemLBkNcR5Z0L8uZxzB3
+         jcLXPZIjeLla/avDb5q42vZ82C4k0ttjkVNkAZ1xlc3XMue/2e5NwmvNpzwLWx5pFfej
+         OjrcB0L2IutehE05W6N9qVff6UP0R5DJFa8Bm0qiyKB1OAJZTv3aVIEhcTM0owi6kDWa
+         e36WoKL+6PyiMlbabQorwUc8RER1Kx+Tl3pVJiY2U9+lET5SaIjU/k+IixcIyKsNzTdt
+         /oI1A9D6t2SGzpTae2etpSwMOMa6i5sQvIvN9+0OwHiffUqkgYdgq/Z8fMPgIBWUPfrC
+         kH9A==
+X-Gm-Message-State: AOJu0Yw8YePNwA1y3MxWwoIw2a3BdwLJJ7YPoCZKEYydLCpzglSRa9OK
+	nyyjRVKP8/w+r1U09RZHt6EfBE+onfr801+RoMK1kVUjRso3jqIHPdCT+2zgOb7IPNbnZg==
+X-Gm-Gg: AeBDievF12sg0KJF7iNFJmf5sHg4em6ED0BL/xq9BJDd4oZ3pVEf52Wh/K0N4rqxLLx
+	t4ByKYrYrOFNYPjbDziay9Er7CS/IT/HpsNLELgJwuVu2xqnARt+P7Zi/uOEmKjjJXxZMgGIoXn
+	WpSQVQ9CkGzqwEbTPxZZksH/a1HQb1lHYL03GFz1jKcTq7mcVqM7gDLigwuz4D54yM4y19enZzO
+	jE3WA0HUQRsgyoXJ0o58os9VIwt/MguEwfc693jW6Djz954123JPYAlJp9xGmqRMoJM0tgl9ESL
+	ygFPs9iAoF8m2wrFZ1Z8Jr5EZerjamum3qrMFlRbC5nwKyYKa2l4btMyJY62ZKhN7ivUebWK5mR
+	O2LDYDNitvPRNflu0TClPPzzyk8a5UIyVh7RBn6vHfRjfkACo14rmmiW14NRUJGIyfH1KvSgYw/
+	tbkVNoHnGOiOueDD5TbZE4h6mO7g==
+X-Received: by 2002:a05:6820:80a:b0:696:8c3f:d7cd with SMTP id 006d021491bc7-69998c8f271mr6396879eaf.4.1778226971426;
+        Fri, 08 May 2026 00:56:11 -0700 (PDT)
+Received: from houminxi ([72.244.37.221])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69b25c767d0sm686246eaf.5.2026.05.08.00.56.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 May 2026 00:56:10 -0700 (PDT)
+From: Minxi Hou <houminxi@gmail.com>
+To: netdev@vger.kernel.org
+Cc: aconole@redhat.com,
+	Minxi Hou <houminxi@gmail.com>
+Subject: Re: [PATCH net-next v7 0/2] selftests: openvswitch: add pop_vlan test
+Date: Fri,  8 May 2026 15:55:55 +0800
+Message-ID: <followup-v7-20260508@houminxi>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260507131541.2331771-1-houminxi@gmail.com>
+References: <20260507131541.2331771-1-houminxi@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] MAINTAINERS: change maintainers for macb Ethernet driver
-To: nicolas.ferre@microchip.com, theo.lebrun@bootlin.com,
- conor.dooley@microchip.com, netdev@vger.kernel.org
-Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
-References: <20260507120444.9733-1-nicolas.ferre@microchip.com>
-Content-Language: en-US
-From: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-In-Reply-To: <20260507120444.9733-1-nicolas.ferre@microchip.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4CEA94F3497
+X-Rspamd-Queue-Id: 88E9F4F3675
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [2.34 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-285711-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285710-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[tuxon.dev];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[redhat.com,gmail.com];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.992];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_THREE(0.00)[3];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[claudiu.beznea@tuxon.dev,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:email,tuxon.dev:email,tuxon.dev:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
+Hi Aaron,
 
+Just checking in on the v7 series. I addressed both items from your
+v5 review:
 
-On 5/7/26 15:04, nicolas.ferre@microchip.com wrote:
-> From: Nicolas Ferre <nicolas.ferre@microchip.com>
-> 
-> I would like to hand over the macb maintenance to Théo, as I'm unable to
-> keep up with the recent flow of patches for this driver. After speaking
-> with Claudiu, he indicated that he is in the same position as me.
-> To help with this work, Conor has agreed to act as a reviewer.
-> 
-> I was given responsibility for this driver years ago, and I'm glad to
-> see it continue with talented developers.
-> 
-> Signed-off-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+  - Removed the slot number comments from encap_ovskey nla_map,
+    keeping only comments on entries that differ from the base class.
+  - Dropped the explicit modprobe 8021q + sysfs pre-flight check,
+    relying on ip link add type vlan to handle module loading.
 
-Acked-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Is there anything else you'd like me to change, or does this look
+ready to move forward?
 
-> ---
->   MAINTAINERS | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 37b105a443dd..ad60104f30a1 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -4181,8 +4181,8 @@ F:	include/uapi/linux/sonet.h
->   F:	net/atm/
->   
->   ATMEL MACB ETHERNET DRIVER
-> -M:	Nicolas Ferre <nicolas.ferre@microchip.com>
-> -M:	Claudiu Beznea <claudiu.beznea@tuxon.dev>
-> +M:	Théo Lebrun <theo.lebrun@bootlin.com>
-> +R:	Conor Dooley <conor.dooley@microchip.com>
->   S:	Maintained
->   F:	drivers/net/ethernet/cadence/
->   
-
+Thanks,
+Minxi
 
