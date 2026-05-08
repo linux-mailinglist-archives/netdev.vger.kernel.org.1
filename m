@@ -1,63 +1,60 @@
-Return-Path: <netdev+bounces-286042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286043-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2JgtFqts/mkgqgAAu9opvQ
-	(envelope-from <netdev+bounces-286042-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 01:07:23 +0200
+	id 8EMqOARt/mkgqgAAu9opvQ
+	(envelope-from <netdev+bounces-286043-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 01:08:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E27A34FC9BB
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 01:07:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C9694FC9DB
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 01:08:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5D78630233E4
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 23:07:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 72371301BA77
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 23:08:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C59E3AE19D;
-	Fri,  8 May 2026 23:07:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4560739BFE7;
+	Fri,  8 May 2026 23:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J8mGkuRK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jwpFOd0T"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC20D3AD50F;
-	Fri,  8 May 2026 23:06:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225C5386575;
+	Fri,  8 May 2026 23:08:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778281619; cv=none; b=OswJWKO6X0ISH3XzjBu4eSKkz5Ndul1/jn256zn1d1aggo7J0Z04gMKz7wJCL9kh60xET5Q2oTInmPzu4NK9GJMDI9dnNyJ3Y+N5HdSWhpoZuh61AF+l5s2cv+q39ZzLLVo+plxLfjqdmyBECmUX64RDq5W7A3ddenwEJjDSK8o=
+	t=1778281729; cv=none; b=G6nn7KySvdcLKHbuKxUPGCQq9az3t71NSevTCnBL7FERy/H7a7JSle0CXk4I0MuOgiO6qvsEP3uHvb3kZ2Y/+elrwH+7AWmvxYeYJme4KIXCSmG0PXSRr5RS9x9duUjmAFn+ITrdglGND5avL+qTriXGPqKwLkQs5172pjo2GJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778281619; c=relaxed/simple;
-	bh=+FrPfgyjI3rfWqKi97LhVDNfKh6TJzFdkuTyyuJOmaQ=;
+	s=arc-20240116; t=1778281729; c=relaxed/simple;
+	bh=DQU7vSiVGqSnmiyHzNY57bXXPN3lLWa/BhvDFce0Mmw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oZoOPVjfN6fdqJylIBNg9xG4Qzf4qpEmcUSSJkCuCZwqLDcJxjI8M2J5z7lGnYXCXbbufi/gWXdy101Bl0+v8/d+1v9+O74jlha55/vkoKAv14UkvgjzMHcKhGdMpPF4j+oPs1oa6DwWUto0thBZfBLpeEY3I0UeYVV1TER23Yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J8mGkuRK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B7A5C2BCB4;
-	Fri,  8 May 2026 23:06:58 +0000 (UTC)
+	 MIME-Version:Content-Type; b=QyC71KJWmMMqxCs5XUu07S9hWdoPdvQUd82p3gACHjVGbHf6/Jwe0E8WbZNYN7w+rtACc8bwZamrdPKCjzL2lAS1g9iaPYVMUeApS2jxikGBXFJ1E8MUKNruf3lxRlC4ag1Cft8NRECTd1mAgLIErttY4Q7xhVoi4lrMQebHpDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jwpFOd0T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C47DC2BCB0;
+	Fri,  8 May 2026 23:08:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778281619;
-	bh=+FrPfgyjI3rfWqKi97LhVDNfKh6TJzFdkuTyyuJOmaQ=;
+	s=k20201202; t=1778281728;
+	bh=DQU7vSiVGqSnmiyHzNY57bXXPN3lLWa/BhvDFce0Mmw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=J8mGkuRKbFejhdhvPnIAb98prcE6xg0HDkoTapUjhHp+oL17dGUq3bRUOgU6rIL4g
-	 hb7U0OFU7UzxeUkzEbBAGql6jZm4LPTfHWGo5S7PJxK/jNC4JBG14aEEnTE2fEnSqA
-	 m5iJOmVd3LczvTRq7aGxnsSGkkMYpmBp5GYDsbaNGOabKPbx62UvG/DA8oiUbSm9wR
-	 xU5DlwTfvt5t0Vj6X4HpAikSXqxMKkncYMxmn1lcQJT0bQlB1GUpN2cVPrrPoaKLwO
-	 vEBi+IM2ABXhqLEqCAuPDWVtRlgvQ/MOTfHGkTMmVVmE+6A8X2Lb0P9+YARfFicyIl
-	 Oy9qPqJogVgzA==
-Date: Fri, 8 May 2026 16:06:56 -0700
+	b=jwpFOd0TK1FiUT+G5BUncG8qZJm1bYzuIFANtOkGskmOIx1Q86uYXFa7TcgYxr4Mi
+	 NJIFHVq3xQFvBDIaXYZqXhXAoaQVBfvfovkislcLxq6WEjeBjkNuiv76M1FHeIH1po
+	 IcAroAySAqO3Jod1CPYLtamuSiTVg27SsX5arLedYbIExUXvFTMHzagDA+k2nuHQ+J
+	 +A2tTz2ldboCkGn22xpKH6n/CmhiOtSmg4gZU00JBBAWebav1uLlm/VtkB/hGjBJw4
+	 40EFu3tt5MpqJ3vfGvq69Q+nSaquMvqsy7eSc0DKFR2aeNpX8NDSruPVhKt09wwRvB
+	 S/5Luh+cWGbsg==
+Date: Fri, 8 May 2026 16:08:47 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: <sukhdeeps@marvell.com>
-Cc: <netdev@vger.kernel.org>, <irusskikh@marvell.com>,
- <epomozov@marvell.com>, <richardcochran@gmail.com>,
- <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
- <pabeni@redhat.com>, <vadim.fedorenko@linux.dev>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 0/9] net: atlantic: add PTP support for
- AQC113 (Antigua)
-Message-ID: <20260508160656.2a318b34@kernel.org>
-In-Reply-To: <20260508120156.3060-1-sukhdeeps@marvell.com>
-References: <20260506135706.2834-1-sukhdeeps@marvell.com>
-	<20260508120156.3060-1-sukhdeeps@marvell.com>
+To: Vineet Agarwal <agarwal.vineet2006@gmail.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net/sched: sch_dualpi2: annotate lockless
+ stats reads in dump path
+Message-ID: <20260508160847.52187d26@kernel.org>
+In-Reply-To: <20260508072918.324797-1-agarwal.vineet2006@gmail.com>
+References: <20260508072918.324797-1-agarwal.vineet2006@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: E27A34FC9BB
+X-Rspamd-Queue-Id: 7C9694FC9DB
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -77,36 +74,35 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,marvell.com,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,linux.dev];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286042-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286043-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Fri, 8 May 2026 17:31:47 +0530 sukhdeeps@marvell.com wrote:
-> From: Sukhdeep Singh <sukhdeeps@marvell.com>
+On Fri,  8 May 2026 12:59:18 +0530 Vineet Agarwal wrote:
+> dualpi2_dump_stats() runs without holding the qdisc lock and provides
+> best-effort statistics to userspace.
 
-I have a process question. Who is maintaining this driver?
-MAINTAINERS list Igor but he didn't sign off any of the patches.
-Occasionally we get patches for this driver from users and other
-developers and none of you Marvell people respond. 
-Please have a read of:
-https://docs.kernel.org/next/maintainer/feature-and-driver-maintainers.html
-and tell me - who is serving as the maintainer of atlantic?
+Didn't Eric already tell you that he's actively working on this?
+
+Please don't get in the way.
+-- 
+pw-bot: reject
 
