@@ -1,212 +1,110 @@
-Return-Path: <netdev+bounces-285966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285967-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MKzWAWJF/mlFogAAu9opvQ
-	(envelope-from <netdev+bounces-285966-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 22:19:46 +0200
+	id 0EsdHOVG/mlFogAAu9opvQ
+	(envelope-from <netdev+bounces-285967-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 22:26:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75DA24FB6A1
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 22:19:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0C944FB7BA
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 22:26:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AFA0E301158D
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 20:19:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EAC7C30115BF
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 20:25:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8405A37E303;
-	Fri,  8 May 2026 20:19:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 849E437C0F5;
+	Fri,  8 May 2026 20:25:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wYs+PV0k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HpL3G3KY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A2B3AC00
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 20:19:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778271582; cv=pass; b=h7w+w5axWORi9Caczx9YCo80DT6HpGCxRWPL+VrF0ZJDuaPjaeUgzE3ZqjYSEwENihM638qMzsRxgWgl3PmAKI0wXmSTnQ/DXX0U0QA8fa63c7NM2yiOIgRvPoJT4fGtbFYesLROHgbO42JrOEwcvTgZtCmzDcVGxZY0EkxXYes=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778271582; c=relaxed/simple;
-	bh=8ItX+BQrb8DPPcdx7Fc0ebuh1W7HIG67JuXl7zgZvCk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jecjq6stdeVkQ8S+r2UsNEFyewWGjN3k+JOEoBzCg9aQJbB1a7c2Iwu7sUHa9Qj3ZVh9ei0+Svl/5pMj990BaJYNrZaspOO/X+ZTxb4vEvkEwiUKuuSYUjVynxEfY1I9wYQIGZt8L+lXdVnDLQFGKc5NAFaQqWltyF1MmhZ6ngc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wYs+PV0k; arc=pass smtp.client-ip=74.125.82.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-132830d8281so2005517c88.1
-        for <netdev@vger.kernel.org>; Fri, 08 May 2026 13:19:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778271580; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Z8nLFpjoD530KpCS+DlZ2mZnN9gVPrHFc2C6kP1fDXgYdXhSygQtn8oMkYL5ZFyXUo
-         /DzDkNJL9QUrfuhwIA7SoJhrfe1DKw0cvEFH/ju4aQlTvqZzH54CaKQO5dHYijW7R1u3
-         EENrBKFAQdw3CawYvqpRG3NWLA40rbnteUJZfigfYEHKPe9CFmzAC9sk1h+WXC1Qwix4
-         m5O0GhVDO7ZY8iAk4Szgy+S21JJjhzEeCxkujLBix5S6iekQRhiDWNTA4yqmPwfl+dJY
-         I34GSSn8i33+bXxdsq5WEhyXSZlvXlyDJilQOUntdz30+gj73tSmyTZpqFtndNpFbp+a
-         FGpQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=+B1AKZI8ovjXprcofyiqirQq75Rr4Az3Z8kwmuK7zZw=;
-        fh=q1FA/NqUDBv09xsTu0s8+ai9lUZo3nMKpgNjAva7dBI=;
-        b=Ag9slmEM/chgpktG/xF1eY55RffFZlOitGkAH2Cm4E2M4tnF0yqNO8n5FP2GfgDWdy
-         QO0uPk1q3Q37gccipACdp0NBBqwIVPXgWzO16gwXb7ytrjgo6uAEtrBBFCy5xNwGYIj/
-         Fhp0jvkYF9SmpTA40DAXMezzYzpu1qp9wjriWoBP+MQlXfb/R3fPhtqjz/IosVnSdRn1
-         yf0XwFcGGV7VhlaKF3l/BEY6aHz4KGhrSDcvTGKN43mBTs27YXyk3IppUb3cZvxlisbd
-         3IEpI9UreBEpgTKqy50Ujq+JHpxZDJDPT9fEk8HDbphkfoq5pGAJBmXts27s9+FzPchG
-         Iomg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778271580; x=1778876380; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+B1AKZI8ovjXprcofyiqirQq75Rr4Az3Z8kwmuK7zZw=;
-        b=wYs+PV0k3yvi6BXrCJcKkZaKqSCOdvCzQ83KBluIldeKIae/TC0Azi8rhyjRXo86uh
-         N9wHPO9MAEwufJkYcU+kHDCajyTOYs844+2mtG/vy2TkGrT2QCyLDce8xVnJq6j+j450
-         oFVLHf3li4Xwsmadbeni0Ug71ieUl0CjT28POlRBTYHnW29l2WKFJqoxC4rDGcT+F9Y5
-         0yXgseMBoSIPgDw0KxGPTC6ZR0+F2iDEGbslP/KDpi50JR2QaNa6NP1VGFO13XMC9yo4
-         H2gLZUvfxtAhIg9oSGNt6wrEVZSjexpjZQSSN4sbo28xE2C4D4xZrckbR4diUxX881IB
-         64Ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778271580; x=1778876380;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+B1AKZI8ovjXprcofyiqirQq75Rr4Az3Z8kwmuK7zZw=;
-        b=ZkyAMeF8IKZkbqCMYamIBEMeA5tMbv3y5cBniVDP60PXvDey3RfImDx8jv9fR99ZF9
-         aZSyCvTxiiewMk0t3XtUdshdSWc92PAr+bA4B0EIIfwnFbOSdIN28cECIjnXHpiwXvfZ
-         560oqFeDBJZezpNIMkPJi0UCMb4Tn5dQ21wvm4BOPhiH2gPhMX0Qn6xMSyIOevd8VMxM
-         wo6xue/1R3Dax/Qz3px8n+9mwFNI89l9TbmcGUwU3XKBswTHwLHNN80gs4AK3mLO9ah2
-         LDLQWAulThkVdqO8elLZxM/IFi1ljvBeVhqH59poj2N9uUMxE+Cd/mqsPAqK2O3EB3Zm
-         LaPQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9i6Z21912zA2hMuJizTRE7s6ZUY1FAn/iXMfrioY1qfIEPPgIe4b2VjLDO8fkRbR1jNH9hXUY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGhXBwZkQ+XCOigICZWUzy+UyjljONVCHZh0op87lIxV4FnaYW
-	VnlS+WW/AbBH8gHQ6zSv9vTot5bGK2KZ4Rgcr3nmhHGgSETHNj9Sqc2omwT1n2O1ks3uSFCBc2A
-	ehMDk2D7EsS69udWeUjYXKBYvLljvzaYNxMbPrCm6
-X-Gm-Gg: AeBDievjVMYQxOXYk7JwJeM5Fh79NcabBjxxsLkO2ZZh5bZNkJFN/YmHIjsCUY4n6dR
-	IOUlBeyT5Xo98llD8fq0gNH8/SjB95KD9CRyHMa9uztrWEtw9XTaiVMfltwCFHli5aPRYDhP7bA
-	lvK8nYL7Sw/V8EoVVtyyUYbg9gHoMno2gc28Sigdl6VdLqLQIRl0bSbn3s7/pCTysR7pbhZiIKO
-	SyHVxH/iY16bEEDQKfMbTkPtjLVFX8pZR4XD4Q0svJlJMNpcnHFArXQRJ82noA80mEwezHmLcz4
-	dQbtRwH9mtOsaULMM6r+bCwzS/g+aAC5YvVPYpiJh8A6R7v3couBgLIsHgyiZYerCKZC5h5OcHf
-	HSV+Uw8CFPrnDOevUDeIG9hKpw/I17q4=
-X-Received: by 2002:a05:7022:4392:b0:11a:641f:ba11 with SMTP id
- a92af1059eb24-13271c9c205mr2423392c88.29.1778271579731; Fri, 08 May 2026
- 13:19:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6122F284662
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 20:25:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778271934; cv=none; b=l+B67PPXKDcGEcuHnsOMFeOzf9cpUsv/Mw/O6ACg+1Lz0bv+woa5CJVE5ZJj4MyacgQfy5k9WEoAB3d/0xZUo7Qdhc6evqRjCEmHiV3C3hoq3eQ1kxNwVAVFhNm7o1rmPYUrVZbSNT1ebH+0KcSM2xXGHtLkWvGtLDkSijZnOh8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778271934; c=relaxed/simple;
+	bh=K0V4rsSg3ck28HBMMEO+ld3HMWVJ+vBsRlwyAok0kGs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QWxJw1ZTSjlWQQJyj9ikjI0yXifsWO28XOCwWvvkk1c+Q1xip5uNGlY9laEgNpaeZYccu1Bn+4zdJ8FuIukHKvHBa55RO47SmpeLz8j1FBBUdY3mL2NiYtJDQKZhMF9QLRsrNabsTDHS4EjDYGyx+kxluNPMQZyqWvW+o+l1xDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HpL3G3KY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83863C2BCB0;
+	Fri,  8 May 2026 20:25:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778271934;
+	bh=K0V4rsSg3ck28HBMMEO+ld3HMWVJ+vBsRlwyAok0kGs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HpL3G3KYsrbhNN2VS2A73NmJb0rRs96adEAOMPrc5cNnd3Jn3fUpPLHgV8nnixbr1
+	 bk4PiXZ+gahL5ACx4EE/lljbTh9EM6n37UmdbfZ6iH7JL0obeqsgjCKZKJUFLHnYq1
+	 XFXF1W9KxL8jJrrrUjt7F3C1kgg1qmYgz6MGPTKrD9DNRPaFfCRsGWZPjycFyuvuh2
+	 PmXWwVxWyFpFDg5awImtZcptCf5ikYHgfxPXMhrlEHjBrxn4i3FbMuNAMeKoYynEbL
+	 VWi6upE/qFrEZXVKO8zWkhIP4DffvghoKDr0n/BS+V56toAJVgU53J7/yirmtgkk1f
+	 mLQ6tkDKLwf9w==
+Date: Fri, 8 May 2026 13:25:32 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: Qingfang Deng <qingfang.deng@linux.dev>, dhowells@redhat.com,
+ marc.dionne@auristor.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, linux-afs@lists.infradead.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net] rxrpc: Also unshare DATA/RESPONSE packets when
+ paged frags are present
+Message-ID: <20260508132532.2008a68f@kernel.org>
+In-Reply-To: <af19tf9gX3sxIrWr@v4bel>
+References: <afKV2zGR6rrelPC7@v4bel>
+	<20260508055716.89380-1-qingfang.deng@linux.dev>
+	<af19tf9gX3sxIrWr@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260508073355.3916746-1-kuniyu@google.com> <20260508073355.3916746-9-kuniyu@google.com>
- <af4CV5itdz5Dzwo7@devvm7509.cco0.facebook.com>
-In-Reply-To: <af4CV5itdz5Dzwo7@devvm7509.cco0.facebook.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Fri, 8 May 2026 13:19:28 -0700
-X-Gm-Features: AVHnY4IfgnSdHVQGqmUp9c8TPr6rc7CoIlimLF0FkCpLI5deyQ5bxtFAPQGZg_k
-Message-ID: <CAAVpQUD01-UJorFM=4sT1b4XbiVF0TPorpzpU+b8DYXzn0FH0g@mail.gmail.com>
-Subject: Re: [PATCH v1 bpf-next 8/8] selftest: bpf: Add test for BPF_SOCK_OPS_RCVLOWAT_CB.
-To: Stanislav Fomichev <sdf.kernel@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Eric Dumazet <edumazet@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Tenzin Ukyab <ukyab@berkeley.edu>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 75DA24FB6A1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: F0C944FB7BA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285966-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285967-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,berkeley.edu,vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Fri, May 8, 2026 at 8:35=E2=80=AFAM Stanislav Fomichev <sdf.kernel@gmail=
-.com> wrote:
->
-> On 05/08, Kuniyuki Iwashima wrote:
-> > The test is roughly divided into two stages, and the sequence
-> > is as follows:
-> >
-> >   I) Setup
-> >
-> >     1. Attach two BPF programs to a cgroup
-> >     2. Establish a TCP connection (@client <-> @child) within the cgrou=
-p
-> >     3. Enable BPF_SOCK_OPS_RCVLOWAT_CB on @child
-> >
-> >  II) RPC frame exchange in various patterns
-> >
-> >     4. Send a partial RPC descriptor from @client to @child
-> >     5. Verify that epoll does NOT wake up @child
-> >     6. Send the remaining data of the RPC frame
-> >     7. Verify that epoll finally wakes up @child
-> >
-> > During setup, two BPF programs are attached to simulate
-> > a real-world scenario; one is SOCK_OPS and the other is
-> > CGROUP_SOCKOPT.
-> >
-> > While the SOCK_OPS prog handles the dynamic adjustment of
-> > sk->sk_rcvlowat, the CGROUP_SOCKOPT prog is used to enable
-> > BPF_SOCK_OPS_RCVLOWAT_CB via userspace setsockopt() using
-> > pseudo options:
-> >
-> >   #define SOL_BPF               0xdeadbeef
-> >   #define BPF_TCP_AUTOLOWAT     0x8badf00d
-> >
-> >   setsockopt(fd, SOL_BPF, BPF_TCP_AUTOLOWAT, &(int){1}, sizeof(int));
->
-> Hmm, so you do want to have this enable-on-a-per-socket use case.. Then w=
-hat
-> happens to the skbs already sitting in the rx queue by the time
-> we enable BPF_SOCK_OPS_RCVLOWAT_CB? Isn't there a race? Or am I missing
-> something?
+On Fri, 8 May 2026 15:07:49 +0900 Hyunwoo Kim wrote:
+> > > -	if (skb_cloned(skb)) {
+> > > +	if (skb_cloned(skb) || skb->data_len) {  
+> > 
+> > Ditto.  
+> 
+> Thank you for the review.
 
-If the upper protocol is designed that way, it could be racy.
-
-For example, HTTP2 could have multiple streams within the
-same TCP connection while only one stream can be upgraded.
-But this use case simply does not work with a single
-sk->sk_rcvlowat in the first place.
-
-This feature implicitly assumes a single stream per connection.
-
-In our original implementation, it traversed all (technically
-up to 100) skbs in the queue and parse them like psock.
-
-But this will be unnecessary if the server drains the queue
-properly before enabling the feature.
-
-If needed, we could return -EBUSY when the queue is not
-empty.  It's always under lock_sock() or bh_lock_sock().
+Maybe skb_ensure_writable() ?
 
