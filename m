@@ -1,104 +1,65 @@
-Return-Path: <netdev+bounces-285954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285955-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OGokB4cm/mminQAAu9opvQ
-	(envelope-from <netdev+bounces-285954-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 20:08:07 +0200
+	id iGYvIz0q/mn/nQAAu9opvQ
+	(envelope-from <netdev+bounces-285955-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 20:23:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 832844FA681
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 20:08:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FED24FA8C5
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 20:23:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 028293014875
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 18:08:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F03C53024951
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 18:23:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E468371D0A;
-	Fri,  8 May 2026 18:07:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 139E63D47DE;
+	Fri,  8 May 2026 18:23:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b="ogrl6MYO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mdOpGjwg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6038433F59B
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 18:07:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D6333A029;
+	Fri,  8 May 2026 18:23:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778263678; cv=none; b=jdVK5Ta8oHJs3i0A3TUn9m6eV0UKy4D/2lK9kUTzt3pbtDtTJhB28t/j+arNrvS+tbYrJI6AiWdkV6m5e8URFiSzD+Q85GPKHyVJEBUwkwrmzaP2oyyrbGHZ9UUSp35FwfYC4V5GxTDJXOYu757OBcoD0WKVQeAW34OdQdn8XO4=
+	t=1778264601; cv=none; b=BCYQqmtNgjAehraNGDKOv5QytKjjSG4hXGRh2s1ir67nj/mirl7fNGnCsKs7lFciSh2enB0QeauJFdjL8UGxHI1Dn8AixAY9rMmqH2fsibLln62dlp0mb9Oqtc7at4bSwWVxGEhloTn/DR/AQwlKYBNLUqJ6217UY5JERrW5VAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778263678; c=relaxed/simple;
-	bh=ufqlUDmozp4nL1Tie+ZeU3H7JAYzyL2fgLNlzO2FG2I=;
+	s=arc-20240116; t=1778264601; c=relaxed/simple;
+	bh=tLEOzE3Pq/BpYLP/PubCHCFKDoLfd+JQAltLfnSlE3U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZYHRxBvZu9crZUVpxq6euIfUzaNeIJ5/pGgWRoKy+aDT0okWtYddBCCE8OOb3mByOCDc0areUial3ux+q6gqgkJsq0nomzykTdoWYy6aBPf0uXu4OcvbQif8R2CAJIzuaVr4JYiGqzzJ6As0fOAnCAkDoR8lCpXssBUxeVrF9rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=ogrl6MYO; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4891f625344so24193005e9.0
-        for <netdev@vger.kernel.org>; Fri, 08 May 2026 11:07:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1778263669; x=1778868469; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=s0WKbRowPzovOif48EIjm8s484eRn+yiPRA2nQfqrh4=;
-        b=ogrl6MYOvZ2Fiftt2Y//Eh19O6LqsZQHZa95fGvytlIFZu2l+UwKqZem2yWGFg6FhA
-         hGkRyWUISEqZ8XBq/huN1SVMb2sGnzB4FY/QwGE9KGxTM+7Qdnb+wp453CA0507MvBKG
-         4Ah7lmbqm+eKmRqEWZY6LXzaY/26MrstWYMchklz/r+4ez00Itfji14JtE/n0LU88pgA
-         F546OW3H9K9TSKeskjW7wLuDLMFEstP5zu8dKDGdW4djTzF2LEu0v2VJ5OI+XTuytgSb
-         jdmyvCq38QjVbqrSItWJZlGB9BgG76Zj1md8J5STJug/xGEqv8xF790ZufviNAQFVbZK
-         DZFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778263669; x=1778868469;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s0WKbRowPzovOif48EIjm8s484eRn+yiPRA2nQfqrh4=;
-        b=rTTd/E9RcCrm804U2AOq8BJFToZUk+MfZPg311uvh0pj64+PnJNcpmkf8QsBx6S6JK
-         Clft0SwWXg8ysQxwGo5j9NaW6TLR7ekFGDi4dBmOQvCdW+fSFrCMEE6zmhGXhWvciv1I
-         NeFK/fOsV1jqAKFa36qIeE+YMUkDqIhPPdKOEWeKOq1ayZHMqWUqxDZFSbXtulzFwZ90
-         W3bnklcFSrU9orhMyd4GW23wQOx6QNZivo6EYj7+4O10IcdxBbafG6Iy++IhLcLKZmnE
-         avpfv02fBzkr/Yli4PGbgoWl9i3tHdErXmcRX5QPJP18shJGkmShGEXrO4JLM5g4SBi3
-         KNLg==
-X-Forwarded-Encrypted: i=1; AFNElJ8ic+T/ZDwjNcCK+dt2Iu76zPsJx6qg2tUSWG9WBndspJ8JZt9eoLhyTmWeW+guvBT1SA5b8qE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBRFFSsf01ouOMzvf+zug8jEJmdFuEX5uYegckuK4Vwd8CpJhj
-	Wk9DeK2otrKK4jj0nCFDw+tD5P/2SuxlJZhlzx6h3cMY8KoYwP5He9l2lAtIi2ZPaeU=
-X-Gm-Gg: AeBDietsmGakq0KbJR/VSKgMWre7lOP96+Qqole4T69Ikk+Z2zgf3q5KhefQZB79vI5
-	qyw19T3tQxkShnoatfT/fcFjYbjHq0h9esteW4bUWqhw4co1T+kzE6th8+0kReXgahOV0jHe9b2
-	6XQ3HIAV8s4dyAh0schcGxeGd5AEx8Aeq69cUeAhgKzpMQnSGKQvfvqEpctdE7dlDAcZ6edFdWc
-	QPg2/aJl91d6+J8P9NNq8lEmIdFLX8f4sQwb9poWj39kgwwRoq+PmmCDvhGPwHiBIZasNk/OIHj
-	htzCv/cuiipM4PozWR5wDveTyolcZXMVl4XOSYwGVuRbc8QRqp4ikKT2EfuZ8MhfIdl8XyIP4J9
-	vroqBpwb1sYgm7IL6iY1uNqy5WXuMNKXUWdvgD5U6SY242sFqLAdQGz5XCtk6DcolUkAWX7Bfz+
-	2NC5NzvsZ8s9ZPC/e+IHCpgg+OoX0UQaAvJFI=
-X-Received: by 2002:a05:600c:8b6e:b0:485:3c2e:60d5 with SMTP id 5b1f17b1804b1-48e5dfcd72emr132299835e9.2.1778263669094;
-        Fri, 08 May 2026 11:07:49 -0700 (PDT)
-Received: from FV6GYCPJ69 ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e6d8d4462sm8825735e9.1.2026.05.08.11.07.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 11:07:48 -0700 (PDT)
-Date: Fri, 8 May 2026 20:07:44 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Simon Horman <horms@kernel.org>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Tariq Toukan <tariqt@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	"Borislav Petkov (AMD)" <bp@alien8.de>, Randy Dunlap <rdunlap@infradead.org>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Christian Brauner <brauner@kernel.org>, 
-	Petr Mladek <pmladek@suse.com>, "Peter Zijlstra (Intel)" <peterz@infradead.org>, 
-	Thomas Gleixner <tglx@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
-	Dapeng Mi <dapeng1.mi@linux.intel.com>, Kees Cook <kees@kernel.org>, Marco Elver <elver@google.com>, 
-	Eric Biggers <ebiggers@kernel.org>, Li RongQing <lirongqing@baidu.com>, 
-	"Paul E. McKenney" <paulmck@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [RFC net-next 0/4] devlink: Add boot-time defaults
-Message-ID: <af4lBIJdCuN5VKq_@FV6GYCPJ69>
-References: <20260506123739.1959770-1-mbloch@nvidia.com>
- <aftaW-irGmkfA7FS@FV6GYCPJ69>
- <3f9215c4-7c84-46d9-ba74-30dabe24db09@nvidia.com>
- <afxvzOjqw-vxUAED@FV6GYCPJ69>
- <b6a9b568-dd09-4414-be57-6b9cd282a43c@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=P1MbQW7OC7Tzq26awHkcxjST5jBj4aKMh8y6CEW577mlceD5JWe17UDD1OcpJpQkjTN1Ro2WWCmG6Thf5tac3l+taE5mU89KkTHXR4HqcLlJGPL4APR5loIyxiIMKLfjQgAtpSnWrOWx6HVFI/3jiqeUpmvIkg+5CO1KwyIU9DQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mdOpGjwg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A5ABC2BCC7;
+	Fri,  8 May 2026 18:23:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778264600;
+	bh=tLEOzE3Pq/BpYLP/PubCHCFKDoLfd+JQAltLfnSlE3U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mdOpGjwgAoidIursjyBrFoK2hKWxX7qYcybRgA6cwAeqloYqgqoDubdKRGjNu/vEM
+	 SVEV7qsxDObAyoMrEPDLU3eHQtTMQI8HUi0w/4SJe1af4mSUaR+0XPm1TWGeB52Yue
+	 nrKXSRqQBwiL5U+g7OVF1OJanFy3hmZ5hixFbBcPKuaPyQ5LjihKWXtxgIVSrJbNnL
+	 qD2mTlak/080X6h+JQxef3a5stvT0tquhDxH1MjGZ9LlHyY7cGnFx82X7+XkaLFuPk
+	 Uxiqx89vTyRMai+/G1ZtJzQPwrRhKsueWFOhOzA0n4+ZS4R2hTsOFIfqhPCRvxOmB1
+	 HF1HFR3DNR69Q==
+Date: Fri, 8 May 2026 18:23:18 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, linux-afs@lists.infradead.org,
+	Marc Dionne <marc.dionne@auristor.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next 2/5] net/rxrpc: Use local FCrypt-PCBC
+ implementation
+Message-ID: <20260508182318.GA4145640@google.com>
+References: <20260428024400.123337-3-ebiggers@kernel.org>
+ <20260428024400.123337-1-ebiggers@kernel.org>
+ <286248.1778263325@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,180 +68,81 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b6a9b568-dd09-4414-be57-6b9cd282a43c@nvidia.com>
-X-Rspamd-Queue-Id: 832844FA681
+In-Reply-To: <286248.1778263325@warthog.procyon.org.uk>
+X-Rspamd-Queue-Id: 1FED24FA8C5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-285955-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285954-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ebiggers@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,resnulli-us.20251104.gappssmtp.com:dkim]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Fri, May 08, 2026 at 07:59:04PM +0200, mbloch@nvidia.com wrote:
->
->
->On 07/05/2026 14:03, Jiri Pirko wrote:
->> Wed, May 06, 2026 at 07:35:10PM +0200, mbloch@nvidia.com wrote:
->>>
->>>
->>> On 06/05/2026 18:22, Jiri Pirko wrote:
->>>> Wed, May 06, 2026 at 02:37:35PM +0200, mbloch@nvidia.com wrote:
->>>>> This series adds a devlink= kernel command line parameter for applying
->>>>> selected devlink settings during device initialization.
->>>>>
->>>>> Following a discussion with Jakub[1], I am sending this RFC to get the
->>>>> conversation moving. I started from Jakub's example/request and extended
->>>>> it to cover requirements from production systems and configurations that
->>>>> customers use.
->>>>>
->>>>> One important caveat is that the parsing logic in this RFC was written
->>>>> with AI assistance. I am also not sure whether the resulting syntax and
->>>>> parser are too complex for a kernel command line interface. This is part
->>>>> of why I am sending it as an RFC: to understand what direction and level
->>>>> of complexity would be acceptable to people.
->>>>>
->>>>> The implementation is intended to support the following properties:
->>>>>
->>>>> - A system may have multiple devlink devices that usually need the same
->>>>>  configuration. For a configuration such as eswitch mode switchdev, a
->>>>>  user should be able to specify multiple devices to which that
->>>>>  configuration applies.
->>>>>
->>>>> - There may be ordering dependencies between options. For example, in
->>>>>  mlx5, flow_steering_mode should be set before moving to switchdev.
->>>>>  With this in mind, defaults are applied per device in the left-to-right
->>>>>  order in which they appear on the command line.
->>>>>
->>>>> The intent is to let deployments set devlink defaults before normal
->>>>> userspace orchestration runs, while still using devlink concepts and
->>>>
->>>> "defaults before normal userspace orchestrarion". I read it as config
->>>> before config, which eventually could be skipped.
->>>>
->>>>
->>>>> driver callbacks rather than adding driver-specific module parameters.
->>>>> A default is scoped to one or more devlink handles, for example:
->>>>>
->>>>>  devlink=[pci/0000:08:00.0]:esw:mode:switchdev
->>>>>  devlink=[pci/0000:08:00.0]:param:flow_steering_mode:smfs
->>>>>  devlink=[pci/0000:08:00.0,pci/0000:08:00.1]:param:flow_steering_mode:hmfs,[pci/0000:08:00.0,pci/0000:08:00.1]:esw:mode:switchdev
->>>>
->>>> I don't like this. What you do, you are basically introducing user
->>>> configuration tool on kernel cmdline.
->>>>
->>>> The same you would achieve with a proper userspace tool/daemon.
->>>> I did try to come up with it and push it here:
->>>> https://github.com/systemd/systemd/pull/37393
->>>> That didn't get merged for unknown reason, but the idea is sound. You
->>>> provide configuration files for devlink object and systemd-devlinkd
->>>> will apply when they appear. Wouldn't this help your case?
->>>
->>> I agree that systemd-devlinkd is the right shape for normal
->>> devlink configuration, and it could probably replace the udev/devlink
->>> plumbing we use today.
->>>
->>> The case I am trying to cover is earlier than that.
->>>
->>> On BlueField/ECPF/DPU systems, the host PF driver cannot always finish
->>> probing independently of the ECPF side. When the ECPF is the eswitch
->>> manager, the host PF is kept in initializing state until the ECPF eswitch
->>> side is set up and mlx5 enables the external host PF HCA. That happens as
->>> part of moving the ECPF to switchdev.
->>>
->>> Today userspace observes the ECPF instance and then switches the
->>> mode through devlink, usually via udev or similar plumbing. That still
->>> leaves a window where the ECPF has probed, userspace has not applied the
->>> mode yet, and the host PF is waiting. With many ECPFs this becomes visible
->>> in host PF probe/boot time. A daemon reacting to the devlink object
->>> appearing can make the userspace side cleaner, but it still runs after the
->>> device has appeared and after userspace scheduling/uevent handling.
->>>
->>> Long term, for these DPU deployments, we would like mlx5 to initialize
->>> directly in switchdev. I am hesitant to make that unconditional because it
->>> changes existing behavior and there is no early opt-out before probe. The
->>> cmdline parameter was meant as an explicit opt-in middle step: ask the
->>> driver to apply the same devlink operation during init, before this path
->>> depends on userspace.
->>>
->>> We previously tried to address this with an mlx5 module parameter. By
->>> design, that was too coarse: it applied to all mlx5 devices handled by the
->>> module. That makes it usable only for narrow DPU-only configurations. The
->>> devlink-handle based cmdline syntax was intended to keep the opt-in scoped
->>> to the specific devices that need this early switchdev transition.
->> 
->> The switchdev mode was introduced at roughly the time CX4 was out. What
->> stopped us from making it default for CX4+ ?
->> 
->> Introducing this horrible plumbing only bacause we were not able to
->> change the default sounds so absurd.
->> 
->> Can we write the default mode as a bit in ASIC NV memory perhaps? Simple
->> devlink cmode permanent param to write it, the driver can read this bit
->> during init to decide the init flow path?
->
->I don't think switchdev by default should mean CX4+ in general. If we get
->there, I would expect it to be limited to the DPU/BlueField/ECPF case, where
->the host PF probe path can depend on the ECPF reaching switchdev. Changing the
->default for regular host NIC deployments feels like a much larger compatibility
->change.
+On Fri, May 08, 2026 at 07:02:05PM +0100, David Howells wrote:
+> Eric Biggers <ebiggers@kernel.org> wrote:
+> 
+> > +	if (skb_linearize(skb) < 0)
+> > +		return -ENOMEM;
+> 
+> It seems skb_linearize() doesn't like being used in this fashion:
+> 
+> 	kernel BUG at net/core/skbuff.c:2295!
+> 	...
+> 	RIP: 0010:pskb_expand_head+0x41/0x220
+> 	 __pskb_pull_tail+0x5e/0x2f0
+> 	 rxkad_verify_packet_2+0xa8/0x190
+> 	 rxkad_verify_packet+0x12c/0x150
+> 	 rxrpc_recvmsg_data+0x1b0/0x470
+> 	 rxrpc_kernel_recv_data+0xa6/0x210
+> 	 afs_extract_data+0x5e/0x180
+> 	 yfs_deliver_fs_fetch_data64+0x10b/0x200
+> 	 afs_deliver_to_call+0xea/0x440
+> 	 afs_read_receive+0x8d/0x150
+> 	 afs_fetch_data_async_rx+0x12/0x20
+> 	 process_one_work+0x18e/0x2b0
+> 
+> which corresponds to this:
+> 
+> 	BUG_ON(skb_shared(skb));
+> 
+> Presumably this is done because fcrypt_pcbc_decrypt() doesn't handle being
+> called on a split buffer.  I think this may require skb_copy() to be used
+> instead, but that would need to be handled in rxrpc_input_call_event().
+> 
+> I think rxkad_decrypt_response() should be okay because the encrypted data is
+> extracted into a buffer first before being decrypted.
 
-We can't travel throught time, but if from CX5 onwards the default would
-be switchdev, nobody would feel broken in terms of compatibility. That
-is my point. Having "legacy" as default is simply wrong for never NIC
-generations. That is why it is called "legacy" and it should have been
-rotten through and out since CX4 times.
+Yes, Marc pointed this out already.  Thanks for the review and testing.
+I just haven't had a chance to decide what to do with this patch yet.
+It could be an unconditional skb_copy(), it could be decrypting the
+fragmented skb in-place, or it could be fixing up the RxRPC code to no
+longer take multiple references to the skb (so skb_shared() would no
+longer be true).  Let me know if you have a preference.
 
+Also I'm waiting to see if the following patch gets merged:
+https://lore.kernel.org/netdev/20260502211340.446927-1-n7l8m4@u.northwestern.edu/
+That does the skb_copy() anyway, which would solve this problem.
 
->
->For the ASIC/NV bit: maybe technically possible, but it feels like the wrong
->layer. This is boot/deployment policy, not a persistent hardware property, and
->storing it in NV memory would make the state persist across kernels/hosts in a
->surprising way.
-
-Well, as any other nv config, it persists across kernels/hosts. Think
-about it as "unbreak-my-not-legacy-device" bit.
-
-
->
->I do agree the RFC probably went too far by making a generic devlink cmdline
->configuration language. Maybe the smaller thing to discuss is only:
->
->devlink=[pci/...]:esw:mode:{legacy|switchdev|switchdev_inactive}
->
->No runtime params, no ordering between different operations, just early eswitch
->mode for explicitly selected handles.
-
-FWIW, I'm still against this.
-
-
->
->@Jakub, I know you wanted something more generic/extensible, but maybe the
->generic case belongs in the devlinkd/systemd direction Jiri pointed at, while
->the kernel cmdline handles only this early boot eswitch mode case.
->
->Mark
+- Eric
 
