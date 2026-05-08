@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-285774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285775-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yG6WDyHR/Wl2jgAAu9opvQ
-	(envelope-from <netdev+bounces-285774-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:03:45 +0200
+	id 0GEmDFrR/Wl2jgAAu9opvQ
+	(envelope-from <netdev+bounces-285775-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:04:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B20164F60D8
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:03:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AF0EE4F6134
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:04:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3BE2F301727E
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 12:03:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0076730086D6
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 12:03:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CB91372B4B;
-	Fri,  8 May 2026 12:03:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FDCA3D4100;
+	Fri,  8 May 2026 12:03:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="bY5WhrWY"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="QgJKW0dU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727EE256C84;
-	Fri,  8 May 2026 12:03:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705DA395254;
+	Fri,  8 May 2026 12:03:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778241804; cv=none; b=AfEH6ateml8HMHUhWIbtMTrP7pVUvIj/C9WO41YFTMJoIxl6doBCUjb98vBO5+GlSohVh976GCg6z79c6QZ1ShcHh+DMUQrSv4fJ/GmqqbxdNf/rwkRkEXaAg0ueQYZ4AUJUb7tQVoD1RBR5Z//hreZdzaDqKqUDshgntZ8WvtY=
+	t=1778241823; cv=none; b=UwZH5lwIeUf2c9oQe88q0uhDxNRuvX0c21N4X2IWOy3aW9pGiEJKhhFUYdgSxgvIpp8WQVNXsbp259ai3N2md0F6Ebo9c7jD0WXfgZELIt1l+bzjnDBHt6H7ySq5umFSeysuc+2nIla1V4WKaIEZK8PLjLsJ16LCmFwDkOqHh14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778241804; c=relaxed/simple;
-	bh=g6fPHPIaMrimEkluU7Nv9VTxJMFe2QqLzA63QAt/Z0U=;
+	s=arc-20240116; t=1778241823; c=relaxed/simple;
+	bh=uxNVsaRzOnFejNmiIUX3HPDYNqZFdOMxWonxL2AMPHk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EPbgFQrCZh9mgK7cdv4u1bj4t3xOSW4lOf/qtgLxgqOWgl2xv3tVN9/17iit9KadBCPpkrwXyfa9QWgIqhqFl7x3MdRIlzGVEEdveEqr6gxp5bevfnBVAPfMLMeNZGrWm7UJvNHK7luz2GJjoeAE/zWaIl/Yxvsn7SZOtZ98+OU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=bY5WhrWY; arc=none smtp.client-ip=67.231.156.173
+	 MIME-Version:Content-Type; b=P2TaXkDP4wm9IgAeOe2qU2HHltDv+Lj0AqLjkUu9ANib5PbAOqWw3RIcGrj3ShlNEiFBFbQbu28cA062ZSBeo6Jt2lS9cUb3K36vsCeSLib1NvPhISIZMTeBp2mErAznPaeOVPessh9JZU4D2wZftFTESEEQqSYRlwtlTGGIvcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=QgJKW0dU; arc=none smtp.client-ip=67.231.148.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 648B8TYt2841686;
-	Fri, 8 May 2026 05:02:57 -0700
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6484mfZd3918198;
+	Fri, 8 May 2026 05:03:12 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=s
-	ftJk20xYEKv2SoQ3gqS0JXxBE1+inAABxct5Pr9YIg=; b=bY5WhrWY0RA5FDnrt
-	46VcBaQixiBiL4hdiQ2WYJD1j1atPJxFFXLhDn/xKq2zA6Bqp3An79H7O2/dK1Cw
-	8Rbnk5ZfgyLAWUh2+BbDnzpHH8egYQu01JTzG0jDjhSyL2JaqfBwR8ehtjmusHbE
-	sptiGqJrUoYUnKfFGJBZQp4Qrit/G2qlfKOwY52RFcSN40qcRgV3niJ+Vz5xw343
-	5zz/ghgINzTfu0tFWTR0qsRwxnBAi4C+s+NmaUKRvfUZprHgY84cKzgGY3G6PZ5t
-	8eaSxab6eRiY1cNLbMW52KCt62iWOVArlob9yn5DEZvFUMPxH9i72p3HixyR//4l
-	wQJMA==
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=U
+	kbjYwFqoIN5M0l98GWm6jC17NSot+pUpVu2G13nNj0=; b=QgJKW0dUh7UZQMJ8h
+	wgrTHjbWvm0QefQKZ+dfqD1MWas6rmvVcdP8/tsbkhRJpngQ5bLsXLaHCHJNJIKz
+	a/DdrrpPLxTE8UJLt0Jh5i2BNrBXZ+W7VGQEJSBG6byc5x5bqRtqGSY9h9ba3tTk
+	cVpA0DsB1UxSDErFO7+vOyZB65q45B/RVifZ8DU2OlTX4m1U+W0SFDjU5cjJ44T7
+	YadQZTvqa5dutt+iVJZxCoyH3MMpfoFrv+L032QOO/hV18sdasn7HfRVbnlja7In
+	yxBIVB4OiB2poH9yaLXYwgpcj1pNfORTUdTSAPGSu1baFZJo/GuOJbPNcPkLSqjC
+	JC75w==
 Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4e14g0hqtk-1
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4e093sxbpk-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 08 May 2026 05:02:56 -0700 (PDT)
+	Fri, 08 May 2026 05:03:12 -0700 (PDT)
 Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
  DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 8 May 2026 05:02:55 -0700
+ 15.2.1544.25; Fri, 8 May 2026 05:03:11 -0700
 Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
  (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Fri, 8 May 2026 05:02:55 -0700
+ Transport; Fri, 8 May 2026 05:03:11 -0700
 Received: from BG-LT92649.marvell.com (BG-LT92649.marvell.com [10.28.166.218])
-	by maili.marvell.com (Postfix) with ESMTP id E8BA63F706D;
-	Fri,  8 May 2026 05:02:50 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id C56F63F706D;
+	Fri,  8 May 2026 05:03:06 -0700 (PDT)
 From: <sukhdeeps@marvell.com>
 To: <netdev@vger.kernel.org>
 CC: <irusskikh@marvell.com>, <epomozov@marvell.com>,
@@ -70,12 +70,13 @@ CC: <irusskikh@marvell.com>, <epomozov@marvell.com>,
         <linux-kernel@vger.kernel.org>,
         Sukhdeep Singh
 	<sukhdeeps@marvell.com>
-Subject: [PATCH net-next v2 0/9] net: atlantic: add PTP support for AQC113 (Antigua)
-Date: Fri, 8 May 2026 17:31:47 +0530
-Message-ID: <20260508120156.3060-1-sukhdeeps@marvell.com>
+Subject: [PATCH net-next v2 1/9] net: atlantic: correct L3L4 filter flow_type masking and IPv6 handling masking and IPv6 handling
+Date: Fri, 8 May 2026 17:31:48 +0530
+Message-ID: <20260508120156.3060-2-sukhdeeps@marvell.com>
 X-Mailer: git-send-email 2.52.0.windows.1
-In-Reply-To: <20260506135706.2834-1-sukhdeeps@marvell.com>
+In-Reply-To: <20260508120156.3060-1-sukhdeeps@marvell.com>
 References: <20260506135706.2834-1-sukhdeeps@marvell.com>
+ <20260508120156.3060-1-sukhdeeps@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,25 +85,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: yC1KXo58hFLpQ9pRIB4kdd7_cU3svRa0
-X-Authority-Analysis: v=2.4 cv=bMUm5v+Z c=1 sm=1 tr=0 ts=69fdd0f0 cx=c_pps
+X-Proofpoint-ORIG-GUID: vKBi4YCZKzowzZqW1f8iMWFXj9p1qVaW
+X-Proofpoint-GUID: vKBi4YCZKzowzZqW1f8iMWFXj9p1qVaW
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTA4MDEyNSBTYWx0ZWRfX4iikq9MMgtSW
+ JoQUtw+k9IsKp0QcCv1qCAq4+7OApR7TvufqdV0ZQiLHpkfzD33MWe0zpiqSejm0yV58WjQTOHz
+ NUPDgtiRmFHOJjqh8/ooLbGVKe8bsLzix/8+0WsnNIWv0DBoxImeTIWtoijQebkAELqaDuh+qol
+ 1Abw3BXTLsvoLks6WIb6sthdOIp3lCMy0UHG/uX2Oo9UDiXmjel0qj+I3e5JB0eE9VkQt994b07
+ ZkIeGjKoBe1S+VlrJv2dt35BjJ+52hulyZNKxelarEwU9UcdL18k4gtzyqOpSgb1PXH+PCYNPso
+ tzPsEKBln+pExEG8W1EPSxLMyKmUGiUbpI5y0TrNlJm+XHEf+i+CRgIHycpNn8PacncoJTFuKKp
+ 9dnftFE/u73Z2T/xa/35YL5FXzv6eUUmC9CrzTCqQRChbAWAsyEUAvbJHA7e6FSMsNHo2qJqN6u
+ RsihSx/mByPF3U5j3gQ==
+X-Authority-Analysis: v=2.4 cv=WZ48rUhX c=1 sm=1 tr=0 ts=69fdd100 cx=c_pps
  a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
  a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=qit2iCtTFQkLgVSMPQTB:22 a=M5GUcnROAAAA:8 a=D6WJUydZfyHhnkMUwaQA:9
+ a=TtqV-g6YmW1Jfm2GSLaY:22 a=M5GUcnROAAAA:8 a=7-RSyJf46AiWYYgqFwsA:9
  a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTA4MDEyNSBTYWx0ZWRfX/1DjNePbS0P9
- 1gZcJAolBee6Cca95Jg/wXk9sRSOEIgxqzvnbB7BUMMAwX9Si7VP+HhOo4dV1M8VwwSLqyJW180
- oafO22LbofLiL2lHkym+ey4W5fMK53dL4i66lse1li2Pzu+oBTyGNOeQNxGAq9kgUegkRX3DtI8
- AnCapFgBV9cHeTQRySaumFK08EdMBtRXtO6I0Ol7zjxImHFjRhWe1aLX06y8dtpOF7f9DGCYcyb
- NxzfDg6I7v4pEyB6Wq+cM6TpT8dLxtxEw9+V+HP5wV6gt3rWgn5H6HGJicGBeLtE3L6FZkfc4su
- fRtjoYfpGNc0LS4/vPYz6xcxnsT5EjjcjOjGCvoFKMqClQ855Latnq7o3aV/rodZZlgyUvBwBPz
- ZQxga3T0uZ3Kif+vLy27iX+a705gw5QjLxMC1T24kP2y7ART0Wcxt2BLYSauSDDHf6llh6BMJNI
- H6fj4tJJdc92/r3gbbQ==
-X-Proofpoint-GUID: yC1KXo58hFLpQ9pRIB4kdd7_cU3svRa0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-05-07_02,2026-05-06_01,2025-10-01_01
-X-Rspamd-Queue-Id: B20164F60D8
+X-Rspamd-Queue-Id: AF0EE4F6134
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -119,15 +120,15 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-285774-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285775-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,marvell.com:email,marvell.com:mid,marvell.com:dkim];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:email,marvell.com:mid,marvell.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sukhdeeps@marvell.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[marvell.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
+	NEURAL_HAM(-0.00)[-0.999];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
@@ -136,93 +137,90 @@ X-Rspamd-Action: no action
 
 From: Sukhdeep Singh <sukhdeeps@marvell.com>
 
-This series adds IEEE 1588 PTP support for the AQC113 (Antigua) network
-controller. AQC113 is the successor to the existing AQC107 (Atlantic)
-chip already supported by the atlantic driver.
+Correct three issues in aq_set_data_fl3l4() required for the AQC113
+PTP filter path introduced later in this series:
 
-AQC113 uses a substantially different hardware architecture for PTP
-compared to AQC107:
+1. Mask FLOW_EXT from flow_type before the protocol switch statement.
+   Flow types with FLOW_EXT set (e.g. TCP_V4_FLOW | FLOW_EXT) fall
+   through to the default case and skip protocol comparison flags.
 
-  - Dual on-chip TSG clocks with direct register access instead of
-    PHY-based timestamping via firmware
-  - TX timestamps via descriptor writeback instead of firmware mailbox
-  - Hardware L3/L4 RX filters for PTP multicast steering with both
-    IPv4 and IPv6 support
-  - Reference-counted shared filter slots managed through an Action
-    Resolver Table (ART), allowing multiple rules to share L3/L4
-    hardware filters when their match criteria are identical
+2. Extend the L3 address comparison check to cover all four IPv6
+   words. The original code only checked ip_src[0]/ip_dst[0] and
+   required !is_ipv6, so CMP_SRC_ADDR_L3/CMP_DEST_ADDR_L3 were never
+   set for IPv6 filters.
 
-The series is structured in three parts:
+3. Use explicit flow type checks for port extraction instead of
+   negating IP_USER_FLOW/IPV6_USER_FLOW. The old check did not mask
+   FLOW_EXT, so IP_USER_FLOW | FLOW_EXT would incorrectly attempt
+   port extraction. Use the actual flow type to pick the correct
+   union member directly.
 
-Patches 1-3 prepare the existing L3/L4 filter path:
+Signed-off-by: Sukhdeep Singh <sukhdeeps@marvell.com>
+---
+ .../ethernet/aquantia/atlantic/aq_filters.c   | 33 ++++++++++---------
+ 1 file changed, 17 insertions(+), 16 deletions(-)
 
-  Patch 1 corrects flow_type masking and IPv6 address handling in
-  aq_set_data_fl3l4(). Patch 2 moves the active_ipv4/ipv6 bitmap
-  updates to after the hardware write succeeds. Patch 3 decouples
-  the function from driver-internal structures so it can be called
-  directly by the AQC113 PTP filter setup code.
-
-Patches 4-6 add the AQC113 hardware infrastructure:
-
-  Patch 4 adds the low-level register definitions and accessor
-  functions. Patch 5 adds filter data structures and firmware
-  capability query. Patch 6 implements the complete L2/L3/L4 RX
-  filter management layer including the reference-counted sharing
-  and ART integration.
-
-Patches 7-9 add the AQC113 PTP feature:
-
-  Patch 7 reserves the dedicated PTP traffic class buffer and
-  configures the TX path. Patch 8 extends the hw_ops interface
-  with PTP-specific function pointers and updates AQC107 to the
-  new signatures. Patch 9 implements the full PTP subsystem
-  integration for AQC113.
-
-The existing AQC107 PTP implementation is not functionally changed
-by this series; AQC113-specific code paths are gated on chip
-detection throughout.
-
-Tested on AQC113 at 1G, 2.5G, 5G, and 10G link speeds using
-ptp4l/phc2sys with hardware timestamping in both L2 and L4
-(IPv4/IPv6) modes.
-
-Changes in v2:
-- Patch 6: Remove redundant variable initializers for art_mask, h, l
-  and err as suggested by Vadim Fedorenko
-
-Sukhdeep Singh (9):
-  net: atlantic: correct L3L4 filter flow_type masking and IPv6 handling
-  net: atlantic: move active_ipv4/ipv6 bitmap updates after HW write
-  net: atlantic: decouple aq_set_data_fl3l4() from driver internals
-  net: atlantic: add AQC113 hardware register definitions and accessors
-  net: atlantic: add AQC113 filter data structures and firmware query
-  net: atlantic: implement AQC113 L2/L3/L4 RX filter management
-  net: atlantic: add AQC113 PTP traffic class and TX path setup
-  net: atlantic: extend hw_ops and TX descriptor for AQC113 PTP
-  net: atlantic: add PTP support for AQC113 (Antigua)
-
- drivers/net/ethernet/aquantia/atlantic/aq_filters.c          |  64 +-
- drivers/net/ethernet/aquantia/atlantic/aq_filters.h          |   3 +
- drivers/net/ethernet/aquantia/atlantic/aq_hw.h               |  37 +-
- drivers/net/ethernet/aquantia/atlantic/aq_main.c             |  33 +-
- drivers/net/ethernet/aquantia/atlantic/aq_nic.c              |  51 +-
- drivers/net/ethernet/aquantia/atlantic/aq_pci_func.c         |   4 +-
- drivers/net/ethernet/aquantia/atlantic/aq_ptp.c              | 531 +++++++--
- drivers/net/ethernet/aquantia/atlantic/aq_ptp.h              |  15 +-
- drivers/net/ethernet/aquantia/atlantic/aq_ring.c             |  42 +-
- drivers/net/ethernet/aquantia/atlantic/aq_ring.h             |   4 +-
- drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_b0.c   |  15 +-
- drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2.c    | 813 +++++++++++-
- drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2.h    |  12 +
- drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h | 69 +-
- drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_llh.c | 360 ++++++
- drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_llh.h | 107 +-
- drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_llh_internal.h | 204 ++-
- drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.c |  33 +
- drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.h |  15 +
- drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c |  52 +
- 20 files changed, 2244 insertions(+), 224 deletions(-)
-
+diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_filters.c b/drivers/net/ethernet/aquantia/atlantic/aq_filters.c
+index e419c73b32ce..eef52f23166d 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/aq_filters.c
++++ b/drivers/net/ethernet/aquantia/atlantic/aq_filters.c
+@@ -472,6 +472,7 @@ static int aq_set_data_fl3l4(struct aq_nic_s *aq_nic,
+ {
+ 	struct aq_hw_rx_fltrs_s *rx_fltrs = aq_get_hw_rx_fltrs(aq_nic);
+ 	const struct ethtool_rx_flow_spec *fsp = &aq_rx_fltr->aq_fsp;
++	u32 flow = fsp->flow_type & ~FLOW_EXT;
+ 
+ 	memset(data, 0, sizeof(*data));
+ 
+@@ -490,7 +491,7 @@ static int aq_set_data_fl3l4(struct aq_nic_s *aq_nic,
+ 
+ 	data->cmd |= HW_ATL_RX_ENABLE_FLTR_L3L4;
+ 
+-	switch (fsp->flow_type) {
++	switch (flow) {
+ 	case TCP_V4_FLOW:
+ 	case TCP_V6_FLOW:
+ 		data->cmd |= HW_ATL_RX_ENABLE_CMP_PROT_L4;
+@@ -527,23 +528,23 @@ static int aq_set_data_fl3l4(struct aq_nic_s *aq_nic,
+ 		}
+ 		data->cmd |= HW_ATL_RX_ENABLE_L3_IPV6;
+ 	}
+-	if (fsp->flow_type != IP_USER_FLOW &&
+-	    fsp->flow_type != IPV6_USER_FLOW) {
+-		if (!data->is_ipv6) {
+-			data->p_dst =
+-				ntohs(fsp->h_u.tcp_ip4_spec.pdst);
+-			data->p_src =
+-				ntohs(fsp->h_u.tcp_ip4_spec.psrc);
+-		} else {
+-			data->p_dst =
+-				ntohs(fsp->h_u.tcp_ip6_spec.pdst);
+-			data->p_src =
+-				ntohs(fsp->h_u.tcp_ip6_spec.psrc);
+-		}
++	if (flow == TCP_V4_FLOW || flow == UDP_V4_FLOW ||
++	    flow == SCTP_V4_FLOW) {
++		data->p_dst = ntohs(fsp->h_u.tcp_ip4_spec.pdst);
++		data->p_src = ntohs(fsp->h_u.tcp_ip4_spec.psrc);
++	}
++	if (flow == TCP_V6_FLOW || flow == UDP_V6_FLOW ||
++	    flow == SCTP_V6_FLOW) {
++		data->p_dst = ntohs(fsp->h_u.tcp_ip6_spec.pdst);
++		data->p_src = ntohs(fsp->h_u.tcp_ip6_spec.psrc);
+ 	}
+-	if (data->ip_src[0] && !data->is_ipv6)
++	if (data->ip_src[0] ||
++	    (data->is_ipv6 && (data->ip_src[1] || data->ip_src[2] ||
++			       data->ip_src[3])))
+ 		data->cmd |= HW_ATL_RX_ENABLE_CMP_SRC_ADDR_L3;
+-	if (data->ip_dst[0] && !data->is_ipv6)
++	if (data->ip_dst[0] ||
++	    (data->is_ipv6 && (data->ip_dst[1] || data->ip_dst[2] ||
++			       data->ip_dst[3])))
+ 		data->cmd |= HW_ATL_RX_ENABLE_CMP_DEST_ADDR_L3;
+ 	if (data->p_dst)
+ 		data->cmd |= HW_ATL_RX_ENABLE_CMP_DEST_PORT_L4;
 -- 
 2.43.0
+
 
