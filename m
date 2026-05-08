@@ -1,250 +1,342 @@
-Return-Path: <netdev+bounces-285757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285758-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yOlsHTe9/WmOiQAAu9opvQ
-	(envelope-from <netdev+bounces-285757-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 12:38:47 +0200
+	id 6CTNEUG9/WmOiQAAu9opvQ
+	(envelope-from <netdev+bounces-285758-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 12:38:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F116B4F5184
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 12:38:46 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0CE54F519A
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 12:38:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 50F8B301BF54
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 10:38:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1B0A13016280
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 10:38:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7FE93CFF70;
-	Fri,  8 May 2026 10:38:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59C7836F430;
+	Fri,  8 May 2026 10:38:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EaaBrRgG";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="JDgnLGTJ"
+	dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b="rl/kKWO9"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010016.outbound.protection.outlook.com [52.101.84.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 165303C8731
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 10:38:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778236723; cv=none; b=EvrZv63fPUxJfSIWAPvpDFRwB8p8D930wZFZx50I439PL2CyDhaNqMYWad++4kTGMt1h1VkuTLTV/xZx428pzrdiHrfPIJBVIQjhqDK6C7olH0umC0E7O59VNHv9Sv9ndpp6cgU9x7ym4MlcbY53PBWGargFPFD1NooGQUobo+I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778236723; c=relaxed/simple;
-	bh=MSTUs5VmMs5E3z7P5tkkJbr9UZZ5t6JPN4eNIlmTVac=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RDAw2wbs99XAVpL5mlTo2TaJUCp/1t0eMcj2PxIYsMMBP022jHMxFmqhrWFI8Y80ZLYiZ9hGVqRz8iBALHJrDm5fb7NL/Eh85UjoKDdjQ6oB1oTYzk7wSDOvhKwZjVg2UIeUmg1KdZ2GjHcwEurQBGnCJe2bCwE3C7wwgsxOYD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EaaBrRgG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=JDgnLGTJ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778236721;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K3CQx535Mhn8kkYAr+IKjhOgoYF3I8ZJ28RdhySKLwo=;
-	b=EaaBrRgGFkSbLbhyCM0/yfnimkgl3DEecxBUWG99PUsbVi/8RCk0Ye6H6xahjONoyHbIkz
-	mxfGH+rkxQ/TxT97VY2kqH8wmi8I6VsF1lrBA5Map4tL3TYDIXos2HO6KvjbPEG8mho4Lj
-	EIMNhOYXKzX1RyngILkW+FUHGaq11v8=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-251-5hb_IkcGPMCwsIzDJbUG0A-1; Fri, 08 May 2026 06:38:40 -0400
-X-MC-Unique: 5hb_IkcGPMCwsIzDJbUG0A-1
-X-Mimecast-MFC-AGG-ID: 5hb_IkcGPMCwsIzDJbUG0A_1778236719
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-48e5dfa8ec7so9706225e9.2
-        for <netdev@vger.kernel.org>; Fri, 08 May 2026 03:38:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1778236719; x=1778841519; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K3CQx535Mhn8kkYAr+IKjhOgoYF3I8ZJ28RdhySKLwo=;
-        b=JDgnLGTJaxCt/gfvRiLK2xY4cTBx/pBgQ9BKpfIO/vn775aQx5E4lw1vLQtASdHoYO
-         OuYQX2ppJeP5NIIH32BUdvA9OhbiTHXzcFuqZ/qPjJZVAHhLrBnRk47o6RtBX8zlABAq
-         K8l2xcfgoTIIJF5WhqoDSX/WgDcSVBRmdqzZqNc/Ikl+qmOlF7VVxoIcX5FQaN9mMf+e
-         urRh77PzQ5Zb3zlRjgMSzMTU7gsBVwfsnqn9mFZ4DGwwD4nW+r6bAtqxfD66Vp6CEuOL
-         +9wImHirSQ6wOc0hOrnI9GPTwVwVl7GOKn9vS4K911PCAEJVCxx47K+6UnDcl3oMb9Po
-         oG/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778236719; x=1778841519;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=K3CQx535Mhn8kkYAr+IKjhOgoYF3I8ZJ28RdhySKLwo=;
-        b=QAVYiy/h8udUByLUbJNG7/Euo2rwnaVlRqnX/TJlhrgfqtKuPfWHyyVE0bVmfHLAsh
-         3IndFYbmkmiIRV+d07j7klpMLIuiYlqibJ5/hc0CkaZFxwQqgiKV38OASO/ADyjjXHp6
-         tCKvnLXNxxu1pYJOaU5jKW6i6Ptd7u3TroAr9pjTyhi4UeAE7ELIZ9p9op3bMH/q8DLH
-         RqfxCE8WCbnyoKGVeJ9X+0QfEuvjUczSZ1+fIuC4w61dlY8qHYMYxeHPCRfe3nRlEGmo
-         rQtD7stLp61SLvNyqCS8KcLRizB+tD64fV+GoiBkGYSW0Lw5pyf/S7WB7R9U6rmIggIC
-         kwiw==
-X-Gm-Message-State: AOJu0YyljW9gsAxWZTX3C+3FU6BhBWmj6qqOUXPDzGHUTX6UHRD3IVXt
-	lfooMsSoYM5pe7BtKMl9mRxHpFe+85JCS+tzuhnqyPHc/IaB+yKMd8LVD/P9ScES6wSgvFaHf04
-	dcBHsH+vG2h3G2kZdCq68niYyYSZyD6aqIkHUTk5MjSbuvixyxwvkKj7fPg==
-X-Gm-Gg: AeBDiesDfjLsS3dFQeJEE+qTzFwfIxV4Ypd4fJWwfauPdlc0RGf80cmpd0sevSgnsoL
-	WX/CXxKXu8yPceUbJGFWRKNr0iEa2eJtOhVpPwXUx+4W9V4LKF2FySyHG6QTOMdE8UUVYU4yPzs
-	esmyqktSXnh4xNbaVEYLdPYS7ZbQSnQjwL6oCN0NBYxNidtKW0w/A0igW483RaJBdcyaEVBvMAy
-	il5UywzbaRUjGV/Z/hNNl2qkgcWL/xxlx71oKqtSN3NXTM7KHQM8vT9+LAHw8BxoFywAje/uEaY
-	10ZfU8F+5drgDaVhHGfx3sUq9VdDBrseLfYG7I7wJUUtvEfAj/kBY8o7gB/nwvDFcl+Z0MBZlnz
-	x4ra5fT2zpjnSJ6/F9GlPh+5D9T7DTdIq/PlUSNXicIYZCS6uSGdTUCupFYDzP6Y=
-X-Received: by 2002:a05:600c:811a:b0:48a:674d:e756 with SMTP id 5b1f17b1804b1-48e51f36569mr193210415e9.20.1778236718669;
-        Fri, 08 May 2026 03:38:38 -0700 (PDT)
-X-Received: by 2002:a05:600c:811a:b0:48a:674d:e756 with SMTP id 5b1f17b1804b1-48e51f36569mr193209945e9.20.1778236718109;
-        Fri, 08 May 2026 03:38:38 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-11-6-2.retail.telecomitalia.it. [87.11.6.2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e642e2b29sm26082845e9.1.2026.05.08.03.38.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 03:38:37 -0700 (PDT)
-Date: Fri, 8 May 2026 12:38:32 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, 
-	"David S. Miller" <davem@davemloft.net>, Jason Wang <jasowang@redhat.com>, 
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, kvm@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>
-Subject: Re: [PATCH net] vsock/virtio: fix skb overhead accounting to
- preserve full buf_alloc
-Message-ID: <af28MAV0LF4qHVmB@sgarzare-redhat>
-References: <20260508092330.69690-1-sgarzare@redhat.com>
- <20260508055125-mutt-send-email-mst@kernel.org>
- <af2y2Fyp7H-om-ur@sgarzare-redhat>
- <20260508063104-mutt-send-email-mst@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AF463CF696;
+	Fri,  8 May 2026 10:38:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778236731; cv=fail; b=BBJrIAGwP3cni6o6sShcPE/XpWgID+m/GaNzCrf30Sctm2T30LHJpZvk23sLPI67EAMlSf/6y7PrtKSJaNQXMZ/tph4/Dm20CJ5Te4UhNm3j5CYlv13T/hCIIGKMT6EMAGlFtsatCCpX+EmF/X5dAKbLVNiss/ykmLv9zjJ5Gpg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778236731; c=relaxed/simple;
+	bh=xo8GMZ2ZB7REvW9Dp32DNOEPH/r3n2AscUje+3N0r+c=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=RSfRK5jeT9Nx/HT38fj3ghnNppaEuixBHSUulcAcyoHeCJME59/2vILO0JTjJ6QTsu/G2X6vghNSSgmjSjemxYpakINmG9mzpLwX5cIRbTiIPkd231uFyxKgw3tZL1KSNTuUmqfWhW/mLKvFTcp3zVVtskmiJFUmKez0/asIHe0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=rl/kKWO9; arc=fail smtp.client-ip=52.101.84.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=est.tech
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bMbmBQsYRaZCy55GtL+2b314wJsg41LX1lU9W4dx+yjVHxXCmJ964AyY5eyt/UYcd2ElC62RRTHTit9LuiCr1bHzdVY7EIXbzlKBQX0AIDWPRVEH9SR0FIfOx7XBEiSMHPRcg/cRWxpMx8yRAgwE2JWM28kkuZUyejoIoUyEMm7SVRA4daohy1DgFalObFar7IJ3ts6uvLmYWA3cPrViCkgE9TAbM/CcIOxLVhbSmIVLMEOmiUWtjiWMyFwkUtDbS0N0xvQOWCV2RO06oD8Z8rgmAy0P7brc6HNmdVDCOH/4SwFqJ22lJBc3FI11/5kqr69s3Rmqbn673GBZL6wPmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ieot99JBe+fqWMs+g4w7Jef8DaeO0NaFwBuUTgw1HEk=;
+ b=Vjp4sn+NHIDRYFIml5P+MDeh33oQZQ3JB5pO957GKLyMqohl+DPziqqGTmbxQfMOo0pY3xq6F/DvZP2H5h9joR3F4NqnWpAF9Doy1V0dfOiU/OxAbFhHsO6aBBSKT7IzCvUG4yPfOpbFKf8giV9FFEQyd1k6fEf7Ws4gYbw5Fb/dpF1v6NvddYbbdaId1irFHN4+BbjGDuI5w3mz4fitxOE4c04v07nSz/bDpmf1vPlyHL31Aaz5QoByhZ5n1ZWVPaSJG/5ZA7A2kmCxWe+rw457g59Ted4LWT+U52FDV4jWlF1vYG6WoLZUE+zmIaNf8exhNqrI9iUCRgYdUZ2EVw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
+ dkim=pass header.d=est.tech; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ieot99JBe+fqWMs+g4w7Jef8DaeO0NaFwBuUTgw1HEk=;
+ b=rl/kKWO9qBwa3/FS173Sz1H8OlEIjB1EERrVLBg8Q80Y1OyTWVzUjJ3VvLoOpUjp0oebUNE53H6fYjVOHygpQaFy0UBZNr51uNg/aFW4u87FQMzV7H3ZNJ5Y4hkOhIN8/CFgo/gp5HvWQnu8CHYSjfGH/pZWkTqPR8OeEDd9o6qwyJgG0dc1Qc+eWlarL8YO4SmwDjDVm7h4uY2Xalnl+EISzY6XcMLGvlhu15WCgWTtaCVefr7H2pTXuPISH7143X6bOjUi3QKgtIXMfPzl/YxIfB5S9iLCS1juMpInLvTuHyrkcVDT9sACkYAivYm504AEh2iC3DAVfKFKlbuKdA==
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
+ PA1P189MB3389.EURP189.PROD.OUTLOOK.COM (2603:10a6:102:4fc::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9891.15; Fri, 8 May 2026 10:38:42 +0000
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7%6]) with mapi id 15.20.9891.008; Fri, 8 May 2026
+ 10:38:42 +0000
+From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
+To: "cassiogabrielcontato@gmail.com" <cassiogabrielcontato@gmail.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>, Jon Maloy
+	<jmaloy@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Subject: RE: [PATCH net] tipc: avoid sending zero-length stream messages
+Thread-Topic: [PATCH net] tipc: avoid sending zero-length stream messages
+Thread-Index: AQHc3Rc1c/sP2rnzUEqXCsEyfUxhbrYAidAggAFERwCAAiM9kA==
+Date: Fri, 8 May 2026 10:38:42 +0000
+Message-ID:
+ <GV1P189MB1988525D7BFF6A00283ADFE0C63D2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+References:
+ <20260506-tipc-zero-length-stream-stall-v1-1-5d75f202227b@gmail.com>
+ <GV1P189MB1988FEBC4D7BA3F00E210774C63F2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+ <dfd8fb00-29de-4151-86a7-307a7c721f7d@gmail.com>
+In-Reply-To: <dfd8fb00-29de-4151-86a7-307a7c721f7d@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=est.tech;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: GV1P189MB1988:EE_|PA1P189MB3389:EE_
+x-ms-office365-filtering-correlation-id: 4f56d4ca-8a08-41b4-1d8c-08deacedf95f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|7416014|376014|1800799024|56012099003|38070700021|22082099003|18002099003;
+x-microsoft-antispam-message-info:
+ TSaVhhTMruDr5LmjMcutDtgEKTJR1bUL0TckbPjPNyYxACmXGOyF0FP5iQtd82S5bGC/SHDDNCrRVYu28xA17z7VbuVP5kmZ1ECA04GoUiZG5nviYSmyg7TqDN6fJ4/TC8PQaN24XR9nPDUgMbGIyXamdRnLW5+7QLBnyuiGSspRaPsExh4OKXWTH93TZt5sF9Qfzh8pDrJW7yjSjEBIqMnzkZPRXJI1p9tmeYw/rRKMhug/jWUE4pKJck/v9beExcDuJz2hiTl3D0do2Amx/M/2qxKE0ThiYVqTy1hmSCMUE0OuJmYcNknH2yuNWiyerfFlt6CQjUc8PaUShXdOTgenyJGs8Iylz5UquORQsNz3+VrXe/TZoS7HV4L1QjrKLJQKES2BuqZ66qpRGxsIKCUmAzeg+uCIIzaHJR1BrTfQA2NC6khztdP501KeeOQNRdC3gInAVvyWWTkIY6Dssoq8AXayI7XjrcwFTi7fb03oYFWn4ArX4cDDqp7oeyrIIrLfLNq3u1c27rOZNavLJ2VO5VkKP7sD9dYnS2ZIHA0OKbK2vthCD9Vv5eT99Wrz+B5QCX3ncqs3s0cTxj4QbTcVKIEJNAzbNlo+AkIyzNsVJ3OKThF8WTwBsC3/jelzBYB6uZFjXEm0wOk7Bs7rOHzbF+Ogf7jJTzTmrYJ5ZI1htYblc+eHfq/9YbraxuBxdVyvb5eaLULnT/E3Vzls5M5JFp2F0km46FyX2wbtSjmFJcwU2rznfYx95zPCqBO+
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(56012099003)(38070700021)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?Hfo3p4EPVPycLUHFubqn5VSuHMasI2NrunEPghJVv2ics8tLTLU9t1wZWx1n?=
+ =?us-ascii?Q?YITF3of9Lfy3BSRN3M/emTbdh6yM1kMvc+KaN3jAzh4tKhF5hSW7M6WP16dB?=
+ =?us-ascii?Q?vfgHGQlbLpNinme2L1UxiJS8B7mKrVp1PhYOF3Vw3gKk6VbHpYt49JyXc2Kh?=
+ =?us-ascii?Q?Mrqz68M27Zq8E/ZowHZB2dHPcWecnNkTuV34LFz0iIZaNDQf1sAz44mrIv1z?=
+ =?us-ascii?Q?oUgXVkbHHE9MV5/25R8Du6noq+RO5EtxQh2bmAyxHn6gmg81WwLZDFkze9U0?=
+ =?us-ascii?Q?KBy7eyHP0yeG2VgC4aNwBV/S3C31k4HAg+tCaFbpEXxZRowBuOmKgnszVrnP?=
+ =?us-ascii?Q?2t4FDOQZSrjrxyPWCfFgcrKWudU/su1PVfSxwpnXZkT3p1iL9NCThlaIoM7V?=
+ =?us-ascii?Q?ks5+wyN+9xTEYEw2oljXSHHlh0AJ7ipD8ZisrEABo/psgkKfyh4F2fxxgYuM?=
+ =?us-ascii?Q?/W+Ny/T3N8nfzXLps5WWqh8kkTGdhZbVN/DWEXtkndec32ZxXCgLEbZZSG0Z?=
+ =?us-ascii?Q?LXZn/tOTJr92qFVjuFP+oO8Y2QnXc8CjK3QOWVCKDBvGi9YleyJw+kOUWV1Z?=
+ =?us-ascii?Q?zYUli6YNcAQRywRGBbJOA+awJPIi8iJiqS38oXjcHi1eK+AufPlrva6bv50C?=
+ =?us-ascii?Q?QGabTcKAFq2ilimUxCUSYHevZoth1+lzU/FAYPv75QLDwfGxya0WaV9PHO31?=
+ =?us-ascii?Q?cJhzgNViMGjwkm/mpAz88HYXI1vsVNlJ+l7T3eMmChHYHqWoH130CgPUB7W8?=
+ =?us-ascii?Q?I0dDLKLT+AZE9BYQejqBriirJVOmTIKsvHj6ebSfBfY+yK0VHMFn46700CzS?=
+ =?us-ascii?Q?+6sOSiqwo17b08znsrzQhpKPupoE9u/eYI1izD5gCwg59CcLfS+rzFxEkb7A?=
+ =?us-ascii?Q?djfkwbmKlsj1Oju8jBhgQgpzjUhfX38+tpDv1Dm/9Ak3B7FCjQO+v0HsTWcA?=
+ =?us-ascii?Q?W+NvSKFcGDv+41N9eDKavW8McVV6V3GCuim4zKL/5WuFW7VsVaWHi7Tayl63?=
+ =?us-ascii?Q?fuX2iZoan/u5ioUm9LugrTGgDHfTWtfIFf1AonWE7/oDb1jUlxSYIYW6NU4S?=
+ =?us-ascii?Q?i5ziO//UD6fdJKF/3gJ0ICeZc4kOsL/61/zyWktffbcRh9LDMEw3MRonNWKa?=
+ =?us-ascii?Q?zVxDkC03WZexmF3zH3+AF3M6bWHMmIUHMBk8Eosr1h9p2pYbS+j6vxZwBbch?=
+ =?us-ascii?Q?th96DqUTZCSFqRz5XBahejCiy/MgVCnrPJNz1SZZcTEoB6j8OOLg5DcbsrPR?=
+ =?us-ascii?Q?jUg2VAclhP1YRy0RUbtYDwXKFPW/91Pmeebr7MPECJMZz9vQI++IfFLZQ8ss?=
+ =?us-ascii?Q?8sp/Xb06ghUragp0yRJdR0Y0DdVgQJQ7Q5G355Cw+U9l5OYaaXAIm12utt6O?=
+ =?us-ascii?Q?LXwVBYZrNdnzNlYPSDvgoTR55XW3Hy3pWySffmuFuFLUY4/lGubtJ28hLXzJ?=
+ =?us-ascii?Q?aoe77fy4SsYUw3y8Ab0OrItwtAyytN8weU7bU/fYw32NGEY5Pp36EYbgIGIq?=
+ =?us-ascii?Q?pAkmpbLSHQowqVadEawrpsUiOb3dPZ+WBcZpwMBIA1EIwEGmSm33alm0bk6u?=
+ =?us-ascii?Q?2I+kxJr6se7JxCr7Rc1iwJ8jyszaFnfzOvnleYyopCHTZWfGP5uKJrM86eoS?=
+ =?us-ascii?Q?YYeiuKEiKByh9oG/SRdqb0C9mJtqL8/Ij0bO5oLpXr38ryzdNOzdh8nGD3iu?=
+ =?us-ascii?Q?tyr4Mbkz4w1reCWZH/OvNjkidIYmYMqzKunAl6/fYcNzBtKAEK4ay+Y8Pe1D?=
+ =?us-ascii?Q?xB5bbJS0uQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260508063104-mutt-send-email-mst@kernel.org>
-X-Rspamd-Queue-Id: F116B4F5184
+X-OriginatorOrg: est.tech
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f56d4ca-8a08-41b4-1d8c-08deacedf95f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 May 2026 10:38:42.3914
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: cPw7vxFaAfDRa1GAiInvCdvyDBW5n9TusJPWOjQ1ph/Ix75yh+F+QxodvQDOKqNWTkGd6/O4Afx4VhAy9RpU95bwYJWCt1lQKeY8Dhka2+0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1P189MB3389
+X-Rspamd-Queue-Id: A0CE54F519A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-285758-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285757-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DMARC_NA(0.00)[est.tech];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DKIM_TRACE(0.00)[est.tech:+];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,est.tech:dkim,GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid]
 X-Rspamd-Action: no action
 
-On Fri, May 08, 2026 at 06:33:13AM -0400, Michael S. Tsirkin wrote:
->On Fri, May 08, 2026 at 12:01:50PM +0200, Stefano Garzarella wrote:
->> On Fri, May 08, 2026 at 05:53:07AM -0400, Michael S. Tsirkin wrote:
->> > On Fri, May 08, 2026 at 11:23:30AM +0200, Stefano Garzarella wrote:
->> > > From: Stefano Garzarella <sgarzare@redhat.com>
->> > >
->> > > After commit 059b7dbd20a6 ("vsock/virtio: fix potential unbounded skb
->> > > queue"), virtio_transport_inc_rx_pkt() subtracts per-skb overhead from
->> > > buf_alloc when checking whether a new packet fits. This reduces the
->> > > effective receive buffer below what the user configured via
->> > > SO_VM_SOCKETS_BUFFER_SIZE, causing legitimate data packets to be
->> > > silently dropped and applications that rely on the full buffer size
->> > > to deadlock.
->> > >
->> > > Also, the reduced space is not communicated to the remote peer, so
->> > > its credit calculation accounts more credit than the receiver will
->> > > actually accept, causing data loss (there is no retransmission).
->> > >
->> > > This also causes failures in tools/testing/vsock/vsock_test.c.
->> > > Test 18 sometimes fails, while test 22 always fails in this way:
->> > >     18 - SOCK_STREAM MSG_ZEROCOPY...hash mismatch
->> > >
->> > >     22 - SOCK_STREAM virtio credit update + SO_RCVLOWAT...send failed:
->> > >     Resource temporarily unavailable
->> > >
->> > > Fix this by introducing virtio_transport_rx_buf_size() to calculate the
->> > > size of the RX buffer based on the overhead. Using it in the acceptance
->> > > check, the advertised buf_alloc, and the credit update decision.
->> > > Use buf_alloc * 2 as total budget (payload + overhead), similar to how
->> > > SO_RCVBUF is doubled to reserve space for sk_buff metadata.
->> > > The function returns buf_alloc as long as overhead fits within the
->> > > reservation, then gradually reduces toward 0 as overhead exceeds
->> > > buf_alloc (e.g. under small-packet flooding), informing the peer to
->> > > slow down.
->> > >
->> > > Fixes: 059b7dbd20a6 ("vsock/virtio: fix potential unbounded skb queue")
->> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->> >
->> >
->> > unfortunately, this is a bit of a spec violation and there is no guarantee
->> > it helps.
->>
->> Loosing data like we are doing in 059b7dbd20a6 is even worse IMHO.
->>
->> >
->> > a spec violation because the spec says:
->> > Only payload bytes are counted and header bytes are not
->> > included
->> >
->> > and the implication is that a side can not reduce its own buf_alloc.
->> >
->> > no guarantee because the other side is not required to process your
->> > packets, so it might not see your buf alloc reduction.
->> >
->> > as designed in the current spec, you can only increase your buf alloc,
->> > not decrease it.
->>
->> We never enforced this, currently an user can reduce it by
->> SO_VM_SOCKETS_BUFFER_SIZE and we haven't blocked it since virtio-vsock was
->> introduced, should we update the spec?
+>Subject: Re: [PATCH net] tipc: avoid sending zero-length stream messages
 >
+>Hi!
 >
->it's not that we need to enforce it, it's that all synchronization
->assumes this. as in, anyone can use an old copy until they run out
->of credits.
+>On 5/6/26 03:41, Tung Quang Nguyen wrote:
+>>> Subject: [PATCH net] tipc: avoid sending zero-length stream messages
+>>>
+>>> TIPC stream send currently enters the transmit loop even when the user
+>>> payload length is zero. This can build and transmit a header-only
+>connection
+>>> message.
+>>>
+>>> For local TIPC sockets, such messages are delivered synchronously throu=
+gh
+>the
+>>> loopback receive path. When this happens while socket backlog processin=
+g
+>is
+>>> being flushed, reply transmission can re-enter TIPC receive processing
+>>> repeatedly and trigger an RCU stall.
+>>>
+>> Can you demonstrate this scenario using code ? It is better to point out=
+ what
+>current code is faulty.
 >
+>The minimized user-visible trigger is essentially:
 >
->> >
->> > what can be done:
->> > - more efficient storage for small packets (poc i posted)
->> > - reduce buf alloc ahead of the time
->>
->> That's basically what I'm doing here: I'm using twice the size of
->> `buf_alloc` (just like `SO_RCVBUF` does for other socket types) and telling
->> the other peer just `buf_alloc`.
->>
->> But then, somehow, we have to let the other person know that we're running
->> out of space. With this patch that only happens when the other peer isn't
->> behaving properly, sending so many small packets that the overhead exceeds
->> `buf_alloc`.
->>
->> Stefano
+>      int fd[2];
+>      struct msghdr msg =3D {};
 >
->what is "not proper" here, it is up to the application what to send.
+>      socketpair(AF_TIPC, SOCK_STREAM, 0, fd);
+>
+>      /* In parallel, this makes release_sock() flush backlog. */
+>      setsockopt(fd[0], SOL_SOCKET, SO_ATTACH_BPF, &bad_fd,
+>                 sizeof(bad_fd));
+>
+>      /* Repeated zero-length MSG_PROBE send on the connected peer. */
+>      for (i =3D 0; i < 64; i++)
+>              sendmsg(fd[1], &msg, MSG_PROBE | MSG_MORE);
+>
+>The faulty current-code path is that TIPC stream send does not handle
+>MSG_PROBE before entering __tipc_sendstream(). MSG_PROBE is supposed to
+>probe without transmitting data, but the call reaches __tipc_sendstream()
+>with dlen =3D=3D 0.
+>
+>__tipc_sendstream() uses a do/while loop, so even when dlen is 0 the body
+>runs once:
+>
+>      send =3D min_t(size_t, dlen - sent, TIPC_MAX_USER_MSG_SIZE);
+>
+>At that point send is 0, but the code can still call tipc_msg_append() or
+>tipc_msg_build(), creating a TIPC connection message with only the header.
+>It then calls:
+>
+>      tipc_node_xmit(net, txq, dnode, tsk->portid);
+>
+>For a local TIPC socketpair, tipc_node_xmit() takes the in_own_node() path
+>and synchronously calls tipc_sk_rcv(). When this happens while
+>release_sock() is processing backlog, the receive path can generate
+>response traffic through tipc_node_distr_xmit(), which re-enters the same
+>local receive path.
+>
+>I should have made that explicit in the changelog and pointed at the
+>missing MSG_PROBE handling as the faulty part.
+TIPC does not support MSG_PROBE. So, It makes no sense handling this flag.
+Even if user application sends zero length data message using this flag, th=
+e message will be dropped at receiving side.
+>>>
 
-Sure, but here we're just slowing down the application by telling it we 
-don't have any more space.
+>>> diff --git a/net/tipc/socket.c b/net/tipc/socket.c index
+>>> 9329919fb07f..3c7838713d74 100644
+>>> --- a/net/tipc/socket.c
+>>> +++ b/net/tipc/socket.c
+>>> @@ -1585,6 +1585,8 @@ static int __tipc_sendstream(struct socket *sock,
+>>> struct msghdr *m, size_t dlen)
+>>> 					 tipc_sk_connected(sk)));
+>>> 		if (unlikely(rc))
+>>> 			break;
+>>> +		if (unlikely(!dlen && sk->sk_type =3D=3D SOCK_STREAM))
+>>> +			break;
+>> This change is wrong. It immediately breaks normal connection set up
+>because the ACK  (zero in length) has no chance to be sent back from the
+>server to the client.
+>> Please try to test your patch before submission.
+>
+>I did test the patch with the syzkaller C repro under QEMU for 10 minutes,=
+ and
+>it did not trigger the reported RCU stall:
+>
+>      /tmp/repro & pid=3D$!; sleep 600; kill $pid
+>      dmesg | grep -Ei 'rcu.*stall|rcu_preempt|soft
+>lockup|panic|BUG|WARNING' (attached)
+>
+>The dmesg check did not show any repro-triggered RCU stall, soft lockup,
+>panic, BUG, or WARNING. But that test only covered the syzkaller trigger;
+>it did not cover normal active/passive TIPC stream connection setup, which
+>your review points out is broken by this version.
+>
+>I re-checked the TIPC connection setup path as well.
+>
+>tipc_accept() intentionally sends the server-side ACK as a zero-length
+>stream message:
+>
+>      iov_iter_kvec(&m.msg_iter, ITER_SOURCE, NULL, 0, 0);
+>      __tipc_sendstream(new_sock, &m, 0);
+>
+>So blocking all zero-length sends inside __tipc_sendstream() prevents
+>that ACK from being transmitted and can break normal SOCK_STREAM
+>connection setup.
+>
+>After re-checking the syzkaller repro, the real trigger seems to be narrow=
+er
+I am aware of this syzbot report about this issue. I will try to find some =
+time to fix it.
 
-Again, without this patch we are just dropping data, which IMO is even 
-worse.
-
-So I think we should merge this for now, while we handle better the EOM.
-If you prefer, I can drop the part where we reduce the buf_alloc 
-advertised to the other peer, but at least we should drop data after 
-`buf_alloc * 2` IMO.
-
-
-Stefano
-
+>than zero-length stream send. The repro uses a user sendmsg() with
+>MSG_PROBE | MSG_MORE and no payload on an already connected TIPC
+>stream
+>socket. MSG_PROBE is supposed to probe without sending, but TIPC stream
+>send currently lets that path reach __tipc_sendstream(), where the
+>do/while body can still run once with dlen =3D=3D 0 and build/transmit a
+>header-only message.
+>
+>I think we should avoid suppressing the internal __tipc_sendstream() ACK p=
+ath
+>and instead handle the user-originated zero-length MSG_PROBE case before i=
+t
+>reaches the internal stream send helper.
+>
+>The v2 fix would look like this:
+>
+>-- 8< --
+>
+>diff --git a/net/tipc/socket.c b/net/tipc/socket.c
+>index 9329919fb07f..4783df337971 100644
+>--- a/net/tipc/socket.c
+>+++ b/net/tipc/socket.c
+>@@ -1542,6 +1542,10 @@ static int tipc_sendstream(struct socket *sock, str=
+uct
+>msghdr *m, size_t dsz)
+>        struct sock *sk =3D sock->sk;
+>        int ret;
+>
+>+       /* MSG_PROBE asks only to probe the path, not to transmit data. */
+>+       if (unlikely((m->msg_flags & MSG_PROBE) && !dsz))
+>+               return 0;
+>+
+This is wrong. We cannot do this because it just silences syzbot and hides =
+the real nested lock issue in current code.
+>        lock_sock(sk);
+>        ret =3D __tipc_sendstream(sock, m, dsz);
+>        release_sock(sk);
+>-- >8 --
+>
+>I tested the reworked patch with the syzkaller C reproducer under QEMU.
+>The reproducer was run for 10 minutes:
+>
+>      /tmp/repro & pid=3D$!; sleep 600; kill $pid
+>      dmesg | grep -Ei 'rcu.*stall|rcu_preempt|soft
+>lockup|panic|BUG|WARNING' (attached)
+>
+>The grep only matched boot-time command-line/debug messages; no
+>repro-triggered RCU stall, soft lockup, panic, BUG, or WARNING appeared.
+>
+>What you think?
 
