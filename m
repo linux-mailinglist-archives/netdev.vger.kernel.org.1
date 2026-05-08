@@ -1,429 +1,226 @@
-Return-Path: <netdev+bounces-285654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285659-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2Mj1Hfp5/WnnegAAu9opvQ
-	(envelope-from <netdev+bounces-285654-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 07:51:54 +0200
+	id KHUgKdt8/WnnegAAu9opvQ
+	(envelope-from <netdev+bounces-285659-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 08:04:11 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C29094F21BD
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 07:51:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F25B64F2376
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 08:04:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8F37730D8ACF
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 05:42:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 35612311F4DB
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 05:46:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB74F34E744;
-	Fri,  8 May 2026 05:38:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D64372ED6;
+	Fri,  8 May 2026 05:43:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BLkjhVod"
 X-Original-To: netdev@vger.kernel.org
-Received: from CHN02-SH0-obe.outbound.protection.partner.outlook.cn (mail-sh0chn02on2106.outbound.protection.partner.outlook.cn [139.219.146.106])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2038E37997E;
-	Fri,  8 May 2026 05:38:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.146.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 736F634DCD6
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 05:43:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.182
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778218734; cv=fail; b=f1xWbs6L599EaLzvCaajgBko94C40RaBTPleRLHuNiklhTvhMCZCb6W99ooq/3F5Z5B8+8kYcRFnRyY/lpza/3HZmK5b+s0O5xAtjK8b0MefGH5iGnE38iKPPX02XZMHuIN2N7rfm35vGR/bgv01SaLRwBVq/SKeUckoFvMKoM0=
+	t=1778219012; cv=pass; b=ih+xT0AwoHwmiOcj8HXdWuRYCFsWpBkdxVovyaMePe6lpYfV+RUiIrwfP9GPDUlDy8pu4CypiaxUyQq9ZaDYYWBNHbE9+eGu/JrFJo26Wm0dOZReiz29YydH4ZO415M7ijkqflRQz7lc1kAfQ1wgIwskcEMzNfLUXgimvxBOLrE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778218734; c=relaxed/simple;
-	bh=1V6JDjk9nECfKrPNjH+lkE9wT2UGFHjfPbnNDSyW0jQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=RSNa32jGBq+iq2jsT/3jtpJx9WwBLlK/hLGExpVhP+HB7nTtbedxfBhTVuWwrB/RdzPYys9VA964v2ycPHRQ8uQQfPpkOCYcW7kpqzvtSHEJr4BzkhmJ9YzRNEJHUoZvHjXbPyUs/+/BIoo+uxQ/pZXqvud8tMEvZHJPKPOetfs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.146.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dGSfkxyPXjinacNFz6L2z+wAciO+I9GZHnc4GVVLevWKbOPG2Vi/8cbM1iTvQ3ayvfScUNBZH7eutDvXA+BfbXDctDFK7SdUDgF8G25s/50gndfywEzvA+2Ec4TDekrJAS3Fgn6QX2QzFWnpzx4L/lv9gWvXXozjznOVFteQChYOzK/BusAjEx2xLpdH60cen7m4oot0Jp7f/lIqN5VBUtw++aKcstOJI6jhI8FEe8Sh5/grO4no6Zp2Y6BY6YS7QfNVGZwoPPOk9ZF1WsoDvZHJaj1sNNQxbedcaoMdbcir/o9VO6AfsrbDDpnVNA8qutAa3rpkciH1KGXzSRzwIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=k+bKDYtB+SmyXym/8JCpu1CHeAVyY584B0GSnkCqO9w=;
- b=GQxJBbic3EbNmAbyExWp9dGqIS1LCqTMj9qEdmNmRp+IQB937p3Ni3A7pr5dW3kVOqcb5zrMV+QP46p0bxJ3RAaAUX2/Z0G1wi7d0/HI/x06KbP3pYygO4WTzpOLRAvjAn9iOLqAgXxHQKahlqgZYOV6/GRjw3jHNpcVZvRxslvw+jSGJq2cNrIzrR+xRhN+dBhtSpTk7z1mTBPRNvhrURaBQUwKoGbtTp+cDvVMJIW7V3VaZRFeypNkN7cW3rEEsGkaWmI5gooxNNOpDeg3SZC9IWr3PQ+WLIcpQnsTL1suZau5F/NqBdHAfFWANdNi0DRSIEqzTJCUdxQtJ4NQ5w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=starfivetech.com; dmarc=pass action=none
- header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=starfivetech.com;
-Received: from ZQ4PR01MB1202.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c550:17::6) by ZQ4PR01MB1252.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c550:16::8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.18; Fri, 8 May
- 2026 05:37:20 +0000
-Received: from ZQ4PR01MB1202.CHNPR01.prod.partner.outlook.cn
- ([fe80::e7d4:256c:b066:850d]) by
- ZQ4PR01MB1202.CHNPR01.prod.partner.outlook.cn ([fe80::e7d4:256c:b066:850d%5])
- with mapi id 15.20.9891.019; Fri, 8 May 2026 05:37:20 +0000
-From: Changhuang Liang <changhuang.liang@starfivetech.com>
-To: Michael Turquette <mturquette@baylibre.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Kees Cook <kees@kernel.org>,
-	"Gustavo A . R . Silva" <gustavoars@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>
-Cc: linux-clk@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	linux-hardening@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Sia Jee Heng <jeeheng.sia@starfivetech.com>,
-	Hal Feng <hal.feng@starfivetech.com>,
-	Ley Foon Tan <leyfoon.tan@starfivetech.com>,
-	Changhuang Liang <changhuang.liang@starfivetech.com>
-Subject: [PATCH v2 22/22] riscv: dts: starfive: jhb100: Add clocks and resets nodes
-Date: Thu,  7 May 2026 22:36:32 -0700
-Message-Id: <20260508053632.818548-23-changhuang.liang@starfivetech.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260508053632.818548-1-changhuang.liang@starfivetech.com>
-References: <20260508053632.818548-1-changhuang.liang@starfivetech.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: NT0PR01CA0035.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c510:c::12) To ZQ4PR01MB1202.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c550:17::6)
+	s=arc-20240116; t=1778219012; c=relaxed/simple;
+	bh=uX8Bqh7YpeKp4fdj9isKZywI474/oU3ittXTncvIgFM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kErHEK4GxiIUrqMx2fLanpJdfT9zLATi1f0IZVks/YMyDit/b/igWUejsqQAumqQlnibTIwS+fu8bRS6QyG493WVlx/VbJpwQncqDZw+OeUjVTa6nsYwDqy0MV2CxLJ4yVJw85K14v9Qhc6x2sLU4QLYkxd7IZO9j5Wi2/mxIms=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BLkjhVod; arc=pass smtp.client-ip=209.85.221.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-56a9a7e762bso1333969e0c.3
+        for <netdev@vger.kernel.org>; Thu, 07 May 2026 22:43:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778219001; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Kwen/WjiNNWgyNF27DMcA3RdpNzhNJ0CPpe7VGy328OGXQZU3YZw3ClvmMvTSR8f6j
+         7KD3iAOQQaIEncgGk8xaVV5ezJnTY4Rpfey7XrNaY8gAeq3v9+LduWuHvPp09xopWynn
+         qGr1/hzWdkTPMsKQ7frdp/9GapnHfqmHFvlp7LlW+L1NHR/UrFY+E+kRVdNUeHqrI+SR
+         c8MT96bV+DuswvYKfAUIRDkdfbvQ9cB28oQhoTZ/Lrr9hoBeE8mvsJ7FnGj4YWuCzRZp
+         bJh35vYkxx21yJ9qCCX+jYK04hsMamasl+1v1cM9xZyJq861fimHGbsWW1TTl1K3awrU
+         gr3g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=CDnhIRIXiY7h9ZbppX63ng5K5Ff78Y4tvS1lNHspaTA=;
+        fh=dBksNAk7Uh7GgS7Yr4lmFCW8BDEgaFLrLsnUhhKZHu4=;
+        b=JgBmEkQgW+dvVkDxJAbqRdR9RfntucxafMBNLu+crtY94uJS8FGpR4o6EcsJa5OU+T
+         cGmFibZCI7+vOZadnkT2jUEAxwMXXMFx1l2G19yJgHmIlOT/wjXTiPuBA31P1+YnHAaX
+         ac67g+7e1JREm3D9218RshGz9c4jlNPLoV5HvK0zykZvB9qDplISvfezxQPmRIlxZEi1
+         mEXJQaKJxEFantiPF9DYfkdLYZtgnKgPzCmTWtxpcZcsM+pmmicqhBc1FLk31N/S1ryQ
+         cMeg+NdBANx0zh5KZ0+yDjrNjDDenoXRbX66k4IfvnDc9tIYwms7uPRH7RT9KGocN8Db
+         9oKA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778219001; x=1778823801; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=CDnhIRIXiY7h9ZbppX63ng5K5Ff78Y4tvS1lNHspaTA=;
+        b=BLkjhVodQI8qRrx6yE9A13yJXyiaOsv7qUdkPncubVLAVr7kjGAn3V9UCx4NaQjym4
+         eeN77Sl3YebkBjamlrQIhqd/oFByXCCmvK9jXil0eoECD9HRN58GQwhNb3bU7X0CEupK
+         XtKkzQAxGFv/9id3hMVcW9AZoLYtdzFvbp6/zlpXKKvLk/TbkCuNNaxyAuZr4jLT8HaI
+         ZAuL3P9kqPetB+mQ+geZtmK7/e6CXm56Ud76uOofilFrTz+oclzfk7HK0hXxm6QfzcOZ
+         1eOnNhviJ794y0Nd+LkZgJsLc1VZVEYnwbkpmF7VA4IVN6s2XiwMdDosenmyvJy0JLpo
+         jMfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778219001; x=1778823801;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CDnhIRIXiY7h9ZbppX63ng5K5Ff78Y4tvS1lNHspaTA=;
+        b=RP1xQn00G4c4V70dVVFdB+6f9TZPrsZk/cJ8DWCOg7OOl/GGFpCh1vUozIa0Z9Rcez
+         dRNHx2gvtmLOl2l8uvbhwQXj73XCdIxs+hWdd4UGsnzWQ9vasYJ4eW8yBpPMqjnue2Gu
+         Y++Yc9oZ1mz+NX3oarfkjewRErSMcel+mHhu8N6EvVZOprIAassl6oOCgJHTf5ZLUBJL
+         Zsu/BNN/eBCIuFmSeId2RA5x14242RQNprDQVgizcZ9I+h9a+rZygA/nHpjmVg8ZqFzG
+         abflC1WUIOFwG1uCBu1abFxatfz+wI6oN0Pan1hqP8XQyigloKXwVAscT4JGOBcTt2AI
+         azig==
+X-Forwarded-Encrypted: i=1; AFNElJ+cLrZ5/nl5KepXaOxu6aawXRLi1qgFNlg686HjvrAyX2CQaaU40DLKJA1ii7XpdYFW1d7u9vM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwibxaspXXOeApvs1yox1iqDFgL7f6w7W5ZsZvYbx86loCTNtOD
+	dLQtC1O9fYspzRxoDMCuoCXATpeN7tzn5rZRVwH0Zql2xiyfhlMt3uKkPsc62CJDgbLn7seGn41
+	iX2Avlh2PP/kKKh2R9PAWlYHb8csF1dU=
+X-Gm-Gg: Acq92OH0KSOobqt8WhIF9Mi0kdj0t3LxG5mSE3JDRKDhp6WNfzA8CCen4kCxWW3b6ql
+	19R8xzV/pC0dgfZp4bY+t4itrwyxOJCUCwIaeEaRRpZxIluO//lAfz9/Y9v3D1oaAYVFTJxyC7Z
+	77BMgZ7U1L4T/hLdzP7xKJy78PrpkYpaFC1o9LH9gOvQK34zo94MCtj9h4zsJL962FxDLgkQ0aM
+	3rRZCbabpDrqK1tYNova9jMW1EbAmk5P39qj9tONBj8F0kBOPnUrvFYd39KWY+fd4O+GEerOgg4
+	spUFo+Z3fDaT+ZSq1w==
+X-Received: by 2002:a05:6122:915:b0:575:3b34:28bd with SMTP id
+ 71dfb90a1353d-575595653c4mr6840849e0c.8.1778219001028; Thu, 07 May 2026
+ 22:43:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: ZQ4PR01MB1202:EE_|ZQ4PR01MB1252:EE_
-X-MS-Office365-Filtering-Correlation-Id: f30d72f8-0904-4f5d-6f2f-08deacc3df64
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|52116014|7416014|376014|921020|38350700014|56012099003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	kcvL5AcPtHSx47YqBrPuF2idbKyuVwUe3odCJdQ51povAtXx9hoRaGIUFonv1Ez/M9ryzHV/7BlX98i/4+QpC0MJ12en9PENxMQQbraWUdTdvYWz5BDpovSv9ZEbepAP/N0kIHn+va7+nahSLa6t2QnlRdUcGWzFOKWnwn0DPVK6er22kgbKqbqO1cl8RBO+jLtCpuEYCbsyAVBhnzTlok0Hagjv3qzWA0jsOPZnffc89HojtTHbjsDiDno3hNFdQyv9z5sUCq4cLvM9V3okAVswA5GYgPWZN1k+o6paryNqGJgcAPtcf9ySNZz0EuBtW6hwaNjoL4SwF9chpzkfcKBd4toJ1XrLB+ieqqhGNEdmcou6zbvWxgfN4KyjS9EXsIyO8Gze2dOh369nQ2Ag2bRTi0o8p1Rc6aD3sgmE4BPqqjtAuw8m7IiN5fi0TuwJPld6COuhfguv3HHyjmJMNY4njMth5+/oSxAJboXN8LGrY/3qrhA7dp9iPjgrDALVLWGuzOIn4KrXWhHJSCnY+EPuCypH/tYCM0OjYmHqIRsCtoZBGLdgnDDTtaxDSfarTBmVK1PV3rb5hz4orxvLzA==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ZQ4PR01MB1202.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(52116014)(7416014)(376014)(921020)(38350700014)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?FkvQs5pnqV1REXmQB/80zFIhywlawBtwwiuCdqHVqqr3BYh4viS4sMJjpo2s?=
- =?us-ascii?Q?zP8kiJ1+aYDreB8/gpaeFTxjPUF0XkMwylOS2Iv8ivDHHjPVcfgMV76C281b?=
- =?us-ascii?Q?B/t8AXyAEjZyMeTqeJ2wIyGzD0l1Wx2Rb7Hi55nJ/f4ewB66T+LaZQd6rnRf?=
- =?us-ascii?Q?GdvHNyUzElxlh9Upz0CcnA5qYLsHVh2iqCzK/SQVOglotOA1uNisf/ICRVpk?=
- =?us-ascii?Q?MDF9N9cjjal4AJp3ww8ABo3J8nTXQk5ly/ecjPXnKDxOV+qioNXYcSI6dhN7?=
- =?us-ascii?Q?MILVXvAuk5V+tAYbRiVqWfP2V4pryGzq36bkgoJcaVcQS+b6VuvcisDRhLWD?=
- =?us-ascii?Q?prs6amYLQRVW4oPm36NhrTANta6OD47+7d3TSOO24Lbymr5LHZ/JOWQjmQ34?=
- =?us-ascii?Q?Pyc2z8rahI32aK381H0Y0KxgHeYXTKKthH+qTNo7YUiuqwg7i7X9CQiwrIF2?=
- =?us-ascii?Q?4OkYvtTNrJfzjHuMCHKQchnMa/1IxvdBr1qCxIYsaKQvt2VC+IbSz4KPKKyf?=
- =?us-ascii?Q?sufqivevdQgcAXm8FYUfCdugzBNOmHkKr01++h5ahnueNUq+gpMviZeScL0o?=
- =?us-ascii?Q?2oVD9Mp+vy2nJP10Wqwyqdr52tgIolYEW0ZmKQ7DOVn456TvC8rUZe9QTcEg?=
- =?us-ascii?Q?c/BCZYOlCclhCucl/BK/YK9S2ZtH2yyNzp61t5DsaQkkXLxhaFZA6M6hz4Rc?=
- =?us-ascii?Q?KVre8cAu7fCbwBN75ZoPm0kVv8Mx62YALCUUjU9ZE5RasVu/B5YWz/2bifOW?=
- =?us-ascii?Q?2It5IA+xiC9hMk3Yhlt0ImUp2+PcnLYYCramo8NlMheWM+nbfvSTUrz7QjHJ?=
- =?us-ascii?Q?/21hI/Do2N+kNJ3X6bfZNpWMzs53h8QWyg7I/iwsMHmu03WyT7teBTANbEVZ?=
- =?us-ascii?Q?DC8wXe6cyeOlSzDIzhyJdUGwbLIvPq9w2BZey3iBBelOsfYq5mFXGeuc6jql?=
- =?us-ascii?Q?N8z/wM+oAmP3zIjsPYD9l1E6l8tGRUylV/S8B2xl3eTiz/8godI/Y3FFWZyb?=
- =?us-ascii?Q?HaXP6nKkXfWIPB79DboeD3Cz0FvksST7YzrT+CLrufFIVFcZbqc8XwzswJ8O?=
- =?us-ascii?Q?bmjC/n21h8RNdAXUYt+FcoPfCWMCr5j4pWQscMwOZhYDVO4AkUKoI9SLezNp?=
- =?us-ascii?Q?qPSw4SHT0dJx0iFmf3VMOAM9QiSY55REapTqA3enxfqdEVBjSSPYXEIBQ2qC?=
- =?us-ascii?Q?SGvVDSVWs/CSFfRosJ+jYFvt6EnI4gSj4rnFxaYWuAPDMAHLkPNKmCT4hlUS?=
- =?us-ascii?Q?6xIrNX1XzHuCsRBB8SCJYb5wlpd6ADkj3x5IPrGxaiL5bUQdAyjXpgsVi9Mc?=
- =?us-ascii?Q?S0+Lenu6gljLI5nkv74sy5PuPx2OAKl9vOsiHlaWG9q5w1khJIe89axUR6VU?=
- =?us-ascii?Q?44vGq5KHQtBm7JsxyMkJYVbNcbPgf28xGwDKkdFpL5UvSfjhtxLG/TRHZpB7?=
- =?us-ascii?Q?dUOeou3umxkmE6XSxRALrlgKgQlKtm/dJH4CtsuKMw71+znwM0AfvlgX98bC?=
- =?us-ascii?Q?GxMw9rwTkAFwHgp63cqm9Dpa29PKkg78wasEouaXRaR6xHXVSynK+cxkKWGL?=
- =?us-ascii?Q?mj3c24ME9N5tloojaZEPRbIoA4KzoY7c+0vHPBYkDHCDgqqS+43lMA+GThjd?=
- =?us-ascii?Q?x1HgoHcObGtqlsGxkWS/d6/KdBMAHfSQJmpxlBdMvtsNOANC5ROFQ6NF4oNl?=
- =?us-ascii?Q?ZSwXFGWeLrOK3B5XFrtpInd3v0o03LZgDAhPa+xpXFmUUL1s2d553AHiqEYn?=
- =?us-ascii?Q?0kC4hXSaklMQ6tumGG2oqcRPXpfMYqIPH5+ERz439MaSjY/ttnBa?=
-X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f30d72f8-0904-4f5d-6f2f-08deacc3df64
-X-MS-Exchange-CrossTenant-AuthSource: ZQ4PR01MB1202.CHNPR01.prod.partner.outlook.cn
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2026 05:37:20.0535
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XqjWKUb/7NvixPfWUTzPahERS1E2j86waagYYz8BJru0ZNcSSPvTC4XwA9qCuP8n4G1k+B9dVifxvus+eoUpBDDptPbPKe4gNWjDWyNSvgIgJePdDmbx54Ci0paCsqLF
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: ZQ4PR01MB1252
-X-Rspamd-Queue-Id: C29094F21BD
+References: <CAAAOPT9Jw_TKnuqyQ_5es_ot0SNLprU2fSJwtEORj3OLf_QECA@mail.gmail.com>
+ <aftA0Iwi2aX_4ORo@gondor.apana.org.au>
+In-Reply-To: <aftA0Iwi2aX_4ORo@gondor.apana.org.au>
+From: Yilin Zhu <zylzyl2333@gmail.com>
+Date: Thu, 7 May 2026 22:43:10 -0700
+X-Gm-Features: AVHnY4I2UmjcPPhXYzBwRo2_jYwaRcKF6yXje_bVTzJ29AOMPj3itzn_GbLLixI
+Message-ID: <CAAAOPT9Mt8jw+2J+DGDztOo6ou=9CbsERRZSq19+DrBo0_+Qgg@mail.gmail.com>
+Subject: Re: [v3 PATCH] xfrm: ipcomp: Free destination pages on acomp errors
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: n05ec@lzu.edu.cn, netdev@vger.kernel.org, steffen.klassert@secunet.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, yuantan098@gmail.com, yifanwucs@gmail.com, 
+	tomapufckgml@gmail.com, bird@lzu.edu.cn, ronbogo@outlook.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: F25B64F2376
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [5.04 / 15.00];
-	DMARC_POLICY_QUARANTINE(1.50)[starfivetech.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[baylibre.com,kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,pengutronix.de,esmil.dk,gmail.com];
-	GREYLIST(0.00)[pass,meta];
+	TAGGED_FROM(0.00)[bounces-285659-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lzu.edu.cn,vger.kernel.org,secunet.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,outlook.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-285654-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[24];
 	FROM_HAS_DN(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.700];
-	FROM_NEQ_ENVFROM(0.00)[changhuang.liang@starfivetech.com,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[0.198.124.128:email,11bc0000:email,11c40000:email,starfivetech.com:email,starfivetech.com:mid,0.182.212.176:email,0.198.108.224:email,0.201.184.160:email,11a08000:email,0.198.93.64:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zylzyl2333@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,apana.org.au:email,apana.org.au:url,lzu.edu.cn:email]
 X-Rspamd-Action: no action
 
-Add clocks and resets nodes for JHB100 RISC-V BMC SoC. They contain
-sys0crg/sys1crg/sys2crg/per0crg/per1crg/per2crg/per3crg.
+On Wed, 6 May 2026 at 06:24, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> Orion Zhu <zylzyl2333@gmail.com> wrote:
+> >
+> > Thanks, but I think moving the label is not safe for all paths reaching
+> > ipcomp_post_acomp().
+>
+> Thanks for checking!
+>
+> We could fix this by checking whether req is NULL and whether
+> sg_page(dsg) is NULL.
+>
+> ---8<---
+> Move the out_free_req label up by a couple of lines so that the
+> allocated dst SG list gets freed on error as well as success.
+>
+> Fixes: eb2953d26971 ("xfrm: ipcomp: Use crypto_acomp interface")
+> Cc: stable@kernel.org
+> Reported-by: Yuan Tan <yuantan098@gmail.com>
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Reported-by: Xin Liu <bird@lzu.edu.cn>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>
+> diff --git a/net/xfrm/xfrm_ipcomp.c b/net/xfrm/xfrm_ipcomp.c
+> index 5f38dff16177..671d48f8c937 100644
+> --- a/net/xfrm/xfrm_ipcomp.c
+> +++ b/net/xfrm/xfrm_ipcomp.c
+> @@ -51,11 +51,15 @@ static int ipcomp_post_acomp(struct sk_buff *skb, int err, int hlen)
+>         struct scatterlist *dsg;
+>         int len, dlen;
+>
+> -       if (unlikely(err))
+> -               goto out_free_req;
+> +       if (unlikely(!req))
+> +               return err;
+>
+>         extra = acomp_request_extra(req);
+>         dsg = extra->sg;
+> +
+> +       if (unlikely(err))
+> +               goto out_free_req;
+> +
+>         dlen = req->dlen;
+>
+>         pskb_trim_unique(skb, 0);
+> @@ -84,10 +88,10 @@ static int ipcomp_post_acomp(struct sk_buff *skb, int err, int hlen)
+>                 skb_shinfo(skb)->nr_frags++;
+>         } while ((dlen -= len));
+>
+> -       for (; dsg; dsg = sg_next(dsg))
+> +out_free_req:
+> +       for (; dsg && sg_page(dsg); dsg = sg_next(dsg))
+>                 __free_page(sg_page(dsg));
+>
+> -out_free_req:
+>         acomp_request_free(req);
+>         return err;
+>  }
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
-Signed-off-by: Changhuang Liang <changhuang.liang@starfivetech.com>
----
- arch/riscv/boot/dts/starfive/jhb100.dtsi | 198 ++++++++++++++++++++++-
- 1 file changed, 195 insertions(+), 3 deletions(-)
+Hi Herbert,
 
-diff --git a/arch/riscv/boot/dts/starfive/jhb100.dtsi b/arch/riscv/boot/dts/starfive/jhb100.dtsi
-index 4133ba1f45b4..943324b3b2fd 100644
---- a/arch/riscv/boot/dts/starfive/jhb100.dtsi
-+++ b/arch/riscv/boot/dts/starfive/jhb100.dtsi
-@@ -4,6 +4,8 @@
-  */
- 
- /dts-v1/;
-+#include <dt-bindings/clock/starfive,jhb100-crg.h>
-+#include <dt-bindings/reset/starfive,jhb100-crg.h>
- 
- / {
- 	compatible = "starfive,jhb100";
-@@ -268,12 +270,96 @@ pmu {
- 			<0x00 0x22 0xFFFFFFFF 0xFFFFFF22 0x00007FF8>;	/* Event ID 34 */
- 	};
- 
--	clk_uart: clock-25000000 {
--		compatible = "fixed-clock"; /* Initial clock handler for UART */
-+	osc: clock-osc {
-+		compatible = "fixed-clock";
- 		#clock-cells = <0>;
- 		clock-frequency = <25000000>;
- 	};
- 
-+	pll0: clock-pll0 {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <2400000000>;
-+	};
-+
-+	pll1: clock-pll1 {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <1000000000>;
-+	};
-+
-+	pll2: clock-pll2 {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <903168000>;
-+	};
-+
-+	pll4: clock-pll4 {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <100700000>;
-+	};
-+
-+	pll5: clock-pll5 {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <100700000>;
-+	};
-+
-+	pll6: clock-pll6 {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <2400000000>;
-+	};
-+
-+	pll7: clock-pll7 {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <1950000000>;
-+	};
-+
-+	per2_gmac2_rgmii_rx: clock-per2-gmac2-rgmii-rx {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <125000000>;
-+	};
-+
-+	per2_gmac2_rmii_ref: clock-per2-gmac2-rmii-ref {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <50000000>;
-+	};
-+
-+	per2_gmac3_sgmii_tx: clock-per2-gmac3-sgmii-tx {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <125000000>;
-+	};
-+
-+	per2_gmac3_sgmii_rx: clock-per2-gmac3-sgmii-rx {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <125000000>;
-+	};
-+
-+	per3_gmac0_rmii_rclki: clock-per3-gmac0-rmii-rclki {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <50000000>;
-+	};
-+
-+	per3_gmac1_sgmii_tx: clock-per3-gmac1-sgmii-tx {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <125000000>;
-+	};
-+
-+	per3_gmac1_sgmii_rx: clock-per3-gmac1-sgmii-rx {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <125000000>;
-+	};
-+
- 	soc {
- 		compatible = "simple-bus";
- 		interrupt-parent = <&plic>;
-@@ -316,8 +402,10 @@ bus_nioc: bus_nioc {
- 			uart6: serial@11982000 {
- 				compatible = "snps,dw-apb-uart";
- 				reg = <0x0 0x11982000 0x0 0x400>;
--				clocks = <&clk_uart>, <&clk_uart>;
-+				clocks = <&per0crg JHB100_PER0CLK_SCLK_UART6>,
-+					 <&per0crg JHB100_PER0CLK_APB_UART6>;
- 				clock-names = "baudclk", "apb_pclk";
-+				resets = <&per0crg JHB100_PER0RST_MAIN_RSTN_UART6>;
- 				interrupt-parent = <&intc>;
- 				interrupts = <26>;
- 				reg-io-width = <4>;
-@@ -325,6 +413,110 @@ uart6: serial@11982000 {
- 				status = "disabled";
- 			};
- 
-+			per0crg: clock-controller@11a08000 {
-+				compatible = "starfive,jhb100-per0crg";
-+				reg = <0x0 0x11a08000 0x0 0x1000>;
-+				clocks = <&osc>, <&pll6>,
-+					 <&sys0crg JHB100_SYS0CLK_BMCPER0_CFG_400>,
-+					 <&sys0crg JHB100_SYS0CLK_BMCPER0_CFG_800>,
-+					 <&sys0crg JHB100_SYS0CLK_BMCPER0_NCNOC_INIT>,
-+					 <&sys2crg JHB100_SYS2CLK_BMCPER0_NCNOC_TARG>;
-+				clock-names = "osc", "pll6", "cfg_400",
-+					      "cfg_800", "ncnoc_init",
-+					      "ncnoc_targ";
-+				#clock-cells = <1>;
-+				#reset-cells = <1>;
-+			};
-+
-+			per1crg: clock-controller@11b40000 {
-+				compatible = "starfive,jhb100-per1crg";
-+				reg = <0x0 0x11b40000 0x0 0x1000>;
-+				clocks = <&pll7>,
-+					 <&sys0crg JHB100_SYS0CLK_BMCPER1_NCNOC_INIT>,
-+					 <&sys0crg JHB100_SYS0CLK_BMCPER1_CFG_800>,
-+					 <&sys2crg JHB100_SYS2CLK_BMCPER1_NCNOC_TARG>,
-+					 <&sys2crg JHB100_SYS2CLK_BMCPER1_CFG_143>;
-+				clock-names = "pll7", "ncnoc_init",
-+					      "cfg_800", "ncnoc_targ",
-+					      "cfg_143";
-+				#clock-cells = <1>;
-+				#reset-cells = <1>;
-+			};
-+
-+			per2crg: clock-controller@11bc0000 {
-+				compatible = "starfive,jhb100-per2crg";
-+				reg = <0x0 0x11bc0000 0x0 0x1000>;
-+				clocks = <&sys0crg JHB100_SYS0CLK_BMCPER2_NCNOC_INIT>,
-+					 <&sys0crg JHB100_SYS0CLK_BMCPER2_CFG_400>,
-+					 <&sys0crg JHB100_SYS0CLK_BMCPER2_CFG_125>,
-+					 <&per2_gmac2_rgmii_rx>,
-+					 <&per2_gmac2_rmii_ref>,
-+					 <&per2_gmac3_sgmii_tx>,
-+					 <&per2_gmac3_sgmii_rx>,
-+					 <&osc>;
-+				clock-names = "ncnoc_init", "cfg_400", "cfg_125",
-+					      "gmac2_rgmii_rx",
-+					      "gmac2_rmii_ref",
-+					      "gmac3_sgmii_tx",
-+					      "gmac3_sgmii_rx",
-+					      "osc";
-+				#clock-cells = <1>;
-+				#reset-cells = <1>;
-+			};
-+
-+			per3crg: clock-controller@11c40000 {
-+				compatible = "starfive,jhb100-per3crg";
-+				reg = <0x0 0x11c40000 0x0 0x1000>;
-+				clocks = <&sys0crg JHB100_SYS0CLK_BMCPER3_NCNOC_INIT>,
-+					 <&sys1crg JHB100_SYS1CLK_BMCPER3_NCNOC_TARG>,
-+					 <&sys1crg JHB100_SYS1CLK_BMCPER3_CFG_125>,
-+					 <&per3_gmac0_rmii_rclki>,
-+					 <&per3_gmac1_sgmii_tx>,
-+					 <&per3_gmac1_sgmii_rx>,
-+					 <&osc>;
-+				clock-names = "ncnoc_init", "ncnoc_targ", "cfg_125",
-+					      "gmac0_rmii_rclki",
-+					      "gmac1_sgmii_tx",
-+					      "gmac1_sgmii_rx",
-+					      "osc";
-+				#clock-cells = <1>;
-+				#reset-cells = <1>;
-+			};
-+
-+			sys0crg: clock-controller@13000000 {
-+				compatible = "starfive,jhb100-sys0crg";
-+				reg = <0x0 0x13000000 0x0 0x4000>;
-+				clocks = <&osc>, <&pll0>, <&pll1>,
-+					 <&pll2>;
-+				clock-names = "osc", "pll0", "pll1", "pll2";
-+				#clock-cells = <1>;
-+				#reset-cells = <1>;
-+			};
-+
-+			sys1crg: clock-controller@13004000 {
-+				compatible = "starfive,jhb100-sys1crg";
-+				reg = <0x0 0x13004000 0x0 0x4000>;
-+				clocks = <&osc>, <&pll0>, <&pll1>,
-+					 <&pll2>, <&pll4>, <&pll5>,
-+					 <&sys0crg JHB100_SYS0CLK_NPU_NCNOC_INIT>;
-+				clock-names = "osc", "pll0", "pll1", "pll2",
-+					      "pll4", "pll5", "npu_ncnoc_init";
-+				#clock-cells = <1>;
-+				#reset-cells = <1>;
-+			};
-+
-+			sys2crg: clock-controller@13008000 {
-+				compatible = "starfive,jhb100-sys2crg";
-+				reg = <0x0 0x13008000 0x0 0x4000>;
-+				clocks = <&osc>, <&pll1>,
-+					 <&sys0crg JHB100_SYS0CLK_GPU0_NCNOC_INIT>,
-+					 <&sys0crg JHB100_SYS0CLK_GPU1_NCNOC_INIT>;
-+				clock-names = "osc", "pll1", "gpu0_ncnoc_init",
-+					      "gpu1_ncnoc_init";
-+				#clock-cells = <1>;
-+				#reset-cells = <1>;
-+			};
-+
- 			intc: interrupt-controller@13220000 {
- 				compatible = "starfive,jhb100-intc";
- 				reg = <0x0 0x13220000 0x0 0x80>;
--- 
-2.25.1
+Thanks for the update.
 
+I think this version looks reasonable to me. Checking req before
+dereferencing it and stopping the SG walk at a NULL sg_page() should
+cover the setup failure paths I was concerned about, while still freeing
+the allocated destination pages on the acomp error path.
+
+Could you please also add my Reported-by tag?
+
+Reported-by: Yilin Zhu <zylzyl2333@gmail.com>
+
+Thanks,
+Yilin
 
