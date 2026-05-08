@@ -1,83 +1,85 @@
-Return-Path: <netdev+bounces-285875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285876-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +ALQFvH5/WnYlQAAu9opvQ
-	(envelope-from <netdev+bounces-285875-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:57:53 +0200
+	id yCgxBp75/WnYlQAAu9opvQ
+	(envelope-from <netdev+bounces-285876-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:56:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA1794F832F
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:57:52 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E5424F82E3
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:56:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1AA513095542
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 14:54:27 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 11C53302997A
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 14:54:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1C253FBEAA;
-	Fri,  8 May 2026 14:54:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35CCE3F787D;
+	Fri,  8 May 2026 14:54:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JX7Gf+7m"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y66C6sfo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EBFD3FB7D5
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 14:54:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8E43F6600
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 14:54:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778252045; cv=none; b=d+ArBeV2MKNzMPGqWQN/v82UWD0Dr9JmzHd9XAKTwC4X8Oxhx1Nx66e1ALlSgOGSFbxlAwL9S+1GemaYbXu8w2NzieL/vnZKBIPwUf2M9OKvvKAIOzHh3hUpx8D7SR7CMm2QpJ3acBmil3aBHytORK9/07R0WQMuOt8VucVVvfI=
+	t=1778252047; cv=none; b=c9X0kcNb1aIDr4ieSYvWIKoW6hNb3T/ZlhHjlLIp36SEpgJoQiJWsUPgpqMWLiMzhG/BQh2WuT7CsaKXioaLNfKbrtg1HTEB/qThmQM/iX8qEDLJTfTHsUJXGT7qihNYLJvUnyzoizJp+jTE24evupkZuDuyDyAyINs8jcR+u8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778252045; c=relaxed/simple;
-	bh=EicQdT3c6J+Vumm9/+ppdAXyUo5a0VPkbIng1VxcDLM=;
+	s=arc-20240116; t=1778252047; c=relaxed/simple;
+	bh=Jie18w538Ct7x3CbVmimV1bnCHwry8E9OuWrmJ6cumQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Xgh/mfrY1nCllgPYO6J3OWPdia4Q/mVp2+X8znT+A1L8yVslEZZlNTOlSwwoi5qvDCYKMiUeW0I8vvVlxamHtEqkBFJgOnSiAQaQMSoSq5SHg1bJJC/MisSSao9C8OZJmBwCnB5R0TdXgWlq/pIFnn87Sa6JikbhOHKwouLKpMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JX7Gf+7m; arc=none smtp.client-ip=209.85.167.169
+	 In-Reply-To:To:Cc; b=e+HxSYEwWsPb9Jj/I4W6R2O27Gy7LCFC/3yuX49nISai5mvR/XWv70EhWbgXBFfpq3VVr2GPIkalPz+1rBF05JZw0IfmD7MWToTIjG2EbHDmXUu86JcvP741YKkKMVzs/DzR4/cedKOH11jGJ4bjRmzWe2mHKf09lKBYyxcsIJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y66C6sfo; arc=none smtp.client-ip=209.85.161.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-4756e74f8edso1466242b6e.1
-        for <netdev@vger.kernel.org>; Fri, 08 May 2026 07:54:03 -0700 (PDT)
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-697bcc9d769so1126800eaf.0
+        for <netdev@vger.kernel.org>; Fri, 08 May 2026 07:54:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778252043; x=1778856843; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778252044; x=1778856844; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=dbANzqSWAbJg10BPC4Wd4ggqpW76AexGUgGB0zbc/mU=;
-        b=JX7Gf+7mxJ4nfAMcA9qOJ0vyg7Rgwbc91jnfBavfyh9embFSvvoa2DnvdywlAMmElh
-         TlDlSdTDdKTssmaR0pN13I+7Pf4fph6kXWcKdVDRF3R8XBfCE5Wx93ObUeLi3Bh77Xpd
-         If5tA3zpKiBDfck1mNkf+Byps5PEf2iCpJZAr9PR27a6shxdTRqunY3uVQ0fHe1DsdCx
-         ukb5miRUAwwPKuBzZxcUUdeBS5xs7uG/ihslrR/HEfBxqIYCEf1nvqGx3IhfmwqEfJWW
-         GQoDYWOFP8cL6Q6BDDj1FyEFXQN5hZ6lLNQTe7YOR0qQAfvcCr6/8LR3ZfNWWkOEh7E7
-         mVXg==
+        bh=/pc5hm9zFh0GvB9s3uy8ydQwYAOR2n93oEpCRRyHbDs=;
+        b=Y66C6sfoXs7fYH05OJUcRJvV1jKRTahMqbmBEEFc6pEwM+vnFILwFzy7oiJXwAHzJq
+         6McZilUcNdRmcBLdk8wUWGTDGi8xFdx5+vN5U8dMJzPWm7+J7IRSBj9Dj5DcL14iF9RV
+         datUsrsz1sGfWsFhp8DI/u1SQCPSNebZsTKQgiRM0LA2VJciSkEzIq73hEsG7dSejPog
+         2qPxIpJaS6kJkpUxi7irYcXACruv6ugox/eDmjy1ulmESnQ6wJ+zAgzy63hMz67syz8q
+         2+V7KFNL9U/7MaTHkDQ9g8MAAp9iQJIrWgBmGBa/48n7HyUNPaBXGWui2NgQv936MSt+
+         cRmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778252043; x=1778856843;
+        d=1e100.net; s=20251104; t=1778252044; x=1778856844;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=dbANzqSWAbJg10BPC4Wd4ggqpW76AexGUgGB0zbc/mU=;
-        b=dpYckDpCF8v1aN3JRaYhhns+pP/3EHn25mzax2Yf6Vps9GCS28fk987nLGPfX5ldO8
-         x0q+FimvIFMQskuFQBSDxNDXZ0cV+DP4XmlP2YDigDyzU5d0Rd3wSeaIHCfOsgEB/ZV/
-         CjJ+cUj8lLHeCiqvALRAe8gPMZ1HwygxxyB/DoUY4i6zvfT4P6Vw0Q4wyzO65GyLm3ZT
-         M2Lo6zdm1GoYvFQAAJmtUB/tIfmWj8xBr0MvwGiLn/HcqcFHLRZNv10aauJGXqEAiLjc
-         1G1f+nfHV91kWo6DHhULRLiGJJI0/0c0OTXs3pSHRak1jW4uBRLJfpMgft+vZC4sI21o
-         dpAg==
-X-Gm-Message-State: AOJu0YwQNXp+SNKEGLkAY11MNqk/uS+9VlNpvI83XbjAv5NsessXbn35
-	h2dCq7j8yFyh6stQkd8REy7FdQWevICDGicLWv8IoWF3HmxCiqmH/8B52+5SUw==
-X-Gm-Gg: AeBDievhrgZgz1vCfoMxzBe7W34MLS0ujGG16Y2tShvs8nkEAmypRkVNzaodpW884nc
-	WQaabnksYk8MNaZxZ1z1TtVe8998sK69Sehjdz00E3lCoIKyeQH0A1trnm5t3p5EudLEj9KJqKZ
-	98vBaG7TzbCnSAWlCZxwrmVxRljKMCLbTkWMrgtKkfir3e+2PAv+5QcHpZEr/tUcuQdSkHd0ci8
-	R1op8wK6Yi405YMSzy5Ky23ODA2igcMHhTqU+MRrqFuHhuY90O3YoLXKq7Yr21rq+e2zfh+zudx
-	3hM3ENejUOODoWdmO7HImb/GyvdbFcSaZi3y7YgOKlK3dRlAMMsc04kZBNGffQ9TV3SDl5n/2iC
-	5nI0/TONEw4XCP7Dn3E6R71tmLSq5IzYbihljYsyz2oXQ5chLQJ/cO3K18odrrF6SlQTUfTY8kj
-	22v27QFuX6ofUDh1D7NqdIPimAP40EYc4QkvOWjNFaFWtcxSXx6w8=
-X-Received: by 2002:a05:6808:6606:b0:479:dc28:b71d with SMTP id 5614622812f47-48042503b43mr8326241b6e.38.1778252042809;
-        Fri, 08 May 2026 07:54:02 -0700 (PDT)
-Received: from localhost ([2a03:2880:10ff:4::])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-47c76986404sm14617049b6e.15.2026.05.08.07.54.02
+        bh=/pc5hm9zFh0GvB9s3uy8ydQwYAOR2n93oEpCRRyHbDs=;
+        b=WvylI8AarwWs+V6la4XpOe6SIXrxAho3ah/RvBDkelK1JKSdSbhLs4HRiqsIXMVFFw
+         IEi+2VKweBUNXlMQ+xm0OY1C8pzhkTnGgTJ/FemyxYy8jhyf3aACvGL+7x950vbAelv7
+         OeYSMBSSNCzqIGDeTdQzv03DvpqGnvkiDxo6BVNctX0I2Q07+bl0rr0n9SLutR6ZbbdX
+         EnbaysPmq5vHIzN/x6Otg0uXIuBuwxTxbVk7SSsLS28cA2DK2Jp3q0n67kP6gPTCwUYM
+         cZYM/BvgE2YH/GKv17ye79uxOaSrlc4UyhnJv/bt4wU6SxY5SgiXxf7L92o2Kmqx7Dzh
+         GwoA==
+X-Gm-Message-State: AOJu0YxdVVJ/MfX/Rjak0jfWyd1h4UnfFdeCr/ZjpAP3Sri4UQKoihtK
+	Y3B8vRK7L/4gCgKTxufVwUmOxsFZhCvwDmoiSbufvHFQUY7PdzVI8kHYKU01SQ==
+X-Gm-Gg: AeBDiesKk6qg4EHwhWI+nzVbKBuZuPDHVOOSZnvq/v1SWfLKQG6e/Vob5ukXKOlM/2e
+	kyJXnkwMfYyS8Y9Yws5B5CkCieeGpyDVa2jDlCv5pA5DENPZgSB+hCnVt0ZiwW9csdgD6TuHIMR
+	U3gGulqW7IcnVZ7KVq/OdNjkdx0ujCwN1Hj/oywbvcMU04OXtyTu5Of6dSIa2zdSLs7JORhZVNV
+	NVkLNUS9d7QBPtZjM3KXLxQkWwj8fueJvC2lTHvpL/JFMKrP1YejgMreFGcWBv0IKoyEo/jnLhd
+	PZbGkQb3oLC9Pk3TPw443S18wlKb2iS9/6j9DzIMpeO/gAJi0oBJ/2Wpx10iomfJj97/TCkl13n
+	0ui3sedn8+Nv87kAdPNwEaaq0LDPc4787+x5JgqHQtSygQTqZsG02neuR7RxyQDfR24DHuUV6yy
+	IVEpyy0R4IB9KlVgmngQT4pH8cK8ZxuGciT2xjo6ttxfEpZ27jtKeplH8LRXV/BXNVAAQyOvMRD
+	Q==
+X-Received: by 2002:a05:6820:1c92:b0:694:a17f:759d with SMTP id 006d021491bc7-69998d1d6damr7091353eaf.28.1778252044172;
+        Fri, 08 May 2026 07:54:04 -0700 (PDT)
+Received: from localhost ([2a03:2880:10ff:4f::])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69b25e0dbb5sm1108003eaf.13.2026.05.08.07.54.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 07:54:02 -0700 (PDT)
+        Fri, 08 May 2026 07:54:03 -0700 (PDT)
 From: Daniel Zahka <daniel.zahka@gmail.com>
-Date: Fri, 08 May 2026 07:53:47 -0700
-Subject: [PATCH net-next 4/6] netdevsim: psp: implement kdf from psp spec
+Date: Fri, 08 May 2026 07:53:48 -0700
+Subject: [PATCH net-next 5/6] netdevsim: psp: add real aes-gcm encryption
+ and decryption
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,7 +88,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260508-nsim-psp-crypto-v1-4-4b50ed09b794@gmail.com>
+Message-Id: <20260508-nsim-psp-crypto-v1-5-4b50ed09b794@gmail.com>
 References: <20260508-nsim-psp-crypto-v1-0-4b50ed09b794@gmail.com>
 In-Reply-To: <20260508-nsim-psp-crypto-v1-0-4b50ed09b794@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -95,19 +97,19 @@ To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
  Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 X-Mailer: b4 0.13.0
-X-Rspamd-Queue-Id: CA1794F832F
+X-Rspamd-Queue-Id: 0E5424F82E3
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285875-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285876-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -115,7 +117,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -126,160 +128,197 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Implement the PSP key derivation function (KDF) per the PSP
-Architecture Spec.
+Implement real AES-GCM-128/256 encryption and decryption for PSP
+packets in the netdevsim driver, and remove gmac from supported
+versions.
 
-The kdf is used to generate spi + session key pairs, and will also be
-used in the rx path to re-derive the tx key used by the peer.
-
-Also, remove support for psd->generation, as it is not needed for
-netdevsim after removing the fake authentication hack.
+We now have to add and remove the PSP ICV trailer from packets. We
+linearize skb's because the aesgcm crypto library does not work on
+non-linear buffers.
 
 Assisted-by: Claude:claude-opus-4.6
 Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 ---
- drivers/net/Kconfig               |  1 +
- drivers/net/netdevsim/netdevsim.h |  3 +++
- drivers/net/netdevsim/psp.c       | 55 ++++++++++++++++++++++++++++++++++++---
- 3 files changed, 55 insertions(+), 4 deletions(-)
+ drivers/net/Kconfig         |  1 +
+ drivers/net/netdevsim/psp.c | 98 ++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 93 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-index ff79c466712d..44a220c05536 100644
+index 44a220c05536..2d21ba13de15 100644
 --- a/drivers/net/Kconfig
 +++ b/drivers/net/Kconfig
-@@ -610,6 +610,7 @@ config NETDEVSIM
- 	select NET_DEVLINK
+@@ -611,6 +611,7 @@ config NETDEVSIM
  	select PAGE_POOL
  	select NET_SHAPER
-+	select CRYPTO_LIB_AES_CBC_MACS if INET_PSP
+ 	select CRYPTO_LIB_AES_CBC_MACS if INET_PSP
++	select CRYPTO_LIB_AESGCM if INET_PSP
  	help
  	  This driver is a developer testing tool and software model that can
  	  be used to test various control path networking APIs, especially
-diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-index dcea76429bac..112fe1ee10bc 100644
---- a/drivers/net/netdevsim/netdevsim.h
-+++ b/drivers/net/netdevsim/netdevsim.h
-@@ -38,6 +38,7 @@
- #define NSIM_IPSEC_VALID		BIT(31)
- #define NSIM_UDP_TUNNEL_N_PORTS		4
- 
-+#define NSIM_PSP_DEV_KEY_SIZE		32
- #define NSIM_HDS_THRESHOLD_MAX		1024
- 
- struct nsim_sa {
-@@ -123,6 +124,8 @@ struct netdevsim {
- 		struct psp_dev __rcu *dev;
- 		struct dentry *rereg;
- 		struct mutex rereg_lock;
-+		spinlock_t dev_keys_lock;
-+		u8 dev_keys[2][NSIM_PSP_DEV_KEY_SIZE];
- 		u32 spi;
- 		u32 assoc_cnt;
- 	} psp;
 diff --git a/drivers/net/netdevsim/psp.c b/drivers/net/netdevsim/psp.c
-index e8831d4bf394..8cdb88b1e232 100644
+index 8cdb88b1e232..4945973d523d 100644
 --- a/drivers/net/netdevsim/psp.c
 +++ b/drivers/net/netdevsim/psp.c
-@@ -1,11 +1,45 @@
+@@ -1,8 +1,11 @@
  // SPDX-License-Identifier: GPL-2.0
  
-+#include <crypto/aes-cbc-macs.h>
-+#include <linux/random.h>
+ #include <crypto/aes-cbc-macs.h>
++#include <crypto/gcm.h>
++#include <linux/ip.h>
+ #include <linux/random.h>
  #include <linux/skbuff.h>
-+#include <linux/unaligned.h>
++#include <linux/timekeeping.h>
+ #include <linux/unaligned.h>
  #include <net/psp.h>
  #include <net/sock.h>
- 
- #include "netdevsim.h"
- 
-+/* Session key derivation from device key per PSP Architecture Spec */
-+static void nsim_psp_derive_key(const u8 *dev_key, __be32 spi, u32 version,
-+				u8 *derived_key)
-+{
-+	unsigned int key_size = psp_key_size(version);
-+	struct aes_cmac_key key;
-+	u8 block[16];
-+
-+	aes_cmac_preparekey(&key, dev_key, NSIM_PSP_DEV_KEY_SIZE);
-+
-+	block[0]  = 0x00;
-+	block[1]  = 0x00;
-+	block[2]  = 0x00;
-+	block[3]  = 0x01;		/* counter */
-+	block[4]  = 0x50;		/* 'P' */
-+	block[5]  = 0x76;		/* 'v' */
-+	block[6]  = 0x30 | version;	/* '0' + version */
-+	block[7]  = 0x00;
-+	memcpy(&block[8], &spi, sizeof(spi));
-+	put_unaligned_be32(key_size * 8, &block[12]);
-+
-+	aes_cmac(&key, block, sizeof(block), derived_key);
-+
-+	if (key_size > 16) {
-+		block[3] = 0x02;
-+		aes_cmac(&key, block, sizeof(block), derived_key + 16);
-+	}
-+
-+	memzero_explicit(&key, sizeof(key));
-+}
-+
- enum skb_drop_reason
+@@ -44,9 +47,17 @@ enum skb_drop_reason
  nsim_psp_handle_tx(struct sk_buff *skb, struct netdevsim *ns)
  {
-@@ -155,7 +189,7 @@ nsim_rx_spi_alloc(struct psp_dev *psd, u32 version,
- 		  struct netlink_ext_ack *extack)
- {
- 	struct netdevsim *ns = psd->drv_priv;
--	int i;
-+	unsigned int phase;
+ 	enum skb_drop_reason rc = 0;
++	u8 iv[GCM_AES_IV_SIZE];
++	struct aesgcm_ctx ctx;
+ 	struct psp_assoc *pas;
++	unsigned int key_size;
++	struct psphdr *psph;
++	int payload_len;
+ 	struct net *net;
++	u8 *authtag;
++	int psp_off;
+ 	void **ptr;
++	int err;
  
- 	if ((ns->psp.spi ^ (ns->psp.spi + 1)) & PSP_SPI_KEY_PHASE) {
- 		NL_SET_ERR_MSG(extack, "SPI space exhausted");
-@@ -163,9 +197,11 @@ nsim_rx_spi_alloc(struct psp_dev *psd, u32 version,
+ 	rcu_read_lock();
+ 	pas = psp_skb_get_assoc_rcu(skb);
+@@ -72,12 +83,52 @@ nsim_psp_handle_tx(struct sk_buff *skb, struct netdevsim *ns)
+ 		goto out_unlock;
  	}
  
- 	assoc->spi = cpu_to_be32(++ns->psp.spi);
--	assoc->key[0] = psd->generation;
--	for (i = 1; i < PSP_MAX_KEY; i++)
--		assoc->key[i] = ns->psp.spi + i;
-+	phase = !!(ns->psp.spi & PSP_SPI_KEY_PHASE);
++	key_size = psp_key_size(pas->version);
++	err = aesgcm_expandkey(&ctx, pas->tx.key, key_size, PSP_TRL_SIZE);
++	if (err) {
++		rc = SKB_DROP_REASON_PSP_OUTPUT;
++		goto out_unlock;
++	}
 +
-+	/* dev_keys_lock not needed because of psd->lock */
-+	nsim_psp_derive_key(ns->psp.dev_keys[phase], assoc->spi, version,
-+			    assoc->key);
++	if (skb_linearize_cow(skb) ||
++	    (skb_tailroom(skb) < PSP_TRL_SIZE &&
++	     pskb_expand_head(skb, 0, PSP_TRL_SIZE, GFP_ATOMIC))) {
++		rc = SKB_DROP_REASON_PSP_OUTPUT;
++		goto out_unlock;
++	}
++	skb_put(skb, PSP_TRL_SIZE);
++
++	if (skb->protocol == htons(ETH_P_IP)) {
++		be16_add_cpu(&ip_hdr(skb)->tot_len, PSP_TRL_SIZE);
++		ip_send_check(ip_hdr(skb));
++	} else if (skb->protocol == htons(ETH_P_IPV6)) {
++		be16_add_cpu(&ipv6_hdr(skb)->payload_len, PSP_TRL_SIZE);
++	}
++	be16_add_cpu(&udp_hdr(skb)->len, PSP_TRL_SIZE);
++
++	psph = (struct psphdr *)(skb_transport_header(skb) +
++				sizeof(struct udphdr));
++
++	/* Real impl needs to guarantee IV isn't reused on the same key */
++	psph->iv = cpu_to_be64(ktime_get_mono_fast_ns());
++	memcpy(iv, &psph->spi, sizeof(psph->spi));
++	memcpy(iv + sizeof(psph->spi), &psph->iv, sizeof(psph->iv));
++	psp_off = skb_transport_offset(skb) + sizeof(struct udphdr);
++	payload_len = skb->len - psp_off - PSP_HDR_SIZE - PSP_TRL_SIZE;
++	authtag = skb->data + skb->len - PSP_TRL_SIZE;
++
++	aesgcm_encrypt(&ctx,
++		       skb->data + psp_off + PSP_HDR_SIZE,
++		       skb->data + psp_off + PSP_HDR_SIZE,
++		       payload_len, (u8 *)psph, PSP_HDR_SIZE,
++		       iv, authtag);
++	memzero_explicit(&ctx, sizeof(ctx));
++
+ 	skb->decrypted = 0;
  
- 	return 0;
- }
-@@ -186,8 +222,15 @@ static int nsim_assoc_add(struct psp_dev *psd, struct psp_assoc *pas,
- static int nsim_key_rotate(struct psp_dev *psd, struct netlink_ext_ack *extack)
+ 	u64_stats_update_begin(&ns->psp.syncp);
+ 	u64_stats_inc(&ns->psp.tx_packets);
+-	u64_stats_add(&ns->psp.tx_bytes,
+-		      skb->len - skb_inner_transport_offset(skb));
++	u64_stats_add(&ns->psp.tx_bytes, payload_len);
+ 	u64_stats_update_end(&ns->psp.syncp);
+ out_unlock:
+ 	rcu_read_unlock();
+@@ -87,12 +138,17 @@ nsim_psp_handle_tx(struct sk_buff *skb, struct netdevsim *ns)
+ /* Returns true if skb was consumed, false otherwise. */
+ bool nsim_psp_handle_rx(struct netdevsim *ns, struct sk_buff *skb)
  {
- 	struct netdevsim *ns = psd->drv_priv;
-+	unsigned int next_phase;
++	u8 iv[GCM_AES_IV_SIZE];
++	struct aesgcm_ctx ctx;
+ 	struct psp_dev *psd;
++	u8 key[PSP_MAX_KEY];
+ 	struct psphdr *psph;
++	unsigned int phase;
+ 	struct udphdr *uh;
+ 	int payload_len;
+ 	u32 versions;
+ 	int psp_off;
++	u8 *authtag;
+ 	bool is_udp;
+ 	int l3_hlen;
+ 	u8 version;
+@@ -154,9 +210,41 @@ bool nsim_psp_handle_rx(struct netdevsim *ns, struct sk_buff *skb)
+ 	if (payload_len < 0)
+ 		goto drop;
  
-+	psd->generation = 0;
- 	ns->psp.spi = (ns->psp.spi & PSP_SPI_KEY_PHASE) ^ PSP_SPI_KEY_PHASE;
-+	next_phase = !!(ns->psp.spi & PSP_SPI_KEY_PHASE);
++	if (FIELD_GET(PSPHDR_CRYPT_OFFSET, psph->crypt_offset))
++		goto drop;
++
++	if (skb_linearize_cow(skb))
++		goto drop;
++
++	psph = (struct psphdr *)(skb->data + psp_off);
++	phase = !!(ntohl(psph->spi) & PSP_SPI_KEY_PHASE);
 +
 +	spin_lock_bh(&ns->psp.dev_keys_lock);
-+	get_random_bytes(ns->psp.dev_keys[next_phase], NSIM_PSP_DEV_KEY_SIZE);
++	nsim_psp_derive_key(ns->psp.dev_keys[phase], psph->spi, version, key);
 +	spin_unlock_bh(&ns->psp.dev_keys_lock);
- 
- 	return 0;
- }
-@@ -295,6 +338,10 @@ int nsim_psp_init(struct netdevsim *ns)
- 	struct dentry *ddir = ns->nsim_dev_port->ddir;
- 	struct psp_dev *psd;
- 
-+	spin_lock_init(&ns->psp.dev_keys_lock);
-+	get_random_bytes(ns->psp.dev_keys[0], NSIM_PSP_DEV_KEY_SIZE);
-+	get_random_bytes(ns->psp.dev_keys[1], NSIM_PSP_DEV_KEY_SIZE);
 +
- 	psd = psp_dev_create(ns->netdev, &nsim_psp_ops, &nsim_psp_caps, ns);
- 	if (IS_ERR(psd))
- 		return PTR_ERR(psd);
++	err = aesgcm_expandkey(&ctx, key, psp_key_size(version), PSP_TRL_SIZE);
++	memzero_explicit(key, sizeof(key));
++	if (err)
++		goto drop;
++
++	memcpy(iv, &psph->spi, sizeof(psph->spi));
++	memcpy(iv + sizeof(psph->spi), &psph->iv, sizeof(psph->iv));
++	authtag = skb->data + skb->len - PSP_TRL_SIZE;
++
++	if (!aesgcm_decrypt(&ctx,
++			    skb->data + psp_off + PSP_HDR_SIZE,
++			    skb->data + psp_off + PSP_HDR_SIZE,
++			    payload_len, (u8 *)psph, PSP_HDR_SIZE,
++			    iv, authtag)) {
++		memzero_explicit(&ctx, sizeof(ctx));
++		goto drop;
++	}
++	memzero_explicit(&ctx, sizeof(ctx));
++
+ 	skb_push(skb, ETH_HLEN);
+ 	skb->mac_len = ETH_HLEN;
+-	err = psp_dev_rcv(skb, psd_id, 0, false);
++	err = psp_dev_rcv(skb, psd_id, 0, true);
+ 	if (err)
+ 		goto drop;
+ 
+@@ -274,9 +362,7 @@ static struct psp_dev_ops nsim_psp_ops = {
+ 
+ static struct psp_dev_caps nsim_psp_caps = {
+ 	.versions = 1 << PSP_VERSION_HDR0_AES_GCM_128 |
+-		    1 << PSP_VERSION_HDR0_AES_GMAC_128 |
+-		    1 << PSP_VERSION_HDR0_AES_GCM_256 |
+-		    1 << PSP_VERSION_HDR0_AES_GMAC_256,
++		    1 << PSP_VERSION_HDR0_AES_GCM_256,
+ 	.assoc_drv_spc = sizeof(void *),
+ };
+ 
 
 -- 
 2.52.0
