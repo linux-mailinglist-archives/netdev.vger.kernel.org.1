@@ -1,49 +1,51 @@
-Return-Path: <netdev+bounces-285915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285918-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kK4UDEkG/mnumAAAu9opvQ
-	(envelope-from <netdev+bounces-285915-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 17:50:33 +0200
+	id iOPbMF0G/mnumAAAu9opvQ
+	(envelope-from <netdev+bounces-285918-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 17:50:53 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E1404F8FFA
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 17:50:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 46DF04F9010
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 17:50:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A8322301AA7E
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 15:50:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5C922303CD27
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 15:50:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1E630649C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99CA630F55B;
 	Fri,  8 May 2026 15:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b="eMQSS70w"
+	dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b="p4+LF1Sa"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA943002DD
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 15:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 895B12FF144;
+	Fri,  8 May 2026 15:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.38.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778255430; cv=none; b=Q5oVzagDyMQJB1A1p2K7WxuxksqLBhim2KzJPadRgSD6YJmmtf584zOP5WCKNqx5+8I1kp9y5hU5yN+Esti46rSHR08FleSwQYmVM94lOG+vVltgDhWdlk0GOVtFx9Wsd/czFWURe30EXgduu27T6tUFYbZ0FQ6e9JO+fKVjGUw=
+	t=1778255430; cv=none; b=dPZTUyD71WtlTfjRj8vatnddVbGf6cD2eMys2RGvYzCzXQsqmwc1VX82/GhfpP1vFit7/XWnV9Jw2FFZgcA7JiHvNYPh5KFGEx+ZGGiUJryif8cZ4FWVX/MG8gkVOcTMXuvU0aaM1fqlsNQD4MMAzLHEG93LWh5Byw53kh5haw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1778255430; c=relaxed/simple;
-	bh=EV9pyTwVgtQ8OQAfRIcWb0vGF3HesC5dvxiqueUXGNg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Uo26BIzo2Aq9juQ1iwPGGQ6gp31taWlKQiPSMhwonKoT1IomUUYzYpLq6IbTMIlyU5CN9llLnkGDHkcBg91iaOfs0SC0ycVIZ8QfvtlfDm+8OrdsDQ0R9Q0Y8JT168yo5R4H1BCCvy6AqwSuIIMbFiCg2cw/gl0yicvllCSZu6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=eMQSS70w; arc=none smtp.client-ip=23.88.38.48
+	bh=Kk33coW1BTPPsoCzN/JAaLnY1ljWrmKl1FiAXHveNYE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=H0HLi7PUeAGSxtBgA0YlIY+4AyoSzaJDK3JbGVR4udQNQoFanbbp6qwBNtEMrOfRsWfiLLHhJqGLZderwUWnUlsMdF72PHvPQumk/ukHDT+/6xrkFZT+xyy7Vv3UMFiMHAG1WpzqWRy1xY5kpAO4CYxTMAeWgMYXJTB6Z2KuvU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=p4+LF1Sa; arc=none smtp.client-ip=23.88.38.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simonwunderlich.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
-	s=09092022; t=1778255006;
+	s=09092022; t=1778255007;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=8zhRPnfLe2NDUY+iSHXVns7vYjJltQ03OVMAkw18IsM=;
-	b=eMQSS70w0o8Hxn0SN1KG+7odxp01shVyfDXNODrtYMZWnf2If0W19IfQ9EVzbHACsHuHU9
-	DvSM2KX39r5gtgTs4g7zex5T7uGXw48/XScBjk0jv137ceubkYzDqrscSX3SptKyyRlMD6
-	Ij1Rer/hNkJsbPusM3sFnj4UYylMqJSWuLorp8tIqaQHu1zxtVlJyEseBTyfqLmECR0jy7
-	ozMGnLj3QCU2iY9PZdLsCdt2nZm94YuGixFSzUOqnxeiTrLmbXi4QLhWkw6wDaDrcBlDwM
-	f2kTbsr8vLDRhw4u1jXe9qyYaO/9KQIPpXTAW+3T4GW79KOf3Rn2vkP2T2VlJw==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rnpguk5kWeeiPMWnYmoJrWVYQWeHIgM9Bw9lqx5btd8=;
+	b=p4+LF1SaGzSqq95SIiJjAFZpQZEZ5JI/fpKPr+uoXjKGXWhJl3/zGW/HbZu+rleL4SSx2/
+	BX7HtEvWdhhUfsmjZ4a03+6BBNQD2/B+5GRD3sVvSBA2lu/H2MUU7tMlbmsQIcPscRyztx
+	bdr/EPFCy4SLxzR5d0VdDyBEZrwJAOGqBDadWIORfddHkOQR8Qyc6KgYXYQVVz4N78Ak80
+	A0dJAaloRPrgbk2+9zD5Nf8shToYQRpl1gXpqXZbMjKX5TS7SfePcvhl9SpXV/7FnQ/vJd
+	L8aFUEtzK2HA0eZVaIUM39lW6vNpcWRIC9xOCjEZDrhL3Hhqtc1E2Nwrp35dNg==
 From: Simon Wunderlich <sw@simonwunderlich.de>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -52,11 +54,17 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
 	b.a.t.m.a.n@lists.open-mesh.org,
+	Lyes Bourennani <lbourennani@fuzzinglabs.com>,
+	stable@vger.kernel.org,
+	Alexis Pinson <apinson@fuzzinglabs.com>,
+	Sven Eckelmann <sven@narfation.org>,
 	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH net 0/8] pull request: batman-adv 2026-05-08
-Date: Fri,  8 May 2026 17:43:06 +0200
-Message-ID: <20260508154314.12817-1-sw@simonwunderlich.de>
+Subject: [PATCH net 1/8] batman-adv: fix integer overflow on buff_pos
+Date: Fri,  8 May 2026 17:43:07 +0200
+Message-ID: <20260508154314.12817-2-sw@simonwunderlich.de>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260508154314.12817-1-sw@simonwunderlich.de>
+References: <20260508154314.12817-1-sw@simonwunderlich.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,11 +72,11 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 8E1404F8FFA
+X-Rspamd-Queue-Id: 46DF04F9010
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[simonwunderlich.de,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
@@ -77,77 +85,54 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285918-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285915-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[simonwunderlich.de:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[simonwunderlich.de:+];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[simonwunderlich.de:mid,simonwunderlich.de:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,open-mesh.org:url]
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[narfation.org:email,simonwunderlich.de:email,simonwunderlich.de:mid,simonwunderlich.de:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Dear net maintainers,
+From: Lyes Bourennani <lbourennani@fuzzinglabs.com>
 
-here are a couple of bugfixes for batman-adv which we would like to have integrated into net.
+Fixing an integer overflow present in batadv_iv_ogm_send_to_if. The size
+check is done using the int type in batadv_iv_ogm_aggr_packet whereas the
+buff_pos variable uses the s16 type. This could lead to an out-of-bound
+read.
 
-Please pull or let me know of any problem!
+Cc: stable@vger.kernel.org
+Fixes: c6c8fea29769 ("net: Add batman-adv meshing protocol")
+Signed-off-by: Lyes Bourennani <lbourennani@fuzzinglabs.com>
+Signed-off-by: Alexis Pinson <apinson@fuzzinglabs.com>
+Signed-off-by: Sven Eckelmann <sven@narfation.org>
+Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
+---
+ net/batman-adv/bat_iv_ogm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thank you,
-      Simon
+diff --git a/net/batman-adv/bat_iv_ogm.c b/net/batman-adv/bat_iv_ogm.c
+index f28e9cbf8ad5f..618d1889c04e7 100644
+--- a/net/batman-adv/bat_iv_ogm.c
++++ b/net/batman-adv/bat_iv_ogm.c
+@@ -335,7 +335,7 @@ static void batadv_iv_ogm_send_to_if(struct batadv_forw_packet *forw_packet,
+ 	struct batadv_priv *bat_priv = netdev_priv(hard_iface->mesh_iface);
+ 	const char *fwd_str;
+ 	u8 packet_num;
+-	s16 buff_pos;
++	int buff_pos;
+ 	struct batadv_ogm_packet *batadv_ogm_packet;
+ 	struct sk_buff *skb;
+ 	u8 *packet_pos;
+-- 
+2.47.3
 
-The following changes since commit 1f5ffc672165ff851063a5fd044b727ab2517ae3:
-
-  Fix mismerge of the arm64 / timer-core interrupt handling changes (2026-04-14 23:03:02 -0700)
-
-are available in the Git repository at:
-
-  https://git.open-mesh.org/batadv.git tags/batadv-net-pullrequest-20260508
-
-for you to fetch changes up to ba9d20ee9076dac32c371116bacbe72480eb356c:
-
-  batman-adv: bla: put backbone reference on failed claim hash insert (2026-05-08 14:29:02 +0200)
-
-----------------------------------------------------------------
-Here are some batman-adv bugfixes:
-
-- fix integer overflow on buff_pos, by Lyes Bourennani
-
-- fix invalid tp_meter access during teardown, by Jiexun Wang (2 patches)
-
-- stop caching unowned originator pointers in BAT IV, by Jiexun Wang
-
-- tp_meter: fix tp_num leak on kmalloc failure, by Sven Eckelmann
-
-- fix BLA refcounting issues, by Sven Eckelmann (3 patches)
-
-----------------------------------------------------------------
-Jiexun Wang (3):
-      batman-adv: reject new tp_meter sessions during teardown
-      batman-adv: stop tp_meter sessions during mesh teardown
-      batman-adv: stop caching unowned originator pointers in BAT IV
-
-Lyes Bourennani (1):
-      batman-adv: fix integer overflow on buff_pos
-
-Sven Eckelmann (4):
-      batman-adv: tp_meter: fix tp_num leak on kmalloc failure
-      batman-adv: bla: prevent use-after-free when deleting claims
-      batman-adv: bla: only purge non-released claims
-      batman-adv: bla: put backbone reference on failed claim hash insert
-
- net/batman-adv/bat_iv_ogm.c            |  85 +++++++++++++++++-------
- net/batman-adv/bridge_loop_avoidance.c |  11 +++-
- net/batman-adv/main.c                  |   1 +
- net/batman-adv/tp_meter.c              | 116 +++++++++++++++++++++++++++------
- net/batman-adv/tp_meter.h              |   1 +
- net/batman-adv/types.h                 |   4 ++
- 6 files changed, 172 insertions(+), 46 deletions(-)
 
