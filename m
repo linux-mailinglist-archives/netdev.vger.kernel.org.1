@@ -1,83 +1,84 @@
-Return-Path: <netdev+bounces-285871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285872-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eC5TGk75/WlilQAAu9opvQ
-	(envelope-from <netdev+bounces-285871-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:55:10 +0200
+	id wFW5EhP5/WlilQAAu9opvQ
+	(envelope-from <netdev+bounces-285872-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:54:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0729B4F828F
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:55:09 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE8EC4F8259
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:54:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 809C9302DF9C
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 14:54:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 62673301F3C2
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 14:54:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B8373F65EC;
-	Fri,  8 May 2026 14:54:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AC0B3F7897;
+	Fri,  8 May 2026 14:54:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bOLkqDc3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BoptMYnT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
+Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBEE43EE1CC
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 14:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37603F54AC
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 14:53:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778252040; cv=none; b=rFuJ9MNiqg7DAGk0Rgnz6drETVs8fTTJS3q2a9Zv0e9TTzp7a3KEiYoM8D8YyvY7RBegl1TYSt/RnwFASZBxwQPUeOdOoP2nmi6LhwerOff/HF/87na/fRiwm5FxUae+7GEMpex5C7xhzUOcNLs5Lx/Y+ulaXCYWFDd+7+nCYio=
+	t=1778252041; cv=none; b=gqXakeU4VLvzgqoVJao/b4E38BQMm+rm1Pt3GyCiZoZjrTKpB6KdXFw3p0Kg71r/PnOzv+Pudhza+CWb/c80GJrjHd93GzaHp1uocRPw+fTdpY0tsxjzsPChE7ikkCVdfSetY16ZWa+YQdhqUgxh1tJdzGNIABANXlbczAEpcMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778252040; c=relaxed/simple;
-	bh=nXs/4DWqryu4+JAyntBAhrhB85pWzV+OLPNXFOFy1zk=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=NPzzbtYfoivRCoXCgX0yKurCPSN0g+VA4kRZWwVYm1AUNqY9WD1wpqZAKGAFQWRju28XheNdKDjS5GjFvB5eG8lNoYkyhfmBuT+hwfnuvPUUC9bCrpMvQgWAJJGRv8sU2yP2FXz9PQFaqOCcXYYcnLuwtwTAa4S+urdt7XPKMQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bOLkqDc3; arc=none smtp.client-ip=209.85.160.53
+	s=arc-20240116; t=1778252041; c=relaxed/simple;
+	bh=Imh165vQ/goc4NSzO7qYhOZsclYavVhpTt2KZ2NZzGU=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=BUqiMkBy3spjTU9gDgf6qIYCwgjt3aCKw05id/KsHyJ7PYQOTTxgotDYGw8SFJWPEwOh63HtE4MGSFnYSw2XPTd8mba4QUobEe2PX3UeZFRnscV/DrfqtWIXLM+99G76sGCQcdTX3nvCmovyVxQKS8+zv7Y5tPjtkYfASvqYaso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BoptMYnT; arc=none smtp.client-ip=209.85.161.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-435153d9b68so1255639fac.3
-        for <netdev@vger.kernel.org>; Fri, 08 May 2026 07:53:58 -0700 (PDT)
+Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-691de293326so1247014eaf.3
+        for <netdev@vger.kernel.org>; Fri, 08 May 2026 07:53:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778252037; x=1778856837; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=oW0JV5YHJoHP9APafUOMSje4n7Yn/urY8p671I1K7jg=;
-        b=bOLkqDc3i6nzmGJryQ+RzogDgJSw0Ou6E/nWeI4KreAZ5OrJZpcDwsS1JHeGucWbMT
-         q0pvvVvvHHjcZMcMhinaIxhsE6Va4GiIsa5Odi4qD8SQFnEH1JddeNet5G+79G1eXXbc
-         o1qyOgtL3gqTp81NClm7tOpyM8m+fEZGnCEztZwc2gPN7+bASFU0aRZWowvRwENioKgu
-         HBJgHxX6ltaV88mD0Eu2KSAF40XPP6YFugHiS05snQZJ4LRLBc/OzZy51LaIS6s6j5qW
-         M1h3XEorq4rgC1NERmOgJsimmYmfe5t8T9TYf6fXJUMyphapdqI5G5F5vf7cKrZ5iY77
-         HN2Q==
+        d=gmail.com; s=20251104; t=1778252038; x=1778856838; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=p3yf/0EioU1Vkg8reIOYdru1mIh+jCd1PePb15OVlfI=;
+        b=BoptMYnT3XYVkaWsOQkveikubxxOkLGFxXnwb1hS8/9I65AJRK41p0CtgtKfNESV4p
+         dVYSRpA9+D0VBkGMClqYAKOdTiDSzEyz46ELu0h6BfjhK+GCi5xo1RADXLuCPsOLT0nl
+         WDKEPhGSNckA5+qNB4gPwr/CGgZ6b3HufZpLsrGDfjz0jU/xzHBZreaQGArqSACe88oM
+         DewzTbDpnIxMYuh9TMwFRUxsxX7AxWyXAgcvRTCxA3SatEYoq6o1qj1eebWsSSliKgAH
+         1ocsTbBi9Iff7ppNQEkuehCjM2XwOiapTpmb0a6HuqprytckWJDOCRZ7TLqjKPILzDFO
+         42sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778252037; x=1778856837;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oW0JV5YHJoHP9APafUOMSje4n7Yn/urY8p671I1K7jg=;
-        b=itay2gMDb1enRKrNbiBMerlBaOu7fUq3ItxBBEgUu89iszOOVKUkRenUC+k9232bYC
-         fo9nGBjChDm2e4ettL2gXk2jbe4NUt/Ta/LPDvGcTfrQ3JS/TKVS9BDLiMXH1WCAdZIL
-         5i2c0UW764ZjynRd40qLn8kXzhMM1O1SGZe5Yv67K71YLxqDb4H5rSg0ej46RtYbfknV
-         +T4mCRW1f8eKjhoEGlTuwaLjQUoAdqZb7m39IO6ZurKsR3NHei7+nCIU/914yBY9QkL6
-         aCRcdnVwQJhwnpvk0VDC/I8JPm/G6EKQpJR1KT7Uxm/liGZg3n5jxOUx6Vfjsj1lTK95
-         z/mQ==
-X-Gm-Message-State: AOJu0Yy+sUTEz6VSBaeqvHZNRV8UI2GUDkj5gdMdZGgvQ+abt7j8rupY
-	ae3HKSLbVf7rb/2BiJsOQATV4rhMCX/HU6WAXkIHuljdDXgifUCkJRjB3yQEaA==
-X-Gm-Gg: AeBDiesM4nlvRQ1f2lxBf3h1OdaAcexrc2EstfBBwnNK8WVB+FoQ2v3EofDeh9Kuv9n
-	XA4suMJPPlFwDbtM2c2xwJyrj1hdRC0zvC2Xp8MAB0T6eDOIFRDVTV28q2SJ0cEGpnZRgBQgObG
-	u6+IKlKaWWh6mFgFFlIRmfQKb8/b6PXHzbumyJOZsKvn72uNW2hpt6EYSRZvafVdXaR8VPTu9Hi
-	osTi9BtE65tlIcC0U3HvZSG4sXaCvwYYsGbixv0DIB0UxmTzPi+YquPq01nMvBA3/vPQz8MPT4e
-	5IYtxOqCW7jY274VSnLW4JtiVFiX0X6gGcQbcSNam1A0UV9Zo8GexCWYCGSQZVzyAoQAeR7bH5Q
-	3F9mtMFqs+XXGZwMBFk0yUFUSEyzyKPWk3AKZWgIhXLVR1lhZU0BPNm7S9kiO6UaUy4Q0+xsRgf
-	Sq2oavXEcQEQr2+b72RkPYJIhDS9zBedn67tqCcpbRQKO0w+86rWvEzoPCGuCiBw==
-X-Received: by 2002:a05:6870:9a1c:b0:42f:ee6c:35fb with SMTP id 586e51a60fabf-434f64e9150mr7554864fac.20.1778252037459;
-        Fri, 08 May 2026 07:53:57 -0700 (PDT)
-Received: from localhost ([2a03:2880:10ff:2::])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-435573e94edsm1993038fac.13.2026.05.08.07.53.56
+        d=1e100.net; s=20251104; t=1778252038; x=1778856838;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=p3yf/0EioU1Vkg8reIOYdru1mIh+jCd1PePb15OVlfI=;
+        b=a5z/I4JaumvGoHNGHDpN0NiD8Feg9MHC8UeY83xRFLIa1IhIQiLoB79WO7bPNjqauX
+         DTP+qUd6PMwv/kIzjmyPG66Fcm97A2ItYLU54Y7CVdVmDkpKP2t1a2CHCE8VuHklFUYH
+         uKWUIzlRmQ4iBFvgJnlhsf22aQ/wx7aNI8rZgoy2aQz14stP2lBwSAGtFYYf/+1lilgQ
+         Va2d/7VtDuCThnnQ8vqoer95O6MzxWtiqczPnOU77RW+i+W/IxNckWcRXbo7Xxj6PoCd
+         pILyZMIQO/6YSvd+1Ekeh5VgcHOEq8w11e8VVOO1l7CrDJI123ZfInoAzw58ha0wVAMc
+         qe3w==
+X-Gm-Message-State: AOJu0Yy1TpbxWdSR6QMvFboR+FAmcbuAPP49QjeYex4z03N82AdiAxt0
+	rHcT9Y9XIdJjWhUwbWdEP+rfgOHpREJePWwCWBSnrWn2/tNDcX7yTRt2mtPGTg==
+X-Gm-Gg: AeBDievwGeKPt5NuYX2q5zseC1deBf58WCBxiq7GGuMim+RWFTTE9A5rvVH1D5YV37T
+	63/UQpzF80DwyXWbk1TybMPM/yuWD3UiH/nfnDLU11lwG7wZb4rh+jjHZSD8V4H7y7NjiXxget4
+	E37mM00x9ntqMUBIWKJMnUdXP16CQHb+o/wV75lLaCx/q/0qupVJNpTZD8XPJUdPRFS6WXNBqF0
+	1BEwcEr5GewXEXiX6yfzm+HtYRcUreKhFeMrQJ0Gl9rYhsp1lavPOxJ92ie/hPspIgn2yyB+PCX
+	k11Iy/0UD0Ng0Y8Fgh6u1r2g2VqSAds+mVut2c6mBZbBgAYrW305Z3f1gKwBTKhNwmN0qc9OqXq
+	fWiKNew1Ia4M9sUmC65i61gkE6DpoUpZU31Y+v3piJH/1qlFSejWrrh62tyauqmv9rh87xkRBLZ
+	zMk62VE8wti5HQVrK0Tr2xc3EqW6F215kAJrV9Du6hrQY2LxQp8Y1Z
+X-Received: by 2002:a05:6820:3106:b0:696:924d:2fec with SMTP id 006d021491bc7-69998d5e1b6mr6025442eaf.56.1778252038577;
+        Fri, 08 May 2026 07:53:58 -0700 (PDT)
+Received: from localhost ([2a03:2880:10ff:52::])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69b25c76cc4sm1213298eaf.6.2026.05.08.07.53.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 07:53:57 -0700 (PDT)
+        Fri, 08 May 2026 07:53:58 -0700 (PDT)
 From: Daniel Zahka <daniel.zahka@gmail.com>
-Subject: [PATCH net-next 0/6] netdevsim: psp: implement real crypto
- operations from the PSP spec
-Date: Fri, 08 May 2026 07:53:43 -0700
-Message-Id: <20260508-nsim-psp-crypto-v1-0-4b50ed09b794@gmail.com>
+Date: Fri, 08 May 2026 07:53:44 -0700
+Subject: [PATCH net-next 1/6] netdevsim: psp: reset spi on key rotation and
+ check for exhaustion on alloc
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,28 +87,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAPf4/WkC/x3MwQqDMAyA4VeRnA2k7RjMVxEP4tIth6WlKaIU3
- 92y43f4/wbGRdhgGhoU3sUkaYcbB9i+q34Y5d0NnvyTHoFQTX6YLeNWzlwTUnCOYvSvEB30Khe
- OcvyPMyhXVD4qLNd1A6Qs1BdrAAAA
+Message-Id: <20260508-nsim-psp-crypto-v1-1-4b50ed09b794@gmail.com>
+References: <20260508-nsim-psp-crypto-v1-0-4b50ed09b794@gmail.com>
+In-Reply-To: <20260508-nsim-psp-crypto-v1-0-4b50ed09b794@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Paolo Abeni <pabeni@redhat.com>, 
  Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 X-Mailer: b4 0.13.0
-X-Rspamd-Queue-Id: 0729B4F828F
+X-Rspamd-Queue-Id: DE8EC4F8259
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285871-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285872-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -115,7 +116,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -126,53 +127,57 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,psp.py:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-My motivation for this series is to enable packetdrill [1] testing to work
-with netdevsim the same way it would work against a real NIC + driver
-stack. That means being able to write already enapsulated and
-encrypted packets from userspace into a packet socket (skips normal
-psp tx path), yet still trigger the psp rx path (decapsulation and
-metadata creation) just based on parsing the bytes "on the wire".
+The PSP spec states that the lower 31b of the SPI need to be
+non-zero. Though not in the spec, I think it is reasonable to reset
+the lower 31b of the spi space after a key rotation, and to also
+decline to generate session keys when the lower 31b saturate.
 
-I will add that I believe this also has the benefit of making the
-netdevsim code higher fidelity by removing the fake authentication
-hack used by data_send_bad_key testcase in psp.py, and replacing with
-true authentication from aes-gcm.
-
-The header parsing in nsim_poll() may have some side effects on
-non-psp paths from the pskb_may_pull'ing in nsim_psp_handle_rx(), but
-that can be avoided by not configuring psp.
-
-As for the code, I believe it is fairly straightforward. It implements
-what is described in the psp spec. It preserves passing behavior of
-the psp.py tests, and I have tested the crypto interoperability with
-an nvidia cx7 card.
-
-[1]: https://github.com/google/packetdrill/pull/100
-
+Assisted-by: Claude:claude-opus-4.7
 Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 ---
-Daniel Zahka (6):
-      netdevsim: psp: reset spi on key rotation and check for exhaustion on alloc
-      netdevsim: psp: remove unnecessary UDP checksum computation
-      netdevsim: psp: move rx processing into nsim_poll()
-      netdevsim: psp: implement kdf from psp spec
-      netdevsim: psp: add real aes-gcm encryption and decryption
-      netdevsim: psp: count rx authentication and length errors
+ drivers/net/netdevsim/psp.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
- drivers/net/Kconfig               |   2 +
- drivers/net/netdevsim/netdev.c    |  18 +--
- drivers/net/netdevsim/netdevsim.h |  19 ++-
- drivers/net/netdevsim/psp.c       | 333 ++++++++++++++++++++++++++++----------
- 4 files changed, 272 insertions(+), 100 deletions(-)
----
-base-commit: 6a4c4656b0d2d4056a1f0c35442db4e8a5cf8021
-change-id: 20260430-nsim-psp-crypto-03110ff293f1
+diff --git a/drivers/net/netdevsim/psp.c b/drivers/net/netdevsim/psp.c
+index 6936ecb8173e..5073bda60883 100644
+--- a/drivers/net/netdevsim/psp.c
++++ b/drivers/net/netdevsim/psp.c
+@@ -132,14 +132,14 @@ nsim_rx_spi_alloc(struct psp_dev *psd, u32 version,
+ 		  struct netlink_ext_ack *extack)
+ {
+ 	struct netdevsim *ns = psd->drv_priv;
+-	unsigned int new;
+ 	int i;
+ 
+-	new = ++ns->psp.spi & PSP_SPI_KEY_ID;
+-	if (psd->generation & 1)
+-		new |= PSP_SPI_KEY_PHASE;
++	if ((ns->psp.spi ^ (ns->psp.spi + 1)) & PSP_SPI_KEY_PHASE) {
++		NL_SET_ERR_MSG(extack, "SPI space exhausted");
++		return -ENOSPC;
++	}
+ 
+-	assoc->spi = cpu_to_be32(new);
++	assoc->spi = cpu_to_be32(++ns->psp.spi);
+ 	assoc->key[0] = psd->generation;
+ 	for (i = 1; i < PSP_MAX_KEY; i++)
+ 		assoc->key[i] = ns->psp.spi + i;
+@@ -162,6 +162,10 @@ static int nsim_assoc_add(struct psp_dev *psd, struct psp_assoc *pas,
+ 
+ static int nsim_key_rotate(struct psp_dev *psd, struct netlink_ext_ack *extack)
+ {
++	struct netdevsim *ns = psd->drv_priv;
++
++	ns->psp.spi = (ns->psp.spi & PSP_SPI_KEY_PHASE) ^ PSP_SPI_KEY_PHASE;
++
+ 	return 0;
+ }
+ 
 
-Best regards,
 -- 
-Daniel Zahka <daniel.zahka@gmail.com>
+2.52.0
 
 
