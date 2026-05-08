@@ -1,121 +1,158 @@
-Return-Path: <netdev+bounces-285785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285787-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ABqoBoDT/Wl2jgAAu9opvQ
-	(envelope-from <netdev+bounces-285785-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:13:52 +0200
+	id kJojEbbT/Wl2jgAAu9opvQ
+	(envelope-from <netdev+bounces-285787-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:14:46 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CAEE4F62F5
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:13:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B5A274F6335
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:14:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 352583087288
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 12:07:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4225930158BF
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 12:08:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6CC93DBD4F;
-	Fri,  8 May 2026 12:07:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E6A37FF76;
+	Fri,  8 May 2026 12:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="iyPcTCBv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bfmWwOtd"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0CBA3A1A54
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 12:07:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 366AC3D0918
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 12:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778242049; cv=none; b=QZR2Xug27xdtMxiF+dQyqJ32U3azMJbOqW+QNBBbdmjzb3mDlTQsFPQvebtJ6T15Ft/Oppo22Rtccimrtd6cP4WNh9eRSPw5tkoPsdXH1iHGF3lzn524ADWLQhZ/8DRLa4XJCaywCQJ616LQoUU22fg4z0u72hZ91GKp2wf2zeY=
+	t=1778242137; cv=none; b=k7yATO2wdnb9UtQn113uLf9D4m8MjNECsCja5NrPmUBBLzTNVkUUCRH6Fqctvd6sYBsCjRrUEY9jUam4BeEDlEw+ArxPI5SoE6dNVXNhsKxR+c+JCB5bHDUIrw6Ioc5KEvIFemj4g958eSRHbLnbNAD5B3oVeJuoIgbH8E3qMAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778242049; c=relaxed/simple;
-	bh=QbDTVF2ImXMDl2jgCVZV89KZ7SBcRmn9NE8pN7GIF7Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gi2bg7+e7J7Bltw63QD2huUcmsFBind3OkQ/y5eVstMk+dKUZHkFFHTs5teM1/YoNFlefvxsL3qw8HjsU2n/LqgJ39eRW2V7Jz6MpasD6SBZFaiF6pCEmcy85AAoNaaxUD7apyD/CTbpfmCfn14+zemCwRvN224etRFa9KOnAm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iyPcTCBv; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8zKC6bgCNQ22N5CFjyOJGIo+pSm6Ry0GOh6h1WUxHF4=; b=iyPcTCBvpkw+uSGyG3dNh174BJ
-	pocFtQ3A/q4eOQSeqRmqCxg78qnY3uh55h70tU9Cy4MrIlS/x9FiI1EHVFj77Qm0fG5PjSqcrB3iJ
-	gOez8KbmRnpskikzAHEECCi7hDVDZ6cFCJGfWMTS42Qr1kQ9klspJKjiQjnE0kqztq+I=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wLJyy-001xgE-6u; Fri, 08 May 2026 14:07:04 +0200
-Date: Fri, 8 May 2026 14:07:04 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tao Cui <cuitao@kylinos.cn>
-Cc: leitao@debian.org, vadim.fedorenko@linux.dev, davem@davemloft.net,
-	edumazet@google.com, horms@kernel.org, kuba@kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH net v2] net: ethtool: fix missing closing paren in
- rings_reply_size()
-Message-ID: <1c5f2275-17f0-4a80-97db-61af3129e6b4@lunn.ch>
-References: <af2tj9AkacSUfsp9@gmail.com>
- <20260508100435.186819-1-cuitao@kylinos.cn>
+	s=arc-20240116; t=1778242137; c=relaxed/simple;
+	bh=S+AcWVmLoet6g9VZdUwzYxVEGVFSw/VjPbZZzfwKjvg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=iqRicKRKVBkJlo+nzryJtyq7DXMzhKEFsYCjFM6AtT4zlyTJRTTysczwqpFY6wadnZ2LIDyD8cMkLqiPVvZLPq4xwbFEv/m9qsOAhRXnaJsGejv3oBEQfDf3AiNfaeLjO+SV2YBz3rJM1Diz2dOW+SLYLaQcSd7HXXTN535j80o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bfmWwOtd; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-365c5ca76fdso1600174a91.2
+        for <netdev@vger.kernel.org>; Fri, 08 May 2026 05:08:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1778242135; x=1778846935; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=o1XcD/NkGd3x78OcBs8IiVYHbP5jUQCOzADI2FH/BY4=;
+        b=bfmWwOtd0K2vRNyX8z1TXiLWjzAxVmKzvlb1DoGXUgrkJRdrP2tBGU9ryRAmyd0FLF
+         CqSbp9lK+OvFiFDKRD1c11Kq2L0xtXtlA+sepyV5+WtrzxAfYtcuvs//WuqeU6AaIiwH
+         vvPw4YfeslRV1f7e7td8wneHrCYe0URN3a15wDC+AzeUdEhA+0JL11nSloHLN/gP9tsi
+         kLaDXaJNa0ka/DdFur7Dfq1a3xtq5nD5jSOzYd5FFUHbLuQ/J902SjwA549gPPTeU6Ym
+         Mb4e9N0tYNd2XX13nboVxALgorpMv4UNgJDupmVr51otOmo/g3X9qv8I8E1SXN5t5cnw
+         Wzvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778242135; x=1778846935;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=o1XcD/NkGd3x78OcBs8IiVYHbP5jUQCOzADI2FH/BY4=;
+        b=P6niL+V5WPa0F0utqasAYhNJhdJQ976YW7tkkG3LfHyWEcduZW7R9R5IvvZQf+Qd+V
+         DrZlEqZDgb8PjYe2hv+6oWU7S1+bwNwkhvBW0oYfAOfRensE2rzIoESlCmFHYBQdoUGk
+         HH5Ixa/NUNGFaqipxSPW9toDbL1VMuDQfq/AXWQPOV13Zh9wYaP9EBI0hln+BgSm7GOR
+         jBC+X2bgg9AQOw+DcwkrndftlVrTQI/731PbGCKJdccz+OMmQR3+nBmDktj5+RdFmZoD
+         sNpgdaAnjiX3rFDxR++c+GC6FvpeL8QXp9ZU4bqT0kBjOFM5rHCauRRMhw3DVkA5zKGL
+         lJUA==
+X-Forwarded-Encrypted: i=1; AFNElJ/YWrYUReg4T9zhxiVFWRwYgvWnFuG2zHRX06Ap1K7lSCRKr+9A7lVkSzgk1X1h1BnPMJ8NCiI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8IkHpG+oEnL2pSi3i7S+upvNlpOd1mKUt32O4bkOnLwjiIEQb
+	4iQfL7Ej6AYfygTBver7c5OggMsQwCZ1tvxprRpVMZtW08zSO5Rn26ebEgOrNLYe5XlS3GuPyT9
+	agqSwbg==
+X-Received: from pjqt4.prod.google.com ([2002:a17:90a:ae04:b0:35f:ba7a:947d])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2f4e:b0:35f:c46f:2b0
+ with SMTP id 98e67ed59e1d1-365ac080c4bmr11271691a91.14.1778242135316; Fri, 08
+ May 2026 05:08:55 -0700 (PDT)
+Date: Fri,  8 May 2026 12:08:46 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260508100435.186819-1-cuitao@kylinos.cn>
-X-Rspamd-Queue-Id: 4CAEE4F62F5
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
+Message-ID: <20260508120853.4098365-1-kuniyu@google.com>
+Subject: [PATCH v2 net] tcp: Fix out-of-bounds access for twsk in tcp_ao_established_key().
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Dmitry Safonov <0x7f454c46@gmail.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	Damiano Melotti <melotti@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: B5A274F6335
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	MID_CONTAINS_FROM(1.00)[];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285785-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285787-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,google.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email,kylinos.cn:email]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Fri, May 08, 2026 at 06:04:35PM +0800, Tao Cui wrote:
-> sizeof(u32) on the _RINGS_CQE_SIZE line is missing its closing
-> parenthesis, causing nla_total_size() to absorb the subsequent
-> _TX_PUSH and _RX_PUSH entries. The resulting size estimate
-> happens to be numerically identical due to NLA alignment, but
-> the nesting is wrong and misleading.
-> 
-> Fixes: 4dc84c06a343 ("net: ethtool: extend ringparam set/get APIs for tx_push")
-> Signed-off-by: Tao Cui <cuitao@kylinos.cn>
-> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> Reviewed-by: Breno Leitao <leitao@debian.org>
-> ---
-> v2:
-> - Added Fixes: tag as suggested by Breno Leitao.
-> - Added Reviewed-by tags from Vadim Fedorenko and Breno Leitao.
+lockdep_sock_is_held() was added in tcp_ao_established_key()
+by the cited commit.
 
-Please always start a new thread for a new version of a
-patch. Otherwise the CI/CD system just thinks it is a comment to an
-existing patch.
+It can be called from tcp_v[46]_timewait_ack() with twsk.
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+Since it does not have sk->sk_lock, the lockdep annotation
+results in out-of-bound access.
 
-	Andrew
+  $ pahole -C tcp_timewait_sock vmlinux | grep size
+  	/* size: 288, cachelines: 5, members: 8 */
+  $ pahole -C sock vmlinux | grep sk_lock
+  	socket_lock_t              sk_lock;              /*   440   192 */
+
+Let's not use lockdep_sock_is_held() for TCP_TIME_WAIT.
+
+Fixes: 6b2d11e2d8fc ("net/tcp: Add missing lockdep annotations for TCP-AO hlist traversals")
+Reported-by: Damiano Melotti <melotti@google.com>
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+v2: Ensure that TCP_TIME_WAIT does not evade RCU lockdep check
+v1: https://lore.kernel.org/netdev/20260506172830.2237574-1-kuniyu@google.com/
+---
+ net/ipv4/tcp_ao.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+index a97cdf3e6af4..0a4b38b315fe 100644
+--- a/net/ipv4/tcp_ao.c
++++ b/net/ipv4/tcp_ao.c
+@@ -116,7 +116,8 @@ struct tcp_ao_key *tcp_ao_established_key(const struct sock *sk,
+ {
+ 	struct tcp_ao_key *key;
+ 
+-	hlist_for_each_entry_rcu(key, &ao->head, node, lockdep_sock_is_held(sk)) {
++	hlist_for_each_entry_rcu(key, &ao->head, node,
++				 sk_fullsock(sk) && lockdep_sock_is_held(sk)) {
+ 		if ((sndid >= 0 && key->sndid != sndid) ||
+ 		    (rcvid >= 0 && key->rcvid != rcvid))
+ 			continue;
+-- 
+2.54.0.563.g4f69b47b94-goog
+
 
