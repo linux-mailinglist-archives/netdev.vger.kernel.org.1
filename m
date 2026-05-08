@@ -1,322 +1,154 @@
-Return-Path: <netdev+bounces-285952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285953-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yNuvLpIk/mlTnQAAu9opvQ
-	(envelope-from <netdev+bounces-285952-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 19:59:46 +0200
+	id 0MqsEnEl/mlTnQAAu9opvQ
+	(envelope-from <netdev+bounces-285953-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 20:03:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AF844FA4E0
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 19:59:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAA6F4FA587
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 20:03:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5DBDA30436B0
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 17:59:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 500B73036EE6
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 18:02:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8A61355803;
-	Fri,  8 May 2026 17:59:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAA002F5491;
+	Fri,  8 May 2026 18:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WBB8vOGM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YR75U+hL"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012063.outbound.protection.outlook.com [40.93.195.63])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AEFD3D891C;
-	Fri,  8 May 2026 17:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778263158; cv=fail; b=ST+t7LVYdoK2/hNn4mm17Bb5TYYUDNBnydKU1zS5Ppky9F96fsTViT66bqO4JIHQEH5gDJXdRzpPZA8ACSrc/cXheEALQIj4lTf2kk8GEygjECm7iihkap5BMENDd94e0nbQcRESX1d+WwJcF80zFIRKqsiuqfRJ+v2eLFmMHb4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778263158; c=relaxed/simple;
-	bh=mLb//v6M8jWWIODlwSTSTQ0nnhLZ8+OpSJh1t08b9JA=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=X605z+lIXIm9v9+mGE9E06ptRT1lKl7K7IdgvDuUHeLSwdX8pKLQRd65BgNy2Gmr4YkmVva53sFFZNkKuAMyrrtvZwv8Y7FZVNgbsujc6J07P3DgAOX5WapljlvM5eF7X/jvmqtBqTzXL1I3+/iJKQ+lIbJRbWj/L27osrpR5as=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WBB8vOGM; arc=fail smtp.client-ip=40.93.195.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LL/FHeenTPm3uhB3xf9DALhqgYP8D1CpyZPDpRhb0ppuCG/zBGXXwgMfHZfgfc9/DHEbklxPWJZklJ7kcHPFCv285Z/HdGaTdTBCXKUW87mmUC4FmOD6KlGBs+KbIE3TneH7udCpJOCelxkU/0p78u+VE3SK224Ih0WHYjeIWRoAhppNGyIN1GJrOTTpmc9qydS2BtafSu8JZ6xtUi9MWEYj5r1a91237/DU0YuWk9uIgtMy4CvfMhV0q+HdSpZhVrWwOnofe4ASwgf9Q7HkNqG3ha6nTS284FK8iruatyeM2ldQak17bQw13g+38U4smiz4vy8n5K8bOB+m2Hj8gg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vW83zg3kDEpFAByyv53bYOGAjqM5RkwAu/rv/m+Xqmw=;
- b=q9lEw66K0JDQlnLW4MWX4H8QBEx8jLBhf1a9opXOfCWV7k9ffeb9sn7OHBTktnrKiK+RjT1pNv97WMmGO08o+OgjKos/6R+hCDNRLuEUNWsh3eXaBou9hl9Vee+u6lIZFmYeER9SKZs6gpXeK06jEZJqLEW8ytpNJG3XyPXsELiZVqSFnTty1jvyjBcwN4fipqlVi+u/XtPe18OzFQbY2cIMBjo4JdCtfYcFFu9RtRfTQKFpNty1G6sYgT4Y0TZzGAQ4rDLMeLo64OO58P7zv1k16GwTduiglv9TE0WvUIAratUsbG9moajzOybqHlxuc5BTXKHBafUcJMltzZIA/w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vW83zg3kDEpFAByyv53bYOGAjqM5RkwAu/rv/m+Xqmw=;
- b=WBB8vOGMBzZf/786AdbuPRCN03cDsVuFc95IS24TsTYAmiG36RNCu7e+byol6Ko3DE3PATrTypqEeGs9oZ3XiGTT9RqKwrifOiqYEY5EFGi4vSMbd0O7U+IU6AXNuVkNBFGNjuh+fvqL9qNTrzGgfOvBQpiSUicxoZT7JoGDSVK8v1VXoz3O5wJy6ieiL93H9tfJT2acxbT76g9uLuy5ZCETZGKjEtS7r7reoE0ulKQbZudnYgVyrlEd2fUtzPMoKN1DLC7nsquqQQvxvochwOGapP0K7GLm4CeUzf4BfvvuoSN8I/wz+oTBBUfGx7QSsezpD8buEk2OvJ2OquWIoQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from IA1PR12MB7541.namprd12.prod.outlook.com (2603:10b6:208:42f::13)
- by IA0PR12MB9045.namprd12.prod.outlook.com (2603:10b6:208:406::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.20; Fri, 8 May
- 2026 17:59:09 +0000
-Received: from IA1PR12MB7541.namprd12.prod.outlook.com
- ([fe80::4445:7716:8576:62c7]) by IA1PR12MB7541.namprd12.prod.outlook.com
- ([fe80::4445:7716:8576:62c7%5]) with mapi id 15.20.9891.019; Fri, 8 May 2026
- 17:59:09 +0000
-Message-ID: <b6a9b568-dd09-4414-be57-6b9cd282a43c@nvidia.com>
-Date: Fri, 8 May 2026 20:59:04 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next 0/4] devlink: Add boot-time defaults
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <skhan@linuxfoundation.org>, Simon Horman <horms@kernel.org>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>,
- "Borislav Petkov (AMD)" <bp@alien8.de>, Randy Dunlap
- <rdunlap@infradead.org>, Dave Hansen <dave.hansen@linux.intel.com>,
- Christian Brauner <brauner@kernel.org>, Petr Mladek <pmladek@suse.com>,
- "Peter Zijlstra (Intel)" <peterz@infradead.org>,
- Thomas Gleixner <tglx@kernel.org>,
- Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
- Dapeng Mi <dapeng1.mi@linux.intel.com>, Kees Cook <kees@kernel.org>,
- Marco Elver <elver@google.com>, Eric Biggers <ebiggers@kernel.org>,
- Li RongQing <lirongqing@baidu.com>, "Paul E. McKenney" <paulmck@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <20260506123739.1959770-1-mbloch@nvidia.com>
- <aftaW-irGmkfA7FS@FV6GYCPJ69>
- <3f9215c4-7c84-46d9-ba74-30dabe24db09@nvidia.com>
- <afxvzOjqw-vxUAED@FV6GYCPJ69>
-Content-Language: en-US
-From: Mark Bloch <mbloch@nvidia.com>
-In-Reply-To: <afxvzOjqw-vxUAED@FV6GYCPJ69>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0173.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:b7::16) To IA1PR12MB7541.namprd12.prod.outlook.com
- (2603:10b6:208:42f::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C40F2FFDE1
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 18:02:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778263339; cv=none; b=q0gEwQcUtOh258tvWwR7XJc+OF5QYS+11EinR/bSxjdIN/1GN6pw26UGyCe88wECqodVRy/gq2/66gvJ/5+O0XRKaNWvXpbsWUZOXZT5f7MDwM91Rtsw7CNdu45QEh6na/ta9H+tJEIOcgIhOOQx4VLsmdFev+u0OplABmu8+s4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778263339; c=relaxed/simple;
+	bh=HcJz6VMTkfApFdjleG7mQcukjTCAb0JMtV1GPbyQ3D0=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=i14Okn6q7VByfBW4HkiWPMDciOAkZgVvibwS0fbcVKKLflnMQUF9+jMVQBfNytxKWCByiNXIM++oRjjux2GrQymMhKMaCZFLRIr53IM4QDmYkdvxtTvDtZSJ+PQRBZW2ttcRcXkJlzfkS/UxBN7/NCOmvG+BtakZShRHJ5N9GHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YR75U+hL; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778263337;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZGqgfA1J5FpUiR5+Nk8eHRPb/t1oc8uclHJVTxFrrAo=;
+	b=YR75U+hLvZVgck038UhE4zOlhml9RUv4xk+v6ilY4h7XftdmOeTk83SiDiR422oEuoKqPj
+	5ZjgYobDoD1ByhIFB2JYydoY+ee4mcHHVkET2GX+sb51+80MRQMBSThtcLwD6L7UcjmJo9
+	oC5ztdZd/SIhiO2t/UxYJxX9rFnxCos=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-617-P0XOWXJkNMKscSXIyy0kXg-1; Fri,
+ 08 May 2026 14:02:14 -0400
+X-MC-Unique: P0XOWXJkNMKscSXIyy0kXg-1
+X-Mimecast-MFC-AGG-ID: P0XOWXJkNMKscSXIyy0kXg_1778263332
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8EBDD18002C8;
+	Fri,  8 May 2026 18:02:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.48.83])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3D43F1801A63;
+	Fri,  8 May 2026 18:02:07 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20260428024400.123337-3-ebiggers@kernel.org>
+References: <20260428024400.123337-3-ebiggers@kernel.org> <20260428024400.123337-1-ebiggers@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: dhowells@redhat.com, netdev@vger.kernel.org,
+    linux-afs@lists.infradead.org,
+    Marc Dionne <marc.dionne@auristor.com>, linux-crypto@vger.kernel.org,
+    linux-kernel@vger.kernel.org,
+    "David S . Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next 2/5] net/rxrpc: Use local FCrypt-PCBC implementation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB7541:EE_|IA0PR12MB9045:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1bfaf233-7020-4530-9561-08dead2b80c7
-X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|3023799003|56012099003|22082099003|3122999024|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	AO+BO6iLlbOTAXtCE3nfO/9PaUiRNmTfS4t9FWXVU77xA+r6Ch+btjg7gI3gwNdNaX2aOaq64MFze5wj1XshAFzk5pfE/GaMo0qJ3A8zY9Ju3NBcoA6sMkkAi7RFhF4id0HB98EO/ivRV+mHHV2I4pJcQIY91As5ocSc/z7GFNYr2KK7hcYaZ3rFc2zoZoO0QxUIbAOOfRWpwTMtqTkYYWYbERzBCq/SWcP/6c98qToNRW3iJrWptFqZK2tNEdFBcWrFWIVY1gYI5qUnzYrKP4Kx6sqZEXNiWhBqTqyguRoBTGtc9aUHMW1tcUyNRHjwJs695SeJ/Ic4Jl0CigpzgdLsAm0Dfy7mTmwVdQxZizyM3W01x/EsaPK5W4X6vsEHaOw+8XdyG+S+R30kvXp878Hk9RQPWcS7wBDaEtTRATpmX02T9juzXWIPyTbsBK/7dEZbhC97JpgWvRjQV9s1VvPjmExDygNt2jJe5/SFhil5n9PhAKT3ikSHMkrYqqjR6gv7Txi35wQkxaXZBhea7bEfkuiRNgymUVzKzghztnKcL/6li6Ud/49k2dEa5NiAYlEeF2IqYQYgijgRp2ExeDxDeR3hfmXy+i/efZ8O1e8qhkLAt3AxWvVUpCjNwi8A9caCtGIvJLccNvHckxfTDGrVj0pX/jWnw3SIUvz7TPgQZKM1+Y96J0fLMu5ls3N0a0EzAxrD4J7kcibvHsmqlg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB7541.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(3023799003)(56012099003)(22082099003)(3122999024)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SXVLVmlSSG9ZYmRtODBEZ29NZ1ZZODJmVWZWVm9yaUltdkU2WHpFNEhnL3Vh?=
- =?utf-8?B?SU5GMDFSOFNIMEJyM2NvV3ViOFlrNzZGWTRsQWpTT3diUEl2UWU3UUJzeFIz?=
- =?utf-8?B?OURJZFdwN2FQcVIzVHRlSjkrSytJejVSNjNCbTBLdUlUb1FiazdybTBFVFAv?=
- =?utf-8?B?a0E1RXNGUzFRMlZNZWRiMk9Sd0JLNkkzK2lEanczeHVpNVZydWlvTzlBbllT?=
- =?utf-8?B?UlRiM0dLbHRwOXZibUJ6UXFoZUN5SFVVeXNFNVBSUk1weHpBamM2RUIzR2lH?=
- =?utf-8?B?ZnFpeXgvQTA0MzBac3NwU3phSmQvM1lJOER5dkd5UWt5VUhXRmF2TTN0WjBG?=
- =?utf-8?B?VG5GQWtiQUphTHJPWGlYaEVlU3cyWTFjT3Z4dSt2Z1h1L2pUQXM3SnJPL0s1?=
- =?utf-8?B?S0hQZTU5MGlFYUw0NVRjRUdBK0Rza095dmoreFRBdFRHZU1QNXlRRVc3Mkpy?=
- =?utf-8?B?KzRXTU1nNFNJMWJYYU5BS3lnbEIyaFhhdFBlU2J6Q2V3Qnl2YUZvN1pJZkpH?=
- =?utf-8?B?TXQyQWc4TEtuRytPNXF5eitzN0NaWDhWQk5JYmxvem03RXIxeWxWZW9FbnRF?=
- =?utf-8?B?dnZhakp3dmc4OUNHNVhEZ2tuQUhlYTRuYWtoR3JkZktaeXpoLzIvQ1I1TkJ6?=
- =?utf-8?B?YVczQVVFOE1WWWN4b3FyRVF0MGtqTjdpc0Qza3NaK2JSNkJlQzFYMnNHZkdu?=
- =?utf-8?B?K01LL3hRdU5ZL05CVHBLcSs1YkxlSkUrU0FuQjlYUXphOVc2R1VaWXhjWm5x?=
- =?utf-8?B?TXhPNnVQSDlJSW1pVFJWeGRZZzlISmlFWmhFN3R4Y2VUR3AvanJjR0xPQ2h3?=
- =?utf-8?B?RHI3NG0zbE1vV2xkOGt3WS96UVFSeGFicDNGUGlBUTNrcHl4N3B2OEllVkh6?=
- =?utf-8?B?OWNNRVlyVDlRbFc5dElVSm9Db1lnTzFLc3NtK2lQRDZWNk9rSzhVZU1QSWIr?=
- =?utf-8?B?MlJsQmpYZG1KTVprdGRNZGZvM0tMd0NoUFoxbUVaY3cvcnc2aG0wVjMya2po?=
- =?utf-8?B?dExvU0NUZ2s3UHlUR3Z5bXBWZnBJdnFMOTdUa2poa1NVZVc5Tm90MzhnVzhF?=
- =?utf-8?B?YVRyUXFkclFPeURZVkVVMXFXNVVWcVBoVmtLYSs2R1ZDOTl1S3dmdFNSdEM3?=
- =?utf-8?B?Rkx5ZkhmVk9CZ3BvaENCVithOEJ3NHh5WXl0dW55Q292WmdYMkd4T1BFbDdo?=
- =?utf-8?B?M3lLVTNRclY1UGtXZjZENnV2Yk5tUnd0K1RLNk5kYXJPaDlRQVJycEdyMW5r?=
- =?utf-8?B?QmxzY3hVV3FhTzhFeFRhbzVkUFZsbEpCZXZqVDhTOWFsNU9Sc0p5S3o3cmI3?=
- =?utf-8?B?L1I0WEVZNVdpMWJ0OEhrVnZrU0QydEJxVTRkc0l5K0tKS0lLbUV2OWpUcEt4?=
- =?utf-8?B?NWw5MDRISC9FR0JxN1gybWZJaUx3bDF6NG9UaVNaS0hTVlh4VmtkTzNYZUV4?=
- =?utf-8?B?cEFpQVkxamxmUXEzT3ZMVmphbEFValdYanVxRWpsd3VTYVJzdUdiT01Lb0Z3?=
- =?utf-8?B?eXQxQXd1MFhUVC9OM3FJTHdYUGN0NDNOYkxVbSt3ZEhrd003T3VyU3daNEVt?=
- =?utf-8?B?OC9DbjVRWDB3ejBlWkw4Z1A3Q290Wno0b2Vud3hlQUFRYVBhaHZTV3lyYnkx?=
- =?utf-8?B?L05xVFVlYmZySXVFUUdQUTU2dHZGYmdtampTZ0k0WDBLeVBqRlRxR3VlWDdO?=
- =?utf-8?B?U0x5T2libVdIU1B4NUVrSTFHUllSZlZoM2VjUndYUERZcWtNV05SbDRlaHZi?=
- =?utf-8?B?SXNoaVNyc3NrRC9EQlFVY05DVEREVlJtTkk5QkhpMEQ0RnZLUVVvZFpiNUY2?=
- =?utf-8?B?dUpsTExER0hsSm9lYXVkUGRYUHp5NHgxWmFPSTZJVWlKbHRFZGpNdnV0SlBk?=
- =?utf-8?B?KzladUY3eDF6QmdQQ1htRDRKWkN5V0R0QTdROGVjUXFtVFVUdmpsSDFIVjhk?=
- =?utf-8?B?c1JUSWtXbGFqQ3JCd0ZGcy9zOXArYzI2cFVZQmhEK2NqVVZmRUU1UkNmZjRY?=
- =?utf-8?B?bThWMk9mdjBtV0tvVDQ1enVmbFRaM0h0M0ltR1Q1NTZHYkpKQTkvWXZBOU11?=
- =?utf-8?B?NnZmS2ZIdkg4bmlLQ0ZrR0tXbVdudmtKRWwxZmhCZTdqc2N0NERHc1J1TURZ?=
- =?utf-8?B?bEZqYVN0SmRnYmY2eEpUZVliMkkwM25zZU9hTXM4bEplNUtTNnJPdWZDVlZS?=
- =?utf-8?B?UXFQUmhncjRqWWloR3Q1YXJITmlvc1VOYm5pb3RLcTZrc2ovNnFYV1dHenhR?=
- =?utf-8?B?Z21TTzNtdCtGRU8wWER0MHZwR1AvTkhvd3dLWk9Xb3JVZHZEU3JWSVpocWNV?=
- =?utf-8?B?Qy9LY3NhQVBPRG5TWFBXUFZNV2VTVFFSTkVOSExTTk1CZzN5a2hudz09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1bfaf233-7020-4530-9561-08dead2b80c7
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB7541.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2026 17:59:09.1602
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vUmtVmq1W+IIHrsogdJsLAeCkrLXSqu4PgpP9A6bwr+dQYWLV4esDNjC700TxdDOKLVyLvWsVfc+NVVZetY4YA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB9045
-X-Rspamd-Queue-Id: 1AF844FA4E0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <286247.1778263325.1@warthog.procyon.org.uk>
+Date: Fri, 08 May 2026 19:02:05 +0100
+Message-ID: <286248.1778263325@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Rspamd-Queue-Id: AAA6F4FA587
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	TAGGED_FROM(0.00)[bounces-285952-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285953-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mbloch@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email,nvidia.com:mid,Nvidia.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
+Eric Biggers <ebiggers@kernel.org> wrote:
 
+> +	if (skb_linearize(skb) < 0)
+> +		return -ENOMEM;
 
-On 07/05/2026 14:03, Jiri Pirko wrote:
-> Wed, May 06, 2026 at 07:35:10PM +0200, mbloch@nvidia.com wrote:
->>
->>
->> On 06/05/2026 18:22, Jiri Pirko wrote:
->>> Wed, May 06, 2026 at 02:37:35PM +0200, mbloch@nvidia.com wrote:
->>>> This series adds a devlink= kernel command line parameter for applying
->>>> selected devlink settings during device initialization.
->>>>
->>>> Following a discussion with Jakub[1], I am sending this RFC to get the
->>>> conversation moving. I started from Jakub's example/request and extended
->>>> it to cover requirements from production systems and configurations that
->>>> customers use.
->>>>
->>>> One important caveat is that the parsing logic in this RFC was written
->>>> with AI assistance. I am also not sure whether the resulting syntax and
->>>> parser are too complex for a kernel command line interface. This is part
->>>> of why I am sending it as an RFC: to understand what direction and level
->>>> of complexity would be acceptable to people.
->>>>
->>>> The implementation is intended to support the following properties:
->>>>
->>>> - A system may have multiple devlink devices that usually need the same
->>>>  configuration. For a configuration such as eswitch mode switchdev, a
->>>>  user should be able to specify multiple devices to which that
->>>>  configuration applies.
->>>>
->>>> - There may be ordering dependencies between options. For example, in
->>>>  mlx5, flow_steering_mode should be set before moving to switchdev.
->>>>  With this in mind, defaults are applied per device in the left-to-right
->>>>  order in which they appear on the command line.
->>>>
->>>> The intent is to let deployments set devlink defaults before normal
->>>> userspace orchestration runs, while still using devlink concepts and
->>>
->>> "defaults before normal userspace orchestrarion". I read it as config
->>> before config, which eventually could be skipped.
->>>
->>>
->>>> driver callbacks rather than adding driver-specific module parameters.
->>>> A default is scoped to one or more devlink handles, for example:
->>>>
->>>>  devlink=[pci/0000:08:00.0]:esw:mode:switchdev
->>>>  devlink=[pci/0000:08:00.0]:param:flow_steering_mode:smfs
->>>>  devlink=[pci/0000:08:00.0,pci/0000:08:00.1]:param:flow_steering_mode:hmfs,[pci/0000:08:00.0,pci/0000:08:00.1]:esw:mode:switchdev
->>>
->>> I don't like this. What you do, you are basically introducing user
->>> configuration tool on kernel cmdline.
->>>
->>> The same you would achieve with a proper userspace tool/daemon.
->>> I did try to come up with it and push it here:
->>> https://github.com/systemd/systemd/pull/37393
->>> That didn't get merged for unknown reason, but the idea is sound. You
->>> provide configuration files for devlink object and systemd-devlinkd
->>> will apply when they appear. Wouldn't this help your case?
->>
->> I agree that systemd-devlinkd is the right shape for normal
->> devlink configuration, and it could probably replace the udev/devlink
->> plumbing we use today.
->>
->> The case I am trying to cover is earlier than that.
->>
->> On BlueField/ECPF/DPU systems, the host PF driver cannot always finish
->> probing independently of the ECPF side. When the ECPF is the eswitch
->> manager, the host PF is kept in initializing state until the ECPF eswitch
->> side is set up and mlx5 enables the external host PF HCA. That happens as
->> part of moving the ECPF to switchdev.
->>
->> Today userspace observes the ECPF instance and then switches the
->> mode through devlink, usually via udev or similar plumbing. That still
->> leaves a window where the ECPF has probed, userspace has not applied the
->> mode yet, and the host PF is waiting. With many ECPFs this becomes visible
->> in host PF probe/boot time. A daemon reacting to the devlink object
->> appearing can make the userspace side cleaner, but it still runs after the
->> device has appeared and after userspace scheduling/uevent handling.
->>
->> Long term, for these DPU deployments, we would like mlx5 to initialize
->> directly in switchdev. I am hesitant to make that unconditional because it
->> changes existing behavior and there is no early opt-out before probe. The
->> cmdline parameter was meant as an explicit opt-in middle step: ask the
->> driver to apply the same devlink operation during init, before this path
->> depends on userspace.
->>
->> We previously tried to address this with an mlx5 module parameter. By
->> design, that was too coarse: it applied to all mlx5 devices handled by the
->> module. That makes it usable only for narrow DPU-only configurations. The
->> devlink-handle based cmdline syntax was intended to keep the opt-in scoped
->> to the specific devices that need this early switchdev transition.
-> 
-> The switchdev mode was introduced at roughly the time CX4 was out. What
-> stopped us from making it default for CX4+ ?
-> 
-> Introducing this horrible plumbing only bacause we were not able to
-> change the default sounds so absurd.
-> 
-> Can we write the default mode as a bit in ASIC NV memory perhaps? Simple
-> devlink cmode permanent param to write it, the driver can read this bit
-> during init to decide the init flow path?
+It seems skb_linearize() doesn't like being used in this fashion:
 
-I don't think switchdev by default should mean CX4+ in general. If we get
-there, I would expect it to be limited to the DPU/BlueField/ECPF case, where
-the host PF probe path can depend on the ECPF reaching switchdev. Changing the
-default for regular host NIC deployments feels like a much larger compatibility
-change.
+	kernel BUG at net/core/skbuff.c:2295!
+	...
+	RIP: 0010:pskb_expand_head+0x41/0x220
+	 __pskb_pull_tail+0x5e/0x2f0
+	 rxkad_verify_packet_2+0xa8/0x190
+	 rxkad_verify_packet+0x12c/0x150
+	 rxrpc_recvmsg_data+0x1b0/0x470
+	 rxrpc_kernel_recv_data+0xa6/0x210
+	 afs_extract_data+0x5e/0x180
+	 yfs_deliver_fs_fetch_data64+0x10b/0x200
+	 afs_deliver_to_call+0xea/0x440
+	 afs_read_receive+0x8d/0x150
+	 afs_fetch_data_async_rx+0x12/0x20
+	 process_one_work+0x18e/0x2b0
 
-For the ASIC/NV bit: maybe technically possible, but it feels like the wrong
-layer. This is boot/deployment policy, not a persistent hardware property, and
-storing it in NV memory would make the state persist across kernels/hosts in a
-surprising way.
+which corresponds to this:
 
-I do agree the RFC probably went too far by making a generic devlink cmdline
-configuration language. Maybe the smaller thing to discuss is only:
+	BUG_ON(skb_shared(skb));
 
-devlink=[pci/...]:esw:mode:{legacy|switchdev|switchdev_inactive}
+Presumably this is done because fcrypt_pcbc_decrypt() doesn't handle being
+called on a split buffer.  I think this may require skb_copy() to be used
+instead, but that would need to be handled in rxrpc_input_call_event().
 
-No runtime params, no ordering between different operations, just early eswitch
-mode for explicitly selected handles.
+I think rxkad_decrypt_response() should be okay because the encrypted data is
+extracted into a buffer first before being decrypted.
 
-@Jakub, I know you wanted something more generic/extensible, but maybe the
-generic case belongs in the devlinkd/systemd direction Jiri pointed at, while
-the kernel cmdline handles only this early boot eswitch mode case.
+David
 
-Mark
 
