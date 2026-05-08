@@ -1,270 +1,220 @@
-Return-Path: <netdev+bounces-285793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285797-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qOxVKfvV/Wl2jgAAu9opvQ
-	(envelope-from <netdev+bounces-285793-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:24:27 +0200
+	id 6AICGKzW/Wl2jgAAu9opvQ
+	(envelope-from <netdev+bounces-285797-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:27:24 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06F734F6587
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:24:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AA3F34F65E9
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:27:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 96316303CC2E
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 12:18:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 192B63090DB7
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 12:20:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0B243DD535;
-	Fri,  8 May 2026 12:18:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22AFD35C184;
+	Fri,  8 May 2026 12:20:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="NopgsXyj"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="j8aD0fHs"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 368E42CCC5;
-	Fri,  8 May 2026 12:18:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B2830FF21
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 12:20:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778242727; cv=none; b=bmzMm5Yf/6w6We6PnV6ZnQvEo5+hXRloj6PWZRkte75rRS7hGoF2BZXryrDyPC7XhMrvlAW9pOWt/WVo9AAeNcCc9iqfABaKAuSIF0/Uvgmf18NU/VlSFUoOAtdbUOG0ypbRyub9OMye7QhVCtWxPKRN5uQQ3XEnzu0qmS7w0Qg=
+	t=1778242822; cv=none; b=D3Jx8wLWQiDzrDMJF3U8iGvX0j3OdtFYLB/qwDTMFFtQug4JDhR274pflakYZv8wcr5G+3wkb6O7bF0LilKAXzo6jYBHzltITLUn0GmuMlzDXqt9hCPhoz+9p97AvtPZbijLC/P690Wf56JRNy58+Fu4CJ5AbAg2Gpifi8NUnsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778242727; c=relaxed/simple;
-	bh=3/NS0z5S4QaVd3Vu5Kl9y9vQhq27W2rQg5Pd07yZzCI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Enw8Wov6vJFFfyPjmhoIAwVjCZtTlQOh4ikJ4Oisx5XPFOcfnrqgivX+J1k0isHvFOdbtw0rEnALORf3oeQ/2NwiUzTV5AO+koKJ1QkGcmRqberrDfUUzxmLeAqK1Nj7r9C9dDImSRioQGd/Xi1sUhA+gxDrjXsyEOvA2BDncBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=NopgsXyj; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 648CIEqmC3782632, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1778242694;
-	bh=m5nNTAjRQxVVk1OciYWT51Mfyd9BCmD3SPf+JZ+R9ns=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=NopgsXyjO0zYthnfLcg75lM//xNkXLGaEogmCp85B1L6A459cO6G2BB0xvzOm/J1i
-	 6NXnAgzDFuRKWKokETA8uSdkgCViya2PpBQVDncCwOyBfWqcSmFRH99aFoZicZkJrT
-	 OZuaokJiwU/RTUI2lAqQGJ31cPYGKGAidpAiMLjonc3tL4G7OQotQn3NhzxDNUQF7l
-	 rIcjekrQW7WKvR3xIfFMOtalDY/RrEJmvPJ2sJM+TvCneMeJODYD/tujC1EJgQQ30V
-	 KMP63q9Gz0pgP0ZpSjXtUSe6dHrLz644VAjhhlLYnT8klplRrzIJKZrvl1D857Nz5x
-	 NTJZIJRxqQ5SQ==
-Received: from RS-EX-MBS1.realsil.com.cn ([172.29.17.101])
-	by rtits2.realtek.com.tw (8.15.2/3.27/5.94) with ESMTPS id 648CIEqmC3782632
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 8 May 2026 20:18:14 +0800
-Received: from RS-EX-MBS2.realsil.com.cn (172.29.17.102) by
- RS-EX-MBS1.realsil.com.cn (172.29.17.101) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Fri, 8 May 2026 20:18:13 +0800
-Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS2.realsil.com.cn
- (172.29.17.102) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Fri, 8 May 2026 20:18:13 +0800
-From: javen <javen_xu@realsil.com.cn>
-To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Javen Xu
-	<javen_xu@realsil.com.cn>
-Subject: [Patch net-next v2 7/7] r8169: add support for ethtool
-Date: Fri, 8 May 2026 20:18:01 +0800
-Message-ID: <20260508121802.2010-8-javen_xu@realsil.com.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
-In-Reply-To: <20260508121802.2010-1-javen_xu@realsil.com.cn>
-References: <20260508121802.2010-1-javen_xu@realsil.com.cn>
+	s=arc-20240116; t=1778242822; c=relaxed/simple;
+	bh=4vEE2/b1oZRMCPG+2K+JAtmDvlJBK0+IzvqatGl5v/E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iUo8z5zYrh0y+y2wavyzwGCGApwDNRz5EfQA8KIZNhrniCjW4Fshkngoor4X2UBzo039g0uTKmHYAkYD0Hb7te9KnYwDuYMT8NXYXOHMl2IUy1O8v+pyve0xmL/xR1GOs4K05o5EOZv4olee+z5t8W20S+j0bFsY22Nt25C/YPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=j8aD0fHs; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <9362bf10-9ede-4005-8e63-a18dafd7fab0@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1778242808;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Y75SKeSevL3Yn/NaSSjIxUWA5aj0urOj6ugd6tGsN1Q=;
+	b=j8aD0fHs1OVoX/takMidKE59xaxURNObENZhacZCXt3DCqF1w+KCL77TsyXeY1xQ4xWjqg
+	bgxQ5xpcsDD8o6XI5Ly9NCE0vkkLRTYL83TbSipcwQ75Qo0zanyHuZe9Kw0YrKV/K6lxA8
+	5akbLqq1cuf6Q0EC9ZTZnPgfHWApK1A=
+Date: Fri, 8 May 2026 20:19:32 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH v1 bpf-next 7/8] bpf: tcp: Add SOCK_OPS rcvlowat hook.
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Eric Dumazet <edumazet@google.com>,
+ Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
+ Tenzin Ukyab <ukyab@berkeley.edu>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20260508073355.3916746-1-kuniyu@google.com>
+ <20260508073355.3916746-8-kuniyu@google.com>
+ <21ee2d5d-fc8c-497e-aa98-e5e4e3fbecf8@linux.dev>
+ <CAAVpQUBv0Uc4Xi-4wK2S63FqtXHHkLqJTotOxxDyhqFknoZG_Q@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <CAAVpQUBv0Uc4Xi-4wK2S63FqtXHHkLqJTotOxxDyhqFknoZG_Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Rspamd-Queue-Id: 06F734F6587
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: AA3F34F65E9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-285797-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-285793-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,berkeley.edu,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,realsil.com.cn:email,realsil.com.cn:mid,realsil.com.cn:dkim]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bpf_sock_ops.data:url]
 X-Rspamd-Action: no action
 
-From: Javen Xu <javen_xu@realsil.com.cn>
 
-This patch add support for changing rx queues by ethtool. We can set rx
-1, 2, 4, 8 by ethtool -L eth1 rx num.
+On 5/8/26 7:30 PM, Kuniyuki Iwashima wrote:
+> On Fri, May 8, 2026 at 3:37 AM Jiayuan Chen <jiayuan.chen@linux.dev> wrote:
+>>
+>> On 5/8/26 3:33 PM, Kuniyuki Iwashima wrote:
+>>> Now, it is time to add the new hooks for BPF_SOCK_OPS_RCVLOWAT_CB.
+>>>
+>>> Let's invoke the BPF SOCK_OPS prog when
+>>>
+>>>     1. TCP stack enqueues skb to sk->sk_receive_queue
+>>>        -> tcp_queue_rcv(), tcp_ofo_queue(), and tcp_fastopen_add_skb()
+>>>
+>>>     2. TCP recvmsg() completes
+>>>        -> __tcp_cleanup_rbuf()
+>>>
+>>> This will allow the BPF prog to parse each skb and dynamically
+>>> adjust sk->sk_rcvlowat to suppress unnecessary EPOLLIN wakeups
+>>> until sufficient data (e.g., a full RPC frame) is available
+>>> in the receive queue.
+>>>
+>>> Note that the direct access to bpf_sock_ops.data is intentionally
+>>> disabled by passing 0 as end_offset.
+>>>
+>>> Instead, the BPF prog is supposed to use bpf_skb_load_bytes()
+>>> with bpf_sock_ops because payload is not in the linear area
+>>> with TCP header/data split on and skb may contain a RPC
+>>> descriptor in skb frag.  This also simplifies the BPF prog.
+>>>
+>>> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+>>> ---
+>>>    include/net/tcp.h       | 14 ++++++++++++++
+>>>    net/ipv4/tcp.c          |  2 ++
+>>>    net/ipv4/tcp_fastopen.c |  2 ++
+>>>    net/ipv4/tcp_input.c    | 10 ++++++++++
+>>>    4 files changed, 28 insertions(+)
+>>>
+>>> diff --git a/include/net/tcp.h b/include/net/tcp.h
+>>> index 4e9e634e276b..003e46c9b500 100644
+>>> --- a/include/net/tcp.h
+>>> +++ b/include/net/tcp.h
+>>> @@ -737,6 +737,20 @@ static inline struct request_sock *cookie_bpf_check(struct net *net, struct sock
+>>>    }
+>>>    #endif
+>>>
+>>> +#ifdef CONFIG_CGROUP_BPF
+>>> +void bpf_skops_rcvlowat(struct sock *sk, struct sk_buff *skb);
+>>> +
+>>> +static inline void tcp_bpf_rcvlowat(struct sock *sk, struct sk_buff *skb)
+>>> +{
+>>> +     if (BPF_SOCK_OPS_TEST_FLAG(tcp_sk(sk), BPF_SOCK_OPS_RCVLOWAT_CB_FLAG))
+>>> +             bpf_skops_rcvlowat(sk, skb);
+>>> +}
+>>> +#else
+>>> +static inline void tcp_bpf_rcvlowat(struct sock *sk, struct sk_buff *skb)
+>>> +{
+>>> +}
+>>> +#endif
+>>> +
+>>>    /* From net/ipv6/syncookies.c */
+>>>    int __cookie_v6_check(const struct ipv6hdr *iph, const struct tcphdr *th);
+>>>    struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb);
+>>> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+>>> index 1d9e52fc454f..80144b97a87a 100644
+>>> --- a/net/ipv4/tcp.c
+>>> +++ b/net/ipv4/tcp.c
+>>> @@ -1602,6 +1602,8 @@ void __tcp_cleanup_rbuf(struct sock *sk, int copied)
+>>>                tcp_mstamp_refresh(tp);
+>>>                tcp_send_ack(sk);
+>>>        }
+>>> +
+>>> +     tcp_bpf_rcvlowat(sk, NULL);
+>>>    }
+>>>
+>> tcp_read_skb (process frame 1 and __skb_unlink)
+>> └─ sk_psock_verdict_recv
+>>       └─ sk_psock_verdict_apply
+>>           └─ tcp_eat_skb
+>>               └─ tcp_cleanup_rbuf
+>>                   └─ __tcp_cleanup_rbuf
+>>                       └─ BPF RCVLOWAT_CB
+>>                           └─ bpf_sock_ops_tcp_set_rcvlowat (wakeup=true)
+>>                               └─ tcp_data_ready
+>>                                   └─ sk_psock_verdict_data_ready
+>>                                       └─ tcp_read_skb (frame 2)
+>>                                           └─ ... → tcp_read_skb (frame 3) ...
+>>
+>> For strparser it use read_sock instead of read_skb and it will become
+>> more complicated...
+> To be clear, this feature is NOT to use strparser/sockmap.
+>> I think this will cause stack overflow with amounts of skbs in receive
+>> queue or infinite call(not tested) for sockmap/kTLS/strparser.
+>>
+> BPF user is responsible for not doing silly things.
+>
+> tcp_bpf_strp_read_sock() can have loop detection logic,
+> but it's only if really needed.
 
-Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
----
- drivers/net/ethernet/realtek/r8169_main.c | 126 ++++++++++++++++++++++
- 1 file changed, 126 insertions(+)
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 17a7edc42a80..8b78e450b68d 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -6330,6 +6330,130 @@ static void r8169_init_napi(struct rtl8169_private *tp)
- 	}
- }
- 
-+static void rtl8169_get_channels(struct net_device *dev,
-+				 struct ethtool_channels *ch)
-+{
-+	struct rtl8169_private *tp = netdev_priv(dev);
-+
-+	ch->max_rx = tp->hw_supp_num_rx_queues;
-+	ch->max_tx = 1;
-+	ch->max_other = 0;
-+	ch->max_combined = 0;
-+
-+	ch->rx_count = tp->num_rx_rings;
-+	ch->tx_count = 1;
-+	ch->other_count = 0;
-+	ch->combined_count = 0;
-+}
-+
-+static int rtl8169_realloc_rx(struct rtl8169_private *tp,
-+			      struct rtl8169_rx_ring *new_rx,
-+			      int new_count)
-+{
-+	int i, ret;
-+
-+	for (i = 0; i < new_count; i++) {
-+		struct rtl8169_rx_ring *ring = &new_rx[i];
-+
-+		ring->rx_desc_alloc_size = (NUM_RX_DESC + 1) * sizeof(struct RxDesc);
-+		ring->rx_desc_array = dma_alloc_coherent(&tp->pci_dev->dev,
-+							 ring->rx_desc_alloc_size,
-+							 &ring->rx_phy_addr,
-+							 GFP_KERNEL);
-+		if (!ring->rx_desc_array) {
-+			ret = -ENOMEM;
-+			goto err_free;
-+		}
-+
-+		memset(ring->rx_databuff, 0, sizeof(ring->rx_databuff));
-+		ret = rtl8169_rx_fill(tp, ring);
-+		if (ret) {
-+			dma_free_coherent(&tp->pci_dev->dev, ring->rx_desc_alloc_size,
-+					  ring->rx_desc_array, ring->rx_phy_addr);
-+			goto err_free;
-+		}
-+	}
-+	return 0;
-+
-+err_free:
-+	while (--i >= 0) {
-+		rtl8169_rx_clear(tp, &new_rx[i]);
-+		dma_free_coherent(&tp->pci_dev->dev, new_rx[i].rx_desc_alloc_size,
-+				  new_rx[i].rx_desc_array, new_rx[i].rx_phy_addr);
-+	}
-+	return ret;
-+}
-+
-+static int rtl8169_set_channels(struct net_device *dev,
-+				struct ethtool_channels *ch)
-+{
-+	struct rtl8169_private *tp = netdev_priv(dev);
-+	bool if_running = netif_running(dev);
-+	struct rtl8169_rx_ring *new_rx;
-+	u8 old_tx_desc_type = tp->init_rx_desc_type;
-+	u8 new_desc_type;
-+	bool new_rss_enable;
-+	int i, ret;
-+
-+	if (!tp->rss_support && (ch->rx_count > 1 || ch->tx_count > 1)) {
-+		netdev_warn(dev, "This chip does not support multiple channels/RSS.\n");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (!(tp->features & RTL_VEC_MAP_ENABLE))
-+		return -EINVAL;
-+
-+	new_rss_enable = (ch->rx_count > 1 && tp->rss_support);
-+	new_desc_type = new_rss_enable ? RX_DESC_RING_TYPE_RSS : RX_DESC_RING_TYPE_DEFAULT;
-+	tp->init_rx_desc_type = new_desc_type;
-+
-+	if (!if_running) {
-+		tp->num_rx_rings = ch->rx_count;
-+		tp->rss_enable = new_rss_enable;
-+		return 0;
-+	}
-+
-+	new_rx = kcalloc(R8169_MAX_RX_QUEUES, sizeof(*new_rx), GFP_KERNEL);
-+	if (!new_rx)
-+		return -ENOMEM;
-+
-+	ret = rtl8169_realloc_rx(tp, new_rx, ch->rx_count);
-+	if (ret) {
-+		kfree(new_rx);
-+		tp->init_rx_desc_type = old_tx_desc_type;
-+		return ret;
-+	}
-+
-+	netif_stop_queue(dev);
-+	rtl8169_down(tp);
-+
-+	for (i = 0; i < tp->num_rx_rings; i++)
-+		rtl8169_rx_clear(tp, &tp->rx_ring[i]);
-+	rtl8169_free_rx_desc(tp);
-+
-+	tp->num_rx_rings = ch->rx_count;
-+	tp->rss_enable = new_rss_enable;
-+
-+	memset(tp->rx_ring, 0, sizeof(tp->rx_ring));
-+	memcpy(tp->rx_ring, new_rx, sizeof(*new_rx) * ch->rx_count);
-+
-+	for (i = 0; i < tp->hw_supp_indir_tbl_entries; i++) {
-+		if (tp->rss_enable)
-+			tp->rss_indir_tbl[i] = ethtool_rxfh_indir_default(i, tp->num_rx_rings);
-+		else
-+			tp->rss_indir_tbl[i] = 0;
-+	}
-+
-+	rtl_set_irq_mask(tp);
-+
-+	rtl8169_up(tp);
-+	netif_start_queue(dev);
-+
-+	kfree(new_rx);
-+
-+	return 0;
-+}
-+
- static const struct ethtool_ops rtl8169_ethtool_ops = {
- 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
- 				     ETHTOOL_COALESCE_MAX_FRAMES,
-@@ -6348,6 +6472,8 @@ static const struct ethtool_ops rtl8169_ethtool_ops = {
- 	.nway_reset		= phy_ethtool_nway_reset,
- 	.get_eee		= rtl8169_get_eee,
- 	.set_eee		= rtl8169_set_eee,
-+	.get_channels		= rtl8169_get_channels,
-+	.set_channels		= rtl8169_set_channels,
- 	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
- 	.set_link_ksettings	= rtl8169_set_link_ksettings,
- 	.get_ringparam		= rtl8169_get_ringparam,
--- 
-2.43.0
+Similar infinite recursion problems for reference:
+  https://lore.kernel.org/r/20220929070407.965581-5-martin.lau@linux.dev
+  https://lore.kernel.org/bpf/20260421155804.135786-1-kafai.wan@linux.dev/
+
+They were not solved in TCP side but in ops side.
+
+
+Can we try to handle it on the BPF/OPS side first and only
+prevent it elsewhere if it's not feasible there ?
+
+
+Thanks
 
 
