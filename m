@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-285590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285591-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aMHPFcVU/WkYawAAu9opvQ
-	(envelope-from <netdev+bounces-285590-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 05:13:09 +0200
+	id AKCiJtRU/WkYawAAu9opvQ
+	(envelope-from <netdev+bounces-285591-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 05:13:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D52984F1076
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 05:13:08 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A92F4F108B
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 05:13:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 62C72302C6EB
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 03:12:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6A1B73030B21
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 03:12:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 095C32D5A01;
-	Fri,  8 May 2026 03:12:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B6E32C21C5;
+	Fri,  8 May 2026 03:12:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f9BG9yfd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NGZS+pM6"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469A32D2496
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 03:12:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF53D2571DD
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 03:12:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778209953; cv=none; b=Pht/4SsIkkpK6R8BYsSXMetIY0gCBgcW4e8Umk7A46d5wmlB6jgwkIrOEOLL7h2VsiJIbZB9CjEEXtfQu7H4Hh+5lJMpoZUSySw+APkiUK8vjAV+RoieSnH3kW+v3ErK++AoBNIo+do88FbdqXmGCtRDcyd73GdObcuyV9vm2Uw=
+	t=1778209955; cv=none; b=EK+zwhW0tlv2AfcupMHgJUITQLeRPZjN60WAo3J0/jgW0lGVvVJavtSsHretj4onyLBcKvhj/V9mbKeJnax+oh5TLLqy0HPUfnbwKeF2sLFYhq2dSjZ2sNxw/aUCtRAtTiHMKNzSqSjMtrfRzqy9+QIhrvtzUCNyjmrPg/Q/Hqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778209953; c=relaxed/simple;
-	bh=NDXYRNxohjaR9SlsX7zQsn4ljQYIO2z6Y5cD8SIerPU=;
+	s=arc-20240116; t=1778209955; c=relaxed/simple;
+	bh=eNkuLWRPSYTLbgVnN8ZTLbezDayq2V1B+TaYvmbS3UQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Yk/MphjGmy9WayFavH6fKP+3g+waGZHjQTBF3/tJ7OPUsiqO1PRGxAne5ktolTFsuIOCNC1Shf+jHg2lD7ph58tsNzPnhrAp4HK4v0HfjoJPIrvWkVmyLghFqf4+sT0oGfivU1RVgt0wYio/lT26nnFR2pNWVzHUzxN3NuYY4+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f9BG9yfd; arc=none smtp.client-ip=192.198.163.17
+	 MIME-Version; b=Mw82lOxgs9tw0zF7sre+tEJ+1scI346m46wwfvJp462dkUOCCbs6FrNHiokRQOta8GyAFuvAJY/uN06QnHg7wBHCP6xmuaE5tTFc4V7C29crgixa6PXTI+DwVGNY11IR0GuY5UoqzuCJodTscIRSlGOOB/X1mpK4vUQft8AGgnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NGZS+pM6; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778209952; x=1809745952;
+  t=1778209954; x=1809745954;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=NDXYRNxohjaR9SlsX7zQsn4ljQYIO2z6Y5cD8SIerPU=;
-  b=f9BG9yfd75PiKbCKMnDQrPqt1pqdrMf93D9T3wDhRiQ6KGjw7Bc+kREl
-   c+CrzdFxivN0zNnXgS30vWIDLxn/bB+lr2hWT/Q+kdhv3+v6Ipn27u/re
-   Cefs+zEnS0X+1zQ5IZ0fz1bqG3zC27AIrHToiGZCAdnS9+M2FNGkipi/p
-   QjaUxZddh5Kja7GnzwXKx2KQ9zDiVM7dtwprvPoHlNd5OLxqREYy71lvA
-   hkxyoqiUlegNhv234RSR8iLgK7DAyMI+oPS5EEawpSshngAWVIn5ZpYjO
-   Y2OweeTMNbnjHr59SMpHjIEkpDzEVHZqxrOCJuP0qnR2+qfxmxWCvEZEP
-   Q==;
-X-CSE-ConnectionGUID: 29oZBSQ4R1KU8bs1CrgsEg==
-X-CSE-MsgGUID: pmCCIEdoTgG6QImYtujF5g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11779"; a="79027488"
+  bh=eNkuLWRPSYTLbgVnN8ZTLbezDayq2V1B+TaYvmbS3UQ=;
+  b=NGZS+pM6gDcFbB2LOj1Z15MV3dnjMoPNqHjcksds+Wp+tZoMf4UgPKX5
+   Oczpxf89dN3Rus6Ks9U0o8zXnqieMkRKIFnpxiSkjZzbf/rmcmajQvr2w
+   JJt0KDegKrySY8faDLTjC+iI5CWElrF0Dh+Ymz+ROvnMdB8yVCs7QngTy
+   wdyW0PEZ7GP3GM08LxkTbTljY65OV7ibVtgmU1dCHODWoPxHuJTzkesxT
+   +FZHXx5BvjPxYy7VO4vU+H40Pqiu2YTZuGEruSJCk0OG95gGcXLvvKynD
+   tLCPpPbX7Y8kJu6nP39DV/VwxNOgvBEyahQs0U2o0od/wn9kZ7E4R+l8l
+   w==;
+X-CSE-ConnectionGUID: CxtXQ+onTCCktPIpBWqJAA==
+X-CSE-MsgGUID: OZ+39BsEQbmaC0R9WMoFuQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11779"; a="79027500"
 X-IronPort-AV: E=Sophos;i="6.23,222,1770624000"; 
-   d="scan'208";a="79027488"
+   d="scan'208";a="79027500"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 20:12:32 -0700
-X-CSE-ConnectionGUID: MChumWXESnuwnG0zcO/pWw==
-X-CSE-MsgGUID: i7GdhBqkRKWzsz+joIaEFg==
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 20:12:34 -0700
+X-CSE-ConnectionGUID: 64ZNGCcPTIG3odcucKXIjw==
+X-CSE-MsgGUID: LUJ9MZl+RIWFn0YYHfHPhw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,222,1770624000"; 
-   d="scan'208";a="241623182"
+   d="scan'208";a="241623191"
 Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
-  by fmviesa005.fm.intel.com with ESMTP; 07 May 2026 20:12:30 -0700
+  by fmviesa005.fm.intel.com with ESMTP; 07 May 2026 20:12:32 -0700
 From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 To: intel-wired-lan@lists.osuosl.org,
 	anthony.l.nguyen@intel.com,
 	aleksandr.loktionov@intel.com
 Cc: netdev@vger.kernel.org,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH iwl-next 2/8] ixgbe: use int instead of u32 for error code variables
-Date: Fri,  8 May 2026 05:12:20 +0200
-Message-ID: <20260508031226.3601800-3-aleksandr.loktionov@intel.com>
+	Piotr Skajewski <piotrx.skajewski@intel.com>
+Subject: [PATCH iwl-next 3/8] ixgbe: prevent adding duplicate FDIR perfect filter rules
+Date: Fri,  8 May 2026 05:12:21 +0200
+Message-ID: <20260508031226.3601800-4-aleksandr.loktionov@intel.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260508031226.3601800-1-aleksandr.loktionov@intel.com>
 References: <20260508031226.3601800-1-aleksandr.loktionov@intel.com>
@@ -80,7 +80,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: D52984F1076
+X-Rspamd-Queue-Id: 1A92F4F108B
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -88,7 +88,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -96,9 +96,9 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285590-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285591-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCPT_COUNT_FIVE(0.00)[5];
 	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
@@ -110,139 +110,84 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:mid,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-The variables used to store return values of kernel and driver functions
-throughout the ixgbe driver are declared as u32 in several places.  Such
-functions return negative errno values on error (e.g. -EIO, -EFAULT),
-which are sign-extended negative integers.  Storing them in an unsigned
-u32 silently wraps the value: -EIO (0xFFFFFFF7) stored in u32 becomes a
-large positive number, so any "if (status)" truthiness check still works
-by accident, but comparisons against specific negative error codes or
-propagation up the call stack produce wrong results.
+From: Piotr Skajewski <piotrx.skajewski@intel.com>
 
-In the Linux kernel, u32 is reserved for fixed-width quantities used in
-hardware interfaces or protocol structures.  Using it for generic error
-codes misleads reviewers into thinking the value is hardware-constrained.
+When the same flow specification is added twice (same 5-tuple with
+different sw_idx values), ixgbe_add_ethtool_fdir_entry() silently
+programs the duplicate into hardware using a second FDIR table slot.
+This wastes a scarce FDIR entry and can cause confusing behaviour
+when deleting rules.
 
-Change all such local variables from u32 to int driver-wide: one in
-ixgbe_main.c (ixgbe_resume), three in ixgbe_phy.c
-(ixgbe_identify_phy_generic, ixgbe_tn_check_overtemp,
-ixgbe_set_copper_phy_power), and six in ixgbe_x550.c
-(ixgbe_check_link_t_X550em, ixgbe_get_lasi_ext_t_x550em,
-ixgbe_enable_lasi_ext_t_x550em, ixgbe_handle_lasi_ext_t_x550em,
-ixgbe_ext_phy_t_x550em_get_link, ixgbe_setup_internal_phy_t_x550em).
+Add a helper ixgbe_match_ethtool_fdir_entry() that walks the in-kernel
+filter list before programming hardware.  If an entry with an
+identical filter (excluding the sw_idx) already exists, the new add
+request is rejected with -EEXIST.
 
-No functional change.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Piotr Skajewski <piotrx.skajewski@intel.com>
 Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c  |  6 +++---
- drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c | 12 ++++++------
- 3 files changed, 10 insertions(+), 10 deletions(-)
+ .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  | 27 +++++++++++++++++--
+ 1 file changed, 25 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 65426a1..b6308c1 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -7528,7 +7528,7 @@ static int ixgbe_resume(struct device *dev_d)
- 	struct pci_dev *pdev = to_pci_dev(dev_d);
- 	struct ixgbe_adapter *adapter = pci_get_drvdata(pdev);
- 	struct net_device *netdev = adapter->netdev;
--	u32 err;
-+	int err;
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+index ba049b3..a2009df 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+@@ -2938,6 +2938,23 @@ static int ixgbe_flowspec_to_flow_type(struct ethtool_rx_flow_spec *fsp,
+ 	return 1;
+ }
  
- 	adapter->hw.hw_addr = adapter->io_addr;
- 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
-index ab733e7..de8f6c6 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
-@@ -262,7 +262,7 @@ static bool ixgbe_probe_phy(struct ixgbe_hw *hw, u16 phy_addr)
-  **/
- int ixgbe_identify_phy_generic(struct ixgbe_hw *hw)
++static bool ixgbe_match_ethtool_fdir_entry(struct ixgbe_adapter *adapter,
++					   struct ixgbe_fdir_filter *input)
++{
++	struct ixgbe_fdir_filter *rule = NULL;
++
++	hlist_for_each_entry(rule, &adapter->fdir_filter_list, fdir_node) {
++		if (rule->sw_idx == input->sw_idx)
++			continue;
++		if (!memcmp(&rule->filter, &input->filter,
++			    sizeof(rule->filter))) {
++			e_warn(drv, "FDIR filter already exists\n");
++			return true;
++		}
++	}
++	return false;
++}
++
+ static int ixgbe_add_ethtool_fdir_entry(struct ixgbe_adapter *adapter,
+ 					struct ethtool_rxnfc *cmd)
  {
--	u32 status = -EFAULT;
-+	int status = -EFAULT;
- 	u32 phy_addr;
+@@ -2947,7 +2964,7 @@ static int ixgbe_add_ethtool_fdir_entry(struct ixgbe_adapter *adapter,
+ 	struct ixgbe_fdir_filter *input;
+ 	union ixgbe_atr_input mask;
+ 	u8 queue;
+-	int err;
++	int err = -EINVAL;
  
- 	if (!hw->phy.phy_semaphore_mask) {
-@@ -2811,7 +2811,7 @@ static void ixgbe_i2c_bus_clear(struct ixgbe_hw *hw)
- bool ixgbe_tn_check_overtemp(struct ixgbe_hw *hw)
- {
- 	u16 phy_data = 0;
--	u32 status;
-+	int status;
+ 	if (!(adapter->flags & IXGBE_FLAG_FDIR_PERFECT_CAPABLE))
+ 		return -EOPNOTSUPP;
+@@ -3050,6 +3067,12 @@ static int ixgbe_add_ethtool_fdir_entry(struct ixgbe_adapter *adapter,
+ 	/* apply mask and compute/store hash */
+ 	ixgbe_atr_compute_perfect_hash_82599(&input->filter, &mask);
  
- 	if (hw->device_id != IXGBE_DEV_ID_82599_T3_LOM)
- 		return false;
-@@ -2831,7 +2831,7 @@ bool ixgbe_tn_check_overtemp(struct ixgbe_hw *hw)
-  **/
- int ixgbe_set_copper_phy_power(struct ixgbe_hw *hw, bool on)
- {
--	u32 status;
-+	int status;
- 	u16 reg;
++	/* check for a duplicate filter */
++	if (ixgbe_match_ethtool_fdir_entry(adapter, input)) {
++		err = -EEXIST;
++		goto err_out_w_lock;
++	}
++
+ 	/* program filters to filter memory */
+ 	err = ixgbe_fdir_write_perfect_filter_82599(hw,
+ 				&input->filter, input->sw_idx, queue);
+@@ -3065,7 +3088,7 @@ static int ixgbe_add_ethtool_fdir_entry(struct ixgbe_adapter *adapter,
+ 	spin_unlock(&adapter->fdir_perfect_lock);
+ err_out:
+ 	kfree(input);
+-	return -EINVAL;
++	return err;
+ }
  
- 	/* Bail if we don't have copper phy */
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-index 76d2fa3..9b14f3b 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-@@ -1911,7 +1911,7 @@ static int ixgbe_check_link_t_X550em(struct ixgbe_hw *hw,
- 				     bool *link_up,
- 				     bool link_up_wait_to_complete)
- {
--	u32 status;
-+	int status;
- 	u16 i, autoneg_status;
- 
- 	if (hw->mac.ops.get_media_type(hw) != ixgbe_media_type_copper)
-@@ -2330,7 +2330,7 @@ static int ixgbe_get_link_capabilities_X550em(struct ixgbe_hw *hw,
- static int ixgbe_get_lasi_ext_t_x550em(struct ixgbe_hw *hw, bool *lsc,
- 				       bool *is_overtemp)
- {
--	u32 status;
-+	int status;
- 	u16 reg;
- 
- 	*is_overtemp = false;
-@@ -2418,7 +2418,7 @@ static int ixgbe_get_lasi_ext_t_x550em(struct ixgbe_hw *hw, bool *lsc,
- static int ixgbe_enable_lasi_ext_t_x550em(struct ixgbe_hw *hw)
- {
- 	bool lsc, overtemp;
--	u32 status;
-+	int status;
- 	u16 reg;
- 
- 	/* Clear interrupt flags */
-@@ -2512,7 +2512,7 @@ static int ixgbe_handle_lasi_ext_t_x550em(struct ixgbe_hw *hw,
- {
- 	struct ixgbe_phy_info *phy = &hw->phy;
- 	bool lsc;
--	u32 status;
-+	int status;
- 
- 	status = ixgbe_get_lasi_ext_t_x550em(hw, &lsc, is_overtemp);
- 	if (status)
-@@ -2606,7 +2606,7 @@ static int ixgbe_setup_kr_x550em(struct ixgbe_hw *hw)
-  **/
- static int ixgbe_ext_phy_t_x550em_get_link(struct ixgbe_hw *hw, bool *link_up)
- {
--	u32 ret;
-+	int ret;
- 	u16 autoneg_status;
- 
- 	*link_up = false;
-@@ -2642,7 +2642,7 @@ static int ixgbe_setup_internal_phy_t_x550em(struct ixgbe_hw *hw)
- {
- 	ixgbe_link_speed force_speed;
- 	bool link_up;
--	u32 status;
-+	int status;
- 	u16 speed;
- 
- 	if (hw->mac.ops.get_media_type(hw) != ixgbe_media_type_copper)
+ static int ixgbe_del_ethtool_fdir_entry(struct ixgbe_adapter *adapter,
 -- 
 2.52.0
 
