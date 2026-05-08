@@ -1,89 +1,75 @@
-Return-Path: <netdev+bounces-285976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285978-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yFzrK99L/mllowAAu9opvQ
-	(envelope-from <netdev+bounces-285976-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 22:47:27 +0200
+	id SPOcE7VM/mllowAAu9opvQ
+	(envelope-from <netdev+bounces-285978-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 22:51:01 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C8694FB9E8
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 22:47:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 972814FBA4B
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 22:51:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DB5F630330AF
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 20:47:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 139673020A57
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 20:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D34D37E2FE;
-	Fri,  8 May 2026 20:47:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2513D565B;
+	Fri,  8 May 2026 20:50:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QqNFQ/NL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J+PzjAfG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D6C31355D;
-	Fri,  8 May 2026 20:47:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C25E27979A;
+	Fri,  8 May 2026 20:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778273240; cv=none; b=e30e13rlD71lRO3YrLqlKw62xho1y1nWMiWNZkY2wyZALLOgLE7GWDY361+YnQM08Zp7h6l1yxOkh/0pJaItBnHRZgMGa/FrNwEDBYKDe/Dv1/XwTTEcDDljslwNTKqXkpE7b1rX2o4btQvgyFKvnYAgFxieFDAzMO5RASnknAg=
+	t=1778273458; cv=none; b=NIhY4q1/iwn47OnSOWyNsA99HR4Ndvu3aiZwPkcrOj1JmtWTZx0/yvg3n2hvF0HpP+pOBGDadc8zlUlWfidj4Iax4QY575tvjYytfsjyudszcqaYBkCa7vUXxeezk2JGKtKDdBRJ1M3TcM2D1iCIgGb5LfiJPlVe1sunwdH1fJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778273240; c=relaxed/simple;
-	bh=joSQS8mvp1Pdc83wykIvr6y2MmJNBUJLd38AS4iXpr8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HLENWM97Brpojd96v21T9/veVrtisqD/GxMsHEN7w2NqvyMhB5zyfiK3ocrorkte3xnKBzTcOFqrf/am3DXRGLnXgoGWjBPYWqW8rWDyENnwJC4EV1zW0Oxrdi0+Fa8pKUUbbRa47ztqqyPo2vG0ac6WbIHrVGAAB1FY8a/jDqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QqNFQ/NL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81D89C2BCB0;
-	Fri,  8 May 2026 20:47:18 +0000 (UTC)
+	s=arc-20240116; t=1778273458; c=relaxed/simple;
+	bh=EdkMVJWYxM7ydC46+t4W/1YQcJrEaMzpphAuTXL9O8w=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=uIL/JHU9KbNmEHsRc7gvbHlN9AqJqsTz8ffeeo7GVk+xStwwpZR9Y7HA6veQu26bicu92SMRXcm15qdwho6coEcvzQ1Ddgmg/wRezsrBU0QGaC2GexQTKMnGjPMHHDCAA5vz0SMDo65fe0iuCKZcsTdkrkFfvqeYpEuCXAC3yPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J+PzjAfG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C92D9C2BCB0;
+	Fri,  8 May 2026 20:50:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778273240;
-	bh=joSQS8mvp1Pdc83wykIvr6y2MmJNBUJLd38AS4iXpr8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QqNFQ/NLC07IFxAzovH4Xwn4Kjhc1ThxJRYmVqYCltwjL89FUWkxlm/mKlGl7i0Xl
-	 U2e8Y5wizCsLwbBM7MTB4EssWdJcoPVNE9uqgFOzcdqLrJktJE/SDnCscAu0Hm9u4n
-	 zBE3J4kOVWKEc6jwwxwMuDziSargFVvsbfumqDHNSfuWDCdLgPSPDavTNPTr7nrodM
-	 Qpuz718DEztfoz5l6SGhBdkpJdBXbt+LJF1RzVAL/gss/bpKzWOePPlI5xrD/7TVOc
-	 eK0rtlqNzgPExyN+FslcnUdJiH2MTY3jce9aYjIaY+PUHBLAgOPQLknHT59haMmu71
-	 ThfYEPUlqkEEA==
-Date: Fri, 8 May 2026 13:47:17 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, Alex Shi
- <alexs@kernel.org>, Yanteng Si <si.yanteng@linux.dev>, Dongliang Mu
- <dzm91@hust.edu.cn>, Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi
- <pavan.chebbi@broadcom.com>, Joshua Washington <joshwash@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>, Saeed Mahameed
- <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch
- <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Alexander Duyck
- <alexanderduyck@fb.com>, kernel-team@meta.com, Daniel Borkmann
- <daniel@iogearbox.net>, Nikolay Aleksandrov <razor@blackwall.org>, Shuah
- Khan <shuah@kernel.org>, dw@davidwei.uk, sdf.kernel@gmail.com,
- mohsin.bashr@gmail.com, willemb@google.com, jiang.kun2@zte.com.cn,
- xu.xin16@zte.com.cn, wang.yaxin@zte.com.cn, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Stanislav Fomichev <sdf@fomichev.me>, Mina
- Almasry <almasrymina@google.com>, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v3 3/8] net: devmem: support TX over
- NETMEM_TX_NO_DMA devices
-Message-ID: <20260508134717.4ef87ab6@kernel.org>
-In-Reply-To: <20260507-tcp-dm-netkit-v3-3-52821445867c@meta.com>
-References: <20260507-tcp-dm-netkit-v3-0-52821445867c@meta.com>
-	<20260507-tcp-dm-netkit-v3-3-52821445867c@meta.com>
+	s=k20201202; t=1778273457;
+	bh=EdkMVJWYxM7ydC46+t4W/1YQcJrEaMzpphAuTXL9O8w=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=J+PzjAfGXSrA9OVdp7AMB22X4Z5vLDGKgoYcZKBB1eRS4X6gyTDYc4VTXLf2NKZU/
+	 LXW9c/GwTsyBhJ883bP7ro6vLM4Kz657IxdxCBVnvjD5duDFjbtzK/30QQZmNwlHCl
+	 W20vbabg2uoHDhUr1FhkPOE8BdOxoBailzoG+rsakMeXPqm8IYBUweO0AytumqMYOZ
+	 q1ivNBWtpYoEvr95XklC/3PaTCCR5KrbEKAJj+7m22aff7YjP8gItr2xhHoU4krYGy
+	 dhUcLeIgpdc01fMQx76YgyZl8svX3jK1TAXNxvlKe71rYXmikBkU2zswAYXGlrKywt
+	 NUrG/NmLBUjnw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7D0DD38119C3;
+	Fri,  8 May 2026 20:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 5C8694FB9E8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 bpf] bpf: Free reuseport cBPF prog after RCU grace
+ period.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177827340608.844515.12414699446325110304.git-patchwork-notify@kernel.org>
+Date: Fri, 08 May 2026 20:50:06 +0000
+References: <20260426012647.3233119-1-kuniyu@google.com>
+In-Reply-To: <20260426012647.3233119-1-kuniyu@google.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: martin.lau@linux.dev, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, eddyz87@gmail.com, memxor@gmail.com, kuni1840@gmail.com,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, eulgyukim@snu.ac.kr
+X-Rspamd-Queue-Id: 972814FBA4B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
@@ -91,40 +77,55 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[linux.dev,kernel.org,iogearbox.net,gmail.com,vger.kernel.org,snu.ac.kr];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285976-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[40];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,lwn.net,linuxfoundation.org,linux.dev,hust.edu.cn,broadcom.com,nvidia.com,fb.com,meta.com,iogearbox.net,blackwall.org,davidwei.uk,gmail.com,zte.com.cn,vger.kernel.org,fomichev.me];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285978-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iogearbox.net:email]
 X-Rspamd-Action: no action
 
-On Thu, 07 May 2026 19:27:48 -0700 Bobby Eshleman wrote:
-> +	/* Virtual device (e.g. netkit) the user called bind-tx on. Must be
-> +	 * NETMEM_TX_NO_DMA.
-> +	 */
-> +	struct net_device *vdev;
+Hello:
 
-AI keeps complaining that we don't hold a reference to this dev which 
-I think is fine, we're just comparing pointers. Could we maybe make this
-a void pointer and mention in the comment that we treat it as "best
-effort cookie" (better phrasing welcome).
+This patch was applied to bpf/bpf.git (master)
+by Daniel Borkmann <daniel@iogearbox.net>:
 
-Or we should wipe these vdev pointers when vdevs disappear, not sure
-how hard that'd be (or whether it's worth the extra state).
+On Sun, 26 Apr 2026 01:26:43 +0000 you wrote:
+> Eulgyu Kim reported the splat below with a repro. [0]
+> 
+> The repro sets up a UDP reuseport group with a cBPF prog and
+> replaces it with a new one while another thread is sending
+> a UDP packet to the group.
+> 
+> The reuseport prog is freed by sk_reuseport_prog_free().
+> bpf_prog_put() is called for "e"BPF prog to destruct through
+> multiple stages while cBPF prog is freed immediately by
+> bpf_release_orig_filter() and bpf_prog_free().
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,bpf] bpf: Free reuseport cBPF prog after RCU grace period.
+    https://git.kernel.org/bpf/bpf/c/18fc650ccd7f
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
