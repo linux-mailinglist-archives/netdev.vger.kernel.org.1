@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-285853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285854-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OLqeKF/q/WkPkgAAu9opvQ
-	(envelope-from <netdev+bounces-285853-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:51:27 +0200
+	id uJAgMsHo/WkPkgAAu9opvQ
+	(envelope-from <netdev+bounces-285854-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:44:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0264D4F7601
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:51:26 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71C2F4F7457
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:44:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7B36B30B96CE
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 13:43:53 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1433B301DE7E
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 13:44:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36D8C3E4C80;
-	Fri,  8 May 2026 13:43:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287D93ECBF1;
+	Fri,  8 May 2026 13:43:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qbw2Qgqv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UFYN6zP9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f65.google.com (mail-ot1-f65.google.com [209.85.210.65])
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04463E8C65
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 13:43:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDF73E6398
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 13:43:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778247817; cv=none; b=lDqJZpMmWLg2ewFpqAL7713pLBAmY87g53/klnIp3W4Iuxjko5nJilMVemYU7CYVbBYmS6XewzGbwhz80CXw+4eOJvmVZqH+q9qC/7EkH/1ynNzLAsF4UBfx0HU8MVSqV7/hcvaKDQck7krcoR+p5fb8ldYtxkee59IOrTnmJQY=
+	t=1778247821; cv=none; b=TfFPjEx1oa//fAN5+l70QApvYp4PnWRLyUxQ8BX/RE4oPl2XIpsIdRGWISRseiFhbSQ35FKNHY840uQ/8XuFs6vLNcKRTeCTe0a1DoPW/EqkeNkwr5F8rQU/qzt5Nfo8IefteTpfcHs1zJK96kxtpca6g+SfO9MLxCwXz9eGXa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778247817; c=relaxed/simple;
-	bh=raY71pv8nsb2htXxqNP+EVXfsZ1KkQp8/Pqte7PSDt0=;
+	s=arc-20240116; t=1778247821; c=relaxed/simple;
+	bh=QbDAcqmCs39fePaBHuY30LnIJo4+WAkx22s1UP1/KKI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I6RXxiQ4raeHCasSbxNmHr4IZs6wnEaLYhBuvK3KUuvi3oywh9rqwBr2a2cmSJC11Qu8gh0sGbrgUdn931i7zeBIOkopdDj2GxPENFnTUkaO5yF1U4qqsXDsXWVVLZpu9wcC8a6UnLgID+0vZbfvc04YV0sqhPR748efzQEW+bE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qbw2Qgqv; arc=none smtp.client-ip=209.85.210.65
+	 MIME-Version; b=Mg5sqgnHbiGLhLmXVCZqr8jArAmr7BN1nfMemH7XIV8/ljWU5tS9FXO6EvfoG+zztBd3S1tSh8yvhsawf00ZqlXXNTbrp6CjKk5O1TB1wLUF+Gk9dDwlx+40ZtFfVGNWBLRwp8sQEgZ1H1RdSLT6HGPIxHlFFEj9RUrhDrNK5G8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UFYN6zP9; arc=none smtp.client-ip=209.85.160.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f65.google.com with SMTP id 46e09a7af769-7dcd9061b1aso1714934a34.2
-        for <netdev@vger.kernel.org>; Fri, 08 May 2026 06:43:34 -0700 (PDT)
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-42fe552aedeso714487fac.0
+        for <netdev@vger.kernel.org>; Fri, 08 May 2026 06:43:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778247813; x=1778852613; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778247818; x=1778852618; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+k8jCx+4owYWbxzMTzfLIwLSG5wN8p2PhTA/UFqYTeI=;
-        b=qbw2Qgqvo0vo6OxySdmhk1Tz54SRhBm3T4nCuwUbBSiudCPnuTay6jQWUdFc6QLJj1
-         NHnl5TIBs5w2BtBZFORWV90F5GSLLdnsfUJqLs8OCnWt9BPiRkmjXIBck4e1hZGhUhOb
-         atpolD/FpfHwKtaWrdVnQetk42Cm4j4boCITYsqL8xaFCWAc1MO8diWFexiU3cHo24f0
-         Ys9Ifx9jn19knx2FsvjY8A5JjafLKjMLLOczWuBMvBGCqePvRNtjJI8Sjm5EQhkJZ4ro
-         uaHppqzWb2e6/anTstTLpGNmem5DfZc2jQIBaGgODYTfm33YFCjmAAwsxP/r6yKS77fs
-         UjLg==
+        bh=G++PmIEZH/3IDDChHFNdq5UZKsic2mGL2G/u53vWWPc=;
+        b=UFYN6zP9IjzK2OCGFAdUrGI6JQR6HbBcfL1bCmwk6c1sMVx/K4Yp/MdFeqoXr1fxmz
+         hytjyq8u8q9TcvTpC4qwJWeOFGgmflng5MPM9PhmDeDZZBSI1naZHm6Hg2HBUv0GH0CK
+         ypbHaKx1qfbQSaoocxnnwzZ2SIDxeULxKchpPwPISPp9rvHB4Npq8rcNzHglFZHVNw9m
+         YdKUx0oc4F8TTMo4Wf5E8nIAMjqrHQRxP/3myxwtSLnFx3eVtNbg3JX+n0kWUcpry1Ni
+         8pQ9U2ZaJrUgL42YhzlNNoY5A+/0Ht4i+W21/MUOw1PXLPlbeSaBJ+Qa8lMwEQ2+gRr6
+         vl4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778247813; x=1778852613;
+        d=1e100.net; s=20251104; t=1778247818; x=1778852618;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=+k8jCx+4owYWbxzMTzfLIwLSG5wN8p2PhTA/UFqYTeI=;
-        b=D+1/PqrwM2L0cmHHNMMWpoEOZpKsSHrRzEQV3Fhb0d7HP6VZP98Ig6UdGLyJk7ldXj
-         E4+O+2e/J6ARQAiKzehe5nYwnExQiOq1awicOVBCCZDU79CMCmDhpf8hAlShNEL6TOhn
-         s5LhgSXLqFh0gDEri2jtMFRK2k58DYcLJSBwkc+mfWVt579P6BKMUZDtMjYa16z5j0dA
-         imK12Uw6iZRAcmdB34mpmACjv7DKvqLSGFiJenZvShmt6fKNeDgmAr8MHwJoLnf8lQHW
-         0ACLAPR+/VOp/r9ukuLwD9ODPMOzmlp35dqjXJGbWEEFggq1n031E3tHWYmjQnyO6ibw
-         r6zw==
-X-Gm-Message-State: AOJu0Ywn4coaqh1/Yy6MPWduym0yGJFwIcwQ8ZMQdkVzNAjuHYNLD7pa
-	voEsHEnES387CameP6Hf2Fzoa2GdDZNvFa5EICR3qr0D8TtG+3XEGoZtVExjRTBTDFvmHQ==
-X-Gm-Gg: AeBDiesNjkdFZxB1rdf9riYKK5/qGeNCu6fHNxtiAPbXnxh5v7phewSp1zd6OyD+yKa
-	NWStUK9dc0/Ld44fKafFil04LHvQvq/4EnLHUu6lzuO4cej6AtFsQepsj1gy22/G0YDmpyhwpjd
-	/MPefQppt5cZc/7hFXEnI0z2wF9mbkl2SP5b8GgA63gXjsXQgFjXlDP5i+pyy7k2KrEAyrh4zkF
-	pJITRgj8XoUkFSTHlXb5A5xqQOnm/KTQ4qjP1MaMm0K+SyvjSHgUEnXKqmRc8xkHh4EOEs+FPpF
-	jTUr/2bwXAZJkBEkg+K8RSXXWS/S7grWoD7X/+I8irbEIbP8dhC7VgjAMBaU1zlJ+Je3sS3LiyL
-	ks+/ZrJR1abCv0rZpMgzm/jSl4OmhgzMdLkT/KngM/byJUuyk2MArllEIDvNbJvPe0OUCziQeLY
-	VafzbE3tfvRrTbnZA=
-X-Received: by 2002:a05:6820:81c6:b0:688:7dbe:5ff7 with SMTP id 006d021491bc7-69998d6381amr7317612eaf.56.1778247813275;
-        Fri, 08 May 2026 06:43:33 -0700 (PDT)
+        bh=G++PmIEZH/3IDDChHFNdq5UZKsic2mGL2G/u53vWWPc=;
+        b=aL/+4coZGeHckmvN5hQxAt/uc70WqdSjwNQyoEJ8QWjqgaerLE3j3lMeGXCKT+3mLS
+         /UFij30Pd5fxVF6+IjGGJKxVEsm0XSTw9nE8jwx+WQtq/J+yJQVo02h3JWzzPon8Z41g
+         3PTzEIEuL1kUVkS/+Ttju5PWrg4aYsXdUzxPF/W+2AJ7SVMPSopO0ChWE/oR6Wy9Zqny
+         oGlCDb+3OPpERbJa4IOGHxYkQ5YPE2LyCjo7cRuEoPEz0XT4uN/KfDKCwrdof9K9uZbf
+         +NEd86YgyLzj2DutZbd79Lhu4ndp+kHGG8vfEG406awZOwNQueO0n955OmLeHWlfVatr
+         ElSA==
+X-Gm-Message-State: AOJu0YzIHTD8N77y7nlstZbNJNhtdZvUCsYTJKwq3qBbgR7/qIaO+prD
+	Jm9Y27CUXHFIitpo7mgj5U1PGGLK1rzaxXoFMT5hTLH38YlinzVK6KjhZ3FLJoL3R9I=
+X-Gm-Gg: AeBDiev2sOuq2df37WhaJ4xspHVmvMPRQwXunrsFuTTQ2W8Sn8BZyGdPmi05vSRF9I/
+	0svRrKTc0xLTGaNv3GxGq8RCRqQttRF7AwASe2C6+A0ut8M4yNLaO7cBTSvxvrMtAT34uD6YLaN
+	Y69eA3Sv6U3FLutMkmFgauDuSLG/V13TKoTUC+uoO7dH1uwDf0r37KXmeFrChKQGVBE9Gmv0wPx
+	rxjsuBAJrV2pg98X8qt4Fc3TQvzxIOhwz60f3edJRtAfRX7aqO/jGaHTvkuD13FDmsl5EmeE6ms
+	cFhErtIt2CUZQ5nPd+rT0vl/4/hxyZJDcC5S/Knt8a29Q8+2nrEiLF2qHt8GL45dRCbUKHQg8IX
+	1rT5SUhfuMl9V+a6NlxCoUAhJsoTAhiJWDfjnOibccynDi+t8VjUklYic5gM5wiraxiZxuoN2tq
+	MoN4x50by43T1W/G8=
+X-Received: by 2002:a05:6820:61e:b0:67b:bd89:90ed with SMTP id 006d021491bc7-69998d30169mr7387370eaf.41.1778247818205;
+        Fri, 08 May 2026 06:43:38 -0700 (PDT)
 Received: from houminxi ([72.244.37.221])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69b25c76cc4sm1119108eaf.6.2026.05.08.06.43.28
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69b25c76cc4sm1119108eaf.6.2026.05.08.06.43.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 06:43:32 -0700 (PDT)
+        Fri, 08 May 2026 06:43:37 -0700 (PDT)
 From: Minxi Hou <houminxi@gmail.com>
 To: netdev@vger.kernel.org
 Cc: aconole@redhat.com,
@@ -90,9 +90,9 @@ Cc: aconole@redhat.com,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Minxi Hou <houminxi@gmail.com>
-Subject: [PATCH net-next v8 1/2] selftests: openvswitch: add vlan() and encap() flow string parsing
-Date: Fri,  8 May 2026 21:43:07 +0800
-Message-ID: <20260508134308.2857449-2-houminxi@gmail.com>
+Subject: [PATCH net-next v8 2/2] selftests: openvswitch: add pop_vlan test
+Date: Fri,  8 May 2026 21:43:08 +0800
+Message-ID: <20260508134308.2857449-3-houminxi@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260508134308.2857449-1-houminxi@gmail.com>
 References: <20260508134308.2857449-1-houminxi@gmail.com>
@@ -103,14 +103,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 0264D4F7601
+X-Rspamd-Queue-Id: 71C2F4F7457
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -118,7 +118,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_CC(0.00)[redhat.com,ovn.org,davemloft.net,google.com,kernel.org,openvswitch.org,vger.kernel.org,gmail.com];
 	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-285853-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285854-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -131,447 +131,124 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
-Add VLAN TCI formatting and parsing support to ovs-dpctl.py:
+Add test_pop_vlan() to verify OVS kernel datapath pop_vlan action
+correctly strips 802.1Q VLAN tags from frames.
 
-- Add _vlan_dpstr() to decompose TCI into vid/pcp/cfi fields,
-  with raw tci=0x%04x fallback when cfi=0 for round-trip safety.
-- Add _parse_vlan_from_flowstr() boundary check for missing ')'.
-- Add encap_ovskey subclass restricting nla_map to L2-L4 attributes
-  (slots 0-21) that appear inside 802.1Q ENCAP, with metadata
-  attributes set to "none".
-- Check parse() return value for unrecognized trailing content.
-- Support callable format functions in dpstr() output.
-- Change OVS_KEY_ATTR_VLAN type from uint16 to be16 to match the
-  kernel __be16 wire format; uint16 decodes in host byte order,
-  which gives wrong values on little-endian architectures.
-- Change OVS_KEY_ATTR_ENCAP type from none to encap_ovskey to
-  enable recursive parsing of 802.1Q encapsulated flow keys.
-- Add push_vlan action class with fields matching kernel struct
-  ovs_action_push_vlan (vlan_tpid, vlan_tci as network-order u16).
-- Add push_vlan dpstr format and parse with range validation
-  (vid 0-4095, pcp 0-7, tpid 0-0xFFFF) and CFI forced to 1.
-- Remove MAX_ENCAP_DEPTH constant and depth tracking -- the
-  bracket-depth counter in the encap parser already handles
-  nesting; the global depth limit was unnecessary.
+Test structure:
+- Baseline: untagged forwarding validates basic connectivity.
+- Negative: forward without pop_vlan, tagged frame is invisible
+  to ns2 (no VLAN sub-interface), ping fails.
+- Positive: pop_vlan strips tag on forward path, push_vlan
+  restores tag on return path, ping succeeds.
+
+Use static ARP entries to avoid VLAN-tagged ARP complexity.
+Rely on ping success/failure for verification -- no tcpdump or
+pcap files needed.
 
 Signed-off-by: Minxi Hou <houminxi@gmail.com>
 ---
- .../selftests/net/openvswitch/ovs-dpctl.py    | 322 +++++++++++++++++-
- 1 file changed, 312 insertions(+), 10 deletions(-)
+ .../selftests/net/openvswitch/openvswitch.sh  | 77 +++++++++++++++++++
+ 1 file changed, 77 insertions(+)
 
-diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-index 848f61fdcee0..75a6e3861242 100644
---- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-+++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-@@ -370,7 +370,7 @@ class ovsactions(nla):
-         ("OVS_ACTION_ATTR_OUTPUT", "uint32"),
-         ("OVS_ACTION_ATTR_USERSPACE", "userspace"),
-         ("OVS_ACTION_ATTR_SET", "ovskey"),
--        ("OVS_ACTION_ATTR_PUSH_VLAN", "none"),
-+        ("OVS_ACTION_ATTR_PUSH_VLAN", "push_vlan"),
-         ("OVS_ACTION_ATTR_POP_VLAN", "flag"),
-         ("OVS_ACTION_ATTR_SAMPLE", "sample"),
-         ("OVS_ACTION_ATTR_RECIRC", "uint32"),
-@@ -427,6 +427,9 @@ class ovsactions(nla):
+diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+index b327d3061ed5..a0e8e6cbd301 100755
+--- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
++++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+@@ -27,6 +27,7 @@ tests="
+ 	upcall_interfaces			ovs: test the upcall interfaces
+ 	tunnel_metadata				ovs: test extraction of tunnel metadata
+ 	drop_reason				drop: test drop reasons are emitted
++	pop_vlan				vlan: POP_VLAN action strips tag
+ 	psample					psample: Sampling packets with psample"
  
-             return actstr
+ info() {
+@@ -830,6 +831,82 @@ test_tunnel_metadata() {
+ 	return 0
+ }
  
-+    class push_vlan(nla):
-+        fields = (("vlan_tpid", "!H"), ("vlan_tci", "!H"))
++test_pop_vlan() {
++	local sbx="test_pop_vlan"
++	sbx_add "$sbx" || return $?
++	ovs_add_dp "$sbx" vlandp || return 1
 +
-     class sample(nla):
-         nla_flags = NLA_F_NESTED
- 
-@@ -633,6 +636,14 @@ class ovsactions(nla):
-                 print_str += "ct_clear"
-             elif field[0] == "OVS_ACTION_ATTR_POP_VLAN":
-                 print_str += "pop_vlan"
-+            elif field[0] == "OVS_ACTION_ATTR_PUSH_VLAN":
-+                datum = self.get_attr(field[0])
-+                tpid = datum["vlan_tpid"]
-+                tci = datum["vlan_tci"]
-+                vid = tci & 0x0FFF
-+                pcp = (tci >> 13) & 0x7
-+                print_str += "push_vlan(vid=%d,pcp=%d" \
-+                    ",tpid=0x%04x)" % (vid, pcp, tpid)
-             elif field[0] == "OVS_ACTION_ATTR_POP_ETH":
-                 print_str += "pop_eth"
-             elif field[0] == "OVS_ACTION_ATTR_POP_NSH":
-@@ -726,7 +737,57 @@ class ovsactions(nla):
-                     actstr = actstr[strspn(actstr, ", ") :]
-                     parsed = True
- 
--            if parse_starts_block(actstr, "clone(", False):
-+            if parse_starts_block(actstr, "push_vlan(", False):
-+                actstr = actstr[len("push_vlan("):]
-+                vid = 0
-+                pcp = 0
-+                tpid = 0x8100
-+                if ")" not in actstr:
-+                    raise ValueError(
-+                        "push_vlan(): missing ')'")
-+                paren = actstr.index(")")
-+                if not actstr[:paren].strip():
-+                    raise ValueError("push_vlan(): no fields")
-+                for kv in actstr[:paren].split(","):
-+                    if "=" not in kv:
-+                        raise ValueError(
-+                            "push_vlan(): bad field '%s'"
-+                            % kv.strip())
-+                    k = kv[:kv.index("=")].strip()
-+                    v = kv[kv.index("=") + 1:].strip()
-+                    if k == "vid":
-+                        vid = int(v, 0)
-+                        if vid < 0 or vid > 0xFFF:
-+                            raise ValueError(
-+                                "push_vlan(): vid=%d out of "
-+                                "range (0-4095)" % vid)
-+                    elif k == "pcp":
-+                        pcp = int(v, 0)
-+                        if pcp < 0 or pcp > 7:
-+                            raise ValueError(
-+                                "push_vlan(): pcp=%d out of "
-+                                "range (0-7)" % pcp)
-+                    elif k == "tpid":
-+                        tpid = int(v, 0)
-+                        if tpid < 0 or tpid > 0xFFFF:
-+                            raise ValueError(
-+                                "push_vlan(): tpid=0x%x out "
-+                                "of range (0-0xffff)" % tpid)
-+                    else:
-+                        raise ValueError(
-+                            "push_vlan(): unknown key '%s'"
-+                            % k)
-+                tci = (vid & 0x0FFF) | ((pcp & 0x7) << 13) \
-+                    | 0x1000
-+                pvact = self.push_vlan()
-+                pvact["vlan_tpid"] = tpid
-+                pvact["vlan_tci"] = tci
-+                self["attrs"].append(
-+                    ["OVS_ACTION_ATTR_PUSH_VLAN", pvact])
-+                actstr = actstr[paren + 1:]
-+                parsed = True
++	ovs_add_netns_and_veths "$sbx" vlandp \
++		ns1 veth1 ns1veth 192.0.2.1/24 || return 1
++	ovs_add_netns_and_veths "$sbx" vlandp \
++		ns2 veth2 ns2veth 192.0.2.2/24 || return 1
 +
-+            elif parse_starts_block(actstr, "clone(", False):
-                 parencount += 1
-                 subacts = ovsactions()
-                 actstr = actstr[len("clone("):]
-@@ -901,11 +962,11 @@ class ovskey(nla):
-     nla_flags = NLA_F_NESTED
-     nla_map = (
-         ("OVS_KEY_ATTR_UNSPEC", "none"),
--        ("OVS_KEY_ATTR_ENCAP", "none"),
-+        ("OVS_KEY_ATTR_ENCAP", "encap_ovskey"),
-         ("OVS_KEY_ATTR_PRIORITY", "uint32"),
-         ("OVS_KEY_ATTR_IN_PORT", "uint32"),
-         ("OVS_KEY_ATTR_ETHERNET", "ethaddr"),
--        ("OVS_KEY_ATTR_VLAN", "uint16"),
-+        ("OVS_KEY_ATTR_VLAN", "be16"),
-         ("OVS_KEY_ATTR_ETHERTYPE", "be16"),
-         ("OVS_KEY_ATTR_IPV4", "ovs_key_ipv4"),
-         ("OVS_KEY_ATTR_IPV6", "ovs_key_ipv6"),
-@@ -1636,6 +1697,194 @@ class ovskey(nla):
-     class ovs_key_mpls(nla):
-         fields = (("lse", ">I"),)
- 
-+    # 802.1Q CFI (Canonical Format Indicator) bit, always set for Ethernet
-+    _VLAN_CFI_MASK = 0x1000
++	# Baseline: untagged bidirectional forwarding
++	ovs_add_flow "$sbx" vlandp \
++		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
++	ovs_add_flow "$sbx" vlandp \
++		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
++	ovs_add_flow "$sbx" vlandp \
++		'in_port(1),eth(),eth_type(0x0800),ipv4()' '2' || return 1
++	ovs_add_flow "$sbx" vlandp \
++		'in_port(2),eth(),eth_type(0x0800),ipv4()' '1' || return 1
++	ovs_sbx "$sbx" ip netns exec ns1 ping -c 3 -W 2 \
++		192.0.2.2 || return 1
 +
-+    @staticmethod
-+    def _vlan_dpstr(tci):
-+        """Format VLAN TCI as vid=X,pcp=Y,cfi=Z or tci=0xNNNN.
++	# VLAN topology: ns1 uses VLAN sub-interface, ns2 is plain
++	ip -n ns1 link add link ns1veth name ns1veth.10 \
++		type vlan id 10 || return 1
++	on_exit "ip -n ns1 link del ns1veth.10 2>/dev/null"
++	ip -n ns1 addr add 198.51.100.1/24 dev ns1veth.10 || return 1
++	ip -n ns1 link set ns1veth.10 up || return 1
++	ip -n ns2 addr add 198.51.100.2/24 dev ns2veth || return 1
 +
-+        When cfi=1 (standard Ethernet VLAN), outputs decomposed
-+        vid/pcp/cfi fields. When cfi=0 (truncated VLAN header),
-+        falls back to raw tci=0x%04x to ensure round-trip
-+        correctness: the parser auto-adds cfi=1 for vid/pcp
-+        format, so cfi=0 would be lost on re-parse."""
-+        vid = tci & 0x0FFF
-+        pcp = (tci >> 13) & 0x7
-+        cfi = (tci >> 12) & 0x1
-+        if cfi:
-+            return "vid=%d,pcp=%d,cfi=%d" % (vid, pcp, cfi)
-+        return "tci=0x%04x" % tci
++	ovs_del_flows "$sbx" vlandp
 +
-+    @staticmethod
-+    def _parse_vlan_from_flowstr(flowstr):
-+        """Parse vlan(tci=X) or vlan(vid=X[,pcp=Y,cfi=Z]) from flowstr.
++	# Static ARP: avoids VLAN-tagged ARP complexity
++	local ns1veth10mac ns2mac
++	ns1veth10mac=$(ip -n ns1 link show ns1veth.10 \
++		| awk '/link\/ether/ {print $2}')
++	[ -z "$ns1veth10mac" ] && \
++		{ info "failed to get ns1veth10mac"; return 1; }
++	ns2mac=$(ip -n ns2 link show ns2veth \
++		| awk '/link\/ether/ {print $2}')
++	[ -z "$ns2mac" ] && \
++		{ info "failed to get ns2mac"; return 1; }
++	ip -n ns1 neigh replace 198.51.100.2 lladdr "$ns2mac" \
++		dev ns1veth.10 nud permanent || return 1
++	ip -n ns2 neigh replace 198.51.100.1 \
++		lladdr "$ns1veth10mac" \
++		dev ns2veth nud permanent || return 1
 +
-+        Returns (remaining_flowstr, key_tci, mask_tci).
-+        TCI values use standard bit layout (VID bits 0-11,
-+        CFI bit 12, PCP bits 13-15); byte order conversion to
-+        big-endian happens in pyroute2 be16 NLA serialization.
-+        The mask covers only the fields the caller specified:
-+        vid -> 0x0FFF, pcp -> 0xE000, cfi -> 0x1000, tci -> 0xFFFF.
++	local vlan_match='in_port(1),eth(),eth_type(0x8100),'
++	vlan_match+='vlan(vid=10),'
++	vlan_match+='encap(eth_type(0x0800),'
++	vlan_match+='ipv4(src=198.51.100.1,proto=1),icmp())'
 +
-+        The tci= key sets the raw TCI bitfield (no CFI validation) to allow
-+        non-Ethernet use cases.  Use cfi=1 for standard Ethernet VLAN matching.
-+        """
-+        tci = 0
-+        mask = 0
-+        has_tci = False
-+        has_vid = has_pcp = has_cfi = False
-+        _tci_mix_err = "vlan(): 'tci' cannot be mixed " \
-+                       "with 'vid'/'pcp'/'cfi'"
-+        first = True
-+        while True:
-+            flowstr = flowstr.lstrip()
-+            if not flowstr:
-+                raise ValueError("vlan(): missing ')'")
-+            if flowstr[0] == ')':
-+                break
-+            if not first:
-+                flowstr = flowstr[1:]  # skip ','
-+                if not flowstr:
-+                    raise ValueError("vlan(): missing ')' after trailing comma")
-+                flowstr = flowstr.lstrip()
-+                if flowstr and flowstr[0] == ')':
-+                    break
-+                if flowstr and flowstr[0] == ',':
-+                    raise ValueError(
-+                        "vlan(): empty or extra comma in field list")
-+            first = False
++	# Negative: forward without pop_vlan -- tagged frame
++	# is invisible to ns2 (no VLAN sub-interface), ping fails
++	ovs_add_flow "$sbx" vlandp "$vlan_match" '2' || return 1
++	ovs_sbx "$sbx" ip netns exec ns1 ping -I ns1veth.10 \
++		-c 3 -W 1 198.51.100.2 >/dev/null 2>&1 \
++		&& { info "FAIL: ping should fail without pop_vlan"
++		     return 1; }
 +
-+            eq = flowstr.find('=')
-+            if eq == -1:
-+                raise ValueError(
-+                    "vlan(): expected key=value, got '%s'" % flowstr)
-+            key = flowstr[:eq].strip()
-+            flowstr = flowstr[eq + 1:]
++	ovs_del_flows "$sbx" vlandp
 +
-+            end = flowstr.find(',')
-+            end2 = flowstr.find(')')
-+            if end == -1 and end2 == -1:
-+                raise ValueError("vlan(): missing ')'")
-+            if end == -1 or (end2 != -1 and end2 < end):
-+                end = end2
-+            val = flowstr[:end].strip()
-+            flowstr = flowstr[end:]
++	# Positive: pop_vlan strips tag on forward path,
++	# push_vlan restores tag on return path -- ping succeeds
++	ovs_add_flow "$sbx" vlandp \
++		"$vlan_match" 'pop_vlan,2' || return 1
++	ovs_add_flow "$sbx" vlandp \
++		'in_port(2),eth(),eth_type(0x0800),ipv4()' \
++		'push_vlan(vid=10,pcp=0,tpid=0x8100),1' || return 1
++	ovs_sbx "$sbx" ip netns exec ns1 ping -I ns1veth.10 \
++		-c 3 -W 2 198.51.100.2 || return 1
 +
-+            if not val:
-+                raise ValueError("vlan(): empty value for key '%s'" % key)
-+            try:
-+                v = int(val, 16) if val.startswith(('0x', '0X')) else int(val)
-+            except ValueError as exc:
-+                raise ValueError(
-+                    "vlan(): invalid value '%s' for key '%s'"
-+                    % (val, key)) from exc
++	return 0
++}
 +
-+            if key == 'tci':
-+                if has_tci:
-+                    raise ValueError("vlan(): duplicate 'tci'")
-+                if has_vid or has_pcp or has_cfi:
-+                    raise ValueError(_tci_mix_err)
-+                if v > 0xFFFF or v < 0:
-+                    raise ValueError("vlan(): tci=0x%x out of range" % v)
-+                tci = v
-+                mask = 0xFFFF
-+                has_tci = True
-+            elif key == 'vid':
-+                if has_tci:
-+                    raise ValueError(_tci_mix_err)
-+                if has_vid:
-+                    raise ValueError("vlan(): duplicate 'vid'")
-+                if v < 0 or v > 0xFFF:
-+                    raise ValueError("vlan(): vid=%d out of range (0-4095)" % v)
-+                tci |= v
-+                mask |= 0x0FFF
-+                has_vid = True
-+            elif key == 'pcp':
-+                if has_tci:
-+                    raise ValueError(_tci_mix_err)
-+                if has_pcp:
-+                    raise ValueError("vlan(): duplicate 'pcp'")
-+                if v < 0 or v > 7:
-+                    raise ValueError("vlan(): pcp=%d out of range (0-7)" % v)
-+                tci |= (v & 0x7) << 13
-+                mask |= 0xE000
-+                has_pcp = True
-+            elif key == 'cfi':
-+                if has_tci:
-+                    raise ValueError(_tci_mix_err)
-+                if has_cfi:
-+                    raise ValueError("vlan(): duplicate 'cfi'")
-+                if v != 1:
-+                    raise ValueError("vlan(): cfi must be 1 for Ethernet")
-+                tci |= ovskey._VLAN_CFI_MASK
-+                mask |= ovskey._VLAN_CFI_MASK
-+                has_cfi = True
-+            else:
-+                raise ValueError("vlan(): unknown key '%s'" % key)
-+
-+        flowstr = flowstr[1:]  # skip ')'
-+        # Catch immediate '))' (user error).  A ')' after ',' is consumed
-+        # by parse()'s strspn(flowstr, "), ") inter-field separator stripping.
-+        if flowstr.lstrip().startswith(')'):
-+            raise ValueError("vlan(): unmatched ')'")
-+        # parse() strips trailing ',', ')', ' ' as inter-field separators,
-+        # so we do not need to call strspn here.
-+
-+        if mask == 0:
-+            raise ValueError("vlan(): no fields specified, "
-+                             "use vlan(vid=X[,pcp=Y,cfi=Z]) or vlan(tci=X)")
-+        if not has_tci:
-+            tci |= ovskey._VLAN_CFI_MASK
-+            mask |= ovskey._VLAN_CFI_MASK
-+        return flowstr, tci, mask
-+
-+    @staticmethod
-+    def _parse_encap_from_flowstr(flowstr):
-+        """Parse encap(inner_flow) from flowstr.
-+
-+        Returns (remaining_flowstr, inner_key_dict, inner_mask_dict)
-+        where each dict has an 'attrs' key for recursive NLA encoding.
-+        Parenthesis-depth tracking handles nested encap() calls but not
-+        quoted strings containing literal parentheses.
-+        """
-+        depth = 1
-+        end = -1
-+        for i, c in enumerate(flowstr):
-+            if c == '(':
-+                depth += 1
-+            elif c == ')':
-+                depth -= 1
-+                if depth < 0:
-+                    raise ValueError(
-+                        "encap(): unmatched ')' at position %d" % i)
-+                if depth == 0:
-+                    end = i
-+                    break
-+
-+        if end == -1:
-+            if depth > 1:
-+                raise ValueError("encap(): missing ')' in nested encap")
-+            raise ValueError("encap(): missing ')'")
-+
-+        inner_str = flowstr[:end].strip()
-+        if not inner_str:
-+            raise ValueError("encap(): empty inner flow")
-+
-+        flowstr = flowstr[end + 1:]
-+        if flowstr.lstrip().startswith(')'):
-+            raise ValueError("encap(): unmatched ')' after encap()")
-+
-+        inner_key = encap_ovskey()
-+        inner_mask = encap_ovskey()
-+        remaining = inner_key.parse(inner_str, inner_mask)
-+        if remaining and re.search(r'[^\s,)]', remaining):
-+            raise ValueError(
-+                "encap(): unrecognized trailing "
-+                "content '%s'" % remaining.strip())
-+
-+        return flowstr, inner_key, inner_mask
-+
-     def parse(self, flowstr, mask=None):
-         for field in (
-             ("OVS_KEY_ATTR_PRIORITY", "skb_priority", intparse),
-@@ -1657,6 +1906,16 @@ class ovskey(nla):
-                 "eth_type",
-                 lambda x: intparse(x, "0xffff"),
-             ),
-+            (
-+                "OVS_KEY_ATTR_VLAN",
-+                "vlan",
-+                ovskey._parse_vlan_from_flowstr,
-+            ),
-+            (
-+                "OVS_KEY_ATTR_ENCAP",
-+                "encap",
-+                ovskey._parse_encap_from_flowstr,
-+            ),
-             (
-                 "OVS_KEY_ATTR_IPV4",
-                 "ipv4",
-@@ -1794,6 +2053,9 @@ class ovskey(nla):
-                 True,
-             ),
-             ("OVS_KEY_ATTR_ETHERNET", None, None, False, False),
-+            ("OVS_KEY_ATTR_VLAN", "vlan", ovskey._vlan_dpstr,
-+                lambda x: False, True),
-+            ("OVS_KEY_ATTR_ENCAP", None, None, False, False),
-             (
-                 "OVS_KEY_ATTR_ETHERTYPE",
-                 "eth_type",
-@@ -1821,22 +2083,61 @@ class ovskey(nla):
-             v = self.get_attr(field[0])
-             if v is not None:
-                 m = None if mask is None else mask.get_attr(field[0])
-+                fmt = field[2]  # str format or callable
-                 if field[4] is False:
-                     print_str += v.dpstr(m, more)
-                     print_str += ","
-                 else:
-                     if m is None or field[3](m):
--                        print_str += field[1] + "("
--                        print_str += field[2] % v
--                        print_str += "),"
-+                        val = fmt(v) if callable(fmt) else fmt % v
-+                        print_str += field[1] + "(" + val + "),"
-                     elif more or m != 0:
--                        print_str += field[1] + "("
--                        print_str += (field[2] % v) + "/" + (field[2] % m)
--                        print_str += "),"
-+                        if callable(fmt):
-+                            val = fmt(v) + "/" + fmt(m)
-+                        else:
-+                            val = (fmt % v) + "/" + (fmt % m)
-+                        print_str += field[1] + "(" + val + "),"
- 
-         return print_str
- 
- 
-+class encap_ovskey(ovskey):
-+    """Inner flow key attributes valid inside 802.1Q ENCAP.
-+
-+    Only L2-L4 key attributes (slots 0-21) appear inside ENCAP.
-+    Metadata-only attributes (SKB_MARK, DP_HASH, RECIRC_ID, etc.)
-+    are set to "none" -- they never appear inside ENCAP per
-+    ovs_nla_put_vlan() in net/openvswitch/flow_netlink.c.
-+
-+    nla_map indexes must match OVS_KEY_ATTR_* enum values in
-+    include/uapi/linux/openvswitch.h.
-+    """
-+    nla_map = (
-+        ("OVS_KEY_ATTR_UNSPEC", "none"),
-+        ("OVS_KEY_ATTR_ENCAP", "none"),  # placeholder, parsed by ovskey
-+        ("OVS_KEY_ATTR_PRIORITY", "none"),  # skb metadata, not in ENCAP
-+        ("OVS_KEY_ATTR_IN_PORT", "none"),  # skb metadata, not in ENCAP
-+        ("OVS_KEY_ATTR_ETHERNET", "ethaddr"),
-+        ("OVS_KEY_ATTR_VLAN", "be16"),
-+        ("OVS_KEY_ATTR_ETHERTYPE", "be16"),
-+        ("OVS_KEY_ATTR_IPV4", "ovs_key_ipv4"),
-+        ("OVS_KEY_ATTR_IPV6", "ovs_key_ipv6"),
-+        ("OVS_KEY_ATTR_TCP", "ovs_key_tcp"),
-+        ("OVS_KEY_ATTR_UDP", "ovs_key_udp"),
-+        ("OVS_KEY_ATTR_ICMP", "ovs_key_icmp"),
-+        ("OVS_KEY_ATTR_ICMPV6", "ovs_key_icmpv6"),
-+        ("OVS_KEY_ATTR_ARP", "ovs_key_arp"),
-+        ("OVS_KEY_ATTR_ND", "ovs_key_nd"),
-+        ("OVS_KEY_ATTR_SKB_MARK", "none"),  # metadata, not in ENCAP
-+        ("OVS_KEY_ATTR_TUNNEL", "none"),  # tunnel metadata, not in ENCAP
-+        ("OVS_KEY_ATTR_SCTP", "ovs_key_sctp"),
-+        ("OVS_KEY_ATTR_TCP_FLAGS", "be16"),
-+        ("OVS_KEY_ATTR_DP_HASH", "none"),  # metadata, not in ENCAP
-+        ("OVS_KEY_ATTR_RECIRC_ID", "none"),  # metadata, not in ENCAP
-+        ("OVS_KEY_ATTR_MPLS", "array(ovs_key_mpls)"),
-+    )
-+
-+
- class OvsPacket(GenericNetlinkSocket):
-     OVS_PACKET_CMD_MISS = 1  # Flow table miss
-     OVS_PACKET_CMD_ACTION = 2  # USERSPACE action
-@@ -2576,6 +2877,7 @@ def print_ovsdp_full(dp_lookup_rep, ifindex, ndb=NDB(), vpl=OvsVport()):
- 
- 
- def main(argv):
-+    nlmsg_atoms.encap_ovskey = encap_ovskey
-     nlmsg_atoms.ovskey = ovskey
-     nlmsg_atoms.ovsactions = ovsactions
- 
+ run_test() {
+ 	(
+ 	tname="$1"
 -- 
 2.53.0
 
