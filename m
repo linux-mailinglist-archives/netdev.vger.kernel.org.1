@@ -1,141 +1,154 @@
-Return-Path: <netdev+bounces-285805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285806-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OB0CNWbc/Wn0jwAAu9opvQ
-	(envelope-from <netdev+bounces-285805-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:51:50 +0200
+	id wG4zOU7e/WmqkAAAu9opvQ
+	(envelope-from <netdev+bounces-285806-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:59:58 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 598E34F6946
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:51:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 30DFD4F6ADB
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:59:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8358F3006B20
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 12:50:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AC16C3045AB2
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 12:55:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A4EC3DCD92;
-	Fri,  8 May 2026 12:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VLkhtd8W"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E72743CAE9C;
+	Fri,  8 May 2026 12:55:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A34280A5A
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 12:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42E13876B9
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 12:55:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778244647; cv=none; b=r23t7Fn9TiTh/DFQkfQy0UO8rC/Eg1ixDoE1CDee5jVJ9nCx9Dd58i/DxTHWcpOrVHuJW7p/PifPQ4xh8XV9Eq/go0FM2cLDsEwq3eVi5xVB0OjS9fBNT5o/F8EbuDd4wTxe5K5pZuLdDIIMe29TmszLvgd1U95xNXkzUv0O2w8=
+	t=1778244950; cv=none; b=oKh88RZo22WtQPPrgdzbEoj2+sbwNB9UFpULnXOUEbF3sVXWEG3wrP0RW3SWAvOSNou1ao/fCcvLXTc1RV65sZmY1+WdgnyVjo8EsnUfudMlDVq6TwIro+UO1fdhRxL0lpLzKssZnUCdpkFqb5tfXv83DC6YlH/UG5ln+/syZ68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778244647; c=relaxed/simple;
-	bh=HHMEf8DWNIJ2igzl7oSuvE+lxVSKVIP8abm7DBvgqEs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=OUwkKVhyRLb3uZ9+pkMQT7taddEKnrxh5LydIdqHIYwRQk5iWWzA8EcxElNoRkIfF9Wprv41ygQpGPXEIa9KV3CZkGeMxkYn/0k16I69gltDj91dGhca++d6mKhqNd5dXISpsdFBWE58kQ2LXTSv5+UoGP+kJu09tsg/gSVVeNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VLkhtd8W; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778244644;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5nscIJDj62jaV3hdNmP/ANYN3y+AdM2VSE+HH2VLj/M=;
-	b=VLkhtd8WlhHGANLXGzxjjNHTzefZpcVZMV02yQZCsKIDczfFUyPYUGxJHCttj610yXFEbc
-	R/u9M76PQqHAwaxWqpOY1AiIHOIT/ixw+r+mZ0/24HAzSE2JCXP5tB9+TiNaqfRh/fMDDg
-	p62/2lH7fFGhIISn8F5o04qFwZE/mIY=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-300-SPHISxg7N0aP7ecQl9bfow-1; Fri,
- 08 May 2026 08:50:41 -0400
-X-MC-Unique: SPHISxg7N0aP7ecQl9bfow-1
-X-Mimecast-MFC-AGG-ID: SPHISxg7N0aP7ecQl9bfow_1778244639
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 84B681800283;
-	Fri,  8 May 2026 12:50:39 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.65.142])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D1AF7300019F;
-	Fri,  8 May 2026 12:50:36 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Ilya Maximets <i.maximets@ovn.org>
-Cc: netdev@vger.kernel.org,  Eelco Chaudron <echaudro@redhat.com>,  "David
- S. Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,
-  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
-  Simon Horman <horms@kernel.org>,  Jiri Benc <jbenc@redhat.com>,  Yi Yang
- <yi.y.yang@intel.com>,  dev@openvswitch.org,  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: nsh: fix incorrect header length macros
-In-Reply-To: <20260507120434.2962505-1-i.maximets@ovn.org> (Ilya Maximets's
-	message of "Thu, 7 May 2026 14:04:26 +0200")
-References: <20260507120434.2962505-1-i.maximets@ovn.org>
-Date: Fri, 08 May 2026 08:50:35 -0400
-Message-ID: <f7ta4uarrok.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1778244950; c=relaxed/simple;
+	bh=wIRorCkWr0tAR/ZLsIsgAmM66meLaondgk5OY02a4Eo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bKVVHgNzKS0dXxOudfS6Rw0uSi/Kko9XRAyFmEcj/6pCurPHWFlkWsVF2Qkq/e2fCCmMoMwN72qQbEb2o3NV9lBzuDKb5f3wkoKol+6IvDEeNgtTQ5njDhZBEUzXxev2eBx7fyZP0LKq1jGbkP57H16XKopLD1LvcUqk1+kcIh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 34073e024add11f1aa26b74ffac11d73-20260508
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
+	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED
+	SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS
+	DMARC_NOPASS, CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS
+	GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:888ec7f6-322b-4610-a7e4-f4677d7068be,IP:10,
+	URL:0,TC:0,Content:0,EDM:25,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:30
+X-CID-INFO: VERSION:1.3.12,REQID:888ec7f6-322b-4610-a7e4-f4677d7068be,IP:10,UR
+	L:0,TC:0,Content:0,EDM:25,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:30
+X-CID-META: VersionHash:e7bac3a,CLOUDID:d6a0d5131c38331f118a175109378b75,BulkI
+	D:260508180451HUA6S6OO,BulkQuantity:1,Recheck:0,SF:17|19|38|66|78|102|127|
+	898,TC:nil,Content:0|15|50,EDM:5,IP:-2,URL:0,File:nil,RT:nil,Bulk:40,QS:ni
+	l,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:
+	0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 34073e024add11f1aa26b74ffac11d73-20260508
+X-User: cuitao@kylinos.cn
+Received: from ctao-book.. [(223.70.159.239)] by mailgw.kylinos.cn
+	(envelope-from <cuitao@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1360609858; Fri, 08 May 2026 20:55:34 +0800
+From: Tao Cui <cuitao@kylinos.cn>
+To: andrew@lunn.ch,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com
+Cc: horms@kernel.org,
+	vadim.fedorenko@linux.dev,
+	leitao@debian.org,
+	netdev@vger.kernel.org,
+	Tao Cui <cuitao@kylinos.cn>
+Subject: [PATCH net v2] net: ethtool: fix missing closing paren in rings_reply_size()
+Date: Fri,  8 May 2026 20:54:12 +0800
+Message-ID: <20260508125412.189804-1-cuitao@kylinos.cn>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Rspamd-Queue-Id: 598E34F6946
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 30DFD4F6ADB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285805-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285806-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	DMARC_NA(0.00)[kylinos.cn];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[aconole@redhat.com,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[cuitao@kylinos.cn,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.969];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ovn.org:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Ilya Maximets <i.maximets@ovn.org> writes:
+sizeof(u32) on the _RINGS_CQE_SIZE line is missing its closing
+parenthesis, causing nla_total_size() to absorb the subsequent
+_TX_PUSH and _RX_PUSH entries. The resulting size estimate
+happens to be numerically identical due to NLA alignment, but
+the nesting is wrong and misleading.
 
-> NSH header length is a 6-bit field that encodes the total length of
-> the header in 4-byte words.  So the maximum length is 0b111111 * 4,
-> which is 252 and not 256.  The maximum context length is the same
-> number minus the length of the base header (8), so 244.
->
-> These macros are used to validate push_nsh() action in openvswitch.
-> Miscalculation here doesn't cause any real issues.  In the worst case
-> the oversized context is truncated while building the header, so we'll
-> construct and send a broken packet, which is not a big problem, as any
-> receiver should validate the fields.  No invalid memory accesses will
-> happen during the header push.  But we should fix the macros to reject
-> the incorrect actions in the first place.
->
-> Using previously defined values and calculating the length instead
-> of defining numbers directly, so it's easier to understand where they
-> come from and harder to make a mistake.
->
-> Fixes: 1f0b7744c505 ("net: add NSH header structures and helpers")
-> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
-> ---
+Fixes: 4dc84c06a343 ("net: ethtool: extend ringparam set/get APIs for tx_push")
+Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Reviewed-by: Breno Leitao <leitao@debian.org>
+---
+v2:
+- Added Fixes: tag as suggested by Breno Leitao.
+- Added Reviewed-by tags from Vadim Fedorenko and Breno Leitao.
+---
+ net/ethtool/rings.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks Ilya!
-
-Reviewed-by: Aaron Conole <aconole@redhat.com>
+diff --git a/net/ethtool/rings.c b/net/ethtool/rings.c
+index 0fd5dcc3729f..9054c89c5d7b 100644
+--- a/net/ethtool/rings.c
++++ b/net/ethtool/rings.c
+@@ -63,9 +63,9 @@ static int rings_reply_size(const struct ethnl_req_info *req_base,
+ 	       nla_total_size(sizeof(u32)) +	/* _RINGS_TX */
+ 	       nla_total_size(sizeof(u32)) +	/* _RINGS_RX_BUF_LEN */
+ 	       nla_total_size(sizeof(u8))  +	/* _RINGS_TCP_DATA_SPLIT */
+-	       nla_total_size(sizeof(u32)  +	/* _RINGS_CQE_SIZE */
++	       nla_total_size(sizeof(u32)) +	/* _RINGS_CQE_SIZE */
+ 	       nla_total_size(sizeof(u8))  +	/* _RINGS_TX_PUSH */
+-	       nla_total_size(sizeof(u8))) +	/* _RINGS_RX_PUSH */
++	       nla_total_size(sizeof(u8))  +	/* _RINGS_RX_PUSH */
+ 	       nla_total_size(sizeof(u32)) +	/* _RINGS_TX_PUSH_BUF_LEN */
+ 	       nla_total_size(sizeof(u32)) +	/* _RINGS_TX_PUSH_BUF_LEN_MAX */
+ 	       nla_total_size(sizeof(u32)) +	/* _RINGS_HDS_THRESH */
+-- 
+2.43.0
 
 
