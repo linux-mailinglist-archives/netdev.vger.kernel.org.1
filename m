@@ -1,181 +1,163 @@
-Return-Path: <netdev+bounces-285674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285675-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gP6iM+qF/WmefQAAu9opvQ
-	(envelope-from <netdev+bounces-285674-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 08:42:50 +0200
+	id oFtvHNSG/WmefQAAu9opvQ
+	(envelope-from <netdev+bounces-285675-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 08:46:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04F6C4F2944
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 08:42:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC9FE4F298A
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 08:46:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5F610300BCA8
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 06:42:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4F7213022630
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 06:46:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A107537883E;
-	Fri,  8 May 2026 06:42:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E01B337649A;
+	Fri,  8 May 2026 06:46:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TCRLw1IV"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="gYa32qQm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3139535F615
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 06:42:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319A5377561;
+	Fri,  8 May 2026 06:46:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778222560; cv=none; b=Kht/V4+9VgS2nSDJeAwxIb+ez6O8CeD27vraPZ6JBFA2wmmEVflh7gnPbTavu615N8t5T2/yGc8qCcuosVxUaef5gN8X7IqbAjhYnZJAwAzSgl/nI01dixn6RoGzkot3gOLeNw7kdaTiTXpzxFY7zbc2h2Ek4EW8Qj7A0NM5mTQ=
+	t=1778222797; cv=none; b=gPuXw+xBMysrlnG48BoQfzx1iVkxuIXGAZ4s7UzPS/naPG7Si+2i9RrXLjLEHBDzfwf5FTfop/XqcO1msqcdth/DdYSCfa+uj8qppu8yAWtLa2boxTny8XSZZjCt33gs20ZCq9oe/JYoraEXboC3PjxHvwO2J88WSNZL6T3ngQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778222560; c=relaxed/simple;
-	bh=0quxifnJ6eLNYHMyHf/CXF5opgcByfW/LR54z4sJXnM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=StwpXVOzcadzhPTbuCTw8MABCzK1yroJB/gHQzbkTxzuLmTxW0vpmPqokLiOx6YVl/eVgC4SxUPXr3AfA9AXWtl7YGhNr8W+aOZ/jJXd8friJsTsTpU7tyUazJC9qVNDFZy8RCSCkjTdrw3DDkJ5OVpNKFPmSxgGNlKoxJUVlRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TCRLw1IV; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2aaed195901so8429055ad.0
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 23:42:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778222553; x=1778827353; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8Wj6RD6FHkHjiXXRtgdNiP7tVxbDGuEYZp49mnK7Ji8=;
-        b=TCRLw1IVUs7DHRiFDSP5x8/n4YALVhX9ye73CWRywLCU0aGnG0k/UYc70OYUBlUL85
-         JBRY+0wR3MDQs0TIyDj0JY025kF/sulLy//sOZD50mdYuXb4aN6ZdPCyLqzLniV0vqXS
-         sdY+VXvusTtkOfmcQKdJiNEq8KvqE0dW+fVd0kxDc5TjQynKCZpQ6raXfMcFeiLicGyM
-         6eleTnc5/LC4CKk1ThPWBofoHLBXZsM/spyosUBOYI9Xct1O+bc5LGbcYlX9CGcpL1uz
-         TMrqXH81M6gcm/SU+9yb50ytvnowrmGSoR8nHTNFY4/gYBE/K8Vr+J57Ogx3c8Qf0w/a
-         ZA2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778222553; x=1778827353;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8Wj6RD6FHkHjiXXRtgdNiP7tVxbDGuEYZp49mnK7Ji8=;
-        b=k5JOvmLBfcqJJoTupRAsmvtOHBtCbHif1wfwviohIiMghsDpvFS3C6R3/dhfQP6p5d
-         TQyvHxsFPMO8xSx+vltDTzuvOKcS4YS3gSoX2VIC4566WUy8+MqAppyg5RZi3N0n+kLv
-         cI4+vGdQtB9Q6QuB+qW5TZ00hpEqsG/GM3n2GBglDXIobA5wBR1Kkl9Kc1OutX8T0MUP
-         BTojqdcHsHhVHQGjG2yu6Qaqx52H429HHEtNJXfGgwScSpwhvTXTcIcqPfR0z3Sy/hFy
-         jTgIG7bHwrCi+aveHjgdvqUZWPEZxNTsQp6LKDUvsttq3X7bC2I1/PnspcUY7kYw5q9H
-         oMfQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/RP3/dLGatujB5oD0JE1parZn4AWTaY/s7zFkQZwmaIIxng6i8jsO5UB4eBnWYCQ1U4Y+sa90=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEalVmnAA+CtijEoxavj4gfS8KuJlAKt47BNOquV/UOCPLWHxC
-	D9gUtgtCmEmNOiWY1nMdLRv+8OMEX+blGaESyisVNoLkBC9ng6G/OXzN
-X-Gm-Gg: Acq92OFkUVGAeeNGCp+A89vq6RdyLTIyE+UuCRp6rIgKldUKlfNdu/XVw639VwSyeIW
-	0iCcttAwzQ1QK8zwPFsLnpJiQN/LSfwEdKrWFRFuWH/mHxszOZW1wQuJ3EEh2/m4qvEfma3iq72
-	+o9dNbWYsX76DYkc6P6C3E91Uzd/dC9YHgM8CPid7L/9wBeTP/h4d5zLtHfDVq7pBLwM/JZ0gBc
-	uv/twjrmBBDhzVon4gfMmYP9n5u2POtTH04dy74It8qTgQEcqnL4RTmx72MHt+1HoWg4iqlCZa4
-	0cL4oPNaN5YhLyshJY1L2oR6r58qRtnR1BLNKTjA6FFnAtfTUwhTKs+/lfjnTwqaSpkgvLFsHEz
-	o46SlVa3QilmSVJU4jFh7WMpu/jtR6O9pgS7Lwom7bv7uNQzz4xv68gbVFZgYXeuzjgXvrJA3Oi
-	B/8lz3FWVnpYHlb3R90C3TG3rB9Vwo9rIoFzQDBJtN1P4=
-X-Received: by 2002:a17:903:947:b0:2b2:5857:583e with SMTP id d9443c01a7336-2ba798bb607mr112847185ad.31.1778222553061;
-        Thu, 07 May 2026 23:42:33 -0700 (PDT)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1e36596sm9559765ad.48.2026.05.07.23.42.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2026 23:42:32 -0700 (PDT)
-Date: Fri, 8 May 2026 15:42:28 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: dhowells@redhat.com, marc.dionne@auristor.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, qingfang.deng@linux.dev
-Cc: linux-afs@lists.infradead.org, netdev@vger.kernel.org,
-	stable@vger.kernel.org, imv4bel@gmail.com
-Subject: [PATCH net v2] rxrpc: Also unshare DATA/RESPONSE packets when paged
- frags are present
-Message-ID: <af2F1FU5d4Q_Gn1W@v4bel>
+	s=arc-20240116; t=1778222797; c=relaxed/simple;
+	bh=05nZ+gIzppm+BLZBfpcPgMdNGhEbEugPLSX//8bpPp0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uMvQtCDmujCfKFGiOLDyLhxTYq9P3W/SzK0MetiMup6yzj79eMOi9AmxqqEGldJkHKNUYF2qZG6imuvWcx8Cm9V92U+eyYT4b6VCQfyW+1yL0c1v+g2bbhmiYway7Iu84VyKOjrh+eeBoPE/cSFEPuh0Oj2tG4266bdZS5EuPyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=gYa32qQm; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 34574207BE;
+	Fri,  8 May 2026 08:46:16 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id AO8moCBcSTVj; Fri,  8 May 2026 08:46:14 +0200 (CEST)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id BF1F8206B0;
+	Fri,  8 May 2026 08:46:14 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com BF1F8206B0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1778222774;
+	bh=g2RV2sN+jzmrGkn4ZV3GjuywoldoUqX9Pel8LWivNrw=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=gYa32qQm7axhs8CWSzB8b+Vry+3lO9qOfomax+LQeGMEs3iQQlUyFDqiQQ0GjShcd
+	 QT8Os2VrZPYUEUEQCV7DlUY2TOprGkx2xkLIeu0OFUAO8QmNC0E08JlSzXxobTlwvu
+	 I8m4BgkDM7aUhl3SOum6g0x7omMSyktafCfq8QekxoKoTqy922TmOXnRPs4MbZcgdm
+	 JRk+g4Zwhg/I8sE1ap3oGHZW8QqHPwdO3NNOgag84sZ1CG5Hg3nyzKAgrdOfUVnKz+
+	 X6oYi2EO0bpPHeS0IyXA3rK6nKSscpvB0Pm+aOkKjBQ4GONK3SnVbYBwjDObBO7wvi
+	 eMB2fm7DZZOAQ==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 8 May
+ 2026 08:46:14 +0200
+Received: (nullmailer pid 2712693 invoked by uid 1000);
+	Fri, 08 May 2026 06:46:13 -0000
+Date: Fri, 8 May 2026 08:46:13 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Maoyi Xie <maoyixie.tju@gmail.com>
+CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <edumazet@google.com>, <horms@kernel.org>,
+	<antony.antony@secunet.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
+Subject: Re: [PATCH net] xfrm: route MIGRATE notifications to caller's netns
+Message-ID: <af2GtRO3hhGKa0ek@secunet.com>
+References: <20260504142736.1228425-1-maoyi.xie@ntu.edu.sg>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-X-Rspamd-Queue-Id: 04F6C4F2944
+In-Reply-To: <20260504142736.1228425-1-maoyi.xie@ntu.edu.sg>
+X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
+ (10.32.0.171)
+X-Rspamd-Queue-Id: CC9FE4F298A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285674-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[lists.infradead.org,vger.kernel.org,gmail.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:mid,secunet.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ntu.edu.sg:email];
+	TAGGED_FROM(0.00)[bounces-285675-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-The DATA-packet handler in rxrpc_input_call_event() and the RESPONSE
-handler in rxrpc_verify_response() copy the skb to a linear one before
-calling into the security ops only when skb_cloned() is true.  An skb
-that is not cloned but still carries paged fragments (skb->data_len != 0)
-falls through to the in-place decryption path, which binds the frag
-pages directly into the AEAD/skcipher SGL via skb_to_sgvec().
+On Mon, May 04, 2026 at 10:27:36PM +0800, Maoyi Xie wrote:
+> xfrm_send_migrate() in net/xfrm/xfrm_user.c and pfkey_send_migrate()
+> in net/key/af_key.c both hardcode &init_net for the multicast that
+> announces a successful XFRM_MSG_MIGRATE / SADB_X_MIGRATE.
+> 
+> XFRM_MSG_MIGRATE arrives on a per-netns NETLINK_XFRM socket, and the
+> rest of the xfrm/af_key netlink path was made netns-aware in 2008.
+> The other 14 multicast paths in xfrm_user.c route their event using
+> xs_net(x), xp_net(xp) or sock_net(skb->sk); only the migrate path
+> was missed.
+> 
+> Two consequences of the init_net hardcoding:
+> 
+>   1. The notification (selector, old/new endpoint addresses, and the
+>      km_address) is delivered to listeners on init_net's
+>      XFRMNLGRP_MIGRATE / pfkey BROADCAST_ALL groups rather than on
+>      the issuing netns. An IKE daemon running in init_net therefore
+>      receives migration notifications originating from any other
+>      netns on the host.
+> 
+>   2. An IKE daemon running inside a non-init netns and subscribed
+>      to its own XFRMNLGRP_MIGRATE / pfkey groups never receives the
+>      notification of its own migration. IKEv2 MOBIKE / address-update
+>      handling inside a netns is silently broken.
+> 
+> Thread struct net through km_migrate() and the xfrm_mgr.migrate
+> function pointer, drop the &init_net override in xfrm_send_migrate()
+> and pfkey_send_migrate(), and pass the caller's net (already in
+> scope in xfrm_migrate() via sock_net(skb->sk)) all the way down.
+> struct xfrm_mgr is in-tree only and not exported as a stable API,
+> so the function-pointer signature change is internal.
+> 
+> pfkey_broadcast() is already netns-aware via net_generic(net,
+> pfkey_net_id) since the pernet conversion. The five other
+> pfkey_broadcast() callers in af_key.c already pass xs_net(x),
+> sock_net(sk) or a per-netns net, so this only removes the
+> &init_net outlier.
+> 
+> Fixes: 5c79de6e79cd ("[XFRM]: User interface for handling XFRM_MSG_MIGRATE")
+> Cc: stable@vger.kernel.org # v5.15+
+> Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
 
-Extend the gate so that any skb with non-linear data is also copied,
-ensuring the security handler always operates on a fully linear skb.
-The OOM/trace handling already in place is reused.
-
-Fixes: d0d5c0cd1e71 ("rxrpc: Use skb_unshare() rather than skb_cow_data()")
-Cc: stable@vger.kernel.org
-Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
----
-Changes in v2:
-- Use skb_is_nonlinear() instead of skb->data_len
-- v1: https://lore.kernel.org/all/afKV2zGR6rrelPC7@v4bel/
----
- net/rxrpc/call_event.c | 2 +-
- net/rxrpc/conn_event.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/net/rxrpc/call_event.c b/net/rxrpc/call_event.c
-index fdd683261226..a6ad5ff6ec5f 100644
---- a/net/rxrpc/call_event.c
-+++ b/net/rxrpc/call_event.c
-@@ -334,7 +334,7 @@ bool rxrpc_input_call_event(struct rxrpc_call *call)
- 
- 			if (sp->hdr.type == RXRPC_PACKET_TYPE_DATA &&
- 			    sp->hdr.securityIndex != 0 &&
--			    skb_cloned(skb)) {
-+			    (skb_cloned(skb) || skb_is_nonlinear(skb))) {
- 				/* Unshare the packet so that it can be
- 				 * modified by in-place decryption.
- 				 */
-diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
-index a2130d25aaa9..632cbeff1f5d 100644
---- a/net/rxrpc/conn_event.c
-+++ b/net/rxrpc/conn_event.c
-@@ -245,7 +245,7 @@ static int rxrpc_verify_response(struct rxrpc_connection *conn,
- {
- 	int ret;
- 
--	if (skb_cloned(skb)) {
-+	if (skb_cloned(skb) || skb_is_nonlinear(skb)) {
- 		/* Copy the packet if shared so that we can do in-place
- 		 * decryption.
- 		 */
--- 
-2.43.0
-
+Applied, thanks a lot!
 
