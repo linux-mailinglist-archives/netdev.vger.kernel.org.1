@@ -1,58 +1,47 @@
-Return-Path: <netdev+bounces-285824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285825-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EIobGGDf/Wn0jwAAu9opvQ
-	(envelope-from <netdev+bounces-285824-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:04:32 +0200
+	id GCx6FJng/WkhkQAAu9opvQ
+	(envelope-from <netdev+bounces-285825-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:09:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6301F4F6C04
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:04:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CB264F6CD7
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:09:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5A9B430459E1
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 13:00:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 89F183020A67
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 13:09:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC9AF2571C7;
-	Fri,  8 May 2026 13:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="XX8z0kWk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06D453DDDDB;
+	Fri,  8 May 2026 13:09:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
+Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C3B346FA7;
-	Fri,  8 May 2026 13:00:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936C41F8691;
+	Fri,  8 May 2026 13:09:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778245221; cv=none; b=JDdMHR4z+/qHYol5635ScIUdx/wEDbqfy15NsUQbt2IAyD6pWFrjrZgWBiMp1339oGeo85Tg6cpifLi6h2J39TsVBQM3JsXYJumA8b0m8RJMPEHeYi51M+itsbKWMQxA/n87LAlnp//vOQ+y3WcUU54hQqS/x36LargkJn5fS5s=
+	t=1778245781; cv=none; b=cRID1vfVWmeytbb6zeY9cfEztyJbVK1ejFaS1jH57wpO+538JgrQAtKPefzfoqfP44NpZYTybX9Cr3OC+KHX2EB+Z7jHOd4k3qFa9cnIJUyz3EjpcQeFGVHJPDV1piDEppJGSzzeiNNe+WD66QiYg3PSlBkq0E6qozAl40MlodU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778245221; c=relaxed/simple;
-	bh=VOTenCH+yVCAOU/B/X+w1TN8sfvfgnU61LeNEOd2v9c=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=XVBInZgTTmITUrOS8vKPkm2Dfe8eaYy3ee8770X9eV07kECb2e2gg0MF+Nt2jBTx7mfr+0DVsyS783FwnclVh01l4p19D/QMGwJV2lnIM7hk8kq8Dy+uz6YXrmQnhlPIoNKBDi0cZzAwMvwt/ctpu99FpxiJrHv7nFBa8t5aLrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=XX8z0kWk; arc=none smtp.client-ip=113.46.200.222
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=jBfBcBIL2bV05exYHwd/uY8mcQjvCoEww7m2lBB4MA0=;
-	b=XX8z0kWkkSvINIzHjMzQOSDeN9FE8SuRnzmKfpUgCeXRdOUeVsThn4czLXsCwHpzcRU7bnKq8
-	nxcVJgpOI7BzMmdA8wVGzAzN3ZkVx15tGXVQ3F0GozZNtYwgtRJGHjOwhCzfQ+vf6OvG5qByAi7
-	SU3qP0++7NJjXRDh+LaO6FQ=
-Received: from mail.maildlp.com (unknown [172.19.163.200])
-	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4gBptd22t5zLlSC;
-	Fri,  8 May 2026 20:52:41 +0800 (CST)
-Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
-	by mail.maildlp.com (Postfix) with ESMTPS id E79214055B;
-	Fri,  8 May 2026 21:00:14 +0800 (CST)
-Received: from [10.174.176.240] (10.174.176.240) by
- kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Fri, 8 May 2026 21:00:13 +0800
-Message-ID: <39819ad4-3105-4802-b5e2-79e131b25984@huawei.com>
-Date: Fri, 8 May 2026 21:00:12 +0800
+	s=arc-20240116; t=1778245781; c=relaxed/simple;
+	bh=6S4huXMF9Eta3Yguft6rRPtDlnuPmLRdDWOyNOIjQWk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Zly17A7dUA3i8SjBCZCD42yJB0qiqzBM/lcDacpaeSUAVI7MeywJg6v4DGWzAKt7RP+JmtPSQ1oC2nvxz/6+EsDm0iVmzUOFz9L0RFst8EgoE42cQHDQNfMwSBs+n1kK8X3cwSBrhy8l41RLDU/2kDoEQ6Smtxmo1kTmSu09q9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=radxa.com; spf=pass smtp.mailfrom=radxa.com; arc=none smtp.client-ip=54.206.16.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=radxa.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=radxa.com
+X-QQ-mid: esmtpsz21t1778245760te8ff9860
+X-QQ-Originating-IP: oDfTC3UmzXvWtX1d3MtBp/Xfjq9qMy3Zm4+IG/bmLQ4=
+Received: from [127.0.0.1] ( [116.234.74.217])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 08 May 2026 21:09:14 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 10512550886452153488
+Message-ID: <6744F8FEFD290FFD+4973b8ba-7d3b-45e4-8478-0b3334b81960@radxa.com>
+Date: Fri, 8 May 2026 21:09:12 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,291 +49,131 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/6] SUNRPC: Address remaining cache_check_rcu() UAF in
- cache content files
-From: yangerkun <yangerkun@huawei.com>
-To: Chuck Lever <cel@kernel.org>, Misbah Anjum N <misanjum@linux.ibm.com>,
-	Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>, Olga
- Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
-	<tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
-	<anna@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, <yi.zhang@huawei.com>,
-	Zhihao Cheng <chengzhihao1@huawei.com>, Li Lingfeng <lilingfeng3@huawei.com>
-CC: <linux-nfs@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, Chuck Lever <chuck.lever@oracle.com>
-References: <20260501-cache-uaf-fix-v1-0-a49928bf4817@oracle.com>
- <c45779f6-fe6c-4037-bb1c-01cfbbaa8aac@huawei.com>
- <76a10e49-54a6-4813-8b58-b7cd0820fdc6@app.fastmail.com>
- <4bb9ed6b-1a64-406a-9239-b0560ca963cc@huawei.com>
- <05f93fc4-59d7-4735-bc7d-a00d1497687a@huawei.com>
- <10019b42-4589-4f9f-8d5b-d8197db1ce3c@huawei.com>
-In-Reply-To: <10019b42-4589-4f9f-8d5b-d8197db1ce3c@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Subject: Re: [PATCH net-next 10/12] net: stmmac: tc956x: add TC956x/QPS615
+ support
+To: Alex Elder <elder@riscstar.com>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, maxime.chevallier@bootlin.com,
+ rmk+kernel@armlinux.org.uk, andersson@kernel.org, konradybcio@kernel.org,
+ robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, linusw@kernel.org,
+ brgl@kernel.org, arnd@arndb.de, gregkh@linuxfoundation.org
+Cc: Daniel Thompson <daniel@riscstar.com>, mohd.anwar@oss.qualcomm.com,
+ a0987203069@gmail.com, alexandre.torgue@foss.st.com, ast@kernel.org,
+ boon.khai.ng@altera.com, chenchuangyu@xiaomi.com, chenhuacai@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, hkallweit1@gmail.com,
+ inochiama@gmail.com, john.fastabend@gmail.com, julianbraha@gmail.com,
+ livelycarpet87@gmail.com, matthew.gerlach@altera.com,
+ mcoquelin.stm32@gmail.com, me@ziyao.cc,
+ prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
+ rohan.g.thomas@altera.com, sdf@fomichev.me, siyanteng@cqsoftware.com.cn,
+ weishangjuan@eswincomputing.com, wens@kernel.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20260501155421.3329862-1-elder@riscstar.com>
+ <20260501155421.3329862-11-elder@riscstar.com>
+ <224E233C593EF171+8c8a43dd-5061-40f8-9eb7-f360eabf2ecc@radxa.com>
+ <ae90a4c9-f027-4373-a378-d0d4b7796ff3@riscstar.com>
+Content-Language: en-US
+From: Xilin Wu <sophon@radxa.com>
+In-Reply-To: <ae90a4c9-f027-4373-a378-d0d4b7796ff3@riscstar.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemf100006.china.huawei.com (7.202.181.220)
-X-Rspamd-Queue-Id: 6301F4F6C04
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:radxa.com:qybglogicsvrsz:qybglogicsvrsz3b-0
+X-QQ-XMAILINFO: Nt+z/y60tPnUntNr0h37IREVots3RaLwrPULh0GA79jGtOpfwKEdcvBB
+	vGDhDCFVCVDGkxyRE2OTvoJ3BAC5PxlqIDN/JJD4AXSK/ikl0jyX/GSVQGKFFkz4ENdEUSS
+	jVXeX8iIz18DyrTydrM2dT8KiFby0YfBminxUOL4J5AlH5kCMgkXuyKePKNiHWGlFK+yBQv
+	SRVy4V6iARJyXlvbI1rbJ1Dngayn4XErNHsXR0Kg6smHfZQdkinU29+j+A6LtvM6yZUbS4t
+	QVQptLZzaaJ4WQvRP74OndQJsbw1vv1nmsXyg0PvpJnR4E3kbenRf7lh2UQrWCAfnYWhxcG
+	hTAd64lSERlfpmuk9ijl7MHnkLFb+kT+JhDfn0EbwWHpNLpnzJlzMszqlfuaXd1hwc4nDs4
+	Ptr2Y85lsLV/akVhLZ1+rrmVHL5PiC3YijY+AWaatV34T0VxlBj6F8/QWgEBQSR7nOH8bXQ
+	XHo4x+A7+OOLAYUoEpxHHu2jQBnq4W40kBbHQZFQcx2uX3k9qxLStign4ItRLp83ezdKGG3
+	rXIy7z63D4JRXnth+L/LMCgCOPIZX6UbSeKhC9UhQunoQKllBcQEkKDh5ygpTooEHPICCWN
+	v0NJ3AVXTCKg6RKp5kRQji0h3ubCOuk69Ca/CWOhkExCsuc7W4Gt18DmMOI73hWUNVt/ZpJ
+	Xegb8FAgVlmlXrGb9znklqo0dwEPFirhVlvSBYtwqFD0A+8ja53Su/2ws9tOkRBaTVgwQ8y
+	9A52Vd9IzSmDXvRutmZ56mbDo0QML6AmH+JXOF1+N98BQ6kl+Oroy003IPxqdeoroKdzWoW
+	7ajNQ78e3UhIMmJwN0Vzj9r/TIEN0VSKF89diPqkVlE0OitsvnUNFQHnnw96hl+q0o7uSQx
+	qPUMp9N0FI5EOZQjZweOFJ9azZ8DPpS884uDoNmmdcnERsJD7LQeKa9uc/wF/706zGwfDfE
+	NvYT+qtbE9RcFiJA28y7jSs17ND2F9A/LO72INNmSpnullpo/DF8C5pCvK/V+oUxNUDaK1L
+	Pplxx2FKqdHoQ5JbP002M+X2JYw0kTRtD1WNuV8r1C1HA66FuZ
+X-QQ-XMRINFO: Mp0Kj//9VHAxzExpfF+O8yhSrljjwrznVg==
+X-QQ-RECHKSPAM: 0
+X-Rspamd-Queue-Id: 9CB264F6CD7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[radxa.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	URIBL_MULTI_FAIL(0.00)[huawei.com:server fail,sea.lore.kernel.org:server fail,oracle.com:server fail];
-	TAGGED_FROM(0.00)[bounces-285824-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285825-lists,netdev=lfdr.de];
+	FORGED_MUA_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[riscstar.com,oss.qualcomm.com,gmail.com,foss.st.com,kernel.org,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[50];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yangerkun@huawei.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[sophon@radxa.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-0.962];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oracle.com:email,huawei.com:email,huawei.com:mid,huawei.com:dkim]
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-
-
-在 2026/5/8 16:16, yangerkun 写道:
+On 5/8/2026 2:44 AM, Alex Elder wrote:
+> On 5/6/26 7:59 AM, Xilin Wu wrote:
+>> On 5/1/2026 11:54 PM, Alex Elder wrote:
+>>> +    /* AXI Configuration */
+>>> +    axi = &td->axi;
+>>> +    axi->axi_lpi_en = 1;
+>>> +    axi->axi_wr_osr_lmt = 31;
+>>> +    axi->axi_rd_osr_lmt = 31;
+>>> +    /* All sizes (2^2..2^8) are supported */
+>>> +    axi->axi_blen_regval = DMA_AXI_BLEN_MASK;
+>>> +    plat->axi = axi;
+>>> +
+>>> +    plat->mac_port_sel_speed = speed;
+>>> +    plat->flags = STMMAC_FLAG_MULTI_MSI_EN | STMMAC_FLAG_TSO_EN;
+>>
+>> I got WoL working only after adding STMMAC_FLAG_USE_PHY_WOL here. I 
+>> guess it's required, since the driver clocks down the MAC/PMA/XPCS in 
+>> its suspend hook?
 > 
+> I just want to respond to this with a summary of our plans.
 > 
-> 在 2026/5/8 11:08, yangerkun 写道:
->>
->>
->> 在 2026/5/8 10:45, yangerkun 写道:
->>> Hello  Chuck,
->>>
->>> 在 2026/5/8 0:12, Chuck Lever 写道:
->>>> Hello Erkun -
->>>>
->>>> On Thu, May 7, 2026, at 11:09 AM, yangerkun wrote:
->>>>> Hi,
->>>>>
->>>>> 在 2026/5/1 22:51, Chuck Lever 写道:
->>>>>> Misbah Anjum reported a use-after-free in cache_check_rcu()
->>>>>> reached through e_show() while sosreport was reading
->>>>>> /proc/fs/nfsd/exports on ppc64le.  Two fixes for that report
->>>>>> landed in v7.0:
->>>>>>
->>>>>>     48db892356d6 ("NFSD: Defer sub-object cleanup in export put 
->>>>>> callbacks")
->>>>>>     e7fcf179b82d ("NFSD: Hold net reference for the lifetime of / 
->>>>>> proc/fs/nfs/exports fd")
->>>>>
->>>>> Back to the problem fixed by this patches, I'm a little confused why
->>>>> this UAF can be trigged.
->>>>>
->>>>> Before this patches, svc_export_put show as follow:
->>>>>
->>>>>    368 static void svc_export_put(struct kref *ref)
->>>>>    369 {
->>>>>    370         struct svc_export *exp = container_of(ref, struct
->>>>> svc_export, h.ref);
->>>>>    371
->>>>>    372         path_put(&exp->ex_path);
->>>>>    373         auth_domain_put(exp->ex_client);
->>>>>    374         call_rcu(&exp->ex_rcu, svc_export_release);
->>>>>    375 }
->>>>>
->>>>> The auth_domain_put function releases ->name using call_rcu, and
->>>>> path_put may release the dentry also via call_rcu. All of this 
->>>>> seems to
->>>>> prevent e_show from causing a UAF. Could you point out which line in
->>>>> d_path triggers the issue?
->>>>
->>>> The dentry, the mount, and the auth_domain ->name buffer all
->>>> end up RCU-freed (dentry_free() and delayed_free_vfsmnt in
->>>> fs/, svcauth_unix_domain_release_rcu() in svcauth_unix.c).
->>>> The eventual kfree isn't the problem.
->>>>
->>>> The problem is the synchronous teardown inside path_put(),
->>>> which runs before svc_export_put() ever reaches its own
->>>> call_rcu():
->>>>
->>>>    path_put(&exp->ex_path)
->>>>      -> dput(dentry)
->>>>         -> __dentry_kill()              [if last ref]
->>>>            -> __d_drop()                /* unhashes */
->>>>            -> dentry_unlink_inode()     /* d_inode = NULL */
->>>>            -> d_op->d_release() if set
->>>>            -> drops parent d_lockref    /* may cascade up */
->>>>            -> dentry_free()             /* call_rcu deferred */
->>>>      -> mntput(mnt)                     /* deferred via task_work */
->>>>
->>>> The dentry pointer itself is RCU-safe, so prepend_path()'s walk
->>>> of d_parent and d_name doesn't read freed memory.  But by the
->>>> time the reader gets there, __d_clear_type_and_inode() has
->>>> already stored NULL into d_inode, __d_drop() has broken the
->>>> hash linkage, and the parent's d_lockref has been decremented
->>>> -- which can in turn fire __dentry_kill() on the parent, and
->>>> on up the tree.  An e_show() that's still inside its cache RCU
->>>> read section walks into that half-dismantled state through
->>>> seq_path(), and that's the NULL deref Misbah reported.
->>>
->>> Thank you for your detailed explanation! Yes, e_show might be called 
->>> when the state is partially dismantled, but after carefully reviewing 
->>> the code with dput up to __dentry_kill, I still cannot find anything 
->>> that could cause this issue. Additionally, the comments for 
->>> prepend_path indicate that they have already taken into account that 
->>> the dentry can be removed concurrently. I have also run some tests on 
->>> my arm64 QEMU, but I couldn't reproduce the problem either. Could you 
->>> please help me identify the specific line or pointer in the dentry 
->>> that triggers this use-after-free or null pointer issue?
->>>
->>> Maybe I am not be very familiar with the code, which caused me to 
->>> fail to identify the real root cause. I'm so sorry for that.
->>>
->>>
->>> 265 char *d_path(const struct path *path, char *buf, int buflen)
->>> 266 {
->>> 267         DECLARE_BUFFER(b, buf, buflen);
->>> 268         struct path root;
->>> 269
->>> 270         /*
->>> 271          * We have various synthetic filesystems that never get 
->>> mounted.  On
->>> 272          * these filesystems dentries are never used for lookup 
->>> purposes, and
->>> 273          * thus don't need to be hashed.  They also don't need a 
->>> name until a
->>> 274          * user wants to identify the object in /proc/pid/fd/. 
->>> The little hack
->>> 275          * below allows us to generate a name for these objects 
->>> on demand:
->>> 276          *
->>> 277          * Some pseudo inodes are mountable.  When they are mounted
->>> 278          * path->dentry == path->mnt->mnt_root.  In that case 
->>> don't call d_dname
->>> 279          * and instead have d_path return the mounted path.
->>> 280          */
->>> 281         if (path->dentry->d_op && path->dentry->d_op->d_dname &&
->>> 282             (!IS_ROOT(path->dentry) || path->dentry != path->mnt- 
->>>  >mnt_root))
->>> 283                 return path->dentry->d_op->d_dname(path->dentry, 
->>> buf, buflen);
->>> 284
->>> 285         rcu_read_lock();
->>> 286         get_fs_root_rcu(current->fs, &root);
->>> 287         if (unlikely(d_unlinked(path->dentry)))
->>> 288                 prepend(&b, " (deleted)", 11);
->>> 289         else
->>> 290                 prepend_char(&b, 0);
->>> 291         prepend_path(path, &root, &b);
->>> 292         rcu_read_unlock();
->>> 293
->>> 294         return extract_string(&b);
->>> 295 }
->>>
->>>
->>>>
->>>> The earlier fix (2530766492ec, "nfsd: fix UAF when access
->>>> ex_uuid or ex_stats") moved the kfree of ex_uuid and ex_stats
->>>> into svc_export_release() so those are RCU-safe now.
->>>> path_put() and auth_domain_put() couldn't go in there because
->>>> both may sleep, and call_rcu callbacks run in softirq context.
->>>> This series uses queue_rcu_work() instead: it defers past the
->>>> grace period AND runs the callback in process context, so the
->>>> sleeping puts move into the deferred path and the window
->>>> closes.
->>>
->>> Yeah, I can get this! Thanks again for your detail explanation!
->>
->> Also, could the scenario described in this commit be triggered again?
->>
->> commit 69d803c40edeaf94089fbc8751c9b746cdc35044
->> Author: Yang Erkun <yangerkun@huawei.com>
->> Date:   Mon Dec 16 22:21:52 2024 +0800
->>
->>      nfsd: Revert "nfsd: release svc_expkey/svc_export with rcu_work"
->>
->>      This reverts commit f8c989a0c89a75d30f899a7cabdc14d72522bb8d.
->>
->>      Before this commit, svc_export_put or expkey_put will call 
->> path_put with
->>      sync mode. After this commit, path_put will be called with async 
->> mode.
->>      And this can lead the unexpected results show as follow.
->>
->>      mkfs.xfs -f /dev/sda
->>      echo "/ *(rw,no_root_squash,fsid=0)" > /etc/exports
->>      echo "/mnt *(rw,no_root_squash,fsid=1)" >> /etc/exports
->>      exportfs -ra
->>      service nfs-server start
->>      mount -t nfs -o vers=4.0 127.0.0.1:/mnt /mnt1
->>      mount /dev/sda /mnt/sda
->>      touch /mnt1/sda/file
->>      exportfs -r
->>      umount /mnt/sda # failed unexcepted
->>
->>      The touch will finally call nfsd_cross_mnt, add refcount to 
->> mount, and
->>      then add cache_head. Before this commit, exportfs -r will call
->>      cache_flush to cleanup all cache_head, and path_put in
->>      svc_export_put/expkey_put will be finished with sync mode. So, the
->>      latter umount will always success. However, after this commit, 
->> path_put
->>      will be called with async mode, the latter umount may failed, and if
->>      we add some delay, umount will success too. Personally I think 
->> this bug
->>      and should be fixed. We first revert before bugfix patch, and 
->> then fix
->>      the original bug with a different way.
->>
->>      Fixes: f8c989a0c89a ("nfsd: release svc_expkey/svc_export with 
->> rcu_work")
->>      Signed-off-by: Yang Erkun <yangerkun@huawei.com>
->>      Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
->>
->>
+> We will *not* be implementing wake-on-LAN (WoL) initially.  We
+> will work to get support for the eMACs upstream for TC956x, and
+> then as a separate step, we will enable WoL.
 > 
-> After reviewing these two commits:
+> It's great to know you have it working, and our plan is to
+> implement it via the PHYs and not involve the MAC.  It seems
+> it will be relatively easy, but we have no plans to add it to
+> the current series.
 > 
-> e7fcf179b82d NFSD: Hold net reference for the lifetime of /proc/fs/nfs/ 
-> exports fd
-> 48db892356d6 NFSD: Defer sub-object cleanup in export put callbacks
-> 
-> I believe that the issue described in commit e7fcf179b82d might be the
-> root cause of the null pointer dereferences mentioned in [1]. This is
-> because we do not call get_net when opening /proc/fs/nfs/exports. As a
-> result, when the network namespace exits, nfsd_net_exit is triggered.
-> If, at the same time, the contents of /proc/fs/nfs/exports are being
-> read, a use-after-free (UAF) can occur on the struct cache_detail. I
-> think all three bugs referenced in [1] stem from this issue. Therefore,
-> commit e7fcf179b82d has already addressed the problem. To prevent the
-> issue described in commit 69d803c40ede, should we consider reverting
-> commit 48db892356d6 first? Please let me know if I have misunderstood
-> any aspect of this problem.
-
-Locally, I wrote a stable regression test case. I also reverted to 
-commit 9189d23b835cec646ba5010db35d1557a77c5857 (which is before commits 
-2862eee078a4 "SUNRPC: make sure cache entry active before cache_show" 
-and be8f982c369c "nfsd: make sure exp active before svc_export_show"). 
-Even then, a panic can still be triggered without any actual export path...
-
-> 
->>>
->>> Thanks,
->>> Erkun.
->>>
->>>>
->>>>
->>>
->>
->>
->>
-> 
-> 
+>                      -Alex
 > 
 
+Hi Alex,
+
+Maybe I missed something, but I already have WoL working *without* 
+changes in the tc956x driver.
+
+https://lore.kernel.org/all/859776B5671B36B9+577c19e4-3e66-4036-b26f-fe20287a1d43@radxa.com/
+
+
+-- 
+Best regards,
+Xilin Wu <sophon@radxa.com>
 
