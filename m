@@ -1,168 +1,128 @@
-Return-Path: <netdev+bounces-285735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285736-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qM7LK2Wt/WmlhgAAu9opvQ
-	(envelope-from <netdev+bounces-285735-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 11:31:17 +0200
+	id MBcNOOOt/WmlhgAAu9opvQ
+	(envelope-from <netdev+bounces-285736-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 11:33:23 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 592164F4478
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 11:31:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 40D414F44A4
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 11:33:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 59033300B477
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 09:28:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3A6B330134A5
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 09:31:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5D0B383C6B;
-	Fri,  8 May 2026 09:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3B3A3BFE44;
+	Fri,  8 May 2026 09:30:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="syba9Nwx"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MOmyCPW8"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8BB36C9EE
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 09:28:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6795D3A451B
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 09:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778232522; cv=none; b=HuIs4lVnWmHshJOtCVBTT/uOD/u4ixm6GEDvqH/Rgu/7tMkUTMX/IH0HwoaYqRpsflgg3s/roQY7qI1B9LtFAPS4DIMDog3P3FvoYXqWWY3wGl63RFehVI8gkyeTPj9rnVcvIvW4t4Eh+aEYTCO1M+3RxIoppZ6usZPlO2nJTvE=
+	t=1778232659; cv=none; b=c2uJIJZ4kVj4WbAUq5jx+BHDwF+zn1enc1RjcVTlgIuK7UHVMeHoscd+FMbbsDItG45f8bYS5OQTqqB9yJNAxcCqC5y+l7ud06ejCGYJFkscjR2ArEFKe42PQj81/NemOR6Y1oKDeOuapuuo82/2f1IwwKymKdXQLfNoZ3p41B4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778232522; c=relaxed/simple;
-	bh=a/7MP5KgFHbcO1EOLTaNUbNZhO9UjZJbmPG24V98Ts0=;
+	s=arc-20240116; t=1778232659; c=relaxed/simple;
+	bh=NOB2ptxL8dE1Y9LNF612Zf4gU5IdXC9Br58KlDf3JHg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BFrX2V1AeOnyOW0Yhr5o6LfOf0KGu9yVT1N4rKs2omDHXhK9BdbXP09JUa4L9X+O6dj9I3F4jQXM0q6FCAmfcuEb0O4lLsGUytyE6dd3itHRjgTM8idjRNybMgK72mEitCDFHm/WGB1CyE7jMw8a6Sttig8Ya76+i4FmE5IidI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=syba9Nwx; arc=none smtp.client-ip=91.218.175.180
+	 In-Reply-To:Content-Type; b=dNFSmZg1mzk+nHoPYuYJUJIqefHVDITCJuB559Scx8kBalmTKpDH867GaDSwBLgWBU98099PGWjSy3a4wjkp7zyRAkOJB/WML8du0tlWiiecO7UAcarUba4KN2omknAxUrRMBYmZin5/tvELLmavzEs2/P1Z1oXvFVeiL57Guns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MOmyCPW8; arc=none smtp.client-ip=95.215.58.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <33d3f804-2877-490e-b59f-5464e51bbf74@linux.dev>
+Message-ID: <539af15d-3d38-49d9-9023-6b074220149a@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1778232508;
+	t=1778232656;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IYZcQhqYYzE659oIBhM3F6WkTOSlrt+goCsH4UGC31I=;
-	b=syba9NwxIH6kg/aJEm6IgB5V+6hCCchQOcFO/Nt0wV2iRFYqTxBanApdRpKLF0WFFUs3TH
-	+2k8zTpRQnAgWSdsbgaPeD3BNG6fs0QkCTrI5yg22GtVwoBuF8cuXZhkPyrp5juER9Be9z
-	L+/xKGqaDNd5Mf3qz5NgQXVRSKvoR8k=
-Date: Fri, 8 May 2026 10:28:24 +0100
+	bh=e6QY7g9qkuQ6dWIXFQsCUwwqjFrRk+mfQdDgCMmtD80=;
+	b=MOmyCPW8TNvo8y5FbrRVEdcJ2OyG8GZzIzDl0v7lhOTVzmKC6Xg4GFb1WsELAJvMEk1SVo
+	uyOM1EVXorAZKaZ84s23pSQZ5JHjqOgpODWHbVo+QtDePibzYH2XxkvZqgI4smz7rIxVFk
+	Y6fEru1z3DFjDpKK16+AbiEi6jPa2Vg=
+Date: Fri, 8 May 2026 10:30:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] net: ena: PHC: Fix potential use-after-free in
- get_timestamp
-To: Arthur Kiyanovski <akiyano@amazon.com>, David Miller
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org
-Cc: Richard Cochran <richardcochran@gmail.com>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- David Woodhouse <dwmw2@infradead.org>, Thomas Gleixner <tglx@linutronix.de>,
- Miroslav Lichvar <mlichvar@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Wen Gu <guwen@linux.alibaba.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- David Woodhouse <dwmw@amazon.com>, Yonatan Sarna <ysarna@amazon.com>,
- Zorik Machulsky <zorik@amazon.com>, Alexander Matushevsky
- <matua@amazon.com>, Saeed Bshara <saeedb@amazon.com>,
- Matt Wilson <msw@amazon.com>, Anthony Liguori <aliguori@amazon.com>,
- Nafea Bshara <nafea@amazon.com>, Evgeny Schmeilin <evgenys@amazon.com>,
- Netanel Belgazal <netanel@amazon.com>, Ali Saidi <alisaidi@amazon.com>,
- Benjamin Herrenschmidt <benh@amazon.com>, Noam Dagan <ndagan@amazon.com>,
- David Arinzon <darinzon@amazon.com>, Evgeny Ostrovsky <evostrov@amazon.com>,
- Ofir Tabachnik <ofirt@amazon.com>, Amit Bernstein <amitbern@amazon.com>,
- stable@vger.kernel.org
-References: <20260508062126.7273-1-akiyano@amazon.com>
+Subject: Re: [PATCH] net: ethtool: fix missing closing paren in
+ rings_reply_size()
+To: Tao Cui <cuitao@kylinos.cn>, andrew@lunn.ch, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com
+Cc: horms@kernel.org, netdev@vger.kernel.org
+References: <20260508071402.183909-1-cuitao@kylinos.cn>
 Content-Language: en-US
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260508062126.7273-1-akiyano@amazon.com>
+In-Reply-To: <20260508071402.183909-1-cuitao@kylinos.cn>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 592164F4478
+X-Rspamd-Queue-Id: 40D414F44A4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-285736-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285735-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,google.com,redhat.com,infradead.org,linutronix.de,lunn.ch,linux.alibaba.com,amazon.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email,linux.dev:mid,linux.dev:dkim]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email,linux.dev:mid,linux.dev:dkim,kylinos.cn:email]
 X-Rspamd-Action: no action
 
-On 08/05/2026 07:21, Arthur Kiyanovski wrote:
-> Move the phc->active check and resp pointer assignment to after
-> acquiring the spinlock. Previously, phc->active was checked without
-> holding the lock, and resp was cached from ena_dev->phc.virt_addr
-> before the lock was acquired.
+On 08/05/2026 08:14, Tao Cui wrote:
+> sizeof(u32) on the _RINGS_CQE_SIZE line is missing its closing
+> parenthesis, causing nla_total_size() to absorb the subsequent
+> _TX_PUSH and _RX_PUSH entries. The resulting size estimate
+> happens to be numerically identical due to NLA alignment, but
+> the nesting is wrong and misleading.
 > 
-> If ena_com_phc_destroy() runs between the lockless active check and
-> the lock acquisition, it sets active=false, releases the lock, frees
-> the DMA memory, and sets virt_addr=NULL. The get_timestamp path would
-> then read a NULL virt_addr and dereference it.
-> 
-> With both the active check and the pointer read under the lock,
-> destroy cannot free the memory while get_timestamp is using it.
-> 
-> Fixes: e0ea34158ee8 ("net: ena: Add PHC support in the ENA driver")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Arthur Kiyanovski <akiyano@amazon.com>
+> Signed-off-by: Tao Cui <cuitao@kylinos.cn>
 > ---
->   drivers/net/ethernet/amazon/ena/ena_com.c | 7 +++++--
->   1 file changed, 5 insertions(+), 2 deletions(-)
+>   net/ethtool/rings.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/amazon/ena/ena_com.c b/drivers/net/ethernet/amazon/ena/ena_com.c
-> index e67b592..8c86789 100644
-> --- a/drivers/net/ethernet/amazon/ena/ena_com.c
-> +++ b/drivers/net/ethernet/amazon/ena/ena_com.c
-> @@ -1782,20 +1782,23 @@ void ena_com_phc_destroy(struct ena_com_dev *ena_dev)
->   
->   int ena_com_phc_get_timestamp(struct ena_com_dev *ena_dev, u64 *timestamp)
->   {
-> -	volatile struct ena_admin_phc_resp *resp = ena_dev->phc.virt_addr;
->   	const ktime_t zero_system_time = ktime_set(0, 0);
->   	struct ena_com_phc_info *phc = &ena_dev->phc;
-> +	volatile struct ena_admin_phc_resp *resp;
->   	ktime_t expire_time;
->   	ktime_t block_time;
->   	unsigned long flags = 0;
->   	int ret = 0;
->   
-> +	spin_lock_irqsave(&phc->lock, flags);
-> +
->   	if (!phc->active) {
-> +		spin_unlock_irqrestore(&phc->lock, flags);
->   		netdev_err(ena_dev->net_device, "PHC feature is not active in the device\n");
->   		return -EOPNOTSUPP;
->   	}
->   
-> -	spin_lock_irqsave(&phc->lock, flags);
-> +	resp = ena_dev->phc.virt_addr;
->   
->   	/* Check if PHC is in blocked state */
->   	if (unlikely(ktime_compare(phc->system_time, zero_system_time))) {
+> diff --git a/net/ethtool/rings.c b/net/ethtool/rings.c
+> index 0fd5dcc3729f..9054c89c5d7b 100644
+> --- a/net/ethtool/rings.c
+> +++ b/net/ethtool/rings.c
+> @@ -63,9 +63,9 @@ static int rings_reply_size(const struct ethnl_req_info *req_base,
+>   	       nla_total_size(sizeof(u32)) +	/* _RINGS_TX */
+>   	       nla_total_size(sizeof(u32)) +	/* _RINGS_RX_BUF_LEN */
+>   	       nla_total_size(sizeof(u8))  +	/* _RINGS_TCP_DATA_SPLIT */
+> -	       nla_total_size(sizeof(u32)  +	/* _RINGS_CQE_SIZE */
+> +	       nla_total_size(sizeof(u32)) +	/* _RINGS_CQE_SIZE */
+>   	       nla_total_size(sizeof(u8))  +	/* _RINGS_TX_PUSH */
+> -	       nla_total_size(sizeof(u8))) +	/* _RINGS_RX_PUSH */
+> +	       nla_total_size(sizeof(u8))  +	/* _RINGS_RX_PUSH */
+>   	       nla_total_size(sizeof(u32)) +	/* _RINGS_TX_PUSH_BUF_LEN */
+>   	       nla_total_size(sizeof(u32)) +	/* _RINGS_TX_PUSH_BUF_LEN_MAX */
+>   	       nla_total_size(sizeof(u32)) +	/* _RINGS_HDS_THRESH */
 
 Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
