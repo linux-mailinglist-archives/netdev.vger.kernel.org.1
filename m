@@ -1,224 +1,191 @@
-Return-Path: <netdev+bounces-285722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285723-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yJLkAYKi/WmwgQAAu9opvQ
-	(envelope-from <netdev+bounces-285722-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 10:44:50 +0200
+	id 8CMHHMOk/Wl0ggAAu9opvQ
+	(envelope-from <netdev+bounces-285723-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 10:54:27 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54F9E4F3DBF
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 10:44:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF3FF4F3EDF
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 10:54:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3AFD3300D464
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 08:44:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6304C301ABA9
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 08:53:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CA0C33BBAF;
-	Fri,  8 May 2026 08:44:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91FEF359A6B;
+	Fri,  8 May 2026 08:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ViV0FGD9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F19B37C11E
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 08:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D76C30DEBA
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 08:53:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778229886; cv=none; b=UuTRrVeEJfuazLTt+Vl/WRXOaUJXBBDyN90ZSkXmQawnPnRjpr67BihIvc0qP/uP9zJrAcqiogf3kH4/Qni7cwcZPt/pDkAhp5OZUPzfUSItzwGVOlSPKX1zdazT4l43QZIwRA4tn8x1LpDYfOb+tJvClRGX/pvif0ghu1FI+Ro=
+	t=1778230396; cv=none; b=dZnmvfx6vyaWr28LwNU1mfDfvudlTp7PWvi4QRi5H8YE7mVe5+3TVOpypIGmU5NjnD21xL/ZRIVcUhxXw0bBEEg6lQiTfLCRSrE1vS2lUmTi1r3X8XWjHITnPbi5Lg4dsY5pzq8iU2kFoVk3MgKbjMvNdoiKkYw4z2Z/R2IUg/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778229886; c=relaxed/simple;
-	bh=hF2cY836LJIpXS4vQghwyB9jREEaQQyS14SxfqBmIOU=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=nLeT3hM9ikU5byWdFP8L5qvq03Y6snlgsCpjVdP2dN+TdJV3cQrDJLlor+gGAtczSrQgefNxP1E4C8BtFds5smp1M2ytm2they1B0F21NRtRmxgVTAV3XZBd137C7lBtacitlG8mNFZJWYBmDBxdUkJWLTlxnnFYO0pH89zxYHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas10t1778229841t201t25828
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [60.186.244.4])
-X-QQ-SSF:0000000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 5630249792012590739
-To: "'Jakub Kicinski'" <kuba@kernel.org>
-Cc: <netdev@vger.kernel.org>,
-	<mengyuanlou@net-swift.com>,
-	<andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<pabeni@redhat.com>,
-	<richardcochran@gmail.com>,
-	<linux@armlinux.org.uk>,
-	<horms@kernel.org>,
-	<kees@kernel.org>,
-	<larysa.zaremba@intel.com>,
-	<leitao@debian.org>,
-	<joe@dama.to>,
-	<jacob.e.keller@intel.com>,
-	<fabio.baltieri@gmail.com>,
-	<netdev@vger.kernel.org>,
-	<mengyuanlou@net-swift.com>,
-	<andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<pabeni@redhat.com>,
-	<richardcochran@gmail.com>,
-	<linux@armlinux.org.uk>,
-	<horms@kernel.org>,
-	<kees@kernel.org>,
-	<larysa.zaremba@intel.com>,
-	<leitao@debian.org>,
-	<joe@dama.to>,
-	<jacob.e.keller@intel.com>,
-	<fabio.baltieri@gmail.com>
-References: <20260430082517.19612-6-jiawenwu@trustnetic.com> <20260503021536.4127361-1-kuba@kernel.org>
-In-Reply-To: <20260503021536.4127361-1-kuba@kernel.org>
-Subject: RE: [PATCH net-next v2 5/6] net: wangxun: clear stored DMA addresses after dma_free_coherent()
-Date: Fri, 8 May 2026 16:43:59 +0800
-Message-ID: <05d601dcdec6$d0c58a10$72509e30$@trustnetic.com>
+	s=arc-20240116; t=1778230396; c=relaxed/simple;
+	bh=c9epRKiYhaGspONM8KWKVGgkg5mJffga5eNI3KZzYj0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=qlcXinMhmt2DsUQm4SwFq4wro1tdDmLTyl44MHb+YH6HPjvSt6zUz32v1y6lD5ffVruRP8um7KTsWmylG91798Om55H3ZyiAWWTNitgVZ6877uny4fjH55iC+zFCpPE9mLe8NAS5QeUEPzLskprRdDGzq1ChU+x2PeRiSaZYC4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ViV0FGD9; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-8353fd1cb5fso864993b3a.0
+        for <netdev@vger.kernel.org>; Fri, 08 May 2026 01:53:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778230394; x=1778835194; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ri1HIxFfdPDhQYTOtlv8tdzoC5QvHDL1O0z7T1+MFXM=;
+        b=ViV0FGD9Jl9zN1VC2sxfiKgJDTZAQH+EeUHFY7VqHkh3RTGkIA9/IqVWl7+HNlvu4a
+         D2rsBSJqpqcaTKH+m6fAaiByJltEDc6kNLOBv53Sk2NT902a9bnCuP1zDKmP+pMeEDd1
+         VdDu+mfSUAydowKbGOxVuJxhY3Sopn/QhKLoZmbW1oa2YirsxlwDm6gKxuQKA7425WuD
+         KXhIp8anio9ZYqkTJGpAnHwK8zs8c/mJHTocnf61vGCJgStZD1PxoB04+wY2XO37Euz8
+         sYYbcFal24QnjHSmEQ/P5avjVm1xA7l008X1PgCez8XbUl6sj71wk1fawjex6O4IULXv
+         rlpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778230394; x=1778835194;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ri1HIxFfdPDhQYTOtlv8tdzoC5QvHDL1O0z7T1+MFXM=;
+        b=VpdZu6k8bFZYtUW0yXVW7dzT/XzZ+OG8BDtbXkoxykj3Rx14F9WSWxIcL/y84eRGfs
+         oWoPqly1b74wkrym+Uz4P+SOnriUj08tE21kLbSFWcjhp7F6VEWuYz7bDEtI0c8dv8Vi
+         Z+m309FZISFvCnmFE2KP05ALMjUJI9lZO7HU8wt5JyzZ/gDogAlSD5aPzomW1t7ziUeM
+         3EhQz2/baCUy1XEnb1J3VKJTySuBLsjCpwP12iUrFbR963uWotIpyy6rCQOhX7iQwqtd
+         kYyAbqO+3Tn4QZ1gq/sugwe0PW/7YP4f+39O9cmlF/OC86bWCHCgaxaQx+eeNwEmVF4T
+         bzDg==
+X-Forwarded-Encrypted: i=1; AFNElJ+1NIHUb8r0Hq6vV/mwpHUXbxwSu6qQ8eBsVgyuR3xfRwIxne56oB3FujG7CvHrlDfj96gqSv4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSl3QVQ0N3WqkXqip7EVW7YheIeCetNilVot1T16ARaow+U+Q1
+	xCa+foOdL3F1Mvfbq1RqAiIo84lpzY8dWpXumIO38A8653hXnsbNQB+Z
+X-Gm-Gg: AeBDiesbSkXpWKEVQlOxH0LVJcNbKUF/IS49OyvZgcT68g1o9gackndekgoBG6OMAB1
+	PfIQfTsgCRaOqlvCzqxWbmuc/Wxr+nanEFOMj893WfhZDyYDTP8lAeZ1HHc/GUA1wJd7/Vw7KZ/
+	D6DVGIThXPouP5x05qtiqK0wtQpQI8NtmP7FXqIKFf4lAJw+VmA8vGmh1i+ozpjijaX+nGLTpvP
+	khJyDdfRXn9Z3Z/zTfh6LVYBw7UDvKrMxIz9ntnk86LZUawxyClDvGzQ8wlfBV3NfjTYVWHq7uf
+	G8gSurCTnKKY6XqrrFDfjH3DTWWvLVzVjU2mseZi2iH++QJAN3T0nF6q2dKL4P7QJGAXIk8UXTp
+	ARkFpWWLzW8db9C6/ZJqKPpAq8NuyWLyVJTkLRNMTii89vbY4Z25SVR41ia2ydCFa7lIg3YOBfL
+	WZRWl7T4wVBCYP0lSLjNbNl+f/sWEifCpsaAF1r8dEZxA=
+X-Received: by 2002:a05:6a00:3e1a:b0:835:36f5:17c9 with SMTP id d2e1a72fcca58-83bb65f38bfmr5369559b3a.2.1778230393951;
+        Fri, 08 May 2026 01:53:13 -0700 (PDT)
+Received: from v4bel ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8396563f03bsm11851171b3a.9.2026.05.08.01.53.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 May 2026 01:53:13 -0700 (PDT)
+Date: Fri, 8 May 2026 17:53:09 +0900
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: dhowells@redhat.com, marc.dionne@auristor.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, qingfang.deng@linux.dev, jiayuan.chen@linux.dev
+Cc: linux-afs@lists.infradead.org, netdev@vger.kernel.org,
+	stable@vger.kernel.org, imv4bel@gmail.com
+Subject: [PATCH net v3] rxrpc: Also unshare DATA/RESPONSE packets when paged
+ frags are present
+Message-ID: <af2kdW2F1gJ9U-Gg@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQLpQ8cnx5tQgpavr6X+xPHX+BoRmgEzKPP6s+FrQVA=
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: N30UA4ZiPg7fDw0ifkn/6G4Swpeqbkhg2oxdOpnFPQrGvZ7ZQGW51P+z
-	XjK101bH0QCNzY/XJPQO+EXOZ40yJX7rBv1LydDQXNoTjrFJ4cwKB8B+an9B+1184hHNz8Z
-	jgGIXXGJdQ60avpNBS+S13WUPdbI/IsT4XkEqElIvjv+v/iXWntJX0XkUjtVTD5A6bGOngl
-	A5CeJ2dWekMgvTUpwxm1X4UFtfaDu0rbp+CqJTw/NGqZ+A4kX7GnRphfi0kfh1MkZXyUe+R
-	mnh4Me6iFUOJwjzz1o24KrJLOIGTZouWXfQdYXKSARPbfSsLgD4BNQ79uuGIVsJ5qXoLzci
-	NNZFU3Zzka+MYApHaa+Fb5ZjCy72Fktiq+VEqG+IiCvXVDbt787ZXkex+t9UE1v6MiK/pR0
-	lKV0Z29cMHK5x7tMz5ukTMPVhHcrM5MjYciRucUNWayjiYSUMtFAc+9j+LtDjxze6OxmQW6
-	Ca3o1pEdw6g/fAmgeOTOd54RYDhv4jUH+Ogq/JtlTmBMIqoZmfRwEnTyBKYPSJ/vtcOKtkq
-	C8fegSNmiXrhrotEuAJ+VFHy3uZASHSiL6A17JhyQK06dPbT3aJ4RcRD+UrqTRNyPFYieRl
-	KurQzZD6OSIvTnQhG26IzqkUPoPY47Y3GLsUwPhTbEvoMfQlSKKjL6+Yh2rI+vYdi0G5chy
-	3wjDPLh1h8XeTNATtxPytAjAzJ/Pc6pFcVavWSKRNUdkS8dCF3877QrBXidzpyP8B+yPuAc
-	L0pfQ5CA7P5nM1JJjIMFK/RuDCF+5/2hJVo4iOKriFHX0+RPfTrGP+BFRBILDwmev4iMSLS
-	FnWEpWKhJvSGcNZqbPsQkGEtUbpGvDYtTSulHUsE0mD8it1WwPMMSHBi1/GaqjgvzgKf+u1
-	6o6X8n4alO+OK2G/Tfu72s+Y4Ow6NHXARert23sMt1kFR71njg0xXEIdBoW+xMrzTUGmP2C
-	1S0lkEQfJtf5prZpUVmK8WP/TLmPlafAJKBbzCPH4JwHkLl0lR3S2wJUg7vM4UHdyeXXCuz
-	lUt/yde3LHI6EjllppiGc1jhFGkgSI+EMdwAul0pR1aGnvm+soF69zxfAlTYzqAvyTVN+Dd
-	w==
-X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
-X-QQ-RECHKSPAM: 0
-X-Rspamd-Queue-Id: 54F9E4F3DBF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Rspamd-Queue-Id: DF3FF4F3EDF
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	FROM_EXCESS_BASE64(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285722-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[trustnetic.com];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,armlinux.org.uk,kernel.org,intel.com,debian.org,dama.to];
+	TAGGED_FROM(0.00)[bounces-285723-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lists.infradead.org,vger.kernel.org,gmail.com];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.889];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Sun, May 3, 2026 10:16 AM, Jakub Kicinski wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> ---
-> net: wangxun: clear stored DMA addresses after dma_free_coherent()
-> 
-> This commit clears the ring DMA addresses after freeing their resources via
-> dma_free_coherent() in the wangxun driver. It aims to prevent use-after-free
-> of the DMA rings at shutdown when WOL is enabled.
-> 
-> > diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-> > index 3216dee778be7..51599f6b878e7 100644
-> > --- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-> > +++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-> > @@ -2462,6 +2462,7 @@ void wx_free_isb_resources(struct wx *wx)
-> >  	dma_free_coherent(&pdev->dev, sizeof(u32) * 4,
-> >  			  wx->isb_mem, wx->isb_dma);
-> >  	wx->isb_mem = NULL;
-> > +	wx->isb_dma = 0;
-> >  }
-> 
-> This isn't a regression introduced by this patch, but can dma_free_coherent()
-> be called with a NULL wx->isb_mem virtual address here?
-> 
-> Since wx->isb_mem is only allocated when the interface is brought up, if the
-> module is removed while the interface is down, wx->isb_mem will be NULL. Does
-> passing a NULL virtual address to dma_free_coherent() cause a panic here, and
-> should it be guarded by a NULL check?
-> 
-> [ ... ]
-> 
-> > @@ -2678,6 +2679,7 @@ static void wx_free_rx_resources(struct wx_ring *rx_ring)
-> >  			  rx_ring->desc, rx_ring->dma);
-> >
-> >  	rx_ring->desc = NULL;
-> > +	rx_ring->dma = 0;
-> 
-> If rx_ring->dma is set to 0 here, and Wake-on-LAN is enabled, does this result
-> in the hardware being programmed to DMA directly to physical address 0?
-> 
-> Looking at ngbe_dev_shutdown(), it frees these resources and then calls
-> wx_configure_rx(). Inside wx_configure_rx_ring(), the driver programs the
-> base address registers WX_PX_RR_BAL with ring->dma, which is now 0. When a
-> WOL packet arrives, could this cause silent memory corruption or fatal
-> IOMMU faults?
+The DATA-packet handler in rxrpc_input_call_event() and the RESPONSE
+handler in rxrpc_verify_response() copy the skb to a linear one before
+calling into the security ops only when skb_cloned() is true.  An skb
+that is not cloned but still carries externally-owned paged fragments
+(e.g. SKBFL_SHARED_FRAG set by splice() into a UDP socket via
+__ip_append_data, or a chained skb_has_frag_list()) falls through to
+the in-place decryption path, which binds the frag pages directly into
+the AEAD/skcipher SGL via skb_to_sgvec().
 
-For the hardware design on this device, WOL packets are handled before DMA ring.
-So programming a zeroed ring->dma does not result in DMA transactions to
-physical address 0. At this point, the original code is fine.
+Extend the gate to also unshare when skb_has_frag_list() or
+skb_has_shared_frag() is true.  This catches the splice-loopback vector
+and other externally-shared frag sources while preserving the
+zero-copy fast path for skbs whose frags are kernel-private (e.g. NIC
+page_pool RX, GRO).  The OOM/trace handling already in place is reused.
 
-> 
-> Additionally, this wasn't introduced by this patch, but does the shutdown
-> sequence trigger a NULL pointer dereference when WOL is active?
-> 
-> Earlier in wx_free_rx_resources(), rx_ring->rx_buffer_info is freed and set
-> to NULL, but ring->count retains its original value. During WOL shutdown,
-> ngbe_dev_shutdown() frees these resources and then reconfigures the RX rings
-> via wx_configure_rx_ring().
-> 
-> If wx_configure_rx_ring() executes:
-> memset(ring->rx_buffer_info, 0, sizeof(struct wx_rx_buffer) * ring->count);
-> 
-> with a NULL pointer and a count > 0, won't this cause a kernel panic?
-> 
-> [ ... ]
-> 
-> > @@ -2906,6 +2910,7 @@ static int wx_setup_rx_resources(struct wx_ring *rx_ring)
-> >
-> >  err_desc:
-> >  	dma_free_coherent(dev, rx_ring->size, rx_ring->desc, rx_ring->dma);
-> > +	rx_ring->dma = 0;
-> >  err:
-> >  	kvfree(rx_ring->rx_buffer_info);
-> >  	rx_ring->rx_buffer_info = NULL;
-> 
-> Should rx_ring->desc also be set to NULL here?
-> 
-> If wx_alloc_page_pool() fails, the driver jumps to err_desc and frees the DMA
-> memory, but leaves rx_ring->desc pointing to the freed memory. Since wx_ring
-> structures can be reused across interface up/down cycles, could this dangling
-> pointer bypass the if (!rx_ring->desc) safety check in wx_free_rx_resources()
-> and cause a double-free later?
-> 
+Fixes: d0d5c0cd1e71 ("rxrpc: Use skb_unshare() rather than skb_cow_data()")
+Cc: stable@vger.kernel.org
+Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+---
+Changes in v3:
+- Use skb_has_frag_list() || skb_has_shared_frag() instead of skb_is_nonlinear()
+- v2: https://lore.kernel.org/all/af2F1FU5d4Q_Gn1W@v4bel/
+Changes in v2:
+- Use skb_is_nonlinear() instead of skb->data_len
+- v1: https://lore.kernel.org/all/afKV2zGR6rrelPC7@v4bel/
+---
+ net/rxrpc/call_event.c | 4 +++-
+ net/rxrpc/conn_event.c | 3 ++-
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/net/rxrpc/call_event.c b/net/rxrpc/call_event.c
+index fdd683261226..2b19b252225e 100644
+--- a/net/rxrpc/call_event.c
++++ b/net/rxrpc/call_event.c
+@@ -334,7 +334,9 @@ bool rxrpc_input_call_event(struct rxrpc_call *call)
+ 
+ 			if (sp->hdr.type == RXRPC_PACKET_TYPE_DATA &&
+ 			    sp->hdr.securityIndex != 0 &&
+-			    skb_cloned(skb)) {
++			    (skb_cloned(skb) ||
++			     skb_has_frag_list(skb) ||
++			     skb_has_shared_frag(skb))) {
+ 				/* Unshare the packet so that it can be
+ 				 * modified by in-place decryption.
+ 				 */
+diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
+index a2130d25aaa9..442414d90ba1 100644
+--- a/net/rxrpc/conn_event.c
++++ b/net/rxrpc/conn_event.c
+@@ -245,7 +245,8 @@ static int rxrpc_verify_response(struct rxrpc_connection *conn,
+ {
+ 	int ret;
+ 
+-	if (skb_cloned(skb)) {
++	if (skb_cloned(skb) || skb_has_frag_list(skb) ||
++	    skb_has_shared_frag(skb)) {
+ 		/* Copy the packet if shared so that we can do in-place
+ 		 * decryption.
+ 		 */
+-- 
+2.43.0
 
 
