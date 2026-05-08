@@ -1,197 +1,257 @@
-Return-Path: <netdev+bounces-285877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285878-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MFeTElz5/WlilQAAu9opvQ
-	(envelope-from <netdev+bounces-285877-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:55:24 +0200
+	id 8NtkON/5/WnYlQAAu9opvQ
+	(envelope-from <netdev+bounces-285878-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:57:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE7B24F82BD
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:55:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87EF64F831A
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:57:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 511613024A38
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 14:54:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7A7E8303FF25
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 14:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E5FE3FCB3E;
-	Fri,  8 May 2026 14:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA8073EE1CC;
+	Fri,  8 May 2026 14:55:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eBcSVAhu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rjLnu2D1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A205C3FCB00
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 14:54:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B57EA2571C7;
+	Fri,  8 May 2026 14:55:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778252048; cv=none; b=VgRYmZwAEZ8nokNDqFoYyNHoDGcWo7sjhnMFGhT8J2WTyWFUTKq30eXR8hs7zWtIjMCoNqI/cXQ64VROKqr7bEL8UIOPqEHPwKOOhOKh/dJ5d0Mz6JsV6F9dzhygHtk1tBt+jiyFyKMF0b+eLUqGnf9li5YgVaX+Je/heM0IDko=
+	t=1778252146; cv=none; b=LtlZvJzNt6KU6JUYVXcGrmkbJjnrn7jTIjWCSsJZn24sPjL0fIyPqO24PjI8g6iRL0A2YoUIQfKi1sWfbR+E0ud/dJfKXNTQ4aMZpRAcvcceflP9hPyLNctsoRZAXDaVrT4dfBtzZLpiDHHxtHihSe+Pq2RSUt3syOt/hu79WVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778252048; c=relaxed/simple;
-	bh=36DgZFE5cWQ/2I06imy7s6CW61tBQ1NllxQ2tZYBFhs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=MUnAs5bZ9FeepL39AMfz/7ETJh432NG6Sb0GrRdS/wdtO93hbefKpHNYnnV0jmZ+1abvY+bve9PKsuOPby9fWgh2HF6WW0wbx9zcQoU61CfCgQh1w8f4SAmUxbTerYD0n3KmhCZ/6XIUwsyXhD2433GH2IKGbatWSOpVrqob2AY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eBcSVAhu; arc=none smtp.client-ip=209.85.210.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7dcd89701acso1879494a34.1
-        for <netdev@vger.kernel.org>; Fri, 08 May 2026 07:54:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778252045; x=1778856845; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RHL1wJQG1EIug8Z16j66mJo+lKQHRHLvWtIK615c/6Y=;
-        b=eBcSVAhui0dnRIpBkoAxEI+H+frOMTDPxFMo7GarVpT7ZTW1UfuynJ6w68J8KHKiLD
-         EcVbm0GJxepUWcNQSZQ631emacVQ5QvFGi6CMZMnoCkChgPSgqKYEu/dmthR5/jXWf5E
-         SvQP4PjnsseCTU2v4CrgRWYoYJ7quG5itsWq2JLbR79BkDMRuuxwJLKvXjlNJKan5xKC
-         0/cVkEbwcwAEEV1sEiGWZcgaOc7xA8QOVuDhl3TJ7KQ7hXY/F864Ac86MspnB6EqP0UK
-         +P98XP7s303GRlUhtnR4dVnQWGVKKSUmCa7mXFOcF7F8kGuIssDGvgkSkt4DYxLyTMRe
-         L8Wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778252045; x=1778856845;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=RHL1wJQG1EIug8Z16j66mJo+lKQHRHLvWtIK615c/6Y=;
-        b=TF9G+hC96/fV+hMJwRgRE0GVeMWDCJFnXAv1PxiJYKKiDDxhuyaT9x7fPOQa+VClan
-         kXxVkhzflB120DHbeUXzlaTPltsIWnt8E3EpQ5HXy+Ocg2q8lnA7b/k1dOLRnnngxhWi
-         zPHzKa7T0JGD4pOT9YWaz4npy1pyeu8AKugbJ+y0gcuzCjI4zz4S1cocA98CnukCGTqC
-         UTtCVKsG4Rti0014ujjXKKmf1wVRwEON5P1HQLJNIuhBAmUMWACF9zPa4bXy28iQlf/Y
-         CAm5TTp1sLUM48QX12rerJH7oS6pSKQniizG8dwgfHbXFj8Dd54FEF4/dE/DyzYN1RSM
-         6Fhw==
-X-Gm-Message-State: AOJu0Yyc1BVP6aNjRG7M04PC4B7bDbLbbOQRj+F7oq4jUTF2xIhfEh+D
-	SCJjsqqWJNc7T00suGMxuvy9WMOo68T4tAbSdhbas6rGq/aHqh5EIGXwvHZ6bQ==
-X-Gm-Gg: AeBDietWeZDQBSGa1Yxarl8Yw9r/fPsebWil7FMIPOxHD6Xn4AOKby1yRoD/MnlPRgn
-	yI9hqa1eMCYZ21ogPcVoGAa+e9+aogywfAXUFnXoMgCfYGW+etbVKDoXmonQo+fdf8XZg9C6+L9
-	1+tnAQQKd6h9BngFYyw+Gix6XkwCy6XXO5/wfLS/QJts9QGsnGdoAlnrh99VWggO+yd/AM2T2VQ
-	tQI0Y/uZwmVGjS7/w9lbK2xKK+3uOJJO6vtyXWJoSqjJIptL129CU89LZqTYoJJ63MgR305S/oI
-	y2EWDRMbBXl1odw9JOdoafonvQQFu6E+2gAU3T0TfEi4vQjV0u2OJXFj+3dEFDtpVIftTSrl7cD
-	c3RGh+zvfLAexPVCBqc3b4S9/u+tcVbHB89sRk50mrOl6lNQQruQVydvtv+B0EdtiHD7Pqy4eCB
-	jKdQvNVlgMvYvRL4ghdkwGafdum7WK5cuWx9T6SMLcTq5YRsR8CgzYgdnjkelLl1A=
-X-Received: by 2002:a05:6830:d8d:b0:7de:a2cc:9dde with SMTP id 46e09a7af769-7e1df04e894mr8115894a34.15.1778252045438;
-        Fri, 08 May 2026 07:54:05 -0700 (PDT)
-Received: from localhost ([2a03:2880:10ff:4e::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e367c056desm1190872a34.10.2026.05.08.07.54.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 07:54:04 -0700 (PDT)
-From: Daniel Zahka <daniel.zahka@gmail.com>
-Date: Fri, 08 May 2026 07:53:49 -0700
-Subject: [PATCH net-next 6/6] netdevsim: psp: count rx authentication and
- length errors
+	s=arc-20240116; t=1778252146; c=relaxed/simple;
+	bh=N869R35gS1hmPx22qrwaifKiqn02BVaqbn9SBybbSpU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SiY9PvSZdXXAaqmmgl1FiFiWIEOPFcwjRb7TGnzh+wk7hGp/VxiTYdvl5YHgO+IMv560HOsHdGZaiom+383w6/dPnT/e/QwaYH0Kee7BlWzMjm8R3meZCvjIk2YWeT/iOV7NXdM3pzzCTapRtp8pObAnDtiKeD5V2JxCgDV04oQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rjLnu2D1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AEFAC2BCB0;
+	Fri,  8 May 2026 14:55:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778252146;
+	bh=N869R35gS1hmPx22qrwaifKiqn02BVaqbn9SBybbSpU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rjLnu2D10PWshoFmra/WqT2x/oIazuGIRH8ewIGoBqLvCb8aB9EYk8O+CkpUcagTh
+	 296wobZZiAHV25FyTCp5M3vABi828lVuMnB8U/NAzbSpyD68jS/FZcQVWXjLjyQ70g
+	 uriBMCHtOGT+YTrfC+K9Squ9DQR5y8LcBOGY/NqpOIC+KFYmztke+3TBg/pChX2mlE
+	 sc2R87QeTXzp7dJXNJmrANH6ufElnyNlJ+mqfNI2mbpK2RC6Xmo04EWZ9nXy5a7W6X
+	 0teea2lGgLpGHYqIdSOKndHAo78EixdezGqcPVOtMKhgmYZ1UiDE4tmXDFlIfnsnKQ
+	 +FvNwNzPFsiXA==
+Date: Fri, 8 May 2026 15:55:40 +0100
+From: Conor Dooley <conor@kernel.org>
+To: =?utf-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+	rmk+kernel@armlinux.org.uk, maxime.chevallier@bootlin.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
+	linmin@eswincomputing.com, pinkesh.vaghela@einfochips.com,
+	pritesh.patel@einfochips.com, weishangjuan@eswincomputing.com
+Subject: Re: Re: [PATCH net v1 1/2] dt-bindings: ethernet: eswin: refine
+ delay model and HSP register description
+Message-ID: <20260508-detention-frisk-84cff00cb228@spud>
+References: <20260507083037.152-1-lizhi2@eswincomputing.com>
+ <20260507083136.175-1-lizhi2@eswincomputing.com>
+ <20260507-mural-moocher-ad6e07ef8ae0@spud>
+ <22d09a07.7cfd.19e061cacea.Coremail.lizhi2@eswincomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260508-nsim-psp-crypto-v1-6-4b50ed09b794@gmail.com>
-References: <20260508-nsim-psp-crypto-v1-0-4b50ed09b794@gmail.com>
-In-Reply-To: <20260508-nsim-psp-crypto-v1-0-4b50ed09b794@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-X-Mailer: b4 0.13.0
-X-Rspamd-Queue-Id: DE7B24F82BD
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="z+PhFZ7j1pI5I6B9"
+Content-Disposition: inline
+In-Reply-To: <22d09a07.7cfd.19e061cacea.Coremail.lizhi2@eswincomputing.com>
+X-Rspamd-Queue-Id: 87EF64F831A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285877-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285878-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[danielzahka@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,st-md-mailman.stormreply.com,lists.infradead.org,eswincomputing.com,einfochips.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Now that netdevsim does psp parsing and aes-gcm decryption in rx, we
-can report authentication and length errors in the psp stats api.
 
-Assisted-by: Claude:claude-opus-4.7
-Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
----
- drivers/net/netdevsim/netdevsim.h |  2 ++
- drivers/net/netdevsim/psp.c       | 11 ++++++++++-
- 2 files changed, 12 insertions(+), 1 deletion(-)
+--z+PhFZ7j1pI5I6B9
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-index 112fe1ee10bc..5f0f638ee893 100644
---- a/drivers/net/netdevsim/netdevsim.h
-+++ b/drivers/net/netdevsim/netdevsim.h
-@@ -118,6 +118,8 @@ struct netdevsim {
- 	struct {
- 		u64_stats_t rx_packets;
- 		u64_stats_t rx_bytes;
-+		u64_stats_t rx_auth_fail;
-+		u64_stats_t rx_error;
- 		u64_stats_t tx_packets;
- 		u64_stats_t tx_bytes;
- 		struct u64_stats_sync syncp;
-diff --git a/drivers/net/netdevsim/psp.c b/drivers/net/netdevsim/psp.c
-index 4945973d523d..053c01cc310d 100644
---- a/drivers/net/netdevsim/psp.c
-+++ b/drivers/net/netdevsim/psp.c
-@@ -207,8 +207,12 @@ bool nsim_psp_handle_rx(struct netdevsim *ns, struct sk_buff *skb)
- 
- 	psp_off = l3_hlen + sizeof(struct udphdr);
- 	payload_len = skb->len - psp_off - PSP_HDR_SIZE - PSP_TRL_SIZE;
--	if (payload_len < 0)
-+	if (payload_len < 0) {
-+		u64_stats_update_begin(&ns->psp.syncp);
-+		u64_stats_inc(&ns->psp.rx_error);
-+		u64_stats_update_end(&ns->psp.syncp);
- 		goto drop;
-+	}
- 
- 	if (FIELD_GET(PSPHDR_CRYPT_OFFSET, psph->crypt_offset))
- 		goto drop;
-@@ -238,6 +242,9 @@ bool nsim_psp_handle_rx(struct netdevsim *ns, struct sk_buff *skb)
- 			    payload_len, (u8 *)psph, PSP_HDR_SIZE,
- 			    iv, authtag)) {
- 		memzero_explicit(&ctx, sizeof(ctx));
-+		u64_stats_update_begin(&ns->psp.syncp);
-+		u64_stats_inc(&ns->psp.rx_auth_fail);
-+		u64_stats_update_end(&ns->psp.syncp);
- 		goto drop;
- 	}
- 	memzero_explicit(&ctx, sizeof(ctx));
-@@ -346,6 +353,8 @@ static void nsim_get_stats(struct psp_dev *psd, struct psp_dev_stats *stats)
- 		start = u64_stats_fetch_begin(&ns->psp.syncp);
- 		stats->rx_bytes = u64_stats_read(&ns->psp.rx_bytes);
- 		stats->rx_packets = u64_stats_read(&ns->psp.rx_packets);
-+		stats->rx_auth_fail = u64_stats_read(&ns->psp.rx_auth_fail);
-+		stats->rx_error = u64_stats_read(&ns->psp.rx_error);
- 		stats->tx_bytes = u64_stats_read(&ns->psp.tx_bytes);
- 		stats->tx_packets = u64_stats_read(&ns->psp.tx_packets);
- 	} while (u64_stats_fetch_retry(&ns->psp.syncp, start));
+On Fri, May 08, 2026 at 01:43:23PM +0800, =E6=9D=8E=E5=BF=97 wrote:
+>=20
+>=20
+>=20
+> > -----=E5=8E=9F=E5=A7=8B=E9=82=AE=E4=BB=B6-----
+> > =E5=8F=91=E4=BB=B6=E4=BA=BA: "Conor Dooley" <conor@kernel.org>
+> > =E5=8F=91=E9=80=81=E6=97=B6=E9=97=B4:2026-05-08 01:24:02 (=E6=98=9F=E6=
+=9C=9F=E4=BA=94)
+> > =E6=94=B6=E4=BB=B6=E4=BA=BA: lizhi2@eswincomputing.com
+> > =E6=8A=84=E9=80=81: andrew+netdev@lunn.ch, davem@davemloft.net, edumaze=
+t@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@=
+kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org, devicetree@vger.ke=
+rnel.org, linux-kernel@vger.kernel.org, mcoquelin.stm32@gmail.com, alexandr=
+e.torgue@foss.st.com, rmk+kernel@armlinux.org.uk, maxime.chevallier@bootlin=
+=2Ecom, linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.in=
+fradead.org, ningyu@eswincomputing.com, linmin@eswincomputing.com, pinkesh.=
+vaghela@einfochips.com, pritesh.patel@einfochips.com, weishangjuan@eswincom=
+puting.com
+> > =E4=B8=BB=E9=A2=98: Re: [PATCH net v1 1/2] dt-bindings: ethernet: eswin=
+: refine delay model and HSP register description
+> >=20
+> > On Thu, May 07, 2026 at 04:31:36PM +0800, lizhi2@eswincomputing.com wro=
+te:
+> > > From: Zhi Li <lizhi2@eswincomputing.com>
+> > >=20
+> > > Refine the EIC7700 Ethernet dt-binding based on observed hardware beh=
+avior
+> > > and clarify the original delay model for eth0.
+> > >=20
+> > > The previous binding used an enum-based definition for
+> > > rx-internal-delay-ps and tx-internal-delay-ps. Replace it with a
+> > > range-based model using:
+> > >=20
+> > >   - minimum: 0
+> > >   - maximum: 2540
+> > >   - multipleOf: 20
+> > >=20
+> > > This better reflects the actual hardware implementation, which
+> > > supports 20ps granularity delay steps in the MAC RGMII interface.
+> > >=20
+> > > The tx/rx internal delay values are clarified as MAC-side programmable
+> > > delay components applied on the RGMII clock/data path, representing
+> > > the effective delay seen at the MAC interface.
+> > >=20
+> > > This does not change the intended hardware semantics, but aligns the
+> > > binding with the actual hardware implementation.
+> > >=20
+> > > These properties are optional and only required when MAC-side fine
+> > > tuning is needed; otherwise delay alignment is provided by PHY or
+> > > board design.
+> > >=20
+> > > Depending on the selected RGMII timing mode, delay alignment may be
+> > > provided by the PHY (e.g. rgmii-id) or by board/MAC-side configuratio=
+n.
+> > > When PHY or board design already provides the required delay, these
+> > > MAC-side properties may be omitted. When MAC-side fine tuning is
+> > > required, they should be provided to describe the internal RGMII
+> > > timing adjustment.
+> > >=20
+> > > Additionally, extend the description of the HSP subsystem register
+> > > layout used by the MAC glue logic. This includes explicit TXD and RXD
+> > > delay control registers to ensure deterministic initialization and
+> > > to override any residual configuration potentially left by bootloader=
+s.
+> > >=20
+> > > Add reference to the EIC7700X SoC Technical Reference Manual,
+> > > Chapter 10 ("High-Speed Interface"), Part 4 for background of the
+> > > HSP CSR block:
+> > > https://github.com/eswincomputing/EIC7700X-SoC-Technical-Reference-Ma=
+nual/releases
+> > >=20
+> > > There are no in-tree users of this binding, so no ABI impact is
+> > > expected.
+> > >=20
+> > > Fixes: 888bd0eca93c ("dt-bindings: ethernet: eswin: Document for EIC7=
+700 SoC")
+> > > Signed-off-by: Zhi Li <lizhi2@eswincomputing.com>
+> > > ---
+> >=20
+> > While this is v1, it's really v8 and there should therefore be a
+> > changelog that explains where my ack and the new compatible went.
+> >=20
+>=20
+> Thanks for the review.
+>=20
+> Based on Jakub's feedback on the previous v7 series, I plan to split the
+> changes into two separate series:
+>=20
+> - a smaller fix series intended for net,
+> - and a separate eth1 feature series intended for net-next.
+>=20
+> After the split, the scope and target trees of the two series will differ
+> from the original combined series, so I plan to restart the revision
+> numbering from v1 for both series.
+>=20
+> The additional compatible string and the eth1-specific DT binding
+> extensions will be moved into the separate feature series, and I will
+> reflect this in the v2 cover letter.
+>=20
+> The DT binding changes in this fix series v1 are simply extracted from the
+> previous v7 series as part of the split.
+>=20
+> Since the series has been restructured, I will drop the previous
+> Acked-by tags.
+>=20
+> I will also document the reason for doing so and the impact of the split
+> in the v2 cover letter.
 
--- 
-2.52.0
+This isn't what I am looking for. I just want/wanted an explanation for
+why the new compatible has been removed from the patch.
 
+>=20
+> If you think the binding changes are still effectively unchanged and the
+> previous Acked-by can still apply, I am happy to retain them or re-apply
+> them as appropriate. Otherwise I will assume a fresh review is preferred.
+
+If the removed compatible is the one for eth1, then
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+
+Cheers,
+Conor.
+
+>=20
+> Please let me know your preference.
+>=20
+> Thanks,
+> Zhi
+
+--z+PhFZ7j1pI5I6B9
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaf35awAKCRB4tDGHoIJi
+0gmJAQDr6xhvwtTAQnqP7MMHtuQzQnKum+qSUdWXb8zOKVsrRwD/X6Xp21HqiPK6
+cDQ6QwfRf7AfLBtSYxseFDv4lV/jMQw=
+=T72E
+-----END PGP SIGNATURE-----
+
+--z+PhFZ7j1pI5I6B9--
 
