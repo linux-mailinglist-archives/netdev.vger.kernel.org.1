@@ -1,144 +1,163 @@
-Return-Path: <netdev+bounces-285711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285712-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eK8ABT6X/WnBgAAAu9opvQ
-	(envelope-from <netdev+bounces-285711-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 09:56:46 +0200
+	id gCdlFsyX/WnBgAAAu9opvQ
+	(envelope-from <netdev+bounces-285712-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 09:59:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88E9F4F3675
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 09:56:44 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB86E4F36B9
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 09:59:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5EA9F30037E8
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 07:56:17 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9A44E300380E
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 07:59:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D93AE3806A6;
-	Fri,  8 May 2026 07:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53940378822;
+	Fri,  8 May 2026 07:59:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P7Z6cYON"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Qjy8dFfX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129AB37FF47
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 07:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061B236C9EE
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 07:59:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778226975; cv=none; b=bCqLMWC9Apm9GY7oD367s4M5CsGnTe8I2FUSoUOT0rEQwLpHCdP2xZm/3BKpvl+tDhnLPJUFthpdI3y7KHzgtYB1CAhG4R+jhba4jQUfncD0aVwzr0qApL5oW4xkqHtkNtwGW28xV/msNq2v/voHOTKkBTUtY92HT8KpGdl/7S8=
+	t=1778227145; cv=none; b=ETD+mud7Ibz/k1XefCW6XDvQd826DPIhRCqqWk0EZhP2il4Fh5GH05dITh5t2RAGP3Pv3f2nvOsHYsE1CUWpVPAgc4H8atYCto5eJ1nuo9KJrMwvSebv6Sc8NJ+lFTlTIbWQ/jpVmFc7bHg1NdlsV24BtQN8St7gtL5eL56rkjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778226975; c=relaxed/simple;
-	bh=QxqWhck90nRyAuLxI/aJEO388vUHtx/+6ylrqU+FxrY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q242d7M8X1UZx7eMxCm6YtVHuL6Er0xrHotPHM/jV8ji5qAaoehSAwppOpwio9bNLtx3/9+9yaumEApAPvnQ3uxQi0VpQMIVdNNyCMEbLJAVn/BM/OOJgJDZzZWZIMpeQMlxa+WypwhnljfRRJT4GUOItlcnOOiUlN4buk9vu8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P7Z6cYON; arc=none smtp.client-ip=209.85.210.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-7de4e6c5a30so1765164a34.0
-        for <netdev@vger.kernel.org>; Fri, 08 May 2026 00:56:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778226971; x=1778831771; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XHciCBjHg+XtpY+/D0jNffHfXvfNbDr11DUMtmP6X2I=;
-        b=P7Z6cYONWHZEjE/5ED3hchiwYTtT1qHBt2rHxwosDeO4K4SGoGmS7o/66aS3gIzjhy
-         jGYCcyzqXTRjaQVkhLf5zspU1mDxM0R85S+/e/KBnXVh+ywh4ERHw9k0lNspDHHC9YjM
-         bhlyB07anpBkOJxnF0/9oBps7z6L+6pLH1u3W53tuifpgex6soFyZSlkzFmQI/SRWZrg
-         NnJclskyvKrDU4A7ynLoD5PDjNpDBLwuksE9QhyXNfyu7lXEbFqW9XxgTbuCmrh4EZby
-         xhBMYk8+NqOgmfq4sFFq2VTF0xVJWuQjfl9daUHk8+G2P91c9u46DtOKRf7TG2KxzDkX
-         LKuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778226971; x=1778831771;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=XHciCBjHg+XtpY+/D0jNffHfXvfNbDr11DUMtmP6X2I=;
-        b=jL9L3ktUPluKSaPjB/ZPY1DFOs/vadYStV2wGGICifETtuQemLBkNcR5Z0L8uZxzB3
-         jcLXPZIjeLla/avDb5q42vZ82C4k0ttjkVNkAZ1xlc3XMue/2e5NwmvNpzwLWx5pFfej
-         OjrcB0L2IutehE05W6N9qVff6UP0R5DJFa8Bm0qiyKB1OAJZTv3aVIEhcTM0owi6kDWa
-         e36WoKL+6PyiMlbabQorwUc8RER1Kx+Tl3pVJiY2U9+lET5SaIjU/k+IixcIyKsNzTdt
-         /oI1A9D6t2SGzpTae2etpSwMOMa6i5sQvIvN9+0OwHiffUqkgYdgq/Z8fMPgIBWUPfrC
-         kH9A==
-X-Gm-Message-State: AOJu0Yw8YePNwA1y3MxWwoIw2a3BdwLJJ7YPoCZKEYydLCpzglSRa9OK
-	nyyjRVKP8/w+r1U09RZHt6EfBE+onfr801+RoMK1kVUjRso3jqIHPdCT+2zgOb7IPNbnZg==
-X-Gm-Gg: AeBDievF12sg0KJF7iNFJmf5sHg4em6ED0BL/xq9BJDd4oZ3pVEf52Wh/K0N4rqxLLx
-	t4ByKYrYrOFNYPjbDziay9Er7CS/IT/HpsNLELgJwuVu2xqnARt+P7Zi/uOEmKjjJXxZMgGIoXn
-	WpSQVQ9CkGzqwEbTPxZZksH/a1HQb1lHYL03GFz1jKcTq7mcVqM7gDLigwuz4D54yM4y19enZzO
-	jE3WA0HUQRsgyoXJ0o58os9VIwt/MguEwfc693jW6Djz954123JPYAlJp9xGmqRMoJM0tgl9ESL
-	ygFPs9iAoF8m2wrFZ1Z8Jr5EZerjamum3qrMFlRbC5nwKyYKa2l4btMyJY62ZKhN7ivUebWK5mR
-	O2LDYDNitvPRNflu0TClPPzzyk8a5UIyVh7RBn6vHfRjfkACo14rmmiW14NRUJGIyfH1KvSgYw/
-	tbkVNoHnGOiOueDD5TbZE4h6mO7g==
-X-Received: by 2002:a05:6820:80a:b0:696:8c3f:d7cd with SMTP id 006d021491bc7-69998c8f271mr6396879eaf.4.1778226971426;
-        Fri, 08 May 2026 00:56:11 -0700 (PDT)
-Received: from houminxi ([72.244.37.221])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69b25c767d0sm686246eaf.5.2026.05.08.00.56.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 00:56:10 -0700 (PDT)
-From: Minxi Hou <houminxi@gmail.com>
-To: netdev@vger.kernel.org
-Cc: aconole@redhat.com,
-	Minxi Hou <houminxi@gmail.com>
-Subject: Re: [PATCH net-next v7 0/2] selftests: openvswitch: add pop_vlan test
-Date: Fri,  8 May 2026 15:55:55 +0800
-Message-ID: <followup-v7-20260508@houminxi>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260507131541.2331771-1-houminxi@gmail.com>
-References: <20260507131541.2331771-1-houminxi@gmail.com>
+	s=arc-20240116; t=1778227145; c=relaxed/simple;
+	bh=A5eLo0k1WN3dKsNjpIfOF2pKn7Y3GKqYof0joQHkltM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tupLO7whc3FBqAjyafTPyAj2pTzyBEL7XnzJfAIrG8ddxK53KiMRo0J+XxpzTrMiuZUMda3UE9iyZWx6O+Jw620NSWzdgeCZovhV0wdw44RtiiLznC5omHB/9btxodSVZXzXdLLzEoA5gIJdDXE71hhY2dRK7UMrl6VoQzVKYPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Qjy8dFfX; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <6a1a50d1-9aa8-406d-90b1-4d5ca9fe0afb@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1778227141;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EebeowThzEPHzOPHxVe8PsQqS05P87lAK1+IwQ9r900=;
+	b=Qjy8dFfXevjzgSXdRI1yDAk2G8yPi/JugjEL0KTVbj7Q73qdGyrgbj7Ldy7OqgADZFF+ct
+	MhgQ+ysmCiE64X077RZfXX4MGsixZdjmO3BmUT3YT//HVjGBsu6ZI1HZsZtfKDPVzSroHW
+	I/Q0TdE6vWkf3MuGkDwmsBElASIklS0=
+Date: Fri, 8 May 2026 15:58:34 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH net v2] rxrpc: Also unshare DATA/RESPONSE packets when
+ paged frags are present
+To: Hyunwoo Kim <imv4bel@gmail.com>, dhowells@redhat.com,
+ marc.dionne@auristor.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, qingfang.deng@linux.dev
+Cc: linux-afs@lists.infradead.org, netdev@vger.kernel.org,
+ stable@vger.kernel.org
+References: <af2F1FU5d4Q_Gn1W@v4bel>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <af2F1FU5d4Q_Gn1W@v4bel>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 88E9F4F3675
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: CB86E4F36B9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.34 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285711-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_TO(0.00)[gmail.com,redhat.com,auristor.com,davemloft.net,google.com,kernel.org,linux.dev];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285712-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[redhat.com,gmail.com];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_THREE(0.00)[3];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim]
 X-Rspamd-Action: no action
 
-Hi Aaron,
 
-Just checking in on the v7 series. I addressed both items from your
-v5 review:
+On 5/8/26 2:42 PM, Hyunwoo Kim wrote:
+> The DATA-packet handler in rxrpc_input_call_event() and the RESPONSE
+> handler in rxrpc_verify_response() copy the skb to a linear one before
+> calling into the security ops only when skb_cloned() is true.  An skb
+> that is not cloned but still carries paged fragments (skb->data_len != 0)
+> falls through to the in-place decryption path, which binds the frag
+> pages directly into the AEAD/skcipher SGL via skb_to_sgvec().
+>
+> Extend the gate so that any skb with non-linear data is also copied,
+> ensuring the security handler always operates on a fully linear skb.
+> The OOM/trace handling already in place is reused.
+>
+> Fixes: d0d5c0cd1e71 ("rxrpc: Use skb_unshare() rather than skb_cow_data()")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+> ---
+> Changes in v2:
+> - Use skb_is_nonlinear() instead of skb->data_len
+> - v1: https://lore.kernel.org/all/afKV2zGR6rrelPC7@v4bel/
+> ---
+>   net/rxrpc/call_event.c | 2 +-
+>   net/rxrpc/conn_event.c | 2 +-
+>   2 files changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/rxrpc/call_event.c b/net/rxrpc/call_event.c
+> index fdd683261226..a6ad5ff6ec5f 100644
+> --- a/net/rxrpc/call_event.c
+> +++ b/net/rxrpc/call_event.c
+> @@ -334,7 +334,7 @@ bool rxrpc_input_call_event(struct rxrpc_call *call)
+>   
+>   			if (sp->hdr.type == RXRPC_PACKET_TYPE_DATA &&
+>   			    sp->hdr.securityIndex != 0 &&
+> -			    skb_cloned(skb)) {
+> +			    (skb_cloned(skb) || skb_is_nonlinear(skb))) {
+>   				/* Unshare the packet so that it can be
+>   				 * modified by in-place decryption.
+>   				 */
+> diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
+> index a2130d25aaa9..632cbeff1f5d 100644
+> --- a/net/rxrpc/conn_event.c
+> +++ b/net/rxrpc/conn_event.c
+> @@ -245,7 +245,7 @@ static int rxrpc_verify_response(struct rxrpc_connection *conn,
+>   {
+>   	int ret;
+>   
+> -	if (skb_cloned(skb)) {
+> +	if (skb_cloned(skb) || skb_is_nonlinear(skb)) {
+>   		/* Copy the packet if shared so that we can do in-place
+>   		 * decryption.
+>   		 */
 
-  - Removed the slot number comments from encap_ovskey nla_map,
-    keeping only comments on entries that differ from the base class.
-  - Dropped the explicit modprobe 8021q + sysfs pre-flight check,
-    relying on ip link add type vlan to handle module loading.
 
-Is there anything else you'd like me to change, or does this look
-ready to move forward?
+Why not adopt the same gate as the ESP fix:
 
-Thanks,
-Minxi
+
+     skb_cloned(skb) || skb_has_frag_list(skb) || skb_has_shared_frag(skb)
+
+
+so NIC page_pool RX keeps its zero-copy path while still catching the 
+splice-loopback vector?
+
+
 
