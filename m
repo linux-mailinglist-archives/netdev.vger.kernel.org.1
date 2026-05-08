@@ -1,123 +1,161 @@
-Return-Path: <netdev+bounces-285850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285851-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qGw2Dwrq/WkPkgAAu9opvQ
-	(envelope-from <netdev+bounces-285850-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:50:02 +0200
+	id KMSmDRvq/WnvkgAAu9opvQ
+	(envelope-from <netdev+bounces-285851-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:50:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA0504F7593
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:50:01 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A983F4F75AA
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:50:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1FE21301B148
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 13:41:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B885E3097F6F
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 13:42:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10B7F3E4C73;
-	Fri,  8 May 2026 13:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bGPlDiGH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2E2A3E5EC6;
+	Fri,  8 May 2026 13:41:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA2937419B;
-	Fri,  8 May 2026 13:41:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E60B37BE70;
+	Fri,  8 May 2026 13:41:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778247664; cv=none; b=mkUfTUOP8Jneb2pWwlRHDEBc3it61OpmYkfhpEhauKrBAMVsjHMC9UZu0ySXNsFPbXKbrlM614y9mi51Km9K7chbjBYxqG16QsCkoDRLFvMVUtvlY8IVC/y2sSy2m99vx5KhRVboD6LGyUgaAlkjJTb3KLu7OPtZYveS1PZkbVY=
+	t=1778247715; cv=none; b=NqPCch++bToJYbEhD1hKz6rvLV4vVfYIIrgIsR0621xFWV6z/sRBSnNwcawSgEw6nEV0jNRV9hcfTrND6bmSaOaP55IKDRz67Bv6CnwkXa0VATqa+0oMhBDDnrdXqu+fhW3OGlXejCfuTpvqoNFQ9NfKg10x4zb7Ka7jts2hHcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778247664; c=relaxed/simple;
-	bh=mfMIFp8OlSOd98T1kC1LhYj4A4fV7dYb1x+gh2ih10w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Skb5yC2xIl2S+PILz06t3aWLqgO8Lp4gP4uCZ62AQkl5l8SpzEDvdMhak7W99CuaOIZWYdHSzhZb6Z4NDag6zwqUh7E5MsNKIg9k2uPSGzmKrdx0oFPRo+UCRvrhcnsvfoCmtPbQBWmG31l8HBuncECbanuI51IpbDsGzJec/+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bGPlDiGH; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8jYBlJurA7H2/29k8CP0C4HEnBKLf57PI9B4HQDRtrE=; b=bGPlDiGHM3F2v3OpskK2kBiVlb
-	8PFc09cGeG9JhWve6wwBXxvT0IDveI/l79yjqqnYsib5rMgLcv1L3+WG5CbdkdAhLZzXt1QMLeYw8
-	GmVLty8v03ZCSsh+BAKv5xapE26rgXIFQYe+JzMb8lbbI2gs81pY7ZkY4uYTsh8s6EFQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wLLRS-001yeh-Vl; Fri, 08 May 2026 15:40:34 +0200
-Date: Fri, 8 May 2026 15:40:34 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Illusion Wang <Illusion.Wang@nebula-matrix.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Dimon <dimon.zhao@nebula-matrix.com>,
-	Alvin <alvin.wang@nebula-matrix.com>,
-	Sam <sam.chen@nebula-matrix.com>, netdev <netdev@vger.kernel.org>,
-	andrew+netdev <andrew+netdev@lunn.ch>, corbet <corbet@lwn.net>,
-	kuba <kuba@kernel.org>, linux-doc <linux-doc@vger.kernel.org>,
-	lorenzo <lorenzo@kernel.org>, horms <horms@kernel.org>,
-	"vadim.fedorenko" <vadim.fedorenko@linux.dev>,
-	"lukas.bulwahn" <lukas.bulwahn@redhat.com>,
-	edumazet <edumazet@google.com>,
-	enelsonmoore <enelsonmoore@gmail.com>,
-	skhan <skhan@linuxfoundation.org>,
-	hkallweit1 <hkallweit1@gmail.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: =?utf-8?B?5Zue5aSN77yaW1BBVENIIHYxMyBu?= =?utf-8?Q?et-next?=
- 03/11] net/nebula-matrix: add chip related definitions
-Message-ID: <bdaf51a9-66d1-4469-960f-d5ec74f870de@lunn.ch>
-References: <20260428114910.2616-1-illusion.wang@nebula-matrix.com>
- <20260428114910.2616-4-illusion.wang@nebula-matrix.com>
- <e41adaad-8937-4b5d-bdbf-d57d3efe2855@redhat.com>
- <b240b971-81b8-4325-80b6-5352e1515f07.Illusion.Wang@nebula-matrix.com>
+	s=arc-20240116; t=1778247715; c=relaxed/simple;
+	bh=M01axkFi60PgsS5+yPl+h/GD+JWVJPr57X7IRcb625U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AP1MeOdIHRA2qmwql5WZjzPMQcEZCixtPn6sF1r/+gR5f/4yHrrbwUVCLr5DgPsyDQHXO8A1q7ylvsno2XJYc2srPNJjHF8ge3ynd1mv8J7gPYH0CLf3FbcmzEtLgYp38naP4sA58AXweXwZLoBChF2hLY68j+LQdjxzLSo5lnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=radxa.com; spf=pass smtp.mailfrom=radxa.com; arc=none smtp.client-ip=52.59.177.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=radxa.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=radxa.com
+X-QQ-mid: zesmtpsz9t1778247685t1369d6ed
+X-QQ-Originating-IP: Rwa7KskeJ2ohyMfXaBDQ3/23jeqhEAjyHFd1W0vcT44=
+Received: from [127.0.0.1] ( [116.234.74.217])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 08 May 2026 21:41:19 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 14886756243137966030
+Message-ID: <ED7EE77387FC4C2F+9b254eea-8598-4b34-876e-670fcef2d185@radxa.com>
+Date: Fri, 8 May 2026 21:41:17 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b240b971-81b8-4325-80b6-5352e1515f07.Illusion.Wang@nebula-matrix.com>
-X-Rspamd-Queue-Id: AA0504F7593
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 10/12] net: stmmac: tc956x: add TC956x/QPS615
+ support
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alex Elder <elder@riscstar.com>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, maxime.chevallier@bootlin.com,
+ rmk+kernel@armlinux.org.uk, andersson@kernel.org, konradybcio@kernel.org,
+ robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, linusw@kernel.org,
+ brgl@kernel.org, arnd@arndb.de, gregkh@linuxfoundation.org,
+ Daniel Thompson <daniel@riscstar.com>, mohd.anwar@oss.qualcomm.com,
+ a0987203069@gmail.com, alexandre.torgue@foss.st.com, ast@kernel.org,
+ boon.khai.ng@altera.com, chenchuangyu@xiaomi.com, chenhuacai@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, hkallweit1@gmail.com,
+ inochiama@gmail.com, john.fastabend@gmail.com, julianbraha@gmail.com,
+ livelycarpet87@gmail.com, matthew.gerlach@altera.com,
+ mcoquelin.stm32@gmail.com, me@ziyao.cc,
+ prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
+ rohan.g.thomas@altera.com, sdf@fomichev.me, siyanteng@cqsoftware.com.cn,
+ weishangjuan@eswincomputing.com, wens@kernel.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20260501155421.3329862-1-elder@riscstar.com>
+ <20260501155421.3329862-11-elder@riscstar.com>
+ <224E233C593EF171+8c8a43dd-5061-40f8-9eb7-f360eabf2ecc@radxa.com>
+ <ae90a4c9-f027-4373-a378-d0d4b7796ff3@riscstar.com>
+ <6744F8FEFD290FFD+4973b8ba-7d3b-45e4-8478-0b3334b81960@radxa.com>
+ <fc5d14d5-c65d-445f-90c6-9659e284c0ca@lunn.ch>
+Content-Language: en-US
+From: Xilin Wu <sophon@radxa.com>
+In-Reply-To: <fc5d14d5-c65d-445f-90c6-9659e284c0ca@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:radxa.com:qybglogicsvrsz:qybglogicsvrsz3b-0
+X-QQ-XMAILINFO: Mom5ezI3X1cDdstxr0dvEIZV443NBEYAfToYd8iPkwSlMrpUFKrexK8P
+	dTvWTgpqC6Skcw0ZRPuUSf3Wz7VpYWQwC9iH6yHq0bFCcJYPFPdk4miUDUngLuiFEe/oLMO
+	XvESpVBjhvLLQjFeGc4/SEgKqu9OYOrHE1gMC0mjnqRSeqgJmnLUvcBcCm+smi5QKexLhr5
+	CxwYvkoAzOjw4aMgudRQ8yGCJ/Gxsil4YNYEgNXjwqchA6H5ywfDG0StQmJvHaH0ac/3eO3
+	Y4gAPULSyC4lTo7wNhiLmOPwJfvREVDd9gH5eapN703xRJQEPIMsXvAN4ADGNqho0RV+Ojx
+	jGGwagzF4qK7kU5mZBOptSdYd8kFvS49tt1slIYJSbaPRJZuLhQrQgWk6nl0CGonh0vrQnQ
+	BWjX/CQPP2P7pIHcLnUFCCP44rKBHEtW8k7aQ2OK3Sv4Vg1yvwjelZkn3w/Ty/870rJttFS
+	OqBkH8/xYcYEqDnuHIJyt3mi3tc1wrHIvYehd5puuj0ieRZ2Cu2Y3BGxF6Hpqb3OmVQC5o7
+	eKBrQ2rv3Zkx+I9oQYXH7xa53o5dt3iwq0spnNOtnD5LTHhDbuuLV8os0emQ1BbLfkQs8Eg
+	P6/jWIVAL5jB7uiTF1o4qc72Q1N2noULu6hVAQ+rKU9cYYSdzflLHWFLiUFqExsOXFNtrT+
+	9sogoxbxW6xeVhVUTYjOCubqmG6q85LsyZQzi7O8W1dn0RQHJz8kEEWuDHNYtc/qSECDti2
+	wdKllmnodr3ZJ+AIu//SuRnitrcqNeE8ahOASgdSlX93R85FrVSvI6LHtnO5Ebcxwm7bIp2
+	akzyqKkz4b4fEzjRZRuRnZAaIS0jXTdMck9sUMOxo3lFqzdJXZIhB7Ql4HAwL0SlU84tJ1K
+	/XT6Z+n/gVx31J5bSD3iZELcqoseoLF8Z8HMPGgRhwanVvAnesUm76VLWLNDlWMfDutM2jD
+	qcFITzeAXCPUCfujhBbwj8/EMAbdu9Ry22tR2BGIzwb9lDfzbi+l87t5LWvVAxA2LibQXdy
+	I/YPPaVs/0XRwAimtGrqSt/RPEoWIgPWl/9cxxgXehFZCUdqqsnb3gKJWv6ySlAqnB7Mj0Z
+	g==
+X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
+X-QQ-RECHKSPAM: 0
+X-Rspamd-Queue-Id: A983F4F75AA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[radxa.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285850-lists,netdev=lfdr.de];
+	FORGED_MUA_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285851-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_CC(0.00)[riscstar.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,nebula-matrix.com,vger.kernel.org,lunn.ch,lwn.net,kernel.org,linux.dev,google.com,gmail.com,linuxfoundation.org];
-	TO_DN_ALL(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[19]
+	RCPT_COUNT_GT_50(0.00)[51];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sophon@radxa.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.968];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel,dt];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-> But I printed out the results: 
-> ARRAY_SIZE(nbl_sec009_data) equals NBL_SEC009_SIZE,
-> ARRAY_SIZE(nbl_sec025_data) equals NBL_SEC025_SIZE,
-> and ARRAY_SIZE(nbl_sec022_data) equals NBL_SEC022_SIZE.
+On 5/8/2026 9:36 PM, Andrew Lunn wrote:
+>> Hi Alex,
+>>
+>> Maybe I missed something, but I already have WoL working *without* changes
+>> in the tc956x driver.
+>>
+>> https://lore.kernel.org/all/859776B5671B36B9+577c19e4-3e66-4036-b26f-fe20287a1d43@radxa.com/
 > 
-> Is the AI making a mistake here?
+> Sorry, did i miss the patches for the PHY driver? Or was the code
+> already there?
+> 
+> 	Andrew
+> 
 
-Just a guess, i've not looked at this patch at all.
+No, I'm using an out-of-tree patch currently.
 
-Are you doing this on a 32 bit build? Maybe the AI is?
+https://github.com/strongtz/linux-radxa-qcom/commit/4a085eb54115844be62bfaa9d0b3e905c22ee479
 
-    Andrew
+
+-- 
+Best regards,
+Xilin Wu <sophon@radxa.com>
+
 
