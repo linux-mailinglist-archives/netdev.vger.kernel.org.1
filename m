@@ -1,113 +1,328 @@
-Return-Path: <netdev+bounces-285996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286000-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Dk4GLZf/mnCpwAAu9opvQ
-	(envelope-from <netdev+bounces-285996-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 00:12:06 +0200
+	id kCs9L9Jf/mnCpwAAu9opvQ
+	(envelope-from <netdev+bounces-286000-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 00:12:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C17D74FC336
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 00:12:05 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D9054FC33E
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 00:12:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F3658301D961
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 22:12:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 21E863006171
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 22:12:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FB0433AD85;
-	Fri,  8 May 2026 22:12:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dx84vVH1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE2C3822B5;
+	Fri,  8 May 2026 22:12:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C19A2F8EAA;
-	Fri,  8 May 2026 22:12:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7382137B00F;
+	Fri,  8 May 2026 22:12:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778278321; cv=none; b=Oy2mGyVR/sOD1s+lPmwPKtk8oO83FUVxe6bJgy0h732cBuj3tHEug6wW6W2wrXRCDWMMP5d4SfxRgPKbF0aXp7ufn9errGZnEL5eugX2QnZaa7lHqNksrZzV9z4rpt/r1MTj6ym3+odpbEP6IUANCdiQ/yXPLJNV5VpCWOIdB4o=
+	t=1778278343; cv=none; b=C3Nll5SlUkM+abcHcDn+EvwHs47fdgGXgTV+9NZcyHEhs2jLzVhOxvJbRMbYt3lTwCdkWSPFi/bSzxPUQRSWcSE7VKUTJiCRs6isaJ4hOczc12bqBAv1NyY4L9nrSq7cNraUTl2Ut7qozREDFmAV8IIfejsPztKYjV7ceBP0bvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778278321; c=relaxed/simple;
-	bh=LkeV/ALn0czsawBXiy7GAAtm0EMvNk/rpiQrvEi75D4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j7uAyM0P2YtoqFqaLwOxVNUX0AgcfLfT8Zoh/dad6LKDWlo1yfWnjLI05wTCQYueaIR2JN4ZbbQZWh9CSuohIIfZf+7lxypc/BU30KpHoR9qK3nI1xjCwO8uCaYHHOEtQsNAWxTRYbuHBRKccuCjc9Q1xCzVPyE4UuUrAv94ph0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dx84vVH1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F230C2BCB0;
-	Fri,  8 May 2026 22:12:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778278320;
-	bh=LkeV/ALn0czsawBXiy7GAAtm0EMvNk/rpiQrvEi75D4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Dx84vVH1FnHKECcH0UJeTZo/O7KIixErG/2sJodC4mdU1dvDtEcg8x8CjJYcaUVNy
-	 UkNx2hLhgH90V/RsKDWHriPrG3mzHA4tjLp3mlkV5D9oIu3Qlfl+d0al45gChQx4l9
-	 K9zKclZ6/RqLTx6JVjMSEhksWdiCpQZ0MiVeUutD0yH16dE9oXEago7GfIN4+mNvMf
-	 mq0E0068ST86xgtLR/FX6fOdsuSuTtC2aFhjj0SGv/gWyNbjStlGQowPIss92Z10Ug
-	 hA2OxGmbma/5DORT4hlxBzLvkBLPbdIVVczI5DVJc975l2t8s+JNUcKvKgZkzG5uXM
-	 E+dV9ZGqSNy+A==
-Date: Fri, 8 May 2026 15:11:59 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, linux-can@vger.kernel.org,
- kernel@pengutronix.de, Ciprian Marian Costea
- <ciprianmarian.costea@oss.nxp.com>
-Subject: Re: [PATCH net 6/6] can: flexcan: disable all IRQ lines in
- flexcan_chip_interrupts_enable()
-Message-ID: <20260508151159.71fa563a@kernel.org>
-In-Reply-To: <20260507112321.439968-7-mkl@pengutronix.de>
-References: <20260507112321.439968-1-mkl@pengutronix.de>
-	<20260507112321.439968-7-mkl@pengutronix.de>
+	s=arc-20240116; t=1778278343; c=relaxed/simple;
+	bh=6/ravVuB1EMQulA7YFeshIfpGWjBWHeXi/25EFtUwGo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Nudbw42G9OU+Te+S615rOY1KQ14ktfC9Mu+DyPKDo6b7FoqtdgIdBo3JN33EbDuY/WnytYtbpssYl+rpOImPUGKzJz/iJwx3WvkxVX3ZRxNc7zRkqea6jFMpgk5t2Z1E7tY8lIGvKcKd65XNzwyR5X9DdU8AIT/yeQ5bph2BN5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1202)
+	id 3493020B7169; Fri,  8 May 2026 15:12:21 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3493020B7169
+From: Long Li <longli@microsoft.com>
+To: Long Li <longli@microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K . Y . Srinivasan" <kys@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	shradhagupta@linux.microsoft.com
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v8 3/6] net: mana: Introduce GIC context with refcounting for interrupt management
+Date: Fri,  8 May 2026 15:11:59 -0700
+Message-ID: <20260508221202.15725-4-longli@microsoft.com>
+X-Mailer: git-send-email 2.43.7
+In-Reply-To: <20260508221202.15725-1-longli@microsoft.com>
+References: <20260508221202.15725-1-longli@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: C17D74FC336
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 5D9054FC33E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [3.54 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[microsoft.com : SPF not aligned (relaxed), No valid DKIM,reject];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285996-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286000-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.081];
+	FROM_NEQ_ENVFROM(0.00)[longli@microsoft.com,netdev@vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,pci:email]
 X-Rspamd-Action: no action
 
-On Thu,  7 May 2026 10:22:28 +0200 Marc Kleine-Budde wrote:
-> flexcan_chip_interrupts_enable() disables only the primary IRQ line while
-> writing to the IMASK and CTRL registers.
-> 
-> On multi-IRQ platforms (S32G2, MCF5441X), the additional IRQ lines (boff,
-> err, secondary-mb) remain active so their handlers can fire while
-> registers are inconsistent.
-> 
-> Disable all registered IRQ lines around the IMASK/CTRL writes. This
-> also fixes the resume path, which calls this function.
+To allow Ethernet EQs to use dedicated or shared MSI-X vectors and RDMA
+EQs to share the same MSI-X, introduce a GIC (GDMA IRQ Context) with
+reference counting. This allows the driver to create an interrupt context
+on an assigned or unassigned MSI-X vector and share it across multiple
+EQ consumers.
 
-Sashiko points out that the driver is requesting those IRQs with
-IRQF_SHARED, I think you should also clear that flag if the QUIRK
-is necessary.
+Signed-off-by: Long Li <longli@microsoft.com>
+---
+ .../net/ethernet/microsoft/mana/gdma_main.c   | 159 ++++++++++++++++++
+ include/net/mana/gdma.h                       |  12 ++
+ 2 files changed, 171 insertions(+)
 
-Marc, sorry for the delay LMK if you prefer follow up or respin
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 4673ff62e6d9..78cb89c46ff3 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -1618,6 +1618,164 @@ static irqreturn_t mana_gd_intr(int irq, void *arg)
+ 	return IRQ_HANDLED;
+ }
+ 
++void mana_gd_put_gic(struct gdma_context *gc, bool use_msi_bitmap, int msi)
++{
++	struct pci_dev *dev = to_pci_dev(gc->dev);
++	struct msi_map irq_map;
++	struct gdma_irq_context *gic;
++	int irq;
++
++	mutex_lock(&gc->gic_mutex);
++
++	gic = xa_load(&gc->irq_contexts, msi);
++	if (WARN_ON(!gic)) {
++		mutex_unlock(&gc->gic_mutex);
++		return;
++	}
++
++	if (use_msi_bitmap)
++		gic->bitmap_refs--;
++
++	if (use_msi_bitmap && gic->bitmap_refs == 0)
++		clear_bit(msi, gc->msi_bitmap);
++
++	if (!refcount_dec_and_test(&gic->refcount))
++		goto out;
++
++	irq = gic->irq;
++
++	irq_update_affinity_hint(irq, NULL);
++	free_irq(irq, gic);
++
++	if (gic->dyn_msix) {
++		irq_map.virq = irq;
++		irq_map.index = msi;
++		pci_msix_free_irq(dev, irq_map);
++	}
++
++	xa_erase(&gc->irq_contexts, msi);
++	kfree(gic);
++
++out:
++	mutex_unlock(&gc->gic_mutex);
++}
++EXPORT_SYMBOL_NS(mana_gd_put_gic, "NET_MANA");
++
++/*
++ * Get a GIC (GDMA IRQ Context) on a MSI vector
++ * a MSI can be shared between different EQs, this function supports setting
++ * up separate MSIs using a bitmap, or directly using the MSI index
++ *
++ * @use_msi_bitmap:
++ * True if MSI is assigned by this function on available slots from bitmap.
++ * False if MSI is passed from *msi_requested
++ */
++struct gdma_irq_context *mana_gd_get_gic(struct gdma_context *gc,
++					 bool use_msi_bitmap,
++					 int *msi_requested)
++{
++	struct gdma_irq_context *gic;
++	struct pci_dev *dev = to_pci_dev(gc->dev);
++	struct msi_map irq_map = { };
++	int irq;
++	int msi;
++	int err;
++
++	mutex_lock(&gc->gic_mutex);
++
++	if (use_msi_bitmap) {
++		msi = find_first_zero_bit(gc->msi_bitmap, gc->num_msix_usable);
++		if (msi >= gc->num_msix_usable) {
++			dev_err(gc->dev, "No free MSI vectors available\n");
++			gic = NULL;
++			goto out;
++		}
++		*msi_requested = msi;
++	} else {
++		msi = *msi_requested;
++	}
++
++	gic = xa_load(&gc->irq_contexts, msi);
++	if (gic) {
++		refcount_inc(&gic->refcount);
++		if (use_msi_bitmap) {
++			gic->bitmap_refs++;
++			set_bit(msi, gc->msi_bitmap);
++		}
++		goto out;
++	}
++
++	irq = pci_irq_vector(dev, msi);
++	if (irq == -EINVAL) {
++		irq_map = pci_msix_alloc_irq_at(dev, msi, NULL);
++		if (!irq_map.virq) {
++			err = irq_map.index;
++			dev_err(gc->dev,
++				"Failed to alloc irq_map msi %d err %d\n",
++				msi, err);
++			gic = NULL;
++			goto out;
++		}
++		irq = irq_map.virq;
++		msi = irq_map.index;
++	}
++
++	gic = kzalloc(sizeof(*gic), GFP_KERNEL);
++	if (!gic) {
++		if (irq_map.virq)
++			pci_msix_free_irq(dev, irq_map);
++		goto out;
++	}
++
++	gic->handler = mana_gd_process_eq_events;
++	gic->msi = msi;
++	gic->irq = irq;
++	INIT_LIST_HEAD(&gic->eq_list);
++	spin_lock_init(&gic->lock);
++
++	if (!gic->msi)
++		snprintf(gic->name, MANA_IRQ_NAME_SZ, "mana_hwc@pci:%s",
++			 pci_name(dev));
++	else
++		snprintf(gic->name, MANA_IRQ_NAME_SZ, "mana_msi%d@pci:%s",
++			 gic->msi, pci_name(dev));
++
++	err = request_irq(irq, mana_gd_intr, 0, gic->name, gic);
++	if (err) {
++		dev_err(gc->dev, "Failed to request irq %d %s\n",
++			irq, gic->name);
++		kfree(gic);
++		gic = NULL;
++		if (irq_map.virq)
++			pci_msix_free_irq(dev, irq_map);
++		goto out;
++	}
++
++	gic->dyn_msix = !!irq_map.virq;
++	refcount_set(&gic->refcount, 1);
++	gic->bitmap_refs = use_msi_bitmap ? 1 : 0;
++
++	err = xa_err(xa_store(&gc->irq_contexts, msi, gic, GFP_KERNEL));
++	if (err) {
++		dev_err(gc->dev, "Failed to store irq context for msi %d: %d\n",
++			msi, err);
++		free_irq(irq, gic);
++		kfree(gic);
++		gic = NULL;
++		if (irq_map.virq)
++			pci_msix_free_irq(dev, irq_map);
++		goto out;
++	}
++
++	if (use_msi_bitmap)
++		set_bit(msi, gc->msi_bitmap);
++
++out:
++	mutex_unlock(&gc->gic_mutex);
++	return gic;
++}
++EXPORT_SYMBOL_NS(mana_gd_get_gic, "NET_MANA");
++
+ int mana_gd_alloc_res_map(u32 res_avail, struct gdma_resource *r)
+ {
+ 	r->map = bitmap_zalloc(res_avail, GFP_KERNEL);
+@@ -2107,6 +2265,7 @@ static int mana_gd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		goto release_region;
+ 
+ 	mutex_init(&gc->eq_test_event_mutex);
++	mutex_init(&gc->gic_mutex);
+ 	pci_set_drvdata(pdev, gc);
+ 	gc->bar0_pa = pci_resource_start(pdev, 0);
+ 	gc->bar0_size = pci_resource_len(pdev, 0);
+diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+index 9c05b1e15c3e..fbe3c1427b45 100644
+--- a/include/net/mana/gdma.h
++++ b/include/net/mana/gdma.h
+@@ -388,6 +388,11 @@ struct gdma_irq_context {
+ 	spinlock_t lock;
+ 	struct list_head eq_list;
+ 	char name[MANA_IRQ_NAME_SZ];
++	unsigned int msi;
++	unsigned int irq;
++	refcount_t refcount;
++	unsigned int bitmap_refs;
++	bool dyn_msix;
+ };
+ 
+ enum gdma_context_flags {
+@@ -449,6 +454,9 @@ struct gdma_context {
+ 
+ 	unsigned long		flags;
+ 
++	/* Protect access to GIC context */
++	struct mutex		gic_mutex;
++
+ 	/* Indicate if this device is sharing MSI for EQs on MANA */
+ 	bool msi_sharing;
+ 
+@@ -1026,6 +1034,10 @@ int mana_gd_resume(struct pci_dev *pdev);
+ 
+ bool mana_need_log(struct gdma_context *gc, int err);
+ 
++struct gdma_irq_context *mana_gd_get_gic(struct gdma_context *gc,
++					 bool use_msi_bitmap,
++					 int *msi_requested);
++void mana_gd_put_gic(struct gdma_context *gc, bool use_msi_bitmap, int msi);
+ int mana_gd_query_device_cfg(struct gdma_context *gc, u32 proto_major_ver,
+ 			     u32 proto_minor_ver, u32 proto_micro_ver,
+ 			     u16 *max_num_vports, u8 *bm_hostmode);
+-- 
+2.43.0
+
 
