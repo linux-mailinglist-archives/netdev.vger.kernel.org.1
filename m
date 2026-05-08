@@ -1,256 +1,335 @@
-Return-Path: <netdev+bounces-285728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285729-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qF7jOE6q/WmEhAAAu9opvQ
-	(envelope-from <netdev+bounces-285728-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 11:18:06 +0200
+	id VKJjDwmr/WlOhgAAu9opvQ
+	(envelope-from <netdev+bounces-285729-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 11:21:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 508F44F4270
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 11:18:06 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 356794F42E7
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 11:21:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A1E8E3050F5A
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 09:15:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7901C3008448
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 09:20:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06BC731B833;
-	Fri,  8 May 2026 09:15:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB7E03A3E78;
+	Fri,  8 May 2026 09:20:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CBdurmMg"
+	dkim=pass (2048-bit key) header.d=schippers-hamm.de header.i=simon@schippers-hamm.de header.b="Xu9LrzYS"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012019.outbound.protection.outlook.com [40.107.200.19])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8906430E829;
-	Fri,  8 May 2026 09:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778231738; cv=fail; b=lKsx5E9Yocxv+u6+tlUvB3hjKJ1CWvraI83jpYmQz1G6ZvwbMfF4Rl8MMFSS6SFN5fbRijqWN1uatvPuVxh8WP62ruMgAjvIRvhP4Z1sS2pO0JQUnwXeTrqrHT2F4lOj7ZmLwdCrD99c/eLTL7dBmC1VwR1GjpMHASZYg7sjAK0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778231738; c=relaxed/simple;
-	bh=xDJXqMROWBg3wdbKdifFhbKGCq+7gvnNnHAT3AIIVqk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ly7edLVpfcVY0Sf+mwAaiy2b2MjgDxyx2qci0Fp1mJ7iPFTJhghk2SKGHPbc/89eqoh0lih4pstc8zI6/d3TlBz4lcj5VvMq4o0crHWJgubZancpLQqvLGFCJ75EzEZjhP2HcoyUAgXYUGsOI5sBsy6Vb0gax/Xo13S4Eu0Zia0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CBdurmMg; arc=fail smtp.client-ip=40.107.200.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Y6JXtja2r0IcpYMG/HuweKPokZchswAc6fp7MIFCB+ngs0BdpRVhYzUML04DjC9BNgs5vBAtUmt2edJIpvbjdAr3Aob5enBgz1dAsewE/7eycq7LBaPdOFEK+ClxzfGQ2UfrmgTUdjMMFD1+91rQ3/zyAuAh/8UxTdUBDqLi1OT5SnlXeezk1BpY3EgpkwPXO33qkmdJx3XbhurXUA73zqwUzS6Mup/lHsiNeq/h1U9L275P5Zv+sLeXHNudhdO2D7ZbXlKr3oHXw40mbHXDxz1MrYLVxYlVg0x51ukUTttfKBj9I4KzRS+BVpO2LWGl6WG9m/LE77y4Q0+COWkLVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Wcpn7zZm4+UZu4fh+au+VKes06zgviDl7vc4f9c7B1s=;
- b=wAqnt6Z3dT5wH4kUA0eHFUMWGE5yclQ2COC+bYjfDn6RgGfVp9BrtfF2NDeWoYXhQntuCpc5pQOpPc9F2VkDb1U79zECydUq8PTwTfKulEPlO0adbDZ4Nz7sapDgdF7F44qhi4zQtmgB9e+mUiJd3Koi6S+S+fkxD1yQ/y6jUtsRblZiUug0PbDq3FPV/9Qjx/3xVhkr4mnCb3NDaWIeGcdqZz2KM8asigH79YH9jseRisOD6jwv3vUQgYpw46SCGVGcujMWQqCIfstDbtvI8aktpRky1jx/XDLLE+6YMZPFAWL0W+83UKL0vf+cdP7wH6VdyFpX+LOB0srGeEaO6w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Wcpn7zZm4+UZu4fh+au+VKes06zgviDl7vc4f9c7B1s=;
- b=CBdurmMgI6z046Sm4FvMTpVmwyjgQuCrL1SbMvvUJIAuwi7VfUm5TwkKWXypYJTROSOU21EygI6+DHmitCydmH4uGsOs4ZBNU0mhr9WMAK1jc4ETmQNEDSvOnGCegFmsHfmnFI3EIbhas/GKQPl0oWXWkhNndfJIqM9F8MxoBSMBJ+S2xwi25te34eGsgtCW4hkuMuB7iMBC2NNEv9NoSRS74gKbyQeBGcLzIqUJ7ramSP4VG0Q1GLPszO1qwaBd3VBVUtMvvT4b0Z2SCtZfYflftg7fckngstSqJDRXmvsn9nKRTW5Mwaq+h2iz7CliODsz0rg1sqzGWSe8zR7c4w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8728.namprd12.prod.outlook.com (2603:10b6:610:171::12)
- by BN7PPFEE0F400A9.namprd12.prod.outlook.com (2603:10b6:40f:fc02::6e9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.26; Fri, 8 May
- 2026 09:15:33 +0000
-Received: from CH3PR12MB8728.namprd12.prod.outlook.com
- ([fe80::2641:1046:bdf3:93d7]) by CH3PR12MB8728.namprd12.prod.outlook.com
- ([fe80::2641:1046:bdf3:93d7%7]) with mapi id 15.20.9891.015; Fri, 8 May 2026
- 09:15:33 +0000
-Message-ID: <70d0b319-178f-4233-b0da-9618489a1dd6@nvidia.com>
-Date: Fri, 8 May 2026 11:15:27 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V6 2/3] net/mlx5e: Avoid copying payload to the
- skb's linear part
-To: Amery Hung <ameryhung@gmail.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Christoph Paasch <cpaasch@openai.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>
-References: <20260507095330.318892-1-tariqt@nvidia.com>
- <20260507095330.318892-3-tariqt@nvidia.com>
- <CAMB2axOFQN2f=veYgeJs+4tbZmb9PuNHk03TH_bmE8UL_REd7w@mail.gmail.com>
- <b1d3f9bc-a5d7-4236-8bda-49e6327ee533@nvidia.com>
- <CAMB2axPNhveQaDPs-ttu4uFcpvAfJCdzJ3d05HWQf4+p7uVUsg@mail.gmail.com>
-Content-Language: en-US
-From: Dragos Tatulea <dtatulea@nvidia.com>
-In-Reply-To: <CAMB2axPNhveQaDPs-ttu4uFcpvAfJCdzJ3d05HWQf4+p7uVUsg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR4P281CA0334.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:ea::10) To CH3PR12MB8728.namprd12.prod.outlook.com
- (2603:10b6:610:171::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D813A0B3B;
+	Fri,  8 May 2026 09:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.13
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778232054; cv=none; b=SAT7/3LJb7bxnO49k/F4EcKOx2669T0wHk3Cvx6RO6z+brqRG6TwEU08wMzweoSzBChANzffR2EYQQYV9cqoa41vV8Ub/kmmSbo46o/1RvpjX7bpywo0ZZONKdsWggS+cm9eYKOLmoq04h0+0T65OF5swsQxtNdlFo9u0NFHgeU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778232054; c=relaxed/simple;
+	bh=oenf9co85HWC6U6Z6yxE2cSzQKfneZ36M1pV4jxCyT8=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=t3m3n9MV0CAq3EwTcK1EZDOo+9vw/0UWzv1uPxmjtWorZJ0WShR8gUyYlzqwpqDRptxsJZ/HAyAz1R9LfmHICH4ZfXLTv6Vu9hQm/5Qd0C4YvPwWdF4d2U8imu6mbmKb4eAIYkU+J8ssIBT2hGiaiVbk0sumPbqZ9WMbRF+JAWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schippers-hamm.de; spf=pass smtp.mailfrom=schippers-hamm.de; dkim=pass (2048-bit key) header.d=schippers-hamm.de header.i=simon@schippers-hamm.de header.b=Xu9LrzYS; arc=none smtp.client-ip=212.227.17.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schippers-hamm.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=schippers-hamm.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=schippers-hamm.de;
+	s=s1-ionos; t=1778232008; x=1778836808; i=simon@schippers-hamm.de;
+	bh=Hc0GCEPa4JhrvnKii+m3Lykf1LE1GIBL0gGV95D/z88=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:From:To:
+	 Cc:References:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=Xu9LrzYSxbVNYH/KQzwfwj5bV0VNLuoAFZTDfCVZgcEtaUOs3nX/o6i/tlYuPrkl
+	 SVWhSaA+f+KyHAjkSYedMuZUBBbpXrMMPQKF8e47a/sJmjGUh9ZjxRtAFfcHiAgb2
+	 spHONZdtEkpXEhenISaIU8i6Yj0PQdP/aYQJKq42ZHR30qN6wTCZ/ppqMEgOn/P7N
+	 wAxthuYeM2HSi+x5qKBdzdSYYwqV1W6xaxf+Rk8jd+J5mCaXX3FgoWxfZyLykm23P
+	 XVR5DXO2piW4BSpSSZeYUYH2YcX96uR5ImOJz9nsJLSIMqBc5lVbJg0uPCyobMbFV
+	 XlqOfl4zCcXsxGZVxw==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue108
+ [212.227.17.181]) with ESMTPSA (Nemesis) id 1MCsHm-1wCRgm1iIS-00Dqn7; Fri, 08
+ May 2026 11:20:08 +0200
+Message-ID: <ab56d050-33c9-4f65-94e6-64e1bc2b03b4@schippers-hamm.de>
+Date: Fri, 8 May 2026 11:20:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8728:EE_|BN7PPFEE0F400A9:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8ea7d885-c74a-4247-cbc1-08deace25b52
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|376014|366016|22082099003|18002099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	BrHVg4k4XjTmLvMUal+aKstuAR+J61CNg8m58oF5WaQDaHcg77WZVKfEqnNbnDeQGfnPh/r70BnF50Hc8m1NTV98Hxch27pormOR9TFxUDQMasBKYV8xmeMjPOA94jaYNwlvtU8LxAY0fpW74R/vyi3mlKhMsva9fsfMiIhChYDKhI570mHfXvQY54USC2IyKn91H25jukpkd5IJbMpBBh0mnvjOzp+IU5+Mm2Ua/6YfPlIylOySpe2hgLSWGrDrJSkQWF/V7hQgvdRxz6Xz6lGMyMBdK7BaRt1JEgCxJHv6rTfwmpexAclALE+6Z5Jvb5LatCtlAq4NBT40HVhFzej+DyReI1oCxM6vmq4QxgoV7jxKd/aDjZpDjrOjDQnOG2VmVSCNoLRvcex0rNL55ht9SaOqun2zt0BPViC3ggRnYIRJQpw/GvNAwZslOTAGStSaQreLKrhOt1YaNA9aSCrX1mgaSR1ssWBWWb5FSUURnieG8k36VmGZkS8w8SJifpCHRbPt5zU870XGFtE1Rj7tBCRRrenI9mbzqolRm0yBJqqTyblfShM79s3dAQGWqYmPasiGEwhoL16tBUVsEMzXFEfrbizt8z0TwLCUKNSebiHxoPw8m7zoq+bNa+lK7azSiYQk8H2OqsLibl82hSyjsBCkS1QOtl77gGpQt0AOXzlklz1ZwVeebAb7JSOw
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8728.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RU9PeXdDdWQ5ZHZzQVIxSEVXY0VWVDQvb0tCZjdIRVVSMDh1T0w5TUxRMnZB?=
- =?utf-8?B?SC9pZUk5bDNYUXNQYWFCK3BrVkFPVVpjd0oxL0FNdHdpVkF3Znk2YitjR1dS?=
- =?utf-8?B?SHFUM0xKOG9qbmV6eS9hWnBaTGlpY3VQRE51Tmt6UGtjS0NoaU40VEZncCtK?=
- =?utf-8?B?NlozTVRjeWNLN01uSUlWb1NsTVA5L3Q1OUdqMjY5MzJiampaZ0JqT0NYd3pr?=
- =?utf-8?B?U2MvRkhmWDZhU0RSaHU1a0huMUpNYkw1dkE3SndhdldhV25ld2pkSkFzTXpr?=
- =?utf-8?B?S2JZV3BHbEJZa3M0d3YwTTZCdkJkbE1VV3hoR0tBZ21oWUpzQ2lwQTEzc3pH?=
- =?utf-8?B?YUp3a09tT0xFSS80eEVaTVdDcVQ5L2hCL0ova2NuMWtrMDBXM24xVDhxR1VQ?=
- =?utf-8?B?Rit0NytZZDloUDZjeGNIdkpMVWFUaXZ1WkNCdzNHMkRRWUVtREZTNGczMDVO?=
- =?utf-8?B?VDdTODRIMFB1UFRkS3Z4K1YxMXE3VHNEdGQ4WUh6MlZhZ084U0s0MGwyNUlk?=
- =?utf-8?B?QTZqdTFraklYbzFBWWxqZHd0eGFuVVJtdFZDVnk0eDcvZ1RuZjRNVzJCeFh2?=
- =?utf-8?B?Vy80TWFkTkRsU2N2SEFmTDhwQTFnV21WSUlnUStzUVc5VjNkZS9TdlpoRExh?=
- =?utf-8?B?TE4zTlZlWml4ekdlM0s4YXYxbFk2eVoxZUNyR2IzcXFmSU02MnloMk1SbnFP?=
- =?utf-8?B?QndQTkFxRXdDcDNSY3pvbUpyR0JPc0ZaMWQ2VW5SMnUyR1Nka3c4M3JNZkFM?=
- =?utf-8?B?YXFPYlNuSmttYTJBK2pSVUgrNitmaU1LZlNtR3ErWEhWZ08vWlEzMGJ6RTNE?=
- =?utf-8?B?M3lETktlcHZQaWxTUVRpeEhhQjBOM2xWRE5MbU1aQVBGRGlhdzl5WkhGRi9P?=
- =?utf-8?B?bk9vbFMyenNmdUNVajh3VVk5ZzN5dDNUdXJyUExvNDJPdHlvZWkyWEwyUnY2?=
- =?utf-8?B?cm5PdllvUkUwT2FBc1haYmNhVFU1UG55RzYxLy9XenMwQWtKK0tYaHZBeDdw?=
- =?utf-8?B?aEVZak9GTXBXY0hQM1JiL3ZWeWFwU29HREhIeG9LOEl1SEkxd0pFVy9BSXV5?=
- =?utf-8?B?UHNBdTdlWmtiMVdpc2hDc1UvYXdLR2RrcFpkK0s0YUpjM3hybExLK2Q0ZWV2?=
- =?utf-8?B?TFlPbUlPM1dWTGxOS1JhczhBNjFKejlnMWQrN1BlTWxaOTNqWjdLNEZmR3JW?=
- =?utf-8?B?QXJLQklERktrdkwwLzlqWmhTWnNVcE5Bb0JmQTdvdkYrZEJQVEl5MHhKQUJo?=
- =?utf-8?B?eEl6SnhPU25iM3phejkwaHBDT1BZRmc0ZFFZemltZEQvMWhpS0xaRDI0NGwz?=
- =?utf-8?B?aktWWUZZYmFZS3F6emt3eStiZDlCenVOcGJaSWhYWHlXTjFSUE05K2pDSXMw?=
- =?utf-8?B?dFBTYk00QmI0ZVJQRmNhbjBzUTVHYnhZOUw4MTZuL0xhWmVtcWxiMk1hUmtq?=
- =?utf-8?B?M21QaXY3dENTNmNMRXJuREZIZVRzTjVEUzR6ZzZsU3N0ZUZpTjk5SGpaMkpK?=
- =?utf-8?B?UFl1N0h3SE1TR25GVUxUSE0xN2NrMEo5OVY3NHl4OFVlM2pYRWN5OWZOWVRq?=
- =?utf-8?B?NGRyK1dELzZUMzFkcUtLVjVFdmhCb2xyaGJackNlemJNRFd4T3pFb1ppZERH?=
- =?utf-8?B?enVlcjVURi9QZ3VKdVFjWmxPSzdYOWJWVzB2cEZhOUpDL2hwaCtmL0Y2Q0I3?=
- =?utf-8?B?NEJxN00zM0R5aDQ0bGhuRjlmamxrczllOUovR1BweU1qSkJnYjk1K0dVd2RI?=
- =?utf-8?B?S014WnAzR3dmNlZmWldLMmVXVVo2amdWeHRoM0ZmMTh0MHFKOW0xVjQ2WThI?=
- =?utf-8?B?OW1TeHo3cWxyajNMT25lNXdSbklCUVdUeFRrQlJqMVF4R3FicHJSUStvNEUz?=
- =?utf-8?B?SzdHakIydGxhQXYxclhSZ1hYOVRraU1ocWRERHRqYThwQTlYUndnSW5Vd3d4?=
- =?utf-8?B?MjdJd0F2MndJelRvUGtTc0ZEbjMyTlhZZXEySmxoMmptTGVLNHF4aVh4b3I5?=
- =?utf-8?B?U0s0SmpiODNUU3RIWEpmOHZBSSsrNms5RlYwb3NZRDhZMzlHL3NuOEFJVFQz?=
- =?utf-8?B?Z1Q2TS9PTGpFRVQrbUhTZHV1ZmV3b1k4ZUJUMFdTV0hOOEFGdjN2cFI2dGkv?=
- =?utf-8?B?RktjYXpIR2MvRkFmekxOamkyVUhoTnpBUkwxWXJmdmJnY210SzVNMHU3cXN6?=
- =?utf-8?B?Y1d1UFM1UU5jSlF1Z2xZZU52Q05hcGVCeThCS0xtQkM3NVUxTm00NjRLUDZk?=
- =?utf-8?B?aWVaTGFNNDg5bnhjRjhkWUxCY1RnbllLYmhxSzFSaUZSOVFMcTNrOXpaV1dC?=
- =?utf-8?B?Y3VaUzZNUFRyeUZvU2szMHRrYW14K2dRbWJiRmZNVUc3KzJ0VG42QT09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8ea7d885-c74a-4247-cbc1-08deace25b52
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8728.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2026 09:15:33.0784
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FLFR14HJwM4/IbGNves4N7eXy/ZhS74u8lsEoK3exAdounp9zNjsrGFMY4u8QAoYdzFqXaRm8t9Rd8DubWHpZg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PPFEE0F400A9
-X-Rspamd-Queue-Id: 508F44F4270
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 3/5] veth: implement Byte Queue Limits (BQL)
+ for latency reduction
+From: Simon Schippers <simon@schippers-hamm.de>
+To: Jesper Dangaard Brouer <hawk@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: kernel-team@cloudflare.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20260505132159.241305-1-hawk@kernel.org>
+ <20260505132159.241305-4-hawk@kernel.org>
+ <ee275aa6-af27-4dac-9afa-da88abde312b@schippers-hamm.de>
+ <8f2f7f2e-6aa2-4e5b-b52d-0025b2525579@redhat.com>
+ <e3a91545-13cd-4f87-8375-d707865bdbca@schippers-hamm.de>
+ <6a597dbd-70bf-4b14-b495-2f7248fd3220@kernel.org>
+ <68223314-1a44-4aee-8207-57437ef9f3ab@schippers-hamm.de>
+ <3e43117f-356d-4086-a176-abd7fe2e6f0a@kernel.org>
+ <21d639fc-e244-486e-8368-8891b3c43215@schippers-hamm.de>
+Content-Language: en-US
+In-Reply-To: <21d639fc-e244-486e-8368-8891b3c43215@schippers-hamm.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:WAXVRmfQ06nU85T0VZPtSVGg7wsnYtNUbsSf7t56ghLd8asTuKq
+ SHuNw52IRNqz3QxBsJ1+wtMtPSug/zIsUmutNan0DvKqWhoRn0dwq6D7x3NK1mNz8CVBvoT
+ iesOpBf/cEXVEU2MSByE9rKQ0xm2dBxDKG6mRl18aPEz92FHnX0cvrP9+jz5cxbA7hFn5Wh
+ eW0UoTTiwT9qFWWN3hjeA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:/xrhJ6c1wLo=;wy0A1q7QtPHjyGzaRqW8oZlrR3P
+ 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
+ fovKqiTsxbs=
+X-Rspamd-Queue-Id: 356794F42E7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[schippers-hamm.de,none];
+	R_DKIM_ALLOW(-0.20)[schippers-hamm.de:s=s1-ionos];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285728-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285729-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[cloudflare.com,lunn.ch,davemloft.net,google.com,kernel.org,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[nvidia.com,openai.com,google.com,kernel.org,redhat.com,lunn.ch,davemloft.net,vger.kernel.org,iogearbox.net,gmail.com,fomichev.me];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dtatulea@nvidia.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[simon@schippers-hamm.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[schippers-hamm.de:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,Nvidia.com:dkim,nvidia.com:email,nvidia.com:mid]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
 
 
-On 07.05.26 22:50, Amery Hung wrote:
-> On Thu, May 7, 2026 at 4:50 PM Dragos Tatulea <dtatulea@nvidia.com> wrote:
+On 5/8/26 10:01, Simon Schippers wrote:
+> On 5/7/26 22:45, Jesper Dangaard Brouer wrote:
 >>
 >>
->> Hi Amery,
->>
->> On 07.05.26 15:53, Amery Hung wrote:
->>> [...]
->>> Am I understanding correctly that the better performance comes with
->>> the assumption that the XDP does not change headers?
->>>
->>> headlen is determined before the XDP program runs. If it push/pop
->>> headers, there could be headers in frags or data in the linear region
->>> after __pskb_pull_tail().
->>>
->> That's right.
->>
->>>>                         if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flags)) {
->>>>                                 struct mlx5e_frag_page *pfp;
->>>> @@ -2060,8 +2066,7 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq *rq, struct mlx5e_mpw_info *w
->>>>                                 pagep->frags++;
->>>>                         while (++pagep < frag_page);
+>> On 07/05/2026 22.12, Simon Schippers wrote:
+>>> On 5/7/26 21:09, Jesper Dangaard Brouer wrote:
 >>>>
->>>> -                       headlen = min_t(u16, MLX5E_RX_MAX_HEAD - len,
->>>> -                                       skb->data_len);
->>>> +                       headlen = min_t(u16, headlen - len, skb->data_len);
+>>>>
+>>>> On 07/05/2026 16.46, Simon Schippers wrote:
+>>>>>
+>>>>>
+>>>>> On 5/7/26 16:34, Paolo Abeni wrote:
+>>>>>> On 5/7/26 8:54 AM, Simon Schippers wrote:
+>>>>>>> On 5/5/26 15:21, hawk@kernel.org wrote:
+>>>>>>>> @@ -928,9 +968,13 @@ static int veth_xdp_rcv(struct veth_rq *rq, =
+int budget,
+>>>>>>>>                }
+>>>>>>>>            } else {
+>>>>>>>>                /* ndo_start_xmit */
+>>>>>>>> -            struct sk_buff *skb =3D ptr;
+>>>>>>>> +            bool bql_charged =3D veth_ptr_is_bql(ptr);
+>>>>>>>> +            struct sk_buff *skb =3D veth_ptr_to_skb(ptr);
+>>>>>>>>                  stats->xdp_bytes +=3D skb->len;
+>>>>>>>> +            if (peer_txq && bql_charged)
+>>>>>>>> +                netdev_tx_completed_queue(peer_txq, 1, VETH_BQL_=
+UNIT);
+>>>>>>>
+>>>>>>> In the discussion with Jonas [1], I left a comment explaining why =
+I think
+>>>>>>> this doesn=E2=80=99t work.
+>>>>>>>
+>>>>
+>>>> I've experimented with doing the "completion" at NAPI-end in
+>>>> veth_poll(), but that resulted in BQL limit being 128 packets, which
+>>>> leads to bad latency results (not acceptable).
+>>>> (See detailed report later)
+>>>>
+>>>>
+>>>>>>> I still think first that adding an option to modify the hard-coded
+>>>>>>> VETH_RING_SIZE is the way to go.
+>>>>>>>
+>>>>
+>>>> Not against being able to modify VETH_RING_SIZE, but I don't think it=
+ is
+>>>> the solution here.
+>>>>
+>>>> The simply solution is the configure BQL limit_min:
+>>>>   `/sys/class/net/<dev>/queues/tx-N/byte_queue_limits/limit_min`
+>>>>
+>>>> My experiments (below) find that limit_min=3D8 is gives good performa=
+nce.
+>>>> We can simply set default to 8 as this still allows userspace to chan=
+ge
+>>>> this later if lower latency is preferred.
+>>>>
+>>>>>>> Thanks!
+>>>>>>>
+>>>>>>> [1] Link: https://lore.kernel.org/netdev/e8cdba04-aa9a-45c6-9807-8=
+274b62920df@tu-dortmund.de/
+>>>>>>
+>>>>>> In the above discussion a 20% regression is reported, which IMHO ca=
+n't
+>>>>>> be ignored. Still the tput figures in the data are extremely low,
+>>>>>> something is possibly off?!? I would expect a few Mpps with pktgen =
+on
+>>>>>> top of veth, while the reported data is ~20-30Kpps.
+>>>>>>
+>>>>>> /P
+>>>>>>
+>>>>>
+>>>>> The ~20-30Kpps occur when thousands of iptables rules are applied an=
+d
+>>>>> an UDP userspace application is sending.
+>>>>>
+>>>>> And there is a 20% pktgen regression (no iptables rules applied).
+>>>>>
+>>>>
+>>>> The pktgen test is a little dubious/weird and Jonas had to modify pkt=
+gen
+>>>> to test this.   John Fastabend added a config to pktgen that allows u=
+s
+>>>> to benchmarking egress qdisc path, this might be better to use this.
+>>>> The samples/pktgen/pktgen_bench_xmit_mode_queue_xmit.sh is a demo usa=
+ge.
+>>>>
+>>>> If redoing the tests, can you adjust limit_min to see the effect?
+>>>>   /sys/class/net/<dev>/queues/tx-N/byte_queue_limits/limit_min
+>>>>
+>>>> 20% throughput performance regression is of-cause too much, but I wil=
+l
+>>>> remind us, that adding a qdisc will "cost" some overhead, that is a
+>>>> configuration choice.  Our purpose here is to reduce bufferbloat and
+>>>> latency, not optimize for throughput.
+>>>>
+>>>>
+>>>>> I am pretty sure the reason is because the BQL limit is stuck at 2
+>>>>> packets (because the completed queue is always called with 1 packet
+>>>>> and not in a interrupt/timer with multiple packets...).
+>>>>>
+>>>>
+>>>> I've run a lot of experiments, which I made AI write a report over, s=
+ee attachment.  The TL;DR is that best performance vs latency tradeoff is =
+defaulting BQL/DQL limit_min to be 8 packets.
+>>>>
+>>>> I fear this patchset will stall forever, if we keep searching for a p=
+erfect solution without any overhead.  The qdisc layer will be a baseline =
+overhead.  The limit=3D2 packets is actually the optimal darkbuffer queue =
+size, but I acknowledge that this causes too many qdisc requeue events (le=
+ading to overhead).  I suggest that I add another patch in V6, that defaul=
+ts limit_min to 8 (separate patch to make it easier to revert/adjust later=
+).
+>>>>
+>>>> I've talked with Jonas, and we want to experiment with different solu=
+tions to make BQL/DQL work better with virtual devices.
+>>>>
+>>>> This patchset helps our (production) use-case reduce mice-flow latenc=
+y
+>>>> from approx 22ms to 1.3ms for latency under-load.  Due to the consume=
+r
+>>>> namespace being the bottleneck the requeue overhead is negligible in
+>>>> comparison.
+>>>>
+>>>> -Jesper
 >>>
->>> headlen - len can underflow but will be capped by skb->data_len, so
->>> this should be okay, right?
->> It is safe. But it might trigger an extra allocation in the pull when
->> len > headlen. We could also skip the pull in that case. Or do a
->> min(headlen - len, min(skb->data_len, MLX5E_RX_MAX_HEAD)). WDYT?
-> 
-> Make sense, but this line took me a bit to understand. Maybe consider
-> checking len < headlen first?
-> 
-> if (len < headlen) {
->         headlen = min_t(u32, headlen - len, skb->data_len);
->         __pskb_pull_tail(skb, headlen);
-> }
-> 
-Yes, that's what I had in mind when skipping the pull. I would also
-tag this as likely.
+>>> First of all thanks for you work and I really see the advantages of
+>>> avoiding bufferbloat :)
+>>>
+>>> But the key of the BQL algorithm, which is the *dynamic* adaption of t=
+he
+>>> limit, is not working. Always calling netdev_completed_queue() with
+>>> 1 packet results in a static limit of 2 packets (as seen by Jonas
+>>> measurements), which you force up to 8 packets.
+>>>
+>>> So in the end this patchset has the same effect as just setting
+>>> VETH_RING_SIZE to 8 (and giving an option to change this value).
+>>>
+>>
+>> I've code up a time based BQL implementation, see attachment.
+>> WDYT?
+>>
+>> --Jesper
+>>
+>=20
+> A step in the right direction, but I dislike that you call
+> netdev_sent_queue() with at least 1 packet (never 0 packets).
+> I am not sure if it works, and I am not sure about the parameter.
+>=20
 
-> Another clarifying question. So this patch will improve the
-> performance when the XDP programs don't change header length. For
-> those that encap/decap, they should precisely pull only headers into
-> the linear area for optimal performance. Is it correct?
-> 
-Right for encap, but for decap not quite:
+Rethinking of it this could be fine, but really needs testing because:
 
-Let's say that the XDP program pulls 64B header into the linear part
-and snips 4B of the encap out. This would result in a pull of an
-additional 4B (headlen (64B) - len (60B) = 4B) which are now
-data bytes => sub-optimal layout.
+The weird thing is that is that BQL's inflight !=3D number of packets
+in the ring and BQL's limit !=3D "current ring size". Instead the BQL
+limit describes the number of maximal allowed packets between
+calls of netdev_sent_queue().
 
-I don't see how we can improve this corner case though.
 
-Thanks,
-Dragos
+
+I messed up in my approach below. Forget it :P
+
+>=20
+> I would propose doing it like other BQL implementations do
+> (for example usbnet for which I adapted BQL [1] :) ):
+>=20
+> Call netdev_sent_queue() with n_bql in a periodic work. n_bql would
+> still be counted in veth_xdp_rcv() like you currently do (synchronized
+> with the work via ring.consumer_lock?).
+>=20
+> The only weird thing that remains is that BQL's inflight !=3D number of
+> packets in the ring and BQL's limit !=3D "current ring size". Instead
+> the BQL limit describes the number of maximal allowed packets between
+> calls of netdev_sent_queue(), which occur periodically in a somewhat
+> fixed time interval.
+> I guess that could be fine, but it surely needs testing.
+>=20
+> [1] Link: https://lore.kernel.org/netdev/20251106175615.26948-1-simon.sc=
+hippers@tu-dortmund.de/
+>=20
 
