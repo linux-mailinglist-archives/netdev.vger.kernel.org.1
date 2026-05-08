@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-285633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285634-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GC12JmRz/WlzeQAAu9opvQ
-	(envelope-from <netdev+bounces-285633-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 07:23:48 +0200
+	id EJP5EpBz/WlzeQAAu9opvQ
+	(envelope-from <netdev+bounces-285634-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 07:24:32 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ED514F1E8E
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 07:23:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B22D24F1E95
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 07:24:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2C9CB3037160
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 05:22:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B2DBA301CFB9
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 05:22:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C076C33B6F9;
-	Fri,  8 May 2026 05:22:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BA1D33C183;
+	Fri,  8 May 2026 05:22:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="DwhQWZKv"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="CxXc7oV0"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FAB232FA14;
-	Fri,  8 May 2026 05:22:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E84433BBC5;
+	Fri,  8 May 2026 05:22:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778217743; cv=none; b=XhKR+8hZYRBMfOVX0cnrpJdUGTU5mzrdGZ+1zv73HePjbp7LWIP/A1zjeg6VW9hUS9QqYeZFWQvicwypnu4xsD3zKNS5cgC18Kbro6NPWFQlczX4gQETeDf+Rs9qlGE4FYYuK3uZ5ER3b4RWuHifHwCTUrRE8Nbws7/Elu51zok=
+	t=1778217749; cv=none; b=XENXQREJl1TvzZBPwz4lYIYI+qUW6lPipBD5y2LPfRH6vCTM30HS38R6TEvXKlfTzAFF8X3byseOzi5zcuWVu08swJMlvPu+/6jaCS/4rHMuxCunhuB+tQzbyHQzj+MHRGqB7lnamCJGp3t9aO39zOBlbgd11SYWCmGrnDsSp7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778217743; c=relaxed/simple;
-	bh=/WadYXeNsvZ0sj7kfWtCdyJIzDwGWspdCLPutduhIbI=;
+	s=arc-20240116; t=1778217749; c=relaxed/simple;
+	bh=RkAcGFS++tyGD7Hqu5U360Au8/lV2PT0DRuuLMnRFJg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=inKVIiq5yn8FmuNk+pijXj6Z4JEN/srO/KjRC7rLeigbedpKVyaR/kedjepQVnLaXQG99Hi/6Gs8KI+RAvQuCZ6ECMxGnqusY/U97j+9OlQsjjPpclYlvYDuJmXlG8GdcDKpz0u/GkgHKzEJ83CTUQdkPTFz8F0QzfM3XMym4iQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=DwhQWZKv; arc=none smtp.client-ip=68.232.154.123
+	 MIME-Version:Content-Type; b=b4+ZLJYtK3R4MVPu3jlgnGAicYi8/BFhdfmpDF+LNzcptk2jhHK3SWgu4Xr+iIUjMPtTptEttPtvOQovEaRxFkAkwYwLxStT2W6F5MpntjmypE809/7uJTi17jof6s0tFu8CTPk4QC7W0e4rmVI5JSLpO9urmR8Cp+MheThZsUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=CxXc7oV0; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1778217742; x=1809753742;
+  t=1778217747; x=1809753747;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=/WadYXeNsvZ0sj7kfWtCdyJIzDwGWspdCLPutduhIbI=;
-  b=DwhQWZKv83/FNwmr3d0D/X5gwdzLMMe28uXtlQTmd7B6B9nAeY2AvC5w
-   0znOhB5AcFLdXmM/cr7Q3Wa3Vrhm7FkwyZEo769HwPPLBCitx7ptenMvO
-   sycOlA53v9gy1AHgYtzObWKfM77EHPy76AExk4X4y7oPv+YGsqDVKDEZz
-   nM8oDdTLZ65SI7YW2/SaxQtI/9Tt23gWsaGfXqMlMpiy59oAQgW3gIa9o
-   YA6zqTgUP14JHJKan21gJEi8hogw5ytsCr8CkZzXa4Jy4+pCPwcfeUp8n
-   h77LsCie0snomyobUNsHDHVNNvmGkzBRtgPN3MdZfu0z9QxnUSMJxwjYA
-   A==;
-X-CSE-ConnectionGUID: gjLlGO3yT0u1Gc7mL7ViJQ==
-X-CSE-MsgGUID: l0g/kl3wSESbZ1mZaDgmlw==
+  bh=RkAcGFS++tyGD7Hqu5U360Au8/lV2PT0DRuuLMnRFJg=;
+  b=CxXc7oV0ordvXDPevrHTKNvEAjQG+rcHBi+rSefUGPGQ+qse3pmhrrcS
+   AojKxhprwqFgplaVg6qpcewfKdWkPgPXwbm7+PDh0T3ZVX3LByDPH+2Ad
+   liLJeWII/EXfwsfrAPvHTQxdUZbbMchM4SnWU6MnZEwpSjohY/hFIuP0v
+   zF4ev/LOmGmXaAgxa56RrPkDSSA7PCSUk8RiNnjlXv58+sBaGhcUhLgKr
+   4W6QCr82+J6e689GsPgpbVnIS107WlBXdzbDLDDVaZd+ur0YKNQLye0RN
+   C/Uetw3tTZYeZBdnkHg3LHzIXViIJORz954jm9iMUfbx5LdOB3aHu/Osu
+   w==;
+X-CSE-ConnectionGUID: bd7FDk8rS9SqCTU5B3h9eg==
+X-CSE-MsgGUID: zJlJVzpUTDyGiRPH0D/uoA==
 X-IronPort-AV: E=Sophos;i="6.23,222,1770620400"; 
-   d="scan'208";a="57611587"
+   d="scan'208";a="288577539"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 22:22:21 -0700
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 22:22:26 -0700
 Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
- chn-vm-ex2.mchp-main.com (10.10.87.31) with Microsoft SMTP Server
+ chn-vm-ex1.mchp-main.com (10.10.87.30) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.37; Thu, 7 May 2026 22:22:21 -0700
+ 15.2.2562.37; Thu, 7 May 2026 22:22:26 -0700
 Received: from che-ld-unglab06.microchip.com (10.10.85.11) by
  chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Thu, 7 May 2026 22:22:17 -0700
+ 15.1.2507.58 via Frontend Transport; Thu, 7 May 2026 22:22:22 -0700
 From: Thangaraj Samynathan <thangaraj.s@microchip.com>
 To: <netdev@vger.kernel.org>
 CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
 	<kuba@kernel.org>, <pabeni@redhat.com>, <bryan.whitehead@microchip.com>,
 	<UNGLinuxDriver@microchip.com>, <linux@armlinux.org.uk>,
 	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next v3 1/5] net: lan743x: rename is_sgmii_en to is_pcs_en
-Date: Fri, 8 May 2026 10:51:46 +0530
-Message-ID: <20260508052150.11852-2-thangaraj.s@microchip.com>
+Subject: [PATCH net-next v3 2/5] net: lan743x: read SFP straps from PCI11x1x device
+Date: Fri, 8 May 2026 10:51:47 +0530
+Message-ID: <20260508052150.11852-3-thangaraj.s@microchip.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260508052150.11852-1-thangaraj.s@microchip.com>
 References: <20260508052150.11852-1-thangaraj.s@microchip.com>
@@ -81,7 +81,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Rspamd-Queue-Id: 1ED514F1E8E
+X-Rspamd-Queue-Id: B22D24F1E95
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -99,7 +99,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[thangaraj.s@microchip.com,netdev@vger.kernel.org];
 	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_FROM(0.00)[bounces-285633-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285634-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[microchip.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
@@ -109,122 +109,90 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_NONE(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,microchip.com:email,microchip.com:mid,microchip.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:email,microchip.com:mid,microchip.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-The flag is_sgmii_en indicates whether the PCS interface is enabled.
-However, the name implies that the interface is strictly SGMII, which is
-misleading.
+Reads the SFP enable bits from the strap registers to determine
+if the hardware is configured for SFP usage.
 
-Rename the variable to is_pcs_en to better reflect that the flag
-represents the PCS enable state rather than a specific interface mode.
-Update all references and logs accordingly (but keep device registers
-unchanged to match its documentation).
-
-No functional change intended.
+- Add STRAP_SFP_USE_EN_ and STRAP_SFP_EN_ definitions to read SFP
+straps.
+- Store SFP status in the adapter's is_sfp_support_en flag.
+- Add a validation check to ensure PCS is enabled when SFP support
+is requested, as SFP operation requires the PCS interface.
+- Refactor debug logging to use the str_enable_disable() helper for
+  consistency with modern kernel standards.
 
 Signed-off-by: Thangaraj Samynathan <thangaraj.s@microchip.com>
 ---
- .../net/ethernet/microchip/lan743x_ethtool.c   |  4 ++--
- drivers/net/ethernet/microchip/lan743x_main.c  | 18 +++++++++---------
- drivers/net/ethernet/microchip/lan743x_main.h  |  2 +-
- 3 files changed, 12 insertions(+), 12 deletions(-)
+ drivers/net/ethernet/microchip/lan743x_main.c | 16 ++++++++++++++++
+ drivers/net/ethernet/microchip/lan743x_main.h |  3 +++
+ 2 files changed, 19 insertions(+)
 
-diff --git a/drivers/net/ethernet/microchip/lan743x_ethtool.c b/drivers/net/ethernet/microchip/lan743x_ethtool.c
-index 9195419ecee0..743acfd56554 100644
---- a/drivers/net/ethernet/microchip/lan743x_ethtool.c
-+++ b/drivers/net/ethernet/microchip/lan743x_ethtool.c
-@@ -1312,7 +1312,7 @@ static int lan743x_get_regs_len(struct net_device *dev)
- 	struct lan743x_adapter *adapter = netdev_priv(dev);
- 	u32 num_regs = MAX_LAN743X_ETH_COMMON_REGS;
- 
--	if (adapter->is_sgmii_en)
-+	if (adapter->is_pcs_en)
- 		num_regs += MAX_LAN743X_ETH_SGMII_REGS;
- 
- 	return num_regs * sizeof(u32);
-@@ -1333,7 +1333,7 @@ static void lan743x_get_regs(struct net_device *dev,
- 	lan743x_common_regs(dev, p);
- 	p = (u32 *)p + MAX_LAN743X_ETH_COMMON_REGS;
- 
--	if (adapter->is_sgmii_en) {
-+	if (adapter->is_pcs_en) {
- 		lan743x_sgmii_regs(dev, p);
- 		p = (u32 *)p + MAX_LAN743X_ETH_SGMII_REGS;
- 	}
 diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-index f3332417162e..fad4a246e06e 100644
+index fad4a246e06e..867310dbe9ba 100644
 --- a/drivers/net/ethernet/microchip/lan743x_main.c
 +++ b/drivers/net/ethernet/microchip/lan743x_main.c
-@@ -59,22 +59,22 @@ static void pci11x1x_strap_get_status(struct lan743x_adapter *adapter)
- 	      hw_cfg & HW_CFG_RST_PROTECT_)) ||
- 	    (strap & STRAP_READ_USE_SGMII_EN_)) {
- 		if (strap & STRAP_READ_SGMII_EN_)
--			adapter->is_sgmii_en = true;
-+			adapter->is_pcs_en = true;
+@@ -62,6 +62,12 @@ static void pci11x1x_strap_get_status(struct lan743x_adapter *adapter)
+ 			adapter->is_pcs_en = true;
  		else
--			adapter->is_sgmii_en = false;
-+			adapter->is_pcs_en = false;
+ 			adapter->is_pcs_en = false;
++
++		if ((strap & STRAP_SFP_USE_EN_) && (strap & STRAP_SFP_EN_))
++			adapter->is_sfp_support_en = true;
++		else
++			adapter->is_sfp_support_en = false;
++
  	} else {
  		fpga_rev = lan743x_csr_read(adapter, FPGA_REV);
  		if (fpga_rev) {
- 			if (fpga_rev & FPGA_SGMII_OP)
--				adapter->is_sgmii_en = true;
-+				adapter->is_pcs_en = true;
- 			else
--				adapter->is_sgmii_en = false;
-+				adapter->is_pcs_en = false;
- 		} else {
--			adapter->is_sgmii_en = false;
-+			adapter->is_pcs_en = false;
+@@ -73,8 +79,17 @@ static void pci11x1x_strap_get_status(struct lan743x_adapter *adapter)
+ 			adapter->is_pcs_en = false;
  		}
  	}
++
++	if (adapter->is_pci11x1x && !adapter->is_pcs_en &&
++	    adapter->is_sfp_support_en) {
++		netif_err(adapter, drv, adapter->netdev,
++			  "Invalid EEPROM configuration: SFP_EN strap specified without SGMII_EN strap\n");
++	}
++
  	netif_dbg(adapter, drv, adapter->netdev,
--		  "SGMII I/F %sable\n", adapter->is_sgmii_en ? "En" : "Dis");
-+		  "PCS I/F %s\n", str_enable_disable(adapter->is_pcs_en));
+ 		  "PCS I/F %s\n", str_enable_disable(adapter->is_pcs_en));
++	netif_dbg(adapter, drv, adapter->netdev,
++		  "SFP support %s\n", str_enable_disable(adapter->is_sfp_support_en));
  }
  
  static bool is_pci11x1x_chip(struct lan743x_adapter *adapter)
-@@ -1361,7 +1361,7 @@ static void lan743x_phy_interface_select(struct lan743x_adapter *adapter)
- 	data = lan743x_csr_read(adapter, MAC_CR);
- 	id_rev = adapter->csr.id_rev & ID_REV_ID_MASK_;
+@@ -3665,6 +3680,7 @@ static int lan743x_pcidev_probe(struct pci_dev *pdev,
+ 			      NETIF_MSG_LINK | NETIF_MSG_IFUP |
+ 			      NETIF_MSG_IFDOWN | NETIF_MSG_TX_QUEUED;
+ 	netdev->max_mtu = LAN743X_MAX_FRAME_SIZE;
++	adapter->is_sfp_support_en = false;
  
--	if (adapter->is_pci11x1x && adapter->is_sgmii_en)
-+	if (adapter->is_pci11x1x && adapter->is_pcs_en)
- 		adapter->phy_interface = PHY_INTERFACE_MODE_SGMII;
- 	else if (id_rev == ID_REV_ID_LAN7430_)
- 		adapter->phy_interface = PHY_INTERFACE_MODE_GMII;
-@@ -3515,7 +3515,7 @@ static int lan743x_hardware_init(struct lan743x_adapter *adapter,
- 		mutex_init(&adapter->sgmii_rw_lock);
- 		pci11x1x_set_rfe_rd_fifo_threshold(adapter);
- 		sgmii_ctl = lan743x_csr_read(adapter, SGMII_CTL);
--		if (adapter->is_sgmii_en) {
-+		if (adapter->is_pcs_en) {
- 			sgmii_ctl |= SGMII_CTL_SGMII_ENABLE_;
- 			sgmii_ctl &= ~SGMII_CTL_SGMII_POWER_DN_;
- 		} else {
-@@ -3580,7 +3580,7 @@ static int lan743x_mdiobus_init(struct lan743x_adapter *adapter)
+ 	of_get_mac_address(pdev->dev.of_node, adapter->mac_address);
  
- 	adapter->mdiobus->priv = (void *)adapter;
- 	if (adapter->is_pci11x1x) {
--		if (adapter->is_sgmii_en) {
-+		if (adapter->is_pcs_en) {
- 			netif_dbg(adapter, drv, adapter->netdev,
- 				  "SGMII operation\n");
- 			adapter->mdiobus->read = lan743x_mdiobus_read_c22;
 diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
-index 160d94a7cee6..f0fa0580b04e 100644
+index f0fa0580b04e..26c30dc2e55c 100644
 --- a/drivers/net/ethernet/microchip/lan743x_main.h
 +++ b/drivers/net/ethernet/microchip/lan743x_main.h
-@@ -1070,7 +1070,7 @@ struct lan743x_adapter {
- 	struct lan743x_tx       tx[PCI11X1X_USED_TX_CHANNELS];
- 	struct lan743x_rx       rx[LAN743X_USED_RX_CHANNELS];
- 	bool			is_pci11x1x;
--	bool			is_sgmii_en;
-+	bool			is_pcs_en;
- 	/* protect ethernet syslock */
- 	spinlock_t		eth_syslock_spinlock;
- 	bool			eth_syslock_en;
+@@ -37,6 +37,8 @@
+ 
+ #define STRAP_READ			(0x0C)
+ #define STRAP_READ_USE_SGMII_EN_	BIT(22)
++#define STRAP_SFP_USE_EN_              BIT(31)
++#define STRAP_SFP_EN_                  BIT(15)
+ #define STRAP_READ_SGMII_EN_		BIT(6)
+ #define STRAP_READ_SGMII_REFCLK_	BIT(5)
+ #define STRAP_READ_SGMII_2_5G_		BIT(4)
+@@ -1081,6 +1083,7 @@ struct lan743x_adapter {
+ 	u8			max_tx_channels;
+ 	u8			used_tx_channels;
+ 	u8			max_vector_count;
++	bool                    is_sfp_support_en;
+ 
+ #define LAN743X_ADAPTER_FLAG_OTP		BIT(0)
+ 	u32			flags;
 -- 
 2.34.1
 
