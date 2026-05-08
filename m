@@ -1,181 +1,170 @@
-Return-Path: <netdev+bounces-285979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285980-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ECAhE1xQ/ml/pAAAu9opvQ
-	(envelope-from <netdev+bounces-285979-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 23:06:36 +0200
+	id uPbgJMdT/mntpAAAu9opvQ
+	(envelope-from <netdev+bounces-285980-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 23:21:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A967E4FBC0A
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 23:06:35 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 320444FBDA6
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 23:21:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F2EBD3031AE8
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 21:06:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1FBA830089AB
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 21:21:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 474263DA5B1;
-	Fri,  8 May 2026 21:06:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47B033F23BB;
+	Fri,  8 May 2026 21:21:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="hZ6JYsCY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hgJevPmx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47782225413;
-	Fri,  8 May 2026 21:06:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2245E31715F;
+	Fri,  8 May 2026 21:21:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778274393; cv=none; b=iTnMbibu9ayS/aUKo9C40bAe3RSYj6gnEA1w6O09jebQy2OGQHE50y8pKfYtMr6c1sIZjXy9CWErE6oLILKEXoFjZwSQl5j8ltW8Fdcev6xl3hA2+05gToGpeBe6t/odxuML8VBTjxZDe70bhtoWehFF1k8b6pO6/olvdFAoujc=
+	t=1778275266; cv=none; b=Ky0drbaOqVVdWsppktqfLniMmsV0eQCijv2sfgqzS9Iq9epnYP9sOt3ViObuYXvMtco8fsKgTzGu5t1rH+Z5k0vxRwSCxm3ee5VfaPC4Pn6y4JIDix3XMkjXeVdgvZhjCZXN2DEEXHi4eiFSbD/znOFWmfKOu9N3lFAyaJbOGlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778274393; c=relaxed/simple;
-	bh=T0eWHYvoB32q4/LjWG9pTPZE5yTNYbilqq9QRe3btmk=;
+	s=arc-20240116; t=1778275266; c=relaxed/simple;
+	bh=/4xLVTYRRJmOtJBRufc46FWoiGaSuJOkh/bI92mmbZ0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q4vFWUzTpNSMQvJnSrfaMkf50EKz0Bn+YIDJTJqEN/qyNIa8Mg8NoHZUAXhfbu/WN4yhJGxcvxLZKuo97vB/VOSIIssUCtUNaNChho2zhxbLfsgC87NUmlxJxBal1+EqqxUOFjdqXxygqOMJfNxY5LtH1pbpi3yzgFkZKB8po8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=hZ6JYsCY; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7680240E00C2;
-	Fri,  8 May 2026 21:06:28 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id hgMfzb9Q01z8; Fri,  8 May 2026 21:06:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1778274377; bh=THjyDfJHG7KW9npiqBHK3HlBg3FTqIowEJNRgPMlB/w=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=DN8dRy2+sQk4elETAmlxKLVAFX36P3Sqvq1D7y+36LBwEPEsRn12u69n1IzC1Edv3msbByVDCMXGkwb9YWFR8aqq+xnysSHRfq51OpxXKThWYyB6YWraNosMThey7JqcXzcaGBDCYtkZN0lx2y7hLzzTrbf8VxlrmGokOGA3k8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hgJevPmx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 252A6C2BCB0;
+	Fri,  8 May 2026 21:21:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778275265;
+	bh=/4xLVTYRRJmOtJBRufc46FWoiGaSuJOkh/bI92mmbZ0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hZ6JYsCYHUgII6cO/Pj/xxaMkCexjTFlixqmNXNw918guUvdWQNt98LA2QtBpt8oh
-	 2G6VbNwCsf1GFoey3tSlMK+l2dB/3LEDfUOc6W7g7a0WEMxfy4oBTzFnWoa08TIvGM
-	 H/FeXQqiEkiH5Ac6wIly0j5pb8tqcXvWUYY9sF5P1NSiM/ijHl3gSbroqzXvr+MSxu
-	 tI3NpnfLfMmvZF1HmRuEYVqUye4oXpKPeO8hxkxTNUgIuCJ/Tpn3EBZ9qCX8frgC0w
-	 B1lIptOv7SA00tM6phu4KI6UahFQui8Ly0kNI+IriGaJAGO4qQhELbnGzoMv37xfKC
-	 B/AcsJTnS4HzUcG77+KdyUMG0maJZFvuI7xhlGLHbESKNSz8MFMXMR4l3OZFblsjZA
-	 0fN2qlB1egK7K2LAaqxPFw9pOSsiSkJ08ap0TzrcXha9IklHyx49UuhlbXz/J1N3hC
-	 kcwh8KR1xqkXVleNxkXmuA7FpWpZTkeUdqic8/Uwu9LBmwbW3ss2+Xn9d+RD0ya7ZA
-	 GqUcSfYtwystf/w7zBknjGt0ULLwYQcm1/cS2GkkqdxFA7GiR54QMv4zSjv3VUYnWP
-	 svxB3a4hPt8+UV52rUrfb71bKpwutQXDLkOL21b5q/EMV6wGTSk3kKjk+2eZL6LPNu
-	 EZLlRu8V3SW4Uupd9i5VmLZM=
-Received: from zn.tnic (pd953014d.dip0.t-ipconnect.de [217.83.1.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id E01BC40E014B;
-	Fri,  8 May 2026 21:05:34 +0000 (UTC)
-Date: Fri, 8 May 2026 23:05:27 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
-	Nikolay Borisov <nik.borisov@suse.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	David Kaplan <david.kaplan@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
+	b=hgJevPmx3gxDzL+KNlNmrujQDe7HQ4xEn2AndsI+qvlXYJGXMmhqT9E9hmG+TOmuO
+	 E0EPqd84ewmcqxQ7UMtozzuj95tsnTAeWmAqH0ZE+pgJ9ZWSVDLYb81hzycY7GYAIE
+	 o6udnN3/UGBpsvbeQQBKVq1AwNxBIlzpCvaCH5Fv0BDDInulX//JR2Hki4QJrZoJFR
+	 i+ukNsb+kMk9lOsLb9fQkVoTkgTEgTXigW3JCtJKerFnY8nKOn5a8uwuWCsaudblPu
+	 TolfU5JF4ejNc60rSuc7yP6cyYwE9s4e/ZYU+jSX+5q2iHeDzMJ58woXulso8SS/DZ
+	 9itUvskTX9Fgg==
+Date: Sat, 9 May 2026 00:21:01 +0300
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: David Howells <dhowells@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	David Laight <david.laight.linux@gmail.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jason Baron <jbaron@akamai.com>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v11 02/12] x86/bhi: Make clear_bhb_loop() effective on
- newer CPUs
-Message-ID: <20260508210527.GFaf5QFz61RmSRBqKT@fat_crate.local>
-References: <20260422-vmscape-bhb-v11-0-b18e0cf32af4@linux.intel.com>
- <20260422-vmscape-bhb-v11-2-b18e0cf32af4@linux.intel.com>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Tim Bird <tim.bird@sony.com>, keyrings@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/2] keys, dns: drop unused upayload->data
+ NUL terminator
+Message-ID: <af5TvSZHwBH0N8Jq@kernel.org>
+References: <20260427114422.313356-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260422-vmscape-bhb-v11-2-b18e0cf32af4@linux.intel.com>
-X-Rspamd-Queue-Id: A967E4FBC0A
+In-Reply-To: <20260427114422.313356-3-thorsten.blum@linux.dev>
+X-Rspamd-Queue-Id: 320444FBDA6
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[alien8.de,none];
-	R_DKIM_ALLOW(-0.20)[alien8.de:s=alien8];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285979-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,google.com,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net,akamai.com,goodmis.org,linuxfoundation.org,vger.kernel.org,intel.com];
-	RCPT_COUNT_TWELVE(0.00)[42];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-285980-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bp@alien8.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[alien8.de:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email]
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jarkko@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Wed, Apr 22, 2026 at 11:15:15PM -0700, Pawan Gupta wrote:
-> As a mitigation for BHI, clear_bhb_loop() executes branches that overwrite
-> the Branch History Buffer (BHB). On Alder Lake and newer parts this
-> sequence is not sufficient because it doesn't clear enough entries. This
-> was not an issue because these CPUs use the BHI_DIS_S hardware mitigation
-> in the kernel.
+On Mon, Apr 27, 2026 at 01:44:23PM +0200, Thorsten Blum wrote:
+> ->data includes an extra NUL terminator despite never being used as a C
+> string and only accessing ->datalen bytes. Remove the redundant NUL
+> terminator and allocate one byte less in dns_resolver_preparse().
 > 
-> Now with VMSCAPE (BHI variant) it is also required to isolate branch
-> history between guests and userspace. Since BHI_DIS_S only protects the
-> kernel, the newer CPUs also use IBPB.
-> 
-> A cheaper alternative to the current IBPB mitigation is clear_bhb_loop().
-> But it currently does not clear enough BHB entries to be effective on newer
-> CPUs with larger BHB. At boot, dynamically set the loop count of
-> clear_bhb_loop() such that it is effective on newer CPUs too.
-> 
-> Introduce global loop counts, initializing them with appropriate value
-> based on the hardware feature X86_FEATURE_BHI_CTRL.
-> 
-> Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
-> Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+
+Never being used where?
+
+Let me go this through.
+
+I read this from the documentation:
+
+  /*
+   * Preparse instantiation data for a dns_resolver key.
+   *
+   * For normal hostname lookups, the data must be a NUL-terminated string, with
+   * the NUL char accounted in datalen.
+
+So what is confusing here for me is that should upayload, which is
+original data with options and '\0'.
+
+So my question is which is the regression here:
+
+1. Incorrect length. Then the fix would be simply setting length as
+   'result_len + 1', which aligns also with the snippet of documentation
+   I pasted.
+2. Unnecessary '\0'.
+
+If there is an issue, your commit is lacking fixes tag and cc tag to the
+author of potentially failing commit.
+
 > ---
->  arch/x86/entry/entry_64.S            |  8 +++++---
->  arch/x86/include/asm/nospec-branch.h |  2 ++
->  arch/x86/kernel/cpu/bugs.c           | 13 +++++++++++++
->  3 files changed, 20 insertions(+), 3 deletions(-)
+> Changes in v3:
+> - Update commit message
+> - v2: https://lore.kernel.org/lkml/20260409225703.158552-4-thorsten.blum@linux.dev/
+> 
+> Changes in v2:
+> - No changes in patch 1/2
+> - v1: https://lore.kernel.org/lkml/20260406175810.1018681-3-thorsten.blum@linux.dev/
+> ---
+>  net/dns_resolver/dns_key.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+> index c3c8c3240ef9..451247864a63 100644
+> --- a/net/dns_resolver/dns_key.c
+> +++ b/net/dns_resolver/dns_key.c
+> @@ -203,7 +203,7 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
+>  	kdebug("store result");
+>  	prep->quotalen = result_len;
+>  
+> -	upayload = kmalloc_flex(*upayload, data, result_len + 1);
+> +	upayload = kmalloc_flex(*upayload, data, result_len);
+>  	if (!upayload) {
+>  		kleave(" = -ENOMEM");
+>  		return -ENOMEM;
+> @@ -211,7 +211,6 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
+>  
+>  	upayload->datalen = result_len;
+>  	memcpy(upayload->data, data, result_len);
+> -	upayload->data[result_len] = '\0';
+>  
+>  	prep->payload.data[dns_key_data] = upayload;
+>  	kleave(" = 0");
 
-Simple and clean - that's how I like 'em.
-
-Acked-by: Borislav Petkov (AMD) <bp@alien8.de>
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+BR, Jarkko
 
