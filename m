@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-285779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285780-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GHrLLjjR/Wl2jgAAu9opvQ
-	(envelope-from <netdev+bounces-285779-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:04:08 +0200
+	id qJ+DIEHR/Wl2jgAAu9opvQ
+	(envelope-from <netdev+bounces-285780-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:04:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A3334F60E6
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:04:07 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BB324F60F4
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:04:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 17F75300E02B
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 12:04:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D1EA5300BB8D
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 12:04:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 027EC3890F9;
-	Fri,  8 May 2026 12:04:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46DD3D0918;
+	Fri,  8 May 2026 12:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="hhqeFOUT"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="IP+CRGv1"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 679C2395254;
-	Fri,  8 May 2026 12:04:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB5A396579;
+	Fri,  8 May 2026 12:04:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778241845; cv=none; b=R4asQ1if339wnEZAx3fa6CeBVsnwrcJKisrelkqm4xtwLduQIjnrdXydSIMroIT0mQa4144UagqSrMbaAPwR/SStGqjzWX1nDecL1wn4N3oYpQ/WqS7jKd3OZVoPsurv2kiO4JL6qzm5DYLDOR74RwAJy48JoDSh4NeXq/1F0Ek=
+	t=1778241854; cv=none; b=dM9yJRdULpIsu0l2eYQcrz5OC1xbTYFhheZejrPX6W/1s3MrIssknGXxHyVed4lmHcYPEQgTEaiOv9bwMxATvVWCk9N3AMeWPWZ27L8Tc3b9Od1ZpIcmRTDHbcbQjSdcon1DODi4f44tQaaUTTEpTYW6o82399pVmKJgApJ/Gfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778241845; c=relaxed/simple;
-	bh=pS/NHo26KR2yadceDNjzTfzVGimQ19p7OFFeFhgzV3E=;
+	s=arc-20240116; t=1778241854; c=relaxed/simple;
+	bh=5Rj3PnAz0uBEx3C9AT31iUuHVS6X4ygvcnuR5FL0kz8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=spcB231rBsDx8zPz2RlrbiZtVAARoRs0iDYGZ4DYB2+XHoKpjsLFnraOD1fY/e4VlkoeHCbi0Lcg6hxYEgeu2/JNHOOp1UD2CuSMjc/hmjCw2BagKvDMRGTpsCwTfdwjYCswwm8pomQGG8pYq6r3EhZG7KdEBHO32U63DoSbFP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=hhqeFOUT; arc=none smtp.client-ip=67.231.156.173
+	 MIME-Version:Content-Type; b=VGLDZ0v3WEm+UdzgIGENFkyh40U7HbKKhoSzi03VXC5UQKWYL/gFe4XKaJ/wPg/5jhH1SPYDN8wpGK5h00QH0lSupqY/ssHowMemsNo4VVzAy/ZX4QsBE+DcoH9YSsUO5NWs4Q0JZW/+fh086p06i99DHJBE6LyRkTk+FV8iXQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=IP+CRGv1; arc=none smtp.client-ip=67.231.156.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6481co7o1753610;
-	Fri, 8 May 2026 05:03:42 -0700
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 648BPU5u2841684;
+	Fri, 8 May 2026 05:03:49 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=i
-	3Jd3g4sORASzHea+bl+InX+uYPD+wDaCnDHFG6mwDI=; b=hhqeFOUTG6W0F0bpQ
-	+ctbozYTL4v+zIMJjZ9e0cDDC4iOD6aIjGgHpI0Y5QfonX/TT5UQOJSzZGGrATHA
-	WH0qdYiSJ6CDRT0YoH9FqD+3h5sonn1JyGezwIDTmHqidE+SLXN2FEFKGrqPRPTk
-	82FeIK7mKf/1rf2ydWw3Xs7W6sg2IbK5v7zU/0cWTa9HvYbI2cw6ScJORs245E4J
-	kJKnbEB6RG5rC6OKYVMqp1Avgkmm5631TegMweauvK6C5XnGqdVxoCedAEyZpage
-	cDl0pG1jYCec0N1UXpq935pCmScPS0fsGcMVVeL9Oe0IiXcbdDmMqZ2bcFtv8BD0
-	s5tow==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4e0uytkcrk-1
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=a
+	5+rFPRIyuxq7S27C0/a57f8Nd+3qn0oDbgIIXIbIqQ=; b=IP+CRGv1toRPQUy9w
+	HJUBgvRhhgoOBPba28Eypnp7jZ2hDDnqGWM/ecg/yuepQBbeeeME4r4B3tKsJy6v
+	wU71wt8lHjQ9T+wpy+384sT0kAOYfI3npEs4MqpWMKn6YBv9ge12FOqOerR+dhtG
+	uhMDJ38CSA34CYHY8CaMhNWedA5EIbO2LJ82wr6l0x78DmWA9fFE0f4a56+N2bCC
+	7B1yyu6d4yjHpViguXTpBz0jEjZq266rVxTAl26PSQilj+zQH+54rsXQ+JSEAVrh
+	YcqGUJZMKiZEp8qZLat0GDl2S0h9eDfFDrP46ugVXs8uqDqrnYiglW9nyBMdkRLq
+	Vw6Ww==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4e14g0hqw1-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 08 May 2026 05:03:42 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+	Fri, 08 May 2026 05:03:49 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 8 May 2026 05:03:40 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Fri, 8 May 2026 05:03:40 -0700
+ 15.2.1544.25; Fri, 8 May 2026 05:03:48 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Fri, 8 May 2026 05:03:48 -0700
 Received: from BG-LT92649.marvell.com (BG-LT92649.marvell.com [10.28.166.218])
-	by maili.marvell.com (Postfix) with ESMTP id 2C4783F708C;
-	Fri,  8 May 2026 05:03:35 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id AD7D75B693F;
+	Fri,  8 May 2026 05:03:43 -0700 (PDT)
 From: <sukhdeeps@marvell.com>
 To: <netdev@vger.kernel.org>
 CC: <irusskikh@marvell.com>, <epomozov@marvell.com>,
@@ -70,9 +70,9 @@ CC: <irusskikh@marvell.com>, <epomozov@marvell.com>,
         <linux-kernel@vger.kernel.org>,
         Sukhdeep Singh
 	<sukhdeeps@marvell.com>
-Subject: [PATCH net-next v2 5/9] net: atlantic: add AQC113 filter data structures and firmware query and firmware query firmware query
-Date: Fri, 8 May 2026 17:31:52 +0530
-Message-ID: <20260508120156.3060-6-sukhdeeps@marvell.com>
+Subject: [PATCH net-next v2 6/9] net: atlantic: implement AQC113 L2/L3/L4 RX filter management filter management management
+Date: Fri, 8 May 2026 17:31:53 +0530
+Message-ID: <20260508120156.3060-7-sukhdeeps@marvell.com>
 X-Mailer: git-send-email 2.52.0.windows.1
 In-Reply-To: <20260508120156.3060-1-sukhdeeps@marvell.com>
 References: <20260506135706.2834-1-sukhdeeps@marvell.com>
@@ -85,25 +85,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=I6RVgtgg c=1 sm=1 tr=0 ts=69fdd11e cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+X-Proofpoint-ORIG-GUID: OgZw0sPRkgYLpWyurbA6O1dWCewynjNd
+X-Authority-Analysis: v=2.4 cv=bMUm5v+Z c=1 sm=1 tr=0 ts=69fdd125 cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
  a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=QXcCYyLzdtTjyudCfB6f:22 a=M5GUcnROAAAA:8 a=3QfP4igTxnc4TM591i8A:9
+ a=qit2iCtTFQkLgVSMPQTB:22 a=M5GUcnROAAAA:8 a=J2FfQZe5whmnkCmaWzMA:9
  a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTA4MDEyNSBTYWx0ZWRfXwkOoEAtj69X+
- XHb1G3O7GYXxd6NxdaDkC0+MmMbNoIoJnyRFzlPdJJ1v+QPfQX0oXyxHyqQ8c2xs6P7Khny299V
- THYwe/cVYnoLTpLnz4QR8N1cOzSz455crAFRweAS7ACpFEM3SUUTH+YDpzwz6OU2p2IgTg+pXpc
- wlnYqFNqbTWdMj1yQCzI8uTjJLaiDgNTu98RFE5ckC2mi3AGq1k8pPJn0IrIMibWP4eI8IKJ+0s
- QgA+pvyZIxDtXwrUzEh0EOx+JIRi0t21lYl1D4okg3BT5zcn4+1jdefY2U3eu5LkGiJNhyxwA8S
- V2Lr3U+heF/f1t9wqjDTd9LbxKl02umjF6CfTz5pGNPKYt4QBD5CHPx+UZ8wU3D3EM0/o/yAzsU
- UPWEEfZovV5vRzxo6PyUz04JmaZQBjKzZiJIAmIyRYyg8LOOS8K0fQcZ/sopneXCaYBKNVAZArP
- YGDeyHdYiSZQUFDzioQ==
-X-Proofpoint-GUID: AHj3wMgKXYrG5tVjGrrBd5GS_9F7tGxj
-X-Proofpoint-ORIG-GUID: AHj3wMgKXYrG5tVjGrrBd5GS_9F7tGxj
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTA4MDEyNSBTYWx0ZWRfXy7nBg07jFS7h
+ BSsix7aU5jy2bOtdC8qOmEuIgNM3ut0PKvGM9ww9SFyuBNl8sVpxb7Bs9h9P2geLMc73nyfX55N
+ IJwcdevuU17Ni4KACiYe1Ap6N7ijQu5UiGn2ZTD3RK2gt0JBRBgqp6KcnaK2LMxTdmUI2e38Z98
+ N/XiPz4hF0I/7hcNwacFJH0KZtZywF9Ed032oTL9hfcLz1z2E/TXJ8mVA5yxzsf7tjb91mKs4rh
+ KSOxKpgHHd2w+4QuMvg87BfxgkQoQABnvxYfbjPkXdHm0CSCblBeJyxl8npc+dvfkfOqAYzj3rX
+ Jm0QX0ODME49kBCB5rJsloy772CMpTSMK+8gxzapcHAlFW7LsLi1dD+zSTyiMISNIYVQAMPAoEG
+ 7HYq/lwSfxjrn60utOJOUuhu7BCSawBq0VIkPz9txbUpO+4cbViV3uWhclqfJbQeKugwgTcYfvc
+ +YS6wc2O3RD4CiQgyJg==
+X-Proofpoint-GUID: OgZw0sPRkgYLpWyurbA6O1dWCewynjNd
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-05-07_02,2026-05-06_01,2025-10-01_01
-X-Rspamd-Queue-Id: 5A3334F60E6
+X-Rspamd-Queue-Id: 1BB324F60F4
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -112,7 +112,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
 	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -120,16 +120,16 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-285779-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285780-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:email,marvell.com:mid,marvell.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:email,marvell.com:mid,marvell.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,l4.sport:url];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sukhdeeps@marvell.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[marvell.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.997];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[8]
@@ -137,252 +137,719 @@ X-Rspamd-Action: no action
 
 From: Sukhdeep Singh <sukhdeeps@marvell.com>
 
-Add filter infrastructure for AQC113 hardware:
+Implement complete RX filter management for AQC113 hardware:
 
-- Define L3 (IPv4/IPv6), L4 (TCP/UDP/SCTP), and combined L3L4 filter
-  structures with reference-counted sharing support.
-- Define tag policy structure for ethertype filter management.
-- Add RPF L3/L4 command bit definitions for filter programming.
-- Add filter count constants for L3L4, L3V4, L4, VLAN, and ethertype.
-- Extend hw_atl2_priv with filter arrays, base indices, and counts
-  discovered from firmware.
+- Add tag-based filter policy with reference-counted sharing, allowing
+  multiple filter rules to share the same L3 or L4 hardware filter
+  when their match criteria are identical.
+- Implement L3 (IPv4/IPv6 source/destination address and protocol)
+  filter find, get (program HW and increment refcount), and put
+  (decrement refcount and clear HW when last user releases).
+- Implement L4 (TCP/UDP/SCTP source/destination port) filter
+  management with the same find/get/put pattern.
+- Add combined L3L4 filter configuration that translates legacy
+  aq_rx_filter_l3l4 commands into AQC113 separate L3+L4 filter
+  programming with Action Resolver Table (ART) entries.
+- Add L2 ethertype filter set/clear with tag-based ART integration.
+- Add MAC address setup using firmware-provided L2 filter base index.
 
-Query filter capabilities from firmware shared memory at init time
-to discover available L2/L3/L4/VLAN/ethertype filter resources and
-ART (Action Resolver Table) configuration.
+Update hardware initialization:
+- Use firmware-reported ART section base and count instead of
+  hardcoded 0xFFFF section enable.
+- Enable L3 v6/v4 select mode for simultaneous IPv4/IPv6 filtering.
+- Initialize L3L4 filter indices to -1 on reset.
 
-Add hardware register dump utility for AQC113 debug support.
+Wire up hw_filter_l2_set, hw_filter_l2_clear, hw_filter_l3l4_set,
+hw_set_mac_address, hw_get_version, and hw_get_regs in hw_atl2_ops.
 
 Signed-off-by: Sukhdeep Singh <sukhdeeps@marvell.com>
 ---
- .../atlantic/hw_atl2/hw_atl2_internal.h       | 63 +++++++++++++++++++
- .../aquantia/atlantic/hw_atl2/hw_atl2_utils.c | 33 ++++++++++
- .../aquantia/atlantic/hw_atl2/hw_atl2_utils.h |  5 ++
- .../atlantic/hw_atl2/hw_atl2_utils_fw.c       | 52 +++++++++++++++
- 4 files changed, 153 insertions(+)
+ .../net/ethernet/aquantia/atlantic/aq_hw.h    |   2 +
+ .../aquantia/atlantic/hw_atl2/hw_atl2.c       | 582 +++++++++++++++++-
+ 2 files changed, 580 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h
-index 5a89bb8722f9..fc086d84fb91 100644
---- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h
-+++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h
-@@ -84,6 +84,18 @@ enum HW_ATL2_RPF_ART_INDEX {
- 					  HW_ATL_VLAN_MAX_FILTERS,
+diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_hw.h b/drivers/net/ethernet/aquantia/atlantic/aq_hw.h
+index 57ea59026a2c..04fb87d4e56d 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/aq_hw.h
++++ b/drivers/net/ethernet/aquantia/atlantic/aq_hw.h
+@@ -236,6 +236,8 @@ struct aq_hw_ops {
+ 
+ 	int (*hw_stop)(struct aq_hw_s *self);
+ 
++	u32 (*hw_get_version)(struct aq_hw_s *self);
++
+ 	int (*hw_ring_tx_init)(struct aq_hw_s *self, struct aq_ring_s *aq_ring,
+ 			       struct aq_ring_param_s *aq_ring_param);
+ 
+diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2.c b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2.c
+index 0ce9caae8799..7abf7fe6e32c 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2.c
++++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2.c
+@@ -11,6 +11,7 @@
+ #include "hw_atl/hw_atl_utils.h"
+ #include "hw_atl/hw_atl_llh.h"
+ #include "hw_atl/hw_atl_llh_internal.h"
++#include "hw_atl2.h"
+ #include "hw_atl2_utils.h"
+ #include "hw_atl2_llh.h"
+ #include "hw_atl2_internal.h"
+@@ -86,6 +87,38 @@ const struct aq_hw_caps_s hw_atl2_caps_aqc116c = {
+ 			  AQ_NIC_RATE_10M,
  };
  
-+#define HW_ATL2_RPF_L3_CMD_EN       BIT(0)
-+#define HW_ATL2_RPF_L3_CMD_SA_EN    BIT(1)
-+#define HW_ATL2_RPF_L3_CMD_DA_EN    BIT(2)
-+#define HW_ATL2_RPF_L3_CMD_PROTO_EN BIT(3)
-+#define HW_ATL2_RPF_L3_V6_CMD_EN       BIT(0x10)
-+#define HW_ATL2_RPF_L3_V6_CMD_SA_EN    BIT(0x11)
-+#define HW_ATL2_RPF_L3_V6_CMD_DA_EN    BIT(0x12)
-+#define HW_ATL2_RPF_L3_V6_CMD_PROTO_EN BIT(0x13)
-+#define HW_ATL2_RPF_L4_CMD_EN       BIT(0)
-+#define HW_ATL2_RPF_L4_CMD_DP_EN    BIT(1)
-+#define HW_ATL2_RPF_L4_CMD_SP_EN    BIT(2)
-+
- #define HW_ATL2_ACTION(ACTION, RSS, INDEX, VALID) \
- 	((((ACTION) & 0x3U) << 8) | \
- 	(((RSS) & 0x1U) << 7) | \
-@@ -94,6 +106,12 @@ enum HW_ATL2_RPF_ART_INDEX {
- #define HW_ATL2_ACTION_DISABLE HW_ATL2_ACTION(0, 0, 0, 0)
- #define HW_ATL2_ACTION_ASSIGN_QUEUE(QUEUE) HW_ATL2_ACTION(1, 0, (QUEUE), 1)
- #define HW_ATL2_ACTION_ASSIGN_TC(TC) HW_ATL2_ACTION(1, 1, (TC), 1)
-+#define HW_ATL2_RPF_L3L4_FILTERS 8
-+#define HW_ATL2_RPF_L3V4_FILTERS 8
-+#define HW_ATL2_RPF_L4_FILTERS 8
-+#define HW_ATL2_RPF_VLAN_FILTERS 16
-+#define HW_ATL2_RPF_ETYPE_FILTERS 16
-+#define HW_ATL2_RPF_ETYPE_TAGS 7
- 
- enum HW_ATL2_RPF_RSS_HASH_TYPE {
- 	HW_ATL2_RPF_RSS_HASH_TYPE_NONE = 0,
-@@ -119,9 +137,54 @@ enum HW_ATL2_RPF_RSS_HASH_TYPE {
- 
- #define HW_ATL_MCAST_FLT_ANY_TO_HOST 0x00010FFFU
- 
-+struct hw_atl2_l3_filter {
-+	u8 proto;
-+	u8 usage;
-+	u32 cmd;
-+	u32 srcip[4];
-+	u32 dstip[4];
-+};
-+
-+struct hw_atl2_l4_filter {
-+	u8 usage;
-+	u32 cmd;
-+	u16 sport;
-+	u16 dport;
-+};
-+
-+struct hw_atl2_l3l4_filter {
-+	s8 l3_index;
-+	s8 l4_index;
-+	u8 ipv6;
-+};
-+
-+struct hw_atl2_tag_policy {
-+	u16 action;
-+	u16 usage;
-+};
-+
- struct hw_atl2_priv {
-+	struct hw_atl2_l3_filter l3_v4_filters[HW_ATL2_RPF_L3L4_FILTERS];
-+	struct hw_atl2_l3_filter l3_v6_filters[HW_ATL2_RPF_L3L4_FILTERS];
-+	struct hw_atl2_l4_filter l4_filters[HW_ATL2_RPF_L3L4_FILTERS];
-+	struct hw_atl2_l3l4_filter l3l4_filters[HW_ATL2_RPF_L3L4_FILTERS];
-+	struct hw_atl2_tag_policy etype_policy[HW_ATL2_RPF_ETYPE_FILTERS];
- 	struct statistics_s last_stats;
- 	unsigned int art_base_index;
-+	unsigned int art_count;
-+	unsigned int l2_filters_base_index;
-+	unsigned int l2_filter_count;
-+	unsigned int etype_filter_base_index;
-+	unsigned int etype_filter_count;
-+	unsigned int etype_filter_tag_top;
-+	unsigned int vlan_filter_base_index;
-+	unsigned int vlan_filter_count;
-+	unsigned int l3_v4_filter_base_index;
-+	unsigned int l3_v4_filter_count;
-+	unsigned int l3_v6_filter_base_index;
-+	unsigned int l3_v6_filter_count;
-+	unsigned int l4_filter_base_index;
-+	unsigned int l4_filter_count;
- };
- 
- #endif /* HW_ATL2_INTERNAL_H */
-diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.c b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.c
-index 0fe6257d9c08..ffd723dcfb63 100644
---- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.c
-+++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.c
-@@ -128,3 +128,36 @@ int hw_atl2_utils_soft_reset(struct aq_hw_s *self)
- err_exit:
- 	return err;
- }
-+
-+static const u32 hw_atl2_utils_hw_mac_regs[] = {
-+	0x00005580U, 0x00005590U, 0x000055B0U, 0x000055B4U,
-+	0x000055C0U, 0x00005B00U, 0x00005B04U, 0x00005B08U,
-+	0x00005B0CU, 0x00005B10U, 0x00005B14U, 0x00005B18U,
-+	0x00005B1CU, 0x00005B20U, 0x00005B24U, 0x00005B28U,
-+	0x00005B2CU, 0x00005B30U, 0x00005B34U, 0x00005B38U,
-+	0x00005B3CU, 0x00005B40U, 0x00005B44U, 0x00005B48U,
-+	0x00005B4CU, 0x00005B50U, 0x00005B54U, 0x00005B58U,
-+	0x00005B5CU, 0x00005B60U, 0x00005B64U, 0x00005B68U,
-+	0x00005B6CU, 0x00005B70U, 0x00005B74U, 0x00005B78U,
-+	0x00005B7CU, 0x00007C00U, 0x00007C04U, 0x00007C08U,
-+	0x00007C0CU, 0x00007C10U, 0x00007C14U, 0x00007C18U,
-+	0x00007C1CU, 0x00007C20U, 0x00007C40U, 0x00007C44U,
-+	0x00007C48U, 0x00007C4CU, 0x00007C50U, 0x00007C54U,
-+	0x00007C58U, 0x00007C5CU, 0x00007C60U, 0x00007C80U,
-+	0x00007C84U, 0x00007C88U, 0x00007C8CU, 0x00007C90U,
-+	0x00007C94U, 0x00007C98U, 0x00007C9CU, 0x00007CA0U,
-+	0x00007CC0U, 0x00007CC4U, 0x00007CC8U, 0x00007CCCU,
-+	0x00007CD0U, 0x00007CD4U, 0x00007CD8U, 0x00007CDCU,
-+};
-+
-+int hw_atl2_utils_hw_get_regs(struct aq_hw_s *self,
-+			      const struct aq_hw_caps_s *aq_hw_caps,
-+			      u32 *regs_buff)
++/* Find tag with the same action or new free tag
++ *  top - top inclusive tag value
++ *  action - action for ActionResolverTable
++ */
++static int hw_atl2_filter_tag_get(struct hw_atl2_tag_policy *tags,
++				  int top, u16 action)
 +{
-+	unsigned int i;
++	int i;
 +
-+	for (i = 0; i < aq_hw_caps->mac_regs_count; i++)
-+		regs_buff[i] = aq_hw_read_reg(self,
-+					      hw_atl2_utils_hw_mac_regs[i]);
-+	return 0;
++	for (i = 1; i <= top; i++)
++		if (tags[i].usage > 0 && tags[i].action == action) {
++			tags[i].usage++;
++			return i;
++		}
++
++	for (i = 1; i <= top; i++)
++		if (tags[i].usage == 0) {
++			tags[i].usage = 1;
++			tags[i].action = action;
++			return i;
++		}
++
++	return -1;
 +}
-diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.h b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.h
-index 6bad64c77b87..c84955bc14ae 100644
---- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.h
-+++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.h
-@@ -626,10 +626,15 @@ int hw_atl2_utils_initfw(struct aq_hw_s *self, const struct aq_fw_ops **fw_ops);
- 
- int hw_atl2_utils_soft_reset(struct aq_hw_s *self);
- 
-+int hw_atl2_utils_hw_get_regs(struct aq_hw_s *self,
-+			      const struct aq_hw_caps_s *aq_hw_caps,
-+			      u32 *regs_buff);
 +
- u32 hw_atl2_utils_get_fw_version(struct aq_hw_s *self);
- 
- int hw_atl2_utils_get_action_resolve_table_caps(struct aq_hw_s *self,
- 						u8 *base_index, u8 *count);
-+int hw_atl2_utils_get_filter_caps(struct aq_hw_s *self);
- 
- extern const struct aq_fw_ops aq_a2_fw_ops;
- 
-diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c
-index 7370e3f76b62..546b48f897d3 100644
---- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c
-+++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c
-@@ -121,6 +121,10 @@ static int aq_a2_fw_init(struct aq_hw_s *self)
- 	u32 val;
++static void hw_atl2_filter_tag_put(struct hw_atl2_tag_policy *tags,
++				   int tag)
++{
++	if (tags[tag].usage > 0)
++		tags[tag].usage--;
++}
++
+ static u32 hw_atl2_sem_act_rslvr_get(struct aq_hw_s *self)
+ {
+ 	return hw_atl_reg_glb_cpu_sem_get(self, HW_ATL2_FW_SM_ACT_RSLVR);
+@@ -95,12 +128,21 @@ static int hw_atl2_hw_reset(struct aq_hw_s *self)
+ {
+ 	struct hw_atl2_priv *priv = self->priv;
  	int err;
++	int i;
  
-+	err = hw_atl2_utils_get_filter_caps(self);
-+	if (err)
-+		return err;
-+
- 	hw_atl2_shared_buffer_get(self, link_control, link_control);
- 	link_control.mode = AQ_HOST_MODE_ACTIVE;
- 	hw_atl2_shared_buffer_write(self, link_control, link_control);
-@@ -606,6 +610,54 @@ u32 hw_atl2_utils_get_fw_version(struct aq_hw_s *self)
- 	       version.bundle.build;
+ 	err = hw_atl2_utils_soft_reset(self);
+ 	if (err)
+ 		return err;
+ 
+-	memset(priv, 0, sizeof(*priv));
++	memset(&priv->last_stats, 0, sizeof(priv->last_stats));
++	memset(priv->l3_v4_filters, 0, sizeof(priv->l3_v4_filters));
++	memset(priv->l3_v6_filters, 0, sizeof(priv->l3_v6_filters));
++	memset(priv->l4_filters, 0, sizeof(priv->l4_filters));
++	memset(priv->etype_policy, 0, sizeof(priv->etype_policy));
++	for (i = 0; i < HW_ATL2_RPF_L3L4_FILTERS; i++) {
++		priv->l3l4_filters[i].l3_index = -1;
++		priv->l3l4_filters[i].l4_index = -1;
++	}
+ 
+ 	self->aq_fw_ops->set_state(self, MPI_RESET);
+ 
+@@ -380,6 +422,9 @@ static void hw_atl2_hw_init_new_rx_filters(struct aq_hw_s *self)
+ {
+ 	u8 *prio_tc_map = self->aq_nic_cfg->prio_tc_map;
+ 	struct hw_atl2_priv *priv = self->priv;
++	u32 art_first_sec, art_last_sec;
++	u32 art_sections;
++	u32 art_mask;
+ 	u16 action;
+ 	u8 index;
+ 	int i;
+@@ -394,9 +439,14 @@ static void hw_atl2_hw_init_new_rx_filters(struct aq_hw_s *self)
+ 	 * REC entry is used for further processing. If multiple entries match,
+ 	 * the lowest REC entry, Action field will be selected.
+ 	 */
+-	hw_atl2_rpf_act_rslvr_section_en_set(self, 0xFFFF);
++	art_last_sec = priv->art_base_index / 8 + priv->art_count / 8;
++	art_first_sec = priv->art_base_index / 8;
++	art_mask = (BIT(art_last_sec) - 1) - (BIT(art_first_sec) - 1);
++	art_sections = hw_atl2_rpf_act_rslvr_section_en_get(self) | art_mask;
++	hw_atl2_rpf_act_rslvr_section_en_set(self, art_sections);
++	hw_atl2_rpf_l3_v6_v4_select_set(self, 1);
+ 	hw_atl2_rpfl2_uc_flr_tag_set(self, HW_ATL2_RPF_TAG_BASE_UC,
+-				     HW_ATL2_MAC_UC);
++				     priv->l2_filters_base_index);
+ 	hw_atl2_rpfl2_bc_flr_tag_set(self, HW_ATL2_RPF_TAG_BASE_UC);
+ 
+ 	/* FW reserves the beginning of ART, thus all driver entries must
+@@ -530,6 +580,35 @@ static int hw_atl2_hw_init_rx_path(struct aq_hw_s *self)
+ 	return aq_hw_err_from_flags(self);
  }
  
-+int hw_atl2_utils_get_filter_caps(struct aq_hw_s *self)
++static int hw_atl2_hw_mac_addr_set(struct aq_hw_s *self, const u8 *mac_addr)
 +{
 +	struct hw_atl2_priv *priv = self->priv;
-+	struct filter_caps_s filter_caps;
-+	u32 tag_top;
++	u32 location = priv->l2_filters_base_index;
++	unsigned int h;
++	unsigned int l;
 +	int err;
 +
-+	err = hw_atl2_shared_buffer_read_safe(self, filter_caps, &filter_caps);
-+	if (err)
-+		return err;
++	if (!mac_addr) {
++		err = -EINVAL;
++		goto err_exit;
++	}
++	h = (mac_addr[0] << 8) | (mac_addr[1]);
++	l = (mac_addr[2] << 24) | (mac_addr[3] << 16) |
++		(mac_addr[4] << 8) | mac_addr[5];
 +
-+	priv->art_base_index = filter_caps.rslv_tbl_base_index * 8;
-+	priv->art_count = filter_caps.rslv_tbl_count * 8;
-+	if (priv->art_count == 0)
-+		priv->art_count = 128;
-+	priv->l2_filters_base_index = filter_caps.l2_filters_base_index;
-+	priv->l2_filter_count = filter_caps.l2_filter_count;
-+	priv->etype_filter_base_index = filter_caps.ethertype_filter_base_index;
-+	priv->etype_filter_count = filter_caps.ethertype_filter_count;
-+	priv->etype_filter_tag_top =
-+		(priv->etype_filter_count >= HW_ATL2_RPF_ETYPE_TAGS) ?
-+		 (HW_ATL2_RPF_ETYPE_TAGS) : (HW_ATL2_RPF_ETYPE_TAGS >> 1);
-+	priv->vlan_filter_base_index = filter_caps.vlan_filter_base_index;
-+	/* 0 - no tag, 1 - reserved for vlan-filter-offload filters */
-+	tag_top =
-+		  (filter_caps.vlan_filter_count == HW_ATL2_RPF_VLAN_FILTERS) ?
-+		  (HW_ATL2_RPF_VLAN_FILTERS - 2) :
-+		  (HW_ATL2_RPF_VLAN_FILTERS / 2 - 2);
++	hw_atl_rpfl2_uc_flr_en_set(self, 0U, location);
++	hw_atl_rpfl2unicast_dest_addresslsw_set(self, l, location);
++	hw_atl_rpfl2unicast_dest_addressmsw_set(self, h, location);
++	hw_atl_rpfl2unicast_flr_act_set(self, 1U, location);
++	hw_atl2_rpfl2_uc_flr_tag_set(self, HW_ATL2_RPF_TAG_BASE_UC, location);
++	hw_atl_rpfl2_uc_flr_en_set(self, 1U, location);
 +
-+	if (filter_caps.vlan_filter_count > 2)
-+		priv->vlan_filter_count = min_t(u32,
-+						filter_caps.vlan_filter_count - 2,
-+						tag_top);
++	err = aq_hw_err_from_flags(self);
++
++err_exit:
++	return err;
++}
++
+ static int hw_atl2_hw_init(struct aq_hw_s *self, const u8 *mac_addr)
+ {
+ 	static u32 aq_hw_atl2_igcr_table_[4][2] = {
+@@ -767,6 +846,496 @@ static struct aq_stats_s *hw_atl2_utils_get_hw_stats(struct aq_hw_s *self)
+ 	return &self->curr_stats;
+ }
+ 
++static bool hw_atl2_rxf_l3_is_equal(struct hw_atl2_l3_filter *f1,
++				    struct hw_atl2_l3_filter *f2)
++{
++	if (f1->cmd != f2->cmd)
++		return false;
++
++	if (f1->cmd & HW_ATL2_RPF_L3_CMD_SA_EN)
++		if (f1->srcip[0] != f2->srcip[0])
++			return false;
++
++	if (f1->cmd & HW_ATL2_RPF_L3_CMD_DA_EN)
++		if (f1->dstip[0] != f2->dstip[0])
++			return false;
++
++	if (f1->cmd & (HW_ATL2_RPF_L3_CMD_PROTO_EN |
++		       HW_ATL2_RPF_L3_V6_CMD_PROTO_EN))
++		if (f1->proto != f2->proto)
++			return false;
++
++	if (f1->cmd & HW_ATL2_RPF_L3_V6_CMD_SA_EN)
++		if (memcmp(f1->srcip, f2->srcip, 16))
++			return false;
++
++	if (f1->cmd & HW_ATL2_RPF_L3_V6_CMD_DA_EN)
++		if (memcmp(f1->dstip, f2->dstip, 16))
++			return false;
++
++	return true;
++}
++
++static int hw_atl2_new_fl3l4_find_l3(struct aq_hw_s *self,
++				     struct hw_atl2_l3_filter *l3)
++{
++	struct hw_atl2_priv *priv = self->priv;
++	struct hw_atl2_l3_filter *l3_filters;
++	int i, first, last;
++
++	if (l3->cmd & HW_ATL2_RPF_L3_V6_CMD_EN) {
++		l3_filters = priv->l3_v6_filters;
++		first = priv->l3_v6_filter_base_index;
++		last = priv->l3_v6_filter_base_index +
++		       priv->l3_v6_filter_count;
++	} else {
++		l3_filters = priv->l3_v4_filters;
++		first = priv->l3_v4_filter_base_index;
++		last = priv->l3_v4_filter_base_index +
++		       priv->l3_v4_filter_count;
++	}
++	for (i = first; i < last; i++) {
++		if (hw_atl2_rxf_l3_is_equal(&l3_filters[i], l3))
++			return i;
++	}
++
++	for (i = first; i < last; i++) {
++		u32 l3_enable_mask = HW_ATL2_RPF_L3_CMD_EN |
++				     HW_ATL2_RPF_L3_V6_CMD_EN;
++
++		if (!(l3_filters[i].cmd & l3_enable_mask))
++			return i;
++	}
++
++	return -ENOSPC;
++}
++
++static void hw_atl2_rxf_l3_get(struct aq_hw_s *self,
++			       struct hw_atl2_l3_filter *l3, int idx,
++			       const struct hw_atl2_l3_filter *_l3)
++{
++	int i;
++
++	l3->usage++;
++	if (l3->usage == 1) {
++		l3->cmd = _l3->cmd;
++		for (i = 0; i < 4; i++) {
++			l3->srcip[i] = _l3->srcip[i];
++			l3->dstip[i] = _l3->dstip[i];
++		}
++		l3->proto = _l3->proto;
++
++		if (l3->cmd & HW_ATL2_RPF_L3_CMD_EN) {
++			hw_atl2_rpf_l3_v4_cmd_set(self, l3->cmd, idx);
++			hw_atl2_rpf_l3_v4_tag_set(self, idx + 1, idx);
++			hw_atl2_rpf_l3_v4_dest_addr_set(self,
++							idx,
++							l3->dstip[0]);
++			hw_atl2_rpf_l3_v4_src_addr_set(self,
++						       idx,
++						       l3->srcip[0]);
++		} else {
++			hw_atl2_rpf_l3_v6_cmd_set(self, l3->cmd, idx);
++			hw_atl2_rpf_l3_v6_tag_set(self, idx + 1, idx);
++			hw_atl2_rpf_l3_v6_dest_addr_set(self,
++							idx,
++							l3->dstip);
++			hw_atl2_rpf_l3_v6_src_addr_set(self,
++						       idx,
++						       l3->srcip);
++		}
++	}
++}
++
++static void hw_atl2_rxf_l3_put(struct aq_hw_s *self,
++			       struct hw_atl2_l3_filter *l3, int idx)
++{
++	if (l3->usage)
++		l3->usage--;
++
++	if (!l3->usage) {
++		if (l3->cmd & HW_ATL2_RPF_L3_V6_CMD_EN)
++			hw_atl2_rpf_l3_v6_cmd_set(self, 0, idx);
++		else
++			hw_atl2_rpf_l3_v4_cmd_set(self, 0, idx);
++		l3->cmd = 0;
++	}
++}
++
++static bool hw_atl2_rxf_l4_is_equal(struct hw_atl2_l4_filter *f1,
++				    struct hw_atl2_l4_filter *f2)
++{
++	if (f1->cmd != f2->cmd)
++		return false;
++
++	if (f1->cmd & HW_ATL2_RPF_L4_CMD_SP_EN)
++		if (f1->sport != f2->sport)
++			return false;
++
++	if (f1->cmd & HW_ATL2_RPF_L4_CMD_DP_EN)
++		if (f1->dport != f2->dport)
++			return false;
++
++	return true;
++}
++
++static int hw_atl2_new_fl3l4_find_l4(struct aq_hw_s *self,
++				     struct hw_atl2_l4_filter *l4)
++{
++	struct hw_atl2_priv *priv = self->priv;
++	int i, first, last;
++
++	first = priv->l4_filter_base_index;
++	last = priv->l4_filter_base_index + priv->l4_filter_count;
++
++	for (i = first; i < last; i++)
++		if (hw_atl2_rxf_l4_is_equal(&priv->l4_filters[i], l4))
++			return i;
++
++	for (i = first; i < last; i++)
++		if ((priv->l4_filters[i].cmd & HW_ATL2_RPF_L4_CMD_EN) == 0)
++			return i;
++
++	return -ENOSPC;
++}
++
++static void hw_atl2_rxf_l4_put(struct aq_hw_s *self,
++			       struct hw_atl2_l4_filter *l4, int idx)
++{
++	if (l4->usage)
++		l4->usage--;
++
++	if (!l4->usage) {
++		l4->cmd = 0;
++		hw_atl2_rpf_l4_cmd_set(self, l4->cmd, idx);
++	}
++}
++
++static void hw_atl2_rxf_l4_get(struct aq_hw_s *self,
++			       struct hw_atl2_l4_filter *l4, int idx,
++			       const struct hw_atl2_l4_filter *_l4)
++{
++	l4->usage++;
++	if (l4->usage == 1) {
++		l4->cmd = _l4->cmd;
++		l4->sport = _l4->sport;
++		l4->dport = _l4->dport;
++
++		hw_atl2_rpf_l4_cmd_set(self, l4->cmd, idx);
++		hw_atl2_rpf_l4_tag_set(self, idx + 1, idx);
++		hw_atl_rpf_l4_spd_set(self, l4->sport, idx);
++		hw_atl_rpf_l4_dpd_set(self, l4->dport, idx);
++	}
++}
++
++static int hw_atl2_new_fl3l4_configure(struct aq_hw_s *self,
++				       struct aq_rx_filter_l3l4 *data)
++{
++	struct hw_atl2_priv *priv = self->priv;
++	s8 old_l3_index = priv->l3l4_filters[data->location].l3_index;
++	s8 old_l4_index = priv->l3l4_filters[data->location].l4_index;
++	u8 old_ipv6 = priv->l3l4_filters[data->location].ipv6;
++	struct hw_atl2_l3_filter *l3_filters;
++	struct hw_atl2_l3_filter l3;
++	struct hw_atl2_l4_filter l4;
++	s8 l3_idx = -1;
++	s8 l4_idx = -1;
++
++	if (!(data->cmd & HW_ATL_RX_ENABLE_FLTR_L3L4))
++		return 0;
++
++	memset(&l3, 0, sizeof(l3));
++	memset(&l4, 0, sizeof(l4));
++
++	/* convert legacy filter to new */
++	if (data->cmd & HW_ATL_RX_ENABLE_CMP_PROT_L4) {
++		l3.cmd |= data->is_ipv6 ? HW_ATL2_RPF_L3_V6_CMD_PROTO_EN :
++					  HW_ATL2_RPF_L3_CMD_PROTO_EN;
++		l3.cmd |= data->is_ipv6 ? HW_ATL2_RPF_L3_V6_CMD_EN :
++					  HW_ATL2_RPF_L3_CMD_EN;
++		switch (data->cmd & 0x7) {
++		case HW_ATL_RX_TCP:
++			l3.cmd |= IPPROTO_TCP << (data->is_ipv6 ? 0x18 : 8);
++			break;
++		case HW_ATL_RX_UDP:
++			l3.cmd |= IPPROTO_UDP << (data->is_ipv6 ? 0x18 : 8);
++			break;
++		case HW_ATL_RX_SCTP:
++			l3.cmd |= IPPROTO_SCTP << (data->is_ipv6 ? 0x18 : 8);
++			break;
++		case HW_ATL_RX_ICMP:
++			l3.cmd |= IPPROTO_ICMP << (data->is_ipv6 ? 0x18 : 8);
++			break;
++		}
++	}
++
++	if (data->cmd & HW_ATL_RX_ENABLE_CMP_SRC_ADDR_L3) {
++		if (data->is_ipv6) {
++			l3.cmd |= HW_ATL2_RPF_L3_V6_CMD_SA_EN |
++				  HW_ATL2_RPF_L3_V6_CMD_EN;
++			memcpy(l3.srcip, data->ip_src, sizeof(l3.srcip));
++		} else {
++			l3.cmd |= HW_ATL2_RPF_L3_CMD_SA_EN |
++				  HW_ATL2_RPF_L3_CMD_EN;
++			l3.srcip[0] = data->ip_src[0];
++		}
++	}
++	if (data->cmd & HW_ATL_RX_ENABLE_CMP_DEST_ADDR_L3) {
++		if (data->is_ipv6) {
++			l3.cmd |= HW_ATL2_RPF_L3_V6_CMD_DA_EN |
++				  HW_ATL2_RPF_L3_V6_CMD_EN;
++			memcpy(l3.dstip, data->ip_dst, sizeof(l3.dstip));
++		} else {
++			l3.cmd |= HW_ATL2_RPF_L3_CMD_DA_EN |
++				  HW_ATL2_RPF_L3_CMD_EN;
++			l3.dstip[0] = data->ip_dst[0];
++		}
++	}
++
++	if (data->cmd & HW_ATL_RX_ENABLE_CMP_DEST_PORT_L4) {
++		l4.cmd |= HW_ATL2_RPF_L4_CMD_DP_EN | HW_ATL2_RPF_L4_CMD_EN;
++		l4.dport = data->p_dst;
++	}
++	if (data->cmd & HW_ATL_RX_ENABLE_CMP_SRC_PORT_L4) {
++		l4.cmd |= HW_ATL2_RPF_L4_CMD_SP_EN | HW_ATL2_RPF_L4_CMD_EN;
++		l4.sport = data->p_src;
++	}
++
++	/* find L3 and L4 filters */
++	if (l3.cmd & (HW_ATL2_RPF_L3_CMD_EN | HW_ATL2_RPF_L3_V6_CMD_EN)) {
++		l3_idx = hw_atl2_new_fl3l4_find_l3(self, &l3);
++		if (l3_idx < 0)
++			return l3_idx;
++
++		if (l3.cmd & HW_ATL2_RPF_L3_V6_CMD_EN)
++			l3_filters = priv->l3_v6_filters;
++		else
++			l3_filters = priv->l3_v4_filters;
++
++		if (priv->l3l4_filters[data->location].l3_index != l3_idx)
++			hw_atl2_rxf_l3_get(self, &l3_filters[l3_idx],
++					   l3_idx, &l3);
++	}
++
++	if (old_l3_index != -1) {
++		if (old_ipv6)
++			l3_filters = priv->l3_v6_filters;
++		else
++			l3_filters = priv->l3_v4_filters;
++
++		if (!(hw_atl2_rxf_l3_is_equal(&l3,
++					      &l3_filters[old_l3_index]))) {
++			hw_atl2_rxf_l3_put(self,
++					   &l3_filters[old_l3_index],
++					   old_l3_index);
++		}
++	}
++	if (l3.cmd & HW_ATL2_RPF_L3_V6_CMD_EN)
++		priv->l3l4_filters[data->location].ipv6 = 1;
 +	else
-+		priv->vlan_filter_count = 0;
++		priv->l3l4_filters[data->location].ipv6 = 0;
++	priv->l3l4_filters[data->location].l3_index = l3_idx;
 +
-+	priv->l3_v4_filter_base_index = filter_caps.l3_ip4_filter_base_index;
-+	priv->l3_v4_filter_count = min_t(u32, filter_caps.l3_ip4_filter_count,
-+					 HW_ATL2_RPF_L3V4_FILTERS - 1);
-+	priv->l3_v6_filter_base_index = filter_caps.l3_ip6_filter_base_index;
-+	priv->l3_v6_filter_count = filter_caps.l3_ip6_filter_count;
-+	priv->l4_filter_base_index = filter_caps.l4_filter_base_index;
-+	priv->l4_filter_count = min_t(u32, filter_caps.l4_filter_count,
-+				      HW_ATL2_RPF_L4_FILTERS - 1);
++	if (l4.cmd & HW_ATL2_RPF_L4_CMD_EN) {
++		l4_idx = hw_atl2_new_fl3l4_find_l4(self, &l4);
++		if (l4_idx < 0) {
++			/* Undo L3 acquisition */
++			if (l3_idx >= 0) {
++				hw_atl2_rxf_l3_put(self, &l3_filters[l3_idx], l3_idx);
++				priv->l3l4_filters[data->location].l3_index = old_l3_index;
++				priv->l3l4_filters[data->location].ipv6 = old_ipv6;
++			}
++			return -EINVAL;
++		}
++
++		if (priv->l3l4_filters[data->location].l4_index != l4_idx)
++			hw_atl2_rxf_l4_get(self, &priv->l4_filters[l4_idx],
++					   l4_idx, &l4);
++	}
++
++	if (old_l4_index != -1) {
++		if (!(hw_atl2_rxf_l4_is_equal(&priv->l4_filters[old_l4_index],
++					      &l4))) {
++			hw_atl2_rxf_l4_put(self,
++					   &priv->l4_filters[old_l4_index],
++					   old_l4_index);
++		}
++	}
++	priv->l3l4_filters[data->location].l4_index = l4_idx;
 +
 +	return 0;
 +}
 +
- int hw_atl2_utils_get_action_resolve_table_caps(struct aq_hw_s *self,
- 						u8 *base_index, u8 *count)
++static int hw_atl2_hw_fl3l4_set(struct aq_hw_s *self,
++				struct aq_rx_filter_l3l4 *data)
++{
++	struct hw_atl2_priv *priv = self->priv;
++	struct hw_atl2_l3_filter *l3_filters;
++	struct hw_atl2_l3_filter *l3 = NULL;
++	struct hw_atl2_l4_filter *l4 = NULL;
++	u8 location = data->location;
++	u32 req_tag = 0;
++	u16 action = 0;
++	int l3_index;
++	int l4_index;
++	u32 mask = 0;
++	u8 index;
++	u8 ipv6;
++	int res;
++
++	res = hw_atl2_new_fl3l4_configure(self, data);
++	if (res)
++		return res;
++
++	l3_index = priv->l3l4_filters[location].l3_index;
++	l4_index = priv->l3l4_filters[location].l4_index;
++	ipv6 = priv->l3l4_filters[location].ipv6;
++	if (ipv6)
++		l3_filters = priv->l3_v6_filters;
++	else
++		l3_filters = priv->l3_v4_filters;
++
++	if (!(data->cmd & HW_ATL_RX_ENABLE_FLTR_L3L4)) {
++		if (l3_index > -1)
++			hw_atl2_rxf_l3_put(self, &l3_filters[l3_index],
++					   l3_index);
++
++		if (l4_index > -1)
++			hw_atl2_rxf_l4_put(self, &priv->l4_filters[l4_index],
++					   l4_index);
++
++		priv->l3l4_filters[location].l3_index = -1;
++		priv->l3l4_filters[location].l4_index = -1;
++		index = priv->art_base_index + HW_ATL2_RPF_L3L4_USER_INDEX +
++			location;
++		hw_atl2_act_rslvr_table_set(self, index, 0, 0,
++					    HW_ATL2_ACTION_DISABLE);
++
++		return 0;
++	}
++
++	if (l3_index != -1)
++		l3 = &l3_filters[l3_index];
++	if (l4_index != -1)
++		l4 = &priv->l4_filters[l4_index];
++
++	if (l4 && (l4->cmd & HW_ATL2_RPF_L4_CMD_EN)) {
++		req_tag |= (l4_index + 1) << HW_ATL2_RPF_TAG_L4_OFFSET;
++		mask |= HW_ATL2_RPF_TAG_L4_MASK;
++	}
++
++	if (l3) {
++		if (l3->cmd & HW_ATL2_RPF_L3_V6_CMD_EN) {
++			req_tag |= (l3_index + 1) <<
++				   HW_ATL2_RPF_TAG_L3_V6_OFFSET;
++			mask |= HW_ATL2_RPF_TAG_L3_V6_MASK;
++		} else {
++			req_tag |= (l3_index + 1) <<
++				   HW_ATL2_RPF_TAG_L3_V4_OFFSET;
++			mask |= HW_ATL2_RPF_TAG_L3_V4_MASK;
++		}
++	}
++
++	if (data->cmd & (HW_ATL_RX_HOST << HW_ATL2_RPF_L3_L4_ACTF_SHIFT))
++		action = HW_ATL2_ACTION_ASSIGN_QUEUE((data->cmd  &
++						      HW_ATL2_RPF_L3_L4_RXQF_MSK) >>
++						     HW_ATL2_RPF_L3_L4_RXQF_SHIFT);
++	else if (data->cmd)
++		action = HW_ATL2_ACTION_DROP;
++	else
++		action = HW_ATL2_ACTION_DISABLE;
++
++	index = priv->art_base_index + HW_ATL2_RPF_L3L4_USER_INDEX + location;
++	hw_atl2_act_rslvr_table_set(self, index, req_tag, mask, action);
++	return 0;
++}
++
++static int hw_atl2_hw_fl2_set(struct aq_hw_s *self,
++			      struct aq_rx_filter_l2 *data)
++{
++	struct hw_atl2_priv *priv = self->priv;
++	u32 mask = HW_ATL2_RPF_TAG_ET_MASK;
++	u32 req_tag = 0;
++	u16 action = 0;
++	u32 location;
++	u8 index;
++	int tag;
++
++	location = priv->etype_filter_base_index + data->location;
++	hw_atl_rpf_etht_flr_set(self, data->ethertype, location);
++	hw_atl_rpf_etht_user_priority_en_set(self,
++					     !!data->user_priority_en,
++					     location);
++	if (data->user_priority_en) {
++		hw_atl_rpf_etht_user_priority_set(self,
++						  data->user_priority,
++						  location);
++		req_tag |= data->user_priority << HW_ATL2_RPF_TAG_PCP_OFFSET;
++		mask |= HW_ATL2_RPF_TAG_PCP_MASK;
++	}
++
++	if (data->queue < 0) {
++		hw_atl_rpf_etht_flr_act_set(self, 0U, location);
++		hw_atl_rpf_etht_rx_queue_en_set(self, 0U, location);
++		action = HW_ATL2_ACTION_DROP;
++	} else {
++		hw_atl_rpf_etht_flr_act_set(self, 1U, location);
++		hw_atl_rpf_etht_rx_queue_en_set(self, 1U, location);
++		hw_atl_rpf_etht_rx_queue_set(self, data->queue, location);
++		action = HW_ATL2_ACTION_ASSIGN_QUEUE(data->queue);
++	}
++
++	tag = hw_atl2_filter_tag_get(priv->etype_policy,
++				     priv->etype_filter_tag_top,
++				     action);
++
++	if (tag < 0)
++		return -ENOSPC;
++
++	req_tag |= tag << HW_ATL2_RPF_TAG_ET_OFFSET;
++	hw_atl2_rpf_etht_flr_tag_set(self, tag, location);
++	index = priv->art_base_index + HW_ATL2_RPF_ET_PCP_USER_INDEX +
++		data->location;
++	hw_atl2_act_rslvr_table_set(self, index, req_tag, mask, action);
++
++	hw_atl_rpf_etht_flr_en_set(self, 1U, location);
++
++	return aq_hw_err_from_flags(self);
++}
++
++static int hw_atl2_hw_fl2_clear(struct aq_hw_s *self,
++				struct aq_rx_filter_l2 *data)
++{
++	struct hw_atl2_priv *priv = self->priv;
++	u32 location;
++	u8 index;
++	u32 tag;
++
++	location = priv->etype_filter_base_index + data->location;
++	hw_atl_rpf_etht_flr_en_set(self, 0U, location);
++	hw_atl_rpf_etht_flr_set(self, 0U, location);
++	hw_atl_rpf_etht_user_priority_en_set(self, 0U, location);
++
++	index = priv->art_base_index + HW_ATL2_RPF_ET_PCP_USER_INDEX +
++		data->location;
++	hw_atl2_act_rslvr_table_set(self, index, 0, 0,
++				    HW_ATL2_ACTION_DISABLE);
++	tag = hw_atl2_rpf_etht_flr_tag_get(self, location);
++	hw_atl2_filter_tag_put(priv->etype_policy, tag);
++
++	return aq_hw_err_from_flags(self);
++}
++
++/*
++ * Set VLAN filter table
++ * Configure VLAN filter table to accept (and assign the queue) traffic
++ * for the particular vlan ids.
++ * Note: use this function under vlan promisc mode not to lost the traffic
++ *
++ * param - aq_hw_s
++ * param - aq_rx_filter_vlan VLAN filter configuration
++ * return 0 - OK, <0 - error
++ */
+ static int hw_atl2_hw_vlan_set(struct aq_hw_s *self,
+ 			       struct aq_rx_filter_vlan *aq_vlans)
  {
+@@ -825,7 +1394,7 @@ static int hw_atl2_hw_vlan_ctrl(struct aq_hw_s *self, bool enable)
+ const struct aq_hw_ops hw_atl2_ops = {
+ 	.hw_soft_reset        = hw_atl2_utils_soft_reset,
+ 	.hw_prepare           = hw_atl2_utils_initfw,
+-	.hw_set_mac_address   = hw_atl_b0_hw_mac_addr_set,
++	.hw_set_mac_address   = hw_atl2_hw_mac_addr_set,
+ 	.hw_init              = hw_atl2_hw_init,
+ 	.hw_reset             = hw_atl2_hw_reset,
+ 	.hw_start             = hw_atl_b0_hw_start,
+@@ -834,6 +1403,7 @@ const struct aq_hw_ops hw_atl2_ops = {
+ 	.hw_ring_rx_start     = hw_atl_b0_hw_ring_rx_start,
+ 	.hw_ring_rx_stop      = hw_atl_b0_hw_ring_rx_stop,
+ 	.hw_stop              = hw_atl2_hw_stop,
++	.hw_get_version       = hw_atl2_get_hw_version,
+ 
+ 	.hw_ring_tx_xmit         = hw_atl_b0_hw_ring_tx_xmit,
+ 	.hw_ring_tx_head_update  = hw_atl_b0_hw_ring_tx_head_update,
+@@ -848,6 +1418,9 @@ const struct aq_hw_ops hw_atl2_ops = {
+ 	.hw_ring_rx_init             = hw_atl2_hw_ring_rx_init,
+ 	.hw_ring_tx_init             = hw_atl2_hw_ring_tx_init,
+ 	.hw_packet_filter_set        = hw_atl2_hw_packet_filter_set,
++	.hw_filter_l2_set            = hw_atl2_hw_fl2_set,
++	.hw_filter_l2_clear          = hw_atl2_hw_fl2_clear,
++	.hw_filter_l3l4_set          = hw_atl2_hw_fl3l4_set,
+ 	.hw_filter_vlan_set          = hw_atl2_hw_vlan_set,
+ 	.hw_filter_vlan_ctrl         = hw_atl2_hw_vlan_ctrl,
+ 	.hw_multicast_list_set       = hw_atl2_hw_multicast_list_set,
+@@ -855,6 +1428,7 @@ const struct aq_hw_ops hw_atl2_ops = {
+ 	.hw_rss_set                  = hw_atl2_hw_rss_set,
+ 	.hw_rss_hash_set             = hw_atl_b0_hw_rss_hash_set,
+ 	.hw_tc_rate_limit_set        = hw_atl2_hw_init_tx_tc_rate_limit,
++	.hw_get_regs                 = hw_atl2_utils_hw_get_regs,
+ 	.hw_get_hw_stats             = hw_atl2_utils_get_hw_stats,
+ 	.hw_get_fw_version           = hw_atl2_utils_get_fw_version,
+ 	.hw_set_offload              = hw_atl_b0_hw_offload_set,
 -- 
 2.43.0
 
