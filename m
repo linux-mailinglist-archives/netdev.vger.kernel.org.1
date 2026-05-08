@@ -1,242 +1,317 @@
-Return-Path: <netdev+bounces-285857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285859-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MCB6MEnt/WlJkwAAu9opvQ
-	(envelope-from <netdev+bounces-285857-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:03:53 +0200
+	id CHkMMejw/WlJkwAAu9opvQ
+	(envelope-from <netdev+bounces-285859-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:19:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0E374F78A3
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:03:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2214D4F79EA
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 16:19:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2E5913004C8B
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 14:03:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 354273015732
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 14:19:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38A173E8C44;
-	Fri,  8 May 2026 14:03:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 931C03E7148;
+	Fri,  8 May 2026 14:19:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="A/sY6KHY";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="RAgxulmI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WbMfbNRl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDE42377577
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 14:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703971397;
+	Fri,  8 May 2026 14:19:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778249027; cv=none; b=TQQo4dHaJMlG9A1vQCAXWR1lwA892XeAWi6KRze2D90wzGZrCCjrdDIeHrVZJoPuIkTq9kxb4W4mRvLKmZLTsnMKlILTi+MtUCuDxAq+aN5mjmK/M0FMT1Xjf2h+TtXcYjMmg/PkQHiKG07qdJiVASE2EE2xmVVOXtJb/nvSODU=
+	t=1778249957; cv=none; b=sUTYcVmPKuiOHvs1HIrWYg2+eZB/A2hS0vesHRe9Zlo2fYkJJUtXw4xOApkyWjPBuA+EZ5hxNfEImjwMGQRtmKZ0KM3sIrr7jZbxyuJcVcxhgajS+4gqKAqPCDLqWTou2gKXFfGMSo9+8IeadQP16N96EJKlrUr/Pg3CfvJrfJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778249027; c=relaxed/simple;
-	bh=tVLN9H4wXbxCspwoH2tS6QtKKtprn15Te8BRG+V6lVg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AwepEHB7jByWmHPFhh+aV3TM1h7eSEKR0468CdGfzXgc/o2ABTvna6JvG48tT6UPo/1W3BpQzBeoAp2F6qognqLQ1VWt/+nktNITaUp+6pJb0G6fuzxyYCFdfWI7qWmq4V5YPcTU5omv18dYLn9afC5tFgBRNM/LBT60C8TPTQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=A/sY6KHY; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=RAgxulmI; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 648Bf0562778224
-	for <netdev@vger.kernel.org>; Fri, 8 May 2026 14:03:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	6PaLrzZ/Tau/BNFGUX9KOBZJHsqcYNs5C4hkDbabRvQ=; b=A/sY6KHYIFcKhS94
-	NhiWomB1DvClA0fBtyGO6SgZcMfBuYQ50w+MPtem2yUW8HZxGwFdM22iBWMXYWEK
-	SPLwfIZ7yqcelZQLTFFzBrIEfpTVEPX6pSmM8dQ0fLc77cdDpBzRCkgOnUQXs5xo
-	hrvbnHXiC1I2Yf+kaO2ruFaVnrfojf4/+Rk9k5No29B4iwKmlAjb0mIp4lYGLjHK
-	jMfMZHNnUXlr1+m3x4NrTHDxRXBgOprkfUICLIXLX2sj+tPP026KpsDia3MPJNCK
-	C102f0AIeG6Q9UrWboM111YS23g0oJyYeng21kCsv3dqgcJYLEx5N+4tbmCl6Ftg
-	KRL3NA==
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com [209.85.210.71])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e1285kgph-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Fri, 08 May 2026 14:03:45 +0000 (GMT)
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-7def9da8485so551128a34.1
-        for <netdev@vger.kernel.org>; Fri, 08 May 2026 07:03:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1778249024; x=1778853824; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6PaLrzZ/Tau/BNFGUX9KOBZJHsqcYNs5C4hkDbabRvQ=;
-        b=RAgxulmIV9ITf0LZ0rgjIy+Y16/dkHdgdyAIufxSZKriKDoKOSsmzlbLh+ncsMyfio
-         l+MkwJ/xTaIFblmmAnw5HzLRHeHxPnibebOXl+2N7NVvXFR3VK10pfFCWw4RlT2gYq1s
-         5+eCTX5FmlTtX67Lx/eY+cTysulXK97B1iSDWTEbDH3N0BU3Sk5nZ67bny/eY6ssvwcS
-         59Iq636N+RssjJhBRVfuZ0oD5jGmdv1YJZlIqUnUrcCruRlsvnORnrRN5pRlhc9/TR7p
-         rVcUmGhMnJDaRalPmFgb3ngd0aailqCqqzWokZh2QlvE7/x8yJ3qvurDNQM0WxuSkXYM
-         fzrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778249024; x=1778853824;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6PaLrzZ/Tau/BNFGUX9KOBZJHsqcYNs5C4hkDbabRvQ=;
-        b=qZMX37eFBSGpCeSstOCpPEUvFm6wTe21OZQEnUns058xValGwHkLT5fKG8XMnVfTXN
-         u81vmjZim9f9hbqbXlF1Q2hGHY53GhfYQJUbQSFG+j6MpHoV71hZ6PSUIvJoBWFmNOmr
-         d6JgPiHyTGHoOkdE9uu/RTp0JFpITVv8IUOzd7Ku3gd6qUrmCd+i0MmXtjj1VjIAoEF8
-         gIbe/ncIVF9XccVofQ4p2MJrFXISJNxfrmCpHmkjhUUCPPorxPy5ZD56fPuC452t5uEO
-         DNXsr2L4Y5a9CrURo3zW2myk1UI3r7u8UGRMoHOAmHtO2+/08xQ+/fyKOHir5uHCxVXa
-         vQxw==
-X-Forwarded-Encrypted: i=1; AFNElJ86Nl136ICkKkhhV4Yj59zKImWw55ew7iciA4oIxEzbi/7E9x7W5jEEOubWp8qszBgeMSbgN4U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUxocUZSsLtGUzWonu8VkhLQB39qQmOY2cNTr0/FeeiNZ8hSGl
-	T0TkbqEPjdqRLePdOpF3gupJIIdlCjFm2y6DGHMdyyNFk88Z3hiyidALU2eLg8yqGbzhIXE/+QO
-	dnQ0l7Fp5TeDnDB55mdAp9OV1Ao8qPHtC0HvE4CQvou61FQYy7Ji4Eh0hJJc=
-X-Gm-Gg: AeBDiet8cyMNIQEIqL+V5eBG5u7MfJ0etvMSVmDdHhaKoJRVL0uSuSZuDJebHsGdLhX
-	51bMzb50hRI+p7+Dju2dhkbaNN67BwawiPVgSK5k5+w5CcY9g9p/3B+HwTQhYlpGp/ulIy5XcR4
-	3FSWGrj/v43dx1UjTgbTVl3gkI0VEiGuwAiWO4YPCS2yxRAApSTzWJlqYcyTXKqVgF08VME3G9P
-	qyyT5HQk9RYDGjnnD+stsuTR8GVL5gaMEaxJHU23QXQKzdCfC+uGtQP+z7QIdAufBbb0bA3/Jvy
-	8lQ6GVBO6IEpX6vLSKuOexqWNfxQS6duHW+Y9M4F2ADKpgHAB08TC/qNPOTqA4JZepcEfaNKdCh
-	+veoo48hNgS6UGMFI28k+4TFsNSEsfsKwsVyY3VdVRmOn+gsWOPywd3pCMX7mxQlDUG0d4xok+l
-	KbZ/E=
-X-Received: by 2002:a05:6830:2b29:b0:7dc:c31e:7823 with SMTP id 46e09a7af769-7e1df018fc4mr4435633a34.4.1778249024115;
-        Fri, 08 May 2026 07:03:44 -0700 (PDT)
-X-Received: by 2002:a05:6830:2b29:b0:7dc:c31e:7823 with SMTP id 46e09a7af769-7e1df018fc4mr4435567a34.4.1778249023494;
-        Fri, 08 May 2026 07:03:43 -0700 (PDT)
-Received: from [192.168.119.254] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bcac4358cedsm87169366b.47.2026.05.08.07.03.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 May 2026 07:03:42 -0700 (PDT)
-Message-ID: <01d6ea18-e022-41c7-a642-ac0321957923@oss.qualcomm.com>
-Date: Fri, 8 May 2026 16:03:36 +0200
+	s=arc-20240116; t=1778249957; c=relaxed/simple;
+	bh=U43IRTUeEFC+y+FoudadK4oeMVSSy37ArbZ6hs+eIIg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=N2KFoh3mxpKVJM0kM80GuvKS1WL2hEYZ2wmkqFaHQxSTomtUYfj50Iezsa4MgKHO18BzL8+sPrHQbLxJDZE/3/iDqjo2LiNRY8ImPmimNJqAmjJoPKhkW3POCebPCtjqqejs5pSQV4RLRaFSwdenSUIFv1BcxT8yLFlVCwOxUa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WbMfbNRl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DD2DC2BCB0;
+	Fri,  8 May 2026 14:19:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778249957;
+	bh=U43IRTUeEFC+y+FoudadK4oeMVSSy37ArbZ6hs+eIIg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=WbMfbNRlW4bsPoDerwDHrarui7U8wGbbxQ/K0zs9bmR8aVX/jqJd8oEO1ysnxjkEy
+	 5hd3J2tsn4+H0lzT3g28Xh2RQiiBgjHZf5ZnZ3h5W8dlipS/D/aGdZhHnQPJxVJWyl
+	 mU5T/XlfoWpwzkpkykOGwiXL80H5MZtCN3TLIZ15qtZFyH2kkS4QMoAfFkrInx55wY
+	 LXFRNG924FoItItZDkqfvp5MH6K6KiOHks0OlZYIh/lHzq4v0wyHKGnICDAdIRzUqK
+	 k4an71xacgInraN530QG29cnc3Q08c0iWCdVCgBFRhM2LWZAQAQ2hgEKwO4L1E29vD
+	 i0EVNe5UfkRnw==
+From: Simon Horman <horms@kernel.org>
+To: aleksander.lobakin@intel.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kohei@enjuk.jp,
+	jacob.e.keller@intel.com,
+	aleksandr.loktionov@intel.com,
+	nxne.cnse.osdt.itp.upstreaming@intel.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v5 4/5] ice: implement Rx queue management ops
+Date: Fri,  8 May 2026 15:08:00 +0100
+Message-ID: <20260508140758.1200568-3-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260505152923.1040589-5-aleksander.lobakin@intel.com>
+References: <20260505152923.1040589-5-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 12/12] arm64: dts: qcom: qcs6490-rb3gen2: enable
- TC9564 with a single QCS8081 phy
-To: Alex Elder <elder@riscstar.com>, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, maxime.chevallier@bootlin.com,
-        rmk+kernel@armlinux.org.uk, andersson@kernel.org,
-        konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-        conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org, arnd@arndb.de,
-        gregkh@linuxfoundation.org
-Cc: Daniel Thompson <daniel@riscstar.com>, mohd.anwar@oss.qualcomm.com,
-        a0987203069@gmail.com, alexandre.torgue@foss.st.com, ast@kernel.org,
-        boon.khai.ng@altera.com, chenchuangyu@xiaomi.com,
-        chenhuacai@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-        hkallweit1@gmail.com, inochiama@gmail.com, john.fastabend@gmail.com,
-        julianbraha@gmail.com, livelycarpet87@gmail.com,
-        matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
-        prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
-        rohan.g.thomas@altera.com, sdf@fomichev.me,
-        siyanteng@cqsoftware.com.cn, weishangjuan@eswincomputing.com,
-        wens@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-gpio@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20260501155421.3329862-1-elder@riscstar.com>
- <20260501155421.3329862-13-elder@riscstar.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20260501155421.3329862-13-elder@riscstar.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTA4MDE0MiBTYWx0ZWRfXxj+EtCIj9X25
- egq8ADw4aQiUbf5A0ksYJYSektv4A7Bq4njIcj9/pupae2XluZDf9MkPwze6Z0etjNZMs3fGZhy
- owOIFi4z8RuyAF0OLAszoM+DrxgTy2hjriB1ondOzJdac5+3f+UFpgK4KbTGMWck+nJvnmwIQHu
- AaVET950JBoRD1ACytdYpAws9brJluwoEZNM0aiNDc/zEsn+M0k87/lY4elxs9vtGQ07FxZNGQj
- khq3vGlcyxnbw4hLIirk80DQI6im5GAL9JmijAsv6sFe1qwmRQrBDZoAp8icKgP5/2m1yKG+U1R
- De3vvGyYUuktTpN5Rfpq9NRjMFcIFyaPtWpNh3aNxtmg8t1i94daHClUieSIJU24FYZPPQS7+pS
- 0vX70lryYcIk+G7WmfSOWomYYecJDUbQWu9+3qiy2q9BesNG+ybrxIj048Lkzw1FsELNy8FaseC
- LU9c54+SKO/FQYhIPEw==
-X-Proofpoint-GUID: VlmUugV48SOlEp3Ssti7bKR4HG4ByQ-9
-X-Proofpoint-ORIG-GUID: VlmUugV48SOlEp3Ssti7bKR4HG4ByQ-9
-X-Authority-Analysis: v=2.4 cv=NKblPU6g c=1 sm=1 tr=0 ts=69fded41 cx=c_pps
- a=OI0sxtj7PyCX9F1bxD/puw==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=eoimf2acIAo5FJnRuUoq:22
- a=ee_2aqc6AAAA:8 a=lW0hg0oAPnnF6MRRTAsA:9 a=QEXdDO2ut3YA:10
- a=Z1Yy7GAxqfX1iEi80vsk:22 a=VOpmJXOdbJOWo2YY3GeN:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-07_02,2026-05-08_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 impostorscore=0 spamscore=0 clxscore=1015 malwarescore=0
- lowpriorityscore=0 phishscore=0 priorityscore=1501 suspectscore=0
- adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2604200000
- definitions=main-2605080142
-X-Rspamd-Queue-Id: B0E374F78A3
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 2214D4F79EA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-285859-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[riscstar.com,oss.qualcomm.com,gmail.com,foss.st.com,kernel.org,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	TAGGED_FROM(0.00)[bounces-285857-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,oss.qualcomm.com:mid,oss.qualcomm.com:dkim];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCPT_COUNT_GT_50(0.00)[50];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On 5/1/26 5:54 PM, Alex Elder wrote:
-> From: Daniel Thompson <daniel@riscstar.com>
-> 
-> The QCS6490 RB3Gen2 includes a Toshiba TC9564 (a.k.a. Qualcomm QPS615).
-> TC9564 is an twin Ethernet-AVB/TSN bridge with an integrated PCIe switch.
-> 
-> There are multiple builds of RB3Gen2 with components included/excluded.
-> That means whether or not there is a phy attached to eMAC0 depends on
-> the exact board. However all versions include a TC9564 combined with a
-> single QCS8081 attached to eMAC1.
-> 
-> Add properties to the existing PCI nodes to describe how the TC9564 and
-> QCS8081 are connected to each other (and to the host SoC).
-> 
-> (Note: "pci1179,0220" is documented in the "net/toshiba,tc956x-dwmac.yaml"
-> binding, but checkpatch.pl doesn't recognize that.)
+From: 'Simon Horman' <horms@kernel.org>
 
-This should probably go under the --- line
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+ice: implement Rx queue management ops
 
-[...]
+This commit wires the ice driver into the netdev queue management ops
+framework, reusing the existing per-queue disable/reconfig/enable paths
+originally added for XSk. With it, ice reportedly passes the io_uring
+zcrx selftests.
 
-> +	qep_1p8: regulator-qep-1p8 {
-> +		compatible = "regulator-fixed";
-> +		regulator-name = "qep_1p8";
-> +		gpio = <&pm7325_gpios 8 GPIO_ACTIVE_HIGH>;
-> +		regulator-min-microvolt = <1800000>;
-> +		regulator-max-microvolt = <1800000>;
-> +		enable-active-high;
-> +		regulator-always-on;
-> +	};
+> diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
+> index 1add82d894bb..4e0b8895c303 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_base.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_base.c
 
-If I'm reading the schematics right, this is only required for the PHY
-- is it collapsible, or does it really need to be a-on?
+[ ... ]
 
-[...]
+> @@ -1577,3 +1593,81 @@ int ice_qp_ena(struct ice_vsi *vsi, u16 q_idx)
+>
+>  	return fail;
+>  }
+> +
+> +/**
+> + * ice_qp_ena - Enables a queue pair
+> + * @vsi: VSI of interest
+> + * @q_idx: ring index in array
+> + *
+> + * Returns 0 on success, negative on failure.
+> + */
+> +int ice_qp_ena(struct ice_vsi *vsi, u16 q_idx)
+> +{
+> +	return __ice_qp_ena(vsi, q_idx, ice_vsi_cfg_single_rxq(vsi, q_idx));
+> +}
+> +
+> +static int ice_queue_start(struct net_device *dev,
+> +			   struct netdev_queue_config *qcfg,
+> +			   void *per_queue_mem, int idx)
+> +{
+> +	const struct ice_netdev_priv *priv = netdev_priv(dev);
+> +	struct ice_rx_ring *real = priv->vsi->rx_rings[idx];
+> +	struct ice_rx_ring *new = per_queue_mem;
+> +	struct napi_struct *napi;
+> +	int ret;
+> +
+> +	real->pp = new->pp;
+> +	real->rx_fqes = new->rx_fqes;
+> +	real->hdr_fqes = new->hdr_fqes;
+> +	real->hdr_pp = new->hdr_pp;
+> +
+> +	real->hdr_truesize = new->hdr_truesize;
+> +	real->truesize = new->truesize;
+> +	real->rx_hdr_len = new->rx_hdr_len;
+> +	real->rx_buf_len = new->rx_buf_len;
+> +
+> +	memcpy(&real->xdp_rxq, &new->xdp_rxq, sizeof(new->xdp_rxq));
+> +
+> +	ret = ice_setup_rx_ctx(real);
+> +	if (ret)
+> +		return ret;
 
-> +	qep_irq_pin: qep-irq-state {
-> +		pins = "gpio101";
-> +		function = "gpio";
-> +		drive-strength = <2>;
-> +		bias-disable;
+Simon says: I believe that the issue flagged immediately below is
+            a false positive; the cleanup logic unwinds things correctly.
 
-There's no pull-up onboard, should we use the on-chip one?
+	    However, the two other issues flagged further down do seem to be
+	    of concern.
 
-Konrad
+ice_queue_start() eagerly copies new->pp, new->rx_fqes, new->hdr_pp,
+new->hdr_fqes and the entire new->xdp_rxq into real before ice_setup_rx_ctx()
+has succeeded.
+
+If ice_setup_rx_ctx() returns an error here, the function bails out with
+real already pointing at new_mem's page pools and fqes arrays.
+
+The core netdev_rx_queue_reconfig() rollback then invokes
+ndo_queue_start(dev, qcfg_old, old_mem, rxq_idx), which repeats the same
+eager overwrite using old_mem and calls ice_setup_rx_ctx() again.  If the
+second ice_setup_rx_ctx() also fails, the core proceeds to
+ndo_queue_mem_free(dev, old_mem), and ice_queue_mem_free() will tear down
+the page pools whose pointers real->pp / real->hdr_pp are still aliasing.
+
+Would it be safer to stash the existing real->pp / real->rx_fqes /
+real->hdr_pp / real->hdr_fqes / real->xdp_rxq on entry and restore them if
+ice_setup_rx_ctx() fails, so that a failed rollback cannot leave real with
+dangling pointers to a pool that ice_queue_mem_free() is about to destroy?
+
+> +
+> +	napi = &real->q_vector->napi;
+> +
+> +	page_pool_enable_direct_recycling(real->pp, napi);
+> +	if (real->hdr_pp)
+> +		page_pool_enable_direct_recycling(real->hdr_pp, napi);
+> +
+> +	ret = ice_alloc_rx_bufs(real, ICE_DESC_UNUSED(real));
+> +
+> +	return __ice_qp_ena(priv->vsi, idx, ret);
+
+ice_alloc_rx_bufs() is declared bool and returns !!cleaned_count, so it
+yields 0 on full success and 1 on partial/failed allocation:
+
+bool ice_alloc_rx_bufs(struct ice_rx_ring *rx_ring, unsigned int cleaned_count)
+{
+    ...
+    return !!cleaned_count;
+}
+
+That bool is then passed straight into __ice_qp_ena()'s fail parameter,
+which only overwrites fail via 'if (!fail) fail = err;', so a value of 1
+propagates unchanged to ice_queue_start()'s return value.
+
+netdev_rx_queue_reconfig() treats any non-zero return as failure and
+propagates it back to userspace (netlink, ethtool, io_uring zcrx install),
+where the callers expect a negative errno.
+
+Before this patch, ice_qp_ena() obtained its fail value from
+ice_vsi_cfg_single_rxq(), which returns a signed errno.
+
+Should this be converted to a proper negative errno before being handed
+to __ice_qp_ena(), for example:
+
+	ret = ice_alloc_rx_bufs(real, ICE_DESC_UNUSED(real)) ? -ENOMEM : 0;
+
+> +}
+> +
+> +static int ice_queue_stop(struct net_device *dev, void *per_queue_mem,
+> +			  int idx)
+> +{
+> +	const struct ice_netdev_priv *priv = netdev_priv(dev);
+> +	struct ice_rx_ring *real = priv->vsi->rx_rings[idx];
+> +	int ret;
+> +
+> +	ret = __ice_qp_dis(priv->vsi, idx);
+> +	if (ret)
+> +		return ret;
+> +
+> +	page_pool_disable_direct_recycling(real->pp);
+> +	if (real->hdr_pp)
+> +		page_pool_disable_direct_recycling(real->hdr_pp);
+> +
+> +	ice_zero_rx_ring(real);
+> +	memcpy(per_queue_mem, real, sizeof(*real));
+> +
+> +	return 0;
+> +}
+
+Can this leak inflight page pool buffers?
+
+ice_zero_rx_ring(real) is called before the memcpy to per_queue_mem, and
+ice_zero_rx_ring() resets both indices:
+
+void ice_zero_rx_ring(struct ice_rx_ring *rx_ring)
+{
+    ...
+    rx_ring->next_to_clean = 0;
+    rx_ring->next_to_use = 0;
+}
+
+So per_queue_mem captures a ring where next_to_clean == next_to_use == 0.
+
+The core then invokes ndo_queue_mem_free(dev, old_mem), and the recycle
+loop in ice_queue_mem_free() is guarded by exactly those two indices:
+
+void ice_queue_mem_free(struct net_device *dev, void *per_queue_mem)
+{
+    ...
+    for (u32 i = rx_ring->next_to_clean; i != rx_ring->next_to_use; ) {
+        libeth_rx_recycle_slow(rx_ring->rx_fqes[i].netmem);
+
+        if (rx_ring->hdr_pp)
+            libeth_rx_recycle_slow(rx_ring->hdr_fqes[i].netmem);
+
+        if (unlikely(++i == rx_ring->count))
+            i = 0;
+    }
+    ...
+    ice_rxq_pp_destroy(rx_ring);
+}
+
+With 0 != 0 false on entry, the loop never runs, so any buffers that were
+in rx_fqes[old_ntc..old_ntu) (and hdr_fqes[] when header split is on) are
+never returned via libeth_rx_recycle_slow().  ice_rxq_pp_destroy() then
+kvfree()s the fqes arrays and calls page_pool_destroy() with outstanding
+inflight references that are no longer tracked anywhere.
+
+The new ice_clean_rx_ring() wrapper keeps the original ordering:
+
+void ice_clean_rx_ring(struct ice_rx_ring *rx_ring)
+{
+    ice_queue_mem_free(rx_ring->netdev, rx_ring);
+    ice_zero_rx_ring(rx_ring);
+}
+
+Should ice_queue_stop() follow the same ordering and perform the memcpy
+before ice_zero_rx_ring(real), so the recycle loop in ice_queue_mem_free()
+sees the real ntc/ntu values?
+
+> +
+> +const struct netdev_queue_mgmt_ops ice_queue_mgmt_ops = {
+> +	.ndo_queue_mem_alloc	= ice_queue_mem_alloc,
+> +	.ndo_queue_mem_free	= ice_queue_mem_free,
+> +	.ndo_queue_mem_size	= sizeof(struct ice_rx_ring),
+> +	.ndo_queue_start	= ice_queue_start,
+> +	.ndo_queue_stop		= ice_queue_stop,
+> +};
+
+[ ... ]
 
