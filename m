@@ -1,117 +1,166 @@
-Return-Path: <netdev+bounces-286036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286037-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uPkrDsdp/mmIqQAAu9opvQ
-	(envelope-from <netdev+bounces-286036-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 00:55:03 +0200
+	id yO2tGfNp/mmIqQAAu9opvQ
+	(envelope-from <netdev+bounces-286037-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 00:55:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8BED4FC858
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 00:55:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA8C24FC87C
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 00:55:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BAFBC300E3B8
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 22:54:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9A8493034662
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 22:55:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4402C39D6DB;
-	Fri,  8 May 2026 22:54:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99A86390230;
+	Fri,  8 May 2026 22:55:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kgv6Q6Zx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WYb9LAMf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D370D3A4F51
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 22:54:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F3B33D515
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 22:55:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778280854; cv=none; b=bWYQug0SNNnc93UgDrjT+8K5YunOohdYWBQL6j17WNLN1cZy4VTx64cGpP81kNsbFxBEcHAYWZ5cv3LhdNAe/WRZpnsh9tFrCWl1yFxrMW02NemAwA09zR/B2/lSn85reRwE5ID7nfOoJB/lfVKUouAKmjlcmelOlesmCch1EHU=
+	t=1778280910; cv=none; b=TKCabuE7YnbYch+SchIr3zpOUAy9TYU2YKoVj67Rkor2o9vvi58egUn7XJ/cljxf9gJJK0INbTIoeSAHdcfc6Ml4dqE04vsDrhRBg58LBYpEFfBWJ0F4sqw7iYBJVIsBYJ74uN3oBlXHEuwwGjWi7LsNOgmHGZo3aTyN10B+TYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778280854; c=relaxed/simple;
-	bh=XJib6TBxDNIaKnuOW16rvYV0JwpYsbFVywMLOhoZMYw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SCAdHKKI1KhQ5tqzJYPY4u4PEgpLcHGr+Gk3j4MT9WQ6q+KJ6x1EKgW2ZeuZRi+wbfAazvsRuU9Rvse4wyyt7pLkVdhUoReMiu5mYa6jnTi8yQPytOAH0ABNq615LNdScrIDaaBlanrmoHlzqb1ghpKibVEmnqpw2YLvgcUqMac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kgv6Q6Zx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2E82C2BCB0;
-	Fri,  8 May 2026 22:54:13 +0000 (UTC)
+	s=arc-20240116; t=1778280910; c=relaxed/simple;
+	bh=1zWI+LqID15NmPEIovlhBcmvzLkD+SE1qFthydKUNH4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=cD1IIlkWGLDhMuh8DPCtNJH76+Ji/dytYTkFEDkeoP9nGosOxl9yK+I+40Sd7EwTVl45RVPKKQrhst7ED/M9nXhfSIHCQ6k1m9wl61mfuaieCfjoUQI16/aZ4qwtLNVhslyPF7p0mV163gH6N1gW1vRu8uGGNXB99236k4o5Wt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WYb9LAMf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9DE0C2BCB0;
+	Fri,  8 May 2026 22:55:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778280854;
-	bh=XJib6TBxDNIaKnuOW16rvYV0JwpYsbFVywMLOhoZMYw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kgv6Q6ZxJ8qhWdl266dw6OuPg/h+QKsAEor4v3/iHgnhDpU9ltjS9GIf55fO+uCti
-	 DoEKQ2sTsJDPWRkz2GIGSxCA+9hto/AIslrBbf536F5jAtu/8y+RFv9eu7NAcC1HLA
-	 /2IdzD+QtQVa5G/h97TJjqcITQBGKttWoWEu7d66vqm60ZlccVIxiWDo3X2GQCPCQe
-	 n2V5+QWRKGZTfqFsCuPa2HvCdk6LMQS64Zm9zIuKyAsstP9Elbbu3FRy+Fta8xV3qq
-	 9NcpQclHt9NKH/WvIEyHUKTAjrUa+jbPTyyfqzk95yB+CwjD08GtdCTaayw8w8J1mZ
-	 Z5W8a/52g4YxQ==
-Date: Fri, 8 May 2026 15:54:12 -0700
+	s=k20201202; t=1778280910;
+	bh=1zWI+LqID15NmPEIovlhBcmvzLkD+SE1qFthydKUNH4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=WYb9LAMflyJ/KvuoVS8tZ714RKy1+ryJUplyRqm9VIabaczprcyd+pAPE+Vuhfr7j
+	 YRY9rUYkST7IAhCHtU5W8Xk1LRv02/8H9zW+ZcKvP5ta8h/UcgxngIBrpNrbu4wUI/
+	 LwArjqTokc+tIJy11A1TXOHYbq+IKqmx98EUiNmC3gqk/iAUcZolsYFUbuuHAgeaOP
+	 cVhuZsceCxrsXl1lfO6CXdrB8pTc0I5Kw0wxCbyQQRoqMYwLdVO/l1RpWBhulxLpag
+	 wiLH0CZKaio2WaZ+ZSmfxLxM0H8iV9enp6kEct6nHF2Qryt2XHVBnoLugHrWNBMPc6
+	 VL8C72oj22nRQ==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Joyner <eric.joyner@amd.com>
-Cc: <netdev@vger.kernel.org>, Brett Creeley <brett.creeley@amd.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2 2/5] ionic: Get "link_down_count" ext link
- stat from firmware
-Message-ID: <20260508155412.57b28bc9@kernel.org>
-In-Reply-To: <20260506043526.64301-3-eric.joyner@amd.com>
-References: <20260506043526.64301-1-eric.joyner@amd.com>
-	<20260506043526.64301-3-eric.joyner@amd.com>
+To: eric.joyner@amd.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	brett.creeley@amd.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com
+Subject: Re: [PATCH net-next v2 1/5] ionic: Small improvements in devcmd retry logic
+Date: Fri,  8 May 2026 15:55:08 -0700
+Message-ID: <20260508225508.3420208-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260506043526.64301-2-eric.joyner@amd.com>
+References: <20260506043526.64301-2-eric.joyner@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: A8BED4FC858
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: BA8C24FC87C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286036-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286037-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Tue, 5 May 2026 21:35:22 -0700 Eric Joyner wrote:
-> The number of times that link has gone down at the port level is tracked
-> by the firmware and sent to the driver via regular DMA writes to an
-> instance of struct ionic_port_status in the driver's memory.
-> 
-> This statistic was never reported in favor of a driver-derived stat, but
-> doing it in the driver was never necessary since firmware had been
-> reporting it the whole time. Since it would be more accurate and true to
-> the description of the statistic to get this count at the PHY level,
-> replace the driver-calculated statistic with the firmware one and remove
-> the driver-calculated one entirely.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+---
+ionic: Small improvements in devcmd retry logic
 
-missing le16_to_cpu() ?
+This commit aims to preserve the -EAGAIN error code when a device command
+times out on its final retry. It also reduces the sleep time between retries
+from 1000ms to 50ms to allow more attempts before timing out.
 
-drivers/net/ethernet/pensando/ionic/ionic_ethtool.c:120:41: warning: incorrect type in assignment (different base types)
-drivers/net/ethernet/pensando/ionic/ionic_ethtool.c:120:41:    expected unsigned long long [usertype] link_down_events
-drivers/net/ethernet/pensando/ionic/ionic_ethtool.c:120:41:    got restricted __le16 [usertype] link_down_count
+> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_main.c b/drivers/net/ethernet/pensando/ionic/ionic_main.c
+> index 3c5200e2fdb7d..92f2ec0bd5af9 100644
+> --- a/drivers/net/ethernet/pensando/ionic/ionic_main.c
+> +++ b/drivers/net/ethernet/pensando/ionic/ionic_main.c
+> @@ -554,6 +554,11 @@ static int __ionic_dev_cmd_wait(struct ionic *ionic, unsigned long max_seconds,
+>  
+>  	if (!done && !time_before(jiffies, max_wait)) {
+>  		ionic_dev_cmd_clean(ionic);
+> +
+> +		/* allow caller to manage EAGAIN from previous attempt */
+> +		if (err == IONIC_RC_EAGAIN)
+> +			return -EAGAIN;
 
+Could err be uninitialized here?
+
+Looking at __ionic_dev_cmd_wait(), err is declared at the start of the
+function but is not assigned until later via ionic_dev_cmd_status(). If the
+initial wait loop times out on the very first attempt (for example, if the
+firmware is unresponsive or the system stalls), execution falls through to
+this block. Checking err here would read an uninitialized stack variable,
+potentially leading to unpredictable driver initialization behavior.
+
+> +
+>  		dev_warn(ionic->dev, "DEVCMD %s (%d) timeout after %ld secs\n",
+>  			 ionic_opcode_to_str(opcode), opcode, max_seconds);
+>  		return -ETIMEDOUT;
+
+[ ... ]
+
+> @@ -568,7 +573,7 @@ static int __ionic_dev_cmd_wait(struct ionic *ionic, unsigned long max_seconds,
+>  				ionic_error_to_str(err), err);
+>  
+>  			iowrite32(0, &idev->dev_cmd_regs->done);
+> -			msleep(1000);
+> +			msleep(50);
+
+Does this logic abandon retries prematurely?
+
+The surrounding retry condition still requires at least one full second of
+remaining time:
+
+    if (err == IONIC_RC_EAGAIN &&
+        time_before(jiffies, (max_wait - HZ))) {
+
+The - HZ check was likely originally added to ensure there was enough time
+left for the 1000ms sleep. Now that the sleep is reduced to 50ms, requiring
+a full second of remaining time means the driver will abort retries during
+the final second of the timeout. If max_seconds is small, it may not retry
+at all, which seems to contradict the intent of increasing the number of
+retries.
+
+>  			iowrite32(1, &idev->dev_cmd_regs->doorbell);
+>  			goto try_again;
+>  		}
+-- 
+pw-bot: cr
 
