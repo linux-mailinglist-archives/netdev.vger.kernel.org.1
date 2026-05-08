@@ -1,255 +1,256 @@
-Return-Path: <netdev+bounces-285854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285855-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uJAgMsHo/WkPkgAAu9opvQ
-	(envelope-from <netdev+bounces-285854-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:44:33 +0200
+	id 6HWBETPq/WkPkgAAu9opvQ
+	(envelope-from <netdev+bounces-285855-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:50:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71C2F4F7457
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:44:32 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43B374F75C9
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:50:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1433B301DE7E
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 13:44:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CF092300F62E
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 13:50:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287D93ECBF1;
-	Fri,  8 May 2026 13:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C335D3502A9;
+	Fri,  8 May 2026 13:50:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UFYN6zP9"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="SMhzCgJk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013023.outbound.protection.outlook.com [52.101.83.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDF73E6398
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 13:43:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778247821; cv=none; b=TfFPjEx1oa//fAN5+l70QApvYp4PnWRLyUxQ8BX/RE4oPl2XIpsIdRGWISRseiFhbSQ35FKNHY840uQ/8XuFs6vLNcKRTeCTe0a1DoPW/EqkeNkwr5F8rQU/qzt5Nfo8IefteTpfcHs1zJK96kxtpca6g+SfO9MLxCwXz9eGXa0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778247821; c=relaxed/simple;
-	bh=QbDAcqmCs39fePaBHuY30LnIJo4+WAkx22s1UP1/KKI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Mg5sqgnHbiGLhLmXVCZqr8jArAmr7BN1nfMemH7XIV8/ljWU5tS9FXO6EvfoG+zztBd3S1tSh8yvhsawf00ZqlXXNTbrp6CjKk5O1TB1wLUF+Gk9dDwlx+40ZtFfVGNWBLRwp8sQEgZ1H1RdSLT6HGPIxHlFFEj9RUrhDrNK5G8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UFYN6zP9; arc=none smtp.client-ip=209.85.160.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-42fe552aedeso714487fac.0
-        for <netdev@vger.kernel.org>; Fri, 08 May 2026 06:43:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778247818; x=1778852618; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G++PmIEZH/3IDDChHFNdq5UZKsic2mGL2G/u53vWWPc=;
-        b=UFYN6zP9IjzK2OCGFAdUrGI6JQR6HbBcfL1bCmwk6c1sMVx/K4Yp/MdFeqoXr1fxmz
-         hytjyq8u8q9TcvTpC4qwJWeOFGgmflng5MPM9PhmDeDZZBSI1naZHm6Hg2HBUv0GH0CK
-         ypbHaKx1qfbQSaoocxnnwzZ2SIDxeULxKchpPwPISPp9rvHB4Npq8rcNzHglFZHVNw9m
-         YdKUx0oc4F8TTMo4Wf5E8nIAMjqrHQRxP/3myxwtSLnFx3eVtNbg3JX+n0kWUcpry1Ni
-         8pQ9U2ZaJrUgL42YhzlNNoY5A+/0Ht4i+W21/MUOw1PXLPlbeSaBJ+Qa8lMwEQ2+gRr6
-         vl4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778247818; x=1778852618;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=G++PmIEZH/3IDDChHFNdq5UZKsic2mGL2G/u53vWWPc=;
-        b=aL/+4coZGeHckmvN5hQxAt/uc70WqdSjwNQyoEJ8QWjqgaerLE3j3lMeGXCKT+3mLS
-         /UFij30Pd5fxVF6+IjGGJKxVEsm0XSTw9nE8jwx+WQtq/J+yJQVo02h3JWzzPon8Z41g
-         3PTzEIEuL1kUVkS/+Ttju5PWrg4aYsXdUzxPF/W+2AJ7SVMPSopO0ChWE/oR6Wy9Zqny
-         oGlCDb+3OPpERbJa4IOGHxYkQ5YPE2LyCjo7cRuEoPEz0XT4uN/KfDKCwrdof9K9uZbf
-         +NEd86YgyLzj2DutZbd79Lhu4ndp+kHGG8vfEG406awZOwNQueO0n955OmLeHWlfVatr
-         ElSA==
-X-Gm-Message-State: AOJu0YzIHTD8N77y7nlstZbNJNhtdZvUCsYTJKwq3qBbgR7/qIaO+prD
-	Jm9Y27CUXHFIitpo7mgj5U1PGGLK1rzaxXoFMT5hTLH38YlinzVK6KjhZ3FLJoL3R9I=
-X-Gm-Gg: AeBDiev2sOuq2df37WhaJ4xspHVmvMPRQwXunrsFuTTQ2W8Sn8BZyGdPmi05vSRF9I/
-	0svRrKTc0xLTGaNv3GxGq8RCRqQttRF7AwASe2C6+A0ut8M4yNLaO7cBTSvxvrMtAT34uD6YLaN
-	Y69eA3Sv6U3FLutMkmFgauDuSLG/V13TKoTUC+uoO7dH1uwDf0r37KXmeFrChKQGVBE9Gmv0wPx
-	rxjsuBAJrV2pg98X8qt4Fc3TQvzxIOhwz60f3edJRtAfRX7aqO/jGaHTvkuD13FDmsl5EmeE6ms
-	cFhErtIt2CUZQ5nPd+rT0vl/4/hxyZJDcC5S/Knt8a29Q8+2nrEiLF2qHt8GL45dRCbUKHQg8IX
-	1rT5SUhfuMl9V+a6NlxCoUAhJsoTAhiJWDfjnOibccynDi+t8VjUklYic5gM5wiraxiZxuoN2tq
-	MoN4x50by43T1W/G8=
-X-Received: by 2002:a05:6820:61e:b0:67b:bd89:90ed with SMTP id 006d021491bc7-69998d30169mr7387370eaf.41.1778247818205;
-        Fri, 08 May 2026 06:43:38 -0700 (PDT)
-Received: from houminxi ([72.244.37.221])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69b25c76cc4sm1119108eaf.6.2026.05.08.06.43.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 06:43:37 -0700 (PDT)
-From: Minxi Hou <houminxi@gmail.com>
-To: netdev@vger.kernel.org
-Cc: aconole@redhat.com,
-	echaudro@redhat.com,
-	i.maximets@ovn.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org,
-	dev@openvswitch.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Minxi Hou <houminxi@gmail.com>
-Subject: [PATCH net-next v8 2/2] selftests: openvswitch: add pop_vlan test
-Date: Fri,  8 May 2026 21:43:08 +0800
-Message-ID: <20260508134308.2857449-3-houminxi@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260508134308.2857449-1-houminxi@gmail.com>
-References: <20260508134308.2857449-1-houminxi@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F74B288AD;
+	Fri,  8 May 2026 13:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.23
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778248213; cv=fail; b=HzXK4hs87meOpUw42nET35+OGHZn3r3Hie6Vt5CwEnbNKLSxcGH37JAQ6E7h27unb57MrzOdT0/Q6x23cUQiW/rgYlXqEJWmUnSvKCQGoBI6r3QWoPtpd0qmqIt+PWQu6lxO5Zkxqzy3mWTGssBV2N2v7n3E7LF+CoMAcWRZs78=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778248213; c=relaxed/simple;
+	bh=cZHe/bbIaSukV8YYdR9VTSpQG2hNM7U5AIVl/5pjj7k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Z/70LqiSaK64jp1Zw6X4UcTjxCP9ZRk2EzeZ1f/8Roi5V2rmVpZ0UQ+TmtRKDBclIM78AqfYNyi0ZRW/PphqnGG141Biue6mCDp23HcBYp96p+B5Uouu7bM30UgeOiDbiwqXXTVekkUbfnXTVSFDNFrn7yFgUJjyVWOKqNSkUHg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=SMhzCgJk; arc=fail smtp.client-ip=52.101.83.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bPgYpxWkiFQ+6YSzV/VBbIti0hR0f5uHdyoif2BBvDiLuMan5uj4bjtoGX7X+GOimDujRqpZDJ/gEJs6lWKfMxCEsCNP9ICO3mhBVru8NCWfS4a4Vdx7/yDIni6+a2RhKEekGWl7FO0Q/dW6c2b9aNoH4LXSf25orvNSTbHOi8A5s+YCHi69p7JkWQ0/Vt0zKMkZ5MiBuSaEscDwnKDnUqFSNsvwgt93mi0PmT/7pu0Fa1pedLjbxnIBAy/P9Hm/TtmFfcnaC61ZgJZXz22/c9CQG8CwhT/ViFI2/p6esmVPQwGh0eFz6M1CETar5D4RsrKMC/TJsQzQ1D9KNlKyHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YKyb8oc22Lc4x7qV/EtudqcEZ025DMh44mPZpjSNn1c=;
+ b=gMU5AYs5GQ2qZb7pttYyAsG0LasNDGlXgf6Z26pkcQeZqX9GrQElM18vZEWKFEdTmD2Nd94Ho8jkuI0GfZi6bQdsro2iGmuqHgv/dnzCse8EFrvTiamgk0qBzmwRNrL394PJ8hWkYEN9s38eSLJ/wo3KdbYBOJZH5Eojm1CzGdhFsQpFLy13vNGazo4/L0wwuIfTuWwJAZJUndcSFlOfhJr39i+z4dLnMgPHIlSX/zzWID0DVTBi/wUB7fq05GsIhFHDRiCbL3pJgcLDVJfvW1LTaS3Gg5r3vwKHh5VCqqJklPD5SH/1nM2W0zyd4FZFp7KqSFPyW63UksqFSHB59A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YKyb8oc22Lc4x7qV/EtudqcEZ025DMh44mPZpjSNn1c=;
+ b=SMhzCgJkvyR3K4+/xuMFDiQ/ogJ0KbuZaNfe9gUkiEpp0WPlD7xHHncCwuOOrHyLM2fiz3SWOpXuwLkQd2+BXHB4CDo8in9zIRH8WPstPaJU8kyrszgmv6gmwqTBBiYO7C4Ux/oO1C5SAOVCijfKSfMij/g4uIs+6ZIj5iZ9N48xzbGX5CCsYkMLVHR+LcrDLj0KqBr6DWv1TfB6daCGj73UApUIWcDprfIcDXnH1DdTTw37h3uKjCLbFAj6ED2XvlJPGBlvMZzfS9lzn4G0j2E+piS1TsxHK6Vma52xfEyoOHjnz5t3UaF/ea/z6fBtRZSePLaoCD6tkcZvQ6d8PA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from VI0PR04MB11503.eurprd04.prod.outlook.com
+ (2603:10a6:800:2c7::16) by DB9PR04MB8429.eurprd04.prod.outlook.com
+ (2603:10a6:10:242::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.19; Fri, 8 May
+ 2026 13:50:08 +0000
+Received: from VI0PR04MB11503.eurprd04.prod.outlook.com
+ ([fe80::cbe9:4c03:71b6:359f]) by VI0PR04MB11503.eurprd04.prod.outlook.com
+ ([fe80::cbe9:4c03:71b6:359f%6]) with mapi id 15.20.9891.008; Fri, 8 May 2026
+ 13:50:08 +0000
+Date: Fri, 8 May 2026 16:50:04 +0300
+From: Ioana Ciornei <ioana.ciornei@nxp.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 04/13] dpaa2-switch: extend
+ dpaa2_switch_port_set_fdb() to cover bond scenarios
+Message-ID: <umivrsfdmjqey665jmqqi332mqul4kf774gjjhxq7f5l73ondz@r57mjfcfjdw2>
+References: <20260506151540.1242997-1-ioana.ciornei@nxp.com>
+ <20260506151540.1242997-5-ioana.ciornei@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260506151540.1242997-5-ioana.ciornei@nxp.com>
+X-ClientProxiedBy: FR4P281CA0216.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:e4::20) To VI0PR04MB11503.eurprd04.prod.outlook.com
+ (2603:10a6:800:2c7::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 71C2F4F7457
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VI0PR04MB11503:EE_|DB9PR04MB8429:EE_
+X-MS-Office365-Filtering-Correlation-Id: f695ea27-bff2-44ec-703b-08dead08b75a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|19092799006|376014|366016|1800799024|18002099003|22082099003|56012099003|3023799003;
+X-Microsoft-Antispam-Message-Info:
+	v398jS18skOP39d0NTGu9p2qCIgm3YeO8a7pQC4FfST5O3ofH2+xF8UC1k+7ZYFp3NwgiTcmE+iuLemSIMxHefAfYtx88MlljxK8tmi6dQzL5X2UMdqODXLU0OxGmnzbu5FZlK+S9PzbSqapbn8OiEHMWQfDCMOESQ8u63QF6ESyyHOu6rSx85ixWDs2L1pcuCHsB0fERSztBetmaTnf5O/eT3Em+QOX1bF5p1RKhZQAlnJr9P/k4XOyjRp9yLn4J4OrUcq6iXwysqp9k8K8u+7Tvv5mUvSdLECFBh26PD6Sd9RxFn/hAN/JLr1sdc4aC7Km/47FKvEy9IxIC9Cc5Y3tZwpJOp74I2tgpsJmdXUiMA5gn19B8MhRfMuglUxqcx75N3+MATX640/Aj6J9mU9FWEVVLzcM3Zav7R4U+d2UISr0zlj9GNmpZ80VMqPM3Ca5lzkIOp1HzJomd/JHIAinW2uVrz3tQlSFW56ghQLke4cQfif6sW3bp8XzZGKMAFcCPnKKAgRqd/lsW2G+5Q4iicA5ve92JkXHUX9AAzVNzDmJTY6trjaEFQBtHdOIVYl3nOGXYOeVtj7XEaEUUCl1su3oRR13Z2miuucNlLvufthCprVaY8Gs6xeRhsys/hN3FOEdSpYWRnO2vAAhNNjeSMh5hgBGqnqzozZXet04W+rw2h1Co/xgVHu0HEOS
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI0PR04MB11503.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(376014)(366016)(1800799024)(18002099003)(22082099003)(56012099003)(3023799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Dt63ZHHoze+wxNHXGxWFNRKd4TizH6GLHjAgF5R8dSFMQxfDSPCIBebfTiUU?=
+ =?us-ascii?Q?e7S/RSM/7kJBXGLMxKE549f5bs1pvdSYw1EaYLSmeRkcmwZEQFj5L8Ob/eLq?=
+ =?us-ascii?Q?cg5Zw6fr9QuucBUwWYyzbFn3LhdOHVxKdvgSkIA0KehyTaKTywiDCSZ+OdM2?=
+ =?us-ascii?Q?UmIpV3whVMFbemOoS52xWCnDMrO7R7MBdq6L/7kwCl5PedgZMBTNj1Zl1eql?=
+ =?us-ascii?Q?u9RkDE2NKu4kNLh/Lm13h1tDiqBu4rE4kMjtAbvoydTOGXYp6TjHm0r+XFZO?=
+ =?us-ascii?Q?9bj4AzRi8WcLOvRtjaQtiIERLRedBO1IM5UL0t/8WT22jyGRp/ULDOzcO5Y4?=
+ =?us-ascii?Q?vIdyuJANW8q6Kz78B8ghtov/hKNdUGsQRysO0tfVLJq+iKPwp2ylA808/VKA?=
+ =?us-ascii?Q?SfftFQy8TrDBela2kDo9b7orOz9hlnTneUHu2hHanz1DRQgf/AMmknBokwvH?=
+ =?us-ascii?Q?Vq2PKUt4yt1U/lZLKO+f2yj686frgrLaxNQOs2zOvo8R2QmwteEaXYydU01D?=
+ =?us-ascii?Q?6EPmpvTtjGNfbsvY0JVxJU4mrZ6yr2CUaGRUileCPBMTZDA2hhoy+5T3Xc/S?=
+ =?us-ascii?Q?MwmZeat2TeNzjTGdwubw4osYqQeFvPOBby8IbB0+eq4j4G2w+hV6Ej7Dsb9g?=
+ =?us-ascii?Q?vE14cCUUxjb+3xIXs6o7BnQG60ur2qRKSlzzKZO6eb1oMuudDXG0XGbroJ6N?=
+ =?us-ascii?Q?B895LLWmekx0g77puToXCQYtBfMXeFds+RWU1JcGMnpnklK78DWKPkdZERfD?=
+ =?us-ascii?Q?7dGBikqO+QvjRs6mselK9J27X2C46//8SEw/a2Qibv61pq/9j34xTpO0ieYP?=
+ =?us-ascii?Q?fDoTI9Dpn1GlOG+EDCoHE5D0EDlPUmUI5Up9Ju7VWkhpgz0FXZjcTi8KffNp?=
+ =?us-ascii?Q?G+RXIMU9S3Dde/57PQ1AaffKspvanAeOLnwR/+t+J9CegwDcV0u7ViD01fzX?=
+ =?us-ascii?Q?Sf06fDa44eoneBZPWfIWoadhdZ5LFug3kHOO0oC0bHZKeYLFpZh0t9L095BU?=
+ =?us-ascii?Q?J1l/8HYpnPqUWKOLpz3ASUVn3+G2Q80nLzOvNeWAOryyxo8X0E9VrlqtZZXZ?=
+ =?us-ascii?Q?56q7A6SBjAuTy8VSXs+lQZ+HdB0g33eTpRRfGhBlMsjUSop7cmiVA1g0AMVI?=
+ =?us-ascii?Q?cY41jzFUsAXg0W4BZEBP086GSAqY2G8DO31KZjI0YIW5Cgiynqw9r91NaN5M?=
+ =?us-ascii?Q?uVdZLf33cI4NQqY10zxpbIwNe+LzNzYQvPaIZBf1ZvHspf6hRq6mcMoT13rd?=
+ =?us-ascii?Q?hFSP/tj68btP8rY8RIi/w302gpmD54bjRbKSSULObBW8PDmgKVckBPTY9S+0?=
+ =?us-ascii?Q?TTMAYIoxZbcDloXS16LW5/Vy6y1+bETJ2ZGl0oWiipCw4m2QtrSYzVcwk5TV?=
+ =?us-ascii?Q?m3Tc681/1tqIoO+zHwaKcoNdcgjO9P9/GqnKkPnZ/GJVtlL8njrgbk2kDoXh?=
+ =?us-ascii?Q?FkmpFcO5P2W6j4IJcFP+ZB1pOnOoo3T6f5VZmHq20AsTuyAdPn9AqnCJkuXi?=
+ =?us-ascii?Q?oSCtc7cYemBJ/vCOnlm5u5mtMTaB4PuU+hTcKrCIGR0GRZvu+L+R1tawcBh3?=
+ =?us-ascii?Q?Xy4D4fSiAAU21yBO05P5R65cG40y9JZaRPqpa6JN+00rnG9qXPx8fM3mZ0RG?=
+ =?us-ascii?Q?Qs0wzu/16Dz7v4v8Eld1tvVhgxbuurV/rG5KVp6keWqN2j9LXwi2Cfod9s1i?=
+ =?us-ascii?Q?YKyPccjnCOfNN/pHYoL5T69yqn0cyG/BUELqupWfWs7QsJkHlrTS9EQEmh/n?=
+ =?us-ascii?Q?96DHzCtl0Q=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f695ea27-bff2-44ec-703b-08dead08b75a
+X-MS-Exchange-CrossTenant-AuthSource: VI0PR04MB11503.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2026 13:50:08.3193
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Mbst0Ztig4Gns8VsPnHfnQrn0d331ejIl3GJSV1nOFHJ3L5qF3UTMNJqMcMhtrzO/miZAfqFf8TxbmMVQD06Jg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB8429
+X-Rspamd-Queue-Id: 43B374F75C9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [1.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[redhat.com,ovn.org,davemloft.net,google.com,kernel.org,openvswitch.org,vger.kernel.org,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-285854-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285855-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[nxp.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
+	MIME_TRACE(0.00)[0:+]
 X-Rspamd-Action: no action
 
-Add test_pop_vlan() to verify OVS kernel datapath pop_vlan action
-correctly strips 802.1Q VLAN tags from frames.
+On Wed, May 06, 2026 at 06:15:31PM +0300, Ioana Ciornei wrote:
+> The dpaa2_switch_port_set_fdb() function is responsible with determining
+> what FDB should be used by a port as a consequence of changing its upper
+> device. This patch extends the function to also cover the circumstances
+> in which a DPAA2 switch port offloads a bond device.
+> 
+> This will allow us, for example, to setup the same FDB on all DPAA2
+> switch ports which are under the same bridge, even though not directly
+> but rather through an upper bond device which is bridged. How the
+> function does this is by first determining a DPAA2 port is already under
+> the same bridge and if so, choosing its FDB. To cover the entire
+> hierarchy in depth, we add an extra walk through all the lowers of a
+> bridged bond device.
+> 
+> When leaving an upper device, the DPAA2 switch port must find a new FDB
+> to use. If before it just searched for an unused FDB to go along with
+> its new standalone status, now it first checks if the port is still part
+> of a LAG and then uses the FDB of any port that already left the same
+> bridge.
+> 
+> Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
+> ---
+>  .../ethernet/freescale/dpaa2/dpaa2-switch.c   | 102 +++++++++++++-----
+>  1 file changed, 78 insertions(+), 24 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+> index f1b4c24b8a47..9d3a0aef1568 100644
 
-Test structure:
-- Baseline: untagged forwarding validates basic connectivity.
-- Negative: forward without pop_vlan, tagged frame is invisible
-  to ns2 (no VLAN sub-interface), ping fails.
-- Positive: pop_vlan strips tag on forward path, push_vlan
-  restores tag on return path, ping succeeds.
+(...)
 
-Use static ARP entries to avoid VLAN-tagged ARP complexity.
-Rely on ping success/failure for verification -- no tcpdump or
-pcap files needed.
+> -		if (!fdb) {
+> -			port_priv->fdb->bridge_dev = NULL;
+> -			return;
+> +		/* Try to get hold of an unused FDB to use */
+> +		if (!fdb)
+> +			fdb = dpaa2_switch_fdb_get_unused(port_priv->ethsw_data);
 
-Signed-off-by: Minxi Hou <houminxi@gmail.com>
----
- .../selftests/net/openvswitch/openvswitch.sh  | 77 +++++++++++++++++++
- 1 file changed, 77 insertions(+)
+Sashiko notes:
 
-diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index b327d3061ed5..a0e8e6cbd301 100755
---- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-+++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -27,6 +27,7 @@ tests="
- 	upcall_interfaces			ovs: test the upcall interfaces
- 	tunnel_metadata				ovs: test extraction of tunnel metadata
- 	drop_reason				drop: test drop reasons are emitted
-+	pop_vlan				vlan: POP_VLAN action strips tag
- 	psample					psample: Sampling packets with psample"
- 
- info() {
-@@ -830,6 +831,82 @@ test_tunnel_metadata() {
- 	return 0
- }
- 
-+test_pop_vlan() {
-+	local sbx="test_pop_vlan"
-+	sbx_add "$sbx" || return $?
-+	ovs_add_dp "$sbx" vlandp || return 1
-+
-+	ovs_add_netns_and_veths "$sbx" vlandp \
-+		ns1 veth1 ns1veth 192.0.2.1/24 || return 1
-+	ovs_add_netns_and_veths "$sbx" vlandp \
-+		ns2 veth2 ns2veth 192.0.2.2/24 || return 1
-+
-+	# Baseline: untagged bidirectional forwarding
-+	ovs_add_flow "$sbx" vlandp \
-+		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
-+	ovs_add_flow "$sbx" vlandp \
-+		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
-+	ovs_add_flow "$sbx" vlandp \
-+		'in_port(1),eth(),eth_type(0x0800),ipv4()' '2' || return 1
-+	ovs_add_flow "$sbx" vlandp \
-+		'in_port(2),eth(),eth_type(0x0800),ipv4()' '1' || return 1
-+	ovs_sbx "$sbx" ip netns exec ns1 ping -c 3 -W 2 \
-+		192.0.2.2 || return 1
-+
-+	# VLAN topology: ns1 uses VLAN sub-interface, ns2 is plain
-+	ip -n ns1 link add link ns1veth name ns1veth.10 \
-+		type vlan id 10 || return 1
-+	on_exit "ip -n ns1 link del ns1veth.10 2>/dev/null"
-+	ip -n ns1 addr add 198.51.100.1/24 dev ns1veth.10 || return 1
-+	ip -n ns1 link set ns1veth.10 up || return 1
-+	ip -n ns2 addr add 198.51.100.2/24 dev ns2veth || return 1
-+
-+	ovs_del_flows "$sbx" vlandp
-+
-+	# Static ARP: avoids VLAN-tagged ARP complexity
-+	local ns1veth10mac ns2mac
-+	ns1veth10mac=$(ip -n ns1 link show ns1veth.10 \
-+		| awk '/link\/ether/ {print $2}')
-+	[ -z "$ns1veth10mac" ] && \
-+		{ info "failed to get ns1veth10mac"; return 1; }
-+	ns2mac=$(ip -n ns2 link show ns2veth \
-+		| awk '/link\/ether/ {print $2}')
-+	[ -z "$ns2mac" ] && \
-+		{ info "failed to get ns2mac"; return 1; }
-+	ip -n ns1 neigh replace 198.51.100.2 lladdr "$ns2mac" \
-+		dev ns1veth.10 nud permanent || return 1
-+	ip -n ns2 neigh replace 198.51.100.1 \
-+		lladdr "$ns1veth10mac" \
-+		dev ns2veth nud permanent || return 1
-+
-+	local vlan_match='in_port(1),eth(),eth_type(0x8100),'
-+	vlan_match+='vlan(vid=10),'
-+	vlan_match+='encap(eth_type(0x0800),'
-+	vlan_match+='ipv4(src=198.51.100.1,proto=1),icmp())'
-+
-+	# Negative: forward without pop_vlan -- tagged frame
-+	# is invisible to ns2 (no VLAN sub-interface), ping fails
-+	ovs_add_flow "$sbx" vlandp "$vlan_match" '2' || return 1
-+	ovs_sbx "$sbx" ip netns exec ns1 ping -I ns1veth.10 \
-+		-c 3 -W 1 198.51.100.2 >/dev/null 2>&1 \
-+		&& { info "FAIL: ping should fail without pop_vlan"
-+		     return 1; }
-+
-+	ovs_del_flows "$sbx" vlandp
-+
-+	# Positive: pop_vlan strips tag on forward path,
-+	# push_vlan restores tag on return path -- ping succeeds
-+	ovs_add_flow "$sbx" vlandp \
-+		"$vlan_match" 'pop_vlan,2' || return 1
-+	ovs_add_flow "$sbx" vlandp \
-+		'in_port(2),eth(),eth_type(0x0800),ipv4()' \
-+		'push_vlan(vid=10,pcp=0,tpid=0x8100),1' || return 1
-+	ovs_sbx "$sbx" ip netns exec ns1 ping -I ns1veth.10 \
-+		-c 3 -W 2 198.51.100.2 || return 1
-+
-+	return 0
-+}
-+
- run_test() {
- 	(
- 	tname="$1"
--- 
-2.53.0
+	Does this sequence introduce a resource leak of FDB entries?
+	When a bridged bond leaves the bridge, the first port acquires
+	an unused FDB.  Subsequent ports in the bond bypass the unused
+	pool and directly copy the first port's FDB, leaving surplus
+	FDBs in the pool.
 
+That is not the correct understanding at all. The FDBs are there as a
+means to correctly setup the forwarding domains in a switch, there is no
+such thing as "surplus FDBs in the pool"
+
+> +
+> +		if (fdb) {
+> +			port_priv->fdb = fdb;
+> +			port_priv->fdb->in_use = true;
+>  		}
+>  
+> -		port_priv->fdb = fdb;
+> -		port_priv->fdb->in_use = true;
+> -		port_priv->fdb->bridge_dev = NULL;
+> +		if (netif_is_bridge_master(upper_dev))
+> +			port_priv->fdb->bridge_dev = NULL;
+> +
+> +		/* In case all FDBs are already in use, we must be the last
+> +		 * port that becomes standalone. We can just keep the FDB that
+> +		 * we already have. Nothing more to do in this case.
+> +		 */
+>  		return;
+
+Sashiko notes:
+
+	When the final port in the bridge (e.g., a standalone port)
+	subsequently leaves, it will find these surplus FDBs and
+	successfully acquire one. The original bridge FDB is then
+	completely abandoned, but since its in_use flag is never
+	explicitly set to false in this path, the FDB is leaked.
+
+	If a bond and a standalone port repeatedly join and leave a
+	bridge, could this exhaust the hardware FDB pool? Once
+	exhausted, it seems subsequent standalone ports would fail to
+	acquire exclusive FDBs and might silently share existing FDBs
+	with other networks.
+
+Not correct at all. The FDBs cannot be "leaked". There is an array
+holding them per ethsw_data.
+
+Also, it's ok not to have all FDBs used at a moment in time. In this
+exemple above, after an offloaded bond device and a dpaa2 switch port
+leave a bridge, it's expected for all the switch ports under the same
+bond to use the same FDB, thus leaving unused FDBs.
 
