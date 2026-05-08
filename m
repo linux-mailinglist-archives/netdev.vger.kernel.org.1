@@ -1,352 +1,305 @@
-Return-Path: <netdev+bounces-285616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285617-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id omlaEFRj/WnUcwAAu9opvQ
-	(envelope-from <netdev+bounces-285616-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 06:15:16 +0200
+	id 4K9cNutl/WksdAAAu9opvQ
+	(envelope-from <netdev+bounces-285617-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 06:26:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 462FA4F1683
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 06:15:14 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 863834F17FD
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 06:26:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 571E7301D315
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 04:15:13 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F16453004D22
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 04:26:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C023A272E56;
-	Fri,  8 May 2026 04:15:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C22D23254A5;
+	Fri,  8 May 2026 04:26:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZkrHFKOE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TVb32eW8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB512FFDD6
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 04:15:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778213712; cv=fail; b=lPo6TZoEE87w1BHBlhpZT+fyW93RwN7EyTSJ5Y9yhOvsaXwm/PuRmtSl+EsaEpZb8EtZvVJ8oJwvfVgXi2QG7UNGzMPCdaI4htO//ub6Jyxm/6bamIcqL+xKW5X404jLgBARXfs1TPdKeJVeujtr4FH+NcXh8x1Z//vgcveZmLo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778213712; c=relaxed/simple;
-	bh=Sn6gmg4laYPWucujUo68mK3Jv78SMJvFs7mBXxzJ1U4=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=YuYeNKJ8g3Lhf5Uo+79xWhD0k8WYVVZ+bw3wWQujgwJKCEg3Yptfa8pu9HDtrgXFLAAofdTQf7CfXaqlwbS8Mt0pgpk6Po2l0E9Zk+ONAXdiBdyMLZEXebBIx2tEXED3z4bcuRQO/+U42CETMO4cXSKT6U+JlPYEpl65AMbkz/U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZkrHFKOE; arc=fail smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778213711; x=1809749711;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Sn6gmg4laYPWucujUo68mK3Jv78SMJvFs7mBXxzJ1U4=;
-  b=ZkrHFKOEapfyTlNPa/VK4DpMrKqJo0HM22paK6LM/hnO2//J5FazIzBd
-   w3GAA3zmwYLMgTpw68sa49FRLFR9slSiqHzbbdtwP/E6TGXCaDEtAtv7x
-   JqA+hsoW12VxaKLdVULVc0IZeZwwgdRo2AOp1CcTCUaN15+XWYj1RIASz
-   8g97DWcdBepTSCEIkYZLcNzTznpj+o7ct40G3dSainnDmNiHvpbR/Zg0q
-   0ACnkRsZFMTVCjUp97TXTgcFKtBZQunjx5iibQz02yHN18z4Tt0zzEmS1
-   sACzWlCqxSn5BQVlIj6cBghIp5KfUaDsYCEP+PejEi48FINru/4BYF7gE
-   Q==;
-X-CSE-ConnectionGUID: QV7RlkCgSNmybBQ3B7zqaA==
-X-CSE-MsgGUID: L3YS5woBRlu/8GbWDvFUjw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11779"; a="104637816"
-X-IronPort-AV: E=Sophos;i="6.23,222,1770624000"; 
-   d="scan'208";a="104637816"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 21:15:10 -0700
-X-CSE-ConnectionGUID: BKMlzuGRRaipkzVxx3EPnQ==
-X-CSE-MsgGUID: AjnESq2vQke8gYvLb0rvnw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,222,1770624000"; 
-   d="scan'208";a="260368389"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 21:15:10 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 7 May 2026 21:15:09 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Thu, 7 May 2026 21:15:09 -0700
-Received: from PH7PR06CU001.outbound.protection.outlook.com (52.101.201.2) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 7 May 2026 21:15:09 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Vw9VmiW5QttglLGRVcV/EULHMPm/wvHzW6+SMGzf3AkFChXkKxWM7DH75keMck4n38/0L+31AS7GCrZguufdWuOJ2vaJB9YUbCyxGSx3ZoyKw/HyO/vDUOZkaLwhPknLUWAXK1Ou6KN0OeGtrsDTK+8So+FQy9IUphMmc43jc2H/xDLxiEthyYdJ00ixTt3LBByGElWxKcp4JUVebAsoPW1q8SU/NwwCq5UqoSAdy2HQDPh70LHM1wwlbkAbLCEd+Fnv6ccpSUKU2p/xJIg0IvMFI1rGu9LV+jxxCO3uoii5Xt6GQxkyzgGJfZHRco1cywxRt4roF7Wh6FU6xYcrtw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+F/4oYjpN6lQXjw9VtE1qV+aHCIVaWu8JSvJiFTNsQs=;
- b=EiBllQWs0Fo8yt9G1PgHYHcFQbWC6j0I+YDpRfYYaGfK3fiWrY7ZNG3c1hrDQseAgY6SmouoLEVOuJQnRQWVRLy1NmDoXpFKBbeGn6XZOkOY7aE5ZONvcjDJlvlaj7mAjGLjDMMXKP9sDdbU7yD4QH+mOo99T23YoAkNpd1/VaKl7dhoIwonND9oNsrTF/Pt01lMCm6ifaf5AXxXF2LB3Wek/0SuECKpp54goRRcnmUQMJ5+Dh9vyr+XK4wDKEK+dyhjOXw/fss3n33jM1KqYzsiRl7+P7xZriKmYrRtcu+9uh7AXWDvN16klcipOKnfAH5nOYvhFrQhSPsQftUjUQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by SJ2PR11MB7598.namprd11.prod.outlook.com (2603:10b6:a03:4c6::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.15; Fri, 8 May
- 2026 04:15:05 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::8d98:e538:8d7:6311]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::8d98:e538:8d7:6311%5]) with mapi id 15.20.9891.019; Fri, 8 May 2026
- 04:15:04 +0000
-Message-ID: <05165d50-d60f-4afb-aeb4-1c20641379ce@intel.com>
-Date: Fri, 8 May 2026 06:15:00 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next 2/8] ixgbe: use int instead of u32 for error code
- variables
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-CC: <netdev@vger.kernel.org>, Simon Horman <horms@kernel.org>,
-	<anthony.l.nguyen@intel.com>, <intel-wired-lan@lists.osuosl.org>
-References: <20260508031226.3601800-1-aleksandr.loktionov@intel.com>
- <20260508031226.3601800-3-aleksandr.loktionov@intel.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <20260508031226.3601800-3-aleksandr.loktionov@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DU7P194CA0021.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:10:553::27) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD6014F70
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 04:26:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778214377; cv=none; b=ZXR9lQM+d/JsS9w5TCJ3S6tcnoACzixvXX2C/8HehnE2ncdwc9Xt3EyjJ3ZtahZ0px5W2w2xIpX4eVd1vZROacyBuxmiARoyiGbcl/iIbjbh2CMqv08uygou1BJu0pbSNSjgYzQ8/+ZBy5p+ixM6kV27JEU+4tEiXcXaTJkBiGE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778214377; c=relaxed/simple;
+	bh=aaSHgCMQLohi4sTq0My9B5Wa6nItpt+kgA3B/jP+lKk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NFmGvQvgtWEp07QDNXV7bTiOc7emBw05swmus7G1OmJJyJHXJ1Cy0Rr/GdgQtI8UvqTaHHz0PegiiBgagDOsMe8y7lqcRXc3JFYG1nsADC5doU/zAXa3hx+e3K25eGStp2plsZkRTiXFxJ38gl+l6yfR6c8iN9Y/wF+R9rj/HEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TVb32eW8; arc=none smtp.client-ip=74.125.224.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-65c83b7e2deso189340d50.2
+        for <netdev@vger.kernel.org>; Thu, 07 May 2026 21:26:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778214375; x=1778819175; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IuDPPHgRrI0xOu1LJOWYLSVywx4ixE00BXI1Fan9Bhk=;
+        b=TVb32eW8TMOTcCySSKPJ5z+hq7694xgiYVUdig3jfzKnsPl0HQt1TBJPKcNK8at9x4
+         WUvUIQvAmZa+dnLXYtNjwA6COZpXAMWvtJ0Dou/d/BfVbvwcwA8gTlMqxVh+Zfng9022
+         tfIu5Bu6UnK5+P8E8/j7aAN8lQr+3sfeeD9wLmcB2bFBMvIp/sKbKuXu7un+uxJ4sNNe
+         0LPIs3auLGPE0lhGihdWKXFwxZGNMBxaTDNQ6YSsV+bBjfcoeaxyUgDI5hBJlXQh91bc
+         28vjaBEzvWn8F6qPjtp9JKH9A4RAY84jJNWhPZhwM1FMMF9Sqfqn++xJCI2tMQiqIfs8
+         BNsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778214375; x=1778819175;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IuDPPHgRrI0xOu1LJOWYLSVywx4ixE00BXI1Fan9Bhk=;
+        b=tNwsckiKLBtmo2/JK7AFRe/eQMEUnMwAnbX3lIBW/cQNXhyflfiffBemXVI4Nff2SW
+         XYbDArkeblfUPKeB80wdNB41j5PsddY7AJBGbpM8xWqhdt+xX3ag2hRvtfD3JlTo/Yc6
+         VDeVp4XuisMYkoZhEFP87DmDBF9kY7B8kx6kljCGVs2XLWrsxq52j4SyPx5SyGcj3dWY
+         Kcjc+Kxakvw7qjPPn+GlKPwHTONhO6b0onRu3x/glGmrQuUhlKXsNraBXrak2j7GsyRc
+         Q1Jk5pxNseq1sV9CyAP+q2y/H6UoumMRIz8xGrYzVtG6m8BA6dbB9xuK9erSwX4gXh98
+         N64A==
+X-Gm-Message-State: AOJu0Yyg5lxcnCnqKWZ2fWLD+TlQoI7wCCIBRTefWv68MRIZyTXKfTqk
+	2ukFHEfXZqXCTaObqTQz2fFEPnjliG2G/IzE7wDUL10FUOjjLFiiU6YhFcYuLQ==
+X-Gm-Gg: Acq92OFhJfcngkTcDT7SktTpk9jqF9Y8vrOBD6Dc+xn97sqMWfjhMVbuz8xweEpbNem
+	Aygx03S43rNG+YbjY5QV/1D4/CqE2JseFEtROmKyGRORxSD9CxFwH8kULiOz7NwFNYafZanRUuA
+	+dRu4icuv3bJCMCfxTEATNwqJqOoDbS27Gc6N/m80NJx0tgYKcoEjORD0spbHXtJFjSLwaskHVc
+	kNg90G5COE0PpVe6D4Gxl6Khq5IUHJ6GyMmR3EGMJ2rXMCny+AvGfyfwisfEBNIiYtYGiG/P3hC
+	6X1vCLprW69ZNKVmszkoe5nQL0euvqAF1JOk5nuunTaggvkEbiavd8Yk30o14kjish63+0DsWyv
+	SPAs02bYzIOVO/9TqZ34RZysCGTZ3QNAdPipmShmPAMRDbqNz3RyJFNLAjmSzdQVHxWa0agt1rc
+	4pgPKfV3E7wYkifB2Tw87IhiYg
+X-Received: by 2002:a05:690c:281:b0:79c:adbd:4f15 with SMTP id 00721157ae682-7bdf7c08a81mr69358267b3.2.1778214374810;
+        Thu, 07 May 2026 21:26:14 -0700 (PDT)
+Received: from localhost ([2a03:2880:21ff:4c::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7bd66896b35sm100518147b3.47.2026.05.07.21.26.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 May 2026 21:26:14 -0700 (PDT)
+From: Wei Wang <weibunny.kernel@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Daniel Zahka <daniel.zahka@gmail.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	David Wei <dw@davidwei.uk>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: Wei Wang <weibunny@fb.com>
+Subject: [PATCH v14 net-next 0/5] psp: Add support for dev-assoc/disassoc 
+Date: Thu,  7 May 2026 21:26:05 -0700
+Message-ID: <20260508042611.130945-1-weibunny.kernel@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SJ2PR11MB7598:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0fa55026-e6e1-4abb-1199-08deacb861ad
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|56012099003|18002099003|22082099003|3023799003;
-X-Microsoft-Antispam-Message-Info: h5ZbXDwaDJZLo7nucc8meYIfiY+zglrH3DJbs2t5H+E6zilR9WksUGm7ZP/R4YtSixd+UE0p8365d/PUUZm9ZhMDXI3m9yefsa2t4P7GyGzHAbGUyacry2it3L9rjP7EayghO7suCp0B3ioiGrOmhJ/oQNnANcZmplA6JCfqXfgej+rMoxb12d4Tkm225LFpCfAyMUTCIQLJ3fji6vpuB6Bg3z/+dPCu+AlKk9pizxHdazIGJI2Jg4sOb2ZzaWeqsKcMj0NpS0KOGOOtrA7QxHEZ8lQL6fspniyYxrUUFdmI2TEVQ9qi6G0Zs7VsvGKeK0uprybU7rxRb1VCUQBFkMFmAmWqxFRXRWYOMEbhXsNixwvoToMso6cLxP6ZZFjzEuILgXizin0lp09+lqn6MH5JAt/bE5q2LNrlm1ThB2mnUGZVpl3yXA7GZGKP9oHgvVzzbJpM/yiV0ieu1TRBMf+fum3LWVdPDN27bA3xT7s8rViiXc8NISL57cln8BTO6U/6F+IHBMzCuny8cGuKrv9Xlxq543HmEqGUEt96hd05imfAqEonbV9UvvH/Dyr8qrTZvkR9n5EmnWjYdefI7EBlg+zjJEVv1I3XXnDrzWYORTW/zKuKbgJ8Rc1BxcJjNpWYyordtqrPem/9PsW4AI/snDrzUvnifevkkkqFhFZCUUkpdK13ME3WSK4lfkHt
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(56012099003)(18002099003)(22082099003)(3023799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bmdWZDlDZENhKzd1ZHV4Q1RnMVRTazdFWEdLTzRVSFdLMUw1MnRLNmdBRUVp?=
- =?utf-8?B?MFVBUGsrL2xLRE9UL2J2bE9sWWRvbEVsOTRaYWtFOHk5Z3pNbXBJRFFEUFBj?=
- =?utf-8?B?MExFQi9tb3ZGL1dDTmVFMUVGZGNOc1ZJZjJUUFF4Q2x1MmpzL01lYVF4L0JX?=
- =?utf-8?B?Z2kzMEN4RHNaQktTSmNqeWlTRFFtdndIckFZSVdtYUJUUG5rdGl1c2svYVpM?=
- =?utf-8?B?N2ZqbW5IRjAxbks0MG5kSHRPclBac2VlQzMvQlp6dTRhVGdrODNjTHlOZW9n?=
- =?utf-8?B?TjRyWXZmZmRZd1lHblNoeUY2MCtSZ1dVRzk5M0wzdVV2WnJZLzA0UG41Mlpp?=
- =?utf-8?B?ZDFZMXdiNEZucW90d1Z6dStOL0kxdzArU1lWdFZkZWlvSWFqSExJQ1gxc2lo?=
- =?utf-8?B?ekhacWFwR2pZQ1kwQVRBbWtDVUpaKzMvSXB3Sk1GLzJRRTUxODNZenpITzRk?=
- =?utf-8?B?OWdlMU5aYzUrVUE2ajZBVFJ0WTRTQUVLMENvMkQrQm55cE1HQ0poekVUdUZ1?=
- =?utf-8?B?NG9WaGRabE1oWW9halRBaWpibHpmdFJ6a2U3Vy9xN0lwK01WdUZwY0t0Qmc4?=
- =?utf-8?B?M04vZjh0SHZxY2FYWlhhUnFZZm05YzNZenVnamZEZmdQRWZYM3IzYzhoNTBo?=
- =?utf-8?B?UWgrZ3YrK1lQdnQxeUdOY0dtV2psd3IzOGZ3TVpXYitkOVZSSmVZRmxIV21y?=
- =?utf-8?B?Vk96cWlpbXlyTGpzYTNVeWZ2ckZoRnhMbWw2d3JFcVpmMExYdkVaRDNZQlYz?=
- =?utf-8?B?VXJjTnFUZGt6UDZFREUxazNEb0FBUDllT0hLVVNUcHVnQzR1WjNOaXRqUDhw?=
- =?utf-8?B?b2R5ZGM1NVhTNHBsNm40UllFNGdobW1HMExIRHBiTVRCNzdhczJOZjF5aHdD?=
- =?utf-8?B?cllHQWU0L1ZBMFRYN2pHMldzRThHUUNteHJjNStiaS82MkdoZnIzR2c3Si83?=
- =?utf-8?B?N0tBcDlNbDcvMmdidngySHJITUxLMmxUSjdWMTJScW9KOThkYU8vUzNNNmhY?=
- =?utf-8?B?M3dTcDJMVHE0SCszdTc3Yzl6UEVrVERDanNuQXJkMDNvSVhBNlFpTE8wOHZm?=
- =?utf-8?B?bS8vdTBPVzg0SlVObHlBWk1rUzArRmZLK3YvNXlpREFOdjYzNjV6RFVrYWZB?=
- =?utf-8?B?TTRkakRTU0VRWUxIcTZEcWNjSXNBSW80czZ4aDI5aXVPY2xhYzhJcTR5RS9B?=
- =?utf-8?B?WHBVZHgvcC9ycGhXVDcxKzdWRER1bHBTRzVoSzNOaUNpNzhQWEFxUmY2ZWtY?=
- =?utf-8?B?Qzd3dFN6b1Mzb1lnSXc3WGMzRXQxMEluVW8wd0VIUEljT21hM0d0NEs3alVE?=
- =?utf-8?B?Y1dGcDhUaWF4L3I3UGZUVVhTNXZLZUdTWmZIdUhibGJFTjJhSStjdWN6VGp5?=
- =?utf-8?B?WWF6aGRuWFlaSzdVRjgvMDc1anZ1L0xNdmtPSERQTDlmVldRRGNVVGtmMkZm?=
- =?utf-8?B?SXJOTG94SW95T1FsSDJjL2tRVmxHeFI1Z0thNDdBNmNvKzVST0N4WE8yRERZ?=
- =?utf-8?B?ZUNIcXhsd1JKUXpRY2pETEJjUXNSc1dhd1ZIUkltUkJzVHhDbERwQ3ZEclk4?=
- =?utf-8?B?WmtobWY4L2ZLNzNISkd1S2lsUlJuRzRucHBrN1dFeSsxTnI3Y2pUSTJWNUFu?=
- =?utf-8?B?bzZrbm5vZ3NoMG1sYnB3SGIzODcyUExRSG1tT09uNlljekFLVkNyUFNpQ2Jv?=
- =?utf-8?B?N0xnSUE2SUg5U2VzTzhOMk9EUEphVTBkcmpRcGtvVWRKSGVHNmZFVGRVMmxY?=
- =?utf-8?B?cXRBa1dyK2lsK24rSWhja1RYMnBxU2N0UlJ5NmNXc25IM2g3ZWt3cHJJOFQy?=
- =?utf-8?B?azdFSmlNZEF1SGoxZEFHblpJZ2hmdUF1TTRuSTRzeDVTNFNmcTF2TTlrSDRJ?=
- =?utf-8?B?Qkg1UjhIT2h5ZFV3NUR6M2NRcmxDazIvUUtQUXVWZXlxQjdGbVU0SnFFcTVp?=
- =?utf-8?B?QklsYnh3VVI0SVlFQm1tWGljSTZVNTR5bXZPdTFLS3E5eEkxZzhtS3Y0K1pW?=
- =?utf-8?B?RUoyWWIxYWFZZVN3VERhSXl3eXJtWTBWQ0RhWGNEWk9IbExBeFcwbDF6ZkZi?=
- =?utf-8?B?MWxkZXJvM2lSa1R4dEp5L3hVdUY2Yk9nbng5UHJTV2JpUmlzNTRXSFdMOTZy?=
- =?utf-8?B?NlJPMEx2QXJsSU1jQzBsZTJJV1RHNjB6OU00ZkZmcTl1eWtSc095TUJtMmdz?=
- =?utf-8?B?SDcyMFAxMWlTNUwyMjRhWFJIajUwbXUxVEtUMnV6WnBTajd2Smg5QUhkdnRC?=
- =?utf-8?B?WEpmdUw2NWFaMXpqMG5yT2JtUC9YeVFQVWIxSGw1RG1MUG5jZFVqYjlneWVE?=
- =?utf-8?B?ald0ZzBPcU1QMGtBbFZjTVovOWxQQi9oOURRMGNFNUoxWncyS3NhMFBlN3By?=
- =?utf-8?Q?MaC4TsAZ9bl2koIU=3D?=
-X-Exchange-RoutingPolicyChecked: OUN2M5wmvInNS+3OWV72cg+lIsgY9RMvTI/Su3jL3xx16fSpyAaKZjIOvYhveMM3VFI/qicVp+9IG89nBGL0WlLKDlss/xneTly7wvnCrCCdHqAChTZpW3zoZgXzDmqjy00enSzfDrFbA3NdyhNnRS4TCBAwrwl98wmnd2uhlwkEOD+CyvU9HosJHoQXO29wpslUaD2G2QDrYbhll3ZC6GaAE1u+lmCEm44YU/bpBsbYSPQyQX3wTlEZX3FmXNZhK93ixB/560ao+7iuIV+EnSCpOMvXN2zFvqOVIpf5ut4/f7UG4ZOSAvtxq7DNOcM0bcFpQmpcMBQkswD3VKfJnQ==
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0fa55026-e6e1-4abb-1199-08deacb861ad
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2026 04:15:04.7963
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: R3DMEYrrGPchdYnr9lWmDVTC9C30MVlHLj+GldgJB7EywztYxC1yx8MGYp79BC0X8X8ewcZ8hx/lrpgeNfA8/ThqKku022aTYDqymvIbAoU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB7598
-X-OriginatorOrg: intel.com
-X-Rspamd-Queue-Id: 462FA4F1683
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 863834F17FD
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	SUBJECT_ENDS_SPACES(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285616-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285617-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:mid,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[weibunnykernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,fb.com:email]
 X-Rspamd-Action: no action
 
-On 5/8/26 05:12, Aleksandr Loktionov wrote:
-> The variables used to store return values of kernel and driver functions
-> throughout the ixgbe driver are declared as u32 in several places.  Such
-> functions return negative errno values on error (e.g. -EIO, -EFAULT),
-> which are sign-extended negative integers.  Storing them in an unsigned
-> u32 silently wraps the value: -EIO (0xFFFFFFF7) stored in u32 becomes a
-> large positive number, so any "if (status)" truthiness check still works
-> by accident, but comparisons against specific negative error codes or
-> propagation up the call stack produce wrong results.
-> 
-> In the Linux kernel, u32 is reserved for fixed-width quantities used in
-> hardware interfaces or protocol structures.  Using it for generic error
-> codes misleads reviewers into thinking the value is hardware-constrained.
-> 
-> Change all such local variables from u32 to int driver-wide: one in
-> ixgbe_main.c (ixgbe_resume), three in ixgbe_phy.c
-> (ixgbe_identify_phy_generic, ixgbe_tn_check_overtemp,
-> ixgbe_set_copper_phy_power), and six in ixgbe_x550.c
-> (ixgbe_check_link_t_X550em, ixgbe_get_lasi_ext_t_x550em,
-> ixgbe_enable_lasi_ext_t_x550em, ixgbe_handle_lasi_ext_t_x550em,
-> ixgbe_ext_phy_t_x550em_get_link, ixgbe_setup_internal_phy_t_x550em).
-> 
-> No functional change.
+From: Wei Wang <weibunny@fb.com>
 
-unless there is a check "status < 0" somewhere
-anyway, that's why the preferred style is to write "!status" or "status"
+The main purpose of this feature is to associate virtual devices like
+veth or netkit with a real PSP device, so we could provide PSP
+functionality to the application running with virtual devices.
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+A typical deployment that works with this feature is as follows:
+     Host Namespace:
+     psp_dev_local  ←──physically linked──→ psp_dev_peer
+	  (PSP device)
+	       │
+	       │ BPF on psp_dev_local ingress: bpf_redirect_peer() to nk_guest
+	       │
+	  nk_host / veth_host
+	       │
+	       │ BPF on nk_host ingress: bpf_redirect_neigh() to psp_dev_local
+	       │
+      Guest Namespace (netns):
+	       │
+	  nk_guest / veth_guest
+	  ★ PSP application run here
 
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> ---
->   drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  2 +-
->   drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c  |  6 +++---
->   drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c | 12 ++++++------
->   3 files changed, 10 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> index 65426a1..b6308c1 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> @@ -7528,7 +7528,7 @@ static int ixgbe_resume(struct device *dev_d)
->   	struct pci_dev *pdev = to_pci_dev(dev_d);
->   	struct ixgbe_adapter *adapter = pci_get_drvdata(pdev);
->   	struct net_device *netdev = adapter->netdev;
-> -	u32 err;
-> +	int err;
->   
->   	adapter->hw.hw_addr = adapter->io_addr;
->   
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
-> index ab733e7..de8f6c6 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
-> @@ -262,7 +262,7 @@ static bool ixgbe_probe_phy(struct ixgbe_hw *hw, u16 phy_addr)
->    **/
->   int ixgbe_identify_phy_generic(struct ixgbe_hw *hw)
->   {
-> -	u32 status = -EFAULT;
-> +	int status = -EFAULT;
->   	u32 phy_addr;
->   
->   	if (!hw->phy.phy_semaphore_mask) {
-> @@ -2811,7 +2811,7 @@ static void ixgbe_i2c_bus_clear(struct ixgbe_hw *hw)
->   bool ixgbe_tn_check_overtemp(struct ixgbe_hw *hw)
->   {
->   	u16 phy_data = 0;
-> -	u32 status;
-> +	int status;
->   
->   	if (hw->device_id != IXGBE_DEV_ID_82599_T3_LOM)
->   		return false;
-> @@ -2831,7 +2831,7 @@ bool ixgbe_tn_check_overtemp(struct ixgbe_hw *hw)
->    **/
->   int ixgbe_set_copper_phy_power(struct ixgbe_hw *hw, bool on)
->   {
-> -	u32 status;
-> +	int status;
->   	u16 reg;
->   
->   	/* Bail if we don't have copper phy */
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-> index 76d2fa3..9b14f3b 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-> @@ -1911,7 +1911,7 @@ static int ixgbe_check_link_t_X550em(struct ixgbe_hw *hw,
->   				     bool *link_up,
->   				     bool link_up_wait_to_complete)
->   {
-> -	u32 status;
-> +	int status;
->   	u16 i, autoneg_status;
->   
->   	if (hw->mac.ops.get_media_type(hw) != ixgbe_media_type_copper)
-> @@ -2330,7 +2330,7 @@ static int ixgbe_get_link_capabilities_X550em(struct ixgbe_hw *hw,
->   static int ixgbe_get_lasi_ext_t_x550em(struct ixgbe_hw *hw, bool *lsc,
->   				       bool *is_overtemp)
->   {
-> -	u32 status;
-> +	int status;
->   	u16 reg;
->   
->   	*is_overtemp = false;
-> @@ -2418,7 +2418,7 @@ static int ixgbe_get_lasi_ext_t_x550em(struct ixgbe_hw *hw, bool *lsc,
->   static int ixgbe_enable_lasi_ext_t_x550em(struct ixgbe_hw *hw)
->   {
->   	bool lsc, overtemp;
-> -	u32 status;
-> +	int status;
->   	u16 reg;
->   
->   	/* Clear interrupt flags */
-> @@ -2512,7 +2512,7 @@ static int ixgbe_handle_lasi_ext_t_x550em(struct ixgbe_hw *hw,
->   {
->   	struct ixgbe_phy_info *phy = &hw->phy;
->   	bool lsc;
-> -	u32 status;
-> +	int status;
->   
->   	status = ixgbe_get_lasi_ext_t_x550em(hw, &lsc, is_overtemp);
->   	if (status)
-> @@ -2606,7 +2606,7 @@ static int ixgbe_setup_kr_x550em(struct ixgbe_hw *hw)
->    **/
->   static int ixgbe_ext_phy_t_x550em_get_link(struct ixgbe_hw *hw, bool *link_up)
->   {
-> -	u32 ret;
-> +	int ret;
->   	u16 autoneg_status;
->   
->   	*link_up = false;
-> @@ -2642,7 +2642,7 @@ static int ixgbe_setup_internal_phy_t_x550em(struct ixgbe_hw *hw)
->   {
->   	ixgbe_link_speed force_speed;
->   	bool link_up;
-> -	u32 status;
-> +	int status;
->   	u16 speed;
->   
->   	if (hw->mac.ops.get_media_type(hw) != ixgbe_media_type_copper)
+      Remote Namespace (_netns):
+	  psp_dev_peer
+	  ★ PSP server application runs here
+
+Note:
+The general requirement for this feature to work:
+For PSP to work correctly, the egress device at validate_xmit_skb()
+time must have psp_dev matching the association's psd. Any device
+stacking or traffic redirection that changes the egress device will
+cause either:
+1. TX validation failure (SKB_DROP_REASON_PSP_OUTPUT) - fail-safe
+2. RX policy failure after tx-assoc - packets without PSP extension
+   are rejected by receiver expecting encrypted traffic
+
+Here are a few examples that this feature would not work:
+- Bonding with load balancing in round-robin, XOR, 802.3ad mode across
+  multiple PSP devices, or mixed PSP and non-PSP devices
+- Bonding with active-backup mode might work without PSP migration for
+  failover case.
+- ipvlan/macvlan in bridge mode would not work given packets are
+  loopbacked locally without going through the PSP device.
+
+Changes since v13:
+- Added flags: [admin-perm] to both dev-assoc and dev-disassoc in patch
+  2
+- Added psp_nl_notify_dev(psd, PSP_CMD_DEV_CHANGE_NTF) in psp_netdev_event
+before calling psp_dev_disassoc_one in patch 2
+- In patch 5:
+  - Added _find_bpf_obj() helper that searches test_dir first, then
+  test_dir / "hw/" as fallback
+  - Register clean up functions with defer() so we properly clean up for
+  failures
+  - Added cfg._nk_host_tc_attached = False and cfg._tc_attached = False
+  after deleting the netkit pair
+  - Replaced hardcoded cfg.nsim_v6_pfx with cfg.addr_v["6"] and
+  cfg.remote_addr_v["6"] so routes work on real hardware
+
+Changes since v12:
+- Rebase
+
+Changes since v11:
+- Cap max number of associated devs per psd to 128 to avoid overflowing
+  GENLMSG_DEFAULT_SIZE for netlink msg in patch 2
+- Make common function for getting net in psp_nl_dev_assoc_doit() and
+  psp_nl_dev_disassoc_doit() in patch 2
+- Only allow NSID to be passed in when user is in dev_net(psd->main_netdev)
+  to avoid manipulation of dev-assoc/dev-disassoc from netns other than
+  its own in patch 2
+- Fixed the race between netdev_unregister() and psp_nl_dev_assoc_doit()
+  by adding devreg status check in psp_nl_dev_assoc_doit().
+
+Changes since v10:
+- Corrected typo on patch 1
+- Removed the kdoc style comments, Use goto style in
+  psp_nl_dev_assoc_doit() clean up code, Resolved "TOCTOU" issue in
+  psp_assoc_device_get_locked() in patch 2
+- Replaced psp_devs_lock with a new mutex in
+  psp_attach_netdev_notifier(), Fixed kdoc style comments in patch 3
+
+Changes since v9:
+- Added comments for psp_device_get_locked(), fixed lint issue, fixed
+  rcu warning in patch 2
+- Return error if register_netdevice_notifier() fails in
+  psp_device_get_locked_dev_assoc() in patch 3
+- Removed psp version and ip version for unnecessary tests cases in
+  patch 5
+
+Changes since v8:
+- Rebase
+
+Changes since v7:
+- Refactor in patch 1 to have a common helper for
+  psp_device_get_locked_admin() and psp_device_get_locked()
+- Take psd->lock in psp_assoc_device_get_locked() before
+  psp_dev_check_access() in patch 2
+- Use cmpxchg() for assoc_dev->psp_dev assignment when doing dev-assoc
+  in patch 2
+- Check for err for register_netdevice_notifier() in patch 3
+- Call psp_attach_netdev_notifier() in pre_doit handler for dev-assoc to
+  avoid releasing of psd->lock in patch 3
+
+Changes since v6:
+- Remove the unused remote_addr, nk_guest_addr and import cmd in patch 5
+
+Changes since v5:
+- Remove module_exit() in patch 3
+
+Changes since v4:
+- Address compilation warning in patch 3
+- Removed the call to psp_nl_has_listeners_any_ns() and check listeners
+  when looping through netns in psp_nl_notify_dev() in patch 2. This
+  makes sure we only send notification to netns that has listeners.
+
+Changes since v3:
+- Make nsid optional for dev-assoc/dev-disassoc operation, and use
+  the ns user is in when it's not specified. Also added a test for this.
+- Fix psp_nl_notify_dev() to compute the correct nsid relative to the
+  listener's netns.
+- Only register the new netdev event for psp dev cleanup upon the first
+  successful dev-assoc operation.
+- Change the following in selftest:
+  - Add CONFIG_NETKIT to driver/net's config
+  - Fall back to NetDrvEpEnv and run basic test cases if NetDrvContEnv
+    does not load
+  - Use ksft_variants instead of psp_ip_ver_test_builder
+
+Changes since v2:
+- Change the newly added parameter to psp_device_get_and_lock() to
+  admin in patch 1. Introduce 2 device check functions:
+  - psp_device_get_locked_admin() for dev-set and key-rotate
+  - psp_device_get_locked() for all other operations
+  Flip the logic for checking the dev_assoc_list accordingly in patch 2.
+- Move psp_nl_notify_dev() before removing the dev from assoc_dev_list
+  in psp_nl_dev_disassoc_doit() and correct the typo in commit msg in
+  patch 2.
+- Remove the threading and subprocess and some comment updates in patch 5. 
+
+Changes since v1:
+- Update the first 4 patches to reflect the latest changes in
+  https://lore.kernel.org/netdev/20260302053315.1919859-1-dw@davidwei.uk/
+- Update patch 9 to add a param to NetDrvContEnv to control the loading
+  of the tx forwarding bpf program
+
+Wei Wang (5):
+  psp: add admin/non-admin version of psp_device_get_locked
+  psp: add new netlink cmd for dev-assoc and dev-disassoc
+  psp: add a new netdev event for dev unregister
+  selftests/net: Add bpf skb forwarding program
+  selftests/net: psp: Add test for dev-assoc/disassoc
+
+ Documentation/netlink/specs/psp.yaml          |  73 ++-
+ include/net/psp/types.h                       |  23 +
+ include/uapi/linux/psp.h                      |  13 +
+ net/psp/psp-nl-gen.c                          |  36 +-
+ net/psp/psp-nl-gen.h                          |   7 +
+ net/psp/psp.h                                 |   3 +-
+ net/psp/psp_main.c                            | 105 ++++-
+ net/psp/psp_nl.c                              | 401 +++++++++++++++-
+ tools/testing/selftests/drivers/net/config    |   1 +
+ .../drivers/net/hw/nk_redirect.bpf.c          |  60 +++
+ .../selftests/drivers/net/lib/py/env.py       |  69 ++-
+ tools/testing/selftests/drivers/net/psp.py    | 435 ++++++++++++++++--
+ 12 files changed, 1163 insertions(+), 63 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/nk_redirect.bpf.c
+
+-- 
+2.52.0
 
 
