@@ -1,252 +1,198 @@
-Return-Path: <netdev+bounces-285584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285585-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iK4JJTpO/Wm1aQAAu9opvQ
-	(envelope-from <netdev+bounces-285584-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 04:45:14 +0200
+	id CFVCKZVO/Wm1aQAAu9opvQ
+	(envelope-from <netdev+bounces-285585-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 04:46:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FD5D4F0E5C
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 04:45:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E96304F0E9C
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 04:46:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 492943006B22
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 02:45:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5E713300F9FC
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 02:46:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF6F528B4E2;
-	Fri,  8 May 2026 02:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1E1421A453;
+	Fri,  8 May 2026 02:46:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="adYUVP7b"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="imXsrakc"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011046.outbound.protection.outlook.com [52.101.70.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA9B276058;
-	Fri,  8 May 2026 02:45:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778208310; cv=none; b=oIzXoRsWBxDAZi//q5YpEAbO+CQFuKOb7VRrAf0cdPwX1ooP5IdXfPc1w2KgmMcNk/YuIreOTT2YAYnEw6G+FrCNVo4xW1wNT1uQjE5G2+KyHS1vhgusl//ls4juZzUb7xadrB2rUoFq69itN9kePV4nL1MsPYaTSEAQZuk9H/s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778208310; c=relaxed/simple;
-	bh=J6mvIxH+ZZzLBDBHsSOL4HrTFGVClt8f94g6+dy+Ys8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=KY38YoabvBXH6sO5+0q9D+BRAc39qsMGXN3EQRd1kqRQA0cXnnCZBVaToTcrtAM4XmksrsShzTfY5b9W3O5qp+11lzudkoccMtKXAF25NJ1J3Bk6eVWmN7q1Dzto8i/CLcFFC10AkkozHeE5ZvvC5ufcwUM/z6BGwbhLkt+gSTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=adYUVP7b; arc=none smtp.client-ip=113.46.200.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=nIfdFbiZVgiXdv9VSRsfyJN+b7Vc9DXCfpPg/eyjtVE=;
-	b=adYUVP7bOZN+ranjhCnTfspCuat+EA2xM+rynfed3f3Fu+qGaVp6PqB+TozQDqLv7h8Vy5hwA
-	O0wWMedXxLkqGqoDNoxGxkWEE4auAcHHB9boPY9RjV7uHiMLiWaypsWIslwL7JMtrjpyU4/Prs9
-	CHawLwYMHKf6aT1MavurUwE=
-Received: from mail.maildlp.com (unknown [172.19.163.163])
-	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4gBYDq2xt3z1K984;
-	Fri,  8 May 2026 10:37:31 +0800 (CST)
-Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
-	by mail.maildlp.com (Postfix) with ESMTPS id DF59840575;
-	Fri,  8 May 2026 10:45:03 +0800 (CST)
-Received: from [10.174.176.240] (10.174.176.240) by
- kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Fri, 8 May 2026 10:45:02 +0800
-Message-ID: <4bb9ed6b-1a64-406a-9239-b0560ca963cc@huawei.com>
-Date: Fri, 8 May 2026 10:45:01 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 962E2155757;
+	Fri,  8 May 2026 02:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778208402; cv=fail; b=aIdVOgqI7sUbmisSptlgGcDrVHi8js0XdR7YQ65d3XDpqZIX1Zbp23JWPqQvKmzCcygwCYO9CEgjo6WI+Wg1JVlVyC/qJEJMsq12KOY3o+aG3QzbdDLfKVTpjAzyo6//E4+lU2y7SIXYfi1I7XrSGxmhloqAJNHbVI/7Hy7f2+M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778208402; c=relaxed/simple;
+	bh=0XYVpomz5GifiFKEwxuErgW3K8U905z7MuhJZpQT0sA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=I5mSs6R6jfqSI87cf7ihOjxF6Yt1FSPbgYKDGHYKsNJVj+N5jayjtpfJjgm2AQmVzhbPnQ3BHU11NgKDx5ZKa9OoKmFBeYmssM65u6X05a1bJ2abKQhCqo53wIE0ZL3lbbwZ5upv28EDp0bJvVYYeLEQmSjKRdIQd2gaJz0RTVg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=imXsrakc; arc=fail smtp.client-ip=52.101.70.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Pe/Qs5RUTbMmF/uy3HCFeMIZR2ca48AfAiVSrpYuRttLt+9tO6o1l3ztR2MyfNK6EXZYp9+t1Tx9TdcJ/IZB7WVvyqIUf7hD/iIwMOVotmtbwmrmuqI2DEAYDC9RyvTI7uufonl2MyVU446HJRfoiiHi8eHdN09ioBRvMlHysGyh5e6lNeovf8kALKqpmTzOKZ9xgC9L2jwsnnxrF5uLKhYKgm0j6fI67h4kv1ZNVpvPR1MwOS4hWK/Y/wBRzrPMnqXR5ySYAhPF0PABZGeoh+cLBBUEQTtDloRDszg5p8aijNsqNzh+oQ/HJZ2wOlLX/BQPaypR++5Cli8+FKF5NQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NzBSorI8DJlvFga46QUPv4tnQQuOgsSCk7XFQY7kUUA=;
+ b=GDdqoFCLWROK4ZZwZo/sUKH6MP5zpa6P0QE/lK6VsU41uQnXJMKoOe5n2khAw5B2MONTlqWdGA3RT+a1abhaZxiqd9qNcf3Ck2Szb/y40unLvfxvhZBFfl0MZFhMOehO5t2HPKaDPFMk2CGTADxkcylWESV161mHhV2Wqp1S1Ygyn5Z05mQpDyrXzB2opyR/0CGhC9DDnV/NehsyyPXpvKbxPQqESVWyMxxBX9UHiCR75rNcOw6qiCKzIhGXWPbdg+tVAl/iDDCUOZSy0LCBq2y+lkmLGRK8Ris/73Nf737bamWwbO/PR0Nxi3AQ3ix2TV0ThgtlLSXCOGDmZdeNVQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NzBSorI8DJlvFga46QUPv4tnQQuOgsSCk7XFQY7kUUA=;
+ b=imXsrakc4cH9cpDHv8+M9qBBgsOrHMoDHbPf0ayZ4GAyaJfD+mk+ggBFJt/kXPcjwT2NHqQyLvwCu0etL52jBlxoPgM5wmUArpqMfqbVHM8FAtPnevy/tZTBTwcG8CU7DWCDMWLsXZD3npnj4+mRFtoKV6ncrRjOz3t0HgaAHlELAt3MKxp7X08YChIMI72AdmcES/Tm0SpFLhbKVEJyHfN34cK4ZApBlCFFQ1L7rxwPOShUPY01mc921fA9By8GUU/v52EwuWEp6g1AAx9C56YAfYWrG3zewU1pqa+kvwK+YsyYyMUGbAo5x2sAKcKulGYVPvv1WRlumXCoR7CNzg==
+Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
+ by AM7PR04MB7096.eurprd04.prod.outlook.com (2603:10a6:20b:113::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.19; Fri, 8 May
+ 2026 02:46:38 +0000
+Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
+ ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
+ ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.20.9891.019; Fri, 8 May 2026
+ 02:46:38 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Greg Ungerer <gerg@kernel.org>, "linux-m68k@lists.linux-m68k.org"
+	<linux-m68k@lists.linux-m68k.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"arnd@kernel.org" <arnd@kernel.org>, Greg Ungerer <gerg@linux-m68k.org>,
+	Frank Li <frank.li@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [RFC 1/4] net: fec: do not use readl()/writel() for ColdFire
+Thread-Topic: [RFC 1/4] net: fec: do not use readl()/writel() for ColdFire
+Thread-Index: AQHc3WSQFQftmBcNm0etAxstaTRQurYDaxsQ
+Date: Fri, 8 May 2026 02:46:38 +0000
+Message-ID:
+ <DBBPR04MB750044F98B1E719AD9DBD93E883D2@DBBPR04MB7500.eurprd04.prod.outlook.com>
+References: <20260506142644.3234270-2-gerg@kernel.org>
+In-Reply-To: <20260506142644.3234270-2-gerg@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DBBPR04MB7500:EE_|AM7PR04MB7096:EE_
+x-ms-office365-filtering-correlation-id: 8af19e3f-3b3c-4967-e3df-08deacac06ec
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|19092799006|1800799024|376014|38070700021|18002099003|22082099003|56012099003;
+x-microsoft-antispam-message-info:
+ 9dDarhdbAfys7/92IeVnsQbnycNBxMVkFJvfCWv9L4Rm4cnGsOWvgmbpxtvQQ8oSiyRVMbskvo9r4J/CQnsKZpcjKMKLrexn4o+CqqKl0j9Pv13MoFRjkD8cd+kmMtNF0nj5Aq3upgaTlBq1m7U8cbILAVXgK5XvOI/XOIOt5dxt5hnxWIHiqSZq71rPpie/TPnk9LmR2RMadS2h5BsdDGUbbC2MdjlSuITbm4ZTOPDyLcag60LZqFqR+BP8/rA/nD4kEokQJuARB/9+CM63C76+iaPrXxt7uao1KRw0t+/Gz53Uo4y/a8ICK1ybfA2EOn7eW2CRSfNBzclwaWYtcKcgzBpWO8JoKEZ6X/+k26QdENcVFHa4ERdgBjUnXROdU0RWFLSmK83evl1hYuy1Rx9WoyOmWdPsMN8w+HVdU81Au7WAPEHfgYquFgtSyCOSnXPtYW7i3pX+/YmlJ/hPCh91HRNgLspNrSyTpiNxpmd/f2dSx3MZZKi4rtMqMQWqCmNydkzbCqqQJKzDMoXpe1hC7pbuRMwMYv+dxKBYcx3uSHy7LKAttMU0A0UvbwA11aej1T87nHh1W3wB57MO7Ugyylp5RDvDaml8ONpNR2p+xq5QKfsTbZ0V/MKrWjCvru7zrk04a0fibCrcqJqDW9aVsQO5g2uDjzurM8+LhuaedaSL9xbzyMXNRceY/VuTvjB4mF4KZpvIh6DXh2HLiw==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(1800799024)(376014)(38070700021)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?pDNyhnrLXBHHX65BWR3URWmf18C4ADnQcwKp2PrfuxxMPocWOC7Wf3H+1FE7?=
+ =?us-ascii?Q?26lZQlC/TuQk2y+zLcQRvY4i9Kxr05kt9XqnBAE9VPMKfxw5xlie4MVF2gCG?=
+ =?us-ascii?Q?noJ6dJVqhUeoK7z5ymcLc2fAegqa0VBdv9z7VSSaSMcPtHHyvcTy535/lwBp?=
+ =?us-ascii?Q?6muifqOwla8IIeqNS9NWKrZGZnRwmcCozb7yQCuu84y/7qedioEYdnBTHZcN?=
+ =?us-ascii?Q?I+aySbKEkxF1nfkwUlzZx63nh+zXm53548NVmH2TN5H0KMUzSt6P6cydl80K?=
+ =?us-ascii?Q?6ci6OGvD45L+nFlX8hU6HZiB5r1SH7Tep3DgKo0nHeLwy8EiyJcUydgVpb/A?=
+ =?us-ascii?Q?JAP1DCV0FZ/IZQjGSgWStQh0yPa/8ZezQiVeMLZc1stS3D38Gl/xDhomR9Ys?=
+ =?us-ascii?Q?ypYFxrCV89blISqJE1A7DWok7VSl6ZVuNpb2ZxsB4WbF6QbUkd0mbQqjsrm4?=
+ =?us-ascii?Q?kEw2Kwm93N4N3EL/qEKmkOPtPeHTshfnlgIa8madYnrPCfnFzGyCwyAAJfi9?=
+ =?us-ascii?Q?0G02zSFuK78/Z69kk4hRmFmzQgF2EGs9zVuSlv7HleGmCe3Vx3I+mWe2uwcz?=
+ =?us-ascii?Q?GWQu1sPtuw4EfwiRhqMFQxqtEDGVZVWWWCWZkjPYSEARSYznDK1+HlKiB+82?=
+ =?us-ascii?Q?+pSSCVmASNTCxA/eKn7MZtLVzmpF6VXPy5rZ2e1L6owg7+y7JvdF9+E++GDJ?=
+ =?us-ascii?Q?MZyCs006b0vLxT8zTIEGkWZVHkebpeeVq2llXKCDMKvHs7uMKFiUWgIS3imq?=
+ =?us-ascii?Q?gwpkE/O37dk1xW7I7V1DahlL4NTQ8i1iN2e/AqFVnJhi7oR4M1F1AkXjYdD/?=
+ =?us-ascii?Q?dzQVW3ePkOPCn0y5IthgJhPmoXPjBeVgv+hQABGmTp0U6Je9mrN/HW4pASE+?=
+ =?us-ascii?Q?YxFURSaftnCzM1q4SrLRhIZ0RkhewLWb34l7nVFbd6R8sv3yHVcgc9MKVnu5?=
+ =?us-ascii?Q?pa0NTlm/g5lUt+z3lLMDcq9QQ6CF66CARgLAt2/rMx2nYwoLYBd11yx1Vtdm?=
+ =?us-ascii?Q?z0mXcr2vgRmx9a0n5cLoTVkKvuhYm/gHTa8SUhXu9QQOwCzZ1r40KDXa7e+a?=
+ =?us-ascii?Q?1f3A1P1JAy3KLjxT7+8ox2YlrDEMFvO5U5Rrv730p2HBT0WgVjBCMIe7fM3E?=
+ =?us-ascii?Q?boOYWv23FtwHiLfY9VgbYwW1cA+qqRpz/7ioFrB7IToE0EL42LyD8Lo2vbzl?=
+ =?us-ascii?Q?ZLwbBbEYs1nMoJDkIsSpqCz520MpQ18gAOPCuEMOCqLH17wQQKExxKFeH/Dc?=
+ =?us-ascii?Q?fogsTlfUtUnharnP/nXWhFowg30ejNEJwb7wwhgPOZBsF4ct++CK+pt/wH42?=
+ =?us-ascii?Q?sc0B+S5/zB7bO30SdUwagyrYVHlLQ+sQIjY6zjoTZmztV5Yjaa6b7FCMR0ry?=
+ =?us-ascii?Q?7yVm+MyJT3lCqxRL9PxVYflz56Z5x94cxDymeZdYYlm9pF2uj8p3koXViCQX?=
+ =?us-ascii?Q?t+LUrudLvd8CwIM0vmCOZgHaOh0q4ospO754haqc2JeDPqYeht2vf+Xgo6N0?=
+ =?us-ascii?Q?faOQK5byXLS5GTqJIxc+lCJFxY2K065BGlxGsCgxibT9L6xZfcvT/JD6RgWP?=
+ =?us-ascii?Q?+ohaiekOuF4jXFEDoecbfWxc/Naj4psrvLV1dNqv/djVEBOn1XEiDq+MToZT?=
+ =?us-ascii?Q?PuW3AyWSWQ8ltOS8f+hGnlrkqLeWxZkDx/9lNyHI18WRbgIiBJercTBJAN+H?=
+ =?us-ascii?Q?M5bVYoYjgdOyD6ev6431ZsYt5MJAMkiRFTcQpJd6uwx1jynH?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/6] SUNRPC: Address remaining cache_check_rcu() UAF in
- cache content files
-To: Chuck Lever <cel@kernel.org>, Misbah Anjum N <misanjum@linux.ibm.com>,
-	Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>, Olga
- Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
-	<tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
-	<anna@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, <yi.zhang@huawei.com>
-CC: <linux-nfs@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, Chuck Lever <chuck.lever@oracle.com>
-References: <20260501-cache-uaf-fix-v1-0-a49928bf4817@oracle.com>
- <c45779f6-fe6c-4037-bb1c-01cfbbaa8aac@huawei.com>
- <76a10e49-54a6-4813-8b58-b7cd0820fdc6@app.fastmail.com>
-From: yangerkun <yangerkun@huawei.com>
-In-Reply-To: <76a10e49-54a6-4813-8b58-b7cd0820fdc6@app.fastmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemf100006.china.huawei.com (7.202.181.220)
-X-Rspamd-Queue-Id: 2FD5D4F0E5C
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8af19e3f-3b3c-4967-e3df-08deacac06ec
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 May 2026 02:46:38.3485
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vW2XvlpoZAqplsKYyGaTuyxxIhoinYcYL4xBljSpzy0kN1jYS+YMYcQVpw552gdYtS8NPRwHyJx45HvFgWJNVA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB7096
+X-Rspamd-Queue-Id: E96304F0E9C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_FROM(0.00)[bounces-285584-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285585-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yangerkun@huawei.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:mid,huawei.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,DBBPR04MB7500.eurprd04.prod.outlook.com:mid]
 X-Rspamd-Action: no action
 
-Hello  Chuck,
+>  static void
+>  fec_stop(struct net_device *ndev)
+>  {
+>  	struct fec_enet_private *fep =3D netdev_priv(ndev);
+> -	u32 rmii_mode =3D readl(fep->hwp + FEC_R_CNTRL) & FEC_RCR_RMII;
+> +	u32 rmii_mode =3D fec_readl(fep->hwp + FEC_R_CNTRL) & FEC_RCR_RMII;
 
-在 2026/5/8 0:12, Chuck Lever 写道:
-> Hello Erkun -
-> 
-> On Thu, May 7, 2026, at 11:09 AM, yangerkun wrote:
->> Hi,
->>
->> 在 2026/5/1 22:51, Chuck Lever 写道:
->>> Misbah Anjum reported a use-after-free in cache_check_rcu()
->>> reached through e_show() while sosreport was reading
->>> /proc/fs/nfsd/exports on ppc64le.  Two fixes for that report
->>> landed in v7.0:
->>>
->>>     48db892356d6 ("NFSD: Defer sub-object cleanup in export put callbacks")
->>>     e7fcf179b82d ("NFSD: Hold net reference for the lifetime of /proc/fs/nfs/exports fd")
->>
->> Back to the problem fixed by this patches, I'm a little confused why
->> this UAF can be trigged.
->>
->> Before this patches, svc_export_put show as follow:
->>
->>    368 static void svc_export_put(struct kref *ref)
->>    369 {
->>    370         struct svc_export *exp = container_of(ref, struct
->> svc_export, h.ref);
->>    371
->>    372         path_put(&exp->ex_path);
->>    373         auth_domain_put(exp->ex_client);
->>    374         call_rcu(&exp->ex_rcu, svc_export_release);
->>    375 }
->>
->> The auth_domain_put function releases ->name using call_rcu, and
->> path_put may release the dentry also via call_rcu. All of this seems to
->> prevent e_show from causing a UAF. Could you point out which line in
->> d_path triggers the issue?
-> 
-> The dentry, the mount, and the auth_domain ->name buffer all
-> end up RCU-freed (dentry_free() and delayed_free_vfsmnt in
-> fs/, svcauth_unix_domain_release_rcu() in svcauth_unix.c).
-> The eventual kfree isn't the problem.
-> 
-> The problem is the synchronous teardown inside path_put(),
-> which runs before svc_export_put() ever reaches its own
-> call_rcu():
-> 
->    path_put(&exp->ex_path)
->      -> dput(dentry)
->         -> __dentry_kill()              [if last ref]
->            -> __d_drop()                /* unhashes */
->            -> dentry_unlink_inode()     /* d_inode = NULL */
->            -> d_op->d_release() if set
->            -> drops parent d_lockref    /* may cascade up */
->            -> dentry_free()             /* call_rcu deferred */
->      -> mntput(mnt)                     /* deferred via task_work */
-> 
-> The dentry pointer itself is RCU-safe, so prepend_path()'s walk
-> of d_parent and d_name doesn't read freed memory.  But by the
-> time the reader gets there, __d_clear_type_and_inode() has
-> already stored NULL into d_inode, __d_drop() has broken the
-> hash linkage, and the parent's d_lockref has been decremented
-> -- which can in turn fire __dentry_kill() on the parent, and
-> on up the tree.  An e_show() that's still inside its cache RCU
-> read section walks into that half-dismantled state through
-> seq_path(), and that's the NULL deref Misbah reported.
+This is not an issue, but since you changed this line, the new code should
+follow the "reverse xmas tree" style.
 
-Thank you for your detailed explanation! Yes, e_show might be called 
-when the state is partially dismantled, but after carefully reviewing 
-the code with dput up to __dentry_kill, I still cannot find anything 
-that could cause this issue. Additionally, the comments for prepend_path 
-indicate that they have already taken into account that the dentry can 
-be removed concurrently. I have also run some tests on my arm64 QEMU, 
-but I couldn't reproduce the problem either. Could you please help me 
-identify the specific line or pointer in the dentry that triggers this 
-use-after-free or null pointer issue?
+See: https://elixir.bootlin.com/linux/v7.0.1/source/Documentation/process/m=
+aintainer-netdev.rst#L380
 
-Maybe I am not be very familiar with the code, which caused me to fail 
-to identify the real root cause. I'm so sorry for that.
-
-
-265 char *d_path(const struct path *path, char *buf, int buflen)
-266 {
-267         DECLARE_BUFFER(b, buf, buflen);
-268         struct path root;
-269
-270         /*
-271          * We have various synthetic filesystems that never get 
-mounted.  On
-272          * these filesystems dentries are never used for lookup 
-purposes, and
-273          * thus don't need to be hashed.  They also don't need a 
-name until a
-274          * user wants to identify the object in /proc/pid/fd/.  The 
-little hack
-275          * below allows us to generate a name for these objects on 
-demand:
-276          *
-277          * Some pseudo inodes are mountable.  When they are mounted
-278          * path->dentry == path->mnt->mnt_root.  In that case don't 
-call d_dname
-279          * and instead have d_path return the mounted path.
-280          */
-281         if (path->dentry->d_op && path->dentry->d_op->d_dname &&
-282             (!IS_ROOT(path->dentry) || path->dentry != 
-path->mnt->mnt_root))
-283                 return path->dentry->d_op->d_dname(path->dentry, 
-buf, buflen);
-284
-285         rcu_read_lock();
-286         get_fs_root_rcu(current->fs, &root);
-287         if (unlikely(d_unlinked(path->dentry)))
-288                 prepend(&b, " (deleted)", 11);
-289         else
-290                 prepend_char(&b, 0);
-291         prepend_path(path, &root, &b);
-292         rcu_read_unlock();
-293
-294         return extract_string(&b);
-295 }
-
-
-> 
-> The earlier fix (2530766492ec, "nfsd: fix UAF when access
-> ex_uuid or ex_stats") moved the kfree of ex_uuid and ex_stats
-> into svc_export_release() so those are RCU-safe now.
-> path_put() and auth_domain_put() couldn't go in there because
-> both may sleep, and call_rcu callbacks run in softirq context.
-> This series uses queue_rcu_work() instead: it defers past the
-> grace period AND runs the callback in process context, so the
-> sleeping puts move into the deferred path and the window
-> closes.
-
-Yeah, I can get this! Thanks again for your detail explanation!
-
-Thanks,
-Erkun.
-
-> 
-> 
+>  	u32 val;
+>=20
+>  	/* We cannot expect a graceful transmit stop without link !!! */
+>  	if (fep->link) {
+> -		writel(1, fep->hwp + FEC_X_CNTRL); /* Graceful transmit stop */
+> +		fec_writel(1, fep->hwp + FEC_X_CNTRL); /* Graceful transmit stop */
+>  		udelay(10);
+> -		if (!(readl(fep->hwp + FEC_IEVENT) & FEC_ENET_GRA))
+> +		if (!(fec_readl(fep->hwp + FEC_IEVENT) & FEC_ENET_GRA))
+>  			netdev_err(ndev, "Graceful transmit stop did not complete!\n");
+>  	}
+>=20
 
 
