@@ -1,248 +1,208 @@
-Return-Path: <netdev+bounces-285766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285768-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OIDxAE3J/WkpigAAu9opvQ
-	(envelope-from <netdev+bounces-285766-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 13:30:21 +0200
+	id mPTgFJPJ/WkpigAAu9opvQ
+	(envelope-from <netdev+bounces-285768-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 13:31:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A40F34F5C76
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 13:30:19 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBB7E4F5CA4
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 13:31:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 450A1308DDA7
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 11:25:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B9DAA301A15C
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 11:31:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DBB5382F00;
-	Fri,  8 May 2026 11:25:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F13A93D3CF7;
+	Fri,  8 May 2026 11:31:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JLg/6xzM"
+	dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b="zaGqOHpn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 391C933D506;
-	Fri,  8 May 2026 11:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE0C3D34A0
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 11:31:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778239540; cv=none; b=EaqlWxqT8OY1PQQGFqmwTYube0wlRuuiyBC+Ywf9BFtnX3uV5TucV+JTNk5IeCX26wEtoto068edub8gavJXocxH+shzmiuMIVfyxemtgqiLW/uhcbT33gMq1HjHaMgY9YgsD+LSpeDYzR2oaxIauCI8Kz02ME/Zt/LazwDJvMM=
+	t=1778239888; cv=none; b=jxS6+E4lZb2ASBSmKBsISPVXRJSOqBlEQfQpvPfV02qJHP/NubKJd0DR8O7LTZ/wJFdq+JkFopBOL/FU+Dakxti6Ewrnfzzx4PigUoXyugXs4s3h+/JUM2zsPmKEM5/RYZHvqRiRRebKL+Co/AuCIKy09acppdjro+p+10YqKxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778239540; c=relaxed/simple;
-	bh=tz0eZGnrl6wId4LnLK2yrH+5fHe4AC68YMgQAi103mY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=iKeHKifTs8vRRbeaVCK8WTn7BFJQ+dOTJ89QOeGxuoREHIa8S0cvXaoUt1xRDELTIW/mdb7QGNAIcjWjFz2wIanFQOQiBcsc4d2xosGHbVm5RpVWwAS9b2IByCNnATThTYEjv9xFWQfjAEZbJLldymGGscF3zVu/ksaMOWqBTt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JLg/6xzM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60A55C2BCB0;
-	Fri,  8 May 2026 11:25:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778239539;
-	bh=tz0eZGnrl6wId4LnLK2yrH+5fHe4AC68YMgQAi103mY=;
-	h=From:Date:Subject:To:Cc:From;
-	b=JLg/6xzM6NrEJIPS0+Z/e8yP4ikju6KV6x6ilghcOTY+3fBi4n+tYG4BSF0IkVl9j
-	 gUDfq6mAAGC+olZqNBtfuOBQGu0QLMMQo96hA2/1ZER+oXitT51tugIKjp4fROMvMg
-	 1UQn3FIjSOYxvQAaEH1ktnIkeNHNzBW2+7cdJn482wKX2IIrqqsblrzSUN0cVLgrL5
-	 rMLbzIfrf5CJBYLNq8rmqeHuAsmqGSm7KjZR4USJAI65f/aFY/LZ1TTrArp5iCSd2W
-	 kkJoNgxs/q8HtUszoOa2zKHd0Sn3qy3b9bicTtZI877UptYIShCvXEqjCnrcm1vQ/2
-	 oEovWOPuEKDog==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Fri, 08 May 2026 13:25:14 +0200
-Subject: [PATCH net] net: neigh: Reallocate headroom if necessary in
- neigh_hh_bridge()
+	s=arc-20240116; t=1778239888; c=relaxed/simple;
+	bh=0hrQlW5FpcXozs6wxkIBzDktzohYeRr936w21ThvyGI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kiELiaBjIR/YRN8MuCOb0zekk+bJ56Imm1mDO9Gjl/eXrLs0Fger8kc4lwvtabw+un1v/G6dyrYXzTE2m3J4oSkQSu6pxCy5+YS2zhhTrOZfXWJQfizlRPJbS9nRdQXX8EtLmQhkI66i4djAI62D8NnVAPwLMu2GfPGRydVcyUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com; spf=pass smtp.mailfrom=riscstar.com; dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b=zaGqOHpn; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riscstar.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5a87782588cso2432583e87.3
+        for <netdev@vger.kernel.org>; Fri, 08 May 2026 04:31:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=riscstar-com.20251104.gappssmtp.com; s=20251104; t=1778239885; x=1778844685; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=i3oCf6JjY2k4f2DdZmgb+d8lKs1DeUt4qK3/lGPB5dQ=;
+        b=zaGqOHpnsUCV+vA6TVCtOV8VWmaUyfmOkHHzLGkEADuNsj0J4GjK9oK4xW/3CNcMv1
+         kr2whR9te0rnCtZzCtVGzKfUAwZD6kHX9gGeHzEsQcbNGuRb4fmjNxOlVuMYvwmAWdsW
+         bvU3Td71ri1EF7xTc7xlkE/UfzI1UbRtOQiSxPjohk5NqmvUGfWywNqBa3IXqUOCOmUf
+         3NdGZQzac7id9nnvXWk6uxZsnLiMk/CXcqDwT8e/eZUD1PK07a3sz4+cyR/2bkcPk3NA
+         37zzl8/r5xA1jqnaU8Tn8o4ptwTUmO55EBkqwi8X9fG++kTorbv8j18lsB4Dre85coVs
+         Oh+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778239885; x=1778844685;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i3oCf6JjY2k4f2DdZmgb+d8lKs1DeUt4qK3/lGPB5dQ=;
+        b=BDFRiGlVpJUFfbYAP0Oe/bodqsLO9o4+Q5P1HfMMdnbmeWSuS7M/XLu/ghgp9oJqop
+         0P6VC6r9umUiFEFIvRVtbjPLv6njH1CFMk37feiZZWt8r7aV4fAGRbWNnAvOvJ4leTEJ
+         T+EKTMZp5b5O8AY9OU8hWdIHRpgxfxw9T1pVEFkSJtxua3yRywTvLgdVOEI/ZhPr2EJ2
+         y2AU58T7yBBQV6/vXDdVB96VFbImZgnXLyDcVpVIsdV6RlXN2cFsw9/QuFzu1yXiSwv0
+         pakrcCkAkq1Vgg7Igrb22bZlZDZbE4QM+oVBravAs4id/RU7gkigmLMv6M84XK3U6uh5
+         qPyQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8n7BTRd0k+ONblF0KoSpE+MTEYtEEFS/yWmb+dWzqyO5jrC9vKT4HSGjt8aBa4QA2hKDjPOHQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6K64yDXi1Ge2cuMkmkabXndpK40naxTIRsWv+7GjHNDmGw80S
+	TkU3tNVbezrjj9drtdiV5lVyqqUxy7fsgJyIo1aKJsC5nnn559tkbnndIEa0krvKHjuwdZ5rtf+
+	lkc26wwc=
+X-Gm-Gg: Acq92OFdQweU0RQi3fAWwyWDxYmc2Nmq8SJLylDCo9rvtZmCw8rJf2wqHU1z2L6FU3o
+	7D0mVqzwIGgLocv4ItUMZub+4Tnb3zKyo/pUyXy2qTohp/HM3m1hypYfcSB22ZgXzi8OjFO7av2
+	/+V6uc9D/kokuHvVbBmszdRnzcK+2x0g0QPk3mnVZlY+B3KtLP7jzDGp561Swew5/Uuv60yBEvJ
+	VIcge8GxOObZkD70K7Ire2KVAdeolOUzzDfbs3z9PItKco5Brc8FmWsA0/sOw+fapz03Sv/XrHV
+	YAQ22wNqQVkpGJDRXpLKG+sxG/Cqcq+dOESsH2O+wRCVWM/NS1H4d2lMAp034EXRccMRYZYwNWE
+	j7WmiUh6mNyhRhyQjD0hQGV3oIFNRP2mHkdrkmouQiF/CxKPgYoxdQ2V5Mr0WP9M3eIfT9ncMQP
+	hFWLEcCjnJtxZ+O0a5n686svT0wEDZs0rw4xTtH682uU5HrlGETVg4JsOzwmzz7O9mKY3agYHVC
+	+vE3BPYfYstapckmT+kYgQtDcvyU4krlmloSRhr7tiZc0dzJfgjjqWLReEM/kQhdw+l7z5GDVmD
+	q3jAhVEf
+X-Received: by 2002:a05:6000:26c9:b0:43b:3b80:6776 with SMTP id ffacd0b85a97d-4515d3dc30emr18803689f8f.30.1778239532551;
+        Fri, 08 May 2026 04:25:32 -0700 (PDT)
+Received: from aspen.lan (aztw-34-b2-v4wan-166919-cust780.vm26.cable.virginm.net. [82.37.195.13])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-454917d57aesm3814079f8f.26.2026.05.08.04.25.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 May 2026 04:25:31 -0700 (PDT)
+Date: Fri, 8 May 2026 12:25:28 +0100
+From: Daniel Thompson <daniel@riscstar.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alex Elder <elder@riscstar.com>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, maxime.chevallier@bootlin.com,
+	rmk+kernel@armlinux.org.uk, andersson@kernel.org,
+	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org,
+	arnd@arndb.de, gregkh@linuxfoundation.org,
+	mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com,
+	alexandre.torgue@foss.st.com, ast@kernel.org,
+	boon.khai.ng@altera.com, chenchuangyu@xiaomi.com,
+	chenhuacai@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	hkallweit1@gmail.com, inochiama@gmail.com, john.fastabend@gmail.com,
+	julianbraha@gmail.com, livelycarpet87@gmail.com,
+	matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
+	prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
+	rohan.g.thomas@altera.com, sdf@fomichev.me,
+	siyanteng@cqsoftware.com.cn, weishangjuan@eswincomputing.com,
+	wens@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 10/12] net: stmmac: tc956x: add TC956x/QPS615
+ support
+Message-ID: <af3IKKkjl0jK8GGB@aspen.lan>
+References: <20260501155421.3329862-1-elder@riscstar.com>
+ <20260501155421.3329862-11-elder@riscstar.com>
+ <2ce5897d-5bbb-486a-b0f0-0e30e54b451a@lunn.ch>
+ <afy34kj2hPxIlArO@aspen.lan>
+ <ef6df85f-11ac-404d-958a-8cf69b3b6bb6@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260508-nf-neigh_hh_bridge-fix-v1-1-a1464468d92e@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2MSQqAMBAEvyJzNhAjrl8REZfWzGWUREQQ/+7gs
- ZrqeigiMCK1yUMBF0feRSFLE5r9KBsML8rkrCttYWsjqxHw5gfvhynwosbKt2nGqaoKwOVzSXo
- +AnT+wx0JTurf9wNVYzFKbQAAAA==
-X-Change-ID: 20260508-nf-neigh_hh_bridge-fix-9ab775ee23c6
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, 
- Phil Sutter <phil@nwl.cc>, Nikolay Aleksandrov <razor@blackwall.org>, 
- Ido Schimmel <idosch@nvidia.com>, Bart De Schuymer <bdschuym@pandora.be>, 
- Patrick McHardy <kaber@trash.net>
-Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
- coreteam@netfilter.org, bridge@lists.linux.dev, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.3
-X-Rspamd-Queue-Id: A40F34F5C76
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ef6df85f-11ac-404d-958a-8cf69b3b6bb6@lunn.ch>
+X-Rspamd-Queue-Id: BBB7E4F5CA4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.06 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[riscstar-com.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[riscstar.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285766-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[riscstar.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	TAGGED_FROM(0.00)[bounces-285768-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[riscstar-com.20251104.gappssmtp.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@riscstar.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[50];
+	TAGGED_RCPT(0.00)[netdev,kernel,dt];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,aspen.lan:mid,riscstar-com.20251104.gappssmtp.com:dkim]
 X-Rspamd-Action: no action
 
-neigh_hh_bridge() assumes the skb always has sufficient headroom to copy
-the aligned  L2 header. This assumption can trigger the crash reported
-below using the following netfilter setup:
+On Thu, May 07, 2026 at 06:29:15PM +0200, Andrew Lunn wrote:
+> On Thu, May 07, 2026 at 05:03:46PM +0100, Daniel Thompson wrote:
+> > On Fri, May 01, 2026 at 09:04:58PM +0200, Andrew Lunn wrote:
+> > > > +static struct tc956x_mac_speed mac_speed[] = {
+> > > > +	{ PHY_INTERFACE_MODE_2500BASEX,	SPEED_2500,  SP_SEL_SGMII_2500M, },
+> > > > +	{ PHY_INTERFACE_MODE_SGMII,	SPEED_2500,  SP_SEL_SGMII_2500M, },
+> > > > +	{ PHY_INTERFACE_MODE_SGMII,	SPEED_1000,  SP_SEL_SGMII_1000M, },
+> > >
+> > > That looks odd. Some vendors implemented 2500BaseX using SGMII
+> > > overclocked. But that is not strictly 2500BaseX. Having the 2500BASEX
+> > > entry suggests you have real 2500BASEX, so why have an SGMII entry
+> > > with SPEED_2500?
+> >
+> > This is a consequence of the code that uses this lookup table being
+> > called both during initialization and from the fix_mac_speed() callback.
+> >
+> > During initialization we only have the value in plat->phy_interface to
+> > go on so we run the lookup table using plat->phy_interface (which is
+> > typically PHY_INTERFACE_MODE_SGMII) and with the maximum permitted
+> > speed.
+>
+> Something sounds wrong here. SGMII only supports 10/100/1G. You should
+> never be asked to do SGMII at 2500. It should ask for 2500BaseX.
 
-$modprobe br_netfilter
-$sysctl -w net.bridge.bridge-nf-call-iptables=1
+We weren't being asked. It was just an internal driver trick to common
+up some code paths.
 
-$root@OpenWrt:~# nft list ruleset
-table ip nat {
-        chain prerouting {
-                type nat hook prerouting priority dstnat; policy accept;
-                ip daddr 192.168.83.123 dnat to 192.168.83.120
-        }
-}
+However I did a few tests and the internal driver trick doesn't
+actually do much we can't achieve a different way. With that changed I
+can (and will) remove the PHY_INTERFACE_MODE_SGMII/SPEED_2500 entry
+from the table.
 
-- iperf3 client (192.168.83.119) --> bridge (192.168.83.118) --> iperf3 server (192.168.83.120)
 
-the iperf3 client is sending packet for 192.168.83.123 to the bridge device.
+> > I haven't got detailed enough notes to allow me to double check but I
+> > think there were problems completing the initial MAC reset if we didn't
+> > write something sensible to the hardware during initialization.
+>
+> > During fix_max_speed() we get told to adopt 2500base-x. Reviewing the
+> > code I can see we don't propagate that and just use
+> > plat->phy_interface for fix_mac_speed(). I will fix the code to that
+> > the requested interface propagates properly to the lookup table but I
+> > think we would still rely on the SGMII entry to get sane initial values
+> > to write to the hardware.
+>
+> Getting sane values into the hardware is good, but 2500 SGMII is not
+> sane :-(
 
-[ 1579.036575] Unable to handle kernel write to read-only memory at virtual address ffffff8004d76ffe
-[ 1579.045482] Mem abort info:
-[ 1579.048273]   ESR = 0x000000009600004f
-[ 1579.052024]   EC = 0x25: DABT (current EL), IL = 32 bits
-[ 1579.057363]   SET = 0, FnV = 0
-[ 1579.060417]   EA = 0, S1PTW = 0
-[ 1579.063550]   FSC = 0x0f: level 3 permission fault
-[ 1579.068345] Data abort info:
-[ 1579.071224]   ISV = 0, ISS = 0x0000004f, ISS2 = 0x00000000
-[ 1579.076720]   CM = 0, WnR = 1, TnD = 0, TagAccess = 0
-[ 1579.081770]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-[ 1579.087092] swapper pgtable: 4k pages, 39-bit VAs, pgdp=0000000080dc4000
-[ 1579.093794] [ffffff8004d76ffe] pgd=180000009ffff003, p4d=180000009ffff003, pud=180000009ffff003, pmd=180000009ffe3003, pte=0060000084d76787
-[ 1579.106343] Internal error: Oops: 000000009600004f [#1] SMP
-[ 1579.193824] CPU: 0 UID: 0 PID: 235 Comm: napi/qdma_eth-3 Tainted: G           O       6.12.57 #0
-[ 1579.202614] Tainted: [O]=OOT_MODULE
-[ 1579.206102] Hardware name: Airoha AN7581 Evaluation Board (DT)
-[ 1579.211929] pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[ 1579.218889] pc : br_nf_pre_routing_finish_bridge+0x1ac/0xcc8 [br_netfilter]
-[ 1579.225859] lr : br_nf_pre_routing_finish_bridge+0x18c/0xcc8 [br_netfilter]
-[ 1579.232822] sp : ffffffc0817cba20
-[ 1579.236128] x29: ffffffc0817cba20 x28: 0000000000000000 x27: ffffff8002b89000
-[ 1579.243273] x26: ffffff8004d7700e x25: 0000000000000008 x24: 0000000000000000
-[ 1579.250416] x23: ffffffc08179d4c0 x22: 0000000000000000 x21: ffffffc08179d4c0
-[ 1579.257561] x20: ffffff8004d9b800 x19: ffffff8015010000 x18: 0000000000000014
-[ 1579.264704] x17: ffffffbf9e930000 x16: ffffffc0817c8000 x15: 0000000000000070
-[ 1579.271848] x14: 0000000000000080 x13: 0000000000000001 x12: 0000000000000000
-[ 1579.278993] x11: ffffffc0798caae0 x10: ffffff8014db6fd8 x9 : 0000000000000000
-[ 1579.286136] x8 : 0000000000000003 x7 : ffffffc08171f628 x6 : 000000001a3b83d3
-[ 1579.293281] x5 : 0000000000000000 x4 : 1beb76f22fee0000 x3 : ffffff8004d7700e
-[ 1579.300425] x2 : 0000000000000000 x1 : ffffff8004d9b8bc x0 : ffffff80026ed000
-[ 1579.307570] Call trace:
-[ 1579.310018]  br_nf_pre_routing_finish_bridge+0x1ac/0xcc8 [br_netfilter]
-[ 1579.316632]  br_nf_hook_thresh+0xd4/0x14bc [br_netfilter]
-[ 1579.322032]  br_nf_hook_thresh+0x250/0x14bc [br_netfilter]
-[ 1579.327517]  br_nf_hook_thresh+0x76c/0x14bc [br_netfilter]
-[ 1579.333003]  br_handle_frame+0x180/0x480
-[ 1579.336935]  __netif_receive_skb_core.constprop.0+0x540/0xf40
-[ 1579.342682]  __netif_receive_skb_one_core+0x28/0x50
-[ 1579.347561]  process_backlog+0x98/0x1e0
-[ 1579.351398]  __napi_poll+0x34/0x1c4
-[ 1579.354887]  net_rx_action+0x178/0x330
-[ 1579.358638]  handle_softirqs+0x108/0x2d4
-[ 1579.362560]  __do_softirq+0x10/0x18
-[ 1579.366051]  ____do_softirq+0xc/0x20
-[ 1579.369627]  call_on_irq_stack+0x30/0x4c
-[ 1579.373550]  do_softirq_own_stack+0x18/0x20
-[ 1579.377734]  do_softirq+0x4c/0x60
-[ 1579.381050]  __local_bh_enable_ip+0x88/0x98
-[ 1579.385234]  napi_threaded_poll_loop+0x188/0x21c
-[ 1579.389853]  napi_threaded_poll+0x70/0x80
-[ 1579.393863]  kthread+0xd8/0xdc
-[ 1579.396918]  ret_from_fork+0x10/0x20
-[ 1579.400499] Code: 88dffc22 3707ffc2 f9406663 f9406684 (f81f0064)
-[ 1579.406589] ---[ end trace 0000000000000000 ]---
-[ 1579.411209] Kernel panic - not syncing: Oops: Fatal exception in interrupt
-[ 1579.418083] SMP: stopping secondary CPUs
-[ 1579.422012] Kernel Offset: disabled
+BTW if you are bothered by SP_SEL_SGMII_2500M, that name comes directly
+from the TRM and I'd prefer to keep it if I can. The enumerated value
+we have to write into the SP_SEL for 2500base-X is "SGMII 2500M".
 
-Fix the issue reallocating the skb headroom if necessary in neigh_hh_bridge routine.
 
-Fixes: e179e6322ac33 ("netfilter: bridge-netfilter: Fix MAC header handling with IP DNAT")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- include/net/neighbour.h         | 15 +++++++++++----
- net/bridge/br_netfilter_hooks.c |  5 ++++-
- 2 files changed, 15 insertions(+), 5 deletions(-)
-
-diff --git a/include/net/neighbour.h b/include/net/neighbour.h
-index 2dfee6d4258a..4e1222968753 100644
---- a/include/net/neighbour.h
-+++ b/include/net/neighbour.h
-@@ -487,16 +487,23 @@ static inline int neigh_event_send(struct neighbour *neigh, struct sk_buff *skb)
- }
- 
- #if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
--static inline int neigh_hh_bridge(struct hh_cache *hh, struct sk_buff *skb)
-+static inline struct sk_buff *
-+neigh_hh_bridge(struct hh_cache *hh, struct sk_buff *skb)
- {
--	unsigned int seq, hh_alen;
-+	unsigned int seq, hh_alen = HH_DATA_ALIGN(ETH_HLEN);
-+
-+	if (unlikely(skb_headroom(skb) < hh_alen)) {
-+		skb = skb_expand_head(skb, hh_alen);
-+		if (!skb)
-+			return NULL;
-+	}
- 
- 	do {
- 		seq = read_seqbegin(&hh->hh_lock);
--		hh_alen = HH_DATA_ALIGN(ETH_HLEN);
- 		memcpy(skb->data - hh_alen, hh->hh_data, ETH_ALEN + hh_alen - ETH_HLEN);
- 	} while (read_seqretry(&hh->hh_lock, seq));
--	return 0;
-+
-+	return skb;
- }
- #endif
- 
-diff --git a/net/bridge/br_netfilter_hooks.c b/net/bridge/br_netfilter_hooks.c
-index 0ab1c94db4b9..6b59d7eb7906 100644
---- a/net/bridge/br_netfilter_hooks.c
-+++ b/net/bridge/br_netfilter_hooks.c
-@@ -297,7 +297,10 @@ int br_nf_pre_routing_finish_bridge(struct net *net, struct sock *sk, struct sk_
- 				goto free_skb;
- 			}
- 
--			neigh_hh_bridge(&neigh->hh, skb);
-+			skb = neigh_hh_bridge(&neigh->hh, skb);
-+			if (!skb)
-+				return -ENOMEM;
-+
- 			skb->dev = br_indev;
- 
- 			ret = br_handle_frame_finish(net, sk, skb);
-
----
-base-commit: fcee7d82f27d6a8b1ddc5bbefda59b4e441e9bc0
-change-id: 20260508-nf-neigh_hh_bridge-fix-9ab775ee23c6
-
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
-
+Daniel.
 
