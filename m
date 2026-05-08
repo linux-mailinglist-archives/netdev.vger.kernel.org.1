@@ -1,180 +1,199 @@
-Return-Path: <netdev+bounces-285763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285764-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iMytIDzI/WlSjAAAu9opvQ
-	(envelope-from <netdev+bounces-285763-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 13:25:48 +0200
+	id wFIVI6XI/WkpigAAu9opvQ
+	(envelope-from <netdev+bounces-285764-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 13:27:33 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC6354F5BD2
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 13:25:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D8B84F5C1D
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 13:27:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 11DDF300F503
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 11:21:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 515903058486
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 11:22:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CA23395D87;
-	Fri,  8 May 2026 11:21:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDB98396579;
+	Fri,  8 May 2026 11:22:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=desarrollaria.com header.i=y2k@desarrollaria.com header.b="q8leFCbc"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="dCNo/pXx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.131])
+Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF68282F05;
-	Fri,  8 May 2026 11:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57542391837;
+	Fri,  8 May 2026 11:22:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778239298; cv=none; b=pc4xRZnmsR+SDqxdjIdbChxZvkTZZwiUnlZ3YRAiC4OliUP/+z3W4eiUe/WeI1hSHWUnkiuZBxXTY86GYPCJeAtmi9WKe7HXimmzm+GHHfpNaXY2YzH29W43sLvBVM+M+IFzq29DtF+JrfoBxWj+V+hfWQIXbUrNtNXeWq9hgnQ=
+	t=1778239353; cv=none; b=os/i5IPj9CT9Z50Q2rg8nYPHrw9xjxjuLigh1H0GxrqkpztsVQ10j1qCAFuJ5PRb6LyNYRv7k6C+RNkBQoKEi5ekAI7gNBSAuZbFKUdp+Fe1L5oNF2Hpt+9yBa1XR3f2TY4/K72diaS+QAcxuLKyJ8BEs+UplD8XI+VPDxZjoNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778239298; c=relaxed/simple;
-	bh=gzDbhQIoIGWMSRircUWTa1O74IhGW+YFHmHbNp9z2cM=;
-	h=Date:Message-ID:From:To:Cc:Subject:Content-Type; b=tpNWBOBrWHhXiKGgpxZgNNUOsDZUtCSl5MpajbbIhDDAw8s6nteD1YZNTYy3gqeLvtQQcJbmurRUkzIr+Nps13o6Gb4vF3j1f2FtfVn94SI4QU/EBPwSkXTDcZqiVeaDdLaAdfWBvRBK3eKCDIYgSDjI2cJEGsx6236b0kYlRHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=desarrollaria.com; spf=pass smtp.mailfrom=desarrollaria.com; dkim=pass (2048-bit key) header.d=desarrollaria.com header.i=y2k@desarrollaria.com header.b=q8leFCbc; arc=none smtp.client-ip=212.227.126.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=desarrollaria.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=desarrollaria.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=desarrollaria.com;
-	s=s1-ionos; t=1778239283; x=1778844083; i=y2k@desarrollaria.com;
-	bh=weV1CskBejzvSQS/4D3AQl2jH3o7iHunH2yC9B3HlFI=;
-	h=X-UI-Sender-Class:Date:Message-ID:From:To:Cc:Subject:
-	 Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=q8leFCbc8U3PzEdSlnkmRjo/zGqOp1jfa6IttdELZc7fuB18KIDmmCrYMjYhvUtd
-	 z+PJ42xGcH8pRjfkRkGpt/ZOGnb1sDsD4UnGW25+OOED8X20IQE1/7J4qvYn+/ZkX
-	 QpaXBo2s2BujrTBPBuFqWCE/IRTDbcvLCNe8e+necPbJ7nLenwM7cmzB3afF6rptA
-	 KOXULHNgNiB4XEoUheIdcFS3GGWc9n+Rz/UWUAPw9HPxEcmxpCBBkCQ6uAimwRIIO
-	 4cHzKl8v6FQGKhhVlztwH/KCjhWkZVkcLFsDHIZCYNRFmwImUodzI5gZ32lyps9Nz
-	 +KOVjOsohos4pz6ZIA==
-X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue009
- [212.227.15.136]) with ESMTPSA (Nemesis) id 1MXp1Q-1vnCPf2BUS-00K6HF; Fri, 08
- May 2026 13:21:23 +0200
-Date: Fri, 08 May 2026 13:21:21 +0200
-Message-ID: <863d7892459fd7627388d8b0c1670292.y2k@desarrollaria.com>
-From: y2k <y2k@desarrollaria.com>
-To: dsahern@kernel.org
-Cc: idosch@nvidia.com, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: ipv6: ip6mr: Call ip6mr_fib_lookup() under RCU in pim6_rcv() and reg_vif6_xmit()
-Content-Type: text/plain; charset=UTF-8
-X-Provags-ID: V03:K1:7PRER3YMWhF8Go32xvQbWA10liFdpO2yjDHvfks5Y9VrKxoFcDY
- slH5aaIOeCl38l8JQqAZ7SCjLHBkUiY3D9EjNEg5jomftrE3R07DJiP9EM1G/n9jV/wFGJW
- tfbQUnkgzRxkHFog/5D1obInVsyfsPqvuUQoclwUPqDVNh7v9iLdvB2Uaq3N1jLVmTiFPBV
- aKeDZeP2D91lSaBImHaBg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:OO5xyz/qqSE=;WaVOQdmKTR8HeEtr+qaQMRMuZmN
- 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
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1778239353; c=relaxed/simple;
+	bh=TefaeVnDgO5HJw5krNA7gKg08j918DZOBjY3E/uSDL8=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=L5MzNVF5s/Xjch6waw3lklJTweUUrR/rQgmhHRYoSA9IxxlfUYJzyB2d8kQv18K/mfo3RkH9WAqk5UXoIMSWEDyxyzF6RoyWK8G6VDTwTqf1k9+WC+/aCxO/d6G1bas+dLv/BszGjbT/B6Ir8KA8noSTyFwV25nPVU/v3mUyrHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=dCNo/pXx; arc=none smtp.client-ip=113.46.200.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=mk8T4h2POm1Gh7v/THTjLkFeyRD4K+Mhi0S9q4bCysw=;
+	b=dCNo/pXxvVfaTcACa5UroQNo5tXlDbrIre1YJu694RHuZCQV80PJDLf4+FR4zsCaT+VPlTJMC
+	nqfRIaQ0P8j+BDT1rT0xJISfzwh2BJHt9kgw0NnUtXkIGPNHJBKmNmz6m7HVrHelVGGhubiyvAG
+	muo0A8DGm9Ry1X2QfaUvIKg=
+Received: from mail.maildlp.com (unknown [172.19.163.127])
+	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4gBmjf4s4dzmV8k;
+	Fri,  8 May 2026 19:14:46 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id E223D402AB;
+	Fri,  8 May 2026 19:22:21 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Fri, 8 May 2026 19:22:20 +0800
+Message-ID: <47530dd8-cba6-4282-ae80-4cabd52b08bc@huawei.com>
+Date: Fri, 8 May 2026 19:22:19 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-X-Rspamd-Queue-Id: DC6354F5BD2
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>
+Subject: Re: [PATCH v4 net 3/3] net: hns3: fix CWR handling in drivers to
+ preserve ACE signal
+To: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>,
+	"linyunsheng@huawei.com" <linyunsheng@huawei.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "parav@nvidia.com" <parav@nvidia.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>, "mst@redhat.com"
+	<mst@redhat.com>, "shenjian15@huawei.com" <shenjian15@huawei.com>,
+	"salil.mehta@huawei.com" <salil.mehta@huawei.com>, "saeedm@nvidia.com"
+	<saeedm@nvidia.com>, "tariqt@nvidia.com" <tariqt@nvidia.com>,
+	"mbloch@nvidia.com" <mbloch@nvidia.com>, "leonro@nvidia.com"
+	<leonro@nvidia.com>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>, "ij@kernel.org" <ij@kernel.org>,
+	"ncardwell@google.com" <ncardwell@google.com>, "Koen De Schepper (Nokia)"
+	<koen.de_schepper@nokia-bell-labs.com>, "g.white@cablelabs.com"
+	<g.white@cablelabs.com>, "ingemar.s.johansson@ericsson.com"
+	<ingemar.s.johansson@ericsson.com>, "mirja.kuehlewind@ericsson.com"
+	<mirja.kuehlewind@ericsson.com>, "cheshire@apple.com" <cheshire@apple.com>,
+	"rs.ietf@gmx.at" <rs.ietf@gmx.at>, "Jason_Livingood@comcast.com"
+	<Jason_Livingood@comcast.com>, "vidhi_goel@apple.com" <vidhi_goel@apple.com>
+References: <20260417152642.71674-1-chia-yu.chang@nokia-bell-labs.com>
+ <20260417152642.71674-4-chia-yu.chang@nokia-bell-labs.com>
+ <6ae96ead-61b3-470a-a30b-3418350a45f0@huawei.com>
+ <PAXPR07MB7984A31018E9B85DEC28B68CA3282@PAXPR07MB7984.eurprd07.prod.outlook.com>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <PAXPR07MB7984A31018E9B85DEC28B68CA3282@PAXPR07MB7984.eurprd07.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
+X-Rspamd-Queue-Id: 5D8B84F5C1D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	MISSING_MIME_VERSION(2.00)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[desarrollaria.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[desarrollaria.com:s=s1-ionos];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[desarrollaria.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-285764-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285763-lists,netdev=lfdr.de];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[nokia-bell-labs.com,huawei.com,lunn.ch,nvidia.com,redhat.com,vger.kernel.org,davemloft.net,google.com,kernel.org,cablelabs.com,ericsson.com,apple.com,gmx.at,comcast.com];
+	RCPT_COUNT_TWELVE(0.00)[30];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	TO_DN_NONE(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[y2k@desarrollaria.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[huawei.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,desarrollaria.com:email,desarrollaria.com:mid,desarrollaria.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Commit 019c892e4654 ("ipmr: Call ipmr_fib_lookup() under RCU.") fixed
-the same issue in IPv4's reg_vif_xmit(). The IPv6 counterpart has the
-same problem in two places.
 
-In pim6_rcv() (net/ipv6/ip6mr.c:578) and reg_vif6_xmit()
-(net/ipv6/ip6mr.c:624), ip6mr_fib_lookup() is called without holding
-rcu_read_lock().
+on 2026/4/25 22:30, Chia-Yu Chang (Nokia) wrote:
+>> -----Original Message-----
+>> From: Jijie Shao <shaojijie@huawei.com>
+>> Sent: Saturday, April 25, 2026 11:35 AM
+>> To: Chia-Yu Chang (Nokia) <chia-yu.chang@nokia-bell-labs.com>; linyunsheng@huawei.com; andrew+netdev@lunn.ch; parav@nvidia.com; jasowang@redhat.com; mst@redhat.com; shenjian15@huawei.com; salil.mehta@huawei.com; saeedm@nvidia.com; tariqt@nvidia.com; mbloch@nvidia.com; leonro@nvidia.com; linux-rdma@vger.kernel.org; netdev@vger.kernel.org; davem@davemloft.net; edumazet@google.com; kuba@kernel.org; pabeni@redhat.com; horms@kernel.org; ij@kernel.org; ncardwell@google.com; Koen De Schepper (Nokia) <koen.de_schepper@nokia-bell-labs.com>; g.white@cablelabs.com; ingemar.s.johansson@ericsson.com; mirja.kuehlewind@ericsson.com; cheshire@apple.com; rs.ietf@gmx.at; Jason_Livingood@comcast.com; vidhi_goel@apple.com
+>> Cc: shaojijie@huawei.com
+>> Subject: Re: [PATCH v4 net 3/3] net: hns3: fix CWR handling in drivers to preserve ACE signal
+>>
+>>
+>> on 2026/4/17 23:26, chia-yu.chang@nokia-bell-labs.com wrote:
+>>> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+>>>
+>>> Currently, hns3 Rx paths use SKB_GSO_TCP_ECN flag when a TCP segment
+>>> with the CWR flag set. This is wrong because SKB_GSO_TCP_ECN is only
+>>> valid for RFC3168 ECN on Tx, and using it on Rx allows RFC3168 ECN
+>>> offload to clear the CWR flag. As a result, incoming TCP segments lose
+>>> their ACE signal integrity required for AccECN (RFC9768), especially
+>>> when the packet is forwarded and later re-segmented by GSO.
+>>>
+>>> Fix this by setting SKB_GSO_TCP_ACCECN for any Rx segment with the CWR
+>>> flag set. SKB_GSO_TCP_ACCECN ensure that RFC3168 ECN offload will not
+>>> clear the CWR flag, therefore preserving the ACE signal.
+>>>
+>>> Fixes: d474d88f88261 ("net: hns3: add hns3_gro_complete for HW GRO
+>>> process")
+>>> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+>>> ---
+>>>    drivers/net/ethernet/hisilicon/hns3/hns3_enet.c | 2 +-
+>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+>>> b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+>>> index a3206c97923e..e1b0dba56182 100644
+>>> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+>>> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+>>> @@ -3904,7 +3904,7 @@ static int hns3_gro_complete(struct sk_buff
+>>> *skb, u32 l234info)
+>>>    
+>>>    	skb_shinfo(skb)->gso_segs = NAPI_GRO_CB(skb)->count;
+>>>    	if (th->cwr)
+>>> -		skb_shinfo(skb)->gso_type |= SKB_GSO_TCP_ECN;
+>>> +		skb_shinfo(skb)->gso_type |= SKB_GSO_TCP_ACCECN;
+>>>    
+>>>    	if (l234info & BIT(HNS3_RXD_GRO_FIXID_B))
+>>>    		skb_shinfo(skb)->gso_type |= SKB_GSO_TCP_FIXEDID;
+>> I agree with Paolo's previous point;
+>> for already released hardware, it is indeed not suitable to modify it.
+>> During the hardware aggregation process, the ACE signal may have already been lost.
+>>
+>> Jijie Shao
+> Hi Jijie,
+>
+> I would disagree with not fixing on released hardware. (Did Paolo explicit mention that?)
+> The ACCECN protocol is based on ACE signal, and a broken ACE signal might be due to SKB_GSO_TCP_ECN at the RX path.
+> You can see the explicit explanations and examples in the commit message.
+> There is already a fix in patch 4e4f7cefb130af6aba6a393b2d13930b49390df9 for tcp_gro_receive() of tcp_offload.c
+>
+> And In this patch series, we would like to propose the similar fix on hns3 and mlx5e.
+> While one main issue is to confirm is how the GRO is done in the corresponding HW-GRO.
+> And if the driver can be safely changed from SKB_GSO_TCP_ECN to SKB_GSO_TCP_ACCECN, then we can ensure ECN and AccECN can be supported over existing hardware.
 
-When CONFIG_IP6_MROUTE_MULTIPLE_TABLES=3Dn, ip6mr_fib_lookup() accesses
-net->ipv6.mrt6 directly without rcu_dereference(), while the IPv4
-equivalent correctly uses rcu_dereference(net->ipv4.mrt). This
-inconsistency means IPv6 multicast routing lacks proper RCU protection.
+Sorry for the late reply.
 
-In reg_vif6_xmit(), rcu_read_lock() is acquired at line 628 after the
-ip6mr_fib_lookup() call at line 624 =E2=80=94 too late. In pim6_rcv(), the=
-re
-is no rcu_read_lock() before ip6mr_fib_lookup() at line 578 at all.
+It is confirmed that ACC_ECN is not supported.
+HW-GRO will set the TOS field to 0.
 
-Suggested fix for reg_vif6_xmit():
+Jijie Shao
 
-  + rcu_read_lock();
-    if (ip6mr_fib_lookup(net, &fl6, &mrt) < 0) {
-  +   rcu_read_unlock();
-      goto tx_err;
-    }
-    DEV_STATS_ADD(dev, tx_bytes, skb->len);
-    DEV_STATS_INC(dev, tx_packets);
-  - rcu_read_lock();
-    ip6mr_cache_report(mrt, skb, READ_ONCE(mrt->mroute_reg_vif_num),
-                       MRT6MSG_WHOLEPKT);
-    rcu_read_unlock();
 
-Suggested fix for pim6_rcv():
-
-  + rcu_read_lock();
-    if (ip6mr_fib_lookup(net, &fl6, &mrt) < 0) {
-  +   rcu_read_unlock();
-      goto drop;
-    }
-
-Additionally, net->ipv6.mrt6 should be accessed via rcu_dereference()
-in ip6mr_fib_lookup() to match the IPv4 pattern in ipmr_fib_lookup().
-
-Thanks,
-y2k
-y2k@desarrollaria.com
 
