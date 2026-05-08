@@ -1,207 +1,199 @@
-Return-Path: <netdev+bounces-285564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285565-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6CPhJh8r/WkJYgAAu9opvQ
-	(envelope-from <netdev+bounces-285564-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 02:15:27 +0200
+	id cMGOMKsu/WlIYgAAu9opvQ
+	(envelope-from <netdev+bounces-285565-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 02:30:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA46B4F0701
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 02:15:26 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C78D44F07B1
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 02:30:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8679930075D4
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 00:15:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D01E2300A586
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 00:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 104F118EFD1;
-	Fri,  8 May 2026 00:15:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n9qgO/B4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9149C1891A9;
+	Fri,  8 May 2026 00:30:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
+Received: from mail-ot1-f80.google.com (mail-ot1-f80.google.com [209.85.210.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A696213D539
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 00:15:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA11171BB
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 00:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778199325; cv=none; b=ppDS87wM1jf/ecY5csvUvqp/IOQxYgPlQeGhlIgCbh7uZIweKFSH6Vx+wJgYDZlMzdK2GGmrgDkQd+8gGUIUBRHIvZK/wqFMJX6cJP9VErVa9acRyxJKmWqj5mDqiG+aFOkGBlPmmYmyO7jf0yaGkKeQoZ9mhSOdwkQ4nwHnicc=
+	t=1778200230; cv=none; b=XKzcnIcydIcMJS2CvsGU/xEMsvBG74lfW8ZnLZz91kQUa/BYU4+9JKj8Xt0xpeGx7e1rEeKbdEbwn8tEhEEHUKsJt3LtJIH2eiLIOMA1arAwy36blEydSo5GieRHobakuBiAX/NoXyHXiX7E+v2XcHSrdsuCFjDJdFSays04o68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778199325; c=relaxed/simple;
-	bh=SKEeViFbp1uXUSYeHb372Uw+KJNAO1yOkAXwhXCVyQU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e0akM+iXWZcoQCMptsS7O82NuPd2wtSHzg5liHy8SPBygRj/kx/ljzOsR5pL9gzYyz07oxXZ95Ww7mBjoDlX33Z2EAZ/J3AMBs2wdGEXsJ0+Awvm0QJ+jWnPYx0JDc84v/iD8CxHfRWazOP0r9h5P6xCKSz4r27BO2Cxvmlir+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n9qgO/B4; arc=none smtp.client-ip=74.125.82.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-2f7ca62a3c4so882743eec.0
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 17:15:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778199323; x=1778804123; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7LQCxTjl/7QlKwFcwi4/FESx78z4DYB8yBxbbODWZwc=;
-        b=n9qgO/B4xR/jX45b67IAoPWeP6O8vPd3ZC3fn0rtRW/Cn4hailsG1MIWMeDH32+cqV
-         VvDB/4WQBRHVQl7YmuiQNa9pI9033C7Ax4n4vxO1RD3YNwejSFZcRLtGLHDBz23k1zM8
-         6bGjewXsaYPUeT/P6CwDZC4GnNn2heEZWAyGhFlKTm4EZcGRtYSIrRdzirI4jrlg6ij7
-         SXNPKahH7sykQmgYsL3Yau0DTEznYS+pH/V4TqZZp846h5pljX29MCBqP+2Ut1D8kGTv
-         Vm0cjK5GLZtUj7ef8/kKp1i0oDXa5v7CU/Jsx4nadhNJEin1j7JRgopiFxfiiY1EQA7e
-         OSUw==
+	s=arc-20240116; t=1778200230; c=relaxed/simple;
+	bh=jKrNWM4sTl/fN6pwMtPOkS6bJ/8RKqOpQAKAIXdpwPU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=hzoEmOlGvfRi3/QcRpILijewrp3PN7LdKjKcwws3jb8H0lIOJy0ed5P6LqBp6fJCviOIQCxi0SbBpsuSsDV/7r7MEp8dx75ElCXcwGFbCj6em38D95kl1w3t+qKpLReXm7n2zgdPZJKRYIXyV3ZfSK994SdMyjluvvw0tMrGTps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f80.google.com with SMTP id 46e09a7af769-7d496d080d8so2134245a34.0
+        for <netdev@vger.kernel.org>; Thu, 07 May 2026 17:30:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778199323; x=1778804123;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7LQCxTjl/7QlKwFcwi4/FESx78z4DYB8yBxbbODWZwc=;
-        b=hUFvr6gxbj5Z81C7w45N4VWs9PnGx1cD7LLRd820JKwTOraqlLpHfEGrEVGC1+OUvM
-         VCT4uEhW0kV1thqmcHbIYlVxIK3c9+OLGTgtENBNdN4l2OcdaueN9/HH0KCMc8g8g5Nv
-         mUHixqzJGs9RzjJMNWtoYYsSB/SWzu+jnvANieV38SYdFJRZMyJ0iV6YBy3vvGnpGX5O
-         yb/DxeViIngsrJNoPD7zvpQsxW2Od6z3q9ZmfAU1+SFBpH/iJgRwFVUN57t4BP16A5D3
-         Ys6Yv60N8vOVbejYTDkfrtYLkxnWIgrRXtFNK7eJPEtpBm4ckKU0jcSB99ymN1xYnpfR
-         5Pwg==
-X-Forwarded-Encrypted: i=1; AFNElJ/OWOEYpiCqd9thCoQYOJ6CHKYwFr37BtXoBIpzjiari7n+UYP4bgUfp/vrq+ew2y3HaXlKKIk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyS/I+AkYXEDNrl4C0oDO0L3mPQ2YONH1+/17i6LV7auQysP5WZ
-	gS16KF4J1qF7qrHFg/0n9AR5mp92TfsL1WUi5ZgW8fTSR9ak/BYPo/do
-X-Gm-Gg: Acq92OFz1rb5D9JhOUNXI6fW3ExaR3wyKWdEjhHBzn1Y7A3SYlZx3BRbxzQv87/2KxX
-	wEMMTzGQBySTCMxM4burnb5Yge0jpIKtMSofSMBlgg1v8KqwLySEgZotS2M2YCYJ0cAOCvK5ml9
-	1folS2CDnt203L4m9nRMUJ3XiereE1iZYcAdSUE8y6hMY7lA3AhVzvax4yIGonxWAJG6kk9DWx0
-	MQE79SdY2GhFN2mKr/+I6oMaPOcvkwXEGL7M8A4IosSwu0q7d8TYsd2Q3rH74tWCMcImgUwfjq7
-	sDZRnTs6N1A4QVnCBRoxGZnibaUvT2IB85hnZPevOarlvo7qYt1/PLpwSnmzKcKUA90efm0iWGA
-	cB+O7GJ1YLE9rnEJX+MN67ehLJHwv+mz8vekeuUEqAHVjmPzH8ERZtXLRweJLKflfR/uc8Po95K
-	MQSizpi5dPbLoa89sC3bo5dv433G/jAUMdq65SDi4Et1UvTU/F
-X-Received: by 2002:a05:7300:e82b:b0:2ca:7eb4:3e0f with SMTP id 5a478bee46e88-2f54b897f52mr5070659eec.5.1778199322328;
-        Thu, 07 May 2026 17:15:22 -0700 (PDT)
-Received: from bmorris-M3Y3522M42 ([136.24.56.26])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2f8859eafc2sm103309eec.4.2026.05.07.17.15.20
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 07 May 2026 17:15:21 -0700 (PDT)
-From: joycathacker@gmail.com
-To: marcelo.leitner@gmail.com,
-	lucien.xin@gmail.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-sctp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	security@kernel.org,
-	Ben Morris <bmorris@anthropic.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net] sctp: revalidate list cursor after sctp_sendmsg_to_asoc() in SCTP_SENDALL
-Date: Thu,  7 May 2026 17:14:55 -0700
-Message-ID: <20260508001455.3137-1-joycathacker@gmail.com>
-X-Mailer: git-send-email 2.51.2
+        d=1e100.net; s=20251104; t=1778200228; x=1778805028;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mIkD2xwrP+8INnxczVEjgjkxbUkaCe5PiDLA5paCELc=;
+        b=N8XO8JZOssB0fym/Kxk7fqkwomiCck4r74vPfuYn74bWyGraO2RSd9bp8QjCzlWyk4
+         dA+vx1G5qrH6gQ5xLtoE+rPyHk4LFAvNMSUk+vGTAce27rkLePNYShrGOxT2XYMZLxpd
+         Bze4tIjntobjk+7HOrWhqMqF1qMHYBUlUAHMvSYv8QbFma0YauKL03pGSDBmzQoKfOwd
+         bGgB3M4SbWr85/n98TQIl3AU+KRKSMh1kLN4gICQO+ATicMtf7m0+/fkUaJZ7wyUrabI
+         tvx/8D2CoC3FMK7ezf6oncmL1ttMtSNoQQPA5nLYuXeBF0wUCURQm8qbSj9TCxz2QN4i
+         EMEg==
+X-Forwarded-Encrypted: i=1; AFNElJ+I8U3Nq7jm+ZBCCEJ8EhB/hp4IDnAEgfybjs1e4ckCxo4tRmT0PHgcH6wkalSEpw/fEDIfBKA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOtEzrITIdJcU01Gy8PeiugzY2t4/ICLKoXAPuCr/8Y4CLmmkT
+	s9D7PUh2Ost5zdRJnvY1DDfgleCqy08QDSSSmw3Dil4XSIdKBzXVbgpDyVmjZ9QhqInMCQudDrY
+	2hbrOp2AaY5uoZ3XjPqKZlPTJa616AZM66YKi+fS74s2fe9L0D4mBtfQdTyQ=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: EA46B4F0701
+X-Received: by 2002:a05:6820:604:b0:67e:1be2:59e1 with SMTP id
+ 006d021491bc7-69998cbca0dmr5705143eaf.18.1778200227797; Thu, 07 May 2026
+ 17:30:27 -0700 (PDT)
+Date: Thu, 07 May 2026 17:30:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69fd2ea3.170a0220.25a3d6.0008.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in wiphy_register (5)
+From: syzbot <syzbot+2002864e6c6895cb0ac3@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: C78D44F07B1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=f2b487b72ffad035];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285564-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TAGGED_FROM(0.00)[bounces-285565-lists,netdev=lfdr.de,2002864e6c6895cb0ac3];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,googlegroups.com:email,syzkaller.appspot.com:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joycathacker@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,anthropic.com:email]
+	SUBJECT_HAS_QUESTION(0.00)[]
 X-Rspamd-Action: no action
 
-From: Ben Morris <bmorris@anthropic.com>
+Hello,
 
-The SCTP_SENDALL path in sctp_sendmsg() iterates ep->asocs with
-list_for_each_entry_safe(), which caches the next entry in @tmp before
-the loop body runs.  The body calls sctp_sendmsg_to_asoc(), which may
-drop the socket lock inside sctp_wait_for_sndbuf().
+syzbot found the following issue on:
 
-While the lock is dropped, another thread can SCTP_SOCKOPT_PEELOFF the
-association cached in @tmp, migrating it to a new endpoint via
-sctp_sock_migrate() (list_del_init() + list_add_tail() to
-newep->asocs), and optionally close the new socket which frees the
-association via kfree_rcu().  The cached @tmp can also be freed by a
-network ABORT for that association, processed in softirq while the
-lock is dropped.
+HEAD commit:    2281958e6007 Merge tag 'wireless-next-2026-05-06' of https..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=139f656a580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f2b487b72ffad035
+dashboard link: https://syzkaller.appspot.com/bug?extid=2002864e6c6895cb0ac3
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1452fb48580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=179f656a580000
 
-sctp_wait_for_sndbuf() revalidates @asoc (the current entry) on re-lock
-via the "sk != asoc->base.sk" and "asoc->base.dead" checks, but nothing
-revalidates @tmp.  After a successful return, the iterator advances to
-the stale @tmp, yielding either a use-after-free (if the peeled socket
-was closed) or a list-walk onto the new endpoint's list head (type
-confusion of &newep->asocs as a struct sctp_association *).
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/4df17f60254b/disk-2281958e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1e93157edd25/vmlinux-2281958e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/60dbf6a0a81c/bzImage-2281958e.xz
 
-Both are reachable from CapEff=0; the type-confusion path gives
-controlled indirect call via the outqueue.sched->init_sid pointer.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2002864e6c6895cb0ac3@syzkaller.appspotmail.com
 
-Fix by re-deriving @tmp from @asoc after sctp_sendmsg_to_asoc()
-returns.  @asoc is known to still be on ep->asocs at that point: the
-only callers that list_del an association from ep->asocs are
-sctp_association_free() (which sets asoc->base.dead) and
-sctp_assoc_migrate() (which changes asoc->base.sk), and
-sctp_wait_for_sndbuf() checks both under the lock before any
-successful return; a tripped check propagates as err < 0 and the loop
-bails before the re-derive.
+------------[ cut here ]------------
+(wiphy->interface_modes & BIT(NL80211_IFTYPE_NAN_DATA)) && (!wiphy->nan_capa.phy.ht.ht_supported || wiphy->n_radio > 1)
+WARNING: net/wireless/core.c:885 at wiphy_register+0x58a/0x2fe0 net/wireless/core.c:884, CPU#0: syz.0.17/5835
+Modules linked in:
+CPU: 0 UID: 0 PID: 5835 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+RIP: 0010:wiphy_register+0x58a/0x2fe0 net/wireless/core.c:884
+Code: 00 00 e8 49 8f d4 f6 90 0f 0b 90 e9 67 0a 00 00 e8 3b 8f d4 f6 e9 59 0a 00 00 e8 31 8f d4 f6 e9 eb 00 00 00 e8 27 8f d4 f6 90 <0f> 0b 90 e9 45 0a 00 00 44 89 f8 24 06 0f b6 d8 31 ff 89 de e8 0d
+RSP: 0018:ffffc90003236860 EFLAGS: 00010293
+RAX: ffffffff8af13fe2 RBX: 0000000000000004 RCX: ffff88802ed60000
+RDX: 0000000000000000 RSI: 0000000000000004 RDI: 0000000000000001
+RBP: ffffc900032369f0 R08: ffff8880582b0faf R09: 1ffff1100b0561f5
+R10: dffffc0000000000 R11: ffffed100b0561f6 R12: ffff8880582b0740
+R13: dffffc0000000000 R14: ffffffff8d002990 R15: ffff8880582b0804
+FS:  0000555593855500(0000) GS:ffff888125289000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007eff2e872700 CR3: 0000000075672000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ ieee80211_register_hw+0x3c53/0x4910 net/mac80211/main.c:1627
+ mac80211_hwsim_new_radio+0x3327/0x57e0 drivers/net/wireless/virtual/mac80211_hwsim_main.c:6047
+ hwsim_new_radio_nl+0xe20/0x26e0 drivers/net/wireless/virtual/mac80211_hwsim_main.c:6832
+ genl_family_rcv_msg_doit+0x22a/0x330 net/netlink/genetlink.c:1114
+ genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
+ genl_rcv_msg+0x61c/0x7a0 net/netlink/genetlink.c:1209
+ netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2551
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
+ netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+ netlink_unicast+0x75c/0x8e0 net/netlink/af_netlink.c:1345
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1895
+ sock_sendmsg_nosec net/socket.c:787 [inline]
+ __sock_sendmsg net/socket.c:802 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2698
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2752
+ __sys_sendmsg net/socket.c:2784 [inline]
+ __do_sys_sendmsg net/socket.c:2789 [inline]
+ __se_sys_sendmsg net/socket.c:2787 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2787
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7eff2e99cdd9
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffd72c5edf8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007eff2ec15fa0 RCX: 00007eff2e99cdd9
+RDX: 0000000000000000 RSI: 0000200000000100 RDI: 0000000000000003
+RBP: 00007eff2ea32d69 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007eff2ec15fac R14: 00007eff2ec15fa0 R15: 00007eff2ec15fa0
+ </TASK>
 
-The SCTP_ABORT path in sctp_sendmsg_check_sflags() returns 0 and the
-loop hits 'continue' before sctp_sendmsg_to_asoc() is ever called, so
-the @tmp cached by list_for_each_entry_safe() still covers the
-lock-held free that ba59fb027307 ("sctp: walk the list of asoc
-safely") was added for.
 
-Fixes: 4910280503f3 ("sctp: add support for snd flag SCTP_SENDALL process in sendmsg")
-Cc: stable@vger.kernel.org
-Assisted-by: claude:mythos
-Signed-off-by: Ben Morris <bmorris@anthropic.com>
 ---
- net/sctp/socket.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-index 58d0d9747f0b..1d2568bb6bc2 100644
---- a/net/sctp/socket.c
-+++ b/net/sctp/socket.c
-@@ -1986,6 +1986,15 @@ static int sctp_sendmsg(struct sock *sk, struct msghdr *msg, size_t msg_len)
- 				goto out_unlock;
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
- 			iov_iter_revert(&msg->msg_iter, err);
-+
-+			/* sctp_sendmsg_to_asoc() may have released the socket
-+			 * lock (sctp_wait_for_sndbuf), during which other
-+			 * associations on ep->asocs could have been peeled
-+			 * off or freed.  @asoc itself is revalidated by the
-+			 * base.dead and base.sk checks in sctp_wait_for_sndbuf,
-+			 * so re-derive the cached cursor from it.
-+			 */
-+			tmp = list_next_entry(asoc, asocs);
- 		}
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
- 		goto out_unlock;
---
-2.43.0
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
