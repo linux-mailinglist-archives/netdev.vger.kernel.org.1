@@ -1,163 +1,149 @@
-Return-Path: <netdev+bounces-285675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285676-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oFtvHNSG/WmefQAAu9opvQ
-	(envelope-from <netdev+bounces-285675-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 08:46:44 +0200
+	id KKWyOQGH/WmefQAAu9opvQ
+	(envelope-from <netdev+bounces-285676-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 08:47:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC9FE4F298A
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 08:46:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 401B84F29A1
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 08:47:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4F7213022630
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 06:46:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 20080303FFEA
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 06:47:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E01B337649A;
-	Fri,  8 May 2026 06:46:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA8633D6F8;
+	Fri,  8 May 2026 06:47:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="gYa32qQm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rBoM+uOJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319A5377561;
-	Fri,  8 May 2026 06:46:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8CD1351C3A;
+	Fri,  8 May 2026 06:47:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778222797; cv=none; b=gPuXw+xBMysrlnG48BoQfzx1iVkxuIXGAZ4s7UzPS/naPG7Si+2i9RrXLjLEHBDzfwf5FTfop/XqcO1msqcdth/DdYSCfa+uj8qppu8yAWtLa2boxTny8XSZZjCt33gs20ZCq9oe/JYoraEXboC3PjxHvwO2J88WSNZL6T3ngQ8=
+	t=1778222821; cv=none; b=UkFJfEYvOoQvgQu9dJs8mvv64wAHwwRx/LkbcrCr9iiuG/p1vJZCfManrdXtDC57aYmQchFB2o76f7RKa4jiNdePk7TnLmHRVcMR7voqD+kkY8r1RRj+HJpr2L1C41IQgzEfVYlHrda3ry7OCUKz+ZowJdv7gV2EZbj1tfsDvA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778222797; c=relaxed/simple;
-	bh=05nZ+gIzppm+BLZBfpcPgMdNGhEbEugPLSX//8bpPp0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uMvQtCDmujCfKFGiOLDyLhxTYq9P3W/SzK0MetiMup6yzj79eMOi9AmxqqEGldJkHKNUYF2qZG6imuvWcx8Cm9V92U+eyYT4b6VCQfyW+1yL0c1v+g2bbhmiYway7Iu84VyKOjrh+eeBoPE/cSFEPuh0Oj2tG4266bdZS5EuPyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=gYa32qQm; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 34574207BE;
-	Fri,  8 May 2026 08:46:16 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AO8moCBcSTVj; Fri,  8 May 2026 08:46:14 +0200 (CEST)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id BF1F8206B0;
-	Fri,  8 May 2026 08:46:14 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com BF1F8206B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1778222774;
-	bh=g2RV2sN+jzmrGkn4ZV3GjuywoldoUqX9Pel8LWivNrw=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=gYa32qQm7axhs8CWSzB8b+Vry+3lO9qOfomax+LQeGMEs3iQQlUyFDqiQQ0GjShcd
-	 QT8Os2VrZPYUEUEQCV7DlUY2TOprGkx2xkLIeu0OFUAO8QmNC0E08JlSzXxobTlwvu
-	 I8m4BgkDM7aUhl3SOum6g0x7omMSyktafCfq8QekxoKoTqy922TmOXnRPs4MbZcgdm
-	 JRk+g4Zwhg/I8sE1ap3oGHZW8QqHPwdO3NNOgag84sZ1CG5Hg3nyzKAgrdOfUVnKz+
-	 X6oYi2EO0bpPHeS0IyXA3rK6nKSscpvB0Pm+aOkKjBQ4GONK3SnVbYBwjDObBO7wvi
-	 eMB2fm7DZZOAQ==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 8 May
- 2026 08:46:14 +0200
-Received: (nullmailer pid 2712693 invoked by uid 1000);
-	Fri, 08 May 2026 06:46:13 -0000
-Date: Fri, 8 May 2026 08:46:13 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Maoyi Xie <maoyixie.tju@gmail.com>
-CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <edumazet@google.com>, <horms@kernel.org>,
-	<antony.antony@secunet.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
-Subject: Re: [PATCH net] xfrm: route MIGRATE notifications to caller's netns
-Message-ID: <af2GtRO3hhGKa0ek@secunet.com>
-References: <20260504142736.1228425-1-maoyi.xie@ntu.edu.sg>
+	s=arc-20240116; t=1778222821; c=relaxed/simple;
+	bh=uKAOXdr7KoyoLXoWkvIiwhu5inN82Hrcf71gx2FwTL4=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=MEfS9wsiwyGjE1iGLbDDqpZpoyA4+QxUw092v6mZPmJIUzhO1K+DDAVBtUyZzWcisvEDO6BQ/rtgazl18ZrcIyGBgM82AHEfnnF6KqbiWJlGMFhisWP7RRy3ippIyvn+ZKsBgR/5XkP3UKSnK+fcaaZucBzib++oVdRa1TrIPZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rBoM+uOJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 193EBC2BCB0;
+	Fri,  8 May 2026 06:46:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778222819;
+	bh=uKAOXdr7KoyoLXoWkvIiwhu5inN82Hrcf71gx2FwTL4=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=rBoM+uOJQYB0NFff7uB2cgpANz0ma7Q2Xa2GtuDlwToO8Z4hyJ3vsgSr7JHXCc+be
+	 OLHKrccw0DSFGpeId3LHUKMk/Gwl4tqOqp/07IIW6u2cFxfyoOHuYWbFh23r7xTIOi
+	 hL5WDRxzrIV6p6YckB/PmvwN7uPvaMY8cQ1rsoojo2qL3raam0Hmw0Tuc77TuWcpRj
+	 ELQNf3ajnJ7t3nB+K+LQqKtJE3QjgxbH6e7bFggdFLT3FlZJUNU6lYITqPEd/6fQbx
+	 uGYvmGl+oQd65vop7dQbVH+vVgJK7uUkiBh1CJlNu5DjaXsiG5N/gfY+Q0WIG2/kWu
+	 FXza7gN5NuWLw==
+Date: Fri, 08 May 2026 01:46:57 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260504142736.1228425-1-maoyi.xie@ntu.edu.sg>
-X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
- (10.32.0.171)
-X-Rspamd-Queue-Id: CC9FE4F298A
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ linux-hardening@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, 
+ Hal Feng <hal.feng@starfivetech.com>, Stephen Boyd <sboyd@kernel.org>, 
+ linux-riscv@lists.infradead.org, Albert Ou <aou@eecs.berkeley.edu>, 
+ netdev@vger.kernel.org, Palmer Dabbelt <palmer@dabbelt.com>, 
+ linux-clk@vger.kernel.org, Kees Cook <kees@kernel.org>, 
+ Alexandre Ghiti <alex@ghiti.fr>, Philipp Zabel <p.zabel@pengutronix.de>, 
+ Michael Turquette <mturquette@baylibre.com>, 
+ Emil Renner Berthing <kernel@esmil.dk>, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Sia Jee Heng <jeeheng.sia@starfivetech.com>, 
+ "Gustavo A . R . Silva" <gustavoars@kernel.org>, 
+ Richard Cochran <richardcochran@gmail.com>, Paul Walmsley <pjw@kernel.org>, 
+ Ley Foon Tan <leyfoon.tan@starfivetech.com>
+To: Changhuang Liang <changhuang.liang@starfivetech.com>
+In-Reply-To: <20260508053632.818548-18-changhuang.liang@starfivetech.com>
+References: <20260508053632.818548-1-changhuang.liang@starfivetech.com>
+ <20260508053632.818548-18-changhuang.liang@starfivetech.com>
+Message-Id: <177822281712.4161155.7993611746550690786.robh@kernel.org>
+Subject: Re: [PATCH v2 17/22] dt-bindings: clock: Add StarFive JHB100
+ Peripheral-2 clock and reset generator
+X-Rspamd-Queue-Id: 401B84F29A1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:mid,secunet.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ntu.edu.sg:email];
-	TAGGED_FROM(0.00)[bounces-285675-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,starfivetech.com,lists.infradead.org,eecs.berkeley.edu,dabbelt.com,ghiti.fr,pengutronix.de,baylibre.com,esmil.dk,gmail.com];
+	TAGGED_FROM(0.00)[bounces-285676-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.1:email,devicetree.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,starfivetech.com:email]
 X-Rspamd-Action: no action
 
-On Mon, May 04, 2026 at 10:27:36PM +0800, Maoyi Xie wrote:
-> xfrm_send_migrate() in net/xfrm/xfrm_user.c and pfkey_send_migrate()
-> in net/key/af_key.c both hardcode &init_net for the multicast that
-> announces a successful XFRM_MSG_MIGRATE / SADB_X_MIGRATE.
-> 
-> XFRM_MSG_MIGRATE arrives on a per-netns NETLINK_XFRM socket, and the
-> rest of the xfrm/af_key netlink path was made netns-aware in 2008.
-> The other 14 multicast paths in xfrm_user.c route their event using
-> xs_net(x), xp_net(xp) or sock_net(skb->sk); only the migrate path
-> was missed.
-> 
-> Two consequences of the init_net hardcoding:
-> 
->   1. The notification (selector, old/new endpoint addresses, and the
->      km_address) is delivered to listeners on init_net's
->      XFRMNLGRP_MIGRATE / pfkey BROADCAST_ALL groups rather than on
->      the issuing netns. An IKE daemon running in init_net therefore
->      receives migration notifications originating from any other
->      netns on the host.
-> 
->   2. An IKE daemon running inside a non-init netns and subscribed
->      to its own XFRMNLGRP_MIGRATE / pfkey groups never receives the
->      notification of its own migration. IKEv2 MOBIKE / address-update
->      handling inside a netns is silently broken.
-> 
-> Thread struct net through km_migrate() and the xfrm_mgr.migrate
-> function pointer, drop the &init_net override in xfrm_send_migrate()
-> and pfkey_send_migrate(), and pass the caller's net (already in
-> scope in xfrm_migrate() via sock_net(skb->sk)) all the way down.
-> struct xfrm_mgr is in-tree only and not exported as a stable API,
-> so the function-pointer signature change is internal.
-> 
-> pfkey_broadcast() is already netns-aware via net_generic(net,
-> pfkey_net_id) since the pernet conversion. The five other
-> pfkey_broadcast() callers in af_key.c already pass xs_net(x),
-> sock_net(sk) or a per-netns net, so this only removes the
-> &init_net outlier.
-> 
-> Fixes: 5c79de6e79cd ("[XFRM]: User interface for handling XFRM_MSG_MIGRATE")
-> Cc: stable@vger.kernel.org # v5.15+
-> Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
 
-Applied, thanks a lot!
+On Thu, 07 May 2026 22:36:27 -0700, Changhuang Liang wrote:
+> Add bindings for the Peripheral-2 clock and reset generator (PER2CRG)
+> on the JHB100 RISC-V SoC by StarFive Ltd.
+> 
+> Signed-off-by: Changhuang Liang <changhuang.liang@starfivetech.com>
+> ---
+>  .../clock/starfive,jhb100-per2crg.yaml        | 76 +++++++++++++++++++
+>  .../dt-bindings/clock/starfive,jhb100-crg.h   | 57 ++++++++++++++
+>  .../dt-bindings/reset/starfive,jhb100-crg.h   | 17 +++++
+>  3 files changed, 150 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/clock/starfive,jhb100-per2crg.yaml
+> 
+
+My bot found errors running 'make dt_binding_check' on your patch:
+
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/renesas,ether.example.dtb: ethernet-phy@1 (ethernet-phy-id0022.1537): compatible: ['ethernet-phy-id0022.1537', 'ethernet-phy-ieee802.3-c22'] is too long
+	from schema $id: http://devicetree.org/schemas/net/micrel.yaml
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.kernel.org/project/devicetree/patch/20260508053632.818548-18-changhuang.liang@starfivetech.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
