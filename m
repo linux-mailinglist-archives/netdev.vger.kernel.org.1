@@ -1,231 +1,252 @@
-Return-Path: <netdev+bounces-285583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285584-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0FBcABdN/WkraQAAu9opvQ
-	(envelope-from <netdev+bounces-285583-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 04:40:23 +0200
+	id iK4JJTpO/Wm1aQAAu9opvQ
+	(envelope-from <netdev+bounces-285584-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 04:45:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F5F94F0E47
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 04:40:22 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FD5D4F0E5C
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 04:45:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7B4D9304BE72
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 02:38:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 492943006B22
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 02:45:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEF3826A1AF;
-	Fri,  8 May 2026 02:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF6F528B4E2;
+	Fri,  8 May 2026 02:45:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="Jqq19Gok"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="adYUVP7b"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526681F63D9
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 02:38:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA9B276058;
+	Fri,  8 May 2026 02:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778207887; cv=none; b=LdnQrzD2g1555HE/YAvz9uW9pw7Z1cjkZLke76F90r1KPAdX5d3HZL/HvadJjSsP/awWyXzeoVN8sbdXZLz7kroW/dy2Y6jsgnwiuVy7TvXVRm95NjmQyfT/YYduFy6txNctAcr32me05pAxpFi3GymiobiwI9k1zfVhjjzpJf8=
+	t=1778208310; cv=none; b=oIzXoRsWBxDAZi//q5YpEAbO+CQFuKOb7VRrAf0cdPwX1ooP5IdXfPc1w2KgmMcNk/YuIreOTT2YAYnEw6G+FrCNVo4xW1wNT1uQjE5G2+KyHS1vhgusl//ls4juZzUb7xadrB2rUoFq69itN9kePV4nL1MsPYaTSEAQZuk9H/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778207887; c=relaxed/simple;
-	bh=2ULnQu4EydgN19WmdHGJkZB1ofR7oyXmS23aa5beXmo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JHAFOoOa3Z6xHVspJqt6NyidlgWhVPK0HYOWmOsu/WZ4+tKDtN1nPCqioC4ezaWobcDoODFou5qVmEJVdxxQyLhK79wHmHBSq1G/yLyUP5OIWJl0JG1+a9YxZycBLpYwCElrrMxDnwok3sE9IJMb21WwFeEqgDa/Bb260g8Sq8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=Jqq19Gok; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=y2xgnUVTSEmtFl7AVjBTgOn4OO+GYRXOx9xXLnwDwhI=; t=1778207886; x=1779071886; 
-	b=Jqq19GokzWQ7k53fE4YmsKamMuenQVDO4ia0ic8+yZN+X556ewcbDjMMPD2hUfA7PZ5Fw7vXrCp
-	4INBXho1mk7KHb2GZQjx0XDBLbBsqH8Jdq4V5Q+pMC8jD9kzmnJyyH3xTGPQVdgr4YikyfDgQ6uR1
-	hnz+LJal3xvAICXRdPeGHBnxKxngsaGmAqMDk9VDDmhh0BsBa5hN4peo1K5W8BEzl4sSLnkqWqjKz
-	5q6BF3xo7FvU08zJnWu0TZX1OTPqrXo10ltyOyfcCKFfMlVhq78xPiQmsF/1wdxo4+k1iM3ltTSFS
-	TkZeDDEp/tgsPvLwpzKzlLUUHbXrJ6hi+wwQ==;
-Received: from mail-yw1-f169.google.com ([209.85.128.169]:52552)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1wLB6J-00068A-Mf
-	for netdev@vger.kernel.org; Thu, 07 May 2026 19:38:05 -0700
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-7bd810cdc5dso16502577b3.1
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 19:38:03 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ//T6hT+1xnDM8Ta4QqbTdFkS7BMdHjb40NmBvwuUAUqHsiVdzuWjL6OGklaanheeAya25T4/U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywuu2SDdsEZlBmKm9/x6deD0rLYwY7e9/lzGIaIzSbwNUkon0o1
-	kgEMIhfwezMRXG+AlTGoTl2GHxhDiuSqFvFBlefJLf8IyVqo0XFR1KqghgLR0VfYiWrrgHjaOIB
-	3qdKy4lDt3su4+IDKmYE7PttcBzNVvBo=
-X-Received: by 2002:a05:690c:e094:b0:7bb:c0f:19d4 with SMTP id
- 00721157ae682-7bdf5d7fff7mr116382837b3.4.1778207882943; Thu, 07 May 2026
- 19:38:02 -0700 (PDT)
+	s=arc-20240116; t=1778208310; c=relaxed/simple;
+	bh=J6mvIxH+ZZzLBDBHsSOL4HrTFGVClt8f94g6+dy+Ys8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=KY38YoabvBXH6sO5+0q9D+BRAc39qsMGXN3EQRd1kqRQA0cXnnCZBVaToTcrtAM4XmksrsShzTfY5b9W3O5qp+11lzudkoccMtKXAF25NJ1J3Bk6eVWmN7q1Dzto8i/CLcFFC10AkkozHeE5ZvvC5ufcwUM/z6BGwbhLkt+gSTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=adYUVP7b; arc=none smtp.client-ip=113.46.200.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=nIfdFbiZVgiXdv9VSRsfyJN+b7Vc9DXCfpPg/eyjtVE=;
+	b=adYUVP7bOZN+ranjhCnTfspCuat+EA2xM+rynfed3f3Fu+qGaVp6PqB+TozQDqLv7h8Vy5hwA
+	O0wWMedXxLkqGqoDNoxGxkWEE4auAcHHB9boPY9RjV7uHiMLiWaypsWIslwL7JMtrjpyU4/Prs9
+	CHawLwYMHKf6aT1MavurUwE=
+Received: from mail.maildlp.com (unknown [172.19.163.163])
+	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4gBYDq2xt3z1K984;
+	Fri,  8 May 2026 10:37:31 +0800 (CST)
+Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
+	by mail.maildlp.com (Postfix) with ESMTPS id DF59840575;
+	Fri,  8 May 2026 10:45:03 +0800 (CST)
+Received: from [10.174.176.240] (10.174.176.240) by
+ kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Fri, 8 May 2026 10:45:02 +0800
+Message-ID: <4bb9ed6b-1a64-406a-9239-b0560ca963cc@huawei.com>
+Date: Fri, 8 May 2026 10:45:01 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260507183843.1457-1-ouster@cs.stanford.edu> <379cd3dc-aff5-4fcd-bf9f-4878ae21ee74@intel.com>
-In-Reply-To: <379cd3dc-aff5-4fcd-bf9f-4878ae21ee74@intel.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Thu, 7 May 2026 19:37:26 -0700
-X-Gmail-Original-Message-ID: <CAGXJAmzqBQha+XRu12ZpLTDBSMgAEANffD2uGKZ+VVdkMk6OVA@mail.gmail.com>
-X-Gm-Features: AVHnY4LeXWVde9sR1jld00r7tS8euPOtaMdbiRvSbEKzDRI4GYQW7FInkNAHXv4
-Message-ID: <CAGXJAmzqBQha+XRu12ZpLTDBSMgAEANffD2uGKZ+VVdkMk6OVA@mail.gmail.com>
-Subject: Re: [PATCH net v2] ice: fix packet corruption due to extraneous page flip
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: anthony.l.nguyen@intel.com, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org, 
-	przemyslaw.kitszel@intel.com, netdev@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Scan-Signature: e7339ca2e2d71873cd3c16053348112b
-X-Rspamd-Queue-Id: 9F5F94F0E47
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/6] SUNRPC: Address remaining cache_check_rcu() UAF in
+ cache content files
+To: Chuck Lever <cel@kernel.org>, Misbah Anjum N <misanjum@linux.ibm.com>,
+	Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>, Olga
+ Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
+	<tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
+	<anna@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, <yi.zhang@huawei.com>
+CC: <linux-nfs@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Chuck Lever <chuck.lever@oracle.com>
+References: <20260501-cache-uaf-fix-v1-0-a49928bf4817@oracle.com>
+ <c45779f6-fe6c-4037-bb1c-01cfbbaa8aac@huawei.com>
+ <76a10e49-54a6-4813-8b58-b7cd0820fdc6@app.fastmail.com>
+From: yangerkun <yangerkun@huawei.com>
+In-Reply-To: <76a10e49-54a6-4813-8b58-b7cd0820fdc6@app.fastmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemf100006.china.huawei.com (7.202.181.220)
+X-Rspamd-Queue-Id: 2FD5D4F0E5C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[cs.stanford.edu:s=cs2308];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[cs.stanford.edu : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[cs.stanford.edu:-];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-285584-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285583-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[ouster@cs.stanford.edu,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.996];
+	FROM_NEQ_ENVFROM(0.00)[yangerkun@huawei.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,stanford.edu:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:mid,huawei.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Correct: this patch only applies to the ice driver before its conversion.
+Hello  Chuck,
 
-The patch applies to versions 6.18.27 and 6.12.86. I believe the bug
-may also be present in 6.6.137, but the code has a slightly different
-structure there (the function ice_put_rx_mbuf doesn't yet exist in
-that version) so the patch would need to be reworked a bit.
+在 2026/5/8 0:12, Chuck Lever 写道:
+> Hello Erkun -
+> 
+> On Thu, May 7, 2026, at 11:09 AM, yangerkun wrote:
+>> Hi,
+>>
+>> 在 2026/5/1 22:51, Chuck Lever 写道:
+>>> Misbah Anjum reported a use-after-free in cache_check_rcu()
+>>> reached through e_show() while sosreport was reading
+>>> /proc/fs/nfsd/exports on ppc64le.  Two fixes for that report
+>>> landed in v7.0:
+>>>
+>>>     48db892356d6 ("NFSD: Defer sub-object cleanup in export put callbacks")
+>>>     e7fcf179b82d ("NFSD: Hold net reference for the lifetime of /proc/fs/nfs/exports fd")
+>>
+>> Back to the problem fixed by this patches, I'm a little confused why
+>> this UAF can be trigged.
+>>
+>> Before this patches, svc_export_put show as follow:
+>>
+>>    368 static void svc_export_put(struct kref *ref)
+>>    369 {
+>>    370         struct svc_export *exp = container_of(ref, struct
+>> svc_export, h.ref);
+>>    371
+>>    372         path_put(&exp->ex_path);
+>>    373         auth_domain_put(exp->ex_client);
+>>    374         call_rcu(&exp->ex_rcu, svc_export_release);
+>>    375 }
+>>
+>> The auth_domain_put function releases ->name using call_rcu, and
+>> path_put may release the dentry also via call_rcu. All of this seems to
+>> prevent e_show from causing a UAF. Could you point out which line in
+>> d_path triggers the issue?
+> 
+> The dentry, the mount, and the auth_domain ->name buffer all
+> end up RCU-freed (dentry_free() and delayed_free_vfsmnt in
+> fs/, svcauth_unix_domain_release_rcu() in svcauth_unix.c).
+> The eventual kfree isn't the problem.
+> 
+> The problem is the synchronous teardown inside path_put(),
+> which runs before svc_export_put() ever reaches its own
+> call_rcu():
+> 
+>    path_put(&exp->ex_path)
+>      -> dput(dentry)
+>         -> __dentry_kill()              [if last ref]
+>            -> __d_drop()                /* unhashes */
+>            -> dentry_unlink_inode()     /* d_inode = NULL */
+>            -> d_op->d_release() if set
+>            -> drops parent d_lockref    /* may cascade up */
+>            -> dentry_free()             /* call_rcu deferred */
+>      -> mntput(mnt)                     /* deferred via task_work */
+> 
+> The dentry pointer itself is RCU-safe, so prepend_path()'s walk
+> of d_parent and d_name doesn't read freed memory.  But by the
+> time the reader gets there, __d_clear_type_and_inode() has
+> already stored NULL into d_inode, __d_drop() has broken the
+> hash linkage, and the parent's d_lockref has been decremented
+> -- which can in turn fire __dentry_kill() on the parent, and
+> on up the tree.  An e_show() that's still inside its cache RCU
+> read section walks into that half-dismantled state through
+> seq_path(), and that's the NULL deref Misbah reported.
 
-This situation isn't all that rare. It isn't a zero-length packet that
-triggers it; it seems to happen if a packet uses every available byte
-in a buffer, ending precisely at the end of the buffer. When this
-happens, the NIC seems to generate an extra zero-length "buffer". This
-happens quite frequently (thousands of times per second in some of my
-workloads).
+Thank you for your detailed explanation! Yes, e_show might be called 
+when the state is partially dismantled, but after carefully reviewing 
+the code with dput up to __dentry_kill, I still cannot find anything 
+that could cause this issue. Additionally, the comments for prepend_path 
+indicate that they have already taken into account that the dentry can 
+be removed concurrently. I have also run some tests on my arm64 QEMU, 
+but I couldn't reproduce the problem either. Could you please help me 
+identify the specific line or pointer in the dentry that triggers this 
+use-after-free or null pointer issue?
 
-What keeps corruption from happening constantly is that there is only
-a problem if the "other half" of the buffer page is still active when
-the 0-length buffer is received from the NIC. I suspect that with TCP
-this is pretty unlikely: packet buffers get recycled quickly. If the
-other half is not in use, then it doesn't matter whether the page gets
-"flipped" while processing the 0-length buffer. I ran into this
-problem because I was testing Homa under conditions that caused some
-packet buffers to stay alive for longer periods of time.
-
--John-
+Maybe I am not be very familiar with the code, which caused me to fail 
+to identify the real root cause. I'm so sorry for that.
 
 
-On Thu, May 7, 2026 at 3:11=E2=80=AFPM Jacob Keller <jacob.e.keller@intel.c=
-om> wrote:
->
-> On 5/7/2026 11:38 AM, John Ousterhout wrote:
-> > Note: major revisions to the ice driver make this patch irrelevant
-> > for recent versions. It applies to longterm stable versions
-> > 6.18.27 and 6.12.86; it also seems relevant for 6.6.137, but would
-> > need modifications for that version. I have not examined earlier
-> > versions
-> >
->
-> From this description I take it this only applies to the ice driver
-> prior to its conversion to page pool?
->
-> In that case, I think you need to Cc: stable@vger.kernel.org and include
-> the relevant versions you intend to target.
->
-> I think this case is "unique" since there would not be an upstream
-> equivalent patch. But that is merely because we removed the faulty code
-> before it could be fixed.
->
-> I'm not 100% sure whta method to follow since typical stable rules don't
-> really like taking patches that don't apply to mainline...
->
-> Even with it being somewhat rare to get 0 size packet, it is not
-> impossible and packet corruption is a Big(TM) deal.
->
-> Thanks,
-> Jake
->
-> > Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
-> > ---
-> >  drivers/net/ethernet/intel/ice/ice_txrx.c | 23 ++++++++++++++++++++---
-> >  1 file changed, 20 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/et=
-hernet/intel/ice/ice_txrx.c
-> > index 51c459a3e722..081c7a7392b7 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-> > @@ -1215,6 +1215,13 @@ static void ice_put_rx_mbuf(struct ice_rx_ring *=
-rx_ring, struct xdp_buff *xdp,
-> >               xdp_frags =3D xdp_get_shared_info_from_buff(xdp)->nr_frag=
-s;
-> >
-> >       while (idx !=3D ntc) {
-> > +             union ice_32b_rx_flex_desc *rx_desc;
-> > +             unsigned int size;
-> > +
-> > +             rx_desc =3D ICE_RX_DESC(rx_ring, idx);
-> > +             size =3D le16_to_cpu(rx_desc->wb.pkt_len) &
-> > +                    ICE_RX_FLX_DESC_PKT_LEN_M;
-> > +
-> >               buf =3D &rx_ring->rx_buf[idx];
-> >               if (++idx =3D=3D cnt)
-> >                       idx =3D 0;
-> > @@ -1224,10 +1231,20 @@ static void ice_put_rx_mbuf(struct ice_rx_ring =
-*rx_ring, struct xdp_buff *xdp,
-> >                * To do this, only adjust pagecnt_bias for fragments up =
-to
-> >                * the total remaining after the XDP program has run.
-> >                */
-> > -             if (verdict !=3D ICE_XDP_CONSUMED)
-> > -                     ice_rx_buf_adjust_pg_offset(buf, xdp->frame_sz);
-> > -             else if (i++ <=3D xdp_frags)
-> > +             if (verdict !=3D ICE_XDP_CONSUMED) {
-> > +                     /* Don't "flip" the page if size is 0: in this ca=
-se
-> > +                      * the data in the current half will not be used =
-so
-> > +                      * it's OK to reuse that half. And, since the bia=
-s
-> > +                      * didn't get decremented for this half, the page=
- can
-> > +                      * be returned to the NIC even if the other half =
-is
-> > +                      * still in use, so flipping the page could cause
-> > +                      * live packet data to be overwritten.
-> > +                      */
-> > +                     if (size !=3D 0)
-> > +                             ice_rx_buf_adjust_pg_offset(buf, xdp->fra=
-me_sz);
-> > +             } else if (i++ <=3D xdp_frags) {
-> >                       buf->pagecnt_bias++;
-> > +             }
-> >
-> >               ice_put_rx_buf(rx_ring, buf);
-> >       }
->
+265 char *d_path(const struct path *path, char *buf, int buflen)
+266 {
+267         DECLARE_BUFFER(b, buf, buflen);
+268         struct path root;
+269
+270         /*
+271          * We have various synthetic filesystems that never get 
+mounted.  On
+272          * these filesystems dentries are never used for lookup 
+purposes, and
+273          * thus don't need to be hashed.  They also don't need a 
+name until a
+274          * user wants to identify the object in /proc/pid/fd/.  The 
+little hack
+275          * below allows us to generate a name for these objects on 
+demand:
+276          *
+277          * Some pseudo inodes are mountable.  When they are mounted
+278          * path->dentry == path->mnt->mnt_root.  In that case don't 
+call d_dname
+279          * and instead have d_path return the mounted path.
+280          */
+281         if (path->dentry->d_op && path->dentry->d_op->d_dname &&
+282             (!IS_ROOT(path->dentry) || path->dentry != 
+path->mnt->mnt_root))
+283                 return path->dentry->d_op->d_dname(path->dentry, 
+buf, buflen);
+284
+285         rcu_read_lock();
+286         get_fs_root_rcu(current->fs, &root);
+287         if (unlikely(d_unlinked(path->dentry)))
+288                 prepend(&b, " (deleted)", 11);
+289         else
+290                 prepend_char(&b, 0);
+291         prepend_path(path, &root, &b);
+292         rcu_read_unlock();
+293
+294         return extract_string(&b);
+295 }
+
+
+> 
+> The earlier fix (2530766492ec, "nfsd: fix UAF when access
+> ex_uuid or ex_stats") moved the kfree of ex_uuid and ex_stats
+> into svc_export_release() so those are RCU-safe now.
+> path_put() and auth_domain_put() couldn't go in there because
+> both may sleep, and call_rcu callbacks run in softirq context.
+> This series uses queue_rcu_work() instead: it defers past the
+> grace period AND runs the callback in process context, so the
+> sleeping puts move into the deferred path and the window
+> closes.
+
+Yeah, I can get this! Thanks again for your detail explanation!
+
+Thanks,
+Erkun.
+
+> 
+> 
+
 
