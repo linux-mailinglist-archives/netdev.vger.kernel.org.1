@@ -1,185 +1,301 @@
-Return-Path: <netdev+bounces-285587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285586-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oLzCCKlT/WnZagAAu9opvQ
-	(envelope-from <netdev+bounces-285587-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 05:08:25 +0200
+	id HbFuBJ1T/WnZagAAu9opvQ
+	(envelope-from <netdev+bounces-285586-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 05:08:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C03A4F0FDF
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 05:08:23 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B14DA4F0FCA
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 05:08:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 74EA03030D00
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 03:08:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 93342302DF72
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 03:08:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C96AA2C21C5;
-	Fri,  8 May 2026 03:08:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A96D72C11FE;
+	Fri,  8 May 2026 03:08:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="DR7yDCMF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
+Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B202D2D0C63;
-	Fri,  8 May 2026 03:08:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4EEA85C4A;
+	Fri,  8 May 2026 03:08:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778209696; cv=none; b=M6p8v+z12uHBuv6B4u2dog5B+jzmF18BBUv/4XsnQ8SXIotpD4+SNKUcnjNLa7p1TcqiRE1Qjl1vArSRJ4fWTx+XWhz0AaKAFFwOXQVPrfWa/YmBEU0LjWM0u4+qZ1xb9lrxgRfbS7tWFK1DMaHizby71qNcFQUYF9dQydbYfy4=
+	t=1778209689; cv=none; b=oMuRGBzDpkEml+K3qPRyLh7gIB/NF9BdCRK19t7xBFkb+6UbRFS6v5UPE/zxEOAZtDGDujhwBpzAfpApQK/qRGlqdZ0K43yHLwxYqmD/26C/5NP0wI+eF7yH3eFYsP6o8wAWF6ULtMllGfGbH5cmyP3H/HLD9fzPh/gZ/AYW9So=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778209696; c=relaxed/simple;
-	bh=R4QaLoZ21ZWIyPXIDUNgRMphhclhCRWSPOmd6S6pEmc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=izv2TJVDAWcZavHLYw7gGDEkctqRbPiAKQYhq3mkiv+1H0GisVYiV8npdX93BcHpmuqYhl58piJp3ulotAWZnB4tnOg1FllJ86zpkcZ7a31DF70ISbJlLH6oKdQoldJusBfpbet22/3uqq/LHHJlZWN0XOVhp7RA8L5/C8kPd9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.254.200.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: esmtpsz18t1778209603t05234e01
-X-QQ-Originating-IP: e3y/p6SyaB390KdMAAFShBQkpIAg0Aaw079vcng1oIE=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 08 May 2026 11:06:41 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 9392278446034368298
-EX-QQ-RecipientCnt: 11
-Date: Fri, 8 May 2026 11:06:40 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, danishanwar@ti.com,
-	horms@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, yaojun@mucse.com
-Subject: Re: [PATCH net-next v3 1/4] net: rnpgbe: Add interrupt handling
-Message-ID: <B1A8B62336166017+20260508030640.GA201293@nic-Precision-5820-Tower>
-References: <20260507081539.171844-1-dong100@mucse.com>
- <20260507081539.171844-2-dong100@mucse.com>
- <5e9b15c7-5db4-408e-a5bc-75fe5752ed74@linux.dev>
+	s=arc-20240116; t=1778209689; c=relaxed/simple;
+	bh=Z+4BJzkahkPueJQQDJmwerj5OdeHePhUSnQWH4c+DrU=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=itAP2+jE8iiRgGlss0iRMnGk1k5qEBSXcrmdM9pYufF3bcOlkrGearotK71Op5O4XpNw6lUcNDnZEx+7sRKouZRr0IZ1bDFv12DJm+l9XpNPn6m/KCPtdOQ9HOuIC0EDh30poiVx/lZwAbHu6orUQubPUa27n8XqHysbQMqJ6c0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=DR7yDCMF; arc=none smtp.client-ip=113.46.200.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=iJ5bCtWz4Uw7A2PHD6anCOABAZbR/8j7iEMJ+HNXiA8=;
+	b=DR7yDCMF3x8rvrY50/LRfe6PAX/HUGj6O/gAzI0+NxHa86QKDtCZj4HfZoJW+a2pCgj5ozln+
+	BYKjh3pCYv3YDImW5D7kED5WcowwYWroXBnFYqN/Y4n9MfD4b43v5RVawMFyJNjplprn2Eea5p1
+	1jkWKU9BqxLGtTXIlivYRB0=
+Received: from mail.maildlp.com (unknown [172.19.162.140])
+	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4gBYlJ60mxz1T4KV;
+	Fri,  8 May 2026 11:00:28 +0800 (CST)
+Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4ED9520333;
+	Fri,  8 May 2026 11:08:02 +0800 (CST)
+Received: from [10.174.176.240] (10.174.176.240) by
+ kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Fri, 8 May 2026 11:08:01 +0800
+Message-ID: <05f93fc4-59d7-4735-bc7d-a00d1497687a@huawei.com>
+Date: Fri, 8 May 2026 11:08:00 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5e9b15c7-5db4-408e-a5bc-75fe5752ed74@linux.dev>
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz3a-1
-X-QQ-XMAILINFO: OOCyznbq6KdUduxR6UO4g51jNDQga9H1OeqXbHS3oza5DSS5Bu5WzqnZ
-	PiVB0d2LYXCo1foOTY1+/ouLs82VwJSmF5Xh/9h89T8+WD1FEDj5IZzuJkGuQUXdP1OHKyC
-	EAiTn11qDSDbShAv2gSobPxhNbcq6fifNmh2ocIsBm5PbxUKEck7Tl7I7kXXu0/9dNbouts
-	d/rhs6anDyytOB2yma7Fbxsaio6AqhXRKS+0AEiM8clqfZ8keix9ADT0ItLGHwv/UCVRDx5
-	RdCNuh1hY8cBNEppEe3akVOPb/doZGeFb7wq9uR88hg1rZpd1NYqySpHFZoVojBPU4a4pbT
-	UM272XhjyDSJg8jggu/NG6s1u5WixNuIAl9d1gSzoePfiM2elrjOwnu3lGjDBVDsHlYcuZ+
-	ArKst10OXZCl71RJOMRKIPAYHTBhFPTDw8uX8DM+3qQtfA5wjamTkM3rgT9QzZOAiyemKsI
-	hKK2Y6a0AQtUqsQjy1QFjmPhgfAK9eG4NEYSG/dOCQgZFvnqAidraDpDnsuOTHuDoEMLr80
-	ftqCFLKf0Cz/8tSNUuX2cpqzLRv1XBwLHbVi5A6PH3RmUL6QlZMV/lrSBo+tbPoeWRMByEL
-	Fjhugz33q2dRXqJT4WxbFNq9MgIqO9Vks0ZP0+pU4pqxIv6xM0tWC7z33Hn0tMsrYJeNbHZ
-	4ZjG18EugigLiLR3hxpPP8XFiTodkQfJ2q26322sFMZR2KGQ/5DDRaHEHWGz84SlYLkOsBy
-	4I/XPLYRCKajbPdJUkd7+0IPcf4UXleTiNbAM+uQEkNfrPeg6w2KWWYIgU8arUsEouMOe5g
-	lPgNFdmbB4W6yhAuNq9AY0UkazurMW/2lk4hrgrUyg1ilG3E8osp3RaXGst9Q0gJ8JF7e0z
-	VcHHKRuCUrxKTRBAu95qxqsPY8J8pKAEP2iR9e1Rp0aEd5wSZQ+Gz8iH/iRXJgKfY9hCTAk
-	FsRIxiDc32MONjwMntHFsSZf+0QiXl7sa9iH3RmFwT9T6JEse3BRjMUUqYEIgGdZmQe7A19
-	dMuZs6pQO2qxZPMxyAv32GZ/aBUlQ=
-X-QQ-XMRINFO: Mp0Kj//9VHAxzExpfF+O8yhSrljjwrznVg==
-X-QQ-RECHKSPAM: 0
-X-Rspamd-Queue-Id: 7C03A4F0FDF
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/6] SUNRPC: Address remaining cache_check_rcu() UAF in
+ cache content files
+From: yangerkun <yangerkun@huawei.com>
+To: Chuck Lever <cel@kernel.org>, Misbah Anjum N <misanjum@linux.ibm.com>,
+	Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>, Olga
+ Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
+	<tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
+	<anna@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, <yi.zhang@huawei.com>
+CC: <linux-nfs@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Chuck Lever <chuck.lever@oracle.com>
+References: <20260501-cache-uaf-fix-v1-0-a49928bf4817@oracle.com>
+ <c45779f6-fe6c-4037-bb1c-01cfbbaa8aac@huawei.com>
+ <76a10e49-54a6-4813-8b58-b7cd0820fdc6@app.fastmail.com>
+ <4bb9ed6b-1a64-406a-9239-b0560ca963cc@huawei.com>
+In-Reply-To: <4bb9ed6b-1a64-406a-9239-b0560ca963cc@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemf100006.china.huawei.com (7.202.181.220)
+X-Rspamd-Queue-Id: B14DA4F0FCA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285587-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[mucse.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dong100@mucse.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.991];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	R_DKIM_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yangerkun@huawei.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285586-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[huawei.com:+]
 X-Rspamd-Action: no action
 
-On Thu, May 07, 2026 at 01:30:55PM +0100, Vadim Fedorenko wrote:
-> On 07/05/2026 09:15, Dong Yibo wrote:
-> > Add comprehensive interrupt handling for the RNPGBE driver:
-> > - Implement msi-x/msi interrupt configuration and management
-> > - Create library functions for interrupt registration and cleanup
-> > 
-> > This infrastructure enables proper interrupt handling for the
-> > RNPGBE driver.
-> > 
+
+
+在 2026/5/8 10:45, yangerkun 写道:
+> Hello  Chuck,
 > 
-> [...]
+> 在 2026/5/8 0:12, Chuck Lever 写道:
+>> Hello Erkun -
+>>
+>> On Thu, May 7, 2026, at 11:09 AM, yangerkun wrote:
+>>> Hi,
+>>>
+>>> 在 2026/5/1 22:51, Chuck Lever 写道:
+>>>> Misbah Anjum reported a use-after-free in cache_check_rcu()
+>>>> reached through e_show() while sosreport was reading
+>>>> /proc/fs/nfsd/exports on ppc64le.  Two fixes for that report
+>>>> landed in v7.0:
+>>>>
+>>>>     48db892356d6 ("NFSD: Defer sub-object cleanup in export put 
+>>>> callbacks")
+>>>>     e7fcf179b82d ("NFSD: Hold net reference for the lifetime of / 
+>>>> proc/fs/nfs/exports fd")
+>>>
+>>> Back to the problem fixed by this patches, I'm a little confused why
+>>> this UAF can be trigged.
+>>>
+>>> Before this patches, svc_export_put show as follow:
+>>>
+>>>    368 static void svc_export_put(struct kref *ref)
+>>>    369 {
+>>>    370         struct svc_export *exp = container_of(ref, struct
+>>> svc_export, h.ref);
+>>>    371
+>>>    372         path_put(&exp->ex_path);
+>>>    373         auth_domain_put(exp->ex_client);
+>>>    374         call_rcu(&exp->ex_rcu, svc_export_release);
+>>>    375 }
+>>>
+>>> The auth_domain_put function releases ->name using call_rcu, and
+>>> path_put may release the dentry also via call_rcu. All of this seems to
+>>> prevent e_show from causing a UAF. Could you point out which line in
+>>> d_path triggers the issue?
+>>
+>> The dentry, the mount, and the auth_domain ->name buffer all
+>> end up RCU-freed (dentry_free() and delayed_free_vfsmnt in
+>> fs/, svcauth_unix_domain_release_rcu() in svcauth_unix.c).
+>> The eventual kfree isn't the problem.
+>>
+>> The problem is the synchronous teardown inside path_put(),
+>> which runs before svc_export_put() ever reaches its own
+>> call_rcu():
+>>
+>>    path_put(&exp->ex_path)
+>>      -> dput(dentry)
+>>         -> __dentry_kill()              [if last ref]
+>>            -> __d_drop()                /* unhashes */
+>>            -> dentry_unlink_inode()     /* d_inode = NULL */
+>>            -> d_op->d_release() if set
+>>            -> drops parent d_lockref    /* may cascade up */
+>>            -> dentry_free()             /* call_rcu deferred */
+>>      -> mntput(mnt)                     /* deferred via task_work */
+>>
+>> The dentry pointer itself is RCU-safe, so prepend_path()'s walk
+>> of d_parent and d_name doesn't read freed memory.  But by the
+>> time the reader gets there, __d_clear_type_and_inode() has
+>> already stored NULL into d_inode, __d_drop() has broken the
+>> hash linkage, and the parent's d_lockref has been decremented
+>> -- which can in turn fire __dentry_kill() on the parent, and
+>> on up the tree.  An e_show() that's still inside its cache RCU
+>> read section walks into that half-dismantled state through
+>> seq_path(), and that's the NULL deref Misbah reported.
 > 
-> > +/**
-> > + * rnpgbe_set_interrupt_capability - Set MSI-X or MSI if supported
-> > + * @mucse: pointer to private structure
-> > + *
-> > + * Attempt to configure the interrupts using the best available
-> > + * capabilities of the hardware.
-> > + *
-> > + * @return: 0 on success, negative on failure
-> > + **/
-> > +static int rnpgbe_set_interrupt_capability(struct mucse *mucse)
-> > +{
-> > +	int v_budget;
-> > +
-> > +	v_budget = min_t(int, mucse->num_tx_queues, mucse->num_rx_queues);
-> > +	v_budget = min_t(int, v_budget, MAX_Q_VECTORS);
+> Thank you for your detailed explanation! Yes, e_show might be called 
+> when the state is partially dismantled, but after carefully reviewing 
+> the code with dput up to __dentry_kill, I still cannot find anything 
+> that could cause this issue. Additionally, the comments for prepend_path 
+> indicate that they have already taken into account that the dentry can 
+> be removed concurrently. I have also run some tests on my arm64 QEMU, 
+> but I couldn't reproduce the problem either. Could you please help me 
+> identify the specific line or pointer in the dentry that triggers this 
+> use-after-free or null pointer issue?
 > 
-> these 2 lines can be simplified to
+> Maybe I am not be very familiar with the code, which caused me to fail 
+> to identify the real root cause. I'm so sorry for that.
 > 
-> min3(mucse->num_tx_queues, mucse->num_rx_queues, MAX_Q_VECTORS);
+> 
+> 265 char *d_path(const struct path *path, char *buf, int buflen)
+> 266 {
+> 267         DECLARE_BUFFER(b, buf, buflen);
+> 268         struct path root;
+> 269
+> 270         /*
+> 271          * We have various synthetic filesystems that never get 
+> mounted.  On
+> 272          * these filesystems dentries are never used for lookup 
+> purposes, and
+> 273          * thus don't need to be hashed.  They also don't need a 
+> name until a
+> 274          * user wants to identify the object in /proc/pid/fd/.  The 
+> little hack
+> 275          * below allows us to generate a name for these objects on 
+> demand:
+> 276          *
+> 277          * Some pseudo inodes are mountable.  When they are mounted
+> 278          * path->dentry == path->mnt->mnt_root.  In that case don't 
+> call d_dname
+> 279          * and instead have d_path return the mounted path.
+> 280          */
+> 281         if (path->dentry->d_op && path->dentry->d_op->d_dname &&
+> 282             (!IS_ROOT(path->dentry) || path->dentry != path->mnt- 
+>  >mnt_root))
+> 283                 return path->dentry->d_op->d_dname(path->dentry, 
+> buf, buflen);
+> 284
+> 285         rcu_read_lock();
+> 286         get_fs_root_rcu(current->fs, &root);
+> 287         if (unlikely(d_unlinked(path->dentry)))
+> 288                 prepend(&b, " (deleted)", 11);
+> 289         else
+> 290                 prepend_char(&b, 0);
+> 291         prepend_path(path, &root, &b);
+> 292         rcu_read_unlock();
+> 293
+> 294         return extract_string(&b);
+> 295 }
+> 
+> 
+>>
+>> The earlier fix (2530766492ec, "nfsd: fix UAF when access
+>> ex_uuid or ex_stats") moved the kfree of ex_uuid and ex_stats
+>> into svc_export_release() so those are RCU-safe now.
+>> path_put() and auth_domain_put() couldn't go in there because
+>> both may sleep, and call_rcu callbacks run in softirq context.
+>> This series uses queue_rcu_work() instead: it defers past the
+>> grace period AND runs the callback in process context, so the
+>> sleeping puts move into the deferred path and the window
+>> closes.
+> 
+> Yeah, I can get this! Thanks again for your detail explanation!
+
+Also, could the scenario described in this commit be triggered again?
+
+commit 69d803c40edeaf94089fbc8751c9b746cdc35044
+Author: Yang Erkun <yangerkun@huawei.com>
+Date:   Mon Dec 16 22:21:52 2024 +0800
+
+     nfsd: Revert "nfsd: release svc_expkey/svc_export with rcu_work"
+
+     This reverts commit f8c989a0c89a75d30f899a7cabdc14d72522bb8d.
+
+     Before this commit, svc_export_put or expkey_put will call path_put 
+with
+     sync mode. After this commit, path_put will be called with async mode.
+     And this can lead the unexpected results show as follow.
+
+     mkfs.xfs -f /dev/sda
+     echo "/ *(rw,no_root_squash,fsid=0)" > /etc/exports
+     echo "/mnt *(rw,no_root_squash,fsid=1)" >> /etc/exports
+     exportfs -ra
+     service nfs-server start
+     mount -t nfs -o vers=4.0 127.0.0.1:/mnt /mnt1
+     mount /dev/sda /mnt/sda
+     touch /mnt1/sda/file
+     exportfs -r
+     umount /mnt/sda # failed unexcepted
+
+     The touch will finally call nfsd_cross_mnt, add refcount to mount, and
+     then add cache_head. Before this commit, exportfs -r will call
+     cache_flush to cleanup all cache_head, and path_put in
+     svc_export_put/expkey_put will be finished with sync mode. So, the
+     latter umount will always success. However, after this commit, path_put
+     will be called with async mode, the latter umount may failed, and if
+     we add some delay, umount will success too. Personally I think this bug
+     and should be fixed. We first revert before bugfix patch, and then fix
+     the original bug with a different way.
+
+     Fixes: f8c989a0c89a ("nfsd: release svc_expkey/svc_export with 
+rcu_work")
+     Signed-off-by: Yang Erkun <yangerkun@huawei.com>
+     Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+
+
+> 
+> Thanks,
+> Erkun.
+> 
+>>
+>>
 > 
 
-Got it, I will update this.
-
-> > +	v_budget = min_t(int, v_budget, num_online_cpus());
-> > +	/* add one vector for mbx */> +	v_budget += 1;
-> > +	v_budget = pci_alloc_irq_vectors(mucse->pdev, 1, v_budget,
-> > +					 PCI_IRQ_MSI | PCI_IRQ_MSIX);
-> > +	if (v_budget < 0)
-> > +		return v_budget;
-> > +
-> > +	if (mucse->pdev->msix_enabled) {
-> > +		/* q_vector not include mbx */
-> > +		if (v_budget > 1) {
-> > +			mucse->flags |= M_FLAG_MSIX_EN;
-> > +			mucse->num_q_vectors = v_budget - 1;
-> > +		} else {
-> > +			mucse->flags |= M_FLAG_MSIX_SINGLE_EN;
-> > +			mucse->num_q_vectors = 1;
-> > +		}
-> > +	} else {
-> > +		/* msi use only 1 irq */
-> > +		mucse->num_q_vectors = 1;
-> > +		mucse->flags |= M_FLAG_MSI_EN;
-> > +	}
-> 
-> How will it work in case it's only 1 vector allocated? AFAIU, you need at
-> least 2 irq vectors - 1 for queue processing, another one for mbx.
-> 
-
-Mbx and tx/rx irq share 1 irq. And in fact, Hw only support 1 msi irq.
-Just like ixgbe_intr in intel drivers.
-
-> > +
-> > +	return 0;
-> > +}
-> 
-
-Thanks for your feedback.
 
