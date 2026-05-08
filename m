@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-285641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285643-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MEq7JA53/WnnegAAu9opvQ
-	(envelope-from <netdev+bounces-285641-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 07:39:26 +0200
+	id kLmLJWZ3/WnnegAAu9opvQ
+	(envelope-from <netdev+bounces-285643-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 07:40:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 983B94F1FC7
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 07:39:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B30F4F1FFD
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 07:40:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 639C0303DD64
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 05:37:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B8F21301D324
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 05:38:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 963F4348452;
-	Fri,  8 May 2026 05:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89747363095;
+	Fri,  8 May 2026 05:37:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2133.outbound.protection.partner.outlook.cn [139.219.17.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C5F31AF1B;
-	Fri,  8 May 2026 05:37:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC10F34F275;
+	Fri,  8 May 2026 05:37:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.133
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778218632; cv=fail; b=aTG+UZaWT27YoqY2H1Iyn6o6xhwi6405Xm175CMHMvLSmW6yBJApwhRTkGxo4h8Wtd7xqakVaKsTfsrov4d7TNmHryr87PtoaF9P7LUE+NotU4QcGy6yMqbP+T81YSfF0RWwByBMoCb6/E19DDN5aUeIbo9dTqYphrlibHUbvjk=
+	t=1778218642; cv=fail; b=VosUfv+Z8PJ91kyRYFmm4vzkXOi6E/9I0VoniTpFU+bUuEnAKa6IDHGLjax9vAZugLdZ5Gy3VVpgIU0aLKxzooFZaHVMFLHEu5BYHnHGZ+t5BoYi15SxsebCqA+kvVQZw7kgUIHs7umleCIlQBAsZeW7piL+Z7C3zk7x8aacrsc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778218632; c=relaxed/simple;
-	bh=swtHxHKdhTd7WvOdGcW/yYg1PGVP9OsJULwuZ1Hm+hU=;
+	s=arc-20240116; t=1778218642; c=relaxed/simple;
+	bh=sgazUNdwEnnUM3cz4lqOtOKlY6RRo+fHXdGc8/fI68c=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=WvVmOmlR9fCeT5N9Gqrkw+XMyejB4Ie6McMpU2/DEweZI8XJeQm+njiPu3LgUcJyh7jwJu/z0ZpZ6QOPPKYJC9rhHhQj/f/OEUg8ZcD70WIRbMYBaGmtOgGcrp/jlqg/ZNZ9/ICc5guzi4qNLCBENx/7pkyUA+6u9YXOm4HCBPY=
+	 Content-Type:MIME-Version; b=JJXA+F4NRC2RjPTOoi6vDoT+X4P5eyzAIfLZIVosUYh6MaUDnAN7QMjqOwGjaNGZRH4oqhTa/ifULSLELk74gR67AY0DWoNDbPUMFh9+Ot77ng70VQtFYPRp008IFxX/hF2RoZI5jWtefC/5ytsvgKRv4pJRDlmayeklrbdBFv0=
 ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ax+IeHpGxwNivEs+yiedVlTyjvIW1XaC48luzp9qI3uRxfPpIAwdNvu0tB9eiRzOv1We5IvJPzaRVlQdAVhCmtgysjPLo4on8h8O+3IxS15zulLGtwrW331PPiq3WJWCitZ3tUkCaFxA5YEkkcRrnkoaiww+VB7usObeT5rArDzw1sZDle9qzyZfYUqTN5/bmOdYsDeIInT8br5+yvI9f/ZgZJvfVq/VA80A7NQg2I9dKgJ04I+zqRYir0qm4JA1F+tUqUmMIZRkVK32epfPrWR9p41PVEes67PfyRx1ZhAjkLT3ygG2TyByWVTXOM5a7R+m4ZeSO0W+kxCoNNCTQw==
+ b=dsBMOokKmcxHqeVVuJypbeJ4GQP7iBbdEoEEdujDWShJqZ4ADRp1cyEfQt5vymKUIzDA4avnXOVOz5IBa00zPd5qR8jiGgQJcreEjTTj9x6HHGNDoMeyxRIXUHUIabKW1ApWidmMgZNxGwxi7OztoCzhqQ5jr2R95R45TlEfl3l4qKyl6t4hCQdHRvzYiDI19hcB39os8nPKCivHySGpFWXq3xPxSRgej7H9kwV42vP8y++S6CPNIIP5PdNerjjhhUZ9za8TQUrXLRIqblm1F5n6edI6/efwr5TI6BM9kQaKndkV00J2MjOClQ3K+mCb9Rl4UW1KdJWpGnAXtJcEdw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0hKap1/2iVqVNgZn0M6XHNF41vKghAksiRv/LDqnUgs=;
- b=RdSv5a6Kg4iJfE/Aa0fLxsuh92eRN8v6DYFcgOFIJvZ08bsqy7bg4AC4rMeKEc0XuXi654gLoHKJpavFlTy74tDB+kSxOR0evx6AUIe5abb5cmAZTBPtUiklXB3rsI4ZqtMJwXKV2V/jOmt4FNJUhOxVEBWf4GkwvvxhYs64c9HqMm43vuFWNqdIjZ3Dy1UWVRermWZz5kIhD82iQqDl+BrJbLlxqwXL51sjBb6UKkA2kc9eOuupBipiFI0F8Resg7lXRY+gD4yGH+k9goAs9re4LdzmXeDuFrM/irTGpWYn0WQn11KySjv5EGz24zFsbA2ljxTZznfZDzc4DHZXXg==
+ bh=3N4y4Hwh9v+qsEdsqbZ2wT60ktcUBiiMr3bOYv/2jDQ=;
+ b=f2XixJKdnL8qH81AkXcYXXOJtHq17kjOaaxCHgUlko1pk6/8kv6VA7DOGDL+axer7DOF/sI612Cb9719KBkAdFUSCRYfyGO3KZ8lmc94t+arkul1G8ES2wSsKXHGXcjxHThn/SZaiS2savEEHz6y4wV1uRjOfxBClX4GpvsaMCcefpyW7lIrJI8YT9TkdwEDjtlboNj4CfOQdsWL2Bqd/jX61hRyqIoGccx5CDZIomT+AiXFYtrg2IiNTYGW7It//wpiex2jC8Hwl8yssCpS9lL7Y0RnsXs/GteoVfgn7qBjHbPjewbX2q2GeB1/p2HjnqmR98f0ccnNwUMglClywA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=starfivetech.com; dmarc=pass action=none
  header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
@@ -48,11 +48,11 @@ Received: from ZQ4PR01MB1202.CHNPR01.prod.partner.outlook.cn
  (2406:e500:c550:17::6) by ZQ4PR01MB1236.CHNPR01.prod.partner.outlook.cn
  (2406:e500:c550:14::12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.17; Fri, 8 May
- 2026 05:36:48 +0000
+ 2026 05:36:49 +0000
 Received: from ZQ4PR01MB1202.CHNPR01.prod.partner.outlook.cn
  ([fe80::e7d4:256c:b066:850d]) by
  ZQ4PR01MB1202.CHNPR01.prod.partner.outlook.cn ([fe80::e7d4:256c:b066:850d%5])
- with mapi id 15.20.9891.019; Fri, 8 May 2026 05:36:47 +0000
+ with mapi id 15.20.9891.019; Fri, 8 May 2026 05:36:49 +0000
 From: Changhuang Liang <changhuang.liang@starfivetech.com>
 To: Michael Turquette <mturquette@baylibre.com>,
 	Rob Herring <robh@kernel.org>,
@@ -78,9 +78,9 @@ Cc: linux-clk@vger.kernel.org,
 	Hal Feng <hal.feng@starfivetech.com>,
 	Ley Foon Tan <leyfoon.tan@starfivetech.com>,
 	Changhuang Liang <changhuang.liang@starfivetech.com>
-Subject: [PATCH v2 04/22] clk: starfive: Convert the word "jh71x0" to "starfive"
-Date: Thu,  7 May 2026 22:36:14 -0700
-Message-Id: <20260508053632.818548-5-changhuang.liang@starfivetech.com>
+Subject: [PATCH v2 05/22] dt-bindings: clock: Add StarFive JHB100 System-0 clock and reset generator
+Date: Thu,  7 May 2026 22:36:15 -0700
+Message-Id: <20260508053632.818548-6-changhuang.liang@starfivetech.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260508053632.818548-1-changhuang.liang@starfivetech.com>
 References: <20260508053632.818548-1-changhuang.liang@starfivetech.com>
@@ -97,58 +97,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: ZQ4PR01MB1202:EE_|ZQ4PR01MB1236:EE_
-X-MS-Office365-Filtering-Correlation-Id: 23c597cf-7c12-47b5-ad47-08deacc3cc0b
+X-MS-Office365-Filtering-Correlation-Id: caf99e25-5d78-4d30-1880-08deacc3cd4f
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|52116014|7416014|376014|366016|1800799024|38350700014|921020|22082099003|18002099003|56012099003;
+	BCL:0;ARA:13230040|52116014|7416014|376014|366016|1800799024|38350700014|921020|22082099003|3023799003|18002099003|56012099003;
 X-Microsoft-Antispam-Message-Info:
-	5i35zUy/yfCA7gqd9lq5+mlszquTh+MYsOTw34VNL4u+wo2PRaeVnVcRKBt2/qGnU2F7skETcwv9JRG8OAHD8e1j1paYupRIO75ufV2Ff3l3wneKGMFwWLfW89DP/uZS0rML2KgMrUzkS5Ggr1ctBC4MYSYhz85pzrjACkYEJynVCgWwjEKw6CBUcZNORYP7AMYtuE6Tw7FWNIn3OJHBrGbOTEXwGxFa6SgAFLaE4RIRUXzrDiZ6cTXK9yCfFAsMUB6+f/39J1pUtXpUoXIT4fUrJFlYBT+CPzXolcsqU/WvpcnnZPrw3VAsYGS3qZCP/ACCcVZ5SCrpY4sdbiQSkdmLcfk9pqueBc3s2ZTZG1ig78IR4rcv/E5KBpjNIHpme7SGgyrNjgvTYGj3OZGcmJmqXNXM1uWVPcDSxaaaiS+S1hqOOQ8rrpAoI9oGPq2R/Z6co7hIC8FSLL4R5JkW/uU3v5C8w+ak5dLNjV1d7GjqtqgwZKC+y+eZ3atK4iP5fgdn3xo0z2hr6Gy6tVHiLH8Nw1r6ZgxmS6YNELATyQLcoCJ+Brsh1YRArzc6kBE1KmalCPlNZTQSN6mbmvDQMA==
+	Yw/PAjTh+01xt4VDufssqA/GmNq2mQTbaqkefwqFiIKW5WoJITuu1/T0r1e+BsIYtJ5wPIXDwyNrLQ8SsDiEHD3e2BzC/GcITMGcU1naY5G9RCI6pZyzaxHcmitDhihx0YDGmjsdAxWwp4du1mSzn95wXmyJ+5p4xxwkyxSIku1x5PpG+VEZarzbWHNR1hD+WRs9xKKZiRrxlxPaDOdgE+CP+6QDl15d0otCjjD/vreBB3jc48wYnkXNKB5eO8CFau3P9gt4r0KSLuaXnhZqqqn+IStUUgbU1u02GOClJDKSG99hCv20cTn4HhdxVIpBZbDeC6cjuUaNy/vXaN649NZ/+SnFDCOGA25+N7uDfgan8ub6QILWfjilKLXqyzoAUbVrlwCM667aWlNsofFi5tZra30m0Hxa6/JmeWwCU+VAmgHo+l8G8WA0DpTExfYbtmanp8Ehiup8bntUsfC92rg/GlPMVB1+3hXB0bPzYcbL2BJFoU4lAYqmxuQD5WIdly2uSAtrvwH6AMXqRaWiqSSrNG/jQX9dFurROg8J/HaKHjVNs9/GqnH1YrmaCQTr9E8lTwgpCkMBsusk5LQhlA==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ZQ4PR01MB1202.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(52116014)(7416014)(376014)(366016)(1800799024)(38350700014)(921020)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ZQ4PR01MB1202.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(52116014)(7416014)(376014)(366016)(1800799024)(38350700014)(921020)(22082099003)(3023799003)(18002099003)(56012099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?JR7VLRCWLjlYpv3Pno5Zq0ryxSzTT92dcAfdVzHnq21fiRGIzoFO2Wk+5FbA?=
- =?us-ascii?Q?RIAyM/qjsvpH5yxF/yjFM67xfhX58TKY6QVacfRJnUNf4mox+AJbGwLL0uAZ?=
- =?us-ascii?Q?RFdLecsqATis9mvMowshuz/1pTBUlpc21XbUUfvVRSXWIAg/1WzVnZZ3S8G1?=
- =?us-ascii?Q?IyzBnjjSZyrGBMxxKUKmkViyW7SUm/wMCoeoUZ2PlgKhMuO7C8hMBSKu4DFD?=
- =?us-ascii?Q?vEvkemkSG3rNry72rAkWNX07nDuUkAz3OCuHzGLZkKM36sP8Y/p9qsKBv3Ff?=
- =?us-ascii?Q?A9QANrs3tOf3Cx1E3lokHXGzfv06dToKJEixA07iGajOekX/Qrq2jDY8a6f9?=
- =?us-ascii?Q?LpiJmsqU+Yt9cNl7ls79f82/jhaT3ABhq6WJcEFmvNQ2AZicaDBrbf1iyuT2?=
- =?us-ascii?Q?MS2F9Xmu/IhyAKIU6KhcfVeOfTKOrM+4v/3vzKHlM+Wec004lrN1mWrGjimm?=
- =?us-ascii?Q?UjAWvL/EcMUD+ZS+E1ZW/9z5876AN6yuQlgmIyKPs3ymeehc6wxCDlS5VvR4?=
- =?us-ascii?Q?vlI/ysL0ID387ZvE1KAAjm3wgbc7qdFmM+6dh1HrGVhOm7bX6JXwABeBzyNj?=
- =?us-ascii?Q?dj1TZ9cpbmE/frqxq/GR0s4YUVYkDTjenUvsRQcpkxWYyNZXJvsONkPfq0G7?=
- =?us-ascii?Q?14BbasgPod+ApsdlODhP0M7Ri65w98ss6OY0mcrXZnqRXSbhiFUjLnykxtzp?=
- =?us-ascii?Q?Aq4d2ZPxU36VZ3xL4aFxPx8nuh3jAppdzrUC038vYpnJTbVjZmaZtXJdx7uR?=
- =?us-ascii?Q?GDkq3mIcA1Xd9CfNcqGRtA9MXbwYY5feuB0sSH/qMJViW0S32EfIFV3RdHIP?=
- =?us-ascii?Q?MTbntP4wHLkl4NgeWuN2Am8M7Hn0YeAKAe89rgqKxQYoqmFD4Ar/W+3d6v5t?=
- =?us-ascii?Q?eF/ZawWzAXIabE5yKze6+dxe7OO3NKX6o/Q3o5+Yi7VePNA5c6HcTXJU8qiV?=
- =?us-ascii?Q?qWCf3SR9Cy+8hmUNitsNhfF88/lARJzgdcYOJ91hijTg5SLEHhoeW5h/ywfH?=
- =?us-ascii?Q?RK0xiL8Cdb6EanoSMyFvnUqlPt80He3rttzDcrH6X4mDUiJnQHa1AZQhFrQr?=
- =?us-ascii?Q?42vU5z+rfAJ45py4xNDI920mxyNdwoa8VXwSU9dLdyUJ5MIe3jpP5NNmTBjo?=
- =?us-ascii?Q?sW3ABW01qJPl2/1dVzU0Z5EiGQ0gFrU+sMkyokfLSK6G9oDt7k87/HkVFhTg?=
- =?us-ascii?Q?MadF4wV7vbHEEyYjP9SxMfX0ZzOApBSD3+Z0prKxsXQptN/k/VTRXU/gQ/Ld?=
- =?us-ascii?Q?IS1s0p7XantOWKAc7+c+IRIbMQWuuytW9iwl6KKqi/HsPtvgENf8extJlvxw?=
- =?us-ascii?Q?sMpwYmMt4FKyi2h7laQfGGZxmdz98+LkTbua4UXnLGrYtvhNRQE5FZ0iXYQc?=
- =?us-ascii?Q?h1O13G/RI4RIr5we8Jyxc+YZapgZ+GeSvFm7SI+aQBaRqYKacUpnwSH2zVwj?=
- =?us-ascii?Q?+ap6Um5I896lfQe1WyOZKH3jFubkd1GjpyQ5cbAxjoEGxu4IvzJrpbhdJjFN?=
- =?us-ascii?Q?Q7y46dLH78+1aJFN0w3bZ87qqdXv76woPv9ygPvdE6MAJO88WObS9Q2SpB98?=
- =?us-ascii?Q?HnGsLdt+z1gjS6kabfggjJOZI+BrXiYvxF9CZqpKYijKa320VRwVZhP6QJ/j?=
- =?us-ascii?Q?9NnDk3cwez00vgj7RyV0sLT4dZsVoabGHyU47i/9g5v2jkQRcHEKjR4UZLGo?=
- =?us-ascii?Q?2gn++DaqAIC4S/KmcBITl8Ncf5040vI1VZy3uBDIAx++m8YSKr4JV3lbxhoy?=
- =?us-ascii?Q?yB31mqJdeal1kbj1OcGwEoVgkGbH+5L4/5C5gj8RHFd5UHiL4GkF?=
+	=?us-ascii?Q?UONU2EF3wc5CXYVLrwUvpOIpmoC2GyN1BQjUAH6JfZbF+LzE/7nDgYh6Zl90?=
+ =?us-ascii?Q?BO3Nwj9vMkipBR2uMkbZjkgU3s29wVZQBC3nCGJVYx4EBiwhq8YIfM/0Oky6?=
+ =?us-ascii?Q?DIyNkBHcEsPKBZ4o30crBR0O3Xq9J1KTyNDM0CiG6dvHiIVRkP9Mq+nRVwWp?=
+ =?us-ascii?Q?f9NmEnCHfNXfU+qqOA99rN/z+D1niBciCDSb8xZ08iXis9uwP0xL1fiecYBh?=
+ =?us-ascii?Q?+cDN3KPITsiirZODqKhYopkEiJ0cr17WcMY4D9Mx6IXl4zI0GaiCY5YmKvHX?=
+ =?us-ascii?Q?pW4keXsk0V8lKFkq1v1tPIhMrn+/xZ5WhloTfIF/0VO+Xt6G6vK3VswJ6KFJ?=
+ =?us-ascii?Q?30jJyJh7zQON5i2R01iZoMybGkHgn1gbGCOQjTs3RMtIYIT0zN2Hi5uoeU7e?=
+ =?us-ascii?Q?pagBkVG1H3WxZtb8W5k46WvfV7G1Zvb3LF/h91zdvK7mtc97SQpgUCW6jSjQ?=
+ =?us-ascii?Q?XclOxHlutmdNYAwYXGF4DZzVYiXVhrC5jiZMYplA9iJ8GzXsbLOCQKEhlFMP?=
+ =?us-ascii?Q?BPQfAFxZythKJjkeLeO5MYWHHsui4S5yM9TUcqPa91a1otUiWBVJvyB/QshL?=
+ =?us-ascii?Q?iTCR/iN9DpLSl1AsE45SEArpumtl1Nt7W3sBIV+TNNCRlhSn8Pwi/DBlwXNA?=
+ =?us-ascii?Q?eJtfyteYOq2Oaq+HyvF393I82rJfORcHmq4DeecGy0pREXvpy3yMElSws+rj?=
+ =?us-ascii?Q?KITUIxmlRgXJ8nL3WZ3g4ov5tXmnt98A4kDKk7bztTM3N4s1C43Dm0bcyUqv?=
+ =?us-ascii?Q?nXU82UKnRfisLJp2bFkcuN5+siTOBhnwKRE1FGoteZlW790LdFeeaeusMsvT?=
+ =?us-ascii?Q?mY1W93/AyPnnbWqW3C/Cj1LNJkAdvsX0HenJCYNxmaboWVpViaGts5GF4S18?=
+ =?us-ascii?Q?jSJWg2YHFwDJx+fQHtUovfRGfvwFxFUgAULmW+8sQ9GADXnVTRMUe1+2D93v?=
+ =?us-ascii?Q?1mjxaOlYAEbDFrO3GMiUXqryqRJYsglxEK8K0WQ+7EMeLEenQFlBXfUELamf?=
+ =?us-ascii?Q?xhPEhl6pSgGjvJQP9wJEDijwjFMSuDqrW6jv4pm5HKQLuT3Fstm6YeXIboMf?=
+ =?us-ascii?Q?KQKhqMIQCXJxLfRsEm2C45FTyM7CntM135nE8hdJkoojTqsQtS6fBi8AJQzX?=
+ =?us-ascii?Q?YQT2fEdIUTbLzT5tlBU8+Jp/ui/JyV805qjqyhvpsifmPtc4Y6jQWGSLO9/i?=
+ =?us-ascii?Q?0CY2yCk4d4/KVPguK/OoVvYgo6oG8iqumwJVmc4qkZmw/lFp1bQZWY4Jrets?=
+ =?us-ascii?Q?nBEgwb0/FBVohr18hE9uvhDQjnGXi9vwSEIcwAXX/8wGMJ42htQM2FUVunO6?=
+ =?us-ascii?Q?ZPj0Vt8DF1t0cg7yENItQ6eaK+Vc170sV4uMDWyDMs1WKE7vCPSGXb/5ACBk?=
+ =?us-ascii?Q?j/AXOWv8us9UIPaeIs13yTDq1vezuf2P6Ok7opeEQsWj4cEna1DumtCWAjff?=
+ =?us-ascii?Q?7janDg46ejmeBBKpL2dbmeeJ5IFszFpJJsmkZfiBycGCKbmwypABsu8I3Yx3?=
+ =?us-ascii?Q?LeMrCvCvfV+iXfGz6wQhVdrpYE9R33NhKvfVHjiyeCkg757frl2E6zd3aPSY?=
+ =?us-ascii?Q?gS6Rq4A2I6KnioQTsi2JOtiJ+5JPlAfsLvVhG/4D0vuJkWRXLh4yA6aa/GJS?=
+ =?us-ascii?Q?YgQrKfhqpfXM67BYQVYZ2CM26opxd+HcSFrzmUI6/Vz7nD/C20LnumFXHDpR?=
+ =?us-ascii?Q?SjxXnE1XApkeQoDjorHTVpEdl7bh5hyCtolRC07fsIgH1fPGaVv4aiG+JTZq?=
+ =?us-ascii?Q?W8YuhimAcRrOU2t+IRgWW9/84dyhrBKDMAb3xmsRVe0e/c1FMU/8?=
 X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 23c597cf-7c12-47b5-ad47-08deacc3cc0b
+X-MS-Exchange-CrossTenant-Network-Message-Id: caf99e25-5d78-4d30-1880-08deacc3cd4f
 X-MS-Exchange-CrossTenant-AuthSource: ZQ4PR01MB1202.CHNPR01.prod.partner.outlook.cn
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2026 05:36:47.8448
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2026 05:36:49.7850
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NCsuv9fiGkp/wqy8ugToIjrCU2JJsvxJWFVdi6RcKPubBlUZ+nPXtXAGU2+SAgWIdiH+oyz18cMVQu/KcfWReTRGvSFRzLIVZn4QepGndfKRCLLw86lwfwkk3tHlXjMv
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2injlVFWP9xN7XYv6Ui+Lzs6rhopSYUnAKXFR224zRucmvBkItMnUbALg5Hhboiksl8MRmkO0BDS1RZcfNS1OUA5RtL7q0NN3JXtfSW2YDkiwVFClyv7GXS8SwCTvufv
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: ZQ4PR01MB1236
-X-Rspamd-Queue-Id: 983B94F1FC7
+X-Rspamd-Queue-Id: 0B30F4F1FFD
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [5.04 / 15.00];
 	DMARC_POLICY_QUARANTINE(1.50)[starfivetech.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
@@ -156,2488 +156,209 @@ X-Spamd-Result: default: False [5.04 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_TO(0.00)[baylibre.com,kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,pengutronix.de,esmil.dk,gmail.com];
 	GREYLIST(0.00)[pass,meta];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-285641-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	FROM_HAS_DN(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.929];
-	FROM_NEQ_ENVFROM(0.00)[changhuang.liang@starfivetech.com,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	TAGGED_FROM(0.00)[bounces-285643-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[changhuang.liang@starfivetech.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,canonical.com:email,starfivetech.com:email,starfivetech.com:mid]
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.817];
+	DBL_PROHIBIT(0.00)[0.198.93.64:email];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	R_DKIM_NA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,starfivetech.com:email,starfivetech.com:mid,devicetree.org:url]
 X-Rspamd-Action: no action
 
-From: Sia Jee Heng <jeeheng.sia@starfivetech.com>
+Add bindings for the System-0 clocks and reset generator (SYS0CRG) on
+JHB100 SoC.
 
-Function names that consist of the 'jh71x0' naming convention are
-renamed to use the 'starfive' wording.
-
-Signed-off-by: Sia Jee Heng <jeeheng.sia@starfivetech.com>
-Reviewed-by: Ley Foon Tan <leyfoon.tan@starfivetech.com>
-Reviewed-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
 Signed-off-by: Changhuang Liang <changhuang.liang@starfivetech.com>
 ---
- drivers/clk/starfive/clk-starfive-common.c    | 296 +++++-----
- drivers/clk/starfive/clk-starfive-common.h    |  70 +--
- .../clk/starfive/clk-starfive-jh7100-audio.c  | 125 +++--
- drivers/clk/starfive/clk-starfive-jh7100.c    | 501 ++++++++---------
- .../clk/starfive/clk-starfive-jh7110-aon.c    |  62 +--
- .../clk/starfive/clk-starfive-jh7110-isp.c    |  72 +--
- .../clk/starfive/clk-starfive-jh7110-stg.c    |  94 ++--
- .../clk/starfive/clk-starfive-jh7110-sys.c    | 519 +++++++++---------
- .../clk/starfive/clk-starfive-jh7110-vout.c   |  74 +--
- drivers/clk/starfive/clk-starfive-jh7110.h    |   2 +-
- 10 files changed, 913 insertions(+), 902 deletions(-)
+ .../clock/starfive,jhb100-sys0crg.yaml        | 63 +++++++++++++++++++
+ .../dt-bindings/clock/starfive,jhb100-crg.h   | 56 +++++++++++++++++
+ .../dt-bindings/reset/starfive,jhb100-crg.h   | 28 +++++++++
+ 3 files changed, 147 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/clock/starfive,jhb100-sys0crg.yaml
+ create mode 100644 include/dt-bindings/clock/starfive,jhb100-crg.h
+ create mode 100644 include/dt-bindings/reset/starfive,jhb100-crg.h
 
-diff --git a/drivers/clk/starfive/clk-starfive-common.c b/drivers/clk/starfive/clk-starfive-common.c
-index 4aecb65e9fd7..9c0eb7a50d1e 100644
---- a/drivers/clk/starfive/clk-starfive-common.c
-+++ b/drivers/clk/starfive/clk-starfive-common.c
-@@ -12,27 +12,27 @@
- 
- #include "clk-starfive-common.h"
- 
--static struct jh71x0_clk *jh71x0_clk_from(struct clk_hw *hw)
-+static struct starfive_clk *starfive_clk_from(struct clk_hw *hw)
- {
--	return container_of(hw, struct jh71x0_clk, hw);
-+	return container_of(hw, struct starfive_clk, hw);
- }
- 
--static struct jh71x0_clk_priv *jh71x0_priv_from(struct jh71x0_clk *clk)
-+static struct starfive_clk_priv *starfive_priv_from(struct starfive_clk *clk)
- {
--	return container_of(clk, struct jh71x0_clk_priv, reg[clk->idx]);
-+	return container_of(clk, struct starfive_clk_priv, reg[clk->idx]);
- }
- 
--static u32 jh71x0_clk_reg_get(struct jh71x0_clk *clk)
-+static u32 starfive_clk_reg_get(struct starfive_clk *clk)
- {
--	struct jh71x0_clk_priv *priv = jh71x0_priv_from(clk);
-+	struct starfive_clk_priv *priv = starfive_priv_from(clk);
- 	void __iomem *reg = priv->base + 4 * clk->idx;
- 
- 	return readl_relaxed(reg);
- }
- 
--static void jh71x0_clk_reg_rmw(struct jh71x0_clk *clk, u32 mask, u32 value)
-+static void starfive_clk_reg_rmw(struct starfive_clk *clk, u32 mask, u32 value)
- {
--	struct jh71x0_clk_priv *priv = jh71x0_priv_from(clk);
-+	struct starfive_clk_priv *priv = starfive_priv_from(clk);
- 	void __iomem *reg = priv->base + 4 * clk->idx;
- 	unsigned long flags;
- 
-@@ -42,41 +42,41 @@ static void jh71x0_clk_reg_rmw(struct jh71x0_clk *clk, u32 mask, u32 value)
- 	spin_unlock_irqrestore(&priv->rmw_lock, flags);
- }
- 
--static int jh71x0_clk_enable(struct clk_hw *hw)
-+static int starfive_clk_enable(struct clk_hw *hw)
- {
--	struct jh71x0_clk *clk = jh71x0_clk_from(hw);
-+	struct starfive_clk *clk = starfive_clk_from(hw);
- 
--	jh71x0_clk_reg_rmw(clk, JH71X0_CLK_ENABLE, JH71X0_CLK_ENABLE);
-+	starfive_clk_reg_rmw(clk, STARFIVE_CLK_ENABLE, STARFIVE_CLK_ENABLE);
- 	return 0;
- }
- 
--static void jh71x0_clk_disable(struct clk_hw *hw)
-+static void starfive_clk_disable(struct clk_hw *hw)
- {
--	struct jh71x0_clk *clk = jh71x0_clk_from(hw);
-+	struct starfive_clk *clk = starfive_clk_from(hw);
- 
--	jh71x0_clk_reg_rmw(clk, JH71X0_CLK_ENABLE, 0);
-+	starfive_clk_reg_rmw(clk, STARFIVE_CLK_ENABLE, 0);
- }
- 
--static int jh71x0_clk_is_enabled(struct clk_hw *hw)
-+static int starfive_clk_is_enabled(struct clk_hw *hw)
- {
--	struct jh71x0_clk *clk = jh71x0_clk_from(hw);
-+	struct starfive_clk *clk = starfive_clk_from(hw);
- 
--	return !!(jh71x0_clk_reg_get(clk) & JH71X0_CLK_ENABLE);
-+	return !!(starfive_clk_reg_get(clk) & STARFIVE_CLK_ENABLE);
- }
- 
--static unsigned long jh71x0_clk_recalc_rate(struct clk_hw *hw,
--					    unsigned long parent_rate)
-+static unsigned long starfive_clk_recalc_rate(struct clk_hw *hw,
-+					      unsigned long parent_rate)
- {
--	struct jh71x0_clk *clk = jh71x0_clk_from(hw);
--	u32 div = jh71x0_clk_reg_get(clk) & JH71X0_CLK_DIV_MASK;
-+	struct starfive_clk *clk = starfive_clk_from(hw);
-+	u32 div = starfive_clk_reg_get(clk) & STARFIVE_CLK_DIV_MASK;
- 
- 	return div ? parent_rate / div : 0;
- }
- 
--static int jh71x0_clk_determine_rate(struct clk_hw *hw,
--				     struct clk_rate_request *req)
-+static int starfive_clk_determine_rate(struct clk_hw *hw,
-+				       struct clk_rate_request *req)
- {
--	struct jh71x0_clk *clk = jh71x0_clk_from(hw);
-+	struct starfive_clk *clk = starfive_clk_from(hw);
- 	unsigned long parent = req->best_parent_rate;
- 	unsigned long rate = clamp(req->rate, req->min_rate, req->max_rate);
- 	unsigned long div = min_t(unsigned long, DIV_ROUND_UP(parent, rate), clk->max_div);
-@@ -102,233 +102,233 @@ static int jh71x0_clk_determine_rate(struct clk_hw *hw,
- 	return 0;
- }
- 
--static int jh71x0_clk_set_rate(struct clk_hw *hw,
--			       unsigned long rate,
--			       unsigned long parent_rate)
-+static int starfive_clk_set_rate(struct clk_hw *hw,
-+				 unsigned long rate,
-+				 unsigned long parent_rate)
- {
--	struct jh71x0_clk *clk = jh71x0_clk_from(hw);
-+	struct starfive_clk *clk = starfive_clk_from(hw);
- 	unsigned long div = clamp(DIV_ROUND_CLOSEST(parent_rate, rate),
- 				  1UL, (unsigned long)clk->max_div);
- 
--	jh71x0_clk_reg_rmw(clk, JH71X0_CLK_DIV_MASK, div);
-+	starfive_clk_reg_rmw(clk, STARFIVE_CLK_DIV_MASK, div);
- 	return 0;
- }
- 
--static unsigned long jh71x0_clk_frac_recalc_rate(struct clk_hw *hw,
--						 unsigned long parent_rate)
-+static unsigned long starfive_clk_frac_recalc_rate(struct clk_hw *hw,
-+						   unsigned long parent_rate)
- {
--	struct jh71x0_clk *clk = jh71x0_clk_from(hw);
--	u32 reg = jh71x0_clk_reg_get(clk);
--	unsigned long div100 = 100 * (reg & JH71X0_CLK_INT_MASK) +
--			       ((reg & JH71X0_CLK_FRAC_MASK) >> JH71X0_CLK_FRAC_SHIFT);
-+	struct starfive_clk *clk = starfive_clk_from(hw);
-+	u32 reg = starfive_clk_reg_get(clk);
-+	unsigned long div100 = 100 * (reg & STARFIVE_CLK_INT_MASK) +
-+			       ((reg & STARFIVE_CLK_FRAC_MASK) >> STARFIVE_CLK_FRAC_SHIFT);
- 
--	return (div100 >= JH71X0_CLK_FRAC_MIN) ? 100 * parent_rate / div100 : 0;
-+	return (div100 >= STARFIVE_CLK_FRAC_MIN) ? 100 * parent_rate / div100 : 0;
- }
- 
--static int jh71x0_clk_frac_determine_rate(struct clk_hw *hw,
--					  struct clk_rate_request *req)
-+static int starfive_clk_frac_determine_rate(struct clk_hw *hw,
-+					    struct clk_rate_request *req)
- {
- 	unsigned long parent100 = 100 * req->best_parent_rate;
- 	unsigned long rate = clamp(req->rate, req->min_rate, req->max_rate);
- 	unsigned long div100 = clamp(DIV_ROUND_CLOSEST(parent100, rate),
--				     JH71X0_CLK_FRAC_MIN, JH71X0_CLK_FRAC_MAX);
-+				     STARFIVE_CLK_FRAC_MIN, STARFIVE_CLK_FRAC_MAX);
- 	unsigned long result = parent100 / div100;
- 
--	/* clamp the result as in jh71x0_clk_determine_rate() above */
--	if (result > req->max_rate && div100 < JH71X0_CLK_FRAC_MAX)
-+	/* clamp the result as in starfive_clk_determine_rate() above */
-+	if (result > req->max_rate && div100 < STARFIVE_CLK_FRAC_MAX)
- 		result = parent100 / (div100 + 1);
--	if (result < req->min_rate && div100 > JH71X0_CLK_FRAC_MIN)
-+	if (result < req->min_rate && div100 > STARFIVE_CLK_FRAC_MIN)
- 		result = parent100 / (div100 - 1);
- 
- 	req->rate = result;
- 	return 0;
- }
- 
--static int jh71x0_clk_frac_set_rate(struct clk_hw *hw,
--				    unsigned long rate,
--				    unsigned long parent_rate)
-+static int starfive_clk_frac_set_rate(struct clk_hw *hw,
-+				      unsigned long rate,
-+				      unsigned long parent_rate)
- {
--	struct jh71x0_clk *clk = jh71x0_clk_from(hw);
-+	struct starfive_clk *clk = starfive_clk_from(hw);
- 	unsigned long div100 = clamp(DIV_ROUND_CLOSEST(100 * parent_rate, rate),
--				     JH71X0_CLK_FRAC_MIN, JH71X0_CLK_FRAC_MAX);
--	u32 value = ((div100 % 100) << JH71X0_CLK_FRAC_SHIFT) | (div100 / 100);
-+				     STARFIVE_CLK_FRAC_MIN, STARFIVE_CLK_FRAC_MAX);
-+	u32 value = ((div100 % 100) << STARFIVE_CLK_FRAC_SHIFT) | (div100 / 100);
- 
--	jh71x0_clk_reg_rmw(clk, JH71X0_CLK_DIV_MASK, value);
-+	starfive_clk_reg_rmw(clk, STARFIVE_CLK_DIV_MASK, value);
- 	return 0;
- }
- 
--static u8 jh71x0_clk_get_parent(struct clk_hw *hw)
-+static u8 starfive_clk_get_parent(struct clk_hw *hw)
- {
--	struct jh71x0_clk *clk = jh71x0_clk_from(hw);
--	u32 value = jh71x0_clk_reg_get(clk);
-+	struct starfive_clk *clk = starfive_clk_from(hw);
-+	u32 value = starfive_clk_reg_get(clk);
- 
--	return (value & JH71X0_CLK_MUX_MASK) >> JH71X0_CLK_MUX_SHIFT;
-+	return (value & STARFIVE_CLK_MUX_MASK) >> STARFIVE_CLK_MUX_SHIFT;
- }
- 
--static int jh71x0_clk_set_parent(struct clk_hw *hw, u8 index)
-+static int starfive_clk_set_parent(struct clk_hw *hw, u8 index)
- {
--	struct jh71x0_clk *clk = jh71x0_clk_from(hw);
--	u32 value = (u32)index << JH71X0_CLK_MUX_SHIFT;
-+	struct starfive_clk *clk = starfive_clk_from(hw);
-+	u32 value = (u32)index << STARFIVE_CLK_MUX_SHIFT;
- 
--	jh71x0_clk_reg_rmw(clk, JH71X0_CLK_MUX_MASK, value);
-+	starfive_clk_reg_rmw(clk, STARFIVE_CLK_MUX_MASK, value);
- 	return 0;
- }
- 
--static int jh71x0_clk_get_phase(struct clk_hw *hw)
-+static int starfive_clk_get_phase(struct clk_hw *hw)
- {
--	struct jh71x0_clk *clk = jh71x0_clk_from(hw);
--	u32 value = jh71x0_clk_reg_get(clk);
-+	struct starfive_clk *clk = starfive_clk_from(hw);
-+	u32 value = starfive_clk_reg_get(clk);
- 
--	return (value & JH71X0_CLK_INVERT) ? 180 : 0;
-+	return (value & STARFIVE_CLK_INVERT) ? 180 : 0;
- }
- 
--static int jh71x0_clk_set_phase(struct clk_hw *hw, int degrees)
-+static int starfive_clk_set_phase(struct clk_hw *hw, int degrees)
- {
--	struct jh71x0_clk *clk = jh71x0_clk_from(hw);
-+	struct starfive_clk *clk = starfive_clk_from(hw);
- 	u32 value;
- 
- 	if (degrees == 0)
- 		value = 0;
- 	else if (degrees == 180)
--		value = JH71X0_CLK_INVERT;
-+		value = STARFIVE_CLK_INVERT;
- 	else
- 		return -EINVAL;
- 
--	jh71x0_clk_reg_rmw(clk, JH71X0_CLK_INVERT, value);
-+	starfive_clk_reg_rmw(clk, STARFIVE_CLK_INVERT, value);
- 	return 0;
- }
- 
- #ifdef CONFIG_DEBUG_FS
--static void jh71x0_clk_debug_init(struct clk_hw *hw, struct dentry *dentry)
-+static void starfive_clk_debug_init(struct clk_hw *hw, struct dentry *dentry)
- {
--	static const struct debugfs_reg32 jh71x0_clk_reg = {
-+	static const struct debugfs_reg32 starfive_clk_reg = {
- 		.name = "CTRL",
- 		.offset = 0,
- 	};
--	struct jh71x0_clk *clk = jh71x0_clk_from(hw);
--	struct jh71x0_clk_priv *priv = jh71x0_priv_from(clk);
-+	struct starfive_clk *clk = starfive_clk_from(hw);
-+	struct starfive_clk_priv *priv = starfive_priv_from(clk);
- 	struct debugfs_regset32 *regset;
- 
- 	regset = devm_kzalloc(priv->dev, sizeof(*regset), GFP_KERNEL);
- 	if (!regset)
- 		return;
- 
--	regset->regs = &jh71x0_clk_reg;
-+	regset->regs = &starfive_clk_reg;
- 	regset->nregs = 1;
- 	regset->base = priv->base + 4 * clk->idx;
- 
- 	debugfs_create_regset32("registers", 0400, dentry, regset);
- }
- #else
--#define jh71x0_clk_debug_init NULL
-+#define starfive_clk_debug_init NULL
- #endif
- 
--static const struct clk_ops jh71x0_clk_gate_ops = {
--	.enable = jh71x0_clk_enable,
--	.disable = jh71x0_clk_disable,
--	.is_enabled = jh71x0_clk_is_enabled,
--	.debug_init = jh71x0_clk_debug_init,
-+static const struct clk_ops starfive_clk_gate_ops = {
-+	.enable = starfive_clk_enable,
-+	.disable = starfive_clk_disable,
-+	.is_enabled = starfive_clk_is_enabled,
-+	.debug_init = starfive_clk_debug_init,
- };
- 
--static const struct clk_ops jh71x0_clk_div_ops = {
--	.recalc_rate = jh71x0_clk_recalc_rate,
--	.determine_rate = jh71x0_clk_determine_rate,
--	.set_rate = jh71x0_clk_set_rate,
--	.debug_init = jh71x0_clk_debug_init,
-+static const struct clk_ops starfive_clk_div_ops = {
-+	.recalc_rate = starfive_clk_recalc_rate,
-+	.determine_rate = starfive_clk_determine_rate,
-+	.set_rate = starfive_clk_set_rate,
-+	.debug_init = starfive_clk_debug_init,
- };
- 
--static const struct clk_ops jh71x0_clk_fdiv_ops = {
--	.recalc_rate = jh71x0_clk_frac_recalc_rate,
--	.determine_rate = jh71x0_clk_frac_determine_rate,
--	.set_rate = jh71x0_clk_frac_set_rate,
--	.debug_init = jh71x0_clk_debug_init,
-+static const struct clk_ops starfive_clk_fdiv_ops = {
-+	.recalc_rate = starfive_clk_frac_recalc_rate,
-+	.determine_rate = starfive_clk_frac_determine_rate,
-+	.set_rate = starfive_clk_frac_set_rate,
-+	.debug_init = starfive_clk_debug_init,
- };
- 
--static const struct clk_ops jh71x0_clk_gdiv_ops = {
--	.enable = jh71x0_clk_enable,
--	.disable = jh71x0_clk_disable,
--	.is_enabled = jh71x0_clk_is_enabled,
--	.recalc_rate = jh71x0_clk_recalc_rate,
--	.determine_rate = jh71x0_clk_determine_rate,
--	.set_rate = jh71x0_clk_set_rate,
--	.debug_init = jh71x0_clk_debug_init,
-+static const struct clk_ops starfive_clk_gdiv_ops = {
-+	.enable = starfive_clk_enable,
-+	.disable = starfive_clk_disable,
-+	.is_enabled = starfive_clk_is_enabled,
-+	.recalc_rate = starfive_clk_recalc_rate,
-+	.determine_rate = starfive_clk_determine_rate,
-+	.set_rate = starfive_clk_set_rate,
-+	.debug_init = starfive_clk_debug_init,
- };
- 
--static const struct clk_ops jh71x0_clk_mux_ops = {
-+static const struct clk_ops starfive_clk_mux_ops = {
- 	.determine_rate = __clk_mux_determine_rate,
--	.set_parent = jh71x0_clk_set_parent,
--	.get_parent = jh71x0_clk_get_parent,
--	.debug_init = jh71x0_clk_debug_init,
-+	.set_parent = starfive_clk_set_parent,
-+	.get_parent = starfive_clk_get_parent,
-+	.debug_init = starfive_clk_debug_init,
- };
- 
--static const struct clk_ops jh71x0_clk_gmux_ops = {
--	.enable = jh71x0_clk_enable,
--	.disable = jh71x0_clk_disable,
--	.is_enabled = jh71x0_clk_is_enabled,
-+static const struct clk_ops starfive_clk_gmux_ops = {
-+	.enable = starfive_clk_enable,
-+	.disable = starfive_clk_disable,
-+	.is_enabled = starfive_clk_is_enabled,
- 	.determine_rate = __clk_mux_determine_rate,
--	.set_parent = jh71x0_clk_set_parent,
--	.get_parent = jh71x0_clk_get_parent,
--	.debug_init = jh71x0_clk_debug_init,
-+	.set_parent = starfive_clk_set_parent,
-+	.get_parent = starfive_clk_get_parent,
-+	.debug_init = starfive_clk_debug_init,
- };
- 
--static const struct clk_ops jh71x0_clk_mdiv_ops = {
--	.recalc_rate = jh71x0_clk_recalc_rate,
--	.determine_rate = jh71x0_clk_determine_rate,
--	.get_parent = jh71x0_clk_get_parent,
--	.set_parent = jh71x0_clk_set_parent,
--	.set_rate = jh71x0_clk_set_rate,
--	.debug_init = jh71x0_clk_debug_init,
-+static const struct clk_ops starfive_clk_mdiv_ops = {
-+	.recalc_rate = starfive_clk_recalc_rate,
-+	.determine_rate = starfive_clk_determine_rate,
-+	.get_parent = starfive_clk_get_parent,
-+	.set_parent = starfive_clk_set_parent,
-+	.set_rate = starfive_clk_set_rate,
-+	.debug_init = starfive_clk_debug_init,
- };
- 
--static const struct clk_ops jh71x0_clk_gmd_ops = {
--	.enable = jh71x0_clk_enable,
--	.disable = jh71x0_clk_disable,
--	.is_enabled = jh71x0_clk_is_enabled,
--	.recalc_rate = jh71x0_clk_recalc_rate,
--	.determine_rate = jh71x0_clk_determine_rate,
--	.get_parent = jh71x0_clk_get_parent,
--	.set_parent = jh71x0_clk_set_parent,
--	.set_rate = jh71x0_clk_set_rate,
--	.debug_init = jh71x0_clk_debug_init,
-+static const struct clk_ops starfive_clk_gmd_ops = {
-+	.enable = starfive_clk_enable,
-+	.disable = starfive_clk_disable,
-+	.is_enabled = starfive_clk_is_enabled,
-+	.recalc_rate = starfive_clk_recalc_rate,
-+	.determine_rate = starfive_clk_determine_rate,
-+	.get_parent = starfive_clk_get_parent,
-+	.set_parent = starfive_clk_set_parent,
-+	.set_rate = starfive_clk_set_rate,
-+	.debug_init = starfive_clk_debug_init,
- };
- 
--static const struct clk_ops jh71x0_clk_inv_ops = {
--	.get_phase = jh71x0_clk_get_phase,
--	.set_phase = jh71x0_clk_set_phase,
--	.debug_init = jh71x0_clk_debug_init,
-+static const struct clk_ops starfive_clk_inv_ops = {
-+	.get_phase = starfive_clk_get_phase,
-+	.set_phase = starfive_clk_set_phase,
-+	.debug_init = starfive_clk_debug_init,
- };
- 
--const struct clk_ops *starfive_jh71x0_clk_ops(u32 max)
-+const struct clk_ops *starfive_clk_ops(u32 max)
- {
--	if (max & JH71X0_CLK_DIV_MASK) {
--		if (max & JH71X0_CLK_MUX_MASK) {
--			if (max & JH71X0_CLK_ENABLE)
--				return &jh71x0_clk_gmd_ops;
--			return &jh71x0_clk_mdiv_ops;
-+	if (max & STARFIVE_CLK_DIV_MASK) {
-+		if (max & STARFIVE_CLK_MUX_MASK) {
-+			if (max & STARFIVE_CLK_ENABLE)
-+				return &starfive_clk_gmd_ops;
-+			return &starfive_clk_mdiv_ops;
- 		}
--		if (max & JH71X0_CLK_ENABLE)
--			return &jh71x0_clk_gdiv_ops;
--		if (max == JH71X0_CLK_FRAC_MAX)
--			return &jh71x0_clk_fdiv_ops;
--		return &jh71x0_clk_div_ops;
-+		if (max & STARFIVE_CLK_ENABLE)
-+			return &starfive_clk_gdiv_ops;
-+		if (max == STARFIVE_CLK_FRAC_MAX)
-+			return &starfive_clk_fdiv_ops;
-+		return &starfive_clk_div_ops;
- 	}
- 
--	if (max & JH71X0_CLK_MUX_MASK) {
--		if (max & JH71X0_CLK_ENABLE)
--			return &jh71x0_clk_gmux_ops;
--		return &jh71x0_clk_mux_ops;
-+	if (max & STARFIVE_CLK_MUX_MASK) {
-+		if (max & STARFIVE_CLK_ENABLE)
-+			return &starfive_clk_gmux_ops;
-+		return &starfive_clk_mux_ops;
- 	}
- 
--	if (max & JH71X0_CLK_ENABLE)
--		return &jh71x0_clk_gate_ops;
-+	if (max & STARFIVE_CLK_ENABLE)
-+		return &starfive_clk_gate_ops;
- 
--	return &jh71x0_clk_inv_ops;
-+	return &starfive_clk_inv_ops;
- }
--EXPORT_SYMBOL_GPL(starfive_jh71x0_clk_ops);
-+EXPORT_SYMBOL_GPL(starfive_clk_ops);
- 
--struct clk_hw *jh71x0_clk_get(struct of_phandle_args *clkspec, void *data)
-+struct clk_hw *starfive_clk_get(struct of_phandle_args *clkspec, void *data)
- {
--	struct jh71x0_clk_priv *priv = data;
-+	struct starfive_clk_priv *priv = data;
- 	unsigned int idx = clkspec->args[0];
- 
- 	if (idx < priv->num_reg)
-@@ -336,4 +336,4 @@ struct clk_hw *jh71x0_clk_get(struct of_phandle_args *clkspec, void *data)
- 
- 	return ERR_PTR(-EINVAL);
- }
--EXPORT_SYMBOL_GPL(jh71x0_clk_get);
-+EXPORT_SYMBOL_GPL(starfive_clk_get);
-diff --git a/drivers/clk/starfive/clk-starfive-common.h b/drivers/clk/starfive/clk-starfive-common.h
-index f634c62c196a..a03824e9e75f 100644
---- a/drivers/clk/starfive/clk-starfive-common.h
-+++ b/drivers/clk/starfive/clk-starfive-common.h
-@@ -8,36 +8,36 @@
- #include <linux/spinlock.h>
- 
- /* register fields */
--#define JH71X0_CLK_ENABLE	BIT(31)
--#define JH71X0_CLK_INVERT	BIT(30)
--#define JH71X0_CLK_MUX_MASK	GENMASK(27, 24)
--#define JH71X0_CLK_MUX_SHIFT	24
--#define JH71X0_CLK_DIV_MASK	GENMASK(23, 0)
--#define JH71X0_CLK_FRAC_MASK	GENMASK(15, 8)
--#define JH71X0_CLK_FRAC_SHIFT	8
--#define JH71X0_CLK_INT_MASK	GENMASK(7, 0)
-+#define STARFIVE_CLK_ENABLE	BIT(31)
-+#define STARFIVE_CLK_INVERT	BIT(30)
-+#define STARFIVE_CLK_MUX_MASK	GENMASK(27, 24)
-+#define STARFIVE_CLK_MUX_SHIFT	24
-+#define STARFIVE_CLK_DIV_MASK	GENMASK(23, 0)
-+#define STARFIVE_CLK_FRAC_MASK	GENMASK(15, 8)
-+#define STARFIVE_CLK_FRAC_SHIFT	8
-+#define STARFIVE_CLK_INT_MASK	GENMASK(7, 0)
- 
- /* fractional divider min/max */
--#define JH71X0_CLK_FRAC_MIN	100UL
--#define JH71X0_CLK_FRAC_MAX	25599UL
-+#define STARFIVE_CLK_FRAC_MIN	100UL
-+#define STARFIVE_CLK_FRAC_MAX	25599UL
- 
- /* clock data */
--struct jh71x0_clk_data {
-+struct starfive_clk_data {
- 	const char *name;
- 	unsigned long flags;
- 	u32 max;
- 	u8 parents[4];
- };
- 
--#define JH71X0_GATE(_idx, _name, _flags, _parent)				\
-+#define STARFIVE_GATE(_idx, _name, _flags, _parent)				\
- [_idx] = {									\
- 	.name = _name,								\
- 	.flags = CLK_SET_RATE_PARENT | (_flags),				\
--	.max = JH71X0_CLK_ENABLE,						\
-+	.max = STARFIVE_CLK_ENABLE,						\
- 	.parents = { [0] = _parent },						\
- }
- 
--#define JH71X0__DIV(_idx, _name, _max, _parent)					\
-+#define STARFIVE__DIV(_idx, _name, _max, _parent)				\
- [_idx] = {									\
- 	.name = _name,								\
- 	.flags = 0,								\
-@@ -45,71 +45,71 @@ struct jh71x0_clk_data {
- 	.parents = { [0] = _parent },						\
- }
- 
--#define JH71X0_GDIV(_idx, _name, _flags, _max, _parent)				\
-+#define STARFIVE_GDIV(_idx, _name, _flags, _max, _parent)			\
- [_idx] = {									\
- 	.name = _name,								\
- 	.flags = _flags,							\
--	.max = JH71X0_CLK_ENABLE | (_max),					\
-+	.max = STARFIVE_CLK_ENABLE | (_max),					\
- 	.parents = { [0] = _parent },						\
- }
- 
--#define JH71X0_FDIV(_idx, _name, _parent)					\
-+#define STARFIVE_FDIV(_idx, _name, _parent)					\
- [_idx] = {									\
- 	.name = _name,								\
- 	.flags = 0,								\
--	.max = JH71X0_CLK_FRAC_MAX,						\
-+	.max = STARFIVE_CLK_FRAC_MAX,						\
- 	.parents = { [0] = _parent },						\
- }
- 
--#define JH71X0__MUX(_idx, _name, _flags, _nparents, ...)			\
-+#define STARFIVE__MUX(_idx, _name, _flags, _nparents, ...)			\
- [_idx] = {									\
- 	.name = _name,								\
- 	.flags = _flags,							\
--	.max = ((_nparents) - 1) << JH71X0_CLK_MUX_SHIFT,			\
-+	.max = ((_nparents) - 1) << STARFIVE_CLK_MUX_SHIFT,			\
- 	.parents = { __VA_ARGS__ },						\
- }
- 
--#define JH71X0_GMUX(_idx, _name, _flags, _nparents, ...)			\
-+#define STARFIVE_GMUX(_idx, _name, _flags, _nparents, ...)			\
- [_idx] = {									\
- 	.name = _name,								\
- 	.flags = _flags,							\
--	.max = JH71X0_CLK_ENABLE |						\
--		(((_nparents) - 1) << JH71X0_CLK_MUX_SHIFT),			\
-+	.max = STARFIVE_CLK_ENABLE |						\
-+		(((_nparents) - 1) << STARFIVE_CLK_MUX_SHIFT),			\
- 	.parents = { __VA_ARGS__ },						\
- }
- 
--#define JH71X0_MDIV(_idx, _name, _max, _nparents, ...)				\
-+#define STARFIVE_MDIV(_idx, _name, _max, _nparents, ...)			\
- [_idx] = {									\
- 	.name = _name,								\
- 	.flags = 0,								\
--	.max = (((_nparents) - 1) << JH71X0_CLK_MUX_SHIFT) | (_max),		\
-+	.max = (((_nparents) - 1) << STARFIVE_CLK_MUX_SHIFT) | (_max),		\
- 	.parents = { __VA_ARGS__ },						\
- }
- 
--#define JH71X0__GMD(_idx, _name, _flags, _max, _nparents, ...)			\
-+#define STARFIVE__GMD(_idx, _name, _flags, _max, _nparents, ...)		\
- [_idx] = {									\
- 	.name = _name,								\
- 	.flags = _flags,							\
--	.max = JH71X0_CLK_ENABLE |						\
--		(((_nparents) - 1) << JH71X0_CLK_MUX_SHIFT) | (_max),		\
-+	.max = STARFIVE_CLK_ENABLE |						\
-+		(((_nparents) - 1) << STARFIVE_CLK_MUX_SHIFT) | (_max),		\
- 	.parents = { __VA_ARGS__ },						\
- }
- 
--#define JH71X0__INV(_idx, _name, _parent)					\
-+#define STARFIVE__INV(_idx, _name, _parent)					\
- [_idx] = {									\
- 	.name = _name,								\
- 	.flags = CLK_SET_RATE_PARENT,						\
--	.max = JH71X0_CLK_INVERT,						\
-+	.max = STARFIVE_CLK_INVERT,						\
- 	.parents = { [0] = _parent },						\
- }
- 
--struct jh71x0_clk {
-+struct starfive_clk {
- 	struct clk_hw hw;
- 	unsigned int idx;
- 	unsigned int max_div;
- };
- 
--struct jh71x0_clk_priv {
-+struct starfive_clk_priv {
- 	/* protect clk enable and set rate/parent from happening at the same time */
- 	spinlock_t rmw_lock;
- 	struct device *dev;
-@@ -118,10 +118,10 @@ struct jh71x0_clk_priv {
- 	struct notifier_block pll_clk_nb;
- 	struct clk_hw *pll[3];
- 	unsigned int num_reg;
--	struct jh71x0_clk reg[] __counted_by(num_reg);
-+	struct starfive_clk reg[] __counted_by(num_reg);
- };
- 
--const struct clk_ops *starfive_jh71x0_clk_ops(u32 max);
--struct clk_hw *jh71x0_clk_get(struct of_phandle_args *clkspec, void *data);
-+const struct clk_ops *starfive_clk_ops(u32 max);
-+struct clk_hw *starfive_clk_get(struct of_phandle_args *clkspec, void *data);
- 
- #endif
-diff --git a/drivers/clk/starfive/clk-starfive-jh7100-audio.c b/drivers/clk/starfive/clk-starfive-jh7100-audio.c
-index 4505d309f664..6c295b06e6ad 100644
---- a/drivers/clk/starfive/clk-starfive-jh7100-audio.c
-+++ b/drivers/clk/starfive/clk-starfive-jh7100-audio.c
-@@ -27,66 +27,68 @@
- #define JH7100_AUDCLK_I2SDAC_LRCLK_IOPAD	(JH7100_AUDCLK_END + 6)
- #define JH7100_AUDCLK_VAD_INTMEM                (JH7100_AUDCLK_END + 7)
- 
--static const struct jh71x0_clk_data jh7100_audclk_data[] = {
--	JH71X0__GMD(JH7100_AUDCLK_ADC_MCLK, "adc_mclk", 0, 15, 2,
--		    JH7100_AUDCLK_AUDIO_SRC,
--		    JH7100_AUDCLK_AUDIO_12288),
--	JH71X0__GMD(JH7100_AUDCLK_I2S1_MCLK, "i2s1_mclk", 0, 15, 2,
--		    JH7100_AUDCLK_AUDIO_SRC,
--		    JH7100_AUDCLK_AUDIO_12288),
--	JH71X0_GATE(JH7100_AUDCLK_I2SADC_APB, "i2sadc_apb", 0, JH7100_AUDCLK_APB0_BUS),
--	JH71X0_MDIV(JH7100_AUDCLK_I2SADC_BCLK, "i2sadc_bclk", 31, 2,
--		    JH7100_AUDCLK_ADC_MCLK,
--		    JH7100_AUDCLK_I2SADC_BCLK_IOPAD),
--	JH71X0__INV(JH7100_AUDCLK_I2SADC_BCLK_N, "i2sadc_bclk_n", JH7100_AUDCLK_I2SADC_BCLK),
--	JH71X0_MDIV(JH7100_AUDCLK_I2SADC_LRCLK, "i2sadc_lrclk", 63, 3,
--		    JH7100_AUDCLK_I2SADC_BCLK_N,
--		    JH7100_AUDCLK_I2SADC_LRCLK_IOPAD,
--		    JH7100_AUDCLK_I2SADC_BCLK),
--	JH71X0_GATE(JH7100_AUDCLK_PDM_APB, "pdm_apb", 0, JH7100_AUDCLK_APB0_BUS),
--	JH71X0__GMD(JH7100_AUDCLK_PDM_MCLK, "pdm_mclk", 0, 15, 2,
--		    JH7100_AUDCLK_AUDIO_SRC,
--		    JH7100_AUDCLK_AUDIO_12288),
--	JH71X0_GATE(JH7100_AUDCLK_I2SVAD_APB, "i2svad_apb", 0, JH7100_AUDCLK_APB0_BUS),
--	JH71X0__GMD(JH7100_AUDCLK_SPDIF, "spdif", 0, 15, 2,
--		    JH7100_AUDCLK_AUDIO_SRC,
--		    JH7100_AUDCLK_AUDIO_12288),
--	JH71X0_GATE(JH7100_AUDCLK_SPDIF_APB, "spdif_apb", 0, JH7100_AUDCLK_APB0_BUS),
--	JH71X0_GATE(JH7100_AUDCLK_PWMDAC_APB, "pwmdac_apb", 0, JH7100_AUDCLK_APB0_BUS),
--	JH71X0__GMD(JH7100_AUDCLK_DAC_MCLK, "dac_mclk", 0, 15, 2,
--		    JH7100_AUDCLK_AUDIO_SRC,
--		    JH7100_AUDCLK_AUDIO_12288),
--	JH71X0_GATE(JH7100_AUDCLK_I2SDAC_APB, "i2sdac_apb", 0, JH7100_AUDCLK_APB0_BUS),
--	JH71X0_MDIV(JH7100_AUDCLK_I2SDAC_BCLK, "i2sdac_bclk", 31, 2,
--		    JH7100_AUDCLK_DAC_MCLK,
--		    JH7100_AUDCLK_I2SDAC_BCLK_IOPAD),
--	JH71X0__INV(JH7100_AUDCLK_I2SDAC_BCLK_N, "i2sdac_bclk_n", JH7100_AUDCLK_I2SDAC_BCLK),
--	JH71X0_MDIV(JH7100_AUDCLK_I2SDAC_LRCLK, "i2sdac_lrclk", 31, 2,
--		    JH7100_AUDCLK_I2S1_MCLK,
--		    JH7100_AUDCLK_I2SDAC_BCLK_IOPAD),
--	JH71X0_GATE(JH7100_AUDCLK_I2S1_APB, "i2s1_apb", 0, JH7100_AUDCLK_APB0_BUS),
--	JH71X0_MDIV(JH7100_AUDCLK_I2S1_BCLK, "i2s1_bclk", 31, 2,
--		    JH7100_AUDCLK_I2S1_MCLK,
--		    JH7100_AUDCLK_I2SDAC_BCLK_IOPAD),
--	JH71X0__INV(JH7100_AUDCLK_I2S1_BCLK_N, "i2s1_bclk_n", JH7100_AUDCLK_I2S1_BCLK),
--	JH71X0_MDIV(JH7100_AUDCLK_I2S1_LRCLK, "i2s1_lrclk", 63, 3,
--		    JH7100_AUDCLK_I2S1_BCLK_N,
--		    JH7100_AUDCLK_I2SDAC_LRCLK_IOPAD),
--	JH71X0_GATE(JH7100_AUDCLK_I2SDAC16K_APB, "i2s1dac16k_apb", 0, JH7100_AUDCLK_APB0_BUS),
--	JH71X0__DIV(JH7100_AUDCLK_APB0_BUS, "apb0_bus", 8, JH7100_AUDCLK_DOM7AHB_BUS),
--	JH71X0_GATE(JH7100_AUDCLK_DMA1P_AHB, "dma1p_ahb", 0, JH7100_AUDCLK_DOM7AHB_BUS),
--	JH71X0_GATE(JH7100_AUDCLK_USB_APB, "usb_apb", CLK_IGNORE_UNUSED, JH7100_AUDCLK_APB_EN),
--	JH71X0_GDIV(JH7100_AUDCLK_USB_LPM, "usb_lpm", CLK_IGNORE_UNUSED, 4, JH7100_AUDCLK_USB_APB),
--	JH71X0_GDIV(JH7100_AUDCLK_USB_STB, "usb_stb", CLK_IGNORE_UNUSED, 3, JH7100_AUDCLK_USB_APB),
--	JH71X0__DIV(JH7100_AUDCLK_APB_EN, "apb_en", 8, JH7100_AUDCLK_DOM7AHB_BUS),
--	JH71X0__MUX(JH7100_AUDCLK_VAD_MEM, "vad_mem", 0, 2,
--		    JH7100_AUDCLK_VAD_INTMEM,
--		    JH7100_AUDCLK_AUDIO_12288),
-+static const struct starfive_clk_data jh7100_audclk_data[] = {
-+	STARFIVE__GMD(JH7100_AUDCLK_ADC_MCLK, "adc_mclk", 0, 15, 2,
-+		      JH7100_AUDCLK_AUDIO_SRC,
-+		      JH7100_AUDCLK_AUDIO_12288),
-+	STARFIVE__GMD(JH7100_AUDCLK_I2S1_MCLK, "i2s1_mclk", 0, 15, 2,
-+		      JH7100_AUDCLK_AUDIO_SRC,
-+		      JH7100_AUDCLK_AUDIO_12288),
-+	STARFIVE_GATE(JH7100_AUDCLK_I2SADC_APB, "i2sadc_apb", 0, JH7100_AUDCLK_APB0_BUS),
-+	STARFIVE_MDIV(JH7100_AUDCLK_I2SADC_BCLK, "i2sadc_bclk", 31, 2,
-+		      JH7100_AUDCLK_ADC_MCLK,
-+		      JH7100_AUDCLK_I2SADC_BCLK_IOPAD),
-+	STARFIVE__INV(JH7100_AUDCLK_I2SADC_BCLK_N, "i2sadc_bclk_n", JH7100_AUDCLK_I2SADC_BCLK),
-+	STARFIVE_MDIV(JH7100_AUDCLK_I2SADC_LRCLK, "i2sadc_lrclk", 63, 3,
-+		      JH7100_AUDCLK_I2SADC_BCLK_N,
-+		      JH7100_AUDCLK_I2SADC_LRCLK_IOPAD,
-+		      JH7100_AUDCLK_I2SADC_BCLK),
-+	STARFIVE_GATE(JH7100_AUDCLK_PDM_APB, "pdm_apb", 0, JH7100_AUDCLK_APB0_BUS),
-+	STARFIVE__GMD(JH7100_AUDCLK_PDM_MCLK, "pdm_mclk", 0, 15, 2,
-+		      JH7100_AUDCLK_AUDIO_SRC,
-+		      JH7100_AUDCLK_AUDIO_12288),
-+	STARFIVE_GATE(JH7100_AUDCLK_I2SVAD_APB, "i2svad_apb", 0, JH7100_AUDCLK_APB0_BUS),
-+	STARFIVE__GMD(JH7100_AUDCLK_SPDIF, "spdif", 0, 15, 2,
-+		      JH7100_AUDCLK_AUDIO_SRC,
-+		      JH7100_AUDCLK_AUDIO_12288),
-+	STARFIVE_GATE(JH7100_AUDCLK_SPDIF_APB, "spdif_apb", 0, JH7100_AUDCLK_APB0_BUS),
-+	STARFIVE_GATE(JH7100_AUDCLK_PWMDAC_APB, "pwmdac_apb", 0, JH7100_AUDCLK_APB0_BUS),
-+	STARFIVE__GMD(JH7100_AUDCLK_DAC_MCLK, "dac_mclk", 0, 15, 2,
-+		      JH7100_AUDCLK_AUDIO_SRC,
-+		      JH7100_AUDCLK_AUDIO_12288),
-+	STARFIVE_GATE(JH7100_AUDCLK_I2SDAC_APB, "i2sdac_apb", 0, JH7100_AUDCLK_APB0_BUS),
-+	STARFIVE_MDIV(JH7100_AUDCLK_I2SDAC_BCLK, "i2sdac_bclk", 31, 2,
-+		      JH7100_AUDCLK_DAC_MCLK,
-+		      JH7100_AUDCLK_I2SDAC_BCLK_IOPAD),
-+	STARFIVE__INV(JH7100_AUDCLK_I2SDAC_BCLK_N, "i2sdac_bclk_n", JH7100_AUDCLK_I2SDAC_BCLK),
-+	STARFIVE_MDIV(JH7100_AUDCLK_I2SDAC_LRCLK, "i2sdac_lrclk", 31, 2,
-+		      JH7100_AUDCLK_I2S1_MCLK,
-+		      JH7100_AUDCLK_I2SDAC_BCLK_IOPAD),
-+	STARFIVE_GATE(JH7100_AUDCLK_I2S1_APB, "i2s1_apb", 0, JH7100_AUDCLK_APB0_BUS),
-+	STARFIVE_MDIV(JH7100_AUDCLK_I2S1_BCLK, "i2s1_bclk", 31, 2,
-+		      JH7100_AUDCLK_I2S1_MCLK,
-+		      JH7100_AUDCLK_I2SDAC_BCLK_IOPAD),
-+	STARFIVE__INV(JH7100_AUDCLK_I2S1_BCLK_N, "i2s1_bclk_n", JH7100_AUDCLK_I2S1_BCLK),
-+	STARFIVE_MDIV(JH7100_AUDCLK_I2S1_LRCLK, "i2s1_lrclk", 63, 3,
-+		      JH7100_AUDCLK_I2S1_BCLK_N,
-+		      JH7100_AUDCLK_I2SDAC_LRCLK_IOPAD),
-+	STARFIVE_GATE(JH7100_AUDCLK_I2SDAC16K_APB, "i2s1dac16k_apb", 0, JH7100_AUDCLK_APB0_BUS),
-+	STARFIVE__DIV(JH7100_AUDCLK_APB0_BUS, "apb0_bus", 8, JH7100_AUDCLK_DOM7AHB_BUS),
-+	STARFIVE_GATE(JH7100_AUDCLK_DMA1P_AHB, "dma1p_ahb", 0, JH7100_AUDCLK_DOM7AHB_BUS),
-+	STARFIVE_GATE(JH7100_AUDCLK_USB_APB, "usb_apb", CLK_IGNORE_UNUSED, JH7100_AUDCLK_APB_EN),
-+	STARFIVE_GDIV(JH7100_AUDCLK_USB_LPM, "usb_lpm", CLK_IGNORE_UNUSED, 4,
-+		      JH7100_AUDCLK_USB_APB),
-+	STARFIVE_GDIV(JH7100_AUDCLK_USB_STB, "usb_stb", CLK_IGNORE_UNUSED, 3,
-+		      JH7100_AUDCLK_USB_APB),
-+	STARFIVE__DIV(JH7100_AUDCLK_APB_EN, "apb_en", 8, JH7100_AUDCLK_DOM7AHB_BUS),
-+	STARFIVE__MUX(JH7100_AUDCLK_VAD_MEM, "vad_mem", 0, 2,
-+		      JH7100_AUDCLK_VAD_INTMEM,
-+		      JH7100_AUDCLK_AUDIO_12288),
- };
- 
- static int jh7100_audclk_probe(struct platform_device *pdev)
- {
--	struct jh71x0_clk_priv *priv;
-+	struct starfive_clk_priv *priv;
- 	unsigned int idx;
- 	int ret;
- 
-@@ -106,12 +108,13 @@ static int jh7100_audclk_probe(struct platform_device *pdev)
- 		struct clk_parent_data parents[4] = {};
- 		struct clk_init_data init = {
- 			.name = jh7100_audclk_data[idx].name,
--			.ops = starfive_jh71x0_clk_ops(max),
-+			.ops = starfive_clk_ops(max),
- 			.parent_data = parents,
--			.num_parents = ((max & JH71X0_CLK_MUX_MASK) >> JH71X0_CLK_MUX_SHIFT) + 1,
-+			.num_parents = ((max & STARFIVE_CLK_MUX_MASK)
-+					>> STARFIVE_CLK_MUX_SHIFT) + 1,
- 			.flags = jh7100_audclk_data[idx].flags,
- 		};
--		struct jh71x0_clk *clk = &priv->reg[idx];
-+		struct starfive_clk *clk = &priv->reg[idx];
- 		unsigned int i;
- 
- 		for (i = 0; i < init.num_parents; i++) {
-@@ -129,14 +132,14 @@ static int jh7100_audclk_probe(struct platform_device *pdev)
- 
- 		clk->hw.init = &init;
- 		clk->idx = idx;
--		clk->max_div = max & JH71X0_CLK_DIV_MASK;
-+		clk->max_div = max & STARFIVE_CLK_DIV_MASK;
- 
- 		ret = devm_clk_hw_register(priv->dev, &clk->hw);
- 		if (ret)
- 			return ret;
- 	}
- 
--	return devm_of_clk_add_hw_provider(priv->dev, jh71x0_clk_get, priv);
-+	return devm_of_clk_add_hw_provider(priv->dev, starfive_clk_get, priv);
- }
- 
- static const struct of_device_id jh7100_audclk_match[] = {
-diff --git a/drivers/clk/starfive/clk-starfive-jh7100.c b/drivers/clk/starfive/clk-starfive-jh7100.c
-index bf82190b9c57..4f7cd56a86bf 100644
---- a/drivers/clk/starfive/clk-starfive-jh7100.c
-+++ b/drivers/clk/starfive/clk-starfive-jh7100.c
-@@ -23,253 +23,257 @@
- #define JH7100_CLK_GMAC_RMII_REF	(JH7100_CLK_END + 2)
- #define JH7100_CLK_GMAC_GR_MII_RX	(JH7100_CLK_END + 3)
- 
--static const struct jh71x0_clk_data jh7100_clk_data[] __initconst = {
--	JH71X0__MUX(JH7100_CLK_CPUNDBUS_ROOT, "cpundbus_root", 0, 4,
--		    JH7100_CLK_OSC_SYS,
--		    JH7100_CLK_PLL0_OUT,
--		    JH7100_CLK_PLL1_OUT,
--		    JH7100_CLK_PLL2_OUT),
--	JH71X0__MUX(JH7100_CLK_DLA_ROOT, "dla_root", 0, 3,
--		    JH7100_CLK_OSC_SYS,
--		    JH7100_CLK_PLL1_OUT,
--		    JH7100_CLK_PLL2_OUT),
--	JH71X0__MUX(JH7100_CLK_DSP_ROOT, "dsp_root", 0, 4,
--		    JH7100_CLK_OSC_SYS,
--		    JH7100_CLK_PLL0_OUT,
--		    JH7100_CLK_PLL1_OUT,
--		    JH7100_CLK_PLL2_OUT),
--	JH71X0__MUX(JH7100_CLK_GMACUSB_ROOT, "gmacusb_root", 0, 3,
--		    JH7100_CLK_OSC_SYS,
--		    JH7100_CLK_PLL0_OUT,
--		    JH7100_CLK_PLL2_OUT),
--	JH71X0__MUX(JH7100_CLK_PERH0_ROOT, "perh0_root", 0, 2,
--		    JH7100_CLK_OSC_SYS,
--		    JH7100_CLK_PLL0_OUT),
--	JH71X0__MUX(JH7100_CLK_PERH1_ROOT, "perh1_root", 0, 2,
--		    JH7100_CLK_OSC_SYS,
--		    JH7100_CLK_PLL2_OUT),
--	JH71X0__MUX(JH7100_CLK_VIN_ROOT, "vin_root", 0, 3,
--		    JH7100_CLK_OSC_SYS,
--		    JH7100_CLK_PLL1_OUT,
--		    JH7100_CLK_PLL2_OUT),
--	JH71X0__MUX(JH7100_CLK_VOUT_ROOT, "vout_root", 0, 3,
--		    JH7100_CLK_OSC_AUD,
--		    JH7100_CLK_PLL0_OUT,
--		    JH7100_CLK_PLL2_OUT),
--	JH71X0_GDIV(JH7100_CLK_AUDIO_ROOT, "audio_root", 0, 8, JH7100_CLK_PLL0_OUT),
--	JH71X0__MUX(JH7100_CLK_CDECHIFI4_ROOT, "cdechifi4_root", 0, 3,
--		    JH7100_CLK_OSC_SYS,
--		    JH7100_CLK_PLL1_OUT,
--		    JH7100_CLK_PLL2_OUT),
--	JH71X0__MUX(JH7100_CLK_CDEC_ROOT, "cdec_root", 0, 3,
--		    JH7100_CLK_OSC_SYS,
--		    JH7100_CLK_PLL0_OUT,
--		    JH7100_CLK_PLL1_OUT),
--	JH71X0__MUX(JH7100_CLK_VOUTBUS_ROOT, "voutbus_root", 0, 3,
--		    JH7100_CLK_OSC_AUD,
--		    JH7100_CLK_PLL0_OUT,
--		    JH7100_CLK_PLL2_OUT),
--	JH71X0__DIV(JH7100_CLK_CPUNBUS_ROOT_DIV, "cpunbus_root_div", 2, JH7100_CLK_CPUNDBUS_ROOT),
--	JH71X0__DIV(JH7100_CLK_DSP_ROOT_DIV, "dsp_root_div", 4, JH7100_CLK_DSP_ROOT),
--	JH71X0__DIV(JH7100_CLK_PERH0_SRC, "perh0_src", 4, JH7100_CLK_PERH0_ROOT),
--	JH71X0__DIV(JH7100_CLK_PERH1_SRC, "perh1_src", 4, JH7100_CLK_PERH1_ROOT),
--	JH71X0_GDIV(JH7100_CLK_PLL0_TESTOUT, "pll0_testout", 0, 31, JH7100_CLK_PERH0_SRC),
--	JH71X0_GDIV(JH7100_CLK_PLL1_TESTOUT, "pll1_testout", 0, 31, JH7100_CLK_DLA_ROOT),
--	JH71X0_GDIV(JH7100_CLK_PLL2_TESTOUT, "pll2_testout", 0, 31, JH7100_CLK_PERH1_SRC),
--	JH71X0__MUX(JH7100_CLK_PLL2_REF, "pll2_refclk", 0, 2,
--		    JH7100_CLK_OSC_SYS,
--		    JH7100_CLK_OSC_AUD),
--	JH71X0__DIV(JH7100_CLK_CPU_CORE, "cpu_core", 8, JH7100_CLK_CPUNBUS_ROOT_DIV),
--	JH71X0__DIV(JH7100_CLK_CPU_AXI, "cpu_axi", 8, JH7100_CLK_CPU_CORE),
--	JH71X0__DIV(JH7100_CLK_AHB_BUS, "ahb_bus", 8, JH7100_CLK_CPUNBUS_ROOT_DIV),
--	JH71X0__DIV(JH7100_CLK_APB1_BUS, "apb1_bus", 8, JH7100_CLK_AHB_BUS),
--	JH71X0__DIV(JH7100_CLK_APB2_BUS, "apb2_bus", 8, JH7100_CLK_AHB_BUS),
--	JH71X0_GATE(JH7100_CLK_DOM3AHB_BUS, "dom3ahb_bus", CLK_IS_CRITICAL, JH7100_CLK_AHB_BUS),
--	JH71X0_GATE(JH7100_CLK_DOM7AHB_BUS, "dom7ahb_bus", CLK_IS_CRITICAL, JH7100_CLK_AHB_BUS),
--	JH71X0_GATE(JH7100_CLK_U74_CORE0, "u74_core0", CLK_IS_CRITICAL, JH7100_CLK_CPU_CORE),
--	JH71X0_GDIV(JH7100_CLK_U74_CORE1, "u74_core1", CLK_IS_CRITICAL, 8, JH7100_CLK_CPU_CORE),
--	JH71X0_GATE(JH7100_CLK_U74_AXI, "u74_axi", CLK_IS_CRITICAL, JH7100_CLK_CPU_AXI),
--	JH71X0_GATE(JH7100_CLK_U74RTC_TOGGLE, "u74rtc_toggle", CLK_IS_CRITICAL, JH7100_CLK_OSC_SYS),
--	JH71X0_GATE(JH7100_CLK_SGDMA2P_AXI, "sgdma2p_axi", 0, JH7100_CLK_CPU_AXI),
--	JH71X0_GATE(JH7100_CLK_DMA2PNOC_AXI, "dma2pnoc_axi", 0, JH7100_CLK_CPU_AXI),
--	JH71X0_GATE(JH7100_CLK_SGDMA2P_AHB, "sgdma2p_ahb", 0, JH7100_CLK_AHB_BUS),
--	JH71X0__DIV(JH7100_CLK_DLA_BUS, "dla_bus", 4, JH7100_CLK_DLA_ROOT),
--	JH71X0_GATE(JH7100_CLK_DLA_AXI, "dla_axi", 0, JH7100_CLK_DLA_BUS),
--	JH71X0_GATE(JH7100_CLK_DLANOC_AXI, "dlanoc_axi", 0, JH7100_CLK_DLA_BUS),
--	JH71X0_GATE(JH7100_CLK_DLA_APB, "dla_apb", 0, JH7100_CLK_APB1_BUS),
--	JH71X0_GDIV(JH7100_CLK_VP6_CORE, "vp6_core", 0, 4, JH7100_CLK_DSP_ROOT_DIV),
--	JH71X0__DIV(JH7100_CLK_VP6BUS_SRC, "vp6bus_src", 4, JH7100_CLK_DSP_ROOT),
--	JH71X0_GDIV(JH7100_CLK_VP6_AXI, "vp6_axi", 0, 4, JH7100_CLK_VP6BUS_SRC),
--	JH71X0__DIV(JH7100_CLK_VCDECBUS_SRC, "vcdecbus_src", 4, JH7100_CLK_CDECHIFI4_ROOT),
--	JH71X0__DIV(JH7100_CLK_VDEC_BUS, "vdec_bus", 8, JH7100_CLK_VCDECBUS_SRC),
--	JH71X0_GATE(JH7100_CLK_VDEC_AXI, "vdec_axi", 0, JH7100_CLK_VDEC_BUS),
--	JH71X0_GATE(JH7100_CLK_VDECBRG_MAIN, "vdecbrg_mainclk", 0, JH7100_CLK_VDEC_BUS),
--	JH71X0_GDIV(JH7100_CLK_VDEC_BCLK, "vdec_bclk", 0, 8, JH7100_CLK_VCDECBUS_SRC),
--	JH71X0_GDIV(JH7100_CLK_VDEC_CCLK, "vdec_cclk", 0, 8, JH7100_CLK_CDEC_ROOT),
--	JH71X0_GATE(JH7100_CLK_VDEC_APB, "vdec_apb", 0, JH7100_CLK_APB1_BUS),
--	JH71X0_GDIV(JH7100_CLK_JPEG_AXI, "jpeg_axi", 0, 8, JH7100_CLK_CPUNBUS_ROOT_DIV),
--	JH71X0_GDIV(JH7100_CLK_JPEG_CCLK, "jpeg_cclk", 0, 8, JH7100_CLK_CPUNBUS_ROOT_DIV),
--	JH71X0_GATE(JH7100_CLK_JPEG_APB, "jpeg_apb", 0, JH7100_CLK_APB1_BUS),
--	JH71X0_GDIV(JH7100_CLK_GC300_2X, "gc300_2x", 0, 8, JH7100_CLK_CDECHIFI4_ROOT),
--	JH71X0_GATE(JH7100_CLK_GC300_AHB, "gc300_ahb", 0, JH7100_CLK_AHB_BUS),
--	JH71X0__DIV(JH7100_CLK_JPCGC300_AXIBUS, "jpcgc300_axibus", 8, JH7100_CLK_VCDECBUS_SRC),
--	JH71X0_GATE(JH7100_CLK_GC300_AXI, "gc300_axi", 0, JH7100_CLK_JPCGC300_AXIBUS),
--	JH71X0_GATE(JH7100_CLK_JPCGC300_MAIN, "jpcgc300_mainclk", 0, JH7100_CLK_JPCGC300_AXIBUS),
--	JH71X0__DIV(JH7100_CLK_VENC_BUS, "venc_bus", 8, JH7100_CLK_VCDECBUS_SRC),
--	JH71X0_GATE(JH7100_CLK_VENC_AXI, "venc_axi", 0, JH7100_CLK_VENC_BUS),
--	JH71X0_GATE(JH7100_CLK_VENCBRG_MAIN, "vencbrg_mainclk", 0, JH7100_CLK_VENC_BUS),
--	JH71X0_GDIV(JH7100_CLK_VENC_BCLK, "venc_bclk", 0, 8, JH7100_CLK_VCDECBUS_SRC),
--	JH71X0_GDIV(JH7100_CLK_VENC_CCLK, "venc_cclk", 0, 8, JH7100_CLK_CDEC_ROOT),
--	JH71X0_GATE(JH7100_CLK_VENC_APB, "venc_apb", 0, JH7100_CLK_APB1_BUS),
--	JH71X0_GDIV(JH7100_CLK_DDRPLL_DIV2, "ddrpll_div2", CLK_IS_CRITICAL, 2, JH7100_CLK_PLL1_OUT),
--	JH71X0_GDIV(JH7100_CLK_DDRPLL_DIV4, "ddrpll_div4", CLK_IS_CRITICAL, 2,
--		    JH7100_CLK_DDRPLL_DIV2),
--	JH71X0_GDIV(JH7100_CLK_DDRPLL_DIV8, "ddrpll_div8", CLK_IS_CRITICAL, 2,
--		    JH7100_CLK_DDRPLL_DIV4),
--	JH71X0_GDIV(JH7100_CLK_DDROSC_DIV2, "ddrosc_div2", CLK_IS_CRITICAL, 2, JH7100_CLK_OSC_SYS),
--	JH71X0_GMUX(JH7100_CLK_DDRC0, "ddrc0", CLK_IS_CRITICAL, 4,
--		    JH7100_CLK_DDROSC_DIV2,
--		    JH7100_CLK_DDRPLL_DIV2,
--		    JH7100_CLK_DDRPLL_DIV4,
--		    JH7100_CLK_DDRPLL_DIV8),
--	JH71X0_GMUX(JH7100_CLK_DDRC1, "ddrc1", CLK_IS_CRITICAL, 4,
--		    JH7100_CLK_DDROSC_DIV2,
--		    JH7100_CLK_DDRPLL_DIV2,
--		    JH7100_CLK_DDRPLL_DIV4,
--		    JH7100_CLK_DDRPLL_DIV8),
--	JH71X0_GATE(JH7100_CLK_DDRPHY_APB, "ddrphy_apb", 0, JH7100_CLK_APB1_BUS),
--	JH71X0__DIV(JH7100_CLK_NOC_ROB, "noc_rob", 8, JH7100_CLK_CPUNBUS_ROOT_DIV),
--	JH71X0__DIV(JH7100_CLK_NOC_COG, "noc_cog", 8, JH7100_CLK_DLA_ROOT),
--	JH71X0_GATE(JH7100_CLK_NNE_AHB, "nne_ahb", 0, JH7100_CLK_AHB_BUS),
--	JH71X0__DIV(JH7100_CLK_NNEBUS_SRC1, "nnebus_src1", 4, JH7100_CLK_DSP_ROOT),
--	JH71X0__MUX(JH7100_CLK_NNE_BUS, "nne_bus", 0, 2,
--		    JH7100_CLK_CPU_AXI,
--		    JH7100_CLK_NNEBUS_SRC1),
--	JH71X0_GATE(JH7100_CLK_NNE_AXI, "nne_axi", 0, JH7100_CLK_NNE_BUS),
--	JH71X0_GATE(JH7100_CLK_NNENOC_AXI, "nnenoc_axi", 0, JH7100_CLK_NNE_BUS),
--	JH71X0_GATE(JH7100_CLK_DLASLV_AXI, "dlaslv_axi", 0, JH7100_CLK_NNE_BUS),
--	JH71X0_GATE(JH7100_CLK_DSPX2C_AXI, "dspx2c_axi", CLK_IS_CRITICAL, JH7100_CLK_NNE_BUS),
--	JH71X0__DIV(JH7100_CLK_HIFI4_SRC, "hifi4_src", 4, JH7100_CLK_CDECHIFI4_ROOT),
--	JH71X0__DIV(JH7100_CLK_HIFI4_COREFREE, "hifi4_corefree", 8, JH7100_CLK_HIFI4_SRC),
--	JH71X0_GATE(JH7100_CLK_HIFI4_CORE, "hifi4_core", 0, JH7100_CLK_HIFI4_COREFREE),
--	JH71X0__DIV(JH7100_CLK_HIFI4_BUS, "hifi4_bus", 8, JH7100_CLK_HIFI4_COREFREE),
--	JH71X0_GATE(JH7100_CLK_HIFI4_AXI, "hifi4_axi", 0, JH7100_CLK_HIFI4_BUS),
--	JH71X0_GATE(JH7100_CLK_HIFI4NOC_AXI, "hifi4noc_axi", 0, JH7100_CLK_HIFI4_BUS),
--	JH71X0__DIV(JH7100_CLK_SGDMA1P_BUS, "sgdma1p_bus", 8, JH7100_CLK_CPUNBUS_ROOT_DIV),
--	JH71X0_GATE(JH7100_CLK_SGDMA1P_AXI, "sgdma1p_axi", 0, JH7100_CLK_SGDMA1P_BUS),
--	JH71X0_GATE(JH7100_CLK_DMA1P_AXI, "dma1p_axi", 0, JH7100_CLK_SGDMA1P_BUS),
--	JH71X0_GDIV(JH7100_CLK_X2C_AXI, "x2c_axi", CLK_IS_CRITICAL, 8, JH7100_CLK_CPUNBUS_ROOT_DIV),
--	JH71X0__DIV(JH7100_CLK_USB_BUS, "usb_bus", 8, JH7100_CLK_CPUNBUS_ROOT_DIV),
--	JH71X0_GATE(JH7100_CLK_USB_AXI, "usb_axi", 0, JH7100_CLK_USB_BUS),
--	JH71X0_GATE(JH7100_CLK_USBNOC_AXI, "usbnoc_axi", 0, JH7100_CLK_USB_BUS),
--	JH71X0__DIV(JH7100_CLK_USBPHY_ROOTDIV, "usbphy_rootdiv", 4, JH7100_CLK_GMACUSB_ROOT),
--	JH71X0_GDIV(JH7100_CLK_USBPHY_125M, "usbphy_125m", 0, 8, JH7100_CLK_USBPHY_ROOTDIV),
--	JH71X0_GDIV(JH7100_CLK_USBPHY_PLLDIV25M, "usbphy_plldiv25m", 0, 32,
--		    JH7100_CLK_USBPHY_ROOTDIV),
--	JH71X0__MUX(JH7100_CLK_USBPHY_25M, "usbphy_25m", 0, 2,
--		    JH7100_CLK_OSC_SYS,
--		    JH7100_CLK_USBPHY_PLLDIV25M),
--	JH71X0_FDIV(JH7100_CLK_AUDIO_DIV, "audio_div", JH7100_CLK_AUDIO_ROOT),
--	JH71X0_GATE(JH7100_CLK_AUDIO_SRC, "audio_src", 0, JH7100_CLK_AUDIO_DIV),
--	JH71X0_GATE(JH7100_CLK_AUDIO_12288, "audio_12288", 0, JH7100_CLK_OSC_AUD),
--	JH71X0_GDIV(JH7100_CLK_VIN_SRC, "vin_src", 0, 4, JH7100_CLK_VIN_ROOT),
--	JH71X0__DIV(JH7100_CLK_ISP0_BUS, "isp0_bus", 8, JH7100_CLK_VIN_SRC),
--	JH71X0_GATE(JH7100_CLK_ISP0_AXI, "isp0_axi", 0, JH7100_CLK_ISP0_BUS),
--	JH71X0_GATE(JH7100_CLK_ISP0NOC_AXI, "isp0noc_axi", 0, JH7100_CLK_ISP0_BUS),
--	JH71X0_GATE(JH7100_CLK_ISPSLV_AXI, "ispslv_axi", 0, JH7100_CLK_ISP0_BUS),
--	JH71X0__DIV(JH7100_CLK_ISP1_BUS, "isp1_bus", 8, JH7100_CLK_VIN_SRC),
--	JH71X0_GATE(JH7100_CLK_ISP1_AXI, "isp1_axi", 0, JH7100_CLK_ISP1_BUS),
--	JH71X0_GATE(JH7100_CLK_ISP1NOC_AXI, "isp1noc_axi", 0, JH7100_CLK_ISP1_BUS),
--	JH71X0__DIV(JH7100_CLK_VIN_BUS, "vin_bus", 8, JH7100_CLK_VIN_SRC),
--	JH71X0_GATE(JH7100_CLK_VIN_AXI, "vin_axi", 0, JH7100_CLK_VIN_BUS),
--	JH71X0_GATE(JH7100_CLK_VINNOC_AXI, "vinnoc_axi", 0, JH7100_CLK_VIN_BUS),
--	JH71X0_GDIV(JH7100_CLK_VOUT_SRC, "vout_src", 0, 4, JH7100_CLK_VOUT_ROOT),
--	JH71X0__DIV(JH7100_CLK_DISPBUS_SRC, "dispbus_src", 4, JH7100_CLK_VOUTBUS_ROOT),
--	JH71X0__DIV(JH7100_CLK_DISP_BUS, "disp_bus", 4, JH7100_CLK_DISPBUS_SRC),
--	JH71X0_GATE(JH7100_CLK_DISP_AXI, "disp_axi", 0, JH7100_CLK_DISP_BUS),
--	JH71X0_GATE(JH7100_CLK_DISPNOC_AXI, "dispnoc_axi", 0, JH7100_CLK_DISP_BUS),
--	JH71X0_GATE(JH7100_CLK_SDIO0_AHB, "sdio0_ahb", 0, JH7100_CLK_AHB_BUS),
--	JH71X0_GDIV(JH7100_CLK_SDIO0_CCLKINT, "sdio0_cclkint", 0, 24, JH7100_CLK_PERH0_SRC),
--	JH71X0__INV(JH7100_CLK_SDIO0_CCLKINT_INV, "sdio0_cclkint_inv", JH7100_CLK_SDIO0_CCLKINT),
--	JH71X0_GATE(JH7100_CLK_SDIO1_AHB, "sdio1_ahb", 0, JH7100_CLK_AHB_BUS),
--	JH71X0_GDIV(JH7100_CLK_SDIO1_CCLKINT, "sdio1_cclkint", 0, 24, JH7100_CLK_PERH1_SRC),
--	JH71X0__INV(JH7100_CLK_SDIO1_CCLKINT_INV, "sdio1_cclkint_inv", JH7100_CLK_SDIO1_CCLKINT),
--	JH71X0_GATE(JH7100_CLK_GMAC_AHB, "gmac_ahb", 0, JH7100_CLK_AHB_BUS),
--	JH71X0__DIV(JH7100_CLK_GMAC_ROOT_DIV, "gmac_root_div", 8, JH7100_CLK_GMACUSB_ROOT),
--	JH71X0_GDIV(JH7100_CLK_GMAC_PTP_REF, "gmac_ptp_refclk", 0, 31, JH7100_CLK_GMAC_ROOT_DIV),
--	JH71X0_GDIV(JH7100_CLK_GMAC_GTX, "gmac_gtxclk", 0, 255, JH7100_CLK_GMAC_ROOT_DIV),
--	JH71X0_GDIV(JH7100_CLK_GMAC_RMII_TX, "gmac_rmii_txclk", 0, 8, JH7100_CLK_GMAC_RMII_REF),
--	JH71X0_GDIV(JH7100_CLK_GMAC_RMII_RX, "gmac_rmii_rxclk", 0, 8, JH7100_CLK_GMAC_RMII_REF),
--	JH71X0__MUX(JH7100_CLK_GMAC_TX, "gmac_tx", CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT, 3,
--		    JH7100_CLK_GMAC_GTX,
--		    JH7100_CLK_GMAC_TX_INV,
--		    JH7100_CLK_GMAC_RMII_TX),
--	JH71X0__INV(JH7100_CLK_GMAC_TX_INV, "gmac_tx_inv", JH7100_CLK_GMAC_TX),
--	JH71X0__MUX(JH7100_CLK_GMAC_RX_PRE, "gmac_rx_pre", 0, 2,
--		    JH7100_CLK_GMAC_GR_MII_RX,
--		    JH7100_CLK_GMAC_RMII_RX),
--	JH71X0__INV(JH7100_CLK_GMAC_RX_INV, "gmac_rx_inv", JH7100_CLK_GMAC_RX_PRE),
--	JH71X0_GATE(JH7100_CLK_GMAC_RMII, "gmac_rmii", 0, JH7100_CLK_GMAC_RMII_REF),
--	JH71X0_GDIV(JH7100_CLK_GMAC_TOPHYREF, "gmac_tophyref", 0, 127, JH7100_CLK_GMAC_ROOT_DIV),
--	JH71X0_GATE(JH7100_CLK_SPI2AHB_AHB, "spi2ahb_ahb", 0, JH7100_CLK_AHB_BUS),
--	JH71X0_GDIV(JH7100_CLK_SPI2AHB_CORE, "spi2ahb_core", 0, 31, JH7100_CLK_PERH0_SRC),
--	JH71X0_GATE(JH7100_CLK_EZMASTER_AHB, "ezmaster_ahb", 0, JH7100_CLK_AHB_BUS),
--	JH71X0_GATE(JH7100_CLK_E24_AHB, "e24_ahb", 0, JH7100_CLK_AHB_BUS),
--	JH71X0_GATE(JH7100_CLK_E24RTC_TOGGLE, "e24rtc_toggle", 0, JH7100_CLK_OSC_SYS),
--	JH71X0_GATE(JH7100_CLK_QSPI_AHB, "qspi_ahb", 0, JH7100_CLK_AHB_BUS),
--	JH71X0_GATE(JH7100_CLK_QSPI_APB, "qspi_apb", 0, JH7100_CLK_APB1_BUS),
--	JH71X0_GDIV(JH7100_CLK_QSPI_REF, "qspi_refclk", 0, 31, JH7100_CLK_PERH0_SRC),
--	JH71X0_GATE(JH7100_CLK_SEC_AHB, "sec_ahb", 0, JH7100_CLK_AHB_BUS),
--	JH71X0_GATE(JH7100_CLK_AES, "aes_clk", 0, JH7100_CLK_SEC_AHB),
--	JH71X0_GATE(JH7100_CLK_SHA, "sha_clk", 0, JH7100_CLK_SEC_AHB),
--	JH71X0_GATE(JH7100_CLK_PKA, "pka_clk", 0, JH7100_CLK_SEC_AHB),
--	JH71X0_GATE(JH7100_CLK_TRNG_APB, "trng_apb", 0, JH7100_CLK_APB1_BUS),
--	JH71X0_GATE(JH7100_CLK_OTP_APB, "otp_apb", 0, JH7100_CLK_APB1_BUS),
--	JH71X0_GATE(JH7100_CLK_UART0_APB, "uart0_apb", 0, JH7100_CLK_APB1_BUS),
--	JH71X0_GDIV(JH7100_CLK_UART0_CORE, "uart0_core", 0, 63, JH7100_CLK_PERH1_SRC),
--	JH71X0_GATE(JH7100_CLK_UART1_APB, "uart1_apb", 0, JH7100_CLK_APB1_BUS),
--	JH71X0_GDIV(JH7100_CLK_UART1_CORE, "uart1_core", 0, 63, JH7100_CLK_PERH1_SRC),
--	JH71X0_GATE(JH7100_CLK_SPI0_APB, "spi0_apb", 0, JH7100_CLK_APB1_BUS),
--	JH71X0_GDIV(JH7100_CLK_SPI0_CORE, "spi0_core", 0, 63, JH7100_CLK_PERH1_SRC),
--	JH71X0_GATE(JH7100_CLK_SPI1_APB, "spi1_apb", 0, JH7100_CLK_APB1_BUS),
--	JH71X0_GDIV(JH7100_CLK_SPI1_CORE, "spi1_core", 0, 63, JH7100_CLK_PERH1_SRC),
--	JH71X0_GATE(JH7100_CLK_I2C0_APB, "i2c0_apb", 0, JH7100_CLK_APB1_BUS),
--	JH71X0_GDIV(JH7100_CLK_I2C0_CORE, "i2c0_core", 0, 63, JH7100_CLK_PERH1_SRC),
--	JH71X0_GATE(JH7100_CLK_I2C1_APB, "i2c1_apb", 0, JH7100_CLK_APB1_BUS),
--	JH71X0_GDIV(JH7100_CLK_I2C1_CORE, "i2c1_core", 0, 63, JH7100_CLK_PERH1_SRC),
--	JH71X0_GATE(JH7100_CLK_GPIO_APB, "gpio_apb", 0, JH7100_CLK_APB1_BUS),
--	JH71X0_GATE(JH7100_CLK_UART2_APB, "uart2_apb", 0, JH7100_CLK_APB2_BUS),
--	JH71X0_GDIV(JH7100_CLK_UART2_CORE, "uart2_core", 0, 63, JH7100_CLK_PERH0_SRC),
--	JH71X0_GATE(JH7100_CLK_UART3_APB, "uart3_apb", 0, JH7100_CLK_APB2_BUS),
--	JH71X0_GDIV(JH7100_CLK_UART3_CORE, "uart3_core", 0, 63, JH7100_CLK_PERH0_SRC),
--	JH71X0_GATE(JH7100_CLK_SPI2_APB, "spi2_apb", 0, JH7100_CLK_APB2_BUS),
--	JH71X0_GDIV(JH7100_CLK_SPI2_CORE, "spi2_core", 0, 63, JH7100_CLK_PERH0_SRC),
--	JH71X0_GATE(JH7100_CLK_SPI3_APB, "spi3_apb", 0, JH7100_CLK_APB2_BUS),
--	JH71X0_GDIV(JH7100_CLK_SPI3_CORE, "spi3_core", 0, 63, JH7100_CLK_PERH0_SRC),
--	JH71X0_GATE(JH7100_CLK_I2C2_APB, "i2c2_apb", 0, JH7100_CLK_APB2_BUS),
--	JH71X0_GDIV(JH7100_CLK_I2C2_CORE, "i2c2_core", 0, 63, JH7100_CLK_PERH0_SRC),
--	JH71X0_GATE(JH7100_CLK_I2C3_APB, "i2c3_apb", 0, JH7100_CLK_APB2_BUS),
--	JH71X0_GDIV(JH7100_CLK_I2C3_CORE, "i2c3_core", 0, 63, JH7100_CLK_PERH0_SRC),
--	JH71X0_GATE(JH7100_CLK_WDTIMER_APB, "wdtimer_apb", 0, JH7100_CLK_APB2_BUS),
--	JH71X0_GDIV(JH7100_CLK_WDT_CORE, "wdt_coreclk", 0, 63, JH7100_CLK_PERH0_SRC),
--	JH71X0_GDIV(JH7100_CLK_TIMER0_CORE, "timer0_coreclk", 0, 63, JH7100_CLK_PERH0_SRC),
--	JH71X0_GDIV(JH7100_CLK_TIMER1_CORE, "timer1_coreclk", 0, 63, JH7100_CLK_PERH0_SRC),
--	JH71X0_GDIV(JH7100_CLK_TIMER2_CORE, "timer2_coreclk", 0, 63, JH7100_CLK_PERH0_SRC),
--	JH71X0_GDIV(JH7100_CLK_TIMER3_CORE, "timer3_coreclk", 0, 63, JH7100_CLK_PERH0_SRC),
--	JH71X0_GDIV(JH7100_CLK_TIMER4_CORE, "timer4_coreclk", 0, 63, JH7100_CLK_PERH0_SRC),
--	JH71X0_GDIV(JH7100_CLK_TIMER5_CORE, "timer5_coreclk", 0, 63, JH7100_CLK_PERH0_SRC),
--	JH71X0_GDIV(JH7100_CLK_TIMER6_CORE, "timer6_coreclk", 0, 63, JH7100_CLK_PERH0_SRC),
--	JH71X0_GATE(JH7100_CLK_VP6INTC_APB, "vp6intc_apb", 0, JH7100_CLK_APB2_BUS),
--	JH71X0_GATE(JH7100_CLK_PWM_APB, "pwm_apb", 0, JH7100_CLK_APB2_BUS),
--	JH71X0_GATE(JH7100_CLK_MSI_APB, "msi_apb", 0, JH7100_CLK_APB2_BUS),
--	JH71X0_GATE(JH7100_CLK_TEMP_APB, "temp_apb", 0, JH7100_CLK_APB2_BUS),
--	JH71X0_GDIV(JH7100_CLK_TEMP_SENSE, "temp_sense", 0, 31, JH7100_CLK_OSC_SYS),
--	JH71X0_GATE(JH7100_CLK_SYSERR_APB, "syserr_apb", 0, JH7100_CLK_APB2_BUS),
-+static const struct starfive_clk_data jh7100_clk_data[] __initconst = {
-+	STARFIVE__MUX(JH7100_CLK_CPUNDBUS_ROOT, "cpundbus_root", 0, 4,
-+		      JH7100_CLK_OSC_SYS,
-+		      JH7100_CLK_PLL0_OUT,
-+		      JH7100_CLK_PLL1_OUT,
-+		      JH7100_CLK_PLL2_OUT),
-+	STARFIVE__MUX(JH7100_CLK_DLA_ROOT, "dla_root", 0, 3,
-+		      JH7100_CLK_OSC_SYS,
-+		      JH7100_CLK_PLL1_OUT,
-+		      JH7100_CLK_PLL2_OUT),
-+	STARFIVE__MUX(JH7100_CLK_DSP_ROOT, "dsp_root", 0, 4,
-+		      JH7100_CLK_OSC_SYS,
-+		      JH7100_CLK_PLL0_OUT,
-+		      JH7100_CLK_PLL1_OUT,
-+		      JH7100_CLK_PLL2_OUT),
-+	STARFIVE__MUX(JH7100_CLK_GMACUSB_ROOT, "gmacusb_root", 0, 3,
-+		      JH7100_CLK_OSC_SYS,
-+		      JH7100_CLK_PLL0_OUT,
-+		      JH7100_CLK_PLL2_OUT),
-+	STARFIVE__MUX(JH7100_CLK_PERH0_ROOT, "perh0_root", 0, 2,
-+		      JH7100_CLK_OSC_SYS,
-+		      JH7100_CLK_PLL0_OUT),
-+	STARFIVE__MUX(JH7100_CLK_PERH1_ROOT, "perh1_root", 0, 2,
-+		      JH7100_CLK_OSC_SYS,
-+		      JH7100_CLK_PLL2_OUT),
-+	STARFIVE__MUX(JH7100_CLK_VIN_ROOT, "vin_root", 0, 3,
-+		      JH7100_CLK_OSC_SYS,
-+		      JH7100_CLK_PLL1_OUT,
-+		      JH7100_CLK_PLL2_OUT),
-+	STARFIVE__MUX(JH7100_CLK_VOUT_ROOT, "vout_root", 0, 3,
-+		      JH7100_CLK_OSC_AUD,
-+		      JH7100_CLK_PLL0_OUT,
-+		      JH7100_CLK_PLL2_OUT),
-+	STARFIVE_GDIV(JH7100_CLK_AUDIO_ROOT, "audio_root", 0, 8, JH7100_CLK_PLL0_OUT),
-+	STARFIVE__MUX(JH7100_CLK_CDECHIFI4_ROOT, "cdechifi4_root", 0, 3,
-+		      JH7100_CLK_OSC_SYS,
-+		      JH7100_CLK_PLL1_OUT,
-+		      JH7100_CLK_PLL2_OUT),
-+	STARFIVE__MUX(JH7100_CLK_CDEC_ROOT, "cdec_root", 0, 3,
-+		      JH7100_CLK_OSC_SYS,
-+		      JH7100_CLK_PLL0_OUT,
-+		      JH7100_CLK_PLL1_OUT),
-+	STARFIVE__MUX(JH7100_CLK_VOUTBUS_ROOT, "voutbus_root", 0, 3,
-+		      JH7100_CLK_OSC_AUD,
-+		      JH7100_CLK_PLL0_OUT,
-+		      JH7100_CLK_PLL2_OUT),
-+	STARFIVE__DIV(JH7100_CLK_CPUNBUS_ROOT_DIV, "cpunbus_root_div", 2, JH7100_CLK_CPUNDBUS_ROOT),
-+	STARFIVE__DIV(JH7100_CLK_DSP_ROOT_DIV, "dsp_root_div", 4, JH7100_CLK_DSP_ROOT),
-+	STARFIVE__DIV(JH7100_CLK_PERH0_SRC, "perh0_src", 4, JH7100_CLK_PERH0_ROOT),
-+	STARFIVE__DIV(JH7100_CLK_PERH1_SRC, "perh1_src", 4, JH7100_CLK_PERH1_ROOT),
-+	STARFIVE_GDIV(JH7100_CLK_PLL0_TESTOUT, "pll0_testout", 0, 31, JH7100_CLK_PERH0_SRC),
-+	STARFIVE_GDIV(JH7100_CLK_PLL1_TESTOUT, "pll1_testout", 0, 31, JH7100_CLK_DLA_ROOT),
-+	STARFIVE_GDIV(JH7100_CLK_PLL2_TESTOUT, "pll2_testout", 0, 31, JH7100_CLK_PERH1_SRC),
-+	STARFIVE__MUX(JH7100_CLK_PLL2_REF, "pll2_refclk", 0, 2,
-+		      JH7100_CLK_OSC_SYS,
-+		      JH7100_CLK_OSC_AUD),
-+	STARFIVE__DIV(JH7100_CLK_CPU_CORE, "cpu_core", 8, JH7100_CLK_CPUNBUS_ROOT_DIV),
-+	STARFIVE__DIV(JH7100_CLK_CPU_AXI, "cpu_axi", 8, JH7100_CLK_CPU_CORE),
-+	STARFIVE__DIV(JH7100_CLK_AHB_BUS, "ahb_bus", 8, JH7100_CLK_CPUNBUS_ROOT_DIV),
-+	STARFIVE__DIV(JH7100_CLK_APB1_BUS, "apb1_bus", 8, JH7100_CLK_AHB_BUS),
-+	STARFIVE__DIV(JH7100_CLK_APB2_BUS, "apb2_bus", 8, JH7100_CLK_AHB_BUS),
-+	STARFIVE_GATE(JH7100_CLK_DOM3AHB_BUS, "dom3ahb_bus", CLK_IS_CRITICAL, JH7100_CLK_AHB_BUS),
-+	STARFIVE_GATE(JH7100_CLK_DOM7AHB_BUS, "dom7ahb_bus", CLK_IS_CRITICAL, JH7100_CLK_AHB_BUS),
-+	STARFIVE_GATE(JH7100_CLK_U74_CORE0, "u74_core0", CLK_IS_CRITICAL, JH7100_CLK_CPU_CORE),
-+	STARFIVE_GDIV(JH7100_CLK_U74_CORE1, "u74_core1", CLK_IS_CRITICAL, 8, JH7100_CLK_CPU_CORE),
-+	STARFIVE_GATE(JH7100_CLK_U74_AXI, "u74_axi", CLK_IS_CRITICAL, JH7100_CLK_CPU_AXI),
-+	STARFIVE_GATE(JH7100_CLK_U74RTC_TOGGLE, "u74rtc_toggle", CLK_IS_CRITICAL,
-+		      JH7100_CLK_OSC_SYS),
-+	STARFIVE_GATE(JH7100_CLK_SGDMA2P_AXI, "sgdma2p_axi", 0, JH7100_CLK_CPU_AXI),
-+	STARFIVE_GATE(JH7100_CLK_DMA2PNOC_AXI, "dma2pnoc_axi", 0, JH7100_CLK_CPU_AXI),
-+	STARFIVE_GATE(JH7100_CLK_SGDMA2P_AHB, "sgdma2p_ahb", 0, JH7100_CLK_AHB_BUS),
-+	STARFIVE__DIV(JH7100_CLK_DLA_BUS, "dla_bus", 4, JH7100_CLK_DLA_ROOT),
-+	STARFIVE_GATE(JH7100_CLK_DLA_AXI, "dla_axi", 0, JH7100_CLK_DLA_BUS),
-+	STARFIVE_GATE(JH7100_CLK_DLANOC_AXI, "dlanoc_axi", 0, JH7100_CLK_DLA_BUS),
-+	STARFIVE_GATE(JH7100_CLK_DLA_APB, "dla_apb", 0, JH7100_CLK_APB1_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_VP6_CORE, "vp6_core", 0, 4, JH7100_CLK_DSP_ROOT_DIV),
-+	STARFIVE__DIV(JH7100_CLK_VP6BUS_SRC, "vp6bus_src", 4, JH7100_CLK_DSP_ROOT),
-+	STARFIVE_GDIV(JH7100_CLK_VP6_AXI, "vp6_axi", 0, 4, JH7100_CLK_VP6BUS_SRC),
-+	STARFIVE__DIV(JH7100_CLK_VCDECBUS_SRC, "vcdecbus_src", 4, JH7100_CLK_CDECHIFI4_ROOT),
-+	STARFIVE__DIV(JH7100_CLK_VDEC_BUS, "vdec_bus", 8, JH7100_CLK_VCDECBUS_SRC),
-+	STARFIVE_GATE(JH7100_CLK_VDEC_AXI, "vdec_axi", 0, JH7100_CLK_VDEC_BUS),
-+	STARFIVE_GATE(JH7100_CLK_VDECBRG_MAIN, "vdecbrg_mainclk", 0, JH7100_CLK_VDEC_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_VDEC_BCLK, "vdec_bclk", 0, 8, JH7100_CLK_VCDECBUS_SRC),
-+	STARFIVE_GDIV(JH7100_CLK_VDEC_CCLK, "vdec_cclk", 0, 8, JH7100_CLK_CDEC_ROOT),
-+	STARFIVE_GATE(JH7100_CLK_VDEC_APB, "vdec_apb", 0, JH7100_CLK_APB1_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_JPEG_AXI, "jpeg_axi", 0, 8, JH7100_CLK_CPUNBUS_ROOT_DIV),
-+	STARFIVE_GDIV(JH7100_CLK_JPEG_CCLK, "jpeg_cclk", 0, 8, JH7100_CLK_CPUNBUS_ROOT_DIV),
-+	STARFIVE_GATE(JH7100_CLK_JPEG_APB, "jpeg_apb", 0, JH7100_CLK_APB1_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_GC300_2X, "gc300_2x", 0, 8, JH7100_CLK_CDECHIFI4_ROOT),
-+	STARFIVE_GATE(JH7100_CLK_GC300_AHB, "gc300_ahb", 0, JH7100_CLK_AHB_BUS),
-+	STARFIVE__DIV(JH7100_CLK_JPCGC300_AXIBUS, "jpcgc300_axibus", 8, JH7100_CLK_VCDECBUS_SRC),
-+	STARFIVE_GATE(JH7100_CLK_GC300_AXI, "gc300_axi", 0, JH7100_CLK_JPCGC300_AXIBUS),
-+	STARFIVE_GATE(JH7100_CLK_JPCGC300_MAIN, "jpcgc300_mainclk", 0, JH7100_CLK_JPCGC300_AXIBUS),
-+	STARFIVE__DIV(JH7100_CLK_VENC_BUS, "venc_bus", 8, JH7100_CLK_VCDECBUS_SRC),
-+	STARFIVE_GATE(JH7100_CLK_VENC_AXI, "venc_axi", 0, JH7100_CLK_VENC_BUS),
-+	STARFIVE_GATE(JH7100_CLK_VENCBRG_MAIN, "vencbrg_mainclk", 0, JH7100_CLK_VENC_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_VENC_BCLK, "venc_bclk", 0, 8, JH7100_CLK_VCDECBUS_SRC),
-+	STARFIVE_GDIV(JH7100_CLK_VENC_CCLK, "venc_cclk", 0, 8, JH7100_CLK_CDEC_ROOT),
-+	STARFIVE_GATE(JH7100_CLK_VENC_APB, "venc_apb", 0, JH7100_CLK_APB1_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_DDRPLL_DIV2, "ddrpll_div2", CLK_IS_CRITICAL, 2,
-+		      JH7100_CLK_PLL1_OUT),
-+	STARFIVE_GDIV(JH7100_CLK_DDRPLL_DIV4, "ddrpll_div4", CLK_IS_CRITICAL, 2,
-+		      JH7100_CLK_DDRPLL_DIV2),
-+	STARFIVE_GDIV(JH7100_CLK_DDRPLL_DIV8, "ddrpll_div8", CLK_IS_CRITICAL, 2,
-+		      JH7100_CLK_DDRPLL_DIV4),
-+	STARFIVE_GDIV(JH7100_CLK_DDROSC_DIV2, "ddrosc_div2", CLK_IS_CRITICAL, 2,
-+		      JH7100_CLK_OSC_SYS),
-+	STARFIVE_GMUX(JH7100_CLK_DDRC0, "ddrc0", CLK_IS_CRITICAL, 4,
-+		      JH7100_CLK_DDROSC_DIV2,
-+		      JH7100_CLK_DDRPLL_DIV2,
-+		      JH7100_CLK_DDRPLL_DIV4,
-+		      JH7100_CLK_DDRPLL_DIV8),
-+	STARFIVE_GMUX(JH7100_CLK_DDRC1, "ddrc1", CLK_IS_CRITICAL, 4,
-+		      JH7100_CLK_DDROSC_DIV2,
-+		      JH7100_CLK_DDRPLL_DIV2,
-+		      JH7100_CLK_DDRPLL_DIV4,
-+		      JH7100_CLK_DDRPLL_DIV8),
-+	STARFIVE_GATE(JH7100_CLK_DDRPHY_APB, "ddrphy_apb", 0, JH7100_CLK_APB1_BUS),
-+	STARFIVE__DIV(JH7100_CLK_NOC_ROB, "noc_rob", 8, JH7100_CLK_CPUNBUS_ROOT_DIV),
-+	STARFIVE__DIV(JH7100_CLK_NOC_COG, "noc_cog", 8, JH7100_CLK_DLA_ROOT),
-+	STARFIVE_GATE(JH7100_CLK_NNE_AHB, "nne_ahb", 0, JH7100_CLK_AHB_BUS),
-+	STARFIVE__DIV(JH7100_CLK_NNEBUS_SRC1, "nnebus_src1", 4, JH7100_CLK_DSP_ROOT),
-+	STARFIVE__MUX(JH7100_CLK_NNE_BUS, "nne_bus", 0, 2,
-+		      JH7100_CLK_CPU_AXI,
-+		      JH7100_CLK_NNEBUS_SRC1),
-+	STARFIVE_GATE(JH7100_CLK_NNE_AXI, "nne_axi", 0, JH7100_CLK_NNE_BUS),
-+	STARFIVE_GATE(JH7100_CLK_NNENOC_AXI, "nnenoc_axi", 0, JH7100_CLK_NNE_BUS),
-+	STARFIVE_GATE(JH7100_CLK_DLASLV_AXI, "dlaslv_axi", 0, JH7100_CLK_NNE_BUS),
-+	STARFIVE_GATE(JH7100_CLK_DSPX2C_AXI, "dspx2c_axi", CLK_IS_CRITICAL, JH7100_CLK_NNE_BUS),
-+	STARFIVE__DIV(JH7100_CLK_HIFI4_SRC, "hifi4_src", 4, JH7100_CLK_CDECHIFI4_ROOT),
-+	STARFIVE__DIV(JH7100_CLK_HIFI4_COREFREE, "hifi4_corefree", 8, JH7100_CLK_HIFI4_SRC),
-+	STARFIVE_GATE(JH7100_CLK_HIFI4_CORE, "hifi4_core", 0, JH7100_CLK_HIFI4_COREFREE),
-+	STARFIVE__DIV(JH7100_CLK_HIFI4_BUS, "hifi4_bus", 8, JH7100_CLK_HIFI4_COREFREE),
-+	STARFIVE_GATE(JH7100_CLK_HIFI4_AXI, "hifi4_axi", 0, JH7100_CLK_HIFI4_BUS),
-+	STARFIVE_GATE(JH7100_CLK_HIFI4NOC_AXI, "hifi4noc_axi", 0, JH7100_CLK_HIFI4_BUS),
-+	STARFIVE__DIV(JH7100_CLK_SGDMA1P_BUS, "sgdma1p_bus", 8, JH7100_CLK_CPUNBUS_ROOT_DIV),
-+	STARFIVE_GATE(JH7100_CLK_SGDMA1P_AXI, "sgdma1p_axi", 0, JH7100_CLK_SGDMA1P_BUS),
-+	STARFIVE_GATE(JH7100_CLK_DMA1P_AXI, "dma1p_axi", 0, JH7100_CLK_SGDMA1P_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_X2C_AXI, "x2c_axi", CLK_IS_CRITICAL, 8,
-+		      JH7100_CLK_CPUNBUS_ROOT_DIV),
-+	STARFIVE__DIV(JH7100_CLK_USB_BUS, "usb_bus", 8, JH7100_CLK_CPUNBUS_ROOT_DIV),
-+	STARFIVE_GATE(JH7100_CLK_USB_AXI, "usb_axi", 0, JH7100_CLK_USB_BUS),
-+	STARFIVE_GATE(JH7100_CLK_USBNOC_AXI, "usbnoc_axi", 0, JH7100_CLK_USB_BUS),
-+	STARFIVE__DIV(JH7100_CLK_USBPHY_ROOTDIV, "usbphy_rootdiv", 4, JH7100_CLK_GMACUSB_ROOT),
-+	STARFIVE_GDIV(JH7100_CLK_USBPHY_125M, "usbphy_125m", 0, 8, JH7100_CLK_USBPHY_ROOTDIV),
-+	STARFIVE_GDIV(JH7100_CLK_USBPHY_PLLDIV25M, "usbphy_plldiv25m", 0, 32,
-+		      JH7100_CLK_USBPHY_ROOTDIV),
-+	STARFIVE__MUX(JH7100_CLK_USBPHY_25M, "usbphy_25m", 0, 2,
-+		      JH7100_CLK_OSC_SYS,
-+		      JH7100_CLK_USBPHY_PLLDIV25M),
-+	STARFIVE_FDIV(JH7100_CLK_AUDIO_DIV, "audio_div", JH7100_CLK_AUDIO_ROOT),
-+	STARFIVE_GATE(JH7100_CLK_AUDIO_SRC, "audio_src", 0, JH7100_CLK_AUDIO_DIV),
-+	STARFIVE_GATE(JH7100_CLK_AUDIO_12288, "audio_12288", 0, JH7100_CLK_OSC_AUD),
-+	STARFIVE_GDIV(JH7100_CLK_VIN_SRC, "vin_src", 0, 4, JH7100_CLK_VIN_ROOT),
-+	STARFIVE__DIV(JH7100_CLK_ISP0_BUS, "isp0_bus", 8, JH7100_CLK_VIN_SRC),
-+	STARFIVE_GATE(JH7100_CLK_ISP0_AXI, "isp0_axi", 0, JH7100_CLK_ISP0_BUS),
-+	STARFIVE_GATE(JH7100_CLK_ISP0NOC_AXI, "isp0noc_axi", 0, JH7100_CLK_ISP0_BUS),
-+	STARFIVE_GATE(JH7100_CLK_ISPSLV_AXI, "ispslv_axi", 0, JH7100_CLK_ISP0_BUS),
-+	STARFIVE__DIV(JH7100_CLK_ISP1_BUS, "isp1_bus", 8, JH7100_CLK_VIN_SRC),
-+	STARFIVE_GATE(JH7100_CLK_ISP1_AXI, "isp1_axi", 0, JH7100_CLK_ISP1_BUS),
-+	STARFIVE_GATE(JH7100_CLK_ISP1NOC_AXI, "isp1noc_axi", 0, JH7100_CLK_ISP1_BUS),
-+	STARFIVE__DIV(JH7100_CLK_VIN_BUS, "vin_bus", 8, JH7100_CLK_VIN_SRC),
-+	STARFIVE_GATE(JH7100_CLK_VIN_AXI, "vin_axi", 0, JH7100_CLK_VIN_BUS),
-+	STARFIVE_GATE(JH7100_CLK_VINNOC_AXI, "vinnoc_axi", 0, JH7100_CLK_VIN_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_VOUT_SRC, "vout_src", 0, 4, JH7100_CLK_VOUT_ROOT),
-+	STARFIVE__DIV(JH7100_CLK_DISPBUS_SRC, "dispbus_src", 4, JH7100_CLK_VOUTBUS_ROOT),
-+	STARFIVE__DIV(JH7100_CLK_DISP_BUS, "disp_bus", 4, JH7100_CLK_DISPBUS_SRC),
-+	STARFIVE_GATE(JH7100_CLK_DISP_AXI, "disp_axi", 0, JH7100_CLK_DISP_BUS),
-+	STARFIVE_GATE(JH7100_CLK_DISPNOC_AXI, "dispnoc_axi", 0, JH7100_CLK_DISP_BUS),
-+	STARFIVE_GATE(JH7100_CLK_SDIO0_AHB, "sdio0_ahb", 0, JH7100_CLK_AHB_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_SDIO0_CCLKINT, "sdio0_cclkint", 0, 24, JH7100_CLK_PERH0_SRC),
-+	STARFIVE__INV(JH7100_CLK_SDIO0_CCLKINT_INV, "sdio0_cclkint_inv", JH7100_CLK_SDIO0_CCLKINT),
-+	STARFIVE_GATE(JH7100_CLK_SDIO1_AHB, "sdio1_ahb", 0, JH7100_CLK_AHB_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_SDIO1_CCLKINT, "sdio1_cclkint", 0, 24, JH7100_CLK_PERH1_SRC),
-+	STARFIVE__INV(JH7100_CLK_SDIO1_CCLKINT_INV, "sdio1_cclkint_inv", JH7100_CLK_SDIO1_CCLKINT),
-+	STARFIVE_GATE(JH7100_CLK_GMAC_AHB, "gmac_ahb", 0, JH7100_CLK_AHB_BUS),
-+	STARFIVE__DIV(JH7100_CLK_GMAC_ROOT_DIV, "gmac_root_div", 8, JH7100_CLK_GMACUSB_ROOT),
-+	STARFIVE_GDIV(JH7100_CLK_GMAC_PTP_REF, "gmac_ptp_refclk", 0, 31, JH7100_CLK_GMAC_ROOT_DIV),
-+	STARFIVE_GDIV(JH7100_CLK_GMAC_GTX, "gmac_gtxclk", 0, 255, JH7100_CLK_GMAC_ROOT_DIV),
-+	STARFIVE_GDIV(JH7100_CLK_GMAC_RMII_TX, "gmac_rmii_txclk", 0, 8, JH7100_CLK_GMAC_RMII_REF),
-+	STARFIVE_GDIV(JH7100_CLK_GMAC_RMII_RX, "gmac_rmii_rxclk", 0, 8, JH7100_CLK_GMAC_RMII_REF),
-+	STARFIVE__MUX(JH7100_CLK_GMAC_TX, "gmac_tx", CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT, 3,
-+		      JH7100_CLK_GMAC_GTX,
-+		      JH7100_CLK_GMAC_TX_INV,
-+		      JH7100_CLK_GMAC_RMII_TX),
-+	STARFIVE__INV(JH7100_CLK_GMAC_TX_INV, "gmac_tx_inv", JH7100_CLK_GMAC_TX),
-+	STARFIVE__MUX(JH7100_CLK_GMAC_RX_PRE, "gmac_rx_pre", 0, 2,
-+		      JH7100_CLK_GMAC_GR_MII_RX,
-+		      JH7100_CLK_GMAC_RMII_RX),
-+	STARFIVE__INV(JH7100_CLK_GMAC_RX_INV, "gmac_rx_inv", JH7100_CLK_GMAC_RX_PRE),
-+	STARFIVE_GATE(JH7100_CLK_GMAC_RMII, "gmac_rmii", 0, JH7100_CLK_GMAC_RMII_REF),
-+	STARFIVE_GDIV(JH7100_CLK_GMAC_TOPHYREF, "gmac_tophyref", 0, 127, JH7100_CLK_GMAC_ROOT_DIV),
-+	STARFIVE_GATE(JH7100_CLK_SPI2AHB_AHB, "spi2ahb_ahb", 0, JH7100_CLK_AHB_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_SPI2AHB_CORE, "spi2ahb_core", 0, 31, JH7100_CLK_PERH0_SRC),
-+	STARFIVE_GATE(JH7100_CLK_EZMASTER_AHB, "ezmaster_ahb", 0, JH7100_CLK_AHB_BUS),
-+	STARFIVE_GATE(JH7100_CLK_E24_AHB, "e24_ahb", 0, JH7100_CLK_AHB_BUS),
-+	STARFIVE_GATE(JH7100_CLK_E24RTC_TOGGLE, "e24rtc_toggle", 0, JH7100_CLK_OSC_SYS),
-+	STARFIVE_GATE(JH7100_CLK_QSPI_AHB, "qspi_ahb", 0, JH7100_CLK_AHB_BUS),
-+	STARFIVE_GATE(JH7100_CLK_QSPI_APB, "qspi_apb", 0, JH7100_CLK_APB1_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_QSPI_REF, "qspi_refclk", 0, 31, JH7100_CLK_PERH0_SRC),
-+	STARFIVE_GATE(JH7100_CLK_SEC_AHB, "sec_ahb", 0, JH7100_CLK_AHB_BUS),
-+	STARFIVE_GATE(JH7100_CLK_AES, "aes_clk", 0, JH7100_CLK_SEC_AHB),
-+	STARFIVE_GATE(JH7100_CLK_SHA, "sha_clk", 0, JH7100_CLK_SEC_AHB),
-+	STARFIVE_GATE(JH7100_CLK_PKA, "pka_clk", 0, JH7100_CLK_SEC_AHB),
-+	STARFIVE_GATE(JH7100_CLK_TRNG_APB, "trng_apb", 0, JH7100_CLK_APB1_BUS),
-+	STARFIVE_GATE(JH7100_CLK_OTP_APB, "otp_apb", 0, JH7100_CLK_APB1_BUS),
-+	STARFIVE_GATE(JH7100_CLK_UART0_APB, "uart0_apb", 0, JH7100_CLK_APB1_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_UART0_CORE, "uart0_core", 0, 63, JH7100_CLK_PERH1_SRC),
-+	STARFIVE_GATE(JH7100_CLK_UART1_APB, "uart1_apb", 0, JH7100_CLK_APB1_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_UART1_CORE, "uart1_core", 0, 63, JH7100_CLK_PERH1_SRC),
-+	STARFIVE_GATE(JH7100_CLK_SPI0_APB, "spi0_apb", 0, JH7100_CLK_APB1_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_SPI0_CORE, "spi0_core", 0, 63, JH7100_CLK_PERH1_SRC),
-+	STARFIVE_GATE(JH7100_CLK_SPI1_APB, "spi1_apb", 0, JH7100_CLK_APB1_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_SPI1_CORE, "spi1_core", 0, 63, JH7100_CLK_PERH1_SRC),
-+	STARFIVE_GATE(JH7100_CLK_I2C0_APB, "i2c0_apb", 0, JH7100_CLK_APB1_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_I2C0_CORE, "i2c0_core", 0, 63, JH7100_CLK_PERH1_SRC),
-+	STARFIVE_GATE(JH7100_CLK_I2C1_APB, "i2c1_apb", 0, JH7100_CLK_APB1_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_I2C1_CORE, "i2c1_core", 0, 63, JH7100_CLK_PERH1_SRC),
-+	STARFIVE_GATE(JH7100_CLK_GPIO_APB, "gpio_apb", 0, JH7100_CLK_APB1_BUS),
-+	STARFIVE_GATE(JH7100_CLK_UART2_APB, "uart2_apb", 0, JH7100_CLK_APB2_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_UART2_CORE, "uart2_core", 0, 63, JH7100_CLK_PERH0_SRC),
-+	STARFIVE_GATE(JH7100_CLK_UART3_APB, "uart3_apb", 0, JH7100_CLK_APB2_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_UART3_CORE, "uart3_core", 0, 63, JH7100_CLK_PERH0_SRC),
-+	STARFIVE_GATE(JH7100_CLK_SPI2_APB, "spi2_apb", 0, JH7100_CLK_APB2_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_SPI2_CORE, "spi2_core", 0, 63, JH7100_CLK_PERH0_SRC),
-+	STARFIVE_GATE(JH7100_CLK_SPI3_APB, "spi3_apb", 0, JH7100_CLK_APB2_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_SPI3_CORE, "spi3_core", 0, 63, JH7100_CLK_PERH0_SRC),
-+	STARFIVE_GATE(JH7100_CLK_I2C2_APB, "i2c2_apb", 0, JH7100_CLK_APB2_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_I2C2_CORE, "i2c2_core", 0, 63, JH7100_CLK_PERH0_SRC),
-+	STARFIVE_GATE(JH7100_CLK_I2C3_APB, "i2c3_apb", 0, JH7100_CLK_APB2_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_I2C3_CORE, "i2c3_core", 0, 63, JH7100_CLK_PERH0_SRC),
-+	STARFIVE_GATE(JH7100_CLK_WDTIMER_APB, "wdtimer_apb", 0, JH7100_CLK_APB2_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_WDT_CORE, "wdt_coreclk", 0, 63, JH7100_CLK_PERH0_SRC),
-+	STARFIVE_GDIV(JH7100_CLK_TIMER0_CORE, "timer0_coreclk", 0, 63, JH7100_CLK_PERH0_SRC),
-+	STARFIVE_GDIV(JH7100_CLK_TIMER1_CORE, "timer1_coreclk", 0, 63, JH7100_CLK_PERH0_SRC),
-+	STARFIVE_GDIV(JH7100_CLK_TIMER2_CORE, "timer2_coreclk", 0, 63, JH7100_CLK_PERH0_SRC),
-+	STARFIVE_GDIV(JH7100_CLK_TIMER3_CORE, "timer3_coreclk", 0, 63, JH7100_CLK_PERH0_SRC),
-+	STARFIVE_GDIV(JH7100_CLK_TIMER4_CORE, "timer4_coreclk", 0, 63, JH7100_CLK_PERH0_SRC),
-+	STARFIVE_GDIV(JH7100_CLK_TIMER5_CORE, "timer5_coreclk", 0, 63, JH7100_CLK_PERH0_SRC),
-+	STARFIVE_GDIV(JH7100_CLK_TIMER6_CORE, "timer6_coreclk", 0, 63, JH7100_CLK_PERH0_SRC),
-+	STARFIVE_GATE(JH7100_CLK_VP6INTC_APB, "vp6intc_apb", 0, JH7100_CLK_APB2_BUS),
-+	STARFIVE_GATE(JH7100_CLK_PWM_APB, "pwm_apb", 0, JH7100_CLK_APB2_BUS),
-+	STARFIVE_GATE(JH7100_CLK_MSI_APB, "msi_apb", 0, JH7100_CLK_APB2_BUS),
-+	STARFIVE_GATE(JH7100_CLK_TEMP_APB, "temp_apb", 0, JH7100_CLK_APB2_BUS),
-+	STARFIVE_GDIV(JH7100_CLK_TEMP_SENSE, "temp_sense", 0, 31, JH7100_CLK_OSC_SYS),
-+	STARFIVE_GATE(JH7100_CLK_SYSERR_APB, "syserr_apb", 0, JH7100_CLK_APB2_BUS),
- };
- 
- static struct clk_hw *jh7100_clk_get(struct of_phandle_args *clkspec, void *data)
- {
--	struct jh71x0_clk_priv *priv = data;
-+	struct starfive_clk_priv *priv = data;
- 	unsigned int idx = clkspec->args[0];
- 
- 	if (idx < JH7100_CLK_PLL0_OUT)
-@@ -283,7 +287,7 @@ static struct clk_hw *jh7100_clk_get(struct of_phandle_args *clkspec, void *data
- 
- static int __init clk_starfive_jh7100_probe(struct platform_device *pdev)
- {
--	struct jh71x0_clk_priv *priv;
-+	struct starfive_clk_priv *priv;
- 	unsigned int idx;
- 	int ret;
- 
-@@ -317,12 +321,13 @@ static int __init clk_starfive_jh7100_probe(struct platform_device *pdev)
- 		struct clk_parent_data parents[4] = {};
- 		struct clk_init_data init = {
- 			.name = jh7100_clk_data[idx].name,
--			.ops = starfive_jh71x0_clk_ops(max),
-+			.ops = starfive_clk_ops(max),
- 			.parent_data = parents,
--			.num_parents = ((max & JH71X0_CLK_MUX_MASK) >> JH71X0_CLK_MUX_SHIFT) + 1,
-+			.num_parents = ((max & STARFIVE_CLK_MUX_MASK)
-+					>> STARFIVE_CLK_MUX_SHIFT) + 1,
- 			.flags = jh7100_clk_data[idx].flags,
- 		};
--		struct jh71x0_clk *clk = &priv->reg[idx];
-+		struct starfive_clk *clk = &priv->reg[idx];
- 		unsigned int i;
- 
- 		for (i = 0; i < init.num_parents; i++) {
-@@ -344,7 +349,7 @@ static int __init clk_starfive_jh7100_probe(struct platform_device *pdev)
- 
- 		clk->hw.init = &init;
- 		clk->idx = idx;
--		clk->max_div = max & JH71X0_CLK_DIV_MASK;
-+		clk->max_div = max & STARFIVE_CLK_DIV_MASK;
- 
- 		ret = devm_clk_hw_register(priv->dev, &clk->hw);
- 		if (ret)
-diff --git a/drivers/clk/starfive/clk-starfive-jh7110-aon.c b/drivers/clk/starfive/clk-starfive-jh7110-aon.c
-index 6f67587f4335..a3bd07ebdc46 100644
---- a/drivers/clk/starfive/clk-starfive-jh7110-aon.c
-+++ b/drivers/clk/starfive/clk-starfive-jh7110-aon.c
-@@ -23,40 +23,40 @@
- #define JH7110_AONCLK_GMAC0_GTXCLK	(JH7110_AONCLK_END + 5)
- #define JH7110_AONCLK_RTC_OSC		(JH7110_AONCLK_END + 6)
- 
--static const struct jh71x0_clk_data jh7110_aonclk_data[] = {
-+static const struct starfive_clk_data jh7110_aonclk_data[] = {
- 	/* source */
--	JH71X0__DIV(JH7110_AONCLK_OSC_DIV4, "osc_div4", 4, JH7110_AONCLK_OSC),
--	JH71X0__MUX(JH7110_AONCLK_APB_FUNC, "apb_func", 0, 2,
--		    JH7110_AONCLK_OSC_DIV4,
--		    JH7110_AONCLK_OSC),
-+	STARFIVE__DIV(JH7110_AONCLK_OSC_DIV4, "osc_div4", 4, JH7110_AONCLK_OSC),
-+	STARFIVE__MUX(JH7110_AONCLK_APB_FUNC, "apb_func", 0, 2,
-+		      JH7110_AONCLK_OSC_DIV4,
-+		      JH7110_AONCLK_OSC),
- 	/* gmac0 */
--	JH71X0_GATE(JH7110_AONCLK_GMAC0_AHB, "gmac0_ahb", 0, JH7110_AONCLK_STG_AXIAHB),
--	JH71X0_GATE(JH7110_AONCLK_GMAC0_AXI, "gmac0_axi", 0, JH7110_AONCLK_STG_AXIAHB),
--	JH71X0__DIV(JH7110_AONCLK_GMAC0_RMII_RTX, "gmac0_rmii_rtx", 30,
--		    JH7110_AONCLK_GMAC0_RMII_REFIN),
--	JH71X0_GMUX(JH7110_AONCLK_GMAC0_TX, "gmac0_tx",
--		    CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT, 2,
--		    JH7110_AONCLK_GMAC0_GTXCLK,
--		    JH7110_AONCLK_GMAC0_RMII_RTX),
--	JH71X0__INV(JH7110_AONCLK_GMAC0_TX_INV, "gmac0_tx_inv", JH7110_AONCLK_GMAC0_TX),
--	JH71X0__MUX(JH7110_AONCLK_GMAC0_RX, "gmac0_rx", 0, 2,
--		    JH7110_AONCLK_GMAC0_RGMII_RXIN,
--		    JH7110_AONCLK_GMAC0_RMII_RTX),
--	JH71X0__INV(JH7110_AONCLK_GMAC0_RX_INV, "gmac0_rx_inv", JH7110_AONCLK_GMAC0_RX),
-+	STARFIVE_GATE(JH7110_AONCLK_GMAC0_AHB, "gmac0_ahb", 0, JH7110_AONCLK_STG_AXIAHB),
-+	STARFIVE_GATE(JH7110_AONCLK_GMAC0_AXI, "gmac0_axi", 0, JH7110_AONCLK_STG_AXIAHB),
-+	STARFIVE__DIV(JH7110_AONCLK_GMAC0_RMII_RTX, "gmac0_rmii_rtx", 30,
-+		      JH7110_AONCLK_GMAC0_RMII_REFIN),
-+	STARFIVE_GMUX(JH7110_AONCLK_GMAC0_TX, "gmac0_tx",
-+		      CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT, 2,
-+		      JH7110_AONCLK_GMAC0_GTXCLK,
-+		      JH7110_AONCLK_GMAC0_RMII_RTX),
-+	STARFIVE__INV(JH7110_AONCLK_GMAC0_TX_INV, "gmac0_tx_inv", JH7110_AONCLK_GMAC0_TX),
-+	STARFIVE__MUX(JH7110_AONCLK_GMAC0_RX, "gmac0_rx", 0, 2,
-+		      JH7110_AONCLK_GMAC0_RGMII_RXIN,
-+		      JH7110_AONCLK_GMAC0_RMII_RTX),
-+	STARFIVE__INV(JH7110_AONCLK_GMAC0_RX_INV, "gmac0_rx_inv", JH7110_AONCLK_GMAC0_RX),
- 	/* otpc */
--	JH71X0_GATE(JH7110_AONCLK_OTPC_APB, "otpc_apb", 0, JH7110_AONCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_AONCLK_OTPC_APB, "otpc_apb", 0, JH7110_AONCLK_APB_BUS),
- 	/* rtc */
--	JH71X0_GATE(JH7110_AONCLK_RTC_APB, "rtc_apb", 0, JH7110_AONCLK_APB_BUS),
--	JH71X0__DIV(JH7110_AONCLK_RTC_INTERNAL, "rtc_internal", 1022, JH7110_AONCLK_OSC),
--	JH71X0__MUX(JH7110_AONCLK_RTC_32K, "rtc_32k", 0, 2,
--		    JH7110_AONCLK_RTC_OSC,
--		    JH7110_AONCLK_RTC_INTERNAL),
--	JH71X0_GATE(JH7110_AONCLK_RTC_CAL, "rtc_cal", 0, JH7110_AONCLK_OSC),
-+	STARFIVE_GATE(JH7110_AONCLK_RTC_APB, "rtc_apb", 0, JH7110_AONCLK_APB_BUS),
-+	STARFIVE__DIV(JH7110_AONCLK_RTC_INTERNAL, "rtc_internal", 1022, JH7110_AONCLK_OSC),
-+	STARFIVE__MUX(JH7110_AONCLK_RTC_32K, "rtc_32k", 0, 2,
-+		      JH7110_AONCLK_RTC_OSC,
-+		      JH7110_AONCLK_RTC_INTERNAL),
-+	STARFIVE_GATE(JH7110_AONCLK_RTC_CAL, "rtc_cal", 0, JH7110_AONCLK_OSC),
- };
- 
- static int jh7110_aoncrg_probe(struct platform_device *pdev)
- {
--	struct jh71x0_clk_priv *priv;
-+	struct starfive_clk_priv *priv;
- 	unsigned int idx;
- 	int ret;
- 
-@@ -78,13 +78,13 @@ static int jh7110_aoncrg_probe(struct platform_device *pdev)
- 		struct clk_parent_data parents[4] = {};
- 		struct clk_init_data init = {
- 			.name = jh7110_aonclk_data[idx].name,
--			.ops = starfive_jh71x0_clk_ops(max),
-+			.ops = starfive_clk_ops(max),
- 			.parent_data = parents,
- 			.num_parents =
--				((max & JH71X0_CLK_MUX_MASK) >> JH71X0_CLK_MUX_SHIFT) + 1,
-+				((max & STARFIVE_CLK_MUX_MASK) >> STARFIVE_CLK_MUX_SHIFT) + 1,
- 			.flags = jh7110_aonclk_data[idx].flags,
- 		};
--		struct jh71x0_clk *clk = &priv->reg[idx];
-+		struct starfive_clk *clk = &priv->reg[idx];
- 		unsigned int i;
- 
- 		for (i = 0; i < init.num_parents; i++) {
-@@ -110,14 +110,14 @@ static int jh7110_aoncrg_probe(struct platform_device *pdev)
- 
- 		clk->hw.init = &init;
- 		clk->idx = idx;
--		clk->max_div = max & JH71X0_CLK_DIV_MASK;
-+		clk->max_div = max & STARFIVE_CLK_DIV_MASK;
- 
- 		ret = devm_clk_hw_register(&pdev->dev, &clk->hw);
- 		if (ret)
- 			return ret;
- 	}
- 
--	ret = devm_of_clk_add_hw_provider(&pdev->dev, jh71x0_clk_get, priv);
-+	ret = devm_of_clk_add_hw_provider(&pdev->dev, starfive_clk_get, priv);
- 	if (ret)
- 		return ret;
- 
-diff --git a/drivers/clk/starfive/clk-starfive-jh7110-isp.c b/drivers/clk/starfive/clk-starfive-jh7110-isp.c
-index f3fa069db193..6c0bb7ef7f11 100644
---- a/drivers/clk/starfive/clk-starfive-jh7110-isp.c
-+++ b/drivers/clk/starfive/clk-starfive-jh7110-isp.c
-@@ -28,41 +28,41 @@ static struct clk_bulk_data jh7110_isp_top_clks[] = {
- 	{ .id = "isp_top_axi" }
- };
- 
--static const struct jh71x0_clk_data jh7110_ispclk_data[] = {
-+static const struct starfive_clk_data jh7110_ispclk_data[] = {
- 	/* syscon */
--	JH71X0__DIV(JH7110_ISPCLK_DOM4_APB_FUNC, "dom4_apb_func", 15,
--		    JH7110_ISPCLK_ISP_TOP_AXI),
--	JH71X0__DIV(JH7110_ISPCLK_MIPI_RX0_PXL, "mipi_rx0_pxl", 8,
--		    JH7110_ISPCLK_ISP_TOP_CORE),
--	JH71X0__INV(JH7110_ISPCLK_DVP_INV, "dvp_inv", JH7110_ISPCLK_DVP_CLK),
-+	STARFIVE__DIV(JH7110_ISPCLK_DOM4_APB_FUNC, "dom4_apb_func", 15,
-+		      JH7110_ISPCLK_ISP_TOP_AXI),
-+	STARFIVE__DIV(JH7110_ISPCLK_MIPI_RX0_PXL, "mipi_rx0_pxl", 8,
-+		      JH7110_ISPCLK_ISP_TOP_CORE),
-+	STARFIVE__INV(JH7110_ISPCLK_DVP_INV, "dvp_inv", JH7110_ISPCLK_DVP_CLK),
- 	/* vin */
--	JH71X0__DIV(JH7110_ISPCLK_M31DPHY_CFG_IN, "m31dphy_cfg_in", 16,
--		    JH7110_ISPCLK_ISP_TOP_CORE),
--	JH71X0__DIV(JH7110_ISPCLK_M31DPHY_REF_IN, "m31dphy_ref_in", 16,
--		    JH7110_ISPCLK_ISP_TOP_CORE),
--	JH71X0__DIV(JH7110_ISPCLK_M31DPHY_TX_ESC_LAN0, "m31dphy_tx_esc_lan0", 60,
--		    JH7110_ISPCLK_ISP_TOP_CORE),
--	JH71X0_GATE(JH7110_ISPCLK_VIN_APB, "vin_apb", 0,
--		    JH7110_ISPCLK_DOM4_APB_FUNC),
--	JH71X0__DIV(JH7110_ISPCLK_VIN_SYS, "vin_sys", 8, JH7110_ISPCLK_ISP_TOP_CORE),
--	JH71X0_GATE(JH7110_ISPCLK_VIN_PIXEL_IF0, "vin_pixel_if0", 0,
--		    JH7110_ISPCLK_MIPI_RX0_PXL),
--	JH71X0_GATE(JH7110_ISPCLK_VIN_PIXEL_IF1, "vin_pixel_if1", 0,
--		    JH7110_ISPCLK_MIPI_RX0_PXL),
--	JH71X0_GATE(JH7110_ISPCLK_VIN_PIXEL_IF2, "vin_pixel_if2", 0,
--		    JH7110_ISPCLK_MIPI_RX0_PXL),
--	JH71X0_GATE(JH7110_ISPCLK_VIN_PIXEL_IF3, "vin_pixel_if3", 0,
--		    JH7110_ISPCLK_MIPI_RX0_PXL),
--	JH71X0__MUX(JH7110_ISPCLK_VIN_P_AXI_WR, "vin_p_axi_wr", 0, 2,
--		    JH7110_ISPCLK_MIPI_RX0_PXL,
--		    JH7110_ISPCLK_DVP_INV),
-+	STARFIVE__DIV(JH7110_ISPCLK_M31DPHY_CFG_IN, "m31dphy_cfg_in", 16,
-+		      JH7110_ISPCLK_ISP_TOP_CORE),
-+	STARFIVE__DIV(JH7110_ISPCLK_M31DPHY_REF_IN, "m31dphy_ref_in", 16,
-+		      JH7110_ISPCLK_ISP_TOP_CORE),
-+	STARFIVE__DIV(JH7110_ISPCLK_M31DPHY_TX_ESC_LAN0, "m31dphy_tx_esc_lan0", 60,
-+		      JH7110_ISPCLK_ISP_TOP_CORE),
-+	STARFIVE_GATE(JH7110_ISPCLK_VIN_APB, "vin_apb", 0,
-+		      JH7110_ISPCLK_DOM4_APB_FUNC),
-+	STARFIVE__DIV(JH7110_ISPCLK_VIN_SYS, "vin_sys", 8, JH7110_ISPCLK_ISP_TOP_CORE),
-+	STARFIVE_GATE(JH7110_ISPCLK_VIN_PIXEL_IF0, "vin_pixel_if0", 0,
-+		      JH7110_ISPCLK_MIPI_RX0_PXL),
-+	STARFIVE_GATE(JH7110_ISPCLK_VIN_PIXEL_IF1, "vin_pixel_if1", 0,
-+		      JH7110_ISPCLK_MIPI_RX0_PXL),
-+	STARFIVE_GATE(JH7110_ISPCLK_VIN_PIXEL_IF2, "vin_pixel_if2", 0,
-+		      JH7110_ISPCLK_MIPI_RX0_PXL),
-+	STARFIVE_GATE(JH7110_ISPCLK_VIN_PIXEL_IF3, "vin_pixel_if3", 0,
-+		      JH7110_ISPCLK_MIPI_RX0_PXL),
-+	STARFIVE__MUX(JH7110_ISPCLK_VIN_P_AXI_WR, "vin_p_axi_wr", 0, 2,
-+		      JH7110_ISPCLK_MIPI_RX0_PXL,
-+		      JH7110_ISPCLK_DVP_INV),
- 	/* ispv2_top_wrapper */
--	JH71X0_GMUX(JH7110_ISPCLK_ISPV2_TOP_WRAPPER_C, "ispv2_top_wrapper_c", 0, 2,
--		    JH7110_ISPCLK_MIPI_RX0_PXL,
--		    JH7110_ISPCLK_DVP_INV),
-+	STARFIVE_GMUX(JH7110_ISPCLK_ISPV2_TOP_WRAPPER_C, "ispv2_top_wrapper_c", 0, 2,
-+		      JH7110_ISPCLK_MIPI_RX0_PXL,
-+		      JH7110_ISPCLK_DVP_INV),
- };
- 
--static inline int jh7110_isp_top_rst_init(struct jh71x0_clk_priv *priv)
-+static inline int jh7110_isp_top_rst_init(struct starfive_clk_priv *priv)
- {
- 	struct reset_control *top_rsts;
- 
-@@ -99,7 +99,7 @@ static const struct dev_pm_ops jh7110_ispcrg_pm_ops = {
- 
- static int jh7110_ispcrg_probe(struct platform_device *pdev)
- {
--	struct jh71x0_clk_priv *priv;
-+	struct starfive_clk_priv *priv;
- 	struct jh7110_top_sysclk *top;
- 	unsigned int idx;
- 	int ret;
-@@ -143,13 +143,13 @@ static int jh7110_ispcrg_probe(struct platform_device *pdev)
- 		struct clk_parent_data parents[4] = {};
- 		struct clk_init_data init = {
- 			.name = jh7110_ispclk_data[idx].name,
--			.ops = starfive_jh71x0_clk_ops(max),
-+			.ops = starfive_clk_ops(max),
- 			.parent_data = parents,
- 			.num_parents =
--				((max & JH71X0_CLK_MUX_MASK) >> JH71X0_CLK_MUX_SHIFT) + 1,
-+				((max & STARFIVE_CLK_MUX_MASK) >> STARFIVE_CLK_MUX_SHIFT) + 1,
- 			.flags = jh7110_ispclk_data[idx].flags,
- 		};
--		struct jh71x0_clk *clk = &priv->reg[idx];
-+		struct starfive_clk *clk = &priv->reg[idx];
- 		unsigned int i;
- 		const char *fw_name[JH7110_ISPCLK_EXT_END - JH7110_ISPCLK_END] = {
- 			"isp_top_core",
-@@ -169,14 +169,14 @@ static int jh7110_ispcrg_probe(struct platform_device *pdev)
- 
- 		clk->hw.init = &init;
- 		clk->idx = idx;
--		clk->max_div = max & JH71X0_CLK_DIV_MASK;
-+		clk->max_div = max & STARFIVE_CLK_DIV_MASK;
- 
- 		ret = devm_clk_hw_register(&pdev->dev, &clk->hw);
- 		if (ret)
- 			goto err_exit;
- 	}
- 
--	ret = devm_of_clk_add_hw_provider(&pdev->dev, jh71x0_clk_get, priv);
-+	ret = devm_of_clk_add_hw_provider(&pdev->dev, starfive_clk_get, priv);
- 	if (ret)
- 		goto err_exit;
- 
-diff --git a/drivers/clk/starfive/clk-starfive-jh7110-stg.c b/drivers/clk/starfive/clk-starfive-jh7110-stg.c
-index 2a5ad0e07d1d..4edaf736a20d 100644
---- a/drivers/clk/starfive/clk-starfive-jh7110-stg.c
-+++ b/drivers/clk/starfive/clk-starfive-jh7110-stg.c
-@@ -25,59 +25,59 @@
- #define JH7110_STGCLK_APB_BUS			(JH7110_STGCLK_END + 7)
- #define JH7110_STGCLK_EXT_END			(JH7110_STGCLK_END + 8)
- 
--static const struct jh71x0_clk_data jh7110_stgclk_data[] = {
-+static const struct starfive_clk_data jh7110_stgclk_data[] = {
- 	/* hifi4 */
--	JH71X0_GATE(JH7110_STGCLK_HIFI4_CLK_CORE, "hifi4_clk_core", 0,
--		    JH7110_STGCLK_HIFI4_CORE),
-+	STARFIVE_GATE(JH7110_STGCLK_HIFI4_CLK_CORE, "hifi4_clk_core", 0,
-+		      JH7110_STGCLK_HIFI4_CORE),
- 	/* usb */
--	JH71X0_GATE(JH7110_STGCLK_USB0_APB, "usb0_apb", 0, JH7110_STGCLK_APB_BUS),
--	JH71X0_GATE(JH7110_STGCLK_USB0_UTMI_APB, "usb0_utmi_apb", 0, JH7110_STGCLK_APB_BUS),
--	JH71X0_GATE(JH7110_STGCLK_USB0_AXI, "usb0_axi", 0, JH7110_STGCLK_STG_AXIAHB),
--	JH71X0_GDIV(JH7110_STGCLK_USB0_LPM, "usb0_lpm", 0, 2, JH7110_STGCLK_OSC),
--	JH71X0_GDIV(JH7110_STGCLK_USB0_STB, "usb0_stb", 0, 4, JH7110_STGCLK_OSC),
--	JH71X0_GATE(JH7110_STGCLK_USB0_APP_125, "usb0_app_125", 0, JH7110_STGCLK_USB_125M),
--	JH71X0__DIV(JH7110_STGCLK_USB0_REFCLK, "usb0_refclk", 2, JH7110_STGCLK_OSC),
-+	STARFIVE_GATE(JH7110_STGCLK_USB0_APB, "usb0_apb", 0, JH7110_STGCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_STGCLK_USB0_UTMI_APB, "usb0_utmi_apb", 0, JH7110_STGCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_STGCLK_USB0_AXI, "usb0_axi", 0, JH7110_STGCLK_STG_AXIAHB),
-+	STARFIVE_GDIV(JH7110_STGCLK_USB0_LPM, "usb0_lpm", 0, 2, JH7110_STGCLK_OSC),
-+	STARFIVE_GDIV(JH7110_STGCLK_USB0_STB, "usb0_stb", 0, 4, JH7110_STGCLK_OSC),
-+	STARFIVE_GATE(JH7110_STGCLK_USB0_APP_125, "usb0_app_125", 0, JH7110_STGCLK_USB_125M),
-+	STARFIVE__DIV(JH7110_STGCLK_USB0_REFCLK, "usb0_refclk", 2, JH7110_STGCLK_OSC),
- 	/* pci-e */
--	JH71X0_GATE(JH7110_STGCLK_PCIE0_AXI_MST0, "pcie0_axi_mst0", 0,
--		    JH7110_STGCLK_STG_AXIAHB),
--	JH71X0_GATE(JH7110_STGCLK_PCIE0_APB, "pcie0_apb", 0, JH7110_STGCLK_APB_BUS),
--	JH71X0_GATE(JH7110_STGCLK_PCIE0_TL, "pcie0_tl", 0, JH7110_STGCLK_STG_AXIAHB),
--	JH71X0_GATE(JH7110_STGCLK_PCIE1_AXI_MST0, "pcie1_axi_mst0", 0,
--		    JH7110_STGCLK_STG_AXIAHB),
--	JH71X0_GATE(JH7110_STGCLK_PCIE1_APB, "pcie1_apb", 0, JH7110_STGCLK_APB_BUS),
--	JH71X0_GATE(JH7110_STGCLK_PCIE1_TL, "pcie1_tl", 0, JH7110_STGCLK_STG_AXIAHB),
--	JH71X0_GATE(JH7110_STGCLK_PCIE_SLV_MAIN, "pcie_slv_main", CLK_IS_CRITICAL,
--		    JH7110_STGCLK_STG_AXIAHB),
-+	STARFIVE_GATE(JH7110_STGCLK_PCIE0_AXI_MST0, "pcie0_axi_mst0", 0,
-+		      JH7110_STGCLK_STG_AXIAHB),
-+	STARFIVE_GATE(JH7110_STGCLK_PCIE0_APB, "pcie0_apb", 0, JH7110_STGCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_STGCLK_PCIE0_TL, "pcie0_tl", 0, JH7110_STGCLK_STG_AXIAHB),
-+	STARFIVE_GATE(JH7110_STGCLK_PCIE1_AXI_MST0, "pcie1_axi_mst0", 0,
-+		      JH7110_STGCLK_STG_AXIAHB),
-+	STARFIVE_GATE(JH7110_STGCLK_PCIE1_APB, "pcie1_apb", 0, JH7110_STGCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_STGCLK_PCIE1_TL, "pcie1_tl", 0, JH7110_STGCLK_STG_AXIAHB),
-+	STARFIVE_GATE(JH7110_STGCLK_PCIE_SLV_MAIN, "pcie_slv_main", CLK_IS_CRITICAL,
-+		      JH7110_STGCLK_STG_AXIAHB),
- 	/* security */
--	JH71X0_GATE(JH7110_STGCLK_SEC_AHB, "sec_ahb", 0, JH7110_STGCLK_STG_AXIAHB),
--	JH71X0_GATE(JH7110_STGCLK_SEC_MISC_AHB, "sec_misc_ahb", 0, JH7110_STGCLK_STG_AXIAHB),
-+	STARFIVE_GATE(JH7110_STGCLK_SEC_AHB, "sec_ahb", 0, JH7110_STGCLK_STG_AXIAHB),
-+	STARFIVE_GATE(JH7110_STGCLK_SEC_MISC_AHB, "sec_misc_ahb", 0, JH7110_STGCLK_STG_AXIAHB),
- 	/* stg mtrx */
--	JH71X0_GATE(JH7110_STGCLK_GRP0_MAIN, "mtrx_grp0_main", CLK_IS_CRITICAL,
--		    JH7110_STGCLK_CPU_BUS),
--	JH71X0_GATE(JH7110_STGCLK_GRP0_BUS, "mtrx_grp0_bus", CLK_IS_CRITICAL,
--		    JH7110_STGCLK_NOCSTG_BUS),
--	JH71X0_GATE(JH7110_STGCLK_GRP0_STG, "mtrx_grp0_stg", CLK_IS_CRITICAL,
--		    JH7110_STGCLK_STG_AXIAHB),
--	JH71X0_GATE(JH7110_STGCLK_GRP1_MAIN, "mtrx_grp1_main", CLK_IS_CRITICAL,
--		    JH7110_STGCLK_CPU_BUS),
--	JH71X0_GATE(JH7110_STGCLK_GRP1_BUS, "mtrx_grp1_bus", CLK_IS_CRITICAL,
--		    JH7110_STGCLK_NOCSTG_BUS),
--	JH71X0_GATE(JH7110_STGCLK_GRP1_STG, "mtrx_grp1_stg", CLK_IS_CRITICAL,
--		    JH7110_STGCLK_STG_AXIAHB),
--	JH71X0_GATE(JH7110_STGCLK_GRP1_HIFI, "mtrx_grp1_hifi", CLK_IS_CRITICAL,
--		    JH7110_STGCLK_HIFI4_AXI),
-+	STARFIVE_GATE(JH7110_STGCLK_GRP0_MAIN, "mtrx_grp0_main", CLK_IS_CRITICAL,
-+		      JH7110_STGCLK_CPU_BUS),
-+	STARFIVE_GATE(JH7110_STGCLK_GRP0_BUS, "mtrx_grp0_bus", CLK_IS_CRITICAL,
-+		      JH7110_STGCLK_NOCSTG_BUS),
-+	STARFIVE_GATE(JH7110_STGCLK_GRP0_STG, "mtrx_grp0_stg", CLK_IS_CRITICAL,
-+		      JH7110_STGCLK_STG_AXIAHB),
-+	STARFIVE_GATE(JH7110_STGCLK_GRP1_MAIN, "mtrx_grp1_main", CLK_IS_CRITICAL,
-+		      JH7110_STGCLK_CPU_BUS),
-+	STARFIVE_GATE(JH7110_STGCLK_GRP1_BUS, "mtrx_grp1_bus", CLK_IS_CRITICAL,
-+		      JH7110_STGCLK_NOCSTG_BUS),
-+	STARFIVE_GATE(JH7110_STGCLK_GRP1_STG, "mtrx_grp1_stg", CLK_IS_CRITICAL,
-+		      JH7110_STGCLK_STG_AXIAHB),
-+	STARFIVE_GATE(JH7110_STGCLK_GRP1_HIFI, "mtrx_grp1_hifi", CLK_IS_CRITICAL,
-+		      JH7110_STGCLK_HIFI4_AXI),
- 	/* e24_rvpi */
--	JH71X0_GDIV(JH7110_STGCLK_E2_RTC, "e2_rtc", 0, 24, JH7110_STGCLK_OSC),
--	JH71X0_GATE(JH7110_STGCLK_E2_CORE, "e2_core", 0, JH7110_STGCLK_STG_AXIAHB),
--	JH71X0_GATE(JH7110_STGCLK_E2_DBG, "e2_dbg", 0, JH7110_STGCLK_STG_AXIAHB),
-+	STARFIVE_GDIV(JH7110_STGCLK_E2_RTC, "e2_rtc", 0, 24, JH7110_STGCLK_OSC),
-+	STARFIVE_GATE(JH7110_STGCLK_E2_CORE, "e2_core", 0, JH7110_STGCLK_STG_AXIAHB),
-+	STARFIVE_GATE(JH7110_STGCLK_E2_DBG, "e2_dbg", 0, JH7110_STGCLK_STG_AXIAHB),
- 	/* dw_sgdma1p */
--	JH71X0_GATE(JH7110_STGCLK_DMA1P_AXI, "dma1p_axi", 0, JH7110_STGCLK_STG_AXIAHB),
--	JH71X0_GATE(JH7110_STGCLK_DMA1P_AHB, "dma1p_ahb", 0, JH7110_STGCLK_STG_AXIAHB),
-+	STARFIVE_GATE(JH7110_STGCLK_DMA1P_AXI, "dma1p_axi", 0, JH7110_STGCLK_STG_AXIAHB),
-+	STARFIVE_GATE(JH7110_STGCLK_DMA1P_AHB, "dma1p_ahb", 0, JH7110_STGCLK_STG_AXIAHB),
- };
- 
- static int jh7110_stgcrg_probe(struct platform_device *pdev)
- {
--	struct jh71x0_clk_priv *priv;
-+	struct starfive_clk_priv *priv;
- 	unsigned int idx;
- 	int ret;
- 
-@@ -98,13 +98,13 @@ static int jh7110_stgcrg_probe(struct platform_device *pdev)
- 		struct clk_parent_data parents[4] = {};
- 		struct clk_init_data init = {
- 			.name = jh7110_stgclk_data[idx].name,
--			.ops = starfive_jh71x0_clk_ops(max),
-+			.ops = starfive_clk_ops(max),
- 			.parent_data = parents,
- 			.num_parents =
--				((max & JH71X0_CLK_MUX_MASK) >> JH71X0_CLK_MUX_SHIFT) + 1,
-+				((max & STARFIVE_CLK_MUX_MASK) >> STARFIVE_CLK_MUX_SHIFT) + 1,
- 			.flags = jh7110_stgclk_data[idx].flags,
- 		};
--		struct jh71x0_clk *clk = &priv->reg[idx];
-+		struct starfive_clk *clk = &priv->reg[idx];
- 		const char *fw_name[JH7110_STGCLK_EXT_END - JH7110_STGCLK_END] = {
- 			"osc",
- 			"hifi4_core",
-@@ -128,14 +128,14 @@ static int jh7110_stgcrg_probe(struct platform_device *pdev)
- 
- 		clk->hw.init = &init;
- 		clk->idx = idx;
--		clk->max_div = max & JH71X0_CLK_DIV_MASK;
-+		clk->max_div = max & STARFIVE_CLK_DIV_MASK;
- 
- 		ret = devm_clk_hw_register(&pdev->dev, &clk->hw);
- 		if (ret)
- 			return ret;
- 	}
- 
--	ret = devm_of_clk_add_hw_provider(&pdev->dev, jh71x0_clk_get, priv);
-+	ret = devm_of_clk_add_hw_provider(&pdev->dev, starfive_clk_get, priv);
- 	if (ret)
- 		return ret;
- 
-diff --git a/drivers/clk/starfive/clk-starfive-jh7110-sys.c b/drivers/clk/starfive/clk-starfive-jh7110-sys.c
-index 17fd061ee196..92eb5152a132 100644
---- a/drivers/clk/starfive/clk-starfive-jh7110-sys.c
-+++ b/drivers/clk/starfive/clk-starfive-jh7110-sys.c
-@@ -34,293 +34,296 @@
- #define JH7110_SYSCLK_PLL1_OUT			(JH7110_SYSCLK_END + 10)
- #define JH7110_SYSCLK_PLL2_OUT			(JH7110_SYSCLK_END + 11)
- 
--static const struct jh71x0_clk_data jh7110_sysclk_data[] __initconst = {
-+static const struct starfive_clk_data jh7110_sysclk_data[] __initconst = {
- 	/* root */
--	JH71X0__MUX(JH7110_SYSCLK_CPU_ROOT, "cpu_root", 0, 2,
--		    JH7110_SYSCLK_OSC,
--		    JH7110_SYSCLK_PLL0_OUT),
--	JH71X0__DIV(JH7110_SYSCLK_CPU_CORE, "cpu_core", 7, JH7110_SYSCLK_CPU_ROOT),
--	JH71X0__DIV(JH7110_SYSCLK_CPU_BUS, "cpu_bus", 2, JH7110_SYSCLK_CPU_CORE),
--	JH71X0__MUX(JH7110_SYSCLK_GPU_ROOT, "gpu_root", 0, 2,
--		    JH7110_SYSCLK_PLL2_OUT,
--		    JH7110_SYSCLK_PLL1_OUT),
--	JH71X0_MDIV(JH7110_SYSCLK_PERH_ROOT, "perh_root", 2, 2,
--		    JH7110_SYSCLK_PLL0_OUT,
--		    JH7110_SYSCLK_PLL2_OUT),
--	JH71X0__MUX(JH7110_SYSCLK_BUS_ROOT, "bus_root", 0, 2,
--		    JH7110_SYSCLK_OSC,
--		    JH7110_SYSCLK_PLL2_OUT),
--	JH71X0__DIV(JH7110_SYSCLK_NOCSTG_BUS, "nocstg_bus", 3, JH7110_SYSCLK_BUS_ROOT),
--	JH71X0__DIV(JH7110_SYSCLK_AXI_CFG0, "axi_cfg0", 3, JH7110_SYSCLK_BUS_ROOT),
--	JH71X0__DIV(JH7110_SYSCLK_STG_AXIAHB, "stg_axiahb", 2, JH7110_SYSCLK_AXI_CFG0),
--	JH71X0_GATE(JH7110_SYSCLK_AHB0, "ahb0", CLK_IS_CRITICAL, JH7110_SYSCLK_STG_AXIAHB),
--	JH71X0_GATE(JH7110_SYSCLK_AHB1, "ahb1", CLK_IS_CRITICAL, JH7110_SYSCLK_STG_AXIAHB),
--	JH71X0__DIV(JH7110_SYSCLK_APB_BUS, "apb_bus", 8, JH7110_SYSCLK_STG_AXIAHB),
--	JH71X0_GATE(JH7110_SYSCLK_APB0, "apb0", CLK_IS_CRITICAL, JH7110_SYSCLK_APB_BUS),
--	JH71X0__DIV(JH7110_SYSCLK_PLL0_DIV2, "pll0_div2", 2, JH7110_SYSCLK_PLL0_OUT),
--	JH71X0__DIV(JH7110_SYSCLK_PLL1_DIV2, "pll1_div2", 2, JH7110_SYSCLK_PLL1_OUT),
--	JH71X0__DIV(JH7110_SYSCLK_PLL2_DIV2, "pll2_div2", 2, JH7110_SYSCLK_PLL2_OUT),
--	JH71X0__DIV(JH7110_SYSCLK_AUDIO_ROOT, "audio_root", 8, JH7110_SYSCLK_PLL2_OUT),
--	JH71X0__DIV(JH7110_SYSCLK_MCLK_INNER, "mclk_inner", 64, JH7110_SYSCLK_AUDIO_ROOT),
--	JH71X0__MUX(JH7110_SYSCLK_MCLK, "mclk", 0, 2,
--		    JH7110_SYSCLK_MCLK_INNER,
--		    JH7110_SYSCLK_MCLK_EXT),
--	JH71X0_GATE(JH7110_SYSCLK_MCLK_OUT, "mclk_out", 0, JH7110_SYSCLK_MCLK_INNER),
--	JH71X0_MDIV(JH7110_SYSCLK_ISP_2X, "isp_2x", 8, 2,
--		    JH7110_SYSCLK_PLL2_OUT,
--		    JH7110_SYSCLK_PLL1_OUT),
--	JH71X0__DIV(JH7110_SYSCLK_ISP_AXI, "isp_axi", 4, JH7110_SYSCLK_ISP_2X),
--	JH71X0_GDIV(JH7110_SYSCLK_GCLK0, "gclk0", 0, 62, JH7110_SYSCLK_PLL0_DIV2),
--	JH71X0_GDIV(JH7110_SYSCLK_GCLK1, "gclk1", 0, 62, JH7110_SYSCLK_PLL1_DIV2),
--	JH71X0_GDIV(JH7110_SYSCLK_GCLK2, "gclk2", 0, 62, JH7110_SYSCLK_PLL2_DIV2),
-+	STARFIVE__MUX(JH7110_SYSCLK_CPU_ROOT, "cpu_root", 0, 2,
-+		      JH7110_SYSCLK_OSC,
-+		      JH7110_SYSCLK_PLL0_OUT),
-+	STARFIVE__DIV(JH7110_SYSCLK_CPU_CORE, "cpu_core", 7, JH7110_SYSCLK_CPU_ROOT),
-+	STARFIVE__DIV(JH7110_SYSCLK_CPU_BUS, "cpu_bus", 2, JH7110_SYSCLK_CPU_CORE),
-+	STARFIVE__MUX(JH7110_SYSCLK_GPU_ROOT, "gpu_root", 0, 2,
-+		      JH7110_SYSCLK_PLL2_OUT,
-+		      JH7110_SYSCLK_PLL1_OUT),
-+	STARFIVE_MDIV(JH7110_SYSCLK_PERH_ROOT, "perh_root", 2, 2,
-+		      JH7110_SYSCLK_PLL0_OUT,
-+		      JH7110_SYSCLK_PLL2_OUT),
-+	STARFIVE__MUX(JH7110_SYSCLK_BUS_ROOT, "bus_root", 0, 2,
-+		      JH7110_SYSCLK_OSC,
-+		      JH7110_SYSCLK_PLL2_OUT),
-+	STARFIVE__DIV(JH7110_SYSCLK_NOCSTG_BUS, "nocstg_bus", 3, JH7110_SYSCLK_BUS_ROOT),
-+	STARFIVE__DIV(JH7110_SYSCLK_AXI_CFG0, "axi_cfg0", 3, JH7110_SYSCLK_BUS_ROOT),
-+	STARFIVE__DIV(JH7110_SYSCLK_STG_AXIAHB, "stg_axiahb", 2, JH7110_SYSCLK_AXI_CFG0),
-+	STARFIVE_GATE(JH7110_SYSCLK_AHB0, "ahb0", CLK_IS_CRITICAL, JH7110_SYSCLK_STG_AXIAHB),
-+	STARFIVE_GATE(JH7110_SYSCLK_AHB1, "ahb1", CLK_IS_CRITICAL, JH7110_SYSCLK_STG_AXIAHB),
-+	STARFIVE__DIV(JH7110_SYSCLK_APB_BUS, "apb_bus", 8, JH7110_SYSCLK_STG_AXIAHB),
-+	STARFIVE_GATE(JH7110_SYSCLK_APB0, "apb0", CLK_IS_CRITICAL, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE__DIV(JH7110_SYSCLK_PLL0_DIV2, "pll0_div2", 2, JH7110_SYSCLK_PLL0_OUT),
-+	STARFIVE__DIV(JH7110_SYSCLK_PLL1_DIV2, "pll1_div2", 2, JH7110_SYSCLK_PLL1_OUT),
-+	STARFIVE__DIV(JH7110_SYSCLK_PLL2_DIV2, "pll2_div2", 2, JH7110_SYSCLK_PLL2_OUT),
-+	STARFIVE__DIV(JH7110_SYSCLK_AUDIO_ROOT, "audio_root", 8, JH7110_SYSCLK_PLL2_OUT),
-+	STARFIVE__DIV(JH7110_SYSCLK_MCLK_INNER, "mclk_inner", 64, JH7110_SYSCLK_AUDIO_ROOT),
-+	STARFIVE__MUX(JH7110_SYSCLK_MCLK, "mclk", 0, 2,
-+		      JH7110_SYSCLK_MCLK_INNER,
-+		      JH7110_SYSCLK_MCLK_EXT),
-+	STARFIVE_GATE(JH7110_SYSCLK_MCLK_OUT, "mclk_out", 0, JH7110_SYSCLK_MCLK_INNER),
-+	STARFIVE_MDIV(JH7110_SYSCLK_ISP_2X, "isp_2x", 8, 2,
-+		      JH7110_SYSCLK_PLL2_OUT,
-+		      JH7110_SYSCLK_PLL1_OUT),
-+	STARFIVE__DIV(JH7110_SYSCLK_ISP_AXI, "isp_axi", 4, JH7110_SYSCLK_ISP_2X),
-+	STARFIVE_GDIV(JH7110_SYSCLK_GCLK0, "gclk0", 0, 62, JH7110_SYSCLK_PLL0_DIV2),
-+	STARFIVE_GDIV(JH7110_SYSCLK_GCLK1, "gclk1", 0, 62, JH7110_SYSCLK_PLL1_DIV2),
-+	STARFIVE_GDIV(JH7110_SYSCLK_GCLK2, "gclk2", 0, 62, JH7110_SYSCLK_PLL2_DIV2),
- 	/* cores */
--	JH71X0_GATE(JH7110_SYSCLK_CORE, "core", CLK_IS_CRITICAL, JH7110_SYSCLK_CPU_CORE),
--	JH71X0_GATE(JH7110_SYSCLK_CORE1, "core1", CLK_IS_CRITICAL, JH7110_SYSCLK_CPU_CORE),
--	JH71X0_GATE(JH7110_SYSCLK_CORE2, "core2", CLK_IS_CRITICAL, JH7110_SYSCLK_CPU_CORE),
--	JH71X0_GATE(JH7110_SYSCLK_CORE3, "core3", CLK_IS_CRITICAL, JH7110_SYSCLK_CPU_CORE),
--	JH71X0_GATE(JH7110_SYSCLK_CORE4, "core4", CLK_IS_CRITICAL, JH7110_SYSCLK_CPU_CORE),
--	JH71X0_GATE(JH7110_SYSCLK_DEBUG, "debug", 0, JH7110_SYSCLK_CPU_BUS),
--	JH71X0__DIV(JH7110_SYSCLK_RTC_TOGGLE, "rtc_toggle", 6, JH7110_SYSCLK_OSC),
--	JH71X0_GATE(JH7110_SYSCLK_TRACE0, "trace0", 0, JH7110_SYSCLK_CPU_CORE),
--	JH71X0_GATE(JH7110_SYSCLK_TRACE1, "trace1", 0, JH7110_SYSCLK_CPU_CORE),
--	JH71X0_GATE(JH7110_SYSCLK_TRACE2, "trace2", 0, JH7110_SYSCLK_CPU_CORE),
--	JH71X0_GATE(JH7110_SYSCLK_TRACE3, "trace3", 0, JH7110_SYSCLK_CPU_CORE),
--	JH71X0_GATE(JH7110_SYSCLK_TRACE4, "trace4", 0, JH7110_SYSCLK_CPU_CORE),
--	JH71X0_GATE(JH7110_SYSCLK_TRACE_COM, "trace_com", 0, JH7110_SYSCLK_CPU_BUS),
-+	STARFIVE_GATE(JH7110_SYSCLK_CORE, "core", CLK_IS_CRITICAL, JH7110_SYSCLK_CPU_CORE),
-+	STARFIVE_GATE(JH7110_SYSCLK_CORE1, "core1", CLK_IS_CRITICAL, JH7110_SYSCLK_CPU_CORE),
-+	STARFIVE_GATE(JH7110_SYSCLK_CORE2, "core2", CLK_IS_CRITICAL, JH7110_SYSCLK_CPU_CORE),
-+	STARFIVE_GATE(JH7110_SYSCLK_CORE3, "core3", CLK_IS_CRITICAL, JH7110_SYSCLK_CPU_CORE),
-+	STARFIVE_GATE(JH7110_SYSCLK_CORE4, "core4", CLK_IS_CRITICAL, JH7110_SYSCLK_CPU_CORE),
-+	STARFIVE_GATE(JH7110_SYSCLK_DEBUG, "debug", 0, JH7110_SYSCLK_CPU_BUS),
-+	STARFIVE__DIV(JH7110_SYSCLK_RTC_TOGGLE, "rtc_toggle", 6, JH7110_SYSCLK_OSC),
-+	STARFIVE_GATE(JH7110_SYSCLK_TRACE0, "trace0", 0, JH7110_SYSCLK_CPU_CORE),
-+	STARFIVE_GATE(JH7110_SYSCLK_TRACE1, "trace1", 0, JH7110_SYSCLK_CPU_CORE),
-+	STARFIVE_GATE(JH7110_SYSCLK_TRACE2, "trace2", 0, JH7110_SYSCLK_CPU_CORE),
-+	STARFIVE_GATE(JH7110_SYSCLK_TRACE3, "trace3", 0, JH7110_SYSCLK_CPU_CORE),
-+	STARFIVE_GATE(JH7110_SYSCLK_TRACE4, "trace4", 0, JH7110_SYSCLK_CPU_CORE),
-+	STARFIVE_GATE(JH7110_SYSCLK_TRACE_COM, "trace_com", 0, JH7110_SYSCLK_CPU_BUS),
- 	/* noc */
--	JH71X0_GATE(JH7110_SYSCLK_NOC_BUS_CPU_AXI, "noc_bus_cpu_axi", CLK_IS_CRITICAL,
--		    JH7110_SYSCLK_CPU_BUS),
--	JH71X0_GATE(JH7110_SYSCLK_NOC_BUS_AXICFG0_AXI, "noc_bus_axicfg0_axi", CLK_IS_CRITICAL,
--		    JH7110_SYSCLK_AXI_CFG0),
-+	STARFIVE_GATE(JH7110_SYSCLK_NOC_BUS_CPU_AXI, "noc_bus_cpu_axi", CLK_IS_CRITICAL,
-+		      JH7110_SYSCLK_CPU_BUS),
-+	STARFIVE_GATE(JH7110_SYSCLK_NOC_BUS_AXICFG0_AXI, "noc_bus_axicfg0_axi", CLK_IS_CRITICAL,
-+		      JH7110_SYSCLK_AXI_CFG0),
- 	/* ddr */
--	JH71X0__DIV(JH7110_SYSCLK_OSC_DIV2, "osc_div2", 2, JH7110_SYSCLK_OSC),
--	JH71X0__DIV(JH7110_SYSCLK_PLL1_DIV4, "pll1_div4", 2, JH7110_SYSCLK_PLL1_DIV2),
--	JH71X0__DIV(JH7110_SYSCLK_PLL1_DIV8, "pll1_div8", 2, JH7110_SYSCLK_PLL1_DIV4),
--	JH71X0__MUX(JH7110_SYSCLK_DDR_BUS, "ddr_bus", 0, 4,
--		    JH7110_SYSCLK_OSC_DIV2,
--		    JH7110_SYSCLK_PLL1_DIV2,
--		    JH7110_SYSCLK_PLL1_DIV4,
--		    JH7110_SYSCLK_PLL1_DIV8),
--	JH71X0_GATE(JH7110_SYSCLK_DDR_AXI, "ddr_axi", CLK_IS_CRITICAL, JH7110_SYSCLK_DDR_BUS),
-+	STARFIVE__DIV(JH7110_SYSCLK_OSC_DIV2, "osc_div2", 2, JH7110_SYSCLK_OSC),
-+	STARFIVE__DIV(JH7110_SYSCLK_PLL1_DIV4, "pll1_div4", 2, JH7110_SYSCLK_PLL1_DIV2),
-+	STARFIVE__DIV(JH7110_SYSCLK_PLL1_DIV8, "pll1_div8", 2, JH7110_SYSCLK_PLL1_DIV4),
-+	STARFIVE__MUX(JH7110_SYSCLK_DDR_BUS, "ddr_bus", 0, 4,
-+		      JH7110_SYSCLK_OSC_DIV2,
-+		      JH7110_SYSCLK_PLL1_DIV2,
-+		      JH7110_SYSCLK_PLL1_DIV4,
-+		      JH7110_SYSCLK_PLL1_DIV8),
-+	STARFIVE_GATE(JH7110_SYSCLK_DDR_AXI, "ddr_axi", CLK_IS_CRITICAL, JH7110_SYSCLK_DDR_BUS),
- 	/* gpu */
--	JH71X0__DIV(JH7110_SYSCLK_GPU_CORE, "gpu_core", 7, JH7110_SYSCLK_GPU_ROOT),
--	JH71X0_GATE(JH7110_SYSCLK_GPU_CORE_CLK, "gpu_core_clk", 0, JH7110_SYSCLK_GPU_CORE),
--	JH71X0_GATE(JH7110_SYSCLK_GPU_SYS_CLK, "gpu_sys_clk", 0, JH7110_SYSCLK_ISP_AXI),
--	JH71X0_GATE(JH7110_SYSCLK_GPU_APB, "gpu_apb", 0, JH7110_SYSCLK_APB_BUS),
--	JH71X0_GDIV(JH7110_SYSCLK_GPU_RTC_TOGGLE, "gpu_rtc_toggle", 0, 12, JH7110_SYSCLK_OSC),
--	JH71X0_GATE(JH7110_SYSCLK_NOC_BUS_GPU_AXI, "noc_bus_gpu_axi", 0, JH7110_SYSCLK_GPU_CORE),
-+	STARFIVE__DIV(JH7110_SYSCLK_GPU_CORE, "gpu_core", 7, JH7110_SYSCLK_GPU_ROOT),
-+	STARFIVE_GATE(JH7110_SYSCLK_GPU_CORE_CLK, "gpu_core_clk", 0, JH7110_SYSCLK_GPU_CORE),
-+	STARFIVE_GATE(JH7110_SYSCLK_GPU_SYS_CLK, "gpu_sys_clk", 0, JH7110_SYSCLK_ISP_AXI),
-+	STARFIVE_GATE(JH7110_SYSCLK_GPU_APB, "gpu_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GDIV(JH7110_SYSCLK_GPU_RTC_TOGGLE, "gpu_rtc_toggle", 0, 12, JH7110_SYSCLK_OSC),
-+	STARFIVE_GATE(JH7110_SYSCLK_NOC_BUS_GPU_AXI, "noc_bus_gpu_axi", 0, JH7110_SYSCLK_GPU_CORE),
- 	/* isp */
--	JH71X0_GATE(JH7110_SYSCLK_ISP_TOP_CORE, "isp_top_core", 0, JH7110_SYSCLK_ISP_2X),
--	JH71X0_GATE(JH7110_SYSCLK_ISP_TOP_AXI, "isp_top_axi", 0, JH7110_SYSCLK_ISP_AXI),
--	JH71X0_GATE(JH7110_SYSCLK_NOC_BUS_ISP_AXI, "noc_bus_isp_axi", CLK_IS_CRITICAL,
--		    JH7110_SYSCLK_ISP_AXI),
-+	STARFIVE_GATE(JH7110_SYSCLK_ISP_TOP_CORE, "isp_top_core", 0, JH7110_SYSCLK_ISP_2X),
-+	STARFIVE_GATE(JH7110_SYSCLK_ISP_TOP_AXI, "isp_top_axi", 0, JH7110_SYSCLK_ISP_AXI),
-+	STARFIVE_GATE(JH7110_SYSCLK_NOC_BUS_ISP_AXI, "noc_bus_isp_axi", CLK_IS_CRITICAL,
-+		      JH7110_SYSCLK_ISP_AXI),
- 	/* hifi4 */
--	JH71X0__DIV(JH7110_SYSCLK_HIFI4_CORE, "hifi4_core", 15, JH7110_SYSCLK_BUS_ROOT),
--	JH71X0__DIV(JH7110_SYSCLK_HIFI4_AXI, "hifi4_axi", 2, JH7110_SYSCLK_HIFI4_CORE),
-+	STARFIVE__DIV(JH7110_SYSCLK_HIFI4_CORE, "hifi4_core", 15, JH7110_SYSCLK_BUS_ROOT),
-+	STARFIVE__DIV(JH7110_SYSCLK_HIFI4_AXI, "hifi4_axi", 2, JH7110_SYSCLK_HIFI4_CORE),
- 	/* axi_cfg1 */
--	JH71X0_GATE(JH7110_SYSCLK_AXI_CFG1_MAIN, "axi_cfg1_main", CLK_IS_CRITICAL,
--		    JH7110_SYSCLK_ISP_AXI),
--	JH71X0_GATE(JH7110_SYSCLK_AXI_CFG1_AHB, "axi_cfg1_ahb", CLK_IS_CRITICAL,
--		    JH7110_SYSCLK_AHB0),
-+	STARFIVE_GATE(JH7110_SYSCLK_AXI_CFG1_MAIN, "axi_cfg1_main", CLK_IS_CRITICAL,
-+		      JH7110_SYSCLK_ISP_AXI),
-+	STARFIVE_GATE(JH7110_SYSCLK_AXI_CFG1_AHB, "axi_cfg1_ahb", CLK_IS_CRITICAL,
-+		      JH7110_SYSCLK_AHB0),
- 	/* vout */
--	JH71X0_GATE(JH7110_SYSCLK_VOUT_SRC, "vout_src", 0, JH7110_SYSCLK_PLL2_OUT),
--	JH71X0__DIV(JH7110_SYSCLK_VOUT_AXI, "vout_axi", 7, JH7110_SYSCLK_PLL2_OUT),
--	JH71X0_GATE(JH7110_SYSCLK_NOC_BUS_DISP_AXI, "noc_bus_disp_axi", 0, JH7110_SYSCLK_VOUT_AXI),
--	JH71X0_GATE(JH7110_SYSCLK_VOUT_TOP_AHB, "vout_top_ahb", 0, JH7110_SYSCLK_AHB1),
--	JH71X0_GATE(JH7110_SYSCLK_VOUT_TOP_AXI, "vout_top_axi", 0, JH7110_SYSCLK_VOUT_AXI),
--	JH71X0_GATE(JH7110_SYSCLK_VOUT_TOP_HDMITX0_MCLK, "vout_top_hdmitx0_mclk", 0,
--		    JH7110_SYSCLK_MCLK),
--	JH71X0__DIV(JH7110_SYSCLK_VOUT_TOP_MIPIPHY_REF, "vout_top_mipiphy_ref", 2,
--		    JH7110_SYSCLK_OSC),
-+	STARFIVE_GATE(JH7110_SYSCLK_VOUT_SRC, "vout_src", 0, JH7110_SYSCLK_PLL2_OUT),
-+	STARFIVE__DIV(JH7110_SYSCLK_VOUT_AXI, "vout_axi", 7, JH7110_SYSCLK_PLL2_OUT),
-+	STARFIVE_GATE(JH7110_SYSCLK_NOC_BUS_DISP_AXI, "noc_bus_disp_axi", 0,
-+		      JH7110_SYSCLK_VOUT_AXI),
-+	STARFIVE_GATE(JH7110_SYSCLK_VOUT_TOP_AHB, "vout_top_ahb", 0, JH7110_SYSCLK_AHB1),
-+	STARFIVE_GATE(JH7110_SYSCLK_VOUT_TOP_AXI, "vout_top_axi", 0, JH7110_SYSCLK_VOUT_AXI),
-+	STARFIVE_GATE(JH7110_SYSCLK_VOUT_TOP_HDMITX0_MCLK, "vout_top_hdmitx0_mclk", 0,
-+		      JH7110_SYSCLK_MCLK),
-+	STARFIVE__DIV(JH7110_SYSCLK_VOUT_TOP_MIPIPHY_REF, "vout_top_mipiphy_ref", 2,
-+		      JH7110_SYSCLK_OSC),
- 	/* jpegc */
--	JH71X0__DIV(JH7110_SYSCLK_JPEGC_AXI, "jpegc_axi", 16, JH7110_SYSCLK_PLL2_OUT),
--	JH71X0_GATE(JH7110_SYSCLK_CODAJ12_AXI, "codaj12_axi", 0, JH7110_SYSCLK_JPEGC_AXI),
--	JH71X0_GDIV(JH7110_SYSCLK_CODAJ12_CORE, "codaj12_core", 0, 16, JH7110_SYSCLK_PLL2_OUT),
--	JH71X0_GATE(JH7110_SYSCLK_CODAJ12_APB, "codaj12_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE__DIV(JH7110_SYSCLK_JPEGC_AXI, "jpegc_axi", 16, JH7110_SYSCLK_PLL2_OUT),
-+	STARFIVE_GATE(JH7110_SYSCLK_CODAJ12_AXI, "codaj12_axi", 0, JH7110_SYSCLK_JPEGC_AXI),
-+	STARFIVE_GDIV(JH7110_SYSCLK_CODAJ12_CORE, "codaj12_core", 0, 16, JH7110_SYSCLK_PLL2_OUT),
-+	STARFIVE_GATE(JH7110_SYSCLK_CODAJ12_APB, "codaj12_apb", 0, JH7110_SYSCLK_APB_BUS),
- 	/* vdec */
--	JH71X0__DIV(JH7110_SYSCLK_VDEC_AXI, "vdec_axi", 7, JH7110_SYSCLK_BUS_ROOT),
--	JH71X0_GATE(JH7110_SYSCLK_WAVE511_AXI, "wave511_axi", 0, JH7110_SYSCLK_VDEC_AXI),
--	JH71X0_GDIV(JH7110_SYSCLK_WAVE511_BPU, "wave511_bpu", 0, 7, JH7110_SYSCLK_BUS_ROOT),
--	JH71X0_GDIV(JH7110_SYSCLK_WAVE511_VCE, "wave511_vce", 0, 7, JH7110_SYSCLK_PLL0_OUT),
--	JH71X0_GATE(JH7110_SYSCLK_WAVE511_APB, "wave511_apb", 0, JH7110_SYSCLK_APB_BUS),
--	JH71X0_GATE(JH7110_SYSCLK_VDEC_JPG, "vdec_jpg", 0, JH7110_SYSCLK_JPEGC_AXI),
--	JH71X0_GATE(JH7110_SYSCLK_VDEC_MAIN, "vdec_main", 0, JH7110_SYSCLK_VDEC_AXI),
--	JH71X0_GATE(JH7110_SYSCLK_NOC_BUS_VDEC_AXI, "noc_bus_vdec_axi", 0, JH7110_SYSCLK_VDEC_AXI),
-+	STARFIVE__DIV(JH7110_SYSCLK_VDEC_AXI, "vdec_axi", 7, JH7110_SYSCLK_BUS_ROOT),
-+	STARFIVE_GATE(JH7110_SYSCLK_WAVE511_AXI, "wave511_axi", 0, JH7110_SYSCLK_VDEC_AXI),
-+	STARFIVE_GDIV(JH7110_SYSCLK_WAVE511_BPU, "wave511_bpu", 0, 7, JH7110_SYSCLK_BUS_ROOT),
-+	STARFIVE_GDIV(JH7110_SYSCLK_WAVE511_VCE, "wave511_vce", 0, 7, JH7110_SYSCLK_PLL0_OUT),
-+	STARFIVE_GATE(JH7110_SYSCLK_WAVE511_APB, "wave511_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_SYSCLK_VDEC_JPG, "vdec_jpg", 0, JH7110_SYSCLK_JPEGC_AXI),
-+	STARFIVE_GATE(JH7110_SYSCLK_VDEC_MAIN, "vdec_main", 0, JH7110_SYSCLK_VDEC_AXI),
-+	STARFIVE_GATE(JH7110_SYSCLK_NOC_BUS_VDEC_AXI, "noc_bus_vdec_axi", 0,
-+		      JH7110_SYSCLK_VDEC_AXI),
- 	/* venc */
--	JH71X0__DIV(JH7110_SYSCLK_VENC_AXI, "venc_axi", 15, JH7110_SYSCLK_PLL2_OUT),
--	JH71X0_GATE(JH7110_SYSCLK_WAVE420L_AXI, "wave420l_axi", 0, JH7110_SYSCLK_VENC_AXI),
--	JH71X0_GDIV(JH7110_SYSCLK_WAVE420L_BPU, "wave420l_bpu", 0, 15, JH7110_SYSCLK_PLL2_OUT),
--	JH71X0_GDIV(JH7110_SYSCLK_WAVE420L_VCE, "wave420l_vce", 0, 15, JH7110_SYSCLK_PLL2_OUT),
--	JH71X0_GATE(JH7110_SYSCLK_WAVE420L_APB, "wave420l_apb", 0, JH7110_SYSCLK_APB_BUS),
--	JH71X0_GATE(JH7110_SYSCLK_NOC_BUS_VENC_AXI, "noc_bus_venc_axi", 0, JH7110_SYSCLK_VENC_AXI),
-+	STARFIVE__DIV(JH7110_SYSCLK_VENC_AXI, "venc_axi", 15, JH7110_SYSCLK_PLL2_OUT),
-+	STARFIVE_GATE(JH7110_SYSCLK_WAVE420L_AXI, "wave420l_axi", 0, JH7110_SYSCLK_VENC_AXI),
-+	STARFIVE_GDIV(JH7110_SYSCLK_WAVE420L_BPU, "wave420l_bpu", 0, 15, JH7110_SYSCLK_PLL2_OUT),
-+	STARFIVE_GDIV(JH7110_SYSCLK_WAVE420L_VCE, "wave420l_vce", 0, 15, JH7110_SYSCLK_PLL2_OUT),
-+	STARFIVE_GATE(JH7110_SYSCLK_WAVE420L_APB, "wave420l_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_SYSCLK_NOC_BUS_VENC_AXI, "noc_bus_venc_axi", 0,
-+		      JH7110_SYSCLK_VENC_AXI),
- 	/* axi_cfg0 */
--	JH71X0_GATE(JH7110_SYSCLK_AXI_CFG0_MAIN_DIV, "axi_cfg0_main_div", CLK_IS_CRITICAL,
--		    JH7110_SYSCLK_AHB1),
--	JH71X0_GATE(JH7110_SYSCLK_AXI_CFG0_MAIN, "axi_cfg0_main", CLK_IS_CRITICAL,
--		    JH7110_SYSCLK_AXI_CFG0),
--	JH71X0_GATE(JH7110_SYSCLK_AXI_CFG0_HIFI4, "axi_cfg0_hifi4", CLK_IS_CRITICAL,
--		    JH7110_SYSCLK_HIFI4_AXI),
-+	STARFIVE_GATE(JH7110_SYSCLK_AXI_CFG0_MAIN_DIV, "axi_cfg0_main_div", CLK_IS_CRITICAL,
-+		      JH7110_SYSCLK_AHB1),
-+	STARFIVE_GATE(JH7110_SYSCLK_AXI_CFG0_MAIN, "axi_cfg0_main", CLK_IS_CRITICAL,
-+		      JH7110_SYSCLK_AXI_CFG0),
-+	STARFIVE_GATE(JH7110_SYSCLK_AXI_CFG0_HIFI4, "axi_cfg0_hifi4", CLK_IS_CRITICAL,
-+		      JH7110_SYSCLK_HIFI4_AXI),
- 	/* intmem */
--	JH71X0_GATE(JH7110_SYSCLK_AXIMEM2_AXI, "aximem2_axi", 0, JH7110_SYSCLK_AXI_CFG0),
-+	STARFIVE_GATE(JH7110_SYSCLK_AXIMEM2_AXI, "aximem2_axi", 0, JH7110_SYSCLK_AXI_CFG0),
- 	/* qspi */
--	JH71X0_GATE(JH7110_SYSCLK_QSPI_AHB, "qspi_ahb", 0, JH7110_SYSCLK_AHB1),
--	JH71X0_GATE(JH7110_SYSCLK_QSPI_APB, "qspi_apb", 0, JH7110_SYSCLK_APB_BUS),
--	JH71X0__DIV(JH7110_SYSCLK_QSPI_REF_SRC, "qspi_ref_src", 16, JH7110_SYSCLK_PLL0_OUT),
--	JH71X0_GMUX(JH7110_SYSCLK_QSPI_REF, "qspi_ref", 0, 2,
--		    JH7110_SYSCLK_OSC,
--		    JH7110_SYSCLK_QSPI_REF_SRC),
-+	STARFIVE_GATE(JH7110_SYSCLK_QSPI_AHB, "qspi_ahb", 0, JH7110_SYSCLK_AHB1),
-+	STARFIVE_GATE(JH7110_SYSCLK_QSPI_APB, "qspi_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE__DIV(JH7110_SYSCLK_QSPI_REF_SRC, "qspi_ref_src", 16, JH7110_SYSCLK_PLL0_OUT),
-+	STARFIVE_GMUX(JH7110_SYSCLK_QSPI_REF, "qspi_ref", 0, 2,
-+		      JH7110_SYSCLK_OSC,
-+		      JH7110_SYSCLK_QSPI_REF_SRC),
- 	/* sdio */
--	JH71X0_GATE(JH7110_SYSCLK_SDIO0_AHB, "sdio0_ahb", 0, JH7110_SYSCLK_AHB0),
--	JH71X0_GATE(JH7110_SYSCLK_SDIO1_AHB, "sdio1_ahb", 0, JH7110_SYSCLK_AHB0),
--	JH71X0_GDIV(JH7110_SYSCLK_SDIO0_SDCARD, "sdio0_sdcard", 0, 15, JH7110_SYSCLK_AXI_CFG0),
--	JH71X0_GDIV(JH7110_SYSCLK_SDIO1_SDCARD, "sdio1_sdcard", 0, 15, JH7110_SYSCLK_AXI_CFG0),
-+	STARFIVE_GATE(JH7110_SYSCLK_SDIO0_AHB, "sdio0_ahb", 0, JH7110_SYSCLK_AHB0),
-+	STARFIVE_GATE(JH7110_SYSCLK_SDIO1_AHB, "sdio1_ahb", 0, JH7110_SYSCLK_AHB0),
-+	STARFIVE_GDIV(JH7110_SYSCLK_SDIO0_SDCARD, "sdio0_sdcard", 0, 15, JH7110_SYSCLK_AXI_CFG0),
-+	STARFIVE_GDIV(JH7110_SYSCLK_SDIO1_SDCARD, "sdio1_sdcard", 0, 15, JH7110_SYSCLK_AXI_CFG0),
- 	/* stg */
--	JH71X0__DIV(JH7110_SYSCLK_USB_125M, "usb_125m", 15, JH7110_SYSCLK_PLL0_OUT),
--	JH71X0_GATE(JH7110_SYSCLK_NOC_BUS_STG_AXI, "noc_bus_stg_axi", CLK_IS_CRITICAL,
--		    JH7110_SYSCLK_NOCSTG_BUS),
-+	STARFIVE__DIV(JH7110_SYSCLK_USB_125M, "usb_125m", 15, JH7110_SYSCLK_PLL0_OUT),
-+	STARFIVE_GATE(JH7110_SYSCLK_NOC_BUS_STG_AXI, "noc_bus_stg_axi", CLK_IS_CRITICAL,
-+		      JH7110_SYSCLK_NOCSTG_BUS),
- 	/* gmac1 */
--	JH71X0_GATE(JH7110_SYSCLK_GMAC1_AHB, "gmac1_ahb", 0, JH7110_SYSCLK_AHB0),
--	JH71X0_GATE(JH7110_SYSCLK_GMAC1_AXI, "gmac1_axi", 0, JH7110_SYSCLK_STG_AXIAHB),
--	JH71X0__DIV(JH7110_SYSCLK_GMAC_SRC, "gmac_src", 7, JH7110_SYSCLK_PLL0_OUT),
--	JH71X0__DIV(JH7110_SYSCLK_GMAC1_GTXCLK, "gmac1_gtxclk", 15, JH7110_SYSCLK_PLL0_OUT),
--	JH71X0__DIV(JH7110_SYSCLK_GMAC1_RMII_RTX, "gmac1_rmii_rtx", 30,
--		    JH7110_SYSCLK_GMAC1_RMII_REFIN),
--	JH71X0_GDIV(JH7110_SYSCLK_GMAC1_PTP, "gmac1_ptp", 0, 31, JH7110_SYSCLK_GMAC_SRC),
--	JH71X0__MUX(JH7110_SYSCLK_GMAC1_RX, "gmac1_rx", 0, 2,
--		    JH7110_SYSCLK_GMAC1_RGMII_RXIN,
--		    JH7110_SYSCLK_GMAC1_RMII_RTX),
--	JH71X0__INV(JH7110_SYSCLK_GMAC1_RX_INV, "gmac1_rx_inv", JH7110_SYSCLK_GMAC1_RX),
--	JH71X0_GMUX(JH7110_SYSCLK_GMAC1_TX, "gmac1_tx",
--		    CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT, 2,
--		    JH7110_SYSCLK_GMAC1_GTXCLK,
--		    JH7110_SYSCLK_GMAC1_RMII_RTX),
--	JH71X0__INV(JH7110_SYSCLK_GMAC1_TX_INV, "gmac1_tx_inv", JH7110_SYSCLK_GMAC1_TX),
--	JH71X0_GATE(JH7110_SYSCLK_GMAC1_GTXC, "gmac1_gtxc", 0, JH7110_SYSCLK_GMAC1_GTXCLK),
-+	STARFIVE_GATE(JH7110_SYSCLK_GMAC1_AHB, "gmac1_ahb", 0, JH7110_SYSCLK_AHB0),
-+	STARFIVE_GATE(JH7110_SYSCLK_GMAC1_AXI, "gmac1_axi", 0, JH7110_SYSCLK_STG_AXIAHB),
-+	STARFIVE__DIV(JH7110_SYSCLK_GMAC_SRC, "gmac_src", 7, JH7110_SYSCLK_PLL0_OUT),
-+	STARFIVE__DIV(JH7110_SYSCLK_GMAC1_GTXCLK, "gmac1_gtxclk", 15, JH7110_SYSCLK_PLL0_OUT),
-+	STARFIVE__DIV(JH7110_SYSCLK_GMAC1_RMII_RTX, "gmac1_rmii_rtx", 30,
-+		      JH7110_SYSCLK_GMAC1_RMII_REFIN),
-+	STARFIVE_GDIV(JH7110_SYSCLK_GMAC1_PTP, "gmac1_ptp", 0, 31, JH7110_SYSCLK_GMAC_SRC),
-+	STARFIVE__MUX(JH7110_SYSCLK_GMAC1_RX, "gmac1_rx", 0, 2,
-+		      JH7110_SYSCLK_GMAC1_RGMII_RXIN,
-+		      JH7110_SYSCLK_GMAC1_RMII_RTX),
-+	STARFIVE__INV(JH7110_SYSCLK_GMAC1_RX_INV, "gmac1_rx_inv", JH7110_SYSCLK_GMAC1_RX),
-+	STARFIVE_GMUX(JH7110_SYSCLK_GMAC1_TX, "gmac1_tx",
-+		      CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT, 2,
-+		      JH7110_SYSCLK_GMAC1_GTXCLK,
-+		      JH7110_SYSCLK_GMAC1_RMII_RTX),
-+	STARFIVE__INV(JH7110_SYSCLK_GMAC1_TX_INV, "gmac1_tx_inv", JH7110_SYSCLK_GMAC1_TX),
-+	STARFIVE_GATE(JH7110_SYSCLK_GMAC1_GTXC, "gmac1_gtxc", 0, JH7110_SYSCLK_GMAC1_GTXCLK),
- 	/* gmac0 */
--	JH71X0_GDIV(JH7110_SYSCLK_GMAC0_GTXCLK, "gmac0_gtxclk", 0, 15, JH7110_SYSCLK_PLL0_OUT),
--	JH71X0_GDIV(JH7110_SYSCLK_GMAC0_PTP, "gmac0_ptp", 0, 31, JH7110_SYSCLK_GMAC_SRC),
--	JH71X0_GDIV(JH7110_SYSCLK_GMAC_PHY, "gmac_phy", 0, 31, JH7110_SYSCLK_GMAC_SRC),
--	JH71X0_GATE(JH7110_SYSCLK_GMAC0_GTXC, "gmac0_gtxc", 0, JH7110_SYSCLK_GMAC0_GTXCLK),
-+	STARFIVE_GDIV(JH7110_SYSCLK_GMAC0_GTXCLK, "gmac0_gtxclk", 0, 15, JH7110_SYSCLK_PLL0_OUT),
-+	STARFIVE_GDIV(JH7110_SYSCLK_GMAC0_PTP, "gmac0_ptp", 0, 31, JH7110_SYSCLK_GMAC_SRC),
-+	STARFIVE_GDIV(JH7110_SYSCLK_GMAC_PHY, "gmac_phy", 0, 31, JH7110_SYSCLK_GMAC_SRC),
-+	STARFIVE_GATE(JH7110_SYSCLK_GMAC0_GTXC, "gmac0_gtxc", 0, JH7110_SYSCLK_GMAC0_GTXCLK),
- 	/* apb misc */
--	JH71X0_GATE(JH7110_SYSCLK_IOMUX_APB, "iomux_apb", 0, JH7110_SYSCLK_APB_BUS),
--	JH71X0_GATE(JH7110_SYSCLK_MAILBOX_APB, "mailbox_apb", 0, JH7110_SYSCLK_APB_BUS),
--	JH71X0_GATE(JH7110_SYSCLK_INT_CTRL_APB, "int_ctrl_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_SYSCLK_IOMUX_APB, "iomux_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_SYSCLK_MAILBOX_APB, "mailbox_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_SYSCLK_INT_CTRL_APB, "int_ctrl_apb", 0, JH7110_SYSCLK_APB_BUS),
- 	/* can0 */
--	JH71X0_GATE(JH7110_SYSCLK_CAN0_APB, "can0_apb", 0, JH7110_SYSCLK_APB_BUS),
--	JH71X0_GDIV(JH7110_SYSCLK_CAN0_TIMER, "can0_timer", 0, 24, JH7110_SYSCLK_OSC),
--	JH71X0_GDIV(JH7110_SYSCLK_CAN0_CAN, "can0_can", 0, 63, JH7110_SYSCLK_PERH_ROOT),
-+	STARFIVE_GATE(JH7110_SYSCLK_CAN0_APB, "can0_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GDIV(JH7110_SYSCLK_CAN0_TIMER, "can0_timer", 0, 24, JH7110_SYSCLK_OSC),
-+	STARFIVE_GDIV(JH7110_SYSCLK_CAN0_CAN, "can0_can", 0, 63, JH7110_SYSCLK_PERH_ROOT),
- 	/* can1 */
--	JH71X0_GATE(JH7110_SYSCLK_CAN1_APB, "can1_apb", 0, JH7110_SYSCLK_APB_BUS),
--	JH71X0_GDIV(JH7110_SYSCLK_CAN1_TIMER, "can1_timer", 0, 24, JH7110_SYSCLK_OSC),
--	JH71X0_GDIV(JH7110_SYSCLK_CAN1_CAN, "can1_can", 0, 63, JH7110_SYSCLK_PERH_ROOT),
-+	STARFIVE_GATE(JH7110_SYSCLK_CAN1_APB, "can1_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GDIV(JH7110_SYSCLK_CAN1_TIMER, "can1_timer", 0, 24, JH7110_SYSCLK_OSC),
-+	STARFIVE_GDIV(JH7110_SYSCLK_CAN1_CAN, "can1_can", 0, 63, JH7110_SYSCLK_PERH_ROOT),
- 	/* pwm */
--	JH71X0_GATE(JH7110_SYSCLK_PWM_APB, "pwm_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_SYSCLK_PWM_APB, "pwm_apb", 0, JH7110_SYSCLK_APB_BUS),
- 	/* wdt */
--	JH71X0_GATE(JH7110_SYSCLK_WDT_APB, "wdt_apb", 0, JH7110_SYSCLK_APB_BUS),
--	JH71X0_GATE(JH7110_SYSCLK_WDT_CORE, "wdt_core", 0, JH7110_SYSCLK_OSC),
-+	STARFIVE_GATE(JH7110_SYSCLK_WDT_APB, "wdt_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_SYSCLK_WDT_CORE, "wdt_core", 0, JH7110_SYSCLK_OSC),
- 	/* timer */
--	JH71X0_GATE(JH7110_SYSCLK_TIMER_APB, "timer_apb", 0, JH7110_SYSCLK_APB_BUS),
--	JH71X0_GATE(JH7110_SYSCLK_TIMER0, "timer0", 0, JH7110_SYSCLK_OSC),
--	JH71X0_GATE(JH7110_SYSCLK_TIMER1, "timer1", 0, JH7110_SYSCLK_OSC),
--	JH71X0_GATE(JH7110_SYSCLK_TIMER2, "timer2", 0, JH7110_SYSCLK_OSC),
--	JH71X0_GATE(JH7110_SYSCLK_TIMER3, "timer3", 0, JH7110_SYSCLK_OSC),
-+	STARFIVE_GATE(JH7110_SYSCLK_TIMER_APB, "timer_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_SYSCLK_TIMER0, "timer0", 0, JH7110_SYSCLK_OSC),
-+	STARFIVE_GATE(JH7110_SYSCLK_TIMER1, "timer1", 0, JH7110_SYSCLK_OSC),
-+	STARFIVE_GATE(JH7110_SYSCLK_TIMER2, "timer2", 0, JH7110_SYSCLK_OSC),
-+	STARFIVE_GATE(JH7110_SYSCLK_TIMER3, "timer3", 0, JH7110_SYSCLK_OSC),
- 	/* temp sensor */
--	JH71X0_GATE(JH7110_SYSCLK_TEMP_APB, "temp_apb", 0, JH7110_SYSCLK_APB_BUS),
--	JH71X0_GDIV(JH7110_SYSCLK_TEMP_CORE, "temp_core", 0, 24, JH7110_SYSCLK_OSC),
-+	STARFIVE_GATE(JH7110_SYSCLK_TEMP_APB, "temp_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GDIV(JH7110_SYSCLK_TEMP_CORE, "temp_core", 0, 24, JH7110_SYSCLK_OSC),
- 	/* spi */
--	JH71X0_GATE(JH7110_SYSCLK_SPI0_APB, "spi0_apb", 0, JH7110_SYSCLK_APB0),
--	JH71X0_GATE(JH7110_SYSCLK_SPI1_APB, "spi1_apb", 0, JH7110_SYSCLK_APB0),
--	JH71X0_GATE(JH7110_SYSCLK_SPI2_APB, "spi2_apb", 0, JH7110_SYSCLK_APB0),
--	JH71X0_GATE(JH7110_SYSCLK_SPI3_APB, "spi3_apb", 0, JH7110_SYSCLK_APB_BUS),
--	JH71X0_GATE(JH7110_SYSCLK_SPI4_APB, "spi4_apb", 0, JH7110_SYSCLK_APB_BUS),
--	JH71X0_GATE(JH7110_SYSCLK_SPI5_APB, "spi5_apb", 0, JH7110_SYSCLK_APB_BUS),
--	JH71X0_GATE(JH7110_SYSCLK_SPI6_APB, "spi6_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_SYSCLK_SPI0_APB, "spi0_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GATE(JH7110_SYSCLK_SPI1_APB, "spi1_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GATE(JH7110_SYSCLK_SPI2_APB, "spi2_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GATE(JH7110_SYSCLK_SPI3_APB, "spi3_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_SYSCLK_SPI4_APB, "spi4_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_SYSCLK_SPI5_APB, "spi5_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_SYSCLK_SPI6_APB, "spi6_apb", 0, JH7110_SYSCLK_APB_BUS),
- 	/* i2c */
--	JH71X0_GATE(JH7110_SYSCLK_I2C0_APB, "i2c0_apb", 0, JH7110_SYSCLK_APB0),
--	JH71X0_GATE(JH7110_SYSCLK_I2C1_APB, "i2c1_apb", 0, JH7110_SYSCLK_APB0),
--	JH71X0_GATE(JH7110_SYSCLK_I2C2_APB, "i2c2_apb", 0, JH7110_SYSCLK_APB0),
--	JH71X0_GATE(JH7110_SYSCLK_I2C3_APB, "i2c3_apb", 0, JH7110_SYSCLK_APB_BUS),
--	JH71X0_GATE(JH7110_SYSCLK_I2C4_APB, "i2c4_apb", 0, JH7110_SYSCLK_APB_BUS),
--	JH71X0_GATE(JH7110_SYSCLK_I2C5_APB, "i2c5_apb", 0, JH7110_SYSCLK_APB_BUS),
--	JH71X0_GATE(JH7110_SYSCLK_I2C6_APB, "i2c6_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_SYSCLK_I2C0_APB, "i2c0_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GATE(JH7110_SYSCLK_I2C1_APB, "i2c1_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GATE(JH7110_SYSCLK_I2C2_APB, "i2c2_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GATE(JH7110_SYSCLK_I2C3_APB, "i2c3_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_SYSCLK_I2C4_APB, "i2c4_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_SYSCLK_I2C5_APB, "i2c5_apb", 0, JH7110_SYSCLK_APB_BUS),
-+	STARFIVE_GATE(JH7110_SYSCLK_I2C6_APB, "i2c6_apb", 0, JH7110_SYSCLK_APB_BUS),
- 	/* uart */
--	JH71X0_GATE(JH7110_SYSCLK_UART0_APB, "uart0_apb", 0, JH7110_SYSCLK_APB0),
--	JH71X0_GATE(JH7110_SYSCLK_UART0_CORE, "uart0_core", 0, JH7110_SYSCLK_OSC),
--	JH71X0_GATE(JH7110_SYSCLK_UART1_APB, "uart1_apb", 0, JH7110_SYSCLK_APB0),
--	JH71X0_GATE(JH7110_SYSCLK_UART1_CORE, "uart1_core", 0, JH7110_SYSCLK_OSC),
--	JH71X0_GATE(JH7110_SYSCLK_UART2_APB, "uart2_apb", 0, JH7110_SYSCLK_APB0),
--	JH71X0_GATE(JH7110_SYSCLK_UART2_CORE, "uart2_core", 0, JH7110_SYSCLK_OSC),
--	JH71X0_GATE(JH7110_SYSCLK_UART3_APB, "uart3_apb", 0, JH7110_SYSCLK_APB0),
--	JH71X0_GDIV(JH7110_SYSCLK_UART3_CORE, "uart3_core", 0, 10, JH7110_SYSCLK_PERH_ROOT),
--	JH71X0_GATE(JH7110_SYSCLK_UART4_APB, "uart4_apb", 0, JH7110_SYSCLK_APB0),
--	JH71X0_GDIV(JH7110_SYSCLK_UART4_CORE, "uart4_core", 0, 10, JH7110_SYSCLK_PERH_ROOT),
--	JH71X0_GATE(JH7110_SYSCLK_UART5_APB, "uart5_apb", 0, JH7110_SYSCLK_APB0),
--	JH71X0_GDIV(JH7110_SYSCLK_UART5_CORE, "uart5_core", 0, 10, JH7110_SYSCLK_PERH_ROOT),
-+	STARFIVE_GATE(JH7110_SYSCLK_UART0_APB, "uart0_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GATE(JH7110_SYSCLK_UART0_CORE, "uart0_core", 0, JH7110_SYSCLK_OSC),
-+	STARFIVE_GATE(JH7110_SYSCLK_UART1_APB, "uart1_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GATE(JH7110_SYSCLK_UART1_CORE, "uart1_core", 0, JH7110_SYSCLK_OSC),
-+	STARFIVE_GATE(JH7110_SYSCLK_UART2_APB, "uart2_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GATE(JH7110_SYSCLK_UART2_CORE, "uart2_core", 0, JH7110_SYSCLK_OSC),
-+	STARFIVE_GATE(JH7110_SYSCLK_UART3_APB, "uart3_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GDIV(JH7110_SYSCLK_UART3_CORE, "uart3_core", 0, 10, JH7110_SYSCLK_PERH_ROOT),
-+	STARFIVE_GATE(JH7110_SYSCLK_UART4_APB, "uart4_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GDIV(JH7110_SYSCLK_UART4_CORE, "uart4_core", 0, 10, JH7110_SYSCLK_PERH_ROOT),
-+	STARFIVE_GATE(JH7110_SYSCLK_UART5_APB, "uart5_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GDIV(JH7110_SYSCLK_UART5_CORE, "uart5_core", 0, 10, JH7110_SYSCLK_PERH_ROOT),
- 	/* pwmdac */
--	JH71X0_GATE(JH7110_SYSCLK_PWMDAC_APB, "pwmdac_apb", 0, JH7110_SYSCLK_APB0),
--	JH71X0_GDIV(JH7110_SYSCLK_PWMDAC_CORE, "pwmdac_core", 0, 256, JH7110_SYSCLK_AUDIO_ROOT),
-+	STARFIVE_GATE(JH7110_SYSCLK_PWMDAC_APB, "pwmdac_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GDIV(JH7110_SYSCLK_PWMDAC_CORE, "pwmdac_core", 0, 256, JH7110_SYSCLK_AUDIO_ROOT),
- 	/* spdif */
--	JH71X0_GATE(JH7110_SYSCLK_SPDIF_APB, "spdif_apb", 0, JH7110_SYSCLK_APB0),
--	JH71X0_GATE(JH7110_SYSCLK_SPDIF_CORE, "spdif_core", 0, JH7110_SYSCLK_MCLK),
-+	STARFIVE_GATE(JH7110_SYSCLK_SPDIF_APB, "spdif_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GATE(JH7110_SYSCLK_SPDIF_CORE, "spdif_core", 0, JH7110_SYSCLK_MCLK),
- 	/* i2stx0 */
--	JH71X0_GATE(JH7110_SYSCLK_I2STX0_APB, "i2stx0_apb", 0, JH7110_SYSCLK_APB0),
--	JH71X0_GDIV(JH7110_SYSCLK_I2STX0_BCLK_MST, "i2stx0_bclk_mst", 0, 32, JH7110_SYSCLK_MCLK),
--	JH71X0__INV(JH7110_SYSCLK_I2STX0_BCLK_MST_INV, "i2stx0_bclk_mst_inv",
--		    JH7110_SYSCLK_I2STX0_BCLK_MST),
--	JH71X0_MDIV(JH7110_SYSCLK_I2STX0_LRCK_MST, "i2stx0_lrck_mst", 64, 2,
--		    JH7110_SYSCLK_I2STX0_BCLK_MST_INV,
--		    JH7110_SYSCLK_I2STX0_BCLK_MST),
--	JH71X0__MUX(JH7110_SYSCLK_I2STX0_BCLK, "i2stx0_bclk", 0, 2,
--		    JH7110_SYSCLK_I2STX0_BCLK_MST,
--		    JH7110_SYSCLK_I2STX_BCLK_EXT),
--	JH71X0__INV(JH7110_SYSCLK_I2STX0_BCLK_INV, "i2stx0_bclk_inv", JH7110_SYSCLK_I2STX0_BCLK),
--	JH71X0__MUX(JH7110_SYSCLK_I2STX0_LRCK, "i2stx0_lrck", 0, 2,
--		    JH7110_SYSCLK_I2STX0_LRCK_MST,
--		    JH7110_SYSCLK_I2STX_LRCK_EXT),
-+	STARFIVE_GATE(JH7110_SYSCLK_I2STX0_APB, "i2stx0_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GDIV(JH7110_SYSCLK_I2STX0_BCLK_MST, "i2stx0_bclk_mst", 0, 32, JH7110_SYSCLK_MCLK),
-+	STARFIVE__INV(JH7110_SYSCLK_I2STX0_BCLK_MST_INV, "i2stx0_bclk_mst_inv",
-+		      JH7110_SYSCLK_I2STX0_BCLK_MST),
-+	STARFIVE_MDIV(JH7110_SYSCLK_I2STX0_LRCK_MST, "i2stx0_lrck_mst", 64, 2,
-+		      JH7110_SYSCLK_I2STX0_BCLK_MST_INV,
-+		      JH7110_SYSCLK_I2STX0_BCLK_MST),
-+	STARFIVE__MUX(JH7110_SYSCLK_I2STX0_BCLK, "i2stx0_bclk",	0, 2,
-+		      JH7110_SYSCLK_I2STX0_BCLK_MST,
-+		      JH7110_SYSCLK_I2STX_BCLK_EXT),
-+	STARFIVE__INV(JH7110_SYSCLK_I2STX0_BCLK_INV, "i2stx0_bclk_inv", JH7110_SYSCLK_I2STX0_BCLK),
-+	STARFIVE__MUX(JH7110_SYSCLK_I2STX0_LRCK, "i2stx0_lrck", 0, 2,
-+		      JH7110_SYSCLK_I2STX0_LRCK_MST,
-+		      JH7110_SYSCLK_I2STX_LRCK_EXT),
- 	/* i2stx1 */
--	JH71X0_GATE(JH7110_SYSCLK_I2STX1_APB, "i2stx1_apb", 0, JH7110_SYSCLK_APB0),
--	JH71X0_GDIV(JH7110_SYSCLK_I2STX1_BCLK_MST, "i2stx1_bclk_mst", 0, 32, JH7110_SYSCLK_MCLK),
--	JH71X0__INV(JH7110_SYSCLK_I2STX1_BCLK_MST_INV, "i2stx1_bclk_mst_inv",
--		    JH7110_SYSCLK_I2STX1_BCLK_MST),
--	JH71X0_MDIV(JH7110_SYSCLK_I2STX1_LRCK_MST, "i2stx1_lrck_mst", 64, 2,
--		    JH7110_SYSCLK_I2STX1_BCLK_MST_INV,
--		    JH7110_SYSCLK_I2STX1_BCLK_MST),
--	JH71X0__MUX(JH7110_SYSCLK_I2STX1_BCLK, "i2stx1_bclk", 0, 2,
--		    JH7110_SYSCLK_I2STX1_BCLK_MST,
--		    JH7110_SYSCLK_I2STX_BCLK_EXT),
--	JH71X0__INV(JH7110_SYSCLK_I2STX1_BCLK_INV, "i2stx1_bclk_inv", JH7110_SYSCLK_I2STX1_BCLK),
--	JH71X0__MUX(JH7110_SYSCLK_I2STX1_LRCK, "i2stx1_lrck", 0, 2,
--		    JH7110_SYSCLK_I2STX1_LRCK_MST,
--		    JH7110_SYSCLK_I2STX_LRCK_EXT),
-+	STARFIVE_GATE(JH7110_SYSCLK_I2STX1_APB, "i2stx1_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GDIV(JH7110_SYSCLK_I2STX1_BCLK_MST, "i2stx1_bclk_mst", 0, 32, JH7110_SYSCLK_MCLK),
-+	STARFIVE__INV(JH7110_SYSCLK_I2STX1_BCLK_MST_INV, "i2stx1_bclk_mst_inv",
-+		      JH7110_SYSCLK_I2STX1_BCLK_MST),
-+	STARFIVE_MDIV(JH7110_SYSCLK_I2STX1_LRCK_MST, "i2stx1_lrck_mst", 64, 2,
-+		      JH7110_SYSCLK_I2STX1_BCLK_MST_INV,
-+		      JH7110_SYSCLK_I2STX1_BCLK_MST),
-+	STARFIVE__MUX(JH7110_SYSCLK_I2STX1_BCLK, "i2stx1_bclk", 0, 2,
-+		      JH7110_SYSCLK_I2STX1_BCLK_MST,
-+		      JH7110_SYSCLK_I2STX_BCLK_EXT),
-+	STARFIVE__INV(JH7110_SYSCLK_I2STX1_BCLK_INV, "i2stx1_bclk_inv", JH7110_SYSCLK_I2STX1_BCLK),
-+	STARFIVE__MUX(JH7110_SYSCLK_I2STX1_LRCK, "i2stx1_lrck", 0, 2,
-+		      JH7110_SYSCLK_I2STX1_LRCK_MST,
-+		      JH7110_SYSCLK_I2STX_LRCK_EXT),
- 	/* i2srx */
--	JH71X0_GATE(JH7110_SYSCLK_I2SRX_APB, "i2srx_apb", 0, JH7110_SYSCLK_APB0),
--	JH71X0_GDIV(JH7110_SYSCLK_I2SRX_BCLK_MST, "i2srx_bclk_mst", 0, 32, JH7110_SYSCLK_MCLK),
--	JH71X0__INV(JH7110_SYSCLK_I2SRX_BCLK_MST_INV, "i2srx_bclk_mst_inv",
--		    JH7110_SYSCLK_I2SRX_BCLK_MST),
--	JH71X0_MDIV(JH7110_SYSCLK_I2SRX_LRCK_MST, "i2srx_lrck_mst", 64, 2,
--		    JH7110_SYSCLK_I2SRX_BCLK_MST_INV,
--		    JH7110_SYSCLK_I2SRX_BCLK_MST),
--	JH71X0__MUX(JH7110_SYSCLK_I2SRX_BCLK, "i2srx_bclk", 0, 2,
--		    JH7110_SYSCLK_I2SRX_BCLK_MST,
--		    JH7110_SYSCLK_I2SRX_BCLK_EXT),
--	JH71X0__INV(JH7110_SYSCLK_I2SRX_BCLK_INV, "i2srx_bclk_inv", JH7110_SYSCLK_I2SRX_BCLK),
--	JH71X0__MUX(JH7110_SYSCLK_I2SRX_LRCK, "i2srx_lrck", 0, 2,
--		    JH7110_SYSCLK_I2SRX_LRCK_MST,
--		    JH7110_SYSCLK_I2SRX_LRCK_EXT),
-+	STARFIVE_GATE(JH7110_SYSCLK_I2SRX_APB, "i2srx_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GDIV(JH7110_SYSCLK_I2SRX_BCLK_MST, "i2srx_bclk_mst", 0, 32, JH7110_SYSCLK_MCLK),
-+	STARFIVE__INV(JH7110_SYSCLK_I2SRX_BCLK_MST_INV, "i2srx_bclk_mst_inv",
-+		      JH7110_SYSCLK_I2SRX_BCLK_MST),
-+	STARFIVE_MDIV(JH7110_SYSCLK_I2SRX_LRCK_MST, "i2srx_lrck_mst", 64, 2,
-+		      JH7110_SYSCLK_I2SRX_BCLK_MST_INV,
-+		      JH7110_SYSCLK_I2SRX_BCLK_MST),
-+	STARFIVE__MUX(JH7110_SYSCLK_I2SRX_BCLK, "i2srx_bclk", 0, 2,
-+		      JH7110_SYSCLK_I2SRX_BCLK_MST,
-+		      JH7110_SYSCLK_I2SRX_BCLK_EXT),
-+	STARFIVE__INV(JH7110_SYSCLK_I2SRX_BCLK_INV, "i2srx_bclk_inv", JH7110_SYSCLK_I2SRX_BCLK),
-+	STARFIVE__MUX(JH7110_SYSCLK_I2SRX_LRCK, "i2srx_lrck", 0, 2,
-+		      JH7110_SYSCLK_I2SRX_LRCK_MST,
-+		      JH7110_SYSCLK_I2SRX_LRCK_EXT),
- 	/* pdm */
--	JH71X0_GDIV(JH7110_SYSCLK_PDM_DMIC, "pdm_dmic", 0, 64, JH7110_SYSCLK_MCLK),
--	JH71X0_GATE(JH7110_SYSCLK_PDM_APB, "pdm_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GDIV(JH7110_SYSCLK_PDM_DMIC, "pdm_dmic", 0, 64, JH7110_SYSCLK_MCLK),
-+	STARFIVE_GATE(JH7110_SYSCLK_PDM_APB, "pdm_apb", 0, JH7110_SYSCLK_APB0),
- 	/* tdm */
--	JH71X0_GATE(JH7110_SYSCLK_TDM_AHB, "tdm_ahb", 0, JH7110_SYSCLK_AHB0),
--	JH71X0_GATE(JH7110_SYSCLK_TDM_APB, "tdm_apb", 0, JH7110_SYSCLK_APB0),
--	JH71X0_GDIV(JH7110_SYSCLK_TDM_INTERNAL, "tdm_internal", 0, 64, JH7110_SYSCLK_MCLK),
--	JH71X0__MUX(JH7110_SYSCLK_TDM_TDM, "tdm_tdm", 0, 2,
--		    JH7110_SYSCLK_TDM_INTERNAL,
--		    JH7110_SYSCLK_TDM_EXT),
--	JH71X0__INV(JH7110_SYSCLK_TDM_TDM_INV, "tdm_tdm_inv", JH7110_SYSCLK_TDM_TDM),
-+	STARFIVE_GATE(JH7110_SYSCLK_TDM_AHB, "tdm_ahb", 0, JH7110_SYSCLK_AHB0),
-+	STARFIVE_GATE(JH7110_SYSCLK_TDM_APB, "tdm_apb", 0, JH7110_SYSCLK_APB0),
-+	STARFIVE_GDIV(JH7110_SYSCLK_TDM_INTERNAL, "tdm_internal", 0, 64, JH7110_SYSCLK_MCLK),
-+	STARFIVE__MUX(JH7110_SYSCLK_TDM_TDM, "tdm_tdm", 0, 2,
-+		      JH7110_SYSCLK_TDM_INTERNAL,
-+		      JH7110_SYSCLK_TDM_EXT),
-+	STARFIVE__INV(JH7110_SYSCLK_TDM_TDM_INV, "tdm_tdm_inv", JH7110_SYSCLK_TDM_TDM),
- 	/* jtag */
--	JH71X0__DIV(JH7110_SYSCLK_JTAG_CERTIFICATION_TRNG, "jtag_certification_trng", 4,
--		    JH7110_SYSCLK_OSC),
-+	STARFIVE__DIV(JH7110_SYSCLK_JTAG_CERTIFICATION_TRNG, "jtag_certification_trng", 4,
-+		      JH7110_SYSCLK_OSC),
- };
- 
- static void jh7110_reset_unregister_adev(void *_adev)
-@@ -339,7 +342,7 @@ static void jh7110_reset_adev_release(struct device *dev)
- 	kfree(rdev);
- }
- 
--int jh7110_reset_controller_register(struct jh71x0_clk_priv *priv,
-+int jh7110_reset_controller_register(struct starfive_clk_priv *priv,
- 				     const char *adev_name,
- 				     u32 adev_id)
- {
-@@ -383,7 +386,7 @@ EXPORT_SYMBOL_GPL(jh7110_reset_controller_register);
- static int jh7110_pll0_clk_notifier_cb(struct notifier_block *nb,
- 				       unsigned long action, void *data)
- {
--	struct jh71x0_clk_priv *priv = container_of(nb, struct jh71x0_clk_priv, pll_clk_nb);
-+	struct starfive_clk_priv *priv = container_of(nb, struct starfive_clk_priv, pll_clk_nb);
- 	struct clk *cpu_root = priv->reg[JH7110_SYSCLK_CPU_ROOT].hw.clk;
- 	int ret = 0;
- 
-@@ -402,7 +405,7 @@ static int jh7110_pll0_clk_notifier_cb(struct notifier_block *nb,
- 
- static int __init jh7110_syscrg_probe(struct platform_device *pdev)
- {
--	struct jh71x0_clk_priv *priv;
-+	struct starfive_clk_priv *priv;
- 	unsigned int idx;
- 	int ret;
- 	struct clk *pllclk;
-@@ -465,13 +468,13 @@ static int __init jh7110_syscrg_probe(struct platform_device *pdev)
- 		struct clk_parent_data parents[4] = {};
- 		struct clk_init_data init = {
- 			.name = jh7110_sysclk_data[idx].name,
--			.ops = starfive_jh71x0_clk_ops(max),
-+			.ops = starfive_clk_ops(max),
- 			.parent_data = parents,
- 			.num_parents =
--				((max & JH71X0_CLK_MUX_MASK) >> JH71X0_CLK_MUX_SHIFT) + 1,
-+				((max & STARFIVE_CLK_MUX_MASK) >> STARFIVE_CLK_MUX_SHIFT) + 1,
- 			.flags = jh7110_sysclk_data[idx].flags,
- 		};
--		struct jh71x0_clk *clk = &priv->reg[idx];
-+		struct starfive_clk *clk = &priv->reg[idx];
- 		unsigned int i;
- 
- 		for (i = 0; i < init.num_parents; i++) {
-@@ -509,14 +512,14 @@ static int __init jh7110_syscrg_probe(struct platform_device *pdev)
- 
- 		clk->hw.init = &init;
- 		clk->idx = idx;
--		clk->max_div = max & JH71X0_CLK_DIV_MASK;
-+		clk->max_div = max & STARFIVE_CLK_DIV_MASK;
- 
- 		ret = devm_clk_hw_register(&pdev->dev, &clk->hw);
- 		if (ret)
- 			return ret;
- 	}
- 
--	ret = devm_of_clk_add_hw_provider(&pdev->dev, jh71x0_clk_get, priv);
-+	ret = devm_of_clk_add_hw_provider(&pdev->dev, starfive_clk_get, priv);
- 	if (ret)
- 		return ret;
- 
-diff --git a/drivers/clk/starfive/clk-starfive-jh7110-vout.c b/drivers/clk/starfive/clk-starfive-jh7110-vout.c
-index bad20d5d794a..af3916e1a3c1 100644
---- a/drivers/clk/starfive/clk-starfive-jh7110-vout.c
-+++ b/drivers/clk/starfive/clk-starfive-jh7110-vout.c
-@@ -30,45 +30,45 @@ static struct clk_bulk_data jh7110_vout_top_clks[] = {
- 	{ .id = "vout_top_ahb" }
- };
- 
--static const struct jh71x0_clk_data jh7110_voutclk_data[] = {
-+static const struct starfive_clk_data jh7110_voutclk_data[] = {
- 	/* divider */
--	JH71X0__DIV(JH7110_VOUTCLK_APB, "apb", 8, JH7110_VOUTCLK_VOUT_TOP_AHB),
--	JH71X0__DIV(JH7110_VOUTCLK_DC8200_PIX, "dc8200_pix", 63, JH7110_VOUTCLK_VOUT_SRC),
--	JH71X0__DIV(JH7110_VOUTCLK_DSI_SYS, "dsi_sys", 31, JH7110_VOUTCLK_VOUT_SRC),
--	JH71X0__DIV(JH7110_VOUTCLK_TX_ESC, "tx_esc", 31, JH7110_VOUTCLK_VOUT_TOP_AHB),
-+	STARFIVE__DIV(JH7110_VOUTCLK_APB, "apb", 8, JH7110_VOUTCLK_VOUT_TOP_AHB),
-+	STARFIVE__DIV(JH7110_VOUTCLK_DC8200_PIX, "dc8200_pix", 63, JH7110_VOUTCLK_VOUT_SRC),
-+	STARFIVE__DIV(JH7110_VOUTCLK_DSI_SYS, "dsi_sys", 31, JH7110_VOUTCLK_VOUT_SRC),
-+	STARFIVE__DIV(JH7110_VOUTCLK_TX_ESC, "tx_esc", 31, JH7110_VOUTCLK_VOUT_TOP_AHB),
- 	/* dc8200 */
--	JH71X0_GATE(JH7110_VOUTCLK_DC8200_AXI, "dc8200_axi", 0, JH7110_VOUTCLK_VOUT_TOP_AXI),
--	JH71X0_GATE(JH7110_VOUTCLK_DC8200_CORE, "dc8200_core", 0, JH7110_VOUTCLK_VOUT_TOP_AXI),
--	JH71X0_GATE(JH7110_VOUTCLK_DC8200_AHB, "dc8200_ahb", 0, JH7110_VOUTCLK_VOUT_TOP_AHB),
--	JH71X0_GMUX(JH7110_VOUTCLK_DC8200_PIX0, "dc8200_pix0", 0, 2,
--		    JH7110_VOUTCLK_DC8200_PIX,
--		    JH7110_VOUTCLK_HDMITX0_PIXELCLK),
--	JH71X0_GMUX(JH7110_VOUTCLK_DC8200_PIX1, "dc8200_pix1", 0, 2,
--		    JH7110_VOUTCLK_DC8200_PIX,
--		    JH7110_VOUTCLK_HDMITX0_PIXELCLK),
-+	STARFIVE_GATE(JH7110_VOUTCLK_DC8200_AXI, "dc8200_axi", 0, JH7110_VOUTCLK_VOUT_TOP_AXI),
-+	STARFIVE_GATE(JH7110_VOUTCLK_DC8200_CORE, "dc8200_core", 0, JH7110_VOUTCLK_VOUT_TOP_AXI),
-+	STARFIVE_GATE(JH7110_VOUTCLK_DC8200_AHB, "dc8200_ahb", 0, JH7110_VOUTCLK_VOUT_TOP_AHB),
-+	STARFIVE_GMUX(JH7110_VOUTCLK_DC8200_PIX0, "dc8200_pix0", 0, 2,
-+		      JH7110_VOUTCLK_DC8200_PIX,
-+		      JH7110_VOUTCLK_HDMITX0_PIXELCLK),
-+	STARFIVE_GMUX(JH7110_VOUTCLK_DC8200_PIX1, "dc8200_pix1", 0, 2,
-+		      JH7110_VOUTCLK_DC8200_PIX,
-+		      JH7110_VOUTCLK_HDMITX0_PIXELCLK),
- 	/* LCD */
--	JH71X0_GMUX(JH7110_VOUTCLK_DOM_VOUT_TOP_LCD, "dom_vout_top_lcd", 0, 2,
--		    JH7110_VOUTCLK_DC8200_PIX0,
--		    JH7110_VOUTCLK_DC8200_PIX1),
-+	STARFIVE_GMUX(JH7110_VOUTCLK_DOM_VOUT_TOP_LCD, "dom_vout_top_lcd", 0, 2,
-+		      JH7110_VOUTCLK_DC8200_PIX0,
-+		      JH7110_VOUTCLK_DC8200_PIX1),
- 	/* dsiTx */
--	JH71X0_GATE(JH7110_VOUTCLK_DSITX_APB, "dsiTx_apb", 0, JH7110_VOUTCLK_DSI_SYS),
--	JH71X0_GATE(JH7110_VOUTCLK_DSITX_SYS, "dsiTx_sys", 0, JH7110_VOUTCLK_DSI_SYS),
--	JH71X0_GMUX(JH7110_VOUTCLK_DSITX_DPI, "dsiTx_dpi", 0, 2,
--		    JH7110_VOUTCLK_DC8200_PIX,
--		    JH7110_VOUTCLK_HDMITX0_PIXELCLK),
--	JH71X0_GATE(JH7110_VOUTCLK_DSITX_TXESC, "dsiTx_txesc", 0, JH7110_VOUTCLK_TX_ESC),
-+	STARFIVE_GATE(JH7110_VOUTCLK_DSITX_APB, "dsiTx_apb", 0, JH7110_VOUTCLK_DSI_SYS),
-+	STARFIVE_GATE(JH7110_VOUTCLK_DSITX_SYS, "dsiTx_sys", 0, JH7110_VOUTCLK_DSI_SYS),
-+	STARFIVE_GMUX(JH7110_VOUTCLK_DSITX_DPI, "dsiTx_dpi", 0, 2,
-+		      JH7110_VOUTCLK_DC8200_PIX,
-+		      JH7110_VOUTCLK_HDMITX0_PIXELCLK),
-+	STARFIVE_GATE(JH7110_VOUTCLK_DSITX_TXESC, "dsiTx_txesc", 0, JH7110_VOUTCLK_TX_ESC),
- 	/* mipitx DPHY */
--	JH71X0_GATE(JH7110_VOUTCLK_MIPITX_DPHY_TXESC, "mipitx_dphy_txesc", 0,
--		    JH7110_VOUTCLK_TX_ESC),
-+	STARFIVE_GATE(JH7110_VOUTCLK_MIPITX_DPHY_TXESC, "mipitx_dphy_txesc", 0,
-+		      JH7110_VOUTCLK_TX_ESC),
- 	/* hdmi */
--	JH71X0_GATE(JH7110_VOUTCLK_HDMI_TX_MCLK, "hdmi_tx_mclk", 0,
--		    JH7110_VOUTCLK_VOUT_TOP_HDMITX0_MCLK),
--	JH71X0_GATE(JH7110_VOUTCLK_HDMI_TX_BCLK, "hdmi_tx_bclk", 0,
--		    JH7110_VOUTCLK_I2STX0_BCLK),
--	JH71X0_GATE(JH7110_VOUTCLK_HDMI_TX_SYS, "hdmi_tx_sys", 0, JH7110_VOUTCLK_APB),
-+	STARFIVE_GATE(JH7110_VOUTCLK_HDMI_TX_MCLK, "hdmi_tx_mclk", 0,
-+		      JH7110_VOUTCLK_VOUT_TOP_HDMITX0_MCLK),
-+	STARFIVE_GATE(JH7110_VOUTCLK_HDMI_TX_BCLK, "hdmi_tx_bclk", 0,
-+		      JH7110_VOUTCLK_I2STX0_BCLK),
-+	STARFIVE_GATE(JH7110_VOUTCLK_HDMI_TX_SYS, "hdmi_tx_sys", 0, JH7110_VOUTCLK_APB),
- };
- 
--static int jh7110_vout_top_rst_init(struct jh71x0_clk_priv *priv)
-+static int jh7110_vout_top_rst_init(struct starfive_clk_priv *priv)
- {
- 	struct reset_control *top_rst;
- 
-@@ -104,7 +104,7 @@ static const struct dev_pm_ops jh7110_voutcrg_pm_ops = {
- 
- static int jh7110_voutcrg_probe(struct platform_device *pdev)
- {
--	struct jh71x0_clk_priv *priv;
-+	struct starfive_clk_priv *priv;
- 	struct jh7110_top_sysclk *top;
- 	unsigned int idx;
- 	int ret;
-@@ -148,13 +148,13 @@ static int jh7110_voutcrg_probe(struct platform_device *pdev)
- 		struct clk_parent_data parents[4] = {};
- 		struct clk_init_data init = {
- 			.name = jh7110_voutclk_data[idx].name,
--			.ops = starfive_jh71x0_clk_ops(max),
-+			.ops = starfive_clk_ops(max),
- 			.parent_data = parents,
- 			.num_parents =
--				((max & JH71X0_CLK_MUX_MASK) >> JH71X0_CLK_MUX_SHIFT) + 1,
-+				((max & STARFIVE_CLK_MUX_MASK) >> STARFIVE_CLK_MUX_SHIFT) + 1,
- 			.flags = jh7110_voutclk_data[idx].flags,
- 		};
--		struct jh71x0_clk *clk = &priv->reg[idx];
-+		struct starfive_clk *clk = &priv->reg[idx];
- 		unsigned int i;
- 		const char *fw_name[JH7110_VOUTCLK_EXT_END - JH7110_VOUTCLK_END] = {
- 			"vout_src",
-@@ -176,14 +176,14 @@ static int jh7110_voutcrg_probe(struct platform_device *pdev)
- 
- 		clk->hw.init = &init;
- 		clk->idx = idx;
--		clk->max_div = max & JH71X0_CLK_DIV_MASK;
-+		clk->max_div = max & STARFIVE_CLK_DIV_MASK;
- 
- 		ret = devm_clk_hw_register(&pdev->dev, &clk->hw);
- 		if (ret)
- 			goto err_exit;
- 	}
- 
--	ret = devm_of_clk_add_hw_provider(&pdev->dev, jh71x0_clk_get, priv);
-+	ret = devm_of_clk_add_hw_provider(&pdev->dev, starfive_clk_get, priv);
- 	if (ret)
- 		goto err_exit;
- 
-diff --git a/drivers/clk/starfive/clk-starfive-jh7110.h b/drivers/clk/starfive/clk-starfive-jh7110.h
-index 6b1bdf860f00..4a6dfd8d8636 100644
---- a/drivers/clk/starfive/clk-starfive-jh7110.h
-+++ b/drivers/clk/starfive/clk-starfive-jh7110.h
-@@ -10,7 +10,7 @@ struct jh7110_top_sysclk {
- 	int top_clks_num;
- };
- 
--int jh7110_reset_controller_register(struct jh71x0_clk_priv *priv,
-+int jh7110_reset_controller_register(struct starfive_clk_priv *priv,
- 				     const char *adev_name,
- 				     u32 adev_id);
- 
+diff --git a/Documentation/devicetree/bindings/clock/starfive,jhb100-sys0crg.yaml b/Documentation/devicetree/bindings/clock/starfive,jhb100-sys0crg.yaml
+new file mode 100644
+index 000000000000..08016a61992c
+--- /dev/null
++++ b/Documentation/devicetree/bindings/clock/starfive,jhb100-sys0crg.yaml
+@@ -0,0 +1,63 @@
++# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/clock/starfive,jhb100-sys0crg.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: StarFive JHB100 System-0 Clock and Reset Generator
++
++maintainers:
++  - Changhuang Liang <changhuang.liang@starfivetech.com>
++
++properties:
++  compatible:
++    const: starfive,jhb100-sys0crg
++
++  reg:
++    maxItems: 1
++
++  clocks:
++    items:
++      - description: Main Oscillator (25 MHz)
++      - description: PLL0
++      - description: PLL1
++      - description: PLL2
++
++  clock-names:
++    items:
++      - const: osc
++      - const: pll0
++      - const: pll1
++      - const: pll2
++
++  '#clock-cells':
++    const: 1
++    description:
++      See <dt-bindings/clock/starfive,jhb100-crg.h> for valid indices.
++
++  '#reset-cells':
++    const: 1
++    description:
++      See <dt-bindings/reset/starfive-jhb100-crg.h> for valid indices.
++
++required:
++  - compatible
++  - reg
++  - clocks
++  - clock-names
++  - '#clock-cells'
++  - '#reset-cells'
++
++additionalProperties: false
++
++examples:
++  - |
++    clock-controller@13000000 {
++      compatible = "starfive,jhb100-sys0crg";
++      reg = <0x13000000 0x4000>;
++      clocks = <&osc>, <&pll0>, <&pll1>,
++               <&syspll 0>;
++      clock-names = "osc", "pll0", "pll1", "pll2";
++      #clock-cells = <1>;
++      #reset-cells = <1>;
++    };
+diff --git a/include/dt-bindings/clock/starfive,jhb100-crg.h b/include/dt-bindings/clock/starfive,jhb100-crg.h
+new file mode 100644
+index 000000000000..24ef2663f05a
+--- /dev/null
++++ b/include/dt-bindings/clock/starfive,jhb100-crg.h
+@@ -0,0 +1,56 @@
++/* SPDX-License-Identifier: GPL-2.0 OR MIT */
++/*
++ * Copyright (C) 2024 StarFive Technology Co., Ltd.
++ * Author: Changhuang Liang <changhuang.liang@starfivetech.com>
++ *
++ */
++
++#ifndef __DT_BINDINGS_CLOCK_STARFIVE_JHB100_H__
++#define __DT_BINDINGS_CLOCK_STARFIVE_JHB100_H__
++
++/* SYS0CRG clocks */
++#define JHB100_SYS0CLK_BMCPCIERP_NCNOC_MAIN		17
++#define JHB100_SYS0CLK_BMCPCIERP_NCNOC_CFG		18
++
++#define JHB100_SYS0CLK_PCIE_REF_CML			20
++#define JHB100_SYS0CLK_BMCPCIERP_NCNOC_DATA_INIT	21
++#define JHB100_SYS0CLK_BMCPCIERP_NCNOC_CFG_INIT		22
++#define JHB100_SYS0CLK_BMCPCIERP_NCNOC_TARG		23
++
++#define JHB100_SYS0CLK_BMCPCIERP_PCU			26
++#define JHB100_SYS0CLK_HOSTSS0_NCNOC_CFG		27
++#define JHB100_SYS0CLK_HOSTSS0_NCNOC_DATA		28
++#define JHB100_SYS0CLK_HOSTSS0_PHY_SCAN_400		29
++#define JHB100_SYS0CLK_GPIO_ESPI0_EXT			30
++
++#define JHB100_SYS0CLK_BMCUSB_NCNOC_INIT		34
++#define JHB100_SYS0CLK_BMCUSB_NCNOC_TARG		35
++#define JHB100_SYS0CLK_BMCUSB_SCANCLK			36
++#define JHB100_SYS0CLK_BMCUSB_480M_SCANCLK		37
++
++#define JHB100_SYS0CLK_VCE_NCNOC_INIT			50
++#define JHB100_SYS0CLK_VCE_NCNOC_TARG			51
++#define JHB100_SYS0CLK_BMCPER2_NCNOC_INIT		52
++#define JHB100_SYS0CLK_BMCPER2_NCNOC_TARG		53
++#define JHB100_SYS0CLK_BMCPER2_CFG_400			54
++#define JHB100_SYS0CLK_BMCPER2_CFG_125			55
++
++#define JHB100_SYS0CLK_HOSTSS1_NCNOC_DATA		58
++#define JHB100_SYS0CLK_HOSTSS1_PHY_SCAN_400		59
++#define JHB100_SYS0CLK_HOSTSS1_PHY_SCAN_400_ICG_BUF	60
++#define JHB100_SYS0CLK_NPU_NCNOC_INIT			61
++#define JHB100_SYS0CLK_VOUT_NCNOC_INIT			62
++#define JHB100_SYS0CLK_VOUT_AUX				63
++
++#define JHB100_SYS0CLK_BMCPER3_NCNOC_INIT		65
++#define JHB100_SYS0CLK_HOSTUSB_NCNOC_INIT		66
++#define JHB100_SYS0CLK_HOSTUSBCMN_CFG_480		67
++#define JHB100_SYS0CLK_BMCPER1_NCNOC_INIT		68
++#define JHB100_SYS0CLK_BMCPER1_CFG_800			69
++#define JHB100_SYS0CLK_BMCPER0_NCNOC_INIT		70
++#define JHB100_SYS0CLK_BMCPER0_CFG_400			71
++#define JHB100_SYS0CLK_BMCPER0_CFG_800			72
++#define JHB100_SYS0CLK_GPU0_NCNOC_INIT			73
++#define JHB100_SYS0CLK_GPU1_NCNOC_INIT			74
++
++#endif /* __DT_BINDINGS_CLOCK_STARFIVE_JHB100_H__ */
+diff --git a/include/dt-bindings/reset/starfive,jhb100-crg.h b/include/dt-bindings/reset/starfive,jhb100-crg.h
+new file mode 100644
+index 000000000000..5c7b00afda73
+--- /dev/null
++++ b/include/dt-bindings/reset/starfive,jhb100-crg.h
+@@ -0,0 +1,28 @@
++/* SPDX-License-Identifier: GPL-2.0 OR MIT */
++/*
++ * Copyright (C) 2024 StarFive Technology Co., Ltd.
++ * Author: Changhuang Liang <changhuang.liang@starfivetech.com>
++ *
++ */
++
++#ifndef __DT_BINDINGS_RESET_STARFIVE_JHB100_CRG_H__
++#define __DT_BINDINGS_RESET_STARFIVE_JHB100_CRG_H__
++
++/* SYS0CRG resets */
++#define JHB100_SYS0RST_RESOURCE_ARB					0
++#define JHB100_SYS0RST_SYS0_IOMUX_PRESETN				1
++#define JHB100_SYS0RST_SYS0H_IOMUX_PRESETN				2
++#define JHB100_SYS0RST_RST_ADAPTOR_TIMEOUT_RSTN				3
++#define JHB100_SYS0RST_BMCPCIERP_RSTN_BUS				4
++#define JHB100_SYS0RST_BMCPCIERP_RSTN_CRG				5
++#define JHB100_SYS0RST_HOSTSS0_RSTN_BUS_ESPI				6
++#define JHB100_SYS0RST_HOSTSS0_RSTN_BUS_PCIE				7
++#define JHB100_SYS0RST_HOSTSS0_RSTN_CRG					8
++#define JHB100_SYS0RST_BMCPERIPH2_RSTN_CRG				9
++#define JHB100_SYS0RST_BMCPERIPH2_RSTN_BUS				10
++#define JHB100_SYS0RST_VCE_RSTN_CRG					11
++#define JHB100_SYS0RST_VCE_RSTN_BUS					12
++#define JHB100_SYS0RST_BMCUSB_RSTN_BUS					13
++#define JHB100_SYS0RST_BMCUSB_RSTN_CRG					14
++
++#endif /* __DT_BINDINGS_RESET_STARFIVE_JHB100_CRG_H__ */
 -- 
 2.25.1
 
