@@ -1,416 +1,182 @@
-Return-Path: <netdev+bounces-285753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285754-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QE4RKSS5/Wm4hwAAu9opvQ
-	(envelope-from <netdev+bounces-285753-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 12:21:24 +0200
+	id iKdGDOO5/Wm4hwAAu9opvQ
+	(envelope-from <netdev+bounces-285754-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 12:24:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A6174F4F1A
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 12:21:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84D124F4F93
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 12:24:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 503563007F4B
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 10:20:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9E3E330378B7
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 10:24:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B039137268D;
-	Fri,  8 May 2026 10:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B533CAE9B;
+	Fri,  8 May 2026 10:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NlWYukpB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N5QpGj/y";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="YGCrnwNc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E34222590
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 10:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3DF23C2792
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 10:24:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778235645; cv=none; b=PVPJPJWqIuC9EqqE4nMDJ7A36IQ3ToHqvvw0+STuQDSLOEiWH9beExH7K78aPNq0TZkUPtRWPoYY5EJY2uyAz0UXbqI32V9+XPDVODxSe3Nl6ltFFya04jzWV5fs7uimjwjnUfw8AuRoYC2R5Kg5Hm42Sj2tx/pIvoATD7zscak=
+	t=1778235845; cv=none; b=oE0tzGUkjBsBLKZ0KcIRyXiyEfhXOe1BAg++5hXp4clNDLrDvjQtUg22SBgJraXAn4KTIGPf4eihpDYwFV+TRVasEU5C7AEiDCs/EoAHdwQobQfi/R+1vJGod26et+h/lWR7CATriTL3YlfO4qbRODPd20gYjNR5x3seKNodqws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778235645; c=relaxed/simple;
-	bh=61CmHDJMaJqENMrDzbk4K1Q7rdUJmlVEpDDuFtXnHjk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Yq50LqnKx7+FeXKBhEiDawOVGP1g3DSKHFDVAHpuowKwAZfomtJ2ywttuwnvU6HP1UWiOlEIpQUz5KjkZ9n98+F0gvClTYW+Kw9Rhvip4Kji6rNJwuv6ZfOVNVepC9usD+9iGtoaCDrqubem7WECCu1HFO9fpQp1fG6MbmTyGb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NlWYukpB; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778235643; x=1809771643;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=61CmHDJMaJqENMrDzbk4K1Q7rdUJmlVEpDDuFtXnHjk=;
-  b=NlWYukpBgyv1iZ04rjby22oGxxRh5xYiFTwcNw9hd1x5rA7zxzNWDpNl
-   grhUisXBH7GtNstVAU8kZy1zCFW3nde0OxdkRCqKgEoBJwkF0urr1/6XE
-   CCC7TId2HQQjPSScLZ98AAxIJDd7pw7qxdqlpIgQSztOtbl2MvPKaD1L7
-   sngwVDkpmPUgHyBSgUuyrkRbyrp/htmnDx02nn7I8XC+zB/NT3M9A2Fkq
-   Q7v7DaR0YkaGCzdEuUgeBTgiP+rau2d7BbALmjkNZ9S50HDBjAFiRj5tA
-   VLj59Orczoeby5Z5DAgb/TLhNpcDR9VM1hxAN7uY+YONUkNiA7zXN129U
-   A==;
-X-CSE-ConnectionGUID: kfezIJLrShGDztaZaLAYTA==
-X-CSE-MsgGUID: ItIwuQr8QQypIU8K/zhaHA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11779"; a="82821270"
-X-IronPort-AV: E=Sophos;i="6.23,223,1770624000"; 
-   d="scan'208";a="82821270"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2026 03:20:43 -0700
-X-CSE-ConnectionGUID: 2HVFWLs6Sy2K4UYdD/0Jgw==
-X-CSE-MsgGUID: uJuozvGOQu2s8lYs3+C+6w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,223,1770624000"; 
-   d="scan'208";a="260168683"
-Received: from pae-d-dell-r7525-263.igk.intel.com ([172.28.191.240])
-  by fmviesa002.fm.intel.com with ESMTP; 08 May 2026 03:20:41 -0700
-From: Przemyslaw Korba <przemyslaw.korba@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	aleksandr.loktionov@intel.com,
-	arkadiusz.kubalewski@intel.com,
-	Przemyslaw Korba <przemyslaw.korba@intel.com>
-Subject: [PATCH iwl-net v2] ice: support SBQ posted writes with non-posted support for CGU
-Date: Fri,  8 May 2026 12:20:30 +0200
-Message-ID: <20260508102247.826375-1-przemyslaw.korba@intel.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1778235845; c=relaxed/simple;
+	bh=V0S77WuEXUDfU2urKVEn7xkQzr0Ul1uEZMmvaVqcTQg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oJFOzOCN9hv0UVWIZL8bSrE4KqByUhOrAAsyk//4tsaFVV6kyM6SVtKwBu5auxoqWomX4l/7d7yeocli69/ctl5ADK4qFWMsR3jaTBcxh8EEOfmUflR5YNslSABUghkyZRcFsRmPkA5RsMgFPfE/Rvwvl/elUoj6UwQyaa1qgaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N5QpGj/y; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=YGCrnwNc; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778235843;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/aqqvi31nG0cLuop8j70SGka90++tg12ySoiLhybgfc=;
+	b=N5QpGj/y+gXLKdIlz6TXwCyUjbvMPdkFWd4PKnBhDAgoM24qUMTEnLiT8kHGAM+vRee+ny
+	hm2x8i3pPBFAOu53jAhKuX7AkA9oJxDpzE/j7k1ks/n/ZjU1hJtAQIeuIyIkUqTrzdiFKT
+	gBfFV8/uwQtG2H3hCKuKNWUSnosF3So=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-380-TAHe2IM8OFiS9bQVcXs5Sg-1; Fri, 08 May 2026 06:23:59 -0400
+X-MC-Unique: TAHe2IM8OFiS9bQVcXs5Sg-1
+X-Mimecast-MFC-AGG-ID: TAHe2IM8OFiS9bQVcXs5Sg_1778235839
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-48e5eecd0aaso10315245e9.0
+        for <netdev@vger.kernel.org>; Fri, 08 May 2026 03:23:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1778235838; x=1778840638; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/aqqvi31nG0cLuop8j70SGka90++tg12ySoiLhybgfc=;
+        b=YGCrnwNcQIPLkUNcDxDOxd0wZHQrifVbPtJPvQDYo+TQ3p4A6/WdKkDroLrpjfYja5
+         cfAZk9BEFFUHQJFA4ozw/buMMtYYi+ZmUd2YPmnFwl0wdh0WENUFoqXFHb9iSZimubmv
+         RRcXj6mvFupUmfee0Y4jHElvxD2teulnwZdtYKVy+27qng8qkEHC33vydROApOCcYsis
+         RTecjwJ666wsrf9Yo/9nuXHzh+KVnPRuPpxc042hEsgezXW+NgBf5lPuDaT+k6Hbgv/J
+         jvt0DBLGfzDHmV6vd7LTzSNXStKu7SsJe46SPaGYHOtNLpYuiPPTj162h9161QlvjBD0
+         kLfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778235838; x=1778840638;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/aqqvi31nG0cLuop8j70SGka90++tg12ySoiLhybgfc=;
+        b=KRr3Y8K+6bPYrRzXkRH/6FSSz/jhqFdWQ0F0/mGqvu5h/xKZf/Wzqs1+k6vDP+YWls
+         ByXhcbxwu8NgSLnaVJ+6NgNon7ViCPhRkzKk7m0r8ggl1j7bppCniwwm3Ix0OlSMgaSq
+         12yRcBBDI9c3+aWEihnHAlPb5UhgXa8Sf+dTTtvlHL1hKHph7j0TbbIAF2ioq6hdmzQe
+         iZ5E9nk4E0qXYX/3K6bAgj5s3LJt7rlbU9nXonO+VZpiOWZcxVc7l8jVZuSgrViFMk+2
+         0BPEuJ8OhY33W3iykJY/PXgSE9yMI6xk1DZPbCmWwN3nZDW2iIDdgiXzlyh/SGMcaYcN
+         XdXw==
+X-Forwarded-Encrypted: i=1; AFNElJ8LpVB1pfH30CjJKGeJKNOb/wbdGh4WqZinQc+KaK7m7UM8EiAhWFkBZg6gkCWkizlWHXOVocg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3wBY7Xpo9yfkUs0NzrY1M3V5Z89Jk6CQXbx5ytQmogt1sP7Ls
+	eXCaBwPGxTvvo9xyR13RqzcubRQOpiY/m1HqaOlNjar742ReIk1SwpUbvZ5ViGvNSEihhO2qx6x
+	hrpKv/rlY13V7AOdvhFMGCk1Hscb0vc5Gl2ACe5qEVLtiBOSYRh9H59a6kQ==
+X-Gm-Gg: Acq92OHAoCx1iR79U2HDUSTmbdUs4XbAyIsRzfQktWdR8DI8ENkEp7OpHCkGOBTAYXD
+	ElIBO9lkZQJ+jVAmIIbmmk3larZEWYLTqOrt5S8LWp6u1X7sk6m2I+eZT35UXX1otCwTqVQqjdo
+	T09Kowk9SHEAVSkLVLaZd6OMdflkqacZdm1yV2MGt9MbSXeczrScbL4eF2IvrnzXOHyCFJ5LG1f
+	62xbXzSNDM7B+b7B/Gpfr9HTE5kMFOeupPrLNeFfIRsTO73zbujBHYl0vSF0M2Q1Qf01IicGrDN
+	7nNrZCay1eg2Vz+2VEsELyZvxf9oLErPBzmcR17zcIXzZhjqf36L5SfmJap80NSS975VnW6Lc1a
+	f6+Y0Gczt/h70IzYPoBDCYFHtG570KDngji//Jk00WlQS1DOrhn0GkpnO3g==
+X-Received: by 2002:a05:6000:420c:b0:43d:7a97:78a2 with SMTP id ffacd0b85a97d-4515c5752f7mr19940565f8f.28.1778235838518;
+        Fri, 08 May 2026 03:23:58 -0700 (PDT)
+X-Received: by 2002:a05:6000:420c:b0:43d:7a97:78a2 with SMTP id ffacd0b85a97d-4515c5752f7mr19940485f8f.28.1778235837943;
+        Fri, 08 May 2026 03:23:57 -0700 (PDT)
+Received: from [192.168.88.32] ([169.155.232.187])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4548ec6aea4sm3873533f8f.10.2026.05.08.03.23.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 May 2026 03:23:57 -0700 (PDT)
+Message-ID: <8988ea27-59ae-4ebf-ad7d-6e4ef3bf28ed@redhat.com>
+Date: Fri, 8 May 2026 12:23:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] mptcp: do not drop partial packets
+To: Shardul Bankar <shardulsb08@gmail.com>, matttbe@kernel.org,
+ martineau@kernel.org
+Cc: geliang@kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, horms@kernel.org, netdev@vger.kernel.org,
+ mptcp@lists.linux.dev, linux-kernel@vger.kernel.org, janak@mpiric.us,
+ kalpan.jani@mpiricsoftware.com, Shardul Bankar <shardul.b@mpiricsoftware.com>
+References: <20260422143931.43281-1-shardul.b@mpiricsoftware.com>
+From: Paolo Abeni <pabeni@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260422143931.43281-1-shardul.b@mpiricsoftware.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 0A6174F4F1A
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 84D124F4F93
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
+	TAGGED_FROM(0.00)[bounces-285754-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285753-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[przemyslaw.korba@intel.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,msg.data:url,intel.com:email,intel.com:mid,intel.com:dkim]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mpiricsoftware.com:email]
 X-Rspamd-Action: no action
 
-From: Karol Kolacinski <karol.kolacinski@intel.com>
+On 4/22/26 4:39 PM, Shardul Bankar wrote:
+> When a packet arrives with map_seq < ack_seq < end_seq, the beginning
+> of the packet has already been acknowledged but the end contains new
+> data.  Currently the entire packet is dropped as "old data," forcing
+> the sender to retransmit.
+> 
+> Instead, skip the already-acked bytes by adjusting the skb offset and
+> enqueue only the new portion.  Update bytes_received and ack_seq to
+> reflect the new data consumed.
+> 
+> A previous attempt at this fix (commit 1d2ce718811a ("mptcp: do not
+> drop partial packets"), reverted in commit bf39160c4218 ("Revert
+> "mptcp: do not drop partial packets"")) also added a zero-window
+> check and changed rcv_wnd_sent initialization, which caused test
+> regressions.  This version addresses only the partial packet handling
+> without modifying receive window accounting.
+> 
+> Fixes: ab174ad8ef76 ("mptcp: move ooo skbs into msk out of order queue.")
+> Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/600
+> Signed-off-by: Shardul Bankar <shardul.b@mpiricsoftware.com>
 
-Sideband queue (SBQ) is a HW queue with very short completion time. All
-SBQ writes were posted by default, which means that the driver did not
-have to wait for completion from the neighbor device, because there was
-none. This introduced unnecessary delays, where only those delays were
-"ensuring" that the command is "completed" and this was a potential race
-condition.
+It would be great if you could send a v3 addressing the AI comment.
 
-Add the possibility to perform non-posted writes where it's necessary to
-wait for completion, instead of relying on fake completion from the FW,
-where only the delays are guarding the writes.
+If you don't have time or capacity, please LMK, I can send v3 with your
+SoB and the needed editing.
 
-Flush the SBQ by reading address 0 from the PHY 0 before issuing SYNC
-command to ensure that writes to all PHYs were completed and skip SBQ
-message completion if it's posted.
+Thanks,
 
-To analyze if delays are gone, look for and compare time spent in
-ice_sq_send_cmd — posted writes should return immediately after the wr32.
-That can be done for example by adjusting phc time with phc_ctl on E830
-device, for less than 2 seconds to use this new mechanism. Without it,
-command below will fail.
-
-Reproduction steps:
-phc_ctl eth13 adj 1
-phc_ctl[4478170.994]: adjusted clock by 1.000000 seconds
-
-Check trace for timing for comparisions:
-echo ice_sbq_send_cmd > /sys/kernel/debug/tracing/set_ftrace_filter
-echo function_graph > /sys/kernel/debug/tracing/current_tracer
-cat /sys/kernel/debug/tracing/trace
-
-Tested on:
-  - Intel E830 NIC (FW version 1.00)
-  - Kernel 6.19.0+
-
-Fixes: 8f5ee3c477a8 ("ice: add support for sideband messages")
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
----
-v2:
-- fix minor issues for E810 devices
-v1:
-https://lore.kernel.org/intel-wired-lan/20260507135110.809367-1-przemyslaw.korba@intel.com/
----
- drivers/net/ethernet/intel/ice/ice_common.c   | 21 ++++--
- drivers/net/ethernet/intel/ice/ice_controlq.c |  4 ++
- drivers/net/ethernet/intel/ice/ice_controlq.h |  1 +
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 65 +++++++++++--------
- drivers/net/ethernet/intel/ice/ice_sbq_cmd.h  |  5 +-
- 5 files changed, 63 insertions(+), 33 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 0ec65007d672..d5007f6c9d6e 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -1762,6 +1762,7 @@ int ice_sbq_rw_reg(struct ice_hw *hw, struct ice_sbq_msg_input *in, u16 flags)
- {
- 	struct ice_sbq_cmd_desc desc = {0};
- 	struct ice_sbq_msg_req msg = {0};
-+	struct ice_sq_cd cd = {};
- 	u16 msg_len;
- 	int status;
- 
-@@ -1774,19 +1775,29 @@ int ice_sbq_rw_reg(struct ice_hw *hw, struct ice_sbq_msg_input *in, u16 flags)
- 	msg.msg_addr_low = cpu_to_le16(in->msg_addr_low);
- 	msg.msg_addr_high = cpu_to_le32(in->msg_addr_high);
- 
--	if (in->opcode)
-+	switch (in->opcode) {
-+	case ice_sbq_msg_wr_p:
-+	case ice_sbq_msg_wr_np:
- 		msg.data = cpu_to_le32(in->data);
--	else
-+		break;
-+	case ice_sbq_msg_rd:
- 		/* data read comes back in completion, so shorten the struct by
- 		 * sizeof(msg.data)
- 		 */
- 		msg_len -= sizeof(msg.data);
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	cd.posted = in->opcode == ice_sbq_msg_wr_p;
- 
- 	desc.flags = cpu_to_le16(flags);
- 	desc.opcode = cpu_to_le16(ice_sbq_opc_neigh_dev_req);
- 	desc.param0.cmd_len = cpu_to_le16(msg_len);
--	status = ice_sbq_send_cmd(hw, &desc, &msg, msg_len, NULL);
--	if (!status && !in->opcode)
-+	status = ice_sbq_send_cmd(hw, &desc, &msg, msg_len, &cd);
-+
-+	if (!status && in->opcode == ice_sbq_msg_rd)
- 		in->data = le32_to_cpu
- 			(((struct ice_sbq_msg_cmpl *)&msg)->data);
- 	return status;
-@@ -6557,7 +6568,7 @@ int ice_write_cgu_reg(struct ice_hw *hw, u32 addr, u32 val)
- {
- 	struct ice_sbq_msg_input cgu_msg = {
- 		.dest_dev = ice_get_dest_cgu(hw),
--		.opcode = ice_sbq_msg_wr,
-+		.opcode = ice_sbq_msg_wr_np,
- 		.msg_addr_low = addr,
- 		.data = val
- 	};
-diff --git a/drivers/net/ethernet/intel/ice/ice_controlq.c b/drivers/net/ethernet/intel/ice/ice_controlq.c
-index dcb837cadd18..a6008dc77fa4 100644
---- a/drivers/net/ethernet/intel/ice/ice_controlq.c
-+++ b/drivers/net/ethernet/intel/ice/ice_controlq.c
-@@ -1086,6 +1086,10 @@ ice_sq_send_cmd(struct ice_hw *hw, struct ice_ctl_q_info *cq,
- 	wr32(hw, cq->sq.tail, cq->sq.next_to_use);
- 	ice_flush(hw);
- 
-+	/* If the message is posted, don't wait for completion. */
-+	if (cd && cd->posted)
-+		goto sq_send_command_error;
-+
- 	/* Wait for the command to complete. If it finishes within the
- 	 * timeout, copy the descriptor back to temp.
- 	 */
-diff --git a/drivers/net/ethernet/intel/ice/ice_controlq.h b/drivers/net/ethernet/intel/ice/ice_controlq.h
-index 788040dd662e..c50d6fcbacba 100644
---- a/drivers/net/ethernet/intel/ice/ice_controlq.h
-+++ b/drivers/net/ethernet/intel/ice/ice_controlq.h
-@@ -77,6 +77,7 @@ struct ice_ctl_q_ring {
- /* sq transaction details */
- struct ice_sq_cd {
- 	struct libie_aq_desc *wb_desc;
-+	u8 posted : 1;
- };
- 
- /* rq event information */
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 2c18e16fe053..698e65c1209c 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -352,6 +352,17 @@ void ice_ptp_src_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
- static void ice_ptp_exec_tmr_cmd(struct ice_hw *hw)
- {
- 	struct ice_pf *pf = container_of(hw, struct ice_pf, hw);
-+	struct ice_sbq_msg_input msg = {
-+		.dest_dev = ice_sbq_dev_phy_0,
-+		.opcode = ice_sbq_msg_rd,
-+	};
-+	int err;
-+
-+	if (hw->mac_type != ICE_MAC_E810) {
-+		err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
-+		if (err)
-+			dev_warn(ice_hw_to_dev(hw), "Failed to flush SBQ: %d\n", err);
-+	}
- 
- 	if (!ice_is_primary(hw))
- 		hw = ice_get_primary_hw(pf);
-@@ -442,7 +453,7 @@ static int ice_write_phy_eth56g(struct ice_hw *hw, u8 port, u32 addr, u32 val)
- {
- 	struct ice_sbq_msg_input msg = {
- 		.dest_dev = ice_ptp_get_dest_dev_e825(hw, port),
--		.opcode = ice_sbq_msg_wr,
-+		.opcode = ice_sbq_msg_wr_p,
- 		.msg_addr_low = lower_16_bits(addr),
- 		.msg_addr_high = upper_16_bits(addr),
- 		.data = val
-@@ -2504,11 +2515,12 @@ static bool ice_is_40b_phy_reg_e82x(u16 low_addr, u16 *high_addr)
- static int
- ice_read_phy_reg_e82x(struct ice_hw *hw, u8 port, u16 offset, u32 *val)
- {
--	struct ice_sbq_msg_input msg = {0};
-+	struct ice_sbq_msg_input msg = {
-+		.opcode = ice_sbq_msg_rd,
-+	};
- 	int err;
- 
- 	ice_fill_phy_msg_e82x(hw, &msg, port, offset);
--	msg.opcode = ice_sbq_msg_rd;
- 
- 	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
-@@ -2581,12 +2593,13 @@ ice_read_64b_phy_reg_e82x(struct ice_hw *hw, u8 port, u16 low_addr, u64 *val)
- static int
- ice_write_phy_reg_e82x(struct ice_hw *hw, u8 port, u16 offset, u32 val)
- {
--	struct ice_sbq_msg_input msg = {0};
-+	struct ice_sbq_msg_input msg = {
-+		.opcode = ice_sbq_msg_wr_p,
-+		.data = val
-+	};
- 	int err;
- 
- 	ice_fill_phy_msg_e82x(hw, &msg, port, offset);
--	msg.opcode = ice_sbq_msg_wr;
--	msg.data = val;
- 
- 	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
-@@ -2740,15 +2753,15 @@ static int ice_fill_quad_msg_e82x(struct ice_hw *hw,
- int
- ice_read_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 *val)
- {
--	struct ice_sbq_msg_input msg = {0};
-+	struct ice_sbq_msg_input msg = {
-+		.opcode = ice_sbq_msg_rd,
-+	};
- 	int err;
- 
- 	err = ice_fill_quad_msg_e82x(hw, &msg, quad, offset);
- 	if (err)
- 		return err;
- 
--	msg.opcode = ice_sbq_msg_rd;
--
- 	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
-@@ -2774,16 +2787,16 @@ ice_read_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 *val)
- int
- ice_write_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 val)
- {
--	struct ice_sbq_msg_input msg = {0};
-+	struct ice_sbq_msg_input msg = {
-+		.opcode = ice_sbq_msg_wr_p,
-+		.data = val
-+	};
- 	int err;
- 
- 	err = ice_fill_quad_msg_e82x(hw, &msg, quad, offset);
- 	if (err)
- 		return err;
- 
--	msg.opcode = ice_sbq_msg_wr;
--	msg.data = val;
--
- 	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
-@@ -4450,14 +4463,14 @@ static void ice_ptp_init_phy_e82x(struct ice_ptp_hw *ptp)
-  */
- static int ice_read_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 *val)
- {
--	struct ice_sbq_msg_input msg = {0};
-+	struct ice_sbq_msg_input msg = {
-+		.dest_dev = ice_sbq_dev_phy_0,
-+		.opcode = ice_sbq_msg_rd,
-+		.msg_addr_low = lower_16_bits(addr),
-+		.msg_addr_high = upper_16_bits(addr),
-+	};
- 	int err;
- 
--	msg.msg_addr_low = lower_16_bits(addr);
--	msg.msg_addr_high = upper_16_bits(addr);
--	msg.opcode = ice_sbq_msg_rd;
--	msg.dest_dev = ice_sbq_dev_phy_0;
--
- 	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
-@@ -4480,15 +4493,15 @@ static int ice_read_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 *val)
-  */
- static int ice_write_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 val)
- {
--	struct ice_sbq_msg_input msg = {0};
-+	struct ice_sbq_msg_input msg = {
-+		.dest_dev = ice_sbq_dev_phy_0,
-+		.opcode = ice_sbq_msg_wr_p,
-+		.msg_addr_low = lower_16_bits(addr),
-+		.msg_addr_high = upper_16_bits(addr),
-+		.data = val
-+	};
- 	int err;
- 
--	msg.msg_addr_low = lower_16_bits(addr);
--	msg.msg_addr_high = upper_16_bits(addr);
--	msg.opcode = ice_sbq_msg_wr;
--	msg.dest_dev = ice_sbq_dev_phy_0;
--	msg.data = val;
--
- 	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
-diff --git a/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h b/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
-index 21bb861febbf..86a143ebf089 100644
---- a/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
-@@ -54,8 +54,9 @@ enum ice_sbq_dev_id {
- };
- 
- enum ice_sbq_msg_opcode {
--	ice_sbq_msg_rd	= 0x00,
--	ice_sbq_msg_wr	= 0x01
-+	ice_sbq_msg_rd		= 0x00,
-+	ice_sbq_msg_wr_p	= 0x01,
-+	ice_sbq_msg_wr_np	= 0x02,
- };
- 
- #define ICE_SBQ_MSG_FLAGS	0x40
-
-base-commit: 80b47e88f7ead00b0795e9f2833f1d0cafe11d90
--- 
-2.43.0
+Paolo
 
 
