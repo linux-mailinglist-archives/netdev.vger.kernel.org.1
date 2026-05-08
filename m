@@ -1,316 +1,249 @@
-Return-Path: <netdev+bounces-285681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285682-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mLMXH/CJ/WnWfgAAu9opvQ
-	(envelope-from <netdev+bounces-285681-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 09:00:00 +0200
+	id wB6tGZOK/WnWfgAAu9opvQ
+	(envelope-from <netdev+bounces-285682-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 09:02:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D7D04F2B31
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 08:59:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B22CD4F2BBF
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 09:02:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 37CFB30656BF
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 06:58:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1BFFB3041AA2
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 07:01:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D386737C920;
-	Fri,  8 May 2026 06:58:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E11837B3F6;
+	Fri,  8 May 2026 07:01:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VGBGh7j3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gNYii+KW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D2B37BE6A
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 06:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778223496; cv=none; b=WqRVmsx1C53Fm7+EtbDf0BN5BOX5V4VrpJddmDQBVx2fWgbPBrpJsNC6nYHy7B12StanX037WueOlCjzSVMAE0ydy5LnfJ1q3wihRwnRZOy4MuND7bU4LVhyXjzJfxOjDbgZFuo/duSi7TyuqTLrQNtLIMyPkUs9zv2Vwe/VBHg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778223496; c=relaxed/simple;
-	bh=UdgosYae9F+e7dLGb4mKSYKF+x5xyGjAKdpTwwSF/w8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=csNoHLL73/G66JWNf1+Q322MiktM2VBLq+sa67a9ckSknFqtYs/mquT/GY4eHlIOVoAlNytkSwHSAVjRRgbm1FvdHTyu5svX0i1qX8jqAkT1ZXb/6OzAArTNWG+tFGLuYykwbJPmeOHd/lWQQ2vuQc2WrVPKSumOFer69FrattE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VGBGh7j3; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2a7a9b8ed69so15298285ad.2
-        for <netdev@vger.kernel.org>; Thu, 07 May 2026 23:58:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778223491; x=1778828291; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/rvwhZ7O9c2frMQxQn/S0l7e+r5hR2V5hdN2HElgeRU=;
-        b=VGBGh7j3P1/JRnQqjBxjpsmcWYraAaVkZPMT1BWDiX7mwAs9iP6w9li1piHzQU33Df
-         +B9zMtLiyU8cPI3rCZJ7g4rpYgsvamY1+EIsoTHuX9d/9bzjOmcbLz5wtXspxA6s6tyc
-         UGOvfr6ezByPX/VvajD1vpAwWOFT11GBodY87NU/0unDrdzzDO33iTKBSW2XSGpomfDR
-         fplwqlyrMw+ysHQ6T/zwpPS4+uoqo91z54nGxr4IUQuT9DXoGqHa5fkZyuxf/9bG5lrX
-         L+aLBUcriF6B8yrhMb38o+ZHEJ69JjjWN3yRui6+a2YZc9MWAO6T49AMMFWPipWxY/sT
-         pkgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778223491; x=1778828291;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=/rvwhZ7O9c2frMQxQn/S0l7e+r5hR2V5hdN2HElgeRU=;
-        b=gxB2EPs9On4u+L5LOx+e1C7BKONUMkKsBzaZysqJvMaR0bKvRXJwO+2FPtlDcr5ZZO
-         rp4N0wtKZA1vrL21sjzrCAr3bgn4mzWMex2wflETJ2odeTh5PjNxQk8Xe3hnUBeAPCK1
-         jWx8oZreDAo70ttJbwOCklv+4yRws5Akc7ag68QH17dHxphIahydYSI7m7m5LUztv6Ka
-         QOEgk/DCqaWVc+2K3hVSffOHd4DK1+otdc6kKw4JswCJ094li1P4t1X0ura4oXt6qM5G
-         X3F3U7S8niFMP5d7V+rcS7zYrD1I3OdBXDvRv01crnYrswIiWKdl4TIk1GHJ8NNjFeTP
-         emxQ==
-X-Gm-Message-State: AOJu0YyWfe2EMJSd46AVaC6xY0Uf6G/4BWr8VEq0p230wgZSaOZKTlMA
-	tfOjTt9dxbHSHPfJuaQfwFfRvUiZItx+xa2ma+ajk2P1Wv4UcLHSarwJXpnPlS6q
-X-Gm-Gg: Acq92OFQpQdk8xd1Tfe8vzX+MSuIUsbm0FqgGmwqD4TWIyU1tLxXnbEdJ5MxdY11BLp
-	hc5VFQjNxtBqnVZ+Ameot7lCn10PWrK6ybR+BP5UPMaUVagnFkIWjtGGN8zCk3392PYiQckwEBs
-	AUH0RFYSrqVVqCtWQFVjR73rD1pFxlBk71pjVYhGEe6id53Ye7pRPQDZ8Q3USZFlaDw3zD31TrG
-	hFUF31wVD1dTtJF+hLS/jH046eDqnmJvbKgMbb8DmlI6zIhhKpd0tScbH+Q6ejowMIA3OqL9k98
-	BpKzJS9CsMWFRnwdjHwlMbkYUMCQErrfpImo6H7bJ+WjaP1UqnLacidb3wkvIWqSWrDwKzxsYoy
-	7+zyi/vlkC6NhOXGtV1JFU7aZW8lTd0CbVw8IlTzCzSjwiZH2QxbBbWxGBfqmkoNcbuli+QSsrE
-	fcBxBMXukt9FElgnamguRizL2SLOXoQYZuIv1EEALjqcW7jZ0YBPs4abgUAXWn
-X-Received: by 2002:a17:903:3b85:b0:2b2:ddfa:3a1e with SMTP id d9443c01a7336-2ba7a31dc61mr122165185ad.30.1778223491400;
-        Thu, 07 May 2026 23:58:11 -0700 (PDT)
-Received: from d.home.yangfl.dn42 ([2a09:bac5:6619:3046::4cf:90])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1e35bcfsm9488785ad.38.2026.05.07.23.58.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2026 23:58:11 -0700 (PDT)
-From: David Yang <mmyangfl@gmail.com>
-To: netdev@vger.kernel.org
-Cc: David Yang <mmyangfl@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 2/2] net: dsa: yt921x: Add port TBF support
-Date: Fri,  8 May 2026 14:57:53 +0800
-Message-ID: <20260508065757.2566258-3-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260508065757.2566258-1-mmyangfl@gmail.com>
-References: <20260508065757.2566258-1-mmyangfl@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9080520E702
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 07:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778223681; cv=fail; b=RnRezK0VHz2MeOVpBcjeoiTD5uEIS/MGhawLoEmvzOtHHc6e+moe4jKqr3pcQsDmAvBpEMH3aRwMTGMMJp7S6GpSgwUlbURun+KpF/tMYTzrmUSybc0uiyeppWJwz1veWPPnBlBV70NxKmYeHp1yqCD88pPP3Zhbs2XCxWdQusM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778223681; c=relaxed/simple;
+	bh=2LHYTNKuFn8MiLXWNkriKnHoTKqwscUlNF/vWyXXkxk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Ec0tnQm3Lxg9URDuLqggCdKREusjkEzYD6yeOA2BfsSm8Ud083GM+d4NdGuIbwksPGud0OmPLupvBx5iccEgLiPTrEpQH4lg2sA+2y1bKi0gFXAUEPnTwiijiySdwrXiM3xPjw2PPT1NsLteCt9oke4jNesViDgfHGbE1dGILT4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gNYii+KW; arc=fail smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778223678; x=1809759678;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=2LHYTNKuFn8MiLXWNkriKnHoTKqwscUlNF/vWyXXkxk=;
+  b=gNYii+KWjN1yZSgDtpimibR7vjuQJH1ZRacC/vn2QfKpVTcGR+tDKX3R
+   o7xZHx857QG1FxdX187ueJMawm4msfvR53fDOB2JbwR1n3Tpv63aFa4Bi
+   UHGi7F/zQL9lxTCmfmsJ2VnifmWeTSVd2h8vUS65H48dm9K2yRu6wNxbA
+   mZRnQKy/D1HltdbYahYBg5eFlEM/x7X1iedSgzGer069rpNRzs5tire0h
+   bzqTONbn5SyVPIWFRcgsPtPvhXEKS4w5YFWRypN9OJgjKRUFhghbmTYmm
+   h5j2RTwEatjGXFhDCQsRRCb9h2x3I6k6EpcYalK0/upK2eaSRwYbxvJ76
+   A==;
+X-CSE-ConnectionGUID: FeMC4VRyRnKbLsfLbS0cCA==
+X-CSE-MsgGUID: m2H4xoMBQyW9b2VbcAu67g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11779"; a="82809054"
+X-IronPort-AV: E=Sophos;i="6.23,223,1770624000"; 
+   d="scan'208";a="82809054"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2026 00:01:16 -0700
+X-CSE-ConnectionGUID: PnqpABKMRIO0IoUFoPc9cQ==
+X-CSE-MsgGUID: Dzf097aRRN2W2ycpO3MQmg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,223,1770624000"; 
+   d="scan'208";a="274808813"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2026 00:01:15 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Fri, 8 May 2026 00:01:14 -0700
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Fri, 8 May 2026 00:01:14 -0700
+Received: from BYAPR05CU005.outbound.protection.outlook.com (52.101.85.50) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Fri, 8 May 2026 00:01:14 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UXLIT1LFNe1HryrXNSopU9qlNn8jT86tzChMBB06l82c5JOwWo4qn/qe7a3N+IWQCguUldhNiiq9aTckPdabycNeosFqHGlGtL6Bjf7Q2zGn3xX2gkY4uO9TfadBEy1zUrQNS4x0kO1RDyxI+8bzwW+4T0UfGy7P4h+ZpLshH0dloQS8E4onRWQs/ZVCfDCoyGW08FxXp53Fh6R3ch+mBE1Ei2bYZelu1I7MKy/UVP5kgP2OHHZs4A8iWyTou2geoUFc8qq7QRBlWFkNrkm95FWxTCjJKuyZh4usJVDEnhYikwxy2elQXlkTRaltD2DcCnbCLD2dQ3g3mvtZgao69Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2LHYTNKuFn8MiLXWNkriKnHoTKqwscUlNF/vWyXXkxk=;
+ b=ZzmaN6W5BlLsrx/BwlJbvBo9Jl4419AoROkz61zKvom8ungzFQ5Uz+d7WmVLwhSRa7N84UHT7FfFmrKpw67bU9efhc+6WHt2TrKtLXLesfiNe0XwhI7IBbbWhsB57+6mymdIv0zAvMTNMgWeLVYsB50gUfYBPiOMwNrfs9ahaYXaJ9CHk8xHK7WCcTUWjQU2YqfqlYHa17XC7mRjdjN5XoPs5Y/sjYXcPyV6vjIFfGc2h7rfUte2rEuxpU2bibbgPFS4EaMUhLr9VT0I2AotzuLJ0D8eQJ0etM1gZPp4oAa6E0r3bCMgsIXjrji5O3eaSF2Sw+JmB+n9PFj/B91Q8g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM4PR11MB6261.namprd11.prod.outlook.com (2603:10b6:8:a8::10) by
+ SJ5PPF64191BB3C.namprd11.prod.outlook.com (2603:10b6:a0f:fc02::82f) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.19; Fri, 8 May
+ 2026 07:01:11 +0000
+Received: from DM4PR11MB6261.namprd11.prod.outlook.com
+ ([fe80::66c7:4013:fead:be53]) by DM4PR11MB6261.namprd11.prod.outlook.com
+ ([fe80::66c7:4013:fead:be53%4]) with mapi id 15.20.9891.008; Fri, 8 May 2026
+ 07:01:11 +0000
+From: "Rinitha, SX" <sx.rinitha@intel.com>
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Loktionov, Aleksandr"
+	<aleksandr.loktionov@intel.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Keller, Jacob E"
+	<jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>
+Subject: RE: [Intel-wired-lan] [PATCH net] ice: fix locking around
+ wait_event_interruptible_locked_irq
+Thread-Topic: [Intel-wired-lan] [PATCH net] ice: fix locking around
+ wait_event_interruptible_locked_irq
+Thread-Index: AQHcvbqvTxlL10IWWkyLXzDvHMN4cLYD9I5g
+Date: Fri, 8 May 2026 07:01:11 +0000
+Message-ID: <DM4PR11MB6261C4034D8882E969C2BE268B3D2@DM4PR11MB6261.namprd11.prod.outlook.com>
+References: <20260327072332.130320-1-aleksandr.loktionov@intel.com>
+ <20260327072332.130320-2-aleksandr.loktionov@intel.com>
+In-Reply-To: <20260327072332.130320-2-aleksandr.loktionov@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM4PR11MB6261:EE_|SJ5PPF64191BB3C:EE_
+x-ms-office365-filtering-correlation-id: 44a054bd-f45c-4622-29ae-08deaccf9651
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700021|56012099003|18002099003|22082099003;
+x-microsoft-antispam-message-info: /fdurh+hYXv4j2SuttrZSua2rXq8E8gOXT6D62z5dgt147zZnr5S+QpLMbxeOB1mYqZVDNJO3qJf5R862Sl6OkGqiCsfJaoKHh28ejOl842teHODWF3z4h7vwlWI8/ug4eTYliLsZum0MP7CDG0rPjBHCQfF3481H0fgbzu1A+qYdsmWRnL4ByHK5JogKdsA8AB7K7SQEtr7Hv1kskPLJ7ReyTUQx0Tef7bFvuu0lswFokTBMs4yluWADt8heTYgGJaO/Wnyf4LsPXfvgan1nKsh8aVhckTZTBDDmxVw6Az2Y79N3HTNw4Q/1qVJhr3tuSfcesABi6MOzLvqlroWOhFBrCIwVnhsAdio+iHORyQS46w1zFzg7F5sDceE84+Kx4e2DQzCd4CVYm3v3Qbcfs9iPgli4Iz49ZCcxuEfYUDOcSiw5DlLRr+WdqIN4IqV3BCd/4W3UDgnRCQIVLc2zYuG5sfLk58A9QP7YtcqZdMEkz+gU3rTwfQrarPOhJxPg0LewJYG0DPlbh7kK5TovE92hWJGGhQv6Nz7v1Sct+ZZt0hbaCx0djQSFOaGdueW2Lt5KDwhsVbldXZxcTv2UGxRS+anvJi500YYMSUj+77JdqWsqgGTBVQ1uSTSsWhchDvZv8ZSxxTomA+kI0TEkfxe+sYT1M/MRaNlqgtreZXD9DBs9H7C2myGDasOhUU7C5J9GbUe1gojkXoEjpq++em0pwiMrFs3xwes0yZX4Da4qF3/kmfKv+9nuGyNXlKj
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6261.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700021)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?QNiprl1lY/a2LXUzJbTFq5LK0i+z5brx7tiAg1HlrLB3ZIUGMWFX3h9QOb2+?=
+ =?us-ascii?Q?9JtmUN0HDJ91a9N3m/tuaTKV8+jPwZ9iSCeAs8LTBnIejtDDRHc8ZDyZAdcE?=
+ =?us-ascii?Q?5X0yRd2sPVlSPrgmIUKwJhVcACX629gQN83GNTy2fWPNZm/MN/CdaiuD1u6P?=
+ =?us-ascii?Q?azdv7mTPcSDV7fVZ94c60w8GjE6AJAC7CBWrMTLIjsoXKZ9WgBAbbcL45kF5?=
+ =?us-ascii?Q?m5wHmZE2mJaaxdoYaGGryjzPbY9O6GDZKVbAcExptBeePoGwkMbXh36D2jBX?=
+ =?us-ascii?Q?TWdffNPaprm190LmnIGF4as2F15ecdHN0NiNfisyFdPXD4Kz7dS400PDRf7r?=
+ =?us-ascii?Q?ihp32xm6g74kZnGjwjL5X2p15HNGSdQXLBrFvPfcOMAVddRbSGPKV81B/4CO?=
+ =?us-ascii?Q?c3w2U8YzUfcSgYtEuQN4wIseXaps/vYwF3mxH0kF7fxGkmXzwVhVt9Y/a9au?=
+ =?us-ascii?Q?VSe/xL0xMJj6ibVtFkvBiPvwSSv8umHFDAGcMOfNJB+ukgZXDhn6xBzbDQRU?=
+ =?us-ascii?Q?TePwd1Cf0CLdiW71CsNKZQwbpyo98FUGPTS7O899niMBIy1qX+8zrOfrGoxK?=
+ =?us-ascii?Q?i4l2V4aPF7IVjqEec+4D/msKlrM7vEy0lkQ3V4c+UPYKAnEWaJpXSeH3M4B4?=
+ =?us-ascii?Q?fxG2B5sC+bZD7cYiO2YZnEbassSaMYg3E8S0yR7jGYQf8mtG3Dq34nnCEMjC?=
+ =?us-ascii?Q?wulZOm2hMBlb9RINXRgZC73vmqnAp0ypR75YOWhC2kBRveXCiQ/ERuuh7qIK?=
+ =?us-ascii?Q?C1LmVZ62A8rZBzwHZ9awxtyyy5QiKkD1MFbNBe067LAmACwIN0SX4XacID3K?=
+ =?us-ascii?Q?TCMPutDRFjCPehUEskUaugAAS5LkphpIWLH6Y0ylJrqqA9xHrt9AwTYz9Az4?=
+ =?us-ascii?Q?rctFsxxxJHQB3DTTgsnV53vAiMw5vQdeANqrZK2290AW6myGAPx2qI+zZr6z?=
+ =?us-ascii?Q?e7Qzy2cE4aYmBnV7CR9mpoQqP6YYyT7UWKevIQGuz1p7PfTPfJv5fuLrZ/LZ?=
+ =?us-ascii?Q?HnaeuOcTVWMDkgkiNebWchYP+RS+hIvD0ozI0poQoUZmHP8Yb9r8pAUEg8CX?=
+ =?us-ascii?Q?DgHo6gJHzw5Ypr9Slejmtq3Ez5NVQzSTn7qjdsEd243oWsB4QbAxdexjmx5+?=
+ =?us-ascii?Q?f5F3Ke0p1tabtBxXO1HENy9SxKWxBbcjMeTlUcfX74ceWvQMkdclL11QDORf?=
+ =?us-ascii?Q?hJxIHGQOa+FkfjOmoBbiG6+/EGVP/T0Y0kC1bSU17Umfz9E38S1shiG49LKf?=
+ =?us-ascii?Q?AlWalEy70ibu1Vs89+ZwAIrMCATgYejpukk/AXEsYZ+gFubpNfjW+NLXOJvH?=
+ =?us-ascii?Q?odoZfeWDeuKjnplYAOrww78r+fkvj3ZbxOnaZUMelcsnUgewipVFefLY4Rvr?=
+ =?us-ascii?Q?ry6i9fJoz+VNXal+6NxmmxsKsAcjf19Hlg7yI08poz6Cud3hieOH1MnH8Trl?=
+ =?us-ascii?Q?omZr+gwA9bVog8ZaVL+uc1lRbbjVXYraGuK7A8jpQHHeJdUnn4C06J/zMQIn?=
+ =?us-ascii?Q?cnXBnNcrMdsgVaKnmNn8u4xyaX3lX/2cgtn+Spq4ZP4geinBK287vIbb1PO9?=
+ =?us-ascii?Q?r7Yi3LJuP8FHfBK5LAkQ4QdB3hEw8pOoKqpXV9AMjXeIchThXg8dKJycxT0M?=
+ =?us-ascii?Q?e20uTnJicd688bWmBjrP1KamjWkY7M9y2+WCtWoiVI7aDXED1TtWX5rasGaT?=
+ =?us-ascii?Q?0NqNOSTnWqCPNvUBhlsX/9hHvONK9KvGCniOt9zsQjC1Wxez?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 1D7D04F2B31
+X-Exchange-RoutingPolicyChecked: lHc5pH+XoHZMrBwM3MCmyfoeBSslP4/OygTe8V20wWfi2/J6XJl37X3U5US2yW6/iX43oM6urz+fnzg3q68cWrZUzxXerqq2WrgZ/2V6TABxQZh0Iyv2QolB0QCTI0stCkBvKpOAXTiAHXbi/waOzHY25WG060rlreRVbguHwburB+DCMq1WEoJ/M+lGq7+XBROp6TUM9m6mSIPKLQSppgmkX7bE8EDhcjJgyV34NxMZRAJSim5UzN45mikvycU1oI5vrTZoGsweN3k2/vbRp3A2pwFQwF1U1pwiJeByMaQQaBi0GHq9Y/t3VZiaDtig9qBRbhSdr6z2FQeImb4Kug==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6261.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 44a054bd-f45c-4622-29ae-08deaccf9651
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 May 2026 07:01:11.2466
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: wq7vydtaSp5+mrD10qgfsEPjsiGCkanVGEx/iTIUXPV+NnPMMaf3jf1gIkk34lkqhxwBQB+1WpnHoXxUh5mVGw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF64191BB3C
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: B22CD4F2BBF
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,mojatatu.com,resnulli.us,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-285681-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-285682-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,osuosl.org:email];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sx.rinitha@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Action: no action
 
-React to TC_SETUP_QDISC_TBF and configure the egress shaper as
-appropriate with the maximum rate and burst size requested by the user.
-Per queue shaper is possible, though not touched in this commit.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of A=
+leksandr Loktionov
+> Sent: 27 March 2026 12:53
+> To: intel-wired-lan@lists.osuosl.org; Nguyen, Anthony L <anthony.l.nguyen=
+@intel.com>; Loktionov, Aleksandr <aleksandr.loktionov@intel.com>
+> Cc: netdev@vger.kernel.org; Keller, Jacob E <jacob.e.keller@intel.com>; J=
+akub Kicinski <kuba@kernel.org>
+> Subject: [Intel-wired-lan] [PATCH net] ice: fix locking around wait_event=
+_interruptible_locked_irq
+>
+> From: Jacob Keller <jacob.e.keller@intel.com>
+>
+> Commit 50327223a8bb ("ice: add lock to protect low latency interface") in=
+troduced a wait queue used to protect the low latency timer interface.
+> The queue is used with the wait_event_interruptible_locked_irq macro, whi=
+ch unlocks the wait queue lock while sleeping. The irq variant uses spin_lo=
+ck_irq and spin_unlock_irq to manage this. The wait queue lock was previous=
+ly locked using spin_lock_irqsave. This difference in lock variants could l=
+ead to issues, since wait_event would unlock the wait queue and restore int=
+errupts while sleeping.
+>
+> The ice_read_phy_tstamp_ll_e810() function is ultimately called through i=
+ce_read_phy_tstamp, which is called from ice_ptp_process_tx_tstamp or ice_p=
+tp_clear_unexpected_tx_ready. The former is called through the miscellaneou=
+s IRQ thread function, while the latter is called from the service task wor=
+k queue thread. Neither of these functions has interrupts disabled, so use =
+spin_lock_irq instead of spin_lock_irqsave.
+>
+> Fixes: 50327223a8bb ("ice: add lock to protect low latency interface")
+> Cc: stable@vger.kernel.org
+> Reported-by: Jakub Kicinski <kuba@kernel.org>
+> Closes: https://lore.kernel.org/netdev/20250109181823.77f44c69@kernel.org=
+/
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
+>
+> drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 9 ++++-----
+> 1 file changed, 4 insertions(+), 5 deletions(-)
+>
 
-Signed-off-by: David Yang <mmyangfl@gmail.com>
----
- drivers/net/dsa/yt921x.c | 84 ++++++++++++++++++++++++++++++++++++++++
- drivers/net/dsa/yt921x.h | 18 +++++++++
- 2 files changed, 102 insertions(+)
-
-diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
-index fd1fdcd5f9a3..e5f547629bfd 100644
---- a/drivers/net/dsa/yt921x.c
-+++ b/drivers/net/dsa/yt921x.c
-@@ -24,6 +24,7 @@
- #include <net/dsa.h>
- #include <net/dscp.h>
- #include <net/ieee8021q.h>
-+#include <net/pkt_cls.h>
- 
- #include "yt921x.h"
- 
-@@ -1272,6 +1273,17 @@ yt921x_marker_tfm_police(struct yt921x_marker *marker,
- 				 priv, port, extack);
- }
- 
-+static int
-+yt921x_marker_tfm_shape(struct yt921x_marker *marker, u64 rate, u64 burst,
-+			unsigned int flags, struct yt921x_priv *priv, int port,
-+			struct netlink_ext_ack *extack)
-+{
-+	return yt921x_marker_tfm(marker, rate, burst, flags,
-+				 priv->port_shape_slot_ns, YT921X_SHAPE_CIR_MAX,
-+				 YT921X_SHAPE_CBS_MAX, YT921X_SHAPE_UNIT_MAX,
-+				 priv, port, extack);
-+}
-+
- static int
- yt921x_police_validate(const struct flow_action_police *police,
- 		       const struct flow_action *action,
-@@ -1378,6 +1390,70 @@ yt921x_dsa_port_policer_add(struct dsa_switch *ds, int port,
- 	return res;
- }
- 
-+static int
-+yt921x_dsa_port_setup_tc_tbf_port(struct dsa_switch *ds, int port,
-+				  const struct tc_tbf_qopt_offload *qopt)
-+{
-+	struct yt921x_priv *priv = to_yt921x_priv(ds);
-+	struct netlink_ext_ack *extack = qopt->extack;
-+	u32 ctrls[2];
-+	int res;
-+
-+	if (qopt->parent != TC_H_ROOT)
-+		return -EOPNOTSUPP;
-+
-+	switch (qopt->command) {
-+	case TC_TBF_STATS:
-+		return 0;
-+	case TC_TBF_DESTROY:
-+		ctrls[0] = 0;
-+		ctrls[1] = 0;
-+		break;
-+	case TC_TBF_REPLACE: {
-+		const struct tc_tbf_qopt_offload_replace_params *p;
-+		struct yt921x_marker marker;
-+
-+		p = &qopt->replace_params;
-+
-+		res = yt921x_marker_tfm_shape(&marker, p->rate.rate_bytes_ps,
-+					      p->max_size,
-+					      YT921X_MARKER_SINGLE_BUCKET,
-+					      priv, port, extack);
-+		if (res)
-+			return res;
-+
-+		ctrls[0] = YT921X_PORT_SHAPE_CTRLa_CIR(marker.cir) |
-+			   YT921X_PORT_SHAPE_CTRLa_CBS(marker.cbs);
-+		ctrls[1] = YT921X_PORT_SHAPE_CTRLb_UNIT(marker.unit) |
-+			   YT921X_PORT_SHAPE_CTRLb_EN;
-+		break;
-+	}
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+
-+	mutex_lock(&priv->reg_lock);
-+	res = yt921x_reg64_write(priv, YT921X_PORTn_SHAPE_CTRL(port), ctrls);
-+	mutex_unlock(&priv->reg_lock);
-+
-+	return res;
-+}
-+
-+static int
-+yt921x_dsa_port_setup_tc(struct dsa_switch *ds, int port,
-+			 enum tc_setup_type type, void *type_data)
-+{
-+	switch (type) {
-+	case TC_SETUP_QDISC_TBF: {
-+		const struct tc_tbf_qopt_offload *qopt = type_data;
-+
-+		return yt921x_dsa_port_setup_tc_tbf_port(ds, port, qopt);
-+	}
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
- static int
- yt921x_mirror_del(struct yt921x_priv *priv, int port, bool ingress)
- {
-@@ -3524,6 +3600,13 @@ static int yt921x_chip_setup_tc(struct yt921x_priv *priv)
- 		return res;
- 	priv->meter_slot_ns = ctrl * op_ns;
- 
-+	ctrl = max(priv->port_shape_slot_ns / op_ns,
-+		   YT921X_PORT_SHAPE_SLOT_MIN);
-+	res = yt921x_reg_write(priv, YT921X_PORT_SHAPE_SLOT, ctrl);
-+	if (res)
-+		return res;
-+	priv->port_shape_slot_ns = ctrl * op_ns;
-+
- 	return 0;
- }
- 
-@@ -3680,6 +3763,7 @@ static const struct dsa_switch_ops yt921x_dsa_switch_ops = {
- 	/* rate */
- 	.port_policer_del	= yt921x_dsa_port_policer_del,
- 	.port_policer_add	= yt921x_dsa_port_policer_add,
-+	.port_setup_tc		= yt921x_dsa_port_setup_tc,
- 	/* hsr */
- 	.port_hsr_leave		= dsa_port_simple_hsr_leave,
- 	.port_hsr_join		= dsa_port_simple_hsr_join,
-diff --git a/drivers/net/dsa/yt921x.h b/drivers/net/dsa/yt921x.h
-index 546b12a8994a..70fa780c337f 100644
---- a/drivers/net/dsa/yt921x.h
-+++ b/drivers/net/dsa/yt921x.h
-@@ -531,6 +531,19 @@ enum yt921x_app_selector {
- #define  YT921X_MIRROR_PORT_M			GENMASK(3, 0)
- #define   YT921X_MIRROR_PORT(x)				FIELD_PREP(YT921X_MIRROR_PORT_M, (x))
- 
-+#define YT921X_PORT_SHAPE_SLOT		0x34000c
-+#define  YT921X_PORT_SHAPE_SLOT_SLOT_M		GENMASK(11, 0)
-+#define YT921X_PORTn_SHAPE_CTRL(port)	(0x354000 + 8 * (port))
-+#define  YT921X_PORT_SHAPE_CTRLb_EN		BIT(4)
-+#define  YT921X_PORT_SHAPE_CTRLb_PKT_MODE	BIT(3)	/* 0: byte rate mode */
-+#define  YT921X_PORT_SHAPE_CTRLb_UNIT_M		GENMASK(2, 0)
-+#define   YT921X_PORT_SHAPE_CTRLb_UNIT(x)		FIELD_PREP(YT921X_PORT_SHAPE_CTRLb_UNIT_M, (x))
-+#define  YT921X_PORT_SHAPE_CTRLa_CBS_M		GENMASK(31, 18)
-+#define   YT921X_PORT_SHAPE_CTRLa_CBS(x)		FIELD_PREP(YT921X_PORT_SHAPE_CTRLa_CBS_M, (x))
-+#define  YT921X_PORT_SHAPE_CTRLa_CIR_M		GENMASK(17, 0)
-+#define   YT921X_PORT_SHAPE_CTRLa_CIR(x)		FIELD_PREP(YT921X_PORT_SHAPE_CTRLa_CIR_M, (x))
-+#define YT921X_PORTn_SHAPE_STAT(port)	(0x356000 + 4 * (port))
-+
- #define YT921X_EDATA_EXTMODE	0xfb
- #define YT921X_EDATA_LEN	0x100
- 
-@@ -556,6 +569,10 @@ enum yt921x_fdb_entry_status {
- #define YT921X_METER_UNIT_MAX	((1 << 3) - 1)
- #define YT921X_METER_CIR_MAX	((1 << 18) - 1)
- #define YT921X_METER_CBS_MAX	((1 << 16) - 1)
-+#define YT921X_PORT_SHAPE_SLOT_MIN	80
-+#define YT921X_SHAPE_UNIT_MAX	((1 << 3) - 1)
-+#define YT921X_SHAPE_CIR_MAX	((1 << 18) - 1)
-+#define YT921X_SHAPE_CBS_MAX	((1 << 14) - 1)
- 
- #define YT921X_LAG_NUM		2
- #define YT921X_LAG_PORT_NUM	4
-@@ -652,6 +669,7 @@ struct yt921x_priv {
- 
- 	const struct yt921x_info *info;
- 	unsigned int meter_slot_ns;
-+	unsigned int port_shape_slot_ns;
- 	/* cache of dsa_cpu_ports(ds) */
- 	u16 cpu_ports_mask;
- 	unsigned char cycle_ns;
--- 
-2.53.0
-
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 
