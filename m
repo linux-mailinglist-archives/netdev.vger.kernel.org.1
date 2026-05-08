@@ -1,212 +1,201 @@
-Return-Path: <netdev+bounces-285937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285938-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WFhXFsMc/mnymwAAu9opvQ
-	(envelope-from <netdev+bounces-285937-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 19:26:27 +0200
+	id gL2CDd8c/mnymwAAu9opvQ
+	(envelope-from <netdev+bounces-285938-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 19:26:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E18294F9F1F
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 19:26:26 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ADC74F9F36
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 19:26:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0C5F93046FA0
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 17:23:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DD05030297B3
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 17:26:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C14F533A702;
-	Fri,  8 May 2026 17:23:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EDA9388399;
+	Fri,  8 May 2026 17:26:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="gvciuZH9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VzactBeb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7764175A77
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 17:23:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31B6C37BE62
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 17:26:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778261029; cv=none; b=u4UnK0IasAhWPd4tUV6monIMXqdlw517jZ4tZdHM8IXoEytq6sMJzcjhI49OH2HHyExqHKU+yyQT9YJs4SeFB5NWx850O9i3A5VFPOA9S/1bxZpdhIcFcT+BBDzF0Y0eI34xx8VUWYLudaxq/KWE/vo8E8VVTlM4DNDZvVWj7kQ=
+	t=1778261212; cv=none; b=TQaNd3+3TOoKsHHAXb78qDQgQBeVnYp26D2ZZT8PWrBUC0+wMz9mfOno/HlOlQwoXG/4cAUXdSKdMSDtaqRoInyUwhwszyOhGBEa/xqfdXPBkELhmVnKN6G5plEsa1xv1vEyM0qyUm9YmR3wq9QR5DQA6TTIvHVP5We3bCZkdDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778261029; c=relaxed/simple;
-	bh=WOyx8Z48htcxwyxmNQbyPqTjfn7K0keNSd9wlveroLI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=VqPp88EDDEVqEDF8+BQX51bMjPIPbTUbwYCfASDUlN1mCfiqeEgXXmZ9Pp/mrKCq7QkErVTLGchnYvKb4kZI4dpyQaD1dqEdICZKkIdKl1ou8zpHcyJ8Gd4wISXZShf+lDYOtPBlhwLUbBrHMBbiHTFy09RJTkpn/zsLSzUqE/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=gvciuZH9; arc=none smtp.client-ip=209.85.210.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7de7dc85b74so1924065a34.2
-        for <netdev@vger.kernel.org>; Fri, 08 May 2026 10:23:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1778261026; x=1778865826; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=1DP+JuCnIiM0V9Dxy5rK6Ns6ZckVWIlwW+CDaFwu9r8=;
-        b=gvciuZH9/GpAabeNj7v0/yjRAaqzwh3FodU+bWFch5mONSfYvY2Je6Y+UVgivqN/0Q
-         wrc4bUh7DlcuPQUwjYpf+od8DT07F7xlRYQ7c+0IF1kYiFeeXtKUuddZtzQgEwWy2x7L
-         6+TJ/kQDyJsZjcy+uKhN5oltUqLo4Ylsa6ANo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778261026; x=1778865826;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1DP+JuCnIiM0V9Dxy5rK6Ns6ZckVWIlwW+CDaFwu9r8=;
-        b=H/TqKdbQ2R6s6ZBdFXWykZPMPiB8xv9rxYKRkskS5NHY7QRC3cG/wHqnbdz52p6NrJ
-         G0Pa1VQO2jNr7XPns+9quF+IcCAgG7Qg9bjoHNo8RKriKYymeVBBTjnnMYnoje4F3DCM
-         JH6nt1pTLFWLkrkoBQBrMDnFIL5neNfa1w7QZJYCSkgAo+jfwQkCnXfYhjhAf0G2bDbL
-         CIYZVSHQqaJhC3OnLwJaTmik7e/UE+DMKzGpl4lh3rF5aW2soL63X7NK5OnlwONe7rDN
-         k/JuaZ+R3XGE8SLX7W/x7hXvjJgaStV3Aw/zUfGudRpvur/9KS1Mhbi1pX33jQZ6llJ3
-         OvcA==
-X-Forwarded-Encrypted: i=1; AFNElJ9Ns7HcJPgSnqE7W2V4jOdWyONXiO2jrE+XkIlSge7pRSEnc8HCy8DsSzvJX9m/NEu38lm/Rn4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcPEL8rXvS5wiiBLEKyo+OhyisUbNzeyeXvvochqZ7gqT+MRKG
-	AN/4BqGTulZJyTwoXAbiZgcCbfRwWgUabaxSTujLCm+wegfE9cTzT1+4ETO1s9h0+wQ=
-X-Gm-Gg: AeBDiev1ZiM/cXt+3p9n/p7c0x4u+T9LEuzHtd73KSsZvOiSQiSYbfxvhCyhZKrTAjx
-	OuKnMfGMJKierInVKG8JnKDHb2vlkMfol1kGNxJqkuJx/99aOWLRvpJjuzyqGB/yxKVh8KCDK+w
-	HKrMxbi3JrZELzIYkV2vgIaeNTxEQRbFJ/w43TsjIaJhhWZX5o/po/WfFNT9Y7v34sBPZjp9Xik
-	tA+J4rQsdXTpm5KNEa76xmEQngCHXZQtIJrICOZePQ4lc28PsLYfpheejutL+QgYsgKnIxmuGpX
-	O8O9yPzEPSLMmqwMlxcSf772kbVWXxQzcR1AE/kDd8xwfMi3EkXWfK24bESFIGwmHybSdyZ3+as
-	o5Suflq0SkXjs/qhf7GJ727jndgDotkcSgklMqeaXdPGquCW3DuEe0pMmZiwpMIWt5FWjiiQKGH
-	8HtdtWTp7aWPf1ax7yS25CT1pZUOrzJsE=
-X-Received: by 2002:a05:6820:178a:b0:696:982b:1c24 with SMTP id 006d021491bc7-69998d56a5cmr7340448eaf.57.1778261025735;
-        Fri, 08 May 2026 10:23:45 -0700 (PDT)
-Received: from [192.168.1.14] ([38.15.57.99])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69b25c1a58asm1448361eaf.1.2026.05.08.10.23.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 May 2026 10:23:45 -0700 (PDT)
-Message-ID: <2b771350-0562-4cb1-b9b3-cc3ce59b1a63@linuxfoundation.org>
-Date: Fri, 8 May 2026 11:23:43 -0600
+	s=arc-20240116; t=1778261212; c=relaxed/simple;
+	bh=Jm7pHPykzXvhlBTyVsKD/1Cl9+n7bKEt4iRr0kDgMTM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C900+cNZYoB4J7lwnzTkduULdOiLPlwSh0zWlHV80J4j8ZqKTP3TUJOl6jRX8Agb3eYly00WaL3cs5i+lli8g8vySxixO+O4oqxBwoX6P9R13LykW1QX3Rs/MMgxKz8PmciIG1UldI2zCr3c7+87TkKDsllt1VivO7KsgF2Yjd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VzactBeb; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778261210;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ibh7LjPfvBLgT/tpVXxRHveeXcSku8wakGYGI8sSKuc=;
+	b=VzactBebpLVKkZ+4w0dCtFqUS+OWtD5IVMWz1rFS4338fPyqlKKsuVQNNhNJKwAROVyFT9
+	5SxT6VghIdylZntYMeBoy4xT49JmAVOknR3FemndgPLtYO3IsoGmES8gUWL/STcabJvD2P
+	J4CJfLa1xjofyZSfwnDXB0RBABi5nZY=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-246-lGVe0lkNNNW2OdIvNWCSWQ-1; Fri,
+ 08 May 2026 13:26:44 -0400
+X-MC-Unique: lGVe0lkNNNW2OdIvNWCSWQ-1
+X-Mimecast-MFC-AGG-ID: lGVe0lkNNNW2OdIvNWCSWQ_1778261203
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B3B54195608F;
+	Fri,  8 May 2026 17:26:42 +0000 (UTC)
+Received: from thinkpad (headnet01.pony-001.prod.iad2.dc.redhat.com [10.2.32.101])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5F75219560A2;
+	Fri,  8 May 2026 17:26:39 +0000 (UTC)
+Date: Fri, 8 May 2026 19:26:36 +0200
+From: Felix Maurer <fmaurer@redhat.com>
+To: Qingfang Deng <qingfang.deng@linux.dev>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Petr Machata <petrm@nvidia.com>, linux-kernel@vger.kernel.org,
+	linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next] selftests: net: add tests for PPPoL2TP
+Message-ID: <af4czAjnz--nOUYf@thinkpad>
+References: <20260508032158.67887-1-qingfang.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/5] docs: fix repeated prepositions across documentation
-To: Adrien Reynard <reynard.adrien.08@gmail.com>,
- Andrey Ryabinin <ryabinin.a.a@gmail.com>,
- Alexander Potapenko <glider@google.com>,
- Andrey Konovalov <andreyknvl@gmail.com>, Dmitry Vyukov <dvyukov@google.com>,
- Vincenzo Frascino <vincenzo.frascino@arm.com>,
- Jonathan Corbet <corbet@lwn.net>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- "open list:KASAN" <kasan-dev@googlegroups.com>,
- "open list:DOCUMENTATION PROCESS" <workflows@vger.kernel.org>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
- "open list:USER-MODE LINUX (UML)" <linux-um@lists.infradead.org>,
- Shuah Khan <skhan@linuxfoundation.org>
-References: <20260508163804.16267-1-reynard.adrien.08@gmail.com>
-Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <20260508163804.16267-1-reynard.adrien.08@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: E18294F9F1F
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260508032158.67887-1-qingfang.deng@linux.dev>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Rspamd-Queue-Id: 9ADC74F9F36
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=google];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285937-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,google.com,arm.com,lwn.net,davemloft.net,kernel.org,redhat.com,nod.at,cambridgegreys.com,sipsolutions.net,googlegroups.com,vger.kernel.org,lists.infradead.org,linuxfoundation.org];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285938-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linuxfoundation.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[skhan@linuxfoundation.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxfoundation.org:email,linuxfoundation.org:mid,linuxfoundation.org:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,pppol2tp.sh:url,ppp_common.sh:url,pppoe.sh:url,ppp_async.sh:url]
 X-Rspamd-Action: no action
 
-On 5/8/26 10:38, Adrien Reynard wrote:
-
-Missing commit log
-
-> Signed-off-by: Adrien Reynard <reynard.adrien.08@gmail.com>
+On Fri, May 08, 2026 at 11:21:49AM +0800, Qingfang Deng wrote:
+> Add ping, iperf3, and recursion tests for PPPoL2TP.
+>
+> Assisted-by: Gemini:gemini-3-flash
+> Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
 > ---
->   Documentation/dev-tools/kasan.rst                   | 2 +-
->   Documentation/networking/switchdev.rst              | 2 +-
->   Documentation/virt/uml/user_mode_linux_howto_v2.rst | 2 +-
->   3 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/dev-tools/kasan.rst b/Documentation/dev-tools/kasan.rst
-> index 4968b2aa60c8..3a8bd40ad905 100644
-> --- a/Documentation/dev-tools/kasan.rst
-> +++ b/Documentation/dev-tools/kasan.rst
-> @@ -392,7 +392,7 @@ reserved to tag freed memory regions.
->   If the hardware does not support MTE (pre ARMv8.5), Hardware Tag-Based KASAN
->   will not be enabled. In this case, all KASAN boot parameters are ignored.
->   
-> -Note that enabling CONFIG_KASAN_HW_TAGS always results in in-kernel TBI being
-> +Note that enabling CONFIG_KASAN_HW_TAGS always results in-kernel TBI being
+>  tools/testing/selftests/net/ppp/Makefile    |  1 +
+>  tools/testing/selftests/net/ppp/config      |  3 +
+>  tools/testing/selftests/net/ppp/pppol2tp.sh | 93 +++++++++++++++++++++
+>  3 files changed, 97 insertions(+)
+>  create mode 100755 tools/testing/selftests/net/ppp/pppol2tp.sh
+>
+> diff --git a/tools/testing/selftests/net/ppp/Makefile b/tools/testing/selftests/net/ppp/Makefile
+> index b39b0abadde6..6036fa134351 100644
+> --- a/tools/testing/selftests/net/ppp/Makefile
+> +++ b/tools/testing/selftests/net/ppp/Makefile
+> @@ -5,6 +5,7 @@ top_srcdir = ../../../../..
+>  TEST_PROGS := \
+>  	ppp_async.sh \
+>  	pppoe.sh \
+> +	pppol2tp.sh \
+>  # end of TEST_PROGS
+>
+>  TEST_FILES := \
+> diff --git a/tools/testing/selftests/net/ppp/config b/tools/testing/selftests/net/ppp/config
+> index b45d25c5b970..8bc3b7c33d5c 100644
+> --- a/tools/testing/selftests/net/ppp/config
+> +++ b/tools/testing/selftests/net/ppp/config
+> @@ -1,4 +1,6 @@
+>  CONFIG_IPV6=y
+> +CONFIG_L2TP=m
+> +CONFIG_NETKIT=y
+>  CONFIG_PACKET=y
+>  CONFIG_PPP=m
+>  CONFIG_PPP_ASYNC=m
+> @@ -6,4 +8,5 @@ CONFIG_PPP_BSDCOMP=m
+>  CONFIG_PPP_DEFLATE=m
+>  CONFIG_PPPOE=m
+>  CONFIG_PPPOE_HASH_BITS_4=y
+> +CONFIG_PPPOL2TP=m
+>  CONFIG_VETH=y
+> diff --git a/tools/testing/selftests/net/ppp/pppol2tp.sh b/tools/testing/selftests/net/ppp/pppol2tp.sh
+> new file mode 100755
+> index 000000000000..5ddcc6c41c33
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/ppp/pppol2tp.sh
+> @@ -0,0 +1,93 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +source ppp_common.sh
+> +
+> +NK_SERVER="nk0"
+> +NK_CLIENT="nk1"
+> +OUTER_IP_SERVER="172.16.1.1"
+> +OUTER_IP_CLIENT="172.16.1.2"
+> +
+> +PPPOL2TP_DIR=$(mktemp -d /tmp/pppol2tp.XXXXXX)
+> +
+> +# shellcheck disable=SC2329
+> +cleanup() {
+> +	cleanup_all_ns
+> +	rm -rf "$PPPOL2TP_DIR"
+> +}
+> +
+> +trap cleanup EXIT
+> +
+> +require_command xl2tpd
+> +ppp_common_init
+> +modprobe -q l2tp_ppp
+> +
+> +# Create the netkit pair
+> +ip -netns "$NS_CLIENT" link add "$NK_CLIENT" type netkit
+> +ip -netns "$NS_CLIENT" link set "$NK_SERVER" netns "$NS_SERVER"
+> +ip -netns "$NS_SERVER" link set "$NK_SERVER" up
+> +ip -netns "$NS_CLIENT" link set "$NK_CLIENT" up
+> +ip -netns "$NS_SERVER" address add dev "$NK_SERVER" "$OUTER_IP_SERVER" peer "$OUTER_IP_CLIENT"
+> +ip -netns "$NS_CLIENT" address add dev "$NK_CLIENT" "$OUTER_IP_CLIENT" peer "$OUTER_IP_SERVER"
 
-This is correct the way it is - no need to change this. "results in in-kernel"
+Is there a particular reason to create the test setup with a netkit pair
+instead of the more standard veth pairs?
 
->   enabled. Even when ``kasan.mode=off`` is provided or when the hardware does not
->   support MTE (but supports TBI).
->   
-> diff --git a/Documentation/networking/switchdev.rst b/Documentation/networking/switchdev.rst
-> index 2966b7122f05..948bce44ca9b 100644
-> --- a/Documentation/networking/switchdev.rst
-> +++ b/Documentation/networking/switchdev.rst
-> @@ -162,7 +162,7 @@ The switchdev driver can know a particular port's position in the topology by
->   monitoring NETDEV_CHANGEUPPER notifications.  For example, a port moved into a
->   bond will see its upper master change.  If that bond is moved into a bridge,
->   the bond's upper master will change.  And so on.  The driver will track such
-> -movements to know what position a port is in in the overall topology by
-> +movements to know what position a port is in the overall topology by
+Thanks,
+   Felix
 
-This looks fine.
-
->   registering for netdevice events and acting on NETDEV_CHANGEUPPER.
->   
->   L2 Forwarding Offload
-> diff --git a/Documentation/virt/uml/user_mode_linux_howto_v2.rst b/Documentation/virt/uml/user_mode_linux_howto_v2.rst
-> index c37e8e594d12..7b08738c30aa 100644
-> --- a/Documentation/virt/uml/user_mode_linux_howto_v2.rst
-> +++ b/Documentation/virt/uml/user_mode_linux_howto_v2.rst
-> @@ -1092,7 +1092,7 @@ be formatted as plain text.
->   
->   Developing always goes hand in hand with debugging. First of all,
->   you can always run UML under gdb and there will be a whole section
-> -later on on how to do that. That, however, is not the only way to
-> +later on how to do that. That, however, is not the only way to
-
-This change is not needed. If at all add a comma after "later" to make
-a distinction between the use two back to back "on"s
-
-  "later on,"
-
->   debug a Linux kernel. Quite often adding tracing statements and/or
->   using UML specific approaches such as ptracing the UML kernel process
->   are significantly more informative.
-
-With these changes:
-
-Reviewed-by: Shuah Khan <skhan@linuxfoundation.org>
-
-thanks,
--- Shuah
 
