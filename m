@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-285827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285828-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AB9EGhbh/Wn0jwAAu9opvQ
-	(envelope-from <netdev+bounces-285827-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:11:50 +0200
+	id CKNfIqvh/Wn0jwAAu9opvQ
+	(envelope-from <netdev+bounces-285828-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:14:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED1D44F6D2A
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:11:49 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86CF24F6DAF
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:14:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 43604305637C
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 13:11:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 61FB8300BEA7
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 13:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A6F53E0238;
-	Fri,  8 May 2026 13:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82BC73E276D;
+	Fri,  8 May 2026 13:14:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RkiuW8Wu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B3E6Jmj3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE6712CDBE;
-	Fri,  8 May 2026 13:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 606EB3DDDDB;
+	Fri,  8 May 2026 13:14:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778245886; cv=none; b=KwN36T5DVXTj0AqnycHrR1hIoa+xjgAyqhosHLike7szaJ8aPr77USvgVDVB2L6EsgQVSw7nn/jHtOuZL8NG6ugBrkG+LPkD7EJp5zI+46I/xr7VyPhLvyO/A1Z5WRgMzQ8H7AHYxN6Cw4QQLtVLEMJNpYysYyj+JVNa4dED8xk=
+	t=1778246052; cv=none; b=nWcZnficlefQhO5VBewxIq9PMx3rgpd+bbny1DlOz3jAY05a9Gbu5PP+HSdYwz+OHGWZ1/PgR2Sc+13CRYW/60f4xZLhH3ZQ3FmoYu3GV94Gtkj9rQfSEB40Bml3MjvzI/G+Jc1CMhoo9hOKNGH3aTaWfvVayD2056eBQ0STXXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778245886; c=relaxed/simple;
-	bh=s4VkyW6Ymj0X647w5aPHLX8Impm8n/23UVTni3FkwDk=;
+	s=arc-20240116; t=1778246052; c=relaxed/simple;
+	bh=T9xjqblfP5Kt4p73w+ZmacLEOzrmjcyyAl7jfGRQ15k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FujBpkJikZknz6Ct5aV8/7+TWfLBW/cjxqSMbS2XyvoxATcVo2ElJxnRDfGGL9MrBamEDI9QRPzp4mtIW2mElUEqGamO3P2T8jcmNQEj4ZjcZmlzM1ci7TeIjy05n+zjWG0mcHL7UxmgtgKuQiW56D2BqXZsS0pv9dl0Go2uS9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RkiuW8Wu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADD75C2BCB0;
-	Fri,  8 May 2026 13:11:23 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=UB1i/DD8qauGYVuBDLBEcaIRiY6btpBH5YEyp7iYmgFMRQ56nQFhTVkxjWPdI1Rwu//L4qWi5imWrSZ/o6P7DfXoSQi4uz8dgHBUfTfZX42xJ0cZdl7+WUEqOuLMT49ou3/ExpX5GoMGQRGxhoiQP1kR4azFv/K6JVxtDdn3DRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B3E6Jmj3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0F36C2BCB0;
+	Fri,  8 May 2026 13:14:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778245885;
-	bh=s4VkyW6Ymj0X647w5aPHLX8Impm8n/23UVTni3FkwDk=;
+	s=k20201202; t=1778246052;
+	bh=T9xjqblfP5Kt4p73w+ZmacLEOzrmjcyyAl7jfGRQ15k=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RkiuW8WuvbCjoltHo2R7ImGHyTP1X+HJjXOvmiDGORAkoUjd7bRtnujJzi8NjZ62b
-	 Aw5b2NBOr99kUVPPg8++4d+/pDa53NmlLoO2BLGwoNSkw0RtUEVA8GEbkewmHsyWXd
-	 eHxGYOUp4BULphk4AXX6IKUdQS2UauhBaf4qdKhnvuJb8neHBdZ8kLyg/4fUqOvmIv
-	 QDM5BONisY9nvg2Zgr5ZWVIrC1Ol+/muQ47FXI0P6TVmdTt2PunlkDgXyB30+p740V
-	 xTW01VLSV+U84ccqsBgC1ZarJ+1JUI11CI2yA1GPwpw1lsV8BdDq/+zMC5huMpopMK
-	 FodDD+H+FWwBQ==
-Message-ID: <bb56ee81-dbcd-4aae-b5f9-64debb9c9bbd@kernel.org>
-Date: Fri, 8 May 2026 23:11:20 +1000
+	b=B3E6Jmj3TZY8Q+W7JPq2bwUryqyxvF1JQXv5kB1vCMgyhwSrYca1MwK6/xQtzQFN7
+	 I7pnjEbnBlsifSii6MAtOoShUJqh6jHeR53SrTO0swPEmmzfjEvdhy2EyqNQkD/YqP
+	 BaM+VQCHH3eBl4Uhrd8W3OmdU8pAFUpo1eUuem3S6vRZT0XrNPHZv1I/XzkD3K7jBj
+	 vzdifR3loJ1AN4OUg5oOLt0qZXjZclPDpIqB8cH0sn1EWZ7niidcK8V0Z5hfONUwoF
+	 gtmbqy5Q/7VEJdz2iuLnNIAPbDVWVTDmmQ2obSCzQYnzN2WHm4GeZEPXJeYANRUcsN
+	 JRb50yW9mxANQ==
+Message-ID: <151f5b1b-8a82-4d7b-b1c9-67da07853806@kernel.org>
+Date: Fri, 8 May 2026 23:14:07 +1000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,81 +54,99 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [RFC 1/4] net: fec: do not use readl()/writel() for ColdFire
-To: Wei Fang <wei.fang@nxp.com>,
- "linux-m68k@lists.linux-m68k.org" <linux-m68k@lists.linux-m68k.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+To: David Laight <david.laight.linux@gmail.com>, Wei Fang <wei.fang@nxp.com>
+Cc: "linux-m68k@lists.linux-m68k.org" <linux-m68k@lists.linux-m68k.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
  "arnd@kernel.org" <arnd@kernel.org>, Greg Ungerer <gerg@linux-m68k.org>,
  Frank Li <frank.li@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
  "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 References: <20260506142644.3234270-2-gerg@kernel.org>
  <DBBPR04MB750044F98B1E719AD9DBD93E883D2@DBBPR04MB7500.eurprd04.prod.outlook.com>
+ <20260508094043.20f5f3fc@pumpkin>
 Content-Language: en-US
 From: Greg Ungerer <gerg@kernel.org>
-In-Reply-To: <DBBPR04MB750044F98B1E719AD9DBD93E883D2@DBBPR04MB7500.eurprd04.prod.outlook.com>
+In-Reply-To: <20260508094043.20f5f3fc@pumpkin>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: ED1D44F6D2A
+X-Rspamd-Queue-Id: 86CF24F6DAF
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-285827-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-285828-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,nxp.com];
 	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[gerg@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
 
-On 8/5/26 12:46, Wei Fang wrote:
->>   static void
->>   fec_stop(struct net_device *ndev)
->>   {
->>   	struct fec_enet_private *fep = netdev_priv(ndev);
->> -	u32 rmii_mode = readl(fep->hwp + FEC_R_CNTRL) & FEC_RCR_RMII;
->> +	u32 rmii_mode = fec_readl(fep->hwp + FEC_R_CNTRL) & FEC_RCR_RMII;
+On 8/5/26 18:40, David Laight wrote:
+> On Fri, 8 May 2026 02:46:38 +0000
+> Wei Fang <wei.fang@nxp.com> wrote:
 > 
-> This is not an issue, but since you changed this line, the new code should
-> follow the "reverse xmas tree" style.
+>>>   static void
+>>>   fec_stop(struct net_device *ndev)
+>>>   {
+>>>   	struct fec_enet_private *fep = netdev_priv(ndev);
+>>> -	u32 rmii_mode = readl(fep->hwp + FEC_R_CNTRL) & FEC_RCR_RMII;
+>>> +	u32 rmii_mode = fec_readl(fep->hwp + FEC_R_CNTRL) & FEC_RCR_RMII;
+>>
+>> This is not an issue, but since you changed this line, the new code should
+>> follow the "reverse xmas tree" style.
+> 
+> Looking rmii_mode isn't even used until much later in the function.
+> (and then not very often)
+> Much better to read it just before it is needed.
 
-Sure, will change in next version.
+Sure, but that feels like a change for a separate patch.
+The changes to this file are a global search and replace.
+The final produced object is identical before and after.
 
-Thanks
+Regards
 Greg
 
 
-> See: https://elixir.bootlin.com/linux/v7.0.1/source/Documentation/process/maintainer-netdev.rst#L380
+> 	David
 > 
->>   	u32 val;
+> 
 >>
->>   	/* We cannot expect a graceful transmit stop without link !!! */
->>   	if (fep->link) {
->> -		writel(1, fep->hwp + FEC_X_CNTRL); /* Graceful transmit stop */
->> +		fec_writel(1, fep->hwp + FEC_X_CNTRL); /* Graceful transmit stop */
->>   		udelay(10);
->> -		if (!(readl(fep->hwp + FEC_IEVENT) & FEC_ENET_GRA))
->> +		if (!(fec_readl(fep->hwp + FEC_IEVENT) & FEC_ENET_GRA))
->>   			netdev_err(ndev, "Graceful transmit stop did not complete!\n");
->>   	}
+>> See: https://elixir.bootlin.com/linux/v7.0.1/source/Documentation/process/maintainer-netdev.rst#L380
+>>
+>>>   	u32 val;
+>>>
+>>>   	/* We cannot expect a graceful transmit stop without link !!! */
+>>>   	if (fep->link) {
+>>> -		writel(1, fep->hwp + FEC_X_CNTRL); /* Graceful transmit stop */
+>>> +		fec_writel(1, fep->hwp + FEC_X_CNTRL); /* Graceful transmit stop */
+>>>   		udelay(10);
+>>> -		if (!(readl(fep->hwp + FEC_IEVENT) & FEC_ENET_GRA))
+>>> +		if (!(fec_readl(fep->hwp + FEC_IEVENT) & FEC_ENET_GRA))
+>>>   			netdev_err(ndev, "Graceful transmit stop did not complete!\n");
+>>>   	}
+>>>    
+>>
 >>
 > 
 
