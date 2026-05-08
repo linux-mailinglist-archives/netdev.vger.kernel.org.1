@@ -1,243 +1,262 @@
-Return-Path: <netdev+bounces-285802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285808-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mJxBKnra/Wl2jgAAu9opvQ
-	(envelope-from <netdev+bounces-285802-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:43:38 +0200
+	id ML/IKb/e/Wn0jwAAu9opvQ
+	(envelope-from <netdev+bounces-285808-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:01:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A1444F6822
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 14:43:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5257D4F6B8D
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 15:01:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5D342303098F
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 12:41:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 546533009176
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 12:59:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8213DEAC3;
-	Fri,  8 May 2026 12:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0298D3E121B;
+	Fri,  8 May 2026 12:59:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WuSviAk5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EZoTwqiL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7BA3DCDB8
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 12:41:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CADB43E0C6F
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 12:59:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778244068; cv=none; b=dYx7WQnWpq13BXWHcIu5cjmLqCw27kCoP999+VO0HHIilBsehHrd4S1HUpvnUgHI3oF3FXDzSS8+rVGuXGAuHjXJapWVNzTudMoAFseGJngUN7SheCwJGY31KuUHwJt5VsleLgqE4nWP1Q3M2NH7VnRylLHukoZEKkNoQpvE2SQ=
+	t=1778245185; cv=none; b=nVOuCD4EomqZy1vmI+xC8DOhuAUyQP6v+SChiW6cYQaVIj1JmgChGs3f+u1fwhDXIANVyDzNsPZc/RrKxEYr98a6+daHC+FAE/Tv+bqjx6+vrgwzCFvV3RkkqiJX5b2QW0P1XNqE5RSwnmldYpDajDVaJJjdA3ng75JJzRQfzQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778244068; c=relaxed/simple;
-	bh=nlSoLnSKPIcLMHgTsk2TjZ6qExBlK3inTuUN51B7onw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Az9jyzZ1NmUcOVNFNfAGG+kR630vElW+fV3B19F85OFN7JHkT26WhnSnlK0q/mIRdeAAZ/UclDulRDY/fSXfgTjwrrLUcKevkHV6kANMWMU17YW8J5ZTvDst4VlTHwbeKhVrfNJmV5GCl6EImk58VRm4Oz5qhUTio/2KmrugUvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WuSviAk5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778244065;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oOQAs0ycqiuZ5ztluw7Eol8hdH6Zm+lywN/xK4ATBJE=;
-	b=WuSviAk5NxTE0fhC3ufi7Qv64UxSeZQSxig4UzpY22seQjO+rmrST++mO0VSGz4Q4nUEwE
-	TiuwoHo4vofo9Etz+4oup1/p0GYcspOaCbOzrDzXIXGyYiwnphWMnzMRT5HPJpoKd8ITce
-	lirncLfR89zjbWBgb3fb9Xd34jXVtdM=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-690-__LpUwA2PWSIeTbZN4yHAA-1; Fri,
- 08 May 2026 08:41:02 -0400
-X-MC-Unique: __LpUwA2PWSIeTbZN4yHAA-1
-X-Mimecast-MFC-AGG-ID: __LpUwA2PWSIeTbZN4yHAA_1778244060
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 26F7A18005B6;
-	Fri,  8 May 2026 12:41:00 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.65.142])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8D64E300019F;
-	Fri,  8 May 2026 12:40:57 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Minxi Hou <houminxi@gmail.com>
-Cc: netdev@vger.kernel.org,  echaudro@redhat.com,  i.maximets@ovn.org,
-  davem@davemloft.net,  edumazet@google.com,  kuba@kernel.org,
-  pabeni@redhat.com,  horms@kernel.org,  shuah@kernel.org,
-  dev@openvswitch.org,  linux-kselftest@vger.kernel.org,
-  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v7 2/2] selftests: openvswitch: add pop_vlan test
-In-Reply-To: <20260507131541.2331771-3-houminxi@gmail.com> (Minxi Hou's
-	message of "Thu, 7 May 2026 21:15:41 +0800")
-References: <20260507131541.2331771-1-houminxi@gmail.com>
-	<20260507131541.2331771-3-houminxi@gmail.com>
-Date: Fri, 08 May 2026 08:40:50 -0400
-Message-ID: <f7th5oirs4t.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1778245185; c=relaxed/simple;
+	bh=Cecj/jI4Hf3y5GjyNmlPt5sbEVv1v3dHbPozo7/APAo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nRQrkrMqKQP3k6PrmrIF9+rVadBr97LU4CyKcbX4nmXeVJA8xaIxs/YGZfogzgnXZpaBWTBUTFYO/URBt1W7UMmuiwL80tSYggHfQgp8wuMSbgZs+C77m66xOeLkCwUHgVeQpOuIJ89aeTg/q7qDY3/GGrPZ4qZJv0LNWQp62YY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EZoTwqiL; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778245183; x=1809781183;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Cecj/jI4Hf3y5GjyNmlPt5sbEVv1v3dHbPozo7/APAo=;
+  b=EZoTwqiL4W58eQ1jRddb5zfEAd77kIhEtL+lqbOFgItFle/SCQgAuCeo
+   Ikl77gOvz7G3992rZG8DwtjiM4FhKdy3txCyox9NhZU5iuayC4ALsJi1C
+   OgxuEhwr4jbnRakYXt7wZbjl1S5zxdxVzkEbCtuc7FTuwQ9eQoCk9u2UV
+   LQeTDwDmsI5Bf5O7c/A/kqwZsbXmW6x+bsfWQbTQBZo5ohG7P5VEAOEjs
+   8Fa4SbRoLtfter13KDRwelON1pGyBA7o2vZ+WbJFahmCpd9gZHfv/ZK7B
+   w4PkVvEkriYY2xEwhCVV8Dm1dtzgm0f1zWGGKY1pEzcmry2X/QtpCzcSJ
+   g==;
+X-CSE-ConnectionGUID: 5k4Qx7TMRAe4Ia1OShCKYg==
+X-CSE-MsgGUID: oiU+tLglTXimtY4tGYSfkg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11779"; a="79199845"
+X-IronPort-AV: E=Sophos;i="6.23,223,1770624000"; 
+   d="scan'208";a="79199845"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2026 05:59:43 -0700
+X-CSE-ConnectionGUID: 71w7MdL8REmoYuq4rRbu+Q==
+X-CSE-MsgGUID: KgGuZ4MPQ825zBvYOvUa1w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,223,1770624000"; 
+   d="scan'208";a="241730090"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa005.fm.intel.com with ESMTP; 08 May 2026 05:59:36 -0700
+Received: from vecna.igk.intel.com (vecna.igk.intel.com [10.123.220.17])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 58E6F28795;
+	Fri,  8 May 2026 13:59:34 +0100 (IST)
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	bruce.richardson@intel.com,
+	Vladimir Medvedkin <vladimir.medvedkin@intel.com>,
+	padraig.j.connolly@intel.com,
+	ananth.s@intel.com,
+	timothy.miskell@intel.com,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Lukasz Czapnik <lukasz.czapnik@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-next v1 00/15] devlink, mlx5, iavf, ice: XLVF for iavf
+Date: Fri,  8 May 2026 14:41:53 +0200
+Message-Id: <20260508124208.11622-1-przemyslaw.kitszel@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Rspamd-Queue-Id: 6A1444F6822
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 5257D4F6B8D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-285802-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-285808-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aconole@redhat.com,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_COUNT_FIVE(0.00)[6];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-0.997];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ozlabs.org:url]
 X-Rspamd-Action: no action
 
-Minxi Hou <houminxi@gmail.com> writes:
+Code is also available here:
+https://github.com/pkitszel/linux/tree/xlvf-iwl
 
-> Add test_pop_vlan() to verify OVS kernel datapath pop_vlan action
-> correctly strips 802.1Q VLAN tags from frames.
->
-> Test structure:
-> - Baseline: untagged forwarding validates basic connectivity.
-> - Negative: forward without pop_vlan, tagged frame is invisible
->   to ns2 (no VLAN sub-interface), ping fails.
-> - Positive: pop_vlan strips tag on forward path, push_vlan
->   restores tag on return path, ping succeeds.
->
-> Use static ARP entries to avoid VLAN-tagged ARP complexity.
-> Rely on ping success/failure for verification -- no tcpdump or
-> pcap files needed.
->
-> Signed-off-by: Minxi Hou <houminxi@gmail.com>
-> ---
->  .../selftests/net/openvswitch/openvswitch.sh  | 73 +++++++++++++++++++
->  1 file changed, 73 insertions(+)
->
-> diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> index b327d3061ed5..6d13ee8c2baf 100755
-> --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> @@ -27,6 +27,7 @@ tests="
->  	upcall_interfaces			ovs: test the upcall interfaces
->  	tunnel_metadata				ovs: test extraction of tunnel metadata
->  	drop_reason				drop: test drop reasons are emitted
-> +	pop_vlan				vlan: POP_VLAN action strips tag
->  	psample					psample: Sampling packets with psample"
->  
->  info() {
-> @@ -830,6 +831,78 @@ test_tunnel_metadata() {
->  	return 0
->  }
->  
-> +test_pop_vlan() {
-> +	local sbx="test_pop_vlan"
-> +	sbx_add "$sbx" || return $?
-> +	ovs_add_dp "$sbx" vlandp || return 1
-> +
-> +	ovs_add_netns_and_veths "$sbx" vlandp \
-> +		ns1 veth1 ns1veth 192.0.2.1/24 || return 1
-> +	ovs_add_netns_and_veths "$sbx" vlandp \
-> +		ns2 veth2 ns2veth 192.0.2.2/24 || return 1
-> +
-> +	# Baseline: untagged bidirectional forwarding
-> +	ovs_add_flow "$sbx" vlandp \
-> +		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
-> +	ovs_add_flow "$sbx" vlandp \
-> +		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
-> +	ovs_add_flow "$sbx" vlandp \
-> +		'in_port(1),eth(),eth_type(0x0800),ipv4()' '2' || return 1
-> +	ovs_add_flow "$sbx" vlandp \
-> +		'in_port(2),eth(),eth_type(0x0800),ipv4()' '1' || return 1
-> +	ovs_sbx "$sbx" ip netns exec ns1 ping -c 3 -W 2 \
-> +		192.0.2.2 || return 1
-> +
-> +	# VLAN topology: ns1 uses VLAN sub-interface, ns2 is plain
-> +	ip -n ns1 link add link ns1veth name ns1veth.10 \
-> +		type vlan id 10 || return 1
-> +	on_exit "ip -n ns1 link del ns1veth.10 2>/dev/null"
-> +	ip -n ns1 addr add 198.51.100.1/24 dev ns1veth.10 || return 1
-> +	ip -n ns1 link set ns1veth.10 up || return 1
-> +	ip -n ns2 addr add 198.51.100.2/24 dev ns2veth || return 1
-> +
-> +	ovs_del_flows "$sbx" vlandp
-> +
-> +	# Static ARP: avoids VLAN-tagged ARP complexity
-> +	local ns1veth10mac ns2mac
-> +	ns1veth10mac=$(ip -n ns1 link show ns1veth.10 \
-> +		| awk '/link\/ether/ {print $2}')
+There are two dependecies:
+https://patchwork.ozlabs.org/project/intel-wired-lan/patch/20260429102426.210750-4-jtornosm@redhat.com
+https://patchwork.ozlabs.org/project/intel-wired-lan/patch/20260427151827.43342-1-mschmidt@redhat.com
 
-We might add a check here (as a just in case):
+The purpose of this series is to allow iavf to use more than 16 queue pairs,
+in two modes, up to 64 and up to 256 queue pairs.
 
-  [ -z "$ns1veth10mac" ] && \
-    { info "failed to get ns1veth10mac"; return 1; }
+Devlink changes:
+1. Extend devlink by two callbacks used by shared devlink.
+   Callbacks provide option for the driver to have constructor/destructor
+   for the priv data attached to the shared devlink instance.
+   Use the callbacks from ice.
+   mlx5 is just touched to have additional param passed.
+   Non-null additional param for the constructor is used in: "ice: represent RSS
+   LUTs as devlink resources"
+2. Extend devlink resources API to allow user to assign resources.
+   Before it was only the driver to assign resources, without any way for user
+   to interact. ice' RSS LUTs are exposed that way.
 
-Same with the ns2mac.   The commands after will fail anyway (because the
-empty string will be an issue for the syntax), so it's more like helping
-to debug when things go wrong.
+More about the interface:
+In order to support more queues for VF, we must give it a bigger RSS table
+(GLOBAL LUT or PF LUT). There are 16 GLOBAL LUTs on E810, and there is one
+PF LUT for every PF on given card. Both kinds of the mentioned LUTs could
+be (re)assigned to VF. PF must hold at least one of the mentioned LUTs at
+any given moment. GLOBAL LUT allows VF to use up to 64 queues, PF LUT lets
+it to use up to 256 queues.
 
-With that:
+RSS LUTs are exposed for the user for assignment via devlink resources
+API, which I have extended to make it possible.
 
-Reviewed-by: Aaron Conole <aconole@redhat.com>
+We have also some "little cleanup" patches, Admin Queue extension
+for GLOBAL RSS alloc/free, and two rather big "new opcodes" patches by Ahmed
+and Brett.
 
-> +	ns2mac=$(ip -n ns2 link show ns2veth \
-> +		| awk '/link\/ether/ {print $2}')
-> +	ip -n ns1 neigh replace 198.51.100.2 lladdr "$ns2mac" \
-> +		dev ns1veth.10 nud permanent || return 1
-> +	ip -n ns2 neigh replace 198.51.100.1 \
-> +		lladdr "$ns1veth10mac" \
-> +		dev ns2veth nud permanent || return 1
-> +
-> +	local vlan_match='in_port(1),eth(),eth_type(0x8100),'
-> +	vlan_match+='vlan(vid=10),'
-> +	vlan_match+='encap(eth_type(0x0800),'
-> +	vlan_match+='ipv4(src=198.51.100.1,proto=1),icmp())'
-> +
-> +	# Negative: forward without pop_vlan -- tagged frame
-> +	# is invisible to ns2 (no VLAN sub-interface), ping fails
-> +	ovs_add_flow "$sbx" vlandp "$vlan_match" '2' || return 1
-> +	ovs_sbx "$sbx" ip netns exec ns1 ping -I ns1veth.10 \
-> +		-c 3 -W 1 198.51.100.2 >/dev/null 2>&1 \
-> +		&& { info "FAIL: ping should fail without pop_vlan"
-> +		     return 1; }
-> +
-> +	ovs_del_flows "$sbx" vlandp
-> +
-> +	# Positive: pop_vlan strips tag on forward path,
-> +	# push_vlan restores tag on return path -- ping succeeds
-> +	ovs_add_flow "$sbx" vlandp \
-> +		"$vlan_match" 'pop_vlan,2' || return 1
-> +	ovs_add_flow "$sbx" vlandp \
-> +		'in_port(2),eth(),eth_type(0x0800),ipv4()' \
-> +		'push_vlan(vid=10,pcp=0,tpid=0x8100),1' || return 1
-> +	ovs_sbx "$sbx" ip netns exec ns1 ping -I ns1veth.10 \
-> +		-c 3 -W 2 198.51.100.2 || return 1
-> +
-> +	return 0
-> +}
-> +
->  run_test() {
->  	(
->  	tname="$1"
+I introduce also a "whole device" aggregate over all PFs on
+given card, via shared devlink instance.
+
+I also extend devlink resources to have custom occupancy setters, that allow
+user to modify PF device LUTs assignment.
+
+Finally there is a patch that adds devlink instance for VF and registers
+devlink resources on it, combined with all the glue code to make actual
+use of the whole series and desired larger number of queues accepted to VF
+This (the last) patch contains usage examples.
+
+There is one resource added that just groups GLOBAL and PF LUTs under it -
+there are 3 rows of data for each device (PF/VF/whole-dev):
+$ devlink resource show pci/0000:18:00.0
+pci/0000:18:00.0:
+  name rss size 1 unit entry size_min 0 size_max 2 size_gran 1 dpipe_tables none
+    resources:
+      name lut_512 size 0 unit entry size_min 0 size_max 1 size_gran 1 dpipe_tables none
+      name lut_2048 size 1 unit entry size_min 0 size_max 1 size_gran 1 dpipe_tables none
+technically the aggregate "name rss" line could be eliminated with just
+the two last ones kept (then renamed to "rss_lut_2048" form current
+"rss/lut_2048"), I like it like this, but this was just an opinion.
+The rest of the series is rather much needed, but I'm always open to
+discussion.
+
+Devlink resource changes were RFC-proposed a year ago, link in the patch.
+
+Ahmed Zaki (1):
+  iavf: use new opcodes to request more than 16 queues
+
+Brett Creeley (2):
+  ice: add VF queue ena/dis helper functions
+  ice: introduce handling of virtchnl LARGE VF opcodes
+
+Przemek Kitszel (12):
+  devlink, mlx5: add init/fini ops for shared devlink
+  ice: use shared devlink to store ice_adapters instead of custom xarray
+  ice: simplify ice_vc_dis_qs_msg() a little
+  ice: add helpers for Global RSS LUT alloc, free, vsi_update
+  ice: rename ICE_MAX_RSS_QS_PER_VF to ICE_MAX_QS_PER_VF_VCV1
+  ice: bump to 256qs for VF
+  iavf: extend iavf_configure_queues() to support more queues
+  iavf: temporary rename of IAVF_MAX_REQ_QUEUES to
+    IAVF_MAX_REQ_QUEUES_VCV1
+  iavf: increase max number of queues to 256
+  devlink: give user option to allocate resources
+  ice: represent RSS LUTs as devlink resources
+  ice: support up to 256 VF queues
+
+ drivers/net/ethernet/intel/ice/Makefile       |   1 +
+ drivers/net/ethernet/intel/iavf/iavf.h        |  18 +-
+ .../net/ethernet/intel/ice/devlink/resource.h |  22 +
+ drivers/net/ethernet/intel/ice/ice.h          |   1 +
+ drivers/net/ethernet/intel/ice/ice_adapter.h  |  52 +-
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   1 +
+ drivers/net/ethernet/intel/ice/ice_common.h   |   1 +
+ drivers/net/ethernet/intel/ice/ice_lag.h      |   2 +-
+ drivers/net/ethernet/intel/ice/ice_lib.h      |   5 +-
+ drivers/net/ethernet/intel/ice/ice_switch.h   |   2 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h   |  26 +-
+ drivers/net/ethernet/intel/ice/virt/queues.h  |   3 +
+ drivers/net/ethernet/intel/ice/virt/rss.h     |   1 +
+ .../net/ethernet/intel/ice/virt/virtchnl.h    |   4 +
+ include/linux/intel/virtchnl.h                | 136 ++++-
+ include/net/devlink.h                         |  33 +
+ .../net/ethernet/intel/iavf/iavf_ethtool.c    |   7 +-
+ drivers/net/ethernet/intel/iavf/iavf_main.c   | 125 +++-
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 262 +++++++-
+ .../net/ethernet/intel/ice/devlink/devlink.c  |   3 +
+ .../net/ethernet/intel/ice/devlink/resource.c | 572 ++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_adapter.c  | 105 ++--
+ drivers/net/ethernet/intel/ice/ice_common.c   |   2 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c      |  78 ++-
+ drivers/net/ethernet/intel/ice/ice_main.c     |  43 +-
+ drivers/net/ethernet/intel/ice/ice_sriov.c    |  14 +-
+ drivers/net/ethernet/intel/ice/ice_switch.c   |  41 ++
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c   |  54 +-
+ .../net/ethernet/intel/ice/virt/allowlist.c   |   8 +
+ drivers/net/ethernet/intel/ice/virt/queues.c  | 480 +++++++++++++--
+ drivers/net/ethernet/intel/ice/virt/rss.c     |  36 +-
+ .../net/ethernet/intel/ice/virt/virtchnl.c    |  47 +-
+ .../ethernet/mellanox/mlx5/core/sh_devlink.c  |   2 +-
+ net/devlink/resource.c                        |  98 ++-
+ net/devlink/sh_dev.c                          |  38 +-
+ 35 files changed, 2102 insertions(+), 221 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ice/devlink/resource.h
+ create mode 100644 drivers/net/ethernet/intel/ice/devlink/resource.c
+
+-- 
+2.39.3
 
 
