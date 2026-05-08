@@ -1,197 +1,171 @@
-Return-Path: <netdev+bounces-285956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-285957-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IOG/JXIr/mk/ngAAu9opvQ
-	(envelope-from <netdev+bounces-285956-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 20:29:06 +0200
+	id oAp8Coos/ml0ngAAu9opvQ
+	(envelope-from <netdev+bounces-285957-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 20:33:46 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0295A4FA9A2
-	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 20:29:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F0824FA9F2
+	for <lists+netdev@lfdr.de>; Fri, 08 May 2026 20:33:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C206730234D5
-	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 18:29:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9B74E3025D0B
+	for <lists+netdev@lfdr.de>; Fri,  8 May 2026 18:33:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116113D903C;
-	Fri,  8 May 2026 18:29:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFF0B3783A8;
+	Fri,  8 May 2026 18:33:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tA9+tX1h"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="jgavkDgz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299AB3D8106
-	for <netdev@vger.kernel.org>; Fri,  8 May 2026 18:28:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E8AB1F91F6
+	for <netdev@vger.kernel.org>; Fri,  8 May 2026 18:33:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778264941; cv=none; b=JOYx2bp8wKw4jPEdhbkb8Y/AMXf+Dw33YlVMPphtphy+15rsQJtTdWEE4nojoJRhwsRnPL4D+9jvOmAUU1Pd40erMbmM1yYHNNJHPOVqphCgpokm5Cl+0oAy3+5ZNxogKSZ9VD4sLjE/qTw/iNiT6yNnPi84ZBvjT0kR+ZsC5fg=
+	t=1778265222; cv=none; b=cC6ChaeBSaaKdI4vqGCt9lgudgNgn4BslMZJsxaydS/Cpd2ukWAYBIvEngtH2/S41ffMvluxuF7h77BRz8Yfzo1Hg5Dv2YaykqxRr6tjzJ/+wpuOkGJ+cfBx86FtpOM01r7iIwA45yFhSDlWceqMckuxxfXPY3bbHia8ieL/P3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778264941; c=relaxed/simple;
-	bh=e+hoEU1BVnwIhgWSnafe2Ncw2XQkEPQSWsM97UwRlqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Dn+7zw9ltBKV/+34NFGdCDSftHMre8BL67wZVtEc3Lni62PZ0ka9hvg7KVyIjyN7a9EWck2Qg3MCAaOhkGGhw26CKIBcTcy+Y/50Ut2gM573JV/VMd2iCnzZQ6FApOFONOKtwrAE3/sqYjx3RQnNMNTvcKQfb8G0GrZ9zmsXkh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=tA9+tX1h; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-48334ee0aeaso17731895e9.1
-        for <netdev@vger.kernel.org>; Fri, 08 May 2026 11:28:58 -0700 (PDT)
+	s=arc-20240116; t=1778265222; c=relaxed/simple;
+	bh=6GLyNF6vbIZMeC9hJuUoOqy9YYTm345Gh23ogdPiPG8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AeHjlWTqOaNc5M3jD9hJgOI0dXXCReDSAYy3cl9KiPG/a8AgCj+c6CBHMQMZOevREclYSQn05+YEa8zrR5vkewx4sMCXhIGsN6uc5W7RmBVKXXyXtr2PSft6SAicYVm90E+ypXD02N82FwlyQ/ULp0auoX6NG54NWc10NSIuQXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=jgavkDgz; arc=none smtp.client-ip=74.125.82.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-1309f4ee97fso3100432c88.1
+        for <netdev@vger.kernel.org>; Fri, 08 May 2026 11:33:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778264937; x=1778869737; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oVMKZWAk0SD1GHr6tr/9fhB28kwxhrp+So3ZgzrkNIs=;
-        b=tA9+tX1hlqIMJBQp8pL1dIdDwcZjzMQ9wtubMLabRWf7K0bR/A6WIro+Q2O1ojvMWk
-         SX1rlwnFZNY5snfZhVIyu0B5KJUVmiELdEbMx8RZjQJoA36C1ABXz1fpeSbOd4WJnHtI
-         +WuMIPxhbuLVXl9UOph4WsZMWrS2Qpla0uM5c6g/Byq6ekq0OqF1+h0Zxtdz/DR43d9j
-         F54CLJnS9JOXI+6HJwnka4w8Jl+Io0316vhvqY0f7XB0vI/U07D2UUnJO0lUMGZ5nQaR
-         YZKwCiYkvoN1QIspHuZQTB/BS2RIddDS1arJ4gJu96GfUyp0DJs0BkMtYC15aPhd57Uc
-         g1zQ==
+        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1778265220; x=1778870020; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nQ2n3k/rZIJ8kJFhv4WMs9Q2AXD8SGmPY7Bkax05prQ=;
+        b=jgavkDgzjTUv9CXWBY5/btQb0FMIkjWGfGXM5Ts2Td61u1DsCyW/k8jGOsvLJuSwhy
+         sI2EHS27mH4Q9tQQLVNaCODp7LsUIc9KGF9AUALed2lQA7IFOL4qXOe6R0lqPm9HaFxN
+         ZSlvljuvZ2DfvYy8d9K7fQ8tb1bx2VJU1huQXPzzaAFBvwl/DWRNl7g60oI6OwlIqwTY
+         9dtbW73bNi/fLATDl9PntktBp+26Os5MS+TIvCaWej2n4Vagf2SEHZcWh+kKDYFFD0UF
+         9uDUjYWxz4JstAXBkekXN5+iXAG1nCkkeQvl1aNQg2FzKzWw86qNYVwXCobZ3nkQPj5G
+         gO7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778264937; x=1778869737;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=oVMKZWAk0SD1GHr6tr/9fhB28kwxhrp+So3ZgzrkNIs=;
-        b=fnnx9o6zwOn9ib6Vvxzyr0yy6RkzcPhPVaob142l3gec5R7X/sNAkgvrNMvnFTl1U1
-         0q0M+j8WHc6v8QsG9AMN2+jIPd/cHIsTS0ejb95+Xh8WcuqkY/ggh3JNf+N3H49PINb+
-         70Vo/4JaRwjmlW7ZaufkJi2Fuo0fWSardJ6+0JK2VbiToP1jnwHLvKIb4RTSpWubhrdg
-         Ym47dArXBbLcdkvEyztMXIug9cRi5i3tl1Lvfik4G6SBfO+Nczvp8Q3r8ZSx6KAKuYOJ
-         G+FV+JSJ2NaQVWioIzsjDZ89JardpchI3Ri7nHXoKO5CswM1xOJfnLm4W4hezbU+9ZJR
-         XhPA==
-X-Forwarded-Encrypted: i=1; AFNElJ80uS9hr6zpJrHbCrPgH7T1FxQHUOIfr4lRjCknvvDDE+4o6fYRNRGuWImLCn9A2ik3RLc52+4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwPVOkzKl0OAGNFyMo37pHkY6RfjkjGWTOu+FyuR8v9vHJDxpC
-	kaCDD5s7U1e9NT9naQNOyYJFm4KDjsTdA9M6ONMiN9BvHUlUrMUdyZZ/
-X-Gm-Gg: AeBDieslcZzoLrHMb+nLT+IP5tnL4Rn33Pw1dzwpr+yQMzHrV1WuRw7h43K26u8w9cu
-	Uk0sXTNM0JAqZJ3Bhc/vEaiIv9wbruObbLpP1j2AidwgOfmA0Yy5ckaEFFqqcUpOlSc+mXB1DMq
-	EHXg+ykjnSSbKf1TH62gffu33Wl4/eO8g7wJYkufvFn48o3b8LLD8D/vpPMcb+JCVP5RaN73GHW
-	c2hpiZzC8VJlfC2nJ9OZevlVIExU6mjo9KdZKeEL+qQlTkNBrzYvvYdicxkj2WaYkoogbyKzAvo
-	wkbqRPdQn3p4z1bTWl3Z7f6MeTjYcrVX41gT9bNz3I4/hx118+ugjC3/TkHpWMGxu7h1hqj3WQc
-	nZhdObMvVFAoRJ+FH6yBw0V06yj6T/z3b8roukLmDUFCd3zSZxzzGsewD/QtN9D+xGoyxT73TFs
-	F973PXYvQzz3qyQPDhukRorrTcHUVagxWwm2zDgYPWe4pVL+rBPZQ2pCr6g98c2S/v
-X-Received: by 2002:a05:600c:8011:b0:485:35d3:ce59 with SMTP id 5b1f17b1804b1-48e51e1a545mr213241825e9.10.1778264937224;
-        Fri, 08 May 2026 11:28:57 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e6dd3fd0csm10812815e9.14.2026.05.08.11.28.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 11:28:56 -0700 (PDT)
-Date: Fri, 8 May 2026 19:28:55 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Adrien Reynard <reynard.adrien.08@gmail.com>
-Cc: Andrey Ryabinin <ryabinin.a.a@gmail.com>, Alexander Potapenko
- <glider@google.com>, Andrey Konovalov <andreyknvl@gmail.com>, Dmitry Vyukov
- <dvyukov@google.com>, Vincenzo Frascino <vincenzo.frascino@arm.com>,
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Richard Weinberger
- <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes
- Berg <johannes@sipsolutions.net>, kasan-dev@googlegroups.com (open
- list:KASAN), workflows@vger.kernel.org (open list:DOCUMENTATION PROCESS),
- linux-doc@vger.kernel.org (open list:DOCUMENTATION),
- linux-kernel@vger.kernel.org (open list), netdev@vger.kernel.org (open
- list:NETWORKING [GENERAL]), linux-um@lists.infradead.org (open
- list:USER-MODE LINUX (UML))
-Subject: Re: [PATCH 4/5] docs: fix repeated prepositions across
- documentation
-Message-ID: <20260508192855.3b024c83@pumpkin>
-In-Reply-To: <20260508163804.16267-1-reynard.adrien.08@gmail.com>
-References: <20260508163804.16267-1-reynard.adrien.08@gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        d=1e100.net; s=20251104; t=1778265220; x=1778870020;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nQ2n3k/rZIJ8kJFhv4WMs9Q2AXD8SGmPY7Bkax05prQ=;
+        b=l6znIdQHLF96LctDjHemUHe/yYEvNTRZvt5CbX8Skr2WOvK2cvZ94qOStpTacDfJV+
+         iPBIuKbUjhOhIbW82H1WMjjgZBFpZRFIZP4KCMfOIzu4aXGYQBvK/lOJuCG0Ykbkk8gW
+         QgOdhhSV+xGHwhBSGuxYMV2wPFOVLi9oNvN5GyAyvk+c/DsUE/QhdJ1rQk3g1oro3CPi
+         APE90OpndsAkYicvxYfq5oiTHxHOJXrN637PAU7NYgLnKTWtyF+nsNyPlpYidodLnYIQ
+         lUb2YVrexRV0BOP76Stlke+iooQSM3bcWCH5YPg3IrBO7OMDajmW7HC3sng+T6+chWf8
+         mwUw==
+X-Forwarded-Encrypted: i=1; AFNElJ8N0wUwpBVQczukZSJMno1jV6lHcHV73MtmBbLjqIzoLQ1zisTBK+2j4KpkZxcyqyG8aHBOmh4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9y2RGF05E3O8RnyOqxPAY4AngUWcYhWc1L9mdiwm9ufe4s/3I
+	UrImNYUjmEAAyBZp/yxJz3elWQ4IT0zMYfh8l8s0epkotaaUAR8xTVHmLf8QsaBl+w==
+X-Gm-Gg: AeBDieuDBMZtEQovGX+0vsZ3C7WfuZEZsj/AHCTgycoTmDMki7pwW45dJVfj7dJ2b6H
+	ZR4yVM46xb71VMsaGyGCZ3pczwBDr9W28/WwwYf3PaEKts9yXahl8mkuK8fsGy1cWNTPtJY02A1
+	Sbs8CbIX8EpFnixGB22ZoFpi3T5OHqbiPKifvLMdTIJbhE1YD6Bc4twOLb5XUi8Zu5TA70v37rw
+	KAPJnfWCsrjHCufBwFCzs4qxqUtKZRn8+/QxjokKuNqhekVCLPX7T2Mq8sbzvbePO+SGbuP1ueo
+	KHM+bMiKRsD+g80pw544aEN5lp7Qf/kJk+0IS938A1pEFAfxa3v4sWZxCptOyn6RnJaxdTkCYg3
+	aZwQKQWuFxs2zMq6S3JUdCrn++8Ghg78Tx2wqGNZ5/H+1eLtgdomUK04LfcFpDu+HLFLpM3kH6+
+	IqUfGYIFgezDMrEkD0M8Wrw8S0l6VfvydBYw==
+X-Received: by 2002:a05:7022:e19:b0:12c:61fe:fb49 with SMTP id a92af1059eb24-131967d7c1cmr6928969c88.6.1778265220522;
+        Fri, 08 May 2026 11:33:40 -0700 (PDT)
+Received: from ?IPV6:2804:14d:5c54:4d67::2000? ([2804:14d:5c54:4d67::2000])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1327865700asm3395907c88.9.2026.05.08.11.33.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 May 2026 11:33:39 -0700 (PDT)
+Message-ID: <6b5d2268-ffaa-4746-87d0-8f16135aba44@mojatatu.com>
+Date: Fri, 8 May 2026 15:33:34 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 0295A4FA9A2
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 5/8] net/sched: add const qualifiers to
+ gnet_stats helpers
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20260507221948.335726-1-edumazet@google.com>
+ <20260507221948.335726-6-edumazet@google.com>
+Content-Language: en-US
+From: Victor Nogueira <victor@mojatatu.com>
+In-Reply-To: <20260507221948.335726-6-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 5F0824FA9F2
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-285956-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_FROM(0.00)[bounces-285957-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
+	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,google.com,arm.com,lwn.net,linuxfoundation.org,davemloft.net,kernel.org,redhat.com,nod.at,cambridgegreys.com,sipsolutions.net,googlegroups.com,vger.kernel.org,lists.infradead.org];
+	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mojatatu-com.20251104.gappssmtp.com:dkim]
 X-Rspamd-Action: no action
 
-On Fri,  8 May 2026 18:38:03 +0200
-Adrien Reynard <reynard.adrien.08@gmail.com> wrote:
-
-Nope, all these are correct as is.
-I'm not looking at any more.
-
-> Signed-off-by: Adrien Reynard <reynard.adrien.08@gmail.com>
-> ---
->  Documentation/dev-tools/kasan.rst                   | 2 +-
->  Documentation/networking/switchdev.rst              | 2 +-
->  Documentation/virt/uml/user_mode_linux_howto_v2.rst | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
+On 07/05/2026 19:19, Eric Dumazet wrote:
+> In preparation of lockless qdisc dumps, add const qualifiers to:
 > 
-> diff --git a/Documentation/dev-tools/kasan.rst b/Documentation/dev-tools/kasan.rst
-> index 4968b2aa60c8..3a8bd40ad905 100644
-> --- a/Documentation/dev-tools/kasan.rst
-> +++ b/Documentation/dev-tools/kasan.rst
-> @@ -392,7 +392,7 @@ reserved to tag freed memory regions.
->  If the hardware does not support MTE (pre ARMv8.5), Hardware Tag-Based KASAN
->  will not be enabled. In this case, all KASAN boot parameters are ignored.
->  
-> -Note that enabling CONFIG_KASAN_HW_TAGS always results in in-kernel TBI being
-> +Note that enabling CONFIG_KASAN_HW_TAGS always results in-kernel TBI being
->  enabled. Even when ``kasan.mode=off`` is provided or when the hardware does not
->  support MTE (but supports TBI).
->  
-> diff --git a/Documentation/networking/switchdev.rst b/Documentation/networking/switchdev.rst
-> index 2966b7122f05..948bce44ca9b 100644
-> --- a/Documentation/networking/switchdev.rst
-> +++ b/Documentation/networking/switchdev.rst
-> @@ -162,7 +162,7 @@ The switchdev driver can know a particular port's position in the topology by
->  monitoring NETDEV_CHANGEUPPER notifications.  For example, a port moved into a
->  bond will see its upper master change.  If that bond is moved into a bridge,
->  the bond's upper master will change.  And so on.  The driver will track such
-> -movements to know what position a port is in in the overall topology by
-> +movements to know what position a port is in the overall topology by
->  registering for netdevice events and acting on NETDEV_CHANGEUPPER.
->  
->  L2 Forwarding Offload
-> diff --git a/Documentation/virt/uml/user_mode_linux_howto_v2.rst b/Documentation/virt/uml/user_mode_linux_howto_v2.rst
-> index c37e8e594d12..7b08738c30aa 100644
-> --- a/Documentation/virt/uml/user_mode_linux_howto_v2.rst
-> +++ b/Documentation/virt/uml/user_mode_linux_howto_v2.rst
-> @@ -1092,7 +1092,7 @@ be formatted as plain text.
->  
->  Developing always goes hand in hand with debugging. First of all,
->  you can always run UML under gdb and there will be a whole section
-> -later on on how to do that. That, however, is not the only way to
-> +later on how to do that. That, however, is not the only way to
->  debug a Linux kernel. Quite often adding tracing statements and/or
->  using UML specific approaches such as ptracing the UML kernel process
->  are significantly more informative.
+> - gnet_stats_add_basic()
+> - gnet_stats_copy_basic()
+> - gnet_stats_copy_queue()
+> - gnet_stats_read_basic()
+> - ___gnet_stats_copy_basic()
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> [...]
+> diff --git a/net/core/gen_stats.c b/net/core/gen_stats.c
+> index 1a2380e74272de8eaf3d4ef453e56105a31e9edf..3b2f9ea2eb072dde792aad5b60cf00dcc2efa76d 100644
+> --- a/net/core/gen_stats.c
+> +++ b/net/core/gen_stats.c
+> @@ -124,7 +124,7 @@ void gnet_stats_basic_sync_init(struct gnet_stats_basic_sync *b)
+>   EXPORT_SYMBOL(gnet_stats_basic_sync_init);
+>   
+>   static void gnet_stats_add_basic_cpu(struct gnet_stats_basic_sync *bstats,
+> -				     struct gnet_stats_basic_sync __percpu *cpu)
+> +				     const struct gnet_stats_basic_sync __percpu *cpu)
 
+This seems to be causing a compilation error:
+
+net/core/gen_stats.c: In function ‘gnet_stats_add_basic_cpu’:
+./include/linux/percpu-defs.h:238:1: error: initialization discards 
+‘const’ qualifier from pointer target type [-Werror=discarded-qualifiers]
+   238 | ({ 
+         \
+       | ^
+net/core/gen_stats.c:133:54: note: in expansion of macro ‘per_cpu_ptr’
+   133 |                 struct gnet_stats_basic_sync *bcpu = 
+per_cpu_ptr(cpu, i);
+
+cheers,
+Victor
 
