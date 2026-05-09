@@ -1,52 +1,54 @@
-Return-Path: <netdev+bounces-286208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286206-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6O8kK62G/2nn7QAAu9opvQ
-	(envelope-from <netdev+bounces-286208-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 21:10:37 +0200
+	id 5ldxFYiG/2nn7QAAu9opvQ
+	(envelope-from <netdev+bounces-286206-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 21:10:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16E8C501295
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 21:10:36 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8EAC50127F
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 21:09:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1A7EC301ABBA
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 19:10:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1EEFC300362F
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 19:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 505053C9EEE;
-	Sat,  9 May 2026 19:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2538C3BB9FA;
+	Sat,  9 May 2026 19:09:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="JIyIYh3D"
+	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="JNGmpuwE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout2.routing.net (mxout2.routing.net [134.0.28.12])
+Received: from mxout4.routing.net (mxout4.routing.net [134.0.28.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5914A3E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D54E33A9D6;
 	Sat,  9 May 2026 19:09:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.12
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778353799; cv=none; b=tkXfYepuO7/aiVfe5WsqJzwFaaJp6KJ27go/Kj4Tcn306OrVUIl+ATBwAiwlemQC22OaVeOr9uMj6BEEPUPHYSCrX3SyhAkfDuNPrCB82Orl5gl9vExMRsl3N8MXg/uv2z6WV48zmkWwGWuoICjZFPOEqKlOye9N9DtQfBrcPNg=
+	t=1778353798; cv=none; b=eUgFiGERhS0iOoUcv+fk46pVutSvZcIGlNwQr+24gBJ+FqLqviu/lNWRx0TupljX7b8qrGGLq4BIMvs79EzeOQFgWZmvPjthHZGZL+r2bBbOHiHTrXcwCIGflLB7kRh/+hCDPHA4gGcAt4Hctw3GUAkb7W9YpEozDDpvVnOA2oY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778353799; c=relaxed/simple;
-	bh=JHZnWGqI6eiIxQuCB5+UHtBR+e2s1h2INqrc+YWSsH8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cIBdTNkNJF8lhzgkzsuI1Q7VQMofsFljtbW+m3ZD1oFPdJx0gWT2OAJh3FVSr4tfGkbF4T7+qxMcm0csomqTMjSBB645czmFZn2Q+8VtIfKFrL/XeePekfoH/y/jVXZ4HIX+w2YjpWH8z1aAPsPyMZtDAmDulmHASAbzTz6y2B8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=JIyIYh3D; arc=none smtp.client-ip=134.0.28.12
+	s=arc-20240116; t=1778353798; c=relaxed/simple;
+	bh=vsrtrJ9buHwdzmdyF82x8HdFrwpQnmtnlmltzMTO8Bs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KFJiTRVm71PYtkd+sTMqjRlh7F8eq0IInNKFDnrsvUdvoOn1A/A6CZa9mPU87DyNn42jqYMI2iToHHuAU/eCy7cRAMTAPxA7uAFHV7mbiCkSelnrkSiHXVXGR3b3bVlVx/cJNFzHRSXa+Bc1XSjECMrcXUWhVu+g/JQ7tQ6nAPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=JNGmpuwE; arc=none smtp.client-ip=134.0.28.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
 Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
-	by mxout2.routing.net (Postfix) with ESMTP id AEA365FC5A;
+	by mxout4.routing.net (Postfix) with ESMTP id EE10A100824;
 	Sat,  9 May 2026 19:09:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=routing; t=1778353786;
+	s=routing; t=1778353787;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=EKnlnckxkADslXtJokLa5AGNX78GYEKcN/BuvSjY7yo=;
-	b=JIyIYh3D0cLYIYGhraKVBwFzRh30NYLao4sogDADXfU7YlttF96e8Omu2P7gRpxhDksry2
-	2GevANviVXcmwOO/KBtufa7gO9ogC8xErua3A2IaH6xZ5thuk48eZKxFK7AktD9h96gH6e
-	XHmy2V00CQMKy1sJxnyj05aN1GzYUOE=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pQOo6i5L4AWlWVMmz8x/g6xSz6/gFVtG0BN+RVJuYk8=;
+	b=JNGmpuwEV9Mg+FDXbQ/EUqQeuaJjNR9uQ9d92VPzzr1lQLx2ebuAPftiQq7725x92Pc3WI
+	kaRMRvX3UQhb36v3uHUoPwZpeTsv0g3lUDxL/0OrVYreeW1WO7+Xz9m8NcJziKo6b2t+D6
+	hTfbSE3EifM84F7jPE6iM/Dd/5UUJW0=
 Received: from frank-u24.. (fttx-pool-217.61.152.172.bambit.de [217.61.152.172])
-	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id 707611226E6;
+	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id B2F011226F2;
 	Sat,  9 May 2026 19:09:46 +0000 (UTC)
 From: Frank Wunderlich <linux@fw-web.de>
 To: Felix Fietkau <nbd@nbd.name>,
@@ -66,10 +68,12 @@ Cc: Frank Wunderlich <frank-w@public-files.de>,
 	linux-mediatek@lists.infradead.org,
 	Mason Chang <mason-cw.chang@mediatek.com>,
 	Daniel Golle <daniel@makrotopia.org>
-Subject: [net-next v8 0/3] Add RSS and LRO support
-Date: Sat,  9 May 2026 21:09:29 +0200
-Message-ID: <20260509190938.169290-1-linux@fw-web.de>
+Subject: [net-next v8 1/3] net: ethernet: mtk_eth_soc: Add register definitions for RSS and LRO
+Date: Sat,  9 May 2026 21:09:30 +0200
+Message-ID: <20260509190938.169290-2-linux@fw-web.de>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260509190938.169290-1-linux@fw-web.de>
+References: <20260509190938.169290-1-linux@fw-web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,19 +81,19 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 16E8C501295
+X-Rspamd-Queue-Id: D8EAC50127F
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
 	R_DKIM_ALLOW(-0.20)[mailerdienst.de:s=routing];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286208-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286206-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_TO(0.00)[nbd.name,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,collabora.com,armlinux.org.uk];
@@ -105,78 +109,133 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	DKIM_TRACE(0.00)[mailerdienst.de:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.986];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.990];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mailerdienst.de:dkim,fw-web.de:mid,mediatek.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,public-files.de:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,public-files.de:email]
 X-Rspamd-Action: no action
 
-From: Frank Wunderlich <frank-w@public-files.de>
+From: Mason Chang <mason-cw.chang@mediatek.com>
 
-This series add RSS and LRO hardware acceleration for terminating
-traffic on MT798x.
+Add definitions for Receive Side Scaling and Large Receive Offload support.
 
-patches are upported from mtk SDK:
-- https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/refs/heads/master/master/files/target/linux/mediatek/patches-6.12/999-eth-08-mtk_eth_soc-add-register-definitions-for-rss-lro-reg.patch
-- https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/refs/heads/master/master/files/target/linux/mediatek/patches-6.12/999-eth-09-mtk_eth_soc-add-rss-support.patch
-- https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/refs/heads/master/master/files/target/linux/mediatek/patches-6.12/999-eth-10-mtk_eth_soc-add-hw-lro-support.patch
-with additional fixes
+Signed-off-by: Mason Chang <mason-cw.chang@mediatek.com>
+Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
+---
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c | 23 +++++++++++++++
+ drivers/net/ethernet/mediatek/mtk_eth_soc.h | 32 +++++++++++++++------
+ 2 files changed, 46 insertions(+), 9 deletions(-)
 
-changes:
-  v8:
-  - fix more sparse errors, should be all touched lines now
-
-  v7:
-  - fix u32 vs. be32 reported by patchwork check
-  - add L4 PSH check
-    https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/7521c42b0bd5be20d52e20b110daea8c756fc069%5E%21/#F1
-  - Add HW LRO max 4-depth VLAN support including switch special tag.
-    https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/35490cec6a2e5982532935fb0a1c884f7c4efdb0%5E%21/#F2
-
-  v6:
-    - no RFC
-    - rebase on netnext (7.1-rc1)
-    - drop unused MTK_CTRL_DW0_SDL_MASK
-    - e33bd8dd7f1f ("net: mediatek: convert to use .get_rx_ring_count") moved
-      ETHTOOL_GRXRINGS handling from mtk_get_rxnfc to mtk_get_rx_ring_count
-      move changes to this new function too
-    - fix some Macro argument '...' may be better as '(...)' to avoid precedence issues
-  v5:
-    - fix too long lines after macro changes reported by checkpatch
-  v4:
-    - drop unrelated file
-    - rss-changes suggested by andrew
-    - fix MTK_HW_LRO_RING_NUM macro (add eth)
-    - fix MTK_LRO_CTRL_DW[123]_CFG (add reg_map param)
-    - fix MTK_RX_DONE_INT (add eth param)
-    - fix lro reverse christmas tree and LRO params suggested by andrew
-    - drop mtk_hwlro_stats_ebl and unused IS_HW_LRO_RING (only used in
-      properitary debugfs)
-  v3:
-    - readded the change dropped in v2 because it was a fix
-      for getting RSS working on mt7986
-    - changes requested by jakub
-    - reworked coverletter (dropped instructions for configuration)
-    - name all PDMA-IRQ the same way
-    - retested on
-      - BPI-R3/mt7986 (RSS needs to be enabled)
-      - BPI-R4/mt7988
-      - BPI-R64/mt7622 and BPI-R2/mt7623 for not breaking network functionality
-
-  v2:
-    - drop wrong change (MTK_CDMP_IG_CTRL is only netsys v1)
-    - Fix immutable string IRQ setup (thx to Emilia Schotte)
-    - drop links to 6.6 patches/commits in sdk in comments
-
-Mason Chang (3):
-  net: ethernet: mtk_eth_soc: Add register definitions for RSS and LRO
-  net: ethernet: mtk_eth_soc: Add RSS support
-  net: ethernet: mtk_eth_soc: Add LRO support
-
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 828 ++++++++++++++++----
- drivers/net/ethernet/mediatek/mtk_eth_soc.h | 177 +++--
- 2 files changed, 792 insertions(+), 213 deletions(-)
-
+diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+index 8d225bc9f063..d25e0b96c26e 100644
+--- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
++++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+@@ -50,13 +50,18 @@ static const struct mtk_reg_map mtk_reg_map = {
+ 		.rx_ptr		= 0x0900,
+ 		.rx_cnt_cfg	= 0x0904,
+ 		.pcrx_ptr	= 0x0908,
++		.lro_ctrl_dw0   = 0x0980,
+ 		.glo_cfg	= 0x0a04,
+ 		.rst_idx	= 0x0a08,
+ 		.delay_irq	= 0x0a0c,
+ 		.irq_status	= 0x0a20,
+ 		.irq_mask	= 0x0a28,
+ 		.adma_rx_dbg0	= 0x0a38,
++		.lro_alt_score_delta	= 0x0a4c,
+ 		.int_grp	= 0x0a50,
++		.lro_rx1_dly_int	= 0x0a70,
++		.lro_ring_dip_dw0	= 0x0b04,
++		.lro_ring_ctrl_dw1	= 0x0b28,
+ 	},
+ 	.qdma = {
+ 		.qtx_cfg	= 0x1800,
+@@ -113,6 +118,7 @@ static const struct mtk_reg_map mt7986_reg_map = {
+ 	.tx_irq_mask		= 0x461c,
+ 	.tx_irq_status		= 0x4618,
+ 	.pdma = {
++		.rss_glo_cfg    = 0x2800,
+ 		.rx_ptr		= 0x4100,
+ 		.rx_cnt_cfg	= 0x4104,
+ 		.pcrx_ptr	= 0x4108,
+@@ -123,6 +129,12 @@ static const struct mtk_reg_map mt7986_reg_map = {
+ 		.irq_mask	= 0x4228,
+ 		.adma_rx_dbg0	= 0x4238,
+ 		.int_grp	= 0x4250,
++		.int_grp3	= 0x422c,
++		.lro_ctrl_dw0	= 0x4180,
++		.lro_alt_score_delta	= 0x424c,
++		.lro_rx1_dly_int	= 0x4270,
++		.lro_ring_dip_dw0	= 0x4304,
++		.lro_ring_ctrl_dw1	= 0x4328,
+ 	},
+ 	.qdma = {
+ 		.qtx_cfg	= 0x4400,
+@@ -170,10 +182,21 @@ static const struct mtk_reg_map mt7988_reg_map = {
+ 		.glo_cfg	= 0x6a04,
+ 		.rst_idx	= 0x6a08,
+ 		.delay_irq	= 0x6a0c,
++		.rx_cfg		= 0x6a10,
+ 		.irq_status	= 0x6a20,
+ 		.irq_mask	= 0x6a28,
+ 		.adma_rx_dbg0	= 0x6a38,
+ 		.int_grp	= 0x6a50,
++		.int_grp3	= 0x6a58,
++		.tx_delay_irq	= 0x6ab0,
++		.rx_delay_irq	= 0x6ac0,
++		.lro_ctrl_dw0	= 0x6c08,
++		.lro_alt_score_delta	= 0x6c1c,
++		.lro_ring_dip_dw0	= 0x6c14,
++		.lro_ring_ctrl_dw1	= 0x6c38,
++		.lro_alt_dbg	= 0x6c40,
++		.lro_alt_dbg_data	= 0x6c44,
++		.rss_glo_cfg	= 0x7000,
+ 	},
+ 	.qdma = {
+ 		.qtx_cfg	= 0x4400,
+diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+index 0168e2fbc619..334625814b97 100644
+--- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
++++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+@@ -1143,16 +1143,30 @@ struct mtk_reg_map {
+ 	u32	tx_irq_mask;
+ 	u32	tx_irq_status;
+ 	struct {
+-		u32	rx_ptr;		/* rx base pointer */
+-		u32	rx_cnt_cfg;	/* rx max count configuration */
+-		u32	pcrx_ptr;	/* rx cpu pointer */
+-		u32	glo_cfg;	/* global configuration */
+-		u32	rst_idx;	/* reset index */
+-		u32	delay_irq;	/* delay interrupt */
+-		u32	irq_status;	/* interrupt status */
+-		u32	irq_mask;	/* interrupt mask */
++		u32	rx_ptr;			/* rx base pointer */
++		u32	rx_cnt_cfg;		/* rx max count configuration */
++		u32	pcrx_ptr;		/* rx cpu pointer */
++		u32	pdrx_ptr;		/* rx dma pointer */
++		u32	glo_cfg;		/* global configuration */
++		u32	rst_idx;		/* reset index */
++		u32	rx_cfg;			/* rx dma configuration */
++		u32	delay_irq;		/* delay interrupt */
++		u32	irq_status;		/* interrupt status */
++		u32	irq_mask;		/* interrupt mask */
+ 		u32	adma_rx_dbg0;
+-		u32	int_grp;
++		u32	int_grp;		/* interrupt group1 */
++		u32	int_grp3;		/* interrupt group3 */
++		u32	tx_delay_irq;		/* tx delay interrupt */
++		u32	rx_delay_irq;		/* rx delay interrupt */
++		u32	lro_ctrl_dw0;		/* lro ctrl dword0 */
++		u32	lro_alt_score_delta;	/* lro auto-learn score delta */
++		u32	lro_rx1_dly_int;	/* lro rx ring1 delay interrupt */
++		u32	lro_ring_dip_dw0;	/* lro ring dip dword0 */
++		u32	lro_ring_ctrl_dw1;	/* lro ring ctrl dword1 */
++		u32	lro_alt_dbg;		/* lro auto-learn debug */
++		u32	lro_alt_dbg_data;	/* lro auto-learn debug data */
++		u32	rss_glo_cfg;		/* rss global configuration */
++
+ 	} pdma;
+ 	struct {
+ 		u32	qtx_cfg;	/* tx queue configuration */
 -- 
 2.43.0
 
