@@ -1,159 +1,184 @@
-Return-Path: <netdev+bounces-286188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286189-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6MKrNYo9/2kn3wAAu9opvQ
-	(envelope-from <netdev+bounces-286188-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 15:58:34 +0200
+	id mJnZMEA+/2lU3wAAu9opvQ
+	(envelope-from <netdev+bounces-286189-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 16:01:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90E614FFF26
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 15:58:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 188D64FFF58
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 16:01:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DA2CC301628C
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 13:58:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0CDDD300C59D
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 14:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33B48393DE8;
-	Sat,  9 May 2026 13:58:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 845D322541C;
+	Sat,  9 May 2026 14:01:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="bJgv3pZX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RWXwN5RZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D50C7361DD0
-	for <netdev@vger.kernel.org>; Sat,  9 May 2026 13:58:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61437175A69
+	for <netdev@vger.kernel.org>; Sat,  9 May 2026 14:01:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778335103; cv=none; b=ujMf4X23KgqVrEJyL9L/r25lWNteZWLAQfTiBIHi7Xbm6CtKQOLzbpVx11/TIr2q3k3XFuhr7HtPRMS46l8fdXhIoWgMyQfE2vlbMJMYK7Ee/x1zzACDDg2E0PRe7tJyuJXg+QSDooHqfg52wJcCgYMoEs4Q8rxP+rvP049bhvc=
+	t=1778335293; cv=none; b=I1r6bfrC/wk8sfdwMeBrxfWKDZ7OgTR50xvBuKv58mqZ0gf7ivOU8GmT+xaUO4CxYPKtkTlyYTEl8mdcSwpuzAGWVQrYINIYmKMQ88eXuHk9IiassrPic4cge0RlOJrhSjTke28rEkXSy1s3n5sjegOK8XiuK3KEHVgvrzDiRdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778335103; c=relaxed/simple;
-	bh=M7Hg0+gE3eusbpps+buAnnwLX5X81d+g9BpOiYxCKiU=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=noDlMHbRbz5dkEnPyHO9rO+x+cwXbW7aXtO3hJXD/kdy/5CXqN0ZeHjcIggwKqTGlTJmnrOlCttwRXiBuaPhsE+KkwyUlFhXChNUHFptea4p3qtU7K9KTfcxBQkHpDWf7SfZPVTq9+mgDxaKB7/ffS0zGKvKJ4z6GA4CXmuZaD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=bJgv3pZX; arc=none smtp.client-ip=209.85.161.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-6841e6a5e51so1484026eaf.3
-        for <netdev@vger.kernel.org>; Sat, 09 May 2026 06:58:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1778335099; x=1778939899; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JtcoItxJPGzLDup9Ghrw2YhEOUYqeKEI+y1BljciO94=;
-        b=bJgv3pZXZB7lEb9b/zf1zhliHBonI7yU0JUmTLFVudUMhgNPkJhB4xl/SUQIeObP/u
-         osR9y4nnILxk2ahMQXNrfZ5p4h2X+xXJYbKcj2rsZ/TONDpWfEkY0cls1phndT5sMLP2
-         V2jPUEEZZ3rTqF2POyqFPrMhHV1o8ruZ0Dxg4DWsfwFw1Pv8woSi8xq96unnLOkic5+I
-         0gjTdJ4ayfcqgoU3zg2aA26bcRC3xkAwHnBbutUElrEBM/C5uvwUyTX/QLGuXHTb8X91
-         RWxw92sy8SMgLvGMZnS/csu59mzDcneJlXUSoLwrdU6BmCBycs1Es+QCwrjQu2/1vJQe
-         588A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778335099; x=1778939899;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=JtcoItxJPGzLDup9Ghrw2YhEOUYqeKEI+y1BljciO94=;
-        b=OF2NoN/KDuocS/aZY7/N5CpOJ4lvnn611knOH7N+1aW+KXFhv7S5dEU1XlF+PjrbbT
-         Wu92uHqBQGoLJFoIyVbZp0GjYtLhRtCu+OFR+R8CJ08d/gSMnJXvcSYasUwsUiTVao4R
-         12QWFZTkr0ySuikRq2bELEuqDeGu2TDihuvpPfYz9QiLJLqJy+HsAXmDIAqPVkrvW/Aq
-         eU0lWgpOqFeB/UNwuUP6W/GpaRFMIwhMMjyNXDPjJPJA2L9Z9LzNrd3vtoNGxuRevqOg
-         DHx5Xl1UIPvJqT+2AetyqUDAM89Qohmnh+JLfxkGwbwygw2UWtXjbYJzzyk8DNBDjOWf
-         AiAw==
-X-Forwarded-Encrypted: i=1; AFNElJ8REHUgbWNuYribpmNaRUPHWGWw+gR0E20X01jKh/NoX33lLIhKnMP67Ay1U3nnNEoxm/7psRE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynxmAkgjSPuOpsBEwJPhqYAulkQ8YJXfCTUOyH/13LzpU7D8i6
-	rOSrYXp4Xm/LI/ELhe6bfcms3upmTOGrmtMugn1syVLStJRgzZs+80r7G7qWTy3b0GXBr9JuGuH
-	PLYmo
-X-Gm-Gg: Acq92OFcFAIiGs/aI+Jh6KsS/PESf3Eus7mzrK/slpRhKCu080zzGM0VU7wij8Np0DY
-	CrogSrhzdfpjqoqmmsfV6CQ1W4X2YwNJ3wll280lq6OWYbrZnHysFivlgJXW/0af3MvX9PUSbJO
-	wJqhkdwiGQAmladSiBhA7Fo7U33hVz6wfASeVUGkPNUnky6yTeOHjdI6k1i2gaDQ/rHGFBpXKdf
-	sd6Y7zLYil9MN0T+/bsHM2ZLvPeYB7Mg++UqcKuxq4MJ3RehOPh+bPxWyxe+RWoHpueL5lZ8B+k
-	Xbtmx312WB3p7a2l7Srdxc9Q+Q/xbrM3qZ96VzdKb5OftZeK4sKMk47RLtwxGn6jyyeBKMYFf2g
-	PYtGSPEiAUWhsXql4DoNXyJwNtFqC8HO5n3N+ZO5sR0yHvz9QqdCZYfFreyPgf/MzxlSJjpKtFC
-	97n1SmXPekAk1yOFa5YuguY7FwARanwQcJYPn/wgmeL04gPqlSqo/M/dY5XLxG0GYhXcU9kSkUY
-	22kmxI7w7MHgoQ=
-X-Received: by 2002:a4a:ee12:0:b0:694:8646:9933 with SMTP id 006d021491bc7-69998c9f9f4mr9127230eaf.9.1778335099502;
-        Sat, 09 May 2026 06:58:19 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-43556bbebe6sm4395297fac.0.2026.05.09.06.58.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 May 2026 06:58:18 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: =?utf-8?q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-Cc: drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org, 
- Lars Ellenberg <lars.ellenberg@linbit.com>, 
- Philipp Reisner <philipp.reisner@linbit.com>, linux-block@vger.kernel.org, 
- Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-In-Reply-To: <20260506124541.1951772-1-christoph.boehmwalder@linbit.com>
-References: <20260506124541.1951772-1-christoph.boehmwalder@linbit.com>
-Subject: Re: [PATCH v3 0/2] drbd: switch from genl_magic to YNL
-Message-Id: <177833509787.32015.11244289527797673484.b4-ty@b4>
-Date: Sat, 09 May 2026 07:58:17 -0600
+	s=arc-20240116; t=1778335293; c=relaxed/simple;
+	bh=ryVl5ZiJIV0a0q8v731KaLXpfxXsEZzmZsEUMVQfhP8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=fmM25Plmzq7HzhmDGH20mZ/9Bc8+xsHflx6LJhrSPnEwbL9ybKFPWxzZGYDtSpH1AF7ybQcQspW2D1fOgbxMocfrIJi6Xv+6G/JnVM65tOlSikQwE2CzrqCXBhlPHNIZI0ixAS7iWQRs0k8Rup5PIW1pp0cln4XAb21hYUOwK2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RWXwN5RZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70708C2BCB2;
+	Sat,  9 May 2026 14:01:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778335293;
+	bh=ryVl5ZiJIV0a0q8v731KaLXpfxXsEZzmZsEUMVQfhP8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=RWXwN5RZYsj/8sp8lAmN3dBOMt3XgnHNfiTkNoCr03dfToBvANj+QA7HXyuSFth9l
+	 PagkQmsnEMotkvInZPp6W/I2Y4PysE4Q/n3LQGVZ/kk6RxmFsHYRrmgVZXOizN15J2
+	 MEihOhKFQlb7x8j+tqR8vho63NBC26dsxFxjk7xEyCKUZFfvi9zu8fxM5e0nzix7EB
+	 BbvVZikJn+XkZQ5Dre+K/v/yZyYayDvl4rAOiKPBDjD7+8C26s/YgAtiTkHyBzCMUP
+	 IoCmXAv86eMandbCXlYqaHLHaT6CFDbQPHLM4i0rvb81G7yLPvsOgjztTP88axs6Y5
+	 0DKfJW+qnNABg==
+From: Simon Horman <horms@kernel.org>
+To: steffen.klassert@secunet.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	sd@queasysnail.net,
+	tobias@strongswan.org,
+	herbert@gondor.apana.org.au,
+	devel@linux-ipsec.org
+Subject: Re: [PATCH ipsec-next v2] esp: Consolidate esp4 and esp6
+Date: Sat,  9 May 2026 15:00:21 +0100
+Message-ID: <20260509140020.1312473-2-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <afr4ipktV91sA8WU@secunet.com>
+References: <afr4ipktV91sA8WU@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.15.2
-X-Rspamd-Queue-Id: 90E614FFF26
+X-Rspamd-Queue-Id: 188D64FFF58
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel-dk.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286188-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286189-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[kernel.dk];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lists.linbit.com,vger.kernel.org,linbit.com,gmail.com,google.com,kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[axboe@kernel.dk,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel-dk.20251104.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-0.997];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[kernel-dk.20251104.gappssmtp.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
 X-Rspamd-Action: no action
 
+From: 'Simon Horman' <horms@kernel.org>
 
-On Wed, 06 May 2026 14:45:39 +0200, Christoph Böhmwalder wrote:
-> DRBD's genetlink interface was defined using a custom multi-include
-> macro system, genl_magic_{func,struct}.h. This system generated struct
-> definitions, netlink policies, serialization functions and more
-> from a single "magic" header.
-> It never really caught on; DRBD is its only user, its internal macro
-> jungle is next to impossible to understand, and even harder to debug.
-> 
-> [...]
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+esp: Consolidate esp4 and esp6
 
-Applied, thanks!
+This commit merges the common code from esp4.c and esp6.c into xfrm_esp.c to
+reduce duplication. It adapts the input and output encapsulation paths to
+use indirect function calls.
 
-[1/2] drbd: move UAPI headers to include/uapi/linux/
-      (no commit info)
-[2/2] drbd: replace genl_magic with explicit netlink serialization
-      (no commit info)
+> diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
+> index 9f75313734f8c..9d6e030510860 100644
+> --- a/net/ipv6/esp6.c
+> +++ b/net/ipv6/esp6.c
+[ ... ]
+> +static int esp6_input_encap(struct sk_buff *skb, struct xfrm_state *x)
+> +{
+> +	const struct ipv6hdr *ip6h = ipv6_hdr(skb);
+> +	int offset = skb_network_offset(skb) + sizeof(*ip6h);
+> +	struct xfrm_encap_tmpl *encap = x->encap;
+> +	int hdr_len = skb_network_header_len(skb);
+> +	u8 nexthdr = ip6h->nexthdr;
+> +	__be16 frag_off, source;
+> +	struct udphdr *uh;
+> +	struct tcphdr *th;
+> +	int ret;
+>  
+> +	ret = ipv6_skip_exthdr(skb, offset, &nexthdr, &frag_off);
+> +	if (ret == -1)
+> +		return ret;
+>  
+> +	ret += hdr_len;
+>  
+> +	uh = (void *)(skb->data + ret);
+> +	th = (void *)(skb->data + ret);
 
-Best regards,
--- 
-Jens Axboe
+If hdr_len is added to ret before computing the uh and th pointers, does this
+cause the pointers to overshoot the transport header by hdr_len bytes?
 
+If uh->source reads from inside the decrypted ESP payload instead of the actual
+UDP header, it seems this would almost always mismatch encap->encap_sport.
+Could this lead to the kernel unconditionally calling km_new_mapping() on
+every received packet, breaking IPv6 NAT-T?
 
+> diff --git a/net/xfrm/xfrm_esp.c b/net/xfrm/xfrm_esp.c
+> new file mode 100644
+> index 0000000000000..4f75e1ace3bbc
+> --- /dev/null
+> +++ b/net/xfrm/xfrm_esp.c
+[ ... ]
+> +#ifdef CONFIG_INET_ESPINTCP
+> +static int esp_output_tcp_finish(struct xfrm_state *x, struct sk_buff *skb)
+> +{
+[ ... ]
+> +#else
+> +static int esp_output_tail_tcp(struct xfrm_state *x, struct sk_buff *skb)
+> +{
+> +	WARN_ON(1);
+> +	return -EOPNOTSUPP;
+> +}
+> +#endif
+[ ... ]
+> +#ifdef CONFIG_INET_ESPINTCP
+> +static struct ip_esp_hdr *esp_output_tcp_encap(struct xfrm_state *x,
+> +					       struct sk_buff *skb,
+> +					       struct esp_info *esp)
+[ ... ]
+> +#else
+> +static struct ip_esp_hdr *esp_output_tcp_encap(struct xfrm_state *x,
+> +					       struct sk_buff *skb,
+> +					       struct esp_info *esp)
+> +{
+> +	return ERR_PTR(-EOPNOTSUPP);
+> +}
+> +#endif
 
+Since the TCP encapsulation methods are guarded exclusively by
+CONFIG_INET_ESPINTCP, does this break IPv6 ESP-in-TCP if
+CONFIG_INET6_ESPINTCP is enabled but the IPv4 equivalent is disabled?
+
+If CONFIG_INET_ESPINTCP is not enabled, these functions fall back to returning
+-EOPNOTSUPP. Should these preprocessor guards check for both
+CONFIG_INET_ESPINTCP and CONFIG_INET6_ESPINTCP?
 
