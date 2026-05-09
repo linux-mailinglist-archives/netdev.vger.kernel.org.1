@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-286077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286078-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MN4DBzCS/mnJswAAu9opvQ
-	(envelope-from <netdev+bounces-286077-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 03:47:28 +0200
+	id sLvrJUOS/mnJswAAu9opvQ
+	(envelope-from <netdev+bounces-286078-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 03:47:47 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90DC94FD62A
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 03:47:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 08F484FD63A
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 03:47:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 74A153037EDA
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 01:46:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8D0C7301E963
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 01:46:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50957276041;
-	Sat,  9 May 2026 01:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE0DE276041;
+	Sat,  9 May 2026 01:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EJJgXfPJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FxwZ31Gn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0831917CD;
-	Sat,  9 May 2026 01:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC06B2F8E8D;
+	Sat,  9 May 2026 01:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778291177; cv=none; b=eAhzNs5CJqeZDMYWyBYyehwQoHia3xz+FIaG+J8emgPAFwtIG5zZENP7m3Gsy/T/+P2cbFrFOYJp8vQth5qyUuYpCclTkWCNR6GTTrpzRtP/WYVwb6Yi1Gnr1e6uP/iSMw9SAWbyrM2XFIHtAtm4LeZWXvrUcF03XN+pmtr1o8c=
+	t=1778291179; cv=none; b=A3437LIZgS99MdWtd13qG0+8XmgrcIyzqtbF1C45RbFirhGIyfQrKB6ziCETbGmPjwBYyWfL1OEOm5rVTlBO7VcGNqZAlSfXYpciEK6t9tVmZCi/MN4+idXjP6AJXkbPI2z/ZReCpiSAw55TkxojZr626BLDhp1y/Ysh2KH2sAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778291177; c=relaxed/simple;
-	bh=EVpS+D5l4uaBpd3aqAD7zLlOvMu0NW0P58tfE3k9TC8=;
+	s=arc-20240116; t=1778291179; c=relaxed/simple;
+	bh=iGaG0hbnBggkXGo2+ZH9xqq0NqNOcHcRTvyvOIt57KY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QEEgBHE3G94BgKXNE9JYUuSx67GzSHqID+0ZYEqYqQHTXEsT4IwxqVGTysz7qFJ/GC3ihXulD9Gu8DpFdcAGIMuGrDbeTkovml1g/QPjnf9pQpD0bbBsEXzKnqu1DhxRUJPjxY1l926i/Ew0/entuLO4S5l9FIjBC0CEk0hFg3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EJJgXfPJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 675A2C2BCB0;
-	Sat,  9 May 2026 01:46:16 +0000 (UTC)
+	 MIME-Version; b=o9NsqpD9HTGYemPrjt4IAeVBDsPyUX7Eqhq3gqV947VTKRFMSnawo/Qma+YtNeROaRk5mwUR0VLCZ/Wtm69HJXofHyshyApIxY+oA++/GxMosa0ySIsWEUVbrbJgK3bqmIw7A/fVwvdInDycnJjYxKoeH9xoAzAzdYpJerM/Jj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FxwZ31Gn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62948C2BCB0;
+	Sat,  9 May 2026 01:46:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778291177;
-	bh=EVpS+D5l4uaBpd3aqAD7zLlOvMu0NW0P58tfE3k9TC8=;
+	s=k20201202; t=1778291179;
+	bh=iGaG0hbnBggkXGo2+ZH9xqq0NqNOcHcRTvyvOIt57KY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EJJgXfPJj55SCswGnSWPnjWDEr8+pn30ZDMP3Zxhd5XSiJTKaYib/X+RO8gHn2poL
-	 FYyIutfbLp9CqWG/OindW3AREvrTwqB5chULip5ialgic8e7TAZnrr5qLPnNDyu5XJ
-	 bEAn54yfHbPtEgwtipGig2WoW7KfbuKdtJseQgxCYIcXO7I5vQleG/b45kg1WCl5sj
-	 TWg+0NbxfTAh6MN2MI0VPKUFuHw5BiG8OYfavv3/f635iLkASAGSNAJPUHCnXLZWxk
-	 /L1bMdlR7KU9Wf50G7hG+d2wQt3UlcXwOPZeEJo3cSNxdPR3AD4GhGU+TjV6qqr6Rv
-	 CtqMSI5vTbArw==
+	b=FxwZ31Gn80QTNO5KvQSyIowUIEW715f7W3UyjCiV5yE7p+CyiOwdQ2GpW0wJrI0/h
+	 rxQg/D7TbOHiEbNOC6Qu0H3d/ZDacNYxEJgSIjR0QXya9BOdMq1WfUaI/53GVaxZLi
+	 UWHJFIo2FBZ04wDNf54HPaN+sWVHWomdt0i+RVpoq6dQueC0+O7Yz+IITB0f1HGM4j
+	 7RWqR1ptf0Y5T5oH2G9fDS9JVxt7mkZT8Kv6CxrXWoObvvrp51M8Jnb1KRg/LXU5/I
+	 7o4mPYK5b9pObYWUenYIsPRdMgoU6kQmiKU5yMQ6XagTCItgM5c8AOlCpJ6xw+OLBv
+	 Siq0QgLHUUYEw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: lorenzo@kernel.org
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -61,12 +61,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	madhur.agrawal@airoha.com
-Subject: Re: [PATCH net-next v4 09/10] net: airoha: Introduce WAN device flag
-Date: Fri,  8 May 2026 18:46:15 -0700
-Message-ID: <20260509014615.3558164-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v4 10/10] net: airoha: Support multiple LAN/WAN interfaces for hw MAC address configuration
+Date: Fri,  8 May 2026 18:46:17 -0700
+Message-ID: <20260509014617.3558185-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260507-airoha-eth-multi-serdes-v4-9-af613b61ae02@kernel.org>
-References: <20260507-airoha-eth-multi-serdes-v4-9-af613b61ae02@kernel.org>
+In-Reply-To: <20260507-airoha-eth-multi-serdes-v4-10-af613b61ae02@kernel.org>
+References: <20260507-airoha-eth-multi-serdes-v4-10-af613b61ae02@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,7 +74,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 90DC94FD62A
+X-Rspamd-Queue-Id: 08F484FD63A
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -90,7 +90,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,genexis.eu,lists.infradead.org,vger.kernel.org,airoha.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-286077-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286078-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -110,46 +110,34 @@ X-Rspamd-Action: no action
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-net: airoha: Introduce WAN device flag
+net: airoha: Support multiple LAN/WAN interfaces for hw MAC address configuration
 
-This commit replaces the port->id == 1 LAN/WAN test with a per-dev
-PRIV_FLAG_WAN bit that is set during airoha_dev_init() based on the
-port id and the presence of other WAN devices. It also extracts the
-QDMA selection/PPE cpu port programming into a new helper and reworks
-the GDM2 loopback path to key off the new flag.
-
-A few questions about the new policy and error paths.
-
-[Medium]
-The commit message says:
-
-    Introduce WAN flag to specify if a given device is used to
-    transmit/receive WAN or LAN traffic. [...] Please note it is possible
-    to specify multiple LAN devices but just a single WAN one.
-
-Under the old helper (port->id == 1), GDM2/GDM3/GDM4 were all treated as
-WAN. Under the new logic, when GDM2 (eth->ports[1]) is present, the
-GDM3/GDM4 case breaks out of the switch without setting PRIV_FLAG_WAN, so
-GDM3 and GDM4 are now classified as LAN. That flips the MAC register
-(REG_FE_WAN_MAC_H -> REG_FE_LAN_MAC_H in airoha_set_macaddr()), the QDMA
-binding (qdma[1] -> qdma[0] in airoha_dev_set_qdma()), and the PPE cpu
-port (CDM2 -> CDM1). Is that role change intentional, and could the
-commit message call it out so bisecting a board that relied on the old
-GDM3/GDM4=WAN semantics is easier?
+This patch extends airoha_set_macaddr() to derive REG_FE_MAC_LMIN and
+REG_FE_MAC_LMAX by iterating over all sibling LAN/WAN net_devices, and
+rejects addresses whose upper 3 bytes do not match the already-registered
+peers. airoha_dev_set_macaddr() is also changed to split eth_mac_addr()
+into eth_prepare_mac_addr_change() and eth_commit_mac_addr_change() around
+the hardware programming step.
 
 > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-> index 1c4927c1aeb0..8617dd4f7932 100644
+> index 8617dd4f7932..fbfefd0ec355 100644
 > --- a/drivers/net/ethernet/airoha/airoha_eth.c
 > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> @@ -1863,36 +1863,77 @@ static int airoha_set_gdm2_loopback(struct airoha_gdm_dev *dev)
->  	return 0;
+> @@ -71,20 +71,67 @@ static void airoha_qdma_irq_disable(struct airoha_irq_bank *irq_bank,
+>  	airoha_qdma_set_irqmask(irq_bank, index, mask, 0);
 >  }
 >  
-> -static int airoha_dev_init(struct net_device *netdev)
-> +static struct airoha_gdm_dev *
-> +airoha_get_wan_gdm_dev(struct airoha_eth *eth)
-> +{
+> -static void airoha_set_macaddr(struct airoha_gdm_dev *dev, const u8 *addr)
+> +static int airoha_set_macaddr(struct airoha_gdm_dev *dev, const u8 *addr)
+>  {
+>  	struct airoha_eth *eth = dev->eth;
+> -	u32 val, reg;
+> +	u8 ref_addr[ETH_ALEN] = {};
+> +	u32 reg, val, lmin, lmax;
 > +	int i;
+> +
+> +	lmin = (addr[3] << 16) | (addr[4] << 8) | addr[5];
+> +	lmax = lmin;
 > +
 > +	for (i = 0; i < ARRAY_SIZE(eth->ports); i++) {
 > +		struct airoha_gdm_port *port = eth->ports[i];
@@ -159,169 +147,154 @@ GDM3/GDM4=WAN semantics is easier?
 > +			continue;
 > +
 > +		for (j = 0; j < ARRAY_SIZE(port->devs); j++) {
-> +			struct airoha_gdm_dev *dev = port->devs[j];
+> +			struct airoha_gdm_dev *iter_dev;
+> +			struct net_device *netdev;
 > +
-> +			if (dev && !airoha_is_lan_gdm_dev(dev))
-> +				return dev;
+> +			iter_dev = port->devs[j];
+> +			if (!iter_dev || iter_dev == dev)
+> +				continue;
+> +
+> +			if (airoha_is_lan_gdm_dev(iter_dev) !=
+> +			    airoha_is_lan_gdm_dev(dev))
+> +				continue;
+> +
+> +			netdev = iter_dev->dev;
+> +			if (netdev->reg_state != NETREG_REGISTERED)
+> +				continue;
+> +
+> +			ether_addr_copy(ref_addr, netdev->dev_addr);
+> +			val = (netdev->dev_addr[3] << 16) |
+> +			      (netdev->dev_addr[4] << 8) | netdev->dev_addr[5];
+> +			if (val < lmin)
+> +				lmin = val;
+> +			if (val > lmax)
+> +				lmax = val;
 > +		}
 > +	}
 > +
-> +	return NULL;
-> +}
+> +	if (!is_zero_ether_addr(ref_addr) && memcmp(ref_addr, addr, 3)) {
+> +		/* According to the HW design, hw mac address MS bits
+> +		 * must be the same for each net_device with the same
+> +		 * LAN/WAN configuration.
+> +		 */
+> +		return -EINVAL;
+> +	}
 
-[High]
-airoha_register_gdm_devices() invokes airoha_dev_init() for each dev in
-port->devs[] sequentially. On EN7581 GDM3 supports two devs (nbq 4/5 for
-PCIE0/PCIE1 in airoha_alloc_gdm_device()). When both devs are registered,
-devs[0] sets PRIV_FLAG_WAN and then devs[1] sees the first via
-airoha_get_wan_gdm_dev() and falls through to LAN. Is that the intended
-result for two devs on the same physical GDM3/GDM4 port?
+[Medium]
+The NETREG_REGISTERED filter here means the check only sees peers that
+have already completed register_netdev(). airoha_dev_init() is invoked
+as ndo_init from register_netdev() before dev->reg_state transitions
+to NETREG_REGISTERED, so the constraint is only enforced across
+already-registered siblings.
 
-The two devs then diverge:
+When the device tree does not supply a mac-address property,
+airoha_alloc_gdm_device() falls back to eth_hw_addr_random() and each
+sibling gets an independently generated random MAC. With two or more
+LAN (or two or more WAN) net_devices going through this fallback, the
+second and later siblings' upper 3 bytes will almost always differ
+from the first, so airoha_set_macaddr() returns -EINVAL:
 
-  airoha_dev_set_qdma()
-    dev->qdma = &eth->qdma[!airoha_is_lan_gdm_dev(dev)];
+	if (!is_zero_ether_addr(ref_addr) && memcmp(ref_addr, addr, 3))
+		return -EINVAL;
 
-so devs[1] binds to qdma[0] while devs[0] is on qdma[1];
+airoha_dev_init() now propagates that error, which fails
+register_netdev() and airoha_register_gdm_devices(), aborting probe.
 
-  airoha_set_macaddr()
-    reg = airoha_is_lan_gdm_dev(dev) ? REG_FE_LAN_MAC_H
-                                     : REG_FE_WAN_MAC_H;
+Before this patch the same configuration still came up (with the single
+REG_FE_{LAN,WAN}_MAC_H being last-writer-wins). Should the random
+fallback path derive sibling MACs from a shared base, or should the
+upper-3-bytes constraint only be enforced for user-triggered
+ndo_set_mac_address rather than for init-time programming?
 
-so devs[1] writes into the LAN MAC range that belongs to GDM1; and in
-airoha_ppe_foe_entry_prepare() pse_port becomes port->id instead of 2
-(GDM2 loopback) only for devs[1]. Is there an assumption that sibling
-devs on the same port must share the WAN/LAN classification?
-
+>  
+>  	reg = airoha_is_lan_gdm_dev(dev) ? REG_FE_LAN_MAC_H : REG_FE_WAN_MAC_H;
+>  	val = (addr[0] << 16) | (addr[1] << 8) | addr[2];
+>  	airoha_fe_wr(eth, reg, val);
+>  
+> -	val = (addr[3] << 16) | (addr[4] << 8) | addr[5];
+> -	airoha_fe_wr(eth, REG_FE_MAC_LMIN(reg), val);
+> -	airoha_fe_wr(eth, REG_FE_MAC_LMAX(reg), val);
+> +	airoha_fe_wr(eth, REG_FE_MAC_LMIN(reg), lmin);
+> +	airoha_fe_wr(eth, REG_FE_MAC_LMAX(reg), lmax);
+>  
+>  	airoha_ppe_init_upd_mem(dev);
 > +
-> +static void airoha_dev_set_qdma(struct airoha_gdm_dev *dev)
+> +	return 0;
+>  }
+>  
+>  static void airoha_set_gdm_port_fwd_cfg(struct airoha_eth *eth, u32 addr,
+> @@ -1792,13 +1839,18 @@ static int airoha_dev_stop(struct net_device *netdev)
+>  static int airoha_dev_set_macaddr(struct net_device *netdev, void *p)
 >  {
-> -	struct airoha_gdm_dev *dev = netdev_priv(netdev);
-> -	struct airoha_gdm_port *port = dev->port;
->  	struct airoha_eth *eth = dev->eth;
->  	int i;
+>  	struct airoha_gdm_dev *dev = netdev_priv(netdev);
+> +	struct sockaddr *addr = p;
+>  	int err;
 >  
->  	/* QDMA0 is used for lan ports while QDMA1 is used for WAN ports */
->  	dev->qdma = &eth->qdma[!airoha_is_lan_gdm_dev(dev)];
->  	dev->dev->irq = dev->qdma->irq_banks[0].irq;
+> -	err = eth_mac_addr(netdev, p);
+> +	err = eth_prepare_mac_addr_change(netdev, p);
+>  	if (err)
+>  		return err;
+>  
 > -	airoha_set_macaddr(dev, netdev->dev_addr);
+> +	err = airoha_set_macaddr(dev, addr->sa_data);
+> +	if (err)
+> +		return err;
 > +
-> +	for (i = 0; i < eth->soc->num_ppe; i++)
-> +		airoha_ppe_set_cpu_port(dev, i, airoha_get_fe_port(dev));
-> +}
-> +
-> +static int airoha_dev_init(struct net_device *netdev)
-> +{
-> +	struct airoha_gdm_dev *dev = netdev_priv(netdev);
-> +	struct airoha_gdm_port *port = dev->port;
->  
->  	switch (port->id) {
->  	case AIROHA_GDM3_IDX:
-> -	case AIROHA_GDM4_IDX:
-> -		/* If GDM2 is active we can't enable loopback */
-> -		if (!eth->ports[1]) {
-> -			int err;
-> +	case AIROHA_GDM4_IDX: {
-> +		struct airoha_eth *eth = dev->eth;
->  
-> -			err = airoha_set_gdm2_loopback(dev);
-> -			if (err)
-> -				return err;
-> -		}
-> +		if (eth->ports[1] || airoha_get_wan_gdm_dev(eth))
-> +			break;
-
-[Medium]
-Is the eth->ports[1] check equivalent to asking whether a GDM2 dev
-actually exists? airoha_alloc_gdm_port() assigns eth->ports[p] before
-iterating the "airoha,eth-port" child nodes, so with all GDM2 child nodes
-marked status="disabled" and GDM3 or GDM4 enabled, eth->ports[1] is
-non-NULL but port->devs[] is empty. In that case this branch still breaks
-out of the switch and the uplink GDM3/GDM4 dev ends up LAN. Would checking
-for an actual dev under eth->ports[1] be safer than checking the port
-pointer alone?
-
-[Medium, Low]
-The policy that "just a single WAN one" is allowed is enforced by silently
-breaking here when airoha_get_wan_gdm_dev() returns non-NULL. Would a
-netdev_warn() or -EINVAL help an administrator notice that a second WAN
-candidate was demoted to LAN? Also, with both GDM3 and GDM4 enabled and
-GDM2 absent, the winner of PRIV_FLAG_WAN depends on eth->ports[] iteration
-order and the port/dev allocation order; is there a deterministic,
-documented way to choose which dev becomes WAN (DT property, for example)?
-
-> +		fallthrough;
-> +	}
-> +	case AIROHA_GDM2_IDX:
-> +		/* GDM2 is always used as wan */
-> +		dev->flags |= PRIV_FLAG_WAN;
->  		break;
->  	default:
->  		break;
->  	}
->  
-> -	for (i = 0; i < eth->soc->num_ppe; i++)
-> -		airoha_ppe_set_cpu_port(dev, i, airoha_get_fe_port(dev));
-> +	airoha_dev_set_qdma(dev);
-> +	airoha_set_macaddr(dev, netdev->dev_addr);
-> +
-> +	if (!airoha_is_lan_gdm_dev(dev) &&
-> +	    (port->id == AIROHA_GDM3_IDX || port->id == AIROHA_GDM4_IDX)) {
-> +		int err;
-> +
-> +		err = airoha_set_gdm2_loopback(dev);
-> +		if (err) {
-> +			dev->flags &= ~PRIV_FLAG_WAN;
-> +			return err;
-> +		}
-> +	}
-
-[Medium]
-On the error path, is clearing PRIV_FLAG_WAN sufficient? By the time
-airoha_set_gdm2_loopback() returns a failure, airoha_dev_set_qdma() has
-already pointed dev->qdma at &eth->qdma[1] and set dev->dev->irq to the
-WAN IRQ, airoha_set_macaddr() has written into REG_FE_WAN_MAC_H,
-airoha_ppe_set_cpu_port() has programmed CDM2 as the PPE cpu port, and
-airoha_set_gdm2_loopback() itself may have already programmed
-REG_GDM_FWD_CFG(GDM2), REG_GDM_TXCHN_EN/RXCHN_EN, REG_GDM_LPBK_CFG,
-REG_GDM_LEN_CFG, REG_FE_VIP_PORT_EN and REG_FE_IFC_PORT_EN before the
-get_sport() branch failed.
-
-After clearing the flag airoha_is_lan_gdm_dev(dev) reports LAN but
-dev->qdma and the hardware registers above still describe the WAN setup.
-Would it be cleaner to either unwind those steps or drop the flag clear?
-
+> +	eth_commit_mac_addr_change(netdev, p);
 >  
 >  	return 0;
 >  }
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-> index 3a313ac439e7..5715b03e630b 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.h
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
-> @@ -540,12 +540,17 @@ struct airoha_qdma {
->  	u64 fwd_tx_packets;
->  };
->  
-> +enum airoha_priv_flags {
-> +	PRIV_FLAG_WAN = BIT(0),
-> +};
 
-[Low]
-This isn't a bug, but PRIV_FLAG_WAN and the u32 flags field below overlap
-conceptually with struct net_device::priv_flags and the IFF_* namespace.
-Would a driver-prefixed name such as AIROHA_DEV_F_WAN make the
-driver-local scope obvious to future readers?
+[High]
+After this reordering, does airoha_ppe_init_upd_mem() end up
+programming the PPE update memory with the old MAC rather than the new
+one?
 
-> +
->  struct airoha_gdm_dev {
->  	struct airoha_gdm_port *port;
->  	struct airoha_qdma *qdma;
->  	struct airoha_eth *eth;
->  	struct net_device *dev;
->  
-> +	u32 flags;
->  	int nbq;
->  };
+eth_prepare_mac_addr_change() only validates the sockaddr and does not
+touch netdev->dev_addr; the actual write to netdev->dev_addr happens in
+eth_commit_mac_addr_change() via eth_hw_addr_set():
 
+net/ethernet/eth.c:eth_prepare_mac_addr_change() {
+	if (!(dev->priv_flags & IFF_LIVE_ADDR_CHANGE) && netif_running(dev))
+		return -EBUSY;
+	if (!is_valid_ether_addr(addr->sa_data))
+		return -EADDRNOTAVAIL;
+	return 0;
+}
+
+net/ethernet/eth.c:eth_commit_mac_addr_change() {
+	eth_hw_addr_set(dev, addr->sa_data);
+}
+
+airoha_set_macaddr() is invoked between those two, so when it reaches
+airoha_ppe_init_upd_mem(dev) the commit has not yet run. That helper
+reads netdev->dev_addr directly rather than using the addr argument:
+
+drivers/net/ethernet/airoha/airoha_ppe.c:airoha_ppe_init_upd_mem() {
+	const u8 *addr = netdev->dev_addr;
+	...
+	val = (addr[2] << 24) | (addr[3] << 16) | (addr[4] << 8) | addr[5];
+	airoha_fe_wr(eth, REG_UPDMEM_DATA(0), val);
+	...
+	val = (addr[0] << 8) | addr[1];
+	airoha_fe_wr(eth, REG_UPDMEM_DATA(0), val);
+	...
+}
+
+So the FE registers REG_FE_{LAN,WAN}_MAC_H / REG_FE_MAC_LMIN /
+REG_FE_MAC_LMAX are written from the new addr parameter, but the PPE
+REG_UPDMEM_DATA/REG_UPDMEM_CTRL entries are written from the still-old
+netdev->dev_addr.
+
+Previously eth_mac_addr() (prepare + commit combined) ran first, so
+netdev->dev_addr was the new MAC by the time airoha_set_macaddr() and
+airoha_ppe_init_upd_mem() ran, keeping the two blocks in sync.
+
+Would it be cleaner to either pass addr through to
+airoha_ppe_init_upd_mem(), or invoke eth_commit_mac_addr_change() before
+airoha_set_macaddr() (with a rollback path if the hardware programming
+fails)?
+
+> @@ -1903,6 +1955,7 @@ static int airoha_dev_init(struct net_device *netdev)
 [ ... ]
 
