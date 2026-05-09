@@ -1,49 +1,94 @@
-Return-Path: <netdev+bounces-286218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286219-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mIGvDn+h/2mw8gAAu9opvQ
-	(envelope-from <netdev+bounces-286218-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 23:05:03 +0200
+	id YCJ5Igai/2mw8gAAu9opvQ
+	(envelope-from <netdev+bounces-286219-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 23:07:18 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DB505016C4
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 23:05:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E323C5016DB
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 23:07:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 12FA8300A8CA
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 21:05:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 23F47300A8E6
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 21:07:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4D837EFE8;
-	Sat,  9 May 2026 21:05:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A61F0383C6C;
+	Sat,  9 May 2026 21:07:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="byAsD0d6"
 X-Original-To: netdev@vger.kernel.org
-Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB75725333F;
-	Sat,  9 May 2026 21:04:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.133.224.34
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A47F34F479
+	for <netdev@vger.kernel.org>; Sat,  9 May 2026 21:07:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778360700; cv=none; b=BGpcLkNibiLf29rS3/jW9pyqhF6R9Wz+D6i0UsU9FoqO25tqhineFfsVl/Pk+fxmF7ZK5TWnM1N2HhNorIYzeuJKogcZWz6Y+SgKAk72gDEdlJScvGeP0PhL1zZqZIJ9Yv/5UQ3jb0hUagAlMz17+eYBybgi6n8IdmzWKxQEDTk=
+	t=1778360835; cv=none; b=qo6SmjU/u39RuXBWYnhsikWcE0lMw6mvznNTyYpEJkHH/hVikvrRBeTzCFKOOwrtofTl+UPW3Az9xUCMpAn5KjcAso74RCJUKaw3MtvyOnin+bm55rKP9Fya5gVrbe9VKQi3V5G3mn1umLskZTwXzu3xTd/7x35KuA1wJKN3XqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778360700; c=relaxed/simple;
-	bh=08lThNnhevMm71QOCq37Tyz24IUFKenJcrFBUwo74DQ=;
-	h=Date:From:To:cc:Subject:Message-ID:MIME-Version:Content-Type; b=Bpszat1n4gaVg0bE40NyreTFtLWfSJL0I6TZcR00dQCAQj3g7oy/ZZpLcCqnubs/LgNdtdqOxM/WrGKranuZTwzdXSCZzH6nPRSbd2ZPWwo0bXyPY3yzWnsnKfCDEtTctfVFJwY3YI/dAn5UNeNMROWOATeHpUz7JCe5zd8+4lU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=orcam.me.uk
-Received: by angie.orcam.me.uk (Postfix, from userid 500)
-	id 3983D92009C; Sat,  9 May 2026 23:04:50 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by angie.orcam.me.uk (Postfix) with ESMTP id 324DB92009B;
-	Sat,  9 May 2026 22:04:50 +0100 (BST)
-Date: Sat, 9 May 2026 22:04:50 +0100 (BST)
-From: "Maciej W. Rozycki" <macro@orcam.me.uk>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>
-cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] FDDI: defza: Sanitise the reset safety timer
-Message-ID: <alpine.DEB.2.21.2605061216430.46195@angie.orcam.me.uk>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+	s=arc-20240116; t=1778360835; c=relaxed/simple;
+	bh=O2iMQMku/uThSPkCYna+5mUj6KQSiDJiBMLY28Hrp9Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=X0rd9WNCgRWJsg2NZKW01FH9LQm5S4HSP/4GEEBXYaRBU7z636bbdgQHA3pP+R3VuyTsKvDczJ8S1fttVz8VOeEnpQYiCejW1lLeKZj7IbS8S6G0FBqgKfkIZavDxnGu2OShBK+vrtmD16xvWHhtco5VKp/tL7GCkzi6lg9U9QY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=byAsD0d6; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-43d73422431so2423990f8f.2
+        for <netdev@vger.kernel.org>; Sat, 09 May 2026 14:07:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778360832; x=1778965632; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FKVIrDb2f0B70UBcuwE2Fw73npcPR9XEbE9y6JlsQxc=;
+        b=byAsD0d6tHqz/+8c5sQbV5fT6qkU8b7sYhC5ia3RDhOPFtasWPGpThB5+hdgOmvBGE
+         zcDjfcnWaKUW9wkosqxR0k+rRiEbB2ut2FPTSs1df3eClXsk7l9RxGnwiGvR1Fx5GifE
+         bem+br3umjdIZuRsHLtdwWn17jzeKECbxXJkznRsL3bKPOsV/58oG6Z8Z2m8Yojc9y28
+         ZBw8WO8r3GDdR/H60jBJ4TsngplQ2jPY17Nga5TQFmkJxM/PKF8J69HnP0xOfq5LbNAB
+         /XXysLw1hVxsF4vwQXU26D+aA0iz1WLwD3s8sEZCuwO+MvtYo+DI6V4v3u6rC1CX437h
+         IjHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778360832; x=1778965632;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=FKVIrDb2f0B70UBcuwE2Fw73npcPR9XEbE9y6JlsQxc=;
+        b=Jb5dYcz/YtMdT1MIxxBeN9NSBdYYvRgqHEivxmCRyw5iRoGAOzsj052LX1meRHA/p2
+         Rms0NsJ1WM0lOMIkXVXeLrItb8o5ONYgFrm0PZeCrFaRinnaSbP/JpnYfUadffkP/O8+
+         ApL073KOXACBRwvFa/lNVc3wtIGb3gqGqMSBzaytnxUURSIIBP8LKZjK9G9JXOKUMdnv
+         bC/OnmJOFpWOXfaCNdNZCPW0rg67hUaYalFPkyEzputMIDdSTLI+P/9JjtJWrboUY79U
+         QTuaFLVH8I7Jpc0gcePPgG0ElmJhRyID4HBglUyn40Kucr1IrmeJHnZGZ4Y8yhCVzT6F
+         1WJQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/IlTCv73QZ2zzt+Vv0HanR5x28PoPuXzFxEoYL4tpfwZpJWIJbT3Y73BHyrYRkynuW8Gb4Dt0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTIkqmDKV8b81lElrNWj9lLWZhuG+Dvu/HaOpHNqiTQ7rW7dQk
+	sZLnOASR47IbxEryi/CUi91/HuPpdyrUBWEGKI+evxq2Q4AXvemM2sCDtr/V0seE
+X-Gm-Gg: Acq92OE/mpGcz/FNE/K+XWXo7Fnk3d0GTtyegBpoX3rCDEl+ZPSOLt0LiWvPaeEjt8k
+	303TSzQvr1GDsMLiDDnMqiHlelqZoHkOr9pxKYifNDPlqj4MlMt8gHbI8NE8zhtGC1F/F4Pv7B8
+	kc/xiDN4Q4wSQhDSC4aCcEf72gdSb5s7ZWqMvgat8+ILuDjP/s7gph+/OTwTLqEYVNEBes/Lv8p
+	it8eLzGmKycDMHQNq1BWd7xGw0korgv459ABy10Ft/uiqic7MrxHHAFNGXGjI4WHYw8ic8tt1Xr
+	oqH9ak32HLpJQk1WQlGwKonOjXBglgO3KpsYqINoyJ3YAGLFGeAaYlD5vxlzTjHEdEoJp7zXDm4
+	N3qavYFGatT0Uw90SvEjqpJZrrY6TrJPG+bJ1PMxgxR3jCVLgIePURW8P/e9+Eq7OVgBwni48d/
+	zBjJ25mnBBGyakBB3rI6E/KUW0wX1GOb+Cg8VQQdOuEkyoqNLKMeanipZm/t6LieLh
+X-Received: by 2002:a5d:64e7:0:b0:44a:9b52:8891 with SMTP id ffacd0b85a97d-4515b42fbc4mr27251402f8f.11.1778360832327;
+        Sat, 09 May 2026 14:07:12 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45491da03a7sm14120942f8f.33.2026.05.09.14.07.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 May 2026 14:07:11 -0700 (PDT)
+Date: Sat, 9 May 2026 22:07:10 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Adrien Reynard <reynard.adrien.08@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 4/4] docs: fix repeated word 'in' in networking
+ documentation
+Message-ID: <20260509220710.05e78cfe@pumpkin>
+In-Reply-To: <20260509143103.16558-1-reynard.adrien.08@gmail.com>
+References: <20260508163804.16267-1-reynard.adrien.08@gmail.com>
+	<20260509143103.16558-1-reynard.adrien.08@gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,224 +96,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-X-Rspamd-Queue-Id: 7DB505016C4
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: E323C5016DB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286218-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286219-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DMARC_NA(0.00)[orcam.me.uk];
+	TO_DN_SOME(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[macro@orcam.me.uk,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.993];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	R_DKIM_NA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[angie.orcam.me.uk:mid]
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-The reset actions of the DEFZA adapters are exceedingly slow, taking up 
-to 30 seconds to complete by the device spec and typically in the range 
-of 10 seconds in reality, as required for the device RTOS to boot, still 
-quite a lot.  Therefore a state machine is used that's interrupt driven, 
-however a safety mechanism is required in case of adapter malfunction, 
-so that if no state change interrupt has arrived in time, then the 
-situation is taken care of.
+On Sat,  9 May 2026 16:31:03 +0200
+Adrien Reynard <reynard.adrien.08@gmail.com> wrote:
 
-The safety mechanism depends on the origin of the reset.  For regular 
-adapter initialisation at the device probe time a sleep is requested.  
-However a reset is also required by the device spec when the adapter has 
-transitioned into the halted state, such as in response to a PC Trace 
-event in the course of ring fault recovery, possibly a common network 
-event.  In that case no sleep is possible as a device halt is reported 
-at the hardirq level.
+> Remove duplicated word 'in' in networking/switchdev.rst.
 
-A timer is therefore set up to ensure progress in case no adapter state 
-change interrupt has arrived in time, but as from commit 168f6b6ffbee 
-("timers: Use del_timer_sync() even on UP") a warning is issued as the 
-timer is deleted in the hardirq handler upon an expected state change:
+Nak
 
-  defza: v.1.1.4  Oct  6 2018  Maciej W. Rozycki
-  tc2: DEC FDDIcontroller 700 or 700-C at 0x18000000, irq 4
-  tc2: resetting the board...
-  ------------[ cut here ]------------
-  WARNING: kernel/time/timer.c:1611 at __timer_delete_sync+0x104/0x120, CPU#0: swapper/0/0
-  Modules linked in:
-  CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 7.0.0-dirty #2 VOLUNTARY 
-  Stack : 9800000002027d08 00000000140120e0 0000000000000000 ffffffff8089d468
-          0000000000000000 0000000000000000 ffffffff807ed6b8 ffffffff80897458
-          ffffffff80897400 9800000002027b88 0000000000000000 7070617773203a6d
-          0000000000000000 9800000002027ba4 0000000000001000 6465746e69617420
-          0000000000000000 ffffffff807ed6b8 00000000140120e0 0000000000000009
-          000000000000064b ffffffff800dd14c 0000000000000036 9800000002184000
-          0000000000000000 0000000000000020 0000000000000000 ffffffff80910000
-          ffffffff8085c000 9800000002027c70 0000000000000001 ffffffff80045fa0
-          0000000000000000 0000000000000000 0000000000000000 0000000000000009
-          000000000000064b ffffffff800502b8 ffffffff807ed6b8 ffffffff80045fa0
-          ...
-  Call Trace:
-  [<ffffffff800502b8>] show_stack+0x28/0xf0
-  [<ffffffff80045fa0>] dump_stack_lvl+0x48/0x7c
-  [<ffffffff80068c98>] __warn+0xa0/0x128
-  [<ffffffff8004120c>] warn_slowpath_fmt+0x64/0xa4
-  [<ffffffff800dd14c>] __timer_delete_sync+0x104/0x120
-  [<ffffffff804934ac>] fza_interrupt+0xc74/0xeb8
-  [<ffffffff800c6390>] __handle_irq_event_percpu+0x70/0x228
-  [<ffffffff800c6560>] handle_irq_event_percpu+0x18/0x78
-  [<ffffffff800cc320>] handle_percpu_irq+0x50/0x80
-  [<ffffffff800c5970>] generic_handle_irq+0x90/0xd0
-  [<ffffffff806e956c>] do_IRQ+0x1c/0x30
-  [<ffffffff8004ad4c>] handle_int+0x148/0x154
-  [<ffffffff800ab7c0>] do_idle+0x40/0x108
-  [<ffffffff800abb0c>] cpu_startup_entry+0x2c/0x38
-  [<ffffffff806dfec8>] kernel_init+0x0/0x108
-  
-  ---[ end trace 0000000000000000 ]---
-  tc2: OK
-  tc2: model 700 (DEFZA-AA), MMF PMD, address 08-00-2b-xx-xx-xx
-  tc2: ROM rev. 1.0, firmware rev. 1.2, RMC rev. A, SMT ver. 1
-  tc2: link unavailable
-  ------------[ cut here ]------------
-  WARNING: kernel/time/timer.c:1611 at __timer_delete_sync+0x104/0x120, CPU#0: swapper/0/0
-  Modules linked in:
-  CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Tainted: G        W           7.0.0-dirty #2 VOLUNTARY 
-  Tainted: [W]=WARN
-  Stack : 9800000002027d08 00000000140120e0 0000000000000000 ffffffff8089d468
-          0000000000000000 0000000000000000 ffffffff807ed6b8 ffffffff80897458
-          ffffffff80897400 9800000002027b88 0000000000000000 0000000000000000
-          0000000000000000 9800000002027ba4 0000000000001000 0000000000000000
-          0000000000000000 ffffffff807ed6b8 00000000140120e0 0000000000000009
-          000000000000064b ffffffff800dd14c 0000000000000036 9800000002184000
-          0000000000000000 0000000000000020 0000000000000000 ffffffff80910000
-          ffffffff8085c000 9800000002027c70 0000000000000001 ffffffff80045fa0
-          0000000000000000 0000000000000000 0000000000000000 0000000000000009
-          000000000000064b ffffffff800502b8 ffffffff807ed6b8 ffffffff80045fa0
-          ...
-  Call Trace:
-  [<ffffffff800502b8>] show_stack+0x28/0xf0
-  [<ffffffff80045fa0>] dump_stack_lvl+0x48/0x7c
-  [<ffffffff80068c98>] __warn+0xa0/0x128
-  [<ffffffff8004120c>] warn_slowpath_fmt+0x64/0xa4
-  [<ffffffff800dd14c>] __timer_delete_sync+0x104/0x120
-  [<ffffffff804934ac>] fza_interrupt+0xc74/0xeb8
-  [<ffffffff800c6390>] __handle_irq_event_percpu+0x70/0x228
-  [<ffffffff800c6560>] handle_irq_event_percpu+0x18/0x78
-  [<ffffffff800cc320>] handle_percpu_irq+0x50/0x80
-  [<ffffffff800c5970>] generic_handle_irq+0x90/0xd0
-  [<ffffffff806e956c>] do_IRQ+0x1c/0x30
-  [<ffffffff8004ad4c>] handle_int+0x148/0x154
-  [<ffffffff806de8a4>] arch_local_irq_disable+0x4/0x28
-  [<ffffffff800ab7d0>] do_idle+0x50/0x108
-  [<ffffffff800abb0c>] cpu_startup_entry+0x2c/0x38
-  [<ffffffff806dfec8>] kernel_init+0x0/0x108
-  
-  ---[ end trace 0000000000000000 ]---
-  tc2: registered as fddi0
 
-The immediate origin of the new warning is the switch away from aliasing 
-del_timer_sync() to del_timer() (timer_delete_sync() to timer_delete() 
-in terms of current function names) for UP configurations, which however 
-is the only choice for this driver anyway as no SMP hardware supports 
-the TURBOchannel bus this device interfaces to.  Therefore there is a 
-very remote issue only this is a sign of.
+> 
+> Signed-off-by: Adrien Reynard <reynard.adrien.08@gmail.com>
+> ---
+>  Documentation/networking/switchdev.rst | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/networking/switchdev.rst b/Documentation/networking/switchdev.rst
+> index 2966b7122f05..948bce44ca9b 100644
+> --- a/Documentation/networking/switchdev.rst
+> +++ b/Documentation/networking/switchdev.rst
+> @@ -162,7 +162,7 @@ The switchdev driver can know a particular port's position in the topology by
+>  monitoring NETDEV_CHANGEUPPER notifications.  For example, a port moved into a
+>  bond will see its upper master change.  If that bond is moved into a bridge,
+>  the bond's upper master will change.  And so on.  The driver will track such
+> -movements to know what position a port is in in the overall topology by
+> +movements to know what position a port is in the overall topology by
+>  registering for netdevice events and acting on NETDEV_CHANGEUPPER.
+>  
+>  L2 Forwarding Offload
 
-Specifically if an adapter reset issued upon a transition to the halted 
-state times out and first triggers fza_reset_timer() for another reset 
-assertion, which then schedules fza_reset_timer() for reset deassertion 
-and then that second call is pre-empted after poking at the hardware, 
-but before the timer has been rearmed and owing to high system load 
-causing exceedingly high scheduling latency control is not handed back 
-before a transition to the uninitialised state has caused the timer to 
-be deleted even before it has been started, then fza_reset_timer() will 
-be called yet again and issue another reset even though by then the 
-adapter has already recovered.
-
-Prevent this situation from happening by switching to timer_delete() for 
-the transition to the halted state and protect the code region affected 
-with a spinlock, also to make sure add_timer() has not been called twice 
-in a row due to an execution race between the interrupt handler and the 
-timer handler (though it could only happen on SMP, but let's keep the 
-driver clean).  It's a very unlikely sequence of events to happen and 
-therefore there's no point in trying to be overly clever about it, such 
-as by placing printk() calls outside the protection.  For the transition 
-to the uninitialised state switch to timer_delete_sync_try() instead, so 
-that a timer isn't deleted that's just been rearmed by the timer handler 
-and needs to watch for the device to come out of reset again (again, an 
-SMP scenario only).
-
-Retain timer_delete_sync() invocations outside the hardirq context for a 
-stray timer not to fire once device structures have been released.
-
-Fixes: 61414f5ec9834 ("FDDI: defza: Add support for DEC FDDIcontroller 700 TURBOchannel adapter")
-Signed-off-by: Maciej W. Rozycki <macro@orcam.me.uk>
----
- drivers/net/fddi/defza.c |   11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-linux-defza-timer-lock.diff
-Index: linux-macro/drivers/net/fddi/defza.c
-===================================================================
---- linux-macro.orig/drivers/net/fddi/defza.c
-+++ linux-macro/drivers/net/fddi/defza.c
-@@ -984,7 +984,7 @@ static irqreturn_t fza_interrupt(int irq
- 
- 		case FZA_STATE_UNINITIALIZED:
- 			netif_carrier_off(dev);
--			timer_delete_sync(&fp->reset_timer);
-+			timer_delete_sync_try(&fp->reset_timer);
- 			fp->ring_cmd_index = 0;
- 			fp->ring_uns_index = 0;
- 			fp->ring_rmc_tx_index = 0;
-@@ -1018,7 +1018,9 @@ static irqreturn_t fza_interrupt(int irq
- 			fp->queue_active = 0;
- 			netif_stop_queue(dev);
- 			pr_debug("%s: queue stopped\n", fp->name);
--			timer_delete_sync(&fp->reset_timer);
-+
-+			spin_lock(&fp->lock);
-+			timer_delete(&fp->reset_timer);
- 			pr_warn("%s: halted, reason: %x\n", fp->name,
- 				FZA_STATUS_GET_HALT(status));
- 			fza_regs_dump(fp);
-@@ -1027,6 +1029,8 @@ static irqreturn_t fza_interrupt(int irq
- 			fp->timer_state = 0;
- 			fp->reset_timer.expires = jiffies + 45 * HZ;
- 			add_timer(&fp->reset_timer);
-+			spin_unlock(&fp->lock);
-+
- 			break;
- 
- 		default:
-@@ -1046,7 +1050,9 @@ static irqreturn_t fza_interrupt(int irq
- static void fza_reset_timer(struct timer_list *t)
- {
- 	struct fza_private *fp = timer_container_of(fp, t, reset_timer);
-+	unsigned long flags;
- 
-+	spin_lock_irqsave(&fp->lock, flags);
- 	if (!fp->timer_state) {
- 		pr_err("%s: RESET timed out!\n", fp->name);
- 		pr_info("%s: trying harder...\n", fp->name);
-@@ -1069,6 +1075,7 @@ static void fza_reset_timer(struct timer
- 		fp->reset_timer.expires = jiffies + 45 * HZ;
- 	}
- 	add_timer(&fp->reset_timer);
-+	spin_unlock_irqrestore(&fp->lock, flags);
- }
- 
- static int fza_set_mac_address(struct net_device *dev, void *addr)
 
