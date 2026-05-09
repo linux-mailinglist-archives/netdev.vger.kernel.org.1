@@ -1,210 +1,274 @@
-Return-Path: <netdev+bounces-286217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286218-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id P+YXKz2h/2mw8gAAu9opvQ
-	(envelope-from <netdev+bounces-286217-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 23:03:57 +0200
+	id mIGvDn+h/2mw8gAAu9opvQ
+	(envelope-from <netdev+bounces-286218-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 23:05:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FC375016BB
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 23:03:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DB505016C4
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 23:05:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A38A5300381B
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 21:03:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 12FA8300A8CA
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 21:05:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 243A537C927;
-	Sat,  9 May 2026 21:03:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="XKx1w1nB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4D837EFE8;
+	Sat,  9 May 2026 21:05:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B79634F479
-	for <netdev@vger.kernel.org>; Sat,  9 May 2026 21:03:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778360633; cv=pass; b=Fb1hQdH0xShGvUJSJmTqYZM1vO6pttj+3mGGX/eqX/dzC2XreYro09Q++XOdXTDEfZ6M5s31LaXb7NjmwcDHluHklxhLaL7TZvbryUb+ISpe035gOcNKDrlj9eZ9zjXi1e6BHlK5bcjdsufn6u2vOo4KL4X19wmqTPqVOmEMDJE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778360633; c=relaxed/simple;
-	bh=PxwmTw2cZ8X5Rse2nPySPXmuP6gvLtPzrJcrTGriioM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hkzP5lpOzvco+FN+LJjn988HkT1qHNtGphran6SSoK2P51plM1ZmsMpSN+MYHFLGDtt9NlufHzsX9xzGRuscq/Awfx+lu1uSCxY7U/SbLeVjHuP1uH/Gncx1TCS1MAQd8t0QekCHSP0iKdtHdVrMdurCqe5Wzb0dOT6yuRL0OTk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=XKx1w1nB; arc=pass smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-7bd87e5d8ffso45827857b3.1
-        for <netdev@vger.kernel.org>; Sat, 09 May 2026 14:03:50 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778360629; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Xo5FCo1BDmxQ186jLl11QKWQxdAawz9CJjHFOJGXjUY1deQxhLywdnXnOpYYlMnD5s
-         zsNXRiz5w3BIeaVbVJbxVoxQEbOzFPT6L7/j/wpA1CakcBrlsnH2a5FO55Tqrv7xyuCT
-         hGoC7N+0IBz6xX14ZeW60c0/2P5NZr3r+uWSBFLz1ATqZO4JBE0osYFJ2YqGyxITJFl/
-         +0URMaVWHtzF+sOt/ey3mgIzDkPIGUiRqpjKR1shEQ6KoQ/d2Sg0L8DwMMoFszfLmHoL
-         OKVJ/uTD57XRPabvV2K8sZNMCG+RJDjFmRpvJUaiSR1mbSOBtovd/zIcjLvW9P5s9gVt
-         rNAw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=3Hgcm2XESHpuTekaIUaBfVFqK4X+Fc2qjFkrFyUDlzI=;
-        fh=3W7TwQl6gJwB951YYi4HN/Y+7o51f5w3IYBhDpdQFz8=;
-        b=ER8Ga0N2hLCKCyFL1MsACuRLz61NdxZePpTclw7vpBfQHda4UVNjGWLa7Ncb1fquNL
-         aF6zGEkTN46qWWJvEkJvnu/3MjAcfXNHOvyHQQf+b13eu/+mqysitAoGVb9V0hHu6PdS
-         0/ZfW9Km3ndjI/XM03P67KDZfIK7t7X2FcTa4HXPRl5bETKf442bQkMI5/EI4K8/d9Io
-         AHMnhCERoAciUIj5RrRzKqjqmEFiuSmRq8tklxXNyyWau624UYppnqsyIk54HA7xHd+j
-         uZLH+HhfHIybEoWztHT+cqK8f82ujza/HGR5WNO4t9VZbpUZ0cA0wsMrlfg7SBILpVs0
-         REvw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1778360629; x=1778965429; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3Hgcm2XESHpuTekaIUaBfVFqK4X+Fc2qjFkrFyUDlzI=;
-        b=XKx1w1nBeH16Rt3eUrg7M8LQt+E17htkqMIV1774xxdLyzOMZzrEqxdHgEL6TzKg6L
-         IDLXqXgl6qp0XRdScYaCXxEVlJDaQSfM3BHMmZKjNaoQCPOKQh9r7gX1GR56PmrKEkvN
-         qqX8ngLVPLRvme27++YZI2UsOaRIF68/cRDOa+U/XjO3qk8ubHGXyyKozceSaguI5acU
-         M/PKw2zhGz8RD2oSrz96Ti8fXc+haPx2eg0/SgUAf4Qw6j18AaBtG7o1SHl0kywXR79z
-         3gwlhTXgq5orpEngKojKg6SZH0VS7sw57NXCF9DLfk6vKWDP0TYWgKAPUpDpJLqCohy0
-         Midw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778360629; x=1778965429;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3Hgcm2XESHpuTekaIUaBfVFqK4X+Fc2qjFkrFyUDlzI=;
-        b=HH9eYSds4HvYfwPXsqJMPw608eLigj1f8Jf3kxqO2JpXTfg0s7QNdNCovxFSw5xiU0
-         VMSHr54uTzRlaBBFZlv1/44eJBclBYxmXoOooXLsD+mnkUDeJm8wJtEAD0wO7g/JIYaB
-         GKikS7tmVQLTaYy7hfg1PtZycobKpjPqbqKy3rXeK3xvxk7hWXU3XOxeOfnJLvImesvh
-         L/hU57FuYvNVw6eRbrOxnY8j5K9jPXozWyIbLtOI3EqY9XlOYobApLiIMptCESVjY/YS
-         aTdHIblpAWKGK/M+k/3MwT9hvls19v6hJEtM/qXY3HscbL54J6IJ5OIRL/6NrsRE96kd
-         xMgA==
-X-Forwarded-Encrypted: i=1; AFNElJ+LpBv7p3dBD52NQmDcv8ptm1Jop/WWKljliZqY7QPPpqGZA5kBA0ZfnZBprvJ3bMilMDXJmTE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5BTNFYaIBYpjI/enCZaRtgtKs4H6DrnIQ1Q5tn4YKgB+VUTua
-	Xnas6muW19tkwTlVh5Mclj99SCyhsUsM6Mbdpfwq3udiVJQtIqEFB4NO7UvpCX0Ae5wUt3Gk+d9
-	q/BdyDrdshqr2rNwEPRaq6ZonypcKJ3a1pFVooBaa
-X-Gm-Gg: Acq92OEWn49u1qliA82vFZf3VSIhs5zXtssESut5EtdxGiULm9znsSn/JEboIaGtEd6
-	PVIDJIDM4Qng8o3NZFcM0eJ4FfDFH1ERArV0vma+862m9tMNndfDnYQWdPmhzvoGWFKOmmt0w5b
-	SvG1vCkreKXvKpCQrAT+Kz9t+7FMobshWp1AiZ7PuOYlPZTPNnIOMXUvyc6DojWjqaCP4ZS6FL8
-	lJb9CuoQIflH/Pg2uukfwGVnDtzV4lBsFU0L0QZ/+K8fb55xTXNyAK7oIFtYJZITRqr+91KDFIX
-	6g3RioLGZQ3nnaAk6QazBCpPJu+oh7yK
-X-Received: by 2002:a05:690c:660c:b0:7bd:7e01:8d58 with SMTP id
- 00721157ae682-7bf04c7b1c4mr96556957b3.29.1778360629523; Sat, 09 May 2026
- 14:03:49 -0700 (PDT)
+Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB75725333F;
+	Sat,  9 May 2026 21:04:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.133.224.34
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778360700; cv=none; b=BGpcLkNibiLf29rS3/jW9pyqhF6R9Wz+D6i0UsU9FoqO25tqhineFfsVl/Pk+fxmF7ZK5TWnM1N2HhNorIYzeuJKogcZWz6Y+SgKAk72gDEdlJScvGeP0PhL1zZqZIJ9Yv/5UQ3jb0hUagAlMz17+eYBybgi6n8IdmzWKxQEDTk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778360700; c=relaxed/simple;
+	bh=08lThNnhevMm71QOCq37Tyz24IUFKenJcrFBUwo74DQ=;
+	h=Date:From:To:cc:Subject:Message-ID:MIME-Version:Content-Type; b=Bpszat1n4gaVg0bE40NyreTFtLWfSJL0I6TZcR00dQCAQj3g7oy/ZZpLcCqnubs/LgNdtdqOxM/WrGKranuZTwzdXSCZzH6nPRSbd2ZPWwo0bXyPY3yzWnsnKfCDEtTctfVFJwY3YI/dAn5UNeNMROWOATeHpUz7JCe5zd8+4lU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=orcam.me.uk
+Received: by angie.orcam.me.uk (Postfix, from userid 500)
+	id 3983D92009C; Sat,  9 May 2026 23:04:50 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by angie.orcam.me.uk (Postfix) with ESMTP id 324DB92009B;
+	Sat,  9 May 2026 22:04:50 +0100 (BST)
+Date: Sat, 9 May 2026 22:04:50 +0100 (BST)
+From: "Maciej W. Rozycki" <macro@orcam.me.uk>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+    "David S. Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>
+cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] FDDI: defza: Sanitise the reset safety timer
+Message-ID: <alpine.DEB.2.21.2605061216430.46195@angie.orcam.me.uk>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260507221948.335726-1-edumazet@google.com> <20260507221948.335726-6-edumazet@google.com>
- <6b5d2268-ffaa-4746-87d0-8f16135aba44@mojatatu.com> <CANn89i+eK7w_VXW+vva_4Uy50mBPN-pT_oijYN0T-US-AK-dZA@mail.gmail.com>
-In-Reply-To: <CANn89i+eK7w_VXW+vva_4Uy50mBPN-pT_oijYN0T-US-AK-dZA@mail.gmail.com>
-From: Victor Nogueira <victor@mojatatu.com>
-Date: Sat, 9 May 2026 18:03:38 -0300
-X-Gm-Features: AVHnY4I98TffYGf3dgr7XX4SR2y-JGJHZrP1sO0_WTgnLHMHAt_T99eWHS6wm-Q
-Message-ID: <CA+NMeC-wn-ikFgyH3MabnXwcSrJzEwdXQmuHkXd=QboNq2vONA@mail.gmail.com>
-Subject: Re: [PATCH net-next 5/8] net/sched: add const qualifiers to
- gnet_stats helpers
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 2FC375016BB
+Content-Type: text/plain; charset=US-ASCII
+X-Rspamd-Queue-Id: 7DB505016C4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286217-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-286218-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DMARC_NA(0.00)[orcam.me.uk];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[macro@orcam.me.uk,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mojatatu.com:email]
+	NEURAL_HAM(-0.00)[-0.993];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	R_DKIM_NA(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[angie.orcam.me.uk:mid]
 X-Rspamd-Action: no action
 
-On Sat, May 9, 2026 at 2:53=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> On Fri, May 8, 2026 at 11:33=E2=80=AFAM Victor Nogueira <victor@mojatatu.=
-com> wrote:
-> >
-> > On 07/05/2026 19:19, Eric Dumazet wrote:
-> > > In preparation of lockless qdisc dumps, add const qualifiers to:
-> > >
-> > > - gnet_stats_add_basic()
-> > > - gnet_stats_copy_basic()
-> > > - gnet_stats_copy_queue()
-> > > - gnet_stats_read_basic()
-> > > - ___gnet_stats_copy_basic()
-> > >
-> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > > [...]
-> > > diff --git a/net/core/gen_stats.c b/net/core/gen_stats.c
-> > > index 1a2380e74272de8eaf3d4ef453e56105a31e9edf..3b2f9ea2eb072dde792aa=
-d5b60cf00dcc2efa76d 100644
-> > > --- a/net/core/gen_stats.c
-> > > +++ b/net/core/gen_stats.c
-> > > @@ -124,7 +124,7 @@ void gnet_stats_basic_sync_init(struct gnet_stats=
-_basic_sync *b)
-> > >   EXPORT_SYMBOL(gnet_stats_basic_sync_init);
-> > >
-> > >   static void gnet_stats_add_basic_cpu(struct gnet_stats_basic_sync *=
-bstats,
-> > > -                                  struct gnet_stats_basic_sync __per=
-cpu *cpu)
-> > > +                                  const struct gnet_stats_basic_sync=
- __percpu *cpu)
-> >
-> > This seems to be causing a compilation error:
-> >
-> > net/core/gen_stats.c: In function =E2=80=98gnet_stats_add_basic_cpu=E2=
-=80=99:
-> > ./include/linux/percpu-defs.h:238:1: error: initialization discards
-> > =E2=80=98const=E2=80=99 qualifier from pointer target type [-Werror=3Dd=
-iscarded-qualifiers]
-> >    238 | ({
-> >          \
-> >        | ^
-> > net/core/gen_stats.c:133:54: note: in expansion of macro =E2=80=98per_c=
-pu_ptr=E2=80=99
-> >    133 |                 struct gnet_stats_basic_sync *bcpu =3D
-> > per_cpu_ptr(cpu, i);
->
-> Interesting, no error on my side wth gcc or clang.
+The reset actions of the DEFZA adapters are exceedingly slow, taking up 
+to 30 seconds to complete by the device spec and typically in the range 
+of 10 seconds in reality, as required for the device RTOS to boot, still 
+quite a lot.  Therefore a state machine is used that's interrupt driven, 
+however a safety mechanism is required in case of adapter malfunction, 
+so that if no state change interrupt has arrived in time, then the 
+situation is taken care of.
 
-Yes, it's weird.
-I can reproduce with the gcc versions below:
-gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
-gcc (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0
+The safety mechanism depends on the origin of the reset.  For regular 
+adapter initialisation at the device probe time a sleep is requested.  
+However a reset is also required by the device spec when the adapter has 
+transitioned into the halted state, such as in response to a PC Trace 
+event in the course of ring fault recovery, possibly a common network 
+event.  In that case no sleep is possible as a device halt is reported 
+at the hardirq level.
 
-However with gcc 15 it's not reproducing.
-There's probably been an update in gcc
-that's masking the issue now.
+A timer is therefore set up to ensure progress in case no adapter state 
+change interrupt has arrived in time, but as from commit 168f6b6ffbee 
+("timers: Use del_timer_sync() even on UP") a warning is issued as the 
+timer is deleted in the hardirq handler upon an expected state change:
 
-cheers,
-Victor
+  defza: v.1.1.4  Oct  6 2018  Maciej W. Rozycki
+  tc2: DEC FDDIcontroller 700 or 700-C at 0x18000000, irq 4
+  tc2: resetting the board...
+  ------------[ cut here ]------------
+  WARNING: kernel/time/timer.c:1611 at __timer_delete_sync+0x104/0x120, CPU#0: swapper/0/0
+  Modules linked in:
+  CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 7.0.0-dirty #2 VOLUNTARY 
+  Stack : 9800000002027d08 00000000140120e0 0000000000000000 ffffffff8089d468
+          0000000000000000 0000000000000000 ffffffff807ed6b8 ffffffff80897458
+          ffffffff80897400 9800000002027b88 0000000000000000 7070617773203a6d
+          0000000000000000 9800000002027ba4 0000000000001000 6465746e69617420
+          0000000000000000 ffffffff807ed6b8 00000000140120e0 0000000000000009
+          000000000000064b ffffffff800dd14c 0000000000000036 9800000002184000
+          0000000000000000 0000000000000020 0000000000000000 ffffffff80910000
+          ffffffff8085c000 9800000002027c70 0000000000000001 ffffffff80045fa0
+          0000000000000000 0000000000000000 0000000000000000 0000000000000009
+          000000000000064b ffffffff800502b8 ffffffff807ed6b8 ffffffff80045fa0
+          ...
+  Call Trace:
+  [<ffffffff800502b8>] show_stack+0x28/0xf0
+  [<ffffffff80045fa0>] dump_stack_lvl+0x48/0x7c
+  [<ffffffff80068c98>] __warn+0xa0/0x128
+  [<ffffffff8004120c>] warn_slowpath_fmt+0x64/0xa4
+  [<ffffffff800dd14c>] __timer_delete_sync+0x104/0x120
+  [<ffffffff804934ac>] fza_interrupt+0xc74/0xeb8
+  [<ffffffff800c6390>] __handle_irq_event_percpu+0x70/0x228
+  [<ffffffff800c6560>] handle_irq_event_percpu+0x18/0x78
+  [<ffffffff800cc320>] handle_percpu_irq+0x50/0x80
+  [<ffffffff800c5970>] generic_handle_irq+0x90/0xd0
+  [<ffffffff806e956c>] do_IRQ+0x1c/0x30
+  [<ffffffff8004ad4c>] handle_int+0x148/0x154
+  [<ffffffff800ab7c0>] do_idle+0x40/0x108
+  [<ffffffff800abb0c>] cpu_startup_entry+0x2c/0x38
+  [<ffffffff806dfec8>] kernel_init+0x0/0x108
+  
+  ---[ end trace 0000000000000000 ]---
+  tc2: OK
+  tc2: model 700 (DEFZA-AA), MMF PMD, address 08-00-2b-xx-xx-xx
+  tc2: ROM rev. 1.0, firmware rev. 1.2, RMC rev. A, SMT ver. 1
+  tc2: link unavailable
+  ------------[ cut here ]------------
+  WARNING: kernel/time/timer.c:1611 at __timer_delete_sync+0x104/0x120, CPU#0: swapper/0/0
+  Modules linked in:
+  CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Tainted: G        W           7.0.0-dirty #2 VOLUNTARY 
+  Tainted: [W]=WARN
+  Stack : 9800000002027d08 00000000140120e0 0000000000000000 ffffffff8089d468
+          0000000000000000 0000000000000000 ffffffff807ed6b8 ffffffff80897458
+          ffffffff80897400 9800000002027b88 0000000000000000 0000000000000000
+          0000000000000000 9800000002027ba4 0000000000001000 0000000000000000
+          0000000000000000 ffffffff807ed6b8 00000000140120e0 0000000000000009
+          000000000000064b ffffffff800dd14c 0000000000000036 9800000002184000
+          0000000000000000 0000000000000020 0000000000000000 ffffffff80910000
+          ffffffff8085c000 9800000002027c70 0000000000000001 ffffffff80045fa0
+          0000000000000000 0000000000000000 0000000000000000 0000000000000009
+          000000000000064b ffffffff800502b8 ffffffff807ed6b8 ffffffff80045fa0
+          ...
+  Call Trace:
+  [<ffffffff800502b8>] show_stack+0x28/0xf0
+  [<ffffffff80045fa0>] dump_stack_lvl+0x48/0x7c
+  [<ffffffff80068c98>] __warn+0xa0/0x128
+  [<ffffffff8004120c>] warn_slowpath_fmt+0x64/0xa4
+  [<ffffffff800dd14c>] __timer_delete_sync+0x104/0x120
+  [<ffffffff804934ac>] fza_interrupt+0xc74/0xeb8
+  [<ffffffff800c6390>] __handle_irq_event_percpu+0x70/0x228
+  [<ffffffff800c6560>] handle_irq_event_percpu+0x18/0x78
+  [<ffffffff800cc320>] handle_percpu_irq+0x50/0x80
+  [<ffffffff800c5970>] generic_handle_irq+0x90/0xd0
+  [<ffffffff806e956c>] do_IRQ+0x1c/0x30
+  [<ffffffff8004ad4c>] handle_int+0x148/0x154
+  [<ffffffff806de8a4>] arch_local_irq_disable+0x4/0x28
+  [<ffffffff800ab7d0>] do_idle+0x50/0x108
+  [<ffffffff800abb0c>] cpu_startup_entry+0x2c/0x38
+  [<ffffffff806dfec8>] kernel_init+0x0/0x108
+  
+  ---[ end trace 0000000000000000 ]---
+  tc2: registered as fddi0
+
+The immediate origin of the new warning is the switch away from aliasing 
+del_timer_sync() to del_timer() (timer_delete_sync() to timer_delete() 
+in terms of current function names) for UP configurations, which however 
+is the only choice for this driver anyway as no SMP hardware supports 
+the TURBOchannel bus this device interfaces to.  Therefore there is a 
+very remote issue only this is a sign of.
+
+Specifically if an adapter reset issued upon a transition to the halted 
+state times out and first triggers fza_reset_timer() for another reset 
+assertion, which then schedules fza_reset_timer() for reset deassertion 
+and then that second call is pre-empted after poking at the hardware, 
+but before the timer has been rearmed and owing to high system load 
+causing exceedingly high scheduling latency control is not handed back 
+before a transition to the uninitialised state has caused the timer to 
+be deleted even before it has been started, then fza_reset_timer() will 
+be called yet again and issue another reset even though by then the 
+adapter has already recovered.
+
+Prevent this situation from happening by switching to timer_delete() for 
+the transition to the halted state and protect the code region affected 
+with a spinlock, also to make sure add_timer() has not been called twice 
+in a row due to an execution race between the interrupt handler and the 
+timer handler (though it could only happen on SMP, but let's keep the 
+driver clean).  It's a very unlikely sequence of events to happen and 
+therefore there's no point in trying to be overly clever about it, such 
+as by placing printk() calls outside the protection.  For the transition 
+to the uninitialised state switch to timer_delete_sync_try() instead, so 
+that a timer isn't deleted that's just been rearmed by the timer handler 
+and needs to watch for the device to come out of reset again (again, an 
+SMP scenario only).
+
+Retain timer_delete_sync() invocations outside the hardirq context for a 
+stray timer not to fire once device structures have been released.
+
+Fixes: 61414f5ec9834 ("FDDI: defza: Add support for DEC FDDIcontroller 700 TURBOchannel adapter")
+Signed-off-by: Maciej W. Rozycki <macro@orcam.me.uk>
+---
+ drivers/net/fddi/defza.c |   11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+linux-defza-timer-lock.diff
+Index: linux-macro/drivers/net/fddi/defza.c
+===================================================================
+--- linux-macro.orig/drivers/net/fddi/defza.c
++++ linux-macro/drivers/net/fddi/defza.c
+@@ -984,7 +984,7 @@ static irqreturn_t fza_interrupt(int irq
+ 
+ 		case FZA_STATE_UNINITIALIZED:
+ 			netif_carrier_off(dev);
+-			timer_delete_sync(&fp->reset_timer);
++			timer_delete_sync_try(&fp->reset_timer);
+ 			fp->ring_cmd_index = 0;
+ 			fp->ring_uns_index = 0;
+ 			fp->ring_rmc_tx_index = 0;
+@@ -1018,7 +1018,9 @@ static irqreturn_t fza_interrupt(int irq
+ 			fp->queue_active = 0;
+ 			netif_stop_queue(dev);
+ 			pr_debug("%s: queue stopped\n", fp->name);
+-			timer_delete_sync(&fp->reset_timer);
++
++			spin_lock(&fp->lock);
++			timer_delete(&fp->reset_timer);
+ 			pr_warn("%s: halted, reason: %x\n", fp->name,
+ 				FZA_STATUS_GET_HALT(status));
+ 			fza_regs_dump(fp);
+@@ -1027,6 +1029,8 @@ static irqreturn_t fza_interrupt(int irq
+ 			fp->timer_state = 0;
+ 			fp->reset_timer.expires = jiffies + 45 * HZ;
+ 			add_timer(&fp->reset_timer);
++			spin_unlock(&fp->lock);
++
+ 			break;
+ 
+ 		default:
+@@ -1046,7 +1050,9 @@ static irqreturn_t fza_interrupt(int irq
+ static void fza_reset_timer(struct timer_list *t)
+ {
+ 	struct fza_private *fp = timer_container_of(fp, t, reset_timer);
++	unsigned long flags;
+ 
++	spin_lock_irqsave(&fp->lock, flags);
+ 	if (!fp->timer_state) {
+ 		pr_err("%s: RESET timed out!\n", fp->name);
+ 		pr_info("%s: trying harder...\n", fp->name);
+@@ -1069,6 +1075,7 @@ static void fza_reset_timer(struct timer
+ 		fp->reset_timer.expires = jiffies + 45 * HZ;
+ 	}
+ 	add_timer(&fp->reset_timer);
++	spin_unlock_irqrestore(&fp->lock, flags);
+ }
+ 
+ static int fza_set_mac_address(struct net_device *dev, void *addr)
 
