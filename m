@@ -1,866 +1,471 @@
-Return-Path: <netdev+bounces-286131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286132-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id pBW6J6L//mkn1AAAu9opvQ
-	(envelope-from <netdev+bounces-286131-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 11:34:26 +0200
+	id 0Ia+A1UB/2mL1AAAu9opvQ
+	(envelope-from <netdev+bounces-286132-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 11:41:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34A9C4FEFFE
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 11:34:24 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 238264FF043
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 11:41:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7AF2A30069B3
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 09:34:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4B86E300698B
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 09:41:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D56738237E;
-	Sat,  9 May 2026 09:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CBC338E5DA;
+	Sat,  9 May 2026 09:41:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Fs2HHj1i"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6212F8EA2;
-	Sat,  9 May 2026 09:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B5A3845A9;
+	Sat,  9 May 2026 09:41:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778319258; cv=none; b=BNjewBm8wlouru6M3Y8GaYKV9K4XK4kBUI4rX3698hB9iL0GvzDiHGWTIo/+ZlNXIyO7Y446XneVUVTY3cOawPuWSVk0IgCEsDxzhqgej3ck++KGvUAX0WPz/71FgRW1y7pJ5ys7eClty1wKQvdS9LzkS95ii4AoYZmBH7vI2is=
+	t=1778319690; cv=none; b=rdwFTu7kIMrloitZ8i+chPjEhGB2QEzxdWFWHF6Rd3xOOer2zFeQ3aUj446yBQelaIKuokXoAEyv0MQkBeVrY8X73VI85q13umbRZ8zEfgeSYFnIVb8I/ajVmSnXBE7b5OEJAP7SYg3/TM2y63VSdMmhlDIvNOHk2k/ge9qqsZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778319258; c=relaxed/simple;
-	bh=Y1GYzWmY8vkMfw+j7QABBLA/mQnyTGHXjs+9F4rfKTU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tR/HpRiBrxqtgujs13LUVRJZQ6JTE4hvqZS3d6cinH65bsXp6Atam2fDW+6qKN8ncRiv822Fpwqjqlwyu2ZbAABA2Hm/176gB5XsjpuLz6Is55VaHTsNtL9pEd3Q3sobhRfcHQEP/0B2Q4vkcrE/8Uy7hK5nt3TjGULdO/1w4ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mails.ucas.ac.cn; spf=pass smtp.mailfrom=mails.ucas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mails.ucas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.ucas.ac.cn
-Received: from fric.. (unknown [36.110.52.2])
-	by APP-03 (Coremail) with SMTP id rQCowAB3W+KH__5peqZ7EA--.25316S2;
-	Sat, 09 May 2026 17:33:59 +0800 (CST)
-From: Jiakai Xu <xujiakai24@mails.ucas.ac.cn>
-To: xujiakai24@mails.ucas.ac.cn
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH] netdevsim: Fix task hung by releasing bus lock before device ops
-Date: Sat,  9 May 2026 09:33:59 +0000
-Message-Id: <20260509093359.3451699-1-xujiakai24@mails.ucas.ac.cn>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260509092837.3432281-1-xujiakai24@mails.ucas.ac.cn>
-References: <20260509092837.3432281-1-xujiakai24@mails.ucas.ac.cn>
+	s=arc-20240116; t=1778319690; c=relaxed/simple;
+	bh=oLpg47DSe9US8IX5roqIcuUzQM4CfiqXPvK6CvOwUBk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Scxgg8KWGbVFaj/fXimxLm+6GaUJkRfSVXECRi5ebu2jtBR3naCGnLRbtvXd8T+GbfKcqkVo7bNah1nMGCAm4Xs7vKcFo9KQyynsGWu5W0j+kpZeexDQyTaiGhqz7YWYnNMfRRfCxKzhVgd33XG7pYqSjPa8LFxlg+zLKa9dYGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Fs2HHj1i; arc=none smtp.client-ip=113.46.200.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=tMT5B6mrg7SMy3LvephoG51biiHh3rgEicSBYASx8d0=;
+	b=Fs2HHj1imE5n726zGGh6xeghlqL5c3iyzLPDeQnyJF8rVgqo8EYpyWsRcyJ+/g+eFFRuoAzK0
+	D2BsuVOrSDJ8kZDOpPcsw83V26ntOFbXF7l6xfDmHIfE0Z8HutPWlms7IdyQYds5ViP9p6yTrbP
+	/yUcD+klXvnaS6Pzqq61LDM=
+Received: from mail.maildlp.com (unknown [172.19.163.200])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gCLRG4kdDznTc7;
+	Sat,  9 May 2026 17:34:18 +0800 (CST)
+Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
+	by mail.maildlp.com (Postfix) with ESMTPS id B01834055B;
+	Sat,  9 May 2026 17:41:23 +0800 (CST)
+Received: from [10.174.176.240] (10.174.176.240) by
+ kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Sat, 9 May 2026 17:41:22 +0800
+Message-ID: <4ee398d0-d2ec-45b2-8214-6e35520fca2d@huawei.com>
+Date: Sat, 9 May 2026 17:41:21 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/6] SUNRPC: Address remaining cache_check_rcu() UAF in
+ cache content files
+To: Chuck Lever <cel@kernel.org>, Misbah Anjum N <misanjum@linux.ibm.com>,
+	Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>, Olga
+ Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
+	<tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
+	<anna@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, <yi.zhang@huawei.com>,
+	Zhihao Cheng <chengzhihao1@huawei.com>, Li Lingfeng <lilingfeng3@huawei.com>
+CC: <linux-nfs@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Chuck Lever <chuck.lever@oracle.com>
+References: <20260501-cache-uaf-fix-v1-0-a49928bf4817@oracle.com>
+ <c45779f6-fe6c-4037-bb1c-01cfbbaa8aac@huawei.com>
+ <76a10e49-54a6-4813-8b58-b7cd0820fdc6@app.fastmail.com>
+ <4bb9ed6b-1a64-406a-9239-b0560ca963cc@huawei.com>
+ <05f93fc4-59d7-4735-bc7d-a00d1497687a@huawei.com>
+ <10019b42-4589-4f9f-8d5b-d8197db1ce3c@huawei.com>
+ <39819ad4-3105-4802-b5e2-79e131b25984@huawei.com>
+ <f4caa4fa-f15f-4c95-8318-d4ec216e6090@app.fastmail.com>
+From: yangerkun <yangerkun@huawei.com>
+In-Reply-To: <f4caa4fa-f15f-4c95-8318-d4ec216e6090@app.fastmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowAB3W+KH__5peqZ7EA--.25316S2
-X-Coremail-Antispam: 1UD129KBjvAXoWDXr13Jw1DWF43WrykKr45Wrg_yoW7Xw43Ao
-	W5XryUJr48G3WUJr1fJw15XryrGr1DXFsxAr4UCr1UWr17Jr4UJr1jkw1xAr4Utw1UtFy3
-	Aw18tas5G3y5tr4kn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
-	AaLaJ3UjIYCTnIWjp_UUUYh7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20EY4v20xva
-	j40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2
-	x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWx
-	JVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r4j6F
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
-	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-	1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-	AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
-	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWI
-	evJa73UjIFyTuYvjfUe7KsUUUUU
-X-CM-SenderInfo: 50xmxthndljko6pdxz3voxutnvoduhdfq/
-X-Rspamd-Queue-Id: 34A9C4FEFFE
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemf100006.china.huawei.com (7.202.181.220)
+X-Rspamd-Queue-Id: 238264FF043
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286131-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[ucas.ac.cn];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	FROM_NEQ_ENVFROM(0.00)[xujiakai24@mails.ucas.ac.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-286132-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.876];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mails.ucas.ac.cn:mid]
+	FROM_NEQ_ENVFROM(0.00)[yangerkun@huawei.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-I found this issue through fuzzing.
+Hi Chuck!
 
-Here is the full crash report produced by the fuzzer:
+在 2026/5/9 4:47, Chuck Lever 写道:
+> Hi Erkun -
+> 
+> On Fri, May 8, 2026, at 9:00 AM, yangerkun wrote:
+>> 在 2026/5/8 16:16, yangerkun 写道:
+>>>
+>>>
+>>> 在 2026/5/8 11:08, yangerkun 写道:
+>>> After reviewing these two commits:
+>>>
+>>> e7fcf179b82d NFSD: Hold net reference for the lifetime of /proc/fs/nfs/
+>>> exports fd
+>>> 48db892356d6 NFSD: Defer sub-object cleanup in export put callbacks
+>>>
+>>> I believe that the issue described in commit e7fcf179b82d might be the
+>>> root cause of the null pointer dereferences mentioned in [1].
+> 
+> That's where I landed too. e7fcf179b82d closed the specific
+> oops Misbah hit on /proc/fs/nfs/exports. The matching patch
 
-INFO: task syz-executor:15504 blocked for more than 424 seconds.
-      Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:0     pid:15504 tgid:15504 ppid:1      task_flags:0x400140 flags:0x00000002
-Call Trace:
-[<ffffffff867069b0>] context_switch kernel/sched/core.c:5387 [inline]
-[<ffffffff867069b0>] __schedule+0x1a2e/0x513c kernel/sched/core.c:7188
-[<ffffffff8670a182>] __schedule_loop kernel/sched/core.c:7267 [inline]
-[<ffffffff8670a182>] schedule+0xc4/0x35e kernel/sched/core.c:7282
-[<ffffffff8670a518>] schedule_preempt_disabled+0x16/0x28 kernel/sched/core.c:7339
-[<ffffffff86712a14>] __mutex_lock_common kernel/locking/mutex.c:726 [inline]
-[<ffffffff86712a14>] __mutex_lock+0xbee/0x1b0e kernel/locking/mutex.c:820
-[<ffffffff86713948>] mutex_lock_nested+0x14/0x1c kernel/locking/mutex.c:873
-[<ffffffff839164cc>] new_device_store+0x10a/0x6c2 drivers/net/netdevsim/bus.c:184
-[<ffffffff82d41b12>] bus_attr_store+0x6a/0x9e drivers/base/bus.c:172
-[<ffffffff80fb8126>] sysfs_kf_write+0xc2/0x11c fs/sysfs/file.c:142
-[<ffffffff80fb17fc>] kernfs_fop_write_iter+0x32a/0x4c8 fs/kernfs/file.c:352
-[<ffffffff80ceb5c8>] new_sync_write fs/read_write.c:595 [inline]
-[<ffffffff80ceb5c8>] vfs_write+0x776/0xc9e fs/read_write.c:688
-[<ffffffff80cebeea>] ksys_write+0x126/0x234 fs/read_write.c:740
-[<ffffffff80cec066>] __do_sys_write fs/read_write.c:751 [inline]
-[<ffffffff80cec066>] __se_sys_write fs/read_write.c:748 [inline]
-[<ffffffff80cec066>] __riscv_sys_write+0x6e/0xa0 fs/read_write.c:748
-[<ffffffff80078fb2>] syscall_handler+0x94/0x118 arch/riscv/include/asm/syscall.h:112
-[<ffffffff866fa9ea>] do_trap_ecall_u+0x43e/0x5de arch/riscv/kernel/traps.c:342
-[<ffffffff867267f6>] handle_exception+0x15e/0x16a arch/riscv/kernel/entry.S:232
-INFO: task syz-executor:15582 blocked for more than 433 seconds.
-      Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:0     pid:15582 tgid:15582 ppid:15557  task_flags:0x400140 flags:0x00000000
-Call Trace:
-[<ffffffff867069b0>] context_switch kernel/sched/core.c:5387 [inline]
-[<ffffffff867069b0>] __schedule+0x1a2e/0x513c kernel/sched/core.c:7188
-[<ffffffff8670a182>] __schedule_loop kernel/sched/core.c:7267 [inline]
-[<ffffffff8670a182>] schedule+0xc4/0x35e kernel/sched/core.c:7282
-[<ffffffff8670a518>] schedule_preempt_disabled+0x16/0x28 kernel/sched/core.c:7339
-[<ffffffff86712a14>] __mutex_lock_common kernel/locking/mutex.c:726 [inline]
-[<ffffffff86712a14>] __mutex_lock+0xbee/0x1b0e kernel/locking/mutex.c:820
-[<ffffffff86713948>] mutex_lock_nested+0x14/0x1c kernel/locking/mutex.c:873
-[<ffffffff83915a5e>] del_device_store+0xf0/0x48c drivers/net/netdevsim/bus.c:234
-[<ffffffff82d41b12>] bus_attr_store+0x6a/0x9e drivers/base/bus.c:172
-[<ffffffff80fb8126>] sysfs_kf_write+0xc2/0x11c fs/sysfs/file.c:142
-[<ffffffff80fb17fc>] kernfs_fop_write_iter+0x32a/0x4c8 fs/kernfs/file.c:352
-[<ffffffff80ceb5c8>] new_sync_write fs/read_write.c:595 [inline]
-[<ffffffff80ceb5c8>] vfs_write+0x776/0xc9e fs/read_write.c:688
-[<ffffffff80cebeea>] ksys_write+0x126/0x234 fs/read_write.c:740
-[<ffffffff80cec066>] __do_sys_write fs/read_write.c:751 [inline]
-[<ffffffff80cec066>] __se_sys_write fs/read_write.c:748 [inline]
-[<ffffffff80cec066>] __riscv_sys_write+0x6e/0xa0 fs/read_write.c:748
-[<ffffffff80078fb2>] syscall_handler+0x94/0x118 arch/riscv/include/asm/syscall.h:112
-[<ffffffff866fa9ea>] do_trap_ecall_u+0x43e/0x5de arch/riscv/kernel/traps.c:342
-[<ffffffff867267f6>] handle_exception+0x15e/0x16a arch/riscv/kernel/entry.S:232
-INFO: task syz-executor:15597 blocked for more than 422 seconds.
-      Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:0     pid:15597 tgid:15597 ppid:15595  task_flags:0x400140 flags:0x00000000
-Call Trace:
-[<ffffffff867069b0>] context_switch kernel/sched/core.c:5387 [inline]
-[<ffffffff867069b0>] __schedule+0x1a2e/0x513c kernel/sched/core.c:7188
-[<ffffffff8670a182>] __schedule_loop kernel/sched/core.c:7267 [inline]
-[<ffffffff8670a182>] schedule+0xc4/0x35e kernel/sched/core.c:7282
-[<ffffffff8670a518>] schedule_preempt_disabled+0x16/0x28 kernel/sched/core.c:7339
-[<ffffffff86712a14>] __mutex_lock_common kernel/locking/mutex.c:726 [inline]
-[<ffffffff86712a14>] __mutex_lock+0xbee/0x1b0e kernel/locking/mutex.c:820
-[<ffffffff86713948>] mutex_lock_nested+0x14/0x1c kernel/locking/mutex.c:873
-[<ffffffff8549fd26>] rtnl_lock net/core/rtnetlink.c:80 [inline]
-[<ffffffff8549fd26>] rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
-[<ffffffff8549fd26>] rtnl_newlink+0x64c/0x1dc6 net/core/rtnetlink.c:4108
-[<ffffffff854a34e0>] rtnetlink_rcv_msg+0x9e2/0xdbe net/core/rtnetlink.c:6995
-[<ffffffff858203ca>] netlink_rcv_skb+0x206/0x3be net/netlink/af_netlink.c:2550
-[<ffffffff8548fe9a>] rtnetlink_rcv+0x26/0x30 net/core/rtnetlink.c:7022
-[<ffffffff8581e6a8>] netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
-[<ffffffff8581e6a8>] netlink_unicast+0x52a/0x888 net/netlink/af_netlink.c:1344
-[<ffffffff8581f386>] netlink_sendmsg+0x980/0xd8a net/netlink/af_netlink.c:1894
-[<ffffffff85365c18>] sock_sendmsg_nosec net/socket.c:787 [inline]
-[<ffffffff85365c18>] __sock_sendmsg+0xcc/0x162 net/socket.c:802
-[<ffffffff8536f6a0>] __sys_sendto+0x27a/0x34e net/socket.c:2265
-[<ffffffff8536f834>] __do_sys_sendto net/socket.c:2272 [inline]
-[<ffffffff8536f834>] __se_sys_sendto net/socket.c:2268 [inline]
-[<ffffffff8536f834>] __riscv_sys_sendto+0xc0/0x158 net/socket.c:2268
-[<ffffffff80078fb2>] syscall_handler+0x94/0x118 arch/riscv/include/asm/syscall.h:112
-[<ffffffff866fa9ea>] do_trap_ecall_u+0x43e/0x5de arch/riscv/kernel/traps.c:342
-[<ffffffff867267f6>] handle_exception+0x15e/0x16a arch/riscv/kernel/entry.S:232
+Yeah!
 
-Showing all locks held in the system:
-1 lock held by khungtaskd/43:
- #0: ffffffff889e8f60 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x2a/0x1a0 kernel/locking/lockdep.c:6771
-3 locks held by kworker/u16:7/950:
- #0: ff60000080134140 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work+0x886/0x21ba kernel/workqueue.c:3277
- #1: ff20000003057b50 ((linkwatch_work).work){+.+.}-{0:0}, at: process_one_work+0x8ae/0x21ba kernel/workqueue.c:3277
- #2: ffffffff89f64220 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x22/0x2a net/core/rtnetlink.c:80
-2 locks held by syslogd/3051:
-2 locks held by getty/3104:
- #0: ff600000926110a0 (&tty->ldisc_sem){++++}-{0:0}, at: ldsem_down_read+0x3a/0x46 drivers/tty/tty_ldsem.c:340
- #1: ff200000000bb2e8 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x3e4/0x12d6 drivers/tty/n_tty.c:2211
-6 locks held by kworker/u16:3/3136:
-2 locks held by syz-executor/3139:
-3 locks held by kworker/u16:10/4765:
- #0: ff6000008d5a6140 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_one_work+0x886/0x21ba kernel/workqueue.c:3277
- #1: ff20000002377b50 ((work_completion)(&(&net->ipv6.addr_chk_work)->work)){+.+.}-{0:0}, at: process_one_work+0x8ae/0x21ba kernel/workqueue.c:3277
- #2: ffffffff89f64220 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x22/0x2a net/core/rtnetlink.c:80
-7 locks held by syz-executor/15475:
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: percpu_down_read_freezable include/linux/percpu-rwsem.h:83 [inline]
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: __sb_start_write include/linux/fs/super.h:19 [inline]
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: sb_start_write include/linux/fs/super.h:125 [inline]
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:2724 [inline]
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x9d0/0xc9e fs/read_write.c:684
- #1: ff6000008d69bc80 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x252/0x4c8 fs/kernfs/file.c:343
- #2: ff6000008b946a58 (kn->active#5){.+.+}-{0:0}, at: kernfs_get_active_of fs/kernfs/file.c:80 [inline]
- #2: ff6000008b946a58 (kn->active#5){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x2aa/0x4c8 fs/kernfs/file.c:344
- #3: ffffffff8979c780 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: new_device_store+0x10a/0x6c2 drivers/net/netdevsim/bus.c:184
- #4: ff600000b0c0b128 (&dev->mutex){....}-{4:4}, at: device_lock include/linux/device.h:1040 [inline]
- #4: ff600000b0c0b128 (&dev->mutex){....}-{4:4}, at: __device_attach+0x8e/0x490 drivers/base/dd.c:1076
- #5: ff6000008e375258 (&devlink->lock_key#22){+.+.}-{4:4}, at: devl_lock+0x22/0x2c net/devlink/core.c:292
- #6: ffffffff89f64220 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x22/0x2a net/core/rtnetlink.c:80
-4 locks held by syz-executor/15504:
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: percpu_down_read_freezable include/linux/percpu-rwsem.h:83 [inline]
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: __sb_start_write include/linux/fs/super.h:19 [inline]
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: sb_start_write include/linux/fs/super.h:125 [inline]
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:2724 [inline]
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x9d0/0xc9e fs/read_write.c:684
- #1: ff600000aa105480 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x252/0x4c8 fs/kernfs/file.c:343
- #2: ff6000008b946a58 (kn->active#5){.+.+}-{0:0}, at: kernfs_get_active_of fs/kernfs/file.c:80 [inline]
- #2: ff6000008b946a58 (kn->active#5){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x2aa/0x4c8 fs/kernfs/file.c:344
- #3: ffffffff8979c780 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: new_device_store+0x10a/0x6c2 drivers/net/netdevsim/bus.c:184
-4 locks held by syz-executor/15575:
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: percpu_down_read_freezable include/linux/percpu-rwsem.h:83 [inline]
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: __sb_start_write include/linux/fs/super.h:19 [inline]
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: sb_start_write include/linux/fs/super.h:125 [inline]
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:2724 [inline]
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x9d0/0xc9e fs/read_write.c:684
- #1: ff6000009624e880 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x252/0x4c8 fs/kernfs/file.c:343
- #2: ff6000008b946968 (kn->active#4){.+.+}-{0:0}, at: kernfs_get_active_of fs/kernfs/file.c:80 [inline]
- #2: ff6000008b946968 (kn->active#4){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x2aa/0x4c8 fs/kernfs/file.c:344
- #3: ffffffff8979c780 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: del_device_store+0xf0/0x48c drivers/net/netdevsim/bus.c:234
-4 locks held by syz-executor/15582:
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: percpu_down_read_freezable include/linux/percpu-rwsem.h:83 [inline]
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: __sb_start_write include/linux/fs/super.h:19 [inline]
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: sb_start_write include/linux/fs/super.h:125 [inline]
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:2724 [inline]
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x9d0/0xc9e fs/read_write.c:684
- #1: ff600000b1aba480 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x252/0x4c8 fs/kernfs/file.c:343
- #2: ff6000008b946968 (kn->active#4){.+.+}-{0:0}, at: kernfs_get_active_of fs/kernfs/file.c:80 [inline]
- #2: ff6000008b946968 (kn->active#4){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x2aa/0x4c8 fs/kernfs/file.c:344
- #3: ffffffff8979c780 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: del_device_store+0xf0/0x48c drivers/net/netdevsim/bus.c:234
-2 locks held by syz-executor/15597:
- #0: ffffffff896a4b48 (&ops->srcu){.+.+}-{0:0}, at: rtnl_link_ops_get+0xea/0x31c net/core/rtnetlink.c:573
- #1: ffffffff89f64220 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
- #1: ffffffff89f64220 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
- #1: ffffffff89f64220 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x64c/0x1dc6 net/core/rtnetlink.c:4108
-3 locks held by kworker/2:3/17058:
-4 locks held by syz-executor/17064:
-1 lock held by syz-executor/17066:
- #0: ffffffff88e31ad8 (tomoyo_ss){.+.+}-{0:0}, at: tomoyo_check_open_permission+0x144/0x3d6 security/tomoyo/file.c:766
-2 locks held by syz-executor/17067:
-1 lock held by syz-executor/17070:
+> in this series is 5/6 ("SUNRPC: Hold cd->net for the lifetime
+> of cache files"), which extends the same get_net()/put_net()
+> guard to the sunrpc cache files at
+> 
+>   /proc/net/rpc/<cache>/{content,channel,flush} .
+> 
+> Those open helpers had the same hole; sosreport just hit the
+> nfsd-specific file first because it reads /proc/fs/nfsd/exports.
 
-=============================================
 
-NMI backtrace for cpu 1
-CPU: 1 UID: 0 PID: 43 Comm: khungtaskd Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1 PREEMPT 
-Tainted: [W]=WARN
-Hardware name: riscv-virtio,qemu (DT)
-Call Trace:
-[<ffffffff8007c91c>] dump_backtrace+0x2e/0x3c arch/riscv/kernel/stacktrace.c:149
-[<ffffffff800032ce>] show_stack+0x30/0x3c arch/riscv/kernel/stacktrace.c:155
-[<ffffffff80060fbe>] __dump_stack lib/dump_stack.c:94 [inline]
-[<ffffffff80060fbe>] dump_stack_lvl+0x12a/0x1a2 lib/dump_stack.c:120
-[<ffffffff80061052>] dump_stack+0x1c/0x24 lib/dump_stack.c:129
-[<ffffffff866ba6bc>] nmi_cpu_backtrace+0x3b0/0x3b2 lib/nmi_backtrace.c:113
-[<ffffffff866ba974>] nmi_trigger_cpumask_backtrace+0x2b6/0x45a lib/nmi_backtrace.c:62
-[<ffffffff8008aae0>] arch_trigger_cpumask_backtrace+0x2c/0x38 arch/riscv/kernel/smp.c:350
-[<ffffffff866cee94>] trigger_all_cpu_backtrace include/linux/nmi.h:162 [inline]
-[<ffffffff866cee94>] __sys_info lib/sys_info.c:157 [inline]
-[<ffffffff866cee94>] sys_info+0x20c/0x24e lib/sys_info.c:165
-[<ffffffff8053fe46>] check_hung_uninterruptible_tasks kernel/hung_task.c:353 [inline]
-[<ffffffff8053fe46>] watchdog+0x920/0x137c kernel/hung_task.c:561
-[<ffffffff801f7d58>] kthread+0x336/0x47e kernel/kthread.c:436
-[<ffffffff8006a302>] ret_from_fork_kernel+0x94/0xfce arch/riscv/kernel/process.c:230
-[<ffffffff86726926>] ret_from_fork_kernel_asm+0x16/0x18 arch/riscv/kernel/entry.S:363
-Sending NMI from CPU 1 to CPUs 0,2-3:
-NMI backtrace for cpu 2
-CPU: 2 UID: 0 PID: 3139 Comm: syz-executor Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1 PREEMPT 
-Tainted: [W]=WARN
-Hardware name: riscv-virtio,qemu (DT)
-epc : mod_node_page_state+0x28/0x6a mm/vmstat.c:731
- ra : mod_node_page_state+0x58/0x6a mm/vmstat.c:730
-epc : ffffffff809bb55e ra : ffffffff809bb58e sp : ff200000063a7600
- gp : ffffffff8a395420 tp : ff6000008b193580 t0 : ffebffff15c2c000
- t1 : 0000000000000001 t2 : 0000000000000000 s0 : ff200000063a7630
- s1 : 0000000000000002 a0 : 0000000000000002 a1 : 0000000000000000
- a2 : 0000000000000000 a3 : ffffffff8193bb24 a4 : 0000000000000001
- a5 : 0000000000000000 a6 : 0000000000000003 a7 : ffffffff80c62208
- s2 : ff600000fffe99c0 s3 : 0000000000000024 s4 : ffffffffffffffff
- s5 : 0000000000000000 s6 : 0000000000000007 s7 : ffebffff11077215
- s8 : 0000000000000160 s9 : ff1c000002b85800 s10: 1fec000011077215
- s11: ff600000883b9080 t3 : 4b952e4d00000000 t4 : 0000000000000000
- t5 : 0000000000000000 t6 : 0000000000000002 ssp : 0000000000000000
-status: 0000000200000120 badaddr: 0000000000000000 cause: 8000000000000009
-[<ffffffff809bb55e>] arch_local_irq_restore arch/riscv/include/asm/irqflags.h:51 [inline]
-[<ffffffff809bb55e>] mod_node_page_state+0x28/0x6a mm/vmstat.c:730
-[<ffffffff80c623ae>] lruvec_stat_mod_folio+0x200/0x25a mm/memcontrol.c:979
-[<ffffffff80addf62>] mod_lruvec_page_state include/linux/vmstat.h:528 [inline]
-[<ffffffff80addf62>] vfree+0x272/0xca8 mm/vmalloc.c:3471
-[<ffffffff8053dea8>] kcov_put kernel/kcov.c:442 [inline]
-[<ffffffff8053dea8>] kcov_put kernel/kcov.c:438 [inline]
-[<ffffffff8053dea8>] kcov_close+0x42/0x70 kernel/kcov.c:543
-[<ffffffff80cf2748>] __fput+0x382/0xac6 fs/file_table.c:510
-[<ffffffff80cf2f3a>] ____fput+0x1c/0x26 fs/file_table.c:538
-[<ffffffff801f13b2>] task_work_run+0x16a/0x25e kernel/task_work.c:233
-[<ffffffff80169d02>] exit_task_work include/linux/task_work.h:40 [inline]
-[<ffffffff80169d02>] do_exit+0x8e4/0x2a6c kernel/exit.c:975
-[<ffffffff8016c3ea>] do_group_exit+0xd4/0x26c kernel/exit.c:1117
-[<ffffffff801a6fb0>] get_signal+0x2070/0x22aa kernel/signal.c:3037
-[<ffffffff80073742>] arch_do_signal_or_restart+0xcc4/0x1d72 arch/riscv/kernel/signal.c:534
-[<ffffffff803eca40>] __exit_to_user_mode_loop kernel/entry/common.c:64 [inline]
-[<ffffffff803eca40>] exit_to_user_mode_loop+0x9c/0x7a4 kernel/entry/common.c:98
-[<ffffffff866faa3c>] __exit_to_user_mode_prepare include/linux/irq-entry-common.h:207 [inline]
-[<ffffffff866faa3c>] syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:238 [inline]
-[<ffffffff866faa3c>] syscall_exit_to_user_mode include/linux/entry-common.h:318 [inline]
-[<ffffffff866faa3c>] do_trap_ecall_u+0x490/0x5de arch/riscv/kernel/traps.c:345
-[<ffffffff867267f6>] handle_exception+0x15e/0x16a arch/riscv/kernel/entry.S:232
-NMI backtrace for cpu 3
-CPU: 3 UID: 0 PID: 17070 Comm: syz-executor Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1 PREEMPT 
-Tainted: [W]=WARN
-Hardware name: riscv-virtio,qemu (DT)
-epc : kasan_quarantine_put+0x8a/0x1fa mm/kasan/quarantine.c:236
- ra : kasan_quarantine_put+0x198/0x1fa mm/kasan/quarantine.c:234
-epc : ffffffff80becf0a ra : ffffffff80bed018 sp : ff200000062279b0
- gp : ffffffff8a395420 tp : ff60000093cab580 t0 : ff20000006227990
- t1 : 0000000000000008 t2 : 5f726573755f776f s0 : ff200000062279f0
- s1 : 00000000000f1a70 a0 : 0000000000000003 a1 : 0000000000000000
- a2 : 0000000000000000 a3 : ffffffff8193bb24 a4 : 0000000000000001
- a5 : 0000000000000000 a6 : 0000000000000003 a7 : 0000000039dd5796
- s2 : ff60000096170400 s3 : 0000000000000002 s4 : ff60000080002c80
- s5 : 0000000000000000 s6 : 0000000000000000 s7 : 0000000000001000
- s8 : 0000000000000000 s9 : ff60000096170400 s10: ff600000b124c000
- s11: ff600000b124e000 t3 : 1243f8b800000000 t4 : 0000000000001fff
- t5 : 00000000000000c8 t6 : 0000000000000002 ssp : 0000000000000000
-status: 0000000200000120 badaddr: 0000000000000000 cause: 8000000000000009
-[<ffffffff80becf0a>] arch_local_irq_restore arch/riscv/include/asm/irqflags.h:51 [inline]
-[<ffffffff80becf0a>] kasan_quarantine_put+0x8a/0x1fa mm/kasan/quarantine.c:234
-[<ffffffff80be8d24>] __kasan_slab_free+0x6a/0x7e mm/kasan/common.c:295
-[<ffffffff80b39284>] kasan_slab_free include/linux/kasan.h:235 [inline]
-[<ffffffff80b39284>] slab_free_hook mm/slub.c:2689 [inline]
-[<ffffffff80b39284>] slab_free mm/slub.c:6246 [inline]
-[<ffffffff80b39284>] kfree+0x30a/0x6e2 mm/slub.c:6561
-[<ffffffff8149f2ee>] tomoyo_find_next_domain+0x7d0/0x1e48 security/tomoyo/domain.c:893
-[<ffffffff814b1224>] tomoyo_bprm_check_security security/tomoyo/tomoyo.c:102 [inline]
-[<ffffffff814b1224>] tomoyo_bprm_check_security+0x128/0x1c4 security/tomoyo/tomoyo.c:92
-[<ffffffff81461316>] security_bprm_check+0x278/0x28e security/security.c:820
-[<ffffffff80d085b8>] search_binary_handler fs/exec.c:1654 [inline]
-[<ffffffff80d085b8>] exec_binprm fs/exec.c:1696 [inline]
-[<ffffffff80d085b8>] bprm_execve fs/exec.c:1748 [inline]
-[<ffffffff80d085b8>] bprm_execve+0x80c/0x1878 fs/exec.c:1724
-[<ffffffff80d0acda>] do_execveat_common.isra.0+0x45e/0x59e fs/exec.c:1846
-[<ffffffff80d0ef52>] __do_sys_execve fs/exec.c:1930 [inline]
-[<ffffffff80d0ef52>] __se_sys_execve fs/exec.c:1924 [inline]
-[<ffffffff80d0ef52>] __riscv_sys_execve+0x8c/0xc4 fs/exec.c:1924
-[<ffffffff80078fb2>] syscall_handler+0x94/0x118 arch/riscv/include/asm/syscall.h:112
-[<ffffffff866fa9ea>] do_trap_ecall_u+0x43e/0x5de arch/riscv/kernel/traps.c:342
-[<ffffffff867267f6>] handle_exception+0x15e/0x16a arch/riscv/kernel/entry.S:232
-NMI backtrace for cpu 0
-CPU: 0 UID: 0 PID: 17064 Comm: syz-executor Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1 PREEMPT 
-Tainted: [W]=WARN
-Hardware name: riscv-virtio,qemu (DT)
-epc : arch_local_irq_restore arch/riscv/include/asm/irqflags.h:52 [inline]
-epc : lock_acquire kernel/locking/lockdep.c:5871 [inline]
-epc : lock_acquire+0x2a8/0x50e kernel/locking/lockdep.c:5825
- ra : lockdep_recursion_finish kernel/locking/lockdep.c:470 [inline]
- ra : lock_acquire kernel/locking/lockdep.c:5870 [inline]
- ra : lock_acquire+0x276/0x50e kernel/locking/lockdep.c:5825
-epc : ffffffff802fe96a ra : ffffffff802fe938 sp : ff200000000e7030
- gp : ffffffff8a395420 tp : ff6000008e4eb580 t0 : 0000000000000000
- t1 : 0000000000000001 t2 : 0000000000000000 s0 : ff200000000e7110
- s1 : ffffffff9176ce80 a0 : 0000000000000000 a1 : ffffffff88169438
- a2 : 0000000000000016 a3 : ffffffff8a4a70a0 a4 : 0000000000000000
- a5 : 0000000000000000 a6 : 0000000000000050 a7 : ffffffff80aa2f74
- s2 : ff600000ffa29788 s3 : 0000000000000001 s4 : 0000000000000000
- s5 : 0000000000000000 s6 : 0000000000000000 s7 : ffffffff80aa2f74
- s8 : ffffffff86a68788 s9 : 0000000000000002 s10: ffffffff9176ce80
- s11: ff600000ffa29788 t3 : fbb730c400000000 t4 : 0000000000001fff
- t5 : 00000000000000c8 t6 : 0000000000000002 ssp : 0000000000000000
-status: 0000000200000120 badaddr: 0000000000000000 cause: 8000000000000009
-[<ffffffff802fe96a>] arch_local_irq_restore arch/riscv/include/asm/irqflags.h:51 [inline]
-[<ffffffff802fe96a>] lock_acquire kernel/locking/lockdep.c:5871 [inline]
-[<ffffffff802fe96a>] lock_acquire+0x2a8/0x50e kernel/locking/lockdep.c:5825
-[<ffffffff86721cd2>] __raw_spin_lock include/linux/spinlock_api_smp.h:158 [inline]
-[<ffffffff86721cd2>] _raw_spin_lock+0x32/0x48 kernel/locking/spinlock.c:158
-[<ffffffff80aa2f74>] spin_lock include/linux/spinlock.h:342 [inline]
-[<ffffffff80aa2f74>] pte_offset_map_lock+0x1d6/0x3d2 mm/pgtable-generic.c:404
-[<ffffffff80a5258e>] get_locked_pte+0x70/0xc2 mm/memory.c:2284
-[<ffffffff80a526fc>] insert_page+0x11c/0x232 mm/memory.c:2387
-[<ffffffff80a52a96>] vm_insert_page+0x284/0x3ae mm/memory.c:2575
-[<ffffffff8053dc36>] kcov_mmap+0xb4/0x11c kernel/kcov.c:514
-[<ffffffff80af0dfe>] vfs_mmap include/linux/fs.h:2071 [inline]
-[<ffffffff80af0dfe>] mmap_file mm/internal.h:168 [inline]
-[<ffffffff80af0dfe>] __mmap_new_file_vma mm/vma.c:2496 [inline]
-[<ffffffff80af0dfe>] __mmap_new_vma mm/vma.c:2562 [inline]
-[<ffffffff80af0dfe>] __mmap_region+0x10b4/0x2800 mm/vma.c:2771
-[<ffffffff80af6c24>] mmap_region+0x3e8/0x500 mm/vma.c:2856
-[<ffffffff80a7c7d0>] do_mmap+0x944/0x1048 mm/mmap.c:560
-[<ffffffff809b7d5a>] vm_mmap_pgoff+0x27c/0x41e mm/util.c:581
-[<ffffffff80a7959c>] ksys_mmap_pgoff+0x2ce/0x6fa mm/mmap.c:606
-[<ffffffff800749f4>] riscv_sys_mmap arch/riscv/kernel/sys_riscv.c:29 [inline]
-[<ffffffff800749f4>] __do_sys_mmap arch/riscv/kernel/sys_riscv.c:38 [inline]
-[<ffffffff800749f4>] __se_sys_mmap arch/riscv/kernel/sys_riscv.c:34 [inline]
-[<ffffffff800749f4>] __riscv_sys_mmap+0x11c/0x18c arch/riscv/kernel/sys_riscv.c:34
-[<ffffffff80078fb2>] syscall_handler+0x94/0x118 arch/riscv/include/asm/syscall.h:112
-[<ffffffff866fa9ea>] do_trap_ecall_u+0x43e/0x5de arch/riscv/kernel/traps.c:342
-[<ffffffff867267f6>] handle_exception+0x15e/0x16a arch/riscv/kernel/entry.S:232
+Hmm... /proc/net is always a symlink to /proc/self/net. After opening 
+/proc/net/rpc/<cache>/content and attempting to read it, the 
+proc_reg_read function calls use_pde before pde_read. This sequence can 
+prevent a race condition because nfsd_export_shutdown leads to 
+cache_unregister_net, which calls remove_cache_proc_entries, then 
+proc_remove, and eventually proc_entry_rundown. The proc_entry_rundown 
+function waits until unuse_pde is called in proc_reg_read. Therefore, 
+I'm not sure if forgetting to call get_net when opening 
+/proc/net/rpc/<cache>/content is the root cause of the null pointer in 
+c_show. I've tried to find any other possible root causes but have been 
+unsuccessful. Sorry....
 
-<<<<<<<<<<<<<<< tail report >>>>>>>>>>>>>>>
 
-      Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:0     pid:15504 tgid:15504 ppid:1      task_flags:0x400140 flags:0x00000002
-Call Trace:
-[<ffffffff867069b0>] __schedule+0x1a2e/0x513c
-[<ffffffff8670a182>] schedule+0xc4/0x35e
-[<ffffffff8670a518>] schedule_preempt_disabled+0x16/0x28
-[<ffffffff86712a14>] __mutex_lock+0xbee/0x1b0e
-[<ffffffff86713948>] mutex_lock_nested+0x14/0x1c
-[<ffffffff839164cc>] new_device_store+0x10a/0x6c2
-[<ffffffff82d41b12>] bus_attr_store+0x6a/0x9e
-[<ffffffff80fb8126>] sysfs_kf_write+0xc2/0x11c
-[<ffffffff80fb17fc>] kernfs_fop_write_iter+0x32a/0x4c8
-[<ffffffff80ceb5c8>] vfs_write+0x776/0xc9e
-[<ffffffff80cebeea>] ksys_write+0x126/0x234
-[<ffffffff80cec066>] __riscv_sys_write+0x6e/0xa0
-[<ffffffff80078fb2>] syscall_handler+0x94/0x118
-[<ffffffff866fa9ea>] do_trap_ecall_u+0x43e/0x5de
-[<ffffffff867267f6>] handle_exception+0x15e/0x16a
-INFO: task syz-executor:15582 blocked for more than 433 seconds.
-      Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:0     pid:15582 tgid:15582 ppid:15557  task_flags:0x400140 flags:0x00000000
-Call Trace:
-[<ffffffff867069b0>] __schedule+0x1a2e/0x513c
-[<ffffffff8670a182>] schedule+0xc4/0x35e
-[<ffffffff8670a518>] schedule_preempt_disabled+0x16/0x28
-[<ffffffff86712a14>] __mutex_lock+0xbee/0x1b0e
-[<ffffffff86713948>] mutex_lock_nested+0x14/0x1c
-[<ffffffff83915a5e>] del_device_store+0xf0/0x48c
-[<ffffffff82d41b12>] bus_attr_store+0x6a/0x9e
-[<ffffffff80fb8126>] sysfs_kf_write+0xc2/0x11c
-[<ffffffff80fb17fc>] kernfs_fop_write_iter+0x32a/0x4c8
-[<ffffffff80ceb5c8>] vfs_write+0x776/0xc9e
-[<ffffffff80cebeea>] ksys_write+0x126/0x234
-[<ffffffff80cec066>] __riscv_sys_write+0x6e/0xa0
-[<ffffffff80078fb2>] syscall_handler+0x94/0x118
-[<ffffffff866fa9ea>] do_trap_ecall_u+0x43e/0x5de
-[<ffffffff867267f6>] handle_exception+0x15e/0x16a
-INFO: task syz-executor:15597 blocked for more than 422 seconds.
-      Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:0     pid:15597 tgid:15597 ppid:15595  task_flags:0x400140 flags:0x00000000
-Call Trace:
-[<ffffffff867069b0>] __schedule+0x1a2e/0x513c
-[<ffffffff8670a182>] schedule+0xc4/0x35e
-[<ffffffff8670a518>] schedule_preempt_disabled+0x16/0x28
-[<ffffffff86712a14>] __mutex_lock+0xbee/0x1b0e
-[<ffffffff86713948>] mutex_lock_nested+0x14/0x1c
-[<ffffffff8549fd26>] rtnl_newlink+0x64c/0x1dc6
-[<ffffffff854a34e0>] rtnetlink_rcv_msg+0x9e2/0xdbe
-[<ffffffff858203ca>] netlink_rcv_skb+0x206/0x3be
-[<ffffffff8548fe9a>] rtnetlink_rcv+0x26/0x30
-[<ffffffff8581e6a8>] netlink_unicast+0x52a/0x888
-[<ffffffff8581f386>] netlink_sendmsg+0x980/0xd8a
-[<ffffffff85365c18>] __sock_sendmsg+0xcc/0x162
-[<ffffffff8536f6a0>] __sys_sendto+0x27a/0x34e
-[<ffffffff8536f834>] __riscv_sys_sendto+0xc0/0x158
-[<ffffffff80078fb2>] syscall_handler+0x94/0x118
-[<ffffffff866fa9ea>] do_trap_ecall_u+0x43e/0x5de
-[<ffffffff867267f6>] handle_exception+0x15e/0x16a
+> 
+> Patch 5/6's changelog pins down the deref site you asked
+> about: cache_check_rcu() faults reading h->flags off a
+> garbage cache_head returned by __cache_seq_start() walking a
+> cd->hash_table that cache_destroy_net() already freed. Not a
+> dentry deref. The dentry-teardown path is a separate failure
+> mode that 48db892356d6 closed for the export and expkey caches.
+> 
+> 
+>>> To prevent the
+>>> issue described in commit 69d803c40ede, should we consider reverting
+>>> commit 48db892356d6 first?
+> 
+> Not for this series. Patches 3/6 and 4/6 don't add any new
+> path_put deferral; their commit messages call them out as
+> consistency changes, not bug fixes. ip_map holds only an
+> auth_domain reference and unix_gid holds only a group_info,
+> so neither cache reaches mntput from the deferred release.
+> The exportfs-r-then-umount sequence isn't touched by this
+> series.
+> 
+> The svc_export and svc_expkey path_put deferral lives in
+> 48db892356d6, which is already in v7.0. If the umount window
+> from 69d803c40ede is still reachable through that commit,
+> that's a regression in 48db892356d6 and worth a separate
+> thread.
 
-Showing all locks held in the system:
-1 lock held by khungtaskd/43:
- #0: ffffffff889e8f60 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x2a/0x1a0
-3 locks held by kworker/u16:7/950:
- #0: ff60000080134140 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work+0x886/0x21ba
- #1: ff20000003057b50 ((linkwatch_work).work){+.+.}-{0:0}, at: process_one_work+0x8ae/0x21ba
- #2: ffffffff89f64220 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x22/0x2a
-2 locks held by syslogd/3051:
-2 locks held by getty/3104:
- #0: ff600000926110a0 (&tty->ldisc_sem){++++}-{0:0}, at: ldsem_down_read+0x3a/0x46
- #1: ff200000000bb2e8 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x3e4/0x12d6
-6 locks held by kworker/u16:3/3136:
-2 locks held by syz-executor/3139:
-3 locks held by kworker/u16:10/4765:
- #0: ff6000008d5a6140 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_one_work+0x886/0x21ba
- #1: ff20000002377b50 ((work_completion)(&(&net->ipv6.addr_chk_work)->work)){+.+.}-{0:0}, at: process_one_work+0x8ae/0x21ba
- #2: ffffffff89f64220 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x22/0x2a
-7 locks held by syz-executor/15475:
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x9d0/0xc9e
- #1: ff6000008d69bc80 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x252/0x4c8
- #2: ff6000008b946a58 (kn->active#5){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x2aa/0x4c8
- #3: ffffffff8979c780 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: new_device_store+0x10a/0x6c2
- #4: ff600000b0c0b128 (&dev->mutex){....}-{4:4}, at: __device_attach+0x8e/0x490
- #5: ff6000008e375258 (&devlink->lock_key#22){+.+.}-{4:4}, at: devl_lock+0x22/0x2c
- #6: ffffffff89f64220 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x22/0x2a
-4 locks held by syz-executor/15504:
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x9d0/0xc9e
- #1: ff600000aa105480 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x252/0x4c8
- #2: ff6000008b946a58 (kn->active#5){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x2aa/0x4c8
- #3: ffffffff8979c780 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: new_device_store+0x10a/0x6c2
-4 locks held by syz-executor/15575:
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x9d0/0xc9e
- #1: ff6000009624e880 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x252/0x4c8
- #2: ff6000008b946968 (kn->active#4){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x2aa/0x4c8
- #3: ffffffff8979c780 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: del_device_store+0xf0/0x48c
-4 locks held by syz-executor/15582:
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x9d0/0xc9e
- #1: ff600000b1aba480 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x252/0x4c8
- #2: ff6000008b946968 (kn->active#4){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x2aa/0x4c8
- #3: ffffffff8979c780 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: del_device_store+0xf0/0x48c
-2 locks held by syz-executor/15597:
- #0: ffffffff896a4b48 (&ops->srcu){.+.+}-{0:0}, at: rtnl_link_ops_get+0xea/0x31c
- #1: ffffffff89f64220 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x64c/0x1dc6
-3 locks held by kworker/2:3/17058:
-4 locks held by syz-executor/17064:
-1 lock held by syz-executor/17066:
- #0: ffffffff88e31ad8 (tomoyo_ss){.+.+}-{0:0}, at: tomoyo_check_open_permission+0x144/0x3d6
-2 locks held by syz-executor/17067:
-1 lock held by syz-executor/17070:
+Yeah! Totally agree!
 
-=============================================
+> 
+> 
+>> Locally, I wrote a stable regression test case. I also reverted to
+>> commit 9189d23b835cec646ba5010db35d1557a77c5857 (which is before commits
+>> 2862eee078a4 "SUNRPC: make sure cache entry active before cache_show"
+>> and be8f982c369c "nfsd: make sure exp active before svc_export_show").
+>> Even then, a panic can still be triggered without any actual export path...
+> 
+> That fits 5/6's failure mode. Without an export no svc_export
+> or svc_expkey entry is populated, but rpc.mountd reads
+> auth.unix.ip/content and auth.unix.gid/content directly,
+> and on a pre-5/6 tree the open helpers in cache.c hold no
+> reference on cd->net. cache_destroy_net() at namespace exit
+> then races a reader still inside cache_seq_start_rcu(), and
+> the reader walks a freed cd->hash_table.
+> 
+> Could you share the reproducer and the panic stack trace?
+> If the fault is in cache_check_rcu() through one of the
+> sunrpc cache files, that confirms 5/6 is the right fix, and
+> I'll happily carry your Tested-by on it.
 
-NMI backtrace for cpu 1
-CPU: 1 UID: 0 PID: 43 Comm: khungtaskd Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1 PREEMPT 
-Tainted: [W]=WARN
-Hardware name: riscv-virtio,qemu (DT)
-Call Trace:
-[<ffffffff8007c91c>] dump_backtrace+0x2e/0x3c
-[<ffffffff800032ce>] show_stack+0x30/0x3c
-[<ffffffff80060fbe>] dump_stack_lvl+0x12a/0x1a2
-[<ffffffff80061052>] dump_stack+0x1c/0x24
-[<ffffffff866ba6bc>] nmi_cpu_backtrace+0x3b0/0x3b2
-[<ffffffff866ba974>] nmi_trigger_cpumask_backtrace+0x2b6/0x45a
-[<ffffffff8008aae0>] arch_trigger_cpumask_backtrace+0x2c/0x38
-[<ffffffff866cee94>] sys_info+0x20c/0x24e
-[<ffffffff8053fe46>] watchdog+0x920/0x137c
-[<ffffffff801f7d58>] kthread+0x336/0x47e
-[<ffffffff8006a302>] ret_from_fork_kernel+0x94/0xfce
-[<ffffffff86726926>] ret_from_fork_kernel_asm+0x16/0x18
-Sending NMI from CPU 1 to CPUs 0,2-3:
-NMI backtrace for cpu 2
-CPU: 2 UID: 0 PID: 3139 Comm: syz-executor Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1 PREEMPT 
-Tainted: [W]=WARN
-Hardware name: riscv-virtio,qemu (DT)
-epc : mod_node_page_state+0x28/0x6a
- ra : mod_node_page_state+0x58/0x6a
-epc : ffffffff809bb55e ra : ffffffff809bb58e sp : ff200000063a7600
- gp : ffffffff8a395420 tp : ff6000008b193580 t0 : ffebffff15c2c000
- t1 : 0000000000000001 t2 : 0000000000000000 s0 : ff200000063a7630
- s1 : 0000000000000002 a0 : 0000000000000002 a1 : 0000000000000000
- a2 : 0000000000000000 a3 : ffffffff8193bb24 a4 : 0000000000000001
- a5 : 0000000000000000 a6 : 0000000000000003 a7 : ffffffff80c62208
- s2 : ff600000fffe99c0 s3 : 0000000000000024 s4 : ffffffffffffffff
- s5 : 0000000000000000 s6 : 0000000000000007 s7 : ffebffff11077215
- s8 : 0000000000000160 s9 : ff1c000002b85800 s10: 1fec000011077215
- s11: ff600000883b9080 t3 : 4b952e4d00000000 t4 : 0000000000000000
- t5 : 0000000000000000 t6 : 0000000000000002 ssp : 0000000000000000
-status: 0000000200000120 badaddr: 0000000000000000 cause: 8000000000000009
-[<ffffffff809bb55e>] mod_node_page_state+0x28/0x6a
-[<ffffffff80c623ae>] lruvec_stat_mod_folio+0x200/0x25a
-[<ffffffff80addf62>] vfree+0x272/0xca8
-[<ffffffff8053dea8>] kcov_close+0x42/0x70
-[<ffffffff80cf2748>] __fput+0x382/0xac6
-[<ffffffff80cf2f3a>] ____fput+0x1c/0x26
-[<ffffffff801f13b2>] task_work_run+0x16a/0x25e
-[<ffffffff80169d02>] do_exit+0x8e4/0x2a6c
-[<ffffffff8016c3ea>] do_group_exit+0xd4/0x26c
-[<ffffffff801a6fb0>] get_signal+0x2070/0x22aa
-[<ffffffff80073742>] arch_do_signal_or_restart+0xcc4/0x1d72
-[<ffffffff803eca40>] exit_to_user_mode_loop+0x9c/0x7a4
-[<ffffffff866faa3c>] do_trap_ecall_u+0x490/0x5de
-[<ffffffff867267f6>] handle_exception+0x15e/0x16a
-NMI backtrace for cpu 3
-CPU: 3 UID: 0 PID: 17070 Comm: syz-executor Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1 PREEMPT 
-Tainted: [W]=WARN
-Hardware name: riscv-virtio,qemu (DT)
-epc : kasan_quarantine_put+0x8a/0x1fa
- ra : kasan_quarantine_put+0x198/0x1fa
-epc : ffffffff80becf0a ra : ffffffff80bed018 sp : ff200000062279b0
- gp : ffffffff8a395420 tp : ff60000093cab580 t0 : ff20000006227990
- t1 : 0000000000000008 t2 : 5f726573755f776f s0 : ff200000062279f0
- s1 : 00000000000f1a70 a0 : 0000000000000003 a1 : 0000000000000000
- a2 : 0000000000000000 a3 : ffffffff8193bb24 a4 : 0000000000000001
- a5 : 0000000000000000 a6 : 0000000000000003 a7 : 0000000039dd5796
- s2 : ff60000096170400 s3 : 0000000000000002 s4 : ff60000080002c80
- s5 : 0000000000000000 s6 : 0000000000000000 s7 : 0000000000001000
- s8 : 0000000000000000 s9 : ff60000096170400 s10: ff600000b124c000
- s11: ff600000b124e000 t3 : 1243f8b800000000 t4 : 0000000000001fff
- t5 : 00000000000000c8 t6 : 0000000000000002 ssp : 0000000000000000
-status: 0000000200000120 badaddr: 0000000000000000 cause: 8000000000000009
-[<ffffffff80becf0a>] kasan_quarantine_put+0x8a/0x1fa
-[<ffffffff80be8d24>] __kasan_slab_free+0x6a/0x7e
-[<ffffffff80b39284>] kfree+0x30a/0x6e2
-[<ffffffff8149f2ee>] tomoyo_find_next_domain+0x7d0/0x1e48
-[<ffffffff814b1224>] tomoyo_bprm_check_security+0x128/0x1c4
-[<ffffffff81461316>] security_bprm_check+0x278/0x28e
-[<ffffffff80d085b8>] bprm_execve+0x80c/0x1878
-[<ffffffff80d0acda>] do_execveat_common.isra.0+0x45e/0x59e
-[<ffffffff80d0ef52>] __riscv_sys_execve+0x8c/0xc4
-[<ffffffff80078fb2>] syscall_handler+0x94/0x118
-[<ffffffff866fa9ea>] do_trap_ecall_u+0x43e/0x5de
-[<ffffffff867267f6>] handle_exception+0x15e/0x16a
-NMI backtrace for cpu 0
-CPU: 0 UID: 0 PID: 17064 Comm: syz-executor Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1 PREEMPT 
-Tainted: [W]=WARN
-Hardware name: riscv-virtio,qemu (DT)
-epc : lock_acquire+0x2a8/0x50e
- ra : lock_acquire+0x276/0x50e
-epc : ffffffff802fe96a ra : ffffffff802fe938 sp : ff200000000e7030
- gp : ffffffff8a395420 tp : ff6000008e4eb580 t0 : 0000000000000000
- t1 : 0000000000000001 t2 : 0000000000000000 s0 : ff200000000e7110
- s1 : ffffffff9176ce80 a0 : 0000000000000000 a1 : ffffffff88169438
- a2 : 0000000000000016 a3 : ffffffff8a4a70a0 a4 : 0000000000000000
- a5 : 0000000000000000 a6 : 0000000000000050 a7 : ffffffff80aa2f74
- s2 : ff600000ffa29788 s3 : 0000000000000001 s4 : 0000000000000000
- s5 : 0000000000000000 s6 : 0000000000000000 s7 : ffffffff80aa2f74
- s8 : ffffffff86a68788 s9 : 0000000000000002 s10: ffffffff9176ce80
- s11: ff600000ffa29788 t3 : fbb730c400000000 t4 : 0000000000001fff
- t5 : 00000000000000c8 t6 : 0000000000000002 ssp : 0000000000000000
-status: 0000000200000120 badaddr: 0000000000000000 cause: 8000000000000009
-[<ffffffff802fe96a>] lock_acquire+0x2a8/0x50e
-[<ffffffff86721cd2>] _raw_spin_lock+0x32/0x48
-[<ffffffff80aa2f74>] pte_offset_map_lock+0x1d6/0x3d2
-[<ffffffff80a5258e>] get_locked_pte+0x70/0xc2
-[<ffffffff80a526fc>] insert_page+0x11c/0x232
-[<ffffffff80a52a96>] vm_insert_page+0x284/0x3ae
-[<ffffffff8053dc36>] kcov_mmap+0xb4/0x11c
-[<ffffffff80af0dfe>] __mmap_region+0x10b4/0x2800
-[<ffffffff80af6c24>] mmap_region+0x3e8/0x500
-[<ffffffff80a7c7d0>] do_mmap+0x944/0x1048
-[<ffffffff809b7d5a>] vm_mmap_pgoff+0x27c/0x41e
-[<ffffffff80a7959c>] ksys_mmap_pgoff+0x2ce/0x6fa
-[<ffffffff800749f4>] __riscv_sys_mmap+0x11c/0x18c
-[<ffffffff80078fb2>] syscall_handler+0x94/0x118
-[<ffffffff866fa9ea>] do_trap_ecall_u+0x43e/0x5de
-[<ffffffff867267f6>] handle_exception+0x15e/0x16a
+The shell(Created will AI assist):
 
-<<<<<<<<<<<<<<< tail report >>>>>>>>>>>>>>>
+#!/bin/bash
+#
+# Test for e7fcf179b82d ("NFSD: Hold net reference for ...")
+#
+# Reproduces the scenario described in the commit:
+#   1. Process opens /proc/fs/nfsd/exports in netns A
+#   2. Process leaves A (joins B), emptying A
+#   3. ip netns del A triggers nfsd_export_shutdown → cache_detail freed
+#   4. Process reads from still-open fd → UAF on UNFIXED kernel
+#
+# On current kernel (with e7fcf179b82d applied):
+#   get_net in exports_net_open prevents netns A from being destroyed
+#   → read succeeds safely (test output: "SUCCESS")
+#
+# On kernel WITHOUT e7fcf179b82d:
+#   No get_net → A destroyed → read triggers UAF:
+#     - KASAN: use-after-free, or
+#     - NULL deref, or
+#     - slab corruption (ASCII strings like "cap_type", "libz.so.")
+#
+# Usage: sudo ./test_nfsd_exports_uaf.sh
 
-      Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:0     pid:15582 tgid:15582 ppid:15557  task_flags:0x400140 flags:0x00000000
-Call Trace:
-[<ffffffff867069b0>] __schedule+0x1a2e/0x513c
-[<ffffffff8670a182>] schedule+0xc4/0x35e
-[<ffffffff8670a518>] schedule_preempt_disabled+0x16/0x28
-[<ffffffff86712a14>] __mutex_lock+0xbee/0x1b0e
-[<ffffffff86713948>] mutex_lock_nested+0x14/0x1c
-[<ffffffff83915a5e>] del_device_store+0xf0/0x48c
-[<ffffffff82d41b12>] bus_attr_store+0x6a/0x9e
-[<ffffffff80fb8126>] sysfs_kf_write+0xc2/0x11c
-[<ffffffff80fb17fc>] kernfs_fop_write_iter+0x32a/0x4c8
-[<ffffffff80ceb5c8>] vfs_write+0x776/0xc9e
-[<ffffffff80cebeea>] ksys_write+0x126/0x234
-[<ffffffff80cec066>] __riscv_sys_write+0x6e/0xa0
-[<ffffffff80078fb2>] syscall_handler+0x94/0x118
-[<ffffffff866fa9ea>] do_trap_ecall_u+0x43e/0x5de
-[<ffffffff867267f6>] handle_exception+0x15e/0x16a
-INFO: task syz-executor:15597 blocked for more than 422 seconds.
-      Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:0     pid:15597 tgid:15597 ppid:15595  task_flags:0x400140 flags:0x00000000
-Call Trace:
-[<ffffffff867069b0>] __schedule+0x1a2e/0x513c
-[<ffffffff8670a182>] schedule+0xc4/0x35e
-[<ffffffff8670a518>] schedule_preempt_disabled+0x16/0x28
-[<ffffffff86712a14>] __mutex_lock+0xbee/0x1b0e
-[<ffffffff86713948>] mutex_lock_nested+0x14/0x1c
-[<ffffffff8549fd26>] rtnl_newlink+0x64c/0x1dc6
-[<ffffffff854a34e0>] rtnetlink_rcv_msg+0x9e2/0xdbe
-[<ffffffff858203ca>] netlink_rcv_skb+0x206/0x3be
-[<ffffffff8548fe9a>] rtnetlink_rcv+0x26/0x30
-[<ffffffff8581e6a8>] netlink_unicast+0x52a/0x888
-[<ffffffff8581f386>] netlink_sendmsg+0x980/0xd8a
-[<ffffffff85365c18>] __sock_sendmsg+0xcc/0x162
-[<ffffffff8536f6a0>] __sys_sendto+0x27a/0x34e
-[<ffffffff8536f834>] __riscv_sys_sendto+0xc0/0x158
-[<ffffffff80078fb2>] syscall_handler+0x94/0x118
-[<ffffffff866fa9ea>] do_trap_ecall_u+0x43e/0x5de
-[<ffffffff867267f6>] handle_exception+0x15e/0x16a
+set -e -u
 
-Showing all locks held in the system:
-1 lock held by khungtaskd/43:
- #0: ffffffff889e8f60 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x2a/0x1a0
-3 locks held by kworker/u16:7/950:
- #0: ff60000080134140 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work+0x886/0x21ba
- #1: ff20000003057b50 ((linkwatch_work).work){+.+.}-{0:0}, at: process_one_work+0x8ae/0x21ba
- #2: ffffffff89f64220 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x22/0x2a
-2 locks held by syslogd/3051:
-2 locks held by getty/3104:
- #0: ff600000926110a0 (&tty->ldisc_sem){++++}-{0:0}, at: ldsem_down_read+0x3a/0x46
- #1: ff200000000bb2e8 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x3e4/0x12d6
-6 locks held by kworker/u16:3/3136:
-2 locks held by syz-executor/3139:
-3 locks held by kworker/u16:10/4765:
- #0: ff6000008d5a6140 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_one_work+0x886/0x21ba
- #1: ff20000002377b50 ((work_completion)(&(&net->ipv6.addr_chk_work)->work)){+.+.}-{0:0}, at: process_one_work+0x8ae/0x21ba
- #2: ffffffff89f64220 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x22/0x2a
-7 locks held by syz-executor/15475:
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x9d0/0xc9e
- #1: ff6000008d69bc80 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x252/0x4c8
- #2: ff6000008b946a58 (kn->active#5){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x2aa/0x4c8
- #3: ffffffff8979c780 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: new_device_store+0x10a/0x6c2
- #4: ff600000b0c0b128 (&dev->mutex){....}-{4:4}, at: __device_attach+0x8e/0x490
- #5: ff6000008e375258 (&devlink->lock_key#22){+.+.}-{4:4}, at: devl_lock+0x22/0x2c
- #6: ffffffff89f64220 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x22/0x2a
-4 locks held by syz-executor/15504:
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x9d0/0xc9e
- #1: ff600000aa105480 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x252/0x4c8
- #2: ff6000008b946a58 (kn->active#5){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x2aa/0x4c8
- #3: ffffffff8979c780 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: new_device_store+0x10a/0x6c2
-4 locks held by syz-executor/15575:
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x9d0/0xc9e
- #1: ff6000009624e880 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x252/0x4c8
- #2: ff6000008b946968 (kn->active#4){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x2aa/0x4c8
- #3: ffffffff8979c780 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: del_device_store+0xf0/0x48c
-4 locks held by syz-executor/15582:
- #0: ff6000009335a410 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x9d0/0xc9e
- #1: ff600000b1aba480 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x252/0x4c8
- #2: ff6000008b946968 (kn->active#4){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x2aa/0x4c8
- #3: ffffffff8979c780 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: del_device_store+0xf0/0x48c
-2 locks held by syz-executor/15597:
- #0: ffffffff896a4b48 (&ops->srcu){.+.+}-{0:0}, at: rtnl_link_ops_get+0xea/0x31c
- #1: ffffffff89f64220 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x64c/0x1dc6
-3 locks held by kworker/2:3/17058:
-4 locks held by syz-executor/17064:
-1 lock held by syz-executor/17066:
- #0: ffffffff88e31ad8 (tomoyo_ss){.+.+}-{0:0}, at: tomoyo_check_open_permission+0x144/0x3d6
-2 locks held by syz-executor/17067:
-1 lock held by syz-executor/17070:
+NS_A="nfsd_test_A_$$"
+NS_B="nfsd_test_B_$$"
+SYNC="/tmp/nfsd_uaf_sync_$$"
+GO="/tmp/nfsd_uaf_go_$$"
+REPRO="/tmp/uaf_repro_$$"
 
-=============================================
+cleanup() {
+     set +e
+     kill $REPRO_PID 2>/dev/null || true
+     wait $REPRO_PID 2>/dev/null || true
+     ip netns del "$NS_B" 2>/dev/null || true
+     ip netns del "$NS_A" 2>/dev/null || true
+     rm -f "$REPRO" "$SYNC" "$GO"
+}
+trap cleanup EXIT
 
-NMI backtrace for cpu 1
-CPU: 1 UID: 0 PID: 43 Comm: khungtaskd Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1 PREEMPT 
-Tainted: [W]=WARN
-Hardware name: riscv-virtio,qemu (DT)
-Call Trace:
-[<ffffffff8007c91c>] dump_backtrace+0x2e/0x3c
-[<ffffffff800032ce>] show_stack+0x30/0x3c
-[<ffffffff80060fbe>] dump_stack_lvl+0x12a/0x1a2
-[<ffffffff80061052>] dump_stack+0x1c/0x24
-[<ffffffff866ba6bc>] nmi_cpu_backtrace+0x3b0/0x3b2
-[<ffffffff866ba974>] nmi_trigger_cpumask_backtrace+0x2b6/0x45a
-[<ffffffff8008aae0>] arch_trigger_cpumask_backtrace+0x2c/0x38
-[<ffffffff866cee94>] sys_info+0x20c/0x24e
-[<ffffffff8053fe46>] watchdog+0x920/0x137c
-[<ffffffff801f7d58>] kthread+0x336/0x47e
-[<ffffffff8006a302>] ret_from_fork_kernel+0x94/0xfce
-[<ffffffff86726926>] ret_from_fork_kernel_asm+0x16/0x18
-Sending NMI from CPU 1 to CPUs 0,2-3:
-NMI backtrace for cpu 2
-CPU: 2 UID: 0 PID: 3139 Comm: syz-executor Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1 PREEMPT 
-Tainted: [W]=WARN
-Hardware name: riscv-virtio,qemu (DT)
-epc : mod_node_page_state+0x28/0x6a
- ra : mod_node_page_state+0x58/0x6a
-epc : ffffffff809bb55e ra : ffffffff809bb58e sp : ff200000063a7600
- gp : ffffffff8a395420 tp : ff6000008b193580 t0 : ffebffff15c2c000
- t1 : 0000000000000001 t2 : 0000000000000000 s0 : ff200000063a7630
- s1 : 0000000000000002 a0 : 0000000000000002 a1 : 0000000000000000
- a2 : 0000000000000000 a3 : ffffffff8193bb24 a4 : 0000000000000001
- a5 : 0000000000000000 a6 : 0000000000000003 a7 : ffffffff80c62208
- s2 : ff600000fffe99c0 s3 : 0000000000000024 s4 : ffffffffffffffff
- s5 : 0000000000000000 s6 : 0000000000000007 s7 : ffebffff11077215
- s8 : 0000000000000160 s9 : ff1c000002b85800 s10: 1fec000011077215
- s11: ff600000883b9080 t3 : 4b952e4d00000000 t4 : 0000000000000000
- t5 : 0000000000000000 t6 : 0000000000000002 ssp : 0000000000000000
-status: 0000000200000120 badaddr: 0000000000000000 cause: 8000000000000009
-[<ffffffff809bb55e>] mod_node_page_state+0x28/0x6a
-[<ffffffff80c623ae>] lruvec_stat_mod_folio+0x200/0x25a
-[<ffffffff80addf62>] vfree+0x272/0xca8
-[<ffffffff8053dea8>] kcov_close+0x42/0x70
-[<ffffffff80cf2748>] __fput+0x382/0xac6
-[<ffffffff80cf2f3a>] ____fput+0x1c/0x26
-[<ffffffff801f13b2>] task_work_run+0x16a/0x25e
-[<ffffffff80169d02>] do_exit+0x8e4/0x2a6c
-[<ffffffff8016c3ea>] do_group_exit+0xd4/0x26c
-[<ffffffff801a6fb0>] get_signal+0x2070/0x22aa
-[<ffffffff80073742>] arch_do_signal_or_restart+0xcc4/0x1d72
-[<ffffffff803eca40>] exit_to_user_mode_loop+0x9c/0x7a4
-[<ffffffff866faa3c>] do_trap_ecall_u+0x490/0x5de
-[<ffffffff867267f6>] handle_exception+0x15e/0x16a
-NMI backtrace for cpu 3
-CPU: 3 UID: 0 PID: 17070 Comm: syz-executor Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1 PREEMPT 
-Tainted: [W]=WARN
-Hardware name: riscv-virtio,qemu (DT)
-epc : kasan_quarantine_put+0x8a/0x1fa
- ra : kasan_quarantine_put+0x198/0x1fa
-epc : ffffffff80becf0a ra : ffffffff80bed018 sp : ff200000062279b0
- gp : ffffffff8a395420 tp : ff60000093cab580 t0 : ff20000006227990
- t1 : 0000000000000008 t2 : 5f726573755f776f s0 : ff200000062279f0
- s1 : 00000000000f1a70 a0 : 0000000000000003 a1 : 0000000000000000
- a2 : 0000000000000000 a3 : ffffffff8193bb24 a4 : 0000000000000001
- a5 : 0000000000000000 a6 : 0000000000000003 a7 : 0000000039dd5796
- s2 : ff60000096170400 s3 : 0000000000000002 s4 : ff60000080002c80
- s5 : 0000000000000000 s6 : 0000000000000000 s7 : 0000000000001000
- s8 : 0000000000000000 s9 : ff60000096170400 s10: ff600000b124c000
- s11: ff600000b124e000 t3 : 1243f8b800000000 t4 : 0000000000001fff
- t5 : 00000000000000c8 t6 : 0000000000000002 ssp : 0000000000000000
-status: 0000000200000120 badaddr: 0000000000000000 cause: 8000000000000009
-[<ffffffff80becf0a>] kasan_quarantine_put+0x8a/0x1fa
-[<ffffffff80be8d24>] __kasan_slab_free+0x6a/0x7e
-[<ffffffff80b39284>] kfree+0x30a/0x6e2
-[<ffffffff8149f2ee>] tomoyo_find_next_domain+0x7d0/0x1e48
-[<ffffffff814b1224>] tomoyo_bprm_check_security+0x128/0x1c4
-[<ffffffff81461316>] security_bprm_check+0x278/0x28e
-[<ffffffff80d085b8>] bprm_execve+0x80c/0x1878
-[<ffffffff80d0acda>] do_execveat_common.isra.0+0x45e/0x59e
-[<ffffffff80d0ef52>] __riscv_sys_execve+0x8c/0xc4
-[<ffffffff80078fb2>] syscall_handler+0x94/0x118
-[<ffffffff866fa9ea>] do_trap_ecall_u+0x43e/0x5de
-[<ffffffff867267f6>] handle_exception+0x15e/0x16a
-NMI backtrace for cpu 0
-CPU: 0 UID: 0 PID: 17064 Comm: syz-executor Tainted: G        W           7.1.0-rc1-gdb909bd7986c #1 PREEMPT 
-Tainted: [W]=WARN
-Hardware name: riscv-virtio,qemu (DT)
-epc : lock_acquire+0x2a8/0x50e
- ra : lock_acquire+0x276/0x50e
-epc : ffffffff802fe96a ra : ffffffff802fe938 sp : ff200000000e7030
- gp : ffffffff8a395420 tp : ff6000008e4eb580 t0 : 0000000000000000
- t1 : 0000000000000001 t2 : 0000000000000000 s0 : ff200000000e7110
- s1 : ffffffff9176ce80 a0 : 0000000000000000 a1 : ffffffff88169438
- a2 : 0000000000000016 a3 : ffffffff8a4a70a0 a4 : 0000000000000000
- a5 : 0000000000000000 a6 : 0000000000000050 a7 : ffffffff80aa2f74
- s2 : ff600000ffa29788 s3 : 0000000000000001 s4 : 0000000000000000
- s5 : 0000000000000000 s6 : 0000000000000000 s7 : ffffffff80aa2f74
- s8 : ffffffff86a68788 s9 : 0000000000000002 s10: ffffffff9176ce80
- s11: ff600000ffa29788 t3 : fbb730c400000000 t4 : 0000000000001fff
- t5 : 00000000000000c8 t6 : 0000000000000002 ssp : 0000000000000000
-status: 0000000200000120 badaddr: 0000000000000000 cause: 8000000000000009
-[<ffffffff802fe96a>] lock_acquire+0x2a8/0x50e
-[<ffffffff86721cd2>] _raw_spin_lock+0x32/0x48
-[<ffffffff80aa2f74>] pte_offset_map_lock+0x1d6/0x3d2
-[<ffffffff80a5258e>] get_locked_pte+0x70/0xc2
-[<ffffffff80a526fc>] insert_page+0x11c/0x232
-[<ffffffff80a52a96>] vm_insert_page+0x284/0x3ae
-[<ffffffff8053dc36>] kcov_mmap+0xb4/0x11c
-[<ffffffff80af0dfe>] __mmap_region+0x10b4/0x2800
-[<ffffffff80af6c24>] mmap_region+0x3e8/0x500
-[<ffffffff80a7c7d0>] do_mmap+0x944/0x1048
-[<ffffffff809b7d5a>] vm_mmap_pgoff+0x27c/0x41e
-[<ffffffff80a7959c>] ksys_mmap_pgoff+0x2ce/0x6fa
-[<ffffffff800749f4>] __riscv_sys_mmap+0x11c/0x18c
-[<ffffffff80078fb2>] syscall_handler+0x94/0x118
-[<ffffffff866fa9ea>] do_trap_ecall_u+0x43e/0x5de
-[<ffffffff867267f6>] handle_exception+0x15e/0x16a
+echo "=== Reproduce e7fcf179b82d scenario ==="
 
-<<<<<<<<<<<<<<< tail report >>>>>>>>>>>>>>>
+# --- Setup ---
+echo "[setup] creating netns A and B..."
+ip netns add "$NS_A"
+ip netns add "$NS_B"
+
+echo "[setup] loading nfsd..."
+modprobe nfsd || true
+
+echo "[setup] compiling repro..."
+gcc -o "$REPRO" /tmp/uaf_repro.c 2>/dev/null || \
+     gcc -o "$REPRO" -x c - <<'SRCEOF' 2>/dev/null
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sched.h>
+#include <signal.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+static volatile sig_atomic_t go_flag = 0;
+static void handler(int sig) { go_flag = 1; }
+int main(int argc, char *argv[]) {
+     const char *netns_b = argv[1], *sync_f = argv[2], *go_f = argv[3];
+     int fd, nsfd; ssize_t n; char buf[4096];
+     fd = open("/proc/fs/nfs/exports", O_RDONLY);
+     if (fd < 0) { perror("open exports debug"); return 1; }
+     fprintf(stderr, "[repro] opened exports (fd=%d) in netns A\n", fd);
+     nsfd = open(netns_b, O_RDONLY);
+     if (nsfd < 0) { perror("open B"); return 1; }
+     if (setns(nsfd, CLONE_NEWNET) < 0) { perror("setns"); return 1; }
+     close(nsfd);
+     fprintf(stderr, "[repro] moved to B; A has no processes\n");
+     close(open(sync_f, O_CREAT | O_WRONLY, 0666));
+     signal(SIGCONT, handler);
+     while (!go_flag) { struct stat st; if (stat(go_f, &st) == 0) break; 
+pause(); }
+     fprintf(stderr, "[repro] reading exports fd...\n");
+     lseek(fd, 0, SEEK_SET);
+     sleep(1);
+     n = read(fd, buf, sizeof(buf)-1);
+     if (n < 0) { perror("read"); close(fd); return 1; }
+     buf[n] = '\0';
+     fprintf(stderr, "[repro] SUCCESS: read %zd bytes (no UAF)\n", n);
+     close(fd);
+     return 0;
+}
+SRCEOF
+
+# --- Run repro inside A ---
+rm -f "$SYNC" "$GO"
+echo "[test] starting repro inside netns A..."
+ip netns exec "$NS_A" "$REPRO" /var/run/netns/"$NS_B" "$SYNC" "$GO" &
+REPRO_PID=$!
+
+# --- Wait for repro to move to B ---
+echo "[test] waiting for repro to signal that A is empty..."
+for i in $(seq 1 30); do
+     if [ -f "$SYNC" ]; then break; fi
+     if ! kill -0 $REPRO_PID 2>/dev/null; then
+         echo "[FAIL] repro exited prematurely"
+         wait $REPRO_PID || true
+         exit 1
+     fi
+     sleep 0.2
+done
+
+if [ ! -f "$SYNC" ]; then
+     echo "[FAIL] timeout waiting for repro"
+     exit 1
+fi
+echo "[test] repro moved to B"
+
+# --- Destroy netns A ---
+echo "[test] destroying netns A (ip netns del $NS_A)..."
+set +e
+ip netns del "$NS_A" 2>&1
+RC=$?
+set -e
+
+if [ $RC -eq 0 ]; then
+     echo "[test] 'ip netns del $NS_A' returned success"
+else
+     echo "[test] 'ip netns del $NS_A' returned $RC"
+fi
+
+# --- Signal repro to read from the exports fd ---
+echo "[test] signaling repro to read from exports fd..."
+touch "$GO"
+kill -CONT $REPRO_PID 2>/dev/null || true
+
+# --- Wait for repro and check result ---
+set +e
+wait $REPRO_PID
+RC=$?
+set -e
+
+if [ $RC -eq 0 ]; then
+     echo ""
+     echo "=== TEST PASSED: no UAF detected (kernel has e7fcf179b82d 
+fix) ==="
+     echo "   get_net() holds netns A alive while the fd is open."
+else
+     echo ""
+     echo "=== TEST FAILED with exit code $RC ==="
+     echo "   Possible UAF or other error."
+     echo "   If running on a kernel WITHOUT e7fcf179b82d, this crash is 
+EXPECTED."
+fi
+exit $RC
+
+
+Panic show as follow with commit:
+
+commit 9189d23b835cec646ba5010db35d1557a77c5857 (HEAD -> master)
+Author: Chuck Lever <chuck.lever@oracle.com>
+Date:   Thu Oct 17 09:36:31 2024 -0400
+
+     lockd: Remove unneeded initialization of file_lock::c.flc_flags
+
+
+localhost login: [   39.462598][  T579] 
+================================================================== 
+  
+  
+     [202/363]
+[   39.463541][  T579] BUG: KASAN: slab-use-after-free in 
+cache_seq_next_rcu+0xa4/0x180 [sunrpc]
+[   39.464551][  T579] Read of size 4 at addr ffff00000fbe8408 by task 
+uaf_repro_563/579
+[   39.465291][  T579]
+[   39.465513][  T579] CPU: 1 UID: 0 PID: 579 Comm: uaf_repro_563 Not 
+tainted 6.12.0-rc7+ #17
+[   39.466349][  T579] Hardware name: linux,dummy-virt (DT)
+[   39.466897][  T579] Call trace:
+[   39.467224][  T579]  dump_backtrace+0xa4/0x140
+[   39.467742][  T579]  show_stack+0x20/0x38
+[   39.468156][  T579]  dump_stack_lvl+0x80/0xf8
+[   39.468694][  T579]  print_report+0xfc/0x5c8
+[   39.469237][  T579]  kasan_report+0x78/0xc8
+[   39.469676][  T579]  __asan_load4+0x9c/0xc0
+[   39.470115][  T579]  cache_seq_next_rcu+0xa4/0x180 [sunrpc]
+[   39.470842][  T579]  seq_read_iter+0x4a0/0x6c0
+[   39.471355][  T579]  seq_read+0x194/0x218
+[   39.471770][  T579]  proc_reg_read+0x110/0x198
+[   39.472235][  T579]  vfs_read+0x150/0x490
+[   39.472656][  T579]  ksys_read+0xd4/0x198
+[   39.473070][  T579]  __arm64_sys_read+0x4c/0x68
+[   39.473537][  T579]  invoke_syscall+0x64/0x188
+[   39.473992][  T579]  el0_svc_common.constprop.1+0xd8/0x158
+[   39.474558][  T579]  do_el0_svc+0x38/0x50
+[   39.474981][  T579]  el0_svc+0x34/0xc0
+[   39.475422][  T579]  el0t_64_sync_handler+0xa0/0xc8
+[   39.475933][  T579]  el0t_64_sync+0x188/0x190
+[   39.476385][  T579]
+[   39.476618][  T579] Allocated by task 566:
+[   39.477087][  T579]  kasan_save_stack+0x2c/0x58
+[   39.477561][  T579]  kasan_save_track+0x20/0x40
+[   39.478030][  T579]  kasan_save_alloc_info+0x40/0x58
+[   39.478539][  T579]  __kasan_kmalloc+0xa0/0xb8
+[   39.478997][  T579]  __kmalloc_node_track_caller_noprof+0x194/0x370
+[   39.479646][  T579]  kmemdup_noprof+0x34/0x68
+[   39.480094][  T579]  cache_create_net+0x30/0x108 [sunrpc]
+[   39.480800][  T579]  nfsd_export_init+0x78/0x188 [nfsd]
+[   39.481505][  T579]  nfsd_net_init+0x50/0x1e8 [nfsd]
+[   39.482136][  T579]  ops_init+0xcc/0x210
+[   39.482615][  T579]  register_pernet_operations+0x218/0x348
+[   39.483180][  T579]  register_pernet_subsys+0x38/0x60
+[   39.483698][  T579]  0xffffb6c9bf5b90c0
+[   39.484096][  T579]  do_one_initcall+0xa8/0x3c8
+[   39.484563][  T579]  do_init_module+0x100/0x378
+[   39.485070][  T579]  load_module+0x2d78/0x2e80
+[   39.485532][  T579]  init_module_from_file+0xec/0x148
+[   39.486044][  T579]  __arm64_sys_finit_module+0x394/0x618
+[   39.486604][  T579]  invoke_syscall+0x64/0x188
+[   39.487065][  T579]  el0_svc_common.constprop.1+0xd8/0x158
+[   39.487629][  T579]  do_el0_svc+0x38/0x50
+[   39.488044][  T579]  el0_svc+0x34/0xc0
+[   39.488437][  T579]  el0t_64_sync_handler+0xa0/0xc8
+[   39.488939][  T579]  el0t_64_sync+0x188/0x190
+[   39.489398][  T579]
+[   39.489635][  T579] Freed by task 53:
+[   39.490013][  T579]  kasan_save_stack+0x2c/0x58
+[   39.490479][  T579]  kasan_save_track+0x20/0x40
+[   39.490948][  T579]  kasan_save_free_info+0x4c/0x78
+[   39.491449][  T579]  __kasan_slab_free+0x50/0x70
+[   39.491924][  T579]  kfree+0x160/0x310
+[   39.492312][  T579]  cache_destroy_net+0x34/0x50 [sunrpc]
+[   39.493015][  T579]  nfsd_export_shutdown+0xc0/0x150 [nfsd]
+[   39.493711][  T579]  nfsd_net_exit+0x68/0x88 [nfsd]
+[   39.494338][  T579]  ops_exit_list.isra.13+0x64/0xc0
+[   39.494856][  T579]  cleanup_net+0x508/0x788
+[   39.495300][  T579]  process_scheduled_works+0x3d8/0x7e8
+[   39.495895][  T579]  worker_thread+0x29c/0x630
+[   39.496364][  T579]  kthread+0x170/0x188
+[   39.496773][  T579]  ret_from_fork+0x10/0x20
+[   39.497217][  T579]
+[   39.497453][  T579] The buggy address belongs to the object at 
+ffff00000fbe8400
+
+I have try to replace
+fd = open("/proc/fs/nfs/exports", O_RDONLY);
+with
+fd = open("/proc/fs/nfs/exports", O_RDONLY);
+
+No c_show UAF trigger...
+
+
+> 
+> 
 
 
