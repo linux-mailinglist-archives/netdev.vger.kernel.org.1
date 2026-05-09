@@ -1,101 +1,63 @@
-Return-Path: <netdev+bounces-286186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286187-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uFmFO+w8/2kS3wAAu9opvQ
-	(envelope-from <netdev+bounces-286186-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 15:55:56 +0200
+	id 0KRjO0k9/2kn3wAAu9opvQ
+	(envelope-from <netdev+bounces-286187-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 15:57:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D3474FFEED
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 15:55:56 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id F27D34FFF0B
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 15:57:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AF7BB302BBC9
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 13:55:03 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0E17530013A7
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 13:57:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D13F394787;
-	Sat,  9 May 2026 13:54:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A62527AC31;
+	Sat,  9 May 2026 13:57:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n5bKHCiK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u/JYVpmU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D3EE39479F
-	for <netdev@vger.kernel.org>; Sat,  9 May 2026 13:54:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAFBD1A2392
+	for <netdev@vger.kernel.org>; Sat,  9 May 2026 13:57:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778334897; cv=none; b=Q1F44K8c7wtjbPqixlmy4b8JLLZlrsUPmmE0ZhmpKdZKbh23fTihc4+HxZrpKw6A6XbZsP4ihxo7y+uiDRE/M2f1K68G7fQ8BpBGyMjM6rBVgCZnpSKKncz11T7K4ymqHq5aKqwFuxBGBhtOGoXUQAy6YpemGdUv+aSazqAiEMQ=
+	t=1778335043; cv=none; b=n31mR8wYxtR2kpA0YWRtBt3tctON4HrysJBNTCJ2kri67C9SjqxoF0XMI6neo9jTkY71X9DsYZ583XPfYZ0SF1xseWvXuXAQvAHnblk5NtJ2Tjv38iBxcjmxh6ASz77KSC4HvUE8H5bXI9p4lqLbhRoa3b8/uD7ma1ajSAeLMxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778334897; c=relaxed/simple;
-	bh=GQeOcJ4x5WRRquDnsAee0Zm2Twr2g7DVIbPAVoTtP+o=;
+	s=arc-20240116; t=1778335043; c=relaxed/simple;
+	bh=cxc9n++18QJ7wy+EjcfEz49X2FxVZv+VqE1pXVjdRto=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ah6R8TzJ7bTlJlq9gBieNMb4zj5XTFXAYFs06Q+Y3hzspzkVp+d0J6T8aeYwf+E1wZe79FKkGL87o60ylrZqsv+tdRNPVmKw+BI6nrPfn1FGV7CcyjYRekcPcdRxHJx8WUxVnlB092MuTzC12dU7cP/e5xbhs62raff7J6tZKCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n5bKHCiK; arc=none smtp.client-ip=209.85.210.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7dcdaf06498so2164306a34.2
-        for <netdev@vger.kernel.org>; Sat, 09 May 2026 06:54:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778334894; x=1778939694; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CzF0t66wEszl2BcU24gnomwmHovPmL+M9vg4PdgRwyk=;
-        b=n5bKHCiKKGSziil6l64CunkGbkyg8GxMtjA/uk4N45MDBTufAG/cFI4WaWoOHVZQt7
-         nSzqRj7E8lZkN4vSJ6iLZakif6an4onGXG6pFSTWL6PmScvKVbdc8l2tAV3BaTSaKLXy
-         jF7mc3EU6GK7Le57oEc3ZG2xYSKkK85WOvkxAiHgkx2e+LdTXta+CcvF+HDWxN0KAMh9
-         hLF2PyKF/0JONP+qLBrJCPSM/tR4bpJKL1+wN6J+yEJHXzWzAEaRSvpN1Veuj5aKaAv2
-         Y2DcAViDwsY10pithaAexUXmMyIp8uGKFlnhOt0+nr1oXvNVhpdFLJEN805Btbhxize0
-         /1tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778334894; x=1778939694;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=CzF0t66wEszl2BcU24gnomwmHovPmL+M9vg4PdgRwyk=;
-        b=UJc3E660ptRaWycppCv7/zNeALgwyUi2XN1Z2GQ7MzWZxjov/VTJWhCmpppiFg7EfS
-         tBSK0jzonskZxBeEl12CeqpjQNErt0KGTnQYque5jNkFeFqV9SPOvd/ZxM3i1LIxKaG8
-         CT3JZOSB738E2ojG+iBkUgyRMyoV9yGyhW0xa3Ovf78A0/kq7+zQqMHSvupaPwEj2SIL
-         EIDYYNmvqPa0y9QHjnWdx/O3+yMxJOFrv60LYYPkmFjqo9Ilkozr8qNcvkkRiOGaLK8y
-         DuFONUxbeEcyV+aRSMlj1aV8XHteXA41fQfPtXSZR+DLQX7ueSoGwd7eE8ye7LaTLpDA
-         tQSQ==
-X-Gm-Message-State: AOJu0YxPa0+l50EubZuQdxMRm4JEC8sblo9WqLfSM+2BMNDXYN6gfTXl
-	C2NU3xnjUK1p5jtmxkQAMiWgJb2F73ljo9fuR0QecA3pvA/TVxQ5C5M5Y1kpIuFT34s=
-X-Gm-Gg: Acq92OGivS8OGaO4IzTvTdm1QQPY9h0l5TxCn7CoBSoH86f6fcHfz0MY3plM/qQp5Rw
-	Xc2abHeE1WalT7nQ35MbJXzvRBY+vYZayOGNvzcNDC8ajSFFsGALgILYKbJSFUwaMvgpsTDK+Cz
-	UTcqkS/4CZwfPiUzLLOL7wTBg9xxxyVGr60kgeRp79z1hzB47Y9Nmn0bbsLof31vn1XwSGnERPf
-	ZoM+03CzBYTwiOeVHS4GF3/Bah5wapnUlJ9dEehkO/hstyrra0Q9tl69VKrrwIUurvYQWOtnM31
-	JSw7irEML+LJgWJXErRB4GaIojmkCfZvs2QFyvDY9S77J9J0oe44wVBJY3cOparQ+NNzwuTSbpV
-	la1DIL3GUQp0ChJZA8w9jzFTm8d7jg/UduZROQXSmA8NkKEztk21IDrju8fpOpSGdJ2+x3KWuo8
-	rqMKxe5Xmsc/mm5QI=
-X-Received: by 2002:a05:6830:6d29:b0:7dc:e37b:b5d2 with SMTP id 46e09a7af769-7e1dee9c9a7mr10654591a34.8.1778334894011;
-        Sat, 09 May 2026 06:54:54 -0700 (PDT)
-Received: from houminxi ([72.244.37.221])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e367c04e66sm3098110a34.8.2026.05.09.06.54.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 May 2026 06:54:52 -0700 (PDT)
-From: Minxi Hou <houminxi@gmail.com>
-To: netdev@vger.kernel.org
-Cc: aconole@redhat.com,
-	echaudro@redhat.com,
-	i.maximets@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org,
-	dev@openvswitch.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Minxi Hou <houminxi@gmail.com>
-Subject: [PATCH net-next v9 2/2] selftests: openvswitch: add pop_vlan test
-Date: Sat,  9 May 2026 21:54:23 +0800
-Message-ID: <20260509135423.3433910-3-houminxi@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260509135423.3433910-1-houminxi@gmail.com>
-References: <20260509135423.3433910-1-houminxi@gmail.com>
+	 MIME-Version; b=fLldtB0eRuiI1Mdg0rtJMNXFDfjRzvoV3fBP2nKm4Hr7BgPe/bLDxuk+CrllRmsJxMTe0xj4RgaoDNBKLrGFgA4VqtPkNp8emm4o5kGN4B6vSyL2MxMCvS6QCpCvScUyWQlJScGSttolkkx7YvsM8e7Uva/rj7TDZcw+LdrTa38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u/JYVpmU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C6F9C2BCB2;
+	Sat,  9 May 2026 13:57:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778335042;
+	bh=cxc9n++18QJ7wy+EjcfEz49X2FxVZv+VqE1pXVjdRto=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=u/JYVpmUebedpNFZZSiSdJNKwe5V5jwZThqfh+fXVTR/C0XVNWmk7C1arDlw17pPk
+	 bVv+drG7uoVXrtavnw6sSCCcpI5LpRgHkVdRwbqhUW16mfCjW/d/9cytkWBKILLylE
+	 cXXwGB92KkJYHfc15eE8PbUB0bl154ls+XPW33xJAmmETW6dQ5JiH0e2K5IMFKNmM+
+	 09t1uSRsVrnlR3DMdOLjyJYGVYwhsrhISoZRoh7Otwmu9bBeSAGwgf1grXbRlNs+ah
+	 RhhoyMirX4QhggYtDcXChnBnc8b6E5IDgGvrUjy0Ur7666oTSxPr4AwDlJITdc0H18
+	 GfWeQlvvtApOg==
+From: Simon Horman <horms@kernel.org>
+To: steffen.klassert@secunet.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	sd@queasysnail.net,
+	tobias@strongswan.org,
+	herbert@gondor.apana.org.au,
+	devel@linux-ipsec.org
+Subject: Re: [PATCH ipsec-next v2] esp: Consolidate esp4 and esp6
+Date: Sat,  9 May 2026 14:56:40 +0100
+Message-ID: <20260509135639.1309815-2-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <afr4ipktV91sA8WU@secunet.com>
+References: <afr4ipktV91sA8WU@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,156 +65,232 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 9D3474FFEED
+X-Rspamd-Queue-Id: F27D34FFF0B
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,google.com,kernel.org,openvswitch.org,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-286186-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286187-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-0.998];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,sashiko.dev:url,secunet.com:email]
 X-Rspamd-Action: no action
 
-Add test_pop_vlan() to verify OVS kernel datapath pop_vlan action
-correctly strips 802.1Q VLAN tags from frames.
+From: 'Simon Horman' <horms@kernel.org>
 
-Test structure:
-- Baseline: untagged forwarding validates basic connectivity.
-- Negative: forward without pop_vlan, tagged frame is invisible
-  to ns2 (no VLAN sub-interface), ping fails.
-- Positive: pop_vlan strips tag on forward path, push_vlan
-  restores tag on return path, ping succeeds.
-
-Use static ARP entries to avoid VLAN-tagged ARP complexity.
-Rely on ping success/failure for verification -- no tcpdump or
-pcap files needed.
-
-Signed-off-by: Minxi Hou <houminxi@gmail.com>
-Reviewed-by: Aaron Conole <aconole@redhat.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
 ---
- .../selftests/net/openvswitch/openvswitch.sh  | 78 +++++++++++++++++++
- 1 file changed, 78 insertions(+)
+Now I have enough to produce the report.
 
-diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index 3cdd953f6813..8cd5b3d894ab 100755
---- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-+++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -28,6 +28,7 @@ tests="
- 	tunnel_metadata				ovs: test extraction of tunnel metadata
- 	tunnel_refcount				ovs: test tunnel vport reference cleanup
- 	drop_reason				drop: test drop reasons are emitted
-+	pop_vlan				vlan: POP_VLAN action strips tag
- 	psample					psample: Sampling packets with psample"
- 
- info() {
-@@ -864,6 +865,83 @@ test_tunnel_refcount() {
- 		ovs_wait dev_removed dp-${tun_type} || return 1
- 		ovs_wait dev_removed ovs-${tun_type}0 || return 1
- 	done
-+
-+	return 0
-+}
-+
-+test_pop_vlan() {
-+	local sbx="test_pop_vlan"
-+	sbx_add "$sbx" || return $?
-+	ovs_add_dp "$sbx" vlandp || return 1
-+
-+	ovs_add_netns_and_veths "$sbx" vlandp \
-+		ns1 veth1 ns1veth 192.0.2.1/24 || return 1
-+	ovs_add_netns_and_veths "$sbx" vlandp \
-+		ns2 veth2 ns2veth 192.0.2.2/24 || return 1
-+
-+	# Baseline: untagged bidirectional forwarding
-+	ovs_add_flow "$sbx" vlandp \
-+		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
-+	ovs_add_flow "$sbx" vlandp \
-+		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
-+	ovs_add_flow "$sbx" vlandp \
-+		'in_port(1),eth(),eth_type(0x0800),ipv4()' '2' || return 1
-+	ovs_add_flow "$sbx" vlandp \
-+		'in_port(2),eth(),eth_type(0x0800),ipv4()' '1' || return 1
-+	ovs_sbx "$sbx" ip netns exec ns1 ping -c 3 -W 2 \
-+		192.0.2.2 || return 1
-+
-+	# VLAN topology: ns1 uses VLAN sub-interface, ns2 is plain
-+	ip -n ns1 link add link ns1veth name ns1veth.10 \
-+		type vlan id 10 || return 1
-+	on_exit "ip -n ns1 link del ns1veth.10 2>/dev/null"
-+	ip -n ns1 addr add 198.51.100.1/24 dev ns1veth.10 || return 1
-+	ip -n ns1 link set ns1veth.10 up || return 1
-+	ip -n ns2 addr add 198.51.100.2/24 dev ns2veth || return 1
-+
-+	ovs_del_flows "$sbx" vlandp
-+
-+	# Static ARP: avoids VLAN-tagged ARP complexity
-+	local ns1veth10mac ns2mac
-+	ns1veth10mac=$(ip -n ns1 link show ns1veth.10 \
-+		| awk '/link\/ether/ {print $2}')
-+	[ -z "$ns1veth10mac" ] && \
-+		{ info "failed to get ns1veth10mac"; return 1; }
-+	ns2mac=$(ip -n ns2 link show ns2veth \
-+		| awk '/link\/ether/ {print $2}')
-+	[ -z "$ns2mac" ] && \
-+		{ info "failed to get ns2mac"; return 1; }
-+	ip -n ns1 neigh replace 198.51.100.2 lladdr "$ns2mac" \
-+		dev ns1veth.10 nud permanent || return 1
-+	ip -n ns2 neigh replace 198.51.100.1 \
-+		lladdr "$ns1veth10mac" \
-+		dev ns2veth nud permanent || return 1
-+
-+	local vlan_match='in_port(1),eth(),eth_type(0x8100),'
-+	vlan_match+='vlan(vid=10),'
-+	vlan_match+='encap(eth_type(0x0800),'
-+	vlan_match+='ipv4(src=198.51.100.1,proto=1),icmp())'
-+
-+	# Negative: forward without pop_vlan -- tagged frame
-+	# is invisible to ns2 (no VLAN sub-interface), ping fails
-+	ovs_add_flow "$sbx" vlandp "$vlan_match" '2' || return 1
-+	ovs_sbx "$sbx" ip netns exec ns1 ping -I ns1veth.10 \
-+		-c 3 -W 1 198.51.100.2 >/dev/null 2>&1 \
-+		&& { info "FAIL: ping should fail without pop_vlan"
-+		     return 1; }
-+
-+	ovs_del_flows "$sbx" vlandp
-+
-+	# Positive: pop_vlan strips tag on forward path,
-+	# push_vlan restores tag on return path -- ping succeeds
-+	ovs_add_flow "$sbx" vlandp \
-+		"$vlan_match" 'pop_vlan,2' || return 1
-+	ovs_add_flow "$sbx" vlandp \
-+		'in_port(2),eth(),eth_type(0x0800),ipv4()' \
-+		'push_vlan(vid=10,pcp=0,tpid=0x8100),1' || return 1
-+	ovs_sbx "$sbx" ip netns exec ns1 ping -I ns1veth.10 \
-+		-c 3 -W 2 198.51.100.2 || return 1
-+
- 	return 0
- }
- 
--- 
-2.53.0
+commit 64848fd4fb36bc803f3ebb41951e5c02a19f0280
+Author: Steffen Klassert <steffen.klassert@secunet.com>
 
+esp: Consolidate esp4 and esp6
+
+This patch merges common code of esp4.c and esp6.c into a new
+xfrm_esp.c. ESP output/input, AEAD setup and the TCP/UDP encapsulation
+helpers are shared between IPv4 and IPv6, with three family-specific
+hooks (input_encap, find_tcp_sk, output_encap_csum) added to struct
+xfrm_type.
+
+> diff --git a/net/ipv6/esp6_offload.c b/net/ipv6/esp6_offload.c
+> index 22895521a57d..b1c38d7d286e 100644
+> --- a/net/ipv6/esp6_offload.c
+> +++ b/net/ipv6/esp6_offload.c
+> @@ -290,14 +290,18 @@ static int esp6_input_tail(struct xfrm_state *x, struct sk_buff *skb)
+>  {
+>  	struct crypto_aead *aead = x->data;
+>  	struct xfrm_offload *xo = xfrm_offload(skb);
+> +	int hlen = sizeof(struct ip_esp_hdr) + crypto_aead_ivsize(aead);
+>  
+> -	if (!pskb_may_pull(skb, sizeof(struct ip_esp_hdr) + crypto_aead_ivsize(aead)))
+> +	if (!pskb_may_pull(skb, hlen))
+>  		return -EINVAL;
+>  
+>  	if (!(xo->flags & CRYPTO_DONE))
+>  		skb->ip_summed = CHECKSUM_NONE;
+> +	else
+> +		skb_postpull_rcsum(skb, skb_network_header(skb),
+> +				   skb_network_header_len(skb));
+>  
+> -	return esp6_input_done2(skb, 0);
+> +	return esp_input_done2(skb, 0);
+>  }
+
+Has the non-offload IPv6 ESP input path lost its skb_postpull_rcsum()
+for the IPv6 header?
+
+Before this patch, esp6_input_done2() did:
+
+    skb_postpull_rcsum(skb, skb_network_header(skb),
+                       skb_network_header_len(skb));
+    skb_pull_rcsum(skb, hlen);
+
+and that call was introduced by commit a9b28c2bf05d ("esp6: Fix RX
+checksum after header pull") to compensate for ip6_input_finish()
+stripping the IPv6 header without adjusting skb->csum, fixing
+"hw csum failure" warnings on devices delivering CHECKSUM_COMPLETE.
+
+The new esp_input_done2() in net/xfrm/xfrm_esp.c only does:
+
+    hlen = sizeof(struct ip_esp_hdr) + crypto_aead_ivsize(aead);
+    skb_pull_rcsum(skb, hlen);
+
+and the postpull is reinstated only in esp6_input_tail() under the
+"xo->flags & CRYPTO_DONE" branch. Non-offload software-decrypt IPv6
+ESP RX therefore no longer compensates skb->csum for the outer IPv6
+header bytes. Is this an intentional change, and if so what replaces
+the fix from a9b28c2bf05d?
+
+The commit message says "Move the skb_postpull_rcsum() call to the
+offloading codepath, it is needed only there", which seems to
+contradict the stated reason for a9b28c2bf05d. Is there a later commit
+or code change that makes it unnecessary in the non-offload path?
+
+> diff --git a/net/xfrm/xfrm_esp.c b/net/xfrm/xfrm_esp.c
+> new file mode 100644
+> index 000000000000..4f75e1ace3bb
+> --- /dev/null
+> +++ b/net/xfrm/xfrm_esp.c
+
+[ ... ]
+
+> +#ifdef CONFIG_INET_ESPINTCP
+> +static int esp_output_tcp_finish(struct xfrm_state *x, struct sk_buff *skb)
+> +{
+> +	struct sock *sk;
+> +	int err;
+> +
+> +	rcu_read_lock();
+> +
+> +	sk = x->type->find_tcp_sk(x);
+[ ... ]
+> +static int esp_output_tail_tcp(struct xfrm_state *x, struct sk_buff *skb)
+> +{
+> +	int err;
+> +
+> +	local_bh_disable();
+> +	err = xfrm_trans_queue_net(xs_net(x), skb, esp_output_tcp_encap_cb);
+> +	local_bh_enable();
+[ ... ]
+> +}
+> +#else
+> +static int esp_output_tail_tcp(struct xfrm_state *x, struct sk_buff *skb)
+> +{
+> +	WARN_ON(1);
+> +	return -EOPNOTSUPP;
+> +}
+> +#endif
+
+Is CONFIG_INET_ESPINTCP the right guard for this shared file?
+
+This new xfrm_esp.c is compiled for both IPv4 and IPv6 ESP, but the
+TCP-encap helpers are wrapped with #ifdef CONFIG_INET_ESPINTCP, which
+is the IPv4-only Kconfig symbol. The IPv6 counterpart is
+CONFIG_INET6_ESPINTCP, and both symbols "select XFRM_ESPINTCP" as the
+common hidden symbol (see net/xfrm/Kconfig and net/xfrm/Makefile,
+which uses obj-$(CONFIG_XFRM_ESPINTCP) += espintcp.o).
+
+For a kernel configured with CONFIG_INET_ESPINTCP=n and
+CONFIG_INET6_ESPINTCP=y, the full esp_output_tcp_encap() /
+esp_output_tail_tcp() are not compiled in, so the stub returning
+-EOPNOTSUPP with WARN_ON(1) is selected, and any IPv6 ESP-in-TCP
+output call ending up in esp_output_head() -> esp_output_encap() ->
+esp_output_tcp_encap() will fail. The same #ifdef also appears further
+down around esp_output_tcp_encap().
+
+Should these two blocks be guarded by CONFIG_XFRM_ESPINTCP instead?
+
+> +static struct ip_esp_hdr *esp_output_udp_encap(struct sk_buff *skb,
+> +					       int encap_type,
+> +					       struct esp_info *esp,
+> +					       __be16 sport,
+> +					       __be16 dport)
+> +{
+> +	struct udphdr *uh;
+> +	unsigned int len;
+> +	struct xfrm_offload *xo = xfrm_offload(skb);
+> +
+> +	len = skb->len + esp->tailen - skb_transport_offset(skb);
+> +
+> +	uh = (struct udphdr *)esp->esph;
+> +	uh->source = sport;
+> +	uh->dest = dport;
+> +	uh->len = htons(len);
+> +	uh->check = 0;
+
+Can this silently truncate uh->len?
+
+The old esp6_output_udp_encap() explicitly rejected len > U16_MAX with
+-EMSGSIZE before writing htons(len) into the 16-bit UDP length field,
+and the old IPv4 esp_output_udp_encap() rejected len + sizeof(iphdr)
+> IP_MAX_MTU. Both bounds are gone from this consolidated helper.
+
+The commit message says:
+
+    "Remove the IP_MAX_MTU check from UDP/TCP encap.
+     The IPv4/IPv6 local_out function will do that ceck later."
+
+local_out checks the outer IP packet length, not the UDP 16-bit length
+field. In the software-fallback branch of esp6_xmit() (the !hw_offload
+path calling esp_output_head()), skb->len of a GSO skb can exceed
+65535 pre-segmentation, so the htons() can truncate uh->len without
+any earlier check rejecting the packet.
+
+Should the >U16_MAX check be retained in esp_output_udp_encap(), at
+least for IPv6?
+
+> +#ifdef CONFIG_INET_ESPINTCP
+> +static struct ip_esp_hdr *esp_output_tcp_encap(struct xfrm_state *x,
+> +					       struct sk_buff *skb,
+> +					       struct esp_info *esp)
+> +{
+> +	__be16 *lenp = (void *)esp->esph;
+> +	struct ip_esp_hdr *esph;
+> +	unsigned int len;
+> +	struct sock *sk;
+> +
+> +	len = skb->len + esp->tailen - skb_transport_offset(skb);
+> +
+> +	rcu_read_lock();
+> +	sk = x->type->find_tcp_sk(x);
+> +	rcu_read_unlock();
+> +
+> +	if (IS_ERR(sk))
+> +		return ERR_CAST(sk);
+> +
+> +	sock_put(sk);
+> +
+> +	*lenp = htons(len);
+
+Can *lenp be truncated here?
+
+The previous IPv4 and IPv6 versions both had "if (len > IP_MAX_MTU)
+return ERR_PTR(-EMSGSIZE)" before writing the 2-byte espintcp length
+prefix. espintcp frames ride over TCP and are not bounded by any IP
+MTU that local_out will later enforce on the outer header, so the
+local_out justification in the commit message does not seem to cover
+this case. Should the len > 65535 check be preserved here?
 
