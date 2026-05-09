@@ -1,196 +1,273 @@
-Return-Path: <netdev+bounces-286203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286204-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yI7AFap0/2nE6gAAu9opvQ
-	(envelope-from <netdev+bounces-286203-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 19:53:46 +0200
+	id cEYLKuR8/2kU7AAAu9opvQ
+	(envelope-from <netdev+bounces-286204-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 20:28:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B040E500D38
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 19:53:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0134C500FB1
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 20:28:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3E74C300A396
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 17:53:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E77C93009172
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 18:19:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6935D2FE58C;
-	Sat,  9 May 2026 17:53:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D1612DC76A;
+	Sat,  9 May 2026 18:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OLJyqjfn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NnmFcrr6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3958003D
-	for <netdev@vger.kernel.org>; Sat,  9 May 2026 17:53:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778349223; cv=pass; b=cYwOUErM90NfEWeUxpXhDGbyTWdoS077ZIvFNX6SfwI/CykygVPY0tFH8cNaLq6unwdnMc3BqH/PM+wquU5dxlepPj43x5jWn9deOpGwmaUV1TAoH0KC0PbyrUBvFurb0XTTPkFmKSGoxwRCejp2E5oatsx9hO4fYwbx13FZ0cQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778349223; c=relaxed/simple;
-	bh=/wERocRBBx+2tUEVqAwQjWoEe3tgy7I3Zsk9Nr2rHPE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RYsobCt8XxOadsVX7cD1QiZErD5yHvc6PodtRmPqvxZcXQ+sVyplY81nc4agkagnDmF8ubX0a/CmLWiTf75+/JHACgwnnrCpl1as9FDMwfeKRZUIsL5oLMAdDMol6wWKxiNcfOXb31eZqenITdHUI3ZGgEGuTMGw4h0mSCqLUO4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OLJyqjfn; arc=pass smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-50fb4a7d704so22482801cf.1
-        for <netdev@vger.kernel.org>; Sat, 09 May 2026 10:53:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778349221; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DPANntMhJKZ6H+EPEP8tXwaEtCGV7rVajG4MvoihP1mFbOyiXN49m8aey2dlgm2EcD
-         975WMUv/ERVie/DWgVwnns5JgYFH1qDElDX5TFAVgBenVsNmlrXyIm2SznrCEND0U66T
-         MWur73YB+WShs+odkHzxBXYwH98D4JBkkUdffBFHQb+nCv6VtiO8pYHW5owB4buoTNon
-         H+Wb3s8nfRyIKnCr1pGF8PYozgXV1hX792JiT5hXGfs3/GlK3hjAkTgNTfnyBdZrAbOU
-         YyY+8Wrpb9hYH7m2YGHelO6rKPcofytIOB13ezxUoq0b6+mNlatIyngCwqRKj3weGlme
-         vtQg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=1B5tP3GQztShCRFPoRFfuuVT4/kaOVIg0k/U1NSjmC0=;
-        fh=JqGBteGTY1UugAvl+Vz1malbMReXGFbpAXZAE2rE0Po=;
-        b=R/8VO6nbslB2dSLkd51G93HAwmVuwNzXREE6/Vf4F0FOydodoYkIM+1DH15INKbDXH
-         Hwz2Iu7vlLPmnDEQgg48Rx2KMlZZ+4YVsAxv6aGmYP3UT1Pw8Dz1Nv8nBvqbUoONue9p
-         Tr5uYgfjTSLFDU1uB6eC+S89+zhPXE3X0Vj5HbA1QY1/6V5c1mSbZd/Rr1lHaCnB6Z+r
-         HlIiAdpP9Z8TjAU/e26oLdcBPQLodgSroR0zApNHwneL/sGLtv/+u63aWlfrL/CMmBeO
-         vD2SMAC29srr1nR9TC4ML4EVLLdRKlHKGQ0FUUVvEqY5B4AYgnJSorOr7OIG/wB+onmA
-         2JdA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2554A3E
+	for <netdev@vger.kernel.org>; Sat,  9 May 2026 18:19:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778350742; cv=none; b=ccyz9I0mIsr5R/FSCgDPZ9YkUTNH0Mj+mfJotdZFLmP4SBstqa7bn54vwRL3QZv+FJCbcmQmnGcRyVYEYUa3kqJ+c760nfHblJpz0HH5mPlT3+xcgRbbeRvEl8x2mS9x6keleqkXqG7yBqzivsh0PdRitoHG+K27fJFCNsJ7izQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778350742; c=relaxed/simple;
+	bh=oO/gf2Fs5rNYURzdy4+Z5xpsyUBpydMy7vmp4nuPgKg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OwEoa9Ij1Tx42eHGxubs+aeF0c6YHF8MT8FK744OiG5aND1b7ODXtVZw5+vdj5wZI/EBRpB2MHRpv1ZK0ju9X4JBYp9nx5CD8/mqNLentxMP2dSf+5jn0PGlmC9+ophfL44GUNdSB4sRWxysXRUZx1GBl2/ARsqnFqlpcYmgBmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NnmFcrr6; arc=none smtp.client-ip=74.125.82.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-2f7ca62a3c4so2656518eec.0
+        for <netdev@vger.kernel.org>; Sat, 09 May 2026 11:19:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778349221; x=1778954021; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1B5tP3GQztShCRFPoRFfuuVT4/kaOVIg0k/U1NSjmC0=;
-        b=OLJyqjfnymwTVa9JxnRJo941IE6wlDJ+0aI45aiZOzxikA6fFu2aCPhz4OBLD9rPcL
-         nH/fzcg6VxSg+u8fTEbWA6Btro6FFBMn/kG4WbD1HOqPSGoiyozrINlXShtZLpKg+7No
-         X5g+E8qXLpQL3kFEb3qBZVWYU9dStHW9suVuKxRH5I2ZgR/pRuszp9AZ6NFklMhjjRnN
-         O2THgS1HJhZXBeAbpHzx+W1uJyMRLlju0RfQnic71MEa1l5+ashu69mbHAoMBppwpSzt
-         b9hDNWdaJaTwI6NE3mH1Y25IfsbYHz+/YU5rFHIosxtG821/1ZJw1JquSjfcUoytZHr0
-         9zCQ==
+        d=gmail.com; s=20251104; t=1778350740; x=1778955540; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=J85h/DDiS1R+yV4gY6WSw7npft67Bb4Adxg28ToTKn8=;
+        b=NnmFcrr6pCJj3sK0t0eKMG/BdHJmiomjxFHX6bXOqSOgLKf3winbnNz4aTyZsHFYqW
+         gk5CSFzd9NIRkvgM4f26c6FiYzM2V4MpOskLPKYqampc7Prra14jbRhhidSr6yM3lrhl
+         wa1fw764WLuF7lWESrAUSGKxlVp0Tfb0HIgjCWuhpwfKAZVnxzh3/13NNinvsnlzuxmh
+         vPAML9o4k+7NTyHFThWpqO4pF8HvnmmrppUO7VH+lOMJMp3+AltDcE0D01vCJY2hZ0YP
+         BOG7WjH36q10Ujs3wm0+A7bt/6kn3qXxR9FzinYr8Q+zGPi4Ux8jGPPJfhPr8jJss6J7
+         IFsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778349221; x=1778954021;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=1B5tP3GQztShCRFPoRFfuuVT4/kaOVIg0k/U1NSjmC0=;
-        b=nSH9nLO4VuDlb2hL1NoKinrvIv8ZRtt1a5rUf+nZFgEnkKaaZ4RrY1IMcKbh82gFXt
-         rddIX5qJ1FAQKNh15YtHM71spJ6JhHLjS/CLFYPgsbnLrDnvTwAwks7jg2pmoyFRP/Pw
-         fbg9K8UGvH0GKULCuMUHm2cezgi6MnDTi3Fo2sIW48j/J7BimpxvxDxHlsyrqJRDk30F
-         cY93uF99lMp1VATQcXENR9jLEGs+BXQFa6wX6Vg1QABSFBbP3qrySbMiiXgHv927L5B3
-         T4YFa19zy26+vrlmhP3QPELmjAI0rgKegB4vx36zgf4tgoGWOlxPR29DQoiwaIg0PyDQ
-         f99w==
-X-Forwarded-Encrypted: i=1; AFNElJ9kUYoFYAlQYXzqss9RF+fdkeIvTg91Jiz+N5mEsTSpknuWEXuUOaMFFIaU6qra7bDsN1oeFIU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsK0lD+FT2vmyXHNI4a7rOtfoYtSLJSigi8gTGteK9LLJTj7zS
-	qPtlX/tyCxGrxWM7o7imN4zLk908b3JTo+YFefbuN9Yf7pQ5Jvlfv/tAeN70zWJJoefexeQ/fvb
-	ofsoyrF1rUaJnZWKDKeWS2ZeiDg2IXgNQmVcxoYNO
-X-Gm-Gg: Acq92OF3+SSC4Yxqtn03AkrSHcUk0+brS9M91KbZsi6SNNLZwjzuX69d7y4tlhpmjwF
-	UbDzOlTwdr9QMCWHg9casdi/pHwVU7McmritIF9o1q50DJK5fdHnrGYvU724QJbCckMGPfg1+vj
-	d/GnhBxGidYiR90oDBb2YdeQ8lEztDGq7B/4vcA+XfSZoFOdOwW1X5hRTv0uzTWHKakuf8ihU5/
-	MjT/Tk702H7g/Qg3WWZrM4SVn4NUkftCssROFiQLEtG0QmLYGCgysgXfS2rgIl3/piA3wvmNIjF
-	o63dXekWWQ12Nw6Hz0TmG9DcRfFkOJqlyriZUevPnuRRGV62EpKvd1w30+5/e9hqjk4wn4EkhQD
-	W7o0WKrUjKQdc8XDfL6NX6eTKpM6OWUU=
-X-Received: by 2002:ac8:5f14:0:b0:50e:5cc3:6f42 with SMTP id
- d75a77b69052e-514a0cf6c8fmr50395201cf.59.1778349220360; Sat, 09 May 2026
- 10:53:40 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1778350740; x=1778955540;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J85h/DDiS1R+yV4gY6WSw7npft67Bb4Adxg28ToTKn8=;
+        b=SkAyPPctME6oDCFzu9fpP9eA5mwIzF8XdIBNKg9PUuH6I6QfW1oQx2O2YWq3YjRvNW
+         AVU0R6LoWUL+B8+Ndmfk/gziIYic98mJr4AbY6d9RsyICedYGzmijqrTId+elAvVd7of
+         uyr1RVJWVDXoW5QfbrFTYzJZP6kTBx7FVPLbw/wJXLbHwFOKDFQj8JeYYqZCd+mEMLP4
+         gENm0E+Y3BzQyFn7ugWHiU1kkISRUd4POapTc3IvTK/Y7CGIKGSm3LTiGfqMD8gadaGk
+         VSLoF3KMd+9hq4BlUyCyNqxsUTXoqdvH33cViUFbT9iJxwNiiOPha9jXeRowIKf8q5ZH
+         OjPA==
+X-Gm-Message-State: AOJu0YzY0TkjvM6i5VYSYuOiQaul22Ffsfw9LMf/x0UAxnYDQ/yHajxp
+	GqT32CObu1JjmcryW3R7WpTy9MxXkhHB7kBqY/MlbZB1Qsx/jtnGbCcWaTLwrgjoGxM=
+X-Gm-Gg: Acq92OEx/1NNdIf9KtD/qbqRYKnSBr6sKFRC/UpInChj9Pt+TZ9uwv7Uab9yImkUlyL
+	1u6ds723yueKiUOdxEK0sVSE5UILG14kWLk5JEj5EomOJslNzmuIu9K8LmGRMriUPffAgct2g+N
+	Om/wAh9qdUGI4cbUuibAWG5hx2wAOBiC9zhJgpolLBF1LTRca7HLX943r8gtaBgIWP5iIiZSy/H
+	UENJbjwuA+joRoaunFyOmtuWD+lS2DWhIVBAKzYi5hSwtUXTsJJd6HA3Bm5QKzKPWhF9AzkKcQO
+	A5fLC5A23KM28G6ER8B7DW0smH1EQIUmwcfqCibnKAbM6+QNZbet65RLmu0k6uJZaoHuntBaejm
+	J3kmz2sGrk0tOIa4QByBaQefMiZHyjPTczVEt8rhEm5INr096W7xiQUtVUl4AEXz48x9l3cxFBB
+	y0GehfElyAmdGFmPAQF3VV6Q8drjlu1MlQ6YDkehRBAYkMszJ3jayvH5dH5JjpQzahwsj7OMSq9
+	pPkRkU/mg==
+X-Received: by 2002:a05:7300:642a:b0:2e6:ff79:e356 with SMTP id 5a478bee46e88-2f54c280859mr7978521eec.11.1778350739756;
+        Sat, 09 May 2026 11:18:59 -0700 (PDT)
+Received: from efaec68ba852.tailc0aff1.ts.net ([206.206.192.132])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2f8862d43b4sm6864346eec.11.2026.05.09.11.18.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 May 2026 11:18:58 -0700 (PDT)
+From: Weiming Shi <bestswngs@gmail.com>
+To: Jiri Pirko <jiri@resnulli.us>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	Xiang Mei <xmei5@asu.edu>,
+	Weiming Shi <bestswngs@gmail.com>
+Subject: [PATCH net v2] net: team: fix NULL pointer dereference in team_xmit during mode change
+Date: Sat,  9 May 2026 11:18:26 -0700
+Message-ID: <20260509181825.1523951-2-bestswngs@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260507221948.335726-1-edumazet@google.com> <20260507221948.335726-6-edumazet@google.com>
- <6b5d2268-ffaa-4746-87d0-8f16135aba44@mojatatu.com>
-In-Reply-To: <6b5d2268-ffaa-4746-87d0-8f16135aba44@mojatatu.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 9 May 2026 10:53:28 -0700
-X-Gm-Features: AVHnY4LBZr_K8I_MEEYpLloL7wmF8vR4-vNEvUr66i5ag32Sihw_RdjicnxRv1A
-Message-ID: <CANn89i+eK7w_VXW+vva_4Uy50mBPN-pT_oijYN0T-US-AK-dZA@mail.gmail.com>
-Subject: Re: [PATCH net-next 5/8] net/sched: add const qualifiers to
- gnet_stats helpers
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: B040E500D38
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 0134C500FB1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [6.34 / 15.00];
+	SEM_URIBL(3.50)[asu.edu:email];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	MAILLIST(-0.15)[generic];
+	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-286204-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,asu.edu,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
+	R_DKIM_ALLOW(0.00)[gmail.com:s=20251104];
+	GREYLIST(0.00)[pass,body];
+	TO_DN_SOME(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-286203-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_SPAM(0.00)[0.695];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
+	R_SPF_ALLOW(0.00)[+ip4:172.234.253.10:c];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Action: no action
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Action: add header
+X-Spam: Yes
 
-On Fri, May 8, 2026 at 11:33=E2=80=AFAM Victor Nogueira <victor@mojatatu.co=
-m> wrote:
->
-> On 07/05/2026 19:19, Eric Dumazet wrote:
-> > In preparation of lockless qdisc dumps, add const qualifiers to:
-> >
-> > - gnet_stats_add_basic()
-> > - gnet_stats_copy_basic()
-> > - gnet_stats_copy_queue()
-> > - gnet_stats_read_basic()
-> > - ___gnet_stats_copy_basic()
-> >
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > [...]
-> > diff --git a/net/core/gen_stats.c b/net/core/gen_stats.c
-> > index 1a2380e74272de8eaf3d4ef453e56105a31e9edf..3b2f9ea2eb072dde792aad5=
-b60cf00dcc2efa76d 100644
-> > --- a/net/core/gen_stats.c
-> > +++ b/net/core/gen_stats.c
-> > @@ -124,7 +124,7 @@ void gnet_stats_basic_sync_init(struct gnet_stats_b=
-asic_sync *b)
-> >   EXPORT_SYMBOL(gnet_stats_basic_sync_init);
-> >
-> >   static void gnet_stats_add_basic_cpu(struct gnet_stats_basic_sync *bs=
-tats,
-> > -                                  struct gnet_stats_basic_sync __percp=
-u *cpu)
-> > +                                  const struct gnet_stats_basic_sync _=
-_percpu *cpu)
->
-> This seems to be causing a compilation error:
->
-> net/core/gen_stats.c: In function =E2=80=98gnet_stats_add_basic_cpu=E2=80=
-=99:
-> ./include/linux/percpu-defs.h:238:1: error: initialization discards
-> =E2=80=98const=E2=80=99 qualifier from pointer target type [-Werror=3Ddis=
-carded-qualifiers]
->    238 | ({
->          \
->        | ^
-> net/core/gen_stats.c:133:54: note: in expansion of macro =E2=80=98per_cpu=
-_ptr=E2=80=99
->    133 |                 struct gnet_stats_basic_sync *bcpu =3D
-> per_cpu_ptr(cpu, i);
+__team_change_mode() clears team->ops with memset() before restoring
+safe dummy handlers via team_adjust_ops(). A concurrent team_xmit()
+running under RCU on another CPU can read team->ops.transmit during
+this window and call a NULL function pointer, crashing the kernel.
 
-Interesting, no error on my side wth gcc or clang.
+The race requires CAP_NET_ADMIN (in init_user_ns) to trigger via
+TEAM_CMD_OPTIONS_SET, plus AF_PACKET sendto() on a team device with
+forced carrier and no ports.
+
+ BUG: kernel NULL pointer dereference, address: 0000000000000000
+ Oops: 0010 [#1] SMP KASAN NOPTI
+ RIP: 0010:0x0
+ Call Trace:
+  team_xmit (drivers/net/team/team_core.c:1853)
+  dev_hard_start_xmit (net/core/dev.c:3904)
+  __dev_queue_xmit (net/core/dev.c:4871)
+  packet_sendmsg (net/packet/af_packet.c:3109)
+  __sys_sendto (net/socket.c:2265)
+
+Fix this on the writer side by replacing the memset()/memcpy() with
+per-field updates that keep transmit and receive always valid via
+smp_store_release(), paired with smp_load_acquire() on the reader
+side. A synchronize_net() before exit_op() drains in-flight readers
+before tearing down mode state.
+
+Fixes: 3d249d4ca7d0 ("net: introduce ethernet teaming device")
+Reported-by: Xiang Mei <xmei5@asu.edu>
+Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+---
+v2:
+ - Move fix from data path (reader-side NULL fallback) to
+   configuration path (writer-side per-field updates), as suggested
+   by the reviewer.
+ - Use smp_store_release()/smp_load_acquire() instead of plain
+   stores/loads for proper ordering on weakly-ordered architectures.
+ - Add synchronize_net() before exit_op() to drain in-flight readers
+   and prevent use-after-free of mode private state.
+
+ drivers/net/team/team_core.c | 46 ++++++++++++++++++++++++++----------
+ 1 file changed, 33 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
+index 0c87f9972..dabee3aa7 100644
+--- a/drivers/net/team/team_core.c
++++ b/drivers/net/team/team_core.c
+@@ -534,21 +534,22 @@ static void team_adjust_ops(struct team *team)
+ 
+ 	if (!team->tx_en_port_count || !team_is_mode_set(team) ||
+ 	    !team->mode->ops->transmit)
+-		team->ops.transmit = team_dummy_transmit;
++		smp_store_release(&team->ops.transmit, team_dummy_transmit);
+ 	else
+-		team->ops.transmit = team->mode->ops->transmit;
++		smp_store_release(&team->ops.transmit, team->mode->ops->transmit);
+ 
+ 	if (!team->rx_en_port_count || !team_is_mode_set(team) ||
+ 	    !team->mode->ops->receive)
+-		team->ops.receive = team_dummy_receive;
++		smp_store_release(&team->ops.receive, team_dummy_receive);
+ 	else
+-		team->ops.receive = team->mode->ops->receive;
++		smp_store_release(&team->ops.receive, team->mode->ops->receive);
+ }
+ 
+ /*
+- * We can benefit from the fact that it's ensured no port is present
+- * at the time of mode change. Therefore no packets are in fly so there's no
+- * need to set mode operations in any special way.
++ * team_change_mode() ensures no ports are present during mode change,
++ * but lockless readers (AF_PACKET) can still reach team_xmit(). Use
++ * smp_store_release() to publish safe dummy handlers before teardown,
++ * and synchronize_net() to drain in-flight readers.
+  */
+ static int __team_change_mode(struct team *team,
+ 			      const struct team_mode *new_mode)
+@@ -557,9 +558,23 @@ static int __team_change_mode(struct team *team,
+ 	if (team_is_mode_set(team)) {
+ 		void (*exit_op)(struct team *team) = team->ops.exit;
+ 
+-		/* Clear ops area so no callback is called any longer */
+-		memset(&team->ops, 0, sizeof(struct team_mode_ops));
+-		team_adjust_ops(team);
++		/* Install dummy handlers for locklessly-read hot-path ops
++		 * first, then clear cold-path ops that are only used under
++		 * RTNL.
++		 */
++		smp_store_release(&team->ops.transmit, team_dummy_transmit);
++		smp_store_release(&team->ops.receive, team_dummy_receive);
++		team->ops.init = NULL;
++		team->ops.exit = NULL;
++		team->ops.port_enter = NULL;
++		team->ops.port_leave = NULL;
++		team->ops.port_change_dev_addr = NULL;
++		team->ops.port_tx_disabled = NULL;
++
++		/* Ensure in-flight readers using old handlers have finished
++		 * before tearing down mode state they may depend on.
++		 */
++		synchronize_net();
+ 
+ 		if (exit_op)
+ 			exit_op(team);
+@@ -582,7 +597,12 @@ static int __team_change_mode(struct team *team,
+ 	}
+ 
+ 	team->mode = new_mode;
+-	memcpy(&team->ops, new_mode->ops, sizeof(struct team_mode_ops));
++	team->ops.init = new_mode->ops->init;
++	team->ops.exit = new_mode->ops->exit;
++	team->ops.port_enter = new_mode->ops->port_enter;
++	team->ops.port_leave = new_mode->ops->port_leave;
++	team->ops.port_change_dev_addr = new_mode->ops->port_change_dev_addr;
++	team->ops.port_tx_disabled = new_mode->ops->port_tx_disabled;
+ 	team_adjust_ops(team);
+ 
+ 	return 0;
+@@ -743,7 +763,7 @@ static rx_handler_result_t team_handle_frame(struct sk_buff **pskb)
+ 		/* allow exact match delivery for disabled ports */
+ 		res = RX_HANDLER_EXACT;
+ 	} else {
+-		res = team->ops.receive(team, port, skb);
++		res = smp_load_acquire(&team->ops.receive)(team, port, skb);
+ 	}
+ 	if (res == RX_HANDLER_ANOTHER) {
+ 		struct team_pcpu_stats *pcpu_stats;
+@@ -1845,7 +1865,7 @@ static netdev_tx_t team_xmit(struct sk_buff *skb, struct net_device *dev)
+ 
+ 	tx_success = team_queue_override_transmit(team, skb);
+ 	if (!tx_success)
+-		tx_success = team->ops.transmit(team, skb);
++		tx_success = smp_load_acquire(&team->ops.transmit)(team, skb);
+ 	if (tx_success) {
+ 		struct team_pcpu_stats *pcpu_stats;
+ 
+-- 
+2.43.0
+
 
