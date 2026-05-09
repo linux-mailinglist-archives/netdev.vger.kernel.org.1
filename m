@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-286100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286101-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QA/uOj2r/mkyuwAAu9opvQ
-	(envelope-from <netdev+bounces-286100-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 05:34:21 +0200
+	id KN5JAFCs/mkyuwAAu9opvQ
+	(envelope-from <netdev+bounces-286101-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 05:38:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A739C4FDE86
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 05:34:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A98E4FDEE8
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 05:38:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BDA5C3023DA7
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 03:34:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 84CFF307B07D
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 03:34:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D18B037BE6E;
-	Sat,  9 May 2026 03:34:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 293B9381AFC;
+	Sat,  9 May 2026 03:34:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l7dEtgdz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jv/xpnPv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
+Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54EB4381AFC
-	for <netdev@vger.kernel.org>; Sat,  9 May 2026 03:34:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52095382281
+	for <netdev@vger.kernel.org>; Sat,  9 May 2026 03:34:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778297653; cv=none; b=ofAjIO+x1bHgw6pwZ20NgwF2jV9RIxP0R+0B1O5/DO/F2KwAOMFINA+6zWkD3bLxVTVyJrw2uxHUn1jpA4SOXvAEZ5J3KWZ7GIAzrsFi7Fq36a12W4Iv3xiaEsCGM/wFBpJZAsZow/pwaT+JXTgsyLXACL+gHtaWwquQVVzJux0=
+	t=1778297656; cv=none; b=mt8o815squhv9MLplDpSxBrPdvYN972BHLlVshdOYnLQEuSE5Uq2p9L+eKLG/s3q+MwAeKh4NT7at5+S5Nrsx4VCgt/B/Q7i5s41xCdnH9jhJMkDpO3LpRmcu/MWT4je693Hdz1yp8PAPsmk9l/ksR7gYAWS4PLNNaMuIuKgicE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778297653; c=relaxed/simple;
-	bh=gdVwM1O3NHaJYyd05hJhAOkWnuvo0J6zyfeT5CSMGO0=;
+	s=arc-20240116; t=1778297656; c=relaxed/simple;
+	bh=RC7KUDm0vfRUyDesE9Dh/S40NqhnzqFOOKvD/Z5ywuo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Zmahyc6Y3dZecND5oHkDw+mlwRu3kt+3jjYNS72LDiixZFyNT36gb8iy70ATVVXl6iTWeUpNl+rGLwtueM0d8B/s3djZyWwp2zd3d+eENmyPV+Fz3RazbueAy279hNIPdwOHzk39nGGc5dMqy3FVBoaYlDc+js5+pSFHtPoDEvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l7dEtgdz; arc=none smtp.client-ip=74.125.82.43
+	 MIME-Version; b=ZEomjd/qhcZlcWmY50iTLaAqN4rAent/U1zBDtT5DI5ES2lSVbdtag/s9ksKL4iJt/bny3RHa/q98OMbQzCowbgbPdd/Jc801IQFcpHEefHU8N5NmKVeNrUqlnw8AFdO6UtH2Mb8NEWk1VD8Sb7MB5xdfyhX13HLanxDcMbr5e0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jv/xpnPv; arc=none smtp.client-ip=74.125.82.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-130b2295ed0so7725572c88.0
-        for <netdev@vger.kernel.org>; Fri, 08 May 2026 20:34:12 -0700 (PDT)
+Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-12c1a170a50so3741999c88.0
+        for <netdev@vger.kernel.org>; Fri, 08 May 2026 20:34:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778297651; x=1778902451; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778297653; x=1778902453; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6vOkoZCHqUk0sHRsVjfTCZpEX/siD7cO7/dfOVMynEg=;
-        b=l7dEtgdzP0TdJ7SpTsrZm0XmFPbc/+G3OTQWiOLuh0RXd9J3SpWiTBweIKr5t6PxiK
-         3kH9tZGtGCG38T6rJnEOHDbFrbIzgLAyshaTOL1TIuskNHWkSig+ImUCckr7z1eEudeC
-         J3V9oI3d3C6SAUX6bp0VqIRnazieXCA5WKvLSxiIuYGvEf8HzQQviFwoy8OS7dYDWM1h
-         GyMYCX5VxQrLU03pabuKG/SlKKj7ssq21dCevYMnGubaxe2HxvexY1EIvbEJPbM/g9y4
-         GnR2YOOqSLT9hsVaojCYOab7Hclwz60Nq8rvz6yM63H2lMTswR7J+4jZaopjXDULG1dx
-         kq/g==
+        bh=qwTDmMVV2Hq2IQrp233SiuNlHmlaz9y7w8F+WJgS2+o=;
+        b=Jv/xpnPv5lTxI2dcRuAIubpTOpamRbBxhgXdmB0XU8v27BI0GkZc5CxV1UI1izoVtK
+         DI3QGCsGhRYVVpS5AkMvq/VVjERMzcK5EMQJTjdR9q5cSw39vP69eKrgKliwe4sguAxO
+         1Uguncp13OJn3vNG492wlgWpUnObQedjPfiLhys1xmUesnpQdFr/cDCZhwCC2SlWNsgw
+         xeIQQJvh/YkYFvI5QWK6I+AErAR5NFY9RhbmW6Y3TULi15+BrOXiiT+/b5CmVs4nZlLG
+         cW2GpH5/XX7EsTxEy8KM5n1n6ja5XnR60FfJJJv9lpyx+ryDazbinsDqW7fYGQPhtBaZ
+         46qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778297651; x=1778902451;
+        d=1e100.net; s=20251104; t=1778297653; x=1778902453;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=6vOkoZCHqUk0sHRsVjfTCZpEX/siD7cO7/dfOVMynEg=;
-        b=qYjjCG61wklLFge6sWxrLTD+MNSRkA+Dj9lMWv6Ws9qY3MayWfc4gdQwwuhDdpztVp
-         DGytmiHCI7a3Zk0HsgV9xFMA5oKj9siAwYwHLU+MB7cEhu2KUNq/Ri41O8cnanWYKuQA
-         DQKU0i5ByrO6fleq+QgkQYDbX+3iK23KYxqJPOTvmA9g+aiuYS1jkwR4HLnUYKdI07O+
-         oSYgZJOljxyWnXaKOUN6pyiES0MI4+9/7VpEHH5+5Tl1nyn0XNnXMJazqOv7xSjPcVm4
-         nBHVh1rIk5jdgpP60oJ7iuO4mwZlRpQZAZl4ALoLy0O0aFi5InLmTIU1jpwoFShoZXlY
-         v4Tw==
-X-Gm-Message-State: AOJu0Yxln82de/gNPpTC7lS7ug79rji/1LIEDMZcG4FqU5hmMDJalr36
-	XUT6O8rnk+B6FnLDGCHd7kHn3Hq4k0pV/YK8XtopJcFqnXC7zfsOrKu4
-X-Gm-Gg: AeBDies3Y/pj92skjghd+YbMITHfOatzLlD33fsH82wRouU1UUhKxB3+utH7b0QoDA+
-	vIB8dJShUyv1wzr7seXKhDAxJAG3L+mi0ljM/sORSqDVaN3jcsY7Yo9rSvlGN3DKSMRfsogS5/Q
-	Yb5qW2vfDWzz6E1kM5pABVPVo1/3gapKj/UoD3RDVhgQtobvpmXVB8LXR3Z3ahbFAvhVwpI0J/Y
-	yjhlajkac629NgG9d+KC1Lf+u295Q1aoQngJd4x5PIB6cHL1g4UHZPR67JPBjlHeYi8t/bqzg/t
-	pmX4w0lDKakAQDRf44/8wGwB13bmSy43HQHO3NZzVVMMqx3Bzvx+Iby8OF6RcDEHEsI5wDZsN72
-	IoLL+yRNqRd6g4pdloiqjhgfw3VGJFd1YdI/4R8OqC/ECB1+DigLZ3g8xM3ho6HqJM3UeGIvRvV
-	VnGxvn9BzeUklsTlC6M7m1wg65gI05zD7BnSo=
-X-Received: by 2002:a05:7022:e981:b0:12d:de3e:cbfe with SMTP id a92af1059eb24-1318eb57b9dmr8244075c88.37.1778297651292;
-        Fri, 08 May 2026 20:34:11 -0700 (PDT)
+        bh=qwTDmMVV2Hq2IQrp233SiuNlHmlaz9y7w8F+WJgS2+o=;
+        b=NIcOlnPYOToIq3WINms6MMsveOU7rjQtDz3rI+3IUL9teIgOlHWjQLSXILPc18RNtB
+         vVbhCluvlU26WIboQ7Z7SlgA0LBcgGN2doIFO2DGXznmJ1NR490KWLaxQjut3/bH/HaD
+         a3yyd/ucU4ekGDDx0iYOyMS02ayZ6utm9oWNZlC3jcs5Q6nelUnm5blEpjWG8wqI4q2Y
+         st1yEWDTedz38PiM/S0P43Qwcn6VVU7ocPeT3MLqnQkaK2m0tKztc3E03d4ExB/RkCC2
+         5WxX5pR+V1nY0AlLW8+h9DekHaA+krW8iu+ktT9xjDnI19mfG4H+E5zhbprtSABe+Nu7
+         uPdw==
+X-Gm-Message-State: AOJu0YyPtMM6Fo+5vSlRK54rVKrrbraWKvmDf7T65rCPajy38vQxYMRR
+	CnF1fJgcXvKq6S7gtGM8Z1IW5eMwoGvsXS6H5nmpdjQXFr3WDx2ku7P4
+X-Gm-Gg: AeBDieuWIz8KMAr6yWB5k6pFb6nTlJXRL5qVtw/xxZtCForgwtvyGYyT/Za1paBtUVd
+	iuSAdK20DOqx5Zqon/U7jgcN2jzo0RWCPzg3kupNm5gp8lz4O7lp3hI/Gvs3x3pA2IojGFiviYd
+	hK10p0B2ppI2ZwdeU4ZEQ2qbiqE9SXbudTz1OINFZ1nhSHt7cHzt9XHGmzhWHgz1tRwuI/cwyTD
+	ABW1ZTURnb9IiDFsU8iDekic6JMrGICeWN5cV75Ej8kBCPGp8eFK7jVNLaAztSvucLhBUhCjHV8
+	HTPsLzwK3tnePn0MlLS2HBBhHme/uuUV8tO9R9TZSIfdRlZIQi0tTkh+j9aVVfQbiWoyaeKwRSW
+	aob1JJ6ylija3sVNaendkJEa6POwE03VHaFH5MdKoFKgX2s0YnWN66nUM9wsiVNZpkQ3njfItR1
+	MjGYG2hG0ts+rH43qqCuL8v9MxBgtt+7lVUc0=
+X-Received: by 2002:a05:7022:4182:b0:130:73ed:214 with SMTP id a92af1059eb24-131967d5111mr7372756c88.1.1778297653213;
+        Fri, 08 May 2026 20:34:13 -0700 (PDT)
 Received: from VM-16-24-fedora.. ([43.153.32.141])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1327821fc59sm5500989c88.7.2026.05.08.20.34.10
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1327821fc59sm5500989c88.7.2026.05.08.20.34.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 20:34:10 -0700 (PDT)
+        Fri, 08 May 2026 20:34:12 -0700 (PDT)
 From: alexjlzheng@gmail.com
 X-Google-Original-From: alexjlzheng@tencent.com
 To: sd@queasysnail.net,
@@ -91,9 +91,9 @@ To: sd@queasysnail.net,
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Jinliang Zheng <alexjlzheng@tencent.com>
-Subject: [PATCH net v3 v3 1/3] macsec: introduce dedicated workqueue for SA crypto cleanup
-Date: Sat,  9 May 2026 11:33:45 +0800
-Message-ID: <20260509033353.1814289-2-alexjlzheng@tencent.com>
+Subject: [PATCH net v3 v3 2/3] macsec: use rcu_work to defer RX SA crypto cleanup out of softirq
+Date: Sat,  9 May 2026 11:33:46 +0800
+Message-ID: <20260509033353.1814289-3-alexjlzheng@tencent.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20260509033353.1814289-1-alexjlzheng@tencent.com>
 References: <20260509033353.1814289-1-alexjlzheng@tencent.com>
@@ -104,7 +104,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: A739C4FDE86
+X-Rspamd-Queue-Id: 4A98E4FDEE8
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -112,11 +112,11 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286100-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286101-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_TLS_LAST(0.00)[];
@@ -129,7 +129,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[alexjlzheng@gmail.com,netdev@vger.kernel.org]
@@ -137,94 +137,96 @@ X-Rspamd-Action: no action
 
 From: Jinliang Zheng <alexjlzheng@tencent.com>
 
-Introduce a dedicated ordered workqueue, macsec_wq, which will be used
-by subsequent patches to defer SA crypto cleanup (crypto_free_aead and
-related teardown) out of softirq context.
+crypto_free_aead() can internally invoke vunmap() (e.g. via
+dma_free_attrs() in hardware crypto drivers such as hisi_sec2).
+vunmap() must not be called from softirq context, but free_rxsa()
+is an RCU callback that runs in softirq, leading to a kernel crash:
 
-Using a dedicated workqueue instead of system_wq allows macsec_exit()
-to drain exactly the work items belonging to this module via
-destroy_workqueue(), without interfering with unrelated work items on
-system_wq or causing unexpected delays elsewhere.
+  vunmap+0x4c/0x70
+  __iommu_dma_free+0xd0/0x138
+  dma_free_attrs+0xf4/0x100
+  sec_aead_exit+0x64/0xb8 [hisi_sec2]
+  crypto_destroy_tfm+0x98/0x110
+  free_rxsa+0x28/0x50 [macsec]
+  rcu_do_batch+0x184/0x460
+  rcu_core+0xf4/0x1f8
+  handle_softirqs+0x118/0x330
 
-rcu_barrier() in macsec_exit() ensures all in-flight rcu_work callbacks
-have enqueued their work items before destroy_workqueue() drains and
-destroys the queue, making the two-step teardown correct and complete.
-The same sequence is kept in the error path of macsec_init() as a
-precaution, to mirror macsec_exit() and stay safe if work ever becomes
-queueable before this point in the future.
+Use rcu_work to defer the cleanup to a workqueue. rcu_work dispatches
+the worker asynchronously after the RCU grace period, so no thread
+blocks waiting, and concurrent releases of multiple SAs naturally
+share the same grace period.
 
-While at it, rename the error labels in macsec_init() from the
-resource-named style (rtnl:, notifier:, wq:) to the err_xxx: style
-(err_rtnl:, err_notifier:, err_destroy_wq:) to align with the broader
-kernel convention.
-
+Fixes: c09440f7dcb3 ("macsec: introduce IEEE 802.1AE driver")
 Signed-off-by: Jinliang Zheng <alexjlzheng@tencent.com>
 ---
- drivers/net/macsec.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+ drivers/net/macsec.c | 8 +++++---
+ include/net/macsec.h | 4 +++-
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
-index f6cad0746a02..52d6dd03ac92 100644
+index 52d6dd03ac92..67e4e3f439c7 100644
 --- a/drivers/net/macsec.c
 +++ b/drivers/net/macsec.c
-@@ -26,6 +26,8 @@
+@@ -176,9 +176,10 @@ static void macsec_rxsc_put(struct macsec_rx_sc *sc)
+ 		call_rcu(&sc->rcu_head, free_rx_sc_rcu);
+ }
  
- #include <uapi/linux/if_macsec.h>
- 
-+static struct workqueue_struct *macsec_wq;
-+
- /* SecTAG length = macsec_eth_header without the optional SCI */
- #define MACSEC_TAG_LEN 6
- 
-@@ -4450,25 +4452,35 @@ static int __init macsec_init(void)
+-static void free_rxsa(struct rcu_head *head)
++static void free_rxsa_work(struct work_struct *work)
  {
- 	int err;
+-	struct macsec_rx_sa *sa = container_of(head, struct macsec_rx_sa, rcu);
++	struct macsec_rx_sa *sa =
++		container_of(to_rcu_work(work), struct macsec_rx_sa, destroy_work);
  
-+	macsec_wq = alloc_ordered_workqueue("macsec", 0);
-+	if (!macsec_wq)
-+		return -ENOMEM;
-+
- 	pr_info("MACsec IEEE 802.1AE\n");
- 	err = register_netdevice_notifier(&macsec_notifier);
- 	if (err)
--		return err;
-+		goto err_destroy_wq;
+ 	crypto_free_aead(sa->key.tfm);
+ 	free_percpu(sa->stats);
+@@ -188,7 +189,7 @@ static void free_rxsa(struct rcu_head *head)
+ static void macsec_rxsa_put(struct macsec_rx_sa *sa)
+ {
+ 	if (refcount_dec_and_test(&sa->refcnt))
+-		call_rcu(&sa->rcu, free_rxsa);
++		queue_rcu_work(macsec_wq, &sa->destroy_work);
+ }
  
- 	err = rtnl_link_register(&macsec_link_ops);
- 	if (err)
--		goto notifier;
-+		goto err_notifier;
- 
- 	err = genl_register_family(&macsec_fam);
- 	if (err)
--		goto rtnl;
-+		goto err_rtnl;
+ static struct macsec_tx_sa *macsec_txsa_get(struct macsec_tx_sa __rcu *ptr)
+@@ -1409,6 +1410,7 @@ static int init_rx_sa(struct macsec_rx_sa *rx_sa, char *sak, int key_len,
+ 	rx_sa->next_pn = 1;
+ 	refcount_set(&rx_sa->refcnt, 1);
+ 	spin_lock_init(&rx_sa->lock);
++	INIT_RCU_WORK(&rx_sa->destroy_work, free_rxsa_work);
  
  	return 0;
- 
--rtnl:
-+err_rtnl:
- 	rtnl_link_unregister(&macsec_link_ops);
--notifier:
-+err_notifier:
- 	unregister_netdevice_notifier(&macsec_notifier);
-+err_destroy_wq:
-+	/* Precautionary, mirrors macsec_exit() to stay safe if work
-+	 * ever becomes queueable before this point in the future.
-+	 */
-+	rcu_barrier();
-+	destroy_workqueue(macsec_wq);
- 	return err;
  }
+diff --git a/include/net/macsec.h b/include/net/macsec.h
+index bc7de5b53e54..0980ef36fbf0 100644
+--- a/include/net/macsec.h
++++ b/include/net/macsec.h
+@@ -9,6 +9,7 @@
  
-@@ -4478,6 +4490,7 @@ static void __exit macsec_exit(void)
- 	rtnl_link_unregister(&macsec_link_ops);
- 	unregister_netdevice_notifier(&macsec_notifier);
- 	rcu_barrier();
-+	destroy_workqueue(macsec_wq);
- }
+ #include <linux/u64_stats_sync.h>
+ #include <linux/if_vlan.h>
++#include <linux/workqueue.h>
+ #include <uapi/linux/if_link.h>
+ #include <uapi/linux/if_macsec.h>
  
- module_init(macsec_init);
+@@ -123,6 +124,7 @@ struct macsec_dev_stats {
+  * @key: key structure
+  * @ssci: short secure channel identifier
+  * @stats: per-SA stats
++ * @destroy_work: deferred work to free the SA in process context after RCU grace period
+  */
+ struct macsec_rx_sa {
+ 	struct macsec_key key;
+@@ -136,7 +138,7 @@ struct macsec_rx_sa {
+ 	bool active;
+ 	struct macsec_rx_sa_stats __percpu *stats;
+ 	struct macsec_rx_sc *sc;
+-	struct rcu_head rcu;
++	struct rcu_work destroy_work;
+ };
+ 
+ struct pcpu_rx_sc_stats {
 -- 
 2.39.3
 
