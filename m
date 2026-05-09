@@ -1,162 +1,372 @@
-Return-Path: <netdev+bounces-286215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286216-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0E4TKAec/2mZ8QAAu9opvQ
-	(envelope-from <netdev+bounces-286215-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 22:41:43 +0200
+	id eCGrJEGg/2lH8gAAu9opvQ
+	(envelope-from <netdev+bounces-286216-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 22:59:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45582501633
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 22:41:43 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECEE7501694
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 22:59:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A6426300381D
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 20:41:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 92FC03009019
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 20:59:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 643D635A3A9;
-	Sat,  9 May 2026 20:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A96F438238A;
+	Sat,  9 May 2026 20:59:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="0/fcOC0x"
+	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="YMNq6lpp"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A737213635E;
-	Sat,  9 May 2026 20:41:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC14F386571
+	for <netdev@vger.kernel.org>; Sat,  9 May 2026 20:59:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778359299; cv=none; b=B/g6ne/LB7E2Y9geBCoIQ3PeNgPDvZpRNQiIiXGl/9z5+oRNyZgtY5Qm5o6BkJuKYj8E7LmxfDOciLzaJ4y0RKEsoivoyOdEbug9wHPxUCoOiIZ/eqWBwxlMKYBlsh/oxig6/0L33+3erUflyhXBK4jYQW+pAJJNY9gUDK4n614=
+	t=1778360381; cv=none; b=IwC0S6hiYT5x0z3NOOUin/NMeiBfHIwXaJcW88EZfOw6mSVszBBtXpTwCQvS0UVfP6EnmgBqAIks71Lw73pvCSp2FV+HXJJHs/5LHX9nJJQyBQJSQvMOpvl0E82PXZTSr1f3alyskCyys0sC4xY8H3I4bU891K+HUVcPdZ2T9/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778359299; c=relaxed/simple;
-	bh=IvbiowIyJzp/HWMWybhmqyEgvwDPaciIa/5gxI4tNzk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iWA598KG6fcJJlSw4ojHyl9nNm+i3C/PMdRI0eto+rsLdufs3sQRsq7syZE+MnXbbG9fMqI7w8Cfm6BHe69tJ4nfvDgyl94oV/QCHgG6RnFw5gSHK3Lzj+H3JTvnMo5PWAS9r6589Yn8y+0E/QTmdl+XEnnSzfJo/s5U6MUiF+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=0/fcOC0x; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=8Ll9UzEIFrA/Y2cg4MLqHpnXwj68nPuPZz+mPcUm9t4=; b=0/fcOC0xnzptOC8GRNsT8GfFML
-	TkDvmgtlcMrnt76s8JV2j92mXn4OBEmAzTBIO8YZ0S1UuQPWwf4cb/yyRVt0fjaGJjySBHFqFlWB8
-	cUhjdhVm9N8HC8IZfwIizFSSFN1KQPeXU8mStMitD3pp+z9r+WPZUouA0UM7fu1l0oi7I6IEUnbPn
-	+stFVqmhBKWbRscWdfWMk94qnObTT9GlsTAQCJTQlptE+u7ifOPWCDKqvg+djKBRfdUwjd56fZD0q
-	7VsGmcVvUs8nYipfnyBE09xWL2LVI6qhTneI6OZ+M/Yc7aFuKKsbNwKxDQtZzzjz+MmLuEjGwEXk6
-	YzDJOwdg==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wLoUJ-00000009dBh-1fcW;
-	Sat, 09 May 2026 20:41:27 +0000
-Message-ID: <5cc6c7e2-f870-47fd-8fcc-0e4c2b978f2e@infradead.org>
-Date: Sat, 9 May 2026 13:41:26 -0700
+	s=arc-20240116; t=1778360381; c=relaxed/simple;
+	bh=MzIviuSn6WROBtiWfEj7lk3KXY5nGzLSMqcPdQsN8ZM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YGv+DAuWyQOA/Qswaxsf6jQUX5R5Wd+U+oYsRXdDrEKT+68B/9MBD1gkZu0Vfej+MZuQlsg5MWMrQEBrKh51S2A0pbN/+tHUJyfdiHhWl+0JvTbXJJbHEQzteWsvC3s0xp6L7rl1lHpap5yx60IB9OlI6fW2eBRgOHTC3YxXInY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=YMNq6lpp; arc=none smtp.client-ip=212.77.101.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+Received: (wp-smtpd smtp.wp.pl 20747 invoked from network); 9 May 2026 22:59:35 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
+          t=1778360375; bh=fBZDCOIOyh9U7gxfxmh0aRKlRwrZ21RbZ5QvCtUKxMU=;
+          h=From:To:Cc:Subject;
+          b=YMNq6lppvArpU65UFSvWq+VKmHQpSf8LO2Dg5J/kX/1Stx7MUZlQIcYEyYgHWTc0d
+           wGBeqnLGPDy+CLVCnsh8Nh4xFnUcd/uKTlhXoKYOQJyViB0ePpaSP6FiCkirkXp9Dl
+           MzPGyMr/X9Tk/+1ec2jw4h4kze5Nx7Hteoas8RzA34uhpp4AlNRV5+FtUfIUO1pBSr
+           4dDORheVwCLoeL5IiNDGYkiuMCCfD6aoS7U5H4AQVVCNYGqVEEBG1qfr5HfY3JX/aw
+           +u0+3PfyegONxI+cKhtCRlsVOHl0fo5bTreCO72dls0PTxXMisCuDQ33sMB+HY+WK2
+           GiOeqxvX2W0Pw==
+Received: from 83.6.112.20.ipv4.supernova.orange.pl (HELO abajkowski.lan) (olek2@wp.pl@[83.6.112.20])
+          (envelope-sender <olek2@wp.pl>)
+          by smtp.wp.pl (WP-SMTPD) with TLS_AES_256_GCM_SHA384 encrypted SMTP
+          for <andrew@lunn.ch>; 9 May 2026 22:59:35 +0200
+From: Aleksander Jan Bajkowski <olek2@wp.pl>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
+Subject: [PATCH] net: phy: intel-xway: add PHY-level statistics via ethtool
+Date: Sat,  9 May 2026 22:59:27 +0200
+Message-ID: <20260509205933.3965832-1-olek2@wp.pl>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/5] docs: fix repeated prepositions across documentation
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Shuah Khan <skhan@linuxfoundation.org>,
- Adrien Reynard <reynard.adrien.08@gmail.com>,
- Andrey Ryabinin <ryabinin.a.a@gmail.com>,
- Alexander Potapenko <glider@google.com>,
- Andrey Konovalov <andreyknvl@gmail.com>, Dmitry Vyukov <dvyukov@google.com>,
- Vincenzo Frascino <vincenzo.frascino@arm.com>,
- Jonathan Corbet <corbet@lwn.net>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- "open list:KASAN" <kasan-dev@googlegroups.com>,
- "open list:DOCUMENTATION PROCESS" <workflows@vger.kernel.org>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
- "open list:USER-MODE LINUX (UML)" <linux-um@lists.infradead.org>
-References: <20260508163804.16267-1-reynard.adrien.08@gmail.com>
- <2b771350-0562-4cb1-b9b3-cc3ce59b1a63@linuxfoundation.org>
- <3c6cde1a-9ce0-4d63-ba89-820c596cff3e@lunn.ch>
- <27c61395-f04f-420c-9a84-7e27773f2027@infradead.org>
- <3b4357a7-f70d-41b0-a75d-c30f9fb7dd98@lunn.ch>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <3b4357a7-f70d-41b0-a75d-c30f9fb7dd98@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 45582501633
+Content-Transfer-Encoding: 8bit
+X-WP-DKIM-Status: good (id: wp.pl)                                                      
+X-WP-MailID: b805c9ad648ce4112a190b2abe5c63de
+X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
+X-WP-SPAM: NO 0000000 [QaOU]                               
+X-Rspamd-Queue-Id: ECEE7501694
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=bombadil.20210309];
+	DMARC_POLICY_ALLOW(-0.50)[wp.pl,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[wp.pl:s=20241105];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-286216-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[wp.pl];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286215-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
-	FREEMAIL_CC(0.00)[linuxfoundation.org,gmail.com,google.com,arm.com,lwn.net,davemloft.net,kernel.org,redhat.com,nod.at,cambridgegreys.com,sipsolutions.net,googlegroups.com,vger.kernel.org,lists.infradead.org];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_FROM(0.00)[wp.pl];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rdunlap@infradead.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[olek2@wp.pl,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[wp.pl:+];
+	NEURAL_HAM(-0.00)[-0.995];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:mid,infradead.org:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[wp.pl:email,wp.pl:mid,wp.pl:dkim]
 X-Rspamd-Action: no action
 
+Report PCS receive error counts for all supported PEF 7061, 7071, 7072 and
+xRX200 PHYs.
 
+Accumulate the vendor-specific PHY_ERRCNT read-clear counter
+(SEL=RXERR) in .update_stats() and expose it as both IEEE 802.3
+SymbolErrorDuringCarrier and generic rx_errors via
+.get_phy_stats().
 
-On 5/9/26 12:39 PM, Andrew Lunn wrote:
->>> Can we get the tool changed to add a warning, something like:
->>>
->>>   WARNING: This tool uses very simple pattern matching to look for
->>>   repeated words. It does not understand the complexity of English,
->>>   and will often result in false positive reports. Please assume it is
->>>   wrong until proven otherwise.
->>
->> There was no commit log and no cover letter AFAIK.
->> Do we know what tool was used?
->>
->> Adrien, how did you discover these repeated words?
->>
->> (If it's my script from 2021, I'll gladly update it.)
+Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+---
+ drivers/net/phy/intel-xway.c | 79 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 79 insertions(+)
 
-Adrien is not using my script -- they developed their own script.
-
-> Thinking about it some more, i think the warning might actually need
-> to be different.
-> 
-> If this tool has been around since 2021, all the real problems have
-> been solved, leaving only the false positives. So the warning probably
-> needs to be much stronger, saying that it probably only reports false
-> positives, unless the code is new.
-
-Makes some sense.
-
-
-> Maybe we also want to extend the tool to have a list all the known
-> false positives?
-
-I'm not crazy about that one. And we have no evidence that I am aware
-of that my script is causing any of these patches.
-
-
+diff --git a/drivers/net/phy/intel-xway.c b/drivers/net/phy/intel-xway.c
+index 12ff4c1f285d..afbcec711744 100644
+--- a/drivers/net/phy/intel-xway.c
++++ b/drivers/net/phy/intel-xway.c
+@@ -10,11 +10,16 @@
+ #include <linux/of.h>
+ #include <linux/bitfield.h>
+ 
++#define XWAY_MDIO_ERRCNT		0x15	/* error counter */
+ #define XWAY_MDIO_MIICTRL		0x17	/* mii control */
+ #define XWAY_MDIO_IMASK			0x19	/* interrupt mask */
+ #define XWAY_MDIO_ISTAT			0x1A	/* interrupt status */
+ #define XWAY_MDIO_LED			0x1B	/* led control */
+ 
++#define XWAY_MDIO_ERRCNT_SEL		GENMASK(11, 8)
++#define XWAY_MDIO_ERRCNT_COUNT		GENMASK(7, 0)
++#define XWAY_MDIO_ERRCNT_SEL_RXERR	0
++
+ #define XWAY_MDIO_MIICTRL_RXSKEW_MASK	GENMASK(14, 12)
+ #define XWAY_MDIO_MIICTRL_TXSKEW_MASK	GENMASK(10, 8)
+ 
+@@ -169,6 +174,10 @@
+ #define PHY_ID_PHY11G_VR9_1_2		0xD565A409
+ #define PHY_ID_PHY22F_VR9_1_2		0xD565A419
+ 
++struct xway_gphy_priv {
++	u64 rx_errors;
++};
++
+ static const int xway_internal_delay[] = {0, 500, 1000, 1500, 2000, 2500,
+ 					 3000, 3500};
+ 
+@@ -299,6 +308,21 @@ static int xway_gphy_config_init(struct phy_device *phydev)
+ 	if (err)
+ 		return err;
+ 
++	/* Count MDI RX errors (SymbolErrorDuringCarrier) */
++	return phy_write(phydev, XWAY_MDIO_ERRCNT,
++			 FIELD_PREP(XWAY_MDIO_ERRCNT_SEL, XWAY_MDIO_ERRCNT_SEL_RXERR));
++}
++
++static int xway_gphy_probe(struct phy_device *phydev)
++{
++	struct device *dev = &phydev->mdio.dev;
++	struct xway_gphy_priv *priv;
++
++	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
++	if (!priv)
++		return -ENOMEM;
++	phydev->priv = priv;
++
+ 	return 0;
+ }
+ 
+@@ -532,6 +556,31 @@ static int xway_gphy_led_polarity_set(struct phy_device *phydev, int index,
+ 	return -EINVAL;
+ }
+ 
++static int xway_gphy_update_stats(struct phy_device *phydev)
++{
++	struct xway_gphy_priv *priv = phydev->priv;
++	int ret;
++
++	/* XWAY_MDIO_ERRCNT: 8-bit read-clear counter, SEL set to RXERR */
++	ret = phy_read(phydev, XWAY_MDIO_ERRCNT);
++	if (ret < 0)
++		return ret;
++
++	priv->rx_errors += FIELD_GET(XWAY_MDIO_ERRCNT_COUNT, ret);
++
++	return 0;
++}
++
++static void xway_gphy_get_phy_stats(struct phy_device *phydev,
++				    struct ethtool_eth_phy_stats *eth_stats,
++				    struct ethtool_phy_stats *stats)
++{
++	struct xway_gphy_priv *priv = phydev->priv;
++
++	eth_stats->SymbolErrorDuringCarrier = priv->rx_errors;
++	stats->rx_errors = priv->rx_errors;
++}
++
+ static struct phy_driver xway_gphy[] = {
+ 	{
+ 		.phy_id		= PHY_ID_PHY11G_1_3,
+@@ -539,6 +588,7 @@ static struct phy_driver xway_gphy[] = {
+ 		.name		= "Intel XWAY PHY11G (PEF 7071/PEF 7072) v1.3",
+ 		/* PHY_GBIT_FEATURES */
+ 		.config_init	= xway_gphy_config_init,
++		.probe		= xway_gphy_probe,
+ 		.config_aneg	= xway_gphy14_config_aneg,
+ 		.handle_interrupt = xway_gphy_handle_interrupt,
+ 		.config_intr	= xway_gphy_config_intr,
+@@ -549,12 +599,15 @@ static struct phy_driver xway_gphy[] = {
+ 		.led_hw_control_get = xway_gphy_led_hw_control_get,
+ 		.led_hw_control_set = xway_gphy_led_hw_control_set,
+ 		.led_polarity_set = xway_gphy_led_polarity_set,
++		.update_stats	= xway_gphy_update_stats,
++		.get_phy_stats	= xway_gphy_get_phy_stats,
+ 	}, {
+ 		.phy_id		= PHY_ID_PHY22F_1_3,
+ 		.phy_id_mask	= 0xffffffff,
+ 		.name		= "Intel XWAY PHY22F (PEF 7061) v1.3",
+ 		/* PHY_BASIC_FEATURES */
+ 		.config_init	= xway_gphy_config_init,
++		.probe		= xway_gphy_probe,
+ 		.config_aneg	= xway_gphy14_config_aneg,
+ 		.handle_interrupt = xway_gphy_handle_interrupt,
+ 		.config_intr	= xway_gphy_config_intr,
+@@ -565,12 +618,15 @@ static struct phy_driver xway_gphy[] = {
+ 		.led_hw_control_get = xway_gphy_led_hw_control_get,
+ 		.led_hw_control_set = xway_gphy_led_hw_control_set,
+ 		.led_polarity_set = xway_gphy_led_polarity_set,
++		.update_stats	= xway_gphy_update_stats,
++		.get_phy_stats	= xway_gphy_get_phy_stats,
+ 	}, {
+ 		.phy_id		= PHY_ID_PHY11G_1_4,
+ 		.phy_id_mask	= 0xffffffff,
+ 		.name		= "Intel XWAY PHY11G (PEF 7071/PEF 7072) v1.4",
+ 		/* PHY_GBIT_FEATURES */
+ 		.config_init	= xway_gphy_config_init,
++		.probe		= xway_gphy_probe,
+ 		.config_aneg	= xway_gphy14_config_aneg,
+ 		.handle_interrupt = xway_gphy_handle_interrupt,
+ 		.config_intr	= xway_gphy_config_intr,
+@@ -581,12 +637,15 @@ static struct phy_driver xway_gphy[] = {
+ 		.led_hw_control_get = xway_gphy_led_hw_control_get,
+ 		.led_hw_control_set = xway_gphy_led_hw_control_set,
+ 		.led_polarity_set = xway_gphy_led_polarity_set,
++		.update_stats	= xway_gphy_update_stats,
++		.get_phy_stats	= xway_gphy_get_phy_stats,
+ 	}, {
+ 		.phy_id		= PHY_ID_PHY22F_1_4,
+ 		.phy_id_mask	= 0xffffffff,
+ 		.name		= "Intel XWAY PHY22F (PEF 7061) v1.4",
+ 		/* PHY_BASIC_FEATURES */
+ 		.config_init	= xway_gphy_config_init,
++		.probe		= xway_gphy_probe,
+ 		.config_aneg	= xway_gphy14_config_aneg,
+ 		.handle_interrupt = xway_gphy_handle_interrupt,
+ 		.config_intr	= xway_gphy_config_intr,
+@@ -597,12 +656,15 @@ static struct phy_driver xway_gphy[] = {
+ 		.led_hw_control_get = xway_gphy_led_hw_control_get,
+ 		.led_hw_control_set = xway_gphy_led_hw_control_set,
+ 		.led_polarity_set = xway_gphy_led_polarity_set,
++		.update_stats	= xway_gphy_update_stats,
++		.get_phy_stats	= xway_gphy_get_phy_stats,
+ 	}, {
+ 		.phy_id		= PHY_ID_PHY11G_1_5,
+ 		.phy_id_mask	= 0xffffffff,
+ 		.name		= "Intel XWAY PHY11G (PEF 7071/PEF 7072) v1.5 / v1.6",
+ 		/* PHY_GBIT_FEATURES */
+ 		.config_init	= xway_gphy_config_init,
++		.probe		= xway_gphy_probe,
+ 		.handle_interrupt = xway_gphy_handle_interrupt,
+ 		.config_intr	= xway_gphy_config_intr,
+ 		.suspend	= genphy_suspend,
+@@ -612,12 +674,15 @@ static struct phy_driver xway_gphy[] = {
+ 		.led_hw_control_get = xway_gphy_led_hw_control_get,
+ 		.led_hw_control_set = xway_gphy_led_hw_control_set,
+ 		.led_polarity_set = xway_gphy_led_polarity_set,
++		.update_stats	= xway_gphy_update_stats,
++		.get_phy_stats	= xway_gphy_get_phy_stats,
+ 	}, {
+ 		.phy_id		= PHY_ID_PHY22F_1_5,
+ 		.phy_id_mask	= 0xffffffff,
+ 		.name		= "Intel XWAY PHY22F (PEF 7061) v1.5 / v1.6",
+ 		/* PHY_BASIC_FEATURES */
+ 		.config_init	= xway_gphy_config_init,
++		.probe		= xway_gphy_probe,
+ 		.handle_interrupt = xway_gphy_handle_interrupt,
+ 		.config_intr	= xway_gphy_config_intr,
+ 		.suspend	= genphy_suspend,
+@@ -627,12 +692,15 @@ static struct phy_driver xway_gphy[] = {
+ 		.led_hw_control_get = xway_gphy_led_hw_control_get,
+ 		.led_hw_control_set = xway_gphy_led_hw_control_set,
+ 		.led_polarity_set = xway_gphy_led_polarity_set,
++		.update_stats	= xway_gphy_update_stats,
++		.get_phy_stats	= xway_gphy_get_phy_stats,
+ 	}, {
+ 		.phy_id		= PHY_ID_PHY11G_VR9_1_1,
+ 		.phy_id_mask	= 0xffffffff,
+ 		.name		= "Intel XWAY PHY11G (xRX v1.1 integrated)",
+ 		/* PHY_GBIT_FEATURES */
+ 		.config_init	= xway_gphy_config_init,
++		.probe		= xway_gphy_probe,
+ 		.handle_interrupt = xway_gphy_handle_interrupt,
+ 		.config_intr	= xway_gphy_config_intr,
+ 		.suspend	= genphy_suspend,
+@@ -642,12 +710,15 @@ static struct phy_driver xway_gphy[] = {
+ 		.led_hw_control_get = xway_gphy_led_hw_control_get,
+ 		.led_hw_control_set = xway_gphy_led_hw_control_set,
+ 		.led_polarity_set = xway_gphy_led_polarity_set,
++		.update_stats	= xway_gphy_update_stats,
++		.get_phy_stats	= xway_gphy_get_phy_stats,
+ 	}, {
+ 		.phy_id		= PHY_ID_PHY22F_VR9_1_1,
+ 		.phy_id_mask	= 0xffffffff,
+ 		.name		= "Intel XWAY PHY22F (xRX v1.1 integrated)",
+ 		/* PHY_BASIC_FEATURES */
+ 		.config_init	= xway_gphy_config_init,
++		.probe		= xway_gphy_probe,
+ 		.handle_interrupt = xway_gphy_handle_interrupt,
+ 		.config_intr	= xway_gphy_config_intr,
+ 		.suspend	= genphy_suspend,
+@@ -657,12 +728,15 @@ static struct phy_driver xway_gphy[] = {
+ 		.led_hw_control_get = xway_gphy_led_hw_control_get,
+ 		.led_hw_control_set = xway_gphy_led_hw_control_set,
+ 		.led_polarity_set = xway_gphy_led_polarity_set,
++		.update_stats	= xway_gphy_update_stats,
++		.get_phy_stats	= xway_gphy_get_phy_stats,
+ 	}, {
+ 		.phy_id		= PHY_ID_PHY11G_VR9_1_2,
+ 		.phy_id_mask	= 0xffffffff,
+ 		.name		= "Intel XWAY PHY11G (xRX v1.2 integrated)",
+ 		/* PHY_GBIT_FEATURES */
+ 		.config_init	= xway_gphy_config_init,
++		.probe		= xway_gphy_probe,
+ 		.handle_interrupt = xway_gphy_handle_interrupt,
+ 		.config_intr	= xway_gphy_config_intr,
+ 		.suspend	= genphy_suspend,
+@@ -672,12 +746,15 @@ static struct phy_driver xway_gphy[] = {
+ 		.led_hw_control_get = xway_gphy_led_hw_control_get,
+ 		.led_hw_control_set = xway_gphy_led_hw_control_set,
+ 		.led_polarity_set = xway_gphy_led_polarity_set,
++		.update_stats	= xway_gphy_update_stats,
++		.get_phy_stats	= xway_gphy_get_phy_stats,
+ 	}, {
+ 		.phy_id		= PHY_ID_PHY22F_VR9_1_2,
+ 		.phy_id_mask	= 0xffffffff,
+ 		.name		= "Intel XWAY PHY22F (xRX v1.2 integrated)",
+ 		/* PHY_BASIC_FEATURES */
+ 		.config_init	= xway_gphy_config_init,
++		.probe		= xway_gphy_probe,
+ 		.handle_interrupt = xway_gphy_handle_interrupt,
+ 		.config_intr	= xway_gphy_config_intr,
+ 		.suspend	= genphy_suspend,
+@@ -687,6 +764,8 @@ static struct phy_driver xway_gphy[] = {
+ 		.led_hw_control_get = xway_gphy_led_hw_control_get,
+ 		.led_hw_control_set = xway_gphy_led_hw_control_set,
+ 		.led_polarity_set = xway_gphy_led_polarity_set,
++		.update_stats	= xway_gphy_update_stats,
++		.get_phy_stats	= xway_gphy_get_phy_stats,
+ 	},
+ };
+ module_phy_driver(xway_gphy);
 -- 
-~Randy
+2.53.0
 
 
