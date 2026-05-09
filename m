@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-286089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286090-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UCjmGUqb/mkMtwAAu9opvQ
-	(envelope-from <netdev+bounces-286089-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 04:26:18 +0200
+	id aBJ3LF2b/mkMtwAAu9opvQ
+	(envelope-from <netdev+bounces-286090-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 04:26:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0D484FD9FE
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 04:26:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 432DE4FDA06
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 04:26:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 68600303CA73
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 02:24:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 72FEC3014676
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 02:24:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56DB12C11DE;
-	Sat,  9 May 2026 02:24:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E22672C11F9;
+	Sat,  9 May 2026 02:24:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CU+9ZdfC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OjMeL1A3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD042C08CF
-	for <netdev@vger.kernel.org>; Sat,  9 May 2026 02:24:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB772BFC85
+	for <netdev@vger.kernel.org>; Sat,  9 May 2026 02:24:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778293454; cv=none; b=RVlluskKON8MshuVtIROZ7QcNTRNI4OGd8xUUS7VFwtx8WxdIAPtoaD4f83i4OkOifP0JJGJtkMRX+rGa35O+jGA2nJ6UiyGpJbXkMhmfkC13P9h3WeYLuamn6hacufe0wLupjiG4lKpq0OUHKwTbtPQFsa5448q4WDxozy5QTo=
+	t=1778293458; cv=none; b=biqTFTQ5ACW3YEYy640I5FkeCvrHBT4mOlUvEbKcg8BrImGY4B3d7WGc05PYBXf0aRuSaf5FCt5AB6oxiksG8IJ5zV3pPpmzv838+3LuftzbrmVlugzUX8+BtqgtFCjTBlHd2savZf9F2wRAItgE3yPm86oGY1sfVs1D7YjV3xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778293454; c=relaxed/simple;
-	bh=safKsecjXibYbiYmynEbCX7dyi43jejtX3R+IhJ6eSE=;
+	s=arc-20240116; t=1778293458; c=relaxed/simple;
+	bh=7dVSa7ksFpXgMr/jLnckfWMDCSg7BbD178PtVaianoc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N6ARJhhA4lnpU0wUI2pdywtMp5/9cgNJwdFW9lbj3nVR7sru53ujiwr8MumA3KQ8yKF0sq30PFXwWj7hPTUnWsbvWzodk0jc6w9LJ2SqaLEgoeiYF0T/iQpgL/F0Db2Yzo2X0OkJ5Vl7RAI34o8+wTK0d6t7bxeC3o+NR85x5x8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CU+9ZdfC; arc=none smtp.client-ip=209.85.128.47
+	 MIME-Version; b=oNULaeFITDnHGVsNzqghhiMgGR+Fg5n0lvDhcoqbay7v7xGjH15eqaKWBKfze7yYyms60uqH+JvNeOoo6NF6ax0X02DFt1+ypNTCbPo04IuaskEko41eOErVkevN0K1LuRwTKhBW41c/3jRaK9jQzHM5arvl66bPnb8r6k3MU20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OjMeL1A3; arc=none smtp.client-ip=209.85.221.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-488b0046078so20829545e9.1
-        for <netdev@vger.kernel.org>; Fri, 08 May 2026 19:24:12 -0700 (PDT)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-44ccbd3290aso1966106f8f.2
+        for <netdev@vger.kernel.org>; Fri, 08 May 2026 19:24:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778293450; x=1778898250; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778293455; x=1778898255; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wDV88yauO4u8TgmWa0MN3NF8sVmma225KYeS7BDXi9I=;
-        b=CU+9ZdfC0468NscONZmL+RQisJEoGSoSFrS5soL/rh7vNa4MsosLRmfJVfJm954E8f
-         yXl/Yi4AGTcKZBIWYaKRJdLNDgQfIViXlHEgn8BiJL/5+VlDvqLBiJJ2m6R4fH/nMFdd
-         cfv7xB5bEvLbN4u6Bvdpt9z6PPCjujKDBxAhY+M2RZfwfltUW8k/t2dotGzxdD2A7pUn
-         vIOvIxdfPjFpC8IUQTkRnXK68GIUgZB/Vzz4PCtxTCnEZm06BKug0cVUjeR95C7JyzZ4
-         8XQ4qtFfgRwHYl+f0FH9ArNVipMpIQSKR2x22s3DpL4VDQY3w3alfU4fDICh83NXE5/J
-         OEGA==
+        bh=aWO+R3wnt/yGbI4trvo9eBfuBhXyNneDRc2cIMmMhqE=;
+        b=OjMeL1A3EARwqOztym7w384/mU5U8u5K+OleJfexUR5mB9gj3B5v/m/Ebh93etNrwE
+         8us0kWNJEByRRW4hs4YSRwt3YRtmzKu64tLkIbi/XzFCvfLRiizzFyVtsMSj0O4KbG0a
+         xTDwaHQp1CXcHNRck7RLrMzVEoKOLBZupQw51BdQ6u5rHReLl+ZHAHpzoWT7zCbigKpI
+         skHcML3bQX8z32Gt+ypZ5ZSD3CvNrLdkE6NzuRU3MoseWrB0hnWl6UCR/3h2GrKsaMFE
+         LiyRFErIwc3K7cQEt8AQwLGJnSWNT6omXRM3X3tstB+XuzFV5peWO16rmNmHxh75sLvp
+         5YrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778293450; x=1778898250;
+        d=1e100.net; s=20251104; t=1778293455; x=1778898255;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=wDV88yauO4u8TgmWa0MN3NF8sVmma225KYeS7BDXi9I=;
-        b=tPxu8zLap/4aqm6437YC9i5BsdXVhS6APBjlhFZMbgl8qBiY+I8GBg7Z5KHVe0UEUI
-         EQ/NEB8PD6WjmA9W6H4bBsYr9lTmdtOS202hYSnO0uJCBj3ES4dboG4Li9QjqjwG6EnV
-         lPwRb9Xo3/bQb3/iSQ7w4vqo2y7HHNZow0khqcKUR3ZyouHfI89sSXDtEfePivl3geMj
-         Npdbtd8dxGeWsNHCmxT1nwBJAc4Xc6/GVbQdmNMB+Jw8K1zOqDH7yGOxJUAGsW0ISU2i
-         KECYTptAsG1BaYXaCHNvX/CKgkbN45S9mRbdme3gaKEoQxUpIuWWFdsZ/VWS/rujLsNT
-         Xlmg==
-X-Gm-Message-State: AOJu0Yyyz0280w55KZfLQY8nKFPQtyo1cFrstllnldujNLQi7mhHbXmZ
-	IGn9OTvAaiDGhsONLH15y0UbXQELy5IkDaLpzqTmUwFBvOfzKpVsDzf8aHx2enRT
-X-Gm-Gg: AeBDies8H96t/z5+gl9sQfIuIPwWrsRJvKL9U5qSGQAtTBYzFLsQ0A68xueRPFDv4CN
-	yQfAOUTm9z59Zc2J4OdjRqVUh41KJcRayZMO3kNLOH/HArkb4FHp6Guan1TogV//Gsc/95JYp5c
-	9OXVMhFTi4yRarnc/1tU8WBNtokNBh7M9qWz2Rr+Kb0GLM1SCM3g3A21pL9Vqcdwd48LF01bXww
-	MyCPiYv/0npqQDWoUiN7Ne84agQedFWiAWZUUxO8adgJa/UhM9pcpaSefRpSMQo4vPXiCJFunzw
-	jS6Sfovd9F1mhchHEfe5Oqmy4RbWPFQ+ZRgi7nHKP1eY3y2QV8/PCx32mQn8hJR30NNNrDnHha/
-	C+hs3NaDvQL0+8OGEXflf6/sGoY9hzr7fMHvDzkTl7AUBiovnGaJ3KQWA5GAUh39L2K7k+4/2pM
-	oBkMgFMHk+PNPslrz/whccCiQloWoosHY=
-X-Received: by 2002:a05:600c:19c8:b0:489:1c2d:211e with SMTP id 5b1f17b1804b1-48e70687ed2mr9116335e9.5.1778293450244;
-        Fri, 08 May 2026 19:24:10 -0700 (PDT)
-Received: from localhost ([2a03:2880:31ff:47::])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e6db189d3sm11885745e9.32.2026.05.08.19.24.09
+        bh=aWO+R3wnt/yGbI4trvo9eBfuBhXyNneDRc2cIMmMhqE=;
+        b=h0YLWtQunjmMp7H5vWmt4vDiua78/6JRCU5jjSPEDDAH3xm+FLinhtRcEqib2EStoz
+         SwDNs1jgXSKARqmG/5J5WOfTksyEiJJYzkZ6JnABPJz7qbEzzMgPhCVsoUwjJRZMTQui
+         7CyTqu9kO7dXx1heP88Twv7XYoVcS+Z+NxeQkGXZynTM42CKn1EnRDqqo4zrAJ0eZGBj
+         CHsTRe6t+i/90HhE49kEaC+8Xkmg0Z14a53XSmuiHDGHojqalwNxE6S3SeXH7822Q5bs
+         IkOfW1TkJ5q0AmnWoAiojfVlSrdvqHvTzKLgQxd2GW3kD50TFXw9h+sqDeII3x4OBue2
+         SlPQ==
+X-Gm-Message-State: AOJu0YxAoDFXRw+aIkSv9tFhDqmZea97G6AY6AuQOKbBjiR1Srae5ApF
+	KRHYz4zS8zJLAsJgXSaCLS5mEtBIU4MLwJNvSVQQiJ0pH77G0wXyhhzxFSNHWucB
+X-Gm-Gg: Acq92OGuifr2lC6092A9d7esI0xZzsXJVXQnxPpKqBKAtPfA3QuIGpPxzSASJB779F/
+	e2ypyhzUqKJmzHoH+5qv7ck04ACnQeBZZwhpKTBMdKOn23Ccrn3YM2CIJkO5ElNPBbcWvV413l+
+	fUGuiJPEz4uuDvAVaYV7B80m118YJMBv5QFAUkQ/ZY59fVBk8byeGfp6IZJ7HOpjDoiwNT+2AY1
+	ql/4zgIY2kIpSZaa4i7wA/SjJtgqvChhOmTyOZXK+L7UnPuA5DGLUPpjlBmbKZEd1nLkqDRzjbt
+	JC8DkK4EUC0ojUr/v7ar6+97k+55TOa3vHnum9gtTRaKDibYYSG1MjdYVxH3bf2mdkE+7/icrvi
+	428tC3Zvg239L7tRkKVy3YCBavOLJARjFFvZmEd+WgO3Tx7CeY7yXHW0e+Eyo+Fnbn7x31adrag
+	kGzJU8E+pp8QKDS52vgs3bevrAonYnqA==
+X-Received: by 2002:a05:6000:2902:b0:43d:50c:6f33 with SMTP id ffacd0b85a97d-4515cf11c1bmr23813662f8f.26.1778293455236;
+        Fri, 08 May 2026 19:24:15 -0700 (PDT)
+Received: from localhost ([2a03:2880:31ff:3::])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-454917d57aesm8843835f8f.26.2026.05.08.19.24.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 19:24:09 -0700 (PDT)
+        Fri, 08 May 2026 19:24:13 -0700 (PDT)
 From: Mohsin Bashir <mohsin.bashr@gmail.com>
 To: netdev@vger.kernel.org
 Cc: dsahern@kernel.org,
@@ -83,9 +83,9 @@ Cc: dsahern@kernel.org,
 	kuba@kernel.org,
 	ernis@linux.microsoft.com,
 	mohsin.bashr@gmail.com
-Subject: [PATCH iproute2-next v2 4/6] netshaper: Extract struct shaper_args and parse_shaper_arg() helper
-Date: Fri,  8 May 2026 19:23:51 -0700
-Message-ID: <20260509022353.3470738-5-mohsin.bashr@gmail.com>
+Subject: [PATCH iproute2-next v2 5/6] netshaper: Add group command for creating scheduling hierarchies
+Date: Fri,  8 May 2026 19:23:52 -0700
+Message-ID: <20260509022353.3470738-6-mohsin.bashr@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260509022353.3470738-1-mohsin.bashr@gmail.com>
 References: <20260509022353.3470738-1-mohsin.bashr@gmail.com>
@@ -96,21 +96,21 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: C0D484FD9FE
+X-Rspamd-Queue-Id: 432DE4FDA06
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[mohsinbashr@gmail.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-286089-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286090-lists,netdev=lfdr.de];
 	TO_DN_NONE(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -121,129 +121,121 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	RCPT_COUNT_SEVEN(0.00)[7];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.999];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
 From: Mohsin Bashir <hmohsin@meta.com>
 
-Extract common shaper parameters (dev, bw-min, bw-max, weight) into
-struct shaper_args and add parse_shaper_arg() to parse them. This
-avoids duplicating argument parsing when the group command is added
-in the next patch.
+Add the group command to create and update scheduling groups via the
+NET_SHAPER_CMD_GROUP netlink operation. This enables building shaper
+hierarchies by specifying a node handle, parent scope, rate parameters,
+and a set of queue leaf shapers to attach.
+
+The group command allows the node handle id to be omitted, letting
+the kernel auto-assign one for new nodes. Only queue scope is
+accepted for leaf shapers. Group handle and parent scopes are
+validated to accept only node or netdev. Parent node scope
+requires an explicit id since it must reference an existing node.
+
+Common argument parsing (dev, bw-min, bw-max, weight) reuses the
+parse_shaper_arg() helper introduced in the previous patch.
+
+Example usage:
+  netshaper group dev foo handle scope node parent scope netdev \
+      bw-max 1gbit leaves scope queue id 0 scope queue id 1
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Mohsin Bashir <hmohsin@meta.com>
 ---
- netshaper/netshaper.c | 111 +++++++++++++++++++++++++++---------------
- 1 file changed, 72 insertions(+), 39 deletions(-)
+ netshaper/netshaper.c | 220 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 219 insertions(+), 1 deletion(-)
 
 diff --git a/netshaper/netshaper.c b/netshaper/netshaper.c
-index 83bfd2f6..9ccd09f4 100644
+index 9ccd09f4..5b1726d3 100644
 --- a/netshaper/netshaper.c
 +++ b/netshaper/netshaper.c
-@@ -69,6 +69,54 @@ static int parse_rate(const char *str, __u64 *rate_bps)
- 	return 0;
+@@ -31,10 +31,15 @@ static void usage(void)
+ 	fprintf(stderr,
+ 		"Usage: netshaper [ OPTIONS ] { COMMAND | help }\n"
+ 		"OPTIONS := { -V[ersion] | -c[olor] | -help }\n"
+-		"COMMAND := { set | get | delete } dev DEVNAME\n"
++		"COMMAND := { set | get | delete | group } dev DEVNAME\n"
+ 		"	    handle scope HANDLE_SCOPE [id HANDLE_ID]\n"
+ 		"	    [bw-min BW_MIN] [bw-max BW_MAX] [weight WEIGHT]\n"
+ 		"\n"
++		"netshaper group dev DEVNAME handle scope SCOPE [ id ID ]\n"
++		"          parent scope SCOPE [ id ID ]\n"
++		"          [ bw-min BW ] [ bw-max BW ] [ weight WEIGHT ]\n"
++		"          leaves { scope SCOPE id ID } [ ... ]\n"
++		"\n"
+ 		"Where: DEVNAME         := STRING\n"
+ 		"       HANDLE_SCOPE    := { netdev | queue | node }\n"
+ 		"       HANDLE_ID       := UINT (required for queue/node, optional for netdev)\n"
+@@ -319,6 +324,217 @@ static int do_cmd(int argc, char **argv, int cmd)
+ 	return err;
  }
  
-+struct shaper_args {
-+	__u64 bw_min_bps, bw_max_bps;
-+	__u32 weight;
-+	bool has_bw_min, has_bw_max, has_weight;
-+	int ifindex;
-+};
++#define NET_SHAPER_MAX_LEAVES	256
 +
-+#define SHAPER_ARGS_INIT { .ifindex = -1 }
-+
-+static int parse_shaper_arg(const char *key, int *argcp, char ***argvp,
-+			    struct shaper_args *args)
++static int do_group(int argc, char **argv)
 +{
-+	int argc = *argcp;
-+	char **argv = *argvp;
++	GENL_REQUEST(req, 4096, genl_family, 0, NET_SHAPER_FAMILY_VERSION,
++		     NET_SHAPER_CMD_GROUP, NLM_F_REQUEST | NLM_F_ACK);
 +
-+	if (strcmp(key, "dev") == 0) {
-+		NEXT_ARG();
-+		args->ifindex = ll_name_to_index(*argv);
-+		if (args->ifindex == 0) {
-+			fprintf(stderr, "Device \"%s\" not found\n", *argv);
-+			return -1;
-+		}
-+	} else if (strcmp(key, "bw-min") == 0) {
-+		NEXT_ARG();
-+		if (parse_rate(*argv, &args->bw_min_bps))
-+			return -1;
-+		args->has_bw_min = true;
-+	} else if (strcmp(key, "bw-max") == 0) {
-+		NEXT_ARG();
-+		if (parse_rate(*argv, &args->bw_max_bps))
-+			return -1;
-+		args->has_bw_max = true;
-+	} else if (strcmp(key, "weight") == 0) {
-+		NEXT_ARG();
-+		if (get_unsigned(&args->weight, *argv, 10)) {
-+			fprintf(stderr, "Invalid weight value\n");
-+			return -1;
-+		}
-+		args->has_weight = true;
-+	} else {
-+		return 0;
-+	}
-+
-+	*argcp = argc;
-+	*argvp = argv;
-+	return 1;
-+}
-+
- static void print_netshaper_attrs(struct nlmsghdr *answer)
- {
- 	struct rtattr *handle_tb[NET_SHAPER_A_HANDLE_MAX + 1] = {};
-@@ -155,41 +203,25 @@ static int do_cmd(int argc, char **argv, int cmd)
- 	GENL_REQUEST(req, 1024, genl_family, 0, NET_SHAPER_FAMILY_VERSION, cmd,
- 		     NLM_F_REQUEST | NLM_F_ACK);
- 
--	bool has_bw_min = false, has_bw_max = false, has_weight = false;
 +	struct shaper_args args = SHAPER_ARGS_INIT;
- 	int handle_scope = NET_SHAPER_SCOPE_UNSPEC;
--	__u64 bw_min_bps = 0, bw_max_bps = 0;
--	__u32 handle_id = 0, weight = 0;
- 	bool handle_present = false;
- 	bool has_handle_id = false;
- 	struct nlmsghdr *answer;
--	int err, ifindex = -1;
-+	__u32 handle_id = 0;
-+	int err, ret;
- 
- 	while (argc > 0) {
--		if (strcmp(*argv, "dev") == 0) {
--			NEXT_ARG();
--			ifindex = ll_name_to_index(*argv);
--			if (ifindex == 0) {
--				fprintf(stderr, "Device \"%s\" not found\n", *argv);
--				return -1;
--			}
--		} else if (strcmp(*argv, "bw-min") == 0) {
--			NEXT_ARG();
--			if (parse_rate(*argv, &bw_min_bps))
--				return -1;
--			has_bw_min = true;
--		} else if (strcmp(*argv, "bw-max") == 0) {
--			NEXT_ARG();
--			if (parse_rate(*argv, &bw_max_bps))
--				return -1;
--			has_bw_max = true;
--		} else if (strcmp(*argv, "weight") == 0) {
--			NEXT_ARG();
--			if (get_unsigned(&weight, *argv, 10)) {
--				fprintf(stderr, "Invalid weight value\n");
--				return -1;
--			}
--			has_weight = true;
--		} else if (strcmp(*argv, "handle") == 0) {
++	bool parsing_leaves = false, has_handle_id = false, has_parent_id = false;
++	int parent_scope = -1, num_leaves = 0;
++	int err, ret, handle_scope = NET_SHAPER_SCOPE_UNSPEC;
++	__u32 handle_id = 0, parent_id = 0;
++	struct nlmsghdr *answer;
++
++	struct {
++		int scope;
++		__u32 id;
++	} leaves[NET_SHAPER_MAX_LEAVES];
++
++	while (argc > 0) {
++		if (parsing_leaves) {
++			if (strcmp(*argv, "scope") == 0) {
++				int lscope;
++
++				NEXT_ARG();
++				lscope = parse_scope(*argv);
++				if (lscope < 0) {
++					fprintf(stderr, "Invalid leaf scope \"%s\"\n",
++						*argv);
++					return -1;
++				}
++				NEXT_ARG();
++				if (strcmp(*argv, "id") != 0) {
++					fprintf(stderr, "Expected \"id\" after leaf scope\n");
++					return -1;
++				}
++
++				NEXT_ARG();
++				if (num_leaves >= ARRAY_SIZE(leaves)) {
++					fprintf(stderr, "Too many leaves\n");
++					return -1;
++				}
++				leaves[num_leaves].scope = lscope;
++				if (get_unsigned(&leaves[num_leaves].id, *argv, 10)) {
++					fprintf(stderr, "Invalid leaf id\n");
++					return -1;
++				}
++				num_leaves++;
++				argc--;
++				argv++;
++				continue;
++			}
++			parsing_leaves = false;
++		}
++
 +		ret = parse_shaper_arg(*argv, &argc, &argv, &args);
 +		if (ret < 0)
 +			return -1;
@@ -254,54 +246,164 @@ index 83bfd2f6..9ccd09f4 100644
 +		}
 +
 +		if (strcmp(*argv, "handle") == 0) {
- 			handle_present = true;
- 			NEXT_ARG();
- 
-@@ -241,16 +273,17 @@ static int do_cmd(int argc, char **argv, int cmd)
- 		argv++;
- 	}
- 
--	if (ifindex == -1)
++			NEXT_ARG();
++			if (strcmp(*argv, "scope") != 0) {
++				fprintf(stderr, "Expected \"scope\" after \"handle\"\n");
++				return -1;
++			}
++			NEXT_ARG();
++			handle_scope = parse_scope(*argv);
++			if (handle_scope < 0) {
++				fprintf(stderr, "Invalid handle scope \"%s\"\n",
++					*argv);
++				return -1;
++			}
++			if (handle_scope != NET_SHAPER_SCOPE_NODE &&
++			    handle_scope != NET_SHAPER_SCOPE_NETDEV) {
++				fprintf(stderr, "Group handle scope must be \"node\" or \"netdev\"\n");
++				return -1;
++			}
++
++			if (argc > 1 && strcmp(argv[1], "id") == 0) {
++				NEXT_ARG();
++				NEXT_ARG();
++				if (get_unsigned(&handle_id, *argv, 10)) {
++					fprintf(stderr, "Invalid handle id\n");
++					return -1;
++				}
++				has_handle_id = true;
++			}
++		} else if (strcmp(*argv, "parent") == 0) {
++			NEXT_ARG();
++			if (strcmp(*argv, "scope") != 0) {
++				fprintf(stderr, "Expected \"scope\" after \"parent\"\n");
++				return -1;
++			}
++			NEXT_ARG();
++			parent_scope = parse_scope(*argv);
++			if (parent_scope < 0) {
++				fprintf(stderr, "Invalid parent scope \"%s\"\n",
++					*argv);
++				return -1;
++			}
++			if (parent_scope != NET_SHAPER_SCOPE_NODE &&
++			    parent_scope != NET_SHAPER_SCOPE_NETDEV) {
++				fprintf(stderr, "Parent scope must be \"node\" or \"netdev\"\n");
++				return -1;
++			}
++
++			if (parent_scope == NET_SHAPER_SCOPE_NODE) {
++				NEXT_ARG();
++				if (strcmp(*argv, "id") != 0) {
++					fprintf(stderr, "What is \"%s\"\n", *argv);
++					usage();
++					return -1;
++				}
++				NEXT_ARG();
++				if (get_unsigned(&parent_id, *argv, 10)) {
++					fprintf(stderr, "Invalid parent id\n");
++					return -1;
++				}
++				has_parent_id = true;
++			} else if (argc > 1 && strcmp(argv[1], "id") == 0) {
++				NEXT_ARG();
++				NEXT_ARG();
++				if (get_unsigned(&parent_id, *argv, 10)) {
++					fprintf(stderr, "Invalid parent id\n");
++					return -1;
++				}
++				has_parent_id = true;
++			}
++		} else if (strcmp(*argv, "leaves") == 0) {
++			parsing_leaves = true;
++			argc--;
++			argv++;
++			continue;
++		} else {
++			fprintf(stderr, "What is \"%s\"\n", *argv);
++			usage();
++			return -1;
++		}
++		argc--;
++		argv++;
++	}
++
 +	if (args.ifindex == -1)
- 		missarg("dev");
- 
- 	if (!handle_present)
- 		missarg("handle");
- 
--	if (cmd == NET_SHAPER_CMD_SET && !has_bw_min && !has_bw_max && !has_weight)
-+	if (cmd == NET_SHAPER_CMD_SET &&
-+	    !args.has_bw_min && !args.has_bw_max && !args.has_weight)
- 		missarg("bw-min, bw-max, or weight");
- 
--	addattr32(&req.n, sizeof(req), NET_SHAPER_A_IFINDEX, ifindex);
++		missarg("dev");
++	if (handle_scope == NET_SHAPER_SCOPE_UNSPEC)
++		missarg("handle");
++	if (parent_scope < 0)
++		missarg("parent");
++	if (num_leaves == 0)
++		missarg("leaves");
++
 +	addattr32(&req.n, sizeof(req), NET_SHAPER_A_IFINDEX, args.ifindex);
- 
- 	struct rtattr *handle = addattr_nest(&req.n, sizeof(req),
- 					     NET_SHAPER_A_HANDLE | NLA_F_NESTED);
-@@ -260,16 +293,16 @@ static int do_cmd(int argc, char **argv, int cmd)
- 	addattr_nest_end(&req.n, handle);
- 
- 	if (cmd == NET_SHAPER_CMD_SET) {
--		if (has_bw_min)
-+		if (args.has_bw_min)
- 			addattr64(&req.n, sizeof(req), NET_SHAPER_A_BW_MIN,
--				  bw_min_bps);
--		if (has_bw_max)
-+				  args.bw_min_bps);
-+		if (args.has_bw_max)
- 			addattr64(&req.n, sizeof(req), NET_SHAPER_A_BW_MAX,
--				  bw_max_bps);
--		if (has_weight)
-+				  args.bw_max_bps);
-+		if (args.has_weight)
- 			addattr32(&req.n, sizeof(req), NET_SHAPER_A_WEIGHT,
--				  weight);
--		if (has_bw_min || has_bw_max)
-+				  args.weight);
-+		if (args.has_bw_min || args.has_bw_max)
- 			addattr32(&req.n, sizeof(req), NET_SHAPER_A_METRIC,
- 				  NET_SHAPER_METRIC_BPS);
- 	}
++
++	struct rtattr *parent = addattr_nest(&req.n, sizeof(req),
++					     NET_SHAPER_A_PARENT | NLA_F_NESTED);
++	addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_SCOPE, parent_scope);
++	if (has_parent_id)
++		addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_ID, parent_id);
++	addattr_nest_end(&req.n, parent);
++
++	struct rtattr *handle = addattr_nest(&req.n, sizeof(req),
++					     NET_SHAPER_A_HANDLE | NLA_F_NESTED);
++	addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_SCOPE, handle_scope);
++	if (has_handle_id)
++		addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_ID, handle_id);
++	addattr_nest_end(&req.n, handle);
++
++	if (args.has_bw_min)
++		addattr64(&req.n, sizeof(req), NET_SHAPER_A_BW_MIN,
++			  args.bw_min_bps);
++	if (args.has_bw_max)
++		addattr64(&req.n, sizeof(req), NET_SHAPER_A_BW_MAX,
++			  args.bw_max_bps);
++	if (args.has_weight)
++		addattr32(&req.n, sizeof(req), NET_SHAPER_A_WEIGHT, args.weight);
++
++	if (args.has_bw_min || args.has_bw_max)
++		addattr32(&req.n, sizeof(req), NET_SHAPER_A_METRIC,
++			  NET_SHAPER_METRIC_BPS);
++
++	for (int i = 0; i < num_leaves; i++) {
++		struct rtattr *leaf, *leaf_handle;
++
++		leaf = addattr_nest(&req.n, sizeof(req),
++				    NET_SHAPER_A_LEAVES | NLA_F_NESTED);
++		leaf_handle = addattr_nest(&req.n, sizeof(req),
++					   NET_SHAPER_A_HANDLE | NLA_F_NESTED);
++		addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_SCOPE,
++			  leaves[i].scope);
++		addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_ID,
++			  leaves[i].id);
++		addattr_nest_end(&req.n, leaf_handle);
++		addattr_nest_end(&req.n, leaf);
++	}
++
++	err = rtnl_talk(&gen_rth, &req.n, &answer);
++	if (err < 0) {
++		printf("Kernel command failed: %d\n", err);
++		return err;
++	}
++
++	print_netshaper_attrs(answer);
++	free(answer);
++	return 0;
++}
++
+ int main(int argc, char **argv)
+ {
+ 	int color = default_color_opt();
+@@ -363,6 +579,8 @@ int main(int argc, char **argv)
+ 			return do_cmd(argc - 1, argv + 1, NET_SHAPER_CMD_DELETE);
+ 		if (strcmp(*argv, "show") == 0)
+ 			return do_cmd(argc - 1, argv + 1, NET_SHAPER_CMD_GET);
++		if (strcmp(*argv, "group") == 0)
++			return do_group(argc - 1, argv + 1);
+ 		if (strcmp(*argv, "help") == 0) {
+ 			usage();
+ 			return 0;
 -- 
 2.53.0-Meta
 
