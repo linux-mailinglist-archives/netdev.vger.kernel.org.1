@@ -1,188 +1,169 @@
-Return-Path: <netdev+bounces-286058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286059-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eKsMEUWF/mmBsQAAu9opvQ
-	(envelope-from <netdev+bounces-286058-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 02:52:21 +0200
+	id UOTkImiG/mm/sQAAu9opvQ
+	(envelope-from <netdev+bounces-286059-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 02:57:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3EE34FD1EC
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 02:52:20 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B1464FD248
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 02:57:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4766330233E6
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 00:52:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7F02D30193BE
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 00:57:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47DB323AE62;
-	Sat,  9 May 2026 00:52:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cxbmyloE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FADC1A6828;
+	Sat,  9 May 2026 00:57:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2064F22CBE6;
-	Sat,  9 May 2026 00:52:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F444E573
+	for <netdev@vger.kernel.org>; Sat,  9 May 2026 00:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778287935; cv=none; b=dydOLh6etGrTl9eiVPSBF8tN9riTFUuCdhkAWJUj5gXkO+EW5kW/gCPmYE8NkF+pBuWKxFhyfYefV1KrkstBnoIs5Wl9VR6gSSeJkWhWqpBnYNdGFlLcg3MDOOZKWgQF9PHx7dRoZBkpwOgP55RW891258l5jo+JI342OZWx3Qg=
+	t=1778288228; cv=none; b=f93ikxDQuf5/hIxHdYAFRNAQ+f4MD/gthEW5dCCxvHeQAmbNpQNQdWu8gmH6MtTCzV4EqEl9Gyw9xk9DYPffI3tWBfoN7eLtRNZwQmIMB0+lj5giPU9Z7vhKHolExdQfgIAAtpei//SW4ur8K8mjR/n5Nz0Gbtr/cVzK3n7mNUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778287935; c=relaxed/simple;
-	bh=tzx7ZwgL4qb9E7LiEim00qbYgEtsXeRU7mCgbW19k6M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GjwB6afowpjeE+1vdgOiBgbig4/hkWTQkUuNMvr8EChzDinzFw2I5b3Y2iYcVGt29Qm0IID5ey0AYZ7STZf/iJNVi0CyErGJIPwfDAj6z4sPLbCnhYLNfyLAgwAYSemc5ku4tFc4u1FcTMYbQvrp65BP9Eci19ApURsbSj8hjlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cxbmyloE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6BC3C2BCB0;
-	Sat,  9 May 2026 00:52:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778287935;
-	bh=tzx7ZwgL4qb9E7LiEim00qbYgEtsXeRU7mCgbW19k6M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cxbmyloEO08k8n6A91Ub0EQs8QPp9FXDJCaF269871JqsS/tTFWF1ZAR1/IYmJmQJ
-	 WIAcvX75OsoH9C668Vyuga0z2wnL5ebyJudy2owBLJva0WrfsHvKCQYqUMs71671Mp
-	 /BcjaxY1Dy6fyLgVtvD3MdaVhxspItLv5A0IcbGmOhKd+JIHyfrKa1tJiI3uDn6TaM
-	 KtABzmVKJ6QaWVGn9nBQW+1M+zEfcPXyAFcOCablaxW+1/PneBfzyop5SRANApwTS0
-	 u3PubW9+JuPHP5rtT6Z1zVkFQPtfIjmj4VmNuizxrb3f/JBBSWsUv2g06+90KB9MRV
-	 i4fA4+V1ZaRgA==
-Date: Fri, 8 May 2026 17:52:13 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Mark Bloch <mbloch@nvidia.com>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <skhan@linuxfoundation.org>, Simon Horman <horms@kernel.org>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Andrew Morton
- <akpm@linux-foundation.org>, "Borislav Petkov (AMD)" <bp@alien8.de>, Randy
- Dunlap <rdunlap@infradead.org>, Dave Hansen <dave.hansen@linux.intel.com>,
- Christian Brauner <brauner@kernel.org>, Petr Mladek <pmladek@suse.com>,
- "Peter Zijlstra (Intel)" <peterz@infradead.org>, Thomas Gleixner
- <tglx@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Dapeng
- Mi <dapeng1.mi@linux.intel.com>, Kees Cook <kees@kernel.org>, Marco Elver
- <elver@google.com>, Eric Biggers <ebiggers@kernel.org>, Li RongQing
- <lirongqing@baidu.com>, "Paul E. McKenney" <paulmck@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [RFC net-next 0/4] devlink: Add boot-time defaults
-Message-ID: <20260508175213.1952097f@kernel.org>
-In-Reply-To: <af4lBIJdCuN5VKq_@FV6GYCPJ69>
-References: <20260506123739.1959770-1-mbloch@nvidia.com>
-	<aftaW-irGmkfA7FS@FV6GYCPJ69>
-	<3f9215c4-7c84-46d9-ba74-30dabe24db09@nvidia.com>
-	<afxvzOjqw-vxUAED@FV6GYCPJ69>
-	<b6a9b568-dd09-4414-be57-6b9cd282a43c@nvidia.com>
-	<af4lBIJdCuN5VKq_@FV6GYCPJ69>
+	s=arc-20240116; t=1778288228; c=relaxed/simple;
+	bh=mwvZ5RHiogyZbhXaQwdvrGR6XdYfZ0f9jiLEz/X/ceI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=A+oXOC+O8lMnHh9iZWnmqqbu56FcutMfJPFkqGN0pHHsbubjeLgjqSizS7Er7+FG4dHg9WjjS+n/ux+fs/NfkMFfOcPntbVofdiSW1oi1/cK3KMuPx6VVY9Lco6qiUx1HIo9iejOXHxF5UD1m1IXN60aFhJ++M3mUGVKzMC8Xa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: fafd45a64b4111f1aa26b74ffac11d73-20260509
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
+	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED
+	SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS
+	DMARC_NOPASS, CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS
+	GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:977b4956-e7d9-4337-bf64-78ce4d0f5227,IP:10,
+	URL:0,TC:0,Content:-25,EDM:0,RT:0,SF:-30,FILE:0,BULK:0,RULE:Release_Ham,AC
+	TION:release,TS:-45
+X-CID-INFO: VERSION:1.3.12,REQID:977b4956-e7d9-4337-bf64-78ce4d0f5227,IP:10,UR
+	L:0,TC:0,Content:-25,EDM:0,RT:0,SF:-30,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-45
+X-CID-META: VersionHash:e7bac3a,CLOUDID:c9f90a029a18edf43b47b3a3384ae24c,BulkI
+	D:260509085659CTBMKUT8,BulkQuantity:0,Recheck:0,SF:10|38|66|78|102|127|850
+	|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS
+	:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,A
+	RC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: fafd45a64b4111f1aa26b74ffac11d73-20260509
+X-User: zhaochenguang@kylinos.cn
+Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
+	(envelope-from <zhaochenguang@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1222823443; Sat, 09 May 2026 08:56:58 +0800
+From: Chenguang Zhao <zhaochenguang@kylinos.cn>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Breno Leitao <leitao@debian.org>
+Cc: Chenguang Zhao <zhaochenguang@kylinos.cn>,
+	Simon Horman <horms@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH v2] ethtool: fix ethnl_bitmap32_not_zero() bit interval semantics
+Date: Sat,  9 May 2026 08:57:11 +0800
+Message-Id: <20260509005711.127828-1-zhaochenguang@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: A3EE34FD1EC
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 9B1464FD248
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286058-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286059-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[kylinos.cn];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[zhaochenguang@kylinos.cn,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.959];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[kylinos.cn:email,kylinos.cn:mid]
 X-Rspamd-Action: no action
 
-On Fri, 8 May 2026 20:07:44 +0200 Jiri Pirko wrote:
-> >I don't think switchdev by default should mean CX4+ in general. If we get
-> >there, I would expect it to be limited to the DPU/BlueField/ECPF case, where
-> >the host PF probe path can depend on the ECPF reaching switchdev. Changing the
-> >default for regular host NIC deployments feels like a much larger compatibility
-> >change.  
-> 
-> We can't travel throught time, but if from CX5 onwards the default would
-> be switchdev, nobody would feel broken in terms of compatibility. That
-> is my point. Having "legacy" as default is simply wrong for never NIC
-> generations. That is why it is called "legacy" and it should have been
-> rotten through and out since CX4 times.
+ethnl_bitmap32_not_zero() should return true if some bit in [start, end)
+is set:
 
-legacy vs switchdev only describes the eswitch configuration.
-As a non-SR-IOV user I really don't want to see the extra representors
-hanging around my systems, confusing all daemons. IIRC mlx5 had some
-limitations around the uplink representor. Maybe that's the disconnect.
-But for a real, fully featured switchdev eswitches having the
-PHY and PF representors on boot, always, will not make sense.
+- Fix inverted memchr_inv() sense: return true when the scan finds a
+  non-zero byte, not when the middle words are all zero.
+- Return false for an empty interval (end <= start).
+- When end is 32-bit aligned, indices in [start, end) do not include any
+  bits from map[end_word]; return false after earlier checks found no
+  non-zero data.
 
-IOW it's not a question of the generation of the card but of
-the deployment type / use case.
+Fixes: 10b518d4e6dd ("ethtool: netlink bitset handling")
+Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
+---
+ v2:
+  - Add Fixes tag as suggested by Leitao.
+  - Fix other places in ethnl_bitmap32_not_zero()
+    that are inconsistent with the documentation
+    comments.
+---
+ net/ethtool/bitset.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-> >For the ASIC/NV bit: maybe technically possible, but it feels like the wrong
-> >layer. This is boot/deployment policy, not a persistent hardware property, and
-> >storing it in NV memory would make the state persist across kernels/hosts in a
-> >surprising way.  
-> 
-> Well, as any other nv config, it persists across kernels/hosts. Think
-> about it as "unbreak-my-not-legacy-device" bit.
+diff --git a/net/ethtool/bitset.c b/net/ethtool/bitset.c
+index 8bb98d3ea3db..14d3e68582c8 100644
+--- a/net/ethtool/bitset.c
++++ b/net/ethtool/bitset.c
+@@ -92,7 +92,7 @@ static bool ethnl_bitmap32_not_zero(const u32 *map, unsigned int start,
+ 	u32 mask;
+ 
+ 	if (end <= start)
+-		return true;
++		return false;
+ 
+ 	if (start % 32) {
+ 		mask = ethnl_upper_bits(start);
+@@ -105,11 +105,11 @@ static bool ethnl_bitmap32_not_zero(const u32 *map, unsigned int start,
+ 		start_word++;
+ 	}
+ 
+-	if (!memchr_inv(map + start_word, '\0',
++	if (memchr_inv(map + start_word, '\0',
+ 			(end_word - start_word) * sizeof(u32)))
+ 		return true;
+ 	if (end % 32 == 0)
+-		return true;
++		return false;
+ 	return map[end_word] & ethnl_lower_bits(end);
+ }
+ 
+-- 
+2.25.1
 
-For most devices the switchdev mode does not change anything
-substantial about the device. It's purely a kernel / driver config. 
-It changes what objects and default rules kernel / driver installs. 
-So I don't get why it would make sense to flash into the device
-nvmem a Linux SW stack specific config.
-
-> >I do agree the RFC probably went too far by making a generic devlink cmdline
-> >configuration language. Maybe the smaller thing to discuss is only:
-> >
-> >devlink=[pci/...]:esw:mode:{legacy|switchdev|switchdev_inactive}
-> >
-> >No runtime params, no ordering between different operations, just early eswitch
-> >mode for explicitly selected handles.  
-
-Yes, let's cut this down, AI went too far :) As I said we should just
-document how we envision the format growing but for now we can literally
-implement just the global "esw mode".
-
-One note on the formatting, you mentioned:
-
-  devlink=[pci/0000:08:00.0,pci/0000:08:00.1]:param:flow_steering_mode:hmfs,[pci/0000:08:00.0,pci/0000:08:00.1]:esw:mode:switchdev
-
-TBH when I used the square brackets I meant that the field is optional.
-But I guess you used them like we use them for IPv6 addresses to
-separate the : signs, makes sense.
-
-Since AFAIU we only care about global default should we focus on
-supporting:
-
- devlink=*:esw:mode:switchdev
-
-meaning all devices default to switchdev?
-
-> FWIW, I'm still against this.
-
-One more option, tho IDK if it actually is good enough for Mark,
-would be to let user space "pause" devlink probing. So that the
-systemd daemon can configure the device before it populates all
-the netdev stuff. Basically make the devices probe into the reload_down
-state, until user space configures them. IDK how much of the time
-is spent building and tearing down the legacy mode on mlx5 but
-the thinking is that we'd at least stave that wasted effort.
 
