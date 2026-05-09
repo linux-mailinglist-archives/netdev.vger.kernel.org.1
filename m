@@ -1,339 +1,332 @@
-Return-Path: <netdev+bounces-286141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286142-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iIIZGIQH/2lg1QAAu9opvQ
-	(envelope-from <netdev+bounces-286141-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 12:08:04 +0200
+	id +DVCDSUM/2lI1gAAu9opvQ
+	(envelope-from <netdev+bounces-286142-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 12:27:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 062AC4FF1A0
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 12:08:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 893584FF39E
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 12:27:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 64B303006102
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 10:08:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 02BD830078EE
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 10:27:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 877D039F193;
-	Sat,  9 May 2026 10:08:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66D7239A04E;
+	Sat,  9 May 2026 10:27:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="leuQxIIG"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="iUJMM2pO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013041.outbound.protection.outlook.com [40.107.162.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627DE208D0;
-	Sat,  9 May 2026 10:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778321281; cv=none; b=gSIL08X5mGCPAiAXCWBEEkWNUKOYUl/19es9/cCcQ01flfR1oHDykK0ijjaLZYDHA86eAFlRRfpVBRQe4zDxhz379+BWhBNO6mNts2YYt0e8ZBBMDgEN1FdHaqEmHoZPeEshApL8/IuwRSAvV7m98M4c/7Vm5gXYOi4Wz23iu6E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778321281; c=relaxed/simple;
-	bh=DrVObXvVSvJ6Qh3ggMiOeo7pce3nKF+OLq2GUfFw0YE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QD7b0STLYD/XUwPb7ScKJdK1cuNZ4vzuuiEBQMW/idtyPpFczmc5aMx8JSin4ZFyxsQCYjCmeJQY6HQn48ZgaIL6PM4dxH/hkjv8QB3CMHLHO1uzLUWFXlqmn/4A/zCZLIPTt1k3Shl/QPY2GubJ/4wUM+PZeIu25wF/tsZezkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=leuQxIIG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEB13C2BCB2;
-	Sat,  9 May 2026 10:08:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778321281;
-	bh=DrVObXvVSvJ6Qh3ggMiOeo7pce3nKF+OLq2GUfFw0YE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=leuQxIIGtL3ySmiM8r5mjMlZARE6dzdT/vnEblM99cn6q33QGI+M//l8mhH1tVRik
-	 qW44qun4uM4o9P/wQC8aR7XEPNxLiuxUZR+d1RuachQXa97iWgYAfgt5YHTbzpcX7c
-	 KCzR/czetJFcaiBkWeZjfaDLql0F4scJzYDwQxGUDDcLi2TwHrM+p4Utk2WSPdleY8
-	 jCl5i119bdw/3KvuZRhJxETpB3xUK+QDCSXShe32v65GNbScFKbxUSyJCP/3K3mIyQ
-	 DasZs8wAvGZ1hQLVr63crBdR95qNDS3JhiIBHWnu0iWTdFMcypVu6Zr4YPLG2Q7frZ
-	 8B1qWoWZEUpeA==
-Date: Sat, 9 May 2026 12:07:58 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, ansuelsmth@gmail.com,
-	benjamin.larsson@genexis.eu, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, madhur.agrawal@airoha.com
-Subject: Re: [PATCH net-next v4 10/10] net: airoha: Support multiple LAN/WAN
- interfaces for hw MAC address configuration
-Message-ID: <af8HfuSZ1hkJGA2O@lore-desk>
-References: <20260507-airoha-eth-multi-serdes-v4-10-af613b61ae02@kernel.org>
- <20260509014617.3558185-1-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72186272816;
+	Sat,  9 May 2026 10:27:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778322466; cv=fail; b=YUg0wKQT130vumAKo1PGAPsiolGW0puzqrsgepAC3pwX/5h9lvwi6TqcXZ6oFW9FUjl3fYgcgHEYq8baq5j7Mx2C4fIjJyfGb+tIQEECgge+euWAr1jvALz+reNkKYbO75gah21Izxngns1pon0yPHw8yVCnhVL77EOXisT+EdE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778322466; c=relaxed/simple;
+	bh=2UPhHcm+a2UTSAXJcpQXTMMNkASVsARX1pZ/o7YupiU=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=dS15LYZmTKebBeILrK/Uxp1eE+NcUtR389gYPr7uqeZIvl4+04vbOo3q8/g1biwA+xoBsyQ2AslX4gxtBFPLhCkcgoyrCH9T1bkaXzDqAzgZoxOJj+29YDOwnH9th2QYOT4J7qcbq1GCUmwfIBUkzeJlTPVbToBcopJ0aX9D9os=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=iUJMM2pO; arc=fail smtp.client-ip=40.107.162.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GG1e3ScEDgvFR96gX7ujXGP2eAkrwA6R7Nr+SrYuXwYfGtH4D5QD3JMoIPQZsDgkxWMnpgHD6S77Tw+1f54Gb49/tDb3d0PahuDzEmhK8axboqdDsubgJvPwMR7NVAWkKi9bxZ6jfm89WacUxOE5FngtBe86h5LQ+Dh7X4tKMNcW3LWYfTVGUomHW28TaJBjC2FFCxgpUmomRHYC+o3YBbmXnOGYj1rifx7vK84NuII4wzcb+JM8W9VXTprfq5aHN7Na7BwYlAPtmb1GrRoozSzJOf1EqDnbaT5a87BX1Yala1qyB7IMlcawlIhxXTjRBxU0qjQ4lWBjQ9o9h9hT0A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kE3Wr3Q2BKRWH4rWqJ+I4SkacaFTBbusLh3i8EIa0aU=;
+ b=r/OzFm8SaXL9C5n65Q0fEqAYG51R1kS/yAWW1V23ixR/8CmTXOqCu/VsjyU91hOAyQUk1HQ6MMx06JI1RhY4xHPQghfngb/SVavC4Htgc0fkME+Aur4OIu9urBrKjAldvhBq1XuQFG7UTaGuUBOYNJeccvSf27JpuGPP63kqYfJkr/KVQmTWmxmQixs6Rg/mf2f+3J3Z6jU9nn2RLnCHqFT/saWno3AmJOabA34xkofXzUHI8YaDUdyEDwmIyLO+r/5oxe2jpZnLd0ysFMgQk0FxGGHQuXkcv2+zQe3g2bbB34eTfgYaq1hgwhZAs6PaxgR82MPOngNSUpQrMc1xrw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kE3Wr3Q2BKRWH4rWqJ+I4SkacaFTBbusLh3i8EIa0aU=;
+ b=iUJMM2pOu7wKVDvHBy0VYmCExR10FZg+9mRGWUgFwPyyuYCd6/9vQvhBsT7sdX3FuG1TdD1LqiakDIS5QuowDAm+Mm4ZpscSHm7V3qrMFjFmH63Ek9cUFIeEcfJQ37I7JA8Kk6FO3Fjh82l1UbwAvdbqE0Z3JTm+SZfky+rqF30alZVwqVvOyzt3c4BnBVgfSZuBbRQZQO2XRwszMhV5dYSrpsnIIQpUPKjIsJKwp6vvgLQOy3hN8UcnjfxTz4KdnnMOtOXmQNT7qXyTzuD1oS0o7BRTJz/zx7Bluj52Qy+NzDTjk1RUgrYPgmQyBH3HhuzqE2UE516i0xwckAMOJw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
+ by PA1PR04MB10604.eurprd04.prod.outlook.com (2603:10a6:102:48e::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.20; Sat, 9 May
+ 2026 10:27:41 +0000
+Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
+ ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
+ ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.20.9891.019; Sat, 9 May 2026
+ 10:27:41 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com,
+	xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	f.fainelli@gmail.com,
+	frank.li@nxp.com,
+	chleroy@kernel.org,
+	horms@kernel.org,
+	linux@armlinux.org.uk,
+	maxime.chevallier@bootlin.com,
+	andrew@lunn.ch,
+	olteanv@gmail.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-arm-kernel@lists.infradead.org,
+	imx@lists.linux.dev
+Subject: [PATCH v6 net-next 00/15] Add preliminary NETC switch support for i.MX94
+Date: Sat,  9 May 2026 18:29:39 +0800
+Message-Id: <20260509102954.4116624-1-wei.fang@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SI2PR01CA0030.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:192::15) To DBBPR04MB7500.eurprd04.prod.outlook.com
+ (2603:10a6:10:1f4::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="lg/EUJE1MTlDMtub"
-Content-Disposition: inline
-In-Reply-To: <20260509014617.3558185-1-kuba@kernel.org>
-X-Rspamd-Queue-Id: 062AC4FF1A0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DBBPR04MB7500:EE_|PA1PR04MB10604:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2df4fcb3-55fe-4db1-a501-08deadb59964
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|52116014|1800799024|7416014|376014|19092799006|18002099003|38350700014|921020|56012099003|3023799003;
+X-Microsoft-Antispam-Message-Info:
+	bkM2pfREo70MJ5FjOLGpKqnoBKOgj5rUanJNbohrJAlLMf3SU+WU9iIEG4QNPtKwL7Vj/qW6CIYOLRNEbx+tqCPEf2XS8i1BaboS2Z3Nq0NhUzH+f9oesudowiMfxQZK6RyV1Tt5z7Z6tu/xrJi28TIXa8B2LAmfuKY8Q+3n2vQN1egu2pQxvWCB8y1InaUKjXnDH1QBwaQCEh5DZP6j6ZWPkncqLsIR6TwWk9T3svF1mby/EaRTYTi5abU5u6l8m4HA/XGLQ6/Y2TnrEV2dFIsVBbIGxk0PDiw2xShz6nx2e4t4X1+tSnlJ1CMK3bQS0pu0VMwaNsL/ZvE5XEyKfQAeC33mZvbfLj5u+qiIIxuPiiGNUth6uHlAya+M/VJFHsqPqtqYdjS293tFKEy7GgKIKC6mnGe0E1+eAsISXvPZabwpz5MrXqPwZv4A8u/GD0GolWULzDacsHoNKXVhGJRmqExkG3afDe12UpLp7iopLzRAtUviRs/KrvLEKnpYgWxryA5FRlUZs1EajiSIl+pVo6cVQc7n8chznFACkVawfYqouEsTZaMdD3qX5iGryGQ0UB1oKTS70JChjh5n78AHILfD9T9s4xk9yE6iqSODqJgo9w/ANdkMqAl9v7JcL7x4ohuooiAd08pA4fhutC1z6avfTq9yHsCMu/xE5tnT7VVLNE8WS1Cqp6l1egQzV5TVA09KXDtQutsXGck2YGQWLgb6hSEsxS4A/MproijSZ22BEeQkNnfKbmyRyL101eZAlrCT21g6IcXBygpUHw==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(52116014)(1800799024)(7416014)(376014)(19092799006)(18002099003)(38350700014)(921020)(56012099003)(3023799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?RtZS0c/5NblsOVBUBThivVLwLzoBeF01nWpe0ll26cRcSb8vxG2RoxBpAptZ?=
+ =?us-ascii?Q?EOeCO6oMxftzmwlRf3mrUEgnFgSG9LP7YooYm2bo4kwI5zVGDdTiituNLyYA?=
+ =?us-ascii?Q?vfV+3h/KvpzqNxpCCM9QW9APD7ThX563Mr0WiFMtkJNjy/+AcSiR86wfwKu5?=
+ =?us-ascii?Q?BE/ZQC+7Hq9aOxMQs2z/YiSw+NxO0pUISeJhQAeiTrqp16YNRiAb5iuiYbb8?=
+ =?us-ascii?Q?RbyI29vS/nkKG95Evemmqgd5ls3Ma37YMqcs05r6nNeRxHku3K8njUR19WQp?=
+ =?us-ascii?Q?GBOG2Kr5S96BAZsRAsHX1Vw04AmdinSdMwqmfEiOdooJc/CmMXOiLrTHvqeO?=
+ =?us-ascii?Q?njuytul5ULDQu7au0RSvXI8/AOaNxTYAE/9/yr8eSWWnueHjYuutUOgTIXQH?=
+ =?us-ascii?Q?aa54cJLH9LuI9P6kLR+FjF6qxnV6dwLupj/hROUg1S71wJtToISD2V9IqRlx?=
+ =?us-ascii?Q?8/282i6LXhyKFimjjZZlWWtD0Xxw8ISi91p9S8bMIPq0mx3qpa4VMWfakWSH?=
+ =?us-ascii?Q?Y8CTTlKHuW3FQH/zyde/07E0+h2cd6dwnTJK7J73cy+J2sZwEeQ6gvVBNiFd?=
+ =?us-ascii?Q?m7RH/ymMwP/pxxbfBpHx5X7NUAuXQSaVpiSHfPTPzv46aFxVEETjINQMYR1r?=
+ =?us-ascii?Q?gvZg0kcwOPg5QQcKPjr3PCiDhFVgtML+yxnYskliR+ZRBmHqz6mn9kvG+JeE?=
+ =?us-ascii?Q?0+hcpQUiCl15TmHmV0rHaPie09s0LNP5NJMHz0MqGXxOb9v1GnqgZxSZFpEg?=
+ =?us-ascii?Q?9qzv1q7a6nm9wWIKWEB0yHDlrCiu1etAKCEU32eBqa93ULb6FdhGHse7pxc/?=
+ =?us-ascii?Q?0KeBCLG0nkbtjUAKKwvghTR9Ih7be2DUHbh7HxlEJ6xIS4rDS7QNT2gkPJKB?=
+ =?us-ascii?Q?Omv1hej6b/P5qBl17PMcmdD2EBjVcuZT50OobyRc3SSCEuclFnTV2tR5ogOL?=
+ =?us-ascii?Q?dfUVqvzItxYsqTF/3LOPXEDt621Veuo4n8cEV+7BQcCv+HTm3hNr8KYIHlY1?=
+ =?us-ascii?Q?GuIvDGMPQogYzXU//l04R89F37ydV+P+bPtQF0XRH13GaQP8ZN9ipyNGewI7?=
+ =?us-ascii?Q?k73ae0IeumbsLpIp4DgLozbBm/u15dMYiABybIQkO1wr43VN3Zjxd/7oDUuK?=
+ =?us-ascii?Q?0Bf5w9h6MvBjafV3XDMfg9M06KLGq6IwvT09i+fd6GK6kmPA3rrbrJeXAGbq?=
+ =?us-ascii?Q?VWdU1/kBU1GONYmI4VVQSexIL+6nQbooFtBM3GvW/bpcSVnyQwMVG6x13qI1?=
+ =?us-ascii?Q?MS79QK7bwDzc0AapQCywDaISuLlu7mgYphy3wxiz3x0Dr2IwTT6ZBNsR8lYn?=
+ =?us-ascii?Q?KigNUubN3OB2DA3jQBucKdvNkUYtVHDgkp6pmw5sG/aQWZcis6lkyhGNQxng?=
+ =?us-ascii?Q?W+qfEMYfH53Rzjo2G12MKrqtY6If8ylqSxe3/0V8S+ceyHVf8ihBtGxSwClj?=
+ =?us-ascii?Q?GKOUOyApbyM9BWIDEHw8PpTd08ISPMKSVYj+ko8PnttFYKOhAy7O+mfk+NFM?=
+ =?us-ascii?Q?mIznmVHMtQtlzbF9b2KGzqseq5M8ZvdaDuJBn7bhv+V2QZ9bQw9t5csTpyKI?=
+ =?us-ascii?Q?PUgoLx8bGzLyaunJnCHnWSa3Beg/e/PcKzt+rTYFEPdNTMu2UMZHZujniY8K?=
+ =?us-ascii?Q?Q+YJvDbzrcRnullVzqxS6u7N6V9SJlQoi1qmoDY/XgZlMjyOU5lOwG6cJ20j?=
+ =?us-ascii?Q?b+oNmooZukWoIO+ZYjSeqOVO2DoGJu2kDTWtMZBWda3JWCEsgE/6sbobLFy5?=
+ =?us-ascii?Q?qGRPiCkhpA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2df4fcb3-55fe-4db1-a501-08deadb59964
+X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 May 2026 10:27:40.9387
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: y1JkvF+A6HtRy8jIyKF1r/Wf1wo2FSLctGzK+zInlV3ZXWrLsLZmvbHyi504tDerKn8Swkn6N1VJN2gKSzBlwg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR04MB10604
+X-Rspamd-Queue-Id: 893584FF39E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286141-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286142-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,bootlin.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,genexis.eu,lists.infradead.org,vger.kernel.org,airoha.com];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.969];
+	TO_DN_NONE(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
+i.MX94 NETC (v4.3) integrates 802.1Q Ethernet switch functionality, the
+switch provides advanced QoS with 8 traffic classes and a full range of
+TSN standards capabilities. It has 3 user ports and 1 CPU port, and the
+CPU port is connected to an internal ENETC through the pseduo link, so
+instead of a back-to-back MAC, the lightweight "pseudo MAC" is used at
+both ends of the pseudo link to transfer Ethernet frames. The pseudo
+link provides a zero-copy interface (no serialization delay) and lower
+power (less logic and memory).
 
---lg/EUJE1MTlDMtub
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Like most Ethernet switches, the NETC switch also supports a proprietary
+switch tag, is used to carry in-band metadata information about frames.
+This in-band metadata information can include the source port from which
+the frame was received, what was the reason why this frame got forwarded
+to the entity, and for the entity to indicate the precise destination
+port of a frame. The NETC switch tag is added to frames after the source
+MAC address. There are three types of switch tags, and each type has 1
+to 4 subtypes, more details are as follows.
 
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> ---
-> net: airoha: Support multiple LAN/WAN interfaces for hw MAC address confi=
-guration
->=20
-> This patch extends airoha_set_macaddr() to derive REG_FE_MAC_LMIN and
-> REG_FE_MAC_LMAX by iterating over all sibling LAN/WAN net_devices, and
-> rejects addresses whose upper 3 bytes do not match the already-registered
-> peers. airoha_dev_set_macaddr() is also changed to split eth_mac_addr()
-> into eth_prepare_mac_addr_change() and eth_commit_mac_addr_change() around
-> the hardware programming step.
->=20
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
-ernet/airoha/airoha_eth.c
-> > index 8617dd4f7932..fbfefd0ec355 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> > @@ -71,20 +71,67 @@ static void airoha_qdma_irq_disable(struct airoha_i=
-rq_bank *irq_bank,
-> >  	airoha_qdma_set_irqmask(irq_bank, index, mask, 0);
-> >  }
-> > =20
-> > -static void airoha_set_macaddr(struct airoha_gdm_dev *dev, const u8 *a=
-ddr)
-> > +static int airoha_set_macaddr(struct airoha_gdm_dev *dev, const u8 *ad=
-dr)
-> >  {
-> >  	struct airoha_eth *eth =3D dev->eth;
-> > -	u32 val, reg;
-> > +	u8 ref_addr[ETH_ALEN] =3D {};
-> > +	u32 reg, val, lmin, lmax;
-> > +	int i;
-> > +
-> > +	lmin =3D (addr[3] << 16) | (addr[4] << 8) | addr[5];
-> > +	lmax =3D lmin;
-> > +
-> > +	for (i =3D 0; i < ARRAY_SIZE(eth->ports); i++) {
-> > +		struct airoha_gdm_port *port =3D eth->ports[i];
-> > +		int j;
-> > +
-> > +		if (!port)
-> > +			continue;
-> > +
-> > +		for (j =3D 0; j < ARRAY_SIZE(port->devs); j++) {
-> > +			struct airoha_gdm_dev *iter_dev;
-> > +			struct net_device *netdev;
-> > +
-> > +			iter_dev =3D port->devs[j];
-> > +			if (!iter_dev || iter_dev =3D=3D dev)
-> > +				continue;
-> > +
-> > +			if (airoha_is_lan_gdm_dev(iter_dev) !=3D
-> > +			    airoha_is_lan_gdm_dev(dev))
-> > +				continue;
-> > +
-> > +			netdev =3D iter_dev->dev;
-> > +			if (netdev->reg_state !=3D NETREG_REGISTERED)
-> > +				continue;
-> > +
-> > +			ether_addr_copy(ref_addr, netdev->dev_addr);
-> > +			val =3D (netdev->dev_addr[3] << 16) |
-> > +			      (netdev->dev_addr[4] << 8) | netdev->dev_addr[5];
-> > +			if (val < lmin)
-> > +				lmin =3D val;
-> > +			if (val > lmax)
-> > +				lmax =3D val;
-> > +		}
-> > +	}
-> > +
-> > +	if (!is_zero_ether_addr(ref_addr) && memcmp(ref_addr, addr, 3)) {
-> > +		/* According to the HW design, hw mac address MS bits
-> > +		 * must be the same for each net_device with the same
-> > +		 * LAN/WAN configuration.
-> > +		 */
-> > +		return -EINVAL;
-> > +	}
->=20
-> [Medium]
-> The NETREG_REGISTERED filter here means the check only sees peers that
-> have already completed register_netdev(). airoha_dev_init() is invoked
-> as ndo_init from register_netdev() before dev->reg_state transitions
-> to NETREG_REGISTERED, so the constraint is only enforced across
-> already-registered siblings.
->=20
-> When the device tree does not supply a mac-address property,
-> airoha_alloc_gdm_device() falls back to eth_hw_addr_random() and each
-> sibling gets an independently generated random MAC. With two or more
-> LAN (or two or more WAN) net_devices going through this fallback, the
-> second and later siblings' upper 3 bytes will almost always differ
-> from the first, so airoha_set_macaddr() returns -EINVAL:
->=20
-> 	if (!is_zero_ether_addr(ref_addr) && memcmp(ref_addr, addr, 3))
-> 		return -EINVAL;
->=20
-> airoha_dev_init() now propagates that error, which fails
-> register_netdev() and airoha_register_gdm_devices(), aborting probe.
->=20
-> Before this patch the same configuration still came up (with the single
-> REG_FE_{LAN,WAN}_MAC_H being last-writer-wins). Should the random
-> fallback path derive sibling MACs from a shared base, or should the
-> upper-3-bytes constraint only be enforced for user-triggered
-> ndo_set_mac_address rather than for init-time programming?
+Forward switch tag (Type = 0): Represents forwarded frames.
+  - SubType = 0 - Normal frame processing.
 
-Hw design requires that if two (or more) net_devices are configured as LAN
-(or theoretically as WAN), they need to share the mac address upper-3-bytes.
-If the user wants to use multiple devices with the same LAN/WAN configurati=
-on,
-he/she will need to properly store the net_device mac address int the device
-eeprom/nvme or in the dts.
-Please note this series is not introducing any regression since the user was
-not able to run this configuration before this series.
+To_Port switch tag (Type = 1): Represents frames that are to be sent to
+a specific switch port.
+  - SubType = 0. No request to perform timestamping.
+  - SubType = 1. Request to perform one-step timestamping.
+  - SubType = 2. Request to perform two-step timestamping.
+  - SubType = 3. Request to perform both one-step timestamping and
+    two-step timestamping.
 
->=20
-> > =20
-> >  	reg =3D airoha_is_lan_gdm_dev(dev) ? REG_FE_LAN_MAC_H : REG_FE_WAN_MA=
-C_H;
-> >  	val =3D (addr[0] << 16) | (addr[1] << 8) | addr[2];
-> >  	airoha_fe_wr(eth, reg, val);
-> > =20
-> > -	val =3D (addr[3] << 16) | (addr[4] << 8) | addr[5];
-> > -	airoha_fe_wr(eth, REG_FE_MAC_LMIN(reg), val);
-> > -	airoha_fe_wr(eth, REG_FE_MAC_LMAX(reg), val);
-> > +	airoha_fe_wr(eth, REG_FE_MAC_LMIN(reg), lmin);
-> > +	airoha_fe_wr(eth, REG_FE_MAC_LMAX(reg), lmax);
-> > =20
-> >  	airoha_ppe_init_upd_mem(dev);
-> > +
-> > +	return 0;
-> >  }
-> > =20
-> >  static void airoha_set_gdm_port_fwd_cfg(struct airoha_eth *eth, u32 ad=
-dr,
-> > @@ -1792,13 +1839,18 @@ static int airoha_dev_stop(struct net_device *n=
-etdev)
-> >  static int airoha_dev_set_macaddr(struct net_device *netdev, void *p)
-> >  {
-> >  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> > +	struct sockaddr *addr =3D p;
-> >  	int err;
-> > =20
-> > -	err =3D eth_mac_addr(netdev, p);
-> > +	err =3D eth_prepare_mac_addr_change(netdev, p);
-> >  	if (err)
-> >  		return err;
-> > =20
-> > -	airoha_set_macaddr(dev, netdev->dev_addr);
-> > +	err =3D airoha_set_macaddr(dev, addr->sa_data);
-> > +	if (err)
-> > +		return err;
-> > +
-> > +	eth_commit_mac_addr_change(netdev, p);
-> > =20
-> >  	return 0;
-> >  }
->=20
-> [High]
-> After this reordering, does airoha_ppe_init_upd_mem() end up
-> programming the PPE update memory with the old MAC rather than the new
-> one?
->=20
-> eth_prepare_mac_addr_change() only validates the sockaddr and does not
-> touch netdev->dev_addr; the actual write to netdev->dev_addr happens in
-> eth_commit_mac_addr_change() via eth_hw_addr_set():
->=20
-> net/ethernet/eth.c:eth_prepare_mac_addr_change() {
-> 	if (!(dev->priv_flags & IFF_LIVE_ADDR_CHANGE) && netif_running(dev))
-> 		return -EBUSY;
-> 	if (!is_valid_ether_addr(addr->sa_data))
-> 		return -EADDRNOTAVAIL;
-> 	return 0;
-> }
->=20
-> net/ethernet/eth.c:eth_commit_mac_addr_change() {
-> 	eth_hw_addr_set(dev, addr->sa_data);
-> }
->=20
-> airoha_set_macaddr() is invoked between those two, so when it reaches
-> airoha_ppe_init_upd_mem(dev) the commit has not yet run. That helper
-> reads netdev->dev_addr directly rather than using the addr argument:
->=20
-> drivers/net/ethernet/airoha/airoha_ppe.c:airoha_ppe_init_upd_mem() {
-> 	const u8 *addr =3D netdev->dev_addr;
-> 	...
-> 	val =3D (addr[2] << 24) | (addr[3] << 16) | (addr[4] << 8) | addr[5];
-> 	airoha_fe_wr(eth, REG_UPDMEM_DATA(0), val);
-> 	...
-> 	val =3D (addr[0] << 8) | addr[1];
-> 	airoha_fe_wr(eth, REG_UPDMEM_DATA(0), val);
-> 	...
-> }
->=20
-> So the FE registers REG_FE_{LAN,WAN}_MAC_H / REG_FE_MAC_LMIN /
-> REG_FE_MAC_LMAX are written from the new addr parameter, but the PPE
-> REG_UPDMEM_DATA/REG_UPDMEM_CTRL entries are written from the still-old
-> netdev->dev_addr.
->=20
-> Previously eth_mac_addr() (prepare + commit combined) ran first, so
-> netdev->dev_addr was the new MAC by the time airoha_set_macaddr() and
-> airoha_ppe_init_upd_mem() ran, keeping the two blocks in sync.
->=20
-> Would it be cleaner to either pass addr through to
-> airoha_ppe_init_upd_mem(), or invoke eth_commit_mac_addr_change() before
-> airoha_set_macaddr() (with a rollback path if the hardware programming
-> fails)?
+To_Host switch tag (Type = 2): Represents frames redirected or copied to
+the switch management port.
+  - SubType = 0. Received frames redirected or copied to the switch
+     management port.
+  - SubType = 1. Received frames redirected or copied to the switch
+    management port with captured timestamp at the switch port where
+    the frame was received.
+  - SubType = 2. Transmit timestamp response (two-step timestamping).
 
-ack, I will fix it in v5.
+Currently, this patch set supports Forward tag, SubType 0 of To_Port tag
+and SubType 0 of To_Host tag. More tags will be supported in the future.
 
-Regards,
-Lorenzo
+In addition, the switch supports NETC Table Management Protocol (NTMP),
+some switch functionality is controlled using control messages sent to
+the hardware using BD ring interface with 32B descriptors similar to the
+packet Transmit BD ring used on ENETC. This interface is referred to as
+the command BD ring. This is used to configure functionality where the
+underlying resources may be shared between different entities or being
+too large to configure using direct registers.
 
->=20
-> > @@ -1903,6 +1955,7 @@ static int airoha_dev_init(struct net_device *net=
-dev)
-> [ ... ]
+For this patch set, we have supported the following tables through the
+command BD ring interface.
 
---lg/EUJE1MTlDMtub
-Content-Type: application/pgp-signature; name=signature.asc
+FDB Table: It contains forwarding and/or filtering information about MAC
+addresses. The FDB table is used for MAC learning lookups and MAC
+forwarding lookups.
 
------BEGIN PGP SIGNATURE-----
+VLAN Filter Table: It contains configuration and control information for
+each VLAN configured on the switch.
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaf8HfgAKCRA6cBh0uS2t
-rCrFAQC4cypXPyLYpkfCjZ+8fARSlLo1SxcqMz7kvKN7sd0RnAEAx5U4W8tYhksn
-GK2mSoplDd6MwDsxrrEmtIg5gaY9ogw=
-=61qR
------END PGP SIGNATURE-----
+Buffer Pool Table: It contains buffer pool configuration and operational
+information. Each entry corresponds to a buffer pool. Currently, we use
+this table to implement flow control feature on each port.
 
---lg/EUJE1MTlDMtub--
+Ingress Port Filter Table: It contains a set of filters each capable of
+classifying incoming traffic using a mix of L2, L3, and L4 parsed and
+arbitrary field data. We use this table to implement host flood support
+to the switch port.
+
+The switch also supports other tables, and we will add more advanced
+features through them in the future.
+
+---
+v6:
+1. Use FIELD_GET() to get switch tag type
+2. Add PCI BAR length check in netc_switch_pci_init()
+3. Remove CPU port check from netc_port_change_mtu()
+4. Move netc_port_get_info_from_dt() from patch 10 to patch 12
+5. Update the comment for NTMP_QA_ENTRY_ID
+6. Collect Reviewed-by tags
+v5 link: https://lore.kernel.org/imx/20260430024945.3413973-1-wei.fang@nxp.com/
+v4 link: https://lore.kernel.org/imx/20260331113025.1566878-1-wei.fang@nxp.com/
+v3 link: https://lore.kernel.org/imx/20260326062917.3552334-1-wei.fang@nxp.com/
+v2 link: https://lore.kernel.org/imx/20260323060752.1157031-1-wei.fang@nxp.com/
+v1 link: https://lore.kernel.org/imx/20260316094152.1558671-1-wei.fang@nxp.com/
+---
+
+Wei Fang (15):
+  dt-bindings: net: dsa: update the description of 'dsa,member' property
+  dt-bindings: net: dsa: add NETC switch
+  net: enetc: add pre-boot initialization for i.MX94 switch
+  net: enetc: add basic operations to the FDB table
+  net: enetc: add support for the "Add" operation to VLAN filter table
+  net: enetc: add support for the "Update" operation to buffer pool
+    table
+  net: enetc: add support for "Add" and "Delete" operations to IPFT
+  net: enetc: add multiple command BD rings support
+  net: dsa: add NETC switch tag support
+  net: dsa: netc: introduce NXP NETC switch driver for i.MX94
+  net: dsa: netc: add phylink MAC operations
+  net: dsa: netc: add FDB, STP, MTU, port setup and host flooding
+    support
+  net: dsa: netc: initialize buffer pool table and implement
+    flow-control
+  net: dsa: netc: add support for the standardized counters
+  net: dsa: netc: add support for ethtool private statistics
+
+ .../devicetree/bindings/net/dsa/dsa.yaml      |    6 +-
+ .../bindings/net/dsa/nxp,netc-switch.yaml     |  127 ++
+ MAINTAINERS                                   |   11 +
+ drivers/net/dsa/Kconfig                       |    2 +
+ drivers/net/dsa/Makefile                      |    1 +
+ drivers/net/dsa/netc/Kconfig                  |   14 +
+ drivers/net/dsa/netc/Makefile                 |    3 +
+ drivers/net/dsa/netc/netc_ethtool.c           |  297 ++++
+ drivers/net/dsa/netc/netc_main.c              | 1561 +++++++++++++++++
+ drivers/net/dsa/netc/netc_platform.c          |   87 +
+ drivers/net/dsa/netc/netc_switch.h            |  173 ++
+ drivers/net/dsa/netc/netc_switch_hw.h         |  361 ++++
+ .../ethernet/freescale/enetc/netc_blk_ctrl.c  |  185 +-
+ drivers/net/ethernet/freescale/enetc/ntmp.c   |  383 +++-
+ .../ethernet/freescale/enetc/ntmp_private.h   |  122 +-
+ include/linux/dsa/tag_netc.h                  |   14 +
+ include/linux/fsl/netc_global.h               |    6 +
+ include/linux/fsl/ntmp.h                      |  187 +-
+ include/net/dsa.h                             |    2 +
+ include/uapi/linux/if_ether.h                 |    1 +
+ net/dsa/Kconfig                               |   10 +
+ net/dsa/Makefile                              |    1 +
+ net/dsa/tag_netc.c                            |  193 ++
+ 23 files changed, 3717 insertions(+), 30 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/dsa/nxp,netc-switch.yaml
+ create mode 100644 drivers/net/dsa/netc/Kconfig
+ create mode 100644 drivers/net/dsa/netc/Makefile
+ create mode 100644 drivers/net/dsa/netc/netc_ethtool.c
+ create mode 100644 drivers/net/dsa/netc/netc_main.c
+ create mode 100644 drivers/net/dsa/netc/netc_platform.c
+ create mode 100644 drivers/net/dsa/netc/netc_switch.h
+ create mode 100644 drivers/net/dsa/netc/netc_switch_hw.h
+ create mode 100644 include/linux/dsa/tag_netc.h
+ create mode 100644 net/dsa/tag_netc.c
+
+-- 
+2.34.1
+
 
