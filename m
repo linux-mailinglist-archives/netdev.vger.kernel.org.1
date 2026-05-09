@@ -1,139 +1,195 @@
-Return-Path: <netdev+bounces-286129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286130-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kCW3Bun5/mng0gAAu9opvQ
-	(envelope-from <netdev+bounces-286129-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 11:10:01 +0200
+	id yFrbC1r+/mnm0wAAu9opvQ
+	(envelope-from <netdev+bounces-286130-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 11:28:58 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 612EC4FEED6
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 11:10:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 745504FEFCD
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 11:28:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E9492300DDD5
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 09:09:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 39EC2301051B
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 09:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC6D7397691;
-	Sat,  9 May 2026 09:09:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bc4YlmP/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AADE638F64C;
+	Sat,  9 May 2026 09:28:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF3E396590;
-	Sat,  9 May 2026 09:09:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE8E208D0;
+	Sat,  9 May 2026 09:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778317797; cv=none; b=PrIBAhIkan6Aspk5PghHu0eYoG2qSvYPAPKP6JJ+Iymh3TVKBxiNuqGwC4Y7aB3mePPzHP9Iz2ttcg7BUPNGKw10yj8SsDNSgFr8ZiyjUCc/KsHF3SEtXmwfxz4h8rpHz67gQG1P567aC+N56Hs7g8RDVNkrCi8mm1Kx/v+HoyM=
+	t=1778318930; cv=none; b=tCLcvotaMvMsaAKOZgiVlP6lPaAko2T3RGOtRssJci1LzFAoa7rmfDzpRuJhbj9CNwt1jB1KPqsflM+zjFiZwVuHPPUVXibfBFrRcfnL6N2eFSzbtS+A98q+eCXy61IFqKQcxrFpfzLnPnlps36RKmCI9vhSVMvfrGQfH0M2zyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778317797; c=relaxed/simple;
-	bh=I9xmCKGHzYxSSinS9IY36jR9jBt7BmV4S2kZeKuaUp4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uSKteQMDLX3FLUHnoV0e6EoLMZHnzFQv0RKVSyN0i0t/g6DV6176zSjkw0oVjznajpvVQFWS4Bq9DUIr4MSKR4QpTIv+M5j4PHcFhZFC1guNODoQ2WAalzLDBddH1BOx3NihCvbnMvdybEA+VZoSNm9VX0W2DrJ3JRL5wB+Xprw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bc4YlmP/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F360C2BCB2;
-	Sat,  9 May 2026 09:09:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778317796;
-	bh=I9xmCKGHzYxSSinS9IY36jR9jBt7BmV4S2kZeKuaUp4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=bc4YlmP/sUpsEYe9VaGxXj/JScjxIU7hY0Wddht5Pg+tOeTnpG2tGATpEs0M9yEa+
-	 eyTFeaTdXirU9ts2g9Vmqfc/np6rgLyUWVH/YE1ru+g0hRibmzs1t0vBTigHyUxN9n
-	 I8NtAtvB9iZhFn/ZoLCqheoEcAVPh6DGPPx9EkAZnuLyCSkgmPjFM/FRWFHfwKLMWw
-	 xMkxrNZpmXidWaFfkFChQhnAn25o17jJk8RFDQDD7A0rnm+PjDPAuwKVTVfw5c4vdD
-	 FFSZaL934Stwmlhq7vc6z0+xrzMBYaRuvFnlmefKIUju4po6E7arf4N3BCDBY4JpBV
-	 e9MmHdtGZmIzg==
-Message-ID: <f459b95c-80d5-4e05-84b2-f574c92724de@kernel.org>
-Date: Sat, 9 May 2026 11:09:51 +0200
+	s=arc-20240116; t=1778318930; c=relaxed/simple;
+	bh=FWWXJkwrdDXa/mKHmNpzbx3h/Hc9w3djI2kCJYGaY9Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Y3SR93n3rEto7PxGtgDtwUHhFbPk3NUJB33vJREh8tGYi8ywr5JBmaVBZV4yMYtGWkiMu8yLerU5wNmMX3rNgQEIsIGq9DNUjGcKsMHP4vK4n2fcPbapmvNvGM0ySNc0WrZrCmx+VSJabSLLKO81IcN5LAyfEiWmmcFwWtpYGfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mails.ucas.ac.cn; spf=pass smtp.mailfrom=mails.ucas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mails.ucas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.ucas.ac.cn
+Received: from fric.. (unknown [36.110.52.2])
+	by APP-03 (Coremail) with SMTP id rQCowAA3WN9G_v5pCJJ7EA--.18905S2;
+	Sat, 09 May 2026 17:28:38 +0800 (CST)
+From: Jiakai Xu <xujiakai24@mails.ucas.ac.cn>
+To: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jiakai Xu <xujiakai24@mails.ucas.ac.cn>
+Subject: [PATCH] netdevsim: Fix task hung by releasing bus lock before device ops
+Date: Sat,  9 May 2026 09:28:37 +0000
+Message-Id: <20260509092837.3432281-1-xujiakai24@mails.ucas.ac.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 3/5] veth: implement Byte Queue Limits (BQL)
- for latency reduction
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Schippers <simon@schippers-hamm.de>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, kernel-team@cloudflare.com,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20260505132159.241305-1-hawk@kernel.org>
- <20260505132159.241305-4-hawk@kernel.org>
- <ee275aa6-af27-4dac-9afa-da88abde312b@schippers-hamm.de>
- <8f2f7f2e-6aa2-4e5b-b52d-0025b2525579@redhat.com>
- <e3a91545-13cd-4f87-8375-d707865bdbca@schippers-hamm.de>
- <6a597dbd-70bf-4b14-b495-2f7248fd3220@kernel.org>
- <20260508190626.4285fac0@kernel.org>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20260508190626.4285fac0@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 612EC4FEED6
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowAA3WN9G_v5pCJJ7EA--.18905S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxZr13uw4fur45XryftrW5Wrg_yoW5urW5pw
+	43tFy3tF97ZwnrXan8Z3W8ur1Y9r1q9w4furW5Ar97CFs8ZFyYqr17GFy3XrW09rW7uayU
+	JFyUWw4UAr4UXr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Gr0_Cr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
+	rcIFxwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
+	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
+	67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
+	IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
+	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxh
+	VjvjDU0xZFpf9x0JUS1v3UUUUU=
+X-CM-SenderInfo: 50xmxthndljko6pdxz3voxutnvoduhdfq/
+X-Rspamd-Queue-Id: 745504FEFCD
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286129-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286130-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[ucas.ac.cn];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[schippers-hamm.de,redhat.com,vger.kernel.org,cloudflare.com,lunn.ch,davemloft.net,google.com,kernel.org,iogearbox.net,gmail.com,fomichev.me];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FROM_NEQ_ENVFROM(0.00)[xujiakai24@mails.ucas.ac.cn,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.876];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mails.ucas.ac.cn:mid,ucas.ac.cn:email]
 X-Rspamd-Action: no action
 
+The new_device_store and del_device_store sysfs handlers hold
+nsim_bus_dev_list_lock across device_register() and device_unregister()
+calls, which in turn acquire rtnl_lock and devl_lock. This creates
+a lock hold-time inversion: while one thread holds nsim_bus_dev_list_lock
+and waits for rtnl_lock (acquired during probe), all other threads
+attempting new_device_store or del_device_store are blocked on
+nsim_bus_dev_list_lock, and threads waiting for rtnl_lock are also
+blocked.
 
+Fix by:
+1. Moving nsim_bus_dev_new() (which calls device_register()) outside
+   the nsim_bus_dev_list_lock critical section in new_device_store
+2. Releasing nsim_bus_dev_list_lock before calling nsim_bus_dev_del()
+   (which calls device_unregister()) in del_device_store
+3. Moving refcount_inc(&nsim_bus_devs) into nsim_bus_dev_new() before
+   device_register(), so the refcount correctly accounts for the
+   device even if the bus is being torn down concurrently
 
+Signed-off-by: Jiakai Xu <xujiakai24@mails.ucas.ac.cn>
+---
+ drivers/net/netdevsim/bus.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
 
-On 09/05/2026 04.06, Jakub Kicinski wrote:
-> On Thu, 7 May 2026 21:09:09 +0200 Jesper Dangaard Brouer wrote:
->>>>> I still think first that adding an option to modify the hard-coded
->>>>> VETH_RING_SIZE is the way to go.
->>
->> Not against being able to modify VETH_RING_SIZE, but I don't think it is
->> the solution here.
-> 
-> Was it evaluated, tho?
-> 
-> It's obviously super easy these days have AI spew no end of complex
-> code. So it'd be great to have some solid, ideally production-like
-> data to back this all up.
-> 
-> VETH_RING_SIZE seems trivial, ethtool set ringparam
+diff --git a/drivers/net/netdevsim/bus.c b/drivers/net/netdevsim/bus.c
+index 41483e371f05..0e15c8605997 100644
+--- a/drivers/net/netdevsim/bus.c
++++ b/drivers/net/netdevsim/bus.c
+@@ -181,20 +181,18 @@ new_device_store(const struct bus_type *bus, const char *buf, size_t count)
+ 		return -EINVAL;
+ 	}
+ 
++	nsim_bus_dev = nsim_bus_dev_new(id, port_count, num_queues);
++	if (IS_ERR(nsim_bus_dev))
++		return PTR_ERR(nsim_bus_dev);
++
+ 	mutex_lock(&nsim_bus_dev_list_lock);
+ 	/* Prevent to use resource before initialization. */
+ 	if (!smp_load_acquire(&nsim_bus_enable)) {
+-		err = -EBUSY;
+-		goto err;
+-	}
+-
+-	nsim_bus_dev = nsim_bus_dev_new(id, port_count, num_queues);
+-	if (IS_ERR(nsim_bus_dev)) {
+-		err = PTR_ERR(nsim_bus_dev);
+-		goto err;
++		mutex_unlock(&nsim_bus_dev_list_lock);
++		nsim_bus_dev_del(nsim_bus_dev);
++		return -EBUSY;
+ 	}
+ 
+-	refcount_inc(&nsim_bus_devs);
+ 	/* Allow using nsim_bus_dev */
+ 	smp_store_release(&nsim_bus_dev->init, true);
+ 
+@@ -202,9 +200,6 @@ new_device_store(const struct bus_type *bus, const char *buf, size_t count)
+ 	mutex_unlock(&nsim_bus_dev_list_lock);
+ 
+ 	return count;
+-err:
+-	mutex_unlock(&nsim_bus_dev_list_lock);
+-	return err;
+ }
+ static BUS_ATTR_WO(new_device);
+ 
+@@ -241,9 +236,9 @@ del_device_store(const struct bus_type *bus, const char *buf, size_t count)
+ 		if (nsim_bus_dev->dev.id != id)
+ 			continue;
+ 		list_del(&nsim_bus_dev->list);
++		mutex_unlock(&nsim_bus_dev_list_lock);
+ 		nsim_bus_dev_del(nsim_bus_dev);
+-		err = 0;
+-		break;
++		return count;
+ 	}
+ 	mutex_unlock(&nsim_bus_dev_list_lock);
+ 	return !err ? count : err;
+@@ -468,6 +463,11 @@ nsim_bus_dev_new(unsigned int id, unsigned int port_count, unsigned int num_queu
+ 	/* Disallow using nsim_bus_dev */
+ 	smp_store_release(&nsim_bus_dev->init, false);
+ 
++	/* Increment refcount before device_register() so that the device
++	 * is accounted for even if the bus is being torn down concurrently.
++	 */
++	refcount_inc(&nsim_bus_devs);
++
+ 	err = device_register(&nsim_bus_dev->dev);
+ 	if (err)
+ 		goto err_nsim_bus_dev_id_free;
+-- 
+2.34.1
 
-No, unfortunately we cannot just decrease the VETH_RING_SIZE.  The
-reason is that XDP-redirect into veth don't have any back-pressure and
-would simply drop packets if queue size becomes less than the NAPI
-budget (64). (Yes, we use both normal path and XDP-redirect in
-production).  My benchmarking shows that an optimal BQL limit is
-dynamically adjusted between 17-55 depending on veth consumer namespace
-overhead/speed, when balancing throughput and latency.
-
---Jesper
 
