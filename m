@@ -1,113 +1,153 @@
-Return-Path: <netdev+bounces-286071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286072-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MA5IJBmP/mkiswAAu9opvQ
-	(envelope-from <netdev+bounces-286071-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 03:34:17 +0200
+	id ALwJHLyQ/mlyswAAu9opvQ
+	(envelope-from <netdev+bounces-286072-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 03:41:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA9A84FD502
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 03:34:16 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE26A4FD5B9
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 03:41:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6EB05301224E
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 01:32:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 19BBF3014C22
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 01:41:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B290F248F62;
-	Sat,  9 May 2026 01:32:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D4227FB2A;
+	Sat,  9 May 2026 01:41:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fZ6yQpZI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lNSqAgvs"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9162F8EBE
-	for <netdev@vger.kernel.org>; Sat,  9 May 2026 01:32:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 515F2278156;
+	Sat,  9 May 2026 01:41:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778290345; cv=none; b=SL+zV1MzG/4j460iduRYUbbGoCE2ksQfpoqIKqXK+hg2tbynfMr8QyvGZSy5WNVAnRDrIiBa5PmMMGoItKLllkyO0VUSXHSuK4JQpODQQJjRFMqAz4k/OfI7CQFBFYSZ29FBG5T5c9HYqJ5U2u9uHRrLVJknKHZlYbzzRXYqOek=
+	t=1778290873; cv=none; b=DwEcyjT8dzjSej1tFKhXr2pLU+oLk1RICh35cPIug1VH9/u9LF5FcM3yc9VZ6kR7i3xtmStxio79N9wEtvwFLQ/Fl9NoVDnBm3MGL9aeWOEInNtDhAvZSV/esIub2NOpzU3qjs+XpwcjRMwchSd2JIudJ3yVHllktNxbarrgJgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778290345; c=relaxed/simple;
-	bh=A2CHEnH7HIiJd44A/owsr/VuD+rsw11rRjZ/M0jBzfU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dULBTvOKdo60sTMx9Gd+nzdqxahjfX7usjKRas10xdwAIx/ZElad0wfbPlZI4eSGQoO/qsHZZP5aprs+zv60qV4PNl8FcXht6IZDw22QWtF7cVwk/42WZc3yUz+upyZTTmYBXBZPvO77PpIsqdKbH/0JD06cDqLpfXIuOz+ECRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fZ6yQpZI; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <85cac832-64f1-4968-abcc-460b8df8918b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1778290341;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/9sOUkwakbVV7WsZnPUpKNQQ3Ghif9Itez6rShJQHbg=;
-	b=fZ6yQpZInDc9XUpWEbt4tmkjAembd2rvPFPemj2+f4eh3H6r+8hD3gQbJ3GUopmZWy36Vz
-	W1J+GJpYB8bcmbcw+ZL9CSIGV436hy9npRRfnG2MtikHDE7QtKoJ8SaKh3Wi8A2vMHOPQE
-	fHMVkOpyKdK8pTk5uxyFmEECkVxYrbA=
-Date: Sat, 9 May 2026 09:32:06 +0800
+	s=arc-20240116; t=1778290873; c=relaxed/simple;
+	bh=LPHO7mWMRRT8fu6h/79gWlYEjg9jE+RXDoObQaxTUSk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=nsraXsBj3iET8Z66g6zwZBdaLs3vTZC0D7vHKTONUtVKAipgzo/rBJad1A1Uotpj/rMMaWeh4TmXhGn0TA5QfcL1YIHtb6S0sVJi1h8wsVRGqNlzXkA69BqZynlWiHaHnKNyucab4sWhlmYGye51vZbCbjkqhyssVE2V8A5sKkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lNSqAgvs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED232C2BCB0;
+	Sat,  9 May 2026 01:41:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778290873;
+	bh=LPHO7mWMRRT8fu6h/79gWlYEjg9jE+RXDoObQaxTUSk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=lNSqAgvsqnAMn0JbjXmj1zhPby6CXnj9hhdr6cGkCv0HSYT3IWeGyApFL2FokkEtV
+	 dzFaRDt75KtH4QJCL12PGxvZqDQuprlGo5F2KiMk/YioYX4LfH3w6dTVEDXEQzEPsY
+	 8LYTK+Iortxhlq3Yt4eq41oiBV5XltdHDcfFncRApHD7t4BEhe0k6cp+dw+j58BlJg
+	 9zA5c4cD/LbaY2J22PwxnygdB+rwPy8jaPUreBzVSGHf0HFtwxpydPZ1Saez0sYwWL
+	 YlDpZJt5U01T7ONSSgnwPwQjzdEoxrrQea3yMtsfRPnvgHlw49adrwkbNWHTHsw497
+	 /3svYnNM45tLA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CEF738119E4;
+	Sat,  9 May 2026 01:40:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] rxrpc: Also unshare DATA/RESPONSE packets when paged
- frags are present
-To: Jakub Kicinski <kuba@kernel.org>, Hyunwoo Kim <imv4bel@gmail.com>
-Cc: dhowells@redhat.com, marc.dionne@auristor.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- linux-afs@lists.infradead.org, netdev@vger.kernel.org
-References: <afKV2zGR6rrelPC7@v4bel>
- <20260508055716.89380-1-qingfang.deng@linux.dev> <af19tf9gX3sxIrWr@v4bel>
- <20260508132532.2008a68f@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Qingfang Deng <qingfang.deng@linux.dev>
-In-Reply-To: <20260508132532.2008a68f@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: DA9A84FD502
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 01/13] netfilter: x_tables: allow initial table
+ replace
+ without emitting audit log message
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177829082130.929250.13481267199654221976.git-patchwork-notify@kernel.org>
+Date: Sat, 09 May 2026 01:40:21 +0000
+References: <20260507234509.603182-2-pablo@netfilter.org>
+In-Reply-To: <20260507234509.603182-2-pablo@netfilter.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, fw@strlen.de, horms@kernel.org
+X-Rspamd-Queue-Id: BE26A4FD5B9
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286071-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286072-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,netfilter.org:email]
 X-Rspamd-Action: no action
 
-On 2026/5/9 4:25, Jakub Kicinski wrote:
-> On Fri, 8 May 2026 15:07:49 +0900 Hyunwoo Kim wrote:
->>>> -	if (skb_cloned(skb)) {
->>>> +	if (skb_cloned(skb) || skb->data_len) {
->>> Ditto.
->> Thank you for the review.
-> Maybe skb_ensure_writable() ?
+Hello:
 
+This series was applied to netdev/net.git (main)
+by Pablo Neira Ayuso <pablo@netfilter.org>:
 
-This also works, but has a subtle difference that a new buffer is 
-allocated with GFP_ATOMIC instead of GFP_NOFS.
+On Fri,  8 May 2026 01:44:57 +0200 you wrote:
+> From: Florian Westphal <fw@strlen.de>
+> 
+> At the moment we emit the audit log a bit too early, which makes it
+> necessary to also emit an unregister log in case we have to unwind
+> errors after possible hook register failure.
+> 
+> Followup patch will be slightly simpler if we can delay the
+> register message until after the hooks have been wired up.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,01/13] netfilter: x_tables: allow initial table replace without emitting audit log message
+    https://git.kernel.org/netdev/net/c/8e72510db9fa
+  - [net,02/13] netfilter: x_tables: allocate hook ops while under mutex
+    https://git.kernel.org/netdev/net/c/b62eb8dcf2c4
+  - [net,03/13] netfilter: x_tables: add and use xt_unregister_table_pre_exit
+    https://git.kernel.org/netdev/net/c/527d6931473b
+  - [net,04/13] netfilter: x_tables: unregister the templates first
+    https://git.kernel.org/netdev/net/c/d338693d7785
+  - [net,05/13] netfilter: x_tables: add and use xtables_unregister_table_exit
+    https://git.kernel.org/netdev/net/c/b4597d5fd7d2
+  - [net,06/13] netfilter: ebtables: move to two-stage removal scheme
+    https://git.kernel.org/netdev/net/c/b7f0544d86d4
+  - [net,07/13] netfilter: ebtables: close dangling table module init race
+    https://git.kernel.org/netdev/net/c/92c603fa07bc
+  - [net,08/13] netfilter: x_tables: close dangling table module init race
+    https://git.kernel.org/netdev/net/c/16bc4b6686b2
+  - [net,09/13] netfilter: bridge: eb_tables: close module init race
+    https://git.kernel.org/netdev/net/c/27414ff1b287
+  - [net,10/13] netfilter: nf_conntrack_expect: restore helper propagation via expectation
+    https://git.kernel.org/netdev/net/c/dcb0f9aefdd6
+  - [net,11/13] netfilter: ctnetlink: check tuple and mask in expectations created via nfqueue
+    https://git.kernel.org/netdev/net/c/d8ef54c83ad7
+  - [net,12/13] netfilter: nf_conntrack_sip: get helper before allocating expectation
+    https://git.kernel.org/netdev/net/c/eb6317739b1e
+  - [net,13/13] netfilter: nft_ct: fix missing expect put in obj eval
+    https://git.kernel.org/netdev/net/c/19f94b6fee75
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
