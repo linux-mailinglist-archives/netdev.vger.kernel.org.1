@@ -1,283 +1,316 @@
-Return-Path: <netdev+bounces-286116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286117-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 1scfF5nv/mkMzwAAu9opvQ
-	(envelope-from <netdev+bounces-286116-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 10:26:01 +0200
+	id OK/OCKbw/mkdzwAAu9opvQ
+	(envelope-from <netdev+bounces-286117-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 10:30:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85CBE4FEA98
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 10:25:59 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 612454FEB0A
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 10:30:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7CED53011C44
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 08:25:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 48AAB30166EF
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 08:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C7738A72A;
-	Sat,  9 May 2026 08:25:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eCVVtO4G"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B1F83002A0;
+	Sat,  9 May 2026 08:30:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59D2384231;
-	Sat,  9 May 2026 08:25:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D90B2BEC45
+	for <netdev@vger.kernel.org>; Sat,  9 May 2026 08:30:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778315157; cv=none; b=vEqQrkLmkIBHjNF7l4UaMw5ztF1+dkuOy9/4fJooY86EsmgdZYdlUNwpeCwQacgFWXHQalKjuaJjSt1ZAjXKHZ4/oBb8ifp+B6g4bGPTcY8xbsmke3XTtPAFu1AM1RywkZnYHnXg3SKVoCmO9aAYUZum87dM0DxwSYT6sOlDPlw=
+	t=1778315427; cv=none; b=QuOWIXgmxhug+jAC93EKumC96moZ/uM4dzyWrsBhVHRc92ecMAVYZP86N3fTbhZMmCgFT3jg/WSujHNOGfjhJ3hnLx21vFsLI++5Vn8h0oOArRM00W9VD4zmeUVGFPvoQ2Xvi5RdcEE8sFArrkGBBQoON6D7iNqnNW4JF/v3loM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778315157; c=relaxed/simple;
-	bh=nczlNiIr/A9xdNyg6rE5uVSARRuTIZ7Uz1A5NFRANqE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mkCAf+4SYt6zLT0/uhfz1XkUzdDglsooBHAScfjXM82zapxp8NSb47E3S8AHVrCskoDpMUbl9AtWC/NNHcUo9xpArcsSkhh63oTl8loCVQ1Az2aAU4tht++VALMtCMSOH19Vijev4oCIMKISP+kazVgspuW+CLP48LkwIjVZL5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eCVVtO4G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 077A5C2BCB4;
-	Sat,  9 May 2026 08:25:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778315157;
-	bh=nczlNiIr/A9xdNyg6rE5uVSARRuTIZ7Uz1A5NFRANqE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eCVVtO4GspLXm5oU2Y+5HmrgHaQiFURcpPBaQjKOGDVaLDRBN27A8bkvOo394mwtJ
-	 a6liRN/2eMOSZd7Df3DCnUreka/54xDgLu7tAQgtk9B3j//rIFq6oyH9gspoGn2BdC
-	 MWSo54itWTgPWgCNMmXHNez2IsZKTgvMY2K7hvh83lhaXIPQYBu91IFSyluwh+luiD
-	 +ZPIxUoKXYry1c6j30Ut5bhLHkeOmIxbPdhf7cuJXv11GTHNAN6rza+tR2/rC5ABwB
-	 v3TZ0LerSeoUsT4CB9hSHcMcH8CghGTX/VJ1QsgxDqrat8iP7iKHoHUf0G+xw9/n3p
-	 kHIu7Om+b2lTg==
-Date: Sat, 9 May 2026 10:25:54 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, ansuelsmth@gmail.com,
-	benjamin.larsson@genexis.eu, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, madhur.agrawal@airoha.com
-Subject: Re: [PATCH net-next v4 07/10] net: airoha: Support multiple
- net_devices for a single FE GDM port
-Message-ID: <af7vkpjEY5FhlEyc@lore-desk>
-References: <20260507-airoha-eth-multi-serdes-v4-7-af613b61ae02@kernel.org>
- <20260509014611.3558060-1-kuba@kernel.org>
+	s=arc-20240116; t=1778315427; c=relaxed/simple;
+	bh=UmNvH77b0ZWe9BxJ7SSxG9L7kXqbAAbmUNzkthZ+YcE=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=QgsJxrVdgCOLZ2uOLUTwWRCPXIosaWQhdKIZ4Pd7O29FB3iRzoFHnHJQrkFPsyVlDeHp83szhjroV/FBvxMl1fEVRny0X2TxH2mhYY7oRwE/HXFImnu/hxbgfs02dRs4rBC5vwUJa+vPuGFFALZZaFCTiF3g3JQdGzmJHa2LP98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=52.59.177.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas1t1778315377t196t31554
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [115.204.251.157])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 9874354360371735242
+To: "'Jakub Kicinski'" <kuba@kernel.org>
+Cc: <netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>,
+	<andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<pabeni@redhat.com>,
+	<richardcochran@gmail.com>,
+	<linux@armlinux.org.uk>,
+	<horms@kernel.org>,
+	<kees@kernel.org>,
+	<larysa.zaremba@intel.com>,
+	<leitao@debian.org>,
+	<joe@dama.to>,
+	<jacob.e.keller@intel.com>,
+	<fabio.baltieri@gmail.com>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>,
+	<andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<pabeni@redhat.com>,
+	<richardcochran@gmail.com>,
+	<linux@armlinux.org.uk>,
+	<horms@kernel.org>,
+	<kees@kernel.org>,
+	<larysa.zaremba@intel.com>,
+	<leitao@debian.org>,
+	<joe@dama.to>,
+	<jacob.e.keller@intel.com>,
+	<fabio.baltieri@gmail.com>
+References: <20260430082517.19612-7-jiawenwu@trustnetic.com> <20260503021538.4127382-1-kuba@kernel.org>
+In-Reply-To: <20260503021538.4127382-1-kuba@kernel.org>
+Subject: RE: [PATCH net-next v2 6/6] net: wangxun: implement pci_error_handlers ops
+Date: Sat, 9 May 2026 16:29:35 +0800
+Message-ID: <065501dcdf8d$f8473030$e8d59090$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="YnCVD7Lr1XicTVN0"
-Content-Disposition: inline
-In-Reply-To: <20260509014611.3558060-1-kuba@kernel.org>
-X-Rspamd-Queue-Id: 85CBE4FEA98
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQJ1HK6V4TWBBFraiLZyjmkZRUTH8QMLCIbEtLyDZyA=
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: MMKcwIwa79XO1F13dHrZG1/hzkKmzCaulH1aiBntB7TOFLOTHG8tZ4uh
+	Q+8P+kk3Pk5KutzxLqoKUCxYY2F1ErYZa69zRXShoEgoVAVO/JjDoXbvuo20de0QFF/XiRf
+	HLD+aVSV+Y/JbcOdn/HkR0vFi6+/5sa3W+t1fV+VC1kjJjOeFfdu1k0QhSnc463cQNgSXIo
+	zeH4Cl0q1+PJYGyNrqiU9P8tw3Zi+pVkciCCg62mFLHmn6bYpM8pfps3ESG0c8sNe4ukiTH
+	vOqa8kjuk2LgLH01fYuL1JkU5AXR3d7xDWid30K6HjnLH4Bw8RD/qTu2OX8pnzYZyHosyjF
+	aE7TNr0Y0ZizZN0mmw4jTP9KoaZMI873IpVDixsjn3zWS79Dup4REPePCuL/iwbqp7tm/Sa
+	mO4P2yeReSbKRFUT/hnHr7ezQLaIuoXiLbrBPIJMZ1H881Vb5pmP+EW7CfP0n4jHTspTcQL
+	Eb2QtpJYrBrXaArUfdcseWihTi9OALnmTZEhFZK0Z1awYeoiFlOQxqB/vq8DLKyQ5sdicae
+	dBszR/8ltz3GKZcr7FXWuYeKiCRTwRFXT8AhFqe1+OSASWoyVXatPkRddPCxlHj2plKERYf
+	wfGfL/vacaWa+MwNEDmZ1EaBAVvs23AaQ/kShA2N/tEVdTCmamaGHyr4VZdvCXDSFgWlzdc
+	iULxlIQnymb8GmTSpPPQ8EILp/op6dSyQ6/x0Sbiyr+I3DtpM2tq44OhdVmzjTsTFiUlo8U
+	KBRNsGFJREk/xGhgfQLoAtaYUdZzaxIDbz6UdhDPM+y45DnP5nkII8yO5mmOJIjeNnlsJUG
+	HHrHPtH10PMBaVlVlebASMOeziHq9Bid/9n4nuSNgSfE9rwGUa6UFAsSeCIyh01TLtD/Ew6
+	qoqe+AJqNJ+6K7Bqi6Y6RqKmA+rZ1sIsotzclhtVwJnYJ6fqQpioN+WBXmvaQvUrn8TYZ3T
+	ux+i4m4nraC5F4B4peQ2qUOcMWbKkdhjKhy2JUItpJWTErEA+WI6xQzE0bZu/QlaaB69V5r
+	w9kCACoGcpckPxXrIt7FJjnSREXLcfkL4tjzwocBVeKCLpThEh
+X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
+X-QQ-RECHKSPAM: 0
+X-Rspamd-Queue-Id: 612454FEB0A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	FROM_EXCESS_BASE64(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-286117-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286116-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	URIBL_MULTI_FAIL(0.00)[tor.lore.kernel.org:server fail,trustnetic.com:server fail];
+	RCPT_COUNT_TWELVE(0.00)[31];
+	DMARC_NA(0.00)[trustnetic.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,genexis.eu,lists.infradead.org,vger.kernel.org,airoha.com];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.988];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,armlinux.org.uk,kernel.org,intel.com,debian.org,dama.to];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[trustnetic.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-
---YnCVD7Lr1XicTVN0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
+On Sun, May 3, 2026 10:16 AM, Jakub Kicinski wrote:
 > This is an AI-generated review of your patch. The human sending this
 > email has considered the AI review valid, or at least plausible.
 > ---
-> net: airoha: Support multiple net_devices for a single FE GDM port
->=20
-> This commit introduces support for multiple net_devices connected to the
-> same Frame Engine (FE) GDM port (GDM3 or GDM4) via an external hardware
-> arbiter on EN7581 or AN7583 SoCs, and adds a get_dev_from_sport callback
-> to differentiate between the net_devices attached to each port.
->=20
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
-ernet/airoha/airoha_eth.c
-> > index 786bc677af3c..0253919714e0 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
->=20
+> net: wangxun: implement pci_error_handlers ops
+> 
+> Support AER driver to handle the PCIe errors.
+> 
+> > diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
+> > --- a/drivers/net/ethernet/wangxun/libwx/wx_err.c
+> > +++ b/drivers/net/ethernet/wangxun/libwx/wx_err.c
 > [ ... ]
->=20
-> > @@ -3188,14 +3257,23 @@ static int airoha_probe(struct platform_device =
-*pdev)
-> > =20
-> >  	for (i =3D 0; i < ARRAY_SIZE(eth->ports); i++) {
-> >  		struct airoha_gdm_port *port =3D eth->ports[i];
-> > -		struct airoha_gdm_dev *dev;
-> > +		int j;
-> > =20
-> >  		if (!port)
-> >  			continue;
-> > =20
-> > -		dev =3D port->dev;
-> > -		if (dev && dev->dev->reg_state =3D=3D NETREG_REGISTERED)
-> > -			unregister_netdev(dev->dev);
-> > +		for (j =3D 0; j < ARRAY_SIZE(port->devs); j++) {
-> > +			struct airoha_gdm_dev *dev =3D port->devs[j];
-> > +			struct net_device *netdev;
+> > +static pci_ers_result_t wx_io_error_detected(struct pci_dev *pdev,
+> > +					     pci_channel_state_t state)
+> > +{
+> > +	struct wx *wx = pci_get_drvdata(pdev);
+> > +	struct net_device *netdev;
 > > +
-> > +			if (!dev)
-> > +				continue;
+> > +	netdev = wx->netdev;
+> 
+> If an AER event triggers during ngbe_probe() or txgbe_probe() before
+> pci_set_drvdata() is called, wx will be NULL here.
+> 
+> Could this lead to a NULL pointer dereference when accessing wx->netdev?
+> 
+> Should the handler validate the wx pointer, or should pci_set_drvdata()
+> be moved earlier in the probe sequence?
+
+I'll validate the wx pointer first.
+
+> 
+> > +	if (!netif_device_present(netdev))
+> > +		return PCI_ERS_RESULT_DISCONNECT;
 > > +
-> > +			netdev =3D dev->dev;
-> > +			of_node_put(netdev->dev.of_node);
-> > +			if (netdev->reg_state =3D=3D NETREG_REGISTERED)
-> > +				unregister_netdev(netdev);
-> > +		}
-> >  		airoha_metadata_dst_free(port);
-> >  	}
-> >  	airoha_hw_cleanup(eth);
->=20
-> [Medium]
-> Is the ordering of of_node_put() and unregister_netdev() here correct?
->=20
-> airoha_alloc_gdm_device() now does:
->=20
-> 	netdev->dev.of_node =3D of_node_get(np);
->=20
-> so the netdev holds its own reference to the of_node for its entire
-> registered lifetime. In this error unwind the of_node_put() runs before
-> unregister_netdev(), and netdev->dev.of_node is not cleared, so any
-> subsequent access to netdev->dev.of_node during unregistration (netdev
-> notifiers, sysfs, overlay-aware code) would be looking at a node whose
-> reference count has already been dropped.
->=20
-> Other drivers (e.g., drivers/net/ethernet/hisilicon/hns/hns_enet.c in
-> hns_nic_dev_remove()) put the node only after unregister_netdev().
->=20
-> Would swapping the order to call unregister_netdev() first, then
-> of_node_put(), be more appropriate here?
-
-ack, I will fix it in v5.
-
->=20
-> > @@ -3216,14 +3294,22 @@ static void airoha_remove(struct platform_devic=
-e *pdev)
-> > =20
-> >  	for (i =3D 0; i < ARRAY_SIZE(eth->ports); i++) {
-> >  		struct airoha_gdm_port *port =3D eth->ports[i];
-> > -		struct airoha_gdm_dev *dev;
-> > +		int j;
-> > =20
-> >  		if (!port)
-> >  			continue;
-> > =20
-> > -		dev =3D port->dev;
-> > -		if (dev)
-> > -			unregister_netdev(dev->dev);
-> > +		for (j =3D 0; j < ARRAY_SIZE(port->devs); j++) {
-> > +			struct airoha_gdm_dev *dev =3D port->devs[j];
-> > +			struct net_device *netdev;
+> > +	rtnl_lock();
+> > +	netif_device_detach(netdev);
 > > +
-> > +			if (!dev)
-> > +				continue;
+> > +	if (netif_running(netdev))
+> > +		wx->close_suspend(wx);
 > > +
-> > +			netdev =3D dev->dev;
-> > +			of_node_put(netdev->dev.of_node);
-> > +			unregister_netdev(netdev);
-> > +		}
-> >  		airoha_metadata_dst_free(port);
-> >  	}
-> >  	airoha_hw_cleanup(eth);
->=20
-> [Medium]
-> Same question in airoha_remove(): the of_node_put() fires before
-> unregister_netdev(), while netdev->dev.of_node is still assigned. Would
-> this be safer with the unregister first and the put afterwards?
+> > +	if (state == pci_channel_io_perm_failure) {
+> > +		rtnl_unlock();
+> > +		return PCI_ERS_RESULT_DISCONNECT;
+> > +	}
+> 
+> Does calling wx->close_suspend(wx) before checking for
+> pci_channel_io_perm_failure cause illegal MMIO accesses?
+> 
+> If the device is in a permanent failure state, it is physically
+> disconnected, and MMIO accesses could result in Master Aborts or system
+> lockups.
+> 
+> Should the check for permanent failure precede the hardware teardown?
 
-ack, I will fix it in v5.
+I'll fix it.
 
->=20
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/eth=
-ernet/airoha/airoha_eth.h
-> > index 3e93919a175c..207c75152fde 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.h
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.h
->=20
+> 
+> > +	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
+> > +		pci_disable_device(pdev);
+> > +	rtnl_unlock();
+> > +
+> > +	/* Request a slot reset. */
+> > +	return PCI_ERS_RESULT_NEED_RESET;
+> > +}
+> 
+> Should the background service task (wx->service_task) be canceled here
+> using cancel_work_sync()?
+> 
+> Since WX_STATE_DISABLED is not checked within the service task's
+> execution path, it appears the task could wake up and attempt to interact
+> with the device while its MMIO space is disabled.
+
+Service task is canceled in the device close path, and no event triggers it
+when netif is not running.
+
+> 
 > [ ... ]
->=20
-> > @@ -542,14 +543,15 @@ struct airoha_qdma {
-> >  struct airoha_gdm_dev {
-> >  	struct airoha_gdm_port *port;
-> >  	struct airoha_qdma *qdma;
-> > -	struct net_device *dev;
-> >  	struct airoha_eth *eth;
-> > +	struct net_device *dev;
+> > +static pci_ers_result_t wx_io_slot_reset(struct pci_dev *pdev)
+> > +{
+> > +	struct wx *wx = pci_get_drvdata(pdev);
+> > +	pci_ers_result_t result;
 > > +
-> > +	int nbq;
-> >  };
-> > =20
-> >  struct airoha_gdm_port {
-> > -	struct airoha_gdm_dev *dev;
-> > +	struct airoha_gdm_dev *devs[AIROHA_MAX_NUM_GDM_DEVS];
-> >  	int id;
-> > -	int nbq;
-> > =20
-> >  	struct airoha_hw_stats stats;
->=20
-> [Medium]
-> With multiple airoha_gdm_dev instances now sharing a single
-> airoha_gdm_port, do the per-netdev statistics need to become per-netdev
-> rather than per-port?
->=20
-> airoha_dev_get_stats64(), airoha_ethtool_get_mac_stats() and
-> airoha_ethtool_get_rmon_stats() all read from dev->port->stats, and the
-> underlying hardware counters at REG_FE_GDM_*_CNT(port->id) are per-GDM
-> port rather than per-netdev. When two netdevs share a port (for example
-> PCIE0/PCIE1 on EN7581 GDM3, or ETH/USB on GDM4), both netdevs would
-> report identical port-wide counters via rtnl_link_stats64 (ip -s link
-> show) and via the get_eth_mac_stats/get_rmon_stats ethtool callbacks,
-> and summing across the two netdevs would double-count.
->=20
-> Would it make sense to maintain per-netdev software counters in the
-> xmit/RX paths for the multi-dev case so each netdev reports its own
-> traffic through the standard uAPI?
+> > +	if (pci_enable_device_mem(pdev)) {
+> > +		wx_err(wx, "Cannot re-enable PCI device after reset.\n");
+> > +		result = PCI_ERS_RESULT_DISCONNECT;
+> > +	} else {
+> > +		/* make all bar access done before reset. */
+> > +		smp_mb__before_atomic();
+> > +		clear_bit(WX_STATE_DISABLED, wx->state);
+> > +		pci_set_master(pdev);
+> > +		pci_restore_state(pdev);
+> > +		pci_wake_from_d3(pdev, false);
+> > +
+> > +		wx->do_reset(wx->netdev, false);
+> 
+> Is it safe to call wx->do_reset() here without holding the rtnl_lock()?
+> 
+> Other paths that reset the hardware (such as wx_reset_subtask()) appear
+> to acquire rtnl_lock() to serialize against concurrent network
+> configurations.
 
-We have already a separated patch to address this issue that is not part of=
- the
-series. I will add it to the v5 in the next iteration.
+I think there is no need to acquire rtnl_lock().
 
-Regards,
-Lorenzo
+> 
+> Could failing to hold the lock here allow concurrent userspace requests
+> to access hardware registers while the device is in a reset state?
+> 
+> > +		result = PCI_ERS_RESULT_RECOVERED;
+> > +	}
+> > +
+> > +	pci_aer_clear_nonfatal_status(pdev);
+> > +
+> > +	return result;
+> > +}
+> [ ... ]
+> > +static void wx_io_resume(struct pci_dev *pdev)
+> > +{
+> > +	struct wx *wx = pci_get_drvdata(pdev);
+> > +	struct net_device *netdev;
+> > +	int err;
+> > +
+> > +	netdev = wx->netdev;
+> > +	rtnl_lock();
+> > +	if (netif_running(netdev)) {
+> > +		err = netdev->netdev_ops->ndo_open(netdev);
+> 
+> By calling ndo_open() directly instead of dev_open(), is there a risk of
+> bypassing the core network state machine?
+> 
+> If ndo_open() fails, it cleans up its allocations, but the core network
+> stack's __LINK_STATE_START bit remains set.
+> 
+> If a user subsequently administratively downs the interface, the network
+> core might unconditionally call ndo_stop(), potentially leading to a
+> double-free when it attempts to clean up the already-freed resources.
 
---YnCVD7Lr1XicTVN0
-Content-Type: application/pgp-signature; name=signature.asc
+If ndo_open() fails, the hardware state must have been wrong beyond
+recovery. At this point, all further actions are invalid.
 
------BEGIN PGP SIGNATURE-----
+> 
+> > +		if (err) {
+> > +			wx_err(wx, "Failed to open netdev after reset\n");
+> > +			goto out;
+> > +		}
+> > +	}
+> > +	netif_device_attach(netdev);
+> > +out:
+> > +	rtnl_unlock();
+> > +}
+> [ ... ]
+> > diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+> > --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+> > +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+> [ ... ]
+> > @@ -900,6 +901,7 @@ static int txgbe_probe(struct pci_dev *pdev,
+> >  		goto err_remove_phy;
+> >
+> >  	pci_set_drvdata(pdev, wx);
+> > +	pci_save_state(pdev);
+> >
+> >  	netif_tx_stop_all_queues(netdev);
+> 
+> This isn't a bug introduced by this patch, but does the ordering here
+> expose the interface to userspace before queue initialization?
+> 
+> Since register_netdev() is called prior to this code, the interface
+> becomes visible to userspace.
+> 
+> If a management daemon immediately brings the interface UP, invoking
+> ndo_open() and waking the TX queues, could this netif_tx_stop_all_queues()
+> erroneously stop the queues of the logically UP interface, resulting in a
+> silent TX hang?
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaf7vkgAKCRA6cBh0uS2t
-rNx6AP4vp7fBv+mMgpov4j4sMb2X2lfK18z7Rdr86kjr3iuVkQEA2v2JFYUsriWf
-RBzOd9kloGcV9h2okyFY1MsyXDH1uAY=
-=LwTq
------END PGP SIGNATURE-----
+I'll consider this in another patch.
+Thanks.
 
---YnCVD7Lr1XicTVN0--
 
