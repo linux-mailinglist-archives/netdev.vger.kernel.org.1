@@ -1,185 +1,215 @@
-Return-Path: <netdev+bounces-286164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286165-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iUVmBkgk/2kt2wAAu9opvQ
-	(envelope-from <netdev+bounces-286164-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 14:10:48 +0200
+	id 4+5+Gzcl/2lG2wAAu9opvQ
+	(envelope-from <netdev+bounces-286165-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 14:14:47 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 510224FF8A6
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 14:10:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D9D34FF8C1
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 14:14:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3B5F7300D96A
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 12:10:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 741FF300DF7D
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 12:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90BB837BE7D;
-	Sat,  9 May 2026 12:10:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 847D1388E5B;
+	Sat,  9 May 2026 12:14:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="SSKwPXlP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AOydprbm"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic301-31.consmr.mail.ne1.yahoo.com (sonic301-31.consmr.mail.ne1.yahoo.com [66.163.184.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132E01A3165
-	for <netdev@vger.kernel.org>; Sat,  9 May 2026 12:10:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.184.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613E837AA95;
+	Sat,  9 May 2026 12:14:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778328644; cv=none; b=UMJgqJSSBSh+8Y4rCQZB0hZIVfhdy+83M0tgfoRpGiPeLZEFJBSE+wCO5meIRz86/4R7stTa7TPcgb1mwVMYvScJasvWnNeS0v93/d7gNGsEBPbHrD7ew3nfzmfVPK/GYDqr/O4jk2uzH6IudlE79fSpcO9pNHHK9ktlLL1UZDA=
+	t=1778328883; cv=none; b=NN8yMXbTwTu5Gm2GQNc2P7ccLjmVOQk7E17f8EPjIODmqxbUpEOKyshIoIiPeYazkuCmLm+1hO5fS4vDMvYe52wNei0faPJC5HAXYdXXG1tsC9+30/5h50s7+pd1k1Hut9V423nymvyVcxk8slqVO1sn3jTTOJJJrwpwtove0mY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778328644; c=relaxed/simple;
-	bh=2cGsUPdjFXYNl8pYQN8MyIPyDW2PB7dZ0bCVuK5B/7E=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type:
-	 References; b=sASGUumG2w66CTtOoPD1ECG9Hcso801AmrDeY5IzdQ5/pU6uKSIOdGvh3WZkuXXA818u0pUrTEZ2HiYI0gLJLARIOoBDuU+/0TexMxjL9zfy49FdP+aeSrBbKVBDRIFVvRiGxQc++w8Gkg+sX+QQUW/xlzer14LHaf7M5CyV7v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=SSKwPXlP; arc=none smtp.client-ip=66.163.184.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1778328636; bh=PVaPG604sJyPeXwiG+400ARiklpQzlXb2VlIQVb6Sts=; h=Date:To:From:Subject:Cc:References:From:Subject:Reply-To; b=SSKwPXlPv8SQojI446P+tvTFvFWe9ybj8gcAx5rTSkQI+j28SLpurGfMd+cRvrgXTNOpaRo8U7/oWocDMzp8prxwYXIi7j0m2L9MdL2ZK6tQgxShk5JVXhsz8yxoAdEGOy+Q2kd9JIY/SB7dd+acywOhKr1emxkerVstrceaAOnBfp2A1U3YK5KrGPEVizxPuWDAPSa7DLj4ibUZ39RSwNcSF3HmSSsgw2Hdv3tShvxCPIlwW1P76PDLHSF8zHoZWJvpFLEMxG/06IJLxAj7qeVa0Yi8bVWhlXcU/flpxf1/5krSGDNAoJDn4Q2ByKGvy1U+eJsubgY8AzGpz04A+w==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1778328636; bh=j/Kn59h5JTjVC7Y4HtwcWsP2N9uLkqGVps1p+Ko6wDi=; h=X-Sonic-MF:Date:To:From:Subject:From:Subject; b=QpnAJdxpGXrCQpKUmTI/IWAsbZFd/hFryFFI4Vlt+5h4wK5hKccTKUNuuDiejMALuenoWSDyV/hA/FB/uIaHZxFKNPGYvZGuuIzNhXNdX2F0nI6Gzg/ys0Wpp+dnYezayQNJNwRlVvUS0n4sIe7rI0lwT5U1pC11scsfMLAxNVrlskckrkZxt9dQpigF+KVDSMEd8qqZrb+jMIqBKSuOBtF46V7EuieUrYetLF2I9Y4Lww2GLc0AuoLQQe3gmjNH+HptmbPMNiC7bs/6fW7aSMfXbKw8eQAeA5EUQkZvRxqLUdxLyxQEUbAX3yY/rSQAbJUEqJu8kdIKimKA4g8MUQ==
-X-YMail-OSG: .cWCOo8VM1mlA3_h2doOZ8FnI9_gf_j8OSmEwfp8DPEHMq3U66Ou_KO0C0t8GUP
- PNVgP6LLV78iFMFlqwZu3dH4zGyGbMvochJGXZRSLUP7KqOjzXJYic9JM2on_bdeiTAen_C2o9Au
- hKoP5fFcmfGRKqf0EArfZeMxEvolIxzpIIpoJ9keUa.pBItKszglg9Ps5.XmKrZnpar281u.LAfx
- LbLS0Czd3Tm1dcHqEvRPLoOh360bM9ytxhp16l1JKLY3ERNnvakMD_4krCCkeiuCYWv4OObwkBxr
- 0olYhZmpWAc6I858HhEtYdT1ihKj1XUsDmV4LNrMUnkQnkNp3FrqN0t0r2uCifuFjKrgoyc6187Y
- Wxf8KNbTUpNf7IO9K2YG3abjiUC.tHEeI_wzNWeeR5vy5DNK0u2fG9BGUMnvMQBVajVyVLiU_yqf
- BtqZiOOStxbpzzLQwbqiEnkbcOXR6YolAw4fXxdn9fS3Rpy1YJrKeoXhvB4SlwkISY7We.aTHiAf
- FT5irLAQZftbk20ug9pegxjfqh002VUpFWIYGXvUxw8YAqj8qp5WfVs6_0gpLWz8oVJPNZ7L_Ral
- ghcUmZTEGiPZOQSeDaK7EXg4ETWmm3XdXG4sUCptlrjMqAHrUQx_vCwxvK5_cAgMYKaIP.KmXgQe
- nC.05MHA1CmFQrLH5JaNtkn5nc0mPdsJ7u_KLfe0J2twOgOUdLsTJBszIHy2cghn7lC7ApMPRt4u
- Xv_cDnPVK9ZG61AagT78RvRTP4GOki4cbAAAY_56HzlhX4cln3hzKIyRdqXMrzc1tx5lGY5_A6Tx
- GxTcIlc2JgWnMYYSnnrxKzZxE9fDDOkBzlXRWRx._vHmU.WnO9Q0bx.ze0cwe8odFXW_9__rAV5L
- LpIzdvMvj.8HEoED9DWH0Q_SrcxdLlv8B_Jj3z8PKN4QcxwzMVU4PV44zElaMtiWCb.1rHhD917V
- 5g5ZKrjXmO.iU4bpnLD2q4ZbwunF7u2TX1XbdKWsJKfr08Jn.f1u9RjGWp9jrDgZQJ0EPHpJyH0b
- wCyctclM0CUgtz6MXiyZ5yWWgWIZ3YTiKvpWQdT4kmPvSk_fbNEcIqFEV1aKpWZtOKYWbbBDTCOf
- 4nCO5Oup6D2DkuVOYOfqGrJHD1vRGR6MW7IdKONolkSOJi0Tlcn13pv9BYEMCHZTswXNEpAGIOWf
- XeVFVJxaJC7X7NwNgkm6Jg1.gBtQ2bqd0cAdDTZ5aTOCRE18XvbQiDcABVqkfHbvvyFaMeR3Mlhb
- Qyt0BDZG20bM08_xF155SFi7jPX6y2KMPNC.omW7gncnbBWXDgU.FGa.RxuLhNrSW4Mrfd_cuKRc
- sqRsPikgQ5xIWjnslguCaHYpzhkP0RlJsTz_pwnENn87ihH.ZZs0MNpDmkJ3vkdYihW1UpMNQ6fc
- Q9N76WwL2i.As5c7189BzcefimypM_JVXuquYFK_n_ZvoIPrqMG8eyIpmStMcfIvICeGEkjiKQCk
- DFbraFXATjebfwyULZwCuPfzAU0nGHgGnqSCGGYSLwHFAouADQGc__495wkL07.3t9to0Jfik9gl
- ypmHPR6iOTK07_agLyq2r5c9pL1OatZiEjhBs0IsWx1zZzgGekofeZ.GRCsIct9SNJXbLVyzygPo
- 8Greox_jIQQP7T_cIXefJPTzBiud6EHNaqmL5fz5zMUDcKAK1gF5zpoa8aB_gMSMxY6Vi_jfQA_j
- TwMmT26nua6vv4rwdtNtwW7FUcUajr37Vc3ZOaXrhTybVVVgtWvhKPCPy.hN4P5sGwM64QndI6pu
- gr.ZUgoDmfCpwvIYC5i3at2Zibyi7SJE574a2OEVgTm0565.UMcMY453auGJuB0UuEzKsU4P4irN
- tEIvAygAxI_PGunTwqN2QM5U3vxcBTYYp29PA.XhcnVn8fsIsI_6Qe9Eoci.wTqMYqSs0CC3bcV.
- wa74Nowq6OMFmJaB_IzfU1yY79NXytmd8gOj7MHI6fzvxnqtDoxSN1Tui1WjWi3YjlfrPHsYcfrW
- LtiCJ18oEF_.3NxWl.98_1Pne_ql0wCPVI1R1zdqfFmBt09IDK4D_6ZfzdNj62c6MHeF3c1Y.jWw
- 2dHnkl8CTpUEWo0h4yvKO7WaUs8JaI6VHBLkP0zzAPCsCjJOmaPdHtjlSehj6Iwm8LPmej.LZVK4
- pGPZPnEa1uyCIH9AM1Pmqmja_g864GOa_9SclhX4qNqk8sGoRWXZ5DCDxbv34vuPDHWJCSaqcWVh
- _4yPGkqyE28cJjLj2pct2IWyU8qJTLOsRsxQ2AXSoCckjjyc_CIYjjj7M8r9YNC1YTMU8bMj3kYz
- FeO2AuzAcw.DKGJYxd9B.yyyfbdnjJMaYSvOSjfAz
-X-Sonic-MF: <namiltd@yahoo.com>
-X-Sonic-ID: 94eb9a70-4796-488a-87d6-ea0613db7f87
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic301.consmr.mail.ne1.yahoo.com with HTTP; Sat, 9 May 2026 12:10:36 +0000
-Received: by hermes--production-ir2-89844b765-xcbjs (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 4c831a0076a167a8128a5219956ef2e9;
-          Sat, 09 May 2026 12:10:32 +0000 (UTC)
-Message-ID: <3c6d822b-0e85-4173-86ba-2badb140bbf1@yahoo.com>
-Date: Sat, 9 May 2026 14:10:29 +0200
+	s=arc-20240116; t=1778328883; c=relaxed/simple;
+	bh=xj1s+XiVzibKt5JThT5BjIAfNH4K/exIMVrw7lkq7Jk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G/T5tmYmtvpEUE5Q2jrbShZFm2uzLqvzzitN1df93C8DuwE6mj0Wfp/3hknTQ9PNVbArAdtMDRNk8OR8OFiB5Jys8dXh4Uo4btx0+10a5ECRwhQ+/pamQPv4uMqLCr7TaKRTOGUHxtEAZcOwEuia1v/17inpvbuWgpq9S+pnBfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AOydprbm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65612C2BCB2;
+	Sat,  9 May 2026 12:14:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778328882;
+	bh=xj1s+XiVzibKt5JThT5BjIAfNH4K/exIMVrw7lkq7Jk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AOydprbmmHNpTrs2kadBB+xtXNydmin8y+17xDV64Pds46PVGSRpHmrfZ/8XLNnKj
+	 E0RONhj7qoQeYVIrwK+T6Y7fcnAthSjKWLlJK9BfXR+LFT1RT/CXSmDXKIuu2AIZPu
+	 0oTQcfIb0dwJcDqQHGQUc9vbEfecwYh+X5R+jTGRzuXS1fSpdHgMMnJC3jCm4uje0I
+	 O9lpfP4T+7wiiIPPiOLsU8WnpEnf/Dr+qA+MSKK2O8e9qI50b56skog6l1Z3Ne89pT
+	 fahlgAoUIZZs3V1bJgA8yOl7qWZMf8KryApigv9EpRN7JZkHcgu43eVRquXXldSIFw
+	 A5rhQ0I9VIXRw==
+Date: Sat, 9 May 2026 14:14:40 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Cc: Christian Marangi <ansuelsmth@gmail.com>,
+	Benjamin Larsson <benjamin.larsson@genexis.eu>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v4 06/10] net: airoha: Move {cpu,fwd}_tx_packets
+ in airoha_qdma struct
+Message-ID: <af8lMLkovQOx3oON@lore-desk>
+References: <20260507-airoha-eth-multi-serdes-v4-0-af613b61ae02@kernel.org>
+ <20260507-airoha-eth-multi-serdes-v4-6-af613b61ae02@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: pl
-To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?=
- <alsi@bang-olufsen.dk>, Yury Norov <yury.norov@gmail.com>,
- Rasmus Villemoes <linux@rasmusvillemoes.dk>,
- Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org
-From: Mieczyslaw Nalewaj <namiltd@yahoo.com>
-Subject: [PATCH v4] net: dsa: realtek: rtl8365mb: add support for RTL8367SB
-Cc: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-References: <3c6d822b-0e85-4173-86ba-2badb140bbf1.ref@yahoo.com>
-X-Mailer: WebService/1.1.25725 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
-X-Rspamd-Queue-Id: 510224FF8A6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="dcGy5oBbTgHiXKG5"
+Content-Disposition: inline
+In-Reply-To: <20260507-airoha-eth-multi-serdes-v4-6-af613b61ae02@kernel.org>
+X-Rspamd-Queue-Id: 7D9D34FF8C1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[yahoo.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[yahoo.com:s=s2048];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286164-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[yahoo.com];
-	FREEMAIL_CC(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286165-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[gmail.com,genexis.eu,lists.infradead.org,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[namiltd@yahoo.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[yahoo.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
 X-Rspamd-Action: no action
 
-Add chip info entry for the Realtek RTL8367SB switch. This device has
-chip ID 0x6367 and version 0x0010. It exposes two external interfaces:
-port 6 supports MII, TMII, RMII, RGMII, SGMII and HSGMII, while port 7
-supports MII, TMII, RMII and RGMII. Use the existing 8365MB-VC jam table
-for initialization.
 
-Reviewed-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Signed-off-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
----
-v2:
-- no changes over v1
+--dcGy5oBbTgHiXKG5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-v3:
-- expand port 6 external interface capabilities to include
-  MII, TMII, RMII and RGMII in addition to SGMII and HSGMII
+On May 07, Lorenzo Bianconi wrote:
+> Since now multiple net_devices connected to different QDMA blocks can
+> share the same GDM port, cpu_tx_packets and fwd_tx_packets fields can
+> be overwritten with the value from a different QDMA block. In order to
+> fix the issue move cpu_tx_packets and fwd_tx_packets fields from
+> airoha_gdm_port struct to airoha_qdma one.
+>=20
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  drivers/net/ethernet/airoha/airoha_eth.c | 15 +++++++--------
+>  drivers/net/ethernet/airoha/airoha_eth.h |  8 ++++----
+>  2 files changed, 11 insertions(+), 12 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
+net/airoha/airoha_eth.c
+> index 69a4c2e0d58b..786bc677af3c 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> @@ -2306,19 +2306,18 @@ static int airoha_qdma_get_tx_ets_stats(struct ne=
+t_device *netdev, int channel,
+>  					struct tc_ets_qopt_offload *opt)
+>  {
+>  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
+> -	struct airoha_gdm_port *port =3D dev->port;
+> +	struct airoha_qdma *qdma =3D dev->qdma;
+> =20
+> -	u64 cpu_tx_packets =3D airoha_qdma_rr(dev->qdma,
+> -					    REG_CNTR_VAL(channel << 1));
+> -	u64 fwd_tx_packets =3D airoha_qdma_rr(dev->qdma,
+> +	u64 cpu_tx_packets =3D airoha_qdma_rr(qdma, REG_CNTR_VAL(channel << 1));
+> +	u64 fwd_tx_packets =3D airoha_qdma_rr(qdma,
+>  					    REG_CNTR_VAL((channel << 1) + 1));
+> -	u64 tx_packets =3D (cpu_tx_packets - port->cpu_tx_packets) +
+> -			 (fwd_tx_packets - port->fwd_tx_packets);
+> +	u64 tx_packets =3D (cpu_tx_packets - qdma->cpu_tx_packets) +
+> +			 (fwd_tx_packets - qdma->fwd_tx_packets);
+> =20
+>  	_bstats_update(opt->stats.bstats, 0, tx_packets);
+> =20
+> -	port->cpu_tx_packets =3D cpu_tx_packets;
+> -	port->fwd_tx_packets =3D fwd_tx_packets;
+> +	qdma->cpu_tx_packets =3D cpu_tx_packets;
+> +	qdma->fwd_tx_packets =3D fwd_tx_packets;
+> =20
+>  	return 0;
+>  }
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ether=
+net/airoha/airoha_eth.h
+> index 34f1fef51640..3e93919a175c 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.h
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
+> @@ -533,6 +533,10 @@ struct airoha_qdma {
+>  	struct airoha_queue q_rx[AIROHA_NUM_RX_RING];
+> =20
+>  	DECLARE_BITMAP(qos_sq_bmap, AIROHA_NUM_QOS_CHANNELS);
+> +
+> +	/* qos stats counters */
+> +	u64 cpu_tx_packets;
+> +	u64 fwd_tx_packets;
+>  };
+> =20
+>  struct airoha_gdm_dev {
+> @@ -549,10 +553,6 @@ struct airoha_gdm_port {
+> =20
+>  	struct airoha_hw_stats stats;
+> =20
+> -	/* qos stats counters */
+> -	u64 cpu_tx_packets;
+> -	u64 fwd_tx_packets;
+> -
+>  	struct metadata_dst *dsa_meta[AIROHA_MAX_DSA_PORTS];
+>  };
+> =20
+>=20
+> --=20
+> 2.54.0
 
-v4:
-- no code changes
-- add revision changelog
-- repost because v3 did not reach patchwork
+commenting on sashiko report:
+https://sashiko.dev/#/patchset/20260507-airoha-eth-multi-serdes-v4-0-af613b=
+61ae02%40kernel.org
 
- drivers/net/dsa/realtek/rtl8365mb.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+- Will this cause statistics to be stolen between net_devices sharing the s=
+ame QDMA block?
+  - I will fix it in v5 moving counters in airoha_gdm_dev
 
-diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
-index 05412c4aa976..6451e8a31452 100644
---- a/drivers/net/dsa/realtek/rtl8365mb.c
-+++ b/drivers/net/dsa/realtek/rtl8365mb.c
-@@ -545,6 +545,20 @@ static const struct rtl8365mb_chip_info
- 		.jam_size = ARRAY_SIZE(rtl8365mb_init_jam_8365mb_vc),
- 	},
- 	{
-+		.name = "RTL8367SB",
-+		.chip_id = 0x6367,
-+		.chip_ver = 0x0010,
-+		.extints = {
-+			{ 6, 1, PHY_INTF(MII) | PHY_INTF(TMII) |
-+				PHY_INTF(RMII) | PHY_INTF(RGMII) |
-+				PHY_INTF(SGMII) | PHY_INTF(HSGMII) },
-+			{ 7, 2, PHY_INTF(MII) | PHY_INTF(TMII) |
-+				PHY_INTF(RMII) | PHY_INTF(RGMII) },
-+		},
-+		.jam_table = rtl8365mb_init_jam_8365mb_vc,
-+		.jam_size = ARRAY_SIZE(rtl8365mb_init_jam_8365mb_vc),
-+	},
-+	{
- 		.name = "RTL8367RB-VB",
- 		.chip_id = 0x6367,
- 		.chip_ver = 0x0020,
--- 
-2.53.0
+>=20
+
+--dcGy5oBbTgHiXKG5
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaf8lMAAKCRA6cBh0uS2t
+rKLpAQCAJYOh+Mq2Abqk5Pe0IM5zZpEk/MH8fwb8ynVYiecPmQD+OvZdUWTvev/6
+MkfsRGvBE/RJ2OweRxfSJSv4uCI2WQU=
+=cxAJ
+-----END PGP SIGNATURE-----
+
+--dcGy5oBbTgHiXKG5--
 
