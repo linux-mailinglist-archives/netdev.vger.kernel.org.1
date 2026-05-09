@@ -1,271 +1,185 @@
-Return-Path: <netdev+bounces-286163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286164-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id /i9hD08h/2mN2gAAu9opvQ
-	(envelope-from <netdev+bounces-286163-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 13:58:07 +0200
+	id iUVmBkgk/2kt2wAAu9opvQ
+	(envelope-from <netdev+bounces-286164-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 14:10:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E2EE4FF83B
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 13:58:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 510224FF8A6
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 14:10:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3110F300B9D6
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 11:58:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3B5F7300D96A
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 12:10:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E255388E5B;
-	Sat,  9 May 2026 11:58:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90BB837BE7D;
+	Sat,  9 May 2026 12:10:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PcEF8t5k"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="SSKwPXlP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sonic301-31.consmr.mail.ne1.yahoo.com (sonic301-31.consmr.mail.ne1.yahoo.com [66.163.184.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4987317A2F6;
-	Sat,  9 May 2026 11:58:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132E01A3165
+	for <netdev@vger.kernel.org>; Sat,  9 May 2026 12:10:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.184.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778327883; cv=none; b=L7sVsMYaC7EKApFPBCUuQVl7K1WodvndfCMTOwxZG7f9I3Tbe4EbWVDdj7EPfWleU2kEW5fUKJ0QpQh14yEYV/u+dSSjQqWWxTlnqNo+JIfEw7iUj8ZKoyHCclVUKFYLd3aXc5trY2yZFVlyzSj4500fVg7cz5wQq4UdW9v+Zww=
+	t=1778328644; cv=none; b=UMJgqJSSBSh+8Y4rCQZB0hZIVfhdy+83M0tgfoRpGiPeLZEFJBSE+wCO5meIRz86/4R7stTa7TPcgb1mwVMYvScJasvWnNeS0v93/d7gNGsEBPbHrD7ew3nfzmfVPK/GYDqr/O4jk2uzH6IudlE79fSpcO9pNHHK9ktlLL1UZDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778327883; c=relaxed/simple;
-	bh=+kyeoNx5SiAfpEbCxeY8IdHHEPk/F+CGq69tXbZwlEM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JD70whDjoo6PBbGHOfVB8I71Ax4AN7yj2890iD6zqKlojGgHpUAlhmuFKoLaemPLQrSLZJN83VUp3ATTa3RBbvIURvTBYQs0faRoEr1bjGxnx1mILhsOKs8r4gXBUWUoQY1LHljA/sqOICBje9kgZyYBgnIU2g5RV81WmvBih/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PcEF8t5k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A110FC2BCB2;
-	Sat,  9 May 2026 11:58:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778327883;
-	bh=+kyeoNx5SiAfpEbCxeY8IdHHEPk/F+CGq69tXbZwlEM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PcEF8t5k6VqDZ6MdDBPQUeQyQaK9hltJGEAmDInpBrF4Yp8ClEhcV3MGGC263ErJ5
-	 qsyWi7icnNOC5xoC4PtYBQo5QY0/Lu4l95SUBTMKxF6D1wdZLz5IGoB23s0MQDCNGP
-	 7hU9CA/oKvxU4lEhzHEtsQtA/TPwsKAAvvgRlwTFDU+/cCDD5UKAqCyT02MeqYRGHu
-	 dK8VaO0IlEOVAcFDFWwL6/MWk410YinV5EMq1hmrT3cNb/q8mCk3niN7docqetXaeM
-	 qJgf33RV/hWTiTib1d70RaBPcdqBUk2PEHzxrgBldyk3V1V/wgqYHPO2c/Jiz2utRA
-	 MaKVDnNFXA9jA==
-Date: Sat, 9 May 2026 13:58:00 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	Benjamin Larsson <benjamin.larsson@genexis.eu>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, Xuegang Lu <xuegang.lu@airoha.com>
-Subject: Re: [PATCH net-next v4 08/10] net: airoha: Do not stop GDM port if
- it is shared
-Message-ID: <af8hSCcd2GyfbeuE@lore-desk>
-References: <20260507-airoha-eth-multi-serdes-v4-0-af613b61ae02@kernel.org>
- <20260507-airoha-eth-multi-serdes-v4-8-af613b61ae02@kernel.org>
+	s=arc-20240116; t=1778328644; c=relaxed/simple;
+	bh=2cGsUPdjFXYNl8pYQN8MyIPyDW2PB7dZ0bCVuK5B/7E=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type:
+	 References; b=sASGUumG2w66CTtOoPD1ECG9Hcso801AmrDeY5IzdQ5/pU6uKSIOdGvh3WZkuXXA818u0pUrTEZ2HiYI0gLJLARIOoBDuU+/0TexMxjL9zfy49FdP+aeSrBbKVBDRIFVvRiGxQc++w8Gkg+sX+QQUW/xlzer14LHaf7M5CyV7v4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=SSKwPXlP; arc=none smtp.client-ip=66.163.184.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1778328636; bh=PVaPG604sJyPeXwiG+400ARiklpQzlXb2VlIQVb6Sts=; h=Date:To:From:Subject:Cc:References:From:Subject:Reply-To; b=SSKwPXlPv8SQojI446P+tvTFvFWe9ybj8gcAx5rTSkQI+j28SLpurGfMd+cRvrgXTNOpaRo8U7/oWocDMzp8prxwYXIi7j0m2L9MdL2ZK6tQgxShk5JVXhsz8yxoAdEGOy+Q2kd9JIY/SB7dd+acywOhKr1emxkerVstrceaAOnBfp2A1U3YK5KrGPEVizxPuWDAPSa7DLj4ibUZ39RSwNcSF3HmSSsgw2Hdv3tShvxCPIlwW1P76PDLHSF8zHoZWJvpFLEMxG/06IJLxAj7qeVa0Yi8bVWhlXcU/flpxf1/5krSGDNAoJDn4Q2ByKGvy1U+eJsubgY8AzGpz04A+w==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1778328636; bh=j/Kn59h5JTjVC7Y4HtwcWsP2N9uLkqGVps1p+Ko6wDi=; h=X-Sonic-MF:Date:To:From:Subject:From:Subject; b=QpnAJdxpGXrCQpKUmTI/IWAsbZFd/hFryFFI4Vlt+5h4wK5hKccTKUNuuDiejMALuenoWSDyV/hA/FB/uIaHZxFKNPGYvZGuuIzNhXNdX2F0nI6Gzg/ys0Wpp+dnYezayQNJNwRlVvUS0n4sIe7rI0lwT5U1pC11scsfMLAxNVrlskckrkZxt9dQpigF+KVDSMEd8qqZrb+jMIqBKSuOBtF46V7EuieUrYetLF2I9Y4Lww2GLc0AuoLQQe3gmjNH+HptmbPMNiC7bs/6fW7aSMfXbKw8eQAeA5EUQkZvRxqLUdxLyxQEUbAX3yY/rSQAbJUEqJu8kdIKimKA4g8MUQ==
+X-YMail-OSG: .cWCOo8VM1mlA3_h2doOZ8FnI9_gf_j8OSmEwfp8DPEHMq3U66Ou_KO0C0t8GUP
+ PNVgP6LLV78iFMFlqwZu3dH4zGyGbMvochJGXZRSLUP7KqOjzXJYic9JM2on_bdeiTAen_C2o9Au
+ hKoP5fFcmfGRKqf0EArfZeMxEvolIxzpIIpoJ9keUa.pBItKszglg9Ps5.XmKrZnpar281u.LAfx
+ LbLS0Czd3Tm1dcHqEvRPLoOh360bM9ytxhp16l1JKLY3ERNnvakMD_4krCCkeiuCYWv4OObwkBxr
+ 0olYhZmpWAc6I858HhEtYdT1ihKj1XUsDmV4LNrMUnkQnkNp3FrqN0t0r2uCifuFjKrgoyc6187Y
+ Wxf8KNbTUpNf7IO9K2YG3abjiUC.tHEeI_wzNWeeR5vy5DNK0u2fG9BGUMnvMQBVajVyVLiU_yqf
+ BtqZiOOStxbpzzLQwbqiEnkbcOXR6YolAw4fXxdn9fS3Rpy1YJrKeoXhvB4SlwkISY7We.aTHiAf
+ FT5irLAQZftbk20ug9pegxjfqh002VUpFWIYGXvUxw8YAqj8qp5WfVs6_0gpLWz8oVJPNZ7L_Ral
+ ghcUmZTEGiPZOQSeDaK7EXg4ETWmm3XdXG4sUCptlrjMqAHrUQx_vCwxvK5_cAgMYKaIP.KmXgQe
+ nC.05MHA1CmFQrLH5JaNtkn5nc0mPdsJ7u_KLfe0J2twOgOUdLsTJBszIHy2cghn7lC7ApMPRt4u
+ Xv_cDnPVK9ZG61AagT78RvRTP4GOki4cbAAAY_56HzlhX4cln3hzKIyRdqXMrzc1tx5lGY5_A6Tx
+ GxTcIlc2JgWnMYYSnnrxKzZxE9fDDOkBzlXRWRx._vHmU.WnO9Q0bx.ze0cwe8odFXW_9__rAV5L
+ LpIzdvMvj.8HEoED9DWH0Q_SrcxdLlv8B_Jj3z8PKN4QcxwzMVU4PV44zElaMtiWCb.1rHhD917V
+ 5g5ZKrjXmO.iU4bpnLD2q4ZbwunF7u2TX1XbdKWsJKfr08Jn.f1u9RjGWp9jrDgZQJ0EPHpJyH0b
+ wCyctclM0CUgtz6MXiyZ5yWWgWIZ3YTiKvpWQdT4kmPvSk_fbNEcIqFEV1aKpWZtOKYWbbBDTCOf
+ 4nCO5Oup6D2DkuVOYOfqGrJHD1vRGR6MW7IdKONolkSOJi0Tlcn13pv9BYEMCHZTswXNEpAGIOWf
+ XeVFVJxaJC7X7NwNgkm6Jg1.gBtQ2bqd0cAdDTZ5aTOCRE18XvbQiDcABVqkfHbvvyFaMeR3Mlhb
+ Qyt0BDZG20bM08_xF155SFi7jPX6y2KMPNC.omW7gncnbBWXDgU.FGa.RxuLhNrSW4Mrfd_cuKRc
+ sqRsPikgQ5xIWjnslguCaHYpzhkP0RlJsTz_pwnENn87ihH.ZZs0MNpDmkJ3vkdYihW1UpMNQ6fc
+ Q9N76WwL2i.As5c7189BzcefimypM_JVXuquYFK_n_ZvoIPrqMG8eyIpmStMcfIvICeGEkjiKQCk
+ DFbraFXATjebfwyULZwCuPfzAU0nGHgGnqSCGGYSLwHFAouADQGc__495wkL07.3t9to0Jfik9gl
+ ypmHPR6iOTK07_agLyq2r5c9pL1OatZiEjhBs0IsWx1zZzgGekofeZ.GRCsIct9SNJXbLVyzygPo
+ 8Greox_jIQQP7T_cIXefJPTzBiud6EHNaqmL5fz5zMUDcKAK1gF5zpoa8aB_gMSMxY6Vi_jfQA_j
+ TwMmT26nua6vv4rwdtNtwW7FUcUajr37Vc3ZOaXrhTybVVVgtWvhKPCPy.hN4P5sGwM64QndI6pu
+ gr.ZUgoDmfCpwvIYC5i3at2Zibyi7SJE574a2OEVgTm0565.UMcMY453auGJuB0UuEzKsU4P4irN
+ tEIvAygAxI_PGunTwqN2QM5U3vxcBTYYp29PA.XhcnVn8fsIsI_6Qe9Eoci.wTqMYqSs0CC3bcV.
+ wa74Nowq6OMFmJaB_IzfU1yY79NXytmd8gOj7MHI6fzvxnqtDoxSN1Tui1WjWi3YjlfrPHsYcfrW
+ LtiCJ18oEF_.3NxWl.98_1Pne_ql0wCPVI1R1zdqfFmBt09IDK4D_6ZfzdNj62c6MHeF3c1Y.jWw
+ 2dHnkl8CTpUEWo0h4yvKO7WaUs8JaI6VHBLkP0zzAPCsCjJOmaPdHtjlSehj6Iwm8LPmej.LZVK4
+ pGPZPnEa1uyCIH9AM1Pmqmja_g864GOa_9SclhX4qNqk8sGoRWXZ5DCDxbv34vuPDHWJCSaqcWVh
+ _4yPGkqyE28cJjLj2pct2IWyU8qJTLOsRsxQ2AXSoCckjjyc_CIYjjj7M8r9YNC1YTMU8bMj3kYz
+ FeO2AuzAcw.DKGJYxd9B.yyyfbdnjJMaYSvOSjfAz
+X-Sonic-MF: <namiltd@yahoo.com>
+X-Sonic-ID: 94eb9a70-4796-488a-87d6-ea0613db7f87
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic301.consmr.mail.ne1.yahoo.com with HTTP; Sat, 9 May 2026 12:10:36 +0000
+Received: by hermes--production-ir2-89844b765-xcbjs (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 4c831a0076a167a8128a5219956ef2e9;
+          Sat, 09 May 2026 12:10:32 +0000 (UTC)
+Message-ID: <3c6d822b-0e85-4173-86ba-2badb140bbf1@yahoo.com>
+Date: Sat, 9 May 2026 14:10:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="f/l86ZsPISNBd6cb"
-Content-Disposition: inline
-In-Reply-To: <20260507-airoha-eth-multi-serdes-v4-8-af613b61ae02@kernel.org>
-X-Rspamd-Queue-Id: 7E2EE4FF83B
+User-Agent: Mozilla Thunderbird
+Content-Language: pl
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?=
+ <alsi@bang-olufsen.dk>, Yury Norov <yury.norov@gmail.com>,
+ Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+ Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org
+From: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+Subject: [PATCH v4] net: dsa: realtek: rtl8365mb: add support for RTL8367SB
+Cc: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+References: <3c6d822b-0e85-4173-86ba-2badb140bbf1.ref@yahoo.com>
+X-Mailer: WebService/1.1.25725 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+X-Rspamd-Queue-Id: 510224FF8A6
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[yahoo.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[yahoo.com:s=s2048];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-286164-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286163-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[gmail.com,genexis.eu,lists.infradead.org,vger.kernel.org,airoha.com];
+	FREEMAIL_FROM(0.00)[yahoo.com];
+	FREEMAIL_CC(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[namiltd@yahoo.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[yahoo.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
+Add chip info entry for the Realtek RTL8367SB switch. This device has
+chip ID 0x6367 and version 0x0010. It exposes two external interfaces:
+port 6 supports MII, TMII, RMII, RGMII, SGMII and HSGMII, while port 7
+supports MII, TMII, RMII and RGMII. Use the existing 8365MB-VC jam table
+for initialization.
 
---f/l86ZsPISNBd6cb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Signed-off-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+---
+v2:
+- no changes over v1
 
-> Theoretically, in the current codebase, two independent net_devices can
-> be connected to the same GDM port so we need to check the GDM port is not
-> used by any other running net_device before setting the forward
-> configuration to FE_PSE_PORT_DROP.
->=20
-> Tested-by: Xuegang Lu <xuegang.lu@airoha.com>
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  drivers/net/ethernet/airoha/airoha_eth.c | 36 +++++++++++++++++++++++++-=
-------
->  drivers/net/ethernet/airoha/airoha_eth.h |  2 ++
->  2 files changed, 30 insertions(+), 8 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
-net/airoha/airoha_eth.c
-> index 0253919714e0..1c4927c1aeb0 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> @@ -1714,8 +1714,8 @@ static int airoha_dev_open(struct net_device *netde=
-v)
->  	int err, len =3D ETH_HLEN + netdev->mtu + ETH_FCS_LEN;
->  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
->  	struct airoha_gdm_port *port =3D dev->port;
-> +	u32 cur_len, pse_port =3D FE_PSE_PORT_PPE1;
->  	struct airoha_qdma *qdma =3D dev->qdma;
-> -	u32 pse_port =3D FE_PSE_PORT_PPE1;
-> =20
->  	netif_tx_start_all_queues(netdev);
->  	err =3D airoha_set_vip_for_gdm_port(dev, true);
-> @@ -1729,10 +1729,14 @@ static int airoha_dev_open(struct net_device *net=
-dev)
->  		airoha_fe_clear(qdma->eth, REG_GDM_INGRESS_CFG(port->id),
->  				GDM_STAG_EN_MASK);
-> =20
-> -	airoha_fe_rmw(qdma->eth, REG_GDM_LEN_CFG(port->id),
-> -		      GDM_SHORT_LEN_MASK | GDM_LONG_LEN_MASK,
-> -		      FIELD_PREP(GDM_SHORT_LEN_MASK, 60) |
-> -		      FIELD_PREP(GDM_LONG_LEN_MASK, len));
-> +	cur_len =3D airoha_fe_get(qdma->eth, REG_GDM_LEN_CFG(port->id),
-> +				GDM_LONG_LEN_MASK);
-> +	if (!atomic_read(&port->users) || len > cur_len)
-> +		airoha_fe_rmw(qdma->eth, REG_GDM_LEN_CFG(port->id),
-> +			      GDM_SHORT_LEN_MASK | GDM_LONG_LEN_MASK,
-> +			      FIELD_PREP(GDM_SHORT_LEN_MASK, 60) |
-> +			      FIELD_PREP(GDM_LONG_LEN_MASK, len));
-> +	atomic_inc(&port->users);
-> =20
->  	airoha_qdma_set(qdma, REG_QDMA_GLOBAL_CFG,
->  			GLOBAL_CFG_TX_DMA_EN_MASK |
-> @@ -1762,8 +1766,12 @@ static int airoha_dev_stop(struct net_device *netd=
-ev)
->  	for (i =3D 0; i < netdev->num_tx_queues; i++)
->  		netdev_tx_reset_subqueue(netdev, i);
-> =20
-> -	airoha_set_gdm_port_fwd_cfg(qdma->eth, REG_GDM_FWD_CFG(port->id),
-> -				    FE_PSE_PORT_DROP);
-> +	if (atomic_dec_and_test(&port->users)) {
-> +		airoha_set_vip_for_gdm_port(dev, false);
-> +		airoha_set_gdm_port_fwd_cfg(qdma->eth,
-> +					    REG_GDM_FWD_CFG(port->id),
-> +					    FE_PSE_PORT_DROP);
-> +	}
-> =20
->  	if (atomic_dec_and_test(&qdma->users)) {
->  		airoha_qdma_clear(qdma, REG_QDMA_GLOBAL_CFG,
-> @@ -1915,10 +1923,22 @@ static void airoha_dev_get_stats64(struct net_dev=
-ice *netdev,
->  static int airoha_dev_change_mtu(struct net_device *netdev, int mtu)
->  {
->  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> +	u32 cur_len, len =3D ETH_HLEN + mtu + ETH_FCS_LEN;
->  	struct airoha_gdm_port *port =3D dev->port;
-> -	u32 len =3D ETH_HLEN + mtu + ETH_FCS_LEN;
->  	struct airoha_eth *eth =3D dev->eth;
-> =20
-> +	cur_len =3D airoha_fe_get(eth, REG_GDM_LEN_CFG(port->id),
-> +				GDM_LONG_LEN_MASK);
-> +	if (len < cur_len) {
-> +		u8 port_refcnt =3D atomic_read(&port->users);
-> +
-> +		/* We can decrease the device MTU just if the GDM port is
-> +		 * not shared or if the other device is not running.
-> +		 */
-> +		if (port_refcnt > 1 || (port_refcnt && !netif_running(netdev)))
-> +			return -EBUSY;
-> +	}
-> +
->  	airoha_fe_rmw(eth, REG_GDM_LEN_CFG(port->id),
->  		      GDM_LONG_LEN_MASK,
->  		      FIELD_PREP(GDM_LONG_LEN_MASK, len));
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ether=
-net/airoha/airoha_eth.h
-> index 207c75152fde..3a313ac439e7 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.h
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
-> @@ -553,6 +553,8 @@ struct airoha_gdm_port {
->  	struct airoha_gdm_dev *devs[AIROHA_MAX_NUM_GDM_DEVS];
->  	int id;
-> =20
-> +	atomic_t users;
-> +
->  	struct airoha_hw_stats stats;
-> =20
->  	struct metadata_dst *dsa_meta[AIROHA_MAX_DSA_PORTS];
->=20
-> --=20
-> 2.54.0
->=20
+v3:
+- expand port 6 external interface capabilities to include
+  MII, TMII, RMII and RGMII in addition to SGMII and HSGMII
 
-Commenting on shashiko report:
-https://sashiko.dev/#/patchset/20260507-airoha-eth-multi-serdes-v4-0-af613b=
-61ae02%40kernel.org
+v4:
+- no code changes
+- add revision changelog
+- repost because v3 did not reach patchwork
 
-- Is this call to airoha_set_vip_for_gdm_port() redundant?
-  Looking at airoha_dev_stop(), airoha_set_vip_for_gdm_port(dev, false) is
-  already called unconditionally earlier in the function. Since get_vip_por=
-t()
-  returns a device-specific bitmask based on dev->nbq, does the uncondition=
-al
-  call correctly clear the hardware bits for the specific device being stop=
-ped
-  without affecting other devices on the same shared port?
-  - I will fix it in v5.
+ drivers/net/dsa/realtek/rtl8365mb.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-- Does returning -EBUSY here improperly prevent valid software MTU configur=
-ations?=20
-  Instead of failing the ndo_change_mtu callback and preventing the software
-  netdev->mtu from updating, should this code unconditionally allow the sof=
-tware
-  update (netdev->mtu =3D mtu) and simply skip the hardware register
-  (REG_GDM_LEN_CFG) downgrade to safely preserve the larger hardware limit
-  required by active shared siblings?
-  - I will fix it in v5.
-
-- Is the use of an atomic_t necessary for tracking users here?
-  The port->users reference count appears to only be modified in ndo_open a=
-nd
-  ndo_stop, and read in ndo_change_mtu. Since all of these callback paths a=
-re
-  inherently strictly serialized by the kernel's rtnl_lock(), could a simple
-  integer be used instead to avoid unnecessary atomic overhead?
-  - I will fix it in v5.
-
---f/l86ZsPISNBd6cb
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaf8hSAAKCRA6cBh0uS2t
-rIAVAP40XN/xVxenB27WTAZQFLE3D1aOZEx4226QciUyPoghTAEA5Q+pwNyELBEQ
-C2PWBhwiUFSdhonKXDUiPaijAreZyw4=
-=IPQU
------END PGP SIGNATURE-----
-
---f/l86ZsPISNBd6cb--
+diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
+index 05412c4aa976..6451e8a31452 100644
+--- a/drivers/net/dsa/realtek/rtl8365mb.c
++++ b/drivers/net/dsa/realtek/rtl8365mb.c
+@@ -545,6 +545,20 @@ static const struct rtl8365mb_chip_info
+ 		.jam_size = ARRAY_SIZE(rtl8365mb_init_jam_8365mb_vc),
+ 	},
+ 	{
++		.name = "RTL8367SB",
++		.chip_id = 0x6367,
++		.chip_ver = 0x0010,
++		.extints = {
++			{ 6, 1, PHY_INTF(MII) | PHY_INTF(TMII) |
++				PHY_INTF(RMII) | PHY_INTF(RGMII) |
++				PHY_INTF(SGMII) | PHY_INTF(HSGMII) },
++			{ 7, 2, PHY_INTF(MII) | PHY_INTF(TMII) |
++				PHY_INTF(RMII) | PHY_INTF(RGMII) },
++		},
++		.jam_table = rtl8365mb_init_jam_8365mb_vc,
++		.jam_size = ARRAY_SIZE(rtl8365mb_init_jam_8365mb_vc),
++	},
++	{
+ 		.name = "RTL8367RB-VB",
+ 		.chip_id = 0x6367,
+ 		.chip_ver = 0x0020,
+-- 
+2.53.0
 
