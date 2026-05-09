@@ -1,501 +1,216 @@
-Return-Path: <netdev+bounces-286157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286161-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QItXLYAN/2lI1gAAu9opvQ
-	(envelope-from <netdev+bounces-286157-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 12:33:36 +0200
+	id 0FJtCzIV/2lg2AAAu9opvQ
+	(envelope-from <netdev+bounces-286161-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 13:06:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2D474FF53A
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 12:33:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7361F4FF730
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 13:06:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C32E2301C8E6
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 10:30:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 79F8B300E733
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 11:06:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8CED3A63FE;
-	Sat,  9 May 2026 10:29:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="VlwFsBjJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B48F371D16;
+	Sat,  9 May 2026 11:06:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013057.outbound.protection.outlook.com [40.107.162.57])
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB783A3E96;
-	Sat,  9 May 2026 10:29:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778322569; cv=fail; b=T1ZrfdJhY4rNjCfB++8siu8IBuSezm/T4eXuCYwGUApcIG0rVtEf01FkXgkW1yG+Fi9/lWxZGDGI1GJ7MtVzSFUxRWVl+oZjVAJLuvWRy4W3cZeSmMfv61Lyc7Y/K6Vci5k1wCD+Lh8pxu2G8xDVoVQsjPUhAF198CcsLBeSJF8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778322569; c=relaxed/simple;
-	bh=vm6w9BX2K45FFVTEENUG/You0sUJUDZnsZoFA7+COO0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uK3SX+nTXocieEtLoSDanfqmx6GhVYhZDKU9A8zJlmACEIhKWfmMMLZU4OOHpVToq+/lGj4fMs1wogm++mFUlm8kFZr+uFVmHQ7ZWNYdb1SPOePcKuvOE6B/J38ro+RzMv0lpN1Otypdlr17mZ1GZot0nXqzfrBOZkWQxRmsB08=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=VlwFsBjJ; arc=fail smtp.client-ip=40.107.162.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YCjPZZ78hrkeo0iKma49Vod0bdnUMIljltWMMc9ThuQMX8NxsXaf9KB614Zhmxg5kU7bzsJrWNvM5nrYtWcLdpSaoJQarz+/YtnVCUm3cp9AS7kTQ+uMFGzIMFnv07ChFlnJ8BCwA6xVH/jdWdAEU/LRC2WFbmQq2DupGCp19rpeiZnyqZPLtLVgTFuJWNjzfDfAHoJvmvmSi18OUHlyiuAhUvQlmOU+O9FfAsLLLw7u3jjygOtUPG7A+F0donsbzBNbTB8Si6ZykFg4+xgm1pJbT24vmnHQNiqAZpIKLDt5MDanR/MFnFIl0pBXJcByJaWjvEakguhxjBsB+eCmFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bLL8kR60HWiGfBZjWm/4TuxGBOepa12A1njCqZE/dOg=;
- b=t/0JqkHFmsH9cqAPR7DqujLyrBDW1uPiUf4+FEoug3lR+Vv0EcLv36ThawwcHVpRz8tAg4ugzcxlSSg1RVk6laWjjzTU6wFV95hCX81a6/OuQMF0UqlB8bR4ylrjs8Im7Vs1VhP1yW0v/k2eDVmM8pY6bBq8wKXu2HFJWx77AdanIpE/ddVkezyaPz8v8PPeOxy2g+z3zsJxFow5YFScYyV0k/Y32pN/PJR/9lr1imn3neTtP/X+FsKpP0ZsO5xeZM5+1o6hSoxCgz6fnHLFFpdBSELW6mMuktaAeVCn9NNDLA4x3T+Zfj1NF3x7GS9yODD5bhblS7tIW7jrO5pw2w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bLL8kR60HWiGfBZjWm/4TuxGBOepa12A1njCqZE/dOg=;
- b=VlwFsBjJl5yyqBLBen3LVV7dqI8MnpKqYNVfVx1VHKol/UXCKEMl/cB12Tpq3veMjbPbVpYhkqqUAp8tmKpttuK1HWmivY3nz8sNzado1mFF3obKN0LARkIkaec9BwPNft6SCofq7Mu1+dsR03YdVThVFcyBCDgJQ8PqgtMwOrstKLQEnBQlQ4NLEwbkwZTdzgfKP7w+lfqR4sGzTe3Hu3XELBp5nbWM8HMrSi9LmKlFNm8hvnyMi0WD17tx4cIRQxydhocm/EUwKahyUJUKmeQA+yS2neX9DtcbsUjyCqBxWbrYUqy9pN0riDWZkJ25OzQuo4RWZAaiNlZ6rmz9ow==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
- by DU4PR04MB10385.eurprd04.prod.outlook.com (2603:10a6:10:56d::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.20; Sat, 9 May
- 2026 10:29:24 +0000
-Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
- ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
- ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.20.9891.019; Sat, 9 May 2026
- 10:29:24 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	f.fainelli@gmail.com,
-	frank.li@nxp.com,
-	chleroy@kernel.org,
-	horms@kernel.org,
-	linux@armlinux.org.uk,
-	maxime.chevallier@bootlin.com,
-	andrew@lunn.ch,
-	olteanv@gmail.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-arm-kernel@lists.infradead.org,
-	imx@lists.linux.dev
-Subject: [PATCH v6 net-next 15/15] net: dsa: netc: add support for ethtool private statistics
-Date: Sat,  9 May 2026 18:29:54 +0800
-Message-Id: <20260509102954.4116624-16-wei.fang@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260509102954.4116624-1-wei.fang@nxp.com>
-References: <20260509102954.4116624-1-wei.fang@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI2PR01CA0030.apcprd01.prod.exchangelabs.com
- (2603:1096:4:192::15) To DBBPR04MB7500.eurprd04.prod.outlook.com
- (2603:10a6:10:1f4::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7EB35B63D
+	for <netdev@vger.kernel.org>; Sat,  9 May 2026 11:06:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.30.148.34
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778324783; cv=none; b=sVUYB6IwfvTaXewLpZ79DyFS/DmnEcqtS6RscF9MiA1mLOkdMSPBFLvWgm8uiwY5SH8i98uVQY3C+jhbRWf9Mr4z+Xymyqved8atjlRV11NUOtMtFBhHs6vAARkWrOQISGIAkvc/UP35WnFNmGzKnrSFsLBP8XGRG25niF+ZRAg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778324783; c=relaxed/simple;
+	bh=yzot4h43WPl5avDZCWvjdktyZAY+2T74QFGAmTDAPJ4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bKXW8ifgJWnTg8zPMSvDLGUVX/trBF6nwKDU2wMii4/TSwthBNsxpVYxsVl8+8xqOKKXFsVfDO8HShnrr8pY7Tru6bzJ5rp8Vp2ubw/RSeEOtbZ6AlnfJWQNgwWKQbGCaBGL6bgiN0RfgI1hVaEY040wVt9QSO4xWtCTKO6z98s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4gCNTG26SNz5BNS0;
+	Sat, 09 May 2026 19:06:10 +0800 (CST)
+Received: from szxlzmapp04.zte.com.cn ([10.5.231.166])
+	by mse-fl1.zte.com.cn with SMTP id 649B5x5M067046;
+	Sat, 9 May 2026 19:05:59 +0800 (+08)
+	(envelope-from han.junyang@zte.com.cn)
+Received: from localhost.localdomain (unknown [192.168.6.15])
+	by smtp (Zmail) with SMTP;
+	Sat, 9 May 2026 19:06:02 +0800
+X-Zmail-TransId: 3e8169ff1505001-648a6
+X-Zmail-LocalSMTP: 1
+X-Zmail-RealSender: han.junyang@zte.com.cn
+From: Junyang Han <han.junyang@zte.com.cn>
+To: andrew+netdev@lunn.ch
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, han.junyang@zte.com.cn,
+        ran.ming@zte.com.cn, han.chengfei@zte.com.cn, zhang.yanze@zte.com.cn
+Subject: Re: [PATCH net-next v3 1/3] net/ethernet: add ZTE network driver support
+Date: Sat,  9 May 2026 18:34:48 +0800
+Message-ID: <20260509103448.3263890-1-han.junyang@zte.com.cn>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <eabcb0c3-324f-4fd7-992e-8d517980ea27@lunn.ch>
+References: <eabcb0c3-324f-4fd7-992e-8d517980ea27@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DBBPR04MB7500:EE_|DU4PR04MB10385:EE_
-X-MS-Office365-Filtering-Correlation-Id: f6ef3643-d5a7-4446-ab8b-08deadb5d731
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|52116014|366016|1800799024|19092799006|18002099003|22082099003|921020|38350700014|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	exYvn6AuEFCaSZM5pa7I6DvsxideEJv7NSKTGBGt0rwSZMEs87Sswe7YWKOhijFHz16wY8ZO+Mia5tIXe8wPpcV7otvUGVaoXO+kyNvdey5Ukn5W2FDtD+fCwPWto+67+T8Cgdg9KtK6Df+00TOyHbDPGM2HhZKrAW2+MVijR2184RGZBSTCzzWSAKnEtkqwgIlaziq8d98QP53/8sNLXIdMyCmLsmyuR+x7M2dIeoa5HeDH2y70ooKcm5POLQr0UVrkx92V8tmYgIbj8M9FVoEDlckSNc94epZwf9c0VoWp1lc/rw+YAnXJHnORevRflOayLITUMkp16awkl2DzsriBVt4Iy+iybQ6/w50Gdq/kQcNKPtDX0mGAEh85shi7/xk8WC2RwDL72W8PWkYbbrnym0sSn9OoVlAg2Yj1OTwAaeojt38Jjc9/5jSzD65a6oiAG9JJWELysIKiSdPrar4TVHqjwVxS5hCta4DGIxO3iZeyllQDqyvMrtnLzToQeq5Aq94JJWv9EwFx3fpi3jeclMdK++yu/Ft5OVuQRTAmGb9yhuFZkc9mkRB39VsaYcV4ftG3uVjY+p7AZVozdGS0uKbrD6IWOThyNwMHojym6it9MFyxDFYCUdBNM6p4OaC9dTA6Yj5zsI2k5FggH66FWGD6yTuJrEihf/8aYTZDDOEVITzDCIa/Oezb7sx/TsAanBO8iqQ2cHmwZNPm9QYAI64EfYqoQPGESre6L9qWRo1ABpIWGGcFIFmBd4/eK155RNA/u9QmcvL8IJQQOA==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(52116014)(366016)(1800799024)(19092799006)(18002099003)(22082099003)(921020)(38350700014)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?sVzY5zPlVSodKxIFy/g9nrDb8gvISTtV8+gubsrBOIXzhXhrrB/QoFKd24Xh?=
- =?us-ascii?Q?ro3V2nPrCsS22OR2bw1CEtttavupzsAGz7zuR0orLu31qHpHcjgBa1hPiiJ6?=
- =?us-ascii?Q?2+pBCPoxDL/HTOwMIoC1B3hkdfeHmEShLNdrhKVbQKW+ddIf/w5wJNdkL9aF?=
- =?us-ascii?Q?R1hPHgpCWdQ05aDq/v2b3BAwFBFiteq/Ux7230OtwKZ+XUTm7LC/f7LUpI09?=
- =?us-ascii?Q?h8ugzpwEhIQBN8GMpNMMejhiUPiN37+vgiVU889NoJAoRGB/oMxV+sf/U1nz?=
- =?us-ascii?Q?TTWGRGzVDmgzfDEKK4gZNm8O+Damcys7jjl0WMVZ8xR5lRU8GQXUOQBfHO06?=
- =?us-ascii?Q?uuAEdlFYWlvO+JjdI3Nt5SBt6xqQloOtXIUhUCM2Ys/+rEwTE9Dk9pBc+kU3?=
- =?us-ascii?Q?xDwXBt8evgxP4c0Q5ohkqrnOtaZ5CmdcGqMAKJeQ+UBxtovym038YzYUBa7E?=
- =?us-ascii?Q?3PGkJk6mwyRAjZTO07b3G14H594LKti0IZFgataKgzj5QHS+0a49zCKdQOvp?=
- =?us-ascii?Q?q0zHjfqPCYXVgkx7nZqpfWYcOvQESuhEC0iAQCCNbbOkN21tHgrQdXRbtVDE?=
- =?us-ascii?Q?cOr+Py5DQsT+46xnUz2d0wfEAXlwPc7/jiKDxFtYBf0zO8jfRpEeV0UF0SVP?=
- =?us-ascii?Q?/sE+XeiYUvsKgInqm67UzgWFS3+ME0ivjOOP6XoafVHEydVo+PbVChN66VR7?=
- =?us-ascii?Q?UZi+JC9ipHTgbrgnhPVkbq8iTzekw1XyqZj2TRoYd+gFEvxQ37WkqDs80lWv?=
- =?us-ascii?Q?sHRtIDH4RySH75xNxb6ggc7J/gZ9E5FJFixr6wgFRWNwZLq9ZM6ci5Ihs1fH?=
- =?us-ascii?Q?rPWt6MmUn1RAAGz60/tF3nCQmUHN70MdPXyMnXcCg8aB4fhzDnAfFIDCwgeq?=
- =?us-ascii?Q?+97+ZFz4eX2r9Uaw1VRLHj21lIbNqU0drWzoQSdSlU1jM+KEBBpEKbD3iNQ5?=
- =?us-ascii?Q?cIrq/sya7Nu9UVQJYhkp7USA1reNG45qvkmVGCrGOGPfpjjMdfXgtxVaSDXJ?=
- =?us-ascii?Q?RnERdC7ukAwRwEqOsS7ABCmEKTxtXozpMmt7JXtRZybm1Q3NQfwMwSpeV+oZ?=
- =?us-ascii?Q?bUvfmblHaLhn1zEk6+Q8Sf16B7yV2fuDwaLPCQmRoCb0y6cJB487fzjqph6S?=
- =?us-ascii?Q?awEmdCuUx6+XPPl1wI+/Lri8aar9meywwA0ZcJYcMfF56o6h6iIfqDUDDUhy?=
- =?us-ascii?Q?n3leJCJguZZ1+wUZEc6OITfC1hGjnGtepPZEH+ScU2Q015+Fh6Oi/26GvKce?=
- =?us-ascii?Q?Hu9DrARCNISfC6NKauGwB/xRCBShz4Fn4HnvE0a07ebu+KZRV3V5tMGsJOE5?=
- =?us-ascii?Q?iEOk6rhEMgPK+Ec8AooCONwH9/VgZ1lkHsTVHBOsiPVnuZ1d9GXL3n6ORmms?=
- =?us-ascii?Q?EfDEPFM/H13hhOQlQYwCXWxIw/xhMI/kz6NKqOy6j2JUMePPzPQgDsjSZEvH?=
- =?us-ascii?Q?niTzVxhdObUWBRgzPl1ywu5ca7ewKPoMxCNOQUlrdiqQgFexBiLYndhx6HTA?=
- =?us-ascii?Q?SrO0EAFYYUxe7s+WxvUlf8J/TKwDXKdiOziT0xAgsKjXpqPZNeiypL60XO85?=
- =?us-ascii?Q?Der2Z4ZYtWessO0ibJt2iqEmq7uusCZKGFvaU3j6zGwbBcMf3FbVIrXFd8cq?=
- =?us-ascii?Q?Mgb5rA5I6v9MaLWi0B0+lHXHTLsAYDHZ7M2nnnr5LjQWQZm15MeKj50RCpiy?=
- =?us-ascii?Q?du6NdCUTBV1FzvfKJ95cNb2UTGqAuiBkaLp1+bXiR1Eh+knd?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f6ef3643-d5a7-4446-ab8b-08deadb5d731
-X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 May 2026 10:29:24.5954
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: x76wFTtaY7In+pPQvFu+phUSPU5TR+Z/ak9tmp2gox6l9QVw3L7yHjfKOT4UZt5f8WrLLs7eQ1ZbqnP+Y+IKAw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR04MB10385
-X-Rspamd-Queue-Id: B2D474FF53A
+Content-Transfer-Encoding: 8bit
+Content-Type: multipart/mixed;
+	boundary="=====_001_next====="
+X-MAIL:mse-fl1.zte.com.cn 649B5x5M067046
+X-TLS: YES
+X-SPF-DOMAIN: zte.com.cn
+X-ENVELOPE-SENDER: han.junyang@zte.com.cn
+X-SPF: None
+X-SOURCE-IP: 10.5.228.132 unknown Sat, 09 May 2026 19:06:10 +0800
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 69FF1522.000/4gCNTG26SNz5BNS0
+X-Rspamd-Queue-Id: 7361F4FF730
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [6.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+	CTYPE_MIXED_BOGUS(1.00)[];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	SUSPICIOUS_URL_IN_SUSPICIOUS_MESSAGE(1.00)[];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	URIBL_RED(0.50)[zte.com.cn:mid];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,multipart/related,multipart/alternative,text/plain];
+	HAS_ANON_DOMAIN(0.10)[];
+	DMARC_POLICY_SOFTFAIL(0.10)[zte.com.cn : SPF not aligned (relaxed), No valid DKIM,none];
+	BAD_REP_POLICIES(0.10)[];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,bootlin.com];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286157-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-0.990];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286161-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	GREYLIST(0.00)[pass,meta];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TO_DN_NONE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,nxp.com:mid,nxp.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Action: no action
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[han.junyang@zte.com.cn,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+,1:+,2:+,3:+,4:~];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	R_DKIM_NA(0.00)[];
+	R_SPF_ALLOW(0.00)[+ip4:172.234.253.10:c];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,zte.com.cn:mid]
+X-Rspamd-Action: add header
+X-Spam: Yes
 
-Implement the ethtool private statistics interface to expose additional
-port-level and MAC-level counters that are not covered by the standard
-IEEE 802.3 statistics. The pMAC counters are only reported when the port
-supports Frame Preemption (802.1Qbu/802.3br).
 
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
----
- drivers/net/dsa/netc/netc_ethtool.c   | 107 ++++++++++++++++++++++++++
- drivers/net/dsa/netc/netc_main.c      |   3 +
- drivers/net/dsa/netc/netc_switch.h    |   9 +++
- drivers/net/dsa/netc/netc_switch_hw.h |  58 ++++++++++++++
- 4 files changed, 177 insertions(+)
 
-diff --git a/drivers/net/dsa/netc/netc_ethtool.c b/drivers/net/dsa/netc/netc_ethtool.c
-index ac8940b5a85c..8d04db534347 100644
---- a/drivers/net/dsa/netc/netc_ethtool.c
-+++ b/drivers/net/dsa/netc/netc_ethtool.c
-@@ -19,6 +19,56 @@ static const struct ethtool_rmon_hist_range netc_rmon_ranges[] = {
- 	{ }
- };
- 
-+static const struct netc_port_stat netc_port_counters[] = {
-+	{ NETC_PTGSLACR,	"port gate late arrival frames" },
-+	{ NETC_PSDFTCR,	"port SDF transmit frames" },
-+	{ NETC_PSDFDDCR,	"port SDF drop duplicate frames" },
-+	{ NETC_PRXDCR,		"port rx discard frames" },
-+	{ NETC_PRXDCRRR,	"port rx discard read-reset" },
-+	{ NETC_PRXDCRR0,	"port rx discard reason 0" },
-+	{ NETC_PRXDCRR1,	"port rx discard reason 1" },
-+	{ NETC_PTXDCR,		"port tx discard frames" },
-+	{ NETC_PTXDCRRR,	"port tx discard read-reset" },
-+	{ NETC_PTXDCRR0,	"port tx discard reason 0" },
-+	{ NETC_PTXDCRR1,	"port tx discard reason 1" },
-+	{ NETC_BPDCR,		"bridge port discard frames" },
-+	{ NETC_BPDCRRR,	"bridge port discard read-reset" },
-+	{ NETC_BPDCRR0,	"bridge port discard reason 0" },
-+	{ NETC_BPDCRR1,	"bridge port discard reason 1" },
-+};
-+
-+static const struct netc_port_stat netc_emac_counters[] = {
-+	{ NETC_PM_ROCT(0),	"eMAC rx octets" },
-+	{ NETC_PM_RVLAN(0),	"eMAC rx VLAN frames" },
-+	{ NETC_PM_RERR(0),	"eMAC rx frame errors" },
-+	{ NETC_PM_RUCA(0),	"eMAC rx unicast frames" },
-+	{ NETC_PM_RDRP(0),	"eMAC rx dropped packets" },
-+	{ NETC_PM_RPKT(0),	"eMAC rx packets" },
-+	{ NETC_PM_TOCT(0),	"eMAC tx octets" },
-+	{ NETC_PM_TVLAN(0),	"eMAC tx VLAN frames" },
-+	{ NETC_PM_TFCS(0),	"eMAC tx FCS errors" },
-+	{ NETC_PM_TUCA(0),	"eMAC tx unicast frames" },
-+	{ NETC_PM_TPKT(0),	"eMAC tx packets" },
-+	{ NETC_PM_TUND(0),	"eMAC tx undersized packets" },
-+	{ NETC_PM_TIOCT(0),	"eMAC tx invalid octets" },
-+};
-+
-+static const struct netc_port_stat netc_pmac_counters[] = {
-+	{ NETC_PM_ROCT(1),	"pMAC rx octets" },
-+	{ NETC_PM_RVLAN(1),	"pMAC rx VLAN frames" },
-+	{ NETC_PM_RERR(1),	"pMAC rx frame errors" },
-+	{ NETC_PM_RUCA(1),	"pMAC rx unicast frames" },
-+	{ NETC_PM_RDRP(1),	"pMAC rx dropped packets" },
-+	{ NETC_PM_RPKT(1),	"pMAC rx packets" },
-+	{ NETC_PM_TOCT(1),	"pMAC tx octets" },
-+	{ NETC_PM_TVLAN(1),	"pMAC tx VLAN frames" },
-+	{ NETC_PM_TFCS(1),	"pMAC tx FCS errors" },
-+	{ NETC_PM_TUCA(1),	"pMAC tx unicast frames" },
-+	{ NETC_PM_TPKT(1),	"pMAC tx packets" },
-+	{ NETC_PM_TUND(1),	"pMAC tx undersized packets" },
-+	{ NETC_PM_TIOCT(1),	"pMAC tx invalid octets" },
-+};
-+
- static void netc_port_pause_stats(struct netc_port *np, int mac,
- 				  struct ethtool_pause_stats *stats)
- {
-@@ -188,3 +238,60 @@ void netc_port_get_eth_mac_stats(struct dsa_switch *ds, int port,
- 		break;
- 	}
- }
-+
-+int netc_port_get_sset_count(struct dsa_switch *ds, int port, int sset)
-+{
-+	struct netc_port *np = NETC_PORT(ds, port);
-+	int size;
-+
-+	if (sset != ETH_SS_STATS)
-+		return -EOPNOTSUPP;
-+
-+	size = ARRAY_SIZE(netc_port_counters) +
-+	       ARRAY_SIZE(netc_emac_counters);
-+
-+	if (np->caps.pmac)
-+		size += ARRAY_SIZE(netc_pmac_counters);
-+
-+	return size;
-+}
-+
-+void netc_port_get_strings(struct dsa_switch *ds, int port,
-+			   u32 sset, u8 *data)
-+{
-+	struct netc_port *np = NETC_PORT(ds, port);
-+	int i;
-+
-+	if (sset != ETH_SS_STATS)
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_port_counters); i++)
-+		ethtool_cpy(&data, netc_port_counters[i].name);
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_emac_counters); i++)
-+		ethtool_cpy(&data, netc_emac_counters[i].name);
-+
-+	if (!np->caps.pmac)
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_pmac_counters); i++)
-+		ethtool_cpy(&data, netc_pmac_counters[i].name);
-+}
-+
-+void netc_port_get_ethtool_stats(struct dsa_switch *ds, int port, u64 *data)
-+{
-+	struct netc_port *np = NETC_PORT(ds, port);
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_port_counters); i++)
-+		*data++ = netc_port_rd(np, netc_port_counters[i].reg);
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_emac_counters); i++)
-+		*data++ = netc_port_rd64(np, netc_emac_counters[i].reg);
-+
-+	if (!np->caps.pmac)
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_pmac_counters); i++)
-+		*data++ = netc_port_rd64(np, netc_pmac_counters[i].reg);
-+}
-diff --git a/drivers/net/dsa/netc/netc_main.c b/drivers/net/dsa/netc/netc_main.c
-index 338f2421ccb4..a82e156ce86e 100644
---- a/drivers/net/dsa/netc/netc_main.c
-+++ b/drivers/net/dsa/netc/netc_main.c
-@@ -1467,6 +1467,9 @@ static const struct dsa_switch_ops netc_switch_ops = {
- 	.get_rmon_stats			= netc_port_get_rmon_stats,
- 	.get_eth_ctrl_stats		= netc_port_get_eth_ctrl_stats,
- 	.get_eth_mac_stats		= netc_port_get_eth_mac_stats,
-+	.get_sset_count			= netc_port_get_sset_count,
-+	.get_strings			= netc_port_get_strings,
-+	.get_ethtool_stats		= netc_port_get_ethtool_stats,
- };
- 
- static int netc_switch_probe(struct pci_dev *pdev,
-diff --git a/drivers/net/dsa/netc/netc_switch.h b/drivers/net/dsa/netc/netc_switch.h
-index 40e54af0c356..740e1f307c45 100644
---- a/drivers/net/dsa/netc/netc_switch.h
-+++ b/drivers/net/dsa/netc/netc_switch.h
-@@ -94,6 +94,11 @@ struct netc_fdb_entry {
- 	struct hlist_node node;
- };
- 
-+struct netc_port_stat {
-+	int reg;
-+	char name[ETH_GSTRING_LEN] __nonstring;
-+};
-+
- struct netc_switch {
- 	struct pci_dev *pdev;
- 	struct device *dev;
-@@ -160,5 +165,9 @@ void netc_port_get_eth_ctrl_stats(struct dsa_switch *ds, int port,
- 				  struct ethtool_eth_ctrl_stats *ctrl_stats);
- void netc_port_get_eth_mac_stats(struct dsa_switch *ds, int port,
- 				 struct ethtool_eth_mac_stats *mac_stats);
-+int netc_port_get_sset_count(struct dsa_switch *ds, int port, int sset);
-+void netc_port_get_strings(struct dsa_switch *ds, int port,
-+			   u32 sset, u8 *data);
-+void netc_port_get_ethtool_stats(struct dsa_switch *ds, int port, u64 *data);
- 
- #endif
-diff --git a/drivers/net/dsa/netc/netc_switch_hw.h b/drivers/net/dsa/netc/netc_switch_hw.h
-index f8d436ad9623..1b016e7dd03e 100644
---- a/drivers/net/dsa/netc/netc_switch_hw.h
-+++ b/drivers/net/dsa/netc/netc_switch_hw.h
-@@ -87,6 +87,17 @@
- #define  PSR_TX_BUSY			BIT(0)
- #define  PSR_RX_BUSY			BIT(1)
- 
-+#define NETC_PTGSLACR			0x130
-+
-+#define NETC_PRXDCR			0x1c0
-+#define NETC_PRXDCRRR			0x1c4
-+#define NETC_PRXDCRR0			0x1c8
-+#define NETC_PRXDCRR1			0x1cc
-+#define NETC_PTXDCR			0x1e0
-+#define NETC_PTXDCRRR			0x1e4
-+#define NETC_PTXDCRR0			0x1e8
-+#define NETC_PTXDCRR1			0x1ec
-+
- #define NETC_PTCTMSDUR(a)		(0x208 + (a) * 0x20)
- #define  PTCTMSDUR_MAXSDU		GENMASK(15, 0)
- #define  PTCTMSDUR_SDU_TYPE		GENMASK(17, 16)
-@@ -94,6 +105,9 @@
- #define   SDU_TYPE_MPDU			1
- #define   SDU_TYPE_MSDU			2
- 
-+#define NETC_PSDFTCR			0x4c4
-+#define NETC_PSDFDDCR			0x4c8
-+
- #define NETC_BPCR			0x500
- #define  BPCR_DYN_LIMIT			GENMASK(15, 0)
- #define  BPCR_MLO			GENMASK(22, 20)
-@@ -142,6 +156,11 @@ enum netc_stg_stage {
- 	NETC_STG_STATE_FORWARDING,
- };
- 
-+#define NETC_BPDCR			0x580
-+#define NETC_BPDCRRR			0x584
-+#define NETC_BPDCRR0			0x588
-+#define NETC_BPDCRR1			0x58c
-+
- /* Definition of Switch ethernet MAC port registers */
- #define NETC_PMAC_OFFSET		0x400
- #define NETC_PM_CMD_CFG(a)		(0x1008 + (a) * 0x400)
-@@ -176,6 +195,9 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Receive Ethernet Octets Counter */
- #define NETC_PM_REOCT(a)		(0x1100 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Receive Octets Counter */
-+#define NETC_PM_ROCT(a)			(0x1108 + (a) * 0x400)
-+
- /* Port MAC 0/1 Receive Alignment Error Counter Register */
- #define NETC_PM_RALN(a)			(0x1110 + (a) * 0x400)
- 
-@@ -188,12 +210,27 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Receive Frame Check Sequence Error Counter */
- #define NETC_PM_RFCS(a)			(0x1128 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Receive VLAN Frame Counter */
-+#define NETC_PM_RVLAN(a)		(0x1130 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Receive Frame Error Counter */
-+#define NETC_PM_RERR(a)			(0x1138 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Receive Unicast Frame Counter */
-+#define NETC_PM_RUCA(a)			(0x1140 + (a) * 0x400)
-+
- /* Port MAC 0/1 Receive Multicast Frame Counter */
- #define NETC_PM_RMCA(a)			(0x1148 + (a) * 0x400)
- 
- /* Port MAC 0/1 Receive Broadcast Frame Counter */
- #define NETC_PM_RBCA(a)			(0x1150 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Receive Dropped Packets Counter */
-+#define NETC_PM_RDRP(a)			(0x1158 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Receive Packets Counter */
-+#define NETC_PM_RPKT(a)			(0x1160 + (a) * 0x400)
-+
- /* Port MAC 0/1 Receive Undersized Packet Counter */
- #define NETC_PM_RUND(a)			(0x1168 + (a) * 0x400)
- 
-@@ -236,6 +273,9 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Transmit Ethernet Octets Counter */
- #define NETC_PM_TEOCT(a)		(0x1200 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Octets Counter */
-+#define NETC_PM_TOCT(a)			(0x1208 + (a) * 0x400)
-+
- /* Port MAC 0/1 Transmit Excessive Deferral Packet Counter */
- #define NETC_PM_TEDFR(a)		(0x1210 + (a) * 0x400)
- 
-@@ -245,15 +285,30 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Transmit Frame Counter */
- #define NETC_PM_TFRM(a)			(0x1220 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Frame Check Sequence Error Counter */
-+#define NETC_PM_TFCS(a)			(0x1228 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Transmit VLAN Frame Counter */
-+#define NETC_PM_TVLAN(a)		(0x1230 + (a) * 0x400)
-+
- /* Port MAC 0/1 Transmit Frame Error Counter */
- #define NETC_PM_TERR(a)			(0x1238 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Unicast Frame Counter */
-+#define NETC_PM_TUCA(a)			(0x1240 + (a) * 0x400)
-+
- /* Port MAC 0/1 Transmit Multicast Frame Counter */
- #define NETC_PM_TMCA(a)			(0x1248 + (a) * 0x400)
- 
- /* Port MAC 0/1 Transmit Broadcast Frame Counter */
- #define NETC_PM_TBCA(a)			(0x1250 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Packets Counter */
-+#define NETC_PM_TPKT(a)			(0x1260 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Transmit Undersized Packet Counter */
-+#define NETC_PM_TUND(a)			(0x1268 + (a) * 0x400)
-+
- /* Port MAC 0/1 Transmit 64-Octet Packet Counter */
- #define NETC_PM_T64(a)			(0x1270 + (a) * 0x400)
- 
-@@ -293,6 +348,9 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Transmit Excessive Collisions Counter */
- #define NETC_PM_TECOL(a)		(0x12f0 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Invalid Octets Counter */
-+#define NETC_PM_TIOCT(a)		(0x12f8 + (a) * 0x400)
-+
- #define NETC_PEMDIOCR			0x1c00
- #define NETC_EMDIO_BASE			NETC_PEMDIOCR
- 
--- 
-2.34.1
+--=====_001_next=====
+Content-Type: multipart/related;
+	boundary="=====_002_next====="
+
+
+--=====_002_next=====
+Content-Type: multipart/alternative;
+	boundary="=====_003_next====="
+
+
+--=====_003_next=====
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+SGkgQW5kcmV3LA0KDQpUaGFuayB5b3UgZm9yIHRha2luZyB0aGUgdGltZSB0byByZXZpZXcuDQoN
+Cj4gKyAgICBzdHJ1Y3QgZGV2bGluayAqZGV2bGluazsNCg0KPiArICAgIGludCByZXQ7DQo+ICsN
+Cj4gKyAgICBkZXZsaW5rID0gZGV2bGlua19hbGxvYygmZGhfcGZfZGV2bGlua19vcHMsIHNpemVv
+ZihzdHJ1Y3QgZGhfY29yZV9kZXYpLA0KPiArICAgICAgICAgICAgICAgICZwZGV2LT5kZXYpOw0K
+DQo+IFdyb25nIGluZGVudGF0aW9uLiBJbiBmYWN0LCB0aGlzIHNlZW1zIHRvIGhhdmUgc3BhY2Vz
+IG5vdCB0YWJzLiBXaGF0DQo+IGRvZXMgY2hlY2twYXRjaCBzYXkgYWJvdXQgdGhlc2UgZmlsZXM/
+IE9yIGlzIHlvdSBlbWFpbCBzdGlsbCBicm9rZW4/DQoNCg0KSSBkb3VibGUtY2hlY2tlZCB0aGUg
+cGF0Y2ggZmlsZSBsb2NhbGx5LiBUaGUgaW5kZW50YXRpb24gZG9lcyB1c2UNCnRhYnMsIG5vdCBz
+cGFjZXM6DQoNCiAgJCBjYXQgLUEgdjMtMDAwMS0qLnBhdGNoIHwgZ3JlcCAtQTMgImRldmxpbmtf
+YWxsb2MiDQogICteSWRldmxpbmsgPSBkZXZsaW5rX2FsbG9jKCZkaF9wZl9kZXZsaW5rX29wcywg
+c2l6ZW9mKHN0cnVjdCBkaF9jb3JlX2RldiksJA0KICArXkleSV5JXkkmcGRldi0+ZGV2KTskDQog
+ICteSWlmICghZGV2bGluaykkDQogICteSV5JcmV0dXJuIC1FTk9NRU07JA0KDQpBbmQgY2hlY2tw
+YXRjaC5wbCAtLXN0cmljdCBhbHNvIHJlcG9ydHMgMCBlcnJvcnMsIDAgd2FybmluZ3M6DQoNCiAg
+dG90YWw6IDAgZXJyb3JzLCAwIHdhcm5pbmdzLCA0IGNoZWNrcywgMzIwIGxpbmVzIGNoZWNrZWQN
+Cg0KSSBjaGVja2VkIHRoZSByYXcgZW1haWwgb24gbG9yZS5rZXJuZWwub3JnIGFuZCBmb3VuZCB0
+aGF0IG91cg0KY29ycG9yYXRlIG1haWwgc3lzdGVtIGlzIGNvbnZlcnRpbmcgdGhlIG9yaWdpbmFs
+IHRleHQvcGxhaW4gZW1haWwNCmludG8gYSBtdWx0aXBhcnQgTUlNRSBtZXNzYWdlIHdpdGggYm90
+aCB0ZXh0L3BsYWluIGFuZCB0ZXh0L2h0bWwNCmFsdGVybmF0aXZlcy4gSW4gdGhlIEhUTUwgcGFy
+dCwgYWxsIHRhYnMgYXJlIHJlcGxhY2VkIHdpdGgNCm5vbi1icmVha2luZyBzcGFjZXMgKEhUTUwg
+Jm5ic3A7IGVudGl0eSkuIFRoaXMgaXMgbGlrZWx5IHdoYXQNCnlvdSBhcmUgc2VlaW5nLg0KDQpJ
+IHdpbGwgZml4IHRoZSBtYWlsIHNlcnZlciBjb25maWd1cmF0aW9uIGFuZCByZXNlbmQgdGhlIHNl
+cmllcy4NCg0KU29ycnkgZm9yIHRoZSBpbmNvbnZlbmllbmNlLCBhbmQgdGhhbmtzIGFnYWluIGZv
+ciB5b3VyIHBhdGllbmNlLg0KDQpCZXN0IHJlZ2FyZHMsDQpKdW55YW5nIEhhbg==
+
+
+--=====_003_next=====
+Content-Type: text/html ;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+SGkmbmJzcDtBbmRyZXcsPGJyIC8+DTxiciAvPlRoYW5rJm5ic3A7eW91Jm5ic3A7Zm9yJm5ic3A7
+dGFraW5nJm5ic3A7dGhlJm5ic3A7dGltZSZuYnNwO3RvJm5ic3A7cmV2aWV3LjxiciAvPg08YnIg
+Lz4mZ3Q7Jm5ic3A7KyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwO3N0cnVjdCZuYnNwO2Rldmxpbmsm
+bmJzcDsqZGV2bGluazs8YnIgLz4NPGJyIC8+Jmd0OyZuYnNwOysmbmJzcDsmbmJzcDsmbmJzcDsm
+bmJzcDtpbnQmbmJzcDtyZXQ7PGJyIC8+Jmd0OyZuYnNwOys8YnIgLz4mZ3Q7Jm5ic3A7KyZuYnNw
+OyZuYnNwOyZuYnNwOyZuYnNwO2RldmxpbmsmbmJzcDs9Jm5ic3A7ZGV2bGlua19hbGxvYygmYW1w
+O2RoX3BmX2Rldmxpbmtfb3BzLCZuYnNwO3NpemVvZihzdHJ1Y3QmbmJzcDtkaF9jb3JlX2Rldiks
+PGJyIC8+Jmd0OyZuYnNwOysmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
+YW1wO3BkZXYtJmd0O2Rldik7PGJyIC8+DTxiciAvPiZndDsmbmJzcDtXcm9uZyZuYnNwO2luZGVu
+dGF0aW9uLiZuYnNwO0luJm5ic3A7ZmFjdCwmbmJzcDt0aGlzJm5ic3A7c2VlbXMmbmJzcDt0byZu
+YnNwO2hhdmUmbmJzcDtzcGFjZXMmbmJzcDtub3QmbmJzcDt0YWJzLiZuYnNwO1doYXQ8YnIgLz4m
+Z3Q7Jm5ic3A7ZG9lcyZuYnNwO2NoZWNrcGF0Y2gmbmJzcDtzYXkmbmJzcDthYm91dCZuYnNwO3Ro
+ZXNlJm5ic3A7ZmlsZXM/Jm5ic3A7T3ImbmJzcDtpcyZuYnNwO3lvdSZuYnNwO2VtYWlsJm5ic3A7
+c3RpbGwmbmJzcDticm9rZW4/PGJyIC8+DTxiciAvPg08YnIgLz5JJm5ic3A7ZG91YmxlLWNoZWNr
+ZWQmbmJzcDt0aGUmbmJzcDtwYXRjaCZuYnNwO2ZpbGUmbmJzcDtsb2NhbGx5LiZuYnNwO1RoZSZu
+YnNwO2luZGVudGF0aW9uJm5ic3A7ZG9lcyZuYnNwO3VzZTxiciAvPnRhYnMsJm5ic3A7bm90Jm5i
+c3A7c3BhY2VzOjxiciAvPg08YnIgLz4mbmJzcDsmbmJzcDskJm5ic3A7Y2F0Jm5ic3A7LUEmbmJz
+cDt2My0wMDAxLSoucGF0Y2gmbmJzcDt8Jm5ic3A7Z3JlcCZuYnNwOy1BMyZuYnNwOyZxdW90O2Rl
+dmxpbmtfYWxsb2MmcXVvdDsNPGJyIC8+Jm5ic3A7Jm5ic3A7K15JZGV2bGluayZuYnNwOz0mbmJz
+cDtkZXZsaW5rX2FsbG9jKCZhbXA7ZGhfcGZfZGV2bGlua19vcHMsJm5ic3A7c2l6ZW9mKHN0cnVj
+dCZuYnNwO2RoX2NvcmVfZGV2KSwkPGJyIC8+Jm5ic3A7Jm5ic3A7K15JXkleSV5JJmFtcDtwZGV2
+LSZndDtkZXYpOyQ8YnIgLz4mbmJzcDsmbmJzcDsrXklpZiZuYnNwOyghZGV2bGluaykkPGJyIC8+
+Jm5ic3A7Jm5ic3A7K15JXklyZXR1cm4mbmJzcDstRU5PTUVNOyQ8YnIgLz4NPGJyIC8+QW5kJm5i
+c3A7Y2hlY2twYXRjaC5wbCZuYnNwOy0tc3RyaWN0Jm5ic3A7YWxzbyZuYnNwO3JlcG9ydHMmbmJz
+cDswJm5ic3A7ZXJyb3JzLCZuYnNwOzAmbmJzcDt3YXJuaW5nczo8YnIgLz4NPGJyIC8+Jm5ic3A7
+Jm5ic3A7dG90YWw6Jm5ic3A7MCZuYnNwO2Vycm9ycywmbmJzcDswJm5ic3A7d2FybmluZ3MsJm5i
+c3A7NCZuYnNwO2NoZWNrcywmbmJzcDszMjAmbmJzcDtsaW5lcyZuYnNwO2NoZWNrZWQ8YnIgLz4N
+PGJyIC8+SSZuYnNwO2NoZWNrZWQmbmJzcDt0aGUmbmJzcDtyYXcmbmJzcDtlbWFpbCZuYnNwO29u
+Jm5ic3A7bG9yZS5rZXJuZWwub3JnJm5ic3A7YW5kJm5ic3A7Zm91bmQmbmJzcDt0aGF0Jm5ic3A7
+b3VyPGJyIC8+Y29ycG9yYXRlJm5ic3A7bWFpbCZuYnNwO3N5c3RlbSZuYnNwO2lzJm5ic3A7Y29u
+dmVydGluZyZuYnNwO3RoZSZuYnNwO29yaWdpbmFsJm5ic3A7dGV4dC9wbGFpbiZuYnNwO2VtYWls
+PGJyIC8+aW50byZuYnNwO2EmbmJzcDttdWx0aXBhcnQmbmJzcDtNSU1FJm5ic3A7bWVzc2FnZSZu
+YnNwO3dpdGgmbmJzcDtib3RoJm5ic3A7dGV4dC9wbGFpbiZuYnNwO2FuZCZuYnNwO3RleHQvaHRt
+bDxiciAvPmFsdGVybmF0aXZlcy4mbmJzcDtJbiZuYnNwO3RoZSZuYnNwO0hUTUwmbmJzcDtwYXJ0
+LCZuYnNwO2FsbCZuYnNwO3RhYnMmbmJzcDthcmUmbmJzcDtyZXBsYWNlZCZuYnNwO3dpdGg8YnIg
+Lz5ub24tYnJlYWtpbmcmbmJzcDtzcGFjZXMmbmJzcDsoSFRNTCZuYnNwOyZhbXA7bmJzcDsmbmJz
+cDtlbnRpdHkpLiZuYnNwO1RoaXMmbmJzcDtpcyZuYnNwO2xpa2VseSZuYnNwO3doYXQ8YnIgLz55
+b3UmbmJzcDthcmUmbmJzcDtzZWVpbmcuPGJyIC8+DTxiciAvPkkmbmJzcDt3aWxsJm5ic3A7Zml4
+Jm5ic3A7dGhlJm5ic3A7bWFpbCZuYnNwO3NlcnZlciZuYnNwO2NvbmZpZ3VyYXRpb24mbmJzcDth
+bmQmbmJzcDtyZXNlbmQmbmJzcDt0aGUmbmJzcDtzZXJpZXMuPGJyIC8+DTxiciAvPlNvcnJ5Jm5i
+c3A7Zm9yJm5ic3A7dGhlJm5ic3A7aW5jb252ZW5pZW5jZSwmbmJzcDthbmQmbmJzcDt0aGFua3Mm
+bmJzcDthZ2FpbiZuYnNwO2ZvciZuYnNwO3lvdXImbmJzcDtwYXRpZW5jZS48YnIgLz4NPGJyIC8+
+QmVzdCZuYnNwO3JlZ2FyZHMsPGJyIC8+SnVueWFuZyZuYnNwO0hhbg==
+
+
+--=====_003_next=====--
+
+--=====_002_next=====--
+
+--=====_001_next=====--
 
 
