@@ -1,138 +1,170 @@
-Return-Path: <netdev+bounces-286093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286094-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uEeOOryc/mnItwAAu9opvQ
-	(envelope-from <netdev+bounces-286093-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 04:32:28 +0200
+	id GI38DQOe/mkVuAAAu9opvQ
+	(envelope-from <netdev+bounces-286094-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 04:37:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3346F4FDA88
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 04:32:27 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE06E4FDAD2
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 04:37:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5AC0D3014BDA
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 02:32:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CD63A3004925
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 02:37:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEC0A191F91;
-	Sat,  9 May 2026 02:32:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E265A331A66;
+	Sat,  9 May 2026 02:37:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lgKel6yr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ky0MIEg/"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f195.google.com (mail-dy1-f195.google.com [74.125.82.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28EABF9D9
-	for <netdev@vger.kernel.org>; Sat,  9 May 2026 02:32:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CE0733374F
+	for <netdev@vger.kernel.org>; Sat,  9 May 2026 02:37:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778293945; cv=none; b=jrFvHDZTYLprYrocZjxA3U3u57UTnDDDxPLCca3h53UpK0hAf2a5Y1c5mwearH2lCGbeMPATFHIqRyDV/TPM15t50BFloHDQA7Ib02jilGdiD+5x4PDsp1l14mcyXIrCi7z/+oWBpOmSqkP3BotWkx2RUnNXVCWUxPwr3xr/o/8=
+	t=1778294272; cv=none; b=E2/Ajk9xzScvrvb/OvRwOhDOgdw7YjmDHOnOZOyCS5vaJzuRQoTcjNuToP4NLm2Jz+BCqwkqN8aDL2PvFGBG+fE+r7xJBdNEpNKVJEcTGfLq56ZGjISMyzKkxT3l7UpYl0acBn0igWh4t1tVRm8tWr0vmgq/hravHFljee5bWcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778293945; c=relaxed/simple;
-	bh=NA3J8CVX190SnWizDscAU6d2j1q73oPsXQnxKuwsjxg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GjBzRThn8RnUidB4KxL6EZEvjLxXjmtmRk5kCsoaBBK/WEivHl62neaG6xsiJ6VXij3Btxjc1J0V4Vv0ZJlu953EKZMfAZXg9q13NPsfm4T1Jg3JG9BSfhjDFsOo6AIzrVSzHhg2echGMlT175IBrDYSVD1zceN7laGNBJ1wpYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lgKel6yr; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <252e4742-34db-4a04-8c9d-560625df1e70@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1778293942;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iyJGZ9D3wyqlqwlSKI43nO6MG5PTxXwtHtoSkGYi3VQ=;
-	b=lgKel6yrheeXANVmo5p2Ax81k2zKx3tw+XgPekPncCyqVRu3OaCtMvmffkJQlNTYGpKNX+
-	bwpmfWTg1ZJ4JlzJ6jU/R+WBCEqYm2gQkdXZsvHQra9j2or6cU4P+zABOqxsBmSvCyVbdT
-	S/lhOTp+zaoC6eGyi3b6WwJmmlh1sX0=
-Date: Sat, 9 May 2026 10:32:08 +0800
+	s=arc-20240116; t=1778294272; c=relaxed/simple;
+	bh=OrrBWBBsxVt40ESfvxDp4fYu4sB+aY1+BiFrwGQrwxw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HjVN0oJQsxJioQ9kAsi3ZAN67jA9JdUKU84sj7nfQZHEUitD9qFAfN1Y9KBy0kQc/DSkkes+N+XLNamziBEyJBe5kCLmyMvsWTI1IxKPVjSLZ9SptBeC/kzgo9UqPvervAmAtCDnhNjEhqppBTn7GUpHKD/mqH8bPexQp7Q9Nss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ky0MIEg/; arc=none smtp.client-ip=74.125.82.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f195.google.com with SMTP id 5a478bee46e88-2f00a567cfaso2277121eec.0
+        for <netdev@vger.kernel.org>; Fri, 08 May 2026 19:37:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778294270; x=1778899070; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+ni1tZOZf60NuZfdoJF6J/0gev8lFnicQU/0S4esZy8=;
+        b=Ky0MIEg/lh7vHW2RzT0g5+m1R1tyzobhHDJqtwOBdoU/cy7cmnbZDeJdEYZJRM55No
+         U4ZSlRoSGoA854bCdGI2M9zBQQtwYWzYrddOgOiZOWDU9AZ6PU0VYWbffn3UAxSvC3e1
+         ZqTztW12dnuO9yBkHXvCHn54EIzcXoVkj3dRO/C1FRT4lVB5QyphtEcjPSSHy4jIu2rs
+         yiD86cqbHl9FMJgy/3faBfOY+tLpI6nssMpfOf/TLWOvipoZC5Utcf0HgGvGi4alrfZc
+         rXNOGKUj7Vb13JCICDxx9jQ/hDNlbYp1zNXW8I8MpyWx2uxzU8v3lSiF3pXXQXymVxw/
+         D5og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778294270; x=1778899070;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+ni1tZOZf60NuZfdoJF6J/0gev8lFnicQU/0S4esZy8=;
+        b=GsyEJRYtSy1M9XcSeKvUx5VbuABSqg0Tjozmc46/D4a86Bmd7qIEOdzVorEfxl2pvu
+         9LSCCKDBbvHSd1h/lm/MxII1+zDFF5iTE5giI04stm2943qA+i1NE45oNPVnTXE0V1Ff
+         aKzEtBlcK44g3WW6/l0fZjVcUxBie5xe1HHGYX5TPSP7BhHc1WQwb1g2H9FROef/VdtA
+         a1lUOV7zi1mWoL1tYL7Xa/xyBtkrXud+m7RO4iQBcgnfCndUmpdAvySneyxU/CpsQf3W
+         joVZHclm7sFrC3XD3PLFzv/eL5nIrQKY0UU6vtEXWC6+e/Qnxp1sr5q3IZmlRt15fx+0
+         WqyA==
+X-Forwarded-Encrypted: i=1; AFNElJ/rwZZmjLmQ8+5UTZcnCLSCXAgNEM9fzM7MLX5/CZaUO2QfmPn7rnM8FXMgiPYl4PW4w7DARCs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXKUqbaME+5XzKLV0zbwVmQPtmRE2/EdRotPU2W8D7ujCiA1jj
+	Z+YFqTDT/O4juqn5iM6I0SXqqH/KqdIjNzG4TG0YYRah+lyPpwgYOpjq
+X-Gm-Gg: Acq92OEvGrMKdpH+kkTzrUe5oaCNyUKgFhCq5Gws8INa3wQ3MAEQvC/oDBghxlGtU8e
+	Ame7KriWf9dGisHhUS8+uXWs00Z8Vp+1CvdiDulcaCzm8JFxQJ2KqVd9ADpKmbzwEQvnj9HfWe9
+	ck3v6fgoLcoVGiSG99hG3q9q8406cl6NLTf6NFieftzoXwKWmECWTiGtYPdebImKUdPJbCP6787
+	fqfcPxjFi1Iybp5ho4oFZGzp1bgwqQ2JoTooQgCpFGYuwkqbhdOByhnwmis8E3Oh7fxgoM0Urzc
+	pMbZqIk8BjLSaaBgIMnzb0vhC7eupujYaNxxSE17t+UOwmx+htivuHfa5JCFNAK+A0kvrwveHzD
+	yfESUt8LkGsCBLyMRPq5B6S0LevdIZkrxDfZKlXFU78sDruxXnkQpt5kr9uLXXcQPce44tVFReK
+	dmn4yzcEZL5j13TRI3JJEqc7qlPUHnk7klCCD5JUdfBiPfjoui0p1yHJlyYK4E4jXzYeQRir6EW
+	oNMzARZTB0uA70ZaIiMM4v1QyKRm4pIlNhykTtsZDseKcmx9217HzQel3lZqJ/qMcpVmuO6STit
+	XMX8v39PwcLlRVdSgA==
+X-Received: by 2002:a05:7300:7f9f:b0:2f4:d190:37bf with SMTP id 5a478bee46e88-2f6e4563223mr3912893eec.16.1778294270296;
+        Fri, 08 May 2026 19:37:50 -0700 (PDT)
+Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2f88847502fsm5510395eec.14.2026.05.08.19.37.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 May 2026 19:37:49 -0700 (PDT)
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+To: linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org
+Cc: Russell King <linux@armlinux.org.uk>,
+	Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH] net: ethernet: cs89x0: remove stale CONFIG_MACH_MX31ADS reference
+Date: Fri,  8 May 2026 19:37:28 -0700
+Message-ID: <20260509023732.42256-1-enelsonmoore@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v3] rxrpc: Also unshare DATA/RESPONSE packets when
- paged frags are present
-To: Hyunwoo Kim <imv4bel@gmail.com>, dhowells@redhat.com,
- marc.dionne@auristor.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, qingfang.deng@linux.dev
-Cc: linux-afs@lists.infradead.org, netdev@vger.kernel.org,
- stable@vger.kernel.org
-References: <af2kdW2F1gJ9U-Gg@v4bel>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-In-Reply-To: <af2kdW2F1gJ9U-Gg@v4bel>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 3346F4FDA88
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: CE06E4FDAD2
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_TO(0.00)[gmail.com,redhat.com,auristor.com,davemloft.net,google.com,kernel.org,linux.dev];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286093-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[armlinux.org.uk,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:mid,linux.dev:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286094-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.995];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
+The legacy ARM board file for MACH_MX31ADS was removed in commit
+c93197b0041d ("ARM: imx: Remove i.MX31 board files"), but a reference
+to it remained in the cs89x0 driver. Drop this unused code.
 
-On 5/8/26 4:53 PM, Hyunwoo Kim wrote:
-> The DATA-packet handler in rxrpc_input_call_event() and the RESPONSE
-> handler in rxrpc_verify_response() copy the skb to a linear one before
-> calling into the security ops only when skb_cloned() is true.  An skb
-> that is not cloned but still carries externally-owned paged fragments
-> (e.g. SKBFL_SHARED_FRAG set by splice() into a UDP socket via
-> __ip_append_data, or a chained skb_has_frag_list()) falls through to
-> the in-place decryption path, which binds the frag pages directly into
-> the AEAD/skcipher SGL via skb_to_sgvec().
->
-> Extend the gate to also unshare when skb_has_frag_list() or
-> skb_has_shared_frag() is true.  This catches the splice-loopback vector
-> and other externally-shared frag sources while preserving the
-> zero-copy fast path for skbs whose frags are kernel-private (e.g. NIC
-> page_pool RX, GRO).  The OOM/trace handling already in place is reused.
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+---
+I found this issue while working on updating arch/arm/tools/mach-types
+to remove entries for board files that are not in the kernel - this
+reference caused my script to consider MACH_MX31ADS to be present in
+the kernel.
 
+ drivers/net/ethernet/cirrus/cs89x0.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-To be clear, frag_list is not empty for SKB_GSO_FRAGLIST and the skb 
-will go through the copy path.
-
-It's just tradeoff.
-
->
-> Fixes: d0d5c0cd1e71 ("rxrpc: Use skb_unshare() rather than skb_cow_data()")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-> ---
-> Changes in v3:
-> - Use skb_has_frag_list() || skb_has_shared_frag() instead of skb_is_nonlinear()
-> - v2: https://lore.kernel.org/all/af2F1FU5d4Q_Gn1W@v4bel/
-
-
-Others lgtm, it makes sense to keep this as the ESP fix, since both 
-patches address your Dirty Frag vulnerability.
-
-Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+diff --git a/drivers/net/ethernet/cirrus/cs89x0.c b/drivers/net/ethernet/cirrus/cs89x0.c
+index fa5857923db4..b4bfd6c174e7 100644
+--- a/drivers/net/ethernet/cirrus/cs89x0.c
++++ b/drivers/net/ethernet/cirrus/cs89x0.c
+@@ -1271,7 +1271,6 @@ static const struct net_device_ops net_ops = {
+ 
+ static void __init reset_chip(struct net_device *dev)
+ {
+-#if !defined(CONFIG_MACH_MX31ADS)
+ 	struct net_local *lp = netdev_priv(dev);
+ 	unsigned long reset_start_time;
+ 
+@@ -1298,7 +1297,6 @@ static void __init reset_chip(struct net_device *dev)
+ 	while ((readreg(dev, PP_SelfST) & INIT_DONE) == 0 &&
+ 	       time_before(jiffies, reset_start_time + 2))
+ 		;
+-#endif /* !CONFIG_MACH_MX31ADS */
+ }
+ 
+ /* This is the real probe routine.
+-- 
+2.43.0
 
 
