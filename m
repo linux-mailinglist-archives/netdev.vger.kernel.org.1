@@ -1,385 +1,187 @@
-Return-Path: <netdev+bounces-286133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286134-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kHOQNHYB/2mW1AAAu9opvQ
-	(envelope-from <netdev+bounces-286133-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 11:42:14 +0200
+	id UA87EMQE/2kU1QAAu9opvQ
+	(envelope-from <netdev+bounces-286134-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 11:56:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A1174FF06A
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 11:42:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 744D14FF0F4
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 11:56:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5A2DB3015A58
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 09:42:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 785D430179C5
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 09:56:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BFA73914E2;
-	Sat,  9 May 2026 09:42:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B387F39C64C;
+	Sat,  9 May 2026 09:56:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lk+pKtRg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T8nWp/jX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587CD3845A9;
-	Sat,  9 May 2026 09:42:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7310038F64F
+	for <netdev@vger.kernel.org>; Sat,  9 May 2026 09:56:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778319723; cv=none; b=U34VKonyK6xyiFKSOqVEYCnGMkLHj3qtpqfrEbPOsnTzxExTc5cHO01iTVPwDxtTuPKyuAwXCE7UqrQ5XW6cW7e/1EbuxkDPXhMUPib9bKUEKRfp4H+Lh+L3WgazE5T3UMiJLniUQkHhhhh+F3aogczoUHfORtFTVAVt9cZKKGA=
+	t=1778320569; cv=none; b=byTU2MlhwSYndRqlbz69p0/Hov4vIUQy1lGlgYYS5M2CXUeQeIVe4oJIHJfp7Mb5S4nMoQS2ycFkOCe+KXm/XUNzBB7zHir42qdWk0tH/2QZcGMe49vJm96afHnPe5HbBfdlctjecy2BTp3rB2LTrTaCFiLJ1pi1u0obEAXgydg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778319723; c=relaxed/simple;
-	bh=K7XW3fDrAi/SJUEYupM1iZBtmsSrwJ2WcBoDs0GiXxg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t++gXGExnCew1/yZhGjd6Nyi+qpoJAbN0l174mSm+i3q2G/tf8hEgI4SOU1D+3Pz8xryJhe6j8TXTxYNWiH4TonkXFYbDIGggkAamFA72BALKXDE/NBY31k46e+CpOxJMk8RDfs5t8EqF/TIQDCAChxHcArcGMKzGVK9v/WR1Dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lk+pKtRg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9F23C2BCB2;
-	Sat,  9 May 2026 09:42:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778319723;
-	bh=K7XW3fDrAi/SJUEYupM1iZBtmsSrwJ2WcBoDs0GiXxg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Lk+pKtRgFMongdzhfKR4yRp3XwmtqK900PBJqUpGpyvNcTkt8ZYsevmTxvRsL3O2z
-	 o7lW7WOaYHmWG1Ya+c/32+njK33gfkUEpVz5aRhqZ9DldJwXvKXzes+L6vSOLitcnh
-	 JvDMNOenzFLp6IhorBIwVUlEzOheS4ILqATLz2B/WEqmThCKq7aTskkgoV/Y4Hjejl
-	 wBtjkZdAWTT+jFwGvt9d86cfq39OINSSfEejj/uO9y9Ahrf6gVZr1X0rEncKSA1CkH
-	 yMTDRkk13xaMIgZvflOLW01hRock4FvFRM3wbN1NyNBl/ZUy3IzrEkyno5l3zGgaY3
-	 2dB7F7C5Vq1Yg==
-Date: Sat, 9 May 2026 11:42:00 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, ansuelsmth@gmail.com,
-	benjamin.larsson@genexis.eu, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, madhur.agrawal@airoha.com
-Subject: Re: [PATCH net-next v4 09/10] net: airoha: Introduce WAN device flag
-Message-ID: <af8BaMnL9oXttB1t@lore-desk>
-References: <20260507-airoha-eth-multi-serdes-v4-9-af613b61ae02@kernel.org>
- <20260509014615.3558164-1-kuba@kernel.org>
+	s=arc-20240116; t=1778320569; c=relaxed/simple;
+	bh=BKQpBYpbdlRPMoavHmhYs8byFtP2vgGBQl3nAxIAiiA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BogiJFtyT7DDafwgLqn1yg1NtSEVslRm3XzRPpntCt2LSfHuSm3RfexKJl6Yi+iwzW3wd2NePT8RwkbTvKjVKFZVgoKhoqvU7L8sHwUwxnr8vgK12QzjbY1bu4a7LPEq/WNJJtPwoSFmmeY30CmY+iPVi2voZz8JA2IJ7OTx0gw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T8nWp/jX; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c80167f5716so1185078a12.2
+        for <netdev@vger.kernel.org>; Sat, 09 May 2026 02:56:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778320568; x=1778925368; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5F59HTLBnwz0/GR5Td1Do25Vw59YKJu/Lja+nEVeSFQ=;
+        b=T8nWp/jXbQ+AGx84znhw7YiIDwhGcwWwUfk/P7r5QTcYEYOEWAG3oSTDO1EhdnHX4N
+         OkCgz8qAkz/905ud9lb+jjPtbByqbIV6Azna5LdBkMNg0ygGAy8kYly1kp5H8UJHPdsN
+         ddzXHNliuCKmPd3grcmqImyuWqhqxzUxkQCHA8RpHl7J4rZnKxfmlYVNbHWqdWC5EEvz
+         hSBEiZqJsovyP4+LyFK43hCdiMAWHAR5O8TuiwbyRIV55+y8+rH7AliTXdsMcvEMez4n
+         HtdjJW90qVARTHUKneps6iljKxx6lDVzMLuwrZ8dCETcPOt5yRhxzpVb1dooLI8wnWyT
+         YDyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778320568; x=1778925368;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5F59HTLBnwz0/GR5Td1Do25Vw59YKJu/Lja+nEVeSFQ=;
+        b=tOwcuPNvuqpclZsLUKVLjSCmF86DR8e9cDn5luj1jsHKyopA9Z8voawhjGPIqHR9MH
+         +nBRhzvOtxeHbRgNkCfuFdfsZFBC1sluiYhGdiUbPm6wy94PhkU4D3AQ2qNYhHcL0ou2
+         eLNxTdKbTzfabIXeeSzux/KQwyihB8f9gs9CeMtaBwm0TXd1GTeE7zoQWnR+RHadZgc3
+         CYVx0mOVax4oCZn2Mwd8+/+trAym2VAUe738tAK1+GTbLrwnPE+WSv+QQuRlukIMSHfX
+         XDxsGRrgJLUu0O71CqVLJK8JL5CT4cNVKRFeaYo84Mixps25K3q1s86Y7l2rAVD2yY4f
+         vX9g==
+X-Forwarded-Encrypted: i=1; AFNElJ/knFFDd3v9Rk/pXrUpriuuaxSs6OfivxUh6qXVtmDqeuUJGlAb5cxlJVzKTsbOQF0GPikQQBQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQJ6Q5O/artLy+ECvIK0tCrZfaIrjSD8nW8YDnEth7P2oJxls/
+	WyAyCwMPLNixejOiuYr7oM6vr3UMSdP9Syh/R6Yy9dkW4bsEi5dkLhEX
+X-Gm-Gg: Acq92OFAjpWr0ldX5D79kwclYLLY6HI9SGuwV8EImiJ7wFED4z9C6x8rOHXJIDeWgly
+	JYb6YBxAxpTd7/Leuvo9GMcCXOZhAzJqWSjv4rxmXdtOeYwyMj3unRMHpbU8byt8AQuK9bh6BcH
+	KNtoAFWB85NJaqxaTiyU6bApkJA0zMpWY+0azdXVkYTWQz7knPNr+qm+vJLTWrB4lJyjb6a/9pD
+	aoKMR5EPP5h9UqaDNnLf2vbsIjvjHxNOAYXvgW3qRhU7HxFApOeoxLkSf3+oK9mYJQDG/kWYqTU
+	mmV4oYiaa9hXYR0Vewt2mJqN10VorPD9HABoAdZMC3cvMKfWdcp8yKlm/LSvpDTiz6zyUExmcKc
+	KJNTf6JiWcZCGRInz/wbPisNj2go3lWLPf2G+lARuooVQbxmU9HGJ/g3T878c/UEwh4tMTbHu3U
+	hI/ITVu5MMf93HaAA0nl/zzYq4B/3y2Um8fsl4o9LOmDQ5FeOJtZ1UZHnnvJoDQQ==
+X-Received: by 2002:a17:903:3884:b0:2ae:6092:8d93 with SMTP id d9443c01a7336-2bc7aa398c4mr17738045ad.28.1778320567560;
+        Sat, 09 May 2026 02:56:07 -0700 (PDT)
+Received: from localhost.localdomain ([106.0.59.249])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1d3fed8sm48819345ad.27.2026.05.09.02.56.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 May 2026 02:56:07 -0700 (PDT)
+From: Sajal Gupta <sajal2005gupta@gmail.com>
+To: petkan@nucleusys.com
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Sajal Gupta <sajal2005gupta@gmail.com>
+Subject: [PATCH net-next v2] net: usb: pegasus: replace simple_strtoul with kstrtouint
+Date: Sat,  9 May 2026 15:21:48 +0530
+Message-ID: <20260509095518.2640-1-sajal2005gupta@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="cVtlXQ1B6cbL+hCZ"
-Content-Disposition: inline
-In-Reply-To: <20260509014615.3558164-1-kuba@kernel.org>
-X-Rspamd-Queue-Id: 8A1174FF06A
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 744D14FF0F4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286133-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,genexis.eu,lists.infradead.org,vger.kernel.org,airoha.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286134-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[sajal2005gupta@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.976];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
+simple_strtoul() is deprecated as it has no error checking. Replace it
+with kstrtouint() which returns an error code on invalid input, and add
+appropriate error handling.
 
---cVtlXQ1B6cbL+hCZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Also add a NULL check before parsing flags, since strsep() can set id
+to NULL if the input has fewer tokens than expected.
 
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> ---
-> net: airoha: Introduce WAN device flag
->=20
-> This commit replaces the port->id =3D=3D 1 LAN/WAN test with a per-dev
-> PRIV_FLAG_WAN bit that is set during airoha_dev_init() based on the
-> port id and the presence of other WAN devices. It also extracts the
-> QDMA selection/PPE cpu port programming into a new helper and reworks
-> the GDM2 loopback path to key off the new flag.
->=20
-> A few questions about the new policy and error paths.
->=20
-> [Medium]
-> The commit message says:
->=20
->     Introduce WAN flag to specify if a given device is used to
->     transmit/receive WAN or LAN traffic. [...] Please note it is possible
->     to specify multiple LAN devices but just a single WAN one.
->=20
-> Under the old helper (port->id =3D=3D 1), GDM2/GDM3/GDM4 were all treated=
- as
-> WAN. Under the new logic, when GDM2 (eth->ports[1]) is present, the
-> GDM3/GDM4 case breaks out of the switch without setting PRIV_FLAG_WAN, so
-> GDM3 and GDM4 are now classified as LAN. That flips the MAC register
-> (REG_FE_WAN_MAC_H -> REG_FE_LAN_MAC_H in airoha_set_macaddr()), the QDMA
-> binding (qdma[1] -> qdma[0] in airoha_dev_set_qdma()), and the PPE cpu
-> port (CDM2 -> CDM1). Is that role change intentional, and could the
-> commit message call it out so bisecting a board that relied on the old
-> GDM3/GDM4=3DWAN semantics is easier?
+Preserve the original behavior for a trailing colon by checking *id
+before parsing flags, so an empty string results in flags = 0 rather
+than an error.
 
-This change is intentional and this is currently not visible to the user
-since airoha_eth driver currently supports just the internal phy available
-via the MT7530 DSA switch and there are no WAN interfaces officially
-supported since PCS/external phy is not merged mainline yet (it is posted j=
-ust
-as RFC in [0]). I will add this info in the commimit log in v5.
+Signed-off-by: Sajal Gupta <sajal2005gupta@gmail.com>
+---
+Changes in v2:
+ - Drop err variable
+ - Preserve original behavior for trailing colon by checking *id
+   before parsing flags
+v1: https://lore.kernel.org/netdev/20260506152653.52329-1-sajal2005gupta@gmail.com/
 
-[0] https://lore.kernel.org/netdev/20260505182713.27644-1-ansuelsmth@gmail.=
-com/
+ drivers/net/usb/pegasus.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
->=20
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
-ernet/airoha/airoha_eth.c
-> > index 1c4927c1aeb0..8617dd4f7932 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> > @@ -1863,36 +1863,77 @@ static int airoha_set_gdm2_loopback(struct airo=
-ha_gdm_dev *dev)
-> >  	return 0;
-> >  }
-> > =20
-> > -static int airoha_dev_init(struct net_device *netdev)
-> > +static struct airoha_gdm_dev *
-> > +airoha_get_wan_gdm_dev(struct airoha_eth *eth)
-> > +{
-> > +	int i;
-> > +
-> > +	for (i =3D 0; i < ARRAY_SIZE(eth->ports); i++) {
-> > +		struct airoha_gdm_port *port =3D eth->ports[i];
-> > +		int j;
-> > +
-> > +		if (!port)
-> > +			continue;
-> > +
-> > +		for (j =3D 0; j < ARRAY_SIZE(port->devs); j++) {
-> > +			struct airoha_gdm_dev *dev =3D port->devs[j];
-> > +
-> > +			if (dev && !airoha_is_lan_gdm_dev(dev))
-> > +				return dev;
-> > +		}
-> > +	}
-> > +
-> > +	return NULL;
-> > +}
->=20
-> [High]
-> airoha_register_gdm_devices() invokes airoha_dev_init() for each dev in
-> port->devs[] sequentially. On EN7581 GDM3 supports two devs (nbq 4/5 for
-> PCIE0/PCIE1 in airoha_alloc_gdm_device()). When both devs are registered,
-> devs[0] sets PRIV_FLAG_WAN and then devs[1] sees the first via
-> airoha_get_wan_gdm_dev() and falls through to LAN. Is that the intended
-> result for two devs on the same physical GDM3/GDM4 port?
->=20
-> The two devs then diverge:
->=20
->   airoha_dev_set_qdma()
->     dev->qdma =3D &eth->qdma[!airoha_is_lan_gdm_dev(dev)];
->=20
-> so devs[1] binds to qdma[0] while devs[0] is on qdma[1];
->=20
->   airoha_set_macaddr()
->     reg =3D airoha_is_lan_gdm_dev(dev) ? REG_FE_LAN_MAC_H
->                                      : REG_FE_WAN_MAC_H;
->=20
-> so devs[1] writes into the LAN MAC range that belongs to GDM1; and in
-> airoha_ppe_foe_entry_prepare() pse_port becomes port->id instead of 2
-> (GDM2 loopback) only for devs[1]. Is there an assumption that sibling
-> devs on the same port must share the WAN/LAN classification?
+diff --git a/drivers/net/usb/pegasus.c b/drivers/net/usb/pegasus.c
+index db85f40734d7..8700eeb8e22d 100644
+--- a/drivers/net/usb/pegasus.c
++++ b/drivers/net/usb/pegasus.c
+@@ -1328,14 +1328,18 @@ static void __init parse_id(char *id)
+ 	unsigned int vendor_id = 0, device_id = 0, flags = 0, i = 0;
+ 	char *token, *name = NULL;
+ 
+-	if ((token = strsep(&id, ":")) != NULL)
++	token = strsep(&id, ":");
++	if (token)
+ 		name = token;
+ 	/* name now points to a null terminated string*/
+-	if ((token = strsep(&id, ":")) != NULL)
+-		vendor_id = simple_strtoul(token, NULL, 16);
+-	if ((token = strsep(&id, ":")) != NULL)
+-		device_id = simple_strtoul(token, NULL, 16);
+-	flags = simple_strtoul(id, NULL, 16);
++	token = strsep(&id, ":");
++	if (token && kstrtouint(token, 16, &vendor_id))
++		return;
++	token = strsep(&id, ":");
++	if (token && kstrtouint(token, 16, &device_id))
++		return;
++	if (id && *id && kstrtouint(id, 16, &flags))
++		return;
+ 	pr_info("%s: new device %s, vendor ID 0x%04x, device ID 0x%04x, flags: 0x%x\n",
+ 		driver_name, name, vendor_id, device_id, flags);
+ 
+-- 
+2.54.0
 
-A subsequent patch in the series adds suppport for multiple net_device that
-share the same LAN/WAN mac address register space.
-Moreover, I will post subsequent patches (not in the series) to dynamically
-set/get net_device LAN/WAN configuration.
-
->=20
-> > +
-> > +static void airoha_dev_set_qdma(struct airoha_gdm_dev *dev)
-> >  {
-> > -	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> > -	struct airoha_gdm_port *port =3D dev->port;
-> >  	struct airoha_eth *eth =3D dev->eth;
-> >  	int i;
-> > =20
-> >  	/* QDMA0 is used for lan ports while QDMA1 is used for WAN ports */
-> >  	dev->qdma =3D &eth->qdma[!airoha_is_lan_gdm_dev(dev)];
-> >  	dev->dev->irq =3D dev->qdma->irq_banks[0].irq;
-> > -	airoha_set_macaddr(dev, netdev->dev_addr);
-> > +
-> > +	for (i =3D 0; i < eth->soc->num_ppe; i++)
-> > +		airoha_ppe_set_cpu_port(dev, i, airoha_get_fe_port(dev));
-> > +}
-> > +
-> > +static int airoha_dev_init(struct net_device *netdev)
-> > +{
-> > +	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> > +	struct airoha_gdm_port *port =3D dev->port;
-> > =20
-> >  	switch (port->id) {
-> >  	case AIROHA_GDM3_IDX:
-> > -	case AIROHA_GDM4_IDX:
-> > -		/* If GDM2 is active we can't enable loopback */
-> > -		if (!eth->ports[1]) {
-> > -			int err;
-> > +	case AIROHA_GDM4_IDX: {
-> > +		struct airoha_eth *eth =3D dev->eth;
-> > =20
-> > -			err =3D airoha_set_gdm2_loopback(dev);
-> > -			if (err)
-> > -				return err;
-> > -		}
-> > +		if (eth->ports[1] || airoha_get_wan_gdm_dev(eth))
-> > +			break;
->=20
-> [Medium]
-> Is the eth->ports[1] check equivalent to asking whether a GDM2 dev
-> actually exists? airoha_alloc_gdm_port() assigns eth->ports[p] before
-> iterating the "airoha,eth-port" child nodes, so with all GDM2 child nodes
-> marked status=3D"disabled" and GDM3 or GDM4 enabled, eth->ports[1] is
-> non-NULL but port->devs[] is empty. In that case this branch still breaks
-> out of the switch and the uplink GDM3/GDM4 dev ends up LAN. Would checking
-> for an actual dev under eth->ports[1] be safer than checking the port
-> pointer alone?
-
-ack, I will fix it in v5.
-
->=20
-> [Medium, Low]
-> The policy that "just a single WAN one" is allowed is enforced by silently
-> breaking here when airoha_get_wan_gdm_dev() returns non-NULL. Would a
-> netdev_warn() or -EINVAL help an administrator notice that a second WAN
-> candidate was demoted to LAN? Also, with both GDM3 and GDM4 enabled and
-> GDM2 absent, the winner of PRIV_FLAG_WAN depends on eth->ports[] iteration
-> order and the port/dev allocation order; is there a deterministic,
-> documented way to choose which dev becomes WAN (DT property, for example)?
-
-We can't return -EINVAL here since we still need to run airoha_dev_set_qdma=
-()
-and airoha_set_macaddr(). Moreover, I will post subsequent patches (not in =
-the
-series) to dynamically set/get net_device LAN/WAN configuration.
-
->=20
-> > +		fallthrough;
-> > +	}
-> > +	case AIROHA_GDM2_IDX:
-> > +		/* GDM2 is always used as wan */
-> > +		dev->flags |=3D PRIV_FLAG_WAN;
-> >  		break;
-> >  	default:
-> >  		break;
-> >  	}
-> > =20
-> > -	for (i =3D 0; i < eth->soc->num_ppe; i++)
-> > -		airoha_ppe_set_cpu_port(dev, i, airoha_get_fe_port(dev));
-> > +	airoha_dev_set_qdma(dev);
-> > +	airoha_set_macaddr(dev, netdev->dev_addr);
-> > +
-> > +	if (!airoha_is_lan_gdm_dev(dev) &&
-> > +	    (port->id =3D=3D AIROHA_GDM3_IDX || port->id =3D=3D AIROHA_GDM4_I=
-DX)) {
-> > +		int err;
-> > +
-> > +		err =3D airoha_set_gdm2_loopback(dev);
-> > +		if (err) {
-> > +			dev->flags &=3D ~PRIV_FLAG_WAN;
-> > +			return err;
-> > +		}
-> > +	}
->=20
-> [Medium]
-> On the error path, is clearing PRIV_FLAG_WAN sufficient? By the time
-> airoha_set_gdm2_loopback() returns a failure, airoha_dev_set_qdma() has
-> already pointed dev->qdma at &eth->qdma[1] and set dev->dev->irq to the
-> WAN IRQ, airoha_set_macaddr() has written into REG_FE_WAN_MAC_H,
-> airoha_ppe_set_cpu_port() has programmed CDM2 as the PPE cpu port, and
-> airoha_set_gdm2_loopback() itself may have already programmed
-> REG_GDM_FWD_CFG(GDM2), REG_GDM_TXCHN_EN/RXCHN_EN, REG_GDM_LPBK_CFG,
-> REG_GDM_LEN_CFG, REG_FE_VIP_PORT_EN and REG_FE_IFC_PORT_EN before the
-> get_sport() branch failed.
->=20
-> After clearing the flag airoha_is_lan_gdm_dev(dev) reports LAN but
-> dev->qdma and the hardware registers above still describe the WAN setup.
-> Would it be cleaner to either unwind those steps or drop the flag clear?
-
-In this case net_device registration will fail and the pending hw configura=
-tion
-will not affect other running devices. I guess we can avoid to add unnecess=
-ary
-code complexity.
-
->=20
-> > =20
-> >  	return 0;
-> >  }
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/eth=
-ernet/airoha/airoha_eth.h
-> > index 3a313ac439e7..5715b03e630b 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.h
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.h
-> > @@ -540,12 +540,17 @@ struct airoha_qdma {
-> >  	u64 fwd_tx_packets;
-> >  };
-> > =20
-> > +enum airoha_priv_flags {
-> > +	PRIV_FLAG_WAN =3D BIT(0),
-> > +};
->=20
-> [Low]
-> This isn't a bug, but PRIV_FLAG_WAN and the u32 flags field below overlap
-> conceptually with struct net_device::priv_flags and the IFF_* namespace.
-> Would a driver-prefixed name such as AIROHA_DEV_F_WAN make the
-> driver-local scope obvious to future readers?
-
-ack, I will fix it in v5.
-
-Regards,
-Lorenzo
-
->=20
-> > +
-> >  struct airoha_gdm_dev {
-> >  	struct airoha_gdm_port *port;
-> >  	struct airoha_qdma *qdma;
-> >  	struct airoha_eth *eth;
-> >  	struct net_device *dev;
-> > =20
-> > +	u32 flags;
-> >  	int nbq;
-> >  };
->=20
-> [ ... ]
-
---cVtlXQ1B6cbL+hCZ
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaf8BaAAKCRA6cBh0uS2t
-rJSeAP0QBnXEgLvI07F2C7GkDzkU+BlJ80LyIyCiwOmzBYCIZAEAtQDBtjNFBFVg
-QO9/RuVlx3Ku7yx9L95neIwOm3mJDws=
-=k9t2
------END PGP SIGNATURE-----
-
---cVtlXQ1B6cbL+hCZ--
 
