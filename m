@@ -1,378 +1,339 @@
-Return-Path: <netdev+bounces-286138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286141-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qIqoEFkH/2lg1QAAu9opvQ
-	(envelope-from <netdev+bounces-286138-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 12:07:21 +0200
+	id iIIZGIQH/2lg1QAAu9opvQ
+	(envelope-from <netdev+bounces-286141-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 12:08:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A83E44FF191
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 12:07:20 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 062AC4FF1A0
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 12:08:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1386A3013278
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 10:06:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 64B303006102
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 10:08:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1B8239183A;
-	Sat,  9 May 2026 10:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 877D039F193;
+	Sat,  9 May 2026 10:08:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="leuQxIIG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2AB39F16B
-	for <netdev@vger.kernel.org>; Sat,  9 May 2026 10:06:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627DE208D0;
+	Sat,  9 May 2026 10:08:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778321197; cv=none; b=TrF2DmLkfxVPtOvEvhubvW9FXq82HO4PGyP8icD+u22K2SBo5gk5+ql27W7b9sTklIJFtglic1Xja/Pa9uQjPp2Hc+BlHugc6HTP8uaFhNR9BckognTn+w/XBTmxdG6tukgRv8MzLGroH1dy8waDaZ1O0URiH0aJY2LkylIpgco=
+	t=1778321281; cv=none; b=gSIL08X5mGCPAiAXCWBEEkWNUKOYUl/19es9/cCcQ01flfR1oHDykK0ijjaLZYDHA86eAFlRRfpVBRQe4zDxhz379+BWhBNO6mNts2YYt0e8ZBBMDgEN1FdHaqEmHoZPeEshApL8/IuwRSAvV7m98M4c/7Vm5gXYOi4Wz23iu6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778321197; c=relaxed/simple;
-	bh=QQAFBOl8xg6+kZL/BhWbnRk8BZ5BpFkiyuBLCtXfzxw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RDc1Fv8JfL/Tddgr9KX15t4c65ti3I+7Zavi3kyZ96mYEJSmlh/4ceyv2xclhaMVh6MROMV70yv+fbPRuYwha26T1ZzAdrTM+EFjddDEHAHJk4ItnW++mMyd7o7ZunQgTZvV5PZWjjimoKpw/UTJcxTIseC2ZCvo0wnBpDT8XaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.243.244.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: esmtpsz17t1778321162t778454ea
-X-QQ-Originating-IP: 7Fc8txjcZfea5u4+4cUaw04QSp/i00oFCj2mIBV0zIg=
-Received: from lap-jiawenwu.trustnetic.com ( [115.204.251.157])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sat, 09 May 2026 18:06:00 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 7184285776851020265
-EX-QQ-RecipientCnt: 17
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org
-Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	Larysa Zaremba <larysa.zaremba@intel.com>,
-	Breno Leitao <leitao@debian.org>,
-	Joe Damato <joe@dama.to>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Fabio Baltieri <fabio.baltieri@gmail.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v3 5/5] net: wangxun: implement pci_error_handlers ops
-Date: Sat,  9 May 2026 18:05:40 +0800
-Message-Id: <20260509100540.32612-6-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <20260509100540.32612-1-jiawenwu@trustnetic.com>
-References: <20260509100540.32612-1-jiawenwu@trustnetic.com>
+	s=arc-20240116; t=1778321281; c=relaxed/simple;
+	bh=DrVObXvVSvJ6Qh3ggMiOeo7pce3nKF+OLq2GUfFw0YE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QD7b0STLYD/XUwPb7ScKJdK1cuNZ4vzuuiEBQMW/idtyPpFczmc5aMx8JSin4ZFyxsQCYjCmeJQY6HQn48ZgaIL6PM4dxH/hkjv8QB3CMHLHO1uzLUWFXlqmn/4A/zCZLIPTt1k3Shl/QPY2GubJ/4wUM+PZeIu25wF/tsZezkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=leuQxIIG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEB13C2BCB2;
+	Sat,  9 May 2026 10:08:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778321281;
+	bh=DrVObXvVSvJ6Qh3ggMiOeo7pce3nKF+OLq2GUfFw0YE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=leuQxIIGtL3ySmiM8r5mjMlZARE6dzdT/vnEblM99cn6q33QGI+M//l8mhH1tVRik
+	 qW44qun4uM4o9P/wQC8aR7XEPNxLiuxUZR+d1RuachQXa97iWgYAfgt5YHTbzpcX7c
+	 KCzR/czetJFcaiBkWeZjfaDLql0F4scJzYDwQxGUDDcLi2TwHrM+p4Utk2WSPdleY8
+	 jCl5i119bdw/3KvuZRhJxETpB3xUK+QDCSXShe32v65GNbScFKbxUSyJCP/3K3mIyQ
+	 DasZs8wAvGZ1hQLVr63crBdR95qNDS3JhiIBHWnu0iWTdFMcypVu6Zr4YPLG2Q7frZ
+	 8B1qWoWZEUpeA==
+Date: Sat, 9 May 2026 12:07:58 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, ansuelsmth@gmail.com,
+	benjamin.larsson@genexis.eu, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, madhur.agrawal@airoha.com
+Subject: Re: [PATCH net-next v4 10/10] net: airoha: Support multiple LAN/WAN
+ interfaces for hw MAC address configuration
+Message-ID: <af8HfuSZ1hkJGA2O@lore-desk>
+References: <20260507-airoha-eth-multi-serdes-v4-10-af613b61ae02@kernel.org>
+ <20260509014617.3558185-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: NC/J3CrDtaBbc/FFO9edvP3dTY+skoQ2jQhWterE85AvDyDfgGZ5I68R
-	S1CKz5HziPazYAnOQYsI8dhjw1zZx174CsZSoZBTG/7s0nX61WTfjLdMooC0dKangFx6k9C
-	cF7axoG20Tpxkg7szKvBcJPdOIeAQTQTNWbN/dR9zlkaRwO2zGufnqi/tE/xtEX76rBFXax
-	7zQm/w8cjB8xCcc8ygGyaCsJ0VHSL4D7n0ynaqQldUa2sMa9mCdbseh538dUmjLx+oV48+t
-	El7uLzzLZVmPwNXl8Oa0TLiTtOwHXDVCBLjQa/K7KoRoMTreAIrxOhgCyAurZQp3EXyK4/s
-	ZHTkZ3VsC/4xYuU6A3dFTHbfAJAt9N4K7TicKEKS/VLIWU47GdsVUatDFmBgpQ7UjNCFd/h
-	QVhqFbokAvq27jeWLTO4pmIeVBJP5Ay39Z6zlnZmrI0CAd1t9jGLujNIBYiJsacMRPV3CnY
-	JZ0dN13xwBgUu16zwFzK2ynY9nFYZNDf0X5mtV8/pk4MpET4MGjQP8tPY/zSsxN9hQJwZLt
-	QbqH5O642HbNfJlu5kf2cujr0e7mT91dHOnHHUDoHcEwiWgvpUnM3+5TBS/xMsgdAZhxE+P
-	o19coY1kmB6PdcR81GRsFy8wS5E61+TWkjrLpduWaSr7oUjjEfABSkD0yuIqNWdy2dG2sy6
-	wDT+Hbyw0ck52SOCD0+v/J9rS8zflgt12lvRMyfNM8pHNd6r8B1+HmcB855hcNUDoAKP6sk
-	zW728Yu5uroMWCCQHEyn3s9Bcm5Q24eCX5RX+ICwh8o2Kt9OGxQdpzbGESUdGpVECvTrO5T
-	UaJIDgXp/HswMT9eoVBahqI7XVuaSAFNj4cvGggHnZ70L41IpNlKsLZu7eoDCwHLp8JXetj
-	/kHXbQMsc2bIfJyoUmAwjESn4RiAN9ux9qSmOI9o0BeQELhaBew/gccrrMM78HYeZ4OK8H0
-	8Me20FhbYGDxAHCii25dF3GxnwJSQP7Pz8lplmFeZECVOYeWfRl9t3s+Ky0ve8qRFUOCGGi
-	FWsZAmwDKAnUMntNhbjpduzPBKt/RxGhtFoGFq7Mgdwb39UEp5Co1EBWG3nQwMeknxjQNrz
-	w==
-X-QQ-XMRINFO: MSVp+SPm3vtSI1QTLgDHQqIV1w2oNKDqfg==
-X-QQ-RECHKSPAM: 0
-X-Rspamd-Queue-Id: A83E44FF191
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="lg/EUJE1MTlDMtub"
+Content-Disposition: inline
+In-Reply-To: <20260509014617.3558185-1-kuba@kernel.org>
+X-Rspamd-Queue-Id: 062AC4FF1A0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.54 / 15.00];
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286138-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[trustnetic.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,debian.org,dama.to,trustnetic.com];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-286141-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,genexis.eu,lists.infradead.org,vger.kernel.org,airoha.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.627];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[trustnetic.com:email,trustnetic.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Support AER driver to handle the PCIe errors.
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_err.c   | 108 ++++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_err.h   |   2 +
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |   1 +
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |   9 +-
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   8 +-
- 5 files changed, 124 insertions(+), 4 deletions(-)
+--lg/EUJE1MTlDMtub
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-index deb9fac2e1a9..64d43bf6e9da 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_err.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-@@ -4,11 +4,119 @@
- 
- #include <linux/netdevice.h>
- #include <linux/pci.h>
-+#include <linux/aer.h>
- 
- #include "wx_type.h"
- #include "wx_lib.h"
- #include "wx_err.h"
- 
-+/**
-+ * wx_io_error_detected - called when PCI error is detected
-+ * @pdev: Pointer to PCI device
-+ * @state: The current pci connection state
-+ *
-+ * Return: pci_ers_result_t.
-+ *
-+ * This function is called after a PCI bus error affecting
-+ * this device has been detected.
-+ */
-+static pci_ers_result_t wx_io_error_detected(struct pci_dev *pdev,
-+					     pci_channel_state_t state)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	struct net_device *netdev;
-+
-+	if (!wx)
-+		return PCI_ERS_RESULT_DISCONNECT;
-+
-+	netdev = wx->netdev;
-+	if (!netif_device_present(netdev))
-+		return PCI_ERS_RESULT_DISCONNECT;
-+
-+	if (state == pci_channel_io_perm_failure)
-+		return PCI_ERS_RESULT_DISCONNECT;
-+
-+	rtnl_lock();
-+	netif_device_detach(netdev);
-+
-+	if (netif_running(netdev))
-+		wx->close_suspend(wx);
-+
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
-+	rtnl_unlock();
-+
-+	/* Request a slot reset. */
-+	return PCI_ERS_RESULT_NEED_RESET;
-+}
-+
-+/**
-+ * wx_io_slot_reset - called after the pci bus has been reset.
-+ * @pdev: Pointer to PCI device
-+ *
-+ * Return: pci_ers_result_t.
-+ *
-+ * Restart the card from scratch, as if from a cold-boot.
-+ */
-+static pci_ers_result_t wx_io_slot_reset(struct pci_dev *pdev)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	pci_ers_result_t result;
-+
-+	if (pci_enable_device_mem(pdev)) {
-+		wx_err(wx, "Cannot re-enable PCI device after reset.\n");
-+		result = PCI_ERS_RESULT_DISCONNECT;
-+	} else {
-+		/* make all bar access done before reset. */
-+		smp_mb__before_atomic();
-+		clear_bit(WX_STATE_DISABLED, wx->state);
-+		pci_set_master(pdev);
-+		pci_restore_state(pdev);
-+		pci_wake_from_d3(pdev, false);
-+
-+		wx->do_reset(wx->netdev, false);
-+		result = PCI_ERS_RESULT_RECOVERED;
-+	}
-+
-+	pci_aer_clear_nonfatal_status(pdev);
-+
-+	return result;
-+}
-+
-+/**
-+ * wx_io_resume - called when traffic can start flowing again.
-+ * @pdev: Pointer to PCI device
-+ *
-+ * This callback is called when the error recovery driver tells us that
-+ * its OK to resume normal operation.
-+ */
-+static void wx_io_resume(struct pci_dev *pdev)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	struct net_device *netdev;
-+	int err;
-+
-+	netdev = wx->netdev;
-+	rtnl_lock();
-+	if (netif_running(netdev)) {
-+		err = netdev->netdev_ops->ndo_open(netdev);
-+		if (err) {
-+			wx_err(wx, "Failed to open netdev after reset\n");
-+			goto out;
-+		}
-+	}
-+	netif_device_attach(netdev);
-+out:
-+	rtnl_unlock();
-+}
-+
-+const struct pci_error_handlers wx_err_handler = {
-+	.error_detected = wx_io_error_detected,
-+	.slot_reset = wx_io_slot_reset,
-+	.resume = wx_io_resume,
-+};
-+EXPORT_SYMBOL(wx_err_handler);
-+
- void wx_reset_subtask(struct wx *wx)
- {
- 	if (!test_bit(WX_FLAG_NEED_PF_RESET, wx->flags))
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.h b/drivers/net/ethernet/wangxun/libwx/wx_err.h
-index 594e70bce229..9b086f597d8e 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_err.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_err.h
-@@ -7,6 +7,8 @@
- #ifndef _WX_ERR_H_
- #define _WX_ERR_H_
- 
-+extern const struct pci_error_handlers wx_err_handler;
-+
- void wx_reset_subtask(struct wx *wx);
- void wx_check_tx_hang_subtask(struct wx *wx);
- void wx_tx_timeout(struct net_device *netdev, unsigned int txqueue);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index c3befb272274..2dc2bdba74bb 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -1220,6 +1220,7 @@ enum wx_state {
- 	WX_STATE_PTP_RUNNING,
- 	WX_STATE_PTP_TX_IN_PROGRESS,
- 	WX_STATE_SERVICE_SCHED,
-+	WX_STATE_DISABLED,
- 	WX_STATE_NBITS		/* must be last */
- };
- 
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index 891f057470d4..0921d5815a26 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -571,7 +571,8 @@ static void ngbe_dev_shutdown(struct pci_dev *pdev, bool *enable_wake)
- 	*enable_wake = !!wufc;
- 	wx_control_hw(wx, false);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static void ngbe_shutdown(struct pci_dev *pdev)
-@@ -857,6 +858,7 @@ static int ngbe_probe(struct pci_dev *pdev,
- 		goto err_register;
- 
- 	pci_set_drvdata(pdev, wx);
-+	pci_save_state(pdev);
- 
- 	return 0;
- 
-@@ -908,7 +910,8 @@ static void ngbe_remove(struct pci_dev *pdev)
- 	kfree(wx->mac_table);
- 	wx_clear_interrupt_scheme(wx);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static int ngbe_suspend(struct pci_dev *pdev, pm_message_t state)
-@@ -935,6 +938,7 @@ static int ngbe_resume(struct pci_dev *pdev)
- 		wx_err(wx, "Cannot enable PCI device from suspend\n");
- 		return err;
- 	}
-+	clear_bit(WX_STATE_DISABLED, wx->state);
- 	pci_set_master(pdev);
- 	device_wakeup_disable(&pdev->dev);
- 
-@@ -959,6 +963,7 @@ static struct pci_driver ngbe_driver = {
- 	.resume   = ngbe_resume,
- 	.shutdown = ngbe_shutdown,
- 	.sriov_configure = wx_pci_sriov_configure,
-+	.err_handler = &wx_err_handler,
- };
- 
- module_pci_driver(ngbe_driver);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index ae91379d847d..df0534a875a9 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -553,7 +553,8 @@ static void txgbe_dev_shutdown(struct pci_dev *pdev)
- 
- 	wx_control_hw(wx, false);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static void txgbe_shutdown(struct pci_dev *pdev)
-@@ -901,6 +902,7 @@ static int txgbe_probe(struct pci_dev *pdev,
- 		goto err_remove_phy;
- 
- 	pci_set_drvdata(pdev, wx);
-+	pci_save_state(pdev);
- 
- 	netif_tx_stop_all_queues(netdev);
- 
-@@ -971,7 +973,8 @@ static void txgbe_remove(struct pci_dev *pdev)
- 	kfree(wx->mac_table);
- 	wx_clear_interrupt_scheme(wx);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static struct pci_driver txgbe_driver = {
-@@ -981,6 +984,7 @@ static struct pci_driver txgbe_driver = {
- 	.remove   = txgbe_remove,
- 	.shutdown = txgbe_shutdown,
- 	.sriov_configure = wx_pci_sriov_configure,
-+	.err_handler = &wx_err_handler,
- };
- 
- module_pci_driver(txgbe_driver);
--- 
-2.51.0
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> ---
+> net: airoha: Support multiple LAN/WAN interfaces for hw MAC address confi=
+guration
+>=20
+> This patch extends airoha_set_macaddr() to derive REG_FE_MAC_LMIN and
+> REG_FE_MAC_LMAX by iterating over all sibling LAN/WAN net_devices, and
+> rejects addresses whose upper 3 bytes do not match the already-registered
+> peers. airoha_dev_set_macaddr() is also changed to split eth_mac_addr()
+> into eth_prepare_mac_addr_change() and eth_commit_mac_addr_change() around
+> the hardware programming step.
+>=20
+> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
+ernet/airoha/airoha_eth.c
+> > index 8617dd4f7932..fbfefd0ec355 100644
+> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> > @@ -71,20 +71,67 @@ static void airoha_qdma_irq_disable(struct airoha_i=
+rq_bank *irq_bank,
+> >  	airoha_qdma_set_irqmask(irq_bank, index, mask, 0);
+> >  }
+> > =20
+> > -static void airoha_set_macaddr(struct airoha_gdm_dev *dev, const u8 *a=
+ddr)
+> > +static int airoha_set_macaddr(struct airoha_gdm_dev *dev, const u8 *ad=
+dr)
+> >  {
+> >  	struct airoha_eth *eth =3D dev->eth;
+> > -	u32 val, reg;
+> > +	u8 ref_addr[ETH_ALEN] =3D {};
+> > +	u32 reg, val, lmin, lmax;
+> > +	int i;
+> > +
+> > +	lmin =3D (addr[3] << 16) | (addr[4] << 8) | addr[5];
+> > +	lmax =3D lmin;
+> > +
+> > +	for (i =3D 0; i < ARRAY_SIZE(eth->ports); i++) {
+> > +		struct airoha_gdm_port *port =3D eth->ports[i];
+> > +		int j;
+> > +
+> > +		if (!port)
+> > +			continue;
+> > +
+> > +		for (j =3D 0; j < ARRAY_SIZE(port->devs); j++) {
+> > +			struct airoha_gdm_dev *iter_dev;
+> > +			struct net_device *netdev;
+> > +
+> > +			iter_dev =3D port->devs[j];
+> > +			if (!iter_dev || iter_dev =3D=3D dev)
+> > +				continue;
+> > +
+> > +			if (airoha_is_lan_gdm_dev(iter_dev) !=3D
+> > +			    airoha_is_lan_gdm_dev(dev))
+> > +				continue;
+> > +
+> > +			netdev =3D iter_dev->dev;
+> > +			if (netdev->reg_state !=3D NETREG_REGISTERED)
+> > +				continue;
+> > +
+> > +			ether_addr_copy(ref_addr, netdev->dev_addr);
+> > +			val =3D (netdev->dev_addr[3] << 16) |
+> > +			      (netdev->dev_addr[4] << 8) | netdev->dev_addr[5];
+> > +			if (val < lmin)
+> > +				lmin =3D val;
+> > +			if (val > lmax)
+> > +				lmax =3D val;
+> > +		}
+> > +	}
+> > +
+> > +	if (!is_zero_ether_addr(ref_addr) && memcmp(ref_addr, addr, 3)) {
+> > +		/* According to the HW design, hw mac address MS bits
+> > +		 * must be the same for each net_device with the same
+> > +		 * LAN/WAN configuration.
+> > +		 */
+> > +		return -EINVAL;
+> > +	}
+>=20
+> [Medium]
+> The NETREG_REGISTERED filter here means the check only sees peers that
+> have already completed register_netdev(). airoha_dev_init() is invoked
+> as ndo_init from register_netdev() before dev->reg_state transitions
+> to NETREG_REGISTERED, so the constraint is only enforced across
+> already-registered siblings.
+>=20
+> When the device tree does not supply a mac-address property,
+> airoha_alloc_gdm_device() falls back to eth_hw_addr_random() and each
+> sibling gets an independently generated random MAC. With two or more
+> LAN (or two or more WAN) net_devices going through this fallback, the
+> second and later siblings' upper 3 bytes will almost always differ
+> from the first, so airoha_set_macaddr() returns -EINVAL:
+>=20
+> 	if (!is_zero_ether_addr(ref_addr) && memcmp(ref_addr, addr, 3))
+> 		return -EINVAL;
+>=20
+> airoha_dev_init() now propagates that error, which fails
+> register_netdev() and airoha_register_gdm_devices(), aborting probe.
+>=20
+> Before this patch the same configuration still came up (with the single
+> REG_FE_{LAN,WAN}_MAC_H being last-writer-wins). Should the random
+> fallback path derive sibling MACs from a shared base, or should the
+> upper-3-bytes constraint only be enforced for user-triggered
+> ndo_set_mac_address rather than for init-time programming?
 
+Hw design requires that if two (or more) net_devices are configured as LAN
+(or theoretically as WAN), they need to share the mac address upper-3-bytes.
+If the user wants to use multiple devices with the same LAN/WAN configurati=
+on,
+he/she will need to properly store the net_device mac address int the device
+eeprom/nvme or in the dts.
+Please note this series is not introducing any regression since the user was
+not able to run this configuration before this series.
+
+>=20
+> > =20
+> >  	reg =3D airoha_is_lan_gdm_dev(dev) ? REG_FE_LAN_MAC_H : REG_FE_WAN_MA=
+C_H;
+> >  	val =3D (addr[0] << 16) | (addr[1] << 8) | addr[2];
+> >  	airoha_fe_wr(eth, reg, val);
+> > =20
+> > -	val =3D (addr[3] << 16) | (addr[4] << 8) | addr[5];
+> > -	airoha_fe_wr(eth, REG_FE_MAC_LMIN(reg), val);
+> > -	airoha_fe_wr(eth, REG_FE_MAC_LMAX(reg), val);
+> > +	airoha_fe_wr(eth, REG_FE_MAC_LMIN(reg), lmin);
+> > +	airoha_fe_wr(eth, REG_FE_MAC_LMAX(reg), lmax);
+> > =20
+> >  	airoha_ppe_init_upd_mem(dev);
+> > +
+> > +	return 0;
+> >  }
+> > =20
+> >  static void airoha_set_gdm_port_fwd_cfg(struct airoha_eth *eth, u32 ad=
+dr,
+> > @@ -1792,13 +1839,18 @@ static int airoha_dev_stop(struct net_device *n=
+etdev)
+> >  static int airoha_dev_set_macaddr(struct net_device *netdev, void *p)
+> >  {
+> >  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
+> > +	struct sockaddr *addr =3D p;
+> >  	int err;
+> > =20
+> > -	err =3D eth_mac_addr(netdev, p);
+> > +	err =3D eth_prepare_mac_addr_change(netdev, p);
+> >  	if (err)
+> >  		return err;
+> > =20
+> > -	airoha_set_macaddr(dev, netdev->dev_addr);
+> > +	err =3D airoha_set_macaddr(dev, addr->sa_data);
+> > +	if (err)
+> > +		return err;
+> > +
+> > +	eth_commit_mac_addr_change(netdev, p);
+> > =20
+> >  	return 0;
+> >  }
+>=20
+> [High]
+> After this reordering, does airoha_ppe_init_upd_mem() end up
+> programming the PPE update memory with the old MAC rather than the new
+> one?
+>=20
+> eth_prepare_mac_addr_change() only validates the sockaddr and does not
+> touch netdev->dev_addr; the actual write to netdev->dev_addr happens in
+> eth_commit_mac_addr_change() via eth_hw_addr_set():
+>=20
+> net/ethernet/eth.c:eth_prepare_mac_addr_change() {
+> 	if (!(dev->priv_flags & IFF_LIVE_ADDR_CHANGE) && netif_running(dev))
+> 		return -EBUSY;
+> 	if (!is_valid_ether_addr(addr->sa_data))
+> 		return -EADDRNOTAVAIL;
+> 	return 0;
+> }
+>=20
+> net/ethernet/eth.c:eth_commit_mac_addr_change() {
+> 	eth_hw_addr_set(dev, addr->sa_data);
+> }
+>=20
+> airoha_set_macaddr() is invoked between those two, so when it reaches
+> airoha_ppe_init_upd_mem(dev) the commit has not yet run. That helper
+> reads netdev->dev_addr directly rather than using the addr argument:
+>=20
+> drivers/net/ethernet/airoha/airoha_ppe.c:airoha_ppe_init_upd_mem() {
+> 	const u8 *addr =3D netdev->dev_addr;
+> 	...
+> 	val =3D (addr[2] << 24) | (addr[3] << 16) | (addr[4] << 8) | addr[5];
+> 	airoha_fe_wr(eth, REG_UPDMEM_DATA(0), val);
+> 	...
+> 	val =3D (addr[0] << 8) | addr[1];
+> 	airoha_fe_wr(eth, REG_UPDMEM_DATA(0), val);
+> 	...
+> }
+>=20
+> So the FE registers REG_FE_{LAN,WAN}_MAC_H / REG_FE_MAC_LMIN /
+> REG_FE_MAC_LMAX are written from the new addr parameter, but the PPE
+> REG_UPDMEM_DATA/REG_UPDMEM_CTRL entries are written from the still-old
+> netdev->dev_addr.
+>=20
+> Previously eth_mac_addr() (prepare + commit combined) ran first, so
+> netdev->dev_addr was the new MAC by the time airoha_set_macaddr() and
+> airoha_ppe_init_upd_mem() ran, keeping the two blocks in sync.
+>=20
+> Would it be cleaner to either pass addr through to
+> airoha_ppe_init_upd_mem(), or invoke eth_commit_mac_addr_change() before
+> airoha_set_macaddr() (with a rollback path if the hardware programming
+> fails)?
+
+ack, I will fix it in v5.
+
+Regards,
+Lorenzo
+
+>=20
+> > @@ -1903,6 +1955,7 @@ static int airoha_dev_init(struct net_device *net=
+dev)
+> [ ... ]
+
+--lg/EUJE1MTlDMtub
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaf8HfgAKCRA6cBh0uS2t
+rCrFAQC4cypXPyLYpkfCjZ+8fARSlLo1SxcqMz7kvKN7sd0RnAEAx5U4W8tYhksn
+GK2mSoplDd6MwDsxrrEmtIg5gaY9ogw=
+=61qR
+-----END PGP SIGNATURE-----
+
+--lg/EUJE1MTlDMtub--
 
