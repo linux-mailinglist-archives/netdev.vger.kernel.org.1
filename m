@@ -1,324 +1,164 @@
-Return-Path: <netdev+bounces-286201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286202-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wAceLlpr/2kR6QAAu9opvQ
-	(envelope-from <netdev+bounces-286201-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 19:14:02 +0200
+	id iC+WAmhw/2kx6gAAu9opvQ
+	(envelope-from <netdev+bounces-286202-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 19:35:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36280500ABD
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 19:14:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D63C500CA9
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 19:35:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C0896303B716
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 17:11:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 09AFB300D15B
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 17:35:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D04F3BBA1D;
-	Sat,  9 May 2026 17:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 355D02E7F20;
+	Sat,  9 May 2026 17:35:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="ESHIIILZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iUc9ICcd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F6992FD695
-	for <netdev@vger.kernel.org>; Sat,  9 May 2026 17:11:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778346701; cv=none; b=ew8QhksVbuBY9TCOU0paKK/tZ4PQoR6qZqA5vWZSyi6GtKbpGxgK2DSR+JpxE2DQR6dFTsYv/76soeUwMgKsQ5awFXy5xp9uHh+YpDNbPi5iVkInlzhhICqlv3AF0mKVLvukB7I1pNMRhX5DBUWDwnWG9XOeOT4TGL8wNVck+0Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778346701; c=relaxed/simple;
-	bh=FMZ1tRA3ka8Q1nkGxkTHNa//8o9gocm0JiKYQHDx330=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eLC/z/gs2fCVjM4qwnVPAg6v5TBGpc+I31+XBHt5yK8rOhUILV3X65sFMgpqHsGCEaDd9Y+/D/4ehh7pINLigmZ0IOaAfK5WOgF55DpZft9IGySTekLKrFZ3dzS9FyBKCQR9dmuN0rDxvP0+nLN/aJAKWzVtjSC2Frr9h0HupFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=ESHIIILZ; arc=none smtp.client-ip=74.125.82.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-2c15849aa2cso3790840eec.0
-        for <netdev@vger.kernel.org>; Sat, 09 May 2026 10:11:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D132E253958
+	for <netdev@vger.kernel.org>; Sat,  9 May 2026 17:35:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778348133; cv=pass; b=cP3QoVQeCQkk7R7VwZtHOrIzICujaoio1H8z0fPHBeNPoXLZI3Dmt4s/BRJ6gGz2xk143b2H1PXZXWR5hXS1GyhcZaE3cvscybHpKTDQn/05PwQnkak+ypP/QN9ZSVL6PFWtYkL3xoZPsV7f2VyeLyYkkz/SAMp4xFyd9UXhZ6M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778348133; c=relaxed/simple;
+	bh=BNVJivfXYFIEMmnZvgiBuIroH5sJ9sqppVqbhVWqU4c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=E/EsUcJaNgJBeV/xb2pjcEnW5UlIe3qbXCPzd98kdvZ6UOnIb/pensZTbs4xcEqDHzrrZPTNUoLrymzO9fNEF9SABImBqWhzTGQlBUeSPzDJV5aDmPsDiuwfzKIW7O1iYcHt5nKd/76OaLdi9CZdlt9qT+31rkOlawUNU750ghk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iUc9ICcd; arc=pass smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-50fb8e9a4edso32981661cf.1
+        for <netdev@vger.kernel.org>; Sat, 09 May 2026 10:35:31 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778348131; cv=none;
+        d=google.com; s=arc-20240605;
+        b=V7Ml18bGDO2GBMZqK1h1qA+jgDDvK8qe10lOinUYqrHZ/+U0e1O2ZRtexCTMLAAg6D
+         w2VLP1KRAGa++1UBhGNQolwtCoJxR0OYtqNwD97lH0us1BSqnOqdq9vBtjhtWCpB5mmn
+         9cv7o6RK8YhmP2yXgPtJg3yzDHZnqhO5KcEK2sS7jqoLOZgCJy9W4yjchl2ZXiPAdNlB
+         MBlRKh+iFZPz7VSOKXyxT0RaInM8ANg1Emvm1OHNsAbCH2xlutmEHJ9gAz/cjB+GA4qw
+         1gwsum9HPdV1WOrhokZQywH2A8rcCkXQ7mzEs5rcHpLAp6Ru/3ZmVMtoCTN4aN4u/b0j
+         xBeQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=BNVJivfXYFIEMmnZvgiBuIroH5sJ9sqppVqbhVWqU4c=;
+        fh=OleUC13KhMU2w9JY6LrKurTR5DJ6kiRDRXiwGU9AYVA=;
+        b=O6Ny9H7tS0/KWfII52nAAEy/xMH3njiD4HgjO+Dd4I+UareXOBIeL4oecbZfokSKHL
+         9LGPNhE52x/GB4bo3zTRbVNK2ZblJLgRXsOz8NZDDVbEP32EoQVnEqvJ5D//MkEfPxnP
+         bgrAnPytZpSx+l0mykcC1wLLcLsZQVOhMwDp60sJMIhb/TqAJTglXDmT/2qABFW94LEA
+         dScNLsgRQwaPpSJnpavi2jC2wnE6cohj3AbpkL0MgJB126qdL45fLXklRV6bE2traI/2
+         YuqvI05f35hUIIsVGDpRd1ehhetEZnMBKUejrY2/92hLyKoVDHiszQYIORENA9VZE+c1
+         kepg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1778346694; x=1778951494; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20251104; t=1778348131; x=1778952931; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=btSrECOLXP80fkog/hbOs+29e1P11S2qrsGpUwU2SCk=;
-        b=ESHIIILZ6YomoIsD8TDX7HCJRdsHtf59AioxeUzbtUGIQuHcGigaKIF3YLCWIqAJ7G
-         oLE7mBe2a1s2n6+Y4Fe2r8H+pWqjSO8R9oULiIGzdFjTZldgIpJBT6h2sT3R5QHU0sV2
-         1OUn8WSsQcCkxBFpL7wP9ss3b8EMqkxzrW8br7t/4v87tjz9Yt08IgDv5YD1hoI4xyNb
-         vkLwK70Ex9xLs7y5WNkQqrpGQ4idX9mrfsQehkkTeEZSu5zD7MyFez2EGVirB4101jDN
-         8cwQtn0qo6kzXpn547d0gaDoVtincF+VKeyLutqwrBXV68cVJxe1gGqpWFe3fg8FTMnX
-         tOpA==
+        bh=BNVJivfXYFIEMmnZvgiBuIroH5sJ9sqppVqbhVWqU4c=;
+        b=iUc9ICcdmTWCTQfEQ7fjqcjUhyU3s5ZMNNlsX+lwIBaPJUcxWZ4f/wsumNPj003v7D
+         PB92fOTw5GJroV1tmWayYEWt6EfsrAyxfJZM19GlnDayfP8vFAZybSPtchR72grtEjob
+         AHvR2L+lI0ebGavcWk5YtuWUePBvRT+F+vTk7SA3cmx7KjcsGeRFhETCXa0TGLOA6/Ww
+         4C2I7+kRYa6cJ6YkR6yMvDVJsAcDaiunq8z2P6UVyFnwh6JVC1ooUOBu6/pVgnjAJ/R8
+         3mKLEYZ8W3CLvtHfEOQG7ukX4fCW1G6eTHK80F5RiyUFAQpKQkFitoNk04TDFhVV/PMq
+         i+Gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778346694; x=1778951494;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1778348131; x=1778952931;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=btSrECOLXP80fkog/hbOs+29e1P11S2qrsGpUwU2SCk=;
-        b=m6cfgOrftAXpkxiNFqBVeB9+1zqC2W7Org0iYXkyjyqe/8yQ1fYgD7cX/Yvj5hYR7L
-         6MjAqsmqYVEHyYX1iTqab3xWm3IVtI1IhPNeR40j4gFSjJlUZJlMrrP+sCxJSjZ2HeRJ
-         dh0r5gNsym8on6rlEH09CIBSxj0htgWuYOFKy20BkX7LaYzBfqhpqbzEX3jHAWTGlG18
-         tNzQhEjPG3pmoxRDNuR+kEmWKvIzcc+4W1ETqs+QLgeEX4ywjahdpO8Mm06SdlUp4+Yg
-         Jl/rAa1BrgcelETqRIM2RAyji4tH6k62PnnXSnUAF6dfQFTclM+jqza9Iz5SYDZSWc/q
-         S3rg==
-X-Gm-Message-State: AOJu0YxHA0r/oup1Bnn/pbs41JMA+jIVN1sDRAnKWYrNZSXHjiZ+PcME
-	T01dtQTq49DHNxWcufuVDjVdDn6/qGAMLUmzPgTONjjbXEN7P9DfFSQyvoa31+ojwhD5wxyo+kY
-	Ba8px
-X-Gm-Gg: Acq92OFRQPqS2DHW636rgnAX3/n3wqXp3DcfCwqhdi9fvpheZwI7B70WpoKPc26hXOn
-	g6Pz91p5mfj4yXkRparPZLsnKvqtWUa6nFqLhu9rsoB59M7zVIo0kzlZvzJe0Aa4Bq9G7lH7ukW
-	aN64tZElOQW00c5ho8Ity6wop5KyXXn5oQBc5S0hNez0dXMz04YVQ9SSRwcuijEaSrCxHckyS9U
-	K8fZKCgtGvFqKMWOxMvB24SzYhhsEowRTmbDy3gYpdH3CVGJhCO+WBRRfWkCJpkQyhHUq794ZbT
-	G4H7eDRIUPzEBrM8vmVLRw7oSco3AcTBsm+I8ARiImlYc15r5+XncaZY7IYVGq4Qyz7Ola0AS7K
-	guQ4B0MwIoAOU0+WyZlLGRIRSLyjE7fqarEOfVyN76mqJdAAs0qTFnchGGHsVvSNYpeNzyU+j8v
-	nbqvvZ36zFBdE0HyJOIvnjZt3yUtWodoU6
-X-Received: by 2002:a05:7300:6424:b0:2da:a813:a60c with SMTP id 5a478bee46e88-2f549f8389bmr9015305eec.20.1778346694371;
-        Sat, 09 May 2026 10:11:34 -0700 (PDT)
-Received: from phoenix.lan ([104.202.41.210])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2f8859eafcdsm8524568eec.6.2026.05.09.10.11.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 May 2026 10:11:34 -0700 (PDT)
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next v5 5/5] net/sched: netem: add per-impairment extended statistics
-Date: Sat,  9 May 2026 10:03:26 -0700
-Message-ID: <20260509171123.307549-6-stephen@networkplumber.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260509171123.307549-1-stephen@networkplumber.org>
-References: <20260509171123.307549-1-stephen@networkplumber.org>
+        bh=BNVJivfXYFIEMmnZvgiBuIroH5sJ9sqppVqbhVWqU4c=;
+        b=ii4orAso3M6qDZ7xlINUFWKy00p0wPol2hKy1tyim/r0WayhfEffcNCnoI0BqB15I6
+         8hsAJxX8+uATKnRrzebN7gO39VRNQjhimJNU5TMVyFDaWLg2A2UI3cFsvbEq2s0ASJFg
+         ChfUVzDiCBHOkMlr6oVbJXTEkHh8VDILB9Z1bZdu2XG9eLFNYnLZEOikI5fgh7lkInRz
+         B+E06ZermfW+IeAQm9dD7dsn1uA37vPwYOdWApuwrknZQcnm8l4dZToGIPlJxY8a+xW9
+         4N0oYFfegy8RIO8K25l2+FvxqhedQY6jS47tR7WlpyoLZF2lEKi5cOgf2QY+6FyTOXGj
+         NYIg==
+X-Gm-Message-State: AOJu0Yznl1SoNOsSV8b+SKVxVcLDl9UMZJ6D+cicDEATm3nl9CeL02jE
+	qauyJqQHv2gFZRfPUxrkwtaxRr4ROnG/WRIDN7wsH/16pkLAlvqkpIOCgK7PlnvGfEQd+DjF5q6
+	zKzkWmuLgMiQzpLekNPnE/8mPogrWKB0zOs7iIhDM
+X-Gm-Gg: Acq92OG3afmSzF2xZPP3PZlJyKTwHI9W62Qd2BTc9Omy0orlkkhI3HU7fqfgljHkglg
+	25UKXylQXTiKPzX0l0azqPULf/qOTiJDCxpoeNW7IMUpgzQAkxk8IFfm40WLnehhqk7+fvZxA1I
+	8LM7uQU4L/jjFbvWoAF054qLhkaAEiyLOEE52p/P0pRHyHipqmqEdhzd/C91vsckxc3mTDgHldM
+	EJinlhKqLIrAw1su8tzmLSmaJR+Jaywjwa8tOA3bgSmfODi+RIptpPexAj4nBytoDPom2XT+fO7
+	AOFL7CMaP8mn5cQ922kEtufzxXbiqi6lOXODR9nCllkOYbWmGg3Fgo3utnJTHYqnZ0U8tBU0y4Q
+	+WwI2Hg8k0FVjhmMvBvYqCxwO/46aq/A=
+X-Received: by 2002:a05:622a:352:b0:50d:8db0:7abb with SMTP id
+ d75a77b69052e-51461fc4f53mr239015261cf.42.1778348130157; Sat, 09 May 2026
+ 10:35:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 36280500ABD
+References: <20260509100129.479aec7e@phoenix.local>
+In-Reply-To: <20260509100129.479aec7e@phoenix.local>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sat, 9 May 2026 10:35:18 -0700
+X-Gm-Features: AVHnY4Jpb4nUxxx6qtaoswYt2Vy5r7GPyJNRsR_wx-iG3iu5M-KD9amy-rnOFqI
+Message-ID: <CANn89iL_cgqYfycsKqV0PcHn7b3kbZveqLndEdcQOW64fRzaww@mail.gmail.com>
+Subject: Re: Is current INET_ECN_set_ce() safe with cloned skb?
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org, Jamal Hadi Salim <hadi@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 5D63C500CA9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.06 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	SUBJECT_ENDS_QUESTION(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286202-lists,netdev=lfdr.de];
+	RCPT_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286201-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.999];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber.org:email,networkplumber.org:mid,networkplumber-org.20251104.gappssmtp.com:dkim]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,networkplumber.org:email]
 X-Rspamd-Action: no action
 
-Add 64-bit counters for each impairment netem applies (delay, loss,
-ECN marking, corruption, duplication, reordering) and for skb
-allocation failures during enqueue. Exposed through TCA_STATS_APP
-as struct tc_netem_xstats.
+On Sat, May 9, 2026 at 10:01=E2=80=AFAM Stephen Hemminger
+<stephen@networkplumber.org> wrote:
+>
+> While doing changes to netem, Sashiko flagged that INET_ECN_set_ce is not
+> safe on a cloned skb. This wasn't something that was in any of the patche=
+s
+> it was a "drive by" in the review.
+>
+> But it got me thinking it may have found a pre-existing bug.
+> The function INET_ECN_set_ce() modifies the skb to set ECN;
+> but skb is likely a clone from TCP. So modifying the IP header
+> to set ECN will modify the version that TCP is holding as well.
+>
+> The same pattern applies to cake, choke, dualpi2, fq, fq_pie, gred,
+> pie, red, sfb, sfq. I.e all the qdisc that do ECN.
+>
+> Is this a real bug? Is TCP just working around it?
+>
+> BPF is already has fix for this but qdisc usage does not.
 
-Counters increment when an impairment is occurs, independent of later
-events that may mask its on-wire effect. Added allocation_errors
-(similar to sch_fq) to account for when impairment could not be
-applied due to memory pressure, etc.
-
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
----
-
-Note to reviewers. The READ_ONCE/WRITE_ONCE pattern is to
-align with upcoming changes removing qdisc_lock.
-For some reason current AI prompts are obsessed with complaining
-about 64 bit torn read/write on these, since the counters are
-informational only, any such complaints are false positive.
-
-Addition to iproute2 will be sent seperately.
-
- include/uapi/linux/pkt_sched.h | 10 +++++++
- net/sched/sch_netem.c          | 55 ++++++++++++++++++++++++++++++----
- 2 files changed, 59 insertions(+), 6 deletions(-)
-
-diff --git a/include/uapi/linux/pkt_sched.h b/include/uapi/linux/pkt_sched.h
-index 66e8072f44df..490efd288526 100644
---- a/include/uapi/linux/pkt_sched.h
-+++ b/include/uapi/linux/pkt_sched.h
-@@ -569,6 +569,16 @@ struct tc_netem_gemodel {
- #define NETEM_DIST_SCALE	8192
- #define NETEM_DIST_MAX		16384
- 
-+struct tc_netem_xstats {
-+	__u64	delayed;	/* packets delayed */
-+	__u64	dropped;	/* packets dropped by loss model      */
-+	__u64	corrupted;	/* packets with bit errors injected   */
-+	__u64	duplicated;	/* duplicate packets generated        */
-+	__u64	reordered;	/* packets sent out of order          */
-+	__u64	ecn_marked;	/* packets ECN CE-marked (not dropped)*/
-+	__u64	allocation_errors;
-+};
-+
- /* DRR */
- 
- enum {
-diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-index 699c734e4c8b..2433295c3920 100644
---- a/net/sched/sch_netem.c
-+++ b/net/sched/sch_netem.c
-@@ -152,6 +152,15 @@ struct netem_sched_data {
- 		u8  state;
- 	} clg;
- 
-+	/* Impairment counters */
-+	u64			delayed;
-+	u64			dropped;
-+	u64			corrupted;
-+	u64			duplicated;
-+	u64			ecn_marked;
-+	u64			reordered;
-+	u64			allocation_errors;
-+
- 	/* Cold tail: slot reschedule config and the watchdog timer. */
- 	struct tc_netem_slot	slot_config;
- 	struct qdisc_watchdog	watchdog;
-@@ -462,16 +471,21 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	skb->prev = NULL;
- 
- 	/* Random duplication */
--	if (q->duplicate && q->duplicate >= get_crandom(&q->dup_cor, &q->prng))
-+	if (q->duplicate && q->duplicate >= get_crandom(&q->dup_cor, &q->prng)) {
- 		++count;
-+		WRITE_ONCE(q->duplicated, q->duplicated + 1);
-+	}
- 
- 	/* Drop packet? */
- 	if (loss_event(q)) {
--		if (q->ecn && INET_ECN_set_ce(skb))
--			qdisc_qstats_drop(sch); /* mark packet */
--		else
-+		if (q->ecn && INET_ECN_set_ce(skb)) {
-+			WRITE_ONCE(q->ecn_marked, q->ecn_marked + 1);
-+		} else {
-+			WRITE_ONCE(q->dropped, q->dropped + 1);
- 			--count;
-+		}
- 	}
-+
- 	if (count == 0) {
- 		qdisc_qstats_drop(sch);
- 		__qdisc_drop(skb, to_free);
-@@ -488,8 +502,11 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	 * If we need to duplicate packet, then clone it before
- 	 * original is modified.
- 	 */
--	if (count > 1)
-+	if (count > 1) {
- 		skb2 = skb_clone(skb, GFP_ATOMIC);
-+		if (!skb2)
-+			WRITE_ONCE(q->allocation_errors, q->allocation_errors + 1);
-+	}
- 
- 	/*
- 	 * Randomized packet corruption.
-@@ -500,8 +517,10 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	if (q->corrupt && q->corrupt >= get_crandom(&q->corrupt_cor, &q->prng)) {
- 		if (skb_is_gso(skb)) {
- 			skb = netem_segment(skb, sch, to_free);
--			if (!skb)
-+			if (!skb) {
-+				WRITE_ONCE(q->allocation_errors, q->allocation_errors + 1);
- 				goto finish_segs;
-+			}
- 
- 			segs = skb->next;
- 			skb_mark_not_on_list(skb);
-@@ -510,11 +529,13 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 
- 		skb = skb_unshare(skb, GFP_ATOMIC);
- 		if (unlikely(!skb)) {
-+			WRITE_ONCE(q->allocation_errors, q->allocation_errors + 1);
- 			qdisc_qstats_drop(sch);
- 			goto finish_segs;
- 		}
- 		if (skb_linearize(skb) ||
- 		    (skb->ip_summed == CHECKSUM_PARTIAL && skb_checksum_help(skb))) {
-+			WRITE_ONCE(q->allocation_errors, q->allocation_errors + 1);
- 			qdisc_drop(skb, sch, to_free);
- 			skb = NULL;
- 			goto finish_segs;
-@@ -523,6 +544,7 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		if (skb->len) {
- 			u32 offset = get_random_u32_below(skb->len);
- 			skb->data[offset] ^= 1 << get_random_u32_below(8);
-+			WRITE_ONCE(q->corrupted, q->corrupted + 1);
- 		}
- 	}
- 
-@@ -604,12 +626,16 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 
- 		cb->time_to_send = now + delay;
- 		++q->counter;
-+		if (delay)
-+			WRITE_ONCE(q->delayed, q->delayed + 1);
-+
- 		tfifo_enqueue(skb, sch);
- 	} else {
- 		/*
- 		 * Do re-ordering by putting one out of N packets at the front
- 		 * of the queue.
- 		 */
-+		WRITE_ONCE(q->reordered, q->reordered + 1);
- 		cb->time_to_send = ktime_get_ns();
- 		q->counter = 0;
- 
-@@ -1348,6 +1374,22 @@ static int netem_dump(struct Qdisc *sch, struct sk_buff *skb)
- 	return -1;
- }
- 
-+static int netem_dump_stats(struct Qdisc *sch, struct gnet_dump *d)
-+{
-+	struct netem_sched_data *q = qdisc_priv(sch);
-+	struct tc_netem_xstats st = {
-+		.delayed    = READ_ONCE(q->delayed),
-+		.dropped    = READ_ONCE(q->dropped),
-+		.corrupted  = READ_ONCE(q->corrupted),
-+		.duplicated = READ_ONCE(q->duplicated),
-+		.reordered  = READ_ONCE(q->reordered),
-+		.ecn_marked = READ_ONCE(q->ecn_marked),
-+		.allocation_errors = READ_ONCE(q->allocation_errors),
-+	};
-+
-+	return gnet_stats_copy_app(d, &st, sizeof(st));
-+}
-+
- static int netem_dump_class(struct Qdisc *sch, unsigned long cl,
- 			  struct sk_buff *skb, struct tcmsg *tcm)
- {
-@@ -1410,6 +1452,7 @@ static struct Qdisc_ops netem_qdisc_ops __read_mostly = {
- 	.destroy	=	netem_destroy,
- 	.change		=	netem_change,
- 	.dump		=	netem_dump,
-+	.dump_stats	=	netem_dump_stats,
- 	.owner		=	THIS_MODULE,
- };
- MODULE_ALIAS_NET_SCH("netem");
--- 
-2.53.0
-
+TCP does not care, all headers can be changed freely by lower layers.
 
