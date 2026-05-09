@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-286115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286116-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oN2yKavo/mlCzQAAu9opvQ
-	(envelope-from <netdev+bounces-286115-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 09:56:27 +0200
+	id 1scfF5nv/mkMzwAAu9opvQ
+	(envelope-from <netdev+bounces-286116-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 10:26:01 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05C1D4FE9A1
-	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 09:56:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 85CBE4FEA98
+	for <lists+netdev@lfdr.de>; Sat, 09 May 2026 10:25:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3B7BE3010B93
-	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 07:54:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7CED53011C44
+	for <lists+netdev@lfdr.de>; Sat,  9 May 2026 08:25:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DB42383C80;
-	Sat,  9 May 2026 07:54:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C7738A72A;
+	Sat,  9 May 2026 08:25:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J0rzUBvT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eCVVtO4G"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AB853537C7;
-	Sat,  9 May 2026 07:54:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59D2384231;
+	Sat,  9 May 2026 08:25:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778313280; cv=none; b=P5/c4ipWdQJoVK3/HidjMRRGZKdSHTGLsxxLXFnsei73NMppNqDh9QgQXfPmJvJc7o/UdDMLx692pdHABcRBvzyd+hJlShrEq3uMPxETQrOMmgMNbafsmRUlL3V48lRs5a9xHLmrpGxwlhc4fNAG8I4w6g/LwSbqJHXxJvr7Z50=
+	t=1778315157; cv=none; b=vEqQrkLmkIBHjNF7l4UaMw5ztF1+dkuOy9/4fJooY86EsmgdZYdlUNwpeCwQacgFWXHQalKjuaJjSt1ZAjXKHZ4/oBb8ifp+B6g4bGPTcY8xbsmke3XTtPAFu1AM1RywkZnYHnXg3SKVoCmO9aAYUZum87dM0DxwSYT6sOlDPlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778313280; c=relaxed/simple;
-	bh=zxyz8FDN5UzWDUVCt3tWqjRCa0K5HokRsZajA9FWsek=;
+	s=arc-20240116; t=1778315157; c=relaxed/simple;
+	bh=nczlNiIr/A9xdNyg6rE5uVSARRuTIZ7Uz1A5NFRANqE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LK0ioQUI9fytSqsNRQhqeCQz5vtZ74l/eqiuokIJujGle2GrWXOei40GCaZSQfmISnb0zf3vAA9ttVOuKzGJdk5jN2sCXvMzD+1V0saeEmhR2KVcRVd4V9rgoLWq5N7yI1Kl1yNz6iZbq4489+iA14iGkWHTeCSOrv67GMm+t3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J0rzUBvT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A89AC2BCB2;
-	Sat,  9 May 2026 07:54:39 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=mkCAf+4SYt6zLT0/uhfz1XkUzdDglsooBHAScfjXM82zapxp8NSb47E3S8AHVrCskoDpMUbl9AtWC/NNHcUo9xpArcsSkhh63oTl8loCVQ1Az2aAU4tht++VALMtCMSOH19Vijev4oCIMKISP+kazVgspuW+CLP48LkwIjVZL5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eCVVtO4G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 077A5C2BCB4;
+	Sat,  9 May 2026 08:25:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778313280;
-	bh=zxyz8FDN5UzWDUVCt3tWqjRCa0K5HokRsZajA9FWsek=;
+	s=k20201202; t=1778315157;
+	bh=nczlNiIr/A9xdNyg6rE5uVSARRuTIZ7Uz1A5NFRANqE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=J0rzUBvTmVfwTVwe7CTcEVYs2+fRAl+LvX7Voh1dmP5UGx4KZ+7xkZLgR0KsHByP+
-	 2WsukQoAQ2WdzXCU4g9J/XIFmPr7qwiCjTok/Sm0ctfGdPq+cW7YULTR7VRzbycW4r
-	 mMur2I3fBXKo7hwVWOelVhqGnK4icBPDEVBpgzN6Yng39xHunQM7WlHBCGZ6zvoTRd
-	 FGI9eRAYM6GEMIkRLRv0Q8S7gGxf75se8CG0mHWF5Xc0fx7y4H9m/ep+Fsr7VPmwzU
-	 YgvczEoW8dyerxHy0ZQGJwNYCBF0Y48vrtYZFeMJbDe//5a9QQ7fSwBklvWfXZzy1O
-	 kfVIjRHxOzBcw==
-Date: Sat, 9 May 2026 09:54:37 +0200
+	b=eCVVtO4GspLXm5oU2Y+5HmrgHaQiFURcpPBaQjKOGDVaLDRBN27A8bkvOo394mwtJ
+	 a6liRN/2eMOSZd7Df3DCnUreka/54xDgLu7tAQgtk9B3j//rIFq6oyH9gspoGn2BdC
+	 MWSo54itWTgPWgCNMmXHNez2IsZKTgvMY2K7hvh83lhaXIPQYBu91IFSyluwh+luiD
+	 +ZPIxUoKXYry1c6j30Ut5bhLHkeOmIxbPdhf7cuJXv11GTHNAN6rza+tR2/rC5ABwB
+	 v3TZ0LerSeoUsT4CB9hSHcMcH8CghGTX/VJ1QsgxDqrat8iP7iKHoHUf0G+xw9/n3p
+	 kHIu7Om+b2lTg==
+Date: Sat, 9 May 2026 10:25:54 +0200
 From: Lorenzo Bianconi <lorenzo@kernel.org>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
@@ -53,11 +53,11 @@ Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
 	benjamin.larsson@genexis.eu, linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
 	devicetree@vger.kernel.org, madhur.agrawal@airoha.com
-Subject: Re: [PATCH net-next v4 05/10] net: airoha: Move qos_sq_bmap in
- airoha_qdma struct
-Message-ID: <af7oPWp43eMDmolL@lore-desk>
-References: <20260507-airoha-eth-multi-serdes-v4-5-af613b61ae02@kernel.org>
- <20260509014609.3558041-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v4 07/10] net: airoha: Support multiple
+ net_devices for a single FE GDM port
+Message-ID: <af7vkpjEY5FhlEyc@lore-desk>
+References: <20260507-airoha-eth-multi-serdes-v4-7-af613b61ae02@kernel.org>
+ <20260509014611.3558060-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,10 +65,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Xd5dB8WzQ5hyc0ai"
+	protocol="application/pgp-signature"; boundary="YnCVD7Lr1XicTVN0"
 Content-Disposition: inline
-In-Reply-To: <20260509014609.3558041-1-kuba@kernel.org>
-X-Rspamd-Queue-Id: 05C1D4FE9A1
+In-Reply-To: <20260509014611.3558060-1-kuba@kernel.org>
+X-Rspamd-Queue-Id: 85CBE4FEA98
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.26 / 15.00];
 	SIGNED_PGP(-2.00)[];
@@ -82,7 +82,7 @@ X-Spamd-Result: default: False [-2.26 / 15.00];
 	MAILLIST(-0.15)[generic];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286115-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286116-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+,1:+,2:~];
@@ -103,185 +103,181 @@ X-Spamd-Result: default: False [-2.26 / 15.00];
 X-Rspamd-Action: no action
 
 
---Xd5dB8WzQ5hyc0ai
+--YnCVD7Lr1XicTVN0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On May 08, Jakub Kicinski wrote:
 > This is an AI-generated review of your patch. The human sending this
 > email has considered the AI review valid, or at least plausible.
 > ---
->     net: airoha: Move qos_sq_bmap in airoha_qdma struct
+> net: airoha: Support multiple net_devices for a single FE GDM port
 >=20
-> The change moves the HTB-offload channel-allocation bitmap from the
-> per-netdev airoha_gdm_port to the per-QDMA airoha_qdma, so sibling
-> netdevs attached to different QDMA blocks no longer clobber each other's
-> bitmap.
+> This commit introduces support for multiple net_devices connected to the
+> same Frame Engine (FE) GDM port (GDM3 or GDM4) via an external hardware
+> arbiter on EN7581 or AN7583 SoCs, and adds a get_dev_from_sport callback
+> to differentiate between the net_devices attached to each port.
 >=20
 > > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
 ernet/airoha/airoha_eth.c
-> > index 080705e2f58d..69a4c2e0d58b 100644
+> > index 786bc677af3c..0253919714e0 100644
 > > --- a/drivers/net/ethernet/airoha/airoha_eth.c
 > > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> > @@ -2600,7 +2600,7 @@ static int airoha_tc_htb_alloc_leaf_queue(struct =
-net_device *netdev,
-> >  	u32 rate =3D div_u64(opt->rate, 1000) << 3; /* kbps */
-> >  	int err, num_tx_queues =3D netdev->real_num_tx_queues;
-> >  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> > -	struct airoha_gdm_port *port =3D dev->port;
-> > +	struct airoha_qdma *qdma =3D dev->qdma;
+>=20
+> [ ... ]
+>=20
+> > @@ -3188,14 +3257,23 @@ static int airoha_probe(struct platform_device =
+*pdev)
 > > =20
-> >  	if (opt->parent_classid !=3D TC_HTB_CLASSID_ROOT) {
-> >  		NL_SET_ERR_MSG_MOD(opt->extack, "invalid parent classid");
-> > @@ -2627,7 +2627,7 @@ static int airoha_tc_htb_alloc_leaf_queue(struct =
-net_device *netdev,
-> >  		return err;
+> >  	for (i =3D 0; i < ARRAY_SIZE(eth->ports); i++) {
+> >  		struct airoha_gdm_port *port =3D eth->ports[i];
+> > -		struct airoha_gdm_dev *dev;
+> > +		int j;
+> > =20
+> >  		if (!port)
+> >  			continue;
+> > =20
+> > -		dev =3D port->dev;
+> > -		if (dev && dev->dev->reg_state =3D=3D NETREG_REGISTERED)
+> > -			unregister_netdev(dev->dev);
+> > +		for (j =3D 0; j < ARRAY_SIZE(port->devs); j++) {
+> > +			struct airoha_gdm_dev *dev =3D port->devs[j];
+> > +			struct net_device *netdev;
+> > +
+> > +			if (!dev)
+> > +				continue;
+> > +
+> > +			netdev =3D dev->dev;
+> > +			of_node_put(netdev->dev.of_node);
+> > +			if (netdev->reg_state =3D=3D NETREG_REGISTERED)
+> > +				unregister_netdev(netdev);
+> > +		}
+> >  		airoha_metadata_dst_free(port);
 > >  	}
-> > =20
-> > -	set_bit(channel, port->qos_sq_bmap);
-> > +	set_bit(channel, qdma->qos_sq_bmap);
-> >  	opt->qid =3D AIROHA_NUM_TX_RING + channel;
-> > =20
-> >  	return 0;
+> >  	airoha_hw_cleanup(eth);
 >=20
-> [High]
-> Now that qos_sq_bmap is per-QDMA, can two sibling netdevs that share the
-> same QDMA block collide on allocation?  On EN7581, GDM2/GDM3/GDM4 all
-> select the same qdma pointer via:
+> [Medium]
+> Is the ordering of of_node_put() and unregister_netdev() here correct?
 >=20
->     drivers/net/ethernet/airoha/airoha_eth.c:
->         /* QDMA0 is used for lan ports while QDMA1 is used for WAN ports =
-*/
->         dev->qdma =3D &eth->qdma[!airoha_is_lan_gdm_dev(dev)];
+> airoha_alloc_gdm_device() now does:
 >=20
-> and airoha_is_lan_gdm_dev() returns true only for port->id =3D=3D 1, so
-> every non-LAN GDM netdev resolves to eth->qdma[1] and shares
-> qdma->qos_sq_bmap.
+> 	netdev->dev.of_node =3D of_node_get(np);
 >=20
-> The allocation path does not test the bit before setting it:
+> so the netdev holds its own reference to the of_node for its entire
+> registered lifetime. In this error unwind the of_node_put() runs before
+> unregister_netdev(), and netdev->dev.of_node is not cleared, so any
+> subsequent access to netdev->dev.of_node during unregistration (netdev
+> notifiers, sysfs, overlay-aware code) would be looking at a node whose
+> reference count has already been dropped.
 >=20
->     channel =3D TC_H_MIN(opt->classid) % AIROHA_NUM_QOS_CHANNELS;
->     ...
->     set_bit(channel, qdma->qos_sq_bmap);
->     opt->qid =3D AIROHA_NUM_TX_RING + channel;
+> Other drivers (e.g., drivers/net/ethernet/hisilicon/hns/hns_enet.c in
+> hns_nic_dev_remove()) put the node only after unregister_netdev().
 >=20
-> If two sibling netdevs on the same QDMA pick classids whose TC_H_MIN
-> maps to the same channel, both airoha_qdma_set_tx_rate_limit() calls
-> program the same HW TRTCM egress slot, the later caller silently
-> overwrites the earlier configuration, and both netdevs receive the same
-> opt->qid.  Should this path use test_and_set_bit() (or similar owner
-> tracking) to reject a channel already owned by a sibling netdev?
+> Would swapping the order to call unregister_netdev() first, then
+> of_node_put(), be more appropriate here?
 
-ack, I think we should move qos_sq_bmap in airoha_gdm_dev struct and track =
-if a
-shared qdma qos channel is already in use. I will fix it in v5.
+ack, I will fix it in v5.
 
 >=20
-> > @@ -2811,11 +2811,11 @@ static int airoha_dev_setup_tc_block(struct net=
-_device *dev,
-> >  static void airoha_tc_remove_htb_queue(struct net_device *netdev, int =
-queue)
-> >  {
-> >  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> > -	struct airoha_gdm_port *port =3D dev->port;
-> > +	struct airoha_qdma *qdma =3D dev->qdma;
+> > @@ -3216,14 +3294,22 @@ static void airoha_remove(struct platform_devic=
+e *pdev)
 > > =20
-> >  	netif_set_real_num_tx_queues(netdev, netdev->real_num_tx_queues - 1);
-> >  	airoha_qdma_set_tx_rate_limit(netdev, queue + 1, 0, 0);
-> > -	clear_bit(queue, port->qos_sq_bmap);
-> > +	clear_bit(queue, qdma->qos_sq_bmap);
-> >  }
->=20
-> [High]
-> airoha_tc_remove_htb_queue() operates unconditionally on the caller's
-> netdev but clears a bit that may be owned by a sibling netdev on the
-> same QDMA.  The effects that follow look like cross-netdev interference:
->=20
->   - netif_set_real_num_tx_queues(netdev, real_num_tx_queues - 1)
->     decrements the caller's tx-queue count for a queue it never
->     allocated, and its return value is discarded (eventually the txq<1
->     EINVAL guard in netif_set_real_num_tx_queues() will trip silently).
->=20
->   - airoha_qdma_set_tx_rate_limit(netdev, queue + 1, 0, 0) zeros the
->     egress TRTCM rate-limit registers for a channel that the sibling
->     netdev still considers active.
->=20
->   - clear_bit(queue, qdma->qos_sq_bmap) then hides the channel from the
->     legitimate owner's later test_bit() checks.
-
-This issue will be fixed by the change described above. I will fix it in v5.
-
->=20
-> > @@ -2838,10 +2838,10 @@ static int airoha_tc_htb_delete_leaf_queue(stru=
-ct net_device *netdev,
-> >  static int airoha_tc_htb_destroy(struct net_device *netdev)
-> >  {
-> >  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> > -	struct airoha_gdm_port *port =3D dev->port;
-> > +	struct airoha_qdma *qdma =3D dev->qdma;
-> >  	int q;
+> >  	for (i =3D 0; i < ARRAY_SIZE(eth->ports); i++) {
+> >  		struct airoha_gdm_port *port =3D eth->ports[i];
+> > -		struct airoha_gdm_dev *dev;
+> > +		int j;
 > > =20
-> > -	for_each_set_bit(q, port->qos_sq_bmap, AIROHA_NUM_QOS_CHANNELS)
-> > +	for_each_set_bit(q, qdma->qos_sq_bmap, AIROHA_NUM_QOS_CHANNELS)
-> >  		airoha_tc_remove_htb_queue(netdev, q);
+> >  		if (!port)
+> >  			continue;
 > > =20
-> >  	return 0;
-> >  }
+> > -		dev =3D port->dev;
+> > -		if (dev)
+> > -			unregister_netdev(dev->dev);
+> > +		for (j =3D 0; j < ARRAY_SIZE(port->devs); j++) {
+> > +			struct airoha_gdm_dev *dev =3D port->devs[j];
+> > +			struct net_device *netdev;
+> > +
+> > +			if (!dev)
+> > +				continue;
+> > +
+> > +			netdev =3D dev->dev;
+> > +			of_node_put(netdev->dev.of_node);
+> > +			unregister_netdev(netdev);
+> > +		}
+> >  		airoha_metadata_dst_free(port);
+> >  	}
+> >  	airoha_hw_cleanup(eth);
 >=20
-> [High]
-> Does airoha_tc_htb_destroy() now walk bits owned by sibling netdevs?
-> The iteration no longer filters by owning netdev:
->=20
->     for_each_set_bit(q, qdma->qos_sq_bmap, AIROHA_NUM_QOS_CHANNELS)
->         airoha_tc_remove_htb_queue(netdev, q);
->=20
-> Previously each netdev had a private bitmap, so destroy could only
-> touch its own channels.  After this change, tearing down HTB on one
-> GDM netdev appears to remove channels and clear rate-limit HW state
-> belonging to every sibling GDM netdev on the same QDMA.  A subsequent
-> tc-htb delete or get on the legitimate owner then hits:
->=20
->     if (!test_bit(channel, qdma->qos_sq_bmap)) {
->         NL_SET_ERR_MSG_MOD(opt->extack, "invalid queue id");
->         return -EINVAL;
->     }
->=20
-> Should the bitmap track the owning netdev alongside the bit (for
-> example a per-channel owner pointer, or a per-netdev sub-bitmap inside
-> airoha_qdma), so that destroy/delete can only touch channels owned by
-> the caller?
+> [Medium]
+> Same question in airoha_remove(): the of_node_put() fires before
+> unregister_netdev(), while netdev->dev.of_node is still assigned. Would
+> this be safer with the unregister first and the put afterwards?
 
-This issue will be fixed by the change described above. I will fix it in v5.
+ack, I will fix it in v5.
+
+>=20
+> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/eth=
+ernet/airoha/airoha_eth.h
+> > index 3e93919a175c..207c75152fde 100644
+> > --- a/drivers/net/ethernet/airoha/airoha_eth.h
+> > +++ b/drivers/net/ethernet/airoha/airoha_eth.h
+>=20
+> [ ... ]
+>=20
+> > @@ -542,14 +543,15 @@ struct airoha_qdma {
+> >  struct airoha_gdm_dev {
+> >  	struct airoha_gdm_port *port;
+> >  	struct airoha_qdma *qdma;
+> > -	struct net_device *dev;
+> >  	struct airoha_eth *eth;
+> > +	struct net_device *dev;
+> > +
+> > +	int nbq;
+> >  };
+> > =20
+> >  struct airoha_gdm_port {
+> > -	struct airoha_gdm_dev *dev;
+> > +	struct airoha_gdm_dev *devs[AIROHA_MAX_NUM_GDM_DEVS];
+> >  	int id;
+> > -	int nbq;
+> > =20
+> >  	struct airoha_hw_stats stats;
+>=20
+> [Medium]
+> With multiple airoha_gdm_dev instances now sharing a single
+> airoha_gdm_port, do the per-netdev statistics need to become per-netdev
+> rather than per-port?
+>=20
+> airoha_dev_get_stats64(), airoha_ethtool_get_mac_stats() and
+> airoha_ethtool_get_rmon_stats() all read from dev->port->stats, and the
+> underlying hardware counters at REG_FE_GDM_*_CNT(port->id) are per-GDM
+> port rather than per-netdev. When two netdevs share a port (for example
+> PCIE0/PCIE1 on EN7581 GDM3, or ETH/USB on GDM4), both netdevs would
+> report identical port-wide counters via rtnl_link_stats64 (ip -s link
+> show) and via the get_eth_mac_stats/get_rmon_stats ethtool callbacks,
+> and summing across the two netdevs would double-count.
+>=20
+> Would it make sense to maintain per-netdev software counters in the
+> xmit/RX paths for the multi-dev case so each netdev reports its own
+> traffic through the standard uAPI?
+
+We have already a separated patch to address this issue that is not part of=
+ the
+series. I will add it to the v5 in the next iteration.
 
 Regards,
 Lorenzo
 
->=20
-> > @@ -2852,9 +2852,9 @@ static int airoha_tc_get_htb_get_leaf_queue(struc=
-t net_device *netdev,
-> >  {
-> >  	u32 channel =3D TC_H_MIN(opt->classid) % AIROHA_NUM_QOS_CHANNELS;
-> >  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> > -	struct airoha_gdm_port *port =3D dev->port;
-> > +	struct airoha_qdma *qdma =3D dev->qdma;
-> > =20
-> > -	if (!test_bit(channel, port->qos_sq_bmap)) {
-> > +	if (!test_bit(channel, qdma->qos_sq_bmap)) {
-> >  		NL_SET_ERR_MSG_MOD(opt->extack, "invalid queue id");
-> >  		return -EINVAL;
-> >  	}
-
---Xd5dB8WzQ5hyc0ai
+--YnCVD7Lr1XicTVN0
 Content-Type: application/pgp-signature; name=signature.asc
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaf7oPQAKCRA6cBh0uS2t
-rN3RAQCwaawlr2yErx3LmHhe0E+rMXHt3D2fiJwpOoWIsi7hiQEAi8DO4s7DF7IM
-P/IEb6FGOSDFfHmE1ucbwpvLwHIbngg=
-=tFrn
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaf7vkgAKCRA6cBh0uS2t
+rNx6AP4vp7fBv+mMgpov4j4sMb2X2lfK18z7Rdr86kjr3iuVkQEA2v2JFYUsriWf
+RBzOd9kloGcV9h2okyFY1MsyXDH1uAY=
+=LwTq
 -----END PGP SIGNATURE-----
 
---Xd5dB8WzQ5hyc0ai--
+--YnCVD7Lr1XicTVN0--
 
