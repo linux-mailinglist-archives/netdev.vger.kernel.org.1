@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-286393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286394-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sO7UHRrdAGoZNwEAu9opvQ
-	(envelope-from <netdev+bounces-286393-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:31:38 +0200
+	id cMt8ECzdAGoZNwEAu9opvQ
+	(envelope-from <netdev+bounces-286394-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:31:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D6C650600B
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:31:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E157D506021
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:31:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8CDFE3035B45
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 19:29:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A2D07303850B
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 19:29:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA200336EC0;
-	Sun, 10 May 2026 19:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7A93375CB;
+	Sun, 10 May 2026 19:29:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k6P+tnmM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Exp2onsj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7AF632B981;
-	Sun, 10 May 2026 19:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF7432D7C7;
+	Sun, 10 May 2026 19:29:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778441353; cv=none; b=WHgeVakbnI412ycSE1gI0qHcIKuI8IYDbUTqxIFX5kkEwGDbgNx4m0QgbU54yOvJkglniR92PFAPvUaikd9YSGqKFfd6erWPGhqUnnxvdbK6iAEtEl5FD1+Y1X0/hi5Q79F7Ef2bjt1GO7JUjovoNn6rDaWI58LscaXU+vl6FlA=
+	t=1778441354; cv=none; b=tOh4OLJtBrp0FFAE3cBLjxHRbG5A8QflIQHfIvVkHX0OaGDMgLUYRKvqqrHfq5lHxcHldI0yTjalW7wp4//6LfGi9eS0UeUFjNQcER0dZK5077Vicw9bqz2qffMwfKcUjpx9lWd9QMudLxk/dbtf3C4XV9qDMG85y+/nMwBgz6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778441353; c=relaxed/simple;
-	bh=JvNyEbh41HYFaOv4iFYiw4mAj3tBYLXtwmQhcwABHqY=;
+	s=arc-20240116; t=1778441354; c=relaxed/simple;
+	bh=Hovv7eLgCFdgedOgffl8VWtqHbYiTBVjbvkid2QLs6Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N//0y8StAEtRSRI+LtkSPU/2y3TMQH0BrJB5rGTnIy1hYheymCgg5lJno+7BmUyCBRJCEj4rz19apHA6bWXzUAE85c5bo45LNCLJo3uTDIPbOcAguBrWYuhOtXPssCccsBr3wIn26D6U25v+KxQfWPIIH0Z08q/w2Ak/z2iCKxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k6P+tnmM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C74FC2BCFD;
+	 MIME-Version; b=XdJ0LDNioI/IDa3V0YPF1x1uRbdRmeDi9+D5qpke+33XVXi2I6XjaYTf+CSh0qxexJj01U8c17RGK3D9lWLaZ/xEu2eJG/evjHjxS08a9pwmzELFkk14q4TnywFNPAeI5pFCBRJGlNCR9ReuIaNBxJJH8tRHQjx3TMg+Q0noNDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Exp2onsj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C61A4C2BCC7;
 	Sun, 10 May 2026 19:29:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778441353;
-	bh=JvNyEbh41HYFaOv4iFYiw4mAj3tBYLXtwmQhcwABHqY=;
+	s=k20201202; t=1778441354;
+	bh=Hovv7eLgCFdgedOgffl8VWtqHbYiTBVjbvkid2QLs6Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=k6P+tnmMR8SQOOm+EhDyZ1ulF5b6FFYb+iC6pfA/TKeZPWXGLF7PkAXUFBLI5Iqhy
-	 QRD86UmugBMEI+3rs+u+i0xHKEVDyp40BOckHlp3UVpfLgJ7RW2CgyhS0Xt7oUaQ52
-	 KEUBdFIXtsvUZBAmB09P3iPxax2TYuaD29AXFoXKL2/L8+1HtqtZEvbNSwKSNpyezz
-	 hWnXdkwZHzEt+can+sc5qGoG/BdXtRJXT6wotvlcN4HM4DNENZbE7f4xyZqbmOEwkq
-	 hQiwwR2P5uDmqVpbeFgsU/7b3//1/uHmt2XNPTXQcMz4t+awgB9OMoGCbUnOkyZqkB
-	 JE0YK+NszDFyg==
+	b=Exp2onsj4vXn4+plK3DjzPG6Zu9bblJP4XojLI8mZcum0m1bS3EKH5jQCN9xE7nGb
+	 at3G8ZrcCADhIZYb2fye16OJvgxZALt6gaOn9Xb6s6gC8UEgssE7ofJU0pgT4/D5US
+	 jAzpd6xR9pfhI7gwFw/tjg4r2nuPLrX6A6zhmGG7SvA4dyK5Bb+EZ+35yEf55jYRBV
+	 M1uaaPMPgDAMz9ZWvUgBIT3eA+4G8aQD9GVIm8Opg94uacG9BropAIdA/YxngCwHeq
+	 uZLEEf7dn/xX9HyI32eBmTRoD7bGQLKQ3BeIPW/nhMiSM3YrjI4HWd4v6GYhysms4X
+	 XShbzRcxo8GXg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -54,9 +54,9 @@ Cc: netdev@vger.kernel.org,
 	shuah@kernel.org,
 	linux-kselftest@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net v2 09/10] net: shaper: enforce singleton NETDEV scope with id 0
-Date: Sun, 10 May 2026 12:29:03 -0700
-Message-ID: <20260510192904.3987113-10-kuba@kernel.org>
+Subject: [PATCH net v2 10/10] net: shaper: reject QUEUE scope handle with missing id
+Date: Sun, 10 May 2026 12:29:04 -0700
+Message-ID: <20260510192904.3987113-11-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260510192904.3987113-1-kuba@kernel.org>
 References: <20260510192904.3987113-1-kuba@kernel.org>
@@ -67,7 +67,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 0D6C650600B
+X-Rspamd-Queue-Id: E157D506021
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -75,7 +75,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -84,9 +84,9 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286393-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286394-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
@@ -99,37 +99,46 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-The NETDEV scope represents a singleton root shaper in the per-device
-hierarchy.  All code assumes NETDEV shapers have id 0:
-net_shaper_default_parent() hardcodes parent->id = 0 when returning
-the NETDEV parent for QUEUE/NODE children, and the UAPI documentation
-describes NETDEV scope as "the main shaper" (singular, not plural).
+net_shaper_parse_handle() does not enforce that the user provides
+the handle ID. For NODE the ID defaults to UNSPEC for all other
+cases it defaults to 0.
 
-Make sure we reject non-0 IDs.
+For NETDEV 0 is the only option. For QUEUE defaulting to 0 makes
+less intuitive sense. Specifically because the behavior should
+(IMHO) be the same for all cases where there may be more than
+one ID (QUEUE and NODE).
+
+We should either document this as intentional or reject.
+I picked the latter with no strong conviction.
 
 Fixes: 4b623f9f0f59 ("net-shapers: implement NL get operation")
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/shaper/shaper.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ net/shaper/shaper.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/net/shaper/shaper.c b/net/shaper/shaper.c
-index eb049847fed6..4ae3ee6764a0 100644
+index 4ae3ee6764a0..b1c65110f04d 100644
 --- a/net/shaper/shaper.c
 +++ b/net/shaper/shaper.c
-@@ -482,6 +482,12 @@ static int net_shaper_parse_handle(const struct nlattr *attr,
- 	else if (handle->scope == NET_SHAPER_SCOPE_NODE)
+@@ -477,10 +477,15 @@ static int net_shaper_parse_handle(const struct nlattr *attr,
+ 	 * shaper (any other value).
+ 	 */
+ 	id_attr = tb[NET_SHAPER_A_HANDLE_ID];
+-	if (id_attr)
++	if (id_attr) {
+ 		id = nla_get_u32(id_attr);
+-	else if (handle->scope == NET_SHAPER_SCOPE_NODE)
++	} else if (handle->scope == NET_SHAPER_SCOPE_NODE) {
  		id = NET_SHAPER_ID_UNSPEC;
- 
-+	if (id && handle->scope == NET_SHAPER_SCOPE_NETDEV) {
-+		NL_SET_ERR_MSG_ATTR(info->extack, id_attr,
-+				    "Netdev scope is a singleton, must use ID 0");
++	} else if (handle->scope == NET_SHAPER_SCOPE_QUEUE) {
++		NL_SET_ERR_ATTR_MISS(info->extack, attr,
++				     NET_SHAPER_A_HANDLE_ID);
 +		return -EINVAL;
 +	}
-+
- 	handle->id = id;
- 	return 0;
- }
+ 
+ 	if (id && handle->scope == NET_SHAPER_SCOPE_NETDEV) {
+ 		NL_SET_ERR_MSG_ATTR(info->extack, id_attr,
 -- 
 2.54.0
 
