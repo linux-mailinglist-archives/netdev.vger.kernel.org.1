@@ -1,194 +1,127 @@
-Return-Path: <netdev+bounces-286273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286274-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QLDkEVxeAGoGHgEAu9opvQ
-	(envelope-from <netdev+bounces-286273-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 12:30:52 +0200
+	id 4KCBEVdiAGq4IAEAu9opvQ
+	(envelope-from <netdev+bounces-286274-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 12:47:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A56B9503A18
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 12:30:51 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE763503A67
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 12:47:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AEE34300CC3D
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 10:30:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3D60B300383B
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 10:47:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B1A530F927;
-	Sun, 10 May 2026 10:30:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8409436EA9A;
+	Sun, 10 May 2026 10:47:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="I0h4ExgF";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="YskLV+lx"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="J9BzUyLY"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80804175A84;
-	Sun, 10 May 2026 10:30:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1AD634AB14
+	for <netdev@vger.kernel.org>; Sun, 10 May 2026 10:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778409048; cv=none; b=SZDFq2BoD02+hu0SacJJkbH0ywUMbP/o1ZUmRtiQfk9MIIfN9wYazZMRQfezPhERDyE52JrkVQ0bKiwI6iphY4xm+iyMF0VozcMUQA/6cIZVLu+qkpSCCjg99GJYSdeZrSw32V85T43ugV1OoC5KdnpNEDTpcCsqWvn9kkdsS4w=
+	t=1778410064; cv=none; b=kRLPSLgLcmkGp/ppFsg5FOdYNM3SDzRDla3rfqp+qKY8SgfkAikXhTY9fLzt/zE6Mzy4wjnB6ogVzN4yoF9kWVV7FVvarYyOcibDkbZiOf/XWdrIk/lNzkak2s2c7/bh5ZrNnJimClHNj2yP+jckRccFDCVrLpBi2EDqkAzvsIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778409048; c=relaxed/simple;
-	bh=OJnBXpHy0TCpQ0bHlfRGGQ5W9rEzuI/g/UlwGVFxAf8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PGMi1D7ptrPkcY6HF57OCM4mk2nqzR+aFhwAOiqTjH7YHXe0CJPfXHCLbRsPCVNI3p+UmZ9f1xm6rku0BfXb6gYLMnlgTT+hoIO3BK9rNHFnBDf1m5iswyuCti0uWWdcA4icHEeXE+2TK0BFhCrFMIdwD30xDgpqputDEWr10SY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=I0h4ExgF; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=YskLV+lx; arc=none smtp.client-ip=202.12.124.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.stl.internal (Postfix) with ESMTP id 377341D000B8;
-	Sun, 10 May 2026 06:30:44 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Sun, 10 May 2026 06:30:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:message-id:mime-version:reply-to
-	:subject:subject:to:to; s=fm2; t=1778409044; x=1778495444; bh=aJ
-	91xONVsconoGapjJtB3qYAf0KS5nMi+X1jF2T7ZUE=; b=I0h4ExgFvtxOYP9WEe
-	xA9HtpHWHz9OmJxjZ9PSRBaMA1b53QfNatkeQjroOhWKYZuyDVtKjuS5ZoEWCCkZ
-	WGJ+VNVfNkrVSysvsU8Zi2VG0z0zz7HmL5foQyzHFsjjp4z+kRyaig8M4QA9/tRA
-	CNH8YNXjgPWx21iBIQNKTfHEJeBELy2ZBSyfWSRurlt/MxEvAn8U0FVWCScgVDqM
-	bopwpRL6hyLhg2URtCNbptcko+DdhAbdx6md1ycnxRB+4tof5h/Rj3UPt/4aWYS8
-	NJt0tvFxc8EbxU6LgB14cTp7phBp4U3g/C/X7peyH5x+TaoW6vbyA3UDuk+qaXD9
-	u8XA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1778409044; x=1778495444; bh=aJ91xONVsconoGapjJtB3qYAf0KS
-	5nMi+X1jF2T7ZUE=; b=YskLV+lxS4dJnkLMzW5yaZyjBxpZ80x8//lB5F7J/KAQ
-	Ia6nkqH4q6ugNockIpPZwhGYK2wbeTuuHQEuH/mGY3C+2WFydO9O3NXj9HEbcUzQ
-	MBIkK33JsvL85CRKSsrdlOgRSvkoBHSD5uqmq6jw/0K8wUyDx2oHKzufFiRugtO4
-	EZDS2F5Vx4XzAjk0ljchBXZNK8d1ort8OBiNb9iug50yivsZNHmxnhb+XtlXz8a3
-	6WU9XT0ywIbu/zB608fgjtqPXvq9C3tgiAPyVXv8nKiIVAVAChL89AMklvJvWsaQ
-	wpPi2tOikpa2JOhXn46kXtj4RJOHZ2FhsKAUrIA0xA==
-X-ME-Sender: <xms:VF4Aajmj4LQy5SHVc6trQFMnqgqsMEswq0qqQGnThV0YodC7Hir-Mg>
-    <xme:VF4AatVURCITFUCfsGZbKCbom7J0nwssk0i02k_OMm0nnuMppCFNCqtY-OKwud90x
-    jpZE06tnJXUBveQ7UonssLHwoK3eYT7b2SALA8sWH4pqzNrVBZdQo0>
-X-ME-Received: <xmr:VF4AanqHlX4RoS8pv5tgotyNemC5SmethwpWznC3PsTGlqo5oesy98mw71KcBzx4B5jGhVdPqbtDtYnF8i1IeE2Ept6HTrqb8NZN>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduudehkeeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhephffvvefufffkofggtgfgsehtkeertdertdejnecuhfhrohhmpefpihhklhgrshcu
-    ufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnhgvshgrsh
-    esrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpefhgefhveeghfetudeh
-    fffhjeeileehkedvveffuddtleegudegjeeufeefvefftdenucffohhmrghinhepkhgvrh
-    hnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhf
-    rhhomhepnhhikhhlrghsrdhsohguvghrlhhunhgusehrrghgnhgrthgvtghhrdhsvgdpnh
-    gspghrtghpthhtohepudefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehprghu
-    lhesphgsrghrkhgvrhdruggvvhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvse
-    hluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdp
-    rhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkh
-    husggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrght
-    rdgtohhmpdhrtghpthhtohephihoshhhihhhihhrohdrshhhihhmohgurgdruhhhsehrvg
-    hnvghsrghsrdgtohhmpdhrtghpthhtohepghgvvghrtheslhhinhhugidqmheikehkrdho
-    rhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:VF4AauWWhPt-kxuHJPd6QaoUIPfvhoWAXqY-mu7ej72nsgJkY_fKzA>
-    <xmx:VF4AaoHgD2LFkCLK3VUwK6-dVhig5OPG3zYImKgWA37bBxhNxpyaDg>
-    <xmx:VF4AalBwKHemkIDsY00vcPx48vRfFRZquoptsVOplq5M6JqOr3OS5A>
-    <xmx:VF4Aaqz_VsKq32xG452hgq3EWDbHDBBoIiMbeOsXCty2L9MaCsAM4A>
-    <xmx:VF4AagVr3zgvlxRiGG6P_eub8PgRvfDZQI5T6MgKOvJqYAFqfViUg5Zl>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 10 May 2026 06:30:43 -0400 (EDT)
-From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Paul Barker <paul@pbarker.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1778410064; c=relaxed/simple;
+	bh=TItSsgo6xk+A+nS+xKDE670mrpC2vv49TvVJ4oJCwlM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bPkMB+bIaLlmUUtCh+ypHVOQrIMADCygiAOiJYXL5HIKZ1csxbZ7WqZzEzuXPOefq1lzCymFeec2vLdkSx4SpGMVjgmViYLEBpfs93t6e1pJmZrDXvgNg54p65MdB3TrRV690AhsDJ9sVFddlr2j0Nh6/x4dVHmC+3OsoGT5mDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=J9BzUyLY; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Sun, 10 May 2026 12:47:24 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1778410049;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=u4Pzr0iNwGtAMfR8p6Nf/I699yHeqKq0hYur9yHLEUg=;
+	b=J9BzUyLYpergVOZqFXjwm3zUjZBK1n4RkTHIQtTJoBEt2yYnGmOF+X9WsJALlZhOYRzeb/
+	IQHhnD3UMa3mS2xFW83AIbwz9+x7+rw54cOVwn7nLRmzcSrUAgKG76NhSlmO67KC9GrrlT
+	52/8c3djOd6TftdBYjgB6YKQorpzPFk=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Jarkko Sakkinen <jarkko@kernel.org>
+Cc: David Howells <dhowells@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Cc: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Sai Krishna <saikrishnag@marvell.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [next-next,v2] net: ethernet: ravb: Do not check URAM suspension when WoL is active
-Date: Sun, 10 May 2026 12:30:17 +0200
-Message-ID: <20260510103017.613773-1-niklas.soderlund+renesas@ragnatech.se>
-X-Mailer: git-send-email 2.54.0
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Tim Bird <tim.bird@sony.com>, keyrings@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/2] KEYS: annotate struct user_key_payload
+ with __counted_by
+Message-ID: <agBiPEJZhWHydwuz@linux.dev>
+References: <20260427114422.313356-3-thorsten.blum@linux.dev>
+ <20260427114422.313356-4-thorsten.blum@linux.dev>
+ <af8ZUXn4uStU_vs5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: A56B9503A18
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <af8ZUXn4uStU_vs5@kernel.org>
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: DE763503A67
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ragnatech.se,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[ragnatech.se:s=fm2,messagingengine.com:s=fm3];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286273-lists,netdev=lfdr.de,renesas];
-	DKIM_TRACE(0.00)[ragnatech.se:+,messagingengine.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286274-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[niklas.soderlund@ragnatech.se,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[thorsten.blum@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,renesas];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:email,glider.be:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:email,linux.dev:mid,linux.dev:dkim]
 X-Rspamd-Action: no action
 
-When updating the driver to match latest datasheet to suspend access to
-URAM when suspending DMA transfers a corner-case was missed, URAM access
-will not be suspended if WoL is enabled. This lead to the error message
-(correctly) being triggered as URAM access is not suspended even tho
-it's requested as part of stopping DMA.
+On Sat, May 09, 2026 at 02:24:01PM +0300, Jarkko Sakkinen wrote:
+> On Mon, Apr 27, 2026 at 01:44:24PM +0200, Thorsten Blum wrote:
+> > Add the __counted_by() compiler attribute to the flexible array member
+> > 'data' to improve bounds checking via CONFIG_UBSAN_BOUNDS and
+> > CONFIG_FORTIFY_SOURCE.
+> > 
+> > Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> 
+> This is again a crippled commit message.
+> 
+> I.e. this requires either knowing, remembering and/or cross-referencing
+> "bunch of" unrelated to keyring.
 
-Avoid checking if URAM access is suspended and printing the error
-message if WoL is enabled when we suspend the system, as we know it will
-not be.
+I kept the commit message short because it follows the same pattern as
+many other __counted_by() patches that have been accepted across several
+subsystems.
 
-Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Closes: https://lore.kernel.org/all/CAMuHMdWnjV%3DHGE1o08zLhUfTgOSene5fYx1J5GG10mB%2BToq8qg@mail.gmail.com/
-Fixes: 353d8e7989b6 ("net: ethernet: ravb: Suspend and resume the transmission flow")
-Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-Reviewed-by: Sai Krishna <saikrishnag@marvell.com>
-Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
- drivers/net/ethernet/renesas/ravb_main.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+I'm not sure which part of the message you want expanded. Could you be
+more specific?
 
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 1dbfadb2a881..5f88733094d0 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -1108,9 +1108,12 @@ static int ravb_stop_dma(struct net_device *ndev)
- 
- 	/* Request for transmission suspension */
- 	ravb_modify(ndev, CCC, CCC_DTSR, CCC_DTSR);
--	error = ravb_wait(ndev, CSR, CSR_DTS, CSR_DTS);
--	if (error)
--		netdev_err(ndev, "failed to stop AXI BUS\n");
-+	/* Access to URAM will not be suspended if WoL is enabled. */
-+	if (!priv->wol_enabled) {
-+		error = ravb_wait(ndev, CSR, CSR_DTS, CSR_DTS);
-+		if (error)
-+			netdev_err(ndev, "failed to stop AXI BUS\n");
-+	}
- 
- 	/* Stop AVB-DMAC process */
- 	return ravb_set_opmode(ndev, CCC_OPC_CONFIG);
--- 
-2.54.0
-
+Thanks,
+Thorsten
 
