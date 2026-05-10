@@ -1,181 +1,205 @@
-Return-Path: <netdev+bounces-286405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286406-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4F2yI5X8AGrIPQEAu9opvQ
-	(envelope-from <netdev+bounces-286405-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 23:45:57 +0200
+	id QJxXMFf/AGolPgEAu9opvQ
+	(envelope-from <netdev+bounces-286406-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 23:57:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C5075068D6
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 23:45:56 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1FEB5069B1
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 23:57:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 85323300566A
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:45:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 076FF3001A7E
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:57:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D50A332B981;
-	Sun, 10 May 2026 21:45:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ericsson.com header.i=@ericsson.com header.b="YsR2+Gxb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB0F234D4FE;
+	Sun, 10 May 2026 21:57:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010042.outbound.protection.outlook.com [52.101.69.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f77.google.com (mail-oo1-f77.google.com [209.85.161.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731E628C854;
-	Sun, 10 May 2026 21:45:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778449554; cv=fail; b=RgWZYeBUG48NtxTVrdbDkE9J5jNZnA+hjdca34G9TtELn6S7R+63Szj93ziktKvkoxyKGnam8nlzLkGlB6YTfme1vZOR0JWgqkyBEALzTQa2TmohHZ/U7N2lVzcl+OxHhlplk1+rT1VE0Rc5nnlJWeJ9tIwxp+izT1upF7JDf28=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778449554; c=relaxed/simple;
-	bh=r6GqMz98yy33RK7RpKUFTaG9rx2ShHKgSKsplT2ewrE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=teDK6qJxSWhlRPzQajaSNPsX92QHxf8c3uIkJaX2JHI1haucXL+PUdh+Qa0Pd0qEFCD91ZI4uw1avKmyHGljUXXm+EUuqhrDnRmCjF6WSEQzFhFa7LWu/f2fpSL9YpkfFu7eRvwP5Lb7r6iu/jDenWQNNjkZM2PLnrzDaPC5f6w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ericsson.com; spf=pass smtp.mailfrom=ericsson.com; dkim=pass (2048-bit key) header.d=ericsson.com header.i=@ericsson.com header.b=YsR2+Gxb; arc=fail smtp.client-ip=52.101.69.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ericsson.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ericsson.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kIT7HTVEprRP4WlI59q26RDKV5SixFQIToiR/NSfCh/AF4efFbMTX5+ZKAyTMYBn8cFjygEJwA+3xyrGERoLack2wC8QCIW/Qk75tDcD16xz5JOVVLlBaZBJJ2zJgm+A14O/BWEXMYtqq1lc+kvjtYWBtyXPNvwf+8PC5ElOCvtxf8e/pcrMLJNYLwTrS7XrVp5NcgCm7Cp2jDX0q9SHB8yng9bRcx226AslyOTURseutRMkTErRvxMrO1yR9j5l0tj07gYbbx35gqAG3HxeLkqXCp7IyG3tm1DpaHGW1bdPjSanyb3SWxjT2kThVlj4etdLwJ/hIPH35q6fIO7IHg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qthZ/2PdiNxc0mlRiDlMuDWCsQMLw4F39hdBFGLwKMI=;
- b=JmsNP1nJjGFknuFk8p/1oO4dfL67ja1ZumZlYzwzkAOL8z271fr4GGby1iEqbIhjmUoLl270DLlMvFUx1OJT9h68KR/W5DVj7xfq/ViWmk3YnJ/dkc0pD6GSFT6W+W6F4E2t6Wn/qdZYm+ECLABLhY38sljPJebKeAkk3obl+lo/3REtgGu14zTzhUbkMY3Jcy14DZzJTCMbpt5HoBMU+7cx2kq4Yd2Kl5EbLDKVwjGLbiMjOiQFqCwJqzfk3OFv++4bGsfw+sUtthKgVLZKEGOnkuYlkU/sENKuK6AOh7HejBxKacl7IEOe5uN83FOJeEl39DUT1zxJGMN+eMFh2w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 192.176.1.74) smtp.rcpttodomain=davemloft.net smtp.mailfrom=ericsson.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=ericsson.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ericsson.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qthZ/2PdiNxc0mlRiDlMuDWCsQMLw4F39hdBFGLwKMI=;
- b=YsR2+GxbEWqSGF25mR9KGlBOxbVrABYE1c/9oPvebbP2sNfOASvVCAkW/5ujYF2mSmAspHoyAbb8TdnV+pAc4yFd0Fw19yiEeSXe0xkDE4Cp+xA75E/pg7hDx2tP/yQIJX4j9fNrr0WoEtCw3iQH0RpYNJqpxQ77fQ3GJ3ukxwPJ0t6358RgeCfS+xVvya1wK7+QesU1bmq6p1nqWJwBWr2k/MUyldaAJpg2OoEepIexLX1+BjKeZJEegFbqni3mD3IkWjRUFZAjawW4huMoJ6aS+uX3yhb3yB7LJjmllPye3+aas9/4ofEImqU12XtUjJfJ9It+yfJPHuLeIt+l1w==
-Received: from CWLP265CA0485.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:18a::9)
- by PA3PR07MB10666.eurprd07.prod.outlook.com (2603:10a6:102:4d4::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.22; Sun, 10 May
- 2026 21:45:49 +0000
-Received: from AM3PEPF00009B9F.eurprd04.prod.outlook.com
- (2603:10a6:400:18a:cafe::33) by CWLP265CA0485.outlook.office365.com
- (2603:10a6:400:18a::9) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9891.22 via Frontend Transport; Sun,
- 10 May 2026 21:45:49 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 192.176.1.74)
- smtp.mailfrom=ericsson.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=ericsson.com;
-Received-SPF: Pass (protection.outlook.com: domain of ericsson.com designates
- 192.176.1.74 as permitted sender) receiver=protection.outlook.com;
- client-ip=192.176.1.74; helo=oa.msg.ericsson.com; pr=C
-Received: from oa.msg.ericsson.com (192.176.1.74) by
- AM3PEPF00009B9F.mail.protection.outlook.com (10.167.16.24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.25.13 via Frontend Transport; Sun, 10 May 2026 21:45:47 +0000
-Received: from seroius18814.sero.gic.ericsson.se (153.88.142.248) by
- smtp-central.internal.ericsson.com (100.87.178.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Sun, 10 May 2026 23:45:47 +0200
-Received: from seroius06448.sero.gic.ericsson.se (seroius06448.sero.gic.ericsson.se [10.117.92.228])
-	by seroius18814.sero.gic.ericsson.se (Postfix) with ESMTP id ADC5F4020B4A;
-	Sun, 10 May 2026 23:45:46 +0200 (CEST)
-Received: by seroius06448.sero.gic.ericsson.se (Postfix, from userid 7434092)
-	id 97FCE1005D6A; Sun, 10 May 2026 23:45:46 +0200 (CEST)
-From: Fidan Aliyeva <fidan.aliyeva.ext@ericsson.com>
-To: <andrew@lunn.ch>, <olteanv@gmail.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<marek.behun@nic.cz>, <netdev@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <fidan.aliyeva.ext@ericsson.com>
-Subject: Re: [RFC PATCH 1/1] mv88e6xxx: Cache scratch config of 6352 in setup
-Date: Sun, 10 May 2026 23:45:18 +0200
-Message-ID: <20260510214518.2064192-1-fidan.aliyeva.ext@ericsson.com>
-X-Mailer: git-send-email 2.36.0
-In-Reply-To: <20260510213429.2044612-1-fidan.aliyeva.ext@ericsson.com>
-References: <20260510213429.2044612-1-fidan.aliyeva.ext@ericsson.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D25F346E5D
+	for <netdev@vger.kernel.org>; Sun, 10 May 2026 21:57:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.77
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778450256; cv=none; b=ZCxe3UZh8TvlLXKdKSXdJnJJpoJ7A1PvapX6TzkCkDFtw8oNo0n7v2pv4BXU0VNNcD5LnYqvxk1fp6KuT9lkeNXlbJAPA/QmC5+ZGDbpcI7Ah5+g2inwOqqZmzPPD0LgvCzGo7VptYuiHsL6QR9/JKyHKwgOUycDxoDEJ5tYs58=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778450256; c=relaxed/simple;
+	bh=TRo/27K1NjP2wNlz7gI3GKSwraU84oOs4e6O3VxvVXI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=O5b9VG9H5WENFUU+h6XuaY/LlvZ8lbJAq1tnUjKS6ubg/D/MJdFL6l1XPjf5LA5dq183fou8O8DWGF4fmls3XVgP99Xm/YuShwTgdDxbQtI/33O6CotJpIBHlhDpHfyUwwwTBdVtoUTzs2jcudvtRgDOerClZSnKRV0fa7USr+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f77.google.com with SMTP id 006d021491bc7-696307c7ee0so3572763eaf.0
+        for <netdev@vger.kernel.org>; Sun, 10 May 2026 14:57:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778450254; x=1779055054;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=a5zz8JJ6yN1hwedf89sUkMHjvnyxInLqXs9nvE/Ihto=;
+        b=iD3oNtjRculkPHKtMCketCFLM5Mewwoq6Tv3K3w4AYrrx84R5zOH9vsE6FlPJaM+NA
+         maGcJie7OGJm2bbzRG/qvmLOLztS9gyhu2o6hndV7q6E8WKF7GQcIToTerWqS/znSwuy
+         Nqsg7gf7FMA+pnkX6Z4meRTmqmlReo2WmGn5gXYLqpWqBGE+lhrmcltOROMltYe1jQ+2
+         f9oen0GWqFbpmiSJTLBlavS66LI7bdB1q8exUPT6JcF6F/7KSVZbCq2rd2VavCc8AL1w
+         eidkmqmqEQRkUaInY+0cf1GT4dZRQN3GDMS9SYo7h9CI1fy4tUja3kHDJ58NGHC6co/r
+         Jpjg==
+X-Forwarded-Encrypted: i=1; AFNElJ+ukY13XH1ILyz99EKb5rcJXE1DHHFf8h71uDJRK8FjVdECTLOPlS2aNuqmszzxrX8WJDbGLCg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykOytGj83AkQyImMY00Qna7a9nxpxdS/whakm5jSNqVDDxZCjI
+	7IEpTVRFqhx/3mSXIAO/qLOuppyMv2+ZA6cBPMMnkTf8n88F0KTcL5kn28NuQw7Q1BFchmxH0WF
+	z7P4UFIKsS+Yl8CuhATZ4fHZEoBSxzA4gPIodJwj2TUp1Plum1yQptbZHDpw=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM3PEPF00009B9F:EE_|PA3PR07MB10666:EE_
-X-MS-Office365-Filtering-Correlation-Id: f186d094-b580-4d2c-a548-08deaedd7f1a
-X-SMTP-Server: smtp-central.internal.ericsson.com
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700016|82310400026|376014|56012099003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	Ia3DahyoLnzrmtFvRtHx8A8XU8xbMeiWSSaNX9H3OcAhwGz5o1rUIAPhShrPQiFFaNJFh1sbda7y8EX3hKz+AFufJr+DW1O5xSamw5zwvS86m/n5SgizKdB7sngoyZAc7FEP5qpwjSUPPhO9am/4uBwed3YL2IwqyH8MLeCGaXqvphMm3pUPyGi3qpRdISur83VSuHzlZ1sB/7jUkn/9fvxih6KvdHWkIkM8DHqcvCWsNR5uYB9ngec99LLNG/YEL3efxApcfOEqnxGcS4m5FWMl3n2LwKw5WjUgIMx6+D2y6v3yYzXfMAzPB7Fr/8gyocpMZmwGsEbcBSHRPA3pM0fpuxEu4o7pt6XRrgbqERDNjNoDB9MMgh8KFR9lDujggIBCwEpkkv504I+QIuEVhtxm/TbfL6nvfr7SSmQiiapgJ7+uu2nixSy7HYzZUJpdbX2czridGIJLQLL4DG4qOjw0gKuUeUwMR49D14xo8BurJMDWHnnuBLSXfTRNA6baZTWcYAUWOnUT6/iIMeg28wCbP1sHOtbrB9zQkO23n4S0vsJsZqiKd3YKocqM/MZp1bTB4pAaqnhcOOA4nJcMGp1rJfl+1n/gJ/N5WXbZ23RxGYcwHHp+Utkv5e0GDM9eyQI1uG/UqvmrW48ZHve/Gend71j7UCp9u4zdgczw2nWyhNFbXHtm9e6Cs6ch8VtLM3/V7wLQ59aBtjt/Xev8lRdfWUnRBfK7x62qb9TE6Uc=
-X-Forefront-Antispam-Report:
-	CIP:192.176.1.74;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:oa.msg.ericsson.com;PTR:office365.se.ericsson.net;CAT:NONE;SFS:(13230040)(1800799024)(36860700016)(82310400026)(376014)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	tK6XoV2n34iRB3xycHIcoaRP5kUiWneFTYNmmx01fpAEuOkf2YaAuYHHv8GgHdFUyqHm00m2Qo9+aOWij2MVng2JNfnWuE13BGNr8gr+DPhMMoQ6X6yLl9aVFeSwVjYo8Gr80KHPMFG1Oyz0E6wYa0uV3GV1m/fUSf3A3TGd5HNf9wL6ji34SFe3EgIE4H0R1o8sWd5C7laexxIkUY18LgQHvDAnMwMPFiX1jLGAlkddA0iKuU0bVIYHfQ77RvWvCGczER4nS2wQlqhO/f78pHvkyTq9PxD5Z53+270fXHwPfdqCSKsTU4F5r/Jjus4QQ64wBgbnL48drFOaM9gCnI2smhJc8vN0wV4+DJLLqmkN5TGZA4fNmPF2T4mLKLtkhIkyu/WLUYenXWZiwnZaUEVxRtXD3tkPbMByTRHe9pilzcB434iuUxTdk54gw+OT
-X-OriginatorOrg: ericsson.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2026 21:45:47.6086
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f186d094-b580-4d2c-a548-08deaedd7f1a
-X-MS-Exchange-CrossTenant-Id: 92e84ceb-fbfd-47ab-be52-080c6b87953f
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=92e84ceb-fbfd-47ab-be52-080c6b87953f;Ip=[192.176.1.74];Helo=[oa.msg.ericsson.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM3PEPF00009B9F.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA3PR07MB10666
-X-Rspamd-Queue-Id: 0C5075068D6
+X-Received: by 2002:a05:6820:883:b0:696:8ccc:5588 with SMTP id
+ 006d021491bc7-69998d4534bmr12723017eaf.42.1778450254413; Sun, 10 May 2026
+ 14:57:34 -0700 (PDT)
+Date: Sun, 10 May 2026 14:57:34 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a00ff4e.170a0220.1c0296.021e.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in ieee80211_sta_current_bw
+From: syzbot <syzbot+e2a0da81361722f4df3b@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: D1FEB5069B1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[ericsson.com,reject];
-	R_DKIM_ALLOW(-0.20)[ericsson.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+X-Spamd-Result: default: False [-0.36 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=f2b487b72ffad035];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ericsson.com:mid,ericsson.com:dkim];
-	TAGGED_FROM(0.00)[bounces-286405-lists,netdev=lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[fidan.aliyeva.ext@ericsson.com,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,nic.cz,vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[ericsson.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.996];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	TAGGED_FROM(0.00)[bounces-286406-lists,netdev=lfdr.de,e2a0da81361722f4df3b];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[goo.gl:url,googlegroups.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,storage.googleapis.com:url]
 X-Rspamd-Action: no action
 
->
-> In mv88e6352 scratch register in Global Control 2 set of registers
-> returns which port is attached to SERDES. This value is set and
-> stays constant after the switch is released from reset; thus, it
-> can be cached during chip setup instead of reading the register
-> everytime when SERDES config is needed.
-> 
-> 1. Add setup_chip_specific member to mv88e6xxx_ops and
-> g2_scratch_config3 member to mv88e6xxx_chip.
-> 2. Add mv88e6352_g2_cache_global_scratch_config3 function as
-> .setup_chip_specific which reads the CONFIG3 value from the scratch
-> register and caches it.
-> 3. Call .setup_chip_specific during chip setup.
-> 
+Hello,
 
-Can we actually use setup_errata for this instead of adding a new member
-to mv88e6xxx_ops?
+syzbot found the following issue on:
 
-Thank you for your reviews in advance.
+HEAD commit:    2281958e6007 Merge tag 'wireless-next-2026-05-06' of https..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1513e696580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f2b487b72ffad035
+dashboard link: https://syzkaller.appspot.com/bug?extid=e2a0da81361722f4df3b
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
 
-Best,
-Fidan
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/4df17f60254b/disk-2281958e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1e93157edd25/vmlinux-2281958e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/60dbf6a0a81c/bzImage-2281958e.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e2a0da81361722f4df3b@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+1
+WARNING: ./include/net/mac80211.h:8114 at ieee80211_chan_width_to_rx_bw include/net/mac80211.h:8114 [inline], CPU#1: syz.4.4769/22510
+WARNING: ./include/net/mac80211.h:8114 at ieee80211_sta_current_bw_tx_to_sta net/mac80211/sta_info.c:3719 [inline], CPU#1: syz.4.4769/22510
+WARNING: ./include/net/mac80211.h:8114 at ieee80211_sta_current_bw+0x36d/0x510 net/mac80211/sta_info.c:3745, CPU#1: syz.4.4769/22510
+Modules linked in:
+CPU: 1 UID: 0 PID: 22510 Comm: syz.4.4769 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+RIP: 0010:ieee80211_chan_width_to_rx_bw include/net/mac80211.h:8114 [inline]
+RIP: 0010:ieee80211_sta_current_bw_tx_to_sta net/mac80211/sta_info.c:3719 [inline]
+RIP: 0010:ieee80211_sta_current_bw+0x36d/0x510 net/mac80211/sta_info.c:3745
+Code: 00 00 00 eb 49 41 83 fe 05 74 30 41 83 fe 0d 75 13 e8 47 8f af f6 b8 04 00 00 00 eb 31 e8 3b 8f af f6 eb 28 e8 34 8f af f6 90 <0f> 0b 90 eb 1d e8 29 8f af f6 b8 02 00 00 00 eb 13 e8 1d 8f af f6
+RSP: 0018:ffffc90006f4eed8 EFLAGS: 00010283
+RAX: ffffffff8b161cfc RBX: 1ffff1100d1da030 RCX: 0000000000080000
+RDX: ffffc9000e5d2000 RSI: 0000000000000e31 RDI: 0000000000000e32
+RBP: 0000000000000004 R08: ffff888054ad5c40 R09: 0000000000000007
+R10: 000000000000000d R11: 0000000000000002 R12: ffff888068ed0180
+R13: dffffc0000000000 R14: 0000000000000007 R15: 0000000000000000
+FS:  00007fe58f5f66c0(0000) GS:ffff888125389000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000110c2c8823 CR3: 0000000038486000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ ieee80211_chan_bw_change+0x459/0x740 net/mac80211/chan.c:719
+ _ieee80211_recalc_chanctx_min_def net/mac80211/chan.c:758 [inline]
+ ieee80211_recalc_chanctx_min_def+0x36/0x70 net/mac80211/chan.c:770
+ ieee80211_recalc_min_chandef+0x491/0x580 net/mac80211/util.c:2501
+ sta_info_insert_finish net/mac80211/sta_info.c:946 [inline]
+ sta_info_insert_rcu+0x15da/0x26b0 net/mac80211/sta_info.c:1029
+ sta_info_insert+0x16/0xc0 net/mac80211/sta_info.c:1034
+ ieee80211_add_station+0x4c7/0x710 net/mac80211/cfg.c:2666
+ rdev_add_station+0xfc/0x290 net/wireless/rdev-ops.h:201
+ nl80211_new_station+0x1cab/0x2130 net/wireless/nl80211.c:9490
+ genl_family_rcv_msg_doit+0x22a/0x330 net/netlink/genetlink.c:1114
+ genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
+ genl_rcv_msg+0x61c/0x7a0 net/netlink/genetlink.c:1209
+ netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2551
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
+ netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+ netlink_unicast+0x75c/0x8e0 net/netlink/af_netlink.c:1345
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1895
+ sock_sendmsg_nosec net/socket.c:787 [inline]
+ __sock_sendmsg net/socket.c:802 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2698
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2752
+ __sys_sendmsg net/socket.c:2784 [inline]
+ __do_sys_sendmsg net/socket.c:2789 [inline]
+ __se_sys_sendmsg net/socket.c:2787 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2787
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fe59139cdd9
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fe58f5f6028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fe591616090 RCX: 00007fe59139cdd9
+RDX: 0000000000000000 RSI: 0000200000001080 RDI: 0000000000000006
+RBP: 00007fe591432d69 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fe591616128 R14: 00007fe591616090 R15: 00007fff2b0f3978
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
