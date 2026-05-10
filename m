@@ -1,76 +1,105 @@
-Return-Path: <netdev+bounces-286376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286375-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GIcbCaHUAGp8NAEAu9opvQ
-	(envelope-from <netdev+bounces-286376-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 20:55:29 +0200
+	id +FY6A4HUAGp8NAEAu9opvQ
+	(envelope-from <netdev+bounces-286375-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 20:54:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A01EA505D07
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 20:55:28 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7164A505CDC
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 20:54:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 91508300538B
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:55:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D0F1A300808B
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:54:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45F6231E844;
-	Sun, 10 May 2026 18:55:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A025D31D362;
+	Sun, 10 May 2026 18:54:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mqz5ozX7"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ZQUnDwel"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010020.outbound.protection.outlook.com [52.101.85.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FA2253B42;
-	Sun, 10 May 2026 18:55:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778439300; cv=none; b=R6SH5xFE7DCLCIeSTd4cQOuo1PW8O3zCPILemW7UFfNHsr3iTPACCKTsmGI8JC6R7vl+Fqn5A6hjQdSh6lwl1U1kgncBa0gt1ZBv6rlnviXgJkmjZXqcZZHucWj59d6GUxpr/kB3oZcMTaEGTAVou74KrXqrx8Rhz7kGi0EfRVE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778439300; c=relaxed/simple;
-	bh=JlE1vn872snGxe5CIqBp4/RQqX0O9OHxCwmfqNARZjI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A8mVZrVCr9LrOyP8VkvV3vpdN/Om2y61L7IRQ2t47F5P1uTBbmflhGo5GvPC3m5HBODexgd34obvpKNgDzXuvhz1w9yIUZ5Tz8H0r3vW2thx2NcvvsgVt0fmN07SJpAREOceKFle9aR0UrunaWr41IjR/1clMrwdmKhygduL6cc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mqz5ozX7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4497BC2BCB8;
-	Sun, 10 May 2026 18:54:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778439300;
-	bh=JlE1vn872snGxe5CIqBp4/RQqX0O9OHxCwmfqNARZjI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mqz5ozX7p4TrZCX2h3tfsD39NuwZhwQXTDVYyHe679gDwbYy6NfM8j8azWxYfhq+v
-	 h8j2G2p4LfqRxWJ3A4KkcsjbCgFzcgwpmPUWGa2mshTv5WnH5TKQ/RNmOsliEUcSGz
-	 disldo+LRShXI/FQfcALHtA8GCTzVBWvPoD69h9WHYQatowJaydYqoa/1m3/7CfGtf
-	 b7Fq1vULms28SdxxTinJT2HqcW4X/zdh473vHqt7j3Ccq0mw4VkqxRvyv4t3dGLN86
-	 to3JKx9cvj1R1AUr2v17PmN3DywaDzbWem/9hKrnwhTzmwyMH5/RT5HwcxhFIptbTW
-	 sYv5HAnV0mILw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: nb@tipi-net.de
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	justin.chen@broadcom.com,
-	horms@kernel.org,
-	mohsin.bashr@gmail.com,
-	opendmb@gmail.com,
-	florian.fainelli@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com,
-	andrew+netdev@lunn.ch,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@fomichev.me,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH net-next v9 4/7] net: bcmgenet: add XDP_TX support
-Date: Sun, 10 May 2026 11:52:56 -0700
-Message-ID: <20260510185255.3958629-2-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260506095553.55357-5-nb@tipi-net.de>
-References: <20260506095553.55357-5-nb@tipi-net.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 217BD318ED6;
+	Sun, 10 May 2026 18:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778439291; cv=fail; b=SpX3IpEIveTKtODheZKhx72u+NDnAtrE+NCKtwfdddtpQUyhKWZp12UcZVAh2G3U383EGiFWmkAyjzOiM6PvOm2EM6grwFHMSSY44LwmqR1bA972ggt0vDFw16DTFCDAthv4j0lJBv9v8V7P5CNYDcPGND7/sW5iEnCiREWVLzA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778439291; c=relaxed/simple;
+	bh=h5BuznI1TGuQ0wmr6Bynz0+gIKut36M/TXEnZaHMg9w=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=L2HlLDkB0diNgUk14brHlc+2ii89eOyQC+ZcsIRzou+A6GiTEKJY3fT1k7hO2udZJFE68M/ouZbbXekKJQT9enuSoVAxtE4v0DWl1xfEjU9j6TnMxraWPwRfDLsALfkEF1B6akwEQVcxXk1ds2la6f4lsY7FLcToRRlv9O7Rd9Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ZQUnDwel; arc=fail smtp.client-ip=52.101.85.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=b0oPVoCUHB9oP88+hfsc9uCHlds0vzJpG8s1frCyHMBwpLt37vdO+Q6qmTbTKv8nB1MdOtyStMZNhnNuOspSj454efRBF39ubQgTeJbTh4ucw78UXuoWvymIsmvKAVX7nwu+UxbRXyKDb/w+LpTlYE5l5CEUpuZCtlHmS66nIi/kGHSP6x7ZTmaP3fCT5Z/UjBBpDPOi2Qs7TujYfNlOVIpo/rf0w/knI1HqAgNx1MrpMW7czGJW3p3jbSzu+yVdTHiwWy0MvCUDb6kG6ZAqVTcrGJUr/MFHhiyY6tUtDnc1BFwb6rztx8dhHIEOdVPbmxjhRqeJOZu0PaegBJqWuQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OpSkAlDnDbNRxCUXd6vFh3fq2MrsWd4HZxUvUxvcwCE=;
+ b=gTzdjsc6O410bJgHF4pwkN7zrGb8bxj5HUeaOnySTc8paG/J4eNjqzDcU5f4HkQ7vC5yPr0qytxNFmWpWL4lNBspTAcEPtDJMJq5KaW31gInG8NYISFh6aQlH77kUMte8QpOTxGub5PswT5s8vbdLezqAbsfe8Umjz4/abtcuxX4E06Nn0ml6fdRnGNrvMvLBkYSSQqDF1VKxTkZYuldEKzZoDgOUuyt5lqkkYpkOVh8hkxjKLl+mRNCoqG0VGHN+X6fTug99Hj9ZzaRZIpxlfuQev6e2/N0txmwbAKFi6m0uuz64nM/7A20JbF/SUJQoUWhL5txX0/dm1gHEQ1N5Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OpSkAlDnDbNRxCUXd6vFh3fq2MrsWd4HZxUvUxvcwCE=;
+ b=ZQUnDwel/3qncRoBSlm03AVloTY4a6B1kDC1oPDHepxNgAOgtujuTdw/45gZfykvbZB8cFkAXIhuzkjEVTMXBoUjb8ZWKMx71SdFl40TLfVe1pzkOSxQAqbVrlAyS82O2HRitgJ5oXMpY0xgye8do8WuTWUfek7MHAEef4BfzjYhR5hLlrD/sf15QEdyLhIkXASkO9ZV077RGWaGG3PaYXy3dG7I57SUwFT/dzrh+1KkmA+QpQw0xfhkVac0N5C/E/sVvK70vL08G8kSysp6L6mQsKG1t0HuQB7J2k4zT1F6H+XAMeE6oEj4qMnsJ0F5ZBFbOrLsknXUKSXxRRzKHQ==
+Received: from BN0PR10CA0021.namprd10.prod.outlook.com (2603:10b6:408:143::24)
+ by IA0PR12MB8226.namprd12.prod.outlook.com (2603:10b6:208:403::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.22; Sun, 10 May
+ 2026 18:54:43 +0000
+Received: from BN2PEPF00004FC0.namprd04.prod.outlook.com
+ (2603:10b6:408:143:cafe::e3) by BN0PR10CA0021.outlook.office365.com
+ (2603:10b6:408:143::24) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9891.22 via Frontend Transport; Sun,
+ 10 May 2026 18:54:43 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BN2PEPF00004FC0.mail.protection.outlook.com (10.167.243.186) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.25.13 via Frontend Transport; Sun, 10 May 2026 18:54:43 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 10 May
+ 2026 11:54:35 -0700
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 10 May
+ 2026 11:54:34 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.6)
+ with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Sun, 10
+ May 2026 11:54:27 -0700
+From: Mark Bloch <mbloch@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Jiri Pirko <jiri@resnulli.us>
+CC: Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+	Simon Horman <horms@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, "Leon
+ Romanovsky" <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch
+	<mbloch@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>, "Borislav
+ Petkov (AMD)" <bp@alien8.de>, Randy Dunlap <rdunlap@infradead.org>, "Petr
+ Mladek" <pmladek@suse.com>, "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+	Christian Brauner <brauner@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>, Kees Cook <kees@kernel.org>, "Marco
+ Elver" <elver@google.com>, Li RongQing <lirongqing@baidu.com>, Eric Biggers
+	<ebiggers@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>
+Subject: [RFC V2 net-next 0/2] devlink: Add boot-time defaults
+Date: Sun, 10 May 2026 21:54:22 +0300
+Message-ID: <20260510185424.2041415-1-mbloch@nvidia.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,151 +107,139 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: A01EA505D07
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF00004FC0:EE_|IA0PR12MB8226:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7178ae40-8aff-4fdc-14cd-08deaec59923
+X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|36860700016|1800799024|82310400026|18002099003|56012099003|13003099007|3023799003;
+X-Microsoft-Antispam-Message-Info:
+	BgNaYCR+yriBHY9XcI51vIEiaUnBGeTBhM/5EQ5G3X0ySKRObZDgCS+tCRTy3rOHYiOyGQTCQXbisX94LvL/o3BGcTa5vTNI2s50gHEVDXvm0EXbYnNl4xJ8QCPnpbLlaa0YGfmEZ/YhihovI9arvOGtKt/1iYkxpMIce4Ptd9k38smFVLzcmpTfLUjB7ob7e6v4D3Qe/a6ecrb2/pUHcE4lPmUq52rbKJzriBlPtpPf1lp5LOcSnYqF7zyw457pW4dr+MGht/x+nv9c8raoBD3cHU3QfMoMG1OS5ndq2FFEs4mvAnC1d7kdCZ2TyWEbjVMWOOKEjkq2pLmJUXL2wEk1HlwOxp6JzqtBlYn5nuAELx8HSurdOlCM20EMHfV15gUktUrdSEjwf4NBcOQni6o/1VDLnth8dlSt5KhOP1IaLqq+ZunRDr3VoMW6NqMAlwQffRqhwXp28qrtjNmPi6kVNsRBubtpmKe3GZchYrczVRGZVnSMGWXNHY3lLDwI7118uY0EYpW6FMrnZ3CTz46MsVNgbOIGUos5alyxZol8bC1wZ7ebftywyYDaz1NzU01J1JdnGoQRW1X5uZl6GB0ugMoSN4+vLx7ExdLf3eJgyLT4s6I7linqn/6H5QnRPhsFJ3s82twimKeGLqoLWWeajZqgJEqrpZR9NXZ74R4siqsthR0NPm+1skWind1yNQr0pmqvxa14reFWfJZbXGY2tb4JqA4MWtOr+OJEn2LhOrd0yFJL3JPFV+Y55U1G
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(36860700016)(1800799024)(82310400026)(18002099003)(56012099003)(13003099007)(3023799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	iTboHuDGQJXsY8vZL+kscEp/m+JIuw8PM1LPh5qW8HtQaEvbso4qNZSwFD+JBxrTdvqdqu2qmkYHL6cwcaWDRHv7LwaWqf3RbN+sM9Q2KjHd6P6wNeuEN04jlwu7IfUmQTeDgsYuRkfMXWwm/avl3TOpJqbiWQGZP0GIIwyoX/NSPcpKTYpV0UINcXJSMkheW2J9OMLjBFDnaBnT6s/qJ/2x2R7t1ejGlQEpDT+05dKT14O08f/3/ZeacrspckjAyL9PLI+rStfCs537SH/d2jtZ3aI34hvF/p6RUrI0hOr2nOGYahTqy/cM9S723bSzMokESS1quNWB7KzvkrHVP+BplciztmBzxoObW0DYQOTt29nENd1MlaTDDxp+Sz1D1BS0dLyhG7ibbTf5bO0SObM1VFPrNQWdk2rAO43adB83ZsBgTBsNl1YeoCq4SjRb
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2026 18:54:43.3403
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7178ae40-8aff-4fdc-14cd-08deaec59923
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF00004FC0.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8226
+X-Rspamd-Queue-Id: 7164A505CDC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,broadcom.com,gmail.com,lunn.ch,google.com,redhat.com,davemloft.net,iogearbox.net,fomichev.me];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	TAGGED_FROM(0.00)[bounces-286376-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286375-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[mbloch@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.997];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,Nvidia.com:dkim];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-0.995];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-    net: bcmgenet: add XDP_TX support
-    
-    Implement XDP_TX using ring 16 (DESC_INDEX), the hardware default
-    descriptor ring, dedicated to XDP TX for isolation from SKB TX queues.
+This series adds a devlink= kernel command line parameter for applying
+selected devlink settings during device initialization.
 
-[ ... ]
+Following a discussion with Jakub[1], I am sending this RFC to get the
+conversation moving. I started from Jakub's example/request and extended
+it to cover requirements from production systems and configurations that
+customers use. The implementation is intended to support the following
+properties:
 
-> diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> index ee1d4ecc2b874..f1e515526787a 100644
-> --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> @@ -49,8 +49,10 @@
->  
->  #define GENET_Q0_RX_BD_CNT	\
->  	(TOTAL_DESC - priv->hw_params->rx_queues * priv->hw_params->rx_bds_per_q)
-> +#define GENET_Q16_TX_BD_CNT	32
+- A system may have multiple devlink devices that usually need the same
+configuration. For a configuration such as eswitch mode switchdev, a user
+can specify either all devlink devices or an explicit list of devices to
+which that configuration applies.
 
-Will this cause deterministic packet drops on XDP_TX? The NAPI budget is
-typically 64. Since the RX poll reclaims XDP TX completions only once at the
-beginning of the NAPI cycle, a burst of more than 32 XDP_TX actions would
-exhaust the TX ring and drop subsequent packets in that burst.
+- Deployments can set devlink defaults before normal userspace
+orchestration runs, while still using devlink concepts and driver callbacks
+rather than adding driver-specific module parameters.
 
->  #define GENET_Q0_TX_BD_CNT	\
-> -	(TOTAL_DESC - priv->hw_params->tx_queues * priv->hw_params->tx_bds_per_q)
-> +	(TOTAL_DESC - priv->hw_params->tx_queues * priv->hw_params->tx_bds_per_q \
-> +	 - GENET_Q16_TX_BD_CNT)
+A default is scoped to either all devlink handles or to a comma-separated
+list of devlink handles, for example:
 
-[ ... ]
+devlink=[*]:esw:mode:switchdev
+devlink=[pci/0000:08:00.0,pci/0000:09:00.1]:esw:mode:switchdev_inactive
 
-> @@ -2315,14 +2432,42 @@ static unsigned int bcmgenet_run_xdp(struct bcmgenet_rx_ring *ring,
->  	switch (act) {
->  	case XDP_PASS:
->  		return XDP_PASS;
-> +	case XDP_TX:
-> +		/* Prepend a zeroed TSB (Transmit Status Block).  The GENET
-> +		 * MAC has TBUF_64B_EN set globally, so hardware expects every
-> +		 * TX buffer to begin with a 64-byte struct status_64.  Back
-> +		 * up xdp->data into the RSB area (which is no longer needed
-> +		 * after the BPF program ran) and zero it.
-> +		 */
-> +		if (xdp->data - xdp->data_hard_start <
-> +		    sizeof(struct status_64) + sizeof(struct xdp_frame)) {
+The first supported command is eswitch mode configuration.
 
-Does this headroom check need to account for the metadata size? If headroom
-is tight, shifting the pointers might cause xdp_update_frame_from_buff()
-to fail with -ENOSPC and drop the packet.
+mlx5 wires this into device initialization after the devlink instance is
+registered and after mlx5 devlink operations are available, so eswitch mode
+defaults can be applied to matching PCI devlink devices.
 
-Jakub: it may be cleaner to invalidate XDP metadata instead of half-hangling it.
-       AFAIU it doesn't get used past this point anyway.
+Patch 1 adds the devlink boot-default parser, storage,
+devl_apply_defaults() API, eswitch mode default support and documentation
+for the devlink= syntax.
 
-> +			page_pool_put_full_page(ring->page_pool, rx_page,
-> +						true);
-> +			return XDP_DROP;
-> +		}
-> +		xdp->data -= sizeof(struct status_64);
-> +		xdp->data_meta -= sizeof(struct status_64);
-> +		memset(xdp->data, 0, sizeof(struct status_64));
+Patch 2 calls devl_apply_defaults() from mlx5 device initialization.
 
-Could this corrupt XDP metadata and copy uninitialized memory?
+Changelog:
 
-If the XDP program attached metadata, the physical metadata bytes immediately
-precede the original xdp->data. The memset() here spans the exact memory area
-where the original metadata resides, overwriting it with zeros.
+V1 -> V2
 
-Because xdp->data_meta is decremented, it now points to uninitialized
-headroom memory, which xdp_convert_buff_to_frame() would read as the frame's
-metadata.
+- Reduced the series from 4 patches to 2 patches by folding the generic
+boot default infrastructure and eswitch mode support into one devlink
+patch.
 
-> +
-> +		xdpf = xdp_convert_buff_to_frame(xdp);
-> +		if (unlikely(!xdpf)) {
-> +			page_pool_put_full_page(ring->page_pool, rx_page,
-> +						true);
-> +			return XDP_DROP;
-> +		}
+- Narrowed the scope to eswitch mode defaults only. Dropped runtime
+devlink parameter boot defaults and simplified parser.
 
-[ ... ]
+- Added [*] selector support to apply the same eswitch mode default to all
+devlink instances.
 
-> @@ -2548,9 +2693,15 @@ static int bcmgenet_rx_poll(struct napi_struct *napi, int budget)
->  {
->  	struct bcmgenet_rx_ring *ring = container_of(napi,
->  			struct bcmgenet_rx_ring, napi);
-> +	struct bcmgenet_priv *priv = ring->priv;
->  	struct dim_sample dim_sample = {};
->  	unsigned int work_done;
->  
-> +	/* Reclaim completed XDP TX frames (ring 16 has no interrupt) */
-> +	if (priv->xdp_tx_ring.free_bds < priv->xdp_tx_ring.size)
-> +		bcmgenet_tx_reclaim(priv->dev,
-> +				    &priv->xdp_tx_ring, false);
+- Removed support for multiple comma-separated default groups and for
+assigning different defaults to different handles in the same devlink=
+parameter.
 
-If the NAPI budget is not fully consumed, napi_complete_done() is called and
-NAPI exits. Since there is no TX interrupt for ring 16, could XDP TX
-completions stall indefinitely if RX traffic stops? This might leave buffers
-in the TX ring, eventually leading to page pool exhaustion.
+[1] https://lore.kernel.org/all/20260502184153.4fd8d06f@kernel.org/
+V1 : https://lore.kernel.org/all/20260506123739.1959770-1-mbloch@nvidia.com/
 
-Also, is there a risk of severe lock and MMIO contention here?
+Mark Bloch (2):
+  devlink: Add eswitch mode boot defaults
+  net/mlx5: Apply devlink boot defaults during init
 
-Since the single XDP TX ring is shared across all RX queues, every active
-RX NAPI will concurrently evaluate this condition. Since hardware transmission
-takes time, this condition could remain true across multiple concurrent NAPI
-polls. As a result, all active RX queues could simultaneously call
-bcmgenet_tx_reclaim(), heavily contending for spin_lock_bh(&ring->lock) and
-performing expensive MMIO reads.
+ .../admin-guide/kernel-parameters.txt         |  24 ++
+ .../networking/devlink/devlink-defaults.rst   |  93 ++++++
+ Documentation/networking/devlink/index.rst    |   1 +
+ .../net/ethernet/mellanox/mlx5/core/main.c    |   2 +
+ include/net/devlink.h                         |   1 +
+ net/devlink/core.c                            | 269 ++++++++++++++++++
+ 6 files changed, 390 insertions(+)
+ create mode 100644 Documentation/networking/devlink/devlink-defaults.rst
 
-Jakub: also, you can't reclaim XDP Tx if budget is 0
 
-> +
->  	work_done = bcmgenet_desc_rx(ring, budget);
->  
->  	if (work_done < budget && napi_complete_done(napi, work_done))
+base-commit: a93245816556ba03549bb626de48ea2b11c7f9d2
+-- 
+2.34.1
+
 
