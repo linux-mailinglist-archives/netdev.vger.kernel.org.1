@@ -1,330 +1,369 @@
-Return-Path: <netdev+bounces-286402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286403-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id d+3qDMP2AGoFPAEAu9opvQ
-	(envelope-from <netdev+bounces-286402-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 23:21:07 +0200
+	id YEqkCQz6AGprPQEAu9opvQ
+	(envelope-from <netdev+bounces-286403-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 23:35:08 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 966055066F0
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 23:21:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 77924506805
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 23:35:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 877D530078A5
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:21:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 27FD83002E04
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:35:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B12033242B5;
-	Sun, 10 May 2026 21:21:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E43F233D6ED;
+	Sun, 10 May 2026 21:35:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=live.com header.i=@live.com header.b="s9PQtCyr"
+	dkim=pass (2048-bit key) header.d=ericsson.com header.i=@ericsson.com header.b="gWyanYUz"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azolkn19012011.outbound.protection.outlook.com [52.103.23.11])
+Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013024.outbound.protection.outlook.com [52.101.83.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BEA2274B3B;
-	Sun, 10 May 2026 21:21:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.23.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FCA284682;
+	Sun, 10 May 2026 21:35:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.24
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778448062; cv=fail; b=RIKAFuMK0emniddYDqpg1w0i/pyb612tfBiIgHTzXim29kgihmUO805S0vqtD9guumcc0Kc+b8vYdjw7N3JUu/vsZN+vGnte0t8OFxyW/ZMuLs98FUWUICGpqP8FMfjpLDFW/RTW/UEgyYqEFg9qDC9zVgRB9C4x5ZekZTSrndc=
+	t=1778448903; cv=fail; b=Uh1ARBCV1d5RfIxZIzmWhhwaWqDR/6YRPkQJCcnlk3GP88B2dg8tsrkd2BYvqG4gnXZewVELFvZPl8OYmViUnQD4jDH+2IkAO8rK5IzG9zlMEFkjPBafvY2Piy0rNHmXRdGmAH4dNNd5Hy0mTIbUE/yUpx54FukvrgwP/FqD7cE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778448062; c=relaxed/simple;
-	bh=p3sDbq6vVIxjINOhSNdachTCGaXtBdxr8UaXEVRkoRE=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=B64A3wzJMGR9Gds9M2uJffQ0dNJ0ocBiYLDEcXsBsgjLKPuCSrFXGAzOwly6eoC/f47QggShDMNEWF3Q2C3ulRKPXoWmVvYFAZvY5L7TcHRu7DypRss9Ans6JXjwCqNqqyOAWToP7Oz7/LEkPiLQc9Z9t3hJD/wgNZlR8Cp3unk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=live.com; spf=pass smtp.mailfrom=live.com; dkim=pass (2048-bit key) header.d=live.com header.i=@live.com header.b=s9PQtCyr; arc=fail smtp.client-ip=52.103.23.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=live.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=live.com
+	s=arc-20240116; t=1778448903; c=relaxed/simple;
+	bh=m4jyT7Hq7iDRUPrJsPMUKgPcik/b0VVfY7ey/Sqxgs4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RAfP88kvycGKE0KJ1kCStvwm0kqQ2Oxt8cWg32OpNSpePiMdcZJ90B9uWSMURGsZcqjfgP/oB25GcvsT9CSnZoZz4pURJHEMTfULNJV2B6PLXHfzkp4iPaGSlR/d9CPySIpGcDJNb63wnksT+G9VufbIP5UXOoNFftunZbXK5BY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ericsson.com; spf=pass smtp.mailfrom=ericsson.com; dkim=pass (2048-bit key) header.d=ericsson.com header.i=@ericsson.com header.b=gWyanYUz; arc=fail smtp.client-ip=52.101.83.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ericsson.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ericsson.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WHVaxX2XoB0hSkYO09Pgqrs51yBbW3AlCBGie5yCog10HTPjOjJyXn6r0EgNkhY+4eWUUxnR15hz5GFkLrBN8P8zR9PjymRNEMsGn5RipRfUPziluf702LYoDPT5IjWN2lrC1954Dc+hNUeL2v4eq1QYqS2Y7hB4muGkKV7z4RYka9qh+EGi1vyPlNKcRkSE0eY+VNaD/m8e59sGRzGIQ70X0a7LgdX+MAH/+jklpso73ZrrpYR1CfTHwlmQWU1I2TERdlu1Pn/wu/jBvNmABp4t4M6JAo1jlRPLQjBbjXghonZ6+vGov9hrckGnGHKcLk7Lw3irra15fUQHGcxjAA==
+ b=OEZ/irdFTFTFTnir/cZiMMgDyxXT4GHfF5OjmOVfob0YfP59zfWkJKyUH/MQE04HQk3Ef8/OVi9iwkflCk9A9HpYPB87sn1OgwRLEaZNJWcTdKfQCU5Q6btkriT3uk5p1S3P8yFUlH9sMt79rOKBKggHba4guUebYTric7w3FFwOrS2A8G+Uwbhb4AeqRccTlPL3+KPqm6O4bQQbwwFGSeyE2ZyceB45REQ4YJzB0bEZVhsvP5B1Fc+4FqueOnPlyVIW9rS+GN4UhwBc9T/3OHXwsOfTzIc9RLyqnBeh/ty9z1bJb2KhFM3jpSIDJ/l7iBOCwkGADfZqDxdEVxK0yQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9jACOPatPHjAUIMNYoPFR/E6yUAa+R1O/lfygA8JJn8=;
- b=dHoQ02ubyOt6/gVnSB2buj8/KB3UboKnAw28Dm6alL7wQC77OFOgc6jXq1tSgKcd5Qwqs2W0MbaE3v3+w1GwO6/kYpKEKFolPWArbxFQ28J6GqNrpnj5NSy+EHir6EHsiGGF/meWvOR3rV23ruYp4v01wYPTLQEurziH6KizLAz7Y8ZqNaM57a0dsu3ZtUmtduLBH2NyfMmjwI5HCpk7WJqwYNh3roE9xOED/Sc45YeojmSBQfwaVH12pk8OEA7TYBOZaub34UAkNAfMp/i/CjKtUfIQ2aei6guIt3CERNP9lc7RP1VfG1NuAADnWiBUJNkSXI1jOszhqlNECJ5UvQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=live.com; s=selector1;
+ bh=dSfZ4U1aHLKn1mQiTw1CGeeYRLxBTxTcmjPuSpYMMlo=;
+ b=VOtmypqRtvo77qNtOhVfHQZ2Olp5w47QSWowmNu6fMrIGJ1u2J5codKyEgGVbrcnh48kLFLz0siO4scyboDQJQzlq+7g1aGHT/WJz97J4wuaV7exIIvs8i2nCMRcGCbeiAqHQ2rEYQZVHAy8Ait5qTdCvO465Oyx4zRBbbiqBduYcVqAQfTPL5BXgz3XqeFwLyJM0ABp/MEvAjg4o0UlQWvkwuDN/qCIzflacz1kzWpT6SbvEvZNpVH4gd65d5E2xEk17D3Rf+Vl4/Ng4/3CZxOCFovYbqRtRCs6Y0PxGeW8v9MPmC5Oe0ecK27x8omJJ9UXeeEYkR1jKu7hCy51NA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 192.176.1.74) smtp.rcpttodomain=davemloft.net smtp.mailfrom=ericsson.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=ericsson.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ericsson.com;
+ s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9jACOPatPHjAUIMNYoPFR/E6yUAa+R1O/lfygA8JJn8=;
- b=s9PQtCyrhdd0diVRtCcWzRd9XI9oRIeBlYNctfbAiycCZwyqpmZiPH4ORN9mutBiAmfsO9GW48ICPd57LcZYOTATm8Nmzx9rn2Mlq2ly2g1zpCsxxTSLjc9ym5vQnxqu+WzgJ+8tixkIfAYNACI8s0iRgYCTTFUwSzY9F61L2d+ETGPwImPL5eAPi1dDlswQXAfMClgr5kmLTrlos35GlUjcLNZnOnlCX3a50jR0R1XTH8cxknSg7WdwB21tpJjf1rPOV2ab+YiZxeOMPkAa4J4l9GLSpLJqMBCgbTVMPdsjh+DyBARvEotJKfquBvQ/bZW6CErLu15EZv+eY7Ww3Q==
-Received: from CY8PR11MB7084.namprd11.prod.outlook.com (2603:10b6:930:50::5)
- by PH0PR11MB4871.namprd11.prod.outlook.com (2603:10b6:510:30::12) with
+ bh=dSfZ4U1aHLKn1mQiTw1CGeeYRLxBTxTcmjPuSpYMMlo=;
+ b=gWyanYUz4L2grXOd0QkVfq32t+UCs8EL1GpsG/D6RfmHHj4o67C9hyulZtd3y3Lc2lCwgv0ddvFYX/xl60US4ZWTi/9YJooVMPZ27yGtCx+GRycIaL6JB//eT5O0IOKDzLSYjdVOGqYjeHlExltwGA0A/mJ6kwIm3LwZUwefj+TbNMktXIqEUqzhT3yEKuLOkVLOXa9L2EzJ+59AjJP/yoOoj7WREJispq5kfAjMqa0MgCnvwSzubxeFPIlNOuYt85oGjoml43FIMTiHUuOi2ZtKrx932s53x/K8aeGHsqW6d6G/XnO1lO7U8NlyCujXsUi/aA4tbS9heb4DIca3iQ==
+Received: from DU2PR04CA0315.eurprd04.prod.outlook.com (2603:10a6:10:2b5::20)
+ by GV2PR07MB12355.eurprd07.prod.outlook.com (2603:10a6:150:341::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.17; Sun, 10 May
- 2026 21:20:59 +0000
-Received: from CY8PR11MB7084.namprd11.prod.outlook.com
- ([fe80::d056:e384:cb2:38ce]) by CY8PR11MB7084.namprd11.prod.outlook.com
- ([fe80::d056:e384:cb2:38ce%4]) with mapi id 15.20.9891.019; Sun, 10 May 2026
- 21:20:58 +0000
-From: Spencer ?? <spencer.phillips@live.com>
-To: Allison Henderson <achender@kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [PATCH net] net/rds: fix zerocopy page ownership on partial copy
- failure
-Thread-Topic: [PATCH net] net/rds: fix zerocopy page ownership on partial copy
- failure
-Thread-Index: AQHc4MHBGgAOr70AEUyEULgfuWhnXw==
-Date: Sun, 10 May 2026 21:20:58 +0000
-Message-ID:
- <CY8PR11MB70846C6CD3C93572660CCC40EA3B2@CY8PR11MB7084.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY8PR11MB7084:EE_|PH0PR11MB4871:EE_
-x-ms-office365-filtering-correlation-id: 2c3e2f20-b929-4930-c319-08deaeda0780
-x-microsoft-antispam:
- BCL:0;ARA:14566002|20031999006|8062599012|31061999003|8060799015|24021099003|41001999006|19110799012|37011999003|15080799012|15030799006|12121999013|39105399006|5062599005|40105399003|440099028|3412199025|102099032|12091999003;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?9PaW50GKC2PJGSW7Qdq/EK6mu2+RhqDEXc8ae3H7dayDPHeZc2d50vxjzE?=
- =?iso-8859-1?Q?KuDM8UVCsWx2PojSZcMi9hj49fdHarfuvukzhGO5lllSBgWht7/V8NZYfy?=
- =?iso-8859-1?Q?JwmzVfykM1x3Py288qRl5yBsxJyJfrb18bqzO2xDZPUFNexDkafpCfR0r+?=
- =?iso-8859-1?Q?2bIS1iAJfRYpb2fxxJlq6vwoSiLszqbURxccQI5x69GrCPNAGOIw17qAbw?=
- =?iso-8859-1?Q?b8LpKZ8Y8S9BnJ5fHePBdogMtLg0I1uSHp127F4SiNNCPDWBophUI+NH0J?=
- =?iso-8859-1?Q?IuhXxsYxa/RYQ+RQS2fmtqdxMlmDrxZIP3LlBUgy54wpW7iC8HzCmTFW74?=
- =?iso-8859-1?Q?5pHJ+UDdSASiYGaYI6lPNe1cXMzYgbUKpAILLYtayYLJNYto9GxEh0eSFU?=
- =?iso-8859-1?Q?kRBeVEdglZQPBNyaWEKh1LCKzDNZsQ+PN4aeDM8RXCy0ZLoBT9fkCrZpmQ?=
- =?iso-8859-1?Q?6puG6BstRQwGkMbJbCuC389wqiw5ZQ5TPcedQ1/x4YF+0nXTjgEoBkz7/G?=
- =?iso-8859-1?Q?N+jOuA3KAtqxKGo3vHpZdp8QhyZ2Ja4LUyPGv/oy1mcAAGrX5eWl2gxU9l?=
- =?iso-8859-1?Q?cZPRiOxvG2U1ik09jWfM0CzLFsfa4daVPGaQUYUI1sQylhX75dTMqhmO8L?=
- =?iso-8859-1?Q?Me/CA6BSsd0wO6ewTXruPRc0cXyqRWw6UOudPj5VlsWKDSRd5JzbOPyA1b?=
- =?iso-8859-1?Q?dnxZ7LVQ4cpIBZ3hbl3ddRSGqTWF+NXqr7Z7Tjpx/dkisADQjo9JV3xzyu?=
- =?iso-8859-1?Q?g47ejSU1RAohVxOPfDp/wyeE5+2x7+6nuMn2aEhcOPCtLrYYlg6qwl2TzN?=
- =?iso-8859-1?Q?miVJyCxPVUGb5XXUkKWrbdnj2YuT8dX6YJAXmk1kPyE1yLcS0xufYfoqoc?=
- =?iso-8859-1?Q?qjpj55gcwrOvRc0AZntMDiJqPP8LuJYW+vYuYR8W6zYcfwwhirB/jzTPez?=
- =?iso-8859-1?Q?eZjceQ+XB2VRRg0c9DaDcysijaKHaJLfl1buDmA4x4Hr2wBTDr2//VNQss?=
- =?iso-8859-1?Q?ihaJPmb3E0lmJkV6Wd8BfHoVKdXYwD/JJRPQUcWI+zevNQ8QwD2kZmbHgM?=
- =?iso-8859-1?Q?OwfvExkLJQ7YQH96pSd2xDy1C+pjbwPwXXH56iy/wnM6/Lcpo6ZdLLCXnY?=
- =?iso-8859-1?Q?ulbm/Ho3S0pKsf4CLz1kSw1r0Cd16yhp+Hz5wEVNrYn4fs84QtiI9R8Clw?=
- =?iso-8859-1?Q?lEMxIo0QDMvvdQ=3D=3D?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?D/oLUbPbiveZhxDh30EOPhAT/AWEQfSxeaApFV0tbHu4IR6rsE8r0Dmcrc?=
- =?iso-8859-1?Q?ISSSJnZyKm51yA84QzS9d+vuQixHHLwhq1punh/xhqg1tx1y2tUVEJ820S?=
- =?iso-8859-1?Q?eA9PTn3f3nUIhsA47VmR2OWxexmGVBnftspr+C45K1NjxjsrBMzbfWqff/?=
- =?iso-8859-1?Q?nE5D00OX3zTNHimIG5nknGOZhn3JskDjLyJpmH1Cs1sCC5/hgyVIXzmebO?=
- =?iso-8859-1?Q?m/I4a3FXaCqFI4PI4VRlyprIFtwHxgubAqUP3n2sP/C88Ja4nHr69ER0FU?=
- =?iso-8859-1?Q?ogHlnfnTnzNXTJnAGBL6tdeXJA192PM4uhN8YF4EM3wJMpoF+rBeTNE0IW?=
- =?iso-8859-1?Q?Xa0SophVtzmeCmYl+MZsTcu9II5GsBT6abjQ6UZsbu/BqvdX8W/jpkquFK?=
- =?iso-8859-1?Q?T5zZbi//r72IcqLnt69UDzIdQEseVWHFei9t2BjUNePSQQEI47gzyYs8FY?=
- =?iso-8859-1?Q?gKF8iROBQPShIal2+FF44p6EFVwhFUrPhlNA1InxHoFuobhBCCLLSL/1wi?=
- =?iso-8859-1?Q?QEhTstsXVUX4U6Mw/1tCw3qbicS/wl0uq+m80P1SF2T79wzUn8uP0cZPLe?=
- =?iso-8859-1?Q?ajVhvSHzItrnXwvPzPLpWlxpwZ3IXFnVY96Myz4jB5nA0pcisYTwZo3XYp?=
- =?iso-8859-1?Q?uz2hYOmYCfgaLjMNU77GQsLlORXtZUAkkdiqo6Q3lgZ9aOj8MR6xuR10NR?=
- =?iso-8859-1?Q?UJ7GQgpD6a8NsUPsiG3hs3mNMtO2yjSHJH8y3SMHAUtBpOWmSUUDOzP0fr?=
- =?iso-8859-1?Q?RJNxdmt4wySp39OiPpqayLRR89aHV1Do8wSevh1HN9FB/0BE5cyIUJPchI?=
- =?iso-8859-1?Q?Ee1VOvHcwtbONiI+Ssqc5RLEQkEeiMvgmZEQ8kHl732prl667PsvEv+79V?=
- =?iso-8859-1?Q?P8s0/ECgiFpsT8EUmolDD56DH65i+jbyGzusZv1T+FTcPy2TBgctPc04BV?=
- =?iso-8859-1?Q?zwJaQQHjpV0we2czM8DzrF7X69JHB3wu9Mp9S3voTwPtIGAg3P4XovOTsC?=
- =?iso-8859-1?Q?NeG5M0/WRtqUSbPFPXhZY8DBtp+7yx96lEBxd1GV3xeBu1HN/WBcB/I6Lo?=
- =?iso-8859-1?Q?Xh097D3kRgJxfV38v8l+OTsJ5qUOSVqgzVerU7ClLsat6lCY+hQI/J9gzR?=
- =?iso-8859-1?Q?838/RM/5gboYsmRjAKgnOsjHtHKBC3SV26nW8xKTuJCGCpzqzfSgSObyuy?=
- =?iso-8859-1?Q?s554xHYly2n1ZAndwNbfeqCC2fpGimDqFrHSNsiVf3WrDOCoQuyqYM0fgx?=
- =?iso-8859-1?Q?tEGAp7XHvmfkTabjIhQgRHLLrAAWcoT4sAwz+D7po76z8SK6WJHy09QNo/?=
- =?iso-8859-1?Q?2QavYKCg46KF+AlVtjSiSpzvhYgPqPQ3vBc3O55gdELm8hje6cHs1fYV12?=
- =?iso-8859-1?Q?8iQY63IYUXPpPM3KyRmJb5izjECdFDFsBqoOHCsOoR6C+OXy22GRCvB2of?=
- =?iso-8859-1?Q?WWRVGMal49Q63YNO?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ 2026 21:34:55 +0000
+Received: from DB5PEPF00014B8C.eurprd02.prod.outlook.com
+ (2603:10a6:10:2b5:cafe::6f) by DU2PR04CA0315.outlook.office365.com
+ (2603:10a6:10:2b5::20) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9891.22 via Frontend Transport; Sun,
+ 10 May 2026 21:34:54 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 192.176.1.74)
+ smtp.mailfrom=ericsson.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=ericsson.com;
+Received-SPF: Pass (protection.outlook.com: domain of ericsson.com designates
+ 192.176.1.74 as permitted sender) receiver=protection.outlook.com;
+ client-ip=192.176.1.74; helo=oa.msg.ericsson.com; pr=C
+Received: from oa.msg.ericsson.com (192.176.1.74) by
+ DB5PEPF00014B8C.mail.protection.outlook.com (10.167.8.200) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.25.13 via Frontend Transport; Sun, 10 May 2026 21:34:53 +0000
+Received: from seroius18814.sero.gic.ericsson.se (153.88.142.248) by
+ smtp-central.internal.ericsson.com (100.87.178.69) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Sun, 10 May 2026 23:34:53 +0200
+Received: from seroius06448.sero.gic.ericsson.se (seroius06448.sero.gic.ericsson.se [10.117.92.228])
+	by seroius18814.sero.gic.ericsson.se (Postfix) with ESMTP id 84E694020B4A;
+	Sun, 10 May 2026 23:34:52 +0200 (CEST)
+Received: by seroius06448.sero.gic.ericsson.se (Postfix, from userid 7434092)
+	id 6F3871005D6A; Sun, 10 May 2026 23:34:52 +0200 (CEST)
+From: Fidan Aliyeva <fidan.aliyeva.ext@ericsson.com>
+To: <andrew@lunn.ch>, <olteanv@gmail.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<marek.behun@nic.cz>, <netdev@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <fidan.aliyeva.ext@ericsson.com>, "Thomas
+ Eckerman" <thomas.eckerman.ext@ericsson.com>
+Subject: [RFC PATCH 1/1] mv88e6xxx: Cache scratch config of 6352 in setup
+Date: Sun, 10 May 2026 23:34:29 +0200
+Message-ID: <20260510213429.2044612-1-fidan.aliyeva.ext@ericsson.com>
+X-Mailer: git-send-email 2.36.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: sct-15-20-9412-4-msonline-outlook-a6b68.templateTenant
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR11MB7084.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2c3e2f20-b929-4930-c319-08deaeda0780
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 May 2026 21:20:58.5099
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB5PEPF00014B8C:EE_|GV2PR07MB12355:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8b16a264-7a7a-4976-cb05-08deaedbf957
+X-SMTP-Server: smtp-central.internal.ericsson.com
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700016|1800799024|376014|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	EXuynXFfIDG5qjjIQyPr6WuzQ/bDABiQuwg+uJYUUeX+aBMdhB/70BJXrKzwYwEsomjlyxAUlpWKBMVxFFBoe3dXBRb4r+zGmGrZH/0T5Me4Hh2xrfkIyrew7tjOLUsCmR6/Vkm1IXgaPnol2p90bcs8OK3Qqosi4LG9qBn7n0qYgz4UXA39RJSwLTiVDl1FRoTX1zD1+lAAz662Gef26F/tnlQMW5NtNmlxYU9AYZZ9GgkLHNhVrqF4NH+Jh4TTufOpAdivViz4L8t5XPp4ovcM2TUdI4Akk7hgRa7P51Hi/gNU2kOa8/MTP+xgn8IaTdr9T9FkIqnWIp3csZBBYqFZstvtOtZs+WmGc3tQ/eMaef51Kqx/vXdxjjd+ITU94BrY+NLJyEKFiT5qMAIHuzM9Qz+wOFZPjmgrEBpZ1RLN/UVYNAkuqdTNnBBGHYNNcqVuZsVJpwfiReN35sAkagJtrN7k/bldjG7NArxi9hrbBsn6g4zSe/xP9zlYarVC5TLG9I5hTW6ihxQI2yYDUE0RsIchD8HaZsVN+OKErMIu2tu/RbOwC+c1dU+cbl164LiL9q6vn6t2/GYQJ80ztwQAGFf1MNGb7OVSHrTZHH4mLV+NL6bLqEjCBlmDGYB1NhG0yFJn1liWzVITbAK+XdDxdEpdGw3SLkkQHZUaUs9gnCtnhy3H76OKY/CPa0RXtqZnHlJoglcoh2BcX8hLj7cYzTnmny98H0iwprc0wqA=
+X-Forefront-Antispam-Report:
+	CIP:192.176.1.74;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:oa.msg.ericsson.com;PTR:office365.se.ericsson.net;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(1800799024)(376014)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	cnsEeLn+SlVyFRpCmeWEOwX9ZEq2a96jwDvLuwzj6xdFKygk/bC+lJ4pLmpbSOdt3IcnL7gqZioPruMCHA7D11x7UglC6t8LhEC9OB1P1NCI6rLfRG/X18In8lujkktDZzH7BQYWRJa6YkOtvuAa+5X9kDVm8ZqjIwAKmLtHVvStbSFKdzRMu7sT+vhUpBckMiDJoKenSjQmL6kKmWRegNhA2//6YHP7aGadRIxn/BVEerZVjBJz/wDI9gEf7/rh1xF2ycz2HsdERGbZx+OlBapzVaXPCvv8NbsC7bomrLcAdU/dS6KG9v3PoUmwpxpGgB5RhFwRd/v5krMOQiOnxVTICHRArcfDrU5qFb6BS0Wt9KXMugC+cEkMh8rNC4igFgpCtsSH/cyEI3AlAe/5VwrttGzBS1j2qPzQ9FaoCnZG28eIUC1uShMMdYRKzBYU
+X-OriginatorOrg: ericsson.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2026 21:34:53.6699
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4871
-X-Rspamd-Queue-Id: 966055066F0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b16a264-7a7a-4976-cb05-08deaedbf957
+X-MS-Exchange-CrossTenant-Id: 92e84ceb-fbfd-47ab-be52-080c6b87953f
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=92e84ceb-fbfd-47ab-be52-080c6b87953f;Ip=[192.176.1.74];Helo=[oa.msg.ericsson.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DB5PEPF00014B8C.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR07MB12355
+X-Rspamd-Queue-Id: 77924506805
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[live.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[live.com:s=selector1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[ericsson.com,reject];
+	R_DKIM_ALLOW(-0.20)[ericsson.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286402-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286403-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,nic.cz,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[live.com];
-	DKIM_TRACE(0.00)[live.com:+];
-	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[spencer.phillips@live.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fidan.aliyeva.ext@ericsson.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[ericsson.com:+];
+	NEURAL_HAM(-0.00)[-0.997];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,live.com:email,live.com:dkim]
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Action: no action
 
-RDS zerocopy sends pin user pages into the message data SG list and uses a=
-=0A=
-zerocopy notifier to carry pin accounting and completion state.=0A=
-=0A=
-If iov_iter_get_pages2() fails after some SG entries have already been=0A=
-populated, the copy helper currently tears down the notifier and returns an=
-=0A=
-error while leaving the partial SG count live.=0A=
-=0A=
-The common message purge path no longer has a notifier to distinguish=0A=
-zerocopy user pages from copied-send pages in that state, so it can release=
-=0A=
-a still-mapped user page with __free_page().=0A=
-=0A=
-Make data page ownership explicit with an op_zcopy bit. Once zerocopy pin=
-=0A=
-accounting succeeds, leave the notifier, ownership bit, and populated SG=0A=
-count attached to the message and let rds_message_purge() perform the=0A=
-single cleanup path.=0A=
-=0A=
-The notifier still controls zerocopy completion and pin accounting. The new=
-=0A=
-op_zcopy bit controls whether counted data SG entries are released with=0A=
-put_page() or __free_page().=0A=
-=0A=
-This preserves normal copied-send cleanup and queued zerocopy completion=0A=
-behavior. It fixes the partial-build failure path without adding a second=
-=0A=
-manual unwind path.=0A=
-=0A=
-Tested with an AF_RDS/RDS_TCP MSG_ZEROCOPY partial-fault reproducer on a=0A=
-KASAN kernel. Before the fix the run triggered bad page/accounting reports;=
-=0A=
-after the fix sendmsg returns -EFAULT and no bad page or KASAN report occur=
-s.=0A=
-=0A=
-Fixes: 0cebaccef3ac ("rds: zerocopy Tx support.")=0A=
-Cc: stable@vger.kernel.org=0A=
-Assisted-By: Codex:GPT-5.5-xhigh=0A=
-Signed-off-by: Spencer Phillips <spencer.phillips@live.com>=0A=
----=0A=
- net/rds/message.c | 33 ++++++++++-----------------------=0A=
- net/rds/rds.h     |  1 +=0A=
- 2 files changed, 11 insertions(+), 23 deletions(-)=0A=
-=0A=
-diff --git a/net/rds/message.c b/net/rds/message.c=0A=
-index 25fedcb3cd00..a381a895339c 100644=0A=
---- a/net/rds/message.c=0A=
-+++ b/net/rds/message.c=0A=
-@@ -141,7 +141,7 @@ static void rds_message_purge(struct rds_message *rm)=
-=0A=
- 	spin_lock_irqsave(&rm->m_rs_lock, flags);=0A=
- 	znotifier =3D rm->data.op_mmp_znotifier;=0A=
- 	rm->data.op_mmp_znotifier =3D NULL;=0A=
--	zcopy =3D !!znotifier;=0A=
-+	zcopy =3D rm->data.op_zcopy || !!znotifier;=0A=
-=0A=
- 	if (rm->m_rs) {=0A=
- 		struct rds_sock *rs =3D rm->m_rs;=0A=
-@@ -170,6 +170,7 @@ static void rds_message_purge(struct rds_message *rm)=
-=0A=
- 			put_page(sg_page(&rm->data.op_sg[i]));=0A=
- 	}=0A=
- 	rm->data.op_nents =3D 0;=0A=
-+	rm->data.op_zcopy =3D 0;=0A=
-=0A=
- 	if (rm->rdma.op_active)=0A=
- 		rds_rdma_free_op(&rm->rdma);=0A=
-@@ -414,7 +415,6 @@ struct rds_message *rds_message_map_pages(unsigned long=
- *page_addrs, unsigned in=0A=
- static int rds_message_zcopy_from_user(struct rds_message *rm, struct iov_=
-iter *from)=0A=
- {=0A=
- 	struct scatterlist *sg;=0A=
--	int ret =3D 0;=0A=
- 	int length =3D iov_iter_count(from);=0A=
- 	struct rds_msg_zcopy_info *info;=0A=
-=0A=
-@@ -429,12 +429,12 @@ static int rds_message_zcopy_from_user(struct rds_mes=
-sage *rm, struct iov_iter *=0A=
- 	if (!info)=0A=
- 		return -ENOMEM;=0A=
- 	INIT_LIST_HEAD(&info->rs_zcookie_next);=0A=
--	rm->data.op_mmp_znotifier =3D &info->znotif;=0A=
--	if (mm_account_pinned_pages(&rm->data.op_mmp_znotifier->z_mmp,=0A=
--				    length)) {=0A=
--		ret =3D -ENOMEM;=0A=
--		goto err;=0A=
-+	if (mm_account_pinned_pages(&info->znotif.z_mmp, length)) {=0A=
-+		kfree(info);=0A=
-+		return -ENOMEM;=0A=
- 	}=0A=
-+	rm->data.op_mmp_znotifier =3D &info->znotif;=0A=
-+	rm->data.op_zcopy =3D 1;=0A=
- 	while (iov_iter_count(from)) {=0A=
- 		struct page *pages;=0A=
- 		size_t start;=0A=
-@@ -442,28 +442,15 @@ static int rds_message_zcopy_from_user(struct rds_mes=
-sage *rm, struct iov_iter *=0A=
-=0A=
- 		copied =3D iov_iter_get_pages2(from, &pages, PAGE_SIZE,=0A=
- 					    1, &start);=0A=
--		if (copied < 0) {=0A=
--			struct mmpin *mmp;=0A=
--			int i;=0A=
--=0A=
--			for (i =3D 0; i < rm->data.op_nents; i++)=0A=
--				put_page(sg_page(&rm->data.op_sg[i]));=0A=
--			mmp =3D &rm->data.op_mmp_znotifier->z_mmp;=0A=
--			mm_unaccount_pinned_pages(mmp);=0A=
--			ret =3D -EFAULT;=0A=
--			goto err;=0A=
--		}=0A=
-+		if (copied < 0)=0A=
-+			return -EFAULT;=0A=
- 		length -=3D copied;=0A=
- 		sg_set_page(sg, pages, copied, start);=0A=
- 		rm->data.op_nents++;=0A=
- 		sg++;=0A=
- 	}=0A=
- 	WARN_ON_ONCE(length !=3D 0);=0A=
--	return ret;=0A=
--err:=0A=
--	kfree(info);=0A=
--	rm->data.op_mmp_znotifier =3D NULL;=0A=
--	return ret;=0A=
-+	return 0;=0A=
- }=0A=
-=0A=
- int rds_message_copy_from_user(struct rds_message *rm, struct iov_iter *fr=
-om,=0A=
-diff --git a/net/rds/rds.h b/net/rds/rds.h=0A=
-index 6e0790e4b570..b27848ec5c5a 100644=0A=
---- a/net/rds/rds.h=0A=
-+++ b/net/rds/rds.h=0A=
-@@ -496,6 +496,7 @@ struct rds_message {=0A=
- 		} rdma;=0A=
- 		struct rm_data_op {=0A=
- 			unsigned int		op_active:1;=0A=
-+			unsigned int		op_zcopy:1;=0A=
- 			unsigned int		op_nents;=0A=
- 			unsigned int		op_count;=0A=
- 			unsigned int		op_dmasg;=0A=
---=0A=
-2.54.0=
+In mv88e6352 scratch register in Global Control 2 set of registers
+returns which port is attached to SERDES. This value is set and
+stays constant after the switch is released from reset; thus, it
+can be cached during chip setup instead of reading the register
+everytime when SERDES config is needed.
+
+1. Add setup_chip_specific member to mv88e6xxx_ops and
+g2_scratch_config3 member to mv88e6xxx_chip.
+2. Add mv88e6352_g2_cache_global_scratch_config3 function as
+.setup_chip_specific which reads the CONFIG3 value from the scratch
+register and caches it.
+3. Call .setup_chip_specific during chip setup.
+4. Refactor mv88e6352_g2_scratch_port_has_serdes to use the cached
+value.
+5. Remove the locks surrounding mv88e6352_g2_scratch_port_has_serdes.
+Not needed anymore since no register access in the function.
+
+Co-developed-by: Thomas Eckerman <thomas.eckerman.ext@ericsson.com>
+Signed-off-by: Thomas Eckerman <thomas.eckerman.ext@ericsson.com>
+Signed-off-by: Fidan Aliyeva <fidan.aliyeva.ext@ericsson.com>
+---
+ drivers/net/dsa/mv88e6xxx/chip.c            | 13 ++++++--
+ drivers/net/dsa/mv88e6xxx/chip.h            |  6 ++++
+ drivers/net/dsa/mv88e6xxx/global2.h         |  1 +
+ drivers/net/dsa/mv88e6xxx/global2_scratch.c | 36 +++++++++++++++------
+ drivers/net/dsa/mv88e6xxx/pcs-6352.c        |  2 --
+ drivers/net/dsa/mv88e6xxx/serdes.c          |  2 --
+ 6 files changed, 44 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index 8ca5fd40df92..ab354bc2e2f1 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -685,9 +685,6 @@ static void mv88e6352_phylink_get_caps(struct mv88e6xxx_chip *chip, int port,
+ 	/* Port 4 supports automedia if the serdes is associated with it. */
+ 	if (port == 4) {
+ 		err = mv88e6352_g2_scratch_port_has_serdes(chip, port);
+-		if (err < 0)
+-			dev_err(chip->dev, "p%d: failed to read scratch\n",
+-				port);
+ 		if (err <= 0)
+ 			return;
+
+@@ -3997,6 +3994,12 @@ static int mv88e6xxx_setup(struct dsa_switch *ds)
+ 			goto unlock;
+ 	}
+
++	if (chip->info->ops->setup_chip_specific) {
++		err = chip->info->ops->setup_chip_specific(chip);
++		if (err)
++			goto unlock;
++	}
++
+ 	/* Cache the cmode of each port. */
+ 	for (i = 0; i < mv88e6xxx_num_ports(chip); i++) {
+ 		if (chip->info->ops->port_get_cmode) {
+@@ -4662,6 +4665,7 @@ static const struct mv88e6xxx_ops mv88e6172_ops = {
+ 	.vtu_loadpurge = mv88e6352_g1_vtu_loadpurge,
+ 	.stu_getnext = mv88e6352_g1_stu_getnext,
+ 	.stu_loadpurge = mv88e6352_g1_stu_loadpurge,
++	.setup_chip_specific = mv88e6352_g2_cache_global_scratch_config3,
+ 	.serdes_get_regs_len = mv88e6352_serdes_get_regs_len,
+ 	.serdes_get_regs = mv88e6352_serdes_get_regs,
+ 	.gpio_ops = &mv88e6352_gpio_ops,
+@@ -4765,6 +4769,7 @@ static const struct mv88e6xxx_ops mv88e6176_ops = {
+ 	.vtu_loadpurge = mv88e6352_g1_vtu_loadpurge,
+ 	.stu_getnext = mv88e6352_g1_stu_getnext,
+ 	.stu_loadpurge = mv88e6352_g1_stu_loadpurge,
++	.setup_chip_specific = mv88e6352_g2_cache_global_scratch_config3,
+ 	.serdes_irq_mapping = mv88e6352_serdes_irq_mapping,
+ 	.serdes_get_regs_len = mv88e6352_serdes_get_regs_len,
+ 	.serdes_get_regs = mv88e6352_serdes_get_regs,
+@@ -5040,6 +5045,7 @@ static const struct mv88e6xxx_ops mv88e6240_ops = {
+ 	.vtu_loadpurge = mv88e6352_g1_vtu_loadpurge,
+ 	.stu_getnext = mv88e6352_g1_stu_getnext,
+ 	.stu_loadpurge = mv88e6352_g1_stu_loadpurge,
++	.setup_chip_specific = mv88e6352_g2_cache_global_scratch_config3,
+ 	.serdes_irq_mapping = mv88e6352_serdes_irq_mapping,
+ 	.serdes_get_regs_len = mv88e6352_serdes_get_regs_len,
+ 	.serdes_get_regs = mv88e6352_serdes_get_regs,
+@@ -5475,6 +5481,7 @@ static const struct mv88e6xxx_ops mv88e6352_ops = {
+ 	.gpio_ops = &mv88e6352_gpio_ops,
+ 	.avb_ops = &mv88e6352_avb_ops,
+ 	.ptp_ops = &mv88e6352_ptp_ops,
++	.setup_chip_specific = mv88e6352_g2_cache_global_scratch_config3,
+ 	.serdes_get_sset_count = mv88e6352_serdes_get_sset_count,
+ 	.serdes_get_strings = mv88e6352_serdes_get_strings,
+ 	.serdes_get_stats = mv88e6352_serdes_get_stats,
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
+index 2b235ac2c5df..683f5a626f34 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.h
++++ b/drivers/net/dsa/mv88e6xxx/chip.h
+@@ -454,6 +454,9 @@ struct mv88e6xxx_chip {
+
+ 	/* TCAM entries */
+ 	struct mv88e6xxx_tcam tcam;
++
++	/* Global2 scratch register config data3 */
++	u8 g2_scratch_config3;
+ };
+
+ #define TCAM_MATCH_SIZE 96
+@@ -719,6 +722,9 @@ struct mv88e6xxx_ops {
+
+ 	/* Ternary Content Addressable Memory operations */
+ 	const struct mv88e6xxx_tcam_ops *tcam_ops;
++
++	/* Apply chip specific setup steps */
++	int (*setup_chip_specific)(struct mv88e6xxx_chip *chip);
+ };
+
+ struct mv88e6xxx_irq_ops {
+diff --git a/drivers/net/dsa/mv88e6xxx/global2.h b/drivers/net/dsa/mv88e6xxx/global2.h
+index 82f9b410de0b..ff5adf7c9bc3 100644
+--- a/drivers/net/dsa/mv88e6xxx/global2.h
++++ b/drivers/net/dsa/mv88e6xxx/global2.h
+@@ -382,6 +382,7 @@ int mv88e6390_g2_scratch_gpio_set_smi(struct mv88e6xxx_chip *chip,
+ 				      bool external);
+ int mv88e6393x_g2_scratch_gpio_set_smi(struct mv88e6xxx_chip *chip,
+ 				       bool external);
++int mv88e6352_g2_cache_global_scratch_config3(struct mv88e6xxx_chip *chip);
+ int mv88e6352_g2_scratch_port_has_serdes(struct mv88e6xxx_chip *chip, int port);
+ int mv88e6xxx_g2_atu_stats_set(struct mv88e6xxx_chip *chip, u16 kind, u16 bin);
+ int mv88e6xxx_g2_atu_stats_get(struct mv88e6xxx_chip *chip, u16 *stats);
+diff --git a/drivers/net/dsa/mv88e6xxx/global2_scratch.c b/drivers/net/dsa/mv88e6xxx/global2_scratch.c
+index 53a6d3ed63b3..e57b25aa2a4c 100644
+--- a/drivers/net/dsa/mv88e6xxx/global2_scratch.c
++++ b/drivers/net/dsa/mv88e6xxx/global2_scratch.c
+@@ -322,18 +322,18 @@ int mv88e6393x_g2_scratch_gpio_set_smi(struct mv88e6xxx_chip *chip,
+ }
+
+ /**
+- * mv88e6352_g2_scratch_port_has_serdes - indicate if a port can have a serdes
++ * mv88e6352_g2_cache_global_scratch_config3 - caches G2 CONFIG3 value
+  * @chip: chip private data
+- * @port: port number to check for serdes
+  *
+- * Indicates whether the port may have a serdes attached according to the
+- * pin strapping. Returns negative error number, 0 if the port is not
+- * configured to have a serdes, and 1 if the port is configured to have a
+- * serdes attached.
++ * Reads and stores config3 value of global2 scratch registers, which
++ * can be used to determine if the port is attached to a serdes. The
++ * value does not change once the switch is released from reset. Returns
++ * negative error number if the register read fails; otherwise, 0
+  */
+-int mv88e6352_g2_scratch_port_has_serdes(struct mv88e6xxx_chip *chip, int port)
++
++int mv88e6352_g2_cache_global_scratch_config3(struct mv88e6xxx_chip *chip)
+ {
+-	u8 config3, p;
++	u8 config3;
+ 	int err;
+
+ 	err = mv88e6xxx_g2_scratch_read(chip, MV88E6352_G2_SCRATCH_CONFIG_DATA3,
+@@ -341,7 +341,25 @@ int mv88e6352_g2_scratch_port_has_serdes(struct mv88e6xxx_chip *chip, int port)
+ 	if (err)
+ 		return err;
+
+-	if (config3 & MV88E6352_G2_SCRATCH_CONFIG_DATA3_S_SEL)
++	chip->g2_scratch_config3 = config3;
++
++	return 0;
++}
++
++/**
++ * mv88e6352_g2_scratch_port_has_serdes - indicate if a port has serdes
++ * @chip: chip private data
++ * @port: port number to check for serdes
++ *
++ * Indicates whether the port may have a serdes attached according to the
++ * pin strapping. Returns 0 if the port is not configured to have a serdes, and
++ * 1 if the port is configured to have a serdes attached.
++ */
++int mv88e6352_g2_scratch_port_has_serdes(struct mv88e6xxx_chip *chip, int port)
++{
++	u8 p;
++
++	if (chip->g2_scratch_config3 & MV88E6352_G2_SCRATCH_CONFIG_DATA3_S_SEL)
+ 		p = 5;
+ 	else
+ 		p = 4;
+diff --git a/drivers/net/dsa/mv88e6xxx/pcs-6352.c b/drivers/net/dsa/mv88e6xxx/pcs-6352.c
+index 9ebf0f89f817..308655d72d52 100644
+--- a/drivers/net/dsa/mv88e6xxx/pcs-6352.c
++++ b/drivers/net/dsa/mv88e6xxx/pcs-6352.c
+@@ -326,9 +326,7 @@ static int mv88e6352_pcs_init(struct mv88e6xxx_chip *chip, int port)
+ 	unsigned int irq;
+ 	int err;
+
+-	mv88e6xxx_reg_lock(chip);
+ 	err = mv88e6352_g2_scratch_port_has_serdes(chip, port);
+-	mv88e6xxx_reg_unlock(chip);
+ 	if (err <= 0)
+ 		return err;
+
+diff --git a/drivers/net/dsa/mv88e6xxx/serdes.c b/drivers/net/dsa/mv88e6xxx/serdes.c
+index a936ee80ce00..d3d3c121a32d 100644
+--- a/drivers/net/dsa/mv88e6xxx/serdes.c
++++ b/drivers/net/dsa/mv88e6xxx/serdes.c
+@@ -202,9 +202,7 @@ int mv88e6352_serdes_get_regs_len(struct mv88e6xxx_chip *chip, int port)
+ {
+ 	int err;
+
+-	mv88e6xxx_reg_lock(chip);
+ 	err = mv88e6352_g2_scratch_port_has_serdes(chip, port);
+-	mv88e6xxx_reg_unlock(chip);
+ 	if (err <= 0)
+ 		return err;
+
+--
+2.36.0
+
 
