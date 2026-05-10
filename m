@@ -1,71 +1,61 @@
-Return-Path: <netdev+bounces-286322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286323-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QFB3EfmqAGrhLQEAu9opvQ
-	(envelope-from <netdev+bounces-286322-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:57:45 +0200
+	id UJLNNj6rAGrhLQEAu9opvQ
+	(envelope-from <netdev+bounces-286323-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:58:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7DC0504F3D
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:57:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A2C3504F5B
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:58:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 76EC3300D45A
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 15:56:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 49D1D3009B24
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 15:58:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBE7337AA94;
-	Sun, 10 May 2026 15:56:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47909348898;
+	Sun, 10 May 2026 15:58:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RQV28pKR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G0WbLwyA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A88B224886A;
-	Sun, 10 May 2026 15:56:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742E937754B;
+	Sun, 10 May 2026 15:58:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778428563; cv=none; b=mE2H/aDgerJw/46cuCclykpwH7BYNCSHE8tc8lT8VKuNj9DqnOlewI0gAwnd4uL+laMCtgJNiAiLoXFsXuaTXNHKwZxU4Gu7iBrU20t7kRS905Fpl6UFIa6eu72rGo83D5FpIDI7PuqboAyd/j2v4KfWmkcis7DJfwxzYH5crDI=
+	t=1778428723; cv=none; b=IMrAZj7YjuAE0ESTnAnOI6O0oUALrTo5en1th4wDFQOjNew5Bwmkw6WEUGgQC0fXzS+ViOuOALXDg6ZqVBynD9cNWXONuMtVosCgE5t6iTq60HcPFRCqlV/jl73kwXHnXE2nqQpgxT8LxH+UohY91Tq+kg701WB8GL3FUwsKn2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778428563; c=relaxed/simple;
-	bh=DKRMHWxdi6z+PAalXzDlkXlxQgstpqQcwYevUkauWbc=;
+	s=arc-20240116; t=1778428723; c=relaxed/simple;
+	bh=VRGYYL4OLKO7RCTcIN/u+clw2lKg7gWF82T7G0HhC14=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VkTu1LeU8cpIPOTEgdTljrwIdyfDdLOeHN7VANXS9pY+8D5t6t0cRiSuPUHhfl7PhVliHX+VrlLd69oxCAjs0sEMBnASU8Y97q+GSK9PXMHsulM1ObzXEm/1OVlWr8lPzIyQFBsOl2XbTc09vwQqkUCSWyYtTGo4Tpd2SyvqH9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RQV28pKR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D39C4C2BCB8;
-	Sun, 10 May 2026 15:56:02 +0000 (UTC)
+	 MIME-Version:Content-Type; b=V8zVItM7wZ6rLpW0wkpAij9o79jr6wIjConwicLXW/1ZEy7Zv84ooUiS2YFACGKFWtv9Z41aQKoIo83NseUBmwPUpl68AqikWcorK89RUVF5BiLbm764ejPIiFyxUASG/x1navnGHJ2g9bHWMTPEBrSNumdsNqLONWwLnqkhgTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G0WbLwyA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94FA1C2BCB8;
+	Sun, 10 May 2026 15:58:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778428563;
-	bh=DKRMHWxdi6z+PAalXzDlkXlxQgstpqQcwYevUkauWbc=;
+	s=k20201202; t=1778428722;
+	bh=VRGYYL4OLKO7RCTcIN/u+clw2lKg7gWF82T7G0HhC14=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RQV28pKRGyDtX8i8VLG4sjdOuBLsPPcrUVVYrl352AtpEoubl4CNANLQx/Wf9Wzq6
-	 lCFz97ts4Y5vV/K87QW49Aoecb+DxmBhb63CJgaRz+xlP5wTnrzTPZwhSlbNJ9LnRi
-	 fG7zQOexvq40qsX8RaPbA0cHIHph+4+SGXNG57ogcAP2ISHTSYvDuys11ngPjAmivE
-	 2CB4w3VqCGvQw8xJUIjBIWPsmrU8GETuJOpKlaz7qD5+tEU5yAwpL8EQN2NhrIqSoo
-	 4n5qVQowTdegnsvN90dbX2DpQFhWmAUbOzGZ2G7zXfP8eo04wo6ri57JwpfYkxBQcR
-	 cZaamJMnxrLzQ==
-Date: Sun, 10 May 2026 08:56:02 -0700
+	b=G0WbLwyAttWAZWd8F33/xlo/GM7gv8vqBo4WfpkyoYm5BVYQQ+xBPQ57CKYD4W2LX
+	 tHSL094ghEOZ7aormwWKRz+rbh2PkTQnsovite4qhwLsyvcqcQc+YLUPA3dwiurzNu
+	 Y2CkjJoHssEjAw0GUcmExDI3i7EUnnd0kFyMXL6Wh9QDg4DU+RhiAdTuPcH2PQxnEt
+	 G6d+SuTeGMh/oRt5lHOEj8+U4TLCaCvQe/7+9nHk5l+cD0dt17gyYZBDXesoGjwV3E
+	 mGGw9iEFbLx+fQ+JZcRaMcGferE9wcvErBAv01UPFw+AUDf/D+m04hCMZJla3jFJSn
+	 87/i4aFdAZeHg==
+Date: Sun, 10 May 2026 08:58:41 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Simon Schippers <simon@schippers-hamm.de>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, kernel-team@cloudflare.com,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John
- Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next v5 3/5] veth: implement Byte Queue Limits (BQL)
- for latency reduction
-Message-ID: <20260510085602.57c7a081@kernel.org>
-In-Reply-To: <f459b95c-80d5-4e05-84b2-f574c92724de@kernel.org>
-References: <20260505132159.241305-1-hawk@kernel.org>
-	<20260505132159.241305-4-hawk@kernel.org>
-	<ee275aa6-af27-4dac-9afa-da88abde312b@schippers-hamm.de>
-	<8f2f7f2e-6aa2-4e5b-b52d-0025b2525579@redhat.com>
-	<e3a91545-13cd-4f87-8375-d707865bdbca@schippers-hamm.de>
-	<6a597dbd-70bf-4b14-b495-2f7248fd3220@kernel.org>
-	<20260508190626.4285fac0@kernel.org>
-	<f459b95c-80d5-4e05-84b2-f574c92724de@kernel.org>
+To: "Maciej W. Rozycki" <macro@orcam.me.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Ethan Nelson-Moore
+ <enelsonmoore@gmail.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: MAINTAINERS: Add self for the 3c509 network driver
+Message-ID: <20260510085841.243bdd7e@kernel.org>
+In-Reply-To: <alpine.DEB.2.21.2605100246020.46195@angie.orcam.me.uk>
+References: <177827761704.865600.12887598979033208728.git-patchwork-notify@kernel.org>
+	<20260509230519.57607-2-enelsonmoore@gmail.com>
+	<alpine.DEB.2.21.2605100246020.46195@angie.orcam.me.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,68 +64,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: D7DC0504F3D
+X-Rspamd-Queue-Id: 5A2C3504F5B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286322-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-286323-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[schippers-hamm.de,redhat.com,vger.kernel.org,cloudflare.com,lunn.ch,davemloft.net,google.com,kernel.org,iogearbox.net,gmail.com,fomichev.me];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Sat, 9 May 2026 11:09:51 +0200 Jesper Dangaard Brouer wrote:
-> On 09/05/2026 04.06, Jakub Kicinski wrote:
-> > On Thu, 7 May 2026 21:09:09 +0200 Jesper Dangaard Brouer wrote:  
-> >> Not against being able to modify VETH_RING_SIZE, but I don't think it is
-> >> the solution here.  
+On Sun, 10 May 2026 02:57:15 +0100 (BST) Maciej W. Rozycki wrote:
+> On Sat, 9 May 2026, Ethan Nelson-Moore wrote:
+> > > This patch was applied to netdev/net.git (main)
+> > > by Jakub Kicinski <kuba@kernel.org>:  
+> > >   - MAINTAINERS: Add self for the 3c509 network driver  
 > > 
-> > Was it evaluated, tho?
+> > Hi, Jakub,
 > > 
-> > It's obviously super easy these days have AI spew no end of complex
-> > code. So it'd be great to have some solid, ideally production-like
-> > data to back this all up.
-> > 
-> > VETH_RING_SIZE seems trivial, ethtool set ringparam  
+> > Did you forget to revert the driver removal, or have you just not gotten
+> > around to it yet?  
 > 
-> No, unfortunately we cannot just decrease the VETH_RING_SIZE. 
+>  Thanks for the heads-up.  I can see the removal was fast-tracked to 
+> Linus; I didn't expect that, waiting a couple of weeks for people to speak 
+> out wouldn't have hurt.  Now `git revert 91f3a27ae9f6' is in order.  
+> Shall I post the output from that, or what is the expected way to handle 
+> this situation?
 
-To be clear - I said may it configurable with ethtool -G
-not change the default.
-
-> The reason is that XDP-redirect into veth don't have any
-> back-pressure and would simply drop packets if queue size becomes
-> less than the NAPI budget (64). (Yes, we use both normal path and
-> XDP-redirect in production). 
-
-Doesn't this mean you have a queue which is not under BQL control?
-
-> My benchmarking shows that an optimal BQL limit is dynamically
-> adjusted between 17-55 depending on veth consumer namespace
-> overhead/speed, when balancing throughput and latency.
-
-Testing with prod-approximating traffic pattern and load would be great.
+Sorry, must have missed it or forgotten.
+Could you point me to the report of these driver being used?
 
