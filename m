@@ -1,242 +1,243 @@
-Return-Path: <netdev+bounces-286315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286316-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sSbRE6CnAGp/LQEAu9opvQ
-	(envelope-from <netdev+bounces-286315-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:43:28 +0200
+	id 4LklMQaoAGp/LQEAu9opvQ
+	(envelope-from <netdev+bounces-286316-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:45:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8CB6504E26
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:43:27 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4C5B504E63
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:45:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B228D300788E
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 15:43:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1EDF83006D57
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 15:44:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C497D39E6F0;
-	Sun, 10 May 2026 15:43:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A89463A0B1C;
+	Sun, 10 May 2026 15:44:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="wObcXIiT";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="KG4qWpqQ";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="CO0at+Fg";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="gc7kH8YD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="drFbcTBN";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="GuOB4b8p"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F0D2DC76A
-	for <netdev@vger.kernel.org>; Sun, 10 May 2026 15:43:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF02F388E7C
+	for <netdev@vger.kernel.org>; Sun, 10 May 2026 15:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778427803; cv=none; b=Uf7AunPaSelWZjqh0E3eZka+mbI0sB8Khe4QnBwYVyt8WDyp9SVhzSZFmHken1gd8VpeadvZ4Mfd+77t82oq+WwPw43To9IiHYVRhWeCcee2o1X6ruYa0dyknz5Qg+1Fb27aenQmE+mhf8driYOdlWcT+nH0JwweLIhXV4bK92M=
+	t=1778427884; cv=none; b=bxsMDBDCX4wjwg4yo8i1acnFUF9vDSRQwfcIJsrSZZexGXrHQH6y5KmhVfefkQCK7mznDZ4kN32aYFWRYU04xy5GghvYFaZj6M0IS9CfxCLlgg8S+gl3udWW31aEv++pG7X95qnrL5U4TF8ktStWCAqYX4WUF378i1NNIOSqTb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778427803; c=relaxed/simple;
-	bh=Yqm0JJ6KMIy5Dj9ZilpV1LWQn4g2V6QCjYd20uha+qU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iTKFpqSj5n/h8W/PPDDYdjzeRmzkGS1g88CfvUv/xqMFh48/y385pTUQJ+ibAPzvmm8La8p3h3b/BrCZzQHaNzhc1XVUUOPF1K38IEvOprymfdfWeHlMii/oq0Er07csXatJvNfm4sSeAvZZ+EJk+97v22U/UDPS5aEVqqCHc8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=wObcXIiT; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=KG4qWpqQ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=CO0at+Fg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=gc7kH8YD; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 812816799C;
-	Sun, 10 May 2026 15:43:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1778427793; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	s=arc-20240116; t=1778427884; c=relaxed/simple;
+	bh=oCHlo1fqZatJDIDvyJ1SrB7bwf2coY5WCAjVkHb+KpM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DkzMZQdD5fDLyDh6oql/iaZ7XxEFrhFjAv5Z+Th7vga6tODIUVNFKB88GBDoUlTGuCp68nwAAmSPTOlT27/4nFnTF+v2Z8LceGUz6g19HELaIxC8knEOVHMXOajIWqt7u++/+rHYXy+mSGznX30V3jkenHebEJYu9U3Nowl55UI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=drFbcTBN; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=GuOB4b8p; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778427882;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=k8sWkn+8HuBV0/6DaAEZgQxc0UgzXG8eAgWGOiC0/xQ=;
-	b=wObcXIiTm3Q0w8WeTOL9UavTr8HpZJCsAbHL72zuRuGeXHthIa21p1GKA9wvZbwegjX7pG
-	LTAh9Xd1NoxyAQSob4YGO8Hz1xt5GbAYDyoHt9MNALQdD7Ejp75wGD75HfMtlANEJBZ0IV
-	V8fOjKFDluV5UZi3FUtWu3Xp4jSoTu8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1778427793;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k8sWkn+8HuBV0/6DaAEZgQxc0UgzXG8eAgWGOiC0/xQ=;
-	b=KG4qWpqQLtjQA626K/5OLr32UJKGOLpiq5ZqfbA5SamYYk/kAKmI1LpBgdebaGqsZGjCdZ
-	ZUPSV8UIqJL5RjDw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=CO0at+Fg;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=gc7kH8YD
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1778427792; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k8sWkn+8HuBV0/6DaAEZgQxc0UgzXG8eAgWGOiC0/xQ=;
-	b=CO0at+FgYf8ECQT3Lbxp1EWo17OfX3T7QC3rkU/eRlNFzuOi+OgrH5OB3EFHsU7DFq+CNF
-	PPpco4dWFkwCeSKl+udZgEOLdizRHLiuH/jkKaDQOf8ftZ0ROtUpqfDLSf2gaAnEZC1owW
-	/eGquXvVwP6jpm7fJJsEIYlsOTl9z/g=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1778427792;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k8sWkn+8HuBV0/6DaAEZgQxc0UgzXG8eAgWGOiC0/xQ=;
-	b=gc7kH8YDmDHjlVpXK0LuBX2ZCv3L/lpGpSqbCGLHOoe91MA5CRXJDBet+aN6D7Egx5bahf
-	gug/2i/+M6qaC7AQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C08D5593A3;
-	Sun, 10 May 2026 15:43:09 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id szulI42nAGrtMQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Sun, 10 May 2026 15:43:09 +0000
-Message-ID: <ed9bfe0a-2460-476f-8d6e-4c92ecf18e00@suse.de>
-Date: Sun, 10 May 2026 17:43:01 +0200
+	bh=7jk9H54lMHadSFms9Swh2u6zzH7MNV3xP2hPzoWhQ7I=;
+	b=drFbcTBNUBhA8/eDHasEV2qAYSHcZRFeytR6QkwMoJ33NH88QalEd4uSUMtFdESNHzCqob
+	d4crOXfdW7VdT20M+fhLnhkqPqAxoMT3WkJqGWQ2hwcB2dgHH//0fvwjh9Cd5/AOEVzFR1
+	qgKfpofBl+xOyyZth/2UGnP/MESe+dY=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-459-r9zt-uWOMq-Nldm0V3RxbQ-1; Sun, 10 May 2026 11:44:40 -0400
+X-MC-Unique: r9zt-uWOMq-Nldm0V3RxbQ-1
+X-Mimecast-MFC-AGG-ID: r9zt-uWOMq-Nldm0V3RxbQ_1778427879
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-38e83f048bbso17121091fa.2
+        for <netdev@vger.kernel.org>; Sun, 10 May 2026 08:44:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1778427879; x=1779032679; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7jk9H54lMHadSFms9Swh2u6zzH7MNV3xP2hPzoWhQ7I=;
+        b=GuOB4b8p4LkJw+/mwuEKmvVdU0Y8qAhLOm5ictQv5WRJ13qxNDxJflu3zd034A4HFN
+         uSzPSxjwFDWrLuHoaHsq+NgKNWCi6Ol0WlrpZwBPEmHAyHhiURjuKrQRPTYX8TRcryWG
+         zJYzM3yTLkP1asSFichwSR0IWsJ3N0Eng+Rk93H/ttg90w3kcxXrG/kfMmk8NwMtGsd/
+         huj87W1rbpT856F4aShWZgQw/bh6QCRsKLMseEQAvazGQ+m3IhwOyVov66wvh9G1OE+q
+         E1Z4GwiuRXf+GexF2KPsBU5dBYFx804Tyr6CjJP21Qom2ghwNtE451laPluJQVkkdJGl
+         p0uw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778427879; x=1779032679;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7jk9H54lMHadSFms9Swh2u6zzH7MNV3xP2hPzoWhQ7I=;
+        b=ql4SD5is8X2PTJc/DOXtwUW0/cO1aSnmWfkT5VMDsaHQtr/EyN4y2CQAMiQJIQHBvE
+         GCYj9T9NXqAHLmjIRGtJqNYtxV267CqJRr0jNMl7dj5imBzDopFdtGbuDaG9Gg7JEl23
+         H/RIOwqwmcfwATKsHRQz0ERwIxSYVwJhTFT3Cy2564GlFvzt/WKagg/pP8Kp6uNFIwtX
+         38JxTSPIeIspo+32Mb7cE6UFIONt1MIY7F1pI0a+38mKJPBGPI3nssCZ0NadxQw608F2
+         hdOZ4IU4acvjdfSF5UzAgYXzJwRwlXAp8fG7lu+vTDvzkCMo8xEuKE9q2htbAIb91oky
+         WEUA==
+X-Forwarded-Encrypted: i=1; AFNElJ/9+0on5yyybQN0OvyWnvvGmH8H+7XiQgOJWApJKWR2vbKjhQP8lsIki0kV+zt/Bhtu/J5c85U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcBB+nM1NxE9EtXIjLlBj0K1lDp7Ymg/jVkZElGd81ugppWJFE
+	GXHMam+8FReUO5tsNm0Wxl9lgW6crZexwOTJOWGxX9HoZ/ZrWUY84q9e2ZMYsCwycYNx/iZTOO9
+	WS6Hx26HfW4CeNEiMFm6Ha0jHR9HdwpeW6aT3G9ummAYX2sXeEFlv68sHWA==
+X-Gm-Gg: Acq92OGmG9c9L7rDtIEeUELPQyhajXOSRLsQ70wwFGX0Z2Lx4KpY+XgRGjjIHttIm78
+	aPL5fOo6mRNXMrk/Z9VjolKo/evPy7G/yURYvJzQoF0slhZ4oQ/WdGsH50qXVY91jmowkGSX+NK
+	F9KKFBjmMGigiyZLUnw90W94Ow+bolQYrTHqEZVxn2IbYUYyPkO6fH3IQXFQjDTlXzrxIKZNqH2
+	QnEokPcVUKB+ZQVjEZ6sgGa6VJEm41xFc06di8d+LjsYL2z+KGYWu7GBGbUCgo0+/iQmf4WIms8
+	82Z8lPK0SmqlRPe30CsRZdOvtTsxwVUcaYEKEQ0y/WIEB+599PsqzNkwnAN/BxGQrYfh6N7colR
+	Fgirid3w2MXAi+BYd7D1oWEFF0VdEzoMxMNtwq7mv
+X-Received: by 2002:a05:651c:54e:b0:38e:e6fd:65b2 with SMTP id 38308e7fff4ca-39408132229mr19263581fa.21.1778427879024;
+        Sun, 10 May 2026 08:44:39 -0700 (PDT)
+X-Received: by 2002:a05:651c:54e:b0:38e:e6fd:65b2 with SMTP id 38308e7fff4ca-39408132229mr19263431fa.21.1778427878424;
+        Sun, 10 May 2026 08:44:38 -0700 (PDT)
+Received: from redhat.com (IGLD-80-230-48-7.inter.net.il. [80.230.48.7])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-393f60db4f1sm19882511fa.27.2026.05.10.08.44.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 10 May 2026 08:44:37 -0700 (PDT)
+Date: Sun, 10 May 2026 11:44:32 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+	leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+	tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v11 1/4] tun/tap: add ptr_ring consume helper
+ with netdev queue wakeup
+Message-ID: <20260510114401-mutt-send-email-mst@kernel.org>
+References: <20260508151048.183125-1-simon.schippers@tu-dortmund.de>
+ <20260508151048.183125-2-simon.schippers@tu-dortmund.de>
+ <dd0a3ef1-d623-4e09-a391-b56fa4bf95af@tu-dortmund.de>
+ <20260509183518-mutt-send-email-mst@kernel.org>
+ <a14b700a-94e8-44c0-bde0-d8307761c0f1@tu-dortmund.de>
+ <9a4458fc-61f2-469b-8260-f144d3827b5d@tu-dortmund.de>
+ <20260510094020-mutt-send-email-mst@kernel.org>
+ <e5d69f44-4483-49f3-b7fc-aca2cdb24792@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2 net v3] ipv6: addrconf: fix temp address generation
- after prefix deprecation
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- horms@kernel.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, dsahern@kernel.org, =?UTF-8?Q?=C5=81ukasz_Stelmach?=
- <steelman@post.pl>
-References: <20260507132828.3923-1-fmancera@suse.de>
- <20260510145522.GA98198@shredder>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260510145522.GA98198@shredder>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spam-Level: 
-X-Rspamd-Queue-Id: A8CB6504E26
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e5d69f44-4483-49f3-b7fc-aca2cdb24792@tu-dortmund.de>
+X-Rspamd-Queue-Id: C4C5B504E63
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
+	TAGGED_FROM(0.00)[bounces-286316-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
 	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286315-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,suse.de:mid,suse.de:dkim]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On 5/10/26 4:55 PM, Ido Schimmel wrote:
-> On Thu, May 07, 2026 at 03:28:27PM +0200, Fernando Fernandez Mancera wrote:
->> When a router temporarily deprecates an IPv6 prefix (either by sending a
->> Router Advertisement with Preferred Lifetime = 0 or by letting the
->> lifetime expire) and later restores it, the kernel permanently loses its
->> ability to generate temporary privacy addresses (RFC 8981) for that
->> prefix.
->>
->> This happens because the address worker attempts to generate a
->> replacement temporary address when the current one nears expiration. As
->> the base prefix is deprecated already, the generation fails after
->> marking the temporary address already having spawned a replacement
->> (ifp->regen_count++).
->>
->> When the router eventually restores the prefix, the temporary address
->> becomes active again. However, once it naturally expires, the address
->> worker sees this temporary address already tried to generate one and
->> skips the regeneration.
->>
->> Fix this by verifying that the base prefix has sufficient preferred
->> lifetime remaining before attempting to generate a new temporary
->> address. In addition, make ipv6_create_tempaddr() return meaningful
->> error codes. This way, we can catch if a 0-lft RA arrived just after we
->> passed the verification mentioned above. If we don't have sufficient
->> preferred lifetime remaining, the worker will keep the next timer as it
->> is.
+On Sun, May 10, 2026 at 04:01:39PM +0200, Simon Schippers wrote:
+> On 5/10/26 15:40, Michael S. Tsirkin wrote:
+> > On Sun, May 10, 2026 at 10:55:34AM +0200, Simon Schippers wrote:
+> >> On 5/10/26 09:03, Simon Schippers wrote:
+> >>> On 5/10/26 00:44, Michael S. Tsirkin wrote:
+> >>>> On Sat, May 09, 2026 at 06:31:47PM +0200, Simon Schippers wrote:
+> >>>>> On 5/8/26 17:10, Simon Schippers wrote:
+> >>>>>> +static void tun_queue_purge(struct tun_struct *tun, struct tun_file *tfile)
+> >>>>>>  {
+> >>>>>>  	void *ptr;
+> >>>>>>  
+> >>>>>> -	while ((ptr = ptr_ring_consume(&tfile->tx_ring)) != NULL)
+> >>>>>> +	while ((ptr = tun_ring_consume(tun, tfile)) != NULL)
+> >>>>>>  		tun_ptr_free(ptr);
+> >>>>>>  
+> >>>>>>  	skb_queue_purge(&tfile->sk.sk_write_queue);
+> >>>>>
+> >>>>> Sashiko is right once again. tun_ring_consume() in tun_queue_purge()
+> >>>>> operates on a tfile that is being torn down. Its queue_index is no
+> >>>>> longer valid. After the swap in __tun_detach(), it points to the
+> >>>>> netdev subqueue of a different tfile.
+> >>>>> --> We should not wake there.
+> >>>>
+> >>>> Does it not exactly point at ntfile which is what we want to wake?
+> >>>>
+> >>>
+> >>> I see your point. But calling tun_ring_consume() as done here is
+> >>> wrong, because it does not wake if the tx_ring of the tfile 
+> >>> (that is currently torn down) is empty. We could change
+> >>> tun_ring_consume() to call __tun_wake_queue()
+> >>> with consumed=0 if !ptr but I think this would slow down the consumer
+> >>> path.
+> >>>
+> >>
+> >> My statement is wrong:
+> >> There is no way that the tx_ring is empty and the queue is stopped
+> >> at the same time. So we do not need to touch tun_ring_consume() and
+> >> this works just fine.
+> >>
+> >>>>
+> >>>>> I will swap tun_ring_consume() with ptr_ring_consume() again and
+> >>>>> submit a v12 :)
+> >>>>
+> >>>> If so then maybe
+> >>>> netif_tx_wake_queue(netdev_get_tx_queue(tun->dev, index));
+> >>>>
+> >>>
+> >>> But we should only do this if there is space in the ntfile.
+> >>> My approach:
+> >>>
+> >>> @@ -586,12 +588,18 @@ static void __tun_detach(struct tun_file *tfile, bool clean)
+> >>>  		BUG_ON(index >= tun->numqueues);
+> >>>  
+> >>>  		rcu_assign_pointer(tun->tfiles[index],
+> >>>  				   tun->tfiles[tun->numqueues - 1]);
+> >>>  		ntfile = rtnl_dereference(tun->tfiles[index]);
+> >>> +		spin_lock(&ntfile->tx_ring.consumer_lock);
+> >>>  		ntfile->queue_index = index;
+> >>>  		ntfile->xdp_rxq.queue_index = index;
+> >>> +		ntfile->cons_cnt = 0;
+> >>> +		if (__ptr_ring_empty(&ntfile->tx_ring)) {
+> >>> +			netif_wake_subqueue(tun->dev, index);
+> >>> +		}
+> >>> +		spin_unlock(&ntfile->tx_ring.consumer_lock);
+> >>>  		rcu_assign_pointer(tun->tfiles[tun->numqueues - 1],
+> >>>  				   NULL);
+> >>>
+> >>> ntfile->cons_cnt is unvalid, because the new queue might not be stopped.
+> >>> That is the reason why I reset it to 0.
+> >>
+> >> However, I still prefer this approach because the code is easier to
+> >> understand.
+> > 
+> > 
+> > So do you want me to finish review of this one and ack, or want to
+> > post v12?
+> > 
 > 
-> I didn't go through all the Sashiko comments, but at least some of them
-> seem valid. I wonder if we can simplify this and do the following
-> instead:
+> I will post a v12 with the proposed changes for patch 1.
+> No other changes.
 > 
-> When updating all the temporary addresses (f.e., because we received a
-> RA), instead of only creating a temporary address if none exist, also
-> create a temporary address if all the existing ones already regenerated
-> a temporary address, as otherwise no temporary address will ever be
-> created. Something like [1]. I didn't run it through Sashiko, but I did
-> confirm that your test fails without it and passes with it.
-> 
+> Thanks!
 
-Hi Ido,
-
-Thanks for this suggestion. I was preparing a new iteration for the 
-patch and was trying to simplify it. This looks quite good indeed and 
-better than messing with the timers.
-
-Let me test this properly and if it looks good I will send a v4 and add 
-a Suggested-by tag.
-
-Thanks again Ido!
-Fernando.
-
-> [1]
-> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-> index 5476b6536eb7..3eaa583bb08d 100644
-> --- a/net/ipv6/addrconf.c
-> +++ b/net/ipv6/addrconf.c
-> @@ -2597,6 +2597,7 @@ static void manage_tempaddrs(struct inet6_dev *idev,
->   {
->   	u32 flags;
->   	struct inet6_ifaddr *ift;
-> +	bool all_regen = true;
->   
->   	read_lock_bh(&idev->lock);
->   	/* update all temporary addresses in the list */
-> @@ -2637,6 +2638,8 @@ static void manage_tempaddrs(struct inet6_dev *idev,
->   		ift->tstamp = now;
->   		if (prefered_lft > 0)
->   			ift->flags &= ~IFA_F_DEPRECATED;
-> +		if (!ift->regen_count)
-> +			all_regen = false;
->   
->   		spin_unlock(&ift->lock);
->   		if (!(flags&IFA_F_TENTATIVE))
-> @@ -2644,12 +2647,14 @@ static void manage_tempaddrs(struct inet6_dev *idev,
->   	}
->   
->   	/* Also create a temporary address if it's enabled but no temporary
-> -	 * address currently exists.
-> +	 * address currently exists or if all the temporary addresses already
-> +	 * regenerated an address.
->   	 * However, we get called with valid_lft == 0, prefered_lft == 0, create == false
->   	 * as part of cleanup (ie. deleting the mngtmpaddr).
->   	 * We don't want that to result in creating a new temporary ip address.
->   	 */
-> -	if (list_empty(&idev->tempaddr_list) && (valid_lft || prefered_lft))
-> +	if ((list_empty(&idev->tempaddr_list) || all_regen)
-> +	    && (valid_lft || prefered_lft))
->   		create = true;
->   
->   	if (create && READ_ONCE(idev->cnf.use_tempaddr) > 0) {
+actually can you clarify? why only when ntfile ring is empty?
 
 
