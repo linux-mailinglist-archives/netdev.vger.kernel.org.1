@@ -1,205 +1,187 @@
-Return-Path: <netdev+bounces-286406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286407-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QJxXMFf/AGolPgEAu9opvQ
-	(envelope-from <netdev+bounces-286406-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 23:57:43 +0200
+	id 4N0UHl0IAWrVPwEAu9opvQ
+	(envelope-from <netdev+bounces-286407-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 00:36:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1FEB5069B1
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 23:57:42 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15E45506B56
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 00:36:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 076FF3001A7E
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:57:40 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 50FC33003374
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 22:26:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB0F234D4FE;
-	Sun, 10 May 2026 21:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFAD434D4E2;
+	Sun, 10 May 2026 22:26:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="LPHcRNQp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f77.google.com (mail-oo1-f77.google.com [209.85.161.77])
+Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D25F346E5D
-	for <netdev@vger.kernel.org>; Sun, 10 May 2026 21:57:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0D934A786
+	for <netdev@vger.kernel.org>; Sun, 10 May 2026 22:26:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778450256; cv=none; b=ZCxe3UZh8TvlLXKdKSXdJnJJpoJ7A1PvapX6TzkCkDFtw8oNo0n7v2pv4BXU0VNNcD5LnYqvxk1fp6KuT9lkeNXlbJAPA/QmC5+ZGDbpcI7Ah5+g2inwOqqZmzPPD0LgvCzGo7VptYuiHsL6QR9/JKyHKwgOUycDxoDEJ5tYs58=
+	t=1778452012; cv=none; b=IKACViFuAIHsXczDMuqwcXr5HMjXnhpghQ/aBCR43LagrsBhhu4kWAXSF3y1DyPzzm3yohiK5Hq211m1cgQSpnaj/JfgdYaz0rJZwRHRPmxzS6h4q/JWRDWfZydev3IqQrBP30ZamAgH7JzHIMxwogpG1obXJE2hTyxyDYL0gv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778450256; c=relaxed/simple;
-	bh=TRo/27K1NjP2wNlz7gI3GKSwraU84oOs4e6O3VxvVXI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=O5b9VG9H5WENFUU+h6XuaY/LlvZ8lbJAq1tnUjKS6ubg/D/MJdFL6l1XPjf5LA5dq183fou8O8DWGF4fmls3XVgP99Xm/YuShwTgdDxbQtI/33O6CotJpIBHlhDpHfyUwwwTBdVtoUTzs2jcudvtRgDOerClZSnKRV0fa7USr+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f77.google.com with SMTP id 006d021491bc7-696307c7ee0so3572763eaf.0
-        for <netdev@vger.kernel.org>; Sun, 10 May 2026 14:57:35 -0700 (PDT)
+	s=arc-20240116; t=1778452012; c=relaxed/simple;
+	bh=bRTtC/Y15xDEtxte9f/6vRbkFyBjJbqPWN5T/9gK6dA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J5W4YprnTI4cSb5mlGYL0/AjdJTz3k5o2rs0RE+UFozRrZWjwNzCdJ/LxG0GUg7KkVoQjvX+wtfN1tZm0NohG03oly64+8GdynwRdYnH8JjTFu5I0/v1Ed6/G/nbRxJU7Ui7mdGhrXxx6NSgMUDCTgEtnzbKwsKU2zx9DGI7IdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=LPHcRNQp; arc=none smtp.client-ip=74.125.82.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
+Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-2c15849aa2cso4469950eec.0
+        for <netdev@vger.kernel.org>; Sun, 10 May 2026 15:26:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1778452010; x=1779056810; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+7jw5q6CV7UA5J8SrJGgRjMCaga/xFBXiIaTtBtIkq8=;
+        b=LPHcRNQpyA8LHU0CD4BSba/AFLiUCtkxJozbnzrEHCxUCAa3Jt2rRDOkHVMcewCRgK
+         dHljdlQ0IaBJOUGstUuI+9mR9gxE1xCjGnnJxhLUB9EyTyyjBs2scdZElAEnPauVJtgj
+         v9LF1RjJ34FqWKhpHbIXFH+DUNw+Ko3E3MlUAG3Ok8Xh/jr+aGOrDiRSTLjzZubxcJ5n
+         7UGTVEIPD7pJK1itWfm6o27iNJrn3gpF+Li2h87gxFixzcKrM+DB+lxyNvEybQzDV8k9
+         iIfaXeRgDFv89hBfgpVfkFne2n9ZEFxQ+wiVwudLw0yt44rixeaCcK8q6aDSbfSynefP
+         nBTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778450254; x=1779055054;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=a5zz8JJ6yN1hwedf89sUkMHjvnyxInLqXs9nvE/Ihto=;
-        b=iD3oNtjRculkPHKtMCketCFLM5Mewwoq6Tv3K3w4AYrrx84R5zOH9vsE6FlPJaM+NA
-         maGcJie7OGJm2bbzRG/qvmLOLztS9gyhu2o6hndV7q6E8WKF7GQcIToTerWqS/znSwuy
-         Nqsg7gf7FMA+pnkX6Z4meRTmqmlReo2WmGn5gXYLqpWqBGE+lhrmcltOROMltYe1jQ+2
-         f9oen0GWqFbpmiSJTLBlavS66LI7bdB1q8exUPT6JcF6F/7KSVZbCq2rd2VavCc8AL1w
-         eidkmqmqEQRkUaInY+0cf1GT4dZRQN3GDMS9SYo7h9CI1fy4tUja3kHDJ58NGHC6co/r
-         Jpjg==
-X-Forwarded-Encrypted: i=1; AFNElJ+ukY13XH1ILyz99EKb5rcJXE1DHHFf8h71uDJRK8FjVdECTLOPlS2aNuqmszzxrX8WJDbGLCg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykOytGj83AkQyImMY00Qna7a9nxpxdS/whakm5jSNqVDDxZCjI
-	7IEpTVRFqhx/3mSXIAO/qLOuppyMv2+ZA6cBPMMnkTf8n88F0KTcL5kn28NuQw7Q1BFchmxH0WF
-	z7P4UFIKsS+Yl8CuhATZ4fHZEoBSxzA4gPIodJwj2TUp1Plum1yQptbZHDpw=
+        d=1e100.net; s=20251104; t=1778452010; x=1779056810;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+7jw5q6CV7UA5J8SrJGgRjMCaga/xFBXiIaTtBtIkq8=;
+        b=qYJrtbpByfRNicM5e6sPoDX0Qt+VQX/+FGy8rvaWw88VTEX3BrwZORFcVrAvptxSos
+         LIzYTY+uakbBluiaWHPg9oFqRNFwYggSSJz9NuyHO3oCL8n/899oueLxjIzwvzNZcI3j
+         8IqeCDYoG2Ac6UTrOGafBg+VXmxdMvH35pTElev6LTn2126szPSNuu90YsYSw3cj0190
+         rW+kA413mR09v1DLZ0yK0bt+/egr7YrOBFqXIZPg80vRnw0cPDsyS7uJSi6nb9x9jRhX
+         Q+Qk+PB5anzmKVZqKuN/+DlTgKo3YqxDt7M2zthvrNts0wgLxdQB03sWbfA9Wpya6X/7
+         /jJA==
+X-Gm-Message-State: AOJu0Yw7tX33PuuTphcslspU4uQBkqIG+/N6PCktm+XkRu9z2yJ5+Ma3
+	huXT475CkoWzdRqe7cdo1jlCeJw8N+A4G/SEUliTt0UizbrS26W6Texn7SwZ/+WDB1z3EI0pwUr
+	fQhji7w==
+X-Gm-Gg: Acq92OGbHpbVzHdule+ZLJ6velE1YmmeGokTmYRRwnIgvYJ+Xt+3wxQA7qLsCEZxueD
+	vIn2wC6xlVGHKm2UoLXNIYMoHDixbbhiWzIXE9+SDhSqGz1rexRePA3m3mJiJ2DypgJBPpTuIRa
+	fXytNSzvilkDoBbgbFm92zRE2gX8mzMEd4F0VSri7qNbR7UbVWUkUhQGT4tz2NUkhFM8yis/Ph8
+	2Av02CwlYogA7sufmRA4PYluZDQpYoy28H+VsSF5UtbUvvq1Dma4+svCJD9ONf+1XtY1wfnH4/C
+	uVHyJvbpneZiWq19HzFr/ObzD8PgBHNHBnhxyusbDJtSld/wTa3LkmWELzrYNWIep2DZXA7KEMf
+	1jbjZmTipywSt0OsRICnKbyB31Gl1hl3XDLASIAn8zbrT947bJn9NKhV+5Ghb5c8vCwO4zhxhjG
+	olnbwvyGRlr2xKYoprDwDtA9QEFv7JHa0eDCaxCIoJoBwDYK++rDb/Lw==
+X-Received: by 2002:a05:7301:578d:b0:2ed:935:aa33 with SMTP id 5a478bee46e88-2f5482684a9mr10241346eec.5.1778452009918;
+        Sun, 10 May 2026 15:26:49 -0700 (PDT)
+Received: from p1.scai.dhcp.asu.edu (209-147-138-15.nat.asu.edu. [209.147.138.15])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2f8862d429asm11143902eec.12.2026.05.10.15.26.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 10 May 2026 15:26:49 -0700 (PDT)
+From: Xiang Mei <xmei5@asu.edu>
+To: netdev@vger.kernel.org
+Cc: alibuda@linux.alibaba.com,
+	dust.li@linux.alibaba.com,
+	wenjia@linux.ibm.com,
+	sidraya@linux.ibm.com,
+	tonylu@linux.alibaba.com,
+	linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	bestswngs@gmail.com,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH net] net/smc: avoid NULL deref of conn->lnk in smc_msg_event tracepoint
+Date: Sun, 10 May 2026 15:26:40 -0700
+Message-ID: <20260510222640.1230720-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:883:b0:696:8ccc:5588 with SMTP id
- 006d021491bc7-69998d4534bmr12723017eaf.42.1778450254413; Sun, 10 May 2026
- 14:57:34 -0700 (PDT)
-Date: Sun, 10 May 2026 14:57:34 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a00ff4e.170a0220.1c0296.021e.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in ieee80211_sta_current_bw
-From: syzbot <syzbot+e2a0da81361722f4df3b@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: D1FEB5069B1
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 15E45506B56
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=f2b487b72ffad035];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+X-Spamd-Result: default: False [4.84 / 15.00];
+	SEM_URIBL(3.50)[asu.edu:email,asu.edu:dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-286406-lists,netdev=lfdr.de,e2a0da81361722f4df3b];
+	DMARC_POLICY_ALLOW(0.00)[asu.edu,none];
+	DKIM_TRACE(0.00)[asu.edu:+];
+	FREEMAIL_CC(0.00)[linux.alibaba.com,linux.ibm.com,vger.kernel.org,gmail.com,asu.edu];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	R_DKIM_ALLOW(0.00)[asu.edu:s=google];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286407-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
+	GREYLIST(0.00)[pass,body];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.152];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[goo.gl:url,googlegroups.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,storage.googleapis.com:url]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c09:e001:a7::/64:c];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:email,asu.edu:mid,asu.edu:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Hello,
+The smc_msg_event tracepoint class, shared by smc_tx_sendmsg and
+smc_rx_recvmsg, unconditionally dereferences smc->conn.lnk:
 
-syzbot found the following issue on:
+	__string(name, smc->conn.lnk->ibname)
 
-HEAD commit:    2281958e6007 Merge tag 'wireless-next-2026-05-06' of https..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1513e696580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f2b487b72ffad035
-dashboard link: https://syzkaller.appspot.com/bug?extid=e2a0da81361722f4df3b
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+conn->lnk is only set for SMC-R; for SMC-D it is NULL. Other code on
+these paths already handles this (e.g. !conn->lnk in
+SMC_STAT_RMB_TX_SIZE_SMALL()). With the tracepoint enabled, the first
+sendmsg()/recvmsg() on an SMC-D socket crashes:
 
-Unfortunately, I don't have any reproducer for this issue yet.
+  Oops: general protection fault, probably for non-canonical address
+  KASAN: null-ptr-deref in range [...]
+  RIP: 0010:strlen+0x1e/0xa0
+  Call Trace:
+   trace_event_raw_event_smc_msg_event (net/smc/smc_tracepoint.h:44)
+   smc_rx_recvmsg (net/smc/smc_rx.c:515)
+   smc_recvmsg (net/smc/af_smc.c:2859)
+   __sys_recvfrom (net/socket.c:2315)
+   __x64_sys_recvfrom (net/socket.c:2326)
+   do_syscall_64
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/4df17f60254b/disk-2281958e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/1e93157edd25/vmlinux-2281958e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/60dbf6a0a81c/bzImage-2281958e.xz
+The faulting address 0x3e0 is offsetof(struct smc_link, ibname),
+confirming the NULL ->lnk deref. Enabling the tracepoint requires
+root, but the trigger itself is unprivileged: socket(AF_SMC, ...) has
+no capability check, and SMC-D negotiation needs no admin step on
+s390 or on x86 with the loopback ISM device loaded.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e2a0da81361722f4df3b@syzkaller.appspotmail.com
+Log an empty device name for SMC-D instead of dereferencing NULL.
 
-------------[ cut here ]------------
-1
-WARNING: ./include/net/mac80211.h:8114 at ieee80211_chan_width_to_rx_bw include/net/mac80211.h:8114 [inline], CPU#1: syz.4.4769/22510
-WARNING: ./include/net/mac80211.h:8114 at ieee80211_sta_current_bw_tx_to_sta net/mac80211/sta_info.c:3719 [inline], CPU#1: syz.4.4769/22510
-WARNING: ./include/net/mac80211.h:8114 at ieee80211_sta_current_bw+0x36d/0x510 net/mac80211/sta_info.c:3745, CPU#1: syz.4.4769/22510
-Modules linked in:
-CPU: 1 UID: 0 PID: 22510 Comm: syz.4.4769 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
-RIP: 0010:ieee80211_chan_width_to_rx_bw include/net/mac80211.h:8114 [inline]
-RIP: 0010:ieee80211_sta_current_bw_tx_to_sta net/mac80211/sta_info.c:3719 [inline]
-RIP: 0010:ieee80211_sta_current_bw+0x36d/0x510 net/mac80211/sta_info.c:3745
-Code: 00 00 00 eb 49 41 83 fe 05 74 30 41 83 fe 0d 75 13 e8 47 8f af f6 b8 04 00 00 00 eb 31 e8 3b 8f af f6 eb 28 e8 34 8f af f6 90 <0f> 0b 90 eb 1d e8 29 8f af f6 b8 02 00 00 00 eb 13 e8 1d 8f af f6
-RSP: 0018:ffffc90006f4eed8 EFLAGS: 00010283
-RAX: ffffffff8b161cfc RBX: 1ffff1100d1da030 RCX: 0000000000080000
-RDX: ffffc9000e5d2000 RSI: 0000000000000e31 RDI: 0000000000000e32
-RBP: 0000000000000004 R08: ffff888054ad5c40 R09: 0000000000000007
-R10: 000000000000000d R11: 0000000000000002 R12: ffff888068ed0180
-R13: dffffc0000000000 R14: 0000000000000007 R15: 0000000000000000
-FS:  00007fe58f5f66c0(0000) GS:ffff888125389000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000110c2c8823 CR3: 0000000038486000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- ieee80211_chan_bw_change+0x459/0x740 net/mac80211/chan.c:719
- _ieee80211_recalc_chanctx_min_def net/mac80211/chan.c:758 [inline]
- ieee80211_recalc_chanctx_min_def+0x36/0x70 net/mac80211/chan.c:770
- ieee80211_recalc_min_chandef+0x491/0x580 net/mac80211/util.c:2501
- sta_info_insert_finish net/mac80211/sta_info.c:946 [inline]
- sta_info_insert_rcu+0x15da/0x26b0 net/mac80211/sta_info.c:1029
- sta_info_insert+0x16/0xc0 net/mac80211/sta_info.c:1034
- ieee80211_add_station+0x4c7/0x710 net/mac80211/cfg.c:2666
- rdev_add_station+0xfc/0x290 net/wireless/rdev-ops.h:201
- nl80211_new_station+0x1cab/0x2130 net/wireless/nl80211.c:9490
- genl_family_rcv_msg_doit+0x22a/0x330 net/netlink/genetlink.c:1114
- genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
- genl_rcv_msg+0x61c/0x7a0 net/netlink/genetlink.c:1209
- netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2551
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
- netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
- netlink_unicast+0x75c/0x8e0 net/netlink/af_netlink.c:1345
- netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1895
- sock_sendmsg_nosec net/socket.c:787 [inline]
- __sock_sendmsg net/socket.c:802 [inline]
- ____sys_sendmsg+0x972/0x9f0 net/socket.c:2698
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2752
- __sys_sendmsg net/socket.c:2784 [inline]
- __do_sys_sendmsg net/socket.c:2789 [inline]
- __se_sys_sendmsg net/socket.c:2787 [inline]
- __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2787
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fe59139cdd9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fe58f5f6028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fe591616090 RCX: 00007fe59139cdd9
-RDX: 0000000000000000 RSI: 0000200000001080 RDI: 0000000000000006
-RBP: 00007fe591432d69 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fe591616128 R14: 00007fe591616090 R15: 00007fff2b0f3978
- </TASK>
-
-
+Fixes: aff3083f10bf ("net/smc: Introduce tracepoints for tx and rx msg")
+Reported-by: Weiming Shi <bestswngs@gmail.com>
+Assisted-by: Claude:claude-opus-4-7
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/smc/smc_tracepoint.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/smc/smc_tracepoint.h b/net/smc/smc_tracepoint.h
+index a9a6e3c1113a..53da84f57fd6 100644
+--- a/net/smc/smc_tracepoint.h
++++ b/net/smc/smc_tracepoint.h
+@@ -51,7 +51,7 @@ DECLARE_EVENT_CLASS(smc_msg_event,
+ 				     __field(const void *, smc)
+ 				     __field(u64, net_cookie)
+ 				     __field(size_t, len)
+-				     __string(name, smc->conn.lnk->ibname)
++				     __string(name, smc->conn.lnk ? smc->conn.lnk->ibname : "")
+ 		    ),
+ 
+ 		    TP_fast_assign(
+-- 
+2.43.0
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
