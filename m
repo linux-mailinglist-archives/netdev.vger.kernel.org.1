@@ -1,315 +1,142 @@
-Return-Path: <netdev+bounces-286293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286294-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id dKgpFOGSAGoDKgEAu9opvQ
-	(envelope-from <netdev+bounces-286293-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 16:14:57 +0200
+	id kOkwHkKTAGoDKgEAu9opvQ
+	(envelope-from <netdev+bounces-286294-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 16:16:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 336F15048F0
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 16:14:54 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47B62504909
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 16:16:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 690DA300A600
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 14:14:53 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E79343002534
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 14:15:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B399335AC3F;
-	Sun, 10 May 2026 14:14:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFE2739C003;
+	Sun, 10 May 2026 14:15:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R1ZLSQzx"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [4.193.249.245])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2BB190462
-	for <netdev@vger.kernel.org>; Sun, 10 May 2026 14:14:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=4.193.249.245
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98E2934F479;
+	Sun, 10 May 2026 14:15:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778422492; cv=none; b=KCTOMPuK4OcfDHPpehAQXgUWiOR56LhVmHaYuOcos/gLgKtO6D5DZL6r9Z92cP8lYIBj6hnxQR5ltfdThAnzjrVV4ut3Cx6uqRj+EQ5t2nbCTYe8GpJ5lrSqhY13OXIEnSgXGLwQqwHW5KYWOaYI8xgTN/2Zr0dGS+ldi5oF4MM=
+	t=1778422520; cv=none; b=lIdmgMsJIYKaMs7e3Sb/LchDYLhukv8AzqnuxQiCdOktyHq7DLff9/uyulFXRSfMKpjnwo8IxG+610dmN7cv3UnfswgLp5Kcyt0d7Y9qwwUv5UYnWVdfW8CnC7WNfOFM1i+FO1F3bfBbaYOF/cYH2o33F/pimPXJ4NTzsb2ZMCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778422492; c=relaxed/simple;
-	bh=R30grWO549djSMfpvOKe2WVC4lW2ek0PoXw2vUBOhgg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A4dq6d++aNJHyQJj8IWnUA8gwBn4t4+7v5fvORKzpE+MAky6vNf3VKDPiULxuNAi3FjabJCgnI07heVMAx49xOjV9MLMOwyFw1g96cTpcYNEtHTI/pQeIpXfafHd++LrqbaCN4Nl8CUO12erptvSSG7RG093J6yjDYq4soajrGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=4.193.249.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowADHNfaykgBqubgBAQ--.2426S2;
-	Sun, 10 May 2026 22:14:10 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org,
-	mptcp@lists.linux.dev
-Cc: matttbe@kernel.org,
-	martineau@kernel.org,
-	geliang@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	ncardwell@google.com,
-	kuniyu@google.com,
-	daniel@iogearbox.net,
-	kafai@fb.com,
-	yuantan098@gmail.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	bird@lzu.edu.cn,
-	caoruide123@gmail.com,
-	enjou1224z@gmail.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net v2 1/1] mptcp: fix request ownership when cloning reqsk
-Date: Sun, 10 May 2026 22:14:03 +0800
-Message-ID: <40fd38e7a368e5b7bc9bc83364a32241f977d53f.1778404619.git.caoruide123@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1778422520; c=relaxed/simple;
+	bh=wRR1xeuPXc/ERpuUkGr/Dud0hz+KfTf1fQDlI/t+kC4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bK2O0fYpIptKIEIsmkrMt1C71OufswOHVhzkildC9JeVDXjaRFGVEk2YbWFFKoqBlnUlBkDoAW60NBZwnFxXuspD+CR6/J0R2ky5Uumlo6ZxxEocIKhnDXZFw81R6mGdG1ghpw8t45zn1xWt0vbZ4wUDTwoj/hF8AmN0i2YT14A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R1ZLSQzx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77527C2BCB8;
+	Sun, 10 May 2026 14:15:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778422520;
+	bh=wRR1xeuPXc/ERpuUkGr/Dud0hz+KfTf1fQDlI/t+kC4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=R1ZLSQzxfp11nndKq6q8tPg8mHk2I6A6l1hUNEpiMHhoSQFtaoXHhlJN2Q9iqsmcD
+	 zluYrv8RGIbknYuFZCJiNldBWcLB1piH4ihTFttnefD6a1DzFNTPrVJBa6M5OCpj6T
+	 Ibc7rqv0Rrdq7mlwEiwK6FdbFGnNyGB4ilFkWQmHND3YvZzQ+kR60h6LqUppqEe1hj
+	 RsuJZl4fqbAmJaxSg+4O8Goy2Yd50p3nfw+v1dfXIhEGGFmbpa379Cqn6uejxjnEP5
+	 Ct+E+onCyqEP9Z7AePh6eWINRqbxWy16/XprN/YB2ItP9kEzDZe7p/Sj0AgTDbJuKG
+	 gcqb+fQfr5eIw==
+Date: Sun, 10 May 2026 17:14:56 +0300
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: David Howells <dhowells@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Tim Bird <tim.bird@sony.com>, keyrings@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/2] KEYS: annotate struct user_key_payload
+ with __counted_by
+Message-ID: <agCS4O1E336c1aYc@kernel.org>
+References: <20260427114422.313356-3-thorsten.blum@linux.dev>
+ <20260427114422.313356-4-thorsten.blum@linux.dev>
+ <af8ZUXn4uStU_vs5@kernel.org>
+ <agBiPEJZhWHydwuz@linux.dev>
+ <agCSNaiHTcsN3Ye8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowADHNfaykgBqubgBAQ--.2426S2
-X-Coremail-Antispam: 1UD129KBjvJXoW3WF4fXr4DCr4UWr4fKrW3ZFb_yoW3CrykpF
-	4DKrWayrs3XFyxKFs3JFWDZr1Ygw4SkrZxtw45Kw4SyrsrtrsakF1kXF4UZrW3CF48Kr98
-	XF4qgwnrXFnF9aDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
-	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
-	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
-	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
-	w2AFwI0_GFv_Wrylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
-	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRMXdjDUUUU
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQ0DCWoARmUAwwADsP
-X-Rspamd-Queue-Id: 336F15048F0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <agCSNaiHTcsN3Ye8@kernel.org>
+X-Rspamd-Queue-Id: 47B62504909
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.96 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286293-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,iogearbox.net,fb.com,gmail.com,lzu.edu.cn];
+	TAGGED_FROM(0.00)[bounces-286294-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jarkko@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.498];
-	TO_DN_NONE(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lzu.edu.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email]
 X-Rspamd-Action: no action
 
-From: Ruide Cao <caoruide123@gmail.com>
+On Sun, May 10, 2026 at 05:12:13PM +0300, Jarkko Sakkinen wrote:
+> On Sun, May 10, 2026 at 12:47:24PM +0200, Thorsten Blum wrote:
+> > On Sat, May 09, 2026 at 02:24:01PM +0300, Jarkko Sakkinen wrote:
+> > > On Mon, Apr 27, 2026 at 01:44:24PM +0200, Thorsten Blum wrote:
+> > > > Add the __counted_by() compiler attribute to the flexible array member
+> > > > 'data' to improve bounds checking via CONFIG_UBSAN_BOUNDS and
+> > > > CONFIG_FORTIFY_SOURCE.
+> > > > 
+> > > > Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> > > 
+> > > This is again a crippled commit message.
+> > > 
+> > > I.e. this requires either knowing, remembering and/or cross-referencing
+> > > "bunch of" unrelated to keyring.
+> > 
+> > I kept the commit message short because it follows the same pattern as
+> > many other __counted_by() patches that have been accepted across several
+> > subsystems.
+> > 
+> > I'm not sure which part of the message you want expanded. Could you be
+> > more specific?
+> 
+> "Describe your problem. Whether your patch is a one-line bug fix or 5000
+> lines of a new feature, there must be an underlying problem that
+> motivated you to do this work. Convince the reviewer that there is a
+> problem worth fixing and that it makes sense for them to read past the
+> first paragraph."
+> 
+> This is a direct quote from https://docs.kernel.org/process/submitting-patches.html#describe-your-changes
 
-TCP request migration clones pending request sockets with
-inet_reqsk_clone(). For MPTCP MP_JOIN requests this raw-copies
-subflow_req->msk, but the cloned request does not take a new reference.
+And there's pretty good reasons to do this too as commit message is not
+just a cover leter for a patch. It's also reminder in the commit log why
+something was done.
 
-Both the original and the cloned request can later drop the same msk in
-subflow_req_destructor(), and a migrated request may keep a dangling msk
-pointer after the original owner has already been released.
-
-MP_CAPABLE requests have a similar ownership issue for token_node. The
-original request is hashed in the token table, and inet_reqsk_clone()
-raw-copies the hlist pointers into the clone. The clone must not inherit
-that hashed state on migration failure, and the token ownership must move
-only after the new req has actually replaced the old one in the ehash.
-
-Fix both cases while keeping the change local to MPTCP and the TCP
-migration path: grab a reference for cloned subflow requests that carry an
-msk, clear any raw-copied token hash state from the clone, and move the
-hashed token request ownership only after migration succeeds.
-
-Fixes: c905dee62232 ("tcp: Migrate TCP_NEW_SYN_RECV requests at retransmitting SYN+ACKs.")
-Cc: stable@kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Signed-off-by: Ruide Cao <caoruide123@gmail.com>
-Tested-by: Ren Wei <enjou1224z@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
-changes in v2:
-  - drop the generic request_sock clone callback
-  - call MPTCP directly from inet_reqsk_clone() under the TCP protocol check
-  - keep cloned MP_JOIN requests holding an msk reference
-  - clear raw-copied MP_CAPABLE token hash state in the clone
-  - move MP_CAPABLE token ownership only after successful req migration
-  - avoid exposing token internals to inet_connection_sock.c
-  - update the commit message accordingly
-  - v1 link: https://lore.kernel.org/all/86e2514b533bf4d55d4aa2fdbf1404022e8c9430.1776149210.git.caoruide123@gmail.com/
-
- include/net/mptcp.h             | 14 ++++++++++++++
- net/ipv4/inet_connection_sock.c | 12 ++++++++++--
- net/mptcp/protocol.h            |  2 ++
- net/mptcp/subflow.c             | 20 ++++++++++++++++++++
- net/mptcp/token.c               | 25 +++++++++++++++++++++++++
- 5 files changed, 71 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/mptcp.h b/include/net/mptcp.h
-index f7263fe2a2e4..4bb24963afef 100644
---- a/include/net/mptcp.h
-+++ b/include/net/mptcp.h
-@@ -219,6 +219,10 @@ int mptcp_subflow_init_cookie_req(struct request_sock *req,
- struct request_sock *mptcp_subflow_reqsk_alloc(const struct request_sock_ops *ops,
- 					       struct sock *sk_listener,
- 					       bool attach_listener);
-+void mptcp_subflow_reqsk_clone(struct request_sock *req,
-+			       struct request_sock *new_req);
-+void mptcp_subflow_reqsk_migrated(struct request_sock *req,
-+				  struct request_sock *new_req);
- 
- __be32 mptcp_get_reset_option(const struct sk_buff *skb);
- 
-@@ -314,6 +318,16 @@ static inline struct request_sock *mptcp_subflow_reqsk_alloc(const struct reques
- 	return NULL;
- }
- 
-+static inline void mptcp_subflow_reqsk_clone(struct request_sock *req,
-+					     struct request_sock *new_req)
-+{
-+}
-+
-+static inline void mptcp_subflow_reqsk_migrated(struct request_sock *req,
-+						struct request_sock *new_req)
-+{
-+}
-+
- static inline __be32 mptcp_reset_option(const struct sk_buff *skb)  { return htonl(0u); }
- 
- static inline void mptcp_active_detect_blackhole(struct sock *sk, bool expired) { }
-diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-index e961936b6be7..578471bb8a2b 100644
---- a/net/ipv4/inet_connection_sock.c
-+++ b/net/ipv4/inet_connection_sock.c
-@@ -17,6 +17,7 @@
- #include <net/inet_timewait_sock.h>
- #include <net/ip.h>
- #include <net/route.h>
-+#include <net/mptcp.h>
- #include <net/tcp_states.h>
- #include <net/xfrm.h>
- #include <net/tcp.h>
-@@ -951,8 +952,13 @@ static struct request_sock *inet_reqsk_clone(struct request_sock *req,
- 	/* We need not acquire fastopenq->lock
- 	 * because the child socket is locked in inet_csk_listen_stop().
- 	 */
--	if (sk->sk_protocol == IPPROTO_TCP && tcp_rsk(nreq)->tfo_listener)
--		rcu_assign_pointer(tcp_sk(nreq->sk)->fastopen_rsk, nreq);
-+	if (sk->sk_protocol == IPPROTO_TCP) {
-+		if (tcp_rsk(nreq)->tfo_listener)
-+			rcu_assign_pointer(tcp_sk(nreq->sk)->fastopen_rsk, nreq);
-+
-+		if (rsk_is_mptcp(req))
-+			mptcp_subflow_reqsk_clone(req, nreq);
-+	}
- 
- 	return nreq;
- }
-@@ -1115,6 +1121,8 @@ static void reqsk_timer_handler(struct timer_list *t)
- 			goto no_ownership;
- 		}
- 
-+		if (rsk_is_mptcp(oreq))
-+			mptcp_subflow_reqsk_migrated(oreq, nreq);
- 		__NET_INC_STATS(net, LINUX_MIB_TCPMIGRATEREQSUCCESS);
- 		reqsk_migrate_reset(oreq);
- 		reqsk_queue_removed(&inet_csk(oreq->rsk_listener)->icsk_accept_queue, oreq);
-diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
-index ec15e503da8b..ca1ca2334e1a 100644
---- a/net/mptcp/protocol.h
-+++ b/net/mptcp/protocol.h
-@@ -1038,6 +1038,8 @@ static inline void mptcp_token_init_request(struct request_sock *req)
- 
- int mptcp_token_new_request(struct request_sock *req);
- void mptcp_token_destroy_request(struct request_sock *req);
-+void mptcp_token_move_request(struct request_sock *req,
-+			      struct request_sock *new_req);
- int mptcp_token_new_connect(struct sock *ssk);
- void mptcp_token_accept(struct mptcp_subflow_request_sock *r,
- 			struct mptcp_sock *msk);
-diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
-index 4ff5863aa9fd..e4c1d2bb4783 100644
---- a/net/mptcp/subflow.c
-+++ b/net/mptcp/subflow.c
-@@ -47,6 +47,26 @@ static void subflow_req_destructor(struct request_sock *req)
- 	mptcp_token_destroy_request(req);
- }
- 
-+void mptcp_subflow_reqsk_clone(struct request_sock *req,
-+			       struct request_sock *new_req)
-+{
-+	struct mptcp_subflow_request_sock *subflow_req;
-+
-+	subflow_req = mptcp_subflow_rsk(new_req);
-+
-+	if (subflow_req->msk)
-+		sock_hold((struct sock *)subflow_req->msk);
-+
-+	/* Raw-cloned token hash state must not survive failed migrations. */
-+	mptcp_token_init_request(new_req);
-+}
-+
-+void mptcp_subflow_reqsk_migrated(struct request_sock *req,
-+				  struct request_sock *new_req)
-+{
-+	mptcp_token_move_request(req, new_req);
-+}
-+
- static void subflow_generate_hmac(u64 key1, u64 key2, u32 nonce1, u32 nonce2,
- 				  void *hmac)
- {
-diff --git a/net/mptcp/token.c b/net/mptcp/token.c
-index f1a50f367add..8f92a57c26e5 100644
---- a/net/mptcp/token.c
-+++ b/net/mptcp/token.c
-@@ -207,6 +207,31 @@ void mptcp_token_accept(struct mptcp_subflow_request_sock *req,
- 	spin_unlock_bh(&bucket->lock);
- }
- 
-+void mptcp_token_move_request(struct request_sock *req,
-+			      struct request_sock *new_req)
-+{
-+	struct mptcp_subflow_request_sock *subflow_req = mptcp_subflow_rsk(req);
-+	struct mptcp_subflow_request_sock *new_subflow_req;
-+	struct mptcp_subflow_request_sock *pos;
-+	struct token_bucket *bucket;
-+
-+	new_subflow_req = mptcp_subflow_rsk(new_req);
-+
-+	if (hlist_nulls_unhashed(&subflow_req->token_node))
-+		return;
-+
-+	bucket = token_bucket(subflow_req->token);
-+	spin_lock_bh(&bucket->lock);
-+	/* Migrate the pending MP_CAPABLE token ownership to the cloned req. */
-+	pos = __token_lookup_req(bucket, subflow_req->token);
-+	if (!WARN_ON_ONCE(pos != subflow_req))
-+		hlist_nulls_replace_init_rcu(&subflow_req->token_node,
-+					     &new_subflow_req->token_node);
-+	else
-+		mptcp_token_init_request(new_req);
-+	spin_unlock_bh(&bucket->lock);
-+}
-+
- bool mptcp_token_exists(u32 token)
- {
- 	struct hlist_nulls_node *pos;
--- 
-2.34.1
-
+BR, Jarkko
 
