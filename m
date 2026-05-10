@@ -1,219 +1,214 @@
-Return-Path: <netdev+bounces-286236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286237-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 68CJJGkVAGqPCwEAu9opvQ
-	(envelope-from <netdev+bounces-286236-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 07:19:37 +0200
+	id 6NmWAS4ZAGo3DAEAu9opvQ
+	(envelope-from <netdev+bounces-286237-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 07:35:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79409502A1D
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 07:19:35 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF378502A79
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 07:35:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A96AF3014651
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 05:19:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6AEFB3002B4F
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 05:35:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F07312832;
-	Sun, 10 May 2026 05:19:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04C5C34F247;
+	Sun, 10 May 2026 05:35:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QfgI33Nm"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RXwa7q46"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012069.outbound.protection.outlook.com [52.101.53.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33520301472;
-	Sun, 10 May 2026 05:19:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778390374; cv=none; b=UwY54dN70xQLuM6evb88qKzVAai8x65XXVYpSjja1W8YK3QhnzUuB2u7uKOrVBTZIKvT/RijtQ0NOi+kj6iuNCmkuKHFJWn1yUVSHLNI2obtqHcVsVfQNPiPm4CkAUe2Uemi0KtABlGmGj1TDsfiucCyZU3rTbEQgT+RmCPWipI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778390374; c=relaxed/simple;
-	bh=Tb2Fcl07lDQV2lJ3devouZ78CtC47C98TLMHnEnOots=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g1halQ7hQUt8bCFZGf/QQOkTKnKFIk4ix91qgO/RL44hTPbeG7tsMWcGfaqQp8acB8pwrj/NCo2t6Ibr3izIkN618uwiMrecjaK26iacwIfVsTAJkdTrs1ehu6HVmGGS2NbCmDUb6NkU9ApN6SrUtfYLWHbPgghJov6v8a9mZc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QfgI33Nm; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778390372; x=1809926372;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Tb2Fcl07lDQV2lJ3devouZ78CtC47C98TLMHnEnOots=;
-  b=QfgI33NmWMWF4sl3wz1EIbU9areyzcxDRp5+Iy+NCJtqepoRzExy9fpM
-   rKF4bATd7xY7eJdzRmrzeRwm8lcCBiUYMg/PdQjnLlJ/mKQ0kObb53y4W
-   6GR3P3ifDDThEvj2+p+a1UHxdw/BAXTpyvZKShwqhoeg1cQiD+/mmpE92
-   A3/a6DT5ay0oTimQzITWNso1HIaRBX1O2mLyiYzHspN+gZJhfQoxFA0BD
-   ecjPOH0/7JeTF+nJdX3QKXRB0KcdZ4vpcsJXoLJINlJKnwDaKfLMlQRjB
-   GzHnh5dU0dyWoDFwrThBwO66kJSSM1l5uw+xwoszfjRHBoYlbaAoF55u4
-   w==;
-X-CSE-ConnectionGUID: URwRUrPDQFG+nPvahXLDhQ==
-X-CSE-MsgGUID: ned/CTmGTXe8SNg1mhcfOw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11781"; a="89901691"
-X-IronPort-AV: E=Sophos;i="6.23,227,1770624000"; 
-   d="scan'208";a="89901691"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2026 22:19:31 -0700
-X-CSE-ConnectionGUID: WbuzXBsTQSGONjZWXM1spQ==
-X-CSE-MsgGUID: MrIXDTyNTtO4bnYNKCVZNA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,227,1770624000"; 
-   d="scan'208";a="237083204"
-Received: from lkp-server01.sh.intel.com (HELO 82327192134e) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 09 May 2026 22:19:30 -0700
-Received: from kbuild by 82327192134e with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wLwZa-000000001mL-1pCr;
-	Sun, 10 May 2026 05:19:26 +0000
-Date: Sun, 10 May 2026 13:18:57 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jiakai Xu <xujiakai24@mails.ucas.ac.cn>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jiakai Xu <xujiakai24@mails.ucas.ac.cn>
-Subject: Re: [PATCH] netdevsim: Fix task hung by releasing bus lock before
- device ops
-Message-ID: <202605101358.RCmpCsFR-lkp@intel.com>
-References: <20260509092837.3432281-1-xujiakai24@mails.ucas.ac.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A801A6801;
+	Sun, 10 May 2026 05:35:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.69
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778391335; cv=fail; b=C+NHqs6Ac2d2br+SH143VTWHPvvx7DF/qQRoK5ZibhHEe4hM2AQg2eT+vKHiGugAQmI7hejo0cj9kRSBjW9Mfv5fXMFa3K32Z6tXw8ASo8qnF4v0K4WLTVEdC28VisRA9RmfsMc3sNPSzVQZ8fAHUaXJtnOyNJSz1Yx7SwabgHs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778391335; c=relaxed/simple;
+	bh=JQl3vazfO6IFmLXp1dXj6IhFKoxH3tCkbza1NyTlhAI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GTdHWjc8JrW3tf3MW7Tv5nhTrhipAK+7Ku/BMD6OLvq4yt2rsEeM1MwC9GfgvbU+Ulbqqiz1uMU5jyxmGQ6xMVDSTo17bMUTrzmMALF0QnN627Sep399ZB0LAEytWG2gwIt6Y39rlBGkf707GykC5WxV71H6q83zNswyJih7UGQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RXwa7q46; arc=fail smtp.client-ip=52.101.53.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=IZ3AN3g7wW9yEE3i/IuMm+ObppNMwCrCU0Mdo9sKY1ZfREhEKOW9dWIajH3vrV2AwOo4pJr31vAOkrjRQTl7AOO5GwQwmcCvlxEx8MIpcblZYlhif8tEEbhdyixK03vPDoLQ4l4kJOfdsgsVpG1J+Jvnss+YLr3hnLxK9hhT0PZmnJdEHbhfRcxfi4VNApczXSpa6vblXMCjOwOWfOwNsFb/ronFOv7hlnIyL/rfn0Oz5JJh7a5Qq3nYqYJqY8yOTK9TGTdeLtR9YdBvfrtKmXpW9JToe88FoHylfMbV5LNE1bwcG0RVuhof+YyCCsFWzvoAVsIFAIw5GDof5Tv31g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AAztO7hrIRDBMnd58QYkSNBgUsKykbO74VYFkAr2m3Q=;
+ b=HPB6G3ZcKE8dO4WsCaiac00xvWrwDg2a6cHfYvJxpyGia0klg2Eo2sjllWsfzok4OhQRSRbTXAGBjZWGqr6cU14MU4U8pUbanKLj5j9zvzLJawJp1xuRp7X4WPrZXTjEucRd1z1vliOTVsKa7fWKWTu/00aHBsaTcJ+gscc1J5i4sDYvYlIVFCmwHU2PedYxQKM8yO8slnGXZi++n3dEGakVN/EW0ie3FyDRhhSQi6oIgUfye1kPLZf093IlKIQvZImegSdYbHedkDOYhOnRSVi+xs4okVQZnYLrPAetxrVz1oR1T2JVcrSbh+ytJDDKv17hT3TZIaRcA2uDYX7LYg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AAztO7hrIRDBMnd58QYkSNBgUsKykbO74VYFkAr2m3Q=;
+ b=RXwa7q46KeqqWOBFkbcAGHrPd60XUmCErulKs1OLQIQpPrZZhy2C0QlZ+IZNVL9qdRvOd+p6QHt9Sfyg05OWOwQa74LkbyPjA/A/lUfmw3yt7glFEEYw/nhoiYefUmFKtph3iTEvRosDAGsW+SstVfn05aK5osOkhI4C4//eFWr0tKcLMxDLua1JnKfN7FyZDe6C1I0a4MZoCliqAp/BrP5eDq9Uy6oX6CT4dUtUlFrz4U9GDqYGTjTE2RzvCJWICGrts0JUN2FuuwqgNBPxJDOhCaS+HZF7QOktkeFabGdezST4gX9mIrrkBdk3gwx6VVgWe2kHgCgQapZAXqg8Wg==
+Received: from SJ0PR03CA0152.namprd03.prod.outlook.com (2603:10b6:a03:338::7)
+ by CY1PR12MB9601.namprd12.prod.outlook.com (2603:10b6:930:107::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.21; Sun, 10 May
+ 2026 05:35:29 +0000
+Received: from SJ1PEPF000023CC.namprd02.prod.outlook.com
+ (2603:10b6:a03:338:cafe::dd) by SJ0PR03CA0152.outlook.office365.com
+ (2603:10b6:a03:338::7) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9891.17 via Frontend Transport; Sun,
+ 10 May 2026 05:35:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SJ1PEPF000023CC.mail.protection.outlook.com (10.167.244.6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.25.13 via Frontend Transport; Sun, 10 May 2026 05:35:29 +0000
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sat, 9 May
+ 2026 22:35:13 -0700
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail202.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sat, 9 May
+ 2026 22:35:13 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Sat, 9 May
+ 2026 22:35:09 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>
+CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, "Moshe
+ Shemesh" <moshe@nvidia.com>, Akiva Goldberger <agoldberger@nvidia.com>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Dragos Tatulea
+	<dtatulea@nvidia.com>
+Subject: [PATCH net-next 0/8] net/mlx5: Prepare eswitch infrastructure for satellite PF support
+Date: Sun, 10 May 2026 08:34:40 +0300
+Message-ID: <20260510053448.326823-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260509092837.3432281-1-xujiakai24@mails.ucas.ac.cn>
-X-Rspamd-Queue-Id: 79409502A1D
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF000023CC:EE_|CY1PR12MB9601:EE_
+X-MS-Office365-Filtering-Correlation-Id: 54b70ea1-a69d-4e48-fa6d-08deae55f25a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|36860700016|1800799024|82310400026|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	iQ4wmEx8ieWpJtrPMNqNUiu6s9/7/cDVjIZLOIQxzVAHl80rLZZ8JO2bUjUjNJKiSpxAx3j4Zle+Vd2bgFuRiirovhULXXI88VQJUi/eMQqtKT9lLjjs2ghlScz1wwJOunOj0/7i6lCFZMa1hyTzfP13x0Wyc7wF2aH4gTc54x7BtqaqP00/AV7Vld7Deh/Cl8v1+8mrgRK8yeTfQiEqfjGUlsnoisJ23cu1uoyqT2IheIyjtvXZB9i2SSktKc3k38X8KAilc5LqISRMMFCRsj4tztxF5AXfnhyNZxUEW3bFbNl6eKoCRUoRlm2W56Nny65uyOao9CJnFATqNClJaAsr6bvsFDS6Io368Y2mBDvgcD7akxJPv2JSVN57RFbiHviyZU99U22k9bzBKqUVabH4ZIUc9+b3MrfCKQTDhnnUtL0PN1Kg/gdTgN0SwrNtCa5mIdsseiLg07LlwFJ9xr3pV/OL5POAnaslMln3CIWPM2FY7MqR/hiqEdKrWfR8TA2vgF3qhrtB6X4gkOoFYdG+TEMtQDcSnl8lQ7c6E+1RzOl/sBHBxodz0sh52VwU4RJq/JyNpd3jkADQ7q1yfm+7NP+jiP7p92XKU9wZ6259ztMU0so7Vr5+WuEQImIdi1o4HLYQ73fP3oM2ejYn8Dii8HL/iiRe/LXHieB+xq0JRsJxKuzn53n9dUMPuq2o68KSRj9McfMBVAXIPue/zxxb+Bcaq2z8PaU+MODOVNM=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(36860700016)(1800799024)(82310400026)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	lbWfshHi7/y7acyu6agNU5rGmuN1U8qnfKxZEaTh/PsVlySfYBRdxbDzi9ikG93v+R8uy9VBgXnd696VhU8XDP9W2v6uvh6nWuj+pg9fwImVy61u29a81FCExE0eD+32A88Lhof89aW2O76hdB6SKvPGJcw8RMPs49RYOvYQe+3EAUq9Zz5krpir9+bkkz7j4k3uvlqCviW7kWT9WHKKvrJy+zxUuPKR57tTz7KhFYErcz9fXFCRZOexqt1MgO7Z4GGoj8/DLdoi2NucyYKsGTQgXcQkS8VY1iTD9FQQjLWVKJAp1qhVrI1XRt+P08bkTTU0V7IKdn0TLjyA63HsJfPjJ+BT9ynQdT08a6vS1uECozReMtWQQflAX4SwE9kcRjeooY87+Qvidz1UKOqNGzbO5DYg6T8MS1AFUJnc7Hl7/owFDuTs9WeEZvjG5MKM
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2026 05:35:29.4369
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 54b70ea1-a69d-4e48-fa6d-08deae55f25a
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF000023CC.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY1PR12MB9601
+X-Rspamd-Queue-Id: EF378502A79
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	TAGGED_FROM(0.00)[bounces-286236-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286237-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Action: no action
 
-Hi Jiakai,
+Hi,
 
-kernel test robot noticed the following build errors:
+See detailed description by Moshe below.
 
-[auto build test ERROR on linus/master]
-[also build test ERROR on v7.1-rc2 next-20260508]
-[cannot apply to horms-ipvs/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Regards,
+Tariq
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jiakai-Xu/netdevsim-Fix-task-hung-by-releasing-bus-lock-before-device-ops/20260510-070550
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20260509092837.3432281-1-xujiakai24%40mails.ucas.ac.cn
-patch subject: [PATCH] netdevsim: Fix task hung by releasing bus lock before device ops
-config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20260510/202605101358.RCmpCsFR-lkp@intel.com/config)
-compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260510/202605101358.RCmpCsFR-lkp@intel.com/reproduce)
+This series prepares the mlx5 eswitch command interface and vport
+infrastructure for satellite PF support.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202605101358.RCmpCsFR-lkp@intel.com/
+The first two patches abstract host PF data parsing behind a helper and
+switch to the v1 response layout for query_esw_functions when supported,
+so callers are insulated from layout differences.
 
-All errors (new ones prefixed by >>):
+The IPsec VF checks are tightened to use mlx5_eswitch_is_vf_vport()
+instead of comparing against a specific vport number.
 
->> drivers/net/netdevsim/bus.c:192:3: error: call to undeclared function 'nsim_bus_dev_del'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     192 |                 nsim_bus_dev_del(nsim_bus_dev);
-         |                 ^
-   drivers/net/netdevsim/bus.c:192:3: note: did you mean 'nsim_bus_dev_new'?
-   drivers/net/netdevsim/bus.c:156:1: note: 'nsim_bus_dev_new' declared here
-     156 | nsim_bus_dev_new(unsigned int id, unsigned int port_count, unsigned int num_queues);
-         | ^
->> drivers/net/netdevsim/bus.c:206:13: error: conflicting types for 'nsim_bus_dev_del'
-     206 | static void nsim_bus_dev_del(struct nsim_bus_dev *nsim_bus_dev);
-         |             ^
-   drivers/net/netdevsim/bus.c:192:3: note: previous implicit declaration is here
-     192 |                 nsim_bus_dev_del(nsim_bus_dev);
-         |                 ^
-   2 errors generated.
+The remaining patches refactor SET_HCA_CAP and enable/disable_hca
+command helpers to support vhca_id-based addressing, which is required
+for managing functions that are not directly addressable by function_id.
+
+A follow-up series will introduce satellite PF discovery and management
+using this infrastructure.
+
+Moshe Shemesh (8):
+  net/mlx5: Use helper to parse host PF info
+  net/mlx5: Use v1 response layout for query_esw_functions
+  net/mlx5: Use mlx5_eswitch_is_vf_vport() for IPsec VF checks
+  net/mlx5: Switch vport HCA cap helpers to kvzalloc
+  net/mlx5: Add mlx5_vport_set_other_func_general_cap macro
+  net/mlx5: Refactor mlx5_set_msix_vec_count() SET_HCA_CAP
+  net/mlx5: Use vport helper for IPsec eswitch set caps
+  net/mlx5: Generalize enable/disable HCA for any PF vport
+
+ .../net/ethernet/mellanox/mlx5/core/ecpf.c    |  24 ++-
+ .../net/ethernet/mellanox/mlx5/core/ecpf.h    |   4 +-
+ .../ethernet/mellanox/mlx5/core/esw/ipsec.c   |  83 +++------
+ .../net/ethernet/mellanox/mlx5/core/eswitch.c | 157 +++++++++++++++---
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h |  16 ++
+ .../mellanox/mlx5/core/eswitch_offloads.c     |  38 ++---
+ .../ethernet/mellanox/mlx5/core/mlx5_core.h   |   6 +
+ .../net/ethernet/mellanox/mlx5/core/pci_irq.c |  27 +--
+ .../net/ethernet/mellanox/mlx5/core/sriov.c   |   8 +-
+ .../net/ethernet/mellanox/mlx5/core/vport.c   |  12 +-
+ 10 files changed, 227 insertions(+), 148 deletions(-)
 
 
-vim +/nsim_bus_dev_del +192 drivers/net/netdevsim/bus.c
-
-   157	
-   158	static ssize_t
-   159	new_device_store(const struct bus_type *bus, const char *buf, size_t count)
-   160	{
-   161		unsigned int id, port_count, num_queues;
-   162		struct nsim_bus_dev *nsim_bus_dev;
-   163		int err;
-   164	
-   165		err = sscanf(buf, "%u %u %u", &id, &port_count, &num_queues);
-   166		switch (err) {
-   167		case 1:
-   168			port_count = 1;
-   169			fallthrough;
-   170		case 2:
-   171			num_queues = 1;
-   172			fallthrough;
-   173		case 3:
-   174			if (id > INT_MAX) {
-   175				pr_err("Value of \"id\" is too big.\n");
-   176				return -EINVAL;
-   177			}
-   178			break;
-   179		default:
-   180			pr_err("Format for adding new device is \"id port_count num_queues\" (uint uint uint).\n");
-   181			return -EINVAL;
-   182		}
-   183	
-   184		nsim_bus_dev = nsim_bus_dev_new(id, port_count, num_queues);
-   185		if (IS_ERR(nsim_bus_dev))
-   186			return PTR_ERR(nsim_bus_dev);
-   187	
-   188		mutex_lock(&nsim_bus_dev_list_lock);
-   189		/* Prevent to use resource before initialization. */
-   190		if (!smp_load_acquire(&nsim_bus_enable)) {
-   191			mutex_unlock(&nsim_bus_dev_list_lock);
- > 192			nsim_bus_dev_del(nsim_bus_dev);
-   193			return -EBUSY;
-   194		}
-   195	
-   196		/* Allow using nsim_bus_dev */
-   197		smp_store_release(&nsim_bus_dev->init, true);
-   198	
-   199		list_add_tail(&nsim_bus_dev->list, &nsim_bus_dev_list);
-   200		mutex_unlock(&nsim_bus_dev_list_lock);
-   201	
-   202		return count;
-   203	}
-   204	static BUS_ATTR_WO(new_device);
-   205	
- > 206	static void nsim_bus_dev_del(struct nsim_bus_dev *nsim_bus_dev);
-   207	
-
+base-commit: 8b2feced65cd3aa0597d596ed5733a1abd4c4d78
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.44.0
+
 
