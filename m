@@ -1,201 +1,272 @@
-Return-Path: <netdev+bounces-286270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286271-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uK/pIbdXAGpEGgEAu9opvQ
-	(envelope-from <netdev+bounces-286270-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 12:02:31 +0200
+	id cEEtIW1YAGpEGgEAu9opvQ
+	(envelope-from <netdev+bounces-286271-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 12:05:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B78C5037CD
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 12:02:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C84FC50381A
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 12:05:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0A969300253C
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 10:02:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EF93F300C006
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 10:05:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C19F6280331;
-	Sun, 10 May 2026 10:02:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6E3F3563C7;
+	Sun, 10 May 2026 10:05:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Euak2/Cq"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="ZvFpLqTE"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013057.outbound.protection.outlook.com [40.107.201.57])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5725119EED3;
-	Sun, 10 May 2026 10:02:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778407344; cv=fail; b=XvxVVxqc5S2gF43JVnPn9Pkbfq6xgOv7E7t/lMlHciGFMKlK9flqHXYyMAGKl8XBxLR2nlA0GS7fpp0sDvu91D/VnnIe0/+M7JwPTGE76I3tq9oSIpdfeqa4NiXW1oBEJoIDONs9FzFsllb9fL2YS8vv/OOkNG3+Dwubfgv+PgI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778407344; c=relaxed/simple;
-	bh=Gn+hMahaZY6YDhBqMydrOgOWEUNc6P2QGG99UpESDso=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PlH2km/BtoieOpy1WlOr+8y95fZ+Hkld4mDj/1214HInilD0umCfUpMfiDUtFEj/tt17Klm8MyJo3pThD4D3MbLq5SZYpuRdsr5/fyuQmdrGolJSzySYlalANWjh/w1dvfeFqP+AYAhwGY8gwVMgjz/9cWUFFXrDxselfCILQpk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Euak2/Cq; arc=fail smtp.client-ip=40.107.201.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hgW3ZurVyX35izYh//9w6sToH0RAud34C0MCBgtk7oOcr3ZOVkft7lvT5OkWg+eQXv1SRshg6RtDEPzM4QUZMRboKbEsmo/F7juDR70WPWy/whAXmp/A4RTiOUvlGuK1Ir0vhylCxbpwRrCUMs4E7Um/vn+yXYccIVbAj8ZL0QzaTZvd2IbkOWaNhoyqhlI6mVfI+tXrU4jQ7Y4OKGFt1VzTPqMgOgcL6xlmHZFXNsFjks6SaDnDhhcXkYGa9OCO09mrqBWGZ5h8GjWEw200k0iOp8Hiz1QoM48Hd+KW7fsvE+Ow92NOyi6T+Zax307z4S1bpG0W8vaQjSVLl8PsdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ywdkWz1PzxZJjin8n0qhCo17Lf5NTfzpRyCEXrdu+iU=;
- b=FMeM/ybGjbkyPrGQl749anknPaRtmfcKJJTdS2uPP6GPrZw3mz586Ohttu4NTSDt5Kr6KK6J1o0/+O+47rknEAVe9+0fRoQw9l9Kvoeo6qC+dFfD2ryYG+9ibXBfuOfs/U2J600dpdVK2dAZoxrMv+5q1uYMPsjQjoA5wA3jWnjyDB1j5ViN3ZNfXmQ+gZgLTL234WIo1M7V1hcaqB96F8u2FmOANCHtX0t0yg/S63aj9iRz9Pe9IFlFi5pB6lVG6bi0J9dXiW7qHkUDR0XpcM+RDZQvXeugebEP3Bc5bG/lRWG94NdIvqXkWn58pIC241jKB4ka4brL9uDqCqw6WQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ywdkWz1PzxZJjin8n0qhCo17Lf5NTfzpRyCEXrdu+iU=;
- b=Euak2/CqdJ95j1kP1OLqmA42bdG9p7vmXml1r4zWGVsSBwBilxun/nl+lnjD+OnHLAafmECilQM5VC0x8yCFgdDTZKBFWqeibUn7fcU3HPR15D7hEeQG/hxl10t04QNN4YdNXLhaFVOr+DCEG5NMGdtlsx7bMPwYz4wUTDaFdrPi6BJ0xidh38fsZtyOfuXj3czD8AAoCo+PEpmk4uxVG5hzOXLQcBpv3bEKbcMRGoWqU7Gz8neXnNUdqIrwSYEPGncD4Io4hPDlZtc2JMfrw3KJfpxl4A90NvyCXst+1LNxjBNYDO50QoXingiP/OLJh/ISvKsXfGwD6Lvj+ZVQuQ==
-Received: from BYAPR08CA0024.namprd08.prod.outlook.com (2603:10b6:a03:100::37)
- by DS0PR12MB6630.namprd12.prod.outlook.com (2603:10b6:8:d2::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.19; Sun, 10 May
- 2026 10:02:15 +0000
-Received: from SJ5PEPF00000204.namprd05.prod.outlook.com
- (2603:10b6:a03:100:cafe::3b) by BYAPR08CA0024.outlook.office365.com
- (2603:10b6:a03:100::37) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9891.22 via Frontend Transport; Sun,
- 10 May 2026 10:02:15 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SJ5PEPF00000204.mail.protection.outlook.com (10.167.244.37) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.25.13 via Frontend Transport; Sun, 10 May 2026 10:02:15 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 10 May
- 2026 03:02:00 -0700
-Received: from localhost (10.126.231.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 10 May
- 2026 03:01:58 -0700
-Date: Sun, 10 May 2026 13:01:48 +0300
-From: Leon Romanovsky <leonro@nvidia.com>
-To: David Ahern <dsahern@kernel.org>
-CC: <stephen@networkplumber.org>, <netdev@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, David Ahern <dahern@nvidia.com>
-Subject: Re: [PATCH iproute2-next 2/4] iplink: Update iplink_parse to use
- netns_get_fd_pid
-Message-ID: <20260510100148.GC15586@unreal>
-References: <20260507150836.28105-1-dsahern@kernel.org>
- <20260507150836.28105-3-dsahern@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1336221CFE0
+	for <netdev@vger.kernel.org>; Sun, 10 May 2026 10:05:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778407529; cv=none; b=aijoXwI23d9N6UG40c4NASatGn7xxYgh0BZUW61xnq9blmtfyun/FJFuyrXE/EtKQTV4MnkgSm0FRRhINRCAyjeOBj9bwbZ/RHcF6BJt/QOd9/bAmRzvefRT3TWoFcKu8fKpy/D2hqOrtQWsqSODz+EFzleocU7vfMV3ZADZ2A8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778407529; c=relaxed/simple;
+	bh=jl9mMb2xNoQTkvMYCnG85fJgeQuVdezGK14MCgT4Wg0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lCSEVuOQyLXgbDbBt+HcXk8PxdlOlv6FKP2t3jluQ3cTbq3gveRxHs9j4xcXUHkReQd8l3V36dS/f4LKnaurjhmSrdE0Wt7+fvsB97Ljngcctei++Ztl8gbV9ryA3b32hEJo+bD/NlprtfdOUVg5AvMahqZOUP9udM0wOG9lqN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=ZvFpLqTE; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-488a8ca4aadso29935635e9.3
+        for <netdev@vger.kernel.org>; Sun, 10 May 2026 03:05:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall.org; s=google; t=1778407526; x=1779012326; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Fjf6lHgwzOVnsX45ANVQd7FGC8MgEKFi4DF4O0Gwyz0=;
+        b=ZvFpLqTEK9KAR9sLSusM3i9KX1C70Upuaw1yANKJyJ94AnJJ3jtco1z/hrAVuM7bD1
+         Kgb5oqfZ7DG4SMYiFCTWyfL8uQyA9emEGtE7wrXjbmXs2fkU3/hXJ9Xt73rWl/MMNgES
+         pezAOquxLa15Tlv58ueQwFS6M1OlWHUf95CfYrAIvk07TmZzyvdrDbqoqJIUKANICoPI
+         h2ya8OqUuLAjwqX6OzHPDGzAJUx740OtP1vKtBfRx2uTNxIhRhrhtCIt8qIctlGELSOr
+         QFTbR+NJRFtpwRXOX2q2OrKeAk0uGcI6atpaymjpCa4Vi1wUo+LKNcYjFh/HE4RMn3LU
+         i1rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778407526; x=1779012326;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Fjf6lHgwzOVnsX45ANVQd7FGC8MgEKFi4DF4O0Gwyz0=;
+        b=cHfdu6UnBebCFO6xtzUSb1PP0KNp0/JXileYGaQeRkBUtts9tnYc8EkIgUHKxyh0ia
+         plw5T7cDk0VTvKLnHwn7HiNPas/c3bEyd689RUAHnhFvatgqF4uvsXORS8wY/u5qRnQE
+         OAQO3S9iADhRHfeMtRmbmGk78lAeB6ob4N1dZ/OW4zOPIFCivRkAlASkW5gOaYs0ShB8
+         6KbR47UIpVcR7Dw/81ZzALJQATvzT9yE4VKCMWkwAN2+aaem8folR6MpU/iNzynCGcHQ
+         cBhK9P5FxHSFApwnu9ffRNCms92MpNoUCIM51SGKHQ6LvjhKoSZDZ901oK++Q45eWFcw
+         p0vw==
+X-Forwarded-Encrypted: i=1; AFNElJ/G9Gt8bzypx63nIs5T/EN9pTemuPPGgIr1GrNujszHIwiAWR5lbwsJ3y+JiXo65d9zp3jBvhg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPdj4XvMDbk12jIp2YT4EAEkQ3bm01/Zpp0o8dXtkrZPypxSE6
+	MIxoYTac4mtuB1O9HZ9eQ2S4C8JGdBGi9yrKnag4DxGBbRlkVubzO2P5wEjCHDUfAJg=
+X-Gm-Gg: Acq92OFRUPwrRoT4DZ9f4qEi5gSMBBGdIkasS3sSsZavCt04HjwPZ5qWyUWMuggrjaq
+	6+qdlHU3jSCGcv1Pzx92O0itPk2gSDbrgXlJbWecTK1VI3MszeKmsnDQJt1OPBFAFMVwOSmJI7x
+	J5PelxQdv1fEXCkccQD4EX+aHCmucv1Sn4aRyvrIA3rdqtF6Yoc1maPwDOE5ljQKn4mGRV3q92E
+	cQwBI37Ex+obIGJR9iA2mNv/CD/vY1fljrOiHm6g8c9PoFP4ujePrvyII/x5RnO35sAnjnTeVXE
+	Q0KbTyg5swu/OIDXOT5osiwfOvGsmmvR4KPLeUj2hyMREBnVZotzh4b6iKVBtnHU41OYPcM/05V
+	eAPVJvf/2QRZt/nHsiFsBpO8wl5zd0WwJ/EEiqdBOjBbdfn7vlXyzYjKOFT9ZliPmn6NMBItiaT
+	Lct7Fkfhu7i/8oqzH9YrXpILbx+MF5rPRgV/ox76O77OGHIcGmmGT5xg==
+X-Received: by 2002:a05:600c:3055:b0:488:f453:b976 with SMTP id 5b1f17b1804b1-48e51f4e492mr198370365e9.27.1778407526198;
+        Sun, 10 May 2026 03:05:26 -0700 (PDT)
+Received: from [192.168.0.161] (78-154-15-182.ip.btc-net.bg. [78.154.15.182])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4548bb51d40sm17103719f8f.0.2026.05.10.03.05.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 10 May 2026 03:05:25 -0700 (PDT)
+Message-ID: <e1f1b080-cfde-4ea4-b444-b64d43778b2f@blackwall.org>
+Date: Sun, 10 May 2026 13:05:24 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260507150836.28105-3-dsahern@kernel.org>
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF00000204:EE_|DS0PR12MB6630:EE_
-X-MS-Office365-Filtering-Correlation-Id: bb06614d-e9c6-4892-fc30-08deae7b36b2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|82310400026|376014|1800799024|22082099003|56012099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	p1bPcG5RydzOQ3DLPe96s2bX4FaKIO76epPsR3hzU6cS0j/RIyY4al5QkbxFnPgP0cjuNjYO5bIktzjHNlWfQi7qg69nKuCKDwj+fHuKZ45nwy3cWEalOqWMeE/p0jDkXPvpfESi44VvZRtPguMTN2B5lbvny921pJp0aDMQLFOyTZjwCk3Jq6/7hdNa6OkxkitaPboBsJGeZaV658lanlngCIQWMTk2RA08g4o17WSjbCTXisj8+yT7ZP+37dvaTldkr6ctgUxwqPer6QoJBYuULKLt7fPdJx90d7XGswkSNnj4eMUwJkBvF4L+xN+G2kp2ZvOBFm2Iye+lIr4ALGxTPDbwf3bFIphft5i8F4tfWIgNJOJ+lX4ECozWUwd4LBq6ZAc5wZuvL+bbcph8+vCLh6KZJUXdW6tLASkVFCKM6zo+txiGdB0furDPlR4HwEDHt12yG2Ky/Sm0mkRGYRhoRTOkFX/2bHXyYE2uj/Ktbmr7TRE6+Mfscy/jnLTj6lhGbpJxLNj/BoFjNv3Msxh3ShCmEX5Zl+7LhTA7nc/3xm+n600FoultmutY3ZIyg5dKlHmOUdSjdJjYq7PGnuovPE0LwND/yJN+CKF2EOx7sK8Ow3HrYNesKsrsih2HNrW79gXbX/r2n5fsrAoIXxmnyXo+VSAAXFGAZkh+bxQKZL4SmfsL1SVHEDe++US4PI6Wui0SvQKnaJ7XrRVmZzWE5o0Lqd5y7ZvBOmzqOWw=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(82310400026)(376014)(1800799024)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	q0Q65SkoEUpwKGjmLrjzyoeZ2o+cu+btylY6ADms/gAiY971QHDuvJSDTQhymo8myStfjHVEZYwCQuiXYUMwYwLf+LuJRswGNC7F76YKK7UjIcjmqO/H6xjm8MkwxLCAMlMkapqV0ra1pKessUUtsJhJP3MwktHm7MgKWAyYpsA6U11mAHXHKN8KscGrHT/KOj5IFwAC72XWW0tgi4FmrNuH9PeXgDLJZ/dIJg2FNdbtlX/lkmKPp5tbu782g64PPDZY4qX+vyH4IYfFL2PiNXH/DUtyVDccT5x4aNxouCmJrf319nG2ECuQv6nmeJdhgtEG7IT7WZj7EuX2XGt/pZTAgQcfh8atltVi33vJQZLB0ORL73yTDE/565e4xRUWvV++dzM7E6aX1zFBEY0NE1euKOb1IoqbaCRSz1aCq390hsxSiJ71mn9yUgUG1Ymt
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2026 10:02:15.3830
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bb06614d-e9c6-4892-fc30-08deae7b36b2
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF00000204.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6630
-X-Rspamd-Queue-Id: 8B78C5037CD
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/1] net: bridge: cfm: use a per-bridge frame type
+To: Ren Wei <n05ec@lzu.edu.cn>, bridge@lists.linux.dev, netdev@vger.kernel.org
+Cc: idosch@nvidia.com, horatiu.vultur@microchip.com, kuba@kernel.org,
+ henrik.bjoernlund@microchip.com, yuantan098@gmail.com, yifanwucs@gmail.com,
+ tomapufckgml@gmail.com, bird@lzu.edu.cn, ronbogo@outlook.com,
+ zylzyl2333@gmail.com
+References: <cover.1778378864.git.zylzyl2333@gmail.com>
+ <7198fe2845c30c60c6b3833dd78cead8c5966931.1778378864.git.zylzyl2333@gmail.com>
+Content-Language: en-US, bg
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <7198fe2845c30c60c6b3833dd78cead8c5966931.1778378864.git.zylzyl2333@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: C84FC50381A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286270-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286271-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[nvidia.com,microchip.com,kernel.org,gmail.com,lzu.edu.cn,outlook.com];
+	DMARC_NA(0.00)[blackwall.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nvidia.com:email,Nvidia.com:dkim];
+	DKIM_TRACE(0.00)[blackwall.org:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leonro@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[outlook.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,blackwall.org:mid,blackwall.org:dkim,lzu.edu.cn:email]
 X-Rspamd-Action: no action
 
-On Thu, May 07, 2026 at 09:08:33AM -0600, David Ahern wrote:
-> From: David Ahern <dahern@nvidia.com>
+On 10/05/2026 12:15, Ren Wei wrote:
+> From: Yilin Zhu <zylzyl2333@gmail.com>
 > 
-> Drop the open coding of proc/pid/ns/net in favor of
-> netns_get_fd_pid.
+> CFM registers a bridge frame handler when the first MEP is created and
+> unregisters it when the last MEP is deleted. The registered object also
+> contains the hlist_node used by the bridge-local frame_type_list.
 > 
-> Signed-off-by: David Ahern <dahern@nvidia.com>
+> The CFM frame type is currently global, so enabling CFM on multiple
+> bridges links the same hlist_node into multiple bridge-local lists. A
+> later unregister on one bridge can then operate on list state belonging
+> to another bridge.
+> 
+> Move the CFM frame type into struct net_bridge and register/unregister
+> the bridge-owned object. This keeps frame handler list membership local
+> to the bridge while preserving the existing first-MEP/last-MEP lifetime.
+> 
+> Fixes: dc32cbb3dbd7 ("bridge: cfm: Kernel space implementation of CFM. CCM frame RX added.")
+> Cc: stable@kernel.org
+> Reported-by: Yuan Tan <yuantan098@gmail.com>
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Reported-by: Xin Liu <bird@lzu.edu.cn>
+> Co-developed-by: Peihan Liu <ronbogo@outlook.com>
+> Signed-off-by: Peihan Liu <ronbogo@outlook.com>
+> Signed-off-by: Yilin Zhu <zylzyl2333@gmail.com>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 > ---
->  ip/iplink.c | 12 +++---------
->  1 file changed, 3 insertions(+), 9 deletions(-)
+>   net/bridge/br_cfm.c     | 14 ++++++--------
+>   net/bridge/br_private.h | 18 +++++++++++-------
+>   2 files changed, 17 insertions(+), 15 deletions(-)
 > 
-> diff --git a/ip/iplink.c b/ip/iplink.c
-> index eae51438..6c4586ee 100644
-> --- a/ip/iplink.c
-> +++ b/ip/iplink.c
-> @@ -650,19 +650,13 @@ int iplink_parse(int argc, char **argv, struct iplink_req *req, char **type)
->  			if (offload && name == dev)
->  				dev = NULL;
->  		} else if (strcmp(*argv, "netns") == 0) {
-> -			int pid;
-> -
->  			NEXT_ARG();
->  			if (netns != -1)
->  				duparg("netns", *argv);
-> +			/* try by name then by pid */
->  			netns = netns_get_fd(*argv);
-> -			if (netns < 0 && get_integer(&pid, *argv, 0) == 0) {
-> -				char path[PATH_MAX];
-> -
-> -				snprintf(path, sizeof(path), "/proc/%d/ns/net",
-> -					 pid);
-> -				netns = open(path, O_RDONLY);
-> -			}
-> +			if (netns < 0)
-> +				netns = netns_get_fd_pid(*argv);
 
-It would be good to have a single function that handles the entire
-netns_get_fd() → netns < 0 → netns_get_fd_pid() sequence internally. This
-logic is used by at least iplink and rdmatool.
+I think MRP suffers from the same bug, but I also think we can contain the
+fix within the packet type structure instead of making the already huge
+struct net_bridge even bigger. Also, linking a struct within net_bridge
+to a list within the same net_bridge looks weird.
 
-Thanks
+IMO br_add_frame should take a type & a frame_handler, allocate a br_frame_type
+dynamically and link it, then br_del_frame should take a type instead of a ptr
+and remove that frame type and free it with kfree_rcu. That would require
+br_add_frame return value to be checked in the respective cfm/mrp functions.
+Warnings for already existing types on add or missing types on del should be
+added.
+
+Would you please take care of MRP as well?
+
+Cheers,
+  Nik
+
+> diff --git a/net/bridge/br_cfm.c b/net/bridge/br_cfm.c
+> index 118c7ea48c35..547c7415c0ea 100644
+> --- a/net/bridge/br_cfm.c
+> +++ b/net/bridge/br_cfm.c
+> @@ -489,11 +489,6 @@ static int br_cfm_frame_rx(struct net_bridge_port *port, struct sk_buff *skb)
+>   	return 1;
+>   }
+>   
+> -static struct br_frame_type cfm_frame_type __read_mostly = {
+> -	.type = cpu_to_be16(ETH_P_CFM),
+> -	.frame_handler = br_cfm_frame_rx,
+> -};
+> -
+>   int br_cfm_mep_create(struct net_bridge *br,
+>   		      const u32 instance,
+>   		      struct br_cfm_mep_create *const create,
+> @@ -558,8 +553,11 @@ int br_cfm_mep_create(struct net_bridge *br,
+>   	INIT_HLIST_HEAD(&mep->peer_mep_list);
+>   	INIT_DELAYED_WORK(&mep->ccm_tx_dwork, ccm_tx_work_expired);
+>   
+> -	if (hlist_empty(&br->mep_list))
+> -		br_add_frame(br, &cfm_frame_type);
+> +	if (hlist_empty(&br->mep_list)) {
+> +		br->cfm_frame_type.type = cpu_to_be16(ETH_P_CFM);
+> +		br->cfm_frame_type.frame_handler = br_cfm_frame_rx;
+> +		br_add_frame(br, &br->cfm_frame_type);
+> +	}
+>   
+>   	hlist_add_tail_rcu(&mep->head, &br->mep_list);
+>   
+> @@ -588,7 +586,7 @@ static void mep_delete_implementation(struct net_bridge *br,
+>   	kfree_rcu(mep, rcu);
+>   
+>   	if (hlist_empty(&br->mep_list))
+> -		br_del_frame(br, &cfm_frame_type);
+> +		br_del_frame(br, &br->cfm_frame_type);
+>   }
+>   
+>   int br_cfm_mep_delete(struct net_bridge *br,
+> diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
+> index bed1b1d9b282..a3ed9ee826f5 100644
+> --- a/net/bridge/br_private.h
+> +++ b/net/bridge/br_private.h
+> @@ -61,6 +61,9 @@ typedef struct bridge_id bridge_id;
+>   typedef struct mac_addr mac_addr;
+>   typedef __u16 port_id;
+>   
+> +struct net_bridge_port;
+> +struct sk_buff;
+> +
+>   struct bridge_id {
+>   	unsigned char	prio[2];
+>   	unsigned char	addr[ETH_ALEN];
+> @@ -70,6 +73,13 @@ struct mac_addr {
+>   	unsigned char	addr[ETH_ALEN];
+>   };
+>   
+> +struct br_frame_type {
+> +	__be16			type;
+> +	int			(*frame_handler)(struct net_bridge_port *port,
+> +						 struct sk_buff *skb);
+> +	struct hlist_node	list;
+> +};
+> +
+>   #ifdef CONFIG_BRIDGE_IGMP_SNOOPING
+>   /* our own querier */
+>   struct bridge_mcast_own_query {
+> @@ -585,6 +595,7 @@ struct net_bridge {
+>   	struct hlist_head		mrp_list;
+>   #endif
+>   #if IS_ENABLED(CONFIG_BRIDGE_CFM)
+> +	struct br_frame_type	cfm_frame_type;
+>   	struct hlist_head		mep_list;
+>   #endif
+>   };
+> @@ -926,13 +937,6 @@ int nbp_backup_change(struct net_bridge_port *p, struct net_device *backup_dev);
+>   int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb);
+>   rx_handler_func_t *br_get_rx_handler(const struct net_device *dev);
+>   
+> -struct br_frame_type {
+> -	__be16			type;
+> -	int			(*frame_handler)(struct net_bridge_port *port,
+> -						 struct sk_buff *skb);
+> -	struct hlist_node	list;
+> -};
+> -
+>   void br_add_frame(struct net_bridge *br, struct br_frame_type *ft);
+>   void br_del_frame(struct net_bridge *br, struct br_frame_type *ft);
+>   
+
 
