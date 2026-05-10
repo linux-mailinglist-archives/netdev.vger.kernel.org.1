@@ -1,353 +1,170 @@
-Return-Path: <netdev+bounces-286244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286246-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GF/gDF4aAGo3DAEAu9opvQ
-	(envelope-from <netdev+bounces-286244-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 07:40:46 +0200
+	id kKs7EJQaAGo3DAEAu9opvQ
+	(envelope-from <netdev+bounces-286246-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 07:41:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99430502B3B
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 07:40:45 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DD79502B5B
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 07:41:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EDB5130221F1
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 05:36:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9795F300D6B0
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 05:41:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7588C35504D;
-	Sun, 10 May 2026 05:36:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEFDA355F53;
+	Sun, 10 May 2026 05:41:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qbyvBs96"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mr6zAKhQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010055.outbound.protection.outlook.com [52.101.61.55])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59CB351C1F;
-	Sun, 10 May 2026 05:36:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.55
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778391377; cv=fail; b=pCnyLZj67iC4rRiP1C+ZS0CJ6KAlu//6qwQx+BPUluh+ZGYHPiPkZ/gtpfU/FnTHdCQEJw1tSDXvlgCrle019Y55UrLaPiR0V4Up7k1TLd2RoRkyqaZnh1HK+/MbJnHDGY8gWSCb4EROZwDEn3z4TNStCqy8ToLaGx+WxpBZphI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778391377; c=relaxed/simple;
-	bh=FJ6bNCM82zoO7lIe7vpOQAMzjmUIXErxyMPLeIIyudg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Qut/1w8rGzmqmy508gTv/LO1a/FvOy12pDStUER/euq5GZf62Mux55wurHOrkzr1Vjo/xeBABtwHVWNBzo7P99lBQW2z0fr0RdJPfcTguYHWxI90Z29Xpw14ZgxwZ6B1ACBSkjm0paJ/+NIu/5idJblWHAc7/1ZgdYd2RFYsv58=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qbyvBs96; arc=fail smtp.client-ip=52.101.61.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=So1BN2/u30iJ7+W93J2hR9fGpADO+TUY3OwzewWDfcID/S5JFF1g1gRUGdcfdX8/VG/uzUZnc2f79/kb4dwzr8eM3RR+tAH3P295zu1dYfEuVZZaRrhzIoC/sFND55Lwn9ah2yEzGNiwIiEQCr17C/ZST5ggqZVHCtL1i8rZa+UNfmUSTB+b9h6y/1leUw5fIPZ2IT4j1bqnRrrZ90A4mO0BxQB8fQYfV20I/kZNelVR22DFAZujb2QVXmTLxu7Uy47xMsptmImgRVjI+xQLVoclZGssbFlHAvOuvweHZHqMQcf6C96ulwQExy8hUxiyqbvwDvj0AKk3ja7EzAO8wA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WquzEuT3uild5hfbMR7BosqzCK7/3Xcu7d7smLcN4/w=;
- b=v2jRiAU23yGIh4uYMwXFKsxuA6F3mwyEkggaA1OWPu25i5pxlnj8q5PDv60F17iD2iHURLCFQ/Hq/SQyeuu4uYAV2ApmoFd6lgDJY109QIpbq0IvX9kdrd6xtVuqT6YznjiNJ9QZu233iBMjTNPRAByMV+epW0Ip276qwlgckPTAlbA+VpQWrC5PwMI31hgryUM0GLG6kfaTpBXGqYTLk8vZE8cZZmEkikvAeu9mMoezTHV3DkFmpCluSrJ/72IRsMbq0/MMQyAVKcPa4epqeDmVgA0y1YHF+FGevHbJXJXEvPgGHSKpj6PKtQDdWqxazUw1SYVlzPXk/loyb9oPJw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WquzEuT3uild5hfbMR7BosqzCK7/3Xcu7d7smLcN4/w=;
- b=qbyvBs96hTQHAM63gXXW6+kRAanDVvLZK98bxzsa/aODrn+eWKQVOSQ0VLLl1ZrHUmt3K5ToehImgUsUyKwstnXDr4qgK/LbUr+kuL5DK3f4dlWMwOpbTV8VL3qybP+1s0z8AtssjUaXBa1DBmguqagzoP7LvaRM3fMSO7HJl4KLkX6tTxypFZNAUx4073M0wXd0hmpxP2vfVUCShg4ZAWNNzleI1LmqQ1DFtDv1W5HWm9qbdyLsr6Ak3U+G18fEREtohjBvQNjmxe+XqT5r4nz2VR0KUCCbYkq6e6ojwY+4t5+3vzstPzvlDNTUpgVsjHVauve0TeyYdOTLYnVrwA==
-Received: from CH2PR17CA0030.namprd17.prod.outlook.com (2603:10b6:610:53::40)
- by MW6PR12MB8897.namprd12.prod.outlook.com (2603:10b6:303:24a::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.22; Sun, 10 May
- 2026 05:36:09 +0000
-Received: from CH2PEPF0000009F.namprd02.prod.outlook.com
- (2603:10b6:610:53:cafe::2b) by CH2PR17CA0030.outlook.office365.com
- (2603:10b6:610:53::40) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9891.21 via Frontend Transport; Sun,
- 10 May 2026 05:36:09 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CH2PEPF0000009F.mail.protection.outlook.com (10.167.244.21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.25.13 via Frontend Transport; Sun, 10 May 2026 05:36:08 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sat, 9 May
- 2026 22:35:54 -0700
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sat, 9 May
- 2026 22:35:53 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.7)
- with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Sat, 9 May
- 2026 22:35:49 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>
-CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, "Moshe
- Shemesh" <moshe@nvidia.com>, Akiva Goldberger <agoldberger@nvidia.com>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Dragos Tatulea
-	<dtatulea@nvidia.com>
-Subject: [PATCH net-next 8/8] net/mlx5: Generalize enable/disable HCA for any PF vport
-Date: Sun, 10 May 2026 08:34:48 +0300
-Message-ID: <20260510053448.326823-9-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20260510053448.326823-1-tariqt@nvidia.com>
-References: <20260510053448.326823-1-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48A33246EC;
+	Sun, 10 May 2026 05:41:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778391696; cv=none; b=RF17QBnPSyR9MOFXhAw7wPzehnmalqEIW1lwYYsUZhdU9M2A4CXXrw/lA1J4hNt+4OQhQZmFmFl8SB2U9Sk5g2B7poQjSkLH27xAiHY0+M1ksP60W3QcACgLBtGHlQR7X6aDV/F8qXiqwiCeXnQvp1yBuxALFRYBZ6If9ZaAKyg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778391696; c=relaxed/simple;
+	bh=3/cBV5AN1XLyEk9dRTOiyr96+0xqZLMWKK07nBoRzqA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hQwERmEZ6BulruTYeAQ8ILNXcY46gyQNr63bqdsdyoNUtL7hxMFJnIiWyQeyk+KjIXrcLckFCrHfG1KTpilaLC97YGRmu0vzdk3VKCR3adspjCtSkNbr4NYnoXDDDxQE/o6LK87lJGyDHJozeHTEuiDP85sLOtK/Cgkc1aG6/+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mr6zAKhQ; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778391694; x=1809927694;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=3/cBV5AN1XLyEk9dRTOiyr96+0xqZLMWKK07nBoRzqA=;
+  b=mr6zAKhQl4dXIaTkrKUjDKjDuD3/nhdl/aotB7Hwbc1mjGBMLQOzJo6X
+   3VoHpE3GfGS9z4cLJ90Q8MfjZdk/LP9Wp51zWNNtRTLxf/JFXQ6pJd2yk
+   oCak4787TpDAiAzzbhNVVg/ErD/yJKXYXVbOCb6jA+lZH0ZZQQK7iqV0p
+   FJlrPvzjUCnAnuNF9mZpQ2O7ga3UJEt+DUR7cn7hka6o2sdlkIQSg4lOk
+   ywv06fkX2YdjxPtmF7MOJQBrvQhq1Thn4Hv3ChSJe++c4SzbzJnOP8k7F
+   1WY3sOfY44y5Rvc0Xn4pL7t3QATUoSBT/KbMDuO1DS+usp66SUz4H5Kn3
+   Q==;
+X-CSE-ConnectionGUID: 2kxJ6MlwQmC+t2YYMQbewA==
+X-CSE-MsgGUID: 53VX6PQoRM6dRwutKKS+Mw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11781"; a="82930679"
+X-IronPort-AV: E=Sophos;i="6.23,227,1770624000"; 
+   d="scan'208";a="82930679"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2026 22:41:34 -0700
+X-CSE-ConnectionGUID: 00cOE35qRx6bZhiJ1dnfyg==
+X-CSE-MsgGUID: Mx5aEHAvTyKZ++zOVUtDWQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,227,1770624000"; 
+   d="scan'208";a="237247196"
+Received: from lkp-server01.sh.intel.com (HELO 82327192134e) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 09 May 2026 22:41:31 -0700
+Received: from kbuild by 82327192134e with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wLwuu-000000001nV-3WB9;
+	Sun, 10 May 2026 05:41:28 +0000
+Date: Sun, 10 May 2026 13:41:03 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jiakai Xu <xujiakai24@mails.ucas.ac.cn>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jiakai Xu <xujiakai24@mails.ucas.ac.cn>
+Subject: Re: [PATCH] netdevsim: Fix task hung by releasing bus lock before
+ device ops
+Message-ID: <202605101318.qbesSR5H-lkp@intel.com>
+References: <20260509092837.3432281-1-xujiakai24@mails.ucas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF0000009F:EE_|MW6PR12MB8897:EE_
-X-MS-Office365-Filtering-Correlation-Id: c9e8a02a-106b-4d9b-43f9-08deae5609fc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700016|1800799024|82310400026|18002099003|22082099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	ViwZJzY6SZILvH0KUaNt+Eu54jXzXKNbCEwx77jmNDxSex22Me0CaigIhXNkudfpX1S6ICKwnkJer5lC1IRTd0hvlbMLSpDDn2HP5inBSMinBHquYEGA+jqv2cJ0nFOHVf7g0EHCF9vcyyp36PAHt/Zov0o5HPn7PwCE6EiyvkeC4LkouyQXHLTmQjIyrCkJQEEzjaBF0R2L7LGH1vJ+n3QtgvxiwqmmSrHfgfdaSaH2EJAieCKgRdrrj1sQZxCtDOBCRN/CLbXod6cx23srWyHncyfTq2QUDq5ii5tQLVsT+hWoUHzwjNg7tKdtv9uyGRDHyTpX1bVXc3lWxC59vQOb5Gjo+rUNFnwGfNou1OjmnjRLOvk1GZ6iycd7Rl49JzZiH7AKfIfbeNqpbkomLsnjK25IfalW8SdqhxXv8yUz3qAusiO4fI2yBmSOyU1Q06JX+KADrN7cQz5HOWbsAky4YciPsY2QZ4FW+WErzCwcCGSGVj0tXbr3qnD2drW1MrrWhQ5noGHYzS4hrFhrAR7OM+HdOgr/9k7ZDRaiD/i3azr+nOlACJbRl7bQWQeZnKH+tTFN1vBH+kW3T+UX4jZWjdMdqJsfqmf/1kBU9TcvLkXcfQbHRis7SfAc0vJAMhkaZrJVo2cXimOCTWahAbQ/NqGSlm1aT4vPexinU/a5LEsmUk7cXy1lq1cz8yvQaWUnHIghCCeT524uvW9TZYqthTURu1h0GPue4Wwx+0Y=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(36860700016)(1800799024)(82310400026)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	+Au3ua7W+tr9UqrP0sy/X8OsIzp2Y7d39hcO6g+gLK7BxxkSPnSsJNwY2k4xMS4e1xdF0LVpnB2pM39lP8ZoJoTBGNr8zFjlFBTjR49qynZaw+NAE7i7sOwYOVU/9bLSoS1yXKDKHzf3E58+M30nxy+S/jtUn7CXNvg/7MMbk0lZu3s0O+C5BpraRvuJdLZEmYiZN+4tg9WF5tz6nswPDduqLOCgyz4h/rxSc77kEx+fd5Ho8ORF0uA075TSdcF071gbHFVaPx27BbSJ9MMH+Dum3mJPlSZZlhzuZ8dUK85S64Y7BT2S6cEnfM+/YCHll2G1jh2mwCVruGGk7ZfS/bk0shBWjJCMFzqcbyrxK39gapcqFl9Ox1zH6gjvZTnCfVnoN5mupe5lvA7FDus+RfUG1CxkXEoCOeNVMA/X/MX3d+xX7FFK6hyqk7Vo+4tt
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2026 05:36:08.9541
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c9e8a02a-106b-4d9b-43f9-08deae5609fc
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF0000009F.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8897
-X-Rspamd-Queue-Id: 99430502B3B
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260509092837.3432281-1-xujiakai24@mails.ucas.ac.cn>
+X-Rspamd-Queue-Id: 2DD79502B5B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	DKIM_TRACE(0.00)[intel.com:+];
+	TAGGED_FROM(0.00)[bounces-286246-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-286244-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,Nvidia.com:dkim,nvidia.com:email,nvidia.com:mid];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:mid,intel.com:dkim,01.org:url,git-scm.com:url]
 X-Rspamd-Action: no action
 
-From: Moshe Shemesh <moshe@nvidia.com>
+Hi Jiakai,
 
-Refactor the host-PF-specific mlx5_cmd_host_pf_enable/disable_hca()
-into generic mlx5_cmd_pf_enable/disable_hca() that accept a vport
-number. The new functions use vhca_id as function_id when supported.
+kernel test robot noticed the following build warnings:
 
-Similarly, refactor the eswitch layer into generic static helpers
-mlx5_esw_pf_enable/disable_hca() with thin wrappers for the host PF
-case, in preparation for enable_hca on satellite PF vports.
+[auto build test WARNING on linus/master]
+[also build test WARNING on v7.1-rc2 next-20260508]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- .../net/ethernet/mellanox/mlx5/core/ecpf.c    | 24 +++++++++++-----
- .../net/ethernet/mellanox/mlx5/core/ecpf.h    |  4 +--
- .../net/ethernet/mellanox/mlx5/core/eswitch.c | 28 +++++++++++++------
- .../ethernet/mellanox/mlx5/core/mlx5_core.h   |  2 ++
- .../net/ethernet/mellanox/mlx5/core/vport.c   |  4 +--
- 5 files changed, 42 insertions(+), 20 deletions(-)
+url:    https://github.com/intel-lab-lkp/linux/commits/Jiakai-Xu/netdevsim-Fix-task-hung-by-releasing-bus-lock-before-device-ops/20260510-070550
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20260509092837.3432281-1-xujiakai24%40mails.ucas.ac.cn
+patch subject: [PATCH] netdevsim: Fix task hung by releasing bus lock before device ops
+config: riscv-randconfig-001 (https://download.01.org/0day-ci/archive/20260510/202605101318.qbesSR5H-lkp@intel.com/config)
+compiler: riscv64-linux-gcc (GCC) 8.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260510/202605101318.qbesSR5H-lkp@intel.com/reproduce)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/ecpf.c b/drivers/net/ethernet/mellanox/mlx5/core/ecpf.c
-index 15cb27aea2c9..350c47d3643b 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/ecpf.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/ecpf.c
-@@ -18,25 +18,35 @@ static bool mlx5_ecpf_esw_admins_host_pf(const struct mlx5_core_dev *dev)
- 	return mlx5_core_is_ecpf_esw_manager(dev);
- }
- 
--int mlx5_cmd_host_pf_enable_hca(struct mlx5_core_dev *dev)
-+int mlx5_cmd_pf_enable_hca(struct mlx5_core_dev *dev, u16 vport_num)
- {
- 	u32 out[MLX5_ST_SZ_DW(enable_hca_out)] = {};
- 	u32 in[MLX5_ST_SZ_DW(enable_hca_in)]   = {};
-+	u16 vhca_id;
- 
- 	MLX5_SET(enable_hca_in, in, opcode, MLX5_CMD_OP_ENABLE_HCA);
--	MLX5_SET(enable_hca_in, in, function_id, 0);
--	MLX5_SET(enable_hca_in, in, embedded_cpu_function, 0);
--	return mlx5_cmd_exec(dev, &in, sizeof(in), &out, sizeof(out));
-+	if (mlx5_vport_use_vhca_id_as_func_id(dev, vport_num, &vhca_id)) {
-+		MLX5_SET(enable_hca_in, in, function_id, vhca_id);
-+		MLX5_SET(enable_hca_in, in, function_id_type, 1);
-+	} else {
-+		MLX5_SET(enable_hca_in, in, function_id, vport_num);
-+	}
-+	return mlx5_cmd_exec(dev, in, sizeof(in), out, sizeof(out));
- }
- 
--int mlx5_cmd_host_pf_disable_hca(struct mlx5_core_dev *dev)
-+int mlx5_cmd_pf_disable_hca(struct mlx5_core_dev *dev, u16 vport_num)
- {
- 	u32 out[MLX5_ST_SZ_DW(disable_hca_out)] = {};
- 	u32 in[MLX5_ST_SZ_DW(disable_hca_in)]   = {};
-+	u16 vhca_id;
- 
- 	MLX5_SET(disable_hca_in, in, opcode, MLX5_CMD_OP_DISABLE_HCA);
--	MLX5_SET(disable_hca_in, in, function_id, 0);
--	MLX5_SET(disable_hca_in, in, embedded_cpu_function, 0);
-+	if (mlx5_vport_use_vhca_id_as_func_id(dev, vport_num, &vhca_id)) {
-+		MLX5_SET(disable_hca_in, in, function_id, vhca_id);
-+		MLX5_SET(disable_hca_in, in, function_id_type, 1);
-+	} else {
-+		MLX5_SET(disable_hca_in, in, function_id, vport_num);
-+	}
- 	return mlx5_cmd_exec(dev, in, sizeof(in), out, sizeof(out));
- }
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/ecpf.h b/drivers/net/ethernet/mellanox/mlx5/core/ecpf.h
-index 40b6ad76dca6..d9f9a53b019b 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/ecpf.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/ecpf.h
-@@ -17,8 +17,8 @@ bool mlx5_read_embedded_cpu(struct mlx5_core_dev *dev);
- int mlx5_ec_init(struct mlx5_core_dev *dev);
- void mlx5_ec_cleanup(struct mlx5_core_dev *dev);
- 
--int mlx5_cmd_host_pf_enable_hca(struct mlx5_core_dev *dev);
--int mlx5_cmd_host_pf_disable_hca(struct mlx5_core_dev *dev);
-+int mlx5_cmd_pf_enable_hca(struct mlx5_core_dev *dev, u16 vport_num);
-+int mlx5_cmd_pf_disable_hca(struct mlx5_core_dev *dev, u16 vport_num);
- 
- #else  /* CONFIG_MLX5_ESWITCH */
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-index 9a7de7c9a667..206911817a04 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-@@ -1452,7 +1452,7 @@ static int mlx5_eswitch_load_ec_vf_vports(struct mlx5_eswitch *esw, u16 num_ec_v
- 	return err;
- }
- 
--int mlx5_esw_host_pf_enable_hca(struct mlx5_core_dev *dev)
-+static int mlx5_esw_pf_enable_hca(struct mlx5_core_dev *dev, u16 vport_num)
- {
- 	struct mlx5_eswitch *esw = dev->priv.eswitch;
- 	struct mlx5_vport *vport;
-@@ -1461,15 +1461,15 @@ int mlx5_esw_host_pf_enable_hca(struct mlx5_core_dev *dev)
- 	if (!mlx5_core_is_ecpf(dev) || !mlx5_esw_allowed(esw))
- 		return 0;
- 
--	vport = mlx5_eswitch_get_vport(esw, MLX5_VPORT_HOST_PF);
-+	vport = mlx5_eswitch_get_vport(esw, vport_num);
- 	if (IS_ERR(vport))
- 		return PTR_ERR(vport);
- 
--	/* Once vport and representor are ready, take out the external host PF
--	 * out of initializing state. Enabling HCA clears the iser->initializing
--	 * bit and host PF driver loading can progress.
-+	/* Once vport and representor are ready, take the PF out of
-+	 * initializing state. Enabling HCA clears the iser->initializing
-+	 * bit and PF driver loading can progress.
- 	 */
--	err = mlx5_cmd_host_pf_enable_hca(dev);
-+	err = mlx5_cmd_pf_enable_hca(dev, vport_num);
- 	if (err)
- 		return err;
- 
-@@ -1478,7 +1478,7 @@ int mlx5_esw_host_pf_enable_hca(struct mlx5_core_dev *dev)
- 	return 0;
- }
- 
--int mlx5_esw_host_pf_disable_hca(struct mlx5_core_dev *dev)
-+static int mlx5_esw_pf_disable_hca(struct mlx5_core_dev *dev, u16 vport_num)
- {
- 	struct mlx5_eswitch *esw = dev->priv.eswitch;
- 	struct mlx5_vport *vport;
-@@ -1487,11 +1487,11 @@ int mlx5_esw_host_pf_disable_hca(struct mlx5_core_dev *dev)
- 	if (!mlx5_core_is_ecpf(dev) || !mlx5_esw_allowed(esw))
- 		return 0;
- 
--	vport = mlx5_eswitch_get_vport(esw, MLX5_VPORT_HOST_PF);
-+	vport = mlx5_eswitch_get_vport(esw, vport_num);
- 	if (IS_ERR(vport))
- 		return PTR_ERR(vport);
- 
--	err = mlx5_cmd_host_pf_disable_hca(dev);
-+	err = mlx5_cmd_pf_disable_hca(dev, vport_num);
- 	if (err)
- 		return err;
- 
-@@ -1500,6 +1500,16 @@ int mlx5_esw_host_pf_disable_hca(struct mlx5_core_dev *dev)
- 	return 0;
- }
- 
-+int mlx5_esw_host_pf_enable_hca(struct mlx5_core_dev *dev)
-+{
-+	return mlx5_esw_pf_enable_hca(dev, MLX5_VPORT_HOST_PF);
-+}
-+
-+int mlx5_esw_host_pf_disable_hca(struct mlx5_core_dev *dev)
-+{
-+	return mlx5_esw_pf_disable_hca(dev, MLX5_VPORT_HOST_PF);
-+}
-+
- /* mlx5_eswitch_enable_pf_vf_vports() enables vports of PF, ECPF and VFs
-  * whichever are present on the eswitch.
-  */
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h b/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h
-index 2eba141bd521..51637e58a48b 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h
-@@ -452,6 +452,8 @@ void mlx5_unload_one_light(struct mlx5_core_dev *dev);
- 
- void mlx5_query_nic_sw_system_image_guid(struct mlx5_core_dev *mdev, u8 *buf,
- 					 u8 *len);
-+bool mlx5_vport_use_vhca_id_as_func_id(struct mlx5_core_dev *dev,
-+				       u16 vport_num, u16 *vhca_id);
- int mlx5_vport_set_other_func_cap(struct mlx5_core_dev *dev, const void *hca_cap, u16 vport,
- 				  u16 opmod);
- #define mlx5_vport_get_other_func_general_cap(dev, vport, out)		\
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/vport.c b/drivers/net/ethernet/mellanox/mlx5/core/vport.c
-index f8e6b1ab7c5c..e0848f4e88dd 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/vport.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/vport.c
-@@ -1283,8 +1283,8 @@ void mlx5_query_nic_sw_system_image_guid(struct mlx5_core_dev *mdev, u8 *buf,
- 		buf[(*len)++] = MLX5_CAP_GEN_2(mdev, load_balance_id);
- }
- 
--static bool mlx5_vport_use_vhca_id_as_func_id(struct mlx5_core_dev *dev,
--					      u16 vport_num, u16 *vhca_id)
-+bool mlx5_vport_use_vhca_id_as_func_id(struct mlx5_core_dev *dev,
-+				       u16 vport_num, u16 *vhca_id)
- {
- 	if (!MLX5_CAP_GEN_2(dev, function_id_type_vhca_id))
- 		return false;
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202605101318.qbesSR5H-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/netdevsim/bus.c: In function 'new_device_store':
+   drivers/net/netdevsim/bus.c:192:3: error: implicit declaration of function 'nsim_bus_dev_del'; did you mean 'nsim_bus_dev_new'? [-Werror=implicit-function-declaration]
+      nsim_bus_dev_del(nsim_bus_dev);
+      ^~~~~~~~~~~~~~~~
+      nsim_bus_dev_new
+   drivers/net/netdevsim/bus.c: At top level:
+>> drivers/net/netdevsim/bus.c:206:13: warning: conflicting types for 'nsim_bus_dev_del'
+    static void nsim_bus_dev_del(struct nsim_bus_dev *nsim_bus_dev);
+                ^~~~~~~~~~~~~~~~
+   drivers/net/netdevsim/bus.c:206:13: error: static declaration of 'nsim_bus_dev_del' follows non-static declaration
+   drivers/net/netdevsim/bus.c:192:3: note: previous implicit declaration of 'nsim_bus_dev_del' was here
+      nsim_bus_dev_del(nsim_bus_dev);
+      ^~~~~~~~~~~~~~~~
+   cc1: some warnings being treated as errors
+
+
+vim +/nsim_bus_dev_del +206 drivers/net/netdevsim/bus.c
+
+f9d9db47d3ba873 Jiri Pirko 2019-04-25  205  
+e05b2d141fef22c Jiri Pirko 2019-04-25 @206  static void nsim_bus_dev_del(struct nsim_bus_dev *nsim_bus_dev);
+e05b2d141fef22c Jiri Pirko 2019-04-25  207  
+
 -- 
-2.44.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
