@@ -1,231 +1,153 @@
-Return-Path: <netdev+bounces-286301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286302-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +OrOAvihAGqTLAEAu9opvQ
-	(envelope-from <netdev+bounces-286301-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:19:20 +0200
+	id AB4LJ8+iAGqTLAEAu9opvQ
+	(envelope-from <netdev+bounces-286302-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:22:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78775504C8E
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:19:19 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14BF2504CD9
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:22:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B561F3006514
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 15:18:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B690D300DD41
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 15:19:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43EEF3A1A44;
-	Sun, 10 May 2026 15:17:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 664C039B497;
+	Sun, 10 May 2026 15:19:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="JfrOTYLw"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="B7gr0Djg"
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C8BA39EF1E;
-	Sun, 10 May 2026 15:17:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 373E62F8E81;
+	Sun, 10 May 2026 15:19:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778426278; cv=none; b=n8KWzI3YUBcV5lTS4VMLrjLVO4BXXSTaOB3xZk337tpqN5cdkhJBFUmUzwIbpv2Vcf71n4OkdtIRYBGui1cR18jw6OrynSLeDBhbD5iLK+PeIjvFXpFyeg+mmJGIOq5AU4AVWT25ltN+ASWt4pRgQKkmkDU4+FXlL+tccvA2d48=
+	t=1778426365; cv=none; b=SgRmddCs2vQdq1Z+/od+TFlqzSaoK4cteI4oq+6XmrkyyaoKd+os4gajDe2Vssrj1mXQ6c9GIONVvnvGIxS3qJKzErF0TOiKKg5WFCK7MFmsF33qegh8VW6M6qmR25aXGyIDbdlvGA3A9wUC8m7KwqFMxCHroJA61gAsjI//4mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778426278; c=relaxed/simple;
-	bh=+mcQTZU20sAWYXW9EG7YpT2irSTxXUzAf5dqIb6jXm4=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UUcphPVhUQPRB6PBvPJlyYGFCoOnOkbYTNrl6rcnD7wIv5LBRZprCkrmO+E7BEHxEZvLV4m8Gzaiw5HSV/22gp3oj1sNCmzoNwFLJCRZvAa3LQGwoMaztMbXrplwerISmHyAONlGfVwg+7r4uuw/LB/iUDM9nBX4YaaIK9iGa4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=JfrOTYLw; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1778426260;
-	bh=+mcQTZU20sAWYXW9EG7YpT2irSTxXUzAf5dqIb6jXm4=;
-	h=From:To:Subject:Date:In-Reply-To:References;
-	b=JfrOTYLwvlTRFJQfheFjDwLdrq7sYgTFwJ/ehOf2gmY2R7/LOIwQJnOnapiktoDt/
-	 E+WLzqY+k7z5p0YpDi4YKhL6hpzcdnLx29FOduagrhrdwvEaGPbWzoZ796iBoVKQBg
-	 pXs7JYTpY34ZHL8LrVGb1BjkpwiHyGPXGFYeG5/0=
-Received: from simon-Latitude-5450.fritz.box (pd9eaa57d.dip0.t-ipconnect.de [217.234.165.125])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.19.0.1/8.19.0.1) with ESMTPSA id 64AFHaTG009831
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Sun, 10 May 2026 17:17:40 +0200 (CEST)
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-To: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, mst@redhat.com,
-        eperezma@redhat.com, leiyang@redhat.com, stephen@networkplumber.org,
-        jon@nutanix.com, tim.gebauer@tu-dortmund.de,
-        simon.schippers@tu-dortmund.de, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev
-Subject: [PATCH net-next v12 4/4] tun/tap & vhost-net: avoid ptr_ring tail-drop when a qdisc is present
-Date: Sun, 10 May 2026 17:15:29 +0200
-Message-ID: <20260510151529.43895-5-simon.schippers@tu-dortmund.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260510151529.43895-1-simon.schippers@tu-dortmund.de>
-References: <20260510151529.43895-1-simon.schippers@tu-dortmund.de>
+	s=arc-20240116; t=1778426365; c=relaxed/simple;
+	bh=KA/p1RhujIaTAg1hTVqbE076u80O9x23DXASfs8gZPE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Eb0RIEX8WnYw4T2djRsmXzQTQBYz8IlyqMpVBA2Y4GpSPH/ZOT9pUbQkRrSefD5sagpY+zx81OtKUQ7sz+/gGaz1A88igEmFKn50Nabm22zJ2nZEcoyBf4rrVnLzhjqKARi4PoZ49le1M8CNEzPMEx/pvf2hYrgv4IvWw3vZwQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=B7gr0Djg; arc=none smtp.client-ip=115.124.30.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1778426353; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=h8xm0ICWFyWAHAFUbZ2x6pFmPnB7nZ1XWtBXDMkVHTY=;
+	b=B7gr0DjgCvQaFFuoGvNTi4v0bV56JJQ1ykBne7gpROPhqkxEbvsQtyonu4J+LPsUZpGPrp1y9zFuBs4EOudwmheQ7jf/M71CZgp3zrTlIWU+A8tOPti3Tx/tj8dwde9OVAGWRcd3rkO55axfCAa44wl2hor9a+GgcSu+F+CB9Cw=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam011083073210;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0X2cvymd_1778426352;
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0X2cvymd_1778426352 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Sun, 10 May 2026 23:19:12 +0800
+Date: Sun, 10 May 2026 23:19:12 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: =?iso-8859-1?Q?Nicol=F2?= Coccia <n.coccia96@gmail.com>,
+	alibuda@linux.alibaba.com, sidraya@linux.ibm.com,
+	Wenjia Zhang <wenjia@linux.ibm.com>
+Cc: Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	mjambigi@linux.ibm.com,
+	=?iso-8859-1?Q?Nicol=F2?= Coccia <nicolo.coccia@leonardo.com>
+Subject: Re: [PATCH net] net/smc: fix sleep-inside-lock in __smc_setsockopt()
+ causing local DoS
+Message-ID: <agCh8NuM69sYSIRA@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <CALSA8UZaE8FR2K-60fPYE6uSUvUNuLnH=8pPq0Hak2ADQpp1Qw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 78775504C8E
+In-Reply-To: <CALSA8UZaE8FR2K-60fPYE6uSUvUNuLnH=8pPq0Hak2ADQpp1Qw@mail.gmail.com>
+X-Rspamd-Queue-Id: 14BF2504CD9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-7.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286302-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,linux.alibaba.com,linux.ibm.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
-	TAGGED_FROM(0.00)[bounces-286301-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[tu-dortmund.de:+];
-	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.989];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tu-dortmund.de:email,tu-dortmund.de:mid,tu-dortmund.de:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	HAS_REPLYTO(0.00)[dust.li@linux.alibaba.com];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:mid,linux.alibaba.com:dkim,linux.alibaba.com:replyto,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-This commit prevents tail-drop when a qdisc is present and the ptr_ring
-becomes full. Once the ring reaches capacity after a produce attempt,
-the netdev queue is stopped instead of dropping subsequent packets.
-If no qdisc is present, the previous tail-drop behavior is preserved.
+On 2026-05-09 07:01:02, Nicolò Coccia wrote:
+>A logic flaw in __smc_setsockopt() allows a local unprivileged user to
+>cause a Denial of Service (DoS) by holding the socket lock indefinitely.
+>
+>The function __smc_setsockopt() calls copy_from_sockptr() while holding
+>lock_sock(sk). By passing a userfaultfd-monitored memory page (or
+>FUSE-backed memory on systems where unprivileged userfaultfd is disabled)
+>as the optval, an attacker can halt execution during the copy operation,
+>keeping the lock held.
+>
+>Combined with asynchronous tear-down operations like shutdown(), this
+>exhausts the kernel wq (kworkers) and triggers the hung task watchdog.
+>
+>[  240.123456] INFO: task kworker/u8:2 blocked for more than 120 seconds.
+>[  240.123489] Call Trace:
+>[  240.123501]  smc_shutdown+...
+>[  240.123512]  lock_sock_nested+...
+>
+>This patch moves the user-space copy outside the lock_sock() critical
+>section to prevent the issue.
+>
+>Fixes: a6a6fe27bab4 ("net/smc: Dynamic control handshake limitation by
+>socket options")
+>Signed-off-by: Nicolò Coccia <n.coccia96@gmail.com>
+>---
+>v1 -> v2:
+> - Rebased against netdev/net tree
+> - Added Fixes tag
+>
+> net/smc/af_smc.c | 17 ++++++++---------
+> 1 file changed, 8 insertions(+), 9 deletions(-)
+>
+>diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>index 185dbed7de5d..da28652f6810 100644
+>--- a/net/smc/af_smc.c
+>+++ b/net/smc/af_smc.c
+>@@ -3054,18 +3054,17 @@ static int __smc_setsockopt(struct socket
+>*sock, int level, int optname,
 
-If producing an entry fails anyway due to a race, tun_net_xmit() drops
-the packet. Such races are expected because LLTX is enabled and the
-transmit path operates without the usual locking.
 
-The __tun_wake_queue() function of the consumer races with the producer
-for waking/stopping the netdev queue, which could result in a stalled
-queue. Therefore, an smp_mb__after_atomic() is introduced that pairs
-with the smp_mb() of the consumer. It follows the principle of store
-buffering described in tools/memory-model/Documentation/recipes.txt:
+Still not apply, have you changed this manually ?
+You can produce the patch simply using `git format-patch `
 
-- The producer in tun_net_xmit() first sets __QUEUE_STATE_DRV_XOFF,
-  followed by an smp_mb__after_atomic() (= smp_mb()), and then reads the
-  ring with __ptr_ring_check_produce().
-
-- The consumer in __tun_wake_queue() first writes zero to the ring in
-  __ptr_ring_consume(), followed by an smp_mb(), and then reads the queue
-  status with netif_tx_queue_stopped().
-
-=> Following the aforementioned principle, it is impossible for the
-   producer to see a full ring (and therefore not wake the queue on the
-   re-check) while the consumer simultaneously fails to see a stopped
-   queue (and therefore also does not wake it).
-
-Benchmarks:
-The benchmarks show a slight regression in raw transmission performance
-when using two sending threads. Packet loss also occurs only in the
-two-thread sending case; no packet loss was observed with a single
-sending thread.
-
-Test setup:
-AMD Ryzen 5 5600X at 4.3 GHz, 3200 MHz RAM, isolated QEMU threads;
-Average over 50 runs @ 100,000,000 packets. SRSO and spectre v2
-mitigations disabled.
-
-Note for tap+vhost-net:
-XDP drop program active in VM -> ~2.5x faster; slower for tap due to
-more syscalls (high utilization of entry_SYSRETQ_unsafe_stack in perf)
-
-+--------------------------+--------------+----------------+----------+
-| 1 thread                 | Stock        | Patched with   | diff     |
-| sending                  |              | fq_codel qdisc |          |
-+------------+-------------+--------------+----------------+----------+
-| TAP        | Received    | 1.132 Mpps   | 1.123 Mpps     | -0.8%    |
-|            +-------------+--------------+----------------+----------+
-|            | Lost/s      | 3.765 Mpps   | 0 pps          |          |
-+------------+-------------+--------------+----------------+----------+
-| TAP        | Received    | 3.857 Mpps   | 3.901 Mpps     | +1.1%    |
-|            +-------------+--------------+----------------+----------+
-| +vhost-net | Lost/s      | 0.802 Mpps   | 0 pps          |          |
-+------------+-------------+--------------+----------------+----------+
-
-+--------------------------+--------------+----------------+----------+
-| 2 threads                | Stock        | Patched with   | diff     |
-| sending                  |              | fq_codel qdisc |          |
-+------------+-------------+--------------+----------------+----------+
-| TAP        | Received    | 1.115 Mpps   | 1.081 Mpps     | -3.0%    |
-|            +-------------+--------------+----------------+----------+
-|            | Lost/s      | 8.490 Mpps   | 391 pps        |          |
-+------------+-------------+--------------+----------------+----------+
-| TAP        | Received    | 3.664 Mpps   | 3.555 Mpps     | -3.0%    |
-|            +-------------+--------------+----------------+----------+
-| +vhost-net | Lost/s      | 5.330 Mpps   | 938 pps        |          |
-+------------+-------------+--------------+----------------+----------+
-
-Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
----
- drivers/net/tun.c | 25 +++++++++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index cbec66646a4b..bfa49fa9e3a1 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -1018,6 +1018,7 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
- 	struct netdev_queue *queue;
- 	struct tun_file *tfile;
- 	int len = skb->len;
-+	int ret;
- 
- 	rcu_read_lock();
- 	tfile = rcu_dereference(tun->tfiles[txq]);
-@@ -1072,13 +1073,33 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
- 
- 	nf_reset_ct(skb);
- 
--	if (ptr_ring_produce(&tfile->tx_ring, skb)) {
-+	queue = netdev_get_tx_queue(dev, txq);
-+
-+	spin_lock(&tfile->tx_ring.producer_lock);
-+	ret = __ptr_ring_produce(&tfile->tx_ring, skb);
-+	if (!qdisc_txq_has_no_queue(queue) &&
-+	    __ptr_ring_check_produce(&tfile->tx_ring) == -ENOSPC) {
-+		netif_tx_stop_queue(queue);
-+		/* Paired with smp_mb() in __tun_wake_queue() */
-+		smp_mb__after_atomic();
-+		if (!__ptr_ring_check_produce(&tfile->tx_ring))
-+			netif_tx_wake_queue(queue);
-+	}
-+	spin_unlock(&tfile->tx_ring.producer_lock);
-+
-+	if (ret) {
-+		/* This should be a rare case if a qdisc is present, but
-+		 * can happen due to lltx.
-+		 * Since skb_tx_timestamp(), skb_orphan(),
-+		 * run_ebpf_filter() and pskb_trim() could have tinkered
-+		 * with the SKB, returning NETDEV_TX_BUSY is unsafe and
-+		 * we must drop instead.
-+		 */
- 		drop_reason = SKB_DROP_REASON_FULL_RING;
- 		goto drop;
- 	}
- 
- 	/* dev->lltx requires to do our own update of trans_start */
--	queue = netdev_get_tx_queue(dev, txq);
- 	txq_trans_cond_update(queue);
- 
- 	/* Notify and wake up reader process */
--- 
-2.43.0
+Best regards,
+Dust
 
 
