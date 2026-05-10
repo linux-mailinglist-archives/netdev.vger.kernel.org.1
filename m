@@ -1,63 +1,90 @@
-Return-Path: <netdev+bounces-286372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286373-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KERzIALTAGp8NAEAu9opvQ
-	(envelope-from <netdev+bounces-286372-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 20:48:34 +0200
+	id aLU7LqHTAGp8NAEAu9opvQ
+	(envelope-from <netdev+bounces-286373-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 20:51:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFF65505C57
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 20:48:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27801505C77
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 20:51:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 22DE33022AA7
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:47:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E01283007C9C
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:51:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96BAA31326B;
-	Sun, 10 May 2026 18:47:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B2F53115AF;
+	Sun, 10 May 2026 18:51:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TcSPj1rX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZR8dQ+LQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74159128395;
-	Sun, 10 May 2026 18:47:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3795E30C343
+	for <netdev@vger.kernel.org>; Sun, 10 May 2026 18:51:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778438872; cv=none; b=b4d4j40fGeOyMl95ipb3faHxFdKjFk7cDtmjn+Nm2B8bFFtYeOQJIzW8gTx3XldBD+MLtZoNscpOHRofrFac9FsoKPDmOVxfG9h45EzX0sg4eVPWIElOS4HEan6AhLfOhLcOWC02r7RUObn19vBQP+YnuYrwxEDPkaG7JPTi8bk=
+	t=1778439071; cv=none; b=A188k93XdGtvirDs/pTIPegbPrvBYLpx1wCNjUU0xc8rWG2moonRPqsVDBhSgKVoLhSR5M70M1omamc9YmSLD54ve2881LXLQEI0K7hnbReaN0VPlEoYHIUaaC/cdA7tFmbiKCE0CpXTijUmwTJPEJnp8Ll8YkRSgpmhpK4X7lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778438872; c=relaxed/simple;
-	bh=n7VgOciu3rvPWfPH73tA2Fjh2ko9kNaCORNBN7S6Pqw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g+eOf53GeA8w0N09xg0onyTjhEGWuyAezf95RAHlj0Oe1TOulk4uK0U0Q7cus9ToorDiZ1HAlCrgNQYavDgX09jVWVuQsmT3KaxJz39djNAxlF5n+HW2hcLsUXFANBEEkRMhDgSSSm5+wMIx/wviuyhZvTrv0m1X9D6tNzkMxT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TcSPj1rX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 028BCC2BCC7;
-	Sun, 10 May 2026 18:47:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778438872;
-	bh=n7VgOciu3rvPWfPH73tA2Fjh2ko9kNaCORNBN7S6Pqw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TcSPj1rXUzDrIu3dHgvrFK+GWaSVm3XfXo3+MdpkYbwn/fPwzV8yp3fkVo6QISNCG
-	 jlP3riqwj+Z7rlzGOE4CQRMGhPhwtK5T1CfLHIZ/meNMEFVVPoLrcrnpax6mXRQVK1
-	 MNq4UQ3D0krr5wNqOM1087UFuvOO3+pP//l7qVkS0gxqpgbJrWAtOhuIN1CVeFVSs9
-	 JPZ2ZMopBWz47AOmSFzQoLhruwJnFfKjdvusVNbqzANztImke575W/lbCtpph/lMBg
-	 JaZ673vLxpYAiSdSAMG660EPgM3JOq0XN02mFFzcQDXpo3LaQzAEPEE3OL3iGBBVw6
-	 +zx2g4hdd+uZQ==
-Date: Sun, 10 May 2026 19:47:47 +0100
-From: Simon Horman <horms@kernel.org>
-To: mike.marciniszyn@gmail.com
-Cc: Alexander Duyck <alexanderduyck@fb.com>,
-	Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3] net: eth: fbnic: Fix addr validation in pcs
- write
-Message-ID: <20260510184747.GX15617@horms.kernel.org>
-References: <20260507154203.3667-1-mike.marciniszyn@gmail.com>
+	s=arc-20240116; t=1778439071; c=relaxed/simple;
+	bh=NFohv07ge5408h44vUzdjRJjiW+AaiGwDIADhNNE0Bs=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=RYfZOEKadQHDDOx6y8xfux0IponE9DFBOCQaTL6x6yYNdx/crhwCkrhtszgT3zRmln3lYFfSz2I8VQHfNxmEdLov5NDsmC2PqywVLeF4gXoNiGX6RQE+ZRe+5slA0AtY0FDd+zWRZvH3eOiLBZ4m6UKCtCzqvsnzXhwHoMKdVpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZR8dQ+LQ; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-82fbdd60b64so2698793b3a.3
+        for <netdev@vger.kernel.org>; Sun, 10 May 2026 11:51:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778439069; x=1779043869; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=byRCK3EzK0lMDns7NqD8IGNCASe8yk9ZtrezoQnoEvU=;
+        b=ZR8dQ+LQs48ddckBD6U5DWsYCBEc0qw4fX2MqNWaEVnC/KH1diWnfJqElDwGSmljch
+         ha21lKUzxAfodMtWW0mYvaa61//BP1ozoek8EDPuiY4DORCTkEF2lPO3u8BwOQGcJ01M
+         jfNsZBM6BgUePf0JRi+EYluQA3oQ+L/kZ+bdTax1vsNBcWF9RHBppWFcbC2aY2a8BErA
+         OwKhfQr1LnCbPbqF8ealaHpO/mZhPedXtovWn4Bp8js0IfvPEBS7NwH+jUHVve2hHnIe
+         246m6ZMpzV7bCvqCAkmwnLLkfTjx7vfX4d+uiONOz93w6f9TCYDCAUeKYEb9x19bT+ZH
+         FMJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778439069; x=1779043869;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=byRCK3EzK0lMDns7NqD8IGNCASe8yk9ZtrezoQnoEvU=;
+        b=XvWgtSZ0dZ7d6fIkdc1UmuOoxrS0AK1+me/JJHGupKh5BHjGTAuxacM9JYsYoDEykp
+         ua81VO1XyBsNwbwKtNnXmIxvmIYnLBwDDGUGBa+nn+hJMmXPdWRFadiPUZp2i6QYw0hG
+         o+f3hLyKSBC5EJPgAqDC2HLgYB24N6r6+YNd1zCNh/wlMUshcGFP4qZDGHoRXLI2z3xw
+         DuMDzMA1YkpxR4QPpjXaSmcsRXXNnezwY58hHvnTjcAXwtM8H4ArW4BGnJNN/FDRPzGz
+         eeypvPWq5TXy93wEAF8N2xC9oGufzzgpP7XeS97xPkAAz4FAwn2XwuhAhxA64yOnDluK
+         4GdQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8XuNbl3RJIMZZjd/yCIpqMy31+Z6EY4rx0i8jqWDgPTjwwvd+2qIakgfdCzK0WKM29t3Ubmsc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfN9So80jnAgPlDy5qDK+fv8FemHftw9zBxaTuxYeQbyddHEIf
+	JJXCkHxXI+fewWag4GklwCjf0NrOWeaugaXO8mDd5pGQqR8UnGKAnWDCIYj4vg==
+X-Gm-Gg: Acq92OFsi+K6UKC0aJXrwCz1Ukfq4SvcO3YuLNmjY+maErejHDUd7r7SwQsdGnm8A6o
+	D4mekch+f+qWGuTp5WBBwQswFle8eEPIaHY8M4OVy8O1ujoWt3qMH1RAoToE4/zUYO8XBxOGuX0
+	vKym3tL5WluyQGJ3+ntShXrFC3mLmLqSoj5qGeQq1n2nzxkw56+Mg2IuUuUaacpG3GQOfiTvwmc
+	lx+YK608B940zoBeRN4XbGSnHT176zejm5JYcoX5JnmFrGACcPoAJMtoy9nxUlxktHJOYNvNw5t
+	AEzdVoddANyYoXfz343O0Jxdb8y/Zi7cWzsIH3xpLbhTqngSMkQbMeCfv4l2J0xCJ6Afxmb1UbG
+	tuo1w2r9tdWVOYy1Y1JC8SHP/nXKOonSoDq5XWSb1XQaqDHebS1XO2k/rbrILD0ZCTaxhmzBEuk
+	i3Z2wrenlIj/VER1QJCaawzIXeo9Hky0pWujhnDaPau/VvmDgHrGnyrQ==
+X-Received: by 2002:a05:6a00:a254:b0:82f:9e98:1356 with SMTP id d2e1a72fcca58-83e39e3a166mr6381872b3a.20.1778439069437;
+        Sun, 10 May 2026 11:51:09 -0700 (PDT)
+Received: from v4bel ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8396563f381sm21919263b3a.6.2026.05.10.11.51.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 10 May 2026 11:51:09 -0700 (PDT)
+Date: Mon, 11 May 2026 03:51:05 +0900
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: kuba@kernel.org, dhowells@redhat.com, marc.dionne@auristor.com,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	horms@kernel.org, qingfang.deng@linux.dev, jiayuan.chen@linux.dev
+Cc: linux-afs@lists.infradead.org, netdev@vger.kernel.org,
+	imv4bel@gmail.com
+Subject: [PATCH net] rxrpc: Use skb_ensure_writable() before in-place
+ decryption
+Message-ID: <agDTmXM2wXnJflYc@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,64 +93,116 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260507154203.3667-1-mike.marciniszyn@gmail.com>
-X-Rspamd-Queue-Id: DFF65505C57
+X-Rspamd-Queue-Id: 27801505C77
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286372-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286373-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lists.infradead.org,vger.kernel.org,gmail.com];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Thu, May 07, 2026 at 11:42:03AM -0400, mike.marciniszyn@gmail.com wrote:
-> From: "Mike Marciniszyn (Meta)" <mike.marciniszyn@gmail.com>
-> 
-> The DW IP has two distinct PCS address ranges cooresponding
-> to the C45 PCS registers.
-> 
-> The shim translates the PCS addr/regno into specific CSR writes
-> into one of those two zero-relative ranges.
-> 
-> This patch fixes a one off in the test that could allow an invalid
-> CSR write if an addr == 2 was called.
-> 
-> There are is of yet, no real impact for the bug as no PCS writes are
-> present.
-> 
-> Signed-off-by: Mike Marciniszyn (Meta) <mike.marciniszyn@gmail.com>
-> ---
-> v3:
->   - put back into the series based on https://lore.kernel.org/all/9ec11642-8035-419c-a896-52f902020bb8@lunn.ch/
->   - revised commit message will additional details
-> v2:
->   - omitted from patch series
-> v1: https://lore.kernel.org/all/20260428172810.175077-2-mike.marciniszyn@gmail.com/
+Writing to any frag is incorrect since frag pages can be shared.
+Use skb_ensure_writable() to ensure the skb is writable before
+in-place decryption.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Fixes: aa54b1d27fe0 ("rxrpc: Also unshare DATA/RESPONSE packets when paged frags are present")
+Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+---
+ net/rxrpc/call_event.c | 18 ++----------------
+ net/rxrpc/conn_event.c | 23 +++++------------------
+ 2 files changed, 7 insertions(+), 34 deletions(-)
+
+diff --git a/net/rxrpc/call_event.c b/net/rxrpc/call_event.c
+index 2b19b252225e..837e121ed9a6 100644
+--- a/net/rxrpc/call_event.c
++++ b/net/rxrpc/call_event.c
+@@ -334,22 +334,8 @@ bool rxrpc_input_call_event(struct rxrpc_call *call)
+ 
+ 			if (sp->hdr.type == RXRPC_PACKET_TYPE_DATA &&
+ 			    sp->hdr.securityIndex != 0 &&
+-			    (skb_cloned(skb) ||
+-			     skb_has_frag_list(skb) ||
+-			     skb_has_shared_frag(skb))) {
+-				/* Unshare the packet so that it can be
+-				 * modified by in-place decryption.
+-				 */
+-				struct sk_buff *nskb = skb_copy(skb, GFP_ATOMIC);
+-
+-				if (nskb) {
+-					rxrpc_new_skb(nskb, rxrpc_skb_new_unshared);
+-					rxrpc_input_call_packet(call, nskb);
+-					rxrpc_free_skb(nskb, rxrpc_skb_put_call_rx);
+-				} else {
+-					/* OOM - Drop the packet. */
+-					rxrpc_see_skb(skb, rxrpc_skb_see_unshare_nomem);
+-				}
++			    skb_ensure_writable(skb, skb->len)) {
++				rxrpc_see_skb(skb, rxrpc_skb_see_unshare_nomem);
+ 			} else {
+ 				rxrpc_input_call_packet(call, skb);
+ 			}
+diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
+index 442414d90ba1..a9eaad970e0c 100644
+--- a/net/rxrpc/conn_event.c
++++ b/net/rxrpc/conn_event.c
+@@ -245,26 +245,13 @@ static int rxrpc_verify_response(struct rxrpc_connection *conn,
+ {
+ 	int ret;
+ 
+-	if (skb_cloned(skb) || skb_has_frag_list(skb) ||
+-	    skb_has_shared_frag(skb)) {
+-		/* Copy the packet if shared so that we can do in-place
+-		 * decryption.
+-		 */
+-		struct sk_buff *nskb = skb_copy(skb, GFP_NOFS);
+-
+-		if (nskb) {
+-			rxrpc_new_skb(nskb, rxrpc_skb_new_unshared);
+-			ret = conn->security->verify_response(conn, nskb);
+-			rxrpc_free_skb(nskb, rxrpc_skb_put_response_copy);
+-		} else {
+-			/* OOM - Drop the packet. */
+-			rxrpc_see_skb(skb, rxrpc_skb_see_unshare_nomem);
+-			ret = -ENOMEM;
+-		}
+-	} else {
+-		ret = conn->security->verify_response(conn, skb);
++	if (skb_ensure_writable(skb, skb->len)) {
++		rxrpc_see_skb(skb, rxrpc_skb_see_unshare_nomem);
++		return -ENOMEM;
+ 	}
+ 
++	ret = conn->security->verify_response(conn, skb);
++
+ 	return ret;
+ }
+ 
+-- 
+2.43.0
 
 
