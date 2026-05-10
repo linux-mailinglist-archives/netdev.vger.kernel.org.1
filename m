@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-286336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286338-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uJaLIHK2AGplLwEAu9opvQ
-	(envelope-from <netdev+bounces-286336-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:46:42 +0200
+	id 4Om/FrW2AGplLwEAu9opvQ
+	(envelope-from <netdev+bounces-286338-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:47:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E810D5052DF
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:46:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE351505305
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:47:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CA49C303350C
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 16:44:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DBB2A301053E
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 16:44:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 818433B27DA;
-	Sun, 10 May 2026 16:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C92373B27F8;
+	Sun, 10 May 2026 16:44:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=riseup.net header.i=@riseup.net header.b="Vq46uGiv"
+	dkim=pass (1024-bit key) header.d=riseup.net header.i=@riseup.net header.b="lqk3pod7"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.riseup.net (mx1.riseup.net [198.252.153.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371603B27CF;
-	Sun, 10 May 2026 16:44:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE1E3ACF15;
+	Sun, 10 May 2026 16:44:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.252.153.129
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778431459; cv=none; b=YCLZ1Fn+YY0gQ3SD+F+Z17RUNP2zwn4EtpxfUPQPL5Yl60z8ID4QdHE6hwCJg1pVO7hDEyliOCechKZZ9qjw1GiA2D0eQt9/v3TtydVIDY4+f3u4ZcW4aEEFhXwDdmCqBvduRXj/pfhJwGAV+Zq6/YjFfXmyjGuD3pF5Sxgafa4=
+	t=1778431464; cv=none; b=iBTIoe3n4NOj/azTCp3FrCT72QSeKaPW4izKupZfzbu+FfJNM3fGSPLi7LOAodcOsdl6baVsy1YCLLXpB8V78jprYkOYXJ4i0AZEEQGRbuRF0GN+mFaf9nScAxOhuj8nGpAyr65M8skDcfJBMeQs3Mv7Qb64krErlh3A6d7OT7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778431459; c=relaxed/simple;
-	bh=3XFxg4578Egfz87dGChvi1XzwYpSp7bqgoFpUif/CTk=;
+	s=arc-20240116; t=1778431464; c=relaxed/simple;
+	bh=RpmaRYY3PJernLi+mHT5wcbgojVG+s9emQiFmp8vQRE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Un8Ho6MqZT0wkAd6r5Re08c6ag2j7axYQ6PIl3lkclUZzPTSzBpS3D+tOqyewxdB0r9wpwbHBulkfyrsnyTZvbh6i47FuAHhQ/ipKfIPFetkqQ4+/FikCNKpQb6nebIQzea8wD53hDjqr9f3T0KQyFvyFPU5HmWMT9EiVcybyuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riseup.net; spf=pass smtp.mailfrom=riseup.net; dkim=pass (1024-bit key) header.d=riseup.net header.i=@riseup.net header.b=Vq46uGiv; arc=none smtp.client-ip=198.252.153.129
+	 MIME-Version:Content-Type; b=EdW8rtyWjzCM3JsseVeonTAksJQYBShhc/wqiYlGPC8z/WcT/xB3blNom6fTFKrRqkqT/Aph/wBLhlyq8j6MMFiOKZy//hvl0LrB1c+dNwdC7jOlvCVdvozlhtfh54iqq/2+83Nuum1KAH0Y444VHuVCLiKfB/Tnvsg1b6sjV3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riseup.net; spf=pass smtp.mailfrom=riseup.net; dkim=pass (1024-bit key) header.d=riseup.net header.i=@riseup.net header.b=lqk3pod7; arc=none smtp.client-ip=198.252.153.129
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riseup.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riseup.net
 Received: from fews01-sea.riseup.net (fews01-sea-pn.riseup.net [10.0.1.109])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx1.riseup.net (Postfix) with ESMTPS id 4gD7wx3hYvzDqWT;
-	Sun, 10 May 2026 16:44:17 +0000 (UTC)
+	by mx1.riseup.net (Postfix) with ESMTPS id 4gD7x10FkKzDqSf;
+	Sun, 10 May 2026 16:44:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=riseup.net; s=squak;
-	t=1778431457; bh=etVC0bTQFaLljz45Ozw6Z5ar3mBaujDjOBP6pEiANco=;
+	t=1778431461; bh=5T6leDP8tmF3XvpwD7l+rnfsgJdFuQTS47BKmtBbf7E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Vq46uGiv15Wf7VYRGysTH9++I3onNG2LPm8Anl9fPbr3rsNSvOfW8dfIZXYcIH1jg
-	 PX3WKTBIYThXaqr3AUQYP+uL7nQ56N0IarVevJDd4T/+QjqkI8hLXQSAk8mqQjtQsr
-	 TfKLmq933IparXKKgEMugCvO7PpuKtOKlDzHzihA=
-X-Riseup-User-ID: CA6881DCE3628AC70C0111573035719C860D40349A9E12D1DA98BC111642190B
+	b=lqk3pod7Nf5wp43CXQJ6MYEpIucBqZQvSc8kOWAV4yDkUSlZ3gX8L0J9cQbwgk2wu
+	 b00OY6SujXnDN8JgP5bODlIMuV/jVeO3XvMuN4Jc/hEOCgQ3lRwbpd/5x/O/xD0WrC
+	 z5rpH/miZT1VDYMppByY34X9WaL1XQMVmFojnsjQ=
+X-Riseup-User-ID: EA9A6AE0E301AC6588F85268079748D01CA43CB25B8D93121CAEFDF9351872E6
 Received: from [127.0.0.1] (localhost [127.0.0.1])
-	 by fews01-sea.riseup.net (Postfix) with ESMTPSA id 4gD7ws2PVnz1yDs;
-	Sun, 10 May 2026 16:44:13 +0000 (UTC)
+	 by fews01-sea.riseup.net (Postfix) with ESMTPSA id 4gD7wx6jfRz1yDs;
+	Sun, 10 May 2026 16:44:17 +0000 (UTC)
 From: =?UTF-8?q?=C3=8D=C3=B1igo=20Huguet?= <ihuguet@riseup.net>
 To: Jakub Kicinski <kuba@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -63,9 +63,9 @@ Cc: Sabrina Dubroca <sd@queasysnail.net>,
 	linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	=?UTF-8?q?=C3=8D=C3=B1igo=20Huguet?= <ihuguet@riseup.net>
-Subject: [PATCH net-next 4/5] selftest: netdevsim: cleanup the devices and module on failure
-Date: Sun, 10 May 2026 18:43:36 +0200
-Message-ID: <20260510164337.7611-5-ihuguet@riseup.net>
+Subject: [PATCH net-next 5/5] selftest: netdevsim: suppress socat warnings
+Date: Sun, 10 May 2026 18:43:37 +0200
+Message-ID: <20260510164337.7611-6-ihuguet@riseup.net>
 In-Reply-To: <20260510164337.7611-1-ihuguet@riseup.net>
 References: <20260510164337.7611-1-ihuguet@riseup.net>
 Precedence: bulk
@@ -76,20 +76,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: E810D5052DF
+X-Rspamd-Queue-Id: DE351505305
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.93 / 15.00];
+X-Spamd-Result: default: False [1.11 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MIXED_CHARSET(0.59)[subject];
+	R_MIXED_CHARSET(0.77)[subject];
 	DMARC_POLICY_ALLOW(-0.50)[riseup.net,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[riseup.net:s=squak];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286336-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286338-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -106,114 +106,46 @@ X-Spamd-Result: default: False [0.93 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,riseup.net:email,riseup.net:mid,riseup.net:dkim]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[peer.sh:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,riseup.net:email,riseup.net:mid,riseup.net:dkim]
 X-Rspamd-Action: no action
 
-In case of failures only the netns were cleaned, leaving behind the
-netdevsim devices created for the test and the module loaded. On
-failure, delete the devices and unload the module.
+When executing the peer.sh selftest, socat emits these 2 warnings:
+  socat[116839] W address is opened in read-write mode but only supports read-only
+  socat[116833] W exiting on signal 15
+
+The first one is because socat tries to open in read-write mode by
+default, but STDIN can only be opened in read mode. Fix it by adding the
+-u option (unidirectional left-to-right).
+
+The second is because 'kill' is used to terminate the first socat process.
+Suppress this warning by redirecting its stderr to /dev/null
 
 Signed-off-by: Íñigo Huguet <ihuguet@riseup.net>
 ---
- .../selftests/drivers/net/netdevsim/peer.sh   | 21 ++++++-------------
- 1 file changed, 6 insertions(+), 15 deletions(-)
+ tools/testing/selftests/drivers/net/netdevsim/peer.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/tools/testing/selftests/drivers/net/netdevsim/peer.sh b/tools/testing/selftests/drivers/net/netdevsim/peer.sh
-index 5e7b6c1d0bfb..ec96015bc9eb 100755
+index ec96015bc9eb..183a130c6e4b 100755
 --- a/tools/testing/selftests/drivers/net/netdevsim/peer.sh
 +++ b/tools/testing/selftests/drivers/net/netdevsim/peer.sh
-@@ -46,10 +46,13 @@ setup_ns()
- 	set +e
- }
+@@ -210,13 +210,13 @@ assert_carrier_up nscl "$NSIM_DEV_2_NAME"
+ # send/recv packets
  
--cleanup_ns()
-+cleanup()
- {
- 	ip netns del nscl
- 	ip netns del nssv
-+	echo $NSIM_DEV_2_ID > $NSIM_DEV_SYS_DEL
-+	echo $NSIM_DEV_1_ID > $NSIM_DEV_SYS_DEL
-+	modprobe -r netdevsim
- }
+ tmp_file=$(mktemp)
+-ip netns exec nssv socat TCP-LISTEN:1234,fork $tmp_file &
++ip netns exec nssv socat TCP-LISTEN:1234,fork $tmp_file 2>/dev/null &
+ pid=$!
+ res=0
  
- assert_carrier_up()
-@@ -64,7 +67,6 @@ assert_carrier_up()
+ wait_local_port_listen nssv 1234 tcp
  
- 	if [ "$sysfs_carrier" -ne 1 -o "$ethtool_carrier" != "true" ]; then
- 		echo "$nsim_dev's carrier should be UP, but it isn't"
--		cleanup_ns
- 		exit 1
- 	fi
- }
-@@ -81,7 +83,6 @@ assert_carrier_down()
+-echo "HI" | ip netns exec nscl socat STDIN TCP:192.168.1.1:1234
++echo "HI" | ip netns exec nscl socat -u STDIN TCP:192.168.1.1:1234
  
- 	if [ "$sysfs_carrier" -ne 0 -o "$ethtool_carrier" != "false" ]; then
- 		echo "$nsim_dev's carrier should be DOWN, but it isn't"
--		cleanup_ns
- 		exit 1
- 	fi
- }
-@@ -120,6 +121,8 @@ udevadm settle
- 
- setup_ns
- 
-+trap cleanup EXIT
-+
- NSIM_DEV_1_FD=$((256 + RANDOM % 256))
- exec {NSIM_DEV_1_FD}</var/run/netns/nssv
- NSIM_DEV_1_IFIDX=$(ip netns exec nssv cat /sys/class/net/$NSIM_DEV_1_NAME/ifindex)
-@@ -131,28 +134,24 @@ NSIM_DEV_2_IFIDX=$(ip netns exec nscl cat /sys/class/net/$NSIM_DEV_2_NAME/ifinde
- echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_2_FD:2000" > $NSIM_DEV_SYS_LINK 2>/dev/null
- if [ $? -eq 0 ]; then
- 	echo "linking with non-existent netdevsim should fail"
--	cleanup_ns
- 	exit 1
- fi
- 
- echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX 2000:$NSIM_DEV_2_IFIDX" > $NSIM_DEV_SYS_LINK 2>/dev/null
- if [ $? -eq 0 ]; then
- 	echo "linking with non-existent netnsid should fail"
--	cleanup_ns
- 	exit 1
- fi
- 
- echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX" > $NSIM_DEV_SYS_LINK 2>/dev/null
- if [ $? -eq 0 ]; then
- 	echo "linking with self should fail"
--	cleanup_ns
- 	exit 1
- fi
- 
- echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_2_FD:$NSIM_DEV_2_IFIDX" > $NSIM_DEV_SYS_LINK
- if [ $? -ne 0 ]; then
- 	echo "linking netdevsim1 with netdevsim2 should succeed"
--	cleanup_ns
- 	exit 1
- fi
- 
-@@ -161,7 +160,6 @@ fi
- echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_2_FD:a" > $NSIM_DEV_SYS_LINK 2>/dev/null
- if [ $? -eq 0 ]; then
- 	echo "invalid arg should fail"
--	cleanup_ns
- 	exit 1
- fi
- 
-@@ -228,13 +226,6 @@ fi
- 
- echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX" > $NSIM_DEV_SYS_UNLINK
- 
--echo $NSIM_DEV_2_ID > $NSIM_DEV_SYS_DEL
--
- kill $pid
--echo $NSIM_DEV_1_ID > $NSIM_DEV_SYS_DEL
--
--cleanup_ns
--
--modprobe -r netdevsim
- 
- exit $res
+ count=$(cat $tmp_file | wc -c)
+ if [[ $count -ne 3 ]]; then
 -- 
 2.53.0
 
