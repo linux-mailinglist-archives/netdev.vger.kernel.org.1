@@ -1,261 +1,172 @@
-Return-Path: <netdev+bounces-286365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286366-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sKeDKRTDAGqJMQEAu9opvQ
-	(envelope-from <netdev+bounces-286365-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 19:40:36 +0200
+	id sKdlLlTJAGrLMgEAu9opvQ
+	(envelope-from <netdev+bounces-286366-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 20:07:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A999505782
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 19:40:35 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40D505058C0
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 20:07:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5C951305B595
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:35:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3D21E30022DF
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6C4D3B584F;
-	Sun, 10 May 2026 17:35:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 441652F5A06;
+	Sun, 10 May 2026 18:07:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="THfxSy19"
+	dkim=pass (2048-bit key) header.d=amacapital-net.20251104.gappssmtp.com header.i=@amacapital-net.20251104.gappssmtp.com header.b="xd2nxrE2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB3D3B583E;
-	Sun, 10 May 2026 17:35:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778434517; cv=none; b=RMZ79na9wQY8MsdCLjtb7Ul9yak6a6E+7iQTU/sp5j4NRzcbQhDPlMOjD9+z3wh4KOZ7apBhYOYuGRTMdIfNEtggRYq4YY4qyi6QHIS/306u22JuXF51sGmchMd/T4vt9ZPIzsKrMhQZhN1AKs62/vfx3lPXGgsFwV6xqrJDMvQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778434517; c=relaxed/simple;
-	bh=HB3AmcqtaDhCqSsUuOmq+n+OEfZ0V+olniUIZM0nn0Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=V/54Hgh2hnfKYZ5b7l6ni5fc0XfPLljKCyPiYRgsq3n2zlcQkLD5n4nJ/CFqUjvtaow/hTsO6QhIXRNR7FfGhg8KKimU+T4kD4jyVBvcTszZ1lWYki7p0p6s+2hcLFsRcEz5C/X2ULvlbBJA4pMxykoJmMk5n1VKP0u3/XJZcOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=THfxSy19; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2A1EC2BCB8;
-	Sun, 10 May 2026 17:35:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778434517;
-	bh=HB3AmcqtaDhCqSsUuOmq+n+OEfZ0V+olniUIZM0nn0Y=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=THfxSy19Dhjte3gi47Kvgi9XMYiL00VHUd9nuCYic2og04rfLsL6TMN/+L2CPEREP
-	 DD8V6HppXPEhie/K6tL+8DkDGJOgYRTCpJa4h/sL/1Q2gdA14N8gA8SRP/+5Q5Raa1
-	 WHLGz8ycOAE7Pdt/1kshfv1F+XwgVuLz73xwjzrKQKWmft/CyNToBmVwJBE0JRWxlt
-	 u4AMSPEeCJzCstEUQQYy3PyuE9GGHONSk5kvjWp4Z0hAsW6C9PRyL7XsnrzQc4lBnG
-	 CbeXGjG5HKzfsKmZbXirZD8gkus9qZXHaGJ6pWu1UVFJraqC+gH3/8X1YHX31UGJ5F
-	 nh850r2jjdtqQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: luizluca@gmail.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	andrew@lunn.ch,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linusw@kernel.org,
-	alsi@bang-olufsen.dk,
-	yury.norov@gmail.com,
-	linux@rasmusvillemoes.dk,
-	linux@armlinux.org.uk,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v3 7/8] net: dsa: realtek: rtl8365mb: add FDB support
-Date: Sun, 10 May 2026 10:35:16 -0700
-Message-ID: <20260510173516.3920093-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260506-realtek_forward-v3-7-1d87c5f85a3b@gmail.com>
-References: <20260506-realtek_forward-v3-7-1d87c5f85a3b@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78CC2D5925
+	for <netdev@vger.kernel.org>; Sun, 10 May 2026 18:07:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778436434; cv=pass; b=JgrQpQdy8pKypVJ25hhIyNgfY8N3gFb6XXkRpeB18kZzlAkT5cipqyDxjz/KSS30VKSmQrk6aYsK+aZbouCEVpKwGxIICOJ2oahgUlEGFGfu+ddsYJ/1CDRdr9fbpC6N7SnIt/CdhtN46z5UkYljj2tsrL2ZNed4nz5SMQ5MLyA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778436434; c=relaxed/simple;
+	bh=B/9PkITJMR854+53j7XQJ2o4B0fxddCNlnNjJN0jwA8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Hz7SKUEk7SyFgXaotuw0LlwP+30W9ip5zgb4ZpUhUhKAsM7yRWsfctspPvkaEY9BxNKntJuRWYQwldxwlr5MME87Wg6FarRWE1YS4M8o+Fuq+DZHH2FszQTJHYMCtpIz+VV5+5+lviKBvBtkbvdQaYh4MMEClM0HtYc+9bXZi5s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net; spf=pass smtp.mailfrom=amacapital.net; dkim=pass (2048-bit key) header.d=amacapital-net.20251104.gappssmtp.com header.i=@amacapital-net.20251104.gappssmtp.com header.b=xd2nxrE2; arc=pass smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amacapital.net
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5a8c94cefcdso241439e87.0
+        for <netdev@vger.kernel.org>; Sun, 10 May 2026 11:07:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778436431; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Rc28C7MwydfFB4hcYXrocXGH37oHm+eTCVQrQmDLyaqyUxKk3z2eK5vsfiuA3+M+/1
+         F/nqR3t6KMp5YOukEuPSKdPyqtQnCJ2Pgux3Vrd4S+4Zijbm1sy9ZmlF3xiF0ObBWItM
+         8sFtFHTwHv8lhTcWAfbZ6MYreEdlm/yecNCO9jjUBjhrq2xJGdERJUq6lDdjOfDQjpA3
+         /QwNliKhSf4AVI3V7XpEhQ9y1IFyVClGNZiZVHw7iAfxtXjzMiz9CyeNR/FHETZA1wfM
+         xH0eFUUHrIIfGCPLmZ4/Hp5rqy1b5l/CzgCvXNjOtGfDECDF6F+pVZPqpz1NuaHnrChT
+         sF0Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=mPI9RtUtwfMsUB1RLcg9XhbB2p1KI0Jg9PNs9S7CB20=;
+        fh=z/LIbfWiQd2f4b1bYfQSlhxTIFBEcwLelXESfNJmz/c=;
+        b=BYUwlxLGy9NUMN3lkjirV4G3oJLqEcgT/3wf0tfCQRsVkd/OUfsulcOC/B/M/IYqkd
+         mBPFQH7rYZLWzm0Ta1PTQQHnOvDZkvJCJkJVfBO5bycSNUDwF6tnr16hjYCpIGeM3+nS
+         mYLsXOrKiot517NyUP2gCkOT3YUcDvzl5jHAj8f7uYyQv9kSeVhCVS8cuoPi2XXFw+Vz
+         G+/aBNU2lOzApAqbJUe12SXs77p1Kiq3b8s88OGquRlHWygwAX5jtqZhedH5kK2NV6S9
+         UTictteky8xN26TMVChDIqr9agCJ+ycMTga5kfNPhQLl4+wchS0PkPwd+kE8j8EkYv1P
+         mhyw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amacapital-net.20251104.gappssmtp.com; s=20251104; t=1778436431; x=1779041231; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mPI9RtUtwfMsUB1RLcg9XhbB2p1KI0Jg9PNs9S7CB20=;
+        b=xd2nxrE2rwAT9XPROHji45Y7YpK9Lj8wqqYVwjTqgaMJz/T1a0pi3r14co3QbcC+DB
+         1/4Y3nhJBc0pDjz4bJ5G0wRQXnFdGh+e1UV32hu9+18QbspbZI9ZtapjgRmcIkYmN8/A
+         s5i2sZWZaL/7qTGe3cYymFLJtdPu27BfAb9pRJ/kW1s6bvKOSKkPnyd2ENQyI/E2Uxos
+         Kb5P+sJVgC8pCMhXtMlV3JppbqSy+KqJa5FFCmFTcYHk9ic8b4HcwLQRQ4JPzTHCVfbx
+         i+GCaAWpzUEjVYQU5DwBa3Lb8upX9MEia51MmdOlPKXUUobvN8LcCMrj957XJu6cRCp8
+         TXyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778436431; x=1779041231;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=mPI9RtUtwfMsUB1RLcg9XhbB2p1KI0Jg9PNs9S7CB20=;
+        b=OCL04IqQv4ACRvn4qBuTXgPYyoCVsaesuLmyhcum8SmZ7Zb29u+7gqCRDay96vHIjX
+         dwR8zsSNtkgBLQu4kUGOqdUjrZ2xWsuI+xuBCiNaOPbP7dyCIBUYBVzGkb3Ys5uHbBkW
+         nb4aFdyj1vjP+BwpykfuOxiSlKRPX6afutGzYLV9t3ePITT74mqYRFz9K/5NEXYPMkqH
+         k20bgIa3Z0UMeNvP9n58/nfz8Gqymm3oXWPqQX131oFablA73mLzx0yPIrU030zA/B/N
+         UEvtqCkHDGGv1V2RrCVje0rAPiWEdIvnaEpE1OSSnVHYQuDvpkdInw1vnuypt+e285Ye
+         9mqg==
+X-Forwarded-Encrypted: i=1; AFNElJ9JsM2UH1rtVZCXN3URj09uVzLq5eNgshM2R1HVf+FqR2wNhxyCnEsf2sI8b+O0ZD8dy67AbKg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEAdQNk8nynpAnxkNpisSJhbtHDa4G9ivdpr0n/UMC2QrRDAu+
+	b8aqpzp+H0CgoN8X+rnZa7YPE/u8tHC0J7/74YUub4lV3pmc405+gZKS0/YuhTQ/IArw24Tp4yI
+	PXDdTm4h8hRK5yi/7ZGplANfpJuf/i+DtisqD7qGG
+X-Gm-Gg: Acq92OGiz0aHTKNtvnhDmq3N8E+5Xgiml3VgZIzjHw9Ag1QaIKCGlB+ou2/j4ENGfOO
+	6bm2JE0m43/DNel4idcKpzW9Kplql2k3osBlJ/gFrdURugR3sGTrPBPEc8e/rcnFZ69JACo6aKk
+	Rzede0FUBqA1oXU6VAbewb7p/K+PD6nt9rz/FCLp70uuWNjC+t7PTuh9ZoR4nyG7hrY/42TtAgJ
+	9Ee2mP0D4wo0uGvC9SUkg437lhoLiXcVlyZRBzKeN5VW1V3qUMPmjctSKZobylpHyCryKzNiWq2
+	BvxLwB4z7Ob6tSc=
+X-Received: by 2002:a05:6512:3e14:b0:5a7:4699:d851 with SMTP id
+ 2adb3069b0e04-5a8b6c9c530mr1787120e87.7.1778436430400; Sun, 10 May 2026
+ 11:07:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 0A999505782
+References: <CALCETrVqG+1yErRJjkxvJrf=A+Vu84HTR4Bx1Pcd8G1C0PJcMA@mail.gmail.com>
+ <14A441D8-5370-44BE-8732-99BF8107C3FD@getmailspring.com> <0b8bba44-f6bb-4d69-b9d4-5787c276d41a@inspirated.com>
+ <20260510163204.GA2279@sol>
+In-Reply-To: <20260510163204.GA2279@sol>
+From: Andy Lutomirski <luto@amacapital.net>
+Date: Sun, 10 May 2026 11:06:57 -0700
+X-Gm-Features: AVHnY4Ksn57e9ZSnowz7i8VDuqmEeyTqf3rUkaTOYFnl29-9oyrpMeTvEmcHBgg
+Message-ID: <CALCETrVLsFyo71Jk7pZ+VDSR+cX-tu_mD+RdpDe-q1sVw4wisg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Kamran Khan <kz@inspirated.com>, Jeff Barnes <jeffbarnes@linux.microsoft.com>, 
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
+	"linux-api@vger.kernel.org" <linux-api@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 40D505058C0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[amacapital-net.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286365-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[amacapital.net];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286366-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.990];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[amacapital-net.20251104.gappssmtp.com:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luto@amacapital.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,amacapital-net.20251104.gappssmtp.com:dkim]
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-net: dsa: realtek: rtl8365mb: add FDB support
+On Sun, May 10, 2026 at 9:33=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> =
+wrote:
 
-Implement support for FDB and MDB management for the RTL8365MB series
-switches. Introduce a mutex lock (l2_lock) to protect concurrent L2 table
-updates. Add support for forwarding database operations, including unicast
-and multicast entry handling as well as fast aging support.
+> In any case, any hypothetical security benefit provided by AF_ALG would
+> have to be *very high* to outweigh the continuous stream of
+> vulnerabilities in it.  I understand that people using AF_ALG might not
+> be familiar with that continuous stream of vulnerabilities, but it would
+> be worth spending some time researching what has been going on.
 
-> diff --git a/drivers/net/dsa/realtek/rtl8365mb_l2.c b/drivers/net/dsa/realtek/rtl8365mb_l2.c
-> --- /dev/null
-> +++ b/drivers/net/dsa/realtek/rtl8365mb_l2.c
 
-[ ... ]
+It would not be completely crazy to have a simple, straightforward
+interface by which user code could ask the kernel to do a
+cryptographic operation.  Think:
 
-> +static void rtl8365mb_l2_data_to_uc(const u16 *data, struct rtl8365mb_l2_uc *uc)
-> +{
+int compute_keyed_hash(int key_fd, const void *data, size_t len);
 
-[ ... ]
+where key_fd encodes both the key and the hash type (HMAC-SHA256 or
+whatever), and there is a very, very small menu of hashes to choose
+from.
 
-> +	uc->key.efid = FIELD_GET(RTL8365MB_L2_UC_D4_EFID_MASK, data[4]);
-> +	uc->key.vid = FIELD_GET(RTL8365MB_L2_UC_D3_VID_MASK, data[3]);
-> +	uc->key.ivl = FIELD_GET(RTL8365MB_L2_UC_D3_IVL_MASK, data[3]);
-> +	uc->key.fid = FIELD_GET(RTL8365MB_L2_UC_D4_FID_MASK, data[4]);
-
-Because vid and fid share the same union memory in struct rtl8365mb_l2_uc_key,
-does setting fid immediately after vid overwrite the 12-bit vid value with
-the 4-bit fid value?
-
-When rtl83xx_port_fdb_dump() later passes entry.vid to the DSA core, it
-appears this sends the corrupted fid value instead, breaking VLAN visibility
-in userspace tools like bridge fdb show.
-
-[ ... ]
-
-> +static void rtl8365mb_l2_data_to_mc(const u16 *data, struct rtl8365mb_l2_mc *mc)
-> +{
-
-[ ... ]
-
-> +	mc->is_static = FIELD_GET(RTL8365MB_L2_MC_STATIC_MASK, data[5]);
-> +	mc->member = FIELD_GET(RTL8365MB_L2_MC_MBR_MASK, data[4]) |
-> +		     (FIELD_GET(RTL8365MB_L2_MC_MBR_EXT1_MASK, data[3]) << 8) |
-> +		     (FIELD_GET(RTL8365MB_L2_MC_MBR_EXT2_MASK, data[5]) << 8);
-
-Could this shift for MBR_EXT2_MASK be incorrect? 
-
-It seems this shifts MBR_EXT2_MASK by 8 instead of 10. This causes the
-extended bit for port 10 to collide with the EXT1 bits (which are correctly
-shifted by 8) and leaves bit 10 perpetually unset.
-
-In rtl8365mb_l2_mc_to_data(), the shift used is 10:
-
-data[5] |= FIELD_PREP(RTL8365MB_L2_MC_MBR_EXT2_MASK, mc->member >> 10);
-
-When the driver performs a read-modify-write operation on an existing
-multicast entry, this shift mismatch might cause port 10 to be silently
-dropped and port 8 to be erroneously altered.
-
-[ ... ]
-
-> +int rtl8365mb_l2_add_mc(struct realtek_priv *priv, int port,
-> +			const unsigned char mac_addr[static ETH_ALEN],
-> +			u16 vid)
-> +{
-
-[ ... ]
-
-> +	mc.member |= BIT(port);
-> +	mc.is_static = 1;
-> +	rtl8365mb_l2_mc_to_data(&mc, data);
-> +
-> +	/* First look for an existing entry (to get existing port members) */
-> +	ret = rtl8365mb_table_query(priv, RTL8365MB_TABLE_L2,
-> +				    RTL8365MB_TABLE_OP_READ, &addr,
-> +				    RTL8365MB_TABLE_L2_METHOD_MAC, 0,
-> +				    data, RTL8365MB_L2_ENTRY_SIZE);
-> +	if (!ret) {
-> +		/* There is already an entry... */
-> +		rtl8365mb_l2_data_to_mc(data, &mc);
-> +		/* the port must be added as a member */
-> +		mc.member |= BIT(port);
-> +		rtl8365mb_l2_mc_to_data(&mc, data);
-
-If an entry already exists in hardware, rtl8365mb_l2_data_to_mc() overwrites
-the mc struct with the hardware state. If the existing hardware entry was 
-dynamically learned (e.g., via IGMP snooping), is_static is overwritten to 0.
-
-Would this cause the software-requested static MDB entry to be subject to 
-hardware aging?
-
-> diff --git a/drivers/net/dsa/realtek/rtl83xx.c b/drivers/net/dsa/realtek/rtl83xx.c
-> --- a/drivers/net/dsa/realtek/rtl83xx.c
-> +++ b/drivers/net/dsa/realtek/rtl83xx.c
-
-[ ... ]
-
-> +int rtl83xx_port_fdb_dump(struct dsa_switch *ds, int port,
-> +			  dsa_fdb_dump_cb_t *cb, void *data)
-> +{
-
-[ ... ]
-
-> +	mutex_lock(&priv->l2_lock);
-> +	while (true) {
-> +		start_addr = addr;
-> +
-> +		dev_dbg(priv->dev, "l2_get_next_uc, addr:%d, port:%d\n",
-> +			addr, port);
-> +		ret = priv->ops->l2_get_next_uc(priv, &addr, port, &entry);
-> +		dev_dbg(priv->dev,
-> +			"l2_get_next_uc addr:%d mac:%pM vid:%d static:%d ret:%pe\n",
-> +			addr, entry.mac_addr, entry.vid, entry.is_static,
-> +			ERR_PTR(ret));
-> +
-> +		if (ret == -ENOENT)
-> +			break;
-> +		if (ret)
-> +			break;
-> +
-> +		if (addr < start_addr)
-> +			break;
-> +
-> +		cb(entry.mac_addr, entry.vid, entry.is_static, data);
-
-If the netlink socket buffer fills up, the callback returns -EMSGSIZE.
-Since the return value of cb() is ignored here, does the loop fail to abort
-and continue iterating the hardware table?
-
-This would result in the netlink subsystem receiving an incorrect success
-(or -ENOENT) instead of -EMSGSIZE, preventing it from resuming the dump later
-and silently truncating FDB lists.
-
-> +
-> +		addr++;
-> +
-> +		/* Avoid querying beyond the valid L2 table range. */
-> +		if (addr > l2_table_size)
-> +			break;
-> +	}
-> +	mutex_unlock(&priv->l2_lock);
-> +
-> +	return ret;
-
-When l2_get_next_uc() reaches the end of the hardware table, it returns
--ENOENT. 
-
-Because ret is not reset to 0, this returns -ENOENT to the DSA core upon
-successful completion. Should this return 0 on success to adhere to the
-expected API contract?
+But this is not really obviously worth the hassle.  And AF_ALG is
+definitely not the right interface.
 
