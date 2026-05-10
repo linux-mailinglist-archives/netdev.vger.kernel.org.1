@@ -1,538 +1,204 @@
-Return-Path: <netdev+bounces-286319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286320-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QHjKCSiqAGrhLQEAu9opvQ
-	(envelope-from <netdev+bounces-286319-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:54:16 +0200
+	id +CooI4CqAGrhLQEAu9opvQ
+	(envelope-from <netdev+bounces-286320-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:55:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB652504EF2
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:54:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09703504F1C
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:55:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BBD893008E14
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 15:54:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B4E6A30097FC
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 15:54:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A41C3A0E86;
-	Sun, 10 May 2026 15:54:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 508AE39F178;
+	Sun, 10 May 2026 15:54:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=inspirated-com.20251104.gappssmtp.com header.i=@inspirated-com.20251104.gappssmtp.com header.b="jJq4KJ6Y"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="iwsFfPBx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f195.google.com (mail-pg1-f195.google.com [209.85.215.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012064.outbound.protection.outlook.com [40.107.200.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B6339A7F9
-	for <netdev@vger.kernel.org>; Sun, 10 May 2026 15:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.195
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778428453; cv=none; b=usKBTA/ftyeGMmWAFllW+BKMX2nwaIq5wJ10A8yeU0xyMNibbZ6kGeZuVTKKUYOpIZJazkODNoiViErGbkfnGL/Kcv6ynUVvivnKc//UMzAkwhvbOxoTbWYU+osjaCLwoIbWT18tPrjfrM32350Xdl59qUDZPMYp59Yib3jH48U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778428453; c=relaxed/simple;
-	bh=LO76TaPcJ68KpkKLpiKa9Z5MHTFAwbrAsnYL2+h0mJg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oqhh2WbMxI17sXiKt0nwNv8U+o0ScRyOQGnfm+weVd5ucZ9KRYlaOQGXAaN9fbu0HyPfZSP1woNWGegDPZxgxxm4GvPtRS2jjhIxewCDoDfpoS0ToBX46Hu1gCleVklZtju7DzW2zXuRpCG+/bywR/ztl2OqlBB/bxhTZyWOmVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspirated.com; spf=pass smtp.mailfrom=inspirated.com; dkim=pass (2048-bit key) header.d=inspirated-com.20251104.gappssmtp.com header.i=@inspirated-com.20251104.gappssmtp.com header.b=jJq4KJ6Y; arc=none smtp.client-ip=209.85.215.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspirated.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inspirated.com
-Received: by mail-pg1-f195.google.com with SMTP id 41be03b00d2f7-c8027e876fcso1327296a12.1
-        for <netdev@vger.kernel.org>; Sun, 10 May 2026 08:54:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=inspirated-com.20251104.gappssmtp.com; s=20251104; t=1778428449; x=1779033249; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0oE6y69M3xiqzAX/8jVmHNK46h9/q1JAe0RRlKSB0MU=;
-        b=jJq4KJ6Y9888cktD7MCWmzkxWrj+fcOOVIlTiUvOMN6L/l4d20+qne/w4MSqlqYbaY
-         t/YHMhSA4MimVD7aDkAespAcawkwE3bDQDOeKpmwynsQSyvGv+meZ5J7DuDj9007TxJz
-         MTtSISak3kCUrYVFsqFNel4NVhKehI2umNVCJk8VzM0kB/frl9aTkae6xQ02AlG6BohS
-         46I5jda8PlbIsQqJF8BfV576wed45O6IFnga10TMpK1j9yau+8OaOPGzakKOrjngO3RQ
-         3HUlEj2kYxA0CAJ3z6kVze3DQ6ciQqt5AFtKiVmDb+o+PG6H5O3t5+dzE0PxsaZo6Ue6
-         z4oA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778428449; x=1779033249;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0oE6y69M3xiqzAX/8jVmHNK46h9/q1JAe0RRlKSB0MU=;
-        b=EqgNtj+WSFz5Ap95HD7iLBci2iqROoN2KHvNMm9l9KLZ4c08dtU3uXDAEoniQugGhn
-         j4Q4tvf1EepQd6eZ1Y0mvS80mW3rJdnkebaPZCMEBHAYqaIBgKY+9MHEFEiqrVoVM0vX
-         Cm9ivylTJemEIxgZopKqAK7tlh0wwkVD8d3oy4DwPMrpN/3yCOMnjjkBFvH5+r++TMAh
-         93LcryZaQ3iEOIYQ3r2J56jSM2nwlprxun+IKU8ItVEI8GL/B1CneX/lNv2FGLfmnZ+P
-         8pYA82TqpzxdTBI5ZFETDns8OdkgxjBqXL2SrV7cgSRwXtyLflrIPzHoAfB3pw865PZO
-         hpnA==
-X-Forwarded-Encrypted: i=1; AFNElJ9ZIIuazaU4HQt7JAu14kv+5s5vHTpyqPHu4T8BXCGg7c6fcvO6uIHNFLUuLfY/IqMB9NXWHeE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVBed2esKu81iJVbHKoPNox95xj/+ndpKU1szPtb7087Lq/r/X
-	jNe68P7MAIjY14+jtmXTGK2HTA3eaPN+BPVH450nN6qtciLvJZsT0yTzLuDbVPMMd3A=
-X-Gm-Gg: Acq92OGE96NPo+9LqF8afwKNXMlk/keioKUmhOMsTXUCYWElWVBRVdPJ1DQ1ZZqDyp1
-	zCCpxCa/RQsWZMn3Cf/MNAufxwck5MDKpz0kO+jioEfJ2RhevMp8Oxt4dP5fDQZI7J2j25aJ8u4
-	IzZOF3zGSsUQY9U6Hv3u40/+84RWBKhgpo+Bq2Goz8WsZkfwXPBgH1njsyzobAyBXrF2FX6qOAX
-	ZnBkyUiyfHXDs9Ay/GH93gDBD5h0thhzikPYJglEi57sdscQR7dTTfwe2nL+3fILL2BG2MaFSEW
-	ePH75jBJacxX+eph9DdmqnZHrR/DQ6LRB6irUq5fNztUZDPvUD8wviv2WITBfOV3VlDVHS2rFNb
-	fEWfU7H1AhaUSS8laimxLKw+Wep1BvLqAcm/bG91Be8MHCHu0SjYPxnO9kvXohXA+Mo3Ff+LcfJ
-	WDPW73t3SDoc5rlj3oYUtoIRWvrMX/5ZMViZw+bKCSKfkAOupzsYj6e6C4J0nPHi7oTQ==
-X-Received: by 2002:a17:903:1a8d:b0:2bc:a58d:329 with SMTP id d9443c01a7336-2bca58d0532mr31671035ad.40.1778428448790;
-        Sun, 10 May 2026 08:54:08 -0700 (PDT)
-Received: from [192.168.1.106] ([50.35.35.255])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1e8df57sm79286785ad.64.2026.05.10.08.54.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 10 May 2026 08:54:08 -0700 (PDT)
-Message-ID: <0b8bba44-f6bb-4d69-b9d4-5787c276d41a@inspirated.com>
-Date: Sun, 10 May 2026 08:54:07 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A28C36403A;
+	Sun, 10 May 2026 15:54:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778428492; cv=fail; b=guTXh6dfCkuvfKxOlL7qlTukKPY36XOibUYybFcfpdK/yuIG8bhndhPKtfHiWFj7BPjVK9hyqjckB9s0uz9N2hxwTdm66DjCTq9H6AWbSeo/05mg4wefegMcYTIcaJEwVVjF+VW+aCwO6a8XraqVt9lbraZh8IsI0kUbxSnTVi4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778428492; c=relaxed/simple;
+	bh=9xvVBu7V+tOGbQZ1GomLWJrWTIhJmw/ERYWljJ0zueE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=V4KBY691mYCz/Z2hbve2Tw7yBurCBhgbopymBAXkoV7E6bEwz+IRSNPfeFMxqpuIEtisEMN3hVQEnbJviEM4T91oZr64dYY83rXOXHsaaJvSu250tIR1v50ThVJQQS6zZtP/U2soejZ0+RkeZ1G2WH57tanFBVUP2gf8CERJp5s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=fail (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=iwsFfPBx reason="signature verification failed"; arc=fail smtp.client-ip=40.107.200.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=aH3qf/maaWDqr01mPVqlZhcSlpLktfVzyprcfHHGeUS4tYt82JEDw0mPkqo9ZuZfNhjQQyeRfKcR3sQ66Ta5wz0UtmJA5GwGMZ9NPAmFhvoodbWIvg241K8QPGyqgEV+i3t/veTyVIJ7qbiFaEcXeSh+0swsM7gyFpEI92unrXS9As66Ya9bzQ6P3GYKGhOVq8sdvmOAF49TiDe25hyh5kb476PSCQS7lWMTrZx9xffvamvDP5MPT3VPH32zJh0DQS1fAWWOsmRM8/idzLwA+QKmxw8ljvFIVMlqjHRHSiu7GgtzuR+qDElsNNbz8vAl+AUTaZXtam17bEkJeWPXZg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=H4nF6EoLDWrtoYygUPOvzGNXFnWEGln4+00ssuNWV1U=;
+ b=fj5nJk10guvlf80Nln98HpXmb3qamupN3Xg7mT8uFfvPVLTBeJPQWIBilC5ipFlWvWXqyaFBaX/ODXoISjmWChYFQQ8qhcI14jICbt+K3HZy8NWwbvrRZJvXXxy1SRWJNWnbWeLb+mUgUqwUHrGdXjGhdkfx9+Qf+bPWYn0O0nss2B40YTD6X8SCad4p32r4n1eBgYHxaiJn/PCmArDJG3bR5OMBq1YyR/64rrWncK+Gt75q+4vNInLQtQMBRk92S1SiRJl1vwKr3A7WgDwYpz1osMbkp9zp7teWLnwD2fVzfxyRPhU7eom7w+0du7R61L2VHTgxPpxofIG7VNz82A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H4nF6EoLDWrtoYygUPOvzGNXFnWEGln4+00ssuNWV1U=;
+ b=iwsFfPBxxnCbSSXB9VcBjB0KCe8pERQE1SUAinaF0mI7reipO8IeGjlXr0SlsSqR2AUme42Cuh32xpg0Oh6kV+sztMXt/SeOdBueEPVm67PkavtROew8oFSeFqYbAzPIfnynFMSRc1fXFbIE8Armb+yChJzRbkucF6x0TL/FmEllXe3eRIlULb2t9zoLk+W6od8CvtNwUrkZDW8DORDGTSmDAo7uwZjky9EVJPMkW445TK5wM5EAGoP7SsAFqgo7ujZLzsEetMfuGHHlee5aEJVbdfdoqiR++BfYxe5Q9Dq66WvHhAN6+HaEEtcgXg2P1JZAH554PrICmk1T6upnUg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by IA0PR12MB7774.namprd12.prod.outlook.com (2603:10b6:208:430::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.22; Sun, 10 May
+ 2026 15:54:47 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.20.9891.021; Sun, 10 May 2026
+ 15:54:47 +0000
+Date: Sun, 10 May 2026 18:54:38 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Marco Crivellari <marco.crivellari@suse.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	bridge@lists.linux.dev, Tejun Heo <tj@kernel.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Michal Hocko <mhocko@suse.com>, Simon Horman <horms@verge.net.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>
+Subject: Re: [RFC PATCH net-next] net: bridge: Move long delayed work on
+ system_dfl_long_wq
+Message-ID: <20260510155438.GA122361@shredder>
+References: <20260507134815.295588-1-marco.crivellari@suse.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260507134815.295588-1-marco.crivellari@suse.com>
+X-ClientProxiedBy: FR4P281CA0062.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:ce::19) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
-To: Jeff Barnes <jeffbarnes@linux.microsoft.com>,
- Andy Lutomirski <luto@amacapital.net>
-Cc: Eric Biggers <ebiggers@kernel.org>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Linus Torvalds <torvalds@linux-foundation.org>
-References: <CALCETrVqG+1yErRJjkxvJrf=A+Vu84HTR4Bx1Pcd8G1C0PJcMA@mail.gmail.com>
- <14A441D8-5370-44BE-8732-99BF8107C3FD@getmailspring.com>
-Content-Language: en-US
-From: Kamran Khan <kz@inspirated.com>
-In-Reply-To: <14A441D8-5370-44BE-8732-99BF8107C3FD@getmailspring.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: CB652504EF2
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|IA0PR12MB7774:EE_
+X-MS-Office365-Filtering-Correlation-Id: de5a4598-c994-42d8-ac3d-08deaeac763b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|56012099003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	SVgjePjz/0YdDgO7QGZ9YnMQ+P0cFYn9A08iWD0NtG8BEiWqmBju6R4CoDo5Thaf7yTrfJ7FZ2tLqvwOBB0fMeU3fHTTA+bWiCWmKD5j/ndmvU54U2mLi2kwCc7IBpXqVAyddbMmwufGN7NLTylZ7/hDW/DIj1oMHfZq90AmKfB/euAED5yg3X/S6Lfi2jO1X2klN1lMf9kGv87sSW4pVQ/gH8SIqvh/iZFLFyBqe7XQgBI7StRNZEAZmNCan9n0O3KVU5hxl4Y3I4XgBgEOXGVDF4UQcnBLH2pTgpycL769AaXNu6DCAT13mBP4BDSZDhQIjz52ylXCpwoypbkJoazhO4y3cz8TIiH24LsVGiOlST7FuWZvR/DsvYNHBGbfrYvlNggNPB6gDqpkR6HebtP1WFFx0G3NCsauD6F4b7KNeQNHtHMv3fmBTit07RC94AaFJJ0HLSGt1z2O3j9Zw5Bi7ISnz0Z3ungB2yQfXezvQP+VMLKs1Y/dgrgAeHEk/0HquVPJ4jJFqV35nTEA8b9pkxwnAZblD5mnsmhjj3ck3mNRDwwLckUha85gFoU2ACRaX6Oh7Lg0FL8lvDSVqaSeA2ah0kWrjx/VIYj0v47vYKpjGkYHMzhjyvDXp+uCvDRuSEVid5gJZCuHZJkZisIsO3us3QEkO1/pmn1igTM/CWiHpd3wl6XPDA1LDtaT
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?iso-8859-1?Q?nPmJhUGfDCnUg9dv4Yrp/FR/8JcUFRRlB4BT51R5ApNB85FHvmzLzRdRe2?=
+ =?iso-8859-1?Q?dSFt8Uh6jmNdhhmC27Dp3j4KhjHs7egTrD9GlARRr2LkrjBd32fz1xNG4M?=
+ =?iso-8859-1?Q?OwdCA1CBIXm9HgwH0zsl/JCYJFq5gvrgOXwzERvI78cNzPDKrbHN+3H9xB?=
+ =?iso-8859-1?Q?m/eJaNQTEHRgQUx24B3ZGzNwfWoIySaGy1X9GM+a4HmG/nBY27GrB/K7jP?=
+ =?iso-8859-1?Q?tNnakQZ5kFSIbLbETbpd7bgrxW3DPG+QofHPaSimVl0SU1C4RBfhPXvZrJ?=
+ =?iso-8859-1?Q?qrDBKcDZHbtk/WusjiEEXPKVLC4fDWbVVJXsiQiKmW5Zm6ZLrf9PjGgvYH?=
+ =?iso-8859-1?Q?JVHo7opYjHZHMksgiTMqilrU5Rw+jtWbw2utcgU+E+K0j5wzhnRIs9ElRu?=
+ =?iso-8859-1?Q?nU/yEZLokpXsJrA7HuABV8ZrdA9Tc4wqXUwcmoaxNTQbA4ZyyNpBNAC4Wz?=
+ =?iso-8859-1?Q?uXQV04LEZPfbhTOH86Mv8XgDVHzg3Zw7XXkg/UmCxj73fSj1UwcZKqoGdH?=
+ =?iso-8859-1?Q?zlChzeC2f/36lVEogooc5B0OjEkGXDhpdKvh6INJeHpx0PHVfC7aQDuxDQ?=
+ =?iso-8859-1?Q?QiLYFfyStdEnpBEKpbfvZn1DYfkDuJtV+zSfCeG3cLTfjDRPRLXWnGA+Dm?=
+ =?iso-8859-1?Q?1x8Aa4ZcpUCjEUccYdD3thLuC4aRmauGfulWwpOlIV2lnLVeJM91lRdDsI?=
+ =?iso-8859-1?Q?ZBfWsHmlIEqNRqoQSufdVMhlOzd/fGVhJdKLAvqxyN+CCQMgg6SWcm2sbV?=
+ =?iso-8859-1?Q?jsQKUc1tEu0zokd6hjqGGdegE8B//lar36c7q3bdJbymKLhVAxgKLtoSHL?=
+ =?iso-8859-1?Q?1XqdLr2zBvjhTPweqf9xWv+ipt15C2aMMuQNK+vDvrAuYctq6GGBJRFdXH?=
+ =?iso-8859-1?Q?fVoqKT304ZGMFvxx5zg8KgicABYwp6Fou8HmEJGG1/XvIKyESx8RvppPK4?=
+ =?iso-8859-1?Q?V4D8+To9gJ45pqgkEkKC4AgbmSI+UvDSq1yP3U/hkH/KiVuKF5kXJ5Dlcg?=
+ =?iso-8859-1?Q?e6s3RrsOlwfFVMM2vWWMOLIAbKRPcVNErpUMzYvlDU5kg4XWlWMed5H0kX?=
+ =?iso-8859-1?Q?ZRUZng/6LI4pPqcH4noa5pcrc+PLCA6cavNH9U5ghpTvPmW2uTl3CgqnLs?=
+ =?iso-8859-1?Q?i8YIoXHtmfJZCK0h8uSzNVEHiwbZWA+S3D8rwkL8cut5P1uIh0S3IMtN9A?=
+ =?iso-8859-1?Q?RBRJ5/CX/YDWVfvpLVYH2gzwgWlaBUSMULOE3EgEiynSBQ425XBLp/1lr5?=
+ =?iso-8859-1?Q?++hQvWs8UvWIMfptC8URpr1JjbfTW10gbFGYdylQNSZ1uAKKGPq8TeNlaz?=
+ =?iso-8859-1?Q?g+RegG3xldwIgaXAfzova9AkYSYyPy7oxBE2HeKs3SpzQ9ZCEoUzQS1G41?=
+ =?iso-8859-1?Q?vf3XBi4jEzdDI7o8RW8CIM4RWq4TfmWiLmtUpP9rklg7KAYYaVlYWBX3Zy?=
+ =?iso-8859-1?Q?yoiruZEP1iQcuNdiFT2xzgOaS0MVgSrsMrh3UTPyuLBQH+BY5U52Ndkwyk?=
+ =?iso-8859-1?Q?MJSMVhYYnkx+hIaxyO1GO+/+8gkY/mtNa3a73onK+uZ9h3UvJ4cGJGGpsj?=
+ =?iso-8859-1?Q?YL11N8BaxNTnoPwCMqcIGpnYCRY8ni7S2RsuVR0apyExiLPhWMG9wJDo2V?=
+ =?iso-8859-1?Q?wJzz8Wise35Wo7O1HC/Ej6USae2tY3edbKPLfgzqea1a5WtDcxwuBqulP5?=
+ =?iso-8859-1?Q?CYOcDuIiWhyLJElZwynSD4Mfe2oO1rypO+R9zEtDm7QcRfpEYI9uoWxAwr?=
+ =?iso-8859-1?Q?6TpOrdwXrJ5pZBdo4whQRyFgr5mKSC2tJneGXnYOis8PEU?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: de5a4598-c994-42d8-ac3d-08deaeac763b
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2026 15:54:47.6601
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mJ5rp/yQSga/VBsv8UoMDSJOl9KqKZjMNSIWRDuA8ReGE6/HV3O2d9mQkBl+iFH9xKuhENVKbiI1oqOwYe7kLg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7774
+X-Rspamd-Queue-Id: 09703504F1C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[inspirated-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [4.04 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[nvidia.com : SPF not aligned (relaxed),reject];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_DKIM_REJECT(1.00)[Nvidia.com:s=selector2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[inspirated-com.20251104.gappssmtp.com:+];
-	TAGGED_FROM(0.00)[bounces-286319-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[inspirated.com];
+	TAGGED_FROM(0.00)[bounces-286320-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	GREYLIST(0.00)[pass,meta];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,kernel.org,gmail.com,linutronix.de,suse.com,verge.net.au,davemloft.net,google.com,redhat.com,blackwall.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kz@inspirated.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:-];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[inspirated-com.20251104.gappssmtp.com:dkim,chronox.de:url,copy.fail:url]
+	NEURAL_HAM(-0.00)[-0.982];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.com:email,nvidia.com:email]
 X-Rspamd-Action: no action
 
-Hi,
+On Thu, May 07, 2026 at 03:48:15PM +0200, Marco Crivellari wrote:
+> Currently the code enqueue work items using {queue|mod}_delayed_work(),
+> using system_long_wq. This workqueue should be used when long works are
+> expected and it is a per-cpu workqueue.
+> 
+> The function(s) end up calling __queue_delayed_work(), which set a global
+> timer that could fire anywhere, enqueuing the work where the timer fired.
+> 
+> Unbound works could benefit from scheduler task placement, to optimize
+> performance and power consumption. Long work shouldn't stick to a single
+> CPU.
+> 
+> Recently, a new unbound workqueue specific for long running work has
+> been added:
+> 
+> ����c116737e972e ("workqueue: Add system_dfl_long_wq for long unbound works")
+> 
+> Since the workqueue work doesn't rely on per-cpu variables, there is no
+> obvious reason that justify the use of a per-cpu workqueue. So change
+> system_long_wq with system_dfl_long_wq so that the work may benefit from
+> scheduler task placement.
+> 
+> Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
 
-AF_ALG is useful not just for hardware-offloading, but also for memory 
-isolation so that applications only get oracle access to the crypto keys 
-and a memory-safety vulnerability in user applications would not 
-immediately put the secret key material at risk.
-
-I understand and appreciate the concern with complex attack surface and 
-the increased frequency of attacks in this area. But I fear that 
-completely removing AF_ALG increases the risk for userspace applications 
-relying on it for memory isolation.
-
-What alternatives do userspace applications have on Linux for ensuring 
-crypto keys are not exposed in user memory? That is, FreeBSD and NetBSD 
-natively provide /dev/crypto; removing AF_ALG would kill the only 
-equivalent option on the Linux side for kernel-delegated cryptography.
-
-Thanks,
-Kamran.
-
-On 5/6/26 7:42 AM, Jeff Barnes wrote:
-> Hi,
-> 
-> On May 5 2026, at 7:17 pm, Andy Lutomirski <luto@amacapital.net> wrote:
-> 
->>> On Apr 29, 2026, at 6:19 PM, Eric Biggers <ebiggers@kernel.org> wrote:
->>>   
->>> ﻿AF_ALG is almost completely unnecessary, and it exposes a massive attack
->>> surface that hasn't been standing up to modern vulnerability discovery
->>> tools.  The latest one even has its own website, providing a small
->>> Python script that reliably roots most Linux distros: https://copy.fail/
->>   
->> How about adding a configuration option, defaulted on, that requires
->> capable(CAP_SYS_ADMIN) to create the socket (and maybe also to bind /
->> connect it).  And a sysctl to allow the administrator to override this
->> in the unlikely event that it’s needed.
->>   
->> IIRC cryptsetup used to and maybe even still does require these
->> sockets sometimes and this would let it keep working.  And there's all
->> the FIPS stuff downthread.
-> 
-> Apologize in advance for the long-winded answer.
-> 
-> The "FIPS stuff" centers on using sha512hmac -> libkcapi -> AF_ALG for
-> verifying integrity. The early‑boot sha512hmac check that some
-> distributions use (typically from initramfs) sits at an awkward
-> intersection of multiple standards, and it may help to clarify where it
-> actually fits and where it doesn't.
-> 
->  From a standards perspective, FIPS 140‑3 requires a cryptographic module
-> to perform self‑integrity verification using an approved algorithm and
-> to prevent the module from entering an operational state on failure. In
-> the Linux kernel, the cryptographic module is the kernel crypto
-> subsystem, and these requirements are met by the kernel’s internal
-> power‑up self‑tests (KATs, etc.) on the crypto code and critical data as
-> loaded into memory.
-> 
-> FIPS 199 / SP 800‑53 (e.g., SI‑7) impose system‑level integrity
-> requirements (for Moderate impact systems), i.e., that unauthorized
-> modification of critical components is prevented or detected and that
-> failures result in a protective action. These controls are explicitly
-> technology‑agnostic and are not limited to cryptographic‑module self‑tests.
-> 
-> The sha512hmac check is not the FIPS 140‑3 cryptographic‑module
-> self‑integrity test. Instead, it has historically been used as a system
-> integrity control that provides auditors with assurance that the kernel
-> image containing the cryptographic module has not been modified prior to
-> execution, and that a failure will halt the boot.
-> 
-> Although FIPS 140‑3 does not mandate an HMAC over the kernel image, the
-> early‑boot HMAC became an accepted evidence pattern for satisfying
-> system‑integrity expectations (FIPS 199 / SI‑7) alongside a kernel
-> crypto validation. This is why it is often perceived as “required” for
-> FIPS submissions, even though it is not normatively required by
-> FIPS 140‑3 itself.
-> 
-> With the deprecation/removal of AF_ALG for this use case, there is no
-> longer a supported way to perform an early‑boot, userspace‑driven HMAC
-> using validated kernel crypto without introducing circular dependencies
-> (e.g., relying on userspace crypto before crypto self‑tests complete).
-> As a result, there is no drop‑in replacement for sha512hmac that
-> preserves all of its historical properties.
-> 
-> This is a new development that challenges a long‑standing assumption:
-> that system‑integrity evidence and cryptographic‑module self‑integrity
-> can be cleanly separated while still being demonstrated by a single
-> early‑boot mechanism. That assumption no longer holds given proposed
-> kernel interfaces.
-> 
-> A more accurate decomposition (and one that aligns with the intent of
-> the standards) is to separate integrity enforcement by system phase.
-> 
-> 1. Secure Boot (or equivalent platform verification) ensures that a
-> modified kernel image is not executed at all. This satisfies the
-> requirement that critical components are not loaded in a modified state
-> and that integrity failure results in a protective action (boot prevention).
-> 
-> 2. IMA (with appraisal and enforcement) ensures that modified
-> executables, modules, or firmware cannot be loaded or executed once the
-> kernel is running.
-> 
-> 3. Kernel crypto self‑tests continue to satisfy FIPS 140‑3
-> self‑integrity requirements independently of the above.
-> 
-> Taken together, Secure Boot + IMA provide continuous system‑integrity
-> enforcement without re‑introducing early‑boot HMACs or AF_ALG
-> dependencies, while keeping cryptographic‑module self‑integrity
-> correctly scoped to the kernel crypto subsystem.
-> 
-> The transition away from sha512hmac is therefore not a removal of
-> integrity enforcement, but a shift from a single, early‑boot mechanism
-> to a phased integrity model that better reflects the separation of
-> concerns already present in the standards — even though this separation
-> was previously masked by the hacky HMAC approach.
-> 
-> This change will require updated documentation and auditor education,
-> but it reflects the current technical reality and avoids perpetuating an
-> interface that no longer has a sustainable implementation path.
-> 
->>   
->>   
->>>   
->>> This isn't sustainable, especially as LLMs have accelerated the rate the
->>> vulnerabilities are coming in.  The effort that is being put into this
->>> thing is vastly disproportional to the few programs that actually use
->>> it, and those programs would be better served by userspace code anyway.
->>>   
->>> These issues have been noted in many mailing list discussions already.
->>> But until now they haven't been reflected in the documentation or
->>> kconfig menu itself, and the vulnerabilities are still coming in.
->>>   
->>> Let's go ahead and document the deprecation.
->>>   
->>> This isn't intended to change anything overnight.  After all, most Linux
->>> distros won't be able to disable the kconfig options quite yet, mainly
->>> because of iwd.  But this should create a bit more impetus for these
->>> userspace programs to be fixed, and the documentation update should also
->>> help prevent more users from appearing.
->>>   
->>> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
->>> ---
->>>   
->>> This patch is targeting crypto/master
->>>   
->>> Documentation/crypto/userspace-if.rst | 82 ++++++++++++++++++++-------
->>> crypto/Kconfig                        | 69 ++++++++++++++++------
->>> 2 files changed, 113 insertions(+), 38 deletions(-)
->>>   
->>> diff --git a/Documentation/crypto/userspace-if.rst b/Documentation/crypto/userspace-if.rst
->>> index 021759198fe7..c39f5c79a5b7 100644
->>> --- a/Documentation/crypto/userspace-if.rst
->>> +++ b/Documentation/crypto/userspace-if.rst
->>> @@ -2,30 +2,72 @@ User Space Interface
->>> ====================
->>>   
->>> Introduction
->>> ------------
->>>   
->>> -The concepts of the kernel crypto API visible to kernel space is fully
->>> -applicable to the user space interface as well. Therefore, the kernel
->>> -crypto API high level discussion for the in-kernel use cases applies
->>> -here as well.
->>> -
->>> -The major difference, however, is that user space can only act as a
->>> -consumer and never as a provider of a transformation or cipher
->>> -algorithm.
->>> -
->>> -The following covers the user space interface exported by the kernel
->>> -crypto API. A working example of this description is libkcapi that can
->>> -be obtained from [1]. That library can be used by user space
->>> -applications that require cryptographic services from the kernel.
->>> -
->>> -Some details of the in-kernel kernel crypto API aspects do not apply to
->>> -user space, however. This includes the difference between synchronous
->>> -and asynchronous invocations. The user space API call is fully
->>> -synchronous.
->>> -
->>> -[1] https://www.chronox.de/libkcapi/index.html
->>> +AF_ALG provides unprivileged userspace programs access to arbitrary hash,
->>> +symmetric cipher, AEAD, and RNG algorithms that are implemented in kernel-mode
->>> +code.
->>> +
->>> +AF_ALG is insecure and is deprecated. Originally added to the kernel
->>> in 2010,
->>> +most kernel developers now consider it to be a mistake.
->>> +
->>> +AF_ALG continues to be supported only for backwards compatibility.
->>> On systems
->>> +where no programs using AF_ALG remain, the support for it should be
->>> disabled by
->>> +disabling ``CONFIG_CRYPTO_USER_API_*``.
->>> +
->>> +Deprecation
->>> +-----------
->>> +
->>> +AF_ALG was originally intended to provide userspace programs access
->>> to crypto
->>> +accelerators that they wouldn't otherwise have access to.
->>> +
->>> +However, that capability turned out to not be useful on very many
->>> systems. More
->>> +significantly, the actual implementation exposes a vastly greater
->>> amount of
->>> +functionality than that. It actually provides access to all software algorithms.
->>> +
->>> +This includes arbitrary compositions of different algorithms created
->>> via a
->>> +complex template system, as well as algorithms that only make sense
->>> as internal
->>> +implementation details of other algorithms. It also includes full zero-copy
->>> +support, which is difficult for the kernel to implement securely.
->>> +
->>> +Ultimately, these algorithms are just math computations. They use
->>> the same
->>> +instructions that userspace programs already have access to, just
->>> accessed in a
->>> +much more convoluted and less efficient way.
->>> +
->>> +Indeed, userspace code is nearly always what is being used anyway.
->>> These same
->>> +algorithms are widely implemented in userspace crypto libraries.
->>> +
->>> +Meanwhile, AF_ALG hasn't been withstanding modern vulnerability
->>> discovery tools
->>> +such as syzbot and large language models. It receives a steady
->>> stream of CVEs.
->>> +Some of the examples include:
->>> +
->>> +- CVE-2026-31677
->>> +- CVE-2026-31431 (https://copy.fail)
->>> +- CVE-2025-38079
->>> +- CVE-2025-37808
->>> +- CVE-2024-26824
->>> +- CVE-2022-48781
->>> +- CVE-2019-8912
->>> +- CVE-2018-14619
->>> +- CVE-2017-18075
->>> +- CVE-2017-17806
->>> +- CVE-2017-17805
->>> +- CVE-2016-10147
->>> +- CVE-2015-8970
->>> +- CVE-2015-3331
->>> +- CVE-2014-9644
->>> +- CVE-2013-7421
->>> +- CVE-2011-4081
->>> +
->>> +It is recommended that, whenever possible, userspace programs be
->>> migrated to
->>> +userspace crypto code (which again, is what is normally used anyway) and
->>> +``CONFIG_CRYPTO_USER_API_*`` be disabled.  On systems that use
->>> SELinux, SELinux
->>> +can also be used to restrict the use of AF_ALG to trusted programs.
->>> +
->>> +The remainder of this documentation provides the historical
->>> documentation for
->>> +the deprecated AF_ALG interface.
->>>   
->>> User Space API General Remarks
->>> ------------------------------
->>>   
->>> The kernel crypto API is accessible from user space. Currently, the
->>> diff --git a/crypto/Kconfig b/crypto/Kconfig
->>> index 103d1f58cb7c..6cd1c478d4be 100644
->>> --- a/crypto/Kconfig
->>> +++ b/crypto/Kconfig
->>> @@ -1278,48 +1278,72 @@ config CRYPTO_DF80090A
->>>     tristate
->>>     select CRYPTO_AES
->>>     select CRYPTO_CTR
->>>   
->>> endmenu
->>> -menu "Userspace interface"
->>> +menu "Userspace interface (deprecated)"
->>>   
->>> config CRYPTO_USER_API
->>>     tristate
->>>   
->>> config CRYPTO_USER_API_HASH
->>> -    tristate "Hash algorithms"
->>> +    tristate "Hash algorithms (deprecated)"
->>>     depends on NET
->>>     select CRYPTO_HASH
->>>     select CRYPTO_USER_API
->>>     help
->>> -      Enable the userspace interface for hash algorithms.
->>> +      Enable the AF_ALG userspace interface for hash algorithms.  This
->>> +      provides unprivileged userspace programs access to arbitrary hash
->>> +      algorithms implemented in the kernel's privileged execution context.
->>>   
->>> -      See Documentation/crypto/userspace-if.rst and
->>> -      https://www.chronox.de/libkcapi/html/index.html
->>> +      This interface is deprecated and is supported only for backwards
->>> +      compatibility.  It regularly has vulnerabilities, and the capabilities
->>> +      it provides are redundant with userspace crypto libraries.
->>> +
->>> +      Enable this only if needed for support for a program that
->>> hasn't yet
->>> +      been converted to userspace crypto, for example iwd.
->>> +
->>> +      See also Documentation/crypto/userspace-if.rst
->>>   
->>> config CRYPTO_USER_API_SKCIPHER
->>> -    tristate "Symmetric key cipher algorithms"
->>> +    tristate "Symmetric key cipher algorithms (deprecated)"
->>>     depends on NET
->>>     select CRYPTO_SKCIPHER
->>>     select CRYPTO_USER_API
->>>     help
->>> -      Enable the userspace interface for symmetric key cipher algorithms.
->>> +      Enable the AF_ALG userspace interface for symmetric key algorithms.
->>> +      This provides unprivileged userspace programs access to arbitrary
->>> +      symmetric key algorithms implemented in the kernel's privileged
->>> +      execution context.
->>> +
->>> +      This interface is deprecated and is supported only for backwards
->>> +      compatibility.  It regularly has vulnerabilities, and the capabilities
->>> +      it provides are redundant with userspace crypto libraries.
->>> +
->>> +      Enable this only if needed for support for a program that
->>> hasn't yet
->>> +      been converted to userspace crypto, for example iwd, or cryptsetup
->>> +      with certain algorithms.
->>>   
->>> -      See Documentation/crypto/userspace-if.rst and
->>> -      https://www.chronox.de/libkcapi/html/index.html
->>> +      See also Documentation/crypto/userspace-if.rst
->>>   
->>> config CRYPTO_USER_API_RNG
->>> -    tristate "RNG (random number generator) algorithms"
->>> +    tristate "Random number generation algorithms (deprecated)"
->>>     depends on NET
->>>     select CRYPTO_RNG
->>>     select CRYPTO_USER_API
->>>     help
->>> -      Enable the userspace interface for RNG (random number generator)
->>> -      algorithms.
->>> +      Enable the AF_ALG userspace interface for random number generation
->>> +      (RNG) algorithms.  This provides unprivileged userspace programs
->>> +      access to arbitrary RNG algorithms implemented in the kernel's
->>> +      privileged execution context.
->>>   
->>> -      See Documentation/crypto/userspace-if.rst and
->>> -      https://www.chronox.de/libkcapi/html/index.html
->>> +      This interface is deprecated and is supported only for backwards
->>> +      compatibility.  It regularly has vulnerabilities, and the capabilities
->>> +      it provides are redundant with userspace crypto libraries as
->>> well as
->>> +      the normal kernel RNG (e.g., /dev/urandom and getrandom(2)).
->>> +
->>> +      See also Documentation/crypto/userspace-if.rst
->>>   
->>> config CRYPTO_USER_API_RNG_CAVP
->>>     bool "Enable CAVP testing of DRBG"
->>>     depends on CRYPTO_USER_API_RNG && CRYPTO_DRBG
->>>     help
->>> @@ -1330,20 +1354,29 @@ config CRYPTO_USER_API_RNG_CAVP
->>>   
->>>       This should only be enabled for CAVP testing. You should say
->>>       no unless you know what this is.
->>>   
->>> config CRYPTO_USER_API_AEAD
->>> -    tristate "AEAD cipher algorithms"
->>> +    tristate "AEAD cipher algorithms (deprecated)"
->>>     depends on NET
->>>     select CRYPTO_AEAD
->>>     select CRYPTO_SKCIPHER
->>>     select CRYPTO_USER_API
->>>     help
->>> -      Enable the userspace interface for AEAD cipher algorithms.
->>> +      Enable the AF_ALG userspace interface for authenticated encryption
->>> +      with associated data (AEAD) algorithms.  This provides unprivileged
->>> +      userspace programs access to arbitrary AEAD algorithms
->>> implemented in
->>> +      the kernel's privileged execution context.
->>> +
->>> +      This interface is deprecated and is supported only for backwards
->>> +      compatibility.  It regularly has vulnerabilities, and the capabilities
->>> +      it provides are redundant with userspace crypto libraries.
->>> +
->>> +      Enable this only if needed for support for a program that
->>> hasn't yet
->>> +      been converted to userspace crypto, for example iwd.
->>>   
->>> -      See Documentation/crypto/userspace-if.rst and
->>> -      https://www.chronox.de/libkcapi/html/index.html
->>> +      See also Documentation/crypto/userspace-if.rst
->>>   
->>> config CRYPTO_USER_API_ENABLE_OBSOLETE
->>>     bool "Obsolete cryptographic algorithms"
->>>     depends on CRYPTO_USER_API
->>>     default y
->>>   
->>> base-commit: 57b8e2d666a31fa201432d58f5fe3469a0dd83ba
->>> --
->>> 2.54.0
->>>   
->>>   
->>
-> 
-
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
