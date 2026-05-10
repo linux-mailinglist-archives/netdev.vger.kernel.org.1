@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-286386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286387-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AG1rO6HcAGoXNwEAu9opvQ
-	(envelope-from <netdev+bounces-286386-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:29:37 +0200
+	id iLcUBrTcAGoXNwEAu9opvQ
+	(envelope-from <netdev+bounces-286387-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:29:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 742CD505F9D
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:29:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A78D1505FB3
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:29:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1FFC1301951D
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 19:29:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 19FC3301F486
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 19:29:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 556A832D0DE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55D5330301;
 	Sun, 10 May 2026 19:29:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vhldsl8c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QI0WKghc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ED1F32BF24;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917DF32ED39;
 	Sun, 10 May 2026 19:29:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778441350; cv=none; b=tn8qWtUbwyR3wqasJUjaLkZcGr4Vx15bttgHtYEegLE5DBSfSMJUzig3D/5XXVK56Nc3hYUvz0JcUqLKYPOXYhDeDbuTJhhWlq8u46fPJ13EmfaAi9EXMBK4ueB1KIRPceq4ROajqwWuy+X7CwG9H5VMU6o+4F87uDTd4OBDeb0=
+	t=1778441350; cv=none; b=tBPi1Ltm3eUD5s5TgSRjT199qtK3NHzagZE2yBvfhEG+ANGfwG+1x5NTnN+SWiVzE4t0UdIuM16UKIFfCsIcWMxZgKq5doCUIyVJT4Ur2XraBzN5/iYKBN9kU77a9e3EAiYEtZoZL9tL7JyDTcBxxDHaUWDHVOWIR7QGUkC3Uww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1778441350; c=relaxed/simple;
-	bh=L7LrkLgBXg7IKSLXsaQyWF1okpg5RNuXE/qMPhDVGhU=;
+	bh=NTXa2OzAR6LsAdljQYCQySpolQ9D92t/0E8nlVDX1iA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cY5rPNHsCKCfx5J9lC9gPaV8hQwb40BeqqiYodt8TAyqyJk591YmM2zio1l+5Abd/vr0pXYfN70XDn/W/5/sb8XSqINwTTLAdQfCLCfZYeL9TnQ8YgWqBPQ7ROvbcOdHNwX4NJT8/eVxcIqn0pKZHr2ZNjAD6Yd3rq0b2SfzY9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vhldsl8c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BC6AC2BCF7;
-	Sun, 10 May 2026 19:29:09 +0000 (UTC)
+	 MIME-Version; b=OagAT8QQmYCY7i/StOv/0MSk8c1RRQIoCCzeuF78me4VlxVgydPUge40RXnVG4k+pEb2Uz3xsmcIWtyJqQ2ZBSsjKoinagaQvDyEGKrDKUzAetxfeyjXAq/LComrgw7eEVWoGjh536rFQYxfjCyAyP7ujwvzjkwFx3HKwc594kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QI0WKghc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10FF6C2BCB8;
+	Sun, 10 May 2026 19:29:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778441349;
-	bh=L7LrkLgBXg7IKSLXsaQyWF1okpg5RNuXE/qMPhDVGhU=;
+	s=k20201202; t=1778441350;
+	bh=NTXa2OzAR6LsAdljQYCQySpolQ9D92t/0E8nlVDX1iA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Vhldsl8c5k04SBK4xLEEZyFtITyqrTJkoyfmVcMUTej6eyAmV2bT6jxojZxgFk+gO
-	 94+pX5E/IhgW19oxKp7MybGBnoxko2Oq26RpO5NMgbHfGXP3nVkqqJSckhsnKfXC62
-	 e6ZlOtIGOWM/9nXgA072G/XkWfbbOpuMsW05BTHBDMpTL764OiW+10ulP75dl/QVeP
-	 WnqhxbPA94IGb95+y7KvzdorRq3xxFv6muP/8LyyjAztu5IGlhOPMZU9WmFfYy69kD
-	 JboQ/MHYIAzF59NsghpDjGxILATiZ7wdkdSJb0boUEqnETNlG+cLEFnTkffBaS6Vbz
-	 i2F12wBCcGplA==
+	b=QI0WKghcpPlLzUriSz6h+EQ/s6S518f0NVXlc2uVF8d2SgfGrDPDOi2ZZQp01DM0i
+	 CWm5qqZ11ILs1zNuuVr5m1xEad7ESo6wTxzIEXRLfSZ141+i9AXZ+cUcf6D/wfIdcK
+	 fTY0qq68+4wxgD9gIqSbI1Z8HZF98qTm1kdkuVs46VwhVKmAPFSRikVCDbnrrvtyUk
+	 7YS5CHQA3rPmgi4OeK98Dx4IASsihL0PWYtM0Oi040B2CBXg3bgPylMuHGPmM7LPW2
+	 Sj4nkpl9zU6aweDds8eWxkpIgkM0dBvK1PK6Kq3ARnP+bTFzdGAuC9V07kY9YCtgzD
+	 6pXGKiZ9BgLjg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -54,9 +54,9 @@ Cc: netdev@vger.kernel.org,
 	shuah@kernel.org,
 	linux-kselftest@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net v2 02/10] net: shaper: fix trivial ordering issue in net_shaper_commit()
-Date: Sun, 10 May 2026 12:28:56 -0700
-Message-ID: <20260510192904.3987113-3-kuba@kernel.org>
+Subject: [PATCH net v2 03/10] net: shaper: reject duplicate leaves in GROUP request
+Date: Sun, 10 May 2026 12:28:57 -0700
+Message-ID: <20260510192904.3987113-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260510192904.3987113-1-kuba@kernel.org>
 References: <20260510192904.3987113-1-kuba@kernel.org>
@@ -67,7 +67,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 742CD505F9D
+X-Rspamd-Queue-Id: A78D1505FB3
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -75,7 +75,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -84,9 +84,9 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286386-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286387-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
@@ -99,51 +99,108 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-We should update the entry before we mark it as valid.
+net_shaper_nl_group_doit() does not deduplicate NET_SHAPER_A_LEAVES
+entries. When userspace supplies the same leaf handle twice, the same
+old-parent pointer lands twice in old_nodes[]. The cleanup loop double
+frees the parent. Of course the same parent may still be in old_nodes[]
+twice if we are moving multiple of its leaves.
 
-Fixes: 93954b40f6a4 ("net-shapers: implement NL set and delete operations")
+Note that this patch also implicitly fixes the fact that the
+i >= leaves_count path forgets to set ret.
+
+Fixes: 5d5d4700e75d ("net-shapers: implement NL group operation")
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/shaper/shaper.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ net/shaper/shaper.c | 60 +++++++++++++++++++++++++++++++++------------
+ 1 file changed, 45 insertions(+), 15 deletions(-)
 
 diff --git a/net/shaper/shaper.c b/net/shaper/shaper.c
-index d2b8f1f951b1..86319ddbf290 100644
+index 86319ddbf290..c8960821cf23 100644
 --- a/net/shaper/shaper.c
 +++ b/net/shaper/shaper.c
-@@ -295,6 +295,10 @@ net_shaper_lookup(struct net_shaper_binding *binding,
- 				       NET_SHAPER_VALID))
- 		return NULL;
- 
-+	/* Pairs with smp_wmb() in net_shaper_commit(): if the entry is
-+	 * valid, its contents must be visible too.
-+	 */
-+	smp_rmb();
- 	return xa_load(&hierarchy->shapers, index);
+@@ -941,6 +941,46 @@ static int net_shaper_handle_cmp(const struct net_shaper_handle *a,
+ 	return memcmp(a, b, sizeof(*a));
  }
  
-@@ -412,8 +416,9 @@ static void net_shaper_commit(struct net_shaper_binding *binding,
- 		/* Successful update: drop the tentative mark
- 		 * and update the hierarchy container.
- 		 */
--		__xa_set_mark(&hierarchy->shapers, index, NET_SHAPER_VALID);
- 		*cur = shapers[i];
-+		smp_wmb();
-+		__xa_set_mark(&hierarchy->shapers, index, NET_SHAPER_VALID);
- 	}
- 	xa_unlock(&hierarchy->shapers);
- }
-@@ -837,6 +842,10 @@ int net_shaper_nl_get_dumpit(struct sk_buff *skb,
- 	for (; (shaper = xa_find(&hierarchy->shapers, &ctx->start_index,
- 				 U32_MAX, NET_SHAPER_VALID));
- 	     ctx->start_index++) {
-+		/* Pairs with smp_wmb() in net_shaper_commit(): the entry
-+		 * is marked VALID, so its contents must be visible too.
-+		 */
-+		smp_rmb();
- 		ret = net_shaper_fill_one(skb, binding, shaper, info);
- 		if (ret)
- 			break;
++static int net_shaper_parse_leaves(struct net_shaper_binding *binding,
++				   struct genl_info *info,
++				   const struct net_shaper *node,
++				   struct net_shaper *leaves,
++				   int leaves_count)
++{
++	struct nlattr *attr;
++	int i, j, ret, rem;
++
++	i = 0;
++	nla_for_each_attr_type(attr, NET_SHAPER_A_LEAVES,
++			       genlmsg_data(info->genlhdr),
++			       genlmsg_len(info->genlhdr), rem) {
++		if (WARN_ON_ONCE(i >= leaves_count))
++			return -EINVAL;
++
++		ret = net_shaper_parse_leaf(binding, attr, info,
++					    node, &leaves[i]);
++		if (ret)
++			return ret;
++
++		/* Reject duplicates */
++		for (j = 0; j < i; j++) {
++			if (net_shaper_handle_cmp(&leaves[i].handle,
++						  &leaves[j].handle))
++				continue;
++
++			NL_SET_ERR_MSG_ATTR_FMT(info->extack, attr,
++						"Duplicate leaf shaper %d:%d",
++						leaves[i].handle.scope,
++						leaves[i].handle.id);
++			return -EINVAL;
++		}
++
++		i++;
++	}
++
++	return 0;
++}
++
+ static int net_shaper_parent_from_leaves(int leaves_count,
+ 					 const struct net_shaper *leaves,
+ 					 struct net_shaper *node,
+@@ -1197,10 +1237,9 @@ int net_shaper_nl_group_doit(struct sk_buff *skb, struct genl_info *info)
+ 	struct net_shaper **old_nodes, *leaves, node = {};
+ 	struct net_shaper_hierarchy *hierarchy;
+ 	struct net_shaper_binding *binding;
+-	int i, ret, rem, leaves_count;
++	int i, ret, leaves_count;
+ 	int old_nodes_count = 0;
+ 	struct sk_buff *msg;
+-	struct nlattr *attr;
+ 
+ 	if (GENL_REQ_ATTR_CHECK(info, NET_SHAPER_A_LEAVES))
+ 		return -EINVAL;
+@@ -1228,19 +1267,10 @@ int net_shaper_nl_group_doit(struct sk_buff *skb, struct genl_info *info)
+ 	if (ret)
+ 		goto free_leaves;
+ 
+-	i = 0;
+-	nla_for_each_attr_type(attr, NET_SHAPER_A_LEAVES,
+-			       genlmsg_data(info->genlhdr),
+-			       genlmsg_len(info->genlhdr), rem) {
+-		if (WARN_ON_ONCE(i >= leaves_count))
+-			goto free_leaves;
+-
+-		ret = net_shaper_parse_leaf(binding, attr, info,
+-					    &node, &leaves[i]);
+-		if (ret)
+-			goto free_leaves;
+-		i++;
+-	}
++	ret = net_shaper_parse_leaves(binding, info, &node,
++				      leaves, leaves_count);
++	if (ret)
++		goto free_leaves;
+ 
+ 	/* Prepare the msg reply in advance, to avoid device operation
+ 	 * rollback on allocation failure.
 -- 
 2.54.0
 
