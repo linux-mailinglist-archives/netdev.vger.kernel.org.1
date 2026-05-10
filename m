@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-286391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286392-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sLBQEvjcAGoZNwEAu9opvQ
-	(envelope-from <netdev+bounces-286391-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:31:04 +0200
+	id sIt8JAzdAGoZNwEAu9opvQ
+	(envelope-from <netdev+bounces-286392-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:31:24 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 092BC505FE9
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:31:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE94E505FF8
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:31:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AF81F302F385
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 19:29:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B96223032F4E
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 19:29:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D33CD3346A8;
-	Sun, 10 May 2026 19:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 770E7336881;
+	Sun, 10 May 2026 19:29:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WXpczE7x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s5TibhNY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B002E3164BA;
-	Sun, 10 May 2026 19:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54777335564;
+	Sun, 10 May 2026 19:29:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778441352; cv=none; b=YooEUZFPRqBxVG8eKl7MzyKioeTcKSV+QZgc2mAK6BLeLh4fEyEm+66/6DuefOJB4OBq/AmJLVuSCF3CjfhtyJkXXPq2mp4TvLgGGBks3gMMA9GE82zn9S8C5k2wj1cT9xRa4syUaOTCEgOnv4bj0nujGZrBXmxgP3DFvGwoAaw=
+	t=1778441353; cv=none; b=pXdne3W1zEOrAK2delubO53TQ2fe2EDBw0DOa4tinZ/uo/Z7ZiVykDO4wYPh6SurfKNVBmO8khBYXlwgUWzx2YU3YvACrAuEq/Qgi9k6LKEoTIsLVvCzPORebVRGsNc2WmFPoyFZTSMaOzjt1mLTwN+4kD+uYF+nk8ksuK9RyYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778441352; c=relaxed/simple;
-	bh=denafGZs684YNILiajoHJYhj7gvIGuG4BdoLhdY7GMk=;
+	s=arc-20240116; t=1778441353; c=relaxed/simple;
+	bh=6k4eCHJTBWFeleNsJMDu0yalSZFn75Hjwqd6QNayE6Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iRB6TGr6j509K3kHCweyFga5TPGgrKr9p8qxAR0nZ9u/R13DgMoqkj2GiJydGpuaV6tcdWBbp/mjTJlb4gUXw5ZX28kfY8ZNiN+OealNIkFNPUjlbQGbrodVVxCrau2m+cOi0iVVITFxYhGSF0W7UIx7flJDJmFGT31Sa4SmoCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WXpczE7x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A3CDC2BCFB;
+	 MIME-Version; b=RKNPOQIIPKsWNJNgR7/vVLNfGI8Hk8UAUAmSQo4EZP0UlVsjd9YAx9il9kryBa1VxXWPtDhPowCppX8PytG9ltVJ4ztvvYFEJ2VAjllqiO6CdIr3XPaao/RPuDmp7zCuZk5czAQ7EQEAWuTj06kh2GTIrbd08HcLmAl6DHjjpzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s5TibhNY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADB5CC2BCF7;
 	Sun, 10 May 2026 19:29:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778441352;
-	bh=denafGZs684YNILiajoHJYhj7gvIGuG4BdoLhdY7GMk=;
+	s=k20201202; t=1778441353;
+	bh=6k4eCHJTBWFeleNsJMDu0yalSZFn75Hjwqd6QNayE6Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WXpczE7x0UPhVi8o0rrVatkj1lodoAYsbVpu+PBwGsNKsKwsY2Mi6uSRfHaOSS1bD
-	 hZjhLz9B2OURtc5YlJkAKOeoki/rOAhVVhKrBgypzYQ97wofPRuJIFfiYuo83cMaZD
-	 xmJ4Gb8qWyC/DANMs0HySUNEuarQ2lvAzXfj3kMeOgVsw3h45ZKRSlYGOeBU1g2tPR
-	 0XOoEylHetEXTs2RF4zR6y6FTGzpsbQR7406HqDac4Ae+gh9pXOLBgqrf/ERTCBk7w
-	 9nG7Fp6zO+dKNr0v9c4fSd2LHAUZ9k+1BLPufxzyZRZRHmIiMfbXQpb/WXTNfoN5M3
-	 SwDvWN3GZ50lw==
+	b=s5TibhNYGcBTrrCLetgaTJZ96eJEnCkEfZxM+a+YJDQg3h9R0wnNUmZfixNHzZKSa
+	 A49EwqOfwgmvquX9P7GG+kpMxIqIz/bto3WWVB6+ZxdklVrE12BLYDfqStT2W2Ejnb
+	 clTtjzPavHgIvDci7f4ttqpvJWV13kHSWhgbvoeQSLe0osOgSYWrz+TQT0ttgRgzn7
+	 Dw9kRtOXHB9ZDGp5H16t3kuEeb/GnAQ74rNvB2b+SSMVFOghRFexXrBG0uYOd28AdU
+	 wChevVlziquyxB7ytCLWYsRHmgf6bPhL/zWB8Mcyc5xjn2YMKkYGrg7eI63gGLWACk
+	 lbLjKQm3ZxBYQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -53,12 +53,10 @@ Cc: netdev@vger.kernel.org,
 	horms@kernel.org,
 	shuah@kernel.org,
 	linux-kselftest@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	donald.hunter@gmail.com,
-	ast@fiberby.net
-Subject: [PATCH net v2 07/10] tools: ynl: add scope qualifier for definitions
-Date: Sun, 10 May 2026 12:29:01 -0700
-Message-ID: <20260510192904.3987113-8-kuba@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net v2 08/10] net: shaper: reject handle IDs exceeding internal bit-width
+Date: Sun, 10 May 2026 12:29:02 -0700
+Message-ID: <20260510192904.3987113-9-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260510192904.3987113-1-kuba@kernel.org>
 References: <20260510192904.3987113-1-kuba@kernel.org>
@@ -69,7 +67,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 092BC505FE9
+X-Rspamd-Queue-Id: EE94E505FF8
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -77,216 +75,136 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,fiberby.net];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286391-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286392-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.995];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Using definitions in kernel policies is awkward right now.
-On one hand we want defines for max values and such.
-On the other we don't have a way of adding kernel-only defines.
-Adding unnecessary defines to uAPI is a bad idea, we won't
-be able to delete them. And when it comes to policy user
-space should just query it via the policy dump, not use
-hard coded defines.
+net_shaper_parse_handle() reads the user-supplied handle ID via
+nla_get_u32(), accepting the full u32 range. However, the xarray key
+is built by net_shaper_handle_to_index() using
+FIELD_PREP(NET_SHAPER_ID_MASK, handle->id), where NET_SHAPER_ID_MASK
+is GENMASK(25, 0) - only 26 bits wide. FIELD_PREP silently masks off
+the upper bits at runtime. A user-supplied NODE id like 0x04000123
+becomes id 0x123.
 
-Add a "scope" property to definitions, which will let us tell
-the codegen that a definition is for kernel use only. Support
-following values:
-  - uapi: render into the uAPI header (default, today's behavior)
-  - kernel: render to kernel header only
-  - user: same as kernel but for the user-side generated header
+Additionally, a user-supplied id equal to NET_SHAPER_ID_UNSPEC
+(0x03FFFFFF, which is NET_SHAPER_ID_MASK itself) would collide with
+the sentinel used internally by the group operation to signal
+"allocate a new NODE id".
 
-Definitions may have a header property (definition is "external",
-provided by existing header). Extend the scope to headers, too.
-If definition has both scope and header properties we will only
-generate the includes in the right scope.
+Reject user-supplied IDs >= NET_SHAPER_ID_MASK (i.e., >= 0x03FFFFFF)
+in the policy.
 
+Fixes: 4b623f9f0f59 ("net-shapers: implement NL get operation")
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-This will fail yamllint, sticking to the same format as the rest
-of the file (extra spaces inside brackets).
+ Documentation/netlink/specs/net_shaper.yaml | 7 +++++++
+ net/shaper/shaper_nl_gen.h                  | 2 ++
+ net/shaper/shaper.c                         | 4 +++-
+ net/shaper/shaper_nl_gen.c                  | 7 ++++++-
+ 4 files changed, 18 insertions(+), 2 deletions(-)
 
-CC: donald.hunter@gmail.com
-CC: ast@fiberby.net
----
- Documentation/netlink/genetlink-c.yaml      |  9 ++++++
- Documentation/netlink/genetlink-legacy.yaml |  9 ++++++
- Documentation/netlink/genetlink.yaml        |  9 ++++++
- Documentation/netlink/netlink-raw.yaml      |  9 ++++++
- tools/net/ynl/pyynl/ynl_gen_c.py            | 31 +++++++++++++++++++--
- 5 files changed, 65 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/netlink/genetlink-c.yaml b/Documentation/netlink/genetlink-c.yaml
-index 57f59fe23e3f..4ea31e8fc4d1 100644
---- a/Documentation/netlink/genetlink-c.yaml
-+++ b/Documentation/netlink/genetlink-c.yaml
-@@ -69,6 +69,15 @@ additionalProperties: False
-         header:
-           description: For C-compatible languages, header which already defines this value.
-           type: string
-+        scope:
-+          description: |
-+            Visibility of this definition. "uapi" (default) renders into
-+            the uAPI header, "kernel" renders into the kernel-side
-+            generated header, "user" renders into the user-side
-+            generated header. When combined with `header:`, the
-+            definition is not rendered, and the named header is
-+            included only by code matching the scope.
-+          enum: [ uapi, kernel, user ]
-         type:
-           enum: [ const, enum, flags ]
-         doc:
-diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
-index 66fb8653a344..f9c44747729a 100644
---- a/Documentation/netlink/genetlink-legacy.yaml
-+++ b/Documentation/netlink/genetlink-legacy.yaml
-@@ -83,6 +83,15 @@ additionalProperties: False
-         header:
-           description: For C-compatible languages, header which already defines this value.
-           type: string
-+        scope:
-+          description: |
-+            Visibility of this definition. "uapi" (default) renders into
-+            the uAPI header, "kernel" renders into the kernel-side
-+            generated header, "user" renders into the user-side
-+            generated header. When combined with `header:`, the
-+            definition is not rendered, and the named header is
-+            included only by code matching the scope.
-+          enum: [ uapi, kernel, user ]
-         type:
-           enum: [ const, enum, flags, struct ] # Trim
-         doc:
-diff --git a/Documentation/netlink/genetlink.yaml b/Documentation/netlink/genetlink.yaml
-index a1194d5d93fc..d3f3f3399ddf 100644
---- a/Documentation/netlink/genetlink.yaml
-+++ b/Documentation/netlink/genetlink.yaml
-@@ -55,6 +55,15 @@ additionalProperties: False
-         header:
-           description: For C-compatible languages, header which already defines this value.
-           type: string
-+        scope:
-+          description: |
-+            Visibility of this definition. "uapi" (default) renders into
-+            the uAPI header, "kernel" renders into the kernel-side
-+            generated header, "user" renders into the user-side
-+            generated header. When combined with `header:`, the
-+            definition is not rendered, and the named header is
-+            included only by code matching the scope.
-+          enum: [ uapi, kernel, user ]
-         type:
-           enum: [ const, enum, flags ]
-         doc:
-diff --git a/Documentation/netlink/netlink-raw.yaml b/Documentation/netlink/netlink-raw.yaml
-index dd98dda55bd0..4c436b59a34b 100644
---- a/Documentation/netlink/netlink-raw.yaml
-+++ b/Documentation/netlink/netlink-raw.yaml
-@@ -87,6 +87,15 @@ additionalProperties: False
-         header:
-           description: For C-compatible languages, header which already defines this value.
-           type: string
-+        scope:
-+          description: |
-+            Visibility of this definition. "uapi" (default) renders into
-+            the uAPI header, "kernel" renders into the kernel-side
-+            generated header, "user" renders into the user-side
-+            generated header. When combined with `header:`, the
-+            definition is not rendered, and the named header is
-+            included only by code matching the scope.
-+          enum: [ uapi, kernel, user ]
-         type:
-           enum: [ const, enum, flags, struct ] # Trim
-         doc:
-diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-index 0e1e486c1185..cdc3646f2642 100755
---- a/tools/net/ynl/pyynl/ynl_gen_c.py
-+++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -3212,6 +3212,8 @@ _C_KW = {
-     for const in family['definitions']:
-         if const.get('header'):
-             continue
-+        if const.get('scope', 'uapi') != 'uapi':
-+            continue
+diff --git a/Documentation/netlink/specs/net_shaper.yaml b/Documentation/netlink/specs/net_shaper.yaml
+index 3f2ad772b64b..de01f922040a 100644
+--- a/Documentation/netlink/specs/net_shaper.yaml
++++ b/Documentation/netlink/specs/net_shaper.yaml
+@@ -33,6 +33,11 @@ doc: |
+   @cap-get operation.
  
-         if const['type'] != 'const':
-             cw.writes_defines(defines)
-@@ -3339,6 +3341,25 @@ _C_KW = {
-     cw.p(f'#endif /* {hdr_prot} */')
+ definitions:
++  -
++    type: const
++    name: max-handle-id
++    value: 0x3fffffe
++    scope: kernel
+   -
+     type: enum
+     name: scope
+@@ -140,6 +145,8 @@ doc: |
+       -
+         name: id
+         type: u32
++        checks:
++          max: max-handle-id
+         doc: |
+           Numeric identifier of a shaper. The id semantic depends on
+           the scope. For @queue scope it's the queue id and for @node
+diff --git a/net/shaper/shaper_nl_gen.h b/net/shaper/shaper_nl_gen.h
+index 42c46c52c775..2406652a9014 100644
+--- a/net/shaper/shaper_nl_gen.h
++++ b/net/shaper/shaper_nl_gen.h
+@@ -12,6 +12,8 @@
  
+ #include <uapi/linux/net_shaper.h>
  
-+def render_scoped_consts(family, cw, scope):
-+    defines = []
-+    for const in family['definitions']:
-+        if const['type'] != 'const':
-+            continue
-+        if const.get('header'):
-+            continue
-+        if const.get('scope') != scope:
-+            continue
-+        name_pfx = const.get('name-prefix', f"{family.ident_name}-")
-+        defines.append([
-+            c_upper(family.get('c-define-name',
-+                               f"{name_pfx}{const['name']}")),
-+            const['value']])
-+    if defines:
-+        cw.writes_defines(defines)
-+        cw.nl()
++#define NET_SHAPER_MAX_HANDLE_ID	67108862
 +
-+
- def _render_user_ntf_entry(ri, op):
-     if not ri.family.is_classic():
-         ri.cw.block_start(line=f"[{op.enum_name}] = ")
-@@ -3504,8 +3525,12 @@ _C_KW = {
-             cw.p('#include "ynl.h"')
-         headers = []
-     for definition in parsed['definitions'] + parsed['attribute-sets']:
--        if 'header' in definition:
--            headers.append(definition['header'])
-+        if 'header' not in definition:
-+            continue
-+        scope = definition.get('scope', 'uapi')
-+        if scope != 'uapi' and scope != args.mode:
-+            continue
-+        headers.append(definition['header'])
-     if args.mode == 'user':
-         headers.append(parsed.uapi_header)
-     seen_header = []
-@@ -3522,6 +3547,7 @@ _C_KW = {
-             for one in args.user_header:
-                 cw.p(f'#include "{one}"')
-         else:
-+            render_scoped_consts(parsed, cw, 'user')
-             cw.p('struct ynl_sock;')
-             cw.nl()
-             render_user_family(parsed, cw, True)
-@@ -3529,6 +3555,7 @@ _C_KW = {
+ /* Common nested types */
+ extern const struct nla_policy net_shaper_handle_nl_policy[NET_SHAPER_A_HANDLE_ID + 1];
+ extern const struct nla_policy net_shaper_leaf_info_nl_policy[NET_SHAPER_A_WEIGHT + 1];
+diff --git a/net/shaper/shaper.c b/net/shaper/shaper.c
+index 08fde2d9e8aa..eb049847fed6 100644
+--- a/net/shaper/shaper.c
++++ b/net/shaper/shaper.c
+@@ -21,6 +21,8 @@
  
-     if args.mode == "kernel":
-         if args.header:
-+            render_scoped_consts(parsed, cw, 'kernel')
-             for _, struct in sorted(parsed.pure_nested_structs.items()):
-                 if struct.request:
-                     cw.p('/* Common nested types */')
+ #define NET_SHAPER_ID_UNSPEC NET_SHAPER_ID_MASK
+ 
++static_assert(NET_SHAPER_ID_UNSPEC == NET_SHAPER_MAX_HANDLE_ID + 1);
++
+ struct net_shaper_hierarchy {
+ 	struct xarray shapers;
+ };
+@@ -360,7 +362,7 @@ static int net_shaper_pre_insert(struct net_shaper_binding *binding,
+ 	    handle->id == NET_SHAPER_ID_UNSPEC) {
+ 		u32 min, max;
+ 
+-		handle->id = NET_SHAPER_ID_MASK - 1;
++		handle->id = NET_SHAPER_MAX_HANDLE_ID;
+ 		max = net_shaper_handle_to_index(handle);
+ 		handle->id = 0;
+ 		min = net_shaper_handle_to_index(handle);
+diff --git a/net/shaper/shaper_nl_gen.c b/net/shaper/shaper_nl_gen.c
+index 9b29be3ef19a..76eff85ec66d 100644
+--- a/net/shaper/shaper_nl_gen.c
++++ b/net/shaper/shaper_nl_gen.c
+@@ -11,10 +11,15 @@
+ 
+ #include <uapi/linux/net_shaper.h>
+ 
++/* Integer value ranges */
++static const struct netlink_range_validation net_shaper_a_handle_id_range = {
++	.max	= NET_SHAPER_MAX_HANDLE_ID,
++};
++
+ /* Common nested types */
+ const struct nla_policy net_shaper_handle_nl_policy[NET_SHAPER_A_HANDLE_ID + 1] = {
+ 	[NET_SHAPER_A_HANDLE_SCOPE] = NLA_POLICY_MAX(NLA_U32, 3),
+-	[NET_SHAPER_A_HANDLE_ID] = { .type = NLA_U32, },
++	[NET_SHAPER_A_HANDLE_ID] = NLA_POLICY_FULL_RANGE(NLA_U32, &net_shaper_a_handle_id_range),
+ };
+ 
+ const struct nla_policy net_shaper_leaf_info_nl_policy[NET_SHAPER_A_WEIGHT + 1] = {
 -- 
 2.54.0
 
