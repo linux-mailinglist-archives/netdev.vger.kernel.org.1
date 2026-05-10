@@ -1,180 +1,205 @@
-Return-Path: <netdev+bounces-286256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286257-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8C98HRlIAGqnFwEAu9opvQ
-	(envelope-from <netdev+bounces-286256-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 10:55:53 +0200
+	id 6CknMJpIAGqnFwEAu9opvQ
+	(envelope-from <netdev+bounces-286257-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 10:58:02 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D62735033A1
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 10:55:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 226535033E8
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 10:58:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 42CA9300DDF1
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 08:55:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 62A22300D6B8
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 08:58:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ED7C366067;
-	Sun, 10 May 2026 08:55:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0152136A033;
+	Sun, 10 May 2026 08:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="q2M+ss8G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lJU25zPk"
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED100261B9B;
-	Sun, 10 May 2026 08:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0D92308F32;
+	Sun, 10 May 2026 08:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778403349; cv=none; b=ezZcLlRllgS9t7qMZyb5v/Uhr04VlHUSc0mX8eYOYoF8KPctnYv1bX8wv70rZ74tJnjRiCQjS2WpeOfcwWu4nItwe3tCaxNC5HnUa14rMNX3oV9MJBxxGzegjO9RQgWrj4869RhPZj66YAj5Aj07s8pcTuKB8UPFpuIEAYOU1x8=
+	t=1778403479; cv=none; b=uyUUeOPn5ZQSTopUuFmCenwGb19uZmdQLw2tN6IdQSPXmV+srTw6r5RHBpDalOhXaOqHLsXyjOr9VmPLN645yBbgRALYhKnEc9rDOYNNIhL5EsjFWryR7x+/2NA12HMzm0MSkcISpBVa4Su4E2V8tF5/NuzGKTTGn+cFBNtbs58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778403349; c=relaxed/simple;
-	bh=SMtUBZVMpeWH0EUz8sz4vwGLAJFddGEKbluqXrcLqGs=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=OGeoQn0+11wYlUBlfCozZsw2ACves9HS3ohlx5X5RPeot8Py1HzYfz6gHMnqETgME0W+lkafvJ58ev8T2cDmiUbyTB+7YF3BDc5ocg2SQyn7e+889mycvZ1sPEa1da8wuFnyjw6I1GPcQwPG3PpHCU3epoQBbjdZVYwdCC6zJkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=q2M+ss8G; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1778403337;
-	bh=SMtUBZVMpeWH0EUz8sz4vwGLAJFddGEKbluqXrcLqGs=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To;
-	b=q2M+ss8GMuJQwsh+4igsxbIxovcV/Uph7HK0UOCwH2lX3SUERqFdBv9KZyvXH4mmV
-	 /PvWT1RklQGsWaPYv2WMXRmOPafE4IUW1EyLK3Zm1B4pqRsSWw20B7Ngnko1aQKKrc
-	 XG57hSspQw4AfBzZZeMltdH1BKMRKhXvfuaJ1wws=
-Received: from [192.168.178.180] (pd9eaa57d.dip0.t-ipconnect.de [217.234.165.125])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.19.0.1/8.19.0.1) with ESMTPSA id 64A8tY2l026597
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Sun, 10 May 2026 10:55:34 +0200 (CEST)
-Message-ID: <9a4458fc-61f2-469b-8260-f144d3827b5d@tu-dortmund.de>
-Date: Sun, 10 May 2026 10:55:34 +0200
+	s=arc-20240116; t=1778403479; c=relaxed/simple;
+	bh=FNDuC7oCPX7tr3C9D3AUsfZHOsDaY4QftAvCxL6a95g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E+7+m0beneS8VU7ceOpIaRoUT2A3x5+sJ18099e9MwW2gx+NhyoaS3Dj2D9WCnZ5LPnNLFKhXeHoAjXhaQ7ga2JOicipEvB2Z3sajjgtWQVDCHvHez+/rP54CChf7J/ZoGusW24hbXARg8AeoqnRIcutbcBRGr8uAXHeq6MTj0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lJU25zPk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8DF3C2BCB8;
+	Sun, 10 May 2026 08:57:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778403479;
+	bh=FNDuC7oCPX7tr3C9D3AUsfZHOsDaY4QftAvCxL6a95g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lJU25zPkezZNxxAKPS1UvRg+V7DIGwXfisFOCqjmw/qj1GeoYKUn6rxhHw1/S6u1D
+	 az8zl5uJ7f1q9lsoXL0k37wZTz1ClmGlNb32ouyushLCOGNCmCyvQhRg50QTKv8Tfe
+	 jQpHysclDUYd+s0RGHhFzLqdVUbDDqHoFJuyqBs+WzIfe01lghkRhy5Q4IIMyHjc/S
+	 89XYsukKapzYhYw9Z8U+wV2ZAQGebMJKNMXHZuEPZgI2EUExzq+ojjEz8bGiiyzuco
+	 iDABmf2ooHrQgARfZ7wheBHg0TUuS7amjZPtQUaPkzxaCENFJ55JbwvCGKFgZclNWR
+	 z33jWLBdN8m8w==
+Date: Sun, 10 May 2026 09:57:54 +0100
+From: Simon Horman <horms@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, kohei@enjuk.jp, jacob.e.keller@intel.com,
+	aleksandr.loktionov@intel.com,
+	nxne.cnse.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH iwl-next v5 3/5] ice: migrate to netdev ops lock
+Message-ID: <20260510085754.GT15617@horms.kernel.org>
+References: <20260505152923.1040589-4-aleksander.lobakin@intel.com>
+ <20260508132827.1183079-3-horms@kernel.org>
+ <5eab9525-6fbd-46ae-8464-12ca9472bea1@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 1/4] tun/tap: add ptr_ring consume helper
- with netdev queue wakeup
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
-        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
-        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev
-References: <20260508151048.183125-1-simon.schippers@tu-dortmund.de>
- <20260508151048.183125-2-simon.schippers@tu-dortmund.de>
- <dd0a3ef1-d623-4e09-a391-b56fa4bf95af@tu-dortmund.de>
- <20260509183518-mutt-send-email-mst@kernel.org>
- <a14b700a-94e8-44c0-bde0-d8307761c0f1@tu-dortmund.de>
-Content-Language: en-US
-In-Reply-To: <a14b700a-94e8-44c0-bde0-d8307761c0f1@tu-dortmund.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: D62735033A1
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5eab9525-6fbd-46ae-8464-12ca9472bea1@intel.com>
+X-Rspamd-Queue-Id: 226535033E8
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
-	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286256-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286257-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tu-dortmund.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid,sashiko.dev:url]
 X-Rspamd-Action: no action
 
-On 5/10/26 09:03, Simon Schippers wrote:
-> On 5/10/26 00:44, Michael S. Tsirkin wrote:
->> On Sat, May 09, 2026 at 06:31:47PM +0200, Simon Schippers wrote:
->>> On 5/8/26 17:10, Simon Schippers wrote:
->>>> +static void tun_queue_purge(struct tun_struct *tun, struct tun_file *tfile)
->>>>  {
->>>>  	void *ptr;
->>>>  
->>>> -	while ((ptr = ptr_ring_consume(&tfile->tx_ring)) != NULL)
->>>> +	while ((ptr = tun_ring_consume(tun, tfile)) != NULL)
->>>>  		tun_ptr_free(ptr);
->>>>  
->>>>  	skb_queue_purge(&tfile->sk.sk_write_queue);
->>>
->>> Sashiko is right once again. tun_ring_consume() in tun_queue_purge()
->>> operates on a tfile that is being torn down. Its queue_index is no
->>> longer valid. After the swap in __tun_detach(), it points to the
->>> netdev subqueue of a different tfile.
->>> --> We should not wake there.
->>
->> Does it not exactly point at ntfile which is what we want to wake?
->>
+On Fri, May 08, 2026 at 03:57:25PM +0200, Alexander Lobakin wrote:
+> From: Simon Horman <horms@kernel.org>
+> Date: Fri,  8 May 2026 14:28:29 +0100
 > 
-> I see your point. But calling tun_ring_consume() as done here is
-> wrong, because it does not wake if the tx_ring of the tfile 
-> (that is currently torn down) is empty. We could change
-> tun_ring_consume() to call __tun_wake_queue()
-> with consumed=0 if !ptr but I think this would slow down the consumer
-> path.
->
-
-My statement is wrong:
-There is no way that the tx_ring is empty and the queue is stopped
-at the same time. So we do not need to touch tun_ring_consume() and
-this works just fine.
-
->>
->>> I will swap tun_ring_consume() with ptr_ring_consume() again and
->>> submit a v12 :)
->>
->> If so then maybe
->> netif_tx_wake_queue(netdev_get_tx_queue(tun->dev, index));
->>
+> > From: 'Simon Horman' <horms@kernel.org>
+> > 
+> > This is an AI-generated review of your patch. The human sending this
+> > email has considered the AI review valid, or at least plausible.
+> > Full review at: https://sashiko.dev
+> > ---
+> >     ice: migrate to netdev ops lock
+> > 
+> > This commit migrates queue management operations to use netdev locking.
+> > It updates several NAPI and VSI configuration functions to use their
+> > _locked variants to avoid deadlocks, taking the lock manually where needed.
+> > 
+> >> diff --git a/drivers/net/ethernet/intel/ice/ice_dcb_lib.c b/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
+> >> index 16aa255351523..7d89c0acc5d8d 100644
+> >> --- a/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
+> >> +++ b/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
+> > [ ... ]
+> >> @@ -1107,7 +1106,7 @@ ice_dcb_process_lldp_set_mib_change(struct ice_pf *pf,
+> >>  
+> >>  	rtnl_lock();
+> >>  	/* disable VSIs affected by DCB changes */
+> >> -	ice_dcb_ena_dis_vsi(pf, false, true);
+> >> +	ice_dcb_ena_dis_vsi(pf, false);
+> >>  
+> >>  	ret = ice_query_port_ets(pi, &buf, sizeof(buf), NULL);
+> >>  	if (ret) {
+> >> @@ -1119,7 +1118,7 @@ ice_dcb_process_lldp_set_mib_change(struct ice_pf *pf,
+> >>  	ice_pf_dcb_recfg(pf, false);
+> >>  
+> >>  	/* enable previously downed VSIs */
+> >> -	ice_dcb_ena_dis_vsi(pf, true, true);
+> >> +	ice_dcb_ena_dis_vsi(pf, true);
+> >>  unlock_rtnl:
+> >>  	rtnl_unlock();
+> >>  out:
+> > 
+> > This wasn't introduced by this patch, but does this error path leave VSIs
+> > permanently disabled?
+> > 
+> > If ice_query_port_ets() fails, the code jumps to unlock_rtnl, bypassing the
+> > call to ice_dcb_ena_dis_vsi(pf, true). This seems to leave the affected VSIs
+> > (including the main PF interface) in a disabled state (ICE_VSI_DOWN) with
+> > ICE_VSI_NEEDS_RESTART set, which could result in a denial of service.
+> > 
+> >> diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+> >> index 2e4f0969035f7..af0cc77fbf718 100644
+> >> --- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
+> >> +++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+> >> @@ -23,10 +23,16 @@ static int ice_eswitch_setup_env(struct ice_pf *pf)
+> >>  	struct net_device *netdev = uplink_vsi->netdev;
+> >>  	bool if_running = netif_running(netdev);
+> >>  	struct ice_vsi_vlan_ops *vlan_ops;
+> >> +	int ret;
+> >> +
+> >> +	if (if_running && !test_and_set_bit(ICE_VSI_DOWN, uplink_vsi->state)) {
+> >> +		netdev_lock(netdev);
+> >> +		ret = ice_down(uplink_vsi);
+> >> +		netdev_unlock(netdev);
+> >>  
+> >> -	if (if_running && !test_and_set_bit(ICE_VSI_DOWN, uplink_vsi->state))
+> >> -		if (ice_down(uplink_vsi))
+> >> +		if (ret)
+> >>  			return -ENODEV;
+> >> +	}
+> > 
+> > Simon says: It seems that the topic of locks in this patch has come up
+> >             again ¯\_(ツ)_/¯
+> > 
+> > Does manipulating the state bit outside of netdev_lock create a race
+> > condition with interface teardown?
+> > 
+> > If the interface is concurrently brought down, ndo_stop (which holds
+> > netdev_lock) would call ice_vsi_close(). Because ICE_VSI_DOWN is already
+> > set by the test_and_set_bit() call above, ice_vsi_close() would skip calling
+> > ice_down() and immediately proceed to free the Tx/Rx rings.
+> > 
+> > This would leave the hardware queues active and performing DMA operations into
+> > freed memory, potentially causing a use-after-free.
 > 
-> But we should only do this if there is space in the ntfile.
-> My approach:
+> I ran Sashiko internally a couple times and it hasn't found these =\
 > 
-> @@ -586,12 +588,18 @@ static void __tun_detach(struct tun_file *tfile, bool clean)
->  		BUG_ON(index >= tun->numqueues);
->  
->  		rcu_assign_pointer(tun->tfiles[index],
->  				   tun->tfiles[tun->numqueues - 1]);
->  		ntfile = rtnl_dereference(tun->tfiles[index]);
-> +		spin_lock(&ntfile->tx_ring.consumer_lock);
->  		ntfile->queue_index = index;
->  		ntfile->xdp_rxq.queue_index = index;
-> +		ntfile->cons_cnt = 0;
-> +		if (__ptr_ring_empty(&ntfile->tx_ring)) {
-> +			netif_wake_subqueue(tun->dev, index);
-> +		}
-> +		spin_unlock(&ntfile->tx_ring.consumer_lock);
->  		rcu_assign_pointer(tun->tfiles[tun->numqueues - 1],
->  				   NULL);
+> Anyway, now that I anyway need to adjust the series after
+> .ndo_set_rx_mode_asyn() landed, I'll take a look at this, too.
 > 
-> ntfile->cons_cnt is unvalid, because the new queue might not be stopped.
-> That is the reason why I reset it to 0.
+> (I hate this series already. I feel like if Sashiko was alive when other
+>  vendors were switching to the netdev lock, they'd have the same drama)
 
-However, I still prefer this approach because the code is easier to
-understand.
+Life is certainly different with Sashiko.
+No question about it.
 
+> 
+> (I was planning to add devmem/io_uring support to idpf after this lands,
+>  but given that idpf is way more confusing and inconsistent in locking,
+>  I'm not sure I'll have enough patience :D)
+> 
+> Thanks,
+> Olek
 
