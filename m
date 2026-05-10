@@ -1,250 +1,204 @@
-Return-Path: <netdev+bounces-286400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286401-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iKFpMLLrAGrbOQEAu9opvQ
-	(envelope-from <netdev+bounces-286400-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 22:33:54 +0200
+	id 9PCrCm7yAGo9OwEAu9opvQ
+	(envelope-from <netdev+bounces-286401-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 23:02:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D5905063F7
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 22:33:54 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FAD550663F
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 23:02:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9CECF300336D
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 20:33:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E67A23005E83
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65A2E334C1F;
-	Sun, 10 May 2026 20:33:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ncJkTBM8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C1322FC876;
+	Sun, 10 May 2026 21:02:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f80.google.com (mail-ot1-f80.google.com [209.85.210.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961DD3242B2;
-	Sun, 10 May 2026 20:33:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AACA2571A9
+	for <netdev@vger.kernel.org>; Sun, 10 May 2026 21:02:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778445232; cv=none; b=utvVT92BZrebmQJH9P+KM4iIr0FsWdxPAqZCjT4xiI4RWNOPtZRM0UZEifM2vvT+IEBCIrNrh4v0xu6eAwa1cw1uL4xtZJV+fxMwctZi4rYgHLK+75dr8lj8xYhdfeBK9/YXEMw02rsSPdjxO77gG8x6QqowiTLNPKdPtaWcLj4=
+	t=1778446955; cv=none; b=nTwZ7xQ7uesvCrZ7JN6mjzc5bsy4xOb2VNE5QESrlyNyyRx+B+L3TX0yr6TZ0jJyWejuJ3rKFO7TzZIzCjOTVLl4r5sHSyob1ci+IlDV0Is6ASKDFK6AhUfWO9M78LniwdO6BcP6/O88p/xxlsk67bKT5ikUERogGvX0/PXSagk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778445232; c=relaxed/simple;
-	bh=2wUKSUSHE9scw9qUgXRw9l/unI/4n7ehob9Z2USC7nM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ectqCW2UOSe64V2a1fAXxZ8gdXQ2IqRs/Wm30yIcxk8Hbg5Yx+F7XXG3aZWPLYjJsqOdRm+n3pCzBTKQWXRRaop7rk9THl8avgYe9l/5+fkMV6q5RUgGxaSkYX0iedKeBiwqlkiWgG1frc+cBZQ6lOt91cUPIFqem8iKhUuDLnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ncJkTBM8; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <d7de2f17-af2d-4b6a-be65-f009d78e3d20@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1778445218;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mfKcMPHY9ZAK6g9Oz7/PqAZZMUwyLIAqYyCYd/6iX70=;
-	b=ncJkTBM8dnCNpZlfbou7tRQnvzbA5UHpRuL6tjhpE8qRJElAZt+w4X/jfwsa+TPwXOg7d3
-	k6ZFIC1gZ36v/S33lAXeBRU9+khsKtxurPyC3l46D4P+ppuriVat8xTa0i2qwxUqTlzujK
-	I/2d/vw9sboE6jITMTS+qCOnfoXsNl4=
-Date: Sun, 10 May 2026 13:33:18 -0700
+	s=arc-20240116; t=1778446955; c=relaxed/simple;
+	bh=qiMiUP4GWNA2w9vRiyBT9N3XWrpmuvhai0+xrt4hld8=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=sodPIRYnX+4s0Rj2h1KxKeatM3Vj4Qm8FC3xVS0/UCLPQWmdMueWw63xxPywVMjo55oK5eRLQFwuu1/qBUGtoUriQYbdQg73TwoKK5tKCAmbyNsu47rmVHUjPvlR13uQDThYRhhXwSBQygSUlcDjf5lMyTIJvjYWLTlMQeMPcG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f80.google.com with SMTP id 46e09a7af769-7de75c9be4aso7692607a34.0
+        for <netdev@vger.kernel.org>; Sun, 10 May 2026 14:02:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778446952; x=1779051752;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tQFzIGJ6E8REtW8EJbiqWNpybEWzfPqgcYj9hEdNyVo=;
+        b=FsjCRC6QGNx79EapvatwZUgKG/nPx/s/cwybupX352D4UENjlfQVVYa/HZ0UfzMZ0b
+         kXkv/jJ5uCZRoFtqr7bmmRC1ocsRkUZK9HKXgqDHPvpVDpSo3eUUJQpMj8NIer0JyIae
+         uYceNFgizjb8RhMinoZLOqoeKrfTRQS1IcpEABetktsDsT0QwrV5gPBxWHfHIk4XVByC
+         y8eStWpfDeXUv/yt3cN0sm2UfHb0cHUVUbEOX7yXkOcr3HdsFhkUt+nbXOBOHlVi/tWJ
+         XhK1+zciYQRQGjXUbDCGouwQF/ODoqVEqTqcYaUFu65XyQOuoTAVCCb5f1KiM3d9fPcY
+         NW5Q==
+X-Forwarded-Encrypted: i=1; AFNElJ926QDDNY8qXJ9gJgHZSWFItuvpOS/P0kXGrXaiN6Q54+Vz2jwJ38lw4G/GiiqKR98gNFWy7us=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywt7PGryTZuI7I9eEZzPKNBo8KusSL8eS4KEIMr21AOnpu0YQn+
+	wxGqg/hkdYdBX2sSR1TNJoyoWFofp8cqLT40jtaRGJWvZjBLG4Pi2d5+BNE83k2nDY0k1WSNp1f
+	A/Dc1XwHCgsZihReDgcjxhHsX2vOhoRbW9mpR/GuFBspB4rkl1q8szbkE+a0=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v3 0/8] net: devmem: support devmem with netkit
- devices
-To: Bobby Eshleman <bobbyeshleman@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <skhan@linuxfoundation.org>, Alex Shi <alexs@kernel.org>,
- Yanteng Si <si.yanteng@linux.dev>, Dongliang Mu <dzm91@hust.edu.cn>,
- Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>,
- Joshua Washington <joshwash@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com,
- Daniel Borkmann <daniel@iogearbox.net>,
- Nikolay Aleksandrov <razor@blackwall.org>, Shuah Khan <shuah@kernel.org>,
- "yanjun.zhu@linux.dev" <yanjun.zhu@linux.dev>
-Cc: dw@davidwei.uk, sdf.kernel@gmail.com, mohsin.bashr@gmail.com,
- willemb@google.com, jiang.kun2@zte.com.cn, xu.xin16@zte.com.cn,
- wang.yaxin@zte.com.cn, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Stanislav Fomichev <sdf@fomichev.me>, Mina Almasry <almasrymina@google.com>,
- Bobby Eshleman <bobbyeshleman@meta.com>
-References: <20260507-tcp-dm-netkit-v3-0-52821445867c@meta.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20260507-tcp-dm-netkit-v3-0-52821445867c@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 5D5905063F7
+X-Received: by 2002:a05:6820:2905:b0:696:924d:2956 with SMTP id
+ 006d021491bc7-69998cc6047mr12641138eaf.14.1778446952588; Sun, 10 May 2026
+ 14:02:32 -0700 (PDT)
+Date: Sun, 10 May 2026 14:02:32 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a00f268.170a0220.1c0296.021c.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in mac80211_hwsim_tx (2)
+From: syzbot <syzbot+435fdb053cf98bfa5778@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 7FAD550663F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=59da38148f3a3d24];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286400-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,linux.dev,hust.edu.cn,broadcom.com,nvidia.com,fb.com,meta.com,iogearbox.net,blackwall.org];
-	RCPT_COUNT_TWELVE(0.00)[42];
-	FREEMAIL_CC(0.00)[davidwei.uk,gmail.com,google.com,zte.com.cn,vger.kernel.org,fomichev.me,meta.com];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yanjun.zhu@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nk_devmem.py:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim]
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286401-lists,netdev=lfdr.de,435fdb053cf98bfa5778];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.996];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,goo.gl:url,appspotmail.com:email]
 X-Rspamd-Action: no action
 
-在 2026/5/7 19:27, Bobby Eshleman 写道:
-> This series enables TCP devmem TX through netkit devices.
-> 
-> Netkit now supports queue leasing. A physical NIC's RX queue can be
-> leased to a netkit guest interface inside a container namespace. This
-> gives the container a devmem-capable data path on the RX side (bind-rx,
-> etc...). On the TX side, the container process binds to its netkit guest
-> interface and sends traffic that netkit redirects (via BPF or ip
-> forwarding) to the physical NIC for DMA.
-> 
-> Two things in the existing devmem TX path prevent this from working:
-> 
-> 1. validate_xmit_unreadable_skb() requires dev->netmem_tx before it will
->     forward a dmabuf-backed (unreadable) skb. This protects skbs from
->     landing on devices that don't have the IOMMU mappings for the backing
->     dmabuf or that don't speak netmem. Netkit, however, does not support
->     DMA, doesn't attempt to read unreadable skb pages and so doesn't
->     break netmem (it is pure skb routing and redirection). It is
->     functionally capable of routing unreadable skbs, but there is no way
->     for the TX validation pathway to distinguish between a device that
->     will actually attempt DMA-ing the skb and another device
->     (like netkit) that does not DMA but also does not break
->     netmem.
-> 
-> 2. bind_tx_doit uses the bound device as the DMA device.  When the user
->     binds devmem TX to the netkit guest, the bind handler attempts to
->     create DMA mappings against netkit, which has no DMA capability and
->     no IOMMU mappings.
-> 
-> This series solves these problems as follows:
-> 
-> 1. Extend netmem_tx to two bits, assigned to one of three values:
-> 
->     NETMEM_TX_NONE   - netmem not supported
->     NETMEM_TX_DMA    - netmem supported and performs DMA
->     NETMEM_TX_NO_DMA - netmem supported, but does not DMA
-> 
->     With these bits, phys devices can set NETMEM_TX_DMA and devices like
->     netkit set NETMEM_TX_NO_DMA. The validation TX path ensures that any
->     DMA-capable netdev exactly matches the bound device, guaranteeing the
->     correct mapping of the bound dmabuf. The validation TX path also
->     allows devices with NETMEM_TX_NO_DMA to pass, knowing these devices
->     will not misuse netmem or run into IOMMU faults. After redirection or
->     routing and the skb finally makes its way through the stack to a
->     physical device's TX path, the above NETMEM_TX_DMA check is performed
->     again to guarantee the device has the appropriate binding/mappings.
-> 
-> 2. On TX bind, the bind handler recognizes NETMEM_TX_NO_DMA devices and
->     finds the phys TX device and binds to that instead. For the netkit
->     case, if it has been leased a queue from a DMA-capable device
->     already, then the bind action is performed on the DMA-capable device
->     instead and the dmabuf is mapped correctly.
-> 
-> ---
-> Changes in v3:
-> - Fix validate_xmit_unreadable_skb() logic for non-devmem
->    unreadable niovs (should not be dropped) (Sashiko)
-> - Simplify lock handling in bind_tx, no premature release (Jakub)
-> - split NO_DMA changes into separate patch (Jakub)
-> - fixed some pylint issues, one required an additional patch ("selftests:
->    drv-net: make attr _nk_guest_ifname public") to rename a variable from
->    private to public
-> - see per-patch changelist for more detailed changes
-> - Link to v2: https://lore.kernel.org/r/20260504-tcp-dm-netkit-v2-0-56d52ac72fd4@meta.com
-> 
-> Changes in v2:
-> - Squash driver conversion patches (2-5) into patch 1 (Jakub)
-> - In validate_xmit_unreadable_skb() to check netmem_tx mode before inspecting
->    frags (Jakub)
-> - Lock bind_dev around netdev_queue_get_dma_dev() when bind_dev != netdev to
->    fix lockdep (Sashiko)
-> - Move require_devmem() into individual test functions so KsftSkipEx goes up to
->    ksft_run() (Sashiko)
-> - Add nk_devmem.py to TEST_PROGS in Makefile (Sashiko)
-> - Link to v1:
->    https://lore.kernel.org/all/20260428-tcp-dm-netkit-v1-0-719280eba4d2@meta.com/
-> 
-> Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
-> 
-> ---
-> Bobby Eshleman (8):
->        net: convert netmem_tx flag to enum
->        net: netkit: declare NETMEM_TX_NO_DMA mode
->        net: devmem: support TX over NETMEM_TX_NO_DMA devices
+Hello,
 
-I applied this patchset in my local kernel tree and built a new kernel 
-image. I loaded this new kernel image in my test environment. It seems 
-that all the testcases can pass.
+syzbot found the following issue on:
 
-I think that this patchset would not cause any regression problem in my 
-test environment.
+HEAD commit:    adc1e5c6203c Merge tag 'efi-fixes-for-v7.1-1' of git://git..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1369cd06580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=59da38148f3a3d24
+dashboard link: https://syzkaller.appspot.com/bug?extid=435fdb053cf98bfa5778
+compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
 
-Zhu Yanjun
+Unfortunately, I don't have any reproducer for this issue yet.
 
->        selftests: drv-net: ncdevmem: add -n flag to skip NIC configuration
->        selftests: drv-net: make attr _nk_guest_ifname public
->        selftests: drv-net: refactor devmem command builders into lib module
->        selftests: drv-net: add primary_rx_redirect support to NetDrvContEnv
->        selftests: drv-net: add netkit devmem tests
-> 
->   .../networking/net_cachelines/net_device.rst       |   2 +-
->   Documentation/networking/netmem.rst                |   8 +-
->   .../translations/zh_CN/networking/netmem.rst       |   7 +-
->   drivers/net/ethernet/broadcom/bnxt/bnxt.c          |   2 +-
->   drivers/net/ethernet/google/gve/gve_main.c         |   2 +-
->   drivers/net/ethernet/mellanox/mlx5/core/en_main.c  |   2 +-
->   drivers/net/ethernet/meta/fbnic/fbnic_netdev.c     |   2 +-
->   drivers/net/netkit.c                               |   1 +
->   include/linux/netdevice.h                          |  11 +-
->   net/core/dev.c                                     |   5 +-
->   net/core/devmem.c                                  |   6 +-
->   net/core/devmem.h                                  |   9 +-
->   net/core/netdev-genl.c                             |  65 +++++-
->   tools/testing/selftests/drivers/net/hw/Makefile    |   1 +
->   tools/testing/selftests/drivers/net/hw/devmem.py   |  77 ++------
->   .../selftests/drivers/net/hw/lib/py/devmem.py      | 218 +++++++++++++++++++++
->   tools/testing/selftests/drivers/net/hw/ncdevmem.c  |  58 +++---
->   .../testing/selftests/drivers/net/hw/nk_devmem.py  |  55 ++++++
->   .../drivers/net/hw/nk_primary_rx_redirect.bpf.c    |  39 ++++
->   .../testing/selftests/drivers/net/hw/nk_qlease.py  |   8 +-
->   tools/testing/selftests/drivers/net/lib/py/env.py  | 109 ++++++++---
->   21 files changed, 549 insertions(+), 138 deletions(-)
-> ---
-> base-commit: 790ead9394860e7d70c5e0e50a35b243e909a618
-> change-id: 20260423-tcp-dm-netkit-2bd78b638d30
-> 
-> Best regards,
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/e1ec8b63537e/disk-adc1e5c6.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/2030fc4d0035/vmlinux-adc1e5c6.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a50679f39f63/bzImage-adc1e5c6.xz
 
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+435fdb053cf98bfa5778@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+sp->magic != HWSIM_STA_MAGIC
+WARNING: drivers/net/wireless/virtual/mac80211_hwsim.c:265 at hwsim_check_sta_magic drivers/net/wireless/virtual/mac80211_hwsim.c:265 [inline], CPU#1: syz.3.8603/32057
+WARNING: drivers/net/wireless/virtual/mac80211_hwsim.c:265 at hwsim_check_sta_magic drivers/net/wireless/virtual/mac80211_hwsim.c:262 [inline], CPU#1: syz.3.8603/32057
+WARNING: drivers/net/wireless/virtual/mac80211_hwsim.c:265 at mac80211_hwsim_tx+0x2085/0x2b10 drivers/net/wireless/virtual/mac80211_hwsim.c:2213, CPU#1: syz.3.8603/32057
+Modules linked in:
+CPU: 1 UID: 0 PID: 32057 Comm: syz.3.8603 Tainted: G             L      syzkaller #0 PREEMPT(full) 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+RIP: 0010:hwsim_check_sta_magic drivers/net/wireless/virtual/mac80211_hwsim.c:265 [inline]
+RIP: 0010:hwsim_check_sta_magic drivers/net/wireless/virtual/mac80211_hwsim.c:262 [inline]
+RIP: 0010:mac80211_hwsim_tx+0x2085/0x2b10 drivers/net/wireless/virtual/mac80211_hwsim.c:2213
+Code: 44 24 20 e8 fd a6 dc fa 48 8d 3d a6 50 b8 09 48 8b 54 24 20 8b 74 24 30 89 d9 67 48 0f b9 3a e9 f7 ec ff ff e8 dc a6 dc fa 90 <0f> 0b 90 e9 a0 e3 ff ff e8 ce a6 dc fa 48 8d bb f1 07 00 00 48 b8
+RSP: 0018:ffffc900040eeea0 EFLAGS: 00010283
+RAX: 000000000000075e RBX: ffff888083a0eb78 RCX: ffffc90011de4000
+RDX: 0000000000080000 RSI: ffffffff872bec44 RDI: ffff8880663e0000
+RBP: 0000000000000000 R08: 0000000000000005 R09: 000000006d537749
+R10: 0000000000000000 R11: 0000000000000000 R12: ffff888067c460c0
+R13: ffff888074694780 R14: ffff8880401231c0 R15: ffff888074694780
+FS:  00007f439aedf6c0(0000) GS:ffff888124475000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000200000003540 CR3: 000000003994c000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ drv_tx net/mac80211/driver-ops.h:38 [inline]
+ ieee80211_tx_frags+0x5c9/0xa70 net/mac80211/tx.c:1746
+ __ieee80211_tx+0x145/0x5b0 net/mac80211/tx.c:1801
+ ieee80211_tx+0x336/0x460 net/mac80211/tx.c:1984
+ ieee80211_xmit+0x30f/0x3e0 net/mac80211/tx.c:2076
+ __ieee80211_tx_skb_tid_band+0x2c2/0x720 net/mac80211/tx.c:6369
+ ieee80211_tx_skb_tid+0x1c1/0x550 net/mac80211/tx.c:6399
+ ieee80211_mgmt_tx+0x1326/0x2590 net/mac80211/offchannel.c:1029
+ rdev_mgmt_tx net/wireless/rdev-ops.h:767 [inline]
+ cfg80211_mlme_mgmt_tx+0x803/0x1600 net/wireless/mlme.c:961
+ nl80211_tx_mgmt+0x9f9/0xf30 net/wireless/nl80211.c:14358
+ genl_family_rcv_msg_doit+0x214/0x300 net/netlink/genetlink.c:1114
+ genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
+ genl_rcv_msg+0x560/0x800 net/netlink/genetlink.c:1209
+ netlink_rcv_skb+0x159/0x420 net/netlink/af_netlink.c:2550
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0x585/0x850 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x8b0/0xda0 net/netlink/af_netlink.c:1894
+ sock_sendmsg_nosec net/socket.c:787 [inline]
+ __sock_sendmsg net/socket.c:802 [inline]
+ ____sys_sendmsg+0x9e1/0xb70 net/socket.c:2698
+ ___sys_sendmsg+0x190/0x1e0 net/socket.c:2752
+ __sys_sendmsg+0x170/0x220 net/socket.c:2784
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x10b/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f4399f9cdd9
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f439aedf028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f439a216090 RCX: 00007f4399f9cdd9
+RDX: 0000000028004800 RSI: 0000200000003740 RDI: 0000000000000003
+RBP: 00007f439a032d69 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f439a216128 R14: 00007f439a216090 R15: 00007ffff74f7008
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
