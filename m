@@ -1,133 +1,118 @@
-Return-Path: <netdev+bounces-286354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286355-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WACQCN/AAGppMQEAu9opvQ
-	(envelope-from <netdev+bounces-286354-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 19:31:11 +0200
+	id oN9yA5HBAGppMQEAu9opvQ
+	(envelope-from <netdev+bounces-286355-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 19:34:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 142685056A8
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 19:31:10 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C78C5056EC
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 19:34:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 33625300251D
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:31:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 61EA03008520
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:34:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7406B358389;
-	Sun, 10 May 2026 17:31:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E46F3B27DB;
+	Sun, 10 May 2026 17:34:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e4j40NZ5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UyNIcr/W"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EFAD8635D;
-	Sun, 10 May 2026 17:31:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69DF2128395;
+	Sun, 10 May 2026 17:34:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778434263; cv=none; b=HhIeWOI2+vBAT7Te+2qcYnC9vDJ6kAmTIWn568BI3XyB0ZF9erM5rbn4zLe0Sailat3xdeSzksfTmRH4c8mWbOS9mUcSpnOoZzgYTlmQIUSOPDE6dfILNHxtDi7nMmUYqNqmb+TScPmxMz4t7Ux5jwnSeAKm2thfGwHS6QetqFY=
+	t=1778434446; cv=none; b=CD6emKvoQDKykgtPWuJMDPiNVveqJaKPtPUSkEWbq41llztX7H079OZHsobDY2ViNdoEPe5DpHoboHmFfBeEgzGCwcgImYh0JsP2p22YLJAp1JVzNEM6S08+dTrqBMHwKB5SddK5YRUe6qN5SQDLVOlQR+ifTzCf1lN6bGPrL60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778434263; c=relaxed/simple;
-	bh=zclz00P2RXzk0iut/vDC+fZ5PNjL1f7ECX+axT82ogk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZCPlxE7ikLZeX2W2x3y8WnqAEFfhtuBuj1uRjzmp26QlziNDUv7bY+rgBg8oBYU/7uvf0wgSlIE61MMjLsbqimDUTLKKcO4PwCg/8WnUeCFapZuqb6sxES4A4pzRhKfWidEACWOFdFMZz5/NOCgdrxLAashqN65VvI0DWS5xbQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e4j40NZ5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06B7EC2BCB8;
-	Sun, 10 May 2026 17:31:03 +0000 (UTC)
+	s=arc-20240116; t=1778434446; c=relaxed/simple;
+	bh=Jru7/l+BDYpDPfTVh9lIW13IaWEAz6P0PLFOWsCC8mc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V0+m3g2BdWSc+6wsiJSxmgc5YVjoHNFwdj6fcFfgjtoJyXIvtJ7nlSINpW+70ldpSwHh40I5/BlX1sbtOXNv34zX6ONudqRXKtBwS9BxDm37sm2dzEQT0FNRpcZYh5cDvP0GMPrhL354/vY+FsU6hRKicGQktgFmMZJ6Ck8lEMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UyNIcr/W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E3F6C2BCB8;
+	Sun, 10 May 2026 17:34:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778434263;
-	bh=zclz00P2RXzk0iut/vDC+fZ5PNjL1f7ECX+axT82ogk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=e4j40NZ5Jxpte5AHw8vdTYTpu2SoYMrAGSGdMJocjmx1ZoZEubPg+vuIuMZ/pwqd2
-	 u0J4hNsROrC/wBzfC0/Loeo2mguPFK+i8RuH04fykmTGntSt3isC9UikEKHPIajtX4
-	 mTKV4bL1upL2/Vxptv3Uh0pw0Nql3iq2kDT/pN3pjCgCOKd7w4S7yKkBN+8g30HQy3
-	 9yuDjyxzX/0A4y/3xGlIRMgkpgBMKIINFae22d9UKS1txoILYWsDme0ziyO9vO431b
-	 SkWAY0JU0jqIgCglclQWGWCDwX1xVp5FBd7rA5+tUlH0WpoIvxxb4H2mfpRDT67ERP
-	 OsxLcu1zlmPmw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CEC63930020;
-	Sun, 10 May 2026 17:30:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1778434446;
+	bh=Jru7/l+BDYpDPfTVh9lIW13IaWEAz6P0PLFOWsCC8mc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UyNIcr/WycOGm3LZrYgvKZuyoBo4mUc8/cnW1jTKl/8s2PfecUJOXmAQt5cpf3Y9z
+	 1uxZU9X3WlqVdo+SvVItchpjOWaJB074rj4p/iiEYyDE6o8KrKz9X0woKur73/4zpQ
+	 h6669BgpuFnsNjD4M61r4OvzeUwhYes9066S73ElQkLMiNoUQ2iw+vxrCFfl7rVb9o
+	 2cucYZ2jpUlu3IMi/YS8yEtyxW+vBIM/WlLEFE+CseL5ZZ+I2pMQuT2nUB6cRm6bcC
+	 1wTg0kTwnHDCQ/r9x9inEi/68q9JRcard2Zm2L6IIZMbOj7hr2EvHJKijpC6GhWPtD
+	 +YYhN8KEeHilg==
+Date: Sun, 10 May 2026 10:34:04 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Linus Walleij <linusw@kernel.org>, Alvin
+ =?UTF-8?B?xaBpcHJhZ2E=?= <alsi@bang-olufsen.dk>, Yury Norov
+ <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+ Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Abdulkader Alrezej
+ <abdulkader.alrezej@gmail.com>, Yury Norov <ynorov@nvidia.com>
+Subject: Re: [net-next PATCH v3 0/8] net: dsa: realtek: rtl8365mb: bridge
+ offloading and VLAN support
+Message-ID: <20260510103404.21b60138@kernel.org>
+In-Reply-To: <20260506-realtek_forward-v3-0-1d87c5f85a3b@gmail.com>
+References: <20260506-realtek_forward-v3-0-1d87c5f85a3b@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v1 0/3] Log clean up and TAP follow ups
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177843421005.1439575.2959535937305070033.git-patchwork-notify@kernel.org>
-Date: Sun, 10 May 2026 17:30:10 +0000
-References: <20260507233213.556182-1-achender@kernel.org>
-In-Reply-To: <20260507233213.556182-1-achender@kernel.org>
-To: Allison Henderson <achender@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
- kuba@kernel.org, horms@kernel.org, linux-rdma@vger.kernel.org,
- linux-kselftest@vger.kernel.org, shuah@kernel.org
-X-Rspamd-Queue-Id: 142685056A8
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 7C78C5056EC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286354-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-286355-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org,nvidia.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Hello:
+On Wed, 06 May 2026 23:58:17 -0300 Luiz Angelo Daros de Luca wrote:
+> This series introduces bridge offloading, FDB management, and VLAN support
+> for the Realtek rtl8365mb DSA switch driver. The primary goal is to
+> enable hardware frame forwarding between bridge ports, reducing CPU
+> overhead and providing advanced features like VLAN and FDB isolation.
+>=20
+> Some of these patches are based on original work by Alvin =C5=A0ipraga,
+> subsequently adapted and updated for the current net-next state.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu,  7 May 2026 16:32:10 -0700 you wrote:
-> Hi all,
-> 
-> This is a follow up series to the  "Log collection, TAP compliance and
-> cleanups" set.  The sashiko report had made some points that I thought
-> was worth addressing.  This patch set fixes a few more TAP compliance
-> prints in the check_gcov* routines.  Also since the user must now pass
-> in the log folder to collect logs, log clean up is tightened to only
-> remove rds* prefixed artifacts instead of the entire folder.  Lastly a
-> the signal handler alarm should be disarmed after the completes to
-> avoid multiple calls to the stop_pcaps routine.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v1,1/3] selftests: rds: Fix stale log clean up
-    https://git.kernel.org/netdev/net-next/c/4840467c84de
-  - [net-next,v1,2/3] selftests: rds: Fix TAP-prefixed prints in check_gcov*
-    https://git.kernel.org/netdev/net-next/c/490778834a42
-  - [net-next,v1,3/3] selftests: rds: Disarm signal alarm on test completion
-    https://git.kernel.org/netdev/net-next/c/08724ab1dc17
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Could you please look thru the feedback provided by AI bots?
+Most of it looks kinda subjective to me but hard for me to evaluate
+the HW details on patch 7, especially.
 
