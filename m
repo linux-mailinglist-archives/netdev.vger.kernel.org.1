@@ -1,276 +1,261 @@
-Return-Path: <netdev+bounces-286282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286283-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EKGjGcFuAGqvIwEAu9opvQ
-	(envelope-from <netdev+bounces-286282-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 13:40:49 +0200
+	id OPomF9NvAGrdIwEAu9opvQ
+	(envelope-from <netdev+bounces-286283-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 13:45:23 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C542A503D0A
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 13:40:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A6E5F503D1D
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 13:45:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 474C230160F6
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 11:40:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6C5B1300BD87
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 11:45:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D66D3815CC;
-	Sun, 10 May 2026 11:40:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="hGEtmydo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F00C2F90E0;
+	Sun, 10 May 2026 11:45:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADC1E3815C2
-	for <netdev@vger.kernel.org>; Sun, 10 May 2026 11:40:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A7B212D7C
+	for <netdev@vger.kernel.org>; Sun, 10 May 2026 11:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778413222; cv=none; b=uMS4ntiGE4W6D2wvB/o5ai6ifbYEqyGAR/DZhvMUXD1uABuOeL/V2XpK0U3b5k67HOXWLuadsc3B3SkZ2ydRlZFNY1hAsJq4u6kUBFyyb4ewQk/MUhedsrxcUVAh6SrHZRL7b6PuwnNSHOhd7p0+p9YW04zd5JxzYtNbdNOoWqQ=
+	t=1778413521; cv=none; b=uuq6JSSK08pHmv5fIiBWKdqy7QmrzBXjIsvFDwjaCEZRHgE5k3aNkzOFW8n2LprdgW33ySLi3wO6f2Rc6ziCExIIu/mgDfTvtQ/7rVJClZHdJSTF3s97G/3xxsZdK/dl4qF/sYKmTErVXE5U0fnxyHpIPMGiLWxs0r9nxmAAY7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778413222; c=relaxed/simple;
-	bh=/Wo3+PBXbAXUlTotZqvdk9KEBPgZ8FLOpMFS4dkqvGk=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=lWplaa01zWa4Eh0V4IrZzlbWBK4O341GZhUvHuwqVsr4+Ye9rEnNFUcu+gPJyWvV0qwMDqLd6Ak9SiR55m2gJb6fnL4lJMLrqAEA014O6wockzvtBcSrhCkJJKjy3qWVoTmVK9dHur8gZhbKWRMqHnuc3ISSVnPYE1SdQCMR5es=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=hGEtmydo; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-44e1860558fso2169244f8f.0
-        for <netdev@vger.kernel.org>; Sun, 10 May 2026 04:40:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1778413219; x=1779018019; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MU0V5qtLR9exTpcGnpIFJuqzegnzuD5wERdsIC6ROXI=;
-        b=hGEtmydokSC9+RiKTGQ9zSd3VK9Q3nPBjqmCIx4rLRM6zSpTqAZFHMqlZkQJcqlt8D
-         lWMzq/EACsB8OgRI0ZyliOTg7fRlYADf+0WvVnsGGg3W4rMl7nHziK5uX+ezQrF2aW+I
-         7nsaC5lC+/U+5EEGscUzZ0bYYjBxAIu9fbLMA1ywSyNKu9qqmmKgPjwrsl+1eIdjI8ud
-         hVqDXIDMpQ+rF3ZZjm42Ifj+ck3JATZeLERfGmcMCiAMm10vnzhnvt7r+ub36nG87eHp
-         CKlZUT8LFd6YDx9z6gSv5aHRu40vtM5x1FNZBkfoDwPsOL5S5y+FKBq9DqVcpBqQfcjz
-         Ddcw==
+	s=arc-20240116; t=1778413521; c=relaxed/simple;
+	bh=f7vDKd9emGoBZY0kKk+9Q6i+eApjgd4gnN1hfxTgzLI=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=AcqTCrWEReXGfwh4iPqick4cBADk4/Gv35eGarJHRgBUx2xJZ9oTHfx1Ft8OqCf3fnyFABkVvOkVLHja/mdmrhEXb5/VrbkJmApJ6NGBUGDNS5qaNDbmKmL4OwEINOR36q755AjjR6/AIDVgVrMihxykIGMvY4qgUjXTEyYRt0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-69b4c167215so486282eaf.0
+        for <netdev@vger.kernel.org>; Sun, 10 May 2026 04:45:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778413219; x=1779018019;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MU0V5qtLR9exTpcGnpIFJuqzegnzuD5wERdsIC6ROXI=;
-        b=kzeMNfAOxIYpEli2/k2iRZ1HSX8mXwXxcFE8nEGS6jg7aTK3vIsybmj8x9CU9kPzT5
-         j+rgt6nerKnu1e+6M+dxKLRO1vfnsuxME+NiDgV3dXd37f5BneOhv+PllnkWfxTWPMwa
-         bc9moulgHkEoa3q2zUFCkAUAjDY5afHrZaPybhVbSSXzAyxXyX0i252LTE8M1gp8k9UZ
-         g4cKZdlshWaEaB043PVKe1ovdYGUpaf/PgQKKBQ29stOO63XdyB2Y7C4g+NLRmCrROU7
-         V10xQxVO87XWuhntc1m2pGGXSB0T9wur5u5t7BboMI6yDCxiIBB6MvgU1QXzkdDzOPAq
-         wGDQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/XUGEkZLlNfl2LPHOjGg9vCmRy/ieazQOXk8tw14lW0wg3B5PmY8uZcKf4Gag3i+i/jJkxSi0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YylXxLd4RL4XxmPGDhQvBU6MfwX1YBF4OeL+v0NinsLnOg6oowQ
-	XwcreWe+4vW4WWftQqIyhQJu+tF0o17u8jyrCTtVeBFc3Ld0nM+O+kzi/vmcJPoJ1no=
-X-Gm-Gg: Acq92OErratIBZcIh56AJyd5s0h1VH9M0Xmkf5soBGp6rVXFVEPdQLERUs4MbtoYsoY
-	vtSjCbPomFCzi5Tus4yeGyW2szOxygqaVpCz5WTulBQbw5hfVMsOO/ZkdTf1YdDH7q2BaIdB+fc
-	Kp5Y6nMN2ALzujxiRj5FnPypk50Sg5kuItkXMN6dtQN/t4yWfXAF/7Z+RIu6jHb2ju7UUQNjhTL
-	SXusi06W7bVIEUfNE73RWTJbTqB7GjFkqSI8yVn6A3s8lVGoDkd1dWAlMC5rYEfpeUiXXIBxE1g
-	3hJXJSTjUC/xQ5Nha1KGtSm5/eJ8eHwjTs/N2Ev6st6LDQCt4/qpsCV2nnPy0WqvVEQ8Xrmi4M7
-	YBxNtuFon2zMuw5Mr5jeeTkHvR7omxQu/YGVYsd+a4xoRXbxDdDnVCKlKm7cdsYei1Q2Q8OlGmu
-	/ev3Ulxa1v21OtmGXfzIdEpJ0u959xbudZjWIy67uhq644tmNk5ycV3Q==
-X-Received: by 2002:a05:6000:26cf:b0:44e:902f:e341 with SMTP id ffacd0b85a97d-45462c342a3mr15284725f8f.20.1778413218879;
-        Sun, 10 May 2026 04:40:18 -0700 (PDT)
-Received: from [192.168.0.161] (78-154-15-182.ip.btc-net.bg. [78.154.15.182])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4549130549bsm18054698f8f.18.2026.05.10.04.40.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 10 May 2026 04:40:18 -0700 (PDT)
-Message-ID: <9263d4c1-0c57-4926-930b-1d701e1f17db@blackwall.org>
-Date: Sun, 10 May 2026 14:40:17 +0300
+        d=1e100.net; s=20251104; t=1778413518; x=1779018318;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u1S0jhFosikT+aSVaZZXhcknVPXPdrZL1cz+mO2KiWI=;
+        b=n0feCp/vP+5TF+j13f1lyHLBqn/e7zW9HhqcY0H8aDKbXDpMiAf3JEQc3EG1sJhV0N
+         5qz1P8BSXG0fC61cb788c2YkH6TXvndwH4W2F36NFJNvqYenSCAuNt3grvqlHrjp5I9G
+         1yUWvg4ZA8NbS1WjVcUo6xcm0BFuDPWkwSNIJ3YqgRB/ypxNSSmVEff4oSKXY7lzIK11
+         RylazMaY5ABPZC7odGduaGlU4ePMtVLyv8tMny3DYE+z/WZnF73ib5lD60hbvHMeqwIV
+         jyfnD279KqwJkyrBvwMwPqotswxMI5kUo5mszijqn2Q2jUv8H9VYWi3q2QZ589+AXal8
+         B51g==
+X-Forwarded-Encrypted: i=1; AFNElJ+6/hlG/Djyjp+czjIr1+g7iHW53cJ6Kvy55klqSYoeylELaNzIh/gQPPx4g7yHILXzvuHK8NM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8BujJwPrSB/euqMvfqwxryZXLG3FNvN2dkPYTe0VsOyRSW83u
+	CMo1DpxwHGrlX7q+/vWCS+C7S7iuFSe1DvnWQ/IDCfaT9BQixT3xHsn8RrAjw6pVUncwdW+Ynn6
+	9159l435D3YfOvNe7Bqz3iFmTOSU5gQkQrGxzZvVfm0E2YBUHDGFOupVqWgM=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/1] net: bridge: cfm: use a per-bridge frame type
-Content-Language: en-US, bg
-From: Nikolay Aleksandrov <razor@blackwall.org>
-To: Ren Wei <n05ec@lzu.edu.cn>, bridge@lists.linux.dev, netdev@vger.kernel.org
-Cc: idosch@nvidia.com, horatiu.vultur@microchip.com, kuba@kernel.org,
- henrik.bjoernlund@microchip.com, yuantan098@gmail.com, yifanwucs@gmail.com,
- tomapufckgml@gmail.com, bird@lzu.edu.cn, ronbogo@outlook.com,
- zylzyl2333@gmail.com
-References: <cover.1778378864.git.zylzyl2333@gmail.com>
- <7198fe2845c30c60c6b3833dd78cead8c5966931.1778378864.git.zylzyl2333@gmail.com>
- <e1f1b080-cfde-4ea4-b444-b64d43778b2f@blackwall.org>
-In-Reply-To: <e1f1b080-cfde-4ea4-b444-b64d43778b2f@blackwall.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: C542A503D0A
+X-Received: by 2002:a4a:d84b:0:b0:695:94b4:d4cc with SMTP id
+ 006d021491bc7-699ab57164amr5015199eaf.1.1778413518490; Sun, 10 May 2026
+ 04:45:18 -0700 (PDT)
+Date: Sun, 10 May 2026 04:45:18 -0700
+In-Reply-To: <67e8340baa2c2772def267a801c8d5b201444d49.1778382236.git.caoruide123@gmail.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a006fce.a00a0220.1c3806.000f.GAE@google.com>
+Subject: [syzbot ci] Re: net: nsh: limit recursive GSO redispatch
+From: syzbot ci <syzbot+ci4085cfa6e79bb05c@syzkaller.appspotmail.com>
+To: bird@lzu.edu.cn, caoruide123@gmail.com, davem@davemloft.net, 
+	jbenc@redhat.com, lkp@intel.com, lx24@stu.ynu.edu.cn, matttbe@kernel.org, 
+	n05ec@lzu.edu.cn, netdev@vger.kernel.org, tomapufckgml@gmail.com, 
+	yifanwucs@gmail.com, yuantan098@gmail.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: A6E5F503D1D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286282-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[nvidia.com,microchip.com,kernel.org,gmail.com,lzu.edu.cn,outlook.com];
-	DMARC_NA(0.00)[blackwall.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[blackwall.org:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286283-lists,netdev=lfdr.de,ci4085cfa6e79bb05c];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[lzu.edu.cn,gmail.com,davemloft.net,redhat.com,intel.com,stu.ynu.edu.cn,kernel.org,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.901];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,outlook.com:email,lzu.edu.cn:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,googlegroups.com:email,appspotmail.com:email,googlesource.com:url,syzbot.org:url]
 X-Rspamd-Action: no action
 
-On 10/05/2026 13:05, Nikolay Aleksandrov wrote:
-> On 10/05/2026 12:15, Ren Wei wrote:
->> From: Yilin Zhu <zylzyl2333@gmail.com>
->>
->> CFM registers a bridge frame handler when the first MEP is created and
->> unregisters it when the last MEP is deleted. The registered object also
->> contains the hlist_node used by the bridge-local frame_type_list.
->>
->> The CFM frame type is currently global, so enabling CFM on multiple
->> bridges links the same hlist_node into multiple bridge-local lists. A
->> later unregister on one bridge can then operate on list state belonging
->> to another bridge.
->>
->> Move the CFM frame type into struct net_bridge and register/unregister
->> the bridge-owned object. This keeps frame handler list membership local
->> to the bridge while preserving the existing first-MEP/last-MEP lifetime.
->>
->> Fixes: dc32cbb3dbd7 ("bridge: cfm: Kernel space implementation of CFM. CCM 
->> frame RX added.")
->> Cc: stable@kernel.org
->> Reported-by: Yuan Tan <yuantan098@gmail.com>
->> Reported-by: Yifan Wu <yifanwucs@gmail.com>
->> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
->> Reported-by: Xin Liu <bird@lzu.edu.cn>
->> Co-developed-by: Peihan Liu <ronbogo@outlook.com>
->> Signed-off-by: Peihan Liu <ronbogo@outlook.com>
->> Signed-off-by: Yilin Zhu <zylzyl2333@gmail.com>
->> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
->> ---
->>   net/bridge/br_cfm.c     | 14 ++++++--------
->>   net/bridge/br_private.h | 18 +++++++++++-------
->>   2 files changed, 17 insertions(+), 15 deletions(-)
->>
-> 
-> I think MRP suffers from the same bug, but I also think we can contain the
-> fix within the packet type structure instead of making the already huge
-> struct net_bridge even bigger. Also, linking a struct within net_bridge
-> to a list within the same net_bridge looks weird.
-> 
-> IMO br_add_frame should take a type & a frame_handler, allocate a br_frame_type
-> dynamically and link it, then br_del_frame should take a type instead of a ptr
-> and remove that frame type and free it with kfree_rcu. That would require
-> br_add_frame return value to be checked in the respective cfm/mrp functions.
-> Warnings for already existing types on add or missing types on del should be
-> added.
-> 
+syzbot ci has tested the following series
 
-Actually I have a better idea since these handlers can be added only once per
-bridge, we can do away with a simple bitmask (e.g. use net_bridge's options
-which is in a Rx hot cache line) and even reduce net_bridge size while fixing
-these bugs, and also remove a conditional from the fast-path when CFM/MRP are
-not compiled in. Would you like me to prepare it or do you want to give it a go?
+[v2] net: nsh: limit recursive GSO redispatch
+https://lore.kernel.org/all/67e8340baa2c2772def267a801c8d5b201444d49.1778382236.git.caoruide123@gmail.com
+* [PATCH net v2 1/1] net: nsh: limit recursive GSO redispatch
 
-> Would you please take care of MRP as well?
-> 
-> Cheers,
->   Nik
-> 
->> diff --git a/net/bridge/br_cfm.c b/net/bridge/br_cfm.c
->> index 118c7ea48c35..547c7415c0ea 100644
->> --- a/net/bridge/br_cfm.c
->> +++ b/net/bridge/br_cfm.c
->> @@ -489,11 +489,6 @@ static int br_cfm_frame_rx(struct net_bridge_port *port, 
->> struct sk_buff *skb)
->>       return 1;
->>   }
->> -static struct br_frame_type cfm_frame_type __read_mostly = {
->> -    .type = cpu_to_be16(ETH_P_CFM),
->> -    .frame_handler = br_cfm_frame_rx,
->> -};
->> -
->>   int br_cfm_mep_create(struct net_bridge *br,
->>                 const u32 instance,
->>                 struct br_cfm_mep_create *const create,
->> @@ -558,8 +553,11 @@ int br_cfm_mep_create(struct net_bridge *br,
->>       INIT_HLIST_HEAD(&mep->peer_mep_list);
->>       INIT_DELAYED_WORK(&mep->ccm_tx_dwork, ccm_tx_work_expired);
->> -    if (hlist_empty(&br->mep_list))
->> -        br_add_frame(br, &cfm_frame_type);
->> +    if (hlist_empty(&br->mep_list)) {
->> +        br->cfm_frame_type.type = cpu_to_be16(ETH_P_CFM);
->> +        br->cfm_frame_type.frame_handler = br_cfm_frame_rx;
->> +        br_add_frame(br, &br->cfm_frame_type);
->> +    }
->>       hlist_add_tail_rcu(&mep->head, &br->mep_list);
->> @@ -588,7 +586,7 @@ static void mep_delete_implementation(struct net_bridge *br,
->>       kfree_rcu(mep, rcu);
->>       if (hlist_empty(&br->mep_list))
->> -        br_del_frame(br, &cfm_frame_type);
->> +        br_del_frame(br, &br->cfm_frame_type);
->>   }
->>   int br_cfm_mep_delete(struct net_bridge *br,
->> diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
->> index bed1b1d9b282..a3ed9ee826f5 100644
->> --- a/net/bridge/br_private.h
->> +++ b/net/bridge/br_private.h
->> @@ -61,6 +61,9 @@ typedef struct bridge_id bridge_id;
->>   typedef struct mac_addr mac_addr;
->>   typedef __u16 port_id;
->> +struct net_bridge_port;
->> +struct sk_buff;
->> +
->>   struct bridge_id {
->>       unsigned char    prio[2];
->>       unsigned char    addr[ETH_ALEN];
->> @@ -70,6 +73,13 @@ struct mac_addr {
->>       unsigned char    addr[ETH_ALEN];
->>   };
->> +struct br_frame_type {
->> +    __be16            type;
->> +    int            (*frame_handler)(struct net_bridge_port *port,
->> +                         struct sk_buff *skb);
->> +    struct hlist_node    list;
->> +};
->> +
->>   #ifdef CONFIG_BRIDGE_IGMP_SNOOPING
->>   /* our own querier */
->>   struct bridge_mcast_own_query {
->> @@ -585,6 +595,7 @@ struct net_bridge {
->>       struct hlist_head        mrp_list;
->>   #endif
->>   #if IS_ENABLED(CONFIG_BRIDGE_CFM)
->> +    struct br_frame_type    cfm_frame_type;
->>       struct hlist_head        mep_list;
->>   #endif
->>   };
->> @@ -926,13 +937,6 @@ int nbp_backup_change(struct net_bridge_port *p, struct 
->> net_device *backup_dev);
->>   int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff 
->> *skb);
->>   rx_handler_func_t *br_get_rx_handler(const struct net_device *dev);
->> -struct br_frame_type {
->> -    __be16            type;
->> -    int            (*frame_handler)(struct net_bridge_port *port,
->> -                         struct sk_buff *skb);
->> -    struct hlist_node    list;
->> -};
->> -
->>   void br_add_frame(struct net_bridge *br, struct br_frame_type *ft);
->>   void br_del_frame(struct net_bridge *br, struct br_frame_type *ft);
-> 
+and found the following issue:
+BUG: using __this_cpu_read() in preemptible code in nsh_gso_segment
 
+Full report is available here:
+https://ci.syzbot.org/series/cb23e640-2f7a-42e1-8bad-7249684b1cd5
+
+***
+
+BUG: using __this_cpu_read() in preemptible code in nsh_gso_segment
+
+tree:      net
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
+base:      496c0c4c53bbe1bad97e82cd12103df61a6e459d
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/a7e3d1e1-97c4-4876-99c8-658c4cef49c5/config
+syz repro: https://ci.syzbot.org/findings/62ca20c2-7c78-4820-b695-f63b15eaf738/syz_repro
+
+BUG: using __this_cpu_read() in preemptible [00000000] code: syz.1.18/5860
+caller is dev_xmit_recursion include/linux/netdevice.h:3625 [inline]
+caller is nsh_gso_segment+0x535/0xed0 net/nsh/nsh.c:110
+CPU: 0 UID: 0 PID: 5860 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ check_preemption_disabled+0xd3/0xe0 lib/smp_processor_id.c:47
+ dev_xmit_recursion include/linux/netdevice.h:3625 [inline]
+ nsh_gso_segment+0x535/0xed0 net/nsh/nsh.c:110
+ skb_mac_gso_segment+0x31c/0x690 net/core/gso.c:53
+ __skb_gso_segment+0x376/0x540 net/core/gso.c:124
+ skb_gso_segment include/net/gso.h:83 [inline]
+ validate_xmit_skb+0xa21/0x14a0 net/core/dev.c:4039
+ validate_xmit_skb_list net/core/dev.c:4089 [inline]
+ __dev_direct_xmit+0x1b4/0x750 net/core/dev.c:4922
+ dev_direct_xmit include/linux/netdevice.h:3431 [inline]
+ packet_xmit+0x1b4/0x320 net/packet/af_packet.c:285
+ packet_snd net/packet/af_packet.c:3082 [inline]
+ packet_sendmsg+0x3c81/0x4fb0 net/packet/af_packet.c:3114
+ sock_sendmsg_nosec net/socket.c:787 [inline]
+ __sock_sendmsg net/socket.c:802 [inline]
+ __sys_sendto+0x672/0x710 net/socket.c:2265
+ __do_sys_sendto net/socket.c:2272 [inline]
+ __se_sys_sendto net/socket.c:2268 [inline]
+ __x64_sys_sendto+0xde/0x100 net/socket.c:2268
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fcd6a99cdd9
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fcd6b903028 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 00007fcd6ac15fa0 RCX: 00007fcd6a99cdd9
+RDX: 00000000000100a6 RSI: 0000200000000180 RDI: 0000000000000005
+RBP: 00007fcd6aa32d69 R08: 0000200000000140 R09: 0000000000000014
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fcd6ac16038 R14: 00007fcd6ac15fa0 R15: 00007fff57a83608
+ </TASK>
+BUG: using __this_cpu_add() in preemptible [00000000] code: syz.1.18/5860
+caller is dev_xmit_recursion_inc include/linux/netdevice.h:3631 [inline]
+caller is nsh_gso_segment+0x57d/0xed0 net/nsh/nsh.c:113
+CPU: 0 UID: 0 PID: 5860 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ check_preemption_disabled+0xd3/0xe0 lib/smp_processor_id.c:47
+ dev_xmit_recursion_inc include/linux/netdevice.h:3631 [inline]
+ nsh_gso_segment+0x57d/0xed0 net/nsh/nsh.c:113
+ skb_mac_gso_segment+0x31c/0x690 net/core/gso.c:53
+ __skb_gso_segment+0x376/0x540 net/core/gso.c:124
+ skb_gso_segment include/net/gso.h:83 [inline]
+ validate_xmit_skb+0xa21/0x14a0 net/core/dev.c:4039
+ validate_xmit_skb_list net/core/dev.c:4089 [inline]
+ __dev_direct_xmit+0x1b4/0x750 net/core/dev.c:4922
+ dev_direct_xmit include/linux/netdevice.h:3431 [inline]
+ packet_xmit+0x1b4/0x320 net/packet/af_packet.c:285
+ packet_snd net/packet/af_packet.c:3082 [inline]
+ packet_sendmsg+0x3c81/0x4fb0 net/packet/af_packet.c:3114
+ sock_sendmsg_nosec net/socket.c:787 [inline]
+ __sock_sendmsg net/socket.c:802 [inline]
+ __sys_sendto+0x672/0x710 net/socket.c:2265
+ __do_sys_sendto net/socket.c:2272 [inline]
+ __se_sys_sendto net/socket.c:2268 [inline]
+ __x64_sys_sendto+0xde/0x100 net/socket.c:2268
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fcd6a99cdd9
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fcd6b903028 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 00007fcd6ac15fa0 RCX: 00007fcd6a99cdd9
+RDX: 00000000000100a6 RSI: 0000200000000180 RDI: 0000000000000005
+RBP: 00007fcd6aa32d69 R08: 0000200000000140 R09: 0000000000000014
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fcd6ac16038 R14: 00007fcd6ac15fa0 R15: 00007fff57a83608
+ </TASK>
+BUG: using __this_cpu_add() in preemptible [00000000] code: syz.1.18/5860
+caller is dev_xmit_recursion_dec include/linux/netdevice.h:3636 [inline]
+caller is nsh_gso_segment+0x59f/0xed0 net/nsh/nsh.c:115
+CPU: 0 UID: 0 PID: 5860 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ check_preemption_disabled+0xd3/0xe0 lib/smp_processor_id.c:47
+ dev_xmit_recursion_dec include/linux/netdevice.h:3636 [inline]
+ nsh_gso_segment+0x59f/0xed0 net/nsh/nsh.c:115
+ skb_mac_gso_segment+0x31c/0x690 net/core/gso.c:53
+ __skb_gso_segment+0x376/0x540 net/core/gso.c:124
+ skb_gso_segment include/net/gso.h:83 [inline]
+ validate_xmit_skb+0xa21/0x14a0 net/core/dev.c:4039
+ validate_xmit_skb_list net/core/dev.c:4089 [inline]
+ __dev_direct_xmit+0x1b4/0x750 net/core/dev.c:4922
+ dev_direct_xmit include/linux/netdevice.h:3431 [inline]
+ packet_xmit+0x1b4/0x320 net/packet/af_packet.c:285
+ packet_snd net/packet/af_packet.c:3082 [inline]
+ packet_sendmsg+0x3c81/0x4fb0 net/packet/af_packet.c:3114
+ sock_sendmsg_nosec net/socket.c:787 [inline]
+ __sock_sendmsg net/socket.c:802 [inline]
+ __sys_sendto+0x672/0x710 net/socket.c:2265
+ __do_sys_sendto net/socket.c:2272 [inline]
+ __se_sys_sendto net/socket.c:2268 [inline]
+ __x64_sys_sendto+0xde/0x100 net/socket.c:2268
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fcd6a99cdd9
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fcd6b903028 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 00007fcd6ac15fa0 RCX: 00007fcd6a99cdd9
+RDX: 00000000000100a6 RSI: 0000200000000180 RDI: 0000000000000005
+RBP: 00007fcd6aa32d69 R08: 0000200000000140 R09: 0000000000000014
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fcd6ac16038 R14: 00007fcd6ac15fa0 R15: 00007fff57a83608
+ </TASK>
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+
+To test a patch for this bug, please reply with `#syz test`
+(should be on a separate line).
+
+The patch should be attached to the email.
+Note: arguments like custom git repos and branches are not supported.
 
