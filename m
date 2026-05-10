@@ -1,152 +1,138 @@
-Return-Path: <netdev+bounces-286332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286333-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WOzMGVO0AGotLwEAu9opvQ
-	(envelope-from <netdev+bounces-286332-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:37:39 +0200
+	id QKXFE+C1AGplLwEAu9opvQ
+	(envelope-from <netdev+bounces-286333-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:44:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5773505229
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:37:38 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E6AB50527A
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:44:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 293C0300B606
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 16:37:36 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 808843002500
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 16:44:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 347523A6F0A;
-	Sun, 10 May 2026 16:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1AF93B19A8;
+	Sun, 10 May 2026 16:44:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ymejetap"
+	dkim=pass (1024-bit key) header.d=riseup.net header.i=@riseup.net header.b="ghPH/st+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx1.riseup.net (mx1.riseup.net [198.252.153.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7CD371CFF;
-	Sun, 10 May 2026 16:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4682D39EF1C;
+	Sun, 10 May 2026 16:44:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.252.153.129
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778431055; cv=none; b=pFIWucCmibkcOWIcsHRRsNwzOz8RRGplggtAgVn3mOG4t8Lyj5XdOLHNec7aXtZFsz2PTYQZ01O1R4pXx7MLBkcrOKvBxi/ebQrMts3Xx3swuc05kOix3SsYbocXt2mDGYmH3WMhB9i6SkZAfPUMzxYXEVhxRmemWIhG8zKcKxQ=
+	t=1778431448; cv=none; b=XCc3qpin37qty4HDdfm3SDZH4nv5A/q+DUMSWIMS3eJqvzyLI7F1O+XlT6tPnPIMF18t76yh48KtR8Itb0cz7GZri3o77OwSQ0pnVClv544/F/I72kz+ixAqpDb8LuZOCMzPS8/CFIlFjLucdLnFQdI4mGxPfXGEv1q7+HRI33E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778431055; c=relaxed/simple;
-	bh=L1xXaxGzoHwwroa3Zr/iluLS4q9Nr5n/YF8ZM6klWAI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VX5CC8APN8QJcTDGjNu5S95CUUaZXp7q74BD/h8qifasTJ747bzQpy6rcHgV2/Och1TWOhkrDWmB3czyv20db38OWk43F5EfzWq2BB2XKtkvY8Rkao5khcS+6VUDdG2SuG3OtayvRWthW/Kq+9UGv4PoveTBpM/3jGRyktrAl24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ymejetap; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62B38C2BCB8;
-	Sun, 10 May 2026 16:37:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778431054;
-	bh=L1xXaxGzoHwwroa3Zr/iluLS4q9Nr5n/YF8ZM6klWAI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YmejetappZu2ZJ9Zi3qLnqfqreo16SA9xAr7Yjn6jpx0CJK+5jTLugHkfSy/52gJi
-	 5ul8YzfVPW6hCvF+pUMrnGYNSEuQJWFis4rYbr/2Owohegve5Y67jT3JuA3foP8cWw
-	 yV8My0r8fKXTchq0UWB0APXQHO/biL3XWfa1JkInNwlGYp/o2WilHWJ6BZS1IiEmqq
-	 vtBWDI3jb8AMsfZRSU58ucWEtKhV4M4gPkeLD5XHeY2PYm/DY3sqcCXEXkAavJrnJN
-	 OwQI64rExWJN+sRrsO439QxErqYgB945tOZ0PbG+S0NvRctXWsesaHMEAyuM9DN2VF
-	 GCVWrfzrQGe/g==
-Date: Sun, 10 May 2026 09:37:32 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Mark Bloch <mbloch@nvidia.com>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <skhan@linuxfoundation.org>, Simon Horman <horms@kernel.org>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Andrew Morton
- <akpm@linux-foundation.org>, "Borislav Petkov (AMD)" <bp@alien8.de>, Randy
- Dunlap <rdunlap@infradead.org>, Dave Hansen <dave.hansen@linux.intel.com>,
- Christian Brauner <brauner@kernel.org>, Petr Mladek <pmladek@suse.com>,
- "Peter Zijlstra (Intel)" <peterz@infradead.org>, Thomas Gleixner
- <tglx@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Dapeng
- Mi <dapeng1.mi@linux.intel.com>, Kees Cook <kees@kernel.org>, Marco Elver
- <elver@google.com>, Eric Biggers <ebiggers@kernel.org>, Li RongQing
- <lirongqing@baidu.com>, "Paul E. McKenney" <paulmck@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [RFC net-next 0/4] devlink: Add boot-time defaults
-Message-ID: <20260510093732.6ba47e54@kernel.org>
-In-Reply-To: <af7Y4AYv-XDCbK_8@FV6GYCPJ69>
-References: <20260506123739.1959770-1-mbloch@nvidia.com>
-	<aftaW-irGmkfA7FS@FV6GYCPJ69>
-	<3f9215c4-7c84-46d9-ba74-30dabe24db09@nvidia.com>
-	<afxvzOjqw-vxUAED@FV6GYCPJ69>
-	<b6a9b568-dd09-4414-be57-6b9cd282a43c@nvidia.com>
-	<af4lBIJdCuN5VKq_@FV6GYCPJ69>
-	<20260508175213.1952097f@kernel.org>
-	<af7Y4AYv-XDCbK_8@FV6GYCPJ69>
+	s=arc-20240116; t=1778431448; c=relaxed/simple;
+	bh=N3duTWqU4pFsbiaGRw0cmtx/NQYpMFCH77JRqm/Vcxw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ePpsByBscZgM2LSOZJ0qE/3plKStOReeIppaulPtmKPBh0Sue4jynmNulNTWb0eSyO3JeBHrInTc5b851soHvk02xmRhI10+aMAWfI6rR7eNxAEg2OGhUNFVpUnhxWFMPYn+wAdRp/RYwFqiWADLJlv564SSr7RaxXd+RPYm71k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riseup.net; spf=pass smtp.mailfrom=riseup.net; dkim=pass (1024-bit key) header.d=riseup.net header.i=@riseup.net header.b=ghPH/st+; arc=none smtp.client-ip=198.252.153.129
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riseup.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riseup.net
+Received: from fews01-sea.riseup.net (fews01-sea-pn.riseup.net [10.0.1.109])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx1.riseup.net (Postfix) with ESMTPS id 4gD7wc5qWXzDqJ5;
+	Sun, 10 May 2026 16:44:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=riseup.net; s=squak;
+	t=1778431441; bh=xi3qfonM/fxxkErgpkpyWq6RqDhn14z/0dVuc/pda3Q=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ghPH/st+ZStpJkWvPA3y2e+jiLAA1QkB2lVRzBKpnizKpbb6Md63CrgtEbRzQnCve
+	 cD9CSj8J0CetkL1PyRewHv8IlcR6XcmlzUfsGiqU35qQcZ9sGMNgNefn6Nrupzb+yg
+	 ZJuxFrnvIYdKGpD1yQRqB5rzWkXH6uZf/NlRUuv8=
+X-Riseup-User-ID: 84D200AB20CB8D2F72B8E0087B19FAFEBD973C63C5B16F999C22A26D3C44C315
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	 by fews01-sea.riseup.net (Postfix) with ESMTPSA id 4gD7wX6vqRz1yZZ;
+	Sun, 10 May 2026 16:43:56 +0000 (UTC)
+From: =?UTF-8?q?=C3=8D=C3=B1igo=20Huguet?= <ihuguet@riseup.net>
+To: Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>
+Cc: Sabrina Dubroca <sd@queasysnail.net>,
+	Filip Pokryvka <fpokryvk@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	=?UTF-8?q?=C3=8D=C3=B1igo=20Huguet?= <ihuguet@riseup.net>
+Subject: [PATCH net-next 0/5] netdevsim: get link via ethtool, set via sysfs
+Date: Sun, 10 May 2026 18:43:32 +0200
+Message-ID: <20260510164337.7611-1-ihuguet@riseup.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: B5773505229
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 8E6AB50527A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.96 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MIXED_CHARSET(0.63)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[riseup.net,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[riseup.net:s=squak];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286332-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286333-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[ihuguet@riseup.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[riseup.net:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[riseup.net:mid,riseup.net:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Sat, 9 May 2026 09:01:23 +0200 Jiri Pirko wrote:
-> Sat, May 09, 2026 at 02:52:13AM +0200, kuba@kernel.org wrote:
-> >On Fri, 8 May 2026 20:07:44 +0200 Jiri Pirko wrote:  
-> >legacy vs switchdev only describes the eswitch configuration.
-> >As a non-SR-IOV user I really don't want to see the extra representors
-> >hanging around my systems, confusing all daemons. IIRC mlx5 had some
-> >limitations around the uplink representor. Maybe that's the disconnect.
-> >But for a real, fully featured switchdev eswitches having the
-> >PHY and PF representors on boot, always, will not make sense.  
-> 
-> As "a non-SR-IOV user", what extra representors you talk about? When you
-> have pfs only, you don't have anything extra. Just 1 netdev per-pf, one
-> devlink port per-pf. What's extra about it? When you don't have VFs/SFs.
-> Everyhing is the same:
+Allow to read the carrier status of a netdevsim device via ethtool, like
+most of Ethernet devices allow.
 
-Some devices have separate uplink ports and PF representors.
-As I said, what you're proposing isn't going to work for all drivers.
+Also, allow to set its carrier status via sysfs. Currently it's only
+possible by linking a peer device and setting its admin state to
+UP/DOWN. By editing the carrier status via sysfs tests that need to
+check carrier related stuff may be simpler.
 
-> >> Well, as any other nv config, it persists across kernels/hosts.
-> >> Think about it as "unbreak-my-not-legacy-device" bit.  
-> >
-> >For most devices the switchdev mode does not change anything
-> >substantial about the device. It's purely a kernel / driver config. 
-> >It changes what objects and default rules kernel / driver installs. 
-> >So I don't get why it would make sense to flash into the device
-> >nvmem a Linux SW stack specific config.  
-> 
-> I look at it from the perspective that from some CX generation,
-> switchdev mode should be default. So that is a device-based decision.
-> I believe as such it can optionally be permanenty configured (nv config)
-> on older device. Why not?
+The third patch add the proper selftest for both things, and the fourth
+and fifth fix a few small bugs in the selftest itself.
 
-Feels a bit arbitrary and won't cover all cases. The question should be
-why you are nacking a more reasonable solution. Keeping Linux config in
-Linux params.
+Filip Pokryvka (1):
+  netdevsim: Add ethtool get_link support
+
+Íñigo Huguet (4):
+  netdevsim: allow changing carrier state via sysfs
+  selftest: netdevsim: test carrier change via sysfs
+  selftest: netdevsim: cleanup the devices and module on failure
+  selftest: netdevsim: suppress socat warnings
+
+ drivers/net/netdevsim/ethtool.c               |  1 +
+ drivers/net/netdevsim/netdev.c                | 23 +++++
+ .../selftests/drivers/net/netdevsim/peer.sh   | 84 ++++++++++++-------
+ 3 files changed, 80 insertions(+), 28 deletions(-)
+
+-- 
+2.53.0
+
 
