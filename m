@@ -1,169 +1,153 @@
-Return-Path: <netdev+bounces-286340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286341-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0FT0LLO3AGplLwEAu9opvQ
-	(envelope-from <netdev+bounces-286340-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:52:03 +0200
+	id sCgML++2AGplLwEAu9opvQ
+	(envelope-from <netdev+bounces-286341-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:48:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A2CB505378
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:52:03 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61ADB50530E
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:48:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 013DD3031100
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 16:47:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AF547300233E
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 16:48:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416973ACA42;
-	Sun, 10 May 2026 16:47:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B09493AEF24;
+	Sun, 10 May 2026 16:48:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jlNoFq9c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JaGaJsVR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E69D388E72;
-	Sun, 10 May 2026 16:47:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B9E388E72
+	for <netdev@vger.kernel.org>; Sun, 10 May 2026 16:48:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778431672; cv=none; b=j49q//uEjbfhS8YstixXPm980s61t0j5SXFUJX1Nxtunczp6H4ceD+iCBgeBos4pHWQAsECmSq0H37ozn0b5V1DT3WIuKl87mRGAgho6KZflw4qQ/Em8+FNVG4gUz1WivxIFO68mGlenRXCfEuwR/pf3Q4Rvspy5Xf+Di4d4bPw=
+	t=1778431725; cv=none; b=H5rcjwfc1GGFs0C9xsPUrTxIWldgV17YhtxeXYpZ3EHIIDso/Hd8NrPVKKq7YS45uF2e6crB11BXM0jnOWSRwWWXuzxVuMuOEVmH3BT2Ud1RVtNkEzmq/7q4u0SU07m4sbT4S4jvYSkpOnA6XtsIwA6NJ3w2pr8BsC9xzHljIHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778431672; c=relaxed/simple;
-	bh=zwDJnl84possJqYiSlbVu3PgAwRhCZ9BMi6RKw3HoSc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YThdShBPyvuOry7tapzApjI541J6JIEv6T4rAjfwkM27fsTvGlY/o8Qpid6cy9Md7bGEZeb/GARGGbmoQvdBov9Ibmz5bkuc6g9RXRzm2bDTFhIm8HrfX5sUnHtdUInDu49m7TjnWIrLr3bCjOZ8FoY7AmEJpanSv2+YRrGeLR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jlNoFq9c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FD6DC2BCB8;
-	Sun, 10 May 2026 16:47:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778431671;
-	bh=zwDJnl84possJqYiSlbVu3PgAwRhCZ9BMi6RKw3HoSc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jlNoFq9ciz4frJsng2xJ1DGKqHjpGrWYwtgeLXum0fMOV60QR/PfSfe2a7Df8+Mmd
-	 74FjxYnk37ty8I4SORTEF1AIAyAuuWbmxRHY3hqi7fOw/ueGH615e2u2qOa1bNxox7
-	 Nw2xy46Si14s2Mjcr0d0mi5QkXf+eAC0GSYDzrYKy/VUdvg96hmWVq/C2XEjQ9Jzmr
-	 nfxUDsCqC+MeeA8xTFx444OgTZS6T4qz3vcjBEOG5ciK7rr77YGE4CdKZcIeGw5c9H
-	 9HgvkNz+4dd37buL/+fiHGzqbBZ2Hn6kNXoJyLe99rkVoyiWEkftd3a+6OEDgi7XVW
-	 OJTTJysWPxQWg==
-From: Simon Horman <horms@kernel.org>
-To: jelonek.jonas@gmail.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	linux@armlinux.org.uk,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	maxime.chevallier@bootlin.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bjorn@mork.no
-Subject: Re: [PATCH net-next v7 2/2] net: sfp: extend SMBus support
-Date: Sun, 10 May 2026 17:47:41 +0100
-Message-ID: <20260510164741.1401430-1-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260507093301.1144740-3-jelonek.jonas@gmail.com>
-References: <20260507093301.1144740-3-jelonek.jonas@gmail.com>
+	s=arc-20240116; t=1778431725; c=relaxed/simple;
+	bh=SaRV1teEcYuK3pDM4kjkaHnrIO71cSDF/PbaaMnoYTc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pN5sJxTG2JtJZZOhPsqNs8eFE0//qIcnzA/wLjuMzrMVqXv/aHFQyd/hcKECyFFKpb/tqyTiL4xTF59WEmNYeOEmQDrlAc3hlERS1jGoy37/aOKwFgHE+TISC69GkpUZ1ZbMCmmWsRck93IOQjo+PTSJG9X6vgD1jszLlV6p59Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JaGaJsVR; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-367c2a39fcfso751689a91.3
+        for <netdev@vger.kernel.org>; Sun, 10 May 2026 09:48:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778431724; x=1779036524; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eArBLCmYCsffvtaqVgZP4cXQn2AO6g/xQoo/oq6NlGs=;
+        b=JaGaJsVRMIl2RcXQ5IAKLq1GFZwBXqvT93Ih88vKuq3hbLbu0apXjA4jhNUyEBj7rh
+         mfyj4XvmgZ15Cr9LHVW06Lr+LGKhSVcCv8ALLB+rnQaaIO4SuQaqH53uJwn7i0nqYpr7
+         b2lXFomRktDpMBgaCvAA4kP9CGW/Gnl1ZM6TvcRV7cI8d5LkQeiI8cMcXc/oZ6XjFqY2
+         6stj+0Z+aTamVZPkbGrO74GedOFqWNgz0W+omL5VdjrDEHGG76XMjl2GbW3RkYgKciaj
+         S/y0j2SQOlrwYcVujdTu+oWjAoh4jSAySswig+qH2spOkIlwq5QZ2ftics8kQIGMoe8P
+         0iOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778431724; x=1779036524;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eArBLCmYCsffvtaqVgZP4cXQn2AO6g/xQoo/oq6NlGs=;
+        b=LHUNcZ+4HS+buLp9+FoMsA+oHLEGVey2/Ns8phADY2wbFzHqcIvUsNA9ul5Nvt6oFg
+         JwatqUKB1xizZgBpjmtEsFBkiDi7NyypwPInSYVJileq8tkfJ/eZ8z5+Kgss/l6E3w3P
+         +8bXHbJ5+sRUscXEx1Vw6K4GePMUGQlUovLt8XSQFs+uA6zRvN0QHtIaPjKimNlRL8sQ
+         922FDmIQdc9LPAATajY0nRvoM/Tesrkbyxx40EzAKqN3T8HmVRl3CeL4pk5NffsnQfo1
+         xkoCNmqCiWrxDm0R0HpUUhGLJ60xPttKykeo3vIznj+9NUOqmmtAU7L+vNyShvbEnb9N
+         sCSQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9Wz2TXS1PYuzdgYY372dNBOmhznN9CMxIk0qajBcViqIU6gdP7AHEDhN4+iYdtTG/XZwwvU40=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwioohlW4WqFh3Fs0OK7UaQLnqq+AG96s11Ry658TEtJDNtln25
+	Q+ZuVcShfdwQLXolQJMf9iH6v1/DkCZQAbSZqvV9unlcIZmymzqJc/Y6
+X-Gm-Gg: Acq92OHhKLo2auH0V9KhFlpdH1JkDRunXt6MTN56z/lD1RlJp2lgijioBdXTQ0RVHPx
+	KmBE1apZnSU5kE2xWPSOIN9dJ7QZ1VHb73yqSGmtqx7VZtqNzRzvUmfurzROAHFnWaC8lsaUWFa
+	zIbRrMMHQrWb4AAebnODtRuCl27LEomaUlAp4ZQg2kao1SaR5gqNJ5/iG1LXHlrAjFtrphttMcP
+	8Blou9ZiWs/EE4XFFsGfGbmlk1I5/Zh3p9G5pUPRZPVD4y3g+XQ15z8RUMy+LBRye1UBkaWvVkk
+	8VKtlV6XVwUvWKJpauLlkjZoOGiCVW3cdQGXEXpc9j4+ltLgqj8Ld3pMQSr4vpp1K9O6TCon1AP
+	/gvQ2bCtFIqdSTF8JTIzP82kHIDhBBeMcAU1ffd9vh4rp07/3UYIErHJp2PrWQq1ROi643LjkJ0
+	mrqPgQulRSO/3MGCtHJZa0Bp065aIw6R4AztRR7DIH2SotYJZVg+dXgw==
+X-Received: by 2002:a17:903:9ce:b0:2ba:b5a3:1864 with SMTP id d9443c01a7336-2bab5a3210bmr186878225ad.20.1778431723638;
+        Sun, 10 May 2026 09:48:43 -0700 (PDT)
+Received: from v4bel ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1eac3afsm83382135ad.71.2026.05.10.09.48.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 10 May 2026 09:48:43 -0700 (PDT)
+Date: Mon, 11 May 2026 01:48:39 +0900
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: dhowells@redhat.com, marc.dionne@auristor.com, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+	qingfang.deng@linux.dev, jiayuan.chen@linux.dev,
+	linux-afs@lists.infradead.org, netdev@vger.kernel.org,
+	stable@vger.kernel.org, imv4bel@gmail.com
+Subject: Re: [PATCH net v3] rxrpc: Also unshare DATA/RESPONSE packets when
+ paged frags are present
+Message-ID: <agC256wVYa4Gnvy1@v4bel>
+References: <af2kdW2F1gJ9U-Gg@v4bel>
+ <20260510084520.476745b5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 3A2CB505378
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260510084520.476745b5@kernel.org>
+X-Rspamd-Queue-Id: 61ADB50530E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286340-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-286341-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,armlinux.org.uk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,bootlin.com,vger.kernel.org,mork.no];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[redhat.com,auristor.com,davemloft.net,google.com,kernel.org,linux.dev,lists.infradead.org,vger.kernel.org,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.948];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-From: 'Simon Horman' <horms@kernel.org>
+On Sun, May 10, 2026 at 08:45:20AM -0700, Jakub Kicinski wrote:
+> On Fri, 8 May 2026 17:53:09 +0900 Hyunwoo Kim wrote:
+> >  			    sp->hdr.securityIndex != 0 &&
+> > -			    skb_cloned(skb)) {
+> > +			    (skb_cloned(skb) ||
+> > +			     skb_has_frag_list(skb) ||
+> > +			     skb_has_shared_frag(skb))) {
+> 
+> We seem to be getting a lot of fixes for this issue, and this one is
+> incorrect :| Writing to _any_ frags is incorrect. You have to copy
+> if skb is not linear. skb_ensure_writable()
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-net: sfp: extend SMBus support
+I was testing a patch based on skb_ensure_writable() but it seems v3
+has just been merged to mainline...
 
-This commit extends SFP module SMBus support by adding word and I2C
-block access capabilities. It implements single read and write helpers
-that pick the largest supported transfer per chunk and fall back to smaller
-chunks as needed.
+What would be the best way to proceed?
 
-> diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-> index e58e29a1e8d27..16d41d7ee6328 100644
-> --- a/drivers/net/phy/sfp.c
-> +++ b/drivers/net/phy/sfp.c
-[ ... ]
-> @@ -756,50 +757,110 @@ static int sfp_i2c_write(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
-[ ... ]
-> +static int sfp_smbus_read(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
-> +			  size_t len)
-> +{
-> +	union i2c_smbus_data smbus_data;
-> +	u8 bus_addr = a2 ? 0x51 : 0x50;
-> +	size_t this_len, transferred;
-> +	u32 functionality;
-> +	u8 *data = buf;
-> +	int ret;
-> +
-> +	functionality = i2c_get_functionality(sfp->i2c);
-> +
-> +	while (len) {
-> +		this_len = min(len, sfp->i2c_block_size);
-> +
-> +		if (functionality & I2C_FUNC_SMBUS_READ_I2C_BLOCK) {
-> +			smbus_data.block[0] = this_len;
-> +			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> +					     I2C_SMBUS_READ, dev_addr,
-> +					     I2C_SMBUS_I2C_BLOCK_DATA, &smbus_data);
-> +			if (ret < 0)
-> +				return ret;
-> +
-> +			memcpy(data, &smbus_data.block[1], this_len);
 
-Can this sequence leak uninitialized kernel stack memory to the output buffer?
-
-When performing an I2C_SMBUS_I2C_BLOCK_DATA transfer, i2c_smbus_xfer()
-updates smbus_data.block[0] with the actual number of bytes read from the
-bus upon success.
-
-If the adapter or device returns fewer bytes than requested (a short read),
-smbus_data.block[0] will be less than this_len. Because memcpy()
-unconditionally copies this_len bytes, it appears it would overrun the valid
-data and copy uninitialized memory from the smbus_data stack variable.
-
-Since the SFP EEPROM data is accessible to userspace via ethtool, could this
-expose uninitialized kernel stack memory to userspace?
-
-Should the code verify that smbus_data.block[0] == this_len, or use
-smbus_data.block[0] as the actual transferred length?
+Best regards,
+Hyunwoo Kim
 
