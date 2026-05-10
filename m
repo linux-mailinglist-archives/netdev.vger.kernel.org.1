@@ -1,176 +1,133 @@
-Return-Path: <netdev+bounces-286284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286285-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YBdgI/hzAGqaJAEAu9opvQ
-	(envelope-from <netdev+bounces-286284-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 14:03:04 +0200
+	id IJIQM596AGqbJQEAu9opvQ
+	(envelope-from <netdev+bounces-286285-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 14:31:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20BBA503D70
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 14:03:03 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67536503E6C
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 14:31:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 237853002B36
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 12:03:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AC8C23002886
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 12:31:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95D50379ECD;
-	Sun, 10 May 2026 12:03:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61BCE3815EA;
+	Sun, 10 May 2026 12:31:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fO0pJrO8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MnZsboA0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2500834AB14
-	for <netdev@vger.kernel.org>; Sun, 10 May 2026 12:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778414581; cv=pass; b=Dh1KBTVaUVZ13i4hUWxG+ZB3OPWnkQoDTtq9q/+uCgO1m1co93FvEgg0RHboyBteM/dDubH6BTif3EVflzWuYHgreb+JjeRnQROl7pUnpE3PKojV4rMFnO9gVMRX/vWIPthHi3K55nzRVBKl1Clwm43MHNEYQ1UYOV3rIvRQ/7Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778414581; c=relaxed/simple;
-	bh=bH+A1pcJNHbsEm31+G4EJAAN3LgMlSAJINOZTIByCpo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L6hB01BFQWpOurtcTts+PIn1qcCIaYNAA4O3qvGaz8YykNzlC0i0VSgq/eMCjb5lUQ9L+AgmBMGLKS0vCSpzHcY08goJfavajXzG6xI0vp0MGd+LNSH/8VdaxUEMgHrOY7lTQdVE4vLPCw6ng123WUIpzqXCEVsXY2ZHtbxKOGw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fO0pJrO8; arc=pass smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-bc64ad08bf9so520829366b.0
-        for <netdev@vger.kernel.org>; Sun, 10 May 2026 05:02:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778414578; cv=none;
-        d=google.com; s=arc-20240605;
-        b=k01ThDybHOoyoR4V6SvGBXlSBM9YGa+2Ec2ZoFMNi4/6siQhcFDTfKNWuYqGDwSN2r
-         lW4ebrmHz8jof7ITxz+f/0kTa6MbTYZZXYy9SYohhSmm/V21/QaG4etWTTsWIUYVaJJE
-         sdjjGarTsKtvB9VRCa8WrVwlUJHfzR8PVTWT0EodFUePdqQYLfqB/bmirzpmDWo1hmk5
-         mMY2CYSRhyxblu31oliiUVJk8Z8+k8UbIwL1rvVOHyEUWAAKnPCcyyFFQcHiTlBVcNoD
-         PjDIqM55Re5EDVXK/3qP/aliAUwiNFbM2byPOtfPI6KW9rdj0ZzbBGHHQ0BEwigS/VA7
-         q/oQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=Vmli1MjJU1iPg6tCzc8RsiqsXAYEqteoIsuCG5nm0hc=;
-        fh=iQMn4PA81ffs8RQyjb2y18viXB/cDoh/yOLGCaerMdc=;
-        b=KAyhKP9xjOHPf3yUXPogY04cbcrAEp9POtzTK//96K8fN+MSpCGtS3ArQr10qPBFOi
-         LoRdq3fXdsXwOVeSveA+3J1ddu+ncFHCOrpQCffExGMJM+EaX49Wl4zgNHfXV0iLLTfC
-         QSgscz2EPVyyWKqWjreV0/CejHZ9t2NYuJkRrU7J9gHZsYMdKszz1lFuA2/ZItmip9jx
-         W5S62g7yU71/GLTGjRJSx8Ccf5v3KdpYVdRHCGMWShi9C9u/LHdnexl4wNE3bTdgcaLM
-         ZJ18Dv9W7xDGa1glnK7RapQsFOiDwJLM+SNm7VRm7S/E1PG/MD4DBuuUSTEmUAlAzstX
-         LnLQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778414578; x=1779019378; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vmli1MjJU1iPg6tCzc8RsiqsXAYEqteoIsuCG5nm0hc=;
-        b=fO0pJrO8ujKdOeYAdQyNU3+8Vm0rnTWHF7763Kct16qI84G4j3Xzo+XVwJpN7NKMrf
-         TO6g7oBiNUrXU8H7Se7tTM+BqJOXbOjlXEqZNun8vGKTwQ81pbfnbptOYIzsFbzGBnZw
-         9Zv+wa8pOf7abXoV7MVJBpuZUvzyZ5FiuAzUmfoLJP4/d1vePAl/P8PzPOz8ZE558CSy
-         XJpeM1BY8r/J/GELM8VoXH+PCF+iXh2sU2AfRAdaoYkrfqMNFTKQvZLsCfFk2uTbVm6H
-         FBBg+mkzWMzvkt/QD8YWa/Wlnccoc5A9xc8cUXVirru3X7G/0uydm7yWkQPGz0WfmTvm
-         Wyiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778414578; x=1779019378;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vmli1MjJU1iPg6tCzc8RsiqsXAYEqteoIsuCG5nm0hc=;
-        b=ayJsi27Fo1mBgfUTgMYsXHcSV5b1Gw3e5u3c3oiRlsb6s5ac2+6rJinc3/FJZcHg5o
-         +LVkYbnUy5puzMzWFLuFoqC8dynH/lN/6+4cSdx437vGTdWiVVpgC1hDqB/f7H0nxI0U
-         /kbbMxu27Z7g0h4BdTHJZaHGE95W3Sh2z07D0Zg9SYRdku2u8QhYeCZ7q1x06L9IeJTU
-         3hGKVvePvO7QyLq3gYREkK8YbB6WIr6wT5ZGxlwqT7cGuVlTTkLeFVprj29mwYKsSofE
-         cuW7lhOadVRzgQwzgOHDhKcbSfYxQDaczYMYCI5k6VHNGmsyjUKcEHlvQ/YfoZx9RYb1
-         pTLA==
-X-Forwarded-Encrypted: i=1; AFNElJ/+fwrbsXj0yE71eAR0wmvjWP01R8hA5h7KB7GaK4phxEcku9K15syor5zYL3E+w/0uUvnaEiE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNoL+1zZPisCVi6jjeCw/kkiTkl9RzOEEEekiOZdNMBxEumcnE
-	honfqEUX33tgNmOcOLRc9FdKG9XzzxkHMwVAsXdVqn0ISUObdAa1+bnDtDxRBba5yBDUce21ICT
-	db/SFMV5lmf3tEnSi8IkLm+fO9smmPlU=
-X-Gm-Gg: Acq92OGljECOJLrb/mhYNfceVvCpR8naCReH9c3PXeGaN04DwOvrGovasVEPuAzrXm+
-	jk4KPIvsNhqGmZfhp6j1PTmpXWnqOuRQr6A41tBhS80CRBO3pRDi5CvfaBveIP82BWjl2xr09zH
-	w3bjugF0At1n/anDGM9t00NxqN8HwTLWmqRMwleRFA8hqfq10OR87Kj5vsehmS9U1EErxjL1B0s
-	KGkKqxI4giN5ms1nxbgUlfmvdJEX7RRIEEkEMapE9b6joX3t9rx5adZn5d2LvNOyOGaaBr3LWgl
-	RJCaHTzx7YQ2sJhWKeeKKomg7JKfsdLfQcKeT3SoPw==
-X-Received: by 2002:a17:906:eec6:b0:bc3:ae9a:15 with SMTP id
- a640c23a62f3a-bc56b94225bmr1059279966b.9.1778414578150; Sun, 10 May 2026
- 05:02:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36DB9DDCD;
+	Sun, 10 May 2026 12:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778416283; cv=none; b=UfLzCqjLLwfHXsciP0yTGxpniurOkyoK/UZ2Gf+vyhCd0YeLtm+4tR1+rv1Yh1f3QrDk8wqzDu4kul+SnBJ1aZ0jijYW/kEbX2AtrVsvrV2fOQ0hJAr8/qye13DZu6NPTSbczwOcaspBXKMRiDY3aYcv2LZxgx7V548DpEFZlJg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778416283; c=relaxed/simple;
+	bh=3JqIN/a5xnDrsf7uQ/t04AQRZOGabyoAFAk9x9agD58=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=TEfAsLuJcETScE+cHsE2ROt0F42hXh506YYz6fhCvJLid56l9ysyF3Mnew1x8wwCMzJ5VFpOnBuOqBFBhxuufDUD/VVNDDdVhLUDG7fZLYSKtwaR8m+GuyjHr3sXkxIz9LJPq/sCMxZ8lfGCsuNtXuYHCu4Lc3vHJM3RBkZC16s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MnZsboA0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51955C2BCB8;
+	Sun, 10 May 2026 12:31:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778416282;
+	bh=3JqIN/a5xnDrsf7uQ/t04AQRZOGabyoAFAk9x9agD58=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=MnZsboA0jQmaijqnX2BD+hvMlrJcDvxnQQDS/r9gbtq9L0V6otNe32bZ6WXiAjBl3
+	 aKhZSAZglSQAFSPZRmNTI/7CsKpNa/vW0GUwQZSSxgX5zNqKwthOcghfNnZGDyvFfs
+	 pcqtjUOYAD3a3JBSRBc0WzaejDDpIBU2DgafD/VPQsPUgKnuaFhpyjnSV88PTNZVy1
+	 BqVaYN47khWtmCpyaH43ZRIK/rfWHRQCScbn0wHvzO4YXLpYwz5mjuenpxA7ukRS/I
+	 aRTznzwF4TgpHbyDD/T4T9c/LeNSzAQGWUJDOgbfOJFRwbfcVRV097cqwM05W0vHAr
+	 R7W6HiWOe6XCw==
+From: Vinod Koul <vkoul@kernel.org>
+To: Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, 
+ Tero Kristo <kristo@kernel.org>, Neil Armstrong <neil.armstrong@linaro.org>, 
+ Nora Schiffer <nora.schiffer@ew.tq-group.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-phy@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
+ linux@ew.tq-group.com
+In-Reply-To: <cover.1775559102.git.nora.schiffer@ew.tq-group.com>
+References: <cover.1775559102.git.nora.schiffer@ew.tq-group.com>
+Subject: Re: (subset) [PATCH v4 0/5] J722S SGMII support
+Message-Id: <177841627590.434434.3111204439748668574.b4-ty@kernel.org>
+Date: Sun, 10 May 2026 18:01:15 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260505-seg6-mobile-v2-0-9e8022bdfdb6@gmail.com>
- <20260504163915.4a8b028e@kernel.org> <CAGCJULP83NnaX6HAqwb3umDXsxN8LH48_gPpJ_3gG8_xA96QNQ@mail.gmail.com>
- <20260504182833.344d7b33@kernel.org> <20260508033210.5149db4fc3977d33937e6942@uniroma2.it>
- <CAGCJULP_dTSjXQqyOYXckkmtd-HAPo4UT2V0WQofOZaJYLgENw@mail.gmail.com>
-In-Reply-To: <CAGCJULP_dTSjXQqyOYXckkmtd-HAPo4UT2V0WQofOZaJYLgENw@mail.gmail.com>
-From: Yuya Kusakabe <yuya.kusakabe@gmail.com>
-Date: Sun, 10 May 2026 21:02:46 +0900
-X-Gm-Features: AVHnY4IcF3vmMhSO8SdPuE7-fCfzpzAXRJRVY1ZnbUg0Ri8QL_dBkXa2fNxxouU
-Message-ID: <CAGCJULMSMrcWmQUZ-RoWB8uAivZ2DZdefED7nShMpUNBzPBLFQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/7] seg6: add SRv6 Mobile User Plane (RFC 9433) behaviors
-To: Andrea Mayer <andrea.mayer@uniroma2.it>
-Cc: Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, 
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, Justin Iurman <justin.iurman@gmail.com>, 
-	stefano.salsano@uniroma2.it
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 20BBA503D70
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13.0
+X-Rspamd-Queue-Id: 67536503E6C
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286284-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286285-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,lwn.net,linuxfoundation.org,vger.kernel.org,gmail.com,uniroma2.it];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yuyakusakabe@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vkoul@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Fri, May 8, 2026 at 10:32 AM Andrea Mayer <andrea.mayer@uniroma2.it> wrote:
-> just a heads-up: I am going through the series (kernel and iproute2)
-> and will send detailed comments within the next few days. It is a
-> substantial addition so I want to take the time to review it properly.
 
-Quick note from my side before you spend more time on patch 4/7:
+On Tue, 07 Apr 2026 13:42:32 +0200, Nora Schiffer wrote:
+> The J722S CPSW and SERDES are very similar to the variants found on the
+> AM64, but they additionally support SGMII. Introduce new compatible
+> strings for the J722S to add this support to the drivers.
+> 
+> This is a prerequisite for the Single-Pair Ethernet interface of the
+> TQ-Systems MBa67xx baseboard for the TQMa67xx SoM, which will be
+> submitted separately.
+> 
+> [...]
 
-While preparing v3 I noticed that v2's patch 4/7 ("End.M.GTP6.D")
-implements RFC 9433 Section 6.4 (D.Di) by mistake -- it shares the
-SRH-augmenting builder with patch 5/7 and preserves the original
-outer DA in segments[0].  Per Section 6.3 it should push the SR
-Policy verbatim and write Args.Mob.Session into segments[0].
-Already fixed in the local v3 branch.
+Applied, thanks!
 
-Feel free to skip the End.M.GTP6.D-specific comments on v2 patch
-4/7; patch 5/7 (D.Di) is unaffected.  Per Jakub's guidance I will
-hold the v3 repost until your review lands.
+[1/5] dt-bindings: phy: ti: phy-j721e-wiz: Add ti,j722s-wiz-10g compatible
+      commit: 059f1a4c9e3aa44d888c0e7cf4559403eece0438
+[2/5] dt-bindings: phy: ti: phy-gmii-sel: Add ti,j722s-phy-gmii-sel compatible
+      commit: 567b3c62a7eb51db4cb562b416ec220132d524c9
+[3/5] phy: ti: phy-j721e-wiz: add support for J722S SoC family
+      commit: 61849b7afb579630fc45dbeaf5449b42b33cc70e
+[4/5] phy: ti: gmii-sel: add support for J722S SoC family
+      commit: d39cf00e7daea64889dda9abb0b7e6da04a69d04
 
-Thanks,
-Yuya
+Best regards,
+-- 
+~Vinod
+
+
 
