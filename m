@@ -1,118 +1,247 @@
-Return-Path: <netdev+bounces-286355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286356-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oN9yA5HBAGppMQEAu9opvQ
-	(envelope-from <netdev+bounces-286355-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 19:34:09 +0200
+	id oPGXJrrBAGppMQEAu9opvQ
+	(envelope-from <netdev+bounces-286356-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 19:34:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C78C5056EC
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 19:34:08 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 396EF505704
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 19:34:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 61EA03008520
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:34:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9FA943001FD1
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 17:34:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E46F3B27DB;
-	Sun, 10 May 2026 17:34:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89DD3B2FC0;
+	Sun, 10 May 2026 17:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UyNIcr/W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G3xAe9PU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69DF2128395;
-	Sun, 10 May 2026 17:34:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5992390C90;
+	Sun, 10 May 2026 17:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778434446; cv=none; b=CD6emKvoQDKykgtPWuJMDPiNVveqJaKPtPUSkEWbq41llztX7H079OZHsobDY2ViNdoEPe5DpHoboHmFfBeEgzGCwcgImYh0JsP2p22YLJAp1JVzNEM6S08+dTrqBMHwKB5SddK5YRUe6qN5SQDLVOlQR+ifTzCf1lN6bGPrL60=
+	t=1778434487; cv=none; b=JMeZjZezw/KEbnACSb1bTgOj0f98wvUjPCi7aJMfGTX5k+Ya1OC4XmBQqrAdD41WVhq4mmsg8UAs0QVoNpLe+cvn/04SH5QNEeBJoQq+d5rakKr50CRg+hx93VlcA1VSN9Pde/0g/LNMXrAx1ifbRzD2hqw8/GNbclR47/MxVAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778434446; c=relaxed/simple;
-	bh=Jru7/l+BDYpDPfTVh9lIW13IaWEAz6P0PLFOWsCC8mc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V0+m3g2BdWSc+6wsiJSxmgc5YVjoHNFwdj6fcFfgjtoJyXIvtJ7nlSINpW+70ldpSwHh40I5/BlX1sbtOXNv34zX6ONudqRXKtBwS9BxDm37sm2dzEQT0FNRpcZYh5cDvP0GMPrhL354/vY+FsU6hRKicGQktgFmMZJ6Ck8lEMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UyNIcr/W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E3F6C2BCB8;
-	Sun, 10 May 2026 17:34:05 +0000 (UTC)
+	s=arc-20240116; t=1778434487; c=relaxed/simple;
+	bh=OOsI+5HllTxEMuiDYLXP1yV+AiWhZw68Mg+PB8B4cv8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=X56b9tfZ9OuAhXgNc+dOI42rNsk2qL4CcGid1oEik3K9qel1IgN6UckA7bSEgMmkGhkQNR8vhl70DmACfJcIsfPubqI2QFwRAIZS8VlOvAnqcJao9RA3kM8pxQhYakD0L12mf/OAWLG8p8UfFeEQtq1PZbvTVrxfnvA2E4cvw+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G3xAe9PU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5444C2BCB8;
+	Sun, 10 May 2026 17:34:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778434446;
-	bh=Jru7/l+BDYpDPfTVh9lIW13IaWEAz6P0PLFOWsCC8mc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UyNIcr/WycOGm3LZrYgvKZuyoBo4mUc8/cnW1jTKl/8s2PfecUJOXmAQt5cpf3Y9z
-	 1uxZU9X3WlqVdo+SvVItchpjOWaJB074rj4p/iiEYyDE6o8KrKz9X0woKur73/4zpQ
-	 h6669BgpuFnsNjD4M61r4OvzeUwhYes9066S73ElQkLMiNoUQ2iw+vxrCFfl7rVb9o
-	 2cucYZ2jpUlu3IMi/YS8yEtyxW+vBIM/WlLEFE+CseL5ZZ+I2pMQuT2nUB6cRm6bcC
-	 1wTg0kTwnHDCQ/r9x9inEi/68q9JRcard2Zm2L6IIZMbOj7hr2EvHJKijpC6GhWPtD
-	 +YYhN8KEeHilg==
-Date: Sun, 10 May 2026 10:34:04 -0700
+	s=k20201202; t=1778434487;
+	bh=OOsI+5HllTxEMuiDYLXP1yV+AiWhZw68Mg+PB8B4cv8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=G3xAe9PUM8ptgU41d9PYDooGaa5hMFnSlOwX9n/JgSTzgVuepCSXgsqUxALfkTcf+
+	 78q+giI78TBJlt7SpTs/uIngYBrpCNA6EK8QMO1CV940qPIB2vnWq//tGyiuPRjunD
+	 wrVXUGATgRH7Bb3RdYCVVM53SQ8Q8ueCL7RjreaZgO0w3xgL+DvaC9aglPEbJZ0F+y
+	 LvU+OLAPzYQSdn5tPOXiCKN5qewiUJSa0Ga5jbVTUsbTnDbuGBNr2Mt3OGMvmiGwHe
+	 McDv8on4qnbiQKD+tsujfBEpnBX/tvsPiLZ5u1iW6GHLum09MIl5OAsG02F4EOJx76
+	 ycaZRux2dtolw==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Linus Walleij <linusw@kernel.org>, Alvin
- =?UTF-8?B?xaBpcHJhZ2E=?= <alsi@bang-olufsen.dk>, Yury Norov
- <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
- Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Abdulkader Alrezej
- <abdulkader.alrezej@gmail.com>, Yury Norov <ynorov@nvidia.com>
-Subject: Re: [net-next PATCH v3 0/8] net: dsa: realtek: rtl8365mb: bridge
- offloading and VLAN support
-Message-ID: <20260510103404.21b60138@kernel.org>
-In-Reply-To: <20260506-realtek_forward-v3-0-1d87c5f85a3b@gmail.com>
-References: <20260506-realtek_forward-v3-0-1d87c5f85a3b@gmail.com>
+To: luizluca@gmail.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	andrew@lunn.ch,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linusw@kernel.org,
+	alsi@bang-olufsen.dk,
+	yury.norov@gmail.com,
+	linux@rasmusvillemoes.dk,
+	linux@armlinux.org.uk,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH v3 2/8] net: dsa: realtek: rtl8365mb: use dsa helpers for port iteration
+Date: Sun, 10 May 2026 10:34:45 -0700
+Message-ID: <20260510173445.3919786-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260506-realtek_forward-v3-2-1d87c5f85a3b@gmail.com>
+References: <20260506-realtek_forward-v3-2-1d87c5f85a3b@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 7C78C5056EC
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 396EF505704
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-286356-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286355-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org,nvidia.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.982];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Wed, 06 May 2026 23:58:17 -0300 Luiz Angelo Daros de Luca wrote:
-> This series introduces bridge offloading, FDB management, and VLAN support
-> for the Realtek rtl8365mb DSA switch driver. The primary goal is to
-> enable hardware frame forwarding between bridge ports, reducing CPU
-> overhead and providing advanced features like VLAN and FDB isolation.
->=20
-> Some of these patches are based on original work by Alvin =C5=A0ipraga,
-> subsequently adapted and updated for the current net-next state.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+---
+net: dsa: realtek: rtl8365mb: use dsa helpers for port iteration
 
-Could you please look thru the feedback provided by AI bots?
-Most of it looks kinda subjective to me but hard for me to evaluate
-the HW details on patch 7, especially.
+This commit refactors rtl8365mb port iteration to use the
+dsa_switch_for_each_*() helpers, adds a blocking setup phase for all
+ports up front, and extends CPU-port isolation to include all user
+ports.
+
+> diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
+> index edbc16345d0d..7ddb82fcd026 100644
+> --- a/drivers/net/dsa/realtek/rtl8365mb.c
+> +++ b/drivers/net/dsa/realtek/rtl8365mb.c
+
+[ ... ]
+
+> @@ -1943,11 +1946,11 @@ static int rtl8365mb_reset_chip(struct realtek_priv *priv)
+>  static int rtl8365mb_setup(struct dsa_switch *ds)
+>  {
+>  	struct realtek_priv *priv = ds->priv;
+> +	struct dsa_port *cpu_dp, *dp;
+>  	struct rtl8365mb_cpu *cpu;
+> -	struct dsa_port *cpu_dp;
+>  	struct rtl8365mb *mb;
+> +	u32 userports_mask;
+>  	int ret;
+> -	int i;
+>  
+>  	mb = priv->chip_data;
+>  	cpu = &mb->cpu;
+
+[ ... ]
+
+> +	/* Start with all ports blocked, including unused ports */
+> +	dsa_switch_for_each_port(dp, ds) {
+> +		struct rtl8365mb_port *p = &mb->ports[dp->index];
+> +
+> +		/* Set the initial STP state of all ports to DISABLED, otherwise
+> +		 * ports will still forward frames to the CPU despite being
+> +		 * administratively down by default.
+> +		 */
+> +		rtl8365mb_port_stp_state_set(ds, dp->index, BR_STATE_DISABLED);
+> +
+> +		/* Start with all port completely isolated */
+> +		ret = rtl8365mb_port_set_isolation(priv, dp->index, 0);
+> +		if (ret)
+> +			goto out_teardown_irq;
+> +
+> +		/* Disable learning */
+> +		ret = rtl8365mb_port_set_learning(priv, dp->index, false);
+> +		if (ret)
+> +			goto out_teardown_irq;
+> +
+> +		/* Set up per-port private data */
+> +		p->priv = priv;
+> +		p->index = dp->index;
+> +	}
+> +
+> +	userports_mask = dsa_user_ports(ds);
+> +
+>  	/* Configure CPU tagging */
+>  	dsa_switch_for_each_cpu_port(cpu_dp, ds) {
+> -		cpu->mask |= BIT(cpu_dp->index);
+> -
+> +		/* Use the first CPU port as trap_port */
+>  		if (cpu->trap_port == RTL8365MB_MAX_NUM_PORTS)
+>  			cpu->trap_port = cpu_dp->index;
+> +
+> +		/* Forward to all user ports */
+> +		ret = rtl8365mb_port_set_isolation(priv, cpu_dp->index,
+> +						   userports_mask);
+> +		if (ret)
+> +			goto out_teardown_irq;
+>  	}
+> +
+> +	cpu->mask = dsa_cpu_ports(ds);
+>  	cpu->enable = cpu->mask > 0;
+>  	ret = rtl8365mb_cpu_config(priv);
+>  	if (ret)
+>  		goto out_teardown_irq;
+>  
+> -	/* Configure ports */
+> -	for (i = 0; i < priv->num_ports; i++) {
+> -		struct rtl8365mb_port *p = &mb->ports[i];
+> -
+> -		if (dsa_is_unused_port(ds, i))
+> -			continue;
+> -
+> +	/* Configure user ports */
+> +	dsa_switch_for_each_user_port(dp, ds) {
+>  		/* Forward only to the CPU */
+> -		ret = rtl8365mb_port_set_isolation(priv, i, cpu->mask);
+> +		ret = rtl8365mb_port_set_isolation(priv, dp->index, cpu->mask);
+>  		if (ret)
+>  			goto out_teardown_irq;
+
+[Medium]
+Does this refactor change behaviour for DSA-type ports (DSA_PORT_TYPE_DSA)?
+
+Before the patch, the configuration loop iterated every non-unused port
+and applied cpu->mask as the isolation mask, which included DSA-type
+ports:
+
+	for (i = 0; i < priv->num_ports; i++) {
+		...
+		if (dsa_is_unused_port(ds, i))
+			continue;
+		/* Forward only to the CPU */
+		ret = rtl8365mb_port_set_isolation(priv, i, cpu->mask);
+		...
+	}
+
+After the patch, the first pass sets isolation to 0 for every port, and
+the subsequent passes only match CPU ports and user ports:
+
+	#define dsa_switch_for_each_cpu_port(_dp, _ds) \
+		dsa_switch_for_each_port((_dp), (_ds)) \
+			if (dsa_port_is_cpu((_dp)))
+
+	#define dsa_switch_for_each_user_port(_dp, _ds) \
+		dsa_switch_for_each_port((_dp), (_ds)) \
+			if (dsa_port_is_user((_dp)))
+
+So a DSA-type port keeps isolation=0 from the initial pass and is never
+reconfigured.
+
+In addition, the masks derived from dsa_user_ports() and dsa_cpu_ports()
+exclude DSA-type ports, so CPU and user ports will not include DSA link
+ports in their isolation masks either, which looks like it would block
+forwarding across cascaded switches in both directions.
+
+The commit message describes the behaviour change only as "CPU isolation
+now includes all user ports"; is the loss of DSA-port configuration
+intentional, and if so should it be called out in the commit message?
+-- 
+pw-bot: cr
 
