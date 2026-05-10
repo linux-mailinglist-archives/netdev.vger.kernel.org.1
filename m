@@ -1,104 +1,169 @@
-Return-Path: <netdev+bounces-286231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286232-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ZDDWFgjm/2kVAAEAu9opvQ
-	(envelope-from <netdev+bounces-286231-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 03:57:28 +0200
+	id BzvANZjs/2ljAQEAu9opvQ
+	(envelope-from <netdev+bounces-286232-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 04:25:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3D9050228B
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 03:57:27 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F27350244E
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 04:25:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 15C613002D21
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 01:57:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5B497300E161
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 02:25:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31BD3196C7C;
-	Sun, 10 May 2026 01:57:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A56E23E324;
+	Sun, 10 May 2026 02:25:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e79y6hL/"
 X-Original-To: netdev@vger.kernel.org
-Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E93E1CD2C;
-	Sun, 10 May 2026 01:57:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.133.224.34
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C06263CB;
+	Sun, 10 May 2026 02:25:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778378240; cv=none; b=nFf3R0tHCl6kPerUFFf2vynHb+58aWnQJCvuR0ldeohEGr43BCnvN7wBgEHDXlgOmcRyl5Erud5IrvMrWEzQ3gp4shomG9aGTMxBhjI4kZPI0N/9P7Me0tSjFV6WBMwB/9b7IpHRVJ4uUFhULGOqilZJLXlwtzaO6z1R6Ow9rcQ=
+	t=1778379925; cv=none; b=VYNBMYSQ5yCZIX+afyPaDhFPED4GwsworXwI7soW4z2isHHpgA9Gr49zwwJF3FMi4t+2tKYpnyi7ss8dykUJyNVpOtVb/pEcf6tp8T7LP2sxOcP+EaM23UpgvbKAV8DZmP5epr7FIPUs3yCA/JcM6gV4M8MzTPD0kSRIeb/yta8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778378240; c=relaxed/simple;
-	bh=FeQt5ttcbWLwv/nN89wxXVpFGWK6iUKcx7y3nrQ0FZo=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=q+nacnHVKZnFyVh7gjLDu7T/Avq7kiwxFU5Z/Un3RCZjc+fUhdTzYIuKwMCrf6s+VCsvPpxP1Mb4MXrchYnC9QO5FarVr0J9n92wEo14MlqeBye8zJvaJgaISzWFaL9hPjXA9pNknTTlR6CYKG4aMuBNSkRC2d+WsbWLSBvBRac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=orcam.me.uk
-Received: by angie.orcam.me.uk (Postfix, from userid 500)
-	id 5F58A92009C; Sun, 10 May 2026 03:57:15 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by angie.orcam.me.uk (Postfix) with ESMTP id 5110792009B;
-	Sun, 10 May 2026 02:57:15 +0100 (BST)
-Date: Sun, 10 May 2026 02:57:15 +0100 (BST)
-From: "Maciej W. Rozycki" <macro@orcam.me.uk>
-To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-    Ethan Nelson-Moore <enelsonmoore@gmail.com>
-cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: MAINTAINERS: Add self for the 3c509 network driver
-In-Reply-To: <20260509230519.57607-2-enelsonmoore@gmail.com>
-Message-ID: <alpine.DEB.2.21.2605100246020.46195@angie.orcam.me.uk>
-References: <177827761704.865600.12887598979033208728.git-patchwork-notify@kernel.org> <20260509230519.57607-2-enelsonmoore@gmail.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+	s=arc-20240116; t=1778379925; c=relaxed/simple;
+	bh=DuPHI1LqOFfQCPwSGvE4XxVWrva8Uk84ODEwZHi72xU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qDthOCx1hjB4wtUbH7QD+lhf7laJs3isYUsV3b3L1hoeQEgpV433gt0fFA2if/beEMC2+EmfPzx7fcPnLVYaR1+okP72/SU3Jyo+fxZ6A+uEVz+oPVhZFfM3tcOdBIhp0geQGDdWmQOmKEHxKFeJmJqJyk9RMi7sKhntecFsmX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e79y6hL/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DAE5C2BCC7;
+	Sun, 10 May 2026 02:25:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778379924;
+	bh=DuPHI1LqOFfQCPwSGvE4XxVWrva8Uk84ODEwZHi72xU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=e79y6hL/mgDvOZD8UHrjx/yvvGE14Vi42uRup1vVa+BwGGuz0tI3FboKrX6KCcHYW
+	 RzREP9nAcxXgbOLsICt59PEujBZfc43refGEy/MqJqsWO96s+Q3AgEvXjdaDOJlAAS
+	 iXt5onlnEIiRTPA221E7iqjKkNnVa/ou5prZT51yvrxvmamwRnnTONClO46LkwR6wZ
+	 t2IFlN52kGo0lvKsca1tHoXbtX8d3ZNYB/HRYPyRw5jkTtawLddwbKxR+1rJEj3vIi
+	 eoZSgqm4WxQI4AKYACjQH26b7yHJFcZfpkAvmuGCkgkL1k/4LZuGB+A3395nol8DbQ
+	 i0nDH3HyM9r4g==
+Date: Sat, 9 May 2026 21:25:16 -0500
+From: Bjorn Andersson <andersson@kernel.org>
+To: Alex Elder <elder@riscstar.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, maxime.chevallier@bootlin.com, 
+	rmk+kernel@armlinux.org.uk, konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org, arnd@arndb.de, 
+	gregkh@linuxfoundation.org, Daniel Thompson <daniel@riscstar.com>, 
+	mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com, alexandre.torgue@foss.st.com, 
+	ast@kernel.org, boon.khai.ng@altera.com, chenchuangyu@xiaomi.com, 
+	chenhuacai@kernel.org, daniel@iogearbox.net, hawk@kernel.org, hkallweit1@gmail.com, 
+	inochiama@gmail.com, john.fastabend@gmail.com, julianbraha@gmail.com, 
+	livelycarpet87@gmail.com, matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, 
+	me@ziyao.cc, prabhakar.mahadev-lad.rj@bp.renesas.com, 
+	richardcochran@gmail.com, rohan.g.thomas@altera.com, sdf@fomichev.me, 
+	siyanteng@cqsoftware.com.cn, weishangjuan@eswincomputing.com, wens@kernel.org, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 08/12] dt-bindings: net: toshiba,tc965x-dwmac:
+ add TC956x Ethernet bridge
+Message-ID: <af_sarCs9E5M7NLE@baldur>
+References: <20260501155421.3329862-1-elder@riscstar.com>
+ <20260501155421.3329862-9-elder@riscstar.com>
+ <afycOwz5TpkegkZd@baldur>
+ <3c78f48c-6478-46d0-87c2-581bb58637dd@riscstar.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Rspamd-Queue-Id: A3D9050228B
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3c78f48c-6478-46d0-87c2-581bb58637dd@riscstar.com>
+X-Rspamd-Queue-Id: 6F27350244E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[orcam.me.uk];
-	FREEMAIL_TO(0.00)[kernel.org,lunn.ch,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-286231-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286232-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,riscstar.com,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[49];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[macro@orcam.me.uk,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.987];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,angie.orcam.me.uk:mid]
+	FROM_NEQ_ENVFROM(0.00)[andersson@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,kernel,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-On Sat, 9 May 2026, Ethan Nelson-Moore wrote:
-
-> > This patch was applied to netdev/net.git (main)
-> > by Jakub Kicinski <kuba@kernel.org>:
-> [...]
-> >   - MAINTAINERS: Add self for the 3c509 network driver
+On Thu, May 07, 2026 at 01:37:09PM -0500, Alex Elder wrote:
+> On 5/7/26 9:12 AM, Bjorn Andersson wrote:
+> > On Fri, May 01, 2026 at 10:54:16AM -0500, Alex Elder wrote:
+> > > diff --git a/Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.yaml b/Documentation/devicetree/bindings/net/toshiba,tc956x-dwmac.yaml
+> > [..]
+> > > +
+> > > +  gpio-controller: true
+> > 
+> > I don't have any concern with the use of a proper gpio driver to model
+> > the implementation, but if I understand correctly this relationship
+> > between gpio controller and gpio consumer is strictly internal to "the
+> > PCI device".
 > 
-> Hi, Jakub,
+> (I think you're already cool with this but I still wanted to respond.)
 > 
-> Did you forget to revert the driver removal, or have you just not gotten
-> around to it yet?
 
- Thanks for the heads-up.  I can see the removal was fast-tracked to 
-Linus; I didn't expect that, waiting a couple of weeks for people to speak 
-out wouldn't have hurt.  Now `git revert 91f3a27ae9f6' is in order.  
-Shall I post the output from that, or what is the expected way to handle 
-this situation?
+Thank you for the further clarifications, and added details, Alex. This
+does look reasonable to me.
 
-  Maciej
+Regards,
+Bjorn
+
+> That is not correct.  These GPIO lines are used two ways for the
+> RB3gen2:
+> - drivers/pci/pwrctrl/pci-pwrctrl-tc9563.c uses GPIOs 2 and 3 to
+>   assert/deassert the reset lines associated with the two exposed
+>   downstream PCIe ports on the PCIe switch within the TC956x.
+> 
+> - Each of the Ethernet PHYs has a reset GPIO.  On the RB3gen2, the
+>   GPIOs used for the purpose come from the GPIO controller embedded
+>   in the TC9564 (00 and 01).
+> 
+> These are therefore "exposed" (they are *not* strictly internal).
+> 
+> > Is this connection variable or is the link merely expressed in
+> > DeviceTree to mitigate the fact that you choose to implement the
+> > responsibilities of the two parts split into two device drivers?
+> 
+> It is variable.  These resets might be implemented by other GPIO
+> controllers on other platforms.
+> 
+> > Are there other consumers of these TC956x gpios which would result in a
+> > board designer (and hence dts author) to ever reference this
+> > gpio-controller in a different way?
+> 
+> They could.  Nine of these GPIOs are exposed by the TC956x pins
+> (GPIO00-06, GPIO12, GPIO35 and GPIO36).  The RB3gen2 uses 00-03
+> (and possibly 04 but that's for a PHY we haven't tested yet).
+> 
+> 					-Alex
+> 
+> > Regards,
+> > Bjorn
+> 
 
