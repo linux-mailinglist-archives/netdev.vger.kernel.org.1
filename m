@@ -1,168 +1,126 @@
-Return-Path: <netdev+bounces-286279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286280-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6BDiFU5rAGoyIwEAu9opvQ
-	(envelope-from <netdev+bounces-286279-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 13:26:06 +0200
+	id wGwGCVhrAGoyIwEAu9opvQ
+	(envelope-from <netdev+bounces-286280-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 13:26:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4BD9503C9A
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 13:26:05 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCDD4503CA1
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 13:26:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 60A263009FA7
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 11:26:04 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 175D23002B0B
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 11:26:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6EC3378823;
-	Sun, 10 May 2026 11:26:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF6CA37EFF1;
+	Sun, 10 May 2026 11:26:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WZ0viJyT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="okjxQ6ZO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71EEE33A9DD
-	for <netdev@vger.kernel.org>; Sun, 10 May 2026 11:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891D63242BE;
+	Sun, 10 May 2026 11:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778412363; cv=none; b=JwD6BoyBosDmZb8U+rYTiv0yRcSmFrUO/fYIJuh3IzeLrLP28r2Z/IhkrW2vSiN1fkWmG89v8Qmv641VvNdl+vVlK63I2A25el2/tbJZKX9ex5ZAFQI6bT73chA5+DIk8Mbvv0a8wZBnE8ItioINN30x6ZswCu2BpOfJAvKyiPs=
+	t=1778412373; cv=none; b=aRSZfob8TwLEtuZ3ZQvgbDYUeNTiaCazpEzLHOJmwire8zBHP4yvosEU2Xl31SiZvK3jQw3wISqJjXveFe8jQzJ6YkvK1oq9KN/idDfyyX91DDjFbsCMfSaH3s4bktCtLqXp6//k1+y2HhhQTWO5q9FXmoYrrhUCB1v6q1vYFpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778412363; c=relaxed/simple;
-	bh=kWundYsSA1TJvK+/u1cdL3QMlOTJF3BVADcVgUgb70Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MPm1RpjhbqDJhLsrWpAsz1PYlPySHUJyaiY17QAmBuCgdKJAVqVmLIbjAURrZYxcNRbL7CZGs0jTRHHQX+k6xX8tZpl6U0iU9FwN185CtqbacNE+dn1Gm1maE/giG/nYpYTcLRSIaVhL1wH7rZp/zTjlcWTrQsfdHVTlnm/tXkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WZ0viJyT; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-c80167f56cdso1248570a12.3
-        for <netdev@vger.kernel.org>; Sun, 10 May 2026 04:26:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778412362; x=1779017162; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VIl8H8lFysWE5ij7aLpKADHwKQH42nKkHoFfcSIfoNA=;
-        b=WZ0viJyTyb6lN55EJyZH7Tt8pt8NYNK1xhzGFuX4kHsGA7zh7RkM2hMjqsXYItFxDE
-         oom2IYBmg7S103oObghhJvVFu9oRDnO8LgFueWf4f3/qN3XtrFzgVZEyMt5wNqRCajNu
-         q1l9E4Jpw8EHv/3xQYdkagEUqm9lkWnitfPBu4tZXI8jHZkDuaJkmXmI6tS+q4Mz0qyj
-         N5EFqZNpjE8aul0wnGGikpG9jhr/Qli3BCgTU5FG0QJrm37CTjs37shglgEQMc+75r0J
-         BcRCp9eWXxutE7sakTNWBt8xuMssumdqgEXKB6FDkXPsdy12cYl75di6QWV6mEEN3gEW
-         vRUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778412362; x=1779017162;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VIl8H8lFysWE5ij7aLpKADHwKQH42nKkHoFfcSIfoNA=;
-        b=qYnj+uXkW8t+3qhwBqdm7d7Tv2o/382fNeNuuBYUxNrqTzZ3kixWYB0MmfdAcWky98
-         Ve+qWVFUHbXZvBgqi6BnWEgq5zbW5v2DrUIY8wxEqU9m83j1pYb+RWbtAS+SUyKwrTL9
-         3KEujyMG9ugT3IyIRY8zF7zv4WmjeBx2ljCKX76iZsD17CU12jiq1k5Tog8n8gQ3Kg4J
-         cM8+fYyCAGBtGDOtavpTgCxjUoQypw+3ZJ6XU439/Gf223BOv2CnivSxSP03f4CiaeY7
-         M+kJa+fR0y4mvBdRE5fMW+PmVD8CB/3Qxt847cChcfOcYvYwHkElhR0aqPZE7M2wiOmC
-         IbZA==
-X-Forwarded-Encrypted: i=1; AFNElJ8RFOl2ykX2k7VogbY0QULNqy9ozU1SltdjV8QQ/m+O0NhkLt8TBWR2rgWPHrwIchfLuAqmXWA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxfra6h7njiGlkVoV3CxI9NL7OE9wYIs/f9F9hmPzvSg95LgQLX
-	lGrdy+k+6BnDYDoJseusf8UVoSV74an8XTD5w+H3pq9lybQt6JZqYeSD
-X-Gm-Gg: Acq92OGcgZrYArl5Pmq/3dH5HDDNNJ+L3V5UjQF9WD512TDRXX0k97kB9Y+HoN+xqSf
-	+bkfgNz2gUDKjfvUEBbIkrXXB4nC3OVb+yjmTh5dsat82vxi3p5t/rNrhzIlt/aERA6npxb7F41
-	p4ArGlQ6fI52wjunHB/2E9zbFOlQ+n1yNf8PWM2QVYJaDE72DNdzVRzk5VToO8ENWytDzla+uh9
-	6yNJfGEswM7biVSHb3rN4+VZiZKkXYGbDmkpH5RaCjFL+4Cz8xo8k/WE0R2rvIaQrusujsSOE1c
-	ZHsTDjlHwdEmC1sR9W0jhx/QHzI+SAs1xmwGP062DcQUw74Uij2VRt6roOdS2erU8kq7YqTP1/v
-	YtSC9l3tUz8hVoeuW2m6VggnYwHb3stOIMwZ8wuZWon9ZwST6Z/Y/xlrFCLNjIU4AdQaPZjK9C6
-	UaQRxiO7ozHtcw56Mxr8Qn94FK8EYWIziR0MxABkqJ9bgWox7xZCtONL73tKA11HPi9Q0QhrQX
-X-Received: by 2002:a17:902:f78d:b0:2ba:ba5c:2524 with SMTP id d9443c01a7336-2baba5c26d4mr142806315ad.11.1778412361580;
-        Sun, 10 May 2026 04:26:01 -0700 (PDT)
-Received: from localhost.localdomain ([115.110.225.242])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1e35e9dsm75362185ad.39.2026.05.10.04.25.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 10 May 2026 04:26:01 -0700 (PDT)
-From: Shitalkumar Gandhi <shital.gandhi45@gmail.com>
-X-Google-Original-From: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
-To: ajay.kathat@microchip.com,
-	claudiu.beznea@tuxon.dev
-Cc: kvalo@kernel.org,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Shitalkumar Patil <shital@cambiumnetworks.com>
-Subject: [PATCH] wifi: wilc1000: fix dma_buffer leak on bus acquire failure
-Date: Sun, 10 May 2026 16:55:20 +0530
-Message-Id: <20260510112520.977360-1-shitalkumar.gandhi@cambiumnetworks.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1778412373; c=relaxed/simple;
+	bh=2KRTjZ2Lq8ZGRTyfYZPEXXRsQjgKx/NzMCHPT9+g3SI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uYK4mkAhEvu7lHJNpQO5A7QIR0poBteYmJBPpp9QZwMOArgqQxe6wXA4JlFhVvKcRA698J8MYQFZpILEsshtfrCimhlqb01fhtcH88p8JI194TFGJ5ld3Zf3irXNyj2C6Q/DF80pjPoxx9ei2VC4aKgPc1eIjZQGRLh/A353rPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=okjxQ6ZO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DB5EC2BCB8;
+	Sun, 10 May 2026 11:26:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778412373;
+	bh=2KRTjZ2Lq8ZGRTyfYZPEXXRsQjgKx/NzMCHPT9+g3SI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=okjxQ6ZO2rCXK0FiyK77U2aTNgcVTcTMEALrRzyYXJoz/CRP62qy1NUH6tWADKkf0
+	 isu7QOlxxiBapWJhB4qY3oU6FAtuX+C5Yzx+8B0tGvmqPuIG2u+RliTjjhRkaEpHlg
+	 UIWjvvw+YhY910QWp9EIktPQ7gwAtBzz+HbHHhsDBcXLm91Hzh6NGOyydPmJ6gO+QX
+	 PE+Is2ED9RuUB225NOZ10NmtI1cg60/A0X1T4wQnyF3xtBnFhEdddYYNkKFk53xDlY
+	 J3As1YwnIgvhxHQZgXAvH54TOotwgSSPrXJfQQEfTJxY12U1cU/THOsOuTCZpbJX3H
+	 kp9cdbXw1mVbA==
+Date: Sun, 10 May 2026 16:56:08 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Mark Brown <broonie@kernel.org>,
+	Liam Girdwood <lgirdwood@gmail.com>, Lee Jones <lee@kernel.org>,
+	Pavel Machek <pavel@kernel.org>, Peter Rosin <peda@axentia.se>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
+	Tom Rix <trix@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
+	linux-spi@vger.kernel.org, linux-leds@vger.kernel.org,
+	linux-fpga@vger.kernel.org, driver-core@lists.linux.dev
+Subject: Re: [PATCH 02/10] phy: core: switch to using
+ class_find_device_by_fwnode()
+Message-ID: <agBrUA7SsOLwhOMc@vaman>
+References: <20260322-remove-device-find-by-of-node-v1-0-b72eb22a1215@gmail.com>
+ <20260322-remove-device-find-by-of-node-v1-2-b72eb22a1215@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: B4BD9503C9A
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260322-remove-device-find-by-of-node-v1-2-b72eb22a1215@gmail.com>
+X-Rspamd-Queue-Id: BCDD4503CA1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286279-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shitalgandhi45@gmail.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286280-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vkoul@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linaro.org,gmail.com,axentia.se,armlinux.org.uk,intel.com,linuxfoundation.org,vger.kernel.org,lists.infradead.org,lists.linux.dev];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-From: Shitalkumar Patil <shital@cambiumnetworks.com>
+On 22-03-26, 18:54, Dmitry Torokhov wrote:
+> In preparation to class_find_device_by_of_node() going away switch to
+> using class_find_device_by_fwnode().
 
-wilc_wlan_firmware_download() allocates dma_buffer with kmalloc() at
-the top of the function and uses a 'fail:' label to free it via
-kfree(dma_buffer) on error.
+Acked-by: Vinod Koul <vkoul@kernel.org>
 
-All later error paths correctly use 'goto fail' to route through this
-cleanup. However, the early failure path after the first acquire_bus()
-call uses a bare 'return ret;', which leaks dma_buffer whenever the bus
-acquire fails.
 
-Replace the early return with goto fail so the existing cleanup path
-runs.
-
-Found via a custom Coccinelle semantic patch hunting for kmalloc'd
-locals leaked on early-return error paths in driver firmware-download
-code.
-
-Fixes: 1241c5650ff7 ("wifi: wilc1000: Fill in missing error handling")
-Signed-off-by: Shitalkumar Patil <shital@cambiumnetworks.com>
----
- drivers/net/wireless/microchip/wilc1000/wlan.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/wireless/microchip/wilc1000/wlan.c b/drivers/net/wireless/microchip/wilc1000/wlan.c
-index 3fa8592eb250..4b116fe6f9ea 100644
---- a/drivers/net/wireless/microchip/wilc1000/wlan.c
-+++ b/drivers/net/wireless/microchip/wilc1000/wlan.c
-@@ -1265,7 +1265,7 @@ int wilc_wlan_firmware_download(struct wilc *wilc, const u8 *buffer,
- 
- 	ret = acquire_bus(wilc, WILC_BUS_ACQUIRE_AND_WAKEUP);
- 	if (ret)
--		return ret;
-+		goto fail;
- 
- 	wilc->hif_func->hif_read_reg(wilc, WILC_GLB_RESET_0, &reg);
- 	reg &= ~BIT(10);
 -- 
-2.25.1
-
+~Vinod
 
