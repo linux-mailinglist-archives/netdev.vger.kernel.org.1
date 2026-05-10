@@ -1,115 +1,126 @@
-Return-Path: <netdev+bounces-286342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286343-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gFbiLeK3AGplLwEAu9opvQ
-	(envelope-from <netdev+bounces-286342-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:52:50 +0200
+	id qNnCBn25AGqmLwEAu9opvQ
+	(envelope-from <netdev+bounces-286343-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:59:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F421505387
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:52:49 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2D5550540D
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:59:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E090F300764A
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 16:52:48 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1C7383002324
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 16:59:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A503B27F8;
-	Sun, 10 May 2026 16:52:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D657638F251;
+	Sun, 10 May 2026 16:59:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FIttxXmA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u7H5FKeT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25D7366066;
-	Sun, 10 May 2026 16:52:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3345CA4E
+	for <netdev@vger.kernel.org>; Sun, 10 May 2026 16:59:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778431968; cv=none; b=dvuBgamsIqTOUcTIicjj9eazEP/fmE5Iyejw/ulUDTeZGxOndNDW7JHQgfSkZ/pgnqvweOnnExnIFGR1eRtCDtHQgYWi1oBxus/p79nsgu4GDlG76bzUryYMFeYkANKxLhEQpZMIuOykpOAV4ZnCjlzLbd8TBfklVUa85lkSR2w=
+	t=1778432378; cv=none; b=cyw34jykFnhmfBJ0zAReYsjwrMnRtSYWTPXQUZeet8m5rg66EdC/4+T9FDJYDHiQC+EsvJb9lu+VV1emPBb9eC2xmAHFxUH6YL3dx5Eobvq/GBzUDlO+72eK5YpilfjQ8kOO61774mBDEtFMcemG9RtZPs5OHYvlo9xnCC6XQik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778431968; c=relaxed/simple;
-	bh=Wt27c8yUp4nBvAgbQgl0CFl+X/lZLklaSUaR5eqjmvs=;
+	s=arc-20240116; t=1778432378; c=relaxed/simple;
+	bh=fIQOVwyFDN/lNdqwQ2/bx2neU4BDjRNiQ+i1IEnnFow=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uw1TMp+3UYMJru8ZOfzAiHQcjkXRtD2uPwi0Cf4nQLgO61yNe099RLyUUF+a1dTLczu+l4t9EDsldrcPscmVxvx2XQ3+FsZH0+bg/xZ07SRYMB2VzPRWRwSQjzGXWcswTx4er3SBHzzkMa4dyaCnHDjEDo1tyFT3os8jhdcEwJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FIttxXmA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1ECB1C2BCB8;
-	Sun, 10 May 2026 16:52:47 +0000 (UTC)
+	 MIME-Version:Content-Type; b=tXiTYdvHApWfn5sPvCoX0qab1j44d+7B0PcHH8bKWL+O8jnn/2B4qEmzrS1METYbOg+ZH7kGbNbpbYRS0uhbGMFzS8H+OArt+H27jRULv5O6xmzUUEThUI/980waxS3cw144KuGXLDjyRnz7kVAaYtKLwff5nTBL7aPITGJD7rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u7H5FKeT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06D21C2BCB8;
+	Sun, 10 May 2026 16:59:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778431967;
-	bh=Wt27c8yUp4nBvAgbQgl0CFl+X/lZLklaSUaR5eqjmvs=;
+	s=k20201202; t=1778432378;
+	bh=fIQOVwyFDN/lNdqwQ2/bx2neU4BDjRNiQ+i1IEnnFow=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FIttxXmA5kNnMDJMvEg20SClCNuHwC/DVB5d2v18vbh69NMUhI7FikVh+CRwhjTAa
-	 U/Nl74e6J9SFTja4yVfJjLiWTx5YYFUUkFrCcKSfifQXDhW6/kA9KcJx9Shy4bi2l+
-	 TtV7MmVYKm14+b2mpIY5kr3Wynz/gUqMcvuExikWH33QC4J7g8nBvbRiuaU+51UwfC
-	 x254TXt2edbCLEat+WTKaWBQCKgolTAfQyMp0fVQNLqz3STzjCLesRTXKeYb4umXC0
-	 CnFaKd6yvq64GepcU0dKosiEzhVpaiQ/k6gke5Z59vauuYOdSSpBkbejHEJxdJHceT
-	 ilmra89xu9YXg==
-Date: Sun, 10 May 2026 09:52:46 -0700
+	b=u7H5FKeT7sXDD6t2Hdv7KwkhIq/pQjdZ2ko/s+z0oNX2baBEFQpsU3pi9w0XfYUqI
+	 S7CxiAuQTtWJKwskmQoDB1icFeYTLJwkVFmzEQQZo8fMDwxgeNohn4NkSO25GYvX6w
+	 Lb99zdUJEFcU82JUmrqLmZORSh7e19LZPK/Op2290orz8Bsle7nzg0N9cgzenn9PQt
+	 cD/qN/fWnWHhHPCAlFvUqlC8BK2yZ3Fmp2M4lrspAv3MpQJ1U/Tp+A1rl1nJuIvjgA
+	 KogansAf3HL9pXQbIaBHC82Cn5ItF/2+H6hPGvuKu0fa2LZF+8rYItq+h2PKTYIDYY
+	 MRzjYRSCGUWSg==
+Date: Sun, 10 May 2026 09:59:37 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?w43DsWlnbw==?= Huguet <ihuguet@riseup.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Sabrina Dubroca
- <sd@queasysnail.net>, Filip Pokryvka <fpokryvk@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 0/5] netdevsim: get link via ethtool, set via
- sysfs
-Message-ID: <20260510095246.5c8f6d0b@kernel.org>
-In-Reply-To: <20260510164337.7611-1-ihuguet@riseup.net>
-References: <20260510164337.7611-1-ihuguet@riseup.net>
+To: Weiming Shi <bestswngs@gmail.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, Xiang Mei <xmei5@asu.edu>
+Subject: Re: [PATCH net v2] net: team: fix NULL pointer dereference in
+ team_xmit during mode change
+Message-ID: <20260510095937.598c27a6@kernel.org>
+In-Reply-To: <agCtGqWLK53TWCaS@Air.local>
+References: <20260509181825.1523951-2-bestswngs@gmail.com>
+	<20260510082509.1530a1a3@kernel.org>
+	<agCtGqWLK53TWCaS@Air.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 2F421505387
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: B2D5550540D
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286342-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286343-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Sun, 10 May 2026 18:43:32 +0200 =C3=8D=C3=B1igo Huguet wrote:
-> Allow to read the carrier status of a netdevsim device via ethtool, like
-> most of Ethernet devices allow.
->=20
-> Also, allow to set its carrier status via sysfs. Currently it's only
-> possible by linking a peer device and setting its admin state to
-> UP/DOWN. By editing the carrier status via sysfs tests that need to
-> check carrier related stuff may be simpler.
->=20
-> The third patch add the proper selftest for both things, and the fourth
-> and fifth fix a few small bugs in the selftest itself.
+On Mon, 11 May 2026 00:06:50 +0800 Weiming Shi wrote:
+> > Barriers are between things. What are the release / acquire barriers
+> > synchronizing.  
+> 
+> The handler function pointer against the mode_priv state it operates
+> on.  On setup, init() writes mode_priv, then smp_store_release()
+> publishes the real handler - the paired smp_load_acquire() in the
+> reader ensures the handler sees that state.  On teardown,
+> smp_store_release() publishes the dummy before synchronize_net()
+> drains readers, so exit_op() won't tear down state under an
+> in-flight reader.
 
-Could you please explain your motivation? Feels quite trivial,
-so it's not immediately obvious why we need tests.
+Still does not make sense to me. You already add sync_net().
+And if it's possible to switch from dummy to non-dummy mode
+the ordering is inverted.
+
+> > Why is AF_PACKET relevant here??
+> >   
+> 
+> Not specific to the bug, just a reproducer detail.  Dropped.
+> 
+> Sending v3 with the updated changelog shortly.
+
+Please don't rush new versions out.
 
