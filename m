@@ -1,161 +1,194 @@
-Return-Path: <netdev+bounces-286272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286273-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kpxmF21ZAGoZGwEAu9opvQ
-	(envelope-from <netdev+bounces-286272-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 12:09:49 +0200
+	id QLDkEVxeAGoGHgEAu9opvQ
+	(envelope-from <netdev+bounces-286273-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 12:30:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC559503909
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 12:09:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A56B9503A18
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 12:30:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B0B18300C906
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 10:09:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AEE34300CC3D
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 10:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB91535E93E;
-	Sun, 10 May 2026 10:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B1A530F927;
+	Sun, 10 May 2026 10:30:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z+/QpCVe"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="I0h4ExgF";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="YskLV+lx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A022D7D3A;
-	Sun, 10 May 2026 10:09:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80804175A84;
+	Sun, 10 May 2026 10:30:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778407785; cv=none; b=OGqWcHKaZVwJgmbonpuV8Yxgm2fmeJ++5exfyerjpCbK7UZ4T8ApF9wPDB8fCiLe3c4VNIlwF9BovYgMAskvnRkWW6Z/1blgqPzj75+tD24r9vUf0g71Q/YG8Tq7dB1MJetCoqXWY8Lu6gqybsS753QVEaAtETLDYOCvHHGTxLI=
+	t=1778409048; cv=none; b=SZDFq2BoD02+hu0SacJJkbH0ywUMbP/o1ZUmRtiQfk9MIIfN9wYazZMRQfezPhERDyE52JrkVQ0bKiwI6iphY4xm+iyMF0VozcMUQA/6cIZVLu+qkpSCCjg99GJYSdeZrSw32V85T43ugV1OoC5KdnpNEDTpcCsqWvn9kkdsS4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778407785; c=relaxed/simple;
-	bh=uqlxDGtXqYV/zVFSgS1Lzvi3cG2PZDyfoNyh9tfMy5U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qM7yCmekw3T7waRLVHp0wpX9TUACJj3v+pgEBzYmNdmCUsw80J6RsEVB56X35vcyVI9njgv8q+LgcT7ZznQaZfnBavu6d2N8hSx9LvKDak4tm7X0KKVMlateiP1aEUBkMxrMUXN/taaFjlO/Jmf+6i4hv0TEE5Mvmz42I2oOgRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z+/QpCVe; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778407783; x=1809943783;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=uqlxDGtXqYV/zVFSgS1Lzvi3cG2PZDyfoNyh9tfMy5U=;
-  b=Z+/QpCVeDCkVwLF+NxyH6fuNpIL6QtJhMj8jZ5qOn3LhPNWBI7abJcjh
-   83s3vk2xXuhdsFZY0ho1GqyBBeG9OtmTjr1ee/5SGCzBqofNTSbUFLUdR
-   7quuMFZks1RlAw2cRRCeSV5nOzm9UHn2sWH7YWoI+c3n7WjQw7EQ8BEu1
-   I4cKbybAF5tecv5mxOpCsi64nO2Ldre25k1g0tZvzhTF5lcdsIBDOhnsz
-   jiDcnvpDS+2Vhf0b4JugFd9vetj64m22c36UD1GlTwovhlFFKKRGxO8xm
-   7dKgOvb6yzXuu2LBdxof/bpBa2B4dli0PF7bHtFweb0P48devIr/mJSga
-   A==;
-X-CSE-ConnectionGUID: BMS6xjLBSOeKYg77agzhMA==
-X-CSE-MsgGUID: bUiWCvF9RreWfnawRAWfcw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11781"; a="83192992"
-X-IronPort-AV: E=Sophos;i="6.23,227,1770624000"; 
-   d="scan'208";a="83192992"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2026 03:09:43 -0700
-X-CSE-ConnectionGUID: CB3zKpjIQi65C+iinvZdTA==
-X-CSE-MsgGUID: S8kPmL23T8CZPFjhJ5BAzw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,227,1770624000"; 
-   d="scan'208";a="275327717"
-Received: from igk-lkp-server01.igk.intel.com (HELO bdf09bfdbd5f) ([10.211.93.152])
-  by orviesa001.jf.intel.com with ESMTP; 10 May 2026 03:09:41 -0700
-Received: from kbuild by bdf09bfdbd5f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wM16Q-000000007h3-1gJW;
-	Sun, 10 May 2026 10:09:38 +0000
-Date: Sun, 10 May 2026 12:08:58 +0200
-From: kernel test robot <lkp@intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1778409048; c=relaxed/simple;
+	bh=OJnBXpHy0TCpQ0bHlfRGGQ5W9rEzuI/g/UlwGVFxAf8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PGMi1D7ptrPkcY6HF57OCM4mk2nqzR+aFhwAOiqTjH7YHXe0CJPfXHCLbRsPCVNI3p+UmZ9f1xm6rku0BfXb6gYLMnlgTT+hoIO3BK9rNHFnBDf1m5iswyuCti0uWWdcA4icHEeXE+2TK0BFhCrFMIdwD30xDgpqputDEWr10SY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=I0h4ExgF; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=YskLV+lx; arc=none smtp.client-ip=202.12.124.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.stl.internal (Postfix) with ESMTP id 377341D000B8;
+	Sun, 10 May 2026 06:30:44 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Sun, 10 May 2026 06:30:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:message-id:mime-version:reply-to
+	:subject:subject:to:to; s=fm2; t=1778409044; x=1778495444; bh=aJ
+	91xONVsconoGapjJtB3qYAf0KS5nMi+X1jF2T7ZUE=; b=I0h4ExgFvtxOYP9WEe
+	xA9HtpHWHz9OmJxjZ9PSRBaMA1b53QfNatkeQjroOhWKYZuyDVtKjuS5ZoEWCCkZ
+	WGJ+VNVfNkrVSysvsU8Zi2VG0z0zz7HmL5foQyzHFsjjp4z+kRyaig8M4QA9/tRA
+	CNH8YNXjgPWx21iBIQNKTfHEJeBELy2ZBSyfWSRurlt/MxEvAn8U0FVWCScgVDqM
+	bopwpRL6hyLhg2URtCNbptcko+DdhAbdx6md1ycnxRB+4tof5h/Rj3UPt/4aWYS8
+	NJt0tvFxc8EbxU6LgB14cTp7phBp4U3g/C/X7peyH5x+TaoW6vbyA3UDuk+qaXD9
+	u8XA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm3; t=1778409044; x=1778495444; bh=aJ91xONVsconoGapjJtB3qYAf0KS
+	5nMi+X1jF2T7ZUE=; b=YskLV+lxS4dJnkLMzW5yaZyjBxpZ80x8//lB5F7J/KAQ
+	Ia6nkqH4q6ugNockIpPZwhGYK2wbeTuuHQEuH/mGY3C+2WFydO9O3NXj9HEbcUzQ
+	MBIkK33JsvL85CRKSsrdlOgRSvkoBHSD5uqmq6jw/0K8wUyDx2oHKzufFiRugtO4
+	EZDS2F5Vx4XzAjk0ljchBXZNK8d1ort8OBiNb9iug50yivsZNHmxnhb+XtlXz8a3
+	6WU9XT0ywIbu/zB608fgjtqPXvq9C3tgiAPyVXv8nKiIVAVAChL89AMklvJvWsaQ
+	wpPi2tOikpa2JOhXn46kXtj4RJOHZ2FhsKAUrIA0xA==
+X-ME-Sender: <xms:VF4Aajmj4LQy5SHVc6trQFMnqgqsMEswq0qqQGnThV0YodC7Hir-Mg>
+    <xme:VF4AatVURCITFUCfsGZbKCbom7J0nwssk0i02k_OMm0nnuMppCFNCqtY-OKwud90x
+    jpZE06tnJXUBveQ7UonssLHwoK3eYT7b2SALA8sWH4pqzNrVBZdQo0>
+X-ME-Received: <xmr:VF4AanqHlX4RoS8pv5tgotyNemC5SmethwpWznC3PsTGlqo5oesy98mw71KcBzx4B5jGhVdPqbtDtYnF8i1IeE2Ept6HTrqb8NZN>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduudehkeeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefufffkofggtgfgsehtkeertdertdejnecuhfhrohhmpefpihhklhgrshcu
+    ufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnhgvshgrsh
+    esrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpefhgefhveeghfetudeh
+    fffhjeeileehkedvveffuddtleegudegjeeufeefvefftdenucffohhmrghinhepkhgvrh
+    hnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhf
+    rhhomhepnhhikhhlrghsrdhsohguvghrlhhunhgusehrrghgnhgrthgvtghhrdhsvgdpnh
+    gspghrtghpthhtohepudefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehprghu
+    lhesphgsrghrkhgvrhdruggvvhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvse
+    hluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdp
+    rhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkh
+    husggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrght
+    rdgtohhmpdhrtghpthhtohephihoshhhihhhihhrohdrshhhihhmohgurgdruhhhsehrvg
+    hnvghsrghsrdgtohhmpdhrtghpthhtohepghgvvghrtheslhhinhhugidqmheikehkrdho
+    rhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:VF4AauWWhPt-kxuHJPd6QaoUIPfvhoWAXqY-mu7ej72nsgJkY_fKzA>
+    <xmx:VF4AaoHgD2LFkCLK3VUwK6-dVhig5OPG3zYImKgWA37bBxhNxpyaDg>
+    <xmx:VF4AalBwKHemkIDsY00vcPx48vRfFRZquoptsVOplq5M6JqOr3OS5A>
+    <xmx:VF4Aaqz_VsKq32xG452hgq3EWDbHDBBoIiMbeOsXCty2L9MaCsAM4A>
+    <xmx:VF4AagVr3zgvlxRiGG6P_eub8PgRvfDZQI5T6MgKOvJqYAFqfViUg5Zl>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 10 May 2026 06:30:43 -0400 (EDT)
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Paul Barker <paul@pbarker.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>
-Subject: Re: [PATCH net-next v1 5/5] net: mdiobus: Hide acpi_mdio.h
-Message-ID: <202605101210.Y9D9eQWJ-lkp@intel.com>
-References: <20260504074610.40799-6-andriy.shevchenko@linux.intel.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org
+Cc: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	Sai Krishna <saikrishnag@marvell.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: [next-next,v2] net: ethernet: ravb: Do not check URAM suspension when WoL is active
+Date: Sun, 10 May 2026 12:30:17 +0200
+Message-ID: <20260510103017.613773-1-niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260504074610.40799-6-andriy.shevchenko@linux.intel.com>
-X-Rspamd-Queue-Id: AC559503909
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: A56B9503A18
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[ragnatech.se,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[ragnatech.se:s=fm2,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,lunn.ch,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286272-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286273-lists,netdev=lfdr.de,renesas];
+	DKIM_TRACE(0.00)[ragnatech.se:+,messagingengine.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[niklas.soderlund@ragnatech.se,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:mid,intel.com:dkim,01.org:url]
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:email,glider.be:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Hi Andy,
+When updating the driver to match latest datasheet to suspend access to
+URAM when suspending DMA transfers a corner-case was missed, URAM access
+will not be suspended if WoL is enabled. This lead to the error message
+(correctly) being triggered as URAM access is not suspended even tho
+it's requested as part of stopping DMA.
 
-kernel test robot noticed the following build errors:
+Avoid checking if URAM access is suspended and printing the error
+message if WoL is enabled when we suspend the system, as we know it will
+not be.
 
-[auto build test ERROR on net-next/main]
+Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Closes: https://lore.kernel.org/all/CAMuHMdWnjV%3DHGE1o08zLhUfTgOSene5fYx1J5GG10mB%2BToq8qg@mail.gmail.com/
+Fixes: 353d8e7989b6 ("net: ethernet: ravb: Suspend and resume the transmission flow")
+Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+Reviewed-by: Sai Krishna <saikrishnag@marvell.com>
+Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
+---
+ drivers/net/ethernet/renesas/ravb_main.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Andy-Shevchenko/net-mdiobus-Provide-fwnode_mdiobus_register/20260510-124038
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260504074610.40799-6-andriy.shevchenko%40linux.intel.com
-patch subject: [PATCH net-next v1 5/5] net: mdiobus: Hide acpi_mdio.h
-config: x86_64-rhel-9.4-ltp (https://download.01.org/0day-ci/archive/20260510/202605101210.Y9D9eQWJ-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260510/202605101210.Y9D9eQWJ-lkp@intel.com/reproduce)
+diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+index 1dbfadb2a881..5f88733094d0 100644
+--- a/drivers/net/ethernet/renesas/ravb_main.c
++++ b/drivers/net/ethernet/renesas/ravb_main.c
+@@ -1108,9 +1108,12 @@ static int ravb_stop_dma(struct net_device *ndev)
+ 
+ 	/* Request for transmission suspension */
+ 	ravb_modify(ndev, CCC, CCC_DTSR, CCC_DTSR);
+-	error = ravb_wait(ndev, CSR, CSR_DTS, CSR_DTS);
+-	if (error)
+-		netdev_err(ndev, "failed to stop AXI BUS\n");
++	/* Access to URAM will not be suspended if WoL is enabled. */
++	if (!priv->wol_enabled) {
++		error = ravb_wait(ndev, CSR, CSR_DTS, CSR_DTS);
++		if (error)
++			netdev_err(ndev, "failed to stop AXI BUS\n");
++	}
+ 
+ 	/* Stop AVB-DMAC process */
+ 	return ravb_set_opmode(ndev, CCC_OPC_CONFIG);
+-- 
+2.54.0
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202605101210.Y9D9eQWJ-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/net/mdio/fwnode_mdio.c: In function '__fwnode_mdiobus_register':
->> drivers/net/mdio/fwnode_mdio.c:197:24: error: implicit declaration of function '__of_mdiobus_register'; did you mean 'of_mdiobus_register'? [-Wimplicit-function-declaration]
-     197 |                 return __of_mdiobus_register(mdio, to_of_node(fwnode), owner);
-         |                        ^~~~~~~~~~~~~~~~~~~~~
-         |                        of_mdiobus_register
-
-
-vim +197 drivers/net/mdio/fwnode_mdio.c
-
-   192	
-   193	int __fwnode_mdiobus_register(struct mii_bus *mdio, struct fwnode_handle *fwnode,
-   194				      struct module *owner)
-   195	{
-   196		if (is_of_node(fwnode))
- > 197			return __of_mdiobus_register(mdio, to_of_node(fwnode), owner);
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
