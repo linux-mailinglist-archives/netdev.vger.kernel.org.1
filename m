@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-286379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286380-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ILudCbjUAGp8NAEAu9opvQ
-	(envelope-from <netdev+bounces-286379-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 20:55:52 +0200
+	id iEGYFrPWAGovNQEAu9opvQ
+	(envelope-from <netdev+bounces-286380-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:04:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EB83505D2C
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 20:55:51 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B26C3505DF6
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 21:04:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C327B3006B53
-	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 18:55:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 75E5230048E3
+	for <lists+netdev@lfdr.de>; Sun, 10 May 2026 19:04:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F8B231F9A2;
-	Sun, 10 May 2026 18:55:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F098314A6F;
+	Sun, 10 May 2026 19:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MzkVbNnu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tjam84jR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04C93164C3;
-	Sun, 10 May 2026 18:55:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE77D20B22;
+	Sun, 10 May 2026 19:04:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778439349; cv=none; b=Nmi6tcpVhJWK66GYMmQr9FluGydsLdHcNZfc/8uHtG09aQIOTnOTHW6nd2wrKXpoheYfyKHItP9z2c7E/9lB9xiCwa8/mqIt5h13MgYZqKD71H7fflrPN1ASdEj1wZIm3R4oT/Y9WF6eui2RiSjXlGYgwa00K+leCMDtJ0VILDE=
+	t=1778439854; cv=none; b=tEw/e9EgUhdTu5SGKAm7gweo/WfAWXB/N8kw4CvmFEUxqMhm65CHgxNWAq45FYsvGHHNkzhOQKKDxCHAOVLrn1UtHb1fX0qAWm0UPdCDUkwhH10sWumhqISs5onknJHzuwxDpMgB/cM0lWtHeEp9D4hOiYQH76p7gdwMC2Hu60Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778439349; c=relaxed/simple;
-	bh=G9GToOtS3isqcC/YtQR+Ee64Ud4v2fghkptAbDZiq08=;
+	s=arc-20240116; t=1778439854; c=relaxed/simple;
+	bh=imk9coTRb2HVMl2F/BETlKrXnTt+A/4l5suRxPpIGzY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d48NSJJVgZVN4n7TXjSzvqGxbvVaXagdYuTNmUSzYJSAKFQgjXEXD0s5hZcXiAQPk6jmGjiydj5NXti9uF0xU9qEfhlPEpQws9+cxayci3x7Vrz6yuPvWfqrsviWwpGel18fkqPiY5cuqkqIgKInoNIXa7X+pHFPdzfAMPkdxds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MzkVbNnu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1131C2BCB8;
-	Sun, 10 May 2026 18:55:47 +0000 (UTC)
+	 MIME-Version; b=ARU3g6EXIljkCw97P4mFAwF+haS+L7pWxtZNca6Eq7NLBz1kSI9RnBvMz0kyJ1OHphipL8s3JP8ZmMVmiJz/DDTQ1hZjrgroahcvFMIZLlzlxLulxAOpPByHyd4V9ypoOxm90/bjD0QAJNDQuWmfyzAr6m8+e71p3v6OAVI1aKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tjam84jR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6657C2BCB8;
+	Sun, 10 May 2026 19:04:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778439348;
-	bh=G9GToOtS3isqcC/YtQR+Ee64Ud4v2fghkptAbDZiq08=;
+	s=k20201202; t=1778439853;
+	bh=imk9coTRb2HVMl2F/BETlKrXnTt+A/4l5suRxPpIGzY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MzkVbNnuxTVneo62loO/EcB4gwkRIOl4mD8102tjcEW0PhxyBmYZV4CKRzQBq6+kp
-	 IlmdZ7IsH014qL2fuOwBubkP69Hf9Hejrp7KBN5Du0tyzPW1ONBBftDhU6plPErW+C
-	 E+gNL/8juYFTwVQaZ1tIMzTiKefFeUu5UvvpSC34e8Avit+G8NaCP+90Wg5M9bRQsF
-	 obWraTLSttu40ma0GPDJjyRRLlXVAZ0e2JY9zHNdS9hUXgJm6FUokPO4HEttOfMvFY
-	 O3MF0ZkAv7+tn0YCNeujBzQbjtzr+RfrRmFc85/lJmBsY6KRF82egQkH5HXgloVRIG
-	 3vd4L+BL5xLKQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: nb@tipi-net.de
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	justin.chen@broadcom.com,
-	horms@kernel.org,
-	mohsin.bashr@gmail.com,
-	opendmb@gmail.com,
-	florian.fainelli@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com,
-	andrew+netdev@lunn.ch,
+	b=Tjam84jR3CrwUodCn72/gz1X4HYiPIxGBJ+mStB89AQSG44MMbzb7VnJmbV4l5vaO
+	 zxsorkzIFz7QKLvN2sV3NY+8F71JELF7gissRJZlXLgIQUgJgwvyaZ+DRzy3Y/7jXL
+	 3z9OaA6UoBpxnIAsGtIBEQk2zngmnFMSTMck0aKQABWZhSm9aG0ndEWcKYceHQYokC
+	 hZcKNQa+kC7pWYcxMQWcGho6qkWZrzbaa70Qg7yFIPa9Rw7mXGt46KEvzoxLslSiUy
+	 Sycumzwy7YIeHR4O0LvKaIheJfFz6nKCQFbNSEVpmgWxP6mSWe/hMXH6fmAcDRil3A
+	 fZhBqf/jIbS3A==
+From: Simon Horman <horms@kernel.org>
+To: tariqt@nvidia.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	cpaasch@openai.com,
 	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
-	hmohsin@meta.com,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@fomichev.me,
+	saeedm@nvidia.com,
+	leon@kernel.org,
+	mbloch@nvidia.com,
+	kliteyn@nvidia.com,
+	vdogaru@nvidia.com,
+	kees@kernel.org,
+	valex@nvidia.com,
+	erezsh@nvidia.com,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH net-next v9 5/7] net: bcmgenet: add XDP_REDIRECT and ndo_xdp_xmit support
-Date: Sun, 10 May 2026 11:55:46 -0700
-Message-ID: <20260510185546.3960482-1-kuba@kernel.org>
+	gal@nvidia.com,
+	dtatulea@nvidia.com
+Subject: Re: [PATCH net-next 1/3] net/mlx5: HWS, Check if device is down while polling for completion
+Date: Sun, 10 May 2026 20:03:51 +0100
+Message-ID: <20260510190351.1422486-1-horms@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260506095553.55357-6-nb@tipi-net.de>
-References: <20260506095553.55357-6-nb@tipi-net.de>
+In-Reply-To: <20260507173443.320465-2-tariqt@nvidia.com>
+References: <20260507173443.320465-2-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,155 +79,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 7EB83505D2C
+X-Rspamd-Queue-Id: B26C3505DF6
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,broadcom.com,gmail.com,lunn.ch,google.com,redhat.com,meta.com,davemloft.net,iogearbox.net,fomichev.me];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[21];
-	TAGGED_FROM(0.00)[bounces-286379-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286380-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.995];
+	NEURAL_HAM(-0.00)[-0.993];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
+
+From: 'Simon Horman' <horms@kernel.org>
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
 ---
-net: bcmgenet: add XDP_REDIRECT and ndo_xdp_xmit support
+net/mlx5: HWS, Check if device is down while polling for completion
 
-This commit adds XDP_REDIRECT handling in the RX path and implements
-ndo_xdp_xmit so other devices can redirect frames into bcmgenet via
-ring 16. It also advertises NETDEV_XDP_ACT_REDIRECT and
-NETDEV_XDP_ACT_NDO_XMIT in xdp_features.
+This commit adds a check to abort polling for hardware completions if the
+device state indicates an internal error. This returns -ETIMEDOUT early to
+avoid long timeouts when the hardware stops generating completions.
 
-> diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> index f1e515526787..4e4fe785f0bf 100644
-> --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-
-[ ... ]
-
-> @@ -4027,6 +4048,36 @@ static int bcmgenet_xdp(struct net_device *dev, struct netdev_bpf *xdp)
->  	}
->  }
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c
+> index 6dcd9c2a78aa8..eae02bc742218 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c
+> @@ -422,6 +422,18 @@ int mlx5hws_bwc_queue_poll(struct mlx5hws_context *ctx,
+>  	if (!got_comp && !drain)
+>  		return 0;
 >  
-> +static int bcmgenet_xdp_xmit(struct net_device *dev, int num_frames,
-> +			     struct xdp_frame **frames, u32 flags)
-> +{
-> +	struct bcmgenet_priv *priv = netdev_priv(dev);
-> +	struct bcmgenet_tx_ring *ring = &priv->xdp_tx_ring;
-> +	int sent = 0;
-> +	int i;
-> +
-> +	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
-> +		return -EINVAL;
-> +
-> +	if (unlikely(!netif_running(dev)))
-> +		return -ENETDOWN;
-> +
-> +	spin_lock(&ring->lock);
-> +
-> +	for (i = 0; i < num_frames; i++) {
-> +		if (!bcmgenet_xdp_xmit_frame(priv, ring, frames[i], true))
-> +			break;
-> +		sent++;
+> +	if (unlikely(ctx->mdev->state == MLX5_DEVICE_STATE_INTERNAL_ERROR)) {
+> +		/* If the device is down for any reason (e.g. FLR), the HW will
+> +		 * no longer generate completions.
+> +		 * Note that ETIMEDOUT is returned here because the BWC layer
+> +		 * already has a special handling for timeouts - it breaks the
+> +		 * rehash / resize / shrink loops to avoid chain of timeouts.
+> +		 */
+> +		mlx5_core_warn_once(ctx->mdev,
+> +				    "BWC poll: device is down, polling for completion aborted\n");
+> +		return -ETIMEDOUT;
 > +	}
 > +
-> +	if (sent)
-> +		bcmgenet_xdp_ring_doorbell(priv, ring);
-> +
-> +	spin_unlock(&ring->lock);
-> +
-> +	return sent;
-> +}
+>  	queue_full = mlx5hws_send_engine_full(&ctx->send_queue[queue_id]);
+>  	while (queue_full || ((got_comp || drain) && *pending_rules)) {
 
-Can this path make forward progress when bcmgenet is used purely as an
-XDP_REDIRECT destination (for example, redirecting from a USB NIC or
-Wi-Fi adapter into the on-SoC bcmgenet)?
+Could this lead to a CPU stall if the device goes down during the polling loop?
 
-The xdp_tx_ring (ring DESC_INDEX) has no dedicated TX interrupt and no
-TX NAPI.  bcmgenet_init_tx_ring() explicitly skips the TX NAPI for this
-ring:
+The hardware state check is placed outside the while loop. The loop has a
+60-second timeout (MLX5HWS_BWC_POLLING_TIMEOUT) and lacks cond_resched(),
+meaning it can peg the CPU while spinning.
 
-    /* Initialize Tx NAPI for priority queues only; ring DESC_INDEX
-     * (XDP TX) has its completions handled inline in RX NAPI.
-     */
-    if (index != DESC_INDEX)
-        netif_napi_add_tx(priv->dev, &ring->napi, bcmgenet_tx_poll);
+If the hardware fails and stops generating completions while we are already
+inside the loop, the driver's health thread on another CPU might detect the
+failure and set ctx->mdev->state to MLX5_DEVICE_STATE_INTERNAL_ERROR.
 
-The only place that reclaims completed descriptors on this ring is
-bcmgenet_rx_poll():
+Since the check is outside the loop, we would fail to detect the state change
+and continue to spin uselessly for the remainder of the 60 seconds, which
+could trigger a soft lockup panic.
 
-    static int bcmgenet_rx_poll(struct napi_struct *napi, int budget)
-    {
-        ...
-        /* Reclaim completed XDP TX frames (ring 16 has no interrupt) */
-        if (priv->xdp_tx_ring.free_bds < priv->xdp_tx_ring.size)
-            bcmgenet_tx_reclaim(priv->dev,
-                                &priv->xdp_tx_ring, false);
-        ...
-    }
+Should the state check be moved inside the polling loop, perhaps using
+READ_ONCE() on ctx->mdev->state to ensure the compiler does not hoist the
+lockless read?
 
-Before this patch, the only producer on this ring was XDP_TX from
-bcmgenet's own RX path, so reclaim and production were always paired
-with RX NAPI.
-
-With ndo_xdp_xmit, a remote device becomes a producer on the same
-ring.  If bcmgenet itself has no (or very sparse) RX traffic, its RX
-NAPI is never scheduled, bcmgenet_tx_reclaim() on xdp_tx_ring is never
-called, free_bds drains to 0, and:
-
-> +	for (i = 0; i < num_frames; i++) {
-> +		if (!bcmgenet_xdp_xmit_frame(priv, ring, frames[i], true))
-> +			break;
-> +		sent++;
-> +	}
-
-bcmgenet_xdp_xmit_frame() returns false on the free_bds < 1 check and
-bcmgenet_xdp_xmit() returns 0, so bq_xmit_all() in the redirect caller
-counts every frame as a drop.
-
-There does not appear to be a TX completion IRQ, a watchdog, or a
-napi_schedule() kick from bcmgenet_xdp_xmit() to trigger reclaim
-independently of RX traffic.  Is there something else that drains the
-ring in this configuration, or does ndo_xdp_xmit need to schedule the
-RX NAPI (or an independent reclaim path) when it enqueues frames?
-
-> @@ -4341,7 +4393,8 @@ static int bcmgenet_probe(struct platform_device *pdev)
->  			 NETIF_F_RXCSUM;
->  	dev->hw_features |= dev->features;
->  	dev->vlan_features |= dev->features;
-> -	dev->xdp_features = NETDEV_XDP_ACT_BASIC;
-> +	dev->xdp_features = NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_REDIRECT |
-> +			    NETDEV_XDP_ACT_NDO_XMIT;
-
-Relatedly, advertising NETDEV_XDP_ACT_NDO_XMIT tells user space and
-redirect maps that this device is a usable xmit target.  Should this
-bit only be advertised once ring 16 has an independent completion
-source, or is the expectation that users of this feature will always
-have concurrent RX traffic on bcmgenet to drive the reclaim?
--- 
-pw-bot: cr
+>  		ret = mlx5hws_send_queue_poll(ctx, queue_id, comp, burst_th);
 
