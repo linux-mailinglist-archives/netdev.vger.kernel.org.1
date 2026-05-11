@@ -1,253 +1,184 @@
-Return-Path: <netdev+bounces-286658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286659-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ME1rEhbgAWptlgEAu9opvQ
-	(envelope-from <netdev+bounces-286658-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:56:38 +0200
+	id MN9xBuPeAWptlgEAu9opvQ
+	(envelope-from <netdev+bounces-286659-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:51:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DDEE50F72D
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:56:37 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD51250F573
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:51:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EDEC130CDCCD
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 13:48:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AB5E93021F4A
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 13:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 563CC3FA5C8;
-	Mon, 11 May 2026 13:48:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05FB03F54AC;
+	Mon, 11 May 2026 13:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="fdvpZ34P"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="PMeH2Gs0";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Six+pGaW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983F93F65F9
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 13:48:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F113F54A0;
+	Mon, 11 May 2026 13:50:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778507294; cv=none; b=mW63d7XFeCdHlObMwTl88+1SmoE9cqQWCX32I3fkLMHP8uBJkh4vCwYG5EowEL3OanntBSyUKtHc5BFdOj/LqEdzNL0/SaTTRiZGxd5RcziF4e4QaP5FMlIs844yjloErBUjTH4HVK6icWA9V2WDZ5KcuDRTPN7zFPRWHAGmsLI=
+	t=1778507428; cv=none; b=cdUjJ1/MFexV9kzwpHwlhPUhCo6dZVOCTY8A3i0PH6CSluMnzuNibQry8jHWnsiIM8rJ5BMXfjWcgmThT9SIPhlA0k4oRVYFQNOmbytYF5J5uGOUyW40fUivTuYgISM5/Z5v11fOlqTyfNUHRwc0hqolDRXBFhz6L/YEKBVoT8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778507294; c=relaxed/simple;
-	bh=5lTw8AW4wHd4EwAFkjJzid9ifnmy2d8f+Nyohbx8bF8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mF09zW75c4wjiYsRPs7Aqx06U4WNbul5aJQZyfslV2JUFDuwJ+gNpBtK+esrBeMnyUjdfwT+X0ckq2Bm1z24WXRftvOgaSBiRe/JaDEiZ9yuVC4RRhtA23ucA/roia2JbSJz23zkCFSh/8JjluOqsSmkTkA/JlHTuaECGhTT4sM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=fdvpZ34P; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-48a3e9862f0so29017985e9.1
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 06:48:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1778507290; x=1779112090; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5jEKdOT9KNT9VkfLURxJrQMx5JuEqo+lpwOnRqNvfvY=;
-        b=fdvpZ34PGkii73OrZ3bKD/2ykJ93QnGL42dlkoCxkXvZPfHQ+BxaVd1wK+uuA1S2KC
-         Y4rYShGIkkbz0UGs2T9fcVtKQYeoAu+JzCxdLsFoszsLi2mXeVMuCzCbqCj5kzKenXvo
-         nD7bPdh7Qwnl08pcWrrKIqXCXrEgTAyh6wEGG6f1G7b2MXMoRwGEGEe3zBHGRvhi2Zke
-         nAHhggyHw58OYe5xwrMxrqKgPXECZASfhLk/23/ygeNy1IqIsb9f78qjthT5RoLVOwWT
-         fiad8cf/Oj0ZdfKB6+G7qQtwRijuU7ZblE1Xr0VzkUWNlniao1JxMhaqqqVk3hQGjEAt
-         vf4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778507290; x=1779112090;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=5jEKdOT9KNT9VkfLURxJrQMx5JuEqo+lpwOnRqNvfvY=;
-        b=KX/0oAletAPIMYDzRdnp4fp3Pzf5NuRt71lV/StSq1CVaLqrC6gSCJoGygXpO2HcZi
-         IhXGNB8eRDOYl+a1P2WzFMhFpWHxHlCmThYIXZAIwj5Y9D2ZR3bMxN4PFi6ZdvMNypli
-         B8HsEvUGbb2eGhm8D82ch3vXflzUeA/PD7BAG7yk31wlWMIO7t6STLM15yY9MMe/ScwR
-         NGY1lq1n3ZWDiRN8JCiXLdqTsGWYq2xg5285lWqbYJ3u4zRPS3OV7MfUCwkOwKE3skU6
-         519KFTuOONJv4EeJgQvSyDVdRl/vk1z1g3bzJYTHebuDYN40Wp2+9Z0pkWmRDIaDTBRc
-         r/dQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8685IlAjbbShZbjRYs4FDPcCkvwIEmuLbrar0USTfgJ4IXtH+jcSYWTqscmkMizm2U5bMmWwc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywb4sRqCX3wyhDW6snPon5C5RKJTpKMUsRVzGsjshiuq2JAkI8p
-	KA1DfUlK+9uICDSkRj86D6d8Vc8gwJpSBW93WBIdZlFNAHXJfxXUh1dkUM9J7KZRQko=
-X-Gm-Gg: Acq92OEryytjW6hm0zUC9cAx6W0ORwbGmqp8GFTdQ94FiAaOU5oY5uNk+Nyu9SMF3bl
-	zhMpIzL1XoREfOud/vB+AFv+R60EPiSkcbSFfrkTP75yO+K7Ew+mo9VAGDLkiWo4y6YY2Bdzdww
-	E/e7rndWgQrXXblXwcVWWL0o6/g/HNVXVKOL+bDw2NpLaC+730VyFAX2wxOQVTlxniuQLhQz1Gc
-	aBc2xGtikadWQwG379Wa7aqtQDuU1lmBA0NNDB3PbzJYHiyOShKkfy3YW/bAVz6JV6LrUCBPsCR
-	zOEiFaiKAoUIcwqd0Rzwhiu+XXMfPaE9lQh4yG9vl0ZF+e7mjjUvra8PZkc+TfC7XzTYLbRdtI7
-	W+GzEL2ByquEqAA3ovhk4hIdRxmtMBJTdU3kkRzKO7gwMooSuWAT/mY39FFKzmyRmemSnJkV+B5
-	852dGCnZP+4RYsdIPgZxHG3EXabV3UOmEvaKIzOw+/aimmaL8=
-X-Received: by 2002:a05:600c:3b8f:b0:48a:79d8:a8d6 with SMTP id 5b1f17b1804b1-48e642deefamr241378475e9.7.1778507289999;
-        Mon, 11 May 2026 06:48:09 -0700 (PDT)
-Received: from localhost.localdomain ([2a00:6d43:105:c401:e307:1a37:2e76:ce91])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e701e957asm188062665e9.6.2026.05.11.06.48.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 06:48:09 -0700 (PDT)
-From: Marco Crivellari <marco.crivellari@suse.com>
-To: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Tejun Heo <tj@kernel.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Simon Horman <horms@verge.net.au>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Julian Anastasov <ja@ssi.bg>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	lvs-devel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org
-Subject: [PATCH net-next 2/2] ipvs: Replace use of system_unbound_wq with system_dfl_wq
-Date: Mon, 11 May 2026 15:47:37 +0200
-Message-ID: <20260511134744.277032-3-marco.crivellari@suse.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260511134744.277032-1-marco.crivellari@suse.com>
-References: <20260511134744.277032-1-marco.crivellari@suse.com>
+	s=arc-20240116; t=1778507428; c=relaxed/simple;
+	bh=bE5c4a6p1Npfu8zc/F66atVHN8WwFv+DHmrlQEbCTiY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pP6cPh3UX01uwgEuTi4Wz81lwlWIte1bsoIQjerPpltIyxDzCk8SJQaSlwxLb3hmZitazxLNLI4dRUP5qduP9T4t9aaPuxSZLCigcAYTtIKpt/sEC70zBR9NfEd6iM7EfIei1J069qudoQuGh3IGH3dgitn14xw4/1Np87BZpVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=PMeH2Gs0; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Six+pGaW; arc=none smtp.client-ip=103.168.172.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id AA586140008C;
+	Mon, 11 May 2026 09:50:25 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-12.internal (MEProxy); Mon, 11 May 2026 09:50:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1778507425; x=
+	1778593825; bh=MQsEILfirhpSxp1+Vs4WVvqW8kmTFsbVLxudnGtIrB4=; b=P
+	MeH2Gs0szePdtV+96HLDHwgOXkOKIenKtivQpsmvpZXgpEbTi5tsTZwghZd49tm0
+	Q82SWxpc/Gni9XR66MqO3VWJscqOA+52v29o5AGY/LpjcmHmWq2j3gVfgsEObMpG
+	pXPE0Vcm+tO/+OOG87YyyYvJcUe0PsNAHEKTGero/vgJWFy3OrXuqYPNbsge3LJl
+	O5NKsInRKNK2ey/8Fd4qSkD9mYYneU2VI4WcLJEZLitaUHiftkUxBHy0I7XzGbsf
+	um77Dj5mtl4D82TtPq8XpdbZDjAouJdEwts5qkmC1ukAuQg/JAQps5zTJu2WRk4w
+	V8mVNC5csU94STdzQXk9Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1778507425; x=1778593825; bh=MQsEILfirhpSxp1+Vs4WVvqW8kmTFsbVLxu
+	dnGtIrB4=; b=Six+pGaW8K5zqZboY3gX5T2Y93lK2vkRhakogFI7YYzWsizjpjX
+	fMz+lznq6jm9NZTvFE6UzSWNPZdgWqtlfyACK0/7mANSBrpPHUkLpzgppbx4GOfn
+	OKhOiCSCdNjK9jdkWfONlf8fT8njX9cmdrVrRojpMr2YB5D7vBtgkhqINwPUOk/l
+	uv3EYREUttCmBX9vdl6z1TfW7b/VonTm1qHpwmRgxBsvDDYIs/xYJwJ+/3jt6kXp
+	SV3b3pUNDnELH0JvER8QedLuUWrChiVusbYgzA1mnBsIVKGiUBgasq6ZsQwGxbWh
+	+z25KZjD78Gc1j0OQHsCvchKhJwPoABGegg==
+X-ME-Sender: <xms:oN4BamJa6ixhxq74ek9jGfPB3Q_eajvAXOLOI5W5uPOF3VpqZN-FBQ>
+    <xme:oN4BajXP1CuxY7UIjhjJEBcLJBoBZyfRnKPMeVe9XTQastZp5XV_fOGShMeKgmD4S
+    Hu2oKdPVY4zYlZd1ZdYtY6XAo7Ul5vjGTVzR-LLX9eeUzPqk4pPqGhc>
+X-ME-Received: <xmr:oN4BaqFfDPaAqOor6rmbWzRo_CJp41ctFn3snb_DakBXF_PVeRQeFxrIGWoCAaGB9nxwCkjV5ecnRiKMotuxto4>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduudeltdelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedugedpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprghlvgigjhhliihhvghnghesghhmrghilh
+    drtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhr
+    tghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvug
+    humhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgv
+    lhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpth
+    htohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohephhgrnhhnvghssehs
+    thhrvghsshhinhguuhhkthhiohhnrdhorhhgpdhrtghpthhtoheprghlsghinhifhigrnh
+    hgsehtvghntggvnhhtrdgtohhm
+X-ME-Proxy: <xmx:oN4Baq6cuUU2-4f7v-5wsfzQkrFRs5SB0ZEPVrQdNnNuJy_DugyLgw>
+    <xmx:oN4Baoedr6kbCOm0abUH_8F6hFk9k8zPNxavtUxZQWdw7QtUT9uxGw>
+    <xmx:oN4BamncoZKJvhGHfyRLwWT1ALSj8SKtLCI2se-MNulXcV1TvSSkUg>
+    <xmx:oN4Bat-_eFzxbQcYc_fFdfRMeuUs28Faum7nzNwQuBtcMj3z0PcvWw>
+    <xmx:od4BavUJ25oLseLN59PofDHUOpndXHDh9bMZ6HPM__rQ6kSUcsBXNe6G>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 11 May 2026 09:50:24 -0400 (EDT)
+Date: Mon, 11 May 2026 15:50:22 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: alexjlzheng@gmail.com
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	hannes@stressinduktion.org, albinwyang@tencent.com,
+	shenyangyang4@huawei.com, kuniyu@google.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jinliang Zheng <alexjlzheng@tencent.com>
+Subject: Re: [PATCH net v3 v3 2/3] macsec: use rcu_work to defer RX SA crypto
+ cleanup out of softirq
+Message-ID: <agHenphzMNk3HEc8@krikkit>
+References: <20260509033353.1814289-1-alexjlzheng@tencent.com>
+ <20260509033353.1814289-3-alexjlzheng@tencent.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 6DDEE50F72D
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260509033353.1814289-3-alexjlzheng@tencent.com>
+X-Rspamd-Queue-Id: AD51250F573
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linutronix.de,suse.com,verge.net.au,google.com,davemloft.net,redhat.com,ssi.bg,netfilter.org,strlen.de,nwl.cc,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-286658-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[suse.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marco.crivellari@suse.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-286659-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DMARC_NA(0.00)[queasysnail.net];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.com:mid,suse.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ssi.bg:email,nwl.cc:email,strlen.de:email]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[queasysnail.net:email,queasysnail.net:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,messagingengine.com:dkim]
 X-Rspamd-Action: no action
 
-This patch continues the effort to refactor workqueue APIs, which has begun
-with the changes introducing new workqueues and a new alloc_workqueue flag:
+2026-05-09, 11:33:46 +0800, alexjlzheng@gmail.com wrote:
+> From: Jinliang Zheng <alexjlzheng@tencent.com>
+> 
+> crypto_free_aead() can internally invoke vunmap() (e.g. via
+> dma_free_attrs() in hardware crypto drivers such as hisi_sec2).
+> vunmap() must not be called from softirq context, but free_rxsa()
+> is an RCU callback that runs in softirq, leading to a kernel crash:
+> 
+>   vunmap+0x4c/0x70
+>   __iommu_dma_free+0xd0/0x138
+>   dma_free_attrs+0xf4/0x100
+>   sec_aead_exit+0x64/0xb8 [hisi_sec2]
+>   crypto_destroy_tfm+0x98/0x110
+>   free_rxsa+0x28/0x50 [macsec]
+>   rcu_do_batch+0x184/0x460
+>   rcu_core+0xf4/0x1f8
+>   handle_softirqs+0x118/0x330
+> 
+> Use rcu_work to defer the cleanup to a workqueue. rcu_work dispatches
+> the worker asynchronously after the RCU grace period, so no thread
+> blocks waiting, and concurrent releases of multiple SAs naturally
+> share the same grace period.
+> 
+> Fixes: c09440f7dcb3 ("macsec: introduce IEEE 802.1AE driver")
+> Signed-off-by: Jinliang Zheng <alexjlzheng@tencent.com>
+> ---
+>  drivers/net/macsec.c | 8 +++++---
+>  include/net/macsec.h | 4 +++-
+>  2 files changed, 8 insertions(+), 4 deletions(-)
 
-   commit 128ea9f6ccfb ("workqueue: Add system_percpu_wq and system_dfl_wq")
-   commit 930c2ea566af ("workqueue: Add new WQ_PERCPU flag")
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
-The point of the refactoring is to eventually alter the default behavior of
-workqueues to become unbound by default so that their workload placement is
-optimized by the scheduler.
-
-Before that to happen, workqueue users must be converted to the better named
-new workqueues with no intended behaviour changes:
-
-   system_wq -> system_percpu_wq
-   system_unbound_wq -> system_dfl_wq
-
-This way the old obsolete workqueues (system_wq, system_unbound_wq) can be
-removed in the future.
-
-Cc: Julian Anastasov <ja@ssi.bg>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Florian Westphal <fw@strlen.de>
-Cc: Phil Sutter <phil@nwl.cc>
-Cc: lvs-devel@vger.kernel.org
-Cc: netfilter-devel@vger.kernel.org
-Cc: coreteam@netfilter.org
-Link: https://lore.kernel.org/all/20250221112003.1dSuoGyc@linutronix.de/
-Suggested-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
----
- net/netfilter/ipvs/ip_vs_conn.c |  4 ++--
- net/netfilter/ipvs/ip_vs_ctl.c  | 10 +++++-----
- 2 files changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
-index 9ea6b4fa78bf..2625c0379556 100644
---- a/net/netfilter/ipvs/ip_vs_conn.c
-+++ b/net/netfilter/ipvs/ip_vs_conn.c
-@@ -285,7 +285,7 @@ static inline int ip_vs_conn_hash(struct ip_vs_conn *cp)
- 	/* Schedule resizing if load increases */
- 	if (atomic_read(&ipvs->conn_count) > t->u_thresh &&
- 	    !test_and_set_bit(IP_VS_WORK_CONN_RESIZE, &ipvs->work_flags))
--		mod_delayed_work(system_unbound_wq, &ipvs->conn_resize_work, 0);
-+		mod_delayed_work(system_dfl_wq, &ipvs->conn_resize_work, 0);
- 
- 	return ret;
- }
-@@ -916,7 +916,7 @@ static void conn_resize_work_handler(struct work_struct *work)
- 
- out:
- 	/* Monitor if we need to shrink table */
--	queue_delayed_work(system_unbound_wq, &ipvs->conn_resize_work,
-+	queue_delayed_work(system_dfl_wq, &ipvs->conn_resize_work,
- 			   more_work ? 1 : 2 * HZ);
- }
- 
-diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
-index c7c7f6a7a9f6..f8fe1c8981d8 100644
---- a/net/netfilter/ipvs/ip_vs_ctl.c
-+++ b/net/netfilter/ipvs/ip_vs_ctl.c
-@@ -800,7 +800,7 @@ static void svc_resize_work_handler(struct work_struct *work)
- 	if (!READ_ONCE(ipvs->enable) || !more_work ||
- 	    test_bit(IP_VS_WORK_SVC_NORESIZE, &ipvs->work_flags))
- 		return;
--	queue_delayed_work(system_unbound_wq, &ipvs->svc_resize_work, 1);
-+	queue_delayed_work(system_dfl_wq, &ipvs->svc_resize_work, 1);
- }
- 
- static inline void
-@@ -1833,7 +1833,7 @@ ip_vs_add_service(struct netns_ipvs *ipvs, struct ip_vs_service_user_kern *u,
- 	/* Schedule resize work */
- 	if (t && ip_vs_get_num_services(ipvs) > t->u_thresh &&
- 	    !test_and_set_bit(IP_VS_WORK_SVC_RESIZE, &ipvs->work_flags))
--		queue_delayed_work(system_unbound_wq, &ipvs->svc_resize_work,
-+		queue_delayed_work(system_dfl_wq, &ipvs->svc_resize_work,
- 				   1);
- 
- 	*svc_p = svc;
-@@ -2078,7 +2078,7 @@ static int ip_vs_del_service(struct ip_vs_service *svc)
- 	} else if (ns <= t->l_thresh &&
- 		   !test_and_set_bit(IP_VS_WORK_SVC_RESIZE,
- 				     &ipvs->work_flags)) {
--		queue_delayed_work(system_unbound_wq, &ipvs->svc_resize_work,
-+		queue_delayed_work(system_dfl_wq, &ipvs->svc_resize_work,
- 				   1);
- 	}
- 	return 0;
-@@ -2511,7 +2511,7 @@ static int ipvs_proc_conn_lfactor(const struct ctl_table *table, int write,
- 		} else {
- 			WRITE_ONCE(*valp, val);
- 			if (rcu_access_pointer(ipvs->conn_tab))
--				mod_delayed_work(system_unbound_wq,
-+				mod_delayed_work(system_dfl_wq,
- 						 &ipvs->conn_resize_work, 0);
- 		}
- 	}
-@@ -2543,7 +2543,7 @@ static int ipvs_proc_svc_lfactor(const struct ctl_table *table, int write,
- 			    READ_ONCE(ipvs->enable) &&
- 			    !test_bit(IP_VS_WORK_SVC_NORESIZE,
- 				      &ipvs->work_flags))
--				mod_delayed_work(system_unbound_wq,
-+				mod_delayed_work(system_dfl_wq,
- 						 &ipvs->svc_resize_work, 0);
- 			mutex_unlock(&ipvs->service_mutex);
- 		}
 -- 
-2.54.0
-
+Sabrina
 
