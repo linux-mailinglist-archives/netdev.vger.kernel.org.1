@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-286519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286523-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6DsqL06WAWqXfAEAu9opvQ
-	(envelope-from <netdev+bounces-286519-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 10:41:50 +0200
+	id EGQJI4OWAWqXfAEAu9opvQ
+	(envelope-from <netdev+bounces-286523-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 10:42:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BC2250A3CF
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 10:41:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E9C650A405
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 10:42:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2D9D230607D8
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:35:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 34371306D93B
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:36:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 851213BE147;
-	Mon, 11 May 2026 08:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8CBA3BADA2;
+	Mon, 11 May 2026 08:35:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ImzhTa6r"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="N34mmbwL"
 X-Original-To: netdev@vger.kernel.org
 Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010031.outbound.protection.outlook.com [52.101.84.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E15163BB9EF;
-	Mon, 11 May 2026 08:35:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E863BBA1A;
+	Mon, 11 May 2026 08:35:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.31
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778488525; cv=fail; b=KXf1syqZ9gUDO+3sbcEQTzkyJfSP13FyeXF5xp0nsEFDNJdn4+ep2nLaGP8PI926DqKtOeGDnhR7L1RK8txh2gqeyuG1rrqApBB+IKJzkW4wMwSJi+wHmIEJ9Ulioekuo5N1DmP4itUrE1tZvvdB2iwRHJywJBrluAhf7OQaLVQ=
+	t=1778488535; cv=fail; b=QJTFOrVaUpXANECt1KtnNv3vDJIYdzD9EOW9ctJzbb0abqXYtms4XKBguG/X1TAu9iE3st9c+BK+rwaDDPPWeJTVIQT+8qHWZVBGZJeSMf5o4lXuK6Zyli3SPGbbVUHh575z5fanP9JgnlcYJ2Hbe1TWtmuY1CLbHDnaY9lqRI0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778488525; c=relaxed/simple;
-	bh=XSR729WUHSkcebFMtQmZOSmaabQCHHVxR2372dsfhK0=;
+	s=arc-20240116; t=1778488535; c=relaxed/simple;
+	bh=cWrGKjEtIyRhQW5mL1zGuudPTHdIiKwl0H4UVClnclE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=cTrYDneBY8uXY2m6JjjCecb2+bZbO8Fysh66YmeYoiCz6yGti1pVh/Kz9NP/VGt6TYUUqAD2yE7p6pvP2ve5zR/pjrUjkxe0ngIlag4gN2CpOUrAgPWFpnFUDfbW9GNcR/L1x23kLt/HkoMeqD/IO30I67vrGLYl8NihseUHW4Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ImzhTa6r; arc=fail smtp.client-ip=52.101.84.31
+	 Content-Type:MIME-Version; b=dBBlQ0nwiJapbd8F2F1kVnXIYb0no+OOyQCaYBIjIxLM+kBTqgnarPc/Afu++WePlGaV1QrHqSrNqSRLRMw2dJUMmggIYrBt68lAIf8TlD+K07muT7jIv+YZustxl1jr9O4vaMZozWfNqDlh/nXjjykHuhhLIcK0B8S/7cVX06s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=N34mmbwL; arc=fail smtp.client-ip=52.101.84.31
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=roy2HyTcNigIxzt8nPW8pig4dywM8Fwxc4S0deQD0pO+a7LW5nUT50VlwJbj1qnrwdW6wjb4COTIzxf2ofnAiMn6/D2A8n/LMSxS81ks/ihekt2DTikZ7B23ddiIWNw0cKq5gPiCPUmsAptsI6j1riijtuDAx4a9o6FeaukGFoW3bcgOz+2uAljIM8emX+KRCB3Ne+92MhZK2XNoCtmxFIQvPNQMDq/A7AYChwFL+I0eHxPco7tF9hZur8NXs/0n7a3R45uOwyytqN+frxGpPPQlOTehJ8yXGjIiv4PGJYRabDZR7OQ8qb7ZWs7mtmyL/SMRJc1WLomhf8VVHRGyUg==
+ b=os6Wc8ffuzS2IbBtPBfDdq75SRPG3ihWtGm2nyJEs776ErjwVKK+pDBdgtqjyPkbjs6Fd2zYlpMUp40stz+G0ukL0hrf8z7FbD5ko6urPkzXxN+4Ig0Uv7AbVZ9YBxTjoM/oOsgyQjSZKkahXZeWUTRskGPXUe3/cTpnQ6yLiaO2BDR3c8OGweffb82iFCAO8n0VKSY9vyYW0xVqQvSGxP81uKo/FaYSWuG4CbvO0fi8fq3F26C6USMlLD/71u0b/7tXpC2VwEabpMzTSv/VhlmQeVsR85mQ15dF4wZh2AMVAPurCEdND9So/trC1fStEkAsB4FxOEKq0a1jRHRBmw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kli22O7M+23ruj6+6QTOQxjN8xRSxdnsrOanxceTcoo=;
- b=cxSKwGvlyoqyFwOkG8NS0Lc79PDWDTG5pSpbwiwoZV0sTWVYHF7drIWJ3oU2PweFgYxVnIgLpzZFhrEEnduYtLmk0D8KotZcANkluyRLZ0SkDaXo/5URacj/0wd7n+gvvGulvKhDL32BqPSaUQIkJn1MZf+Jyrp9zOkhOAkGSyHFKaH7CN9qJ2eYyZek5ttO/r/X97LDXdn/2IYQejOJdQ5oMDWOhqxjyi7qUc0DqE2SMTj12C0xAzFpCp05lGE/22h1Bs643seQ72KMa/IbTHBL0zvpXlssSSiyGSv5ttty9vpDOW7fM2Z2Q6IuLxvucDgNMU5ZBra3AgAJ26nsag==
+ bh=876jopHB6utsFA9UFh/LhPQmcYrHsHn3hAN/ZauBWpk=;
+ b=NCV4YMP3EuEtXo8E2CM1JS58LIJJ5t49kfk+ygI0ZrjJrIS9ZLEVJM2mVd/3yzmlcmkcuo3aoCXJiqF8rvy3dewvWosFb6/O8tzDtlD7NRaCWOkBSA04nPUU+M2dRQSDzDW7U3q6s5LPmwDnwD701otntnCoZUxLJhkgYgSXnXu392sKkEDbpgVSU/DV3PWyaqvv5UYfPf93+YRL2/1i7h6tQZTxTmt2sgfvwd3i7uvFf+e0JaiOfOsTCa5WjPVmMT2r76AptoY5+xfx7D/qkYvFqAsWNTK6yJLqN/6S/BpDqjVYOnpCiXMyGn7PGc/c8CAeXkpoHHvJc2ycInA/ew==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kli22O7M+23ruj6+6QTOQxjN8xRSxdnsrOanxceTcoo=;
- b=ImzhTa6rOer5ZdIBSluH7vKjM5NkiRbXOYHUg6ghcT1Si3pWUf1/qvpvuGoDsYQxLUnPEbgaJ71m+3EW8l1lKQK0N2OK7UaNgM/WaNtmLdEv6s0p1E0n5oOEgHJTsRhF6HvT3x6cxnN19PFodfkUoFuvAxkAQ/bhoJWs4WdY2ZZ61n+8Gp6MdoJuC2ezErRnuGdSS2+jnhq3GM4DQ0c6i1Jwb6NeeO09QLKVQ+9PvajN9Z+aHI6fMSS23OaIFZsmUf697jyfNVcPa5dzRGPyOKF1b6HT6Zjcoq2UNK+bG2qg2bp4uFM/BqVU8C9arQxbQuRHrhSMpw83uGl9YizEPQ==
+ bh=876jopHB6utsFA9UFh/LhPQmcYrHsHn3hAN/ZauBWpk=;
+ b=N34mmbwLdMegjgpPE6UItGF1DJUuDOudjCprPLeFZQfJXhvnTs/u+qMlDPUXEoFFmYjIIV+dks0JtUD+BRfta7wynXiXvymWBdbONr/F4zDbErIdccNfOY5DmT4UAcLnAHql9lQ72mLF1nvo/0SIKNgDT5iFeLAdlFFcdRHlB+EHvjBLNvrJlwugxLSaC0iGQIe24JrImZ3CQa5RnIS0Kv3X0dKR20ZP+kS36Nsl/vpWf71QqrTPaOLG8GvqHOqlZmQTXFXnhBe2Qc8P6iOR2OgvRDbO16arh+reFy3hIZVBv09LuQz1lOOmPTLLcLRySKvs3Ohf3R7p1Gpa4vzNKA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from PA4PR04MB7502.eurprd04.prod.outlook.com (2603:10a6:102:ef::21)
  by PAWPR04MB10055.eurprd04.prod.outlook.com (2603:10a6:102:380::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.23; Mon, 11 May
- 2026 08:34:56 +0000
+ 2026 08:34:59 +0000
 Received: from PA4PR04MB7502.eurprd04.prod.outlook.com
  ([fe80::ff73:c7b3:5306:2ba0]) by PA4PR04MB7502.eurprd04.prod.outlook.com
  ([fe80::ff73:c7b3:5306:2ba0%3]) with mapi id 15.20.9891.021; Mon, 11 May 2026
- 08:34:55 +0000
+ 08:34:59 +0000
 From: Wei Fang <wei.fang@nxp.com>
 To: claudiu.manoil@nxp.com,
 	vladimir.oltean@nxp.com,
@@ -71,9 +71,9 @@ To: claudiu.manoil@nxp.com,
 Cc: imx@lists.linux.dev,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 05/15] net: enetc: integrate enetc_msg.c into enetc-pf-common driver
-Date: Mon, 11 May 2026 16:07:55 +0800
-Message-Id: <20260511080805.2052495-6-wei.fang@nxp.com>
+Subject: [PATCH net-next 06/15] net: enetc: use read_poll_timeout() for VF mailbox polling
+Date: Mon, 11 May 2026 16:07:56 +0800
+Message-Id: <20260511080805.2052495-7-wei.fang@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260511080805.2052495-1-wei.fang@nxp.com>
 References: <20260511080805.2052495-1-wei.fang@nxp.com>
@@ -90,59 +90,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: PA4PR04MB7502:EE_|PAWPR04MB10055:EE_
-X-MS-Office365-Filtering-Correlation-Id: e74e417e-5600-4f9d-dd75-08deaf382df1
+X-MS-Office365-Filtering-Correlation-Id: 00d96e22-c0d1-482d-1d9f-08deaf383000
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|19092799006|1800799024|52116014|376014|366016|38350700014|56012099003|22082099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	WrUwu/fXxEU8M8QNmPsQZI7J1HVWB8fCqLQyKejYYJ1T21i3VZmU06RykZElH+HMiWHcK563lsEi6Z3JgUXltgMExJ+72MmWmnhnsjwPZ5jfiT7B5mVzvaEY+HSpBclcA3UKU2DcPwv9mwniUIUPabRRiY654B66rWhaMkYTmhtP67yO0tqtqRL6PpPWs2FtZyp4XCJQE5b6fjWAWY2TUyjuzSxVVbbUaKZRxZqY4QsRUsyIhSbhJZehTdd2I77dQT9gk7qarkJyG2MDdi0yp5lg7pLoS2nPrpZG7RpdIhY1g3ywtZdkciQuF2IR2S943PvrHr1MCd3IW8ShY2JSdqO6e8mY8JEu++JXyw7qHaPwMoPzPrdU1ivJ+seo8rkqNzcMDoUlQhEvai2hjEYYoIkeikVstvJY8TppAan9UHdCfOvz3SgTdOwTzvS1HfLrocABtGL8/6rEj5T4I8pObGoj4Ja4a4yhsIEy8nohNGlCqxgUOhUgKJK8GIA+GV2fm4wu2Slg2t/qzYtMP0S5ooumElGA+FDZQVAAVIjrsejvNxGWwtY7BvkOPnn3snDD1+ss3wa8EVokZiUlz/Eo5hPLe3SL6ms3sOuO4PNcSkvZ/2D6l9lcnrQSDPdcy3tMnie6oZ2SU8/4LC0G6EpshHMz+50MViIoEaAhzWZ+r4wZXZcJQX2L3UpniA80w8XpQ+zg/AxRydArDH3RX4JYkG8kf2CP/yE60RjxrTNEvsSEtkcc3OoRmlEwa8GKowgJ
+	b0lAA5dvxUd/DzsoL85uruFFmbyugkfgtMealiBzLFQhVT2PH9kICMGpypX01VAuidNbXVukjt0j6UvWn/B99TGhmShZPrgEJqcJMZs8hk2ic7VXl/G0pqRZroyUtCaqxx3RsPhj1ONwdr35MO5Mk62RIB31HE8Z3xxfho/NX9Te+12l7V3HO+8WinZ/bItjoTWWzM552XtfHwQtr4GFjBFZ7mxLw3gNSyO6mZRsUDe3g3sQYlho8ONri3YX3ntdwa05C1Q8j6rVmzJgSpm2Gk2fuLfRTOhNQMvN3rRLFu9q+3Cw8xZ4TXeZEXIXCVWFhB/Ys7Eajp5dTO4n0TqoJrM6qc6ajW5BiKZILPb59za3pO5lOgzgYURMbrPovB3wpRKyCg8IDGZx5+v8jzGrTmMiiQDLsWXi8DzXDV+eh61i3Cy3O5lBlXc7JYmUdYPSIFszEgiL1gqO8lsCRWyj7QH2etK9lOcCmUwSrDXPQ+KVrdYV7OpOcdemXZ0DLsvNLduyaQ0b5PsqlQyX9CZ+dVVw+f/3LWEB+qpo1EUyUFQ64XlMGlpD1VOJoyASH+JzTTBiH0XaVEP/1SwB9UdYuIAQ4J1hUmo518m13CGfigltz8ygV6CC07XKMss72lR6W8sGFnfCb3gYVyiQZFEeJLj8N6NAQ6JulpioDAObnf4xepO9onxfSh56gGHFRA2TIdm/2H4SX65eXccLPyNow1hOp+6Nle/RqJkjUIXCChb3T0riZ7cUFGSsj3MJcapD
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7502.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(1800799024)(52116014)(376014)(366016)(38350700014)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?t/HnFNkJAqTsH8lB1poiNwAThbtFHDlU7A0wHPNdLF8Dmkb0F/49doDpH6O5?=
- =?us-ascii?Q?UcTKhilbqfscriUXSwnRlgErfQ7XPG0vd+m236vweY+xhuKdsRHWkbkALopX?=
- =?us-ascii?Q?axFa4VySX3Z3dbYM9+plJA/ABMKwAyehlSbNQdXyAGPPJ1RDCTs7i8YIuLhC?=
- =?us-ascii?Q?/T+gdasVFtFNsebNBsm97+nXzPV4IzhKivtKPyBF8PkLmGse/EVxyl4fQKu0?=
- =?us-ascii?Q?1xZxbUkxapD3A5DLxemVHHF+UX3kzdLEZv/1m2NuQBgJVSQVhNwoUy5o/9N+?=
- =?us-ascii?Q?m8dOLcSRneylrAmddQ8v7lUOSaiFtosKlCIdlRBN+hDBILz1cJVLJPO+6hwj?=
- =?us-ascii?Q?0xILnHNDIDrYq2pgznE47B481tiu+APy86SQd1ecYj0obIvRqW4yXw2OgBco?=
- =?us-ascii?Q?caFQyq8D8miYfoC+L2+RH9LU6giaG8Ed3jtNxJT+p86qtCVPo5ZLLloVahUp?=
- =?us-ascii?Q?kPc1Ubf/Y8gTCq3M/ucypXEQt0MpvfbyA7U8DDbhiUGibB5YyRrv8EgbVoig?=
- =?us-ascii?Q?4Gg1/S5qHiUK99G1Bi8N8oqXkNCEgLR9nlsW6cv7Dsv6n7YGSiymWgGu2tLL?=
- =?us-ascii?Q?yTGXOG2GVm0Dcyg67RUiLLXpoyeE3z7k9ZjsvHh3/kxBpDX/4ibUamX9DvOd?=
- =?us-ascii?Q?DgA7WlDdrJjWuDzZw/+FifK/5SJXEYFXaNzj+TzXn2SoqB7EtpS6PaN+m/XD?=
- =?us-ascii?Q?2LRLREor1wz5mdMq0DGj5/juwKR1Exg8mbxjzu0W+Gi+nw6WCp5EJ+VQv6i5?=
- =?us-ascii?Q?BAfyzUYQSsBWxfSrubeRLYoWSEBExKd30r0VMqH7qRSO0ZESrBjSlnyp3hpV?=
- =?us-ascii?Q?g8AsSW7tXBDvcGZ+YN7Nm+C6Gg/eyJRW/eq4HLwdFjJaeYxt7x6W7cFygyUT?=
- =?us-ascii?Q?MseZWaTCJBotrwKhDhZ/4cFmjXIHin9poQg0KIALRaSlLlNhBPZ2otkczqEb?=
- =?us-ascii?Q?zoVkAcPjoJ3hpIBL3IXM7/6A3Uz9UGsfjNc8gL0xzePyG30XJ2jHTdsh/HPl?=
- =?us-ascii?Q?gXqQ7yq+TMviJ/xpNYI4ZyIzLeMS+eWpJPgYuK+cmPFq85TUQVJMny/FzLla?=
- =?us-ascii?Q?7K9CF2U7CXlpmbFnXTjeASaGXg5gbAQKVrjiXaNequ9oKpofyWKvyooRCWCc?=
- =?us-ascii?Q?MpPUAW9/84Hc5kMoksBbfJXPCi+GArM2T+Jj2ZEQVMBCcPNuRkkFyZZxTJfy?=
- =?us-ascii?Q?q/53jArGczMmK2uJwxAftMeQjIMwrnhhN85d+3cSUI+8B8/6RedVsu/lqtaS?=
- =?us-ascii?Q?Hvk4hHfJ773gOUEngjToV6040D8QQEOyhvbh1QRF/hgJ5rbDWxLfdiNUGtX7?=
- =?us-ascii?Q?aWW6kFEJdmIcZ8xeB4cLPEHXqZ8UpjH3XlGRk0cRH6V0GdRO3qVJEd7bppMU?=
- =?us-ascii?Q?ohrwylbGzCB+6WbJVrvsRGCNoLZm6+lp0qIJJ8tH7ojN5h4pZH4JzpnurTsA?=
- =?us-ascii?Q?Z4Qc6bm0ixPikTzgiCbqLKFoXzln7yaiPuIPAIQ3T/3qJuSxX9zbOnlNFODb?=
- =?us-ascii?Q?wphSfpYboLUjOWu+SIWyTJhwmzAoZzWgx/Ow951y3AELXvgc+l3mHlI+IoTO?=
- =?us-ascii?Q?VgbwVkwO6SMtVibOnrBS4GqMYL2tHPclfs6Y6uuppwSZfxncNYlFgfwrU0vI?=
- =?us-ascii?Q?uexm/8NI9N/wLHXZhTMRkA8rnV/B+i0iArtkNVWzIlhLV7XCgaKhsqn2GVse?=
- =?us-ascii?Q?XH16i9AlvhINWtIogjsXOXMeQRyTkAXV0ZHfX1SZgjc972YH68sCN9bhFrs0?=
- =?us-ascii?Q?7RJwmr9fPA=3D=3D?=
+	=?us-ascii?Q?3orKz3jpL5LrsCJ+UmE/A/fpZ9XZyIBOhN3EY7PAQ3fI2IYSNTNJKzzDTaQx?=
+ =?us-ascii?Q?Qz1aSS/lX8YyryYih+bKSD/D/DWvkr8CgZEKKZrOWBmNxn9u+JiJN1/KRzXB?=
+ =?us-ascii?Q?IF7TtRXNat9q7GnHqfheiAiq300UZoVgipKlpgmRz03IN888ySF9QIUpumSa?=
+ =?us-ascii?Q?bqRbaWNhId7PsSlK6yMpXnTIIza15dXZ8CozBJ61a/K1j5V/GFk3Gmcu9/11?=
+ =?us-ascii?Q?6nW/TbCteqdOLU6i5swwzImySf1CASapicNafzjIGRkZKGsmnSk+0BJYFQZS?=
+ =?us-ascii?Q?mnCycZypFxhNztaJI4xBBbzvJPp99OUJZI6GXRTuhBV1VraOHDayMhy261b9?=
+ =?us-ascii?Q?jmaVIf2RrkK/UxZRW4GIiBJU8GPNw3F96MxoFpmnywpeInWU9XZxpSH6GrsD?=
+ =?us-ascii?Q?GYndA7wOWgt/Xxt0Gr8X8PSDbsNHQAd9pA5tpBTu6uOkOOzHuZmB5se7aFd3?=
+ =?us-ascii?Q?pTKr7el/UDCi4ICJ06eVFPbMLV5vsmMrcuzSuIK+urFML3iJRIDBQzWbyzRs?=
+ =?us-ascii?Q?7k1ZUNJM5ywgyY4Q/Tu1kzLgSwCsuSK6gpqWBt1UyXkqDyytZ6mLuXbBjbk1?=
+ =?us-ascii?Q?N3BmGqTXcT0yMr+iZhhELpDPRquqMgdtb7N667DYSqFVOJvIF6/oZHzYnHP/?=
+ =?us-ascii?Q?jIS1arBt5afqnd43/HEXfP5/7T2MMQtWUF2as5EFQJ2pnbs6XRITRxjxIdJ1?=
+ =?us-ascii?Q?R+ic/ISwaDI08afULVWqsjzb+GPTE3cWde+HgoHpsL0rpDwp9S3drcT4/iez?=
+ =?us-ascii?Q?fV7qE6UmPsiso85j6j83n09KiitX0jX4UwWUAWLbgWLICf+YNg9lJrxfHqv4?=
+ =?us-ascii?Q?AH3JTrSssHArBzyfk+51Ah3vlNPtvjTSPyCjW7evOPC5bU4jSpxEX75KcJUd?=
+ =?us-ascii?Q?3/uavs1c9SRsGZtxKDcMtdFhGzgk+MrNdHC+jBW0Ms7uyeBEzvgo320A82Xy?=
+ =?us-ascii?Q?PsOIKzyOTZZ5Cp2bmUyB5OPmhCQOpJu5mcEKULaLsT83jII9IMiz/IwEceUN?=
+ =?us-ascii?Q?QtG0fE8peTvMuhiUQfDPOKLa/jw6ige0SZ6fYGJtc1Ff5kbtm/QbsSld4ATa?=
+ =?us-ascii?Q?LwjzJ82l0s8w9Is++1wnCbt0j7x0+4TPbyh0DDyVHqfnKqubk+Sqxa47nW+B?=
+ =?us-ascii?Q?U3VPOdt5iPc4pCOIWbw6zavlGrK7nnhDM856xLlIuX0LXXoAFfLr4LXgVjfs?=
+ =?us-ascii?Q?YSPDHDGQ219tUkYpDnJX+ioMGt9gTt4/I26vCRJnjcLqp/iq43B/3n+pGw42?=
+ =?us-ascii?Q?NGtY7JR1C0JHQXaKcUpBdWRvM8P4pPkMfqOl2rYrVpDKqqzDbpdxEjxaF99Z?=
+ =?us-ascii?Q?ZHqFQY62iXxXmHCmtWx7qdKTJ4J40Dm79aeWynceOS7JdjWMgdNs1xu0XH75?=
+ =?us-ascii?Q?HO0xZiJDOKPF5gbOxDqYKI4a2o9LYhvm26h4gKm70Um5Y9McIXV8GUVG2sRX?=
+ =?us-ascii?Q?tV6V5k1xGGWmfqchkGb0iiuJ+S0Pm8Xcaqvi/oJVWC4d8vHOVeLoQ/KMXy59?=
+ =?us-ascii?Q?dK/3PdaHifvhmPxL5037iDwBJXOr/F0CWdaH5j8pC/eOjXUSMtE7p7rtc0ky?=
+ =?us-ascii?Q?Llltm3Moo4lASZqniZXHtS4hYWohlopM9nYFVeKg85HBnpwdNHaWVnQPIRUt?=
+ =?us-ascii?Q?xbXyYA00ZLg++Tmc7ez0kKQp15MB1Oy6fPhmW4RXjBHL0ZSTY4gCoQdCMNih?=
+ =?us-ascii?Q?97m7ec4MjhV6o+lGTGMxTkL50qDl44j/VQvOwEkn/10iXIaP5e6bn4+rNYMs?=
+ =?us-ascii?Q?h/K+k9SWyw=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e74e417e-5600-4f9d-dd75-08deaf382df1
+X-MS-Exchange-CrossTenant-Network-Message-Id: 00d96e22-c0d1-482d-1d9f-08deaf383000
 X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7502.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2026 08:34:55.9040
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2026 08:34:59.3418
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6Bd+XDtkB+5w4yX96xbD2OP64A58+RqxenImScP/YqVYFJEzwnihvrvXE8Pc7S5cwsZem7NON9MYz5V6SH60fQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: Zf2qlcp2EvdPsXenFFFeQvSOoPuEpQDIrkrKzAYeJQBVpJziOuWH40KtJMRiRZRIYzsh0cj9yyyFZssh5zPt0g==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR04MB10055
-X-Rspamd-Queue-Id: 2BC2250A3CF
+X-Rspamd-Queue-Id: 2E9C650A405
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -151,12 +151,12 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
 	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_FROM(0.00)[bounces-286519-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286523-lists,netdev=lfdr.de];
 	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -169,104 +169,57 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	TO_DN_NONE(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:email,nxp.com:mid,nxp.com:dkim]
 X-Rspamd-Action: no action
 
-Move enetc_msg.c from the fsl-enetc driver to the nxp-enetc-pf-common
-driver so that SR-IOV mailbox handling can be shared between ENETC v1
-and v4 PF drivers.
-
-Changes:
-- Move enetc_msg.o compilation from fsl-enetc to nxp-enetc-pf-common
-- Export enetc_sriov_configure() with EXPORT_SYMBOL_GPL for use by
-  both PF drivers
-- Move enetc_sriov_configure() declaration from enetc_pf.h to
-  enetc_pf_common.h
-- Update enetc_msg.c to include enetc_pf_common.h instead of enetc_pf.h
-
-The fsl-enetc driver now depends on nxp-enetc-pf-common for SR-IOV
-functionality.
+Replace the manual do-while polling loop in enetc_msg_vsi_send() with
+the standard read_poll_timeout() helper to simplify the code.
 
 Signed-off-by: Wei Fang <wei.fang@nxp.com>
 ---
- drivers/net/ethernet/freescale/enetc/Makefile          | 2 +-
- drivers/net/ethernet/freescale/enetc/enetc_msg.c       | 3 ++-
- drivers/net/ethernet/freescale/enetc/enetc_pf.h        | 9 ---------
- drivers/net/ethernet/freescale/enetc/enetc_pf_common.h | 9 +++++++++
- 4 files changed, 12 insertions(+), 11 deletions(-)
+ .../net/ethernet/freescale/enetc/enetc_vf.c    | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/enetc/Makefile b/drivers/net/ethernet/freescale/enetc/Makefile
-index f1c5ad45fd76..10ab6694c314 100644
---- a/drivers/net/ethernet/freescale/enetc/Makefile
-+++ b/drivers/net/ethernet/freescale/enetc/Makefile
-@@ -5,13 +5,13 @@ fsl-enetc-core-y := enetc.o enetc_cbdr.o enetc_ethtool.o
- 
- obj-$(CONFIG_NXP_ENETC_PF_COMMON) += nxp-enetc-pf-common.o
- nxp-enetc-pf-common-y := enetc_pf_common.o
-+nxp-enetc-pf-common-$(CONFIG_PCI_IOV) += enetc_msg.o
- 
- obj-$(CONFIG_NXP_NETC_LIB) += nxp-netc-lib.o
- nxp-netc-lib-y := ntmp.o
- 
- obj-$(CONFIG_FSL_ENETC) += fsl-enetc.o
- fsl-enetc-y := enetc_pf.o
--fsl-enetc-$(CONFIG_PCI_IOV) += enetc_msg.o
- fsl-enetc-$(CONFIG_FSL_ENETC_QOS) += enetc_qos.o
- 
- obj-$(CONFIG_NXP_ENETC4) += nxp-enetc4.o
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_msg.c b/drivers/net/ethernet/freescale/enetc/enetc_msg.c
-index 6f7927f40bea..a137fa1e6f20 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_msg.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_msg.c
-@@ -1,7 +1,7 @@
- // SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
- /* Copyright 2017-2019 NXP */
- 
--#include "enetc_pf.h"
-+#include "enetc_pf_common.h"
- 
- static void enetc_msg_disable_mr_int(struct enetc_hw *hw)
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc_vf.c b/drivers/net/ethernet/freescale/enetc/enetc_vf.c
+index df8e95cc47d0..669eb939e33c 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc_vf.c
++++ b/drivers/net/ethernet/freescale/enetc/enetc_vf.c
+@@ -28,8 +28,8 @@ static void enetc_msg_dma_free(struct device *dev, struct enetc_msg_swbd *msg)
+ static int enetc_msg_vsi_send(struct enetc_si *si, struct enetc_msg_swbd *msg)
  {
-@@ -245,3 +245,4 @@ int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs)
+ 	struct device *dev = &si->pdev->dev;
+-	int timeout = 100;
+ 	u32 vsimsgsr;
++	int err;
  
- 	return err;
- }
-+EXPORT_SYMBOL_GPL(enetc_sriov_configure);
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.h b/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-index 44cfb7bdd7e8..731d56bad5fc 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-@@ -67,12 +67,3 @@ struct enetc_pf {
- 
- #define phylink_to_enetc_pf(config) \
- 	container_of((config), struct enetc_pf, phylink_config)
+ 	/* The VSI mailbox may be busy if last message was not yet processed
+ 	 * by PSI. So need to check the mailbox status before sending.
+@@ -48,19 +48,13 @@ static int enetc_msg_vsi_send(struct enetc_si *si, struct enetc_msg_swbd *msg)
+ 	enetc_msg_dma_free(dev, &si->msg);
+ 	si->msg = *msg;
+ 	enetc_msg_vsi_write_msg(&si->hw, msg);
 -
--#if IS_ENABLED(CONFIG_PCI_IOV)
--int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs);
--#else
--static inline int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs)
--{
--	return 0;
--}
--#endif
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h
-index 96d4840a3107..548323d29f36 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h
-@@ -20,3 +20,12 @@ static inline u16 enetc_get_ip_revision(struct enetc_hw *hw)
- {
- 	return enetc_global_rd(hw, ENETC_G_EIPBRR0) & EIPBRR0_REVISION;
- }
-+
-+#if IS_ENABLED(CONFIG_PCI_IOV)
-+int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs);
-+#else
-+static inline int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs)
-+{
-+	return 0;
-+}
-+#endif
+-	do {
+-		vsimsgsr = enetc_rd(&si->hw, ENETC_VSIMSGSR);
+-		if (!(vsimsgsr & ENETC_VSIMSGSR_MB))
+-			break;
+-
+-		usleep_range(1000, 2000);
+-	} while (--timeout);
+-
+-	if (!timeout) {
++	err = read_poll_timeout(enetc_rd, vsimsgsr,
++				!(vsimsgsr & ENETC_VSIMSGSR_MB),
++				1000, 200000, false, &si->hw, ENETC_VSIMSGSR);
++	if (err) {
+ 		dev_err(dev, "VSI mailbox timeout\n");
+ 
+-		return -ETIMEDOUT;
++		return err;
+ 	}
+ 
+ 	/* check for message delivery error */
 -- 
 2.34.1
 
