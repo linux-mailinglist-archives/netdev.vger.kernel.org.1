@@ -1,219 +1,173 @@
-Return-Path: <netdev+bounces-286498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286497-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eI1fBNuGAWpOcQEAu9opvQ
-	(envelope-from <netdev+bounces-286498-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:35:55 +0200
+	id iAxjCMOGAWpOcQEAu9opvQ
+	(envelope-from <netdev+bounces-286497-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:35:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC60F5094FA
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:35:54 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6AC15094D5
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:35:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C5C073002B3B
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:35:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BC823300C312
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:35:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75D1F382F07;
-	Mon, 11 May 2026 07:35:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 117F238239E;
+	Mon, 11 May 2026 07:34:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="SaVmE+eC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lI8EAFcD"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.166])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 782333822AA;
-	Mon, 11 May 2026 07:35:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.166
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D673806CC
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 07:34:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778484951; cv=none; b=opuzXfBPZWFqSvWYds7Ig4juyxTUvvfNiZsvba35KGF/NTnEZJk5uDN4CDzhJhW9lg+M9I2zPspfRLXk816VH8acRBh8ydbs82v0yleCZP8U+Q/0clpuliwP4Gn9XbBo0YxzPxJ0zWcp7SkuVbEK35++5B90+qHwmw5REx6Q6wo=
+	t=1778484899; cv=none; b=fdPHo6h3Oa30dU56nivX7/mQIDVKQvZH59OphIPwNpJzNZ6kdJ/4vZjw7QC8X4Iq+iqLdqizXm6NGw4VrXR1rZ7ph/w5btFA4hrlEHWEi56LyMGUMBPKnD2aLHW5JqbaDiMm2LdWHsfauJ6qqFIij2rAufyv6/gsbKFEXA3d+pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778484951; c=relaxed/simple;
-	bh=JekxQ3jhAEWwckKcTZ1KtXX5cs1axMVv72xdmWNzLC0=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ehXNTkmlHlvl8NwRzY+zVWGnBM46JtW8rwqu7eRuT81eNb8/cX2igndVI+4WncuHfP5MfJanId6E+uA7UFq7S1ufM1TtralOaAf64T+7YTUFroVraGctrEKKSo4evWvw+lz+GLJsBdDI7dLWCxEhPc+RPIiTjgAmzef8npa/SOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=SaVmE+eC; arc=none smtp.client-ip=188.68.63.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-Received: from mors-relay-8202.netcup.net (localhost [127.0.0.1])
-	by mors-relay-8202.netcup.net (Postfix) with ESMTPS id 4gDWjT0lbPz41YZ;
-	Mon, 11 May 2026 09:35:41 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
-	s=key2; t=1778484941;
-	bh=JekxQ3jhAEWwckKcTZ1KtXX5cs1axMVv72xdmWNzLC0=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=SaVmE+eCwtnk+V7y6Fc+oBUmBkHhRzHxhauDGaXbgSZO01Nj9EqZsUbuLsbYvrgqr
-	 7VOZ1jiSFQr4GxlLKz04WCYIJrEcNWl939fBtlXodSi8QgWPOacKNrLxrzUcxmyu8Q
-	 UDgUbSeSX2r/BWQmHRpvdC4d0WRNFb7JShsoY3Jyn7N4+N7zjzty4sx9nFOLezsWIT
-	 5A163bJ2c46kPmWNtv7yawU11yEtyvDWUV42u0L18+rHqpqUP/ILRndvX4BGc6jC3M
-	 iKUHTuV5RUOFZfnyg50gEBwjvgoi0DsFXdpCZZMJqsSgXgpSs4zpjx4ePXfR+/uplc
-	 UPKGdmZCicHqg==
-Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
-	by mors-relay-8202.netcup.net (Postfix) with ESMTPS id 4gDWjS74qGz41YQ;
-	Mon, 11 May 2026 09:35:40 +0200 (CEST)
-Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4gDWjS1W60z8sgW;
-	Mon, 11 May 2026 09:35:40 +0200 (CEST)
-Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
-	by mxe9fb.netcup.net (Postfix) with ESMTPSA id 2E7F56183D;
-	Mon, 11 May 2026 09:35:39 +0200 (CEST)
-Authentication-Results: mxe9fb;
-        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
-Received-SPF: pass (mxe9fb: connection is authenticated)
-Message-ID: <f07da4c5-cdb9-42c8-b4e7-f5122254ed8a@leemhuis.info>
-Date: Mon, 11 May 2026 09:35:37 +0200
+	s=arc-20240116; t=1778484899; c=relaxed/simple;
+	bh=V/FqnKuLf5ly7IGnIqtIrW8gjqh4B9YtBRmcrjcAOKg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e2GhX4Y9tWATC+WDSTGwGqqOdY9zNVAzv0ShHP4vEDP+wMaMIRyfmuLGalRgvpNFx9QY04lFNKoDrH8PMZ1/S5IYxKwzUoGRmQJtORbIYRxfvShc0i1jaWNLpDwIwFzfIdVzpRoA0fyX4IHhcsVS1L/lv4fTRlqnO5KYMSUeY/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lI8EAFcD; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778484898; x=1810020898;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=V/FqnKuLf5ly7IGnIqtIrW8gjqh4B9YtBRmcrjcAOKg=;
+  b=lI8EAFcDD918fQJu9pgIWA7bAH3lv1ko7wvP+m8mepqvVlOpEZ8VMYgc
+   VBOuSWAfWLycZBR/HfQdAYPLihiWsA3DVktcdAgxXLwCm1xkdf+IB07EH
+   1/fDoPlDCzPjtEdaQK6QaWAvj7hhqv3cKQoGx31x5jxInGCMqNiDJ1rPK
+   3Cb5waMgyCHfydvBgNFlKCHrl5Grz0krg51RY667MpmREZTY5Zmhts2xk
+   3jdzQViq+a5Ch35n93dhTLSKS86eEzBfhShOvHr4rl1eNmVnRqiN2Z9wW
+   9EKHPE/QNeyiaRtHGJ/HixErp0L88OB5VD1m5QHRXcd6fVeIoK661fFdX
+   Q==;
+X-CSE-ConnectionGUID: 2cVyJ0AjQxyokut/cIxfoQ==
+X-CSE-MsgGUID: lJ8o2EB3QeK02r7heFJO4g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11782"; a="102030053"
+X-IronPort-AV: E=Sophos;i="6.23,228,1770624000"; 
+   d="scan'208";a="102030053"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2026 00:34:57 -0700
+X-CSE-ConnectionGUID: zn7NNtibSluMa6GYVt0IrQ==
+X-CSE-MsgGUID: sE7shOsJSwi1A6usA1va/Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,228,1770624000"; 
+   d="scan'208";a="241735131"
+Received: from pae-d-dell-r7525-263.igk.intel.com ([172.28.191.240])
+  by orviesa004.jf.intel.com with ESMTP; 11 May 2026 00:34:56 -0700
+From: Przemyslaw Korba <przemyslaw.korba@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	aleksandr.loktionov@intel.com,
+	arkadiusz.kubalewski@intel.com,
+	Przemyslaw Korba <przemyslaw.korba@intel.com>
+Subject: [PATCH iwl-next] ice: add rx timestamp tracepoint for debugging
+Date: Mon, 11 May 2026 09:36:34 +0200
+Message-ID: <20260511073657.1073780-1-przemyslaw.korba@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION] stmmac: Random DMA reset failure on RK3399 since
- v6.18
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-To: "stable@vger.kernel.org" <stable@vger.kernel.org>
-Cc: Russell King <linux@armlinux.org.uk>,
- Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- regressions@lists.linux.dev, netdev@vger.kernel.org,
- LKML <linux-kernel@vger.kernel.org>,
- Jensen Huang <jensenhuang@friendlyarm.com>,
- Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-References: 
- <CAMpZ1qEwNOqR-KQD4kEqd93aB-TpHnG6WdQc2tXUF0aXMmw_SA@mail.gmail.com>
- <198e2ce4-07e1-46c0-818d-1eb18645aca0@leemhuis.info>
- <CAMpZ1qGEOiPj7cApnWJnojSyEpDmXfco=No5n1VfyTCoNyCyFQ@mail.gmail.com>
- <5308c658-7d4c-4292-b091-a51546ea4d23@leemhuis.info>
-Content-Language: de-DE, en-US
-In-Reply-To: <5308c658-7d4c-4292-b091-a51546ea4d23@leemhuis.info>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-PPP-Message-ID: <177848493954.3705305.4101896583574132066@mxe9fb.netcup.net>
-X-NC-CID: ly4E+x+yMjHTTvk5EYhBSqPUYKsrNng/6ZNrMOBTFRTtmW+g2rA=
-X-Rspamd-Queue-Id: AC60F5094FA
+X-Rspamd-Queue-Id: B6AC15094D5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[leemhuis.info:s=key2];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,gmail.com,lunn.ch,lists.linux.dev,vger.kernel.org,friendlyarm.com,renesas.com];
-	TAGGED_FROM(0.00)[bounces-286498-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[leemhuis.info];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DKIM_TRACE(0.00)[leemhuis.info:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,leemhuis.info:email,leemhuis.info:mid,leemhuis.info:dkim];
+	TAGGED_FROM(0.00)[bounces-286497-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[regressions@leemhuis.info,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[przemyslaw.korba@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-0.999];
+	DKIM_TRACE(0.00)[intel.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:mid,intel.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Greg, Sasha, could you please cherry-pick c171e679ee66d7 ("net: stmmac:
-Disable EEE RX clock stop when VLAN is enabled") [v6.19-rc1] to 6.18.y?
-It fixes a regression for Jensen Huang (for details see below; it was
-later confirmed that c171e679ee66d7 really fixes this) caused by
-dd557266cf5fb0 ("net: stmmac: block PHY RXC clock-stop") [v6.15-rc1]. tia!
+Add ice_rx_hwtstamp trace event to help debug PTP rx timestamp issues.
+The trace captures cached_time, ts_high, and the extended ts_ns value in
+ice_ptp_get_rx_hwts().
 
-Ciao, Thorsten
+Enable with:
+echo 1 > /sys/kernel/debug/tracing/events/ice/ice_rx_hwtstamp/enable
+cat /sys/kernel/debug/tracing/trace_pipe
 
-On 5/7/26 15:13, Thorsten Leemhuis wrote:
-> [+Ovidiu Panait]
-> On 5/7/26 14:49, Jensen Huang wrote:
->> On Tue, May 5, 2026 at 4:26 PM Thorsten Leemhuis
->> <regressions@leemhuis.info> wrote:
->>> On 4/29/26 14:53, Jensen Huang wrote:
->>
->>>> I'm reporting a regression on RK3399 (stmmac) observed in v6.18.24.
->>>> When a network cable is connected during boot, the DMA reset
->>>> occasionally fails with the error message: "Failed to reset the dma".
->>>>
->>>> This appears to be a timing issue related to the EEE RX clock-stop
->>>> logic. Based on my investigation with the RTL8211E PHY, I monitored
->>>> the PHY register PS1R (MMD device 3, address 0x01) and observed a
->>>> value of 0x0f40. This indicates that the PHY is in LPI mode and the RX
->>>> clock may have already stopped.
->>>>
->>>> While commit dd557266cf5f ("net: stmmac: block PHY RXC clock-stop")
->>>
->>> Just wondering: have you tried if mainline (e.g. 7.1-rc1) is still
->>> affected? This is something that is always a good advisable (some people
->>> would call it required). In this case even more, as it since a while
->>> contains a fix for the change you mentioned, that wasn't backported:
->>> c171e679ee66d7 ("net: stmmac: Disable EEE RX clock stop when VLAN is
->>> enabled"). But this is not my area of expertise (and in different area
->>> of the code), so that fix might be unrelated to your issue.
->>
->> Thanks for the pointer.
->> As you suggested, I have tested the mainline and confirmed that the
->> issue is not present in v7.1-rc2, nor as early as v6.19-rc1. However,
->> I verified that the issue persists in the latest stable v6.18.26.
->> I performed a git bisect and the result pointed exactly to the commit
->> you mentioned: c171e679ee66d7 ("net: stmmac: Disable EEE RX clock stop
->> when VLAN is enabled").
-> 
-> Great! Could you please cherry-pick c171e679ee66d7 to 6.18.y and see if
-> that fixes things? It sounds like it should.
-> 
-> @Ovidiu Panait: c171e679ee66d7 is a commit of yours. If Jensen confirms
-> that cherry-picking fixed the problem, I'd say we ask Greg to pick it up
-> for 6.18.y -- unless you see any reasons why that might be a bad idea.
-> 
->> Additionally, I tested the case where CONFIG_VLAN_8021Q is not set,
->> and the DMA reset issue occurs again.
-> 
-> I'd say that is likely best discussed in a new thread you might want to
-> start. Also wondering if it was like that earlier. Or iow: if that is a
-> regression or not.
-> 
-> Ciao, Thorsten
-> 
->>>> ensures the clock is running before the DMA reset, my tests suggest
->>>> that the phylink_rx_clk_stop_block() call might not provide a
->>>> sufficiently stable RX clock in time for the immediate DMA reset that
->>>> follows.
->>>>
->>>> Since stmmac already sets mac_requires_rxc = true, I modified
->>>> phylink_bringup_phy() to honor this flag. This avoids toggling the
->>>> PHY's clk_stop_enable during the initialization sequence, ensuring the
->>>> RX clock remains active and stable throughout.
->>>> With the change below, I achieved 200/200 successful reboots with the
->>>> cable connected (previously ~50% failure rate).
->>>>
->>>> --- a/drivers/net/phy/phylink.c
->>>> +++ b/drivers/net/phy/phylink.c
->>>> @@ -2171,7 +2171,7 @@ static int phylink_bringup_phy(struct phylink
->>>> *pl, struct phy_device *phy,
->>>>      /* Allow the MAC to stop its clock if the PHY has the capability */
->>>>      pl->mac_tx_clk_stop = phy_eee_tx_clock_stop_capable(phy) > 0;
->>>>
->>>> -    if (pl->mac_supports_eee_ops) {
->>>> +    if (pl->mac_supports_eee_ops && !pl->config->mac_requires_rxc) {
->>>>          /* Explicitly configure whether the PHY is allowed to stop it's
->>>>           * receive clock.
->>>>           */
->>>>
->>>> Any feedback/testing on this would be appreciated.
->>>>
->>>> Best regards,
->>>> Jensen Huang
->>>>
->>>
-> 
+Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_ptp.c   |  2 ++
+ drivers/net/ethernet/intel/ice/ice_trace.h | 18 ++++++++++++++++++
+ 2 files changed, 20 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index 691f05c62d4e..07e621813ff5 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -2333,6 +2333,8 @@ u64 ice_ptp_get_rx_hwts(const union ice_32b_rx_flex_desc *rx_desc,
+ 	ts_high = le32_to_cpu(rx_desc->wb.flex_ts.ts_high);
+ 	ts_ns = ice_ptp_extend_32b_ts(cached_time, ts_high);
+ 
++	ice_trace(rx_hwtstamp, cached_time, ts_high, ts_ns);
++
+ 	return ts_ns;
+ }
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_trace.h b/drivers/net/ethernet/intel/ice/ice_trace.h
+index 4f35ef8d6b29..3cb8c6ea03cf 100644
+--- a/drivers/net/ethernet/intel/ice/ice_trace.h
++++ b/drivers/net/ethernet/intel/ice/ice_trace.h
+@@ -241,6 +241,24 @@ DEFINE_TX_TSTAMP_OP_EVENT(ice_tx_tstamp_fw_req);
+ DEFINE_TX_TSTAMP_OP_EVENT(ice_tx_tstamp_fw_done);
+ DEFINE_TX_TSTAMP_OP_EVENT(ice_tx_tstamp_complete);
+ 
++/* Trace event for Rx timestamp */
++TRACE_EVENT(ice_rx_hwtstamp,
++	    TP_PROTO(u64 cached_time, u32 ts_high, u64 ts_ns),
++
++	    TP_ARGS(cached_time, ts_high, ts_ns),
++
++	    TP_STRUCT__entry(__field(u64, cached_time)
++			     __field(u32, ts_high)
++			     __field(u64, ts_ns)),
++
++	    TP_fast_assign(__entry->cached_time = cached_time;
++			   __entry->ts_high = ts_high;
++			   __entry->ts_ns = ts_ns;),
++
++	    TP_printk("cached_time=%llu ts_high=%u ts_ns=%llu",
++		      __entry->cached_time, __entry->ts_high, __entry->ts_ns)
++);
++
+ DECLARE_EVENT_CLASS(ice_esw_br_fdb_template,
+ 		    TP_PROTO(struct ice_esw_br_fdb_entry *fdb),
+ 		    TP_ARGS(fdb),
+
+base-commit: 5c0d2ac5900d689d422a31cd45073175150c0a39
+-- 
+2.43.0
 
 
