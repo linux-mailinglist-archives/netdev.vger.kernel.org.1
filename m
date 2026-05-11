@@ -1,207 +1,163 @@
-Return-Path: <netdev+bounces-286453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286454-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iJ4HNu5jAWrQXgEAu9opvQ
-	(envelope-from <netdev+bounces-286453-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:06:54 +0200
+	id yLMEG2l0AWr9ZwEAu9opvQ
+	(envelope-from <netdev+bounces-286454-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:17:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 373B0507F50
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:06:54 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E149D508719
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:17:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DE447300BD80
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 05:06:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 826CB300794F
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 06:16:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C837B345CD8;
-	Mon, 11 May 2026 05:06:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53BA52C027A;
+	Mon, 11 May 2026 06:16:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ex1rDnAZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u0HB33fV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EECC194C96;
-	Mon, 11 May 2026 05:06:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778476010; cv=none; b=WNYAv/tkrfmNgGXbXVvH4ISy1lo+3dcpQP8h/yQ11pkB73R92S4S3UMk7RSfq0bqMIcu7JMGr4Dn+99YuXfQx+6mp2DxBJGSpYZM8pYHiSB9Gv10sYKw9vDq7WCHq+AFYff8ISGJ3waBqtYpf/XKwHqvauy5xfOoSC5O/9oEo1U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778476010; c=relaxed/simple;
-	bh=rXSD0fvdynYiCLT4eg+7mt9T9vNIATYsNTdjSgi4k+M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LH/Kyx1EBKYQ+7O1EU5HvkojB93OguX8g001aY5+MGsiBzqcLITnlz9LMp753DlDzmqJ90iWGfXQU3kPuXo5EdSLjp65F6jnGcGj1YC0RlFMFtBBqvo9ECaMuh3fe+3/1A+zye/a9CKqqk3mlzbDtYjisnC9ElkYyAH5wYJRRq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ex1rDnAZ; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64ANPBjK4107090;
-	Mon, 11 May 2026 05:06:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=B+jxpM
-	lReJQFMIHgQeZrD7D1fxNpSKN6r/vmsRKQ1IY=; b=Ex1rDnAZa34R0B8UZiB+N1
-	DUVvzRvUNSCGtuHzd5F2Mzcz40qSXdyhKJti3pELUZefC0IEfYth5qu+/y6e9MDG
-	CIGnU3DqZhXwRGv6ethtEymllFKW1kTIYq04XhUTNGRBGcYy7hBSCSZY13b3U2BU
-	XMWw4ZHv1IJXo/wUwcz6Vw4Ksn5+N0+woGEjK8Cq6YaA30piNFzQYJ8/MzReM35s
-	LE4xlq6TiHtCg2PTxaD7pxNndWASIFPXGy45/yDobg3AL6Ob+7c9KqbhwcuiQIe5
-	JNU8I5tnLbcSd0kF1QALZrCOIiq9tXjPkbKXu0keOLSmR+isXYMwCVFAreA3efWg
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4e1vn4pmqu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 May 2026 05:06:47 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64B4sf6D024107;
-	Mon, 11 May 2026 05:06:46 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4e2fmvuw0t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 May 2026 05:06:46 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64B56iT732833910
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 11 May 2026 05:06:44 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5799820043;
-	Mon, 11 May 2026 05:06:44 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ACEC920040;
-	Mon, 11 May 2026 05:06:42 +0000 (GMT)
-Received: from [9.123.5.222] (unknown [9.123.5.222])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 11 May 2026 05:06:42 +0000 (GMT)
-Message-ID: <990d92d9-40ed-47bc-866f-51d386adcb41@linux.ibm.com>
-Date: Mon, 11 May 2026 10:36:41 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA27122157B
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 06:16:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.174
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778480178; cv=pass; b=PJvSd2qawgUCyUwROKut2XCl4zgy2reDTZjsffiYswmWrgT7CEWT9L9R9HKTYno+hVH1Iow8mYKcpZvdWOErExIhHNlOl4HzpMGaf0bjFl3nsDzTdBOqZ6tWG4mIvJDu3ZWI9xVJ6NurK8UA2qry81sWV8vbOiKn8Akm7DCfYGo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778480178; c=relaxed/simple;
+	bh=eQDtrSQ+EEuMKW8PiS95FUISXJKq/RCO+BZZHIerMDw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uAq4WHL7YD7Pcstt0HREkrARQ34UNeAZPcp7AIJ37qggQ+rCB5+Cn0UOYbAaUrNkcZ4wBvyASqf2Xb4wXzSkEOqfq6FBMFfyLC5xmmzDEfEMZQ/40PD5H1aF4z6XMhOE2IgIG4ZtWuCCVWKUhjPAbMRQuzO7zv70Jgp0W6VJtkA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u0HB33fV; arc=pass smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-8ef0ba61d46so452076585a.2
+        for <netdev@vger.kernel.org>; Sun, 10 May 2026 23:16:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778480176; cv=none;
+        d=google.com; s=arc-20240605;
+        b=XmyyyLqHlGZM41YLrgVujbu6qqCdcrOYbPxAHkgSD2HmTCr21gWoaRuGMlMa8/B/tx
+         cKQTs4jP1eATrGZK/Glb/CchymQvC9mj4pzq52+tWQQrcL8DrxN/a2m991FfsGJPR3Z3
+         9OXbT01HpI6ULrMnoey5DfJ7d11ErS59CuShfEFhKEJxN+Xybz8o0b9im/dHz0aZ2VDR
+         fRQeZm8Ze7Rvmbj6MxqXEEpzzsdw2Oi/lEC2agEpKsfr3HwO/0GjVYjciJHQ118Lisiy
+         nKDbdNl9XpvbN9zbdvqjy1tQnm60rWUuoizbIDyqOJJxEVNDByKNrRHCRXFczaR//uga
+         ZVyw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=4q51TCt/Hox0+nCaWJ6/zJB5WM/wG+F661fL4WPLVPE=;
+        fh=FsUhJyQkYcyNBv7PGFoIQT94JAe25rZjTFIfiv9GtHI=;
+        b=RtuR6gy/bUwY8Oz4MOzl/D2WtyCCoUk6YK9B2N/b+H3Kbd44BZGBZqi0akTRVPbtTX
+         pSN0BtifheRYrSuA6gZEDX2IeXPrj3Jy5hBXwO9b1eDgSk+xyt0sF3AWLXGMwi8RA0tB
+         R8MJ09w5NsG28ooC3PWqCWvwTpYi/aOyzizW9FNFuxkS8IoNiEhed8ph4ouHlK/0yZV9
+         CMCY+PAgoRXmRhEOdBoJ80F6NJaWsIHTTST0Vri9Oed5191+zi4PG+VJlogSv7ZBExWu
+         /z0H2aF9BYtEfazkkmtVd7EwpjpfUjM7juS3RZYGEV3PBlQaLiqCf4jtqg0gGYE/igXC
+         FJYA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1778480176; x=1779084976; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4q51TCt/Hox0+nCaWJ6/zJB5WM/wG+F661fL4WPLVPE=;
+        b=u0HB33fVirZzvboEETiGI31aBtSCd7vDrBzBQk+eabCn86yIGfeXCyJwXT8foIBJRT
+         LuqNqMOhTX+/2412WOYKbnw81gOaPmNNwPLNP1JlsnxFEtXX9dAe6wfUuvC4qApG2Inu
+         xBDIwwnV263v2EFyzUKX1GlEQfLWpcsoVZnkB1Mhl449PpOyX+IzLQwIVQLOlF8Ite3J
+         Pa6hvm3rwmTcTJIxYukcEPcmRV5mNZD6TB7Sx2KTb1xvgpS2JeuNPXgmu/bPhYive6oM
+         akXGOCMtr18UDZA5DtsKxvWApbiDEzZ0R4K5QrGgmTkYxnY/aqTsP1FryOZBXlMeSEg1
+         Z8Sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778480176; x=1779084976;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=4q51TCt/Hox0+nCaWJ6/zJB5WM/wG+F661fL4WPLVPE=;
+        b=qe5GqBsAIAiXDfrN4dxut/M9/199P03actbKwEOoBCLdIly0dMIROCTr7fDq4IiMWy
+         7q9jWN02b1FGJjS++w9tTN1y+HZX+deSdz/vzwHpXgeDmSaCiuc2hLxzaYTWqQRO37+r
+         saHDbgRjLxQFhCt1v6+uhM0V+M6aL8ahZfEqAUyX4V6g3cQdSmEcc/Rrx9tIuvPSrBH5
+         GX4WW/w8ZB17yr1wlRQytLQDXsbg9amQtT3q80EipaTUYLpekvSdddmB2GcMi8mUIm/x
+         uD1y1YcsVU8HI4cI1TPoEFLVdC/e0q/qyP8wDJewLydSOdbEwZTPnk27BLqF5ASji0J3
+         q8tA==
+X-Forwarded-Encrypted: i=1; AFNElJ8kQ4Uhu6x/1Ob1nVwCBJDOLMMdh5yVfLGXWFF99/HGoytO412n4Xk51QFFZr5kZPz6hqn8MMI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMuFkewjG61DnVdbjVpmpr+Inbl4mQK0NQIj4QEfZTNU4PUngv
+	XV/BBrzi/n9Xqmcwp2fxg2oVgpJBiYsdBYLVJkCp+isGUUPGiOMeNxK0jQio+2UTrG+x10UHuqS
+	v84Fx1xUBuUPrVNJimVmrCgPlfF0vVFlRyjgj5695
+X-Gm-Gg: Acq92OEJQHnbNb1PJXNsG/CL2zWJjpPrbEqVgEb7Nzhd4H/eNL2frWLfDhMP7/Jnjhg
+	N5Gd2eYkNx/tHSxQlXPqrlzg3K16SZ/SSMh2JyBmuFZsIMan2vcRAKytohCEMdFoczJyeSLac6x
+	QIyhSFZb02eVxyrVKCl4a6NDZC/YDxkXEz4H6yl4zURflu7hk5O9cLA+aRTxW+pVSXn/8VzQR08
+	oXwE07gVc9YedsU8ScQbeWTJRxu4rqWPlr8xA7HEUyJapMLvqzGaNwFCjwg5g2W9qQh8UJMNrNG
+	fwH2TXzwzlhyc4a2mg5aDkBCzzAPEZU4GvFOV8iPaRtBYctqiMSZvl4cTyvuBND2TP+cChBCgBQ
+	K0YiYUPp6N4lFinaPLLXm3yIHpTrm
+X-Received: by 2002:a05:622a:302:b0:50b:6a79:45c5 with SMTP id
+ d75a77b69052e-51461e3ef66mr327866871cf.22.1778480175379; Sun, 10 May 2026
+ 23:16:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: avoid NULL deref of conn->lnk in
- smc_msg_event tracepoint
-To: Xiang Mei <xmei5@asu.edu>, netdev@vger.kernel.org
-Cc: alibuda@linux.alibaba.com, dust.li@linux.alibaba.com, wenjia@linux.ibm.com,
-        tonylu@linux.alibaba.com, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org, bestswngs@gmail.com
-References: <20260510222640.1230720-1-xmei5@asu.edu>
-Content-Language: en-US
-From: Sidraya Jayagond <sidraya@linux.ibm.com>
-In-Reply-To: <20260510222640.1230720-1-xmei5@asu.edu>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=BM+DalQG c=1 sm=1 tr=0 ts=6a0163e8 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=pGLkceISAAAA:8
- a=VnNF1IyMAAAA:8 a=1CYBFmbjrI-9FY8DL4EA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTExMDA1MyBTYWx0ZWRfX41oWdKmQhcSe
- OMy0byv7g2teWGX94oSjpfMuv8XN7HhUeG4Xoxgj+Dy9r+x0+n+ZF4uRu4bb+lfU7oWB83mDSIe
- FhEnAkegD/gJ4DhNyQONF5m8nBHz7hlv5ZTicJLaXBUQDuMC+jNR5f/cfHPKa2iVwOPrZrhQgMR
- nJNArNNoF+rbun8MwR4zhFeZYeTYbGyuP6+N8Mz45ScWl5xM3YwX+UnJHO1mDK7OmSGGONh9sRb
- 1t6cztmTEAGQLjIJ3EPGVaPyDrPV+M9iwSDAOPU3oReRzYf0fzpMp1cUinO+pcQNmjyZjiu+fuz
- Z0fn8ii72CvF5mtJHnAKYjYmUGKbmM+MfAhmwMR7fZnfzkJkM2tJNuOz9sVVHs/RhEAIAP2SEv6
- ILMLqP8VGooh73xk+nyw944iqPT977KXyx1ZvONhBSxq6HyslnVSeY46SXrw3zmLpZjyIoF6Dgl
- 2aKXw4Wl/r9X8qX/Wig==
-X-Proofpoint-GUID: G6QOa6yLXqsTUl76NowNFZE_wz0_kJGa
-X-Proofpoint-ORIG-GUID: OlUUaAHVRY7LzhNC12llpUP8PaUaXwF6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-11_01,2026-05-08_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1011 impostorscore=0 suspectscore=0 bulkscore=0 spamscore=0
- lowpriorityscore=0 priorityscore=1501 adultscore=0 malwarescore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2604200000
- definitions=main-2605110053
-X-Rspamd-Queue-Id: 373B0507F50
+References: <20260507174547.4125412-1-edumazet@google.com> <20260508161827.15b114eb@kernel.org>
+In-Reply-To: <20260508161827.15b114eb@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sun, 10 May 2026 23:16:04 -0700
+X-Gm-Features: AVHnY4JVhUEOcmAZqNHFcTwJnrTRlPP6AFXqrLe06tiupRW-TLbRo1W3L0sJHaI
+Message-ID: <CANn89iJTjOH6usbeEUuishWTtg8kk2HdDY=T6da9z3QDUCFa1A@mail.gmail.com>
+Subject: Re: [PATCH net] rtnetlink: add RTEXT_FILTER_TERSE_DUMP support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: E149D508719
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [3.34 / 15.00];
-	SEM_URIBL(3.50)[asu.edu:email];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,asu.edu:email];
-	DMARC_POLICY_ALLOW(0.00)[ibm.com,none];
-	FREEMAIL_CC(0.00)[linux.alibaba.com,linux.ibm.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-286453-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	R_DKIM_ALLOW(0.00)[ibm.com:s=pp1];
-	DKIM_TRACE(0.00)[ibm.com:+];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,kernel.org,google.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-286454-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sidraya@linux.ibm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.959];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[11]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
+On Fri, May 8, 2026 at 4:18=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Thu,  7 May 2026 17:45:47 +0000 Eric Dumazet wrote:
+> > We can later avoid using RTNL when RTEXT_FILTER_TERSE_DUMP
+> > is requested, as none of these attributes need RTNL.
+>
+> Since this is uAPI I think we need a better name?
+> TERSE_DUMP doesn't explain much, my first thought was that you'll just
+> trim some ancient attributes to make things smaller. Sounds like you
+> want it to be lockless. Also GET will effectively support this bit
+> too so _DUMP is a lie.
+>
+> Maybe RTEXT_FILTER_LOCKLESS or RTEXT_FILTER_NAME_ONLY ?
 
-
-On 11/05/26 3:56 am, Xiang Mei wrote:
-> The smc_msg_event tracepoint class, shared by smc_tx_sendmsg and
-> smc_rx_recvmsg, unconditionally dereferences smc->conn.lnk:
-> 
-> 	__string(name, smc->conn.lnk->ibname)
-> 
-> conn->lnk is only set for SMC-R; for SMC-D it is NULL. Other code on
-> these paths already handles this (e.g. !conn->lnk in
-> SMC_STAT_RMB_TX_SIZE_SMALL()). With the tracepoint enabled, the first
-> sendmsg()/recvmsg() on an SMC-D socket crashes:
-> 
->   Oops: general protection fault, probably for non-canonical address
->   KASAN: null-ptr-deref in range [...]
->   RIP: 0010:strlen+0x1e/0xa0
->   Call Trace:
->    trace_event_raw_event_smc_msg_event (net/smc/smc_tracepoint.h:44)
->    smc_rx_recvmsg (net/smc/smc_rx.c:515)
->    smc_recvmsg (net/smc/af_smc.c:2859)
->    __sys_recvfrom (net/socket.c:2315)
->    __x64_sys_recvfrom (net/socket.c:2326)
->    do_syscall_64
-> 
-> The faulting address 0x3e0 is offsetof(struct smc_link, ibname),
-> confirming the NULL ->lnk deref. Enabling the tracepoint requires
-> root, but the trigger itself is unprivileged: socket(AF_SMC, ...) has
-> no capability check, and SMC-D negotiation needs no admin step on
-> s390 or on x86 with the loopback ISM device loaded.
-> 
-> Log an empty device name for SMC-D instead of dereferencing NULL.
-> 
-> Fixes: aff3083f10bf ("net/smc: Introduce tracepoints for tx and rx msg")
-> Reported-by: Weiming Shi <bestswngs@gmail.com>
-> Assisted-by: Claude:claude-opus-4-7
-> Signed-off-by: Xiang Mei <xmei5@asu.edu>
-> ---
->  net/smc/smc_tracepoint.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/smc/smc_tracepoint.h b/net/smc/smc_tracepoint.h
-> index a9a6e3c1113a..53da84f57fd6 100644
-> --- a/net/smc/smc_tracepoint.h
-> +++ b/net/smc/smc_tracepoint.h
-> @@ -51,7 +51,7 @@ DECLARE_EVENT_CLASS(smc_msg_event,
->  				     __field(const void *, smc)
->  				     __field(u64, net_cookie)
->  				     __field(size_t, len)
-> -				     __string(name, smc->conn.lnk->ibname)
-> +				     __string(name, smc->conn.lnk ? smc->conn.lnk->ibname : "")
->  		    ),
->  
->  		    TP_fast_assign(
-Reviewed-by: Sidraya Jayagond <sidraya@linux.ibm.com>
+SGTM, thanks.
 
