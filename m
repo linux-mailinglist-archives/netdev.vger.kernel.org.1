@@ -1,262 +1,187 @@
-Return-Path: <netdev+bounces-286530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286506-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cFNJB9iVAWqXfAEAu9opvQ
-	(envelope-from <netdev+bounces-286530-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 10:39:52 +0200
+	id 0BDbOXqPAWoVeQEAu9opvQ
+	(envelope-from <netdev+bounces-286506-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 10:12:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9AD950A385
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 10:39:51 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18E39509E6A
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 10:12:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3CBC93001006
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:39:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0998D300D4C4
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:11:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED97C3CAE6E;
-	Mon, 11 May 2026 08:36:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C5B33B9D91;
+	Mon, 11 May 2026 08:11:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="cAxkBw+b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jITHngpl"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010009.outbound.protection.outlook.com [52.101.69.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C01C3C4554;
-	Mon, 11 May 2026 08:35:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778488570; cv=fail; b=tqXpCUKMzEX3uoF7hMVm2aX8YK/s/YSRvQf1rgndDmWzPbTn48siGIYS4SHdm1dZxKq8a+kXQQq69agaVp09X2FP+TxM/cm6zHTotK8QJbdXw/pbjr+uE8P0rdSPQ6FjfKjFNi7X8ap0rAEfio0FxgGuI+r4Y+nwJDS6cUz98xc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778488570; c=relaxed/simple;
-	bh=DdGG/c1YFwARafmOXamfrmuZBBlGmebSI2t0kP87ja8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=U615NunxxFNVGloWDImDIIp4e2RqYFUbzpOdYcjru9uLQDIBfJyJl895ZcoeGyPvoosTQsDlTbRt7SGqZJ/ZuSsKxTgWXahVauJ7lKC8tkxzikO+OoUobkKaDj4PDU8ycW0X/3F9ZBYdngc3k11mqM0L1l5nu6mBe51aEib8Uw0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=cAxkBw+b; arc=fail smtp.client-ip=52.101.69.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vhAcYKRwYdIwloRSPsuiPAxeN9bRbbg9ClQKKVU1fV+3OpiLjlUec1HeBb1ym+MU9xe23OfApbZ79bXOU55UEWEELo3lHvjgCoC1B1cRlT42I2Aq91IFhj7dOHOCSZEpUIETC+Vc1Hmzztx4X2AiTy+DwfZNBr0no+12QwBJVG9XV+9L7OU1j2wT1lGJ/WG01owZtbw0AJTzVIc5V1b3guV30eD4auPhCwrnL4tjb9qsxS4SFura9WLD0HsO6bbSiKACM6FWThjKt/kdVbY286BaoDqN+MQjY32BFQkZu6EpInb/0HOAdXsGjU66JDsKxRxYZ5mcTsFw6RrtgI+Fqg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MFCLutcLr6O4HE7Pg54bFTM3npU2KN0gtWR/y/26SEs=;
- b=AZ6M9whe8kdS33a3prtwdqV/Ln3wgPWe9oau/kfY58V4JpSIlH6C/3mSb5T4SOodKxfkzJ5aD1b4b950olp42mf2mLlM4ASurHP2yR98cYrA9ZAO3SXPgTM+/qOWS3p1GkMegQi94hnYyO9UfKJATJn5dUh5+njRrps5eKzuOFUHeTE2GV9UwoMWIWA3v3uhkFu+lkxa8c182wPvkZqWZ5vULjlcZ/3UNhx/Gcdbt8ZKQFm6Pp0204GimklTrH0DNR76E8yhufU9MClzOWuzshz6HsoODwKEAtuqYcFlxy1dSwpJuKQbQtRkWj/AasGIlt4KIAvrtgV5n3BRd0UAAQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MFCLutcLr6O4HE7Pg54bFTM3npU2KN0gtWR/y/26SEs=;
- b=cAxkBw+bdiHO5lyYq8kgJXROIAviT+5j4RisxjunguKc2YFqp5NyJwkOOh98OlV58GaYTKNvQYii8WoonjqcdgQi5HFUe0Ue2yVSrHK2K14edMiG1Tjcl1PtFGikkc2/Yrpm4/YVyfPSZW6F1h8BkTiGP5D9zPkGydjgFt/p9Bgm6cSvqO1IU6CoGqaW3QVWa8v0Wr0zng9V4q40uOmzNkcmO2bCtSXvPVkssHJuIns7VakyScHRsZzz1vzdE1c6/+eWX37LB0PN8BOifG4XElF8OZ1cMqFKkQjVgA4O78fECrkCXirQVCw96PJkXRvsYFN+Jaxmd+s11PPmdFg3sQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PA4PR04MB7502.eurprd04.prod.outlook.com (2603:10a6:102:ef::21)
- by AM9PR04MB8322.eurprd04.prod.outlook.com (2603:10a6:20b:3e3::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.22; Mon, 11 May
- 2026 08:35:29 +0000
-Received: from PA4PR04MB7502.eurprd04.prod.outlook.com
- ([fe80::ff73:c7b3:5306:2ba0]) by PA4PR04MB7502.eurprd04.prod.outlook.com
- ([fe80::ff73:c7b3:5306:2ba0%3]) with mapi id 15.20.9891.021; Mon, 11 May 2026
- 08:35:29 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: imx@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 15/15] net: enetc: generate MR interrupt mask based on the number of enabled VFs
-Date: Mon, 11 May 2026 16:08:05 +0800
-Message-Id: <20260511080805.2052495-16-wei.fang@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260511080805.2052495-1-wei.fang@nxp.com>
-References: <20260511080805.2052495-1-wei.fang@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SG2PR02CA0114.apcprd02.prod.outlook.com
- (2603:1096:4:92::30) To PA4PR04MB7502.eurprd04.prod.outlook.com
- (2603:10a6:102:ef::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4392A3B8BC0;
+	Mon, 11 May 2026 08:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778487083; cv=none; b=WU7d3nmOKqZHFzvivBS1JXDkA12rAGBJmP3tlbZurxTh+Uh+KmZeD55HX4QrlQPUrl/8ZqZwugPYVsiYrmnkXbuTbsVlgizJ/jX8mw0+hJ98I13wz0C8FU5wNQs1Atjfuqp1Zj7gaph4RpS34vOHotvTojy4Y7j2AuxMQ/ZNScs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778487083; c=relaxed/simple;
+	bh=G3GLlXZt5VJM3r0uBJedbztGA5LM9PkcJ1qqFAxAG8k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=T080Jjv/4p+dSY3lQ1vioGOL0SfGavwDHyVTSgc3RaxWKC/JJpi8Rn4CSL53YjomRkJANW+y7eAf6zR4gqd5UIggAUM/ywRFBufmG5AV3GMrlhPO4Xgf0BQXsjKPeR53QqmnSCgiIWFANc3c8uy97U46GFTrRWXUM9FMi+w8yCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jITHngpl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ED01C2BCF6;
+	Mon, 11 May 2026 08:11:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778487077;
+	bh=G3GLlXZt5VJM3r0uBJedbztGA5LM9PkcJ1qqFAxAG8k=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=jITHngpl3ZEVsBQTBjt8BFCnxHLyAYshpmvV1uhTnbcFQrs0r1CY1xklP22b0kER5
+	 qNJy4Ej8OYjUJ/pYfk9gFNIWeJZqPv2EC3fCnU/1ImCvMtf2YjMKhIS15he2HwN+J7
+	 yCPIkrBznRDrWKC//4aTkoWuWxDSvBNreslsxn0/2FEVm7boDa/hZhMnoE8JDv8u2U
+	 cWz9oX6H8IeIRBUcrBWaB7p+bcKoITJSdfu12BFD12m/wCzOIhh/2UUti66PrgBkl5
+	 P7ab1DPRl264ouUeQCpVFdZ0Zeak8bAqXedd7Kvtr8dIPVJ3CtOEKZQIUJiT7OJlU0
+	 EhbiE8Xp1tizg==
+Message-ID: <daa05c21-dcfc-4cc4-aa22-9e25c7f6c743@kernel.org>
+Date: Mon, 11 May 2026 10:11:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PA4PR04MB7502:EE_|AM9PR04MB8322:EE_
-X-MS-Office365-Filtering-Correlation-Id: 09f38ca1-99a0-4305-c623-08deaf38422b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|52116014|19092799006|1800799024|56012099003|22082099003|18002099003|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	YMZgBhwFie20/+PnquDWKBncK0GWbTuCQYlZwGepAD4hGL64xUaP6qNhwt4Ws1sip//dcfCBWuteemEY7UWk83KqOeJ6+twMCEiyrm/5KiKGJnnEf35Ok3HvkzYxrDRlZVC7lYePNZdM8O9OsT8LGbruoH4SJKvjXtTYnwzJta8Y6M2RQuptKlAF/ZD9xtR9zJKxgKl5YnRAQNDtCHe1Fbn+i3abzzx68F6h53unUv7oObu8LRncHwzN/cGq7PdzPDSs1A770wQW8wfoKq791PQ0Lx2kaA10XYthDDj+1F/xKNqNqEqPCSvShPoOKdQEXihICwQ3VxobACjnWVM5mmf5+EjxwlCtZuZq4370jU7GN2dX6qZv71Iwxxa4cdVCbrsnQnAQPRSzBcCXNBS9BjFzBdBkbje5Q42VGFyE1ZCxfcceArCCJxRaR8L8tgeOwzRCRPadg65KlNxqHSWgaV3EJLH0Fotv1nAKnrecx+wZVRAclUWqi73fImUR0CWrVVuTI6vJV8x0Hzv71p5vpZ7ycaosIQTfJgS06T22EucmDWco1JgNSGpBtNNCfg1+/ok/l5MkDxPlYnD9yiMbhPg46+ak6uRy3LSU4BmqIwF8CcURiP/Xe4R4HqnnzmALMGA+gr4lLu8IaI+oR6rnk6nXatmITPNbS1YrB2v7FXI6oUXvFKjkGEVoEIHUB4zmfZiZxWlLYsFb2CTgTuEpgh5Va8ZGx80YJbT0wMh0OBW7jknPxL/1hQ7d16CmLwir
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7502.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(52116014)(19092799006)(1800799024)(56012099003)(22082099003)(18002099003)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Hn3+RbqF8jdtnkBpQvXW5EQjomXva8ZbQe0oKIPwF9+Jdl64u6zFGA1Nyxw+?=
- =?us-ascii?Q?GZffPDmDsmt/vByh6cFBSQajSvtZGu3Vt4tGvDG5T7WVLqTbvpvYNfo8pm5D?=
- =?us-ascii?Q?YaLNI7CA+lwCoemCJjMfFmVs7JBLK7CQmKiht+A0C1th8xuSJ088uciIh2OV?=
- =?us-ascii?Q?0K2M7zDgbFqlv7UQa71eXcryXl/cuKsNcxc7rdKZvfuTUUrl5Mw5SWZliaQn?=
- =?us-ascii?Q?P/gkQS0p06jY+HAsHigE4PTJ3Uy9dVyjEjVYnFnExsXCHWk/bjsR6H+ZHwma?=
- =?us-ascii?Q?Ce1RbeURtXmI8V2cOHWKsZvJuFesIqjyDhCjpiKSWjBvjy8FxgXqpWSx+BOd?=
- =?us-ascii?Q?iXwqcYFHgJ3cs9yzsl4waOaN2WLZU5m0E7jTVHZv+jrr6aJkX2Bim1t45IN+?=
- =?us-ascii?Q?Dwe5GGpNB1vG/56GwHCGNv5DR5BwV16NlHGrVNE0mul0XknybifezIrYPmWJ?=
- =?us-ascii?Q?X2dp6v2VSkfC832hQ1JSzp7ri2VjqADHomybDGQD1xOUpz2CvlP2lieqElFG?=
- =?us-ascii?Q?QM1u+iP9j+z0ee3kwwFLncdCr6fSMTeAXrorJbrG6ixLTOTeKtR2yUbh4sPP?=
- =?us-ascii?Q?UIJc/YFhD6N8Mn0wLovGZAfdnEwsjMsTrfn5iJXWOZEUma7KZTITkujibziK?=
- =?us-ascii?Q?+u5aHJxfqeZ595tEct+6+JdDJAXzxMArjIIgWyXpf4fLp3BlAlWUpp3Mc4pQ?=
- =?us-ascii?Q?eFwZfj5JgZtM7oYwLw5o5t3mnNI+/pgwwjP82dJJXShqS4wGp46WJJWLFdG7?=
- =?us-ascii?Q?KOMsTIwfr8tQYmJFntYyK6CfNiBarPzwi3JkhHNWSDrxRAgyIQc4XJLh4Kno?=
- =?us-ascii?Q?7TXymO3ZlHhyrvPHa8bdv5ztakf9iLrzMPzLASs7p6n9qheyktL4nQT80xaO?=
- =?us-ascii?Q?aOAmfkcPgmbpImw7H4h8hl8W81cf34rhpJTzde1mW/8/hwS4kucahcbb2JLp?=
- =?us-ascii?Q?KdbrhfU5vuS5mBGrjlh/g61fZSO/vRKCFyRXjY5SJSING44cUzDUo4JMLDXU?=
- =?us-ascii?Q?bATAXg+2CJWJb4eWRztX+wmosEhWGxYrCyqvp1+YGkefXevz+/lb6NVItNM3?=
- =?us-ascii?Q?I5D/tV7cyHNrDPTlQ90DOgdej2l4VbVH9NKyje6l8WQxb8A0NkmxF5A3uXOv?=
- =?us-ascii?Q?ZJ8RidU7LbotT4vLsXB8lN2qiSN8AXJIjkRBTy2AwOBACbW7wVbcN/0uLTv6?=
- =?us-ascii?Q?GGv0yIelyzSE3U2wD6UJw1IIoToWDpMazqOA3m09ktU8w+DI05q9T/18+ehU?=
- =?us-ascii?Q?AlVAim45xDuLVh/J8x/SrxS26HCXcNEMU1X+XH0eXcaBc7bzulDkuVjIsiK+?=
- =?us-ascii?Q?/nULKy9ucHOfRXsM4Ven/F10N+UHrix+O8h+S/iV5AfxCeOSUsha32uIXq/Q?=
- =?us-ascii?Q?pRLv98+jn7S3MiJDVh4+Zfj4KvFcgxMgeoCdZb02zPO3JkQl16xlaDxIAbTF?=
- =?us-ascii?Q?P56zkMi7b7BUMzVMwTJEAvuMHmqJl5gdOCeUESN/y52JKzv0ZeJFB5z+/W1N?=
- =?us-ascii?Q?XFxTpGmFOpeJAfcz5TaT/hQ32jYESmNdqo3eeZHP1zARE9ttxeMfn6gc6eSR?=
- =?us-ascii?Q?Sez7YPmNeczuQmCHSVLGvhVBuBE2vQ9IlDm2hnjmSNAUT1q0NS4R0i9rdMJ1?=
- =?us-ascii?Q?4JPV/kbUhYKNMdcE9K3ox+3zPLaH6chsWZISDiQQ6/cXbOjkl6aE4mwZc39m?=
- =?us-ascii?Q?RHbG07WIJkhJpmc5/9ssw4LOfpVWu0oxDfaOz9KiAN65so0tBogQHyHTze+R?=
- =?us-ascii?Q?tRUhDUYSsA=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 09f38ca1-99a0-4305-c623-08deaf38422b
-X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7502.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2026 08:35:29.8051
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uprQYRpG4dCHRnW2eedQ4GAfeR9jxxXTFY0gN/fgFitrthtObeKqzO+DfAM2KFwp31PMtBlLPKrQeRkb9H8olw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8322
-X-Rspamd-Queue-Id: D9AD950A385
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 3/5] veth: implement Byte Queue Limits (BQL)
+ for latency reduction
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Schippers <simon@schippers-hamm.de>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, kernel-team@cloudflare.com,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20260505132159.241305-1-hawk@kernel.org>
+ <20260505132159.241305-4-hawk@kernel.org>
+ <ee275aa6-af27-4dac-9afa-da88abde312b@schippers-hamm.de>
+ <8f2f7f2e-6aa2-4e5b-b52d-0025b2525579@redhat.com>
+ <e3a91545-13cd-4f87-8375-d707865bdbca@schippers-hamm.de>
+ <6a597dbd-70bf-4b14-b495-2f7248fd3220@kernel.org>
+ <20260508190626.4285fac0@kernel.org>
+ <f459b95c-80d5-4e05-84b2-f574c92724de@kernel.org>
+ <20260510085602.57c7a081@kernel.org>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20260510085602.57c7a081@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 18E39509E6A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_FROM(0.00)[bounces-286530-lists,netdev=lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286506-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_COUNT_FIVE(0.00)[5];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_NONE(0.00)[];
+	FREEMAIL_CC(0.00)[schippers-hamm.de,redhat.com,vger.kernel.org,cloudflare.com,lunn.ch,davemloft.net,google.com,kernel.org,iogearbox.net,gmail.com,fomichev.me];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nxp.com:email,nxp.com:mid,nxp.com:dkim]
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-The current message-receive (MR) interrupt logic relies on the fixed
-ENETC_PSIIER_MR_MASK constant to determine which VF MR interrupt bits to
-enable or disable. This is sufficient for ENETC v1, where the number of
-supported VFs is limited and fixed. However, ENETC v4 devices may support
-a different number of VFs across implementations, making a static mask
-inadequate: it may fail to cover valid MR interrupt sources or enable
-bits for non-existent VFs.
 
-To accommodate hardware with varying VF counts, replace the fixed
-ENETC_PSIIER_MR_MASK constant with a new parameterized macro named
-PSIIER_MR_MASK(num_vf), which generates the appropriate mask based on
-the number of enabled VFs. The macro uses GENMASK_U32(num_vf, 1) to
-create a mask covering bits 1 through num_vf, where bit N corresponds
-to VF (N-1). This preserves the existing behavior for ENETC v1 (2 VFs)
-while also correctly handling devices with different VF counts such as
-0, 1, 3, or more VFs as found in ENETC v4 implementations.
 
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
----
- drivers/net/ethernet/freescale/enetc/enetc_hw.h  |  3 ++-
- drivers/net/ethernet/freescale/enetc/enetc_msg.c | 15 ++++++++-------
- 2 files changed, 10 insertions(+), 8 deletions(-)
+On 10/05/2026 17.56, Jakub Kicinski wrote:
+> On Sat, 9 May 2026 11:09:51 +0200 Jesper Dangaard Brouer wrote:
+>> On 09/05/2026 04.06, Jakub Kicinski wrote:
+>>> On Thu, 7 May 2026 21:09:09 +0200 Jesper Dangaard Brouer wrote:
+>>>> Not against being able to modify VETH_RING_SIZE, but I don't think it is
+>>>> the solution here.
+>>>
+>>> Was it evaluated, tho?
+>>>
+>>> It's obviously super easy these days have AI spew no end of complex
+>>> code. So it'd be great to have some solid, ideally production-like
+>>> data to back this all up.
+>>>
+>>> VETH_RING_SIZE seems trivial, ethtool set ringparam
+>>
+>> No, unfortunately we cannot just decrease the VETH_RING_SIZE.
+> 
+> To be clear - I said may it configurable with ethtool -G
+> not change the default.
+> 
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_hw.h b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-index 94f53762cea8..77dd7913d199 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-@@ -94,7 +94,8 @@ static inline u32 enetc_vsi_set_msize(u32 size)
- #define ENETC_SICAPR1	0x904
- 
- #define ENETC_PSIIER	0xa00
--#define ENETC_PSIIER_MR_MASK	GENMASK(2, 1)
-+#define  PSIIER_MR_MASK(num_vf)	GENMASK_U32((num_vf), 1)
-+
- #define ENETC_PSIIDR	0xa08
- #define ENETC_SITXIDR	0xa18
- #define ENETC_SIRXIDR	0xa28
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_msg.c b/drivers/net/ethernet/freescale/enetc/enetc_msg.c
-index 73e32c9b65a8..e9963ea154b0 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_msg.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_msg.c
-@@ -10,9 +10,9 @@ static void enetc_msg_set_mr_int(struct enetc_pf *pf, bool enable)
- 
- 	val = enetc_rd(hw, ENETC_PSIIER);
- 	if (enable)
--		val |= ENETC_PSIIER_MR_MASK;
-+		val |= PSIIER_MR_MASK(pf->num_vfs);
- 	else
--		val &= ~ENETC_PSIIER_MR_MASK;
-+		val &= ~PSIIER_MR_MASK(pf->num_vfs);
- 
- 	enetc_wr(hw, ENETC_PSIIER, val);
- }
-@@ -162,15 +162,16 @@ static void enetc_msg_handle_rxmsg(struct enetc_pf *pf, int vf_id,
- static void enetc_msg_task(struct work_struct *work)
- {
- 	struct enetc_pf *pf = container_of(work, struct enetc_pf, msg_task);
-+	u32 mr_mask = PSIIER_MR_MASK(pf->num_vfs);
- 	struct enetc_hw *hw = &pf->si->hw;
--	unsigned long mr_mask;
-+	u32 mr_status;
- 	int i;
- 
- 	for (;;) {
--		mr_mask = enetc_rd(hw, ENETC_PSIMSGRR) & ENETC_PSIMSGRR_MR_MASK;
--		if (!mr_mask) {
-+		mr_status = enetc_rd(hw, ENETC_PSIMSGRR) & mr_mask;
-+		if (!mr_status) {
- 			/* re-arm MR interrupts, w1c the IDR reg */
--			enetc_wr(hw, ENETC_PSIIDR, ENETC_PSIIER_MR_MASK);
-+			enetc_wr(hw, ENETC_PSIIDR, mr_mask);
- 			enetc_msg_set_mr_int(pf, true);
- 			return;
- 		}
-@@ -179,7 +180,7 @@ static void enetc_msg_task(struct work_struct *work)
- 			union enetc_pf_msg pf_msg = {};
- 			u32 psimsgrr;
- 
--			if (!(ENETC_PSIMSGRR_MR(i) & mr_mask))
-+			if (!(ENETC_PSIMSGRR_MR(i) & mr_status))
- 				continue;
- 
- 			enetc_msg_handle_rxmsg(pf, i, &pf_msg);
--- 
-2.34.1
+Sure, I understand the desire to make VETH_RING_SIZE configurable.
+If doing so we are making Linux network stack harder to tune and setup
+correctly. E.g. adding a qdisc to veth would also require changing the
+ring size, but if system also uses XDP then tuning below 64 (likely 128)
+will lead to hard-to-find packet drops.
+
+I prefer adding something (like BQL) that auto-tune how much of the ring
+queue we are using.  Good queues function as shock absorbers when
+concurrent processes in the OS have scheduling noise.
+
+I acknowledge that Simon Schippers found that the BQL implementation was
+actually not auto-tuning.  We need to work on this, my prototype
+implementation [1] [2] works surprisingly well.
+
+
+- [1] 
+https://lore.kernel.org/all/3e43117f-356d-4086-a176-abd7fe2e6f0a@kernel.org/2-09-veth-time-based-bql-coalescing.patch
+- [2] 
+https://lore.kernel.org/all/3e43117f-356d-4086-a176-abd7fe2e6f0a@kernel.org/
+
+
+>> The reason is that XDP-redirect into veth don't have any
+>> back-pressure and would simply drop packets if queue size becomes
+>> less than the NAPI budget (64). (Yes, we use both normal path and
+>> XDP-redirect in production).
+> 
+> Doesn't this mean you have a queue which is not under BQL control?
+> 
+
+It is a matter of perspective. BQL needs between 17-55 elements in the
+256 queue.  At the same time we handle if the ring runs full, e.g. due
+to a sudden burst of XDP redirected packets, which pushes packets into
+the qdisc layer.
+
+
+>> My benchmarking shows that an optimal BQL limit is dynamically
+>> adjusted between 17-55 depending on veth consumer namespace
+>> overhead/speed, when balancing throughput and latency.
+> 
+> Testing with prod-approximating traffic pattern and load would be great.
+
+That is what I'm doing.  I'm testing with prod-approximating traffic
+pattern and changing the number of iptables rules to simulate the
+overhead I measured from production.  I think I explained this in the
+cover letter. We are going to use this in a production environment (to
+be clear).
+
+Simon found an issue testing the overload scenario.
+
+--Jesper
 
 
