@@ -1,226 +1,192 @@
-Return-Path: <netdev+bounces-286697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286698-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aM8VA8zwAWpfmgEAu9opvQ
-	(envelope-from <netdev+bounces-286697-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:07:56 +0200
+	id IJsjOpTvAWpHmQEAu9opvQ
+	(envelope-from <netdev+bounces-286698-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:02:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32C57510DD5
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:07:54 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0DAE510C48
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:02:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D30603064DA5
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:56:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 52BD53056149
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:57:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2398A3FFACE;
-	Mon, 11 May 2026 14:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 114454014AC;
+	Mon, 11 May 2026 14:57:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="RD1y0lxb"
+	dkim=pass (1024-bit key) header.d=schleissheimer.onmicrosoft.com header.i=@schleissheimer.onmicrosoft.com header.b="Wxijt0zL"
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11023133.outbound.protection.outlook.com [40.107.159.133])
+Received: from BEUP281CU002.outbound.protection.outlook.com (mail-germanynorthazon11020098.outbound.protection.outlook.com [52.101.169.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A9C3FFAB2;
-	Mon, 11 May 2026 14:56:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4687E3FBEC6;
+	Mon, 11 May 2026 14:57:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.169.98
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778511403; cv=fail; b=BkhXuCD1z8crD7mvvQ8z+4m6hTObXnu2MBKSIXfuWvzQ99tRyOt9gWuYyMjzf3m+QYXJdCyfwQqpsqU4yDPz+qidFHAslMsIgyYOAJRb9jacxlfRHaP05rU3I/znU+hd0JK3dtP5Y7LtVsNha1F4A8vLrdcJgcB05mc9Tn1iJnw=
+	t=1778511431; cv=fail; b=l3JBFW/Ep53ZZwmHOfCP6jGdBdtCnZZiZaPDfCeO3N/VHep3ymD+xW9U/ThO2fJTwC4xDBK4DyjO9JIFFs0uv6dmgxStWLww8xMJ9p5uDoWhv2lPJl9kyjMy2Ghjp2wJosGx3/7tFulWsfqqH3nKM0Ezjui6M269/E8AF2dARzA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778511403; c=relaxed/simple;
-	bh=SO5l/rI81JOrleN5V2RKwL1ebP+hjOtnvZQtmB08iGo=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=a8MlCi8oylogRm/uiAk/9NEjA52wYScxsUTQ1Tvse4nzywhB0CdcLWKjIBcpErqwTc3JXyc3+QW3+S8Nqk3WgEu3QE8QS9M7Npi+GO7r+1jCPBuCUa5M9/QGK2Bv15LwsA57eTBd9CDeL+miEt7Mndq1ieBt9KYspkU2f0CfmSA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=RD1y0lxb; arc=fail smtp.client-ip=40.107.159.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
+	s=arc-20240116; t=1778511431; c=relaxed/simple;
+	bh=Zs4oaDULX71HvODIlH18YZ6V6DZ0PkVf3YwqSzJoQMI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JH2xpTGqYmK0wnFkv7iSsvRBYOnhglEgRYU1bk/W+EVTgoViMUsTwpLvsJQBOkCLeJvN+vkVana3nSFgE0MLWkIc3OlnrMTart7JW1b1UEvDukDYW2kTCh0hhobdmFfbhmDID/JBcmt6TYSGtANHJwZjrZ/WZaoWkLk9X/4ji8I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schleissheimer.de; spf=pass smtp.mailfrom=schleissheimer.de; dkim=pass (1024-bit key) header.d=schleissheimer.onmicrosoft.com header.i=@schleissheimer.onmicrosoft.com header.b=Wxijt0zL; arc=fail smtp.client-ip=52.101.169.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schleissheimer.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=schleissheimer.de
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DRbr4i/J2yqBEbX0yzqlAvDyro1CICi0pX1nzrNlhiWuQs6/+qHNNgY8Hc6A/wEB6xYlbYbxoYUQGMRW9cThbfc20kXzJSg4TkGpS+dbx2rin2fvXkP6jfVzBDtUUP66nGJfPKW2tgIUkSiYrzhlMk2jL1b5ft8tS0WJLaj2ciFg7XjQXf6f5RbcOSvHHBElLHiugzPk3RZYm0ClvAfNxtKqpKe+1Fn14IjuAOBUbvHMiJ2BlcxI9d223UUuaNUJ2yPLROxir4ph+4b6mDcaEjIjp1RYpqE1iDmEQViZ4Jlcq255c+qSY9tdF9dg2/7L6N0r4nbUTarcNhla2mnAvg==
+ b=htO7ATblF85kBmWRt5MR4bxqaxRDva3F0LrYuOuZW1STbq2ehaMu9vokS9kSdtnjwP9Sqhqub8U3r7dgcZTvhLv4VoRlffTwfjXwqTBLDSawTGbopyD5T7dnxSSu9jSyfcufVi2Ox4oRTH13i0ZCdzeW+McEEr5N95Um6A6BDhEW9H5IyNh+m1A2BzZUtSZZCBsm8drRrAGDT/Tx1iWl+8VHU1RFX8Drq0YIkysNdDJA+HfEHVWDW73dQW7GwBJBUwZBaAYuW5SICiWlyJF95grSW0uAGHHUC8SrW6vwkCF11dMGUPesBzXhhLuX9rv6YZ8sJtU4V17QfIOcdwB9Iw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tYvEhkx6h/tJG6I6aisZI/btEkaYtBUQvHdJlvuWY88=;
- b=u0YMPS7kmghD0Iic8rZwoQxrqbEZuIVaPK+SS/xbZLDS+EM2Nm7p50zJ85HeThzhR+3EyMjvpyoCwwOcP1FxgJcdDVK1enN3bzT/7nG8fZ4HZY6YzQAUqnedBbWUKOadRKSoBdGYTTANgweBHmx/6jTMZFqJTCkVpx1Ng5wSp6AubkozsvBY2fsOI58WmXClv71oRqN0QvLDRqMWg0Dk2eyfyQ7BuqXXppH6zeaDknTV6vc+2zXXK/lwfNhJncU3oOef1pqWtQLICs3N+XZx/hlaQ5K+7zUG9LPzzyrY0BSWBCY1xcPDKzfaPk0mBmcbPHjUIMP8WJj2m02UCXRRuA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
+ bh=PkducTZr0IeH0DPt4Q2sOuN97JOzaG1MRFaz4jljH3U=;
+ b=Vrb5P0XiXcOBdFfuBmAUwEn0jKea1zmKRg/In48qniLe8RKNZIslwPoMC6sPRRrlbzlzW8xqeLkcapviQGyEuYPnc1yaE75G8CK2ZirG+W3TIhS16HctIndy7k9uMqikjTZhNKCm7nBX8d9EMDOSztJ/Oc/tXWdQDMI3ltqwVJAZZBua4pgeT9mlLdehekb3tncCD1ZsUuA1e/e5TK2fSwNe42f/ore/nW8XVpMCziEkyHUaU+8Ympd6bm4Va4leXLBwwf+meRV28+msGSTUC7ZuO+B8jihMhfIcFUBxUDmBdt8lcgAe5GB9MoCbBaTzBxWdkD54vN1sFWvQijjnuQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 62.153.209.165) smtp.rcpttodomain=armlinux.org.uk
+ smtp.mailfrom=schleissheimer.de; dmarc=fail (p=none sp=none pct=100)
+ action=none header.from=schleissheimer.de; dkim=none (message not signed);
+ arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=schleissheimer.onmicrosoft.com; s=selector1-schleissheimer-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tYvEhkx6h/tJG6I6aisZI/btEkaYtBUQvHdJlvuWY88=;
- b=RD1y0lxbK0QGk4R5gYyLM/zYBQj9acsECGraJMpIPhyu/Bp7TwPf7zCUieP19vYjqRDD2J4Eu5GI6mLZ75zAIDYQlRy0MAdp549UnBDTOHirfWzXTxGsVR6qN4ZPGs9TDk9KCSB94Ov6OQ/N3j7FKP7wCzkygEqaNyggfKuHc8G2AkPEDX6U3S4gd0+a/kbElc4W56f0/Opc/Od1D/xA0zPRGuI6bWQ2NL15O5e3lm72oa7Nso9BVRSqX9J9yJiMNFZsNMvKzAC8IjBQidMXZF8Qy/emQ0QDoQXwg1HC2MoDyNE39S2Imw7egL2s7J3seTxQwLWZ2HwEc0w1hfSyeA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=virtuozzo.com;
-Received: from VI0PR08MB10828.eurprd08.prod.outlook.com
- (2603:10a6:800:204::20) by AM7PR08MB5333.eurprd08.prod.outlook.com
- (2603:10a6:20b:104::23) with Microsoft SMTP Server (version=TLS1_2,
+ bh=PkducTZr0IeH0DPt4Q2sOuN97JOzaG1MRFaz4jljH3U=;
+ b=Wxijt0zLxepCAyB0HOPftDl3a5JGM1s11BV83gaYzYESWFrF+8av3fUeZ4zG3AUcOEHaM70+GnnJfwOv7KNM7gpCmoMNHLQIgtt0xj5xc4aR15WFttAm8U/S9vErcGiVTdgo10AqGPRnhj/hkhF/FiGHdSErPyztt4NCsmXcp7I=
+Received: from CWLP265CA0270.GBRP265.PROD.OUTLOOK.COM (2603:10a6:401:5c::18)
+ by FR5P281MB4764.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:151::5) with
+ Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.23; Mon, 11 May
- 2026 14:56:33 +0000
-Received: from VI0PR08MB10828.eurprd08.prod.outlook.com
- ([fe80::2a8a:fe48:6ba2:f774]) by VI0PR08MB10828.eurprd08.prod.outlook.com
- ([fe80::2a8a:fe48:6ba2:f774%4]) with mapi id 15.20.9891.021; Mon, 11 May 2026
- 14:56:33 +0000
-From: Polina Vishneva <polina.vishneva@virtuozzo.com>
-To: linux-kernel@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Polina Vishneva <polina.vishneva@virtuozzo.com>,
-	"Denis V . Lunev" <den@openvz.org>
-Subject: [PATCH] vhost/vsock: Refuse the connection immediately when guest isn't ready
-Date: Mon, 11 May 2026 16:56:10 +0200
-Message-ID: <20260511145610.413210-1-polina.vishneva@virtuozzo.com>
-X-Mailer: git-send-email 2.53.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: ZR2P278CA0074.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:52::8) To VI0PR08MB10828.eurprd08.prod.outlook.com
- (2603:10a6:800:204::20)
+ 2026 14:57:04 +0000
+Received: from AM1PEPF000252DD.eurprd07.prod.outlook.com
+ (2603:10a6:401:5c:cafe::a2) by CWLP265CA0270.outlook.office365.com
+ (2603:10a6:401:5c::18) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9891.23 via Frontend Transport; Mon,
+ 11 May 2026 14:57:04 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 62.153.209.165)
+ smtp.mailfrom=schleissheimer.de; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=none header.from=schleissheimer.de;
+Received-SPF: Fail (protection.outlook.com: domain of schleissheimer.de does
+ not designate 62.153.209.165 as permitted sender)
+ receiver=protection.outlook.com; client-ip=62.153.209.165;
+ helo=mailer.schleissheimer.de;
+Received: from mailer.schleissheimer.de (62.153.209.165) by
+ AM1PEPF000252DD.mail.protection.outlook.com (10.167.16.55) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.25.13
+ via Frontend Transport; Mon, 11 May 2026 14:57:04 +0000
+Received: from A1460-Ubuntu24.schleissheimer.de (A1460-Ubuntu24.schleissheimer.de [192.168.50.44])
+	by mailer.schleissheimer.de (Postfix) with ESMTP id D0606A005A;
+	Mon, 11 May 2026 16:57:03 +0200 (CEST)
+From: Sven Schuchmann <schuchmann@schleissheimer.de>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Dan Murphy <dmurphy@ti.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: maxime.chevallier@bootlin.com,
+	Sven Schuchmann <schuchmann@schleissheimer.de>
+Subject: [PATCH net v3] net: phy: DP83TC811: add reading of abilities
+Date: Mon, 11 May 2026 16:56:30 +0200
+Message-ID: <20260511145630.31618-1-schuchmann@schleissheimer.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VI0PR08MB10828:EE_|AM7PR08MB5333:EE_
-X-MS-Office365-Filtering-Correlation-Id: 02abc91b-8f6d-42c3-0e69-08deaf6d7dfe
+X-MS-TrafficTypeDiagnostic: AM1PEPF000252DD:EE_|FR5P281MB4764:EE_
+Content-Type: text/plain
+X-MS-Office365-Filtering-Correlation-Id: 86a5a3f6-ecb2-4df3-db2f-08deaf6d907c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|56012099003|18002099003;
+	BCL:0;ARA:13230040|7416014|376014|82310400026|36860700016|1800799024|18002099003|921020|56012099003;
 X-Microsoft-Antispam-Message-Info:
-	RHf0K/4FEhkLgtLxnCODeydNGNSfEwju45hxp+xDqwEUDxcoxDAZcvvckS/bwyLiHsSx/MlX/TxksPpnroy0r15/2uohNgjYdlhOtgzfJdh2xIwJSIh9MO09rODVZv+rtGZHcibbn4lXEjLvD0zrzGT30u6bp/B5TzoTPFRMqvS1uKFDYZ7b4yl92nqKX/V4HuVBV8MvsLDrwFKkKTeuC+tWRYp74nlAoefrVj0eqX/eIe5CTQ1S4E8C2LB7kYLFwxLaIRc3xzUb9QdT9gMXgi0Pr5251pIMXf0GYBS12ioNW173+dwvvsBvSL6RRk9dmDT+0+5x/6kIgFlOtDYD/fdcOxGW4ssow4LC2wHDkIXY8P9amPo+to2HrxhbxNXZPmfVoruPF24Ib52SRUIiHRvKgTlBYn+WTTTTdntz7coz2KxCdgtIQ3+PBKgiO8QbVq4Ju4C4fuybdXnr4ZT+WCmKNWC78Rc31+QQMdioLjLUUxcQOMIwj30HeEAmzv9SEqjIwWjvEzQKZQ0XMbnTgYDNtkQ4DOIKqxQ5MITtHuJmjwqpL7+gARBeG0V+MptjvseV1YsgCWzGQIf4TWf7ebR97kpwoEO0/WiWuLi029OXH0JMBnoUcZgWs3rWe56D3OW8kPb6Te7tY8UHsYgogghktbMVoiDljLqxYULEPX7siCQZQLYpOIS6Mccbh8Gd
+	0uhxj2uo9B/s7XcQXwuncvLlk/Bal+UYG7zaN4Iop/Q3YJLQFCSIx8gHheZl7X4102WpBBnPlupl7YaL17yEaSfQtPe1O+MsZArZ8KVnhrw3NXzCzDmIaUJwzHo5OmNGO0TBnvOgHqSRP8bKDbzIr/nTNA7IUAgJJq0vVpz+Gg9mh70CqnxATUnUx0ge/UmdovWSziWeYqBnFB6/D6OOsAKlpeIuzEJz3R7DZH0JrT0fCJWUbZCBE92aVMc/xhm+ha6cdO713S9zbG85RQywIwfNozG6NVcF5OB2SntPJuL1pJp3E6ecMURey/Eio2Yw0Ryd7yMjl/vX2vLbIFqz0hh567g6BHdM5LvqUZlLWZrc8KqkD9EO8MjuqJyHjNrloB0DA/7S4YYwOZ7FpIw+NvArQe6CY4o8xTgJQqdB7Ulyvp+CBZONPY4B9uX4EJouO7/lGnv69jCavUIKkBxP4zHvlfsaRqkUooSID0O0EUM5qwo65946lNiDrlttEQ86GIM/APqnDizfb8FIcBvPWmZkHTwMGLKc/ZIBhM7jZcwD3G4C/8Od2JZod1QmpzX2SiUAoK41KU0lTsYlpSPFDjDWd5WVhphy6btxz9r6sC1ALJ/xgH3RCisDqSvO5ilWHKtjFShpxE4n3IzLL6PpaXq3+KJ5LrH9ZwPd18RwYqj6crUoO9X1d2A2WCBAsYBTOvpxz35wTGDiNre24xgYN4TAdxxwn13sCAl1MHV42rJ8kfyvgWkEEvzv9w6SEcYzam9QMddabI8HstuD6x3CXQ==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI0PR08MB10828.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(56012099003)(18002099003);DIR:OUT;SFP:1102;
+	CIP:62.153.209.165;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mailer.schleissheimer.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(36860700016)(1800799024)(18002099003)(921020)(56012099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?OHzSHA7CMxute09PlwRZsm/7wXoYRcvYpvpV08cLSI6n1MVNuWWc03BuyEIs?=
- =?us-ascii?Q?IC7pgz80D/4FGGuPuYtKEfc6Q++PFyen/t45YNMWqqW202IGA/l3ywXKZ8ut?=
- =?us-ascii?Q?i6ome1t5cT1px24E0QZWeLDoWPpam4g5wToBwR1YpirDN2KnB7SLJNYKNBJm?=
- =?us-ascii?Q?63aoMfS7Tfp/6nN/yvh2ItQFLK+uGf84Y2eZabwLDc637MnXQwXGvM/VgcZw?=
- =?us-ascii?Q?e0nTalMozjxgz7S0lJRapuQXog4ODrXnt5esdfFKstFQ4mtSC66JhgKg/VQd?=
- =?us-ascii?Q?PcpXNOzPR45YA8/T99KDpl7HJKBkJYTztOYHE+QAsu4OOFWYcdpsfSlQag3a?=
- =?us-ascii?Q?Eq5NKyZmiK5kkt4Xz9MSToqguojLbxVKBtM963vqV4GGFzbNSfoljJrPahAw?=
- =?us-ascii?Q?3srezD73BYHmDsJvVgcE0BobJd1+VChnAnZsAzC9BPO3gVU6MwyoZ+UODFqs?=
- =?us-ascii?Q?eS7D1+OeKKetzIjjlTskNzV8rWw+Gu0TCPOpp3qBAfvznyNb1O1kD88O7l46?=
- =?us-ascii?Q?UNP0BIn9o3Au8dinP1cdYM40EI8+JYwkIdmh4JfB8F/UsgAnnZPAekmfjbYm?=
- =?us-ascii?Q?CvBeJXtPFcs0Sbd7ut7y3X6dIlx7nJyzIgmnkG+w5Yr7GgUKpsb1cHEAmpe3?=
- =?us-ascii?Q?djExZIGh+awmqlg8kUutSz14SZrUC0PZf4ZYhWePpjqRtojmtagElX0BaX4b?=
- =?us-ascii?Q?yCUP0S3kuVTG/6bCTcqD9CunN7ju+ZQjvJC2UyabrICsaGRNyGBVxKXHT+kn?=
- =?us-ascii?Q?C2rcGaJjKnAuv9BFML971sA18uzZp4dLXk3vi8PKGkVyAaXqTUpQkqDwKubP?=
- =?us-ascii?Q?OekJ3AwQwAiyGdK/oVkUXGfvfCUivMQIjFofkTAa9nWttJOabczYCPQQ77dJ?=
- =?us-ascii?Q?25easHTROioxOXZsY/XGtd6QVyVOuHRF1ejqHSVC0pH3W9z+s0l4XA5nLdR9?=
- =?us-ascii?Q?9h+ZiVjtZAEyK9MdaKm66KZUqJMUD/M+USrDkNmdro+3K15UpZid/fJlnAF4?=
- =?us-ascii?Q?YBwI1BsLcocBg0ECpG3aLI8i+MaVglSU0S9z4PT2eWjP4pFnUXvmzaPK9PKQ?=
- =?us-ascii?Q?7RjHjKR/xmXX713dF2UyerNxbWpZ4GabvpOdF03eSlHBEY4fKXxg0qbUOCIG?=
- =?us-ascii?Q?hQYMfEPFGAce46DEIhNRsSqurDcjM9TNd2Jyk8yK0/TwfaT23qJw/APupvzm?=
- =?us-ascii?Q?K5mgzOieqGJFM2R0lUsgCuO86iCtsNCLJGGV6qyBiNKkkhMH8sg2EH8dRfVk?=
- =?us-ascii?Q?1TKnyFmQDJwmVt2uZ7ruBoo2oZ86BAlkmrGLB6/m3HqEEtfLucH3nMP6cLui?=
- =?us-ascii?Q?JP907bBgd1bdmSWhIaD9t0GENQI1pEujvVlbKKJEcVlGwyFhqvnW4qWOjM8A?=
- =?us-ascii?Q?7wm43LSmiDt2oPwICj8n9FB3gjLBBt5xodNO/qDQiAr/sgXROjfWfhOts61a?=
- =?us-ascii?Q?7MrQnJ7aoe0EDGIuix3s136iIV6tZK37lW7qqt77Oi3717Rtfa+yzUIwYlDB?=
- =?us-ascii?Q?flEEiPxYi40z+eroZmtCgAvXaq/lP7FgcREbkAqb8NsECxF+QZcvCDCBFSNs?=
- =?us-ascii?Q?2zSzt1QyLyWYGPcXmIolNJPdNkJdduQh77kWy248mZ4g7HTPN0Up/FY3SUNv?=
- =?us-ascii?Q?BO3NDVvF3smo4GAGMzsGG2fIFT64GV5/HInQeINKLA9Zx7q6Jq+evj0Z81XP?=
- =?us-ascii?Q?aZMy+Y+GtmQgCf+kDhqwqPCsVyJmdYfyH3pJsHU1EKVZZDALYCLVQacGMslx?=
- =?us-ascii?Q?GxY0/HW3zDu+weqKDvyeA3hf+z/L9co=3D?=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 02abc91b-8f6d-42c3-0e69-08deaf6d7dfe
-X-MS-Exchange-CrossTenant-AuthSource: VI0PR08MB10828.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2026 14:56:33.5406
+	43ll6x9Gi2rRGGGFs0oKa01E9BSzQv0k22/tWDPlwtUGAxCEC8PsgCRt4Y0L4dIe4qPJTYNzQ5skCKOAZh7A92LkCg4Y7AkcRC/yTfMoqtsS6CbnzQP+DBJ8hDmXz1dLWNwa+PJDnFkEJK+xtiIEqBe0tBMe06Mih8J5LYy6nm9bMlSFKfCyT5d+X8vu52v6p7MGddgxtZbx+UG+dHoS565D22VBv2YAQj89ACpjxGo1h7pnPzwRa6q8XN48hnamEwsWD0HAsAAKPkBoGuz168vGYCS++UUzYYcQPZk2YHCiaMXwFhV29dx+RP1tkLNy0v6vRIC1Og1bn6qMkzkxOUqEseU8j+qVLfWx9RjOeHljhU5TAcIImP83y4CdbXugpLzoQFIAq3X27IW+KkobonU+0b3wZZLRXDuLyJN9arwGHJLG4r/UTFhpwfLcr0Bj
+X-OriginatorOrg: schleissheimer.de
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2026 14:57:04.2914
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: d5Xp1Rqev8vv489NYoBzg0P0pt1oy5bUB1NOA4Z/JzYHbdLAVwYbStLzlZ9NSOaL29BtMiUy+K5Mc+9dSfOkF4JvkyQnr/ErJWJA/dFsqLE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5333
-X-Rspamd-Queue-Id: 32C57510DD5
+X-MS-Exchange-CrossTenant-Network-Message-Id: 86a5a3f6-ecb2-4df3-db2f-08deaf6d907c
+X-MS-Exchange-CrossTenant-Id: ba05321a-a007-44df-8805-c7e62d5887b5
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=ba05321a-a007-44df-8805-c7e62d5887b5;Ip=[62.153.209.165];Helo=[mailer.schleissheimer.de]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AM1PEPF000252DD.eurprd07.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: FR5P281MB4764
+X-Rspamd-Queue-Id: F0DAE510C48
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [3.44 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[virtuozzo.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=selector2];
+	R_DKIM_ALLOW(-0.20)[schleissheimer.onmicrosoft.com:s=selector1-schleissheimer-onmicrosoft-com];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[schleissheimer.de : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-286697-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-286698-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[virtuozzo.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[polina.vishneva@virtuozzo.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,ti.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[schleissheimer.onmicrosoft.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[schuchmann@schleissheimer.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:email,schleissheimer.onmicrosoft.com:dkim,schleissheimer.de:email,schleissheimer.de:mid];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,virtuozzo.com:email,virtuozzo.com:mid,virtuozzo.com:dkim]
+	NEURAL_HAM(-0.00)[-0.988];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-From: "Denis V. Lunev" <den@openvz.org>
+At this time the driver is not listing any speeds
+it supports. This should be ETHTOOL_LINK_MODE_100baseT1_Full_BIT
+for DP83TC811. Add the missing call for phylib to read the abilities.
 
-When the host initiates an AF_VSOCK connect() to a guest that has not
-yet loaded the virtio-vsock transport (i.e. still booting), the caller
-blocks for VSOCK_DEFAULT_CONNECT_TIMEOUT (2 seconds), because
-vhost_transport_do_send_pkt() silently exits when
-vhost_vq_get_backend(vq) returns NULL.
+v3:
+ - Fixed indentitation problems. no code changes.
+v2:
+ - Fixed subject and added fixes tag. no code changes.
 
-If the guest doesn't start listening within this timeout, connect()
-returns ETIMEDOUT.
-
-This delay is usually pointless and it doesn't well align with our
-behavior at other initialization stages: for example, if a connection is
-attempted when the guest driver is already loaded, but when nothing is
-listening yet, it returns ECONNRESET immediately without any wait.
-
-Fix this by checking the RX virtqueue backend in
-vhost_transport_send_pkt() before queuing. If the backend is NULL,
-return -ECONNREFUSED immediately.
-
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-Co-developed-by: Polina Vishneva <polina.vishneva@virtuozzo.com>
-Signed-off-by: Polina Vishneva <polina.vishneva@virtuozzo.com>
+Fixes: b753a9faaf9a ("net: phy: DP83TC811: Introduce support for the DP83TC811 phy")
+Suggested-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Sven Schuchmann <schuchmann@schleissheimer.de>
 ---
- drivers/vhost/vsock.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ drivers/net/phy/dp83tc811.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index 1d8ec6bed53e..a3f218292c3a 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -302,6 +302,16 @@ vhost_transport_send_pkt(struct sk_buff *skb, struct net *net)
- 		return -ENODEV;
- 	}
- 
-+	/* Fast-fail if the guest hasn't enabled the RX vq yet. Reading
-+	 * private_data without vq->mutex is deliberate: even if the backend becomes
-+	 * NULL right after that check, do_send_pkt() checks it under the mutex.
-+	 */
-+	if (!data_race(READ_ONCE(vsock->vqs[VSOCK_VQ_RX].private_data))) {
-+		rcu_read_unlock();
-+		kfree_skb(skb);
-+		return -ECONNREFUSED;
-+	}
-+
- 	if (virtio_vsock_skb_reply(skb))
- 		atomic_inc(&vsock->queued_replies);
- 
-
-base-commit: 8ab992f815d6736b5c7a6f5fd7bfe7bc106bb3dc
+diff --git a/drivers/net/phy/dp83tc811.c b/drivers/net/phy/dp83tc811.c
+index e480c2a07450..252fb12b3e68 100644
+--- a/drivers/net/phy/dp83tc811.c
++++ b/drivers/net/phy/dp83tc811.c
+@@ -393,6 +393,7 @@ static struct phy_driver dp83811_driver[] = {
+ 		.config_init = dp83811_config_init,
+ 		.config_aneg = dp83811_config_aneg,
+ 		.soft_reset = dp83811_phy_reset,
++		.get_features = genphy_c45_pma_read_ext_abilities,
+ 		.get_wol = dp83811_get_wol,
+ 		.set_wol = dp83811_set_wol,
+ 		.config_intr = dp83811_config_intr,
 -- 
-2.53.0
+2.43.0
 
 
