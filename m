@@ -1,269 +1,475 @@
-Return-Path: <netdev+bounces-286557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286558-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MFciEAChAWpKgwEAu9opvQ
-	(envelope-from <netdev+bounces-286557-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 11:27:28 +0200
+	id +CfSJimkAWpKhAEAu9opvQ
+	(envelope-from <netdev+bounces-286558-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 11:40:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B59E750ADAA
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 11:27:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C66A50B1C3
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 11:40:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7E6C630556EA
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:11:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5304D3007AFA
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:13:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452843B8958;
-	Mon, 11 May 2026 09:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70EA43B3BF0;
+	Mon, 11 May 2026 09:13:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HWkYLsRP";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gUyu9PCk"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="YGWPYOSG";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Q/il3wTy"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from flow-a8-smtp.messagingengine.com (flow-a8-smtp.messagingengine.com [103.168.172.143])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A6B363082
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 09:10:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA293AA1A1;
+	Mon, 11 May 2026 09:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.143
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778490661; cv=none; b=IfCtEV/hh6njC3rvsY82WcmHLj2PpX2doer2NV7QNJKkP8GiW/HW4qFKIZHn461PQoL8PdWrGs/iyq2Z40B7mn2SuujJ3l991RhLcTvbZHkDd1Jr+n3q1edObrPFQEkD7neaPc44XwczSrbgVAmGf9BEweXv3aPZ3vO9ZdSoNac=
+	t=1778490827; cv=none; b=LPFJKUCvEFB6TZAYzcucmgQuFZXjPL7k3wVFufHtw2YJD7fqEyx94NhW4crxSxLawSQJLPQCtdrXDJxfKL52jr/XuZ36ghIVVSt5Z37RJpHnR3Kz7RDSwKmWMNmtknzlElbmIQGAiChGdzAw6A4RQZwXoSZewqZF4X7d9pReS/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778490661; c=relaxed/simple;
-	bh=NOVPw0sRFmhs/549yezkhu2bnfPqQ2AHmr7i3bUMSWg=;
+	s=arc-20240116; t=1778490827; c=relaxed/simple;
+	bh=qf/SbQn1jGFBBGGSETlOsx5iiJ1jHVImvSbUVVSTUB0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TTEDUXWAeucjZoRVZkItyfgpk7Os3lBsj2Nv86yGO6OAxNVQ/9m2EqwzHnajSi0Gpse5ktmdht/0uHSIZzIVtTOCvfGhbkxQCACbrphzizm9IMhqPeQFc0nXJByVh6p500S7eDY9CeGeifJ1SCGHGuK7b/4CTwoSPbQMigj5dJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HWkYLsRP; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gUyu9PCk; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778490658;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GeXjhbPFcIE2xpoWydu6GqD8aKPwmV5ublK6KJ28nAc=;
-	b=HWkYLsRPaoHz7KxJeITJVNyRa6E5WsVlc16ZlutllRZbbuFHen+MVD8JttVhcgSGaRIsiD
-	oRldV0qbPj6xpMgD2PqQX1yaQ36fidiEJWTB28Th7UTondJ9eIpN+dJDJTK1UM2+lBlNO2
-	0Ses0Vlabd6F+Vr88KrhAH0YGSTXECM=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-304-qsIXXvM9N3u2WFhTAeBnVA-1; Mon, 11 May 2026 05:10:56 -0400
-X-MC-Unique: qsIXXvM9N3u2WFhTAeBnVA-1
-X-Mimecast-MFC-AGG-ID: qsIXXvM9N3u2WFhTAeBnVA_1778490656
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-488d8deb75fso30098745e9.3
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 02:10:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1778490656; x=1779095456; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GeXjhbPFcIE2xpoWydu6GqD8aKPwmV5ublK6KJ28nAc=;
-        b=gUyu9PCkWd2lgQx96I+kGh1XC3gqZO9nAu+qbvim7zG6zlyQZW0FDmUBk9NdAH3f+a
-         MOPpQ5c3gF/MHJSLeZmR4AispSwWGP90lRx70L0T11x1sttkhRCMwEJXkEsyPBad7si1
-         hCUo2MAHhcYjeFohSkq5KRXd/xuM2nujga7ee6jZs8y+9ozs+AN7o08KxBKWI8IS6k8Z
-         YOTt+sMCGgBCNPUqmgvl2VrvikQfPiQEWLwf8+g3Rk7h58J1gaXmbGB7+DRpq8U3kcoh
-         xv4mm2PZ13z7fIsZHMrmLsVqIMjs+w6fO6NDGn2jtKzmABKC0Q2DD/Jp52MxrMlJifh8
-         om9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778490656; x=1779095456;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GeXjhbPFcIE2xpoWydu6GqD8aKPwmV5ublK6KJ28nAc=;
-        b=NYy4zs1xpOdQLjn1OcHFddv795Y7TclQxa6jRQYB1nA2MxELU2JBCBq9uaXKbb42P0
-         AyLufF/BgA4rLsRcmzQAhwhUaj5Zs3nZ4UD8EMRCUdBdT5jtpFvBgHt4R0sGvAZxNA//
-         teHZawjASROT1w9No5GaFimG1zFoxmZk89UXBYtVhPR7/gtPPkQOu/mskDll6P8BJuCF
-         eHgkG+Fmen8wIHUhv+L31EdNsnxruTTP0APS+AzGfzpnyzG9jpehxKlzBSVP1335b2FC
-         pRWwG69KkkUEjJIzBMHrvUYEiu/TdnEswEa8Q2+h5DEPzgf+Qp7Dt0gWJmFgEDbOEjhZ
-         nHdA==
-X-Forwarded-Encrypted: i=1; AFNElJ/hhyQ4NaU9wx/ANB6FGLvBP6/6qGQH63tGmBSQIxSVW+zUtgFc7p6sJpoc5SAUJH3I6TVehq4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZTpZ5vctciDJdMfPrD7BWVZxNg/gCC+zzs6TDir9kUMg64GxZ
-	w05RQI6UbX61E2SZo/6i8T3kF+qggl+5TlbfUp0IGAgAm5RE5uZMHNDmQB5oQgZEvxjkiMKKesY
-	HW2OpYFm9ig8Sx4tvo6WhNkTB+fm8awgJIbKJ1nbtTYavMIrISxtGpC4hqw==
-X-Gm-Gg: Acq92OHPxQqfEWvI9GQG4fsxt2mk2hAHgHYMSNmduorzUAOCL1J6V1NssmgsOinXmEc
-	qPueyw2yOjCws9aAD+btPPc1UcxV10TZLPy5POVbQvH++NhrddhlGn95RmtYNxK9r0Znpvx6ufa
-	Jy2gOVuI027ArWUO89JsiyRLTzuBJ0Mkiyp8xbDrpHdQDrSZQKHw/gd/IklnTZdm0MVO/lGRu+9
-	MuuxD6rdckAlmF7zAvHMNZvgdUKtIzkxtVFseILGXKk9pgJ3lLGfnQWhUwGcgZVgbEf0aRk7URX
-	5xQwM4WtpIAQiGL2kCoMzzrzKGuHUaPYZLyNmU2NNVuRwCxGBOdozG883pSUxaoV/6KW6cOiZDo
-	ZoRc4VDet0S9olR4/06AnBLrLIGhe0kMhdDqU8gfz
-X-Received: by 2002:a05:600c:628d:b0:48e:82b4:b54 with SMTP id 5b1f17b1804b1-48e82b40ba4mr52289595e9.23.1778490655512;
-        Mon, 11 May 2026 02:10:55 -0700 (PDT)
-X-Received: by 2002:a05:600c:628d:b0:48e:82b4:b54 with SMTP id 5b1f17b1804b1-48e82b40ba4mr52288725e9.23.1778490654837;
-        Mon, 11 May 2026 02:10:54 -0700 (PDT)
-Received: from redhat.com (IGLD-80-230-48-7.inter.net.il. [80.230.48.7])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e6db09cb6sm58109535e9.22.2026.05.11.02.10.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 02:10:54 -0700 (PDT)
-Date: Mon, 11 May 2026 05:10:50 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
-	leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
-	tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next v12 0/4] tun/tap & vhost-net: apply qdisc
- backpressure on full ptr_ring to reduce TX drops
-Message-ID: <20260511051037-mutt-send-email-mst@kernel.org>
-References: <20260510151529.43895-1-simon.schippers@tu-dortmund.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=UGLVnFf3KiQkaQhlE0zu0kU6TQZR07FdmSSKtq8mJaTUfXz04nchjHLbtlEs3QSS6bWmlqAMgu0i9cZMBOqrEUrBQSs/vmiRRUdFADSwRU063ePgGD4IYnE6E0rvKqHxLcBu6QDE7BHP9VIjoAyDq4g+fycTOh4VdWsSfe4Hq/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=YGWPYOSG; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Q/il3wTy; arc=none smtp.client-ip=103.168.172.143
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailflow.phl.internal (Postfix) with ESMTP id DD31813801C3;
+	Mon, 11 May 2026 05:13:41 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-04.internal (MEProxy); Mon, 11 May 2026 05:13:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1778490821; x=
+	1778498021; bh=oG1CScb7r9i2f+vs6+tHiK4YQ7SVJ+GUiKslUmUQvBw=; b=Y
+	GWPYOSGLBR0jTihk3TMfP6Sm2Nm1e8xVTJOUf09OvI8Y5f5u+pDstgK5mXrUjIhv
+	v/1RhkAnf/9O5sPaonypIUiMgJYZu2CNVu/yyAyE0xQdB3kNZRxuf+sTpJ7cqW60
+	t29fJkbTlUBzK52Bc+S92HEichTYhAksJD5NXjBCPtD5GTln9IFMVgvycgQnam9X
+	yeGZWFhvSGAj3Qq4h+4UMQHZizOoX+cAgsSXMr54hRffXDbS8MAIFgfgJid2ugfW
+	LblU8lPZBnMC7hMr5+CLjaKSs9PQO2EzwsPmbPc7myKNiZsoRaXJK2ugwGfjj6cB
+	G/zmwTShkVKiIdBLx4fyw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1778490821; x=1778498021; bh=oG1CScb7r9i2f+vs6+tHiK4YQ7SVJ+GUiKs
+	lUmUQvBw=; b=Q/il3wTyZZuc86xDqbBYJuIlFR92dwM7unbc59UANniNRwbMGt+
+	jyuanN/I7L6fSWbmdzaPYevCOyPH3lv0V+tKAuxgzQ90ikgipOXqP6WQKacFY80C
+	43FP4dQsHjcTIdUmRd4A4RvlGBRmQqwfGyFbzG1fIpq8oYVgonKMEl7RoDqxBZQq
+	hrrc8fBz3bjeUWX2SHIMqFOBLkObTNBkigbnCP9ne+eKKE4CfBLl6sDqCmXgm+/1
+	JEqsIYgwjaVD1qHlOTfWuAXXWxSenwxp8bZmblLxZrbvh6XQ47q/1RwVgDaIzBZX
+	xv9gfrhxn5VIcCip6+dDMekk5Q2dReBGP0g==
+X-ME-Sender: <xms:xJ0BagiZ-zAQ-3goGft4Gk4WFXYb-km9TaORQhkmRh-ErRk9UJsmmw>
+    <xme:xJ0Baqpfxv_OVcPMPK4WLnZSP8bcKj9wQhuHYNz6cffrbw72Fgnn6pmDhFjFMM2KP
+    OhIJUzPlF8EA4BNG2EQGdnhNo_j4lJDHatRr63L7owjEcWUzKiNhYj_>
+X-ME-Received: <xmr:xJ0BasJc4yTSxSiTsPaSZ19zEQbRGHwyE5bWjHJaQzuUwLuTqhq-QH-G8sZZBvxfVqowqc_0sJTe7PGgWyGjNsE>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduudekheeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedvvddpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnthhonhihrdgrnhhtohhnhiesshgvtg
+    hunhgvthdrtghomhdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgv
+    tghunhgvthdrtghomhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprg
+    hnrgdrohhrghdrrghupdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgv
+    thdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoh
+    epkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughh
+    rghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpth
+    htohepughsrghhvghrnheskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:xJ0BantxDn8HL-wKBcK7i8TiJPbjYn1ipV1xLJdW0XVEQh68BWo-Xw>
+    <xmx:xJ0BastveSgh53GwbB3MVostjOGt0UL7AL4velhiHsrE5uPHWRghJQ>
+    <xmx:xJ0BauXumXHy5dUw2OdT7_b18fjaVbk1Eb5bZGM4nAkfFZCoTPc3Jw>
+    <xmx:xJ0BalWGdNS61BK3nnQ3Adf6ftQ7rwD2_hp5lDIRZAz45kwYpMQjJg>
+    <xmx:xZ0BaomnMoVObO4lyaHS0RWsUvtAQgLDpIxObW6yA8bi6rvisxhEun5O>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 11 May 2026 05:13:39 -0400 (EDT)
+Date: Mon, 11 May 2026 11:13:37 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antony Antony <antony.antony@secunet.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Masahide NAKAMURA <nakam@linux-ipv6.org>,
+	Paul Moore <paul@paul-moore.com>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, selinux@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Chiachang Wang <chiachangwang@google.com>,
+	Yan Yan <evitayan@google.com>, devel@linux-ipsec.org
+Subject: Re: [PATCH ipsec-next v8 12/14] xfrm: add XFRM_MSG_MIGRATE_STATE for
+ single SA migration
+Message-ID: <agGdwbo2GFhPP78z@krikkit>
+References: <migrate-state-v8-0-4578fb016965@secunet.com>
+ <migrate-state-v8-12-4578fb016965@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260510151529.43895-1-simon.schippers@tu-dortmund.de>
-X-Rspamd-Queue-Id: B59E750ADAA
+In-Reply-To: <migrate-state-v8-12-4578fb016965@secunet.com>
+X-Rspamd-Queue-Id: 3C66A50B1C3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286557-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-286558-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_CC(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,google.com,kernel.org,redhat.com,linux-ipv6.org,paul-moore.com,gmail.com,lwn.net,linuxfoundation.org,vger.kernel.org,linux-ipsec.org];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,tu-dortmund.de:url,stackexchange.com:url]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,queasysnail.net:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,secunet.com:email]
 X-Rspamd-Action: no action
 
-On Sun, May 10, 2026 at 05:15:25PM +0200, Simon Schippers wrote:
-> This patch series deals with tun/tap & vhost-net which drop incoming
-> SKBs whenever their internal ptr_ring buffer is full. Instead, with this 
-> patch series, the associated netdev queue is stopped - but only when a
-> qdisc is attached. If no qdisc is present the existing behavior is
-> preserved. The XDP transmit path is not affected. This patch series
-> touches tun/tap and vhost-net, as they share common logic and must be
-> updated together. Modifying only one of them would break the other.
+2026-05-05, 06:34:29 +0200, Antony Antony wrote:
+> Add a new netlink method to migrate a single xfrm_state.
+> Unlike the existing migration mechanism (SA + policy), this
+> supports migrating only the SA and allows changing the reqid.
 > 
-> By applying proper backpressure, this change allows the connected qdisc to 
-> operate correctly, as reported in [1], and significantly improves
-> performance in real-world scenarios, as demonstrated in our paper [2]. For 
-> example, we observed a 36% TCP throughput improvement for an OpenVPN 
-> connection between Germany and the USA.
+> The SA is looked up via xfrm_usersa_id, which uniquely
+> identifies it, so old_saddr is not needed. old_daddr is carried in
+> xfrm_usersa_id.daddr.
 > 
-> Synthetic pktgen benchmarks indicate a slight regression, and packet
-> loss is reduced to near zero. Pktgen benchmarks are provided per commit,
-> with the final commit showing the overall performance.
+> The reqid is invariant in the old migration.
+> 
+> Signed-off-by: Antony Antony <antony.antony@secunet.com>
+> 
 
-at v12, time to merge this.
+[...]
+>  include/net/xfrm.h          |  16 ++-
+>  include/uapi/linux/xfrm.h   |  21 ++++
+>  net/xfrm/xfrm_device.c      |   2 +-
+>  net/xfrm/xfrm_policy.c      |  19 +++
+>  net/xfrm/xfrm_state.c       |  29 +++--
+>  net/xfrm/xfrm_user.c        | 281 +++++++++++++++++++++++++++++++++++++++++++-
+>  security/selinux/nlmsgtab.c |   3 +-
+>  7 files changed, 357 insertions(+), 14 deletions(-)
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+If the omission of xfrm_compat.c is intentional, maybe worth
+making a note of that?
 
-> Thanks!
-> 
-> [1] Link: https://unix.stackexchange.com/questions/762935/traffic-shaping-ineffective-on-tun-device
-> [2] Link: https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Research/Publications/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersion.pdf
-> 
-> ---
-> Changelog:
-> v12:
-> Patch 1: 
-> - Revert tun_queue_purge() to plain ptr_ring_consume() and instead
->   explicitly wake the queue in __tun_detach() for the ntfile taking
->   over the queue slot (if its ring is empty).
-> - Inlined tun_reset_cons_cnt(), because only tun_attach() uses it.
-> 
-> - Patches 2-4 and cover letter unchanged.
-> - Compiled and short pktgen test.
-> 
-> v11:
-> - Renamed __ptr_ring_produce_peek() to __ptr_ring_check_produce()
->   (Sashiko)
-> - Add return code -EINVAL to __ptr_ring_check_produce() which lets
->   tun_net_xmit() stop the queue only on -ENOSPC. (MST)
-> - Resolve race on tfile->queue_index by locking tx_ring.consumer_lock
->   in __tun_detach(). (Sashiko)
-> - Wake the queue in tun_queue_resize() to avoid possible stalls.
-> - Other minor adjustments & reran the benchmarks.
-> 
-> v10: https://lore.kernel.org/netdev/20260506141033.180450-1-simon.schippers@tu-dortmund.de/
-> - Changed the term "Transmitted" to "Received" in the benchmarks,
->   as correctly pointed out by MST, and reran the benchmarks.
-> 
-> Addressed the Sashiko AI review:
-> - Avoid a data race on tfile->cons_cnt by always locking.
-> - Correctly count the number of consumed packets for vhost-net.
-> - Corrected a typo in the commit message of commit 3.
-> - Added a missing barrier on the consumer side.
-> --> The barriers now follow the "store buffering" principle.
-> - No longer return NETDEV_TX_BUSY at all, because it is unsafe.
-> --> Result: There are still a few drops with multiple senders, which
->             would be avoided by disabling LLTX.
-> 
-> V9: https://lore.kernel.org/netdev/20260428123859.19578-1-simon.schippers@tu-dortmund.de/
-> - Addressed minor nit by MST in patches 1 and 2.
-> - Rebased patch 3 because of commit d748047
->   ("ptr_ring: disable KCSAN warnings").
-> - Documented the pair of the smp_mb__after_atomic() in tun_net_xmit()
->   with tun_ring_consume().
->   --> It simply pairs with the test_and_clear_bit() inside of
->       netif_wake_subqueue().
-> - Use 1 ptr_ring consumer spinlock instead of 2.
-> - Ran pktgen benchmarks with pg_set SHARED for 50 iterations on
->   latest kernel
->   --> No significant performance difference noticed
-> 
-> V8: https://lore.kernel.org/netdev/20260312130639.138988-1-simon.schippers@tu-dortmund.de/
-> - Drop code changes in drivers/net/tap.c; The code there deals with
->   ipvtap/macvtap which are unrelated to the goal of this patch series
->   and I did not realize that before
-> -> Greatly simplified logic, 4 instead of 9 commits
-> -> No more duplicated logics and distinction in vhost required
-> - Only wake after the queue stopped and half of the ring was consumed
->   as suggested by MST
-> -> Performance improvements for TAP, but still slightly slower
-> - Better benchmarking with pinned threads, XDP drop program for
->   tap+vhost-net and disabling CPU mitigations (and newer Ryzen 5 5600X
->   processor) as suggested by Jason Wang
-> 
-> V7: https://lore.kernel.org/netdev/20260107210448.37851-1-simon.schippers@tu-dortmund.de/
-> - Switch to an approach similar to veth (excluding the recently fixed 
-> variant), as suggested by MST, with minor adjustments discussed in V6
-> - Rename the cover-letter title
-> - Add multithreaded pktgen and iperf3 benchmarks, as suggested by Jason 
-> Wang
-> - Rework __ptr_ring_consume_created_space() so it can also be used after 
-> batched consume
-> 
-> ...
-> 
-> ---
-> 
-> Simon Schippers (4):
->   tun/tap: add ptr_ring consume helper with netdev queue wakeup
->   vhost-net: wake queue of tun/tap after ptr_ring consume
->   ptr_ring: move free-space check into separate helper
->   tun/tap & vhost-net: avoid ptr_ring tail-drop when a qdisc is present
-> 
->  drivers/net/tun.c        | 109 ++++++++++++++++++++++++++++++++++++---
->  drivers/vhost/net.c      |  21 +++++---
->  include/linux/if_tun.h   |   3 ++
->  include/linux/ptr_ring.h |  20 ++++++-
->  4 files changed, 139 insertions(+), 14 deletions(-)
-> 
-> -- 
-> 2.43.0
 
+> diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+> index 4b29ab92c2a7..e33e524cd909 100644
+> --- a/include/net/xfrm.h
+> +++ b/include/net/xfrm.h
+> @@ -684,12 +684,20 @@ struct xfrm_migrate {
+>  	xfrm_address_t		new_saddr;
+>  	struct xfrm_encap_tmpl *encap;
+>  	struct xfrm_user_offload *xuo;
+> +	struct xfrm_mark        old_mark;
+> +	struct xfrm_mark       *new_mark;
+> +	struct xfrm_mark        smark;
+>  	u8			proto;
+>  	u8			mode;
+> -	u16			reserved;
+> +	u16			msg_type; /* XFRM_MSG_MIGRATE or XFRM_MSG_MIGRATE_STATE */
+> +	u32			flags;
+>  	u32			old_reqid;
+> +	u32			new_reqid;
+> +	u32			nat_keepalive_interval;
+> +	u32			mapping_maxage;
+>  	u16			old_family;
+>  	u16			new_family;
+> +	const struct xfrm_selector *new_sel;
+>  };
+
+afkey doesn't zero its array of xfrm_migrate, so those new fields will
+contain garbage there. Hopefully nobody is using it, but...
+
+
+> @@ -2104,7 +2112,7 @@ void xfrm_dev_resume(struct sk_buff *skb);
+>  void xfrm_dev_backlog(struct softnet_data *sd);
+>  struct sk_buff *validate_xmit_xfrm(struct sk_buff *skb, netdev_features_t features, bool *again);
+>  int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
+> -		       struct xfrm_user_offload *xuo,
+> +		       const struct xfrm_user_offload *xuo,
+>  		       struct netlink_ext_ack *extack);
+
+nit: unrelated clean up
+
+
+> diff --git a/include/uapi/linux/xfrm.h b/include/uapi/linux/xfrm.h
+> index a23495c0e0a1..34d8ad5c4818 100644
+> --- a/include/uapi/linux/xfrm.h
+> +++ b/include/uapi/linux/xfrm.h
+[...]
+> +/* Flags for xfrm_user_migrate_state.flags */
+> +enum xfrm_migrate_state_flags {
+> +	XFRM_MIGRATE_STATE_NO_OFFLOAD = 1, /* do not inherit offload from existing SA */
+
+nit: maybe XFRM_MIGRATE_STATE_CLEAR_OFFLOAD?
+
+> +	XFRM_MIGRATE_STATE_UPDATE_SEL = 2, /* update host-to-host selector from saddr and daddr */
+
+"update sel" to me sounds more like "overwrite the whole thing" than
+"copy some bits, fix up others". The name is already long, but maybe
+"XFRM_MIGRATE_STATE_UPDATE_H2H_SEL"? (if only so that userspace devs
+don't think they know what "update sel" means, so they have to read
+the doc instead of possibly guessing wrong :))
+
+
+> diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+> index cf05d778e2dd..9ecc4c8ba693 100644
+> --- a/net/xfrm/xfrm_policy.c
+> +++ b/net/xfrm/xfrm_policy.c
+> @@ -4643,6 +4643,22 @@ static int xfrm_migrate_check(const struct xfrm_migrate *m, int num_migrate,
+>  	return 0;
+>  }
+>  
+> +/*
+> + * Fill migrate fields that are invariant in XFRM_MSG_MIGRATE: inherited
+> + * from the existing SA unchanged. XFRM_MSG_MIGRATE_STATE can update these.
+> + */
+> +static void xfrm_migrate_copy_old(struct xfrm_migrate *mp,
+> +				  const struct xfrm_state *x,
+> +				  struct xfrm_mark *new_mark_buf)
+> +{
+> +	mp->smark                  = x->props.smark;
+> +	mp->new_reqid              = x->props.reqid;
+> +	mp->nat_keepalive_interval = x->nat_keepalive_interval;
+> +	mp->mapping_maxage         = x->mapping_maxage;
+> +	*new_mark_buf              = x->mark;
+> +	mp->new_mark               = new_mark_buf;
+
+Do you really need a separate buffer for that? Or could you just use
+
+    mp->new_mark = &x->mark;
+
+and skip the new_marks array in xfrm_migrate()?
+
+I find that new_marks array quite ugly, so I'd like to get rid of
+it. If that doesn't work, I'd prefer to stuff new_mark_buf directly
+inside struct xfrm_migrate, and then set mp->new_mark pointing to it.
+
+
+> +}
+> +
+>  int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+>  		 struct xfrm_migrate *m, int num_migrate,
+>  		 struct xfrm_kmaddress *k, struct net *net,
+> @@ -4650,6 +4666,7 @@ int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+>  		 struct netlink_ext_ack *extack, struct xfrm_user_offload *xuo)
+>  {
+>  	int i, err, nx_cur = 0, nx_new = 0;
+> +	struct xfrm_mark new_marks[XFRM_MAX_DEPTH] = {};
+>  	struct xfrm_policy *pol = NULL;
+>  	struct xfrm_state *x, *xc;
+>  	struct xfrm_state *x_cur[XFRM_MAX_DEPTH];
+> @@ -4682,6 +4699,8 @@ int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+>  			nx_cur++;
+>  			mp->encap = encap;
+>  			mp->xuo = xuo;
+> +			xfrm_migrate_copy_old(mp, x, &new_marks[i]);
+
+nit: maybe swap mp and x, just to match the order of xfrm_state_migrate()?
+
+It would also be a bit easier to review if you split this refactoring
+(and the corresponding changes to xfrm_state_clone_and_setup) into a
+separate patch.
+
+
+> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> index 043e573c4f32..44244bd323ea 100644
+> --- a/net/xfrm/xfrm_state.c
+> +++ b/net/xfrm/xfrm_state.c
+> @@ -1974,11 +1974,25 @@ static struct xfrm_state *xfrm_state_clone_and_setup(struct xfrm_state *orig,
+>  		goto out;
+>  
+>  	memcpy(&x->id, &orig->id, sizeof(x->id));
+> -	memcpy(&x->sel, &orig->sel, sizeof(x->sel));
+> +	if (m->msg_type == XFRM_MSG_MIGRATE_STATE) {
+> +		if (m->flags & XFRM_MIGRATE_STATE_UPDATE_SEL) {
+> +			u8 prefixlen = (m->new_family == AF_INET6) ? 128 : 32;
+> +
+> +			memcpy(&x->sel, &orig->sel, sizeof(x->sel));
+> +			x->sel.family      = m->new_family;
+> +			x->sel.prefixlen_d = prefixlen;
+> +			x->sel.prefixlen_s = prefixlen;
+> +			memcpy(&x->sel.daddr, &m->new_daddr, sizeof(x->sel.daddr));
+> +			memcpy(&x->sel.saddr, &m->new_saddr, sizeof(x->sel.saddr));
+> +		} else {
+> +			x->sel = *m->new_sel;
+
+nit: the mix of copy styles (memcpy and struct assignment) within this
+function, but especially here for x->sel, is a bit unpleasant.
+
+> +		}
+> +	} else {
+> +		memcpy(&x->sel, &orig->sel, sizeof(x->sel));
+> +	}
+>  	memcpy(&x->lft, &orig->lft, sizeof(x->lft));
+
+[...]
+> diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+> index 03fa4cabf601..a49edf7d6f78 100644
+> --- a/net/xfrm/xfrm_user.c
+> +++ b/net/xfrm/xfrm_user.c
+[...]
+> @@ -3125,7 +3145,7 @@ static int xfrm_do_migrate(struct sk_buff *skb, struct nlmsghdr *nlh,
+>  			   struct nlattr **attrs, struct netlink_ext_ack *extack)
+>  {
+>  	struct xfrm_userpolicy_id *pi = nlmsg_data(nlh);
+> -	struct xfrm_migrate m[XFRM_MAX_DEPTH];
+> +	struct xfrm_migrate m[XFRM_MAX_DEPTH] = {};
+
+I'm not really opposed to this change, but what prompted it?
+
+
+[...]
+> +static int xfrm_do_migrate_state(struct sk_buff *skb, struct nlmsghdr *nlh,
+> +				 struct nlattr **attrs, struct netlink_ext_ack *extack)
+> +{
+> +	struct xfrm_user_migrate_state *um = nlmsg_data(nlh);
+> +	struct net *net = sock_net(skb->sk);
+> +	struct xfrm_user_offload xuo = {};
+> +	struct xfrm_migrate m = {};
+> +	struct xfrm_state *xc;
+> +	struct xfrm_state *x;
+> +	int err;
+> +
+> +	if (!um->id.spi) {
+> +		NL_SET_ERR_MSG(extack, "Invalid SPI 0x0");
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (um->reserved) {
+> +		NL_SET_ERR_MSG(extack, "Reserved field must be zero");
+> +		return -EINVAL;
+> +	}
+> +
+> +	if ((um->flags & XFRM_MIGRATE_STATE_NO_OFFLOAD) &&
+> +	    attrs[XFRMA_OFFLOAD_DEV]) {
+> +		NL_SET_ERR_MSG(extack,
+> +			       "XFRM_MIGRATE_STATE_NO_OFFLOAD and XFRMA_OFFLOAD_DEV are mutually exclusive");
+
+Not a strong objection, but they don't really have to be? "don't
+inherit and set it from the one provided" sounds ok. (it's a bit
+unnecessary to say "don't inherit", but not an issue)
+
+XFRMA_OFFLOAD_DEV with !XFRM_MIGRATE_STATE_NO_OFFLOAD (inherit and
+also set from request) seems more problematic.
+
+> +		return -EINVAL;
+> +	}
+> +
+> +	copy_from_user_migrate_state(&m, um);
+> +
+> +	x = xfrm_state_lookup(net, m.old_mark.v & m.old_mark.m,
+> +			      &um->id.daddr, um->id.spi,
+> +			      um->id.proto, um->id.family);
+> +	if (!x) {
+> +		NL_SET_ERR_MSG(extack, "Can not find state");
+> +		return -ESRCH;
+> +	}
+> +
+> +	if (um->flags & XFRM_MIGRATE_STATE_UPDATE_SEL) {
+> +		u8 prefixlen = (x->sel.family == AF_INET6) ? 128 : 32;
+> +
+> +		if (x->sel.prefixlen_s != x->sel.prefixlen_d ||
+> +		    x->sel.prefixlen_d != prefixlen ||
+> +		    !xfrm_addr_equal(&x->sel.daddr, &x->id.daddr, x->sel.family) ||
+> +		    !xfrm_addr_equal(&x->sel.saddr, &x->props.saddr, x->sel.family)) {
+
+I think we need to be careful about families here too. id and sel
+could have different ones.
+
+[...]
+> +	if (attrs[XFRMA_MTIMER_THRESH]) {
+> +		err = verify_mtimer_thresh(!!m.encap, x->dir, extack);
+> +		if (err)
+> +			goto out;
+> +	}
+> +
+> +	if (attrs[XFRMA_NAT_KEEPALIVE_INTERVAL] &&
+> +	    nla_get_u32(attrs[XFRMA_NAT_KEEPALIVE_INTERVAL]) && !m.encap) {
+
+if (nla_get_u32_default(attrs[XFRMA_NAT_KEEPALIVE_INTERVAL], 0) && !m.encap)
+
+> +		NL_SET_ERR_MSG(extack,
+> +			       "NAT_KEEPALIVE_INTERVAL requires encapsulation");
+> +		err = -EINVAL;
+> +		goto out;
+> +	}
+> +
+> +	if (attrs[XFRMA_OFFLOAD_DEV]) {
+> +		m.xuo = nla_data(attrs[XFRMA_OFFLOAD_DEV]);
+> +	} else if (!(um->flags & XFRM_MIGRATE_STATE_NO_OFFLOAD) && x->xso.dev) {
+
+nit: this would be a bit more readable with
+
+    bool inherit_offload = !(um->flags & XFRM_MIGRATE_STATE_NO_OFFLOAD);
+
+> +		xuo.ifindex = x->xso.dev->ifindex;
+> +		if (x->xso.dir == XFRM_DEV_OFFLOAD_IN)
+> +			xuo.flags = XFRM_OFFLOAD_INBOUND;
+> +		if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET)
+> +			xuo.flags |= XFRM_OFFLOAD_PACKET;
+
+copy_user_offload is doing almost exactly the same thing (copy from
+and xso to an xuo). It would be better to extract some helper
+(xso_to_xuo() ?) and use it in both places, otherwise they'll almost
+certainly get out of sync.
+
+> +		m.xuo = &xuo;
+> +	}
+> +
+> +	if (attrs[XFRMA_MARK])
+> +		m.new_mark = nla_data(attrs[XFRMA_MARK]);
+> +
+> +	if (attrs[XFRMA_SET_MARK])
+> +		xfrm_smark_init(attrs, &m.smark);
+> +	else
+> +		m.smark = x->props.smark;
+> +
+> +	m.mapping_maxage = attrs[XFRMA_MTIMER_THRESH] ?
+> +		nla_get_u32(attrs[XFRMA_MTIMER_THRESH]) : x->mapping_maxage;
+
+m.mapping_maxage = nla_get_u32_default(attrs[XFRMA_MTIMER_THRESH], x->mapping_maxage);
+
+> +	m.nat_keepalive_interval = attrs[XFRMA_NAT_KEEPALIVE_INTERVAL] ?
+> +		nla_get_u32(attrs[XFRMA_NAT_KEEPALIVE_INTERVAL]) :
+> +		x->nat_keepalive_interval;
+
+m.nat_keepalive_interval = nla_get_u32_default(attrs[XFRMA_NAT_KEEPALIVE_INTERVAL], x->nat_keepalive_interval);
+
+
+-- 
+Sabrina
 
