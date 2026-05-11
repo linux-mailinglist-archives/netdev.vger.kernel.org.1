@@ -1,251 +1,386 @@
-Return-Path: <netdev+bounces-286842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286843-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oGnBB4lZAmosrgEAu9opvQ
-	(envelope-from <netdev+bounces-286842-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 00:34:49 +0200
+	id yHAvLgBaAmosrgEAu9opvQ
+	(envelope-from <netdev+bounces-286843-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 00:36:48 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B7EB516F76
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 00:34:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 21725516FE1
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 00:36:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 42CF93059E0F
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 22:22:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7B0DB30459DC
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 22:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3376535674B;
-	Mon, 11 May 2026 22:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0CCD308F23;
+	Mon, 11 May 2026 22:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Av8wErJC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PeFaz1Cn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F245B356741
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 22:21:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778538107; cv=none; b=r+MVkYWSNX9X6Z6vm7CBrriHbldwnbiz8ZS2LZz00tQclfXOwCmObsI4HHRL2qzmzIITyv+5eH4QsUT6hwytAF0Eg/vlhkvSyMQ9l4JVZm0sWPxBGKTxWs5yIQCs064Te/lHp3ZwR+KSbfHm/7WWkSGA9rDhi27qza0ADSfKW78=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778538107; c=relaxed/simple;
-	bh=jjmM2GGitlEzN5iSzma8jtAOF8FHZhqXKOugnFy/DkY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iuuvcJ2sYkR7od/REep7NAIeYkeHM279IF9gsJUqiEZElsoDe9yFSzRjNBzQpG9Bpkn6yHO3rbyYk/BNjagLDdWm7xx3EcU4vN6LnH3X5k2RbAQ4amRrMPoPKTQMmO5swJRFSqlCpQUB09itVKd0nNAi1mGrQXLzzZ1v0czZVQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Av8wErJC; arc=none smtp.client-ip=74.125.224.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-64d5a7926cfso4502199d50.2
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 15:21:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778538104; x=1779142904; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rktqOhL/WC+LFcBNVBl8EKTq1ERQ0ZB3bcN1+M0y/0E=;
-        b=Av8wErJCJAFJEvr7zbANilFauaHEd0ZHnRiRJ0IzHqLHC4xF9y9e2yfBPsLKtmjZJ+
-         56m9iVoleH2FTxyDI+I8os1L1pn2TOOf8oQse/L+mhlMMtbC32WbzDoebzhFbAabdNCO
-         0U3p8WaZOxdEk7Nza/+WXICNaImj9+H5AO6KKtS3KlP6NextYh0jvgUN+KIzjF/ZxnNU
-         8q3RDT2jdCta1b2AdiN7P97Q8O7q3nbaDOO1omwe0/w+f1zgY3owbWj++lMy4yt7USrB
-         wgaeqLyevl6VYmEcleQvDEWxlzG9nqMmoMH/oVhtUa1mor7pVp9v/3XhECqZ8ExWb/cp
-         bJzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778538104; x=1779142904;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rktqOhL/WC+LFcBNVBl8EKTq1ERQ0ZB3bcN1+M0y/0E=;
-        b=HTA1Bo3v8tNNciSqsRSw7VvCkYY4C73tyBey540Mr7LnKy3/LMmkQKTgbvj3ov1aFH
-         YU/3T/tSZe+duc5kLu2p2X6Mb549qiezPqDN0rig8GOiL+qknbUJpEkFSaV+s6K7s0mh
-         JL9IaCU+djVawXvE9IcAZ9JOadKjfndmU5IFJQXSPYejDA/d+fRTbUZ+tnqOpaQnOQJ7
-         jG3icMwCzXKeEaG9+QfHsM8lfYcfU1lsi1dFreioZ3J7fDJHp8lR1SIHqCyyvUYiHDLl
-         6RHX1jCFY+ALaCkftjF9RTfomOVcpVWDKxuhxXA8nT71iYqB3cy6Hbx88IES4hj2uW+y
-         5a3g==
-X-Gm-Message-State: AOJu0YxCxEnRXw0Ohr3MFYUl0xrVoAeCLsOauVPqPUeuyWXLNPrqTGQp
-	nEHhSkMENVvNhEYumOwRvclcI2zNp2WZuWdbApgXtJdN66H3G0OXwzbJIOXNuQ==
-X-Gm-Gg: Acq92OEcmHJk+n/Ju5bO4hUiCF4NPENSWIMTYJZbuiNMZZF2Fxef0H8xRmQbzKRNIQ/
-	W1ibdxcu+EbmiBQCCRXTtYqmVOdc1urdsDmNj5dmB2hLrdFhvonLQSsYMpIdaE+7tkr7JkK0Q+Z
-	3elpMcmnWUPdBpBWssvjxEj8mIeOeJ1ZyIHc3xlg++GlUUcqxQWKYYJK7ovjDcceeEtclbsEZOe
-	0kbO/FJSksm9jNNIlcTTn3CJP5eCHHLwiHNhpS5R8pK4XbAXakwhVTwmFQpLPlyCGWSJWDJlBJ8
-	hWRaiKApUOHBIjE9Uq3EQtvkDwa9Mb1zsGVpzuvGwek29vrsdprYtpKY9GIpoeurdS7pl9cGEdi
-	dsDffnXxrSweLN+vjPROd3aZGwVumFQCveMr9cLiuNXwetokdKaYc4qpO+oNr6nLzq3TJniRGIQ
-	P+PJKqZXKDUMJJSXHjO42Xo0vDyJf7bnlLas5kgS97NyqnyraGNCAm5X8/QlDkH1Uy7BRVEc5Bu
-	3keVqldioLGzDj6swsuQztzOakJTAiErUGUKw==
-X-Received: by 2002:a05:690e:15cf:b0:651:be50:af09 with SMTP id 956f58d0204a3-65c79ad6df1mr18811474d50.3.1778538103818;
-        Mon, 11 May 2026 15:21:43 -0700 (PDT)
-Received: from willemb.c.googlers.com.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65d969fb3b3sm6203476d50.1.2026.05.11.15.21.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 15:21:42 -0700 (PDT)
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	shuah@kernel.org,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next] selftests: drv-net: cope with slow env in so_txtime.py test
-Date: Mon, 11 May 2026 18:19:20 -0400
-Message-ID: <20260511222138.2045551-1-willemdebruijn.kernel@gmail.com>
-X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6167F299A8F;
+	Mon, 11 May 2026 22:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778538647; cv=fail; b=rhh58bhABi35LLxeX3d/FPj4jyTNI7woeog+QNTDwAgAGFrUlWbJMRUV5C5l9X3acMzdyT1xlFUvVGFgEz3C9mo9tTF2TLInmisKTrTAXNIXtJrrDuFr0zL5i6NIlEO3EHEFf3+eJ2sNJplEc4kJHT4sMznN7cPjRl+D6SyTF8E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778538647; c=relaxed/simple;
+	bh=6D1VEx+7tGL9Uhj8n3iyoFZBFldREo9Y/nJ//kQSLwE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=NibDCt+1wInk4OHmfLXyiYpETBw8JGzmfrjAnWYc9Pu3HaOjalgMwIzdCP6uWPxtfs4Er8ybPqV0r83mEPnZqvUsGoHvS9RtAjyDsiqflT0NysdS5pRdpOLU3op6kDFWWwkHrnHkfKVPz2nsDlPoHbYZgQmavYxS9ku+lWeUkIQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PeFaz1Cn; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778538645; x=1810074645;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=6D1VEx+7tGL9Uhj8n3iyoFZBFldREo9Y/nJ//kQSLwE=;
+  b=PeFaz1CnWDgh8sqpaa9zAaIFZ1DyL/UfdKQjXSohNUeUj99OKJg3+RX6
+   tfxNKonFn8MQBX9tNhDm81o7eSWKw/rllJF8PDNhOl1MctzzPCnPQL1k3
+   NgY4JXapj+cX9c3ZqvIZrxfmk0nD+bMK0MBgu6+26CHCV1vf5kJG2tPcB
+   Wpb844YuXQzl+0AUTXC/AD2KOR8fGNe9Nt58GNlFrOQUzQzDj7yGWgFaa
+   7F0Pb3qjTKjQksJ7K757Q+dbkb0xeMHuHfmub2+TE3QlqhgMSehrBlr58
+   mp+jga0Zmdd1efvKDxMNw5Qbx+fmA3AopKrmjgsPvtlikpItrQd+TAQWI
+   A==;
+X-CSE-ConnectionGUID: TFgYOROfTYuNqvlVqM1f0A==
+X-CSE-MsgGUID: f7rMuC3OQ+e6k9qOXkeJxg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11783"; a="90904379"
+X-IronPort-AV: E=Sophos;i="6.23,229,1770624000"; 
+   d="scan'208";a="90904379"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2026 15:30:45 -0700
+X-CSE-ConnectionGUID: KQIadF/8Q9WoEPVu/OdSNA==
+X-CSE-MsgGUID: NYP3t6YpQfqSK67HaACvfA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,229,1770624000"; 
+   d="scan'208";a="242550948"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2026 15:30:44 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 11 May 2026 15:30:44 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Mon, 11 May 2026 15:30:44 -0700
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (52.101.43.62) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 11 May 2026 15:30:43 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=IXcyeSdcALaT3tftr38ZYxFx50Ehl4iz3f8mKIBRlMgocVbPsOLy9wQk1/F3E/t5+5RbrJUzu1w6FIohrqfpUbmdXhbwpBNCc9wcWMqWP4c5DBxxY1Nb0IKd4+lxEQ5OmQhn6fmTkgqoInNmC2XdeLVNi8en5hxrSjsN57f4iG03gH89VCCmacTEJ7EYLl9lUNRqbqeqs7HeYKOynTBQk2P8vIWi8RNckTi8Rtm3EO8HBK2lxkYt6qgbHOPqjYusox7pRzxN3bPR1AkK38gKF8h7WI6p9kG4FVd8wNNvICK3Jl7t1gKSEVGxv3AtuFKlVTOHCdDn0g+RHry+PoSQoA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dnl7bVCGNrwJzrtikEp4mHTOoRFrCH/tn7a1KCo7FiI=;
+ b=OnFnaALoypbvxwe2qCfCqgatpEy27IGBIXeeq0/J2gDc/iOpUdocxmZTls6sKlli/NjdN5zWcQRuBHc1cTj3IhBe9gFfirXePAvxInE38DLGTijeUBe8CP+f7wqSRHbRtgM7JFg6bR8jyA0mQJ4des6bY7xUUglbFdTCC5Y8whxVDuvE7hiy057+Bq1ovHRmoxl/UUBaB/NTlqxm3CbCYRUv2TRt0IDK9hk0QWmCNdGpe9LEcoL+NgJcgKXAtPPH/rA4ldT+d9dwK7uVWXKUIxaD37SUOJt30iq7LI5ZC4bLA8QfxV19LwUdKEciodPTGqFjXh6FULXYAmpb1zHIXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM4PR11MB6240.namprd11.prod.outlook.com (2603:10b6:8:a6::6) by
+ SA1PR11MB6614.namprd11.prod.outlook.com (2603:10b6:806:255::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.23; Mon, 11 May
+ 2026 22:30:38 +0000
+Received: from DM4PR11MB6240.namprd11.prod.outlook.com
+ ([fe80::a89f:ee6c:3596:df18]) by DM4PR11MB6240.namprd11.prod.outlook.com
+ ([fe80::a89f:ee6c:3596:df18%5]) with mapi id 15.20.9891.021; Mon, 11 May 2026
+ 22:30:38 +0000
+From: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Vecera, Ivan"
+	<ivecera@redhat.com>, "vadim.fedorenko@linux.dev"
+	<vadim.fedorenko@linux.dev>, "jiri@resnulli.us" <jiri@resnulli.us>,
+	"edumazet@google.com" <edumazet@google.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "richardcochran@gmail.com"
+	<richardcochran@gmail.com>, "donald.hunter@gmail.com"
+	<donald.hunter@gmail.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "Kubalewski, Arkadiusz"
+	<arkadiusz.kubalewski@intel.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "horms@kernel.org" <horms@kernel.org>,
+	"Prathosh.Satish@microchip.com" <Prathosh.Satish@microchip.com>, "Nguyen,
+ Anthony L" <anthony.l.nguyen@intel.com>, "pabeni@redhat.com"
+	<pabeni@redhat.com>, "davem@davemloft.net" <davem@davemloft.net>
+Subject: RE: [PATCH v7 net-next 4/8] dpll: zl3073x: allow SyncE_Ref pin state
+ change
+Thread-Topic: [PATCH v7 net-next 4/8] dpll: zl3073x: allow SyncE_Ref pin state
+ change
+Thread-Index: AQHc2IZT17ouGC1/RUSER0CKvInaIbX7Am+AgA53LcA=
+Date: Mon, 11 May 2026 22:30:38 +0000
+Message-ID: <DM4PR11MB6240E4D43DC313A4D984893292382@DM4PR11MB6240.namprd11.prod.outlook.com>
+References: <20260430094238.987976-5-grzegorz.nitka@intel.com>
+ <20260502173309.3849677-1-kuba@kernel.org>
+In-Reply-To: <20260502173309.3849677-1-kuba@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM4PR11MB6240:EE_|SA1PR11MB6614:EE_
+x-ms-office365-filtering-correlation-id: b35433ba-78d8-4206-09c7-08deafaced3a
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014|56012099003|38070700021|11063799003|18002099003|22082099003|3023799003;
+x-microsoft-antispam-message-info: BMmgPisb+p3GiWGR75hGxidxAegupL4rMmC3/pqSNC4w5Qyu3GEpmQDW8TMT+83A6v+Gv2fo5LuKsOn/L+/b7mxeqbSqIZMhX8y03jMdGwtA2sXpCmxTVMH1L+FCKhMMLrVrmfV+QiHfhO+I8G4rtVSm9FQV0pzem8Is/C9L77vD9UeIYstWroVNRqWlysCnEVtlls+qOWUsnpc5V+R/Pk2oa4owJkUmXL/1YUUA6QwYujQ7FpT39dcNJtG69E1/1dEdNhmYUPc5Aj4R2VQqxR9pjoNwQZ88hASarwsf7ojItbm4wlDdBrGDTQ14vyzeGSQJRyRPMQv5WRBbURse6bX8Rk17pot3FxMmo7KZRNA2wGobevCVB6hIHvm+wck4ZEP/THtHedPvjUnesp48k2sNe+NvyTPupxNagm4VkVzq3PCaq8GfwQ4KkZWKo+D/v5ba7/YviUq3AKDm5DUcixUd3dOQWgx8Xp3qde3PMm/AZopmJgiMSDu0DBWyPHxMWoHs8ep8IX+58uQEKxLkOm/bgXmiWSDfCrH1zfKWGrIljoWLUAABjHjsBjeCUNbITs2NQ6hrcXor+AN08u3hOiL2mRQ0jd8NNCFjvxoKtxA4KoqqwynusWRwfcIuKvCCAlZz9ZWGeLTme4ltAGIen8DgJO9Kj7O3kGXLTRInEYyDmeEmkxF/QU0QR5BqdoGM6oKfgep2DgNx3odi1aCuQYdcts6EXacIgXbfkISS1r7N0Qyk53X4PQ2E1bffTLSL
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6240.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(56012099003)(38070700021)(11063799003)(18002099003)(22082099003)(3023799003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?XlmokHtr7Wf+AMRmgGp0QPK5ouVSacc/xA47XjzHytLMxx0YmZKdfRWQOcOr?=
+ =?us-ascii?Q?tFjrovcmIXPS8CK36n33uEi1VtKIV9kYSkTiwAx96XDh0Q99MAdFeAm/GXBl?=
+ =?us-ascii?Q?D/bB1KocktMn59Avjm4+P9deVeFthRfBn0C6yWMzWB54AF6ftIXkm45QLQqD?=
+ =?us-ascii?Q?K4V/dnYVThAcYeZ2YZQPKLPMS0WciN6TVxsIS2d0Cn4oNqZrjGPMYL4hEXN7?=
+ =?us-ascii?Q?KmiAX0U2qhyANNnaMYZN6CaBWZPwVG98/EYH5asdgd2/QQniZ6TUBzlKNiFn?=
+ =?us-ascii?Q?u3GfN//Il3BExBPCc5WimP4shWOaNh8F1oiTwLAKnUMbir6rSKK5QD+zyqiQ?=
+ =?us-ascii?Q?PWKzvWLV5lO0KREFpFQFaZCd0rGgGPzP9pVB8Ysw8WRnjxxbeCy9PcMhd5LK?=
+ =?us-ascii?Q?YItYLzdwEYuu/bcv2sYQI7g+1e3CtO/Jgq6uiGniEdZGkgsYTcIaotoKHTbv?=
+ =?us-ascii?Q?cpyBZ/oN66HtxIscXT/XsbqbeAkg1q3dFXhrwFhIBqsjKNgCUtaksVYvdAYd?=
+ =?us-ascii?Q?Q8wDqtzKbEUbC7ZKODp7SC3AAMpxovf3aiC+mjpw+pDHvrSwZ5q2rGUtjOx5?=
+ =?us-ascii?Q?eTrLJbKz+qZf5bJMBGgnnJRMqE4HJz+cYmoIExZzOHS3I0ZPJzMeP//NzssM?=
+ =?us-ascii?Q?uCIEmeXfzeaEYh0mBgmZKwhrxgthJdH/Z48jyXhOuwH3YI9HiePvYfTFBxoC?=
+ =?us-ascii?Q?KyECd2QqmODIrAGsQ7nem0AJ+ku8L8B2WFlnc7Saxw1xYBUH2s2D7MgJc8KY?=
+ =?us-ascii?Q?Edpo3bAd4v3rST6Z6On7gqECLak6sFB8PSQhiaJFFYLAi1dnCaS0QZlNkPpa?=
+ =?us-ascii?Q?aR/RBwTKTU7bqlLZU9hSwgnNeNt/Di0H8J8P9rINSjAHgun8sNy+l9GVWRd7?=
+ =?us-ascii?Q?/SXh6SghCJy2qg9pDKPeeqYg+S7x559T1HzorZhqEpvcaGNcHV0ertUZP+DE?=
+ =?us-ascii?Q?jRfncFS3Ge5MzKZGdPW6G083kWc6DeuesF0AyF4fcW4yIRpyFOr9AePupWYd?=
+ =?us-ascii?Q?yCXwzRPDZHokAGvErmE/pMOXiuE/ie1LHytT+s/tekXNmt5x/mVJLqUMqdBK?=
+ =?us-ascii?Q?XAfooaT66csQ3MEpD7nW0c6zVAVtQVhbaxSmNtuZqcCfwUBk7Nl/+25m25qu?=
+ =?us-ascii?Q?UEVZyxLQnRu2A7JGWdATQoJSdH653vcunDHK6dgWbq6d5E4J6/tV21cs3xSv?=
+ =?us-ascii?Q?7HEjB60A5O9Wpu2NcHfezWTwWSD2KXJ9E7sy7GQw/gKxFWOg2KyOHVr+EERH?=
+ =?us-ascii?Q?AOD/OEUFgfxZ3x14VwS9rhVshq9zApF5o5ph3AGsZ9qhGEPWsU4+FlXjdJ+1?=
+ =?us-ascii?Q?wtfnmujPgcJ3HkKcsqPI4Q597x86JWQLn3mg3Y8WB3TIakxBcGKjXOPhef0s?=
+ =?us-ascii?Q?xYrb+RWK9vK/vE4MYs7f/2YpeUZpQENrQlxrno/2Z01+gn5QsBxUZi99HBhP?=
+ =?us-ascii?Q?sPbVlR/tuHeuYozsknbXc6J0+66xB1POTwR7rOCpaAB5novLpe3REyhQQe3M?=
+ =?us-ascii?Q?75nwbGQdJJBJVQo92ldOqC8notH4uK5e5KthUd9sfgMeBnNLnRQdjfV9VjEn?=
+ =?us-ascii?Q?RiI9AoRz3drQsLzEIgYBOUFc7kHUIiMkn6qGr/w76AqxEtKLisUEC2IzJ8+y?=
+ =?us-ascii?Q?rE895Rr9CmX2B6v7J+W3e3KC8Sy0UMJtWs4SOgXuontpKmDQYKPVNLFnNYMT?=
+ =?us-ascii?Q?Jw3VakzkbPqoDbu7I4ymcC79WpcgEIoO9TMwjzuBg9cgeRyOImIvNOXuvgq6?=
+ =?us-ascii?Q?uDojAHAzNQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 7B7EB516F76
+X-Exchange-RoutingPolicyChecked: NaoKVt4euh89OzzxMe+ql25eyzPxkWXGXGdgcD3rjxQZpmZV2NbxTZidAin3q+Wdm3WZamP2Va860VIP5kId9k80P0FRR8GoCqN4dQUCVi+YCoal+Qn2Z5uOiHD5wIgwp/qWe0SvQYb6EqQiO3PkY5SICGYpgvA8csWa18CD9d2cxdJn/l6wmU4e05bQCuBp3LN2F3gK13EIFqvW6J0IZ/dmi5fVznihS3oCo5znv/13rILLgJANQM/GHi7j4CS1lfBHWC/IFFFvcjFkqsJDK4fyDxWVYQqTGZMLA2tZIzqJGmJn7mWZwW46gvVc/8MFmBVdDDEORbIL++orjijvBA==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6240.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b35433ba-78d8-4206-09c7-08deafaced3a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 May 2026 22:30:38.1778
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 5fx+EbefHJGIg7IKv9EAn+rtUSPvC7ioMZsaSX/XyBcKbEgc/smzDdJFKx3VssIagy5ObuOwQKpNQsUKKhh/m6AOrRk+ktqFFta3M58sKw8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6614
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: 21725516FE1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286843-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,linux.dev,resnulli.us,google.com,intel.com,gmail.com,lunn.ch,lists.osuosl.org,kernel.org,microchip.com,davemloft.net];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286842-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[grzegorz.nitka@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,so_txtime.sh:url,lib.py:url]
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Action: no action
 
-From: Willem de Bruijn <willemb@google.com>
 
-This test was converted from shell script to drv-net test.
 
-The new version is flaky in dbg builds on the netdev.bots dashboard.
-The previous shell script had more protections to avoid these. Added
-in commit a7ee79b9c455 ("selftests: net: cope with slow env in
-so_txtime.sh test").
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: Saturday, May 2, 2026 7:33 PM
+> To: Nitka, Grzegorz <grzegorz.nitka@intel.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>; netdev@vger.kernel.org; Vecera, Iva=
+n
+> <ivecera@redhat.com>; vadim.fedorenko@linux.dev; jiri@resnulli.us;
+> edumazet@google.com; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>;
+> richardcochran@gmail.com; donald.hunter@gmail.com; linux-
+> kernel@vger.kernel.org; Kubalewski, Arkadiusz
+> <arkadiusz.kubalewski@intel.com>; andrew+netdev@lunn.ch; intel-wired-
+> lan@lists.osuosl.org; horms@kernel.org; Prathosh.Satish@microchip.com;
+> Nguyen, Anthony L <anthony.l.nguyen@intel.com>; pabeni@redhat.com;
+> davem@davemloft.net
+> Subject: Re: [PATCH v7 net-next 4/8] dpll: zl3073x: allow SyncE_Ref pin s=
+tate
+> change
+>=20
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> ---
+> dpll: zl3073x: allow SyncE_Ref pin state change
+>=20
+> This patch advertises DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE on the
+> output-direction branch of zl3073x_pin_props_get() with the stated intent
+> of allowing dynamic enable/disable of the SyncE_Ref pin.
+>=20
+> > diff --git a/drivers/dpll/zl3073x/prop.c b/drivers/dpll/zl3073x/prop.c
+> > index ac9d41d0f978..acd7061a741a 100644
+> > --- a/drivers/dpll/zl3073x/prop.c
+> > +++ b/drivers/dpll/zl3073x/prop.c
+> > @@ -215,6 +215,15 @@ struct zl3073x_pin_props
+> *zl3073x_pin_props_get(struct zl3073x_dev *zldev,
+> >
+> >  		props->dpll_props.type =3D DPLL_PIN_TYPE_GNSS;
+> >
+> > +	       /*
+> > +		* The SyncE_Ref pin supports enabling/disabling dynamically.
+> > +		* Some platforms may choose to expose this through
+> firmware
+> > +		* configuration later. For now, advertise this capability
+> > +		* universally since the hardware allows state toggling.
+> > +		*/
+> > +		props->dpll_props.capabilities |=3D
+> > +			DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE;
+>=20
+> Is this capability actually supported by the output pin ops?
+>=20
+> Looking at drivers/dpll/zl3073x/dpll.c, the output pin ops vector does
+> not install a .state_on_dpll_set callback:
+>=20
+>     static const struct dpll_pin_ops zl3073x_dpll_output_pin_ops =3D {
+>             .direction_get       =3D zl3073x_dpll_pin_direction_get,
+>             .esync_get           =3D zl3073x_dpll_output_pin_esync_get,
+>             .esync_set           =3D zl3073x_dpll_output_pin_esync_set,
+>             .frequency_get       =3D zl3073x_dpll_output_pin_frequency_ge=
+t,
+>             .frequency_set       =3D zl3073x_dpll_output_pin_frequency_se=
+t,
+>             .phase_adjust_get    =3D zl3073x_dpll_output_pin_phase_adjust=
+_get,
+>             .phase_adjust_set    =3D zl3073x_dpll_output_pin_phase_adjust=
+_set,
+>             .state_on_dpll_get   =3D zl3073x_dpll_output_pin_state_on_dpl=
+l_get,
+>     };
+>=20
+> and the corresponding getter hardcodes the state to CONNECTED with no
+> hardware read:
+>=20
+>     zl3073x_dpll_output_pin_state_on_dpll_get(...)
+>     {
+>             /* If the output pin is registered then it is always connecte=
+d */
+>             *state =3D DPLL_PIN_STATE_CONNECTED;
+>             return 0;
+>     }
+>=20
+> On the netlink side, dpll_pin_state_set() first checks the capability
+> bit and then requires the setter to exist:
+>=20
+>     if (!(DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE & pin-
+> >prop.capabilities)) {
+>             NL_SET_ERR_MSG(extack, "state changing is not allowed");
+>             return -EOPNOTSUPP;
+>     }
+>     ...
+>     if (!ops->state_on_dpll_set)
+>             return -EOPNOTSUPP;
+>=20
+> With this patch, the capability check now passes for every output pin,
+> but the operation then fails with -EOPNOTSUPP because no setter is
+> provided, and the reported state will remain CONNECTED regardless of
+> what userspace requested.
+>=20
+> Should this series also add a .state_on_dpll_set callback (and a
+> matching hardware path, for example via zl3073x_out_state_set or the
+> output-enable mailbox) before advertising the capability, so the commit
+> subject "allow SyncE_Ref pin state change" can actually be honored?
+>=20
+> Separately, should the scope of this change match the commit message?
+>=20
+> The subject and the first sentence of the new comment describe a change
+> scoped to the SyncE_Ref pin:
+>=20
+>     * The SyncE_Ref pin supports enabling/disabling dynamically.
+>=20
+> but the assignment lives in the generic else-branch of
+> zl3073x_pin_props_get() that runs for every output pin (SMA outputs,
+> 1PPS outputs, internal-oscillator outputs, MUX outputs, etc.), and it
+> executes before the fwnode "connection-type" parsing below can classify
+> the pin as ext/gnss/int/synce/mux. The last sentence of the same
+> comment acknowledges this:
+>=20
+>     * universally since the hardware allows state toggling.
+>=20
+> Would it be clearer to either gate the flag on the SyncE_Ref pin
+> specifically (e.g., via firmware-node property, as the comment hints
+> at), or to update the subject and leading comment sentence to reflect
+> that the capability is being advertised for all output pins?
+>=20
+> > +	       /*
+> > +		* The SyncE_Ref pin supports enabling/disabling dynamically.
+> > +		* Some platforms may choose to expose this through
+> firmware
+> > +		* configuration later. For now, advertise this capability
+> > +		* universally since the hardware allows state toggling.
+> > +		*/
+>=20
+> This isn't a bug, but the indentation of the comment block is
+> inconsistent. The opening "/*" is prefixed with one tab followed by
+> seven spaces, while the " *" continuation lines and the closing " */"
+> are prefixed with two tabs, so the opening "/" does not align with the
+> continuation asterisks. Adjacent comment blocks in the same function
+> (for example "The output pin phase adjustment granularity...") use pure
+> tab alignment.
+>=20
+> > +		props->dpll_props.capabilities |=3D
+> > +			DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE;
+>=20
+> This isn't a bug, but props was just obtained from kzalloc_obj() and
+> nothing in this else-branch writes to capabilities before this point.
+> The symmetric input branch immediately above uses plain "=3D":
+>=20
+>     props->dpll_props.capabilities =3D
+>             DPLL_PIN_CAPABILITIES_PRIORITY_CAN_CHANGE |
+>             DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE;
+>=20
+> Would "=3D" be more consistent here, since there are no pre-existing bits
+> to merge with?
 
-Add the same overall protection:
+Agree, it's not ideal solution. After discussion with Ivan Vecera, I'd like=
+ to come up
+with a different approach, i.e. relax the capability check in dpll_pin_stat=
+e_set() and
+dpll_pin_on_pin_state_set(): when a pin has an associated fwnode, bypass
+the capability gate and let the ops layer decide.
 
-- Suppress so_txtime process failure if KSFT_MACHINE_SLOW
+To be presented in v8
 
-Also relax two timeouts to reduce the number of process failures
-themselves
+Thanks!
 
-- Increase SO_RCVTIMEO to 2 seconds
-- Increase process start-up stabilization to 2 seconds
-
-Delays were experimentally arrived at while running with vng
-built with kernel/configs/debug.config
-
-Fixes: 5c6baef3885c ("selftests: drv-net: convert so_txtime to drv-net")
-Reported-by: Jakub Kicinski <kuba@kernel.org>
-Closes: https://lore.kernel.org/netdev/20260510174219.74aeee6d@kernel.org/
-Signed-off-by: Willem de Bruijn <willemb@google.com>
----
- tools/testing/selftests/drivers/net/so_txtime.c  | 10 ++++++++--
- tools/testing/selftests/drivers/net/so_txtime.py | 11 +++++++++--
- 2 files changed, 17 insertions(+), 4 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/net/so_txtime.c b/tools/testing/selftests/drivers/net/so_txtime.c
-index b6930883569b..75f3beef13d9 100644
---- a/tools/testing/selftests/drivers/net/so_txtime.c
-+++ b/tools/testing/selftests/drivers/net/so_txtime.c
-@@ -38,6 +38,7 @@
- static int	cfg_clockid	= CLOCK_TAI;
- static uint16_t	cfg_port	= 8000;
- static int	cfg_variance_us	= 4000;
-+static bool	cfg_machine_slow;
- static uint64_t	cfg_start_time_ns;
- static int	cfg_mark;
- static bool	cfg_rx;
-@@ -142,7 +143,7 @@ static void do_recv_one(int fdr, struct timed_send *ts)
- 
- 	if (llabs(tstop - texpect) > cfg_variance_us) {
- 		fprintf(stderr, "exceeds variance (%d us)\n", cfg_variance_us);
--		if (!getenv("KSFT_MACHINE_SLOW"))
-+		if (!cfg_machine_slow)
- 			errors++;
- 	}
- }
-@@ -263,7 +264,7 @@ static void start_time_wait(void)
- 	now = gettime_ns(CLOCK_REALTIME);
- 	if (cfg_start_time_ns < now) {
- 		fprintf(stderr, "FAIL: start time already passed\n");
--		if (!getenv("KSFT_MACHINE_SLOW"))
-+		if (!cfg_machine_slow)
- 			errors++;
- 		return;
- 	}
-@@ -326,6 +327,9 @@ static int setup_rx(struct sockaddr *addr, socklen_t alen)
- 	if (bind(fd, addr, alen))
- 		error(1, errno, "bind");
- 
-+	if (cfg_machine_slow)
-+		tv.tv_sec = 2;
-+
- 	if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)))
- 		error(1, errno, "setsockopt rcv timeout");
- 
-@@ -512,6 +516,8 @@ static void parse_opts(int argc, char **argv)
- 	setup_sockaddr(domain, saddr, &cfg_src_addr);
- 
- 	cfg_num_pkt = parse_io(argv[optind], cfg_buf);
-+
-+	cfg_machine_slow = getenv("KSFT_MACHINE_SLOW");
- }
- 
- int main(int argc, char **argv)
-diff --git a/tools/testing/selftests/drivers/net/so_txtime.py b/tools/testing/selftests/drivers/net/so_txtime.py
-index 5b54ce76dff4..e7de8fe22c1e 100755
---- a/tools/testing/selftests/drivers/net/so_txtime.py
-+++ b/tools/testing/selftests/drivers/net/so_txtime.py
-@@ -6,6 +6,7 @@
- Test delivery time in FQ and ETF qdiscs.
- """
- 
-+import os
- import time
- 
- from lib.py import ksft_exit, ksft_run, ksft_variants
-@@ -15,17 +16,23 @@ from lib.py import NetDrvEpEnv, bkg, cmd, defer, tc
- 
- def test_so_txtime(cfg, clockid, ipver, args_tx, args_rx, expect_success):
-     """Main function. Run so_txtime as sender and receiver."""
-+    slow_machine = os.environ.get('KSFT_MACHINE_SLOW')
-+
-     bin_path = cfg.test_dir / "so_txtime"
- 
--    tstart = time.time_ns() + 200_000_000
-+    tstart = time.time_ns() + (2000_000_000 if slow_machine else 200_000_000)
- 
-     cmd_addr = f"-S {cfg.addr_v[ipver]} -D {cfg.remote_addr_v[ipver]}"
-     cmd_base = f"{bin_path} -{ipver} -c {clockid} -t {tstart} {cmd_addr}"
-     cmd_rx = f"{cmd_base} {args_rx} -r"
-     cmd_tx = f"{cmd_base} {args_tx}"
- 
-+    expect_fail = not expect_success
-+    if slow_machine:
-+        expect_success = False
-+
-     with bkg(cmd_rx, host=cfg.remote, fail=expect_success,
--             expect_fail=(not expect_success), exit_wait=True):
-+             expect_fail=expect_fail, exit_wait=True):
-         cmd(cmd_tx)
- 
- 
--- 
-2.54.0.563.g4f69b47b94-goog
-
+Grzegorz
+> --
+> pw-bot: cr
 
