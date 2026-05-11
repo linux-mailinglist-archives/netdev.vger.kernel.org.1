@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-286727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286728-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YM+gL777AWomnAEAu9opvQ
-	(envelope-from <netdev+bounces-286727-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:54:38 +0200
+	id 2AXoL/L8AWppnAEAu9opvQ
+	(envelope-from <netdev+bounces-286728-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:59:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68531511A2F
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:54:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8327A511B71
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:59:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4583230058DF
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:52:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 68984308D746
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:52:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D96E2402435;
-	Mon, 11 May 2026 15:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C9D402BA8;
+	Mon, 11 May 2026 15:52:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DU0LErS0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VI8nmkR2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0392882B7
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 15:52:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D022DF13F
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 15:52:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778514743; cv=none; b=UKbWHfsVGLtfPryQBGLu2sXgvaBZRszd7rPSNppAKo2/EsbWCxUYYlzKX8ALGiEnE5gGNuYp98emhpe1lh9z2QtxCGPHSXjyDYz5/GUJUul8YWcC/HPe/HxYr50Di79HS/xBEhahHRMu4TllHjCUGj6AvtnTSsPVlZJu+iAY0zg=
+	t=1778514750; cv=none; b=S85fhHMoOxmBBB8neZ5vXw8I/yz9KMHMr+ye6ZjjAST+XDGJXfjVQLbvSXjZJaahH3W7MjayJPfHg8bQfYpLjYBX/MwVNRDlPClUDovcw6JhCuU4t5vx3UKwqZWfDAJ6VsZAMO2htmmwU1WWrVsZa+rzTTYuapb3bQLAHNvFqdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778514743; c=relaxed/simple;
-	bh=PWnlaH/VHoTBHOyKr1PYCeLDcl360MRWwN1yVqXU1DA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q74hRRtnASMuQKH0iFWouUuO2RuJUyE/6QAM58hTeJY0OL9utIOY8SN2gaivbwPm9o8NllYxo3JwPLIn9tklph9GHWO2/rB/qsfhDTq0ekURFgiHPbXRbCziWJToaUna9a5W2oSV1MnxM/fSQGrYnlai9txJ35tGqmgNz57AsTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DU0LErS0; arc=none smtp.client-ip=209.85.214.195
+	s=arc-20240116; t=1778514750; c=relaxed/simple;
+	bh=LY8YpcvM3CXANbpB89jmDW3iNuQAInAhIYtroGvfyng=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=cePXtcUOrNJ4Q0WH0uQ5bZxnVNVAOjGBMBbVL9ZtNuBHC3QQLMRtU/kGR6vkaECCqA9eX+UfV6QbZWM/dBnUAXWNrqxwk+7CjE78EY/ZKkmjqv8PnMpuvEgPkZMLFDJhZF0LqCsmWlo5NLKrRU3Ox5rF939iBSLI9JAvZACjfRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VI8nmkR2; arc=none smtp.client-ip=209.85.214.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-2b788a98557so33252485ad.2
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 08:52:22 -0700 (PDT)
+Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-2b4583f0a1aso28622655ad.3
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 08:52:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778514742; x=1779119542; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Iw6QRvTV/LMuhQQo1Dz7cJ7TZ9rzFIru8u2Y0e3Fkk8=;
-        b=DU0LErS02UtFOz1CvdprQDo35r//v/63Q0MukmppoF8KpLUXsXCXSt/4snMFe+sC0F
-         SBNfGh1gbwrTLMfNotbO4A6N2M5cJ34hE1xC2//3mrBzlDc2aHY+ku9rz5136W/KiYER
-         Q/ZyLpO9Fj6SlLPHaEQ3B/zeLMJXXGpS+bOBt25A5YPNmsfG+UkZMvtC1U1zc5HBXvl0
-         4RxbBJ24i/hhgGTNo+QleD2jD9QervabuJMAg92s+cRw0eif9ffroQAVeqT/szrqlOfK
-         PppDdwVVgSM+QSkw7Q1iQschiJzf6vro29h0k60jZafDD/zTG27hunFHDvTEMCTbxIc7
-         Ndgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778514742; x=1779119542;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1778514748; x=1779119548; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Iw6QRvTV/LMuhQQo1Dz7cJ7TZ9rzFIru8u2Y0e3Fkk8=;
-        b=eoMFTY01cVH42H9DqXFFy5LckE5tHmN5GTDXtyV9AM8WvtDnxln4z3P9xAqLMDgPqv
-         iX3gzflHFGdOX8DcozQc7OcsqQ/9yRf7IWGrDZy2M6cxKxISjkHbzHm2nyojyTYGhoQg
-         eXW559JnKew1FRS3EHoE1w3StguHHZ2k2/2xISl+jNV7XWYYXq3coDNQxUep7UFNxz/3
-         VnWoHDvtD/GKWUSh1ryxeTqyxfpXSydJqRQY6W+D5b1Es9NPARtKG/Tz3iqRSkGyxz7D
-         L6pgVmqWMfVVIiTjOqBdaTsXHq98qf4F2ngRnl2uuu4AmsP07aBoxFnn6xq4Sk3ssmtf
-         fXqA==
-X-Forwarded-Encrypted: i=1; AFNElJ/m2FkLVAzgX6/tiLAQrtR+DUPeQ2eMUhYmKSIkb2EU7TnE0l0bWh0NgC7HFfjOqj1H1MTmGn8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzto5oQPygRnj9snzWoC7ZwF6KMvIMJVdt1MPLikZz3Ko3lKyjx
-	yDt3Fzwsmum0A8lAT2UHKACgM7oYMqTx5woQklcuQoEnsJWy1IQRV5qD
-X-Gm-Gg: Acq92OGwkJYB5RDcquN6ul5bdjWGVb6mAW6JGLdNAJ48ewxgvTBa+rSK8K2PDPJ+e2U
-	9wjsd1y6WGEWuHkzQTGwc5f21XPJ4z41g4DAEv3QCYjtbZFsGhgf5X3/b2ckV5VK6hzpymDTCs6
-	qQUWheDJwE2GYz3qkWs7ogaLafawzdKmKD/WPX9MfkmYmfwFGlQGPudD6OrVST2ufEp4zcVI+cG
-	PY2jmYbcAA5q01fXDAAxesqkEza9FznHlF0llm5Lr1w5i2Bli+bk/rN/7483/ASxvll1jT9dSDj
-	pOcA/V7JJSw+kO80Bte29lLyy2vl42maYOXHqJ6jO1hVZkre2O8xUrLpeQFPt4qhJCLGPc3Q6rc
-	hCbsXTGfQ5NHi+eV2PBYZPQhZN+vXEIwJfhMX9fp7fw97Pgb+ONv8iP1tolufAm66a3tPfILETc
-	9PJBdBbdI92PHxLf4cSOXahfXnCDUEErEuyHo=
-X-Received: by 2002:a17:902:f70b:b0:2ba:5e44:ce8f with SMTP id d9443c01a7336-2baf0bd5421mr152532675ad.0.1778514741911;
-        Mon, 11 May 2026 08:52:21 -0700 (PDT)
+        bh=QetRoHLjDkD2yyVDipEmrezVOT3nudkbaSue2EAREBo=;
+        b=VI8nmkR2du8rddqvTnrujuu5pWuAe2LlEPZXvRfpXS392qVA0dEO0w8mqtZckiX4mh
+         3Xbz1/PLM+H2o9ysGW4udUBMZWyr41lxhsuRyqfBajIJyziUx6n7sYFtKQr11mB9efJU
+         6tg3FjPbNvWDlIBZ+jWwTYSQauG1OuvNI44W1eRIGQkYbP6MOj0h7co2fxKfAwL0TWwd
+         m5i47GWZk8Nrg6w4nUet/PJfaRxBuYUYcE12y6y/vg3+OKEp4dLYwk8qtfjJAgFdmC4C
+         yGrnn7eje6RG4c7MQMlWRSH8dI1J6e+2hvCtNtT+rX4HUOsznffONOMnmXjzfBD2DJUn
+         B0uQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778514748; x=1779119548;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=QetRoHLjDkD2yyVDipEmrezVOT3nudkbaSue2EAREBo=;
+        b=DB0iZLDGaBecr/exLrhabj6ilvPho9P9c+gFKSlwMz6WwNEI8dFTfrGSTVxnkop2/6
+         6Npbx+bySwaYh0cT23QRYMFm+XQg61Y3qLgxPfFz39qd3rNouhHp71llUTXS78BC6Nlr
+         bAkieKUf2rRUi2cZBHyDr7m+SdVP+qd/f9NLeHBjF2cWbXh7J8vu7p0v3zLUZ/VsRzec
+         bP9HyneSAjWiR0Qv2YEr942Iya3TAYGZIZ5lvDu3O9urCCPAS1uI4DSw+DHCfs9+SKns
+         W5CFFXgPXjq9w85uhgFGCaXcIYlkbSWD60WrN7mBoX9DWMPdDa9xLYBUl/ihuHYo0eWZ
+         XwxQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+GFupqXmMnyy0gW+W2dS7DxxTMy/srJw+D4cpnwasl0I5oF64Zdc9Q3QfRqFHU13x0gu3pmGI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIJVoht7FcP4wj+HDbRSFxNiW+XsHKLdIl5yWgTfsUBUNIRfYj
+	wiQVbTVggQ3EYPlV8t3T2VG1jt4PYHDsetvITlVn5edmScIp3HMYfHFt
+X-Gm-Gg: Acq92OEzyjcKc0Gp0QJ/MgdtmRTxIp1XF9FBhNBFczejufWVAumgBcGFjKVl9J+/3f4
+	1cMOA7Rkdgy5LB4tagBG6DrNXtAlqkOMqaZoZqbzKWFAyGYB78BFmCyDEFCH4X3hrrwKONGqPUx
+	GJkNj+/jByviJAhEEif2vBA84tom5baZH6575egBACd6anxQJjkEpLg+MLZwWsfFz1UWl7Ji3r+
+	OcWyrkNMl9dVGsQ+isBMbChIIrbgHsmgUkX6EI/mxwQPvVOsda/fTG9PTF5YJ/n0LtMuzL6aBJD
+	uiwQ6nzYbV6Lkdb+7ZilIfrqZvSucBka/2JFDQsEJgy+IATWA+EhnsH0L9AFRUbJxgyU6k16iBo
+	ONci56RHFhkVUD17Wtfth0fADUmbb/1xeqroiwdDKGOwLBO2QF7jhXVY7x1VnCr97sx9u/yr3Ni
+	VZmHqCkoxPbwxtUvrwcJUuqlSyR+6fvIKgl5U=
+X-Received: by 2002:a17:902:f54f:b0:2b2:4d36:7ba with SMTP id d9443c01a7336-2bc7a847f38mr103896425ad.0.1778514748205;
+        Mon, 11 May 2026 08:52:28 -0700 (PDT)
 Received: from fedora.localdomain ([222.20.193.20])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1e78c6csm112117885ad.60.2026.05.11.08.52.18
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1e78c6csm112117885ad.60.2026.05.11.08.52.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 08:52:21 -0700 (PDT)
+        Mon, 11 May 2026 08:52:27 -0700 (PDT)
 From: Xingwang Xiang <v3rdant.xiang@gmail.com>
 To: john.fastabend@gmail.com
 Cc: kuba@kernel.org,
@@ -85,10 +87,12 @@ Cc: kuba@kernel.org,
 	netdev@vger.kernel.org,
 	mrpre@163.com,
 	Xingwang Xiang <v3rdant.xiang@gmail.com>
-Subject: [PATCH net v4 0/2] net/tls: fix UAF when TLS_RX is set on sockmap socket
-Date: Tue, 12 May 2026 00:52:07 +0900
-Message-ID: <20260511155210.32926-1-v3rdant.xiang@gmail.com>
+Subject: [PATCH net v4 1/2] net/tls: reject TLS_RX setsockopt on psock-owned sockets
+Date: Tue, 12 May 2026 00:52:08 +0900
+Message-ID: <20260511155210.32926-2-v3rdant.xiang@gmail.com>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260511155210.32926-1-v3rdant.xiang@gmail.com>
+References: <20260511155210.32926-1-v3rdant.xiang@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,21 +100,21 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 68531511A2F
+X-Rspamd-Queue-Id: 8327A511B71
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286727-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286728-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -127,31 +131,55 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-This series fixes a use-after-free triggered by configuring TLS RX on a
-socket that is already inserted into a sockmap (the reverse of the order
-that is already guarded against by tcp_bpf_check_ulp).
+When a TCP socket is inserted into a sockmap before TLS RX is
+configured, tls_sw_strparser_arm() saves sk_psock_verdict_data_ready
+as rx_ctx->saved_data_ready.  On data arrival tls_rx_msg_ready()
+calls saved_data_ready(), which is sk_psock_verdict_data_ready().
+That calls tcp_read_skb(), draining sk_receive_queue via
+__skb_unlink() without advancing copied_seq, because SK_PASS through
+sk_psock_verdict_recv() does not call tcp_eat_skb().
 
-Patch 1 adds the symmetric check to do_tls_setsockopt_conf: if a psock
-is already attached when TLS_RX is requested, return -EBUSY before any
-strparser state is touched.
+tls_strp_msg_load() then sees tcp_inq() >= full_len (stale), calls
+tcp_recv_skb() on an empty queue, triggers WARN_ON_ONCE(!first), and
+returns with rx_ctx->strp.anchor.frag_list still pointing at a
+psock-owned (potentially freed) skb.  tls_decrypt_sg() subsequently
+walks that frag_list, yielding a use-after-free.
 
-Patch 2 adds a regression test to the KTLS selftest suite that drives
-the vulnerable setup and verifies the kernel either rejects the
-combination or handles it correctly end-to-end.
+The existing guard only covers the reverse order: a sockmap update
+already fails with EBUSY when the socket has TLS ULP set
+(tcp_bpf_check_ulp).  Add the symmetric check: if a psock is already
+attached to the socket, reject setsockopt(TLS_RX) with EBUSY before
+any strparser state is modified.
 
-Xingwang Xiang (2):
-  net/tls: reject TLS_RX setsockopt on psock-owned sockets
-  selftests: bpf: add test for KTLS+sockmap reverse-order UAF
+Signed-off-by: Xingwang Xiang <v3rdant.xiang@gmail.com>
+---
+ net/tls/tls_main.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
- net/tls/tls_main.c                            |   9 ++
- .../selftests/bpf/prog_tests/sockmap_ktls.c   | 109 ++++++++++++++++++
- .../selftests/bpf/progs/test_sockmap_ktls.c   |  21 ++++
- 3 files changed, 139 insertions(+)
-
+diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
+index fd39acf41..46cdd38ae 100644
+--- a/net/tls/tls_main.c
++++ b/net/tls/tls_main.c
+@@ -648,6 +648,15 @@ static int do_tls_setsockopt_conf(struct sock *sk, sockptr_t optval,
+ 	if (sockptr_is_null(optval) || (optlen < sizeof(*crypto_info)))
+ 		return -EINVAL;
+ 
++	if (!tx) {
++		struct sk_psock *psock = sk_psock_get(sk);
++
++		if (psock) {
++			sk_psock_put(sk, psock);
++			return -EBUSY;
++		}
++	}
++
+ 	if (tx) {
+ 		crypto_ctx = &ctx->crypto_send;
+ 		alt_crypto_info = &ctx->crypto_recv.info;
 -- 
 2.54.0
 
