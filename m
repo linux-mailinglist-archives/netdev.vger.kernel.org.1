@@ -1,309 +1,259 @@
-Return-Path: <netdev+bounces-286694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286695-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gFRIJBvwAWpfmgEAu9opvQ
-	(envelope-from <netdev+bounces-286694-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:04:59 +0200
+	id 6GARBXjwAWpfmgEAu9opvQ
+	(envelope-from <netdev+bounces-286695-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:06:32 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84901510CD9
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:04:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 16DDB510D6C
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:06:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8359A3058662
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:53:22 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DAAF130074C1
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F6BD3FFAC6;
-	Mon, 11 May 2026 14:53:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3DBB3FFAC6;
+	Mon, 11 May 2026 14:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hZ/ytBvo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NYEuVt6g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF1CA3FF89D
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 14:53:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778511201; cv=pass; b=Q56C0XMMNbXsvsewpkScaROlqb3EDFpMwTLsiJJpuUOCK5/tlo5PX806vHg1pVIM6ltvYOGacSKmJnX+TadmKQoxqqJcoAx3+OLTf6amXDK7cH25t2c9Rie8yRHvqK8WxmcaxBayamOiRhA8Kft14Sb7iZvmRwNF09bWEVlDTNA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778511201; c=relaxed/simple;
-	bh=q2TCtoSLf2PLJkmKD3x1+eVXl13mdaDYWUrpr08E9W4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YOGjQEFYiSYB4gXJiOwaSA4UDBC0yYPIUnXJ9C9z5B3ChcB0vnJolSo7jjYc4kUvtB/aWJjcyAxoqtllCttxncjIPRv0KSHeB1bMiMi7rEoHfi86rOh+PoGGI7VLV59xaY7PMEvm+RLZ2duae34n2m23GI3AmlPLHsbCQl5SqLU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hZ/ytBvo; arc=pass smtp.client-ip=74.125.224.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0383FE67E
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 14:55:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778511351; cv=none; b=t0oc376WschxvS5rtgI6h+HZ1GbXZsuyZ9ULbyE1ksyUEcp8BtYGrGqWvb+Kt0Lk9QXu9d4/F8zfdP+tGVe2sQUpgMMWnup1NoJ6BLbfJSDB7XtWgC6Q4EbBsr2egM/0h6VcND4U0b3n8h5wackiTOUsSKJ9D1IjezWJcM9/Vsw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778511351; c=relaxed/simple;
+	bh=KDcP1mIxyjc3WE2ChlMOYepGWkKFHZmtQU0cPtkBrgs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qz23aVITUMRW/cP8/W1CnPztsAt0qjfgf5a8m9NSDBvTC5j7PKsMKNERL2h2uidDJsj6AwA9Tp68CBJYixMSED6aD2oy8FjM5mgnFfvnh/d7xuUYC+XJMG95nI1LoTCjES2bbp5jM/RMwMch3/FbWYzAYQmfsSPuheaU9LKb1zA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NYEuVt6g; arc=none smtp.client-ip=209.85.214.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-65c364b893aso4226774d50.0
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 07:53:19 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778511199; cv=none;
-        d=google.com; s=arc-20240605;
-        b=WqKOo2b0o0TDZxMzfj0KLeYSDpxPb2DvtLoR9xna1n1RV7hPKFZyME6nPNAIGXAH3l
-         gdMq2CqFibFfwfkmiomCjAJ1O4iCsrnLQa7sE+NCTo+kDjH5Q2Bofbx4z+28aJYB3wov
-         TSFV6cxhzRFHfDUb7zXFO8Wy07Feyh2xg/FVbaDdUy0jMWaDvxUEz9P4/5NKOUxXYgUq
-         bLCXW/9BYYJ6HOY1Zp1IUg5Iw1GUwpfCYnvqyabtxK9hC0BUqyFr+O+oPuEKmg4/Hra/
-         JQIj/SqVcySGtlBxtOF8+7p0FLr57KN3gjCi+doGxy7sLUheGPtRXSUSS4qrQpDdGU3Z
-         Jl/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=mH7N4j++r3IaudrlTt6rvym5myFHJfjExvIPYpFZaxQ=;
-        fh=NUmgxLSrGAvpF45nyQdBNY4bI0F8LnK0eck9qoVJpUw=;
-        b=SRtjfhJD7mUge/BzEsTo9z8l3lwzHwjw4oJM+goECD+8n19/hNvZLAANnnsaJwH9Vd
-         tEsagkkODLbCJhrLzU7Hgs7CtdkEMiQFE+knub0tq9wfXaq5FCiuzK170pxtmeQOMCgp
-         aGd7V+L6ySvM9fvVYg15U+eccVqas84FxuM11udPSufmxsgd5PH24W0XXRejYyMmKCvx
-         G+41fo2252U7d6ZKTILxzPFjcXSfNiVZKKSH4yE6ycido5VSKbN/JIISEet+gZRn56ph
-         KEmfu3FxCBbHlyiwMfjJ1oESyPiE1CJRqiD7lBknH7v4lYT49q5X9d14Y7Tq0m+AyLT6
-         WVhg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-2bab82d75fdso23872125ad.2
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 07:55:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778511199; x=1779115999; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mH7N4j++r3IaudrlTt6rvym5myFHJfjExvIPYpFZaxQ=;
-        b=hZ/ytBvo/pzqfEAa31ZkNcjZ0PTdYSDkFCCDo6o0tMj2aPedQ1lxUpS51MXkssVl2p
-         u8KgFkv1uFM8EILRW3IAM5acmBYygxsxmnQRboXps0XOFxxrprDO+GdgRshNuHbPwecW
-         azkDgakwyCre9jli/iI+CiquoLpdtpnjEXYl0VQOoFNVMAuIlSkQQd+GhnjYSnGDlwHd
-         A+KdG8lsSzuCy0waoXWtoGtjT0lhwTT5g5WDIGSGqhZHq+sBF3uc0kvaH5BcHwQ3w++l
-         0zPZjcd6aBnD4etsPNq1XRigdY4ctQyaM1f400JGl4tABLUd7sKkNltkNvv9fB9DMQol
-         1Jfg==
+        d=gmail.com; s=20251104; t=1778511350; x=1779116150; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=d7IqJggZrwHqytcUiR9O/Gr2W4bZC/PK+mrUhm5A2Io=;
+        b=NYEuVt6gHMpcNSUqzIfZouOCBWrAVZ4RN0GWRc+OEmEd+nuHthSiGIyOs3x0KSF5gD
+         SrU5Bmq/RRqBYExeWQhuAxMWOdg//p0qfKuFWCpf3BSqrelGyf4rTjzrJ0tKfSg9hU6L
+         iO6pqKlnGgJa7nJFVjdRP+WMp6mVPknH9zoGYu7xeM5VDq0JHs/WrV84XOcjXGc70L5J
+         SIsiTMtV0IMO9UitfFXDbj0IgynsuTSv9ArkWtfdovvUjXsfLcSQmKvpJkldF70ZtPXw
+         X0BZsrOqlIgEGpkhWwFlB/o2gQhpSOv7ZFu++MJrkixwNRK0lx3wmQJmibvEmJmmehnN
+         nvbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778511199; x=1779115999;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=mH7N4j++r3IaudrlTt6rvym5myFHJfjExvIPYpFZaxQ=;
-        b=jFXgVn0yUNjTpYDKY82UJI83rExIgwShkPdktndCE3E9Op4SyD5jh51Nsc+18wUKZb
-         IbLAJtzOegUsc2j3WhgwNzABpnqnO9EtK/o0YLTHdB0kQ5uI2si/uLHCZNh9lgq3i3US
-         Ic1bw/wQc4yP2J1qw8hsSRinsmzFO2Wv1nXsyYpcgboPgh9dEiZve9uDVpnJTefV6RTa
-         jAJGDL075g2yaa8QFKhLpt2r45qmC/osZ4AZJUWHZ7pWdn6agEZk8WZHSIUUzFe2ERjm
-         Ig3P/W/PQzhozjGg7A0ZhSYaJZoyVKjZ5Urj0lBSrUEaZAAKq6WYopuJlINnMVjKu6lV
-         6LKQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/XD/hlZimwbWmzWzKT8w7UlfbAazPUJ9rSiSwqdrvesoCABS3gzG9rfuGgvX//9HbYl80EgQI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeYRM4XWoDDrYiSvjOPm60OfbAzs/hUWWolC6hAZH78TeD82/x
-	cjZI8lIxutnUlmD9qewlFAoKP2eGFKp7hQ4qAJGZq2o02eNvQkeyWw87XIp7W9GJLmR/NbfAUnG
-	owsDIWMNGltsO7k6b8HI52HfflzdtT+E=
-X-Gm-Gg: Acq92OHxhERSxK31wXnWB8ZWkatWWPgIRWVSDrBx4jIdteSWEzHcspeM1NIuDqx2Rkf
-	XOfMlKOs247lAOzt/b27E815dNBNRrYReJT0rMYuLXq3vJkdyB9uroZwzsxJCJogDc3kwNEoIaj
-	3PBIIntIF/PZdfFaovY51MWS2euKGjUuw2lcqCwYJopz2KrIrHcIGpG9Zb06C6qkJj+D91zDxQj
-	9TlPZIIh44+TKBE0RCjh9yxVW+VlItIuEGgw7zYse8oAMwORkPrLCBtc2NxuE8LO54M/4VIS+/v
-	HfZg7DUb+BFD2e+VkwZO9cS/fdC6aFRDVSi6wfocV7YMTqYHx8y3fHKyTyuuxfyUJ08=
-X-Received: by 2002:a05:690e:b4c:b0:656:ad2e:98b5 with SMTP id
- 956f58d0204a3-65d94c4c72emr14661107d50.35.1778511198684; Mon, 11 May 2026
- 07:53:18 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1778511350; x=1779116150;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=d7IqJggZrwHqytcUiR9O/Gr2W4bZC/PK+mrUhm5A2Io=;
+        b=qCOe26Ho4J7FofouaFZGStEPRQYimKJHadd8NdvSsJ84Ck35JgM28sk8bucEgyDJcy
+         06rlnX3a8p9R7ptBYhprXQfxHxDqGTBp3hE2JmRoPeAaPLbGlBM7xIrvpkfkch4mnx5a
+         owXvHmHV1y7eW00P+xopFSQsDlFoz3e/zV4wTwcNBeUfA+9tGrj3Ie5CgTDddz8SMgb2
+         tzvQbz11NhkbeTmx6VNIiJVesoJdTwn3yMk8S00PQD/Oi64kzgDNNNtm9OsKTCPfAHAs
+         Wm9PbWzMLZ6dNTfFynqVG5bTeyJa0Fq2C2MzrRgH5DcMzwKjtE3ZzzjqZDz5GF1uPA1x
+         xsDA==
+X-Forwarded-Encrypted: i=1; AFNElJ8Whal5E1P92gCcwoeG5jxXetRPnhZjZggfi1OFYsPINX23pGwMGnur6HGXeQLDHeneJoXj0zA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeEPzJkSPxpoPazNpFs3p4xTMoJL1bDTu/wJOc8TzqV6KlmcG/
+	1TMHjMEjpLhZWN71OaZiWBAyFfdtwmXDTNhH/yrbEcR8B3B6Eomcpw3B
+X-Gm-Gg: Acq92OFsBItnnPdDUc/w0iT+daVGj3h6tihNbDHFI6tpZ3J4SazqzzqyanEDW1QWuQu
+	TMtBOpfDnb4B1iE8Uutdu5qLZiNQiefsD6BuFtnzd86lxKHOvwmhL21+EEBpuQBG/b7ty42hnw/
+	SklAWWkAAsElX8QJAg/qFRHvQng5GH+mZj/sfduPv/6btmQHo2zDe5uyQvhjirhjuj2WX1zo0/S
+	Vfis7R7bfmGAmv8OdiAzW6534wGcqx5lnwOFxITLzAp7I7n6PrIZNFyTzt4Pwytmuj9it0+dR7W
+	wmZVHHi2f02Nvdhizg0dvEOpQeRZuc+/7DZm51EomAQ5JKDHtJd+LWaKSN1T1ubsEz2qBzhAPog
+	gLQ9esRVpb7JAbkSrj7C+AWrGzz+XtMjQhz8XHbF63FgE1nr6zCXIhp+w046YhkJacTj2+PAmTr
+	D+NPuXYdb4V6MU
+X-Received: by 2002:a17:902:f54f:b0:2b2:4d36:7ba with SMTP id d9443c01a7336-2bc7a847f38mr101597595ad.0.1778511349533;
+        Mon, 11 May 2026 07:55:49 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1e8eef3sm107168145ad.65.2026.05.11.07.55.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 May 2026 07:55:49 -0700 (PDT)
+Date: Mon, 11 May 2026 07:55:48 -0700
+From: Stanislav Fomichev <sdf.kernel@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Yonghong Song <yonghong.song@linux.dev>, 
+	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Tenzin Ukyab <ukyab@berkeley.edu>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v1 bpf-next 7/8] bpf: tcp: Add SOCK_OPS rcvlowat hook.
+Message-ID: <agHtUHUEMis-p5Aw@devvm7509.cco0.facebook.com>
+References: <20260508073355.3916746-1-kuniyu@google.com>
+ <20260508073355.3916746-8-kuniyu@google.com>
+ <af4AO2-9jwluWuik@devvm7509.cco0.facebook.com>
+ <CAAVpQUBTbcpf+kNOqXj-2=Qjx86TeZ-sHVGKT-Vwj=GVXz4hEA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1778506829.git.michael.bommarito@gmail.com> <490e228dd02983fb1530fb114d4174148f810261.1778506829.git.michael.bommarito@gmail.com>
-In-Reply-To: <490e228dd02983fb1530fb114d4174148f810261.1778506829.git.michael.bommarito@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 11 May 2026 10:53:07 -0400
-X-Gm-Features: AVHnY4KdJ6uIUItlvWVm4hjtGOIr8Ds-NBKNTO6jvd9cqCVO4aKGk0OqFI1lRGw
-Message-ID: <CABBYNZL-f+AzFWdhvLcxdf0oCXbgr3AXqM1W2npOPZEv0gRA6w@mail.gmail.com>
-Subject: Re: [PATCH 1/4] Bluetooth: hci_sync: pin conn across hci_le_create_conn_sync
-To: Michael Bommarito <michael.bommarito@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Mat Martineau <martineau@kernel.org>, netdev@vger.kernel.org, 
-	stable@vger.kernel.org, Pauli Virtanen <pav@iki.fi>, Aaron Esau <git@aaronesau.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 84901510CD9
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAAVpQUBTbcpf+kNOqXj-2=Qjx86TeZ-sHVGKT-Vwj=GVXz4hEA@mail.gmail.com>
+X-Rspamd-Queue-Id: 16DDB510D6C
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286694-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-286695-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,berkeley.edu,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.991];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luizdentz@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,devvm7509.cco0.facebook.com:mid,bpf_sock_ops.data:url]
 X-Rspamd-Action: no action
 
-Hi Michael,
+On 05/08, Kuniyuki Iwashima wrote:
+> On Fri, May 8, 2026 at 8:28 AM Stanislav Fomichev <sdf.kernel@gmail.com> wrote:
+> >
+> > On 05/08, Kuniyuki Iwashima wrote:
+> > > Now, it is time to add the new hooks for BPF_SOCK_OPS_RCVLOWAT_CB.
+> > >
+> > > Let's invoke the BPF SOCK_OPS prog when
+> > >
+> > >   1. TCP stack enqueues skb to sk->sk_receive_queue
+> > >      -> tcp_queue_rcv(), tcp_ofo_queue(), and tcp_fastopen_add_skb()
+> > >
+> > >   2. TCP recvmsg() completes
+> > >      -> __tcp_cleanup_rbuf()
+> > >
+> > > This will allow the BPF prog to parse each skb and dynamically
+> > > adjust sk->sk_rcvlowat to suppress unnecessary EPOLLIN wakeups
+> > > until sufficient data (e.g., a full RPC frame) is available
+> > > in the receive queue.
+> > >
+> > > Note that the direct access to bpf_sock_ops.data is intentionally
+> > > disabled by passing 0 as end_offset.
+> > >
+> > > Instead, the BPF prog is supposed to use bpf_skb_load_bytes()
+> > > with bpf_sock_ops because payload is not in the linear area
+> > > with TCP header/data split on and skb may contain a RPC
+> > > descriptor in skb frag.  This also simplifies the BPF prog.
+> > >
+> > > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> >
+> > I was reading the series expecting to find some skb_queue_walk-like
+> > implementation, but since it's a cgroup hook we obviously don't
+> > need to do that.. So at this point BPF_SOCK_OPS_RCVLOWAT_CB_FLAG
+> > is basically a "rx queue skb" hook, right?
+> 
+> If recvmsg() hook w/o skb is not confusing, yes.
+> 
+> > So should we make
+> > the name more generic? There is really nothing lowat-specific
+> > here besides your new kfunc to read the payload?
+> 
+> Do you have any suggestions?  BPF_SOCK_OPS_RCVQ ?
 
-On Mon, May 11, 2026 at 10:34=E2=80=AFAM Michael Bommarito
-<michael.bommarito@gmail.com> wrote:
->
-> hci_le_create_conn_sync() runs from the cmd_sync workqueue with a
-> struct hci_conn pointer it interprets out of the work item's void
-> *data argument. The hci_conn_valid() check at function entry is a
-> TOCTOU: nothing prevents hci_disconn_complete_evt() (executing on
-> hdev->workqueue rx_work) from running between the
-> hci_conn_hash_lookup walk in hci_conn_valid() and the body's first
-> deref. hci_disconn_complete_evt() -> hci_conn_del() -> hci_conn_cleanup()
-> unregisters the device and drops the final kref, which kfrees the
-> hci_conn slot. The cmd_sync callback then writes through the freed
-> pointer (clear_bit on conn->flags, conn->state, the four
-> le_conn_*_interval fields).
->
-> A KASAN slab-use-after-free splat in cache kmalloc-8k confirms the
-> bug on linux-next tip commit bee6ea30c487 ("Add linux-next specific
-> files for 20260421") under UML+KASAN, matching the slab geometry of
-> the syzbot trace fixed in commit 035c25007c9e ("Bluetooth: hci_sync:
-> Fix UAF in le_read_features_complete").
->
-> Follow the reference-pinning pattern from commit 035c25007c9e
-> ("Bluetooth: hci_sync: Fix UAF in le_read_features_complete") and
-> commit 0beddb0c380b ("Bluetooth: hci_conn: fix potential UAF in
-> create_big_sync"): the queue site takes a reference via
-> hci_conn_get() so the slot is not freed between
-> hci_disconn_complete_evt() retiring the conn and the cmd_sync
-> callback / completion handler returning. The completion handler
-> drops the reference on every exit path, including the -ECANCELED
-> short-circuit.
->
-> Introduce a static helper hci_cmd_sync_queue_conn_once() so the
-> get/put pair is not open-coded at every queue site. See the
-> helper's kerneldoc for the -EEXIST contract.
->
-> The hci_conn_valid() check in the callback body is retained: a
-> logically-deleted-but-still-referenced conn has stale
-> hdev->conn_hash.list state, and continuing to drive a connection
-> attempt on it would be a logic bug even though the memory is safe.
->
-> Pauli Virtanen posted a series-wide variant of this fix as
-> https://lore.kernel.org/linux-bluetooth/e18591f264c50e15917cb8b9e5f9798d9=
-880979d.1762100290.git.pav@iki.fi/
-> (PATCH v2 8/8, 2025-11-02). KASAN reproducer captured under
-> UML+KASAN (linux-next tip bee6ea30c487).
->
-> Fixes: 881559af5f5c ("Bluetooth: hci_sync: Attempt to dequeue connection =
-attempt")
-> Cc: stable@vger.kernel.org
-> Assisted-by: Claude:claude-opus-4-7
-> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
-> ---
->  net/bluetooth/hci_sync.c | 41 ++++++++++++++++++++++++++++++++--------
->  1 file changed, 34 insertions(+), 7 deletions(-)
->
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index fd3aacdea512..b20e07474257 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -786,6 +786,31 @@ int hci_cmd_sync_queue_once(struct hci_dev *hdev, hc=
-i_cmd_sync_work_func_t func,
->  }
->  EXPORT_SYMBOL(hci_cmd_sync_queue_once);
->
-> +/* Queue an HCI command entry once, pinning a hci_conn for the duration.
-> + *
-> + * On success, the cmd_sync queue owns one hci_conn_get() reference;
-> + * the supplied destroy callback must hci_conn_put() to balance.
-> + *
-> + * On any failure return (including -EEXIST, where
-> + * hci_cmd_sync_queue_once() neither invokes destroy nor consumes the
-> + * data pointer because an existing entry already owns the slot), the
-> + * helper releases the reference before returning, so callers do not
-> + * need to discriminate failure codes to keep the refcount balanced.
-> + */
-> +static int hci_cmd_sync_queue_conn_once(struct hci_dev *hdev,
+Yeah, idk, maybe something like this :-)
 
-Id suggest we dropped the once at the end so just hci_cmd_sync_queue_conn.
+> 
+> 
+> >
+> > > ---
+> > >  include/net/tcp.h       | 14 ++++++++++++++
+> > >  net/ipv4/tcp.c          |  2 ++
+> > >  net/ipv4/tcp_fastopen.c |  2 ++
+> > >  net/ipv4/tcp_input.c    | 10 ++++++++++
+> > >  4 files changed, 28 insertions(+)
+> > >
+> > > diff --git a/include/net/tcp.h b/include/net/tcp.h
+> > > index 4e9e634e276b..003e46c9b500 100644
+> > > --- a/include/net/tcp.h
+> > > +++ b/include/net/tcp.h
+> > > @@ -737,6 +737,20 @@ static inline struct request_sock *cookie_bpf_check(struct net *net, struct sock
+> > >  }
+> > >  #endif
+> > >
+> > > +#ifdef CONFIG_CGROUP_BPF
+> > > +void bpf_skops_rcvlowat(struct sock *sk, struct sk_buff *skb);
+> > > +
+> > > +static inline void tcp_bpf_rcvlowat(struct sock *sk, struct sk_buff *skb)
+> > > +{
+> > > +     if (BPF_SOCK_OPS_TEST_FLAG(tcp_sk(sk), BPF_SOCK_OPS_RCVLOWAT_CB_FLAG))
+> > > +             bpf_skops_rcvlowat(sk, skb);
+> > > +}
+> > > +#else
+> > > +static inline void tcp_bpf_rcvlowat(struct sock *sk, struct sk_buff *skb)
+> > > +{
+> > > +}
+> > > +#endif
+> > > +
+> > >  /* From net/ipv6/syncookies.c */
+> > >  int __cookie_v6_check(const struct ipv6hdr *iph, const struct tcphdr *th);
+> > >  struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb);
+> > > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> > > index 1d9e52fc454f..80144b97a87a 100644
+> > > --- a/net/ipv4/tcp.c
+> > > +++ b/net/ipv4/tcp.c
+> > > @@ -1602,6 +1602,8 @@ void __tcp_cleanup_rbuf(struct sock *sk, int copied)
+> > >               tcp_mstamp_refresh(tp);
+> > >               tcp_send_ack(sk);
+> > >       }
+> > > +
+> > > +     tcp_bpf_rcvlowat(sk, NULL);
+> > >  }
+> > >
+> > >  void tcp_cleanup_rbuf(struct sock *sk, int copied)
+> > > diff --git a/net/ipv4/tcp_fastopen.c b/net/ipv4/tcp_fastopen.c
+> > > index 471c78be5513..91bf421fc5b6 100644
+> > > --- a/net/ipv4/tcp_fastopen.c
+> > > +++ b/net/ipv4/tcp_fastopen.c
+> > > @@ -281,6 +281,8 @@ void tcp_fastopen_add_skb(struct sock *sk, struct sk_buff *skb)
+> > >       TCP_SKB_CB(skb)->seq++;
+> > >       TCP_SKB_CB(skb)->tcp_flags &= ~TCPHDR_SYN;
+> > >
+> > > +     tcp_bpf_rcvlowat(sk, skb);
+> > > +
+> >
+> > I'm also not sure about the particular placement of some of these..
+> > For example here, why do it before updating tp? Why not after?
+> >
+> > (and same for tcp_ofo_queue)
+> 
+> Basically, it's to give the same snapshot with tcp_queue_rcv().
+> 
+> For example, if you call tcp_bpf_rcvlowat() before updating
+> TCP_SKB_CB(skb)->seq in tcp_fastopen_add_skb(), BPF
+> prog will need to implement an unlikely if branch to strip SYN.
+> 
+> Also, TCP stack can queue overlapping skb into recvq.
+> Once you update rcv_nxt with a new skb, you cannot infer
+> the previous one from skb->len.
 
-> +                                       hci_cmd_sync_work_func_t func,
-> +                                       struct hci_conn *conn,
-> +                                       hci_cmd_sync_work_destroy_t destr=
-oy)
-> +{
-> +       int err;
-> +
-> +       err =3D hci_cmd_sync_queue_once(hdev, func, hci_conn_get(conn), d=
-estroy);
-> +       if (err)
-> +               hci_conn_put(conn);
-> +
-> +       return err;
-
-Then we incorporate return (err =3D=3D -EEXIST) ? 0 : err; logic above, so
-I don't think any caller should require queuing multiple procedures
-for the same conn.
-
-> +}
-> +
->  /* Run HCI command:
->   *
->   * - hdev must be running
-> @@ -6982,36 +7007,38 @@ static void create_le_conn_complete(struct hci_de=
-v *hdev, void *data, int err)
->         bt_dev_dbg(hdev, "err %d", err);
->
->         if (err =3D=3D -ECANCELED)
-> -               return;
-> +               goto done;
->
->         hci_dev_lock(hdev);
->
->         if (!hci_conn_valid(hdev, conn))
-> -               goto done;
-> +               goto unlock;
->
->         if (!err) {
->                 hci_connect_le_scan_cleanup(conn, 0x00);
-> -               goto done;
-> +               goto unlock;
->         }
->
->         /* Check if connection is still pending */
->         if (conn !=3D hci_lookup_le_connect(hdev))
-> -               goto done;
-> +               goto unlock;
->
->         /* Flush to make sure we send create conn cancel command if neede=
-d */
->         flush_delayed_work(&conn->le_conn_timeout);
->         hci_conn_failed(conn, bt_status(err));
->
-> -done:
-> +unlock:
->         hci_dev_unlock(hdev);
-> +done:
-> +       hci_conn_put(conn);
->  }
->
->  int hci_connect_le_sync(struct hci_dev *hdev, struct hci_conn *conn)
->  {
->         int err;
->
-> -       err =3D hci_cmd_sync_queue_once(hdev, hci_le_create_conn_sync, co=
-nn,
-> -                                     create_le_conn_complete);
-> +       err =3D hci_cmd_sync_queue_conn_once(hdev, hci_le_create_conn_syn=
-c, conn,
-> +                                          create_le_conn_complete);
->         return (err =3D=3D -EEXIST) ? 0 : err;
->  }
->
-> --
-> 2.53.0
->
-
-
---=20
-Luiz Augusto von Dentz
+I see, makes sense, thanks!
 
