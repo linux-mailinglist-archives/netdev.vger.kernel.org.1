@@ -1,260 +1,194 @@
-Return-Path: <netdev+bounces-286580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286581-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mLN9DmapAWqFhgEAu9opvQ
-	(envelope-from <netdev+bounces-286580-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 12:03:18 +0200
+	id qDciOgiqAWoMhwEAu9opvQ
+	(envelope-from <netdev+bounces-286581-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 12:06:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0AA350B80C
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 12:03:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FB8850B8A9
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 12:05:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E6C043061E90
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:46:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DABBD30E6DED
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:50:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4F6A34751B;
-	Mon, 11 May 2026 09:46:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88783C1978;
+	Mon, 11 May 2026 09:50:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Nt+zIsAM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ez4G0l1U";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="iGYIg1UJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012025.outbound.protection.outlook.com [52.101.43.25])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8162A31F9BB;
-	Mon, 11 May 2026 09:45:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415913BED16
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 09:50:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778492760; cv=fail; b=RULQgWVayXZqAlYTM78pQKq4Ud68IAIwG2TLzKcGRmkW01e18yBO1HHYMyMTjmO4A4tRIK5XVLMEm4loPyQqh+otNXILVYoLqecOfvZC+DJAXKB9MrKi/fdTSTYFYiLU1FCRFM6mXrWHD4k2VXPaGMXi2g5OS1DpwDXTE1zcOBQ=
+	t=1778493050; cv=pass; b=i6Wu/vczehcxIOoE9DRJJ7X54SRomu4zybov9eJ6EfR2NZWhxt8outlXEJlxO/ZZvRrxSdH94vURNlfqXg95LaEEsJtsCrXW/7kqmc1PCu6HbOEpFr6i5ZbhNJ9FDvTmU33x/hSe9h4hgMlzRHr3LslNvkITBBTdg5hy+ogTeiM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778492760; c=relaxed/simple;
-	bh=7oSuAU0xkftyD4Vo8X/Zb2Xd5EN957etOevIuGFtEeg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=N+bDg3AkbhcKvrkF+5Vn0RJW5VdFE1VroWIcPeeTWFsxWme4p8QvuYDjew4cqp9xw4BhiAMyPpHtMxmTzoUXqS9A5YeKUdCE4cnPbdly6cVu6qfcRFiqUiNzg0QWsdLcl+2ns6oufWvETe0IuHhTFVTcqr7StY3DGjlJAh0jgtM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Nt+zIsAM; arc=fail smtp.client-ip=52.101.43.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OKmSumm+O1yl9klNgYzjeYz/7FPeGX7MWiDUCQrpmhjogHJfyB9zpCEjBALeznWB9OpWbDxGlSqx4xNzre7u3gTktlo0THD+tWmvAJRxfziV4vuJfRLUSsY9IApJSEdCW5Bv0oZdve0ivZeV5McXI2kQZN2t6MJ73YxTQ06SXIrvECOvEL39E7eA4SZOl2E60Ewf3pujbXtFH5Y2O5Zfy0mjIjLxoXmLPiXsMILiaQglBbArkdFZBsfkdVL3l60LI52yecOBH3CtzIK98QbViAkmkrpN2HI4Cem4Q2Z9Voe1UMli0zPJM1oqbxh4fIcxlxsAHepoBzdYXu+Y3Bhs3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cekWc08cdXy2tU6vDBoKExg3U0YiKx108Li5vIt0enw=;
- b=lO59YUGcljm2MPqx0Y/dCLbA2QspqJU8qaqkOnQZA20EwzCrt304QKB8xE/e/rzM51Jo2yL/ebt2MJvHgO9PlLONjsmLezB+9AovtdGkbByme2z2nHwz/1wUKu47TbjmUw4X3JSCc0JHIu0MRonFMbyYFjbJeilkCeDqNzVDSjZl967RECIKHzCqvOLg7tb9FEwtwRBJcK+Viu5/bPko9YSd9Uzgggpu3khvbgD1j+kn9XNusy2R7v4mL7qAhi/1lfxnQDj0hH6zmzlXZsE/JZS7eXNmsuzsmQa7NfEZV46KUj54SwjSAoG7G1JcUYN2CswxdDAominpMxECw8fFjg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cekWc08cdXy2tU6vDBoKExg3U0YiKx108Li5vIt0enw=;
- b=Nt+zIsAM28scjsr1MHbYgMvKmC/kFHa61eq58Fp9jPX/LeWd6Z3ohfCGd8JE8UspF+7AgIQOsWZmAB8aEb0tC7z70MZm++QxyNhRsLY64kVpP+ylpZSYRV1gbMRxlChPBrdb16Yr7nFp3LKJNFImP0P79FJ6Jewo1NWE3h3zOgnEtudjiIOhx2+cFwDt/aN2edxkFDYNfpSzl7FPiWpGl/va9vFd6UwgZwDLXSQDKfhoPHiFUVl/73uIGXVJG7l3t8BqPRMX/VKSo2hNa6O6cj4MP4axcwBmSvW0vqaoho0G93TOMrz6UuBqqWCMN9b0J3iKv77T4yqa4CbVB86mQg==
-Received: from PH7P221CA0070.NAMP221.PROD.OUTLOOK.COM (2603:10b6:510:328::22)
- by MN2PR12MB4207.namprd12.prod.outlook.com (2603:10b6:208:1d9::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.23; Mon, 11 May
- 2026 09:45:53 +0000
-Received: from MW1PEPF0001615A.namprd21.prod.outlook.com
- (2603:10b6:510:328:cafe::e0) by PH7P221CA0070.outlook.office365.com
- (2603:10b6:510:328::22) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9891.23 via Frontend Transport; Mon,
- 11 May 2026 09:45:53 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- MW1PEPF0001615A.mail.protection.outlook.com (10.167.249.85) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.48.3 via Frontend Transport; Mon, 11 May 2026 09:45:52 +0000
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 11 May
- 2026 02:45:33 -0700
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail203.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 11 May
- 2026 02:45:33 -0700
-Received: from f43.com (10.127.8.9) by mail.nvidia.com (10.129.68.7) with
- Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Mon, 11 May
- 2026 02:45:30 -0700
-From: Dragos Tatulea <dtatulea@nvidia.com>
-To: <virtualization@lists.linux.dev>, Dragos Tatulea <dtatulea@nvidia.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	"Xuan Zhuo" <xuanzhuo@linux.alibaba.com>, =?UTF-8?q?Eugenio=20P=C3=A9rez?=
-	<eperezma@redhat.com>
-CC: Tariq Toukan <tariqt@nvidia.com>, Shahar Shitrit <shshitrit@nvidia.com>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<netdev@vger.kernel.org>
-Subject: [PATCH] vhost-vdpa: Expose ASID group change after DRIVER_OK via backend feature
-Date: Mon, 11 May 2026 12:45:03 +0300
-Message-ID: <20260511094504.1619893-2-dtatulea@nvidia.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1778493050; c=relaxed/simple;
+	bh=TyZ0hxf2iniFxRampZvCNdzcdN7Urpbpg3cYJjymmNs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tPM6n9RWoRjGr2s7s5grSDiV+Zh+WXP3C84cp1xyv3TpYhAuQ9A2NTu0KHNMXsyb0ahEqwoSz/gArb50+8/LcHKQbUXXDjW19gWawcbZQQ7f28IFWVJWNggPUf2EDEAfG1ycUUZZvMciWrHR3lrUGgaVc42aJeqZk18acRUSj9k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ez4G0l1U; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=iGYIg1UJ; arc=pass smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778493048;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TyZ0hxf2iniFxRampZvCNdzcdN7Urpbpg3cYJjymmNs=;
+	b=ez4G0l1U6aEyGlJ+he356XorfAo8lsc9M0mRhoE9ceWRxSJvUt4eC19v9WQc+pckPzJi0h
+	+D1D2Uw+Q70vtJahsp31s8MooBznIcxQBV/rF8pogMrjWk8igdaiz4KT4eCNNZM9QXLoXy
+	JJIwP2ASyQC4fRbU1eiWSpmkQkTtMlw=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-133-T4bAtkhhMIqAtqUOaw2S2w-1; Mon, 11 May 2026 05:50:46 -0400
+X-MC-Unique: T4bAtkhhMIqAtqUOaw2S2w-1
+X-Mimecast-MFC-AGG-ID: T4bAtkhhMIqAtqUOaw2S2w_1778493045
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-5a40505f715so1441315e87.3
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 02:50:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778493045; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Gb0fY6ULojl8/xGnUlPJj+BuVi1uL9sccJgSBSZR5EYDOT3p97X41AKxMLfmNqEfgM
+         D2cUbvxNVjRwo0Ix3eHIoMDV1oR56UPP5e1c0vXCSWsP77JEk7YTncISHv55uBm9QJat
+         Or8/lhYfCMrnCpm048X5yu14+h522y9tF5CZNBmv0JTRoFa16IAIBuXDlmv5VxujV7t6
+         KgJnpCMu3khVxTZJVvzT2nb3euc9Tm7p83PWqxaeYlIX5bl9YeHnmUOYDNDEfQXGjuEa
+         e0RZrppBkifx25zgX/ZZb0zMeZ5OkIEVf4QPs5dpLS4Y5H3jwR1kw2rlaOqXzP/1yj8v
+         xt1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=TyZ0hxf2iniFxRampZvCNdzcdN7Urpbpg3cYJjymmNs=;
+        fh=rJq1ursW1Uze1y9el16XkFPgBMs2GQdPYrp6TtyuXNg=;
+        b=ajA8HGcsbAmVmFRCpki6D5eZVZlz1kt2VaiurDVgUZlVUKylbUdEH2OblC6fbZaybS
+         iUtoa+eFb7qHbyTC1TU5YXws8AD3Zf/lbL6ig+bpzxUBuvIqDBsE6HK3+hyQoBpvd63C
+         qb8Su7t/7IQk9wQC5tn0ckOC0r4SsObHZSRnvsS9H5MCMC27PhgpqY6LBJRY/6Ld8X/7
+         Myhchi/fI5C+DiLiK49bvNg8ZZM+CpMrDu9WBeYAmJFROyOiwchTRCVlubqyoL9bD5LD
+         ro7pF2tpCIqIxqTDst9P5CyddtIoFqxry1scKzC6Btn1m+yQxmaHNcsEbEC0ismrWU8Z
+         //bg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1778493045; x=1779097845; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TyZ0hxf2iniFxRampZvCNdzcdN7Urpbpg3cYJjymmNs=;
+        b=iGYIg1UJFu7vIx9Pk44jKpM/yR8klyjVVkMJiPqq09Ma5jaq3n6UdrO5EigGilQnVE
+         7LnJAsWKbeMlhNBlKt8ssr+dfLBwl+vB4lF7e/gTMgJoVaLtws4gupjy7CIwVAuvZaID
+         gJbkucpNTq8MiVVvdBiIj4UtfiE1Lpq9cNLl5CkleUCh9LnT38g1d2nWdprk5+joSUoc
+         f6kycTGlXhY2YTNSZF+/MqXq8KYXeNLdH9hJtmrYWT7d4KOcWw69uX7KXoJl0L9faDXl
+         O05OoZwFUg/ddTJ+GFyHaJD28zNrQMgiOeCS4cagA6zFFmC2zELd/BLspNme4wkG8Jxw
+         n/zA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778493045; x=1779097845;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=TyZ0hxf2iniFxRampZvCNdzcdN7Urpbpg3cYJjymmNs=;
+        b=Fo52GhRkvxsm2ohYxtOPX2dgA7DiEps4/TPc3R5r1o4wTab+dYcFsfH7LCaIumcpyH
+         cfzv0vqmrlsYHGauXgM5+1Jk6I9SXFZwVA74W1hwAhbbwcrsZ7V/533Ib9mv023W26SG
+         G7x6DEe1yEFs8A14uUfmmtfd8u3A5MFVfGGdCtFYK8H+0awTrj/w0vgIo13Y9ofvu1iO
+         ShA/75jtuXA+uW7DzR2HRpCzCwB8ineFzetRTCg8x7Lp77szyBsPYQ0j3V2Or2+8jSi5
+         feX+ahY+H9NTTzWBclmempe9nJXM1xhj1fITLi7Bi93YAPVzKMQo3ZGcfyEIT1vqdVWB
+         TUtA==
+X-Forwarded-Encrypted: i=1; AFNElJ8pPIYgFFEGwoF1qcFcpVWqu8u2g/1uenhD50wxgmWIPBHlcD1Z40kLohQkkrakOH+cQM3+D0I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAZw2TyJivDwbqkj/2GzY8/CpRaZXQf4Ea6rmlYkwp2SEW3egA
+	4EMf1IM8s2eVon1JzDISNTZAutng1fnHrw9WSCA98nSp2GkElamqk7WniGjUUCtylmzFeQOUgwX
+	Jj0PbBlOU45PG6zH5yYzeVpZ8s4ffuy29aoxBD9DGdRzhYJNNgzkdgO1eOqenvKmIo18n9Hy4mu
+	v2giogDC2dw7K4YTPrroA4lfVxVAoJvZBp
+X-Gm-Gg: Acq92OHu3F1eSE+hQLV1bbs7J8qSJvaTHAar8WwzWxnLA9NRqZlb9wmeO9B7dTQ2sSO
+	YDzNgitVRiF8WMctOEkeVDtxbxnMyf9iBiKs7HzZRQ4aJvztvtki58SAG7Q7vT098YlI5tC9EKO
+	kNr4qinMFm1eHj0cBMwnKb3vu6cn6ymh8/Bnc1915QFJETtLdhqvEyDjThyiSvZk4iNOB2/3O8z
+	zjQtw==
+X-Received: by 2002:a05:6512:3046:b0:5a4:56:aa88 with SMTP id 2adb3069b0e04-5a887ce5cb9mr8074552e87.27.1778493044710;
+        Mon, 11 May 2026 02:50:44 -0700 (PDT)
+X-Received: by 2002:a05:6512:3046:b0:5a4:56:aa88 with SMTP id
+ 2adb3069b0e04-5a887ce5cb9mr8074540e87.27.1778493044330; Mon, 11 May 2026
+ 02:50:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW1PEPF0001615A:EE_|MN2PR12MB4207:EE_
-X-MS-Office365-Filtering-Correlation-Id: f072defb-dd69-4d05-f5df-08deaf42177a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700016|1800799024|376014|56012099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	wWGHtHu8uG85UCNyn5IQ2Mn+xSzmERJt+4vM+6TarUEMA+npUijU6Ty6koGEJ2x5Xc6khP5Zx8RAyH4gIBfs3yuUD7UnxQFOc1tVmsByH9PDnt9vRVfr2YSyQXO0ZV2Egb0KSn+uKPlbHitwRxoi3EqG5Z9OzD5tKeu9nBjY8giAjSdHt4voke6x0o9VoabRNzugbw505SzifmhUBE+PkKI+z8YfJV9aiU1uuyR14Xb5znGq49rXjf2Pd+iacY0G4IMnBqSSWlFjmr8FWRTGiWAJDWKMeKM6+9JWPtdSL499No65JSTA2I6UGW83ATueBdOvELgusBmhbFHoMgVrH5xj6bTBhco9GLVYW7M+1gwAso4dbXz8Zna0HKuigr7vkxdm6AnTB14tjNimvh3e6+ZfuTjefNxSP5aXDt0XF0WNbtLhdQd0MGCDMtBxR4Wzu80yo+/Q38nEeqwLseWRY0EXsukg+lMJI/Cq2cCpbTCGztOTkOVzf/kG5BT7Zz5uMeh/t2F5XHsHNtnGwN13JqdCRuPz9Uh6LGo9TXeDupRtxZTWfrCpkqyMsnWJcFOk5sQ1zU7a+7ywD2pQvt1btU916prm7J6MoQ72jEcojWhtZWNE6levvgMEvrVPxFQLjBOAOblMGn+aKnKmo4sydqt3oqO3i5xVAbWeIfyd6/2kAozqhTYZflVVa9GfVaQFqZRUYZWYx93p/jwlHdq9jyU90D7MzcGgHoAmQS989Jw=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(1800799024)(376014)(56012099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	ng0Fq4Vck5y6wTRCl6gY7VHf0niA3YEE4BiRVLllc2gjfXKaH8pNdrEyEF4dGNO0Vj27Wp5zubb0PG68vleuqdF53OrRm2b5sa2qUksxSy8NQ37BKG9HgsamWawJUOD6O4WSSPcn7RJUwM0RzwJc6seS0w15o+H8w9apH8rku1mDnVRi+x0BU8zsAhxyHQaERYNeEl9gG0oPH7by0xqUJb0HNZQN3B8tweE4R76hOaHF9rrPVdprPexmGXzYJgjYFHOJ0IS+ZqWnVZl1bEnIxyL4vhwOUeUqH62CkEpswsTIKWEN7V4Kx0sBvAC8aA1V8O/tGYsB99UAdmcBBtmIRTipaq3STMKGJv+2v0usQ5Go2gV9sOqsuhKnWSp1RlVVVESGbpa6PTfpyWvm83DOH/C1r5dpW1pWwudxhACFa9orqyj54vCJo3kg6uad8r9G
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2026 09:45:52.8879
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f072defb-dd69-4d05-f5df-08deaf42177a
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MW1PEPF0001615A.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4207
-X-Rspamd-Queue-Id: D0AA350B80C
+References: <20260510164337.7611-1-ihuguet@riseup.net> <20260510095246.5c8f6d0b@kernel.org>
+In-Reply-To: <20260510095246.5c8f6d0b@kernel.org>
+From: =?UTF-8?B?w43DsWlnbyBIdWd1ZXQ=?= <ihuguet@redhat.com>
+Date: Mon, 11 May 2026 11:50:32 +0200
+X-Gm-Features: AVHnY4KpEIM0JZ6n7jbTbprKPPeQ-2CVzz4QuyQAwivI33Sd8j48Nhm6mgqEVfo
+Message-ID: <CACT4oucitAa05V11KD0d2mQYc7h1L36zDGumnRYXn6+6XUa=QA@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/5] netdevsim: get link via ethtool, set via sysfs
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: =?UTF-8?B?w43DsWlnbyBIdWd1ZXQ=?= <ihuguet@riseup.net>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Sabrina Dubroca <sd@queasysnail.net>, Filip Pokryvka <fpokryvk@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 4FB8850B8A9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+X-Spamd-Result: default: False [-0.07 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_MIXED_CHARSET(0.59)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286580-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email,nvidia.com:mid,Nvidia.com:dkim];
+	TAGGED_FROM(0.00)[bounces-286581-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dtatulea@nvidia.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[ihuguet@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-The commit in the fixes tag blocked VHOST_VDPA_SET_GROUP_ASID operations
-once DRIVER_OK is set. That is too strict for devices which can safely
-handle this during live migration flows.
+Hi Jakub,
 
-Bring back this behavior under a new vhost backend feature flag. The
-feature is supported by mlx5 and vdpa_sim devices.
+On Sun, May 10, 2026 at 6:52=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+> Could you please explain your motivation? Feels quite trivial,
+> so it's not immediately obvious why we need tests.
+>
 
-Fixes: 3543b04a4ea3 ("vhost: forbid change vq groups ASID if DRIVER_OK is set")
-Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
-Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
----
- drivers/vdpa/mlx5/net/mlx5_vnet.c |  3 ++-
- drivers/vdpa/vdpa_sim/vdpa_sim.c  |  3 ++-
- drivers/vhost/vdpa.c              | 13 +++++++++++--
- include/uapi/linux/vhost_types.h  |  4 ++++
- 4 files changed, 19 insertions(+), 4 deletions(-)
+We use netdevsim for some userspace CI testing here at Red Hat. Specificall=
+y,
+There are some tests that require reacting to carrier changes on a device
+matched by permanent MAC address from userspace. As veths don't have a
+permanent MAC address, we need netdevsim for this test case.
 
-diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-index ad0d5fbbbca8..f89177957c76 100644
---- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-+++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-@@ -2906,7 +2906,8 @@ static void unregister_link_notifier(struct mlx5_vdpa_net *ndev)
- 
- static u64 mlx5_vdpa_get_backend_features(const struct vdpa_device *vdpa)
- {
--	return BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK);
-+	return BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK) |
-+	       BIT_ULL(VHOST_BACKEND_F_GROUP_ASID_AFTER_DRIVER_OK);
- }
- 
- static int mlx5_vdpa_set_driver_features(struct vdpa_device *vdev, u64 features)
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-index 8cb1cc2ea139..253c7fb35ea0 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-@@ -428,7 +428,8 @@ static u64 vdpasim_get_device_features(struct vdpa_device *vdpa)
- 
- static u64 vdpasim_get_backend_features(const struct vdpa_device *vdpa)
- {
--	return BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK);
-+	return BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK) |
-+	       BIT_ULL(VHOST_BACKEND_F_GROUP_ASID_AFTER_DRIVER_OK);
- }
- 
- static int vdpasim_set_driver_features(struct vdpa_device *vdpa, u64 features)
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index 692564b1bcbb..67b3f49fa709 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -682,7 +682,8 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
- 			return -EFAULT;
- 		if (idx >= vdpa->ngroups || s.num >= vdpa->nas)
- 			return -EINVAL;
--		if (ops->get_status(vdpa) & VIRTIO_CONFIG_S_DRIVER_OK)
-+		if ((ops->get_status(vdpa) & VIRTIO_CONFIG_S_DRIVER_OK) &&
-+		    !vhost_backend_has_feature(vq, VHOST_BACKEND_F_GROUP_ASID_AFTER_DRIVER_OK))
- 			return -EBUSY;
- 		if (!ops->set_group_asid)
- 			return -EOPNOTSUPP;
-@@ -791,7 +792,8 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
- 				 BIT_ULL(VHOST_BACKEND_F_IOTLB_PERSIST) |
- 				 BIT_ULL(VHOST_BACKEND_F_SUSPEND) |
- 				 BIT_ULL(VHOST_BACKEND_F_RESUME) |
--				 BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK)))
-+				 BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK) |
-+				 BIT_ULL(VHOST_BACKEND_F_GROUP_ASID_AFTER_DRIVER_OK)))
- 			return -EOPNOTSUPP;
- 		if ((features & BIT_ULL(VHOST_BACKEND_F_SUSPEND)) &&
- 		     !vhost_vdpa_can_suspend(v))
-@@ -805,6 +807,13 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
- 		if ((features & BIT_ULL(VHOST_BACKEND_F_DESC_ASID)) &&
- 		     !vhost_vdpa_has_desc_group(v))
- 			return -EOPNOTSUPP;
-+		if (features & BIT_ULL(VHOST_BACKEND_F_GROUP_ASID_AFTER_DRIVER_OK)) {
-+			if (!(features & BIT_ULL(VHOST_BACKEND_F_IOTLB_ASID)))
-+				return -EINVAL;
-+			if (!(vhost_vdpa_get_backend_features(v) &
-+				BIT_ULL(VHOST_BACKEND_F_GROUP_ASID_AFTER_DRIVER_OK)))
-+				return -EOPNOTSUPP;
-+		}
- 		if ((features & BIT_ULL(VHOST_BACKEND_F_IOTLB_PERSIST)) &&
- 		     !vhost_vdpa_has_persistent_map(v))
- 			return -EOPNOTSUPP;
-diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
-index 1c39cc5f5a31..ec1ff8a2e260 100644
---- a/include/uapi/linux/vhost_types.h
-+++ b/include/uapi/linux/vhost_types.h
-@@ -197,5 +197,9 @@ struct vhost_vdpa_iova_range {
- #define VHOST_BACKEND_F_DESC_ASID    0x7
- /* IOTLB don't flush memory mapping across device reset */
- #define VHOST_BACKEND_F_IOTLB_PERSIST  0x8
-+/* Device supports changing the group ASID after DRIVER_OK.
-+ * Requires VHOST_BACKEND_F_IOTLB_ASID.
-+ */
-+#define VHOST_BACKEND_F_GROUP_ASID_AFTER_DRIVER_OK  0x9
- 
- #endif
--- 
-2.54.0
+As you say, it's pretty trivial, but IMHO there's nothing against it, as it
+will help to resemble better a typical Ethernet device.
+
+Note: we know that there's no guarantee regarding netdevsim's uAPI and we'r=
+e
+ready to adapt for any change, but the truth is that there's no reasonable
+replacement of netdevsim for these kinds of cases where veth is not enough.
+
+
+
+--=20
+=C3=8D=C3=B1igo Huguet
 
 
