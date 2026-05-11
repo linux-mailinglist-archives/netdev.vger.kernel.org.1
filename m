@@ -1,185 +1,183 @@
-Return-Path: <netdev+bounces-286455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286456-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kIE7JhJ3AWpGaQEAu9opvQ
-	(envelope-from <netdev+bounces-286455-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:28:34 +0200
+	id 6BaMOOZ1AWr9ZwEAu9opvQ
+	(envelope-from <netdev+bounces-286456-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:23:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9BC050885E
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:28:33 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60ACC508826
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:23:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 27AC03031EBF
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 06:21:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 66D0B3006B0D
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 06:23:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 835A22D46A1;
-	Mon, 11 May 2026 06:21:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="NBqYZFdh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40DEE2D3725;
+	Mon, 11 May 2026 06:23:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
+Received: from mail-oo1-f77.google.com (mail-oo1-f77.google.com [209.85.161.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBB602D29C8
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 06:21:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBFAB2C0299
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 06:23:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778480518; cv=none; b=Z7FDJoIKgTzzpwDqbL8tBaDe3uqiUCsG24bFZZ3wi4MANKpVH6wmkEf76wwaeaTr27DqiqaEo8OHISnuPYyomlKb9rVNMnTfblrUHTH4B/HtrHI1qN/QDnTgYACFrtgMSPd0Bt/RWWTMgAvytBwLdG2i3wLn/j9DNuG/OciXVCc=
+	t=1778480611; cv=none; b=QNhNs5FwYHnC0AwXDVdy5cKkIcAW23V2QahYQRXb/jY3JlmBNc/pIQdLvVu4Z1p8Y9CIXOHQ7QPWw2cpGvTg2eE3u0e1SbUIYXwQrl8OmTyVg+ZgRvT76Tcl4bA+hmSvMHIhgqD6cXPjMmVx2Uw9INqwCbCzmGGLwGlnPQak8xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778480518; c=relaxed/simple;
-	bh=A7y3fzKCF+AJo3foiCNqQdkebzrP/Mi0PRjx4WBSn84=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r75QvHRThLTm8e0NIOQ5vptBu5hXPEaGFmjM04mUShU8PH4q9Qonv1OAH/67v175G6Bbptw16QhJO6ifJ7XOufuf2pv3my/hQkxu8eGR5k5FUjZgTtdqFeNvn8DtOHXJO1rw/804oa8ZVaPDjZunK6hRvv9mRzJjvGEFjz9OJ2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=NBqYZFdh; arc=none smtp.client-ip=74.125.82.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
-Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-132c3280e8fso1418300c88.1
-        for <netdev@vger.kernel.org>; Sun, 10 May 2026 23:21:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1778480516; x=1779085316; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cLVkZzC6n6tfb7crw+XJ4fgX5lyHGF1s/SBlI8VZgbc=;
-        b=NBqYZFdhZq+RQK96TfcXFzU4STpoQTG0rofHiPtAuknXhXQH20V43EsufTJWZnLn49
-         PkWK4MXWjFjAcEhxyoHsDS9Gzh1iW7okoTs2izRAx2oEhZLYNNqZFr9lRNp/NBzHNxRg
-         4r2afnXeb5cSpUZyFzEXfuxLkeiaKJB0tT5QcDk1MtEVKG9MCfZVDZq62OypBr5vhVO3
-         HnKgW+zyLjoPE4hRy6M1Y/dGXySjSl3Rq3kLOKFWccGJs4XfFnJ+lI+EulOHJLqOZWHD
-         Pif4qIWzIOOmKDjWKH7Hzd8kZgAm9q5/fWXxyi5/h2tCc86JYwK+DpMP59uGlMhQS7BO
-         ZP0w==
+	s=arc-20240116; t=1778480611; c=relaxed/simple;
+	bh=2/R7v9mNHMjP8cDFOGQ/TPV1slRjThbnyFADaLLiPGo=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Gu/h3kW5oKlGV8NwVDcXoXCSuUtHutcpVWvA2FkMSTNPIQSwVKLb4fey3RfCj1R4jAuVPQrK4EzSCyS562+NJx8OuNLQiuuIW/GLi2r90B8Ql/8EMH1DJzPY1aseca7KTWqMPywJwrpeBtxg9UezrB35d8odoMfg6uffMGqNZs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f77.google.com with SMTP id 006d021491bc7-679c5ed0942so5651105eaf.1
+        for <netdev@vger.kernel.org>; Sun, 10 May 2026 23:23:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778480516; x=1779085316;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cLVkZzC6n6tfb7crw+XJ4fgX5lyHGF1s/SBlI8VZgbc=;
-        b=aXRJ0DDoKEGh75vhhbfuHxjC4gk+cmrFTcCjufExKwHutGPjWSwmMj0sFdIyNWc7Af
-         an9TjsS66luKg3ITi27zRa8n+ZqTV2su1EuCwT0zTNMc/egl23C+A+EPIRL4wjoRkZdH
-         8vRn2/NAtZg7zleZQAtWIB0umQIWspUz/I2SPGPktjbTCoZrE1B6lvd0cpPEX0nT2Er+
-         /6CxfNX/HUzXIMq7gneD2kznvLwfr7X1nYH21PWhow1Tz+mj7VDBbhV0Dh7NhfRB4B2t
-         BeyducVUf4jAjfBvUEWep1ZZipyLR7iSpue9N9YhsXpWChyeYRjlZOxoQ4UUeV54q4R2
-         Tzdg==
-X-Gm-Message-State: AOJu0YwHoplfWwbfst/tUsfcRyQXKsYZaQre4xFceU0nTtGUh/Gmw5Q9
-	tuVM1zOo34nhKU1UF35CFY4GaJ+sEC35Dc4594PW7uP+mvoT3is1O4LSmG3mrYjM7JANBiMrh+6
-	8zy2DUg==
-X-Gm-Gg: Acq92OHIwq5eMMlXFk9vz+cFQj55mgjwp04GYOPZomesU1riOK6l3haFwdods+X5CcZ
-	dnO/vz16GXNjFqgr9piqOLqrmGAO/OnrK+Z0mehWkd6IUh26/3VWSmYmCheka0eo/p29cFL0Xs8
-	7LykPGsIg716oD1QmPF8Mi1ynsVxkWdo0I3/IINdkSMlCllG817mbkCKGGLANhCqB6Jy+HrYQpv
-	APPTxKULnp5MxwtMgl/xEvG2t0XmSZ0oXHnI1j1zZt0GpLVzMjJ7OA7q95c3/YRqV3TnxlrTkfk
-	SRKP7BEJf7fRTu25SuRk297SETr2WzuHK6Ft30e+EQa66fep2Sdms80gu0yKQz2ob9hRfGglEv5
-	zqkXMAZy9if8QQd1/yma8lSx6+CKNxj9N4yYdegK4VTQ/AA0N4nQ9JBvtDCjh2L93apuLrvm114
-	g9HSLNjM7GI3QbExxmaDUONgP2nhq0+thJSANOAm/hseMJOUarzAohpQ==
-X-Received: by 2002:a05:7022:439b:b0:128:d24a:a5ba with SMTP id a92af1059eb24-132a83f77d3mr4278742c88.20.1778480515748;
-        Sun, 10 May 2026 23:21:55 -0700 (PDT)
-Received: from p1.scai.dhcp.asu.edu (209-147-138-15.nat.asu.edu. [209.147.138.15])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13278210d40sm16083102c88.4.2026.05.10.23.21.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 10 May 2026 23:21:55 -0700 (PDT)
-From: Xiang Mei <xmei5@asu.edu>
-To: netdev@vger.kernel.org
-Cc: alibuda@linux.alibaba.com,
-	dust.li@linux.alibaba.com,
-	sidraya@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	ubraun@linux.ibm.com,
-	linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	bestswngs@gmail.com,
-	Xiang Mei <xmei5@asu.edu>
-Subject: [PATCH net] net/smc: reject CHID-0 ACCEPT that matches an empty ism_dev slot
-Date: Sun, 10 May 2026 23:21:38 -0700
-Message-ID: <20260511062138.2839584-1-xmei5@asu.edu>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20251104; t=1778480609; x=1779085409;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VaFPG7gEHXdorxY3MrBaNDqtO3iWXxWBFIcMFjQggaU=;
+        b=mu4zrjLSpjcnPPpne3qz9G9PiTHGt0lCjDU03uTE6oftdc08RM6g1Igc2T8y5Z5nY8
+         e2HTcdzXrfeheuFD0QbI+sPQEYF+GO7A+JmVMyyIoZgxptkLUNEJIH64Dsl2EGbqcabJ
+         E3jgxZvqzI+nTzTGou7lcPE9g5s/iPJi0jBKo7mmI+rZj/+HJnsyQ+rl1Gr/KO1p9E47
+         vMcXEkUbDkLmCiiQghGmWbXoSfZD7xCrLBmlTvIUmpmlIKIzSleAFVgrP7ZfJ6ft0S6p
+         hme6tySHACznAh+mjQYWZwSiFkJFK9aPqrYfm6ERz8fFqBTyYIqhrTC2agY50QlEWBVc
+         WS5A==
+X-Forwarded-Encrypted: i=1; AFNElJ+uUEkunpjGovT7j7xB2sc2Xvy9Yn9ay9dTJ6eyTQBR3wmiybv6AbaOd6M/Noc4P/T9tfnAXDY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHCNaw9kUYAawNODBp4DMR8uF5gxRRidbw5yVqBKRHsuD3wsBu
+	kB2H6wZvn+74W+3x+8tY1rSVsOWmsXovT5LvqFMdCdRDLlx/TDU1fV2HwAiqFbO3fJm7yPD+yxO
+	RMxYFUI2C23JeVQSMoKBurtT3MYlt/7dCrJ4v5lBV3EHYCmklqa/QV51I/sM=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: D9BC050885E
+X-Received: by 2002:a05:6820:1622:b0:694:980a:2c47 with SMTP id
+ 006d021491bc7-69998bd405bmr12037677eaf.0.1778480608729; Sun, 10 May 2026
+ 23:23:28 -0700 (PDT)
+Date: Sun, 10 May 2026 23:23:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a0175e0.a00a0220.1c3806.0016.GAE@google.com>
+Subject: [syzbot] [net?] WARNING in qdisc_tree_reduce_backlog (2)
+From: syzbot <syzbot+9744ccaabe337c6fb123@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 60ACC508826
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [4.84 / 15.00];
-	SEM_URIBL(3.50)[asu.edu:email,asu.edu:dkim];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=f2e8ebfec4636d32];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	BAD_REP_POLICIES(0.10)[];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_POLICY_ALLOW(0.00)[asu.edu,none];
-	DKIM_TRACE(0.00)[asu.edu:+];
-	FREEMAIL_CC(0.00)[linux.alibaba.com,linux.ibm.com,vger.kernel.org,gmail.com,asu.edu];
-	RCVD_TLS_LAST(0.00)[];
-	R_DKIM_ALLOW(0.00)[asu.edu:s=google];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-286455-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	GREYLIST(0.00)[pass,body];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.028];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286456-lists,netdev=lfdr.de,9744ccaabe337c6fb123];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	R_SPF_ALLOW(0.00)[+ip4:172.234.253.10:c];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,asu.edu:email,asu.edu:mid,asu.edu:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,goo.gl:url,googlegroups.com:email,storage.googleapis.com:url]
 X-Rspamd-Action: no action
 
-On the SMC-D client, slot 0 of ini->ism_dev[]/ini->ism_chid[] is
-reserved for an SMC-Dv1 device. smc_find_ism_v2_device_clnt()
-populates V2 entries starting at index 1, so when no V1 device is
-selected slot 0 is left in its kzalloc()'ed state with ism_dev[0] ==
-NULL and ism_chid[0] == 0.
+Hello,
 
-smc_v2_determine_accepted_chid() then matches the peer's CHID against
-the array starting from index 0 using the CHID alone. A malicious
-peer replying to a SMC-Dv2-only proposal with d1.chid == 0 matches
-the empty slot, ini->ism_selected becomes 0, and the subsequent
-ism_dev[0]->lgr_lock dereference in smc_conn_create() faults at
-offsetof(struct smcd_dev, lgr_lock) == 0x68:
+syzbot found the following issue on:
 
-  BUG: KASAN: null-ptr-deref in _raw_spin_lock_bh+0x79/0xe0
-  Write of size 4 at addr 0000000000000068 by task exploit/144
-  Call Trace:
-   _raw_spin_lock_bh
-   smc_conn_create (net/smc/smc_core.c:1997)
-   __smc_connect (net/smc/af_smc.c:1447)
-   smc_connect (net/smc/af_smc.c:1720)
-   __sys_connect
-   __x64_sys_connect
-   do_syscall_64
+HEAD commit:    5862221fdded Merge tag 'parisc-for-7.1-rc3' of git://git.k..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12a4bb26580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f2e8ebfec4636d32
+dashboard link: https://syzkaller.appspot.com/bug?extid=9744ccaabe337c6fb123
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
 
-Require ism_dev[i] to be non-NULL before accepting a CHID match.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Fixes: a7c9c5f4af7f ("net/smc: CLC accept / confirm V2")
-Reported-by: Weiming Shi <bestswngs@gmail.com>
-Assisted-by: Claude:claude-opus-4-7
-Signed-off-by: Xiang Mei <xmei5@asu.edu>
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/cd9aba7e59bf/disk-5862221f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/29af9d57e9af/vmlinux-5862221f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/02749594fd1e/bzImage-5862221f.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9744ccaabe337c6fb123@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+parentid != TC_H_ROOT
+WARNING: net/sched/sch_api.c:797 at qdisc_tree_reduce_backlog+0x3d9/0x480 net/sched/sch_api.c:797, CPU#1: ktimers/1/29
+Modules linked in:
+CPU: 1 UID: 0 PID: 29 Comm: ktimers/1 Tainted: G             L      syzkaller #0 PREEMPT_{RT,(full)} 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+RIP: 0010:qdisc_tree_reduce_backlog+0x3d9/0x480 net/sched/sch_api.c:797
+Code: ff ff 4c 89 ef e8 b7 85 12 f9 e9 42 ff ff ff e8 4d 7c ab f8 eb 17 e8 46 7c ab f8 eb 10 e8 3f 7c ab f8 eb 09 e8 38 7c ab f8 90 <0f> 0b 90 e8 7f 72 03 02 89 c3 31 ff 89 c6 e8 d4 80 ab f8 85 db 74
+RSP: 0018:ffffc90000a3f768 EFLAGS: 00010246
+RAX: ffffffff8918f818 RBX: 0000000000000008 RCX: ffff88801daa3d80
+RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000100
+RBP: dffffc0000000000 R08: 0000000000000000 R09: 0000000000000100
+R10: 0000000000000100 R11: 00000000ffffffff R12: 00000000000affe0
+R13: dffffc0000000000 R14: ffffc90000a3f8e0 R15: ffff88803d0a7800
+FS:  0000000000000000(0000) GS:ffff888126279000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055558bcbda38 CR3: 00000000403d8000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000003e4f
+DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ sfq_rehash net/sched/sch_sfq.c:598 [inline]
+ sfq_perturbation+0x205d/0x22d0 net/sched/sch_sfq.c:615
+ call_timer_fn+0x192/0x5e0 kernel/time/timer.c:1748
+ expire_timers kernel/time/timer.c:1799 [inline]
+ __run_timers kernel/time/timer.c:2374 [inline]
+ __run_timer_base+0x6a3/0x9f0 kernel/time/timer.c:2386
+ run_timer_base kernel/time/timer.c:2395 [inline]
+ run_timer_softirq+0x103/0x170 kernel/time/timer.c:2406
+ handle_softirqs+0x1de/0x6d0 kernel/softirq.c:622
+ __do_softirq kernel/softirq.c:656 [inline]
+ run_ktimerd+0x69/0x100 kernel/softirq.c:1151
+ smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
+ kthread+0x388/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+
 ---
- net/smc/af_smc.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index 185dbed7de5d..12ea3b6dbc64 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -1400,7 +1400,8 @@ smc_v2_determine_accepted_chid(struct smc_clc_msg_accept_confirm *aclc,
- 	int i;
- 
- 	for (i = 0; i < ini->ism_offered_cnt + 1; i++) {
--		if (ini->ism_chid[i] == ntohs(aclc->d1.chid)) {
-+		if (ini->ism_dev[i] &&
-+		    ini->ism_chid[i] == ntohs(aclc->d1.chid)) {
- 			ini->ism_selected = i;
- 			return 0;
- 		}
--- 
-2.43.0
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
