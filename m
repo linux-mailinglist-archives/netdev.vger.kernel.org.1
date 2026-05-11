@@ -1,84 +1,61 @@
-Return-Path: <netdev+bounces-286740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286741-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kBoHNZYAAmppnAEAu9opvQ
-	(envelope-from <netdev+bounces-286740-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 18:15:18 +0200
+	id mCPRBF0EAmrknAEAu9opvQ
+	(envelope-from <netdev+bounces-286741-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 18:31:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B908511ED4
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 18:15:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A8695122D7
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 18:31:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4FBF33020C3F
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 16:14:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 578B330DF85A
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 16:19:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B509B425CC4;
-	Mon, 11 May 2026 16:14:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A1A4219FD;
+	Mon, 11 May 2026 16:19:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AEeA/6RZ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Rifixzz+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89BEC42316C;
-	Mon, 11 May 2026 16:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C2673A4F23
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 16:19:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778516066; cv=none; b=uQd/AEkJ2KurZiP741sjHIdWhmm4lXM6VJheeUk27ZvAnrtO2u46F5Iamv1ZLB5aQ+E+zOzN7xT+JfRpcOskvc9JEMWNIe3bjqJNC/BX7RZbSOF/xz5WchYBlPHagYJhPJrQZR25ErBsLkjsEJhYr6EkXP9iDAL72/zuoDCdSg0=
+	t=1778516368; cv=none; b=VohLMhzDw6MNATzJke+LrX9k/CBeTYTBb4X9/C0q5uz7DdEv3M/uvfS+GCzOtNWTf7krWZjF7Thmy2RLx+B0TjyQnAY7WCpjDHvQowwF2hXHlzzF/9IJuFz+BTHqMHFcK8+LtvcCrhl7VbktVh/H74e19rIVGb2wL9vOyNud3Ds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778516066; c=relaxed/simple;
-	bh=loApl5z4gNMlxHcs5ARDnO2c3Zo1516aXOntv1kkSOI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Xokg7dAWVI1n5+Qjur1mYU80xjdvXd9ZZFEbNb6KRSTasvNzfPnaxKtXH195DRU7xHa5I3njYqDeVB7RROEoSZl7+AIzs1l76dbORnQmbQBFKYK765dcNDo66lcRlDDoSX5VJ2OL5iF1LUoZLWu2vp4f9YIC/LqTav215IOjE4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AEeA/6RZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0977C2BCB0;
-	Mon, 11 May 2026 16:14:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778516066;
-	bh=loApl5z4gNMlxHcs5ARDnO2c3Zo1516aXOntv1kkSOI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AEeA/6RZ7YTpM/mMfohIkUuAPJCtp2QiDJuGU1bgB1m4w8DDqNIsJvjjEdg1yis6w
-	 WRBNHSyhHo6FBHW1PFoyBgzmhB543o/db/XweILflbtXmveiTQFmmBR7Y7eIK4qNsq
-	 jIjY90qth83Pt21QXi90Ffm3xgQYlnrBz6htplTsPUb94t5K3gJtlyZWyaQpMY/W8D
-	 nPq5l4OHunZThPbuUnqwORsQZJMmx2n/MsXXPnhNPcLne9U8Lk2JIMxsdG/l1oOhfw
-	 JNLxfqx/ld2gvmmvouQNRubK0Lk+HGJktszx3mEqeMMByX/R3I+vI/xJQqI7ninEbm
-	 uL/GzsKtc0pag==
-From: Simon Horman <horms@kernel.org>
-To: arnd@kernel.org
-Cc: 'Simon Horman' <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	arnd@arndb.de,
-	aaro.koskinen@iki.fi,
-	andreas@kemnade.info,
-	brgl@kernel.org,
-	bcousson@baylibre.com,
-	davem@davemloft.net,
-	dmitry.torokhov@gmail.com,
-	edumazet@google.com,
-	balbi@kernel.org,
-	kuba@kernel.org,
-	johannes@sipsolutions.net,
-	khilman@baylibre.com,
-	krzk+dt@kernel.org,
-	linusw@kernel.org,
-	pabeni@redhat.com,
-	robh+dt@kernel.org,
-	rogerq@kernel.org,
-	tony@atomide.com,
-	linux-wireless@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-gpio@vger.kernel.org,
-	linux-omap@vger.kernel.org,
-	krzk@kernel.org
-Subject: Re: [PATCH 2/3] [v5 net-next] p54spi: convert to devicetree
-Date: Mon, 11 May 2026 17:12:45 +0100
-Message-ID: <20260511161243.49098-3-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260507212451.3333185-3-arnd@kernel.org>
-References: <20260507212451.3333185-3-arnd@kernel.org>
+	s=arc-20240116; t=1778516368; c=relaxed/simple;
+	bh=x2sGPgqWN79edUANLPfEhllBmV9Q6haVRZV/M37GAdo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Kz2DxqUgju4u6JIUruwLeYs+Iin8kD7sVXcvDYr32U6MF/vQzSfi53wGfur5VS6VtpJaGvVgQf0Gkn1SvE00ahMr1jtoJ/3PcOlpu6S80UMUIoMcp0PdVtV3j/YJ1fQ3JvWK4oxShNGcwi0LjFNLv5AN57C1w7WN7LsDVaFqJEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Rifixzz+; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1778516364;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1qEw1gjQ+vGjLBvP3Y3UGcXh4mPsTOticFAyfRlcngA=;
+	b=Rifixzz+XS12fyYBLM5YHJkXmSpsE4EL1d9yNDiU+UYcGhGez82mb5N48/x2zq5VVt19Ka
+	FRxfvkyB8hCZP+7p8LM9GP3dfZLIePcv7iRsx09g3CLMPA+pN+r2MqPq/GX5P9zsmv2hll
+	qDJPbJb6s/WHWF0jTrtVPHkDNFLKBlk=
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+To: Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: [PATCH net v2] ptp: ocp: fix resource freeing order
+Date: Mon, 11 May 2026 16:18:38 +0000
+Message-ID: <20260511161838.1413499-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,141 +63,98 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 7B908511ED4
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 2A8695122D7
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,arndb.de,iki.fi,kemnade.info,baylibre.com,davemloft.net,gmail.com,google.com,sipsolutions.net,redhat.com,atomide.com,lists.infradead.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	TAGGED_FROM(0.00)[bounces-286740-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,redhat.com,nxp.com,armlinux.org.uk,kernel.org];
+	TAGGED_FROM(0.00)[bounces-286741-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.993];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-0.973];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:mid,linux.dev:dkim]
 X-Rspamd-Action: no action
 
-From: 'Simon Horman' <horms@kernel.org>
+Commit a60fc3294a37 ("ptp: rework ptp_clock_unregister() to disable
+events") added a call to ptp_disable_all_events() which changes the
+configuration of pins if they support EXTTS events. In ptp_ocp_detach()
+pins resources are freed before ptp_clock_unregister() and it leads to
+use-after-free during driver removal. Fix it by changing the order of
+free/unregister calls.
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
+Fixes: a60fc3294a37 ("ptp: rework ptp_clock_unregister() to disable events")
+Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 ---
-p54spi: convert to devicetree
+v1 -> v2:
 
-This commit converts the Prism54 SPI driver from using hardcoded GPIO
-module parameters to using the GPIO descriptor interface and device tree
-probing.
+* on v1 sashiko mentioned that some IRQs may fire after bp->ptp freed.
+  it looks like a false positive, because ptp_clock_unregister() will
+  explicitly disable all EXTTS channels before destroying ptp_clock
+  structure. But there is a possibility of timestampers being active
+  without PTP_PF_EXTTS function set. It can be done through sysfs files
+  and it will change pins configuration directly, but can only be done
+  for TS1..TS4. Disable them explicitly after detaching sysfs files.
+---
 
-> diff --git a/drivers/net/wireless/intersil/p54/p54spi.c b/drivers/net/wireless/intersil/p54/p54spi.c
-> index 9d66dcae54e02..d18be25450285 100644
-> --- a/drivers/net/wireless/intersil/p54/p54spi.c
-> +++ b/drivers/net/wireless/intersil/p54/p54spi.c
+ drivers/ptp/ptp_ocp.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-[ ... ]
+diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+index beacc2ffb166..c03db15838ce 100644
+--- a/drivers/ptp/ptp_ocp.c
++++ b/drivers/ptp/ptp_ocp.c
+@@ -4867,6 +4867,18 @@ ptp_ocp_detach(struct ptp_ocp *bp)
+ 	ptp_ocp_detach_sysfs(bp);
+ 	ptp_ocp_attr_group_del(bp);
+ 	timer_delete_sync(&bp->watchdog);
++	/* Disable interrupts on all timestampers */
++	if (bp->ts1)
++		ptp_ocp_ts_enable(bp->ts1, 0, false)
++	if (bp->ts2)
++		ptp_ocp_ts_enable(bp->ts2, 0, false)
++	if (bp->ts3)
++		ptp_ocp_ts_enable(bp->ts3, 0, false)
++	if (bp->ts4)
++		ptp_ocp_ts_enable(bp->ts4, 0, false)
++	if (bp->ptp)
++		ptp_clock_unregister(bp->ptp);
++	kfree(bp->ptp_info.pin_config);
+ 	ptp_ocp_unregister_ext(bp->ts0);
+ 	ptp_ocp_unregister_ext(bp->ts1);
+ 	ptp_ocp_unregister_ext(bp->ts2);
+@@ -4884,9 +4896,6 @@ ptp_ocp_detach(struct ptp_ocp *bp)
+ 		clk_hw_unregister_fixed_rate(bp->i2c_clk);
+ 	if (bp->n_irqs)
+ 		pci_free_irq_vectors(bp->pdev);
+-	if (bp->ptp)
+-		ptp_clock_unregister(bp->ptp);
+-	kfree(bp->ptp_info.pin_config);
+ 	device_unregister(&bp->dev);
+ }
+ 
+-- 
+2.47.3
 
-> @@ -30,19 +31,6 @@
->  MODULE_FIRMWARE("3826.arm");
->  MODULE_FIRMWARE("3826.eeprom");
->  
-> -/* gpios should be handled in board files and provided via platform data,
-> - * but because it's currently impossible for p54spi to have a header file
-> - * in include/linux, let's use module parameters for now
-> - */
-> -
-> -static int p54spi_gpio_power = 97;
-> -module_param(p54spi_gpio_power, int, 0444);
-> -MODULE_PARM_DESC(p54spi_gpio_power, "gpio number for power line");
-> -
-> -static int p54spi_gpio_irq = 87;
-> -module_param(p54spi_gpio_irq, int, 0444);
-> -MODULE_PARM_DESC(p54spi_gpio_irq, "gpio number for irq line");
-> -
->  static void p54spi_spi_read(struct p54s_priv *priv, u8 address,
->  			      void *buf, size_t len)
->  {
-
-Simon says: As a pre-existing issue I don't think we need to be concerned
-            about this in the scope of this patch-set. But it may
-	    be a potential for follow-up.
-
-This problem wasn't introduced by this patch, but I noticed a pre-existing
-issue in the context here. Does the p54spi_spi_read() function perform an SPI
-transfer using a stack-allocated buffer?
-
-Looking at p54spi_spi_read(), the addr variable is allocated on the stack and
-passed as a transfer buffer to spi_sync(). The SPI framework maps transfer
-buffers for DMA. Passing a stack-allocated buffer is illegal, particularly with
-CONFIG_VMAP_STACK enabled, because stack memory resides in vmalloc space and
-cannot be safely DMA-mapped.
-
-Could this cause memory corruption or a kernel panic during the transfer?
-
-[ ... ]
-
-> @@ -608,31 +596,20 @@ static int p54spi_probe(struct spi_device *spi)
->  		goto err_free;
->  	}
->  
-> -	ret = gpio_request(p54spi_gpio_power, "p54spi power");
-> -	if (ret < 0) {
-> -		dev_err(&priv->spi->dev, "power GPIO request failed: %d", ret);
-> +	priv->gpio_powerdown = gpiod_get_optional(&spi->dev, "powerdown", GPIOD_OUT_HIGH);
-> +	if (IS_ERR(priv->gpio_powerdown)) {
-> +		ret = dev_err_probe(&priv->spi->dev, PTR_ERR(priv->gpio_powerdown),
-> +				    "powerdown GPIO request failed\n");
->  		goto err_free;
->  	}
->  
-> -	ret = gpio_request(p54spi_gpio_irq, "p54spi irq");
-> -	if (ret < 0) {
-> -		dev_err(&priv->spi->dev, "irq GPIO request failed: %d", ret);
-> -		goto err_free_gpio_power;
-> -	}
-> -
-> -	gpio_direction_output(p54spi_gpio_power, 0);
-> -	gpio_direction_input(p54spi_gpio_irq);
-> -
-> -	ret = request_irq(gpio_to_irq(p54spi_gpio_irq),
-> -			  p54spi_interrupt, IRQF_NO_AUTOEN, "p54spi",
-> -			  priv->spi);
-> +	ret = request_irq(spi->irq, p54spi_interrupt, IRQF_NO_AUTOEN, "p54spi", priv->spi);
-
-Simon says: This one seems more concerning in the context of this patch-set.
-
-Is there missing validation for spi->irq before calling request_irq()?
-
-If the device tree node lacks an interrupts property, the SPI core may set
-spi->irq to 0 or a negative error code.
-
-Passing this directly to request_irq() without validation can successfully
-hijack a core system interrupt like the system timer on some architectures,
-leading to system instability or deadlocks.
-
-Should there be a check like if (spi->irq <= 0) to fail the probe gracefully?
-
->  	if (ret < 0) {
->  		dev_err(&priv->spi->dev, "request_irq() failed");
-> -		goto err_free_gpio_irq;
-> +		goto err_free_gpio_power;
->  	}
 
