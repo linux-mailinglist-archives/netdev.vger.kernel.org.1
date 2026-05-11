@@ -1,270 +1,110 @@
-Return-Path: <netdev+bounces-286654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286655-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KKtNIHTdAWptlgEAu9opvQ
-	(envelope-from <netdev+bounces-286654-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:45:24 +0200
+	id SDNXD+vfAWptlgEAu9opvQ
+	(envelope-from <netdev+bounces-286655-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:55:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0293750F3CE
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:45:22 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02AC450F6F3
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:55:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B21E63006F30
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 13:41:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ED3933045EDA
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 13:47:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C60423EC2E9;
-	Mon, 11 May 2026 13:41:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A8B93ED10F;
+	Mon, 11 May 2026 13:47:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M1dT215E"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62F7B2F8EB7
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 13:41:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.161.220
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 479E33A6B8E;
+	Mon, 11 May 2026 13:47:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778506901; cv=none; b=j0T3+H8O+gSaoRxyFIVcPOTZhgE1nbe9Dkv+0fkxgBJFUUCiwQW/Ol9Wh/Kr6cpgcmOKLCj9oSAFCssv0XD7lggCvfeKHsXyOHzw7Uh+A1ueSEUBdKMSllSU5G+3QZPgdfqSZniJrPmjIZWCEI/ulXJ4W5RuHdCXUc2sPDG5vXU=
+	t=1778507251; cv=none; b=Uj9QPOWFia3W5k0DV6aT5AFApFRTH4tN0Dws34MCWdECDroY3SQ0Au3bRyOK3DaWO+HihcNuHfEuj3wNWImwMQzikrTK3C2cPEQ8/UPxP/+SiSwdrOZOW0c8FixVH2QigU03tlCKsRjSaeeA/7ddl/zq72esN6JRsCmdkpIsKgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778506901; c=relaxed/simple;
-	bh=TeGbMd6UvwcPKF5foNAf2iQ0GRMCFiZCOWwYAUhfoBw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PnPEpY2p4t1FKKVwZwjqTwCtLh7+/hQT9cP2T8E4OzuK0O3BeFT2bKOdIK3ADuIclLKPFs+e2UGJuABlXHIQSh4sZO64qvISlfEv5NqEx+64T+hdTTUrQ1/YqgBzn+7wgvKm9voGx3H4kijIzQCfYqb/pFwdNBz1IrXm2elS3to=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=162.243.161.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowABXz_9w3AFqGPYDAQ--.4427S3;
-	Mon, 11 May 2026 21:41:07 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	sd@queasysnail.net,
-	yuantan098@gmail.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	bird@lzu.edu.cn,
-	ronbogo@outlook.com,
-	zylzyl2333@gmail.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net 1/1] xfrm: espintcp: publish ULP context before entry points
-Date: Mon, 11 May 2026 21:40:58 +0800
-Message-ID: <c30b645074a1b379e0f7fe297f917c66137d9964.1778464688.git.zylzyl2333@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1778464688.git.zylzyl2333@gmail.com>
-References: <cover.1778464688.git.zylzyl2333@gmail.com>
+	s=arc-20240116; t=1778507251; c=relaxed/simple;
+	bh=tLEp70UHG/EuCtRgDahvTDvSVaeMSKrr5gp+ozE1qW4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nrRAaJ9pJZT85lptuBWRfPuNrdQRkFGVgl8JClV+Jozzs/ofRWLbvdLxwnOYTbb3lGs2isDUFquIiu77bAagQlk+z/KdDsoJizEEyQxt8YdfhXdTkEk/mB6C6G9Hq67s4zTOnbO/+zXJdBFic0GFgH813TkU8eiWTLmdJj4WZfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M1dT215E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64F12C2BCB0;
+	Mon, 11 May 2026 13:47:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778507250;
+	bh=tLEp70UHG/EuCtRgDahvTDvSVaeMSKrr5gp+ozE1qW4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=M1dT215Eo1W/iomsuPqD/B4aeP3cPbUVynPZPTZO3/3aHSKkzOBx9TZLq7cXhnchL
+	 Cw6V1i3ubK4zwonDCjV91jJoXY1q8e1FrEebMyrZKfGzbqOkwVrIqxyNYoPpBHYZ4Z
+	 YI3EahzXHL6E/wQLxw/JNUgeQrUK7mmiu/T03CfJJfdAClAk+fwjKaaFISo5bfXSWZ
+	 r5HoIMImqRKTVQDV6aDQGnkOmsvHF2HJRjISoqYCx1OBBg9Hfx74mnydsJLgsipzjf
+	 JNB1XOgdNtWiLYjbRyuZNMam+ziA5JxKN/jM4C96uuD2oUycYzdXMpUEYoS3w9VWih
+	 7vful3DVMisXA==
+Date: Mon, 11 May 2026 06:47:29 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
+ <luiz.dentz@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kernel-team@meta.com
+Subject: Re: [PATCH net-next 6/7] selftests: net: getsockopt_iter: cover SCO
+ BT_CODEC conversion
+Message-ID: <20260511064729.11c507b1@kernel.org>
+In-Reply-To: <20260511-getsock_three-v1-6-1461fa8786ab@debian.org>
+References: <20260511-getsock_three-v1-0-1461fa8786ab@debian.org>
+	<20260511-getsock_three-v1-6-1461fa8786ab@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowABXz_9w3AFqGPYDAQ--.4427S3
-X-Coremail-Antispam: 1UD129KBjvJXoW3Ww4xJr4Duw4rGw1kJw1kXwb_yoW7Cw4DpF
-	Z8ua43J3yqqrW3CFn2yrWqqr13G3WkZFyUK347XFy2vr1qgr15AF4qyFy2vFn7Cayvk3W5
-	JwsFq3WYvr1xXFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
-	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
-	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
-	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
-	w2AFwI0_Jw0_GFylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
-	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQEECWoBl+UHBwAAsU
-X-Rspamd-Queue-Id: 0293750F3CE
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 02AC450F6F3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.96 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-286655-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286654-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,secunet.com,gondor.apana.org.au,queasysnail.net,gmail.com,lzu.edu.cn,outlook.com];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[holtmann.org,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,vger.kernel.org,meta.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.852];
-	TO_DN_NONE(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,outlook.com:email,lzu.edu.cn:email]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-From: Yilin Zhu <zylzyl2333@gmail.com>
+On Mon, 11 May 2026 03:41:51 -0700 Breno Leitao wrote:
+>  tools/testing/selftests/net/getsockopt_iter.c | 65 +++++++++++++++++++++++++++
 
-espintcp_init_sk() installs sk_prot, sk_socket->ops, and socket callbacks
-while setting up the ULP state. These entry points can be observed by
-receive and write-space paths before the attaching thread finishes.
-
-Previously, espintcp_data_ready() could dereference icsk_ulp_data before
-the new context was published, and espintcp_write_space() could schedule
-ctx->work before INIT_WORK() initialized it.
-
-Initialize the queues, saved callbacks, and TX work item before storing
-the context in icsk_ulp_data.  Then publish sk_prot, sk_socket->ops, and
-the socket callbacks only after smp_wmb(), paired with an ordered context
-load in espintcp_getctx().  Use READ_ONCE()/WRITE_ONCE() for lockless
-socket pointer accesses.
-
-Fixes: e27cca96cd68 ("xfrm: add espintcp (RFC 8229)")
-Cc: stable@kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Co-developed-by: Peihan Liu <ronbogo@outlook.com>
-Signed-off-by: Peihan Liu <ronbogo@outlook.com>
-Signed-off-by: Yilin Zhu <zylzyl2333@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
- include/net/espintcp.h | 13 +++++++++--
- net/xfrm/espintcp.c    | 52 +++++++++++++++++++++++++++---------------
- 2 files changed, 45 insertions(+), 20 deletions(-)
-
-diff --git a/include/net/espintcp.h b/include/net/espintcp.h
-index c70efd704b6d..034be559786b 100644
---- a/include/net/espintcp.h
-+++ b/include/net/espintcp.h
-@@ -34,7 +34,16 @@ static inline struct espintcp_ctx *espintcp_getctx(const struct sock *sk)
- {
- 	const struct inet_connection_sock *icsk = inet_csk(sk);
- 
--	/* RCU is only needed for diag */
--	return (__force void *)icsk->icsk_ulp_data;
-+	/*
-+	 * The caller reached an ESP entry point by observing sk_prot,
-+	 * sk_socket->ops, or one of the socket callbacks.  Keep the ctx
-+	 * load after that observation so the caller cannot see the new
-+	 * entry point while still seeing stale icsk_ulp_data.
-+	 *
-+	 * Pairs with smp_wmb() in espintcp_init_sk().
-+	 */
-+	smp_rmb();
-+
-+	return (__force void *)READ_ONCE(icsk->icsk_ulp_data);
- }
- #endif
-diff --git a/net/xfrm/espintcp.c b/net/xfrm/espintcp.c
-index a2756186e13a..d847632e7d4e 100644
---- a/net/xfrm/espintcp.c
-+++ b/net/xfrm/espintcp.c
-@@ -440,7 +440,9 @@ static void espintcp_destruct(struct sock *sk)
- 
- bool tcp_is_ulp_esp(struct sock *sk)
- {
--	return sk->sk_prot == &espintcp_prot || sk->sk_prot == &espintcp6_prot;
-+	const struct proto *prot = READ_ONCE(sk->sk_prot);
-+
-+	return prot == &espintcp_prot || prot == &espintcp6_prot;
- }
- EXPORT_SYMBOL_GPL(tcp_is_ulp_esp);
- 
-@@ -451,10 +453,12 @@ static void build_protos(struct proto *espintcp_prot,
- static int espintcp_init_sk(struct sock *sk)
- {
- 	struct inet_connection_sock *icsk = inet_csk(sk);
-+	const struct proto_ops *ops;
- 	struct strp_callbacks cb = {
- 		.rcv_msg = espintcp_rcv,
- 		.parse_msg = espintcp_parse,
- 	};
- 	struct espintcp_ctx *ctx;
-+	struct proto *prot;
- 	int err;
- 
-@@ -472,34 +476,46 @@ static int espintcp_init_sk(struct sock *sk)
- 
- 	__sk_dst_reset(sk);
- 
--	strp_check_rcv(&ctx->strp);
- 	skb_queue_head_init(&ctx->ike_queue);
- 	skb_queue_head_init(&ctx->out_queue);
-+	ctx->saved_data_ready = READ_ONCE(sk->sk_data_ready);
-+	ctx->saved_write_space = READ_ONCE(sk->sk_write_space);
-+	ctx->saved_destruct = READ_ONCE(sk->sk_destruct);
-+	INIT_WORK(&ctx->work, espintcp_tx_work);
-+
-+	/* avoid using task_frag */
-+	sk->sk_allocation = GFP_ATOMIC;
-+	sk->sk_use_task_frag = false;
- 
- 	if (sk->sk_family == AF_INET) {
--		sk->sk_prot = &espintcp_prot;
--		sk->sk_socket->ops = &espintcp_ops;
-+		prot = &espintcp_prot;
-+		ops = &espintcp_ops;
- 	} else {
- 		mutex_lock(&tcpv6_prot_mutex);
- 		if (!espintcp6_prot.recvmsg)
--			build_protos(&espintcp6_prot, &espintcp6_ops, sk->sk_prot, sk->sk_socket->ops);
-+			build_protos(&espintcp6_prot, &espintcp6_ops,
-+				     READ_ONCE(sk->sk_prot),
-+				     READ_ONCE(sk->sk_socket->ops));
- 		mutex_unlock(&tcpv6_prot_mutex);
- 
--		sk->sk_prot = &espintcp6_prot;
--		sk->sk_socket->ops = &espintcp6_ops;
-+		prot = &espintcp6_prot;
-+		ops = &espintcp6_ops;
- 	}
--	ctx->saved_data_ready = sk->sk_data_ready;
--	ctx->saved_write_space = sk->sk_write_space;
--	ctx->saved_destruct = sk->sk_destruct;
--	sk->sk_data_ready = espintcp_data_ready;
--	sk->sk_write_space = espintcp_write_space;
--	sk->sk_destruct = espintcp_destruct;
- 	rcu_assign_pointer(icsk->icsk_ulp_data, ctx);
--	INIT_WORK(&ctx->work, espintcp_tx_work);
- 
--	/* avoid using task_frag */
--	sk->sk_allocation = GFP_ATOMIC;
--	sk->sk_use_task_frag = false;
-+	/*
-+	 * Publish the fully initialized ctx before publishing any entry point
-+	 * that can call espintcp_getctx().  The read barrier there runs after
-+	 * the caller has observed one of these pointers.
-+	 */
-+	smp_wmb();
-+	WRITE_ONCE(sk->sk_prot, prot);
-+	WRITE_ONCE(sk->sk_socket->ops, ops);
-+	WRITE_ONCE(sk->sk_data_ready, espintcp_data_ready);
-+	WRITE_ONCE(sk->sk_write_space, espintcp_write_space);
-+	WRITE_ONCE(sk->sk_destruct, espintcp_destruct);
-+
-+	strp_check_rcv(&ctx->strp);
- 
- 	return 0;
- 
-@@ -530,7 +546,7 @@ static void espintcp_close(struct sock *sk, long timeout)
- 
- 	strp_stop(&ctx->strp);
- 
--	sk->sk_prot = &tcp_prot;
-+	WRITE_ONCE(sk->sk_prot, &tcp_prot);
- 	barrier();
- 
- 	disable_work_sync(&ctx->work);
--- 
-2.47.3
-
+please don't add Bluetooth tests under net/ (or at least they must
+cleanly XFAIL if Bluetooth is not enabled). Also Bluetooth has its
+own tree so not net-next in the subject.
 
