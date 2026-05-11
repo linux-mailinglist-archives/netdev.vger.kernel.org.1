@@ -1,400 +1,251 @@
-Return-Path: <netdev+bounces-286841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286842-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WArgK4FWAmosrgEAu9opvQ
-	(envelope-from <netdev+bounces-286841-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 00:21:53 +0200
+	id oGnBB4lZAmosrgEAu9opvQ
+	(envelope-from <netdev+bounces-286842-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 00:34:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A9B7516BB0
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 00:21:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B7EB516F76
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 00:34:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D38023026E87
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 22:20:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 42CF93059E0F
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 22:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E295B4DC556;
-	Mon, 11 May 2026 22:19:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3376535674B;
+	Mon, 11 May 2026 22:21:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SWbOOmdb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Av8wErJC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBAA6423A7B;
-	Mon, 11 May 2026 22:19:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F245B356741
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 22:21:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778537992; cv=none; b=g8INZXAD0x4DzpuS1F53rjmbuqxp0M2EtKiXFi95DVHRCh8SR9wGDXIyO+P8RSITPSh5Dg1kSr/ld5SLWF5WmC1vXTCumHdHS2r1MzlISzpDH+ds+vphtKQkS/ZnCHjj8fd19vFNIETqdGtkG+dQ+EqomPCWAkNRPHc+4hYvLTo=
+	t=1778538107; cv=none; b=r+MVkYWSNX9X6Z6vm7CBrriHbldwnbiz8ZS2LZz00tQclfXOwCmObsI4HHRL2qzmzIITyv+5eH4QsUT6hwytAF0Eg/vlhkvSyMQ9l4JVZm0sWPxBGKTxWs5yIQCs064Te/lHp3ZwR+KSbfHm/7WWkSGA9rDhi27qza0ADSfKW78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778537992; c=relaxed/simple;
-	bh=HaYXk42WvCSIShW8FZ0bSZslAXirNKtycnqzXYI2XpY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aTT9BCraJXgKCwKVJDgb7zb+dvf50Udf+QCYg0MPr5eJMkokUqgIeUilIMdnWCF6yzS4qnJ6YFAfPRwsCbNgLrc4pmnlLyd+toI1l9jIwrUZzJDCJVxGvyRP3lFXq5MxWYxr3p7WTJkTzgypoVz6wuDmbX+PGg62A8cHeZ8H6Vg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SWbOOmdb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42531C2BCF7;
-	Mon, 11 May 2026 22:19:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778537992;
-	bh=HaYXk42WvCSIShW8FZ0bSZslAXirNKtycnqzXYI2XpY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SWbOOmdbhph7gAhY8ds3O0gOLXUE1uCohdW1HllrLZ/jqP8bs6VRQwbkvlr7qeosO
-	 eX6rZKrNIiAcC1toDD4iff5B3JPi6Ry+PUEJGc6DJ9l7vQ2dNnOPzeHy3UldftChv2
-	 vEwEQ9Qj12fAcqR77W1CNkPBEKJP7HDcoUmCaJJCosvDOdBM9MVrMCEKMD9KgB5LWe
-	 U4PQPnIqKhIPsSxTtkkteAbkvPhiRoa7954BSt2V72b3eSY2XMHU4A6dGeHcsW+Udw
-	 NXCyH5nL78heXr02AH338DlCFj+Q8nUkuuClw2+QeIo9U0jYB4Cvu+zxfS0pQTyQCK
-	 hYlSt4xwKMd0Q==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Maoyi Xie <maoyi.xie@ntu.edu.sg>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
+	s=arc-20240116; t=1778538107; c=relaxed/simple;
+	bh=jjmM2GGitlEzN5iSzma8jtAOF8FHZhqXKOugnFy/DkY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iuuvcJ2sYkR7od/REep7NAIeYkeHM279IF9gsJUqiEZElsoDe9yFSzRjNBzQpG9Bpkn6yHO3rbyYk/BNjagLDdWm7xx3EcU4vN6LnH3X5k2RbAQ4amRrMPoPKTQMmO5swJRFSqlCpQUB09itVKd0nNAi1mGrQXLzzZ1v0czZVQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Av8wErJC; arc=none smtp.client-ip=74.125.224.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-64d5a7926cfso4502199d50.2
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 15:21:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778538104; x=1779142904; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rktqOhL/WC+LFcBNVBl8EKTq1ERQ0ZB3bcN1+M0y/0E=;
+        b=Av8wErJCJAFJEvr7zbANilFauaHEd0ZHnRiRJ0IzHqLHC4xF9y9e2yfBPsLKtmjZJ+
+         56m9iVoleH2FTxyDI+I8os1L1pn2TOOf8oQse/L+mhlMMtbC32WbzDoebzhFbAabdNCO
+         0U3p8WaZOxdEk7Nza/+WXICNaImj9+H5AO6KKtS3KlP6NextYh0jvgUN+KIzjF/ZxnNU
+         8q3RDT2jdCta1b2AdiN7P97Q8O7q3nbaDOO1omwe0/w+f1zgY3owbWj++lMy4yt7USrB
+         wgaeqLyevl6VYmEcleQvDEWxlzG9nqMmoMH/oVhtUa1mor7pVp9v/3XhECqZ8ExWb/cp
+         bJzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778538104; x=1779142904;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rktqOhL/WC+LFcBNVBl8EKTq1ERQ0ZB3bcN1+M0y/0E=;
+        b=HTA1Bo3v8tNNciSqsRSw7VvCkYY4C73tyBey540Mr7LnKy3/LMmkQKTgbvj3ov1aFH
+         YU/3T/tSZe+duc5kLu2p2X6Mb549qiezPqDN0rig8GOiL+qknbUJpEkFSaV+s6K7s0mh
+         JL9IaCU+djVawXvE9IcAZ9JOadKjfndmU5IFJQXSPYejDA/d+fRTbUZ+tnqOpaQnOQJ7
+         jG3icMwCzXKeEaG9+QfHsM8lfYcfU1lsi1dFreioZ3J7fDJHp8lR1SIHqCyyvUYiHDLl
+         6RHX1jCFY+ALaCkftjF9RTfomOVcpVWDKxuhxXA8nT71iYqB3cy6Hbx88IES4hj2uW+y
+         5a3g==
+X-Gm-Message-State: AOJu0YxCxEnRXw0Ohr3MFYUl0xrVoAeCLsOauVPqPUeuyWXLNPrqTGQp
+	nEHhSkMENVvNhEYumOwRvclcI2zNp2WZuWdbApgXtJdN66H3G0OXwzbJIOXNuQ==
+X-Gm-Gg: Acq92OEcmHJk+n/Ju5bO4hUiCF4NPENSWIMTYJZbuiNMZZF2Fxef0H8xRmQbzKRNIQ/
+	W1ibdxcu+EbmiBQCCRXTtYqmVOdc1urdsDmNj5dmB2hLrdFhvonLQSsYMpIdaE+7tkr7JkK0Q+Z
+	3elpMcmnWUPdBpBWssvjxEj8mIeOeJ1ZyIHc3xlg++GlUUcqxQWKYYJK7ovjDcceeEtclbsEZOe
+	0kbO/FJSksm9jNNIlcTTn3CJP5eCHHLwiHNhpS5R8pK4XbAXakwhVTwmFQpLPlyCGWSJWDJlBJ8
+	hWRaiKApUOHBIjE9Uq3EQtvkDwa9Mb1zsGVpzuvGwek29vrsdprYtpKY9GIpoeurdS7pl9cGEdi
+	dsDffnXxrSweLN+vjPROd3aZGwVumFQCveMr9cLiuNXwetokdKaYc4qpO+oNr6nLzq3TJniRGIQ
+	P+PJKqZXKDUMJJSXHjO42Xo0vDyJf7bnlLas5kgS97NyqnyraGNCAm5X8/QlDkH1Uy7BRVEc5Bu
+	3keVqldioLGzDj6swsuQztzOakJTAiErUGUKw==
+X-Received: by 2002:a05:690e:15cf:b0:651:be50:af09 with SMTP id 956f58d0204a3-65c79ad6df1mr18811474d50.3.1778538103818;
+        Mon, 11 May 2026 15:21:43 -0700 (PDT)
+Received: from willemb.c.googlers.com.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65d969fb3b3sm6203476d50.1.2026.05.11.15.21.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 May 2026 15:21:42 -0700 (PDT)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
 	kuba@kernel.org,
+	edumazet@google.com,
 	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 7.0-5.10] wifi: nl80211: require CAP_NET_ADMIN over the target netns in SET_WIPHY_NETNS
-Date: Mon, 11 May 2026 18:19:13 -0400
-Message-ID: <20260511221931.2370053-14-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260511221931.2370053-1-sashal@kernel.org>
-References: <20260511221931.2370053-1-sashal@kernel.org>
+	horms@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	shuah@kernel.org,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next] selftests: drv-net: cope with slow env in so_txtime.py test
+Date: Mon, 11 May 2026 18:19:20 -0400
+Message-ID: <20260511222138.2045551-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 7.0.6
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 9A9B7516BB0
+X-Rspamd-Queue-Id: 7B7EB516F76
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286841-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286842-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,patch:url,ntu.edu.sg:email,msgid.link:url]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,so_txtime.sh:url,lib.py:url]
 X-Rspamd-Action: no action
 
-From: Maoyi Xie <maoyi.xie@ntu.edu.sg>
+From: Willem de Bruijn <willemb@google.com>
 
-[ Upstream commit 15994bb0cbb8fc4879da7552ddd08c1896261c39 ]
+This test was converted from shell script to drv-net test.
 
-NL80211_CMD_SET_WIPHY_NETNS dispatches with GENL_UNS_ADMIN_PERM, which
-verifies that the caller has CAP_NET_ADMIN for the source netns. It
-doesn't verify that the caller has CAP_NET_ADMIN over the target netns
-selected by NL80211_ATTR_NETNS_FD or NL80211_ATTR_PID.
+The new version is flaky in dbg builds on the netdev.bots dashboard.
+The previous shell script had more protections to avoid these. Added
+in commit a7ee79b9c455 ("selftests: net: cope with slow env in
+so_txtime.sh test").
 
-This diverges from the convention enforced in
-net/core/rtnetlink.c::rtnl_get_net_ns_capable():
+Add the same overall protection:
 
-    /* For now, the caller is required to have CAP_NET_ADMIN in
-     * the user namespace owning the target net ns.
-     */
-    if (!sk_ns_capable(sk, net->user_ns, CAP_NET_ADMIN))
-        return ERR_PTR(-EACCES);
+- Suppress so_txtime process failure if KSFT_MACHINE_SLOW
 
-A user with CAP_NET_ADMIN in their own user namespace can therefore
-push a wiphy into an arbitrary netns (including init_net) over which
-they have no privilege.
+Also relax two timeouts to reduce the number of process failures
+themselves
 
-Mirror the rtnetlink convention by requiring CAP_NET_ADMIN in the
-target netns before calling cfg80211_switch_netns().
+- Increase SO_RCVTIMEO to 2 seconds
+- Increase process start-up stabilization to 2 seconds
 
-Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
-Link: https://patch.msgid.link/20260506064854.2207105-2-maoyixie.tju@gmail.com
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Delays were experimentally arrived at while running with vng
+built with kernel/configs/debug.config
+
+Fixes: 5c6baef3885c ("selftests: drv-net: convert so_txtime to drv-net")
+Reported-by: Jakub Kicinski <kuba@kernel.org>
+Closes: https://lore.kernel.org/netdev/20260510174219.74aeee6d@kernel.org/
+Signed-off-by: Willem de Bruijn <willemb@google.com>
 ---
+ tools/testing/selftests/drivers/net/so_txtime.c  | 10 ++++++++--
+ tools/testing/selftests/drivers/net/so_txtime.py | 11 +++++++++--
+ 2 files changed, 17 insertions(+), 4 deletions(-)
 
-LLM Generated explanations, may be completely bogus:
-
-## Phase Walkthrough
-
-### Phase 1: Commit Message Forensics
-Record: `wifi: nl80211` subsystem; action verb `require`; intent is to
-require `CAP_NET_ADMIN` over the target network namespace before
-`NL80211_CMD_SET_WIPHY_NETNS` moves a wiphy.
-
-Record: Tags in the provided commit message:
-`Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>`, `Link: https://patch.
-msgid.link/20260506064854.2207105-2-maoyixie.tju@gmail.com`, `Signed-
-off-by: Johannes Berg <johannes.berg@intel.com>`. No `Fixes:`,
-`Reported-by:`, `Tested-by:`, `Reviewed-by:`, or `Cc: stable` tag was
-present in the provided message.
-
-Record: The described bug is an authorization gap. `GENL_UNS_ADMIN_PERM`
-verifies `CAP_NET_ADMIN` for the netlink socket/source netns, but
-`NL80211_ATTR_NETNS_FD` / `NL80211_ATTR_PID` selects a target netns that
-was not separately checked. The b4-fetched cover letter includes a
-concrete reproducer with `mac80211_hwsim`: a caller privileged only in
-its own user namespace can move a delegated wiphy back into `init_net`.
-
-Record: This is not a hidden cleanup fix; it is an explicit
-security/permission bug fix.
-
-### Phase 2: Diff Analysis
-Record: One file changed, `net/wireless/nl80211.c`, with 13 insertions
-in `nl80211_wiphy_netns()`. Scope is a single-function surgical fix.
-
-Record: Before: after resolving the target netns and checking
-`IS_ERR(net)`, the function directly called `cfg80211_switch_netns()` if
-the wiphy was not already in that netns. After: it first checks
-`ns_capable(net->user_ns, CAP_NET_ADMIN)`, drops the netns reference
-with `put_net(net)`, and returns `-EPERM` on failure.
-
-Record: Bug category is security authorization / logic correctness. The
-missing check allowed a source-netns-capable caller to affect a
-different target netns without privilege there.
-
-Record: Fix quality is high: small, localized, follows the verified
-rtnetlink convention in `rtnl_get_net_ns_capable()`, and preserves
-reference cleanup. Regression risk is low and limited to denying
-previously accepted unauthorized cross-netns moves.
-
-### Phase 3: Git History Investigation
-Record: `git blame` on the current stable checkout blamed the function
-body to a repository snapshot-style commit, so it was not useful for
-introduction history. `git log v2.6.29..v2.6.32 -S...` found the
-command/function introduced by `463d018323851` (`cfg80211: make aware of
-net namespaces`), first contained in `v2.6.32-rc1`.
-
-Record: No `Fixes:` tag is present, so there was no tagged commit to
-follow.
-
-Record: Recent local `net/wireless/nl80211.c` history showed unrelated
-wireless fixes/conversions and no existing equivalent target-netns
-capability fix.
-
-Record: No local prior `Maoyi Xie` commits were found under
-`net/wireless`. `MAINTAINERS` verifies Johannes Berg as maintainer for
-`802.11 (including CFG80211/NL80211)`, and the patch was addressed to
-Johannes on linux-wireless.
-
-Record: No code dependency was found for this patch. It is patch 1/2 in
-the submitted series; patch 2 is related namespace hardening, but patch
-1 is standalone for the direct permission bypass.
-
-### Phase 4: Mailing List And External Research
-Record: No commit hash was provided and the exact subject was not found
-in local `master`, `wireless-next`, `net-next`, or `fixes-next`, so `b4
-dig -c <commit>` was not applicable. I used the provided message-id with
-`b4 am`/`b4 mbox`.
-
-Record: `b4 am` found `[PATCH v3 0/2] wifi: nl80211: tighten netns
-handling in SET_WIPHY_NETNS and dump continuation`, including this patch
-as `v3 1/2`. `b4 am -c` did not report a newer revision. Attempts to
-fetch v1/v2 directly with `b4 -v 1/-v 2` did not find those revisions,
-but the v3 cover records that patch 1 was unchanged since v1.
-
-Record: The full mbox contained three messages: cover, patch 1, patch 2.
-It did not contain reviewer reply messages, but the cover records
-Johannes review feedback about trailers/comment wording and says no code
-changes since v2.
-
-Record: Original recipients were Johannes Berg, `linux-
-wireless@vger.kernel.org`, and `linux-kernel@vger.kernel.org`. No stable
-nomination or NAK was found in the fetched mbox. Lore WebFetch searches
-were blocked by Anubis, so stable-list discussion could not be
-independently verified through WebFetch.
-
-### Phase 5: Code Semantic Analysis
-Record: Modified function: `nl80211_wiphy_netns()`.
-
-Record: Caller surface: the only direct reference is the generic-netlink
-op for `NL80211_CMD_SET_WIPHY_NETNS`; `genl_family_rcv_msg()` checks
-`GENL_UNS_ADMIN_PERM` against `net->user_ns`, then
-`genl_family_rcv_msg_doit()` calls `ops->doit()`, reaching
-`nl80211_wiphy_netns()` from userspace netlink.
-
-Record: Key callees: `get_net_ns_by_pid()`, `get_net_ns_by_fd()`, new
-`ns_capable(net->user_ns, CAP_NET_ADMIN)`, `cfg80211_switch_netns()`,
-and `put_net()`. `cfg80211_switch_netns()` moves associated wireless
-netdevs with `dev_change_net_namespace()` and updates `wiphy_net_set()`.
-
-Record: Reachability is verified by the op table and by the b4 cover’s
-PoC. A userspace caller can trigger the path by sending
-`NL80211_CMD_SET_WIPHY_NETNS` with target PID or netns fd.
-
-Record: Similar convention verified in `rtnl_get_net_ns_capable()`,
-which checks target `net->user_ns` before using another netns.
-
-### Phase 6: Stable Tree Analysis
-Record: The vulnerable handler/op shape exists in `v5.4`, `v5.10`,
-`v5.15`, `v6.1`, `v6.6`, `v6.12`, `v6.19`, and current `7.0.y`, with no
-`ns_capable(net->user_ns, CAP_NET_ADMIN)` check in the handler.
-
-Record: `v3.18` has `NL80211_CMD_SET_WIPHY_NETNS`, but uses
-`GENL_ADMIN_PERM`, so the unprivileged-user-namespace aspect is not the
-same there. For active modern stable trees, the issue is present.
-
-Record: `git apply --check` of the fetched v3 mbox succeeds on the
-current `7.0.y` checkout. Older stable trees have line offsets and minor
-surrounding differences, but the same local hunk context exists at least
-in `v5.4`; expected backport difficulty is clean or minor-context-only.
-
-Record: No related local fix already present was found by subject/grep
-searches.
-
-### Phase 7: Subsystem Context
-Record: Subsystem is cfg80211/nl80211 wireless configuration.
-Criticality is IMPORTANT: it is not core-mm/VFS, but it is a userspace-
-facing network configuration and permission boundary.
-
-Record: The wireless subsystem is active in local history, with recent
-cfg80211/nl80211-adjacent fixes.
-
-### Phase 8: Impact And Risk
-Record: Affected users are systems with cfg80211/nl80211, network
-namespaces/user namespaces, and a `WIPHY_FLAG_NETNS_OK` wiphy. Verified
-examples include `mac80211` and drivers setting the flag such as
-`brcmfmac`, `mwifiex`, and `qtnfmac`.
-
-Record: Trigger requires the caller to hold a movable wiphy in its own
-netns and pass a target netns fd or pid. The b4 cover verifies this is
-reachable from an unprivileged user namespace after legitimate admin
-delegation using `mac80211_hwsim`.
-
-Record: Failure mode is a security/namespace isolation violation:
-unauthorized movement of a wiphy into a netns, including `init_net`,
-where the caller lacks privilege. Severity is HIGH because it bypasses
-kernel namespace permission boundaries.
-
-Record: Benefit is high for stable users because it closes a concrete
-privilege boundary bug. Risk is low: 13 lines, one function, no new API,
-no data structure change, and only unauthorized operations change
-behavior.
-
-### Phase 9: Final Synthesis
-Record: Evidence for backporting: real security/authorization bug,
-concrete PoC in the submitted cover, reachable userspace netlink
-command, vulnerable code present across modern stable trees, small
-contained fix, and it mirrors an existing rtnetlink convention.
-
-Record: Evidence against backporting: no `Fixes:`/stable tag, no fetched
-reviewer reply carrying an explicit stable nomination, and the exact
-applied commit hash was not present in local searched branches. These do
-not outweigh the verified technical issue.
-
-Record: Unresolved: I could not verify the final applied commit object
-or run `b4 dig -c` because no commit hash was provided and local branch
-searches did not find the subject. WebFetch to lore/stable was blocked
-by Anubis. I did not run the runtime PoC or a kernel build.
-
-Stable rules checklist:
-1. Obviously correct and tested: yes by inspection; PoC result described
-   in b4 cover, though not locally rerun.
-2. Fixes a real bug affecting users: yes, verified missing target-netns
-   authorization.
-3. Important issue: yes, security/namespace permission bypass.
-4. Small and contained: yes, one function, 13 added lines.
-5. No new features or APIs: yes.
-6. Can apply to stable: yes for current `7.0.y`; older active stable
-   trees likely clean/minor context based on matching code.
-
-Exception category: none. This is not a device ID/quirk/build/doc fix;
-it is a security permission fix.
-
-## Verification
-- [Phase 1] Parsed provided subject/tags and b4-fetched patch/cover;
-  found no `Fixes:`, `Reported-by:`, `Tested-by:`, `Reviewed-by:`, or
-  stable tag.
-- [Phase 2] Compared provided diff and b4 mbox patch; confirmed 13 lines
-  added to `nl80211_wiphy_netns()`.
-- [Phase 3] `git blame -L` was not useful due snapshot-style history;
-  `git log v2.6.29..v2.6.32 -S...` found `463d018323851`, first
-  contained in `v2.6.32-rc1`.
-- [Phase 3] `git log --author='Maoyi Xie' -- net/wireless` found no
-  local prior commits.
-- [Phase 3] `MAINTAINERS` confirms Johannes Berg maintains `802.11
-  (including CFG80211/NL80211)`.
-- [Phase 4] `b4 am` found v3 2-patch series and the supplied patch
-  message-id.
-- [Phase 4] `b4 am -c` found no newer revision.
-- [Phase 4] `b4 mbox` saved the full 3-message thread; no stable
-  nomination or NAK was present there.
-- [Phase 5] `rg` confirmed `nl80211_wiphy_netns()` is reached via the
-  `NL80211_CMD_SET_WIPHY_NETNS` generic-netlink op.
-- [Phase 5] Read `genetlink.c`; confirmed `GENL_UNS_ADMIN_PERM` checks
-  `net->user_ns` before calling `ops->doit()`.
-- [Phase 5] Read `cfg80211_switch_netns()`; confirmed it moves wireless
-  netdevs and changes the wiphy netns.
-- [Phase 6] Checked `v5.4`, `v5.10`, `v5.15`, `v6.1`, `v6.6`, `v6.12`,
-  `v6.19`, and current `7.0.y`; all have the handler/op without the
-  target `ns_capable()` check.
-- [Phase 6] `git apply --check` of the b4 mbox succeeded on current
-  `7.0.y`.
-- [Phase 8] `rg WIPHY_FLAG_NETNS_OK` verified affected mac80211 and
-  several wireless drivers expose movable wiphys.
-- UNVERIFIED: exact final commit SHA and final applied-object metadata,
-  because the subject was not found in local searched branches.
-- UNVERIFIED: stable-list discussion via WebFetch, because lore WebFetch
-  returned Anubis anti-bot pages.
-- UNVERIFIED: local runtime PoC/build; not performed.
-
-This should be backported to stable kernel trees that contain the
-`GENL_UNS_ADMIN_PERM` version of `NL80211_CMD_SET_WIPHY_NETNS`,
-especially active v5.4+ stable/LTS trees.
-
-**YES**
-
- net/wireless/nl80211.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
-
-diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
-index ce3121b1c3319..13c2943ad3e4b 100644
---- a/net/wireless/nl80211.c
-+++ b/net/wireless/nl80211.c
-@@ -13568,6 +13568,19 @@ static int nl80211_wiphy_netns(struct sk_buff *skb, struct genl_info *info)
- 	if (IS_ERR(net))
- 		return PTR_ERR(net);
+diff --git a/tools/testing/selftests/drivers/net/so_txtime.c b/tools/testing/selftests/drivers/net/so_txtime.c
+index b6930883569b..75f3beef13d9 100644
+--- a/tools/testing/selftests/drivers/net/so_txtime.c
++++ b/tools/testing/selftests/drivers/net/so_txtime.c
+@@ -38,6 +38,7 @@
+ static int	cfg_clockid	= CLOCK_TAI;
+ static uint16_t	cfg_port	= 8000;
+ static int	cfg_variance_us	= 4000;
++static bool	cfg_machine_slow;
+ static uint64_t	cfg_start_time_ns;
+ static int	cfg_mark;
+ static bool	cfg_rx;
+@@ -142,7 +143,7 @@ static void do_recv_one(int fdr, struct timed_send *ts)
  
-+	/*
-+	 * The caller already has CAP_NET_ADMIN over the source netns
-+	 * (enforced by GENL_UNS_ADMIN_PERM on the genl op). Mirror the
-+	 * convention used by net/core/rtnetlink.c::rtnl_get_net_ns_capable()
-+	 * and require CAP_NET_ADMIN over the target netns as well, so that
-+	 * a caller that is privileged in their own user namespace cannot
-+	 * push a wiphy into a netns where they have no privilege.
-+	 */
-+	if (!ns_capable(net->user_ns, CAP_NET_ADMIN)) {
-+		put_net(net);
-+		return -EPERM;
-+	}
+ 	if (llabs(tstop - texpect) > cfg_variance_us) {
+ 		fprintf(stderr, "exceeds variance (%d us)\n", cfg_variance_us);
+-		if (!getenv("KSFT_MACHINE_SLOW"))
++		if (!cfg_machine_slow)
+ 			errors++;
+ 	}
+ }
+@@ -263,7 +264,7 @@ static void start_time_wait(void)
+ 	now = gettime_ns(CLOCK_REALTIME);
+ 	if (cfg_start_time_ns < now) {
+ 		fprintf(stderr, "FAIL: start time already passed\n");
+-		if (!getenv("KSFT_MACHINE_SLOW"))
++		if (!cfg_machine_slow)
+ 			errors++;
+ 		return;
+ 	}
+@@ -326,6 +327,9 @@ static int setup_rx(struct sockaddr *addr, socklen_t alen)
+ 	if (bind(fd, addr, alen))
+ 		error(1, errno, "bind");
+ 
++	if (cfg_machine_slow)
++		tv.tv_sec = 2;
 +
- 	err = 0;
+ 	if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)))
+ 		error(1, errno, "setsockopt rcv timeout");
  
- 	/* check if anything to do */
+@@ -512,6 +516,8 @@ static void parse_opts(int argc, char **argv)
+ 	setup_sockaddr(domain, saddr, &cfg_src_addr);
+ 
+ 	cfg_num_pkt = parse_io(argv[optind], cfg_buf);
++
++	cfg_machine_slow = getenv("KSFT_MACHINE_SLOW");
+ }
+ 
+ int main(int argc, char **argv)
+diff --git a/tools/testing/selftests/drivers/net/so_txtime.py b/tools/testing/selftests/drivers/net/so_txtime.py
+index 5b54ce76dff4..e7de8fe22c1e 100755
+--- a/tools/testing/selftests/drivers/net/so_txtime.py
++++ b/tools/testing/selftests/drivers/net/so_txtime.py
+@@ -6,6 +6,7 @@
+ Test delivery time in FQ and ETF qdiscs.
+ """
+ 
++import os
+ import time
+ 
+ from lib.py import ksft_exit, ksft_run, ksft_variants
+@@ -15,17 +16,23 @@ from lib.py import NetDrvEpEnv, bkg, cmd, defer, tc
+ 
+ def test_so_txtime(cfg, clockid, ipver, args_tx, args_rx, expect_success):
+     """Main function. Run so_txtime as sender and receiver."""
++    slow_machine = os.environ.get('KSFT_MACHINE_SLOW')
++
+     bin_path = cfg.test_dir / "so_txtime"
+ 
+-    tstart = time.time_ns() + 200_000_000
++    tstart = time.time_ns() + (2000_000_000 if slow_machine else 200_000_000)
+ 
+     cmd_addr = f"-S {cfg.addr_v[ipver]} -D {cfg.remote_addr_v[ipver]}"
+     cmd_base = f"{bin_path} -{ipver} -c {clockid} -t {tstart} {cmd_addr}"
+     cmd_rx = f"{cmd_base} {args_rx} -r"
+     cmd_tx = f"{cmd_base} {args_tx}"
+ 
++    expect_fail = not expect_success
++    if slow_machine:
++        expect_success = False
++
+     with bkg(cmd_rx, host=cfg.remote, fail=expect_success,
+-             expect_fail=(not expect_success), exit_wait=True):
++             expect_fail=expect_fail, exit_wait=True):
+         cmd(cmd_tx)
+ 
+ 
 -- 
-2.53.0
+2.54.0.563.g4f69b47b94-goog
 
 
