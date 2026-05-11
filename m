@@ -1,343 +1,275 @@
-Return-Path: <netdev+bounces-286642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286643-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ENQ5CnjPAWryjwEAu9opvQ
-	(envelope-from <netdev+bounces-286642-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:45:44 +0200
+	id YH7WCWnRAWryjwEAu9opvQ
+	(envelope-from <netdev+bounces-286643-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:54:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30EDA50E1F6
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:45:42 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D60D50E481
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:54:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DE64B300D4E5
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 12:41:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AAFB5303D2E8
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 12:46:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D94A539BFFA;
-	Mon, 11 May 2026 12:41:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFA28390CA1;
+	Mon, 11 May 2026 12:46:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="btTHTDQi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W0LRcqN4";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="UnHpC4b+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f193.google.com (mail-pf1-f193.google.com [209.85.210.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609D6390CA1
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 12:41:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455603630AD
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 12:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778503317; cv=none; b=bsDx2C+h7vPnbQZRDhj9VSYNplb7lQ4LMhVQxJ2jwNgqJE0N2UJuLn5zn2zQwpdONE7/G6R61YQlwRW/WPVaq1rn301iPugDwXlp3CAJiw7aRPr6FEgZ0PcZpSg9dQ3AlFgvh/DuP1IVVePJfgnM0tcpiFHFrIuqTKgZVT2XXXk=
+	t=1778503589; cv=none; b=Dw0cYL48gVFPEwJ2E4bklmcURiwNM+uiW8M2wlXdIfkLOfxQRxb9Q99JWLUnFYIP9H2f3EPMM9rw25QOZl3OEY2kIqnOI5a6tz9tvO1BNyGeEuAYs4a6QMQkzc51/ox3HrWub/fFg4KOxxYDYRsxXuWAumXWsyvMAo3TWABiHms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778503317; c=relaxed/simple;
-	bh=mpnlRIp84AtLTYYBNSGEUDcNhnUmPndvkI8ESEoKZEA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Qa+2M0+xqfXwcx9m5tj+1NoaNOSlm3VgzYKcjo3el++uem67ktZKCllN/x1LH36mdewyt5m/sAHrfZcqcgNudZT0SdDQJBj9vxgAtswI232pdFbRLHGolC6njUyd638RGz8xhXxJhL4IeYxpr3XrP5xBRO+GjVuJOHLHZtA+2dE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=btTHTDQi; arc=none smtp.client-ip=209.85.210.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f193.google.com with SMTP id d2e1a72fcca58-83d31ac4017so1319817b3a.3
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 05:41:56 -0700 (PDT)
+	s=arc-20240116; t=1778503589; c=relaxed/simple;
+	bh=Ugs/xjDpsbPmanWITKMhKdhwotw3HHy735HCKeIxttI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CLCBaB0TeFRUAh2LdtQ7xApgHeiGoq76x1e1f9DhZ/rXgAP1TZhiNyrVxtobWg+fZwgjWuXQRcwUdqWuRX/BMM157OCX7S80UBNXyI/Alqvc95beYrHF7Et0FmjPjI7OI4wzoar4+7P8mmr9L5VgpReh0Fz9O1C5+GAFEfgI0f8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W0LRcqN4; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=UnHpC4b+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778503587;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5Xz/1zJ+MWlJ9Av9Kr7QaYQGfRn7oNzrnu40h3srvyM=;
+	b=W0LRcqN4gs+qriITT1SBBCYAF8XmdmAqHbtHRjo3uf+IxcIkGa+Ael6YZdL7IlDaONSKrH
+	rbaICpPr3YnxRt0gty1vhtP8pbI444BrJBY6Tx3/xicmB0QprEADnYMmSGLl9Tez66WRgb
+	n6hsmJUL2n7+nkH+CvGYFknHB9oDHSg=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-596-Gt1lpMv9Nna1b5HCnxG7LA-1; Mon, 11 May 2026 08:46:26 -0400
+X-MC-Unique: Gt1lpMv9Nna1b5HCnxG7LA-1
+X-Mimecast-MFC-AGG-ID: Gt1lpMv9Nna1b5HCnxG7LA_1778503585
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-48e6af7a9cdso18585145e9.3
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 05:46:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778503316; x=1779108116; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ISZM7kzCd3i7an1IFyaHbOB6qikrwE1/Zcric7h+vGw=;
-        b=btTHTDQipDW4Ll5QDeWH3Qd67gV2MJGqKzVn+hIylzkQitmZKS9sLYZ8GgNkRa3JTu
-         GtP8vuxzKox3mKDk0YAX0MxWIm7Oha5nNKKxpEh4hAQg+6Y1L5H1pTbvLTCMbCt+DpMA
-         APbU8dxU4mPLrPNn/ejc38vzAmoqzcl3eLVfqBGYmpNLd9lEOz0BmVvRuRFyM3QbSCRi
-         SymEYnKYAHSkARMJn71D5c6wvZDJUTszCNQh4ZjvzMi0LAaLUls2I43wIVG4W7n6THOl
-         rFFsrtBrG3N75TSxgn5DtqCX+akD76t5T7zCo69IBPb11xvGZm5695KXw61dMmo+27Sz
-         1J5Q==
+        d=redhat.com; s=google; t=1778503585; x=1779108385; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5Xz/1zJ+MWlJ9Av9Kr7QaYQGfRn7oNzrnu40h3srvyM=;
+        b=UnHpC4b+7TUffE5IDNk7xeMSjwd43jGXFzk27dViG4rr5UzG/qZhfZ0xmCoRIWNg3m
+         csyybr9JbsWRzpVdpFVmAtPRwX81HdJRkfHZZ86AElC4UyyeTgTe4Tz18Nihz5h9CE8T
+         7ld3BIjTK+lQCfMaMwa3m6hqdNTqrJ0GyFe6uH7C7PyPSekcXj9Jlc55tInX2gIuG/IZ
+         lYlzo70cWp7D6GWlJfCsSL53Qa16iCxu6aATknXh8ElIWLK6g8gfr8f9SLrkg9UxZYN1
+         FqYR+JZdNQXCz3kkQNk8A4Ie1335Ye4xU3B1qNVZUNO7na/irlrcha3En2KPGIacy68H
+         2j/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778503316; x=1779108116;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ISZM7kzCd3i7an1IFyaHbOB6qikrwE1/Zcric7h+vGw=;
-        b=TXE9KSU4kKsl8rl53qERgvKmBxbhhWtli+k3LVGWvFPHQ9SNJFt7ZBPde3yK02VuHD
-         ejgWrGQsFe6Vzknefci9VOjz30EK7zKE85BH9ir9zWuDbVENskv6nGfkLD7TgjVq4/zs
-         JCKKIVcS+D+wq0EA3xVqTteUmQ1GxRbY1/rYwyhUmF/w3v6saqfSMA/035AvOCty/BNZ
-         u3AQu8zbpi6X4RnMwKwzFRtKubqHrgyZc84R8nnOXJ/UlqSYlFFjHnBKOVh+BKdzCDGO
-         VT1XQI05dYT9wj5l9a6Vl3m+mOub7udhGW4wicMkgeimcb3LrZd0zEZkOjPctiBACMjz
-         xsCg==
-X-Forwarded-Encrypted: i=1; AFNElJ+oq4cjl/FMZylvbVlU1OrWqpnBmdiZYpgSv/Ue+EvBANwaVEZPq5Au0VioSTPcQGZsBJclo8k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUME/O9wZ+cLUDSYDCrcmJzoqwDQPH+i2QPfcbQG+BMWz/AtOh
-	o2Cr0zSLW3MHbdM7IazhfHK319vG1HgYPBZ3wdrEG3QstIbSXUmKSOc8
-X-Gm-Gg: Acq92OHp4DhahNr7Dg+++ITxDNfXpVB7mEJrZjiJEJfRqRa5+84p0r3IAsECwGUMGw7
-	ATgT+qWKzHgae8Z/i5AWm47FRIJ8hTenK2QKxQqzcoKyMhU6CNYMVeCYRInERR7Qc6szVcZM5rc
-	rFEH+wZGHHdBRfTmsk7BlNP2TL6abLCKLb6zC3bSWBpauy9Rqf/vWFUo/UECjV/pKYsnRgL4AZP
-	oLjhHtU0IRMtttJJ0hsu2NKY8ZYrpl31O0CO/rPnt6Ze41YdXnuEmUo0bipjSuYn5l08sKwQl8A
-	ERde8IRPwBPSXLRagEjDZbDIkLXU8slLgTq9pNyBPyXZTJYKZdzfbfwHAsPRafMhUpfdTSNa0zk
-	GxVsWKLdci64zKTMd+R4BmjbV3MxLFxGteLVrRLOsHAGcBhoNiNyE4BBae64Eg1zdtbQD2vqZYm
-	oeiJfsP2vYm9wGKyk3j50M9kQwIRrsfDP8AvM=
-X-Received: by 2002:aa7:88d6:0:b0:835:3f51:730e with SMTP id d2e1a72fcca58-83a5b8d9aa3mr21768467b3a.13.1778503315547;
-        Mon, 11 May 2026 05:41:55 -0700 (PDT)
-Received: from fedora.localdomain ([222.20.193.20])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83967dbf0cesm24961380b3a.46.2026.05.11.05.41.52
+        d=1e100.net; s=20251104; t=1778503585; x=1779108385;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5Xz/1zJ+MWlJ9Av9Kr7QaYQGfRn7oNzrnu40h3srvyM=;
+        b=JM8zY174etJ+G4RmGsXVwaygmGJfsF5FFqGd3HUW7Pxypea/JOxuu+FhwZG0anE7U7
+         35O62FPN/qAg7vyGHGor1QmrdsXQh/pPnpssEJUMXhaAREm8Pp/TpUr2g+Cmenf/8aN/
+         qOX/eBPsr9nYeZtd2CEHc/O6lfkHvK6ojMx4xYQrk3bARE70up+coAYNTM1voiZVCpeT
+         MweGpjhVOkY8R/I83d3+Y7MPqnsWNOoSl1oddHnQrcoGbqTdvN2sGNDFebePCoQqJZ48
+         salY/KMFIe3nEYIC7fqDiidvId8Z2BbA15g64Igd7vp8QjIPMxHFvM8vSOTdlZndk1OG
+         /Pjw==
+X-Gm-Message-State: AOJu0YzJebWfIw1q2iGTTzzjxwnUFOCLwHJoKv3HqbXRKxzUWlYUwPhp
+	QnekJc0vnS/04kMXltGa+qlXAAXukgJREVzybfM0Gw31y4oIcvoSz9mp7fgXCtvcBGKW+Sojj7T
+	VWfN9lXWlzVfgnP6R7jsmssIXvdf9hAa+BL9KRd880lOwAuqUc4+aKMj6WNrAXVQVD2Il
+X-Gm-Gg: Acq92OGG/N/hwBEa/9gXXhh8YMWqGsuVbk5afJeZlT3fdslwoYnxK0u+gmqOMOYomOy
+	WqAg+nRUBN4ux3ns67u30p4G5RY8PsIvRHdWHpcL2yh8Ba3NQiTGAIiXKMY7jjhFXebs1EZoX0+
+	V1aaNOzF35RlvB0M1BdeqWk7aypOI/EUQyiGgQrGPVfT0pkOr+5NqerDD0UhKozSI+V6Mlieuhg
+	aBWFSC+Tg3rUqYlPCvoBfWS/AaPBEINz6XY9RLK2dS27y52CUrNmCE2JZ21DX14DAuC+nJpRwz7
+	Ag8HVzOWISeq2fzYvO/exsB32shJt05l+FY/PvEb/iYoUpOYP47HJ9m0d4wFyI2AkBcs6yp0Jls
+	1sj+lTCpaqeejvFMnCrp9DtqsqwW3FS0WYnN091RW
+X-Received: by 2002:a05:600c:1da8:b0:48e:635a:18d2 with SMTP id 5b1f17b1804b1-48e635a1b95mr271700065e9.2.1778503584618;
+        Mon, 11 May 2026 05:46:24 -0700 (PDT)
+X-Received: by 2002:a05:600c:1da8:b0:48e:635a:18d2 with SMTP id 5b1f17b1804b1-48e635a1b95mr271699365e9.2.1778503584063;
+        Mon, 11 May 2026 05:46:24 -0700 (PDT)
+Received: from redhat.com (IGLD-80-230-48-7.inter.net.il. [80.230.48.7])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e6d895781sm114542925e9.0.2026.05.11.05.46.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 05:41:55 -0700 (PDT)
-From: Xingwang Xiang <v3rdant.xiang@gmail.com>
-To: john.fastabend@gmail.com
-Cc: kuba@kernel.org,
-	jakub@cloudflare.com,
-	sd@queasysnail.net,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	mrpre@163.com,
-	Xingwang Xiang <v3rdant.xiang@gmail.com>
-Subject: [PATCH net v3] selftests: bpf: add test for KTLS+sockmap reverse-order UAF
-Date: Mon, 11 May 2026 21:41:48 +0900
-Message-ID: <20260511124149.14834-1-v3rdant.xiang@gmail.com>
-X-Mailer: git-send-email 2.54.0
+        Mon, 11 May 2026 05:46:23 -0700 (PDT)
+Date: Mon, 11 May 2026 08:46:20 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	virtualization@lists.linux.dev,
+	"David S. Miller" <davem@davemloft.net>,
+	Jason Wang <jasowang@redhat.com>, Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, kvm@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
+Subject: Re: [PATCH net] vsock/virtio: fix skb overhead accounting to
+ preserve full buf_alloc
+Message-ID: <20260511084551-mutt-send-email-mst@kernel.org>
+References: <20260508092330.69690-1-sgarzare@redhat.com>
+ <20260508055125-mutt-send-email-mst@kernel.org>
+ <af2y2Fyp7H-om-ur@sgarzare-redhat>
+ <20260508063104-mutt-send-email-mst@kernel.org>
+ <af28MAV0LF4qHVmB@sgarzare-redhat>
+ <CAGxU2F65pw0P1uKOOJpBc4p6KjCz8iePEh9aPybUyECBm1=otg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 30EDA50E1F6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAGxU2F65pw0P1uKOOJpBc4p6KjCz8iePEh9aPybUyECBm1=otg@mail.gmail.com>
+X-Rspamd-Queue-Id: 7D60D50E481
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,cloudflare.com,queasysnail.net,davemloft.net,redhat.com,vger.kernel.org,163.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-286642-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286643-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[v3rdantxiang@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Add a selftest that reproduces the use-after-free triggered when a TCP
-socket is inserted into a sockmap *before* TLS RX is configured on it
-(the reverse of the order that is already blocked by the kernel).
+On Mon, May 11, 2026 at 12:54:44PM +0200, Stefano Garzarella wrote:
+> On Fri, 8 May 2026 at 12:38, Stefano Garzarella <sgarzare@redhat.com> 
+> wrote:
+> >
+> > On Fri, May 08, 2026 at 06:33:13AM -0400, Michael S. Tsirkin wrote:
+> > >On Fri, May 08, 2026 at 12:01:50PM +0200, Stefano Garzarella wrote:
+> > >> On Fri, May 08, 2026 at 05:53:07AM -0400, Michael S. Tsirkin wrote:
+> > >> > On Fri, May 08, 2026 at 11:23:30AM +0200, Stefano Garzarella wrote:
+> > >> > > From: Stefano Garzarella <sgarzare@redhat.com>
+> > >> > >
+> > >> > > After commit 059b7dbd20a6 ("vsock/virtio: fix potential unbounded skb
+> > >> > > queue"), virtio_transport_inc_rx_pkt() subtracts per-skb overhead from
+> > >> > > buf_alloc when checking whether a new packet fits. This reduces the
+> > >> > > effective receive buffer below what the user configured via
+> > >> > > SO_VM_SOCKETS_BUFFER_SIZE, causing legitimate data packets to be
+> > >> > > silently dropped and applications that rely on the full buffer size
+> > >> > > to deadlock.
+> > >> > >
+> > >> > > Also, the reduced space is not communicated to the remote peer, so
+> > >> > > its credit calculation accounts more credit than the receiver will
+> > >> > > actually accept, causing data loss (there is no retransmission).
+> > >> > >
+> > >> > > This also causes failures in tools/testing/vsock/vsock_test.c.
+> > >> > > Test 18 sometimes fails, while test 22 always fails in this way:
+> > >> > >     18 - SOCK_STREAM MSG_ZEROCOPY...hash mismatch
+> > >> > >
+> > >> > >     22 - SOCK_STREAM virtio credit update + SO_RCVLOWAT...send failed:
+> > >> > >     Resource temporarily unavailable
+> > >> > >
+> > >> > > Fix this by introducing virtio_transport_rx_buf_size() to calculate the
+> > >> > > size of the RX buffer based on the overhead. Using it in the acceptance
+> > >> > > check, the advertised buf_alloc, and the credit update decision.
+> > >> > > Use buf_alloc * 2 as total budget (payload + overhead), similar to how
+> > >> > > SO_RCVBUF is doubled to reserve space for sk_buff metadata.
+> > >> > > The function returns buf_alloc as long as overhead fits within the
+> > >> > > reservation, then gradually reduces toward 0 as overhead exceeds
+> > >> > > buf_alloc (e.g. under small-packet flooding), informing the peer to
+> > >> > > slow down.
+> > >> > >
+> > >> > > Fixes: 059b7dbd20a6 ("vsock/virtio: fix potential unbounded skb queue")
+> > >> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > >> >
+> > >> >
+> > >> > unfortunately, this is a bit of a spec violation and there is no guarantee
+> > >> > it helps.
+> > >>
+> > >> Loosing data like we are doing in 059b7dbd20a6 is even worse IMHO.
+> > >>
+> > >> >
+> > >> > a spec violation because the spec says:
+> > >> > Only payload bytes are counted and header bytes are not
+> > >> > included
+> > >> >
+> > >> > and the implication is that a side can not reduce its own buf_alloc.
+> > >> >
+> > >> > no guarantee because the other side is not required to process your
+> > >> > packets, so it might not see your buf alloc reduction.
+> > >> >
+> > >> > as designed in the current spec, you can only increase your buf alloc,
+> > >> > not decrease it.
+> > >>
+> > >> We never enforced this, currently an user can reduce it by
+> > >> SO_VM_SOCKETS_BUFFER_SIZE and we haven't blocked it since virtio-vsock was
+> > >> introduced, should we update the spec?
+> > >
+> > >
+> > >it's not that we need to enforce it, it's that all synchronization
+> > >assumes this. as in, anyone can use an old copy until they run out
+> > >of credits.
+> > >
+> > >
+> > >> >
+> > >> > what can be done:
+> > >> > - more efficient storage for small packets (poc i posted)
+> > >> > - reduce buf alloc ahead of the time
+> > >>
+> > >> That's basically what I'm doing here: I'm using twice the size of
+> > >> `buf_alloc` (just like `SO_RCVBUF` does for other socket types) and telling
+> > >> the other peer just `buf_alloc`.
+> > >>
+> > >> But then, somehow, we have to let the other person know that we're running
+> > >> out of space. With this patch that only happens when the other peer isn't
+> > >> behaving properly, sending so many small packets that the overhead exceeds
+> > >> `buf_alloc`.
+> > >>
+> > >> Stefano
+> > >
+> > >what is "not proper" here, it is up to the application what to send.
+> >
+> > Sure, but here we're just slowing down the application by telling it we
+> > don't have any more space.
+> >
+> > Again, without this patch we are just dropping data, which IMO is even
+> > worse.
+> >
+> > So I think we should merge this for now, while we handle better the EOM.
+> > If you prefer, I can drop the part where we reduce the buf_alloc
+> > advertised to the other peer, but at least we should drop data after
+> > `buf_alloc * 2` IMO.
+> 
+> Okay, I thought it over over the weekend, and I agree that this patch 
+> still doesn't solve the problem and would still result in packet loss.
+> So, until we resolve the issue permanently, and since 059b7dbd20a6 is 
+> coming to stable, I'd like to rework this patch so that we only start 
+> dropping packets when the overhead plus the queued bytes exceeds 
+> `buf_alloc * 2`.
+> Removing the other changes to reduce the buf_alloc advertised, but 
+> terminating the connection so that both peers are aware that something 
+> went wrong.
+> 
+> Any objections?
+> 
+> Stefano
 
-Vulnerable sequence:
+Let's try to first fix it upstream properly please. Discuss backporting
+later.
 
-  1. bpf_map_update_elem(sockmap, server_fd)
-     -> sk->sk_data_ready = sk_psock_verdict_data_ready
-
-  2. setsockopt(server_fd, SOL_TLS, TLS_RX, ...)
-     -> tls_sw_strparser_arm() saves sk_psock_verdict_data_ready as
-        rx_ctx->saved_data_ready, then sets
-        sk->sk_data_ready = tls_data_ready
-
-When data arrives:
-  tls_data_ready -> tls_strp_data_ready -> tls_rx_msg_ready ->
-  saved_data_ready() [= sk_psock_verdict_data_ready] ->
-  tcp_read_skb() drains sk_receive_queue via __skb_unlink() without
-  calling tcp_eat_skb(), so copied_seq is never advanced.
-
-  tls_strp_msg_load() then finds tcp_inq() >= full_len (stale), calls
-  tcp_recv_skb() on an empty queue, hits WARN_ON_ONCE(!first), and
-  returns with frag_list still pointing at the now psock-owned (or
-  already freed) skb.  tls_decrypt_sg() subsequently walks that stale
-  frag_list: a use-after-free.
-
-The new BPF program (prog_skb_verdict_pass, sk_skb/verdict) returns
-SK_PASS, which is the specific verdict that triggers the missing
-tcp_eat_skb() call inside sk_psock_verdict_recv().
-
-The test drives the full setup in the vulnerable order and then
-attempts a send+recv.  After a correct fix the kernel either:
-
-  (a) rejects setsockopt(TLS_RX) with EBUSY/EINVAL when the socket is
-      already owned by a psock, or
-  (b) completes the data transfer without corruption or kernel warnings.
-
-Signed-off-by: Xingwang Xiang <v3rdant.xiang@gmail.com>
----
- .../selftests/bpf/prog_tests/sockmap_ktls.c   | 109 ++++++++++++++++++
- .../selftests/bpf/progs/test_sockmap_ktls.c   |  21 ++++
- 2 files changed, 130 insertions(+)
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c b/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
-index b87e7f39e..e09861e1e 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
-@@ -417,6 +417,113 @@ static void run_tests(int family, enum bpf_map_type map_type)
- 	close(map);
- }
-
-+/*
-+ * Regression test for the KTLS + sockmap reverse-order frag_list UAF.
-+ *
-+ * Vulnerable sequence:
-+ *   1. Insert receiver socket into sockmap (sets sk_data_ready =
-+ *      sk_psock_verdict_data_ready)
-+ *   2. Configure TLS RX on the same socket: tls_sw_strparser_arm() saves
-+ *      sk_psock_verdict_data_ready as rx_ctx->saved_data_ready and replaces
-+ *      sk_data_ready with tls_data_ready.
-+ *
-+ * When data arrives, tls_rx_msg_ready() calls saved_data_ready(), which is
-+ * sk_psock_verdict_data_ready().  That drains sk_receive_queue via
-+ * tcp_read_skb() / __skb_unlink() without advancing copied_seq.
-+ * tls_strp_msg_load() then finds an empty queue while tcp_inq() is still
-+ * non-zero, hits WARN_ON_ONCE(!first), and leaves a dangling frag_list
-+ * pointer that tls_decrypt_sg() walks — a use-after-free.
-+ *
-+ * After the fix the kernel either:
-+ *   (a) rejects setsockopt(TLS_RX) with EBUSY/EINVAL when the socket is
-+ *       already owned by a psock, or
-+ *   (b) correctly handles the data path so recv() returns the right data.
-+ */
-+static void test_sockmap_ktls_reverse_order_tls(int family, int sotype)
-+{
-+	struct tls12_crypto_info_aes_gcm_128 crypto_info = {};
-+	char send_buf[] = "hello ktls sockmap reverse order";
-+	char recv_buf[sizeof(send_buf)] = {};
-+	struct test_sockmap_ktls *skel;
-+	int c = -1, p = -1, zero = 0;
-+	int prog_fd, map_fd;
-+	ssize_t n;
-+	int err;
-+
-+	skel = test_sockmap_ktls__open_and_load();
-+	if (!ASSERT_TRUE(skel, "open_and_load"))
-+		return;
-+
-+	err = create_pair(family, sotype, &c, &p);
-+	if (!ASSERT_OK(err, "create_pair"))
-+		goto out;
-+
-+	prog_fd = bpf_program__fd(skel->progs.prog_skb_verdict_pass);
-+	map_fd = bpf_map__fd(skel->maps.sock_map_verdict);
-+
-+	err = bpf_prog_attach(prog_fd, map_fd, BPF_SK_SKB_VERDICT, 0);
-+	if (!ASSERT_OK(err, "bpf_prog_attach sk_skb verdict"))
-+		goto out;
-+
-+	/* Configure TLS TX on the sender (normal order, no sockmap) */
-+	err = setsockopt(c, IPPROTO_TCP, TCP_ULP, "tls", strlen("tls"));
-+	if (!ASSERT_OK(err, "setsockopt(TCP_ULP) client"))
-+		goto out;
-+
-+	crypto_info.info.version = TLS_1_2_VERSION;
-+	crypto_info.info.cipher_type = TLS_CIPHER_AES_GCM_128;
-+	memset(crypto_info.key, 0x01, sizeof(crypto_info.key));
-+	memset(crypto_info.salt, 0x02, sizeof(crypto_info.salt));
-+
-+	err = setsockopt(c, SOL_TLS, TLS_TX, &crypto_info, sizeof(crypto_info));
-+	if (!ASSERT_OK(err, "setsockopt(TLS_TX)"))
-+		goto out;
-+
-+	/* Insert receiver into sockmap BEFORE TLS RX — the vulnerable ordering */
-+	err = bpf_map_update_elem(map_fd, &zero, &p, BPF_NOEXIST);
-+	if (!ASSERT_OK(err, "bpf_map_update_elem server"))
-+		goto out;
-+
-+	/* Attempt TLS RX setup AFTER sockmap insertion */
-+	err = setsockopt(p, IPPROTO_TCP, TCP_ULP, "tls", strlen("tls"));
-+	if (err) {
-+		/* Kernel correctly rejected TLS ULP on a psock-owned socket */
-+		ASSERT_TRUE(errno == EINVAL || errno == EBUSY,
-+			    "expected EINVAL or EBUSY for TCP_ULP on sockmap socket");
-+		goto out;
-+	}
-+
-+	err = setsockopt(p, SOL_TLS, TLS_RX, &crypto_info, sizeof(crypto_info));
-+	if (err) {
-+		/* Kernel correctly rejected TLS RX after sockmap insertion */
-+		ASSERT_TRUE(errno == EINVAL || errno == EBUSY || errno == ENOTSUPP,
-+			    "expected rejection of TLS_RX on sockmap socket");
-+		goto out;
-+	}
-+
-+	/*
-+	 * Setup was allowed — verify data transfer is correct.
-+	 * A buggy kernel hits WARN_ON_ONCE in tls_strp_load_anchor_with_queue
-+	 * and may UAF in tls_decrypt_sg when walking the stale frag_list.
-+	 */
-+	n = send(c, send_buf, sizeof(send_buf), 0);
-+	if (!ASSERT_EQ(n, (ssize_t)sizeof(send_buf), "send"))
-+		goto out;
-+
-+	n = recv_timeout(p, recv_buf, sizeof(recv_buf), 0, 5);
-+	if (!ASSERT_EQ(n, (ssize_t)sizeof(send_buf), "recv"))
-+		goto out;
-+
-+	ASSERT_OK(memcmp(send_buf, recv_buf, sizeof(send_buf)), "data integrity");
-+
-+out:
-+	if (c != -1)
-+		close(c);
-+	if (p != -1)
-+		close(p);
-+	test_sockmap_ktls__destroy(skel);
-+}
-+
- static void run_ktls_test(int family, int sotype)
- {
- 	if (test__start_subtest("tls simple offload"))
-@@ -429,6 +536,8 @@ static void run_ktls_test(int family, int sotype)
- 		test_sockmap_ktls_tx_no_buf(family, sotype, true);
- 	if (test__start_subtest("tls tx with pop"))
- 		test_sockmap_ktls_tx_pop(family, sotype);
-+	if (test__start_subtest("tls rx after sockmap insert"))
-+		test_sockmap_ktls_reverse_order_tls(family, sotype);
- }
-
- void test_sockmap_ktls(void)
-diff --git a/tools/testing/selftests/bpf/progs/test_sockmap_ktls.c b/tools/testing/selftests/bpf/progs/test_sockmap_ktls.c
-index 83df4919c..facafeaf4 100644
---- a/tools/testing/selftests/bpf/progs/test_sockmap_ktls.c
-+++ b/tools/testing/selftests/bpf/progs/test_sockmap_ktls.c
-@@ -17,6 +17,13 @@ struct {
- 	__type(value, int);
- } sock_map SEC(".maps");
-
-+struct {
-+	__uint(type, BPF_MAP_TYPE_SOCKMAP);
-+	__uint(max_entries, 2);
-+	__type(key, int);
-+	__type(value, int);
-+} sock_map_verdict SEC(".maps");
-+
- SEC("sk_msg")
- int prog_sk_policy(struct sk_msg_md *msg)
- {
-@@ -38,3 +45,17 @@ int prog_sk_policy_redir(struct sk_msg_md *msg)
- 	bpf_msg_apply_bytes(msg, apply_bytes);
- 	return bpf_msg_redirect_map(msg, &sock_map, two, 0);
- }
-+
-+/*
-+ * Verdict program for the reverse-order TLS/sockmap regression test.
-+ * Returns SK_PASS so tcp_read_skb() drains the receive queue via
-+ * sk_psock_verdict_recv() without calling tcp_eat_skb(), which is
-+ * the precondition for the KTLS strparser frag_list UAF.
-+ */
-+SEC("sk_skb/verdict")
-+int prog_skb_verdict_pass(struct __sk_buff *skb)
-+{
-+	return SK_PASS;
-+}
-+
-+char _license[] SEC("license") = "GPL";
---
-2.54.0
+-- 
+MST
 
 
