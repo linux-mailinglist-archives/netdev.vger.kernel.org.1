@@ -1,217 +1,177 @@
-Return-Path: <netdev+bounces-286690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286691-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UGHlIj/rAWpHmQEAu9opvQ
-	(envelope-from <netdev+bounces-286690-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 16:44:15 +0200
+	id aIx0NyrsAWpHmQEAu9opvQ
+	(envelope-from <netdev+bounces-286691-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 16:48:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96377510746
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 16:44:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5967B510874
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 16:48:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 155653016D2D
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:34:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 813C9305C5A8
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E4A73FFAAA;
-	Mon, 11 May 2026 14:34:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BCA03FD152;
+	Mon, 11 May 2026 14:37:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J/WCly3B"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="lc725K2V";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="e681zYKF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0594E3FE66F
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 14:34:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D147A26FDBF;
+	Mon, 11 May 2026 14:37:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778510074; cv=none; b=hJl2VmygAegjKiIObgrwc1sXGHqBoVgxnTcQh5Zw14zThYd5T38Gvstme0nGWmD6FtkY35N8qUmF7Q5t0DXKHpcq5/AX48eGQHTmgO7ysKht8RyS+krJ9b7ZPFdEVUm0gtPa8RUzkukgmTg3xBZnfn4qQOs+fJXbjU8suV3BCns=
+	t=1778510234; cv=none; b=EyWe7XILmJVtIIR9Xd9qi0jU2tfmvNI5fnXbpp2eAYuO+FyA0FVoOy/8B9Gqrr1cB47ZwAhxfkMZ+h8B3Oe8S2mxyc96HJf+kO6diFGREGOgiWzQts0on1/4YNnaaPOpJQsY1E+kItptZs3NO9hME5ZYzodfYDqwTcDn76KhLCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778510074; c=relaxed/simple;
-	bh=SLCjylkoYyrSymgTADQUnZN5X5pHLMpZcZL0BMK5TuM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NXZa9r6vttOxEhYf3m5pKBr4Hh18HSgcHDPAEn2bfzGtLIaGuz31SaNySY6Pbjc/LUehtOOdg0WctLnmggq2TWdaIt/IG5pBzGTirmgivqWNgQ9lNWL6y1RJTdguPQBm4GSI+qsW4xdtOxVMb7otcw5k6ze3hLIemKnk00g5ohk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J/WCly3B; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-50e5ad864a6so44829941cf.0
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 07:34:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778510071; x=1779114871; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KS/XEaKHIMFF8jDxzt8KXTwiFVllSXPL3p6YrwJsG/Q=;
-        b=J/WCly3B7JLxicixynYiCWpTtpaneFRMbAl+9aWqJ9vMOcIMtUgGEf4Iji4ZlS/tr/
-         R2kRuxP0WFnLm1BarlPszdS7FuXwzUrOwM8f/XjoUCuYVYEOvMcg5DMKhh8kDCg4vl3L
-         xTpoBMghkSK5J0TbTu5ptROEUVYxVZEJXcWkvAv08DQzytY1HRSYRgKgWQ+XbPuPPWqA
-         yTDLyNdLcLxkjXNDIwglLztupKvP0cDS3Q2kHQnSQ8GHNA7TQma9RqvGcUS/Ub3TD8PP
-         6gzS8G26RLusqmoW0YRpNG4jyhwlkJDa0g9OTv0GnRwULubFjQ8HTHKrXNUVv3hC6lFw
-         1eNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778510071; x=1779114871;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=KS/XEaKHIMFF8jDxzt8KXTwiFVllSXPL3p6YrwJsG/Q=;
-        b=MXv6OeJHPZeVraoN79FfZCGeEm33zMOL/hHXdGyMt5UhCQwoEysBw9uwtX+k5k9GTR
-         sh+dsaYLmvTWFIxvq5g9IWuLgQSBRo6U3h4bqYvpyu0lthHTsXL87pf7i6dgiS1TC+1B
-         2xuKy1jYjCbI8G30e77W2nRYMMDjde40B+EjoF4BLD/1NYKm5IPChMN5oxbXEKHiUQjj
-         42GQFxI9b6O4j/9zlFdgmen9r/7YN2DI3Uyd3NUA5PZ6JQYv9rhDvn3pXpda0s9Nam+D
-         3PDHkapJpaXFXQ4OTKG4I2kkADm7zleQagGD0cRibIFl/y6Ir6lUyrCwCfsZ+Qn9igLS
-         4sbw==
-X-Forwarded-Encrypted: i=1; AFNElJ94wq5eH0CO3ZVNajH3CYyPpDczmT7T8z7o3xtrFxJI/HALv02oebIOnO527k0o/UQKaOCYb20=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywb0GG6QoxLslJIDW9LgAae/no9v0RkeN+Wh6P2C2HkJeVMOS7Q
-	HviXwopJvkG8chkMvbaoSYyz4XM5R8e2a38DbRSHpDkI5Go9dbWsea5g
-X-Gm-Gg: Acq92OFFqW1vx6nsENXhuFN0vcv/oteUqKKJr21cJ8vrJc8pcn5V1kdkmOhZv7lhmxo
-	+ztBX7Utw3A+HU0JonzN+V+xpW40RgVTvpByu6ntzSFqnINhCF0vxBbg8M57pnmG5vHaH0UwmeF
-	B51Jo0yDCK3XVhioSEjl34WfdgOSnOSPcxndbVmG9rZZT0lmDubg5rljophfWSfjjGk7GEbNCHS
-	Y2e2QtFWHnjv9Sx3Jq8KnJ02OCPhZCcQQR+0pblbJoTlgV+aIZ2xmQ3Oki2E3dwsEOiuOrXDBqQ
-	LlNJ/vSW/FH5sv8KAwfuOu9D4GM8ZsMEoZijL3dW2sl6LVqvBEBesXkJBsRQjHe99wfKdiK0Fjt
-	VKyTZetYieotyFKleN5FbABN9j41V+u9lJ9kEc0Y0d1x4RFvOz8uQAUR/PToutliKofuwFQDKSS
-	1g2MUHC8VVqqRRKsohYi/pVf3besAmDHMG0RFL23MywgIkqfVtJCPnODJYLIQRwf2yMbJRo3ZiK
-	My6sUayichKDOR5Ns9PnDMij1HnaiCJMezL7UDzDEY=
-X-Received: by 2002:a05:622a:13d3:b0:50d:3e1e:7998 with SMTP id d75a77b69052e-51461f9dd67mr340927431cf.37.1778510070473;
-        Mon, 11 May 2026 07:34:30 -0700 (PDT)
-Received: from server0.tail6e7dd.ts.net (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5148e83aa2bsm90605371cf.28.2026.05.11.07.34.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 07:34:29 -0700 (PDT)
-From: Michael Bommarito <michael.bommarito@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	=?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Mat Martineau <martineau@kernel.org>,
-	netdev@vger.kernel.org,
-	stable@vger.kernel.org,
-	Pauli Virtanen <pav@iki.fi>,
-	Aaron Esau <git@aaronesau.com>,
-	Michael Bommarito <michael.bommarito@gmail.com>
-Subject: [PATCH 4/4] Bluetooth: hci_sync: pin conn across hci_acl_create_conn_sync
-Date: Mon, 11 May 2026 10:34:04 -0400
-Message-ID: <a586369f30357a4efe549f567f0629ba5ee0e7f9.1778506829.git.michael.bommarito@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <cover.1778506829.git.michael.bommarito@gmail.com>
-References: <cover.1778506829.git.michael.bommarito@gmail.com>
+	s=arc-20240116; t=1778510234; c=relaxed/simple;
+	bh=MHWR6PcI4v4xFWUM66sMRBlCTGkVqmXoACACvDyfhH8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EeysYlq0F6bAba65frcqb6Uni96ttP35UFJJ87McGT7U4oPj5LXcIB+4KEZwIJNUSWQkQaIHfSpYI+dKIhf5YwDttq5MzYzJ7yuGyaGujQA7RsAEyI77WGzYVhiooQg0GjzpONpFu764gmGnaX5frboWkqkyg7zqSeM2icl3WQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=lc725K2V; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=e681zYKF; arc=none smtp.client-ip=103.168.172.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id ED1D0140017A;
+	Mon, 11 May 2026 10:37:10 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Mon, 11 May 2026 10:37:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1778510230; x=
+	1778596630; bh=DraMNZxC4g0xYvI3vQ/+Pl5BNX6fpYIX5MbSgrxrC0o=; b=l
+	c725K2V4gvQiLVfBiGWwuKuzDBanFbFWtkxTwDYq8rbeJ//hDXVTSGtzzIe+VjD5
+	V0vwEa4q/PaDVbJBLG/6CtSOAFLcYi+128mM6HShWmaRwFIGEco/3rCDb1mwr01l
+	rXkcKu6eK7wXKneUvSfesOcyFNwmAR1xSBJ5TfCBre+lo07eL5DiDkfm1+QB0cXk
+	2tt6FeUMLb1nRZ6n+a1QMAh3SgtCuhDrRHHd/Y7daKo3gtB5MWZzf2pcOg+pdKUj
+	BF2x5xcRYL4xDJKfp2GcHr3xEXroRy+wIN1Es/7RkR4UfddIf7KEXZrQzVjlcbwY
+	95FpBz8OWc20aGH5ZLPhw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1778510230; x=1778596630; bh=DraMNZxC4g0xYvI3vQ/+Pl5BNX6fpYIX5Mb
+	SgrxrC0o=; b=e681zYKFbw3CZ1cyD9FV6+tshJn19OXmS0cQWa7Iy1xUb7+tLa1
+	s8fJjqdQMyGw26s1q0+tCd6h2xDwnBKtrPfkLKS6hUjVC9nhk3T2NWwNMKKY2pG6
+	PoLTEl6LrIPnDhaV+xh/7gXOhOJ14yuygnqbqYsOt6sdVE6aBBd6q3EkgoqYfKcP
+	JeWtbWRfAsPoaA9igRmVhtp10894MhZiR6dSTN+irZ6LUB9KZ0iz09dK0VMuzJPv
+	C9rJYfEf9jIEOHgsiUJHquWBxre6XwgN+Yq8fpomeBYoAcYyAIdXbCbp0ahvX9p9
+	rLcj4aCcFiHeh/xlE1vrSmXNJh1gLyyfpoQ==
+X-ME-Sender: <xms:lukBaubpWpbJL8zolUbKYZ0H95RezNK9pdO70VxvFp-jty2mWsQOSg>
+    <xme:lukBammCYvcn3LfMvMNiowtQbMGzasi0ItwbmQUh5lVtB4B6ctHTOmKiI_KxrDiCf
+    UC-ym9ZY3EysJ7zWMZ15ZoSD9xEx6KUsxA4IdLpgjvsjErOuYtZnSpV>
+X-ME-Received: <xmr:lukBasVkUjx2cVjPZTVXY7mTWAJB4FG50Pbi2CQAinz2fuzzxCbWjVYdEFdMuX7C97GRbGYFKavYa-GsiZHOeuE>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduudeludelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedugedpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprghlvgigjhhliihhvghnghesghhmrghilh
+    drtghomhdprhgtphhtthhopegrlhgsihhnfiihrghnghesthgvnhgtvghnthdrtghomhdp
+    rhgtphhtthhopegrlhgvgihjlhiihhgvnhhgsehtvghntggvnhhtrdgtohhmpdhrtghpth
+    htoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghv
+    vghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgoh
+    hoghhlvgdrtghomhdprhgtphhtthhopehhrghnnhgvshesshhtrhgvshhsihhnughukhht
+    ihhonhdrohhrghdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtph
+    htthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:lukBagIlWA9Tjd-G4c-XL-jd1EDeQHMn36Gqa8uQpXWT0j0U7g8sQg>
+    <xmx:lukBakshG3bfU1HnUO-uvqzTsC_QaStIZKO78Gi1kmNCuEyFmPe1Nw>
+    <xmx:lukBat0Oe6Wgfr01qffJGHJEA5Kum3xSlDn8Ev0L92evvEX1E6hPyw>
+    <xmx:lukBakNzN6GVLDoq_YCrVn34GFkElTck7sF2aHiJZblsJT_sBdr_SQ>
+    <xmx:lukBarmAgUIVsicDm6sFU37eAbMqJ-Vcwcz2WT4Z-DxKHCl57ZEg5igu>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 11 May 2026 10:37:09 -0400 (EDT)
+Date: Mon, 11 May 2026 16:37:07 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jinliang Zheng <alexjlzheng@gmail.com>
+Cc: albinwyang@tencent.com, alexjlzheng@tencent.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com,
+	hannes@stressinduktion.org, horms@kernel.org, kuba@kernel.org,
+	kuniyu@google.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com, shenyangyang4@huawei.com
+Subject: Re: [PATCH net v3 1/3] macsec: introduce dedicated workqueue for SA
+ crypto cleanup
+Message-ID: <agHpk_g6rC194Q2I@krikkit>
+References: <agHahVF3yq9AuLmj@krikkit>
+ <20260511140005.2619263-1-alexjlzheng@tencent.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 96377510746
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260511140005.2619263-1-alexjlzheng@tencent.com>
+X-Rspamd-Queue-Id: 5967B510874
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286690-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FREEMAIL_TO(0.00)[holtmann.org,gmail.com,v0yd.nl,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iki.fi,aaronesau.com,gmail.com];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-286691-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DMARC_NA(0.00)[queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.939];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,queasysnail.net:email,queasysnail.net:dkim]
 X-Rspamd-Action: no action
 
-hci_acl_create_conn_sync() shares the TOCTOU pattern with the
-three sibling cmd_sync callbacks just fixed: the work item's
-void *data is interpreted as a struct hci_conn pointer, validated
-with hci_conn_valid() at entry, then immediately written
-(conn->state, conn->out, conn->role, conn->attempt++) followed by
-a memcpy(conn->dev_class, ie->data.dev_class, 3). If the TOCTOU
-race fires the memcpy lands on a freed slot; the three dev_class
-bytes are sourced from a remote BR/EDR inquiry response, so a
-successful exploit can land attacker-chosen bytes into the heap
-object that reused conn's slot.
+2026-05-11, 22:00:05 +0800, Jinliang Zheng wrote:
+> On Sun, 11 May 2026, Sabrina Dubroca wrote:
+> > > +	macsec_wq = alloc_ordered_workqueue("macsec", 0);
+> >
+> > Why did you pick an ordered workqueue instead of a normal one?
+> 
+> I chose an ordered workqueue for its serialized execution, which
+> avoids potential ordering issues between concurrent SA destructions.
+> In hindsight, there is no actual ordering dependency between SA
+> cleanups, so a normal workqueue is sufficient here.
+> 
+> Should I send a v4 with that switched to alloc_workqueue()?
 
-A KASAN slab-use-after-free splat in cache kmalloc-8k at
-conn->state confirms the bug on linux-next tip commit bee6ea30c487
-("Add linux-next specific files for 20260421") with the synthetic
-harness driving the conn->state write.
+Probably doesn't really matter, but since your cover letter mentions
+"unnecessary latency", maybe? Would it make a difference in your use
+case? I think it would mostly help when we try to unload the module
+with lots of SAs, otherwise the only difference will be that actual
+freeing of resources will be a bit slower. (OTOH it would avoid giving
+the "wrong impression", that the ordered variant of the WQ is needed,
+when it's not)
 
-The existing queue site at hci_connect_acl_sync() passed a NULL
-destroy callback, so the conn was never pinned for the cmd_sync
-workqueue dispatch. Introduce create_acl_conn_complete() to balance
-the conn pin and convert the queue site to the
-hci_cmd_sync_queue_conn_once() helper. The dequeue-on-cancel path
-in hci_cancel_connect_sync() now looks up the entry with the same
-destroy callback, keeping the hci_cmd_sync_lookup_entry() triple
-match consistent.
 
-Prior art: Pauli Virtanen's PATCH v2 8/8 at
-https://lore.kernel.org/linux-bluetooth/e18591f264c50e15917cb8b9e5f9798d9880979d.1762100290.git.pav@iki.fi/.
+Either way, the patch looks ok to me, so for this version:
 
-Fixes: 45340097ce6e ("Bluetooth: hci_conn: Only do ACL connections sequentially")
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-4-7
-Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
----
- net/bluetooth/hci_sync.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 47ce9ba63fe2..9a133de16f63 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6994,12 +6994,21 @@ static int hci_acl_create_conn_sync(struct hci_dev *hdev, void *data)
- 					conn->conn_timeout, NULL);
- }
- 
-+static void create_acl_conn_complete(struct hci_dev *hdev, void *data, int err)
-+{
-+	struct hci_conn *conn = data;
-+
-+	bt_dev_dbg(hdev, "err %d", err);
-+
-+	hci_conn_put(conn);
-+}
-+
- int hci_connect_acl_sync(struct hci_dev *hdev, struct hci_conn *conn)
- {
- 	int err;
- 
--	err = hci_cmd_sync_queue_once(hdev, hci_acl_create_conn_sync, conn,
--				      NULL);
-+	err = hci_cmd_sync_queue_conn_once(hdev, hci_acl_create_conn_sync, conn,
-+					   create_acl_conn_complete);
- 	return (err == -EEXIST) ? 0 : err;
- }
- 
-@@ -7054,7 +7063,8 @@ int hci_cancel_connect_sync(struct hci_dev *hdev, struct hci_conn *conn)
- 	case ACL_LINK:
- 		return !hci_cmd_sync_dequeue_once(hdev,
- 						  hci_acl_create_conn_sync,
--						  conn, NULL);
-+						  conn,
-+						  create_acl_conn_complete);
- 	case LE_LINK:
- 		return !hci_cmd_sync_dequeue_once(hdev, hci_le_create_conn_sync,
- 						  conn, create_le_conn_complete);
 -- 
-2.53.0
-
+Sabrina
 
