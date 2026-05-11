@@ -1,170 +1,151 @@
-Return-Path: <netdev+bounces-286723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286724-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CANpCVkAAmppnAEAu9opvQ
-	(envelope-from <netdev+bounces-286723-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 18:14:17 +0200
+	id oIXeMngAAmppnAEAu9opvQ
+	(envelope-from <netdev+bounces-286724-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 18:14:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D1B3511E78
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 18:14:16 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0A81511E96
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 18:14:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 95AC7309D66A
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:48:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BC8F03154A2B
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:48:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E58640FDBE;
-	Mon, 11 May 2026 15:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74B840758E;
+	Mon, 11 May 2026 15:47:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RdVmIYXY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BvNpoFXI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC4140FDAE;
-	Mon, 11 May 2026 15:47:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A463D406271
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 15:47:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778514424; cv=none; b=TZJ5cMDL3Gncz0HKMNt6UnZ/Xt7CaKr4vmB0gWyFgSEe8RNFpInFjnl+mX0XqGHL4T3F7+hAJnPJ/ddEZzf7L6x8e1qPIKQD3iXdeuJcESsDTENUkPGoYQUSnJfdvCeYFodKqvtcx0CBc4aHdY8EqD9rMTAS7ZHdE1D7S4vcyNs=
+	t=1778514467; cv=none; b=VReULoS1dnJChkxVXzP2K/19tHS6QMe7daoQ8ZqTyC3pxlvxvVY/POoNSGaUsoKR7cJlpK51O5HJZ9L7yujz6LtGBo+AGoFnPsO7e0ViHO9azHkfs6uJGumbCNMo/xAIv0svLda13oPU9gm3Y/rdbb+VdB8CmxNI0QBYUpxmb2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778514424; c=relaxed/simple;
-	bh=Pvc4wGSjhVhIBgmeGHWrbxZecHGbRz8bUAOHQrD+mU8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Jc2Afoqoy8uTb99Dq7D6X1PcTz2jTds/e/HVZbTjJTDMgX7IzOIVKA4widWwnB+WKrCDf+8ugcd2/SMJ9hBGf2EA9OCPTPKUXMQBVkIFCWT65MTl7YH/lPURS7E8Mtcg+vPEvKtJkNyAoR3FYBI0w8011qoxquL5KmnhPHhOaXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RdVmIYXY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86B96C2BCF5;
-	Mon, 11 May 2026 15:47:01 +0000 (UTC)
+	s=arc-20240116; t=1778514467; c=relaxed/simple;
+	bh=wg3sj4YnE54AHzo71NUx2gXbPJJaa+jjk+3YhaTtn2k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PHfKfXZtgPfhi+8SDmOrgDrgkUKWVvz7y+ssLCnkVHofQZP/2rTbiO4RfxRUHq8TCrdWPAyTKMZlBMLoe9NY6FSY0y30b7OujJquFR6+13Ajisc0YcMlQIq9NVQuustwRv21nYevruxCk7n/64aBsZQMubxyXd6NqKtUdiDNAMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BvNpoFXI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EF42C2BCB0;
+	Mon, 11 May 2026 15:47:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778514423;
-	bh=Pvc4wGSjhVhIBgmeGHWrbxZecHGbRz8bUAOHQrD+mU8=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=RdVmIYXYMb5VQdVjU8Wm2wH40QMtOTXfjdVFTdu38SYBLK227uBpOrrNEVVzHOdj/
-	 8RKyKW5eo/F6N45VG3B4S6SO822ScIb34L+ooaQgmRjIGmg5OpKV6nww/fbMv92MjZ
-	 28+qyfDQks1oGZkKfch2bja78iaSLrNrmumEUHUxJkpvPyB3lGw/Ym1op2NnV5EUcA
-	 8m4vpzMaTbRq+R6g6sIXfKIP+BDzIg2+yhg+BKeIzPpgWvFzotAat04nN89ZJ1Nx+p
-	 s66h0CipwMCEBJSqEgrsfvbs9TaUqn+JaY25v62vesNv5IHvzzSStwG/ZKcmA/vkUt
-	 CD4zc895xZwIg==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Mon, 11 May 2026 17:46:31 +0200
-Subject: [PATCH net 5/5] mptcp: update window_clamp on subflows when
- SO_RCVBUF is set
+	s=k20201202; t=1778514467;
+	bh=wg3sj4YnE54AHzo71NUx2gXbPJJaa+jjk+3YhaTtn2k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BvNpoFXI3fi7jwGkY+pWzGB1wYn05cTBMtf2Kpj7RTyHJq6h1pPue8F7RwO173Ngr
+	 6m+0uZ3W3Jhh6O9cOYnEzxy16U8y0930otjA13SJtsp2NtE0ypnPQG/FoQn8jWsPtR
+	 KpaMT5d1UWpJbbz86jxDsUPw+jiEmn/icj+xqoNKm1LVpvBr7lVZ3gP0aYQr13Qxjo
+	 XiY8SaGpgfLwCDroE0/qJJWHdmPl4SxZYcRJK5APgHS7fNNJbf2+HAzi+s4aFRUcyU
+	 GQTiCzqc48IPD0rhu89keicVmyV6tExe2QBPCdpAAeHvs30A98+RE1gP4qya7zfhnr
+	 99uBaZ7+MwEbw==
+Date: Mon, 11 May 2026 16:47:43 +0100
+From: Simon Horman <horms@kernel.org>
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next 7/8] ixgbe: limit ITR decrease in latency mode
+ to prevent ACK overdrive
+Message-ID: <20260511154743.GD27589@horms.kernel.org>
+References: <20260508031226.3601800-1-aleksandr.loktionov@intel.com>
+ <20260508031226.3601800-8-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260511-net-mptcp-misc-fixes-7-1-rc4-v1-5-5ee57cb2b7eb@kernel.org>
-References: <20260511-net-mptcp-misc-fixes-7-1-rc4-v1-0-5ee57cb2b7eb@kernel.org>
-In-Reply-To: <20260511-net-mptcp-misc-fixes-7-1-rc4-v1-0-5ee57cb2b7eb@kernel.org>
-To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: Eric Dumazet <edumaze@google.com>, netdev@vger.kernel.org, 
- mptcp@lists.linux.dev, linux-kernel@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Gang Yan <yangang@kylinos.cn>, stable@vger.kernel.org
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2246; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=ismW0iII4QhYJ6sgxMbjuN/Lcx0EQOH75zkJ2hNVKak=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGLIYfz6vrhZ0eCB0QoWh7/CGShNTw57z+mKRcrXLXBcd7
- W08fIK/o5SFQYyLQVZMkUW6LTJ/5vMq3hIvPwuYOaxMIEMYuDgFYCIxDowM0+ZuLDF6FGhxyeDa
- 68WBoluOczWe+FkkuTVqEWPkpRwHUUaGObdqmLavOr5RI0Bh2icVgbIJSXZuEstmfxd+U3DJQus
- WHwA=
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
-X-Rspamd-Queue-Id: 2D1B3511E78
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260508031226.3601800-8-aleksandr.loktionov@intel.com>
+X-Rspamd-Queue-Id: D0A81511E96
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286723-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286724-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,kylinos.cn:email]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email,horms.kernel.org:mid]
 X-Rspamd-Action: no action
 
-From: Gang Yan <yangang@kylinos.cn>
+On Fri, May 08, 2026 at 05:12:25AM +0200, Aleksandr Loktionov wrote:
+> From: Alexander Duyck <alexander.h.duyck@intel.com>
+> 
+> When operating in latency mode and the computed ITR is lower than the
+> current setting, the algorithm can reduce the interrupt rate too
+> aggressively in a single step.  For a TCP workload this means the ACK
+> stream (a latency-sensitive, low-packet-rate workload) can drive the
+> moderation down to very high interrupt rates, starving CPU time from
+> the sender side.
+> 
+> After the speed-based ITR calculation is complete, check whether the
+> result is in latency mode and would decrease below the current setting.
+> If so, limit the decrease to at most IXGBE_ITR_ADAPTIVE_MIN_INC (2 us)
+> per update.  This ensures the number of interrupts grows by no more
+> than 2x per adjustment step for latency-class workloads, dialling in
+> smoothly rather than overshooting.
+> 
+> Signed-off-by: Alexander Duyck <alexander.h.duyck@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
-Add __mptcp_subflow_set_rcvbuf() helper to write the subflow sk_rcvbuf,
-but also to call the recently added tcp_set_rcvbuf() helper to update
-window_clamp. This is needed because the window clap is updated when
-scaling_ratio changes, in tcp_measure_rcv_mss(). Until scaling_ratio
-changes, the subflow is stuck with the old window clamp which may be
-based on a small initial buffer.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Use this new helper in both mptcp_sol_socket_sync_intval() (setsockopt
-path) and sync_socket_options() (new subflow creation path).
+> ---
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> index aea76b3..ba7b013 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> @@ -2888,6 +2888,17 @@ static void ixgbe_update_itr(struct ixgbe_q_vector *q_vector,
+>  		break;
+>  	}
+>  
+> +	/* In the case of a latency specific workload only allow us to
+> +	 * reduce the ITR by at most 2us. By doing this we should dial
+> +	 * in so that our number of interrupts is no more than 2x the number
+> +	 * of packets for the least busy workload. So for example in the case
+> +	 * of a TCP workload the ACK packets being received would set the
+> +	 * interrupt rate as they are a latency specific workload.
+> +	 */
+> +	if ((itr & IXGBE_ITR_ADAPTIVE_LATENCY) && itr < ring_container->itr)
+> +		itr = max_t(unsigned int, itr,
+> +			    ring_container->itr - IXGBE_ITR_ADAPTIVE_MIN_INC);
 
-Fixes: b025461303d8 ("tcp: update window_clamp when SO_RCVBUF is set")
-Cc: stable@vger.kernel.org
-Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/619
-Signed-off-by: Gang Yan <yangang@kylinos.cn>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- net/mptcp/sockopt.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+nit: I expect this could be min(). And if it could, it should.
 
-diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
-index 1cf608e7357b..1544e3563852 100644
---- a/net/mptcp/sockopt.c
-+++ b/net/mptcp/sockopt.c
-@@ -67,6 +67,12 @@ static int mptcp_get_int_option(struct mptcp_sock *msk, sockptr_t optval,
- 	return 0;
- }
- 
-+static inline void __mptcp_subflow_set_rcvbuf(struct sock *ssk, int val)
-+{
-+	WRITE_ONCE(ssk->sk_rcvbuf, val);
-+	tcp_set_rcvbuf(ssk, val);
-+}
-+
- static void mptcp_sol_socket_sync_intval(struct mptcp_sock *msk, int optname, int val)
- {
- 	struct mptcp_subflow_context *subflow;
-@@ -100,7 +106,7 @@ static void mptcp_sol_socket_sync_intval(struct mptcp_sock *msk, int optname, in
- 		case SO_RCVBUF:
- 		case SO_RCVBUFFORCE:
- 			ssk->sk_userlocks |= SOCK_RCVBUF_LOCK;
--			WRITE_ONCE(ssk->sk_rcvbuf, sk->sk_rcvbuf);
-+			__mptcp_subflow_set_rcvbuf(ssk, sk->sk_rcvbuf);
- 			break;
- 		case SO_MARK:
- 			if (READ_ONCE(ssk->sk_mark) != sk->sk_mark) {
-@@ -1560,7 +1566,7 @@ static void sync_socket_options(struct mptcp_sock *msk, struct sock *ssk)
- 			mptcp_subflow_ctx(ssk)->cached_sndbuf = sk->sk_sndbuf;
- 		}
- 		if (sk->sk_userlocks & SOCK_RCVBUF_LOCK)
--			WRITE_ONCE(ssk->sk_rcvbuf, sk->sk_rcvbuf);
-+			__mptcp_subflow_set_rcvbuf(ssk, sk->sk_rcvbuf);
- 	}
- 
- 	if (sock_flag(sk, SOCK_LINGER)) {
-
--- 
-2.53.0
-
+> +
+>  clear_counts:
+>  	/* write back value */
+>  	ring_container->itr = itr;
+> -- 
+> 2.52.0
+> 
 
