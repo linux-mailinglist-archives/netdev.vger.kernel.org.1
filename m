@@ -1,186 +1,271 @@
-Return-Path: <netdev+bounces-286646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286647-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +HDPIXHTAWryjwEAu9opvQ
-	(envelope-from <netdev+bounces-286646-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:02:41 +0200
+	id oOngIUvSAWr4kQEAu9opvQ
+	(envelope-from <netdev+bounces-286647-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:57:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CF1E50E7D2
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:02:40 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE4B450E5C6
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:57:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4D2AD3038539
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 12:51:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C01983006801
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 12:57:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AACB3A3E74;
-	Mon, 11 May 2026 12:51:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 104313A3E70;
+	Mon, 11 May 2026 12:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ryQVz3zY"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="UHfU/ReE";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RFwEd2rv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f66.google.com (mail-dl1-f66.google.com [74.125.82.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from flow-a4-smtp.messagingengine.com (flow-a4-smtp.messagingengine.com [103.168.172.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6448A3A3E68
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 12:51:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778503901; cv=pass; b=qAsvAvpmRT9pIgeCGaRpMstnKlhdXaEueasynwNB17yVwU0JW4Vi1DN6TtCNQeW9oAuPSCMXFVH/UMJdlUry9Qm02fhF1/RD0VypOCLgTKeymtHlkRUbIaJvnp3gCHVnaRCze7nPkFHKkChPspKOF6pDLUpTHjLJR9bzK00YDBU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778503901; c=relaxed/simple;
-	bh=6Nd+aRmLnrN6tq4Ole5E+cFDdSKj0kHlKORyZ3uhk8M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nWGvgiNZ2QjVKEe8uSSF7Nah9TwW2p5JQFsmjZbMcmk7S79kfiGTEvc8UeHVCWUFl/owt12KyNPUrEXXIciRg5JY5gZA+jpF+3QZVBOLLfGKOH4MyGe4jbrjm8E8oC9rJaZE+R/px6OpHFzdXUFJkVBUG5VSajtSZB6wdFUIzYI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ryQVz3zY; arc=pass smtp.client-ip=74.125.82.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f66.google.com with SMTP id a92af1059eb24-132d1b2519eso1685776c88.0
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 05:51:39 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778503898; cv=none;
-        d=google.com; s=arc-20240605;
-        b=XtEMTtOwJzWQHsUWWHA2HIungG3DHikAn6cqru9MMS+QIvuGuJ2RjNNmTr7eGjU9ks
-         oKhVDiRaCFa05HKIkAB8AxI65v7tnLokS+PieiAhNsuUTVe8SAfQ3GKV5r0Hb6rtUkjn
-         glzGRuy4LYXPHvZfzXxBh8QQ2nnIDm6NdQwiwp8tfrAM6Yix1+8SCbBwDzuAOu6rXYfs
-         xmGAlTEvcu1ruFtFFurdt/V19FG6a2/xi/6SuuV0WqGcFIwODdww3KX8bd6emIa8Qp71
-         C5GUlXxmt0XKtlmKod4nNRoTdxMvS6J3mh3P2ks8pt8KKVCfrnuU8vRpf3S0gWP1KZw1
-         UnmQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=KLpfJUI7ANkWk2FxmqE86hmO2gLdFqLessgqqc/MMP4=;
-        fh=d89ehEq0UX+vwNEnzC+QBpdYit2jbpznlCPfA5N80vk=;
-        b=Xjh98SuWnh1bUwE0kGPBEWyfNhTUqE5sl4ntS9cFmy+u+PFC9EyWmpd0QbeKnvFo/2
-         0VvKvAsz3wvkwbk3SgVAXygBfcgNXy2iPYDH2eYBiiv/4jXaHk9bef7ZjyGnHPgwSmet
-         /g4BZkWy+Cy0hILv/b0QPP8ijKPW16FRNRiYCq91V2R1/MMsiqNyxV3u50HA1pPvYCn5
-         lFN1dEcwGjIi92YIlY6OOdi5In2vY/zzXkFrdEw0LZcUjdYPxS5zxu82fWEvOXo6Bexs
-         dTboNV493PYgrrRGNJPrAhXi5PUSE5djBeZPF6Am4ha/hDgZPtqemVclnMy0iKJOCZ1p
-         ifVg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778503898; x=1779108698; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KLpfJUI7ANkWk2FxmqE86hmO2gLdFqLessgqqc/MMP4=;
-        b=ryQVz3zYV0+CeF+DGAB7Nw4RRU3E1Z7OT2kmXsVKg2YfqYNpJZvFoQf8tIBmnjiXrr
-         U0lqnmyudnL7iBeGJClhbVqcvpJ8gR/R7N9dT6fNa43Bsay4l9JwwnDOVY9VHH9IEpCH
-         hUdceS5CDlXyMX1XDtDw5dUaCx7a8Rfawp9IbKq7R02LNbp4zTKeDIH/3GtHLGIN+tYE
-         ZOUokEyD5vzcpXhztVEJRJPh+xNDKsdMgVled1yE8LUJANFFFbnAnw3xQlVgx4nNElcp
-         40yZvK9falo2b5NbVc1RBn1VGD2kiv/cMsaTWRpDDRm/fbkCm6bH0eKlZUNRcJBUzWbE
-         /fWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778503898; x=1779108698;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=KLpfJUI7ANkWk2FxmqE86hmO2gLdFqLessgqqc/MMP4=;
-        b=bMFdisOMsl7R9SNSax9Qo9nF1zc/oq1OWj1ZQXAHlDs/EV/i4pyYo7xkJ0rcsKXhXu
-         6mnkY07ZgTP2akn7GoAh7h39AXrLyttlHG5LlwxyhzNYMQxPCkKg0rSomhjANNws7ROx
-         bg9NuGUt69huwiILRZibcR0S7ZFfwFj+hiO+Xf8tKWSUoq7nhGrlBtiSBTiZrhLRdjDr
-         3N1/7VvWyf7GuvavZmRUARljDOUWt+W2zEk5SKO0EnFRYZ7wkI+tHk0JHQu6yTB0VWNP
-         Hkut/zXWVEg5CpOwE/Y7bQcEiN2hBJgVgt6eVHLQRt9oo94zXr67yBCX/Z1JPzsLch5u
-         hm0A==
-X-Gm-Message-State: AOJu0YzxbfqWshh22uS7vTm4FG3ofstvbxqWLcnnwOHbdGrpe3KCXSRq
-	6BwGmXeykqOpbJKHoZ8b87wE1nfLiH94LrsjG5zNobv8uNTD1d4+BpMpBUfDlPjpkNDIRiYsWBs
-	8EgMSo2fUDq9oP2A+GKOEh8UFgxHPFDeW1RoZGU3BNcnr
-X-Gm-Gg: Acq92OEFLeMxaARqkt4SfnkKWczCAaTNUNT9htAcP9WnxwDHo41ZVgL3SU5QFN2+obe
-	M2UHUE6p5S13wqqzV23AAoYDwRrZEnY7zvHwYea9+3QYR4t1fucL7g5pAunQtaCfsgtSLETOOYE
-	QO4rbwZGJA5tGghoCtYr9djLIoVnVlZ7ApLxEw1vcQZwVP9MJbyjGYCF/fXtpTL4mbnug4g7xfn
-	DxBoRlxhNUfQjOHyEd2E+rAJPIyTy4W7e5npzt7lGPPpE4PfrX5SFJj0WJyKK43n0I+A/MfE6Cr
-	z53ObhvHHa1zOLbxMQ==
-X-Received: by 2002:a05:7022:61a:b0:12d:de3f:d845 with SMTP id
- a92af1059eb24-1319cf4b792mr12173986c88.40.1778503898311; Mon, 11 May 2026
- 05:51:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB7838F25F;
+	Mon, 11 May 2026 12:57:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.139
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778504262; cv=none; b=M0oGt5RKcsorw0314GBsNmAfdjqUsazoCXfGe/FV83dY0zs8urDAPfwQFATechpTKzEFDbaC4f/Ibx6g3CQulkkK6I8dAL3R3g54eFZj/mncn1v8J65pRGbMJ0KSBXF09iob+uHie/xfmsl3BkO87eqeHDF8tLOFb2pAMM0ESss=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778504262; c=relaxed/simple;
+	bh=T+zncbAmIN2Y8Xk2STET9vNGfkNEwsoAfL1FFMPW80E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kOVDD+QQ+qWsdgFi0hPzek9gZoW1Y8CLHchsk5KyEpez2nCu5ZGVOGy/VJF7xPLbPgKVtTNFeEkne3Zn+ItMcsm2R7oE5x53oKcKWt0y3DGZTFpcbC1751FrC0JvmbY2zKq7NoUNBk5YuE0+eyib6Si++s7A6vXxSFWcNSAD14Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=UHfU/ReE; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RFwEd2rv; arc=none smtp.client-ip=103.168.172.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailflow.phl.internal (Postfix) with ESMTP id 6C2A91380432;
+	Mon, 11 May 2026 08:57:37 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-04.internal (MEProxy); Mon, 11 May 2026 08:57:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1778504257; x=
+	1778511457; bh=9ZylBAjhvDw36cIdH/cZimW58y/qeCfbSIMHarjSv/E=; b=U
+	HfU/ReE0eGF0atBgOVUXv4OilVhWJfQhktDLokRaQ55xfUQ5nXHW8ABWP1v1700i
+	WPmjNbrZbuP9U685Q7Hzn+Jqkpe41FauBl+EauqDf0TkWtJfJJsf/bSUl08hUXgQ
+	f1cuNj9EBiy8zG7mzbGaJlckDqlbCu6WPfeXcN2VV1ifggZmUfB0Tl92ZyeBp9EK
+	VyWBxzaNQ6Eo2p3ogMz9XBTb/F8PzGVq6ItuCOhWKPSaBS1fL+BPiO/eFt5UnHRJ
+	s+TOEQ6TN5BR0QvS3GWbEBifHZHXTVt/HzANrpVeBnnEXr3eA7O4GCi95kTl2mDy
+	NKI3nmMSceAp3X2ZWkxcw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1778504257; x=1778511457; bh=9ZylBAjhvDw36cIdH/cZimW58y/qeCfbSIM
+	HarjSv/E=; b=RFwEd2rvJl4W6cfGdJlaHfoXglNAWuooBpTU6Bv0s2AeZ765qZ3
+	QDX8aHiO1lXER05/ccuGIqrULUU167isaAzKCmRBNHVLVxTp5dK82m+jvKiSdSfL
+	IZXdsNcgNxUWTFt7ZuNq5WZn9083cVlHqR8VTNEb4TFswc1Qk0nTOdr8mfcwDxAx
+	DwPUzMX8aThwC9LOljcna9LX0RocZkLfv46cvr8hFlA2m7kqIYMVuVMMDXNyGvWz
+	UlOB4uCnpSm2A+ed6I1fq5HdvH+dzgUDf4Vc9yzLpnn0Zd0nOkMzgn2ktwib1g9D
+	98jc4eETMWkqtagCTL9IKTm9SgQkqXf4emA==
+X-ME-Sender: <xms:P9IBaiIa6ok3fBrwWxfukwjcaK6AvNR5gI2o8Yl-x308N_W-hwU_oA>
+    <xme:P9IBaryzSLU6j_74eOGxkvKt2V_9t2LYKPmgkI6z8KeK8MLCKKhEvsESfx0v5rAE0
+    aC-sl9Zd7gBQBMSvcTHQgQxZkjriVrNoYHxlcD5uxC_QSxKQesAzA-A>
+X-ME-Received: <xmr:P9IBamxUgaFvD4OQe44zdJz1waE1axIN3-ae8cyVxjf1XbJq6yQ5h2tnpt0Iq3LJE49fvkgvIBawLDx_0kVgksU>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduudekleelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedvvddpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnthhonhihrdgrnhhtohhnhiesshgvtg
+    hunhgvthdrtghomhdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgv
+    tghunhgvthdrtghomhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprg
+    hnrgdrohhrghdrrghupdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgv
+    thdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoh
+    epkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughh
+    rghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpth
+    htohepughsrghhvghrnheskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:P9IBat2gizePE2hTqULqNwpw4FauESLg4RYoOOrJb0cJf_xFpje1XQ>
+    <xmx:P9IBaoWosNg2YqzmWXKxrQ7V58Q7Gfk8x2aCUpq18PO3e6VjAeD-Fw>
+    <xmx:P9IBahcyjK0jrzMydfaJDtMXvCoyPhdI8DUZCizgg92rT5b5P63CvQ>
+    <xmx:P9IBap8OElGSCzktMKVkdzF4otyYXnVwr6nGm_P0qbEfJMu7I-RbUQ>
+    <xmx:QdIBaouFlNyjobY9-si-kDTjl4P1jCpiO77iw-tT3vbL-0Xt00NPbteL>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 11 May 2026 08:57:35 -0400 (EDT)
+Date: Mon, 11 May 2026 14:57:33 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antony Antony <antony.antony@secunet.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Masahide NAKAMURA <nakam@linux-ipv6.org>,
+	Paul Moore <paul@paul-moore.com>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, selinux@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Chiachang Wang <chiachangwang@google.com>,
+	Yan Yan <evitayan@google.com>, devel@linux-ipsec.org
+Subject: Re: [PATCH ipsec-next v8 14/14] xfrm: add documentation for
+ XFRM_MSG_MIGRATE_STATE
+Message-ID: <agHSPUBZg0tHezM-@krikkit>
+References: <migrate-state-v8-0-4578fb016965@secunet.com>
+ <migrate-state-v8-14-4578fb016965@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260321033027.4044119-1-v3rdant.xiang@gmail.com>
- <8509360a-21b8-4d28-8999-67a82796b8b6@163.com> <CAFFJMPyDpKwW9O127JkS1B3bgGGzWPpiw5MqFEbGB6Qpq0nsVQ@mail.gmail.com>
- <20260321074155.6fdb79dc@kernel.org>
-In-Reply-To: <20260321074155.6fdb79dc@kernel.org>
-From: xw x <v3rdant.xiang@gmail.com>
-Date: Mon, 11 May 2026 20:51:25 +0800
-X-Gm-Features: AVHnY4L-WffnVMXUV9-yEd9LXW2OghGxZTJ1dYDha2T2hTs72zL35G821GzoLgw
-Message-ID: <CAFFJMPyGjiaOAE6uui20fyxHfSVB11C-RWvKrzeHMAi7gUJK8A@mail.gmail.com>
-Subject: Re: [PATCH] tls: reject attaching TLS to sockets already in sockmap
-To: Jakub Kicinski <kuba@kernel.org>, Jiayuan Chen <mrpre@163.com>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 1CF1E50E7D2
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <migrate-state-v8-14-4578fb016965@secunet.com>
+X-Rspamd-Queue-Id: EE4B450E5C6
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286646-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,163.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-286647-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-0.998];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[v3rdantxiang@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_CC(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,google.com,kernel.org,redhat.com,linux-ipv6.org,paul-moore.com,gmail.com,lwn.net,linuxfoundation.org,vger.kernel.org,linux-ipsec.org];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-> Also, could you try running the sockmap_ktls selftest
-> (tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c) after applying
-> your patch?
+Overall a very document, thanks. Some comments:
 
-I have merged my POC into the test, and it triggered a crash when I
-ran `./vmtest.sh -- ./test_progs -t sockmap_ktls` locally.
+2026-05-05, 06:34:55 +0200, Antony Antony wrote:
+> +    struct xfrm_user_migrate_state {
+> +        struct xfrm_usersa_id  id;       /* spi, daddr, proto, family */
+> +        xfrm_address_t         new_daddr;
+> +        xfrm_address_t         new_saddr;
+> +        struct xfrm_mark       old_mark; /* SA lookup: key = v & m */
+> +        struct xfrm_selector   new_sel;  /* new selector (see Flags) */
+> +        __u32                  new_reqid;
+> +        __u32                  flags;    /* XFRM_MIGRATE_STATE_* */
+> +        __u16                  new_family;
+> +        __u16                  reserved;
+> +    };
 
-> FWIW you can open a pull request against this repo, and it will run all
-> the sockmap+TLS tests for you: https://github.com/kernel-patches/bpf
+Thinking about the UAPI a bit more, maybe this would be a good time to
+start introducing a "proper" netlink API for XFRM? Instead of having
+the main properties in a fixed struct, and a few attributes as an
+afterthought, use attributes as the main way to exchange information?
 
-Do I need to open a pull request to the BPF repository now? This test
-suit will cause a crash.
+Then we can start adding the attributes as alternative to the fixed
+headers in some other ops, and later start deprecating the current
+API?
+
+(for some reason this thought only popped up when I had the html
+rendering in front of me, sorry it's so late in the process)
+
+[...]
+> +Flags
+> +=====
+> +
+> +The ``flags`` field in ``xfrm_user_migrate_state`` controls optional
+> +migration behaviour. Unknown flag bits are ignored.
+
+Maybe better to reject unknown flag bits (as well as unknown
+attributes beyond XFRMA_MAX), so that we can fully control their
+behavior, and not risk incorrectly migrating an SA if a "too-recent"
+userspace passes attributes we don't know (then if we fail to handle
+them in the kernel, the SA may not handle the traffic).
+
+(Steffen and you will have a much better understanding of the security
+risks here than me)
 
 
-On Sat, Mar 21, 2026 at 10:41=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Sat, 21 Mar 2026 17:47:07 +0800 xw x wrote:
-> > I apologize. I fixed it this way because during my exploitation, I
-> > discovered that sk_psock_init checks for the existence of ULP in sk,
-> > which led me to believe that disabling sk with TLS from being added to
-> > sockmap was expected behavior, and I thought this fix might have the
-> > least impact.
-> >
-> > In fact, the other patch which I believe is a more fundamental
-> > solution, is similar to CVE-2025-37756. In
-> > `tls_strp_load_anchor_with_queue`,
-> > `skb_shinfo(strp->anchor)->frag_list =3D first` acquires a reference to
-> > an skb but doesn't own it. This causes a  dangling pointer when other
-> > kernel components not specifically adapted to TLS (tcp_disconnect in
-> > CVE-2025-37756 and bpt in that vuln) release TLS skbs.
-> >
-> > I will try to add my test program to
-> > tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c so that you can
-> > test it and understand the root cause.
->
-> FWIW you can open a pull request against this repo, and it will run all
-> the sockmap+TLS tests for you: https://github.com/kernel-patches/bpf
->
-> reminder: please don't top post on the list
+
+> +Migration Steps
+> +===============
+
+maybe add:
+
+Userspace is expected to:
+
+> +#. Install a block policy to drop traffic on the affected selector.
+> +#. Remove the old policy.
+> +#. Call ``XFRM_MSG_MIGRATE_STATE`` for each SA.
+> +#. Reinstall the policies.
+> +#. Remove the block policy.
+> +
+> +Block Policy and IV Safety
+> +--------------------------
+> +
+> +Installing a block policy before migration is required to prevent
+> +traffic leaks and IV reuse in counter mode.
+> +
+> +AES-GCM IV uniqueness is critical: reusing a (key, IV) pair allows
+> +an attacker to recover the authentication subkey and forge
+> +authentication tags, breaking both confidentiality and integrity.
+> +
+> +``XFRM_MSG_MIGRATE_STATE`` atomically copies the sequence number and
+> +replay window from the old SA to the new SA and deletes the old SA.
+> +The block policy ensures no outgoing packets are sent in the migration
+> +window, preventing IV reuse under the same key.
+
+Does it matter that the copy is done atomically if we expect userspace
+to install a block policy? (without the block, I'll have to recheck to
+convince myself whether it would be safe, and TBH I'm still a bit
+confused by patch 8)
+
+> +Feature Detection
+> +=================
+> +
+> +Userspace can probe for kernel support by sending a minimal
+> +``XFRM_MSG_MIGRATE_STATE`` message with a non-existent SPI:
+> +
+> +- ``-ENOPROTOOPT``: not supported (``CONFIG_XFRM_MIGRATE`` not enabled)
+> +- any other error: supported
+
+
+xfrm_user_rcv_msg
+
+if (type > XFRM_MSG_MAX)
+        return -EINVAL;
+
+
+Userspace will hit that on a kernel that may have migrate but not
+XFRM_MSG_MIGRATE_STATE, no?
+
+
+[...]
+> +Error Handling
+> +==============
+> +
+> +If the target SA tuple (daddr, SPI, proto, family) is occupied by an existing
+> +unrelated SA, the operation returns ``-EEXIST``.
+
+All this happens under xfrm_cfg_mutex, so if we did an initial lookup
+for the new SA before starting the operation, we could ensure there's
+no dupe, and the mutex would guarantee no insertion. No?
+
+-- 
+Sabrina
 
