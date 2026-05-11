@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-286657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286658-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eJqOIojgAWptlgEAu9opvQ
-	(envelope-from <netdev+bounces-286657-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:58:32 +0200
+	id ME1rEhbgAWptlgEAu9opvQ
+	(envelope-from <netdev+bounces-286658-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:56:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8347C50F7B4
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:58:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DDEE50F72D
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:56:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8F384306A553
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 13:48:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EDEC130CDCCD
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 13:48:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9933A3F7874;
-	Mon, 11 May 2026 13:48:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 563CC3FA5C8;
+	Mon, 11 May 2026 13:48:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="dw+kQApz"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="fdvpZ34P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5593F2116
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 13:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983F93F65F9
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 13:48:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778507291; cv=none; b=JLSjMsi83ijsmsibQE0XVNhIEWpero410h2kKKyxJEHbFxmnwcORc6ng6ZxS6Mhm9+3ekKH7JwKZYcOONRYkcGTGPLoOcteTkK6ifgnYOpb8rMryApFnw4FeyUxP/m555dlskSJE7xrpEm3Kjd4BxzHpEwJheaMyiIYcvR0cXwY=
+	t=1778507294; cv=none; b=mW63d7XFeCdHlObMwTl88+1SmoE9cqQWCX32I3fkLMHP8uBJkh4vCwYG5EowEL3OanntBSyUKtHc5BFdOj/LqEdzNL0/SaTTRiZGxd5RcziF4e4QaP5FMlIs844yjloErBUjTH4HVK6icWA9V2WDZ5KcuDRTPN7zFPRWHAGmsLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778507291; c=relaxed/simple;
-	bh=mwbCUn08CWMwL0woqy177gkj8PZXx4Uk/KthAashRy8=;
+	s=arc-20240116; t=1778507294; c=relaxed/simple;
+	bh=5lTw8AW4wHd4EwAFkjJzid9ifnmy2d8f+Nyohbx8bF8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oWP/oT/sMjC0SQuSsnX8T6q6wGmXvMOw8CSVwAoSTJY/5bhsYiVEOIlZwtYOLrhVtnSvLh6KOGZIrXkiKh2GYHCXwS0KQCDJFwi8OUUbdY40PRQwryO/ShTSz3IA/zxf7XhOQC1ZetWcuwQEu2sUxj71fusOdbn0VTB0jfXEOW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=dw+kQApz; arc=none smtp.client-ip=209.85.128.42
+	 MIME-Version; b=mF09zW75c4wjiYsRPs7Aqx06U4WNbul5aJQZyfslV2JUFDuwJ+gNpBtK+esrBeMnyUjdfwT+X0ckq2Bm1z24WXRftvOgaSBiRe/JaDEiZ9yuVC4RRhtA23ucA/roia2JbSJz23zkCFSh/8JjluOqsSmkTkA/JlHTuaECGhTT4sM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=fdvpZ34P; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-48d102471a4so43197565e9.2
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 06:48:09 -0700 (PDT)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-48a3e9862f0so29017985e9.1
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 06:48:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1778507288; x=1779112088; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1778507290; x=1779112090; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OmJGUnALjoD0KZePhh+NZjTK3Hla1q67wmp2q20EKW8=;
-        b=dw+kQApz6Plu6e2KvAy73Con9p5oCpwQnrP4pQ13yHwpy1T/8KAlt0meTVaZ/l9XsU
-         PmhHfP0gRnRuCJiW2a3a4Z3vXw+pP0Wi4VU/kB6RICkauy1CewU3UEk2Z7KGV0Vqqry+
-         7FwcwYCzydjUgZrd5wiIJgK8m2I+tVi/wTsIxRhbcUCwjLG6rlp+ZNfc/yQOHJyV74WG
-         E17FTxkAnw4pnV3/+ZB7vFlWNXj8/1uDmrlUZGi2TLkatPxj7BjWm8GUUBs2Gd2TDOAl
-         P41o/bAfUm+JERGbvA9AtbXFTg2Z1c04OjiB0C1spM0SruvoOeZXCQYbC5zEGOw5DmR4
-         TXDQ==
+        bh=5jEKdOT9KNT9VkfLURxJrQMx5JuEqo+lpwOnRqNvfvY=;
+        b=fdvpZ34PGkii73OrZ3bKD/2ykJ93QnGL42dlkoCxkXvZPfHQ+BxaVd1wK+uuA1S2KC
+         Y4rYShGIkkbz0UGs2T9fcVtKQYeoAu+JzCxdLsFoszsLi2mXeVMuCzCbqCj5kzKenXvo
+         nD7bPdh7Qwnl08pcWrrKIqXCXrEgTAyh6wEGG6f1G7b2MXMoRwGEGEe3zBHGRvhi2Zke
+         nAHhggyHw58OYe5xwrMxrqKgPXECZASfhLk/23/ygeNy1IqIsb9f78qjthT5RoLVOwWT
+         fiad8cf/Oj0ZdfKB6+G7qQtwRijuU7ZblE1Xr0VzkUWNlniao1JxMhaqqqVk3hQGjEAt
+         vf4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778507288; x=1779112088;
+        d=1e100.net; s=20251104; t=1778507290; x=1779112090;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=OmJGUnALjoD0KZePhh+NZjTK3Hla1q67wmp2q20EKW8=;
-        b=a1qZvEYp5hFBVjvYBHudDxCIBSwxOfbM0+KtI1fqVf+dkSIpgs0COkHQmwU9UvBnfO
-         RueK4mkaCSviyIBtKE1pVwaxMK9ISsN5wocI6QCh8Xfj1azN+H1bnEi5vxs2X/ttQyha
-         XZ28msOGTvdf9HzZtTMyu9768/tLI1Xmlp9jI4j9RAsVsRNp18ies53ycIz2F6HghZMK
-         wlYvNXImnVSlGHsVKes3Meo8ydEyiGyAEh+aj5R92jjSQySwzweJvfBAET7tQD+tIrB9
-         04UX5FmPsp/yn3uRHr7zzrfmUBpoz57Orna+gVintWXaZqemXX1xH934su0tT1RvGBZr
-         NZDg==
-X-Forwarded-Encrypted: i=1; AFNElJ8HT1MirtMu6p9uEO99aSUr4O/qPbEyME+hPrEGqkfZ3Nu986Ll4hOlMHpSP+dW3aywxeQ5weg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMXwBhppUK0TSvuLbS1vzBq6TR/PGeA64se6ND2867h15clFTF
-	XOqMoF6mvF5BiUdL3y6uwzKTsYmZJ8ADhBr1l7UNNOGu7I9NgMZnb1FnenvhvieV5AE=
-X-Gm-Gg: Acq92OGDtxCSiP2/tpuwE7E+X76Zl6HS0+GXWF9UhTlRRtTaUzGUio9KH/lUucxn3/I
-	+8Kg1eyMZpk2uD6CocKeHOk6YSJ3ql45kAzFjipdoTSZED04cU1PCa/EDUMDDizTK69mvZgcLsD
-	hydeJS4LWy1ko8svVK3hWaE6xNQLWOlU5K5X16qfHUSnikp5HUNTA7oLL0aWDdybTt11sXleqU3
-	Oam3/w3Eg4ljcw/0x5vSdvOMvwr4JuN6rK9yFz15nFRC83qOHAzjMRkDFgjJwLj+Lvdys8HP3KM
-	+oBm/csObIiNEMilFQdHyMgkCw+fAXg4N2o6ZJapB/iZ21Kwgc2j7AhyAzy92LY41e/UvuAE0WR
-	qVfGAp4yAB8n0LwO0TOyKG8LzvysoHUAjg8GS6jUNBbXtQKynuK161c17IA4/5k/4FqRyOIQLdm
-	G4NEFA/mPtahamhuh5zQjanzyBlj2gISJejEe5fgTEsZKEQLU=
-X-Received: by 2002:a05:600c:4703:b0:488:936a:6220 with SMTP id 5b1f17b1804b1-48e676ac055mr227158915e9.21.1778507288202;
-        Mon, 11 May 2026 06:48:08 -0700 (PDT)
+        bh=5jEKdOT9KNT9VkfLURxJrQMx5JuEqo+lpwOnRqNvfvY=;
+        b=KX/0oAletAPIMYDzRdnp4fp3Pzf5NuRt71lV/StSq1CVaLqrC6gSCJoGygXpO2HcZi
+         IhXGNB8eRDOYl+a1P2WzFMhFpWHxHlCmThYIXZAIwj5Y9D2ZR3bMxN4PFi6ZdvMNypli
+         B8HsEvUGbb2eGhm8D82ch3vXflzUeA/PD7BAG7yk31wlWMIO7t6STLM15yY9MMe/ScwR
+         NGY1lq1n3ZWDiRN8JCiXLdqTsGWYq2xg5285lWqbYJ3u4zRPS3OV7MfUCwkOwKE3skU6
+         519KFTuOONJv4EeJgQvSyDVdRl/vk1z1g3bzJYTHebuDYN40Wp2+9Z0pkWmRDIaDTBRc
+         r/dQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8685IlAjbbShZbjRYs4FDPcCkvwIEmuLbrar0USTfgJ4IXtH+jcSYWTqscmkMizm2U5bMmWwc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywb4sRqCX3wyhDW6snPon5C5RKJTpKMUsRVzGsjshiuq2JAkI8p
+	KA1DfUlK+9uICDSkRj86D6d8Vc8gwJpSBW93WBIdZlFNAHXJfxXUh1dkUM9J7KZRQko=
+X-Gm-Gg: Acq92OEryytjW6hm0zUC9cAx6W0ORwbGmqp8GFTdQ94FiAaOU5oY5uNk+Nyu9SMF3bl
+	zhMpIzL1XoREfOud/vB+AFv+R60EPiSkcbSFfrkTP75yO+K7Ew+mo9VAGDLkiWo4y6YY2Bdzdww
+	E/e7rndWgQrXXblXwcVWWL0o6/g/HNVXVKOL+bDw2NpLaC+730VyFAX2wxOQVTlxniuQLhQz1Gc
+	aBc2xGtikadWQwG379Wa7aqtQDuU1lmBA0NNDB3PbzJYHiyOShKkfy3YW/bAVz6JV6LrUCBPsCR
+	zOEiFaiKAoUIcwqd0Rzwhiu+XXMfPaE9lQh4yG9vl0ZF+e7mjjUvra8PZkc+TfC7XzTYLbRdtI7
+	W+GzEL2ByquEqAA3ovhk4hIdRxmtMBJTdU3kkRzKO7gwMooSuWAT/mY39FFKzmyRmemSnJkV+B5
+	852dGCnZP+4RYsdIPgZxHG3EXabV3UOmEvaKIzOw+/aimmaL8=
+X-Received: by 2002:a05:600c:3b8f:b0:48a:79d8:a8d6 with SMTP id 5b1f17b1804b1-48e642deefamr241378475e9.7.1778507289999;
+        Mon, 11 May 2026 06:48:09 -0700 (PDT)
 Received: from localhost.localdomain ([2a00:6d43:105:c401:e307:1a37:2e76:ce91])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e701e957asm188062665e9.6.2026.05.11.06.48.06
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e701e957asm188062665e9.6.2026.05.11.06.48.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 06:48:07 -0700 (PDT)
+        Mon, 11 May 2026 06:48:09 -0700 (PDT)
 From: Marco Crivellari <marco.crivellari@suse.com>
 To: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
@@ -90,12 +90,16 @@ Cc: Tejun Heo <tj@kernel.org>,
 	"David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next 1/2] ipmr: Replace use of system_unbound_wq with system_dfl_wq
-Date: Mon, 11 May 2026 15:47:36 +0200
-Message-ID: <20260511134744.277032-2-marco.crivellari@suse.com>
+	Julian Anastasov <ja@ssi.bg>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	lvs-devel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org
+Subject: [PATCH net-next 2/2] ipvs: Replace use of system_unbound_wq with system_dfl_wq
+Date: Mon, 11 May 2026 15:47:37 +0200
+Message-ID: <20260511134744.277032-3-marco.crivellari@suse.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260511134744.277032-1-marco.crivellari@suse.com>
 References: <20260511134744.277032-1-marco.crivellari@suse.com>
@@ -106,7 +110,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 8347C50F7B4
+X-Rspamd-Queue-Id: 6DDEE50F72D
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -114,18 +118,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linutronix.de,suse.com,verge.net.au,google.com,davemloft.net,redhat.com,nvidia.com];
-	TAGGED_FROM(0.00)[bounces-286657-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linutronix.de,suse.com,verge.net.au,google.com,davemloft.net,redhat.com,ssi.bg,netfilter.org,strlen.de,nwl.cc,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-286658-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[suse.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[marco.crivellari@suse.com,netdev@vger.kernel.org];
@@ -135,7 +139,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-0.998];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,suse.com:email,suse.com:mid,suse.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.com:mid,suse.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ssi.bg:email,nwl.cc:email,strlen.de:email]
 X-Rspamd-Action: no action
 
 This patch continues the effort to refactor workqueue APIs, which has begun
@@ -157,29 +161,92 @@ new workqueues with no intended behaviour changes:
 This way the old obsolete workqueues (system_wq, system_unbound_wq) can be
 removed in the future.
 
-Cc: David Ahern <dsahern@kernel.org>
-Cc: Ido Schimmel <idosch@nvidia.com>
-Cc: Simon Horman <horms@kernel.org>
+Cc: Julian Anastasov <ja@ssi.bg>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Florian Westphal <fw@strlen.de>
+Cc: Phil Sutter <phil@nwl.cc>
+Cc: lvs-devel@vger.kernel.org
+Cc: netfilter-devel@vger.kernel.org
+Cc: coreteam@netfilter.org
 Link: https://lore.kernel.org/all/20250221112003.1dSuoGyc@linutronix.de/
 Suggested-by: Tejun Heo <tj@kernel.org>
 Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
 ---
- net/ipv4/ipmr_base.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/netfilter/ipvs/ip_vs_conn.c |  4 ++--
+ net/netfilter/ipvs/ip_vs_ctl.c  | 10 +++++-----
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/net/ipv4/ipmr_base.c b/net/ipv4/ipmr_base.c
-index 3930d612c3de..867b24beded1 100644
---- a/net/ipv4/ipmr_base.c
-+++ b/net/ipv4/ipmr_base.c
-@@ -39,7 +39,7 @@ static void __mr_free_table(struct work_struct *work)
+diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
+index 9ea6b4fa78bf..2625c0379556 100644
+--- a/net/netfilter/ipvs/ip_vs_conn.c
++++ b/net/netfilter/ipvs/ip_vs_conn.c
+@@ -285,7 +285,7 @@ static inline int ip_vs_conn_hash(struct ip_vs_conn *cp)
+ 	/* Schedule resizing if load increases */
+ 	if (atomic_read(&ipvs->conn_count) > t->u_thresh &&
+ 	    !test_and_set_bit(IP_VS_WORK_CONN_RESIZE, &ipvs->work_flags))
+-		mod_delayed_work(system_unbound_wq, &ipvs->conn_resize_work, 0);
++		mod_delayed_work(system_dfl_wq, &ipvs->conn_resize_work, 0);
  
- void mr_table_free(struct mr_table *mrt)
- {
--	queue_rcu_work(system_unbound_wq, &mrt->work);
-+	queue_rcu_work(system_dfl_wq, &mrt->work);
+ 	return ret;
+ }
+@@ -916,7 +916,7 @@ static void conn_resize_work_handler(struct work_struct *work)
+ 
+ out:
+ 	/* Monitor if we need to shrink table */
+-	queue_delayed_work(system_unbound_wq, &ipvs->conn_resize_work,
++	queue_delayed_work(system_dfl_wq, &ipvs->conn_resize_work,
+ 			   more_work ? 1 : 2 * HZ);
  }
  
- struct mr_table *
+diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
+index c7c7f6a7a9f6..f8fe1c8981d8 100644
+--- a/net/netfilter/ipvs/ip_vs_ctl.c
++++ b/net/netfilter/ipvs/ip_vs_ctl.c
+@@ -800,7 +800,7 @@ static void svc_resize_work_handler(struct work_struct *work)
+ 	if (!READ_ONCE(ipvs->enable) || !more_work ||
+ 	    test_bit(IP_VS_WORK_SVC_NORESIZE, &ipvs->work_flags))
+ 		return;
+-	queue_delayed_work(system_unbound_wq, &ipvs->svc_resize_work, 1);
++	queue_delayed_work(system_dfl_wq, &ipvs->svc_resize_work, 1);
+ }
+ 
+ static inline void
+@@ -1833,7 +1833,7 @@ ip_vs_add_service(struct netns_ipvs *ipvs, struct ip_vs_service_user_kern *u,
+ 	/* Schedule resize work */
+ 	if (t && ip_vs_get_num_services(ipvs) > t->u_thresh &&
+ 	    !test_and_set_bit(IP_VS_WORK_SVC_RESIZE, &ipvs->work_flags))
+-		queue_delayed_work(system_unbound_wq, &ipvs->svc_resize_work,
++		queue_delayed_work(system_dfl_wq, &ipvs->svc_resize_work,
+ 				   1);
+ 
+ 	*svc_p = svc;
+@@ -2078,7 +2078,7 @@ static int ip_vs_del_service(struct ip_vs_service *svc)
+ 	} else if (ns <= t->l_thresh &&
+ 		   !test_and_set_bit(IP_VS_WORK_SVC_RESIZE,
+ 				     &ipvs->work_flags)) {
+-		queue_delayed_work(system_unbound_wq, &ipvs->svc_resize_work,
++		queue_delayed_work(system_dfl_wq, &ipvs->svc_resize_work,
+ 				   1);
+ 	}
+ 	return 0;
+@@ -2511,7 +2511,7 @@ static int ipvs_proc_conn_lfactor(const struct ctl_table *table, int write,
+ 		} else {
+ 			WRITE_ONCE(*valp, val);
+ 			if (rcu_access_pointer(ipvs->conn_tab))
+-				mod_delayed_work(system_unbound_wq,
++				mod_delayed_work(system_dfl_wq,
+ 						 &ipvs->conn_resize_work, 0);
+ 		}
+ 	}
+@@ -2543,7 +2543,7 @@ static int ipvs_proc_svc_lfactor(const struct ctl_table *table, int write,
+ 			    READ_ONCE(ipvs->enable) &&
+ 			    !test_bit(IP_VS_WORK_SVC_NORESIZE,
+ 				      &ipvs->work_flags))
+-				mod_delayed_work(system_unbound_wq,
++				mod_delayed_work(system_dfl_wq,
+ 						 &ipvs->svc_resize_work, 0);
+ 			mutex_unlock(&ipvs->service_mutex);
+ 		}
 -- 
 2.54.0
 
