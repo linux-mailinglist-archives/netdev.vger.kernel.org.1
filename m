@@ -1,258 +1,269 @@
-Return-Path: <netdev+bounces-286556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286557-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mEpEEEWfAWpKgwEAu9opvQ
-	(envelope-from <netdev+bounces-286556-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 11:20:05 +0200
+	id MFciEAChAWpKgwEAu9opvQ
+	(envelope-from <netdev+bounces-286557-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 11:27:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E06250AC26
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 11:20:03 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B59E750ADAA
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 11:27:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A8E7E3024031
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:09:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7E6C630556EA
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:11:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21B73BA220;
-	Mon, 11 May 2026 09:08:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452843B8958;
+	Mon, 11 May 2026 09:11:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="RP9TYwqy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HWkYLsRP";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gUyu9PCk"
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013044.outbound.protection.outlook.com [40.107.159.44])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F7337D101;
-	Mon, 11 May 2026 09:08:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778490481; cv=fail; b=Zesp7BVZTEH3r2FR+9aRy1OunXj7zGsyN5WyujdVMMrQ782LLzHGbZ0TqEWznXOKOmK9snKVfgyn/TneRjwSCIEXlx69TCbvuJVybkfBh6J7aQuk6LkM1Vcnqpv0tT+L0BE+JE2RuTqqrB+OL4ZGCGTsqrp+/JQ1rH6HhpK0jU4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778490481; c=relaxed/simple;
-	bh=Ddl2gu7Y5KYpTuhMSmMk1D+KHv1vkOZ4XolFgVCsdbU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=L2Hs3DnKNRKq4cW39QY0YEZk0rYR3VrJSYHuraKO+O10yuho+KidypF1CrSLyQuhTM3g2fZafzlW3xxhQSCH8biUMrzPWG+rjRqH55DXAdY0oNWg8pjsWQs9AC8+APtFLDzUPOmHRq+KKeCvLKCFpWqyCdQoHrQnhj0fc5M95QY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=RP9TYwqy; arc=fail smtp.client-ip=40.107.159.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=k2qQ/otQYY7p5UFNmnCZz51fjUTKiuJeWCJXZtIAs4vqsav+afSkLSA8uh3OktQ24PWP4a7xpCttumq862jAwoFw9QUexgxNIM6dh/DwjoIQbgeUFomSiLIh7qAcVPPOfNeMrItFAyX0JXyFh5iV5qaoPrhIpFLo7uU8FdSGblLqNXk1tX4yZehZxI2gcRMZmyAgDVkM9C65kElAz9XkyJDz50j3KK17U5qKiZc2EFGJjyYojukbfPxZhWCx9NLcRTXSCG3bfRfkDzlPMA8iKuwrjAmUUJ9VxZU5AFbhKDeO/XgbA7BrmJhDDKqENmHB0RZAYAYME9UkSgYB939g1Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QMSBGnUEG0HMANx4DS9Ckfs66YuOmFxtG8EJgsRK+oY=;
- b=rOPzSMIBDeTirr4QqodKsprER/v7i0buOVnFKy0yOmo100ppj46Jwe0VgSJBGNPs/ZsiFbbKIMCl2RzFF8l2JHgyQMBMJzAy1occQKGqFi8T5OGvPiZVEUU+B1n0iDEXWZ5Fr2M85lowjmfKlG8/8y854xr6N7VzA7huOjwa2qnGD/K7t2zH7PWPNNf0jHstAAVJzKuJivWwzF0+2q9lVoXn+mxBv5xndBkLuJOS9hx9cr1LlGGICEJ5JiDIwiM5z9mO/yQ+UZm4UD7vJ8bWLqRr0lKIyqh3wQD8dfJzEGPjjEz8ex4p9FoNQqsFPoDj2q7+igp7kBwfghL1iXI/jw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QMSBGnUEG0HMANx4DS9Ckfs66YuOmFxtG8EJgsRK+oY=;
- b=RP9TYwqywWZZOkYhBOqPiepwKDIIdVspKTR56gJ54Qwqgx+2hHSo6Zlhs55Yh8fkipI4sgZbb+5My68mwfR9l/qi1HlGWK/EzSwoM5GWGf+sUofy6rltO/mjBteau2I5OsroRIKEU71SuxXN3V1bfd4QqbEU2kFjJ7VeggiH5R/c5UgiN2UVL3aImil87/+lHpNb84JAi3d9nSM96ssLs/82kTscRJ910EEHExLkfhZaZ44QQLDSBIGFcBkQuctivT02mVUzK0FIDEYx4/62i5nXbIBGQqcZ0Y+zV3teU0Uw52Sp1lxJLubO4jWojvOX5qmwaeEYVFq0cHleUBAryQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PA1PR04MB11508.eurprd04.prod.outlook.com
- (2603:10a6:102:4e0::21) by DU0PR04MB9494.eurprd04.prod.outlook.com
- (2603:10a6:10:32e::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.22; Mon, 11 May
- 2026 09:07:56 +0000
-Received: from PA1PR04MB11508.eurprd04.prod.outlook.com
- ([fe80::ca15:d140:3af1:77b3]) by PA1PR04MB11508.eurprd04.prod.outlook.com
- ([fe80::ca15:d140:3af1:77b3%5]) with mapi id 15.20.9891.021; Mon, 11 May 2026
- 09:07:56 +0000
-Date: Mon, 11 May 2026 12:07:52 +0300
-From: Ioana Ciornei <ioana.ciornei@nxp.com>
-To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 10/13] dpaa2-switch: offload port objects on an
- upper bond device
-Message-ID: <nzqag7u4ebk4csdkgofs2zmyyt6sdgeu56uzkzloecd3qc4xyu@32gck2hubytg>
-References: <20260506151540.1242997-1-ioana.ciornei@nxp.com>
- <20260506151540.1242997-11-ioana.ciornei@nxp.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260506151540.1242997-11-ioana.ciornei@nxp.com>
-X-ClientProxiedBy: FR4P281CA0316.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:eb::16) To PA1PR04MB11508.eurprd04.prod.outlook.com
- (2603:10a6:102:4e0::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A6B363082
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 09:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778490661; cv=none; b=IfCtEV/hh6njC3rvsY82WcmHLj2PpX2doer2NV7QNJKkP8GiW/HW4qFKIZHn461PQoL8PdWrGs/iyq2Z40B7mn2SuujJ3l991RhLcTvbZHkDd1Jr+n3q1edObrPFQEkD7neaPc44XwczSrbgVAmGf9BEweXv3aPZ3vO9ZdSoNac=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778490661; c=relaxed/simple;
+	bh=NOVPw0sRFmhs/549yezkhu2bnfPqQ2AHmr7i3bUMSWg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TTEDUXWAeucjZoRVZkItyfgpk7Os3lBsj2Nv86yGO6OAxNVQ/9m2EqwzHnajSi0Gpse5ktmdht/0uHSIZzIVtTOCvfGhbkxQCACbrphzizm9IMhqPeQFc0nXJByVh6p500S7eDY9CeGeifJ1SCGHGuK7b/4CTwoSPbQMigj5dJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HWkYLsRP; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gUyu9PCk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778490658;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GeXjhbPFcIE2xpoWydu6GqD8aKPwmV5ublK6KJ28nAc=;
+	b=HWkYLsRPaoHz7KxJeITJVNyRa6E5WsVlc16ZlutllRZbbuFHen+MVD8JttVhcgSGaRIsiD
+	oRldV0qbPj6xpMgD2PqQX1yaQ36fidiEJWTB28Th7UTondJ9eIpN+dJDJTK1UM2+lBlNO2
+	0Ses0Vlabd6F+Vr88KrhAH0YGSTXECM=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-304-qsIXXvM9N3u2WFhTAeBnVA-1; Mon, 11 May 2026 05:10:56 -0400
+X-MC-Unique: qsIXXvM9N3u2WFhTAeBnVA-1
+X-Mimecast-MFC-AGG-ID: qsIXXvM9N3u2WFhTAeBnVA_1778490656
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-488d8deb75fso30098745e9.3
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 02:10:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1778490656; x=1779095456; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GeXjhbPFcIE2xpoWydu6GqD8aKPwmV5ublK6KJ28nAc=;
+        b=gUyu9PCkWd2lgQx96I+kGh1XC3gqZO9nAu+qbvim7zG6zlyQZW0FDmUBk9NdAH3f+a
+         MOPpQ5c3gF/MHJSLeZmR4AispSwWGP90lRx70L0T11x1sttkhRCMwEJXkEsyPBad7si1
+         hCUo2MAHhcYjeFohSkq5KRXd/xuM2nujga7ee6jZs8y+9ozs+AN7o08KxBKWI8IS6k8Z
+         YOTt+sMCGgBCNPUqmgvl2VrvikQfPiQEWLwf8+g3Rk7h58J1gaXmbGB7+DRpq8U3kcoh
+         xv4mm2PZ13z7fIsZHMrmLsVqIMjs+w6fO6NDGn2jtKzmABKC0Q2DD/Jp52MxrMlJifh8
+         om9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778490656; x=1779095456;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GeXjhbPFcIE2xpoWydu6GqD8aKPwmV5ublK6KJ28nAc=;
+        b=NYy4zs1xpOdQLjn1OcHFddv795Y7TclQxa6jRQYB1nA2MxELU2JBCBq9uaXKbb42P0
+         AyLufF/BgA4rLsRcmzQAhwhUaj5Zs3nZ4UD8EMRCUdBdT5jtpFvBgHt4R0sGvAZxNA//
+         teHZawjASROT1w9No5GaFimG1zFoxmZk89UXBYtVhPR7/gtPPkQOu/mskDll6P8BJuCF
+         eHgkG+Fmen8wIHUhv+L31EdNsnxruTTP0APS+AzGfzpnyzG9jpehxKlzBSVP1335b2FC
+         pRWwG69KkkUEjJIzBMHrvUYEiu/TdnEswEa8Q2+h5DEPzgf+Qp7Dt0gWJmFgEDbOEjhZ
+         nHdA==
+X-Forwarded-Encrypted: i=1; AFNElJ/hhyQ4NaU9wx/ANB6FGLvBP6/6qGQH63tGmBSQIxSVW+zUtgFc7p6sJpoc5SAUJH3I6TVehq4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZTpZ5vctciDJdMfPrD7BWVZxNg/gCC+zzs6TDir9kUMg64GxZ
+	w05RQI6UbX61E2SZo/6i8T3kF+qggl+5TlbfUp0IGAgAm5RE5uZMHNDmQB5oQgZEvxjkiMKKesY
+	HW2OpYFm9ig8Sx4tvo6WhNkTB+fm8awgJIbKJ1nbtTYavMIrISxtGpC4hqw==
+X-Gm-Gg: Acq92OHPxQqfEWvI9GQG4fsxt2mk2hAHgHYMSNmduorzUAOCL1J6V1NssmgsOinXmEc
+	qPueyw2yOjCws9aAD+btPPc1UcxV10TZLPy5POVbQvH++NhrddhlGn95RmtYNxK9r0Znpvx6ufa
+	Jy2gOVuI027ArWUO89JsiyRLTzuBJ0Mkiyp8xbDrpHdQDrSZQKHw/gd/IklnTZdm0MVO/lGRu+9
+	MuuxD6rdckAlmF7zAvHMNZvgdUKtIzkxtVFseILGXKk9pgJ3lLGfnQWhUwGcgZVgbEf0aRk7URX
+	5xQwM4WtpIAQiGL2kCoMzzrzKGuHUaPYZLyNmU2NNVuRwCxGBOdozG883pSUxaoV/6KW6cOiZDo
+	ZoRc4VDet0S9olR4/06AnBLrLIGhe0kMhdDqU8gfz
+X-Received: by 2002:a05:600c:628d:b0:48e:82b4:b54 with SMTP id 5b1f17b1804b1-48e82b40ba4mr52289595e9.23.1778490655512;
+        Mon, 11 May 2026 02:10:55 -0700 (PDT)
+X-Received: by 2002:a05:600c:628d:b0:48e:82b4:b54 with SMTP id 5b1f17b1804b1-48e82b40ba4mr52288725e9.23.1778490654837;
+        Mon, 11 May 2026 02:10:54 -0700 (PDT)
+Received: from redhat.com (IGLD-80-230-48-7.inter.net.il. [80.230.48.7])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e6db09cb6sm58109535e9.22.2026.05.11.02.10.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 May 2026 02:10:54 -0700 (PDT)
+Date: Mon, 11 May 2026 05:10:50 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+	leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+	tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v12 0/4] tun/tap & vhost-net: apply qdisc
+ backpressure on full ptr_ring to reduce TX drops
+Message-ID: <20260511051037-mutt-send-email-mst@kernel.org>
+References: <20260510151529.43895-1-simon.schippers@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PA1PR04MB11508:EE_|DU0PR04MB9494:EE_
-X-MS-Office365-Filtering-Correlation-Id: 05b8e429-70e2-45c5-d6d8-08deaf3cca28
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|19092799006|366016|376014|18002099003|22082099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	LUZP+DWmH1DuVM3K73Nsx0cfx06emjfT63t12sKiDp0pL/mVIHF5h2gnsL+lOF3XH1tT3cd9ye9he1nEsNTooqPaN1UTvcQbqfXtD52r2czL7533PV2EomVX3IKl8Mcr0Vi6PzVmZwa+4ti38sFJsHyi75AgaQjoqWraNnA70+NVQVIhp21ALOGqcyKY89e400FKyvhzHoPLQaMbVFzJ7NjDLUf7+2Z3fDu7OvdRB3rb1A2G97VnWsi7Uq1NVKUqOFj608Gx+9OJvRcngJhQO9OMalX9bf5rG3ZsLQtE7hbMNjwKRBzhNKmvHTiRVDIYXWh8tleq+sZvGazDpm85uGskvaUK4Xf/ui/F04LpdsUqXgASwAiDeHiIzHxvn/HZm4p012K8xoUxim0ebnRDuHCjyiZ2kHeMBbeCQQSK/YyTMNlBt44vvmqxLjMIMy961rpjC26LWWc/K0kELEslOJUyNE/eQeEbRepCjCyxT4ho90ZU5sCNYcOKvxHkty6pR86YXPC/Ng8O7lsbxnlQx2oF0kk5OM5KKyRR/KKyRL0+RHwtUyAaspXVDbDNUGZOMQxAPENAAIyijIa9fLSo12pytQFCZiqE9PoF07jIv8rGKxFqxFgqeK8l8D7I6+BeNZ2WzOt/p3GUxF7LxB2cU2s8xMOBFHmzsr4rjvkBKtbzvKKbpbVyL9OVu+lqpxTy
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA1PR04MB11508.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(19092799006)(366016)(376014)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?PPfwTtG0FaeO11unv2A5qascdmNyKsQyvTDcGvzSJpom76pAcC69XSNPDMnA?=
- =?us-ascii?Q?sbr1w8Lh/xkL7nBahpBO94VHGIopxwC1Omqa+wRxL9UHnLRCDCZxbeaL6wbd?=
- =?us-ascii?Q?Rdr4ThC2bda1dxMDxkAKgnrARu/P+vLTYAz+OO5jEYFnrt+CtF0JhPcWEjuL?=
- =?us-ascii?Q?MwUZbcYbHkjsCbk5DhLh/GSKAzErO0tlbQwPZzRBENuLZAixyGq1lCgLKf+e?=
- =?us-ascii?Q?5z6rcFtE9kTpQSJ0IyBr3eboY9ewVChSxq5Bb/qXUvwUbXVPO91cL5goIF12?=
- =?us-ascii?Q?j03GaxtByDG0INQONi5kyDPKRmfRCMTwG9bg5Es8Kt3m0JAIRPqFlNIFAuBO?=
- =?us-ascii?Q?DH7gWl+ORHw1pqSuGpN7h1WkJqsQFWvtPaDDs7vsP+I03SuIRK6YBOAj9mAR?=
- =?us-ascii?Q?KMmXz2WTOgtPGVIY8Vn9kFEqMjXWha4n3MaopCReWMO0NESACjzn80+hO1/+?=
- =?us-ascii?Q?+4y2EcM78k8FdEsHXPDpwNeG9t8nO46eX5OrIUh8j5VaWp/+FQyrj2tcKtAe?=
- =?us-ascii?Q?/+vkA3PgmJD8zvOVF0LPC8Pv5P7MONo5uXxe9smLOe5j3stIqbkiVVhgPP4F?=
- =?us-ascii?Q?qctImg6wjPJLW/VVqwAqvPqa52+FPOAAJ/c30cOronqEdLDeKtSIzDC8heOO?=
- =?us-ascii?Q?80zXl79JWw51LqdiMwv6LhXxMXYq85+hXKRaaDY2H7G2hp0MYQbVugl5JXL/?=
- =?us-ascii?Q?PUsWz6VnzJCmfqcU+ViIkpYSvT4xLEbIpxjM2YJmgH9DLtQi9TTipH+gzsbg?=
- =?us-ascii?Q?KoS0IqRvitoajl0sMOJcwJ976Sy4E9OOuGZJ3dGKlyQkhB6NZgOaDtQEcBXv?=
- =?us-ascii?Q?RdByOi0u+UYuBEaDp4dbm0/XXHBykVZWl54gr8Gw63E9J649XOrXpPvXK1BX?=
- =?us-ascii?Q?3qcpXt/AQS3dck5vV1FMui3pG0STvxaAfjncVoC2wQ25ZFdi4Vs0Z3mqNjRd?=
- =?us-ascii?Q?7N7vIuIR72cuU7VrlOLTfJ3N2d72jjNayd6BaGULBRTQ2NLIXvZ61t8qAjg2?=
- =?us-ascii?Q?74gsWEJoV0WpbSpqD8r55LSZclfcQ6B0P2D+5CnZjxzToRdYKWhdpdv42Sji?=
- =?us-ascii?Q?6rwkGC7oQsVN8r8iTYZRNcTHdAxMeTzlner9jPDUn2MGqB5yd2wnjR0vENFw?=
- =?us-ascii?Q?Thn8KdkGYuoCLqWC4gEeKLeMuVRGu2dq9snapX5nzK4tyAvN7CvVldhrIIyH?=
- =?us-ascii?Q?rA/2U4EOwsru3ztGOnYgmWjurKMV/LSjkj1Fl66MAJKGdZwwTrF6kuECJpQr?=
- =?us-ascii?Q?iGt6c4lKBh0Du9o4hOtFUoGH0dboYIF4MtjV6JBhqpXiIp/pyqJuUKHRCNIJ?=
- =?us-ascii?Q?9YYdDUibJi7qXp2eGDKJrMK7THB8buh0EZgvbvWDMZrrc8wzDQIePw8JpCvA?=
- =?us-ascii?Q?qt3DO3udvY/RCcYLrnYMvI4cKZi9wMD1Ev9F+BWmh7+HHfZq7PJTac0OXVyt?=
- =?us-ascii?Q?Cz5x2M+TPa1tQK52aIDeQOw5gI44OQQbddAJ2fXlFldzho2Mrr7s2tjQVImD?=
- =?us-ascii?Q?fUwsnJorMAt9J2BpIoGHqol52ZnF78havyssp2387GfQBRpkW6mrnJONt7Cq?=
- =?us-ascii?Q?BpZaMdxoHIEN7kKQHMV+KhyWRm1ywqtKHwMbv8m5SvzlsBMZdwrf0z0c+GJi?=
- =?us-ascii?Q?nt9b817+zoQ5GT9Xo5A/Gzr8jFAzT2yWYD1bi8E4fwLEBjfYf794y+NEZiJ4?=
- =?us-ascii?Q?LkXgOS8F8tXBjkB8jkadZIWiv+Xe4Th0BLxZlKUY2kX6W/fD6YcmgTEcFBxp?=
- =?us-ascii?Q?08MtZiyySA=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 05b8e429-70e2-45c5-d6d8-08deaf3cca28
-X-MS-Exchange-CrossTenant-AuthSource: PA1PR04MB11508.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2026 09:07:56.0024
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PNjZANS6tpq8muNpZ9ukFVGJlUZvdDLstgjOF2/brmhWd8PL2qEMh4TSufkEuFH/3DWueIY96/ttHn1zVGVIZQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR04MB9494
-X-Rspamd-Queue-Id: 5E06250AC26
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260510151529.43895-1-simon.schippers@tu-dortmund.de>
+X-Rspamd-Queue-Id: B59E750ADAA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-286557-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	TAGGED_FROM(0.00)[bounces-286556-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,nxp.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,tu-dortmund.de:url,stackexchange.com:url]
 X-Rspamd-Action: no action
 
-On Wed, May 06, 2026 at 06:15:37PM +0300, Ioana Ciornei wrote:
-> This patch adds support for offloading port objects, VLANs and MDBs,
-> added on upper bond devices.
+On Sun, May 10, 2026 at 05:15:25PM +0200, Simon Schippers wrote:
+> This patch series deals with tun/tap & vhost-net which drop incoming
+> SKBs whenever their internal ptr_ring buffer is full. Instead, with this 
+> patch series, the associated netdev queue is stopped - but only when a
+> qdisc is attached. If no qdisc is present the existing behavior is
+> preserved. The XDP transmit path is not affected. This patch series
+> touches tun/tap and vhost-net, as they share common logic and must be
+> updated together. Modifying only one of them would break the other.
 > 
-> First of all, the use of the switchdev_handle_*() replication helpers
-> is introduced for the SWITCHDEV_PORT_OBJ_ADD/SWITCHDEV_PORT_OBJ_DEL
-> events. With this change, setting up the 'port_obj_info->handled = true'
-> is not needed anymore since it's now handled by the new helpers.
+> By applying proper backpressure, this change allows the connected qdisc to 
+> operate correctly, as reported in [1], and significantly improves
+> performance in real-world scenarios, as demonstrated in our paper [2]. For 
+> example, we observed a 36% TCP throughput improvement for an OpenVPN 
+> connection between Germany and the USA.
 > 
-> In the DPAA2 architecture, there is no difference in adding a FDB or MDB
-> which points towards a LAG port. Unlike other architectures, we do not
-> need to populate all the possible destinations which are under the LAG,
-> we only have to specify a single queueing destination (QDID) which
-> represents the LAG. This all means that handling of MDBs in bond devices
-> needs to have refcount mechanism as with the FDBs.
-> This mechanism is triggered by calling the dpaa2_switch_lag_fdb_add() /
-> dpaa2_switch_lag_fdb_del() functions which were added in the previous
-> patch.
+> Synthetic pktgen benchmarks indicate a slight regression, and packet
+> loss is reduced to near zero. Pktgen benchmarks are provided per commit,
+> with the final commit showing the overall performance.
+
+at v12, time to merge this.
+
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+> Thanks!
 > 
-> Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
+> [1] Link: https://unix.stackexchange.com/questions/762935/traffic-shaping-ineffective-on-tun-device
+> [2] Link: https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Research/Publications/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersion.pdf
+> 
 > ---
->  .../ethernet/freescale/dpaa2/dpaa2-switch.c   | 66 ++++++++++---------
->  1 file changed, 36 insertions(+), 30 deletions(-)
+> Changelog:
+> v12:
+> Patch 1: 
+> - Revert tun_queue_purge() to plain ptr_ring_consume() and instead
+>   explicitly wake the queue in __tun_detach() for the ntfile taking
+>   over the queue slot (if its ring is empty).
+> - Inlined tun_reset_cons_cnt(), because only tun_attach() uses it.
 > 
-> diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> index cce0af47ca07..17a7a64064b5 100644
-> --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> @@ -2060,7 +2060,11 @@ static int dpaa2_switch_port_mdb_add(struct net_device *netdev,
->  	if (dpaa2_switch_port_lookup_address(netdev, 0, mdb->addr))
->  		return -EEXIST;
->  
-> -	err = dpaa2_switch_port_fdb_add(port_priv, mdb->addr);
-> +	if (port_priv->lag)
-> +		err = dpaa2_switch_lag_fdb_add(port_priv->lag, mdb->addr,
-> +					       mdb->vid);
-> +	else
-> +		err = dpaa2_switch_port_fdb_add(port_priv, mdb->addr);
->  	if (err)
->  		return err;
-
-Sashiko notes:
-
-	If dev_mc_add() fails further down in this function, the
-	rollback path unconditionally calls
-	dpaa2_switch_port_fdb_del_mc():
-
-	err = dev_mc_add(netdev, mdb->addr);
-	if (err) {
-		netdev_err(netdev, "dev_mc_add err %d\n", err);
-		dpaa2_switch_port_fdb_del_mc(port_priv, mdb->addr);
-	}
-
-	Does this bypass dpaa2_switch_lag_fdb_del() for LAG MDBs?
-	It looks like this could leak the dpaa2_mac_addr structure
-	allocated during dpaa2_switch_lag_fdb_add() and leave the
-	software lag->fdbs list out of sync with the hardware FDB state.
-
-Yes, the cleanup needs to also take into account if the port is under a
-LAG or not. Will fix it.
-
-(...)
-
-> @@ -2178,9 +2190,10 @@ static int dpaa2_switch_port_mdb_del(struct net_device *netdev,
->  	if (!dpaa2_switch_port_lookup_address(netdev, 0, mdb->addr))
->  		return -ENOENT;
->  
-> -	err = dpaa2_switch_port_fdb_del(port_priv, mdb->addr);
-> -	if (err)
-> -		return err;
-> +	if (port_priv->lag)
-> +		dpaa2_switch_lag_fdb_del(port_priv->lag, mdb->addr, mdb->vid);
-> +	else
-> +		dpaa2_switch_port_fdb_del(port_priv, mdb->addr);
-
-Sashiko notes:
-
-	Is it intentional to drop the error check for hardware FDB
-	deletion here?
-
-	Previously, the function returned early if
-	dpaa2_switch_port_fdb_del() returned an error. By silently
-	dropping the return value, the driver proceeds to remove the MAC
-	from the device's multicast list anyway, which might mask
-	hardware desynchronization regressions from the caller.
-
-Yes, it was intentional. I think there is no point propagating such an
-error on the remove path.
+> - Patches 2-4 and cover letter unchanged.
+> - Compiled and short pktgen test.
+> 
+> v11:
+> - Renamed __ptr_ring_produce_peek() to __ptr_ring_check_produce()
+>   (Sashiko)
+> - Add return code -EINVAL to __ptr_ring_check_produce() which lets
+>   tun_net_xmit() stop the queue only on -ENOSPC. (MST)
+> - Resolve race on tfile->queue_index by locking tx_ring.consumer_lock
+>   in __tun_detach(). (Sashiko)
+> - Wake the queue in tun_queue_resize() to avoid possible stalls.
+> - Other minor adjustments & reran the benchmarks.
+> 
+> v10: https://lore.kernel.org/netdev/20260506141033.180450-1-simon.schippers@tu-dortmund.de/
+> - Changed the term "Transmitted" to "Received" in the benchmarks,
+>   as correctly pointed out by MST, and reran the benchmarks.
+> 
+> Addressed the Sashiko AI review:
+> - Avoid a data race on tfile->cons_cnt by always locking.
+> - Correctly count the number of consumed packets for vhost-net.
+> - Corrected a typo in the commit message of commit 3.
+> - Added a missing barrier on the consumer side.
+> --> The barriers now follow the "store buffering" principle.
+> - No longer return NETDEV_TX_BUSY at all, because it is unsafe.
+> --> Result: There are still a few drops with multiple senders, which
+>             would be avoided by disabling LLTX.
+> 
+> V9: https://lore.kernel.org/netdev/20260428123859.19578-1-simon.schippers@tu-dortmund.de/
+> - Addressed minor nit by MST in patches 1 and 2.
+> - Rebased patch 3 because of commit d748047
+>   ("ptr_ring: disable KCSAN warnings").
+> - Documented the pair of the smp_mb__after_atomic() in tun_net_xmit()
+>   with tun_ring_consume().
+>   --> It simply pairs with the test_and_clear_bit() inside of
+>       netif_wake_subqueue().
+> - Use 1 ptr_ring consumer spinlock instead of 2.
+> - Ran pktgen benchmarks with pg_set SHARED for 50 iterations on
+>   latest kernel
+>   --> No significant performance difference noticed
+> 
+> V8: https://lore.kernel.org/netdev/20260312130639.138988-1-simon.schippers@tu-dortmund.de/
+> - Drop code changes in drivers/net/tap.c; The code there deals with
+>   ipvtap/macvtap which are unrelated to the goal of this patch series
+>   and I did not realize that before
+> -> Greatly simplified logic, 4 instead of 9 commits
+> -> No more duplicated logics and distinction in vhost required
+> - Only wake after the queue stopped and half of the ring was consumed
+>   as suggested by MST
+> -> Performance improvements for TAP, but still slightly slower
+> - Better benchmarking with pinned threads, XDP drop program for
+>   tap+vhost-net and disabling CPU mitigations (and newer Ryzen 5 5600X
+>   processor) as suggested by Jason Wang
+> 
+> V7: https://lore.kernel.org/netdev/20260107210448.37851-1-simon.schippers@tu-dortmund.de/
+> - Switch to an approach similar to veth (excluding the recently fixed 
+> variant), as suggested by MST, with minor adjustments discussed in V6
+> - Rename the cover-letter title
+> - Add multithreaded pktgen and iperf3 benchmarks, as suggested by Jason 
+> Wang
+> - Rework __ptr_ring_consume_created_space() so it can also be used after 
+> batched consume
+> 
+> ...
+> 
+> ---
+> 
+> Simon Schippers (4):
+>   tun/tap: add ptr_ring consume helper with netdev queue wakeup
+>   vhost-net: wake queue of tun/tap after ptr_ring consume
+>   ptr_ring: move free-space check into separate helper
+>   tun/tap & vhost-net: avoid ptr_ring tail-drop when a qdisc is present
+> 
+>  drivers/net/tun.c        | 109 ++++++++++++++++++++++++++++++++++++---
+>  drivers/vhost/net.c      |  21 +++++---
+>  include/linux/if_tun.h   |   3 ++
+>  include/linux/ptr_ring.h |  20 ++++++-
+>  4 files changed, 139 insertions(+), 14 deletions(-)
+> 
+> -- 
+> 2.43.0
 
 
