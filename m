@@ -1,215 +1,322 @@
-Return-Path: <netdev+bounces-286502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286503-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oB5pN72JAWpJcwEAu9opvQ
-	(envelope-from <netdev+bounces-286502-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:48:13 +0200
+	id eE0uB2WMAWp4dQEAu9opvQ
+	(envelope-from <netdev+bounces-286503-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:59:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5B2B509848
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:48:13 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87D56509B3B
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:59:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 06C9830087EC
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:48:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 08AE23069186
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:54:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72A13A6F0D;
-	Mon, 11 May 2026 07:47:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6018B3AB285;
+	Mon, 11 May 2026 07:51:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qJi/rCct"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Qe2nk2v7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010062.outbound.protection.outlook.com [52.101.193.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B293A5430;
-	Mon, 11 May 2026 07:47:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778485629; cv=none; b=WkQr2kidUQcGr4Gym7wkil19N6vVIJABnabAFOWWbIHKxX3CTwjU7+FThX36dATznAgEYrDNqO6xhGHndTWp5n2PWDYpCHlPb9K8IUbsRbwET9gW0AjunnTVwKtpupQff/QAlcuoiuTxYJSyt0JxYmD5+TxwvGxtbQVK04GUwTs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778485629; c=relaxed/simple;
-	bh=W6aPnQGxFvV5pxspo8KdT3OU3FU42+Tsl5qJ9Cz1T2s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HMxOJ69tDXMgcGGN7ZNKo45Ac68k5Qjlzj9/HB6j3VNHlCq+uqie9WWeo9ZHgH11dXogN6Wsg0JlO8Zk/VNAGukp4sQj0xIGAZHB2SIXIldzmXFfJPErJYsKIZ55h0FtKjbNKq8n8wLvjsTdgmEWno2llvSgYmUBoeK2MuhksW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qJi/rCct; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFB21C2BCF5;
-	Mon, 11 May 2026 07:47:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778485627;
-	bh=W6aPnQGxFvV5pxspo8KdT3OU3FU42+Tsl5qJ9Cz1T2s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qJi/rCctlOINEtcmwwKI0m1Qyw7ZipkxQA9/9UewVsJVEH6L32P1GLYxN+jYdeU4S
-	 E3dlLGK5mg8ccrMBBfFw/8QMyUoheooWdP3ZBZpRKkq8J5FoC0oUq4m59sQEirx09Q
-	 7azeMg4EYT+vhpOUQI4PFAToG37dC4kg1WukjV0LgwXtGiFMQYOe/33FmTELtc51jZ
-	 4CauPM4USfteYm9Dt1rrj2c0BLvC7TQ87Qx5GQfrMY4rKjUgiUkXXGjX2dqpUd+jYO
-	 y77V85MCeJCQ6NGVAMvm5EdmswCDkpmSkdKQzqTN1lcwcYTptoADYXU/Dc0an0Ev+B
-	 hqGndeYF7Vr1w==
-Date: Mon, 11 May 2026 09:47:04 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: sashiko@lists.linux.dev
-Cc: devicetree@vger.kernel.org, conor+dt@kernel.org, robh@kernel.org,
-	krzk+dt@kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v5 09/12] net: airoha: Do not stop GDM port if
- it is shared
-Message-ID: <agGJeIrmDdRmHoAA@lore-desk>
-References: <20260509-airoha-eth-multi-serdes-v5-9-805e38edc2aa@kernel.org>
- <20260510140505.2C772C2BCF6@smtp.kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06CFE3AA4FE
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 07:51:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.62
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778485894; cv=fail; b=XtxtwYc10EEDJS6ZkMJpqtPq1P+90cP97ukotm+SCrnRjQfjh25EHGK84e8Gpd/iJz7QuJHv9C33gZ0aTgnIWWLzPYPnUMcvl5tygXKZfEcjpPM5Q+Kb7S4TGLDUqPr9oXjuEPS5gBVEO6W67vffqNAVI4GZi85C6qwRDUKL+LA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778485894; c=relaxed/simple;
+	bh=vnqK9KB/9e3CUJqQi1FCBcDT3JXyJb2VmovRQs2VWY0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=blwANQNYPMYfwt6mMdmrpVMX2Mfz9s5+0a2UOwHwKerIG5DNsP9aOjwyp3eYfUIwsM4dNe7BJmbNZlfN+FNi/kk/R/3ABpMn3OG/YOaJ5Pgcgf4kzp+djhdnZ4gqia5Gf1795Tqqcpo2IrgpO7/rDWGa50dJUvSRYmiK6nnvkKo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Qe2nk2v7; arc=fail smtp.client-ip=52.101.193.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PAtjDRHLJthkA6jDhVCGQUIpRLVvOMGzSCBs1blxw9mvBTdDvOtF+R1hSb47QD0I0SWWWe3GtyvBYImhKiTNYn8BE+xeW6a7sQ8z3dqCW/7LmOfeR0s+ObNbF7qrXrQipOmqqlMIArMZ88k5imUhfa2l+fHB7u2InyFzZbRid6A2zW4d8DS4zKaf4xFE0emHLkDVBbCvYO5v3qHRbmorVcgr/WhX/3V6gMjGOfBiKTllvKjJIodQ4H+9g6VzeLQrBAU9X8utY/Ckku2ARTw/OXkuVwaepgbHWiZe7AYZdC2ELN25P9TQpqLMb/nmxXxg4buoTrkGwxcOCrbyp+V9LQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8uYouIMKku/AcYkJIDKCR8v8vQZRpaK05uoDqMQu978=;
+ b=H6tYoyV1pINe3V6gS3/leExZ6BEEjuxkaz3+2FC7Du+NSyp/jDjJlE1zvF9LzhZfQmVrhUEut2Y1Wpe63U2j4LfPLl3fKXEQDCa01vlKX4cHcmuZZCzT+x3DsHYA/CqQPA0hXjyEAwyndhqLr8AeEdP2PW5GD+vZc/GNIi+wizCE2vVqOFrmbWISTmXJNm4288XFBalC1WdnXACwBiMt/OAWN2MMj7lHnkNj0vW5a6WgA99jAymUlm8kAsXZ0UHAlBWx4rqdnbdmlchMMi9FwNZk2QS4IlYw89ip3Xnd+vfieN1ue3VqzdpiMXG7hTs7zj5VpmsF98E4Ye9FnjFdxw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8uYouIMKku/AcYkJIDKCR8v8vQZRpaK05uoDqMQu978=;
+ b=Qe2nk2v7PZ4BlFDrPA01/UogopCzCrhxZF0P4/MFX5tD46iljec/I32mqF1P5dXO+YjGFOnjydrQupKTYusyWW4YuJxCQ3V17n52y0e0o5UjfWrpx7d+6EF3mRRXs7K1iVnCqebLxYoFhzu00HEJHwynoEjo6/8k4WhwFv9+nHwjSqqYWeIL+rq+Dq2qy2gRcODnlYzBCfp0IcMCjMEntVV+JTxj0ivU8E8kXntkiXLdRrv8mzy+lOZ8bOHi6jazP8N1uaWD6+nxErgT5LotkeQBH5+iZbewiSHo+GXuCheFp6vRBKK0E6r/5Z6YewKwd9qARlzQoNMbvqNz9zHJIw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8728.namprd12.prod.outlook.com (2603:10b6:610:171::12)
+ by DM4PR12MB5868.namprd12.prod.outlook.com (2603:10b6:8:67::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.23; Mon, 11 May
+ 2026 07:51:15 +0000
+Received: from CH3PR12MB8728.namprd12.prod.outlook.com
+ ([fe80::2641:1046:bdf3:93d7]) by CH3PR12MB8728.namprd12.prod.outlook.com
+ ([fe80::2641:1046:bdf3:93d7%7]) with mapi id 15.20.9891.021; Mon, 11 May 2026
+ 07:51:15 +0000
+Date: Mon, 11 May 2026 07:51:11 +0000
+From: Dragos Tatulea <dtatulea@nvidia.com>
+To: Stanislav Fomichev <sdf.kernel@gmail.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
+	tariqt@nvidia.com
+Subject: Re: [PATCH net v8 13/15] net: warn ops-locked drivers still using
+ ndo_set_rx_mode
+Message-ID: <4zgvkwdwqzgafohvo3bjyfx2fmdl3g66uj4gzrskmbbnbblwo2@4m5bkkexcywh>
+References: <20260416185712.2155425-1-sdf@fomichev.me>
+ <20260416185712.2155425-14-sdf@fomichev.me>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260416185712.2155425-14-sdf@fomichev.me>
+X-ClientProxiedBy: TL2P290CA0016.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:3::18) To CH3PR12MB8728.namprd12.prod.outlook.com
+ (2603:10b6:610:171::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="AoE5hKwc3VX7KL8z"
-Content-Disposition: inline
-In-Reply-To: <20260510140505.2C772C2BCF6@smtp.kernel.org>
-X-Rspamd-Queue-Id: C5B2B509848
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8728:EE_|DM4PR12MB5868:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8d9d8e4e-1be4-4e90-9e23-08deaf3213d7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|366016|3023799003|56012099003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	AQRhhr5gItO9W7QtbaJB1SX/KIWJRj3uS42W2zvR5PvCHUGLClhuB9wboQ891Ani9+fS/VE3bbDO0pbuNNbmfokgUfWFfOS/uiYp0LHkjgcdKKEoO83euRoea54FCNhtCpoV/ARx5SMpwV2ELrEILAKoToLNEWU4KxX2nTQYgGOwerCQLjDqLC28YaE/vnw33EQIDd1ijuOeAaVa0CchWo1qKgsufb+duSNkNvqQiBIN/Y4mLuTi3AQnvPMQZ3cG3joo/SK8fpQ4CB8JOvPCpl+n2LgNpmFIFuYqocfH0b038pIEc2zCsRkwnfCe/YTlpp+1yHBccK9fbTJISWvbT6PkuMrIJXgQ4rWHTXxaKHcfP4Gfwjs2yjzQ432qksCqpmLACFVGFFs55pDXJQfw9b8iKiQLBu2tjRbAFQuLA8Ru9ewAYDDM2gHOLRzgI9WOkJo0OgdgyGj4umieiGTBQZARjlOUnUt5oYY366bxBF7gCLLCTh8nRXawlmLoZhnGlKvR+xwdAyNSa9Kv5xMUxcRZvN4/GtU+iN2knDQf7on0RZ4SXKOn4IBNVKj2pzMIu92UAUA2K9APs2iry6LxgWugT3GmbstikDW3/ECayj4k+AuGOI+vU2ofo3iV1ItaNgLmIH9Oj85BBSb10CdcB81CCSfirAZz5uXDCQ5BKQTQ1JoMrRDX4VnOGPaqgr25
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8728.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(3023799003)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?MJtIfCD5f4joRMUIJzFeJMHjEPL4iAIknNmp/d+AVWQI4dCVFj73poDuXg3s?=
+ =?us-ascii?Q?pqmAxZiqKBu+Kgq66nKsbR3lJ6vHRyNk/G+SBE/3tePBPJHp6XwocdcRdKGs?=
+ =?us-ascii?Q?TxPczr6JyIvjB6D9LsF2iHESwRqIoG3RBYc6ArQsu00iH/xiRz8fD8oxnBYp?=
+ =?us-ascii?Q?55qBywjM202XP9DAmYobM+c099vGAyPniiYbow4YXIobypeF+GXAg/RSgy1M?=
+ =?us-ascii?Q?Q1ppSJekpYntZlktPEh98OhV1/wOTlJjJO2h6/oHD6PjSmWzsfUKe/1b6d0L?=
+ =?us-ascii?Q?bBVCjyZH1OsVXCmkn/U+oUzrNJzpEpj4udbz1j4S7m766fzcrfccMz/93PHn?=
+ =?us-ascii?Q?NLlO4x8/b63VcsVa7gGDHglMFPGo6uqZBiqoC+CXg6Y2IQzeTEOWDUEzBFkM?=
+ =?us-ascii?Q?iuPZ4xOB4hOk2wqTvusF6tAlprhj14tDo0WU3aQ3Bc/Q3e+52ep9Yb3kLUk1?=
+ =?us-ascii?Q?WfzxFgpc+mPLLmMUyEkNJBmgemzejEWHDEuCgJtsjf92gIeMYX/TrUANMpbm?=
+ =?us-ascii?Q?s1a0zQFxTHRVu49p3Q33uD1D8xFnzKLF3x2V7JNp/XavB4dN3SPOXKiMyl8T?=
+ =?us-ascii?Q?wvUHrzr+fUWs1tItRhBPa9hZAbnrsO15fJoIEE7GErmEMlkLlq2cncLLfviF?=
+ =?us-ascii?Q?vcLs1xoMw1wVTs/ptdYpYKYOjQMIWiD68CzaiIN1/926Io52dEJ034mnrQnb?=
+ =?us-ascii?Q?n10DpimcsgIR5MdlsautCiQojc6zcJewl2y1J40QqU8iiT5E9JoblItbyS+O?=
+ =?us-ascii?Q?y+q8ysrhESOwsVvXQiznkatU+fmovmx0Fzm3xuVeTc7uS2EUnhIJL1FCRuxL?=
+ =?us-ascii?Q?UseK/3ILuz6qXIsbjHj8cgNvJ18ZCPptzW4InnsWtJBhba5Wh7DsDhPDcsFp?=
+ =?us-ascii?Q?aSnQBhUi0bqAPLPvVO1khtfE2bR6wqlWT8NJIT1iObsKi4hK5tkVQCY6Eb14?=
+ =?us-ascii?Q?SN6kxkMl3994/dlNQDv1V0w4ajdcqDYEfbhZ3yrVA4uH5ZzZtRMODe0Fduim?=
+ =?us-ascii?Q?vOlFlLQV7E1SH+Ixxy/Zd3Hdr98Ycs9uR7u5qLzpGOrgQaaaWsd0N/WkcOUb?=
+ =?us-ascii?Q?xlqxgntPRwSXXiijI/6w2bk4YP05tlWMrfZO8eKiX7NLCeGE73+e5F0/2THB?=
+ =?us-ascii?Q?/AHR/g2juJ2l0I4XFJt9qKF8kcPHWCKBLyXgXntv7XEt8cOtE6yoykjLRaxF?=
+ =?us-ascii?Q?yHwzVY1IXUrJJnCQBP+VpX3zAgshqAJKVXiI8vgVf9tl+77bOH3rMPFY5x+E?=
+ =?us-ascii?Q?dRp0Z7rCbtjte0BOBWJG7eZ6lBdU0ZFnMFAXPxpzRc08NgiqNlEBKt4Vb10H?=
+ =?us-ascii?Q?d957luXXsBWaCi7Fo5n2oufbEgpoUfcACh3UATipAh6G3d11OAsnRigLZm1f?=
+ =?us-ascii?Q?UTkOKZsaOCghSaGrQQ+Rr8vO7+cIBdAaaCybeZ7kKqzuGwo9nV28pXHe2Sik?=
+ =?us-ascii?Q?971TrZScS6H3QFXH+sU7OBj+upMpQ10Ln0eETrtkLj+0+o68BrNScopKP3V4?=
+ =?us-ascii?Q?d/PweaUkMLQMevWQu0zQtrwBeYVo/sjScl6mQyOcjEvtXsPD7+V8Of47rMCQ?=
+ =?us-ascii?Q?jjgo8dHNCQHOz1nuGq1PDdWWPeuCCOCzrKbf5N7Dq/9h/AR3jO1+Ocq9Hzeb?=
+ =?us-ascii?Q?ZhGSdgioIa6g3EaFMtQzQefF0OpATrzSw0Kiqg4pxpY4UNDpsVcPRMpIk9sP?=
+ =?us-ascii?Q?ftFSIUt3QGulKBcFgf6agG3mfIEuqz5OLBp2EBSbDw5kQDoff4GxSAMlESVD?=
+ =?us-ascii?Q?VpgAQvc/fg=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8d9d8e4e-1be4-4e90-9e23-08deaf3213d7
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8728.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2026 07:51:15.0992
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: j3cTnPhRwPMRYS0Bk4d2hQ7K9Izwsda9mAiHXI461t4AyFcT7QK4Qn02wbYA5y1kt3BMaXfDibHd5i/giUvRtw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5868
+X-Rspamd-Queue-Id: 87D56509B3B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-3.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [1.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286502-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286503-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,sashiko.dev:url]
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dtatulea@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,Nvidia.com:dkim,fomichev.me:email,qemu.org:url]
 X-Rspamd-Action: no action
 
+On Thu, Apr 16, 2026 at 11:57:10AM -0700, Stanislav Fomichev wrote:
+> Now that all in-tree ops-locked drivers have been converted to
+> ndo_set_rx_mode_async, add a warning in register_netdevice to catch
+> any remaining or newly added drivers that use ndo_set_rx_mode with
+> ops locking. This ensures future driver authors are guided toward
+> the async path.
+> 
+> Also route ops-locked devices through netdev_rx_mode_work even if they
+> lack rx_mode NDOs, to ensure netdev_ops_assert_locked() does not fire
+> on the legacy path where only RTNL is held.
+> 
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> ---
+>  net/core/dev.c            | 5 +++++
+>  net/core/dev_addr_lists.c | 3 ++-
+>  2 files changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 8a69aed56fca..d426c1beeb76 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -11360,6 +11360,11 @@ int register_netdevice(struct net_device *dev)
+>  		goto err_uninit;
+>  	}
+>  
+> +	if (netdev_need_ops_lock(dev) &&
+> +	    dev->netdev_ops->ndo_set_rx_mode &&
+> +	    !dev->netdev_ops->ndo_set_rx_mode_async)
+> +		netdev_WARN(dev, "ops-locked drivers should use ndo_set_rx_mode_async\n");
+> +
+Seems like IPoIB was not covered by this series (see splat below).
+Understandably so because ipoib_intf_init() overrides mlx5's
+netdev_ops with its own ops that implement .ndo_set_rx_mode.
 
---AoE5hKwc3VX7KL8z
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I have a fix pending that implements .ndo_set_rx_mode_async but it
+simply schedules the multicast restart task like before. This is done to
+maintain the assumption that this task and others must run on the same
+order workqueue to avoid racing with themselves. The race between
+ipoib_mcast_join_task() and ipoib_mcast_restart_task() would be the most
+obvious example.
 
-> Thank you for your contribution! Sashiko AI review found 2 potential issu=
-e(s) to consider:
-> - [High] The `GDM_STAG_EN_MASK` configuration is port-global but is modif=
-ied unconditionally per net_device, leading to silent clobbering when multi=
-ple devices share a port.
-> - [Medium] The hardware MTU (`REG_GDM_LEN_CFG`) is not recalculated when =
-a device sharing the port is stopped, leaving the MAC configured to accept =
-inappropriately large frames.
-> --
->=20
-> commit b896e320dcf0d56db7e0654191126c23e6f485fd
-> Author: Lorenzo Bianconi <lorenzo@kernel.org>
-> net: airoha: Do not stop GDM port if it is shared
->=20
-> This commit introduces a users counter to the GDM port structure to allow
-> multiple independent net_device instances to share the same hardware port
-> without prematurely stopping it. It also conditionally updates the MTU so
-> that the largest MTU requested by any sharing device is used.
->=20
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
-ernet/airoha/airoha_eth.c
-> > index be31f639f4be3..ebb24e60f1de3 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> > @@ -1733,10 +1733,20 @@ static int airoha_dev_open(struct net_device *n=
-etdev)
-> >  		airoha_fe_clear(qdma->eth, REG_GDM_INGRESS_CFG(port->id),
-> >  				GDM_STAG_EN_MASK);
->=20
-> Since GDM_STAG_EN_MASK is a port-global configuration, will this clear th=
-e=20
-> flag for the entire port if a secondary non-DSA net_device is brought up?
->=20
-> If the primary master device relies on this hardware tag parsing, it appe=
-ars
-> a secondary device could silently break it by clearing the mask during
-> its open routine. Should this configuration be protected or refcounted wh=
-en
-> multiple devices share a port?
+------------[ cut here ]------------
+netdevice: ib0 (uninitialized): ops-locked drivers should use ndo_set_rx_mode_async
+WARNING: net/core/dev.c:11366 at register_netdevice+0x83c/0x21d0, CPU#1: (udev-worker)/237
+Modules linked in: mlx5_ib(+) fuse rpcrdma rdma_ucm ib_uverbs ib_iser libiscsi scsi_transport_iscsi ib_umad rdma_cm ib_ipoib iw_cm ib_cm mlx5_core ib_core
+CPU: 1 UID: 0 PID: 237 Comm: (udev-worker) Not tainted 7.0.0_external_tested_net_next_2026_04_24_22_03 #1 PREEMPT 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
+RIP: 0010:register_netdevice+0x842/0x21d0
+Code: [...]
+RSP: 0018:ffff88811acc70c8 EFLAGS: 00010246
+RAX: ffffffff844403a0 RBX: 0000000000000000 RCX: 1ffffffff40774c5
+RDX: ffffffff84442360 RSI: ffff88811ff48118 RDI: ffffffff85ce74c0
+RBP: 1ffff11023598e22 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000005 R12: ffff88811ff48000
+R13: ffff88811ff48118 R14: ffffffff84442360 R15: ffff88811ff481e0
+FS:  00007fab057efbc0(0000) GS:ffff88850d432000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000560448cd6ac8 CR3: 000000010d8b0003 CR4: 0000000000372eb0
+Call Trace:
+ <TASK>
+ ? unregister_netdevice_queue+0x350/0x350
+ ? mark_held_locks+0x40/0x70
+ ? lockdep_hardirqs_on_prepare+0xde/0x180
+ register_netdev+0x1f/0x40
+ ipoib_add_one+0x35c/0x880 [ib_ipoib]
+ ? ipoib_intf_alloc+0xb0/0xb0 [ib_ipoib]
+ ? rwsem_mark_wake+0x930/0x930
+ ? do_raw_spin_unlock+0x54/0x210
+ add_client_context+0x2a0/0x430 [ib_core]
+ ? remove_client_context+0xf0/0xf0 [ib_core]
+ ? rwsem_down_write_slowpath+0x1880/0x1880
+ enable_device_and_get+0x19e/0x330 [ib_core]
+ ? add_one_compat_dev+0x800/0x800 [ib_core]
+ ? rdma_counter_init+0x13e/0x390 [ib_core]
+ ib_register_device+0x732/0xb80 [ib_core]
+ ? rdma_dev_change_netns+0x1f0/0x1f0 [ib_core]
+ ? mlx5_lag_is_active+0x7a/0xb0 [mlx5_core]
+ __mlx5_ib_add+0x88/0x1e0 [mlx5_ib]
+ mlx5r_probe+0x26b/0x750 [mlx5_ib]
+ ? mlx5_ib_add_sub_dev+0x550/0x550 [mlx5_ib]
+ ? kernfs_new_node+0x13f/0x1b0
+ ? kernfs_create_link+0x16a/0x230
+ ? do_raw_spin_unlock+0x54/0x210
+ ? auxiliary_match_id+0xd5/0x150
+ ? dev_pm_domain_attach+0x59/0x100
+ really_probe+0x1e1/0x900
+ __driver_probe_device+0x1dd/0x3f0
+ driver_probe_device+0x4a/0x130
+ __driver_attach+0x1ab/0x4f0
+ ? __device_attach_driver+0x2b0/0x2b0
+ bus_for_each_dev+0xef/0x170
+ ? bus_remove_file+0x40/0x40
+ ? bus_add_driver+0x1e3/0x500
+ bus_add_driver+0x21d/0x500
+ driver_register+0x1a1/0x350
+ __auxiliary_driver_register+0x14e/0x230
+ ? test_ti_thread_flag.constprop.0+0xe/0x38 [mlx5_ib]
+ ? __SCT__tp_func_icm_mad_send_err+0xc98/0xc98 [ib_cm]
+ mlx5_ib_init+0x107/0x170 [mlx5_ib]
+ do_one_initcall+0xc3/0x4a0
+ ? trace_event_raw_event_initcall_level+0x1f0/0x1f0
+ ? __create_object+0x5e/0x80
+ ? kasan_unpoison+0x40/0x60
+ do_init_module+0x27b/0x830
+ ? free_module+0x3f0/0x3f0
+ ? load_module+0x6792/0x69e0
+ ? kfree+0x164/0x540
+ ? find_vm_area+0xe/0x50
+ load_module+0x5005/0x69e0
+ ? module_frob_arch_sections+0x20/0x20
+ ? __vmalloc_node_noprof+0x8a/0x100
+ ? security_file_permission+0x2d/0x60
+ ? security_kernel_post_read_file+0x37/0x70
+ ? kernel_read_file+0x3d2/0x860
+ ? __x64_sys_fsopen+0x190/0x190
+ ? lock_acquire+0x10e/0x320
+ ? __virt_addr_valid+0x14e/0x420
+ init_module_from_file+0x153/0x180
+ ? __x64_sys_init_module+0xb0/0xb0
+ ? do_sys_openat2+0xeb/0x160
+ ? __virt_addr_valid+0x21c/0x420
+ ? find_held_lock+0x2b/0x80
+ ? idempotent_init_module+0x5d5/0x750
+ ? idempotent_init_module+0x5d5/0x750
+ ? do_raw_spin_unlock+0x54/0x210
+ idempotent_init_module+0x21d/0x750
+ ? init_module_from_file+0x180/0x180
+ ? cap_capable+0xd0/0x380
+ __x64_sys_finit_module+0xd5/0x160
+ do_syscall_64+0xaf/0x960
+ entry_SYSCALL_64_after_hwframe+0x4b/0x53
+RIP: 0033:0x7fab061be18d
+Code: [...]
+RSP: 002b:00007fff0e4335a8 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
+RAX: ffffffffffffffda RBX: 0000557665c7f6e0 RCX: 00007fab061be18d
+RDX: 0000000000000000 RSI: 00007fab062da07d RDI: 0000000000000010
+RBP: 00007fff0e433660 R08: 0000000000000001 R09: 00007fff0e4335f0
+R10: 0000000000000050 R11: 0000000000000246 R12: 00007fab062da07d
+R13: 0000000000020000 R14: 0000557665c7f9c0 R15: 0000557665c80e00
+ </TASK>
+irq event stamp: 88443
+hardirqs last  enabled at (88455): [<ffffffff8185888a>] __up_console_sem+0x5a/0x70
+hardirqs last disabled at (88464): [<ffffffff8185886f>] __up_console_sem+0x3f/0x70
+softirqs last  enabled at (87614): [<ffffffff81700a39>] __irq_exit_rcu+0x109/0x240
+softirqs last disabled at (87593): [<ffffffff81700a39>] __irq_exit_rcu+0x109/0x240
+---[ end trace 0000000000000000 ]---
 
-This is not a real issue since the hw design supports DSA just on GDM1 wher=
-e we
-can't configure multiple net_devices.
-
->=20
-> > -	airoha_fe_rmw(qdma->eth, REG_GDM_LEN_CFG(port->id),
-> > -		      GDM_SHORT_LEN_MASK | GDM_LONG_LEN_MASK,
-> > -		      FIELD_PREP(GDM_SHORT_LEN_MASK, 60) |
-> > -		      FIELD_PREP(GDM_LONG_LEN_MASK, len));
-> > +	cur_len =3D airoha_fe_get(qdma->eth, REG_GDM_LEN_CFG(port->id),
-> > +				GDM_LONG_LEN_MASK);
-> > +	if (!port->users || len > cur_len) {
-> > +		/* Opening a sibling net_device with a larger MTU updates the
-> > +		 * MTU of already running devices. This is required to allow
-> > +		 * multiple net_devices wht different MTUs to share the same
-> > +		 * QDMA block.
-> > +		 */
-> > +		airoha_fe_rmw(qdma->eth, REG_GDM_LEN_CFG(port->id),
-> > +			      GDM_SHORT_LEN_MASK | GDM_LONG_LEN_MASK,
-> > +			      FIELD_PREP(GDM_SHORT_LEN_MASK, 60) |
-> > +			      FIELD_PREP(GDM_LONG_LEN_MASK, len));
-> > +	}
-> > +	port->users++;
->=20
-> [ ... ]
->=20
-> > @@ -1766,8 +1776,10 @@ static int airoha_dev_stop(struct net_device *ne=
-tdev)
-> >  	for (i =3D 0; i < netdev->num_tx_queues; i++)
-> >  		netdev_tx_reset_subqueue(netdev, i);
-> > =20
-> > -	airoha_set_gdm_port_fwd_cfg(qdma->eth, REG_GDM_FWD_CFG(port->id),
-> > -				    FE_PSE_PORT_DROP);
-> > +	if (!--port->users)
-> > +		airoha_set_gdm_port_fwd_cfg(qdma->eth,
-> > +					    REG_GDM_FWD_CFG(port->id),
-> > +					    FE_PSE_PORT_DROP);
->=20
-> If multiple devices are sharing the port and the device with the largest =
-MTU
-> is stopped, the hardware MTU in REG_GDM_LEN_CFG doesn't appear to be
-> recalculated or shrunk.
->=20
-> Since the MTU is only expanded in airoha_dev_open() and airoha_dev_change=
-_mtu(),
-> does this leave the MAC configured to accept inappropriately large frames
-> for the remaining devices indefinitely?
-
-ack, I will fix it in v6.
-
-Regards,
-Lorenzo
-
->=20
-> --=20
-> Sashiko AI review =B7 https://sashiko.dev/#/patchset/20260509-airoha-eth-=
-multi-serdes-v5-0-805e38edc2aa@kernel.org?part=3D9
-
---AoE5hKwc3VX7KL8z
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCagGJeAAKCRA6cBh0uS2t
-rIC0AQCB4vNpyNwAWhilwrdVKDSwmfIC2mmckVm7kjpBYSFVZwD8Cx27ZuqAmZWr
-5tnKUNCiIHou0///+CnTMfZQZvocXwc=
-=XNlR
------END PGP SIGNATURE-----
-
---AoE5hKwc3VX7KL8z--
+Thanks,
+Dragos
 
