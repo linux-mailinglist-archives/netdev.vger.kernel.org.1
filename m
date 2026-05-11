@@ -1,161 +1,399 @@
-Return-Path: <netdev+bounces-286476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286477-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QEGbARWDAWq+bwEAu9opvQ
-	(envelope-from <netdev+bounces-286476-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:19:49 +0200
+	id wImvLjGDAWoFcAEAu9opvQ
+	(envelope-from <netdev+bounces-286477-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:20:17 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 817FE50903E
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:19:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59A8650906C
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:20:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A0A5F3013A69
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:17:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 74EFC3023A5B
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:17:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 366BA26E173;
-	Mon, 11 May 2026 07:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1B7D377EA2;
+	Mon, 11 May 2026 07:17:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eU92w8Mp"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="TVYAyd9g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011057.outbound.protection.outlook.com [52.101.70.57])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE91930BBBF
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 07:16:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F4019374E6D;
+	Mon, 11 May 2026 07:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.57
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778483819; cv=pass; b=JxdJJJtxrDVFKoiufgoxMq8rG+dKRv78R5JCLWgj4nz6j6vKn/DUxRaN97SmHTHxAjMIf+ddrtcilENSC1N1eyPI/1DTcoWuPg4T9EIBRWKmUb5Grtw6WWJ+rUxXASS90SJMvuw4J2XnFrgkZsiiqZvFeTSsaUehSzqydx+pMq8=
+	t=1778483840; cv=fail; b=QOOjVtGQWt6ottHyMtxRrtZwXIsLWzE0YMLe+7B2ORzutJleRG3FosW70UBks9P2cyEeyCSPjerHjVs56uD1vDIb1H8x/X3U5Y6o07EB/5tqSzl6MKP9ZMSA5WAr7763bTDvNbkS/tJ9hU2EQaa7LPT7g54QuMD1P3r7qNTEiBk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778483819; c=relaxed/simple;
-	bh=gB3ssWzAqZEV5huRzXsa37RW7HSN+Q8iFRQ6Qe1IT/g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lhEiPn56sP8VhXRvqXPod6Pb+F9v7z9w254b9Qqn6HR9sDJuoO9Z1DzAksJ5LgqHfwWwSMFtRUYy672Pz8ocOxjwMEXj6DVp4/5kaTZaaT09j6vcb2cKFkuSki9rHy+A92Ko4fjH7flnG8Sae7ktt/d9kIKFW/5ZiD1+d4ePtXQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eU92w8Mp; arc=pass smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-50d75bfb259so25778071cf.1
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 00:16:57 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778483817; cv=none;
-        d=google.com; s=arc-20240605;
-        b=XfLuLAOAgmDdvljMPLrAi2IfEC4DuDM/QiRHV/+Bnfe35odbzxXbG2ZwoIGG0A5scI
-         ns9HeCXdfDArEnDiYOrN3jqQaSTCcwwNaMER/NxBs+/dzA4q2Kjbi21Js1SeeTystrtH
-         DLs3pXd5lYyMPW3XvpDAV7DpDi2N1EhshR9YkOhHoHoeoEoWe0L8QoLsREdk6YLkShuq
-         mnTE3ipLeJWUIBTQdBVCleA48ck0yl3fmA7lJWHOZg4YREJOc0bE/QlL2y0R9V0CmOQJ
-         FU4okVO1dRjUNGH2XsVwAw7yFCRKtqfpw/YpDGW+CxVtu1HUqHuROM77npFCrMtIrlo3
-         4CYA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=8XGLE0Lb6oyAV1QhgBO72k5Frf1S0m4rmMmZM1kfrHo=;
-        fh=UzbFPEjrXCgSJ+8uCUouP9Fl6UDf2dh+pK5/AKhCW1Q=;
-        b=gAUqckf3V50Ssly1wUdQia3EZPLPr2EDcYJZ3lkupc2l1iBiVqfB1p9tzcoBRdRvar
-         eDY7CkwJhfH5nXBo0V9lKT+LhqSOIR4hV9m/3UPSjmeIxqr5YcRgu5k8PhAVuQAbBO5y
-         4gnF0wP0dAAltiu8WUa8vV45UFcBwMLLiD3RXXIe0CIUmbxN+PeeVoooEZmx6xxRuycj
-         J8y7Sb+L9GHCfi6ablrcSedzHaKRxOzjpR+p3nfLmI02lLnydz2GCsgDR+3S5M0GYHBP
-         vRMa/JrOtIrpA9RcmvhL3ycQZJjF8TJZgjD8fF3z6O4h4jsLRWcqB4ID/Igc/FzGW7F8
-         RBEA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778483817; x=1779088617; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8XGLE0Lb6oyAV1QhgBO72k5Frf1S0m4rmMmZM1kfrHo=;
-        b=eU92w8MpVuo57aNprvGNLumbMLhIAx1QFarrkrG7gpWvbnUM6zuzXp/pFwnr5u21Ir
-         3C6eX+VzFzqgRU6tsNQwx/Gzqohp6qfjBnanHP70IoQKftuWyU+Kw2oJmeUZRjvnzITW
-         zLqvkfbwJF2t7bWF1bD/eE8uFByxG/8cxl9Em0j9YjNyB6FZXCX1XvbA/cGJkaWzOEab
-         UGO0mfk4x1lEwilgwaU9n40Zu3Z/WtmTOEm6AKbBzxsDll1/xTGrMcF2/2phdbwmQ1JR
-         6sJgsgQg6xqJn/A2PZ4RWiGLi19/MkdOk+s4KsYOyVI6WN89jlH3/ujbFhgYrvqMMBBM
-         RHYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778483817; x=1779088617;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=8XGLE0Lb6oyAV1QhgBO72k5Frf1S0m4rmMmZM1kfrHo=;
-        b=Nz6tKLhrnSSHTe5sieZUflw0OUPAoKxht397eA1pC67cK6ycKZOXT6UXdNaCJcGx3x
-         1MbPHCWa9bqEwvteGIcmH4S+Pm8bkjRbO5saI/JdoLbfj4L9V4F2Y16pabUI0ckjUAkm
-         T8oGIFSkv3DStkPZpniTJfPwbCIXkxJOBtqEixHyWbbMe+udm/aWdUfUdegPh4wAcFHj
-         iL7vFjjUZ6zN2A9kH/2/nkzGl8ooWLmz0JvCf8LNxe0VvWlX13Oi0uWAGxSMUMag9wGh
-         mg5c/458uuAtaJP4rxfLpRM1QiDgQYdv9ZCDDGO2wMP0Mw/RZm5ls/vWum/MPMekSXiC
-         mEdQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/4Y0zLI13go3acgppHrOcSsaAnpg1kymy5XLoZ5Ikl00te8sPZTU2UcOmaTroub2OBmQybVqA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAoHkkoTnl5KRsHOszDKkH8DDnDUEIkpJxzCogANchZMDwUKky
-	NJcnMAkUoSIqsEGk8bJ+IJy3kYUL3wE0Nt0Bt1avcq0hhCiORs1+M4DOnlKupVpLtq2S1xRIRzm
-	7/BXwaFTYniFYhUnvha+6LD0CRUIskKC8QzAOJGAU
-X-Gm-Gg: Acq92OHZsBVWd5UrcoV7sr5QCMbD7wKYFjP5/dRFiMaMs1BlDuUAVej4ZIopynWOxsG
-	OeVwAVj/JCUlqh/ANWsM2px/Mr226SkC50gggQmt9pxZX0qE3IR2jEMzS4zmP2jwvl+/CdoyvEL
-	jDPty68aCwdoUM1EIp0wymaHY/dxfp0Twwt8F9HQp6HJvvw19xiXP313n8uNZXs4Y35iiJ5qJBe
-	RDs7lXGx8RFKxif2MbImRu29JVZ5sPx8KWHJ0Hr3l0gW+ZmLaoIX8JTDnHK+Jw5JBcIy0Lv4X4q
-	/TQQrOGerisjMXVdc/SEPIQdmQi10C55c6ZN6xUt1lXArGUShFslbi3mdEgKVrXSfStVjkk1s32
-	vn0I0X3U1BdnvmiuuQyeI6WVuKs+c
-X-Received: by 2002:a05:622a:558b:b0:50b:34f1:6309 with SMTP id
- d75a77b69052e-514621c7dc7mr308820361cf.49.1778483816178; Mon, 11 May 2026
- 00:16:56 -0700 (PDT)
+	s=arc-20240116; t=1778483840; c=relaxed/simple;
+	bh=HR4SoSWWK7/pVFDq3BAtnNaWbeD9av/0GFD99p6U3as=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=jN+8irToIdnVWRGqc+7GigXR3vOvlQuvMkVcQEc0ZUtlUwFu31Seasc8d+0rM1hmyBBGS8vtOkgaHumdwGwFi5Yl1BYMlpQGlb6t13+I6rrAfPeZoMKEebyZ8y4QcakFcv4o+CRoW8Zmovs+FxLfSu8gwuYpFvBOnFk0fpKi2AU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=TVYAyd9g; arc=fail smtp.client-ip=52.101.70.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MyVfVZvuHsnyX9xhgCIG9NPPkpoY1ldx2nTgat+OYrgFglxn6eeavP2rkrCFSA+Eg2ZXRmcYfULJY/9V66AVdugk3T7QEQDVE6dOK1czFU74AJm73hv78xTlNCzVLcsTlohnkQcWKIPkryOJSYFxrIPtv1+rqRD5gHCmTT6VsiXsUDzqnMrJNDOq6gvD5SOe7dGvQspiRwU29vOyve0kEkuGdBMnDk/yJwjPUqvBhU0rz5BgZ08h3qchxQaBl3BwVg9n6Sqc+BtE/7ULtU5k/OQO5PPelU2Ea8+UKkanQKYBfkCuiDWcI/kGVXp/I5DozpdHh7XRPrL7v+izR9WLuw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xRS5TmrEKg7RXytcTXcpaOCY2vFS2mVxZ12suOM8L/w=;
+ b=k/Qn7glTF+rIO2hWMdjw/+slAlGTNTuxs5vTyt/T9mrCX1MyGvrU25Di+1qZLza2QJZVNd1XC4LTCjsTB3HjMe/r7Ainl0avIqSKHYHfQPDSqNxbp6G9uxRq+n9qEbvQ7O82PlnCAuSsksZufdCqpUR0O27b+PBdnfFUT7VDHg6YaTSOKdfyRLmi8AcQpVOh4lTa+QJ3rERq0bdNJaDcpjwPDSkrNg5ND6BAn7qWZN3JXHHQSZo2Vvwi8N4PWhC/kR81hdp72i7MNZwt30bHgoRmfPUq+MIjwJfXQVqysPUVF5i9ACYwhN8PurKTnGc0YYMSljH/LPvvmkw0kxR7KA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xRS5TmrEKg7RXytcTXcpaOCY2vFS2mVxZ12suOM8L/w=;
+ b=TVYAyd9gC3/vh8oB6KX88SGfAq2dtXBmZSucH88hwC+PHT6cz1nyd6mvf4hRAXWSKrqP0KVjop6BSzRbSzvv/XnKDGqpdolIkSSGAryucghyRqaY4Z0AV3zOrzONAeIwd4SrMWDeRa4Q2+e9uVRJ0SVk06vU2Ny3idpeQ/6xKgCAbIyZ2CyAbSVXyRF3JiUarn+QJyfgcqt6QpzeXLYDDVCjqeIG1R1QXmH/AGuoGvuple/XUsx9XiLoimoo9oFyxdmlvb9MknmgsSd92cDBo2q0GaS13iuiLr2mHCV6pZrvQ3Qold1iaxQzRtU0gJjQGIenyjLo/5YF4rIL9A8iPw==
+Received: from PA4PR04MB7502.eurprd04.prod.outlook.com (2603:10a6:102:ef::21)
+ by GV1PR04MB10893.eurprd04.prod.outlook.com (2603:10a6:150:209::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.22; Mon, 11 May
+ 2026 07:17:14 +0000
+Received: from PA4PR04MB7502.eurprd04.prod.outlook.com
+ ([fe80::ff73:c7b3:5306:2ba0]) by PA4PR04MB7502.eurprd04.prod.outlook.com
+ ([fe80::ff73:c7b3:5306:2ba0%3]) with mapi id 15.20.9891.021; Mon, 11 May 2026
+ 07:17:14 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: "sashiko@lists.linux.dev" <sashiko@lists.linux.dev>
+CC: "imx@lists.linux.dev" <imx@lists.linux.dev>, "conor+dt@kernel.org"
+	<conor+dt@kernel.org>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"Frank.Li@kernel.org" <Frank.Li@kernel.org>, "robh@kernel.org"
+	<robh@kernel.org>, Networking <netdev@vger.kernel.org>
+Subject: RE: [PATCH v6 net-next 10/15] net: dsa: netc: introduce NXP NETC
+ switch driver for i.MX94
+Thread-Topic: [PATCH v6 net-next 10/15] net: dsa: netc: introduce NXP NETC
+ switch driver for i.MX94
+Thread-Index: AQHc356gdXpPrsGmkU2EqCuxvHl7wrYHFd0AgAE+JsA=
+Date: Mon, 11 May 2026 07:17:14 +0000
+Message-ID:
+ <PA4PR04MB750282C2004F177F08BF602A88382@PA4PR04MB7502.eurprd04.prod.outlook.com>
+References: <20260509102954.4116624-11-wei.fang@nxp.com>
+ <20260510104836.BDD50C2BCB8@smtp.kernel.org>
+In-Reply-To: <20260510104836.BDD50C2BCB8@smtp.kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PA4PR04MB7502:EE_|GV1PR04MB10893:EE_
+x-ms-office365-filtering-correlation-id: 3ac4a773-f464-4049-a7c6-08deaf2d53b5
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|19092799006|366016|376014|38070700021|18002099003|56012099003|22082099003;
+x-microsoft-antispam-message-info:
+ 7DvbVGtLk5Yh6HY4gpCkhhfgg3M+njX4SxM9WA1o62VeZIHAeaDGqDPYyxqsfWPmsxIQb8iyQp16p/vA0NPglJdFesclGav11BpWhzJjY8gVizfxvYmYvPHszn73SbgZM601S5QepSzfd3/BJg0YkSWryxOlcqhcxOo3N1H8MMa0DPFG9xM6mtcPX4gaCA2zD1sO+rMlyIeBGkzL8aW58rYHucNZlcG635NqI+chiKN/WfumDKCJ7VA4A3xKsK5q6j7afeAdu6ySZ7005FqXb3mFaa/VPzNWGdGEB1397JR7biEAzVcuFC6K5+gSgTVdiBnmfv5BPbsAYlt+2KqYg//3fRKCtMAd2NUg2Gtr67ydt0WU37kNvi62N0EsI/uYoM747+DVzSKe8Ltj+jsOApdjYQkGxNn3FiXMtcDUcWVhx5sxMQnxp+8TgaDMiW0fKl+mvYdvoDl6MBN993rSpX24DavKZual+ehS73IeRmcwgabJuN3kMuB9rvLaB78CZbWwV8my6exPeRogyQZ8iG03MCe1DIg1y1ly36vIf2hHFkJmkRtmnkdDxyS/F6o3SVgW0GoStjyPHPJVzERh+Ycm/fIss9oFXyjEZ3Pokj8misFXGrRyc6PlSAFKFapCJ7Cbet/u+0bsdJ8ReBCDjsHU+a5cPpEtK8+ojg+ZwDt6SpdlrerJEVP6iKi67h6ctB1qU1rKObarvba19cEgzbIfg4fJQ0+P4LTp8wsOi9xx3oPGQ9zT9j21ZFf/Tn2H
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7502.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(19092799006)(366016)(376014)(38070700021)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?koi8-r?Q?kUyjXHYXYSvhhQs1wEiXkSKUNjjAyMgjIrGKzIYNCUFjrTWjKlMKET5hDXuf3T?=
+ =?koi8-r?Q?OusyUTIsv29KT+WhBOo1zgF2ECz815eP8z0sh1xILXQQD718CAL86iqiJJbxvM?=
+ =?koi8-r?Q?do1+ulFhAsSWF0OHwMSXkS7mqDrPt5Xg/OAxo9pqaw2SY+8Jeh3bet57IdulU7?=
+ =?koi8-r?Q?0vUawicQ1VF26ogkwN6Jo5GumWqCtVKZHrAdualcqrr2gfGNYi6icQ3OqzYShG?=
+ =?koi8-r?Q?pq0uJZD/vBWpP7Fptpq1A0CYj/XyMotFumlnbL9dCzrq0kW6d82HrQqGNcZlrc?=
+ =?koi8-r?Q?mwo4SewBPXBvM8juGbel8LnThSNjXJ4BhOw6K+rD4pyQPudGc/QP1k5HTDEPus?=
+ =?koi8-r?Q?JZRhs0bfm8F7DeBqBDIqM9KDh7ca7u3ZUhoY06q0b0CE+5EtkAvV4Jjzr+M5D/?=
+ =?koi8-r?Q?Ivct6mQ0NuOolzUZ2hjNAqDhuxfBpGvkavNvM137Zo+efWQz+RvGQGblzD9xo+?=
+ =?koi8-r?Q?sMJIRJQXdrc6JlpIFUG0qaoLo0eyC/suiFDlV8X80nvyrIYjr8ojrcILsdkDQm?=
+ =?koi8-r?Q?rz49gEmmfL797ZOZevBnMSrMi/oio4EgAoBQ46BL1R1ZoBPVliPOt+xnvSbzZ5?=
+ =?koi8-r?Q?Y51RAxVHSeO299eaqRxSgMnmKaMXBhQ0XiZcALUY0r+/8t8jGzaJDegmyrBLN+?=
+ =?koi8-r?Q?el/Ki42BjqWAv5u3Rde4wtPRra3mL6ux1ORWBVmvfNBWmTIWKG7sZ8KOYihY46?=
+ =?koi8-r?Q?ooZRm5abYldkOb2n9geGC8YWfnzeBrsNE7GTyog9bVonEjrG8wc1M4izQT4iHk?=
+ =?koi8-r?Q?S1GOeh3u0MAApL9mf3R7i3dGDfrpClzk3q9WF78dFk2EQKQM9tWJuQid6ORUX6?=
+ =?koi8-r?Q?xXxOZd2IIYHRMeZEeoIQvde7T0swBdZ89WNlChMb6YF+xm0dB57VHMrMf4iC6L?=
+ =?koi8-r?Q?L/USvmrrImqUjL/QcfhodTrRmGbeW6A9qbBveXUzvnzY44bAOMJa3A+MYeXza5?=
+ =?koi8-r?Q?7E8mXueuR3nJPzdmXwHCTu/CjV4PgYt7TFHDPKvaXmA/yTPy5m1+s0Rf70YljR?=
+ =?koi8-r?Q?fQuC8TGvnFuy1UcDsSqLawBNTwFHISzgPcAh+7+DY6J7pQpuCNgQvqeYfRndH/?=
+ =?koi8-r?Q?YtwOhHvcS6heSJr4i4TeLhjo2Rda0OW6CDjj0Is9nEZmgtJ5n+6gXgNsJutxDt?=
+ =?koi8-r?Q?XvUXMgy3+fZeHWvWSwOq73Qwv1Qv1Lz8UohMFI21A6LlnmNsAUznv6VYaPzrX6?=
+ =?koi8-r?Q?0dCMkXv1AVjVSPbGQo/3N/omjwkyAqrnDU1ZpE5gi6Flw1hnoGuarBGMd10A3y?=
+ =?koi8-r?Q?2nqfBi+ftgLzrnMSJiPEgRGldNvWFO0GL23nzFa8NsPcQgqsFNnKtgNd9m3gUL?=
+ =?koi8-r?Q?U7Hj7v+NdOIXVB+glfoMV1u3iirGUyBZRaYxNmqRkYfm+jqgRDwINTTa/k5hWZ?=
+ =?koi8-r?Q?24ZchDljLFmbp+L7gkGuVF03y0013aULlYEven/Xt9yxku85cKFPBwGKLg0206?=
+ =?koi8-r?Q?ZDSlvS3Y6jC4j64DBQ8PeQjrPkIC257q4X+HAHEOeymSudOAaA4MlROjHN3IZ5?=
+ =?koi8-r?Q?O95uoSoTAhuJkTocpegA2Jv24RJsxNFLRmz/NM2izdv0w+rNCj4oubg2gKXZ33?=
+ =?koi8-r?Q?9wa1lIXp+xOOk2x/B4uEMQn23v1otVqmwms2K8hVmBk4/t4kO74bpLOn0D8BSH?=
+ =?koi8-r?Q?EvI0Ks2LbXaRns225DxKHuVDldQWVl16qRpacgG+y+ftdTbua8mFkS?=
+Content-Type: text/plain; charset="koi8-r"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260507084305.2506115-1-edumazet@google.com> <20260507084305.2506115-2-edumazet@google.com>
- <20260508151523.609cadaa@kernel.org>
-In-Reply-To: <20260508151523.609cadaa@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 11 May 2026 00:16:44 -0700
-X-Gm-Features: AVHnY4JRkK2VfoapsRpfMMSgwumiIvw-0AJW4CWku4xF52ZXB5Bz_8Kb0eIzyKI
-Message-ID: <CANn89iL4EHdJH4Oqq0RkmtgSu=4EB6r5L9v_ig=3n-8jwCOhoQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/3] net: constify sk_skb_reason_drop() sock parameter
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Neal Cardwell <ncardwell@google.com>, Simon Horman <horms@kernel.org>, 
-	Ido Schimmel <idosch@nvidia.com>, David Ahern <dsahern@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 817FE50903E
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7502.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3ac4a773-f464-4049-a7c6-08deaf2d53b5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 May 2026 07:17:14.5819
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Jlpj7JQaL0eALSBCp0Lp1PbVMY2pO1ieH6zcDUUSlQWn1zHq89l8nds8nrlEoMODQAgvDr9AjPksl7ViPBNrBg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR04MB10893
+X-Rspamd-Queue-Id: 59A8650906C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-286477-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,google.com,kernel.org,nvidia.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-286476-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
 	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nxp.com:email,nxp.com:dkim]
 X-Rspamd-Action: no action
 
-On Fri, May 8, 2026 at 3:15=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Thu,  7 May 2026 08:43:03 +0000 Eric Dumazet wrote:
-> >       TP_PROTO(struct sk_buff *skb, void *location,
-> > -              enum skb_drop_reason reason, struct sock *rx_sk),
-> > +              enum skb_drop_reason reason, const struct sock *rx_sk),
->
-> build says drop_monitor registers for this tracepoint from within
-> the kernel, and needs adjusting.
+> Thank you for your contribution! Sashiko AI review found 3 potential issu=
+e(s) to
+> consider:
+> - [High] devres-managed functions are incorrectly used inside the DSA `.s=
+etup`
+> callback, leading to memory leaks and MDIO bus registration failures if t=
+he DSA
+> tree is unbound and rebound.
+> - [High] The driver's PCI shutdown callback fails to stop hardware DMA ri=
+ngs and
+> leaves PCI bus mastering enabled.
+> - [Low] Clearing the PCI driver data via pci_set_drvdata(pdev, NULL) in t=
+he
+> shutdown callback breaks potential subsequent unbind operations.
+> --
+>=20
+> commit bee0164d1f3476eab41d58efbe3baf540bb03cda
+> Author: Wei Fang <wei.fang@nxp.com>
+>=20
+> net: dsa: netc: introduce NXP NETC switch driver for i.MX94
+>=20
+> This commit introduces the initial NXP NETC Ethernet switch driver for
+> the i.MX94 series. It provides basic probe and remove functionality, as
+> well as port capabilities and basic network setup.
+>=20
+> > diff --git a/drivers/net/dsa/netc/netc_main.c
+> b/drivers/net/dsa/netc/netc_main.c
+> > index 0000000000000..8e3a3230226c3 100644
+> > --- /dev/null
+> > +++ b/drivers/net/dsa/netc/netc_main.c
+>=20
+> [ ... ]
+>=20
+> > +static int netc_port_create_emdio_bus(struct netc_port *np,
+> > +				      struct device_node *node)
+> > +{
+> > +	struct netc_switch *priv =3D np->switch_priv;
+> > +	struct enetc_mdio_priv *mdio_priv;
+> > +	struct device *dev =3D priv->dev;
+> > +	struct enetc_hw *hw;
+> > +	struct mii_bus *bus;
+> > +	int err;
+> > +
+> > +	hw =3D enetc_hw_alloc(dev, np->iobase);
+> > +	if (IS_ERR(hw))
+> > +		return dev_err_probe(dev, PTR_ERR(hw),
+> > +				     "Failed to allocate enetc_hw\n");
+> > +
+> > +	bus =3D devm_mdiobus_alloc_size(dev, sizeof(*mdio_priv));
+>=20
+> [ ... ]
+>=20
+> > +	err =3D devm_of_mdiobus_register(dev, bus, node);
+>=20
+> [ ... ]
+>=20
+> > +static int netc_init_all_ports(struct netc_switch *priv)
+> > +{
+> > +	struct device *dev =3D priv->dev;
+> > +	struct netc_port *np;
+> > +	struct dsa_port *dp;
+> > +	int err;
+> > +
+> > +	priv->ports =3D devm_kcalloc(dev, priv->info->num_ports,
+> > +				   sizeof(struct netc_port *),
+> > +				   GFP_KERNEL);
+>=20
+> [ ... ]
+>=20
+> > +	for (int i =3D 0; i < priv->info->num_ports; i++) {
+> > +		np =3D devm_kzalloc(dev, sizeof(*np), GFP_KERNEL);
+>=20
+> [ ... ]
+>=20
+> > +static int netc_init_all_cbdrs(struct netc_switch *priv)
+> > +{
+> > +	struct netc_switch_regs *regs =3D &priv->regs;
+> > +	struct ntmp_user *ntmp =3D &priv->ntmp;
+> > +	int i, err;
+> > +
+> > +	ntmp->cbdr_num =3D NETC_CBDR_NUM;
+> > +	ntmp->dev =3D priv->dev;
+> > +	ntmp->ring =3D devm_kcalloc(ntmp->dev, ntmp->cbdr_num,
+> > +				  sizeof(struct netc_cbdr),
+> > +				  GFP_KERNEL);
+>=20
+> [ ... ]
+>=20
+> > +static int netc_setup(struct dsa_switch *ds)
+> > +{
+> > +	struct netc_switch *priv =3D ds->priv;
+> > +	struct dsa_port *dp;
+> > +	int err;
+> > +
+> > +	err =3D netc_init_switch_id(priv);
+> > +	if (err)
+> > +		return err;
+> > +
+> > +	err =3D netc_init_all_ports(priv);
+> > +	if (err)
+> > +		return err;
+> > +
+> > +	err =3D netc_init_ntmp_user(priv);
+>=20
+> Can these devres-managed allocations and registrations cause issues when =
+the
+> DSA tree unbinds and rebounds?
+>=20
+> In the DSA subsystem, the .setup callback is invoked when the conduit
+> interface becomes available. If the conduit interface is unbound and rebo=
+und,
+> the DSA tree goes through a teardown and setup cycle, meaning netc_setup(=
+)
+> can be called multiple times during the lifetime of the underlying PCI de=
+vice.
 
-Thanks, I fixed this in V2.
+This analysis is wrong, the switch driver will be removed if the conduit in=
+terface
+is unbound. A device link is created between the switch and the conduit int=
+erface.
+See dsa_conduit_setup():
+
+if (!netif_is_lag_master(dev)) {
+		consumer_link =3D device_link_add(ds->dev, dev->dev.parent,
+						DL_FLAG_AUTOREMOVE_CONSUMER);
+		if (!consumer_link)
+			netdev_err(dev,
+				   "Failed to create a device link to DSA switch %s\n",
+				   dev_name(ds->dev));
+}
+
+For NETC switch it does not support LAG, so the consumer_link is created
+when dsa_conduit_setup() is called. netc_setup() is called only once during
+the lifetime of the switch device. The call stack is show below.
+netc_switch_probe()
+	=84=80=80dsa_register_switch()
+		 =84=80=80 dsa_switch_probe()
+			   =84=80=80 dsa_tree_setup()
+				     =84=80=80 dsa_tree_setup_switches()
+						   =84=80=80 dsa_switch_setup()
+
+This is a false positive, please ignore it.
+
+>=20
+> Because netc_init_all_ports() and netc_init_ntmp_user() use devres functi=
+ons
+> (devm_kzalloc(), devm_kcalloc(), and devm_of_mdiobus_register()) tied to =
+the
+> PCI device, their resources will not be freed when .teardown is called. W=
+hen
+> the tree binds again, netc_setup() will execute anew, leaking the previou=
+sly
+> allocated memory. Also, devm_of_mdiobus_register() will attempt to regist=
+er an
+> MDIO bus with an ID that is already in use by the previous unfreed
+> registration, potentially causing .setup to fail.
+>=20
+> Would it be better to either move these allocations to probe(), or manage=
+ them
+> without devm_ helpers and explicitly clean them up in .teardown()?
+>=20
+> [ ... ]
+>=20
+> > +static void netc_switch_shutdown(struct pci_dev *pdev)
+> > +{
+> > +	struct netc_switch *priv =3D pci_get_drvdata(pdev);
+> > +
+> > +	if (!priv)
+> > +		return;
+> > +
+> > +	dsa_switch_shutdown(priv->ds);
+>=20
+> Does the hardware continue to perform DMA after this shutdown callback ru=
+ns?
+>=20
+> The netc_switch_pci_init() function enables PCI bus mastering and sets up=
+ a
+> 64-bit DMA mask, and netc_init_all_cbdrs() initializes the Control BD rin=
+gs.
+> However, dsa_switch_shutdown() only closes the logical network ports with=
+out
+> invoking the DSA teardown callback, meaning the hardware BD rings are nev=
+er
+> disabled.
+>=20
+> Leaving the hardware rings active with bus mastering enabled during a sys=
+tem
+> reboot or a transition to a kexec/kdump kernel might allow the device to
+> continue performing DMA into memory that may have been reassigned,
+> potentially
+> leading to silent memory corruption or IOMMU faults. Should the shutdown
+> callback explicitly disable the rings or call pci_clear_master() here?
+
+NETC switch is PCIe device, what I learned from pci_device_shutdown() is th=
+at
+it is unnecessary to call pci_clear_master() in netc_switch_shutdown().
+
+See the comment from pci_device_shutdown():
+    /*
+	 * If this is a kexec reboot, turn off Bus Master bit on the
+	 * device to tell it to not continue to do DMA. Don't touch
+	 * devices in D3cold or unknown states.
+	 * If it is not a kexec reboot, firmware will hit the PCI
+	 * devices with big hammer and stop their DMA any way.
+	 */
+
+>=20
+> > +	pci_set_drvdata(pdev, NULL);
+>=20
+> Could clearing the driver data here break subsequent unbind operations?
+>=20
+> If a user manually unbinds the driver via sysfs shortly after a shutdown
+> event, netc_switch_remove() will read a NULL priv pointer and return earl=
+y,
+
+I believe this is a technically possible but meaningless edge case, and the=
+re
+is no need to make any changes to this meaningless situation.
+
+> skipping dsa_unregister_switch() and leaking the DSA state. Is it necessa=
+ry to
+> clear the driver data in the shutdown path?
+> > +}
+
+
 
