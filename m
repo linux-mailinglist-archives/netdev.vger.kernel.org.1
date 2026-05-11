@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-286566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286567-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IKdXMaShAWpKgwEAu9opvQ
-	(envelope-from <netdev+bounces-286566-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 11:30:12 +0200
+	id cGzRAb6hAWpKgwEAu9opvQ
+	(envelope-from <netdev+bounces-286567-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 11:30:38 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 943CC50AE82
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 11:30:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B4E4450AE9E
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 11:30:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1FED03017E4A
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:29:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 88F85301B50C
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:29:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9868D3C3420;
-	Mon, 11 May 2026 09:29:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 700AA3C4546;
+	Mon, 11 May 2026 09:29:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="caFPe0Xu"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="f++Qg5V0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FB4D3BFE44
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 09:29:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 834053C1989
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 09:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778491744; cv=none; b=NcwM+aKAiZbuYbkslAlFN3RZ10Bw9MomRPMO8tPD7delLNamzIkx9/kL2DiI+0i3XJqnDymLHYDoGn478rztGo2AMuvnpIXCQrqlYlzL6hswRIg2wPmAygXnVCOWvi/NJsHL6Lp3UyhRqLDL3uimnZWd85qSfuV70eAUoftE5Ig=
+	t=1778491745; cv=none; b=ac6koVQzSEKbASPK9r7nkfYn0c6w+1Z3nO+cftPzqUqsAS8BDdeBWlZNSwdlfREtB4B9UIxzTUCGkTX5qNkrD1bEtgCXo55klG+i6CHa1eeQBg3vLcGbMa5C/GsmT8PBmxbibwl0yxsnziTkO5mpOuQoqje66Ted4nhn/mRwFFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778491744; c=relaxed/simple;
-	bh=WFctueSO0c8kiOMz97Igcd0GbiVV9wZ/sS8JPym8NT4=;
+	s=arc-20240116; t=1778491745; c=relaxed/simple;
+	bh=U1Qm+KKl/AIGh2iSPba1dZ6yy/KwN/3PNFvd/VeLMtM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PU5+KKKABOA3MUFl793RTNTG6L6M2p1Mz9390+3M2rFJqUICpAR7uub9KzTXJzb3Ym/RUJ6et91LUyKJaqgaIDC+LTotDGj2se/wgQbpW/Ko2EKR7cmcJOHbByV+shiiP6GLQUt9re2BbsqW+wyW1btqfZ24/CdNmS0s/Drf568=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=caFPe0Xu; arc=none smtp.client-ip=209.85.128.45
+	 MIME-Version:Content-Type; b=A2pvtFMg1kDuW9Tgpe62y41PhzOh9dCyRd8qLs4uaHIrbMqJ+i3LWCSYO1sgI7e+ognhkNVpJOb/wtCjeYKgkMWM/aOtHHkYAa89ia86hOBeuXHd8PFrLYJ0B40IkjBis4hwaW5My5yQ0LJtlZSsFj1KbmsifdPyy+cFAYxq+jA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=f++Qg5V0; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-488b3f8fa2bso48615985e9.1
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 02:29:02 -0700 (PDT)
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-488b0046078so33686995e9.1
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 02:29:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1778491741; x=1779096541; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1778491742; x=1779096542; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TTpT11VVpBsvTrfwwuWJXCtXwtjRJjFk6SsZKCsLecw=;
-        b=caFPe0XuGA2SSoIQSE8FYKAKHc1C/WLq6nfsXyMjoG5NpiSNQ8ALcyLcTDe6FoAh/G
-         3L+L3m8mToGZ8Bv6u4Pg+cRZsBqSf+3haFEOKBp3+jWcWxOy7RbnVxoLYxvQ9pgFxOy7
-         PcWmBMOXkSZfkPHbDTNWxYa7UjyntWlDlVu2iC53h/0xZM0Xdbud+sdSy2zphk6T+1KW
-         uL8cwvNKDZ1iWUVtOVQx4ozOgt/pfasyiRLQdkzI413QMZH3ZL37I0rOHzQb2zC4j3SP
-         845tXjfLU2JuSovV8vbqx2K9x3Vdk+RiLJvY/UEut8VNUikAMMaq6M3xIanUEFnxq1as
-         gpng==
+        bh=WV7rblNQ4jpJXwaDYZZ+KkXDw9KuCi4SHEk0BK4A9w4=;
+        b=f++Qg5V0Wa1M9jxmceTSJGnCMQCwiMTXauhhz3REkASP1M7pHZnUf1lpED40lrVUDz
+         vfbVbY0YIGxYHj1ojW3Mdrn4fJ49BkYjFt4MPyP7R+pwnTl3KXYOUjs/YzHL3gaaJq3D
+         3WVAEJxUGTFLtGs3ZR8EU3kAMuw7BRJRHptjH+F43AEIXMDj+asejKAYDzOUxScBlHSy
+         RzL3uelkk9oOVx93cK8A1ljtwJv7keIhBwfXpADRgI5earenD4wg4/3CYqSGXxCDGaeh
+         cP90k9zTI86DliGWT+NMSrpLk9RR96ewWLwWqDMsq1XwtJ27PqJSnOzzSD4IfdEMImsC
+         axWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778491741; x=1779096541;
+        d=1e100.net; s=20251104; t=1778491742; x=1779096542;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=TTpT11VVpBsvTrfwwuWJXCtXwtjRJjFk6SsZKCsLecw=;
-        b=NgX3UjEE2YQh8mXr0zL1+ziTcYuWpWy62NvHtTLQuWaPtBtOnG6Wow6zfW97qRKRmX
-         V52TF3bH6mw1kk3+tZ/Ge8EhG+afSWL2gZDR3Eg+TY9/TJzjLOJgn5GFY9400llQKZJK
-         gajI/h5LIUK2u2Pen3VPv6BiU7QbxYxjGrOrWxojFRa/xHrydFZi+MeKJgfSTJBN4RRn
-         YH4bJ9NKkDgwN3etSnF8ldr9BmOZFTrNp9JFw6L1syyUz9ELVEG77975w9Vx43eBEw2I
-         EmvjAxmG49j82W/8H2bUPLa72SOLra3m7zj87UjEkTP1Tt77XeRxI6vtm7gGO3oIhtiC
-         8uQA==
-X-Forwarded-Encrypted: i=1; AFNElJ9JZ2tWS5BL4LZ3tIyBZDF5bi0JlVmNrNTvlK176a6u+zfkleiArRbbbqDl9jLdjRgW/7PnmMA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbXlF9OCL+ZQ0YwJeARG1EeeITPCIM79nA/Kk0/4I/RWARLZjw
-	1sJER5zHe/5k+QyzrFVyQxc201JC6rdSNdxC4Rnl84IE1T51xJPWkbCEai54fCkqdMs=
-X-Gm-Gg: Acq92OGQTq9aXpMB+0tXXlEJecpFl03kTuwYXIEGOIpgCfJxWUVDKYtaBJ59drdM9On
-	egzckMTf2Za/dD26j8/EZTGdTTtUSR7xwGUJWDJ1CtyfQ+viDYI4PROR6oAUOlej8pEV7e77Xpg
-	oO/GN5fZgfgUnW8cf1kJ5uug3toVlHgozxxcbVSpJPn6fDicSMsgDwe/I1oyrBJPgwZIYUdvmxx
-	G0EHNkjUlZwZ/N5e5jcibA3i5FWZJmYKNZ8p8OyXRXUdgYzKImv5+HVO3TpZQud/eLJkp3FzZ85
-	07Ro+QlN3suaEoMR1Yb1R5XZcn0++tR3xQnZTbQc9s/ApdN7d7iNtif6L6TcxzedQ4HGSSu416r
-	TRYl1k/ypU7DNdCvkTiqI8LqD2mx45kfQplreekTy/5UMEkEWdaxBDjm7ZAisDMED1Xr5xyk8U0
-	ELDusfxRhb1vN+WXrjcuvlO9jciKtfk5A2qB7cFcojScdid39i7hesyiknSw==
-X-Received: by 2002:a05:600c:8710:b0:48a:761:5816 with SMTP id 5b1f17b1804b1-48e6d79b006mr168469675e9.8.1778491740918;
-        Mon, 11 May 2026 02:29:00 -0700 (PDT)
+        bh=WV7rblNQ4jpJXwaDYZZ+KkXDw9KuCi4SHEk0BK4A9w4=;
+        b=UZTawFVyf2gEdo3YoAHA4cBC9WmOjzMRMasTVE2aNpk914/W/LlY+IUyoQ10NBzi1B
+         T9xKC4GCMr5Xki3zjjsa15GDg6G1ZuEX73B22m4yv9i0+Pu8DJLs6YbkNA2X1O13kEN/
+         oTCJmp4iRcrwRXb4hA/xcD8vUpYgEOngTUSG333OIzBLdSENNCdlWcKhgnbMmO687Fqc
+         k245+bFKJSt1wZzNzWdgwR+sf5aYow/EGzeEo6R1hxjpscu1dthXTk9BFLaK6Cp/ZYtU
+         jzQcEpzzRyAc96BMCS6MmAoknIp/XK+XcYxtELMmkXqLl4XmkD3hRNLlBr2nzhRgRl5i
+         YkDQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9eYr9ex9j8NLe2GX58RwtTK2h8ebEcxNsN5umEnY6pbBS980MgTPnZbFwRmmttlkMCi8iqAg8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxgm41pEZLf8v4OYegWVlGFCwojXu68dC0uNZezihmlXA3EaD1m
+	nWGOe31BLJ9uGWpcwbwLE1ui4iSCwhf+E6lVkIjoMHAcSrGhOCd2NB6OkTchZpnj/qo=
+X-Gm-Gg: Acq92OE4QOae2kF5VQDSfkMeahQsMcR+i4oa/E8Qbuai7Nck9WNdH/nO9D14kU0xMud
+	9CJbY6mUJrEMRKpaKEn3d6G7pSvMqOefB/boPJJo7fnv9CHlLv3AhmTcwfX0wJ/vsh7mDkTXgHI
+	i8QJNLkjMTEgq7KtsDJ2mFqbIlIImt7feCpp1aPcfjPagidoiqoVMvq6bf/neK+mjcd87uBNmPI
+	26c/XF7qPo44wgYhEoFAbcxeG9F4HZefpcxYJFkY3ZZgNm63PNv7mgWRbXZxqVzgeNd1Gp5wmSx
+	oEgTa57uRMpRawiuWyHlXK+JEmk/3A0BVJPNKwNoAd7TMvrwjlpHAiuEopZ4MjxDX8ARsRnsmsF
+	BOALdhF2iDYwkAsK/8HvAXOE0AMjZNMP/P7m9puaxzZrUqrpCIZmaB4fF0AVR5tZLvsqjqS0UQZ
+	O1cjk+R3VDxHx949fZzTxNgnrrc6o7ztY/TW4uF1aW4s68jMA=
+X-Received: by 2002:a05:600c:c11c:b0:488:c078:bfda with SMTP id 5b1f17b1804b1-48e706e0168mr96108715e9.26.1778491741993;
+        Mon, 11 May 2026 02:29:01 -0700 (PDT)
 Received: from localhost.localdomain ([2a00:6d43:105:c401:e307:1a37:2e76:ce91])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e701e89fbsm157606675e9.4.2026.05.11.02.29.00
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e701e89fbsm157606675e9.4.2026.05.11.02.29.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 02:29:00 -0700 (PDT)
+        Mon, 11 May 2026 02:29:01 -0700 (PDT)
 From: Marco Crivellari <marco.crivellari@suse.com>
 To: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
@@ -90,11 +90,11 @@ Cc: Tejun Heo <tj@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Petko Manolov <petkan@nucleusys.com>,
+	Ethan Nelson-Moore <enelsonmoore@gmail.com>,
 	linux-usb@vger.kernel.org
-Subject: [RFC PATCH net-next 4/5] net: usb: pegasus: Move long delayed work on system_dfl_long_wq
-Date: Mon, 11 May 2026 11:28:39 +0200
-Message-ID: <20260511092846.120141-5-marco.crivellari@suse.com>
+Subject: [RFC PATCH net-next 5/5] r8152: Move long delayed work on system_dfl_long_wq
+Date: Mon, 11 May 2026 11:28:40 +0200
+Message-ID: <20260511092846.120141-6-marco.crivellari@suse.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260511092846.120141-1-marco.crivellari@suse.com>
 References: <20260511092846.120141-1-marco.crivellari@suse.com>
@@ -106,7 +106,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 943CC50AE82
+X-Rspamd-Queue-Id: B4E4450AE9E
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -119,9 +119,9 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linutronix.de,suse.com,lunn.ch,davemloft.net,google.com,redhat.com,nucleusys.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linutronix.de,suse.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-286566-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286567-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -135,7 +135,7 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,suse.com:email,suse.com:mid,suse.com:dkim,carrier_check.work:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,suse.com:email,suse.com:mid,suse.com:dkim]
 X-Rspamd-Action: no action
 
 Currently the code enqueue work items using {queue|mod}_delayed_work(),
@@ -159,47 +159,45 @@ obvious reason that justify the use of a per-cpu workqueue. So change
 system_long_wq with system_dfl_long_wq so that the work may benefit from
 scheduler task placement.
 
-Cc: Petko Manolov <petkan@nucleusys.com>
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 Cc: linux-usb@vger.kernel.org
 Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
 ---
- drivers/net/usb/pegasus.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ drivers/net/usb/r8152.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/usb/pegasus.c b/drivers/net/usb/pegasus.c
-index db85f40734d7..f26bf54e606c 100644
---- a/drivers/net/usb/pegasus.c
-+++ b/drivers/net/usb/pegasus.c
-@@ -1126,8 +1126,9 @@ static void check_carrier(struct work_struct *work)
- 	pegasus_t *pegasus = container_of(work, pegasus_t, carrier_check.work);
- 	set_carrier(pegasus->net);
- 	if (!(pegasus->flags & PEGASUS_UNPLUG)) {
--		queue_delayed_work(system_long_wq, &pegasus->carrier_check,
--			CARRIER_CHECK_DELAY);
-+		queue_delayed_work(system_dfl_long_wq,
-+				   &pegasus->carrier_check,
-+				   CARRIER_CHECK_DELAY);
- 	}
- }
+diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+index 1ace1d2398c9..16c521e3fe0a 100644
+--- a/drivers/net/usb/r8152.c
++++ b/drivers/net/usb/r8152.c
+@@ -7050,7 +7050,8 @@ static void rtl_hw_phy_work_func_t(struct work_struct *work)
  
-@@ -1232,7 +1233,7 @@ static int pegasus_probe(struct usb_interface *intf,
- 	res = register_netdev(net);
- 	if (res)
- 		goto out3;
--	queue_delayed_work(system_long_wq, &pegasus->carrier_check,
-+	queue_delayed_work(system_dfl_long_wq, &pegasus->carrier_check,
- 			   CARRIER_CHECK_DELAY);
- 	dev_info(&intf->dev, "%s, %s, %pM\n", net->name,
- 		 usb_dev_id[dev_index].name, net->dev_addr);
-@@ -1297,7 +1298,7 @@ static int pegasus_resume(struct usb_interface *intf)
- 		pegasus->intr_urb->actual_length = 0;
- 		intr_callback(pegasus->intr_urb);
+ 		/* Delay execution in case request_firmware() is not ready yet.
+ 		 */
+-		queue_delayed_work(system_long_wq, &tp->hw_phy_work, HZ * 10);
++		queue_delayed_work(system_dfl_long_wq, &tp->hw_phy_work,
++				   HZ * 10);
+ 		goto ignore_once;
  	}
--	queue_delayed_work(system_long_wq, &pegasus->carrier_check,
-+	queue_delayed_work(system_dfl_long_wq, &pegasus->carrier_check,
- 				CARRIER_CHECK_DELAY);
- 	return 0;
+ 
+@@ -8620,7 +8621,7 @@ static int rtl8152_reset_resume(struct usb_interface *intf)
+ 	clear_bit(SELECTIVE_SUSPEND, &tp->flags);
+ 	rtl_reset_ocp_base(tp);
+ 	tp->rtl_ops.init(tp);
+-	queue_delayed_work(system_long_wq, &tp->hw_phy_work, 0);
++	queue_delayed_work(system_dfl_long_wq, &tp->hw_phy_work, 0);
+ 	set_ethernet_addr(tp, true);
+ 	return rtl8152_resume(intf);
  }
+@@ -10001,7 +10002,7 @@ static int rtl8152_probe_once(struct usb_interface *intf,
+ 	/* Retry in case request_firmware() is not ready yet. */
+ 	tp->rtl_fw.retry = true;
+ #endif
+-	queue_delayed_work(system_long_wq, &tp->hw_phy_work, 0);
++	queue_delayed_work(system_dfl_long_wq, &tp->hw_phy_work, 0);
+ 	set_ethernet_addr(tp, false);
+ 
+ 	usb_set_intfdata(intf, tp);
 -- 
 2.54.0
 
