@@ -1,179 +1,255 @@
-Return-Path: <netdev+bounces-286754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286755-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cBZ0Be8SAmrangEAu9opvQ
-	(envelope-from <netdev+bounces-286754-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 19:33:35 +0200
+	id 0AYDAy0MAmoSngEAu9opvQ
+	(envelope-from <netdev+bounces-286755-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 19:04:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B3BF5138B4
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 19:33:34 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F12F512F79
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 19:04:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2A05E3034B2E
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:01:34 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5AC433039C9E
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:01:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBEE243E49F;
-	Mon, 11 May 2026 17:01:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EEA443E4A1;
+	Mon, 11 May 2026 17:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OhEKgON8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bob49sCb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EDD43DA5E
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 17:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778518882; cv=pass; b=ksX5JimmJ4nd1Z+gWm8FCcINKTRgdH9anfu6YkitcK+pNUd++DkqAnUNQ4vQviZQylVN0LNcpk2qrMRYiLpQeNTwDKyQxzgBIl3HTd6RDEq4ZIqMisa7w20NXxHzjvlTKboKqzLs5w0Tn+8uENFckbHGhIo+Fwntu0HHfVsGC8E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778518882; c=relaxed/simple;
-	bh=sX76fFKdIdHWcvUPNAk6ORnTk1gk3SV4Auw12s3ZtLg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jSmWw4ldCHj1QIGMGuDb/VvHfh/goY6JFpUZBlHAqPHA3WQufMT6lA+EWUuiO/y32A+hRfV8aG6JsX0iJSQjtXJoOtEV1zSvaeJzzz02VKPYgoRU+gO7oY+KqKainA4oGXS3qhUcUmgFKmxRS+VnsLe2ryCHf8eqcibvMWo2xEA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OhEKgON8; arc=pass smtp.client-ip=74.125.224.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E11D43E9C9
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 17:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778518897; cv=none; b=HxV/VQ50DuXzovJetqpH8CroziNJSIOHzw2olIK8FPB7pEkUEX3F1Pv7+3qLe0fGzPsY+8tSN0O/CsHdz6NghAqjcE2cHl0Z2z7Wb1zn/a9ax1gQn9QW1+aFIUIa4YHwIAI+GpSdPLAn2RBWj8hbrd8fyMYLT8KRlaRCfFhqSBk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778518897; c=relaxed/simple;
+	bh=PE7CfPDlkT2wusrx9oi+uBa5B29abPzYTNGdV9PEKc8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l5dKnteaIyqiabdouHQ/lLrVE8BEIaG8NELF/Vx/zj/RK/oJr1QqhtMcpK6nF5kMl8YNM4oqJZzJ+czaXTBSvSUInsK00FWQS9r/uCEvkMN/FbAe/sPKPlFz1MR9q7NsBKm1AZUXvMJVoSKNYFdCSdsfC8F2+Hg8zhZjaUHQypA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bob49sCb; arc=none smtp.client-ip=209.85.128.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-654672a6d68so4876126d50.0
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 10:01:21 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778518880; cv=none;
-        d=google.com; s=arc-20240605;
-        b=CE2T/u+YS42Kktd+SpZIQdoHvVwTS5/zVnCB55uL7mGrkI25GcaaR77eLPSaei7SQG
-         TTFZHQudlNynLWr+HVNjnsqryq15AvQTn+QFmmO4yyxNCpn3o84Lx4Kb5wUVeVvFausS
-         /4BS2cBCRYAL3MeH5vZIWMps9v+uf7tnyuqmwPvCnsDL9TOQeDBSRJrvVQr7/2XewRR9
-         PawKvJ+ShtmxF9hsNUJlwPWHir9OZcjfzb5Oi07e4p5i/VrIGnUufMXBMyIFgbcJQkkb
-         +SKYGMaCyY9ZuaPPEJB5rp9lU/vOzrucEnmwfFgnK1amVzl5o/sAu1xYwS88l5H/sfpM
-         3gRw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=3Sg1NMnSjHVsI2sM31JWs4ZSAYtGPCK7HEDDBX1EM78=;
-        fh=hpR+OvS7vgsSoTB3qIIhlkaSNms4wHnwFYovtuPOkLw=;
-        b=YMBzr+8lSBH0oqmoD3h36I9CeOBv8WK9709BYyDoDTEopJKSw1WktyF+wCzyXNArDO
-         DFT9f7SQOclABF1H0blWiURwwZ+mZ1mSxJ72NqfTOnAVAAdIVVQuJSEFn/c6yXKVcuzb
-         Ou5/83rhYIfqoPHmL7f44qsoNMCusWHUATf8EwpMGHanY2QyJTws3qHR4CjXV8u+mADZ
-         IpnO/vEvUuvF5J48hzH/CxX8iiv/8qPcnla8bpP29J/bQ5M56Y5OdbCMUhXIQfy74CZB
-         jinTjP+M7d0cAnEyYYh/F3pdF1ddUDB1pbAUevKVIb8Fc9jWh/O/B61kc/RS5igcvbj1
-         wprA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-7b4ee3a88e1so45525197b3.1
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 10:01:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778518880; x=1779123680; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3Sg1NMnSjHVsI2sM31JWs4ZSAYtGPCK7HEDDBX1EM78=;
-        b=OhEKgON80OIy1TrQ5AedbWYWvXJkLRr3IZhNN7DgZU7cyH7SrhWJYPqsAi8s4ebSD8
-         KL/hzXxjAXLYxa7zvr+3Gn7GznGYwUbRik3leQDjccaZ5ps4k5p8Oeqa1njPfoxTCIJd
-         AuJ3xetEIp7x11qZl++Kw2107ViILLeOq9V+p1b+y7qggJGv2/Pq34esszFLe653MJID
-         r5/G03+jQ5GUNz62wHT/0nSpkNOpgNQHd99WbGzd+awgzhR9kGtFZ6ODg9PnS2X8xVzl
-         7fOwO0mhLL2Y3G9RjnWjBgsc0TFS+qM+aObqnH9stxbKckFsJCiUe17KjTzjsd3hH7sf
-         rS2w==
+        d=gmail.com; s=20251104; t=1778518894; x=1779123694; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xawfXJfKqmeoHeOoXubh3qn/e0+i/yH0+NUj7NVoCTE=;
+        b=Bob49sCbsvWdsGg5Bo0V+IiPmAZiZXom4ahxqCPEjCxWuTBugBnA/d7dnO89SvIAZE
+         XE63XQYfKmnSaTB2jQLDvD9F2QkP1qBT4NIvddpVZ3vqoMIfuCkhyqt5rzRuAcUMQRqB
+         5Eg4aBn3G2Vt4/StQffospDOP3HzyKAaBAYhvlDKRvDcZJMiuhhMDv2XnleLIYPqB2yD
+         10b4bwArDx73qG5NmxFYv0SQdPrQFRlZPmucCRjlD7LNZplTqWjhlDsBfKSGspd5Auvl
+         d1fjhxQUffsK1y/D0WXwSMvgUIItrRlqV9IdR8Q5jncDIFxekDh7lqchNXhK44HYuJkN
+         ebWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778518880; x=1779123680;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3Sg1NMnSjHVsI2sM31JWs4ZSAYtGPCK7HEDDBX1EM78=;
-        b=mSeTpMztQkg7++RZryOLYUb4LlrQ24evaPKpDEKuZdu2JxO3RlErKZmgUVzqIoCO+z
-         n+y84mqIpF81X8vODoSoiKM+N6pkMPEqURsBStXWYwa3bXdTo40ZYg5kJYxzyAlfVAph
-         KOQ8OGL07yuk4he8gKWnx359ylEZ5gLYXjeTK+EIvqU6Xe0nlu7BDI1IkFry56I3oQin
-         Cw3qWRYJUscBGGb9F/qgikjwiSSy2Tf45kg0P9/qvQayFyrLr44SSXoHG3pivSE3zajZ
-         Z5f8WBekp1svUNOWD87NQfW+iSC4Z/Bii6tZzldBBQPKtDt/vrIMQdWaRvBDyxXITRWm
-         9/5Q==
-X-Forwarded-Encrypted: i=1; AFNElJ+StZgKcKWdSy08/HlV3lr9RYTL0VoPZwsLYejRchQBtHn7LY6RHcVqcUUl5CkjLWKX2bNinQM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyARF1NxXvsor8Ka/F0JUksz+RyJYTOmeef2183q4TQ9/KKdTxT
-	xBFV1OKfnlqU8/+nXxyIUfejV4TQBa2BS3fzRY5kapGGdUVxnehC6VEC5HxYJ7Dm466OoYNy6wO
-	np7vREElqz2kIy3tk5XzN22NXP4vmO74=
-X-Gm-Gg: Acq92OFzeuGllrs1ZTL6YNwiKTpmk0eeGe/OoISCiCZdpKOMYPTPJig4CeFExxGVz/r
-	lEJvT+5pPNw+bh1akLct4EsvRsl/BqxNcQMSS/BXR+mwS43ZRz2EqUq0aG8BUwrXn85Q60FAgEI
-	Elyu399mJ0VeLC3hf8L0cboCxf88xMwCmzT79rovnbhHePjIqK15NuSorXtyDfCBJJUWGFn0HVL
-	kYeKe0F2BnJscBEo03t153mmQqukUmCocIBiyUV8vyv0/tQg5DvNF9pwPN4vJ7GsqP8Np1QC7Pm
-	pmK06cbEdsW0cSgM9zGSbV1rLKajTqH6BWFYcb5eVwyVegw=
-X-Received: by 2002:a05:690e:4843:b0:654:49e4:ff14 with SMTP id
- 956f58d0204a3-65c79994bd2mr19456740d50.37.1778518879990; Mon, 11 May 2026
- 10:01:19 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1778518894; x=1779123694;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xawfXJfKqmeoHeOoXubh3qn/e0+i/yH0+NUj7NVoCTE=;
+        b=Lug6o9vpvBtWNtoOR1RjlZmx2rQW1HsY4LZKOdhL2oKFs6E/WF12KuKsWyl33dmOzX
+         rzEyXakfeAw/1Yd5+9WrDnPD1uUBHkg85KnfRvOmx0uirMcsXIsMVzMkFA41w60JWjqs
+         u/7WP+gAKNEmSlMzHnWI/9eppmddMAlc+8Unn6Dnov1maIAkNH/EReRWp+99OraLE+K7
+         LE6LwakooPxe//eS3YisNAv2m29hFcxz8BYmtLKVaxTSI3TlyXJp4hB/G2/Tf2E0Wnnk
+         riH9g8Rf0Un5Ba9Mwf7we5nJkiJS840R6obLMsJqbSuj19JTi8HuDcu1m3PHcDpR9/bM
+         xlbg==
+X-Forwarded-Encrypted: i=1; AFNElJ9Ygs2gK6K73Ryqgfgyd3B874ENBS7YyZ3Yi1yo3OomiCMPyjy41vqO1M5LXCQF7d0AN5txYp8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkcRQ97z5mUT3zpJ61bdFQ0M11dJX0PrzPM+pjkKJjaaqrYDEG
+	Q7OIogiQ5YA6uAauw5Jnb5VfFfc4T8e4K6+XpNewIUPRsx6Qb+ZNV73t
+X-Gm-Gg: Acq92OFxRpgtIKdBY/odOT3ztH4SOBpNRyc72MLG6+osuK1856gGYWHFkghLU0c5Aii
+	DdCqh9Wx+yPfobiK5hYjoZZD6+Um+HhhO5A6LIHm3g8TFh9w5GzQWDY9VmpPXf9R2VXxeQ0oZhv
+	LNrR5P7nwoBUgiR2zQ6UWHu6fJI/6hl6FPEJ/NrcOA87dkCHAbgFm9ZDW756LX74GGQlkchyrSp
+	iz9jfy4UyR1y6qZwb6pNxgXEuho8W+CdYqNs71pwB3wrvDB7qyhLPXQGAzAEi08KxUyj26QHyxZ
+	dBkRwXh6II+rRJ7nf+OPAp+vh3xUELta5jnkAYZfT7UdOA9JlAg9lfVCOOKcAXFoASVHggeYAAQ
+	JCQK++3s1Q8iXK6re0/+2hpeZ32dhWZzSYvlUqJeVVAdWv6L5cHcodkAUjgYdfJV2UfhFrksZcy
+	NOOPdEEnf9JrhJzrzXtWzcBbkF8fovQIO30XAz1R7j+YGzfaE=
+X-Received: by 2002:a05:690c:e3c8:b0:7ba:eefe:9fa1 with SMTP id 00721157ae682-7bdf5db6952mr267368157b3.6.1778518893760;
+        Mon, 11 May 2026 10:01:33 -0700 (PDT)
+Received: from devvm29614.prn0.facebook.com ([2a03:2880:f806:11::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7bd66019105sm151829677b3.0.2026.05.11.10.01.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 May 2026 10:01:33 -0700 (PDT)
+Date: Mon, 11 May 2026 10:01:25 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Zhu Yanjun <yanjun.zhu@linux.dev>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>, Alex Shi <alexs@kernel.org>,
+	Yanteng Si <si.yanteng@linux.dev>, Dongliang Mu <dzm91@hust.edu.cn>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Joshua Washington <joshwash@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Shuah Khan <shuah@kernel.org>, dw@davidwei.uk, sdf.kernel@gmail.com,
+	mohsin.bashr@gmail.com, willemb@google.com, jiang.kun2@zte.com.cn,
+	xu.xin16@zte.com.cn, wang.yaxin@zte.com.cn, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Mina Almasry <almasrymina@google.com>,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v3 0/8] net: devmem: support devmem with netkit
+ devices
+Message-ID: <agILZaYTrRBlL+Dt@devvm29614.prn0.facebook.com>
+References: <20260507-tcp-dm-netkit-v3-0-52821445867c@meta.com>
+ <d7de2f17-af2d-4b6a-be65-f009d78e3d20@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1778506829.git.michael.bommarito@gmail.com>
- <490e228dd02983fb1530fb114d4174148f810261.1778506829.git.michael.bommarito@gmail.com>
- <CABBYNZL-f+AzFWdhvLcxdf0oCXbgr3AXqM1W2npOPZEv0gRA6w@mail.gmail.com>
-In-Reply-To: <CABBYNZL-f+AzFWdhvLcxdf0oCXbgr3AXqM1W2npOPZEv0gRA6w@mail.gmail.com>
-From: Michael Bommarito <michael.bommarito@gmail.com>
-Date: Mon, 11 May 2026 13:01:08 -0400
-X-Gm-Features: AVHnY4JhB2d5GMH88lUH892q70_awbB8KMS0O-OtLSzvuZSSVcwIl7oatzofHYs
-Message-ID: <CAJJ9bXxdm6LRW-5a4a1eDyZSQjNkJ4PNF+aERHkHe9EMQFX8oA@mail.gmail.com>
-Subject: Re: [PATCH 1/4] Bluetooth: hci_sync: pin conn across hci_le_create_conn_sync
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Mat Martineau <martineau@kernel.org>, netdev@vger.kernel.org, 
-	stable@vger.kernel.org, Pauli Virtanen <pav@iki.fi>, Aaron Esau <git@aaronesau.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 4B3BF5138B4
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d7de2f17-af2d-4b6a-be65-f009d78e3d20@linux.dev>
+X-Rspamd-Queue-Id: 9F12F512F79
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-286755-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286754-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,linux.dev,hust.edu.cn,broadcom.com,nvidia.com,fb.com,meta.com,iogearbox.net,blackwall.org,davidwei.uk,gmail.com,zte.com.cn,vger.kernel.org,fomichev.me];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[41];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,meta.com:email,nk_devmem.py:url]
 X-Rspamd-Action: no action
 
-On Mon, May 11, 2026 at 10:53=E2=80=AFAM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Id suggest we dropped the once at the end so just hci_cmd_sync_queue_conn=
-.
->
-> > +                                       hci_cmd_sync_work_func_t func,
-> > +                                       struct hci_conn *conn,
-> > +                                       hci_cmd_sync_work_destroy_t des=
-troy)
-> > +{
-> > +       int err;
-> > +
-> > +       err =3D hci_cmd_sync_queue_once(hdev, func, hci_conn_get(conn),=
- destroy);
-> > +       if (err)
-> > +               hci_conn_put(conn);
-> > +
-> > +       return err;
->
-> Then we incorporate return (err =3D=3D -EEXIST) ? 0 : err; logic above, s=
-o
-> I don't think any caller should require queuing multiple procedures
-> for the same conn.
+On Sun, May 10, 2026 at 01:33:18PM -0700, Zhu Yanjun wrote:
+> 在 2026/5/7 19:27, Bobby Eshleman 写道:
+> > This series enables TCP devmem TX through netkit devices.
+> > 
+> > Netkit now supports queue leasing. A physical NIC's RX queue can be
+> > leased to a netkit guest interface inside a container namespace. This
+> > gives the container a devmem-capable data path on the RX side (bind-rx,
+> > etc...). On the TX side, the container process binds to its netkit guest
+> > interface and sends traffic that netkit redirects (via BPF or ip
+> > forwarding) to the physical NIC for DMA.
+> > 
+> > Two things in the existing devmem TX path prevent this from working:
+> > 
+> > 1. validate_xmit_unreadable_skb() requires dev->netmem_tx before it will
+> >     forward a dmabuf-backed (unreadable) skb. This protects skbs from
+> >     landing on devices that don't have the IOMMU mappings for the backing
+> >     dmabuf or that don't speak netmem. Netkit, however, does not support
+> >     DMA, doesn't attempt to read unreadable skb pages and so doesn't
+> >     break netmem (it is pure skb routing and redirection). It is
+> >     functionally capable of routing unreadable skbs, but there is no way
+> >     for the TX validation pathway to distinguish between a device that
+> >     will actually attempt DMA-ing the skb and another device
+> >     (like netkit) that does not DMA but also does not break
+> >     netmem.
+> > 
+> > 2. bind_tx_doit uses the bound device as the DMA device.  When the user
+> >     binds devmem TX to the netkit guest, the bind handler attempts to
+> >     create DMA mappings against netkit, which has no DMA capability and
+> >     no IOMMU mappings.
+> > 
+> > This series solves these problems as follows:
+> > 
+> > 1. Extend netmem_tx to two bits, assigned to one of three values:
+> > 
+> >     NETMEM_TX_NONE   - netmem not supported
+> >     NETMEM_TX_DMA    - netmem supported and performs DMA
+> >     NETMEM_TX_NO_DMA - netmem supported, but does not DMA
+> > 
+> >     With these bits, phys devices can set NETMEM_TX_DMA and devices like
+> >     netkit set NETMEM_TX_NO_DMA. The validation TX path ensures that any
+> >     DMA-capable netdev exactly matches the bound device, guaranteeing the
+> >     correct mapping of the bound dmabuf. The validation TX path also
+> >     allows devices with NETMEM_TX_NO_DMA to pass, knowing these devices
+> >     will not misuse netmem or run into IOMMU faults. After redirection or
+> >     routing and the skb finally makes its way through the stack to a
+> >     physical device's TX path, the above NETMEM_TX_DMA check is performed
+> >     again to guarantee the device has the appropriate binding/mappings.
+> > 
+> > 2. On TX bind, the bind handler recognizes NETMEM_TX_NO_DMA devices and
+> >     finds the phys TX device and binds to that instead. For the netkit
+> >     case, if it has been leased a queue from a DMA-capable device
+> >     already, then the bind action is performed on the DMA-capable device
+> >     instead and the dmabuf is mapped correctly.
+> > 
+> > ---
+> > Changes in v3:
+> > - Fix validate_xmit_unreadable_skb() logic for non-devmem
+> >    unreadable niovs (should not be dropped) (Sashiko)
+> > - Simplify lock handling in bind_tx, no premature release (Jakub)
+> > - split NO_DMA changes into separate patch (Jakub)
+> > - fixed some pylint issues, one required an additional patch ("selftests:
+> >    drv-net: make attr _nk_guest_ifname public") to rename a variable from
+> >    private to public
+> > - see per-patch changelist for more detailed changes
+> > - Link to v2: https://lore.kernel.org/r/20260504-tcp-dm-netkit-v2-0-56d52ac72fd4@meta.com
+> > 
+> > Changes in v2:
+> > - Squash driver conversion patches (2-5) into patch 1 (Jakub)
+> > - In validate_xmit_unreadable_skb() to check netmem_tx mode before inspecting
+> >    frags (Jakub)
+> > - Lock bind_dev around netdev_queue_get_dma_dev() when bind_dev != netdev to
+> >    fix lockdep (Sashiko)
+> > - Move require_devmem() into individual test functions so KsftSkipEx goes up to
+> >    ksft_run() (Sashiko)
+> > - Add nk_devmem.py to TEST_PROGS in Makefile (Sashiko)
+> > - Link to v1:
+> >    https://lore.kernel.org/all/20260428-tcp-dm-netkit-v1-0-719280eba4d2@meta.com/
+> > 
+> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+> > 
+> > ---
+> > Bobby Eshleman (8):
+> >        net: convert netmem_tx flag to enum
+> >        net: netkit: declare NETMEM_TX_NO_DMA mode
+> >        net: devmem: support TX over NETMEM_TX_NO_DMA devices
+> 
+> I applied this patchset in my local kernel tree and built a new kernel
+> image. I loaded this new kernel image in my test environment. It seems that
+> all the testcases can pass.
+> 
+> I think that this patchset would not cause any regression problem in my test
+> environment.
+> 
+> Zhu Yanjun
 
-OK, good call.  I checked the other 10 callers for
-hci_cmd_sync_queue_once and there isn't any variation today, so that
-seems safe.
+Thanks for testing!
 
-Do you want me to wait another 24-48 for others to weigh in or ship v2 now?
+Best,
+Bobby
 
