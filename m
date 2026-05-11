@@ -1,303 +1,724 @@
-Return-Path: <netdev+bounces-286505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286522-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aBtmOYCOAWrCeAEAu9opvQ
-	(envelope-from <netdev+bounces-286505-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 10:08:32 +0200
+	id 4Ht4F3uWAWqXfAEAu9opvQ
+	(envelope-from <netdev+bounces-286522-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 10:42:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 009D5509D4D
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 10:08:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4D7050A3ED
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 10:42:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C036A300938C
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:08:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4F243306C474
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:36:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE7933B9DA1;
-	Mon, 11 May 2026 08:08:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A6583BED63;
+	Mon, 11 May 2026 08:35:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b="a++eeVQU"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="EWU+PWaG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011065.outbound.protection.outlook.com [52.101.70.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0817A3B0AE5
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 08:08:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778486897; cv=none; b=S4IOVfLOBUjAjTCNfjB5P/b1l+B4D96i60dHrUMHiSTF+GsLH12ZHhK/lj49uv7CzmP85So9ley+iBqkFC1SyOcq6a+ATDxNNTWIYn9jbBb2JNuWQzGyWVCCjHzBH9K3vWHqV0QvloQlgffoFOPRUuDYFJXGnaohKwz6477OiBI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778486897; c=relaxed/simple;
-	bh=NcjgQHe/X9C+SBudTsEkTDVrZL8ey9FSJwoVi7+nhtM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mhV6SnDZpb404ngr+cQ8DA+BG6JWPWsN44vfV0PNi9JHnNfyikvPGtafBbxmBl2hHc0CZ8ztqf1XVPUGSLtx07NosJaUFr42k9tDDrOvIqyv6aVMQUYsNN7P7aEKrdLgcbrS+/BzzejC7SbwCaAHHFPRY0TEGbTPu99KIEgSJ38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=a++eeVQU; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-488a14c31eeso27072825e9.0
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 01:08:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1778486881; x=1779091681; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MdfA7aGOGSRQ1CILOc6Le7Ks8CyAnmg3KhzdGxgc+LI=;
-        b=a++eeVQUmQC2uhkhik86EDQ3+IQGTEIrbONafIIO/TsC1d+8CACT4Ow2ImXauiXmEy
-         iT6Z8dRk9jsko6OyvcVs3AllFEIzibqBGSrW5sVE77Zg9/XUA7JixvH6XspnXGO2NHRe
-         ChywALP9BUOB9fXsyBydSIkyJRq8oQMIngY4APhu48oxHhRoVawmNP2MvTrGPiCRpFXz
-         jXjRTp1B+d1MXBK2E1OHZCcB+hfX65rXRrJVbnNf4YZj1enyge5AbNrgFWRSrnlyCaQR
-         CkSAZQvG1cWTQI2PMsKjfAvC0axtBsDdSjjANZjjRY7JsCfdZ+2TKsPOkjZIBzDus2sS
-         PEhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778486881; x=1779091681;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MdfA7aGOGSRQ1CILOc6Le7Ks8CyAnmg3KhzdGxgc+LI=;
-        b=EBaHiGrNNpr/30Dj2oOImOMvgave3KP2mhIM5+WjVSRTcHjJdE6E0GYlTp0eJs6R53
-         T6GME7id2HeYah3O46nlfzg/O9OCpbsiXGiFM7W1EqywF4pTKIDUL0EklCbLgKf2ZoL5
-         vpMR6AwcI/N+OAu+gHMpSGCDcYelseIvq6Qc9WMIhe/pcWj3rNn7kBImzQ3kFx3PVgge
-         V4F8aXeqsTdNRQUlpqbFi6ylQuk3lCEKEePE1k1jAi3Z3QXemPlmpe4daRhw2YG+K0nE
-         Df1abeStzGHT+vWFA28FSmLk0S86UMRXzRmJ2M5RPSZ1L2oiUb41as6bcOh7cBj/C6AY
-         G9nw==
-X-Forwarded-Encrypted: i=1; AFNElJ9h1VTnlrgOFy1fcE8dLKNYFnIwX7c5NCzlKRLDZOugWYFgadpqtByApY79Z/1GVccLsrRUwSQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzk/TmIESJZFNP7CKGF1xa6pfUTPe9ZqgYaSdK+46HdTQN32thx
-	oox8RvDjeA4Ugd7nYWysiHS2arWeVldNfjdxvN0zkFXbWa9sbnZXurOrRfWpoa4ZAgg=
-X-Gm-Gg: Acq92OHWi9WYSq+9RKn47SCb/SBW3y/pTpS3Ml/lDoQ+740hPCSGg76DPHL8t8T/CtA
-	bTQelYZYtPi661TOeAEk8cgpVoGnOdBmaav6Gob/u7M4+mdISuCDqFPLTZs01QMElrGZxhGKdg9
-	ZXJ4QtHATfBXjWUeb9RG44GYndm6faQ+G0GNEMdFGgV2uNS0jX/IfT5qGivQwdQh4jHNUONEVqc
-	MxAdl5aLO2LyS3wWfnrvZ5yxdN2Y1iXTphMlM9ObtooI/mL5rL5HlYEm0vkWye8YEA0yyZDzjoC
-	5aK1636b95rBekI6IWMLrtohuzGZnt8E/52jUqSCeM91qnrcoUK6rAg/coCiFcUI5pcw8DVUBBm
-	UirEImTI2Z4W5S9k4ThEUp4xssoYZzpZ+dd0PzkfNW11WUz5rQ6gRBkdcQagnthNcBK/UaI72nA
-	WcCIrfdQFLgWX8ewc6cRiZWNiOMM/sM0NtEk8=
-X-Received: by 2002:a05:600d:8496:20b0:48e:86e6:c2f1 with SMTP id 5b1f17b1804b1-48e86e6c38fmr7387965e9.2.1778486881151;
-        Mon, 11 May 2026 01:08:01 -0700 (PDT)
-Received: from FV6GYCPJ69 ([140.209.217.212])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-454917d57aesm24147511f8f.26.2026.05.11.01.07.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 01:08:00 -0700 (PDT)
-Date: Mon, 11 May 2026 10:07:57 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Simon Horman <horms@kernel.org>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Tariq Toukan <tariqt@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	"Borislav Petkov (AMD)" <bp@alien8.de>, Randy Dunlap <rdunlap@infradead.org>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Christian Brauner <brauner@kernel.org>, 
-	Petr Mladek <pmladek@suse.com>, "Peter Zijlstra (Intel)" <peterz@infradead.org>, 
-	Thomas Gleixner <tglx@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
-	Dapeng Mi <dapeng1.mi@linux.intel.com>, Kees Cook <kees@kernel.org>, Marco Elver <elver@google.com>, 
-	Eric Biggers <ebiggers@kernel.org>, Li RongQing <lirongqing@baidu.com>, 
-	"Paul E. McKenney" <paulmck@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [RFC net-next 0/4] devlink: Add boot-time defaults
-Message-ID: <agGNVmN9tpHh0K1P@FV6GYCPJ69>
-References: <20260506123739.1959770-1-mbloch@nvidia.com>
- <aftaW-irGmkfA7FS@FV6GYCPJ69>
- <3f9215c4-7c84-46d9-ba74-30dabe24db09@nvidia.com>
- <afxvzOjqw-vxUAED@FV6GYCPJ69>
- <b6a9b568-dd09-4414-be57-6b9cd282a43c@nvidia.com>
- <af4lBIJdCuN5VKq_@FV6GYCPJ69>
- <20260508175213.1952097f@kernel.org>
- <af7Y4AYv-XDCbK_8@FV6GYCPJ69>
- <580a774b-ba9e-4523-b43a-476f75dd5b12@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C83BC3BAD82;
+	Mon, 11 May 2026 08:35:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778488533; cv=fail; b=WyPrkHMIRdR3HHSzZ2dmgQLee88Gb/HWrp+LNnTeXY9CnACczrZUVrnKJUEMPBrfqvI4Owza4t9zyBER1zxOVDXhSmhKRFHq5fTRa3jw4+mgWeCldHQ3gGc4/g33amXbNTL2GoClPC9cBoHUu+fyRuVzs9tjmqb6DNmEL+4tONo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778488533; c=relaxed/simple;
+	bh=r2XCngxy/gskydovF1r5EnWnxtAEvW9FjdrRvih9pbk=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=VHG9kGuXa/AwCeSp6jM+MU9s0pC4rQOewwdhlWcvVUk7BGZ7vlCL17sqYiSCCOxL5taufAzjlR1WBJdrOHvdjNKTmikcWWTTy3/Q55Xkqb9SQ9WwTXlMSiS7evvUXqoqrecgcYV7cNAU+graWeB4TVq3VbtkbD85z6bQMFb7VWg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=EWU+PWaG; arc=fail smtp.client-ip=52.101.70.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MJ6hVYaGjk9XIsNw/XzGl935hOut5ObQ2vhSQInalPFXWOQFsUmFu2BPftvimBZ+21+nqUvw+4hu7cmJu2zvgDUQpsD35k1hAXoLnExdYWvK/I/bQukn53ca+0NqEGIyAS5HnDG5PlDcWASo+bSYeLrFLi6quhWXDHWR8AXB4rK8raU6xHLYZ2o28i/T9cDLfs8AYQuPaZ6Lct1fdNi3O2Xw336rlIpKbACRc5GB2CPDvIh8LiIOrRSkpQ5BpcuOrONh05qfrKMY2rfhNaGNq3jXrWsA9fvDiB9dkygxVeolLzQrt9kLWYSMxCDVqJ0fb5WbYoMYHXyfgdUMPVmrww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nFW1eeLoahigi1Vav0HJx/Q1eOQ5YCecRl7367IMKRc=;
+ b=gRscrHoOz7QyVmPCaNH2IfeUyCQwsn7JNQWgstzm8LQOjGCp9iYB74OkEsrH/+hJ8/fc5vEQlxXKc+2VTZQ5M+ofa6adQJsqkVvsEEs77tQ11ePZjqAWBDHxj0O/R28C+lYEXaFGD/mgXfgv7OGklZTKhLzZKailKli5O1IcQGK4YDo6KmcTR7fWRgsldGXw9P7Mb6dznYah6haPEZMBDJ/9gGum1x9PqidUHU4ILBLyPfwwkw8nUryhV//awBulVoN+NV+c3pJin/sKgcQHoLPh4bnK+VwcpO34A2qMN7MsyUvHmOm56EOG1htJuVTnA58eAZnnJdMg/6o5b9Ehsg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nFW1eeLoahigi1Vav0HJx/Q1eOQ5YCecRl7367IMKRc=;
+ b=EWU+PWaGpaFcqDXwDCHl2gv4U5mcI5ak+7mR4RRvHOnyNT2gcJphAp9eq6KacIRa0++P8HiFaHyUqkJNhW6G7uz0kYsIJfC5CHgy9i67ElXTXB9T/buwECTrRy/H/5kl7nQs/W+2QEoyjwz8+wHE7XMX5AAzbVq2Z0mSE6C7KjtGVqB5BbVKboCI3SXrPQY6fakQdvO78F/rBJkicxy4VUnElV16UJYu21QtNT52755g6cGG4rrl8Jp/NuhcxORsTcVgrZ0MW54O+WemW/889c8+YnKmaftPXDhd+ENiUQ3+XOYsnc4ad2o8OMntCDjNDcjLh4rcMzadmC1fx0lZvQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PA4PR04MB7502.eurprd04.prod.outlook.com (2603:10a6:102:ef::21)
+ by PAWPR04MB10055.eurprd04.prod.outlook.com (2603:10a6:102:380::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.23; Mon, 11 May
+ 2026 08:35:02 +0000
+Received: from PA4PR04MB7502.eurprd04.prod.outlook.com
+ ([fe80::ff73:c7b3:5306:2ba0]) by PA4PR04MB7502.eurprd04.prod.outlook.com
+ ([fe80::ff73:c7b3:5306:2ba0%3]) with mapi id 15.20.9891.021; Mon, 11 May 2026
+ 08:35:02 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com,
+	xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: imx@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 07/15] net: enetc: convert mailbox messages to new formats
+Date: Mon, 11 May 2026 16:07:57 +0800
+Message-Id: <20260511080805.2052495-8-wei.fang@nxp.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260511080805.2052495-1-wei.fang@nxp.com>
+References: <20260511080805.2052495-1-wei.fang@nxp.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SG2PR02CA0114.apcprd02.prod.outlook.com
+ (2603:1096:4:92::30) To PA4PR04MB7502.eurprd04.prod.outlook.com
+ (2603:10a6:102:ef::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <580a774b-ba9e-4523-b43a-476f75dd5b12@nvidia.com>
-X-Rspamd-Queue-Id: 009D5509D4D
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PA4PR04MB7502:EE_|PAWPR04MB10055:EE_
+X-MS-Office365-Filtering-Correlation-Id: e4f2ff18-ba23-40bc-2e29-08deaf383204
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|19092799006|1800799024|52116014|376014|366016|38350700014|3023799003|56012099003|21046099003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	+QMTGhz6LXpNSF3rmn007YyQFy5iPRHmlmgQOifLbCElb3x7TRSVP3CRc4/ukBkFjpaTsWZv0FdRCaknkx1Eh+A2ufLl2fyPp0UIoXztMI/2reYhuufY9CqzH2b8AOWr6yPUqD78owRTFXBxodbZ9PooCZKURbrFCHH0vfmnMqwVyv3N5OURQ2okuoweyUnMgy13A6AxSTlwpU85ZVZN1ovbsoAmTPZqtTjq9THZYGqulKptc5Qz3Ou8dsvGK1PToCDikLmNcVUN05p6ITuHskXO2xduj31N5fEqRKL/ZznyftbkLne+aPzpF8YuqtluFarBtBXauJvAoLWMJu+Zulvueyj6M7n6LsZJtaPi8ZrMTX3lAWADthQlZUCEHs6nzocLL3braApo+SY4Ry9RTEDQ0R1zLPaKTTbqhYQP3tL9XFj84mBAkAkOQaJ05FNXM40Wl3wMwPxDt58+0qO1Tg8DPA1Yi3fwQiqT3ohCK8u4VXRMj/tP4J0GnO/OfH0oP7++a8RVSd7mtucow9PR+Z5RYjWzL5P4e5TZKCES82At1sZaO1mo/AxDeB4hvKIdTE1enIVoF6OvYVaOeoZGEj80l05jN79gfoB1VxiC1HSuf1OAfz8+vHfo16/KuhfUPZhiS+JR8yQfxg9bp2eU7ygxcrmToKddag9+vJKuTPGANzY1LPw4DAGcwtpr0KKfyE2RV5+hWwg3mO6f/hvgRmWdbxzVPtdJV1WwPHluTG7BhoAAs25YfsJ45puksrl2
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7502.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(1800799024)(52116014)(376014)(366016)(38350700014)(3023799003)(56012099003)(21046099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?j9clMqp6YgAUKt7haXR7RoL20FCFQ6LvVrmgy+CpMI7oMC078QqqEJc2vTvt?=
+ =?us-ascii?Q?t95BxBJgWGOeucRhjt4L4Qk2Vk+wAnGlK9GCNXMjNky1jHb8vnsIAmBZExUD?=
+ =?us-ascii?Q?ug/BCSJz4+ByDDkgZ+yPpHZ6s+/PlRnz1YyU93CSKxXWca6/Tl++VPYHzAiP?=
+ =?us-ascii?Q?DZiv4RXgzB5XYbPM6em9I8pUhAXlKrFuo3kKnu17oNkKViLPCcK7L0WkdYk9?=
+ =?us-ascii?Q?1Yj2MZYc7n+KhKxyL/ACXAsyjIxGSFw6J2S+STwwpXuWg83893XAdl5yPkZe?=
+ =?us-ascii?Q?Q4l9Sejkm+bD0HncNQtWRjUCzsFGc/C3BHQ0JCPTi/JadiFDHFkY94eZ4BaC?=
+ =?us-ascii?Q?w/gU88yNJIvWQvYv/egocdfMV854gfWLlbeRXy6M2u9LcLYXaxsB4at/hOKh?=
+ =?us-ascii?Q?JnIxF2Jk2Vr4K8Wh3QOaepRmt71uHhqHsu8//B0iGaEVM+wY7lIqxs7Ll8Vd?=
+ =?us-ascii?Q?5gWPgN534+73k9AFo2ht6enFLxqcAF9sysn6WFINaswDqn13Mq4VYMUAfZLW?=
+ =?us-ascii?Q?GxUe0zCR+pYMM5UgkYVh/Wy8NmXQes0tOa+HDZQ1drVjjBwapSCCQoQdud44?=
+ =?us-ascii?Q?9D9ZOL0cFQr7JUM61PVyCgxZQ9ZgXtstckDUxThAEtlAhlMdc5reT95nhk4Y?=
+ =?us-ascii?Q?11dK971U4Hk6tnTy13fN9V3inpZdi7ieUa0IOGEPZsasw3gUeH2dCB3BrPAk?=
+ =?us-ascii?Q?V50QEt6rs8gg4+BoxY+Y4YeA18AllqZnIVFeeWKi8Jb9B/JQubl3TerA85Pg?=
+ =?us-ascii?Q?UgIvMmNpccDH1X08uxyy7FdaiPMhAwjqUL0dgsaXPMp9lMeXDvKWDTo5wSeF?=
+ =?us-ascii?Q?cXcGMnWBKYnQWblnF0a3f4hFCWBCM+6z87IprZ8adoVaGVzp8ITbbsSX+IDq?=
+ =?us-ascii?Q?Y5n/udmUYYLNs20VWCzME4GMEgTaJcux8muQOIE2rYqdqUfV0MB03CUg7YBM?=
+ =?us-ascii?Q?ly0BGho/kee4edEX6/SKLUGin+Q69NIPpVDhXC4z+6b8P4462H+er4p9E2yA?=
+ =?us-ascii?Q?0P2Q8ZPIbpIMRKzLPhgX3rcm1vJRYtkAXfLmVGhccWPnZAEWAI6LCF7Rc2SC?=
+ =?us-ascii?Q?s3twvVGjSH2xaik/c2TSUPLex7OS/k35HVOgMOOyp0kY/pNE4RnGsw4khbk2?=
+ =?us-ascii?Q?2O/h7DR3bFz7Dl77TsiOsvdRC89ZAb+le6ZixGXMI6mHdswUshTON6HjA9/w?=
+ =?us-ascii?Q?4ClzV7g8LjhMvxgsQML83x6s+3M3/rVk8Tndn68wRrKmYmaWjdA92tmTtOVP?=
+ =?us-ascii?Q?pedKOZ0VY84bBj1JH/urjLM2AItKC6fqFOorbPQ3ArKK7weO4QlWb+i2b2q7?=
+ =?us-ascii?Q?E4BSZTs/3luWyqYrwhh5i1VLfnb1Mit5GLaAlOolwkx8s4HC1zh1cl8kW6vZ?=
+ =?us-ascii?Q?UresussUjr/n9rqx0c9JJlHwfLJbXBBwR//X+w5ntIpgvRI8aOAaqba0i7Dh?=
+ =?us-ascii?Q?jGPYPOkiy7gZ8PuKElTtQKbf+4drvYxHXqpzygWuqBYLML+c7nGseAIaWuHZ?=
+ =?us-ascii?Q?39dKBK3kp0gLRsdMlWDIgHNyBwEVJ6WYcAFXHzuts8cd1ehkXU57TvX3XKr4?=
+ =?us-ascii?Q?zcuanlITr5MEFPXKoK47PhROZptm33fdb45BrV9zbJpGsyY8pb2H7KoKzX8N?=
+ =?us-ascii?Q?0zhVndtAK8MJeUTxTa2yiXcvzJvC0YmPKJc0CYTQ4Snsq9Q8l7B+pNNHb2Dr?=
+ =?us-ascii?Q?AVuPlHAg0ty4yml4tpOh/gUDYm0ASflLHgHxdFW0/74Od57iROlqs62GnE/5?=
+ =?us-ascii?Q?TmADLjEgRA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e4f2ff18-ba23-40bc-2e29-08deaf383204
+X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7502.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2026 08:35:02.7985
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IM8JQ4uGJxAfA8vOM2iHW8heMq2+Ku111OiUR8XExtwgESgX25YZGKpqnCx57bwPxbYAXr5Aimj8sU+6SLTM1g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR04MB10055
+X-Rspamd-Queue-Id: B4D7050A3ED
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286505-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TAGGED_FROM(0.00)[bounces-286522-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-0.991];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[nxp.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[resnulli-us.20251104.gappssmtp.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nvidia.com:email]
+	TO_DN_NONE(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:email,nxp.com:mid,nxp.com:dkim,i.mx:url]
 X-Rspamd-Action: no action
 
-Sun, May 10, 2026 at 02:31:35PM +0200, mbloch@nvidia.com wrote:
->
->
->On 09/05/2026 10:01, Jiri Pirko wrote:
->> Sat, May 09, 2026 at 02:52:13AM +0200, kuba@kernel.org wrote:
->>> On Fri, 8 May 2026 20:07:44 +0200 Jiri Pirko wrote:
->>>>> I don't think switchdev by default should mean CX4+ in general. If we get
->>>>> there, I would expect it to be limited to the DPU/BlueField/ECPF case, where
->>>>> the host PF probe path can depend on the ECPF reaching switchdev. Changing the
->>>>> default for regular host NIC deployments feels like a much larger compatibility
->>>>> change.  
->>>>
->>>> We can't travel throught time, but if from CX5 onwards the default would
->>>> be switchdev, nobody would feel broken in terms of compatibility. That
->>>> is my point. Having "legacy" as default is simply wrong for never NIC
->>>> generations. That is why it is called "legacy" and it should have been
->>>> rotten through and out since CX4 times.
->>>
->>> legacy vs switchdev only describes the eswitch configuration.
->>> As a non-SR-IOV user I really don't want to see the extra representors
->>> hanging around my systems, confusing all daemons. IIRC mlx5 had some
->>> limitations around the uplink representor. Maybe that's the disconnect.
->>> But for a real, fully featured switchdev eswitches having the
->>> PHY and PF representors on boot, always, will not make sense.
->> 
->> As "a non-SR-IOV user", what extra representors you talk about? When you
->> have pfs only, you don't have anything extra. Just 1 netdev per-pf, one
->> devlink port per-pf. What's extra about it? When you don't have VFs/SFs.
->> Everyhing is the same:
->
->The netdev list looking similar is a bit misleading. What matters here is
->not only how many netdevs show up, but what that netdev actually is.
->
->In legacy mode, a PF only user can just use the PF netdev as a regular NIC
->and use ROCE on it directly.
+On the LS1028A platform, the PF-VF mailbox was only used to update the
+VF's MAC address. The original message format is minimal, lacks a clear
+structure, and provides no means for the receiver to validate message
+integrity, making it difficult to extend for new features.
 
-I don't see why we have this limitation. Sounds more like a bug to me.
-The netdev is still the same, capable of the same things no matter in
-which mode you have it. RoCE should work on it in both modes.
+With the introduction of i.MX ENETC v4, the interaction between PF and
+VF has become significantly more complex. Typical deployments now include
+scenarios where the PF is controlled by an M core while the VF is driven
+by either the Linux kernel or DPDK, or where the PF is controlled by the
+Linux kernel while the VF is controlled by DPDK. These heterogeneous
+driver combinations require a unified and extensible message format to
+ensure compatibility across different operating environments.
 
+This patch introduces a newly defined PF-VF message structure and
+converts the existing MAC-update mechanism to use the new format. The
+redesigned message layout provides:
 
->
->In switchdev mode, even if there are no VFs or SFs yet, the PF is moved into
->the switchdev model and the visible netdev is the uplink representor. That is
->not the same thing from a user point of view. The uplink representor is not a
->ROCE capable endpoint. So a user who used to boot the machine and use ROCE on
->the PF now has to create a VF or SF, use that as the roce endpoint, and also
->set up the switchdev forwarding path with tc, bridge or OVS so traffic from
->that function actually reaches the wire.
->
->That is why I don't think this is only a card generation question. It changes
->the deployment model. It may be the right default for BlueField/ECPF style
->systems, where the host is expected to sit behind a switchdev control plane,
->but it is not a safe default for every regular host NIC setup.
+  - extensibility to support future PF-VF features on ENETC v4,
+  - consistent framing for all message types,
+  - improved data integrity checking,
+  - a common protocol usable across Linux, M core firmware, and DPDK.
 
-Yeah, the point is, not to change deployment model. The legacy/switchdev
-should only change behaviour for sriov/eswitch usecase. The rest
-(PF/uplink netdev and related objects) should stay the same.
+Additional PF-VF message types will be added in subsequent patches.
 
+Signed-off-by: Wei Fang <wei.fang@nxp.com>
+---
+ drivers/net/ethernet/freescale/enetc/Kconfig  |   2 +
+ drivers/net/ethernet/freescale/enetc/enetc.h  |  15 +-
+ .../net/ethernet/freescale/enetc/enetc4_pf.c  |   4 -
+ .../ethernet/freescale/enetc/enetc_mailbox.h  | 153 ++++++++++++++++++
+ .../net/ethernet/freescale/enetc/enetc_msg.c  | 107 +++++++++---
+ .../net/ethernet/freescale/enetc/enetc_vf.c   |  88 +++++++---
+ 6 files changed, 306 insertions(+), 63 deletions(-)
+ create mode 100644 drivers/net/ethernet/freescale/enetc/enetc_mailbox.h
 
->
->> 
->> c-220-136-220-218:~$ sudo devlink dev eswitch show pci/0000:08:00.0
->> pci/0000:08:00.0: mode switchdev inline-mode none encap-mode basic
->> c-220-136-220-218:~$ sudo devlink dev eswitch show pci/0000:08:00.1
->> pci/0000:08:00.1: mode legacy inline-mode none encap-mode basic
->> c-220-136-220-218:~$ devlink dev
->> pci/0000:08:00.0: index 0
->>   nested_devlink:
->>     auxiliary/mlx5_core.eth.0
->> devlink_index/1: index 1
->>   nested_devlink:
->>     pci/0000:08:00.0
->>     pci/0000:08:00.1
->> auxiliary/mlx5_core.eth.0: index 2
->> pci/0000:08:00.1: index 3
->>   nested_devlink:
->>     auxiliary/mlx5_core.eth.1
->> auxiliary/mlx5_core.eth.1: index 4
->> c-220-136-220-218:~$ devlink port
->> auxiliary/mlx5_core.eth.0/65535: type eth netdev eth2 flavour physical port 0 splittable false
->> auxiliary/mlx5_core.eth.1/131071: type eth netdev eth3 flavour physical port 1 splittable false
->> c-220-136-220-218:~$ ip link
->> ...
->> 4: eth2: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
->>     link/ether b8:e9:24:f2:b7:6c brd ff:ff:ff:ff:ff:ff
->>     altname enp8s0f0np0
->> 5: eth3: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
->>     link/ether b8:e9:24:f2:b7:6d brd ff:ff:ff:ff:ff:ff
->>     altname enp8s0f1np1
->> 
->> 
->>>
->>> IOW it's not a question of the generation of the card but of
->>> the deployment type / use case.
->> 
->> I don't think so, not in the case of mlx5. The difference is only when
->> you work with sr-iov, you either use legacy way (ip vf) or the new one.
->> Same usecase.
->> 
->> 
->>>
->>>>> For the ASIC/NV bit: maybe technically possible, but it feels like the wrong
->>>>> layer. This is boot/deployment policy, not a persistent hardware property, and
->>>>> storing it in NV memory would make the state persist across kernels/hosts in a
->>>>> surprising way.  
->>>>
->>>> Well, as any other nv config, it persists across kernels/hosts. Think
->>>> about it as "unbreak-my-not-legacy-device" bit.
->>>
->>> For most devices the switchdev mode does not change anything
->>> substantial about the device. It's purely a kernel / driver config. 
->>> It changes what objects and default rules kernel / driver installs. 
->>> So I don't get why it would make sense to flash into the device
->>> nvmem a Linux SW stack specific config.
->> 
->> I look at it from the perspective that from some CX generation,
->> switchdev mode should be default. So that is a device-based decision.
->> I believe as such it can optionally be permanenty configured (nv config)
->> on older device. Why not?
->
->This is a deployment policy decision, not a permanent property of the card.
->The same adapter can be used in a regular host/RDMA setup or in a
->switchdev/offload setup. If we store this in NVM, that Linux switchdev policy
->follows the device across hosts, kernels and use cases, and can surprise the
->next deployment that just expects a normal NIC.
+diff --git a/drivers/net/ethernet/freescale/enetc/Kconfig b/drivers/net/ethernet/freescale/enetc/Kconfig
+index 117038104b69..0e338b33bc85 100644
+--- a/drivers/net/ethernet/freescale/enetc/Kconfig
++++ b/drivers/net/ethernet/freescale/enetc/Kconfig
+@@ -37,6 +37,7 @@ config FSL_ENETC
+ 	select PHYLINK
+ 	select PCS_LYNX
+ 	select DIMLIB
++	select CRC_ITU_T
+ 	help
+ 	  This driver supports NXP ENETC gigabit ethernet controller PCIe
+ 	  physical function (PF) devices, managing ENETC Ports at a privileged
+@@ -70,6 +71,7 @@ config FSL_ENETC_VF
+ 	select FSL_ENETC_MDIO
+ 	select PHYLINK
+ 	select DIMLIB
++	select CRC_ITU_T
+ 	help
+ 	  This driver supports NXP ENETC gigabit ethernet controller PCIe
+ 	  virtual function (VF) devices enabled by the ENETC PF driver.
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc.h b/drivers/net/ethernet/freescale/enetc/enetc.h
+index e691144e8756..b70b625328ea 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc.h
++++ b/drivers/net/ethernet/freescale/enetc/enetc.h
+@@ -16,6 +16,7 @@
+ 
+ #include "enetc_hw.h"
+ #include "enetc4_hw.h"
++#include "enetc_mailbox.h"
+ 
+ #define ENETC_MAC_MAXFRM_SIZE	9600
+ #define ENETC_MAX_MTU		(ENETC_MAC_MAXFRM_SIZE - \
+@@ -257,12 +258,6 @@ static inline union enetc_rx_bd *enetc_rxbd_ext(union enetc_rx_bd *rxbd)
+ 	return ++rxbd;
+ }
+ 
+-struct enetc_msg_swbd {
+-	void *vaddr;
+-	dma_addr_t dma;
+-	int size;
+-};
+-
+ #define ENETC_REV1	0x1
+ #define ENETC_REV4	0x4
+ 
+@@ -490,14 +485,6 @@ struct enetc_ndev_priv {
+ 	u64 sysclk_freq; /* NETC system clock frequency */
+ };
+ 
+-/* Messaging */
+-
+-/* VF-PF set primary MAC address message format */
+-struct enetc_msg_cmd_set_primary_mac {
+-	struct enetc_msg_cmd_header header;
+-	struct sockaddr mac;
+-};
+-
+ #define ENETC_CBD(R, i)	(&(((struct enetc_cbd *)((R).bd_base))[i]))
+ 
+ #define ENETC_CBDR_TIMEOUT	1000 /* usecs */
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
+index 56899f2254aa..4e771f852358 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
++++ b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
+@@ -17,10 +17,6 @@
+ #define ENETC_MAC_FILTER_TYPE_ALL	(ENETC_MAC_FILTER_TYPE_UC | \
+ 					 ENETC_MAC_FILTER_TYPE_MC)
+ 
+-struct enetc_mac_addr {
+-	u8 addr[ETH_ALEN];
+-};
+-
+ static void enetc4_get_port_caps(struct enetc_pf *pf)
+ {
+ 	struct enetc_hw *hw = &pf->si->hw;
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc_mailbox.h b/drivers/net/ethernet/freescale/enetc/enetc_mailbox.h
+new file mode 100644
+index 000000000000..260c7333d93a
+--- /dev/null
++++ b/drivers/net/ethernet/freescale/enetc/enetc_mailbox.h
+@@ -0,0 +1,153 @@
++/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
++/*
++ * Copyright 2025-2026 NXP
++ *
++ * The VSI-to-PSI message generic format:
++ *
++ * OFFSET  0                               16              24            31
++ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
++ *  0x0   |       CRC16 (big-endian)      |    CLASS ID   |     CMD ID    |
++ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
++ *  0x4   |   PROTO VER   |      LEN      |    RESV       | COOKIE|  RESV |
++ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
++ *  0x8   |                              RESV                             |
++ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
++ *  0xc   |                              RESV                             |
++ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
++ *  0x10  |                                                               |
++ *  0x14  |                                                               |
++ *  0x18  |                          Message Body                         |
++ *  0x1c  |                                                               |
++ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
++ *  0x20  |                                                               |
++ *    ~   |              Extended Message Body: LEN x 32B                 |
++ *  0x3e0 |                                                               |
++ *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
++ *
++ * Field Descriptions:
++ * CRC16 (16-bit): Big endian, CRC16 CCITT-FALSE algorithm, It provides the
++ * equivalent data integrity check functionality as the FCS for standard
++ * Ethernet frames.
++ *
++ * CLASS ID (8-bit) and CMD ID (8-bit): These are 8-bit fields identifying
++ * the command class and the class-specific operations supported. For more
++ * details, please refer to the definitions of the relevant class ID and
++ * cmd ID in this document.
++ *
++ * PROTO VER (8-bit): Supported VSI-PSI command protocol version. Currently
++ * only support version 0. To be incremented for future protocol extensions.
++ *
++ * LEN (8-bit): Extended message body length in increments of 32B. The upper
++ * limit is given by the physical implementation of the NETC VSI-PSI Messaging
++ * mechanism that supports message sizes of up to 1024B (including headers),
++ * that are multiple of 32B.
++ *
++ * COOKIE (4-bit): Optional parameter, which, if not 0, indicates that the
++ * command should be execute asynchronously on PSI side. If COOKIE is not 0
++ * and the command cannot be executed instantly on the PSI side (it would
++ * take longer time to complete), the PSI may enqueue the request in a command
++ * queue of up to 15 entries per VSI and, later after command execution, the
++ * PSI returns the COOKIE to VSI as part of an asynchronous notification
++ * message that indicates the command completion status. If COOKIE is 0 then
++ * the command is considered as blocking, the PSI will wait for the execution
++ * of the command to complete before updating the PSIMSGRR[MC] field with the
++ * corresponding return code.
++ *
++ * The PSI-to-VSI message generic format:
++ *   0               4               8               12          15
++ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
++ * |       COOKIE      |   CLASS CODE  |          CLASS ID         |
++ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
++ *
++ * The PSI to VSI message format is mapped to the following PSI message
++ * registers/fields, depending on use case:
++ * 1) PSI_RX_control: PSIMSGRR[MC] - for VSI command return code messages
++ * (blocking requests), and
++ * 2) PSI_TX_control: PSIMSGSR[MC] - for PSI to VSI notification messages
++ * (async mode)
++ */
++
++#ifndef __ENETC_MAILBOX_H
++#define __ENETC_MAILBOX_H
++
++#include <linux/crc-itu-t.h>
++
++#define ENETC_CRC_INIT				0xffff
++#define ENETC_MSG_ALIGN				32
++/* s indicates the size of the message */
++#define ENETC_MSG_EXT_BODY_LEN(s)		((s) / ENETC_MSG_ALIGN - 1)
++/* l indicates the extended body len (LEN field) of the message */
++#define ENETC_MSG_SIZE(l)			(((l) + 1) * ENETC_MSG_ALIGN)
++
++enum enetc_msg_class_id {
++	/* Class ID for PSI-to-VSI messages */
++	ENETC_MSG_CLASS_ID_CMD_SUCCESS		= 1,
++	ENETC_MSG_CLASS_ID_PERMISSION_DENY,
++	ENETC_MSG_CLASS_ID_CMD_NOT_SUPPORT,
++	ENETC_MSG_CLASS_ID_PSI_BUSY,
++	ENETC_MSG_CLASS_ID_CRC_ERROR,
++	ENETC_MSG_CLASS_ID_PROTO_NOT_SUPPORT,
++	ENETC_MSG_CLASS_ID_INVALID_MSG_LEN,
++	ENETC_MSG_CLASS_ID_CMD_TIMEOUT,
++	ENETC_MSG_CLASS_ID_CMD_DEFERRED		= 0xf,
++
++	/* Common Class ID for PSI-to-VSI and VSI-to-PSI messages */
++	ENETC_MSG_CLASS_ID_MAC_FILTER		= 0x20,
++};
++
++enum enetc_msg_mac_filter_cmd_id {
++	ENETC_MSG_SET_PRIMARY_MAC,
++};
++
++/* Class-specific error return codes of MAC filter */
++enum enetc_mac_filter_class_code {
++	ENETC_MF_CLASS_CODE_INVALID_MAC,
++};
++
++struct enetc_msg_swbd {
++	void *vaddr;
++	dma_addr_t dma;
++	int size;
++};
++
++/* The PSI-tO-VSI message format, only a 16-bits code */
++union enetc_pf_msg {
++	struct {
++		u8 cookie:4;
++		u8 class_code:4;
++		u8 class_id;
++	};
++	u16 code;
++};
++
++/* The generic VSI-to-PSI message header */
++struct enetc_msg_header {
++	__be16 crc16;
++	u8 class_id;
++	u8 cmd_id;
++	u8 proto_ver;
++	u8 len;
++	u8 resv0;
++	u8 cookie:4;
++	u8 resv1:4;
++	u8 resv2[8];
++};
++
++struct enetc_mac_addr {
++	u8 addr[ETH_ALEN]; /* Network byte order */
++};
++
++/* Message format of class_id 0x20 for exact MAC filter.
++ * cmd_id 0x0: set primary MAC
++ * cmd_id 0x1: Add entries to MAC address filter table
++ * cmd_id 0x2: Delete entries from MAC address filter table
++ * Note that cmd_id 0x1 and 0x2 are not supported yet.
++ */
++struct enetc_msg_mac_exact_filter {
++	struct enetc_msg_header hdr;
++	u8 mac_cnt; /* No need to set for cmd_id 0 */
++	u8 resv[3];
++	struct enetc_mac_addr mac[];
++};
++
++#endif
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc_msg.c b/drivers/net/ethernet/freescale/enetc/enetc_msg.c
+index a137fa1e6f20..1384752efa7b 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc_msg.c
++++ b/drivers/net/ethernet/freescale/enetc/enetc_msg.c
+@@ -29,49 +29,104 @@ static irqreturn_t enetc_msg_psi_msix(int irq, void *data)
+ }
+ 
+ /* Messaging */
+-static u16 enetc_msg_pf_set_vf_primary_mac_addr(struct enetc_pf *pf,
+-						int vf_id)
++static void enetc_msg_set_vf_primary_mac_addr(struct enetc_pf *pf, int vf_id,
++					      union enetc_pf_msg *pf_msg)
+ {
+ 	struct enetc_vf_state *vf_state = &pf->vf_state[vf_id];
+-	struct enetc_msg_swbd *msg = &pf->rxmsg[vf_id];
+-	struct enetc_msg_cmd_set_primary_mac *cmd;
++	struct enetc_msg_swbd *msg_swbd = &pf->rxmsg[vf_id];
+ 	struct device *dev = &pf->si->pdev->dev;
+-	u16 cmd_id;
++	struct enetc_msg_mac_exact_filter *msg;
+ 	char *addr;
+ 
+-	cmd = (struct enetc_msg_cmd_set_primary_mac *)msg->vaddr;
+-	cmd_id = cmd->header.id;
+-	if (cmd_id != ENETC_MSG_CMD_MNG_ADD)
+-		return ENETC_MSG_CMD_STATUS_FAIL;
++	msg = (struct enetc_msg_mac_exact_filter *)msg_swbd->vaddr;
++	addr = msg->mac[0].addr;
++	if (!is_valid_ether_addr(addr)) {
++		dev_err(dev, "Invalid MAC address from VSI message\n");
++		pf_msg->class_id = ENETC_MSG_CLASS_ID_MAC_FILTER;
++		pf_msg->class_code = ENETC_MF_CLASS_CODE_INVALID_MAC;
++
++		return;
++	}
+ 
+-	addr = cmd->mac.sa_data;
+ 	if (vf_state->flags & ENETC_VF_FLAG_PF_SET_MAC)
+ 		dev_warn(dev, "Attempt to override PF set mac addr for VF%d\n",
+ 			 vf_id);
+ 	else
+ 		pf->ops->set_si_primary_mac(&pf->si->hw, vf_id + 1, addr);
+ 
+-	return ENETC_MSG_CMD_STATUS_OK;
++	pf_msg->class_id = ENETC_MSG_CLASS_ID_CMD_SUCCESS;
++}
++
++static bool enetc_msg_check_crc16(void *msg_addr, u32 msg_size)
++{
++	u32 data_size = msg_size - 2;
++	u8 *data_buf = msg_addr + 2;
++	u16 verify_val;
++
++	if (msg_size > ENETC_DEFAULT_MSG_SIZE)
++		return false;
++
++	verify_val = crc_itu_t(ENETC_CRC_INIT, data_buf, data_size);
++	verify_val = crc_itu_t(verify_val, msg_addr, 2);
++	if (verify_val)
++		return false;
++
++	return true;
++}
++
++static void enetc_msg_handle_mac_filter(struct enetc_msg_header *msg_hdr,
++					struct enetc_pf *pf, int vf_id,
++					union enetc_pf_msg *pf_msg)
++{
++	switch (msg_hdr->cmd_id) {
++	case ENETC_MSG_SET_PRIMARY_MAC:
++		enetc_msg_set_vf_primary_mac_addr(pf, vf_id, pf_msg);
++		break;
++	default:
++		pf_msg->class_id = ENETC_MSG_CLASS_ID_CMD_NOT_SUPPORT;
++	}
+ }
+ 
+-static void enetc_msg_handle_rxmsg(struct enetc_pf *pf, int vf_id, u16 *status)
++static void enetc_msg_handle_rxmsg(struct enetc_pf *pf, int vf_id,
++				   union enetc_pf_msg *pf_msg)
+ {
+-	struct enetc_msg_swbd *msg = &pf->rxmsg[vf_id];
++	struct enetc_msg_swbd *msg_swbd = &pf->rxmsg[vf_id];
+ 	struct device *dev = &pf->si->pdev->dev;
+-	struct enetc_msg_cmd_header *cmd_hdr;
+-	u16 cmd_type;
++	struct enetc_msg_header *msg_hdr;
++	u32 msg_size;
++
++	msg_hdr = (struct enetc_msg_header *)msg_swbd->vaddr;
++	msg_size = ENETC_MSG_SIZE(msg_hdr->len);
++	if (!enetc_msg_check_crc16(msg_swbd->vaddr, msg_size)) {
++		dev_err(dev, "VSI to PSI Message CRC16 error\n");
++		pf_msg->class_id = ENETC_MSG_CLASS_ID_CRC_ERROR;
++
++		return;
++	}
+ 
+-	*status = ENETC_MSG_CMD_STATUS_OK;
+-	cmd_hdr = (struct enetc_msg_cmd_header *)msg->vaddr;
+-	cmd_type = cmd_hdr->type;
++	/* Currently, asynchronous actions are not supported */
++	if (msg_hdr->cookie) {
++		dev_err(dev, "Cookie field is not supported yet\n");
++		pf_msg->class_id = ENETC_MSG_CLASS_ID_CMD_NOT_SUPPORT;
++
++		return;
++	}
++
++	/* Currently only support protocol version 0 */
++	if (msg_hdr->proto_ver) {
++		dev_err(dev, "Protocol version %u is not supported yet\n",
++			msg_hdr->proto_ver);
++		pf_msg->class_id = ENETC_MSG_CLASS_ID_PROTO_NOT_SUPPORT;
++
++		return;
++	}
+ 
+-	switch (cmd_type) {
+-	case ENETC_MSG_CMD_MNG_MAC:
+-		*status = enetc_msg_pf_set_vf_primary_mac_addr(pf, vf_id);
++	switch (msg_hdr->class_id) {
++	case ENETC_MSG_CLASS_ID_MAC_FILTER:
++		enetc_msg_handle_mac_filter(msg_hdr, pf, vf_id, pf_msg);
+ 		break;
+ 	default:
+-		dev_err(dev, "command not supported (cmd_type: 0x%x)\n",
+-			cmd_type);
++		pf_msg->class_id = ENETC_MSG_CLASS_ID_CMD_NOT_SUPPORT;
+ 	}
+ }
+ 
+@@ -92,15 +147,15 @@ static void enetc_msg_task(struct work_struct *work)
+ 		}
+ 
+ 		for (i = 0; i < pf->num_vfs; i++) {
++			union enetc_pf_msg pf_msg = {};
+ 			u32 psimsgrr;
+-			u16 msg_code;
+ 
+ 			if (!(ENETC_PSIMSGRR_MR(i) & mr_mask))
+ 				continue;
+ 
+-			enetc_msg_handle_rxmsg(pf, i, &msg_code);
++			enetc_msg_handle_rxmsg(pf, i, &pf_msg);
+ 
+-			psimsgrr = ENETC_SIMSGSR_SET_MC(msg_code);
++			psimsgrr = ENETC_SIMSGSR_SET_MC(pf_msg.code);
+ 			psimsgrr |= ENETC_PSIMSGRR_MR(i); /* w1c */
+ 			enetc_wr(hw, ENETC_PSIMSGRR, psimsgrr);
+ 		}
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc_vf.c b/drivers/net/ethernet/freescale/enetc/enetc_vf.c
+index 669eb939e33c..31ca08e679b8 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc_vf.c
++++ b/drivers/net/ethernet/freescale/enetc/enetc_vf.c
+@@ -6,7 +6,29 @@
+ 
+ #define ENETC_DRV_NAME_STR "ENETC VF driver"
+ 
+-/* Messaging */
++/* Note: This function should be called after filling the message body,
++ * because the CRC16 needs to be calculated after all the data has been
++ * filled.
++ */
++static void enetc_msg_fill_common_hdr(struct enetc_msg_swbd *msg_swbd,
++				      u8 class_id, u8 cmd_id, u8 proto_ver,
++				      u8 cookie)
++{
++	struct enetc_msg_header *hdr = msg_swbd->vaddr;
++	u8 *data_buf = ((u8 *)msg_swbd->vaddr) + 2; /* skip crc16 field */
++	u32 data_size = msg_swbd->size - 2;
++	u16 crc16;
++
++	hdr->class_id = class_id;
++	hdr->cmd_id = cmd_id;
++	hdr->len = ENETC_MSG_EXT_BODY_LEN(msg_swbd->size);
++	hdr->proto_ver = proto_ver;
++	hdr->cookie = cookie;
++
++	crc16 = crc_itu_t(ENETC_CRC_INIT, data_buf, data_size);
++	hdr->crc16 = htons(crc16);
++}
++
+ static void enetc_msg_vsi_write_msg(struct enetc_hw *hw,
+ 				    struct enetc_msg_swbd *msg)
+ {
+@@ -28,6 +50,7 @@ static void enetc_msg_dma_free(struct device *dev, struct enetc_msg_swbd *msg)
+ static int enetc_msg_vsi_send(struct enetc_si *si, struct enetc_msg_swbd *msg)
+ {
+ 	struct device *dev = &si->pdev->dev;
++	union enetc_pf_msg pf_msg;
+ 	u32 vsimsgsr;
+ 	int err;
+ 
+@@ -59,36 +82,63 @@ static int enetc_msg_vsi_send(struct enetc_si *si, struct enetc_msg_swbd *msg)
+ 
+ 	/* check for message delivery error */
+ 	if (vsimsgsr & ENETC_VSIMSGSR_MS) {
+-		dev_err(dev, "VSI command execute error: %d\n",
+-			ENETC_SIMSGSR_GET_MC(vsimsgsr));
++		dev_err(dev, "Transfer error when copying the data\n");
+ 		return -EIO;
+ 	}
+ 
+-	return 0;
++	pf_msg.code = ENETC_SIMSGSR_GET_MC(vsimsgsr);
++	/* Check the user-defined completion status. */
++	if (pf_msg.class_id != ENETC_MSG_CLASS_ID_CMD_SUCCESS) {
++		switch (pf_msg.class_id) {
++		case ENETC_MSG_CLASS_ID_PERMISSION_DENY:
++			return -EACCES;
++		case ENETC_MSG_CLASS_ID_CMD_NOT_SUPPORT:
++		case ENETC_MSG_CLASS_ID_PROTO_NOT_SUPPORT:
++			err = -EOPNOTSUPP;
++			break;
++		case ENETC_MSG_CLASS_ID_PSI_BUSY:
++			err = -EBUSY;
++			break;
++		case ENETC_MSG_CLASS_ID_CMD_TIMEOUT:
++			err = -ETIME;
++			break;
++		case ENETC_MSG_CLASS_ID_INVALID_MSG_LEN:
++		case ENETC_MSG_CLASS_ID_MAC_FILTER:
++			err = -EINVAL;
++			break;
++		default:
++			err = -EIO;
++		}
++	}
++
++	if (err)
++		dev_err(dev, "Return error code from PSI: 0x%04x\n",
++			pf_msg.code);
++
++	return err;
+ }
+ 
+ static int enetc_msg_vsi_set_primary_mac_addr(struct enetc_ndev_priv *priv,
+ 					      struct sockaddr *saddr)
+ {
+-	struct enetc_msg_cmd_set_primary_mac *cmd;
+-	struct enetc_msg_swbd msg;
+-
+-	msg.size = ALIGN(sizeof(struct enetc_msg_cmd_set_primary_mac), 64);
+-	msg.vaddr = dma_alloc_coherent(priv->dev, msg.size, &msg.dma,
+-				       GFP_KERNEL);
+-	if (!msg.vaddr) {
+-		dev_err(priv->dev, "Failed to alloc Tx msg (size: %d)\n",
+-			msg.size);
++	struct enetc_msg_mac_exact_filter *msg;
++	struct enetc_msg_swbd msg_swbd;
++	u32 msg_size;
++
++	msg_size = struct_size(msg, mac, 1);
++	msg_swbd.size = ALIGN(msg_size, ENETC_MSG_ALIGN);
++	msg_swbd.vaddr = dma_alloc_coherent(priv->dev, msg_swbd.size,
++					    &msg_swbd.dma, GFP_KERNEL);
++	if (!msg_swbd.vaddr)
+ 		return -ENOMEM;
+-	}
+ 
+-	cmd = (struct enetc_msg_cmd_set_primary_mac *)msg.vaddr;
+-	cmd->header.type = ENETC_MSG_CMD_MNG_MAC;
+-	cmd->header.id = ENETC_MSG_CMD_MNG_ADD;
+-	memcpy(&cmd->mac, saddr, sizeof(struct sockaddr));
++	msg = (struct enetc_msg_mac_exact_filter *)msg_swbd.vaddr;
++	memcpy(&msg->mac[0].addr, saddr->sa_data, ETH_ALEN);
++	enetc_msg_fill_common_hdr(&msg_swbd, ENETC_MSG_CLASS_ID_MAC_FILTER,
++				  ENETC_MSG_SET_PRIMARY_MAC, 0, 0);
+ 
+ 	/* send the command and wait */
+-	return enetc_msg_vsi_send(priv->si, &msg);
++	return enetc_msg_vsi_send(priv->si, &msg_swbd);
+ }
+ 
+ static int enetc_vf_set_mac_addr(struct net_device *ndev, void *addr)
+-- 
+2.34.1
 
-Yeah, from my perspective, there should be not surprise/behaviour_change
-for non-sriov/eswitch user. Then switchdev can be default and everyone
-is happy. Why to complicate things?
-
-
->
->I'll send another RFC v2 with support limited to:
->devlink=[...]:esw:mode:{ switchdev | switchdev_inactive | legacy }
->and let's see where we land with that.
->
->I still think a small kernel command line knob is the cleanest way to get to
->"switchdev by default" without making the interface too broad. For more
->complex boot-time configuration, I agree that a devlinkd or similar userspace
->path is probably the better direction.
->
->The "pause probing until userspace configures devlink" idea feels less clear
->to me. It is not quite the simple boot policy knob, and not quite the full
->userspace policy manager either. It would add a new probe state and require
->early userspace orchestration before the device is fully materialized. At
->least for now, I would prefer either the small cmdline option for the simple
->global/default case, or a proper devlinkd-like solution for more complex
->policy. Between those, I still prefer the cmdline option for this specific
->early eswitch mode default.
->
->Mark
->
->> 
->> [...]
->
 
