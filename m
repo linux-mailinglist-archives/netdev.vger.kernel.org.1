@@ -1,184 +1,179 @@
-Return-Path: <netdev+bounces-286753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286754-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aPZAGvILAmrpnQEAu9opvQ
-	(envelope-from <netdev+bounces-286753-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 19:03:46 +0200
+	id cBZ0Be8SAmrangEAu9opvQ
+	(envelope-from <netdev+bounces-286754-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 19:33:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DD5D512F33
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 19:03:45 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B3BF5138B4
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 19:33:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 728C930243A3
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:01:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2A05E3034B2E
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30E9243E4B9;
-	Mon, 11 May 2026 17:01:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBEE243E49F;
+	Mon, 11 May 2026 17:01:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LldmztCI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OhEKgON8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
+Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53C9438FF1
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 17:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778518873; cv=none; b=hl4LF+lojH5PsgIt1B+nx3+jI6esaWpX9Pcq3EYxM+/GJSZ893Sn9CuiUKf8ILi/BtXEVNU79Iu+ktpgURr+7/27No9gkw1Hs1fsmrIbTSZKHw0NRDdpFgqsewRHnImMwuba1OAQSqAlhiQtczRPI3EKHkIjArMF2DbVc2keJNU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778518873; c=relaxed/simple;
-	bh=iUUlpAucA/dZnek3XV6McEL9wHLXl5lrA2H26lKle70=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=HFh7+8L+NoycDKxLtZJIr2PB+JrNpBvVnZng8UtSqQSYclEmJVULb4Zr3M7sfnEQVIUJ2Nhf75Hhv0QZsfvAndAawBv9aJGpva79uZSgL/pQncjnumlEtTDXesWQH1OvAKNIlcZSLsjOXU57T8oJmrKcSe2BwoHjmTYcmNpvuTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LldmztCI; arc=none smtp.client-ip=74.125.224.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EDD43DA5E
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 17:01:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778518882; cv=pass; b=ksX5JimmJ4nd1Z+gWm8FCcINKTRgdH9anfu6YkitcK+pNUd++DkqAnUNQ4vQviZQylVN0LNcpk2qrMRYiLpQeNTwDKyQxzgBIl3HTd6RDEq4ZIqMisa7w20NXxHzjvlTKboKqzLs5w0Tn+8uENFckbHGhIo+Fwntu0HHfVsGC8E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778518882; c=relaxed/simple;
+	bh=sX76fFKdIdHWcvUPNAk6ORnTk1gk3SV4Auw12s3ZtLg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jSmWw4ldCHj1QIGMGuDb/VvHfh/goY6JFpUZBlHAqPHA3WQufMT6lA+EWUuiO/y32A+hRfV8aG6JsX0iJSQjtXJoOtEV1zSvaeJzzz02VKPYgoRU+gO7oY+KqKainA4oGXS3qhUcUmgFKmxRS+VnsLe2ryCHf8eqcibvMWo2xEA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OhEKgON8; arc=pass smtp.client-ip=74.125.224.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-65c477a3278so4573427d50.3
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 10:01:11 -0700 (PDT)
+Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-654672a6d68so4876126d50.0
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 10:01:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778518880; cv=none;
+        d=google.com; s=arc-20240605;
+        b=CE2T/u+YS42Kktd+SpZIQdoHvVwTS5/zVnCB55uL7mGrkI25GcaaR77eLPSaei7SQG
+         TTFZHQudlNynLWr+HVNjnsqryq15AvQTn+QFmmO4yyxNCpn3o84Lx4Kb5wUVeVvFausS
+         /4BS2cBCRYAL3MeH5vZIWMps9v+uf7tnyuqmwPvCnsDL9TOQeDBSRJrvVQr7/2XewRR9
+         PawKvJ+ShtmxF9hsNUJlwPWHir9OZcjfzb5Oi07e4p5i/VrIGnUufMXBMyIFgbcJQkkb
+         +SKYGMaCyY9ZuaPPEJB5rp9lU/vOzrucEnmwfFgnK1amVzl5o/sAu1xYwS88l5H/sfpM
+         3gRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=3Sg1NMnSjHVsI2sM31JWs4ZSAYtGPCK7HEDDBX1EM78=;
+        fh=hpR+OvS7vgsSoTB3qIIhlkaSNms4wHnwFYovtuPOkLw=;
+        b=YMBzr+8lSBH0oqmoD3h36I9CeOBv8WK9709BYyDoDTEopJKSw1WktyF+wCzyXNArDO
+         DFT9f7SQOclABF1H0blWiURwwZ+mZ1mSxJ72NqfTOnAVAAdIVVQuJSEFn/c6yXKVcuzb
+         Ou5/83rhYIfqoPHmL7f44qsoNMCusWHUATf8EwpMGHanY2QyJTws3qHR4CjXV8u+mADZ
+         IpnO/vEvUuvF5J48hzH/CxX8iiv/8qPcnla8bpP29J/bQ5M56Y5OdbCMUhXIQfy74CZB
+         jinTjP+M7d0cAnEyYYh/F3pdF1ddUDB1pbAUevKVIb8Fc9jWh/O/B61kc/RS5igcvbj1
+         wprA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778518871; x=1779123671; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1778518880; x=1779123680; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fSFIFik1v36Q4UudkAaCYemmrKRYJBnkinCt0aw47nU=;
-        b=LldmztCI6pAOLWUa9kIiz+d3VakIUT+qHrb8cqTit4HuVSdzXwle30fTWN3hw6gR7P
-         Gyr+C1FrtPFNSydITGVon6quW1gP/TM2E8KHLffZy8NMI4KhnBtn8ipdiLuPkidp9yH7
-         MdhQmW2aEmA76TC7nDxclfgXOAcAT/SMfKfQ8gEFO7UgLp98Mx9XnDyEfiWHOSlmKmx6
-         AGxEZN+gQzeGkMGZSnyVECGiueRUZed3pgahW5OqwAP2LNw2du95K7JJcYHDKaBkxIUy
-         tOSL2JMTvrVpDUNWHv3ndXe9Q3Oj/J9Nq+1MpaedyyyA4nAgwg6qivF872xS+dQy6pr2
-         PuHw==
+        bh=3Sg1NMnSjHVsI2sM31JWs4ZSAYtGPCK7HEDDBX1EM78=;
+        b=OhEKgON80OIy1TrQ5AedbWYWvXJkLRr3IZhNN7DgZU7cyH7SrhWJYPqsAi8s4ebSD8
+         KL/hzXxjAXLYxa7zvr+3Gn7GznGYwUbRik3leQDjccaZ5ps4k5p8Oeqa1njPfoxTCIJd
+         AuJ3xetEIp7x11qZl++Kw2107ViILLeOq9V+p1b+y7qggJGv2/Pq34esszFLe653MJID
+         r5/G03+jQ5GUNz62wHT/0nSpkNOpgNQHd99WbGzd+awgzhR9kGtFZ6ODg9PnS2X8xVzl
+         7fOwO0mhLL2Y3G9RjnWjBgsc0TFS+qM+aObqnH9stxbKckFsJCiUe17KjTzjsd3hH7sf
+         rS2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778518871; x=1779123671;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fSFIFik1v36Q4UudkAaCYemmrKRYJBnkinCt0aw47nU=;
-        b=UI8RKKy7l4SDm6188Mcn0OFF+PIDFAxrRTWVq/8lv+AGRAjO29raCw/NS5qFZc062f
-         5O0UkO6ZZGoFfW2lr5BU29e3rhCxOCKgntrgBT64dVGOkUsWHTmvvHB7IiXOcAHeu2w4
-         yGYgFUgoL0NFbA0XORX/nixreTcEiY434F9LKiQjCNXmTvDfa0L6FN2rtr5eswJUUZqm
-         xp8dzZ3SOaqs7nDG1UZiRSFIWxwoD8o0myP2nWLozXG3bxsNdJ7IORgDzT8MScFmVh3v
-         2W2ltUzaGyNpdlSPBPgnIkLMv2CwRxk9wVabGRvJEJG2zgCcSQI+wjQShaeQjNtpeht9
-         kogg==
-X-Gm-Message-State: AOJu0Yy3J1hvqYMu3kbzbb5V5uvZCS5y25GKUW8ewT22ThfoXyCxmzQK
-	u4aJmhTyO95KnpckxJmTawoHS3aujQDQoYo76emNhnGVHcT7g9yydQcYAFXWqQ==
-X-Gm-Gg: Acq92OG3S/M+wLUZbY+ERP36Pu5oX/wd+9AAr4CjQ/Dz2HOqj9mIfZ2Q/m7lvqX6ZLy
-	0MUZERb+3CLaOXgg527r5dwXmDqaiTWxYFpPxp4E91nGR/UsUZct8uUTSXoKe8M8qrfCekGJZvP
-	gS8EddqS52Dsx12/2f2dIACzwOFi0tW6bXrZsLCzF9UNg7IFLYcU/92yE1BmcIZ5ZHSXUnSKXBj
-	l3Mlg5WgAebL9Q7kfK2hpIbRhb6E6EBfVFT7kG6/gWJJSjxeuTNGRQ8AHwmiu2m4UA3392rRwYP
-	rhbqsIwCht/jZf72v1g7HQ3VNik/6LDvFEoNwjr9mkaHS+h67Bk5AslymwzWCl/Md9WVIx6fgA9
-	7z4IaYlYXASp6ySN0AudHpoASbRykRXXrTBDyFzOpBdrVX3YoQ/jPVVgPDZwQcq8aXR+wTzYlfr
-	gBshReBj17WKj4sLRLXSUiiVT3/hbXdjMA2UqwEPtXL2lMTLjxohORzIxhkE/kJ80GaEtoE8QQP
-	yVQqcyb+2UWeBE=
-X-Received: by 2002:a05:690e:42cf:b0:654:5d65:9fe1 with SMTP id 956f58d0204a3-65c79ad7682mr17440383d50.8.1778518870017;
-        Mon, 11 May 2026 10:01:10 -0700 (PDT)
-Received: from gmail.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65d96baa3a6sm5563191d50.13.2026.05.11.10.01.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 10:01:09 -0700 (PDT)
-Date: Mon, 11 May 2026 13:01:08 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Daniel Zahka <daniel.zahka@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.1d153b0dc9762@gmail.com>
-In-Reply-To: <20260508-nsim-psp-crypto-v1-2-4b50ed09b794@gmail.com>
-References: <20260508-nsim-psp-crypto-v1-0-4b50ed09b794@gmail.com>
- <20260508-nsim-psp-crypto-v1-2-4b50ed09b794@gmail.com>
-Subject: Re: [PATCH net-next 2/6] netdevsim: psp: remove unnecessary UDP
- checksum computation
+        d=1e100.net; s=20251104; t=1778518880; x=1779123680;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=3Sg1NMnSjHVsI2sM31JWs4ZSAYtGPCK7HEDDBX1EM78=;
+        b=mSeTpMztQkg7++RZryOLYUb4LlrQ24evaPKpDEKuZdu2JxO3RlErKZmgUVzqIoCO+z
+         n+y84mqIpF81X8vODoSoiKM+N6pkMPEqURsBStXWYwa3bXdTo40ZYg5kJYxzyAlfVAph
+         KOQ8OGL07yuk4he8gKWnx359ylEZ5gLYXjeTK+EIvqU6Xe0nlu7BDI1IkFry56I3oQin
+         Cw3qWRYJUscBGGb9F/qgikjwiSSy2Tf45kg0P9/qvQayFyrLr44SSXoHG3pivSE3zajZ
+         Z5f8WBekp1svUNOWD87NQfW+iSC4Z/Bii6tZzldBBQPKtDt/vrIMQdWaRvBDyxXITRWm
+         9/5Q==
+X-Forwarded-Encrypted: i=1; AFNElJ+StZgKcKWdSy08/HlV3lr9RYTL0VoPZwsLYejRchQBtHn7LY6RHcVqcUUl5CkjLWKX2bNinQM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyARF1NxXvsor8Ka/F0JUksz+RyJYTOmeef2183q4TQ9/KKdTxT
+	xBFV1OKfnlqU8/+nXxyIUfejV4TQBa2BS3fzRY5kapGGdUVxnehC6VEC5HxYJ7Dm466OoYNy6wO
+	np7vREElqz2kIy3tk5XzN22NXP4vmO74=
+X-Gm-Gg: Acq92OFzeuGllrs1ZTL6YNwiKTpmk0eeGe/OoISCiCZdpKOMYPTPJig4CeFExxGVz/r
+	lEJvT+5pPNw+bh1akLct4EsvRsl/BqxNcQMSS/BXR+mwS43ZRz2EqUq0aG8BUwrXn85Q60FAgEI
+	Elyu399mJ0VeLC3hf8L0cboCxf88xMwCmzT79rovnbhHePjIqK15NuSorXtyDfCBJJUWGFn0HVL
+	kYeKe0F2BnJscBEo03t153mmQqukUmCocIBiyUV8vyv0/tQg5DvNF9pwPN4vJ7GsqP8Np1QC7Pm
+	pmK06cbEdsW0cSgM9zGSbV1rLKajTqH6BWFYcb5eVwyVegw=
+X-Received: by 2002:a05:690e:4843:b0:654:49e4:ff14 with SMTP id
+ 956f58d0204a3-65c79994bd2mr19456740d50.37.1778518879990; Mon, 11 May 2026
+ 10:01:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 2DD5D512F33
+MIME-Version: 1.0
+References: <cover.1778506829.git.michael.bommarito@gmail.com>
+ <490e228dd02983fb1530fb114d4174148f810261.1778506829.git.michael.bommarito@gmail.com>
+ <CABBYNZL-f+AzFWdhvLcxdf0oCXbgr3AXqM1W2npOPZEv0gRA6w@mail.gmail.com>
+In-Reply-To: <CABBYNZL-f+AzFWdhvLcxdf0oCXbgr3AXqM1W2npOPZEv0gRA6w@mail.gmail.com>
+From: Michael Bommarito <michael.bommarito@gmail.com>
+Date: Mon, 11 May 2026 13:01:08 -0400
+X-Gm-Features: AVHnY4JhB2d5GMH88lUH892q70_awbB8KMS0O-OtLSzvuZSSVcwIl7oatzofHYs
+Message-ID: <CAJJ9bXxdm6LRW-5a4a1eDyZSQjNkJ4PNF+aERHkHe9EMQFX8oA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] Bluetooth: hci_sync: pin conn across hci_le_create_conn_sync
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Mat Martineau <martineau@kernel.org>, netdev@vger.kernel.org, 
+	stable@vger.kernel.org, Pauli Virtanen <pav@iki.fi>, Aaron Esau <git@aaronesau.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 4B3BF5138B4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286753-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286754-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.997];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Daniel Zahka wrote:
-> The PSP spec requires the implementations accept 0 checksum in psp-udp
-> header. Let's take advantage of that to trim netdevsim's psp code
-> down. psp_dev_encapsulate() already sets uh->check to 0.
-> 
-> Assisted-by: Claude:claude-opus-4.6
-> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
-> ---
->  drivers/net/netdevsim/psp.c | 32 --------------------------------
->  1 file changed, 32 deletions(-)
-> 
-> diff --git a/drivers/net/netdevsim/psp.c b/drivers/net/netdevsim/psp.c
-> index 5073bda60883..75740e2a731f 100644
-> --- a/drivers/net/netdevsim/psp.c
-> +++ b/drivers/net/netdevsim/psp.c
-> @@ -1,8 +1,6 @@
->  // SPDX-License-Identifier: GPL-2.0
->  
-> -#include <linux/ip.h>
->  #include <linux/skbuff.h>
-> -#include <net/ip6_checksum.h>
->  #include <net/psp.h>
->  #include <net/sock.h>
->  
-> @@ -81,36 +79,6 @@ nsim_do_psp(struct sk_buff *skb, struct netdevsim *ns,
->  			      skb->len - skb_inner_transport_offset(skb));
->  		u64_stats_update_end(&ns->psp.syncp);
->  	} else {
-> -		struct ipv6hdr *ip6h __maybe_unused;
-> -		struct iphdr *iph;
-> -		struct udphdr *uh;
-> -		__wsum csum;
-> -
-> -		/* Do not decapsulate. Receive the skb with the udp and psp
-> -		 * headers still there as if this is a normal udp packet.
-> -		 * psp_dev_encapsulate() sets udp checksum to 0, so we need to
-> -		 * provide a valid checksum here, so the skb isn't dropped.
-> -		 */
+On Mon, May 11, 2026 at 10:53=E2=80=AFAM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Id suggest we dropped the once at the end so just hci_cmd_sync_queue_conn=
+.
+>
+> > +                                       hci_cmd_sync_work_func_t func,
+> > +                                       struct hci_conn *conn,
+> > +                                       hci_cmd_sync_work_destroy_t des=
+troy)
+> > +{
+> > +       int err;
+> > +
+> > +       err =3D hci_cmd_sync_queue_once(hdev, func, hci_conn_get(conn),=
+ destroy);
+> > +       if (err)
+> > +               hci_conn_put(conn);
+> > +
+> > +       return err;
+>
+> Then we incorporate return (err =3D=3D -EEXIST) ? 0 : err; logic above, s=
+o
+> I don't think any caller should require queuing multiple procedures
+> for the same conn.
 
-Perhaps this was here as IPv6 does not allow zero checksums except for
-tunneling in specific cases (RFC 6936)?
+OK, good call.  I checked the other 10 callers for
+hci_cmd_sync_queue_once and there isn't any variation today, so that
+seems safe.
 
-It seems benign enough to keep the code. Do you have a specific reason
-to remove it, beyond reducing LoC?
+Do you want me to wait another 24-48 for others to weigh in or ship v2 now?
 
