@@ -1,253 +1,212 @@
-Return-Path: <netdev+bounces-286535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286545-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +GV1GCaYAWqXfAEAu9opvQ
-	(envelope-from <netdev+bounces-286535-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 10:49:42 +0200
+	id Dib9GXaaAWo2gAEAu9opvQ
+	(envelope-from <netdev+bounces-286545-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 10:59:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3CD350A531
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 10:49:41 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E09750A799
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 10:59:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2D404301B4F2
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:49:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3D862300B595
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:59:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 410233BA235;
-	Mon, 11 May 2026 08:49:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="B3ux8YjY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B2293C061D;
+	Mon, 11 May 2026 08:57:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012006.outbound.protection.outlook.com [40.107.209.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4AD22E0925;
-	Mon, 11 May 2026 08:49:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.6
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778489352; cv=fail; b=QD+xJUeNiDzhUL4ooMKyjplRj5PuOf3dhNcdEcUJdV96Ky7lDcovBcDsyyIP0ZvSaQ1A3AwtsbBri75hdmFTgoDsLaXay9C0uGZhefxVcklh0pwnIl8nbPerzTxhXs+ihWuAR4LE/6Ww+5+nFvjod5QdqGXjhMecIoKnLoWk0lc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778489352; c=relaxed/simple;
-	bh=gS7ftNzuV4GRXA0aGkeUO7aRVqG6Mv0jMDCswjzMhxI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=rlQ/nXlFShYo4F3m4ioHCgE1bhee2ampu0TpcfZCP7odNFCp2kX/r80yCos81WVNYcWkYJ7dzqBYd2c7Ijex3iQCVQrFLsfMv2BGRZuLr/z7O7sjOCqnCYCxkyeDrHt6uUSu06cedLCqKGxEjFr4skHKt/yi+53xIkd7GTEyaCM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=B3ux8YjY; arc=fail smtp.client-ip=40.107.209.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=T5vB87Y12CwzNnOTYYdtI14RWAiR9PzumkdXuU2A76VsPyIt1+cFf3u6c7xa4FXaQZ/zTt/qqP79o7c0kNO6bsl0o2kdv6jnqu6wljHf7pKm26wFSon8yF+vaF9Wv5zkmTfXGG7loCebN295/oWttwOHS+0Ia80v3bvfV8Gh9j7rSIYF3VgOQ9CFE3LpYUagISP0DWAJFWYMmtkZOITfpai+2etD1xg3cWa8Rs3JuKc6Dg84ArwAmrNBR5qWPffrbR3AOTUzcKOZvkP3GjydxUDpzr2daBsPVHnZF8mSc72064XwROzR0kvCjFXuJq/Tlfh87KDsv+27pwgDCRzqNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LIj/Ktz9Lc3oODZJt3aK5KoF3Pu2l0govBgR0/oTs0k=;
- b=sVxv70yQi4tcV+S5EaTYr3AA6uvGAoyZHF2PpYo45QCpUCSCF+fnOaRcZE4LE7kc+9mSL0r5k6ZPpOlpv1T8IOtv0XBN1TLrAws+7v5t2lGS6/bfHGV4gj2tfjuav6Ye4RrPSily4ZmrfmolTtPKuJX+H5CO+lX2JTSKmQWTV0Gv7zF6BAE1pbrXFGxJt1/HlVzQNkwY0yIy+JEgxIBPHxk/4stNXtvrSnHrfwueHFmPrSBBpT7skaZZBDLD4+q5jx7HdQD70KTA8TUguSPCpTBFgUtKip6QIiSYDYkIZ6bs3Z5WVDHQ7RYsPTfO1j7owXYU1HyxiuhaFClGrIOaYA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LIj/Ktz9Lc3oODZJt3aK5KoF3Pu2l0govBgR0/oTs0k=;
- b=B3ux8YjYMfawxni0isPD8zG+kMPVXaE0VXVHrLOkjmuvmrbOeqYmWlr7S6yuTOtnzM4ClN/0SCma3fCHhSIHWDudGOyoH4DPoIAmt1wrcHDWl3gwryNeCA4YlDQR7ZJkd10lB+2wqTF3prW3GBh6rUSmyv6ze/1U0D/Uo32E7fpnQYT/xzcJpqDxEhAy3fISZng90NWFSCWPYL48A1eyHlvQzWpqX4cLg3S9/WNDWUsU1NO4HDJ4eojfaLpw9lUHp11xHWPE5kZLVH9Uy8Mv4M6prwEOwZHrQiY1tyNLs/X2M/H59HAUI9Opf/QtbUHmUjWb33Th3djJRsmDOIcN2Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from PH7PR12MB5877.namprd12.prod.outlook.com (2603:10b6:510:1d5::17)
- by DS7PR12MB6069.namprd12.prod.outlook.com (2603:10b6:8:9f::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.20; Mon, 11 May
- 2026 08:49:05 +0000
-Received: from PH7PR12MB5877.namprd12.prod.outlook.com
- ([fe80::e6f1:aca:28e7:eed3]) by PH7PR12MB5877.namprd12.prod.outlook.com
- ([fe80::e6f1:aca:28e7:eed3%4]) with mapi id 15.20.9891.021; Mon, 11 May 2026
- 08:49:05 +0000
-Message-ID: <0a39da37-6e4d-434f-9416-f102d1d6a159@nvidia.com>
-Date: Mon, 11 May 2026 11:48:57 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/3] net/mlx5: HWS, Check if device is down while
- polling for completion
-To: Simon Horman <horms@kernel.org>, tariqt@nvidia.com
-Cc: cpaasch@openai.com, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- saeedm@nvidia.com, leon@kernel.org, mbloch@nvidia.com, vdogaru@nvidia.com,
- kees@kernel.org, valex@nvidia.com, erezsh@nvidia.com,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, gal@nvidia.com, dtatulea@nvidia.com
-References: <20260507173443.320465-2-tariqt@nvidia.com>
- <20260510190351.1422486-1-horms@kernel.org>
-Content-Language: en-US
-From: Yevgeny Kliteynik <kliteyn@nvidia.com>
-In-Reply-To: <20260510190351.1422486-1-horms@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0088.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:cd::19) To BL1PR12MB5873.namprd12.prod.outlook.com
- (2603:10b6:208:395::20)
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5C843BF676;
+	Mon, 11 May 2026 08:57:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778489859; cv=none; b=Snn0SlKOw0XCm88dwDkgR+js2ar0dDrcgAnWjxjtLrDKw2g/pcRfJBJuuM/S50reS0okoP6p+f4shmrHXvwjRcNZ2XwvCiEI92AtYE+AxotqbrOF2tn3YlDG1OT4ypbh/ATJ0yDvR8HFrpNdpJdBvpccUS1aR+ffor4h/2QEgRo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778489859; c=relaxed/simple;
+	bh=/0K7mDA6mWO2Krk49Aj3svhN7vMdjMYf1EwQKpjkh1w=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Ow3nRvKWl0WR3DuKOlZZi7LL9donEYzFmESLhTAUFxjr4WkgTO+CcdL0DEUQ9UmidH3dnl6lEsfgp5f3bYil3CN2glxXBkgy/SzZIY1RUR1V5cs2QvBJiojL9U6y4vpoUCSK7lbN3yuEQwPGFJ84sWn4Tgq+wZXgxj8cacqNtlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; arc=none smtp.client-ip=210.160.252.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
+X-CSE-ConnectionGUID: Vy5kvGYnTYu2mBwG9W4Aow==
+X-CSE-MsgGUID: 0vv5tZ40QJOmHxujn72bTw==
+Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
+  by relmlie6.idc.renesas.com with ESMTP; 11 May 2026 17:52:28 +0900
+Received: from [127.0.1.1] (unknown [10.226.78.135])
+	by relmlir5.idc.renesas.com (Postfix) with ESMTP id 1331F4009A31;
+	Mon, 11 May 2026 17:52:24 +0900 (JST)
+From: Michael Dege <michael.dege@renesas.com>
+Subject: [net-next PATCH v4 00/13] net: renesas: rswitch: R-Car S4 add VLAN
+ aware switching
+Date: Mon, 11 May 2026 10:52:03 +0200
+Message-Id: <20260511-rswitch_add_vlans-v4-0-a5a225f8faae@renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5877:EE_|DS7PR12MB6069:EE_
-X-MS-Office365-Filtering-Correlation-Id: fce604c1-cbf5-466a-58cb-08deaf3a27ad
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|56012099003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	fa08S93k8Us6WYaXAnbLkK/lIr8Vz82P0ehTKMqIOVhGR436m6snqI3q6xJH0JdmXCqp6pRnMpZanGKuLVf8G/vI/gfuU1fIQNpVYnCNrrdR/kb6BX5pzh/7vgANchlrtZvc7LK5FkXwE6a0uIhLvZ8sZcMbzhMeoDpk0tepQYyYuTiOPfFTFy5Cx05ysFG+d0zNQlhXvX4WcB8QTHKgIQwawCRcpbdjchDgmONgCpTRqr7MNj9lBZ7OSLQdZ5Q1jIUsYxMFgCrsGkcQ246u2erpUFCKW6Evt1JJdyDPqwAH0sdZLWgSklh/TJywPJy1GRxCUBLyMP9tya9jzmxJJIw/fedBU+xWEuLyAzdZhwCpc1RfbEOAptKHxzHTYPui+iWzu2GPr461ymyS8bidTuP/JPe9+hFMx6jl3NI1q7K3Y8nfuCgC1XJsW+p1s5mCSViBGFJ+a4PVNt1I0WcEYiKI9TpgVB9axiss4DKBZca/aOup4XXIUBoQkEIaci1fptzwSMKpJJC2qfpHWblgNkiaPsJMm+4FCondBZauH95kAo50jyBQYVDbCS914A7aJeSbAmoGrSN2urNBD9T3S1c29LWL5WNKZDwI3r9OJcRbzxUJ3kZ8JSbu3FzJOXbeOObd3AMvHn0RPJBYwHZ4RYWeXeYTKwKh46B/aFNQuUFdyYq8JFKnD+LhV9gCbWKl
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5877.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WVNOR25weDlaTHR4dENiM0orUUxFL2ROWGEvTXp5YWRsR3RrWXNPU0xoeWRy?=
- =?utf-8?B?YkJhdHU5cmZPaEJKVmFiR2F1NTN1ZUlUV0s1YTBOZ0hEcHJZSXZ6RGVMeWRt?=
- =?utf-8?B?M3laQzZDSlRsYW1ldmVKajd2ZkFrdWp1Qk1GWHBmM0ltWWlCQmxKQ3VHVVhx?=
- =?utf-8?B?Zjl4TWVRQSthaXNPVkczUnFpK3o1d3l1aDl2WDBRaGJjUmx5ZmxJYWI1ZUE2?=
- =?utf-8?B?R0lzZ3JZNlhzd3BoMUo0S2xLYitIYzFESFVQRmljMkNmbzEzcmNqR1hEakNh?=
- =?utf-8?B?Mlh1dDh4RnZlYkN6a2VaVDlRN0hOdHZiOU40RHNvSVhZUXhWQTlFZUZHRFJL?=
- =?utf-8?B?S25UUnZyUUVsZVF3RThkazI3QmMvQ1pLc05VMkdiQ2dGek8wKzZSRkdIQXAv?=
- =?utf-8?B?NG1BaWt1emdhdzZXR014d0RNSTZ5SkNpYkQycVA0NG55QWtyUWZSUmJjekxp?=
- =?utf-8?B?WnE2YkNyaUR0U0RBaHcwMXZTWnRpSlkySGlFSlk4aktoOTB2YUJObmVOZFBu?=
- =?utf-8?B?UEVmOWpyZHg3anpPTk5KcmQ3M1FZNk5MWVNydXd6VzdsSEVHL0R2UUd1d042?=
- =?utf-8?B?bG11bUdIY25wTFFueHAxLzlsMVpsam5JeVIwcGZxRWx0RUhUVGVJOVdZQlJU?=
- =?utf-8?B?QWdiUU9iUUgvSHdSTW9rZ2hxYUtpZXJyc0dXNXcxZEd0VmdoSzNsY2xWOCs1?=
- =?utf-8?B?RlF0NU5qd0RQZ3hxamM2Qys0RldXUTdjY0hoRzdKWVhQb2gzY0xwYnlYcGsv?=
- =?utf-8?B?aE0yRllLR2ZwUnI1NVdwQWozbjA4c0drMGpkYkViODY4UDQ3b01PT3FEOElR?=
- =?utf-8?B?V2JaRWFLU01YYm03ZmtCcDVNRXB5V1k2OTc5cFFZSkk0OFlYS0ZHSmdwWjVi?=
- =?utf-8?B?VlE4LytrUkttT0VObDFNRHhpdmVnVndSSFdXOEdDRjMzRHlQelhuMjgyRHUz?=
- =?utf-8?B?K204QldsWHZIWEVnSjlmc0VJZXh6Sy9UTFA0emxRVFphdDdRTVVGVlZZeURB?=
- =?utf-8?B?MFFLck5nS0xPZDdoZExBdVhheVBxYy8zYWZHWTNTanpmNzBneGVLazliTzlq?=
- =?utf-8?B?T3BjSXNYMWMvT3o2SEdXVGkyeHYwcEhDL3hRd2N2MFB6NXlZQnovUG9STysr?=
- =?utf-8?B?Nk9Qb2U1RDlDNThiVkduMlR5VVJwYVlOdjJvYjZwdW1MT3dtWmZEeUNCYlp1?=
- =?utf-8?B?aXZRNzVXRVlPQzY3eVRnTnhIYndrVzZ2a0pJdnM1M0V0UnN1UFA0QVNpdXNU?=
- =?utf-8?B?OUkxVzJqVnlRQVFGNWJoOVhhdnUza1gwbWZwZHdiajJ0RFBrZTZzSEYyaUs4?=
- =?utf-8?B?MXA5a1ZzcDVNWVloYlZHUTBrdWZCcVg3blpGaEFhNVMzalZBN28xaWY4cUJw?=
- =?utf-8?B?ZVpPUkpnZHpKeHM0K1RzcmhWVWFoOEV0dlZRZzZQb01oeHArVlpHWUxuM2RU?=
- =?utf-8?B?bVZPWmxKcGdKVm4wTnBjV2NqYmY1d3kwUEFFMlU0c29EUTlSSHQ1T3puTDdn?=
- =?utf-8?B?ZGFaSVo0MXZ4TUxXSkJENzBDMk42cE94dUE5RG9RMG1DNXZzeHJYenE0MEtS?=
- =?utf-8?B?NHhSVUpVY29mZXhYNGMxNzBBODlxS081NnlYTWdHSUhEb2crN2FlZWFnZWpL?=
- =?utf-8?B?c05XdFJBQXlyVFdiU2pucS9CRDNhMzF0RFFLY2UwYjhzNjlER1FzVVArOVpm?=
- =?utf-8?B?SGFFbnVyV04wTlRQK2VjRDFGUTJ3N0lxQXRJb1pJKzM4NmdYbEdVckkwb0VC?=
- =?utf-8?B?cjBCOVNPYUpac3BLbmMzeFRHZDM0MXZWTVVLVjVhUFpaZitpbEc4NnRLV01I?=
- =?utf-8?B?K1Uvci9Ebm9yRlZ3UjE1RzlpSWFXdXo4ekZ1cC9vQ1R0b3Frd2RjazBpTWR0?=
- =?utf-8?B?RGtUb043aEJkYUkwSEc0YTRwS0ZPTUdEL2FiWUp5WkV5ZkZ4cVZObU9QZ1FE?=
- =?utf-8?B?V3pZV1Nyd00vbWZvZFBHVHVzYmpXTmlobmdzNTg2eno0Q1Y5RkFmdTUydUF0?=
- =?utf-8?B?Ym12Q0tsTzVua2g0RUtpblQ3TXptUEhkUkNQSDhKZVBiMTFQUkhISk52Tk1p?=
- =?utf-8?B?TnBKQ2QzcFJ2VjA1a29VL29XYjJGa29QcjhCbzZXLzdFU1A3ZFhTVWxkd0lR?=
- =?utf-8?B?dFNJSFV0emhGVWRrOHl5REpXZ0lnOVVEa1dJOTE1ZEhTanloWC81N0ZoZno1?=
- =?utf-8?B?YmFEUnJHWkRnbHJHRnk1ZG9GRklXZE1CZDd4RW5kNHBJaDhXZ0VJZTBVcHBR?=
- =?utf-8?B?citpQXk3RmNVdEM2eUhzMThaQ214NGJCdmVlcytuNmMvS0JGWVBCYTQ4RzVI?=
- =?utf-8?Q?gzrmE59AJxz+oiCRom?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fce604c1-cbf5-466a-58cb-08deaf3a27ad
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5873.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2026 08:49:05.3032
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: x/QcYRr0jl0LiaHhNIpgapAQepy1yC7ylxwikjF0VF2F36KKKx6qE4QW2hWX7tm5E5oJI9X0plClYgNwIi4RDQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6069
-X-Rspamd-Queue-Id: F3CD350A531
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALSYAWoC/23NSwrCMBSF4a1IxkaSm6YPR+5DpORpA5pKUqJSu
+ nfTOqnY4X/gfndE0QRnIjruRhRMctH1Pkex3yHVCX812OncCAiUhALBIT7doLpWaN2mm/ARs6a
+ oa2klNKVC+e4RjHWvxTxfcncuDn14Ly8Sndevxmi1oSWKCWaCV9IKYkHTUzDeRBEPqr+j2UuwM
+ mDTgGzoyhaM1ypT4t9gK4PRLYNlQ7GMUEkV5+WvMU3TBxjr0nA8AQAA
+X-Change-ID: 20260120-rswitch_add_vlans-39488bfb296c
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ =?utf-8?q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, 
+ Paul Barker <paul@pbarker.dev>
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Michael Dege <michael.dege@renesas.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1778489544; l=4440;
+ i=michael.dege@renesas.com; s=20251023; h=from:subject:message-id;
+ bh=/0K7mDA6mWO2Krk49Aj3svhN7vMdjMYf1EwQKpjkh1w=;
+ b=ummxGXkJ3a6z4BO+EEGtqwj8cCSQvji807TImBVu4Kka8OKjK5valrs9T84eInDPBOrAmSiVM
+ kEl/QwAmdonBvugGA2blX+w8SAyszvz5f1dvLzcuZ4EGMhUF8T2EZNF
+X-Developer-Key: i=michael.dege@renesas.com; a=ed25519;
+ pk=gu1rwIcCrAxNMv2I8fIfiQvt51xzZwnQy4Ua/DscQt8=
+X-Rspamd-Queue-Id: 2E09750A799
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [0.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[renesas.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	TAGGED_FROM(0.00)[bounces-286535-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-286545-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[michael.dege@renesas.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kliteyn@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.974];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,renesas.com:email,renesas.com:mid]
 X-Rspamd-Action: no action
 
-On 10-May-26 22:03, Simon Horman wrote:
-> From: 'Simon Horman' <horms@kernel.org>
-> 
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> Full review at: https://sashiko.dev
-> ---
-> net/mlx5: HWS, Check if device is down while polling for completion
-> 
-> This commit adds a check to abort polling for hardware completions if the
-> device state indicates an internal error. This returns -ETIMEDOUT early to
-> avoid long timeouts when the hardware stops generating completions.
-> 
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c
->> index 6dcd9c2a78aa8..eae02bc742218 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c
->> @@ -422,6 +422,18 @@ int mlx5hws_bwc_queue_poll(struct mlx5hws_context *ctx,
->>   	if (!got_comp && !drain)
->>   		return 0;
->>   
->> +	if (unlikely(ctx->mdev->state == MLX5_DEVICE_STATE_INTERNAL_ERROR)) {
->> +		/* If the device is down for any reason (e.g. FLR), the HW will
->> +		 * no longer generate completions.
->> +		 * Note that ETIMEDOUT is returned here because the BWC layer
->> +		 * already has a special handling for timeouts - it breaks the
->> +		 * rehash / resize / shrink loops to avoid chain of timeouts.
->> +		 */
->> +		mlx5_core_warn_once(ctx->mdev,
->> +				    "BWC poll: device is down, polling for completion aborted\n");
->> +		return -ETIMEDOUT;
->> +	}
->> +
->>   	queue_full = mlx5hws_send_engine_full(&ctx->send_queue[queue_id]);
->>   	while (queue_full || ((got_comp || drain) && *pending_rules)) {
-> 
-> Could this lead to a CPU stall if the device goes down during the polling loop?
+Hello!
 
-That is correct.
-There is the possibility that the device goes down while we're already inside
-the polling loop, in which case the looping will continue till it reaches the
-timeout.
-But what we're trying to optimize is the "normal" flow. We prefer not to
-add additional 'if' into the polling loop, which should be as efficient
-as possible - it affects rules insertion/deletion rate.
-So this patch aims to prevent chain of timeouts when device is in error
-state, which is happening during deletion of all the flows, and during
-shrinking of the matchers, while it still leaves some probability to see
-a single initial timeout.
+The current R-Car S4 rswitch driver only supports basic HW offloading
+for L2 switching/bridgeing. This patchset extends the driver with
+support for VLAN aware switching.
 
+1. For every port mode change from configuration to operation and
+   vice-versa you need to change to disabled mode first. The
+   functions rswitch_<port>_change_mode now take care of this. 
 
-> The hardware state check is placed outside the while loop. The loop has a
-> 60-second timeout (MLX5HWS_BWC_POLLING_TIMEOUT) and lacks cond_resched(),
-> meaning it can peg the CPU while spinning.
-> 
-> If the hardware fails and stops generating completions while we are already
-> inside the loop, the driver's health thread on another CPU might detect the
-> failure and set ctx->mdev->state to MLX5_DEVICE_STATE_INTERNAL_ERROR.
-> 
-> Since the check is outside the loop, we would fail to detect the state change
-> and continue to spin uselessly for the remainder of the 60 seconds, which
-> could trigger a soft lockup panic.
-> 
-> Should the state check be moved inside the polling loop, perhaps using
-> READ_ONCE() on ctx->mdev->state to ensure the compiler does not hoist the
-> lockless read?
-> 
->>   		ret = mlx5hws_send_queue_poll(ctx, queue_id, comp, burst_th);
+2. In upcomming changes for adding vlan support struct net_device
+   will not be available in all cases, therefore use struct device
+   instead.
+
+3. Fix typo in register define macro and remove duplicate macro.
+
+4. Add register definitions needed fo vlan support.
+
+5. Add exception path for packets with unknown destitination MAC
+   addresses.
+
+6. Make the helper functions rswitch_reg_wait(),
+   rswitch_etha_change_mode() and rswitch_etha_change_mode()
+   available to the whole driver.
+
+7. Add basic start-up time initialization needed to support VLANs.
+
+8. Update ETHA and GWCA port HW initializations.
+
+9. Clean up is_rdev() rswitch_device checking.
+
+10. Provide struct rswitch_private to notifiers.
+
+11. Add handler for FDB notifications to configure bridge MAC address
+    to GWCA registers and update static MAC table entry.
+
+12. Add vlan support to L2 HW bridge.
+
+Configuration example:
+ip link add name br0 type bridge vlan_filtering 1
+ip link set dev tsn0 master br0
+ip link set dev tsn1 master br0
+ip link set dev br0 up
+ip link set dev tsn0 up
+ip link set dev tsn1 up
+bridge vlan add dev tsn0 vid 4
+bridge vlan add dev tsn1 vid 4
+bridge vlan add dev br0 vid 4 self
+ip a a 192.168.1.20/24 dev br0
+ip l a link br0 name br0.1 type vlan id 1
+ip l a link br0 name br0.4 type vlan id 4
+ip a a 192.168.2.20/24 dev br0.1
+ip a a 192.168.4.20/24 dev br0.4
+ip link set dev br0.1 up
+ip link set dev br0.4 up
+
+Signed-off-by: Michael Dege <michael.dege@renesas.com>
+---
+Changes in v4:
+- fixed error checking in rswitch_gwca_change_mode() and rswitch_etha_change_mode().
+- fixed typo in use of GENMASK macro.
+- fixed comments from // to /* */.
+- fixed shared queue ussage in rx interrupt.
+- fixed assingment of fwpc2_clr in false branch.
+- moved PORT_ATR_SET to rswitch_switchdev_blocking_event() to remove dead code.
+- changed from dev_put/dev_hold to netdev_put/netdev_hold.
+- reordered code to make sure the correct type is accessed with info->obj->id in
+  rswitch_port_obj_add()/rswitch_port_obj_del().
+- Link to v3: https://lore.kernel.org/r/20260331-rswitch_add_vlans-v3-0-c37f41b1c556@renesas.com
+
+Changes in v3:
+- Fixed findings made by coccicheck
+- Fixed missing 'depends on BRIDGE' in Kconfig found by test robot.
+- Link to v2: https://lore.kernel.org/r/20260327-rswitch_add_vlans-v2-0-d7f4358ca57a@renesas.com
+
+Changes in v2:
+- Reworked reswitch_update_l2_hw_forwarding_gwca() as suggested.
+- Fixed missing initialization found by test robot.
+- Link to v1: https://lore.kernel.org/r/20260317-rswitch_add_vlans-v1-0-3a57bfa0f2d1@renesas.com
+
+---
+Michael Dege (13):
+      net: renesas: rswitch: improve port change mode functions
+      net: renesas: rswitch: use device instead of net_device
+      net: renesas: rswitch: fix FWPC2 register access macros
+      net: renesas: rswitch: add register definitions for vlan support
+      net: renesas: rswitch: add exception path for packets with unknown dst MAC
+      net: renesas: rswitch: add forwarding rules for gwca
+      net: renesas: rswitch: make helper functions available to whole driver
+      net: renesas: rswitch: add basic vlan init to rswitch_fwd_init
+      net: renesas: rswitch: update port HW init
+      net: renesas: rswitch: clean up is_rdev rswitch_device checking
+      net: renesas: rswitch: add passing of rswitch_private into notifiers
+      net: renesas: rswitch: add handler for FDB notification
+      net: renesas: rswitch: add vlan aware switching
+
+ drivers/net/ethernet/renesas/Kconfig        |   1 +
+ drivers/net/ethernet/renesas/rswitch.h      | 183 +++++++-
+ drivers/net/ethernet/renesas/rswitch_l2.c   | 645 ++++++++++++++++++++++++----
+ drivers/net/ethernet/renesas/rswitch_l2.h   |   6 +-
+ drivers/net/ethernet/renesas/rswitch_main.c | 219 +++++++---
+ 5 files changed, 899 insertions(+), 155 deletions(-)
+---
+base-commit: 1f318b96cc84d7c2ab792fcc0bfd42a7ca890681
+change-id: 20260120-rswitch_add_vlans-39488bfb296c
+
+Best regards,
+-- 
+Michael Dege <michael.dege@renesas.com>
 
 
