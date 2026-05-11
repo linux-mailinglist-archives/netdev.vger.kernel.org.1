@@ -1,223 +1,419 @@
-Return-Path: <netdev+bounces-286620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286621-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uKojFa+8AWoJjQEAu9opvQ
-	(envelope-from <netdev+bounces-286620-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 13:25:35 +0200
+	id MC3nGtO+AWqdjQEAu9opvQ
+	(envelope-from <netdev+bounces-286621-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 13:34:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E35E850CAF1
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 13:25:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FC3E50CD24
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 13:34:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7FCA6300A30E
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 11:25:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6F36E304DE91
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 11:27:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7967C371049;
-	Mon, 11 May 2026 11:25:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E5B2372EC6;
+	Mon, 11 May 2026 11:27:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M4vdMEtG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u0Qisebm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5510B2C0299;
-	Mon, 11 May 2026 11:25:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699DE37266C
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 11:27:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778498731; cv=none; b=sXMh21y5anfu6hY0wra3uZjVae0miADDM8eYm5v0/ggAFl8oW70Q6VvLxEDvSmOj+r12PxY6Rg2xqGNibekhM8WoE6W51+4bavJj2oYX1f+8ZmCqVooeCeZ80XyLIyGjUmyP5Uuple+g0K02YmBvXq7SECTldGp2uNP22mXA/ow=
+	t=1778498868; cv=none; b=JOOm8BhYzq4fLCUUBFVxut4CWftQTz1wEaAZmjAxFv1fbOtDt6w5/yIOWBR26jDxQ44/rRM9N6PkgPw9+rw5+DHZyIrX8o+8mPWJgSf3o/q2NRn/GmKhvH5KOAUieXItzt+wKDVP+SfdWx/oz2bCWnqPzV2PlioNnrqYyWjo0zE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778498731; c=relaxed/simple;
-	bh=w3guzvyASfYrFyqBwE8/oBQLOP9kwSiWu56SinbzOCc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QjwzUPUpmBzmyxw6VdQBuVHDBbD5u9ntCCdfBuj5QZHFwBHHVWKpyeGi4CH4JFZExtIZzxoa4+RdAn/YItFv3Usxwz6ErbJu0MV+Ijc7b9rHcDN7YWfQJCwXeR7ZNCO0JVF8eKyYPQroMMkDu/1bb4a5re+tQ5pZu3C1BRYja6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M4vdMEtG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C361AC2BCB0;
-	Mon, 11 May 2026 11:25:28 +0000 (UTC)
+	s=arc-20240116; t=1778498868; c=relaxed/simple;
+	bh=eROQJdvZzpzP6omZV4CYaxT1ro01gZWOXGEjjxJfLDg=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SKyUJpbzdHM4gzO6nGybyJlWjeAv9d5PG1GvYcBYrCjTk3MWOS0r9z1L0CBVfWsFJsxI5Hn8doqFHHYBFtFEBE3GW6hfnnR2y9C2j9l3RKkNLT+sN5nl6Jjvg60BVXHf5Hb2iOUdTY2PKlrPme+wqGYYlZooRiT7G1XFn9z6sFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u0Qisebm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18996C2BCB0
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 11:27:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778498731;
-	bh=w3guzvyASfYrFyqBwE8/oBQLOP9kwSiWu56SinbzOCc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=M4vdMEtGh2R+yj/SAmYpboFuH2l06z1+b0WxW8D0CQtEHOr8YxVfelwjAxEqvOHPN
-	 vxJ4YnBUF836M8yWSS7fJwofG3o6X+B9Se491XvSI4j+awRJRUmjvtxFWJ/8GNZS1s
-	 DstTIdVELCmOhS91rtLMx4HmkdNTdMDKy8jjJ51lbVVm+2IMLwRKw0GABX6ozDrNeX
-	 gDO2mDFeFPNl0CeiFTVQFeL4v3j8LhtBLmEyckfiHUvOdy+NrFvgaDSNfQMyneUakh
-	 2U7NYC0RwmIs4Q2CKkHsJ22hZJ0p0PHwXEgI5s2xc6Qo+0M1Y4pCxS5qvybE7/iEVV
-	 Hiqg9cPttooHA==
-Message-ID: <549e318b-5f37-4b8b-b76a-563831525042@kernel.org>
-Date: Mon, 11 May 2026 13:25:25 +0200
+	s=k20201202; t=1778498868;
+	bh=eROQJdvZzpzP6omZV4CYaxT1ro01gZWOXGEjjxJfLDg=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
+	b=u0QisebmC3wF3QsbrB29zEqJaZFBryPw0PYH3Qgps6fXb9lvX/LN4jmohJ05yxDnp
+	 KzRFWKiHgBsr6XCzm2kn4FmDe79zFpgDG9HYBsVbvCMNEtt//EZB01GuX9Ds36RKqU
+	 ODRV7vAIhZClvNKkRUdCCTmzF92cDPJ6psIXYoJxI3xH5vRZulchwhj6aqAu9kKMzS
+	 lW8cBUq8T7aimtlfmDuhOBXTWFqU7DY9174tJvsamHIDXngQNf42FsGaifPIZbgsHF
+	 aTxYlf5y5Sca2JdzATd9olwtIs/5vv/A8tHTz3Qp4TeDf/AEcfNd6JqBXJzDmnCVJY
+	 Mboodu7MlmSug==
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-38e800deae4so31992901fa.0
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 04:27:48 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ8ltuJT1O0ESkXFSNaZVCBZUopZ0vbiSvE+9uIzxWjtS8RHnDg3SiUN7uzggW+C4Ik13rSyBb8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyI7fOzFE5TnADqceRNhc1ltVnQgTgq9LGhnoU4i3RH+DiFniRP
+	EZg5z52yV77UrJjJkMJ/kyKFKOcYhL0Ag+fZcQSSAbAECC81+EK7V03tXMiG0f9ZO4oAAGNTe0w
+	DhTn64KbaO6Hga48LK+vGXa5X9hsfc//ZqJk0SgfiUg==
+X-Received: by 2002:a05:6512:acf:b0:5a3:eb4b:37a7 with SMTP id
+ 2adb3069b0e04-5a8b6c9c525mr2447446e87.6.1778498866753; Mon, 11 May 2026
+ 04:27:46 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 11 May 2026 04:27:44 -0700
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 11 May 2026 04:27:44 -0700
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20260507-block-as-nvmem-v2-4-bf17edd5134e@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next 3/8] mptcp: pm: kernel: allow flushing more than
- 8 endpoints
-Content-Language: fr
-To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20260508-net-next-mptcp-pm-inc-limits-v1-0-c84e3fdf9b6a@kernel.org>
- <20260508-net-next-mptcp-pm-inc-limits-v1-3-c84e3fdf9b6a@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20260508-net-next-mptcp-pm-inc-limits-v1-3-c84e3fdf9b6a@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: E35E850CAF1
+References: <20260507-block-as-nvmem-v2-0-bf17edd5134e@oss.qualcomm.com> <20260507-block-as-nvmem-v2-4-bf17edd5134e@oss.qualcomm.com>
+Date: Mon, 11 May 2026 04:27:44 -0700
+X-Gmail-Original-Message-ID: <CAMRc=MdOJtb2Jc-qXs3qBG+DGeSx=xmeZ0go9zn3gkyMBFnRCA@mail.gmail.com>
+X-Gm-Features: AVHnY4K8k1k3RamLldv5ZwT4_Dz11oLIMFN3mMB1glD0JB_d179ZxB8TasJQaQQ
+Message-ID: <CAMRc=MdOJtb2Jc-qXs3qBG+DGeSx=xmeZ0go9zn3gkyMBFnRCA@mail.gmail.com>
+Subject: Re: [PATCH v2 4/8] block: implement NVMEM provider
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, daniel@makrotopia.org, Ulf Hansson <ulfh@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
+	Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Saravana Kannan <saravanak@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 0FC3E50CD24
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286620-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286621-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,makrotopia.org,kernel.org,kernel.dk,sipsolutions.net,holtmann.org,gmail.com,quicinc.com,davemloft.net,google.com,redhat.com,lunn.ch,armlinux.org.uk];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[makrotopia.org:email,qualcomm.com:email,mail.gmail.com:mid,config.name:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,config.id:url,config.dev:url];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[35];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,alist.nr:url]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-Hello,
+On Thu, 7 May 2026 17:24:39 +0200, Loic Poulain
+<loic.poulain@oss.qualcomm.com> said:
+> From: Daniel Golle <daniel@makrotopia.org>
+>
+> On embedded devices using an eMMC it is common that one or more partitions
+> on the eMMC are used to store MAC addresses and Wi-Fi calibration EEPROM
+> data. Allow referencing the partition in device tree for the kernel and
+> Wi-Fi drivers accessing it via the NVMEM layer.
+>
+> To safely defer the freeing of the provider private data until all
+> consumers have released their cells, a nvmem_dev() accessor is added to
+> the NVMEM core to expose the struct device embedded in struct nvmem_device.
+> This allows registering a devm action on the nvmem device itself, ensuring
+> the private data outlives any active cell references.
+>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> Co-developed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> ---
 
-On 08/05/2026 17:40, Matthieu Baerts (NGI0) wrote:
-> The mptcp_rm_list structure contains an array of IDs of 8 entries: to be
-> able to send a RM_ADDR with 8 IDs. This limitation was OK so far because
-> there could maximum 8 endpoints.
-> 
-> But this is going to change in the next commit. To cope with that, if
-> one of the arrays is full, the iteration stops, the lists are processed,
-> then the iteration continues where it previously stopped.
-> 
-> Note that if there are many endpoints to remove, and multiple RM_ADDR to
-> send, it might be more likely that some of these RM_ADDRs are dropped or
-> lost. This is a known limitation: RM_ADDR are not retransmitted in
-> MPTCPv1.
+...
 
-(...)
+> diff --git a/block/blk-nvmem.c b/block/blk-nvmem.c
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..96c0ffc51b1862a75644f3f94add35d59577d86b
+> --- /dev/null
+> +++ b/block/blk-nvmem.c
+> @@ -0,0 +1,188 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * block device NVMEM provider
+> + *
+> + * Copyright (c) 2024 Daniel Golle <daniel@makrotopia.org>
+> + *
+> + * Useful on devices using a partition on an eMMC for MAC addresses or
+> + * Wi-Fi calibration EEPROM data.
+> + */
+> +
+> +#include "blk.h"
 
-> diff --git a/net/mptcp/pm_kernel.c b/net/mptcp/pm_kernel.c
-> index aabd73d15c15..ea3a7ea82013 100644
-> --- a/net/mptcp/pm_kernel.c
-> +++ b/net/mptcp/pm_kernel.c
-> @@ -1223,19 +1223,30 @@ int mptcp_pm_nl_del_addr_doit(struct sk_buff *skb, struct genl_info *info)
+Local includes typically go after system-wide ones. I thought that maybe it's
+a block subsystem thing but no, it too goes after here.
+
+> +#include <linux/nvmem-provider.h>
+> +#include <linux/nvmem-consumer.h>
+> +#include <linux/of.h>
+> +#include <linux/pagemap.h>
+> +#include <linux/property.h>
+> +
+> +static void blk_nvmem_free(void *data)
+> +{
+> +	kfree(data);
+> +}
+> +
+> +/* List of all NVMEM devices */
+> +static LIST_HEAD(nvmem_devices);
+> +static DEFINE_MUTEX(devices_mutex);
+> +
+> +struct blk_nvmem {
+> +	struct nvmem_device	*nvmem;
+> +	dev_t			devt;
+> +	bool			removed;
+> +	struct list_head	list;
+> +};
+> +
+> +static int blk_nvmem_reg_read(void *priv, unsigned int from,
+> +			      void *val, size_t bytes)
+> +{
+> +	blk_mode_t mode = BLK_OPEN_READ | BLK_OPEN_RESTRICT_WRITES;
+> +	unsigned long offs = from & ~PAGE_MASK, to_read;
+> +	pgoff_t f_index = from >> PAGE_SHIFT;
+> +	struct blk_nvmem *bnv = priv;
+> +	size_t bytes_left = bytes;
+> +	struct file *bdev_file;
+> +	struct folio *folio;
+> +	void *p;
+> +	int ret = 0;
+> +
+> +	if (bnv->removed)
+> +		return -ENODEV;
+> +
+> +	bdev_file = bdev_file_open_by_dev(bnv->devt, mode, priv, NULL);
+> +	if (!bdev_file)
+> +		return -ENODEV;
+> +
+> +	if (IS_ERR(bdev_file))
+> +		return PTR_ERR(bdev_file);
+> +
+> +	while (bytes_left) {
+> +		folio = read_mapping_folio(bdev_file->f_mapping, f_index++, NULL);
+> +		if (IS_ERR(folio)) {
+> +			ret = PTR_ERR(folio);
+> +			goto err_release_bdev;
+> +		}
+> +		to_read = min_t(unsigned long, bytes_left, PAGE_SIZE - offs);
+> +		p = folio_address(folio) + offset_in_folio(folio, offs);
+> +		memcpy(val, p, to_read);
+> +		offs = 0;
+> +		bytes_left -= to_read;
+> +		val += to_read;
+> +		folio_put(folio);
+> +	}
+> +
+> +err_release_bdev:
+> +	fput(bdev_file);
+> +
+> +	return ret;
+> +}
+> +
+> +static int blk_nvmem_register(struct device *dev)
+> +{
+> +	struct device_node *np = dev_of_node(dev);
+> +	struct block_device *bdev = dev_to_bdev(dev);
+> +	struct nvmem_config config = {};
+> +	struct blk_nvmem *bnv;
+> +
+> +	/* skip devices which do not have a device tree node */
+> +	if (!np)
+> +		return 0;
+> +
+> +	/* skip devices without an nvmem layout defined */
+> +	if (!of_get_child_by_name(np, "nvmem-layout"))
+> +		return 0;
+> +
+> +	/*
+> +	 * skip block device too large to be represented as NVMEM devices
+> +	 * which are using an 'int' as address
+> +	 */
+> +	if (bdev_nr_bytes(bdev) > INT_MAX)
+> +		return -EFBIG;
+> +
+> +	bnv = kzalloc_obj(*bnv);
+> +	if (!bnv)
+> +		return -ENOMEM;
+> +
+> +	config.id = NVMEM_DEVID_NONE;
+> +	config.dev = &bdev->bd_device;
+> +	config.name = dev_name(&bdev->bd_device);
+> +	config.owner = THIS_MODULE;
+> +	config.priv = bnv;
+> +	config.reg_read = blk_nvmem_reg_read;
+> +	config.size = bdev_nr_bytes(bdev);
+> +	config.word_size = 1;
+> +	config.stride = 1;
+> +	config.read_only = true;
+> +	config.root_only = true;
+> +	config.ignore_wp = true;
+> +	config.of_node = to_of_node(dev->fwnode);
+> +
+> +	bnv->devt = bdev->bd_device.devt;
+> +	bnv->nvmem = nvmem_register(&config);
+> +	if (IS_ERR(bnv->nvmem)) {
+> +		dev_err_probe(&bdev->bd_device, PTR_ERR(bnv->nvmem),
+> +			      "Failed to register NVMEM device\n");
+> +
+> +		kfree(bnv);
+> +		return PTR_ERR(bnv->nvmem);
+> +	}
+> +
+> +	/*
+> +	 * Free bnv only when the nvmem device is fully released (i.e. when
+> +	 * its kref hits zero), not at unregister time. This prevents a
+> +	 * use-after-free if a consumer still holds an nvmem_cell reference
+> +	 * when the block device is removed: nvmem_unregister() only does a
+> +	 * kref_put(), so reg_read could still be called with bnv as priv
+> +	 * until the last consumer drops its cell.
+> +	 */
+> +	if (devm_add_action(nvmem_dev(bnv->nvmem), blk_nvmem_free, bnv)) {
+> +		nvmem_unregister(bnv->nvmem);
+> +		kfree(bnv);
+> +		return -ENOMEM;
+> +	}
+
+Please take a look at the series[1] I sent, it seems to address this issue at
+the nvmem core level. Help reviewing it is appreciated. :)
+
+In any case: I don't think it will work the way you intend it to: the devres
+action will be executed when the nvmem device is "unbound" not when it's
+"released". Not only that but the device you retrieve here is not the "parent"
+device that's actually bound to the driver but the "logical" nvmem device, the
+nvmem core creates to back the struct nvmem_device's functionality and reference
+counting. In other words: I believe the devres action will never be called.
+
+In general, it's a very bad idea to schedule devres actions on devices you
+don't control and in context different than at probe() time.
+
+> +
+> +	mutex_lock(&devices_mutex);
+> +	list_add_tail(&bnv->list, &nvmem_devices);
+> +	mutex_unlock(&devices_mutex);
+> +
+> +	return 0;
+> +}
+> +
+> +static void blk_nvmem_unregister(struct device *dev)
+> +{
+> +	struct blk_nvmem *bnv_c, *bnv = NULL;
+> +
+> +	mutex_lock(&devices_mutex);
+> +	list_for_each_entry(bnv_c, &nvmem_devices, list) {
+> +		if (bnv_c->devt == dev_to_bdev(dev)->bd_device.devt) {
+> +			bnv = bnv_c;
+> +			break;
+> +		}
+> +	}
+> +
+> +	if (!bnv) {
+> +		mutex_unlock(&devices_mutex);
+> +		return;
+> +	}
+> +
+> +	list_del(&bnv->list);
+> +	mutex_unlock(&devices_mutex);
+> +	bnv->removed = true;
+> +	nvmem_unregister(bnv->nvmem);
+> +}
+> +
+> +static struct class_interface blk_nvmem_bus_interface __refdata = {
+> +	.class = &block_class,
+> +	.add_dev = &blk_nvmem_register,
+> +	.remove_dev = &blk_nvmem_unregister,
+> +};
+> +
+> +static int __init blk_nvmem_init(void)
+> +{
+> +	int ret;
+> +
+> +	ret = class_interface_register(&blk_nvmem_bus_interface);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+> +device_initcall(blk_nvmem_init);
+> diff --git a/drivers/nvmem/core.c b/drivers/nvmem/core.c
+> index 311cb2e5a5c02d2c6979d7c9bbb7f94abdfbdad1..ee3481229c20b3063c86d0dd66aabbf6b5e29169 100644
+> --- a/drivers/nvmem/core.c
+> +++ b/drivers/nvmem/core.c
+> @@ -2154,6 +2154,19 @@ const char *nvmem_dev_name(struct nvmem_device *nvmem)
 >  }
->  
->  static void mptcp_pm_flush_addrs_and_subflows(struct mptcp_sock *msk,
-> -					      struct list_head *rm_list)
-> +					      struct list_head *rm_list,
-> +					      struct mptcp_pm_addr_entry *entry)
->  {
-> -	struct mptcp_rm_list alist = { .nr = 0 }, slist = { .nr = 0 };
-> -	struct mptcp_pm_addr_entry *entry;
-> +	struct mptcp_rm_list alist, slist;
-> +	bool more;
->  
-> -	list_for_each_entry(entry, rm_list, list) {
-> -		if (slist.nr < MPTCP_RM_IDS_MAX &&
-> -		    mptcp_lookup_subflow_by_saddr(&msk->conn_list, &entry->addr))
-> +again:
-> +	alist.nr = 0;
-> +	slist.nr = 0;
+>  EXPORT_SYMBOL_GPL(nvmem_dev_name);
+>
+> +/**
+> + * nvmem_dev() - Get the struct device of a given nvmem device.
+> + *
+> + * @nvmem: nvmem device.
+> + *
+> + * Return: pointer to the struct device of the nvmem device.
+> + */
+> +struct device *nvmem_dev(struct nvmem_device *nvmem)
+> +{
+> +	return &nvmem->dev;
+> +}
+> +EXPORT_SYMBOL_GPL(nvmem_dev);
+> +
 
-FYI, Sashiko Gemini is saying:
+That should be done in a separate patch but see my response above.
 
-> Are the ids arrays in alist and slist left uninitialized on the stack here?
-> Later, in mptcp_pm_remove_addr(), a full struct assignment
-> (msk->pm.rm_list_tx = *rm_list) copies the structure. Could this copy
-> uninitialized stack memory into the persistent socket structure and
-> trigger KMSAN use-of-uninitialized-value warnings?
+>  /**
+>   * nvmem_dev_size() - Get the size of a given nvmem device.
+>   *
+> diff --git a/include/linux/nvmem-consumer.h b/include/linux/nvmem-consumer.h
+> index 34c0e58dfa26636d2804fcc7e0bc4a875ee73dae..ce387c89dc8e4bc1241f3b6f36be8c6c95e282ed 100644
+> --- a/include/linux/nvmem-consumer.h
+> +++ b/include/linux/nvmem-consumer.h
+> @@ -82,6 +82,7 @@ int nvmem_device_cell_write(struct nvmem_device *nvmem,
+>
+>  const char *nvmem_dev_name(struct nvmem_device *nvmem);
+>  size_t nvmem_dev_size(struct nvmem_device *nvmem);
+> +struct device *nvmem_dev(struct nvmem_device *nvmem);
+>
+>  void nvmem_add_cell_lookups(struct nvmem_cell_lookup *entries,
+>  			    size_t nentries);
+> @@ -220,6 +221,11 @@ static inline const char *nvmem_dev_name(struct nvmem_device *nvmem)
+>  	return NULL;
+>  }
+>
+> +static inline struct device *nvmem_dev(struct nvmem_device *nvmem)
+> +{
+> +	return NULL;
+> +}
+> +
+>  static inline void
+>  nvmem_add_cell_lookups(struct nvmem_cell_lookup *entries, size_t nentries) {}
+>  static inline void
+>
+> --
+> 2.34.1
+>
+>
 
-It is not an issue, because if 'nr' are 0, nothing else is read from the
-structures. AFAICS KMSAN will then not complain if the uninitialized
-values are not used.
+Thanks,
+Bartosz
 
-> +	more = false;
-
-Sashiko Gemini is saying:
-
-> If "more" is true and the function loops back to process another batch,
-> mptcp_pm_remove_addr() will have already set the MPTCP_RM_ADDR_SIGNAL bit in
-> msk->pm.addr_signal during the first iteration.
-> Since mptcp_pm_flush_addrs_and_subflows() is called with lock_sock(sk) held,
-> the MPTCP TX path cannot run to transmit the RM_ADDR and clear the signal bit
-> between iterations.
-> When the loop processes the second batch and calls mptcp_pm_remove_addr()
-> again, msk->pm.addr_signal is still set.
-> Will this cause mptcp_pm_remove_addr() to return -EINVAL and silently drop all
-> batches after the first locally?
-
-That's fine: RM_ADDR are notifications that can be lost anyway. What is
-important is to remove the different addresses internally.
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+[1] https://lore.kernel.org/all/20260429-nvmem-unbind-v3-0-2a694f95395b@oss.qualcomm.com/
 
