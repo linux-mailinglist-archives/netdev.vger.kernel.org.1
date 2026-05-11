@@ -1,257 +1,192 @@
-Return-Path: <netdev+bounces-286732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286733-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EDyAM0v+AWppnAEAu9opvQ
-	(envelope-from <netdev+bounces-286732-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 18:05:31 +0200
+	id mKbOLlIFAmpEnQEAu9opvQ
+	(envelope-from <netdev+bounces-286733-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 18:35:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53B31511C5E
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 18:05:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E15551248C
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 18:35:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0AE6E3046381
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:58:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E81743085C02
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:58:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45FB43C3449;
-	Mon, 11 May 2026 15:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C764219E4;
+	Mon, 11 May 2026 15:58:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GR+JTF3m"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MFGfYdw8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DEE2ECD32;
-	Mon, 11 May 2026 15:57:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607C241C31B
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 15:58:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778515079; cv=none; b=Omb+vmUe2owmvmSLaXXKo/fD4+5Q+vf75F5UqIGBRckHVGq904rtjnh87Mq6xgQrGgTX1QeZGYrbRZOZLPzN7H8a11jwtx1H7cBkDTGR7moNgkL/5LVp7l4nBgr/7JDVLRSlJMxNRuaAfNWmB+dmLi9caGWXvZwKsbzLqtyPTFw=
+	t=1778515116; cv=none; b=MJFr34irNpHky4Nwhi4Fnk1M03EibxdP7zOS8VxyXolSZCD1lFlS589QbV9SZ6aMw3elnVr43Ls5E71uciOmvuRCvyL7cprQoZv8nnkXTgR33ONBBh3fcVsZms4yvS/rkIxOq4yzxT57C1mNwXFfiw4EPUEwQTuqr5eNV9peOAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778515079; c=relaxed/simple;
-	bh=enAzurMJZ8qy0xdMix1LMOOaZZqMT8Pc+n+Xfmg5430=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=p2oBZpjuB5uyFYJ6H89RebfQW2tTWObGEyUFSkVfb517BTKvb9oPQRTr6mC7em6nwZchNGJQUoueRBc3DqXpdebq3PGpT/csbJs8PmHzcRa35VYlrp4yXT+Oik3xzt9tfwal6FYbvuneW4vOuAxLr1O9G/J83ZzsTjUMli06Cg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GR+JTF3m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BE0EC2BCB0;
-	Mon, 11 May 2026 15:57:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778515078;
-	bh=enAzurMJZ8qy0xdMix1LMOOaZZqMT8Pc+n+Xfmg5430=;
-	h=From:Date:Subject:To:Cc:From;
-	b=GR+JTF3mYxAKStO/OwYUALcmzWDjivtEONwles75uW3rXDEHkghoMprhkHQY+Nz+7
-	 jUc2LLoPYhvTXVDuk3iXI9L32DnZzX24Kin+9Uk+dr5KijnxnFtnBdhH20z7g9KwIY
-	 VHMuS5739p0w12CE90kR1cqmt95eyOs2/DrawsgRCKtLUSxZSri39R1BdLGrTQulVq
-	 4b2NjbThIvpTtfZB7oInKMCBQeMkQtLk5bHQFZA6DY0qVb1bnAnhCcpWebOGHRYGhY
-	 NxAcn6SBW5eWfVVgfG7KUS8jC0PMpEPb/1VecJUnAUFBIjizr7gopfz8b6veXi80nt
-	 z+iyv3HrXCaCA==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Mon, 11 May 2026 17:57:39 +0200
-Subject: [PATCH net v2] net: neigh: Reallocate headroom if necessary in
- neigh_hh_bridge()
+	s=arc-20240116; t=1778515116; c=relaxed/simple;
+	bh=0f733Z/TX/wx+L/uoTgJYtOAPWpuzndYa6v+JxLLAls=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bbYZTWs6sb46FI5Ej6vNibgj1IIRKT3pWTyjOU/TuewoiQpnkCfWrCWWTaiHcJxelpJnwckAoc8rLAFehD0VKXX5XynwqXiexxKTVmgU/ZgarRSwkYihF9GZBK5OSfiWiQLrRAR5jMvFxpwaGYeRcN8rgP+DxjcjCD+A5uao+NY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MFGfYdw8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778515114;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=PvBs0XuNqDi9m0Wooxh2TkMdEChLbJ5nV+4KSQ/yOts=;
+	b=MFGfYdw8H2TWxjfu7WiR9iIsTfHejKSKfvj7/ElFmUy74kBOJb7x5+CKj5uIfLiDKDbSkV
+	4nFRm0kva/ZWu1kyBoP2crvee5bNPH1GLy7v0oCVD2czQMTWvP78eO0fduS0XqvEaavzN8
+	O8DPvw7eL2Y/cBmbZiK3SAS8fawbuYQ=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-661-XZzcg4T9MlydHuQCVRB6jg-1; Mon,
+ 11 May 2026 11:58:29 -0400
+X-MC-Unique: XZzcg4T9MlydHuQCVRB6jg-1
+X-Mimecast-MFC-AGG-ID: XZzcg4T9MlydHuQCVRB6jg_1778515106
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3236618002C9;
+	Mon, 11 May 2026 15:58:25 +0000 (UTC)
+Received: from p16v.redhat.com (unknown [10.44.49.148])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 24101180034E;
+	Mon, 11 May 2026 15:58:17 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Leon Romanovsky <leon@kernel.org>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pasi Vaananen <pvaanane@redhat.com>,
+	Petr Oros <poros@redhat.com>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Simon Horman <horms@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH net-next v4 0/2] dpll: rework fractional frequency offset reporting
+Date: Mon, 11 May 2026 17:58:14 +0200
+Message-ID: <20260511155816.99936-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260511-nf-neigh_hh_bridge-fix-v2-1-c4964c7a7b8f@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/4WNWwqDMBBFtyLz3ZQk1fj46j6KiI8xGVqSMhFpk
- ey9wQ30877OPSAiE0boigMYd4oUfBb6UsDsRm9R0JI1aKmNrGQj/Co8knWDc8PEtOTGSh/RjlN
- dV4j6NhvI4zdjtk/wAzxu0GfTUdwCf8+zXZ3RP+6uhBKjKk1ZmmZpNd6fyB5f18AW+pTSD4ngL
- e3CAAAA
-X-Change-ID: 20260508-nf-neigh_hh_bridge-fix-9ab775ee23c6
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, 
- Phil Sutter <phil@nwl.cc>, Nikolay Aleksandrov <razor@blackwall.org>, 
- Ido Schimmel <idosch@nvidia.com>, Bart De Schuymer <bdschuym@pandora.be>, 
- Patrick McHardy <kaber@trash.net>
-Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
- coreteam@netfilter.org, bridge@lists.linux.dev, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.3
-X-Rspamd-Queue-Id: 53B31511C5E
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Rspamd-Queue-Id: 1E15551248C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286732-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lunn.ch,intel.com,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,lwn.net,nvidia.com,redhat.com,microchip.com,linuxfoundation.org,linux.dev,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286733-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,openwrt:email]
+	NEURAL_HAM(-0.00)[-0.996];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-neigh_hh_bridge() assumes the skb always has sufficient headroom to copy
-the aligned  L2 header. This assumption can trigger the crash reported
-below using the following netfilter setup:
+Rework how the fractional frequency offset (FFO) is reported in
+the DPLL subsystem.
 
-$modprobe br_netfilter
-$sysctl -w net.bridge.bridge-nf-call-iptables=1
+Both fractional-frequency-offset (PPM) and
+fractional-frequency-offset-ppt (PPT) attributes are now present at
+the top level of a pin and inside each pin-parent-device nest. They
+carry the same measurement at different precisions.
 
-$root@OpenWrt:~# nft list ruleset
-table ip nat {
-        chain prerouting {
-                type nat hook prerouting priority dstnat; policy accept;
-                ip daddr 192.168.83.123 dnat to 192.168.83.120
-        }
-}
+Introduce enum dpll_ffo_type and struct dpll_ffo_param to distinguish
+FFO contexts: DPLL_FFO_PORT_RXTX_RATE for the RX vs TX symbol rate
+offset at the top level, and DPLL_FFO_PIN_DEVICE for the pin vs
+parent DPLL offset in the nest. Drivers declare which types they
+support via the supported_ffo bitmask in dpll_pin_ops; the core only
+calls ffo_get for opted-in types.
 
-- iperf3 client (192.168.83.119) --> bridge (192.168.83.118) --> iperf3 server (192.168.83.120)
+Patch 1 adds the type-safe FFO API, updates the YAML spec, netlink
+handling, and documentation, and converts mlx5 and zl3073x drivers.
 
-the iperf3 client is sending packet for 192.168.83.123 to the bridge device.
+Patch 2 implements the nested FFO for zl3073x using the
+dpll_df_offset_x register with ref_ofst=1, providing 2^-48
+resolution. The old per-reference frequency measurement is removed
+as it was redundant with measured-frequency.
 
-[ 1579.036575] Unable to handle kernel write to read-only memory at virtual address ffffff8004d76ffe
-[ 1579.045482] Mem abort info:
-[ 1579.048273]   ESR = 0x000000009600004f
-[ 1579.052024]   EC = 0x25: DABT (current EL), IL = 32 bits
-[ 1579.057363]   SET = 0, FnV = 0
-[ 1579.060417]   EA = 0, S1PTW = 0
-[ 1579.063550]   FSC = 0x0f: level 3 permission fault
-[ 1579.068345] Data abort info:
-[ 1579.071224]   ISV = 0, ISS = 0x0000004f, ISS2 = 0x00000000
-[ 1579.076720]   CM = 0, WnR = 1, TnD = 0, TagAccess = 0
-[ 1579.081770]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-[ 1579.087092] swapper pgtable: 4k pages, 39-bit VAs, pgdp=0000000080dc4000
-[ 1579.093794] [ffffff8004d76ffe] pgd=180000009ffff003, p4d=180000009ffff003, pud=180000009ffff003, pmd=180000009ffe3003, pte=0060000084d76787
-[ 1579.106343] Internal error: Oops: 000000009600004f [#1] SMP
-[ 1579.193824] CPU: 0 UID: 0 PID: 235 Comm: napi/qdma_eth-3 Tainted: G           O       6.12.57 #0
-[ 1579.202614] Tainted: [O]=OOT_MODULE
-[ 1579.206102] Hardware name: Airoha AN7581 Evaluation Board (DT)
-[ 1579.211929] pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[ 1579.218889] pc : br_nf_pre_routing_finish_bridge+0x1ac/0xcc8 [br_netfilter]
-[ 1579.225859] lr : br_nf_pre_routing_finish_bridge+0x18c/0xcc8 [br_netfilter]
-[ 1579.232822] sp : ffffffc0817cba20
-[ 1579.236128] x29: ffffffc0817cba20 x28: 0000000000000000 x27: ffffff8002b89000
-[ 1579.243273] x26: ffffff8004d7700e x25: 0000000000000008 x24: 0000000000000000
-[ 1579.250416] x23: ffffffc08179d4c0 x22: 0000000000000000 x21: ffffffc08179d4c0
-[ 1579.257561] x20: ffffff8004d9b800 x19: ffffff8015010000 x18: 0000000000000014
-[ 1579.264704] x17: ffffffbf9e930000 x16: ffffffc0817c8000 x15: 0000000000000070
-[ 1579.271848] x14: 0000000000000080 x13: 0000000000000001 x12: 0000000000000000
-[ 1579.278993] x11: ffffffc0798caae0 x10: ffffff8014db6fd8 x9 : 0000000000000000
-[ 1579.286136] x8 : 0000000000000003 x7 : ffffffc08171f628 x6 : 000000001a3b83d3
-[ 1579.293281] x5 : 0000000000000000 x4 : 1beb76f22fee0000 x3 : ffffff8004d7700e
-[ 1579.300425] x2 : 0000000000000000 x1 : ffffff8004d9b8bc x0 : ffffff80026ed000
-[ 1579.307570] Call trace:
-[ 1579.310018]  br_nf_pre_routing_finish_bridge+0x1ac/0xcc8 [br_netfilter]
-[ 1579.316632]  br_nf_hook_thresh+0xd4/0x14bc [br_netfilter]
-[ 1579.322032]  br_nf_hook_thresh+0x250/0x14bc [br_netfilter]
-[ 1579.327517]  br_nf_hook_thresh+0x76c/0x14bc [br_netfilter]
-[ 1579.333003]  br_handle_frame+0x180/0x480
-[ 1579.336935]  __netif_receive_skb_core.constprop.0+0x540/0xf40
-[ 1579.342682]  __netif_receive_skb_one_core+0x28/0x50
-[ 1579.347561]  process_backlog+0x98/0x1e0
-[ 1579.351398]  __napi_poll+0x34/0x1c4
-[ 1579.354887]  net_rx_action+0x178/0x330
-[ 1579.358638]  handle_softirqs+0x108/0x2d4
-[ 1579.362560]  __do_softirq+0x10/0x18
-[ 1579.366051]  ____do_softirq+0xc/0x20
-[ 1579.369627]  call_on_irq_stack+0x30/0x4c
-[ 1579.373550]  do_softirq_own_stack+0x18/0x20
-[ 1579.377734]  do_softirq+0x4c/0x60
-[ 1579.381050]  __local_bh_enable_ip+0x88/0x98
-[ 1579.385234]  napi_threaded_poll_loop+0x188/0x21c
-[ 1579.389853]  napi_threaded_poll+0x70/0x80
-[ 1579.393863]  kthread+0xd8/0xdc
-[ 1579.396918]  ret_from_fork+0x10/0x20
-[ 1579.400499] Code: 88dffc22 3707ffc2 f9406663 f9406684 (f81f0064)
-[ 1579.406589] ---[ end trace 0000000000000000 ]---
-[ 1579.411209] Kernel panic - not syncing: Oops: Fatal exception in interrupt
-[ 1579.418083] SMP: stopping secondary CPUs
-[ 1579.422012] Kernel Offset: disabled
+Changes v3 -> v4:
+- Replace dpll=NULL overloading with enum dpll_ffo_type and
+  struct dpll_ffo_param (Jakub Kicinski)
+- Add supported_ffo opt-in bitmask in dpll_pin_ops for fail-close
+  driver validation (Jakub Kicinski)
+- Add WARN_ON in dpll_pin_register for supported_ffo without
+  ffo_get callback
+- Use atomic64_t for freq_offset to prevent torn reads on 32-bit
 
-Fix the issue reallocating the skb headroom if necessary in neigh_hh_bridge routine.
+Changes v2 -> v3:
+- Keep both FFO attributes (PPM and PPT) at both levels instead of
+  moving PPT under pin-parent-device only (Jiri Pirko)
+- Unify attribute documentation to describe semantics at each level
 
-Fixes: e179e6322ac33 ("netfilter: bridge-netfilter: Fix MAC header handling with IP DNAT")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
-Changes in v2:
-- Fix neighbour reference count leak
-- Run skb_expand_head() even for cloned/shared skbs.
-- Link to v1: https://lore.kernel.org/r/20260508-nf-neigh_hh_bridge-fix-v1-1-a1464468d92e@kernel.org
----
- include/net/neighbour.h         | 16 ++++++++++++----
- net/bridge/br_netfilter_hooks.c |  7 ++++++-
- 2 files changed, 18 insertions(+), 5 deletions(-)
+Changes v1 -> v2:
+- Minor commit message fixes
 
-diff --git a/include/net/neighbour.h b/include/net/neighbour.h
-index 2dfee6d4258a..c2b6196705ef 100644
---- a/include/net/neighbour.h
-+++ b/include/net/neighbour.h
-@@ -487,16 +487,24 @@ static inline int neigh_event_send(struct neighbour *neigh, struct sk_buff *skb)
- }
- 
- #if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
--static inline int neigh_hh_bridge(struct hh_cache *hh, struct sk_buff *skb)
-+static inline struct sk_buff *
-+neigh_hh_bridge(struct hh_cache *hh, struct sk_buff *skb)
- {
--	unsigned int seq, hh_alen;
-+	unsigned int seq, hh_alen = HH_DATA_ALIGN(ETH_HLEN);
-+
-+	if (unlikely(skb_headroom(skb) < hh_alen ||
-+		     skb_header_cloned(skb) || skb_shared(skb))) {
-+		skb = skb_expand_head(skb, hh_alen);
-+		if (!skb)
-+			return NULL;
-+	}
- 
- 	do {
- 		seq = read_seqbegin(&hh->hh_lock);
--		hh_alen = HH_DATA_ALIGN(ETH_HLEN);
- 		memcpy(skb->data - hh_alen, hh->hh_data, ETH_ALEN + hh_alen - ETH_HLEN);
- 	} while (read_seqretry(&hh->hh_lock, seq));
--	return 0;
-+
-+	return skb;
- }
- #endif
- 
-diff --git a/net/bridge/br_netfilter_hooks.c b/net/bridge/br_netfilter_hooks.c
-index 0ab1c94db4b9..8d21c88c2116 100644
---- a/net/bridge/br_netfilter_hooks.c
-+++ b/net/bridge/br_netfilter_hooks.c
-@@ -297,7 +297,12 @@ int br_nf_pre_routing_finish_bridge(struct net *net, struct sock *sk, struct sk_
- 				goto free_skb;
- 			}
- 
--			neigh_hh_bridge(&neigh->hh, skb);
-+			skb = neigh_hh_bridge(&neigh->hh, skb);
-+			if (!skb) {
-+				neigh_release(neigh);
-+				return -ENOMEM;
-+			}
-+
- 			skb->dev = br_indev;
- 
- 			ret = br_handle_frame_finish(net, sk, skb);
+Ivan Vecera (2):
+  dpll: add fractional frequency offset to pin-parent-device
+  dpll: zl3073x: report FFO as DPLL vs input reference offset
 
----
-base-commit: a450063ef86b9967234ca1f896c0d77400c74f11
-change-id: 20260508-nf-neigh_hh_bridge-fix-9ab775ee23c6
+ Documentation/driver-api/dpll.rst             | 20 +++++++++
+ Documentation/netlink/specs/dpll.yaml         | 28 +++++++-----
+ drivers/dpll/dpll_core.c                      |  3 +-
+ drivers/dpll/dpll_netlink.c                   | 30 +++++++------
+ drivers/dpll/dpll_nl.c                        |  2 +
+ drivers/dpll/zl3073x/chan.c                   | 31 ++++++++++++-
+ drivers/dpll/zl3073x/chan.h                   | 14 ++++++
+ drivers/dpll/zl3073x/core.c                   | 45 -------------------
+ drivers/dpll/zl3073x/dpll.c                   | 40 ++++++++---------
+ drivers/dpll/zl3073x/ref.h                    | 14 ------
+ drivers/dpll/zl3073x/regs.h                   | 15 +++++++
+ .../net/ethernet/mellanox/mlx5/core/dpll.c    |  6 ++-
+ include/linux/dpll.h                          | 16 ++++++-
+ 13 files changed, 154 insertions(+), 110 deletions(-)
 
-Best regards,
 -- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+2.53.0
 
 
