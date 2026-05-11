@@ -1,167 +1,178 @@
-Return-Path: <netdev+bounces-286415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286416-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wJw/E2E0AWrPRwEAu9opvQ
-	(envelope-from <netdev+bounces-286415-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 03:44:01 +0200
+	id 4Cm1HS81AWr2RwEAu9opvQ
+	(envelope-from <netdev+bounces-286416-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 03:47:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C13CD507077
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 03:44:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 216AC5070A8
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 03:47:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2ADC330078AD
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 01:43:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A3974300B625
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 01:47:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C64C21767D;
-	Mon, 11 May 2026 01:43:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF6831EEA31;
+	Mon, 11 May 2026 01:47:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="UcWEgmtK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD6220C00C
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 01:43:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C0917555;
+	Mon, 11 May 2026 01:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778463817; cv=none; b=qdfh5jGQu+crsZlMW9w6BGoBI7a29nt1DEMf5k7tK0J5mEoo9xAYCkRn/lGpmqFnP67zvbLJ9i/UfB9asOklCbDghRvVfeJCd0y6vYvUMbdYTe1Lh2JycPsfvxSPv8o/IF87Cz9fVGItYRmphauC+573fPtsG5oR0rZcs+lF+0g=
+	t=1778464040; cv=none; b=dBz8cJTTg8ZNXZVG7xRIvSGsaTvsq7Eugca0wlPaa9VIa8+PUXu+fDIqVm835VtZJWW7qPpv5Un2spKjUF+n5RQwlWWfvbZbo3bVJXUByz/Dder3gsdLgiNMat4LDK/i9ViYrp4irnKAC+FEybMHxMoR4fyB5HaU3obuiH+xeS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778463817; c=relaxed/simple;
-	bh=kGtGQW4qg/Ujrij77J9YWBKcTfxuNBsYlCBw1kvoUdI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UfIkCqIsOm3sa1Jfo1nL0g5wCyksm5fXqtvIIzuopLdOhUjf5F+GyzV2lFrENbaxCEiFQVXOw3uNsLcZ8MEj7MYuSXCkgUK3Fbambo12J4VHH5+GCGQLnJwRKUUX/s8uwPje+PRSN9n8QAQYPS9TB871BDr5mHKzxInEiVBZNGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: cf024d8a4cda11f1aa26b74ffac11d73-20260511
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
-	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED
-	SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS
-	DMARC_NOPASS, CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS
-	GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:d116acaa-862a-446c-a752-b1f25a2a7391,IP:20,
-	URL:0,TC:0,Content:-5,EDM:0,RT:0,SF:-30,FILE:0,BULK:0,RULE:Release_Ham,ACT
-	ION:release,TS:-15
-X-CID-INFO: VERSION:1.3.12,REQID:d116acaa-862a-446c-a752-b1f25a2a7391,IP:20,UR
-	L:0,TC:0,Content:-5,EDM:0,RT:0,SF:-30,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:-15
-X-CID-META: VersionHash:e7bac3a,CLOUDID:318fd5898780ea487a77d7f428b34ea4,BulkI
-	D:260511094329LNZZXY8S,BulkQuantity:0,Recheck:0,SF:10|38|66|78|102|127|850
-	|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS
-	:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,A
-	RC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: cf024d8a4cda11f1aa26b74ffac11d73-20260511
-X-User: zhaochenguang@kylinos.cn
-Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
-	(envelope-from <zhaochenguang@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 662413778; Mon, 11 May 2026 09:43:28 +0800
-From: Chenguang Zhao <zhaochenguang@kylinos.cn>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Breno Leitao <leitao@debian.org>
-Cc: Chenguang Zhao <zhaochenguang@kylinos.cn>,
-	Simon Horman <horms@kernel.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH v3] ethtool: fix ethnl_bitmap32_not_zero() bit interval semantics
-Date: Mon, 11 May 2026 09:43:43 +0800
-Message-Id: <20260511014343.133328-1-zhaochenguang@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1778464040; c=relaxed/simple;
+	bh=LIKXv1Kd6GGpmKPV+Z8tTgwfopFvpTic/tfiniEgv+Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RAqX+/hb/9itEK0/YqCskA5rqYq4iklXWBd8cPM4oSEJ18w4lrVQk5heVMWu0qx5V94M/XrBqRGRTVNodQt6VXru3H+QnNfAIbIW6yyPcX4pYezJLRd79y+eDjwnVdu6atIkRXZXeyL0nG5Lken+N9/XnvCAXQ8krkYCWisotjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=UcWEgmtK; arc=none smtp.client-ip=115.124.30.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1778464027; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=CIPIrrLvucNN4Oz2zVGs+g4XHuh9AjvK+xZgw+ovFcI=;
+	b=UcWEgmtK82XlyW6t6DMJgOsZMVN8WbuRv3mePhbxrles2CGfgoM3IIEW/a8BCqy54J/ShvcDF9mUEV8YULpibz68/OfYIlIppwuSKP9TPux9ubrOFPFlbim9CzQN5RdXuifMAfyza6XRwC2/WfnOixY5cklZu8UBn8eFlwxtY8k=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R911e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045098064;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0X2dfoJ._1778464026;
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0X2dfoJ._1778464026 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 11 May 2026 09:47:07 +0800
+Date: Mon, 11 May 2026 09:47:06 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: =?iso-8859-1?Q?Nicol=F2?= Coccia <n.coccia96@gmail.com>,
+	alibuda@linux.alibaba.com, sidraya@linux.ibm.com,
+	wenjia@linux.ibm.com
+Cc: mjambigi@linux.ibm.com, tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, nicolo.coccia@leonardo.com
+Subject: Re: [PATCH v3] net/smc: fix sleep-inside-lock in __smc_setsockopt()
+ causing local DoS
+Message-ID: <agE1Gnk_wJOxIi1V@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20260510163414.16651-1-n.coccia96@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: C13CD507077
+In-Reply-To: <20260510163414.16651-1-n.coccia96@gmail.com>
+X-Rspamd-Queue-Id: 216AC5070A8
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-7.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286415-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286416-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[kylinos.cn];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com,linux.alibaba.com,linux.ibm.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[zhaochenguang@kylinos.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.846];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[kylinos.cn:email,kylinos.cn:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	HAS_REPLYTO(0.00)[dust.li@linux.alibaba.com];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:mid,linux.alibaba.com:dkim,linux.alibaba.com:replyto,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,alibaba.com:email]
 X-Rspamd-Action: no action
 
-ethnl_bitmap32_not_zero() should return true if some bit in [start, end)
-is set:
+On 2026-05-10 12:34:13, Nicolò Coccia wrote:
+>A logic flaw in __smc_setsockopt() allows a local unprivileged user to
+>cause a Denial of Service (DoS) by holding the socket lock indefinitely.
+>
+>The function __smc_setsockopt() calls copy_from_sockptr() while holding
+>lock_sock(sk). By passing a userfaultfd-monitored memory page (or
+>FUSE-backed memory on systems where unprivileged userfaultfd is disabled)
+>as the optval, an attacker can halt execution during the copy operation,
+>keeping the lock held.
+>
+>Combined with asynchronous tear-down operations like shutdown(), this
+>exhausts the kernel wq (kworkers) and triggers the hung task watchdog.
+>
+>[  240.123456] INFO: task kworker/u8:2 blocked for more than 120 seconds.
+>[  240.123489] Call Trace:
+>[  240.123501]  smc_shutdown+...
+>[  240.123512]  lock_sock_nested+...
+>
+>This patch moves the user-space copy outside the lock_sock() critical
+>section to prevent the issue.
+>
+>Fixes: a6a6fe27bab4 ("net/smc: Dynamic control handshake limitation by socket options")
+>
+>Signed-off-by: Nicolò Coccia <n.coccia96@gmail.com>
 
-- Fix inverted memchr_inv() sense: return true when the scan finds a
-  non-zero byte, not when the middle words are all zero.
-- Return false for an empty interval (end <= start).
-- When end is 32-bit aligned, indices in [start, end) do not include any
-  bits from map[end_word]; return false after earlier checks found no
-  non-zero data.
+Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+Tested-by: Dust Li <dust.li@linux.alibaba.com>
 
-Fixes: 10b518d4e6dd ("ethtool: netlink bitset handling")
-Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
----
-v3:
- - Adjust continuation line indentation as suggested by Kicinski.
----
- net/ethtool/bitset.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Best regards,
+Dust
 
-diff --git a/net/ethtool/bitset.c b/net/ethtool/bitset.c
-index 8bb98d3ea3db..2198407d9b89 100644
---- a/net/ethtool/bitset.c
-+++ b/net/ethtool/bitset.c
-@@ -92,7 +92,7 @@ static bool ethnl_bitmap32_not_zero(const u32 *map, unsigned int start,
- 	u32 mask;
- 
- 	if (end <= start)
--		return true;
-+		return false;
- 
- 	if (start % 32) {
- 		mask = ethnl_upper_bits(start);
-@@ -105,11 +105,11 @@ static bool ethnl_bitmap32_not_zero(const u32 *map, unsigned int start,
- 		start_word++;
- 	}
- 
--	if (!memchr_inv(map + start_word, '\0',
--			(end_word - start_word) * sizeof(u32)))
-+	if (memchr_inv(map + start_word, '\0',
-+		       (end_word - start_word) * sizeof(u32)))
- 		return true;
- 	if (end % 32 == 0)
--		return true;
-+		return false;
- 	return map[end_word] & ethnl_lower_bits(end);
- }
- 
--- 
-2.25.1
-
+>---
+> v1 -> v3:
+> - Resend via git send-email to fix webmail whitespace corruption
+> - Rebased against netdev/net tree
+> - Added Fixes tag
+> net/smc/af_smc.c | 17 ++++++++---------
+> 1 file changed, 8 insertions(+), 9 deletions(-)
+>
+>diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>index 185dbed7de5d..da28652f6810 100644
+>--- a/net/smc/af_smc.c
+>+++ b/net/smc/af_smc.c
+>@@ -3054,18 +3054,17 @@ static int __smc_setsockopt(struct socket *sock, int level, int optname,
+> 
+> 	smc = smc_sk(sk);
+> 
+>+	/* pre-fetch user data outside the lock */
+>+	if (optname == SMC_LIMIT_HS) {
+>+		if (optlen < sizeof(int))
+>+			return -EINVAL;
+>+		if (copy_from_sockptr(&val, optval, sizeof(int)))
+>+			return -EFAULT;
+>+	}
+>+
+> 	lock_sock(sk);
+> 	switch (optname) {
+> 	case SMC_LIMIT_HS:
+>-		if (optlen < sizeof(int)) {
+>-			rc = -EINVAL;
+>-			break;
+>-		}
+>-		if (copy_from_sockptr(&val, optval, sizeof(int))) {
+>-			rc = -EFAULT;
+>-			break;
+>-		}
+>-
+> 		smc->limit_smc_hs = !!val;
+> 		rc = 0;
+> 		break;
+>-- 
+>2.53.0
 
