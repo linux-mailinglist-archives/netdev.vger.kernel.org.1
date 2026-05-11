@@ -1,287 +1,204 @@
-Return-Path: <netdev+bounces-286462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286463-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mGcdLtV9AWrFbAEAu9opvQ
-	(envelope-from <netdev+bounces-286462-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:57:25 +0200
+	id wBI4GC9+AWoMbQEAu9opvQ
+	(envelope-from <netdev+bounces-286463-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:58:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 184F7508BC1
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:57:24 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAAB0508BEE
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:58:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 602B63014C17
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 06:54:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 62987300E61F
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 06:58:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 016502FD69E;
-	Mon, 11 May 2026 06:54:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E9CA2FFDE1;
+	Mon, 11 May 2026 06:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WdL+ouEI"
+	dkim=pass (1024-bit key) header.d=schleissheimer.onmicrosoft.com header.i=@schleissheimer.onmicrosoft.com header.b="g21nUQCz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from FR5P281CU006.outbound.protection.outlook.com (mail-germanywestcentralazon11022130.outbound.protection.outlook.com [40.107.149.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537B62F90C9
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 06:54:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644EC301471;
+	Mon, 11 May 2026 06:58:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.149.130
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778482489; cv=pass; b=dfdxwRrp+jZwk8+U/22mF4HT387NhOEdCPhFN3EYoamRzHihHnPn9mF9N7K/K9w3YwnuUQ6deWWrDQYDA85gG6ZeTjqXT/PwvxWhj+W8paf8a0GSdon/9W2Z0yiEi/oTnn/ZNPF7DM37wvv4f5edrdkAkXjrr2kh9NdYb/rgjvE=
+	t=1778482731; cv=fail; b=OdDLco3rnRpOo3vowNbD43VBic2Wf5FPVerIGMCJ4inJoCRvk49mFkZ1NvEzyyTT6aSky6+2lZLXbFra8m0VTkfd7o5SRof7VhuJVktXs/j5aSoWrofnzgxtGeS/+h7TJRsvg1mKxNWq7Iti+n0J1C8boM8vf1na17FxebWDrhM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778482489; c=relaxed/simple;
-	bh=m9ggfBeGwWwf4Ny30oM6cEV7a/Kn+7pJ2p6ePJp+XO0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kGFPJhywVVyW7vLdBgM7G3jXsKABCGO8AvCZpKX7U5BTh97H8NM22htvCOtos43G8D1GKonU1dLf7eL7Pf5J6T/5R+WusyhBgWFKfelfQ3PZ8pEN0q1NkTN87coV/dxYO/WxqreuKP7YteMsUlk/hqQYzchSatTw9EdyPGNX3oY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WdL+ouEI; arc=pass smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-50fb8e9a4edso44781691cf.1
-        for <netdev@vger.kernel.org>; Sun, 10 May 2026 23:54:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778482487; cv=none;
-        d=google.com; s=arc-20240605;
-        b=U1wyu/eeSFmn4QKofV8136zcOE6qZzUITashX/elBZRYOMLdzXihIKG+jirOH6HJkU
-         g8LI6iAz/ggGkMzMUlkv2gLuO//ZFUUhmHOH+U6kzfZ00jesfXN1BaFYBrUV05Izn7di
-         6gxNF1fvoazALuxNS1xo5xBTPMSl21cW/14T1ZSf8IrDlBQvDQfttPMLBGGj3if2itiA
-         4UJBxcl4Ii4uFx9QkNJZtX8tGhzoHnbit01ZUMtxJzcVYF40bR21rF3EoWwjLboQhM2f
-         5OnDNt/F+z4QmQdFOh+JVEGJW4QuxKMkSBUIf2m7MwKnhrCieEYc/K/fVlDCP6s0DNWP
-         32uA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=AyhRRlnK2R9IgaNjTQof4ske+M21SjbRc9ikQCLlfwc=;
-        fh=/Yl41URI+hDAGH8cC8P6rzIOWHabI6OjqSTDD+qpuHw=;
-        b=QQ35RciYNC0ibLzl31bR40eemqpjChhXZEH7f439QO3YF6hKRwUtxGXupVNTW/fjef
-         SRn+ymzsyqX44cTgcAiaZK3H+Gqye1WunzwrHerrk3CsLY5OZre3OlUxrcqT9rW4p8c5
-         NuHLwM/Ig4kVqVkT75Broh6BFYLKlbipLdvrxOigaKYvOtIqe0XG9LdIFDjCviltmsjZ
-         /IkMs+cFbFDu9ypYSKdWZGPsWx4mTBU9J8hdu+apP5Ipy/N5GTPZHLfK8xaBFszqvxhe
-         OLVU8SGAq8WUEG1QYoasZTKB1ixcB/iQJtKYQq9TBUvM1kXTbV3S5nALPVoc+GmlaNnz
-         S8xw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	s=arc-20240116; t=1778482731; c=relaxed/simple;
+	bh=sc5JuvAmgPJ5iJ2hZcsBxFAJk0tTlRR2039tNqSXT/8=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=gEpQEWuNgdscAdiqw+kTWBNfudrb0u3LLfjzyWTc+RN5mwr8elfhdg9kAJexZcORIexVxA7SjBuSGWvictWN8U5WuhhcI6S1hLMrTw1N1nDyJDcx92yIz9IaoHnEeGjNwVfMc5RJvFeOFMavm7x8J0J3/RTB1i+7EVFoZ21zDk4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schleissheimer.de; spf=pass smtp.mailfrom=schleissheimer.de; dkim=pass (1024-bit key) header.d=schleissheimer.onmicrosoft.com header.i=@schleissheimer.onmicrosoft.com header.b=g21nUQCz; arc=fail smtp.client-ip=40.107.149.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schleissheimer.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=schleissheimer.de
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YsD8HEiosb0LC3xOo+RIE8/fMFv1HqweeMAF9KpB2b2I33/K33R223SS7L+KddbYq6eNC+dUILjP4VkBJ7vZiOARGaWsobk9c5PfXFSf+xEi4ZM3RO9x1oq9wEahl0mq7tppltgG5FNhf8s47zI2xFPVFxFi/vT2RbxH5xnhPseFXNDa8ZnsiKDvqUclBPmlHE85Bkb0lR9YUkt2S0wbxnNy+ssukKa0YHXdj8M57qDTlbvhbevpYE4YYePYr9rLgzXlhvktSG2vWC9ABqAbwGe0tOTQ6fBDuk9cFRtMBwd6CtzgSqoebQr9itj5JxGYFd/3dwvYXejNJiL3XBCdKQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RSV/iI20WWVPqhKv863NDlS2dltiLV6NB44ITiMo7P8=;
+ b=QFt+WZIIeR+krCa7AOJBwoaToUdovFELWFvbQBEYpfLwp0TiJ1CplogoiSpO2UEIJUOPLe384yZGbEjzcCa3cYG4FLGlz6kK4oNiYmKKCLa8x5badVZMukU7thI9km6w1r+tA6DjtndJjuLGlRwLYUW8biED9kuZuW8ZFC5OSMDRJOO3Xef7if7qJEPuflgAyGKQ5rmGtHrKQexlsG3tb8flsZMQ96bn6eJxxptlt05BaReJbpLncVHR/ISfLwaFcDB6nhoiuLmpjnxYHp40DGataJMcDzfm5A5o5t273ATnErGJzWobEKmc+etZBbI4uMHg7G6IwYNGROeXBAbxrg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=schleissheimer.de; dmarc=pass action=none
+ header.from=schleissheimer.de; dkim=pass header.d=schleissheimer.de; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778482487; x=1779087287; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AyhRRlnK2R9IgaNjTQof4ske+M21SjbRc9ikQCLlfwc=;
-        b=WdL+ouEIc2+zBkmyR6ajxhIbi1Sswlz1WEnQwgZkeFuuQFM3tj9czp6jQMNzRu7RKj
-         vFS7dUq8scyC4dKYoXkAQK26JQP1Rg5b5/dODIexzIw2uVorMbvvwjU6Tf8XWqV8srG0
-         gKv63OD3Kiz5fpxmqJcRj+uSWx9r+R5pitWCdG4ooN3xKTKxUw0tfF/Ojf3F8fV4+pRv
-         VohrJVwZQw28s1fqgrq8b4KwnWJNTZm4abVnjs4W5P+KIJ0eMQi9XlmqawfYBSMvCYt4
-         MPl7fsUE7kyQyRcx8vVHD0CVuYkCHes+GikL3KJOVfGL7M7rd+5ONCgjtY0MRdzE7KUd
-         vKtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778482487; x=1779087287;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=AyhRRlnK2R9IgaNjTQof4ske+M21SjbRc9ikQCLlfwc=;
-        b=UCGLfT+WAuzhl0nS10U6LeYWyRv9bkKOAkoJ3JK0TmFN8yAcP7flWu6XECoOX/AaB2
-         SiVIXuuqWQRjuZQC1bBgPoT5bDurwx7Rczauk9dPSgxf8yzqS5T4BWsEV+WWQFcBWU+2
-         at+imfLCSAKWSnhY4HXboonnHxbHU4rKIcqU1T2q6XR8WGhij0N5XBBCSGGpL1iIbQNE
-         sT2MXFs6COGLJ2yVIMnh6XUtmEb3LCakq2w6th/dwIvAOzKsFPQoADHBSNQvx3PX94P3
-         C1feNdvK3ZpmHjXna5sCkaT253XcCuDYpVr+/jdyuwygosHcaH+0hYKpfecqnCqcr0Qm
-         ErHg==
-X-Gm-Message-State: AOJu0YzNN8lXp4XhOk1kvjMEosjwQtIBHn2b3KIiDMHmTeK8tSAFCn6q
-	uDlc+ZmS4m0GPT1NYKW0oOEAECdEROww+5SChBEcgXBmR958eonYp3hrcbhPW0KmyB8+zsr9sof
-	ddIqoK6tXYEHuFYXjz9h2x2m+uowJB2pWrZMw03Ut
-X-Gm-Gg: Acq92OGNVePC5etftKO8lPVxAPRNToWqIsAUMgaPQBigaTIUO7S2w8kuXjGeT/A490T
-	WY7UhbGZkM4b9MKIpCu70IFh4Ohcok8lhn6ZtNqYytU8a6Gy+AjRO4OXU/s7SVDelc/DP6NzRR8
-	wTIwuqX/I5F7vk7ntYyJQCSNx9pfFY7XY1j3n/xMYMcH5aYzQGAm/WPha/dCe6U1KodI7wR1JDe
-	Lphby/ue4Bn5b8Q+csDIGpjabO7OsHXt9ghtpElVAveUo8I+EALxUU1XY/W+UvS4atSu7flCwVt
-	BItvaeP3EsEbAJ4Lox4FIYGeeCRL0ZUTMvzTqDr7JKtkkaVDQA+hYAiB+hVHWFvh8orpvc+x09f
-	Qrp3rprmSa1ibLOh+v3NIMESt4EY7
-X-Received: by 2002:a05:622a:114c:b0:50b:41bf:4ee5 with SMTP id
- d75a77b69052e-514621f338cmr353965191cf.57.1778482486865; Sun, 10 May 2026
- 23:54:46 -0700 (PDT)
+ d=schleissheimer.onmicrosoft.com; s=selector1-schleissheimer-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RSV/iI20WWVPqhKv863NDlS2dltiLV6NB44ITiMo7P8=;
+ b=g21nUQCz/7lXjNmq1JKSCK0WbI+/dOzeLnsxV3gArigw3Fa4RqAoY2fRo62hUdg/vrZFv4OMB7+eULdt+xtY17xHNqtAzAr/9GfhSTPzfEPAlYjl/Gr7+dmOK/HCk7NmyqYoPj3R994ItZiqP5+T5NO5Q6yUVWBilJqoK26gTlM=
+Received: from BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM (2603:10a6:b10:52::10)
+ by BE1P281MB2307.DEUP281.PROD.OUTLOOK.COM (2603:10a6:b10:32::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.23; Mon, 11 May
+ 2026 06:58:43 +0000
+Received: from BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM
+ ([fe80::2bc1:32a6:153:c3e9]) by BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM
+ ([fe80::2bc1:32a6:153:c3e9%4]) with mapi id 15.20.9891.021; Mon, 11 May 2026
+ 06:58:43 +0000
+From: Sven Schuchmann <schuchmann@schleissheimer.de>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+CC: "maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>
+Subject: [PATCH net v2] net: phy: DP83TC811: add reading of abilities
+Thread-Topic: [PATCH net v2] net: phy: DP83TC811: add reading of abilities
+Thread-Index: AQHc4RNiAwsqEUoxLU+UgExzF3T7lQ==
+Date: Mon, 11 May 2026 06:58:43 +0000
+Message-ID:
+ <BEZP281MB2245C0B534D1297363EE1343D9382@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
+Accept-Language: de-DE, en-US
+Content-Language: de-DE
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=schleissheimer.de;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BEZP281MB2245:EE_|BE1P281MB2307:EE_
+x-ms-office365-filtering-correlation-id: 92f0b3b4-6197-41b8-f508-08deaf2abd6b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700021|56012099003|18002099003;
+x-microsoft-antispam-message-info:
+ pamyxqBGWhc2nNyC6HtO39VI/Ldk9TbysIsiCi/iV7TA98A/7cDzQp4tnN9DDS0QGKBkJd1BE9OGKw45YnOfC1nAXwzD2Z+0V2ZgJ8NHR9aqLtui13ChKOTZuFHFurjx0QZhEyrnhS6bHON3I4+m5axoEa2SvKiagMpI6IkwNW2gXv7VUpyq72wNgOOl8sXVQmv0sZUoIhA+wiwtoDh+vCxfPWgWQ3P+LMtZR4/4mGq1rfmi1IQVhbimKYYpQYHdqHK1eaAd6NEddq4h6/A7ECeU5f/zbH02swhp4dQgewqwl7UyP58Y6FuaoWSWh9Cjkpnda/MTPwe4tCBNBMyLxdJdU9yt8gtByv4eIPfJyjaOyA14j/IUahKVCF+fgVW2mqBcVOiMeupc7u4UQVP74FCQBnSnV4vJudliP1K4aXM1C+/7PhT5LYUzaEsNKahOPH3ExVQd39UCib6ygwIIlWa2FNlpRoYRI7ziwz4L2gv7+ydYFOEUGH4jjXHCx7UyxPlMt3i/XaPTp9aQLGOQRgTUzTG0zaaDWcpFArwM2LesiQNVrvAD/Rz7cYdv9t7eaCajhG3lg/lM13Lmof1lYyN2ohjpBPhutK/6sN8GqsERLZ3/MpbI3l1WA+ABKYkH8JvDQIiLq1Frotejwy68VnYbqTJ6G/sQZbrsvT7TOIfz0QiY5vC4p6f+zBb+g6onjpaoOXvLeCn2IcNzFOe+PjS42gfGCUhFHu+I9v/Yq11K0ol2XqdkVgZYtvSYZ7ua
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700021)(56012099003)(18002099003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?liDWU6wyiXwP5ipEJXt8BdeMIqNdseXBywtrkIouf+q/Bl9KLSWWpY0nvT?=
+ =?iso-8859-1?Q?j0r7myHPkC8a2UIDUiZWVIPtgeA6hWh2voO3qYq8L4xUrO3e/PwwrdSpK2?=
+ =?iso-8859-1?Q?X/U6jdplYeJYRTxZPwkFl+wsA9X1RE2eUWP8XiA3e2ZEpHSyJHfHfsSE9v?=
+ =?iso-8859-1?Q?gCjBlO7EB2RYeiOzB8ReO61BEI0YYUVr0DxCXj2PMKMLe5t824cKMg+/+j?=
+ =?iso-8859-1?Q?b2y9qeOTQ42+d/Ai/nu2YdqjpM4YEgxAz19KBoo36+sKoCm35R9YRAlxTz?=
+ =?iso-8859-1?Q?nGXTD7zJdPkJDNontoHm1pj456udC42oZr9gDZFJLHiDttBqzzYT4Unca7?=
+ =?iso-8859-1?Q?nUnsfIJJAtSqCTFGY3BuCyhj1CAIqSjP5bGd9vWCT5U44SINKKwZYT1CMb?=
+ =?iso-8859-1?Q?Y/P1bu6O93aZsL51suKdn/qO7h7mdrokBKYh8ydvgrhUcJW6FpHFyltnLs?=
+ =?iso-8859-1?Q?fqtYoem2ci7f40fPNw4WJudoZ6fBcsHZw71ATChuylHsSg04f20gXzMGt8?=
+ =?iso-8859-1?Q?HPF9egurl07ta45im9AUsCBSLFUG6HKdE67a9VAW5476FdHlgXAFD1WMC7?=
+ =?iso-8859-1?Q?acyXPvPpXBj8Qt3PDMx3zcP3PZq1qiFkr4ZdxX7DVNUZ3vgQe3eUowoCxd?=
+ =?iso-8859-1?Q?O8JeCzltySiSi7nFuo+heuCw+ItDY5P/Rb47rf6k+mZu0sNQIXsMt8FDZd?=
+ =?iso-8859-1?Q?MvFM4qeL3xj95ODXgo1eKTCB2vl3rzTOSy68GJ2prtiNGI08Yd2vkpQWrO?=
+ =?iso-8859-1?Q?oqaq1RHLH1wp4hMJ3cW+mbbwv0fSpneWfkJC2bT/fskD3CNEYmnEci8zEM?=
+ =?iso-8859-1?Q?HoeypRaCxngOXhXzYuoLNASWOmm8A6TlWXsEOs2BgIThyJi/5Wbyd6nzKn?=
+ =?iso-8859-1?Q?xRVwp9ZKEfqIOaHABh8JxErbDT3AtfKr5pkGPZ0VA7fv8QKsG/rb3sou/p?=
+ =?iso-8859-1?Q?LxeYLAe1rb+XxIziMP8GTQSLZKKgFYPZzipDBTa6FOrsxzbXryhZ0utBAU?=
+ =?iso-8859-1?Q?5UNvA7KFdBPIo+f/LouOX/8d2OzIg6G4pa163AuduNTuMFbvqO+7TydkwC?=
+ =?iso-8859-1?Q?sbVzx5YnyyNPZbbgqgl4HBYxJ5MmGf3CGSQxUvfnMxkzHQgtbItTCrm7WL?=
+ =?iso-8859-1?Q?Y1VvhBR9yPgbRi45oxk/CbZSIu8hGRZ4zZHEHopNbvd7QV93i0aCaAZZ5s?=
+ =?iso-8859-1?Q?1lgMIalvujLcIJI50u3UcCtZc0FT0Hjg8/ka6YMKHa2tmGjQ9xj7c74jlF?=
+ =?iso-8859-1?Q?XDwyb8QC7rvN+7oVo24WaghQGAqFbuQSCnhTq+y6EUnYzFsj2y9CFYzoKB?=
+ =?iso-8859-1?Q?LwLLudDtWpUKphLKTLLQubA7GbVG+nI/MmNqeOy8wj233mmKiYMUzjeH1v?=
+ =?iso-8859-1?Q?CUnHX6Grg3CO6LhHXPG+y0nokrLG2EQSq4bxxu/xBUP3kd2BwoAHiaItEb?=
+ =?iso-8859-1?Q?SBeZplIGVmni9thB3aRapEwILjAfxBt0z1t2GOEfXN7Uo6r0s6uAaN3+Il?=
+ =?iso-8859-1?Q?KE5MPQcrOd47+UF35pOK8CoCEvAh8Ts/G1SDXumMHx8w9bG/YwQOcTZz5Q?=
+ =?iso-8859-1?Q?nm8SzdOlkMcsjwEyMu5KMwLK4ux1oqEhGs3aGwZo3OyIP04DRKD/eASpmS?=
+ =?iso-8859-1?Q?3jotRs/4J/BWSuNwfQamQDUS3iLn2iXlZRplKj+lx/R1iLsNZazj3zVSLm?=
+ =?iso-8859-1?Q?dTxa6PzzucyetZpLv6QOR9eyy4rSaNXWYg5ffbqczGb7JpzDaaBCnSdS4R?=
+ =?iso-8859-1?Q?+lZLKmezKHeii7v9c3y1ezNo/4gfbVPsLELvW+HqUu/B/YOThd4DUkY0vT?=
+ =?iso-8859-1?Q?5305ORLd8g=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260511063005.38134-1-zhaoyz24@mails.tsinghua.edu.cn>
-In-Reply-To: <20260511063005.38134-1-zhaoyz24@mails.tsinghua.edu.cn>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 10 May 2026 23:54:35 -0700
-X-Gm-Features: AVHnY4Ic4M7f6SXQlN9sMIgnbx4Uj6isQ8OzNi8GIl2ydTasZYrS_kxOfsNW04Q
-Message-ID: <CANn89i+wKfikSrBJ+eatERFx+kC+vQV4WDTe9aCERiv9HtncDA@mail.gmail.com>
-Subject: Re: [PATCH net] net: core: dev: add reprocess depth limit for
- another_round in __netif_receive_skb_core
-To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stanislav Fomichev <sdf.kernel@gmail.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Samiullah Khawaja <skhawaja@google.com>, Hangbin Liu <liuhangbin@gmail.com>, 
-	Krishna Kumar <krikku@gmail.com>, Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>, 
-	Xuewei Feng <fengxw06@126.com>, Qi Li <qli01@tsinghua.edu.cn>, Ke Xu <xuke@tsinghua.edu.cn>, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 184F7508BC1
+X-OriginatorOrg: schleissheimer.de
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 92f0b3b4-6197-41b8-f508-08deaf2abd6b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 May 2026 06:58:43.4614
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: ba05321a-a007-44df-8805-c7e62d5887b5
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: uWe302CTxmCob78PK3GxNgjrzfw0zu/0nPi+Wt05jRvvCQdnxO0eXU4Y9kkguAWGDHITqjdka4cn93JRwP8yrjAvdRvHQeAjdXgmmji846E=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BE1P281MB2307
+X-Rspamd-Queue-Id: DAAB0508BEE
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+X-Spamd-Result: default: False [0.44 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_DKIM_ALLOW(-0.20)[schleissheimer.onmicrosoft.com:s=selector1-schleissheimer-onmicrosoft-com];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[schleissheimer.de : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-286463-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286462-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,redhat.com,gmail.com,google.com,mails.tsinghua.edu.cn,126.com,tsinghua.edu.cn];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[schleissheimer.onmicrosoft.com:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tsinghua.edu.cn:email,z.ai:url]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[schuchmann@schleissheimer.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:email]
 X-Rspamd-Action: no action
 
-On Sun, May 10, 2026 at 11:30=E2=80=AFPM Yizhou Zhao
-<zhaoyz24@mails.tsinghua.edu.cn> wrote:
->
-> In __netif_receive_skb_core(), the another_round label can be reached
-> via a TC ingress redirect (bpf_redirect_peer returning -EAGAIN).
->
-> Across network namespaces, two BPF programs on peer devices can redirect
-> packets back and forth indefinitely, creating an unbounded loop that
-> monopolizes a CPU core in softirq context. This leads to RCU stalls,
-> soft lockups, and system-wide denial of service.
->
-> We reproduced it by creating a pair of TC BPF programs across two
-> network namespaces that redirect packets to each other, and the RCU
-> subsystem detects a stall:
->
-> ```
-> [   24.835219] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-> [   24.835837] rcu:     (detected by 0, t=3D21002 jiffies, g=3D-627, q=3D=
-2 ncpus=3D1)
-> [   24.835959] rcu: All QSes seen, last rcu_preempt kthread activity 2100=
-2 (4294691810-4294670808), jiffies_till_next_fqs=3D3, root ->qsmask 0x0
-> [   24.836239] rcu: rcu_preempt kthread starved for 21002 jiffies! g-627 =
-f0x2 RCU_GP_WAIT_FQS(5) ->state=3D0x0 ->cpu=3D0
-> [   24.836362] rcu:     Unless rcu_preempt kthread gets sufficient CPU ti=
-me, OOM is now expected behavior.
-> [   24.836460] rcu: RCU grace-period kthread stack dump:
-> [   24.836601] task:rcu_preempt     state:R  running task     stack:15448=
- pid:15    tgid:15    ppid:2      task_flags:0x208040 flags:0x00080000
-> [   24.837139] Call Trace:
-> [   24.837568]  <TASK>
-> [   24.838008]  __schedule+0x4ed/0xea0
-> [   24.838934]  schedule+0x22/0xd0
-> [   24.839023]  schedule_timeout+0x81/0x100
-> [   24.839095]  ? __pfx_process_timeout+0x10/0x10
-> [   24.839165]  rcu_gp_fqs_loop+0x11b/0x650
-> [   24.839226]  ? __pfx_rcu_gp_kthread+0x10/0x10
-> [   24.839282]  rcu_gp_kthread+0x17e/0x210
-> [   24.839333]  ? __pfx_rcu_gp_kthread+0x10/0x10
-> [   24.839383]  kthread+0xdd/0x110
-> [   24.839433]  ? __pfx_kthread+0x10/0x10
-> [   24.839481]  ret_from_fork+0x1aa/0x260
-> [   24.839538]  ? __pfx_kthread+0x10/0x10
-> [   24.839585]  ret_from_fork_asm+0x1a/0x30
-> [   24.839686]  </TASK>
-> ......
-> ```
->
-> Fix this by adding a depth counter at the another_round label. When the
-> counter exceeds XMIT_RECURSION_LIMIT (8), the packet is dropped. This
-> follows the same pattern as dev_xmit_recursion() which protects the TX
-> redirect path with the same limit.
->
-> Add SKB_DROP_REASON_RECEIVE_REPROCESS_LOOP for observability.
->
-> This issue was found and reproduced with the assistance of GLM 5.1 from
-> Z.ai, affecting stable versions from v5.10.
->
-> Fixes: 9aa1206e8f482 ("bpf: Add redirect_peer helper")
-> Cc: stable@vger.kernel.org
-> Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-> Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
-> Reported-by: Xuewei Feng <fengxw06@126.com>
-> Reported-by: Qi Li <qli01@tsinghua.edu.cn>
-> Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
-> Reported-by: GLM 5.1 from Z.ai
-> Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-> ---
->  include/net/dropreason-core.h | 6 ++++++
->  net/core/dev.c                | 8 ++++++++
->  2 files changed, 14 insertions(+)
->
-> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.=
-h
-> index a7b7abd66..f0f420f39 100644
-> --- a/include/net/dropreason-core.h
-> +++ b/include/net/dropreason-core.h
-> @@ -130,6 +130,7 @@
->         FN(DUALPI2_STEP_DROP)           \
->         FN(PSP_INPUT)                   \
->         FN(PSP_OUTPUT)                  \
-> +       FN(RECEIVE_REPROCESS_LOOP)      \
-
-I do not think we need a specific drop reason.
-
->         FNe(MAX)
->
->  /**
-> @@ -622,6 +623,11 @@ enum skb_drop_reason {
->         SKB_DROP_REASON_PSP_INPUT,
->         /** @SKB_DROP_REASON_PSP_OUTPUT: PSP output checks failed */
->         SKB_DROP_REASON_PSP_OUTPUT,
-> +       /**
-> +        * @SKB_DROP_REASON_RECEIVE_REPROCESS_LOOP: __netif_receive_skb_c=
-ore
-> +        * exceeded max reprocess loop iterations (another_round).
-> +        */
-> +       SKB_DROP_REASON_RECEIVE_REPROCESS_LOOP,
->         /**
->          * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
->          * shouldn't be used as a real 'reason' - only for tracing code g=
-en
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 831129f2a..376b595b3 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -5958,6 +5958,7 @@ static int __netif_receive_skb_core(struct sk_buff =
-**pskb, bool pfmemalloc,
->         struct net_device *orig_dev;
->         bool deliver_exact =3D false;
->         int ret =3D NET_RX_DROP;
-> +       int reprocess_depth =3D 0;
->         __be16 type;
->
->         net_timestamp_check(!READ_ONCE(net_hotdata.tstamp_prequeue), skb)=
-;
-> @@ -5980,6 +5981,13 @@ static int __netif_receive_skb_core(struct sk_buff=
- **pskb, bool pfmemalloc,
->         pt_prev =3D NULL;
->
->  another_round:
-> +       if (unlikely(++reprocess_depth > XMIT_RECURSION_LIMIT)) {
-> +               net_warn_ratelimited(
-> +                       "%s: reprocess loop limit reached, dropping (dev=
-=3D%s)\n",
-> +                       __func__, skb->dev->name);
-> +               drop_reason =3D SKB_DROP_REASON_RECEIVE_REPROCESS_LOOP;
-> +               goto drop;
-> +       }
->         skb->skb_iif =3D skb->dev->ifindex;
->
->         __this_cpu_inc(softnet_data.processed);
-
-Can we please try to fix this issue without adding yet another cost in
-the fast path.
-
-Presumably this could be done before one specific "goto another_round"
+At this time the driver is not listing any speeds=0A=
+it supports. This should be ETHTOOL_LINK_MODE_100baseT1_Full_BIT=0A=
+for DP83TC811. Add the missing call for phylib to read the abilities.=0A=
+=0A=
+v2:=0A=
+ - Fixed subject and added fixes tag. no code changes.=0A=
+=0A=
+Fixes: b753a9faaf9a ("net: phy: DP83TC811: Introduce support for the DP83TC=
+811 phy")=0A=
+Suggested-by: Andrew Lunn <andrew@lunn.ch>=0A=
+Signed-off-by: Sven Schuchmann <schuchmann@schleissheimer.de>=0A=
+---=0A=
+ drivers/net/phy/dp83tc811.c | 1 +=0A=
+ 1 file changed, 1 insertion(+)=0A=
+=0A=
+diff --git a/drivers/net/phy/dp83tc811.c b/drivers/net/phy/dp83tc811.c=0A=
+index e480c2a07450..6492b60d1f7d 100644=0A=
+--- a/drivers/net/phy/dp83tc811.c=0A=
++++ b/drivers/net/phy/dp83tc811.c=0A=
+@@ -392,6 +392,7 @@ static struct phy_driver dp83811_driver[] =3D {=0A=
+                 /* PHY_BASIC_FEATURES */=0A=
+                 .config_init =3D dp83811_config_init,=0A=
+                 .config_aneg =3D dp83811_config_aneg,=0A=
++               .get_features =3D genphy_c45_pma_read_ext_abilities,=0A=
+                 .soft_reset =3D dp83811_phy_reset,=0A=
+                 .get_wol =3D dp83811_get_wol,=0A=
+                 .set_wol =3D dp83811_set_wol,=0A=
+--=0A=
+2.43.0=
 
