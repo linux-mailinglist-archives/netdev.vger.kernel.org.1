@@ -1,543 +1,315 @@
-Return-Path: <netdev+bounces-286844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286845-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QLFXJT5aAmosrgEAu9opvQ
-	(envelope-from <netdev+bounces-286844-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 00:37:50 +0200
+	id IHf7F5dhAmposAEAu9opvQ
+	(envelope-from <netdev+bounces-286845-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 01:09:11 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18D7D517026
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 00:37:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3A6951726A
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 01:09:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D71D93007E0A
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 22:33:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A6E8C3019917
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 23:09:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F0313446A7;
-	Mon, 11 May 2026 22:33:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15B77356759;
+	Mon, 11 May 2026 23:09:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MMU8nVJY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aCJHZAyH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CD7D285072;
-	Mon, 11 May 2026 22:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 872EF34DB46
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 23:09:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.172
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778538818; cv=fail; b=lif5xerIM8QmMwqaeWfevzSUJTefGzZLzEyLev12du/vwLK5X4fSIC3nMB90M+QPmQBaLIak2em5shkQaKPhQUY56fQRjVl/pBH4LVPs1i8VkiyTTXIFaYdKZ+GVyEz3NZLc+slFiOtssI6dP+FqDYrdtZ0Cluy1KeILvUfz0HU=
+	t=1778540948; cv=pass; b=MdztayFJk6nxGjebTaOhclT5Klquwwgq3X+pdfx9QeGZDPSlSQLSC85IRnLiTPPxi5pAX+Xg3ZyxrBdY1lQ9i5YXhFU99U1R+yDspUrTPpKhk8ggpfHBRnLCpWD/YnAPhCWKxpUF06AXJHXZCmnyC1lNtJzMxTEC4YNSAEsS2vQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778538818; c=relaxed/simple;
-	bh=QE7gH2yY0EhB8YKn9MNMI3eD4jZN+DkPQO+8/R/nX3c=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=E7TQdXQC3vKchjdxbBhGb6iJGSVIZWBl5YiwOT5IS23nKSiK5FV3IudUN1SsXTkyYp5b52lkOHLbSiq64C9nyNpHG9VUc+nO0k/78hfBbC6jmZrA1a2I7zx4OrZbD5pIreQX204w8/qkwp6D5XVuFjZLghsQATNwbfbYLTkD0ks=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MMU8nVJY; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778538816; x=1810074816;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=QE7gH2yY0EhB8YKn9MNMI3eD4jZN+DkPQO+8/R/nX3c=;
-  b=MMU8nVJYsdpcU34BirrWD2q35M6Z+OzIx/cBmog1b/Yp+PSWX1FamfxQ
-   YR91pNyd1HZsI+f4G1mIbEmWahdGxZjKBgojJOphoTqtqRS+58NK/pFsU
-   Oi5dtiE5W6Uuj6OAaDfEGw171o57ETQeYpGLDiH0bz2xtAgLSDsDt2EqE
-   183ZHn1UdFtLkkSQ1p5AzFutnKD9iscgllYJ58oeZ3H4ARoi0SOwro7th
-   /nKgs68Uhz4CTrYopln+c8OJhuA30n/wY2kIXAyfdhgzbpeEf3qCOMfXB
-   GL8ynXCH43wzj4AinAOzlDZhmrYT6P13xelERzw/W3NG/+/pnYi+2LvU+
-   Q==;
-X-CSE-ConnectionGUID: vMkZKEfFSvuRAidN4lAKQA==
-X-CSE-MsgGUID: MVsatBXIQ1mXTzvi3dJquA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11783"; a="78470181"
-X-IronPort-AV: E=Sophos;i="6.23,229,1770624000"; 
-   d="scan'208";a="78470181"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2026 15:33:35 -0700
-X-CSE-ConnectionGUID: R5UckUT2ShKjAJOC3LH2ug==
-X-CSE-MsgGUID: Z06nlBfkReqhacAp+GUxHQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,229,1770624000"; 
-   d="scan'208";a="242552228"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2026 15:33:35 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Mon, 11 May 2026 15:33:34 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Mon, 11 May 2026 15:33:34 -0700
-Received: from BL0PR03CU003.outbound.protection.outlook.com (52.101.53.21) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Mon, 11 May 2026 15:33:33 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TmcidQe83LTyQ05Eb6nEUd95Vc+KpLIom5J5iQo4QI1W8Owo5S4L0iuzYL556xTALkKZ1fiqLY6c0OQ9JRsX5J5kR/+Nssl650aVvY/XT0UfncrM67zdEEyo/jvHlfx60LcpyxScYKlGCAUHfXdnu9ld58ao5sEI6AQ7qEfREJJRVbw6gRs2vhgRTFrOSNesqhdHX4Ocmj9zlp9NQXWZ6Do/en5/GTJ+jMXPHEEPP8gcxlKu5vYhCzrxyTwT2QsOyjpDreOW+3Op9Sy6MeDq3q3+XtwmHpEcU/L2M3j1Jb3oR97XmlW+yYRPHLMCyOwqVrPYmrqw49H8kCADHvKSYg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6/KnOzJO2Jz9QGcD9V9l+zmm5hGA48MbBKV0M9wTgHk=;
- b=MxqZWzfEH82Qf48X8xI9vo7h/mTvEloJRKbVZvsBxZ6B0zXcbb/I+qNYPA6daZY6OR0JaOrU8/HHtSYA/qYirbxGiXCreMMe2jjIzvuSfES7OwTdaCosfOcjg+/gconH2ECQmyShNNTEtJWEhtnTGiZCGcuCHCI5uz+/nbL3JSEUH0OyD3izpVXY0GPW7JY7gv/f1lHz/sd6na+6kxPmz73m2w3WuhVPrp8G12mfG4PY2CHIUyinX1ZO0YZpvQQnliLsc74d2y9gvXmCb3UNHCnjqlPeQvALcK4bfEIdUUXEx/1cc9+QLTAAqRQVUHpwZawh4GPi+3xQoTfQzQa7bQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM4PR11MB6240.namprd11.prod.outlook.com (2603:10b6:8:a6::6) by
- SA1PR11MB6614.namprd11.prod.outlook.com (2603:10b6:806:255::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.23; Mon, 11 May
- 2026 22:33:27 +0000
-Received: from DM4PR11MB6240.namprd11.prod.outlook.com
- ([fe80::a89f:ee6c:3596:df18]) by DM4PR11MB6240.namprd11.prod.outlook.com
- ([fe80::a89f:ee6c:3596:df18%5]) with mapi id 15.20.9891.021; Mon, 11 May 2026
- 22:33:27 +0000
-From: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Vecera, Ivan"
-	<ivecera@redhat.com>, "vadim.fedorenko@linux.dev"
-	<vadim.fedorenko@linux.dev>, "jiri@resnulli.us" <jiri@resnulli.us>,
-	"edumazet@google.com" <edumazet@google.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "richardcochran@gmail.com"
-	<richardcochran@gmail.com>, "donald.hunter@gmail.com"
-	<donald.hunter@gmail.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "Kubalewski, Arkadiusz"
-	<arkadiusz.kubalewski@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "horms@kernel.org" <horms@kernel.org>,
-	"Prathosh.Satish@microchip.com" <Prathosh.Satish@microchip.com>, "Nguyen,
- Anthony L" <anthony.l.nguyen@intel.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "davem@davemloft.net" <davem@davemloft.net>
-Subject: RE: [PATCH v7 net-next 6/8] ice: implement CPI support for E825C
-Thread-Topic: [PATCH v7 net-next 6/8] ice: implement CPI support for E825C
-Thread-Index: AQHc2IZbVc2vlnwSZkuSN6FqUMUqjrX7AnUAgA54reA=
-Date: Mon, 11 May 2026 22:33:27 +0000
-Message-ID: <DM4PR11MB624059E5E04A849185185C7292382@DM4PR11MB6240.namprd11.prod.outlook.com>
-References: <20260430094238.987976-7-grzegorz.nitka@intel.com>
- <20260502173314.3849725-1-kuba@kernel.org>
-In-Reply-To: <20260502173314.3849725-1-kuba@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM4PR11MB6240:EE_|SA1PR11MB6614:EE_
-x-ms-office365-filtering-correlation-id: 48ea8ad6-9135-42d6-ab18-08deafad51e0
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016|38070700021|56012099003|18002099003|22082099003|11063799003;
-x-microsoft-antispam-message-info: L+HaiCDa5Z99FGrGyWQzCFxy8+Ln0/JQJN8Kxdv93+3VUSDNH8qn76dpFuKjp+2MUXnCY71ni4HNFb5K6SRazR7PkOYpopoEBBznQNfaaC4y+wQA3i1CFX35LYDOJ3Obr1cK+O7DNB5cfedx70OX7k2yT8+hq9IGe/ROUwwMBzkvZpDcTQ9lDHgMLykC0LPgCahXq9irw3EH6/olBu+YZDzfQ41twHDZMhmfmKFAXjQVfOHg2mQo7rQ81pH4LRZmvb4xfQK98SIuaOGS53fA7gJtNVXTa2JNJYXCU/Fq6KcStUngxbO7U9St8v9G3DDJvGhdxiGjWP+odc50KbsGYEdcolKsFHVyBLHCdyOTUWYoOZZrP8ZqkvtR2ek89LePMTbvtLTj0yLqL52POTuZ/c8SR4mV7MKSpFGt+aOYo/uFecWdlJVn31qADcrrKwJT2uCFPpsTmnAdO28+JgXq2cEYU0DFggVRGqIXKEnGvdpNtJol667/IEpHQ0tfKpGZB2/lE6gLP5vkEzXkKs+4xQlZbWCfqcV2f1JsKl3dY9X1nQ/r6hfbH2YGDklRahDxRBfsEeZLiIAoDVbOUe/5XRg67ONujOPmv7nIr1et/JlijDfzMkWe7YJQBBs9hO5pj2u2/nWNOiOs0ys1KxqMM0Egk8Nntci4nnW89ozdX2BRozSmzjdyDI+wYxkeY/V3ZEx/ac+QTBF7gHqKwmXa41LMZ1+0zeWVHURf2mSryWreTNMPGuEotJP3LTyhfZAp
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6240.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(38070700021)(56012099003)(18002099003)(22082099003)(11063799003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?hI9DqicSS8nxrGcbLNw7E2B8ZL8Fw4zOPi/elODfXiJEcXSJckzYQav8+Y1Z?=
- =?us-ascii?Q?APyFEGvAUvCcF9T95KZ7W7kNUqDgBvQ3zc/qHHoeqN0Uiq0T1u6d3jg+QSqc?=
- =?us-ascii?Q?olvlUj48Crph8OZidMy5VUZAOgRUF89kkoMk/8PEQcG4vlK2cDKwbKktY0I7?=
- =?us-ascii?Q?fpflRupwAIJfRXQ4T4kMwvLMiPdx7Z8mv56xkBp+mCymXPsDH2+wdYWfETFn?=
- =?us-ascii?Q?huzrS/oktCS9mprGC7ERUF8h7EKOjx8d3NZ2VEdEw+F51RIaJCHxrnU5a9/4?=
- =?us-ascii?Q?gx6AwTizhwbZ1nVwTFT72zWjKVHcK6QXxZPD3cEyfRvr0V9QwXotFkgmCQJu?=
- =?us-ascii?Q?qBCrikxgn+ktryzJoyUrW00lbrxHvROQDxKn7FWii5wcFyKMmVtwW6upf+JY?=
- =?us-ascii?Q?hdkUZ6Gfw0I7VDrdWblEYoVr59mBca4woezTTM7xBx1IjjzhT2/cdTRRvSLy?=
- =?us-ascii?Q?NO6nkLsPa6iW5Q4m9jLOXNOv11TgYnRD6EfE/sj7UubU84pPvXtGPmndTFKj?=
- =?us-ascii?Q?A+x6iztvIljnDp+WlbsCI6JPDJzntJl0YlIJ2Xh0IunKZqlgIAZE5d6P3f2D?=
- =?us-ascii?Q?ZVdVDyhwVDOdfwGA8emQ+IusUO6XktDjdopf5eLrutTnw3cy5bAbhF5JBN+r?=
- =?us-ascii?Q?iIjPf5pfQYuJRz0H1+utcy2dedhxTJDKzKou4gANqDF6jiQwa9hMbB3oFiqE?=
- =?us-ascii?Q?0nfSb7iuatmhpkDlcdec2mqnLfqhZGWyoTBcfzsBt03HPWrzi8ythMEb51qx?=
- =?us-ascii?Q?tZLGuXo7eOgPFu5ne8Q5JX8qYiYbIG2lVtBg3bCiK32s7JvIP9KFnRUoiyBU?=
- =?us-ascii?Q?wddtwg3igtENdia3iTHEgDOZTUibXb4p0wgvBg5ZSMyBslGbk8yVkdZQmKsP?=
- =?us-ascii?Q?uL4h14gFoFq47CiT1JuYFkYN5R05Q5MieMpdmyNRiAg+uvpzdrE4ZN6sMriu?=
- =?us-ascii?Q?KXDoHT/56Eamz4rWNCkHtXOG0wk/azctd0WvbNymNX0P2Zo7klN4hSGdpXlZ?=
- =?us-ascii?Q?5UQaGPXf0YT6EIehMdN9B0gf0h6zG7zBPnpuTxgoxYH26uqAUbd4N8UN5Dcg?=
- =?us-ascii?Q?rxwJkm2iNli/EhwrIUkJ8ZPaHu5LqgidLli5LId+V60wUdO2ACDHFto0JD5r?=
- =?us-ascii?Q?5UlyiCqbHEKbP8m/QKRPt5aykezLeBPsNs9+oLumFTzBW/sUiqsnLnpI/tc5?=
- =?us-ascii?Q?zswvIU3rj7XvG1iBrZOGX1YArtZRoLT1s9tbDKM1HSS/m0ronxbQ1HJRqnmc?=
- =?us-ascii?Q?KEVsu8SHUiNc8w0/SY1q4F/ICSytOsqvfopCoKlInIIJNtHj24dRZjz9HwP3?=
- =?us-ascii?Q?Xzd2W1fgTOSFwm7e+eIfoackxpd71+LUAfErxeADC6xKTcEPRY0rEbLpMRVi?=
- =?us-ascii?Q?kEyfBUqDhl6UJ6l1yLEC6yw38oquqGDs/6EHYGgDO5YbHgR1aEcIga2FZV+a?=
- =?us-ascii?Q?cLR5O/lm6rmA6633YXCcgCcD0I239X2olCdsjFSzPafSgvBq+dvO4GbUwEPq?=
- =?us-ascii?Q?hxhAMhIN0AsYFNJMRgziHjEimSMbsyz/Zt6itzr0IifLKWj+4cTIEd9++DDM?=
- =?us-ascii?Q?muLa/pvmF9FBN/OhFC7MS++UgXKSfA8CZcjidmWFm2pofw7X3HOyVifbsNRP?=
- =?us-ascii?Q?USuhJBKhRk7OTmcTbxk5Pd3g1dHLY691tZqijiDB+++txvgZ5D7YipqglCLa?=
- =?us-ascii?Q?fhkhN0YR/VpWBYsr+x04Q4+yMnLcF082pzqV0XD2FO/8spRLuWhmYw4aqGwB?=
- =?us-ascii?Q?Hhhj/DIj0A=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1778540948; c=relaxed/simple;
+	bh=cNsdw7g/MrqmszFIbkH6/LfQ50TlmEUmn8TbKqKMgN0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dDJz3PLiODVNB+2S1cbDc8wZzjFci0pn0m1eg+oucW51bFJ0svX9M+VJQRXxUUCjsaSDupAuz9IEO9FDw41TVNYG/vGIRNIZwvp55Oawc3QxO93hzeglrdG+A1dytF/uW+yE81h+Co5t1PiKI72BQw7gFBd45qy9a/U06UDwyDc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aCJHZAyH; arc=pass smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-7bf0b47d2f1so45466177b3.3
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 16:09:06 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778540945; cv=none;
+        d=google.com; s=arc-20240605;
+        b=O9G20VQUZbOcvmsIZwEpZ7NyMPb9rPY5QQfh3Y9GvyQdbbCDf9pTJzRZ3/fnQgaI6l
+         lTynfErnHL2c3vido0TBsC6RYVoM95sdeNc3YtvPxrwPQKL7T9U2R0TsqVtM0eWo+snz
+         Rw5CcIG5L0aDsaLaiOk0asvX8pnaxDJ2EFG6afyb81B6dC2wlx93z80iDeSqdUU0gWEv
+         sp2MGNiU7RB6648ZFZ3wtsudTssYCF+4bIC6OU1rxNUIXbPD5AhGGarHjsdksGBe4/EK
+         cWXjKXF1IaPFrupNWRw5js/cGbm64P/qe0NsVkijRn/Xx6pbKTJdJbof/u8fjg8+z95v
+         eZ1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=PXC3S4tQXXBF/WZfZZtgdixtBOfU7xmOv6VXX9PDdSY=;
+        fh=eE/lC2T1dPqvX4yxO0hh5+LrW0OLUTRZUyf3dt4vd6U=;
+        b=ZpaHMs1SJ40pTjT0TlXbrTPDsn/tqV5WzU5bMMui3jDCbJpdEcakhmseLfj6inbvk3
+         5KQRWa2c5M33Ij36d3jip1TmyfTGcagyIumQshAmAC6Z2nvcE9KTV9bu4ndfWyDDUGQl
+         TpeDqsihi6VyI94ckQzMYVYAP/szQJq8lguWKxTGdzEL27PcAigqWb+uXNxz9s3rFR53
+         zygkBoyCc/BaG0dftq9u4+yeA4SRgSYg46zxFHMSNNpcrYMD+Csjv3ARByFNmPinVX/W
+         WwCT5BGQVQ0do/5iAGSS5IJd6bYtrrzd2fFZogqnM06V4pdHvoiI3wkuG0sCbzCzQw9S
+         Rt+A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778540945; x=1779145745; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PXC3S4tQXXBF/WZfZZtgdixtBOfU7xmOv6VXX9PDdSY=;
+        b=aCJHZAyHOC4DFFv91nL3emV+PxxlwaBrJNr5vho0nSYUw2lUcIngid1E8WwrBXBoqZ
+         21Lr7Ht0eiV1FGJsDLkxg8oQav4GTGUqZ2qH9xdESmNuTqI7JLCLeGBEZwAoZKoW9qxi
+         Wci+JjCgZKU1wYFWfZ86+iC5F6xGL7t2+PQCvqau34nTQ7DykDmUF89+KkxCDox0mMsg
+         9CzIWxi4XZHL7BqIUeFROYEts8kyUlmxN898Puyq+HoQaPvSpnm88fIeBjQtvTcswQs4
+         F0+XkIIaqPNDBdOPtp0vy6BHyRCm+ihSoKcKUvJe6mbtcfw/ZjFxfdcB4umB/lQULgAY
+         hezw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778540945; x=1779145745;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=PXC3S4tQXXBF/WZfZZtgdixtBOfU7xmOv6VXX9PDdSY=;
+        b=N+lrK4l5tFY2HHpH7LnaIjXY5PhoY9ytA3t1jEUO+b/BhgHv6HLsb0OE8vLtozBmi/
+         BNog09QmUMUrnus8SUPuuaY/YYaK0v3jHc3pnKF5URtB4l4WtjRJZCJMcbwOgpP//pa1
+         q7N8n0GS0CQpQ+GW9oPF3l7IUsnifSV3k6XiDZ1Ob+GBSHwyj469Ez28K+JnPCQbuoGJ
+         DZriu8H+6Ie39hgf0Diuk9UI6Xw7l54qetDUu8ohUuMzFiZyjj7jcWyGD4/0tsXu0csc
+         ADfJeKSSCyHVntHuGoklze7sggua8SGjDGNIWdUhFUodbwKQN+ELcHZydcaqR3A7EaDb
+         P6kA==
+X-Forwarded-Encrypted: i=1; AFNElJ8noBMZY16GlWTTNo6jgTWPyJtDwHgzupau/WI5ciB7dyiZJGtroaB7Q9TtchRG3Z0R7heqgWs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzALWPshI+kiaTdJGBMgEdtfVV07KXuQgUZn/fyR207CXG8GgiP
+	T0LQACc74ThFUbyJwNvzQ1kMtdydr82o2/D3BGcYE261xGthR+Ji3NAiqeKdMrSxI3dhx7RvPrV
+	YdAS0mBl+l8TbY4jRd0yvmGMB7T5H7UAWQ4QG
+X-Gm-Gg: Acq92OFqoa9g+7kOQL5otw8e6Dwb/eh+XPKYbyP8yc1uNBfvJk+Evzx3m8wmesNx/SE
+	JLXHvNBGt7Sk6jbSuyjcXd/otA1dbl+ghTELEO7vIgDkgl1HupaX1nNPjoxa3uzc8SAD8s6kMI2
+	NhytgTTcxSczSJqG+koN0W32OrtSL3kTmdAsfQ8VXL/s3vosfqOaVMlWk/JH7v0H5vS08omGOM9
+	kcuzLIrw6bNaDenX30clC4Yy8znJrw3OmT7rAz/e29NpZwVzln5tbk9jgcgcBVDED13l7yPi7r4
+	zy4s3u59KzdrldRlxJfh
+X-Received: by 2002:a05:690c:97:b0:7b3:6c50:2e8f with SMTP id
+ 00721157ae682-7bfb9f8eccbmr164762087b3.41.1778540945359; Mon, 11 May 2026
+ 16:09:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: ZJpLMWJSJsztTXJrLzWI5o0D8z34GrflPrLNgu1woBIV06kkromQgahRfykuLcAqmZTnL5gXaF3EFz1bq/4IqTzDqtbG9qvV1t4NvePMLCSAuq/8vb/EjgWgGAP8tqrC7U3UXRn2jl8ptPbVTpaQp347IqHNH8xOCKMEWP+zcvzpXV19osmFXgGqX1F3c1Knu7FPAYPp9/IyyDNrla5Y93KRGCoQdCsKdxj4+l71DlG/ME9cqcIrPnyxZ/4tiESw0Z6qscID6T/fIhBiW3XhfwmoXaP4C3Gy/hXlh9EbsJnyo51vqNYM42zDaxlYO/i9XPW2lLCAjfi/KlkEFuJVIg==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6240.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 48ea8ad6-9135-42d6-ab18-08deafad51e0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 May 2026 22:33:27.0482
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Lpmk935kJzQyCN888uUJfXEVWjXetiZoboIwkq5M8G5UQxib554yjAPqL6kosOCdBKsaj/88J7ys8HZS8gqaxiI5dnicpIlBRrTfd8iP/FE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6614
-X-OriginatorOrg: intel.com
-X-Rspamd-Queue-Id: 18D7D517026
+References: <20260507095330.318892-1-tariqt@nvidia.com> <20260507095330.318892-3-tariqt@nvidia.com>
+ <CAMB2axOFQN2f=veYgeJs+4tbZmb9PuNHk03TH_bmE8UL_REd7w@mail.gmail.com>
+ <b1d3f9bc-a5d7-4236-8bda-49e6327ee533@nvidia.com> <CAMB2axPNhveQaDPs-ttu4uFcpvAfJCdzJ3d05HWQf4+p7uVUsg@mail.gmail.com>
+ <70d0b319-178f-4233-b0da-9618489a1dd6@nvidia.com> <CAMB2axPdqBUORn7Qy35Xccqbn+8aArZ-weegZyz=j0STh+iPNA@mail.gmail.com>
+ <6b7998e7-b2c1-4650-9564-679d647146cf@nvidia.com> <ef926d49-81d6-4d26-8d74-440d4a6bb8b1@nvidia.com>
+In-Reply-To: <ef926d49-81d6-4d26-8d74-440d4a6bb8b1@nvidia.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Tue, 12 May 2026 01:08:52 +0200
+X-Gm-Features: AVHnY4KLKD6htIEllFdI8dqPO2D1AdH38X59DFCpiZ_6MmShTen909W_j38aiKs
+Message-ID: <CAMB2axN6USwsGaUQWkL52G=9V=kSe2La_gE-ppOFLWbPCnaVKQ@mail.gmail.com>
+Subject: Re: [PATCH net-next V6 2/3] net/mlx5e: Avoid copying payload to the
+ skb's linear part
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>, Christoph Paasch <cpaasch@openai.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Alexei Starovoitov <ast@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: B3A6951726A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286844-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,linux.dev,resnulli.us,google.com,intel.com,gmail.com,lunn.ch,lists.osuosl.org,kernel.org,microchip.com,davemloft.net];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	TAGGED_FROM(0.00)[bounces-286845-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[nvidia.com,openai.com,google.com,kernel.org,redhat.com,lunn.ch,davemloft.net,vger.kernel.org,iogearbox.net,gmail.com,fomichev.me];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[grzegorz.nitka@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
+On Sat, May 9, 2026 at 11:51=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com=
+> wrote:
+>
+>
+>
+> On 08.05.26 20:42, Dragos Tatulea wrote:
+> >
+> >
+> > On 08.05.26 19:44, Amery Hung wrote:
+> >> On Fri, May 8, 2026 at 2:15=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia=
+.com> wrote:
+> >>>
+> >>>
+> >>>
+> >>> On 07.05.26 22:50, Amery Hung wrote:
+> >>>> On Thu, May 7, 2026 at 4:50=E2=80=AFPM Dragos Tatulea <dtatulea@nvid=
+ia.com> wrote:
+> >>>>>
+> >>>>>
+> >>>>> Hi Amery,
+> >>>>>
+> >>>>> On 07.05.26 15:53, Amery Hung wrote:
+> >>>>>> [...]
+> >>>>>> Am I understanding correctly that the better performance comes wit=
+h
+> >>>>>> the assumption that the XDP does not change headers?
+> >>>>>>
+> >>>>>> headlen is determined before the XDP program runs. If it push/pop
+> >>>>>> headers, there could be headers in frags or data in the linear reg=
+ion
+> >>>>>> after __pskb_pull_tail().
+> >>>>>>
+> >>>>> That's right.
+> >>>>>
+> >>>>>>>                         if (__test_and_clear_bit(MLX5E_RQ_FLAG_XD=
+P_XMIT, rq->flags)) {
+> >>>>>>>                                 struct mlx5e_frag_page *pfp;
+> >>>>>>> @@ -2060,8 +2066,7 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct m=
+lx5e_rq *rq, struct mlx5e_mpw_info *w
+> >>>>>>>                                 pagep->frags++;
+> >>>>>>>                         while (++pagep < frag_page);
+> >>>>>>>
+> >>>>>>> -                       headlen =3D min_t(u16, MLX5E_RX_MAX_HEAD =
+- len,
+> >>>>>>> -                                       skb->data_len);
+> >>>>>>> +                       headlen =3D min_t(u16, headlen - len, skb=
+->data_len);
+> >>>>>>
+> >>>>>> headlen - len can underflow but will be capped by skb->data_len, s=
+o
+> >>>>>> this should be okay, right?
+> >>>>> It is safe. But it might trigger an extra allocation in the pull wh=
+en
+> >>>>> len > headlen. We could also skip the pull in that case. Or do a
+> >>>>> min(headlen - len, min(skb->data_len, MLX5E_RX_MAX_HEAD)). WDYT?
+> >>>>
+> >>>> Make sense, but this line took me a bit to understand. Maybe conside=
+r
+> >>>> checking len < headlen first?
+> >>>>
+> >>>> if (len < headlen) {
+> >>>>         headlen =3D min_t(u32, headlen - len, skb->data_len);
+> >>>>         __pskb_pull_tail(skb, headlen);
+> >>>> }
+> >>>>
+> >>> Yes, that's what I had in mind when skipping the pull. I would also
+> >>> tag this as likely.
+> >>>
+> >>>> Another clarifying question. So this patch will improve the
+> >>>> performance when the XDP programs don't change header length. For
+> >>>> those that encap/decap, they should precisely pull only headers into
+> >>>> the linear area for optimal performance. Is it correct?
+> >>>>
+> >>> Right for encap, but for decap not quite:
+> >>>
+> >>> Let's say that the XDP program pulls 64B header into the linear part
+> >>> and snips 4B of the encap out. This would result in a pull of an
+> >>> additional 4B (headlen (64B) - len (60B) =3D 4B) which are now
+> >>> data bytes =3D> sub-optimal layout.
+> >>>
+> >>> I don't see how we can improve this corner case though.
+> >>
+> >> I see. Thanks for the clarification.
+> >>
+> >> I think the "if (len < headlen)" makes too many assumptions about what
+> >> the XDP program did.
+> >>
+> >> How about this policy instead: If the XDP program did not create/pull
+> >> data into the linear area, pull the parsed headers; otherwise, assume
+> >> the XDP program owns the geometry. min() is still needed since the
+> >> program can shrink the packet.
+> >>
+> >> if (!len) {
+> >>         headlen =3D min(headlen, skb->data_len);
+> >>         __pskb_pull_tail(skb, headen);
+> >> }
+> >>
+> >> This preserves the optimization for the default no-modification case,
+> >> and most importantly allow XDP program to get the optimal performance
+> >> if it gets the final geometry right.
+> >>
+> > I like this. It will also save us some neurons next time we need to
+> > touch these lines.
+> >
+> Sashiko disagrees:
+>
+> """
+> If an XDP program changes the packet geometry by prepending data, len wil=
+l
+> be greater than 0, which skips the __pskb_pull_tail() call entirely.
+> The resulting SKB's linear part will only contain the prepended data, wit=
+h
+> the Ethernet headers remaining in the fragments.
+> When the network stack later calls eth_type_trans(), it unconditionally
+> pulls ETH_HLEN:
+> net/ethernet/eth.c:eth_type_trans() {
+>     ...
+>     skb_pull_inline(skb, ETH_HLEN);
+>     ...
+> }
+> Could pulling 14 bytes from a smaller linear area cause skb->len to drop
+> below skb->data_len and trigger a BUG() in __skb_pull()?
+> """
+>
+> So I think we need an else where we preserve the old behavior:
+>   if (!len)
+>           headlen =3D min(headlen, skb->data_len);
+>   else
+>           headlen =3D min(MLX5E_RX_MAX_HEAD - len, skb->data_len);
+>
+>   __pskb_pull_tail(skb, headlen);
+
+I see. I am okay with the fallback.
+
+One last question: if the fallback is mainly to preserve the minimum
+linear head needed by eth_type_trans(), can we make that explicit
+instead?
+
+unsigned int pull_len =3D 0;
+
+if (!len)
+        pull_len =3D headlen;
+else if (len < ETH_HLEN)
+        pull_len =3D ETH_HLEN - len;
+
+if (pull_len)
+        __pskb_pull_tail(skb, min(pull_len, skb->data_len));
+
+This keeps the parsed-header pull for the fully nonlinear case, but once
+XDP leaves some linear data, the driver only pulls enough to satisfy the
+Ethernet header invariant and otherwise leaves the final geometry to XDP.
 
 
-> -----Original Message-----
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: Saturday, May 2, 2026 7:33 PM
-> To: Nitka, Grzegorz <grzegorz.nitka@intel.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>; netdev@vger.kernel.org; Vecera, Iva=
-n
-> <ivecera@redhat.com>; vadim.fedorenko@linux.dev; jiri@resnulli.us;
-> edumazet@google.com; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>;
-> richardcochran@gmail.com; donald.hunter@gmail.com; linux-
-> kernel@vger.kernel.org; Kubalewski, Arkadiusz
-> <arkadiusz.kubalewski@intel.com>; andrew+netdev@lunn.ch; intel-wired-
-> lan@lists.osuosl.org; horms@kernel.org; Prathosh.Satish@microchip.com;
-> Nguyen, Anthony L <anthony.l.nguyen@intel.com>; pabeni@redhat.com;
-> davem@davemloft.net
-> Subject: Re: [PATCH v7 net-next 6/8] ice: implement CPI support for E825C
->=20
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> ---
-> ice: implement CPI support for E825C
->=20
-> This patch adds CPI (Converged PHY Interface) command handling for E825C
-> devices, introducing a new ice_cpi.c/ice_cpi.h subsystem that implements
-> the REQ/ACK handshake and a helper to enable or disable Tx reference
-> clocks. It also adds per-PHY mutexes on the adapter and a non-posted
-> write opcode (wr_np) to SBQ.
->=20
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.h
-> b/drivers/net/ethernet/intel/ice/ice_adapter.h
-> > index e95266c7f20b..fa238a6a0e1a 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_adapter.h
-> > +++ b/drivers/net/ethernet/intel/ice/ice_adapter.h
-> > @@ -31,6 +34,8 @@ struct ice_port_list {
-> >   * @ptp_gltsyn_time_lock: Spinlock protecting access to the GLTSYN_TIM=
-E
-> >   *                        register of the PTP clock.
-> >   * @txq_ctx_lock: Spinlock protecting access to the
-> GLCOMM_QTX_CNTX_CTL register
-> > + * @cpi_phy_lock: Per-PHY mutex serializing CPI REQ/ACK transactions.
-> > + *               Index 0 =3D PHY0, index 1 =3D PHY1. Only used on E825=
-C.
-> >   * @ctrl_pf: Control PF of the adapter
-> >   * @ports: Ports list
-> >   * @index: 64-bit index cached for collision detection on 32bit system=
-s
->=20
-> The kernel-doc says cpi_phy_lock is "Only used on E825C", but in
-> ice_adapter_new() and ice_adapter_free() the mutexes are unconditionally
-> initialized and destroyed for every adapter:
->=20
->   for (int i =3D 0; i < ARRAY_SIZE(adapter->cpi_phy_lock); i++)
->           mutex_init(&adapter->cpi_phy_lock[i]);
->=20
-> Would it be better to either relax the comment or gate the
-> init/destroy on an E825C device check so that the behavior matches the
-> documentation?
->=20
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_cpi.c
-> b/drivers/net/ethernet/intel/ice/ice_cpi.c
-> > new file mode 100644
-> > index 000000000000..d5be36c60697
-> > --- /dev/null
-> > +++ b/drivers/net/ethernet/intel/ice/ice_cpi.c
-> > @@ -0,0 +1,364 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/* Copyright (C) 2018-2026 Intel Corporation */
->=20
-> The sibling ice_cpi.h added in the same commit uses
-> "SPDX-License-Identifier: GPL-2.0-only" and "Copyright (C) 2018-2025".
-> Should the two newly added files use the same SPDX form (GPL-2.0 is the
-> deprecated alias of GPL-2.0-only) and the same copyright end year?
->=20
-> [ ... ]
->=20
-> > +/**
-> > + * ice_cpi_wait_req0_ack0 - waits for CPI interface to be available
-> > + * @hw: pointer to the HW struct
-> > + * @phy: phy index of port the CPI action is taken on
-> > + *
-> > + * This function checks if CPI interface is ready to use by CPI client=
-.
-> > + * It's done by assuring LM.CMD.REQ and PHY.CMD.ACK bit in CPI
-> > + * interface registers to be 0.
-> > + *
-> > + * Return: 0 on success, negative on error
-> > + */
-> > +static int ice_cpi_wait_req0_ack0(struct ice_hw *hw, int phy)
-> > +{
-> > +	u32 phy_val;
-> > +	u32 lm_val;
-> > +
-> > +	for (int i =3D 0; i < CPI_RETRIES_COUNT; i++) {
-> > +		int err;
-> > +
-> > +		/* check if another CPI Client is also accessing CPI */
-> > +		err =3D ice_cpi_read_phy(hw, phy, CPI0_LM1_CMD_DATA,
-> &lm_val);
-> > +		if (err)
-> > +			return err;
-> > +		if (FIELD_GET(CPI_LM_CMD_REQ_M, lm_val))
-> > +			return -EBUSY;
->=20
-> The function is shaped as a retry loop and the kernel-doc says it
-> "waits for CPI interface to be available", but when LM.REQ is observed
-> set it returns -EBUSY on the first iteration with no retry.
->=20
-> Only the ACK-deasserted check actually benefits from the loop and the
-> msleep(CPI_RETRIES_CADENCE_MS) cadence.
->=20
-> If another CPI client transiently holds REQ, should this path also be
-> retried (up to CPI_RETRIES_COUNT times) rather than failing
-> immediately?
->=20
-> [ ... ]
->=20
-> > +/**
-> > + * ice_cpi_exec - executes CPI command
-> > + * @hw: pointer to the HW struct
-> > + * @phy: phy index of port the CPI action is taken on
-> > + * @cmd: pointer to the command struct to execute
-> > + * @resp: pointer to user allocated CPI response struct
-> > + *
-> > + * This function executes CPI request with respect to CPI handshake
-> > + * mechanism.
-> > + *
-> > + * Return: 0 on success, otherwise negative on error
-> > + */
-> > +int ice_cpi_exec(struct ice_hw *hw, u8 phy,
-> > +		 const struct ice_cpi_cmd *cmd,
-> > +		 struct ice_cpi_resp *resp)
-> > +{
-> [ ... ]
-> > +	/* 1. Try to acquire the bus, PHY ACK should be low before we begin
-> */
-> > +	err =3D ice_cpi_wait_req0_ack0(hw, phy);
-> > +	if (err)
-> > +		goto cpi_exec_exit;
-> > +
-> > +	/* 2. We start the CPI request */
-> > +	err =3D ice_cpi_exec_cmd(hw, phy, lm_cmd);
-> > +	if (err)
-> > +		goto cpi_exec_exit;
->=20
-> Can this leave LM.REQ stuck asserted on the hardware?
->=20
-> ice_cpi_exec_cmd() writes lm_cmd with CPI_LM_CMD_REQ_M set. If
-> ice_sbq_rw_reg() returns an error after the hardware has already latched
-> the LM.REQ=3D1 write (for example an admin-queue completion timeout after
-> the write was dispatched), control jumps to cpi_exec_exit and skips the
-> REQ deassert at cpi_deassert (steps 4 and 5).
->=20
-> Every subsequent ice_cpi_exec() on that PHY would then fail immediately
-> in ice_cpi_wait_req0_ack0() with -EBUSY, because that helper returns
-> -EBUSY on the first read that observes LM.REQ=3D=3D1 and does not retry.
->=20
-> The step-3 error path already falls through to cpi_deassert; should the
-> step-2 error path do the same so REQ is always cleared? Deasserting REQ
-> when it was never latched is harmless.
->=20
-> > +
-> > +	/*
-> > +	 * 3. Wait for CPI confirmation, PHY ACK should be asserted and
-> opcode
-> > +	 *    echoed in the response
-> > +	 */
-> > +	err =3D ice_cpi_wait_ack1(hw, phy, &phy_cmd);
-> > +	if (err)
-> > +		goto cpi_deassert;
-> > +
-> > +	if (FIELD_GET(CPI_PHY_CMD_ACK_M, phy_cmd) &&
-> > +	    FIELD_GET(CPI_LM_CMD_OPCODE_M, lm_cmd) !=3D
-> > +	    FIELD_GET(CPI_PHY_CMD_OPCODE_M, phy_cmd)) {
-> > +		err =3D -EFAULT;
-> > +		goto cpi_deassert;
-> > +	}
->=20
-> Is the FIELD_GET(CPI_PHY_CMD_ACK_M, phy_cmd) conjunct here ever false?
->=20
-> ice_cpi_wait_ack1() only returns 0 with asserted=3Dtrue when
-> CPI_PHY_CMD_ACK_M is set in the value it stored into phy_cmd:
->=20
->   if (asserted && FIELD_GET(CPI_PHY_CMD_ACK_M, phy_val)) {
->           if (data)
->                   *data =3D phy_val;
->           return 0;
->   }
->=20
-> So the ACK sub-expression is always true on this path, and reading the
-> code suggests a NACK/ACK=3D0 case is handled here that isn't. Would it be
-> clearer to drop the redundant check?
->=20
-> [ ... ]
->=20
-> > +/**
-> > + * ice_cpi_set_cmd - execute CPI SET command
-> > + * @hw: pointer to the HW struct
-> > + * @opcode: CPI command opcode
-> > + * @phy: phy index CPI command is applied for
-> > + * @port_lane: ephy index CPI command is applied for
-> > + * @data: CPI opcode context specific data
-> > + *
-> > + * Return: 0 on success.
-> > + */
-> > +static int ice_cpi_set_cmd(struct ice_hw *hw, u16 opcode, u8 phy, u8
-> port_lane,
-> > +			   u16 data)
-> [ ... ]
-> > +/**
-> > + * ice_cpi_ena_dis_clk_ref - enables/disables Tx reference clock on po=
-rt
-> > + * @hw: pointer to the HW struct
-> > + * @phy: phy index of port for which Tx reference clock is enabled/dis=
-abled
-> > + * @clk: Tx reference clock to enable or disable
-> > + * @enable: bool value to enable or disable Tx reference clock
-> > + *
-> > + * This function executes CPI request to enable or disable specific
-> > + * Tx reference clock on given PHY.
-> > + *
-> > + * Return: 0 on success.
-> > + */
-> > +int ice_cpi_ena_dis_clk_ref(struct ice_hw *hw, u8 phy,
-> > +			    enum ice_e825c_ref_clk clk, bool enable)
->=20
-> The kernel-doc here and on ice_cpi_set_cmd() says "Return: 0 on
-> success." but both functions forward any negative errno produced by
-> ice_cpi_exec() (such as -EINVAL, -EBUSY, -EFAULT, or -ETIMEDOUT).
-> Should the Return: documentation also cover the error path?
->=20
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_cpi.h
-> b/drivers/net/ethernet/intel/ice/ice_cpi.h
-> > new file mode 100644
-> > index 000000000000..932fe0c0824a
-> > --- /dev/null
-> > +++ b/drivers/net/ethernet/intel/ice/ice_cpi.h
-> > @@ -0,0 +1,61 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > +/* Copyright (C) 2018-2025 Intel Corporation */
-> > +
-> > +#ifndef _ICE_CPI_H_
-> > +#define _ICE_CPI_H_
-> [ ... ]
-> > +/* CPI LM CMD DATA register (CPI0_LM1_CMD_DATA) */
-> > +#define CPI_LM_CMD_DATA_M	GENMASK(15, 0)
-> > +#define CPI_LM_CMD_OPCODE_M	GENMASK(23, 16)
-> > +#define CPI_LM_CMD_PORTLANE_M	GENMASK(26, 24)
-> > +#define CPI_LM_CMD_RSVD_M	GENMASK(28, 27)
-> > +#define CPI_LM_CMD_GET_SET_M	BIT(29)
-> > +#define CPI_LM_CMD_RESET_M	BIT(30)
-> > +#define CPI_LM_CMD_REQ_M        BIT(31)
-> > +
-> > +#define CPI_OPCODE_PHY_CLK			0xF1
-> > +#define CPI_OPCODE_PHY_CLK_PHY_SEL_M		GENMASK(9, 6)
-> > +#define CPI_OPCODE_PHY_CLK_REF_CTRL_M		GENMASK(5,
-> 4)
-> > +#define CPI_OPCODE_PHY_CLK_PORT_SEL		0
-> > +#define CPI_OPCODE_PHY_CLK_DISABLE		1
-> > +#define CPI_OPCODE_PHY_CLK_ENABLE		2
-> > +#define CPI_OPCODE_PHY_CLK_REF_SEL_M		GENMASK(3, 0)
-> > +
-> > +#define CPI_OPCODE_PHY_PCS_RESET		0xF0
-> > +#define CPI_OPCODE_PHY_PCS_ONPI_RESET_VAL	0x3F
-> > +
-> > +#define CPI_LM_CMD_REQ		1
-> > +#define CPI_LM_CMD_SET		1
->=20
-> A few of these macros appear unused anywhere in this patch and through
-> the end of the series: CPI_LM_CMD_RESET_M,
-> CPI_OPCODE_PHY_CLK_PORT_SEL,
-> CPI_OPCODE_PHY_PCS_RESET, CPI_OPCODE_PHY_PCS_ONPI_RESET_VAL,
-> and
-> CPI_LM_CMD_SET. CPI_LM_CMD_SET (value 1) looks like it was intended to
-> be passed to FIELD_PREP(CPI_LM_CMD_GET_SET_M, ...), but ice_cpi_exec()
-> uses the bool cmd->set directly and leaves the named constant dead.
->=20
-> Would it make sense to drop the unused defines, or wire them in if
-> they're intended for a follow-up?
->=20
-> Also, the commit message mentions "enabling/disabling/selection of PHY
-> reference clock" and CPI_OPCODE_PHY_CLK_PORT_SEL is defined for the
-> selection variant, but no API in this patch uses it;
-> ice_cpi_ena_dis_clk_ref() only issues ENABLE or DISABLE. Should the
-> commit message be trimmed to match what the patch actually delivers?
->=20
-> > +
-> > +struct ice_cpi_cmd {
-> > +	u8 port;
-> > +	u8 opcode;
-> > +	u16 data;
-> > +	bool set;
-> > +};
-> > +
-> > +struct ice_cpi_resp {
-> > +	u8 port;
-> > +	u8 opcode;
-> > +	u16 data;
-> > +};
-> > +
-> > +int ice_cpi_exec(struct ice_hw *hw, u8 phy,
-> > +		 const struct ice_cpi_cmd *cmd,
-> > +		 struct ice_cpi_resp *resp);
-> > +int ice_cpi_ena_dis_clk_ref(struct ice_hw *hw, u8 port,
-> > +			    enum ice_e825c_ref_clk clk, bool enable);
-> > +#endif /* _ICE_CPI_H_ */
->=20
-> Is ice_cpi.h intended to be self-contained?
->=20
-> The header declares ice_cpi_ena_dis_clk_ref() with an
-> enum ice_e825c_ref_clk parameter and uses struct ice_hw * in both
-> prototypes, but it does not include ice_ptp_hw.h (which defines
-> enum ice_e825c_ref_clk) and does not pull in anything that forward-
-> declares struct ice_hw. ice_cpi.c compiles because it includes
-> ice_type.h, ice_common.h and ice_ptp_hw.h before ice_cpi.h.
->=20
-> Since C does not allow a portable forward declaration of an enum type,
-> would a future consumer that includes ice_cpi.h without first including
-> ice_ptp_hw.h fail to compile? Should the header include what it needs?
-
-Actually all IA concerns are valid.
-To be addressed in v8.
-
-Regards
-
-Grzegorz
+>
+> Thanks,
+> Dragos
 
