@@ -1,192 +1,210 @@
-Return-Path: <netdev+bounces-286698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286696-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IJsjOpTvAWpHmQEAu9opvQ
-	(envelope-from <netdev+bounces-286698-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:02:44 +0200
+	id cO3OMqrwAWpfmgEAu9opvQ
+	(envelope-from <netdev+bounces-286696-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:07:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0DAE510C48
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:02:43 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD026510D97
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:07:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 52BD53056149
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:57:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A8F163016026
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:56:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 114454014AC;
-	Mon, 11 May 2026 14:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1B2C3FA5CC;
+	Mon, 11 May 2026 14:56:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=schleissheimer.onmicrosoft.com header.i=@schleissheimer.onmicrosoft.com header.b="Wxijt0zL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F1tLH/Bp"
 X-Original-To: netdev@vger.kernel.org
-Received: from BEUP281CU002.outbound.protection.outlook.com (mail-germanynorthazon11020098.outbound.protection.outlook.com [52.101.169.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f195.google.com (mail-pg1-f195.google.com [209.85.215.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4687E3FBEC6;
-	Mon, 11 May 2026 14:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.169.98
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778511431; cv=fail; b=l3JBFW/Ep53ZZwmHOfCP6jGdBdtCnZZiZaPDfCeO3N/VHep3ymD+xW9U/ThO2fJTwC4xDBK4DyjO9JIFFs0uv6dmgxStWLww8xMJ9p5uDoWhv2lPJl9kyjMy2Ghjp2wJosGx3/7tFulWsfqqH3nKM0Ezjui6M269/E8AF2dARzA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778511431; c=relaxed/simple;
-	bh=Zs4oaDULX71HvODIlH18YZ6V6DZ0PkVf3YwqSzJoQMI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JH2xpTGqYmK0wnFkv7iSsvRBYOnhglEgRYU1bk/W+EVTgoViMUsTwpLvsJQBOkCLeJvN+vkVana3nSFgE0MLWkIc3OlnrMTart7JW1b1UEvDukDYW2kTCh0hhobdmFfbhmDID/JBcmt6TYSGtANHJwZjrZ/WZaoWkLk9X/4ji8I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schleissheimer.de; spf=pass smtp.mailfrom=schleissheimer.de; dkim=pass (1024-bit key) header.d=schleissheimer.onmicrosoft.com header.i=@schleissheimer.onmicrosoft.com header.b=Wxijt0zL; arc=fail smtp.client-ip=52.101.169.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schleissheimer.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=schleissheimer.de
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=htO7ATblF85kBmWRt5MR4bxqaxRDva3F0LrYuOuZW1STbq2ehaMu9vokS9kSdtnjwP9Sqhqub8U3r7dgcZTvhLv4VoRlffTwfjXwqTBLDSawTGbopyD5T7dnxSSu9jSyfcufVi2Ox4oRTH13i0ZCdzeW+McEEr5N95Um6A6BDhEW9H5IyNh+m1A2BzZUtSZZCBsm8drRrAGDT/Tx1iWl+8VHU1RFX8Drq0YIkysNdDJA+HfEHVWDW73dQW7GwBJBUwZBaAYuW5SICiWlyJF95grSW0uAGHHUC8SrW6vwkCF11dMGUPesBzXhhLuX9rv6YZ8sJtU4V17QfIOcdwB9Iw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PkducTZr0IeH0DPt4Q2sOuN97JOzaG1MRFaz4jljH3U=;
- b=Vrb5P0XiXcOBdFfuBmAUwEn0jKea1zmKRg/In48qniLe8RKNZIslwPoMC6sPRRrlbzlzW8xqeLkcapviQGyEuYPnc1yaE75G8CK2ZirG+W3TIhS16HctIndy7k9uMqikjTZhNKCm7nBX8d9EMDOSztJ/Oc/tXWdQDMI3ltqwVJAZZBua4pgeT9mlLdehekb3tncCD1ZsUuA1e/e5TK2fSwNe42f/ore/nW8XVpMCziEkyHUaU+8Ympd6bm4Va4leXLBwwf+meRV28+msGSTUC7ZuO+B8jihMhfIcFUBxUDmBdt8lcgAe5GB9MoCbBaTzBxWdkD54vN1sFWvQijjnuQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 62.153.209.165) smtp.rcpttodomain=armlinux.org.uk
- smtp.mailfrom=schleissheimer.de; dmarc=fail (p=none sp=none pct=100)
- action=none header.from=schleissheimer.de; dkim=none (message not signed);
- arc=none (0)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6A123AE87
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 14:56:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.195
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778511401; cv=none; b=KeitRoBu5Tah5HOi+YdTe3nZSFfnCBm5+B0t0Hi1kXY9GFwu4rjnpQgdmp6OGOA9NXLrICN8pssJHacW3nEbPmMbj+mi01BXTwXU2wP8j8qi2TmT5irEAyA/1ugA/WyPkNBgtCG1jEejsTgbpme0rYUybIUYdskbJfERxS7gl88=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778511401; c=relaxed/simple;
+	bh=nozqZkYqnKNHxP3Iu3Sop6z/onajxYXf0IYlzL4iAmM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f6Y6RjNNmdRoI3ed/RiRv7VCIzeRUDnfTENr5aInYtnkK6I087BGqApavXXYWnNYDHqUuOtyZg8KqpqDnjnmbN41nINf+Re+iq2f0q5v361xsueKdV4CoiTkQ+qCo5syIwIanRjR0SrVoM1UD9i2q4wn5KpCaiqhOx05i4PBh94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F1tLH/Bp; arc=none smtp.client-ip=209.85.215.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f195.google.com with SMTP id 41be03b00d2f7-c8028fa6039so2834546a12.2
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 07:56:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=schleissheimer.onmicrosoft.com; s=selector1-schleissheimer-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PkducTZr0IeH0DPt4Q2sOuN97JOzaG1MRFaz4jljH3U=;
- b=Wxijt0zLxepCAyB0HOPftDl3a5JGM1s11BV83gaYzYESWFrF+8av3fUeZ4zG3AUcOEHaM70+GnnJfwOv7KNM7gpCmoMNHLQIgtt0xj5xc4aR15WFttAm8U/S9vErcGiVTdgo10AqGPRnhj/hkhF/FiGHdSErPyztt4NCsmXcp7I=
-Received: from CWLP265CA0270.GBRP265.PROD.OUTLOOK.COM (2603:10a6:401:5c::18)
- by FR5P281MB4764.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:151::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.23; Mon, 11 May
- 2026 14:57:04 +0000
-Received: from AM1PEPF000252DD.eurprd07.prod.outlook.com
- (2603:10a6:401:5c:cafe::a2) by CWLP265CA0270.outlook.office365.com
- (2603:10a6:401:5c::18) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9891.23 via Frontend Transport; Mon,
- 11 May 2026 14:57:04 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 62.153.209.165)
- smtp.mailfrom=schleissheimer.de; dkim=none (message not signed)
- header.d=none;dmarc=fail action=none header.from=schleissheimer.de;
-Received-SPF: Fail (protection.outlook.com: domain of schleissheimer.de does
- not designate 62.153.209.165 as permitted sender)
- receiver=protection.outlook.com; client-ip=62.153.209.165;
- helo=mailer.schleissheimer.de;
-Received: from mailer.schleissheimer.de (62.153.209.165) by
- AM1PEPF000252DD.mail.protection.outlook.com (10.167.16.55) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.25.13
- via Frontend Transport; Mon, 11 May 2026 14:57:04 +0000
-Received: from A1460-Ubuntu24.schleissheimer.de (A1460-Ubuntu24.schleissheimer.de [192.168.50.44])
-	by mailer.schleissheimer.de (Postfix) with ESMTP id D0606A005A;
-	Mon, 11 May 2026 16:57:03 +0200 (CEST)
-From: Sven Schuchmann <schuchmann@schleissheimer.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Dan Murphy <dmurphy@ti.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: maxime.chevallier@bootlin.com,
-	Sven Schuchmann <schuchmann@schleissheimer.de>
-Subject: [PATCH net v3] net: phy: DP83TC811: add reading of abilities
-Date: Mon, 11 May 2026 16:56:30 +0200
-Message-ID: <20260511145630.31618-1-schuchmann@schleissheimer.de>
-X-Mailer: git-send-email 2.43.0
+        d=gmail.com; s=20251104; t=1778511397; x=1779116197; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=1/2XYunZZhJOj9243Vaf4F12iOGTyYZHD3g6BpnS6cA=;
+        b=F1tLH/BpqP68bSawJG2Tgwo+t1/bm+oLSP6Ns7lbYuREEBXr856W97T9rWZT12D7H2
+         pa9RMqg6X5sXFO/VTo3BZEpsbXNYtrM/H5NLNnJvkGsnVO1Kg9CBYyIgtCK3bWUKgIpa
+         BQHgjRNXKHF7YxaNtzM9vfa/r9zTisDU8vZKNfFgvA7k4UDJLjgaNTBlpqek3dmyBg8L
+         RSOAYThEDYa+1ojHwZGfKxPKp1EpQt1PJfGZ9AFJcqX9WzV6SXOAUBFLLMRTFR8YXTly
+         /ULVtA91MllQt9BFpWFhRRuufX6RaUPLHRD6g47IPnF/+kpgEX2BPuxASJ0jJeSlDRet
+         N2Hg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778511397; x=1779116197;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1/2XYunZZhJOj9243Vaf4F12iOGTyYZHD3g6BpnS6cA=;
+        b=EraQdwDT6IPI4qToQ2TlfpN7HG04IUrGnTa5s7XuDuNOR9xfPl/nkda+gxaz9Fdmjv
+         UxaA4HpLzYBsrBsK7slvDS7GYSIInjBBsI+/5ijMwQVNFnYzExnUY5eozvgijK1K1LLC
+         j0IZhuyyDOciZGvbzDnmPEmhYq7OzgZwlhyCezyF4TI/sfj5Nz4j/+EER4wEfdbMKmVm
+         PwuXd7VYi49S32ig3pDfWK/HF0WP0Ze5U0egSCfz4bLteSBrznBRhiJQ/T15jbhxoL02
+         jEzG+oe5kDe1d/i1euK5zcraz+ZhMvCzqls9+7hi49rcX2wxsIFI5z/AM5cUY5kTZWpJ
+         5udw==
+X-Forwarded-Encrypted: i=1; AFNElJ8TOQ2fK8BShH3ddhXoPXaHAKfiAGiyoH9HE/9R3BnnHfWhiEr4nds5TSVvPfAPvvtp8UXQA4I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysywVXK9hcf1JQCaBf6Kr0b517ddLF5QI0TkYmW8SpgWQijxoU
+	dxLag3+sqPeRTJGZhD0EBNPHRs6xNaCEEMXgvjwoiuXLuSFD3OPBLCFw
+X-Gm-Gg: Acq92OFVBzxiFV+xii2gCEkGdQSCh9cR/RxAe5yZpIwCfCzmPFjWXZ+5DIEtTtg8d8r
+	p2AX/3SmsY9ib+vBSQOfUtxoZ9yg9RjKTHVclhTh5b1UlcnC//1U5tWcXDhoJjbfQ/8U8I2bWGn
+	dx+AetEbpvEi8tmtoIRacSGJ9uYOAlKwSqf5oglxAbA2Gf21+K3zfw4nugOViANIjG/xjcpDaOh
+	K3LBQTr+xtjCRKQmsGOb6kJ+9ugMaGe56fJCoXFgrE0x5H9+Oo7dU1oQJublzLcFnLCvdwjuwdo
+	Vljk/6C1IGwXVAs8WOgW0GpGuZmzVHVOE4ATuVtBHdh+s8dKoD44Y7FFXSYxLjj7CArdiAqGjkf
+	KuJqDGKI72oNVL2Ks9Pji2nWPWwzsmwdrwV6S6j0ivSnZvIAxJIkLyoDJmXQHuJlzvUR7qqlp98
+	mmqodF0C9aEfEB/OCi
+X-Received: by 2002:a17:903:22c4:b0:2ba:e66b:ce34 with SMTP id d9443c01a7336-2bae66bd563mr171723165ad.21.1778511396945;
+        Mon, 11 May 2026 07:56:36 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:45::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1d4057fsm103030355ad.21.2026.05.11.07.56.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 May 2026 07:56:36 -0700 (PDT)
+Date: Mon, 11 May 2026 07:56:35 -0700
+From: Stanislav Fomichev <sdf.kernel@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Yonghong Song <yonghong.song@linux.dev>, 
+	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Tenzin Ukyab <ukyab@berkeley.edu>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v1 bpf-next 3/8] bpf: tcp: Support bpf_skb_load_bytes()
+ for BPF_SOCK_OPS_RCVLOWAT_CB.
+Message-ID: <agHuDeKLLUDdWXuS@devvm7509.cco0.facebook.com>
+References: <20260508073355.3916746-1-kuniyu@google.com>
+ <20260508073355.3916746-4-kuniyu@google.com>
+ <af390TgIj5sDABvi@devvm7509.cco0.facebook.com>
+ <CAAVpQUA_HHEbcRxEVbuxtnyz_5ibvOSxO2wVx16ZQ0kKHQM7NQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM1PEPF000252DD:EE_|FR5P281MB4764:EE_
-Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: 86a5a3f6-ecb2-4df3-db2f-08deaf6d907c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|82310400026|36860700016|1800799024|18002099003|921020|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	0uhxj2uo9B/s7XcQXwuncvLlk/Bal+UYG7zaN4Iop/Q3YJLQFCSIx8gHheZl7X4102WpBBnPlupl7YaL17yEaSfQtPe1O+MsZArZ8KVnhrw3NXzCzDmIaUJwzHo5OmNGO0TBnvOgHqSRP8bKDbzIr/nTNA7IUAgJJq0vVpz+Gg9mh70CqnxATUnUx0ge/UmdovWSziWeYqBnFB6/D6OOsAKlpeIuzEJz3R7DZH0JrT0fCJWUbZCBE92aVMc/xhm+ha6cdO713S9zbG85RQywIwfNozG6NVcF5OB2SntPJuL1pJp3E6ecMURey/Eio2Yw0Ryd7yMjl/vX2vLbIFqz0hh567g6BHdM5LvqUZlLWZrc8KqkD9EO8MjuqJyHjNrloB0DA/7S4YYwOZ7FpIw+NvArQe6CY4o8xTgJQqdB7Ulyvp+CBZONPY4B9uX4EJouO7/lGnv69jCavUIKkBxP4zHvlfsaRqkUooSID0O0EUM5qwo65946lNiDrlttEQ86GIM/APqnDizfb8FIcBvPWmZkHTwMGLKc/ZIBhM7jZcwD3G4C/8Od2JZod1QmpzX2SiUAoK41KU0lTsYlpSPFDjDWd5WVhphy6btxz9r6sC1ALJ/xgH3RCisDqSvO5ilWHKtjFShpxE4n3IzLL6PpaXq3+KJ5LrH9ZwPd18RwYqj6crUoO9X1d2A2WCBAsYBTOvpxz35wTGDiNre24xgYN4TAdxxwn13sCAl1MHV42rJ8kfyvgWkEEvzv9w6SEcYzam9QMddabI8HstuD6x3CXQ==
-X-Forefront-Antispam-Report:
-	CIP:62.153.209.165;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mailer.schleissheimer.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(36860700016)(1800799024)(18002099003)(921020)(56012099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	43ll6x9Gi2rRGGGFs0oKa01E9BSzQv0k22/tWDPlwtUGAxCEC8PsgCRt4Y0L4dIe4qPJTYNzQ5skCKOAZh7A92LkCg4Y7AkcRC/yTfMoqtsS6CbnzQP+DBJ8hDmXz1dLWNwa+PJDnFkEJK+xtiIEqBe0tBMe06Mih8J5LYy6nm9bMlSFKfCyT5d+X8vu52v6p7MGddgxtZbx+UG+dHoS565D22VBv2YAQj89ACpjxGo1h7pnPzwRa6q8XN48hnamEwsWD0HAsAAKPkBoGuz168vGYCS++UUzYYcQPZk2YHCiaMXwFhV29dx+RP1tkLNy0v6vRIC1Og1bn6qMkzkxOUqEseU8j+qVLfWx9RjOeHljhU5TAcIImP83y4CdbXugpLzoQFIAq3X27IW+KkobonU+0b3wZZLRXDuLyJN9arwGHJLG4r/UTFhpwfLcr0Bj
-X-OriginatorOrg: schleissheimer.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2026 14:57:04.2914
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 86a5a3f6-ecb2-4df3-db2f-08deaf6d907c
-X-MS-Exchange-CrossTenant-Id: ba05321a-a007-44df-8805-c7e62d5887b5
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=ba05321a-a007-44df-8805-c7e62d5887b5;Ip=[62.153.209.165];Helo=[mailer.schleissheimer.de]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM1PEPF000252DD.eurprd07.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: FR5P281MB4764
-X-Rspamd-Queue-Id: F0DAE510C48
+In-Reply-To: <CAAVpQUA_HHEbcRxEVbuxtnyz_5ibvOSxO2wVx16ZQ0kKHQM7NQ@mail.gmail.com>
+X-Rspamd-Queue-Id: CD026510D97
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [3.44 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[schleissheimer.onmicrosoft.com:s=selector1-schleissheimer-onmicrosoft-com];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[schleissheimer.de : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-286698-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286696-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,ti.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[schleissheimer.onmicrosoft.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[schuchmann@schleissheimer.de,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,berkeley.edu,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:email,schleissheimer.onmicrosoft.com:dkim,schleissheimer.de:email,schleissheimer.de:mid];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.988];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,bpf_sock_ops.data:url,devvm7509.cco0.facebook.com:mid]
 X-Rspamd-Action: no action
 
-At this time the driver is not listing any speeds
-it supports. This should be ETHTOOL_LINK_MODE_100baseT1_Full_BIT
-for DP83TC811. Add the missing call for phylib to read the abilities.
+On 05/08, Kuniyuki Iwashima wrote:
+> On Fri, May 8, 2026 at 8:15 AM Stanislav Fomichev <sdf.kernel@gmail.com> wrote:
+> >
+> > On 05/08, Kuniyuki Iwashima wrote:
+> > > When a TCP skb is queued to sk->sk_receive_queue, BPF SOCK_OPS
+> > > prog can be called with BPF_SOCK_OPS_RCVLOWAT_CB.
+> > >
+> > > In this hook, we want to parse the RPC descriptor in the skb
+> > > and adjust sk->sk_rcvlowat based on the RPC frame size.
+> > >
+> > > However, we cannot access payload via bpf_sock_ops.data on
+> > > modern NICs with TCP header/data split on as the payload is
+> > > not placed in the linear area.
+> > >
+> > > Let's support bpf_skb_load_bytes() for BPF_SOCK_OPS_RCVLOWAT_CB.
+> > >
+> > > Two notes:
+> > >
+> > >   1) bpf_sock_ops_kern.skb will be NULL when the BPF prog is
+> > >       invoked from recvmsg().
+> > >
+> > >   2) Access to bpf_sock_ops.data will be disabled by passing
+> > >       0 end_offset to bpf_skops_init_skb().
+> > >
+> > > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> > > ---
+> > >  net/core/filter.c | 34 ++++++++++++++++++++++++++++++++++
+> > >  1 file changed, 34 insertions(+)
+> > >
+> > > diff --git a/net/core/filter.c b/net/core/filter.c
+> > > index 5fa9189eb772..94d07a15b2ab 100644
+> > > --- a/net/core/filter.c
+> > > +++ b/net/core/filter.c
+> > > @@ -7718,6 +7718,38 @@ static const struct bpf_func_proto bpf_sk_assign_proto = {
+> > >       .arg3_type      = ARG_ANYTHING,
+> > >  };
+> > >
+> > > +BPF_CALL_4(bpf_sock_ops_skb_load_bytes, struct bpf_sock_ops_kern *, bpf_sock,
+> > > +        u32, offset, void *, to, u32, len)
+> > > +{
+> > > +     int err;
+> > > +
+> > > +     if (bpf_sock->op != BPF_SOCK_OPS_RCVLOWAT_CB) {
+> > > +             err = -EOPNOTSUPP;
+> > > +             goto err_clear;
+> > > +     }
+> > > +
+> > > +     if (!bpf_sock->skb) {
+> > > +             err = -EPERM;
+> > > +             goto err_clear;
+> > > +     }
+> > > +
+> > > +     return ____bpf_skb_load_bytes(bpf_sock->skb, offset, to, len);
+> >
+> > nit: wondering whether it's better to use __bpf_skb_load_bytes (which
+> > wraps BPF_CALL_4's ____bpf_skb_load_bytes) here? Seems a bit less
+> > magic and used already by dynptr?
+> 
+> I guess dynptr used it because dynptr is in a different file under kernel/.
+> 
+> Users in the same file (sk_reuseport_load_bytes() and
+> sk_reuseport_load_bytes_relative()) call ____bpf_skb_load_bytes()
+> directly and clang inlined it there (including __bpf_skb_load_bytes())
+> while dynptr tail-called __bpf_skb_load_bytes().
+> 
+> I see the point (I had to read BPF_CALL_4() macro for ____), but
+> ____bpf_skb_load_bytes() looks better.
 
-v3:
- - Fixed indentitation problems. no code changes.
-v2:
- - Fixed subject and added fixes tag. no code changes.
-
-Fixes: b753a9faaf9a ("net: phy: DP83TC811: Introduce support for the DP83TC811 phy")
-Suggested-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Sven Schuchmann <schuchmann@schleissheimer.de>
----
- drivers/net/phy/dp83tc811.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/phy/dp83tc811.c b/drivers/net/phy/dp83tc811.c
-index e480c2a07450..252fb12b3e68 100644
---- a/drivers/net/phy/dp83tc811.c
-+++ b/drivers/net/phy/dp83tc811.c
-@@ -393,6 +393,7 @@ static struct phy_driver dp83811_driver[] = {
- 		.config_init = dp83811_config_init,
- 		.config_aneg = dp83811_config_aneg,
- 		.soft_reset = dp83811_phy_reset,
-+		.get_features = genphy_c45_pma_read_ext_abilities,
- 		.get_wol = dp83811_get_wol,
- 		.set_wol = dp83811_set_wol,
- 		.config_intr = dp83811_config_intr,
--- 
-2.43.0
-
+SG!
 
