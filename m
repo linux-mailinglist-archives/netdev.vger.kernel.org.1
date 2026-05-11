@@ -1,181 +1,153 @@
-Return-Path: <netdev+bounces-286717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286718-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YNZPJCL6AWrjmwEAu9opvQ
-	(envelope-from <netdev+bounces-286717-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:47:46 +0200
+	id qDQcB6P7AWomnAEAu9opvQ
+	(envelope-from <netdev+bounces-286718-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:54:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FA15511816
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:47:45 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EFE5511A0A
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:54:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2DDDF302CEF6
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:42:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ACCD43093BB6
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:46:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AD6A407574;
-	Mon, 11 May 2026 15:41:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DDE2406266;
+	Mon, 11 May 2026 15:46:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b="Heko3cGu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ByKj8eDy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E6640628A
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 15:41:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E235B402BBA;
+	Mon, 11 May 2026 15:46:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778514096; cv=none; b=KCDd7qdc21gNB4N3yPxTqRywIsi4x3mHNXM0QNbFEY5hzOuR7QgEWbrwepg3aWisXbMpfGJrMfCD75itheI1EM3ly4ZLvlqEhB7hdCdaEdVdKfu5O1OROrXwr5tVvdQ7EOgQZeF2uNcE5tffsaNwYSos9f5tP5Xb9cjDmgGQyuw=
+	t=1778514411; cv=none; b=gymwjdbBXI774hcyoIkYJh1VWmeou/ggKN8f8PFPKhvjqWx85efCBS6jVijLBuX3juXdOH/vnE66clVkAu1Enwhfpo0wKlDKSpYqeJUUOwlE85k+FtjWEisgkzsRvMMhpQt2MQdPwJ/tbbv4hwpavck93JXm6bz5qY6Ay5l5VUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778514096; c=relaxed/simple;
-	bh=QYUz8b5kzsmvQFipBJ/YClQFCzx8AI1CLI1nrVUTxv0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bzQbQlm7EbNNIXj4ujRYcTg1QD9ErR9XLJRNdo9qiZkHcOguN+lYQ8mUPtxlAibXsUY33stk70Jgv0nUAh/nFHsV9OQW4wOfOYm+lOGOIZAxgDO930FLhWI4Q6EOAEfxhIQTI2hwYnYCpBm/D2ZHCOgZXmaWNYx5HGHYkv6JrYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com; spf=pass smtp.mailfrom=riscstar.com; dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b=Heko3cGu; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riscstar.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-48984d29fe3so48042295e9.0
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 08:41:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=riscstar-com.20251104.gappssmtp.com; s=20251104; t=1778514093; x=1779118893; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QYUz8b5kzsmvQFipBJ/YClQFCzx8AI1CLI1nrVUTxv0=;
-        b=Heko3cGu0Pyebt5bmYaWD5pTPrs+ZlplJer06F5Q3e9Ipc3Hi+pgI51EIhUU1T0ncf
-         c4gO5Em2u4wlHWzDpeHA3DKtgyvG/TC2z3IoMk96Ekl6HoiCL7TdKph+bb5n4SXJ6g0P
-         /opjNxoxU4YepoTNEddD9i5yfspCTDqhwkCPHZpy6MP6pQHszoGnw+I0gAqxHglOk1td
-         UX/nAq9/M1jppHUduHWyQFPlGUWPQZt2oBTccyRjSok+olkdvR+SLawsm+GtGJ7SjoMO
-         4yUg9H0xC3yWKaHycUvgIdVK4SRQpAQg89Z1D43EhU1IglbucyJojJXkmJkcQcz9YkR4
-         gd1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778514093; x=1779118893;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QYUz8b5kzsmvQFipBJ/YClQFCzx8AI1CLI1nrVUTxv0=;
-        b=OvEgofbOTmNeEa/7dpZp1ZX1JfS0KRvxWj9oSIfI26dnuZlSx5pDH3go8ApiW/DJ/J
-         JST5TiE19ndsysyvrJwiA3uiIPVxclKyJTppYGO2kL3BKNJ8uNcpmV1OUbfANU/uD7H5
-         koYAePBjHQDiplTi3bJxVUqH91YYdyhAlzL9SOGXXnDYPBmdheq70EPaweyeLWw6ecpM
-         3oJXxagLcBupCYOZ6YlPH2otAHfZcUrq67O/mtVibH+mh28KUNyHwyKQ+cWoMIpUe+S7
-         lHhWptg2CztbUgeI29zFoi4n4H3H7eXxvDE92ajC4cyOTeCVMUoQwvsRYNZ95EcGEl7s
-         boXw==
-X-Forwarded-Encrypted: i=1; AFNElJ8o+6nSQMOWjxYll8zgQ7yxoPOonPtR44m75a3R3HN23rr4nmvFK+YW4QIkDuPsGuZMWFOx9b0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRtOPLNV46NG5mRjADs90sVhomlsjFRwad4F6wKLBkGpb7Xi6A
-	TbBYtPffxmY9xTe3n8S9XDnfizNPZ6wA5I9rrVUps/Lv/lYII3CyVEpd8PLVQGNnUCU=
-X-Gm-Gg: Acq92OExJQC+YTBaMatJ0DnztKnc0jdkKff7oa9Hb5yprqtk/i0JV7/Oz8CTFhzGQrN
-	nvOnHCf1bxMq9wSPyWgi8GqPRFZmkp2i1Kl4IJAJytqszy379SWjZWxdlPmIufNtRN3ucNV/JXq
-	HlpRzCqmIcDt68ejerJs/oFd9smyvrWhokb79SZEuPxwlhF+ANkQIL3uwagGS2+9AFerzVkbMEr
-	hOf5jNE5YwSSh5djyjYsxk3xFOrwKvwBwmhw9eOVltBSIgcZz7gzV812/FE4cRYhU50w4dT6Yz0
-	MvC0Vnsx60xuIqsbfuDQ1pZjG9H6RntUrbrUvqvoU/cxB/Ia5A+yuuAKsnWBI9dmd/tWcogdnC+
-	neK5wJFO2qVTv5aNkGsUdN3skUj/8j5Uf5AjyfBpt94lnLMrxq8o7X2fK1cF7oFDEGKs+MCs6R3
-	sNgpcERujfkTBb642oBOIfNnq3QpRwM1tq4+Zkd7JRaWOVA2DIbOVYAB1GtJtO8gTPwY5qfzZS3
-	9AFcVj46niW6FXqyAS8EEIfeqwt/QYRjNs802nkDq6KQlxamnRq30XFp+lsLaFKKqsFvqQFIDH+
-	EUoJlgdH
-X-Received: by 2002:a05:600c:1f89:b0:48e:8741:fd42 with SMTP id 5b1f17b1804b1-48e8741ff8cmr37216095e9.12.1778514092586;
-        Mon, 11 May 2026 08:41:32 -0700 (PDT)
-Received: from aspen.lan (aztw-34-b2-v4wan-166919-cust780.vm26.cable.virginm.net. [82.37.195.13])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e6d8e3247sm64622295e9.8.2026.05.11.08.41.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 08:41:31 -0700 (PDT)
-Date: Mon, 11 May 2026 16:41:28 +0100
-From: Daniel Thompson <daniel@riscstar.com>
-To: Xilin Wu <sophon@radxa.com>
-Cc: Alex Elder <elder@riscstar.com>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, maxime.chevallier@bootlin.com,
-	rmk+kernel@armlinux.org.uk, andersson@kernel.org,
-	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org,
-	arnd@arndb.de, gregkh@linuxfoundation.org,
-	mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com,
-	alexandre.torgue@foss.st.com, ast@kernel.org,
-	boon.khai.ng@altera.com, chenchuangyu@xiaomi.com,
-	chenhuacai@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	hkallweit1@gmail.com, inochiama@gmail.com, john.fastabend@gmail.com,
-	julianbraha@gmail.com, livelycarpet87@gmail.com,
-	matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
-	prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
-	rohan.g.thomas@altera.com, sdf@fomichev.me,
-	siyanteng@cqsoftware.com.cn, weishangjuan@eswincomputing.com,
-	wens@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 10/12] net: stmmac: tc956x: add TC956x/QPS615
- support
-Message-ID: <agH4qC74A540koDl@aspen.lan>
-References: <20260501155421.3329862-1-elder@riscstar.com>
- <20260501155421.3329862-11-elder@riscstar.com>
- <DD71CDEABC7C16D5+02d052ff-13bb-4712-a847-91416f76c578@radxa.com>
- <7f3a0f16-5159-4bbc-8b15-9b5841603bf6@riscstar.com>
- <3A5C0389E7C0D241+21a4f16b-1af8-46ac-8831-0c1b49694df0@radxa.com>
+	s=arc-20240116; t=1778514411; c=relaxed/simple;
+	bh=7sqpX/RGgiQGlcXoNsGZI8XmaqwweqJXC66BEehtjaE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=YItFVWB7lIkpXcyyDBH3xd54M8NNAZ4+aOpI0Yfmi80OaE2wGqlXx86A43bWlaUmKKE0vky9y5UhFMMBzSBVsvNmTiOVMXkdeKSE1a1gW3uIwaSkfwPqK7IRUR+Zq9N/VFt2SI4i3ONb/24671w/io3nso+hw8lTMbp2xtL7XwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ByKj8eDy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A661BC2BCB0;
+	Mon, 11 May 2026 15:46:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778514410;
+	bh=7sqpX/RGgiQGlcXoNsGZI8XmaqwweqJXC66BEehtjaE=;
+	h=From:Subject:Date:To:Cc:From;
+	b=ByKj8eDy/sajVMez24k171DDOg94hEs8RiwJd8SGiO4pvsFBKDh3T2BW5Z2xcqyNX
+	 31F543lXn/SNSZdatVJcPga0beXKS4+UXKF6g41sgJK5P3oXpP5VbL2RVVlra6ZzoS
+	 iwkag3FkD37RYm/Zor00L5iTjtkbZkHL07+rIXwkfKhFxCUDWlZQwAEY5V7FOIDMrd
+	 5nDWTjqSZBBRdjVYau2++grz1ONTf0JgA9TUiMwovwwQKXILa+hd1+Atx1SWPzbiou
+	 4eh8hgsT+b6sH4+FlZlTHgDeYwqQ3aWmlpwZGS9uKiw5bxLgcxIOojGM1icEkZmQge
+	 0jwn9U8hSds7Q==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net 0/5] mptcp: misc fixes for v7.1-rc4
+Date: Mon, 11 May 2026 17:46:26 +0200
+Message-Id: <20260511-net-mptcp-misc-fixes-7-1-rc4-v1-0-5ee57cb2b7eb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3A5C0389E7C0D241+21a4f16b-1af8-46ac-8831-0c1b49694df0@radxa.com>
-X-Rspamd-Queue-Id: 2FA15511816
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWM0QrCMBAEf6XcswdJiBX8FfFBrxs9oTHkUhFK/
+ 92oj7PszEqGqjA6DitVvNT0mTv43UByv+QbWKfOFFwY3d57zmg8lyaFZzXhpG8YH9hzlcgIY3R
+ pikhBqCdKxe/QCyfqJp3/oy3XB6R9w7RtHy96DuqFAAAA
+X-Change-ID: 20260511-net-mptcp-misc-fixes-7-1-rc4-e2640fd4ef2c
+To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: Eric Dumazet <edumaze@google.com>, netdev@vger.kernel.org, 
+ mptcp@lists.linux.dev, linux-kernel@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Shardul Bankar <shardul.b@mpiricsoftware.com>, stable@vger.kernel.org, 
+ Li Xiasong <lixiasong1@huawei.com>, Shuah Khan <shuah@kernel.org>, 
+ linux-kselftest@vger.kernel.org, Gang Yan <yangang@kylinos.cn>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1507; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=7sqpX/RGgiQGlcXoNsGZI8XmaqwweqJXC66BEehtjaE=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGLIYfz4+ujZ1H6vK2hZ7W/MH87zW/PHp/W9aWpq136rnt
+ GRE5hPZjlIWBjEuBlkxRRbptsj8mc+reEu8/Cxg5rAygQxh4OIUgIn85GNk+GWseSzKymvXt9j3
+ 25Pcg1aqXV3KNO3tu8pTLwvucb0vUGX477Gb7/H/CTklXxuuTtik3x2YpbHnfeRJb/MfvpdM2u0
+ 7eQE=
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+X-Rspamd-Queue-Id: 7EFE5511A0A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.06 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[riscstar-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[riscstar.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[riscstar.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	TAGGED_FROM(0.00)[bounces-286717-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[riscstar-com.20251104.gappssmtp.com:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286718-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@riscstar.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[50];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,aspen.lan:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Hi Xilin
+Here are various unrelated fixes:
 
-On Thu, May 07, 2026 at 09:57:26PM +0800, Xilin Wu wrote:
-> Do you think if a shutdown callback like this is required? It looks like the
-> driver sometimes does a MDIO MMIO read when the PCIe link is down, causing
-> the board to reset due to SoC side PCIe NoC timeout.
->
-> After this change, the board can always shutdown gracefully.
+- Patch 1: avoid dropping partial packets. A previous version has been
+  sent a few week ago. A fix for 5.10.
 
-I've preferred controlled reboots to power cycles throughout development
-and I hadn't spotted any major problems with graceful shutdown (which
-isn't to say there have never crashes but generally I expect `reboot`
-to provoke a reboot successfully).
+- Patches 2-3: stop ADD_ADDR timer when an ADD_ADDR can never been sent
+  due to insufficient option space. A fix for v5.10.
 
-Just to be sure configured my board with irq=POLL (to match your setup)
-and still can't reproduce.
+- Patch 4: reset rcv_wnd_sent on disconnect, just in case the next
+  connection falls back to TCP. A fix for 5.17.
 
-We mostly run Debian/systemd so there might be something happening in
-userspace to sequence things nicely. However I have ruled out
-NetworkManager.service and networking.service (stopped this services
-does *not* tear down the network link).
+- Patch 5: update window_clamp when SO_RCVBUF is set during the
+  connection. A fix similar to a recent one on TCP side, for v6.6.
 
-Can you share a bit more about how to reproduce the problem (including
-reliability of reproduction)?
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Gang Yan (1):
+      mptcp: update window_clamp on subflows when SO_RCVBUF is set
 
+Li Xiasong (2):
+      mptcp: pm: fix ADD_ADDR timer infinite retry on option space insufficient
+      selftests: mptcp: join: cover ADD_ADDR tx drop and list progress
 
-Daniel.
+Paolo Abeni (1):
+      mptcp: reset rcv wnd on disconnect
+
+Shardul Bankar (1):
+      mptcp: do not drop partial packets
+
+ net/mptcp/pm.c                                  | 56 ++++++++++++++++++++-----
+ net/mptcp/protocol.c                            | 25 ++++++++---
+ net/mptcp/sockopt.c                             | 10 ++++-
+ tools/testing/selftests/net/mptcp/mptcp_join.sh | 31 ++++++++++++++
+ 4 files changed, 105 insertions(+), 17 deletions(-)
+---
+base-commit: a450063ef86b9967234ca1f896c0d77400c74f11
+change-id: 20260511-net-mptcp-misc-fixes-7-1-rc4-e2640fd4ef2c
+
+Best regards,
+--  
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
