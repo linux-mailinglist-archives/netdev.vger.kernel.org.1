@@ -1,101 +1,97 @@
-Return-Path: <netdev+bounces-286470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286471-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kKqeA3d/AWqkbQEAu9opvQ
-	(envelope-from <netdev+bounces-286470-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:04:23 +0200
+	id 8I/jHq5/AWqkbQEAu9opvQ
+	(envelope-from <netdev+bounces-286471-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:05:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85EDE508D57
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:04:22 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BD2A508D8C
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:05:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CE9D0303E239
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:01:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 50CF3300BC6D
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:02:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97643331218;
-	Mon, 11 May 2026 07:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 810F93115A5;
+	Mon, 11 May 2026 07:02:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="W7es/cLs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nscXj4DY"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013062.outbound.protection.outlook.com [40.93.201.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE733101B2;
-	Mon, 11 May 2026 07:01:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778482878; cv=fail; b=HPcPbD1P5/iY4hh51QpvU2AWel5HiQW5fAJ2azC3y1NsXjbZJuQoVYXjSvFW7/jzqJtQMEFsejq2QclXKzRD+Qu3X1qHphkQ0K/e4KLHUQYEBmz3X0MQdvVGFK8dgo+GlD72Nd1JRXIfLFiatYaRSUx9P924L639hD4iUXTOaDk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778482878; c=relaxed/simple;
-	bh=rAJczwMJJa/wfVaVwKqCNJ3A+Zpja+EWVkL/jrE2+4c=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jbSnEasXAVdHR85dquWGp5Zv1eZBTD/QxRoIOTUOrqODLwo7QPQaPQblTraKbo/ZOwXI1z9THuaWiG9CLVi5/zd3zwvNXCOZ6YGU9dj48NFB8iWf+FjuQUXVlG7bSGsOgOWUSmO1ZOf24evDZpgHgyno0QqnEVD9JNl2u5M+hro=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=W7es/cLs; arc=fail smtp.client-ip=40.93.201.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=B01JH9+NyfGeGc3RPtcMDiW90LpzHNZiM4L5vmwMMycoctWV4WpmkzRQddxJIvetXyYKA1LQiHpGskbfM3+K8eMm+U0BG0f7pwlgBrz16Y0UXlzVN9DEUgYfCAVZUlX4TJ4EjdMnYPig/b5MRZgIzSQhCreNzGzRBORpaW2L2ReiBLFQI9EPnGgbS4OjD5RaoVGWu6wNDCfisnWxkF6RomZGBu/75jo0gHFDzfmoOvH7w/fhpkpf6qiW6vaybxDD7M4bvOACgd5ReCVLZ5qlgIXJOrf42IwVdDLLt2+5x9yXKii0wLPM4LktPphqysEk/wD+0JdwkAhf+35grWYPkw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+BhCFznPdt2WpnmOJqXzkqB6U0ETT+WgnWhKBZ4Wyv4=;
- b=U1PdR9sGy4Q8JT/1+W0SDPzT6HNKP42iMo4YU7wLjcqBE0o5dbuA03ie5RYa2/lbDd1enGWrgcs4RH82aO4j9/eo88QiOzVjActmLRluS2snKKWflkRMTtexDBMpdsiyJVM01i7rAKseC8drC/UqrJItxXgi4N+XWDmXn9iovCckozpwo9xueNuSYHIsa9dWsts2Q/8mIZyZ8FmLB0hk0r4laOEixMsvCJ85Ld9CKgKYo9ZG7VWLUNf/pBpZDsL2Y0Jcb0RbFuR1Wj36gyC2Pn/4os64dqVRecNCXnZc2DDtUBGZDi3qXjvwW752uIyDDG5YxWWcGbSCYvfY+mUF7w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+BhCFznPdt2WpnmOJqXzkqB6U0ETT+WgnWhKBZ4Wyv4=;
- b=W7es/cLsnjRI5p7SdWGw3ymiBJUqX1kdB9Ktyd/QHyfuxr7B1yvOkufVh1S92xnNy43+qsgiITRHmtyGe8DtWmw7Of8/Ou5dclbM+kBIunAJXYuFtsp4Ox3XjBaTBc2vy2T5dx9S/mgROjWmY5i54b5wxlkEBkEZpKHhj6V0QHc714evE3y0o4h0JCHIFJAMD411FWUDrBF2gTHqHUTnK3CxMKgNqs54Al6dnnlqm9Zhomv2um4IxR/g+3D7gelpN0Utg+iJx4FDDou6XtRZa7nmyDYjhhp6S2FEhJenAkgjt88DVKPWhMcSgsJb3nakroaRPhTATA9AzHusUghMoQ==
-Received: from CH0PR03CA0118.namprd03.prod.outlook.com (2603:10b6:610:cd::33)
- by PH7PR12MB6419.namprd12.prod.outlook.com (2603:10b6:510:1fd::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.22; Mon, 11 May
- 2026 07:01:05 +0000
-Received: from CH1PEPF0000AD78.namprd04.prod.outlook.com
- (2603:10b6:610:cd:cafe::9d) by CH0PR03CA0118.outlook.office365.com
- (2603:10b6:610:cd::33) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9891.23 via Frontend Transport; Mon,
- 11 May 2026 07:01:05 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CH1PEPF0000AD78.mail.protection.outlook.com (10.167.244.56) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.25.13 via Frontend Transport; Mon, 11 May 2026 07:01:04 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 11 May
- 2026 00:00:46 -0700
-Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.231.37) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Mon, 11 May 2026 00:00:39 -0700
-From: Danielle Ratson <danieller@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <donald.hunter@gmail.com>, <kuba@kernel.org>, <davem@davemloft.net>,
-	<edumazet@google.com>, <pabeni@redhat.com>, <horms@kernel.org>,
-	<razor@blackwall.org>, <idosch@nvidia.com>, <andrew+netdev@lunn.ch>,
-	<shuah@kernel.org>, <ast@fiberby.net>, <liuhangbin@gmail.com>,
-	<daniel@iogearbox.net>, <aroulin@nvidia.com>, <fmaurer@redhat.com>,
-	<sdf.kernel@gmail.com>, <sd@queasysnail.net>, <kees@kernel.org>,
-	<nickgarlis@gmail.com>, <amorenoz@redhat.com>, <alasdair@mcwilliam.dev>,
-	<johannes.wiesboeck@aisec.fraunhofer.de>, <petrm@nvidia.com>,
-	<linux-kernel@vger.kernel.org>, <bridge@lists.linux.dev>,
-	<linux-kselftest@vger.kernel.org>, Danielle Ratson <danieller@nvidia.com>
-Subject: [PATCH net-next v2 6/6] selftests: net: Add tests for neigh_forward_grat option
-Date: Mon, 11 May 2026 09:59:36 +0300
-Message-ID: <20260511065936.4173106-7-danieller@nvidia.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260511065936.4173106-1-danieller@nvidia.com>
-References: <20260511065936.4173106-1-danieller@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C34296BAF
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 07:02:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778482942; cv=none; b=kESYe2kLbtrZnELsP6LCNqEVDrvCh5JomBQGB4lq30DnMwF7JhPkTNKp679H30cl11V8mp+1R46N8q3kbLqmI7eixeTGBBoy0WD76g08jfa/ch/+fadKP9kCg3Lghxmf4w+iMt1JSAPNzNgyy4hm3GWO5nfhIDzBSUSSx9MJu3Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778482942; c=relaxed/simple;
+	bh=QFy4gBqDtUEsal4sJ+4y4+2D6x4MfUMpx6PYX9HGBtk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IZn8qm8sQLBhFtgFvxfQXVzuwwyJZ+r0GB3VOLAKbENRWF1P9Sj4Wsn8os9UTFEBlRxQMUin8A/2CSL8JPKLOCJFcKpmPYai3Kqg89ih6lze7ZmXam0gHepuTl/4rJjRv8Er407G9aWTWv/y3vK4tVQ6Wm8N+qY+SKKwHHVqxQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nscXj4DY; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3567e2b4159so2241207a91.0
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 00:02:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778482938; x=1779087738; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gLQqNeBBoJ1TovFHZ6Y5VIkiSO2gp7MmGpfE8S7ANoU=;
+        b=nscXj4DY4BJcLy1FgjrC0fAKr6tyYm+6ruQSj4zT86zlU9l0NymQGyEPv4Mng1f+1z
+         06gAY+7Yb8bDDKhSeIFe/7Q/pTmOV9SBLwppIIz51jB25rVy9jw0ARS84fIhMIu1EeIa
+         DT5CKMSfUGn256WtAgybdHjZF7uMxu0ZfOAiM64Kt/97889BbDN2B7moe/srKtDLa0Ie
+         vI4/klkgPS2lPNg0x8UVl2Lh7fO198GLNmPM11tLMpKtQg/w7YRaP2ao6fn2jBSQFJhN
+         DC6PVJH4JKMIFCQdVkL+68tG1yWTfl/sVOHfRHIF/zMog3infJc+KrlGvpsX2XalX4XJ
+         ACUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778482938; x=1779087738;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gLQqNeBBoJ1TovFHZ6Y5VIkiSO2gp7MmGpfE8S7ANoU=;
+        b=bS3OVVeFlN9/qvDfcmFuAjUcB5M4k66yulsb4EboLc4TsaJx/fSZi8klWr2EUFGXrb
+         OMtYzj5B7mkQ5sbsOfypWmlR3N8uS3rvCvZ9R3HsyXvusOR6fKct90PatHUPeOhA2Ts7
+         IMAxBdPokR6YFdcxT9w9d8V5OUnBr53GpK1xvwuHUORpogqbqJrDPqYmA3dh+7F2Y4uZ
+         ueFLuI84cHZg5EWqs6IYc8y8QQVuL9UXu4lW6CCyygzfa+vhW5fTkXgTTlayWpGCAmb2
+         6VUxBtGRmgx1TWgO41SSQfyaoAi0bdqxF9xMHAqh2lDEJYZE3lUih9BrC3Kjqx31sNIg
+         pJhA==
+X-Forwarded-Encrypted: i=1; AFNElJ8+ksLOxCk7aH09LNh35doMr5F3hsMO0dXxQSJ5q9eVY3gWrmuuUURJIxeFAYS0jfe3/Pc4PvY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxN04qt9Gqivx6n7hWd6NeY/KUcUC4GF7AEvIWROkUxOtkUbJg3
+	lDzWLYKFj+RGvmNTSRHyoqWjraOBNZnqwMmml0J7DMDEMrg8yvqoNS04
+X-Gm-Gg: Acq92OGaBvgi26PO9BcyU5342VyvR8DpaI6UOst61DEUK5s6WCXvR71H1NwxHN3pHHb
+	J9FKPfLlYeVwmORI0rjfgPPOXsFHOoq3yAv+wTiUA4Q3qrPSpSEKKJ/TwSDpGfslXXtEmv7jU5z
+	6zWRkTslAcVTHBBoJcGC36WdDBChbl4JAI3ivR62/MFSBySUVl9p0agrzTE0UQXIhVrr5hTcdnQ
+	yNxWPeuHd3NzSE9DcKvtvHEL3djCwWdPKrsppqb2Nsukp6lByEiAiPCqnGY3v39Ucu96+EV73P5
+	zR4QDWSjVwAp3KaZUICK0r/Wvy7HPyZZ/kHnIMXK0+r78OdjJUAco2jwmykP0tENAUe43kdMrNx
+	OAzobj8z2QLnJB+9E5UIudNDi1ydmdpMOday6TLdF4UkVQqT/Z6NbpmdOMGk3vYAVU7mUEaCvWP
+	9JhHPMR/FnakTdtuChaEgwo7qYnJNvg6wBCaWx+wZnOtNoopMGqwKChLVI
+X-Received: by 2002:a17:90b:1c8b:b0:362:f860:f9ba with SMTP id 98e67ed59e1d1-365ab9b8e33mr23465932a91.1.1778482937476;
+        Mon, 11 May 2026 00:02:17 -0700 (PDT)
+Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-367beac2c7dsm3274292a91.5.2026.05.11.00.02.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 May 2026 00:02:16 -0700 (PDT)
+From: Maoyi Xie <maoyixie.tju@gmail.com>
+X-Google-Original-From: Maoyi Xie <maoyi.xie@ntu.edu.sg>
+To: Simon Horman <horms@kernel.org>,
+	Allison Henderson <achender@kernel.org>,
+	netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-rdma@vger.kernel.org,
+	rds-devel@oss.oracle.com,
+	linux-kernel@vger.kernel.org,
+	Praveen Kakkolangara <praveen.kakkolangara@aumovio.com>,
+	Maoyi Xie <maoyi.xie@ntu.edu.sg>
+Subject: [PATCH net v3] rds: filter RDS_INFO_* getsockopt by caller's netns
+Date: Mon, 11 May 2026 15:02:11 +0800
+Message-Id: <20260511070211.1033178-1-maoyi.xie@ntu.edu.sg>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,493 +99,382 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD78:EE_|PH7PR12MB6419:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2276534b-2f98-4484-fe28-08deaf2b11da
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|82310400026|36860700016|1800799024|18002099003|22082099003|56012099003|3023799003;
-X-Microsoft-Antispam-Message-Info:
-	9R6iprzYAolNminth9Ko68ZmQYAI+FTYxSfTqUQ8wQFVnLBcWNJjgay+dNfYIYbc07ghMg+I/KdnVTHDUap7jlz6weTwp8SufY76NLLwJu69ZvsfP4S8kCAaRX6LRiG2LeJDIMlxP8TDLKEFt3y06PWoD615tVD8ZEPHwayby9aH8Uc9Lu9c3wxu9FvwwLRVJCtZLYsfqaoLR1haO75gsbW5ZLYHXoBhtyjVRKLF97Mynyg7DP7fNjpb3rnhx6aa4kEXAG/cyVUOWUDktdPTsDykz3cp5FlQfKhDLXQAQsiHV4tHhCq/uxMhBUbU54Vi/XST7LDm8Y21fH9bw7xgNkJp7zlg75MN0El5s2/hkR8S3Y4ZMPUZL7R6qQ/CKg1ybuMagSf15n6pg8jQTB4g8ADgb2ybAAwu61cB7OWeSfYNe45A5C4Ou5Z+OKcrX4Tj1mcZEAZGOuUENcmsYdBdANtmT2/UbmWOkRaSlbYDsueWt+xto4+AYDRnLtJ2KL7XlblmcsJLGjGs4RiWhjEfuSkYW2ALFmuFCLK4P/4UX93A/ebpxedaoub7OLyrw/ZeaJ7o2dAeMPe8lHwMsFVhLfXVDID0bdu9rQpesMkGf7TUjHtZehqmqa5tBES9B1QMMe5VlYjzl+FNj0FIFQuQRVZ8lOYIvnCLinv15yHVw0jy/EStFX1QxytvHWuhVEUcciEhG42tN1csx+WiG34/4UBAzq1c7fzqCkIuAXegxdQ=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(36860700016)(1800799024)(18002099003)(22082099003)(56012099003)(3023799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	3/Hu7HJ+bEbKYCKNzMMzu5t+S88/i7YY/8Ox4O+T/fB8WUrhm1Ug8VleRwPUexVbT3kDsr4Ji+6vEONxCLS33rZ9dvp1zico/JVycUYHwtcDS3bIzoxB5xd5Niw4pXz/Yg44EU2ePoRoOf/pGcJes3hoBHDNwxR+NRfCjD16UJIaJnIX6C5GI8UvAx+Eya8fY48TEuZvQedOgBRWyd3HPTJt3cvfcGVhYmOjtcrl8zvJpcCdXvwQWnLLSI+TuDrbUBDQfhMs2eG5O7bcvm5LIiPJdmkaq4sOoQNXhr7GOIq97OSYetPu0EAMqdUBmMCUyy19ROLBQETNELnoFVw1oOju33pRndoN0Dd+r0omEZEzsHEoh0GKa16pNRlkFsMWjs6xk5CcvTjsvNBtCQh4XVgpM36c55po7SmbzCOqeNfEHDedO5F9K+TAgnKk8Wxl
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2026 07:01:04.9634
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2276534b-2f98-4484-fe28-08deaf2b11da
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000AD78.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6419
-X-Rspamd-Queue-Id: 85EDE508D57
+X-Rspamd-Queue-Id: 7BD2A508D8C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,blackwall.org,nvidia.com,lunn.ch,fiberby.net,iogearbox.net,queasysnail.net,mcwilliam.dev,aisec.fraunhofer.de,vger.kernel.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-286470-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[danieller@nvidia.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-286471-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email,nvidia.com:mid];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.996];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ntu.edu.sg:email,ntu.edu.sg:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,aumovio.com:email]
 X-Rspamd-Action: no action
 
-Add tests to validate the neigh_forward_grat bridge option for selective
-forwarding of gratuitous neighbor announcements.
+The RDS_INFO_* family of getsockopt(2) options reads several
+file-scope global lists that are not per-netns:
 
-The tests verify per-port and per-VLAN control of gratuitous neighbor
-announcement forwarding for both IPv4 (gratuitous ARP) and IPv6
-(unsolicited NA):
-- When neigh_suppress is enabled with neigh_forward_grat off (default),
-  gratuitous announcements are suppressed
-- When neigh_forward_grat is enabled, gratuitous announcements are
-  forwarded while regular neighbor discovery remains suppressed
+  rds_sock_info / rds6_sock_info,
+  rds_sock_inc_info / rds6_sock_inc_info        -> rds_sock_list
+  rds_tcp_tc_info / rds6_tcp_tc_info            -> rds_tcp_tc_list
+  rds_conn_info / rds6_conn_info,
+  rds_conn_message_info_cmn (for the *_SEND_MESSAGES and
+  *_RETRANS_MESSAGES variants),
+  rds_for_each_conn_info (for RDS_INFO_IB_CONNECTIONS)
+                                                -> rds_conn_hash[]
 
-For IPv4, use arping to send gratuitous ARP packets. For IPv6, use
-mausezahn to craft unsolicited Neighbor Advertisement packets.
+The handlers do not filter by the caller's network namespace.
+rds_info_getsockopt() has no netns or capable() check, and
+rds_create() has no capable() check, so AF_RDS is reachable from
+an unprivileged user namespace. As a result, an unprivileged
+caller in a fresh user_ns plus netns can read the bound address
+and sock inode of every RDS socket on the host, the peer address
+of incoming messages on every RDS socket on the host, the peer
+address and TCP sequence numbers of every rds-tcp connection on
+the host, and the peer address and RDS sequence numbers of every
+RDS connection on the host.
 
-For the per-port tests, the IPv4 test exercises the ip link interface,
-while the IPv6 test exercises the bridge link interface.
-The per-VLAN tests use the bridge interface throughout, as per-VLAN
-attributes are only accessible via 'bridge vlan'.
+The rds-tcp transport is reachable from a non-initial netns (see
+rds_set_transport()), so a one-shot init_net gate at
+rds_info_getsockopt() would deny legitimate per-netns visibility
+to rds-tcp callers. Instead, filter at each handler by comparing
+the netns of the caller's socket to the netns of the list entry,
+or to rds_conn_net(conn) for connection paths. Only copy entries
+whose netns matches the caller. Counters (RDS_INFO_COUNTERS) are
+aggregate statistics and remain global.
 
-Signed-off-by: Danielle Ratson <danieller@nvidia.com>
+Reproducer (KASAN VM, rds and rds_tcp loaded): an AF_RDS socket
+binds 127.0.0.1:4242 in init_net as root. A child process enters
+a fresh user_ns plus netns and opens AF_RDS there, then calls
+getsockopt(SOL_RDS, RDS_INFO_SOCKETS). Before this change, the
+child sees the init_net socket. After this change, the child
+sees zero entries.
+
+Suggested-by: Allison Henderson <achender@kernel.org>
+Suggested-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Allison Henderson <achender@kernel.org>
+Co-developed-by: Praveen Kakkolangara <praveen.kakkolangara@aumovio.com>
+Signed-off-by: Praveen Kakkolangara <praveen.kakkolangara@aumovio.com>
+Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
 ---
+v3: Address Simon Horman's review of v2. The size precheck and the
+    lens count are now both restricted to the caller's netns in
+    rds_sock_info, rds6_sock_info, rds_tcp_tc_info and
+    rds6_tcp_tc_info. Each handler now does a first pass under the
+    list lock to count entries visible in the caller's netns, then
+    short-circuits with that count if the user buffer is too small,
+    then a second pass to fill data. This closes both issues Simon
+    flagged: a zero-length probe no longer returns the global count,
+    and a caller that sizes its buffer to the value returned by lens
+    no longer hits ENOSPC on the second call.
+    Re-verified on KASAN VM with the v1 PoC: attacker in fresh
+    user_ns + netns sees zero RDS_INFO_SOCKETS entries; init_net
+    access sees its own entries; lens returns the ns-scoped count
+    on both probe and full reads.
+v2: rebased onto net/main tip (b266bacba) so patchwork can apply.
+    No code changes. Carries forward Reviewed-by from v1 review.
+v1: https://lore.kernel.org/r/20260506075031.2238596-1-maoyixie.tju@gmail.com
 
-Notes:
-    v2:
-    	* Add test cases for validating that regular (non-gratuitous) ARP
-    	  neigh_forward_grat is enabled.
+ net/rds/af_rds.c     | 42 ++++++++++++++++++++++++++++++++++++------
+ net/rds/connection.c | 13 +++++++++++++
+ net/rds/tcp.c        | 35 +++++++++++++++++++++++++++++++----
+ 3 files changed, 80 insertions(+), 10 deletions(-)
 
- .../net/test_bridge_neigh_suppress.sh         | 342 +++++++++++++++++-
- 1 file changed, 340 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/net/test_bridge_neigh_suppress.sh b/tools/testing/selftests/net/test_bridge_neigh_suppress.sh
-index 4bc92078e173..e9ed0d750996 100755
---- a/tools/testing/selftests/net/test_bridge_neigh_suppress.sh
-+++ b/tools/testing/selftests/net/test_bridge_neigh_suppress.sh
-@@ -58,6 +58,10 @@ TESTS="
- 	neigh_vlan_suppress_ns
- 	neigh_suppress_arp_probe
- 	neigh_suppress_dad_ns
-+	neigh_forward_grat_arp
-+	neigh_forward_grat_na
-+	neigh_vlan_forward_grat_arp
-+	neigh_vlan_forward_grat_na
- "
- VERBOSE=0
- PAUSE_ON_FAIL=no
-@@ -76,7 +80,8 @@ log_test()
- 		printf "TEST: %-60s  [ OK ]\n" "${msg}"
- 		nsuccess=$((nsuccess+1))
- 	else
--		ret=1
-+		# shellcheck disable=SC2154
-+		ret=$(ksft_exit_status_merge "$ret" "$ksft_fail")
- 		nfail=$((nfail+1))
- 		printf "TEST: %-60s  [FAIL]\n" "${msg}"
- 		if [ "$VERBOSE" = "1" ]; then
-@@ -99,6 +104,7 @@ log_test()
- 	fi
- 
- 	[ "$VERBOSE" = "1" ] && echo
-+	return 0
- }
- 
- run_cmd()
-@@ -136,6 +142,15 @@ tc_check_packets()
- 	[[ $pkts == $count ]]
- }
- 
-+neigh_forward_grat_check()
-+{
-+	if ! bridge link help 2>&1 | grep -q "neigh_forward_grat"; then
-+		echo "SKIP: iproute2 bridge too old, missing gratuitous ARP/unsolicited NA forwarding control support"
-+		# shellcheck disable=SC2154
-+		return "$ksft_skip"
-+	fi
-+}
-+
- ################################################################################
- # Setup
- 
-@@ -563,6 +578,17 @@ icmpv6_header_get()
- 	echo $p
- }
- 
-+icmpv6_na_header_get()
-+{
-+	local csum=$1; shift
-+	local tip=$1; shift
-+
-+	# Type 136 (Neighbor Advertisement), hex format, Override flag set,
-+	# Solicited flag clear (unsolicited NA).
-+	# ICMPv6.type : ICMPv6.code : ICMPv6.checksum : Flags : Target Address
-+	echo "88:00:$csum:20:00:00:00:$tip:"
-+}
-+
- neigh_suppress_uc_ns_common()
+diff --git a/net/rds/af_rds.c b/net/rds/af_rds.c
+index 76f625986..6e22b516b 100644
+--- a/net/rds/af_rds.c
++++ b/net/rds/af_rds.c
+@@ -735,6 +735,7 @@ static void rds_sock_inc_info(struct socket *sock, unsigned int len,
+ 			      struct rds_info_iterator *iter,
+ 			      struct rds_info_lengths *lens)
  {
- 	local vid=$1; shift
-@@ -1001,6 +1027,315 @@ neigh_suppress_dad_ns()
- 	log_test $? 0 "DAD NS suppression"
- }
++	struct net *net = sock_net(sock->sk);
+ 	struct rds_sock *rs;
+ 	struct rds_incoming *inc;
+ 	unsigned int total = 0;
+@@ -744,6 +745,9 @@ static void rds_sock_inc_info(struct socket *sock, unsigned int len,
+ 	spin_lock_bh(&rds_sock_lock);
  
-+neigh_forward_grat_arp()
-+{
-+	local vid=10
-+	local sip=192.0.2.1
-+	local tip=$sip
-+	local h2_ip=192.0.2.2
-+	local h2_mac
-+
-+	neigh_forward_grat_check || return $?
-+
-+	echo
-+	echo "Gratuitous ARP forwarding"
-+	echo "-------------------------"
-+
-+	run_cmd "tc -n $sw1 qdisc replace dev vx0 clsact"
-+	run_cmd "tc -n $sw1 filter replace dev vx0 egress pref 1 handle 101 proto 0x0806 flower indev swp1 arp_tip $tip arp_sip $sip arp_op request action pass"
-+	run_cmd "tc -n $sw1 filter replace dev vx0 egress pref 1 handle 102 proto 0x0806 flower indev swp1 arp_tip $h2_ip arp_sip $sip arp_op request action pass"
-+
-+	h2_mac=$(ip -n "$h2" -j -p link show eth0."$vid" | jq -r '.[]["address"]')
-+	run_cmd "bridge -n $sw1 fdb replace $h2_mac dev vx0 master static vlan $vid"
-+	run_cmd "ip -n $sw1 neigh replace $tip lladdr $h2_mac nud permanent dev br0.$vid"
-+	run_cmd "ip -n $sw1 neigh replace $h2_ip lladdr $h2_mac nud permanent dev br0.$vid"
-+
-+	# Enable neighbor suppression. Gratuitous ARP should be suppressed by
-+	# default (neigh_forward_grat defaults to off).
-+	run_cmd "ip -n $sw1 link set dev vx0 type bridge_slave neigh_suppress on"
-+	run_cmd "ip -n $sw1 -d link show dev vx0 | grep \"neigh_suppress on\""
-+	log_test $? 0 "\"neigh_suppress\" is on"
-+
-+	# Send gratuitous ARP (sip == tip) and check it's suppressed.
-+	run_cmd "ip netns exec $h1 arping -U -c 1 -w 5 -I eth0.$vid $tip"
-+	tc_check_packets "$sw1" "dev vx0 egress" 101 0
-+	log_test $? 0 "Gratuitous ARP suppression"
-+
-+	# Explicitly enable neigh_forward_grat and verify gratuitous ARP is
-+	# now forwarded.
-+	run_cmd "ip -n $sw1 link set dev vx0 type bridge_slave neigh_forward_grat on"
-+	run_cmd "ip -n $sw1 -d link show dev vx0 | grep \"neigh_forward_grat on\""
-+	log_test $? 0 "\"neigh_forward_grat\" is on"
-+
-+	run_cmd "ip netns exec $h1 arping -U -c 1 -w 5 -I eth0.$vid $tip"
-+	tc_check_packets "$sw1" "dev vx0 egress" 101 1
-+	log_test $? 0 "Gratuitous ARP forwarding"
-+
-+	# Verify that regular (non-gratuitous) ARP requests are still
-+	# suppressed when neigh_forward_grat is enabled.
-+	run_cmd "ip netns exec $h1 arping -c 1 -w 5 -I eth0.$vid $h2_ip"
-+	tc_check_packets "$sw1" "dev vx0 egress" 102 0
-+	log_test $? 0 "Regular ARP suppression with \"neigh_forward_grat\" on"
-+
-+	# Disable neigh_forward_grat and verify suppression resumes.
-+	run_cmd "ip -n $sw1 link set dev vx0 type bridge_slave neigh_forward_grat off"
-+	run_cmd "ip -n $sw1 -d link show dev vx0 | grep \"neigh_forward_grat off\""
-+	log_test $? 0 "\"neigh_forward_grat\" is off"
-+
-+	run_cmd "ip netns exec $h1 arping -U -c 1 -w 5 -I eth0.$vid $tip"
-+	tc_check_packets "$sw1" "dev vx0 egress" 101 1
-+	log_test $? 0 "Gratuitous ARP suppression"
-+}
-+
-+# neigh_forward_grat_arp() uses 'ip link' interface, and neigh_forward_grat_na()
-+# uses 'bridge link' interface to exercise both paths.
-+neigh_forward_grat_na()
-+{
-+	local vid=10
-+	local saddr=2001:db8:1::1
-+	local daddr=ff02::1
-+	local h2_addr=2001:db8:1::2
-+	local h2_maddr=ff02::1:ff00:2
-+	local full_addr=20:01:0d:b8:00:01:00:00:00:00:00:00:00:00:00:01
-+	local h2_full_addr=20:01:0d:b8:00:01:00:00:00:00:00:00:00:00:00:02
-+	local csum="fd:32"
-+	local csum_ns="1f:2f"
-+	local dmac=33:33:00:00:00:01
-+	local h2_dmac=33:33:ff:00:00:02
-+	local h2_mac
-+	local smac
-+
-+	neigh_forward_grat_check || return $?
-+
-+	echo
-+	echo "Unsolicited NA forwarding"
-+	echo "-------------------------"
-+
-+	smac=$(ip -n "$h1" -j -p link show eth0."$vid" | jq -r '.[]["address"]')
-+
-+	run_cmd "tc -n $sw1 qdisc replace dev vx0 clsact"
-+	run_cmd "tc -n $sw1 filter replace dev vx0 egress pref 1 handle 101 proto ipv6 flower indev swp1 ip_proto icmpv6 dst_ip $daddr src_ip $saddr type 136 code 0 action pass"
-+	run_cmd "tc -n $sw1 filter replace dev vx0 egress pref 1 handle 102 proto ipv6 flower indev swp1 ip_proto icmpv6 dst_ip $h2_maddr src_ip $saddr type 135 code 0 action pass"
-+
-+	h2_mac=$(ip -n "$h2" -j -p link show eth0."$vid" | jq -r '.[]["address"]')
-+	run_cmd "bridge -n $sw1 fdb replace $h2_mac dev vx0 master static vlan $vid"
-+	run_cmd "ip -n $sw1 neigh replace $saddr lladdr $h2_mac nud permanent dev br0.$vid"
-+	run_cmd "ip -n $sw1 neigh replace $h2_addr lladdr $h2_mac nud permanent dev br0.$vid"
-+
-+	# Enable neighbor suppression. Unsolicited NA should be suppressed by
-+	# default (neigh_forward_grat defaults to off).
-+	run_cmd "bridge -n $sw1 link set dev vx0 neigh_suppress on"
-+	run_cmd "bridge -n $sw1 -d link show dev vx0 | grep \"neigh_suppress on\""
-+	log_test $? 0 "\"neigh_suppress\" is on"
-+
-+	# Send unsolicited NA and check it's suppressed.
-+	run_cmd "ip netns exec $h1 mausezahn -6 eth0.$vid -c 1 -a $smac -b $dmac -A $saddr -B $daddr -t ip hop=255,next=58,payload=$(icmpv6_na_header_get "$csum" "$full_addr") -q"
-+	tc_check_packets "$sw1" "dev vx0 egress" 101 0
-+	log_test $? 0 "Unsolicited NA suppression"
-+
-+	# Explicitly enable neigh_forward_grat and verify unsolicited NA is
-+	# now forwarded.
-+	run_cmd "bridge -n $sw1 link set dev vx0 neigh_forward_grat on"
-+	run_cmd "bridge -n $sw1 -d link show dev vx0 | grep \"neigh_forward_grat on\""
-+	log_test $? 0 "\"neigh_forward_grat\" is on"
-+
-+	run_cmd "ip netns exec $h1 mausezahn -6 eth0.$vid -c 1 -a $smac -b $dmac -A $saddr -B $daddr -t ip hop=255,next=58,payload=$(icmpv6_na_header_get "$csum" "$full_addr") -q"
-+	tc_check_packets "$sw1" "dev vx0 egress" 101 1
-+	log_test $? 0 "Unsolicited NA forwarding"
-+
-+	# Verify that solicited NS messages are still suppressed when
-+	# neigh_forward_grat is enabled.
-+	run_cmd "ip netns exec $h1 mausezahn -6 eth0.$vid -c 1 -a $smac -b $h2_dmac -A $saddr -B $h2_maddr -t ip hop=255,next=58,payload=$(icmpv6_header_get "$csum_ns" "$h2_full_addr") -q"
-+	tc_check_packets "$sw1" "dev vx0 egress" 102 0
-+	log_test $? 0 "Solicited NS suppression with \"neigh_forward_grat\" on"
-+
-+	# Disable neigh_forward_grat and verify suppression resumes.
-+	run_cmd "bridge -n $sw1 link set dev vx0 neigh_forward_grat off"
-+	run_cmd "bridge -n $sw1 -d link show dev vx0 | grep \"neigh_forward_grat off\""
-+	log_test $? 0 "\"neigh_forward_grat\" is off"
-+
-+	run_cmd "ip netns exec $h1 mausezahn -6 eth0.$vid -c 1 -a $smac -b $dmac -A $saddr -B $daddr -t ip hop=255,next=58,payload=$(icmpv6_na_header_get "$csum" "$full_addr") -q"
-+	tc_check_packets "$sw1" "dev vx0 egress" 101 1
-+	log_test $? 0 "Unsolicited NA suppression"
-+}
-+
-+neigh_vlan_forward_grat_arp()
-+{
-+	local vid1=10
-+	local vid2=20
-+	local sip1=192.0.2.1
-+	local sip2=192.0.2.17
-+	local h2_ip1=192.0.2.2
-+	local h2_mac1
-+	local h2_mac2
-+
-+	neigh_forward_grat_check || return $?
-+
-+	echo
-+	echo "Per-VLAN gratuitous ARP forwarding"
-+	echo "----------------------------------"
-+
-+	run_cmd "tc -n $sw1 qdisc replace dev vx0 clsact"
-+	run_cmd "tc -n $sw1 filter replace dev vx0 egress pref 1 handle 101 proto 0x0806 flower indev swp1 arp_tip $sip1 arp_sip $sip1 arp_op request action pass"
-+	run_cmd "tc -n $sw1 filter replace dev vx0 egress pref 1 handle 102 proto 0x0806 flower indev swp1 arp_tip $sip2 arp_sip $sip2 arp_op request action pass"
-+	run_cmd "tc -n $sw1 filter replace dev vx0 egress pref 1 handle 103 proto 0x0806 flower indev swp1 arp_tip $h2_ip1 arp_sip $sip1 arp_op request action pass"
-+
-+	h2_mac1=$(ip -n "$h2" -j -p link show eth0."$vid1" | jq -r '.[]["address"]')
-+	h2_mac2=$(ip -n "$h2" -j -p link show eth0."$vid2" | jq -r '.[]["address"]')
-+	run_cmd "bridge -n $sw1 fdb replace $h2_mac1 dev vx0 master static vlan $vid1"
-+	run_cmd "bridge -n $sw1 fdb replace $h2_mac2 dev vx0 master static vlan $vid2"
-+	run_cmd "ip -n $sw1 neigh replace $sip1 lladdr $h2_mac1 nud permanent dev br0.$vid1"
-+	run_cmd "ip -n $sw1 neigh replace $sip2 lladdr $h2_mac2 nud permanent dev br0.$vid2"
-+	run_cmd "ip -n $sw1 neigh replace $h2_ip1 lladdr $h2_mac1 nud permanent dev br0.$vid1"
-+
-+	# Enable per-{Port, VLAN} neighbor suppression.
-+	run_cmd "bridge -n $sw1 link set dev vx0 neigh_vlan_suppress on"
-+	run_cmd "bridge -n $sw1 -d link show dev vx0 | grep \"neigh_vlan_suppress on\""
-+	log_test $? 0 "\"neigh_vlan_suppress\" is on"
-+
-+	# Enable neighbor suppression on VLAN 10. Gratuitous ARP should be
-+	# suppressed by default on VLAN 10 (neigh_forward_grat defaults to off)
-+	# but not on VLAN 20.
-+	run_cmd "bridge -n $sw1 vlan set vid $vid1 dev vx0 neigh_suppress on"
-+	run_cmd "bridge -n $sw1 -d vlan show dev vx0 vid $vid1 | grep \"neigh_suppress on\""
-+	log_test $? 0 "\"neigh_suppress\" is on (VLAN $vid1)"
-+
-+	run_cmd "ip netns exec $h1 arping -U -c 1 -w 5 -I eth0.$vid1 $sip1"
-+	tc_check_packets "$sw1" "dev vx0 egress" 101 0
-+	log_test $? 0 "Gratuitous ARP suppression (VLAN $vid1)"
-+
-+	run_cmd "ip netns exec $h1 arping -U -c 1 -w 5 -I eth0.$vid2 $sip2"
-+	tc_check_packets "$sw1" "dev vx0 egress" 102 1
-+	log_test $? 0 "Gratuitous ARP forwarding (VLAN $vid2)"
-+
-+	# Enable neigh_forward_grat on VLAN 10 and verify gratuitous ARP is
-+	# now forwarded.
-+	run_cmd "bridge -n $sw1 vlan set vid $vid1 dev vx0 neigh_forward_grat on"
-+	run_cmd "bridge -n $sw1 -d vlan show dev vx0 vid $vid1 | grep \"neigh_forward_grat on\""
-+	log_test $? 0 "\"neigh_forward_grat\" is on (VLAN $vid1)"
-+
-+	run_cmd "ip netns exec $h1 arping -U -c 1 -w 5 -I eth0.$vid1 $sip1"
-+	tc_check_packets "$sw1" "dev vx0 egress" 101 1
-+	log_test $? 0 "Gratuitous ARP forwarding (VLAN $vid1)"
-+
-+	# Verify that regular (non-gratuitous) ARP requests on VLAN $vid1 are
-+	# still suppressed when neigh_forward_grat is enabled.
-+	run_cmd "ip netns exec $h1 arping -c 1 -w 5 -I eth0.$vid1 $h2_ip1"
-+	tc_check_packets "$sw1" "dev vx0 egress" 103 0
-+	log_test $? 0 "Regular ARP suppression with \"neigh_forward_grat\" on (VLAN $vid1)"
-+
-+	# Enable neighbor suppression on VLAN 20 (neigh_forward_grat defaults to
-+	# off), and verify gratuitous ARP is suppressed on VLAN 20.
-+	run_cmd "bridge -n $sw1 vlan set vid $vid2 dev vx0 neigh_suppress on"
-+	run_cmd "bridge -n $sw1 -d vlan show dev vx0 vid $vid2 | grep \"neigh_suppress on\""
-+	log_test $? 0 "\"neigh_suppress\" is on (VLAN $vid2)"
-+
-+	# VLAN 10 should still forward (neigh_forward_grat is on).
-+	run_cmd "ip netns exec $h1 arping -U -c 1 -w 5 -I eth0.$vid1 $sip1"
-+	tc_check_packets "$sw1" "dev vx0 egress" 101 2
-+	log_test $? 0 "Gratuitous ARP forwarding (VLAN $vid1)"
-+
-+	# VLAN 20 should suppress (neigh_forward_grat defaults to off).
-+	run_cmd "ip netns exec $h1 arping -U -c 1 -w 5 -I eth0.$vid2 $sip2"
-+	tc_check_packets "$sw1" "dev vx0 egress" 102 1
-+	log_test $? 0 "Gratuitous ARP suppression (VLAN $vid2)"
-+}
-+
-+neigh_vlan_forward_grat_na()
-+{
-+	local vid1=10
-+	local vid2=20
-+	local saddr1=2001:db8:1::1
-+	local daddr=ff02::1
-+	local h2_addr1=2001:db8:1::2
-+	local h2_maddr1=ff02::1:ff00:2
-+	local full_addr1=20:01:0d:b8:00:01:00:00:00:00:00:00:00:00:00:01
-+	local h2_full_addr1=20:01:0d:b8:00:01:00:00:00:00:00:00:00:00:00:02
-+	local csum1="fd:32"
-+	local csum_ns1="1f:2f"
-+	local saddr2=2001:db8:2::1
-+	local full_addr2=20:01:0d:b8:00:02:00:00:00:00:00:00:00:00:00:01
-+	local csum2="fd:30"
-+	local dmac=33:33:00:00:00:01
-+	local h2_dmac1=33:33:ff:00:00:02
-+	local h2_mac1
-+	local h2_mac2
-+	local smac
-+
-+	neigh_forward_grat_check || return $?
-+
-+	echo
-+	echo "Per-VLAN unsolicited NA forwarding"
-+	echo "----------------------------------"
-+
-+	smac=$(ip -n "$h1" -j -p link show eth0."$vid1" | jq -r '.[]["address"]')
-+
-+	run_cmd "tc -n $sw1 qdisc replace dev vx0 clsact"
-+	run_cmd "tc -n $sw1 filter replace dev vx0 egress pref 1 handle 101 proto ipv6 flower indev swp1 ip_proto icmpv6 dst_ip $daddr src_ip $saddr1 type 136 code 0 action pass"
-+	run_cmd "tc -n $sw1 filter replace dev vx0 egress pref 1 handle 102 proto ipv6 flower indev swp1 ip_proto icmpv6 dst_ip $daddr src_ip $saddr2 type 136 code 0 action pass"
-+	run_cmd "tc -n $sw1 filter replace dev vx0 egress pref 1 handle 103 proto ipv6 flower indev swp1 ip_proto icmpv6 dst_ip $h2_maddr1 src_ip $saddr1 type 135 code 0 action pass"
-+
-+	h2_mac1=$(ip -n "$h2" -j -p link show eth0."$vid1" | jq -r '.[]["address"]')
-+	h2_mac2=$(ip -n "$h2" -j -p link show eth0."$vid2" | jq -r '.[]["address"]')
-+	run_cmd "bridge -n $sw1 fdb replace $h2_mac1 dev vx0 master static vlan $vid1"
-+	run_cmd "bridge -n $sw1 fdb replace $h2_mac2 dev vx0 master static vlan $vid2"
-+	run_cmd "ip -n $sw1 neigh replace $saddr1 lladdr $h2_mac1 nud permanent dev br0.$vid1"
-+	run_cmd "ip -n $sw1 neigh replace $saddr2 lladdr $h2_mac2 nud permanent dev br0.$vid2"
-+	run_cmd "ip -n $sw1 neigh replace $h2_addr1 lladdr $h2_mac1 nud permanent dev br0.$vid1"
-+
-+	# Enable per-{Port, VLAN} neighbor suppression.
-+	run_cmd "bridge -n $sw1 link set dev vx0 neigh_vlan_suppress on"
-+	run_cmd "bridge -n $sw1 -d link show dev vx0 | grep \"neigh_vlan_suppress on\""
-+	log_test $? 0 "\"neigh_vlan_suppress\" is on"
-+
-+	# Enable neighbor suppression on VLAN 10. Unsolicited NA should be
-+	# suppressed by default on VLAN 10 (neigh_forward_grat defaults to off)
-+	# but not on VLAN 20.
-+	run_cmd "bridge -n $sw1 vlan set vid $vid1 dev vx0 neigh_suppress on"
-+	run_cmd "bridge -n $sw1 -d vlan show dev vx0 vid $vid1 | grep \"neigh_suppress on\""
-+	log_test $? 0 "\"neigh_suppress\" is on (VLAN $vid1)"
-+
-+	run_cmd "ip netns exec $h1 mausezahn -6 eth0.$vid1 -c 1 -a $smac -b $dmac -A $saddr1 -B $daddr -t ip hop=255,next=58,payload=$(icmpv6_na_header_get "$csum1" "$full_addr1") -q"
-+	tc_check_packets "$sw1" "dev vx0 egress" 101 0
-+	log_test $? 0 "Unsolicited NA suppression (VLAN $vid1)"
-+
-+	run_cmd "ip netns exec $h1 mausezahn -6 eth0.$vid2 -c 1 -a $smac -b $dmac -A $saddr2 -B $daddr -t ip hop=255,next=58,payload=$(icmpv6_na_header_get "$csum2" "$full_addr2") -q"
-+	tc_check_packets "$sw1" "dev vx0 egress" 102 1
-+	log_test $? 0 "Unsolicited NA forwarding (VLAN $vid2)"
-+
-+	# Enable neigh_forward_grat on VLAN 10 and verify unsolicited NA is
-+	# now forwarded.
-+	run_cmd "bridge -n $sw1 vlan set vid $vid1 dev vx0 neigh_forward_grat on"
-+	run_cmd "bridge -n $sw1 -d vlan show dev vx0 vid $vid1 | grep \"neigh_forward_grat on\""
-+	log_test $? 0 "\"neigh_forward_grat\" is on (VLAN $vid1)"
-+
-+	run_cmd "ip netns exec $h1 mausezahn -6 eth0.$vid1 -c 1 -a $smac -b $dmac -A $saddr1 -B $daddr -t ip hop=255,next=58,payload=$(icmpv6_na_header_get "$csum1" "$full_addr1") -q"
-+	tc_check_packets "$sw1" "dev vx0 egress" 101 1
-+	log_test $? 0 "Unsolicited NA forwarding (VLAN $vid1)"
-+
-+	# Verify that solicited NS messages on VLAN $vid1 are still suppressed
-+	# when neigh_forward_grat is enabled.
-+	run_cmd "ip netns exec $h1 mausezahn -6 eth0.$vid1 -c 1 -a $smac -b $h2_dmac1 -A $saddr1 -B $h2_maddr1 -t ip hop=255,next=58,payload=$(icmpv6_header_get "$csum_ns1" "$h2_full_addr1") -q"
-+	tc_check_packets "$sw1" "dev vx0 egress" 103 0
-+	log_test $? 0 "Solicited NS suppression with \"neigh_forward_grat\" on (VLAN $vid1)"
-+
-+	# Enable neighbor suppression on VLAN 20 (neigh_forward_grat defaults to
-+	# off), and verify unsolicited NA is suppressed on VLAN 20.
-+	run_cmd "bridge -n $sw1 vlan set vid $vid2 dev vx0 neigh_suppress on"
-+	run_cmd "bridge -n $sw1 -d vlan show dev vx0 vid $vid2 | grep \"neigh_suppress on\""
-+	log_test $? 0 "\"neigh_suppress\" is on (VLAN $vid2)"
-+
-+	# VLAN 10 should still forward (neigh_forward_grat is on).
-+	run_cmd "ip netns exec $h1 mausezahn -6 eth0.$vid1 -c 1 -a $smac -b $dmac -A $saddr1 -B $daddr -t ip hop=255,next=58,payload=$(icmpv6_na_header_get "$csum1" "$full_addr1") -q"
-+	tc_check_packets "$sw1" "dev vx0 egress" 101 2
-+	log_test $? 0 "Unsolicited NA forwarding (VLAN $vid1)"
-+
-+	# VLAN 20 should suppress (neigh_forward_grat defaults to off).
-+	run_cmd "ip netns exec $h1 mausezahn -6 eth0.$vid2 -c 1 -a $smac -b $dmac -A $saddr2 -B $daddr -t ip hop=255,next=58,payload=$(icmpv6_na_header_get "$csum2" "$full_addr2") -q"
-+	tc_check_packets "$sw1" "dev vx0 egress" 102 1
-+	log_test $? 0 "Unsolicited NA suppression (VLAN $vid2)"
-+}
-+
- ################################################################################
- # Usage
+ 	list_for_each_entry(rs, &rds_sock_list, rs_item) {
++		/* Only show sockets in the caller's netns. */
++		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
++			continue;
+ 		/* This option only supports IPv4 sockets. */
+ 		if (!ipv6_addr_v4mapped(&rs->rs_bound_addr))
+ 			continue;
+@@ -774,6 +778,7 @@ static void rds6_sock_inc_info(struct socket *sock, unsigned int len,
+ 			       struct rds_info_iterator *iter,
+ 			       struct rds_info_lengths *lens)
+ {
++	struct net *net = sock_net(sock->sk);
+ 	struct rds_incoming *inc;
+ 	unsigned int total = 0;
+ 	struct rds_sock *rs;
+@@ -783,6 +788,9 @@ static void rds6_sock_inc_info(struct socket *sock, unsigned int len,
+ 	spin_lock_bh(&rds_sock_lock);
  
-@@ -1087,7 +1422,10 @@ cleanup
+ 	list_for_each_entry(rs, &rds_sock_list, rs_item) {
++		/* Only show sockets in the caller's netns. */
++		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
++			continue;
+ 		read_lock(&rs->rs_recv_lock);
  
- for t in $TESTS
- do
--	setup; $t; cleanup;
-+	setup
-+	$t
-+	ret=$(ksft_exit_status_merge "$ret" $?)
-+	cleanup
- done
+ 		list_for_each_entry(inc, &rs->rs_recv_queue, i_item) {
+@@ -806,6 +814,7 @@ static void rds_sock_info(struct socket *sock, unsigned int len,
+ 			  struct rds_info_iterator *iter,
+ 			  struct rds_info_lengths *lens)
+ {
++	struct net *net = sock_net(sock->sk);
+ 	struct rds_info_socket sinfo;
+ 	unsigned int cnt = 0;
+ 	struct rds_sock *rs;
+@@ -814,12 +823,22 @@ static void rds_sock_info(struct socket *sock, unsigned int len,
  
- if [ "$TESTS" != "none" ]; then
+ 	spin_lock_bh(&rds_sock_lock);
+ 
+-	if (len < rds_sock_count) {
+-		cnt = rds_sock_count;
+-		goto out;
++	/* First pass: count entries visible in the caller's netns. */
++	list_for_each_entry(rs, &rds_sock_list, rs_item) {
++		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
++			continue;
++		if (!ipv6_addr_v4mapped(&rs->rs_bound_addr))
++			continue;
++		cnt++;
+ 	}
+ 
++	if (len < cnt)
++		goto out;
++
+ 	list_for_each_entry(rs, &rds_sock_list, rs_item) {
++		/* Only show sockets in the caller's netns. */
++		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
++			continue;
+ 		/* This option only supports IPv4 sockets. */
+ 		if (!ipv6_addr_v4mapped(&rs->rs_bound_addr))
+ 			continue;
+@@ -832,7 +851,6 @@ static void rds_sock_info(struct socket *sock, unsigned int len,
+ 		sinfo.inum = sock_i_ino(rds_rs_to_sk(rs));
+ 
+ 		rds_info_copy(iter, &sinfo, sizeof(sinfo));
+-		cnt++;
+ 	}
+ 
+ out:
+@@ -847,17 +865,29 @@ static void rds6_sock_info(struct socket *sock, unsigned int len,
+ 			   struct rds_info_iterator *iter,
+ 			   struct rds_info_lengths *lens)
+ {
++	struct net *net = sock_net(sock->sk);
+ 	struct rds6_info_socket sinfo6;
++	unsigned int cnt = 0;
+ 	struct rds_sock *rs;
+ 
+ 	len /= sizeof(struct rds6_info_socket);
+ 
+ 	spin_lock_bh(&rds_sock_lock);
+ 
+-	if (len < rds_sock_count)
++	/* First pass: count entries visible in the caller's netns. */
++	list_for_each_entry(rs, &rds_sock_list, rs_item) {
++		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
++			continue;
++		cnt++;
++	}
++
++	if (len < cnt)
+ 		goto out;
+ 
+ 	list_for_each_entry(rs, &rds_sock_list, rs_item) {
++		/* Only show sockets in the caller's netns. */
++		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
++			continue;
+ 		sinfo6.sndbuf = rds_sk_sndbuf(rs);
+ 		sinfo6.rcvbuf = rds_sk_rcvbuf(rs);
+ 		sinfo6.bound_addr = rs->rs_bound_addr;
+@@ -870,7 +900,7 @@ static void rds6_sock_info(struct socket *sock, unsigned int len,
+ 	}
+ 
+  out:
+-	lens->nr = rds_sock_count;
++	lens->nr = cnt;
+ 	lens->each = sizeof(struct rds6_info_socket);
+ 
+ 	spin_unlock_bh(&rds_sock_lock);
+diff --git a/net/rds/connection.c b/net/rds/connection.c
+index c10b7ed06..7c8ab8e97 100644
+--- a/net/rds/connection.c
++++ b/net/rds/connection.c
+@@ -568,6 +568,7 @@ static void rds_conn_message_info_cmn(struct socket *sock, unsigned int len,
+ 				      struct rds_info_lengths *lens,
+ 				      int want_send, bool isv6)
+ {
++	struct net *net = sock_net(sock->sk);
+ 	struct hlist_head *head;
+ 	struct list_head *list;
+ 	struct rds_connection *conn;
+@@ -590,6 +591,9 @@ static void rds_conn_message_info_cmn(struct socket *sock, unsigned int len,
+ 			struct rds_conn_path *cp;
+ 			int npaths;
+ 
++			/* Only show connections in the caller's netns. */
++			if (!net_eq(rds_conn_net(conn), net))
++				continue;
+ 			if (!isv6 && conn->c_isv6)
+ 				continue;
+ 
+@@ -688,6 +692,7 @@ void rds_for_each_conn_info(struct socket *sock, unsigned int len,
+ 			  u64 *buffer,
+ 			  size_t item_len)
+ {
++	struct net *net = sock_net(sock->sk);
+ 	struct hlist_head *head;
+ 	struct rds_connection *conn;
+ 	size_t i;
+@@ -700,6 +705,9 @@ void rds_for_each_conn_info(struct socket *sock, unsigned int len,
+ 	for (i = 0, head = rds_conn_hash; i < ARRAY_SIZE(rds_conn_hash);
+ 	     i++, head++) {
+ 		hlist_for_each_entry_rcu(conn, head, c_hash_node) {
++			/* Only show connections in the caller's netns. */
++			if (!net_eq(rds_conn_net(conn), net))
++				continue;
+ 
+ 			/* Zero the per-item buffer before handing it to the
+ 			 * visitor so any field the visitor does not write -
+@@ -733,6 +741,7 @@ static void rds_walk_conn_path_info(struct socket *sock, unsigned int len,
+ 				    u64 *buffer,
+ 				    size_t item_len)
+ {
++	struct net *net = sock_net(sock->sk);
+ 	struct hlist_head *head;
+ 	struct rds_connection *conn;
+ 	size_t i;
+@@ -747,6 +756,10 @@ static void rds_walk_conn_path_info(struct socket *sock, unsigned int len,
+ 		hlist_for_each_entry_rcu(conn, head, c_hash_node) {
+ 			struct rds_conn_path *cp;
+ 
++			/* Only show connections in the caller's netns. */
++			if (!net_eq(rds_conn_net(conn), net))
++				continue;
++
+ 			/* XXX We only copy the information from the first
+ 			 * path for now.  The problem is that if there are
+ 			 * more than one underlying paths, we cannot report
+diff --git a/net/rds/tcp.c b/net/rds/tcp.c
+index 654e23d13..105e83507 100644
+--- a/net/rds/tcp.c
++++ b/net/rds/tcp.c
+@@ -235,13 +235,24 @@ static void rds_tcp_tc_info(struct socket *rds_sock, unsigned int len,
+ 			    struct rds_info_iterator *iter,
+ 			    struct rds_info_lengths *lens)
+ {
++	struct net *net = sock_net(rds_sock->sk);
+ 	struct rds_info_tcp_socket tsinfo;
+ 	struct rds_tcp_connection *tc;
++	unsigned int cnt = 0;
+ 	unsigned long flags;
+ 
+ 	spin_lock_irqsave(&rds_tcp_tc_list_lock, flags);
+ 
+-	if (len / sizeof(tsinfo) < rds_tcp_tc_count)
++	/* First pass: count entries visible in the caller's netns. */
++	list_for_each_entry(tc, &rds_tcp_tc_list, t_list_item) {
++		if (tc->t_cpath->cp_conn->c_isv6)
++			continue;
++		if (!net_eq(rds_conn_net(tc->t_cpath->cp_conn), net))
++			continue;
++		cnt++;
++	}
++
++	if (len / sizeof(tsinfo) < cnt)
+ 		goto out;
+ 
+ 	list_for_each_entry(tc, &rds_tcp_tc_list, t_list_item) {
+@@ -249,6 +260,9 @@ static void rds_tcp_tc_info(struct socket *rds_sock, unsigned int len,
+ 
+ 		if (tc->t_cpath->cp_conn->c_isv6)
+ 			continue;
++		/* Only show connections in the caller's netns. */
++		if (!net_eq(rds_conn_net(tc->t_cpath->cp_conn), net))
++			continue;
+ 
+ 		tsinfo.local_addr = inet->inet_saddr;
+ 		tsinfo.local_port = inet->inet_sport;
+@@ -266,7 +280,7 @@ static void rds_tcp_tc_info(struct socket *rds_sock, unsigned int len,
+ 	}
+ 
+ out:
+-	lens->nr = rds_tcp_tc_count;
++	lens->nr = cnt;
+ 	lens->each = sizeof(tsinfo);
+ 
+ 	spin_unlock_irqrestore(&rds_tcp_tc_list_lock, flags);
+@@ -281,19 +295,32 @@ static void rds6_tcp_tc_info(struct socket *sock, unsigned int len,
+ 			     struct rds_info_iterator *iter,
+ 			     struct rds_info_lengths *lens)
+ {
++	struct net *net = sock_net(sock->sk);
+ 	struct rds6_info_tcp_socket tsinfo6;
+ 	struct rds_tcp_connection *tc;
++	unsigned int cnt = 0;
+ 	unsigned long flags;
+ 
+ 	spin_lock_irqsave(&rds_tcp_tc_list_lock, flags);
+ 
+-	if (len / sizeof(tsinfo6) < rds6_tcp_tc_count)
++	/* First pass: count entries visible in the caller's netns. */
++	list_for_each_entry(tc, &rds_tcp_tc_list, t_list_item) {
++		if (!net_eq(rds_conn_net(tc->t_cpath->cp_conn), net))
++			continue;
++		cnt++;
++	}
++
++	if (len / sizeof(tsinfo6) < cnt)
+ 		goto out;
+ 
+ 	list_for_each_entry(tc, &rds_tcp_tc_list, t_list_item) {
+ 		struct sock *sk = tc->t_sock->sk;
+ 		struct inet_sock *inet = inet_sk(sk);
+ 
++		/* Only show connections in the caller's netns. */
++		if (!net_eq(rds_conn_net(tc->t_cpath->cp_conn), net))
++			continue;
++
+ 		tsinfo6.local_addr = sk->sk_v6_rcv_saddr;
+ 		tsinfo6.local_port = inet->inet_sport;
+ 		tsinfo6.peer_addr = sk->sk_v6_daddr;
+@@ -309,7 +336,7 @@ static void rds6_tcp_tc_info(struct socket *sock, unsigned int len,
+ 	}
+ 
+ out:
+-	lens->nr = rds6_tcp_tc_count;
++	lens->nr = cnt;
+ 	lens->each = sizeof(tsinfo6);
+ 
+ 	spin_unlock_irqrestore(&rds_tcp_tc_list_lock, flags);
+
+base-commit: b266bacba796ff5c4dcd2ae2fc08aacf7ab39153
 -- 
-2.51.0
+2.34.1
 
 
