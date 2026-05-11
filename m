@@ -1,247 +1,246 @@
-Return-Path: <netdev+bounces-286458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286459-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id A4y7NbB3AWrxaQEAu9opvQ
-	(envelope-from <netdev+bounces-286458-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:31:12 +0200
+	id kGdHAuJ4AWpGaQEAu9opvQ
+	(envelope-from <netdev+bounces-286459-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:36:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09DCC5088C5
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:31:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CE3950894D
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 08:36:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 68E2C30073F9
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 06:31:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 070A7301AD00
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 06:34:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C263A2BE033;
-	Mon, 11 May 2026 06:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60BE92C026C;
+	Mon, 11 May 2026 06:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b="TkTQsnpk"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="GEfRqvDm"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA504282F29;
-	Mon, 11 May 2026 06:31:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
+Received: from out162-62-57-64.mail.qq.com (out162-62-57-64.mail.qq.com [162.62.57.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522012BEC2C;
+	Mon, 11 May 2026 06:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778481068; cv=none; b=iUVLSoz8jFkOlkyR1dGtIonsBXaJU5WOuzyFX431wOl39abBXsnAe1Jnd3Ue/XKPJraaY/dsYu95VzCvZsOi05l92a1YtfwjTODRK3eILGdlyCEYCmknccaSLqVIrjd0G/W/03Ad0DbVMXkbLZ98N3ZlMB+eOiEUSx5yUwXwKWE=
+	t=1778481262; cv=none; b=P1PxIA7MhznosYiXZMu/LxtVHgn0VvqC8ntbLCGC4fHS2bpzAwRPz3x3nZSFmtGQMPclxeXXKnAXer9GQAIdxVyyld9rKS/psqBwau/4hl4KUMb8KAzzBN6bWwfdAaa4y2JtHK0WmKmZgpUmYWimgU2ojNT6BqapzRho/taPBW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778481068; c=relaxed/simple;
-	bh=Pn+MVEvwUdy7CFq+ZSScsQJw4S58LM/Pv6EhCfYrS78=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eU5Bw3yYlVggIN0E0SvoAKXOIAkNTDofpikvsW2Rtuv+N5gx8d8Ec+ba/Pm1VodBVKZ7dKqioPKvHkXPnMW1kxulYuKrjDvaeLaPS0nvg4mJGPYTOZL3hT3hLpudVqaH2JQfSWrPgBTUdPoHMhm/fBeu6usjsNuyOzGvk3yIn2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=TkTQsnpk; arc=none smtp.client-ip=162.243.164.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
-	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=MWCK1
-	ZVD+6mmVvqYKw5PjK59TsuwZErWPh+RHz+te1k=; b=TkTQsnpkIz3mO1r4jftXc
-	JiSxeF6r4ek8VUZI75wLvYWVfhwZ1ffbrFROC+3meAOpjMzkd+Pe4R5aLo3oEVSs
-	EM3QsUjlsotf4vzVS0oxy23t4YugUlsRCXXvxg6ej0L9X06mVDFm/OU4R16GPJ+G
-	kRbXPaopLKiTAS73RRD+Us=
-Received: from localhost.localdomain (unknown [36.112.199.54])
-	by web2 (Coremail) with SMTP id yQQGZQB3UJiRdwFq1ThsAQ--.51354S2;
-	Mon, 11 May 2026 14:30:42 +0800 (CST)
-From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-To: netdev@vger.kernel.org
-Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf.kernel@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Krishna Kumar <krikku@gmail.com>,
-	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
-	Xuewei Feng <fengxw06@126.com>,
-	Qi Li <qli01@tsinghua.edu.cn>,
-	Ke Xu <xuke@tsinghua.edu.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH net] net: core: dev: add reprocess depth limit for another_round in __netif_receive_skb_core
-Date: Mon, 11 May 2026 14:30:04 +0800
-Message-ID: <20260511063005.38134-1-zhaoyz24@mails.tsinghua.edu.cn>
-X-Mailer: git-send-email 2.46.2
+	s=arc-20240116; t=1778481262; c=relaxed/simple;
+	bh=odYTO9CzqRZ/MB/1W9FvnzdFiRY6G5Wu2JuRefiGKYQ=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=iVK/sosh6VOYa0wPAcC3O9popFAiTP4gJcK3AvhkCJ1wBvJD3HmZDat69c0XFx+oV+7gjn4EiTaTMdXJ0xrZgzzi2Gi3NCoeZCc+7sDA7F60XpSq0zMIRospbne3aFoneekmm/0g+aCkXBUwghQzJPR9ldqHE0fFNs3ih+u9D2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=GEfRqvDm; arc=none smtp.client-ip=162.62.57.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1778481248; bh=vfGr/xAlGhPhpi/P77prhoa1++/Z64kxSalCOXbvdkg=;
+	h=From:To:Cc:Subject:Date;
+	b=GEfRqvDm5qsvFdyd0ILcEB/TCHbv2gkXvGyGcxWvG+fjvqHoo8Lq6Y+kkWdsprebN
+	 L6bds87uG4rt1bG85qEWP1BSIj4NgsAwW2fg1ZFSuQ9ygbY7celH9uKq63XBjrdadm
+	 pZjOypm9A2beD+BIDQXvrvbQdky9b9ntSDsNwRNU=
+Received: from NTT-kernel-dev ([60.247.85.88])
+	by newxmesmtplogicsvrsza73-0.qq.com (NewEsmtp) with SMTP
+	id 885872EF; Mon, 11 May 2026 14:34:05 +0800
+X-QQ-mid: xmsmtpt1778481245tdw4aubn2
+Message-ID: <tencent_CA96C7486F1CF8F0C72A2274E56AD1766708@qq.com>
+X-QQ-XMAILINFO: NwU6Bou9okj/7K0UsUOIqEkkX7LoAHgssLC4vzLHV88f2rEERYEgwZugsKgSue
+	 ckNx0IsdeYGRUFV4zLfySeZO87Wzuq7jv9i2d5v9JwMYmD4/KOHE6m01jSammBGT1spcss7v0ISe
+	 G2+6b4tRRBY6Jy4sMDvZ+bkHldZLXvO4tddx3NRPgFX9lPXxCkX49aul5R5t7ocrtmEWUDxwBcpm
+	 8tauVBRJLlkBw5ig7iuQItwKoIesqHl6grJhl7YwLsI0ehvAITsinYZ/sOSlQrI2kcV8CYVD5TvJ
+	 wI4fiyfBfmdgxWfBPfEh1wnP3tXMnccDPAPgYtwnZbvo2qi8+GNzs0llOCmN+tgOVIUPzxe1z9Mf
+	 YNBboknkIpy6u/dX62HkNDVQPQPAcmfDn7KZX1gkyhTHGD+eVwdqhtAGwXPjC3JBLQqWrZ2byR9Q
+	 3XK0CATKaTVNc8HNF9dQ3urTptNIyOTPrFcSe1A6XeQMG2m4r5BdjbameqbJnmYXH0g+mJu4urzY
+	 lRtroy7sXiecYhx/r64Tq5HyHrf5KaLr8Cxqvbxb+AWpS9xqhw4Obkc+elvMSriPNbZsRY6cHg88
+	 8nkqBVqDGpBDf7GIBK66aepNuRFmjPiTTxzEZtplsi+NcGyDQdwk1JMnUx0tdCzUA2cwKu+NOaAC
+	 Ul2CMuTaEhWOUiHolZbW0rlT5TVXzn6xHNXlxqdcg2pbNmjsjxWtMxcZFKRdi7BjNtEuHt1HMKJB
+	 k40Pc0F1W9vy+Pm4vC6nEK3P8+obiiiUWU4Ls7MP/OLpCmq6MyjmAM2WIx77iqF2gd6lwBTvqsRF
+	 ukr9k5rFlkJOvx+WTbgyD92jIl8vZNywEJzmrCSFl6zVcfoEp0K4E1xbrYY0QCCV7BVhUyTnelGa
+	 D4zaAgoVjlIy6+gB1ZuCsz6V5FePG9NYsyPAfKexyhZSkxnXYaH0vUSDtYzDYnW7sqBkD0Q8GqRn
+	 FDIj5X14wZ8WV4XbaoI5FevxDU7wz0AK1ThvIeXZf8dlyA1vivmdW67Cq0AJ8SiimJHBPWzxWWIg
+	 7neRFipA==
+X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
+From: Fang Wang <32840572@qq.com>
+To: gregkh@linuxfoundation.org,
+	stable@vger.kernel.org,
+	luiz.von.dentz@intel.com
+Cc: patches@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH 6.1.y 1/2] Bluetooth: hci_sync: Remove remaining dependencies of hci_request
+Date: Mon, 11 May 2026 14:34:05 +0800
+X-OQ-MSGID: <20260511063405.856013-1-32840572@qq.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-CM-TRANSID:yQQGZQB3UJiRdwFq1ThsAQ--.51354S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxCF1DGw18Gr4rJr48Zr4ktFb_yoWrKr4rpF
-	ZrtFyIyF48Gry2y397Aa1I9ryxJFWkWF43Xa4fKa4xA3Z3GF1rX34SvryYqF1ayrWS9340
-	qFWDGrW8Zan8XrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUP014x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_GFv_Wrylc2xSY4AK67
-	AK6r47MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
-	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc4
-	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
-	xVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
-	1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sR_w0eJUU
-	UUU==
-X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQYEAWoBBSzD9QAAs2
-X-Rspamd-Queue-Id: 09DCC5088C5
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 5CE3950894D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[qq.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[qq.com:s=s201512];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286458-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,126.com,tsinghua.edu.cn,vger.kernel.org];
-	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
+	TAGGED_FROM(0.00)[bounces-286459-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,holtmann.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[32840572@qq.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[qq.com:+];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
+	FREEMAIL_FROM(0.00)[qq.com];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.989];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,z.ai:url,tsinghua.edu.cn:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qq.com:email,qq.com:mid,qq.com:dkim,intel.com:email]
 X-Rspamd-Action: no action
 
-In __netif_receive_skb_core(), the another_round label can be reached=20
-via a TC ingress redirect (bpf_redirect_peer returning -EAGAIN).
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Across network namespaces, two BPF programs on peer devices can redirect
-packets back and forth indefinitely, creating an unbounded loop that=20
-monopolizes a CPU core in softirq context. This leads to RCU stalls,=20
-soft lockups, and system-wide denial of service.
+[ Upstream commit f2d89775358606c7ab6b6b6c4a02fe1e8cd270b1 ]
 
-We reproduced it by creating a pair of TC BPF programs across two=20
-network namespaces that redirect packets to each other, and the RCU=20
-subsystem detects a stall:
+This removes the dependencies of hci_req_init and hci_request_cancel_all
+from hci_sync.c.
 
-```
-[   24.835219] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:=0D
-[   24.835837] rcu: 	(detected by 0, t=3D21002 jiffies, g=3D-627, q=3D2 ncp=
-us=3D1)=0D
-[   24.835959] rcu: All QSes seen, last rcu_preempt kthread activity 21002 =
-(4294691810-4294670808), jiffies_till_next_fqs=3D3, root ->qsmask 0x0=0D
-[   24.836239] rcu: rcu_preempt kthread starved for 21002 jiffies! g-627 f0=
-x2 RCU_GP_WAIT_FQS(5) ->state=3D0x0 ->cpu=3D0=0D
-[   24.836362] rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, O=
-OM is now expected behavior.=0D
-[   24.836460] rcu: RCU grace-period kthread stack dump:=0D
-[   24.836601] task:rcu_preempt     state:R  running task     stack:15448 p=
-id:15    tgid:15    ppid:2      task_flags:0x208040 flags:0x00080000=0D
-[   24.837139] Call Trace:=0D
-[   24.837568]  <TASK>=0D
-[   24.838008]  __schedule+0x4ed/0xea0=0D
-[   24.838934]  schedule+0x22/0xd0=0D
-[   24.839023]  schedule_timeout+0x81/0x100=0D
-[   24.839095]  ? __pfx_process_timeout+0x10/0x10=0D
-[   24.839165]  rcu_gp_fqs_loop+0x11b/0x650=0D
-[   24.839226]  ? __pfx_rcu_gp_kthread+0x10/0x10=0D
-[   24.839282]  rcu_gp_kthread+0x17e/0x210=0D
-[   24.839333]  ? __pfx_rcu_gp_kthread+0x10/0x10=0D
-[   24.839383]  kthread+0xdd/0x110=0D
-[   24.839433]  ? __pfx_kthread+0x10/0x10=0D
-[   24.839481]  ret_from_fork+0x1aa/0x260=0D
-[   24.839538]  ? __pfx_kthread+0x10/0x10=0D
-[   24.839585]  ret_from_fork_asm+0x1a/0x30=0D
-[   24.839686]  </TASK>=0D
-......
-```
-
-Fix this by adding a depth counter at the another_round label. When the
-counter exceeds XMIT_RECURSION_LIMIT (8), the packet is dropped. This=20
-follows the same pattern as dev_xmit_recursion() which protects the TX=20
-redirect path with the same limit.
-
-Add SKB_DROP_REASON_RECEIVE_REPROCESS_LOOP for observability.
-
-This issue was found and reproduced with the assistance of GLM 5.1 from
-Z.ai, affecting stable versions from v5.10.
-
-Fixes: 9aa1206e8f482 ("bpf: Add redirect_peer helper")
-Cc: stable@vger.kernel.org
-Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
-Reported-by: Xuewei Feng <fengxw06@126.com>
-Reported-by: Qi Li <qli01@tsinghua.edu.cn>
-Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
-Reported-by: GLM 5.1 from Z.ai
-Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Fang Wang <32840572@qq.com>
 ---
- include/net/dropreason-core.h | 6 ++++++
- net/core/dev.c                | 8 ++++++++
- 2 files changed, 14 insertions(+)
+ include/net/bluetooth/hci_sync.h | 17 +++++++++++++++++
+ net/bluetooth/hci_request.h      | 21 ---------------------
+ net/bluetooth/hci_sync.c         | 14 +++++++++++---
+ 3 files changed, 28 insertions(+), 24 deletions(-)
 
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index a7b7abd66..f0f420f39 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -130,6 +130,7 @@
- 	FN(DUALPI2_STEP_DROP)		\
- 	FN(PSP_INPUT)			\
- 	FN(PSP_OUTPUT)			\
-+	FN(RECEIVE_REPROCESS_LOOP)	\
- 	FNe(MAX)
-
- /**
-@@ -622,6 +623,11 @@ enum skb_drop_reason {
- 	SKB_DROP_REASON_PSP_INPUT,
- 	/** @SKB_DROP_REASON_PSP_OUTPUT: PSP output checks failed */
- 	SKB_DROP_REASON_PSP_OUTPUT,
-+	/**
-+	 * @SKB_DROP_REASON_RECEIVE_REPROCESS_LOOP: __netif_receive_skb_core
-+	 * exceeded max reprocess loop iterations (another_round).
+diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+index a8b106d884d4..a68ddf5c0228 100644
+--- a/include/net/bluetooth/hci_sync.h
++++ b/include/net/bluetooth/hci_sync.h
+@@ -5,6 +5,23 @@
+  * Copyright (C) 2021 Intel Corporation
+  */
+ 
++#define HCI_REQ_DONE	  0
++#define HCI_REQ_PEND	  1
++#define HCI_REQ_CANCELED  2
++
++#define hci_req_sync_lock(hdev)   mutex_lock(&hdev->req_lock)
++#define hci_req_sync_unlock(hdev) mutex_unlock(&hdev->req_lock)
++
++struct hci_request {
++	struct hci_dev		*hdev;
++	struct sk_buff_head	cmd_q;
++
++	/* If something goes wrong when building the HCI request, the error
++	 * value is stored in this field.
 +	 */
-+	SKB_DROP_REASON_RECEIVE_REPROCESS_LOOP,
- 	/**
- 	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
- 	 * shouldn't be used as a real 'reason' - only for tracing code gen
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 831129f2a..376b595b3 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -5958,6 +5958,7 @@ static int __netif_receive_skb_core(struct sk_buff **=
-pskb, bool pfmemalloc,
- 	struct net_device *orig_dev;
- 	bool deliver_exact =3D false;
- 	int ret =3D NET_RX_DROP;
-+	int reprocess_depth =3D 0;
- 	__be16 type;
-
- 	net_timestamp_check(!READ_ONCE(net_hotdata.tstamp_prequeue), skb);
-@@ -5980,6 +5981,13 @@ static int __netif_receive_skb_core(struct sk_buff *=
-*pskb, bool pfmemalloc,
- 	pt_prev =3D NULL;
-
- another_round:
-+	if (unlikely(++reprocess_depth > XMIT_RECURSION_LIMIT)) {
-+		net_warn_ratelimited(
-+			"%s: reprocess loop limit reached, dropping (dev=3D%s)\n",
-+			__func__, skb->dev->name);
-+		drop_reason =3D SKB_DROP_REASON_RECEIVE_REPROCESS_LOOP;
-+		goto drop;
-+	}
- 	skb->skb_iif =3D skb->dev->ifindex;
-
- 	__this_cpu_inc(softnet_data.processed);
---
-2.43.0
++	int			err;
++};
++
+ typedef int (*hci_cmd_sync_work_func_t)(struct hci_dev *hdev, void *data);
+ typedef void (*hci_cmd_sync_work_destroy_t)(struct hci_dev *hdev, void *data,
+ 					    int err);
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index 0be75cf0efed..b730da4a8b47 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -22,27 +22,6 @@
+ 
+ #include <asm/unaligned.h>
+ 
+-#define HCI_REQ_DONE	  0
+-#define HCI_REQ_PEND	  1
+-#define HCI_REQ_CANCELED  2
+-
+-#define hci_req_sync_lock(hdev)   mutex_lock(&hdev->req_lock)
+-#define hci_req_sync_unlock(hdev) mutex_unlock(&hdev->req_lock)
+-
+-#define HCI_REQ_DONE	  0
+-#define HCI_REQ_PEND	  1
+-#define HCI_REQ_CANCELED  2
+-
+-struct hci_request {
+-	struct hci_dev		*hdev;
+-	struct sk_buff_head	cmd_q;
+-
+-	/* If something goes wrong when building the HCI request, the error
+-	 * value is stored in this field.
+-	 */
+-	int			err;
+-};
+-
+ void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
+ void hci_req_purge(struct hci_request *req);
+ bool hci_req_status_pend(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index c6f9d07a4819..4d23455e90bb 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -11,7 +11,6 @@
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/mgmt.h>
+ 
+-#include "hci_request.h"
+ #include "hci_codec.h"
+ #include "hci_debugfs.h"
+ #include "smp.h"
+@@ -142,6 +141,13 @@ static int hci_cmd_sync_run(struct hci_request *req)
+ 	return 0;
+ }
+ 
++static void hci_request_init(struct hci_request *req, struct hci_dev *hdev)
++{
++	skb_queue_head_init(&req->cmd_q);
++	req->hdev = hdev;
++	req->err = 0;
++}
++
+ /* This function requires the caller holds hdev->req_lock. */
+ struct sk_buff *__hci_cmd_sync_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 				  const void *param, u8 event, u32 timeout,
+@@ -153,7 +159,7 @@ struct sk_buff *__hci_cmd_sync_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 
+ 	bt_dev_dbg(hdev, "Opcode 0x%4.4x", opcode);
+ 
+-	hci_req_init(&req, hdev);
++	hci_request_init(&req, hdev);
+ 
+ 	hci_cmd_sync_add(&req, opcode, plen, param, event, sk);
+ 
+@@ -5188,7 +5194,9 @@ int hci_dev_close_sync(struct hci_dev *hdev)
+ 	cancel_delayed_work(&hdev->le_scan_disable);
+ 	cancel_delayed_work(&hdev->le_scan_restart);
+ 
+-	hci_request_cancel_all(hdev);
++	hci_cmd_sync_cancel_sync(hdev, ENODEV);
++
++	cancel_interleave_scan(hdev);
+ 
+ 	if (hdev->adv_instance_timeout) {
+ 		cancel_delayed_work_sync(&hdev->adv_instance_expire);
+-- 
+2.34.1
 
 
