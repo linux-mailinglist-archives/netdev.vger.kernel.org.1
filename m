@@ -1,55 +1,59 @@
-Return-Path: <netdev+bounces-286501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286502-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yCULAkOIAWpscgEAu9opvQ
-	(envelope-from <netdev+bounces-286501-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:41:55 +0200
+	id oB5pN72JAWpJcwEAu9opvQ
+	(envelope-from <netdev+bounces-286502-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:48:13 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABB9C5096BE
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:41:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5B2B509848
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:48:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0064630054F4
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:41:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 06C9830087EC
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:48:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D7FA39B95E;
-	Mon, 11 May 2026 07:41:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72A13A6F0D;
+	Mon, 11 May 2026 07:47:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iZWYXkvF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qJi/rCct"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23FDD39A054
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 07:41:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B293A5430;
+	Mon, 11 May 2026 07:47:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778485310; cv=none; b=QvmrvQHbBZQ4YEkrlB1YbxBsaZC2xCSj+goPzERoFPaQD66Ng3kAvoRGfZMJP7NtO6JqLUL1nObqeyH5CQzwlsPvCanDaWVy37EA0++u4piqYz4VamLCypizrvzjNw3WeMSd9ZR1Fqylpg/fScYq/0DZVL5YoCxZ8A5Cr4C0BzY=
+	t=1778485629; cv=none; b=WkQr2kidUQcGr4Gym7wkil19N6vVIJABnabAFOWWbIHKxX3CTwjU7+FThX36dATznAgEYrDNqO6xhGHndTWp5n2PWDYpCHlPb9K8IUbsRbwET9gW0AjunnTVwKtpupQff/QAlcuoiuTxYJSyt0JxYmD5+TxwvGxtbQVK04GUwTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778485310; c=relaxed/simple;
-	bh=ibpdvB/sDKrchmvVg45cobuB/AQfnh+eqr95DUIT1SE=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ZWDy4+ou7QQIbl2ei9C9C5qgJ2lyczBqgNH5Dfe8qA1SlfFlhYZddIqf6ARJevRCJn7ErEtOHhF+tyllLRU84l5X9KIPjx7nXZ/GNgZcNCuGY3+VclUEJuMkZqTBw+7KRio40j3bmJIZn3hie17Sak68HSVaMNvQrpexTUrqBKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iZWYXkvF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73838C2BCB0;
-	Mon, 11 May 2026 07:41:48 +0000 (UTC)
+	s=arc-20240116; t=1778485629; c=relaxed/simple;
+	bh=W6aPnQGxFvV5pxspo8KdT3OU3FU42+Tsl5qJ9Cz1T2s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HMxOJ69tDXMgcGGN7ZNKo45Ac68k5Qjlzj9/HB6j3VNHlCq+uqie9WWeo9ZHgH11dXogN6Wsg0JlO8Zk/VNAGukp4sQj0xIGAZHB2SIXIldzmXFfJPErJYsKIZ55h0FtKjbNKq8n8wLvjsTdgmEWno2llvSgYmUBoeK2MuhksW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qJi/rCct; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFB21C2BCF5;
+	Mon, 11 May 2026 07:47:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778485308;
-	bh=ibpdvB/sDKrchmvVg45cobuB/AQfnh+eqr95DUIT1SE=;
-	h=Date:From:To:Subject:From;
-	b=iZWYXkvFNeUEUDVMKJdpJxG2g/kHS9fU7taG1h9qOTTyz0+X+xvTmCdZon1a0CqKh
-	 UoNQ0hKBmNZfj5V7Qu3lmOZ4u9HC7Yb5bB2JsbEqVFLF5/LHlLNrLwvl/GEeYGAULa
-	 6nPJhe2nEzg6Tlft3U7wMB506PAmcdfvxW0o6cK+q6hA+D1bAypZGLg9IFzt8bOpeL
-	 fbCdpXny/ukizV2vwhgBHTLy+UM+WXWa4hhBG9kWYlt8MGIO0GQD2ICAfvSVDt7/rw
-	 XQE6QGq+8nVuuVsRXSqJ9JIyjggd9cLF89xTacAmTHG2Rh3RsfxVrUfdbUzwsbS5r5
-	 /zX88GQGYi5+Q==
-Date: Mon, 11 May 2026 09:41:46 +0200
+	s=k20201202; t=1778485627;
+	bh=W6aPnQGxFvV5pxspo8KdT3OU3FU42+Tsl5qJ9Cz1T2s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qJi/rCctlOINEtcmwwKI0m1Qyw7ZipkxQA9/9UewVsJVEH6L32P1GLYxN+jYdeU4S
+	 E3dlLGK5mg8ccrMBBfFw/8QMyUoheooWdP3ZBZpRKkq8J5FoC0oUq4m59sQEirx09Q
+	 7azeMg4EYT+vhpOUQI4PFAToG37dC4kg1WukjV0LgwXtGiFMQYOe/33FmTELtc51jZ
+	 4CauPM4USfteYm9Dt1rrj2c0BLvC7TQ87Qx5GQfrMY4rKjUgiUkXXGjX2dqpUd+jYO
+	 y77V85MCeJCQ6NGVAMvm5EdmswCDkpmSkdKQzqTN1lcwcYTptoADYXU/Dc0an0Ev+B
+	 hqGndeYF7Vr1w==
+Date: Mon, 11 May 2026 09:47:04 +0200
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: netdev@vger.kernel.org
-Subject: Fwd: Re: [PATCH net-next v5 12/12] net: airoha: Better handle MIB
- for GDM with multiple port attached
-Message-ID: <agGIOpoOLzeHqUUp@lore-desk>
+To: sashiko@lists.linux.dev
+Cc: devicetree@vger.kernel.org, conor+dt@kernel.org, robh@kernel.org,
+	krzk+dt@kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v5 09/12] net: airoha: Do not stop GDM port if
+ it is shared
+Message-ID: <agGJeIrmDdRmHoAA@lore-desk>
+References: <20260509-airoha-eth-multi-serdes-v5-9-805e38edc2aa@kernel.org>
+ <20260510140505.2C772C2BCF6@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,9 +61,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="CySmnG8yP2UzFd1E"
+	protocol="application/pgp-signature"; boundary="AoE5hKwc3VX7KL8z"
 Content-Disposition: inline
-X-Rspamd-Queue-Id: ABB9C5096BE
+In-Reply-To: <20260510140505.2C772C2BCF6@smtp.kernel.org>
+X-Rspamd-Queue-Id: C5B2B509848
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-3.76 / 15.00];
 	SIGNED_PGP(-2.00)[];
@@ -67,16 +72,16 @@ X-Spamd-Result: default: False [-3.76 / 15.00];
 	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	MIME_GOOD(-0.20)[multipart/signed,multipart/mixed,text/plain];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286501-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286502-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_ONE(0.00)[1];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:+,3:~,4:+,5:+,6:~,7:~];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
@@ -86,184 +91,104 @@ X-Spamd-Result: default: False [-3.76 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,sashiko.dev:url]
 X-Rspamd-Action: no action
 
 
---CySmnG8yP2UzFd1E
-Content-Type: multipart/mixed; boundary="SUJg/1OohrSX0AT5"
-Content-Disposition: inline
-
-
---SUJg/1OohrSX0AT5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-+netdev
-
-Regards,
-Lorenzo
-
---SUJg/1OohrSX0AT5
-Content-Type: message/rfc822
-Content-Disposition: inline
-
-Delivered-To: lorenzo.bianconi83@gmail.com
-Received: by 2002:a05:6504:d85:b0:2ff:497e:1c93 with SMTP id b5csp1656174lty;
-        Sun, 10 May 2026 23:51:10 -0700 (PDT)
-X-Forwarded-Encrypted: i=2; AFNElJ961MTQID26LCoMt+5aRYo8AmVEzH9RTAMHlChg69FQtJpLpTwiekaQUktZZ5jbvHvOlr+5hY4a1NZA5FXKnIrpUfU=@gmail.com
-X-Received: by 2002:a05:6a21:e098:b0:3aa:f9cb:d41a with SMTP id adf61e73a8af0-3aaf9cbde2amr5270770637.19.1778482269826;
-        Sun, 10 May 2026 23:51:09 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778482269; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ERZFRPrSsdrvSGL01/TJcOlWxbImud16uetS2cUd/archo2RXh7JMLIfgCy5elyrj9
-         hDKt1zEjhx6rY+Y1hdf/wXLSFf8sy+JbZ4mWJK8/4MmezKHsLClma5cUoAVFH4QLLDQM
-         tZUFJU3jBg3Wu//QlgQR2wOzX5061wJA2bI0lOOGg6pQcF2b0jxLimBTeNDJLQx37z7s
-         lXH+4qqLUqvHQQ7XibAKQv/At0asq+4Hk68+SDoEDaOct1kg2l+ZOzoeNdDbTJ4wmET2
-         norfZL2DVUEOk+ot0X2/Xi4ecxr0SbEMzZwFoNUnGyq/GODYsTY4+bV95acx9nR8iB5f
-         wquw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:dkim-signature:delivered-to;
-        bh=RFgqIeaShXa5BG0VX8+ZB5smnHzxFARpf9cydZVuDco=;
-        fh=+uU8yHGCCo9WYubKXepIIIb+EaV8PrrTYVnAHrrpsxk=;
-        b=cIRswcO4s2oANu0nHWCWCqcV5yYct6MqngJAALZ3PJZ4qvU14gqE0KGo7qSVXu6W2t
-         Z/Dq8PQkWCQM9tJlhHr+IsLV/0NzDPSbqIAPpBpUwuJn6mkjP36GzN2BK0v0PYQxa/F0
-         kCYETzP8k9XvNH2M44L0uCfFoNYdoLRoXk8hlSD2FD0Iyaz/tZezdomuvPXYFzc06mtP
-         uWDv+rsB8WCFGmiedkQnFC8+x9KxBcHBDt0+FLl0oD3pZ95IFZNvEOx82CKD754mx9tA
-         8iDiY5nAu57z4ImUzKK+ciCyefA96y7OBO38dH2XD1g0YxmWALF/7MXaeNeVxOL4AwGS
-         gzbg==;
-        dara=google.com
-ARC-Authentication-Results: i=1; mx.google.com;
-       dkim=pass header.i=@kernel.org header.s=k20201202 header.b=sgoQUKY+;
-       spf=pass (google.com: domain of lorenzo@kernel.org designates 2600:3c0a:e001:78e:0:1991:8:25 as permitted sender) smtp.mailfrom=lorenzo@kernel.org;
-       dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=kernel.org
-Return-Path: <lorenzo@kernel.org>
-Received: from sea.source.kernel.org (sea.source.kernel.org. [2600:3c0a:e001:78e:0:1991:8:25])
-        by mx.google.com with ESMTPS id 41be03b00d2f7-c82677768f4si16797509a12.310.2026.05.10.23.51.09
-        for <lorenzo.bianconi83@gmail.com>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 10 May 2026 23:51:09 -0700 (PDT)
-Received-SPF: pass (google.com: domain of lorenzo@kernel.org designates 2600:3c0a:e001:78e:0:1991:8:25 as permitted sender) client-ip=2600:3c0a:e001:78e:0:1991:8:25;
-Authentication-Results: mx.google.com;
-       dkim=pass header.i=@kernel.org header.s=k20201202 header.b=sgoQUKY+;
-       spf=pass (google.com: domain of lorenzo@kernel.org designates 2600:3c0a:e001:78e:0:1991:8:25 as permitted sender) smtp.mailfrom=lorenzo@kernel.org;
-       dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=kernel.org
-Received: from smtp.kernel.org (transwarp.subspace.kernel.org [100.75.92.58])
-	by sea.source.kernel.org (Postfix) with ESMTP id 7F6C9401DC
-	for <lorenzo.bianconi83@gmail.com>; Mon, 11 May 2026 06:51:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix)
-	id 75E50C2BCF5; Mon, 11 May 2026 06:51:09 +0000 (UTC)
-Delivered-To: lorenzo@kernel.org
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C666C2BCB0;
-	Mon, 11 May 2026 06:51:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778482269;
-	bh=wqD98MO+dMAu60i5VFJSDqQmQqZN+ELhw7sRVp/bcAU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sgoQUKY+dNMX4qe0bwx56KsZt1+o1oCVmbamrfA/i8MIeLcGzKOOvlUz5fT68zfDg
-	 Nx2R/065A3nb6QP5ZvZUpYbhj8aWIZxc48+p2DswiOs2l/JSJSb9AfXjQb9JrBN/Rg
-	 9/Fpltgjic1sELX+YeNVUp1AYC0MyLLjF0nvZz4bBwxcUed5ZKieXCpmFwgleng3HR
-	 Is3Ks7DwuWa9kJQ8QLAxhYYzZB4BBB541SewjgYBO8rAor4e+Az3MvJpFZV2cqru9u
-	 ezYLWloIvOQ31eU8noTtxp7Cer0B0KJ4ODGR+hud7ZVT0LH0sxpsRPq4PopcnDoHyj
-	 VzkNWD37CLi1g==
-Date: Mon, 11 May 2026 08:51:06 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: sashiko@lists.linux.dev
-Cc: krzk+dt@kernel.org, robh@kernel.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v5 12/12] net: airoha: Better handle MIB for GDM
- with multiple port attached
-Message-ID: <agF8WhrU8lTIyOjX@lore-desk>
-References: <20260509-airoha-eth-multi-serdes-v5-12-805e38edc2aa@kernel.org>
- <20260510140506.DBBDCC2BCC9@smtp.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Yak5kKSg5+tzS0K4"
-Content-Disposition: inline
-In-Reply-To: <20260510140506.DBBDCC2BCC9@smtp.kernel.org>
-X-TUID: 8X79iVaMa9Ab
-
-
---Yak5kKSg5+tzS0K4
+--AoE5hKwc3VX7KL8z
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-> Thank you for your contribution! Sashiko AI review found 1 potential issu=
+> Thank you for your contribution! Sashiko AI review found 2 potential issu=
 e(s) to consider:
-> - [Medium] Moving the statistics lock from the port level to the device l=
-evel introduces a race condition on shared hardware registers, causing cros=
-s-interface statistics corruption.
+> - [High] The `GDM_STAG_EN_MASK` configuration is port-global but is modif=
+ied unconditionally per net_device, leading to silent clobbering when multi=
+ple devices share a port.
+> - [Medium] The hardware MTU (`REG_GDM_LEN_CFG`) is not recalculated when =
+a device sharing the port is stopped, leaving the MAC configured to accept =
+inappropriately large frames.
 > --
 >=20
-> commit 29334a9bde18f0777df549f0d135356a4b8bd3ee
-> Author: Christian Marangi <ansuelsmth@gmail.com>
+> commit b896e320dcf0d56db7e0654191126c23e6f485fd
+> Author: Lorenzo Bianconi <lorenzo@kernel.org>
+> net: airoha: Do not stop GDM port if it is shared
 >=20
-> net: airoha: Better handle MIB for GDM with multiple port attached
->=20
-> This commit enables a split MIB feature for GDM3/4 to track counters per
-> hardware channel instead of per GDM port. It moves the statistics structu=
-re,
-> including its protecting lock, from the port level to the device level.
+> This commit introduces a users counter to the GDM port structure to allow
+> multiple independent net_device instances to share the same hardware port
+> without prematurely stopping it. It also conditionally updates the MTU so
+> that the largest MTU requested by any sharing device is used.
 >=20
 > > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
 ernet/airoha/airoha_eth.c
-> > index 623cac42dfb71..b1a6586293457 100644
+> > index be31f639f4be3..ebb24e60f1de3 100644
 > > --- a/drivers/net/ethernet/airoha/airoha_eth.c
 > > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> > @@ -1621,143 +1621,150 @@ static void airoha_update_hw_stats(struct air=
-oha_gdm_dev *dev)
-> >  	struct airoha_eth *eth =3D dev->eth;
-> >  	u32 val, i =3D 0;
-> > =20
-> > -	spin_lock(&port->stats.lock);
-> > -	u64_stats_update_begin(&port->stats.syncp);
-> > +	spin_lock(&dev->stats.lock);
-> > +	u64_stats_update_begin(&dev->stats.syncp);
-> > +
-> > +	/* Read relevant MIB for GDM with multiple port attached */
-> > +	if (port->id =3D=3D AIROHA_GDM3_IDX || port->id =3D=3D AIROHA_GDM4_ID=
-X)
-> > +		airoha_fe_rmw(eth, REG_FE_GDM_MIB_CFG(port->id),
-> > +			      FE_TX_MIB_ID_MASK | FE_RX_MIB_ID_MASK,
-> > +			      FIELD_PREP(FE_TX_MIB_ID_MASK, dev->nbq) |
-> > +			      FIELD_PREP(FE_RX_MIB_ID_MASK, dev->nbq));
+> > @@ -1733,10 +1733,20 @@ static int airoha_dev_open(struct net_device *n=
+etdev)
+> >  		airoha_fe_clear(qdma->eth, REG_GDM_INGRESS_CFG(port->id),
+> >  				GDM_STAG_EN_MASK);
 >=20
-> Does moving the lock from the port to the device level introduce a race
-> condition on the shared port MIB registers?
+> Since GDM_STAG_EN_MASK is a port-global configuration, will this clear th=
+e=20
+> flag for the entire port if a secondary non-DSA net_device is brought up?
 >=20
-> Because ndo_get_stats64 can be called concurrently without the RTNL lock,=
- if two
-> CPUs request stats for two different devices on the same port:
->=20
-> CPU1 calls airoha_update_hw_stats() for dev_A:
->     spin_lock(&dev_A->stats.lock);
->     airoha_fe_rmw(..., REG_FE_GDM_MIB_CFG(port->id), ... dev_A->nbq);
->=20
-> CPU2 concurrently calls airoha_update_hw_stats() for dev_B:
->     spin_lock(&dev_B->stats.lock);
->     airoha_fe_rmw(..., REG_FE_GDM_MIB_CFG(port->id), ... dev_B->nbq);
->=20
-> Could CPU1 then read the hardware counters for dev_B instead of dev_A?
+> If the primary master device relies on this hardware tag parsing, it appe=
+ars
+> a secondary device could silently break it by clearing the mask during
+> its open routine. Should this configuration be protected or refcounted wh=
+en
+> multiple devices share a port?
 
-ack, I will fix it in v6.
+This is not a real issue since the hw design supports DSA just on GDM1 wher=
+e we
+can't configure multiple net_devices.
 
+>=20
+> > -	airoha_fe_rmw(qdma->eth, REG_GDM_LEN_CFG(port->id),
+> > -		      GDM_SHORT_LEN_MASK | GDM_LONG_LEN_MASK,
+> > -		      FIELD_PREP(GDM_SHORT_LEN_MASK, 60) |
+> > -		      FIELD_PREP(GDM_LONG_LEN_MASK, len));
+> > +	cur_len =3D airoha_fe_get(qdma->eth, REG_GDM_LEN_CFG(port->id),
+> > +				GDM_LONG_LEN_MASK);
+> > +	if (!port->users || len > cur_len) {
+> > +		/* Opening a sibling net_device with a larger MTU updates the
+> > +		 * MTU of already running devices. This is required to allow
+> > +		 * multiple net_devices wht different MTUs to share the same
+> > +		 * QDMA block.
+> > +		 */
+> > +		airoha_fe_rmw(qdma->eth, REG_GDM_LEN_CFG(port->id),
+> > +			      GDM_SHORT_LEN_MASK | GDM_LONG_LEN_MASK,
+> > +			      FIELD_PREP(GDM_SHORT_LEN_MASK, 60) |
+> > +			      FIELD_PREP(GDM_LONG_LEN_MASK, len));
+> > +	}
+> > +	port->users++;
 >=20
 > [ ... ]
 >=20
-> >  	/* reset mib counters */
-> >  	airoha_fe_set(eth, REG_FE_GDM_MIB_CLEAR(port->id),
-> >  		      FE_GDM_MIB_RX_CLEAR_MASK | FE_GDM_MIB_TX_CLEAR_MASK);
+> > @@ -1766,8 +1776,10 @@ static int airoha_dev_stop(struct net_device *ne=
+tdev)
+> >  	for (i =3D 0; i < netdev->num_tx_queues; i++)
+> >  		netdev_tx_reset_subqueue(netdev, i);
+> > =20
+> > -	airoha_set_gdm_port_fwd_cfg(qdma->eth, REG_GDM_FWD_CFG(port->id),
+> > -				    FE_PSE_PORT_DROP);
+> > +	if (!--port->users)
+> > +		airoha_set_gdm_port_fwd_cfg(qdma->eth,
+> > +					    REG_GDM_FWD_CFG(port->id),
+> > +					    FE_PSE_PORT_DROP);
 >=20
-> When CPU1 then clears the counters here, could it wipe out the unread
-> hardware statistics for dev_B?
+> If multiple devices are sharing the port and the device with the largest =
+MTU
+> is stopped, the hardware MTU in REG_GDM_LEN_CFG doesn't appear to be
+> recalculated or shrunk.
 >=20
-> Is a port-level lock still needed to exclusively protect access to these =
-shared
-> hardware MIB registers across multiple devices?
+> Since the MTU is only expanded in airoha_dev_open() and airoha_dev_change=
+_mtu(),
+> does this leave the MAC configured to accept inappropriately large frames
+> for the remaining devices indefinitely?
 
 ack, I will fix it in v6.
 
@@ -273,33 +198,18 @@ Lorenzo
 >=20
 > --=20
 > Sashiko AI review =B7 https://sashiko.dev/#/patchset/20260509-airoha-eth-=
-multi-serdes-v5-0-805e38edc2aa@kernel.org?part=3D12
+multi-serdes-v5-0-805e38edc2aa@kernel.org?part=3D9
 
---Yak5kKSg5+tzS0K4
+--AoE5hKwc3VX7KL8z
 Content-Type: application/pgp-signature; name=signature.asc
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCagF8WgAKCRA6cBh0uS2t
-rLKuAQCVHo9zxxc0/M/2vdNjL4owOrzT2rbvhRnV2L78lFsMGQEAwZmw0aUtbQ2O
-JQuPuqSO4Bf8fRR28FMUTzXWBp1DRgM=
-=4akk
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCagGJeAAKCRA6cBh0uS2t
+rIC0AQCB4vNpyNwAWhilwrdVKDSwmfIC2mmckVm7kjpBYSFVZwD8Cx27ZuqAmZWr
+5tnKUNCiIHou0///+CnTMfZQZvocXwc=
+=XNlR
 -----END PGP SIGNATURE-----
 
---Yak5kKSg5+tzS0K4--
-
---SUJg/1OohrSX0AT5--
-
---CySmnG8yP2UzFd1E
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCagGIOgAKCRA6cBh0uS2t
-rMCIAP0UwUvCfp/k1pyhikZgvIm/ktwrleTaqGVha2Q0D0TRiwEAmeRSj3RxPBjl
-mrCF835jnxJhI7udf/YSJy8T/mLkUwI=
-=WNZG
------END PGP SIGNATURE-----
-
---CySmnG8yP2UzFd1E--
+--AoE5hKwc3VX7KL8z--
 
