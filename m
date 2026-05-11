@@ -1,92 +1,99 @@
-Return-Path: <netdev+bounces-286686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286687-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aKeRJyfqAWpHmQEAu9opvQ
-	(envelope-from <netdev+bounces-286686-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 16:39:35 +0200
+	id IFMYKSTqAWpHmQEAu9opvQ
+	(envelope-from <netdev+bounces-286687-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 16:39:32 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D350510557
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 16:39:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E600510550
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 16:39:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 50FC83081CF5
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0131730817C3
 	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:34:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D7E33FE65C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6048E3FE65F;
 	Mon, 11 May 2026 14:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PYKxhRM1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mgyXpWtA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BDBD3FE64E
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 14:34:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F3633FE35E
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 14:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778510070; cv=none; b=UVtv5qfiot8JiTNadWr1rR9uw4JH5yGViR4l7Lc6yA3OhS7MTL40peYeAJAoDVDPvQlkRZi4/Oy+WYMlufNNq9623kJx5P1WYrQO9jkpUSRjsu2iJm2P0ekj1BXt4YggqTCB6dYVoWSOxC5uHdinWjkiLBWq1CJvSIIPACRP2Uk=
+	t=1778510071; cv=none; b=pqq6DApfswW3Y9PToXXhDYRKsim5Zse2EMIcd3IQltZncsmdLKJxkyej+MiDnUuptSLt5gbAt4cu/cssUK25Yc0Q3fQOIhVnJq5fR8b3yD9dTSokc/C0lyRJFMCQmvU9HQoVk18ZYFN4j7lTE1WkvSK4kvPmA+Jrex97XtjoUj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778510070; c=relaxed/simple;
-	bh=xVmk1h/F3OP1l3EftzIIS5KA56VtR1Q3Ps96g1qfUZo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ApF0idP+8oDEyHr+Rbn9/mL7SVDzRx/wYII6lA3TB1OJtryTuvfLEOzVSvmoaYozqhdXYwdyhFJ8MTus/gROpX6lGGAC1i8thYSZhfgFBaAPGTA/feOQ8kFTANhGMJlZj4nFWmBMeGhMOOYFxronwZou2GAVDtlEIFXkDodOAW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PYKxhRM1; arc=none smtp.client-ip=209.85.160.170
+	s=arc-20240116; t=1778510071; c=relaxed/simple;
+	bh=YfQBPQevPYy6KNEQoGGylmuoML0doP9gf/WL6NN7rD4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=gG3s/VDyafrOBoXEJwe68dKj5zw/LXAG+QjizkQrcFSUqM2kZySzwR5cEy67IGeAi2Ew6X7ngksM/4hXOTsf2bL95OF6uU/A3Gs+lKGK8AaQJpmeonwR0iR+sMeVcXUCc3yiBEAgenUv934DD0gvHOuOyL27nzPXEKwo4Rg2GzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mgyXpWtA; arc=none smtp.client-ip=209.85.160.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-514ae601e01so15887941cf.1
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 07:34:26 -0700 (PDT)
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-512f750d4b2so34797641cf.1
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 07:34:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778510065; x=1779114865; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FK+L0K6qz3weg/2Imd9GJZb86R+Jgq/G536dW6Nnm4E=;
-        b=PYKxhRM1yGwH0z7yLss2oIYCvpe0m+dE20r1eSh00nH+Enpb3Y5eBdWohrwAXcgd8G
-         WqC9bFvFRw9a6DHtBGvrNwz/ML0ciwniFptNG8mu/wl+f8g57Ienl660S06M1W5Yfx1F
-         MOdRamJENLi4WsOX2jxqRzWSi1cWZUs5UKSyO2qouEee696c/drhPV9O86qP7DQ8GxiF
-         H0WKAjQp4aKhfSlormg0uG27Wp6hSG+egAUVwTcz+96nM+8jvkYt7V8wgVavZem+2ThF
-         0hbfiVJIC1Kv4Mi9CZfAHYGEkCTyStYA4UPCEDILSy4uEkfWLmYMcyoSPtsiAxpnJ4cu
-         Sfdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778510065; x=1779114865;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1778510067; x=1779114867; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FK+L0K6qz3weg/2Imd9GJZb86R+Jgq/G536dW6Nnm4E=;
-        b=f7MhvPT0XacxIZgr/f9VsAoJu5FIEZrUBPFrzZNQAVL3iHqpfHn9pebvL3ZFlJTX8U
-         1jQkiwZC8tmgM6ZaU2+vcW1wg2BbzPtfoyJGrB2KvK9/Djm7voV9PrF4cPwO3KeM9CAE
-         6jhQOiBYjvgtnDQAvH5QBq9nJpVL5ScD/U/XRm/XIEcjfQC5dKh399FmHQXpS2+oxxO/
-         ABtuHpRQGeKWEBOqGkOgenTr6/zT8QVEuMMq+zJTiMfUIbJ4/R7uypYgxvkvEZPjNd1c
-         zTV2VrwzO6rXTjmYN9VHtM5ilC/S6q0fPmd1hSi/ugtKEfaIsG1BqMCYuH84IkAB+U8R
-         fYnw==
-X-Forwarded-Encrypted: i=1; AFNElJ/wy5AxcS4fWi12TZ/SXXqffXP/sCiRszu20uf8DA9+wn+OpxHhM3USXFRu7WZbzanGSSN3DLE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzfsVZOH1TFpVMEZZnhFkJskAWHA6sNYZ08ey3l5mS1BgcIKHw
-	o6D4typ45Gd9gmbMxA3FOYWcVvAZBRhYFYZ6RHldfHDcZ37w0oBv7zac
-X-Gm-Gg: Acq92OEp172CGLZopDoAM3JYyxCr/rvr/Fvi+Y+xMfmz65pKfnZx8rpYs7o4hsLD6F1
-	sKuOccx3MfuMmlLXWKBQEvO9TeNBG5yIShAcqje5LtXafh4fTFPnwSNox02+r1JkxFPNBNblWD+
-	r0mTqIHPONBGGOT9/ScwmO6DthYS0uoX0i/t3D3onRPV0cfNECkXjCzXdsiIpGp/X3FcQQQAgAS
-	QL36SxWS33zPRHWcomHCsH3J/UZ4Rhy5rjiiYPtAkvuPJ+2azBC5BPOmoLGSqyTwlMrJPiLOfjl
-	qQi4eDhbDrcZccP2bpr9554SIXIXdSxDKw1Y73JoeoNZZdQrmTEPT57NMoWFEmaLQrJyE1sETEj
-	260A6riDda0qW2G1IhBtLDGrSl5KKw9Pf2VXB6lGPruhkZGycf677fxC4vVOhIxa4aOtbGhaQwP
-	AY6bb4SJCbNHrUsJwGvOtdvoy22HWfYH6Ej4oNB5bS3/SXFliv2QRDluZuAO/68EDhufRlaFtGR
-	IESDaM7lCaNZSp/sk3jcNHRgDjo0m9rM1DeJjG4A3U=
-X-Received: by 2002:a05:622a:d5:b0:50d:2a76:43c5 with SMTP id d75a77b69052e-514619de7e5mr335557531cf.2.1778510064939;
-        Mon, 11 May 2026 07:34:24 -0700 (PDT)
+        bh=H9wLQan2nN7eJ+L05d+IVGFJIfDrs/6xj1WgA6VgIXY=;
+        b=mgyXpWtAZItRMUrplVrjLGFLAbdt1IiVgETfNpAp5ZYavJAZfJD4rlQhtgAT/7fU6w
+         LgENAPsX1AEXjTGRN+jG5D/nbxPIjQZhgyy+KnakR98ik5JUziBhLllmvaZXEqc7D/bq
+         e8lGfsP632l3lNguCtwroEqWkCeEp58xNWzYZ+ADAbI9A1yuCmsBe74JiR5NNoH9PByk
+         OuhGZNQNpqiuK308yDBNUNYWcNhC6Kl1QZo7+unHQw+h0AxaNx+EOB+58MfoeplWdZM8
+         cswM4kCaQsigdj56XE4eYFPeM6SbhzfEh7WxY1usNUEJI2Z+G3GhJeqsrmquuEW+oPaQ
+         N1Mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778510067; x=1779114867;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=H9wLQan2nN7eJ+L05d+IVGFJIfDrs/6xj1WgA6VgIXY=;
+        b=nS2NeH4HNptbQ5C282D2SCNjaVDjP6zBqHuo9BL/zJ72VYz3cQzIF2A4JW/osFFFvl
+         3FLCfm76iwhR3GPdNEmWq/CogQBxvrpwTL1ZqsAPXhe5LUPbSKVi5gmrjJkCmCpm7NQ3
+         LlRgFlMpC4ZMuiAzdNPoWDBHAPZMJx7qx1tj5FBDq26WGyrmuvaxcnnhiLFL6dainRGz
+         0NeZLI4sBzwve7uO9+I8lXhJTOTYRsqdtTPbdQLYTNW+/Gsu/Z1wwnifefpTjrioqpWY
+         uMkGcvHIS1lGkiEhSd4jl0rWrPoKVHoVQRvVtaLnlBbFO6Wqj4we71A5ce6vqweCe/67
+         wbwA==
+X-Forwarded-Encrypted: i=1; AFNElJ+HKXhdYY41FwGZH80DioUgEtzTq9FDCKmx9x4tsN8BO5PWLzDRm70pv81/2RH6A60LGOpObYY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy20/f36a1Kfdg1z22Vjq3bHdZWdosO3g4tlP4hM6EmEh30Aka2
+	ILpzzpVjYqkQe+/qlPwBNLZpoqSrBVZmP7f+TRaVdvOjBAheXQ/apxn/
+X-Gm-Gg: Acq92OHHVkRVcJzlgZBXM0bLQVJrr0ZpF0A5yo8Ie+iLrak+m1P9PHPeETamKdYuaiV
+	AOq+LEVjAjLXaRhUNikNlqNjdk5oE5h19Oec1T1z0lscdUzTmaJox09nKheSRaHhpTaWG2XiEcD
+	1RYyrXBJP6fTgUvZpQRtnqEE+VPqt8ySg6VfLks2lGEDgqG1UX/25G4K1JrBgGlTTcDoDE3Gc03
+	uNOROdINH5jQyL2l2nHkLRWBgK9aLA1eG0P8Wj5qA80Nvsj6/j+CIkO6XToW+eNyJkBTBBaIDgP
+	+ovtEyN3jjLjObhaFM36Ha6maQYpbgjta3JWOClsLsCQt6xp1FT1Vg62apv6bUU40XKk95wNlEt
+	4pDbXgvzthq54ypUBcb1s2sfgDi/X1Kqp+YjXR6VmpeWlpYl/+/uLRQ5Uggij8E+7a0s8kQotXL
+	+opjvTk9sW4Bp3AwGZeBpieft7PcMIRPPfVoxFU/5d+dNJETNbGeg4H5AoNeSuo+lROfY8BMJQy
+	AWgpIIN8OKf1qY0x+EQJCXes6tRv1dfQMInEURdqwOVorl1PbQ70w==
+X-Received: by 2002:a05:622a:48:b0:50e:a1aa:2cd9 with SMTP id d75a77b69052e-51461c04ebbmr342766301cf.15.1778510066287;
+        Mon, 11 May 2026 07:34:26 -0700 (PDT)
 Received: from server0.tail6e7dd.ts.net (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5148e83aa2bsm90605371cf.28.2026.05.11.07.34.24
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5148e83aa2bsm90605371cf.28.2026.05.11.07.34.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 07:34:24 -0700 (PDT)
+        Mon, 11 May 2026 07:34:25 -0700 (PDT)
 From: Michael Bommarito <michael.bommarito@gmail.com>
-To: 
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
 Cc: Mat Martineau <martineau@kernel.org>,
 	netdev@vger.kernel.org,
 	stable@vger.kernel.org,
 	Pauli Virtanen <pav@iki.fi>,
 	Aaron Esau <git@aaronesau.com>,
 	Michael Bommarito <michael.bommarito@gmail.com>
-Subject: [PATCH 0/4] Bluetooth: hci_sync: fix TOCTOU UAF in cmd_sync callbacks
-Date: Mon, 11 May 2026 10:34:00 -0400
-Message-ID: <cover.1778506829.git.michael.bommarito@gmail.com>
+Subject: [PATCH 1/4] Bluetooth: hci_sync: pin conn across hci_le_create_conn_sync
+Date: Mon, 11 May 2026 10:34:01 -0400
+Message-ID: <490e228dd02983fb1530fb114d4174148f810261.1778506829.git.michael.bommarito@gmail.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <cover.1778506829.git.michael.bommarito@gmail.com>
+References: <cover.1778506829.git.michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,108 +101,174 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 0D350510557
+X-Rspamd-Queue-Id: 0E600510550
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iki.fi,aaronesau.com,gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286686-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286687-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
+	FREEMAIL_TO(0.00)[holtmann.org,gmail.com,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iki.fi,aaronesau.com,gmail.com];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.994];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-0.923];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,checkpatch.pl:url]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Four hci_sync.c cmd_sync callbacks share a TOCTOU bug: each receives a
-struct hci_conn pointer via void *data, calls hci_conn_valid() at
-function entry, then dereferences the conn without holding a lifetime
-reference. hci_disconn_complete_evt() running on hdev->workqueue
-rx_work can call hci_conn_del() -> hci_conn_cleanup() -> put_device()
-between the validity check and the body's first deref, freeing the
-hci_conn slot. The cmd_sync work item then reads or writes through
-the freed pointer.
+hci_le_create_conn_sync() runs from the cmd_sync workqueue with a
+struct hci_conn pointer it interprets out of the work item's void
+*data argument. The hci_conn_valid() check at function entry is a
+TOCTOU: nothing prevents hci_disconn_complete_evt() (executing on
+hdev->workqueue rx_work) from running between the
+hci_conn_hash_lookup walk in hci_conn_valid() and the body's first
+deref. hci_disconn_complete_evt() -> hci_conn_del() -> hci_conn_cleanup()
+unregisters the device and drops the final kref, which kfrees the
+hci_conn slot. The cmd_sync callback then writes through the freed
+pointer (clear_bit on conn->flags, conn->state, the four
+le_conn_*_interval fields).
 
-The four callsites:
+A KASAN slab-use-after-free splat in cache kmalloc-8k confirms the
+bug on linux-next tip commit bee6ea30c487 ("Add linux-next specific
+files for 20260421") under UML+KASAN, matching the slab geometry of
+the syzbot trace fixed in commit 035c25007c9e ("Bluetooth: hci_sync:
+Fix UAF in le_read_features_complete").
 
-  net/bluetooth/hci_sync.c hci_le_create_conn_sync
-  net/bluetooth/hci_sync.c hci_acl_create_conn_sync
-  net/bluetooth/hci_sync.c hci_le_pa_create_sync
-  net/bluetooth/hci_sync.c hci_le_big_create_sync
+Follow the reference-pinning pattern from commit 035c25007c9e
+("Bluetooth: hci_sync: Fix UAF in le_read_features_complete") and
+commit 0beddb0c380b ("Bluetooth: hci_conn: fix potential UAF in
+create_big_sync"): the queue site takes a reference via
+hci_conn_get() so the slot is not freed between
+hci_disconn_complete_evt() retiring the conn and the cmd_sync
+callback / completion handler returning. The completion handler
+drops the reference on every exit path, including the -ECANCELED
+short-circuit.
 
-The fix shape used by commit 035c25007c9e ("Bluetooth: hci_sync: Fix
-UAF in le_read_features_complete") and commit 0beddb0c380b
-("Bluetooth: hci_conn: fix potential UAF in create_big_sync") is the
-same one this series adopts: hci_conn_get() at the
-cmd_sync_queue_once() call site so the conn slot stays valid for the
-duration of the workqueue dispatch, with hci_conn_put() in the
-completion handler.
+Introduce a static helper hci_cmd_sync_queue_conn_once() so the
+get/put pair is not open-coded at every queue site. See the
+helper's kerneldoc for the -EEXIST contract.
 
-Patch 1 introduces a small static helper hci_cmd_sync_queue_conn_once()
-that centralises the get/put pair so it cannot be miscoded at each
-queue site. The kerneldoc on the helper explains the -EEXIST contract.
-Patches 2-4 convert the remaining three sites.
-
-Each callback was reproduced under UML+KASAN against linux-next tip
-commit bee6ea30c487 ("Add linux-next specific files for 20260421"):
-all four produce a slab-use-after-free splat in cache kmalloc-8k
-matching the syzbot trace cited in commit 035c25007c9e
-("Bluetooth: hci_sync: Fix UAF in le_read_features_complete"). On
-the patched kernel the reproducer returns -ECANCELED cleanly with
-no splat.
-
-An unprivileged process holding an AF_BLUETOOTH socket drives the
-cmd_sync queue side (no CAP_* required); the racing freeing context
-is hci_disconn_complete_evt() arriving via the controller, which an
-adjacent attacker controlling a BLE / BR-EDR peer can drive.
+The hci_conn_valid() check in the callback body is retained: a
+logically-deleted-but-still-referenced conn has stale
+hdev->conn_hash.list state, and continuing to drive a connection
+attempt on it would be a logic bug even though the memory is safe.
 
 Pauli Virtanen posted a series-wide variant of this fix as
 https://lore.kernel.org/linux-bluetooth/e18591f264c50e15917cb8b9e5f9798d9880979d.1762100290.git.pav@iki.fi/
-(PATCH v2 8/8, 2025-11-02); this series re-derives the fix on top of
-current linux-next with per-site Fixes: tags and factors the get/put
-pair into one helper. hci_le_past_sync is not included; the past path
-uses a struct past_data wrapper, not a direct hci_conn *, so it does
-not fit the same helper.
+(PATCH v2 8/8, 2025-11-02). KASAN reproducer captured under
+UML+KASAN (linux-next tip bee6ea30c487).
 
-Aaron Esau's sibling fix for hci_enhanced_setup_sync() in hci_conn.c
-covers the same pattern at a fifth callback,
-https://lore.kernel.org/linux-bluetooth/20260330140347.906689-3-git@aaronesau.com/
-(2026-03-30).
+Fixes: 881559af5f5c ("Bluetooth: hci_sync: Attempt to dequeue connection attempt")
+Cc: stable@vger.kernel.org
+Assisted-by: Claude:claude-opus-4-7
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+---
+ net/bluetooth/hci_sync.c | 41 ++++++++++++++++++++++++++++++++--------
+ 1 file changed, 34 insertions(+), 7 deletions(-)
 
-Build clean on UML+KASAN+SLUB (linux-next tip bee6ea30c487) with no
-new warnings. checkpatch.pl --strict reports 0/0/0 on each patch.
-
-Michael Bommarito (4):
-  Bluetooth: hci_sync: pin conn across hci_le_create_conn_sync
-  Bluetooth: hci_sync: pin conn across hci_le_pa_create_sync
-  Bluetooth: hci_sync: pin conn across hci_le_big_create_sync
-  Bluetooth: hci_sync: pin conn across hci_acl_create_conn_sync
-
- net/bluetooth/hci_sync.c | 77 ++++++++++++++++++++++++++++++++--------
- 1 file changed, 61 insertions(+), 16 deletions(-)
-
---
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index fd3aacdea512..b20e07474257 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -786,6 +786,31 @@ int hci_cmd_sync_queue_once(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
+ }
+ EXPORT_SYMBOL(hci_cmd_sync_queue_once);
+ 
++/* Queue an HCI command entry once, pinning a hci_conn for the duration.
++ *
++ * On success, the cmd_sync queue owns one hci_conn_get() reference;
++ * the supplied destroy callback must hci_conn_put() to balance.
++ *
++ * On any failure return (including -EEXIST, where
++ * hci_cmd_sync_queue_once() neither invokes destroy nor consumes the
++ * data pointer because an existing entry already owns the slot), the
++ * helper releases the reference before returning, so callers do not
++ * need to discriminate failure codes to keep the refcount balanced.
++ */
++static int hci_cmd_sync_queue_conn_once(struct hci_dev *hdev,
++					hci_cmd_sync_work_func_t func,
++					struct hci_conn *conn,
++					hci_cmd_sync_work_destroy_t destroy)
++{
++	int err;
++
++	err = hci_cmd_sync_queue_once(hdev, func, hci_conn_get(conn), destroy);
++	if (err)
++		hci_conn_put(conn);
++
++	return err;
++}
++
+ /* Run HCI command:
+  *
+  * - hdev must be running
+@@ -6982,36 +7007,38 @@ static void create_le_conn_complete(struct hci_dev *hdev, void *data, int err)
+ 	bt_dev_dbg(hdev, "err %d", err);
+ 
+ 	if (err == -ECANCELED)
+-		return;
++		goto done;
+ 
+ 	hci_dev_lock(hdev);
+ 
+ 	if (!hci_conn_valid(hdev, conn))
+-		goto done;
++		goto unlock;
+ 
+ 	if (!err) {
+ 		hci_connect_le_scan_cleanup(conn, 0x00);
+-		goto done;
++		goto unlock;
+ 	}
+ 
+ 	/* Check if connection is still pending */
+ 	if (conn != hci_lookup_le_connect(hdev))
+-		goto done;
++		goto unlock;
+ 
+ 	/* Flush to make sure we send create conn cancel command if needed */
+ 	flush_delayed_work(&conn->le_conn_timeout);
+ 	hci_conn_failed(conn, bt_status(err));
+ 
+-done:
++unlock:
+ 	hci_dev_unlock(hdev);
++done:
++	hci_conn_put(conn);
+ }
+ 
+ int hci_connect_le_sync(struct hci_dev *hdev, struct hci_conn *conn)
+ {
+ 	int err;
+ 
+-	err = hci_cmd_sync_queue_once(hdev, hci_le_create_conn_sync, conn,
+-				      create_le_conn_complete);
++	err = hci_cmd_sync_queue_conn_once(hdev, hci_le_create_conn_sync, conn,
++					   create_le_conn_complete);
+ 	return (err == -EEXIST) ? 0 : err;
+ }
+ 
+-- 
 2.53.0
 
 
