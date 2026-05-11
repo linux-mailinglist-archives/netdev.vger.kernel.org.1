@@ -1,213 +1,229 @@
-Return-Path: <netdev+bounces-286812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286813-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uOx2L+wxAmrSowEAu9opvQ
-	(envelope-from <netdev+bounces-286812-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 21:45:48 +0200
+	id mLOVCrYyAmrSowEAu9opvQ
+	(envelope-from <netdev+bounces-286813-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 21:49:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3E4E5153A7
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 21:45:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BFE9515411
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 21:49:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C56A5300BC51
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 19:45:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C950330358AD
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 19:49:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62396377EB2;
-	Mon, 11 May 2026 19:45:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9180F378D94;
+	Mon, 11 May 2026 19:49:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="D4z5PANb";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="dlJ5/dJq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LKLAs8SQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-b2-smtp.messagingengine.com (flow-b2-smtp.messagingengine.com [202.12.124.137])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2835C231832;
-	Mon, 11 May 2026 19:45:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.137
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1483A286881
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 19:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778528743; cv=none; b=WTb8yWshgTisi6UCNGwNIFB4TThbGApTldbUnEjyTO4DWSlV2GMwBz9BmGIVPGuPO/ko0DruJZ3G6rQAN8QnaC43hYfh6Eup999RLkGYThNjQJ9yaPrvTXa8NLlvUWBUs14VUluWMG5FY4GZ4Ia0u5TWxUKPQXu5XzW0fUWRsfY=
+	t=1778528945; cv=none; b=BwvYsG8ajIgwi1IElmfOFDqYeliN7Vr0qEwS6EhnvM7N8+J6xXjWldx5k5hYv7QNllzmusRvm+mQjs28BxOPINvFka/DwnvdW1YDdsq+8oAh/SjycXgHYPKg6FNBblz7vQVQTMLMXmfayx7L435dtJXz8sQLMwZ6CN7Jznks4UM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778528743; c=relaxed/simple;
-	bh=r2TkPBKD+Aftmua5eAHpQErNAyPhJyA9piMQtqs3gTA=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=ipwwdA/t6NsIoJjRDG4C2gAkJvAcJqgXVdETxbfTu5s+S5amnLm6wO3CUMAL6r++xiBdZyP7Gf7bo1aCAzisltwZujoyrVsDIwfby+FqOESHjmt6ABgx7Y40pYHPsC/MfplauIUdE5gUPn0lShkqRtx6YxI238I8mA4FINQ6Pp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=D4z5PANb; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=dlJ5/dJq; arc=none smtp.client-ip=202.12.124.137
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailflow.stl.internal (Postfix) with ESMTP id 6D4011300612;
-	Mon, 11 May 2026 15:45:39 -0400 (EDT)
-Received: from phl-imap-12 ([10.202.2.86])
-  by phl-compute-04.internal (MEProxy); Mon, 11 May 2026 15:45:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1778528739;
-	 x=1778535939; bh=KxZ33PuusT961rLixN2ifdvh369r1mQpzu5JayZvCM8=; b=
-	D4z5PANbVp75yaAyqbWk8TXrVr0gxga8wuIzjhJAn/I4s82px9yxxTgj3plhNS8C
-	20eCKyiL2n0yCLiKzMVsRDjz97ZANH3ZSbWryKt+ZpTxoGuzY92XCd6L+IJKOb/M
-	0V1QS6L7KleXIM6f3vPP3rPWfHrNDzLPn6ocGHHkxiknoqLNCQG9pE0DPIUkMmj5
-	LT4UmyY9lF6ZGbdtuWC093+nWqCIeznqeTjWNwy38ZxqG7/yzToctTHRdZV32wqo
-	D12tRct0uG2yfKtr91iAy/E6IdzVGF4HI27yV3uQnl1TPd+6z8AnIu/W3NLW3kn8
-	5v40edD/yWCQ+AMauLaFlw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1778528739; x=
-	1778535939; bh=KxZ33PuusT961rLixN2ifdvh369r1mQpzu5JayZvCM8=; b=d
-	lJ5/dJq6u94Ln6yeJLFGxpyMWS4jbbnDDrG9mtCg2graLDsYIYxbf1Giy15cXseT
-	BdZD0L6aMIPj+mdSsOmeV/5G55uUlqSrNFSHZqDcSwAo4ey3OUnpH3kQe7qO0t99
-	xwH1TCWEpkMUso4yaYoiUHtpw8MWUUHxkvgAezWWo4Mtik2E5kLpG9VoGBfBd0cs
-	vYzAYLKT525QU78mHaWUM6baHfnmjQZ6nOUHNWTOdXuHc0eBmlGKPikQneSw5Aye
-	PpvrXSCqcxHQ8jMgFi/g/RMv7z8w4XtKgCUohxvFncPnhtKjwRpokJ/drl3/fiOt
-	UnmqWGovjPskXorK9H3oQ==
-X-ME-Sender: <xms:4jECaoio-q9Hn_18suna-XMApA-5lHHUbxhhZolaW0Aa2PJm9wT5qg>
-    <xme:4jECar3FEko5ciV0r8x99NHSqLrQq7B1RyOFYq9ZrejINaN5TG-r_gNwi3mPXlKTz
-    iJVjCw2BWefC7WIngNE6grcHmizR-yCiQ_hEylOuNwxoTDUjVlnjg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduudelkedtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhgu
-    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
-    hrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdei
-    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
-    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepvdejpdhmohguvgepshhmthhpohhu
-    thdprhgtphhtthhopehtohhnhiesrghtohhmihguvgdrtghomhdprhgtphhtthhopegstg
-    houhhsshhonhessggrhihlihgsrhgvrdgtohhmpdhrtghpthhtohepkhhhihhlmhgrnhes
-    sggrhihlihgsrhgvrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfth
-    drnhgvthdprhgtphhtthhopegumhhithhrhidrthhorhhokhhhohhvsehgmhgrihhlrdgt
-    ohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtth
-    hopegrrghrohdrkhhoshhkihhnvghnsehikhhirdhfihdprhgtphhtthhopegrnhgurhgv
-    rghssehkvghmnhgruggvrdhinhhfohdprhgtphhtthhopegrrhhnugeskhgvrhhnvghlrd
-    horhhg
-X-ME-Proxy: <xmx:4jECaq-fWu4ldeE42gFx7xpX0gT51l92nKflXvkXkKeWkMuJbPpDSA>
-    <xmx:4jECaj5BEi_Xa2gk_9ctxMWOA5CaQV6l15RNRabp1EOAeBG2y8oHHA>
-    <xmx:4jECaqJcOVjx5muBXjU2JNcIaUUQLkDBVLzk5tM4-Aqh-kY6Nhrw-g>
-    <xmx:4jECajVQITiMaykQndkJ3I7EE_zQr88C2yi50Vcz8DgA5Yuw-Fz2Bg>
-    <xmx:4zECajhIaXzc9ryCdCBEsbuNhZ66JeG0SS8KAGAV4sSG8j9QRaB__1-8>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 4DE381060065; Mon, 11 May 2026 15:45:38 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1778528945; c=relaxed/simple;
+	bh=QHHzaIEonCbI1C5dXpKIlAYjdgalgcGFxXhTpOB8rKw=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=r95QzTixaP2lKFQffbXnmH98Pw8coYEbO7wZyH6D1GwC9G3Rm0yfl10lSLkdCWEoyvD2ScHvWtV19AYdtIlUl3+R0agc0aNmnkaBTLgyUJ1QJtHm5IsVwTEP6C8tMB+b/BlV0rLXTSMXKYQhN2e68QQq3vRfo3j7hsr8H91RZDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LKLAs8SQ; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-7bf1433b80cso32093067b3.1
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 12:49:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778528943; x=1779133743; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eUstqJlu3gWnJgtR+FhxyIiNP8zbdgleP0vcu3c2vng=;
+        b=LKLAs8SQKiyUR4XUJjyiu7d6Wvjfle+/Ownp/MVmYtT3Kvd7uNAjz0/CkKUSOPSRsl
+         uvqEK/HUs5SY8nJGHpaIBX6sZnnFrIzAErmmJqpJRvRmne6fyE95MCKDDadyn5DFbZMj
+         Zw/vgnXld4zH+tv/F0z/Vmm7oZlIZze0IJ1qpybZfdYb6DPJEewHd90Q+NGeIBIPUotm
+         NPJJgF3q3ybjm6d4EsqcUdHHr+gJ3yhARM3R6B40FmS+3DGy9NRB6V5g02wcgKULp8rl
+         OlNbhV10n2QkOj1N9kqYhvZzQQfjZzNikW3vkoZhItUI1ALMp7VRx2tpX2YGi7MrMO/v
+         TIOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778528943; x=1779133743;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eUstqJlu3gWnJgtR+FhxyIiNP8zbdgleP0vcu3c2vng=;
+        b=orXY2+oWg2XQutMMS9YjespwpjLSojfKGcneH30hg8hWzlp6kGHCFKOOwE7CrCBorA
+         HOSjHHXZlzMzgDRrjB2LpmblwpS1auNxUQ5lsPvl5WFYt+PfRkWRHPsxTS5vQb5EV0wO
+         1ZCEb12mGnihou2F/eiseWJhifBKCJlNF+5rLPwVFhMXGzTRkiK7HX/Dcs2HdvVPiW2W
+         KoQMvDKU8QmSWrW2g8Iw5vN9h1k1R3yk4PicNj/0/t3+M/vy6XMYjKrt7FvjN6kqEuC1
+         VpwJH7PnPxHD/bbKFYjL3t014s4Pcf4wRa4XyjMhw4h7r0qtHDrnmKb8ABKBMpNnY9qy
+         iufw==
+X-Gm-Message-State: AOJu0Yw4GRMHk1hl6nYOIcmyoXs+IFoh/izpofIZACPd3t8BbYtGBP7s
+	bBqWHATICrIUfqmrsfXGU8Rwzx6Y/DYsI65UQglBDX7cadv8Msomg04h
+X-Gm-Gg: Acq92OFQLTe//R7aaOJXyyLl3XKVbGZxGT6F+tFuYLPODzpQNlc61W/HcrjApGjomLM
+	F/e7w+MUq3XvoCocUAm8qJci9MEI4vFviXE50yx7j8HHZtE0YcejZftggTkUeXxXt1OSovbLsPA
+	uzzB0BeAJsgyEtXqg4PUfjFxjtd9J15rWFRlou0QrDnI3qTJEA82Fj+9J/YzOGDOU1qHcHukCF8
+	01LNafB7KLlODOQfIqVyYA8gYi4MCLqP8UOdXdt381madujBY/AVKmQq8vLyP0ZqyUdEl64qaKY
+	vCtFsOLa5M2ktZiEKJ8AwTXxBJ2P7GjjItxE+dVE7fBnQKvHfeTGjfwSVNrsLlN7Il1cPB3NrtG
+	4GbcPQ61bqvEO2I09Ay7HCLrJvHC4kYYTkA6m99Dp5gpUu0+JAnRMp/XSleXQlXtkett8KOUUWL
+	UeYD4GmaechbtK5hbEwSkUruGceDG3XXo1d9rFMP30oqgSamy1mXIlSDsNN8B+npTytPyaKHZYN
+	OGK
+X-Received: by 2002:a05:690c:298:b0:7c4:86d:5e4b with SMTP id 00721157ae682-7c4086d6187mr37021717b3.41.1778528942944;
+        Mon, 11 May 2026 12:49:02 -0700 (PDT)
+Received: from gmail.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7bed8946d5dsm73201827b3.14.2026.05.11.12.49.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 May 2026 12:49:01 -0700 (PDT)
+Date: Mon, 11 May 2026 15:49:00 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Daniel Zahka <daniel.zahka@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.36d2fcc3d2e74@gmail.com>
+In-Reply-To: <20260508-nsim-psp-crypto-v1-4-4b50ed09b794@gmail.com>
+References: <20260508-nsim-psp-crypto-v1-0-4b50ed09b794@gmail.com>
+ <20260508-nsim-psp-crypto-v1-4-4b50ed09b794@gmail.com>
+Subject: Re: [PATCH net-next 4/6] netdevsim: psp: implement kdf from psp spec
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-ThreadId: Ap_j1q_rtJ4F
-Date: Mon, 11 May 2026 21:45:18 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Simon Horman" <horms@kernel.org>, "Arnd Bergmann" <arnd@kernel.org>
-Cc: Netdev <netdev@vger.kernel.org>, "Aaro Koskinen" <aaro.koskinen@iki.fi>,
- "Andreas Kemnade" <andreas@kemnade.info>,
- "Bartosz Golaszewski" <brgl@kernel.org>,
- =?UTF-8?Q?Beno=C3=AEt_Cousson?= <bcousson@baylibre.com>,
- "David S . Miller" <davem@davemloft.net>,
- "Dmitry Torokhov" <dmitry.torokhov@gmail.com>,
- "Eric Dumazet" <edumazet@google.com>, "Felipe Balbi" <balbi@kernel.org>,
- "Jakub Kicinski" <kuba@kernel.org>,
- "Johannes Berg" <johannes@sipsolutions.net>,
- "Kevin Hilman" <khilman@baylibre.com>, krzk+dt@kernel.org,
- "Linus Walleij" <linusw@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Rob Herring" <robh+dt@kernel.org>, "Roger Quadros" <rogerq@kernel.org>,
- "Tony Lindgren" <tony@atomide.com>, linux-wireless@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org,
- "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
- Linux-OMAP <linux-omap@vger.kernel.org>,
- "Krzysztof Kozlowski" <krzk@kernel.org>
-Message-Id: <edc4d6d6-7a43-442e-adb5-148e37402924@app.fastmail.com>
-In-Reply-To: <20260511161243.49098-3-horms@kernel.org>
-References: <20260507212451.3333185-3-arnd@kernel.org>
- <20260511161243.49098-3-horms@kernel.org>
-Subject: Re: [PATCH 2/3] [v5 net-next] p54spi: convert to devicetree
-Content-Type: text/plain
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: C3E4E5153A7
+X-Rspamd-Queue-Id: 9BFE9515411
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.65 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[arndb.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[arndb.de:s=fm2,messagingengine.com:s=fm3];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
-	TAGGED_FROM(0.00)[bounces-286812-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286813-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	FREEMAIL_CC(0.00)[vger.kernel.org,iki.fi,kemnade.info,kernel.org,baylibre.com,davemloft.net,gmail.com,google.com,sipsolutions.net,redhat.com,atomide.com,lists.infradead.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arnd@arndb.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[arndb.de:+,messagingengine.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[arndb.de:dkim,app.fastmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,messagingengine.com:dkim]
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.996];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Mon, May 11, 2026, at 18:12, Simon Horman wrote:
->
-> Simon says: As a pre-existing issue I don't think we need to be concerned
->             about this in the scope of this patch-set. But it may
-> 	    be a potential for follow-up.
->
-> This problem wasn't introduced by this patch, but I noticed a pre-existing
-> issue in the context here. Does the p54spi_spi_read() function perform an SPI
-> transfer using a stack-allocated buffer?
->
-> Looking at p54spi_spi_read(), the addr variable is allocated on the stack and
-> passed as a transfer buffer to spi_sync(). The SPI framework maps transfer
-> buffers for DMA. Passing a stack-allocated buffer is illegal, particularly with
-> CONFIG_VMAP_STACK enabled, because stack memory resides in vmalloc space and
-> cannot be safely DMA-mapped.
->
-> Could this cause memory corruption or a kernel panic during the transfer?
+Daniel Zahka wrote:
+> Implement the PSP key derivation function (KDF) per the PSP
+> Architecture Spec.
+> 
+> The kdf is used to generate spi + session key pairs, and will also be
 
-I already commented on this earlier: This is indeed a theoretical
-bug, but it works in practice because DMA-capable SPI controllers
-tend to all use MMIO for short transfers instead of DMA.
+Text is a bit ambiguous here: the kdf does not generate the spi. It
+derives a session key from the master key and spi.
 
-SPI is very fragile this way, and I do have some patches to improve
-that overall, but it seems out of scope for this one driver.
+> used in the rx path to re-derive the tx key used by the peer.
+> 
+> Also, remove support for psd->generation, as it is not needed for
+> netdevsim after removing the fake authentication hack.
 
->> -
->> -	gpio_direction_output(p54spi_gpio_power, 0);
->> -	gpio_direction_input(p54spi_gpio_irq);
->> -
->> -	ret = request_irq(gpio_to_irq(p54spi_gpio_irq),
->> -			  p54spi_interrupt, IRQF_NO_AUTOEN, "p54spi",
->> -			  priv->spi);
->> +	ret = request_irq(spi->irq, p54spi_interrupt, IRQF_NO_AUTOEN, "p54spi", priv->spi);
->
-> Simon says: This one seems more concerning in the context of this patch-set.
->
-> Is there missing validation for spi->irq before calling request_irq()?
->
-> If the device tree node lacks an interrupts property, the SPI core may set
-> spi->irq to 0 or a negative error code.
->
-> Passing this directly to request_irq() without validation can successfully
-> hijack a core system interrupt like the system timer on some architectures,
-> leading to system instability or deadlocks.
->
-> Should there be a check like if (spi->irq <= 0) to fail the probe gracefully?
+Is psd->generation only used inside driver code, not by the core PSP
+stack? Else it should be set to !!(ns->psp.spi & PSP_SPI_KEY_PHASE) on
+key rotation. If only used by the driver, no need to reset it on each
+rotation.
 
-I also commented on this: request_irq() already fails gracefully
-with -EINVAL when presented with an invalid IRQ. IRQ 0 is guaranteed
-to be invalid on any target that uses devicetree.
+> Assisted-by: Claude:claude-opus-4.6
+> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 
-      Arnd
+>  enum skb_drop_reason
+>  nsim_psp_handle_tx(struct sk_buff *skb, struct netdevsim *ns)
+>  {
+> @@ -155,7 +189,7 @@ nsim_rx_spi_alloc(struct psp_dev *psd, u32 version,
+>  		  struct netlink_ext_ack *extack)
+>  {
+>  	struct netdevsim *ns = psd->drv_priv;
+> -	int i;
+> +	unsigned int phase;
+>  
+>  	if ((ns->psp.spi ^ (ns->psp.spi + 1)) & PSP_SPI_KEY_PHASE) {
+>  		NL_SET_ERR_MSG(extack, "SPI space exhausted");
+> @@ -163,9 +197,11 @@ nsim_rx_spi_alloc(struct psp_dev *psd, u32 version,
+>  	}
+>  
+>  	assoc->spi = cpu_to_be32(++ns->psp.spi);
+> -	assoc->key[0] = psd->generation;
+> -	for (i = 1; i < PSP_MAX_KEY; i++)
+> -		assoc->key[i] = ns->psp.spi + i;
+> +	phase = !!(ns->psp.spi & PSP_SPI_KEY_PHASE);
+> +
+> +	/* dev_keys_lock not needed because of psd->lock */
+
+Can you elaborate a bit?
+
+Is dev_keys_lock only used to synchronize the writers, then? Which after
+device init would only be concurrent invocations of nsim_key_rotate. But
+that operation correctly also holds the device lock using
+psp_device_get_locked.
+
+> +	nsim_psp_derive_key(ns->psp.dev_keys[phase], assoc->spi, version,
+> +			    assoc->key);
+>  
+>  	return 0;
+>  }
+> @@ -186,8 +222,15 @@ static int nsim_assoc_add(struct psp_dev *psd, struct psp_assoc *pas,
+>  static int nsim_key_rotate(struct psp_dev *psd, struct netlink_ext_ack *extack)
+>  {
+>  	struct netdevsim *ns = psd->drv_priv;
+> +	unsigned int next_phase;
+>  
+> +	psd->generation = 0;
+>  	ns->psp.spi = (ns->psp.spi & PSP_SPI_KEY_PHASE) ^ PSP_SPI_KEY_PHASE;
+> +	next_phase = !!(ns->psp.spi & PSP_SPI_KEY_PHASE);
+> +
+> +	spin_lock_bh(&ns->psp.dev_keys_lock);
+> +	get_random_bytes(ns->psp.dev_keys[next_phase], NSIM_PSP_DEV_KEY_SIZE);
+> +	spin_unlock_bh(&ns->psp.dev_keys_lock);
+>  
+>  	return 0;
+>  }
+> @@ -295,6 +338,10 @@ int nsim_psp_init(struct netdevsim *ns)
+>  	struct dentry *ddir = ns->nsim_dev_port->ddir;
+>  	struct psp_dev *psd;
+>  
+> +	spin_lock_init(&ns->psp.dev_keys_lock);
+> +	get_random_bytes(ns->psp.dev_keys[0], NSIM_PSP_DEV_KEY_SIZE);
+> +	get_random_bytes(ns->psp.dev_keys[1], NSIM_PSP_DEV_KEY_SIZE);
+> +
+>  	psd = psp_dev_create(ns->netdev, &nsim_psp_ops, &nsim_psp_caps, ns);
+>  	if (IS_ERR(psd))
+>  		return PTR_ERR(psd);
+> 
+> -- 
+> 2.52.0
+> 
+
+
 
