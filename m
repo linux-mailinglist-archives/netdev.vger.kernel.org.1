@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-286814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286815-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gFedNTkzAmrSowEAu9opvQ
-	(envelope-from <netdev+bounces-286814-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 21:51:21 +0200
+	id CAl/Gjg0AmocpAEAu9opvQ
+	(envelope-from <netdev+bounces-286815-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 21:55:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F57D515430
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 21:51:20 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5B89515544
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 21:55:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0EF753003EC8
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 19:49:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3D6CB304E665
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 19:55:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191EA3502A3;
-	Mon, 11 May 2026 19:49:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FB2F37EFF0;
+	Mon, 11 May 2026 19:55:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ppvwcDHW"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jAgXnJ+M"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C51D237998C;
-	Mon, 11 May 2026 19:49:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16EE037E31E;
+	Mon, 11 May 2026 19:55:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778528963; cv=none; b=sqPgVRGfdoa+vjP57yxIJpRr+B0+b4hqMdkNjiGFEYODBoKM9P2llyvEHsuU8Ag1/rBDbNrQokoOr2iHZSqdIOZVsPA9nBx1stLQM2qANfj3zKF02Ko4Wy3QfWrLd9pWUDZRtorFZo5JNHU04mWTuA7h+LNuUlwBIqvaV/5O2/g=
+	t=1778529333; cv=none; b=FNoyDYGU3Gt2e6H6V7yoOuaC40QVGKKcp71jtC5vimZFCP1fUzQW7LzB2y9iRMESxSFXyY6SGHNPsezKmmFBo5NP9Xss3L4Ly8QtAwZEoGUS9azBRudC3Jp6H1BoKUCe8g3OM/bIxY0cX5lcCWGv8E46fPpvQ2MCBfkHUDrSSxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778528963; c=relaxed/simple;
-	bh=ES/zVHXEpLSl55hYZiXFJYryCdfnJ8t9WgUEAk1T3AA=;
+	s=arc-20240116; t=1778529333; c=relaxed/simple;
+	bh=td/msFDLYOkLi3omzOi3zK2vVOtwEHv7DN3heQmMk4A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vs6Nxw/nUxV/6aycUuOX4ig41V1S4nTQjsAM9M6J7GImFkJbPr8pSL8cZ3f050kAUWxcOSeqpbzVUVw3gX2fWR/Gf90iGSMGreCK6VNZ0YjsHD0jEt/3enMYjq1lKBzWBOHoKCbq92CTkSBb4eElAfHJrlHyqCKuziA1EwsJq70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ppvwcDHW; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=X4WoiHfgEF8SNlS+X3+eiv17LDdmzD48quMabtzJR1Nm2p2dUHX5vyogu8bbCEUYT2MjFjzPHsx6/WYv1DS6lwmSMLkJSNBQXgTvKh2tB0I3CwfPDZUb+AdefJx4YEdnqC0pPjYuzVNasDNoTdT/69YmEZVojkWh7Itdjsu/2wQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jAgXnJ+M; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,13 +39,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=WPanf4BQtaRA4rRWTLFzrBpCX3rZrqSPwixXTkqtKQI=; b=ppvwcDHWVns+HeqdQ4KGgyo/xg
-	2812PQ1T+UJxdPJU0jLtvyDqZKPKrjApYdk83nX6HYtjO+ZoNLjnVCV1PHFBHmelTISmzqT4knfou
-	KqVqGhOL53RO3KRXnolkX/Y8bEZbcVn4fFpLEdbolXcjF3BovlKmLlAnDl8CCCzCFDSk=;
+	bh=q/2albmhxQkLZgimHwKYmc1iebJjrIQrSyHvOxL4P3Q=; b=jAgXnJ+MB+HEV7buFhgStBqf2a
+	XXYebmgYut2JgquPRveeqskLfFV8zWgERd/Pjzhw8NIols9AjfUrzbLomj+QZ0zDLi2NOSNxOVDux
+	t0uNZGkdjLalMVcGaBQzptgv4v9gaqO4R8e8nlLUKiOmymw2TPpBela9bUeDiOEZ80hY=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1wMWco-002QoQ-NY; Mon, 11 May 2026 21:49:10 +0200
-Date: Mon, 11 May 2026 21:49:10 +0200
+	id 1wMWio-002Qr4-T8; Mon, 11 May 2026 21:55:22 +0200
+Date: Mon, 11 May 2026 21:55:22 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 Cc: Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
@@ -57,10 +57,10 @@ Cc: Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
 	"pabeni@redhat.com" <pabeni@redhat.com>,
 	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 6/9] net: ethernet: oa_tc6: Hardware
- timestamp support for OA TC6 framework
-Message-ID: <46a6321a-408f-4c63-8835-86ee9c4bdcd6@lunn.ch>
-References: <CY8PR02MB9249D813205563D5C64ACEFF83382@CY8PR02MB9249.namprd02.prod.outlook.com>
+Subject: Re: [PATCH net-next v2 7/9] net: ethernet: oa_tc6: fix for minor
+ issues
+Message-ID: <587f96bb-bcfd-4515-a4b6-e9e4292ce5a1@lunn.ch>
+References: <CY8PR02MB92494EEBB98152678D3CCEF183382@CY8PR02MB9249.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,19 +69,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CY8PR02MB9249D813205563D5C64ACEFF83382@CY8PR02MB9249.namprd02.prod.outlook.com>
-X-Rspamd-Queue-Id: 3F57D515430
+In-Reply-To: <CY8PR02MB92494EEBB98152678D3CCEF183382@CY8PR02MB9249.namprd02.prod.outlook.com>
+X-Rspamd-Queue-Id: D5B89515544
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286814-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286815-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_EQ_ADDR_SOME(0.00)[];
@@ -98,38 +98,48 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
 X-Rspamd-Action: no action
 
-On Mon, May 11, 2026 at 06:19:31PM +0000, Selvamani Rajagopal wrote:
-> Added hardware timestamp support as defined in Open Alliance
-> 10BASET1x MACPHY_Serial_Interface specification. ioctl interface
-> added for ethtool to report and set the hardware timestamp feature
+> @@ -459,9 +459,7 @@ EXPORT_SYMBOL_GPL(oa_tc6_hwtstamp_ioctl);
+>  /**
+>   * Add vendor specific MDIO_MMD to OA TC6 MMS mapper value.
+>   * @tc6: oa_tc6 struct.
+> - * @mms: vendor defined MMS value.
+> - *
+> - * Return: 0 on success otherwise failed.
+> + * @mms: vendor defined MMS value for VEND1 mdio device.
 
-7.8 Frame Timestamp Capture
+You just added this in a previous patch. Don't patch your own patch,
+get it right the first time.
 
-The MAC-PHY may optionally support the capturing of timestamps on
-Ethernet frames received from and transmitted to the network. Support
-for this option is indicated by the Frame Timestamp Capability (FTSC)
-bit in the STDCAP register
+> @@ -701,7 +699,7 @@ static int oa_tc6_mdiobus_read(struct mii_bus *bus, int addr, int regnum)
+>  {
+>  	struct oa_tc6 *tc6 = bus->priv;
+>  	u32 regval;
+> -	bool ret;
+> +	int ret;
+>  
+>  	ret = oa_tc6_read_register(tc6, OA_TC6_PHY_STD_REG_ADDR_BASE |
+>  				   (regnum & OA_TC6_PHY_STD_REG_ADDR_MASK),
+> @@ -864,7 +862,7 @@ static void oa_tc6_phy_exit(struct oa_tc6 *tc6)
+>  	oa_tc6_mdiobus_unregister(tc6);
+>  }
 
-I don't see anything in this patch looking for FTSC.
+Please put this in a patch of its own, with a good commit
+message. Lots of small patches, each with a good commit message.
 
-> +/**
-> + * oa_tc6_hwtstamp_ioctl - ioctl interface for hardware timestamp
-> + * @tc6: oa_tc6 struct.
-> + * @rq: request from socket interface
-> + * @cmd: value to set/get timestamp configuration
-> + *
-> + * Return: 0 on success otherwise failed.
-> + */
-> +int oa_tc6_hwtstamp_ioctl(struct oa_tc6 *tc6, struct ifreq *rq, int cmd)
-> +{
 
-It would be better to add a generic ioctl handler. It can call
-phy_do_ioctl_running(), and can check if time stamping is support in
-the hardware, and if so, also support the time stamping IOCTL calls.
+>  
+> -static int oa_tc6_read_status0(struct oa_tc6 *tc6)
+> +static u32 oa_tc6_read_status0(struct oa_tc6 *tc6)
+>  {
+>  	u32 regval;
+>  	int ret;
 
-    Andrew
+A patch of its own, and the commit message can explain why, because it
+takes a bit of work to understand why.
+
+	Andrew
 
