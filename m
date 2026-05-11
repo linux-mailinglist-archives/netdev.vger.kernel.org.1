@@ -1,225 +1,149 @@
-Return-Path: <netdev+bounces-286746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286747-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iMM2AOcVAmr+ngEAu9opvQ
-	(envelope-from <netdev+bounces-286746-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 19:46:15 +0200
+	id KCJ5GRwSAmqIngEAu9opvQ
+	(envelope-from <netdev+bounces-286747-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 19:30:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73DB3513B73
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 19:46:13 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E1ED51374A
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 19:30:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6793632013FC
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 16:53:38 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AD1C330B2E96
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 16:54:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AD2D438FF1;
-	Mon, 11 May 2026 16:53:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67B2E43DA50;
+	Mon, 11 May 2026 16:54:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QXxt+CQE"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="lwvNUVCH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DAD4266A0
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 16:53:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E06243D515
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 16:54:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778518417; cv=none; b=tLoxgN6imnsEk8rSOMPDGNWILfrS17YHxsikX5tNcRULFpomxEXfqC65J/YsGr/usPNS/jjWvoBxWge+u3Ds3SAp6LvEbhQba3CbtPa5+rguzv2qu+QvCNeuGPSfVH/tEqSL4GFDuv2Gub9gktoJTEIANFYcNq5By662gC9jgoE=
+	t=1778518474; cv=none; b=suMt3eVe8bVUdHrazYOG07k3nJN7FaT35C4nSN2ZpvojTQoauGNmUjQ5bO+OWa+vCRE6aBSH79DULJgcujpntkSUSJpHdiz2VwAKF3fgT1UWGbWhMrbQnqr/2dzLcw+SPfzf0JpSIVx+EEFaVPAaoMTWHLQeGTVqd9Y4VYFnfok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778518417; c=relaxed/simple;
-	bh=ieprNEftwYIz0PEqwv+lZWIWv+anmUqRT4shxU8WfRo=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=KFy3BFaomTDqshAcmpWi31aobka/JQv3cxmMhLeoolN+ACYsyOcUi6XYRqADbyhxittXgyLEIiNHEf3zQQKCDTVigxM9SeMOE3o33RjL28uMPEjJyp1MJbSEOozqzMDakwhLdWtDCL1NUgFdQrCmUUDYyDrE7FeGJqSoeEXbQ+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QXxt+CQE; arc=none smtp.client-ip=74.125.224.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-65c21049dafso4125259d50.2
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 09:53:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778518416; x=1779123216; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NNCfA4B6oVFfF4KvBVDRI03KRMfSBcZ5kzx5bM73bqs=;
-        b=QXxt+CQEjLku2UKObxsPapcNlZziNxFFWeNSfm3/Z9M0Jao8RIA16xFHRMbt/zGCYM
-         SDGGjIqI3BjRTf24Oo7PIM30H7NMfxnkbpZasXgR385xFSt7zIB+a1+VHEQivIi+T5fq
-         VEc8EIYSLhjZjqKmYoEOEmuHRffvPI+8YUObqArghi9HdZ8ORSedFcpmOjOF2qRJfWe8
-         czNXay0mZZsSaiPHyYmcX4ZA9xT6gNy72Yzexk1aQH4Gb8uDCIauWJQUT14xlXFhRH1h
-         GQJIEwjXaoOw3unV98ztiQwOx3y6iS5l8k9iCfP3Q6RSAAFAjfqACEL2O9RBpakEivch
-         HtxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778518416; x=1779123216;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NNCfA4B6oVFfF4KvBVDRI03KRMfSBcZ5kzx5bM73bqs=;
-        b=WrPG+MydxLrnxckOb0Siqa69Qr+kKmQ95KuWnQlsVGrTMpbdyGIYDDEe0G6dKQdE5q
-         w3fXpQjRboBHTAPytbkUie0WN70SWbji7yt7knMHK+oyPRIHmitNKF/Xo9CKzWtSTqx0
-         OHyqOW3PVMvLgWH/5YurKN9BueZArumsD+VFArV+kR0Oz+BDNwKZtmi0SGBysZuEwLBL
-         rKSSDnlnvUygbnYRqMqtfmTxLzq3/5TLgvhLMFmsDAtjVEf9bt8yN41iAHcOkIi4DEIz
-         u9dlMqkNanAjMXX2+1RVceHpUijGzquvRlIzJtAfnA0anWZz0dM0T9ZHlblyucjAr3Or
-         Jygg==
-X-Gm-Message-State: AOJu0YwNitFh/fDtlQRbGn/RdBwqGPdAbU4xQKxsRi4/hsUgKbkvC5nT
-	ekTkGuMUbUGxHmJXfQ++TW23Eh9M+1LiD4qcjObrFQLRcVk7emlKsF+3
-X-Gm-Gg: Acq92OHNS4NzGJ5BO3hSRBItP5mpXN+xqj5CO9CDHHZQ9M/scCwalKQCeBJdeNi0wuC
-	ZeIN6H54DRQpzdm2HLSC1nz5BUdAn/eViMQbpjyYeOTkual5+VtZVpNPIkoweZIvGgyVYPDuOh4
-	Ef4XonWiSIZsu6hPphhNOSB4CNkifnA8BPkZP78Ru+SEwov/YQm9X+hAIlXYFZrCp+Rbf/zWhVP
-	fZAqSub8v3Fy1VMLxp3kBb/eTl1hG2S4XG3tgSztzq3nCjMGWtmAlcQd9eRrvfBGrdT9Tgo6Z5S
-	Bm3+Edhn8Em38Ho3slyC5Ia55uPU1Qd9vv9ukVHHuWDpmXYiUTq8rtDBZI7WanlPg3fdZoXyIGO
-	K/QGQid9Tu4/IImgnC4x8yNbISlBgFomlpVc5OqIi/K8dS9gUIAH7Kbinw9zHUBCt/5HWj/fwFt
-	7clhmJovBXmPStbzXi20RSxVcuCkz9NGNlEAduPughfVH6CwzmtkzxXMmfRpar3Ulkn4/7kpLnJ
-	ASh
-X-Received: by 2002:a05:690e:12c8:b0:64a:ef61:188c with SMTP id 956f58d0204a3-65d94c95f02mr14194008d50.47.1778518415568;
-        Mon, 11 May 2026 09:53:35 -0700 (PDT)
-Received: from gmail.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65d96c0e243sm5516726d50.19.2026.05.11.09.53.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 09:53:34 -0700 (PDT)
-Date: Mon, 11 May 2026 12:53:34 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Daniel Zahka <daniel.zahka@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.22d046e36117d@gmail.com>
-In-Reply-To: <20260508-nsim-psp-crypto-v1-1-4b50ed09b794@gmail.com>
-References: <20260508-nsim-psp-crypto-v1-0-4b50ed09b794@gmail.com>
- <20260508-nsim-psp-crypto-v1-1-4b50ed09b794@gmail.com>
-Subject: Re: [PATCH net-next 1/6] netdevsim: psp: reset spi on key rotation
- and check for exhaustion on alloc
+	s=arc-20240116; t=1778518474; c=relaxed/simple;
+	bh=r5eHCP7rNq9HIwxsZU9jp+giwHXdYcUAKOJxfxHvCyA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=hPOw/1KvjfCsBTdJQRpl1Ncf+tecDs3+gXjdyBbZ9iMJo71/paP6rjsNASl4ETh46tgCJh69tOCp2DA/Pz+cjGCC71TQNOj2E9N05V0NM9vW7X+9gmme1PDqGd9mIvTjPqNOtCvLIUevNW4fK4btHQ4aHKKaSnP3zZkaFV8oS+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=lwvNUVCH; arc=none smtp.client-ip=210.118.77.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20260511165431euoutp02e995e6b6e6a1b2b0758c604341914f78~ukSBosRJu2270622706euoutp02Z
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 16:54:31 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20260511165431euoutp02e995e6b6e6a1b2b0758c604341914f78~ukSBosRJu2270622706euoutp02Z
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1778518471;
+	bh=uZPkYNKUuqVZHm5wcyPwbUV02wridxyiun39DDJjZhU=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=lwvNUVCH0QsVAzWhCT5Uihz5+K3urChpk7dNJHLXVd9gpo6E8Q/kZEf9L54oyVjmY
+	 MVaua2s/L3mTEl/MHhFOyd0a2AfDcLaNqenBXayzWDp50dU3Z4sDPB5VSCtXjtN4wR
+	 InJos7vKTsz/1l+T7RsFf3nBlSPuopBlxbP7HPVE=
+Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20260511165430eucas1p2d91808b8aa51316842509f19eea4a0a8~ukSAxlW6c3106631066eucas1p2k;
+	Mon, 11 May 2026 16:54:30 +0000 (GMT)
+Received: from AMDC4843.eu.corp.samsungelectronics.net (unknown
+	[106.120.77.61]) by eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260511165429eusmtip1504fd4f2fb1d123be44ac24b595466f2~ukSAG-wKs2784027840eusmtip1D;
+	Mon, 11 May 2026 16:54:29 +0000 (GMT)
+From: Jakub Raczynski <j.raczynski@samsung.com>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+	k.domagalski@samsung.com, k.tegowski@samsung.com, Jakub Raczynski
+	<j.raczynski@samsung.com>
+Subject: [PATCH net-next 0/3] xgmac: Support for 16 MTL/DMA queues
+Date: Mon, 11 May 2026 18:54:13 +0200
+Message-Id: <20260511165416.3093015-1-j.raczynski@samsung.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 73DB3513B73
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CMS-MailID: 20260511165430eucas1p2d91808b8aa51316842509f19eea4a0a8
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20260511165430eucas1p2d91808b8aa51316842509f19eea4a0a8
+X-EPHeader: CA
+X-CMS-RootMailID: 20260511165430eucas1p2d91808b8aa51316842509f19eea4a0a8
+References: <CGME20260511165430eucas1p2d91808b8aa51316842509f19eea4a0a8@eucas1p2.samsung.com>
+X-Rspamd-Queue-Id: 6E1ED51374A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286746-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,samsung.com];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286747-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.995];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[samsung.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,samsung.com:mid,samsung.com:dkim]
 X-Rspamd-Action: no action
 
-Daniel Zahka wrote:
-> The PSP spec states that the lower 31b of the SPI need to be
-> non-zero. Though not in the spec, I think it is reasonable to reset
-> the lower 31b of the spi space after a key rotation, and to also
-> decline to generate session keys when the lower 31b saturate.
+New XGMAC datasheets for XGMAC 3.20a and 3.40a list support up to
+16 MTL/DMA queues. This patch series does modifications to accommodate for
+that, by following:
+- Increase MAX value macros (this will increase memory allocation for driver)
+- Add missing registers
+- Modify/fix some functions to split TC and MTL/DMA
 
-Since this is already a 6 patch series, these two independent changes
-could be separate patches.
+Biggest issue is that new hardware does support only 8 TC (traffic classes),
+while supporting more MTL/DMA queues. This is problematic, as current code
+does assume that these are equal which is not true anymore. Fix that by
+applying better context to functions, using TC count read from HW_FEATURE
+register where it applies.
 
-Agreed on both points btw.
- 
-> Assisted-by: Claude:claude-opus-4.7
-> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
-> ---
->  drivers/net/netdevsim/psp.c | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/netdevsim/psp.c b/drivers/net/netdevsim/psp.c
-> index 6936ecb8173e..5073bda60883 100644
-> --- a/drivers/net/netdevsim/psp.c
-> +++ b/drivers/net/netdevsim/psp.c
-> @@ -132,14 +132,14 @@ nsim_rx_spi_alloc(struct psp_dev *psd, u32 version,
->  		  struct netlink_ext_ack *extack)
->  {
->  	struct netdevsim *ns = psd->drv_priv;
-> -	unsigned int new;
->  	int i;
->  
-> -	new = ++ns->psp.spi & PSP_SPI_KEY_ID;
-> -	if (psd->generation & 1)
-> -		new |= PSP_SPI_KEY_PHASE;
-> +	if ((ns->psp.spi ^ (ns->psp.spi + 1)) & PSP_SPI_KEY_PHASE) {
-> +		NL_SET_ERR_MSG(extack, "SPI space exhausted");
-> +		return -ENOSPC;
-> +	}
+For DMA/MTL queues higher than TC count redirect traffic to TC 0.
+This is error in user configuration but quite possible to occur,
+if user does 'one DMA/MTL queue per TC'.
 
-Can this all be more readable without the use of XORs? This is not hot
-path code that needs to be optimized.
+This change has been tested on XGMAC based on 3.20a,
+checked with 16 and 8 queue setup.
 
-        if (ns->psp.spi & PSP_SPI_KEY_ID == INT32_MAX) {
-                NL_SET_ERR_MSG(extack, "SPI space exhausted");
-                return -ENOSPC;
-        }
-  
-> -	assoc->spi = cpu_to_be32(new);
-> +	assoc->spi = cpu_to_be32(++ns->psp.spi);
->  	assoc->key[0] = psd->generation;
->  	for (i = 1; i < PSP_MAX_KEY; i++)
->  		assoc->key[i] = ns->psp.spi + i;
-> @@ -162,6 +162,10 @@ static int nsim_assoc_add(struct psp_dev *psd, struct psp_assoc *pas,
->  
->  static int nsim_key_rotate(struct psp_dev *psd, struct netlink_ext_ack *extack)
->  {
-> +	struct netdevsim *ns = psd->drv_priv;
-> +
-> +	ns->psp.spi = (ns->psp.spi & PSP_SPI_KEY_PHASE) ^ PSP_SPI_KEY_PHASE;
-> +
+Jakub Raczynski (3):
+  net/stmmac/dwxgmac: Modify DMA functions for future hardware
+  net/stmmac/dwxgmac: Extend MTL/DMA support to 16 queues
+  include/stmmac: Increase max DMA/MTL channel count from 8 to 16
 
-        /* Flip key phase and reset SPI to 0 within that space
-         * (will be pre-incremented, as 0 is an invalid SPI)
-         */
-        if (ns->psp.spi & PSP_SPI_KEY_PHASE)
-                ns->psp.spi = 0;
-        else
-                ns->psp.spi = PSP_SPI_KEY_PHASE;
+ drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
+ .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  2 +
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 58 ++++++++++++++++++-
+ .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    | 17 +++++-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |  5 +-
+ include/linux/stmmac.h                        |  6 +-
+ 6 files changed, 80 insertions(+), 9 deletions(-)
 
-Even while making the code more self evident I still feel it needs a
-comment to explain all that is going on.
-
-Maybe it can be more self-evident.
-
-Or maybe you find the XOR just as readable already.
-
-Your call. A comment might be helpful either way.
-
-
->  	return 0;
->  }
->  
-> 
-> -- 
-> 2.52.0
-> 
-
+-- 
+2.34.1
 
 
