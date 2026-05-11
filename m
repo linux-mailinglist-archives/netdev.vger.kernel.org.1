@@ -1,270 +1,298 @@
-Return-Path: <netdev+bounces-286437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286438-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ypu4EwZOAWr5UQEAu9opvQ
-	(envelope-from <netdev+bounces-286437-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 05:33:26 +0200
+	id aDIeM81PAWq+UgEAu9opvQ
+	(envelope-from <netdev+bounces-286438-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 05:41:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFCE9507A32
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 05:33:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F48F507B32
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 05:41:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0E8933007662
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 03:33:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AE0683007AD4
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 03:40:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0840836CE14;
-	Mon, 11 May 2026 03:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2C2237CD33;
+	Mon, 11 May 2026 03:40:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="k4MWLbJG"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="IzpdtJ1m"
 X-Original-To: netdev@vger.kernel.org
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011036.outbound.protection.outlook.com [40.107.130.36])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 790761E0B9C;
-	Mon, 11 May 2026 03:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.36
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778470402; cv=fail; b=cG2VUxHJUv5TsCqSo3ZpIX+zbN5qZ0haQU9vIq9KlujWGyO2SkN+Jn3QPeW05y5ZQjg42TKvkE4iHybfiWvlLFPI6BweaBumP+aJJxxXeI++6k4/WQAzz5IkaKe00Hefkg+4hZKGZnWbr0+36bdrxYINmGqNopmVBhfoyvej+hA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778470402; c=relaxed/simple;
-	bh=jrCOX66ASyzT4E0NmRJL4DXGgPBEXoBb7sQm2jj59C0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=JcRIHAUMCHpGq9v3qAURLcZ8iKRwTHz6hb+ije26247r9XLliKiD0DoUE1Omo08YEYPcBFMaGMYVik1a1z1XQk4RbuYzfXjVP03rni2H9q3ZOGsUHGlDhff+mgl+MytP09TiOIXJhopOa/9MiMZstAH1H2W9c12wOK3wxHCcqlw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=k4MWLbJG; arc=fail smtp.client-ip=40.107.130.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LqlUZSoTbhVJ90e+cHSuOo18WftLtK45S3jUBjAgmHIygMt6KY2KacvaGmNWmWSbLsyOHhg2crKJDYYL6xI3CsKmzn1JffCudMD4R+5FKdL6SgPdlv+aIgKNvp9RQ3i/MUUjtNn0eMfz6m/fd5ZfzVEJwdhbdj0cdPF0xZWMEAHIejHUppW09fey+aBvCPM4dYmIDbsvvynnVjWZEWlv45y+oLJkAftqH+9s8Km4qzk+DxBMHOSmZ6ev04jbERbjtoqw1WUrf0ngqeyzAA04h647HsFy17nhJ7pboFRsGZw+TARidtPWyEj/pQCZVCV8xEUOS/hVtOZrZ3xhEPk89g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xoCwGTuZ5izd4dV8zT3hbqZgDUVP/sWXJeV0G0dmAj4=;
- b=X5Tu7qd1+HG6ESd1mkvF0uTMThCIso1wKfSihH7sfXUe5ir284D4RkNHl4g0QBG5ES8LzUiwd/TnOgvdostQwNViRGdOUXGsZEgLQe/prfRaSXAAoaJQLUQlqq8J7Pk6Lp2ay/mjizbPtziroNvPV4zzRZ419SuU9y4Ex1LbiAzshi972CPeoCteQvQl5Qa9lRHMc06d4+r50UNK9mzWg8LWyyTIuE3lnJtwEVHtWkaOBAQ9c05HBysS7VzVQIUxoceqxGh7sPMpb7y/+SSVRuPbLtknAObCS19fioLlECy8iTR4qck33uCSNrLQ6s1giQSW9V1pNHcT4HM93khW1w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xoCwGTuZ5izd4dV8zT3hbqZgDUVP/sWXJeV0G0dmAj4=;
- b=k4MWLbJG91QVzkgU00uwFS1Woy2yMyUFpXuE74XkCQfc9exgWEsxstAs/p8Gjrj+76W6skUUOCidLZ1xzu7GLAOWRp6yVtvZuvg4CUOEL7NwfV8dHI0w7L+mALD/EqnSslYXHW2mYJid9cH3SHSPnieLteLpZlF/1glCPfc8r4tOomc6hzlqkBp90w0N0BYrl5WPCw4cseaT4CkOBvqUKFSmkGhJFqa4s3uy6MySohrbeMu1+0CohDWT12M9kZutEJqHmJSeMQMsrneCRyFkBVznoUIiaoTEnzsHF35E22w3oBheZcjB+oorw2XEwBXFeSHVXgPRPJ13D8vVchnpSA==
-Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
- by AM9PR04MB8857.eurprd04.prod.outlook.com (2603:10a6:20b:408::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Mon, 11 May
- 2026 03:33:18 +0000
-Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
- ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
- ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.20.9891.021; Mon, 11 May 2026
- 03:33:18 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: "sashiko@lists.linux.dev" <sashiko@lists.linux.dev>
-CC: "imx@lists.linux.dev" <imx@lists.linux.dev>, "conor+dt@kernel.org"
-	<conor+dt@kernel.org>, "Frank.Li@kernel.org" <Frank.Li@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "robh@kernel.org"
-	<robh@kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	Networking <netdev@vger.kernel.org>
-Subject: RE: [PATCH v6 net-next 02/15] dt-bindings: net: dsa: add NETC switch
-Thread-Topic: [PATCH v6 net-next 02/15] dt-bindings: net: dsa: add NETC switch
-Thread-Index: AQHc355/3TS9YPjPiUaiT3oExn+47bYHFdiAgAEW7JA=
-Date: Mon, 11 May 2026 03:33:18 +0000
-Message-ID:
- <DBBPR04MB7500661393F2BEFE98A0363B88382@DBBPR04MB7500.eurprd04.prod.outlook.com>
-References: <20260509102954.4116624-3-wei.fang@nxp.com>
- <20260510104832.7061EC2BCB8@smtp.kernel.org>
-In-Reply-To: <20260510104832.7061EC2BCB8@smtp.kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DBBPR04MB7500:EE_|AM9PR04MB8857:EE_
-x-ms-office365-filtering-correlation-id: 40037c0b-b2d8-4ee4-e141-08deaf0e0b27
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|19092799006|366016|376014|1800799024|18002099003|56012099003|22082099003|3023799003|38070700021;
-x-microsoft-antispam-message-info:
- 0XxKFJz8hl/53YH0dl1FvCyCgUo+NFJdBLdakZTctobguGd2Dl7T6gBr5EezMjyLzNU5ZLoyMiLIPnlmrR0pdy2DJzsqRwY1GugIyi1e0N5fcYUbIZS/nEzlslmWN3gmkawxElM70o7/HB9YvqvYpq5lyRaXieNj5k6TcwGxLVXXCafB06CLPXx5mp51EOwN9WS5zPmTQ9oyukUug+3TApu5mf7tuu9Pg4ATn6fbEAHEzfxDV8C544QlIsD6G6zfUaq8uiiZWBjQty8cmsqH7ZBMJW5lpVm+Zz/RYTaDVvXCbOQBC9m21CMWBU6+mIxrqKT9bii3pr0pB5K3ijQiTIbxPNB8D61/65UuJw7JmNtmR5yQDQWVBZvpghPhvWELi19gI6vTVMxpSeLCO3n/SnjAxNU6pdnobfGOuPAhEzBIy5IJaGo+Yl+bBr4Dz6YM+GHsQMJFzo2WUpYZm42MOZuaCl997xrpXU7+HKVIzzkkrjBdu10SyfUKgyFm85agAyzz02s3yNfIbqi4fzHH7VB190jvKBlCPjEjJGbLVsZ8mtMh7whory5z2/vDrHz2vKTILFQVk3l9EDg3GkLahWYRjkxZcWbdOG5ND/sjkE0g9nUPJgjsyv/h4SfgTKrrz85T6VuD2RRwbmIWfWc7wJxrQq0qIwLPpCGPMvDf+W53l1yKtaZjry5PKShhphOmkuZKFUbFGIYdUtK7LMAywbeJOu2mm/K/qrK9Oy0AbwKZPgs2u6XtpbmpDf3DGe7s
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(366016)(376014)(1800799024)(18002099003)(56012099003)(22082099003)(3023799003)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?6/pNI+kHqchUh2/AG3URL1bxZLE6JSK3khNGXfqVICCxUhAcnODGjfyiGvAm?=
- =?us-ascii?Q?Ce8I2Fh7MM848P039b9ITXgtqn8ocmv3bIEhGagxTzfeQjuYvoO9KiPKTnhq?=
- =?us-ascii?Q?xX049N42UAhUL1+UOQnBGPlrSSIG/rS+9tPUIFGRwqqfi+5F0WUjh5Tyf44W?=
- =?us-ascii?Q?ZnrYFkDCjJ40slWp26NY/2GyMqhhc+xESUGQfn7tg2wSP6om+dDeTcR32s4h?=
- =?us-ascii?Q?omNEBtIpUrmO5qHHP7YMaTqeDTzoC7YCa8iC8YraejfE81xtJrZnFaEZg4gl?=
- =?us-ascii?Q?iArc/jgaS/wXaWuOaQO8fpRwh7+GyHDoR7nJ8KwjjCMdlK1Fk7h1usmDtUQm?=
- =?us-ascii?Q?i6N79/4jJDiim6/cQZ6coT+HFA+uqVLxbdteur+s7A0azmkNQ2KzbudD4Mid?=
- =?us-ascii?Q?eGb7ENPad/R5Jr6e5jcih8gnDav+qYSXCarLscSB/Cl0Ap7d+6yi4ykwrVKi?=
- =?us-ascii?Q?cB6HikBSwvNTsjOyP0aGZfrMe9LjEpF3IbJxJniT3kYk19FYUlba2a9G3YK/?=
- =?us-ascii?Q?htNnBJPpmhLk1FXBTwJ95KQx9dc9YWOyyv3+ulCDsxtSKnDXXD7RkNa4fiwK?=
- =?us-ascii?Q?Chh50sk9Zkaraw3dVPN1QSyOlZ6+/ZLfX9JVXYm1FwSaaJQt8SkQaE6S+I7e?=
- =?us-ascii?Q?s2TLmwq8S0TDMXsXUvh52AAkDFKRFhKwejr1uVe9EHXzHogWZzRJ3fG/pt/+?=
- =?us-ascii?Q?cm3JDnTipDtt7JAvdhKRgMlnE0LkrD+UFMBcJQTa5QLACMr+DBdBkRbrnK0g?=
- =?us-ascii?Q?r6APSOMJpWyJQmTANTGdX86VfIpMyAsLZbDI+eKaviPIPj0oQYhvnjyoIQ/o?=
- =?us-ascii?Q?XdKTsPSdFAOgjZ/5JecKoO0/0N4S7i5ZSHBH4SSkfYar1eApMlBDD3kvXjvX?=
- =?us-ascii?Q?RDUHR5QWQfZE/0HRUVaJhNivCpe6AYkPhsQs4afrUA5hwMhbMQovQHgIJTcX?=
- =?us-ascii?Q?+7wSEFfgsV1mkdNVBB/T49E/smqPVKlJgV3+ACx4XquUChyL8VCbXFhjC/P9?=
- =?us-ascii?Q?3nqBfyfrXVwGvW4UJ9gVvYy/nsbodBge1nbLN5yil+oBMxQAVMyEoh/G5D2Q?=
- =?us-ascii?Q?h1wSP2/wGk3ANUDZskdeFPu4Ql6gZEtaxanUgXf9fuG11d/o16XNG/2d4JVO?=
- =?us-ascii?Q?WrRlcr4l5KgmoIl1VBwPWBGZKMqACbLy+xmlmknAUT6GGuFenXIEkT6T/CXr?=
- =?us-ascii?Q?5ztssti4P4oraroaLJpve4zQxy7sdG3F+OF/fbUZBe3LB5o8oBAv9IrJjulQ?=
- =?us-ascii?Q?rctlAyEJLbiSSmWFGEKbhteD2Imlx8IF9LbtEh3h/ZOx3r2AeVkw3ZXhpj4r?=
- =?us-ascii?Q?5HpP+M+KCDYIcOYzcg6dXHQMN6Jl2SwxLXR90Zt1ER2X53bhfUtEEE75Qwey?=
- =?us-ascii?Q?iSfCCWn57cFJIiIMLp12Y2bOITd6udVZohkK9eH9k64MRgwj5dSY4UCbh6gF?=
- =?us-ascii?Q?qU9zFCxKedGpyhYrBdyJUVBcgs88QJZMo9h3fwp7rW5hS4W4Fs35Bhp0togn?=
- =?us-ascii?Q?1FLkIAnu3Rci+tX4/Oec1N8yfEsaFqYxfqyF2IiLwlHwLbC4pxdxYQswQ3Hf?=
- =?us-ascii?Q?jv61HeYR3RxrbwglMoG31xSp8uVnKMXBVGli0vnrjvnFjLLFWNmrbN2w8eGG?=
- =?us-ascii?Q?FPXM43MeBABaFoEBZtiwgwyk/I70AtSSAX8xYUMRdBWj6GZsi82kX4qOnJgQ?=
- =?us-ascii?Q?G0HDCivf47l68bo0lLvjz6UNcAtaopkFldMVBUFgvAf2Y6SW?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FDD8373BFB;
+	Mon, 11 May 2026 03:40:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778470803; cv=none; b=jlCkad70iw+2owXExImU6JdEmAbW7kZpZgAM4V+VFWJMdO8tpzuHd9PU6W5ph7L+TnPrl9TRFVRpaiVNXmIA9TWk4Na9X5o/wJf2hQkKxU9sPPvw/r1z/ct7HEngleKRjD9XObCBFAYZs/QgzoD1LX2jm5mC3p/pNfHL7XODPMw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778470803; c=relaxed/simple;
+	bh=K5sTpLkyuQTd6O0GFPhyVzlvdAfBILO0s5Ox3JuSfXA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u23EQ0NjEW5GMkE/FHoUbmJ1aYu22e9N0T+XgIyHxR+UfjUHbnCe8HGdozwF5y05W0RZLT96IN/3MUMHWMsOrZQHNi29etu0ZaBPafvINY3WVczR2SdJOAgYQixC4w6DkgAKz3r5J/3bC9apgCbJV5AFZok73Eu6b+kImBM8Ynk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=IzpdtJ1m; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64AN05A52527619;
+	Sun, 10 May 2026 20:39:41 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=WgoWlk0xucA9Ae4mtVj0RO/
+	8F/uPjhS4rWh4am5Be/k=; b=IzpdtJ1mnSuMRCw/P2T6ubYwSUwqtICF4WJ5JIh
+	upyX+LyUXkx16i6o9zmApYtd/1PY7Ep0oQ8E2lzejWcC3K/u5ZUe4YDFlHThZhjk
+	+guCSauILRHCPkLu9sD9EWLwqVh0JBMIFD86PHGsN5H61yImf7GCyOiXdkOFINoD
+	NQQ/xEvl2Rn6jlEsli8dFmWIrFxyMtEHh6lCr+NWtItEi55k6Plo5FKemZeZoTIT
+	SX35BC4jVaIN2FufwopKe8EjKpRgZ6qmDH1OrnXOgsKvd2hIe9gVgilpe/ts4ki0
+	rJ5UrG7LWCBhsHXqKUh8PHslfyLtRlauSKGhF6TcaM91kAA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4e24ejaxuw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 10 May 2026 20:39:40 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Sun, 10 May 2026 20:39:39 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Sun, 10 May 2026 20:39:39 -0700
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 013803F708D;
+	Sun, 10 May 2026 20:39:30 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <oss-drivers@corigine.com>
+CC: <akiyano@amazon.com>, <andrew+netdev@lunn.ch>,
+        <anthony.l.nguyen@intel.com>, <arkadiusz.kubalewski@intel.com>,
+        <brett.creeley@amd.com>, <darinzon@amazon.com>, <davem@davemloft.net>,
+        <donald.hunter@gmail.com>, <edumazet@google.com>, <horms@kernel.org>,
+        <idosch@nvidia.com>, <ivecera@redhat.com>, <jiri@resnulli.us>,
+        <kuba@kernel.org>, <leon@kernel.org>, <mbloch@nvidia.com>,
+        <michael.chan@broadcom.com>, <pabeni@redhat.com>,
+        <pavan.chebbi@broadcom.com>, <petrm@nvidia.com>,
+        <Prathosh.Satish@microchip.com>, <przemyslaw.kitszel@intel.com>,
+        <saeedm@nvidia.com>, <sgoutham@marvell.com>, <tariqt@nvidia.com>,
+        <vadim.fedorenko@linux.dev>, Ratheesh Kannoth <rkannoth@marvell.com>
+Subject: [PATCH v13 net-next 0/9] octeontx2-af: npc: Enhancements.
+Date: Mon, 11 May 2026 09:09:14 +0530
+Message-ID: <20260511033923.1301976-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 40037c0b-b2d8-4ee4-e141-08deaf0e0b27
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 May 2026 03:33:18.4358
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: eV5MGTzSvmSTNXZR1QwE0+4zPxTSCHHhgh5uk66+Lfndoj5pHy6mypaoSUJ+48AmpkhEj5JnHMnfAT/R3qa+5g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8857
-X-Rspamd-Queue-Id: AFCE9507A32
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=c5qbhx9l c=1 sm=1 tr=0 ts=6a014f7d cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=QXcCYyLzdtTjyudCfB6f:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
+ a=1rdZWFfAsYpIarNArpIA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: gr4dMvPT2pn0yEUlC34eUsUwkaFnA-UK
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTExMDAzNiBTYWx0ZWRfXxOFUGU+UR3q8
+ 0G4RZDTjzZ9dFnxUdlG/jyiqlnB8cWT4tOifs4rV4CC8x44Yw3SyjtAWxcW2DTjzLXh36AqDsyV
+ 0+EIvW7Dc2AM4TUMtwdvlelCepqJIIsRM6j5paK9cFhEqmccJBTfzSjPh7UJgxBKJxFpR7UfoWi
+ YUP8S0oJMq9iGdUdPTcJ81lc0tz5M9upx2aLTkMSutjo6GS1cVslxKwUHsFqQ00rreFuQprz4o6
+ wOfhdeumme4AbmPiFXls8E+/8pSJTGhYpVQT7KsugyIWgaKWcx58J6W7z7GfSpJx/P2M0iDAXpR
+ Nz9lHs8dhTUmo8U+NXtRR1NsOg0gWvyJDF3181pB9uXXhbwsk6xDtkBVDq0ZV6x8fNheu20Oble
+ yupe8gtsM3ukggKrUpZ0FVSvEZiY5EqWre9E/vdpMwi9QbRql4nA+eoWAR6H5+mTQnfrm8tqUrM
+ O/da+DI00zxRTjJI5Qw==
+X-Proofpoint-GUID: gr4dMvPT2pn0yEUlC34eUsUwkaFnA-UK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-11_01,2026-05-08_02,2025-10-01_01
+X-Rspamd-Queue-Id: 3F48F507B32
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286437-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[amazon.com,lunn.ch,intel.com,amd.com,davemloft.net,gmail.com,google.com,kernel.org,nvidia.com,redhat.com,resnulli.us,broadcom.com,microchip.com,marvell.com,linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[31];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286438-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[DBBPR04MB7500.eurprd04.prod.outlook.com:mid,nxp.com:email,nxp.com:dkim,0.0.0.1:email]
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,marvell.com:email,marvell.com:mid,marvell.com:dkim];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.997];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Action: no action
 
-> Thank you for your contribution! Sashiko AI review found 2 potential issu=
-e(s) to
-> consider:
-> - [Low] The `dsa,member` property lacks validation constraints for the sw=
-itch
-> index.
-> - [Low] The `patternProperties` regex for ethernet ports is overly restri=
-ctive and
-> diverges from standard DSA bindings.
-> --
->=20
-> commit 8c698895982ff77d4bd027af7fa3d21f57f09eba
-> Author: Wei Fang <wei.fang@nxp.com>
->=20
-> dt-bindings: net: dsa: add NETC switch
->=20
-> This commit adds the device tree bindings for the NETC switch. It is a PC=
-Ie
-> function of the NETC IP that supports advanced QoS and TSN capabilities. =
-The
-> switch connects to an internal ENETC port via a light-weight pseudo MAC.
->=20
-> > diff --git a/Documentation/devicetree/bindings/net/dsa/nxp,netc-switch.=
-yaml
-> b/Documentation/devicetree/bindings/net/dsa/nxp,netc-switch.yaml
-> > new file mode 100644
-> > index 0000000000000..988688bf4467d
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/dsa/nxp,netc-switch.yaml
->=20
-> [ ... ]
->=20
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  dsa,member:
-> > +    description: >
-> > +      The property indicates DSA cluster and switch index. For NETC sw=
-itch,
-> > +      the valid range of the switch index is 1 ~ 7, the index is refle=
-cted
-> > +      in the switch tag as an indication of the switch ID where the fr=
-ame
-> > +      originated. The value 0 is reserved for ENETC VEPA switch, whose=
- ID
-> > +      is hardwired to zero.
->=20
-> The description mentions that the valid range of the switch index is 1 to=
- 7
-> and that 0 is reserved, but there do not appear to be any constraints
-> enforcing this restriction in the schema definition.
->=20
-> Should an items array constraint be added here with a minimum of 1 and
-> maximum of 7 for the second element to ensure invalid configurations like
-> <0 0> are caught during schema validation?
+This series extends Marvell octeontx2-af support for CN20K NPC (MCAM
+debuggability, allocation policy, default-rule lifetime, optional KPU
+profiles from firmware files, X2/X4 MCAM keyword handling in flows and
+defaults, and dynamic CN20K NPC private state), adds a devlink mechanism
+for multi-value parameters, and adjusts devlink param netlink helpers
+and mlx5 so stack usage stays within -Wframe-larger-than limits once union
+devlink_param_value grows.
 
-I have added the check in the driver, I can add the following the check in
-next version if no more comments.
+Patch 1 improves CN20K MCAM visibility in debugfs: mcam_layout marks
+enabled entries, dstats reports per-entry hit deltas, and mismatch lists
+enabled entries without a PF mapping. MCAM enable state is tracked in a
+bitmap updated from the CN20K enable path.
 
-  dsa,member:
-    description: >
-      The property indicates DSA cluster and switch index. For NETC switch,
-      the valid range of the switch index is 1 ~ 7, the index is reflected
-      in the switch tag as an indication of the switch ID where the frame
-      originated. The value 0 is reserved for ENETC VEPA switch, whose ID
-      is hardwired to zero.
-    items:
-      - true
-      - minimum: 1
-       maximum: 7
+Patch 2 reduces stack usage in mlx5e_pcie_cong_get_thresh_config() by
+reusing a single union devlink_param_value across four
+devl_param_driverinit_value_get() calls (instead of union devlink_param_value
+val[4] on the stack) and assigning each vu16 into mlx5e_pcie_cong_thresh,
+so the helper stays under the frame-size warning limit as the union grows
+(patches 3-4).
 
->=20
-> > +
-> > +  ethernet-ports:
-> > +    type: object
-> > +    patternProperties:
-> > +      "^ethernet-port@[0-9a-f]$":
->=20
-> Is this regex intentionally more restrictive than the standard DSA bindin=
-gs?
->=20
+Patch 3 changes devlink_nl_param_value_put() and
+devlink_nl_param_value_fill_one() to pass union devlink_param_value by
+pointer instead of by value. Passing two copies of the union by value in
+the param netlink path consumes over 500 bytes of argument stack and risks
+CONFIG_FRAME_WARN as the union grows beyond its historical size (patch 4).
 
-'ethernet-ports' for new bindings. See https://lore.kernel.org/imx/20260408=
-134331.GA1954185-robh@kernel.org/
+Patch 4 (Saeed) introduces DEVLINK_PARAM_TYPE_U64_ARRAY and nested
+DEVLINK_ATTR_PARAM_VALUE_DATA attributes so drivers and user space can
+exchange bounded u64 arrays; YAML, uapi, and netlink validation are
+updated.
 
-> The standard DSA schema in dsa.yaml allows ^(ethernet-)?port@[0-9a-f]+$.
-> Because this binding sets unevaluatedProperties to false for the
-> ethernet-ports node, if a device tree author uses the standard port@1
-> naming convention, the binding will reject it.
->=20
-> Additionally, the single hex digit restriction would prevent port numbers
-> from exceeding 15. Could this be aligned with the standard pattern?
+Patch 5 adds a runtime devlink parameter srch_order to reorder CN20K
+subbank search during MCAM allocation.
 
-Currently, the i.MX94 NETC switch only has 4 ports, a single hex digit is
-enough, and this is consistent with the definition in dsa.yaml. please
-ignore this warning.
+Patch 6 ties default MCAM entries to NIX LF alloc/free on CN20K, adds
+NIX_LF_DONT_FREE_DFT_IDXS for PF teardown paths that must not drop default
+NPC indexes while the driver still owns state, and tightens nix_lf_alloc
+error propagation.
 
+Patch 7 allows loading a custom KPU profile from /lib/firmware/kpu via
+module parameter kpu_profile, with cam2 / ptype_mask wiring and helpers
+that share firmware-sourced vs filesystem-sourced profile layouts.
+
+Patch 8 makes default-rule allocation, AF flow install, and PF-side RSS,
+defaults, and ethtool flows respect the active CN20K MCAM keyword width
+(X2 vs X4), including X4 reference-index masking and -EOPNOTSUPP when a
+flow needs X4 keys on an X2-only profile.
+
+Patch 9 replaces file-scope npc_priv and static dstats with allocation
+sized from discovered bank/subbank geometry, threads npc_priv_get()
+through CN20K NPC paths, and allocates dstats via devm_kzalloc for the
+debugfs helper.
+
+The mlx5 change sits immediately before the devlink patches so the series
+applies cleanly and stays warning-free when built incrementally;
+pass-by-pointer precedes the U64 array type so helpers are not copying an
+even larger union by value. The CN20K patches keep srch_order ahead of
+NIX LF coordination, KPU-from-filesystem, X2/X4 handling, and the npc_priv
+refactor that touches the same files heavily.
+
+Ratheesh Kannoth (8):
+  octeontx2-af: npc: cn20k: debugfs enhancements
+  net/mlx5e: Reduce stack use reading PCIe congestion thresholds
+  devlink: pass param values by pointer
+  octeontx2-af: npc: cn20k: add subbank search order control
+  octeontx2: cn20k: Coordinate default rules with NIX LF lifecycle
+  octeontx2-af: npc: Support for custom KPU profile from filesystem
+  octeontx2: cn20k: Respect NPC MCAM X2/X4 profile in flows and DFT
+    alloc
+  octeontx2-af: npc: cn20k: Allocate npc_priv and dstats dynamically.
+
+Saeed Mahameed (1):
+  devlink: Implement devlink param multi attribute nested data values
+
+ Documentation/netlink/specs/devlink.yaml           |   4 +
+ drivers/dpll/zl3073x/devlink.c                     |   6 +-
+ drivers/net/ethernet/amazon/ena/ena_devlink.c      |   8 +-
+ drivers/net/ethernet/amd/pds_core/core.h           |   2 +-
+ drivers/net/ethernet/amd/pds_core/devlink.c        |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c  |   6 +-
+ drivers/net/ethernet/intel/ice/devlink/devlink.c   |  30 +-
+ .../ethernet/marvell/octeontx2/af/cn20k/debugfs.c  |  16 +-
+ .../net/ethernet/marvell/octeontx2/af/cn20k/npc.c  | 542 ++++++++++++---------
+ .../net/ethernet/marvell/octeontx2/af/cn20k/npc.h  |   6 +-
+ drivers/net/ethernet/marvell/octeontx2/af/mbox.h   |   1 +
+ drivers/net/ethernet/marvell/octeontx2/af/npc.h    |  17 +
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.h    |  12 +-
+ .../ethernet/marvell/octeontx2/af/rvu_devlink.c    | 114 ++++-
+ .../net/ethernet/marvell/octeontx2/af/rvu_nix.c    |  69 ++-
+ .../net/ethernet/marvell/octeontx2/af/rvu_npc.c    | 486 ++++++++++++++----
+ .../net/ethernet/marvell/octeontx2/af/rvu_npc.h    |  17 +
+ .../net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c |  12 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu_reg.h    |   1 +
+ .../ethernet/marvell/octeontx2/nic/otx2_devlink.c  |   4 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_flows.c    |  48 +-
+ .../net/ethernet/marvell/octeontx2/nic/otx2_pf.c   |   6 +-
+ drivers/net/ethernet/mellanox/mlx4/main.c          |  14 +-
+ drivers/net/ethernet/mellanox/mlx5/core/devlink.c  |  72 +--
+ .../mellanox/mlx5/core/en/pcie_cong_event.c        |  45 +-
+ .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |   2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/fs_core.c  |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/lib/nv_param.c |  12 +-
+ drivers/net/ethernet/mellanox/mlxsw/core.c         |   8 +-
+ drivers/net/ethernet/netronome/nfp/devlink_param.c |   6 +-
+ drivers/net/netdevsim/dev.c                        |   4 +-
+ include/net/devlink.h                              |  12 +-
+ include/uapi/linux/devlink.h                       |   1 +
+ net/devlink/netlink_gen.c                          |   2 +
+ net/devlink/param.c                                | 120 +++--
+ 35 files changed, 1175 insertions(+), 536 deletions(-)
+
+--
+
+v12 -> v13: Addressed David Laight comments
+	https://lore.kernel.org/netdev/20260508034912.4082520-1-rkannoth@marvell.com/
+
+v11 -> v12: Addressed Paolo,Jiri comments.
+	https://lore.kernel.org/netdev/20260409025055.1664053-1-rkannoth@marvell.com/
+	Added one patch which was rejected by simon in net
+	(as it was kind of enhancement rather than a bug)
+	Added one more patch- which allocates two variables from heap.
+
+v10 -> v11: Addressed Paolo comments.
+	https://lore.kernel.org/netdev/20260403025533.6250-1-rkannoth@marvell.com/
+
+v9 -> v10: Addressed Paolo comments
+	https://lore.kernel.org/netdev/
+	20260330053105.2722453-1-rkannoth@marvell.com/
+
+v8 -> v9: Addressed Simon comments
+	https://lore.kernel.org/netdev/
+	20260325072159.1126964-1-rkannoth@marvell.com/
+
+v7 -> v8: Addressed Simon comments
+	https://lore.kernel.org/netdev/
+	20260323035110.3908741-1-rkannoth@marvell.com/T/#t
+
+v6 -> v7: Addressed Simon comments
+	https://lore.kernel.org/netdev/20260320165432.98832-1-horms@kernel.org/
+
+v5 -> v6: Addressed Jakub,Jiri comments
+	https://lore.kernel.org/netdev/
+	20260317045623.250187-1-rkannoth@marvell.com/
+
+v4 -> v5: Addressed Jakub comments
+	https://lore.kernel.org/netdev/
+	20260312022754.2029595-6-rkannoth@marvell.com/
+
+v3 -> v4: Addressed Simon comments
+	https://lore.kernel.org/netdev/abDeXLpMMxp7G1v3@rkannoth-OptiPlex-7090/#t
+
+v2 -> v3: Addressed Simon comments.
+	https://lore.kernel.org/netdev/
+	20260304043032.3661647-1-rkannoth@marvell.com/
+
+v1 -> v2: Addressed Jakub comments.
+	https://lore.kernel.org/netdev/
+	20260302085803.2449828-1-rkannoth@marvell.com/#t
+
+2.43.0
 
