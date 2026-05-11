@@ -1,153 +1,247 @@
-Return-Path: <netdev+bounces-286817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286818-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IKJXBLM4AmrmpAEAu9opvQ
-	(envelope-from <netdev+bounces-286817-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 22:14:43 +0200
+	id oMNNAws5AmrmpAEAu9opvQ
+	(envelope-from <netdev+bounces-286818-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 22:16:11 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70FAC51594A
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 22:14:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CC9F51598B
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 22:16:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 51DFD30779E1
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 20:10:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E40663032814
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 20:12:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B764537F8D0;
-	Mon, 11 May 2026 20:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5910837F744;
+	Mon, 11 May 2026 20:12:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fgGSqse1"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4sfYLJzH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05BB327BFB
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 20:10:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED28437F739;
+	Mon, 11 May 2026 20:12:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778530223; cv=none; b=n7GmWu7ryDCk7DarnnQo92ZDzpSSP9jqgUpCPWTTdm3hrovRnCi1eglI4SYaKn6KHz4FYgpZFf3UXxDHXMWJ5z8u39LzpyGg+UxFP1Bb/4gwLCACZWE6zInXOnZnRScWw/6mqUqLUDWNHoof3QMmYwTxXzG7bPICR0hxnKxm7oA=
+	t=1778530332; cv=none; b=XxeuTx+TCEHc/ygl0+tvl+Gj0wxkDhzGXzTEtn98OOcWDogaA07md6u5nSRR+vuz9SLRLhH5Oo97Xtpb1DSnaNt0RH8ohPmWZ2YOBV8dUnDlQZuc7LsPlKwRbfZSZqIdV/+d21W5SZ8Ra7vvyJARhBKRsw6l8h6EQZwNDvt3wuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778530223; c=relaxed/simple;
-	bh=uYq/dpi/2BJmZtXi1gUWp5R7/kwACFoTdOLXb8cBS08=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=F2w79lMepIpjaRvJTkv9ulsureLSg5PX856XC7DksxH4DYeAJHVIdJpe8tdGsBbhVoMLTwTsbNv3bOZqYltJXIN38x8/CPKqv7WtNY2fiJHU+rwWXLLIu/XnJjoQ6TjzsB6RxmshKW2y+nb2BQY6cdA8H+mqKCsJl80QWywvS7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fgGSqse1; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-7b4ee3a88e1so47998817b3.1
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 13:10:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778530220; x=1779135020; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Co/G8UytdXIIVZ3/F5Gw7AG62mkjDUcPKCAHzzQ7WEY=;
-        b=fgGSqse1vxwrThvIrAfjp8eIydZW2pxMvg+xW8EIbRrs4eUdnMNuqdNwf8ppyjuU2I
-         6cP/7taDOTVNnneCT/0hTEbb05qc2CfmoaMuulLOH0OlyCyY2Jup6Qgbeoq5vpcFOmrE
-         onDKi1JZ70QlO803RjX97853e2IdEuxwRjhCS5vgiAwfElInRlXhcWUZxtp64uvyS/rC
-         mNM5aISMhwjreeoxUnv1Tjh21ui6cJtvMi5mkmkBQ6YR0ixlSwONOGHVkD+akL03CPWr
-         SP0fJr+d5XZ+LPMGFsg8PHH6plvX5bz7Z1FJAv+qdgfVL0caVX2VEXl0qGv6MGuEwOjf
-         OgbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778530220; x=1779135020;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Co/G8UytdXIIVZ3/F5Gw7AG62mkjDUcPKCAHzzQ7WEY=;
-        b=RAxgl+1Cpn0aIfo0IW6PB0qqu5GdOxO4na1m7KQUCV71Xi65Ig1cVQyZ6kWqLDXS7e
-         o0OV+hr5w5C142tm2smvbrLPZdnf31MV7t987BbeSUIoWPtj/npbj6ugdQiN4UnpgeUs
-         gjbuHOwF2aRTWQNZXcGqkr+qdhng4AOMcDOT9D2Z5aLWgT9f7r5xI2afFT33DsL6AMC/
-         HfKYM4JdAHkvKiyvo29MTogNWpeNDuAaiskj2hsuuepS5olMYsYqHJJwFi9o5/CzlAM7
-         N9YpLqSFReKsGkmt5c/3YgYP5NeR06xdyp6RFhIwPaQFPBggeTo+xUKhdBtzhs5j9WIU
-         D26Q==
-X-Gm-Message-State: AOJu0YzoUanoCqX4Ae93WDKvXldud+m+hG36ctUub2jXr6HBj2UAP5mZ
-	9IQLiu+jU2hstEW/oV4TKVJGHc+FzX6ZmgOy0v6JKnAKXD5VWDwSnJ0D
-X-Gm-Gg: Acq92OEwgqo4LZk6ZAOwLgi222u42296BY90wtB4OQhDWKzgx/rH93M4EZojdB3sZsR
-	jlzk9oydEsikekk+GV5Mv0mAgS7AfvNdIDF7seFtobNw7TbWhvJd6/Qag1iWgoyKlhXw+fgdD49
-	jhLI7dCdRP529CCwvzkuhylbpdvBqm5QVpAP4hi1H/LyT3+iVpNTGmw8iA9cBWVQTa/k4Gz9dg6
-	QJsLbH7a4K/eVvRL7N++AK5UaY7TDIfcSJagenBULaWr4dy4W35kldkEw9KgRDo25Z/5DH2JR/d
-	Uu4S8cT46yuEH5BNx3YxF9PTWB+aEN7oXjF0YdO7Jaq1dkB5RfIzI0szNPEArmPuYWijq7TUJKw
-	WuShGbM6QZ3yZGRgL9zVvPmaTWFaVyM/sKYyFcGCQcdXwmehBw1VR2JJrca+S47/k06AOfmXmVU
-	3+dxWIIU63UoKqVjHaW42laufDqnt7YS0OzOUE/tn0pTo4x05HpoVPcFo7EUmGdWful/r8C+eZR
-	tvWpDa30T5emNA=
-X-Received: by 2002:a05:690c:6e85:b0:7bd:d4f4:262a with SMTP id 00721157ae682-7bdf5efb218mr252790807b3.37.1778530219834;
-        Mon, 11 May 2026 13:10:19 -0700 (PDT)
-Received: from gmail.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7bd66837e34sm151681247b3.28.2026.05.11.13.10.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 13:10:19 -0700 (PDT)
-Date: Mon, 11 May 2026 16:10:18 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Daniel Zahka <daniel.zahka@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.306465ff30e6b@gmail.com>
-In-Reply-To: <20260508-nsim-psp-crypto-v1-5-4b50ed09b794@gmail.com>
-References: <20260508-nsim-psp-crypto-v1-0-4b50ed09b794@gmail.com>
- <20260508-nsim-psp-crypto-v1-5-4b50ed09b794@gmail.com>
-Subject: Re: [PATCH net-next 5/6] netdevsim: psp: add real aes-gcm encryption
- and decryption
+	s=arc-20240116; t=1778530332; c=relaxed/simple;
+	bh=LBkZ5EQagRy70OXC82F6PyGxd/tDrK9ovMT+r92H+tE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LOlQz33zZLFWE78qYKct4xgN0Q993MJEusPdQOL133zJZZoQV7QLVYubYj+EiqO3ov/6z31QKhZXJxOATy8RUOw71fJwjfzwiGCFPH4ddiIKGibOyUnOQNRSi3mGBF+y3xElnBDOH4rzHBW7ky0YMZYKkMNzBlNxEaAGrvLjpmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4sfYLJzH; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=y7704pXKdK7OmP5Md6k5aCh3b1/U2C67QpaolB6U9/s=; b=4sfYLJzHlHMw07N8IK7Za0F/rQ
+	P1lyiyIdEBY8r0ZLhz67gROTKdI68l1TwpkN5mLGUONDg1o8DnMQD24txSHtbqK2yeWBoMxk4mc5a
+	jyaBHg5Gc3ekZgaGGSYhSCJXenMGRclngkxOzk6jSIa/vsmwByGkvpINeCSFiRzJQ+Xk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wMWyw-002Qyc-GM; Mon, 11 May 2026 22:12:02 +0200
+Date: Mon, 11 May 2026 22:12:02 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+Cc: Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 8/9] onsemi: s2500: Add driver support for
+ TS2500 MAC-PHY
+Message-ID: <c9b1b559-f72e-46e0-8d71-57ea26f70bb0@lunn.ch>
+References: <CY8PR02MB924948C0BB8611D5A2618D3283382@CY8PR02MB9249.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 70FAC51594A
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CY8PR02MB924948C0BB8611D5A2618D3283382@CY8PR02MB9249.namprd02.prod.outlook.com>
+X-Rspamd-Queue-Id: 7CC9F51598B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286817-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286818-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.996];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
 X-Rspamd-Action: no action
 
-Daniel Zahka wrote:
-> Implement real AES-GCM-128/256 encryption and decryption for PSP
-> packets in the netdevsim driver, and remove gmac from supported
-> versions.
-> 
-> We now have to add and remove the PSP ICV trailer from packets. We
-> linearize skb's because the aesgcm crypto library does not work on
-> non-linear buffers.
-> 
-> Assisted-by: Claude:claude-opus-4.6
-> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
+> +static const char s2500_stat_strings[][ETH_GSTRING_LEN] = {
+> +	"tx-bytes-ok",
+> +	"tx-frames",
+> +	"tx-broadcast-frames",
+> +	"tx-multicast-frames",
+> +	"tx-64-frames",
+> +	"tx-65-127-frames",
+> +	"tx-128-255-frames",
+> +	"tx-256-511-frames",
+> +	"tx-512-1023-frames",
+> +	"tx-1024-1518-frames",
+> +	"tx-underrun-errors",
+> +	"tx-single-collision",
+> +	"tx-multiple-collision",
+> +	"tx-excessive-collision",
+> +	"tx-deferred-frames",
+> +	"tx-carrier-sense-errors",
+> +	"rx-bytes-ok",
+> +	"rx-frames",
+> +	"rx-broadcast-frames",
+> +	"rx-multicast-frames",
+> +	"rx-64-frames",
+> +	"rx-65-127-frames",
+> +	"rx-128-255-frames",
+> +	"rx-256-511-frames",
+> +	"rx-512-1023-frames",
+> +	"rx-1024-1518-frames",
+> +	"rx-runt",
+> +	"rx-too-long-frames",
+> +	"rx-crc-errors",
+> +	"rx-symbol-errors",
+> +	"rx-alignment-errors",
+> +	"rx-busy-drop-frames",
+> +	"rx-mismatch-drop-frames",
+> +	"ts_frames",
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Looks like many of these should be returned via .get_rmon_stats
+
+> +static void s2500_get_drvinfo(struct net_device *ndev,
+> +			      struct ethtool_drvinfo *info)
+> +{
+> +	strscpy(info->driver, DRV_NAME, sizeof(info->driver));
+> +	strscpy(info->bus_info, dev_name(&ndev->dev), sizeof(info->bus_info));
+> +	strscpy(info->version, DRV_VERSION, sizeof(info->version));
+
+version is pointless because it never changes, but the kernel is
+always changing. If you don't fill it, the core will return the kernel
+versions.
+
+> +static int s2500_ethtool_set_link_ksettings(struct net_device *ndev,
+> +					    const struct ethtool_link_ksettings *cmd)
+> +{
+> +	phy_ethtool_ksettings_set(ndev->phydev, cmd);
+> +	return 0;
+> +}
+
+phy_ethtool_set_link_ksettings()
+
+> +
+> +static int s2500_ethtool_get_link_ksettings(struct net_device *ndev,
+> +					    struct ethtool_link_ksettings *cmd)
+> +{
+> +	phy_ethtool_ksettings_get(ndev->phydev, cmd);
+> +	return 0;
+> +}
+
+phy_ethtool_get_link_ksettings()
+
+> +++ b/drivers/net/ethernet/onsemi/s2500/s2500_main.c
+> @@ -0,0 +1,698 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * Copyright 2026 Semiconductor Components Industries, LLC ("onsemi").
+> + * onsemi's S2500 10BASE-T1S MAC-PHY driver
+> + */
+> +
+> +#include "s2500_hw_def.h"
+> +
+> +#include <linux/etherdevice.h>
+> +#include <linux/if_ether.h>
+> +#include <linux/irqchip.h>
+> +#include <linux/module.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/phy.h>
+> +
+> +/* S2500 functions & definitions */
+> +
+> +#define S2500_STATUS0_MASK	(S2500_SPI_ST0_CDPE_BIT | \
+> +				S2500_SPI_ST0_TXFCSE_BIT | \
+> +				S2500_SPI_ST0_TTSCAC_BIT | \
+> +				S2500_SPI_ST0_TTSCAB_BIT | \
+> +				S2500_SPI_ST0_TTSCAA_BIT | \
+> +				S2500_SPI_ST0_RESETC_BIT | \
+> +				S2500_SPI_ST0_HDRE_BIT | \
+> +				S2500_SPI_ST0_LOFE_BIT | \
+> +				S2500_SPI_ST0_RXBOE_BIT | \
+> +				S2500_SPI_ST0_TXBUE_BIT | \
+> +				S2500_SPI_ST0_TXBOE_BIT | \
+> +				S2500_SPI_ST0_TXPE_BIT)
+> +
+> +/* Converts a MACPHY ID to a device name */
+> +static inline const char *s2500_id_to_name(u32 id)
+> +{
+> +	if (id == S2500_MODEL_ID)
+> +		return "S2500";
+> +	return "unknown";
+> +}
+
+No inline functions in .c file please.
+
+> +static int s2500_open(struct net_device *ndev)
+> +{
+> +	struct s2500_info *priv = netdev_priv(ndev);
+> +	int ret = 0;
+> +	u32 val;
+> +
+> +	dev_info(&priv->spi->dev, "%s", "s2500_open");
+
+dev_dbg() or not at all. Please don't spam the kernel log.
+
+> +static int s2500_hwtstamp_get(struct net_device *ndev,
+> +			      struct kernel_hwtstamp_config *cfg)
+> +{
+> +	struct s2500_info *priv = netdev_priv(ndev);
+> +
+> +	if (!priv->ptp_clock) {
+> +		cfg->tx_type = 0;
+> +		cfg->rx_filter = 0;
+> +	} else {
+> +		oa_tc6_hwtstamp_get(priv->tc6, cfg);
+> +	}
+> +	return 0;
+
+What is actually specific to the s2500 here? Your aim should be to put
+everything you can into the core.
+
+> +	/* Configure PTP if the model supports it */
+> +	if (priv->capabilities & S2500_CAP_PTP)
+> +		s2500_ptp_register(priv);
+
+That should be in the core, based on FTSC.
+
+	Andrew
 
