@@ -1,271 +1,230 @@
-Return-Path: <netdev+bounces-286647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286671-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oOngIUvSAWr4kQEAu9opvQ
-	(envelope-from <netdev+bounces-286647-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:57:47 +0200
+	id YGgPD+zlAWqKmAEAu9opvQ
+	(envelope-from <netdev+bounces-286671-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 16:21:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE4B450E5C6
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:57:46 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A46D50FFEA
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 16:21:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C01983006801
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 12:57:45 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C5E7E300B9C2
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:07:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 104313A3E70;
-	Mon, 11 May 2026 12:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 057E03FA5CC;
+	Mon, 11 May 2026 14:07:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="UHfU/ReE";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RFwEd2rv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H+CHzD7f"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-a4-smtp.messagingengine.com (flow-a4-smtp.messagingengine.com [103.168.172.139])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB7838F25F;
-	Mon, 11 May 2026 12:57:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2249C3E95BD
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 14:07:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778504262; cv=none; b=M0oGt5RKcsorw0314GBsNmAfdjqUsazoCXfGe/FV83dY0zs8urDAPfwQFATechpTKzEFDbaC4f/Ibx6g3CQulkkK6I8dAL3R3g54eFZj/mncn1v8J65pRGbMJ0KSBXF09iob+uHie/xfmsl3BkO87eqeHDF8tLOFb2pAMM0ESss=
+	t=1778508453; cv=none; b=n8TqtHeNCITINrbn5blN7A63e2IY0BjhAOucACGhpV1SQWbFY3t11pJPkASJXkalNgL/9hzyipj4d8gaqT3V1FOYKFOdvXZlNioeugePC+rjGDQJrDxqMpwKFEwzxI00bd0Ijr6khoWQdOkX1itQCDVEOTHLWwhdjAFbWoyIonY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778504262; c=relaxed/simple;
-	bh=T+zncbAmIN2Y8Xk2STET9vNGfkNEwsoAfL1FFMPW80E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kOVDD+QQ+qWsdgFi0hPzek9gZoW1Y8CLHchsk5KyEpez2nCu5ZGVOGy/VJF7xPLbPgKVtTNFeEkne3Zn+ItMcsm2R7oE5x53oKcKWt0y3DGZTFpcbC1751FrC0JvmbY2zKq7NoUNBk5YuE0+eyib6Si++s7A6vXxSFWcNSAD14Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=UHfU/ReE; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RFwEd2rv; arc=none smtp.client-ip=103.168.172.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailflow.phl.internal (Postfix) with ESMTP id 6C2A91380432;
-	Mon, 11 May 2026 08:57:37 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Mon, 11 May 2026 08:57:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1778504257; x=
-	1778511457; bh=9ZylBAjhvDw36cIdH/cZimW58y/qeCfbSIMHarjSv/E=; b=U
-	HfU/ReE0eGF0atBgOVUXv4OilVhWJfQhktDLokRaQ55xfUQ5nXHW8ABWP1v1700i
-	WPmjNbrZbuP9U685Q7Hzn+Jqkpe41FauBl+EauqDf0TkWtJfJJsf/bSUl08hUXgQ
-	f1cuNj9EBiy8zG7mzbGaJlckDqlbCu6WPfeXcN2VV1ifggZmUfB0Tl92ZyeBp9EK
-	VyWBxzaNQ6Eo2p3ogMz9XBTb/F8PzGVq6ItuCOhWKPSaBS1fL+BPiO/eFt5UnHRJ
-	s+TOEQ6TN5BR0QvS3GWbEBifHZHXTVt/HzANrpVeBnnEXr3eA7O4GCi95kTl2mDy
-	NKI3nmMSceAp3X2ZWkxcw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1778504257; x=1778511457; bh=9ZylBAjhvDw36cIdH/cZimW58y/qeCfbSIM
-	HarjSv/E=; b=RFwEd2rvJl4W6cfGdJlaHfoXglNAWuooBpTU6Bv0s2AeZ765qZ3
-	QDX8aHiO1lXER05/ccuGIqrULUU167isaAzKCmRBNHVLVxTp5dK82m+jvKiSdSfL
-	IZXdsNcgNxUWTFt7ZuNq5WZn9083cVlHqR8VTNEb4TFswc1Qk0nTOdr8mfcwDxAx
-	DwPUzMX8aThwC9LOljcna9LX0RocZkLfv46cvr8hFlA2m7kqIYMVuVMMDXNyGvWz
-	UlOB4uCnpSm2A+ed6I1fq5HdvH+dzgUDf4Vc9yzLpnn0Zd0nOkMzgn2ktwib1g9D
-	98jc4eETMWkqtagCTL9IKTm9SgQkqXf4emA==
-X-ME-Sender: <xms:P9IBaiIa6ok3fBrwWxfukwjcaK6AvNR5gI2o8Yl-x308N_W-hwU_oA>
-    <xme:P9IBaryzSLU6j_74eOGxkvKt2V_9t2LYKPmgkI6z8KeK8MLCKKhEvsESfx0v5rAE0
-    aC-sl9Zd7gBQBMSvcTHQgQxZkjriVrNoYHxlcD5uxC_QSxKQesAzA-A>
-X-ME-Received: <xmr:P9IBamxUgaFvD4OQe44zdJz1waE1axIN3-ae8cyVxjf1XbJq6yQ5h2tnpt0Iq3LJE49fvkgvIBawLDx_0kVgksU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduudekleelucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedvvddpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnthhonhihrdgrnhhtohhnhiesshgvtg
-    hunhgvthdrtghomhdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgv
-    tghunhgvthdrtghomhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprg
-    hnrgdrohhrghdrrghupdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgv
-    thdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoh
-    epkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughh
-    rghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpth
-    htohepughsrghhvghrnheskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:P9IBat2gizePE2hTqULqNwpw4FauESLg4RYoOOrJb0cJf_xFpje1XQ>
-    <xmx:P9IBaoWosNg2YqzmWXKxrQ7V58Q7Gfk8x2aCUpq18PO3e6VjAeD-Fw>
-    <xmx:P9IBahcyjK0jrzMydfaJDtMXvCoyPhdI8DUZCizgg92rT5b5P63CvQ>
-    <xmx:P9IBap8OElGSCzktMKVkdzF4otyYXnVwr6nGm_P0qbEfJMu7I-RbUQ>
-    <xmx:QdIBaouFlNyjobY9-si-kDTjl4P1jCpiO77iw-tT3vbL-0Xt00NPbteL>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 11 May 2026 08:57:35 -0400 (EDT)
-Date: Mon, 11 May 2026 14:57:33 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antony Antony <antony.antony@secunet.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
-	Masahide NAKAMURA <nakam@linux-ipv6.org>,
-	Paul Moore <paul@paul-moore.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>,
-	Ondrej Mosnacek <omosnace@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, selinux@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Chiachang Wang <chiachangwang@google.com>,
-	Yan Yan <evitayan@google.com>, devel@linux-ipsec.org
-Subject: Re: [PATCH ipsec-next v8 14/14] xfrm: add documentation for
- XFRM_MSG_MIGRATE_STATE
-Message-ID: <agHSPUBZg0tHezM-@krikkit>
-References: <migrate-state-v8-0-4578fb016965@secunet.com>
- <migrate-state-v8-14-4578fb016965@secunet.com>
+	s=arc-20240116; t=1778508453; c=relaxed/simple;
+	bh=Db/oBTpZ6iiUd+ZhRm7W0Xyps5oD0x3YXFFm6UzEu/I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=riCrIggXGRUXE7Vw+PPUnDERfcNJNWw6By0Efwbch5hWOUkpfiMkKhMC3TZtRHpxSCU5LVaPw7Xm5Nn2pbc6Id3L8S9JMlEia81xfjo8Va9ZuRL2zpbQaBjGN7HakWCZgaXkWkIS5GXeSkCF9Mu01lrsZsbjBH0Pjbt6LQfxsyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H+CHzD7f; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778508452; x=1810044452;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Db/oBTpZ6iiUd+ZhRm7W0Xyps5oD0x3YXFFm6UzEu/I=;
+  b=H+CHzD7fyU74x+BJ7sRN2MqMXntMxCGGpLWZPCs02DhnWqjrrW/hRpXm
+   aM5SFnBkRb9vXT8jsxaehyLDu6ErTaYKqcEUDffXNfCqdXw795Sj3qWWf
+   Kv7GeWj/pDzT5l7zHhoDNwYEaHUjjBnCeqAGoQUSd+cwzLJQSe3g14ser
+   9RivXsRzxR/eHJb8m3KywzVJd1ltgYPZ8AI3yaAKShrf8yC0wd+LwCNGW
+   GPW1gd9p1VBX/wbZrwSGhh+iv+sSAKKReN0X3o1T5QdPF9QSktaA2Sbnj
+   fWWq9A9G+PBr2O7eCuX50GRGKMY6Z6WFoJ9MavWoeXG5vSvwdQjA6Vhhb
+   Q==;
+X-CSE-ConnectionGUID: kOFkkcqnSeqOuOrMuQtEog==
+X-CSE-MsgGUID: kVQ8MgKfTemLkCDNrheztw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11783"; a="90771752"
+X-IronPort-AV: E=Sophos;i="6.23,229,1770624000"; 
+   d="scan'208";a="90771752"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2026 07:07:31 -0700
+X-CSE-ConnectionGUID: iNhMYFJYSASjKTqdridUoA==
+X-CSE-MsgGUID: ulJuyrc1R86R1fI2JnhHXQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,229,1770624000"; 
+   d="scan'208";a="267820289"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa002.jf.intel.com with ESMTP; 11 May 2026 07:07:29 -0700
+Received: from gond.igk.intel.com (gond.igk.intel.com [10.123.220.52])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 617EB2FC4A;
+	Mon, 11 May 2026 15:07:28 +0100 (IST)
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	sandeep.penigalapati@intel.com,
+	ananth.s@intel.com,
+	alexander.duyck@gmail.com,
+	Marcin Szycik <marcin.szycik@linux.intel.com>
+Subject: [PATCH iwl-next v3 00/10] Add ACL support
+Date: Mon, 11 May 2026 15:06:59 +0200
+Message-ID: <20260511130710.38801-1-marcin.szycik@linux.intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <migrate-state-v8-14-4578fb016965@secunet.com>
-X-Rspamd-Queue-Id: EE4B450E5C6
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 5A46D50FFEA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286647-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	FREEMAIL_CC(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,google.com,kernel.org,redhat.com,linux-ipv6.org,paul-moore.com,gmail.com,lwn.net,linuxfoundation.org,vger.kernel.org,linux-ipsec.org];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,linux.intel.com];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286671-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marcin.szycik@linux.intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.996];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:dkim]
 X-Rspamd-Action: no action
 
-Overall a very document, thanks. Some comments:
+E8xx hardware provides a Ternary Classifier block for implementing
+functions such as ACL (Access Control List). In this series it's simply
+referred to as "ACL".
 
-2026-05-05, 06:34:55 +0200, Antony Antony wrote:
-> +    struct xfrm_user_migrate_state {
-> +        struct xfrm_usersa_id  id;       /* spi, daddr, proto, family */
-> +        xfrm_address_t         new_daddr;
-> +        xfrm_address_t         new_saddr;
-> +        struct xfrm_mark       old_mark; /* SA lookup: key = v & m */
-> +        struct xfrm_selector   new_sel;  /* new selector (see Flags) */
-> +        __u32                  new_reqid;
-> +        __u32                  flags;    /* XFRM_MIGRATE_STATE_* */
-> +        __u16                  new_family;
-> +        __u16                  reserved;
-> +    };
+Implement ACL filtering. This expands support of network flow classification
+rules for the ethtool ntuple command. ACL filtering allows for an ip or port
+field's optional mask to be specified.
 
-Thinking about the UAPI a bit more, maybe this would be a good time to
-start introducing a "proper" netlink API for XFRM? Instead of having
-the main properties in a fixed struct, and a few attributes as an
-afterthought, use attributes as the main way to exchange information?
+Example filters:
+  ethtool -N eth0 flow-type tcp4 dst-port 8880 m 0x00ff action 10
+  ethtool -N eth0 flow-type tcp4 src-ip 192.168.0.55 m 0.0.0.255 action -1
 
-Then we can start adding the attributes as alternative to the fixed
-headers in some other ops, and later start deprecating the current
-API?
+This is a resurrection of an old series from 2020 [1] with several
+improvements, but the fundamental logic unchanged. v1 was almost pulled
+in, but ultimately it was decided to drop it [2] because of unresolved
+issues. One issue was too many defensive NULL checks. Second issue is
+about inconsistency when using multiple input sets. Both are addressed
+in this patchset.
 
-(for some reason this thought only popped up when I had the html
-rendering in front of me, sorry it's so late in the process)
+More about the second issue:
 
-[...]
-> +Flags
-> +=====
-> +
-> +The ``flags`` field in ``xfrm_user_migrate_state`` controls optional
-> +migration behaviour. Unknown flag bits are ignored.
+From [3]:
+>I would argue that you need to have some sort of logic that basically
+>checks to see if you are going to hit the input set issue and falls
+>back and applies the ACL rules. Otherwise you are significantly
+>hampering the usefulness of this filter type. It doesn't make sense
+>that dropping a field will cause a rule to fail to be added, but
+>masking a single bit in some field will make it valid. It would make
+>it a nightmare to use from the user point of view as the rules come
+>across as arbitrary.
 
-Maybe better to reject unknown flag bits (as well as unknown
-attributes beyond XFRMA_MAX), so that we can fully control their
-behavior, and not risk incorrectly migrating an SA if a "too-recent"
-userspace passes attributes we don't know (then if we fail to handle
-them in the kernel, the SA may not handle the traffic).
+Flow Director (FD) has a hardware limitation where all filters for the same
+packet type must use identical input sets. Previously, attempting to add the
+second filter would fail.
 
-(Steffen and you will have a much better understanding of the security
-risks here than me)
+Patch 10 adds automatic fallback to ACL block when FD cannot accommodate a
+filter due to input set conflicts, which resolves this inconsistency.
 
+v3:
+* Various minor fixes, mostly reported by sashiko [4] - check individual
+  changelogs. Not all comments were addressed (some were irrelevant)
+v2:
+* Rebase. Notable conflicts were the removal of ice_status and the addition of
+  libie (which affected AdminQ communication)
+* Reduce the number of defensive NULL checks
+* Use = {} instead of memset for definitions
+* Use kzalloc_obj() instead of plain kzalloc()
+* Move from devm_ to plain allocation for objects that don't require it
+* Move iterator declaration to loop start
+* Move some defines out of structs
+* Fix kdoc (except untouched ice_ethtool_fdir.c functions)
+* Adjust style (err for return variable, spacing, rewrite some comments,
+* commit messages)
+* Remove overly verbose comments
+* Add patches 5, 6, 9 and 10
+* More changes listed in patches (if applicable)
 
+[1] https://lore.kernel.org/intel-wired-lan/20200914153720.48498-1-anthony.l.nguyen@intel.com
+[2] https://lore.kernel.org/netdev/7192efe4d27c93148b3205e65f37203c89170316.camel@intel.com/#t
+[3] https://lore.kernel.org/netdev/CAKgT0Ucxd5-gvEwWAdbL04ER2o++RX_oekUV3E0rYquEgFKj1w@mail.gmail.com
+[4] https://sashiko.dev/#/patchset/20260409120003.2719-1-marcin.szycik%40linux.intel.com
 
-> +Migration Steps
-> +===============
+Lukasz Czapnik (1):
+  ice: use ACL for ntuple rules that conflict with FDir
 
-maybe add:
+Marcin Szycik (3):
+  Revert "ice: remove unused ice_flow_entry fields"
+  ice: use plain alloc/dealloc for ice_ntuple_fltr
+  ice: re-introduce ice_dealloc_flow_entry() helper
 
-Userspace is expected to:
+Real Valiquette (5):
+  ice: initialize ACL table
+  ice: initialize ACL scenario
+  ice: create flow profile
+  ice: create ACL entry
+  ice: program ACL entry
 
-> +#. Install a block policy to drop traffic on the affected selector.
-> +#. Remove the old policy.
-> +#. Call ``XFRM_MSG_MIGRATE_STATE`` for each SA.
-> +#. Reinstall the policies.
-> +#. Remove the block policy.
-> +
-> +Block Policy and IV Safety
-> +--------------------------
-> +
-> +Installing a block policy before migration is required to prevent
-> +traffic leaks and IV reuse in counter mode.
-> +
-> +AES-GCM IV uniqueness is critical: reusing a (key, IV) pair allows
-> +an attacker to recover the authentication subkey and forge
-> +authentication tags, breaking both confidentiality and integrity.
-> +
-> +``XFRM_MSG_MIGRATE_STATE`` atomically copies the sequence number and
-> +replay window from the old SA to the new SA and deletes the old SA.
-> +The block policy ensures no outgoing packets are sent in the migration
-> +window, preventing IV reuse under the same key.
+Tony Nguyen (1):
+  ice: rename shared Flow Director functions and structs
 
-Does it matter that the copy is done atomically if we expect userspace
-to install a block policy? (without the block, I'll have to recheck to
-convince myself whether it would be safe, and TBH I'm still a bit
-confused by patch 8)
-
-> +Feature Detection
-> +=================
-> +
-> +Userspace can probe for kernel support by sending a minimal
-> +``XFRM_MSG_MIGRATE_STATE`` message with a non-existent SPI:
-> +
-> +- ``-ENOPROTOOPT``: not supported (``CONFIG_XFRM_MIGRATE`` not enabled)
-> +- any other error: supported
-
-
-xfrm_user_rcv_msg
-
-if (type > XFRM_MSG_MAX)
-        return -EINVAL;
-
-
-Userspace will hit that on a kernel that may have migrate but not
-XFRM_MSG_MIGRATE_STATE, no?
-
-
-[...]
-> +Error Handling
-> +==============
-> +
-> +If the target SA tuple (daddr, SPI, proto, family) is occupied by an existing
-> +unrelated SA, the operation returns ``-EEXIST``.
-
-All this happens under xfrm_cfg_mutex, so if we did an initial lookup
-for the new SA before starting the operation, we could ensure there's
-no dupe, and the mutex would guarantee no insertion. No?
+ drivers/net/ethernet/intel/ice/Makefile       |    5 +-
+ drivers/net/ethernet/intel/ice/ice.h          |   21 +-
+ drivers/net/ethernet/intel/ice/ice_acl.h      |  170 +++
+ drivers/net/ethernet/intel/ice/ice_acl_main.h |    9 +
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  393 +++++-
+ drivers/net/ethernet/intel/ice/ice_arfs.h     |    2 +-
+ drivers/net/ethernet/intel/ice/ice_fdir.h     |   18 +-
+ .../net/ethernet/intel/ice/ice_flex_pipe.h    |    2 +
+ drivers/net/ethernet/intel/ice/ice_flow.h     |   39 +-
+ .../net/ethernet/intel/ice/ice_lan_tx_rx.h    |    3 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |    5 +
+ drivers/net/ethernet/intel/ice/ice_acl.c      |  486 +++++++
+ drivers/net/ethernet/intel/ice/ice_acl_ctrl.c | 1127 +++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_acl_main.c |  311 +++++
+ drivers/net/ethernet/intel/ice/ice_arfs.c     |    8 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |    8 +-
+ ...ce_ethtool_fdir.c => ice_ethtool_ntuple.c} |  654 ++++++---
+ drivers/net/ethernet/intel/ice/ice_fdir.c     |   32 +-
+ .../net/ethernet/intel/ice/ice_flex_pipe.c    |   11 +-
+ drivers/net/ethernet/intel/ice/ice_flow.c     | 1234 ++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_lib.c      |   10 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |   94 +-
+ drivers/net/ethernet/intel/ice/virt/fdir.c    |   32 +-
+ 23 files changed, 4420 insertions(+), 254 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_acl.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_acl_main.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_acl.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_acl_ctrl.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_acl_main.c
+ rename drivers/net/ethernet/intel/ice/{ice_ethtool_fdir.c => ice_ethtool_ntuple.c} (78%)
 
 -- 
-Sabrina
+2.49.0
+
 
