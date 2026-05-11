@@ -1,171 +1,348 @@
-Return-Path: <netdev+bounces-286429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286430-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aGSrKL5CAWpwTAEAu9opvQ
-	(envelope-from <netdev+bounces-286429-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 04:45:18 +0200
+	id eFs9EqlJAWqKTwEAu9opvQ
+	(envelope-from <netdev+bounces-286430-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 05:14:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D4925074BA
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 04:45:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E52F4507876
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 05:14:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6EFD83008889
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 02:45:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 766FB3008740
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 03:14:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3FC2309EEC;
-	Mon, 11 May 2026 02:45:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED14376464;
+	Mon, 11 May 2026 03:14:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="DAuzAf/f"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="P94sOQnr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010025.outbound.protection.outlook.com [52.101.69.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007573043D5;
-	Mon, 11 May 2026 02:45:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778467514; cv=none; b=f7Vrh8DWxuvRJxwQstfnKh2Z785VSqScJcHbcgq8RVSFDMUhPL0lplGnX2l+CTz+OUAcUXsopXcEiq0iWSfl3F4hKdbHV4kWJJQqyQHW0w8I5zlb0i8H5KsNKC7MDLTnFe8Us6VkMaqRRNgb2cHAqYEZHV/KTKOI1MX2RmXtD6E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778467514; c=relaxed/simple;
-	bh=uDBGpNXR7xfRIM9KaaQyUSl/DTnHJD0R4Q6E5syiWts=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HMyO1JxvqUEHSZp1/Au5cXFgUZPPaGRrFvt5WRThqz61+Ssh2HL4hJJAV6Y5z+O5kUfU0qqokSKVW0pzdyHxNtiHnZsrUKtbwYlmFEyzpVoz1bHw2QRXb/GHGofwGYJk3SWt2il8Ul4RiQk2Es0yCRtw+9aOjDf1KQc7pwpFQCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=DAuzAf/f; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64ALxVgx2886655;
-	Sun, 10 May 2026 19:44:34 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=TCZGVfP3PrygTPQur+dOCeAnW
-	SnlOU1PSYLbzVz6oog=; b=DAuzAf/fA+i+JrocE+oizKuLJFWYUn5VYzKQatIJv
-	NQJ6lgOCmIMllRbzNQQNBSQ2l4cK9BXg0CSYVHpa0ktDtWIg5U0JgC9/JwwsAl6E
-	ng4rV0aAv/Tv7r1OY5y3KQLFkQaHosQ6ujK8zffgotGTpk7c27BGMyXBQwFFdbHh
-	KmBGM6B0JongvK3KEPdwE5k9XtphT03VvoTh+D0csJnNHyjbjwdehuuhUjXuUl8X
-	3Libo5zoZuIxzJwIbkMnvosUgtxtnfDohSsK6yPKw8YjrgyW3vsV09oCHKoYo4sl
-	NGWcgwh6cZxCarSjhLFh/Qi3h/EJ/RFUM24tZoXrgQ22w==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4e229jkf6e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 10 May 2026 19:44:34 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Sun, 10 May 2026 19:44:33 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Sun, 10 May 2026 19:44:32 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 818CF3F7088;
-	Sun, 10 May 2026 19:44:23 -0700 (PDT)
-Date: Mon, 11 May 2026 08:14:22 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <intel-wired-lan@lists.osuosl.org>, <linux-kernel@vger.kernel.org>,
-        <linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <oss-drivers@corigine.com>
-CC: <akiyano@amazon.com>, <andrew+netdev@lunn.ch>,
-        <anthony.l.nguyen@intel.com>, <arkadiusz.kubalewski@intel.com>,
-        <brett.creeley@amd.com>, <darinzon@amazon.com>, <davem@davemloft.net>,
-        <donald.hunter@gmail.com>, <edumazet@google.com>, <horms@kernel.org>,
-        <idosch@nvidia.com>, <ivecera@redhat.com>, <jiri@resnulli.us>,
-        <kuba@kernel.org>, <leon@kernel.org>, <mbloch@nvidia.com>,
-        <michael.chan@broadcom.com>, <pabeni@redhat.com>,
-        <pavan.chebbi@broadcom.com>, <petrm@nvidia.com>,
-        <Prathosh.Satish@microchip.com>, <przemyslaw.kitszel@intel.com>,
-        <saeedm@nvidia.com>, <sgoutham@marvell.com>, <tariqt@nvidia.com>,
-        <vadim.fedorenko@linux.dev>
-Subject: Re: [PATCH v12 net-next 6/9] octeontx2: cn20k: Coordinate default
- rules with NIX LF lifecycle
-Message-ID: <agFChlSIxsYM3wj6@rkannoth-OptiPlex-7090>
-References: <20260508034912.4082520-1-rkannoth@marvell.com>
- <20260508034912.4082520-7-rkannoth@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562701684BE;
+	Mon, 11 May 2026 03:14:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.25
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778469285; cv=fail; b=pBJht1WlF0qQGp9nnC4B61se1VJYtNact/ebX37WkASy6OTJWbhei/Adycaud5WC3TtWwVS4St3sEsxDffksDtbQrj5JjXAFlJ++dmA2ZRxag+9+kxGAMss7TM1ieonSaXO5r+Lad9QbaPSDDl9yjhacUhv2nEIV4O1Ub4ccqwk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778469285; c=relaxed/simple;
+	bh=iqTAuW2Se1nBDqvl9tAKb82A/sK1jGE6R67OhI+GNmo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=tAOSeQ8zcnR4XBPG9bgsDVjze1jk/KdPPkjxXpvJapsnzN6EyhFuBNCE8kF3rjjC6Y1IaFLhNQJC4b625qyAHHFhXoArYn8T5XxBGyEx17TCflPygvqg2zwD+qVZn4v7iIpZT8EoXXe9Xffm/R04Lcm6PAGnt1ofmKPJgD5pLOQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=P94sOQnr; arc=fail smtp.client-ip=52.101.69.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=LOv8GSBEAqVRHMFtU9fodHd1Ay8iE0jxcEu+TYK9YtcZwu2Afe3z8V17xopOSeO67TzOGsjH/qWEj09xVabg2TpvfsaXoSH2w1ZSLRsedBFedJj7lplelEHbwK+IAJt1uclDYrQUhDJECBpPRx5UCiceX4Dwee6cp+l97UEndGvJUXt3JSQ18hL2X3wXtsDZaPk+VhLlsvWiFhE9jVG6pF7+ovFHfaRyTsJP0q47KcJBFEFQnRSNFPlq1jPStrAt3FeD2Sg6o19TCJEex0prK5o/XrrZPqfbNKJVizF5iYyoky/IxMb7JwzbSio1orf/npDo0q8uXEETwSBlex2t5g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=s+T+NALi8eKjps8Rx7LU1yMxmFMmrqoHmeGjfboVY8k=;
+ b=dzOXttmt5jJqBU/5FlAiD1nufAgGu1VnEok+gPaNrxAPxEF/HS3vDsiUJZz181SUB/AkQHNq+EgRc1xXo5/48JcWhP11lHjyQIABvQPidi9/FwBxiHPdzroPRRv9tNGKT15zRMftdLFBc+69CWoeE2egpzHwKRODN7W+c6RVUJj+u2dlUpaUAi3+vWlXoEOGUmzPo0RdqLZEuqba2OBdQ0jGW3ZWD2703xQcw7CSY30U5wxkPX4WJpDNcwD0OUGVi1luXGyg8zv1d/7fy3L52pn65L2JwhLeCY9l/9Wsr/l83xnrLuPi2Raf2yhkzTxwQPt51cw5d/wphhqdi3rFHA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=s+T+NALi8eKjps8Rx7LU1yMxmFMmrqoHmeGjfboVY8k=;
+ b=P94sOQnrOfmriyzbZhcl6UhdTSJ43RkNQvEKAQTJ0EVKf87YNaHs4BTWBHxPm/H06o9k9yY8v+3o80FPweeosg0H2WueT8E6SJuOirE36I2V6DphaKzFaftoOZK+uvo+pIAilSiCCHnXV6vb3C7VAjskvN8uWzwvP0Wb62lglzT/AYzMiLVLCwYzApYzgoK3dYeIJzZTOKHPmW0TYxd5c5rw9kqkUcYZOZQmjnNzSTFWkRuE8qdsEhdjJeaNclps5SntPL2/DLEzrOdfNx2eI82JPwIm1IRjaZFNuIozJG/Av6DSz34k+xC12+QV48qx2X7v9MEDROn7e4B6HqyC2g==
+Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
+ by DB5PR04MB12203.eurprd04.prod.outlook.com (2603:10a6:10:64b::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.22; Mon, 11 May
+ 2026 03:14:40 +0000
+Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
+ ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
+ ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.20.9891.021; Mon, 11 May 2026
+ 03:14:40 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: "sashiko@lists.linux.dev" <sashiko@lists.linux.dev>
+CC: "imx@lists.linux.dev" <imx@lists.linux.dev>, "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	"robh@kernel.org" <robh@kernel.org>, "conor+dt@kernel.org"
+	<conor+dt@kernel.org>, "Frank.Li@kernel.org" <Frank.Li@kernel.org>,
+	Networking <netdev@vger.kernel.org>
+Subject: RE: [PATCH v6 net-next 12/15] net: dsa: netc: add FDB, STP, MTU, port
+ setup and host flooding support
+Thread-Topic: [PATCH v6 net-next 12/15] net: dsa: netc: add FDB, STP, MTU,
+ port setup and host flooding support
+Thread-Index: AQHc356oJ+jsDHmt5Eqn9ujFEA7UKbYHFeAAgAEMFuA=
+Date: Mon, 11 May 2026 03:14:40 +0000
+Message-ID:
+ <DBBPR04MB75004982323B70E4E942331688382@DBBPR04MB7500.eurprd04.prod.outlook.com>
+References: <20260509102954.4116624-13-wei.fang@nxp.com>
+ <20260510104838.8514DC2BCB8@smtp.kernel.org>
+In-Reply-To: <20260510104838.8514DC2BCB8@smtp.kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DBBPR04MB7500:EE_|DB5PR04MB12203:EE_
+x-ms-office365-filtering-correlation-id: 75a0fb54-f26f-44af-090d-08deaf0b70a1
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|366016|19092799006|1800799024|38070700021|3023799003|56012099003|22082099003|18002099003;
+x-microsoft-antispam-message-info:
+ SH4Yb/5M+finmqj7OfQvBn9n/KcHVcjvMJa27ltQMeNyuZIQd3YopIpwpjzzkpY83kD4M95YhKcKSmfgAwt5j223DPZSlGSp1c+OThH3v6RxPfUCaguZjyhMi6SDlsvZFv6evGjIQXw5fOTypbuzYock32PAkUSTTbY3CqfgTK55tHRDai3eLVyAeioOjonwRtPpRchx68Hv3+UgEmpC7qZVuVykvoSSWMdlzJSWQhkXUzTCWX40jv376vdV5RWZ9JcNRqkAaI1iHTLNMB9SQZbnyRyo02Ew8m6LKgQC1sxYaFLnM1nE8Oe/9SdLVQ+UFrafVbPDLwjfuE/JOM1y7xEF6Xf31cTx5vyY2mViO9mjd2gIWVglfuVZeLg797RmFmCUQuLL8xZmOgFXVWsJTOq9b9nYtamgpVUMmSFzJW8R3E12LrpZL6rGphIh54fepbWR8on65ILOJ+gZRVZ9xczmY4msesOl9/UNLtcFKJEfXihkV9AVuzh56v+u3JsnAySP/URARAQiPQJGQBZNAj/pftFUTFnkR0zgoGn3ZUzbm5V+HYgQoe176f9/Kg4LAM29wLl+QJ+LmndD+kjkNQQQD86ASX5naxZM4wNeLLysdWY1CbYjmtFMdY4dwruWO8fC2gkOCkXw8iZtodZ1LHMan6cDGnTOVMPUmVajUDmc7ywMsnZ8RIEE9Lh23FHLMGC/h4tFgaphQsa2nKE9QEowEKddb1Z2SRj4yjThllFSU8UUc5RnALanMzxFXVal
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(19092799006)(1800799024)(38070700021)(3023799003)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?o98GmBOCT0+0UBINaMpewNSGq6dXfvrGe0gTEoaJsZ1rorz3Fe2Et9ANt01Z?=
+ =?us-ascii?Q?3l8/GuvckNwZwyvokTjD8gRduuyeKY+qMdsGVkwQeJkJhqjK6qbaLHnKfkgL?=
+ =?us-ascii?Q?QcQr4uKKFsHT5VtXT7qMk1rWryri+6l67Q9f4904yiKZO9x0dCJQKf615JkQ?=
+ =?us-ascii?Q?IZRRQO/6enXswwMGWOlYaEICKAQU4J358f0xFzrx9hBJtTTNgb4Q3lLc8CX6?=
+ =?us-ascii?Q?OuaLhaimAP2LkKEg5ZePsCBdKcw1fZBhiSP5iEe7fbWrfbn9P3++w6sOKWfw?=
+ =?us-ascii?Q?cMUscpfyqxvCAYmdduN/mYWmB2GfwhvbmZhbKQXSnrs5YpXvbEHTCf0ZNjcb?=
+ =?us-ascii?Q?DBaE7UZ7gQiApeXj5fPQPy9/c4IjfJVR/90Uuw6FZExKGBlKWtOvWsFzcusa?=
+ =?us-ascii?Q?JC+tmd7B59nXQ/wPES2i1nfhpg9Mi3rRXIRC0DCPY7CQk3L1gT/xOcW+JNFJ?=
+ =?us-ascii?Q?IbS4WIer+seeTQrwlY/aGUEnsj4o5EIRZJgmqHgPrHvnW9HoqSVHfTIITLty?=
+ =?us-ascii?Q?2NaOITmrrMpOWglgSoe9eQ3x4n1Dga6K3gZeP8xVd/bWAUz7lKS/zCCMMf/+?=
+ =?us-ascii?Q?IBko+POIZUShjccbTuFtfH0xqk4uWmlyWjjyIaxi9ImYGSor5DAOeSKZkfNr?=
+ =?us-ascii?Q?LAqgyNXNl53GYBzV7BrhmOA+zQYH16J/sU9tzYna65Vh3JK+gyTuiW+UjCRU?=
+ =?us-ascii?Q?4GPttJxjHypbe40KahtFiFvhaatqhleBPC9cousO/qXBcpyCF2KoZDzaUta/?=
+ =?us-ascii?Q?bUxBI+qqTmUkJgWkMAUXletvi5+VBkdmT7kUiccqoFLy4AshSzy5ZyLcankK?=
+ =?us-ascii?Q?gZ0wJKLNEwpgRBgySSwuSoiy+DgdCv9ugSWErLUCMw9L1vqx9K8sfBzXeHY0?=
+ =?us-ascii?Q?kXnSVvJQ0cs3EyYrJl8f09yogbWuC4DmJRAzP52iXWakfQlcS6IQQ3k2C9N4?=
+ =?us-ascii?Q?zOIrOY3Lt0bBRA2bdCSJJXCF9C4142L4prbryTw8jVO5CBYZMb8w5G4CJUnH?=
+ =?us-ascii?Q?OwZJcJFe0w4+qG72RRLdqF8aS8JerE0B4oxhNbImVMokL6/9ubmyudKBKW8Z?=
+ =?us-ascii?Q?H6+uGJkWSXDTAvBHXXRjwZnnC83ElvhEkp84l6sFOcvjtqzv14QbSZbcY9vh?=
+ =?us-ascii?Q?+BzZ8VWa533Q1PujtUT/jImihA/9YIJ9G1kPTlq4+e/2Sc/G7ohVzxNF833a?=
+ =?us-ascii?Q?aMoZucVYEvE9lLW7b1N33A9l7cqCeNUafex2w9fMP0skolErGmzjhvOr4+pw?=
+ =?us-ascii?Q?2s2sP5CVZReCiX3dpnRHmD56X04ivNDqNOgBy5z1BOSF+83B7KjYtVKcBiZS?=
+ =?us-ascii?Q?uDSlr5BRELmrDs7tvBDSznmh3ag9RxNF7yaj+A83igmBTzXY8JsK6PKU0/9s?=
+ =?us-ascii?Q?4OMewbnlURCdCURz4iGUnroehBiiTw3xG/hK9rJ+DcXowkCncv0jxO239Mki?=
+ =?us-ascii?Q?it96Laai3BErQ+7A5PzdfWa9xAQGNmILrH3zByrbMGCerL5ZzYBerfV3toOx?=
+ =?us-ascii?Q?0sPVHABtltWnq9Dea8sJ028fh1wJMaF+xkSi+Ez5dC1AERlsRPUkNaaEYvee?=
+ =?us-ascii?Q?9qb5druUQqE4oYiVCBArx0bR5ZD0cSwP22YdksLcKyfemRdbCbXBvrQ8P441?=
+ =?us-ascii?Q?NkEqStwhj+eN156d7pWPnKUJE7jNUJ13ujS7jPOkwWDrWjU5lakkpUb1j54E?=
+ =?us-ascii?Q?QtIRYqqMGSF5hh/2xi2yFSiYkGMGV7M/z0cyTUNfE7X+2RVR?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260508034912.4082520-7-rkannoth@marvell.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTExMDAyNyBTYWx0ZWRfX1qoSKKDXVfQe
- d/r/S0T94RPFTYaLXpKupzlTPMGqs3OgPqAvfOCm6SjnHKX9Wd6Y6fzU3Af1hass93NXqIIp2XT
- mRvXGGZM5JjKrm7FUPuIJBYS+enYINIQYRD3NNehYCxSThZ/3tHDzxhoXtUHmP4S+Uo7Zo8pIw9
- svxyFgkJzcEXCQNEmW/VUWWr1QGbve7sN1zBYu8WeRMRnZG3Dduo/Yy5esTZJR/4lfXtwTq9/85
- Tep1WJ/sz3df/bSOqhmcy5dqxk7U2YcYwcqklx/Q2jGm0R2tpg3fhugD2YKU2U7s4F121FGyZaj
- pl3Y3zYXN0mwRdO6c1c4rICqH63oQSO3BGMjMGrXJ9hMV6YF7JvX8Wq3OIvjqsc76swLRkewVJs
- ue3l9V4Hb3XY6g4GSeH7SI+vsHHSKOYWd7pv4AXX1uuZRiyvxzfjhsG2vuwM5AdAtKrWkEez5Pm
- aveea3RoCkHHYLimLaw==
-X-Proofpoint-GUID: oIDeRa2Cm1H1BBu9O7kBRp-tgSNu22Ge
-X-Proofpoint-ORIG-GUID: oIDeRa2Cm1H1BBu9O7kBRp-tgSNu22Ge
-X-Authority-Analysis: v=2.4 cv=LdAMLDfi c=1 sm=1 tr=0 ts=6a014292 cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=kj9zAlcOel0A:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=EAYMVhzMl8SCOHhVQcBL:22 a=M5GUcnROAAAA:8
- a=hBA3f-BUjflL6dYasosA:9 a=CjuIK1q_8ugA:10 a=OBjm3rFKGHvpk9ecZwUJ:22
- a=Oh551-UHZqmTy8JkqTUo:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-11_01,2026-05-08_02,2025-10-01_01
-X-Rspamd-Queue-Id: 1D4925074BA
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 75a0fb54-f26f-44af-090d-08deaf0b70a1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 May 2026 03:14:40.2206
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Pp5SHJxnPKBLLV8Zv2cR3ONquehysWiPIcUaUGDYVlprw0vbkc23XsUUtct1wUdYaSW2d5OEeG1ZiFkg5BWdKA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB5PR04MB12203
+X-Rspamd-Queue-Id: E52F4507876
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[amazon.com,lunn.ch,intel.com,amd.com,davemloft.net,gmail.com,google.com,kernel.org,nvidia.com,redhat.com,resnulli.us,broadcom.com,microchip.com,marvell.com,linux.dev];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286430-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286429-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[marvell.com:+];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On 2026-05-08 at 09:19:09, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
-> Add NIX_LF_DONT_FREE_DFT_IDXS so the PF can send NIX LF free during hw
-> reinit or teardown without the AF freeing CN20K default NPC rule indexes
-> while the driver still owns that state (otx2_init_hw_resources and
-> otx2_free_hw_resources).
+> Thank you for your contribution! Sashiko AI review found 3 potential issu=
+e(s) to
+> consider:
+> - [High] Incorrect FDB port bitmap update causes roaming unicast entries =
+to be
+> flooded to multiple ports.
+> - [High] Local `u8` arrays `bcast` and `dmac_mask` are passed to
+> `ether_addr_copy` without ensuring 16-bit alignment.
+> - [Medium] The driver silently fails to delete dynamically learned FDB en=
+tries.
+> --
+>=20
+> commit 5ef406cd4ab0e5005f26e470e33265be68b4fe54
+> Author: Wei Fang <wei.fang@nxp.com>
+>=20
+> net: dsa: netc: add FDB, STP, MTU, port setup and host flooding support
+>=20
+> Expand the NETC switch driver with foundational features including FDB
+> management, STP, MTU configuration, and host flooding support. The driver
+> operates in standalone port mode.
+>=20
+> diff --git a/drivers/net/dsa/netc/netc_main.c
+> b/drivers/net/dsa/netc/netc_main.c
+> --- a/drivers/net/dsa/netc/netc_main.c
+> +++ b/drivers/net/dsa/netc/netc_main.c
+> [ ... ]
+> > @@ -363,6 +418,206 @@ static void netc_port_default_config(struct
+> netc_port *np)
+> [ ... ]
+> > +static int netc_port_set_fdb_entry(struct netc_port *np,
+> > +				   const unsigned char *addr, u16 vid)
+> > +{
+> [ ... ]
+> > +	cfge =3D &entry->cfge;
+> > +	/* If the entry already exists on the port, return 0 directly */
+> > +	if (unlikely(cfge->port_bitmap & cpu_to_le32(BIT(port))))
+> > +		goto unlock_fdbt;
+> > +
+> > +	/* If the entry already exists, but not on this port, we need to
+> > +	 * update the port bitmap. In general, it should only be valid
+> > +	 * for multicast or broadcast address.
+> > +	 */
+> > +	cfge->port_bitmap |=3D cpu_to_le32(BIT(port));
+>=20
+> Does this correctly handle roaming unicast MAC addresses?
+>=20
+> When a unicast MAC address roams from one port to another, or when a user
+> replaces a static unicast FDB entry using bridge fdb replace, the bridge =
+core
+> requests adding the entry on the new port.
+>=20
+> Because this unconditionally ORs the port into the bitmap, the unicast ad=
+dress
+> becomes associated with both the old and new ports simultaneously. This w=
+ill
+> cause the switch hardware to duplicate and flood unicast frames to multip=
+le
+> ports.
+>=20
+> Should this check is_multicast_ether_addr() and replace the port_bitmap
+> instead of ORing it for unicast addresses?
 
-pw-bot: changes-requested
+netc_port_set_fdb_entry() is an interface shared by single port mode and br=
+idge
+mode. Currently, since only single port mode is supported, it doesn't have =
+any
+impact, as this mode only allows setting FDB entries on CPU ports. However,=
+ for
+future support of bridge mode, this is indeed a potential issue, and I will=
+ improve
+this shared interface in the next version.
 
->> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
->> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
->> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
->> @@ -990,7 +990,7 @@ void rvu_npc_install_allmulti_entry(struct rvu *rvu, u16 pcifunc, int nixlf,
->>  	u16 vf_func;
->>
->>  	/* Only CGX PF/VF can add allmulticast entry */
->> -	if (is_lbk_vf(rvu, pcifunc) && is_sdp_vf(rvu, pcifunc))
->> +	if (is_lbk_vf(rvu, pcifunc) || is_sdp_vf(rvu, pcifunc))
->Is this logic change intended to be part of this commit?
->The commit message focuses on coordinating default rules with the NIX LF
->lifecycle, but this silently changes the condition from a logical AND to a
->logical OR. While this appears to correctly fix a bug where the condition
->could never be true (since a device cannot simultaneously be both an LBK VF
->and an SDP VF), including an undocumented bug fix in a patch about a
->different topic obscures the commit's intent.
->Should this be split into a separate patch, or explicitly mentioned in the
->commit message?
+>=20
+> > +	err =3D ntmp_fdbt_update_entry(&priv->ntmp, entry->entry_id, cfge);
+> [ ... ]
+> > +static int netc_port_del_fdb_entry(struct netc_port *np,
+> > +				   const unsigned char *addr, u16 vid)
+> > +{
+> > +	struct netc_switch *priv =3D np->switch_priv;
+> > +	struct ntmp_user *ntmp =3D &priv->ntmp;
+> > +	struct netc_fdb_entry *entry;
+> > +	struct fdbt_cfge_data *cfge;
+> > +	int port =3D np->dp->index;
+> > +	int err =3D 0;
+> > +
+> > +	mutex_lock(&priv->fdbt_lock);
+> > +
+> > +	entry =3D netc_lookup_fdb_entry(priv, addr, vid);
+> > +	if (unlikely(!entry))
+> > +		goto unlock_fdbt;
+>=20
+> Can this silently fail to delete dynamically learned FDB entries?
+>=20
+> The netc_lookup_fdb_entry() function searches priv->fdb_list, which only
+> tracks static entries explicitly added by software.
+>=20
+> If the bridge core or user attempts to delete a hardware-learned dynamic =
+MAC
+> address, the lookup will return NULL. The function will then jump to
+> unlock_fdbt and silently return 0 (success) without actually issuing a de=
+lete
+> command to the hardware FDB.
 
-ACK. This is a fix, i will post as seperate patch after this net-next series merged.
+Currently, this patch set only supports single port mode, the MAC learning =
+is
+disabled, so there is no dynamically learned FDB entry. This interface will
+be improved when the bridge mode support is added. So please ignore this
+warning as we do not support bridge mode yet.
+
+>=20
+> > +
+> > +	cfge =3D &entry->cfge;
+> [ ... ]
+> > +static int netc_add_standalone_fdb_bcast_entry(struct netc_switch *pri=
+v)
+> > +{
+> > +	const u8 bcast[ETH_ALEN] =3D {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+>=20
+> Are local byte arrays guaranteed to be 16-bit aligned?
+>=20
+> The ether_addr_equal() macro (used inside netc_lookup_fdb_entry which is
+> subsequently called by netc_port_set_fdb_entry) expects its pointer argum=
+ents
+> to be 16-bit aligned.
+>=20
+> Because bcast is declared as a simple u8 array on the stack, the compiler
+> only guarantees a 1-byte alignment by default. On architectures with stri=
+ct
+> alignment requirements, this could trigger an unaligned access exception.
+>=20
+
+The switch runs on ARM64 SoCs, CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+is always selected, so there is no need to align bcast to 16-bit. This is a=
+ false
+positive, please ignore it
+
+> > +	struct dsa_port *dp, *cpu_dp =3D NULL;
+> > +
+> > +	dsa_switch_for_each_cpu_port(dp, priv->ds) {
+> > +		cpu_dp =3D dp;
+> > +		break;
+> > +	}
+> > +
+> > +	if (!cpu_dp)
+> > +		return -ENODEV;
+> > +
+> > +	/* If the user port acts as a standalone port, then its PVID is 0,
+> > +	 * MLO is set to "disable MAC learning" and MFO is set to "discard
+> > +	 * frames if no matching entry found in FDB table". Therefore, we
+> > +	 * need to add a broadcast FDB entry on the CPU port so that the
+> > +	 * broadcast frames received on the user port can be forwarded to
+> > +	 * the CPU port.
+> > +	 */
+> > +	return netc_port_set_fdb_entry(NETC_PORT(priv->ds, cpu_dp->index),
+> > +				       bcast, NETC_STANDALONE_PVID);
+> > +}
+> [ ... ]
+> > +static int netc_port_add_host_flood_rule(struct netc_port *np,
+> > +					 bool uc, bool mc)
+> > +{
+> > +	const u8 dmac_mask[ETH_ALEN] =3D {0x1, 0, 0, 0, 0, 0};
+>=20
+> This has the same alignment concern as the bcast array above.
+>=20
+> The ether_addr_copy() macro expects its pointer arguments to be 16-bit
+> aligned. Passing a stack-allocated u8 array without explicit alignment co=
+uld
+> cause unaligned access faults on certain architectures.
+
+Likewise.
+
+--
+pw-bot: cr
 
