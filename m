@@ -1,263 +1,310 @@
-Return-Path: <netdev+bounces-286836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286837-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MI2PJuhOAmrIqgEAu9opvQ
-	(envelope-from <netdev+bounces-286836-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 23:49:28 +0200
+	id aGYhOPVWAmoOrgEAu9opvQ
+	(envelope-from <netdev+bounces-286837-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 00:23:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DDD25167E5
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 23:49:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3CC2516C78
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 00:23:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CD8093027DA5
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 21:49:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9ED8A3069D0E
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 22:19:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ECEC4D98EF;
-	Mon, 11 May 2026 21:49:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1DB64DB558;
+	Mon, 11 May 2026 22:19:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lGGFQuXa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e8rOUNwd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B1DA4D8D9B
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 21:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF504DB554;
+	Mon, 11 May 2026 22:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778536163; cv=none; b=Zc/nb+daa/K5ILecoHZGxky0nVEUcSv5k1yYqEr1/Du+D1H5OGxHRQmNQfyC8oZD+4cRRSkckoWvrDB8ObJsKTNoELrIiGwSkzeZzSr9GHr4Jy9dn5eR/OrVg15QnNzDkHkPnH1vejS3tDCvGdalRsXYXiAZMLf9Glw2SpmGsz0=
+	t=1778537979; cv=none; b=MMOG3CCm8VgNsi/8V/gPuFE7ru1r3DS/RiXtbaZwzPZcWt+S7hOwdVKB5zbZTYCL//7/2VvP1vZOsfrRt7mXZZE4XNqwnwL9ZMPW6Bhbs9REUSZzC6Nic/aEZTt8DIAvav1RJiW4LfPT0DkZUVyDf/LhKtE6DftUnYLmnEuFeMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778536163; c=relaxed/simple;
-	bh=/uwFRyr0e70vsLfP5Z7ZjZd6g/vbSjiMUdls5IeyXqQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=RnOv23Ks2RGlJ5owH9eT83ZtTY3FpEvqnWPwh+8hDxrLvSZqStCNPebGr3TzwtW+26xfY0t8g2ppiNrwVDC/PKu9xKtsFAs7DI5CBvvbAWCWOWYp6wd53Xe73KGm2Mv5HcsG01lw0RK2S8KoEx2W1RSHMUl7hhYFbTzZ3r6xccs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lGGFQuXa; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-365e20fe3b8so2714871a91.3
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 14:49:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778536160; x=1779140960; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=KzbOTDWUIcvbxViZESEou8Tslep7e7aQLC8OW+VAMeM=;
-        b=lGGFQuXaRz3858kCFf03Bpn/nnX763kpIxNPME/9zYLV6dLUzGkabl3Xk4CaK4v1wN
-         SuKrfmfYj+J9woOz9utSgrIx768ahXHWsxnTUXWMrbJTTGZ9bhfqEFy29W+knE2Ou5fU
-         J4mnmzuScJJ/sTSi1e3XEHZqvfpnmrNayYWq2hmmVwiiiAUb5ntMMlP8SN4Cl5w3qkxt
-         KjOdQIY0V1JdwEV+gw7Nis9c1iJ/SAYZt4tcanMqhDN1leoN1kjT23KqOvKWGci4SRa3
-         ZLlHuGyy8b1o+n3w8r6hT2kBTLYKkVx8yxyATvvhKTTnDsm5zyNBWVO57RLKZUzWGnQI
-         aK8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778536160; x=1779140960;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KzbOTDWUIcvbxViZESEou8Tslep7e7aQLC8OW+VAMeM=;
-        b=YNd5zjnWoxyhy8HJ6W/VbneCejzNuh/P+CEQsIuJgqug96KK3vALDl4eX20mzY+2iz
-         o0yx0G8QlVVMe0TUYfHSdgFBOM4oz8oSPcQetrvRyZ3GL/0PG4h1Q3WcNtdCQWSiguxM
-         f91CI99LPR7e7I7wWsL1MUdZLwU+0obZ09f9bSbP7VXCWQ4V9zCCaM/ou53BaHXHm9/f
-         VU9lTtbIip9fKS2jDPkjHHeOYDJI9FN300I/GBtzDHGMr66NiXQU0UdPEGuoZfCqMbsY
-         4H5jtoUHAxsGGb44pQ/oM3hV8E1dTwngtv1YZRDo+kB841Of4qldm+upUWiuiUISzTWC
-         EX+A==
-X-Gm-Message-State: AOJu0Yzudsi++MSLyjmpcw6FDmqQTP5y4PeTA5vLlGC4H7JtpBACYC7C
-	nNkuR6LojzeWMs5zqpd/Q3/0ytMb5k5OHiEcHreGx4RKuO/P/UaPnTqX
-X-Gm-Gg: Acq92OG43w7dftXMxE1nImvHvkE8Ufx8lWw5ZU8UJHfj42MpKmneZUdm9BbjcQsud9J
-	bivuHUANMrQKM+6zpiO8rEE717gpWYn5kjQhT8DkmLU9kjjtKkuAci7bDXiSnZgb5GdlK1BqD6k
-	cmPHq0MBIud/mhLc/hyqd4gEJS95RxHhEJp5CbP7hTt+T/RTinKOhVa3i2b91KteBUOipnoMeut
-	xAh+ghjL+UyPQN8/DkBknvGURtKoP4gR962hHdoWDDTHlX1El0Pwjv8qwAzBMIN0nKo0S+yZDzR
-	OuJwmTW9icnN4ZBw8UbtxfwqZLgol0BkRlAO089X+ef4hQhCQ4DbcDeHS2M0JcWSUFBLLG7dXHH
-	dI2aZHzRmCzmOrmbZHhEqwNQ5CvhkqItxqcGGvB2d8S1PK5O+yfS/lT0vh6ZYSQTSqp0Xcssj2z
-	c/BQpAe5VlgTP4KK5nHKwJyzwTd3RpygZ83v8+tRST5PmAx5+x8dAnmcevdLj7CtA=
-X-Received: by 2002:a17:90b:2884:b0:366:159a:c1ba with SMTP id 98e67ed59e1d1-3664c8db9acmr17291161a91.3.1778536160485;
-        Mon, 11 May 2026 14:49:20 -0700 (PDT)
-Received: from [192.168.0.226] ([38.34.87.7])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-367d64de478sm8776231a91.13.2026.05.11.14.49.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 14:49:20 -0700 (PDT)
-Message-ID: <7cffd25282e426002edc4a371b17816bcb862d41.camel@gmail.com>
-Subject: Re: [PATCH bpf-next v4 04/12] bpf: Preserve reg->id of pointer
- objects after null-check
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Amery Hung <ameryhung@gmail.com>, bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
- 	daniel@iogearbox.net, memxor@gmail.com, martin.lau@kernel.org, 
-	mykyta.yatsenko5@gmail.com, kernel-team@meta.com
-Date: Mon, 11 May 2026 14:48:47 -0700
-In-Reply-To: <20260506142709.2298255-5-ameryhung@gmail.com>
-References: <20260506142709.2298255-1-ameryhung@gmail.com>
-	 <20260506142709.2298255-5-ameryhung@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	s=arc-20240116; t=1778537979; c=relaxed/simple;
+	bh=GECVds6PVy5qQArWNQudsG6SbMG1H5Ihikpk5pwJxCE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZMnDqfpoFZ5JeK69vSCshuTY0EKprO24cG7kZ4QAf2GXiAjbzB9jik/xDDqnFStmx0WonWL6UGe9lm3SSOMYeMjJ9mw5jY15+QkQNoe2LlUdPsN7aw9lSCx377zhdtpdPe9wlHDlfAYGau8+FUJxeINu9Oh+xdamlw7A80nK1RE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e8rOUNwd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05D0DC2BCB0;
+	Mon, 11 May 2026 22:19:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778537979;
+	bh=GECVds6PVy5qQArWNQudsG6SbMG1H5Ihikpk5pwJxCE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=e8rOUNwdO/t3Gk27U4UEPph8XZEbTjvWsmhZ6n2ZV1j44BkshNBdIX4atv3zv646L
+	 x5cMuFL511cbBhnIFvQFUpXVjZTE0wMRFfnqGxRX+ydq0XsyRJSINKgEzvAnxILaib
+	 ++YX24ezFYOMGKUxH4GpdEk/BwFqfpccZr+ZTldHe3b1phFIgy9UVGxsG1Q7goPLDD
+	 U7mIXphZuyWWh+5Y9x4Ma65Ny30NNNllU9Nv1mPMDO8KIGzXGvoVmN6TCr/WJ6uUzg
+	 mYpkeeFbViKIWRM3ALqDmkcXkQvkyj9UWfrF597k4TFnMPxED0SZdi/K7Zjx1WJTDN
+	 8/CpGIYZwpXDA==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Maoyi Xie <maoyi.xie@ntu.edu.sg>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Sasha Levin <sashal@kernel.org>,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH AUTOSEL 7.0-5.15] wifi: nl80211: re-check wiphy netns in nl80211_prepare_wdev_dump() continuation
+Date: Mon, 11 May 2026 18:19:04 -0400
+Message-ID: <20260511221931.2370053-5-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260511221931.2370053-1-sashal@kernel.org>
+References: <20260511221931.2370053-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: 4DDD25167E5
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 7.0.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: F3CC2516C78
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
-	TAGGED_FROM(0.00)[bounces-286836-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286837-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[eddyz87@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ntu.edu.sg:email,msgid.link:url,p:url]
 X-Rspamd-Action: no action
 
-On Wed, 2026-05-06 at 07:27 -0700, Amery Hung wrote:
-> Preserve reg->id of pointer objects after null-checking the register so
-> that children objects derived from it can still refer to it in the new
-> object relationship tracking mechanism introduced in a later patch. This
-> change incurs a slight increase in the number of states in one selftest
-> bpf object, rbtree_search.bpf.o. For Meta bpf objects, the increase of
-> states is also negligible.
->=20
-> Selftest BPF objects with insns_diff > 0
->=20
-> Program                   Insns (A)  Insns (B)  Insns   (DIFF)  States (A=
-)  States (B)  States (DIFF)
-> ------------------------  ---------  ---------  --------------  ---------=
--  ----------  -------------
-> rbtree_search                  6820       7326   +506 (+7.42%)         37=
-9         398   +19 (+5.01%)
->=20
-> Meta BPF objects with insns_diff > 0
->=20
-> Program                   Insns (A)  Insns (B)  Insns   (DIFF)  States (A=
-)  States (B)  States (DIFF)
-> ------------------------  ---------  ---------  --------------  ---------=
--  ----------  -------------
-> ned_imex_be_tclass               52         57     +5 (+9.62%)           =
-5           6   +1 (+20.00%)
-> ned_imex_be_tclass               52         57     +5 (+9.62%)           =
-5           6   +1 (+20.00%)
-> ned_skop_auto_flowlabel         523        526     +3 (+0.57%)          3=
-9          40    +1 (+2.56%)
-> ned_skop_mss                    289        292     +3 (+1.04%)          2=
-0          20    +0 (+0.00%)
-> ned_skopt_bet_classifier         78         82     +4 (+5.13%)           =
-8           8    +0 (+0.00%)
-> dctcp_update_alpha              252        320   +68 (+26.98%)          2=
-1          27   +6 (+28.57%)
-> dctcp_update_alpha              252        320   +68 (+26.98%)          2=
-1          27   +6 (+28.57%)
-> ned_ts_func                     119        126     +7 (+5.88%)           =
-6           7   +1 (+16.67%)
-> tw_egress                      1119       1128     +9 (+0.80%)          9=
-5          96    +1 (+1.05%)
-> tw_ingress                     1128       1137     +9 (+0.80%)          9=
-5          96    +1 (+1.05%)
-> tw_tproxy_router               4380       4465    +85 (+1.94%)         11=
-4         118    +4 (+3.51%)
-> tw_tproxy_router4              3093       3170    +77 (+2.49%)          8=
-3          88    +5 (+6.02%)
-> ttls_tc_ingress               34656      35717  +1061 (+3.06%)         93=
-6         970   +34 (+3.63%)
-> tw_twfw_egress               222327     222338    +11 (+0.00%)       1056=
-3       10564    +1 (+0.01%)
-> tw_twfw_ingress               78295      78299     +4 (+0.01%)        382=
-5        3826    +1 (+0.03%)
-> tw_twfw_tc_eg                222839     222859    +20 (+0.01%)       1058=
-4       10585    +1 (+0.01%)
-> tw_twfw_tc_in                 78295      78299     +4 (+0.01%)        382=
-5        3826    +1 (+0.03%)
-> tw_twfw_egress                 8080       8085     +5 (+0.06%)         45=
-6         456    +0 (+0.00%)
-> tw_twfw_ingress                8053       8056     +3 (+0.04%)         45=
-4         454    +0 (+0.00%)
-> tw_twfw_tc_eg                  8154       8174    +20 (+0.25%)         45=
-6         457    +1 (+0.22%)
-> tw_twfw_tc_in                  8060       8063     +3 (+0.04%)         45=
-5         455    +0 (+0.00%)
-> tw_twfw_egress               222327     222338    +11 (+0.00%)       1056=
-3       10564    +1 (+0.01%)
-> tw_twfw_ingress               78295      78299     +4 (+0.01%)        382=
-5        3826    +1 (+0.03%)
-> tw_twfw_tc_eg                222839     222859    +20 (+0.01%)       1058=
-4       10585    +1 (+0.01%)
-> tw_twfw_tc_in                 78295      78299     +4 (+0.01%)        382=
-5        3826    +1 (+0.03%)
-> tw_twfw_egress                 8080       8085     +5 (+0.06%)         45=
-6         456    +0 (+0.00%)
-> tw_twfw_ingress                8053       8056     +3 (+0.04%)         45=
-4         454    +0 (+0.00%)
-> tw_twfw_tc_eg                  8154       8174    +20 (+0.25%)         45=
-6         457    +1 (+0.22%)
-> tw_twfw_tc_in                  8060       8063     +3 (+0.04%)         45=
-5         455    +0 (+0.00%)
->=20
-> Looking into rbtree_search, the reason for such increase is that the
-> verifier has to explore the main loop shown below for one more iteration
-> until state pruning decides the current state is safe.
->=20
-> long rbtree_search(void *ctx)
-> {
-> 	...
-> 	bpf_spin_lock(&glock0);
-> 	rb_n =3D bpf_rbtree_root(&groot0);
-> 	while (can_loop) {
-> 		if (!rb_n) {
-> 			bpf_spin_unlock(&glock0);
-> 			return __LINE__;
-> 		}
->=20
-> 		n =3D rb_entry(rb_n, struct node_data, r0);
-> 		if (lookup_key =3D=3D n->key0)
-> 			break;
-> 		if (nr_gc < NR_NODES)
-> 			gc_ns[nr_gc++] =3D rb_n;
-> 		if (lookup_key < n->key0)
-> 			rb_n =3D bpf_rbtree_left(&groot0, rb_n);
-> 		else
-> 			rb_n =3D bpf_rbtree_right(&groot0, rb_n);
-> 	}
-> 	...
-> }
->=20
-> Below is what the verifier sees at the start of each iteration
-> (65: may_goto) after preserving id of rb_n. Without id of rb_n, the
-> verifier stops exploring the loop at iter 16.
->=20
->            rb_n  gc_ns[15]
-> iter 15    257   257
->=20
-> iter 16    290   257    rb_n: idmap add 257->290
->                         gc_ns[15]: check 257 !=3D 290 --> state not equal
->=20
-> iter 17    325   257    rb_n: idmap add 290->325
->                         gc_ns[15]: idmap add 257->257 --> state safe
->=20
-> Acked-by: Andrii Nakryiko <andrii@kernel.org>
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> ---
+From: Maoyi Xie <maoyi.xie@ntu.edu.sg>
 
-Acked-by: Eduard Zingerman <eddyz87@gmail.com>
+[ Upstream commit 79240f3f6d766b342b57c32397d643e1cfa26b81 ]
 
-[...]
+NL80211_CMD_GET_SCAN is implemented as a multi-call dumpit. The first
+invocation of nl80211_prepare_wdev_dump() validates the requested wdev
+against the caller's netns via __cfg80211_wdev_from_attrs(). Subsequent
+invocations look up the same wiphy by its global index and do not check
+that the wiphy is still in the caller's netns.
+
+Add the same filter to the continuation path. If the wiphy's netns no
+longer matches the caller's, return -ENODEV and the netlink dump
+machinery terminates the walk cleanly.
+
+Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
+Link: https://patch.msgid.link/20260506064854.2207105-3-maoyixie.tju@gmail.com
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+
+LLM Generated explanations, may be completely bogus:
+
+## Phase Walkthrough
+
+**Phase 1: Commit Message Forensics**
+- Step 1.1 Record: Subsystem `wifi: nl80211`; action verb `re-check`;
+  intent is to revalidate the wiphy net namespace during
+  `nl80211_prepare_wdev_dump()` continuation.
+- Step 1.2 Record: Tags are `Signed-off-by: Maoyi Xie`, `Link: https://p
+  atch.msgid.link/20260506064854.2207105-3-maoyixie.tju@gmail.com`,
+  `Signed-off-by: Johannes Berg`. No `Fixes`, `Reported-by`, `Tested-
+  by`, `Reviewed-by`, `Acked-by`, or `Cc: stable`.
+- Step 1.3 Record: The committed message says first dump invocation
+  validates via `__cfg80211_wdev_from_attrs()`, but later invocations
+  recover the wiphy by global index and lacked a netns check. The v3
+  mailing-list patch further states the failure mode: BSS scan data can
+  continue being copied from a wiphy after it moved to another netns.
+- Step 1.4 Record: This is a hidden security/correctness fix, not a
+  cleanup. It fixes a namespace isolation race in a multi-call netlink
+  dump.
+
+**Phase 2: Diff Analysis**
+- Step 2.1 Record: One file changed, `net/wireless/nl80211.c`; commit
+  stat is 12 insertions. One function changed:
+  `nl80211_prepare_wdev_dump()`. Scope is single-file surgical.
+- Step 2.2 Record: Before, continuation path did
+  `wiphy_idx_to_wiphy(cb->args[0] - 1)`, accepted the wiphy, then
+  searched `wdev_list`. After, it returns `-ENODEV` if
+  `!net_eq(wiphy_net(wiphy), sock_net(cb->skb->sk))`.
+- Step 2.3 Record: Bug category is race / namespace isolation /
+  information disclosure. A wiphy can move netns between dumpit calls
+  via `NL80211_CMD_SET_WIPHY_NETNS`.
+- Step 2.4 Record: Fix quality is high: one predicate and clean error
+  return before taking `wiphy.mtx`. Regression risk is low; it only
+  rejects a continuation whose object no longer belongs to the caller’s
+  netns.
+
+**Phase 3: Git History**
+- Step 3.1 Record: Current checkout is shallow; `git blame` attributed
+  the region to a shallow boundary, so that blame is not reliable.
+  Pickaxe history found the continuation-by-global-wiphy-index pattern
+  in old history, including `c319d50bfcf67` (`nl80211: fix another
+  nl80211_fam.attrbuf race`), contained by `v3.11-rc6`. Netns support
+  for cfg80211/nl80211 was introduced by `463d018323851`, contained by
+  `v2.6.32-rc1`.
+- Step 3.2 Record: No `Fixes:` tag, so no tagged introducer to follow.
+- Step 3.3 Record: Fetched wireless history shows the candidate
+  immediately follows companion commit `15994bb0cbb8f` (`wifi: nl80211:
+  require CAP_NET_ADMIN over the target netns in SET_WIPHY_NETNS`). No
+  intermediate commit between them.
+- Step 3.4 Record: Author has only these two fetched wireless commits.
+  Committer is Johannes Berg, the nl80211/cfg80211 maintainer.
+- Step 3.5 Record: No compile dependency on the companion commit, but
+  logical/security context is stronger if `15994bb0cbb8f` is backported
+  too.
+
+**Phase 4: Mailing List / External Research**
+- Step 4.1 Record: `b4 dig -c 79240f3f6d766...` found the v3 patch at
+  the provided `patch.msgid.link` URL. `b4 dig -a` found v1 and v3; `b4
+  am` showed v1, v2, v3. v3 cover says no code changes since v2 and that
+  Johannes review caused comment/trailer cleanup.
+- Step 4.2 Record: `b4 dig -w` shows Johannes Berg, `linux-wireless`,
+  and `linux-kernel` were included.
+- Step 4.3 Record: No syzbot/bugzilla report. The series cover and patch
+  body provide the bug explanation and patch 1 includes a mac80211_hwsim
+  reproducer for the related `SET_WIPHY_NETNS` privilege path.
+- Step 4.4 Record: This is patch 2/2 in a series. Patch 1 hardens
+  target-netns capability checks; patch 2 fixes dump continuation
+  filtering.
+- Step 4.5 Record: Lore WebFetch was blocked by Anubis; WebSearch did
+  not find stable-specific discussion.
+
+**Phase 5: Code Semantic Analysis**
+- Step 5.1 Record: Modified function is `nl80211_prepare_wdev_dump()`.
+- Step 5.2 Record: Exact callers are `nl80211_dump_station()`,
+  `nl80211_dump_mpath()`, `nl80211_dump_mpp()`, `nl80211_dump_scan()`,
+  and `nl80211_dump_survey()`.
+- Step 5.3 Record: Key callees are `__cfg80211_wdev_from_attrs()`,
+  `wiphy_idx_to_wiphy()`, `wiphy_net()`, `sock_net()`, `net_eq()`,
+  `wiphy_to_rdev()`, and list walk over `wiphy.wdev_list`.
+- Step 5.4 Record: `NL80211_CMD_GET_SCAN` maps to `nl80211_dump_scan()`
+  and has no admin flag in the ops entry; `NL80211_CMD_SET_WIPHY_NETNS`
+  maps to `nl80211_wiphy_netns()` with `GENL_UNS_ADMIN_PERM`.
+- Step 5.5 Record: Similar dump paths `nl80211_dump_wiphy()` and
+  `nl80211_dump_interface()` already filter by `net_eq(wiphy_net(...),
+  sock_net(skb->sk))` each iteration.
+
+**Phase 6: Stable Tree Analysis**
+- Step 6.1 Record: The affected continuation code exists in checked tags
+  `v6.19`, `v6.18`, `v6.12`, `v6.6`, `v6.1`, `v5.15`, `v5.10`, `v5.4`,
+  `v4.19`, and `v4.14`.
+- Step 6.2 Record: Modern stable trees have the same helper shape. Older
+  trees such as `v5.4` and `v4.14` have different function
+  signatures/locking, so they may need small backport adjustment.
+- Step 6.3 Record: Searches in checked stable tags did not find this
+  candidate or the companion commit already present.
+
+**Phase 7: Subsystem Context**
+- Step 7.1 Record: Subsystem is wireless cfg80211/nl80211, an important
+  networking control-plane subsystem.
+- Step 7.2 Record: `net/wireless/nl80211.c` is actively maintained;
+  fetched wireless history shows this series was taken through Johannes
+  Berg’s wireless tree.
+
+**Phase 8: Impact / Risk**
+- Step 8.1 Record: Affected users are systems using wireless devices
+  with nl80211 netns movement support, including delegated/container
+  wireless setups and mac80211_hwsim.
+- Step 8.2 Record: Trigger requires a multi-call dump and a wiphy netns
+  move between invocations. The related series verifies an unprivileged
+  userns path when the caller has a delegated `WIPHY_FLAG_NETNS_OK`
+  wiphy.
+- Step 8.3 Record: Failure mode is namespace isolation breach / cross-
+  netns scan-result exposure, not a crash. Severity: HIGH due
+  security/isolation impact.
+- Step 8.4 Record: Benefit is high for isolation correctness; risk is
+  very low because the patch adds one local validation and returns an
+  existing error code.
+
+**Phase 9: Final Synthesis**
+- Step 9.1 Record: Evidence for backporting: real namespace isolation
+  bug, old code present across stable trees, small surgical fix,
+  maintainer-applied, aligns with existing dump filtering. Evidence
+  against: companion patch should also be considered, and older trees
+  may require minor backport edits. Unresolved: no independent `Tested-
+  by`; stable-specific lore discussion could not be fetched.
+- Step 9.2 Record: Stable rules: obviously correct yes; fixes real bug
+  yes; important issue yes due namespace isolation/security; small and
+  contained yes; no new API/feature yes; applies cleanly or with minor
+  adjustment depending on tree.
+- Step 9.3 Record: No exception category applies.
+- Step 9.4 Record: Backport is warranted, preferably together with
+  `15994bb0cbb8f` for the complete netns hardening series.
+
+## Verification
+- Phase 1: Parsed `git show 79240f3f6d766...` and b4 v3 patch text;
+  verified tags and commit body.
+- Phase 2: Verified diff is one hunk in `nl80211_prepare_wdev_dump()`
+  with 12 insertions.
+- Phase 3: Ran `git blame`, pickaxe history, `git show` for
+  `c319d50bfcf67`, `463d018323851`, companion `15994bb0cbb8f`, and
+  fetched wireless history.
+- Phase 4: Ran `b4 dig`, `b4 dig -a`, `b4 dig -w`, `b4 am` for v1/v2/v3,
+  saved/read mbox; WebFetch to lore was blocked by Anubis.
+- Phase 5: Verified callers and relevant ops entries in
+  `net/wireless/nl80211.c`.
+- Phase 6: Used `git grep` across stable tags to confirm affected code
+  exists and checked stable logs for absence of the candidate.
+- Phase 8: Severity is based on verified patch text plus code paths; no
+  build or runtime test was run.
+
+**YES**
+
+ net/wireless/nl80211.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index b94231c8441c4..ce3121b1c3319 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -1146,6 +1146,18 @@ static int nl80211_prepare_wdev_dump(struct netlink_callback *cb,
+ 			rtnl_unlock();
+ 			return -ENODEV;
+ 		}
++
++		/*
++		 * The first invocation validated the wdev's netns against
++		 * the caller via __cfg80211_wdev_from_attrs(). The wiphy
++		 * may have moved netns between dumpit invocations (via
++		 * NL80211_CMD_SET_WIPHY_NETNS), so re-check here.
++		 */
++		if (!net_eq(wiphy_net(wiphy), sock_net(cb->skb->sk))) {
++			rtnl_unlock();
++			return -ENODEV;
++		}
++
+ 		*rdev = wiphy_to_rdev(wiphy);
+ 		*wdev = NULL;
+ 
+-- 
+2.53.0
+
 
