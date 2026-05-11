@@ -1,243 +1,170 @@
-Return-Path: <netdev+bounces-286472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286473-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EOKINOB/AWqkbQEAu9opvQ
-	(envelope-from <netdev+bounces-286472-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:06:08 +0200
+	id mBV/GUuBAWqebgEAu9opvQ
+	(envelope-from <netdev+bounces-286473-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:12:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51E2D508DBA
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:06:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF330508EBB
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:12:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AF624301750B
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:02:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 20015301ECE3
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78F8230DED0;
-	Mon, 11 May 2026 07:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MQE66NPj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F29E03101B2;
+	Mon, 11 May 2026 07:11:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f74.google.com (mail-vs1-f74.google.com [209.85.217.74])
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA65330C62E
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 07:02:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A3430C62E
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 07:11:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778482972; cv=none; b=pDy9wE6SKfqBjM32yIC0Dp8sJhL2Z/Db34P/O+o6VrcORliLc9zlMHB66Nm6WQT8jAn1gBYIT8SzRwtjN89mxYeXWR28jMQZRX5mIGarMvqrK4P8LoffwO7kFNKM2jcTPoiX3vRicOLcMPBtEGTOwOtmdUfiN6EIFNCU3hDqy6U=
+	t=1778483493; cv=none; b=FQs0cqV5SFsuFIy93BNz5OL9187E9Scm8McIt2/rJg7QJvdTrM4oN0uQNJ0fRmENImQH/XUvLp7SYBbVIvHDW0ohiyPz9RHT2RYpG3/3uQEU6q2cORP8VzzkPGRK0auFljuZTPTJjn+if3scGs/c3lWgdfG+z2Nmqenj1074410=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778482972; c=relaxed/simple;
-	bh=Ch5/B4rT94h5k8/2yZE7pgcAeyUIqOXwNgF4XaeWrng=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=VtgNiRhGqfdW4HGjrsLkjxDpKcP1wmcVciyKdzAAYmZoLYkEXdzfQ9fIY8xSCX6vdOMqoYjC1sHlqyVFJ/GeaHmruTngdPb5daXhk0d2+3PCamCz/dOeqWTfC76PP8ssfxWttPs6tpznfGQ3TKtDS7JxChFiKVDN8bggChN4phM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MQE66NPj; arc=none smtp.client-ip=209.85.217.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-vs1-f74.google.com with SMTP id ada2fe7eead31-6333021c63fso1123752137.2
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 00:02:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778482970; x=1779087770; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=3sGtaunMrhU4W4AhyR5JREDg4vVNc14dY6L9nQ8yW3s=;
-        b=MQE66NPjnO5JuOY0wZS0F7K34rzo211/9emXD3u68xuLU/ZQpns1IGE5YkICGBA99V
-         D1oINRGLYAMCnHlmPH1fNB1nCD+xwYYNyA7muK47sL1Dnxu1Bq83qzrbnk1lDi+0umpR
-         oz9lucCO+vamghg0ZooskjlV7nyndi/7p3Zfq57zn+1fYZVulAZCJKfHGM2O01fpaabx
-         lfljhNFFi5Gr7ssEQyEay3vrWKQN5xQxcYxcOzfWtsUMCuJjcX1NX4rH8CUdU2DbYNK0
-         D/wQIGBgxSDOIEZnmB+dVpVHrj3LQWdgSFwFgl7/bRidQlDcvpwKlfMDpFBkCgERCBrN
-         gwiw==
+	s=arc-20240116; t=1778483493; c=relaxed/simple;
+	bh=O0Um4gJrLPGzHaxOQVL384l150E1rq+F8gd24MkfhgM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OgMKvYXRnMlw70JER6h9/pp8Ro1yT6TcYgVCUNlNxPwQtiJg/g8UI0rs+AjN8Bb4AWCsEeYaI7riWn4KliHMAnFrT+nPHPd62/dh4rCiUY20ZtJlkjM2ahK9HL2/aXBJCZtPhEO82szMpzrzT4cTUVpDzAYLayLI85RFcjnBSgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-57513733658so1169588e0c.3
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 00:11:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778482970; x=1779087770;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3sGtaunMrhU4W4AhyR5JREDg4vVNc14dY6L9nQ8yW3s=;
-        b=Om/vbxfzSqv5d2UV/i0OsEK7LnFxH767bgHexLip5RGFCq9q3YAkyDFMiyT/8a7/TG
-         I+vd8PMG1Hxwz3dhsOKz3PQb5JBWL6omY385RYA1d0EIiho/t3Kv4owu274fat0BtPcV
-         dc14OEChTshIT+ZpgG89won1+EmGthqbfwuxrbr8NshhFFWDWpqSKFrm2UlT6xiEwgN+
-         nfG8YqdMVeAKSB1d1kusSY4s+NBL/5IXBtdUi0LSAw+/mxzbFpcQBUPuzels9wt9nhM7
-         +FeWRtNrLvY1+niSRitbEYkX/eKkRVYRi2plVzBhw3XdIBijreQEw71q13Yd3pt9u395
-         EMDQ==
-X-Forwarded-Encrypted: i=1; AFNElJ96jEUZDqHwzhiKOqbOeGV3mr0yZw/8YTzJ1qD4uh44pBB4KnPGAkBPq6xQRmO/2Lnq0Yweogk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0ZaIdhKFJrVFCbkPd4EebbYs75XREWzn2Ivx7CJMqdP0SmSAs
-	6OE0zWCXHbGSwRkBr52aOKZZTR3h0fZlhmZTmrXM82PoaSUnbMwVZiLGbP2DGfjDwPQW1zz8yD0
-	PW+WFvsJ5ZIeCZQ==
-X-Received: from uaax25-n2.prod.google.com ([2002:a05:6130:84d9:20b0:95d:2d4e:1839])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6102:84d5:20b0:631:3bbb:f25f with SMTP id ada2fe7eead31-6313bbbfecdmr4288580137.15.1778482969597;
- Mon, 11 May 2026 00:02:49 -0700 (PDT)
-Date: Mon, 11 May 2026 07:02:44 +0000
+        d=1e100.net; s=20251104; t=1778483492; x=1779088292;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=kRYUpsuhYWuz84JGxnlH83ZqNH3dWqhHNFOtz4SaUPQ=;
+        b=s9xnRTJsTO9/OIRlM1yR1mQ7v4iJrZTGgv+JE0JbUEuzJB2eEHFcPHi2He1Pg4WWFB
+         ENohOG/tIPR902yqg4fDQ1EPqXD4C07XjkG5um85YCJuFRVIUCNFYsOCryp1a5CeVRwr
+         RHaXgmekNskZk/vBFokxcXRV/2EIDdTY5Xgm2TZ2Nzxk3s1471S1/WzPuxJVkm4fd3iH
+         GkTDBA0UU5+4ss0tAnFKBY6CxRLrFQ1DpvWhsEG0JPkf/Fo2Q2NFgiANNbDgeYr5Dy57
+         7asiy7r+qcLAskHxe99hUmsIKeW+MvBUg6DtGhPMLnc0cX3DZN1MJDXrkB/Gg6s6gHsX
+         vCmw==
+X-Forwarded-Encrypted: i=1; AFNElJ9s11lqClZi+kY9/awG9MJn13h3ifbGxaQG7UxZylG/0/SATwiNRdChxCLAMXmo/ndl65ptbhI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoW5vTHigoWT/yzktiqlsy/JwErZI3Mndj7wqRDC36rhJB3ZGM
+	Yt6wPXvbsJPWUuFwwSZmRIAB0fZtB8RSZ4DYoIU3RSre1+mdpxnCENgpzH1J02yF
+X-Gm-Gg: Acq92OGHmdLjNGQYD9dXnUVxNhsbZR2X6y9pC0Li6Tt53+QJoJHUiP1tA20e0ygQiVe
+	riPWmGO+5Ve94gwH0kai6MKqavcB7fECfPeEmmpn2AqU5RJapigrQfd1KdpkEG+SzCSlK4FVgOH
+	B4RLdYzrBiV5J0816VqB6lUJZGQnPCafImaFtr2Mrz8OzhXKsgLxycFkXKJOlosndUdkMHhHfZo
+	T4vSGniR4bClIMBEjhSg8rLyu+i6A0P2X1NnJn0k3K7ijaJLhimAp4+sXKcmOX/Vq37s67qrME5
+	zMvykc8Zjuk3cfU4ah233G+fFyRMQ9sSoSLYL0gwDuQObJRQu1misswB8Y4PE3yfp1h9vCDu1N3
+	PZR6RzHg7JJg4qw34Zn1R98PcK+7cxdbCsVgygIea00hLpix7l006+R9kpXnU7XBLFlh3YmwBya
+	BiHAIflSpLHWjf/by3ezsAnjQLoYhNhKlSVRHzo9ajk/cSG+oCQ+6KFZefWiT1o1Oa
+X-Received: by 2002:a05:6122:3784:b0:575:24b5:88e7 with SMTP id 71dfb90a1353d-575596afa83mr11664997e0c.11.1778483491631;
+        Mon, 11 May 2026 00:11:31 -0700 (PDT)
+Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com. [209.85.221.172])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-574a6ee065asm18397692e0c.15.2026.05.11.00.11.30
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 May 2026 00:11:30 -0700 (PDT)
+Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-5752b279662so1160868e0c.2
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 00:11:30 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ+o1oLXKjbBtFT/jGTcUSWflusmlQhPBp33a/aiWHneqZZq8qiv/TPoVD0/+PYx8r220n2nxEM=@vger.kernel.org
+X-Received: by 2002:a05:6122:e16b:b0:570:f670:587d with SMTP id
+ 71dfb90a1353d-575596f452bmr8339823e0c.12.1778483489786; Mon, 11 May 2026
+ 00:11:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
-Message-ID: <20260511070244.971028-1-edumazet@google.com>
-Subject: [PATCH v2 net-next] rtnetlink: add RTEXT_FILTER_NAME_ONLY support
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
+MIME-Version: 1.0
+References: <20260510103017.613773-1-niklas.soderlund+renesas@ragnatech.se>
+In-Reply-To: <20260510103017.613773-1-niklas.soderlund+renesas@ragnatech.se>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 11 May 2026 09:11:18 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdUKkP8gAsLFzV1Z98zxx60OLiR_-7=WuVeihWwd8J_aeA@mail.gmail.com>
+X-Gm-Features: AVHnY4KX4L2BgRpFKacIW6Wf2uX1AhP8UA3ovWs0KARjMtrfpefScdS90azHI1U
+Message-ID: <CAMuHMdUKkP8gAsLFzV1Z98zxx60OLiR_-7=WuVeihWwd8J_aeA@mail.gmail.com>
+Subject: Re: [next-next,v2] net: ethernet: ravb: Do not check URAM suspension
+ when WoL is active
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, netdev@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, Sai Krishna <saikrishnag@marvell.com>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 51E2D508DBA
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: BF330508EBB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-286473-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286472-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[linux-m68k.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.887];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[glider.be:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-iproute2 can spend considerable amount of time in ll_init_map()
-or ll_link_get() to dump verbose netdev attributes, contributing
-to RTNL pressure.
+Hi Niklas,
 
-Add RTEXT_FILTER_NAME_ONLY new flag so that rtnl_fill_ifinfo()
-limits its output to:
+On Sun, 10 May 2026 at 12:30, Niklas S=C3=B6derlund
+<niklas.soderlund+renesas@ragnatech.se> wrote:
+> When updating the driver to match latest datasheet to suspend access to
+> URAM when suspending DMA transfers a corner-case was missed, URAM access
+> will not be suspended if WoL is enabled. This lead to the error message
+> (correctly) being triggered as URAM access is not suspended even tho
+> it's requested as part of stopping DMA.
+>
+> Avoid checking if URAM access is suspended and printing the error
+> message if WoL is enabled when we suspend the system, as we know it will
+> not be.
+>
+> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Closes: https://lore.kernel.org/all/CAMuHMdWnjV%3DHGE1o08zLhUfTgOSene5fYx=
+1J5GG10mB%2BToq8qg@mail.gmail.com/
+> Fixes: 353d8e7989b6 ("net: ethernet: ravb: Suspend and resume the transmi=
+ssion flow")
+> Signed-off-by: Niklas S=C3=B6derlund <niklas.soderlund+renesas@ragnatech.=
+se>
+> Reviewed-by: Sai Krishna <saikrishnag@marvell.com>
+> Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-- struct nlmsghdr
-- IFLA_IFNAME
-- IFLA_PROP_LIST (alternate names)
+Thanks for the update!
 
-We can later avoid using RTNL when RTEXT_FILTER_NAME_ONLY
-is requested, as none of these attributes need RTNL.
+I wondered what changed...
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
----
-v2: use RTEXT_FILTER_NAME_ONLY instead of  RTEXT_FILTER_TERSE_DUMP (Jakub)
+v2:
+  - Add Reviewed-by, Tested-by.
 
- include/uapi/linux/rtnetlink.h |  1 +
- net/core/rtnetlink.c           | 31 ++++++++++++++++++++++---------
- 2 files changed, 23 insertions(+), 9 deletions(-)
+Gr{oetje,eeting}s,
 
-diff --git a/include/uapi/linux/rtnetlink.h b/include/uapi/linux/rtnetlink.h
-index dab9493c791b8465c6476990f42c4ee5ae82da2d..27265fd31e5fc99c312b42f3b1f072419b56ee0b 100644
---- a/include/uapi/linux/rtnetlink.h
-+++ b/include/uapi/linux/rtnetlink.h
-@@ -840,6 +840,7 @@ enum {
- #define RTEXT_FILTER_CFM_CONFIG	(1 << 5)
- #define RTEXT_FILTER_CFM_STATUS	(1 << 6)
- #define RTEXT_FILTER_MST	(1 << 7)
-+#define RTEXT_FILTER_NAME_ONLY	(1 << 8)
- 
- /* End of information exported to user level */
- 
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index df042da422ef3137ed67efaf8d243cc6b1fec6c7..70fde922b3718d753caf4874047d0b55ec649ef2 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -1295,7 +1295,12 @@ static noinline size_t if_nlmsg_size(const struct net_device *dev,
- 
- 	size = NLMSG_ALIGN(sizeof(struct ifinfomsg))
- 	       + nla_total_size(IFNAMSIZ) /* IFLA_IFNAME */
--	       + nla_total_size(IFALIASZ) /* IFLA_IFALIAS */
-+	       + rtnl_prop_list_size(dev);
-+
-+	if (ext_filter_mask & RTEXT_FILTER_NAME_ONLY)
-+		return size;
-+
-+	size += nla_total_size(IFALIASZ) /* IFLA_IFALIAS */
- 	       + nla_total_size(IFNAMSIZ) /* IFLA_QDISC */
- 	       + nla_total_size_64bit(sizeof(struct rtnl_link_ifmap))
- 	       + nla_total_size(MAX_ADDR_LEN) /* IFLA_ADDRESS */
-@@ -1342,7 +1347,6 @@ static noinline size_t if_nlmsg_size(const struct net_device *dev,
- 	       + nla_total_size(4)  /* IFLA_CARRIER_DOWN_COUNT */
- 	       + nla_total_size(4)  /* IFLA_MIN_MTU */
- 	       + nla_total_size(4)  /* IFLA_MAX_MTU */
--	       + rtnl_prop_list_size(dev)
- 	       + nla_total_size(MAX_ADDR_LEN) /* IFLA_PERM_ADDRESS */
- 	       + rtnl_devlink_port_size(dev)
- 	       + rtnl_dpll_pin_size(dev)
-@@ -1941,15 +1945,18 @@ static int rtnl_fill_alt_ifnames(struct sk_buff *skb,
- 	struct netdev_name_node *name_node;
- 	int count = 0;
- 
-+	rcu_read_lock();
- 	list_for_each_entry_rcu(name_node, &dev->name_node->list, list) {
--		if (nla_put_string(skb, IFLA_ALT_IFNAME, name_node->name))
-+		if (nla_put_string(skb, IFLA_ALT_IFNAME, name_node->name)) {
-+			rcu_read_unlock();
- 			return -EMSGSIZE;
-+		}
- 		count++;
- 	}
-+	rcu_read_unlock();
- 	return count;
- }
- 
--/* RCU protected. */
- static int rtnl_fill_prop_list(struct sk_buff *skb,
- 			       const struct net_device *dev)
- {
-@@ -2072,13 +2079,20 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
- 	ifm->ifi_flags = netif_get_flags(dev);
- 	ifm->ifi_change = change;
- 
--	if (tgt_netnsid >= 0 && nla_put_s32(skb, IFLA_TARGET_NETNSID, tgt_netnsid))
--		goto nla_put_failure;
--
- 	netdev_copy_name(dev, devname);
- 	if (nla_put_string(skb, IFLA_IFNAME, devname))
- 		goto nla_put_failure;
- 
-+	if (rtnl_fill_prop_list(skb, dev))
-+		goto nla_put_failure;
-+
-+	if (ext_filter_mask & RTEXT_FILTER_NAME_ONLY)
-+		goto end;
-+
-+	if (tgt_netnsid >= 0 &&
-+	    nla_put_s32(skb, IFLA_TARGET_NETNSID, tgt_netnsid))
-+		goto nla_put_failure;
-+
- 	if (nla_put_u32(skb, IFLA_TXQLEN, READ_ONCE(dev->tx_queue_len)) ||
- 	    nla_put_u8(skb, IFLA_OPERSTATE,
- 		       netif_running(dev) ? READ_ONCE(dev->operstate) :
-@@ -2191,8 +2205,6 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
- 		goto nla_put_failure_rcu;
- 	if (rtnl_fill_link_ifmap(skb, dev))
- 		goto nla_put_failure_rcu;
--	if (rtnl_fill_prop_list(skb, dev))
--		goto nla_put_failure_rcu;
- 	rcu_read_unlock();
- 
- 	if (dev->dev.parent &&
-@@ -2211,6 +2223,7 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
- 	if (rtnl_fill_dpll_pin(skb, dev))
- 		goto nla_put_failure;
- 
-+end:
- 	nlmsg_end(skb, nlh);
- 	return 0;
- 
--- 
-2.54.0.563.g4f69b47b94-goog
+                        Geert
 
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
