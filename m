@@ -1,307 +1,270 @@
-Return-Path: <netdev+bounces-286436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286437-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CMMSJ9pMAWqnUAEAu9opvQ
-	(envelope-from <netdev+bounces-286436-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 05:28:26 +0200
+	id ypu4EwZOAWr5UQEAu9opvQ
+	(envelope-from <netdev+bounces-286437-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 05:33:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24CBF5079D8
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 05:28:25 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFCE9507A32
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 05:33:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 04C023008761
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 03:28:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0E8933007662
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 03:33:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D263376BC5;
-	Mon, 11 May 2026 03:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0840836CE14;
+	Mon, 11 May 2026 03:33:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="boGCTIn2"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="k4MWLbJG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011036.outbound.protection.outlook.com [40.107.130.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C72225A38;
-	Mon, 11 May 2026 03:28:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778470101; cv=none; b=t4bPiFy0onrsDh+Nn/fISztxNiqeZM0zcOW03qiWlp+Ahobpjeobtgy1bI1BTlq3hjgAnuymmRKo/xLVTjC+UC7OmKuVVy7F3nuO/tA+vpeYPmcswJqToi0ow+ET8AH6OlWG4JxgVthHUwfdpJiHnfo0k+yQLCdr7yZyWlOZLdc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778470101; c=relaxed/simple;
-	bh=cHa9TF65XKgAtaZwJgStkMjB54mwmKRj3/3OaDXHyEo=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oDT62ICdU/xI9/eAkyB1yWKOFy18y58cydUmV3XsLbHlhGuqFZcLYu7hJ+wqTMnWYZLvYSU3AM0D/b6b/9A6iqjFn+wW3RCQTbj2B0c3RXuWjO3CeNZMvKSFkFZhQJg8pl6EarNWUFvMU/H/8jJk0KLoVwFgpYPN0aYj49iW0RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=boGCTIn2; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64ANCPT22550148;
-	Sun, 10 May 2026 20:27:59 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=kIBFiOeKUUS7hhydWEbQV1KAc
-	v9hj4RTFo4FZIhv4eg=; b=boGCTIn2+4Q8dzUWc/cSC/Mz7UGAKbUjRwvSRZwBi
-	4uKg3z/B1IqyTtdhrXBQhysuVVcEkU/Y/GL1jtMQ2RPvZJvF3szLOEnQbhPaNra0
-	okPKsgawp/SVilp8wL52+VxjdpqcliyTPIFLvBOGbebRWs+LLxZ0aSAjVS50kfTZ
-	9w617aV94jwFy251YorEpiD7ynI708gnn+8rK3Ne/mHv1HtkhE63KycroU8ucsmj
-	Bo5lwpkozv6IW3t5eJmsTamw18q6y8Vn/BPoqF/B5RPz1wAuaydY2JwQJlZEdH7a
-	VF7jzO5Z5JWVoUsAdiHjwqsCU/EA71LlfFYwNuo9WEOWQ==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4e24ejaxav-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 10 May 2026 20:27:58 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Sun, 10 May 2026 20:27:57 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Sun, 10 May 2026 20:27:57 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 056163F708E;
-	Sun, 10 May 2026 20:27:48 -0700 (PDT)
-Date: Mon, 11 May 2026 08:57:47 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <intel-wired-lan@lists.osuosl.org>, <linux-kernel@vger.kernel.org>,
-        <linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <oss-drivers@corigine.com>
-CC: <akiyano@amazon.com>, <andrew+netdev@lunn.ch>,
-        <anthony.l.nguyen@intel.com>, <arkadiusz.kubalewski@intel.com>,
-        <brett.creeley@amd.com>, <darinzon@amazon.com>, <davem@davemloft.net>,
-        <donald.hunter@gmail.com>, <edumazet@google.com>, <horms@kernel.org>,
-        <idosch@nvidia.com>, <ivecera@redhat.com>, <jiri@resnulli.us>,
-        <kuba@kernel.org>, <leon@kernel.org>, <mbloch@nvidia.com>,
-        <michael.chan@broadcom.com>, <pabeni@redhat.com>,
-        <pavan.chebbi@broadcom.com>, <petrm@nvidia.com>,
-        <Prathosh.Satish@microchip.com>, <przemyslaw.kitszel@intel.com>,
-        <saeedm@nvidia.com>, <sgoutham@marvell.com>, <tariqt@nvidia.com>,
-        <vadim.fedorenko@linux.dev>
-Subject: Re: [PATCH v12 net-next 7/9] octeontx2-af: npc: Support for custom
- KPU profile from filesystem
-Message-ID: <agFMs01f5aH63EDV@rkannoth-OptiPlex-7090>
-References: <20260508034912.4082520-1-rkannoth@marvell.com>
- <20260508034912.4082520-8-rkannoth@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 790761E0B9C;
+	Mon, 11 May 2026 03:33:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.36
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778470402; cv=fail; b=cG2VUxHJUv5TsCqSo3ZpIX+zbN5qZ0haQU9vIq9KlujWGyO2SkN+Jn3QPeW05y5ZQjg42TKvkE4iHybfiWvlLFPI6BweaBumP+aJJxxXeI++6k4/WQAzz5IkaKe00Hefkg+4hZKGZnWbr0+36bdrxYINmGqNopmVBhfoyvej+hA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778470402; c=relaxed/simple;
+	bh=jrCOX66ASyzT4E0NmRJL4DXGgPBEXoBb7sQm2jj59C0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=JcRIHAUMCHpGq9v3qAURLcZ8iKRwTHz6hb+ije26247r9XLliKiD0DoUE1Omo08YEYPcBFMaGMYVik1a1z1XQk4RbuYzfXjVP03rni2H9q3ZOGsUHGlDhff+mgl+MytP09TiOIXJhopOa/9MiMZstAH1H2W9c12wOK3wxHCcqlw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=k4MWLbJG; arc=fail smtp.client-ip=40.107.130.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=LqlUZSoTbhVJ90e+cHSuOo18WftLtK45S3jUBjAgmHIygMt6KY2KacvaGmNWmWSbLsyOHhg2crKJDYYL6xI3CsKmzn1JffCudMD4R+5FKdL6SgPdlv+aIgKNvp9RQ3i/MUUjtNn0eMfz6m/fd5ZfzVEJwdhbdj0cdPF0xZWMEAHIejHUppW09fey+aBvCPM4dYmIDbsvvynnVjWZEWlv45y+oLJkAftqH+9s8Km4qzk+DxBMHOSmZ6ev04jbERbjtoqw1WUrf0ngqeyzAA04h647HsFy17nhJ7pboFRsGZw+TARidtPWyEj/pQCZVCV8xEUOS/hVtOZrZ3xhEPk89g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xoCwGTuZ5izd4dV8zT3hbqZgDUVP/sWXJeV0G0dmAj4=;
+ b=X5Tu7qd1+HG6ESd1mkvF0uTMThCIso1wKfSihH7sfXUe5ir284D4RkNHl4g0QBG5ES8LzUiwd/TnOgvdostQwNViRGdOUXGsZEgLQe/prfRaSXAAoaJQLUQlqq8J7Pk6Lp2ay/mjizbPtziroNvPV4zzRZ419SuU9y4Ex1LbiAzshi972CPeoCteQvQl5Qa9lRHMc06d4+r50UNK9mzWg8LWyyTIuE3lnJtwEVHtWkaOBAQ9c05HBysS7VzVQIUxoceqxGh7sPMpb7y/+SSVRuPbLtknAObCS19fioLlECy8iTR4qck33uCSNrLQ6s1giQSW9V1pNHcT4HM93khW1w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xoCwGTuZ5izd4dV8zT3hbqZgDUVP/sWXJeV0G0dmAj4=;
+ b=k4MWLbJG91QVzkgU00uwFS1Woy2yMyUFpXuE74XkCQfc9exgWEsxstAs/p8Gjrj+76W6skUUOCidLZ1xzu7GLAOWRp6yVtvZuvg4CUOEL7NwfV8dHI0w7L+mALD/EqnSslYXHW2mYJid9cH3SHSPnieLteLpZlF/1glCPfc8r4tOomc6hzlqkBp90w0N0BYrl5WPCw4cseaT4CkOBvqUKFSmkGhJFqa4s3uy6MySohrbeMu1+0CohDWT12M9kZutEJqHmJSeMQMsrneCRyFkBVznoUIiaoTEnzsHF35E22w3oBheZcjB+oorw2XEwBXFeSHVXgPRPJ13D8vVchnpSA==
+Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
+ by AM9PR04MB8857.eurprd04.prod.outlook.com (2603:10a6:20b:408::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Mon, 11 May
+ 2026 03:33:18 +0000
+Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
+ ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
+ ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.20.9891.021; Mon, 11 May 2026
+ 03:33:18 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: "sashiko@lists.linux.dev" <sashiko@lists.linux.dev>
+CC: "imx@lists.linux.dev" <imx@lists.linux.dev>, "conor+dt@kernel.org"
+	<conor+dt@kernel.org>, "Frank.Li@kernel.org" <Frank.Li@kernel.org>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "robh@kernel.org"
+	<robh@kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	Networking <netdev@vger.kernel.org>
+Subject: RE: [PATCH v6 net-next 02/15] dt-bindings: net: dsa: add NETC switch
+Thread-Topic: [PATCH v6 net-next 02/15] dt-bindings: net: dsa: add NETC switch
+Thread-Index: AQHc355/3TS9YPjPiUaiT3oExn+47bYHFdiAgAEW7JA=
+Date: Mon, 11 May 2026 03:33:18 +0000
+Message-ID:
+ <DBBPR04MB7500661393F2BEFE98A0363B88382@DBBPR04MB7500.eurprd04.prod.outlook.com>
+References: <20260509102954.4116624-3-wei.fang@nxp.com>
+ <20260510104832.7061EC2BCB8@smtp.kernel.org>
+In-Reply-To: <20260510104832.7061EC2BCB8@smtp.kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DBBPR04MB7500:EE_|AM9PR04MB8857:EE_
+x-ms-office365-filtering-correlation-id: 40037c0b-b2d8-4ee4-e141-08deaf0e0b27
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|19092799006|366016|376014|1800799024|18002099003|56012099003|22082099003|3023799003|38070700021;
+x-microsoft-antispam-message-info:
+ 0XxKFJz8hl/53YH0dl1FvCyCgUo+NFJdBLdakZTctobguGd2Dl7T6gBr5EezMjyLzNU5ZLoyMiLIPnlmrR0pdy2DJzsqRwY1GugIyi1e0N5fcYUbIZS/nEzlslmWN3gmkawxElM70o7/HB9YvqvYpq5lyRaXieNj5k6TcwGxLVXXCafB06CLPXx5mp51EOwN9WS5zPmTQ9oyukUug+3TApu5mf7tuu9Pg4ATn6fbEAHEzfxDV8C544QlIsD6G6zfUaq8uiiZWBjQty8cmsqH7ZBMJW5lpVm+Zz/RYTaDVvXCbOQBC9m21CMWBU6+mIxrqKT9bii3pr0pB5K3ijQiTIbxPNB8D61/65UuJw7JmNtmR5yQDQWVBZvpghPhvWELi19gI6vTVMxpSeLCO3n/SnjAxNU6pdnobfGOuPAhEzBIy5IJaGo+Yl+bBr4Dz6YM+GHsQMJFzo2WUpYZm42MOZuaCl997xrpXU7+HKVIzzkkrjBdu10SyfUKgyFm85agAyzz02s3yNfIbqi4fzHH7VB190jvKBlCPjEjJGbLVsZ8mtMh7whory5z2/vDrHz2vKTILFQVk3l9EDg3GkLahWYRjkxZcWbdOG5ND/sjkE0g9nUPJgjsyv/h4SfgTKrrz85T6VuD2RRwbmIWfWc7wJxrQq0qIwLPpCGPMvDf+W53l1yKtaZjry5PKShhphOmkuZKFUbFGIYdUtK7LMAywbeJOu2mm/K/qrK9Oy0AbwKZPgs2u6XtpbmpDf3DGe7s
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(366016)(376014)(1800799024)(18002099003)(56012099003)(22082099003)(3023799003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?6/pNI+kHqchUh2/AG3URL1bxZLE6JSK3khNGXfqVICCxUhAcnODGjfyiGvAm?=
+ =?us-ascii?Q?Ce8I2Fh7MM848P039b9ITXgtqn8ocmv3bIEhGagxTzfeQjuYvoO9KiPKTnhq?=
+ =?us-ascii?Q?xX049N42UAhUL1+UOQnBGPlrSSIG/rS+9tPUIFGRwqqfi+5F0WUjh5Tyf44W?=
+ =?us-ascii?Q?ZnrYFkDCjJ40slWp26NY/2GyMqhhc+xESUGQfn7tg2wSP6om+dDeTcR32s4h?=
+ =?us-ascii?Q?omNEBtIpUrmO5qHHP7YMaTqeDTzoC7YCa8iC8YraejfE81xtJrZnFaEZg4gl?=
+ =?us-ascii?Q?iArc/jgaS/wXaWuOaQO8fpRwh7+GyHDoR7nJ8KwjjCMdlK1Fk7h1usmDtUQm?=
+ =?us-ascii?Q?i6N79/4jJDiim6/cQZ6coT+HFA+uqVLxbdteur+s7A0azmkNQ2KzbudD4Mid?=
+ =?us-ascii?Q?eGb7ENPad/R5Jr6e5jcih8gnDav+qYSXCarLscSB/Cl0Ap7d+6yi4ykwrVKi?=
+ =?us-ascii?Q?cB6HikBSwvNTsjOyP0aGZfrMe9LjEpF3IbJxJniT3kYk19FYUlba2a9G3YK/?=
+ =?us-ascii?Q?htNnBJPpmhLk1FXBTwJ95KQx9dc9YWOyyv3+ulCDsxtSKnDXXD7RkNa4fiwK?=
+ =?us-ascii?Q?Chh50sk9Zkaraw3dVPN1QSyOlZ6+/ZLfX9JVXYm1FwSaaJQt8SkQaE6S+I7e?=
+ =?us-ascii?Q?s2TLmwq8S0TDMXsXUvh52AAkDFKRFhKwejr1uVe9EHXzHogWZzRJ3fG/pt/+?=
+ =?us-ascii?Q?cm3JDnTipDtt7JAvdhKRgMlnE0LkrD+UFMBcJQTa5QLACMr+DBdBkRbrnK0g?=
+ =?us-ascii?Q?r6APSOMJpWyJQmTANTGdX86VfIpMyAsLZbDI+eKaviPIPj0oQYhvnjyoIQ/o?=
+ =?us-ascii?Q?XdKTsPSdFAOgjZ/5JecKoO0/0N4S7i5ZSHBH4SSkfYar1eApMlBDD3kvXjvX?=
+ =?us-ascii?Q?RDUHR5QWQfZE/0HRUVaJhNivCpe6AYkPhsQs4afrUA5hwMhbMQovQHgIJTcX?=
+ =?us-ascii?Q?+7wSEFfgsV1mkdNVBB/T49E/smqPVKlJgV3+ACx4XquUChyL8VCbXFhjC/P9?=
+ =?us-ascii?Q?3nqBfyfrXVwGvW4UJ9gVvYy/nsbodBge1nbLN5yil+oBMxQAVMyEoh/G5D2Q?=
+ =?us-ascii?Q?h1wSP2/wGk3ANUDZskdeFPu4Ql6gZEtaxanUgXf9fuG11d/o16XNG/2d4JVO?=
+ =?us-ascii?Q?WrRlcr4l5KgmoIl1VBwPWBGZKMqACbLy+xmlmknAUT6GGuFenXIEkT6T/CXr?=
+ =?us-ascii?Q?5ztssti4P4oraroaLJpve4zQxy7sdG3F+OF/fbUZBe3LB5o8oBAv9IrJjulQ?=
+ =?us-ascii?Q?rctlAyEJLbiSSmWFGEKbhteD2Imlx8IF9LbtEh3h/ZOx3r2AeVkw3ZXhpj4r?=
+ =?us-ascii?Q?5HpP+M+KCDYIcOYzcg6dXHQMN6Jl2SwxLXR90Zt1ER2X53bhfUtEEE75Qwey?=
+ =?us-ascii?Q?iSfCCWn57cFJIiIMLp12Y2bOITd6udVZohkK9eH9k64MRgwj5dSY4UCbh6gF?=
+ =?us-ascii?Q?qU9zFCxKedGpyhYrBdyJUVBcgs88QJZMo9h3fwp7rW5hS4W4Fs35Bhp0togn?=
+ =?us-ascii?Q?1FLkIAnu3Rci+tX4/Oec1N8yfEsaFqYxfqyF2IiLwlHwLbC4pxdxYQswQ3Hf?=
+ =?us-ascii?Q?jv61HeYR3RxrbwglMoG31xSp8uVnKMXBVGli0vnrjvnFjLLFWNmrbN2w8eGG?=
+ =?us-ascii?Q?FPXM43MeBABaFoEBZtiwgwyk/I70AtSSAX8xYUMRdBWj6GZsi82kX4qOnJgQ?=
+ =?us-ascii?Q?G0HDCivf47l68bo0lLvjz6UNcAtaopkFldMVBUFgvAf2Y6SW?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260508034912.4082520-8-rkannoth@marvell.com>
-X-Authority-Analysis: v=2.4 cv=c5qbhx9l c=1 sm=1 tr=0 ts=6a014cbf cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=QXcCYyLzdtTjyudCfB6f:22 a=M5GUcnROAAAA:8
- a=pzlqSEyjIBYPxFa5tP8A:9 a=CjuIK1q_8ugA:10 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: 5zUb3tE70VDA888__w3jEbooMCjDESuG
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTExMDAzNCBTYWx0ZWRfX4zqZUKG7sEZ5
- VwxTwAKmk3mCTcwm8FCmC8eQVDJoXYT41elcVNjSAdCLE+tvSA1XPyHuqTtd2zZd69AGFIEX6ad
- eUw9PumK48KRcpo+m3gf66csewn3gTshUFg/S1tGTfcaBCXK/eVoGZLFBBep3inbm+X1EdjZtz+
- FlpyO/Mu3WahLs+f9+SXsm59QomD4zzNhC2u3UmCVriCSb4oQfB72amMbG+Hk/qwIbSwig99I/G
- T//0+YP6xu2ISajPNepaXSu1IrF7GG7v8sVaqu1M3aG8AqocVQxi7hfkvfax2ykx1eDNCvFat9I
- lxMBZvtS0ZtoxMgIt9AvUSYzO2j/64mXkuHrS+AtrIoFec418CvODqpFSeibA8qV7eaTwqcyTu2
- WiDea2sthonz7MnwGJK/LxcDrh4Ca1BntZJuk/Krz2rvdt36nYcgtqWu3b0mSG8nPQWvltFRIwQ
- 0GC5hHB3HEoSmPWjQ4Q==
-X-Proofpoint-GUID: 5zUb3tE70VDA888__w3jEbooMCjDESuG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-11_01,2026-05-08_02,2025-10-01_01
-X-Rspamd-Queue-Id: 24CBF5079D8
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 40037c0b-b2d8-4ee4-e141-08deaf0e0b27
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 May 2026 03:33:18.4358
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: eV5MGTzSvmSTNXZR1QwE0+4zPxTSCHHhgh5uk66+Lfndoj5pHy6mypaoSUJ+48AmpkhEj5JnHMnfAT/R3qa+5g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8857
+X-Rspamd-Queue-Id: AFCE9507A32
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[amazon.com,lunn.ch,intel.com,amd.com,davemloft.net,gmail.com,google.com,kernel.org,nvidia.com,redhat.com,resnulli.us,broadcom.com,microchip.com,marvell.com,linux.dev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,marvell.com:email,marvell.com:dkim];
+	TAGGED_FROM(0.00)[bounces-286437-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286436-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[DBBPR04MB7500.eurprd04.prod.outlook.com:mid,nxp.com:email,nxp.com:dkim,0.0.0.1:email]
 X-Rspamd-Action: no action
 
-On 2026-05-08 at 09:19:10, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
-> Flashing updated firmware on deployed devices is cumbersome. Provide a
-> mechanism to load a custom KPU (Key Parse Unit) profile directly from
-> the filesystem at module load time.
->
-> When the rvu_af module is loaded with the kpu_profile parameter, the
-> specified profile is read from /lib/firmware/kpu and programmed into
-> the KPU registers. Add npc_kpu_profile_cam2 for the extended cam format
-> used by filesystem-loaded profiles and support ptype/ptype_mask in
+> Thank you for your contribution! Sashiko AI review found 2 potential issu=
+e(s) to
+> consider:
+> - [Low] The `dsa,member` property lacks validation constraints for the sw=
+itch
+> index.
+> - [Low] The `patternProperties` regex for ethernet ports is overly restri=
+ctive and
+> diverges from standard DSA bindings.
+> --
+>=20
+> commit 8c698895982ff77d4bd027af7fa3d21f57f09eba
+> Author: Wei Fang <wei.fang@nxp.com>
+>=20
+> dt-bindings: net: dsa: add NETC switch
+>=20
+> This commit adds the device tree bindings for the NETC switch. It is a PC=
+Ie
+> function of the NETC IP that supports advanced QoS and TSN capabilities. =
+The
+> switch connects to an internal ENETC port via a light-weight pseudo MAC.
+>=20
+> > diff --git a/Documentation/devicetree/bindings/net/dsa/nxp,netc-switch.=
+yaml
+> b/Documentation/devicetree/bindings/net/dsa/nxp,netc-switch.yaml
+> > new file mode 100644
+> > index 0000000000000..988688bf4467d
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/dsa/nxp,netc-switch.yaml
+>=20
+> [ ... ]
+>=20
+> > +  reg:
+> > +    maxItems: 1
+> > +
+> > +  dsa,member:
+> > +    description: >
+> > +      The property indicates DSA cluster and switch index. For NETC sw=
+itch,
+> > +      the valid range of the switch index is 1 ~ 7, the index is refle=
+cted
+> > +      in the switch tag as an indication of the switch ID where the fr=
+ame
+> > +      originated. The value 0 is reserved for ENETC VEPA switch, whose=
+ ID
+> > +      is hardwired to zero.
+>=20
+> The description mentions that the valid range of the switch index is 1 to=
+ 7
+> and that 0 is reserved, but there do not appear to be any constraints
+> enforcing this restriction in the schema definition.
+>=20
+> Should an items array constraint be added here with a minimum of 1 and
+> maximum of 7 for the second element to ensure invalid configurations like
+> <0 0> are caught during schema validation?
 
-pw-bot: changes-requested
+I have added the check in the driver, I can add the following the check in
+next version if no more comments.
 
->>  } __packed;
->>
->> +struct npc_kpu_profile_cam2 {
->> +	u8 state;
->> +	u8 state_mask;
->> +	u16 dp0;
->> +	u16 dp0_mask;
->> +	u16 dp1;
->> +	u16 dp1_mask;
->> +	u16 dp2;
->> +	u16 dp2_mask;
->Since the firmware image is little-endian, should these fields be defined as
->__le16?
->When they are accessed as host-order integers without le16_to_cpu() conversion,
->will this lead to incorrect packet parsing rules and silent data corruption on
->big-endian architectures?
+  dsa,member:
+    description: >
+      The property indicates DSA cluster and switch index. For NETC switch,
+      the valid range of the switch index is 1 ~ 7, the index is reflected
+      in the switch tag as an indication of the switch ID where the frame
+      originated. The value 0 is reserved for ENETC VEPA switch, whose ID
+      is hardwired to zero.
+    items:
+      - true
+      - minimum: 1
+       maximum: 7
 
-The current KPU profile loading infrastructure is architecturally
-coupled to a little-endian firmware format. While I acknowledge that
-defining these members as u16 instead of __le16 introduces a
-potential risk of silent data corruption on big-endian hosts, the
-existing OcteonTX2 driver stack is currently for
-little-endian operation to match the native hardware and firmware
-ecosystem.
+>=20
+> > +
+> > +  ethernet-ports:
+> > +    type: object
+> > +    patternProperties:
+> > +      "^ethernet-port@[0-9a-f]$":
+>=20
+> Is this regex intentionally more restrictive than the standard DSA bindin=
+gs?
+>=20
 
-Implementing full endian-neutrality for the KPU profile involves a
-deep refactoring of the firmware parser and associated hardware
-abstraction layers. Given that current deployments are exclusively
-little-endian, I propose addressing host-endianness portability as a
-comprehensive enhancement in a future net-next series. This ensures
-that endian safety is addressed systematically across the entire
-driver rather than being localized to this
+'ethernet-ports' for new bindings. See https://lore.kernel.org/imx/20260408=
+134331.GA1954185-robh@kernel.org/
 
->> -static int npc_apply_custom_kpu(struct rvu *rvu,
->> -				struct npc_kpu_profile_adapter *profile)
->> +static int npc_alloc_kpu_cam2_n_action2(struct rvu *rvu, int kpu_num,
->> +					int num_entries)
->> +{
->> +	struct npc_kpu_profile_adapter *adapter = &rvu->kpu;
->> +	struct npc_kpu_profile *kpu;
->> +
->> +	kpu = &adapter->kpu[kpu_num];
->> +
->> +	kpu->cam2 = devm_kcalloc(rvu->dev, num_entries,
->> +				 sizeof(*kpu->cam2), GFP_KERNEL);
->> +	if (!kpu->cam2)
->> +		return -ENOMEM;
->> +
->> +	kpu->action2 = devm_kcalloc(rvu->dev, num_entries,
->> +				    sizeof(*kpu->action2), GFP_KERNEL);
->Will this cause data corruption and a use-after-free across devices?
->In npc_prepare_default_kpu(), the device's profile->kpu pointer is initialized
->to point to the statically defined npc_kpu_profiles global array.
->Here, we are assigning device-scoped devm_kcalloc memory directly into this
->globally shared array. If multiple RVU devices probe concurrently, they might
->data-race on this shared state. Additionally, upon device unbind, devres will
->free the memory, leaving dangling pointers in the global array.
+> The standard DSA schema in dsa.yaml allows ^(ethernet-)?port@[0-9a-f]+$.
+> Because this binding sets unevaluatedProperties to false for the
+> ethernet-ports node, if a device tree author uses the standard port@1
+> naming convention, the binding will reject it.
+>=20
+> Additionally, the single hex digit restriction would prevent port numbers
+> from exceeding 15. Could this be aligned with the standard pattern?
 
-No. There is only one AF device and one LF for NPC. So mutluple proble of RVU af device is not
-possible.
+Currently, the i.MX94 NETC switch only has 4 ports, a single hex digit is
+enough, and this is consistent with the definition in dsa.yaml. please
+ignore this warning.
 
-> +	fw = rvu->kpu_fwdata;
->> +
->> +	for (kpu = 0; kpu < fw->kpus; kpu++) {
->> +		if (rvu->kpu_fwdata_sz < hdr_sz + offset) {
->> +			dev_warn(rvu->dev,
->> +				 "Profile size mismatch on KPU%i parsing\n",
->> +				 kpu + 1);
->> +			return -EINVAL;
->> +		}
->> +
->> +		fw_kpu = (struct npc_kpu_fwdata *)(fw->data + offset);
->> +		if (fw_kpu->entries > KPU_MAX_CST_ENT)
->> +			dev_warn(rvu->dev,
->> +				 "Too many custom entries on KPU%d: %d > %d\n",
->> +				 kpu, fw_kpu->entries, KPU_MAX_CST_ENT);
->> +		entries = min_t(int, fw_kpu->entries, KPU_MAX_CST_ENT);
->> +		cam = (struct npc_kpu_profile_cam *)fw_kpu->data;
->> +		offset += sizeof(*fw_kpu) + fw_kpu->entries * sizeof(*cam);
->Is there a missing bounds check here for negative values?
->Since fw_kpu->entries is read as a signed int, a malicious firmware blob
->providing a negative value (e.g., -1) could cause the offset calculation to
->underflow the unsigned size_t offset.
->This would wrap the offset backwards, allowing the boundary check
->(rvu->kpu_fwdata_sz < hdr_sz + offset) to incorrectly pass in the next
->iteration, resulting in an out-of-bounds access.
-ACK. Added a check to check if fw_kpu->entries < 0 and return error.
-
->> +	/* Binary blob contains ikpu actions entries at start of data[0] */
->> +	profile->ikpu2 = devm_kcalloc(rvu->dev, 1,
->> +				      sizeof(ikpu_action_entries),
->> +				      GFP_KERNEL);
->> +	if (!profile->ikpu2)
->> +		return -ENOMEM;
->> +
->> +	action = (struct npc_kpu_profile_action *)(fw->data + offset);
->> +
->> +	if (rvu->kpu_fwdata_sz < hdr_sz + sizeof(ikpu_action_entries))
->> +		return -EINVAL;
->> +
->> +	/* The firmware layout does dependent on the internal size of
->> +	 * ikpu_action_entries.
->> +	 */
->> +	memcpy((void *)profile->ikpu2, action, sizeof(ikpu_action_entries));
->> +	offset += sizeof(ikpu_action_entries);
->Will this create a fragile firmware ABI coupled to the internal kernel
->structure size?
->Because ikpu_action_entries is a kernel-internal static array, its size
->depends on the number of port kinds (NPC_MAX_PKIND) defined in the specific
->kernel version compiling it.
->If future kernel versions add elements to this array, the parser will expect a
->larger initial block than the firmware file actually provides. This would
->misalign all subsequent read offsets, causing the driver to interpret garbage
->memory.
-I agree that number of ikpu entries is not part of the structure. We dont want to
-add a field and break legacy ABI. Here assumption is that ikpu section entries match
-number of hardware ikpu entries.
-
->	strcat(path, kpu_profile);
->> +
->> +	if (request_firmware_direct(&fw, path, rvu->dev))
->> +		return -ENOENT;
->> +
->> +	dev_info(rvu->dev, "Loading KPU profile from filesystem: %s\n",
->> +		 path);
->> +
->> +	rvu->kpu_fwdata = fw->data;
->> +	rvu->kpu_fwdata_sz = fw->size;
->> +
->> +	ret = npc_apply_custom_kpu(rvu, profile, true, &fw_kpus);
->> +	release_firmware(fw);
->> +	rvu->kpu_fwdata = NULL;
->> +
->> +	if (ret) {
->> +		rvu->kpu_fwdata_sz = 0;
->> +		dev_err(rvu->dev,
->> +			"Loading KPU profile from filesystem failed\n");
->> +		return ret;
->> +	}
->> +
->> +	rvu->kpu.kpus = fw_kpus;
->> +	profile->kpus = fw_kpus;
->Does this truncate the hardware programming loop in npc_parser_profile_init()?
->By explicitly updating profile->kpus to fw_kpus, the hardware programming loop
->will only configure up to fw_kpus. Since all KPUs are disabled at the beginning
->of npc_parser_profile_init(), the remaining hardware KPUs will be left
->completely disabled, breaking network parsing for traffic reliant on default
->KPU logic.
-BInary blob contains all entries fow all kpu hw entries. There is no partial loading as in
-fw binary loading.
-
-> npc_config_kpucam when profile->from_fs is set.
 
