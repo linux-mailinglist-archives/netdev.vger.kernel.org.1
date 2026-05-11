@@ -1,253 +1,154 @@
-Return-Path: <netdev+bounces-286493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286494-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6NpWBMmEAWoFcAEAu9opvQ
-	(envelope-from <netdev+bounces-286493-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:27:05 +0200
+	id uDqmJVOFAWoFcAEAu9opvQ
+	(envelope-from <netdev+bounces-286494-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:29:23 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 685AE509282
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:27:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C7155092FB
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:29:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 247D63043FCC
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:23:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C91E53008D12
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:25:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8F653803CF;
-	Mon, 11 May 2026 07:23:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54D43806DD;
+	Mon, 11 May 2026 07:25:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ikRnaWO0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NPML3s4s"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7487737FF5B;
-	Mon, 11 May 2026 07:23:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778484204; cv=none; b=etkbS8pxUFnpEiEupAToJVGAtmzesZUGTB8SCR7HXxy3WlBwpfJQmh4MzBS1yYeTHi572iukwGmGLK1PrJdJiD7AWcTeJFjf5yjCbXkhg9HOttvvhs/TEiFxzyw5GB/fikWPWhmZlf1bUztE5/5YumHuohOHr0qbrguttZpGihI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778484204; c=relaxed/simple;
-	bh=FLleedy4XprnQ2/qy5ozrIuF85QAQgtIg7eu0TkJUCM=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oDpiFM3tx9V323bEbZTxyqwre9w09Ji2mM6p7YWTTL7Gs5T2wdYPEmx3ux8B0POkEubEIH2fHKqzUrlvEGlq1I3ePWTtQ3+JD8MW1vUbNWUWhejOe5FwgcLScRO/Y/owiLMRgZB0zowaUuCSIB19Io8CvEs2JCRPELNK+VRI0IE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ikRnaWO0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72579C2BCFC;
-	Mon, 11 May 2026 07:23:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778484204;
-	bh=FLleedy4XprnQ2/qy5ozrIuF85QAQgtIg7eu0TkJUCM=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=ikRnaWO0z1oYLdG1KRcjj2liQEqp4twC4mz0D2NH1WE6pjUJ5TPDCflcXT+PNum9l
-	 FazMXXSbLqgMJKddoijGnAi7OO1w9qpaqRKR5rNbz5M0bLnU6BsTQKMcWOpAYRYbCq
-	 6Ck2+f4bKkLx8dRWhnIGhhmWWoKTGgERf8o5SmG/XL/rfC8Bk2QuKTp7o2Dt7MKi0J
-	 mQyg8gvCVLAQE+P08fwZAMC/ltm9+smcueQf02p6qX9emQ3MI1YiRqz/J28Eo9hglz
-	 Pwrk9C+RKaSlXX7vV95dmH1oD1Htdi2UhxM2uqVFZNVIZlLyCHeRmLSVJaxPasvSxp
-	 GyZDOb4oIy2IQ==
-From: Allison Henderson <achender@kernel.org>
-To: netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	achender@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	shuah@kernel.org
-Subject: [PATCH net-next v1 9/9] selftests: rds: Add ROCE support to run.sh
-Date: Mon, 11 May 2026 00:23:16 -0700
-Message-Id: <20260511072316.1174045-10-achender@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260511072316.1174045-1-achender@kernel.org>
-References: <20260511072316.1174045-1-achender@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873743806CC
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 07:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778484341; cv=pass; b=N19WzdkOOhGrrLgvVHvF7h/VYChd4+zflh/0+Yx8qTj9fMno4aM8zoBgyl/R3DLldXpFm78LospbY5OPzkprz1DhLCVIYM0o2hdKF0JZaDEAKXDS9h30lmMHMNJM2wDg3THkZ+GvEtOTXCrx6qHCIikAACV9aAa/rW+a535wP6A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778484341; c=relaxed/simple;
+	bh=PQwD9dRhs58dJrRipsFaoUlSpPVF9+UKi8x1xHDFYEM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oSn8LmyVr2y4D1H8Lzm73M2Hz6yayzYljrgJJfrjAtvdoNlO2xsgO5/RWhqQHbgdSRyphMk5mqxJCaigJ6ZdttI7M270zQ8iT7Py5BDUSl3k8Q3oc2GcStUHjEjf6iZoJQFLjrzvSZ0Hcl0iPCGxoEI3UY1SDCoRijzNG9+31bE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NPML3s4s; arc=pass smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-43d75312379so3129171f8f.1
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 00:25:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778484339; cv=none;
+        d=google.com; s=arc-20240605;
+        b=SjIZWW7e/a0ENGU/XDgdLmO9m59qBCMMjrf75D79dEOwP3clC0NwW3gs2dizgLm1zA
+         P7odP7Vq+GUj+4oOBsUZ8JUQ8xckFutEsuoMATfUbEBD57Zau09yoh5tNd1G35dQ58AG
+         cItgn1QQvA9L/XYT2VoQcS4AqFrrIjkTTXmZFoTj/beM7a94rBE/W6lXAESXFCABd4eP
+         7smetXdz/yDUQPpkmQP6p7zpP0QPdba66P5SQ3qv+6Kpmdw2fvQeKOybFH8sFjckTJ/c
+         CbmhtCBgzmtmvvloL82SV9JuNCAe8YEgYaNNF/kHUawEwYvu5SbpspvocyG755hehIGZ
+         Kbuw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=PQwD9dRhs58dJrRipsFaoUlSpPVF9+UKi8x1xHDFYEM=;
+        fh=h6TBNQFSVTtNe0l5bQu4r4qk4rnrsBS0WdIcCplDnxg=;
+        b=hoQL2UZRSO+QSmxeExPNNmskEfubmo2YXg5+moMgJrbPOmFxIlLCiMMszXMJcY6YCO
+         44QDGJVlDeHh4cKHrQyf67mQzM+7tBuJqbZoF7QY9rOW0RAKn4uW0CC7iTYJsOCwRgAQ
+         /FhRsuxglI7XrJItL3JI3QNutmYVcMcHITiptXuCu4mYu76qhWbGwHNzYLrigZeGIqMi
+         76T+Yp6G9ooZrqYIl/hdvSIySQN0XPnZ5nG8DgRW4Psx6r9FBaPMpO2dLaGOp/6EiKSi
+         BCnGrgz3ZmX4C+xcpdHtofhiipGmVtsbUkWvdrPTDgMp5MBpzP+vCOYbcNAKkfvNKSD5
+         zPaA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778484339; x=1779089139; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=PQwD9dRhs58dJrRipsFaoUlSpPVF9+UKi8x1xHDFYEM=;
+        b=NPML3s4sRJNRRu3fYQ72m1lLadw/GQ6bD9dSoXhR6OMwPnfhNXctC/SpYy/lhN0Ik5
+         /0VBcY8iH264vz/IsKgG8o7ObDJTPEctcT3lnkSRthytbTog/l3u8bsaKimlPRxgg7Kj
+         3YhwnLQcVdkjOulTHUshT+gSBdeD0+Jzw2z6eDwrPyVZc8ZNqUqoR+DNYaGWR5RxMPYD
+         0fIgQmvQ3t9QSSU76crg+kip+X1R7NWUpQ6s7xddwIqKJbmFuaXjuaXZV5+ePJQLD9+6
+         5xqiMQnij6SFr3F6YIgiM8NSqkpSNk9g+rT9B/fl+h8RhBFNcvyMCgkDky+BGkPSpSYS
+         Y9cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778484339; x=1779089139;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PQwD9dRhs58dJrRipsFaoUlSpPVF9+UKi8x1xHDFYEM=;
+        b=cyUBlumJ00b3KE4xWFA6yW/2nm578iwRKsyQpz7v4hpHf+z3mb4cdXBkjFRZ4Psg0S
+         18tcv3P/57r/2w0yS2G+GkKURYwgEqDHB1XE6Xk6Ff/VPQ/GJW33BkdrUVMGDJc1l7tI
+         SPp2uHaqBtk1iomXBfF33jEif9tcBx2NrOEw1XkYAMPBfuVRHhXyJWtOgmxaB/uNpoOC
+         5sTEvMLFB4bUD1e1heo5jpKCJQUvrg62bamr86oNU7sJzr/MzeYNV/3R52fkhGQdCzox
+         hP154lP/W2FHokId9ekv2Iyk+Ielpr0MUp7QQvWrRBjVS7Q369p2W6sZmD5xWZzaD07u
+         PR3Q==
+X-Gm-Message-State: AOJu0Yw5dEiDjQICANqC1qBtPkwDp0jKjS/C23o4WNbMVaDE6+hINTOX
+	gHN/NEcHc+Q5k6EX7jucZt0kViGtVd2/5CJ6fXXacwN9G3a+8NHwxfVeJF7xvUnsVSdfiCP3YTD
+	O0smZgHz0UvmhxwZ/mvj4jyZu00YxpgE=
+X-Gm-Gg: Acq92OF/fbZyHhQEK1SOvC3Redk6CDhd5QY2tuVQTy//1qSwCQuvVUG11tlFIkZu9WH
+	jxWaeeZ5sNumjOtpyuTczU0Y38DFMC7ikPigNgbta8XKqQLoc6E8oiqOJDTz0c0mqBqe59g2nVX
+	QlbcJai4IcS7RpUMdQ4vFzuoijJbeYqOOMDHUY68ZPmar5qkDlFRKzanYX69KUoOBv7C5axdqAi
+	hOIdngxlC5nWVl5c7yJQKzJQsiNe6BMBk4ZYf9UAWcrmrxeS8FKeYn9OWKrZQ0xymuLC0CXCMMA
+	nPdzxySQRiRkq7Y4zA==
+X-Received: by 2002:a05:6000:440b:b0:454:454a:4cd5 with SMTP id
+ ffacd0b85a97d-454455992dbmr12988733f8f.6.1778484338651; Mon, 11 May 2026
+ 00:25:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 685AE509282
+References: <20260428110713.2550315-2-maoyixie.tju@gmail.com>
+ <20260430011847.2344915-1-kuba@kernel.org> <CAHPEe=HG6k9mr5iggK52NRgozWYBpo1F_wQEys1=mMpFGumWRQ@mail.gmail.com>
+In-Reply-To: <CAHPEe=HG6k9mr5iggK52NRgozWYBpo1F_wQEys1=mMpFGumWRQ@mail.gmail.com>
+From: Maoyi Xie <maoyixie.tju@gmail.com>
+Date: Mon, 11 May 2026 15:25:27 +0800
+X-Gm-Features: AVHnY4In82RJGgKW0uqty_Of68MhEZ7XWtCzihq1jE-ZkgV2sNBGhfRgOw10zJg
+Message-ID: <CAHPEe=GQAWhGa2TqAhbxD4shmtO8M-+6FAwZfUiubqf1dhfvcw@mail.gmail.com>
+Subject: Re: [PATCH net 1/2] ip6: vti: Use ip6_tnl.net in vti6_changelink().
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, kuniyu@google.com, shaw.leon@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	dsahern@kernel.org, kuznet@ms2.inr.ac.ru, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 0C7155092FB
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-286494-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286493-lists,netdev=lfdr.de];
-	URIBL_MULTI_FAIL(0.00)[sea.lore.kernel.org:server fail,config.sh:server fail,run.sh:server fail];
-	TO_DN_NONE(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.999];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,gmail.com,davemloft.net,redhat.com,kernel.org,ms2.inr.ac.ru];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[run.sh:url,config.sh:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-This patch adds support for testing rds rdma over ROCE.  A new
--r flag is added to config.sh which enables the required kernel
-configs for rdma.  We also add a -T flag to run.sh, which takes
-a transport option, tcp or rdma.  The rdma option will check to
-ensure the proper configs have been enabled. The flag is then
-passed to test.py, which will run the test over the specified
-transport(s)
+Hi Jakub, Kuniyuki,
 
-Signed-off-by: Allison Henderson <achender@kernel.org>
----
- tools/testing/selftests/net/rds/config.sh | 15 ++++++-
- tools/testing/selftests/net/rds/run.sh    | 51 ++++++++++++++++++++++-
- 2 files changed, 62 insertions(+), 4 deletions(-)
+A short ping on the vti6_siocdevprivate site I described below.
+Would you prefer me to send a separate follow-up patch for that
+path, or will it be folded into v2 of the series? Either is fine.
 
-diff --git a/tools/testing/selftests/net/rds/config.sh b/tools/testing/selftests/net/rds/config.sh
-index 29a79314dd60..be0668359a07 100755
---- a/tools/testing/selftests/net/rds/config.sh
-+++ b/tools/testing/selftests/net/rds/config.sh
-@@ -10,7 +10,8 @@ CONF_FILE=""
- FLAGS=()
- 
- GENERATE_GCOV_REPORT=0
--while getopts "gc:" opt; do
-+ENABLE_RDMA=0
-+while getopts "gc:r" opt; do
-   case ${opt} in
-     g)
-       GENERATE_GCOV_REPORT=1
-@@ -18,8 +19,11 @@ while getopts "gc:" opt; do
-     c)
-       CONF_FILE=$OPTARG
-       ;;
-+    r)
-+      ENABLE_RDMA=1
-+      ;;
-     :)
--      echo "USAGE: config.sh [-g] [-c config]"
-+      echo "USAGE: config.sh [-g] [-c config] [-r]"
-       exit 1
-       ;;
-     ?)
-@@ -58,3 +62,10 @@ scripts/config "${FLAGS[@]}" --enable CONFIG_VETH
- # simulate packet loss
- scripts/config "${FLAGS[@]}" --enable CONFIG_NET_SCH_NETEM
- 
-+if [ "$ENABLE_RDMA" -eq 1 ]; then
-+	# enable RDS over InfiniBand / RDMA (rds_rdma test)
-+	scripts/config "${FLAGS[@]}" --enable CONFIG_INFINIBAND
-+	scripts/config "${FLAGS[@]}" --enable CONFIG_INFINIBAND_ADDR_TRANS
-+	scripts/config "${FLAGS[@]}" --enable CONFIG_RDMA_RXE
-+	scripts/config "${FLAGS[@]}" --enable CONFIG_RDS_RDMA
-+fi
-diff --git a/tools/testing/selftests/net/rds/run.sh b/tools/testing/selftests/net/rds/run.sh
-index 424fd57401d8..3b69218014d9 100755
---- a/tools/testing/selftests/net/rds/run.sh
-+++ b/tools/testing/selftests/net/rds/run.sh
-@@ -101,6 +101,15 @@ check_conf_enabled() {
- 		exit 4
- 	fi
- }
-+
-+check_rdma_conf_enabled() {
-+	if ! grep -x "$1=y" "$kconfig" > /dev/null 2>&1; then
-+		echo "selftests: [SKIP] rdma transport requires $1 enabled"
-+		echo "To enable, run tools/testing/selftests/net/rds/config.sh -r and rebuild"
-+		exit 4
-+	fi
-+}
-+
- check_conf_disabled() {
- 	if grep -x "$1=y" "$kconfig" > /dev/null 2>&1; then
- 		echo "selftests: [SKIP] This test requires $1 disabled"
-@@ -117,6 +126,27 @@ check_conf() {
- 	check_conf_disabled CONFIG_MODULES
- }
- 
-+# Check kernel config and host environment for RDS-RDMA support.
-+# Exits with SKIP (4) if the user requested rdma but prerequisites
-+# are not met.
-+check_rdma_conf()
-+{
-+	case "$TRANSPORT" in
-+	  *rdma*) ;;
-+	  *) return ;;
-+	esac
-+
-+	# Kconfig will enforce CONFIG_INFINIBAND_* as dependencies
-+	# of CONFIG_RDMA_RXE
-+	check_rdma_conf_enabled CONFIG_RDMA_RXE
-+	check_rdma_conf_enabled CONFIG_RDS_RDMA
-+
-+	if ! which rdma > /dev/null 2>&1; then
-+		echo "selftests: [SKIP] rdma transport requires the 'rdma' tool (iproute2)"
-+		exit 4
-+	fi
-+}
-+
- check_env()
- {
- 	if ! test -d "$obj_dir"; then
-@@ -153,8 +183,10 @@ check_env()
- LOG_DIR="${RDS_LOG_DIR:-}"
- TIMEOUT=$timeout
- GENERATE_GCOV_REPORT=1
-+TRANSPORT=tcp
- FLAGS=()
--while getopts "d:l:c:u:t:" opt; do
-+
-+while getopts "d:l:c:u:t:T:" opt; do
-   case ${opt} in
-     d)
-       LOG_DIR=${OPTARG}
-@@ -171,9 +203,12 @@ while getopts "d:l:c:u:t:" opt; do
-     u)
-       FLAGS+=("-u" "${OPTARG}")
-       ;;
-+    T)
-+      TRANSPORT=${OPTARG}
-+      ;;
-     :)
-       echo "USAGE: run.sh [-d logdir] [-l packet_loss] [-c packet_corruption]" \
--           "[-u packet_duplicate] [-t timeout]"
-+           "[-u packet_duplicate] [-t timeout] [-T tcp[,rdma]]"
-       exit 1
-       ;;
-     ?)
-@@ -183,9 +218,21 @@ while getopts "d:l:c:u:t:" opt; do
-   esac
- done
- 
-+# Validate transport tokens
-+IFS=',' read -ra transports <<< "$TRANSPORT"
-+for t in "${transports[@]}"; do
-+    if [ "$t" != "tcp" ] && [ "$t" != "rdma" ]; then
-+        echo "run.sh: unknown transport '$t' (expected tcp or rdma)"
-+        exit 1
-+    fi
-+done
-+
-+FLAGS+=("--transport" "${TRANSPORT}")
-+
- check_env
- check_conf
- check_gcov_conf
-+check_rdma_conf
- 
- TRACE_CMD=()
- if [[ -n "$LOG_DIR" ]]; then
--- 
-2.25.1
-
+Thanks,
+Maoyi
 
