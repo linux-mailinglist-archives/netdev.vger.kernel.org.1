@@ -1,221 +1,186 @@
-Return-Path: <netdev+bounces-286826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286827-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kMT3K5pBAmp9pgEAu9opvQ
-	(envelope-from <netdev+bounces-286826-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 22:52:42 +0200
+	id 0ApUJiNEAmofpwEAu9opvQ
+	(envelope-from <netdev+bounces-286827-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 23:03:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3FE5516056
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 22:52:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 435A4516131
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 23:03:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id CE7F83008CA9
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 20:52:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 406223033D0E
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 21:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 354773B52FE;
-	Mon, 11 May 2026 20:52:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KNL95gjv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 454AE4BC001;
+	Mon, 11 May 2026 21:03:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3FB3B388B
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 20:52:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778532756; cv=pass; b=dfuwB3q7GiszGjT3tGa0bRgs1d5+C2LIFU8XFeDHdZXosq0EjbejLYvi1BdCrFcMrKVRwlSdars6je9rhs5CriUB8mVIAHCnFFSoJQJD/JbjsEYZ1TAc4KGQAOnipfLLbM+yxI52EidIiRvXVTt7xg6eoUYA7mS16KI5vj3rYLw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778532756; c=relaxed/simple;
-	bh=DiHWs1sOoiu2X3GZePgpXCTnujQDkMBn+jXMmT4E3Xo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ANRfcrQ6WoE0b7AGhFKl4gAIFF0PjpxPpPs481vxXdM/jDcRiUA0JnnQ2p/YDTL/IjcDm2nvYCQueSve3mN7CZNYSp2FnSf1ArGhW766/kIXkhTbWZ+S62qnelQ3nD/VTXIuE/VVZzIAS+YW0+YJQG9WCE0ss0J/BLh3MvexMdA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KNL95gjv; arc=pass smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE6D3C945B
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 21:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778533407; cv=none; b=nP1RTmnkho3x3yCX3LQQ/nGrdcv69OQ6Lau4/Wa53LMkBbjeBF9cm/7ikzbvT7mhckbJta8o9jr9Ezv1eAjBwRr3tHtBt6lQAHK7L50UQC91O3hfWkacJuM5bHCxG4OU6DsGqnfBMvH3dCRUCAbpXaY+uOYuGpYPeBZvbVq4OXk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778533407; c=relaxed/simple;
+	bh=+NPExyxgo8HU6B6S+16brBkL/23BFRjYZRCRMSCRDlY=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Kb+u4Q9MAd4iCYFcR3wkfLZmP12yA8SO1/oGlGWTxT/Xe5Qj9HKsQ4FwLSStn1fCjhfMlPUcvXzMhsDt47Km8Wxxhhu22m4A2Tcxuuxz9XJjidcSRmkLjKAprdIFYmtvasHw8X2KJsJpt7iM78JWXDdx8gGcrDJnlD7pcwkxwBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-83d31ac4017so1614560b3a.3
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 13:52:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778532754; cv=none;
-        d=google.com; s=arc-20240605;
-        b=OdhVUa2PzdPjji3vNnHPq2S+0zeQo+iFRL8cJ5EsPwaVJjPLsnevakLO0+gCOKhEr0
-         3NTjvyGjuyX2UeSUB1iJoIUdOnKSkLKPDlDxKmaO7NY2bG3LtBEMYjYwS3HL6l1UUDSN
-         UQIIlDqv5kpeJy/SrKYqtiys1/Sbd8Yzztftmk2zlW/4wKg4/kiMxGprdL8N36h8gRpM
-         Ih37AnDEYoF1eXl7WP68/mJIscs5szo36o+7d9gCp0CE9XjQqwnSO6ojdsFIM5pt44sa
-         mx/KgrU/FFD625qZGHWhCC+oavdEpHq5NmiTGDYveQVd5tx2ZWW6id2mZUNfo65kdOze
-         vlGQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=qb2D7VaeqYETPPxAqKFZu7rg55Sh46PbfZK/pmKKrP0=;
-        fh=l83zQuicL9+fKI005cJKIXCK14jvsyh+9kHYRD+hg1Q=;
-        b=JaBJG4RGuLT4jaayNabbmhrg1L/Cxe6IHo4ynOx2RVXpM8gkXhJzfJBr6FzsxETdP1
-         EB+aSHJcUNo5iHDeL4GIBSwGXFNbYWTmKHdBBpIbEZiV0rR36VwXphgKu9/rxhLl64aA
-         hgkiZq+n+ryOFXQfoSQauS1kXDWJtD/+GMmLZj3Ok7r8KdTQK1HVeut7sYARlk5PlLM+
-         nI+zJCf9nsf78m9He8G3kv/lCwlDMbVuocOqx7krlSy2vv3iDk31H4UTMytr45ga5VRe
-         YXuWBCmNGxxKhbE+npglFQn7tDO5bHJ6LjX7Dwt32VPaBHoU4JKUKOXWO1/IykrytUUF
-         /8/g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778532754; x=1779137554; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qb2D7VaeqYETPPxAqKFZu7rg55Sh46PbfZK/pmKKrP0=;
-        b=KNL95gjvbWQXoawbUCz0Gg17P/zErBroamUNEtu6ucAMcF6gXWEzMI4S4HvYKbMD3C
-         apml2UkN5+zj2Ld2qje12S7sXOjZ+h4j71Ou+M8aQ2Nyr7Kd0uU/zCt1ViL0jDNDYR3M
-         QmNYjkvu0JUlHXvJ00w3/HjCMo2ou/Ia8+dNmAs82qVSyI1wXd3a/CRMryd1GtoXhpSE
-         4hZabtcnSE3sG+G4lcuLorg3wrEb12Xk/l40QaTrI9/amqf9ilHLL6uu9hKPdFR9y9wf
-         TqMG3uJUqo+GhNihyFhpWnfEFmXOcrKNNowkVdKOwRe6wpn+M0AfK2iy7dVWZqADjle1
-         ExMg==
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4893940bb5eso29171465e9.3
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 14:03:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778532754; x=1779137554;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=qb2D7VaeqYETPPxAqKFZu7rg55Sh46PbfZK/pmKKrP0=;
-        b=CLQJG4t3MRex1zb0zPNoqa92BBHLMxQPYjqO8JgTI3SEHtGR8O+vgRnyoYv7QE8YDy
-         snoRsx/6M2cC4WMoguw2NEqoktvEqDBMe9kJnf0DYJpk/99jycHyjK1SDh3TapHXrC/L
-         IpbAMNQL4JbGZU/KMSjI5tXB9ibwygzFdYm0BN67EsbSslwrkBQ1xNWbAnWNxZQ83Wpb
-         h3oHKs1yoDXE0VIxasQWYYKqFWEgb5fjsU4q8DuJO04tfkeP4qkdzN856Sa/T3yipxpa
-         a5ZPVKMC6PYKwOrteZB4TMEAmbrBVWu2s+N5ncuFCy/c56maHbQdpDsCX9f8haBID6oB
-         jJ7g==
-X-Forwarded-Encrypted: i=1; AFNElJ9ewmysjMSldH4j2/pDgneJ829lC/AdxMbQG612rY0FGRH8W371EFCtQQXYuHYpv+6Az4S/EjI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlVM0iC6HmNkiVSYtoHWeUbWdQUxhUOGPnn3/7HckB55Kw0e5u
-	kgZ0DAslEXjt9YgaykWdLBSxwZu4hOcTz4gYBRklcQp/ztREXYNlQ5C3cOjL1yRkDxjeuLZ9BYw
-	A38GZiDHsIABmdBT1uyLZoHV6QCJm4P0=
-X-Gm-Gg: Acq92OEkyL04MJiU7dxXBqGQ8aXCitBHJWXEPn7RAvT5ty+QI3/dyVGZQhY0L869Flg
-	7HbtpluAIZd25ugv1+5h3YIxZ7G4IYB5aVSlAUzb8Si++Gujrc3kqCegzLrkhZck1TTI4mM9D+w
-	TI6t0HsdCTS/+6/Idee1onhIYz41QqPAI7llsdnZsp6FbIysii8vSaPH4PbaKruyl+H2IrSZnw2
-	TGKgiqfDOkYE0QVnCDPcuJtPK9N1gbEby94eylImmQlDOz5l2O9AbNx63oMlN2dNDwY3GaVXpTG
-	zIv+ZrMC1UVPODCkPVD79Sl/h7bj4IxXqR5Zimph9s41vKCeXGoJYQa8JBFuAYrE6whHDR/+Vv3
-	s1XOBF5inPJ0TkLip0oKUMnnIzYrbmeHUI7Iur5dW
-X-Received: by 2002:a05:6a00:1bc9:b0:82c:d7c4:4c5c with SMTP id
- d2e1a72fcca58-83a5bae02b6mr23896094b3a.20.1778532754053; Mon, 11 May 2026
- 13:52:34 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1778533404; x=1779138204;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jz3M0PDIssZI97ILfGYCglTutVrokgfI2vbgfWrvds4=;
+        b=IplofirTlsNFxUW3UaE/KLNMXlQGQHUMWZteTfIA81Jg6ZvF7Ju8h5dv+xmG2Q7d1Q
+         zDb4hziFEA2tqYPjlKyCKAA52vT48s3eeW5DW1OQ+dcb1qQPt39z3+/65wo3Tq5DIUcU
+         gJ2UVms6BO0rwFAt+e9S9DV5wSE2v8TCf4BqlphImJFZGJLibUpc+Af85sT355RM2zeN
+         Vs8Op3aGVd8j7q74IrC6ykC++pHa/oI8Ux24bvKGnZkSPQ9oaneP8yflM3w4jieUeTAP
+         462LQu6fADsVaMrEQQl3dz9q1l4y3/nEOCJlgpvXjnUMIBrysTujV3sfS/25+vLCRvV5
+         L9sA==
+X-Forwarded-Encrypted: i=1; AFNElJ8hG/Dw8k/vC+XtlR2wC2ilBsWqdPtMCs29kROXoqSYFQkNdJSVZQO+Cw7cDfBuk15fKU+EWJ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznbAtN0qSZxyX3b1ohk6c3r5plYCPyxsBb4khbQb1TEVRzBLxp
+	ROZyOt/T1/9Pm774yEJk2xHxHC5QFBf0XJaaWDW7/BDUCmrVH2GI7lIX
+X-Gm-Gg: Acq92OEZTl6pnN9F7kB+ttGReOPdmJCCAp+D/bo8dTR1vlQuZ4DWQsL/7Cvn+44SRiR
+	NX5JtbPAW5QuLKIYjx4BiEI0IYsIaA4nkoRt1ek+/KET8vjhmPpxVFXir5mHUd3az6AcFD7UAh8
+	zA1PrblOibz4pCD2AsOEyNqy0K+A6UYRLDqsK+n2jxmorXB/+QlB5ahZItBRjZaJnIgc7RMStLD
+	02+5992Fq2FUPdCwpPQaFvbZAE7lQMI/wcfoxUVDU7IrSLzBMTYxgcejD754Lx25nxfnSq717CD
+	J7eCcYpvbdg8K20kDCXK+t2/70sR5nMIak7rLlhI5IBXB5B+DiD2R7EHLc2+Dbe9RsUlPyzqG0/
+	iGOGY9+mZQk2ww5yDBFokPHkSnwLZb2WFvmu0lGWwnxtWr/T4TF1Vx1o3uOwA7C/l4TeJ3PIW1s
+	SjwNoQsF6Xlj8n5uDyxkrngTuLlMz2pRCzytwIfKedgVNFyy6sA4pyBHxXyZMqETO70g6JoLAv3
+	mE=
+X-Received: by 2002:a05:600c:8b62:b0:47e:e2eb:bc22 with SMTP id 5b1f17b1804b1-48e6748afe8mr234131845e9.5.1778533403812;
+        Mon, 11 May 2026 14:03:23 -0700 (PDT)
+Received: from ?IPV6:2a0a:ef40:96b:a101:6f5c:d416:bfa6:dfbd? ([2a0a:ef40:96b:a101:6f5c:d416:bfa6:dfbd])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e8f4389a6sm2225605e9.22.2026.05.11.14.03.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 May 2026 14:03:23 -0700 (PDT)
+Message-ID: <3bfcf406-fdde-4303-9bd6-0d8d21ddba37@linux.win>
+Date: Mon, 11 May 2026 22:03:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260508001455.3137-1-joycathacker@gmail.com> <CADvbK_fOduqbZSx7xefbDhDi+=eLmgN8k=Bm+J0tRDrFj6ZYmQ@mail.gmail.com>
- <20260508182044.55b567c1@kernel.org>
-In-Reply-To: <20260508182044.55b567c1@kernel.org>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Mon, 11 May 2026 16:52:21 -0400
-X-Gm-Features: AVHnY4K-4oufZ5Bh_ouYXMsrGsz6Jdk671TfT3bU5bBuK9XkaMlt9GEU6bPpSL8
-Message-ID: <CADvbK_f0hTB5rsjNO7Mkg69KqTF2QmCKHNH__JCwS5LtfPgRLg@mail.gmail.com>
-Subject: Re: [PATCH net] sctp: revalidate list cursor after
- sctp_sendmsg_to_asoc() in SCTP_SENDALL
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: joycathacker@gmail.com, marcelo.leitner@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
-	linux-sctp@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, security@kernel.org, 
-	Ben Morris <bmorris@anthropic.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: B3FE5516056
+User-Agent: Mozilla Thunderbird
+From: Ignat Korchagin <ignat@linux.win>
+Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
+To: Eric Biggers <ebiggers@kernel.org>, Kamran Khan <kz@inspirated.com>
+Cc: Jeff Barnes <jeffbarnes@linux.microsoft.com>,
+ Andy Lutomirski <luto@amacapital.net>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Linus Torvalds <torvalds@linux-foundation.org>
+References: <CALCETrVqG+1yErRJjkxvJrf=A+Vu84HTR4Bx1Pcd8G1C0PJcMA@mail.gmail.com>
+ <14A441D8-5370-44BE-8732-99BF8107C3FD@getmailspring.com>
+ <0b8bba44-f6bb-4d69-b9d4-5787c276d41a@inspirated.com>
+ <20260510163204.GA2279@sol>
+Content-Language: en-GB
+In-Reply-To: <20260510163204.GA2279@sol>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 435A4516131
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+X-Spamd-Result: default: False [-1.46 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286826-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,vger.kernel.org,anthropic.com];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286827-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[linux.win];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid,anthropic.com:email,sashiko.dev:url]
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ignat@linux.win,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.995];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	R_DKIM_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Fri, May 8, 2026 at 9:20=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Fri, 8 May 2026 16:35:21 -0400 Xin Long wrote:
-> > On Thu, May 7, 2026 at 8:15=E2=80=AFPM <joycathacker@gmail.com> wrote:
-> > >
-> > > From: Ben Morris <bmorris@anthropic.com>
-> > >
-> > > The SCTP_SENDALL path in sctp_sendmsg() iterates ep->asocs with
-> > > list_for_each_entry_safe(), which caches the next entry in @tmp befor=
-e
-> > > the loop body runs.  The body calls sctp_sendmsg_to_asoc(), which may
-> > > drop the socket lock inside sctp_wait_for_sndbuf().
-> > >
-> > > While the lock is dropped, another thread can SCTP_SOCKOPT_PEELOFF th=
-e
-> > > association cached in @tmp, migrating it to a new endpoint via
-> > > sctp_sock_migrate() (list_del_init() + list_add_tail() to
-> > > newep->asocs), and optionally close the new socket which frees the
-> > > association via kfree_rcu().  The cached @tmp can also be freed by a
-> > > network ABORT for that association, processed in softirq while the
-> > > lock is dropped.
-> > >
-> > > sctp_wait_for_sndbuf() revalidates @asoc (the current entry) on re-lo=
-ck
-> > > via the "sk !=3D asoc->base.sk" and "asoc->base.dead" checks, but not=
-hing
-> > > revalidates @tmp.  After a successful return, the iterator advances t=
-o
-> > > the stale @tmp, yielding either a use-after-free (if the peeled socke=
-t
-> > > was closed) or a list-walk onto the new endpoint's list head (type
-> > > confusion of &newep->asocs as a struct sctp_association *).
-> > >
-> > > Both are reachable from CapEff=3D0; the type-confusion path gives
-> > > controlled indirect call via the outqueue.sched->init_sid pointer.
-> > >
-> > > Fix by re-deriving @tmp from @asoc after sctp_sendmsg_to_asoc()
-> > > returns.  @asoc is known to still be on ep->asocs at that point: the
-> > > only callers that list_del an association from ep->asocs are
-> > > sctp_association_free() (which sets asoc->base.dead) and
-> > > sctp_assoc_migrate() (which changes asoc->base.sk), and
-> > > sctp_wait_for_sndbuf() checks both under the lock before any
-> > > successful return; a tripped check propagates as err < 0 and the loop
-> > > bails before the re-derive.
-> > >
-> > > The SCTP_ABORT path in sctp_sendmsg_check_sflags() returns 0 and the
-> > > loop hits 'continue' before sctp_sendmsg_to_asoc() is ever called, so
-> > > the @tmp cached by list_for_each_entry_safe() still covers the
-> > > lock-held free that ba59fb027307 ("sctp: walk the list of asoc
-> > > safely") was added for.
-> > >
-> > > Fixes: 4910280503f3 ("sctp: add support for snd flag SCTP_SENDALL pro=
-cess in sendmsg")
-> > > Cc: stable@vger.kernel.org
-> > > Assisted-by: claude:mythos
-> > > Signed-off-by: Ben Morris <bmorris@anthropic.com>
-> >
-> > Acked-by: Xin Long <lucien.xin@gmail.com>
->
-> FWIW sashiko says there's more?
->
-> https://sashiko.dev/#/patchset/20260508001455.3137-1-joycathacker%40gmail=
-.com
+On 10/05/2026 17:32, Eric Biggers wrote:
 
-I will try to verify this and submit a fix if it could be reproduced.
+> On Sun, May 10, 2026 at 08:54:07AM -0700, Kamran Khan wrote:
+>> Hi,
+>>
+>> AF_ALG is useful not just for hardware-offloading, but also for memory
+>> isolation so that applications only get oracle access to the crypto keys and
+>> a memory-safety vulnerability in user applications would not immediately put
+>> the secret key material at risk.
+> Note that if that memory-safety vulnerability leads to code execution in
+> the application, then it doesn't matter that it "only" has oracle
+> access.  It can still decrypt any data encrypted by that key.
 
-Thanks.
+
+I don't think fully discounting hardware offloading is beneficial here. 
+HW accelerators will be produced and without a common interface vendors 
+would start implementing their own "bespoke" drivers with bespoke 
+userspace interfaces (we already had such proposals), which in turn may 
+introduce more attack surface. Yes, AF_ALG needs substantial 
+improvement, but at least it can be a standardisation point.
+
+
+> The relevant threat model would be arbitrary reads, not any
+> "memory-safety vulnerability".
+>
+>> I understand and appreciate the concern with complex attack surface and the
+>> increased frequency of attacks in this area. But I fear that completely
+>> removing AF_ALG increases the risk for userspace applications relying on it
+>> for memory isolation.
+>>
+>> What alternatives do userspace applications have on Linux for ensuring
+>> crypto keys are not exposed in user memory? That is, FreeBSD and NetBSD
+>> natively provide /dev/crypto; removing AF_ALG would kill the only equivalent
+>> option on the Linux side for kernel-delegated cryptography.
+> The standard solution is simply to use an isolated userspace process
+> like ssh-agent.  Yes, the keys will be in "user memory".  But "not
+> exposed in user memory" is *not* a correct statement of the problem.
+>
+> (Also note that protecting not-actively-in-use data from arbitrary read
+> primitives doesn't require cryptography at all.  That can be done simply
+> by using mprotect() to remove read permission from the memory, then
+> temporarily adding it back when it needs to be accessed.)
+>
+> In any case, any hypothetical security benefit provided by AF_ALG would
+> have to be *very high* to outweigh the continuous stream of
+> vulnerabilities in it.  I understand that people using AF_ALG might not
+> be familiar with that continuous stream of vulnerabilities, but it would
+
+
+Is it actually that much compared to other features/subsystems, like 
+eBPF or user namespaces? But we don't rush to deprecate those - instead 
+trying to harden them and come up with better design.
+
+
+> be worth spending some time researching what has been going on.
+>
+> - Eric
+
+
+Ignat
+
 
