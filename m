@@ -1,204 +1,206 @@
-Return-Path: <netdev+bounces-286561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286562-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ECA5D62jAWpKhAEAu9opvQ
-	(envelope-from <netdev+bounces-286561-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 11:38:53 +0200
+	id mCE7JLqkAWq+hAEAu9opvQ
+	(envelope-from <netdev+bounces-286562-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 11:43:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A894950B0FD
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 11:38:52 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9925150B2C8
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 11:43:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 64CEB3025494
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:22:02 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0FDF6301ADB9
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:29:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCC7A3BE644;
-	Mon, 11 May 2026 09:21:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EDCA3BD63D;
+	Mon, 11 May 2026 09:29:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20251104.gappssmtp.com header.i=@baylibre-com.20251104.gappssmtp.com header.b="vYxxJc85"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="WfiYQNAi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C78ED3BD64E
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 09:21:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F6A73B9D9F
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 09:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778491304; cv=none; b=pOQVySti60fQyKTD7k00RWT55JWI7Dohbp+C1lRinxN3Vjv/7pMUrs73/PWZERpV94LZ8nPAT7l/TDKCtjTFhgeL6iPaXqnaY9NEYMY1cSTEAq0HeJY3Njm3n+TwLLHsrZvgVBtOOQThAfE5mDGo8PtLd4em6CEngzgOp8Va1+8=
+	t=1778491740; cv=none; b=U42HteUd+ydvghHav7QoH3qza6hgGmrwE9PMdzMamrWb5TWy9QueVLqWXu46jGCeFxeMNs6+nfM9nEwMvLQQLeEuuJdtk+6d3OaGnNR3nzWsntug6bcwbiEfjR3eN1cu1IhUfKU9mAmQ9mswExGEMPzbmpQ2sHa/fYwqaEOAau8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778491304; c=relaxed/simple;
-	bh=yTA3EfMFNqWtw4mwbSh1QoSBedE1rcjpYMGPIfcrLnU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WqRXAeZFNOk1lGMyuFJYtw6mAQW/YBltxOvUUcd1OuFFdRrZbyY+hMqlulK+kV6HJE0SEYAQJ0838eIPvd+xMDhbUZI3RMOvurm6JFGTTHHTII7w56bNTezScV46p6J+2hizHynW1BiSovs2XB5nKblorP1wRpipSYBBadyoDt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20251104.gappssmtp.com header.i=@baylibre-com.20251104.gappssmtp.com header.b=vYxxJc85; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4896c22fcbaso35138235e9.0
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 02:21:42 -0700 (PDT)
+	s=arc-20240116; t=1778491740; c=relaxed/simple;
+	bh=1iE0KxkHqOHOmUaBdxFzx30RUnoGkOPdUPCC8zY2qWM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=g7jwQiUVrGSxNKfFss4NWqs5+Jq8Qh3dllpGv+PW0egRtrF6Va14YSaCif/0UHENJBzqt9FMBBbLp9g9G2+vcvNwtQwT28B0roIgyLmLyZ8KqZWkBT3iL+HJ1gb0mzbddhamyNvT126Ccl0gDTqqf+cF65ttOxcE2kErGBx5YEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=WfiYQNAi; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-488e1a8ac40so40151485e9.2
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 02:28:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20251104.gappssmtp.com; s=20251104; t=1778491301; x=1779096101; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yTA3EfMFNqWtw4mwbSh1QoSBedE1rcjpYMGPIfcrLnU=;
-        b=vYxxJc85V/35JiUXFNYmo0LerbGRF5e+QTMsSTky/PLHoHIXcQfhHeEmbjWBQLjGGj
-         srHQ7Hor7sJDV69koBiim96BM6DEtzFk1x5lmFs8xXLmiTM4A8tZN+sCE6j/fpqZRfbG
-         BbqT8abivpaCYn1MOxRPGCJL3tKCnvHEX9I37FvzdHLKlR9csX5LywataW+c1TMTuA37
-         0nToyUBRw/8kCdFEAMVvNrZXBoy68PJAgBxSciwUkAMeXTVYngR6zURWuVjgiRl+vLyp
-         1AzXruTSGaRmUI3xjY7I86b5FES6SMPdVhgTGpuqMDLMBswvmBeu1b65y5xgDhNb1Z16
-         rOKw==
+        d=suse.com; s=google; t=1778491737; x=1779096537; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zm1633wFLnkrneV2WvzS0oBtJ0Em/RfGVMdTUWbdPDU=;
+        b=WfiYQNAiJAGw/8GrrgI1NSoYaqgqYntn5SHLOyHXdEWjx6cpZAQVoHqI4I2AEsPzrq
+         TkxVfYxESArCt4rlSz2zmHrBH+xyaxppjFrN/csuyiw7AYVNGHgzTsk0yaW9wGx6bSgU
+         MSMrXE6jK8FrqLxFkiuwXJ2IbbA49A1ccevD0GlahZlPFD6CgbnpMTaOQoRXmBZEBu+A
+         +f0lN6yqXfjyGAcyWwB1kqo6gPcFiP7p/ebOqTe7VF5BEZsreMSRZVRslVXk2kcTYIgA
+         Q3GZEwDr5/qkqzfMFpXNUtwuiQtG+MybKBWs5m0XnoK0EqGtoeUYrKLR3U1a762O+jgg
+         9HCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778491301; x=1779096101;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yTA3EfMFNqWtw4mwbSh1QoSBedE1rcjpYMGPIfcrLnU=;
-        b=dNUAb46gJcYS3FLPSs2iiDX0BsZ+7EkOTub1NND00Rc0tEfXeCjsgwwscdWb/fOyL1
-         Q5oxvuQDS59P2TNopbs8JtPxbeuVL5xhmEVtj2WI/ZH0V/KduUV1LIjvF+uqOBpvyq1h
-         HcMvZmNnh+YbKLFqylXGjdBqgrPfE8eTJxje3RhJHI7kaQ2VU44AjGj+JFfP4F8OBoky
-         jOaD3QAc/beDruZyZYHlgW4P4OiCIJeVzDeWSEBUZoGBoxiuYQwpRrsoA6j1s0MzCmFp
-         +KDmIxAu96CPuUqrOahEDXu7NAbn2SofVNjeQirBxBK9lDGAhkFvCSFZC6uiTb45eDSh
-         2PUA==
-X-Forwarded-Encrypted: i=1; AFNElJ8Qvov/Lm7MRJ6QgrtTkM0jBd28h8RDhQyT38phfPHl7wQm9mglxarRy+EN0GfyZsrYcEzNUew=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBR9J/FA7y6Qbzk+5OG4ElRR9stlzJn9TT/qedkhVOuGQppI10
-	Wgr4CM3AWp8sa4PT1Z62RTNofyhbNU/2ZUXFifDVWbPyzrVX/In06N4adpdmZYLWMz0=
-X-Gm-Gg: Acq92OGPZxECjVtJ15ro2/xRDHvyRU0WAarKZsJVoBDaDI5FghPA0AGQBx8to3i6mLo
-	N/w5uEy1ZF5vkFCJx5fI5f8o7Ic5gg4U1ztOJ+H2YIcXCp/kg8cnKRZbkcOAOEfC6BOsT65QSh3
-	EiPueAczOIV+QUbsOJQ2dSGLWzvbnkWsUgXMhU3oO8vw7xAh0WFQLmVbKGGBh4yqwBzLkn26Adn
-	Yhb/y4hkTuJQeRV0nqm9roGEmgm9Pn4hDI2yc766cq+qvboeRjupd6XNpqFlZQp84ph4aDe/YrW
-	JzVRW+OYjWTlWHNqZIPHTLGCvlYKITUggKSYihR3C0Wz2CB3b3Q1LUrMG/teOQN6AMofB3CRur4
-	HgLKMjt5c4Ic0VTDgBXD0/SsizldC4DYvlbxwqCO1S/phljsiwDdLHTQkU2GPUzKhC1+229nuqo
-	Q7PujR4kfaaqW3OAue2h6VfeY5EdF5HlftkMeWvj7RI2aUUxIh8gBM/ADvpAAsolg5REzYL0ZDc
-	zNzHMRrLOsjzVg=
-X-Received: by 2002:a05:600c:b8d:b0:489:1fa5:997f with SMTP id 5b1f17b1804b1-48e70691673mr134646165e9.9.1778491301044;
-        Mon, 11 May 2026 02:21:41 -0700 (PDT)
-Received: from localhost (p200300f65f114e0841c796eda31a14b3.dip0.t-ipconnect.de. [2003:f6:5f11:4e08:41c7:96ed:a31a:14b3])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-48e7041c4e8sm167443115e9.14.2026.05.11.02.21.40
+        d=1e100.net; s=20251104; t=1778491737; x=1779096537;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zm1633wFLnkrneV2WvzS0oBtJ0Em/RfGVMdTUWbdPDU=;
+        b=Fzjgnyuk8XoYI2M6h0nJcZu/SwT4IZQYHsSNS8Ou33t7bXS0nRn9U0U7Bo+Svqq6ir
+         6i+kI174M2bJLAKaMKgPo0KEkSOmkBrDryeSUdYKiLAY89U+jAZBIiF7P494C1RsNT1w
+         xviF74aEkXsymNfLdfVhy64LXaS0YDlTaECExdcbGgPEDhz8p7j2NnP30hKAAwg9/SzR
+         ANNztK+95fJMcv8VeSR3goyJzkV3zZu/fGcCjQOOxtNgHwK73ZRp5UhNdWYyo20Gyke+
+         prazC0DsdWOacihUGyQ5hXAaGGjj1+N2SX0PWw+1DKNfjhpNzLMKdiLKEXeZEOnAjVz+
+         Pbtw==
+X-Forwarded-Encrypted: i=1; AFNElJ8c6FxslWxwiftHPiLbT4wzVsQYWqMnzyd1EdxY8veSwcc7/nuhleSKoKickd7leAbrJpurszo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOSWR9iJZ0mpTj59sZT7qwgFH0HIbfQa+0YanT8GSxmWoEPdxe
+	JXXtNSgsk+DEtKS/21JcO1wS2/ZgUN3Ju2p/m0pkJsB+SsLIzTrmNiQhmvE3BXVBkwo=
+X-Gm-Gg: Acq92OEQ81WJmI3zb0YkgwENQCtrnhfUXV6BZV9rA8mHcN1OS3UGj0Xl4ScRdmbcgox
+	LuyB/Vyv3BvTdoeQizF1SfHijyEwPcgP1wSqmtgMhortI6Pt9Sw6l2CakOSunB9KuCTySLj6TOs
+	FRzDsn69cSkt6NBugyzPf6l6RaiiKIm+4QfBWlbUQIwGxOWeqz1MAU2HyOXxKcPZOSUGYaVaQJK
+	TheLaRSq0A8cTRhazlvCxjh9/9oCSzzuiaGEjjbCgx4Crm92PhPGNB6vjp0acwJVxBkF3PZXW4c
+	zD1FMh6ktvMjoZIYVnn/PdXM+W5jEiiTpcq7QjDuMahr6tXYnbTiwYlzzdH56pgxaXf9DJCheLj
+	mmc2DwNprl5vCNexMHpqMF432l8vBaGESEW5ACJn2yVcHvJiM9XTGL0youucCotSAJhLH6QSYHr
+	5gKcVLVh9skd1hHnsORJyArjo5+Q9TwXp+f6NR3P92Sozsuag=
+X-Received: by 2002:a05:600c:b8d:b0:48e:706b:53e3 with SMTP id 5b1f17b1804b1-48e706b556bmr144977005e9.1.1778491736872;
+        Mon, 11 May 2026 02:28:56 -0700 (PDT)
+Received: from localhost.localdomain ([2a00:6d43:105:c401:e307:1a37:2e76:ce91])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e701e89fbsm157606675e9.4.2026.05.11.02.28.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 02:21:40 -0700 (PDT)
-Date: Mon, 11 May 2026 11:21:39 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
-To: Michael Grzeschik <mgr@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Marc Kleine-Budde <mkl@pengutronix.de>, 
-	Vincent Mailhol <mailhol@kernel.org>, Johannes Berg <johannes@sipsolutions.net>
-Cc: Steffen Klassert <klassert@kernel.org>, 
-	David Dillow <dave@thedillows.org>, Ion Badulescu <ionut@badula.org>, 
-	Mark Einon <mark.einon@gmail.com>, Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com, 
-	Manish Chopra <manishc@marvell.com>, Potnuri Bharat Teja <bharat@chelsio.com>, 
-	Denis Kirjanov <kirjanov@gmail.com>, Jijie Shao <shaojijie@huawei.com>, 
-	Jian Shen <shenjian15@huawei.com>, Cai Huoqing <cai.huoqing@linux.dev>, 
-	Fan Gong <gongfan1@huawei.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Tariq Toukan <tariqt@nvidia.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Mark Bloch <mbloch@nvidia.com>, Ido Schimmel <idosch@nvidia.com>, 
-	Petr Machata <petrm@nvidia.com>, Yibo Dong <dong100@mucse.com>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com, Jiri Pirko <jiri@resnulli.us>, 
-	Francois Romieu <romieu@fr.zoreil.com>, Daniele Venzano <venza@brownhat.org>, 
-	Samuel Chessman <chessman@tux.org>, Jiawen Wu <jiawenwu@trustnetic.com>, 
-	Mengyuan Lou <mengyuanlou@net-swift.com>, Kevin Curtis <kevin.curtis@farsite.co.uk>, 
-	Arend van Spriel <arend.vanspriel@broadcom.com>, Stanislav Yakovlev <stas.yakovlev@gmail.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Kees Cook <kees@kernel.org>, 
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>, Thomas Gleixner <tglx@kernel.org>, 
-	Jacob Keller <jacob.e.keller@intel.com>, Thomas Fourier <fourier.thomas@gmail.com>, 
-	Ingo Molnar <mingo@kernel.org>, Kory Maincent <kory.maincent@bootlin.com>, 
-	Zilin Guan <zilin@seu.edu.cn>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Marco Crivellari <marco.crivellari@suse.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	David Arinzon <darinzon@amazon.com>, Yeounsu Moon <yyyynoom@gmail.com>, 
-	Denis Benato <benato.denis96@gmail.com>, Yonglong Liu <liuyonglong@huawei.com>, 
-	Andy Shevchenko <andriy.shevchenko@intel.com>, Randy Dunlap <rdunlap@infradead.org>, 
-	Yicong Hui <yiconghui@gmail.com>, MD Danish Anwar <danishanwar@ti.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Ethan Nelson-Moore <enelsonmoore@gmail.com>, 
-	Larysa Zaremba <larysa.zaremba@intel.com>, Ian Lin <ian.lin@infineon.com>, 
-	Colin Ian King <colin.i.king@gmail.com>, Double Lo <double.lo@cypress.com>, 
-	Markus Schneider-Pargmann <msp@baylibre.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-can@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org, oss-drivers@corigine.com, 
-	linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com
-Subject: Re: [PATCH net-next v3 2/2] net: Consistently define pci_device_ids
- using named initializers
-Message-ID: <agGfbyxlKC8WcEdm@monoceros>
-References: <20260511090023.1634387-4-u.kleine-koenig@baylibre.com>
- <20260511090023.1634387-6-u.kleine-koenig@baylibre.com>
+        Mon, 11 May 2026 02:28:56 -0700 (PDT)
+From: Marco Crivellari <marco.crivellari@suse.com>
+To: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Tejun Heo <tj@kernel.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	Haren Myneni <haren@linux.ibm.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	MD Danish Anwar <danishanwar@ti.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Mika Westerberg <westeri@kernel.org>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Nick Child <nnac123@linux.ibm.com>,
+	Petko Manolov <petkan@nucleusys.com>,
+	Rick Lindsley <ricklind@linux.ibm.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	Yehezkel Bernat <YehezkelShB@gmail.com>
+Subject: [RFC PATCH net-next 0/5] net: Move system_long_wq to system_dfl_long_wq
+Date: Mon, 11 May 2026 11:28:35 +0200
+Message-ID: <20260511092846.120141-1-marco.crivellari@suse.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="26wz6vcj2wzkdd5i"
-Content-Disposition: inline
-In-Reply-To: <20260511090023.1634387-6-u.kleine-koenig@baylibre.com>
-X-Rspamd-Queue-Id: A894950B0FD
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 9925150B2C8
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[baylibre-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286561-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linutronix.de,suse.com,lunn.ch,davemloft.net,google.com,redhat.com,linux.ibm.com,ti.com,ellerman.id.au,nucleusys.com];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286562-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[baylibre.com];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,thedillows.org,badula.org,gmail.com,marvell.com,chelsio.com,huawei.com,linux.dev,intel.com,nvidia.com,mucse.com,realtek.com,resnulli.us,fr.zoreil.com,brownhat.org,tux.org,trustnetic.com,net-swift.com,farsite.co.uk,broadcom.com,bootlin.com,seu.edu.cn,suse.com,google.com,amazon.com,infradead.org,ti.com,infineon.com,cypress.com,baylibre.com,vger.kernel.org,lists.osuosl.org,corigine.com,lists.linux.dev];
-	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[baylibre-com.20251104.gappssmtp.com:+];
-	RCPT_COUNT_GT_50(0.00)[80];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[marco.crivellari@suse.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,baylibre-com.20251104.gappssmtp.com:dkim]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,suse.com:mid,suse.com:dkim]
 X-Rspamd-Action: no action
 
+Hello,
 
---26wz6vcj2wzkdd5i
-Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net-next v3 2/2] net: Consistently define pci_device_ids
- using named initializers
-MIME-Version: 1.0
+Currently the code uses the per-cpu workqueue system_long_wq to schedule
+long running works.
 
-On Mon, May 11, 2026 at 11:00:24AM +0200, Uwe Kleine-K=F6nig (The Capable H=
-ub) wrote:
-> Forwarded: id:76da4f44d48bdde84580963862bf9616bee5c9e9.1778149923.git.u.k=
-leine-koenig@baylibre.com (v2)
+Unbound works could benefit from scheduler task placement, to optimize
+performance and power consumption. Another good reason to have this unbound,
+is the "queue_delayed_work()" function, used to enqueue the work item.
+More details on this will follow in the next section.
 
-This is my internal marker for tracking mainline submissions. If someone
-applies this revision please drop this line.
+Recently, a new unbound workqueue specific for long running work has been
+added:
 
-Best regards
-Uwe
+    c116737e972e ("workqueue: Add system_dfl_long_wq for long unbound works")
 
---26wz6vcj2wzkdd5i
-Content-Type: application/pgp-signature; name="signature.asc"
+~~~ Details about queue_delayed_work ~~~
 
------BEGIN PGP SIGNATURE-----
+system_long_wq is a per-cpu workqueue and it is used as a parameter of
+queue_delayed_work(). This function schedule an item that it will later
+be enqueued (once the timer will fire). __queue_delayed_work() does the job
+receiving as "cpu" WORK_CPU_UNBOUND:
 
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmoBn6EACgkQj4D7WH0S
-/k4q9wgAnNsetoJQuSPdcsRqTfhJ3nvDxBsfxvsce6Raf4aiAs6sa5jJlBrTa5h3
-nEaIsI15hqOx2W/FeLUG3/e0pnGua3DO4qsTmtY+G74jweYDfLDdXlEHlt9zNS6x
-lDrxCXGPT97KmN2CifwJILefl8Lv7jTwROdpFGiVt85DXbiZtFIL/frdeU6leU+1
-FdE6JY7j/Qx1jjdXNf0bWzAYX8PJ8ocHv+b0BcV8ctfX7hsV/vxsLmUU0goDLYiO
-u683/fMBDCwmEtoIHKOODM7mPIJAndSocuWgR2Fn2xqlVyooDPuS9d0p0wTjl2qT
-eA7SLNWIZbT2fhIZM4FV8lAwHsMj+w==
-=qcwQ
------END PGP SIGNATURE-----
+    if (housekeeping_enabled(HK_TYPE_TIMER)) {
+    //      [....]
+    } else {
+            if (likely(cpu == WORK_CPU_UNBOUND))
+                    add_timer_global(timer);
+            else
+                    add_timer_on(timer, cpu);
+    }
 
---26wz6vcj2wzkdd5i--
+The timer is global, so can fire everywhere, and the work item will be
+enqueued where the timer fired.
+
+Since the workqueue work doesn't rely on per-cpu variables, there is no
+obvious reason that justify the use of a per-cpu workqueue. So change the
+workqueue with the new system_dfl_long_wq, so that the used workqueue is
+now unbound and can benefit from scheduler task placement.
+
+Thanks!
+
+Marco Crivellari (5):
+  ibmvnic: Move long delayed work on system_dfl_long_wq
+  net: ti: icssg-stats: Move long delayed work on system_dfl_long_wq
+  net: thunderbolt: Move long delayed work on system_dfl_long_wq
+  net: usb: pegasus: Move long delayed work on system_dfl_long_wq
+  r8152: Move long delayed work on system_dfl_long_wq
+
+ drivers/net/ethernet/ibm/ibmvnic.c          | 4 ++--
+ drivers/net/ethernet/ti/icssg/icssg_stats.c | 2 +-
+ drivers/net/thunderbolt/main.c              | 7 ++++---
+ drivers/net/usb/pegasus.c                   | 9 +++++----
+ drivers/net/usb/r8152.c                     | 7 ++++---
+ 5 files changed, 16 insertions(+), 13 deletions(-)
+
+-- 
+2.54.0
+
 
