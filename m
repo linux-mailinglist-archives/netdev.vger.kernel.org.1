@@ -1,94 +1,90 @@
-Return-Path: <netdev+bounces-286632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286631-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +LWkBzTJAWoRjwEAu9opvQ
-	(envelope-from <netdev+bounces-286632-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:19:00 +0200
+	id YNmHJXvHAWoRjwEAu9opvQ
+	(envelope-from <netdev+bounces-286631-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:11:39 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7249650D81D
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:18:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3102150D652
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 14:11:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 363953005D2E
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 12:11:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 12E09302B389
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 12:05:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82963376483;
-	Mon, 11 May 2026 12:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8765137AA6F;
+	Mon, 11 May 2026 12:05:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="haM7+ffl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PQ7AK+GV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31573374722
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 12:11:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 437F537AA83
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 12:05:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778501503; cv=none; b=THYV400Kkdm5WW3oIIJbubyf5iwAZXSFQUs8LMpUjjHxxDO6Zyw/rt1SW4ZBr5lQh6UPTjsHpFDOi442ofLjRLo0DWVlI3N0S1D9zcHKH2ImWPql4PEV7cjq7Do0J4bVxOGsJrMcnrBchBz5vGrTh9LqFlXmH7GUlmeTh5PjjOg=
+	t=1778501157; cv=none; b=fOcN6NwQuzycdGoVv4g/FGPq5wFfWJ4tfBNF3XQ0DGPYB4w+IYSYCiyg3g3Ns3HFxEr1Y0v4Lp0gTxOuvmDXlK0e/0ZQteSRUviWKkhRYuh4CP1xO34nwqy1yk5SjP9DfJvxr7ntcl8OI9xv50dcn98GVJRRDd358iLWTwfr3ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778501503; c=relaxed/simple;
-	bh=zDIDQFn+g9lckgjVKIk0P2Ns1wxOnHnQ78kGDl4X6wg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sO7J0nRmyGUJYbdgEE5Ud4y6d/h1qyDXA87nzFTVfpw1ELWFV2wXMBx/JgCIsNiU2u3SKVh3bnVrWPl0G64g3VQVKz43dqZBhanJSbLE0N68X9gJifbTyqUzrxCglhUWX/eOFNWL4TQWmcYwksUaGBPTakEbTqr5LBLSU7e+pkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=haM7+ffl; arc=none smtp.client-ip=74.125.82.175
+	s=arc-20240116; t=1778501157; c=relaxed/simple;
+	bh=y4bazO79X2luP3aXo5Zu79w/2ssn3oIiVFWNhmrzfUQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=fxA2LAsY6eNYki0fNSd4AuA8ToSWovjXSvAF0rBVNBF49eOu19VhvjoX636CmIo2AYpRDTznn2ZLVwx/xtQjmMgDa7+sbDWt995jwLZYI992oufokKF81p1xhymgO3/vHpyXWoRlaFLEao+KMCcmehromlbWOsZtdsthDgs+4eY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PQ7AK+GV; arc=none smtp.client-ip=209.85.210.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-2ecf9e398f4so11340928eec.1
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 05:11:42 -0700 (PDT)
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7e363c6141dso2655497a34.2
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 05:05:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778501501; x=1779106301; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hs534S+X0dZVP+pvepgGG5haFKXdeP4FpqB4r44PpkE=;
-        b=haM7+fflD4Y/IpjRB0Ehsf1mr1MI0cSEFL4cSyeTXJ3dtzd5t2OgKL19R+GA2Mzn7O
-         xmWo6dCdpj1Rjfc1/1fl7pgdcLj34OpJMMIHwDDPC60iSbaUC3+Y5VJh0X9NRhjQi/qp
-         Q04et4p5BdKDfhvEz5yC3sD4V5OPsexobBdQ+4u6bMZbofMLZXoljWMD1BBMLltSKG1X
-         +OTCoDW9hLMHpUt9usUZoK6ignNdvJKm7RVHLMnT48DDwqiqX7BkEEdOm8xgD89BFBwz
-         Hw5+X26VSLpX7XrePqm0YSix6KMbeqR8XljEyQZvkmOGNg4thRUVaPWJaBU/rdA5BvYO
-         szOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778501501; x=1779106301;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1778501155; x=1779105955; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hs534S+X0dZVP+pvepgGG5haFKXdeP4FpqB4r44PpkE=;
-        b=iQvX2dDGmJeeGP45BMlE2q8rhrmzFNnxpzrjCfGm2TGbK/NKKshcCE6hIiv0drjkBb
-         rFLXGYG+5ydpY1C6TvUmSER6ZF1UNneEyk7p6q++euYmdkNF7Yv0M/9Bf5Mr2ZHnpOUM
-         goc8Eoo2LS3CyAgmFW6OeA2qmqMe4qLlZsZDhFmIi1Raiu4EkJzccgifibKx5mc+PgJF
-         zC68l3xnfVFq2hbKDEScD9Yo3eH2EqtchoGpBsJAvTPPuUXr8S9DUkdID2GoCuvOvLbF
-         qcPw72fe32lwq4I5bsBwXOYTUAkIa1T2J0s+Km00jz3Sig2htIPCn7wnQpj13F9KTSdK
-         rWPg==
-X-Gm-Message-State: AOJu0YzgjjtgLhcUEZlsd9m4mdAmWsm0Q16i+gkpdJ5yxd5yNus0Hyu0
-	cwcZLAplaRamn1MZhnKt38i7NURho4XTXSCjcazjkmx3ooVMgwnXYc+R
-X-Gm-Gg: Acq92OElTwR57NPea8N0Uwp4qkAoW4qPUrEBmzmUW39H5DXRVrwmmdAT23diAx/hH9k
-	vXafoA6tUzzEEW6Jr+CnK7m8gK3w+Gev6rdy7NHrGYGnVkx5Soka1uHQ9gMtGwawF4AdWbfj2S0
-	GYAnHrbkXr2tYe6dPEOQYgi2s+Eg/PFThp519bROuw+SbAZEvcrwg4kiklmFqR0aYqSBE7Uf0qH
-	p9ShaXYYXK6f4rHTGVLWJHQ8HDyDiOwNuf5y7l5hetYIvnugQvgASmeQocfdqlAUW33GTbtVlTo
-	zxL0Qw0CoYoEPgW0V/647hoWfrnXN8eof2CBScZoIGD9EkkrMl74y72SrcLQw7g9VBziJgSWce9
-	BqxK3HnpSL2Gxq11q5iFPpMH/guEALbJthrN5OyEDmoR6BoyNaWXimq0vVL0gA8tFDLMSdIi740
-	VpGa3g4Lx/GY988CutqDjmGOx9Fi+Z+Yx8U16b4Z9DinM01q0doSG9VXFCB9Q9bWx5hw5gr2pJh
-	w+6/EsI5Em/upofQF3o
-X-Received: by 2002:a05:693c:2b08:b0:2ea:5057:a304 with SMTP id 5a478bee46e88-2f54ad72533mr11567414eec.2.1778501501090;
-        Mon, 11 May 2026 05:11:41 -0700 (PDT)
-Received: from efaec68ba852.tailc0aff1.ts.net ([206.206.192.132])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2f888e381c9sm12879102eec.26.2026.05.11.05.11.39
+        bh=V4XcVvpH9Ox3FvY9rNYp2Al5P5pekeYZiWZMMmvoOw0=;
+        b=PQ7AK+GVwCZ94XfbfgiuVnmKhUGeVxmCLix9GVJJoJHTdJrSoPqqM/UVjJoHdyG2m0
+         TbgMLn6mWOz8m+hfBomf7gj/F0gl/NfXaJWYQ5mfQs1wamLYpOZ7baXP9iQBMqwri6jg
+         LPTAgXxtAheE/hbQkL++PwLeSN/So0pN3sCd51PlVz+N/uacmID3OSS+6XSRU7G5wsLx
+         iWWKCUPnmTN1R33DqrZ6KwyaJ+Qbn4hmlOO+Ry+0y6UQqrmU0q3j9KPbDSxCSWAZiICN
+         2fndhVbZBmiI+2tYTOSWtp8BhjNprHdXfITEqGkEjAt8ubiE1AnsT73H3sB6yux2O48z
+         0bRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778501155; x=1779105955;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=V4XcVvpH9Ox3FvY9rNYp2Al5P5pekeYZiWZMMmvoOw0=;
+        b=EXwGOI+zysmOtX9aDGlQ+Upr57TFpg1NgxrrMst1rrPw3jNTHh4uz5goEhMzshEP1E
+         PT0DxwBu3LWtrKLrxAmz1CHP4TImsB8L+ooZ0ByFAE9EfUumwxzUofqk6ZGD9Sas2NZd
+         alSym30PrHwiIUsA2BKuy69AQU8ZwFvTJ0LNYx8ziXPkjcihMjIIlgyDhQ//Hp+xWgLo
+         0z8rJ7bwGCK/Ek8gwgV6c1NHEr0VkQyCUWJDRTRLR2FiFjaVS08MX+2fJtJXvfJO1mBX
+         yESAHeFi9fV2Ub80ETTcRVdW3f8/1yPyTChN16B3Kv1iD35ZMSleO12vqG9ljAQPKOv6
+         46HQ==
+X-Gm-Message-State: AOJu0YyFkHHxE+WyHqhkKgrtPvxuD4CFdaEPHoGP8urzrlJlPwIa2d6b
+	a0M1nUO2VSpmc1LKc/WGO/0/7xesqk0yFV0RCJbH07cK5Bh4Qa8V7ogUnglmKvX4d68=
+X-Gm-Gg: Acq92OFT3bNuGnACzwTSirRANqhK/fDZtTFN90g6fk95vVUooBMBHfYFrb+dJ+GuzkL
+	POqrOnMPFw9D14TsIdcrks9ln3RB6det3g5b1UCbBO4tRuNBZpgscdDYhFr8W8GEJgzfaLtskHC
+	OWkLrO0UkCRSKArsbnWlnFqUecSojneKLJ9lllucq/Tt2Atlsk+e+HI8ZIQSxaGFyqJuyJm9ILV
+	ekLEX02kkpG+j3nx2xc9MSGMIBOY87oQmZvJ76bdnPRIfLtw2j7QylzhC6dSKaZWkNTiYPcPGNK
+	E3Z4g28Uh5TY3pWmBZH8l2h1lKNIjccaRSZ8QCb9vU9zpemN0P213ve29aL1Eb76vE1LG7WT14o
+	ezfS59B70j3J3X6a3tMK2szMhJRWNEYE+Elha6EKqYlX+9FQCN5yeZNSGsO0bvzBqR45J7BRZ+J
+	2AVtHvpK4MnIDf4Fs=
+X-Received: by 2002:a05:6820:150d:b0:694:8b4d:5f8c with SMTP id 006d021491bc7-69998ca0697mr13574825eaf.12.1778501154591;
+        Mon, 11 May 2026 05:05:54 -0700 (PDT)
+Received: from houminxi ([72.244.37.221])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69b25e0e79asm5608123eaf.14.2026.05.11.05.05.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 05:11:40 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@oss.qualcomm.com>,
-	Sean Tranchetti <sean.tranchetti@oss.qualcomm.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	Xiang Mei <xmei5@asu.edu>,
-	Weiming Shi <bestswngs@gmail.com>
-Subject: [PATCH] net: qualcomm: rmnet: fix endpoint use-after-free in rmnet_dellink()
-Date: Mon, 11 May 2026 05:00:18 -0700
-Message-ID: <20260511120015.2298403-4-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Mon, 11 May 2026 05:05:54 -0700 (PDT)
+From: Minxi Hou <houminxi@gmail.com>
+To: netdev@vger.kernel.org
+Cc: aconole@redhat.com,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v9 0/2] selftests: openvswitch: add pop_vlan test
+Date: Mon, 11 May 2026 20:05:43 +0800
+Message-ID: <20260511120543.390702-1-houminxi@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260509135423.3433910-1-houminxi@gmail.com>
+References: <20260509135423.3433910-1-houminxi@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,113 +92,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 7249650D81D
+X-Rspamd-Queue-Id: 3102150D652
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [6.34 / 15.00];
-	SEM_URIBL(3.50)[asu.edu:email];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286632-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,asu.edu,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	R_DKIM_ALLOW(0.00)[gmail.com:s=20251104];
-	GREYLIST(0.00)[pass,meta];
-	TO_DN_SOME(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_SPAM(0.00)[0.686];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286631-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[3];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,asu.edu:email]
-X-Rspamd-Action: add header
-X-Spam: Yes
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Action: no action
 
-From: Security Analysis <xmei5@asu.edu>
+Found a few issues in v9 that need fixing, will respin as v10:
 
-rmnet_dellink() removes the endpoint from the hash table with
-hlist_del_init_rcu() and then immediately frees it with kfree(). However,
-RCU readers on the receive path (rmnet_rx_handler ->
-__rmnet_map_ingress_handler) may still hold a reference to the endpoint and
-dereference ep->egress_dev after the memory has been freed. The endpoint is
-a kmalloc-32 object, and the stale read at offset 8 corresponds to the
-egress_dev pointer.
+- Commit message for patch 1 references removing MAX_ENCAP_DEPTH,
+  which was dropped in an earlier revision. Needs cleanup.
 
-  BUG: unable to handle page fault for address: ffffffffde942eef
-  Oops: 0002 [#1] SMP NOPTI
-  CPU: 1 UID: 0 PID: 137 Comm: poc_write Not tainted 7.0.0+ #4 PREEMPTLAZY
-  RIP: 0010:rmnet_vnd_rx_fixup (rmnet_vnd.c:27)
-  Call Trace:
-   <TASK>
-   __rmnet_map_ingress_handler (rmnet_handlers.c:48 rmnet_handlers.c:101)
-   rmnet_rx_handler (rmnet_handlers.c:129 rmnet_handlers.c:235)
-   __netif_receive_skb_core.constprop.0 (net/core/dev.c:6096)
-   __netif_receive_skb_one_core (net/core/dev.c:6208)
-   netif_receive_skb (net/core/dev.c:6467)
-   tun_get_user (drivers/net/tun.c:1955)
-   tun_chr_write_iter (drivers/net/tun.c:2003)
-   vfs_write (fs/read_write.c:688)
-   ksys_write (fs/read_write.c:740)
-   </TASK>
+- Masked VLAN format string produces output that cannot be parsed
+  back (round-trip failure for vlan key with masks).
 
-Replace kfree() with kfree_rcu_mightsleep() so the endpoint memory remains
-valid through the RCU grace period. Also remove the rmnet_vnd_dellink() call
-and inline only the nr_rmnet_devs decrement, since rmnet_vnd_dellink() would
-set ep->egress_dev to NULL during the grace period, creating a data race with
-lockless readers.
+- Negative test in patch 2 lacks a return flow for in_port(2),
+  so ping fails regardless of whether pop_vlan works correctly.
+  Need to add a return flow to make the negative case meaningful.
 
-Fixes: ceed73a2cf4a ("drivers: net: ethernet: qualcomm: rmnet: Initial implementation")
-Assisted-by: Claude:claude-opus-4-7
-Reported-by: Xiang Mei <xmei5@asu.edu>
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
----
- drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c b/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c
-index 269c0449760c..2e17a43aec5a 100644
---- a/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c
-+++ b/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c
-@@ -213,8 +213,8 @@ static void rmnet_dellink(struct net_device *dev, struct list_head *head)
- 	ep = rmnet_get_endpoint(real_port, mux_id);
- 	if (ep) {
- 		hlist_del_init_rcu(&ep->hlnode);
--		rmnet_vnd_dellink(mux_id, real_port, ep);
--		kfree(ep);
-+		real_port->nr_rmnet_devs--;
-+		kfree_rcu_mightsleep(ep);
- 	}
- 
- 	netdev_upper_dev_unlink(real_dev, dev);
-@@ -238,9 +238,9 @@ static void rmnet_force_unassociate_device(struct net_device *real_dev)
- 		hash_for_each_safe(port->muxed_ep, bkt_ep, tmp_ep, ep, hlnode) {
- 			unregister_netdevice_queue(ep->egress_dev, &list);
- 			netdev_upper_dev_unlink(real_dev, ep->egress_dev);
--			rmnet_vnd_dellink(ep->mux_id, port, ep);
- 			hlist_del_init_rcu(&ep->hlnode);
--			kfree(ep);
-+			port->nr_rmnet_devs--;
-+			kfree_rcu_mightsleep(ep);
- 		}
- 		rmnet_unregister_real_device(real_dev);
- 		unregister_netdevice_many(&list);
--- 
-2.43.0
-
+Minxi
 
