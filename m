@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-286818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286819-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oMNNAws5AmrmpAEAu9opvQ
-	(envelope-from <netdev+bounces-286818-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 22:16:11 +0200
+	id eCtiIrU6AmrmpAEAu9opvQ
+	(envelope-from <netdev+bounces-286819-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 22:23:17 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CC9F51598B
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 22:16:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E8424515C45
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 22:23:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E40663032814
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 20:12:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 888303013248
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 20:18:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5910837F744;
-	Mon, 11 May 2026 20:12:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 047083793A6;
+	Mon, 11 May 2026 20:18:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4sfYLJzH"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NNdRg8IA"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED28437F739;
-	Mon, 11 May 2026 20:12:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFE342E3B15;
+	Mon, 11 May 2026 20:18:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778530332; cv=none; b=XxeuTx+TCEHc/ygl0+tvl+Gj0wxkDhzGXzTEtn98OOcWDogaA07md6u5nSRR+vuz9SLRLhH5Oo97Xtpb1DSnaNt0RH8ohPmWZ2YOBV8dUnDlQZuc7LsPlKwRbfZSZqIdV/+d21W5SZ8Ra7vvyJARhBKRsw6l8h6EQZwNDvt3wuM=
+	t=1778530726; cv=none; b=R3zzLiV74NEr3xrEtrFXl3cp2QER601dZ/0cZaXczU5OUNn/pNA3KwYlxghGIPP8p1wmhsIJCPo/Gvft36ubHfUvd5RmrfuLL0VuWASaF81q5tR9WYDjowS278q2MIaSgq1X7jOzmSdkpR9Iyd/rNNXYpsw9EP9I0Xzc0kd/bgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778530332; c=relaxed/simple;
-	bh=LBkZ5EQagRy70OXC82F6PyGxd/tDrK9ovMT+r92H+tE=;
+	s=arc-20240116; t=1778530726; c=relaxed/simple;
+	bh=0VjGp+tXbz9uFrh/GLx9A0gDKs6zfM8IUPWa4rbivE4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LOlQz33zZLFWE78qYKct4xgN0Q993MJEusPdQOL133zJZZoQV7QLVYubYj+EiqO3ov/6z31QKhZXJxOATy8RUOw71fJwjfzwiGCFPH4ddiIKGibOyUnOQNRSi3mGBF+y3xElnBDOH4rzHBW7ky0YMZYKkMNzBlNxEaAGrvLjpmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4sfYLJzH; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=GhdJWw6ajz8XkCxtj1RYvA+Mr66H2tF9zyqMhrNy2sbiFDZytjnoGzOL4NTQkxL6JaA8CTJGav8fPoe0P7zK+M3Ez1LevVhQmzqnbRUTrUdryid8RGmLmi4UnJqTGCRqAx76EyC7TDvxPOvMHE9/a33wJ90Sb/3bjIb0fzzCcsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NNdRg8IA; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,13 +39,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=y7704pXKdK7OmP5Md6k5aCh3b1/U2C67QpaolB6U9/s=; b=4sfYLJzHlHMw07N8IK7Za0F/rQ
-	P1lyiyIdEBY8r0ZLhz67gROTKdI68l1TwpkN5mLGUONDg1o8DnMQD24txSHtbqK2yeWBoMxk4mc5a
-	jyaBHg5Gc3ekZgaGGSYhSCJXenMGRclngkxOzk6jSIa/vsmwByGkvpINeCSFiRzJQ+Xk=;
+	bh=mtQa3BI1a6Wl1vb+E1fQiei8z4Ufqvm312kxxeSce2M=; b=NNdRg8IAe+w77wDtdltpkGJUCl
+	G/yp/TSl2Ey1sQDaf5qCEi9XoYst15iVA74KyRN7Mjo4/S2h01vhFEH2VvjDB1ZrzCyRhLTVGvyX4
+	cEfBzFouz+X2fr8Sq6vIDsGjv/N77ZY2m9GuHQ+hrTVhA0AunDqfDUrLhPs+WOkGFuok=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1wMWyw-002Qyc-GM; Mon, 11 May 2026 22:12:02 +0200
-Date: Mon, 11 May 2026 22:12:02 +0200
+	id 1wMX5G-002R0L-Lc; Mon, 11 May 2026 22:18:34 +0200
+Date: Mon, 11 May 2026 22:18:34 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 Cc: Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
@@ -58,7 +58,7 @@ Cc: Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH net-next v2 8/9] onsemi: s2500: Add driver support for
  TS2500 MAC-PHY
-Message-ID: <c9b1b559-f72e-46e0-8d71-57ea26f70bb0@lunn.ch>
+Message-ID: <657612fb-747f-4506-8a7f-e9536d7c4c2b@lunn.ch>
 References: <CY8PR02MB924948C0BB8611D5A2618D3283382@CY8PR02MB9249.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -69,7 +69,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <CY8PR02MB924948C0BB8611D5A2618D3283382@CY8PR02MB9249.namprd02.prod.outlook.com>
-X-Rspamd-Queue-Id: 7CC9F51598B
+X-Rspamd-Queue-Id: E8424515C45
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -80,7 +80,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286818-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286819-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_EQ_ADDR_SOME(0.00)[];
@@ -98,150 +98,27 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-> +static const char s2500_stat_strings[][ETH_GSTRING_LEN] = {
-> +	"tx-bytes-ok",
-> +	"tx-frames",
-> +	"tx-broadcast-frames",
-> +	"tx-multicast-frames",
-> +	"tx-64-frames",
-> +	"tx-65-127-frames",
-> +	"tx-128-255-frames",
-> +	"tx-256-511-frames",
-> +	"tx-512-1023-frames",
-> +	"tx-1024-1518-frames",
-> +	"tx-underrun-errors",
-> +	"tx-single-collision",
-> +	"tx-multiple-collision",
-> +	"tx-excessive-collision",
-> +	"tx-deferred-frames",
-> +	"tx-carrier-sense-errors",
-> +	"rx-bytes-ok",
-> +	"rx-frames",
-> +	"rx-broadcast-frames",
-> +	"rx-multicast-frames",
-> +	"rx-64-frames",
-> +	"rx-65-127-frames",
-> +	"rx-128-255-frames",
-> +	"rx-256-511-frames",
-> +	"rx-512-1023-frames",
-> +	"rx-1024-1518-frames",
-> +	"rx-runt",
-> +	"rx-too-long-frames",
-> +	"rx-crc-errors",
-> +	"rx-symbol-errors",
-> +	"rx-alignment-errors",
-> +	"rx-busy-drop-frames",
-> +	"rx-mismatch-drop-frames",
-> +	"ts_frames",
+> +static u32 phy_addr_list[S2500_NUM_REGS] = {
+> +	(0x4 << 16) | 0x8000,
 
-Looks like many of these should be returned via .get_rmon_stats
+> +	(0xC << 16) | 0x10,
 
-> +static void s2500_get_drvinfo(struct net_device *ndev,
-> +			      struct ethtool_drvinfo *info)
-> +{
-> +	strscpy(info->driver, DRV_NAME, sizeof(info->driver));
-> +	strscpy(info->bus_info, dev_name(&ndev->dev), sizeof(info->bus_info));
-> +	strscpy(info->version, DRV_VERSION, sizeof(info->version));
+Is 4 OA_TC6_PHY_C45_VS_PLCA_MMS4?
 
-version is pointless because it never changes, but the kernel is
-always changing. If you don't fill it, the core will return the kernel
-versions.
+0xC is your vendor 1?
 
-> +static int s2500_ethtool_set_link_ksettings(struct net_device *ndev,
-> +					    const struct ethtool_link_ksettings *cmd)
-> +{
-> +	phy_ethtool_ksettings_set(ndev->phydev, cmd);
-> +	return 0;
-> +}
+These should probably be moved somewhere public:
 
-phy_ethtool_set_link_ksettings()
+#define OA_TC6_PHY_C45_PCS_MMS2                 2       /* MMD 3 */
+#define OA_TC6_PHY_C45_PMA_PMD_MMS3             3       /* MMD 1 */
+#define OA_TC6_PHY_C45_VS_PLCA_MMS4             4       /* MMD 31 */
+#define OA_TC6_PHY_C45_AUTO_NEG_MMS5            5       /* MMD 7 */
+#define OA_TC6_PHY_C45_POWER_UNIT_MMS6          6       /* MMD 13 */
 
-> +
-> +static int s2500_ethtool_get_link_ksettings(struct net_device *ndev,
-> +					    struct ethtool_link_ksettings *cmd)
-> +{
-> +	phy_ethtool_ksettings_get(ndev->phydev, cmd);
-> +	return 0;
-> +}
+and think about how you can represent 12 using a #define.
 
-phy_ethtool_get_link_ksettings()
-
-> +++ b/drivers/net/ethernet/onsemi/s2500/s2500_main.c
-> @@ -0,0 +1,698 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * Copyright 2026 Semiconductor Components Industries, LLC ("onsemi").
-> + * onsemi's S2500 10BASE-T1S MAC-PHY driver
-> + */
-> +
-> +#include "s2500_hw_def.h"
-> +
-> +#include <linux/etherdevice.h>
-> +#include <linux/if_ether.h>
-> +#include <linux/irqchip.h>
-> +#include <linux/module.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/phy.h>
-> +
-> +/* S2500 functions & definitions */
-> +
-> +#define S2500_STATUS0_MASK	(S2500_SPI_ST0_CDPE_BIT | \
-> +				S2500_SPI_ST0_TXFCSE_BIT | \
-> +				S2500_SPI_ST0_TTSCAC_BIT | \
-> +				S2500_SPI_ST0_TTSCAB_BIT | \
-> +				S2500_SPI_ST0_TTSCAA_BIT | \
-> +				S2500_SPI_ST0_RESETC_BIT | \
-> +				S2500_SPI_ST0_HDRE_BIT | \
-> +				S2500_SPI_ST0_LOFE_BIT | \
-> +				S2500_SPI_ST0_RXBOE_BIT | \
-> +				S2500_SPI_ST0_TXBUE_BIT | \
-> +				S2500_SPI_ST0_TXBOE_BIT | \
-> +				S2500_SPI_ST0_TXPE_BIT)
-> +
-> +/* Converts a MACPHY ID to a device name */
-> +static inline const char *s2500_id_to_name(u32 id)
-> +{
-> +	if (id == S2500_MODEL_ID)
-> +		return "S2500";
-> +	return "unknown";
-> +}
-
-No inline functions in .c file please.
-
-> +static int s2500_open(struct net_device *ndev)
-> +{
-> +	struct s2500_info *priv = netdev_priv(ndev);
-> +	int ret = 0;
-> +	u32 val;
-> +
-> +	dev_info(&priv->spi->dev, "%s", "s2500_open");
-
-dev_dbg() or not at all. Please don't spam the kernel log.
-
-> +static int s2500_hwtstamp_get(struct net_device *ndev,
-> +			      struct kernel_hwtstamp_config *cfg)
-> +{
-> +	struct s2500_info *priv = netdev_priv(ndev);
-> +
-> +	if (!priv->ptp_clock) {
-> +		cfg->tx_type = 0;
-> +		cfg->rx_filter = 0;
-> +	} else {
-> +		oa_tc6_hwtstamp_get(priv->tc6, cfg);
-> +	}
-> +	return 0;
-
-What is actually specific to the s2500 here? Your aim should be to put
-everything you can into the core.
-
-> +	/* Configure PTP if the model supports it */
-> +	if (priv->capabilities & S2500_CAP_PTP)
-> +		s2500_ptp_register(priv);
-
-That should be in the core, based on FTSC.
-
-	Andrew
+    Andrew
 
