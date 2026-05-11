@@ -1,153 +1,202 @@
-Return-Path: <netdev+bounces-286774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286775-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ELlLJ30aAmocoAEAu9opvQ
-	(envelope-from <netdev+bounces-286774-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 20:05:49 +0200
+	id KHcnDIAcAmocoAEAu9opvQ
+	(envelope-from <netdev+bounces-286775-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 20:14:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B1595140DA
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 20:05:49 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5681C5142A7
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 20:14:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B3BAD3023042
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 18:05:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 12350301D826
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 18:08:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0D947884F;
-	Mon, 11 May 2026 18:05:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6F847884E;
+	Mon, 11 May 2026 18:08:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="buHgxpeh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SQx7Bk9F"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7E2371CFF;
-	Mon, 11 May 2026 18:05:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A778242EEA3;
+	Mon, 11 May 2026 18:08:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778522736; cv=none; b=m3cOwQjs7ojI7wu0tWB39iY3fneHbxMANItutceafvTDieSrmFqDr/rwAbwPbg+U7kHN10YIrK3NrX2b9xlQhY9NI06hov/NCjFRbqiTmXu8IF/HankwKr4f5VVbTyJmyULaI0CY1yuZOceY+Ak2SexfoNNKy8a+0vxfYPzpWIA=
+	t=1778522892; cv=none; b=sVWEvTaqZZcm6sZkbi9WamQ6Cq8yy/g68faGrv4DPDv/V+sx1hDBqsOpL5UmG8C/MfTMQsXNjkF2sz2Sqi0itlaepLQ/mYdhpK7Sdp7sWaosVZEFhZqmPtOKmC/DeecfaHt6dBPCXC28Yf83ly0Fj2PfrgpPoOaufsi+cdEasOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778522736; c=relaxed/simple;
-	bh=xXcn4Rp8hgJmF94zgy9rzHfF5q14gMGoEQCU2/qn9Ig=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R+vyylXlMf1pB4JHuScF8bYPh7x8XLGCIhB9T9FmE5R3rO3MCxMcXlV73Ad4CLcFFhRkYFxNkYuJT8wqhQ14qQvQBiJnTUFKTUAypsEL56ZcbFGD9XefiobFdFk9e0gKStfS9LPY4nML/6iO+7UswiMsMQFGUOMMyQ2I2Smr2dI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=buHgxpeh; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Jh6u29AOADS1fMHBmCiOeXqCU3d+ntmTih5itrIf2Zc=; b=buHgxpehuDjPXoyWstUrVUhMKP
-	e96k0inUJUxTp/HH5DA25IGkPmg+FpjdnULd5Oqendp7rrTlEmPLjujsc1DLi1ca92yQREhuAWYr4
-	/cpTxpfdq3gkSmbMOwe7CMhbYz+l0r/dU/ibeVITbx/6wXm+kZtrSzujNfcw9i6GdueI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wMV0W-002Q6u-Ns; Mon, 11 May 2026 20:05:32 +0200
-Date: Mon, 11 May 2026 20:05:32 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Raczynski <j.raczynski@samsung.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, k.domagalski@samsung.com,
-	k.tegowski@samsung.com
-Subject: Re: [PATCH net-next 2/3] net/stmmac/dwxgmac: Extend MTL/DMA support
- to 16 queues
-Message-ID: <93db358a-4ff2-4cc7-ac89-a0f13ae05597@lunn.ch>
-References: <20260511165416.3093015-1-j.raczynski@samsung.com>
- <CGME20260511165431eucas1p28254403c5d4117b900dca4ca613bb532@eucas1p2.samsung.com>
- <20260511165416.3093015-3-j.raczynski@samsung.com>
+	s=arc-20240116; t=1778522892; c=relaxed/simple;
+	bh=zGxdkZySaTWxihWT7HicM0TgM1njYZbnMUe3rO0FjhE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ULrzH0f+wu2reCuYEhvrE8ppF6Ij8AmZQ2ST0BjkySNFs+AxOgKbdCSYOMFgO6HVKsQeiwJgeipOWqESLtdWTPKEHdJfqP1onuLeSqTysdbSxE0kdPWBkF0L2+ip7/cYoEe0n7TVLNJVmEQsl/z9ohPBpn4YEdk96w8k7BEWiY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SQx7Bk9F; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E79CBC2BCB0;
+	Mon, 11 May 2026 18:08:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778522892;
+	bh=zGxdkZySaTWxihWT7HicM0TgM1njYZbnMUe3rO0FjhE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=SQx7Bk9Fi1NvlUS/w8qhcF6fyU6fHcZeQX60zznPGX2h6sYsESE3hDTd8mYTZShEd
+	 hIBkcZpFUIPaF9Wqt88UjaDXmtJ8Kv6rc3IpynlLJWp6sh9zwyv02bwa9GImfHdqiO
+	 OTqYkaFkkd1YUlGKfqb1x7PhyPCjLpWvUBu1uXxWn21aArWeHvg9ar4/IXc4EGxgsq
+	 4076+fiqrRed3JEQFf6UE88Xw2woRifJ9pG8VQ4MqxbuWoECJJKfmbDd4GC8d7YGvE
+	 OlPSM2wo98z0gOJ8BMSFS3JLCQG5EHiydpL8StMoFdvk89ajN2QGHIf1ysgG2ovQF9
+	 Os2CsCTzN2ZhQ==
+Message-ID: <b78f002a-8cb9-4857-bf8f-0137e790f644@kernel.org>
+Date: Mon, 11 May 2026 20:08:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260511165416.3093015-3-j.raczynski@samsung.com>
-X-Rspamd-Queue-Id: 1B1595140DA
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 3/5] veth: implement Byte Queue Limits (BQL)
+ for latency reduction
+To: Simon Schippers <simon@schippers-hamm.de>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ kernel-team@cloudflare.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20260505132159.241305-1-hawk@kernel.org>
+ <20260505132159.241305-4-hawk@kernel.org>
+ <ee275aa6-af27-4dac-9afa-da88abde312b@schippers-hamm.de>
+ <8f2f7f2e-6aa2-4e5b-b52d-0025b2525579@redhat.com>
+ <e3a91545-13cd-4f87-8375-d707865bdbca@schippers-hamm.de>
+ <6a597dbd-70bf-4b14-b495-2f7248fd3220@kernel.org>
+ <20260508190626.4285fac0@kernel.org>
+ <f459b95c-80d5-4e05-84b2-f574c92724de@kernel.org>
+ <20260510085602.57c7a081@kernel.org>
+ <daa05c21-dcfc-4cc4-aa22-9e25c7f6c743@kernel.org>
+ <41023c34-87a3-4e4f-b3ab-3ed53d171910@schippers-hamm.de>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <41023c34-87a3-4e4f-b3ab-3ed53d171910@schippers-hamm.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 5681C5142A7
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-286775-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286774-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,samsung.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[redhat.com,vger.kernel.org,cloudflare.com,lunn.ch,davemloft.net,google.com,kernel.org,iogearbox.net,gmail.com,fomichev.me];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
+	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[samsung.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Mon, May 11, 2026 at 06:54:15PM +0200, Jakub Raczynski wrote:
-> New datasheets for XGMAC (3.20a and 3.40a, depending on product) support up to
-> 16 MTL/DMA queues. Before we increase max amount through macro,
-> prepare dwxgmac functions to handle that.
+
+
+On 11/05/2026 11.55, Simon Schippers wrote:
+> On 5/11/26 10:11, Jesper Dangaard Brouer wrote:
+>>
+>>
+>> On 10/05/2026 17.56, Jakub Kicinski wrote:
+>>> On Sat, 9 May 2026 11:09:51 +0200 Jesper Dangaard Brouer wrote:
+>>>> On 09/05/2026 04.06, Jakub Kicinski wrote:
+>>>>> On Thu, 7 May 2026 21:09:09 +0200 Jesper Dangaard Brouer wrote:
+>>>>>> Not against being able to modify VETH_RING_SIZE, but I don't think it is
+>>>>>> the solution here.
+>>>>>
+>>>>> Was it evaluated, tho?
+>>>>>
+>>>>> It's obviously super easy these days have AI spew no end of complex
+>>>>> code. So it'd be great to have some solid, ideally production-like
+>>>>> data to back this all up.
+>>>>>
+>>>>> VETH_RING_SIZE seems trivial, ethtool set ringparam
+>>>>
+>>>> No, unfortunately we cannot just decrease the VETH_RING_SIZE.
+>>>
+>>> To be clear - I said may it configurable with ethtool -G
+>>> not change the default.
+>>>
+>>
+>> Sure, I understand the desire to make VETH_RING_SIZE configurable.
+>> If doing so we are making Linux network stack harder to tune and setup
+>> correctly. E.g. adding a qdisc to veth would also require changing the
+>> ring size, but if system also uses XDP then tuning below 64 (likely 128)
+>> will lead to hard-to-find packet drops.
 > 
-> Signed-off-by: Jakub Raczynski <j.raczynski@samsung.com>
-> ---
->  .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  2 ++
->  .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 24 +++++++++++++++++--
->  2 files changed, 24 insertions(+), 2 deletions(-)
+> I mean 64 still could be a 4x improvement at least.
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> index 51943705a2b0..bd333afe7e1b 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> @@ -257,6 +257,8 @@
->  #define XGMAC_MTL_INT_STATUS		0x00001020
->  #define XGMAC_MTL_RXQ_DMA_MAP0		0x00001030
->  #define XGMAC_MTL_RXQ_DMA_MAP1		0x00001034
-> +#define XGMAC_MTL_RXQ_DMA_MAP2		0x00001038
-> +#define XGMAC_MTL_RXQ_DMA_MAP3		0x0000103c
->  #define XGMAC_QxMDMACH(x)		GENMASK((x) * 8 + 7, (x) * 8)
->  #define XGMAC_QxMDMACH_SHIFT(x)		((x) * 8)
->  #define XGMAC_QDDMACH			BIT(7)
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> index 98b3e0cc84fa..76f8214a6e5b 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> @@ -266,9 +266,29 @@ static void dwxgmac2_map_mtl_to_dma(struct mac_device_info *hw, u32 queue,
->  	void __iomem *ioaddr = hw->pcsr;
->  	u32 value, reg;
->  
-> -	reg = (queue < 4) ? XGMAC_MTL_RXQ_DMA_MAP0 : XGMAC_MTL_RXQ_DMA_MAP1;
-> -	if (queue >= 4)
-> +	switch (queue / 4) {
-> +	// queue 0 ~ 3
-> +	case 0:
-> +		reg = XGMAC_MTL_RXQ_DMA_MAP0;
-> +		break;
-> +	// queue 4 ~ 7
 
-I think
+No not really, setting it to 64 will give same (bad) latency from "BQL
+off" which that patchset is trying to address.
 
-	switch (queue):
-	case 0 ... 3:
-	     reg = XGMAC_MTL_RXQ_DMA_MAP0;
+>>
+>> I prefer adding something (like BQL) that auto-tune how much of the ring
+>> queue we are using.  Good queues function as shock absorbers when
+>> concurrent processes in the OS have scheduling noise.
+>>
+>> I acknowledge that Simon Schippers found that the BQL implementation was
+>> actually not auto-tuning.  We need to work on this, my prototype
+>> implementation [1] [2] works surprisingly well.
+>>
+>>
+>> - [1] https://lore.kernel.org/all/3e43117f-356d-4086-a176-abd7fe2e6f0a@kernel.org/2-09-veth-time-based-bql-coalescing.patch
+>> - [2] https://lore.kernel.org/all/3e43117f-356d-4086-a176-abd7fe2e6f0a@kernel.org/
+>>
+>>
+>>>> The reason is that XDP-redirect into veth don't have any
+>>>> back-pressure and would simply drop packets if queue size becomes
+>>>> less than the NAPI budget (64). (Yes, we use both normal path and
+>>>> XDP-redirect in production).
+>>>
+>>> Doesn't this mean you have a queue which is not under BQL control?
+>>>
+>>
+>> It is a matter of perspective. BQL needs between 17-55 elements in the
+>> 256 queue.  At the same time we handle if the ring runs full, e.g. due
+>> to a sudden burst of XDP redirected packets, which pushes packets into
+>> the qdisc layer.
+> 
+> You are checking inflight/limit in /sys directory to get the 17-55
+> number, right?
+> 
 
-is more readable, and expresses in code what you had in the comment.
+Nope, I'm using a bpftrace program to keep track of the inflight/limit
+in a BPF hashmap.  Reading from /sys will not be accurate.
 
-   Andrew
+I moved the selftests into a github repo [1] to allow us to collaborate
+and evaluate the changes more easily.  I explicitly kept the new BPF
+based BQL tracking as a commit[2] for your benefit.
+
+  [1] 
+https://github.com/netoptimizer/veth-backpressure-performance-testing/tree/main/selftests
+
+  [2] 
+https://github.com/netoptimizer/veth-backpressure-performance-testing/commit/f25c5dc92977
+
+Sorry for cutting the remaining of the message, but I ran out of time,
+as things are a bit challenging/hectic here at Cloudflare at the moment.
+
+--Jesper
 
