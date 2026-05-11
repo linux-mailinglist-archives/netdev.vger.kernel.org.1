@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-286728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286729-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2AXoL/L8AWppnAEAu9opvQ
-	(envelope-from <netdev+bounces-286728-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:59:46 +0200
+	id QGNlEOn7AWomnAEAu9opvQ
+	(envelope-from <netdev+bounces-286729-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:55:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8327A511B71
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:59:46 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1987511A54
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 17:55:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 68984308D746
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:52:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9A8DE3024F96
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 15:52:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C9D402BA8;
-	Mon, 11 May 2026 15:52:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 763A3406288;
+	Mon, 11 May 2026 15:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VI8nmkR2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="maKVNWf1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
+Received: from mail-pg1-f194.google.com (mail-pg1-f194.google.com [209.85.215.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D022DF13F
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 15:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66EE402B9C
+	for <netdev@vger.kernel.org>; Mon, 11 May 2026 15:52:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778514750; cv=none; b=S85fhHMoOxmBBB8neZ5vXw8I/yz9KMHMr+ye6ZjjAST+XDGJXfjVQLbvSXjZJaahH3W7MjayJPfHg8bQfYpLjYBX/MwVNRDlPClUDovcw6JhCuU4t5vx3UKwqZWfDAJ6VsZAMO2htmmwU1WWrVsZa+rzTTYuapb3bQLAHNvFqdg=
+	t=1778514756; cv=none; b=deMLHmP00mZk/etbJtNLrCJ+kqn81NCw2EF2ttLFCh7/8F2p+xkwSRTu3cB3KYUxCmlKnWluLrgLqZJe0XLm7CnJzXqSTOfYvHpGehZG/eTDbQG+h5Y+r77piwW5BlZ5oe215AE0kOKXTxJ5X6rfh/9dGzKPjTMZ6lseSen6Qk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778514750; c=relaxed/simple;
-	bh=LY8YpcvM3CXANbpB89jmDW3iNuQAInAhIYtroGvfyng=;
+	s=arc-20240116; t=1778514756; c=relaxed/simple;
+	bh=DTFUEU2OuJNVmNPfMe4YoHyZOAvET9nfa33vgjgsZ7g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cePXtcUOrNJ4Q0WH0uQ5bZxnVNVAOjGBMBbVL9ZtNuBHC3QQLMRtU/kGR6vkaECCqA9eX+UfV6QbZWM/dBnUAXWNrqxwk+7CjE78EY/ZKkmjqv8PnMpuvEgPkZMLFDJhZF0LqCsmWlo5NLKrRU3Ox5rF939iBSLI9JAvZACjfRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VI8nmkR2; arc=none smtp.client-ip=209.85.214.194
+	 MIME-Version:Content-Type; b=u/7ZdxIJXZK9LfAMdoqFlHCbGYXqMn1rJssbYTMEZ0CpRjcpSoz0SfH7eikQ95Tk0AhCs/79Z2hyBzNIDjl7ONe5J8XH6wHUeqEvUKuy5ddULoHqJ1kTAF8+18QRNQpBDhPA9vYceCdVkuPW1nIy0nFjgezH/W/wJ0Oa2wely/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=maKVNWf1; arc=none smtp.client-ip=209.85.215.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-2b4583f0a1aso28622655ad.3
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 08:52:28 -0700 (PDT)
+Received: by mail-pg1-f194.google.com with SMTP id 41be03b00d2f7-c80227c9572so1983780a12.2
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 08:52:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778514748; x=1779119548; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778514754; x=1779119554; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QetRoHLjDkD2yyVDipEmrezVOT3nudkbaSue2EAREBo=;
-        b=VI8nmkR2du8rddqvTnrujuu5pWuAe2LlEPZXvRfpXS392qVA0dEO0w8mqtZckiX4mh
-         3Xbz1/PLM+H2o9ysGW4udUBMZWyr41lxhsuRyqfBajIJyziUx6n7sYFtKQr11mB9efJU
-         6tg3FjPbNvWDlIBZ+jWwTYSQauG1OuvNI44W1eRIGQkYbP6MOj0h7co2fxKfAwL0TWwd
-         m5i47GWZk8Nrg6w4nUet/PJfaRxBuYUYcE12y6y/vg3+OKEp4dLYwk8qtfjJAgFdmC4C
-         yGrnn7eje6RG4c7MQMlWRSH8dI1J6e+2hvCtNtT+rX4HUOsznffONOMnmXjzfBD2DJUn
-         B0uQ==
+        bh=ZY7jXeM4i67pdCLJbWB9EBFnm7uOeoT6zFaMpTbtsOY=;
+        b=maKVNWf1mJzHhaEeiuyuZWckH3Qr84UFyQ/JfdsCVyPgpiP4ln95izCR2on6W9dYFI
+         obCH8V8ylJC0I9ADel0qt/Chk9cL1Kk/8S7QIHFFo4S9PoeWWrHi8HiS6rqh2JyQGzDn
+         ELBdgCqUfWxrKpa6CiFX66vUd6B8bFJzBkDqy0crgM2WPB4N8FYbAtLlJmEgxVvqQGdW
+         3vo01TMvKuQgL/L/53QgdioqDUTTd5h8hu2nzJCc33acg62g46BFofsGwXGPXUd3Fs3E
+         KHOS8wllHWKMYRxNc0gKZyTpYXFnFvwfjx8jwCot8dTdzlFsY/K/Dms1HZWNqrvV9wy0
+         z4Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778514748; x=1779119548;
+        d=1e100.net; s=20251104; t=1778514754; x=1779119554;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=QetRoHLjDkD2yyVDipEmrezVOT3nudkbaSue2EAREBo=;
-        b=DB0iZLDGaBecr/exLrhabj6ilvPho9P9c+gFKSlwMz6WwNEI8dFTfrGSTVxnkop2/6
-         6Npbx+bySwaYh0cT23QRYMFm+XQg61Y3qLgxPfFz39qd3rNouhHp71llUTXS78BC6Nlr
-         bAkieKUf2rRUi2cZBHyDr7m+SdVP+qd/f9NLeHBjF2cWbXh7J8vu7p0v3zLUZ/VsRzec
-         bP9HyneSAjWiR0Qv2YEr942Iya3TAYGZIZ5lvDu3O9urCCPAS1uI4DSw+DHCfs9+SKns
-         W5CFFXgPXjq9w85uhgFGCaXcIYlkbSWD60WrN7mBoX9DWMPdDa9xLYBUl/ihuHYo0eWZ
-         XwxQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+GFupqXmMnyy0gW+W2dS7DxxTMy/srJw+D4cpnwasl0I5oF64Zdc9Q3QfRqFHU13x0gu3pmGI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIJVoht7FcP4wj+HDbRSFxNiW+XsHKLdIl5yWgTfsUBUNIRfYj
-	wiQVbTVggQ3EYPlV8t3T2VG1jt4PYHDsetvITlVn5edmScIp3HMYfHFt
-X-Gm-Gg: Acq92OEzyjcKc0Gp0QJ/MgdtmRTxIp1XF9FBhNBFczejufWVAumgBcGFjKVl9J+/3f4
-	1cMOA7Rkdgy5LB4tagBG6DrNXtAlqkOMqaZoZqbzKWFAyGYB78BFmCyDEFCH4X3hrrwKONGqPUx
-	GJkNj+/jByviJAhEEif2vBA84tom5baZH6575egBACd6anxQJjkEpLg+MLZwWsfFz1UWl7Ji3r+
-	OcWyrkNMl9dVGsQ+isBMbChIIrbgHsmgUkX6EI/mxwQPvVOsda/fTG9PTF5YJ/n0LtMuzL6aBJD
-	uiwQ6nzYbV6Lkdb+7ZilIfrqZvSucBka/2JFDQsEJgy+IATWA+EhnsH0L9AFRUbJxgyU6k16iBo
-	ONci56RHFhkVUD17Wtfth0fADUmbb/1xeqroiwdDKGOwLBO2QF7jhXVY7x1VnCr97sx9u/yr3Ni
-	VZmHqCkoxPbwxtUvrwcJUuqlSyR+6fvIKgl5U=
-X-Received: by 2002:a17:902:f54f:b0:2b2:4d36:7ba with SMTP id d9443c01a7336-2bc7a847f38mr103896425ad.0.1778514748205;
-        Mon, 11 May 2026 08:52:28 -0700 (PDT)
+        bh=ZY7jXeM4i67pdCLJbWB9EBFnm7uOeoT6zFaMpTbtsOY=;
+        b=YkM7drv/UbTguk3aIV69nZ/EKeOYJ9CqgJGZT4AyhlGrvpo600QzAGl0gwTYpbxFg2
+         fqE9/yMcvpR5py6Kkc/WVBqaCfauLSCvtQI702kh89LTpVeV0N2XbEgsNs8EdQJ4iQ+y
+         U9VD3hAke0QGiACjErxC7Rhzjr4fOW+0p6Z787a5D+aGuNYp5de1XHH33Gg45GPc+NHV
+         qNeRm+ObjSzajFBGY6y6685H/6tLorkMJojEOWeVKQ5lUslL75K0bQfqAK6kpTcOLUhm
+         ZxiTg7cu4EWbiWr6wru1X7ktDwHg4FkW7m/Lgs9wIyGS79tXQSCkmpadAHWD/2AGdmxE
+         uD5g==
+X-Forwarded-Encrypted: i=1; AFNElJ/iucI3bXTEUimzno6KSB8uNo/8g9QYshpIA6Zq4H/qRTwA9S/ImK/YXe7ye+6O3hu3ay2riYY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztX+8UasfXI8aEzOUT79ZupRnP6B4HGr2exQIMzbsx4gpPwII6
+	96N2zgwAbWHk4kVKlzNJ2E4upFSugc/RRLaPUi3+QGvGXWJP2xa9NkGn
+X-Gm-Gg: Acq92OE/CoUWw6ETD3bG1WLUu22lAkWXoQfDZZapGxnAGurfD4yGKqLGD98IsXibVZ3
+	GwA+Mo9sJGgww10pkovUDQAJxNnc9FBC+8k72fygcU++69rmSHQs4+qmJSt0uL7P8e/UKkqqKDV
+	8ryJhY2MlDot0gZeCkXA6P/LkpHQVav38se+BIYVR7ctKZqabyEt28eza4BL+ZABT1BpuWzv1k2
+	KPveb1E3IZ2LR6MWeNpoFnPauiDcMeQZC/JaUJu3hmIp+HkORnsJJk8iTn5lRT7Jkqbc8K2TW0g
+	N9SSTCbX0GZuAuR32SKnkO3ZoEfiuvhofPkcoKik24mk/UHI/TyjO/Zk/XhZ4IP5IV9K31RzO+M
+	taBzdIA0sTvewySiZI1s6k+m3fhhS4TxwbLz4NshnkX62Diw3OatZYwz6wJPS93yyrnRH7EKGyS
+	F7k85KheaPirN7K2UvlCaUVxA+h3lSbEnB4/E=
+X-Received: by 2002:a17:903:64f:b0:2b0:41bf:ca83 with SMTP id d9443c01a7336-2ba798c27a9mr170300155ad.23.1778514754024;
+        Mon, 11 May 2026 08:52:34 -0700 (PDT)
 Received: from fedora.localdomain ([222.20.193.20])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1e78c6csm112117885ad.60.2026.05.11.08.52.25
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1e78c6csm112117885ad.60.2026.05.11.08.52.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 08:52:27 -0700 (PDT)
+        Mon, 11 May 2026 08:52:33 -0700 (PDT)
 From: Xingwang Xiang <v3rdant.xiang@gmail.com>
 To: john.fastabend@gmail.com
 Cc: kuba@kernel.org,
@@ -87,9 +87,9 @@ Cc: kuba@kernel.org,
 	netdev@vger.kernel.org,
 	mrpre@163.com,
 	Xingwang Xiang <v3rdant.xiang@gmail.com>
-Subject: [PATCH net v4 1/2] net/tls: reject TLS_RX setsockopt on psock-owned sockets
-Date: Tue, 12 May 2026 00:52:08 +0900
-Message-ID: <20260511155210.32926-2-v3rdant.xiang@gmail.com>
+Subject: [PATCH net v4 2/2] selftests: bpf: add test for KTLS+sockmap reverse-order UAF
+Date: Tue, 12 May 2026 00:52:09 +0900
+Message-ID: <20260511155210.32926-3-v3rdant.xiang@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260511155210.32926-1-v3rdant.xiang@gmail.com>
 References: <20260511155210.32926-1-v3rdant.xiang@gmail.com>
@@ -99,87 +99,248 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 8327A511B71
+X-Rspamd-Queue-Id: D1987511A54
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286728-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_CC(0.00)[kernel.org,cloudflare.com,queasysnail.net,davemloft.net,redhat.com,vger.kernel.org,163.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-286729-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[v3rdantxiang@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.970];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-When a TCP socket is inserted into a sockmap before TLS RX is
-configured, tls_sw_strparser_arm() saves sk_psock_verdict_data_ready
-as rx_ctx->saved_data_ready.  On data arrival tls_rx_msg_ready()
-calls saved_data_ready(), which is sk_psock_verdict_data_ready().
-That calls tcp_read_skb(), draining sk_receive_queue via
-__skb_unlink() without advancing copied_seq, because SK_PASS through
-sk_psock_verdict_recv() does not call tcp_eat_skb().
+Add a selftest that reproduces the use-after-free triggered when a TCP
+socket is inserted into a sockmap *before* TLS RX is configured on it
+(the reverse of the order that is already blocked by the kernel).
 
-tls_strp_msg_load() then sees tcp_inq() >= full_len (stale), calls
-tcp_recv_skb() on an empty queue, triggers WARN_ON_ONCE(!first), and
-returns with rx_ctx->strp.anchor.frag_list still pointing at a
-psock-owned (potentially freed) skb.  tls_decrypt_sg() subsequently
-walks that frag_list, yielding a use-after-free.
+Vulnerable sequence:
 
-The existing guard only covers the reverse order: a sockmap update
-already fails with EBUSY when the socket has TLS ULP set
-(tcp_bpf_check_ulp).  Add the symmetric check: if a psock is already
-attached to the socket, reject setsockopt(TLS_RX) with EBUSY before
-any strparser state is modified.
+  1. bpf_map_update_elem(sockmap, server_fd)
+     -> sk->sk_data_ready = sk_psock_verdict_data_ready
+
+  2. setsockopt(server_fd, SOL_TLS, TLS_RX, ...)
+     -> tls_sw_strparser_arm() saves sk_psock_verdict_data_ready as
+        rx_ctx->saved_data_ready, then sets
+        sk->sk_data_ready = tls_data_ready
+
+When data arrives:
+  tls_data_ready -> tls_strp_data_ready -> tls_rx_msg_ready ->
+  saved_data_ready() [= sk_psock_verdict_data_ready] ->
+  tcp_read_skb() drains sk_receive_queue via __skb_unlink() without
+  calling tcp_eat_skb(), so copied_seq is never advanced.
+
+  tls_strp_msg_load() then finds tcp_inq() >= full_len (stale), calls
+  tcp_recv_skb() on an empty queue, hits WARN_ON_ONCE(!first), and
+  returns with frag_list still pointing at the now psock-owned (or
+  already freed) skb.  tls_decrypt_sg() subsequently walks that stale
+  frag_list: a use-after-free.
+
+The new BPF program (prog_skb_verdict_pass, sk_skb/verdict) returns
+SK_PASS, which is the specific verdict that triggers the missing
+tcp_eat_skb() call inside sk_psock_verdict_recv().
+
+The test drives the full setup in the vulnerable order and then
+attempts a send+recv.  After a correct fix the kernel either:
+
+  (a) rejects setsockopt(TLS_RX) with EBUSY/EINVAL when the socket is
+      already owned by a psock, or
+  (b) completes the data transfer without corruption or kernel warnings.
 
 Signed-off-by: Xingwang Xiang <v3rdant.xiang@gmail.com>
 ---
- net/tls/tls_main.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ .../selftests/bpf/prog_tests/sockmap_ktls.c   | 109 ++++++++++++++++++
+ .../selftests/bpf/progs/test_sockmap_ktls.c   |  21 ++++
+ 2 files changed, 130 insertions(+)
 
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index fd39acf41..46cdd38ae 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -648,6 +648,15 @@ static int do_tls_setsockopt_conf(struct sock *sk, sockptr_t optval,
- 	if (sockptr_is_null(optval) || (optlen < sizeof(*crypto_info)))
- 		return -EINVAL;
+diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c b/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
+index b87e7f39e..e71e6561b 100644
+--- a/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
++++ b/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
+@@ -417,6 +417,113 @@ static void run_tests(int family, enum bpf_map_type map_type)
+ 	close(map);
+ }
  
-+	if (!tx) {
-+		struct sk_psock *psock = sk_psock_get(sk);
++/*
++ * Regression test for the KTLS + sockmap reverse-order frag_list UAF.
++ *
++ * Vulnerable sequence:
++ *   1. Insert receiver socket into sockmap (sets sk_data_ready =
++ *      sk_psock_verdict_data_ready)
++ *   2. Configure TLS RX on the same socket: tls_sw_strparser_arm() saves
++ *      sk_psock_verdict_data_ready as rx_ctx->saved_data_ready and replaces
++ *      sk_data_ready with tls_data_ready.
++ *
++ * When data arrives, tls_rx_msg_ready() calls saved_data_ready(), which is
++ * sk_psock_verdict_data_ready().  That drains sk_receive_queue via
++ * tcp_read_skb() / __skb_unlink() without advancing copied_seq.
++ * tls_strp_msg_load() then finds an empty queue while tcp_inq() is still
++ * non-zero, hits WARN_ON_ONCE(!first), and leaves a dangling frag_list
++ * pointer that tls_decrypt_sg() walks — a use-after-free.
++ *
++ * After the fix the kernel either:
++ *   (a) rejects setsockopt(TLS_RX) with EBUSY/EINVAL when the socket is
++ *       already owned by a psock, or
++ *   (b) correctly handles the data path so recv() returns the right data.
++ */
++static void test_sockmap_ktls_reverse_order_tls(int family, int sotype)
++{
++	struct tls12_crypto_info_aes_gcm_128 crypto_info = {};
++	char send_buf[] = "hello ktls sockmap reverse order";
++	char recv_buf[sizeof(send_buf)] = {};
++	struct test_sockmap_ktls *skel;
++	int c = -1, p = -1, zero = 0;
++	int prog_fd, map_fd;
++	ssize_t n;
++	int err;
 +
-+		if (psock) {
-+			sk_psock_put(sk, psock);
-+			return -EBUSY;
-+		}
++	skel = test_sockmap_ktls__open_and_load();
++	if (!ASSERT_TRUE(skel, "open_and_load"))
++		return;
++
++	err = create_pair(family, sotype, &c, &p);
++	if (!ASSERT_OK(err, "create_pair"))
++		goto out;
++
++	prog_fd = bpf_program__fd(skel->progs.prog_skb_verdict_pass);
++	map_fd = bpf_map__fd(skel->maps.sock_map_verdict);
++
++	err = bpf_prog_attach(prog_fd, map_fd, BPF_SK_SKB_VERDICT, 0);
++	if (!ASSERT_OK(err, "bpf_prog_attach sk_skb verdict"))
++		goto out;
++
++	/* Configure TLS TX on the sender (normal order, no sockmap) */
++	err = setsockopt(c, IPPROTO_TCP, TCP_ULP, "tls", strlen("tls"));
++	if (!ASSERT_OK(err, "setsockopt(TCP_ULP) client"))
++		goto out;
++
++	crypto_info.info.version = TLS_1_2_VERSION;
++	crypto_info.info.cipher_type = TLS_CIPHER_AES_GCM_128;
++	memset(crypto_info.key, 0x01, sizeof(crypto_info.key));
++	memset(crypto_info.salt, 0x02, sizeof(crypto_info.salt));
++
++	err = setsockopt(c, SOL_TLS, TLS_TX, &crypto_info, sizeof(crypto_info));
++	if (!ASSERT_OK(err, "setsockopt(TLS_TX)"))
++		goto out;
++
++	/* Insert receiver into sockmap BEFORE TLS RX — the vulnerable ordering */
++	err = bpf_map_update_elem(map_fd, &zero, &p, BPF_NOEXIST);
++	if (!ASSERT_OK(err, "bpf_map_update_elem server"))
++		goto out;
++
++	/* Attempt TLS RX setup AFTER sockmap insertion */
++	err = setsockopt(p, IPPROTO_TCP, TCP_ULP, "tls", strlen("tls"));
++	if (err) {
++		/* Kernel correctly rejected TLS ULP on a psock-owned socket */
++		ASSERT_TRUE(errno == EINVAL || errno == EBUSY,
++			    "expected EINVAL or EBUSY for TCP_ULP on sockmap socket");
++		goto out;
 +	}
 +
- 	if (tx) {
- 		crypto_ctx = &ctx->crypto_send;
- 		alt_crypto_info = &ctx->crypto_recv.info;
++	err = setsockopt(p, SOL_TLS, TLS_RX, &crypto_info, sizeof(crypto_info));
++	if (err) {
++		/* Kernel correctly rejected TLS RX after sockmap insertion */
++		ASSERT_TRUE(errno == EINVAL || errno == EBUSY || errno == EOPNOTSUPP,
++			    "expected rejection of TLS_RX on sockmap socket");
++		goto out;
++	}
++
++	/*
++	 * Setup was allowed — verify data transfer is correct.
++	 * A buggy kernel hits WARN_ON_ONCE in tls_strp_load_anchor_with_queue
++	 * and may UAF in tls_decrypt_sg when walking the stale frag_list.
++	 */
++	n = send(c, send_buf, sizeof(send_buf), 0);
++	if (!ASSERT_EQ(n, (ssize_t)sizeof(send_buf), "send"))
++		goto out;
++
++	n = recv_timeout(p, recv_buf, sizeof(recv_buf), 0, 5);
++	if (!ASSERT_EQ(n, (ssize_t)sizeof(send_buf), "recv"))
++		goto out;
++
++	ASSERT_OK(memcmp(send_buf, recv_buf, sizeof(send_buf)), "data integrity");
++
++out:
++	if (c != -1)
++		close(c);
++	if (p != -1)
++		close(p);
++	test_sockmap_ktls__destroy(skel);
++}
++
+ static void run_ktls_test(int family, int sotype)
+ {
+ 	if (test__start_subtest("tls simple offload"))
+@@ -429,6 +536,8 @@ static void run_ktls_test(int family, int sotype)
+ 		test_sockmap_ktls_tx_no_buf(family, sotype, true);
+ 	if (test__start_subtest("tls tx with pop"))
+ 		test_sockmap_ktls_tx_pop(family, sotype);
++	if (test__start_subtest("tls rx after sockmap insert"))
++		test_sockmap_ktls_reverse_order_tls(family, sotype);
+ }
+ 
+ void test_sockmap_ktls(void)
+diff --git a/tools/testing/selftests/bpf/progs/test_sockmap_ktls.c b/tools/testing/selftests/bpf/progs/test_sockmap_ktls.c
+index 83df4919c..facafeaf4 100644
+--- a/tools/testing/selftests/bpf/progs/test_sockmap_ktls.c
++++ b/tools/testing/selftests/bpf/progs/test_sockmap_ktls.c
+@@ -17,6 +17,13 @@ struct {
+ 	__type(value, int);
+ } sock_map SEC(".maps");
+ 
++struct {
++	__uint(type, BPF_MAP_TYPE_SOCKMAP);
++	__uint(max_entries, 2);
++	__type(key, int);
++	__type(value, int);
++} sock_map_verdict SEC(".maps");
++
+ SEC("sk_msg")
+ int prog_sk_policy(struct sk_msg_md *msg)
+ {
+@@ -38,3 +45,17 @@ int prog_sk_policy_redir(struct sk_msg_md *msg)
+ 	bpf_msg_apply_bytes(msg, apply_bytes);
+ 	return bpf_msg_redirect_map(msg, &sock_map, two, 0);
+ }
++
++/*
++ * Verdict program for the reverse-order TLS/sockmap regression test.
++ * Returns SK_PASS so tcp_read_skb() drains the receive queue via
++ * sk_psock_verdict_recv() without calling tcp_eat_skb(), which is
++ * the precondition for the KTLS strparser frag_list UAF.
++ */
++SEC("sk_skb/verdict")
++int prog_skb_verdict_pass(struct __sk_buff *skb)
++{
++	return SK_PASS;
++}
++
++char _license[] SEC("license") = "GPL";
 -- 
 2.54.0
 
