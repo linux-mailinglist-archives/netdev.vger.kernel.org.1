@@ -1,146 +1,186 @@
-Return-Path: <netdev+bounces-286482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286487-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KJeSHOmDAWoFcAEAu9opvQ
-	(envelope-from <netdev+bounces-286482-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:23:21 +0200
+	id CAe0LWCEAWoFcAEAu9opvQ
+	(envelope-from <netdev+bounces-286487-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:25:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1258C509122
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:23:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1689A5091BE
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 09:25:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 11E693004DF9
-	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:23:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5D3913035254
+	for <lists+netdev@lfdr.de>; Mon, 11 May 2026 07:23:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B29CC37C914;
-	Mon, 11 May 2026 07:23:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A1AA3112BD;
+	Mon, 11 May 2026 07:23:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SX8mJ++t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WD8abpuI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F58B37A487
-	for <netdev@vger.kernel.org>; Mon, 11 May 2026 07:23:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2EA037E30C;
+	Mon, 11 May 2026 07:23:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778484197; cv=none; b=M/U6t1+QA//L6c2i8+/hIZlJSO7+yOhHeOvP0FqTpUUWlYbzaCSEQ0YP4xwKTGFmGO73i9bnyfHlhEiXnM1/VN7tWQCKbbXTZm+HjZlOxL3jxdUTxHnxau7dTBPmKoB1BTXRSNt3FGl4A7FPsxBN1lF0jvtjLEynLmJAH+P/Tjk=
+	t=1778484200; cv=none; b=oAfOgby8qwi/GAMEvGe+q+HjKJna+s1xxmtfI0bilvMy/aF0s+WgUDMNyuP/fjOrtUyFqRrp86qVCY/oOHZahG+bZzt+FJWecOTCvAIdh6iIXbz9RMp9mNO4UgIQMKd/7uoV8YUCHI0DphcivMkQEGR0hmiq+uQVJWjO3rbKQIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778484197; c=relaxed/simple;
-	bh=QBJ9bAgBdlvl+Y+NPkJIUuN4hkKheOjiuSWIb90iRDg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LsqSZEJqtuo8tllpsS3XNfP2fIB9VfEoAK6FvXlMwKFNP7BC6UlE4HBySGertp8cQ2BTH/OJydZXKBNFaJVYu2NZRh5IlDwVW6EZSJzFS/WGaSCtYBYL7Vxay02GI89rNrEtoYf2OGOS/lFUwlY5EQBAciE4j4S19RYXBifJvkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SX8mJ++t; arc=none smtp.client-ip=209.85.160.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-50fbc70cfbdso95939761cf.2
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 00:23:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778484195; x=1779088995; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9LgfR7YGNZGuLLZeQ+ZuGIJz/Ma2zGid6K+DTuQe30s=;
-        b=SX8mJ++t0922zC8jKWFg3MI7OlUdvdJT36RfwjUK+CXhmrvwRHz2+R3WG1x3OYpbgX
-         eATJB5EsyMcHabgFAv40xHrbU+mWrz+2cfVqzEfv5A+kOacHOnoPkxjCodujALNxPQZV
-         uFOdxgFs9NKHMB5eoQkp5fkLJaAAQoTQE5N9KdTKQ5wQJKpAUniss5jTXxZu9MrJKn0r
-         1VHesl/SFIEhJKVKkwaol26OlJaLyCHif52J4e/IoRyt1727zJMjQbJZym3QBYWag/ON
-         TKrFqvDMb4sJKg8qs2MYdjpcM3szR3aoR+wq875H82PEwLX+bOPov8+yA3W/KSszncD2
-         OmhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778484195; x=1779088995;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9LgfR7YGNZGuLLZeQ+ZuGIJz/Ma2zGid6K+DTuQe30s=;
-        b=cN12fXJEOJFhn3cPlBDorEhBBKoBr71QPDWTczm8lkRom3I1s+njxhwf4VOzcnZdyt
-         9dgLBGVMjVtrjD3dGkf3xB8Y4V4RNYpCX+2kIPFcxAcNrDdxRJhAlctlOZyiIRYQG6a0
-         olRjMR6A9FLaI5DYNwXKTnbddHmILXvHCJNe26c230ZaljfHn3rv4HfrOch25wcipvVH
-         ZcFw59La6waRZ0ugya6MNuHff3ewRrDuGpj7YoYZHuDv/TRj+0z/OvFA1vECu80umNfa
-         lVrx/Nlnp41sld0RWVJzj+ACPA1K9O+HDnVt3WvjvBL18tLHrfylz0IqtauecItqGMqN
-         uFUg==
-X-Forwarded-Encrypted: i=1; AFNElJ+1/CdnazkcPSbIGXI1IF8bcCYBeEeFy4mDN7MHoYZWO+2amNhLHcqQ+YDWrTTM+kYC8DEE40M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLdSAnC5m3JuxxQkvvAFN6w5RUFcO8k65iJnaBVT3tQj5x4T09
-	jHxEd9t1lOC/7maeiqAKYiak4VUAUJeRIAJ85DjFtn2RFVg6NsAdHNVCcjZXsrLucv78I78lwdN
-	PR4jG1WyRtRIubA==
-X-Received: from qtwo19.prod.google.com ([2002:a05:622a:93:b0:50f:def9:dd6f])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:5a09:b0:50f:d54b:34c6 with SMTP id d75a77b69052e-51461be01a0mr325111601cf.12.1778484194959;
- Mon, 11 May 2026 00:23:14 -0700 (PDT)
-Date: Mon, 11 May 2026 07:23:09 +0000
-In-Reply-To: <20260511072310.1094859-1-edumazet@google.com>
+	s=arc-20240116; t=1778484200; c=relaxed/simple;
+	bh=KG6pW0j2q9TtLN/BqYsg6Ko8fpp8rjoXBp5PMI2CHC0=;
+	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=nC0fssKSNAIKpYxSRCM+pzRgsgA5EZMOkzk9uGFRuVc3DGgKQFFdLEL0uJBZHLHeTNtmFCF0YXJ6hAKzKZx8yM3dhSvk+ARFzhyIMLLFxZgx+VJFHcj6Q35D/GKdqA0Y7YkIfRWScKI5IIAhhjc2RZzieOOpVi+oukrkvflMM3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WD8abpuI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A407C2BCB0;
+	Mon, 11 May 2026 07:23:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778484199;
+	bh=KG6pW0j2q9TtLN/BqYsg6Ko8fpp8rjoXBp5PMI2CHC0=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=WD8abpuIQpSehG5qQ5sGU07TfbzEugxT3YfGiQUL/y7b30fUKh5WNNjgapBcMzNFL
+	 y2r9172IOrdS9D+yiq+PYcjn/8tbWDNXJYNqM73LtbHNTyYpA3FGZGGnmvNuQKwFwb
+	 f6gpFluuTOUHqngEwZXuRkDRpZllz1+3gV7Qtc9UCmo4eIhV0grT6Q4tXXOY0fEy3w
+	 z+Ge4/5DpNXjZj5PhjViuqJT7ZAiFnBYV/8HUGWJ966KWD28Mm+D5iCb+weHFtQc6w
+	 nggDuC1ffpd4PyBw5pOuOn+LuRd0kLMM0wHStWlHi1e5FwQBQwy9Z1HvpQbny9BoYc
+	 kSCFNPAB1YG6g==
+From: Allison Henderson <achender@kernel.org>
+To: netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	horms@kernel.org,
+	linux-rdma@vger.kernel.org,
+	achender@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	shuah@kernel.org
+Subject: [PATCH net-next v1 3/9] selftests: rds: Add helper function check_info() in test.py
+Date: Mon, 11 May 2026 00:23:10 -0700
+Message-Id: <20260511072316.1174045-4-achender@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20260511072316.1174045-1-achender@kernel.org>
+References: <20260511072316.1174045-1-achender@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260511072310.1094859-1-edumazet@google.com>
-X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
-Message-ID: <20260511072310.1094859-3-edumazet@google.com>
-Subject: [PATCH v2 net-next 2/3] tcp: use SKB_DROP_REASON_IP_OUTNOROUTES in tcp_v6_send_response()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 1258C509122
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 1689A5091BE
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-286487-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286482-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_NONE(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-0.996];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,test.py:url]
 X-Rspamd-Action: no action
 
-Replace a bare kfree_skb() with a modern sk_skb_reason_drop() call,
-and provide IP_OUTNOROUTES drop reason.
+Hoist the page info logic in test.py into a helper function,
+check_info().  This is a preparatory refactoring for the rds over ROCE
+series that helps modularize the send/recv logic. Breaking up the logic
+now will help avoid large function pylint errors later.  No functional
+changes are introduced in this patch.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: David Ahern <dsahern@kernel.org>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Signed-off-by: Allison Henderson <achender@kernel.org>
 ---
- net/ipv6/tcp_ipv6.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/net/rds/test.py | 53 +++++++++++++++----------
+ 1 file changed, 31 insertions(+), 22 deletions(-)
 
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index d13d49bfef19457cc5902cb556605a80f4c0ab2c..0d5e2b0a3f579a240e3457881bfe6c647cb3d2d9 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -982,7 +982,7 @@ static void tcp_v6_send_response(const struct sock *sk, struct sk_buff *skb, u32
- 		return;
- 	}
+diff --git a/tools/testing/selftests/net/rds/test.py b/tools/testing/selftests/net/rds/test.py
+index 027131b26287..5d4b039580df 100755
+--- a/tools/testing/selftests/net/rds/test.py
++++ b/tools/testing/selftests/net/rds/test.py
+@@ -79,6 +79,36 @@ def netns_socket(netns, *sock_args):
+     u1.close()
+     return socket.fromfd(fds[0], *sock_args)
  
--	kfree_skb(buff);
-+	sk_skb_reason_drop(sk, buff, SKB_DROP_REASON_IP_OUTNOROUTES);
- }
++def check_info(socks):
++    """
++    Check all rds info pages for errors
++
++    :param socks: list of sockets to check
++    """
++
++    # the Python socket module doesn't know these
++    rds_info_first = 10000
++    rds_info_last = 10017
++
++    nr_success = 0
++    nr_error = 0
++
++    for sock in socks:
++        for optname in range(rds_info_first, rds_info_last + 1):
++            # Sigh, the Python socket module doesn't allow us to pass
++            # buffer lengths greater than 1024 for some reason. RDS
++            # wants multiple pages.
++            try:
++                sock.getsockopt(socket.SOL_RDS, optname, 1024)
++                nr_success = nr_success + 1
++            except OSError as e:
++                nr_error = nr_error + 1
++                if e.errno == errno.ENOSPC:
++                    # ignore
++                    pass
++
++    ksft_pr(f"getsockopt(): {nr_success}/{nr_error}")
++
+ def stop_pcaps():
+     """Stop tcpdump processes.
  
- static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb,
+@@ -268,28 +298,7 @@ while nr_send < NUM_PACKETS:
+ 
+ ksft_pr("done", nr_send, nr_recv)
+ 
+-# the Python socket module doesn't know these
+-RDS_INFO_FIRST = 10000
+-RDS_INFO_LAST = 10017
+-
+-nr_success = 0
+-nr_error = 0
+-
+-for s in sockets:
+-    for optname in range(RDS_INFO_FIRST, RDS_INFO_LAST + 1):
+-        # Sigh, the Python socket module doesn't allow us to pass
+-        # buffer lengths greater than 1024 for some reason. RDS
+-        # wants multiple pages.
+-        try:
+-            s.getsockopt(socket.SOL_RDS, optname, 1024)
+-            nr_success = nr_success + 1
+-        except OSError as e:
+-            nr_error = nr_error + 1
+-            if e.errno == errno.ENOSPC:
+-                # ignore
+-                pass
+-
+-ksft_pr(f"getsockopt(): {nr_success}/{nr_error}")
++check_info(sockets)
+ 
+ # cancel timeout
+ signal.alarm(0)
 -- 
-2.54.0.563.g4f69b47b94-goog
+2.25.1
 
 
