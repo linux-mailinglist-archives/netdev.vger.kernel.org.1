@@ -1,307 +1,202 @@
-Return-Path: <netdev+bounces-286954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286955-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +AgjCRu8AmonwAEAu9opvQ
-	(envelope-from <netdev+bounces-286954-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 07:35:23 +0200
+	id 0BoiIGS8AmonwAEAu9opvQ
+	(envelope-from <netdev+bounces-286955-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 07:36:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DA5051A26F
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 07:35:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBFC951A2C5
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 07:36:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1437E30BCD15
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 05:23:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 537B23041BB9
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 05:32:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54D0733C1BD;
-	Tue, 12 May 2026 05:22:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B86AC39891C;
+	Tue, 12 May 2026 05:32:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QLwZ73D/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Pvum05ck"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7F233EAEC
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 05:22:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778563340; cv=pass; b=Pcld+OAckwMCEtc9Z9k1hvX+aVg0+KVywQFjyrUt77h03IZ549XJf5oN5eQphLWjbyil0g3N9PI9hgZ8kqoL66WsNsg4tlEMs/qBCLCwYG08rnpmhS5U4Kd1/2O9YNNmOGc+/9CXP9+uvzMPQDKmMpu4JEAgYUfQeLGlHjknnkY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778563340; c=relaxed/simple;
-	bh=w6LcnvI+UACPGciOB3/FIjNHS7YFdMfDIftn70GGb8s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UArfJuIDZUX5y+Wc0wa87GYetlu581HNXXPGtRkfDVByTUaJDyf7mgNo6wsOm+eRV0EeAZOBiMsKEtejY/UAEzbnZ8rsVWo4DKBCtjYM2LSnyYD93gJm0wN2Ww6QNH2VlB5rsb8SMYRC6YgcrhPgbmxEfO71Ix9gC1UW/2sPkM0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QLwZ73D/; arc=pass smtp.client-ip=209.85.222.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-95697b46831so3459662241.0
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 22:22:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778563324; cv=none;
-        d=google.com; s=arc-20240605;
-        b=EtGA3JyPGdtMapa/ZjbK4Riy7Y2NFZX+OjzBfcHR6jM6WlguoQkvXxP2GqsU0WNPG8
-         zeg5HMTX36sDqW1BbBLlROVgT+nLy7jEN96s5OHPN3F0ZVnWLja7nBWU+k27poL8kyli
-         gYVlZNI3IYbw915RZQ8EeD2lxY/2y75u0hjP0TWeBab977xtAKxe6K1h7pHL6xV97hqK
-         OBMxsvgmtg7KqWIAuaIFC1w8mek7Qn8x1+bjkf6Bsk+7geK1iRT+kEbVA/j6yKAK2WPg
-         i+KZmlN8E60QqUnkVGULshbM4I0H92s820VekmIumCdrg348URVbaAiX9qmFOMBA+Fb7
-         Wf2Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=eYgT6JkoWsOe0O7WVvYu/GZhovUNbtX9Qj6rCvjhBPw=;
-        fh=EbcXnDKF0UKHYD278Eya2iUOJ3MCxKhag2UsiPHLwvI=;
-        b=fy1JoNbm1nI2bFUqxsEy+zHJZEw1zgPFnlVdOiRaq9qNelWGeEZKwZLq/wDbEb8o+f
-         lE10UdNl9oD9dZTtoL2E8HNheYlNI+d7GIs0sE26geyRKimY2M/MDTOUFAvN5QewoMA6
-         DfsEls5tkKOWn5j3vcOKRKQZjs3hT3qsgmyOS/Rqop26sKxN3qNA6iMYcpFihNAKNlDS
-         YJjJK+47TlnFseAVXFS/VeJyuucGnBfAbC0gHBepiJKK8xiNVWZtDJ1o5m/TVf8U6udq
-         X9fwnRd7WymRRhpLN+BLol9HaFsAMAlm14mbSEioYc+cblaiAuCmo5F4WnsYXJDyQKwS
-         yoPw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778563324; x=1779168124; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=eYgT6JkoWsOe0O7WVvYu/GZhovUNbtX9Qj6rCvjhBPw=;
-        b=QLwZ73D/hOr1cbE6gxqw/nYkDtHXQKp49FSL0bDSYNHYRk7zdqG8f2h9BB7N1Sw6Ec
-         pyVJUfICHKkJEu+3psHf8pAyniCnPODWJTkrOgVlJZ4N8DuBJIeoj0SDU2J9MBkog+Bs
-         WHMiyd9ftZf+dYWdnj50j1z3bqI7e8gmeBjbgcnKx5VU2hu4md1NVZnrQIckRcTs48VS
-         YorxDCKrQHc9AIhIMRHvNQCfUjrEQJK5Vqh97OHtIw2d+BFuQSZpcc7kQP1B6rjMAP0E
-         EnMMtR8mBRQfdQMxTrcNwOPmUyJfqX2hoKXPRM6+XdJSaGQjrI9s0Bl/ZqaG287yKXjo
-         8YCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778563324; x=1779168124;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eYgT6JkoWsOe0O7WVvYu/GZhovUNbtX9Qj6rCvjhBPw=;
-        b=JxQ5Gs1YX2TlHmygibPCFlljC2W9P5RO/h1vJrGsb167uqN/88rHncg1WuojN8iT/x
-         YYJdaI5Ry5siol/CKb7igWEdPIWsm7KEBIAHGPHItT9mA7dqki/2bYC0iXcfwxhNaf7l
-         zG/kDVdAlyA8hUPkFizpdxqwCkF7LOym55BNOBar4SHNeouqxtn1Vr5LY2vkB/mtd4aW
-         xQit1U6fF3OEQi53IF0U/72gkx8VNMAs4/2rqkGkpxYiqx/FIB0vFL4m9Vecj9LkWQ/J
-         AUdsnutEd9rdqFQXXU04OB5TmLcJXR9i/UnyJKNxodHxVHZmmjBYfMX13MamZS+KoRB5
-         1RWw==
-X-Forwarded-Encrypted: i=1; AFNElJ/t9vrFh67GiT/6rK6vf2yjA7pXFMt/sOOtFC+ofm++NSyZK2FFMwgkPZw3Si0IpUJZff60YJU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUT+PXmsdT0Ioazr1wXx3Ez6So0OvMELIlVeXgq3de+1IDTlxe
-	1cciEbGQsHHw7WRhG4r2KzXguviFXgyF6F+t7Cwqa2a3fVXuqtKYWyhpx/6CwiauJDRUZD8fDq0
-	fEEMy0SUdNxmsu9ulo2OqJDcWgPqBE2k=
-X-Gm-Gg: Acq92OGC4N44vu6Jc7e4Nx/HTkW1gB/REmO9X2/0IuKx7eVmbeS7qCMVTpJM9xjC8u9
-	APIUZQfv5cGHdPleDOpJvQUiznzZgsVNKQZk6dd0CQ+6AvGMJCSqQ7mccuTPAAOb3onGzVhOWO7
-	BEbw6yYCoxMwcBIua8+D+aVVRvEM8jcr1PAfHVXtXDNjKRhDoQl8E4EKaA4UPgqoqpCO3ACVEOc
-	YkAovk+sriRE/VFobBM2G3Ump11RN88lyJBfbPPGKojvjUSaHDNJzyWHUwIFeLUISoM609pswKk
-	YckZBL0Ely71MsAVIw==
-X-Received: by 2002:a05:6102:38cb:b0:62e:63e8:427b with SMTP id
- ada2fe7eead31-631d5f7dd9emr5242022137.0.1778563323750; Mon, 11 May 2026
- 22:22:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986E438737E
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 05:32:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778563972; cv=none; b=aDHEKdEevUoMWYO+IVNuUUBXKtGWUqDs6oNaSpEdHObfD24MBJixhE34sPsvgUmgfdeOtH17j7GadkUQR9AVXnIJl7jgmW3vI5lxYih3Gw26DPHQBaziv/Pac+1LEZsPWdE/NxUNG//bTVsjDKn6K+TMOEqcWodQHIo5tAEIk/g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778563972; c=relaxed/simple;
+	bh=lx+K+0YCP54PiWyu/GiEJIZl64mAgPzGpZSUAIt8dOU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M+o+Y5Q9kxOuDGKLM3IO/udnQlPzLZKTSM1y7lGEyFeC2ue/7HUlwuDzEGKFdaO6xVV/Vc88dL6FvlU2iexUoV7FfQzmwbzN763wjVZOfWD7hmM6AJEozkajtpcgt0ML3HMS/cclYeFN5Kj5yYUCTjF4RmOicC+BNmlVQ+mKhvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Pvum05ck; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778563971; x=1810099971;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=lx+K+0YCP54PiWyu/GiEJIZl64mAgPzGpZSUAIt8dOU=;
+  b=Pvum05ckXCRMF9elfGwK0jAschaT9KuZaYs713pw5b6sNEnyAFdZpZSN
+   mteqLnx6lpd5csKw0gxQrwIzKMpaqhCXLTVxPrz6R3xMKlvauoss3A1zj
+   C8++EqsI4/Pgv9BhVmvZgOX2MEJW0FgUcPCUm615AS1RV6hS9WF0oOZQr
+   kOe7TPEBJvtZPb+2xFN5kJ+U9FPWZ88n7zWSdlcVLdv9cAONqKMFwTp24
+   5XU3w+Kvyj/Toa8JQe63eTVNDdA2SCGRu2WIu1QQp58tp5xavOrXOfcST
+   27R8Xmzxm+Yo1CErqqn9TTir+zahw9CdVDgDOQQqz5Fh6I4EC9QWtvqax
+   w==;
+X-CSE-ConnectionGUID: yJ0MMWOFSHKCZIH35Q2sjA==
+X-CSE-MsgGUID: T+inO1koQQ+bTx+k++DQOw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11783"; a="89766954"
+X-IronPort-AV: E=Sophos;i="6.23,230,1770624000"; 
+   d="scan'208";a="89766954"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2026 22:32:50 -0700
+X-CSE-ConnectionGUID: 6djvsQSsRwSmwlARv6CcJg==
+X-CSE-MsgGUID: KttygPD5QRSCpD2Dw972PA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,230,1770624000"; 
+   d="scan'208";a="233352080"
+Received: from lkp-server01.sh.intel.com (HELO dca79079c3eb) ([10.239.97.150])
+  by fmviesa010.fm.intel.com with ESMTP; 11 May 2026 22:32:47 -0700
+Received: from kbuild by dca79079c3eb with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wMfjY-000000001dp-0Y1a;
+	Tue, 12 May 2026 05:32:44 +0000
+Date: Tue, 12 May 2026 13:32:29 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH net v2] ptp: ocp: fix resource freeing order
+Message-ID: <202605121304.5VA5PtAi-lkp@intel.com>
+References: <20260511161838.1413499-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1778378864.git.zylzyl2333@gmail.com> <7198fe2845c30c60c6b3833dd78cead8c5966931.1778378864.git.zylzyl2333@gmail.com>
- <e1f1b080-cfde-4ea4-b444-b64d43778b2f@blackwall.org> <9263d4c1-0c57-4926-930b-1d701e1f17db@blackwall.org>
-In-Reply-To: <9263d4c1-0c57-4926-930b-1d701e1f17db@blackwall.org>
-From: Yilin Zhu <zylzyl2333@gmail.com>
-Date: Mon, 11 May 2026 22:21:51 -0700
-X-Gm-Features: AVHnY4K18FPt2uO6-1U5OqSUkqde66HFo9bX9_ajKrRzv_V_NgvX7_lhx7IXbhw
-Message-ID: <CAAAOPT8mBxW9Fd9Sr=xWAb-fa4MUHCqKaQf86-DFNqaB9Xvgng@mail.gmail.com>
-Subject: Re: [PATCH net 1/1] net: bridge: cfm: use a per-bridge frame type
-To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Ren Wei <n05ec@lzu.edu.cn>, bridge@lists.linux.dev, netdev@vger.kernel.org, 
-	idosch@nvidia.com, horatiu.vultur@microchip.com, kuba@kernel.org, 
-	henrik.bjoernlund@microchip.com, yuantan098@gmail.com, yifanwucs@gmail.com, 
-	tomapufckgml@gmail.com, bird@lzu.edu.cn, ronbogo@outlook.com
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 6DA5051A26F
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260511161838.1413499-1-vadim.fedorenko@linux.dev>
+X-Rspamd-Queue-Id: EBFC951A2C5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286954-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lzu.edu.cn,lists.linux.dev,vger.kernel.org,nvidia.com,microchip.com,kernel.org,gmail.com,outlook.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286955-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zylzyl2333@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_TO(0.00)[linux.dev,gmail.com,lunn.ch,davemloft.net,redhat.com,nxp.com,armlinux.org.uk,kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,outlook.com:email,mail.gmail.com:mid,blackwall.org:email]
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:mid,intel.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,01.org:url]
 X-Rspamd-Action: no action
 
-On Sun, 10 May 2026 at 04:40, Nikolay Aleksandrov <razor@blackwall.org> wrote:
->
-> On 10/05/2026 13:05, Nikolay Aleksandrov wrote:
-> > On 10/05/2026 12:15, Ren Wei wrote:
-> >> From: Yilin Zhu <zylzyl2333@gmail.com>
-> >>
-> >> CFM registers a bridge frame handler when the first MEP is created and
-> >> unregisters it when the last MEP is deleted. The registered object also
-> >> contains the hlist_node used by the bridge-local frame_type_list.
-> >>
-> >> The CFM frame type is currently global, so enabling CFM on multiple
-> >> bridges links the same hlist_node into multiple bridge-local lists. A
-> >> later unregister on one bridge can then operate on list state belonging
-> >> to another bridge.
-> >>
-> >> Move the CFM frame type into struct net_bridge and register/unregister
-> >> the bridge-owned object. This keeps frame handler list membership local
-> >> to the bridge while preserving the existing first-MEP/last-MEP lifetime.
-> >>
-> >> Fixes: dc32cbb3dbd7 ("bridge: cfm: Kernel space implementation of CFM. CCM
-> >> frame RX added.")
-> >> Cc: stable@kernel.org
-> >> Reported-by: Yuan Tan <yuantan098@gmail.com>
-> >> Reported-by: Yifan Wu <yifanwucs@gmail.com>
-> >> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-> >> Reported-by: Xin Liu <bird@lzu.edu.cn>
-> >> Co-developed-by: Peihan Liu <ronbogo@outlook.com>
-> >> Signed-off-by: Peihan Liu <ronbogo@outlook.com>
-> >> Signed-off-by: Yilin Zhu <zylzyl2333@gmail.com>
-> >> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
-> >> ---
-> >>   net/bridge/br_cfm.c     | 14 ++++++--------
-> >>   net/bridge/br_private.h | 18 +++++++++++-------
-> >>   2 files changed, 17 insertions(+), 15 deletions(-)
-> >>
-> >
-> > I think MRP suffers from the same bug, but I also think we can contain the
-> > fix within the packet type structure instead of making the already huge
-> > struct net_bridge even bigger. Also, linking a struct within net_bridge
-> > to a list within the same net_bridge looks weird.
-> >
-> > IMO br_add_frame should take a type & a frame_handler, allocate a br_frame_type
-> > dynamically and link it, then br_del_frame should take a type instead of a ptr
-> > and remove that frame type and free it with kfree_rcu. That would require
-> > br_add_frame return value to be checked in the respective cfm/mrp functions.
-> > Warnings for already existing types on add or missing types on del should be
-> > added.
-> >
->
-> Actually I have a better idea since these handlers can be added only once per
-> bridge, we can do away with a simple bitmask (e.g. use net_bridge's options
-> which is in a Rx hot cache line) and even reduce net_bridge size while fixing
-> these bugs, and also remove a conditional from the fast-path when CFM/MRP are
-> not compiled in. Would you like me to prepare it or do you want to give it a go?
->
+Hi Vadim,
 
-Hi Nik,
+kernel test robot noticed the following build errors:
 
-Thanks for the suggestion.
+[auto build test ERROR on net/main]
 
-I'll give it a go. IIUC, the idea is to remove the shared
-br_frame_type list entries for CFM/MRP, track their per-bridge enable
-state with bridge option bits, and dispatch the CFM/MRP handlers directly
-from the receive path when the corresponding EtherType and option bit
-match.
+url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/ptp-ocp-fix-resource-freeing-order/20260512-061754
+base:   net/main
+patch link:    https://lore.kernel.org/r/20260511161838.1413499-1-vadim.fedorenko%40linux.dev
+patch subject: [PATCH net v2] ptp: ocp: fix resource freeing order
+config: sparc64-randconfig-002-20260512 (https://download.01.org/0day-ci/archive/20260512/202605121304.5VA5PtAi-lkp@intel.com/config)
+compiler: sparc64-linux-gcc (GCC) 8.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260512/202605121304.5VA5PtAi-lkp@intel.com/reproduce)
 
-I'll include MRP in v2.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202605121304.5VA5PtAi-lkp@intel.com/
 
-Thanks,
-Yilin
+All errors (new ones prefixed by >>):
 
-> > Would you please take care of MRP as well?
-> >
-> > Cheers,
-> >   Nik
-> >
-> >> diff --git a/net/bridge/br_cfm.c b/net/bridge/br_cfm.c
-> >> index 118c7ea48c35..547c7415c0ea 100644
-> >> --- a/net/bridge/br_cfm.c
-> >> +++ b/net/bridge/br_cfm.c
-> >> @@ -489,11 +489,6 @@ static int br_cfm_frame_rx(struct net_bridge_port *port,
-> >> struct sk_buff *skb)
-> >>       return 1;
-> >>   }
-> >> -static struct br_frame_type cfm_frame_type __read_mostly = {
-> >> -    .type = cpu_to_be16(ETH_P_CFM),
-> >> -    .frame_handler = br_cfm_frame_rx,
-> >> -};
-> >> -
-> >>   int br_cfm_mep_create(struct net_bridge *br,
-> >>                 const u32 instance,
-> >>                 struct br_cfm_mep_create *const create,
-> >> @@ -558,8 +553,11 @@ int br_cfm_mep_create(struct net_bridge *br,
-> >>       INIT_HLIST_HEAD(&mep->peer_mep_list);
-> >>       INIT_DELAYED_WORK(&mep->ccm_tx_dwork, ccm_tx_work_expired);
-> >> -    if (hlist_empty(&br->mep_list))
-> >> -        br_add_frame(br, &cfm_frame_type);
-> >> +    if (hlist_empty(&br->mep_list)) {
-> >> +        br->cfm_frame_type.type = cpu_to_be16(ETH_P_CFM);
-> >> +        br->cfm_frame_type.frame_handler = br_cfm_frame_rx;
-> >> +        br_add_frame(br, &br->cfm_frame_type);
-> >> +    }
-> >>       hlist_add_tail_rcu(&mep->head, &br->mep_list);
-> >> @@ -588,7 +586,7 @@ static void mep_delete_implementation(struct net_bridge *br,
-> >>       kfree_rcu(mep, rcu);
-> >>       if (hlist_empty(&br->mep_list))
-> >> -        br_del_frame(br, &cfm_frame_type);
-> >> +        br_del_frame(br, &br->cfm_frame_type);
-> >>   }
-> >>   int br_cfm_mep_delete(struct net_bridge *br,
-> >> diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
-> >> index bed1b1d9b282..a3ed9ee826f5 100644
-> >> --- a/net/bridge/br_private.h
-> >> +++ b/net/bridge/br_private.h
-> >> @@ -61,6 +61,9 @@ typedef struct bridge_id bridge_id;
-> >>   typedef struct mac_addr mac_addr;
-> >>   typedef __u16 port_id;
-> >> +struct net_bridge_port;
-> >> +struct sk_buff;
-> >> +
-> >>   struct bridge_id {
-> >>       unsigned char    prio[2];
-> >>       unsigned char    addr[ETH_ALEN];
-> >> @@ -70,6 +73,13 @@ struct mac_addr {
-> >>       unsigned char    addr[ETH_ALEN];
-> >>   };
-> >> +struct br_frame_type {
-> >> +    __be16            type;
-> >> +    int            (*frame_handler)(struct net_bridge_port *port,
-> >> +                         struct sk_buff *skb);
-> >> +    struct hlist_node    list;
-> >> +};
-> >> +
-> >>   #ifdef CONFIG_BRIDGE_IGMP_SNOOPING
-> >>   /* our own querier */
-> >>   struct bridge_mcast_own_query {
-> >> @@ -585,6 +595,7 @@ struct net_bridge {
-> >>       struct hlist_head        mrp_list;
-> >>   #endif
-> >>   #if IS_ENABLED(CONFIG_BRIDGE_CFM)
-> >> +    struct br_frame_type    cfm_frame_type;
-> >>       struct hlist_head        mep_list;
-> >>   #endif
-> >>   };
-> >> @@ -926,13 +937,6 @@ int nbp_backup_change(struct net_bridge_port *p, struct
-> >> net_device *backup_dev);
-> >>   int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff
-> >> *skb);
-> >>   rx_handler_func_t *br_get_rx_handler(const struct net_device *dev);
-> >> -struct br_frame_type {
-> >> -    __be16            type;
-> >> -    int            (*frame_handler)(struct net_bridge_port *port,
-> >> -                         struct sk_buff *skb);
-> >> -    struct hlist_node    list;
-> >> -};
-> >> -
-> >>   void br_add_frame(struct net_bridge *br, struct br_frame_type *ft);
-> >>   void br_del_frame(struct net_bridge *br, struct br_frame_type *ft);
-> >
->
+   drivers/ptp/ptp_ocp.c: In function 'ptp_ocp_detach':
+>> drivers/ptp/ptp_ocp.c:4872:39: error: expected ';' before 'if'
+      ptp_ocp_ts_enable(bp->ts1, 0, false)
+                                          ^
+                                          ;
+     if (bp->ts2)
+     ~~                                    
+
+
+vim +4872 drivers/ptp/ptp_ocp.c
+
+  4860	
+  4861	static void
+  4862	ptp_ocp_detach(struct ptp_ocp *bp)
+  4863	{
+  4864		int i;
+  4865	
+  4866		ptp_ocp_debugfs_remove_device(bp);
+  4867		ptp_ocp_detach_sysfs(bp);
+  4868		ptp_ocp_attr_group_del(bp);
+  4869		timer_delete_sync(&bp->watchdog);
+  4870		/* Disable interrupts on all timestampers */
+  4871		if (bp->ts1)
+> 4872			ptp_ocp_ts_enable(bp->ts1, 0, false)
+  4873		if (bp->ts2)
+  4874			ptp_ocp_ts_enable(bp->ts2, 0, false)
+  4875		if (bp->ts3)
+  4876			ptp_ocp_ts_enable(bp->ts3, 0, false)
+  4877		if (bp->ts4)
+  4878			ptp_ocp_ts_enable(bp->ts4, 0, false)
+  4879		if (bp->ptp)
+  4880			ptp_clock_unregister(bp->ptp);
+  4881		kfree(bp->ptp_info.pin_config);
+  4882		ptp_ocp_unregister_ext(bp->ts0);
+  4883		ptp_ocp_unregister_ext(bp->ts1);
+  4884		ptp_ocp_unregister_ext(bp->ts2);
+  4885		ptp_ocp_unregister_ext(bp->ts3);
+  4886		ptp_ocp_unregister_ext(bp->ts4);
+  4887		ptp_ocp_unregister_ext(bp->pps);
+  4888		for (i = 0; i < 4; i++)
+  4889			ptp_ocp_unregister_ext(bp->signal_out[i]);
+  4890		for (i = 0; i < __PORT_COUNT; i++)
+  4891			if (bp->port[i].line != -1)
+  4892				serial8250_unregister_port(bp->port[i].line);
+  4893		platform_device_unregister(bp->spi_flash);
+  4894		platform_device_unregister(bp->i2c_ctrl);
+  4895		if (bp->i2c_clk)
+  4896			clk_hw_unregister_fixed_rate(bp->i2c_clk);
+  4897		if (bp->n_irqs)
+  4898			pci_free_irq_vectors(bp->pdev);
+  4899		device_unregister(&bp->dev);
+  4900	}
+  4901	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
