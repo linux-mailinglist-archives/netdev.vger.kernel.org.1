@@ -1,110 +1,204 @@
-Return-Path: <netdev+bounces-286891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286892-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ABH5GK19AmrCtgEAu9opvQ
-	(envelope-from <netdev+bounces-286891-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 03:09:01 +0200
+	id WKwkMWR/AmoZtwEAu9opvQ
+	(envelope-from <netdev+bounces-286892-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 03:16:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E441851809A
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 03:09:00 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42337518155
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 03:16:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 74C1D3016EC8
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 01:08:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5D747302962B
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 01:16:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A6A723EAA0;
-	Tue, 12 May 2026 01:08:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 518DE253B58;
+	Tue, 12 May 2026 01:16:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bA/ToxwQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OUfhKIfw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A1222156C;
-	Tue, 12 May 2026 01:08:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281CA19AD90;
+	Tue, 12 May 2026 01:16:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778548124; cv=none; b=KbDQwXZC61aFPIz/Fbay/NxZZ9ONKyPHjUTeg7W/SKNO+5mHPsnZIm2TkuIgOCQi8fb+oT9d6ObuGN/JiBqXKg6XwXZAZs5RyflQmyWfVg4ZXSigHgTSgYyM+3jQ0F0YShizPkWgc1zh3SEL7C14te7k9S2iBcjMT1nQxpXRUj4=
+	t=1778548566; cv=none; b=uljwkQ56Tzu7+keQhDRfw7xlogyVBFG1vQoTWnmrAtqVMFC4ip1JWDrJsJR/4qzratN4CsfOXmsh0uf2L/Li8T5IyEw0nnUb2IILiq5gdQX5X+wEl9fYZLW8/2x7RWhH2vWZxUGX4pHZ6EWjdcWXjAjoI1sxHHxecjNIpK+if20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778548124; c=relaxed/simple;
-	bh=y+581VyAmDoRxgCfmK0fkL9lSondMn5xnIWlB1UWcvk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CAzmQwuzrQtE1b6zdYTdxRWTtiL2Rf09zDk0Z+bTMPxBxF7f+sMeqiUTGk6hJSw7JtHjMWN3/YefJPrwN/hEd6D17UtZndFcoaw55I+NNH7ZQ7AKiirlJFpNVOq9sDzKwaO4NSBliAsKpQ/7istTfFzFnjVjzUomdqg9omcmGrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bA/ToxwQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 692A0C2BCB0;
-	Tue, 12 May 2026 01:08:43 +0000 (UTC)
+	s=arc-20240116; t=1778548566; c=relaxed/simple;
+	bh=ACf9F8mIe11uR9zPEzpLlpeJBEkpXvF/E/hQaOiFhrU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qlkExy+gLpaqIcJm4OQqBOaEChTlhORMfMwQPEzpHtp69A9wVHv732tjBzi5YwBSdCIoD6P3vUt2TNztPsBW0NpeNgcfTOKP3RDjM5iHHlvPJaYYmP5LkhAmFGqqFXQVYUZGeNm+iZtmTmSQQw273+vzAN02NOJ/mOuun2hyaAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OUfhKIfw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EA50C2BCB0;
+	Tue, 12 May 2026 01:16:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778548123;
-	bh=y+581VyAmDoRxgCfmK0fkL9lSondMn5xnIWlB1UWcvk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bA/ToxwQ5+E+ECM8M4dbimYOgMPkmOLl1zfrwLzNyRbh2l4MZUnf7c4/73Z2UoEle
-	 4mJakNujH+UAy93pDnMBplHKbZORFwlg/QvQ5Yv7XkdLtjlxO4xK7JSj8TqqTPQQep
-	 s+W6/Lx0ML3afttAjJbY6cV3LsD6FEUOc6Ouq2YwD9gdx/6Iz13LKDsmY5DJZR0s/w
-	 RnJgn7twHjmFI9PZ8pCaHc6b3OeT/gQyeRAtgU8ArSlhLqhRTee23zJ0woVHv6jnpk
-	 GRxd5CnWBevIcmoT1bYuvvq7Xa0VUz20gyCxEJRKSQRjrJLCLTqR14sv9B2Oz8ZmdY
-	 TcRQ/m+ealVhw==
-Date: Mon, 11 May 2026 18:08:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: muhammad.nazim.amirul.nazle.asmade@altera.com
-Cc: netdev@vger.kernel.org, davem@davemloft.net, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3] net: stmmac: Use interrupt mode INTM=1 for
- per channel irq
-Message-ID: <20260511180842.0a547a25@kernel.org>
-In-Reply-To: <20260507070125.11886-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
-References: <20260507070125.11886-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
+	s=k20201202; t=1778548565;
+	bh=ACf9F8mIe11uR9zPEzpLlpeJBEkpXvF/E/hQaOiFhrU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OUfhKIfwzuH226iZczHaYhoQACRSH2B1xVSUZfwTCDcXqu92SoJTYAQJG1dAkvSES
+	 ZAH9f7JH+WWSt/8oU9itsz8CkbQq3UvEf+kqcvyW618t3fSB2G8G4INL8vq43A9W25
+	 bozKFqvXU4Ex5W+9HEkFOfo7uCUFZ2gzoPUe6mYCzlei1Cx9u2uX7ltZZB3M9hrP4D
+	 m0/ISBGrpUlo7gTM4fE+cRTWgDzypCL6ZIyHLy0/KEwlJ2nS0t3sFReZ17FXkKFy8I
+	 2rBD1NceY8pJzxAnrE9gtu8N5wUV4VFgV4ACZCYZm3Sfhs8hxdB8WV+GxxnFTIoZu/
+	 lyuDz4wF/Fpig==
+Date: Tue, 12 May 2026 09:15:59 +0800
+From: "Peter Chen (CIX)" <peter.chen@kernel.org>
+To: Svyatoslav Ryhel <clamor95@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Thierry Reding <thierry.reding@kernel.org>,
+	Jonathan Hunter <jonathanh@nvidia.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
+	linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org
+Subject: Re: [PATCH v1 2/6] usb: chipidea: tegra: Avoid controller/PHY init
+ if bus is externally controlled
+Message-ID: <agJ/T8nBGWEoblmd@nchen-desktop>
+References: <20260511135703.62470-1-clamor95@gmail.com>
+ <20260511135703.62470-3-clamor95@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: E441851809A
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260511135703.62470-3-clamor95@gmail.com>
+X-Rspamd-Queue-Id: 42337518155
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286891-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286892-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[peter.chen@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Thu,  7 May 2026 00:01:25 -0700
-muhammad.nazim.amirul.nazle.asmade@altera.com wrote:
-> - Wire up multi_irq_en via STMMAC_FLAG_MULTI_IRQ_EN in stmmac_main.c
->   so the feature is reachable by platform drivers.
+On 26-05-11 16:56:57, Svyatoslav Ryhel wrote:
+> If the USB controller and PHY are externally controlled, then the
+> registration of the controller and the PHY initialization should be
+> skipped, since these configurations must be done by the device that
+> controls the bus to work correctly.
+> 
 
-Okay, but where is a platform driver which uses it _today_ ?
-We need an upstream platform that uses this new bit submitted
-as part of the same series.
+I find you only control USB controller device add at PHY driver, most of USB drivers
+has PHY control, for chipidea, it has PHY control at core.c, would please try to
+adapt for it?
 
-If I'm completely off, and this new code somehow gets triggered
-with upstream platforms - please improve the commit message.
+Peter
+
+> Signed-off-by: Svyatoslav Ryhel <clamor95@gmail.com>
+> ---
+>  drivers/usb/chipidea/ci_hdrc_tegra.c | 36 +++++++++++++++++-----------
+>  1 file changed, 22 insertions(+), 14 deletions(-)
+> 
+> diff --git a/drivers/usb/chipidea/ci_hdrc_tegra.c b/drivers/usb/chipidea/ci_hdrc_tegra.c
+> index 372788f0f970..593390a818d1 100644
+> --- a/drivers/usb/chipidea/ci_hdrc_tegra.c
+> +++ b/drivers/usb/chipidea/ci_hdrc_tegra.c
+> @@ -32,6 +32,7 @@ struct tegra_usb {
+>  	struct clk *clk;
+>  
+>  	bool needs_double_reset;
+> +	bool externally_controlled;
+>  };
+>  
+>  struct tegra_usb_soc_info {
+> @@ -312,20 +313,25 @@ static int tegra_usb_probe(struct platform_device *pdev)
+>  	if (device_property_present(&pdev->dev, "nvidia,needs-double-reset"))
+>  		usb->needs_double_reset = true;
+>  
+> +	if (device_property_present(&pdev->dev, "nvidia,external-control"))
+> +		usb->externally_controlled = true;
+> +
+>  	err = tegra_usb_reset_controller(&pdev->dev);
+>  	if (err) {
+>  		dev_err_probe(&pdev->dev, err, "failed to reset controller");
+>  		goto fail_power_off;
+>  	}
+>  
+> -	/*
+> -	 * USB controller registers shouldn't be touched before PHY is
+> -	 * initialized, otherwise CPU will hang because clocks are gated.
+> -	 * PHY driver controls gating of internal USB clocks on Tegra.
+> -	 */
+> -	err = usb_phy_init(usb->phy);
+> -	if (err)
+> -		goto fail_power_off;
+> +	if (!usb->externally_controlled) {
+> +		/*
+> +		 * USB controller registers shouldn't be touched before PHY is
+> +		 * initialized, otherwise CPU will hang because clocks are gated.
+> +		 * PHY driver controls gating of internal USB clocks on Tegra.
+> +		 */
+> +		err = usb_phy_init(usb->phy);
+> +		if (err)
+> +			goto fail_power_off;
+> +	}
+>  
+>  	/* setup and register ChipIdea HDRC device */
+>  	usb->soc = soc;
+> @@ -342,12 +348,14 @@ static int tegra_usb_probe(struct platform_device *pdev)
+>  	if (of_usb_get_phy_mode(pdev->dev.of_node) == USBPHY_INTERFACE_MODE_ULPI)
+>  		usb->data.flags &= ~CI_HDRC_SUPPORTS_RUNTIME_PM;
+>  
+> -	usb->dev = ci_hdrc_add_device(&pdev->dev, pdev->resource,
+> -				      pdev->num_resources, &usb->data);
+> -	if (IS_ERR(usb->dev)) {
+> -		err = dev_err_probe(&pdev->dev, PTR_ERR(usb->dev),
+> -				    "failed to add HDRC device");
+> -		goto phy_shutdown;
+> +	if (!usb->externally_controlled) {
+> +		usb->dev = ci_hdrc_add_device(&pdev->dev, pdev->resource,
+> +					      pdev->num_resources, &usb->data);
+> +		if (IS_ERR(usb->dev)) {
+> +			err = dev_err_probe(&pdev->dev, PTR_ERR(usb->dev),
+> +					    "failed to add HDRC device");
+> +			goto phy_shutdown;
+> +		}
+>  	}
+>  
+>  	return 0;
+> -- 
+> 2.51.0
+> 
+
 -- 
-pw-bot: cr
+
+Best regards,
+Peter
 
