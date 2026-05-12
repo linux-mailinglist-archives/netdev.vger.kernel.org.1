@@ -1,203 +1,213 @@
-Return-Path: <netdev+bounces-287307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287308-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EJUzLFaZA2p27wEAu9opvQ
-	(envelope-from <netdev+bounces-287307-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 23:19:18 +0200
+	id MNVJBueZA2p27wEAu9opvQ
+	(envelope-from <netdev+bounces-287308-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 23:21:43 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 438BE52A2D0
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 23:19:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 717A052A377
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 23:21:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0C50730903A3
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 21:19:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 19736306C3C9
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 21:21:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 596C937FF71;
-	Tue, 12 May 2026 21:18:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94515379C55;
+	Tue, 12 May 2026 21:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="PWARkuK/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-pl1-f226.google.com (mail-pl1-f226.google.com [209.85.214.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B3F26ED46
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 21:18:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26628357D19
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 21:21:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778620739; cv=none; b=nWN0UVtS2CUCF6nPLtW2lpRDOpAcXf2eTj3oIoEl3FGP7mYpa1gB8a3/cB5+IWXU5vQ+ahm54Q1AolkcmHrh6NxHG7AMaDp9OL+CwYIROzaZedqTGdesV3OChiGiAL7pCwuAgViGT0O/8Ph9qvjHKfbeGYaXADdgw2XLidhCWf0=
+	t=1778620899; cv=none; b=gbTiQHSOtTebvUMjGE8M8Tf1yErqBtFWynWtIJUXS5RgUesWVgAF5b0fz60isU87mnVT4gm5ufO4dj7iaMcBV1cNdUPTdVr+K4FiVKxXbG1RseArYln2mjFN++UaLyR6f6+YF1dpG+hAnTQGbR3agPMF/1E2tUdRIfYOzeWCxGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778620739; c=relaxed/simple;
-	bh=ZF+m+ZjVtnGgRZxs8fykE/7UK37XkDux4yfRZUGOw5Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mQcgKoG+Ht5dG0azZq1bY8kHc5uKC2RFKdgeRyRDSYe7OgFFdPsUfkRrZWBdmcPAj/PreRcbO9siM06nj4XIUpuzK/jra3BVoFy/qX+rBUaW+L9iV5L+Q0kCQgEs+aXzzDAA+LeJhLHUEXiW3yC+BSwS4dzEBArO7khYlp9WkW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-67da63ae541so10613289a12.0
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 14:18:57 -0700 (PDT)
+	s=arc-20240116; t=1778620899; c=relaxed/simple;
+	bh=ZreFQtX/Nm8nnTIYzrKqjmFmDNrdFUpuv0A5omdi8KE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WZPu41RnxvnNTMduMoDLdhROUmTSXjdgqruP6ZEbyb2nXk2vD2jngN4s43pok5o1M6NJHkT1a40+1vY/HEWeGT7F5Cc9FxLCccrb6HfYtXu7RdlMzigVpzQtsTuN0RCUCSzC7NwmaDyeIS1wZzaos+498MEn2+TS+uLknbb+9Js=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=PWARkuK/; arc=none smtp.client-ip=209.85.214.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f226.google.com with SMTP id d9443c01a7336-2ba1e9d3687so39694305ad.3
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 14:21:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778620736; x=1779225536;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ULDGSLAty8SEh/aPzQ3wMjjybANkPqfntQTcejrtbks=;
-        b=iAO26F7d2JAvR9efMRvyD+fi+XRBvyPayQPAO8ioXJrBCksOD2bpkYjmqoItdqRheh
-         r+I0cENRoFbh91H7MxIkxkL/FWshiNw9PGk8jUyKIsGlS/oZq2pcEnDplk/CvL5la0Gb
-         u0z+RTK+gIFrjbzhfWu+v2grVZYYe8s/Lv0kbCdI4mDKNbgm6rk1DMyBG1Dho4A5Jh72
-         5tOS4OiXrv/5WkabyTV9t7TsNJHbhl2Ocm++TkDz0lConymUY+Xzxya0PSUbeeeEa1JK
-         PojVeBt8KqeRWA08svzHq7IWbS3gl9RHa3K1IH+d/Nib+8Eqg1DleIcN+k/jjxR6Ul4F
-         Mf2Q==
-X-Forwarded-Encrypted: i=1; AFNElJ95m+QMf4FI3Q+uDOFkO5og4ov+o3dZmJDx3fS1eikLB0GS8LsP1G8VYije870iWElXvkV2DJk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxS0xBh+wSqPUtCkSk8PTFAbNmeop5DSoFBc5xZIju9KZpf7MGw
-	QsFhL+hSay51G1QmpOmEpIr+5lPvhYCCyfpyCn+/lPOw7jE8WfjB7fqb6Jilb9j75ns=
-X-Gm-Gg: Acq92OHDIcN/wU1frELK3p5G3O/0HmaFSC32PfW0vlwq7ramJ5osgjTp0GZuhV3D9UK
-	iQPvRCdYo/iZOG7bAa/MxK8xj0inf8MK/7E5vlsjjzoCzSbbQu8uT/+Jx1Rie7QorePkml2eyyG
-	httEmA29jvehtSy3l8+8ihmd9rgDBjkVkFd9ikbCD1SOPdInmC0yEJQ4GdCq7cwCtsW1FAKMCUQ
-	e8N5QWPhiLH+vPWoSIpBsA6m2yowsr3pd7RuKVJtHR7oD8RYv3o9J3aBp5O/IR6/nZD27AnaOWR
-	Yhv8umANSLQrOMeH7O8FPPxr3ZLcfnUybquZv6kDTdIzinstbx02nAUZMW5VywmznNsCmOFJZ/H
-	llJ3qZefQVYnBwCLe6GqOKFlwEO3tjoyjj2h6Z+QOiKs6LDFh5BlZa1+RREVzvuBoAcSD1OHvjn
-	fwWsLqTdDSySmhUZd+atDlVUfJtugw1SCEtYnDf3bGlR9w7EhCLGji3Q==
-X-Received: by 2002:aa7:d74f:0:b0:681:2472:76c2 with SMTP id 4fb4d7f45d1cf-682558ec2ccmr197916a12.4.1778620735839;
-        Tue, 12 May 2026 14:18:55 -0700 (PDT)
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com. [209.85.218.42])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-67ef0e0d455sm5538690a12.21.2026.05.12.14.18.53
+        d=1e100.net; s=20251104; t=1778620897; x=1779225697;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E5N/aiikmvqNMuuf2jP9nM0ku7DfZyr7Pis/tFxzFic=;
+        b=OfnQ/txL6BcROs7ensBhI5R9T2rPEwWvEXAAVjzgdPTlkkQgTYSXnicBVKHGiNhkLX
+         09mH6U7wcgkCkDUkc8oWb7NuFEeJCUER4hfCm8G9LlxkaSEmL5xnKJRurLBYqYeB5E6u
+         zjiyy6BGs/j5r5LeObTZmEw5uSLv60hwWaGX1dkOSdNindjHNdMgiBxID6H1Evl/44oJ
+         1n786lQeKkWcoAfnDzTYMZnLDUwQG/mzA9a80qqTKHOEBSywwJb6V2LoMBfxdrUcyN3R
+         bNRsnEdriP/bLflWef57l0RNQPPetyVDDzSb5rRsaIy3BBcpfO1l9Qr6FUMvsPcQUtrg
+         CGiA==
+X-Gm-Message-State: AOJu0YxeF3cRYIuoOM5yrB3HW2kGNVqww7OF3FKuzCcVufXAptS3NK+z
+	LWhschMSZ+9pCQ2vJILIh234ZaBQY8LQUIqwxAa2R2Ergqz1Ru/XJR/BPFAbx12rs/EpWfodigY
+	J5bx6UCAluF9dW3AluGHeDkGPrSRu4gUYhVATN/BwoXIPHk3ncG4IarydmXnIajzzxU+P0MOaPV
+	E7WwfPHlCYpZtcwnPVEQl+Q6fkl1nh7L3e34vMUHM9o1b5fl44TXR/imVeCQIbm/7klNO6IHxvD
+	mPgmxSCXYg=
+X-Gm-Gg: Acq92OE+aK7kvP9xoLSjCWaSIfNxD+YrQ+HmtcFZLm0YRLbQO+O5USg9ylIs77Ye+sw
+	TGZRzbccs8bFGMpInn67yOiUq0HbC5eMBXQcVv6cPnqa3eULTpUXzWK3GAal0hoFPlIeNugCSE4
+	eEwSpvD8cNG7VzcaCFChvGroe8r1G7zUrPiDQ28LGXF5ox9pT8zh3h3BW1iTi8LQQx3YXSW3wih
+	phrfWUjJiP0YvBJt3Iak1Ewh725J+Ryx5HV8xApiypgOKj+kM5WQZ/8WnaqUMVP/Do2oTIWDBUg
+	S1NMmaSMnf++DcR7sr+JS0w7ZqA7+DvcDA7p6j8hWaXhe3IVBUvjHvgknmUuO0fO37AlFxcZaWA
+	FKOqwAaW2Gm5y4ZM9W3SHq4SzwJB125M47x95ZVdJb7NSJsUje10Nw8G+sweNmpyqYljsxXytEN
+	i4ZKB64tH0WlECFA60xRrq+Hm95syWS18JJ2sXjZADNSpJ1oXOEJUgJesr
+X-Received: by 2002:a17:903:2b0e:b0:2ba:6ca2:bca with SMTP id d9443c01a7336-2bd275a9707mr6759875ad.26.1778620897338;
+        Tue, 12 May 2026 14:21:37 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-16.dlp.protect.broadcom.com. [144.49.247.16])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2baf1ead595sm10732545ad.27.2026.05.12.14.21.35
         for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 May 2026 14:18:54 -0700 (PDT)
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-bd24f466598so272297866b.3
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 14:18:53 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ+Gw26NNvu7MCt9oDCvB5ueFkQaw7vJOBByDZdc2cmn9r3AQ2Xm4J7LtpTkXtAuIdm+2EWgAOU=@vger.kernel.org
-X-Received: by 2002:a17:907:80a:b0:bd1:e36f:1ad7 with SMTP id
- a640c23a62f3a-bd3bf484689mr27989066b.9.1778620733204; Tue, 12 May 2026
- 14:18:53 -0700 (PDT)
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 12 May 2026 14:21:37 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-dl1-f71.google.com with SMTP id a92af1059eb24-132a8f93432so12235494c88.0
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 14:21:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1778620894; x=1779225694; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=E5N/aiikmvqNMuuf2jP9nM0ku7DfZyr7Pis/tFxzFic=;
+        b=PWARkuK/D14RweQrf7/jSXHSvAl4LrZOBBpILIAXIl2WiUj7OekLGcsHWg6ai2D3JI
+         YeSARUXMZN/1CwzZwXu/cAiZgGrKdB4wTNC7DnbtBnE3HQn4I1pf1zWzkgGldy455Vzg
+         5Tt13K9l0ClPMUEJSLrt78brr77aOZ3ixycss=
+X-Received: by 2002:a05:7022:626:b0:12b:ec67:3529 with SMTP id a92af1059eb24-1349a807f49mr80033c88.14.1778620894324;
+        Tue, 12 May 2026 14:21:34 -0700 (PDT)
+X-Received: by 2002:a05:7022:626:b0:12b:ec67:3529 with SMTP id a92af1059eb24-1349a807f49mr80014c88.14.1778620893800;
+        Tue, 12 May 2026 14:21:33 -0700 (PDT)
+Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-132787673ffsm26603202c88.15.2026.05.12.14.21.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 May 2026 14:21:33 -0700 (PDT)
+From: Michael Chan <michael.chan@broadcom.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com
+Subject: [PATCH net-next v2 00/15] bnxt_en: Add kTLS TX offload support
+Date: Tue, 12 May 2026 14:20:50 -0700
+Message-ID: <20260512212105.3488258-1-michael.chan@broadcom.com>
+X-Mailer: git-send-email 2.45.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALCETrVqG+1yErRJjkxvJrf=A+Vu84HTR4Bx1Pcd8G1C0PJcMA@mail.gmail.com>
- <14A441D8-5370-44BE-8732-99BF8107C3FD@getmailspring.com> <0b8bba44-f6bb-4d69-b9d4-5787c276d41a@inspirated.com>
- <20260510163204.GA2279@sol> <3bfcf406-fdde-4303-9bd6-0d8d21ddba37@linux.win> <20260511213829.GA316710@google.com>
-In-Reply-To: <20260511213829.GA316710@google.com>
-From: Ignat Korchagin <ignat@linux.win>
-Date: Tue, 12 May 2026 22:18:42 +0100
-X-Gmail-Original-Message-ID: <CAOs+rJUA+bz6Y2GKioHnFGFKX_uAP+4LaPRs=ZDgRQoUi4mWkg@mail.gmail.com>
-X-Gm-Features: AVHnY4IXFsTsREC72LukcHqvk6gC-iS5eeOIEbsMsX37ajVDHN0xSqZ-iDLXxGU
-Message-ID: <CAOs+rJUA+bz6Y2GKioHnFGFKX_uAP+4LaPRs=ZDgRQoUi4mWkg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Kamran Khan <kz@inspirated.com>, Jeff Barnes <jeffbarnes@linux.microsoft.com>, 
-	Andy Lutomirski <luto@amacapital.net>, 
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
-	"linux-api@vger.kernel.org" <linux-api@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 438BE52A2D0
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+X-Rspamd-Queue-Id: 717A052A377
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287307-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[linux.win];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287308-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[broadcom.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ignat@linux.win,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-On Mon, May 11, 2026 at 10:38=E2=80=AFPM Eric Biggers <ebiggers@kernel.org>=
- wrote:
->
-> On Mon, May 11, 2026 at 10:03:21PM +0100, Ignat Korchagin wrote:
-> > I don't think fully discounting hardware offloading is beneficial here.=
- HW
-> > accelerators will be produced and without a common interface vendors wo=
-uld
-> > start implementing their own "bespoke" drivers with bespoke userspace
-> > interfaces (we already had such proposals), which in turn may introduce=
- more
-> > attack surface. Yes, AF_ALG needs substantial improvement, but at least=
- it
-> > can be a standardisation point.
->
-> That isn't the best way to accelerate symmetric crypto anymore though,
-> if it ever was.  This has been known for a long time.
->
-> > > In any case, any hypothetical security benefit provided by AF_ALG wou=
-ld
-> > > have to be *very high* to outweigh the continuous stream of
-> > > vulnerabilities in it.  I understand that people using AF_ALG might n=
-ot
-> > > be familiar with that continuous stream of vulnerabilities, but it wo=
-uld
-> >
-> >
-> > Is it actually that much compared to other features/subsystems, like eB=
-PF or
-> > user namespaces? But we don't rush to deprecate those - instead trying =
-to
-> > harden them and come up with better design.
->
-> There are plenty of other kernel features with a large attack surface,
-> of course.  But they tend to be much more useful than AF_ALG.  It's all
-> about weighing benefits vs. risks.
+This patchset adds kTLS offload support for TX direction.  A number
+of new files are added:
 
-If divide number of CVEs in such systems on imaginary units of
-usefulness, I think the ratio is similar.
+bnxt_mpc.[ch] handle midpath channels (MPCs) used to offload kTLS
+connections to the chip's crypto blocks without going through FW.
 
-> When we get the point where a large number of Linux users *had* to
-> disable AF_ALG as an emergency vulnerability response, and at the same
-> time their systems weren't even using AF_ALG so nothing even broke and
-> they could have just done that to begin with, I think we get a very
+bnxt_crypto.[ch] handle the crypto interface and resources.
 
-Well, there were: cryptsetup, RHEL fips check, so there are some...
+bnxt_ktls.[ch] handle kTLS offload.
 
-> clear idea of which side is heavier for AF_ALG in the real world.
+A new CONFIG_BNXT_TLS is added to enable all of the above.  The first 6
+patches add the MPC logic including resource accounting and reservations.
+The next 5 patches add the crypto logic to handle the crypto resources
+and to send/receive control data using the MPCs.  The last 4 patches
+add kTLS offload for the TX direction.
 
-Same thing could be said for unprivileged user namespaces - distros
-even put a custom sysctl to restrict it and no-one noticed.
+There will be a follow-on patchset to make the TX offload more complete
+and to add the RX direction offload.
 
-> The main relevance of AF_ALG to the Linux community is that it allows
-> their systems to be exploited.
+v2:
+Fix unused variable compile warnings in patch 10 and 12 by reorganizing
+the patches (reported by Jakub)
 
-To be clear I'm not arguing for the current AF_ALG implementation. I
-agree, the splice zero-copy is... suboptimal (to be soft) and is
-actually not-so-zero copy. But I think it was just added before we had
-more modern approaches like io_uring (have their own can of worms, but
-hey - people adopt it fast).
+Fix some error recovery issues in patch 12
 
-But I advocate for the usefulness of the concept itself - kernel/OS
-providing crypto services to userspace. As mentioned in other threads,
-other operating systems have it and Linux lags behind. There are use
-cases: common interface for HW accelerators, embedded systems, which
-don't have the space to bring a userspace lib etc. Even non-technical:
-there are environments that just don't want to rely on third-party
-userspace libraries like OpenSSL purely for licensing reasons. And I
-agree, that it is hard to do it right, but we can piggy-back on other
-subsystems (such as io_uring mentioned or other ideas).
+v1:
+https://lore.kernel.org/netdev/20260504235836.3019499-1-michael.chan@broadcom.com/
 
-> - Eric
->
+Michael Chan (15):
+  bnxt_en: Add Midpath channel information
+  bnxt_en: Account for the MPC TX and CP rings
+  bnxt_en: Set default MPC ring count
+  bnxt_en: Rename xdp_tx_lock to tx_lock
+  bnxt_en: Allocate and free MPC software structures
+  bnxt_en: Allocate and free MPC channels from firmware
+  bnxt_en: Allocate crypto structure and backing store
+  bnxt_en: Reserve crypto RX and TX key contexts on a PF
+  bnxt_en: Add infrastructure for crypto key context IDs
+  bnxt_en: Add MPC transmit and completion functions
+  bnxt_en: Add crypto MPC transmit/completion infrastructure
+  bnxt_en: Support kTLS TX offload by implementing .tls_dev_add/del()
+  bnxt_en: Implement kTLS TX normal path
+  bnxt_en: Add support for inline transmit BDs
+  bnxt_en: Add kTLS retransmission support
 
-Ignat
+ drivers/net/ethernet/broadcom/Kconfig         |   9 +
+ drivers/net/ethernet/broadcom/bnxt/Makefile   |   1 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 206 ++++-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  84 ++-
+ .../net/ethernet/broadcom/bnxt/bnxt_crypto.c  | 575 ++++++++++++++
+ .../net/ethernet/broadcom/bnxt/bnxt_crypto.h  | 223 ++++++
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  50 ++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c |   2 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_ktls.c    | 458 +++++++++++
+ .../net/ethernet/broadcom/bnxt/bnxt_ktls.h    | 128 ++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c | 711 ++++++++++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h | 210 ++++++
+ .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   |   6 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |   4 +-
+ include/linux/bnxt/hsi.h                      |  37 +
+ 15 files changed, 2654 insertions(+), 50 deletions(-)
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.h
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h
+
+-- 
+2.51.0
+
 
