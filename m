@@ -1,220 +1,320 @@
-Return-Path: <netdev+bounces-287205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287206-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IDNrI7hGA2ri2QEAu9opvQ
-	(envelope-from <netdev+bounces-287205-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:26:48 +0200
+	id eAUJJJRIA2qS2wEAu9opvQ
+	(envelope-from <netdev+bounces-287206-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:34:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E12075239C9
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:26:47 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4444523BAE
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:34:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 688AB3338D1F
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 14:33:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ECC3834E20C4
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 14:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2004C3B5DE6;
-	Tue, 12 May 2026 14:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F71C3B83F9;
+	Tue, 12 May 2026 14:37:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U6m41eCO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EaESo/MM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62F943905F0
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 14:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778596410; cv=pass; b=Bv3DEB2Fct7qCoE50kn/n11/6ShTnfhnKttI8qMgrcf9UUCB79etUWwHvbvVRTrl899XL95tovH1lPiTsIKWkw7Vzh0lmo0jchU34rZkOAd6Vnnw/uvfQilhiA6Up0cDLgQkH+9M/EWpY5IRvsl4P68tZlQ4D+pQw+eZPKISDlI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778596410; c=relaxed/simple;
-	bh=tGgX0l6ytIx698dvDPac8KCkKialk7vhswDMJfEF6Io=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OBH1RbT9lSqt+utVUmaU5LxlMl6+6wjdGMNm4wZ5W3cer7OXINAaUG8mzWyBgf03R7FUV3HP3zi0Un9/cMWfEkcS3iMfd5jOTCXMYHJ99mgbF6WNa/hfObcVs/e7qRj0cbMX60VYbpPIFgWLQB1vWO5RwChQruAQA4DK0aYItb0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U6m41eCO; arc=pass smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-3939d2bd739so48754211fa.0
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 07:33:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778596406; cv=none;
-        d=google.com; s=arc-20240605;
-        b=dQ4XsmNCiQQULbUhynSmq5X7I3Db5dWlVzZ7BP+M6f5YxLNKCB4NWajB7zxzHsJNbU
-         vRHyDPb5w+o+ShQ+0JknKwhg6aCQlH9IkxT8gLI8j+gLbektnKr6brIxUOalYF6nVJpZ
-         DJknRKpWGTsFvclg9Q6g+rt8JWVExXyCvl1NIXo24LSoDRrQSq+7hTCJ8ul1TmsdoXQd
-         6CpG9Tpbm98dDxmE7L0jbswy5hZfOuUk1jDRi5zv83k7sttBuL3sXRykCmMGFp789V6w
-         T9FpJe9JBU+Or4Gx9/CT2ATvZouE3DU34eUTPh2z1eMwCQYMFE4NKWldnr2MP8sk3G98
-         lloQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=EXUv7LZ3hil13DS+1vWxEoJG7EI40S6boiJv/fJ2an8=;
-        fh=XQ8BlnyBzVC2ALxko/hhi0vBFPMFSkW3JnrCLcDX09A=;
-        b=HobFEKNFk0Vt5vVSQ/4kpacUfGiiOWjBM5asNQQJvD6Y5TBcTXc3tRehkkcHqFhny8
-         /aXoGecelWA5KrSSLC9GQ23+oCqL1DJSS+VgAeJSWD0vlkmXEHmXHz9e0kiBX8RgJw9i
-         vRrs1Pv//n9zn65TdwTTpvoDupLMiWKqngzkGjnRa6U077Q1CodEw20vFq099+/aafhY
-         UW1rnxj1KypxIIbchWvrQH1k7OX7FT/zaChFiOVJDqXhptIiRANhOj5UmLLV/MzNQ3ag
-         JZt85EpIW+dey061tsprxhP9s4Yn/MiW3hZQhqCdLD0AsM+m7e02zQO6mYnum0L/KnmX
-         4CyA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778596406; x=1779201206; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EXUv7LZ3hil13DS+1vWxEoJG7EI40S6boiJv/fJ2an8=;
-        b=U6m41eCOsygw2T7/afuG1MX35qhXbh8UCAWxWC9H3xdWOiqThEn6NCtS8QACCwZo4D
-         ClqFdrEsj8BneboRIF9rqsyZJ6h6aKsIx66dJvg0dNcQfLgCcuu3vG/eBTNACcvPOxgL
-         Mqe4AXpgKoHPCb+/Kbqt6QJQMD/EOjbzONU4rm1NgWJbVOh502Dp5W2AIVttdivMmvG6
-         4AAEbhxEwuYpkSB2vp1S+iwCRm5+SYGG9qBeMR8VMVHigbRnTT2weQTRjPF1Lu3RQYsh
-         uARJPmrjD+AAVzWtrP6WLjTli1SH+8D6LS5b6yYdIPoTPNBdpBkbShB8dcL0cDDm+PPE
-         lH4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778596406; x=1779201206;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=EXUv7LZ3hil13DS+1vWxEoJG7EI40S6boiJv/fJ2an8=;
-        b=NOqSt1tLiteWk8qKqeceqzblNy8/noCmVz+dnKeYK853IVxjvorpn8Lxqawlb5YPwq
-         LPvS7p9gJgjdwIZRt3MRBYaRnZXuj105IeZ/Y7JTjsBro8HEQwX6jNDidy6+UxsScleW
-         4AWE62QCKnhrBZMXL8kqv53e/fA1EVeH5cKjEmz+tzz2gRcg1i1ZXEctCkv6o8RihW0Q
-         W+2W8GtJRIsRG+Y2lN+SHD3SdkARQlRZ4c1G+incnIzSt32c4zdDKjZ4+tYzotbr4NZm
-         4emGB+Duixs0x0BNcgeG/TfJ901bmDI3juCqr7n6f89CrOihs5fM2Nms05LRV6vxjqT8
-         wOVw==
-X-Forwarded-Encrypted: i=1; AFNElJ9btQt1nwoSmfpUmQchezeVIlSb4nJj6NYxH4O8+t8+6kpdo5l98WtXUk837SoYtLFaWwagocE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1oDWfHNsxQyeKo9PG2YRbg8a2WMMNv0osKBW57PNn31LFMGef
-	n/3gyWusiWelh3rNz3QNnycWOyxXNcX92g7mMR9Bj7rsrP5m4hMPsHeaFB0aFmcHk/9MeVIW0Ms
-	4M88kPnehODAOWODz766es1efPb2QhtE=
-X-Gm-Gg: Acq92OFzyfRV/PsbBGrB434+us5+Ny9yrwkiWXYlvRgNNY/TT0QpJpR9ALdZwadazVY
-	sZhnJCZpd7brYXlWg8m0rxIeKesCrPzJU2NzL/vC297VmqzTQwgQL8Ee8+n5tdjH0xpba9lqPM2
-	oC1FGVtONGqqYiIL97IE3+Tk2zMM8d85kUBe91SOfm3XwiLQT6JXLe4O27MNzK39uxBdWsRalaY
-	YfJ7yyfEC4NE5BbEhlN1177cIIzZrXWRUglC2Rbb79FVM2zgW8DB3zKBsDUnJUc8w2fdToprG8f
-	nG8GKEQx0VhL+j5PeTRoVGI4vyfo983jque9yiU=
-X-Received: by 2002:a05:6512:a8b:b0:5a8:6d09:483c with SMTP id
- 2adb3069b0e04-5a887cde8b0mr9177414e87.22.1778596406090; Tue, 12 May 2026
- 07:33:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66B83B5F5D
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 14:37:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778596673; cv=none; b=CUpvTOwkVkzOlPzXsEyZWrRZEL/4Jeqc/o4O/UPX1UKAQiJW8fYJ0S/Go1wjczqM1Bka8t4Sxc60V3BcOjrMfQwVcLJZYCcZ/R7+s2aNL+74rLIhv58wuMebyA1PXbOJKhprKLcpJUY6dDERuz/D7XWWLrbFR6OPsy1h7HSudeU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778596673; c=relaxed/simple;
+	bh=WYr5m3QewSCuYPj5Y8aDfV6V209VvUnkAHIIKUHVfUA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JUpaAqe+V3ygVTuMxedRq9G45YfMo7nZ2JRtQY6HgdYCIJ2EGZQJLu7fFGIU645q/Y9xxJZUkIkgxharw/Ponj1UhEnI4l689o8ANhXXQw3+i7/+k1HQk+Iq1Z2ucLA+fvIirprQ85eE9FRzzJCEf5eAhGGbft6/het6TXHa0FA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EaESo/MM; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778596671; x=1810132671;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=WYr5m3QewSCuYPj5Y8aDfV6V209VvUnkAHIIKUHVfUA=;
+  b=EaESo/MMAMq15x0Lofbax/yHadViBIa1pLUJ0M+qzK8kc2siI94DWsvu
+   7AMrUsj8N9qWo9k3Kyr6Ak2a8zudKVBHQ+MTy7emrJhJROP0RsIOJnZ5J
+   /IoWXIB4YtIjZyxEf5Xfa7T7+WqudqwKP5+ec7izoGxrJtzTl/xYJh/9B
+   bfYjYpvhwTrsG4byiKC40/XcppKB9/SfFBW+6LHrpDk/vyF3MlcMQglBh
+   oFV1TJgYOnw/4R29VT92O5tAlc4g+pRU/iG5GojPVoMIv9iy0WiGXJzUH
+   kr3nVNHrLgtd54/WrTJAmPVEyAIsqhQilTU8UEF9ECf4acoHl3LQn2ZWC
+   g==;
+X-CSE-ConnectionGUID: Ap5qwBOHSxGazG+/4DGTaA==
+X-CSE-MsgGUID: HgvFx6Z7QgauEYMR1ZmXuQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11784"; a="83359915"
+X-IronPort-AV: E=Sophos;i="6.23,231,1770624000"; 
+   d="scan'208";a="83359915"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2026 07:37:50 -0700
+X-CSE-ConnectionGUID: OGsVD7iCQd+npCT6CeFarg==
+X-CSE-MsgGUID: qx11dIs2S0ShvIT9w6mrsA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,231,1770624000"; 
+   d="scan'208";a="233481547"
+Received: from black.igk.intel.com ([10.91.253.5])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2026 07:37:46 -0700
+Date: Tue, 12 May 2026 16:37:43 +0200
+From: Raag Jadav <raag.jadav@intel.com>
+To: "Tauro, Riana" <riana.tauro@intel.com>
+Cc: intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	netdev@vger.kernel.org, simona.vetter@ffwll.ch, airlied@gmail.com,
+	kuba@kernel.org, lijo.lazar@amd.com, Hawking.Zhang@amd.com,
+	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+	maarten@lankhorst.se, zachary.mckevitt@oss.qualcomm.com,
+	rodrigo.vivi@intel.com, michal.wajdeczko@intel.com,
+	matthew.d.roper@intel.com, umesh.nerlige.ramappa@intel.com,
+	mallesh.koujalagi@intel.com, soham.purkait@intel.com,
+	anoop.c.vijay@intel.com, aravind.iddamsetty@linux.intel.com
+Subject: Re: [PATCH v1 08/11] drm/xe/ras: Get error threshold support
+Message-ID: <agM7NzEdT5SsOi4f@black.igk.intel.com>
+References: <20260417211730.837345-1-raag.jadav@intel.com>
+ <20260417211730.837345-9-raag.jadav@intel.com>
+ <81b9b5f6-6107-467a-879c-c2906e8d1f58@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260510012310.88570-1-kerneljasonxing@gmail.com>
- <20260510012310.88570-2-kerneljasonxing@gmail.com> <agHurBlnAgjVNq-u@devvm7509.cco0.facebook.com>
-In-Reply-To: <agHurBlnAgjVNq-u@devvm7509.cco0.facebook.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 12 May 2026 22:32:48 +0800
-X-Gm-Features: AVHnY4LzRy-kEe49ipIAtXqtdtfngArZKEyPOI6lhrhr2J7k4GL9DmZHDRGpq_s
-Message-ID: <CAL+tcoDrjJ8iHzSGz_Orf7iH-1WJ2H_LZd6BMKTnDS3MVN8daA@mail.gmail.com>
-Subject: Re: [PATCH net 1/4] xsk: cache csum_start/csum_offset to fix TOCTOU
- in xsk_skb_metadata()
-To: Stanislav Fomichev <sdf.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, horms@kernel.org, andrew+netdev@lunn.ch, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: E12075239C9
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <81b9b5f6-6107-467a-879c-c2906e8d1f58@intel.com>
+X-Rspamd-Queue-Id: E4444523BAE
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287205-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[lists.freedesktop.org,vger.kernel.org,ffwll.ch,gmail.com,kernel.org,amd.com,davemloft.net,redhat.com,google.com,lankhorst.se,oss.qualcomm.com,intel.com,linux.intel.com];
+	TAGGED_FROM(0.00)[bounces-287206-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.988];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,fomichev.me,iogearbox.net,lunn.ch,vger.kernel.org,tencent.com];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tencent.com:email]
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[raag.jadav@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,black.igk.intel.com:mid,header.data:url]
 X-Rspamd-Action: no action
 
-On Mon, May 11, 2026 at 11:03=E2=80=AFPM Stanislav Fomichev
-<sdf.kernel@gmail.com> wrote:
->
-> On 05/10, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > The TX metadata area resides in the UMEM buffer which is memory-mapped
-> > and concurrently writable by userspace. In xsk_skb_metadata(),
-> > csum_start and csum_offset are read from shared memory for bounds
-> > validation, then read again for skb assignment. A malicious userspace
-> > application can race to overwrite these values between the two reads,
-> > bypassing the bounds check and causing out-of-bounds memory access
-> > during checksum computation in the transmit path.
-> >
-> > Fix this by reading csum_start and csum_offset into local variables
-> > once, then using the local copies for both validation and assignment.
-> >
-> > Note that other metadata fields (flags, launch_time) and the cached
-> > csum fields may be mutually inconsistent due to concurrent userspace
-> > writes, but this is benign: the only security-critical invariant is
-> > that each field's validated value is the same one used, which local
-> > caching guarantees.
-> >
-> > Closes: https://lore.kernel.org/all/20260503200927.73EA1C2BCB4@smtp.ker=
-nel.org/
-> > Fixes: 48eb03dd2630 ("xsk: Add TX timestamp and TX checksum offload sup=
-port")
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+On Mon, May 11, 2026 at 10:40:29PM +0530, Tauro, Riana wrote:
+> On 4/18/2026 2:46 AM, Raag Jadav wrote:
+> > System controller allows programming per error threshold value, which
+> > it uses to raise error events to the driver. Get it using mailbox
+> > command so that it can be exposed to the user.
+> > 
+> > Signed-off-by: Raag Jadav<raag.jadav@intel.com>
 > > ---
-> >  net/xdp/xsk.c | 11 +++++++----
-> >  1 file changed, 7 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> > index 6bcd77068e52..cd039e397018 100644
-> > --- a/net/xdp/xsk.c
-> > +++ b/net/xdp/xsk.c
-> > @@ -722,6 +722,7 @@ static int xsk_skb_metadata(struct sk_buff *skb, vo=
-id *buffer,
-> >                           u32 hr)
-> >  {
-> >       struct xsk_tx_metadata *meta =3D NULL;
-> > +     u16 csum_start, csum_offset;
-> >
-> >       if (unlikely(pool->tx_metadata_len =3D=3D 0))
-> >               return -EINVAL;
-> > @@ -731,13 +732,15 @@ static int xsk_skb_metadata(struct sk_buff *skb, =
-void *buffer,
-> >               return -EINVAL;
-> >
-> >       if (meta->flags & XDP_TXMD_FLAGS_CHECKSUM) {
-> > -             if (unlikely(meta->request.csum_start +
-> > -                          meta->request.csum_offset +
-> > +             csum_start =3D meta->request.csum_start;
-> > +             csum_offset =3D meta->request.csum_offset;
->
-> Wondering if it's better to READ_ONCE(x) these?
+> >   drivers/gpu/drm/xe/xe_ras.c                   | 73 +++++++++++++++++++
+> >   drivers/gpu/drm/xe/xe_ras.h                   |  3 +
+> >   drivers/gpu/drm/xe/xe_ras_types.h             | 22 ++++++
+> >   drivers/gpu/drm/xe/xe_sysctrl_mailbox_types.h |  2 +
+> >   4 files changed, 100 insertions(+)
+> > 
+> > diff --git a/drivers/gpu/drm/xe/xe_ras.c b/drivers/gpu/drm/xe/xe_ras.c
+> > index 08e91348c459..3e93f838aa4a 100644
+> > --- a/drivers/gpu/drm/xe/xe_ras.c
+> > +++ b/drivers/gpu/drm/xe/xe_ras.c
+> > @@ -3,11 +3,14 @@
+> >    * Copyright © 2026 Intel Corporation
+> >    */
+> > +#include "xe_pm.h"
+> >   #include "xe_printk.h"
+> >   #include "xe_ras.h"
+> >   #include "xe_ras_types.h"
+> >   #include "xe_sysctrl.h"
+> >   #include "xe_sysctrl_event_types.h"
+> > +#include "xe_sysctrl_mailbox.h"
+> > +#include "xe_sysctrl_mailbox_types.h"
+> >   /* Severity of detected errors  */
+> >   enum xe_ras_severity {
+> > @@ -49,6 +52,23 @@ static const char *const xe_ras_components[] = {
+> >   };
+> >   static_assert(ARRAY_SIZE(xe_ras_components) == XE_RAS_COMP_MAX);
+> > +/* uAPI mapping */
+> > +static const int drm_to_xe_ras_components[] = {
+> > +	[DRM_XE_RAS_ERR_COMP_CORE_COMPUTE]	= XE_RAS_COMP_CORE_COMPUTE,
+> > +	[DRM_XE_RAS_ERR_COMP_SOC_INTERNAL]	= XE_RAS_COMP_SOC_INTERNAL,
+> > +	[DRM_XE_RAS_ERR_COMP_DEVICE_MEMORY]	= XE_RAS_COMP_DEVICE_MEMORY,
+> > +	[DRM_XE_RAS_ERR_COMP_PCIE]		= XE_RAS_COMP_PCIE,
+> > +	[DRM_XE_RAS_ERR_COMP_FABRIC]		= XE_RAS_COMP_FABRIC
+> > +};
+> > +static_assert(ARRAY_SIZE(drm_to_xe_ras_components) == DRM_XE_RAS_ERR_COMP_MAX);
+> > +
+> > +/* uAPI mapping */
+> > +static const int drm_to_xe_ras_severities[] = {
+> > +	[DRM_XE_RAS_ERR_SEV_CORRECTABLE]	= XE_RAS_SEV_CORRECTABLE,
+> > +	[DRM_XE_RAS_ERR_SEV_UNCORRECTABLE]	= XE_RAS_SEV_UNCORRECTABLE
+> > +};
+> > +static_assert(ARRAY_SIZE(drm_to_xe_ras_severities) == DRM_XE_RAS_ERR_SEV_MAX);
+> > +
+> >   static inline const char *sev_to_str(u8 sev)
+> >   {
+> >   	if (sev >= XE_RAS_SEV_MAX)
+> > @@ -90,3 +110,56 @@ void xe_ras_counter_threshold_crossed(struct xe_device *xe,
+> >   			comp_to_str(component), sev_to_str(severity));
+> >   	}
+> >   }
+> > +
+> > +static void ras_command_prepare(struct xe_sysctrl_mailbox_command *command,
+> > +				void *request, size_t request_len, void *response,
+> > +				size_t response_len, u8 hdr_cmd)
+> > +{
+> > +	struct xe_sysctrl_app_msg_hdr header = {};
+> > +
+> > +	header.data = REG_FIELD_PREP(APP_HDR_GROUP_ID_MASK, XE_SYSCTRL_GROUP_GFSP) |
+> > +		      REG_FIELD_PREP(APP_HDR_COMMAND_MASK, hdr_cmd);
+> > +
+> > +	command->header = header;
+> > +	command->data_in = request;
+> > +	command->data_in_len = request_len;
+> > +	command->data_out = response;
+> > +	command->data_out_len = response_len;
+> > +}
+> > +
+> > +int xe_ras_get_threshold(struct xe_device *xe, u32 severity, u32 component, u32 *threshold)
+> > +{
+> > +	struct xe_ras_get_threshold_response response = {};
+> > +	struct xe_ras_get_threshold_request request = {};
+> > +	struct xe_sysctrl_mailbox_command command = {};
+> > +	struct xe_ras_error_class counter = {};
+> > +	size_t len;
+> > +	int ret;
+> > +
+> > +	counter.common.severity = drm_to_xe_ras_severities[severity];
+> > +	counter.common.component = drm_to_xe_ras_components[component];
+> 
+> I see this is only for correctable errors. We do not have correctable memory
+> errors
+> Do we want to return -EOPNOTSUPP for memory errors?
 
-I still chose not to use it after reading the suggestion from local
-AI. The reason is there is no WRITE_ONCE pair to make sure everything
-is no data-race. I also checked some existing implementations around
-the shared buffer (between userspace and kernel) and didn't manage to
-see the usage of XXXX_ONCE(). Does it make any sense to you :) ?
+Could be done, but I'm expecting it to come from firmware since driver
+is more or less acting as a transport here.
 
-Thanks,
-Jason
+Raag
+
+> > +	request.counter = counter;
+> > +
+> > +	ras_command_prepare(&command, &request, sizeof(request), &response,
+> > +			    sizeof(response), XE_SYSCTRL_CMD_GET_THRESHOLD);
+> > +
+> > +	guard(xe_pm_runtime)(xe);
+> > +	ret = xe_sysctrl_send_command(&xe->sc, &command, &len);
+> > +	if (ret) {
+> > +		xe_err(xe, "sysctrl: failed to get threshold %d\n", ret);
+> > +		return ret;
+> > +	}
+> > +
+> > +	if (len != sizeof(response)) {
+> > +		xe_err(xe, "sysctrl: unexpected get threshold response length %zu (expected %zu)\n",
+> > +		       len, sizeof(response));
+> > +		return -EIO;
+> > +	}
+> > +
+> > +	counter = response.counter;
+> 
+> Do we expect this to change?
+
+Nope, but it helps with wrapping below.
+
+> > +	*threshold = response.threshold;
+> > +
+> > +	xe_dbg(xe, "[RAS]: Get threshold %u for %s %s\n", response.threshold,
+> > +	       comp_to_str(counter.common.component), sev_to_str(counter.common.severity));
+> 
+> Do we need this. it should be visible to the user via netlink
+
+It's for us, not the user.
+
+> > +	return 0;
+> > +}
+> > diff --git a/drivers/gpu/drm/xe/xe_ras.h b/drivers/gpu/drm/xe/xe_ras.h
+> > index ea90593b62dc..982bbe61461e 100644
+> > --- a/drivers/gpu/drm/xe/xe_ras.h
+> > +++ b/drivers/gpu/drm/xe/xe_ras.h
+> > @@ -6,10 +6,13 @@
+> >   #ifndef _XE_RAS_H_
+> >   #define _XE_RAS_H_
+> > +#include <linux/types.h>
+> > +
+> >   struct xe_device;
+> >   struct xe_sysctrl_event_response;
+> >   void xe_ras_counter_threshold_crossed(struct xe_device *xe,
+> >   				      struct xe_sysctrl_event_response *response);
+> > +int xe_ras_get_threshold(struct xe_device *xe, u32 severity, u32 component, u32 *threshold);
+> >   #endif
+> > diff --git a/drivers/gpu/drm/xe/xe_ras_types.h b/drivers/gpu/drm/xe/xe_ras_types.h
+> > index 4e63c67f806a..d5da93d65cf5 100644
+> > --- a/drivers/gpu/drm/xe/xe_ras_types.h
+> > +++ b/drivers/gpu/drm/xe/xe_ras_types.h
+> > @@ -70,4 +70,26 @@ struct xe_ras_threshold_crossed {
+> >   	struct xe_ras_error_class counters[XE_RAS_NUM_COUNTERS];
+> >   } __packed;
+> > +/**
+> > + * struct xe_ras_get_threshold_request - Request structure for get threshold
+> > + */
+> > +struct xe_ras_get_threshold_request {
+> > +	/** @counter: Counter to get threshold for */
+> > +	struct xe_ras_error_class counter;
+> > +	/** @reserved: Reserved for future use */
+> > +	u32 reserved;
+> > +} __packed;
+> > +
+> > +/**
+> > + * struct xe_ras_get_threshold_response - Response structure for get threshold
+> > + */
+> > +struct xe_ras_get_threshold_response {
+> > +	/** @counter: Counter id */
+> 
+> Nit: ID
+
+Sure.
+
+Raag
+
+> > +	struct xe_ras_error_class counter;
+> > +	/** @threshold: Threshold value */
+> > +	u32 threshold;
+> > +	/** @reserved: Reserved for future use */
+> > +	u32 reserved[4];
+> > +} __packed;
+> > +
+> >   #endif
+> > diff --git a/drivers/gpu/drm/xe/xe_sysctrl_mailbox_types.h b/drivers/gpu/drm/xe/xe_sysctrl_mailbox_types.h
+> > index 84d7c647e743..a1b71218deca 100644
+> > --- a/drivers/gpu/drm/xe/xe_sysctrl_mailbox_types.h
+> > +++ b/drivers/gpu/drm/xe/xe_sysctrl_mailbox_types.h
+> > @@ -22,9 +22,11 @@ enum xe_sysctrl_group {
+> >   /**
+> >    * enum xe_sysctrl_gfsp_cmd - Commands supported by GFSP group
+> >    *
+> > + * @XE_SYSCTRL_CMD_GET_THRESHOLD: Retrieve error threshold
+> >    * @XE_SYSCTRL_CMD_GET_PENDING_EVENT: Retrieve pending event
+> >    */
+> >   enum xe_sysctrl_gfsp_cmd {
+> > +	XE_SYSCTRL_CMD_GET_THRESHOLD		= 0x05,
+> >   	XE_SYSCTRL_CMD_GET_PENDING_EVENT	= 0x07,
+> >   };
 
