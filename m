@@ -1,58 +1,85 @@
-Return-Path: <netdev+bounces-287080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287092-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6KsjNNIFA2r1zgEAu9opvQ
-	(envelope-from <netdev+bounces-287080-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 12:49:54 +0200
+	id MOnHKOEIA2pmzwEAu9opvQ
+	(envelope-from <netdev+bounces-287092-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:02:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 415BF51EDAA
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 12:49:53 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 978B451F016
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:02:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A62713024142
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:46:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 27D27302C0F3
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:59:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D983A38398B;
-	Tue, 12 May 2026 10:46:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C9E38E8B0;
+	Tue, 12 May 2026 10:59:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ccAFGbMN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qurh9UKE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0709349CC0;
-	Tue, 12 May 2026 10:46:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6693938E8CB
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 10:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778582811; cv=none; b=EhTSCVJdeBmwR1FO7922xrzJ/ppPCKJzXBp99D/Ftk7/U5ot8hCdVOpOqMCvRlgQ7O59d2Kq+EDo+0jShGCYaI3ks85PshYFOIydoljYBwtcXIbr+bPnxI96sxUdgWXEVqslA5ZAlM7j+NQV0NjjbzH+fGSTt+OfpvUSxlmaDiM=
+	t=1778583581; cv=none; b=N4FXOx3vb6UFMS7JArWQbq9VTAU0m3dRdam/ZhTufTDtkzNbNYv1uYKmNVN6tbQbWbeQ+wnjZMmZcRF/LkjO8bAuKCadW0uRr97jcC6aRQ3Tek3q5lWse9KidbfRJH9kktKv6DPE4Nmpm6oNmv7BxfUC4S4OGOinIiaCrZUosWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778582811; c=relaxed/simple;
-	bh=CfTnm+NwfcKBfFp0bUW7Erh6C3aJPfKER4/xwdSZ/Vc=;
+	s=arc-20240116; t=1778583581; c=relaxed/simple;
+	bh=KCShsNDFwaVgc0g936GzfxoTB5zHdp5tRc26zVLP33U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aZT5UY/gFjEAmsFFZkrVC2i95wauxKWj9APFVq4gwMPeZeF02qlXXA7An31xe613uC8mqaSPIQq0hO8izPSCPpFi5L7lSUE8JQQXx7gOymSyHbxhn42ep5lVTHdsGgKw9u2X2ygI6ZHfvjTlhs2qU4uMopbFlg56/tLksTRbf2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ccAFGbMN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 717DCC2BCB0;
-	Tue, 12 May 2026 10:46:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778582811;
-	bh=CfTnm+NwfcKBfFp0bUW7Erh6C3aJPfKER4/xwdSZ/Vc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ccAFGbMNgzMK1PkjeUwVGBFpwMe+/f+2yMbP6VFLPkzL6VFb7QsHQBbRea1DFeJ7r
-	 BeMhzOWkUiomhq1oHzCMcChcLel2sGfTZ1zLBZ/uqEbI/MNQ7H5ZmJMnTDYbP71ZAl
-	 Xf6XU4gRMKWe6JYDz/NXvcJ5PDX6s+e4IPVAZIqLTu5qriTNPlBwyvOzq2jtzSfFyk
-	 pE1fyrfhtuopNYya+4lPoODtW9YwZrL8cCbCekO21CxHO+90tRIT6Go+j0bRQWjzQj
-	 KdfofwewjUXXDki54UNz1tOnWqGA+sphbv5kpu/Qnf8xSH7GBNUMl9JXumRzKkl+4U
-	 Pu1okX7RSn93w==
-Date: Tue, 12 May 2026 11:46:47 +0100
-From: Simon Horman <horms@kernel.org>
-To: Xiang Mei <xmei5@asu.edu>
-Cc: netdev@vger.kernel.org, fmaurer@redhat.com, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, davem@davemloft.net,
-	linux-kernel@vger.kernel.org, bestswngs@gmail.com
-Subject: Re: [PATCH net] net: hsr: fix NULL deref in hsr_get_node_data
-Message-ID: <20260512104647.GK27589@horms.kernel.org>
-References: <20260511071517.3013445-1-xmei5@asu.edu>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WI2/98Py/wo/xqxtDKnZ+zB+v0u/ICJyYnL+1yOKeOPouK73INMdHhkhYpyCMe06WnSDmBBoPwSpD2CXRK/ls9+9YltQjFqQHGjjesogF05dWta/gxkfaaA1ui7SdfCRZhH1a/QDPQvosoJJLaWpMP2fyakKc3bNGE27WkQZgJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Qurh9UKE; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778583580; x=1810119580;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=KCShsNDFwaVgc0g936GzfxoTB5zHdp5tRc26zVLP33U=;
+  b=Qurh9UKEgzBHZr3pK9gNJxS0VccyDvh+qauhvcG1lW2lc385Tsv387Ph
+   Bp4eaI4eSEe5mc+Soag6XoW0hTdwSiMQxjMOOqMCOAngfIvJ/eLyzn4TM
+   jV/arWdnu3VRwH0mH30HDXwVYU3D/qlBcVWUK6x3fPer6SNGjkDMQylBL
+   BaxeHD/CAgSUwBGznswrwE93HeSWK5qsBFxP1rng6QxUUqU3b25Hkuw9v
+   yggoTLExyQ5iubEtfcskX7lRxBn7vDB6n+jGJL7f4ubzqcPwpa7LK0MDq
+   k7RQSqg5RVqpHH1tW3vywaevDS4+208oq7vxOVeYacGVPYUBiXfjsJnz6
+   A==;
+X-CSE-ConnectionGUID: bxOeKVwXTYqD+8zSIY7TCQ==
+X-CSE-MsgGUID: R/XUwOYjRZCR5o9BY7gSqg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11783"; a="89792058"
+X-IronPort-AV: E=Sophos;i="6.23,230,1770624000"; 
+   d="scan'208";a="89792058"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2026 03:59:38 -0700
+X-CSE-ConnectionGUID: RetFvmcTQSmOeRYouH+sBw==
+X-CSE-MsgGUID: 46O51GTFSGq9B5iWl/uclQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,230,1770624000"; 
+   d="scan'208";a="275853671"
+Received: from lkp-server01.sh.intel.com (HELO dca79079c3eb) ([10.239.97.150])
+  by orviesa001.jf.intel.com with ESMTP; 12 May 2026 03:59:35 -0700
+Received: from kbuild by dca79079c3eb with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wMkpo-0000000020w-0kb3;
+	Tue, 12 May 2026 10:59:32 +0000
+Date: Tue, 12 May 2026 18:59:18 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH net v2] ptp: ocp: fix resource freeing order
+Message-ID: <202605121813.ZVbOZfjr-lkp@intel.com>
+References: <20260511161838.1413499-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,93 +88,125 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260511071517.3013445-1-xmei5@asu.edu>
-X-Rspamd-Queue-Id: 415BF51EDAA
+In-Reply-To: <20260511161838.1413499-1-vadim.fedorenko@linux.dev>
+X-Rspamd-Queue-Id: 978B451F016
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [3.34 / 15.00];
-	SEM_URIBL(3.50)[asu.edu:email];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,kernel.org,google.com,davemloft.net,gmail.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-287080-lists,netdev=lfdr.de];
-	R_DKIM_ALLOW(0.00)[kernel.org:s=k20201202];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287092-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[linux.dev,gmail.com,lunn.ch,davemloft.net,redhat.com,nxp.com,armlinux.org.uk,kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.723];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
-	TAGGED_RCPT(0.00)[netdev];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid,asu.edu:email]
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email,intel.com:mid,intel.com:dkim]
 X-Rspamd-Action: no action
 
-On Mon, May 11, 2026 at 12:15:17AM -0700, Xiang Mei wrote:
-> hsr_get_node_data() looks up a node's address-B port and dereferences
-> port->dev->ifindex without checking the return value of
-> hsr_port_get_hsr(), which returns NULL when no port of the requested
-> type is currently attached.
-> 
-> node->addr_B_port is set by hsr_handle_sup_frame() on every supervision
-> frame but is never cleared when the corresponding slave is removed.
-> If one slave of an HSR master is unregistered while the master stays
-> alive (the other slave keeps it up), node_db entries retain a stale
-> addr_B_port. An unprivileged HSR_C_GET_NODE_STATUS query (genl op has
-> .flags = 0) then crashes the kernel:
-> 
->   Oops: general protection fault, probably for non-canonical address
->   0xdffffc0000000002: 0000 [#1] SMP KASAN NOPTI
->   KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
->   RIP: 0010:hsr_get_node_data (net/hsr/hsr_framereg.c:892)
->   Call Trace:
->    hsr_get_node_status (net/hsr/hsr_netlink.c:366)
->    genl_family_rcv_msg_doit (net/netlink/genetlink.c:1114)
->    genl_rcv_msg (net/netlink/genetlink.c:1209)
->    netlink_rcv_skb (net/netlink/af_netlink.c:2550)
->    netlink_unicast (net/netlink/af_netlink.c:1344)
->    netlink_sendmsg (net/netlink/af_netlink.c:1894)
->    __sys_sendto (net/socket.c:2265)
-> 
-> Default *addr_b_ifindex to -1 and only overwrite it when the port
-> lookup succeeds. The caller hsr_get_node_status() already treats
-> addr_b_ifindex == -1 as "no address-B port" when emitting the
-> HSR_A_NODE_ADDR_B / HSR_A_ADDR_B_IFINDEX attributes, so behavior is
-> unchanged for valid setups.
-> 
-> Fixes: c5a759117210 ("net/hsr: Use list_head (and rcu) instead of array for slave devices.")
-> Reported-by: Weiming Shi <bestswngs@gmail.com>
-> Assisted-by: Claude:claude-opus-4-7
-> Signed-off-by: Xiang Mei <xmei5@asu.edu>
+Hi Vadim,
 
-Hi,
+kernel test robot noticed the following build errors:
 
-Thanks for your patch.  It appears to address the same issue as the
-following commit which was recently added to net.
+[auto build test ERROR on net/main]
 
-Here is the summary with links:
-  - [net] net: hsr: fix NULL pointer dereference in hsr_get_node_data()
-    https://git.kernel.org/netdev/net/c/911f54771ca9
+url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/ptp-ocp-fix-resource-freeing-order/20260512-061754
+base:   net/main
+patch link:    https://lore.kernel.org/r/20260511161838.1413499-1-vadim.fedorenko%40linux.dev
+patch subject: [PATCH net v2] ptp: ocp: fix resource freeing order
+config: riscv-allyesconfig (https://download.01.org/0day-ci/archive/20260512/202605121813.ZVbOZfjr-lkp@intel.com/config)
+compiler: clang version 16.0.6 (https://github.com/llvm/llvm-project 7cbf1a2591520c2491aa35339f227775f4d3adf6)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260512/202605121813.ZVbOZfjr-lkp@intel.com/reproduce)
 
-Although that code-changes there differ from this patch,
-I believe the overall logic is the same.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202605121813.ZVbOZfjr-lkp@intel.com/
 
-Please consider an incremental patch if you think the commit above
-is insufficient for some reason.
+All errors (new ones prefixed by >>):
+
+>> drivers/ptp/ptp_ocp.c:4872:39: error: expected ';' after expression
+                   ptp_ocp_ts_enable(bp->ts1, 0, false)
+                                                       ^
+                                                       ;
+   drivers/ptp/ptp_ocp.c:4874:39: error: expected ';' after expression
+                   ptp_ocp_ts_enable(bp->ts2, 0, false)
+                                                       ^
+                                                       ;
+   drivers/ptp/ptp_ocp.c:4876:39: error: expected ';' after expression
+                   ptp_ocp_ts_enable(bp->ts3, 0, false)
+                                                       ^
+                                                       ;
+   drivers/ptp/ptp_ocp.c:4878:39: error: expected ';' after expression
+                   ptp_ocp_ts_enable(bp->ts4, 0, false)
+                                                       ^
+                                                       ;
+   4 errors generated.
+
+
+vim +4872 drivers/ptp/ptp_ocp.c
+
+  4860	
+  4861	static void
+  4862	ptp_ocp_detach(struct ptp_ocp *bp)
+  4863	{
+  4864		int i;
+  4865	
+  4866		ptp_ocp_debugfs_remove_device(bp);
+  4867		ptp_ocp_detach_sysfs(bp);
+  4868		ptp_ocp_attr_group_del(bp);
+  4869		timer_delete_sync(&bp->watchdog);
+  4870		/* Disable interrupts on all timestampers */
+  4871		if (bp->ts1)
+> 4872			ptp_ocp_ts_enable(bp->ts1, 0, false)
+  4873		if (bp->ts2)
+  4874			ptp_ocp_ts_enable(bp->ts2, 0, false)
+  4875		if (bp->ts3)
+  4876			ptp_ocp_ts_enable(bp->ts3, 0, false)
+  4877		if (bp->ts4)
+  4878			ptp_ocp_ts_enable(bp->ts4, 0, false)
+  4879		if (bp->ptp)
+  4880			ptp_clock_unregister(bp->ptp);
+  4881		kfree(bp->ptp_info.pin_config);
+  4882		ptp_ocp_unregister_ext(bp->ts0);
+  4883		ptp_ocp_unregister_ext(bp->ts1);
+  4884		ptp_ocp_unregister_ext(bp->ts2);
+  4885		ptp_ocp_unregister_ext(bp->ts3);
+  4886		ptp_ocp_unregister_ext(bp->ts4);
+  4887		ptp_ocp_unregister_ext(bp->pps);
+  4888		for (i = 0; i < 4; i++)
+  4889			ptp_ocp_unregister_ext(bp->signal_out[i]);
+  4890		for (i = 0; i < __PORT_COUNT; i++)
+  4891			if (bp->port[i].line != -1)
+  4892				serial8250_unregister_port(bp->port[i].line);
+  4893		platform_device_unregister(bp->spi_flash);
+  4894		platform_device_unregister(bp->i2c_ctrl);
+  4895		if (bp->i2c_clk)
+  4896			clk_hw_unregister_fixed_rate(bp->i2c_clk);
+  4897		if (bp->n_irqs)
+  4898			pci_free_irq_vectors(bp->pdev);
+  4899		device_unregister(&bp->dev);
+  4900	}
+  4901	
 
 -- 
-pw-bot: changes-requested
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
