@@ -1,280 +1,237 @@
-Return-Path: <netdev+bounces-286963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286964-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ULntOk/FAmp7wQEAu9opvQ
-	(envelope-from <netdev+bounces-286963-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 08:14:39 +0200
+	id wP9gKuzFAmp7wQEAu9opvQ
+	(envelope-from <netdev+bounces-286964-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 08:17:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80AA051ACA7
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 08:14:39 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66D1951AD3F
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 08:17:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E2C12301BEFF
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 06:14:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 09E87301C032
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 06:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEE034DB572;
-	Tue, 12 May 2026 06:14:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E832044B696;
+	Tue, 12 May 2026 06:17:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P6JVSg17"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JmH5pBKj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551EB466B7B
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 06:13:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1754DB54F;
+	Tue, 12 May 2026 06:16:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778566451; cv=pass; b=TVYouy0TsRJNAHE75ftqch2KP9VJoPZAiCI/UKeDimmffKqA2cMfUlmLKS1vjcQBlcNZTZjRGDS8LFE/RI8SgNgxqRacoqPEc1m6gB5ptEXodSoV1D6SP5NbFFQ9NfqBVwIXXAJvZNfU++H8ZcSgULoIg7utNm7h4DLniyuShHI=
+	t=1778566617; cv=fail; b=BcTfR2PGTEI2yBKODjs9DURRa37PuP3QLTiCnjlQRVYpBhr2tMq/bMtgz9MqVyPEVBNVk/r86QED3jyhc5mfi56YMVBSzR+aniEFCivZQXosRuUaigv6XXMcA0RrXo5WdR1/CNVXBZiS5Q5JIIxRW07hzqyh2krkWhT+9e615hE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778566451; c=relaxed/simple;
-	bh=3ld4zdEky9JiorADEB2JzKLMGmxL8CZq09SENbVMLTw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iV+ff5j1E6E6XxrCJ6fmzfhFIP+nNEH56bybA3wV8Lee/DJUHa9C1fHj7qZ45aYUXszj8uj+f8ISH0eAd/gJc/K1857nwUqDtDvfDhuge97jWYuwhhZAlLlqm6z1PwaYW/TBEhDQST3TIblRbNjFM7qpuBdFMkXHgSs4ZPwRQp8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P6JVSg17; arc=pass smtp.client-ip=74.125.82.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-2f36da5c8fbso5029023eec.0
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 23:13:56 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778566432; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Im9Nfil3ro42dm+E1qqRsk7X+x28Wo/TJHG/gsA8sKadBbO9cU94SUebxwTlr7uljs
-         su5H3HU9IZ2kZrVQw5Gq3SK1gN9jEY1l6VhptSWos6aa6notoDCgxWr5qgMTKXE9gExK
-         F8W/uds1ws9EZa+LuxLd54gUSF1vTdtOZjBLrT3rCxB6aabkURI9ZzLrFgsZI3rU/kxz
-         GAG3l5ScD9HgsP1tRmvX8R9fjTQSSNLR7q1o4rB0rj6XBGB3hHTEifQpR0vaD98Jb1L7
-         XOP5OK/1Xcxb4ahOVz9AAdkNVKQb/Kx2vpTvvDYhPSWTOPipQZby3f7fqKSpGDflAE9m
-         5lRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=yr8QRs98bsPiw0gF0kGFiK+9h78W1fGBBJoeOfjYUCc=;
-        fh=qPEqS4BSwf51rIS3IyMvSEEevLOBlTnzkOG1uJdli5M=;
-        b=WLi80ciTnbYJp576l7MMxMFIVCDsxFwcYsMPWE21Nfx/ApBHCJ+6NID6mkRBGSzfF8
-         6ytkHX27JEOhPoZ6/MxmdBbU5e/smzcdExWbSINw6Yy8l47eJJnUFqkQharKQll5DzYU
-         G7znkHhALCTlacu7pZeuywMmHpN4oH4FoNa4oZO2RHOy2LA1RX4k0kdOG2q3X/VOPfVz
-         nsZDc7oKOPS6S52DeE59PrHTrkmSH9zY4guL42r50qY8FZa07LO1faULcVxAowfSPhXI
-         K/u9J7j/Q0TkXpT7KttGlIg/nfGizLeFzYd/54jPb0dPhYHpg8UD6lQxb/PzznQJ9Bqf
-         jPGQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778566432; x=1779171232; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yr8QRs98bsPiw0gF0kGFiK+9h78W1fGBBJoeOfjYUCc=;
-        b=P6JVSg17mfG3AE++SHupyqKkJLaPPzom6Hym1yhnh9DOVxBji9AnJ3hls5QLmWd2TG
-         ULq6zRBIkTtCCKHl/RGgKcP3NwzPXDUGKuv3j9xOZ8IVvN7cTQQtKwh1xBmkhS8Ip/dI
-         gwUXG/gIKMWiY/1fAKKkeyuc5gMhyUcg18cf0fLz4gsWYuyey29l/rgRHUkaqPujaeyM
-         aTmavwGzzsnO71xErdMSJdx5/+ZnQ5bp+9d/1ZzFEsd8MYd3HdaAOrZhEBJa7d0v7i7+
-         vNVEUMU3/83mySnyyEUsL1VgvgozYrJEg2+UG0n2xUEJj733OO0F0x7ngpNZ12iyOWIL
-         JZzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778566432; x=1779171232;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=yr8QRs98bsPiw0gF0kGFiK+9h78W1fGBBJoeOfjYUCc=;
-        b=JxAV6hX6giKpDt0TryNIVs4OSA330CcAnGNb3sZLI8t4RNqpLMd3sdsCEEsSy7jxJU
-         Ent8jTMHMisxkRhJ6zlJDFLyvQs23Je9KAgUfDfHGlnNnxU89hrLAvzKaKtRq8092lKR
-         x/ScCjim5qXl2a978RTk668fqBn5L90Xpw0dHMyoIrTYP7TcXW7lHhUPzsis6EvV4u4K
-         vPcUNicmNi0Lvxdqs4xs/nS1xL/nDORFW6GYt3R8k4RkMBbuRoEUMAg1O68e7ItBoqhH
-         kegWK5dUDn2Q9CIIrcRVqoauf5Cl9TYqorcsCVuOQpd84RmGNkkrVxZjLHce+6SPN0nD
-         QZXg==
-X-Forwarded-Encrypted: i=1; AFNElJ//sZbjyJfvYH8GBvE7gC3TddEWbWhbuGoc6MIi5lRkNV1S9RSskTV3EmdcjQHsVqZ2aR/LY0Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwloqgMMQUQOHRMQSRleT7G2j5frHlBqE+81d4c/kHfDOx+fIKj
-	SeHU9DYZ+QSIsetjL05EKplyKiAFyGKHnZaUddwM6/EB/1+2W97gzdDc3g4a8yRBK8wIMQu79tL
-	6JdcVMzAG8q3f1RRg3VVcnSgI4GwBC2U=
-X-Gm-Gg: Acq92OHhp4QZWuP1JkJbWF1y9NUJ0S1Zk0An75x+uAJHok1XGDccMfF3l2Ply1ZeKg+
-	UV+zRRXOgJg0MkVFAOobAAAqRRh+VfUoz1BbYNcS8W9jzK6yGEaeR8LnyQBBsL8UzzgIUAEb3kD
-	O2I1b3Y47o93adpbGGsuVwx7F1xVVsEYr1W6OWQRIOYXfriQ0m2hC2RhlIWLZ3blaH4nnPgVSHJ
-	7g6mQfEzDoV6pCB/lWitr7vS9TK+r7qLN041ce3VpY9ATA7H+eBfASi5zTZAel4zn6h2zcH8JBt
-	VSo4m5rM
-X-Received: by 2002:a05:7301:7213:b0:2e2:4979:ec7 with SMTP id
- 5a478bee46e88-2fb4bff2949mr6162640eec.10.1778566431760; Mon, 11 May 2026
- 23:13:51 -0700 (PDT)
+	s=arc-20240116; t=1778566617; c=relaxed/simple;
+	bh=97OqqOCITFT0NXp4yHE4ptspB1Y/TNtAXr6ayLGzfak=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=aBc28gxlq6PJrBvCKeh8ZyqPFAwSpdO0Ac513pjmZhn7GnL/FMTgjtNvnU+50kkrnybXvdddJnmbawYmqlxhwoa6X9wUJz7BQcOLKTIEeos2rzc8zZhi5b65GHgUHpuMAIaiAP93RtJFYeFhK53fvX26q24dXWOtnW8+Q2jN8co=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JmH5pBKj; arc=fail smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778566606; x=1810102606;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=97OqqOCITFT0NXp4yHE4ptspB1Y/TNtAXr6ayLGzfak=;
+  b=JmH5pBKjOV0/xx6jA+YcwycoXFzAIIc1CISr3ZxRA10Db74zACfyeFA1
+   /IFglJrKwqLOaLP18E3XDIsXPVyUZMCyqotFDTRt96y214CYf3EMBKk+m
+   qhPVOzF8cM56YJW2fM6/tILlGGEoxrNG7ksug7k5u281AiwrXtWcMBeVs
+   PfQ4NhFeoQ9l1p4F4ce8pPlWCKRLBSRZ+Nad6FWEbtgURO0P7kUs8jB2x
+   rJ9mpMLq3k1srnN0VIH8mGWI5A9CIwirmYGTrmMw1q2MmQkxmEeKLWrcn
+   9rCzvPPh8obPqhoywQInQetNz+cyFP2uP1EoFGFVuZZyeMyFaIoa8lrPT
+   w==;
+X-CSE-ConnectionGUID: kMYTm/wmQT2l3BTdnoRdSg==
+X-CSE-MsgGUID: 5y5uIIDmSEKkdtFog4BMPg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11783"; a="90567421"
+X-IronPort-AV: E=Sophos;i="6.23,230,1770624000"; 
+   d="scan'208";a="90567421"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2026 23:16:43 -0700
+X-CSE-ConnectionGUID: Ltv5M2QuSm2MjTCYOYkbRA==
+X-CSE-MsgGUID: wfuN4plbSGyb/9pdML7HkA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,230,1770624000"; 
+   d="scan'208";a="236688913"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2026 23:16:43 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 11 May 2026 23:16:42 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Mon, 11 May 2026 23:16:42 -0700
+Received: from BN8PR05CU002.outbound.protection.outlook.com (52.101.57.7) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 11 May 2026 23:16:41 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=OFgkm66bACzu0EpmHtQrci9U8e1gz7gZ1YBauf0GmSVpavTUqqIx3lVI9P1j2gW2V0sgN9S443Z/gc2q3CBHU+c5K+dfJrQH5U8h0zCCGCgjOIMEV3IybpSzc0+yIivBERveo9QoZKXu6AoD7t0gXDCvA4OAl29ofeuq8AXmygPI02nGSOin2ljxhL822yAiwPxATOzIs7nRjaHbLqf647zhLIOuabuPE4KFFIvcaComCJzOsp/BtqAORtaw3eiK03HZDMb3Saw++gJhVk8iLBb78gq4N6R949OxHn/ucwiqTj1e7P5yQ9Yzk1sjpPO2O2DgZTWXQcqA5bgfRYP7Iw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=97OqqOCITFT0NXp4yHE4ptspB1Y/TNtAXr6ayLGzfak=;
+ b=B8PFKKd9Upsi3dYQgUj0lQQpp70rAmCmaUVGuSHHcEjttZcsTgKXFnYE+DEr3EIK7yy2J4MXFPmSPjazjh8VcxIRM+T71/E0Am7JJMbw0qlpKDYuODxdZASG1MJN22TWbaNKQpjl1EXX8y6j2Y2LFD8DiJ3H/jBrdn8APdCAAeS+z4xn/69KyMf/XbdvG+cImFx//mhm2DHuifbf2UbzYOKu5ZwDLa44tUUI6pMV1u9FiKIuMjcIWXj6n/Z06hdKHv9NR39q7KKE41Q8r5ui51bxgEEY9YB4UhdxDcDRnwmR/YT+7JYLO59/RFAXqOIZXG5oK9p6F5F3JR10eG3b4A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
+ by DS0PR11MB7877.namprd11.prod.outlook.com (2603:10b6:8:f4::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9891.22; Tue, 12 May 2026 06:16:38 +0000
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919]) by IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919%5]) with mapi id 15.20.9891.021; Tue, 12 May 2026
+ 06:16:38 +0000
+From: "Rinitha, SX" <sx.rinitha@intel.com>
+To: Daiki Harada <daiky0325@gmail.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Kohei Enju
+	<kohei@enjuk.jp>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v1 1/2] igb: use
+ napi_schedule_irqoff() instead of napi_schedule()
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v1 1/2] igb: use
+ napi_schedule_irqoff() instead of napi_schedule()
+Thread-Index: AQHcwSMg/qakifTA80madtnLoVQrdLYKKH5g
+Date: Tue, 12 May 2026 06:16:38 +0000
+Message-ID: <IA1PR11MB62415F3CAADAD6B857B135E98B392@IA1PR11MB6241.namprd11.prod.outlook.com>
+References: <20260331103924.36422-1-daiky0325@gmail.com>
+ <20260331103924.36422-2-daiky0325@gmail.com>
+In-Reply-To: <20260331103924.36422-2-daiky0325@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|DS0PR11MB7877:EE_
+x-ms-office365-filtering-correlation-id: 7aa66962-2261-4a5b-e0e4-08deafee06ba
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016|11063799003|38070700021|56012099003|18002099003|22082099003;
+x-microsoft-antispam-message-info: mWZVz1/YurFvQ+uB6CTeyvYwo7dp9Mi1JWRxvQCBUcDYvBquvUj2QmIIXbAhymgXZ6w2Ty6qzK24ouLLS+UkY6DMI1GE9Bq23uM2eSjVZ9FCZUqAiOqHimlD9WvECHVh8UxUxEaUqnjykIyHPDma1+F/icGA1sOJlm/hR/8UxlQZZow3EWPxM0YAttdGoB9sf98TGxX0p8Gd/JIvTRgqGULu5fjoUuittlHxpRorc+HFOX5Q0v+FAqTQJBSHdjisio+dY+NU1aSgTxI7vPqxMY0iTbzwrSSQsx2MCamN4LG6drX316qvRCXKkfbcq0HkBEs++ADJQt9M3XRn0Fl4EJPySydjt69Qcx0BMEkvgBZ/v7zl/QL8GIFAL192SgBGuESfOoY13Qei3tpQz514J8DGXKqpKDUWxVuav234/dyxPYqlhDTT0ZtAV2udQAW7yXNID3MGrbo96jhaN5DjnZz9kCBGmqyFpVLp1lUIYbZj0eYx3inLyQTn1Tr3Ww6+fCuIgSC0eYG5AQOP4BG5yrHrTOib+8Yq1OS1h/d8uB16mIZZdlFCTY1fAaoaOOeHXZJOW5P0YgfqVX4aOdav/6r3+NVfp1MJ5BAkGQ6FyfrZjHbnKFApHl1pztN+AZSWP2TzIK+pRRB8XGQohvaY/em4bw1UmJtK3+yx7g5LYAqkm5Dw/5JT0SEp28pzKtzOoAw+Vq2KDRxoXzzSBl3EJDNYt6izlBBg/uzv9ZimZ5qN4omS9CwXiOHSw6F0tJrp
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(11063799003)(38070700021)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?INjajWYW4ytgo578vxndgsH2Te7bbIDnPYwqtSNfwVBXSmfTHtYSo5dRrAFW?=
+ =?us-ascii?Q?OxK0WpWV0hqMwZjE2FYl860HlcbDfnfgeLDVQFOM83yW9GBcklOsVvTdZpeV?=
+ =?us-ascii?Q?PUcQlVO4uPa4ADmIuqbZnLXBTUriL4mL6vdUrW7k5e23z11D0pi04+uqk3i2?=
+ =?us-ascii?Q?/QhI4DcvT5rHpN9oLRCtv8iGVb2A6+Tmt2PfNwWniDQ6gKR5Qqz8/PyLvxYv?=
+ =?us-ascii?Q?WhGz7BccemX86bQJ29VEhInXlQAPv9/oKg9f6zrMavGw3qNgAk63Oj3ZEHPY?=
+ =?us-ascii?Q?DjyRoaqpbuz+I1r9ymrVjkH72FM/De6kAf+mLrDnPwtnGB6guDCVX0FXaLZy?=
+ =?us-ascii?Q?HJJPb5gQUq6lmTq1JlsGSBt+5CBIy1Bu/2XjRGXR7wKKrShZ5EmO0FNayY/Q?=
+ =?us-ascii?Q?mUwny6jWAgst+61FNXOcjlxrkyVZKTbDm96fO6etZDDEIT5BmUA4yQPsIDyc?=
+ =?us-ascii?Q?pkYxZOzBDVIW36rm6dEljmtc5dYxVZ7EikyE2ty1eUP/YIvoRTtHjBbP1m9k?=
+ =?us-ascii?Q?qy+HEELffSzzQ8jXu3Ish2QFCGrV5YtTnBQpVLj2fivjf8yK+ov8ltTAfRTo?=
+ =?us-ascii?Q?fqVg//U7s+bsp6ZWoRTxTtpSOngxdrtanASzrrpdT/HnzLA8GzgYjM/p4vYl?=
+ =?us-ascii?Q?b6TricghJAdw3gZx2y5vR5J8CEDcs7r6fUD18ZAEzAIUBZLYBHhJc6mBMTZ6?=
+ =?us-ascii?Q?ue5zad5Zu/Vbr5VnhPssDp2CwkhAEjEXrfyk3cAwp8ilSYdQA+B83BWTultY?=
+ =?us-ascii?Q?Juu+tP9rr2HLOKDUYtoLMfPUsRUicus8NRXkCoywPlfkvu691dwmThwwG691?=
+ =?us-ascii?Q?XXu9YQ/iuXe7NHctKB7x7/SygC0RHjk9HGJP4LteO2JpsLmIMQoi9JflyoSq?=
+ =?us-ascii?Q?q9aCDYC4oo2RKPa5T2UEfEN4JK2IT0XWJV9F3wCWUWSPyEA+sG9aBfIHnNeO?=
+ =?us-ascii?Q?/n6hxilkq+asuGfB3PJjL3mHRVNb/cPjzt3rmL0SR1WSKZNx8BY88WE/sNAH?=
+ =?us-ascii?Q?u/TbYKm6S4/qNYrLeStRnI9Z3pd8EY3rjS60sfn8TXYnTC4MqEspOvG+xnhK?=
+ =?us-ascii?Q?gHKnUBco/vpV1cX9OD0qrBdjj0TkNyhj8eBKxug/uMByw9CtAO94Fa8t69Ke?=
+ =?us-ascii?Q?0rLWcuABMKkxdv4Nvz8+ryAo9U5pXzd1ZmPZE1Qicfvc1ED/Rhj1aAhjnq/e?=
+ =?us-ascii?Q?ZvYCVwjZvCgxl0HFMiPmxNKcjWHzj4V6QqFZD+/iFj/aaATL27npu1lpd6Tm?=
+ =?us-ascii?Q?zCPN312IbzNNazV/Yb95H2e2zvXzAueCqNW3rWawvXPsbxVIpABV9wGT364f?=
+ =?us-ascii?Q?4GQQQA4AJRU+ZT2abT5fZR3LKUUolKKm+sE9J0sgmCS9VCH6r7MdP1FX7FIp?=
+ =?us-ascii?Q?lj27HOKxoekgzRpcwfL54Ir5weq6P+iq15w7zbpxlmbPblleqgspJoc4mpJW?=
+ =?us-ascii?Q?Uj521d7ZeKjgldAAKVlAgCEpJSXulmYB8KO+rag7En1C/Qt+QVEXTh0AdpMm?=
+ =?us-ascii?Q?FdAanM+OZL32xgsNgz62sCdgY4kMirSCX+D8m03fggiQbe/5fEI5sEHyy38z?=
+ =?us-ascii?Q?c9h6nQitjq4w6RKsTjWfIsmykyIGDK/UYQnsdq34aCQTWhB0sbFTZOqox5AX?=
+ =?us-ascii?Q?E/yndjkfXLh1OXXYTIglDol+hpKSU8DYH3pHspZzRxciFrT+zR2DtiHZ1BMI?=
+ =?us-ascii?Q?dCPMlz0bfI+kq2gatuIcnZDDFKgdMty8BNFZQWruQVkX+cXG?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260511135703.62470-1-clamor95@gmail.com> <20260511135703.62470-3-clamor95@gmail.com>
- <agJ/T8nBGWEoblmd@nchen-desktop>
-In-Reply-To: <agJ/T8nBGWEoblmd@nchen-desktop>
-From: Svyatoslav Ryhel <clamor95@gmail.com>
-Date: Tue, 12 May 2026 09:13:40 +0300
-X-Gm-Features: AVHnY4L1_bWZXCrp3MmGLMUWBEn-sMyg9m87GKXzm_vHqR-lTAFW3X_ZqIO7y3g
-Message-ID: <CAPVz0n173syW9rXy7Qt_N=mChe6WBRLvjRDypcJEC50hPL4OMQ@mail.gmail.com>
-Subject: Re: [PATCH v1 2/6] usb: chipidea: tegra: Avoid controller/PHY init if
- bus is externally controlled
-To: "Peter Chen (CIX)" <peter.chen@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Vinod Koul <vkoul@kernel.org>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Thierry Reding <thierry.reding@kernel.org>, Jonathan Hunter <jonathanh@nvidia.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-phy@lists.infradead.org, linux-tegra@vger.kernel.org, 
-	linux-usb@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 80AA051ACA7
+X-Exchange-RoutingPolicyChecked: mldMmp6HddFQvRrGKtmGNyVSe1l3EEovfIDPbR4u+TCWIsFAMWpwbKpnpV26uiS6oVzKxmIf5Utch57/cJT1P5G/a2yhvBh4kWDhjDae/AOB8/bZUEeTyZaM0OWtQGbHuKX0Vo1BdcOMarQk5yij7Y/CUk5FcPMbRYx54WhO4gTotxQq86pRqjgSLHhjRfFmC32w68dEElq7Bxmmw8s9IwV/6LDbtrxqbbPwU36oHZL4nmVhpP/WpHw2G3SbkqwnbAtEBLGmhIzs0WgTbnqg8nsksPs7uq2fO8u4sqlEZY2/hhBoKvNcK36xSXhskh8irOzTW56c5YZGibAotrBUlg==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7aa66962-2261-4a5b-e0e4-08deafee06ba
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 May 2026 06:16:38.2541
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 8P+4Ru5815+RuVI8cs3g33aPehVP1YKJqmDcNXM2jDCR9GgbvNeeEdlo49Nrv+0gFPPAnKSQLOle2cVsnHylKQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7877
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: 66D1951AD3F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286963-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286964-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FROM_HAS_DN(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,lists.osuosl.org,vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[osuosl.org:email,intel.com:email,intel.com:dkim];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[clamor95@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_NEQ_ENVFROM(0.00)[sx.rinitha@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Action: no action
 
-=D0=B2=D1=82, 12 =D1=82=D1=80=D0=B0=D0=B2. 2026=E2=80=AF=D1=80. =D0=BE 04:1=
-6 Peter Chen (CIX) <peter.chen@kernel.org> =D0=BF=D0=B8=D1=88=D0=B5:
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of D=
+aiki Harada
+> Sent: 31 March 2026 16:09
+> To: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; linux-kerne=
+l@vger.kernel.org
+> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw <=
+przemyslaw.kitszel@intel.com>; Andrew Lunn <andrew+netdev@lunn.ch>; David S=
+. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub K=
+icinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Daiki Harada <d=
+aiky0325@gmail.com>; Kohei Enju <kohei@enjuk.jp>
+> Subject: [Intel-wired-lan] [PATCH iwl-next v1 1/2] igb: use napi_schedule=
+_irqoff() instead of napi_schedule()
 >
-> On 26-05-11 16:56:57, Svyatoslav Ryhel wrote:
-> > If the USB controller and PHY are externally controlled, then the
-> > registration of the controller and the PHY initialization should be
-> > skipped, since these configurations must be done by the device that
-> > controls the bus to work correctly.
-> >
+> Replace napi_schedule() with napi_schedule_irqoff() in the interrupt hand=
+ler path in igb driver
 >
-> I find you only control USB controller device add at PHY driver, most of =
-USB drivers
-> has PHY control, for chipidea, it has PHY control at core.c, would please=
- try to
-> adapt for it?
+> Tested on QEMU with igb NIC emulation (-nic user,model=3Digb)
+>
+> Suggested-by: Kohei Enju <kohei@enjuk.jp>
+> Signed-off-by: Daiki Harada <daiky0325@gmail.com>
+> ---
+> drivers/net/ethernet/intel/igb/igb_main.c | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
 >
 
-Usually yes, but this is not the case for Tegra unfortunately. As you
-can see Tegra specific section of Chipidea driver specifically
-describes why it has to set PHY manually.
-
-/*
- * USB controller registers shouldn't be touched before PHY is
- * initialized, otherwise CPU will hang because clocks are gated.
- * PHY driver controls gating of internal USB clocks on Tegra.
- */
-
-So in order to provide correct work of USB when set by an external
-device, both PHY and controller init/add must be skipped.
-
-> Peter
->
-> > Signed-off-by: Svyatoslav Ryhel <clamor95@gmail.com>
-> > ---
-> >  drivers/usb/chipidea/ci_hdrc_tegra.c | 36 +++++++++++++++++-----------
-> >  1 file changed, 22 insertions(+), 14 deletions(-)
-> >
-> > diff --git a/drivers/usb/chipidea/ci_hdrc_tegra.c b/drivers/usb/chipide=
-a/ci_hdrc_tegra.c
-> > index 372788f0f970..593390a818d1 100644
-> > --- a/drivers/usb/chipidea/ci_hdrc_tegra.c
-> > +++ b/drivers/usb/chipidea/ci_hdrc_tegra.c
-> > @@ -32,6 +32,7 @@ struct tegra_usb {
-> >       struct clk *clk;
-> >
-> >       bool needs_double_reset;
-> > +     bool externally_controlled;
-> >  };
-> >
-> >  struct tegra_usb_soc_info {
-> > @@ -312,20 +313,25 @@ static int tegra_usb_probe(struct platform_device=
- *pdev)
-> >       if (device_property_present(&pdev->dev, "nvidia,needs-double-rese=
-t"))
-> >               usb->needs_double_reset =3D true;
-> >
-> > +     if (device_property_present(&pdev->dev, "nvidia,external-control"=
-))
-> > +             usb->externally_controlled =3D true;
-> > +
-> >       err =3D tegra_usb_reset_controller(&pdev->dev);
-> >       if (err) {
-> >               dev_err_probe(&pdev->dev, err, "failed to reset controlle=
-r");
-> >               goto fail_power_off;
-> >       }
-> >
-> > -     /*
-> > -      * USB controller registers shouldn't be touched before PHY is
-> > -      * initialized, otherwise CPU will hang because clocks are gated.
-> > -      * PHY driver controls gating of internal USB clocks on Tegra.
-> > -      */
-> > -     err =3D usb_phy_init(usb->phy);
-> > -     if (err)
-> > -             goto fail_power_off;
-> > +     if (!usb->externally_controlled) {
-> > +             /*
-> > +              * USB controller registers shouldn't be touched before P=
-HY is
-> > +              * initialized, otherwise CPU will hang because clocks ar=
-e gated.
-> > +              * PHY driver controls gating of internal USB clocks on T=
-egra.
-> > +              */
-> > +             err =3D usb_phy_init(usb->phy);
-> > +             if (err)
-> > +                     goto fail_power_off;
-> > +     }
-> >
-> >       /* setup and register ChipIdea HDRC device */
-> >       usb->soc =3D soc;
-> > @@ -342,12 +348,14 @@ static int tegra_usb_probe(struct platform_device=
- *pdev)
-> >       if (of_usb_get_phy_mode(pdev->dev.of_node) =3D=3D USBPHY_INTERFAC=
-E_MODE_ULPI)
-> >               usb->data.flags &=3D ~CI_HDRC_SUPPORTS_RUNTIME_PM;
-> >
-> > -     usb->dev =3D ci_hdrc_add_device(&pdev->dev, pdev->resource,
-> > -                                   pdev->num_resources, &usb->data);
-> > -     if (IS_ERR(usb->dev)) {
-> > -             err =3D dev_err_probe(&pdev->dev, PTR_ERR(usb->dev),
-> > -                                 "failed to add HDRC device");
-> > -             goto phy_shutdown;
-> > +     if (!usb->externally_controlled) {
-> > +             usb->dev =3D ci_hdrc_add_device(&pdev->dev, pdev->resourc=
-e,
-> > +                                           pdev->num_resources, &usb->=
-data);
-> > +             if (IS_ERR(usb->dev)) {
-> > +                     err =3D dev_err_probe(&pdev->dev, PTR_ERR(usb->de=
-v),
-> > +                                         "failed to add HDRC device");
-> > +                     goto phy_shutdown;
-> > +             }
-> >       }
-> >
-> >       return 0;
-> > --
-> > 2.51.0
-> >
->
-> --
->
-> Best regards,
-> Peter
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 
