@@ -1,76 +1,89 @@
-Return-Path: <netdev+bounces-287001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287002-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GDW3FGHkAmpEyQEAu9opvQ
-	(envelope-from <netdev+bounces-287001-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:27:13 +0200
+	id 6PVNJN/lAmpEyQEAu9opvQ
+	(envelope-from <netdev+bounces-287002-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:33:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF69851CABC
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:27:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7E5D51CC21
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:33:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5DD4230074F7
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 08:26:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 417B230CC257
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 08:27:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AD8F379C37;
-	Tue, 12 May 2026 08:26:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA30F492505;
+	Tue, 12 May 2026 08:27:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="ZAp2Ge8G"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RZy1MWXc"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-137.mail.qq.com (out162-62-57-137.mail.qq.com [162.62.57.137])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9958E3C3432
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 08:26:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.137
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF74494A03
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 08:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778574411; cv=none; b=d8GOVsCkRZhysMzkp/vabt/dbikh3E9otCp5AkEAPFRcbyYpO/5/X3tggmVt/pYSVzsRnkA0wbB5sNTVksa50wZ7tUD+vKXyyZEPxdMza0j2lszj0bwa/zRbJABePUM6ixrpmaIRZDL+cyrHao7i1tPcKYqBvEoDcL6k7SeqoLI=
+	t=1778574459; cv=none; b=OxA7ZgW5zUt7lftW3OQA5bHcs0QyvbDowQsSM5s/kHKHkkF3T45LZ45Lghnx48CI40HtomkJAYK0zKAZRD848G1O+Iv/LRfT31iHN9GIzg1OuPWcls3H3WXwGPFULVg5NwDuax4zXtjeorGK08KRlbN2+GFQwu39cHG9iK32a5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778574411; c=relaxed/simple;
-	bh=VLSGmShOghrSXYnI4aK3+vKI8/mp2m0WvnYejAiprmg=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=WhX2DiAV5Lu8BH0pOO8KhwcHhSRO8NB1t6ZK9QEe3TjNrgPKOiGjWDgHIrGKYaHsEG4gHTr5aKjhm+nZnc0pGFK/2Yors+qHL+uM2S+dBB9bEUxyloeCgaiDtVkZ/liTkhf0rJC+b8H2huPGj1aTfH9uk/dkBStEphucqCkGPRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=ZAp2Ge8G; arc=none smtp.client-ip=162.62.57.137
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1778574398;
-	bh=4vlvKM82lCQ7lznrUp6GIFP8zOg3p1TWy6CDl/8s3JQ=;
-	h=From:To:Cc:Subject:Date;
-	b=ZAp2Ge8GJcpTOFSqnKfzYQAhrfuXle45zDpt2QCa+gzuU8zZb3T7Bpjv/DQhGLQBo
-	 8Rq2+4sHxOFl3jnvVwVPp9TYRT9alYDFedcEGZOLXHu9QNqAshSUR0lvfphI6uuums
-	 pxMc71GzJ1RUW3VHBlwatVrWhAQ4dsSEzocLVK5w=
-Received: from localhost.localdomain ([116.128.244.169])
-	by newxmesmtplogicsvrszb43-0.qq.com (NewEsmtp) with SMTP
-	id 6573A662; Tue, 12 May 2026 16:25:23 +0800
-X-QQ-mid: xmsmtpt1778574323tbnhh6kx7
-Message-ID: <tencent_F7CCFD2243D4A5BBFDEDEEB978E0E6479405@qq.com>
-X-QQ-XMAILINFO: NYWR1JZzYCQ4zLaCbra3jtVFTKWuBvr+mb6MuR2M23FdU+lVyScX/pnzjE8C8g
-	 GTGdinDO3hHZG2yj6VRJDAdT79+2uIhp2ejOduoXo4MnvBT1K5f07sfuFTGSqnQhSX9qUf3jEbvs
-	 wuzb7N7zOzE5Bq9HR4BHqmc/QYtT6cQfffy7uq9Fi6KE9W5g5W3FPSLpnuOojHzL1VIeXfupqArJ
-	 9ZckaT0HvZt68514oDX3gEYxMMB9b85O+Xu5QGBHzqP6NrIniHjbvpGgcsw4T6ddpeiuOvpdJTED
-	 Mn5w3X/HSInrWv9WLCmlAcyjFhfn8dj/DvZ13K3B4AykKje+GM2x1tA4zscM3eO0+RHqQgCZOMmg
-	 KTRMym7vGjCom2vB8p5fbJc3Ni75RfDxhfZf//Dq63+1YsxJbAc4Dio2PwBcMehwGMEMlkumO23/
-	 z83x6eZCjXLYvZDQaxdf3+/rOZ1mh+/+MN/BA3C8fTLhlverSsvIelALiNP7zlI+ci4W5yUM1qbU
-	 1ptM4opD+cvwXjFhmODOpLznB0dkUFWYJCX0jiG+EYnQ73FTgp2Yh0r4nvTm47fGZhZMph7bzAN8
-	 TG2v8+EJ4LuSYUCDUh6Jts/EsHGHIgtFItSKcYv8bnixzqvtK6Q3djNBdYXIytYYoqfcc0UkdgNc
-	 Kv33rrrMgd6RI4prjHROhpR9QuYTLNdtYz/rZxmh+ckaU5vVyaCVPRfEO4HtbyUqH0hjUykvj5we
-	 TjKO0tHOZiddY87/+C8uPgYiRC1NrbxiIiWSNybyeElZZAxLDWledz7l66o7H9vOuFXQ/LDCleBx
-	 oPiUdrZ63gyM1tBHHnKGE4vEHd4yBVBw8eqLgOcqJFVoALH6mYuzKu3HJIowcRVmte2cEDpwVG+B
-	 gMjOlQDlUxQ0UcnRKNxMDSeFSkYYLxF9jFO7YIPNJAUe6ZC1xtEJ/hXKjlEEwkdzKwx2gFf8YBbA
-	 F1WxhDU9MneJUkIm5Px1xJ4N60wBgZCR18KS1p56VfDi8wIzLMx1eKWGDFVuN7FeI6xQr0zgM=
-X-QQ-XMRINFO: MPJ6Tf5t3I/ylTmHUqvI8+Wpn+Gzalws3A==
-From: Zhao Dongdong <winter91@foxmail.com>
-To: davem@davemloft.net,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	kuba@kernel.org
-Cc: netdev@vger.kernel.org,
-	Zhao Dongdong <zhaodongdong@kylinos.cn>
-Subject: [PATCH] net: mdiobus: add mdio_c45_bad_oui_list for mdiobus_prevent_c45_scan
-Date: Tue, 12 May 2026 16:25:21 +0800
-X-OQ-MSGID: <20260512082521.382202-1-winter91@foxmail.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1778574459; c=relaxed/simple;
+	bh=3f3TWl/FMyDabHUfcf1LYXSNUp/KGmnxIWuBbs4atEM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=eMzFUNF5tAv7Tud6RWiUBkfyYWMaBD/99FRT8Jc27jkk6Ma5EjGTAi9cK+cKveIc/KdLgg59JPNt5c0EV/q/lY77t+7eOnhjPUVtbQFCgauZKT8aHnLtk11il9pi0xs661CQfFDyjyh4uEWy3yXK9GeAGIiuT/A20w55kup+yeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RZy1MWXc; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778574457;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YNx0TFbbiCBLwtVn8Zame8DbRPfhYzAJuNIRgs2yuOA=;
+	b=RZy1MWXcfLTXYFp9+z8BneUtjAnyr8zdk9Bcrf/63vAJg6Aa6mB6fsS2+K/o6mA0GmIHV7
+	YJD3YHZSZXwNBhKMUhQRJtGSetdGx+k9Fwn53exO1FI/CEzajp3y6n81F/ksPSAqBfDTkB
+	p+OXSMPnptycFdsneM5rvpm/nmCW2kk=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-226-pdQZZTbpP0WDI5-TwzXooQ-1; Tue,
+ 12 May 2026 04:27:34 -0400
+X-MC-Unique: pdQZZTbpP0WDI5-TwzXooQ-1
+X-Mimecast-MFC-AGG-ID: pdQZZTbpP0WDI5-TwzXooQ_1778574451
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4E7851956095;
+	Tue, 12 May 2026 08:27:31 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.48.142])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 797D418004A3;
+	Tue, 12 May 2026 08:27:25 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: alibuda@linux.alibaba.com
+Cc: davem@davemloft.net,
+	dust.li@linux.alibaba.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	sidraya@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	mjambigi@linux.ibm.com,
+	horms@kernel.org,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	oliver.yang@linux.alibaba.com,
+	pasic@linux.ibm.com
+Subject: Re: [PATCH net-next 2/2] net/smc: reduce TX slot contention with exclusive wait
+Date: Tue, 12 May 2026 10:26:43 +0200
+Message-ID: <20260512082643.89020-1-pabeni@redhat.com>
+In-Reply-To: <20260508063718.101622-3-alibuda@linux.alibaba.com>
+References: <20260508063718.101622-3-alibuda@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,76 +91,183 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: CF69851CABC
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Rspamd-Queue-Id: E7E5D51CC21
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[foxmail.com,none];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[foxmail.com:s=s201512];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[davemloft.net,lunn.ch,gmail.com,kernel.org];
-	FREEMAIL_FROM(0.00)[foxmail.com];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287001-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_NEQ_ENVFROM(0.00)[winter91@foxmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-287002-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[foxmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.996];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,qq.com:mid,foxmail.com:dkim]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-From: Zhao Dongdong <zhaodongdong@kylinos.cn>
+From: AI Reviewer <ai@example.com>
 
-Added the mdio_c45_bad_oui_list to facilitate adding more PHYs that
-do not support C45 scanning.
-
-Signed-off-by: Zhao Dongdong <zhaodongdong@kylinos.cn>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://netdev-ai.bots.linux.dev/sashiko/
 ---
- drivers/net/phy/mdio_bus_provider.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+net/smc: reduce TX slot contention with exclusive wait
 
-diff --git a/drivers/net/phy/mdio_bus_provider.c b/drivers/net/phy/mdio_bus_provider.c
-index ce3a607a40cb..928586602eff 100644
---- a/drivers/net/phy/mdio_bus_provider.c
-+++ b/drivers/net/phy/mdio_bus_provider.c
-@@ -522,15 +522,21 @@ static int mdiobus_scan_bus_c45(struct mii_bus *bus)
-  * devices have been found, see if any of them are bad for C45, and if we
-  * should skip the C45 scan.
-  */
-+static const u32 mdio_c45_bad_oui_list[] = {
-+	MICREL_OUI,
-+};
- static bool mdiobus_prevent_c45_scan(struct mii_bus *bus)
- {
- 	struct phy_device *phydev;
- 
- 	mdiobus_for_each_phy(bus, phydev) {
- 		u32 oui = phydev->phy_id >> 10;
-+		int i;
- 
--		if (oui == MICREL_OUI)
--			return true;
-+		for (i = 0; i < ARRAY_SIZE(mdio_c45_bad_oui_list); i++) {
-+			if (oui == mdio_c45_bad_oui_list[i])
-+				return true;
-+		}
- 	}
- 
- 	return false;
+This patch replaces the non-exclusive wait_event_interruptible_timeout()
+in smc_wr_tx_get_free_slot() with an open-coded exclusive wait loop via
+prepare_to_wait_exclusive(), so wake_up() on a freed TX slot wakes only
+a single waiter instead of the entire wait queue.
+
+> diff --git a/net/smc/smc_wr.c b/net/smc/smc_wr.c
+> index 48037a3d97a3..0a6f2befb0e2 100644
+> --- a/net/smc/smc_wr.c
+> +++ b/net/smc/smc_wr.c
+> @@ -171,17 +173,27 @@ int smc_wr_tx_get_free_slot(struct smc_link *link,
+>  		if (rc)
+>  			return rc;
+>  	} else {
+> -		rc = wait_event_interruptible_timeout(
+> -			link->wr_tx_wait,
+> -			!smc_link_sendable(link) ||
+> -			lgr->terminating ||
+> -			(smc_wr_tx_get_free_slot_index(link, &idx) != -EBUSY),
+> -			SMC_WR_TX_WAIT_FREE_SLOT_TIME);
+> -		if (!rc) {
+> -			/* timeout - terminate link */
+> -			smcr_link_down_cond_sched(link);
+> -			return -EPIPE;
+> +		rc = 0;
+> +		for (;;) {
+> +			prepare_to_wait_exclusive(&link->wr_tx_wait, &wait,
+> +						  TASK_INTERRUPTIBLE);
+> +			if (!smc_link_sendable(link) || lgr->terminating ||
+> +			    smc_wr_tx_get_free_slot_index(link, &idx) != -EBUSY)
+> +				break;
+> +			timeout = schedule_timeout(timeout);
+> +			if (!timeout) {
+> +				/* timeout - terminate link */
+> +				smcr_link_down_cond_sched(link);
+> +				break;
+> +			}
+> +			if (signal_pending(current)) {
+> +				rc = -ERESTARTSYS;
+> +				break;
+> +			}
+
+[High]
+With exclusive waiters, wake_up() on link->wr_tx_wait wakes only one
+task per freed slot. If that waiter is about to exit via the
+signal_pending() branch, can the freed slot be lost to the remaining
+sleepers?
+
+Consider two exclusive waiters A and B asleep in schedule_timeout():
+
+  1. smc_wr_tx_put_slot() -> wake_up(&link->wr_tx_wait) is effectively
+     __wake_up(..., nr_exclusive=1).  default_wake_function makes A
+     runnable, autoremove_wake_function pulls A off the queue, and
+     __wake_up_common stops -- B is not woken.
+
+  2. A signal is delivered to A before it actually runs.  Because A is
+     already TASK_RUNNING, signal_wake_up only sets TIF_SIGPENDING.
+
+  3. A returns from schedule_timeout() with timeout > 0, so the
+     !timeout branch is skipped.  signal_pending(current) is true, so
+     the loop sets rc = -ERESTARTSYS and breaks without re-testing
+     smc_wr_tx_get_free_slot_index() and without issuing any wake_up()
+     on the way out.
+
+  4. B stays asleep on the wait queue even though the wr_tx_mask bit
+     for the freed slot is still available.  With no further
+     completions, B sleeps until the full SMC_WR_TX_WAIT_FREE_SLOT_TIME
+     expires, at which point smcr_link_down_cond_sched() tears down an
+     otherwise healthy link.
+
+The previous wait_event_interruptible_timeout() was non-exclusive, so
+every waiter was woken on each wake_up() and re-evaluated the
+condition, which avoided this class of lost-wakeup.
+
+Should the signal path re-check the slot condition before returning,
+or issue a wake_up() on exit so another exclusive waiter gets a chance
+at the slot?
+
+[Medium]
+The commit message says this is a contention optimization and that
+"teardown behavior is unchanged", but does it also change the errno
+returned to callers on signal delivery?
+
+Before this patch, wait_event_interruptible_timeout() returned
+-ERESTARTSYS on signal; that value is non-zero, so the old if (!rc)
+branch was skipped, control fell through to the trailing
+if (idx == link->wr_tx_cnt) return -EPIPE, and callers saw -EPIPE.
+
+After the patch, the signal path does:
+
+    if (signal_pending(current)) {
+        rc = -ERESTARTSYS;
+        break;
+    }
+    ...
+    finish_wait(&link->wr_tx_wait, &wait);
+    if (rc)
+        return rc;
+
+so -ERESTARTSYS propagates up through smc_cdc_get_free_slot() (which
+only remaps rc to -EPIPE when conn->killed is set),
+smcr_cdc_get_slot_and_msg_send(), smc_cdc_get_slot_and_msg_send() and
+smc_tx_sendmsg(), meaning userspace sees syscall restart / -EINTR
+instead of -EPIPE.
+
+Note that the sibling smc_wr_reg_send() in the same file explicitly
+converts -ERESTARTSYS to -EINTR.  Should this return-code change be
+called out in the commit message (and possibly split out), given that
+the stated intent of the patch is purely to reduce contention?
+
+[Low]
+On timeout expiry the new loop takes the teardown path without
+re-testing whether a slot became available:
+
+> +			timeout = schedule_timeout(timeout);
+> +			if (!timeout) {
+> +				/* timeout - terminate link */
+> +				smcr_link_down_cond_sched(link);
+> +				break;
+> +			}
+
+The old wait_event_interruptible_timeout() expansion re-evaluated the
+condition via ___wait_cond_timeout after schedule_timeout() returned
+0, so a wake_up() racing with timer expiry could still report success
+and let smc_wr_tx_get_free_slot_index() claim the slot.
+
+In the narrow race where a slot is freed at the same instant the
+timer fires, does this now tear the link down even though a slot was
+actually available?
+
+>  		}
+> +		finish_wait(&link->wr_tx_wait, &wait);
+> +		if (rc)
+> +			return rc;
+>  		if (idx == link->wr_tx_cnt)
+>  			return -EPIPE;
+>  	}
 -- 
-2.25.1
+This is an AI-generated review.
 
 
