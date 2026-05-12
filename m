@@ -1,263 +1,110 @@
-Return-Path: <netdev+bounces-286890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286891-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id dzxAIJp5AmritQEAu9opvQ
-	(envelope-from <netdev+bounces-286890-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 02:51:38 +0200
+	id ABH5GK19AmrCtgEAu9opvQ
+	(envelope-from <netdev+bounces-286891-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 03:09:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1E5F517FE3
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 02:51:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E441851809A
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 03:09:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B0D423021995
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 00:51:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 74C1D3016EC8
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 01:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2533623372C;
-	Tue, 12 May 2026 00:51:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A6A723EAA0;
+	Tue, 12 May 2026 01:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g1xZLS8x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bA/ToxwQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E0522F74A
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 00:51:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A1222156C;
+	Tue, 12 May 2026 01:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778547094; cv=none; b=f0Pu1FUvrljlhQ4kc5bS7CYGiLCwiyJHhYXsoKFn77DRgwEsTobZSX3k14BPHJv/9O0Ud5rttYObnAdO6e6rvwWcYY2W2kFtCAlN1KeJmcURTQfyN7G/aIIZkeZfz4XybOOF4urtt5J6g8TAfHM8tiTPi37FWt5c9THNT9Dc3rY=
+	t=1778548124; cv=none; b=KbDQwXZC61aFPIz/Fbay/NxZZ9ONKyPHjUTeg7W/SKNO+5mHPsnZIm2TkuIgOCQi8fb+oT9d6ObuGN/JiBqXKg6XwXZAZs5RyflQmyWfVg4ZXSigHgTSgYyM+3jQ0F0YShizPkWgc1zh3SEL7C14te7k9S2iBcjMT1nQxpXRUj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778547094; c=relaxed/simple;
-	bh=f0RRwhVwZZY0XRS6uTtiUkwdoDW0fO8pPZBXqz2/eOM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=IzVsKtKwp2ka/+YK9Q776DWdzoQjAiVk2aBcd6pblqnshK9Hd7omHKfT8CBkXg4wVaBCsQH3D6M0pxe8gdgSD5UB2hb4rfUCjVkM1MhSKKFFqjjN03I2ysi+lhHRSAHPODs+XqCx2JIuUkNdbWoI8LZCVg+d4Pyh8mIAwcFDRnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g1xZLS8x; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-7bf14e33f5bso44164417b3.1
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 17:51:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778547092; x=1779151892; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zziufg3DXdLJHPbUcdcMN7kXgJx9C/jwfLS4a4Ly0sw=;
-        b=g1xZLS8xJdRtCEV0JR9MGKUMi2yqWthQR20n9gVvDyEulEgEt1dS1AMc0UYZMD64jP
-         uJgh7TgsuWeZMNxi33r47uUBrvZ8xf+8Z0m9NnbWknAYx8FSXGjJ9Rg5ZGaUkZQD7epz
-         qRGnKmn7ovyhz80pusP9Cwr2PAuTXBmkCFxPgIlqHvHX4XsXswI/7gkQEQwO3CSrazYj
-         SOfqD9iJ6Uu3UHBnOXiofnf5c6zpKlfq/HCN8U/M9FPUC0+pY2hKv9iUnVs7RD1nX3n0
-         WUUbqDfXq/UrR7fuVgJ8nQCXxsM5XHnoOzbqqRzV8+AkDD69ufzjdolElU2+rAu2ySAf
-         yCRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778547092; x=1779151892;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zziufg3DXdLJHPbUcdcMN7kXgJx9C/jwfLS4a4Ly0sw=;
-        b=M8qIuryIXA/lihY2G6b/R0gFdi05n9riwn3/nJLmnTfIBRrq8+PjVkVcRnTrRu4E1F
-         +TQjAJxX7AiAcUFGVS6p3sytmqssBII3Bz0pQIiDIspc4wnYBjnvuu2N/KaH7ynOczpU
-         tF1Ce5gvZBWSYfxEb0CsDv1qGsT+MOEOmX9ezGjYdoYXgZ8pLBIRAVLDU1wt2iaOJdG3
-         Njjb0A3PIqqoZ7XHUtGazG0rCqvdZTurWhpr1Mbtd6D4bi2E38XzzLCFmQYP4cLsSC3e
-         P8V9V38v1KtOBGAOMR1XQ0JYKbgAI5TUFTIpgOgyzvixFavCJef5rxPRKD6x3zkG4nD0
-         Oszg==
-X-Gm-Message-State: AOJu0YynQWt6v9q+ZXj3gEv02hMmBYtaPIg2OVuCVc+pdQuQSVyGMvfR
-	+dLoBwpm4Twmgdxf3MZCOCIOzRjTNQIQYVUpdlPh43BKdJCEAJJop9u7
-X-Gm-Gg: Acq92OE9LT7tOrEZH5hyTP447WtnhRt9pvdn79/k9AhnF1S6p0uAzaXj+KpK7vZW9mk
-	SGLrY5ou+wXy6BZ9OGbgbKXT0gpvm84CmOudErTro9CaHRHqN5NZoIHKC6CQIL5x0aGWcxdms5I
-	iMO8UrNoWfIkJ9cEGQgOuLi1JlisF1P3i54hFJnPx6V3jd9uNpvwpgoISFOFSyRhr2X61QIypwG
-	TzRSeyZAGFJeqbF09gnkxL3aEBzPhXwthhQtrMIUO4CBow8zg9QBH3dPxyf6GBNL7bCyewSkA8V
-	71L+2q47SbYyUi+VABbIm3em4xn7BxEh3q2cVhC+fc5QC2y2aOC7TkzkXakkEWWYs97c2K709xA
-	ehiWfMCJ7wcuVQ7XUNOV1iL9qtdfRoNRwuSvJ2ByOeXmSpQrtKAfTHIFbD1pSg0eb51rrQfkUEp
-	Ap+LMcAsLtC8IZjfm1i1vztsWmFbq9A4qsHwRkEw4Lugp20YXiRGkB56cZxvw5JvY3u2yNk/gMu
-	VKl
-X-Received: by 2002:a05:690c:e3ce:b0:7bd:9f34:5998 with SMTP id 00721157ae682-7bfb9aa172emr168105257b3.34.1778547091734;
-        Mon, 11 May 2026 17:51:31 -0700 (PDT)
-Received: from gmail.com (172.235.85.34.bc.googleusercontent.com. [34.85.235.172])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7bd6683836asm160318087b3.25.2026.05.11.17.51.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 17:51:31 -0700 (PDT)
-Date: Mon, 11 May 2026 20:51:30 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Daniel Zahka <daniel.zahka@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.3467d6902b8a2@gmail.com>
-In-Reply-To: <a3aff385-4c40-46e7-9ad9-d64f399750f6@gmail.com>
-References: <20260508-nsim-psp-crypto-v1-0-4b50ed09b794@gmail.com>
- <20260508-nsim-psp-crypto-v1-3-4b50ed09b794@gmail.com>
- <willemdebruijn.kernel.255240af45e5d@gmail.com>
- <a3aff385-4c40-46e7-9ad9-d64f399750f6@gmail.com>
-Subject: Re: [PATCH net-next 3/6] netdevsim: psp: move rx processing into
- nsim_poll()
+	s=arc-20240116; t=1778548124; c=relaxed/simple;
+	bh=y+581VyAmDoRxgCfmK0fkL9lSondMn5xnIWlB1UWcvk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CAzmQwuzrQtE1b6zdYTdxRWTtiL2Rf09zDk0Z+bTMPxBxF7f+sMeqiUTGk6hJSw7JtHjMWN3/YefJPrwN/hEd6D17UtZndFcoaw55I+NNH7ZQ7AKiirlJFpNVOq9sDzKwaO4NSBliAsKpQ/7istTfFzFnjVjzUomdqg9omcmGrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bA/ToxwQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 692A0C2BCB0;
+	Tue, 12 May 2026 01:08:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778548123;
+	bh=y+581VyAmDoRxgCfmK0fkL9lSondMn5xnIWlB1UWcvk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bA/ToxwQ5+E+ECM8M4dbimYOgMPkmOLl1zfrwLzNyRbh2l4MZUnf7c4/73Z2UoEle
+	 4mJakNujH+UAy93pDnMBplHKbZORFwlg/QvQ5Yv7XkdLtjlxO4xK7JSj8TqqTPQQep
+	 s+W6/Lx0ML3afttAjJbY6cV3LsD6FEUOc6Ouq2YwD9gdx/6Iz13LKDsmY5DJZR0s/w
+	 RnJgn7twHjmFI9PZ8pCaHc6b3OeT/gQyeRAtgU8ArSlhLqhRTee23zJ0woVHv6jnpk
+	 GRxd5CnWBevIcmoT1bYuvvq7Xa0VUz20gyCxEJRKSQRjrJLCLTqR14sv9B2Oz8ZmdY
+	 TcRQ/m+ealVhw==
+Date: Mon, 11 May 2026 18:08:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: muhammad.nazim.amirul.nazle.asmade@altera.com
+Cc: netdev@vger.kernel.org, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3] net: stmmac: Use interrupt mode INTM=1 for
+ per channel irq
+Message-ID: <20260511180842.0a547a25@kernel.org>
+In-Reply-To: <20260507070125.11886-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
+References: <20260507070125.11886-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: E1E5F517FE3
+X-Rspamd-Queue-Id: E441851809A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-286890-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	TAGGED_FROM(0.00)[bounces-286891-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Daniel Zahka wrote:
-> 
-> On 5/11/26 4:03 PM, Willem de Bruijn wrote:
-> > Daniel Zahka wrote:
-> >> nsim_do_psp() does PSP decap and skb extension creation in the tx
-> >> path. This has the slightly undesirable property of not allowing the
-> >> psp rx code to run on PSP packets cooked up in userspace and
-> >> transmitted on a packet socket from the peer dev (e.g. packetdrill).
-> > Whether this happens in the nsim_start_xmit tx side handler directly
-> > or is deferred to nsim_napi_rx is irrelevant, isn't it?
-> 
-> 
-> You're right. The way netdevsim works, it is entirely immaterial. I'll 
-> correct the erroneous commit message, but I still think having the decap 
-> code in the napi_poll side makes a little bit more logical sense here.
+On Thu,  7 May 2026 00:01:25 -0700
+muhammad.nazim.amirul.nazle.asmade@altera.com wrote:
+> - Wire up multi_irq_en via STMMAC_FLAG_MULTI_IRQ_EN in stmmac_main.c
+>   so the feature is reachable by platform drivers.
 
-Agreed
- 
-> 
-> >> +/* Returns true if skb was consumed, false otherwise. */
-> >> +bool nsim_psp_handle_rx(struct netdevsim *ns, struct sk_buff *skb)
-> >> +{
-> >> +	struct psp_dev *psd;
-> >> +	struct psphdr *psph;
-> >> +	struct udphdr *uh;
-> >> +	int payload_len;
-> >> +	u32 versions;
-> >> +	int psp_off;
-> >> +	bool is_udp;
-> >> +	int l3_hlen;
-> >> +	u8 version;
-> >> +	u32 psd_id;
-> >> +	int err;
-> >> +
-> >> +	if (skb->protocol == htons(ETH_P_IP)) {
-> >> +		struct iphdr *iph;
-> >> +
-> >> +		if (!pskb_may_pull(skb, sizeof(struct iphdr)))
-> >> +			return false;
-> >> +
-> >> +		iph = (struct iphdr *)skb->data;
-> >> +		if (iph->ihl < 5)
-> >> +			return false;
-> >> +
-> >> +		is_udp = iph->protocol == IPPROTO_UDP;
-> >> +		l3_hlen = iph->ihl * 4;
-> >> +	} else if (skb->protocol == htons(ETH_P_IPV6)) {
-> >> +		struct ipv6hdr *ip6h;
-> >> +
-> >> +		if (!pskb_may_pull(skb, sizeof(struct ipv6hdr)))
-> >> +			return false;
-> >> +		ip6h = (struct ipv6hdr *)skb->data;
-> >> +		is_udp = ip6h->nexthdr == IPPROTO_UDP;
-> >> +		l3_hlen = sizeof(struct ipv6hdr);
-> >> +	} else {
-> >> +		return false;
-> >> +	}
-> >> +
-> >> +	if (!is_udp)
-> >> +		return false;
-> >> +
-> >> +	if (!pskb_may_pull(skb, l3_hlen + sizeof(struct udphdr) + PSP_HDR_SIZE))
-> >> +		return false;
-> >> +
-> >> +	uh = (struct udphdr *)(skb->data + l3_hlen);
-> >> +	if (uh->dest != htons(PSP_DEFAULT_UDP_PORT))
-> >> +		return false;
-> >> +
-> >> +	psph = (struct psphdr *)(uh + 1);
-> >> +	version = FIELD_GET(PSPHDR_VERFL_VERSION, psph->verfl);
-> > This seems to reimplement a lot of psp_dev_rcv. Is that needed?
-> >
-> > Is it a hint that this psp driver API needs some work?
-> 
-> 
-> It could be. I'd have to split the parsing from the decap logic in 
-> psp_dev_rcv(). I just wonder if another user of the two separate halves 
-> other than netdevsim will come along.
+Okay, but where is a platform driver which uses it _today_ ?
+We need an upstream platform that uses this new bit submitted
+as part of the same series.
 
-Fair. Why does this driver need it. Only for that version check? If so,
-can that move after the generic decap.
-
-> 
-> >> +	rcu_read_lock();
-> >> +	psd = rcu_dereference(ns->psp.dev);
-> >> +	if (psd) {
-> >> +		versions = READ_ONCE(psd->config.versions);
-> >> +		psd_id = psd->id;
-> >> +	}
-> >> +	rcu_read_unlock();
-> >> +
-> >> +	if (!psd || !(versions & (1 << version))) {
-> >> +		skb->ip_summed = CHECKSUM_NONE;
-> >> +		return false;
-> >> +	}
-> >> +
-> >> +	psp_off = l3_hlen + sizeof(struct udphdr);
-> >> +	payload_len = skb->len - psp_off - PSP_HDR_SIZE - PSP_TRL_SIZE;
-> >> +	if (payload_len < 0)
-> >> +		goto drop;
-> >> +
-> >> +	skb_push(skb, ETH_HLEN);
-> >> +	skb->mac_len = ETH_HLEN;
-> >> +	err = psp_dev_rcv(skb, psd_id, 0, false);
-> >> +	if (err)
-> >> +		goto drop;
-> >> +
-> >> +	skb_reset_mac_header(skb);
-> >> +	skb_pull(skb, ETH_HLEN);
-> > Similarly this is a bit of a hack, pushing and pulling a fake Ethernet
-> > offset.
-> >
-> > And is this skb_reset_mac_header needed?
-> 
-> 
-> skb_reset_mac_header() is needed because psp_dev_rcv() shifts the l2 and l3 headers forward, and the mac header has already been set. psp_dev_rcv() expects the mac header to be there. I hear what you're saying though. The driver api could probably handle these for us, but I also didn't want to overfit to netdevsim without another user. I'll explore some options before I post this again.
-
-Ack, thanks. 
-
-
+If I'm completely off, and this new code somehow gets triggered
+with upstream platforms - please improve the commit message.
+-- 
+pw-bot: cr
 
