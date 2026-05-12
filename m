@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-287044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287045-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iD12ALn4AmqvzAEAu9opvQ
-	(envelope-from <netdev+bounces-287044-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:54:01 +0200
+	id MOkzF974AmqvzAEAu9opvQ
+	(envelope-from <netdev+bounces-287045-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:54:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9725F51E189
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:54:00 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AC2451E1A5
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:54:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8408B300AB3F
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 09:53:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 35A4730121E9
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 09:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E8844BCAC3;
-	Tue, 12 May 2026 09:53:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0674C042F;
+	Tue, 12 May 2026 09:54:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WAfDxPPN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BlRwYRAr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8447349250D
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 09:53:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71EC14BCADE
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 09:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778579637; cv=none; b=qqP1nDS0YWlmkVp2szy+8SBAPy8i86wClc0F2aJtpKE7rgTrxiLEM2bah3t4tJOVotsZkIFZ65Z2XUn7w1gNnZbI8ipcgHfcwNFn0GfAvDhI8xWKRzBkVPi1LUaT7FBRqr9Zh38HqSnd/+oO7SqnEGvaLuezpgsysNaRj8a7iFM=
+	t=1778579649; cv=none; b=fKsUCAolKwvF31XBZ+y6ZiTCZzZxbPhFJVA2E2NrjabxK6gq4I3W75dE3RTrwMd+q1Ibe9aPEGpNHQvsUvlIcSTly+Crg4TXYsn2iQtcjLI1bg18nibaEBzxb+b/3lyq+xFJYtO3JT0PXQeMCHi/aNW+29xH9NPnMRuSmM/4zyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778579637; c=relaxed/simple;
-	bh=q9UFIGH2TFyvxqrySWxohYUwuY3EZ77lFKUOAZJOgME=;
+	s=arc-20240116; t=1778579649; c=relaxed/simple;
+	bh=GhcbWShvWu0HBoL4vJTJZaZ4YXcm4LYzQBrJroNK88g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=edbnCFkC8s0ozTHPSxDLlnI5FbZuV4UTUdR1Nx5fa0RTiHT/PcwnrdMdN1YG0Rkhp1PCQd56Kd5Km2hKzc1rQJ4336/Xm3KjtLsbuQOApICLYoS55pWEi2ykCghmOel+f4mp6GI/bc7zt6i+dRTdh8bFp10ZvF7cTVIEcYvinBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WAfDxPPN; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=ufMgP2CemBxT3/WaPSfzVoLmh0H5K2pRjuZGtOS/OVFyZ+PcujXJ6ffTS/8sGxKTXCQY+nARc1sIDWeBXBhl9egn40jjh5k8Xvlz3dIX9uKPPtBihtMBwzH3JrHbWnq2iRLyl9IKQKJyL1ARebgJWL7T/UJ5OGk/dd5/J7WHxtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BlRwYRAr; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778579634;
+	s=mimecast20190719; t=1778579645;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+wQWXx5MVHKxpx3NSTHnfj/VmgVwD/333uvQQPjns28=;
-	b=WAfDxPPNZ8JKpoWKhhQRmIPAtDrPs6KozPpjL+QpnDf+Kps2hL63qxVu7XWWwt+KW6YrZr
-	h9L5z3rggdLpPNZdzh0qxXZhZXH0pixXD1skt48m9IWslDtk1BnaeL9SURDap5+pLMqSOG
-	jqh7Phko0Pc9cYFaUoekG4S8JM6HHeI=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+	bh=5QE9d9z2R7mk3rN0owPm0GllpWfqewHyaYRZUy3W9Hc=;
+	b=BlRwYRArrvGArQWEwA1FfwyuAbHvUz78ztv6SQWaCL1pEF7B+Igoy5CYQH16RmMh4d4JwH
+	VF4ncd4hJwk9Jr8FdQNhNWri4EjjlqstbUmCVjiz9ADnkPBwA4B64TErw+rhAUJSo5P8xa
+	Sh+fbKs3duwiJS8HuAtsavDo/77DI9A=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-657-x1yydIMMOvqUfzjcilPG6Q-1; Tue,
- 12 May 2026 05:53:50 -0400
-X-MC-Unique: x1yydIMMOvqUfzjcilPG6Q-1
-X-Mimecast-MFC-AGG-ID: x1yydIMMOvqUfzjcilPG6Q_1778579629
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-48-j6uhMd5cM3q75A7lfzPjSg-1; Tue,
+ 12 May 2026 05:54:02 -0400
+X-MC-Unique: j6uhMd5cM3q75A7lfzPjSg-1
+X-Mimecast-MFC-AGG-ID: j6uhMd5cM3q75A7lfzPjSg_1778579640
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D4FF9180034C;
-	Tue, 12 May 2026 09:53:48 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 683AE18005B3;
+	Tue, 12 May 2026 09:54:00 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.44.48.142])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5224418004A3;
-	Tue, 12 May 2026 09:53:45 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0665519560A2;
+	Tue, 12 May 2026 09:53:56 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: sukhdeeps@marvell.com
 Cc: netdev@vger.kernel.org,
@@ -72,11 +72,11 @@ Cc: netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/9] net: atlantic: move active_ipv4/ipv6 bitmap updates after HW write updates after HW write
-Date: Tue, 12 May 2026 11:53:31 +0200
-Message-ID: <20260512095339.134878-1-pabeni@redhat.com>
-In-Reply-To: <20260506135706.2834-3-sukhdeeps@marvell.com>
-References: <20260506135706.2834-3-sukhdeeps@marvell.com>
+Subject: Re: [PATCH net-next 5/9] net: atlantic: add AQC113 filter data structures and firmware query and firmware query firmware query
+Date: Tue, 12 May 2026 11:53:49 +0200
+Message-ID: <20260512095354.134894-1-pabeni@redhat.com>
+In-Reply-To: <20260506135706.2834-6-sukhdeeps@marvell.com>
+References: <20260506135706.2834-6-sukhdeeps@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,8 +85,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
-X-Rspamd-Queue-Id: 9725F51E189
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Rspamd-Queue-Id: 5AC2451E1A5
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -94,18 +94,18 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,marvell.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287044-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-287045-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
@@ -115,7 +115,7 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:url]
 X-Rspamd-Action: no action
 
 From: AI Reviewer <ai@example.com>
@@ -124,76 +124,217 @@ This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 Full review at: https://netdev-ai.bots.linux.dev/sashiko/
 ---
-net: atlantic: move active_ipv4/ipv6 bitmap updates after HW write updates after HW write
+net: atlantic: add AQC113 filter data structures and firmware query and firmware query firmware query
 
-This change moves the active_ipv4/active_ipv6 bitmap updates out of
-aq_set_data_fl3l4() and into aq_add_del_fl3l4() after the HW write, and
-removes the bitmap manipulation from aq_nic_reserve_filter() and
-aq_nic_release_filter().
+This patch adds filter data structures, RPF L3/L4 command bits, filter
+count constants, and a firmware capability query used to populate filter
+base indices and counts stored in hw_atl2_priv. It also adds a MAC
+register dump helper for debug support.
 
-> net: atlantic: move active_ipv4/ipv6 bitmap updates after HW write updates after HW write
+> net: atlantic: add AQC113 filter data structures and firmware query and firmware query firmware query
 
-The subject line repeats "updates after HW write" twice.  Was this
-intended, or should it read "net: atlantic: move active_ipv4/ipv6 bitmap
-updates after HW write"?
+The subject line has "firmware query" repeated three times.  Similar
+duplication appears on other subjects in this series (for example
+"filter management filter management management", "(Antigua) (Antigua)",
+"TX path setup TX path setup").  Would it be possible to regenerate the
+series so each subject reads cleanly?
 
-A few other subjects in this series look like they have the same
-copy-paste pattern (for example "masking and IPv6 handling masking and
-IPv6 handling", "driver internals driver internals", "TX path setup TX
-path setup", "(Antigua) (Antigua)") and may want the same cleanup.
+> diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h
+> index 5a89bb8722f9..fc086d84fb91 100644
+> --- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h
+> +++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h
 
-> diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-> index ef9447810071..3cec853e9fad 100644
-> --- a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-> +++ b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-> @@ -1522,8 +1522,6 @@ u8 aq_nic_reserve_filter(struct aq_nic_s *self, enum aq_rx_filter_type type)
->  	case aq_rx_filter_l3l4:
->  		fltr_cnt = AQ_RX_LAST_LOC_FL3L4 - AQ_RX_FIRST_LOC_FL3L4;
->  		n_bit = fltr_cnt - self->aq_hw_rx_fltrs.fl3l4.reserved_count;
-> -
-> -		self->aq_hw_rx_fltrs.fl3l4.active_ipv4 |= BIT(n_bit);
->  		self->aq_hw_rx_fltrs.fl3l4.reserved_count++;
->  		location = n_bit;
->  		break;
+[ ... ]
 
-Could dropping the active_ipv4 update here regress PTP's IPv4/IPv6
-collision protection?
+> @@ -119,9 +137,54 @@ enum HW_ATL2_RPF_RSS_HASH_TYPE {
+>  
+>  #define HW_ATL_MCAST_FLT_ANY_TO_HOST 0x00010FFFU
+>  
+> +struct hw_atl2_l3_filter {
+> +	u8 proto;
+> +	u8 usage;
+> +	u32 cmd;
+> +	u32 srcip[4];
+> +	u32 dstip[4];
+> +};
 
-The PTP path calls aq_nic_reserve_filter(aq_rx_filter_l3l4) from
-aq_ptp_init() to grab a single L3L4 slot, and then programs its IPv4 UDP
-filter by calling hw_ops->hw_filter_l3l4_set() directly from
-aq_ptp_hwtstamp_config_set() / aq_ptp_prepare_filters() — it never goes
-through aq_add_del_fl3l4() where the new bitmap update now lives.
+[ ... ]
 
-Before this change, aq_nic_reserve_filter() set:
+>  struct hw_atl2_priv {
+> +	struct hw_atl2_l3_filter l3_v4_filters[HW_ATL2_RPF_L3L4_FILTERS];
+> +	struct hw_atl2_l3_filter l3_v6_filters[HW_ATL2_RPF_L3L4_FILTERS];
+> +	struct hw_atl2_l4_filter l4_filters[HW_ATL2_RPF_L3L4_FILTERS];
+> +	struct hw_atl2_l3l4_filter l3l4_filters[HW_ATL2_RPF_L3L4_FILTERS];
+> +	struct hw_atl2_tag_policy etype_policy[HW_ATL2_RPF_ETYPE_FILTERS];
+>  	struct statistics_s last_stats;
+>  	unsigned int art_base_index;
+> +	unsigned int art_count;
+> +	unsigned int l2_filters_base_index;
+> +	unsigned int l2_filter_count;
+> +	unsigned int etype_filter_base_index;
+> +	unsigned int etype_filter_count;
+> +	unsigned int etype_filter_tag_top;
+> +	unsigned int vlan_filter_base_index;
+> +	unsigned int vlan_filter_count;
+> +	unsigned int l3_v4_filter_base_index;
+> +	unsigned int l3_v4_filter_count;
+> +	unsigned int l3_v6_filter_base_index;
+> +	unsigned int l3_v6_filter_count;
+> +	unsigned int l4_filter_base_index;
+> +	unsigned int l4_filter_count;
+>  };
 
-    self->aq_hw_rx_fltrs.fl3l4.active_ipv4 |= BIT(n_bit);
+The backing arrays l3_v4_filters[], l3_v6_filters[], l4_filters[] and
+etype_policy[] are fixed-size (HW_ATL2_RPF_L3L4_FILTERS == 8, and
+HW_ATL2_RPF_ETYPE_FILTERS == 16), but the *_count and *_base_index
+fields are populated from firmware below.  See the next comment in
+hw_atl2_utils_get_filter_caps() about validation.
 
-which caused aq_check_approve_fl3l4() to reject any later IPv6 L3L4 rule,
-protecting PTP's reserved slot.
+> diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.c b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.c
+> index 0fe6257d9c08..ffd723dcfb63 100644
+> --- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.c
+> +++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.c
+> @@ -128,3 +128,36 @@ int hw_atl2_utils_soft_reset(struct aq_hw_s *self)
+>  err_exit:
+>  	return err;
+>  }
+> +
+> +static const u32 hw_atl2_utils_hw_mac_regs[] = {
+> +	0x00005580U, 0x00005590U, 0x000055B0U, 0x000055B4U,
 
-After this change, active_ipv4 stays zero while PTP is actively filtering
-IPv4 in hardware.  Can a user now add an IPv6 L3L4 rule at
-AQ_RX_FIRST_LOC_FL3L4 + 4 (still within AQ_RX_LAST_LOC_FL3L4) and have
-the IPv6 filter program HW slots 4..7, silently overwriting PTP's IPv4
-filter at HW slot 7?
+[ ... array of 72 entries ... ]
 
-I looked through the rest of the series including the AQC113 PTP patches
-(aq_ptp_dpath_enable / aq_ptp_add_a2_filter) and they also call
-hw_filter_l3l4_set() directly rather than going through
-aq_add_del_fl3l4(), so the reserved PTP slot does not get re-reflected
-into active_ipv4 by a later patch.
+> +	0x00007CD0U, 0x00007CD4U, 0x00007CD8U, 0x00007CDCU,
+> +};
+> +
+> +int hw_atl2_utils_hw_get_regs(struct aq_hw_s *self,
+> +			      const struct aq_hw_caps_s *aq_hw_caps,
+> +			      u32 *regs_buff)
+> +{
+> +	unsigned int i;
+> +
+> +	for (i = 0; i < aq_hw_caps->mac_regs_count; i++)
+> +		regs_buff[i] = aq_hw_read_reg(self,
+> +					      hw_atl2_utils_hw_mac_regs[i]);
+> +	return 0;
+> +}
 
-> @@ -1543,7 +1541,6 @@ void aq_nic_release_filter(struct aq_nic_s *self, enum aq_rx_filter_type type,
->  		break;
->  	case aq_rx_filter_l3l4:
->  		self->aq_hw_rx_fltrs.fl3l4.reserved_count--;
-> -		self->aq_hw_rx_fltrs.fl3l4.active_ipv4 &= ~BIT(location);
->  		break;
+This isn't a bug today, since hw_atl2_caps_aqc113.mac_regs_count is 72
+and hw_atl2_utils_hw_mac_regs[] has 72 entries, but would a
+BUILD_BUG_ON() or a runtime min_t() tying the loop bound to
+ARRAY_SIZE(hw_atl2_utils_hw_mac_regs) be worth adding?  If a future
+variant bumps mac_regs_count without updating the table, the loop
+would read past the rodata array and issue readl() on unintended
+register offsets.
 
-Would it be worth keeping these updates (or adding equivalent ones on the
-PTP reserve/release path) so that aq_check_approve_fl3l4() continues to
-see PTP's reserved slot as active_ipv4?
+Also, hw_atl2_utils_hw_get_regs() only ever returns 0.  Does it need
+to be declared as returning int, or could it be void?
+
+> diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c
+> index 7370e3f76b62..546b48f897d3 100644
+> --- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c
+> +++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c
+
+[ ... ]
+
+> @@ -606,6 +610,54 @@ u32 hw_atl2_utils_get_fw_version(struct aq_hw_s *self)
+>  	       version.bundle.build;
+>  }
+>  
+> +int hw_atl2_utils_get_filter_caps(struct aq_hw_s *self)
+> +{
+> +	struct hw_atl2_priv *priv = self->priv;
+> +	struct filter_caps_s filter_caps;
+> +	u32 tag_top;
+> +	int err;
+> +
+> +	err = hw_atl2_shared_buffer_read_safe(self, filter_caps, &filter_caps);
+> +	if (err)
+> +		return err;
+> +
+> +	priv->art_base_index = filter_caps.rslv_tbl_base_index * 8;
+> +	priv->art_count = filter_caps.rslv_tbl_count * 8;
+> +	if (priv->art_count == 0)
+> +		priv->art_count = 128;
+> +	priv->l2_filters_base_index = filter_caps.l2_filters_base_index;
+> +	priv->l2_filter_count = filter_caps.l2_filter_count;
+> +	priv->etype_filter_base_index = filter_caps.ethertype_filter_base_index;
+> +	priv->etype_filter_count = filter_caps.ethertype_filter_count;
+
+Should priv->l2_filter_count and priv->etype_filter_count also be
+clamped against their backing arrays the way the v4/L4 paths below
+are?  The etype_policy[] array is sized HW_ATL2_RPF_ETYPE_FILTERS
+(16), and the base indices are accepted verbatim from firmware
+without any check that base_index + count stays within the array.
+
+> +	priv->etype_filter_tag_top =
+> +		(priv->etype_filter_count >= HW_ATL2_RPF_ETYPE_TAGS) ?
+> +		 (HW_ATL2_RPF_ETYPE_TAGS) : (HW_ATL2_RPF_ETYPE_TAGS >> 1);
+> +	priv->vlan_filter_base_index = filter_caps.vlan_filter_base_index;
+> +	/* 0 - no tag, 1 - reserved for vlan-filter-offload filters */
+> +	tag_top =
+> +		  (filter_caps.vlan_filter_count == HW_ATL2_RPF_VLAN_FILTERS) ?
+> +		  (HW_ATL2_RPF_VLAN_FILTERS - 2) :
+> +		  (HW_ATL2_RPF_VLAN_FILTERS / 2 - 2);
+> +
+> +	if (filter_caps.vlan_filter_count > 2)
+> +		priv->vlan_filter_count = min_t(u32,
+> +						filter_caps.vlan_filter_count - 2,
+> +						tag_top);
+> +	else
+> +		priv->vlan_filter_count = 0;
+> +
+> +	priv->l3_v4_filter_base_index = filter_caps.l3_ip4_filter_base_index;
+> +	priv->l3_v4_filter_count = min_t(u32, filter_caps.l3_ip4_filter_count,
+> +					 HW_ATL2_RPF_L3V4_FILTERS - 1);
+> +	priv->l3_v6_filter_base_index = filter_caps.l3_ip6_filter_base_index;
+> +	priv->l3_v6_filter_count = filter_caps.l3_ip6_filter_count;
+
+Can priv->l3_v6_filter_count overflow l3_v6_filters[]?  The l3_v4 and
+l4 counts just above/below are clamped:
+
+    priv->l3_v4_filter_count = min_t(u32, filter_caps.l3_ip4_filter_count,
+                                     HW_ATL2_RPF_L3V4_FILTERS - 1);
+    ...
+    priv->l4_filter_count = min_t(u32, filter_caps.l4_filter_count,
+                                  HW_ATL2_RPF_L4_FILTERS - 1);
+
+but l3_v6_filter_count takes filter_caps.l3_ip6_filter_count directly.
+The backing array is
+
+    struct hw_atl2_l3_filter l3_v6_filters[HW_ATL2_RPF_L3L4_FILTERS];
+
+and HW_ATL2_RPF_L3L4_FILTERS is 8.  The l3_ip6_filter_count field in
+struct filter_caps_s is wider than 3 bits, so the firmware can report
+a count above 8.
+
+The consumer added in the follow-up patch in this series then walks
+priv->l3_v6_filters[] using the unclamped count:
+
+    first = priv->l3_v6_filter_base_index;
+    last  = priv->l3_v6_filter_base_index + priv->l3_v6_filter_count;
+    for (i = first; i < last; i++)
+        if (hw_atl2_rxf_l3_is_equal(&l3_filters[i], l3))
+            return i;
+
+and hw_atl2_rxf_l3_get() writes through &l3_filters[idx]
+(l3->usage++, l3->cmd = ...).  If firmware reports an oversized
+l3_ip6_filter_count, or any non-zero base_index that pushes the
+window past slot 7, doesn't this read and write past
+priv->l3_v6_filters[] into the adjacent priv fields?
+
+The same question applies to priv->l3_v4_filter_base_index and
+priv->l3_v6_filter_base_index — they are stored verbatim from
+firmware with no check that base_index + count stays within the
+corresponding backing array.  Would it make sense to validate the
+full window for every filter category?
+
+> +	priv->l4_filter_base_index = filter_caps.l4_filter_base_index;
+> +	priv->l4_filter_count = min_t(u32, filter_caps.l4_filter_count,
+> +				      HW_ATL2_RPF_L4_FILTERS - 1);
+> +
+> +	return 0;
+> +}
 -- 
 This is an AI-generated review.
 
