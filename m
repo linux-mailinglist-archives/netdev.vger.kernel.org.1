@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-287241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287242-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CGrvFrZdA2qE5QEAu9opvQ
-	(envelope-from <netdev+bounces-287241-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 19:04:54 +0200
+	id QEJ4LSteA2qE5QEAu9opvQ
+	(envelope-from <netdev+bounces-287242-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 19:06:51 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9670525633
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 19:04:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 19ACD5256E3
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 19:06:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3007130F517D
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:58:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DF9C730D9FE8
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:58:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C3A3D5C3C;
-	Tue, 12 May 2026 16:58:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D72C3D5C10;
+	Tue, 12 May 2026 16:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="qCmZ4WB4";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="IRCZ3qU5"
+	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="LEixIodf";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="FOk3mRJd"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
+Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E8423C8C56
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 16:58:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993453C8C56
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 16:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778605082; cv=none; b=dRNE+LOgZ1AY/RIWvnCv/cyh36ogXS0Fe/niSnQZdZbsueGGp0A0lJfK/OybMSVM+XUP2rhJTELhmACDc8RffPJWWET8CzNmgnkkd7ThmPylNGLxzVERcC2tCPcwa6tghvG+GjSnub/10MsLfzAuFpWXNXg8lq/Nu/Uu+RpxEIs=
+	t=1778605086; cv=none; b=lJVwHPWFisjba0Ab+Ns3i72W5kFlpYZwsN55yeYzLuIwfMBCOddiEParM2tRlnE67K1++JL3DD3v/fboXWfkdMP6QeVTh3lDZMeWtKfwGJK7CaNi/SL/tmivxML9iNAXRyQnH+OpoRy+g7eKYOanJ+9CtSOB6Gy/hfqbTf+ngSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778605082; c=relaxed/simple;
-	bh=uF2J0U+AeUMpf8yatWTnd1IGwq3m9MEPTNSKwRsKd6c=;
+	s=arc-20240116; t=1778605086; c=relaxed/simple;
+	bh=LYO28w/vatzILRqMViTx9/quD1mD+r9tqUUt+p9iM6M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=haW0wbYRYdoQ3Ag1n6ZaPkbsOARtVt3yd8LKj8cX+YzWqxGgdpeRVcWX0gW3MelulHeLOjSfoeVvpBqq1wZPNz8cgEHnZQhCneDemA1ohh0xUKbjfrm2SnBOX83VP2SiFQEgQ3kmx+UXz5WbKK1+Qp8iB1p+icrJOC9Lwbt0M64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=qCmZ4WB4; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=IRCZ3qU5; arc=none smtp.client-ip=103.168.172.151
+	 MIME-Version; b=pQ/5sEDtIQVx231XZl3l1cUIqdIqgcXCPuUjt0hfFFWgSc6dSB1nHEN34CVHSiKKn4UHGphKCrYgmr+iJkgQVH57UXVexC5QJoqLltIFqIMIwJiXL+YzeoYJl6ei5y2TPtCca4LHWBMxT+6vqB/V3ZH0NxlacVKXgQKepQPPGDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=LEixIodf; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=FOk3mRJd; arc=none smtp.client-ip=103.168.172.155
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.phl.internal (Postfix) with ESMTP id 9038DEC023E;
-	Tue, 12 May 2026 12:58:00 -0400 (EDT)
+Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id A492814000A7;
+	Tue, 12 May 2026 12:58:03 -0400 (EDT)
 Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Tue, 12 May 2026 12:58:00 -0400
+  by phl-compute-07.internal (MEProxy); Tue, 12 May 2026 12:58:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
 	cc:cc:content-transfer-encoding:content-type:date:date:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1778605080; x=
-	1778691480; bh=MCyCNoaXKGya1g7fnQ6UO+KPouCstairzMyr+XkoEqM=; b=q
-	CmZ4WB4bh3F0XIZGKULk7VX1u5JbJRyJ0U2AT8UVLtwmAVd/4OkAdOnSt/j00dNk
-	XwNqO+ytqfHnKvendsk9yWM1RPfPkRnJrkhAwsNguCfa+XkT1Odx6ipz/KJvvaHa
-	CDM7L0omg7PgU2wDqPixEIfEV7lwBPaYFuTx0pCj7XktTRTH98FT+jy9evmt5Z1f
-	4fL7dxpadTTOQXHsG5kmCvUHb4PQ8KhlGE+WZg4YR6w+hTPaevvisniuxqHn3u/D
-	HpcRPjSVbC99pvhJIseiz06NA9fWYZtJnJkK43Y6wIzSc+cmNUc/1rbG/zMdW4Wq
-	4DDhkR6mh+HcvhaU5LOSg==
+	:reply-to:subject:subject:to:to; s=fm3; t=1778605083; x=
+	1778691483; bh=LHiQfTHyETI1dxH8h/QYy2J8CbZWqHqqCzMiGRcrZHo=; b=L
+	EixIodfDNfMRUOSEHDq5YZU0k8WgNWfajTMTVqEuwWP2C6kU625FRjCKwzT6nEkj
+	/W5F4Cw4xodhUerCYkOn5txj8EZI3CZZStpN603jGcF6AlF/J83re2A4jb7q0x4m
+	uecxsdAjHZxVb1vcYSMhGGwnZ5DzXliMVJ8XT9dOn6VMN1ULOSiN1gSjNdauj1+O
+	+56x5bii0I0iSTTWwIhaKvYr1JpzQZAUqtcfz8KODmDSnDGK/OYYoTyRpbPepXP1
+	aFSv9OpGbpDjpUZexPDsnFsAffg3eqdoEIMOC0Vz7qYfn5UvEQt5dh5AVyElCn/k
+	eA7FtZcAZ31OYPPBEuuig==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1778605080; x=1778691480; bh=M
-	CyCNoaXKGya1g7fnQ6UO+KPouCstairzMyr+XkoEqM=; b=IRCZ3qU5tuFx16/jh
-	2++6b0eBTZ/JipIBgfJaMOAFEIR+6ypGHovQz/6FGSysiQD31IiF3tA8WFkWX++M
-	4PlHTtE/8LpEqo8/3yYmoIgvWPNlvYK9NRxwz+9CT55d9gfn0oQlQz4p/R/A0lfI
-	VF9K7cKYPWGva4BxtQJhVMekrLrPnWnS29TsVur29eshLWPQvUHOOGvIhLZtWEiD
-	3KD5H0Ya8pBoZSxDunnn097by+aTChdH3RfbE1PVFen5tDP8l5mh2+m0OUZsuwpB
-	scJeJCSHPZPdFKi1HUFZLJ1UTsbgMvBH/8INmfPHw2FuSuJwAv8xOEMhaPUJoQKD
-	4SV7g==
-X-ME-Sender: <xms:GFwDatTgTsdu1PfOrsYgxNg-ziKTRbiJo7pRra4wu6JaK3T8t0vwYA>
-    <xme:GFwDajH8hYOEmcYxJYiui0QBray0-WbuXZV8YcvNM3WPWQB7-kns6vEBsrqJbqFuo
-    MFB-74_aye7lATWVN_6DaxD7zWDfJeAuR50PLriCoSEypTTh50YAhQ>
-X-ME-Received: <xmr:GFwDakcJwhV-UkuLY-QmlctbtpVQ7LZhjitGWXFjYnqQhpANikmhGDJ5cla6fnPQS2hEJ7i4vTuK1URRoQ>
+	:x-me-sender:x-sasl-enc; s=fm3; t=1778605083; x=1778691483; bh=L
+	HiQfTHyETI1dxH8h/QYy2J8CbZWqHqqCzMiGRcrZHo=; b=FOk3mRJdRtR4M7tP5
+	pYu6l2OmWwthJotluh+UcAXu8IYY4Mz8V+NcIWGjeZidJCeg9yXOkyjuMJ3hS/hj
+	YIkoEwHzdTDUyquIe0JAH9nw+YWMx1KxoxnAmpF+2IncOIBapasD2fVsD32qoBIN
+	45WBOZh//3yO1FoJZ/YRwGgNj/qD730GSUv2LHjwSfLZbkTUx87AFZSgsh5UOekp
+	AtL4NgjBlWoWfSGkc7iSTLwJ++gtLJuJ8Btpv0mhOi2G43tjhvi/BkyL3MO6Z7Zi
+	+QN8Xw6jKn5OgcurQR9kkyvy1tnEHmnYikIwZmXg+6axMnpIVQYI2LmStnxucSRz
+	WSnZA==
+X-ME-Sender: <xms:G1wDauCmVLmsyIpuqk4Ec501Y9gu_hEZ4n3lIyNX5rXnsRHAsRVEig>
+    <xme:G1wDanCL_uzfB9F8uVgs4SVd2dYWSq5zhZ0YX2nBM69UEir0LS8vZB2Nmyw3GW0vZ
+    FNOqMcxMN42T_hjYQMyd7-DJHKjd9j_zGBUaZJlVAXMZtN3gHii3Y8>
+X-ME-Received: <xmr:G1wDaoYa5LrT-h9k1Mb0qYqTiGtAulV3eDIHvkLhZvzF9U9mhDXJFczjsneM81Ba0NTFplk0zBr877boqA>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduvddvfeegucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
@@ -76,7 +76,7 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduvddvfeegucetufdote
     himheqnecuggftrfgrthhtvghrnhepteffleejfedvhfehieejlefgkeeljeevueeggeev
     tefhgfeuhfduffegkedvtddtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
     hmrghilhhfrhhomheprghlihgtvgdrkhgvrhhnvghlsehfrghsthhmrghilhdrihhmpdhn
-    sggprhgtphhtthhopedukedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrnh
+    sggprhgtphhtthhopedujedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrnh
     hivghlsehiohhgvggrrhgsohigrdhnvghtpdhrtghpthhtohepuggrvhgvmhesuggrvhgv
     mhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtoh
     hmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggs
@@ -84,14 +84,14 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduvddvfeegucetufdote
     grihhlrdgtohhmpdhrtghpthhtohepfihilhhlvghmuggvsghruhhijhhnrdhkvghrnhgv
     lhesghhmrghilhdrtghomhdprhgtphhtthhopeifihhllhgvmhgssehgohhoghhlvgdrtg
     homhdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:GFwDaiJ8rABQJ-63uIUECmysti7clg8C-Wsihw3TNC_yNalYewqhXw>
-    <xmx:GFwDaroCMe_Fr4zqf63a_Q86yGwaHZQ1OpsXcM1Vos6Jb-hFr1tGPg>
-    <xmx:GFwDagUeb9LKrYQXfe8qXKVhXibmpLOY6xeTdvHxI5rG2effP-WU7A>
-    <xmx:GFwDau34o33Z1_VepmqQqhMC3daAnj7zL-So8zasn-qIXRkrggQGRg>
-    <xmx:GFwDagi0ksknfzcmBJEA23jPsUnXCTdumOtOOxe-VlITwPJtAWlRqZwe>
+X-ME-Proxy: <xmx:G1wDasz64fux5Q6DxDGpBuzZSy77WIfg9-4VfYWP5NFtuIOpMTmLww>
+    <xmx:G1wDardOmjKx0KTHSytSueP4F01pbsp_vq-Kc9dCw9tEAzhr5JkELQ>
+    <xmx:G1wDaiJsWK3w5anxueGVECCHGhmKL-ibkSPlPKZpYemLpfO8xwqejQ>
+    <xmx:G1wDak2c0Uldi7jCvdEYKK55Mfii_cmw86Dif4cvJ3FUwHEWC6M4kw>
+    <xmx:G1wDagLRzk3jna3szlvjGLSn2aUfY6IGjwAacNIHbON22zYE5tBJ2i-j>
 Feedback-ID: i559e4809:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 12 May 2026 12:57:59 -0400 (EDT)
+ 12 May 2026 12:58:02 -0400 (EDT)
 From: Alice Mikityanska <alice.kernel@fastmail.im>
 To: Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -109,11 +109,10 @@ Cc: Shuah Khan <shuah@kernel.org>,
 	Simon Horman <horms@kernel.org>,
 	Florian Westphal <fw@strlen.de>,
 	netdev@vger.kernel.org,
-	Alice Mikityanska <alice@isovalent.com>,
-	Gal Pressman <gal@nvidia.com>
-Subject: [PATCH net-next v4 02/12] udp: gso: Simplify handling length in GSO_PARTIAL
-Date: Tue, 12 May 2026 18:56:38 +0200
-Message-ID: <20260512165648.386518-3-alice.kernel@fastmail.im>
+	Alice Mikityanska <alice@isovalent.com>
+Subject: [PATCH net-next v4 03/12] geneve: Fix off-by-one comparing with GRO_LEGACY_MAX_SIZE
+Date: Tue, 12 May 2026 18:56:39 +0200
+Message-ID: <20260512165648.386518-4-alice.kernel@fastmail.im>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260512165648.386518-1-alice.kernel@fastmail.im>
 References: <20260512165648.386518-1-alice.kernel@fastmail.im>
@@ -124,7 +123,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: B9670525633
+X-Rspamd-Queue-Id: 19ACD5256E3
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -137,12 +136,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,strlen.de,vger.kernel.org,isovalent.com,nvidia.com];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,strlen.de,vger.kernel.org,isovalent.com];
 	FREEMAIL_FROM(0.00)[fastmail.im];
-	TAGGED_FROM(0.00)[bounces-287241-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-287242-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_TO(0.00)[iogearbox.net,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,blackwall.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -153,77 +152,40 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.971];
+	NEURAL_HAM(-0.00)[-0.973];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,fastmail.im:mid,fastmail.im:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,isovalent.com:email,nvidia.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[isovalent.com:email,messagingengine.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,fastmail.im:mid,fastmail.im:dkim]
 X-Rspamd-Action: no action
 
 From: Alice Mikityanska <alice@isovalent.com>
 
-Taking further the idea of commit b10b446ce7ad ("udp: gso: Use single
-MSS length in UDP header for GSO_PARTIAL"), simplify the implementation
-and fix the checksum (apparently ignored by hardware anyway).
+GRO_LEGACY_MAX_SIZE = 65536; total_len being 65536 is too big to fit
+into a u16. As can be seen in skb_gro_receive, packets bigger or equal
+to gro_max_size (or GRO_LEGACY_MAX_SIZE) are dropped with -E2BIG. Apply
+the same boundary to geneve_post_decap_hint to avoid writing 65536 to a
+16-bit iph->tot_len field with an overflow.
 
-The mentioned commit started using msslen for uh->len, but still uses
-newlen to adjust uh->check. If the formula for check is fixed, newlen is
-assigned but never used before the loop, and newlen is overwritten after
-the loop. This makes msslen not really necessary, as we can reuse
-newlen, if we don't adjust mss before. The adjustment of mss can be
-simply dropped, because mss is not used anywhere else below.
-
-This brings us back to one variable, drops an unneeded arithmetic for
-mss, and fixes the UDP checksum.
-
+Fixes: fd0dd796576e ("geneve: use GRO hint option in the RX path")
 Signed-off-by: Alice Mikityanska <alice@isovalent.com>
-Cc: Gal Pressman <gal@nvidia.com>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 ---
- net/ipv4/udp_offload.c | 13 ++-----------
- 1 file changed, 2 insertions(+), 11 deletions(-)
+ drivers/net/geneve.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index a0813d425b71..2578aa7f9ff9 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -482,11 +482,11 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
- 	struct sock *sk = gso_skb->sk;
- 	unsigned int sum_truesize = 0;
- 	struct sk_buff *segs, *seg;
--	__be16 newlen, msslen;
- 	struct udphdr *uh;
- 	unsigned int mss;
- 	bool copy_dtor;
- 	__sum16 check;
-+	__be16 newlen;
- 	int ret = 0;
+diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
+index b36fad833724..aee05be69d1e 100644
+--- a/drivers/net/geneve.c
++++ b/drivers/net/geneve.c
+@@ -603,7 +603,7 @@ static int geneve_post_decap_hint(const struct sock *sk, struct sk_buff *skb,
+ 	ipv6h = (void *)skb->data + gro_hint->nested_nh_offset;
+ 	iph = (struct iphdr *)ipv6h;
+ 	total_len = skb->len - gro_hint->nested_nh_offset;
+-	if (total_len > GRO_LEGACY_MAX_SIZE)
++	if (total_len >= GRO_LEGACY_MAX_SIZE)
+ 		return -E2BIG;
  
- 	mss = skb_shinfo(gso_skb)->gso_size;
-@@ -555,15 +555,6 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
- 		return segs;
- 	}
- 
--	msslen = htons(sizeof(*uh) + mss);
--
--	/* GSO partial and frag_list segmentation only requires splitting
--	 * the frame into an MSS multiple and possibly a remainder, both
--	 * cases return a GSO skb. So update the mss now.
--	 */
--	if (skb_is_gso(segs))
--		mss *= skb_shinfo(segs)->gso_segs;
--
- 	seg = segs;
- 	uh = udp_hdr(seg);
- 
-@@ -586,7 +577,7 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
- 		if (!seg->next)
- 			break;
- 
--		uh->len = msslen;
-+		uh->len = newlen;
- 		uh->check = check;
- 
- 		if (seg->ip_summed == CHECKSUM_PARTIAL)
+ 	/*
 -- 
 2.54.0
 
