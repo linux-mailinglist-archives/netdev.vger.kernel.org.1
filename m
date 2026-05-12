@@ -1,184 +1,285 @@
-Return-Path: <netdev+bounces-287287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287288-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EJeHFxiKA2pN7AEAu9opvQ
-	(envelope-from <netdev+bounces-287287-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:14:16 +0200
+	id qOaZCaGLA2pN7AEAu9opvQ
+	(envelope-from <netdev+bounces-287288-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:20:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FD9B528FE2
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:14:15 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22CE95290A3
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:20:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BACCB309BD85
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 20:13:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4274C3028D2C
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 20:20:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1BA43AC0DC;
-	Tue, 12 May 2026 20:13:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF2693C0A00;
+	Tue, 12 May 2026 20:20:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EE+mRqvL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ltbq6GPe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 003DC3AB29B
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 20:13:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.176
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778616835; cv=pass; b=FOPFijPKbmr0/Ws/E4XDp7Eo9dJOeLltfmxVXwbUi1TMgDpdCsLMwL3beRCPu+l7X2pEBkPuyCCei4ki5OipG3hq6ZottD1jJW146XJmA+pdoM+HsqCcEWjyzEBxnJvaRpFABZnDuJA53IhNFLQUeIoyvHqREOYfpyevdQLwgRY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778616835; c=relaxed/simple;
-	bh=W1UGjXUOUr5pw5lZpfHp70Rnm12IZhxZ9f4qzZHvZdY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QWr6LZZL7+Sl8OerPkhWdOuokEhajJrnMIFtIAqiIR/O6JqCu2qc140MnDK/+Mw0b6yZtg+KuPTYtd2XmUcvCtQmZ/GGGCdzADYRye7DfJtyJXLB9rpYhBWwHzh3DfIWfsgM2wktJrGK0+ydDEgqxxaK5zvbpoiJ97GzNapI5M8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EE+mRqvL; arc=pass smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28592372074
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 20:20:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778617243; cv=none; b=QEqg52nNeZMxCi8o2qps1kDd1U1CqA+8tpy4QOyjsJdp49MCBQwvo9i1eFJfFQqHk5TUE2eygtiVsGLa3upMSPBAhdz4X28xnj5f/KNEgpRpK7vEG/R5H0gisBt2wJeLe5JJXvPwSL0xuxh+8+pT+mPjZkGonGzKWGGaVvdanUc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778617243; c=relaxed/simple;
+	bh=06Ut2b9dvZs1v+RSw5hLsGRQubpCyWhXGoGpYe0/huo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=PH/sAJgTU4lUwr7Qn85z+xNP0U+IBoK3nv4EFGFgyLeUr3Zqaabea/f2mRVZ85lNfrUPp79bwS/GhfeqPoAocsSuo2tLO1ELlRGe9JQrrPV+VggmsNpqrQtNAcaiDTfzJNzX026YlgBcK9c6VlibpOtKRH3I46m87fRmYDmZQqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ltbq6GPe; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-7bde9d73678so64684647b3.0
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 13:13:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778616833; cv=none;
-        d=google.com; s=arc-20240605;
-        b=jD7dt1HteReR49cshcxQaJU69IPHaQpbqxavTtmPmokOuloe5gRC8bQSeyLxRLVH0l
-         yxpPv0K2Si6fALFUvLSzMx4PBgZ8vdtcQq2cuw6jnLenNuPXT0/hiyuoh7mqp1jnK3jp
-         qsowEpXoKcyRy4cS4LFzIIrIPMPytp1iTabu2oQF7jtutjm5vqisLMmW3cU6PdicY3SA
-         2/iHGy/nwemhdlw4nV3Y2oF9eu78GjeFzAIaiMiM5Oje7w1OIAotm/ijLX9Nwx4pO8L8
-         4AhRDFFunJlhpIOeO/6fGyCFDyCkCONR6HXEDC2JHjkBRQeZfvkLXcqgZxcEjYW2XT7z
-         wwcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=18RQIx270SijuQPvP2u+5KmQApCCLoVeABosefiDH1g=;
-        fh=uq83Gn8JW4w5nIC0KviLmz/UoKLFkc/KFo2TM+3YxDY=;
-        b=C34obsnNx2hDfFGjiAnrsqhNbucVuO3WgDsKjTSkCpafGemnNXeMRlztMCxlYTzqf3
-         8dagOl/7RaWYrqKzBO+LP7rkG8kBSPa4mLBJ3z2w5cOM3OQvVHTjD3GCuAMVORaezgaD
-         zv6hR81kTs5CUtjkrOSAr640Zi4DUr2DP5sVQMf08hgeUObr6/+5v7/FIQhfyfKXTPYX
-         EJET6mwyea38BBgaD0AoIXk6tjZt3KW9mYb3jiCii6UQl+9mS6Vnzy73H4Og3bmdQncr
-         +IgOwy8PDOB0D00SL8Qu3scQFZ3edvRYggV/2Wvr2+VC+1+MqWEoO5yaZVqBfT63kJ2S
-         Whyg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-8383fb7143aso2877027b3a.3
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 13:20:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778616833; x=1779221633; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=18RQIx270SijuQPvP2u+5KmQApCCLoVeABosefiDH1g=;
-        b=EE+mRqvLxG07xaQ3nlhUcnyffLMKoyefrfZ/jn0/KPpzlX7c11L7zb48YEOm2HyTDx
-         ZpsLX8fD981bigHfB4au2c2IfqHOw1yt93yylb5x9wRThJhZUucTuz4v/0BoqCC3I4nC
-         i/9H64cYNJIkJRI7xLVsA0TgZmFUzF1DeC8AqfXZCY6JHTtcnAAdU1Aj/foJWgc2KCWp
-         FYVWgourjlZZ8crwELV39epfLYUNHLn5O3ozE0wl5dqMRLs3o0zsEzOqb9N1/L1kBBVz
-         fHanTUoAnkJOQNTjC2uxPqGxb90X3DGmeW6+g2JIaWONJEpaN3kalGftQK/kOM18Z1KE
-         nL2A==
+        d=gmail.com; s=20251104; t=1778617233; x=1779222033; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=gQzjdm8eFv/sznJvgMXu/FTaTbhPBF2kbyubytRDFJs=;
+        b=ltbq6GPe0a9lKdTDFbrdF2KmxQ2mNrIT15f9ngyoEgr4T/M9v+HGtZyGL6Q3KqiMMW
+         Jjw23f4OBoXAi4G+U/DEutupX4uqwrnJPE9XPRPG6KJjAq1dBTmItXiJoAfMcJtyfciQ
+         1dPMqkbDvPzyT0dfGFZh/jwhT2tM4b8TmydYLwpV+hP0w5+FVu83D1cpxr+gVaffjaNT
+         aAjp2ave2wqww+aeGm1KjLio5c8L35O91teCISrJCUzYNCJKukF1EUttO8AEPoPytRk6
+         kZHTn6a9qd2byJQUe02J/Z7lSDKKD0qoBK72WHIYtNPx1hlk8rvCaMzOIY4VlFNSFbIw
+         SEow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778616833; x=1779221633;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=18RQIx270SijuQPvP2u+5KmQApCCLoVeABosefiDH1g=;
-        b=ekceNmxqgb/KSVVqjGmnApNMgxw8yxOlfGioG8Y99o6xQnSY3EaD3pC0FsG++PUikH
-         +Z5Dtv2g+s4UKmAPhe9kMNQssXG3BkRiztBgGY4GC3DGKOeFIciXThwvL0dHRaZbWvv3
-         i6zXbcUC4nH++t0IzqgnMvpZ6xVnFuPlgqA1vF/15fY0m2AuACwr3VCq5w/ALDpwLiGy
-         FtRQQZwKzkjDYeuK2R6GMnEfdVPa923RD2pALjstJlE2y5uatrOBPLnTpk/97hpsPika
-         nLkCusp0dzyJ/+ksOX4lNYT3iRlp7+TYunjB3nZohmKD1V5Qr66KDopH/gAvUkuzDbu+
-         qqLA==
-X-Forwarded-Encrypted: i=1; AFNElJ8W2S/n0qrGkx9z88an9S7WTcjyZ2tjPCqlb5QYn6GT8ZqQhlHcywzEG2UWRluBrKufw46bkCw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzW+nsRYXRkd1ODFbKPoMB2rBIMyYh3+/TwvAPgTVRBJfOA8EY
-	nastRKbs9F2Y7sOYv35mteqrLVnyai4Xm+0Z+txqQeLxQY9CqPEroaIrQZ9BXJMwpAfw4rPyo0f
-	8IN6sRcrOI3MBLuSULbivcvcZeQoxd+8=
-X-Gm-Gg: Acq92OGh2aJ8PCqcQnVc1hLI6I2OxKsBzr4n2EHXPV51hYD7IWaSvkDzNYHAmTXTLXh
-	jjv+hdVXrvvT61EY/PL9L1Wrx4wJkz/P9n/qEC5LJd4O50WQEB3RcwTT1iSdkS97uEtvUR9o87q
-	f6nd+N35y2lYwRF8PYgRnLlSbFgQmPtdUCxBqHIidOUOQ5iAYgZ0CF6FMo/MwNBlxLGh9DSh6vf
-	P+yMQKrk8tWAriqcOzi/B4v1izIgBVJ0UOwEhNiTFo8fKNbwTHTq3/ZcxApB22Pn1dwKJq+kKnN
-	TzbVTaOuOkxqpnSOdwJun3pLJpq8hCxCYg==
-X-Received: by 2002:a05:690c:c4fa:b0:7bd:76f6:b3a6 with SMTP id
- 00721157ae682-7c50d9488bemr47523917b3.3.1778616832777; Tue, 12 May 2026
- 13:13:52 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1778617233; x=1779222033;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gQzjdm8eFv/sznJvgMXu/FTaTbhPBF2kbyubytRDFJs=;
+        b=EkcFFugg1Upd6gvy0YXHnJ1I08Z0SArFaf3mGz/MPpaL6vpcD6UnpR8mHOtMyc+s2h
+         wEFRz9EGWuT3HygchpPg3ATnSpb3kckNqnBScSCEpFRnLWcdF4vOZBldt62UbsB0sdan
+         hDPHPmWeQSrYpp+a4n/X3ZnrZqO99T3dZS2uAOI9ZY+R3vjxSofdXXt4Rs3OGCdIKQ33
+         HdDq60o+9PRic6/txwOvoyral8VWdtHA7gXe3bezq9zPzgvUGBiJh9XrArC9cQ0IIm6a
+         BnRdhC9Wb7zUn6wdwwadAzrbV+AjJccvoX5vTr5d2mGWl/+ewhDDwWwvR1uA/7w7Xyd6
+         Gekw==
+X-Gm-Message-State: AOJu0YywYtzC/VSqvep+yjeJyZ1hCKaIP9BuFVqwQegU51Ddk9H3LQ7U
+	CwIxQIM4lwLUnUeqWQbtVTr7eU+9A97t8jdBf2h569VFh/Lz1x0n5QWD
+X-Gm-Gg: Acq92OEhEa29ABJXfctXs6AhVsh2VuGoZoqfwtOYqNHv+p2LZXgrGrfGT3NkOQi//SX
+	2y6QYSDgVhCdaLe/AERAWBiOxPTh5knGPLK90Vlw8789QVrftxi9zvMb9YLM29dV6gNOdHQqjir
+	MxqHqSZm2eksc7dBjvinZRNsgMMhY/7N0yVLcw59wh3rxbe9Q7pbAJKm60xmOctB1BZDL3yAjZn
+	L/OwZa/jnWRFAiOopBkq/8vRbd1FEyxZhZ7nxLeM7HT+OjM4kKRdzYP/uvz/HPWuk3Rii/Zu6e0
+	HLOzx3vOQXyLQ6VYQlTqhuwechWQvwX5TaiMfA82aDjQ0HGBgBT1PCURh0lJpfjWf+StIjukab4
+	ssuDz7TW097QunfU07J2DPsINuGFr8XvYs/T/gN6Tobz07kGSwySrLIsiL5LGrYQyK67EGIMAwv
+	68eg10xtztTWqoX08zQxeRtE6Y69YiJeJPtb3vAjKr5kDvaZlpKwak
+X-Received: by 2002:a05:6a00:328c:b0:83e:cc27:9af7 with SMTP id d2e1a72fcca58-83f04279863mr159190b3a.31.1778617232647;
+        Tue, 12 May 2026 13:20:32 -0700 (PDT)
+Received: from [192.168.0.226] ([38.34.87.7])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-839682abd39sm24975053b3a.52.2026.05.12.13.20.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 May 2026 13:20:32 -0700 (PDT)
+Message-ID: <cfdb2d4af893d70bcb15bcc22d6467f800b7291f.camel@gmail.com>
+Subject: Re: [PATCH bpf-next v4 08/12] bpf: Unify release handling for
+ helpers and kfuncs
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Amery Hung <ameryhung@gmail.com>, bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
+ 	daniel@iogearbox.net, memxor@gmail.com, martin.lau@kernel.org, 
+	mykyta.yatsenko5@gmail.com, kernel-team@meta.com
+Date: Tue, 12 May 2026 13:19:57 -0700
+In-Reply-To: <20260506142709.2298255-9-ameryhung@gmail.com>
+References: <20260506142709.2298255-1-ameryhung@gmail.com>
+	 <20260506142709.2298255-9-ameryhung@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260506142709.2298255-1-ameryhung@gmail.com> <20260506142709.2298255-2-ameryhung@gmail.com>
- <7f0d8cf18e3e0d60751b2453815a1f0ea62ca928.camel@gmail.com>
-In-Reply-To: <7f0d8cf18e3e0d60751b2453815a1f0ea62ca928.camel@gmail.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Tue, 12 May 2026 22:13:39 +0200
-X-Gm-Features: AVHnY4KX0SJeKhrAjXoRIRocx25IwiL34Yyv_drtrnkeYUmF784ybo8h12y8eRQ
-Message-ID: <CAMB2axOVZyx4Z+gHJVEtfteTESFQBXL51aCM7UDPw5zwo+wgqA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 01/12] bpf: Simplify mark_stack_slot_obj_read()
- and callers
-To: Eduard Zingerman <eddyz87@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, memxor@gmail.com, 
-	martin.lau@kernel.org, mykyta.yatsenko5@gmail.com, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 0FD9B528FE2
+X-Rspamd-Queue-Id: 22CE95290A3
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287287-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
+	TAGGED_FROM(0.00)[bounces-287288-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[eddyz87@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Mon, May 11, 2026 at 10:17=E2=80=AFAM Eduard Zingerman <eddyz87@gmail.co=
-m> wrote:
->
-> On Wed, 2026-05-06 at 07:26 -0700, Amery Hung wrote:
-> > Directly call mark_stack_slot_obj_read() from function processing
-> > iter, dynptr and irq_flag. To prepare for unifying dynptr handling,
-> > dynptr_get_spi() will be moved out of mark_dynptr_read(),
-> > As mark_dynptr_read() would join mark_iter_read() as a thin wrapper of
-> > mark_stack_slot_obj_read(), just open code the helpers.
-> >
-> > In addition, since 6762e3a0bce5 ("bpf: simplify liveness to use
-> > (callsite, depth) keyed func_instances") has made
-> > mark_stack_slot_obj_read() always succeed. Return void and drop the now
-> > unused bpf_reg_state argument.
-> >
-> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> > ---
->
-> Acked-by: Eduard Zingerman <eddyz87@gmail.com>
->
-> [...]
->
-> > +static void mark_stack_slot_obj_read(struct bpf_verifier_env *env,
-> > +                                  int spi, int nr_slots)
->
-> Nit: this is probably a leftover from the stack liveness commit,
->      but I think that a better name for this function would now be
->      mark_stack_slots_scratched.
+On Wed, 2026-05-06 at 07:27 -0700, Amery Hung wrote:
 
-Make sense. Will change it to mark_stack_slots_scratched.
+LGTM, one question below.
 
->
-> [...]
+> @@ -8010,28 +8010,15 @@ static int check_func_arg(struct bpf_verifier_env=
+ *env, u32 arg,
+>  		return err;
+> =20
+>  skip_type_check:
+> -	if (arg_type_is_release(arg_type)) {
+> -		if (!arg_type_is_dynptr(arg_type) && !reg->ref_obj_id && !bpf_register=
+_is_null(reg)) {
+> -			verbose(env, "R%d must be referenced when passed to release function\=
+n",
+> -				regno);
+> -			return -EINVAL;
+> -		}
+> -		if (meta->release_regno) {
+> -			verifier_bug(env, "more than one release argument");
+> -			return -EFAULT;
+> -		}
+> -		meta->release_regno =3D regno;
+> +	if (arg_type_is_release(arg_type) && !arg_type_is_dynptr(arg_type) &&
+> +	    !reg->ref_obj_id && !bpf_register_is_null(reg)) {
+> +		verbose(env, "release helper %s expects referenced PTR_TO_BTF_ID passe=
+d to %s\n",
+> +			func_id_name(meta->func_id), reg_arg_name(env, argno));
+> +		return -EINVAL;
+
+Nit: a similar check is added in check_kfunc_args(),
+     can these be wrapped in some utility function?
+
+>  	}
+> =20
+> -	if (reg->ref_obj_id && base_type(arg_type) !=3D ARG_KPTR_XCHG_DEST) {
+> -		if (meta->release_regno && meta->ref_obj.cnt) {
+> -			verbose(env, "more than one arg with ref_obj_id %s %u %u",
+> -				reg_arg_name(env, argno), reg->ref_obj_id,
+> -				meta->ref_obj.ref_obj_id);
+> -			return -EACCES;
+> -		}
+> +	if (reg->ref_obj_id)
+>  		update_ref_obj(&meta->ref_obj, reg);
+> -	}
+> =20
+>  	switch (base_type(arg_type)) {
+>  	case ARG_CONST_MAP_PTR:
+
+[...]
+
+> @@ -9825,7 +9883,7 @@ static int check_helper_call(struct bpf_verifier_en=
+v *env, struct bpf_insn *insn
+>  	memset(&meta, 0, sizeof(meta));
+>  	meta.pkt_access =3D fn->pkt_access;
+> =20
+> -	err =3D check_func_proto(fn);
+> +	err =3D check_func_proto(fn, &meta);
+>  	if (err) {
+>  		verifier_bug(env, "incorrect func proto %s#%d", func_id_name(func_id),=
+ func_id);
+>  		return err;
+> @@ -9870,37 +9928,11 @@ static int check_helper_call(struct bpf_verifier_=
+env *env, struct bpf_insn *insn
+>  	}
+> =20
+>  	if (meta.release_regno) {
+> -		err =3D -EINVAL;
+> -		if (arg_type_is_dynptr(fn->arg_type[meta.release_regno - BPF_REG_1])) =
+{
+> -			err =3D unmark_stack_slots_dynptr(env, &regs[meta.release_regno]);
+> -		} else if (func_id =3D=3D BPF_FUNC_kptr_xchg && meta.ref_obj.ref_obj_i=
+d) {
+> -			u32 ref_obj_id =3D meta.ref_obj.ref_obj_id;
+> -			bool in_rcu =3D in_rcu_cs(env);
+> -			struct bpf_func_state *state;
+> -			struct bpf_reg_state *reg;
+> -
+> -			err =3D release_reference_nomark(env->cur_state, ref_obj_id);
+> -			if (!err) {
+> -				bpf_for_each_reg_in_vstate(env->cur_state, state, reg, ({
+> -					if (reg->ref_obj_id =3D=3D ref_obj_id) {
+> -						if (in_rcu && (reg->type & MEM_ALLOC) && (reg->type & MEM_PERCPU))=
+ {
+> -							reg->ref_obj_id =3D 0;
+> -							reg->type &=3D ~MEM_ALLOC;
+> -							reg->type |=3D MEM_RCU;
+> -						} else {
+> -							mark_reg_invalid(env, reg);
+
+Note: release_reg() does not have this 'else' path, but it seem to be not a=
+ problem,
+      assuming that MEM_ALLOC | MEM_PERCPU registers are generated only fro=
+m some
+      other cmp_xchg call. Is that the case?
+
+> -						}
+> -					}
+> -				}));
+> -			}
+> -		} else if (meta.ref_obj.ref_obj_id) {
+> -			err =3D release_reference(env, meta.ref_obj.ref_obj_id);
+> -		} else if (bpf_register_is_null(&regs[meta.release_regno])) {
+> -			/* meta.ref_obj.ref_obj_id can only be 0 if register that is meant to=
+ be
+> -			 * released is NULL, which must be > R0.
+> -			 */
+> -			err =3D 0;
+> -		}
+> +		struct bpf_reg_state *reg =3D &regs[meta.release_regno];
+> +		bool convert_rcu =3D (func_id =3D=3D BPF_FUNC_kptr_xchg) && in_rcu_cs(=
+env) &&
+> +				   (reg->type & MEM_ALLOC) && (reg->type & MEM_PERCPU);
+> +
+> +		err =3D release_reg(env, reg, convert_rcu, !!meta.dynptr.ref_obj_id);
+>  		if (err)
+>  			return err;
+>  	}
+
+[...]
+
+> @@ -11609,18 +11640,16 @@ static int check_kfunc_args(struct bpf_verifier=
+_env *env, struct bpf_kfunc_call_
+>  			return -EACCES;
+>  		}
+> =20
+> -		if (reg->ref_obj_id) {
+> -			if (is_kfunc_release(meta) && meta->ref_obj.cnt) {
+> -				verbose(env, "more than one arg with ref_obj_id %s %u %u",
+> -					reg_arg_name(env, argno), reg->ref_obj_id,
+> -					meta->ref_obj.ref_obj_id);
+> -				return -EFAULT;
+> -			}
+> -			update_ref_obj(&meta->ref_obj, reg);
+> -			if (is_kfunc_release(meta))
+> -				meta->release_regno =3D regno;
+> +		if (regno =3D=3D meta->release_regno && !is_kfunc_arg_dynptr(meta->btf=
+, &args[i]) &&
+> +		    !reg->ref_obj_id && !bpf_register_is_null(reg)) {
+> +			verbose(env, "release kfunc %s expects referenced PTR_TO_BTF_ID passe=
+d to %s\n",
+> +				func_name, reg_arg_name(env, argno));
+> +			return -EINVAL;
+>  		}
+> =20
+> +		if (reg->ref_obj_id)
+> +			update_ref_obj(&meta->ref_obj, reg);
+> +
+>  		ref_t =3D btf_type_skip_modifiers(btf, t->type, &ref_id);
+>  		ref_tname =3D btf_name_by_offset(btf, ref_t->name_off);
+> =20
+
+[...]
 
