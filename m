@@ -1,273 +1,190 @@
-Return-Path: <netdev+bounces-287002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287003-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6PVNJN/lAmpEyQEAu9opvQ
-	(envelope-from <netdev+bounces-287002-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:33:35 +0200
+	id KK4fMiXlAmpEyQEAu9opvQ
+	(envelope-from <netdev+bounces-287003-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:30:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7E5D51CC21
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:33:34 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD6C851CBAF
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:30:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 417B230CC257
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 08:27:45 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1321C3006D7F
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 08:29:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA30F492505;
-	Tue, 12 May 2026 08:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCDA5492514;
+	Tue, 12 May 2026 08:29:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RZy1MWXc"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="icI9PrrC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF74494A03
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 08:27:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3630E38C41B
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 08:29:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778574459; cv=none; b=OxA7ZgW5zUt7lftW3OQA5bHcs0QyvbDowQsSM5s/kHKHkkF3T45LZ45Lghnx48CI40HtomkJAYK0zKAZRD848G1O+Iv/LRfT31iHN9GIzg1OuPWcls3H3WXwGPFULVg5NwDuax4zXtjeorGK08KRlbN2+GFQwu39cHG9iK32a5Y=
+	t=1778574564; cv=none; b=k0mLzq5jqFQ82vwjJ9IC7ji2zGYl1p+UD8rEAdDSyDCVgpZzypRtBtIu17BjYvXKdqy882xg2sa7BMVWFxAWWhQ8qZS/YJuXk3+/r55AjxTN4e4doVnXLFhKklLeFlcH14R/JAGZ78iXKV+ziPTRJb4+WaIJvgUYfmyC1swVBBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778574459; c=relaxed/simple;
-	bh=3f3TWl/FMyDabHUfcf1LYXSNUp/KGmnxIWuBbs4atEM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eMzFUNF5tAv7Tud6RWiUBkfyYWMaBD/99FRT8Jc27jkk6Ma5EjGTAi9cK+cKveIc/KdLgg59JPNt5c0EV/q/lY77t+7eOnhjPUVtbQFCgauZKT8aHnLtk11il9pi0xs661CQfFDyjyh4uEWy3yXK9GeAGIiuT/A20w55kup+yeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RZy1MWXc; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778574457;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YNx0TFbbiCBLwtVn8Zame8DbRPfhYzAJuNIRgs2yuOA=;
-	b=RZy1MWXcfLTXYFp9+z8BneUtjAnyr8zdk9Bcrf/63vAJg6Aa6mB6fsS2+K/o6mA0GmIHV7
-	YJD3YHZSZXwNBhKMUhQRJtGSetdGx+k9Fwn53exO1FI/CEzajp3y6n81F/ksPSAqBfDTkB
-	p+OXSMPnptycFdsneM5rvpm/nmCW2kk=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-226-pdQZZTbpP0WDI5-TwzXooQ-1; Tue,
- 12 May 2026 04:27:34 -0400
-X-MC-Unique: pdQZZTbpP0WDI5-TwzXooQ-1
-X-Mimecast-MFC-AGG-ID: pdQZZTbpP0WDI5-TwzXooQ_1778574451
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4E7851956095;
-	Tue, 12 May 2026 08:27:31 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.48.142])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 797D418004A3;
-	Tue, 12 May 2026 08:27:25 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: alibuda@linux.alibaba.com
-Cc: davem@davemloft.net,
-	dust.li@linux.alibaba.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	sidraya@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	mjambigi@linux.ibm.com,
-	horms@kernel.org,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	oliver.yang@linux.alibaba.com,
-	pasic@linux.ibm.com
-Subject: Re: [PATCH net-next 2/2] net/smc: reduce TX slot contention with exclusive wait
-Date: Tue, 12 May 2026 10:26:43 +0200
-Message-ID: <20260512082643.89020-1-pabeni@redhat.com>
-In-Reply-To: <20260508063718.101622-3-alibuda@linux.alibaba.com>
-References: <20260508063718.101622-3-alibuda@linux.alibaba.com>
+	s=arc-20240116; t=1778574564; c=relaxed/simple;
+	bh=XSUKlyPXQjtYXxb7m5qC2pdYB0fFCekz9mHLMvhuEPI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZZVL28aE4AsDt9EG+DPmsnSzLFT3332LWU9c7/8EHI/8ACA+zQSJHPMPKFzZkKyPK2oVnOwp4enbo//qdLuTrDDEifPh4Petu9XI2ICDNCSjFVpA4v4Ty0iiRyFNw6GN/TqlpsQ/R4b4Ipsoor6LB1SZ+8eHCJGnhw+t01QH9DM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=icI9PrrC; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-44985f4ab0fso2981658f8f.0
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 01:29:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall.org; s=google; t=1778574560; x=1779179360; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fXZa6qDwstyRO0OpnTlrlrZgvCtyoANqsIG4MYUa2C4=;
+        b=icI9PrrCe+B2f4KMqOCbhWkKUo5JNb208Jj+7Mu2ZGyRmaxgzqo9xUlL5CiZ1WG8tO
+         /KSBth1nCFC3+w5B9vWZN6nBy+QEZy6ZmYjug3/P6i80sl2ajh/gnQg2ITrnch9ia9Y5
+         ekXmOox/hysBwEBS/T6P42PxFmi53cNXA9g1C/wacum3fpGrT3kgWbDRCGOBTGyP4JvC
+         9AmpH4RFoJ0tnLpXL0py8Z1B/oehz3xPxMMyNYHDiEvgGwwfOQbEOtNbHkBrAptFR+ZG
+         sI6MFfDTNX3LhJ58GB08kylFUUEKWskA4qpnX042GM+NjnYg50p/Upk+DW08qoUu780l
+         GnHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778574560; x=1779179360;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fXZa6qDwstyRO0OpnTlrlrZgvCtyoANqsIG4MYUa2C4=;
+        b=AOQ5Ft9ZpmCCp59iBLNN9vn6dEsSs7I0y8CWxJvpqGwLcnpUvEipxJl/YqVNLsZIQY
+         0PD2AnZ6du3kF253CAFuYocB/ndqkXmlNpVDVKXfQLekaAirk1NpoYeZlyeM3AOSpZyy
+         8fT/u1Z3e2T9AeXDtU0fpQXpo/JA9X9AjFOVyfdsraHBp0+Xd+vBPzMmHPqcHodQNKZv
+         EH5FZcpSOFlOzei0Q82UIWzjLlLXY08ZgF7xNSinytsWHHKYzaJTLZU2OoiqMgSxO30d
+         gLuwe2pyaREwZo4Asfy4NP+URwXJBUy+9+3rLwo7QUjTQmuGToQ+4qCqmz3UgB1w5zVj
+         hZtA==
+X-Forwarded-Encrypted: i=1; AFNElJ9KEfPBmYaumNllz0fv99BkIV4N/2fI2fLNArANzcYNVDicd84OWFiPG9ln58E29PhPUene93Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxx80UQn2fHF7xjHj9NUSNXY2nC0rCzVfgk30my938F7brucB7I
+	+mWw+yR1IuRztjLa+nW7SKLwSRq12ZQdsNomydZaOMWvIyGhpMJytS2CvItGjNHZkhM=
+X-Gm-Gg: Acq92OE7JASu9JW5vNcdSnR+vSv5Dq2RRzntMyiKcbgtDAshG3O0sm6r1I3whhFtQoW
+	aETJLF90L6RcxoVOvqJeBXArrhmShk2U7YFH+HT2IXqbq4E0Yt8kY4VYHTAvfQ65HrlDZzzW/n0
+	6VMlXWWqKL2VBAaqvNUh9v+bmU6ebn7NZkl0r2GTga1tfBOIwxvhQOs5TjPNXiLh4AVFXQtMlye
+	sWZCQx310O1eWILpEV+JwMOxREUYPX+UTlXtIqBu/DC6vwOxl/ICbfJSpTGf789FOjwR7Py628M
+	2RnIZe1DDCG+4QjOp5AvIAwFzWg9T/2wt3RQpbAQ41CfpquY+vKInGgh6XukjyxicbE+v3GI1+M
+	YWvSrHtaeq3x1UTZ7X926AmtVxkO2Z2sameMVIDMzg+R0wgwE+3cI2EPlbmKscnnQ/75qGtMPjI
+	T8Sd55TKi1+RvNBRaEO7Uj3+Axfy8ux28he6gUcTWOJ8q1KO7jctILtAow+T6SuuA8
+X-Received: by 2002:a05:6000:2207:b0:441:1cf9:4f06 with SMTP id ffacd0b85a97d-45b13e57a90mr2629777f8f.31.1778574560083;
+        Tue, 12 May 2026 01:29:20 -0700 (PDT)
+Received: from [192.168.0.161] (78-154-15-182.ip.btc-net.bg. [78.154.15.182])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4548ec6b071sm30756065f8f.14.2026.05.12.01.29.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 May 2026 01:29:19 -0700 (PDT)
+Message-ID: <1bfd86a2-e7f8-42ef-8486-4d7fa91b2199@blackwall.org>
+Date: Tue, 12 May 2026 11:29:18 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
-X-Rspamd-Queue-Id: E7E5D51CC21
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/1] net: bridge: guard local finish against missing
+ port
+Content-Language: en-US, bg
+To: Ren Wei <n05ec@lzu.edu.cn>, bridge@lists.linux.dev, netdev@vger.kernel.org
+Cc: idosch@nvidia.com, fw@strlen.de, davem@davemloft.net,
+ yuantan098@gmail.com, yifanwucs@gmail.com, tomapufckgml@gmail.com,
+ bird@lzu.edu.cn, tonanli66@gmail.com
+References: <cover.1778504155.git.tonanli66@gmail.com>
+ <ad183a40c4d906f39e03590b371fdcfdffb863c6.1778504155.git.tonanli66@gmail.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <ad183a40c4d906f39e03590b371fdcfdffb863c6.1778504155.git.tonanli66@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: BD6C851CBAF
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287002-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[blackwall.org:+];
+	FREEMAIL_CC(0.00)[nvidia.com,strlen.de,davemloft.net,gmail.com,lzu.edu.cn];
+	TAGGED_FROM(0.00)[bounces-287003-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[blackwall.org];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,blackwall.org:mid,blackwall.org:dkim,lzu.edu.cn:email]
 X-Rspamd-Action: no action
 
-From: AI Reviewer <ai@example.com>
+On 12/05/2026 07:31, Ren Wei wrote:
+> From: Nan Li <tonanli66@gmail.com>
+> 
+> The bridge local receive path may be deferred by netfilter and resumed
+> later. By the time br_handle_local_finish() runs, skb->dev may still be
+> valid while its bridge port association has already been removed.
+> 
+> br_handle_local_finish() unconditionally looks up the bridge port from
+> skb->dev and dereferences it for source learning. If the port is no
+> longer attached to the bridge, the lookup returns NULL and the deferred
+> local receive path can no longer rely on the port state being present.
+> 
+> Skip the learning step when the bridge port lookup fails. In that case
+> there is no port state left to learn on, so returning early preserves
+> the normal behavior for existing ports while avoiding access to stale
+> state.
+> 
+> Fixes: 8626c56c8279 ("bridge: fix potential use-after-free when hook returns QUEUE or STOLEN verdict")
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://netdev-ai.bots.linux.dev/sashiko/
----
-net/smc: reduce TX slot contention with exclusive wait
+I don't think that is the correct commit, it seems to me this bug
+has existed for a very long time. From a quick search I think (Florian
+please correct me if I'm wrong, but I think NF_QUEUE existed back then)
+it was introduced in 2010 by:
+  f350a0a87374 ("bridge: use rx_handler_data pointer to store net_bridge_port 
+pointer")
 
-This patch replaces the non-exclusive wait_event_interruptible_timeout()
-in smc_wr_tx_get_free_slot() with an open-coded exclusive wait loop via
-prepare_to_wait_exclusive(), so wake_up() on a freed TX slot wakes only
-a single waiter instead of the entire wait queue.
+because that commit removed the same check for a NULL port.
+The patch itself is ok, it restores the check that was there before the commit
+I mentioned.
 
-> diff --git a/net/smc/smc_wr.c b/net/smc/smc_wr.c
-> index 48037a3d97a3..0a6f2befb0e2 100644
-> --- a/net/smc/smc_wr.c
-> +++ b/net/smc/smc_wr.c
-> @@ -171,17 +173,27 @@ int smc_wr_tx_get_free_slot(struct smc_link *link,
->  		if (rc)
->  			return rc;
->  	} else {
-> -		rc = wait_event_interruptible_timeout(
-> -			link->wr_tx_wait,
-> -			!smc_link_sendable(link) ||
-> -			lgr->terminating ||
-> -			(smc_wr_tx_get_free_slot_index(link, &idx) != -EBUSY),
-> -			SMC_WR_TX_WAIT_FREE_SLOT_TIME);
-> -		if (!rc) {
-> -			/* timeout - terminate link */
-> -			smcr_link_down_cond_sched(link);
-> -			return -EPIPE;
-> +		rc = 0;
-> +		for (;;) {
-> +			prepare_to_wait_exclusive(&link->wr_tx_wait, &wait,
-> +						  TASK_INTERRUPTIBLE);
-> +			if (!smc_link_sendable(link) || lgr->terminating ||
-> +			    smc_wr_tx_get_free_slot_index(link, &idx) != -EBUSY)
-> +				break;
-> +			timeout = schedule_timeout(timeout);
-> +			if (!timeout) {
-> +				/* timeout - terminate link */
-> +				smcr_link_down_cond_sched(link);
-> +				break;
-> +			}
-> +			if (signal_pending(current)) {
-> +				rc = -ERESTARTSYS;
-> +				break;
-> +			}
+> Cc: stable@kernel.org
+> Reported-by: Yuan Tan <yuantan098@gmail.com>
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Reported-by: Xin Liu <bird@lzu.edu.cn>
+> Signed-off-by: Nan Li <tonanli66@gmail.com>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> ---
+>   net/bridge/br_input.c | 3 +++
+>   1 file changed, 3 insertions(+)
+> 
+> diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
+> index 2cbae0f9ae1f..5b0d7450de5f 100644
+> --- a/net/bridge/br_input.c
+> +++ b/net/bridge/br_input.c
+> @@ -247,6 +247,9 @@ static void __br_handle_local_finish(struct sk_buff *skb)
+>   	struct net_bridge_port *p = br_port_get_rcu(skb->dev);
+>   	u16 vid = 0;
+>   
+> +	if (unlikely(!p))
+> +		return;
+> +
+>   	/* check if vlan is allowed, to avoid spoofing */
+>   	if ((p->flags & BR_LEARNING) &&
+>   	    nbp_state_should_learn(p) &&
 
-[High]
-With exclusive waiters, wake_up() on link->wr_tx_wait wakes only one
-task per freed slot. If that waiter is about to exit via the
-signal_pending() branch, can the freed slot be lost to the remaining
-sleepers?
-
-Consider two exclusive waiters A and B asleep in schedule_timeout():
-
-  1. smc_wr_tx_put_slot() -> wake_up(&link->wr_tx_wait) is effectively
-     __wake_up(..., nr_exclusive=1).  default_wake_function makes A
-     runnable, autoremove_wake_function pulls A off the queue, and
-     __wake_up_common stops -- B is not woken.
-
-  2. A signal is delivered to A before it actually runs.  Because A is
-     already TASK_RUNNING, signal_wake_up only sets TIF_SIGPENDING.
-
-  3. A returns from schedule_timeout() with timeout > 0, so the
-     !timeout branch is skipped.  signal_pending(current) is true, so
-     the loop sets rc = -ERESTARTSYS and breaks without re-testing
-     smc_wr_tx_get_free_slot_index() and without issuing any wake_up()
-     on the way out.
-
-  4. B stays asleep on the wait queue even though the wr_tx_mask bit
-     for the freed slot is still available.  With no further
-     completions, B sleeps until the full SMC_WR_TX_WAIT_FREE_SLOT_TIME
-     expires, at which point smcr_link_down_cond_sched() tears down an
-     otherwise healthy link.
-
-The previous wait_event_interruptible_timeout() was non-exclusive, so
-every waiter was woken on each wake_up() and re-evaluated the
-condition, which avoided this class of lost-wakeup.
-
-Should the signal path re-check the slot condition before returning,
-or issue a wake_up() on exit so another exclusive waiter gets a chance
-at the slot?
-
-[Medium]
-The commit message says this is a contention optimization and that
-"teardown behavior is unchanged", but does it also change the errno
-returned to callers on signal delivery?
-
-Before this patch, wait_event_interruptible_timeout() returned
--ERESTARTSYS on signal; that value is non-zero, so the old if (!rc)
-branch was skipped, control fell through to the trailing
-if (idx == link->wr_tx_cnt) return -EPIPE, and callers saw -EPIPE.
-
-After the patch, the signal path does:
-
-    if (signal_pending(current)) {
-        rc = -ERESTARTSYS;
-        break;
-    }
-    ...
-    finish_wait(&link->wr_tx_wait, &wait);
-    if (rc)
-        return rc;
-
-so -ERESTARTSYS propagates up through smc_cdc_get_free_slot() (which
-only remaps rc to -EPIPE when conn->killed is set),
-smcr_cdc_get_slot_and_msg_send(), smc_cdc_get_slot_and_msg_send() and
-smc_tx_sendmsg(), meaning userspace sees syscall restart / -EINTR
-instead of -EPIPE.
-
-Note that the sibling smc_wr_reg_send() in the same file explicitly
-converts -ERESTARTSYS to -EINTR.  Should this return-code change be
-called out in the commit message (and possibly split out), given that
-the stated intent of the patch is purely to reduce contention?
-
-[Low]
-On timeout expiry the new loop takes the teardown path without
-re-testing whether a slot became available:
-
-> +			timeout = schedule_timeout(timeout);
-> +			if (!timeout) {
-> +				/* timeout - terminate link */
-> +				smcr_link_down_cond_sched(link);
-> +				break;
-> +			}
-
-The old wait_event_interruptible_timeout() expansion re-evaluated the
-condition via ___wait_cond_timeout after schedule_timeout() returned
-0, so a wake_up() racing with timer expiry could still report success
-and let smc_wr_tx_get_free_slot_index() claim the slot.
-
-In the narrow race where a slot is freed at the same instant the
-timer fires, does this now tear the link down even though a slot was
-actually available?
-
->  		}
-> +		finish_wait(&link->wr_tx_wait, &wait);
-> +		if (rc)
-> +			return rc;
->  		if (idx == link->wr_tx_cnt)
->  			return -EPIPE;
->  	}
--- 
-This is an AI-generated review.
 
 
