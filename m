@@ -1,263 +1,153 @@
-Return-Path: <netdev+bounces-287090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287080-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EOxMG54GA2pmzwEAu9opvQ
-	(envelope-from <netdev+bounces-287090-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 12:53:18 +0200
+	id 6KsjNNIFA2r1zgEAu9opvQ
+	(envelope-from <netdev+bounces-287080-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 12:49:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E330A51EE4D
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 12:53:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 415BF51EDAA
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 12:49:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2A1DC305DF65
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:49:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A62713024142
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:46:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26D0E3B961B;
-	Tue, 12 May 2026 10:49:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D983A38398B;
+	Tue, 12 May 2026 10:46:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="giBh91f7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ccAFGbMN"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8309A4C77CE;
-	Tue, 12 May 2026 10:49:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0709349CC0;
+	Tue, 12 May 2026 10:46:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778582944; cv=none; b=rza/ZrmjDnAphLK0w72MHHeMAqv1HRrpW84NwMAu4MBdbOhduz/4KvDUkwVGYU6fffCuN1IaIA1nQQkgDUa0pjCTz7bn3jV0iey256Kc8uet0TgXOoJ7a8BYN0VQuzdrZ7TXonYCIqK6eDUq97HZ6eXATRapu6r7xrXZ5yRaqb0=
+	t=1778582811; cv=none; b=EhTSCVJdeBmwR1FO7922xrzJ/ppPCKJzXBp99D/Ftk7/U5ot8hCdVOpOqMCvRlgQ7O59d2Kq+EDo+0jShGCYaI3ks85PshYFOIydoljYBwtcXIbr+bPnxI96sxUdgWXEVqslA5ZAlM7j+NQV0NjjbzH+fGSTt+OfpvUSxlmaDiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778582944; c=relaxed/simple;
-	bh=XQvzmY4vaSa4UD/90PLNRuFbhAlYqaPSI0Ghbpbvnc4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=kg4DQhnvQYGoB4h6roCMks+YxcbcdrFdegXt29z24P0Ru3BsJv9jDnuUtFLrXDP0JgkzbdoCQ3RWS621JpaCaTfg95xttAkzprwAwY9abVor1dcJcWsBpR9E4sW7ncKTi3xgfdwt1ZcGitwq641bRy7VdEDkneXQio8kvr3elqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=giBh91f7; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
-	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
-	From:Reply-To:Content-ID:Content-Description;
-	bh=Kfq/mwsfIihE3OBSsEqceJwCjhDjYN8um9ygjxIr+B4=; b=giBh91f74FjzNDZTEBZyX1AQP+
-	igmgTkoIgD5QZEuwItXbptyGM+mfwdmtC9Wopxvm0IZIqQvrazWym6dd2cC+MX4bytt3W+8pxKCUN
-	JZYD/kxmW6EVVB0uuaG43Jo9mCtOwcU0b9pYj37KM8NTszk3/a6M0LPfnsf4Tew80oafFehgTanlH
-	8S600lBF0/OzcShyQ/HWSnDavT9XgzP4Krfcpmtm8/tNh52einsmKzU2bt//Ye0wZgvETADd7/FAx
-	92U2raLjQSqenjPLJPn4jHHdWBV1jTJOLTpPzkfHaar4lkeLTOjJ0Pj38hX2NeHXc0ct/OaxAkHCC
-	qfXSM+3Q==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wMkfZ-002K90-21;
-	Tue, 12 May 2026 10:48:57 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Tue, 12 May 2026 03:46:42 -0700
-Subject: [PATCH net-next v2 9/9] netconsole: move find_skb() from netpoll
+	s=arc-20240116; t=1778582811; c=relaxed/simple;
+	bh=CfTnm+NwfcKBfFp0bUW7Erh6C3aJPfKER4/xwdSZ/Vc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aZT5UY/gFjEAmsFFZkrVC2i95wauxKWj9APFVq4gwMPeZeF02qlXXA7An31xe613uC8mqaSPIQq0hO8izPSCPpFi5L7lSUE8JQQXx7gOymSyHbxhn42ep5lVTHdsGgKw9u2X2ygI6ZHfvjTlhs2qU4uMopbFlg56/tLksTRbf2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ccAFGbMN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 717DCC2BCB0;
+	Tue, 12 May 2026 10:46:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778582811;
+	bh=CfTnm+NwfcKBfFp0bUW7Erh6C3aJPfKER4/xwdSZ/Vc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ccAFGbMNgzMK1PkjeUwVGBFpwMe+/f+2yMbP6VFLPkzL6VFb7QsHQBbRea1DFeJ7r
+	 BeMhzOWkUiomhq1oHzCMcChcLel2sGfTZ1zLBZ/uqEbI/MNQ7H5ZmJMnTDYbP71ZAl
+	 Xf6XU4gRMKWe6JYDz/NXvcJ5PDX6s+e4IPVAZIqLTu5qriTNPlBwyvOzq2jtzSfFyk
+	 pE1fyrfhtuopNYya+4lPoODtW9YwZrL8cCbCekO21CxHO+90tRIT6Go+j0bRQWjzQj
+	 KdfofwewjUXXDki54UNz1tOnWqGA+sphbv5kpu/Qnf8xSH7GBNUMl9JXumRzKkl+4U
+	 Pu1okX7RSn93w==
+Date: Tue, 12 May 2026 11:46:47 +0100
+From: Simon Horman <horms@kernel.org>
+To: Xiang Mei <xmei5@asu.edu>
+Cc: netdev@vger.kernel.org, fmaurer@redhat.com, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, bestswngs@gmail.com
+Subject: Re: [PATCH net] net: hsr: fix NULL deref in hsr_get_node_data
+Message-ID: <20260512104647.GK27589@horms.kernel.org>
+References: <20260511071517.3013445-1-xmei5@asu.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260512-netconsole_split-v2-9-1191d14ad66d@debian.org>
-References: <20260512-netconsole_split-v2-0-1191d14ad66d@debian.org>
-In-Reply-To: <20260512-netconsole_split-v2-0-1191d14ad66d@debian.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
- Clark Williams <clrkwllms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-rt-devel@lists.linux.dev, Breno Leitao <leitao@debian.org>, 
- kernel-team@meta.com
-X-Mailer: b4 0.16-dev-d5d98
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4547; i=leitao@debian.org;
- h=from:subject:message-id; bh=XQvzmY4vaSa4UD/90PLNRuFbhAlYqaPSI0Ghbpbvnc4=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqAwVrTh8s6njfqDyP6OeEFSh0wbkzryFKmuS7k
- Dfj1EC8ch6JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCagMFawAKCRA1o5Of/Hh3
- bfUoD/90KoY9HvtqUdjILi/IUfoQMLiquzA7Ipgk/ZnE8xiZUYAOPPbH+QdI8NjJBXfT+KnTFHk
- +yz0EJE1PbiJXcFkm0h0OhKUijALflsJHpka6XwXrX6KMxifltwyy7oV7FCxu08wLqCGbCqQqik
- j6r+r44uXjD/Fr1rRqx6B7RWS/06Hcxv2P72wmX7cZAb6xkj3HvnSNHI2FJVwLHHV6DtYH2pChX
- dwwprpRkETfdOeQTp3YBST9CUNQ4ESiTHEZTtr4rFSZ7B21GDsZ/j13hXzlHRgMjyqZgFxDEotC
- AK945ajZjpCVqV5qmTo2aVofBjWNwxCkhXY/6xMAZFjKDajKgJkYIWpRGXSXR6AS5mIhggC+d2V
- rnJH0UnknPLGczdrRhAdaYQJdo6k2Gzf85BtrMd67ru6tb4W8xV3lDfh0SwgQzUZZ2Jrss0Orqk
- yEj1n86C+Vn4sR6sfuhikaLtNCadDVyvb+iMq/VGl7VDQfpXeeAFP1N26XXaLyyoccHVPZlHl3m
- c1LWyeppHQV4XQh0PWIu8U+c1oXsdw0JGXYbXzcdTHebIJ6jY3HiZSwAliD0LRabvw4ZvGp+C1D
- Hg7uIWt1lSfJZdIUmHSnh+c1M28FKE4NbVgV0j9INwMyf4J4s7A0SmQxItM0u+1KhdOQEh5Hd86
- tJiQzr2Rdtfzscg==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
-X-Rspamd-Queue-Id: E330A51EE4D
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260511071517.3013445-1-xmei5@asu.edu>
+X-Rspamd-Queue-Id: 415BF51EDAA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [3.34 / 15.00];
+	SEM_URIBL(3.50)[asu.edu:email];
 	MAILLIST(-0.15)[generic];
+	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287090-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FROM_HAS_DN(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,kernel.org,google.com,davemloft.net,gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-287080-lists,netdev=lfdr.de];
+	R_DKIM_ALLOW(0.00)[kernel.org:s=k20201202];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.723];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid,asu.edu:email]
 X-Rspamd-Action: no action
 
-find_skb() is the netconsole-specific entry into the netpoll skb
-pool: every other netpoll consumer (bonding, team, vlan, bridge,
-macvlan, dsa) builds its own sk_buff and never touches the pool.
-With netpoll_send_udp() (its only caller) now living in netconsole,
-find_skb() can join it.
+On Mon, May 11, 2026 at 12:15:17AM -0700, Xiang Mei wrote:
+> hsr_get_node_data() looks up a node's address-B port and dereferences
+> port->dev->ifindex without checking the return value of
+> hsr_port_get_hsr(), which returns NULL when no port of the requested
+> type is currently attached.
+> 
+> node->addr_B_port is set by hsr_handle_sup_frame() on every supervision
+> frame but is never cleared when the corresponding slave is removed.
+> If one slave of an HSR master is unregistered while the master stays
+> alive (the other slave keeps it up), node_db entries retain a stale
+> addr_B_port. An unprivileged HSR_C_GET_NODE_STATUS query (genl op has
+> .flags = 0) then crashes the kernel:
+> 
+>   Oops: general protection fault, probably for non-canonical address
+>   0xdffffc0000000002: 0000 [#1] SMP KASAN NOPTI
+>   KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
+>   RIP: 0010:hsr_get_node_data (net/hsr/hsr_framereg.c:892)
+>   Call Trace:
+>    hsr_get_node_status (net/hsr/hsr_netlink.c:366)
+>    genl_family_rcv_msg_doit (net/netlink/genetlink.c:1114)
+>    genl_rcv_msg (net/netlink/genetlink.c:1209)
+>    netlink_rcv_skb (net/netlink/af_netlink.c:2550)
+>    netlink_unicast (net/netlink/af_netlink.c:1344)
+>    netlink_sendmsg (net/netlink/af_netlink.c:1894)
+>    __sys_sendto (net/socket.c:2265)
+> 
+> Default *addr_b_ifindex to -1 and only overwrite it when the port
+> lookup succeeds. The caller hsr_get_node_status() already treats
+> addr_b_ifindex == -1 as "no address-B port" when emitting the
+> HSR_A_NODE_ADDR_B / HSR_A_ADDR_B_IFINDEX attributes, so behavior is
+> unchanged for valid setups.
+> 
+> Fixes: c5a759117210 ("net/hsr: Use list_head (and rcu) instead of array for slave devices.")
+> Reported-by: Weiming Shi <bestswngs@gmail.com>
+> Assisted-by: Claude:claude-opus-4-7
+> Signed-off-by: Xiang Mei <xmei5@asu.edu>
 
-Move find_skb() into drivers/net/netconsole.c as a file-static
-helper, drop EXPORT_SYMBOL_GPL(find_skb) and remove its prototype
-from include/linux/netpoll.h. find_skb() drains TX completions via
-netpoll_zap_completion_queue(), which is already exported in the
-NETDEV_INTERNAL namespace, so netconsole picks up
-MODULE_IMPORT_NS("NETDEV_INTERNAL") to consume it.
+Hi,
 
-The skb pool's lifecycle (np->skb_pool, np->refill_wq, refill_skbs(),
-refill_skbs_work_handler(), skb_pool_flush()) stays in netpoll: it
-is initialised in __netpoll_setup() and torn down in
-__netpoll_cleanup(), both of which remain netpoll's responsibility.
-The refill work queued via schedule_work(&np->refill_wq) from the
-moved find_skb() runs refill_skbs_work_handler() in netpoll without
-any further plumbing.
+Thanks for your patch.  It appears to address the same issue as the
+following commit which was recently added to net.
 
-This is pure code motion: the function body is unchanged and its
-sole caller (netpoll_send_udp(), already moved by an earlier patch)
-keeps invoking it the same way. Pre-existing concerns about
-find_skb() running from NMI/printk context (zap_completion_queue()
-re-entry, skb_pool spinlocks, GFP_ATOMIC allocation, fallback skb
-sizing vs. MAX_SKB_SIZE, PREEMPT_RT semantics of __kfree_skb()) are
-inherited as-is and are not addressed here; they predate this
-series and are out of scope. Fixing them is left for follow-up
-work.
+Here is the summary with links:
+  - [net] net: hsr: fix NULL pointer dereference in hsr_get_node_data()
+    https://git.kernel.org/netdev/net/c/911f54771ca9
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/netconsole.c | 28 ++++++++++++++++++++++++++++
- include/linux/netpoll.h  |  1 -
- net/core/netpoll.c       | 28 ----------------------------
- 3 files changed, 28 insertions(+), 29 deletions(-)
+Although that code-changes there differ from this patch,
+I believe the overall logic is the same.
 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 48d2670bbdef5..d804d44af87c8 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -50,6 +50,7 @@
- MODULE_AUTHOR("Matt Mackall <mpm@selenic.com>");
- MODULE_DESCRIPTION("Console driver for network interfaces");
- MODULE_LICENSE("GPL");
-+MODULE_IMPORT_NS("NETDEV_INTERNAL");
- 
- #define MAX_PARAM_LENGTH		256
- #define MAX_EXTRADATA_ENTRY_LEN		256
-@@ -1653,6 +1654,33 @@ static struct notifier_block netconsole_netdev_notifier = {
- 	.notifier_call  = netconsole_netdev_event,
- };
- 
-+static struct sk_buff *find_skb(struct netpoll *np, int len, int reserve)
-+{
-+	int count = 0;
-+	struct sk_buff *skb;
-+
-+	netpoll_zap_completion_queue();
-+repeat:
-+
-+	skb = alloc_skb(len, GFP_ATOMIC);
-+	if (!skb) {
-+		skb = skb_dequeue(&np->skb_pool);
-+		schedule_work(&np->refill_wq);
-+	}
-+
-+	if (!skb) {
-+		if (++count < 10) {
-+			netpoll_poll_dev(np->dev);
-+			goto repeat;
-+		}
-+		return NULL;
-+	}
-+
-+	refcount_set(&skb->users, 1);
-+	skb_reserve(skb, reserve);
-+	return skb;
-+}
-+
- static void netpoll_udp_checksum(struct netpoll *np, struct sk_buff *skb,
- 				 int len)
- {
-diff --git a/include/linux/netpoll.h b/include/linux/netpoll.h
-index f986f7486cb8c..e4b8f1f91e54b 100644
---- a/include/linux/netpoll.h
-+++ b/include/linux/netpoll.h
-@@ -73,7 +73,6 @@ void __netpoll_free(struct netpoll *np);
- void netpoll_cleanup(struct netpoll *np);
- void do_netpoll_cleanup(struct netpoll *np);
- netdev_tx_t netpoll_send_skb(struct netpoll *np, struct sk_buff *skb);
--struct sk_buff *find_skb(struct netpoll *np, int len, int reserve);
- void netpoll_zap_completion_queue(void);
- 
- #ifdef CONFIG_NETPOLL
-diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index e4cda0aa4d488..33ab3d827a427 100644
---- a/net/core/netpoll.c
-+++ b/net/core/netpoll.c
-@@ -265,34 +265,6 @@ void netpoll_zap_completion_queue(void)
- }
- EXPORT_SYMBOL_NS_GPL(netpoll_zap_completion_queue, "NETDEV_INTERNAL");
- 
--struct sk_buff *find_skb(struct netpoll *np, int len, int reserve)
--{
--	int count = 0;
--	struct sk_buff *skb;
--
--	netpoll_zap_completion_queue();
--repeat:
--
--	skb = alloc_skb(len, GFP_ATOMIC);
--	if (!skb) {
--		skb = skb_dequeue(&np->skb_pool);
--		schedule_work(&np->refill_wq);
--	}
--
--	if (!skb) {
--		if (++count < 10) {
--			netpoll_poll_dev(np->dev);
--			goto repeat;
--		}
--		return NULL;
--	}
--
--	refcount_set(&skb->users, 1);
--	skb_reserve(skb, reserve);
--	return skb;
--}
--EXPORT_SYMBOL_GPL(find_skb);
--
- static int netpoll_owner_active(struct net_device *dev)
- {
- 	struct napi_struct *napi;
+Please consider an incremental patch if you think the commit above
+is insufficient for some reason.
 
 -- 
-2.53.0-Meta
-
+pw-bot: changes-requested
 
