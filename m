@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-287100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287101-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QAzDIlsLA2pmzwEAu9opvQ
-	(envelope-from <netdev+bounces-287100-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:13:31 +0200
+	id yI2ODIwLA2pmzwEAu9opvQ
+	(envelope-from <netdev+bounces-287101-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:14:20 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88BBC51F25E
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:13:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2125F51F283
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:14:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D04F430167D6
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:12:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1FE1E301B06B
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:13:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FFB138E8D0;
-	Tue, 12 May 2026 11:12:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CB314C6F17;
+	Tue, 12 May 2026 11:12:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="h2TG5ZJ7"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="B7UxfAtN"
 X-Original-To: netdev@vger.kernel.org
 Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F321345BD67;
-	Tue, 12 May 2026 11:12:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A6B48C8DE;
+	Tue, 12 May 2026 11:12:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778584362; cv=none; b=JMYNsYDG+pO4DXzg5oPABFfut8V3AbgGH6fI/cAlZGir1PH4I9Yi4qLbKeT6QPAjmJfsQAx5HTq2PEZevpzU9akwx+Yo/NtrZg3fIcLRwQumXJYleo1L67sd5dmQid3vbgAIf9l6BnbcTsUW3KLb1PjdrYJU0LKvbpzLqtR09gk=
+	t=1778584367; cv=none; b=NttV5gcb3WYgympW5iPQj36zPZGO5ftf35RRM09K3o5GN5WINtt0lB3EwgqdeXXocZ4gSfhhB3LNLRygAkOU25fd8rdke69p1jjpvLVq3JMi7HZMWdUbvg4imKXBypBisR1h5d6Vf/qZlEu+HTM9WtKzZYsf45QGYo2OL/OpWFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778584362; c=relaxed/simple;
-	bh=h6zSdtN9jQgMR/YPfbG1OygHwk4VDPpboHdb0JfjOWE=;
+	s=arc-20240116; t=1778584367; c=relaxed/simple;
+	bh=HK+Sfftx5xMXf/ohhSVSyX4kM0dUiUEr9WG/OrDiAs0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=IW3dRu1NTAaMwUO9CGAjGZKPi7xepe5DUUS+bDAkTDwt0FHsdNhoYCqwOhXfzfOPNkqeWZ9VXg3zIUbbJg+JW3lUywpNAZZiN2yUxHaQtFCcNPD+LNoKwYorHxq7Ga1H9GcJgUra0CkAZZsh01WJDa89BlYlnxOwleqCSEwt0/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=h2TG5ZJ7; arc=none smtp.client-ip=82.195.75.108
+	 In-Reply-To:To:Cc; b=s+o4QepU/SdakaCdZFZb6qPOq29tBe1mC8k9t1+r+wUCM3UzrpZl6qLDF+H9RtPcDeXtLicKuJNabWcRICSTQQlL7+5tTlHed64t5ga2A7mujxJjmbSBAjRs7LVLys+HbJA7PKjjXz9F39eL0jH9VWfs9hOPv7wmpQkhx1Qdk6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=B7UxfAtN; arc=none smtp.client-ip=82.195.75.108
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
 	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
 	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
 	From:Reply-To:Content-ID:Content-Description;
-	bh=1XedRuOdFDTkq6Iy8V1E9JuuU/kZM1EoPconoc3Ujuk=; b=h2TG5ZJ7jWZaAC6oJJ9p1q3p0J
-	Fz1LABqaoB5+ZtxtUwJ1fy1+YIzFGhH1kJMviJYgO3mZHc/x/S24KooI8aF62Bplv6ybjKoeJ+MDV
-	GngGawnXoj4wWG2Vz1brHNB6OD7QlqNvffPZWSnQLdXSr4mWjAAJ7k3mvwnRnnzJLnl+D92bfuyoo
-	YrFDdzqFTOrTw55/wne07hiPTJi1jrrLVnKB0VgeAKaLcuVoLQbM03mStAM3kaUHfDJUOxd4JuGtu
-	OEE16KpJhRXUm7cgofuYwzdC8FT5+NKDzKY/ts8k6JG2EdBak2yOHLnqCk2f8FIkQZcqNsK9KAAe6
-	lw7zgkUQ==;
+	bh=sNHiQxq5X7Gs6FyItbbqpwShrdRtmwW2a3t0q+1JSZQ=; b=B7UxfAtNONy69D8f7EEyNm6204
+	h7bbFNSOWZpMxyN03jbln7IBzR9b9bhRRr9l81C8+7dpAktnLN34aEPF+x25TTW8kukftW3Bhs6OF
+	qqeDThWQJNwwZO6IqKco+i1X4r40Fza5qnJMVtgM5mCEvgumCF8E+jDNgR9i/UHnOeHtQ6hY1FWVE
+	OnqrQ5Xg+uo7iude5+z9jPfJeEnz0HBJ856elPS/pwfnTCxic6HZNGRwLzB7Q490rg+hd2kt4Io4i
+	iz6E+efWF0xqWP3BZWiqrrocLNdkXjCnP7yZIh53dN3AIiG4M/svqp/f+Nm6GZiw/hpC1yR71mehr
+	kUX+O4oQ==;
 Received: from authenticated user
 	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.96)
 	(envelope-from <leitao@debian.org>)
-	id 1wMl2S-002Kqj-2b;
-	Tue, 12 May 2026 11:12:37 +0000
+	id 1wMl2W-002Kqu-36;
+	Tue, 12 May 2026 11:12:41 +0000
 From: Breno Leitao <leitao@debian.org>
-Date: Tue, 12 May 2026 04:12:16 -0700
-Subject: [PATCH net-next v2 1/6] Bluetooth: hci_sock: write the full optval
- for getsockopt
+Date: Tue, 12 May 2026 04:12:17 -0700
+Subject: [PATCH net-next v2 2/6] Bluetooth: hci_sock: convert to
+ getsockopt_iter
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,7 +62,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260512-getsock_three-v2-1-30b7b22ef14c@debian.org>
+Message-Id: <20260512-getsock_three-v2-2-30b7b22ef14c@debian.org>
 References: <20260512-getsock_three-v2-0-30b7b22ef14c@debian.org>
 In-Reply-To: <20260512-getsock_three-v2-0-30b7b22ef14c@debian.org>
 To: Marcel Holtmann <marcel@holtmann.org>, 
@@ -74,24 +74,24 @@ Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
  netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
  Breno Leitao <leitao@debian.org>
 X-Mailer: b4 0.16-dev-d5d98
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1628; i=leitao@debian.org;
- h=from:subject:message-id; bh=h6zSdtN9jQgMR/YPfbG1OygHwk4VDPpboHdb0JfjOWE=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqAwsamdWMyGriAw22QbzyOxsIWKmyJi2oEk9cd
- 0dl2DuZa/SJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCagMLGgAKCRA1o5Of/Hh3
- bWuXD/9wV6UvdSKsEwpuvK5jLVsagbcx0Cd4a6oskdxdwaLpf7CYDNxTwJKgkj7uXkkK3GeHkAT
- NfTvKbvsXOSBH45RGy2JX1zjcXYRIlN2eHbKRGLVBpty280S/0hTZR/PIqdLBU68gSLo3AJmtZj
- 3tiagIpvk1AKaBroefmqd5qW8cfXmC5UDMgFoIOAfYdvJLjWvogdI6A+yiA+jDB0Hpb+tE/OLiq
- Ca/qUBa2Vpmv4tBPn140Pgv01wyrKGS+yR1CmBccWN0TBMEclHKybfyy9VEACjN57dOh3aQdXKs
- FZotNjTgu1zbJ6ml7dVaYH4GyzELL2/ry6QqG/cOuM340hzT6Kh0MZ+JKWac3Mhagom5sucI1ZO
- Y1R+8hvphu0p6UzLj1U+HL8Y9wR+QfMNzaQo0Wtc0m9JwaH9T8zTejonUSViNO5D6bXLPh11YfJ
- TmlK20xyU6aQ1kPe+fw3U1UQNRynm8PEr7lcDhljCPLEqXc7r09nWoj8jpuEIg8f47koxRwTBQX
- sdbROfjktpIV6IehkDOoL+KolGeLdbV0dHLI9c1pe6I9JrSnNcoeJcR0sd37CwKDh39uobC85d3
- iGruwxaJY/5nFpUdvrnQ4lfBzzgMggLuCmKs2Cmx788LcORikaKKS6EfyUwJkpD73MeUXWBwJ5k
- wIioujjpEuy2FCA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3818; i=leitao@debian.org;
+ h=from:subject:message-id; bh=HK+Sfftx5xMXf/ohhSVSyX4kM0dUiUEr9WG/OrDiAs0=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqAwsbGmfHz2HnWNFsHbzsK7EdpZyQCiqUwas6U
+ N6aBnCuOECJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCagMLGwAKCRA1o5Of/Hh3
+ bTNPD/sHnTvtkff+PCBtG6N+tawpf4284y16XGZzDhT91hIfn/cA+ZzbCnUi6CONbtl0qs9bhj3
+ Vk71pcVACGrnMrFLMuXYW/VFwsx/+5+fzo/TnNpJ+GFf2nzxqw/U5ts3vYOJTHixPO2VMyZvC80
+ Zmj5R92fEM8KM9EgE+n6SC0HsxMJnfo5gtmuyABzr9eMe6afO4uRPE16YvpyRPL6DPVrmi6EhC5
+ 1OC1XzUid3Rya7oMBAIh8+41kHeyk8u9JuMEy07xU/5lzNi1aLLyLf52uRi+Ty2DS9eVgIlnBH4
+ Fof3bByuaUEI/iLyEfBG9nM4veMvRuTI+vnz7RdtfnbyHhxB7NgAma7jU8T4gDvE7J8rx0/VdDJ
+ mqF6gWa085P2vhupJA+ibpUhmTkFAOCDNIMEO9IU0I9lV/1bUQpJsM88qM2DksZMplnHO7BbMtd
+ mBcemkVBA9YCCVzd0PHrdZzZGyaRgWP9Mf7Qdda8bQUOzWuLoWY/dLysRs7AmHnB/SzTLywWbWw
+ h4bB2EDqRHNkEisewm9NmW5ICpCSzV4PDI4Al19/f7WbUY2zWTXG0dnRBNvUs23JXDdc3dKkgBD
+ 7VmJ96fNmjItgzciJo2bbz/K0/0hiWcTW2OI6Xp89E/TlIHfK6CwaT1joLklWYvYGe7JSvck728
+ gZ3cV+BdihMdOQg==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 X-Debian-User: leitao
-X-Rspamd-Queue-Id: 88BBC51F25E
+X-Rspamd-Queue-Id: 2125F51F283
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -103,7 +103,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287100-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-287101-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[holtmann.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -122,51 +122,124 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-In hci_sock_getsockopt_old(), HCI_DATA_DIR and HCI_TIME_STAMP both store
-their value into a local int and then call put_user(opt, optval). Because
-optval is the function parameter typed char __user *, put_user sizes the
-write from sizeof(*optval), so only the low byte of the int is copied to
-userspace.
+Convert HCI socket's getsockopt implementation to use the new
+getsockopt_iter callback with sockopt_t.
 
-The matching setsockopt path reads sizeof(int) via copy_safe_from_sockptr,
-so userspace passes a 4-byte buffer in both directions but previously got
-back only one initialized byte on the read side.
+Key changes:
+- Replace (char __user *optval, int __user *optlen) with sockopt_t *sopt
+- Use sopt->optlen for buffer length (input)
+- Use copy_to_iter() instead of put_user()/copy_to_user()
+- Add linux/uio.h for copy_to_iter()
 
-Not sending this through 'net' tree given this bug is mostly invisble,
-given opt is 0/1, and the last byte is being properly copied.
-
-With this change, the upcoming translation to .getsockopt_iter becomes
-mechanical.
-
-FWIW: This behavior appeared in commit 1da177e4c3f4 ("Linux-2.6.12-rc2").
+The sockopt_t parameter is named sopt rather than opt to avoid
+collision with the existing local int opt used by HCI_DATA_DIR and
+HCI_TIME_STAMP.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- net/bluetooth/hci_sock.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_sock.c | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
 
 diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 0290dea081f62..1823c06ba8940 100644
+index 1823c06ba8940..61fec674a2078 100644
 --- a/net/bluetooth/hci_sock.c
 +++ b/net/bluetooth/hci_sock.c
-@@ -2088,7 +2088,7 @@ static int hci_sock_getsockopt_old(struct socket *sock, int level, int optname,
+@@ -27,6 +27,7 @@
+ #include <linux/export.h>
+ #include <linux/utsname.h>
+ #include <linux/sched.h>
++#include <linux/uio.h>
+ #include <linux/unaligned.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+@@ -2063,7 +2064,7 @@ static int hci_sock_setsockopt(struct socket *sock, int level, int optname,
+ }
+ 
+ static int hci_sock_getsockopt_old(struct socket *sock, int level, int optname,
+-				   char __user *optval, int __user *optlen)
++				   sockopt_t *sopt)
+ {
+ 	struct hci_ufilter uf;
+ 	struct sock *sk = sock->sk;
+@@ -2071,8 +2072,7 @@ static int hci_sock_getsockopt_old(struct socket *sock, int level, int optname,
+ 
+ 	BT_DBG("sk %p, opt %d", sk, optname);
+ 
+-	if (get_user(len, optlen))
+-		return -EFAULT;
++	len = sopt->optlen;
+ 
+ 	lock_sock(sk);
+ 
+@@ -2088,7 +2088,8 @@ static int hci_sock_getsockopt_old(struct socket *sock, int level, int optname,
  		else
  			opt = 0;
  
--		if (put_user(opt, optval))
-+		if (put_user(opt, (int __user *)optval))
+-		if (put_user(opt, (int __user *)optval))
++		if (copy_to_iter(&opt, sizeof(opt), &sopt->iter_out) !=
++		    sizeof(opt))
  			err = -EFAULT;
  		break;
  
-@@ -2098,7 +2098,7 @@ static int hci_sock_getsockopt_old(struct socket *sock, int level, int optname,
+@@ -2098,7 +2099,8 @@ static int hci_sock_getsockopt_old(struct socket *sock, int level, int optname,
  		else
  			opt = 0;
  
--		if (put_user(opt, optval))
-+		if (put_user(opt, (int __user *)optval))
+-		if (put_user(opt, (int __user *)optval))
++		if (copy_to_iter(&opt, sizeof(opt), &sopt->iter_out) !=
++		    sizeof(opt))
  			err = -EFAULT;
  		break;
  
+@@ -2114,7 +2116,7 @@ static int hci_sock_getsockopt_old(struct socket *sock, int level, int optname,
+ 		}
+ 
+ 		len = min_t(unsigned int, len, sizeof(uf));
+-		if (copy_to_user(optval, &uf, len))
++		if (copy_to_iter(&uf, len, &sopt->iter_out) != len)
+ 			err = -EFAULT;
+ 		break;
+ 
+@@ -2129,16 +2131,16 @@ static int hci_sock_getsockopt_old(struct socket *sock, int level, int optname,
+ }
+ 
+ static int hci_sock_getsockopt(struct socket *sock, int level, int optname,
+-			       char __user *optval, int __user *optlen)
++			       sockopt_t *sopt)
+ {
+ 	struct sock *sk = sock->sk;
+ 	int err = 0;
++	u16 mtu;
+ 
+ 	BT_DBG("sk %p, opt %d", sk, optname);
+ 
+ 	if (level == SOL_HCI)
+-		return hci_sock_getsockopt_old(sock, level, optname, optval,
+-					       optlen);
++		return hci_sock_getsockopt_old(sock, level, optname, sopt);
+ 
+ 	if (level != SOL_BLUETOOTH)
+ 		return -ENOPROTOOPT;
+@@ -2148,7 +2150,9 @@ static int hci_sock_getsockopt(struct socket *sock, int level, int optname,
+ 	switch (optname) {
+ 	case BT_SNDMTU:
+ 	case BT_RCVMTU:
+-		if (put_user(hci_pi(sk)->mtu, (u16 __user *)optval))
++		mtu = hci_pi(sk)->mtu;
++		if (copy_to_iter(&mtu, sizeof(mtu), &sopt->iter_out) !=
++		    sizeof(mtu))
+ 			err = -EFAULT;
+ 		break;
+ 
+@@ -2185,7 +2189,7 @@ static const struct proto_ops hci_sock_ops = {
+ 	.listen		= sock_no_listen,
+ 	.shutdown	= sock_no_shutdown,
+ 	.setsockopt	= hci_sock_setsockopt,
+-	.getsockopt	= hci_sock_getsockopt,
++	.getsockopt_iter = hci_sock_getsockopt,
+ 	.connect	= sock_no_connect,
+ 	.socketpair	= sock_no_socketpair,
+ 	.accept		= sock_no_accept,
 
 -- 
 2.53.0-Meta
