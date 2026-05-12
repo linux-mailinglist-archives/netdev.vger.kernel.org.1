@@ -1,242 +1,237 @@
-Return-Path: <netdev+bounces-286965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286966-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cPgwEYfHAmqWwgEAu9opvQ
-	(envelope-from <netdev+bounces-286965-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 08:24:07 +0200
+	id eEdeFL/IAmrmwgEAu9opvQ
+	(envelope-from <netdev+bounces-286966-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 08:29:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EA8E51AEDF
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 08:24:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF9BD51B065
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 08:29:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C98693044B9A
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 06:19:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C05B4300903A
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 06:29:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EB4946AF3C;
-	Tue, 12 May 2026 06:19:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19114E3769;
+	Tue, 12 May 2026 06:29:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="vxamPC5x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875C6421A0F
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 06:18:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914B0357D19;
+	Tue, 12 May 2026 06:29:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778566748; cv=none; b=TnmaxxH+JHleeMH7ttzTYJDgleF1irg2zhGcpdDyIb7kNsOgj6ot1BLWopCM0JelYgF0/i8VW4O0xxskMLuwFsvvX4gn0jQZiXdyjq4IwTS/4GVDe6qFRoCZaXiV7w2EGgh8aKZREShr6PzjBtSrxJb18ShfOwMlPaY+/HfByTw=
+	t=1778567355; cv=none; b=YxWZ2zIP9s5Ht+C2UDHrUj49UQlOkfpmShwO3aZVUWnvMpe9h/1avWIa7L9EGCaw32w9HTLM2/odeBl/stVc6qx5FT0i7/lx/CprfKDve/1AN9dC5LAHq7TRsLp+UvrOWfWA71Q+DEnF8alsr4LsfThtP4itws59tRkIykEGjrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778566748; c=relaxed/simple;
-	bh=A9cySep/CEG1X39ZMIB/dkxmsRq8AU52nK52aNjusRQ=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=WM/UEjiAnGEf+IC2KckF1KEGeS7O4llx2xrwcV3rudQk/419O2vKq01SF+WiZwKDM/Iq26ChH4ccpor420sebQbeLfMQ6ltlM8gcJZf9Ff6Gm3I69iKAxKDDZ55dxNIWHjqCSCOOx/wWwtVhaa1Yet0B88/LgwOo2DQtmJAwc00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-69649771a5aso9536458eaf.2
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 23:18:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778566732; x=1779171532;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Quvp48/YwD/viN8Bdy5pN7ImHZzsvCGWxopU74+qfq4=;
-        b=MzIEV6o9jr0bO6JWWDtwPsKA9F6nKHsxzUrHjk9jMTv+o2CsThTK35ahZs32JzrjAS
-         u4i+FvCrwyjonCVgo5mLCiIrtXsMw0F1uon1MPBUAQhPbXqqWDxhcrqsbUhsC4D4Q55j
-         ZIxce4ULZ9lbDxS6PGYKUd+gjRepVlwlfAr8SgBdD25rRi0erSP7MfPFeXEmEXm/Ra++
-         zH6RrPcHSD6zcsMxWdwaAjdLnIH7SdrcK48rSO3f7UBCz1Gsi+RqhG0vPpF6CsNo6p2J
-         eodx8IwYLE02WVau1k1bLDzkc6LFj+Gw9LsN0kyniTX5FjLZ7LitwPmfdTghQes/m7hc
-         rbkw==
-X-Forwarded-Encrypted: i=1; AFNElJ91zsmezd3R0rvTzZ6/BFAUqyuVvkT5RO+NL0XUKVHG6mgn6ynmnd7uHSC2SlQUwh4SABQCQJg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyU3e/h6TsXzVG4un/SpSgSeIiKM0ypaxzb9bDYcezdGXHNnTCQ
-	Al/9G3IwMs3v+125Q3T3tTkZhjLUUHkzNu2DLkYH6KFYwHU4MN8YZmbMb88rBfSanO9d9gJs5NR
-	9IWIcKOv8EnR9hCTNC6wD/DcXmXzolMezYTCplBo0zaNuVExwWCHTVm/CZRE=
+	s=arc-20240116; t=1778567355; c=relaxed/simple;
+	bh=Oo+KTjYKYfxwig/IKUE/DuqgmKu3ILJeUNkunDT+mHQ=;
+	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=JPFm/nHIgkqwX1DnrK3e+YlAHwsquALIV+yBFvyUQVAZY32CHTR1nFlUSGeiplgfn6N+R1YbSpIG01Pzyx1sm06AUQj3UjPeIRzp21bOihhX57CauSJ9IZzqRai6RGVxDoBp18t2YxqmoENYi927OrIEZWiuqxlXWZYTl7oGTkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=vxamPC5x; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1778567347; x=1810103347;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=Oo+KTjYKYfxwig/IKUE/DuqgmKu3ILJeUNkunDT+mHQ=;
+  b=vxamPC5x7Jn+ob9qxFZ76FdB5760npGncd5TCwRvO6uJt4Kv8Ljem/0N
+   5+yWqAa5DkMfkjb0EgKPVAnhlY6fqA9TkXxu/jIX6BEW9epb/JualBIlB
+   5TjiJ+cYvexlUdamNk/2csCVLZdTmuvFm/dh4P1uKeOAxhbsGOWUEMe75
+   g9GBKNA/1jxa4P6A5NeMnmh7NVG8CL1LlJK6st3i/QwdicinFJjHOw+CM
+   8WzUwS+Tr0CNe5seLulm0xAhPyp0LmVs0wqYNSMwpSz/2wxwO04bI04Tm
+   Rm6j5RJZljB2lTu8pgNIkOObN/dm9EoLoc1kcZxdXcfooPH0vsPKF2FMP
+   A==;
+X-CSE-ConnectionGUID: rbouXjx3QOGRKvFETiyjeQ==
+X-CSE-MsgGUID: j9+9l88vSauU/Pg6jiP03w==
+X-IronPort-AV: E=Sophos;i="6.23,230,1770620400"; 
+   d="scan'208";a="288736053"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2026 23:28:51 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
+ chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.37; Mon, 11 May 2026 23:28:50 -0700
+Received: from DEN-DL-M77643.microsemi.net (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Mon, 11 May 2026 23:28:47 -0700
+Message-ID: <5d440e2a4647a578c277e303a8ad7f0f4bc96767.camel@microchip.com>
+Subject: Re: [PATCH net-next v4 1/9] net: dsa: add tag driver for LAN9645X
+From: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <UNGLinuxDriver@microchip.com>, <andrew@lunn.ch>, <olteanv@gmail.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<horms@kernel.org>, <robh@kernel.org>, <krzk+dt@kernel.org>,
+	<conor+dt@kernel.org>, <woojung.huh@microchip.com>, <linux@armlinux.org.uk>,
+	<Steen.Hegelund@microchip.com>, <daniel.machon@microchip.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>
+Date: Tue, 12 May 2026 08:28:46 +0200
+In-Reply-To: <20260506014552.1616551-1-kuba@kernel.org>
+References: <20260430-dsa_lan9645x_switch_driver_base-v4-1-f1b6005fa8b7@microchip.com>
+	 <20260506014552.1616551-1-kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:151e:b0:694:8d83:a344 with SMTP id
- 006d021491bc7-69998ca2d42mr15168311eaf.16.1778566731871; Mon, 11 May 2026
- 23:18:51 -0700 (PDT)
-Date: Mon, 11 May 2026 23:18:51 -0700
-In-Reply-To: <20260511151559.1916614-1-edumazet@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a02c64b.050a0220.14e4b1.0006.GAE@google.com>
-Subject: [syzbot ci] Re: tcp: fix stale per-CPU tcp_tw_isn leak enabling ISN prediction
-From: syzbot ci <syzbot+cic9c132a1582cb710@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, eric.dumazet@gmail.com, 
-	horms@kernel.org, kuba@kernel.org, kuniyu@google.com, ncardwell@google.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 8EA8E51AEDF
+X-Rspamd-Queue-Id: BF9BD51B065
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[davemloft.net,google.com,gmail.com,kernel.org,vger.kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-286965-lists,netdev=lfdr.de,cic9c132a1582cb710];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286966-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,armlinux.org.uk,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.875];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[googlegroups.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email]
+	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-syzbot ci has tested the following series
+On Tue, 2026-05-05 at 18:45 -0700, Jakub Kicinski wrote:
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
+e content is safe
+>=20
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> ---
+> net: dsa: add tag driver for LAN9645X
+>=20
+> Adds a DSA tag driver for Microchip LAN9645x switches operating with a
+> front port configured as an NPI CPU port. RX uses a 16-byte long prefix
+> plus a 28-byte internal frame header; TX uses only the IFH.
+>=20
+> > diff --git a/net/dsa/tag_lan9645x.c b/net/dsa/tag_lan9645x.c
+> > new file mode 100644
+> > index 000000000000..81e7a78e0f81
+> > --- /dev/null
+> > +++ b/net/dsa/tag_lan9645x.c
+>=20
+> [ ... ]
+>=20
+> > +static struct sk_buff *lan9645x_rcv(struct sk_buff *skb,
+> > +                                 struct net_device *ndev)
+> > +{
+> > +     u32 src_port, qos_class, vlan_tci, tag_type, popcnt, etype_ofs;
+> > +     struct dsa_port *dp;
+> > +     u32 ifh_gap_len =3D 0;
+> > +     u16 vlan_tpid;
+> > +     u8 *ifh;
+> > +
+> > +     /* DSA master already consumed DMAC,SMAC,ETYPE from long prefix. =
+Go back
+> > +      * to beginning of frame.
+> > +      */
+> > +     skb_push(skb, ETH_HLEN);
+> > +
+> > +     if (unlikely(!pskb_may_pull(skb, LAN9645X_TOTAL_TAG_LEN)))
+> > +             return NULL;
+> > +
+> > +     /* IFH starts after our long prefix */
+> > +     ifh =3D skb_pull(skb, LAN9645X_LONG_PREFIX_LEN);
+>=20
+> [ ... ]
+>=20
+> > +     skb_pull(skb, LAN9645X_IFH_LEN);
+> > +
+> > +     if (unlikely(!pskb_may_pull(skb, ifh_gap_len + ETH_HLEN)))
+> > +             return NULL;
+> > +
+> > +     skb_pull(skb, ifh_gap_len);
+> > +     skb_reset_mac_header(skb);
+> > +     skb_set_network_header(skb, ETH_HLEN);
+> > +     skb_reset_mac_len(skb);
+> > +
+> > +     /* Remove the long prefix + IFH + ifh_gap contribution from
+> > +      * skb->csum so the stack sees a checksum consistent with the
+> > +      * real Ethernet frame. skb->data currently points at the real
+> > +      * MAC header.
+> > +      */
+> > +     skb_postpull_rcsum(skb,
+> > +                        skb->data - LAN9645X_TOTAL_TAG_LEN - ifh_gap_l=
+en,
+> > +                        LAN9645X_TOTAL_TAG_LEN + ifh_gap_len);
+>=20
+> Does this skb_postpull_rcsum() call subtract the wrong region from
+> skb->csum for CHECKSUM_COMPLETE frames?
+>=20
+> By the time lan9645x_rcv() is entered, the conduit's eth_type_trans()
+> has already pulled the first ETH_HLEN (14) bytes of the long prefix and
+> adjusted skb->csum accordingly, so skb->csum covers bytes starting at
+> offset 14 (the remaining 2 bytes of the long prefix plus IFH plus any
+> gap plus the real frame).
+>=20
+> At the point of the skb_postpull_rcsum() call, skb->data points at the
+> real MAC header, i.e. at offset LAN9645X_TOTAL_TAG_LEN + ifh_gap_len
+> from the start of the originally-received frame. So
+> skb->data - LAN9645X_TOTAL_TAG_LEN - ifh_gap_len points at offset 0,
+> and the subtracted region is [0, LAN9645X_TOTAL_TAG_LEN + ifh_gap_len).
+>=20
+> That region includes the first 14 bytes that eth_type_trans() already
+> removed from skb->csum, and it stops short of the real MAC header which
+> also needs to be removed. Shouldn't the subtracted region instead start
+> at what skb->data was on entry to rcv() (i.e. post-eth_type_trans) and
+> cover LAN9645X_TOTAL_TAG_LEN + ifh_gap_len bytes from there, so that it
+> matches what skb->csum actually covers?
+>=20
+> For reference, tag_ocelot.c (cited in the commit message as the
+> architectural model) saves start =3D skb->data at function entry before
+> any skb_push()/skb_pull() manipulation:
+>=20
+>     net/dsa/tag_ocelot.c:ocelot_rcv() {
+>         ...
+>         u8 *start =3D skb->data;
+>         ...
+>         skb_push(skb, ETH_HLEN);
+>         skb_pull(skb, OCELOT_SHORT_PREFIX_LEN);
+>         ...
+>     }
+>=20
+> and later passes that saved pointer to skb_postpull_rcsum() with the
+> total tag length, so the subtracted region exactly matches what the
+> NIC's csum_complete covers.
+>=20
+> Would saving skb->data on entry (before the initial skb_push(ETH_HLEN))
+> and passing that as the start argument, with length
+> LAN9645X_TOTAL_TAG_LEN + ifh_gap_len, produce the correct result here
+> as well?
 
-[v1] tcp: fix stale per-CPU tcp_tw_isn leak enabling ISN prediction
-https://lore.kernel.org/all/20260511151559.1916614-1-edumazet@google.com
-* [PATCH net] tcp: fix stale per-CPU tcp_tw_isn leak enabling ISN prediction
+Hehe, this is what I did originally, but in the previous version sashiko
+convinced me that was not correct. I do not have a CHECKSUM_COMPLETE=20
+host to test it with unfortunately. But after looking at mlx5 it does seem
+the original was correct and the (real) ethernet header should be subtracte=
+d.
 
-and found the following issues:
-* BUG: using __this_cpu_write() in preemptible code in tcp_v4_do_rcv
-* BUG: using __this_cpu_write() in preemptible code in tcp_v6_do_rcv
+We can not save skb->data on entry, as it may have become stale. But just
+swapping the order of skb_pull(skb, ETH_HLEN) and skb_postpul_rcsum should
+give the desired effect. I will fix this in the next version.
 
-Full report is available here:
-https://ci.syzbot.org/series/45073ca6-4b5b-4cbd-83bf-ae30c470d334
-
-***
-
-BUG: using __this_cpu_write() in preemptible code in tcp_v4_do_rcv
-
-tree:      net
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
-base:      a450063ef86b9967234ca1f896c0d77400c74f11
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/d6bfac50-400c-447d-b4f2-f5caa36c16ac/config
-syz repro: https://ci.syzbot.org/findings/95b64202-6cf3-4356-94bc-753dbd8443c4/syz_repro
-
-BUG: using __this_cpu_write() in preemptible [00000000] code: syz.0.17/5875
-caller is tcp_v4_do_rcv+0xb4a/0x13e0 net/ipv4/tcp_ipv4.c:1881
-CPU: 0 UID: 0 PID: 5875 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- check_preemption_disabled+0xd3/0xe0 lib/smp_processor_id.c:47
- tcp_v4_do_rcv+0xb4a/0x13e0 net/ipv4/tcp_ipv4.c:1881
- sk_backlog_rcv include/net/sock.h:1190 [inline]
- __release_sock+0x265/0x3a0 net/core/sock.c:3216
- release_sock+0x190/0x260 net/core/sock.c:3815
- mptcp_pm_rm_addr_or_subflow+0x472/0x9d0 net/mptcp/pm.c:789
- mptcp_nl_remove_id_zero_address net/mptcp/pm_kernel.c:1140 [inline]
- mptcp_pm_nl_del_addr_doit+0x503/0x1430 net/mptcp/pm_kernel.c:1176
- genl_family_rcv_msg_doit+0x22a/0x330 net/netlink/genetlink.c:1114
- genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
- genl_rcv_msg+0x61c/0x7a0 net/netlink/genetlink.c:1209
- netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
- netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
- netlink_unicast+0x75c/0x8e0 net/netlink/af_netlink.c:1344
- netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
- sock_sendmsg_nosec net/socket.c:787 [inline]
- __sock_sendmsg net/socket.c:802 [inline]
- ____sys_sendmsg+0x972/0x9f0 net/socket.c:2698
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2752
- __sys_sendmsg net/socket.c:2784 [inline]
- __do_sys_sendmsg net/socket.c:2789 [inline]
- __se_sys_sendmsg net/socket.c:2787 [inline]
- __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2787
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f6847f9cdd9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f6848e95028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f6848215fa0 RCX: 00007f6847f9cdd9
-RDX: 0000000024000800 RSI: 0000200000000140 RDI: 0000000000000004
-RBP: 00007f6848032d69 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f6848216038 R14: 00007f6848215fa0 R15: 00007ffe50763178
- </TASK>
-
-
-***
-
-BUG: using __this_cpu_write() in preemptible code in tcp_v6_do_rcv
-
-tree:      net
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
-base:      a450063ef86b9967234ca1f896c0d77400c74f11
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/d6bfac50-400c-447d-b4f2-f5caa36c16ac/config
-syz repro: https://ci.syzbot.org/findings/f5960777-902c-46ad-b811-9dff0f17d320/syz_repro
-
-BUG: using __this_cpu_write() in preemptible [00000000] code: syz.0.173/6173
-caller is tcp_v6_do_rcv+0x10c2/0x1ca0 net/ipv6/tcp_ipv6.c:1644
-CPU: 0 UID: 0 PID: 6173 Comm: syz.0.173 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- check_preemption_disabled+0xd3/0xe0 lib/smp_processor_id.c:47
- tcp_v6_do_rcv+0x10c2/0x1ca0 net/ipv6/tcp_ipv6.c:1644
- sk_backlog_rcv include/net/sock.h:1190 [inline]
- __release_sock+0x1b8/0x3a0 net/core/sock.c:3216
- __tcp_close+0x832/0xfe0 net/ipv4/tcp.c:3238
- __mptcp_close_ssk+0x52d/0x1180 net/mptcp/protocol.c:2604
- mptcp_destroy_common+0x15c/0x330 net/mptcp/protocol.c:3408
- mptcp_destroy+0x82/0x120 net/mptcp/protocol.c:3616
- __mptcp_destroy_sock+0x156/0x370 net/mptcp/protocol.c:3250
- __mptcp_close+0x8f6/0xd10 net/mptcp/protocol.c:3352
- mptcp_close+0x28/0x1a0 net/mptcp/protocol.c:3367
- inet_release+0x143/0x190 net/ipv4/af_inet.c:442
- __sock_release net/socket.c:722 [inline]
- sock_close+0xc3/0x240 net/socket.c:1514
- __fput+0x44f/0xa60 fs/file_table.c:510
- task_work_run+0x1d9/0x270 kernel/task_work.c:233
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- __exit_to_user_mode_loop kernel/entry/common.c:67 [inline]
- exit_to_user_mode_loop+0xed/0x480 kernel/entry/common.c:98
- __exit_to_user_mode_prepare include/linux/irq-entry-common.h:207 [inline]
- syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:238 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:318 [inline]
- do_syscall_64+0x33e/0xf80 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f69be79cdd9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc7668ad18 EFLAGS: 00000246 ORIG_RAX: 00000000000001b4
-RAX: 0000000000000000 RBX: 00007ffc7668ae00 RCX: 00007f69be79cdd9
-RDX: 0000000000000000 RSI: 000000000000001e RDI: 0000000000000003
-RBP: 0000000000012dd1 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000001b32b20000 R11: 0000000000000246 R12: 00007ffc7668ae40
-R13: 00007f69bea15fac R14: 0000000000012e0a R15: 00007f69bea15fa0
- </TASK>
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
-
-To test a patch for this bug, please reply with `#syz test`
-(should be on a separate line).
-
-The patch should be attached to the email.
-Note: arguments like custom git repos and branches are not supported.
 
