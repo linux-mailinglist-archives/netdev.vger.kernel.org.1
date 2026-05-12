@@ -1,182 +1,116 @@
-Return-Path: <netdev+bounces-287214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287215-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UG4zJ7NDA2pV2QEAu9opvQ
-	(envelope-from <netdev+bounces-287214-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:13:55 +0200
+	id 6NEpK7FJA2r+2wEAu9opvQ
+	(envelope-from <netdev+bounces-287215-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:39:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24515523656
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:13:55 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2511523D5D
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:39:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 48211301B6F2
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:13:54 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 50D96301FDC7
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:19:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06A9539EB6B;
-	Tue, 12 May 2026 15:13:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2012A37C900;
+	Tue, 12 May 2026 15:19:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="kt5h+Q+P";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="g99FBwDL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EDYRt0EV"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0DA3ADB94;
-	Tue, 12 May 2026 15:13:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1FDC35AC3C
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 15:19:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778598832; cv=none; b=pJE9W0E+QxaG6SUYOCALSmAIHugw9AVBSwy9Yu2AwngocWW0DLUOEcGh+XcTzIz1Xve7g/eMhsk+4Xme92PNZgNQIlAuDvAPxm58647mKhhc3Ja8knts07UZEKMJAQQE0ZQ9RE8oBDjP4dhwDPH4m753m1KLVdVM58fPBhuHbZU=
+	t=1778599151; cv=none; b=Q+00PqeivdaDq0Bvi7IzCArfJBPrX9EI7o2StEqGneyvT38g0S+UXPjKUgJ5GvkyV3g/2/BIIHMZJaV4t0BqhrXxLeMWK1/oattZPITk2JoA9rpWK1eMnaU4Dy+jGgIRothBM5bixJvSrMZmt/gFnJvmzCLjJH5dhyvWXgl/ST0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778598832; c=relaxed/simple;
-	bh=n6He3MHOhl6b1jzMbiTQcxN/83zKOZ1lsUWQ1p+11Cw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iFwuz6PLCe6xUUM/xnIWPmrboJT7b9dzC3HFIZ2828T0qGxK1AAnUQuhsjtdkTSg2IL3iCXoRPkciM+wC7+dz/KgP0HHFb4r2Q4ZvVsa8MssHWpgd/O7PZeCB3JgrJ/cho9WGuwq1qEEBoiu3DzBUYFOOadKFAwjHXsP3iXzMJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=kt5h+Q+P; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=g99FBwDL; arc=none smtp.client-ip=103.168.172.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
-	by mailfout.phl.internal (Postfix) with ESMTP id 16DE5EC0206;
-	Tue, 12 May 2026 11:13:50 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Tue, 12 May 2026 11:13:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1778598830; x=
-	1778685230; bh=x450cnHuAsSkugN6rsBxOaQ+GdojEN9A8YeAUH+BPUI=; b=k
-	t5h+Q+P2x1N9ZGO5m7E9vqlONRCaT+HTEVygiNRrmN2jlPXMmZSmUA11cKdCkczv
-	nDi+CiGkawupfFfiUmLjfWiSQGrZzcMlgs3XdK4esB4oa0bI+MvuK7gi3ayUlPFb
-	j8lT+1nCnu61IAN60rwHnOkCnCz6ECYyElsJ/pXjNaYcn35g1eWzQaRgJot1s2f1
-	qM+xn7zRrMDwgc8ou+zTKQmqnshHfNwIQorG7hySHvcym+crrgpCFCHzS9lhClfg
-	FH0X5B2bq7wWUABgnNg31/f9ntJooh5aNhPlhHnea179slb1mJ3OUcLi43Aoh3Go
-	uXHmughELB0XILkDlapkg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1778598830; x=1778685230; bh=x450cnHuAsSkugN6rsBxOaQ+GdojEN9A8Ye
-	AUH+BPUI=; b=g99FBwDLp2sfBJbP3sOOn4Xr+RaLKurfRG1l6u45yxHgmLG5LhB
-	1dSle44sHDqzsQY/x3PPM4TN9GXEP2oqoBNeP5EPQwjcEVs6f5N9bpgya+dS3BE0
-	rgdd9kPAg0mnrFRBPs9LfWhzmdl/yjrgiC3+JglFfuDBO9gQrgxodmxZcaMS1Cnf
-	MsrPO8JpNvMny5POyxohQYDoyASQjr98e0m6xlzL1SaiDFOd2ePK5mPaInNb4L4R
-	LGApjxy9oXOWT7Z9W85SVq+o3+aJOf+Wlemr9MDI0ecgFIcUDvaZC+3X8QefD3il
-	ZIXQi7dW6oD3i7lfSUTmnVosQoEj3Tj+lvw==
-X-ME-Sender: <xms:rUMDap_HzlOdHzMS0f121DVfh49_1jlg-nIUb8Dov7wqUyB8ji8jNA>
-    <xme:rUMDaiqOhGwo18qxASPTI5FhM3srfrtZ56I67YUSLyv9U6IWR56Qv_98DdBDC_d0z
-    Wf-3VsETjIlCAJqrq9u8QWdxJCFAeKeaRDh8xsLCLLqVyE2nZAQpQ>
-X-ME-Received: <xmr:rUMDarRzYkgoc2KkVe2smsKq1h5JVf_XShwranuHXj9vF_AbFTMTPjD82dLz-DnfWNcyu7yq23YcJb1tkvor6Ow>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduvddvudefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeelpdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopeguvghvnhgvgigvnhesghhmrghilhdrtghomh
-    dprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphht
-    thhopegrnhhtohhnihhosehophgvnhhvphhnrdhnvghtpdhrtghpthhtoheprghnughrvg
-    ifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghm
-    lhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
-    dprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggv
-    nhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvh
-    hgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:rUMDatOxcBne1nuUOCtci9Cu7xkB3KsLJWp5y5CCVaaHgSQD5VE4aQ>
-    <xmx:rUMDahhFSsZHypiYw4Em46L8L4n-yRrguqbCNyHka4yudt9ozVaMsA>
-    <xmx:rUMDaininiFHfTJMMiRow6oYOENZxCUzmTigiZSysqDxFI0qQpVzFA>
-    <xmx:rUMDalhaSY9qOJO4Vc7mjWcleTUwrMMT9EdrKaPlC2y3LaMyXnq9Yg>
-    <xmx:rkMDagO5UrWmWSR8arn6y46LpRhfK5LnN3DO522bBStLwQyEc1DL9SyM>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 12 May 2026 11:13:49 -0400 (EDT)
-Date: Tue, 12 May 2026 17:13:47 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: David Carlier <devnexen@gmail.com>
-Cc: netdev@vger.kernel.org, Antonio Quartulli <antonio@openvpn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 2/2] ovpn: respect peer refcount in CMD_NEW_PEER
- error path
-Message-ID: <agNDqz_4aUnwkusN@krikkit>
-References: <20260512042036.19870-1-devnexen@gmail.com>
- <20260512042036.19870-3-devnexen@gmail.com>
+	s=arc-20240116; t=1778599151; c=relaxed/simple;
+	bh=rtp/zCiJfx6FzTg9IyNA9f+pfCtn8tDWSZWTCqubcM0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WvJP/ZAT6ECx5+B2FRwjp3e/AIopaw+Ce7HbadgOn1eARg1XGAv+dt7dbW9hExnIauZS6L3GyVoxK8dk0NjH52x3MIPsp4ff3aOjp2J9y7umfumEy7PB5Befh7DyzMLNUTN7nfuwYY5+uLJDbF4CdDRcQ4K3fIFnh9K8a876Lg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EDYRt0EV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 065EFC2BCB0;
+	Tue, 12 May 2026 15:19:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778599150;
+	bh=rtp/zCiJfx6FzTg9IyNA9f+pfCtn8tDWSZWTCqubcM0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EDYRt0EVWxbsXqxZvYf6aNUQulpV/G2Yt4hRdzVvQBbvWX787FCf7/RL6xb+z/laM
+	 V5v77do0I1pekkf7REpcPzYgifdkvGGBFE7UJnIThxr1o77Sh+j9/k+GOb8apptM7J
+	 hbfcxvh+88O89g4F3nV+XBJO2H91a54C782MVLsxyiVAvqaNjSwi4jFYv780BdtJGi
+	 SBK2z3fnHZgxoUj6gJFjiArS0bpfwPP3JOjqVBoHyL99fIpdsuiq7Pcx33eUCrA/zV
+	 95YCqemejjZkrOnK9pIp3mlLVGe8sQoMBmdhDDnPn80SBa02Zb6HfdmbxNWBSMTpUx
+	 tpHWw5pA/cNBQ==
+Date: Tue, 12 May 2026 08:19:09 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, horms@kernel.org, idosch@nvidia.com,
+ netdev@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH net] MAINTAINERS: update the IPv4/IPv6 entry and add Ido
+ Schimmel
+Message-ID: <20260512081909.1dc5c281@kernel.org>
+In-Reply-To: <20260512122701.2656064-1-geert+renesas@glider.be>
+References: <20260428203924.1229169-1-kuba@kernel.org>
+	<20260512122701.2656064-1-geert+renesas@glider.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260512042036.19870-3-devnexen@gmail.com>
-X-Rspamd-Queue-Id: 24515523656
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: F2511523D5D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287214-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-287215-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,messagingengine.com:dkim,queasysnail.net:email,queasysnail.net:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,davemloft.net:email]
 X-Rspamd-Action: no action
 
-2026-05-12, 05:19:13 +0100, David Carlier wrote:
-> diff --git a/drivers/net/ovpn/netlink.c b/drivers/net/ovpn/netlink.c
-> index 291e2e5bb450..4c66c1ec497e 100644
-> --- a/drivers/net/ovpn/netlink.c
-> +++ b/drivers/net/ovpn/netlink.c
-> @@ -462,10 +462,12 @@ int ovpn_nl_peer_new_doit(struct sk_buff *skb, struct genl_info *info)
->  sock_release:
->  	ovpn_socket_release(peer);
->  peer_release:
-> -	/* release right away because peer was not yet hashed, thus it is not
-> -	 * used in any context
-> +	/* For UDP, the peer is unreachable until added to the hashtables, so
-> +	 * dropping the initial reference is enough. For TCP, the peer may be
-> +	 * concurrently reachable via sk_user_data->peer until
-> +	 * ovpn_socket_release() detaches; rely on the refcount.
->  	 */
-> -	ovpn_peer_release(peer);
-> +	ovpn_peer_put(peer);
->  
->  	return ret;
->  }
+On Tue, 12 May 2026 14:27:01 +0200 Geert Uytterhoeven wrote:
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -18672,19 +18672,59 @@ F:	net/xfrm/
+> >  F:	tools/testing/selftests/net/ipsec.c
+> >  
+> >  NETWORKING [IPv4/IPv6]
+> > -M:	"David S. Miller" <davem@davemloft.net>  
+> 
+> Is this removal intentional? It is not mentioned in the patch
+> description.
 
-nit: after this change, ovpn_peer_release() is only used within
-peer.c, and can become static.
-
-I think it'd be nicer to do that now with a v2, but if Antonio wants
-to pick this patch up directly, the fix LGTM:
-
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
-
--- 
-Sabrina
+Yes, this is a remanent of pre-git era MAINTAINERS when AFAIU the
+interpretation wasn't as... hierarchical? IOW I'm not sure why this
+entry was listing DaveM directly in the first place. Dave maintains 
+all of networking, of course, no need to list him on all the
+sub-entries?
 
