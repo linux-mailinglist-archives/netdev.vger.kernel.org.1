@@ -1,370 +1,352 @@
-Return-Path: <netdev+bounces-287323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287324-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QN8UIQubA2p27wEAu9opvQ
-	(envelope-from <netdev+bounces-287323-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 23:26:35 +0200
+	id 6DpjKR6aA2p27wEAu9opvQ
+	(envelope-from <netdev+bounces-287324-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 23:22:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E322C52A42A
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 23:26:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2160452A3A2
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 23:22:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3BD20311651B
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 21:22:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0DECC30160F8
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 21:22:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C4A837CD53;
-	Tue, 12 May 2026 21:22:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7045437F8A8;
+	Tue, 12 May 2026 21:22:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="XRla2gT4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s1PvxHyi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f100.google.com (mail-yx1-f100.google.com [74.125.224.100])
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C491926ED46
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 21:22:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.100
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778620925; cv=none; b=h1vku/PQj/QxMcZZ4fe8YyIwuqAdZYHcwFbUEKzEvjNINqNoP+458fS24TpoK+q3WTF/okRUPU//Dwc008QlYJwzBOCnk/4tWsQomcH+MpGoPnBdPKm18/hR+MaBWbaIx6TgOLrXQbOdhTM5SjE7x348XnyXaOf5YShZ/UFjcaw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778620925; c=relaxed/simple;
-	bh=iqLtpub8kZ5IlN17DOEuchMkXiQHoPaXb44Drvi2/B4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZAEJRl6pTFhItlhdvjoohlSmQTlwtxJDNbaFfQ+hTLKUbUq7KYCzG1id0/J1jWJKo8JM8WaN85khNaGvfFlJNHYe7R/X2MxCHSSGePpoWrA8/UWUAdVo2GPLZW51J3Jzdnl/2duaPDj/EAHV07CkNOPKdm7GyIOYODhF8HqgKRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=XRla2gT4; arc=none smtp.client-ip=74.125.224.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-yx1-f100.google.com with SMTP id 956f58d0204a3-6579254f996so3740469d50.1
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 14:22:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778620923; x=1779225723;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qb9aod9fXkT5Yr30wbkkJLdf8M7XH+2hxdPY5VgmBuE=;
-        b=DQZ9jPoQuJ5gYL+i8iaZdg49Z5/OSOeKVe4c46CIHOUkS04b8bFmmecLLTpcVhAapa
-         fnTjyfAxOXFPeDlPB11dJTFCf3sR/HGonMy19fvuFL335P5Ei80W+QQ/ItMMojRaptOZ
-         qBLf44z97NmoLocYgD10PWrdWbKa6oM2bJui92F0kI/IIofx7VrTOMShGFPizGpLrIBa
-         LBeKAbFay0+RSphfHv/SkMtwTOOAIU1FN4TBs1z6WaRLvVMfo7Y6VHrB4ItK8TUwaxeP
-         we9HRld+GY1dZQMotgHHlhNzJlDNofuMb2ZS4DbTRpDjWSJE2Xnb64RYTWgb7dl5rPtr
-         s4Gw==
-X-Gm-Message-State: AOJu0YwoMwjito8LU6RylwnJVfps+WaFweGTIK4c75qFKEjBfv9rS8AG
-	VKR2ooXgvOz1k+sxK5UljBTAkUfuc7ZIug2Mr91RNGoysGCNfs1B/T+URsA+WofoqKIhJYmKMtm
-	R07QbLV94oxSDZqkJQUB8CnO9kSNx8UD7+Ov6Ohvkl/buES7/f9v/LQW751W+MIHmdQbrZYQFDQ
-	3CJaM+dZ31jA5HfOzqpqvYtQNae7B5Mm7vIXrRJDGNRJfoX7bcCBKJsiJrpj7b29nsk8PWnJEeY
-	q3cr2colAc=
-X-Gm-Gg: Acq92OFMP7Fzxz38ML0X1fZuUky8VNhO9/xhg6Ts6aaWgt1Syc6Lh+BU18eDylzduG2
-	DnYFJ/xkVDPOSXJQGK55Jg5v8R2zOOwoKnDrnuHqHa54DFpu30dLLBV9bH7QhLYiswBjhDPW+eI
-	CWk0npitw3tkt+m9HmkBmexlVlr69azBVtSmqFYFUBJ4YA2pWfdVeRQepKgi6Ca3v2mvT7663Ti
-	9GfCt7vmFgY0DC19r3UcmzTxA+aFdITLCqoiht5yOoe79Y5hCTL+8ZlFqQTssITY13x/xMV9rlh
-	ibg9Vvs8z2KQjimTpGeLL2Z3TPNnaveHWJQfVFRCfDSGa2HP4l5WmQOaPIXJXvPIZT7L2Xyu6wo
-	Vq/JSEgueJE0WmeVRTyO8Kfcxx1SfdeO4KZFYQs8m5vaJNd0t6h/0AUkNw+YWO2NSqSL4xsi03P
-	dTjjws
-X-Received: by 2002:a05:690e:4147:b0:65d:b6ca:33fe with SMTP id 956f58d0204a3-65df82e538emr10192d50.50.1778620922761;
-        Tue, 12 May 2026 14:22:02 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com ([144.49.247.127])
-        by smtp-relay.gmail.com with ESMTPS id 956f58d0204a3-65d96b7deebsm1149934d50.15.2026.05.12.14.22.02
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 12 May 2026 14:22:02 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dl1-f69.google.com with SMTP id a92af1059eb24-12dc3d81736so5563714c88.1
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 14:22:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79EB737F019
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 21:22:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778620956; cv=pass; b=rFkuiBGKaZ3KEajyZKwrjuboXCeLLjzIF2tWsCC8ByIh/NAUyaNMzPeZj77bZVpkpF/QtT/9dCpFDCKm6IAL/ymX+yRQJ7Kp0e6DYXjLjOzjse9+/dlKqudsdkrS5mFkvdkF7yEe4gi48v+e7o+vTxXpqKxgJSAU9ClWnUcQOQc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778620956; c=relaxed/simple;
+	bh=PiDYevi2kgVcvyRTmr06usMvTBl/SGOPbnIPQRlvqb8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KeLxivplUgvr/rY0+7LyTbea9lSQI2uHkaTVmrKLCmBwz6DHX8VUk+NMJIwRH535hkpNes5CC3WbNebAyZJMU9uB1YVzftlJjYqcOM8/vOwKLx24X5RnBkQhCS/3QyOHN/SF76cXe59ciWB/KrQuhgvzA640g8qC3+/p9gkDH6U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=s1PvxHyi; arc=pass smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-7c0de780bf1so32760337b3.2
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 14:22:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778620953; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Qr5+9toFpJcArYPfddNvaTP8iKq3fVrthLnhymBxePGs+PXe6k++2WBjEEdHgfqxjB
+         v+cftu71TH24i2In7XnXE6FmgXQPb/uVvGhRfiOkHdShAdiX/OwWD4+YLXIkKL4p0X6M
+         OzM6JwVczsq/0q4lBqLTpxbG3LhsALWarKKpMkwwvGBOgMhCQf8I98QCr6FTDhvFOc/1
+         ypf+4a71TSeiw/bYFyuFSl92kILANsLs8P8yVfs2VZ7oJMaXEV+tXFZahWxqqMuuzRP3
+         KjLKr9Xxr0/e3KrErbM7lCPo/VnMhcYyDXgb9sbYYPmZFCcCaTqNOPnEQ4azLdflTjxv
+         On/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=3KuydEKLLJrXqUzzkqH1Oq4poBO4K1OP1ji2kRqJ9uI=;
+        fh=5yfaC6RlQV5LYdFVJ6qC9xVPheZaOVbiYpMSaAZX2B8=;
+        b=AOJ/wYPm7Ugs0/sSDW+4XNZRGFV8olXwWC4OK/aHWszZNGs0a+3sh6yvqAEI4wvWdn
+         XW3+rSdI7ePANWuf2ADl8vGEk6AaTyfTLvvxpqsvETUDUQmYXBDPx9QQT2it8Jk/n0No
+         TRFQFJMfglB0+HcP/qRCkuxXg3Dwd4YOcTyQ4mdizTQUGyHf5jw+Wq0700USqrIDomEk
+         g2pyW/GDaCnX87mTW2vJ92qg/FYfbC6Rv4O1XAiFQRV0atMJYJwXy36jXRxRmhE6BKds
+         oKvvGAQsPLMALRwDDjL6kNQusAD+c64iVHBZdaT3JfKQHURcM1nT4/TZq47QYQJszzTr
+         5wlg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1778620921; x=1779225721; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1778620953; x=1779225753; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Qb9aod9fXkT5Yr30wbkkJLdf8M7XH+2hxdPY5VgmBuE=;
-        b=XRla2gT44EVAwpRYRk8QEU83yY0FnmbH5rhdNQ3nKwA2blPLhMBRcRFNVe9ZUsr+yU
-         fyIMmqYKRkbyqkW9FSlJU+MZPWBcW0qPyIj6HJ0O48zv6axY1VqixRyEjO+DY+0XdHfA
-         SFHZ0qN55O0B1ZFxB7pLKjOAe7VRoYc9rMf+Q=
-X-Received: by 2002:a05:7022:1a81:b0:12b:f616:1a4e with SMTP id a92af1059eb24-1349ab4de06mr73300c88.23.1778620921293;
-        Tue, 12 May 2026 14:22:01 -0700 (PDT)
-X-Received: by 2002:a05:7022:1a81:b0:12b:f616:1a4e with SMTP id a92af1059eb24-1349ab4de06mr73276c88.23.1778620920741;
-        Tue, 12 May 2026 14:22:00 -0700 (PDT)
-Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-132787673ffsm26603202c88.15.2026.05.12.14.21.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 May 2026 14:21:59 -0700 (PDT)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next v2 15/15] bnxt_en: Add kTLS retransmission support
-Date: Tue, 12 May 2026 14:21:05 -0700
-Message-ID: <20260512212105.3488258-16-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.45.4
-In-Reply-To: <20260512212105.3488258-1-michael.chan@broadcom.com>
-References: <20260512212105.3488258-1-michael.chan@broadcom.com>
+        bh=3KuydEKLLJrXqUzzkqH1Oq4poBO4K1OP1ji2kRqJ9uI=;
+        b=s1PvxHyiAacYS+SqmWtq0dqNrDJnHfhs6NH1lQ6Bjx51gHrgAlSNIhkd9Djcy9PdgX
+         pVj/FGBfk6EC7zXiORaL5hzwkwhMc60gLd42DorXVC1/IT9XbKcS0bvlZNjz0cSsN86s
+         HW8T0hdplYXuI8VocEgnH63KG9uG9f5MJvIh63D+F9DvgtDwigVhmW2P1Y9oDWvvyqLX
+         RQf3AB7QN86vgLVN0W6C4O5IwQzdnKuna/WVvDlcMr3mgUxpTiZ1hkVRVqgNRf7LEc2x
+         hE60ft1n7WlrF9hpocG0ZNu5eJZ0E6WV11akcPTQ/3dg9SQ1MA8MRHoA4fPVd8DuhQ/4
+         j32Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778620953; x=1779225753;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=3KuydEKLLJrXqUzzkqH1Oq4poBO4K1OP1ji2kRqJ9uI=;
+        b=ImnAfXPD4Nc1D9+tPU8/ztPFpAmgIgs6W9CE58XdOATKzPJtLY68L+L4InnG1RJkp8
+         0WlhmQV8WBOuIAubDjxU9qbyfsEMmtOZP1rscYahFNj8gC0syVto3LqMtn44zZtf2aKF
+         cVtihztfOkFIvTJvTx0fx/sstqrJjQmrsyrqysEfP2w4JLgecDepmVK/Usg230xBGE5p
+         YnOUDVuNrOiop+T739Po4U+70Ur7cPWR3q2uzyL6hqjIAQhjeTzZ6zF7IDs2Ku9+B2QH
+         rfC3gvNVxleoH0tlqlNlbw1AkydguXwy33Cub0E86lJ5LPut95oEK1NM/VUVx7JAMhxC
+         W+ow==
+X-Forwarded-Encrypted: i=1; AFNElJ+lmiqyeUBLslDP2xZUN7eudDBTKzR8kd0EGJDc79ZWeW7JJf3K2HYVsK+SnEfdRbQSASPCmA0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaGHTfRa7oXUb7WH/vWB6bYS1YJFpX9148CKF6WTNeev3REQIX
+	PwLX8E/I3uKhEMT3aXfSD7SurzJIlgok2kd2EvqSpDur75+9iGbEgCkGC1A/1YRkFrJCeuGc60V
+	kr5F0eqwb0ij2BguL4BLvcYiBxSZrCRZXQsFa
+X-Gm-Gg: Acq92OEVEdK+0gYN3072HKeFKcdrMAZsjp6t3HkJoBU8/+K6s/3G18IsEeivrZg35fe
+	GDXRJH3U3vfluL9WNwQ5jx20i2Mubu+CVuD+7qWjUtbgEWpeAbcUSpRMbpumS0MiAtD/DHO99Ag
+	IH0y6GkSWray8qDIxMMxra9ySISqnl+29mMfL0iB9kBb7PehvBJ2/OUxI1ySjzOoVOybcDhTtuv
+	+PECMzdZWBiGN6NzMYgerL/CPA3t+XVxZg/qJKqo0Hw4qmkuj2HFgqRiMNi1LsmSrVI9rO0Umgh
+	Oyj+l2klbUngDrOP0PFqvbM=
+X-Received: by 2002:a05:690c:e1d8:20b0:7bf:424:bf6b with SMTP id
+ 00721157ae682-7c6a9f2df4dmr5357877b3.14.1778620953441; Tue, 12 May 2026
+ 14:22:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Rspamd-Queue-Id: E322C52A42A
+References: <20260506142709.2298255-1-ameryhung@gmail.com> <20260506142709.2298255-9-ameryhung@gmail.com>
+ <cfdb2d4af893d70bcb15bcc22d6467f800b7291f.camel@gmail.com>
+In-Reply-To: <cfdb2d4af893d70bcb15bcc22d6467f800b7291f.camel@gmail.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Tue, 12 May 2026 23:22:20 +0200
+X-Gm-Features: AVHnY4KL5O_WnB5HWg9pGPB5V8Psv_hjQSNaVwa-FNe_x5m6XeUyNhDo48F-8aQ
+Message-ID: <CAMB2axO3pL5uCLL-=Ov7Nnyf7_=8tL+j0vUNHRV=Z8EFg66hyQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v4 08/12] bpf: Unify release handling for helpers
+ and kfuncs
+To: Eduard Zingerman <eddyz87@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, memxor@gmail.com, 
+	martin.lau@kernel.org, mykyta.yatsenko5@gmail.com, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 2160452A3A2
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287323-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287324-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:email,broadcom.com:mid,broadcom.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-If TCP retransmits a TLS packet that requires encryption by the NIC, the
-TCP sequence number will go backwards and the hardware will require some
-assistance from the driver.  The driver needs to retrieve the TLS record
-that covers the byte sequence of the retransmitted packet.  If the
-retransmitted packet does not include the tag, the hardware can simply
-encrypt the packet using the informtaion in the TLS record.
+On Tue, May 12, 2026 at 1:20=E2=80=AFPM Eduard Zingerman <eddyz87@gmail.com=
+> wrote:
+>
+> On Wed, 2026-05-06 at 07:27 -0700, Amery Hung wrote:
+>
+> LGTM, one question below.
+>
+> > @@ -8010,28 +8010,15 @@ static int check_func_arg(struct bpf_verifier_e=
+nv *env, u32 arg,
+> >               return err;
+> >
+> >  skip_type_check:
+> > -     if (arg_type_is_release(arg_type)) {
+> > -             if (!arg_type_is_dynptr(arg_type) && !reg->ref_obj_id && =
+!bpf_register_is_null(reg)) {
+> > -                     verbose(env, "R%d must be referenced when passed =
+to release function\n",
+> > -                             regno);
+> > -                     return -EINVAL;
+> > -             }
+> > -             if (meta->release_regno) {
+> > -                     verifier_bug(env, "more than one release argument=
+");
+> > -                     return -EFAULT;
+> > -             }
+> > -             meta->release_regno =3D regno;
+> > +     if (arg_type_is_release(arg_type) && !arg_type_is_dynptr(arg_type=
+) &&
+> > +         !reg->ref_obj_id && !bpf_register_is_null(reg)) {
+> > +             verbose(env, "release helper %s expects referenced PTR_TO=
+_BTF_ID passed to %s\n",
+> > +                     func_id_name(meta->func_id), reg_arg_name(env, ar=
+gno));
+> > +             return -EINVAL;
+>
+> Nit: a similar check is added in check_kfunc_args(),
+>      can these be wrapped in some utility function?
 
-The driver provides the TLS record information for the retransmitted
-packet in the presync TX BD.  The presync TX BD introduced in the last
-patch is treated very much like a TX push BD with inline data.  The only
-exception is that no SKB will be stored for the presync TX BD.
+Make sense.
 
-Retransmission that includes the TLS tag will be handled in future
-patches.
+>
+> >       }
+> >
+> > -     if (reg->ref_obj_id && base_type(arg_type) !=3D ARG_KPTR_XCHG_DES=
+T) {
+> > -             if (meta->release_regno && meta->ref_obj.cnt) {
+> > -                     verbose(env, "more than one arg with ref_obj_id %=
+s %u %u",
+> > -                             reg_arg_name(env, argno), reg->ref_obj_id=
+,
+> > -                             meta->ref_obj.ref_obj_id);
+> > -                     return -EACCES;
+> > -             }
+> > +     if (reg->ref_obj_id)
+> >               update_ref_obj(&meta->ref_obj, reg);
+> > -     }
+> >
+> >       switch (base_type(arg_type)) {
+> >       case ARG_CONST_MAP_PTR:
+>
+> [...]
+>
+> > @@ -9825,7 +9883,7 @@ static int check_helper_call(struct bpf_verifier_=
+env *env, struct bpf_insn *insn
+> >       memset(&meta, 0, sizeof(meta));
+> >       meta.pkt_access =3D fn->pkt_access;
+> >
+> > -     err =3D check_func_proto(fn);
+> > +     err =3D check_func_proto(fn, &meta);
+> >       if (err) {
+> >               verifier_bug(env, "incorrect func proto %s#%d", func_id_n=
+ame(func_id), func_id);
+> >               return err;
+> > @@ -9870,37 +9928,11 @@ static int check_helper_call(struct bpf_verifie=
+r_env *env, struct bpf_insn *insn
+> >       }
+> >
+> >       if (meta.release_regno) {
+> > -             err =3D -EINVAL;
+> > -             if (arg_type_is_dynptr(fn->arg_type[meta.release_regno - =
+BPF_REG_1])) {
+> > -                     err =3D unmark_stack_slots_dynptr(env, &regs[meta=
+.release_regno]);
+> > -             } else if (func_id =3D=3D BPF_FUNC_kptr_xchg && meta.ref_=
+obj.ref_obj_id) {
+> > -                     u32 ref_obj_id =3D meta.ref_obj.ref_obj_id;
+> > -                     bool in_rcu =3D in_rcu_cs(env);
+> > -                     struct bpf_func_state *state;
+> > -                     struct bpf_reg_state *reg;
+> > -
+> > -                     err =3D release_reference_nomark(env->cur_state, =
+ref_obj_id);
+> > -                     if (!err) {
+> > -                             bpf_for_each_reg_in_vstate(env->cur_state=
+, state, reg, ({
+> > -                                     if (reg->ref_obj_id =3D=3D ref_ob=
+j_id) {
+> > -                                             if (in_rcu && (reg->type =
+& MEM_ALLOC) && (reg->type & MEM_PERCPU)) {
+> > -                                                     reg->ref_obj_id =
+=3D 0;
+> > -                                                     reg->type &=3D ~M=
+EM_ALLOC;
+> > -                                                     reg->type |=3D ME=
+M_RCU;
+> > -                                             } else {
+> > -                                                     mark_reg_invalid(=
+env, reg);
+>
+> Note: release_reg() does not have this 'else' path, but it seem to be not=
+ a problem,
+>       assuming that MEM_ALLOC | MEM_PERCPU registers are generated only f=
+rom some
+>       other cmp_xchg call. Is that the case?
 
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |   2 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   2 +
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |   2 +
- .../net/ethernet/broadcom/bnxt/bnxt_ktls.c    | 126 +++++++++++++++++-
- 4 files changed, 128 insertions(+), 4 deletions(-)
+AFAIK, percpu allocated objects (i.e., MEM_ALLOC | MEM_PERCPU
+registers) only come from bpf_kptr_xchg() and bpf_percpu_obj_new(). We
+don't have a mechanism to derive registers from percpu allocated
+objects such that we need to mark_reg_invalid when calling
+bpf_kptr_xchg().
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 89c900db45ba..5697190dc541 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -499,7 +499,6 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 
- 	txq = netdev_get_tx_queue(dev, i);
- 	txr = &bp->tx_ring[bp->tx_ring_map[i]];
--	prod = txr->tx_prod;
- 
- #if (MAX_SKB_FRAGS > TX_MAX_FRAGS)
- 	if (skb_shinfo(skb)->nr_frags > TX_MAX_FRAGS) {
-@@ -532,6 +531,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	if (unlikely(!skb))
- 		return NETDEV_TX_OK;
- 
-+	prod = txr->tx_prod;
- 	length = skb->len;
- 	len = skb_headlen(skb);
- 	last_frag = skb_shinfo(skb)->nr_frags;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index e0880b8c4b73..696dfe522c7b 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1188,6 +1188,8 @@ struct bnxt_cmn_sw_stats {
- enum bnxt_ktls_data_counters {
- 	BNXT_KTLS_TX_PKTS = 0,
- 	BNXT_KTLS_TX_BYTES,
-+	BNXT_KTLS_TX_OOO_PKTS,
-+	BNXT_KTLS_TX_DROP_NO_SYNC,
- 
- 	BNXT_KTLS_MAX_DATA_COUNTERS,
- };
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 66b323e94140..769058a6ec31 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -359,6 +359,8 @@ static const char *const bnxt_ring_drv_stats_arr[] = {
- static const char *const bnxt_ktls_data_stats[] = {
- 	[BNXT_KTLS_TX_PKTS]		= "tx_tls_encrypted_packets",
- 	[BNXT_KTLS_TX_BYTES]		= "tx_tls_encrypted_bytes",
-+	[BNXT_KTLS_TX_OOO_PKTS]		= "tx_tls_ooo_packets",
-+	[BNXT_KTLS_TX_DROP_NO_SYNC]	= "tx_tls_drop_no_sync",
- };
- 
- /* kTLS control plane counter strings indexed by enum bnxt_ktls_ctrl_counters */
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c
-index 263b075af621..b94418ee5436 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c
-@@ -289,6 +289,116 @@ int bnxt_ktls_init(struct bnxt *bp)
- 	return 0;
- }
- 
-+static void bnxt_ktls_pre_xmit(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
-+			       u32 kid, struct crypto_prefix_cmd *pre_cmd)
-+{
-+	struct bnxt_sw_tx_bd *tx_buf;
-+	struct tx_bd_presync *psbd;
-+	u32 bd_space, space;
-+	u8 *pcmd;
-+	u16 prod;
-+
-+	prod = txr->tx_prod;
-+	tx_buf = &txr->tx_buf_ring[RING_TX(bp, prod)];
-+
-+	psbd = (void *)&txr->tx_desc_ring[TX_RING(bp, prod)][TX_IDX(prod)];
-+	psbd->tx_bd_len_flags_type = CRYPTO_PRESYNC_BD_CMD;
-+	psbd->tx_bd_kid = cpu_to_le32(BNXT_KID_HW(kid));
-+	psbd->tx_bd_opaque =
-+		SET_TX_OPAQUE(bp, txr, prod, CRYPTO_PREFIX_CMD_BDS + 1);
-+
-+	prod = NEXT_TX(prod);
-+	pcmd = (void *)&txr->tx_desc_ring[TX_RING(bp, prod)][TX_IDX(prod)];
-+	bd_space = TX_DESC_CNT - TX_IDX(prod);
-+	space = bd_space * sizeof(struct tx_bd);
-+	if (space >= CRYPTO_PREFIX_CMD_SIZE) {
-+		memcpy(pcmd, pre_cmd, CRYPTO_PREFIX_CMD_SIZE);
-+		prod += CRYPTO_PREFIX_CMD_BDS;
-+	} else {
-+		memcpy(pcmd, pre_cmd, space);
-+		prod += bd_space;
-+		pcmd = (void *)&txr->tx_desc_ring[TX_RING(bp, prod)][TX_IDX(prod)];
-+		memcpy(pcmd, (u8 *)pre_cmd + space,
-+		       CRYPTO_PREFIX_CMD_SIZE - space);
-+		prod += CRYPTO_PREFIX_CMD_BDS - bd_space;
-+	}
-+	txr->tx_prod = prod;
-+	tx_buf->is_push = 1;
-+	/* Minus 1 since the header psbd is a single entry short BD */
-+	tx_buf->inline_data_bds = CRYPTO_PREFIX_CMD_BDS - 1;
-+}
-+
-+static int bnxt_ktls_tx_ooo(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
-+			    struct sk_buff *skb, u32 payload_len, u32 seq,
-+			    struct tls_context *tls_ctx)
-+{
-+	struct bnxt_sw_stats *sw_stats = txr->tx_cpr->sw_stats;
-+	struct tls_offload_context_tx *tx_tls_ctx;
-+	struct bnxt_ktls_offload_ctx_tx *kctx_tx;
-+	u32 hdr_tcp_seq, end_seq, total_bds;
-+	struct crypto_prefix_cmd pcmd = {};
-+	struct tls_record_info *record;
-+	unsigned long flags;
-+	bool fwd = false;
-+	u64 rec_sn;
-+	u8 *hdr;
-+	int rc;
-+
-+	tx_tls_ctx = tls_offload_ctx_tx(tls_ctx);
-+	kctx_tx = __tls_driver_ctx(tls_ctx, TLS_OFFLOAD_CTX_DIR_TX);
-+	end_seq = seq + skb->len - skb_tcp_all_headers(skb);
-+	if (unlikely(after(seq, kctx_tx->tcp_seq_no) ||
-+		     after(end_seq, kctx_tx->tcp_seq_no))) {
-+		fwd = true;
-+		pcmd.flags = CRYPTO_PREFIX_CMD_FLAGS_UPDATE_IN_ORDER_VAR_LE;
-+	}
-+
-+	spin_lock_irqsave(&tx_tls_ctx->lock, flags);
-+	record = tls_get_record(tx_tls_ctx, seq, &rec_sn);
-+	if (!record || !record->num_frags) {
-+		rc = -EPROTO;
-+		sw_stats->tls.counters[BNXT_KTLS_TX_DROP_NO_SYNC]++;
-+		goto unlock_exit;
-+	}
-+	hdr_tcp_seq = tls_record_start_seq(record);
-+	hdr = skb_frag_address_safe(&record->frags[0]);
-+
-+	total_bds = CRYPTO_PRESYNC_BDS + skb_shinfo(skb)->nr_frags + 2;
-+	if (bnxt_tx_avail(bp, txr) < total_bds) {
-+		rc = -ENOSPC;
-+		goto unlock_exit;
-+	}
-+
-+	if (before(record->end_seq - tls_ctx->prot_info.tag_size,
-+		   seq + payload_len)) {
-+		/* retransmission includes tag bytes */
-+		rc = -EOPNOTSUPP;
-+		goto unlock_exit;
-+	}
-+	pcmd.header_tcp_seq_num = cpu_to_le32(hdr_tcp_seq);
-+	pcmd.start_tcp_seq_num = cpu_to_le32(seq);
-+	pcmd.end_tcp_seq_num = cpu_to_le32(seq + payload_len - 1);
-+	if (tls_ctx->prot_info.version == TLS_1_2_VERSION) {
-+		u32 nonce_bytes = tls_ctx->prot_info.iv_size;
-+		u32 retrans_off = seq - hdr_tcp_seq;
-+
-+		if (retrans_off > 5 && retrans_off < 5 + nonce_bytes)
-+			nonce_bytes = retrans_off - 5;
-+		memcpy(pcmd.explicit_nonce, hdr + 5, nonce_bytes);
-+	}
-+	memcpy(&pcmd.record_seq_num[0], &rec_sn, sizeof(rec_sn));
-+
-+	rc = 0;
-+	bnxt_ktls_pre_xmit(bp, txr, kctx_tx->kid, &pcmd);
-+
-+	if (fwd)
-+		kctx_tx->tcp_seq_no = end_seq;
-+
-+unlock_exit:
-+	spin_unlock_irqrestore(&tx_tls_ctx->lock, flags);
-+	return rc;
-+}
-+
- struct sk_buff *bnxt_ktls_xmit(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
- 			       struct sk_buff *skb, __le32 *lflags, u32 *kid)
- {
-@@ -297,6 +407,7 @@ struct sk_buff *bnxt_ktls_xmit(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
- 	struct bnxt_ktls_offload_ctx_tx *kctx_tx;
- 	struct tls_context *tls_ctx;
- 	u32 seq, payload_len;
-+	int rc;
- 
- 	if (!IS_ENABLED(CONFIG_TLS_DEVICE) || !ktls ||
- 	    !tls_is_skb_tx_device_offloaded(skb))
-@@ -316,9 +427,18 @@ struct sk_buff *bnxt_ktls_xmit(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
- 		sw_stats->tls.counters[BNXT_KTLS_TX_PKTS]++;
- 		sw_stats->tls.counters[BNXT_KTLS_TX_BYTES] += payload_len;
- 	} else {
--		skb = tls_encrypt_skb(skb);
--		if (!skb)
--			return NULL;
-+		sw_stats->tls.counters[BNXT_KTLS_TX_OOO_PKTS]++;
-+
-+		rc = bnxt_ktls_tx_ooo(bp, txr, skb, payload_len, seq, tls_ctx);
-+		if (rc)
-+			return tls_encrypt_skb(skb);
-+
-+		*kid = BNXT_KID_HW(kctx_tx->kid);
-+		*lflags |= cpu_to_le32(TX_BD_FLAGS_CRYPTO_EN |
-+				       BNXT_TX_KID_LO(*kid));
-+		sw_stats->tls.counters[BNXT_KTLS_TX_PKTS]++;
-+		sw_stats->tls.counters[BNXT_KTLS_TX_BYTES] += payload_len;
-+		return skb;
- 	}
- 	return skb;
- }
--- 
-2.51.0
+If there is such case in the future, maybe we can do the following in
+release_reg() then
 
+        if (convert_rcu)
+                err =3D ref_convert_alloc_rcu_protected(env, reg->ref_obj_i=
+d);
+
+        if (release_dynptr)
+                err =3D unmark_stack_slots_dynptr(env, reg);
+        else if (reg->ref_obj_id)
+                err =3D release_reference(env, reg->ref_obj_id);
+        else if (bpf_register_is_null(reg))
+                err =3D 0;
+
+
+>
+> > -                                             }
+> > -                                     }
+> > -                             }));
+> > -                     }
+> > -             } else if (meta.ref_obj.ref_obj_id) {
+> > -                     err =3D release_reference(env, meta.ref_obj.ref_o=
+bj_id);
+> > -             } else if (bpf_register_is_null(&regs[meta.release_regno]=
+)) {
+> > -                     /* meta.ref_obj.ref_obj_id can only be 0 if regis=
+ter that is meant to be
+> > -                      * released is NULL, which must be > R0.
+> > -                      */
+> > -                     err =3D 0;
+> > -             }
+> > +             struct bpf_reg_state *reg =3D &regs[meta.release_regno];
+> > +             bool convert_rcu =3D (func_id =3D=3D BPF_FUNC_kptr_xchg) =
+&& in_rcu_cs(env) &&
+> > +                                (reg->type & MEM_ALLOC) && (reg->type =
+& MEM_PERCPU);
+> > +
+> > +             err =3D release_reg(env, reg, convert_rcu, !!meta.dynptr.=
+ref_obj_id);
+> >               if (err)
+> >                       return err;
+> >       }
+>
+> [...]
+>
+> > @@ -11609,18 +11640,16 @@ static int check_kfunc_args(struct bpf_verifi=
+er_env *env, struct bpf_kfunc_call_
+> >                       return -EACCES;
+> >               }
+> >
+> > -             if (reg->ref_obj_id) {
+> > -                     if (is_kfunc_release(meta) && meta->ref_obj.cnt) =
+{
+> > -                             verbose(env, "more than one arg with ref_=
+obj_id %s %u %u",
+> > -                                     reg_arg_name(env, argno), reg->re=
+f_obj_id,
+> > -                                     meta->ref_obj.ref_obj_id);
+> > -                             return -EFAULT;
+> > -                     }
+> > -                     update_ref_obj(&meta->ref_obj, reg);
+> > -                     if (is_kfunc_release(meta))
+> > -                             meta->release_regno =3D regno;
+> > +             if (regno =3D=3D meta->release_regno && !is_kfunc_arg_dyn=
+ptr(meta->btf, &args[i]) &&
+> > +                 !reg->ref_obj_id && !bpf_register_is_null(reg)) {
+> > +                     verbose(env, "release kfunc %s expects referenced=
+ PTR_TO_BTF_ID passed to %s\n",
+> > +                             func_name, reg_arg_name(env, argno));
+> > +                     return -EINVAL;
+> >               }
+> >
+> > +             if (reg->ref_obj_id)
+> > +                     update_ref_obj(&meta->ref_obj, reg);
+> > +
+> >               ref_t =3D btf_type_skip_modifiers(btf, t->type, &ref_id);
+> >               ref_tname =3D btf_name_by_offset(btf, ref_t->name_off);
+> >
+>
+> [...]
 
