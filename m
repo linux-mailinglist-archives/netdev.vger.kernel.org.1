@@ -1,122 +1,184 @@
-Return-Path: <netdev+bounces-287121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287122-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mG2VBQIjA2r10gEAu9opvQ
-	(envelope-from <netdev+bounces-287121-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 14:54:26 +0200
+	id IPHKACkjA2oF1AEAu9opvQ
+	(envelope-from <netdev+bounces-287122-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 14:55:05 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7315E520799
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 14:54:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 14C645207D3
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 14:55:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BE00230BCD4F
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 12:49:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0149D30C1BDC
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 12:49:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19EF337DAB3;
-	Tue, 12 May 2026 12:44:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34D5D3911A7;
+	Tue, 12 May 2026 12:44:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EdIWecXn"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="Wxto0oRV"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5903AB5D4;
-	Tue, 12 May 2026 12:44:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64AE3911D9;
+	Tue, 12 May 2026 12:44:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778589860; cv=none; b=mOJ0D97cbeAshUHUB5szn4MQDq1MtjE9mwWvdtFQtQlTxxtl9h5IqDkNmaYIdxx13DOQJ1/TcE2ORIQFMnPzGOxk6e7CXTz2aOqFsJRsMUFT7PYTZaJZcMXJcySeWDVJwD0cGkGc9NPFW7CbGWBnwd9+lUCZZoo0lgmnVrjCc3U=
+	t=1778589891; cv=none; b=h2j0JlTqWC4qlY1Mla8vp2nkak5OVTpNfbRrfgtAFMHNFgFNiX9usBFgDLmX6cr3rWE2mUss3uhXuoA5l0aIqr6fswzRLs+fWTuP+uJlMZ+czCpENaBFuPZt3ZNUckuE3zXnuw05GFYDwBuZD29wp6hvVYNm/HDf4aiI9do3BsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778589860; c=relaxed/simple;
-	bh=ynnjv97wfx/V36rrNYcpM4Ajjb87ua0e4tF3T4P8P70=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pMP1XoC6YGt9ZV/iYUTfCO7AbUUCT05jGR4BT/iUvt4nv8dEWTEyekmtp5ku0KZlZsLJmwSCQTNnWNKm9+nKXH+ZBEd4F1Ppfa7i2PYy43CGiRO2LDbxyG/O1qB+JWFuE54oZBekWjPjWS9KDji+oRRvEMCHOOHz1iXbFFIWS3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EdIWecXn; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=lYPN7aWKZlgH0kIpN2gEWZFs4l/E1/Sd8KYgxMgHv9I=; b=EdIWecXn9FLmtKOpxElIumvSN7
-	0f8evQ8X7XV6zr+MFoBSJYHWegzcQUYPf9v99yioakDL5ynkBLYtQE2XW0BWMHsnKL+AWEk4vDYoi
-	HegdKl7bVr4rYFS4F3bD6rSstwk+P6xV0qZ9Vm8vt534o18Lt3fPMIsScVyy3TB/E43s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wMmSo-002XrU-Pa; Tue, 12 May 2026 14:43:54 +0200
-Date: Tue, 12 May 2026 14:43:54 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, kevin-kw.huang@airoha.com,
-	macpaul.lin@mediatek.com, matthias.bgg@gmail.com,
-	kernel@collabora.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 2/6] net: phy: Add Airoha phy library for
- shared code
-Message-ID: <e8820956-7f75-41f4-80ab-a0fca1637072@lunn.ch>
-References: <20260512-add-airoha-an8801-support-v3-0-1edb34e363ae@collabora.com>
- <20260512-add-airoha-an8801-support-v3-2-1edb34e363ae@collabora.com>
+	s=arc-20240116; t=1778589891; c=relaxed/simple;
+	bh=Q0obD3xzN18rb3XSvaXpjpOgoMjOJVx1jBabrGM3jQw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gWPvVLfj67Gyy56fo3raYkgfnpz8juzhLE6j0svIiEeP6e/6hZq/I2i6f2ml21x7waovssh4HGaUKVbDFQ0m5lGqeZ/lOAQEG5+TIdJXb7siTTJZiOdSE708a/AzpBDmANwC4os6r0df9eYVQHWwD7BvBxRGqqK9Bxtes7zJ1Gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=Wxto0oRV; arc=none smtp.client-ip=54.204.34.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1778589870;
+	bh=1UThKq31Wk9hNnaI3jbgCJkR9UC1fzXczgv8uwTYgnA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=Wxto0oRVOlhPnjZ0+B2S1LexLO+MOilJe02L/A36FV9sz/eO/UT9a3N/TAOTQoDWx
+	 ThNBqJMBh53MTtp8JISh4b+WTzAzc7AdEXHjBEg2uFPCPr1advglt0tWlYWg3syPte
+	 LOY03ZLy7dwYPU8b4jKe7AhPWwCf6g8xg4kSQxyo=
+X-QQ-mid: zesmtpip3t1778589855t9dd58392
+X-QQ-Originating-IP: Ag63rSN4qCk1EFrhJNSHdwBags9UmwA96BsdR6ZI5DY=
+Received: from PEN202512010004 ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 12 May 2026 20:44:13 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 3155177221628480154
+EX-QQ-RecipientCnt: 13
+From: Xu Rao <raoxu@uniontech.com>
+To: davem@davemloft.net
+Cc: edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	kuniyu@google.com,
+	willemb@google.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	dsahern@kernel.org,
+	idosch@nvidia.com,
+	Xu Rao <raoxu@uniontech.com>,
+	syzbot+e2af46126e0644cbebdd@syzkaller.appspotmail.com
+Subject: [PATCH net v2] ipv6: addrconf: skip autoconf on unregistering devices
+Date: Tue, 12 May 2026 20:44:10 +0800
+Message-ID: <1BEC9A31C1E03F38+20260512124410.719476-1-raoxu@uniontech.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260512-add-airoha-an8801-support-v3-2-1edb34e363ae@collabora.com>
-X-Rspamd-Queue-Id: 7315E520799
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: M5AoSkhGr8pkymhH0hMlH35t/aljJ7xydmP1mTCVY5dDmqbOofZ9y1YP
+	YUAuUead4wN8HKcyQWlJZlnrZKZzKnLlHPF6ePt9UrZMwnD8/MU9lrm3xAWEcFEMJB41nrY
+	HD9/DGvQjuzJhy+/JiZqqMw9xJn5MIaKkUBh7og+niQndDPzWqRPKbNtZgQUk+DvI3iya/5
+	qRdyUfKJweBPL2zCMJHH6L7o15wg4sSl1P2Ywvi3lqGv/J8dJ6X5ZjbCQ6BsW24MZaXh/Nk
+	ZFg4rCnPZP9AB0Tlh5baOJ20doyS1eZPEVffY1AMokPo8tHBl/pLd0dQ3cmJb6FJbAX+XNt
+	o9NSQMMG9z7LNHgqyOKPNE0gCoww6Zpz8f8ROg1BjhgEpvOyb2isbVP4CS1uGeAMc73ykKE
+	sJDUeZvqEyxIu7WH8s2FRaqdILa+DcWUfXlD6vQMNG6Rf2y8PFpyUNZ5s8q8SYCfQOttF4O
+	p2sfRz0Pq+Rkposg0FYRp0NwqOCKkTe7dRw8GA1Tnqv84VUFDRQWPY9QHTwK/0pfk9vRLKt
+	CkRQHb4wp+ftTco6pY6sWaxOJdg8S/MalFYdHp/PTtR3/rBX/9X+/0iZE1G7pnyxqGWaqel
+	GGfb4lpDJcuQN7pT6CeALspv0W+QGB5iKISMug2KXuGC7eHj2Q8qgQHKqaTNqEv9yqPTo95
+	zhhkTCuoQzIE0xcsz8qKkwSzvKGX2X3Gwiz4lu42Q+bDGCAuyA/BTmn8D6ldIDnmPLOuEfZ
+	ZSxM2EJ0RJHfxpmrEn1Vn581Jlzla1Szttq5Y8dfPbOq5xac3s22Od9drg4NHiC8zHxn0OK
+	LPKhX3h4+O7BsV0ehTpmYBzzMZbDMGKjVB2WytLoTaMqLu9Y74wCy7HVcGn88FMxrXBhW+a
+	TAc1+V7ld/k/hQtcFRmEkMax1D0ZQHsONjRYwkqPykB8qr2FwXhF/kgovLkNsYL7eVs8/vR
+	XQ6UTesdnUO4B8cSs8T/OP1OJ6KrfYUeTie6rDSMf+Z8s2Uk6orrhrTVYJS2NMrQhovI4Rx
+	j+8rISYQ==
+X-QQ-XMRINFO: MPJ6Tf5t3I/ylTmHUqvI8+Wpn+Gzalws3A==
+X-QQ-RECHKSPAM: 0
+X-Rspamd-Queue-Id: 14C645207D3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[uniontech.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[uniontech.com:s=onoh2408];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287121-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,collabora.com,gmail.com,armlinux.org.uk,airoha.com,mediatek.com,vger.kernel.org,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-287122-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[raoxu@uniontech.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[uniontech.com:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,e2af46126e0644cbebdd];
+	NEURAL_HAM(-0.00)[-0.993];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:email,lunn.ch:mid,lunn.ch:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[uniontech.com:email,uniontech.com:mid,uniontech.com:dkim]
 X-Rspamd-Action: no action
 
-On Tue, May 12, 2026 at 06:33:19AM +0200, Louis-Alexis Eyraud wrote:
-> In preparation of Airoha AN8801R PHY support, split out the interface
-> functions that will be common between the already present air_en8811h
-> driver and the new one, and put them into a new library named
-> air_phy_lib.
-> 
-> Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+syzbot reports that unregister_netdevice() can wait forever for a
+netdevsim device whose reference count never drops to zero.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+The leaked reference is held by an IPv6 local route created from
+addrconf.  A late NETDEV_CHANGE notification can still reach
+addrconf_notify() after the device has entered NETREG_UNREGISTERING.
+The handler can then run automatic address configuration, add a
+link-local address and install its host route after unregister teardown
+has already started.  The route nexthop takes a netdev reference in
+fib6_nh_init(), and there might not be a later ifdown pass to remove
+the newly created address and route.
 
-    Andrew
+Do not run MTU, UP or CHANGE based IPv6 autoconfiguration once the
+device is unregistering.  Keep NETDEV_DOWN and NETDEV_UNREGISTER
+handling unchanged so the teardown path can still remove existing IPv6
+state.
+
+Reported-by: syzbot+e2af46126e0644cbebdd@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=e2af46126e0644cbebdd
+Signed-off-by: Xu Rao <raoxu@uniontech.com>
+---
+v2:
+- Drop READ_ONCE() around dev->reg_state.  addrconf_notify() is called
+  from the netdevice notifier path, so a plain load is sufficient.
+- Do not add a Fixes tag.  The issue does not appear to be caused by a
+  single commit, but by a long-standing unregister-time lifecycle gap.
+
+ net/ipv6/addrconf.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 5476b6536eb7..a517e57cf86a 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -3666,6 +3666,9 @@ static int addrconf_notify(struct notifier_block *this, unsigned long event,
+ 		break;
+
+ 	case NETDEV_CHANGEMTU:
++		if (dev->reg_state == NETREG_UNREGISTERING)
++			break;
++
+ 		/* if MTU under IPV6_MIN_MTU stop IPv6 on this interface. */
+ 		if (dev->mtu < IPV6_MIN_MTU) {
+ 			addrconf_ifdown(dev, dev != net->loopback_dev);
+@@ -3691,6 +3694,9 @@ static int addrconf_notify(struct notifier_block *this, unsigned long event,
+ 		fallthrough;
+ 	case NETDEV_UP:
+ 	case NETDEV_CHANGE:
++		if (dev->reg_state == NETREG_UNREGISTERING)
++			break;
++
+ 		if (idev && idev->cnf.disable_ipv6)
+ 			break;
+
+--
+2.50.1
 
