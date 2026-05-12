@@ -1,277 +1,234 @@
-Return-Path: <netdev+bounces-287058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287059-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uJ/aHfv8AmqrzQEAu9opvQ
-	(envelope-from <netdev+bounces-287058-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 12:12:11 +0200
+	id AKTWOXP8AmpOzQEAu9opvQ
+	(envelope-from <netdev+bounces-287059-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 12:09:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCF1E51E522
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 12:12:10 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB3D351E4B8
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 12:09:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C2270304CEB4
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:07:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D703B300F5D9
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:09:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BD914C77AA;
-	Tue, 12 May 2026 10:07:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBED83ACF0F;
+	Tue, 12 May 2026 10:09:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="aCR5cVer";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="eNRpbl//"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="GEf9Sz8o";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="wDkhbfqI"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C4B3AC0D3
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 10:07:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691F6346AC4
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 10:09:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778580430; cv=none; b=nxIlY+IVweQfj3xefgP4ipNu1Nb6ULYYNTwQp4iZ4B0wuS3s/rF6xH3Qs6dkjSWKNuDkxjwm592xMRwr0lHUs8CqHpnmTlkg38w5hw65DqjrxPSM9P5G/BVB8ia2XBdj77K4+DvuhM5xQNYHf5Gr1GP0QsSyi6qTZo3QnwAMof8=
+	t=1778580590; cv=none; b=nfiPq/7a2kas61ID4zKd+xCfof0J9MEm28dRSTnl5s1SPuDZ/Fuj7sl76VIhcy1hYHxIFvnztu16b9wZ2VmjTye37r0Nw4b28PLdXDzDw9NXwqklGn/QBLQVa5m/iTK5mYK//ekAahLqKXAuSNCGBfRuf7g+OQjMYTxVfpZaB5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778580430; c=relaxed/simple;
-	bh=h0i4ieS/BkyXiFtwoxy7yihh3Nl6Xo9jU/58MwAo/R8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NbvJpYrPRkLh/C9g2ZP+d7QuS1hkzgJLNx0BOd5hMs1RFBkwJf2z05kP4ulZQ7H+ksKn+l8i8DLj+yrpHKGjCuUg8RTyIoTqicZxHLSWqFFKR5YthI23YGGnFnu/8T5+jSYp9ypwZdiSgBhZFiPJfSkT1KtLZleVMK/qPNHJYbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=aCR5cVer; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=eNRpbl//; arc=none smtp.client-ip=202.12.124.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id A29667A011F;
-	Tue, 12 May 2026 06:07:06 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-03.internal (MEProxy); Tue, 12 May 2026 06:07:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1778580426; x=
-	1778666826; bh=fvByL/bwiqxIfeftWHoaHQZg8eSZadJNGAhfU4qTq98=; b=a
-	CR5cVerUaogJl1xlcSx10/CikMgqf8P8uM/lPwsAU5i0NNSHSJ5QQzbvUxqBDjR9
-	/3LemY/e5Xf3g+0jTcWKjXe2cxzTxhw06JzxSwb3b1DTRWqnCfpe2xlsl/jG/AK1
-	4f2bgLfafklgGWUtcs7ZO5heCsU7gERUomS9SkT1RPh/1eqtN6H1r1RQXgP4pEL6
-	TF+U9aG1iomr+YUJG9u7RQQSjkCa3kOi3omPJe/+s4J2Kd3BM0emjbohtPPyiE+F
-	xiKm5/YASpG6lcPpzzdRwLff1nZcMyJLYjM/RZ0plpiTYdPD4k2JqembNO1jUjBJ
-	ZjKwIt66KyetXHZ7e/K6w==
+	s=arc-20240116; t=1778580590; c=relaxed/simple;
+	bh=s/EiGHmA1kXYEYZTPbvn9RBRpzHx0SBN2njw95bBPT0=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=dZ1TfQjg3EDJFT7YW55GIZ3jJZB+SEusr9+082l7Oz4siKouzaNzrz2HV4x4uNgDiD1GlFrSVSunfPUH+P8MHBXW2mJl9pC058J4mapLqYLQhZO9sNa8faYn3zUrV36uq5TnYyEcdqCvpwntwyQlKAkFD/dE2sr44lQ31Dq9+yc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=GEf9Sz8o; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=wDkhbfqI; arc=none smtp.client-ip=103.168.172.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 414ED14001DD;
+	Tue, 12 May 2026 06:09:47 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Tue, 12 May 2026 06:09:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-transfer-encoding:content-type
+	:content-type:date:date:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to; s=fm1; t=1778580587; x=1778666987; bh=ew+1aIxJtUB8dQ5dcedVw
+	soD9yV2OQYgBG/3IC3/Heg=; b=GEf9Sz8o9vnBb8Y7ki9H3lz+lTeAUB+0bFiD/
+	6OhNKFOne9yIFtNoEyADEKWlu9AzxhyrXIxXEnhvNYbsfElcrthdLVEoZixNZ1Ig
+	1OOVGhggTO9rXP2abGWjHpxk6ATouTce+js6HGqKJJhiGcDf2Z7HuLVIf0NFN4zz
+	sVUovxRImNEbLGLNZkCXwzYqLWh0iQis6K2lqEOwpx6HwkVJVHmaTbavbkYD8jlb
+	uVhJIKdt4TFXvCSyJNsxE9BcgYqpaIzlCA80sgJvB9bPhVt04wTOqQVBn637Zd0Y
+	siJ7Kz58Xbgc1EN3+msCqQmSzAZl8NWWh9kijJOupxFb1vvWw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	messagingengine.com; h=cc:cc:content-id
+	:content-transfer-encoding:content-type:content-type:date:date
 	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
 	:message-id:mime-version:references:reply-to:subject:subject:to
 	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1778580426; x=1778666826; bh=fvByL/bwiqxIfeftWHoaHQZg8eSZadJNGAh
-	fU4qTq98=; b=eNRpbl//U+XeKYdqgvWJJAWRii0ByUl7B7f2B8wol9cuQmcw6fE
-	emgSol+UUvxAnVEtKI6cewZcYRzbsmU4OdjbUZPhkeg/vcFyN2rggnC0Ae3NcAL2
-	5j+vopNBIP02+xImPdQIRkT8GJKnrmcBO2L0FkkC/eToZAB8kbCmV3tCl67pu3X3
-	z2WC+M8qpyPz7uaQ8RtYzRGJQOCD4rLg5PGmSt3besOsUw+u3s0cwYpX21rqeAGk
-	KaN6h6Mw6UmO42kXf0CtfHgEB4hBVV9OzEQB2vNdCk+cVj8B69I3g1V/mqESk+PY
-	i5wuL0H5Q46+gWA+obRZR+0cIGwrdNJ2XRA==
-X-ME-Sender: <xms:yPsCagl4MVbx52seipINgu0mI1RmNqluYGJutAw3RcumJdZHTce8GA>
-    <xme:yPsCanYBxvHlzOJmSeXtILKRIGx63pm3_7lEU_7wz39nOjylFvKPCjdYOCQkcBr6_
-    -jvdK9ENTsWnsvTDHFqUvVb3NaVzkbqvsmuS4Z5IxF_xf6uHAYO7w>
-X-ME-Received: <xmr:yPsCauStEZ6Jy3R62DmjwaSMd0FDCn-5iaYAUnuxr5O4YTFlW4Fyj1FBp64MJ0Hm0L7JWZxpG4Rq4i_HKTBpawI>
+	1778580587; x=1778666987; bh=ew+1aIxJtUB8dQ5dcedVwsoD9yV2OQYgBG/
+	3IC3/Heg=; b=wDkhbfqIhhh4An5/xm+Z4lNTFLvodE/yHjsyw3HbFg2TQSrfsuF
+	KFZLXKdXDeMWMV5meI2tCkeJMl0yA/deiwlt+ixEt5WchI0ifLJGMkSRONsOMUuA
+	Lgtj5QEsen9iWqIv9ud06sO2EC8pbtCI+czp1rnFp56EdZdFZKrjfYqkNpC3KszN
+	SNFnr4npycPxcRJBj8a5SaSYz8Ol6ZHTROdWm2b0IoTcGPHAIl7ZZCbbnwc5GQ/V
+	lykzzW6VZK+9WGP2IVyrvAizRIdE1pfWbMpU+NmpF71BSFbL5VsBR/EWmSXgHABp
+	vDu31Znb97xdnpaHh9pvwkKFbYT480D74VQ==
+X-ME-Sender: <xms:avwCapZIKMZ4Drs0ajWaMecJZd14AoYblzXmDtoN8pVBCfgfjq7haw>
+    <xme:avwCaom8F1GYMzVBJqrST9FdNC0k9J5Fic6aZBOciEHtZ8gdOt3Ml1vuYE2yb4cL3
+    TLenwB4nCGEX7rTTUsJ5l71R2dUhEbAv0xQ-JdtZyJVQKbrvsrMbgo>
+X-ME-Received: <xmr:avwCangeRQBKqPyu6tE5DumQBXBBZhl3u7bL-VjJabmG0T23ra_00zR7uU9p4ZrWGj7AnhOabQ>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduvdduhedvucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfhfgggtuggjsehttdertd
-    dttdejnecuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghs
-    hihsnhgrihhlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuieduge
-    dtfefhkeegteehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedt
-    necurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvth
-    dpnhgspghrtghpthhtohepudehpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehn
-    tdehvggtsehliihurdgvughurdgtnhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrd
-    hkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhn
-    vghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtth
-    hopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvggu
-    hhgrthdrtghomhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtph
-    htthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgvtghunhgvthdrtghomhdprhgt
-    phhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrghdrrghu
-X-ME-Proxy: <xmx:yPsCapVBpen4u053VdJxyjxen5N7Tt5S4vmBJFoBQW8fzn7Lbc0APQ>
-    <xmx:yPsCalZS9rP2rZQZR7b7u8ClmHU4DsdOfiet1Y2q25A7iwus3SWgeQ>
-    <xmx:yPsCaq6QqEj6yhlVDG27c06IhhDKBVcd3NaDeW0RRt-9WxKYmSQLwg>
-    <xmx:yPsCauwJJhz6-goEcT5WdREg0Rsi_qYPOd0cTyOVqASLeBuvqTbVdg>
-    <xmx:yvsCauZP0SSJrVhDC-xRzNQkxqtbXI9NU4KWpEPvWyWG0PkzBgqtO9FF>
-Feedback-ID: i934648bf:Fastmail
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefujghfofggtgfgfffksehtqhertdertddvnecuhfhrohhmpeflrgihucgg
+    ohhssghurhhghhcuoehjvhesjhhvohhssghurhhghhdrnhgvtheqnecuggftrfgrthhtvg
+    hrnhepieefvdelfeeljeevtefhfeeiudeuiedvfeeiveelffduvdevfedtheffffetfeff
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepjhhvse
+    hjvhhoshgsuhhrghhhrdhnvghtpdhnsggprhgtphhtthhopeduuddpmhhouggvpehsmhht
+    phhouhhtpdhrtghpthhtoheplhhouhhishdrshgtrghlsggvrhhtseeifihinhgurdgtoh
+    hmpdhrtghpthhtohepjhhonhgrshdrghhorhhskhhisehgmhgrihhlrdgtohhmpdhrtghp
+    thhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehmrghhvg
+    hshhgssehgohhoghhlvgdrtghomhdprhgtphhtthhopegrnhguhiesghhrvgihhhhouhhs
+    vgdrnhgvthdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
+    eprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopehfsghlsehr
+    vgguhhgrthdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
+X-ME-Proxy: <xmx:a_wCaiRP5r_IoTKAjdG4ufa6rIuz8HSKHMakLOY23G7F5deEhaJwTw>
+    <xmx:a_wCagZOqMSDDmZV2VjbTUmjFRHzVGrMag80dmYTpuRT1VGyiOXjKQ>
+    <xmx:a_wCanRvLwqBjU9OPl-tthiIKAWyLhRyMQsvH9CsSHFTEEBWIgIwHg>
+    <xmx:a_wCan_HDxv3x-xT7SWELVqzkQKlWGON7a9E9CWsD3F8Le31ztjKNA>
+    <xmx:a_wCamStpJAD1hdussc8MEEzvLhJPc2-Plvn4ThXOeDIuLzz6lsupTcq>
+Feedback-ID: i53714940:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 12 May 2026 06:07:04 -0400 (EDT)
-Date: Tue, 12 May 2026 12:07:02 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Ren Wei <n05ec@lzu.edu.cn>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
-	yuantan098@gmail.com, yifanwucs@gmail.com, tomapufckgml@gmail.com,
-	bird@lzu.edu.cn, ronbogo@outlook.com, zylzyl2333@gmail.com
-Subject: Re: [PATCH net 1/1] xfrm: espintcp: publish ULP context before entry
- points
-Message-ID: <agL7xoDgf7z6nRXX@krikkit>
-References: <cover.1778464688.git.zylzyl2333@gmail.com>
- <c30b645074a1b379e0f7fe297f917c66137d9964.1778464688.git.zylzyl2333@gmail.com>
+ 12 May 2026 06:09:46 -0400 (EDT)
+Received: by vermin.localdomain (Postfix, from userid 1000)
+	id 19D911C0379; Tue, 12 May 2026 03:09:45 -0700 (PDT)
+Received: from vermin (localhost [127.0.0.1])
+	by vermin.localdomain (Postfix) with ESMTP id 190B51C0369;
+	Tue, 12 May 2026 12:09:45 +0200 (CEST)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Louis Scalbert <louis.scalbert@6wind.com>
+cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, edumazet@google.com,
+    kuba@kernel.org, pabeni@redhat.com, fbl@redhat.com,
+    andy@greyhouse.net, shemminger@vyatta.com, maheshb@google.com,
+    jonas.gorski@gmail.com
+Subject: Re: [PATCH net v5 3/4] bonding: 3ad: fix mux port state on oper down
+In-reply-to: <20260506161144.465485-4-louis.scalbert@6wind.com>
+References: <20260506161144.465485-1-louis.scalbert@6wind.com> <20260506161144.465485-4-louis.scalbert@6wind.com>
+Comments: In-reply-to Louis Scalbert <louis.scalbert@6wind.com>
+   message dated "Wed, 06 May 2026 18:11:43 +0200."
+X-Mailer: MH-E 8.6+git; nmh 1.7+dev; Emacs 29.0.50
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <c30b645074a1b379e0f7fe297f917c66137d9964.1778464688.git.zylzyl2333@gmail.com>
-X-Rspamd-Queue-Id: CCF1E51E522
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <150322.1778580585.1@vermin>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 12 May 2026 12:09:45 +0200
+Message-ID: <150323.1778580585@vermin>
+X-Rspamd-Queue-Id: EB3D351E4B8
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[jvosburgh.net,none];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[jvosburgh.net:s=fm1,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287058-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,google.com,kernel.org,redhat.com,greyhouse.net,vyatta.com,gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,messagingengine.com:dkim];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,secunet.com,gondor.apana.org.au,gmail.com,lzu.edu.cn,outlook.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-287059-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[jvosburgh.net:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jv@jvosburgh.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,messagingengine.com:dkim,queasysnail.net:dkim]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Action: no action
 
-Thanks for the fix. A small note: IPsec fixes go through the "ipsec"
-tree, not "net", so the prefix should be [PATCH ipsec]
+Louis Scalbert <louis.scalbert@6wind.com> wrote:
 
-Some comments inline:
+>When the bonding interface has carrier down due to the absence of
+>usable slaves and a slave transitions from down to up, the bonding
+>interface briefly goes carrier up, then down again, and finally up
+>once LACP negotiates collecting and distributing on the port.
+>
+>When lacp_strict mode is on, the interface should not transition to
+>carrier up until LACP negotiation is complete.
+>
+>This happens because the actor and partner port states remain in
+>Collecting_Distributing when the port goes down. When the port
+>comes back up, it temporarily remains in this state until LACP
+>renegotiation occurs.
+>
+>Previously this was mostly cosmetic, but since the bonding carrier
+>state may depend on the LACP negotiation state, it causes the
+>interface to flap.
+>
+>Move an operationally down port to the Mux WAITING state and clear the
+>Synchronization, Collecting, and Distributing states, in accordance with
+>the 802.1AX Mux state machine diagram.
+>
+>Fixes: 655f8919d549 ("bonding: add min links parameter to 802.3ad")
+>Signed-off-by: Louis Scalbert <louis.scalbert@6wind.com>
+>---
+> drivers/net/bonding/bond_3ad.c | 7 +++++++
+> 1 file changed, 7 insertions(+)
+>
+>diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3a=
+d.c
+>index 1247a1e048df..b531f68a24b0 100644
+>--- a/drivers/net/bonding/bond_3ad.c
+>+++ b/drivers/net/bonding/bond_3ad.c
+>@@ -1055,6 +1055,8 @@ static void ad_mux_machine(struct port *port, bool =
+*update_slave_arr)
+> 	aggregator =3D rcu_dereference(port->aggregator);
+> 	if (port->sm_vars & AD_PORT_BEGIN) {
+> 		port->sm_mux_state =3D AD_MUX_DETACHED;
+>+	} else if (!port->is_enabled && port->sm_mux_state !=3D AD_MUX_DETACHED=
+) {
+>+		port->sm_mux_state =3D AD_MUX_WAITING;
 
-2026-05-11, 21:40:58 +0800, Ren Wei wrote:
-> diff --git a/include/net/espintcp.h b/include/net/espintcp.h
-> index c70efd704b6d..034be559786b 100644
-> --- a/include/net/espintcp.h
-> +++ b/include/net/espintcp.h
-> @@ -34,7 +34,16 @@ static inline struct espintcp_ctx *espintcp_getctx(const struct sock *sk)
->  {
->  	const struct inet_connection_sock *icsk = inet_csk(sk);
->  
-> -	/* RCU is only needed for diag */
-> -	return (__force void *)icsk->icsk_ulp_data;
-> +	/*
-> +	 * The caller reached an ESP entry point by observing sk_prot,
-> +	 * sk_socket->ops, or one of the socket callbacks.  Keep the ctx
-> +	 * load after that observation so the caller cannot see the new
-> +	 * entry point while still seeing stale icsk_ulp_data.
+	Repeating my comment here from the prior version of the patch
+series, that this doesn't seem to comply with the standard.  Bonding
+should comply with IEEE 802.1AX-2014, and I do not want to mix and match
+from different versions of the standard.  The state machines differ
+between versions, and I don't know if a half-and-half implementation
+will function correctly.  The 2020 edition of the standard diverges
+significantly from prior versions, and bonding is very close to the 2014
+standard.
 
-I don't think this comment is really helpful.
-
-> +	 *
-> +	 * Pairs with smp_wmb() in espintcp_init_sk().
-> +	 */
-> +	smp_rmb();
-> +
-> +	return (__force void *)READ_ONCE(icsk->icsk_ulp_data);
-
-I think smp_store_release/smp_load_acquire is the "standard spelling"
-for this now.
+	-J
 
 
-[...]
-> @@ -472,34 +476,46 @@ static int espintcp_init_sk(struct sock *sk)
->  
->  	__sk_dst_reset(sk);
->  
-> -	strp_check_rcv(&ctx->strp);
->  	skb_queue_head_init(&ctx->ike_queue);
->  	skb_queue_head_init(&ctx->out_queue);
-> +	ctx->saved_data_ready = READ_ONCE(sk->sk_data_ready);
-> +	ctx->saved_write_space = READ_ONCE(sk->sk_write_space);
-> +	ctx->saved_destruct = READ_ONCE(sk->sk_destruct);
 
-If something is changing those while espintcp_init_sk is running,
-READ_ONCE won't help us. We'll end up with the wrong saved_*
-values. Can this actually happen here?
+> 	} else {
+> 		switch (port->sm_mux_state) {
+> 		case AD_MUX_DETACHED:
+>@@ -1202,6 +1204,11 @@ static void ad_mux_machine(struct port *port, bool=
+ *update_slave_arr)
+> 			break;
+> 		case AD_MUX_WAITING:
+> 			port->sm_mux_timer_counter =3D __ad_timer_to_ticks(AD_WAIT_WHILE_TIME=
+R, 0);
+>+			port->actor_oper_port_state &=3D ~LACP_STATE_SYNCHRONIZATION;
+>+			ad_disable_collecting_distributing(port,
+>+							   update_slave_arr);
+>+			port->actor_oper_port_state &=3D ~LACP_STATE_COLLECTING;
+>+			port->actor_oper_port_state &=3D ~LACP_STATE_DISTRIBUTING;
+> 			break;
+> 		case AD_MUX_ATTACHED:
+> 			if (aggregator->is_active)
+>-- =
 
+>2.39.2
+>
 
-> +	INIT_WORK(&ctx->work, espintcp_tx_work);
-> +
-> +	/* avoid using task_frag */
-> +	sk->sk_allocation = GFP_ATOMIC;
-> +	sk->sk_use_task_frag = false;
->  
->  	if (sk->sk_family == AF_INET) {
-> -		sk->sk_prot = &espintcp_prot;
-> -		sk->sk_socket->ops = &espintcp_ops;
-> +		prot = &espintcp_prot;
-> +		ops = &espintcp_ops;
->  	} else {
->  		mutex_lock(&tcpv6_prot_mutex);
->  		if (!espintcp6_prot.recvmsg)
-> -			build_protos(&espintcp6_prot, &espintcp6_ops, sk->sk_prot, sk->sk_socket->ops);
-> +			build_protos(&espintcp6_prot, &espintcp6_ops,
-> +				     READ_ONCE(sk->sk_prot),
-> +				     READ_ONCE(sk->sk_socket->ops));
-
-And similar here. Those should always be tcpv6_prot/inet6_stream_ops,
-but I wrote it this way to avoid having to use stubs, back when IPv6
-could be built as a module. This could now be moved into espintcp_init
-like the ipv4 variant of this.
-
->  		mutex_unlock(&tcpv6_prot_mutex);
->  
-> -		sk->sk_prot = &espintcp6_prot;
-> -		sk->sk_socket->ops = &espintcp6_ops;
-> +		prot = &espintcp6_prot;
-> +		ops = &espintcp6_ops;
->  	}
-
-Or just move the whole block to the end, instead of introducing those
-temporary variables?
-
-> -	ctx->saved_data_ready = sk->sk_data_ready;
-> -	ctx->saved_write_space = sk->sk_write_space;
-> -	ctx->saved_destruct = sk->sk_destruct;
-> -	sk->sk_data_ready = espintcp_data_ready;
-> -	sk->sk_write_space = espintcp_write_space;
-> -	sk->sk_destruct = espintcp_destruct;
->  	rcu_assign_pointer(icsk->icsk_ulp_data, ctx);
-> -	INIT_WORK(&ctx->work, espintcp_tx_work);
->  
-> -	/* avoid using task_frag */
-> -	sk->sk_allocation = GFP_ATOMIC;
-> -	sk->sk_use_task_frag = false;
-> +	/*
-> +	 * Publish the fully initialized ctx before publishing any entry point
-> +	 * that can call espintcp_getctx().  The read barrier there runs after
-> +	 * the caller has observed one of these pointers.
-> +	 */
-> +	smp_wmb();
-> +	WRITE_ONCE(sk->sk_prot, prot);
-> +	WRITE_ONCE(sk->sk_socket->ops, ops);
-> +	WRITE_ONCE(sk->sk_data_ready, espintcp_data_ready);
-> +	WRITE_ONCE(sk->sk_write_space, espintcp_write_space);
-> +	WRITE_ONCE(sk->sk_destruct, espintcp_destruct);
-> +
-> +	strp_check_rcv(&ctx->strp);
->  
->  	return 0;
->  
-> @@ -530,7 +546,7 @@ static void espintcp_close(struct sock *sk, long timeout)
->  
->  	strp_stop(&ctx->strp);
->  
-> -	sk->sk_prot = &tcp_prot;
-> +	WRITE_ONCE(sk->sk_prot, &tcp_prot);
-
-Actually this should be the original sk_prot, which could be
-tcpv6_prot.
-
-I'm not sure how much the WRITE_ONCE matters here. What is it
-protecting against/synchronizing with?
-
--- 
-Sabrina
+---
+	-Jay Vosburgh, jv@jvosburgh.net
 
