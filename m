@@ -1,269 +1,216 @@
-Return-Path: <netdev+bounces-286972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286973-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kIgJAfvSAmpJxwEAu9opvQ
-	(envelope-from <netdev+bounces-286972-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 09:12:59 +0200
+	id mJWCDnTSAmpJxwEAu9opvQ
+	(envelope-from <netdev+bounces-286973-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 09:10:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5241651B8D0
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 09:12:58 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F80F51B83F
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 09:10:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 453C830AE2C6
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 07:07:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 33FAD305669B
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 07:09:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E34EA3126BF;
-	Tue, 12 May 2026 07:07:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C0BE3D4120;
+	Tue, 12 May 2026 07:09:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XPHJLkDc";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="pKU8V+Bd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PrS2u+ia"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A0D379C4B
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 07:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B78CD368D68
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 07:09:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778569625; cv=none; b=NF4sPqzJoAWKn1uervos8+2xXogsp7JbdGY+O5MCMmmTRRuI9Y5y9pQIm68XVXzfB52jDIbmOi2Z9F0zStWsC+PSjbUonlixToWt52ZHgD2liDOK6SIISV57JGpeBEnE7GHAFYbMtolz8rNWws4Dl7sZI6PlBpE4Ri0jvdUl9w8=
+	t=1778569746; cv=none; b=M1wbrOTzQi3plriKjo7LNBN6umDPLTUAR0uYWdq3ReANyeWFZPfTzZyR8MmhFxYZ1C1GU4bNLZ1Ake1DKGXkGSKPq49LOtYT3rL8g/ZikQIREUkQBx9XxSbl0iMR1oTvRssbU9eDeQCdgQ6r9HcUvdcuSWXl8aZFjj0VqS5khYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778569625; c=relaxed/simple;
-	bh=vS9bD3PJ6QBZRXfBeufUTv14f2N0oWCBZ2zQWoQYBfs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OyqnCfgSl95++8h8k0rQ5FRbdo9688JLeSWw84vkNMh3LhRjXhDT7Ab7GqRfF9Mgt3ZtZTSOQm3gpZs9ykj6Q6OsvpD3kjy+zFIDI7rhQIuL6Y1XVWw21ETOx43+hXomrICi60cuNAtGMAhuNNB4eWMn+jNxTF2qts5Vi3nSNVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XPHJLkDc; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=pKU8V+Bd; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778569618;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gAb8hIM0aTA1jBLlkdpVPpG/v1UTe85oY7sMeZc2mf0=;
-	b=XPHJLkDcLpyIP1PHB5TEH34jAIQ4Pwic9ci2Hb6NvK2hQ/7dmCKKnPp4qqC1oGPoUf70UC
-	SKM2BkfUEiR5VYp/uP/vvrSZS6k3Tc1wc5X2127qBwp/pC9d/iSrbEbiVNBUmhXcZHPN5Z
-	c2DZyrI1BIdA4RKVR8a7oGlRo/8jdWg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-141-BHo-ygK3MAOHw46TnSPiwQ-1; Tue, 12 May 2026 03:06:56 -0400
-X-MC-Unique: BHo-ygK3MAOHw46TnSPiwQ-1
-X-Mimecast-MFC-AGG-ID: BHo-ygK3MAOHw46TnSPiwQ_1778569615
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-44f1b4d0fb0so3390326f8f.1
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 00:06:56 -0700 (PDT)
+	s=arc-20240116; t=1778569746; c=relaxed/simple;
+	bh=gTpTMvSvFJ8GP4FRzcczUt4KNmNWQ5lbqdKG3wswn0g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=WxJhVd922wbOfADM/k0uGHZ5bzlGtRXMj+9aXkK9cHPvlvPXB6qfvUQrlMOFTM8A5CxGVRd80/Fx1YfSP8ONdl4l3fmoti0im7Zzmmv6RfI6zJK3uyBsChJVEL2QdBmrbtI6WlK0L3VxD5GWgWvpFyIG7360ViPaWP8JetJPm7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PrS2u+ia; arc=none smtp.client-ip=209.85.210.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-7d55b97f358so3628439a34.3
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 00:09:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1778569615; x=1779174415; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gAb8hIM0aTA1jBLlkdpVPpG/v1UTe85oY7sMeZc2mf0=;
-        b=pKU8V+BdcYL2C2ens4Jnikn9y71oQ8Wz7BcQUa1MpgaxYfdSrv4qCLHxCz71FBy038
-         cjWNbSLk/uVD0K1jzgHyk87ZMKMPTuaHg4rTrKTxbUy8O8zeKloAOi52JqauQiVDe0tT
-         LjjZM/AD+IpSAgcplCR94NvZgI20PKw+461tCW7FZL53LnhLX1KOPcrDhE9nyftIyFsQ
-         1vAPYID8Nr4PGgdMBh2/Vj/dm9yJlbcQ3Q+9Q0u4gB4RBWgsai7aPjamHSrNn6cjG8Rv
-         7dob7I3NhsmJnaG/MR49CtkkGL+JSfQ9+JIBQ/zn+0k60D24j09QTsiUjq6xL8KssnV/
-         CxBQ==
+        d=gmail.com; s=20251104; t=1778569741; x=1779174541; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lGMIjlJ1jx9Y1YzrayP6UPnE/naew0CuHij3QAkOKtw=;
+        b=PrS2u+iae/NXDEH6CmKUsQ9ep5OU4W9F9uebtx36QZ8qHHAn6rX4bL/U5Iq7M7kE+H
+         lZ0EgEKClixpjpnoCF9zsU5vI9Hw2+ZLwsGPDn+d5BJhlV+Ot64LRDRTm9uP2gxu6X5p
+         llMeWYZQ6u6rDqVg6q/J5bY4y1kvIPVhkPxHPpF4akEKXSPMD0o3JMZ0kND5UWjrg4i0
+         7ttP/CAz54FyR7ySuOqBjUwsnut/aNkUlXNcaGkeO3AAM38WJAe6IwA7wa36rlFWtWdm
+         8DprbovPxi5H9pkot7O+dMTh5+HWegXYSTGN12MXtchyUq/oyojPr5BtAVZs1cgVgRTF
+         Tw0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778569615; x=1779174415;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gAb8hIM0aTA1jBLlkdpVPpG/v1UTe85oY7sMeZc2mf0=;
-        b=WO+LFLDZCO49Gk9LjSRbsa+7h8WWfFBT6V5mUTtSMPB2iXQo/Bd0pwuXr+8PSnKYVu
-         hT5qgzBUtw6uKY7EiHVJz6Cu76kl6tJ8P2XolJ3tpXwtwQ9MC1R4zI4LYablUu+3o8C1
-         FahLW0VPSkYG3t297ixN+oWuRIjdIWv3fWIK3k3OTRLu46xPmAK/sknCMqxJJAgDU1hc
-         JgfCv8Unew58q7AljPo52h7kNzPU/HrbEQqdwJilECK3miCZImV4+jAd2jUGmq9+rz9J
-         upTyJOjXMORJQ/YgOtINtmX07XNZyiA8l27m/SJo9O9bZ4zLuABsUwf70WhkV/WM9LLF
-         IztQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9oK3xwGZ69GmcIdivhxMFW1IxkIO5aSLxwoR8Sv50gOr6pgIINcXmSrAezqBIZNzDS1V7+ngw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAFKQ0en4hAE/QpzkTKEwtHLtDDI4f6AeQBDDB3mAzdq9hp7wO
-	cOaHmQkA/80/jdYRgKbhKD7pKquPVh1V8Kx5Vow5hxN88r/gEh7Hv03k0ndsIuwPBG+ZqXVpZ8S
-	vcIlFB+Uigwqm9bBBJh7BlEbM6hkxXJCPbL8Ix7e4/jgaj6QpU64qJGxocQ==
-X-Gm-Gg: Acq92OHAsLfMxL8nNW3JXmezOA+t6Zkd8i8zjmfH32UQxiY0tQLE+LkB/jPCTJXYyg6
-	r6NQaGJAjdDTpIEnwuhu6Dxdo6ZcND1NC1two71oKVMOnU3jLd5FQsELmxxlADxLW2dwT9qGiLL
-	4Xd+kK7P0bT5b6srCabkyopEPzPFldCiVp2u12sX75QKU9J8zcJUlVVfIT6kqdZGXHf60/lYB+z
-	IRuiXeQiMNPH/UYQNWH1ZRikqn5hG+fTbpM6lSgP2+SE81HHOmlpakOUOZPdlT97JkRrVjUCgcQ
-	Hj2FBRqPc0YRHlPzpIdV1bDpAQDZdpXqWYRK/LPJTQh8U/YUaZ2Z+UhQlEdIQ+xRcbuRLrxpnF7
-	mAcCRaDbmX4FvhpCg+9P7/AyaGI+prV4E4E6E0ZWNAvYzou+LhRv5rcRC6E56s32yN0gnsMuMhA
-	==
-X-Received: by 2002:a05:600c:3b08:b0:489:149a:f9e6 with SMTP id 5b1f17b1804b1-48e8fe80569mr22966025e9.28.1778569614942;
-        Tue, 12 May 2026 00:06:54 -0700 (PDT)
-X-Received: by 2002:a05:600c:3b08:b0:489:149a:f9e6 with SMTP id 5b1f17b1804b1-48e8fe80569mr22965345e9.28.1778569614432;
-        Tue, 12 May 2026 00:06:54 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-16-204-231.retail.telecomitalia.it. [87.16.204.231])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e9052cd24sm24611725e9.3.2026.05.12.00.06.53
+        d=1e100.net; s=20251104; t=1778569741; x=1779174541;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=lGMIjlJ1jx9Y1YzrayP6UPnE/naew0CuHij3QAkOKtw=;
+        b=Aulb+BSo1vxH+KcWFOdT5V0li9xa/iryfkAd1Y/G8lrF3x++e4vgFvlVZqbmoV9c8i
+         tOUcklgkds4NuEj4jvsgrjoFQfvHOf+DkjkeXUVYcMoWFMlvhJUV6Tri0ynuFFW8+ODp
+         mGrtHHlOaoRzTfIqgdil1H7pVLceihQMLaQmouuvBtVkpC6mzd/OMFTjV6PInyEnGab7
+         RC5EHPYsiK61elRPzwd3yY1Nsk8PpbAEMUrCGgXoCh12uK5EuZZPRmsCLdMp1Pj21QG7
+         XaZueqH7SQKh9uQdsz7ySSnyYihm4UPeTIJyBMEPBAhwJK8ytYhOYRXjlqt09wNhIZf9
+         1HNQ==
+X-Gm-Message-State: AOJu0Yy2HUZZ76ovsAP47G0zz2FbULoL5iBfbN+GUXlRVs402+yBkJrf
+	oskX85x5oyZFt3w38pLopF6ayy/GCBn0GX0UQFrwK9RJLFkRhANje5J96wVK2WLqKv1E4Q==
+X-Gm-Gg: Acq92OFE8k94W4cdGOyzhgXTnwGmOHqRvjF12KsaQthFGkEEd7/8UdJGVqXy0fPMene
+	NcDkWN4jLafXgnUJQx0fh7HB0+rFduyxHr1x5t4/uogpDzIDG+dxL2a6zOBy6ySlDei3SiKgyIw
+	OhPC9mUk1D/L7AJiGZdB5STChgf8c5CSsWiSQal03s9Ln11oUclcF7zIiP1HoUvtj0ihIWWWzyI
+	0vY/frjQ9C+9miIYeoflDy7BE1tUi6ry2QSktX/XchZ0xV5rsYgUfYvcy/w9EPB3+fnXGZ/Eo6o
+	J7DyJVxTORzCt+dK3/PnpuHn1ctvJRu6cl8uwjF0oz+90O3Ax02zacKQNIFRijVVI/O4+Kqzg1u
+	aUCpEBDwsrmMMtV++7/G1OPoWqxhZGE/SCxqSAU1cE2oS2QJfLPmcUOumXFBNHkMhGZ3sbuOAN9
+	9eUBX196qdZcFj0VI=
+X-Received: by 2002:a05:6830:d81:b0:7dc:cd0b:58ba with SMTP id 46e09a7af769-7e1dee8f954mr16403178a34.4.1778569740857;
+        Tue, 12 May 2026 00:09:00 -0700 (PDT)
+Received: from houminxi ([72.244.37.221])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e367a18481sm8417658a34.0.2026.05.12.00.08.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 May 2026 00:06:53 -0700 (PDT)
-Date: Tue, 12 May 2026 09:06:51 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Minh Nguyen <minhnguyen.080505@gmail.com>
-Cc: Bryan Tan <bryan-bt.tan@broadcom.com>, 
-	Vishnu Dasa <vishnu.dasa@broadcom.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org, virtualization@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net v2] vsock/vmci: fix UAF when peer resets connection
- during handshake
-Message-ID: <agLRfHBHJ2990NJo@sgarzare-redhat>
-References: <20260512025851.189140-1-minhnguyen.080505@gmail.com>
+        Tue, 12 May 2026 00:08:59 -0700 (PDT)
+From: Minxi Hou <houminxi@gmail.com>
+To: netdev@vger.kernel.org
+Cc: dev@openvswitch.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	aconole@redhat.com,
+	echaudro@redhat.com,
+	i.maximets@ovn.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org,
+	Minxi Hou <houminxi@gmail.com>
+Subject: [PATCH net-next v10 0/2] selftests: openvswitch: add pop_vlan test
+Date: Tue, 12 May 2026 15:08:39 +0800
+Message-ID: <20260512070841.1183581-1-houminxi@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260509135423.3433910-1-houminxi@gmail.com>
+References: <20260509135423.3433910-1-houminxi@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260512025851.189140-1-minhnguyen.080505@gmail.com>
-X-Rspamd-Queue-Id: 5241651B8D0
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 9F80F51B83F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[openvswitch.org,vger.kernel.org,redhat.com,ovn.org,davemloft.net,google.com,kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-286973-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286972-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.999];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ovs-dpctl.py:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Tue, May 12, 2026 at 09:58:51AM +0700, Minh Nguyen wrote:
->vmci_transport_recv_connecting_server() jumps to its destroy: label
->and performs an unconditional sock_put(pending) to release the
->explicit sock_hold() taken by vmci_transport_recv_listen() before
->schedule_delayed_work().  The existing comment claimed this was safe
->because the listen handler removes pending from the pending list on
->the way out, which would prevent vsock_pending_work() from dropping
->the same reference later.
->
->That assumption breaks for a peer RST.  The default arm of the packet
->switch sets:
->
->	err = pkt->type == VMCI_TRANSPORT_PACKET_TYPE_RST ? 0 : -EINVAL;
->
->and vmci_transport_recv_listen() only calls vsock_remove_pending()
->when err < 0:
->
->	if (err < 0)
->		vsock_remove_pending(sk, pending);
->
->For RST (err == 0) the socket stays on the pending list, so when
->vsock_pending_work() fires it takes the is_pending=true path and
->drops all three references itself: the pending-list reference via
->vsock_remove_pending(), then the two trailing sock_put(sk) calls.
->The unconditional sock_put() in destroy: had already dropped the
->explicit sock_hold() reference, so the second trailing sock_put(sk)
->in vsock_pending_work() is a write into the freed AF_VSOCK slab
->object.  KASAN reports a slab-use-after-free write of 4 bytes from
->refcount_warn_saturate() on the workqueue path:
->
->  BUG: KASAN: slab-use-after-free in refcount_warn_saturate
->  Write of size 4 at addr ffff88800b1cac80 by task kworker
->  Workqueue: events vsock_pending_work
->  Call Trace:
->   refcount_warn_saturate
->   vsock_pending_work
->   process_one_work
->   worker_thread
->
->Triggering the bug requires only the ability to open a VSOCK
->connection to the target and send a RST before the listener accepts.
->
->Skip the sock_put() in destroy: when err == 0 so it only compensates
->the cases where vmci_transport_recv_listen() actually calls
->vsock_remove_pending().  RST is the only path that reaches destroy:
->with err == 0; every other path produces a negative value, so their
->behaviour is unchanged.
->
->Verified on lts-6.12.79 with KASAN enabled (CONFIG_KASAN_INLINE=y,
->kasan_multi_shot): same trigger binary, same VM, 100 iterations:
->without this patch 52 KASAN slab-use-after-free reports fire; with
->this patch applied, 0 reports.
->
->Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
->Cc: stable@vger.kernel.org
->Signed-off-by: Minh Nguyen <minhnguyen.080505@gmail.com>
->Assisted-by: Claude:claude-opus-4-7
->---
->v2:
->  - Resubmit to netdev per Stefano Garzarella's request after v1 review.
->  - Retested the PoC with the patch applied on lts-6.12.79 with KASAN
->    enabled: 52/100 unpatched -> 0/100 patched (same trigger binary,
->    same VM, 100 iterations); test summary captured in the commit
->    message.
->  - Changed Cc: stable@kernel.org -> stable@vger.kernel.org now that the
->    bug is no longer embargoed.
->  - Rebased onto net/main (no functional change to the diff).
->
->v1 was sent to security@kernel.org on 2026-05-10 (not on lore archives;
->no public link available).  v1 review summary, for reference:
->  - Stefano Garzarella (vsock maintainer): "Overall LGTM, but I'd wait
->    vmware guys on this that know this code better."  Asked for retest
->    and resubmission via the net tree workflow.
->  - Bryan Tan (VMCI maintainer): "Thanks for the fix, it looks good to
->    me."  Also noted that no modern VMware product allows guest-to-guest
->    VMCI communication, so the practical attack surface is host -> guest.
->
-> net/vmw_vsock/vmci_transport.c | 16 +++++++++-------
-> 1 file changed, 9 insertions(+), 7 deletions(-)
+Add test_pop_vlan() to verify OVS kernel datapath pop_vlan action
+correctly strips 802.1Q VLAN tags from frames.
 
-Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+Patch 1 extends ovs-dpctl.py with vlan(vid=X,pcp=Y,cfi=Z) formatting
+and parsing, plus an encap_ovskey subclass for safe ENCAP NLA decoding.
+It changes OVS_KEY_ATTR_VLAN type from uint16 to be16 to match
+the kernel __be16 wire format.
+It also adds push_vlan action support (parse/format with range
+validation).
+Patch 2 adds the selftest using purely ping-based verification with
+a push_vlan return flow for symmetric bidirectional testing.
 
->
->diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
->index 4296ca1..88d7128 100644
->--- a/net/vmw_vsock/vmci_transport.c
->+++ b/net/vmw_vsock/vmci_transport.c
->@@ -1269,14 +1269,16 @@ vmci_transport_recv_connecting_server(struct sock *listener,
-> destroy:
-> 	pending->sk_err = skerr;
-> 	pending->sk_state = TCP_CLOSE;
->-	/* As long as we drop our reference, all necessary cleanup will handle
->-	 * when the cleanup function drops its reference and our destruct
->-	 * implementation is called.  Note that since the listen handler will
->-	 * remove pending from the pending list upon our failure, the cleanup
->-	 * function won't drop the additional reference, which is why we do it
->-	 * here.
->+	/* Drop the reference taken by vmci_transport_recv_listen() before
->+	 * schedule_delayed_work() only on real errors.  For a peer RST
->+	 * (err == 0) the listener leaves pending on the pending list, and
->+	 * vsock_pending_work() will drop that reference itself when it
->+	 * later cleans the socket up.  Calling sock_put() here in that
->+	 * case would be a double-put and free the socket while
->+	 * vsock_pending_work() still holds it.
-> 	 */
->-	sock_put(pending);
->+	if (err < 0)
->+		sock_put(pending);
->
-> 	return err;
-> }
->
->base-commit: be48e5fe51a5864566307998286a699d6b986934
->-- 
->2.54.0
->
+Tested with vng on x86_64, all OVS selftests pass (including new
+test_pop_vlan).
+
+v10:
+  - rebase on net-next
+  - fix masked VLAN dpstr round-trip: use tci=0xNNNN/0xMMMM format
+    for masked vlan() output instead of vid=X,pcp=Y,cfi=Z/vid=...
+    which the parser cannot re-consume
+  - fix int() base handling in _parse_vlan_from_flowstr: use
+    int(val, 0) for auto base detection instead of manual
+    0x prefix check
+  - fix commit message: remove reference to nonexistent
+    MAX_ENCAP_DEPTH constant, clarify "encap parse()" scope
+v9: https://lore.kernel.org/netdev/20260509135423.3433910-1-houminxi@gmail.com/
+  - rebase on net-next (resolve conflict with 05416ada37aa4
+    "selftests: openvswitch: add tests for tunnel vport
+    refcounting")
+v8: https://lore.kernel.org/netdev/20260508134308.2857449-1-houminxi@gmail.com/
+  - consistent error message prefix: push_vlan() instead of
+    push_vlan (matches vlan() and encap() style)
+  - unify encap() error messages for clarity
+  - add empty-string guards for MAC address variables
+  - remove slot number comments from encap_ovskey nla_map
+  - remove explicit modprobe 8021q pre-flight check
+v7: https://lore.kernel.org/netdev/20260507131541.2331771-1-houminxi@gmail.com/
+  - remove slot number comments from encap_ovskey nla_map, keep
+    only comments explaining differences from base ovskey class
+  - remove explicit modprobe 8021q pre-flight check (ip link add
+    type vlan auto-loads the module)
+v6: https://lore.kernel.org/netdev/20260506131218.1880852-1-houminxi@gmail.com/
+  - fix non-ASCII characters (em dashes) in comments and commit
+    messages
+v5: https://lore.kernel.org/netdev/20260505124957.1239812-1-houminxi@gmail.com/
+  - add push_vlan action class, dpstr format and parse with range
+    validation (vid 0-4095, pcp 0-7, tpid 0-0xFFFF, CFI forced to 1)
+  - remove MAX_ENCAP_DEPTH constant and depth tracking (bracket-depth
+    counter in encap parser already handles nesting)
+  - remove start_capture/stop_capture helpers and tcpdump/pcap
+    verification -- use ping success/failure instead
+  - remove modprobe/netns pre-flight checks (other tests don't do this)
+  - remove ethtool VLAN offload disable (unnecessary for veth)
+  - add push_vlan return flow for symmetric bidirectional ping
+  - use ovs_sbx wrapper for ping commands (consistent with siblings)
+v4: https://lore.kernel.org/netdev/20260504123713.555461-1-houminxi@gmail.com/
+  - fix all checkpatch line-length warnings in new code
+  - fix pylint W0707: use explicit exception chaining (from exc)
+v3: https://lore.kernel.org/netdev/20260503120946.51869-1-houminxi@gmail.com/
+  - encap_ovskey: MPLS type "ovs_key_mpls" -> "array(ovs_key_mpls)"
+  - encap_ovskey: PRIORITY/IN_PORT set to "none" (metadata, not in ENCAP)
+  - _vlan_dpstr: cfi=0 falls back to tci=0x%04x for round-trip safety
+  - encap parse(): check return value for unrecognized trailing content
+  - vlan parser: boundary check + raise-from for exception chaining
+v2: https://lore.kernel.org/netdev/20260501133924.3100680-1-houminxi@gmail.com/
+
+Minxi Hou (2):
+  selftests: openvswitch: add vlan() and encap() flow string parsing
+  selftests: openvswitch: add pop_vlan test
+
+ .../selftests/net/openvswitch/openvswitch.sh  |  78 +++++
+ .../selftests/net/openvswitch/ovs-dpctl.py    | 324 +++++++++++++++++-
+ 2 files changed, 392 insertions(+), 10 deletions(-)
+
+--
+2.53.0
 
 
