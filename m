@@ -1,237 +1,215 @@
-Return-Path: <netdev+bounces-286966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286967-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eEdeFL/IAmrmwgEAu9opvQ
-	(envelope-from <netdev+bounces-286966-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 08:29:19 +0200
+	id YKtyDmDMAmo+wwEAu9opvQ
+	(envelope-from <netdev+bounces-286967-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 08:44:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF9BD51B065
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 08:29:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8730951B328
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 08:44:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C05B4300903A
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 06:29:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 48D16306464D
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 06:39:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19114E3769;
-	Tue, 12 May 2026 06:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7246F4C9579;
+	Tue, 12 May 2026 06:39:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="vxamPC5x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N0zT/NuK"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914B0357D19;
-	Tue, 12 May 2026 06:29:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B57F6357D16
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 06:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778567355; cv=none; b=YxWZ2zIP9s5Ht+C2UDHrUj49UQlOkfpmShwO3aZVUWnvMpe9h/1avWIa7L9EGCaw32w9HTLM2/odeBl/stVc6qx5FT0i7/lx/CprfKDve/1AN9dC5LAHq7TRsLp+UvrOWfWA71Q+DEnF8alsr4LsfThtP4itws59tRkIykEGjrM=
+	t=1778567954; cv=none; b=VzvAomgHjaOsAN3WXMAMGFFlygPVdVtgcAOpjgwlZLLqEgpjf44VcOqyunlUof5RCxTZ42vf+3yqx8kMcRzvkjWt8+cGDihv6ZvNo43VtJ6T8V99btBMylxIZh/7VAMdODNV8oxq79t48HYX208HDE38jkBFui/v7VfcAQCFbnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778567355; c=relaxed/simple;
-	bh=Oo+KTjYKYfxwig/IKUE/DuqgmKu3ILJeUNkunDT+mHQ=;
-	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=JPFm/nHIgkqwX1DnrK3e+YlAHwsquALIV+yBFvyUQVAZY32CHTR1nFlUSGeiplgfn6N+R1YbSpIG01Pzyx1sm06AUQj3UjPeIRzp21bOihhX57CauSJ9IZzqRai6RGVxDoBp18t2YxqmoENYi927OrIEZWiuqxlXWZYTl7oGTkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=vxamPC5x; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1778567347; x=1810103347;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=Oo+KTjYKYfxwig/IKUE/DuqgmKu3ILJeUNkunDT+mHQ=;
-  b=vxamPC5x7Jn+ob9qxFZ76FdB5760npGncd5TCwRvO6uJt4Kv8Ljem/0N
-   5+yWqAa5DkMfkjb0EgKPVAnhlY6fqA9TkXxu/jIX6BEW9epb/JualBIlB
-   5TjiJ+cYvexlUdamNk/2csCVLZdTmuvFm/dh4P1uKeOAxhbsGOWUEMe75
-   g9GBKNA/1jxa4P6A5NeMnmh7NVG8CL1LlJK6st3i/QwdicinFJjHOw+CM
-   8WzUwS+Tr0CNe5seLulm0xAhPyp0LmVs0wqYNSMwpSz/2wxwO04bI04Tm
-   Rm6j5RJZljB2lTu8pgNIkOObN/dm9EoLoc1kcZxdXcfooPH0vsPKF2FMP
-   A==;
-X-CSE-ConnectionGUID: rbouXjx3QOGRKvFETiyjeQ==
-X-CSE-MsgGUID: j9+9l88vSauU/Pg6jiP03w==
-X-IronPort-AV: E=Sophos;i="6.23,230,1770620400"; 
-   d="scan'208";a="288736053"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2026 23:28:51 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
- chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.37; Mon, 11 May 2026 23:28:50 -0700
-Received: from DEN-DL-M77643.microsemi.net (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Mon, 11 May 2026 23:28:47 -0700
-Message-ID: <5d440e2a4647a578c277e303a8ad7f0f4bc96767.camel@microchip.com>
-Subject: Re: [PATCH net-next v4 1/9] net: dsa: add tag driver for LAN9645X
-From: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <UNGLinuxDriver@microchip.com>, <andrew@lunn.ch>, <olteanv@gmail.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<horms@kernel.org>, <robh@kernel.org>, <krzk+dt@kernel.org>,
-	<conor+dt@kernel.org>, <woojung.huh@microchip.com>, <linux@armlinux.org.uk>,
-	<Steen.Hegelund@microchip.com>, <daniel.machon@microchip.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<devicetree@vger.kernel.org>
-Date: Tue, 12 May 2026 08:28:46 +0200
-In-Reply-To: <20260506014552.1616551-1-kuba@kernel.org>
-References: <20260430-dsa_lan9645x_switch_driver_base-v4-1-f1b6005fa8b7@microchip.com>
-	 <20260506014552.1616551-1-kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2.1 
+	s=arc-20240116; t=1778567954; c=relaxed/simple;
+	bh=ReCO6+bh7wS8iJhfio0QbKq7IFDuLtB2Nf5u/s3X6+w=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=BNr8Ut2CsoXHyOvZNu1sJhIXYBPIJG0wo7QkIXZLjsTIA1b5XJuBpgnc1Xz7QC6tjfH1h3AJnO4YoPJ3tuCAfG2TbHFe/uV4GxJlG/A6RGyLjpnPAHt2wFgsqBCt+4vImyPKGTS/K34EqwiP7ZPn2bDsNxShpYrkTkZHvtKRPQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N0zT/NuK; arc=none smtp.client-ip=209.85.210.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-7de44ed7a11so4138193a34.1
+        for <netdev@vger.kernel.org>; Mon, 11 May 2026 23:39:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778567945; x=1779172745; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sZihSXzk3m4ncPT8T2SwT5MxO7o0tjFPGrpvOfDpq78=;
+        b=N0zT/NuK1wSWw7Q97hs7GhIGkxoDTzWq/eiD93nF3tLcRR7SwCtYtZILXSQgC0lUw6
+         QYOJfOkCPQpVZwj0/rZY6bvXQeJ0e7oBxaJdODplI5z9bkRxo6MLuE2LjV3QzTrkCUIQ
+         j4zPPaqdzh4gVBKRK8Vg3bJ1eCp+tZsqpqCNUWGDhGieyqDtmcDMbGlUQ9SuCjApJZz/
+         BbkyErpeSlVL/ku1QHf9E7oqNdYtN4Kwq21oxqiJyY7L+Q7hnK+N9g0BXsDvam+6FppY
+         Vz2zM7/MHi0BNZBXIOKGoI+zoBvofzJUV+SoOQKhEWsAUv62h+/pNLSmzNTsVQ9xHc/9
+         hS2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778567945; x=1779172745;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=sZihSXzk3m4ncPT8T2SwT5MxO7o0tjFPGrpvOfDpq78=;
+        b=nR4BHcgC1xZDerYvNh0AJuXcjtwzw5R7ZcCD3mdCiynsJKS+ipIQC8RSF16BzM79CC
+         zBwMs2kAkYSF1HJ+pn4B+9gmciiI2EvogE1n9vDa+IKwWzF4XXV4wp9UUOkbr5We4LHT
+         6rF+PHJ+y7TtnHR4Q7SSVbu5sK8l6f/QTjDc0wzifpJZskv+kw5Oi8xwRxp51Z2ayXpr
+         VJM0Mf4M8pfFBDMby7BAd3JWZDKYCzWELIBFopko4MnGNhju2oVjWrGlscgAf9gSXpdI
+         EuehphZXVXk4jJdp7npUY6oWk17PYlPOO9Waebqabjd5AehMoEvNIUNl545MRqwxRIQP
+         OHug==
+X-Gm-Message-State: AOJu0YyviYNlN7jBvnwQ1/V85kpuM3o60CU6oijWFpJA9vOT26cZUnlw
+	pTbHgt9bWjTlZwEG5p28fDf9zzUr30AJB8UVeiwhZARgSJvNFv2u2cZNPnx3jUZUDy5dMg==
+X-Gm-Gg: Acq92OG6kSvFuFjXxQZM8+AxvMX3xku7KWglQZlU9SiTzRA9Gy9xp69KDyFMKw9JIqJ
+	10IkTOXsEZKUmPh6nLBdD1jh/wsAzfnaxFEYAfqPnU637NlBES7D4yHwL9a49N8JwkWTtualRhw
+	uLloMT1IFQFGwtuuV/hJpyMZnviSfWE3rlm8ICO9gJnu4JDpoSPVgC+AD6hXdlfrfV1Mh9nxFBN
+	Q/Fqf8ghmZoYlIz9Yovf+kC1qaj9UFKU1MDObYBTt0bhK3ujSWFZjZ4Zg9s2kerp9bQX7TcnqJj
+	JurJ91bddDFuh3do3A+iY0bYG3RG9Gnhf3uNqOPfwsPiLnjIk/ZorOvphXKun5mv8TI9OSkYl3Y
+	PK+sdgvXCQIEX87tazn2CExXzhLveV2n5A3qAttiglHeVQap1ExSgUeF/IHmwghpfxUcqua5QV+
+	6aDXBsLqn88eGssXA=
+X-Received: by 2002:a05:6830:6281:b0:7d7:d504:cc6d with SMTP id 46e09a7af769-7e366839eafmr12638704a34.21.1778567945479;
+        Mon, 11 May 2026 23:39:05 -0700 (PDT)
+Received: from houminxi ([72.244.37.221])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e367d9d788sm8183783a34.24.2026.05.11.23.38.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 May 2026 23:39:03 -0700 (PDT)
+From: Minxi Hou <houminxi@gmail.com>
+To: netdev@vger.kernel.org
+Cc: dev@openvswitch.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	aconole@redhat.com,
+	echaudro@redhat.com,
+	i.maximets@ovn.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org,
+	Minxi Hou <houminxi@gmail.com>
+Subject: [PATCH net-next v10 0/2] selftests: openvswitch: add pop_vlan test
+Date: Tue, 12 May 2026 14:38:48 +0800
+Message-ID: <20260512063850.1133046-1-houminxi@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260509135423.3433910-1-houminxi@gmail.com>
+References: <20260509135423.3433910-1-houminxi@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: BF9BD51B065
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 8730951B328
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286966-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,armlinux.org.uk,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[openvswitch.org,vger.kernel.org,redhat.com,ovn.org,davemloft.net,google.com,kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-286967-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.999];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ovs-dpctl.py:url]
 X-Rspamd-Action: no action
 
-On Tue, 2026-05-05 at 18:45 -0700, Jakub Kicinski wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e content is safe
->=20
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> ---
-> net: dsa: add tag driver for LAN9645X
->=20
-> Adds a DSA tag driver for Microchip LAN9645x switches operating with a
-> front port configured as an NPI CPU port. RX uses a 16-byte long prefix
-> plus a 28-byte internal frame header; TX uses only the IFH.
->=20
-> > diff --git a/net/dsa/tag_lan9645x.c b/net/dsa/tag_lan9645x.c
-> > new file mode 100644
-> > index 000000000000..81e7a78e0f81
-> > --- /dev/null
-> > +++ b/net/dsa/tag_lan9645x.c
->=20
-> [ ... ]
->=20
-> > +static struct sk_buff *lan9645x_rcv(struct sk_buff *skb,
-> > +                                 struct net_device *ndev)
-> > +{
-> > +     u32 src_port, qos_class, vlan_tci, tag_type, popcnt, etype_ofs;
-> > +     struct dsa_port *dp;
-> > +     u32 ifh_gap_len =3D 0;
-> > +     u16 vlan_tpid;
-> > +     u8 *ifh;
-> > +
-> > +     /* DSA master already consumed DMAC,SMAC,ETYPE from long prefix. =
-Go back
-> > +      * to beginning of frame.
-> > +      */
-> > +     skb_push(skb, ETH_HLEN);
-> > +
-> > +     if (unlikely(!pskb_may_pull(skb, LAN9645X_TOTAL_TAG_LEN)))
-> > +             return NULL;
-> > +
-> > +     /* IFH starts after our long prefix */
-> > +     ifh =3D skb_pull(skb, LAN9645X_LONG_PREFIX_LEN);
->=20
-> [ ... ]
->=20
-> > +     skb_pull(skb, LAN9645X_IFH_LEN);
-> > +
-> > +     if (unlikely(!pskb_may_pull(skb, ifh_gap_len + ETH_HLEN)))
-> > +             return NULL;
-> > +
-> > +     skb_pull(skb, ifh_gap_len);
-> > +     skb_reset_mac_header(skb);
-> > +     skb_set_network_header(skb, ETH_HLEN);
-> > +     skb_reset_mac_len(skb);
-> > +
-> > +     /* Remove the long prefix + IFH + ifh_gap contribution from
-> > +      * skb->csum so the stack sees a checksum consistent with the
-> > +      * real Ethernet frame. skb->data currently points at the real
-> > +      * MAC header.
-> > +      */
-> > +     skb_postpull_rcsum(skb,
-> > +                        skb->data - LAN9645X_TOTAL_TAG_LEN - ifh_gap_l=
-en,
-> > +                        LAN9645X_TOTAL_TAG_LEN + ifh_gap_len);
->=20
-> Does this skb_postpull_rcsum() call subtract the wrong region from
-> skb->csum for CHECKSUM_COMPLETE frames?
->=20
-> By the time lan9645x_rcv() is entered, the conduit's eth_type_trans()
-> has already pulled the first ETH_HLEN (14) bytes of the long prefix and
-> adjusted skb->csum accordingly, so skb->csum covers bytes starting at
-> offset 14 (the remaining 2 bytes of the long prefix plus IFH plus any
-> gap plus the real frame).
->=20
-> At the point of the skb_postpull_rcsum() call, skb->data points at the
-> real MAC header, i.e. at offset LAN9645X_TOTAL_TAG_LEN + ifh_gap_len
-> from the start of the originally-received frame. So
-> skb->data - LAN9645X_TOTAL_TAG_LEN - ifh_gap_len points at offset 0,
-> and the subtracted region is [0, LAN9645X_TOTAL_TAG_LEN + ifh_gap_len).
->=20
-> That region includes the first 14 bytes that eth_type_trans() already
-> removed from skb->csum, and it stops short of the real MAC header which
-> also needs to be removed. Shouldn't the subtracted region instead start
-> at what skb->data was on entry to rcv() (i.e. post-eth_type_trans) and
-> cover LAN9645X_TOTAL_TAG_LEN + ifh_gap_len bytes from there, so that it
-> matches what skb->csum actually covers?
->=20
-> For reference, tag_ocelot.c (cited in the commit message as the
-> architectural model) saves start =3D skb->data at function entry before
-> any skb_push()/skb_pull() manipulation:
->=20
->     net/dsa/tag_ocelot.c:ocelot_rcv() {
->         ...
->         u8 *start =3D skb->data;
->         ...
->         skb_push(skb, ETH_HLEN);
->         skb_pull(skb, OCELOT_SHORT_PREFIX_LEN);
->         ...
->     }
->=20
-> and later passes that saved pointer to skb_postpull_rcsum() with the
-> total tag length, so the subtracted region exactly matches what the
-> NIC's csum_complete covers.
->=20
-> Would saving skb->data on entry (before the initial skb_push(ETH_HLEN))
-> and passing that as the start argument, with length
-> LAN9645X_TOTAL_TAG_LEN + ifh_gap_len, produce the correct result here
-> as well?
+Add test_pop_vlan() to verify OVS kernel datapath pop_vlan action
+correctly strips 802.1Q VLAN tags from frames.
 
-Hehe, this is what I did originally, but in the previous version sashiko
-convinced me that was not correct. I do not have a CHECKSUM_COMPLETE=20
-host to test it with unfortunately. But after looking at mlx5 it does seem
-the original was correct and the (real) ethernet header should be subtracte=
-d.
+Patch 1 extends ovs-dpctl.py with vlan(vid=X,pcp=Y,cfi=Z) formatting
+and parsing, plus an encap_ovskey subclass for safe ENCAP NLA decoding.
+It changes OVS_KEY_ATTR_VLAN type from uint16 to be16 to match
+the kernel __be16 wire format.
+It also adds push_vlan action support (parse/format with range
+validation).
+Patch 2 adds the selftest using purely ping-based verification with
+a push_vlan return flow for symmetric bidirectional testing.
 
-We can not save skb->data on entry, as it may have become stale. But just
-swapping the order of skb_pull(skb, ETH_HLEN) and skb_postpul_rcsum should
-give the desired effect. I will fix this in the next version.
+Tested with vng on x86_64, all OVS selftests pass (including new
+test_pop_vlan).
+
+v10:
+  - fix masked VLAN dpstr round-trip: use tci=0xNNNN/0xMMMM format
+    for masked vlan() output instead of vid=X,pcp=Y,cfi=Z/vid=...
+    which the parser cannot re-consume
+  - fix int() base handling in _parse_vlan_from_flowstr: use
+    int(val, 0) for auto base detection instead of manual
+    0x prefix check
+  - fix commit message: remove reference to nonexistent
+    MAX_ENCAP_DEPTH constant, clarify "encap parse()" scope
+v9: https://lore.kernel.org/netdev/20260509135423.3433910-1-houminxi@gmail.com/
+  - rebase on net-next (resolve conflict with 05416ada37aa4
+    "selftests: openvswitch: add tests for tunnel vport
+    refcounting")
+v8: https://lore.kernel.org/netdev/20260508134308.2857449-1-houminxi@gmail.com/
+  - consistent error message prefix: push_vlan() instead of
+    push_vlan (matches vlan() and encap() style)
+  - unify encap() error messages for clarity
+  - add empty-string guards for MAC address variables
+  - remove slot number comments from encap_ovskey nla_map
+  - remove explicit modprobe 8021q pre-flight check
+v7: https://lore.kernel.org/netdev/20260507131541.2331771-1-houminxi@gmail.com/
+  - remove slot number comments from encap_ovskey nla_map, keep
+    only comments explaining differences from base ovskey class
+  - remove explicit modprobe 8021q pre-flight check (ip link add
+    type vlan auto-loads the module)
+v6: https://lore.kernel.org/netdev/20260506131218.1880852-1-houminxi@gmail.com/
+  - fix non-ASCII characters (em dashes) in comments and commit
+    messages
+v5: https://lore.kernel.org/netdev/20260505124957.1239812-1-houminxi@gmail.com/
+  - add push_vlan action class, dpstr format and parse with range
+    validation (vid 0-4095, pcp 0-7, tpid 0-0xFFFF, CFI forced to 1)
+  - remove MAX_ENCAP_DEPTH constant and depth tracking (bracket-depth
+    counter in encap parser already handles nesting)
+  - remove start_capture/stop_capture helpers and tcpdump/pcap
+    verification -- use ping success/failure instead
+  - remove modprobe/netns pre-flight checks (other tests don't do this)
+  - remove ethtool VLAN offload disable (unnecessary for veth)
+  - add push_vlan return flow for symmetric bidirectional ping
+  - use ovs_sbx wrapper for ping commands (consistent with siblings)
+v4: https://lore.kernel.org/netdev/20260504123713.555461-1-houminxi@gmail.com/
+  - fix all checkpatch line-length warnings in new code
+  - fix pylint W0707: use explicit exception chaining (from exc)
+v3: https://lore.kernel.org/netdev/20260503120946.51869-1-houminxi@gmail.com/
+  - encap_ovskey: MPLS type "ovs_key_mpls" -> "array(ovs_key_mpls)"
+  - encap_ovskey: PRIORITY/IN_PORT set to "none" (metadata, not in ENCAP)
+  - _vlan_dpstr: cfi=0 falls back to tci=0x%04x for round-trip safety
+  - encap parse(): check return value for unrecognized trailing content
+  - vlan parser: boundary check + raise-from for exception chaining
+v2: https://lore.kernel.org/netdev/20260501133924.3100680-1-houminxi@gmail.com/
+
+Minxi Hou (2):
+  selftests: openvswitch: add vlan() and encap() flow string parsing
+  selftests: openvswitch: add pop_vlan test
+
+ .../selftests/net/openvswitch/openvswitch.sh  |  78 +++++
+ .../selftests/net/openvswitch/ovs-dpctl.py    | 324 +++++++++++++++++-
+ 2 files changed, 392 insertions(+), 10 deletions(-)
+
+--
+2.53.0
 
 
