@@ -1,191 +1,186 @@
-Return-Path: <netdev+bounces-287210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287211-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oE8qE5M/A2ro2AEAu9opvQ
-	(envelope-from <netdev+bounces-287210-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:56:19 +0200
+	id oDZmIrdBA2oy2QEAu9opvQ
+	(envelope-from <netdev+bounces-287211-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:05:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6F87523111
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:56:18 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 224EB523405
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:05:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 48E9630F1DB5
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 14:45:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F3C9A301EB41
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:01:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 382A9356768;
-	Tue, 12 May 2026 14:45:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 544B83750BC;
+	Tue, 12 May 2026 15:01:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PHtJxjAo"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Rymft1e3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011053.outbound.protection.outlook.com [52.101.70.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BA9A3451B3
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 14:45:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778597120; cv=none; b=FIWa4f625yA3Iu9mvgNtRPieupukHPKAe/EC9hlnhj2U7CYeX12wgW5BnMvWiJYM8pfbT+U4v4+VeF5Rpxq1d5539jznX7l4q2p9cEcpHkQHrIlNwcgj5+1V1J/BM0mIJtv82xB1hWxogHasxkV131WqWr37Owhsicmk1OFGMCA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778597120; c=relaxed/simple;
-	bh=pNjPLUfYOnlL9AuWfKEjlCxudFzPIGw2EJqVl9WOMxQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P8TXjhbvj/t+45CLAbjbgMwRV+KJNy5ODvypyvAJC6/ZGOTEmdq8LJZN4jzANG1et+2x3x+XylE0++A9pJMSeSF7Fq07MrHwsYbqtvK6hhj41VzPt9Wpd1NS/XxtJYKKHayJpfv+xXnWRc8n48ZODuiD3HMOD9LfLuwzW5fK8SE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PHtJxjAo; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-488a8ca4aadso51798505e9.3
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 07:45:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778597117; x=1779201917; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Sza2ZxpHlBY8pmqC5zMaFu/RPKkibTVxTiEJ6kAqjb8=;
-        b=PHtJxjAosh1U0g+a1DEOfiXi0eYoCeR8VARgRkKyNwOTVNJhxAtIMoMl37QJ2m5MUx
-         CRyN8WiSsk96kU6JPWTHLyaX2yhs4nGeUalx1dZgsvH8CNOdmzsH9tFY9hX9tOzF430I
-         n7x0gW4XaIQDz9Xtrn2i8CDqsLfbzXhU86FAp7SUe9u0kRoBTF0cvhIJoDp/iONDV5hH
-         1oal/A+UqE2FYL2YmH1I4Lb5rGpMHF+UWpElhC8m+GfumLD//U9mdtz+dLaXSSH3GRO0
-         Zsfss3DulDcPsRDKyCfPqEIhnkeaRTnk5PMZ9ykCVNjuOR4miSCEppl8Z3UrOSCBvcNN
-         TYDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778597117; x=1779201917;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Sza2ZxpHlBY8pmqC5zMaFu/RPKkibTVxTiEJ6kAqjb8=;
-        b=nj4M6V3w7/XcX+CRIeRyQXTxAnCWS5NN+B0+QaF2Qkjjpc34GWFtzXccC/cN2lwKY+
-         dTtBvTi6/3zTS8+IJ06QIkSs3LRcA/YS5cODY+voZLIPQFj4xcBP2EvoVGFwFILuxy6G
-         iLo4u2V9oBybRAw/LhDaLTQH+nawXWjOjhAvjn+vdeEx0frLelbODwEhEiVyMSZJ+12v
-         sUYZyuX0VkihU8NgaGnPEkMbZKJqc94CSTRf0EycOAqrgaT4Y1p+rnO6akcWjCuU2pP3
-         PAcsw2GD+dL8AgphgV3dUEDXkYIwDIObq4a5TfVYkGN9R4jDFuLcV9TEpe/gA5Yq2RND
-         v8VA==
-X-Forwarded-Encrypted: i=1; AFNElJ9xLAWFHclnRoVZCVP4WtpqhHjwc4ieuX1L+v6TlxZ6Tn+mkDXsByTZEO5cDsUde5KGY6F9J8s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbLtY1xnpGluZN9yuM4vlDcBVyUtSQ6qEQ7j/yCNWR1Wc2fkRJ
-	Lr2Ie9NTFI4yiK7dHnbnUKZgYSHvwLTxguUPxoUIffVQWgLVzDVsn+ok
-X-Gm-Gg: Acq92OFp9+B3bOA2rkbTzR9S9owbeOZqKtfjdY8IOmdngI80ZHXUd2ryg4qK4frznHC
-	vcVBtdcWCa7iFiVoHWCPKthG7dQaDuKcE2eLydzfhY1bwW2wrf4R6n4AA6hXg5lnqgHUoPqbeTR
-	7DMGIhgKCYv064dHOuHleS0bwNd7ZMyQRv7ij/8nxCul70TWp0rwaQoQ6bKwVL3iKQcafa+3RPG
-	pVdx2d9r/JJ0Ch8bezVLcgs/jTzrOK45TCx+A2P+u79MleXaS0lA5HCJeHC612EmAAVIgK2WYGh
-	1OkDhur8SwEUSFbfj9LHyGa85d0IA1KhQtkHEsYiDFSonHrwRyWqV8R4FVyr0BF1ypLqSR6uAeR
-	c90rCveLsCz8wJlQyKWm/xZ5WaNfHFzegt4sWIBTNDAq7qu6oFVWLolCNt/arqitIgpqw5cwZW1
-	o7NwgPk5mX1UqzRkIIkJ13MuKIZyj3p55UpB7RHrC21hG/QFDsFxyQFWc2XH3kMwZp8nWdetwhl
-	CCG
-X-Received: by 2002:a05:600c:17d4:b0:488:c014:34da with SMTP id 5b1f17b1804b1-48e51f4cde9mr282699415e9.26.1778597116959;
-        Tue, 12 May 2026 07:45:16 -0700 (PDT)
-Received: from ubuntu-f6bvp (lfbn-idf1-1-304-238.w86-195.abo.wanadoo.fr. [86.195.26.238])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fc8d1f669sm2563255e9.4.2026.05.12.07.45.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 May 2026 07:45:16 -0700 (PDT)
-From: f6bvp <bernard.f6bvp@gmail.com>
-To: toke@toke.dk,
-	kuba@kernel.org,
-	stable@vger.kernel.org
-Cc: Bernard Pidoux <bernard.f6bvp@gmail.com>,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	gregkh@linuxfoundation.org,
-	linux-hams@vger.kernel.org
-Subject: Re: [PATCH net-deletions] net: remove ax25 and amateur radio (hamradio) subsystem
-Date: Tue, 12 May 2026 16:45:10 +0200
-Message-ID: <20260512144512.9960-1-bernard.f6bvp@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <87se8mytvv.fsf@toke.dk>
-References: <87se8mytvv.fsf@toke.dk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B5136A371;
+	Tue, 12 May 2026 15:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778598090; cv=fail; b=QkOf1LObX07oYNBAUVpqXBbvv+BlwMLVK2fG4rXZMsZ9LYomt+iJvkieOUActaFO3yfaFMwnawDLeY3YezKp+WkZ1i1mO+4fBhapFK+Qck3BeW2BL4qJ5NOFNpF3VlFG+JLJ8MdP/HyMMwZ76r3rxZpP8xulV9Er6/ZYZKcePHE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778598090; c=relaxed/simple;
+	bh=T73M58TWX0bNWIgzgL2Dc9JsD86+fh12TR2Ni5Qw4pQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=L0TARWAC9CyBrTM8s7TKD+GNPLY3j8N+fZ189+HfugbH1aYNZ8uKGUsBOa1MaxxEdZRZPRJiVxzFo079EAzGDGDFSa0h+3oR59MXsgvU11+oOnDcdQMCxTF3a/vDnsFUuTJqHkcntZYFLwZ/VpRKQQt05i/J1+MFKHASx0wXsL8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Rymft1e3; arc=fail smtp.client-ip=52.101.70.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=iwbjaqnI6sVfiQ4UW2GR5vsaxrCLMGvv4gWooEYKWKfpx+MueiWsgcvLJs7cOi7ASkoFUXuIipWETKDPZ2KbVVpxCabf/Ami247ImHhxZvawayDrexo6JbfFErXk7KoEGaZkSXy6e/dvqyAowUZfKoCpus/8R4JCUfuw9ewcVZJ0mgo+fEmBNbQhchAWU3g/8ZHkjZ6ZUKdXgtFr0QJQmr5WvZgPVNA0GgJY//7+9qXXiFIli6B9iROoXibr9mroRrZsM7N9l9EdO3BHAD7o6rT4TnLOj7DXgi7KWyhgUaWKJUX2H6tEeXWFKO9P74Fk8mPmYAVzUm/70lu/hijyLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MLsmmg8ITcOWVR3fX1GW6lTAyDi3UrSpWBVHPYESMy8=;
+ b=o7undTYFE3xisenqkUuf1nDkLiqMCzkJvPkx58jdVH3YkrFbPvQTeeHTYfgZTiBtjqpYYiBMdNqX0Ke6yFcENWnZeSMs5JDxhaP1GAuCc01KK+ayNPJoIa+DuBMFrgP7TCR3DQYUBnTyjvCA7KF5BZaCOhsFHttdd4/suc2MEwnfeU+7HuDpAwkcnCUnDWLKp23ZDzZuQcsFSGW8MF9tJ90ZjGaKJ8hl5OzE06OJXmOJlh6moC0GYeXJwbYLHdhY4MDAUkz9gM4v118ftyDQLFSuEy81JbkBQ7VUGSdoIosxL6k0tP+BXPEyrrM3Ya3vTS3r5V2RW6cEHX5nli1czA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MLsmmg8ITcOWVR3fX1GW6lTAyDi3UrSpWBVHPYESMy8=;
+ b=Rymft1e3Dmhd9TsmbMiD9Y2u2h5YGiCyK1pvp2jiVJSQ9Mh919f+xfQszsS8f2sx/q+MTHR2dizKSjjIWr6ejBwTzYJS84DFvHM5Y4KL/e4VTh0dBE5/c2qFsIuOXBIBQHV+fBUi7v3/QtJWOyQCLhE2txUXqZlJ5lcG0kD9uehZEMZ18APhdwiok/ghBcXLMz246xdEkgTcNcSU9sEgTbrcAoY3MaWpU569to4L/I5oV8CLtUUP2BgAkVkTBWfklYK6nAyLzG5/F9q//h6ENG/zqhkEMEf8tP3FIL7jLvLEAvz9VVn1RSCy9IZO6SKHszvS/bjxA/HTl1rZWEUhDA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PA1PR04MB11508.eurprd04.prod.outlook.com
+ (2603:10a6:102:4e0::21) by AM9PR04MB8987.eurprd04.prod.outlook.com
+ (2603:10a6:20b:40a::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Tue, 12 May
+ 2026 15:01:25 +0000
+Received: from PA1PR04MB11508.eurprd04.prod.outlook.com
+ ([fe80::ca15:d140:3af1:77b3]) by PA1PR04MB11508.eurprd04.prod.outlook.com
+ ([fe80::ca15:d140:3af1:77b3%5]) with mapi id 15.20.9891.021; Tue, 12 May 2026
+ 15:01:25 +0000
+Date: Tue, 12 May 2026 18:01:22 +0300
+From: Ioana Ciornei <ioana.ciornei@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: linux-phy@lists.infradead.org, netdev@vger.kernel.org, 
+	Vinod Koul <vkoul@kernel.org>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Josua Mayer <josua@solid-run.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH phy-next 3/5] phy: lynx-28g: require an OF node to probe
+Message-ID: <xn77hfn32clk4jgokbtd2shazhblbw4hkei4a4pvmit3ey7wfd@xvp6cshgtal2>
+References: <20260511150023.1903577-1-vladimir.oltean@nxp.com>
+ <20260511150023.1903577-4-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260511150023.1903577-4-vladimir.oltean@nxp.com>
+X-ClientProxiedBy: AS4PR09CA0003.eurprd09.prod.outlook.com
+ (2603:10a6:20b:5e0::6) To PA1PR04MB11508.eurprd04.prod.outlook.com
+ (2603:10a6:102:4e0::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: B6F87523111
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PA1PR04MB11508:EE_|AM9PR04MB8987:EE_
+X-MS-Office365-Filtering-Correlation-Id: 103f203b-ec42-4b9e-2ea2-08deb037568d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|366016|19092799006|56012099003|18002099003|11063799003|22082099003|3023799003;
+X-Microsoft-Antispam-Message-Info:
+	ZQ6rSJXfc4OOpJ42najlLTaWDh6bMJBYSyR+M1tHOdE+1xirb67amtVBFm2UMqVLd2+I3aBEsgO8HFHX++7Q7lSNhpFUi/Dc/Yh3JdYo2ucyFrfP9eRPK7HhfG56KVrojXsix5hGsYCRd89GjreDq2FPjHg3K4QeDtCjdlUjJQavH0o/7jFSAV/wKTXkhPPtPlKosohK1GVO+OzuG9NV+5zEUlKJGu1drqAr3rJMrWxbN2d9MvmjxEQpbq9Duk9rXNlsZwy7ry4LXREim3h9VyAmsWesPiYGw4EyT/COI0yQwxX91svaZ1afv66eBJCekPgfXgoC6vMu8RH0vInxRmX9erUnNHJ/BCqGsJBapDGeHMdwlFwQWJkwVtbJAKPOi4sUIVe8eACVtG65bQnweKZTXezTX7KZgS5HJd0gF1kSavZ0MbRGGTLnMIRkMMyM10248t8r2RxalMtkFk0LEfbWOjT9K676bk6KTSZdRJLfnuREWbqbZJXC0hk/PmlRJzbbv7PulCLQOuEWiK4iClQ7doc3TJEPJytt92yjcvshNfElT7DNxK6PuuLAwkeG3xxt+ZCBuyjS4njYJz17nPutA0UQnI0ZXUnwWvma8J4+lIBQl84I9Jzqg9yH9ktm8NWCYHUJ4lUanGMiuA3wo1xizI6krxjKX1zosAgpcAyKaiooPRM0wNIvYbjDhMQN
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA1PR04MB11508.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(19092799006)(56012099003)(18002099003)(11063799003)(22082099003)(3023799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?q7ttfnzkSzvKPHzPJBhAwPQcJxvzhXVy2kOaCV/Jfka1fv7dtQ9AMLChYsr1?=
+ =?us-ascii?Q?ARbRQzWBl+E0ME027Vx5Pecg8Pj6MierHVS/UcaBkRF7iCHjPqAnjUAyqDzt?=
+ =?us-ascii?Q?faUdW5pJVRPBoW8kRuiCZY+ztrIDoJYHyY+Pu6aEc1QV7nPMi8LCgUvCGbFM?=
+ =?us-ascii?Q?tRtWM1OQUFYSsMbhwaqxNyIlhPAvvj1R/bpexG0nVqOQO2FHElcrrE6ruxE4?=
+ =?us-ascii?Q?aR/hvOricDkAlu7eY3pDfi2ZMiwkhUQJI3cCeBBaQUsRVan4QB6urjCHL4lZ?=
+ =?us-ascii?Q?xrGOmtO09GtJ7ic4f07/aMPYcJk0VeBj7szMMUgneNJ25sPe2bidt4E4CRPI?=
+ =?us-ascii?Q?/j9WS358+cxrHl0KTklj0YBJp1IMMpsGMN5QsWcTviIx0oxh7c+ru/c/l54n?=
+ =?us-ascii?Q?XiUpDmkeBMnHbBKFKAF6pLRSPjxSBJAzBCPxSnuByvY4xu5/URWyvY0/A+W4?=
+ =?us-ascii?Q?QQXmcOmTDrZUEoWW93MgcVgAVzK0/h1NEWGBX2ZMenbvRwbSccncpMAgAfKe?=
+ =?us-ascii?Q?D2AuqmTe9YJGAKwuuKDrEH8ZFDC1h4aCrYoVZb8A6qQPI+PFs8uyDXP5Jezg?=
+ =?us-ascii?Q?JmFxB3IYx6uJCot4dyqMgMYqgc16pcWGbI6i/hY6XOPld/gkQAw5nt2usQff?=
+ =?us-ascii?Q?769fLkR/hxzw1+1GcoCmknb/fFl+Ic9iyfnvWWrg8SuQSttdOuo1yvONbZiY?=
+ =?us-ascii?Q?50HE5dPjTWA0t4YmzeOx88g/KHJWKc1NJZU8DYlNYeoK4+y0396llluf5Z+O?=
+ =?us-ascii?Q?cBpwpuNueIHoKx4U+ZLn0wTn5eqgSdt0yUz/1jf4fO/lJyigJSEOUsxIN/+Y?=
+ =?us-ascii?Q?UY+jofwxKZDdKPY+g67TgoM/BqigqoVd7yRgfmoaVhAUwqYbkjrMJ7zarY0J?=
+ =?us-ascii?Q?JrgG2n3rhzhojbXNAOciAQN9HpXDhUBaotZ/bS9ZSIb7aZNrp1JPeCz36XQ6?=
+ =?us-ascii?Q?QQfK1BAgvWTmxPRGzKuiZGqDNfXvyywTbmDbUvEiVVGwOTXuI9K1uTo4dCsQ?=
+ =?us-ascii?Q?I3xKeLp4MqBa1Wm9oYpS1feNA5yrUyLOjfnAR/sqBVo/TfVpiS/F3x1n8lXJ?=
+ =?us-ascii?Q?dj0Fl+RbcDTS1WfFul2LaoOL1pXMz4iF6swXmu99Q6EKtLG21DZyPLsGP45a?=
+ =?us-ascii?Q?PzfkLuoCQowLkz+gFy4qC5hj3WgdhrehVi4ao2FikvxLElC3pWsFvFawG9aF?=
+ =?us-ascii?Q?+KtP/qYEj9GwUolu2gi65Z3GOdwqKmgkLtzMAyPbVZ3MoXIAFANav9J9wBxt?=
+ =?us-ascii?Q?SD27uTO8XTBHKbWFUEg/GrVcWFpwUYW77I3fbDQNQcFViB1jUnT7NB1NTV0/?=
+ =?us-ascii?Q?/dU11o3GTgUzwTTDB2WnAy0wyp2E5e35CGAWN/6WAwXHvlk2gJRBCh8/kx6C?=
+ =?us-ascii?Q?aEcku42btYIVbDjD0sSOhp4jFOH7Rdo4/g2qq1qWJ+u/OfPSxC5fTTqJec9d?=
+ =?us-ascii?Q?D5NO9p0dIi2QZ8piRpspXu6JHgoUSFBaRBv7d8fsr2BTWX9YioMAYIXjRAPC?=
+ =?us-ascii?Q?mgBk8fj2LMzuQpqlW18TEoI5zv3+iEGcm7katcODvjYfLJ39zKXjndjG4VT3?=
+ =?us-ascii?Q?lCz6LfsFkLqxJNjrbqskSyjEEPpZsb/iNFPtuwhwaIi8ULPAY1Zm5qLT/sA+?=
+ =?us-ascii?Q?PBcgqSSWSPz6hMZkltS1PQ8JApNaU9pkxUXVFRIWE8cmMlNFK50n+8VzsYzH?=
+ =?us-ascii?Q?NOF0od2Ay1g4lhjYRpK8CMMzbM+QPfqoSmX4J7vABqnqh8fQizuT/e4mBgkI?=
+ =?us-ascii?Q?2z/TxKme8g=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 103f203b-ec42-4b9e-2ea2-08deb037568d
+X-MS-Exchange-CrossTenant-AuthSource: PA1PR04MB11508.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2026 15:01:25.7195
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XCGxi40Ig3kzVkzHX83no0sJsL52DHdkoOK6U0T9b5KcRK7zfI5yKJ9D9ZxhqgZJ0grt+qoaR3qgukpM01XcNg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8987
+X-Rspamd-Queue-Id: 224EB523405
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,vger.kernel.org,redhat.com,linuxfoundation.org];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287211-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287210-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bernardf6bvp@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,toke.dk:email]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nxp.com:email,nxp.com:dkim]
 X-Rspamd-Action: no action
 
-From: Bernard Pidoux <bernard.f6bvp@gmail.com>
+On Mon, May 11, 2026 at 06:00:21PM +0300, Vladimir Oltean wrote:
+> The driver will gain support for variants in an upcoming change, and
+> will use of_device_get_match_data() to deduce the running variant from
+> the compatible string.
+> 
+> Currently, the driver expects the schema at phy/fsl,lynx-28g.yaml, and
+> OF-based consumers, but doesn't enforce this. And it is possible for
+> user space to force-bind the driver to a device without OF node using
+> the driver_override sysfs.
+> 
+> To avoid future surprise crashes for an unsupported configuration,
+> explicitly test for the presence of an OF node and fail probing if
+> found.
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Toke Høiland-Jørgensen <toke@toke.dk> writes:
+Reviewed-by: Ioana Ciornei <ioana.ciornei@nxp.com>
 
-> Acked-by: Toke Høiland-Jørgensen <toke@toke.dk>
-
-Hello Toke, Jakub, all,
-
-I understand the decision to move AX.25, NET/ROM, and ROSE out of tree,
-and I am not opposing it. The maintenance burden caused by AI-generated
-syzbot reports with no human follow-up is a legitimate reason to act.
-
-That said, I would like to raise one specific concern: the ROSE subsystem
-accumulated a number of real bugs through upstream commits that were merged
-without hardware testing. I have been running ROSE on actual packet radio
-equipment and was able to reproduce and fix five of these bugs, confirmed
-via KASAN and netconsole.
-
-The most severe symptom is that the ROSE module cannot be cleanly unloaded
-once an AX.25 connection has been established, which makes amateur radio
-applications that rely on ROSE effectively unusable until a reboot.
-
-My five patches address:
-
-1. rose: fix dev_put() leak in rose_loopback_timer()
-   Fixes: 0453c6824595 ("net/rose: fix unbound loop in rose_loopback_timer()")
-
-2. rose: hold loopback neighbour reference across timer callback
-   Fixes: d860d1faa6b2 ("net: rose: convert 'use' field to refcount_t")
-
-3. rose: fix race between loopback timer and module removal
-   Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-
-4. rose: clear neighbour pointer after rose_neigh_put() in state machines
-   Fixes: d860d1faa6b2 ("net: rose: convert 'use' field to refcount_t")
-
-5. rose: guard rose_neigh_put() against NULL in timer expiry
-   Fixes: 5de7665e0a07 ("net: rose: fix timer races against user threads")
-
-Each patch carries the appropriate Fixes: tag and a Tested-by from me on
-real hardware. They are visible on lore.kernel.org.
-
-Since ROSE will no longer be maintained in-tree from 7.1 onward, the only
-remaining users are those running current stable kernels (7.0.y and
-earlier). Would it be possible to have these five patches queued for the
-stable trees via Greg's stable process?
-
-I am happy to resend them as a formal series tagged [PATCH stable] against
-the current stable releases if that is preferred.
-
-Thank you for your work on the Linux networking subsystem.
-
-73 de Bernard Pidoux, F6BVP
-<f6bvp@free.fr>
 
