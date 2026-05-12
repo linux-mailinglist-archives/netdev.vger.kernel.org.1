@@ -1,259 +1,159 @@
-Return-Path: <netdev+bounces-286936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286937-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mP97KFaZAmpyuwEAu9opvQ
-	(envelope-from <netdev+bounces-286936-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 05:07:02 +0200
+	id QJz+G66nAmpSvQEAu9opvQ
+	(envelope-from <netdev+bounces-286937-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 06:08:14 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D45751928A
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 05:07:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F310851977F
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 06:08:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5AA8A301A706
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 03:05:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 132873014C27
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 04:08:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FAD1370D69;
-	Tue, 12 May 2026 03:05:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D15C02D7814;
+	Tue, 12 May 2026 04:08:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d0x7E03g"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="T33C+TeP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E8D211A28;
-	Tue, 12 May 2026 03:05:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E2CB383328;
+	Tue, 12 May 2026 04:08:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778555135; cv=none; b=thTvmg19/ZAZKac9rtVmNNvWjXmtGmrlOFQgnP9ubkwW3TuZpNjFpSHgunXAZcOdRsS9YjaX6CVnPVAfnxM5bvZYHA7GARlCFhSuh1iLO3RjpNm9aGNOThzkMfv9w/aIeULo4deN4hOFODB6PeusABrnFkBn1jF2EcTwlb0ibHk=
+	t=1778558887; cv=none; b=dJM93apARNdj1d3eyP1acoUMV/CRie5VbSrz2Qy+QfIYZBZUTUbIllUITyGi2VpGWQ2fLoXjsaUIPcRFXPJ1ie9J6b0I02/PzHLdBrc08+uWWkEAo1f4MhKM6nGbxVkWnY9yrcmBZ1KNeS+4Fz9+w/rCWaZopi0jPhgi1zHH4ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778555135; c=relaxed/simple;
-	bh=1w2UOoO1tnxzUBHVNiml1kjKXTz7nAaO6k3r5W8GT1k=;
+	s=arc-20240116; t=1778558887; c=relaxed/simple;
+	bh=Ofnxgb3ZkYisGIafeUb6xiktQaSDnjEGx/Gk/1v47To=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IEl4TODV1Ko9yBLT62sAzrQmt9rdKIT/wxU6OdPWa+SKPF1wyrRjm5HK8fDT96dIP8UD18DxsfLETrgAWyZzyI7bv/RBQcIOhsS9MtL2CGdyT4UNRBd6GCIXmCkBscxGAAwTxoA3qi9DG2cbo+ePJeqXWF3KDD5otGFsx03kGb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d0x7E03g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D240C2BCB0;
-	Tue, 12 May 2026 03:05:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778555134;
-	bh=1w2UOoO1tnxzUBHVNiml1kjKXTz7nAaO6k3r5W8GT1k=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=d0x7E03g0fkkNy0im+bNUEyZx542jOsy6iuW98pWaS4iN007wIfVwiOFKJaj4e0c7
-	 4dMZRWTFKS0txGG64KScJ/b4VqemIlRIgtwEcTeNlA6PARW6snGZ9a4eTvH4lBzL+3
-	 zGGp1oFKEgxUVGZN2qaKzFafuV2Zl377rmHLWbp+G/76rCs90Pvra6wfY0mfNfdiTY
-	 aJCR097h/v97kBuYXR5yzOcwIecEu538pJidzuO5/gGyJcnT60Cze9m0zdpxJSmEIL
-	 ghG8vP8bRfOYCRnGcV2LNqiLpY1BvcNrXH9SI6VLQdQBCL9u7RZ+hnn1YlW+0BqRCR
-	 QgZNccop0nwaw==
-Message-ID: <8f5bd75c7328d3b314a4c503ea16fb3c1bfffc08.camel@kernel.org>
-Subject: Re: [PATCH net] net/rds: fix zerocopy page ownership on partial
- copy failure
-From: Allison Henderson <achender@kernel.org>
-To: Spencer ?? <spencer.phillips@live.com>, "netdev@vger.kernel.org"
-	 <netdev@vger.kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, 
- "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Date: Mon, 11 May 2026 20:05:32 -0700
-In-Reply-To: <CY8PR11MB70846C6CD3C93572660CCC40EA3B2@CY8PR11MB7084.namprd11.prod.outlook.com>
-References: 
-	<CY8PR11MB70846C6CD3C93572660CCC40EA3B2@CY8PR11MB7084.namprd11.prod.outlook.com>
+	 Content-Type:MIME-Version; b=D7HbA1qtEo1uR6C8yATfW8gnTRnVu0vR9DSX3D1Wra5VwzKxvcwHv+8uDiZXU8a47+K7kGHYeRDvGCZBX8fBAcZewl45ivExAG+YMJzK56gG19bhpYHcX9ImGqZ5mBTOe8bTNrgU4Kj+5IK8ujJC1VfAPmg3rqoHh88BxD3s4Mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=T33C+TeP; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1778558877;
+	bh=Ofnxgb3ZkYisGIafeUb6xiktQaSDnjEGx/Gk/1v47To=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=T33C+TePBPWSqhcbe2bLdceXbubUI2UT/9DzjOQTkfRSrqvRkTePN7+v/hP3GF2cd
+	 aHhhym0XTwbToVeXxm8lrSO+VKvYmkAdKnTWqRterf5HoPHRbBBlTSeZIWWPZGrD8I
+	 DO1dlNlbILmSOH4VYsKR/SiMch0t6CykzTFSFUtvbfgJdk7bx86PVi9bIb7t1dUafi
+	 pOMqinJjWNFtTKmAkWMqb2yd3DHQXpN9hNeW6MxC2NYOF91+dSTOu4T3XJkWLoAAK9
+	 mgAKXknSYOUkWcuW0U2XD/mQCDQwMfDU4xqjfX1CKEutyzk+0qzOJE1ftn0cr77uuV
+	 9VzyWvjkDPGIQ==
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id A71F86008B;
+	Tue, 12 May 2026 12:07:55 +0800 (AWST)
+Message-ID: <71b7c8f40efc25fadb0aede6be888986364f2d53.camel@codeconstruct.com.au>
+Subject: Re: [net-next v41] mctp pcc: Implement MCTP over PCC Transport
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Adam Young <admiyo@amperemail.onmicrosoft.com>, Adam Young	
+ <admiyo@os.amperecomputing.com>, Matt Johnston <matt@codeconstruct.com.au>,
+  Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet	 <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni	 <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Sudeep Holla
+	 <sudeep.holla@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
+ Huisong Li <lihuisong@huawei.com>
+Date: Tue, 12 May 2026 12:07:55 +0800
+In-Reply-To: <9519a497-c10c-4abc-bcf9-414467f74ba3@amperemail.onmicrosoft.com>
+References: <20260510163228.443778-1-admiyo@os.amperecomputing.com>
+	 <9f4d364ebbbbbb697fcee022991a546e60692f11.camel@codeconstruct.com.au>
+	 <9519a497-c10c-4abc-bcf9-414467f74ba3@amperemail.onmicrosoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3-0ubuntu1.1 
+User-Agent: Evolution 3.56.2-0+deb13u1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: 0D45751928A
+X-Rspamd-Queue-Id: F310851977F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
+	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286936-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[live.com,vger.kernel.org];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286937-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,live.com:email]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url,checkstyle.sh:url,codeconstruct.com.au:mid,codeconstruct.com.au:dkim]
 X-Rspamd-Action: no action
 
-On Sun, 2026-05-10 at 21:20 +0000, Spencer ?? wrote:
-> RDS zerocopy sends pin user pages into the message data SG list and uses =
-a
-> zerocopy notifier to carry pin accounting and completion state.
->=20
-> If iov_iter_get_pages2() fails after some SG entries have already been
-> populated, the copy helper currently tears down the notifier and returns =
-an
-> error while leaving the partial SG count live.
->=20
-> The common message purge path no longer has a notifier to distinguish
-> zerocopy user pages from copied-send pages in that state, so it can relea=
-se
-> a still-mapped user page with __free_page().
->=20
-> Make data page ownership explicit with an op_zcopy bit. Once zerocopy pin
-> accounting succeeds, leave the notifier, ownership bit, and populated SG
-> count attached to the message and let rds_message_purge() perform the
-> single cleanup path.
->=20
-> The notifier still controls zerocopy completion and pin accounting. The n=
-ew
-> op_zcopy bit controls whether counted data SG entries are released with
-> put_page() or __free_page().
->=20
-> This preserves normal copied-send cleanup and queued zerocopy completion
-> behavior. It fixes the partial-build failure path without adding a second
-> manual unwind path.
->=20
-> Tested with an AF_RDS/RDS_TCP MSG_ZEROCOPY partial-fault reproducer on a
-> KASAN kernel. Before the fix the run triggered bad page/accounting report=
-s;
-> after the fix sendmsg returns -EFAULT and no bad page or KASAN report occ=
-urs.
->=20
-> Fixes: 0cebaccef3ac ("rds: zerocopy Tx support.")
-> Cc: stable@vger.kernel.org
-> Assisted-By: Codex:GPT-5.5-xhigh
-> Signed-off-by: Spencer Phillips <spencer.phillips@live.com>
+Hi Adam,
 
-Hi Spencer,
+> Sorry, I should have been more explicit here.=C2=A0 I am not certain what=
+ is=20
+> going to happen with fragmentation, so I want to be protected against
+> future changes.
 
-Thanks for finding this.  The fix itself looks ok to me.  When you resend t=
-he patch with the corrected author name, you
-can add my rvb.
+Nothing is going to happen with fragmentation. Your driver will only see
+linear skbs in the ndo_start_xmit callback.
 
-Reviewed-by: Allison Henderson <achender@kernel.org>
+Adding the skb_linearize() there is unnecessary, and creates ambiguity
+about the structure of the skbs that we're dealing with in that path.
 
-Thanks!
-Allison
+> The check in validate_xmit_skb() is good, as it protects against the=20
+> current set up. So my option was to put a comment in here and hope both=
+=20
+> changes happened together, or to just try and get this portion of the
+> driver solid against the change.
 
-> ---
->  net/rds/message.c | 33 ++++++++++-----------------------
->  net/rds/rds.h     |  1 +
->  2 files changed, 11 insertions(+), 23 deletions(-)
->=20
-> diff --git a/net/rds/message.c b/net/rds/message.c
-> index 25fedcb3cd00..a381a895339c 100644
-> --- a/net/rds/message.c
-> +++ b/net/rds/message.c
-> @@ -141,7 +141,7 @@ static void rds_message_purge(struct rds_message *rm)
->  	spin_lock_irqsave(&rm->m_rs_lock, flags);
->  	znotifier =3D rm->data.op_mmp_znotifier;
->  	rm->data.op_mmp_znotifier =3D NULL;
-> -	zcopy =3D !!znotifier;
-> +	zcopy =3D rm->data.op_zcopy || !!znotifier;
->=20
->  	if (rm->m_rs) {
->  		struct rds_sock *rs =3D rm->m_rs;
-> @@ -170,6 +170,7 @@ static void rds_message_purge(struct rds_message *rm)
->  			put_page(sg_page(&rm->data.op_sg[i]));
->  	}
->  	rm->data.op_nents =3D 0;
-> +	rm->data.op_zcopy =3D 0;
->=20
->  	if (rm->rdma.op_active)
->  		rds_rdma_free_op(&rm->rdma);
-> @@ -414,7 +415,6 @@ struct rds_message *rds_message_map_pages(unsigned lo=
-ng *page_addrs, unsigned in
->  static int rds_message_zcopy_from_user(struct rds_message *rm, struct io=
-v_iter *from)
->  {
->  	struct scatterlist *sg;
-> -	int ret =3D 0;
->  	int length =3D iov_iter_count(from);
->  	struct rds_msg_zcopy_info *info;
->=20
-> @@ -429,12 +429,12 @@ static int rds_message_zcopy_from_user(struct rds_m=
-essage *rm, struct iov_iter *
->  	if (!info)
->  		return -ENOMEM;
->  	INIT_LIST_HEAD(&info->rs_zcookie_next);
-> -	rm->data.op_mmp_znotifier =3D &info->znotif;
-> -	if (mm_account_pinned_pages(&rm->data.op_mmp_znotifier->z_mmp,
-> -				    length)) {
-> -		ret =3D -ENOMEM;
-> -		goto err;
-> +	if (mm_account_pinned_pages(&info->znotif.z_mmp, length)) {
-> +		kfree(info);
-> +		return -ENOMEM;
->  	}
-> +	rm->data.op_mmp_znotifier =3D &info->znotif;
-> +	rm->data.op_zcopy =3D 1;
->  	while (iov_iter_count(from)) {
->  		struct page *pages;
->  		size_t start;
-> @@ -442,28 +442,15 @@ static int rds_message_zcopy_from_user(struct rds_m=
-essage *rm, struct iov_iter *
->=20
->  		copied =3D iov_iter_get_pages2(from, &pages, PAGE_SIZE,
->  					    1, &start);
-> -		if (copied < 0) {
-> -			struct mmpin *mmp;
-> -			int i;
-> -
-> -			for (i =3D 0; i < rm->data.op_nents; i++)
-> -				put_page(sg_page(&rm->data.op_sg[i]));
-> -			mmp =3D &rm->data.op_mmp_znotifier->z_mmp;
-> -			mm_unaccount_pinned_pages(mmp);
-> -			ret =3D -EFAULT;
-> -			goto err;
-> -		}
-> +		if (copied < 0)
-> +			return -EFAULT;
->  		length -=3D copied;
->  		sg_set_page(sg, pages, copied, start);
->  		rm->data.op_nents++;
->  		sg++;
->  	}
->  	WARN_ON_ONCE(length !=3D 0);
-> -	return ret;
-> -err:
-> -	kfree(info);
-> -	rm->data.op_mmp_znotifier =3D NULL;
-> -	return ret;
-> +	return 0;
->  }
->=20
->  int rds_message_copy_from_user(struct rds_message *rm, struct iov_iter *=
-from,
-> diff --git a/net/rds/rds.h b/net/rds/rds.h
-> index 6e0790e4b570..b27848ec5c5a 100644
-> --- a/net/rds/rds.h
-> +++ b/net/rds/rds.h
-> @@ -496,6 +496,7 @@ struct rds_message {
->  		} rdma;
->  		struct rm_data_op {
->  			unsigned int		op_active:1;
-> +			unsigned int		op_zcopy:1;
->  			unsigned int		op_nents;
->  			unsigned int		op_count;
->  			unsigned int		op_dmasg;
-> --
-> 2.54.0
+I'm not clear on what changes you're referring to here?
 
+> And I thought that was what you were suggesting in the comment. The=20
+> original comment sounded more like an "here is an optimization" instead=
+=20
+> of "this is important enough to kick back"
+
+It's less of an optimisation, and more removing something that is
+unneeded, and potentially confusing ("why is the driver doing this?")?
+
+> As for spacing, I get that there is a style, but it really should be=20
+> encoded in checkstyle.sh or something and automated.=C2=A0 My own tendenc=
+y is=20
+> to put way too many spaces in to chunk things together, and I end up=20
+> going over-draconian on stripping them out to try and meet the expected=
+=20
+> layout.
+
+I'm not too fussed about the style at the level you have here, these are
+suggestions to clean up if you're already re-rolling. My confusion is
+that you had applied my feedback to one part of the code, but not to the
+area I had commented on (which has the same style structure).
+
+You also had some sashiko feedback on v40. I'm not sure whether all
+items are relevant (I *think* you're OK for the first, for example), but
+worth confirming:
+
+https://sashiko.dev/#/patchset/20260508032953.337036-1-admiyo%40os.ampereco=
+mputing.com
+
+Cheers,
+
+
+Jeremy
 
