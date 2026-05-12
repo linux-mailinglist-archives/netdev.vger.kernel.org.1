@@ -1,171 +1,247 @@
-Return-Path: <netdev+bounces-287166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287167-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UNqfEqsuA2qN1QEAu9opvQ
-	(envelope-from <netdev+bounces-287166-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:44:11 +0200
+	id kIy5KUosA2oR1QEAu9opvQ
+	(envelope-from <netdev+bounces-287167-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:34:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D92B521823
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:44:10 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46E49521462
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:34:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7573B30706B0
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:23:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 087BB30CCA2E
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:25:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE7FF33CEA7;
-	Tue, 12 May 2026 13:18:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8F438D41B;
+	Tue, 12 May 2026 13:23:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FyGQDgO3";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="CHsWbYEF"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="SHQrxH9F"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013039.outbound.protection.outlook.com [40.107.159.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EFF43E173F
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 13:18:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778591932; cv=none; b=dyeS7ZMyuhnL5aQh5W+3GqP/DUVw/Nmax+TzxX9vM8Ew4PEMxCktntscBQzordYfv+r9siVrMWP6fzPjWo89J0/gVUe3vrtyflpPrZfDkW9rjMyn5GhyJfCo5SGqPFBs2X4areSg3zMi0Ypi323IMWnK3UKVQjLutB2aeZ5LEDU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778591932; c=relaxed/simple;
-	bh=oJmQu8Di5waoLooSs0lgzRwiGz4G2MGjJbUfI5fl+68=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OSy2CafXVBLp3mLC96bfu6of1dSuoiaAzcSROdezK76ffKIkMP0dGf8zug1AlwUE/u8lj27ICD32RrvdikMCrLNzLuUMpqvxZtYKrwF22WOdtBmFALnDdE3/rcl50kNlrdSxAjhrw6SBjfOIFWgIVSa02IoO3l2Nv6NyBo0ksMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FyGQDgO3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=CHsWbYEF; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778591930;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GQ8M+MijEct0ZXEThMl7dvJEZhdm5E1OCW5rqU2+pPA=;
-	b=FyGQDgO3H2ykWHzuNXYpJBeFUfCCOXNNDUSjheYGHZ/FnmRlmA1K9sFIkGvFlSFib8fG7x
-	2JXwz6HGSdYYu4E9konafAOGStcMw67t19eIcxP7yZiAR4WS32z9j8CklYJvsUQP2rJURT
-	FplWYW/hXEnJ3IpWlepnahaNFG/D8E4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-108-_XPJdpNJMoeM7e7qrMucTQ-1; Tue, 12 May 2026 09:18:49 -0400
-X-MC-Unique: _XPJdpNJMoeM7e7qrMucTQ-1
-X-Mimecast-MFC-AGG-ID: _XPJdpNJMoeM7e7qrMucTQ_1778591928
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-48d1b294dfeso49885275e9.0
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 06:18:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1778591927; x=1779196727; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GQ8M+MijEct0ZXEThMl7dvJEZhdm5E1OCW5rqU2+pPA=;
-        b=CHsWbYEFOF8OHC0hfmmdGHpdZ1kQDVaCOul9qUvLcdVCmxQbZ/CUatjTf8PLET/DKY
-         lJHGjzWvyuW+Cv33rYAjID6XnJQ3TPBY9WCf3F+VcNtUdg2cM6IBMjNQUn7qohbiUJqa
-         8vJzwqLHmM7+PUIOslXPCBpPnLbpnntGFyHS+dLYttzOgxJGBRCzH2EOBk+IcpD2Hydn
-         Hmmm5rmBL0HsSFKFsQW+AYbxAOIPvIGV0t3HmXx2ZmrZL/s2+FibCuQiGQwyHnI21Om7
-         HwTP/XGv9xFjtPgw1b2mAra7qUIStC5Fh5VvWWr4qw0kFjTNAtMb1OE6hUOCRAuk0qcZ
-         DfOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778591927; x=1779196727;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GQ8M+MijEct0ZXEThMl7dvJEZhdm5E1OCW5rqU2+pPA=;
-        b=BLnTW3adCmrjNOBDsEO1vCa05m9Vbuul54CSH9X3cdfbf54l5ucMyY3nnQh4REI8Qq
-         VgCBeebFAHy6csxPzNV9tlkzDBJjKpb18X+Q+g0ROUZdszSNG8ZzBtaczICjvaM1Ii3n
-         LBjWoef+ov9kuX7EVk7zBB3CLC0UTNfnpN4PhR8IILBRKxtBxCvyViBJ9Xc1+e0LnSDV
-         kifdG+dSzLakP0QkoTArq5WTpPPLU0YGn+V3795KZI6t1uwS1T+/EbB1m323hoUZVdpl
-         4WbSzhUkLQAydSSFc05ehzrXo9RhePp2RvnBQkORbYRLXFm/cdW8R2b1HaZ8gzdXSha+
-         Q/dQ==
-X-Gm-Message-State: AOJu0YwSVhlXvKc1f/OYzCI+CL68E7Up+tYDqZwhJRiACthsmOk3ifP1
-	G9CORt8QAUHqkbqnqTy9aa+TnLU70pym+/PTPQIDEfXRBX4oYtY44+wHEgEAOJw1WGXQRv8wem4
-	C4iY/SozqLwATBf6Fhw8U8De3e6+4vUg5piL6M5upt8iS23YXo0PQxUJmk1qHKhD+pg==
-X-Gm-Gg: Acq92OEe+WjZTk4Z3yzdTeYbPF3tHrT0cqzbG8qTWVvhwp5kCTACFURkMy+bv5qk0ot
-	6ldxouZXahPqUiayrBjdcqkkoivfe6iclqfG/eg8Iq3uARkgPVmMCUS9HkxjwGT7OvN9OfWxZT3
-	BlVRjdSHneRhZXmSs5ZrUbFmystkUsiluRk0hrWMQp+H2Fbtfef5+Y4gkHhnLd/1P7VA55Y3q87
-	aukMXvXhpDvsOmhakuJVa3X7OjIbTmbxpm4WTT7FUINzT1CgfCc3hz+AtWdnAhUchNvjgl/3aUf
-	S9zC/9xcQFFFO+CNaS64byTG+pKzxh9fktoeoA2qfe9HS79K/5Zt90BPXRPFnoCO2ivcxn2U+ZV
-	Sf3rARi7uqeRo1OiURPhnlUkbZruTSm8dgieLQZiKC78RhHm6kg3hMu0=
-X-Received: by 2002:a05:600c:3ba8:b0:48a:97b6:7420 with SMTP id 5b1f17b1804b1-48e707fbac7mr238767185e9.24.1778591927519;
-        Tue, 12 May 2026 06:18:47 -0700 (PDT)
-X-Received: by 2002:a05:600c:3ba8:b0:48a:97b6:7420 with SMTP id 5b1f17b1804b1-48e707fbac7mr238766485e9.24.1778591926996;
-        Tue, 12 May 2026 06:18:46 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.9.106])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e8f428b88sm21742135e9.16.2026.05.12.06.18.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 May 2026 06:18:46 -0700 (PDT)
-Message-ID: <bf110a3f-331e-484c-8a0d-0204ccca104c@redhat.com>
-Date: Tue, 12 May 2026 15:18:44 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E522749D6;
+	Tue, 12 May 2026 13:23:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.39
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778592201; cv=fail; b=h/vr6+86hxCBNm1w50rOEeKkvO/VYXEaKF8q/23bmB22J1wl7aJHUB+Xv1jeToWnd2TOUkvDVlGBiBapTCk9lgAsW9NJZnGOai7eixkKg+rKfvfgWyCNsku5H1lOwwE79tuFz7bwfp+oCSChIqz2RBdUoblCQ1UJ9qAaV3YE50M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778592201; c=relaxed/simple;
+	bh=3501q26RzV3U+NeV5fsBoJv/5Hnkckqwcd9/Es0T3bE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Fu1+ZEi2Ocknd2Ff5czN+DLtPL+qE+Ktknga0F9SB/NGRZYdyhlhPJv6X/8o4crmQZYBdCUHoQognRCNhpVyDCqB7Lv1uc4krO5yOdxcQMsfjmDkZ2zVH+KQhTumXm2QuL8zWNItJ5zM/Pm0M6E/bd23yvpD+p41RHHzw4TKmHM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=SHQrxH9F; arc=fail smtp.client-ip=40.107.159.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AqH+u/W6aBeNKThsZZbhAHvD7bO6wHOGyIwPn0iBAAbhJgtq1fNanfy2ZnQff4cUoSnpjQWOZl3yRM+8n6ebn3x9QovDQgvlRwTmsyjY74VVrUAsUbHKdYecM+Qf4Gs/hRciLCmt6FEquz0q0zPAEOzdKNrh/w5ubo4guPLWELWupwqP6lvDGQenls3bfJbtVWRm/FQWb145soXxT/G1NPpzAvKZ7teiYrTSHd+nOiY5YHETb3z1XJEWBoBK7K2LZBMVjeII1mL73giKs5ud8STIZunKAz0XBbRG6Jx86/UQ4SL01/CJ9kQVE3UHaNKUCvFK5dPTVYBWNWlz0hDQcQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HgNhhWUPf7YJRk4Dd6SQ9iQDP9Vs7rHck6uJToKmt9Q=;
+ b=Ib9qwtt+m+HieKJ2LAorfEXPlNqa5VBoh2r3VEhEixdLLf8zduy3d7YuFAbTSmmtZ5NbwyjzbGPQ4ghkCIniI7T6axkr1eEqpsslDzeQArgeKwsTeL7h9wts9tRjKgg/Fz6Zum1Jq391com4oLMnIp7YxKtlTxLq3iZKoRbrgS/C+Wr8zmSC24XCpUCt5TxWaU1AhDRyJOE9PSKHWz/FKgcRE6xDv+/7oxLMYGLWZEHNcFvNyUu8yykAce21yYooj+yXjb+KzN+3bxu6V9D52E8Kobm5ChVOBXZ69dvZq+2abPS0WgHnmUUy0iCS8TsjGONdSDJdqb5aEDehMaZ7Wg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HgNhhWUPf7YJRk4Dd6SQ9iQDP9Vs7rHck6uJToKmt9Q=;
+ b=SHQrxH9FPggD8zfhw4bM8Eh2HeLaIXrNARkdiF0fq4v4j+204OkQhjSV3iePROTlxX/RJLhJfWm6BEKDmqysTUErXNIOiwTaWKUyU6HaLMniay7/IYofxSOjFasyOtunn/uv4GqjDTVU6LFiLx+WczuVdPTYXhZTCl5wvsMVYGhDHe434nenlssA5fe8CatHQ/Q/f/Iu6TREw3cM8v7oWNi4eswZGL3hE1qEJD5431FNKmperIyXmwKeLzGxQbiiu+LEQ8RvbbfRigSOdkOu514RJxFKlfuzWDhEwSrP93lBfSMoBmaRXqKJ8Do6kgdqDeMTW5kc7PU0J3JuWelPJQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PA1PR04MB11508.eurprd04.prod.outlook.com
+ (2603:10a6:102:4e0::21) by DB8PR04MB7004.eurprd04.prod.outlook.com
+ (2603:10a6:10:11c::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.11; Tue, 12 May
+ 2026 13:23:15 +0000
+Received: from PA1PR04MB11508.eurprd04.prod.outlook.com
+ ([fe80::ca15:d140:3af1:77b3]) by PA1PR04MB11508.eurprd04.prod.outlook.com
+ ([fe80::ca15:d140:3af1:77b3%5]) with mapi id 15.20.9891.021; Tue, 12 May 2026
+ 13:23:15 +0000
+From: Ioana Ciornei <ioana.ciornei@nxp.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 13/13] dpaa2-switch: do not error out when the same VLAN is installed multiple times
+Date: Tue, 12 May 2026 16:23:10 +0300
+Message-Id: <20260512132310.956626-1-ioana.ciornei@nxp.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260512131554.952971-1-ioana.ciornei@nxp.com>
+References: <20260512131554.952971-1-ioana.ciornei@nxp.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AS4P250CA0029.EURP250.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5e3::19) To PA1PR04MB11508.eurprd04.prod.outlook.com
+ (2603:10a6:102:4e0::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 0/4] net: ethernet: cortina: Fix various RX bugs
-To: Linus Walleij <linusw@kernel.org>,
- Andreas Haarmann-Thiemann <eitschman@nebelreich.de>,
- Hans Ulli Kroll <ulli.kroll@googlemail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?=
- <mirq-linux@rere.qmqm.pl>
-Cc: netdev@vger.kernel.org
-References: <20260509-gemini-ethernet-fixes-v1-0-6c5d20ddc35b@kernel.org>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260509-gemini-ethernet-fixes-v1-0-6c5d20ddc35b@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 3D92B521823
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PA1PR04MB11508:EE_|DB8PR04MB7004:EE_
+X-MS-Office365-Filtering-Correlation-Id: 64b8f911-992e-4e1f-06ca-08deb0299fad
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|19092799006|11063799003|18002099003|22082099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	6dcp4f/Xl5qFcVNga7rkuEdHWs6TT/TI3dklDfai6PfVupuUo2KeUjPTo/vYc5XAsF8fZjeA4zEF778vWtF6WgLyEUoima9Yp9EhrTrAKnN5dEsJhK0BJmT9mPk0LbaBFnB2bMCn4s9alExxs4OrNZTVHht/yCkDnQAF22xybxHpmicfIvNEfaHprIwSl8Kstj2/4BEu6DWyxlxQekBoyGquTXGa581Xx/8WeQB6tFlgtWo055v+YkFWLN3fXp+wcobpGEtSykMliTGALsvAnrM3yQcIxa7qXVOGdpX/fVut++dGJia2jET7RLnxHmvEvxfujTTyT5dGbWRFeqJXWFzFu/rVc2RUABaKUenn7blNfNTIPJBjgxQAqQDetlpSR/s6hH7Ur3PAZ2kl1FLJ5ths4Y6DLRd59Y8efzLR/y29qxBpbkflcbZvfGhsEDN36Y1k+nGm5z9Nyeog+7oH4+OH4S1M2ti2X2V6UeUnuqpZzzhkNr4jBEXmhJ7QMiY4Hm0mE/uRz+o08TqgbcI4lWo3Dqhjd6xknpO26tSmRb42yA5D0HH6sLpdXl8ME8anxCtL7HGIwh/qJqROZmmrsOdsCSQKf+xIEUZtOvqr5dCQIViCzcdovbKuxpAkH327o4qHJcBgvvZEWEaZiDJ5Zs8u5bQBVC+UeJ9kLQtwlcnnqQElx9hZl5Zr814mDVSK
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA1PR04MB11508.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(19092799006)(11063799003)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?iviABHJ7TkkNmyZdIzRyhQIXFhjQIdDHD7Pj1gE3kVOVPd8S5EwO+ZjoMzvP?=
+ =?us-ascii?Q?MquQxZB1ILpmFbwBQjU7JhAi4nMzbquJPlwvVd8rICIuoie88gEhchhunN5Y?=
+ =?us-ascii?Q?/jdcjps0R/uUDutSHnHGvtuE0QiZXb/F2OPbcf67+j2jCjw2t8PKu9Iflll9?=
+ =?us-ascii?Q?G2WYyi29BvVQUO+YERx1pY24s4fEJ1YHZb08u12BoXzTeSSeK1NRTWSw0DRA?=
+ =?us-ascii?Q?UCtkS6mTFuFg4bWrbatb2bNJJjUXAbrAdLHVhPs1PXdYav0r0I1xySPqTV1p?=
+ =?us-ascii?Q?Gp8uMTHyZJ4c75hWOR2cNGHqbjYm63ey4AIrzKX5IWLM/tPr44TNLH5mFPZl?=
+ =?us-ascii?Q?vSMMraPLoS8Cuqffokbk9zrXGvb14WbBikLh8DRP1rG9/VvKrghNgR19C/c7?=
+ =?us-ascii?Q?n+BcSrRruXIa1Q5d3JDOvtqhiDHcVEUjnYItzY8Y6lcB1kUSTAApCBmMwDVd?=
+ =?us-ascii?Q?S5sMDkyla9qcTNnCdyhaCTHFmBtD82+W5Xz3sC0YsblCOOIjSXFqjXaqz19Q?=
+ =?us-ascii?Q?24h2k2Dhx66CTsp2p1gwcsVdDWBCiDJdc7zwIh7XdhzkYdjmjvmvhzPEArX1?=
+ =?us-ascii?Q?iXyzDtX4iFI0RZiWrFyA427wzCL5RMc4ZaLawKFoqkKnBkE1THQiHIvrHErc?=
+ =?us-ascii?Q?nxdBBnYMuSqj36G/KWjlOrXrC7XG3TbWq0kZ+/P3LymLAdfG9PKPZj2PEnff?=
+ =?us-ascii?Q?e3f0L8leg64xKwsuag9OnseUK9P4ysbs7auzQfiNST3E1/ATWaK/Mhx0kkAJ?=
+ =?us-ascii?Q?tLnf2giJTRSr0gJBVngdpE/XUll37uFI3DKKzYoUSmJTuaS7LtG2cLg6nwdf?=
+ =?us-ascii?Q?AXiHS2DstwAqedVzTnk7R7trtxGywc5wlrAUlQEw6mfU6IhNDq1ufBBh25X+?=
+ =?us-ascii?Q?51roPmg/6Jop/AEZbA2Uw9EuDmFSKuK9vCweFhJGIdDT+MKnaHt5hJh3hoBm?=
+ =?us-ascii?Q?xsXSWZjfH8HAPArpzBldPJpTQLBHf1Vypp+n4kqO3PrHNdqwTUHjQUyP2q5n?=
+ =?us-ascii?Q?8Bln3gVWL76jH3liwA4q4UkeXp3RkY1q9bHekxNi43tOQlti9LWZavw/3Hr2?=
+ =?us-ascii?Q?axxMPH25fWUUUW3O0QVl2aJ0ZwpDj+P9Tq5laK9ihnRLa8dlujSi8DpfyByq?=
+ =?us-ascii?Q?LGat5oMd41rXgUwH2bPytoi1JMFXVfXclI0z2M2HcXvPef/dNSmBuGrJlnOb?=
+ =?us-ascii?Q?ygfzpdxP3qxoMjfqvfZBVUzq7o/imdL6Tre0SFgGmu/QWKL46RLRsFA3xdaB?=
+ =?us-ascii?Q?sDdr8+dHp4M3WYIbKbsbPKXEG2swkftetfi1G2Zr/eqtUQpGumciss1cuqQe?=
+ =?us-ascii?Q?PfNi4dtrwfZjYld7A4zVrFgLOo6NuDeJGLrtKPbXmOgBihkFdQev9wiJIWmQ?=
+ =?us-ascii?Q?BvDhf5gc9WpJGds1vzgCvHthXkC5IqNE4+AMl5YnbxQXAMn9rO+938NNnZxn?=
+ =?us-ascii?Q?kdl9Yx2wEilxFyHc0Ph9hLfPLxcg8SVNszV5GXfGvz08CfgGSv+KRYd1e0WC?=
+ =?us-ascii?Q?smAuVgd8BU2i5mA1FefX8nrLkUF21kRZexNWAUNnH+9pte5oahNixCH6W51n?=
+ =?us-ascii?Q?3nkdUD3tQZSWqbk5uxckiiRiAdG58tDP9l4eCQTFn1D7DUAqtWU+jzTII7/s?=
+ =?us-ascii?Q?DZITc+DQ8ODnrOpqav465k1Jq2XrQ04f/t4YC/EoGDKRZxQF+YOcSbt1Z24l?=
+ =?us-ascii?Q?d71JoPbpl5cyBgxZ8HvoBgBjroBU40XCNcLJw6aNxzGT2swKOPZudnpDuKtS?=
+ =?us-ascii?Q?1rDnGyHNOw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 64b8f911-992e-4e1f-06ca-08deb0299fad
+X-MS-Exchange-CrossTenant-AuthSource: PA1PR04MB11508.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2026 13:23:15.3684
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: feNQt+PyNRziBcF37s05Gbj40LT423R/R/zLM2hsKyKcX5ToDziAdNSbt9cVLHa/IwPAzLfNtPtGUhl2l6muXw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR04MB7004
+X-Rspamd-Queue-Id: 46E49521462
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[kernel.org,nebelreich.de,googlemail.com,lunn.ch,davemloft.net,google.com,rere.qmqm.pl];
-	TAGGED_FROM(0.00)[bounces-287166-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TAGGED_FROM(0.00)[bounces-287167-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[nxp.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	TO_DN_NONE(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nxp.com:email,nxp.com:mid,nxp.com:dkim]
 X-Rspamd-Action: no action
 
-On 5/9/26 12:13 AM, Linus Walleij wrote:
-> During review of a minor patch for a bug in the Cortina
-> ethernet driver, Sashiko jumped in and pointed out a number
-> of nasty bugs.
-> 
-> This series hopefully fixes all of them.
+With the addition of the LAG offload support it has become apparent that
+depending on the order in which a bridged bond setup is created, the
+driver could be requested to add the same VLAN twice, once through the
+802.1q filters and then through switchdev.
 
-Fortunately(?) sashiko is very good at finding pre-existing issues, and
-this series pointed to another set of such things:
+This is because any VLANs already installed on the bond device when the
+bond_enslave() operation happens will also be installed on the switch
+port through the .ndo_vlan_rx_add_vid() callback. Once the bond device
+becomes offloaded, the same VLANs will get replayed and installed
+through switchdev.
 
-https://sashiko.dev/#/patchset/20260509-gemini-ethernet-fixes-v1-0-6c5d20ddc35b%40kernel.org
+ $ ip link set dev eth4 master bond1
+ [  165.008131] fsl_dpaa2_switch dpsw.0 eth4: configuring for inband/usxgmii link mode
+ [  165.021020] 8021q: adding VLAN 0 to HW filter on device eth4
+ [  165.083351] fsl_dpaa2_switch dpsw.0 eth4: VLAN 100 already configured
+ RTNETLINK answers: File exists
 
-patch 4/4 will need updates, too, but the first 3 are AFAICS good.
-Since I don't see dependencies, let me apply them.
+Avoid this by not erroring out when the same VLAN is installed or
+removed multiple times so that we avoid the above issue. Also remove the
+netdev_err() since there isn't anything that the user can do to prevent
+this behavior.
 
-/P
+Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
+---
+Changes in v2:
+- none
+---
+ .../net/ethernet/freescale/dpaa2/dpaa2-switch.c | 17 +++++------------
+ 1 file changed, 5 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+index 0acebb386486..b7b07ff8c60a 100644
+--- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
++++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+@@ -372,10 +372,8 @@ static int dpaa2_switch_port_add_vlan(struct ethsw_port_priv *port_priv,
+ 	struct dpsw_vlan_if_cfg vcfg = {0};
+ 	int err;
+ 
+-	if (port_priv->vlans[vid]) {
+-		netdev_err(netdev, "VLAN %d already configured\n", vid);
+-		return -EEXIST;
+-	}
++	if (port_priv->vlans[vid])
++		return 0;
+ 
+ 	/* If hit, this VLAN rule will lead the packet into the FDB table
+ 	 * specified in the vlan configuration below
+@@ -2003,13 +2001,8 @@ int dpaa2_switch_port_vlans_add(struct net_device *netdev,
+ 	struct dpsw_attr *attr = &ethsw->sw_attr;
+ 	int err = 0;
+ 
+-	/* Make sure that the VLAN is not already configured
+-	 * on the switch port
+-	 */
+-	if (port_priv->vlans[vlan->vid] & ETHSW_VLAN_MEMBER) {
+-		netdev_err(netdev, "VLAN %d already configured\n", vlan->vid);
+-		return -EEXIST;
+-	}
++	if (port_priv->vlans[vlan->vid] & ETHSW_VLAN_MEMBER)
++		return 0;
+ 
+ 	/* Check if there is space for a new VLAN */
+ 	err = dpsw_get_attributes(ethsw->mc_io, 0, ethsw->dpsw_handle,
+@@ -2129,7 +2122,7 @@ static int dpaa2_switch_port_del_vlan(struct ethsw_port_priv *port_priv, u16 vid
+ 	int i, err;
+ 
+ 	if (!port_priv->vlans[vid])
+-		return -ENOENT;
++		return 0;
+ 
+ 	if (port_priv->vlans[vid] & ETHSW_VLAN_PVID) {
+ 		/* If we are deleting the PVID of a port, use VLAN 4095 instead
+-- 
+2.25.1
 
 
