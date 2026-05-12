@@ -1,142 +1,195 @@
-Return-Path: <netdev+bounces-287225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287232-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +LINATNOA2pq3AEAu9opvQ
-	(envelope-from <netdev+bounces-287225-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:58:43 +0200
+	id KKQDMN1VA2qP4wEAu9opvQ
+	(envelope-from <netdev+bounces-287232-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 18:31:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AECCC524395
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:58:42 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFB36524B77
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 18:31:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 04DB73083AA0
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:53:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 93FA7303C9B8
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 121F23B8139;
-	Tue, 12 May 2026 15:53:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F5603CE0BD;
+	Tue, 12 May 2026 16:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h6MR8EU3"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="iL3Wnq4P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FA53905E7;
-	Tue, 12 May 2026 15:53:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABAA93CC338;
+	Tue, 12 May 2026 16:28:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778601184; cv=none; b=t8ZkIc6AVaTfRfIsk0/BwdWcOGGZB7Dy+nHGnB8TFXTk40DUH54QtLcvSJioAYFRru8SunHFcOlvROeSIrCVycNwzTADemsvGI8GjjBdED/YfmgUd3f2Q6dCesLmhgDLoEcNzuC7JvNCxLpRT+4wG/AaWqVCil5mNEZSk+tq5eM=
+	t=1778603311; cv=none; b=JUKIHpcMisZJgACsVEBpCl37xVs704/e0C3n1D+8FL/yEujr3LnpJRTG8VcRfxaWZTGhQ+6ULeC/9wjrwCv3/90tRD4H/6ykozd54P+Tt0LIwncsoY5hOfe4epiUTIdzJStbq9uWITyU3fJHQN2UZkqjJfXHk0oRHqueK5NTP7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778601184; c=relaxed/simple;
-	bh=+A6RU+3DA3OxZ4iB9Ss03OoR1eraZj8TU5tTdmq4D8U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BQzuA+Xch6hvLP2rK5oFsPiS5VJhuFO+kdvaQnj+WNYQObZvoAbRDv8AMgCrRYoRkCR/4MwInxtEJQLVTSok5MS8LW8xc7O+4jtG5mZn6diSkM5GlJVSHlgvuhyua2+W2tpD0k+PVByzkdlIJCSBaPkOwCGfX3WGkBx5t8sI7A8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h6MR8EU3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A093C2BCB0;
-	Tue, 12 May 2026 15:53:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778601183;
-	bh=+A6RU+3DA3OxZ4iB9Ss03OoR1eraZj8TU5tTdmq4D8U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h6MR8EU30uldPZH2L/gkkWTPKN210PZs/Dzp3UirV62WyFlMoTbasbowHOU+7Flq1
-	 aS6eSIg5gheeIaPERQByxDVVCyPUyiAbOnaytN2JMhYEqSgK0MQ+Zg3oNNVOD8CjhP
-	 SRyYLQFULt5tRTnuwDRsSJEsnKgVgmCDwCP8wAWf2XplEB+J2enOWnEDCj3Q0s2SbJ
-	 ts/mQe5zfzO9J4WomL2GT9+8AYbuYrREfjOUYMFuc0rPaesKZ9Wh8QoqWKUVdL6s4j
-	 mFtyEx/fLl+74i6w8NtsHumdEZG9L16Y9Wdb95UdSgOm/+hrdsBVCEm55GfIHSWvqH
-	 4HM1+XuuG7mwA==
-Date: Tue, 12 May 2026 08:53:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Maciej W. Rozycki" <macro@orcam.me.uk>
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>, Andrew Lunn
- <andrew@lunn.ch>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: MAINTAINERS: Add self for the 3c509 network driver
-Message-ID: <20260512085302.53cca49a@kernel.org>
-In-Reply-To: <alpine.DEB.2.21.2605120123260.46195@angie.orcam.me.uk>
-References: <177827761704.865600.12887598979033208728.git-patchwork-notify@kernel.org>
-	<20260509230519.57607-2-enelsonmoore@gmail.com>
-	<alpine.DEB.2.21.2605100246020.46195@angie.orcam.me.uk>
-	<20260510085841.243bdd7e@kernel.org>
-	<CADkSEUj3qUFDG-Hc3_RNZjm6=h8wJF63OOcHWsZGumG18VdLkA@mail.gmail.com>
-	<20260511162044.45494456@kernel.org>
-	<alpine.DEB.2.21.2605120123260.46195@angie.orcam.me.uk>
+	s=arc-20240116; t=1778603311; c=relaxed/simple;
+	bh=y47bLhuB3bbwOu6OG3ySuxnv0TFonWNvzbA3pv9b8JY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CbdpZY0a3jXrozxrkqGo/Vlswk2e1gXHHGFfot3aJD5rJw70WCn2rdR2iHtztYDsXLG73ty0ci06UANYaZAd5XzpXiX4D9GqJGEI3wsDeNI1kcIwgRQJ6PBhUwf8qy3jRpX2LSMoAZIZ8x5Xzd1lpICNGJTKVP+KGBuHenJnJqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=iL3Wnq4P; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64CEwdVV2086045;
+	Tue, 12 May 2026 09:27:50 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=xXulHHw/MC7noVVIykDiuU4TO
+	Uml7RgT8BW3cOD1fXI=; b=iL3Wnq4PetcbvpMOMDHDpWlzfDkaZivaglBSpx/Ic
+	h0kyCPN4i6VpSjgnjyFDC7uhisXzsPUebKCIED9dBOYlU343kUAusm0EnDpiuKEC
+	1n2RcR0a+u8Km4WbjsVMDWnTZG/63aLaIuATddZb81v/RGauEI49KFqEkcMq9M1s
+	Kai3cNa/0IvI4sCQz/oQnXqd6UpGMn09F4hAPArA4YVLUZuKpbm57U1orH4gVyrB
+	jK/qomHVV132DGQ2rnLxxhCi3ERL4TYtEfWBwl074BTbVkGiBVKIi6W/tjCJUN/S
+	4CpopW3hD0rQ/UijqNeRwNc8lQfrwj1O4/AEKSgSP90Og==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4e46epraqk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 May 2026 09:27:50 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 12 May 2026 09:27:48 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Tue, 12 May 2026 09:27:48 -0700
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 40A6C3F7062;
+	Tue, 12 May 2026 08:54:41 -0700 (PDT)
+Date: Tue, 12 May 2026 21:24:39 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <oss-drivers@corigine.com>,
+        <jiri@resnulli.us>
+CC: <akiyano@amazon.com>, <andrew+netdev@lunn.ch>,
+        <anthony.l.nguyen@intel.com>, <arkadiusz.kubalewski@intel.com>,
+        <brett.creeley@amd.com>, <darinzon@amazon.com>, <davem@davemloft.net>,
+        <donald.hunter@gmail.com>, <edumazet@google.com>, <horms@kernel.org>,
+        <idosch@nvidia.com>, <ivecera@redhat.com>, <jiri@resnulli.us>,
+        <kuba@kernel.org>, <leon@kernel.org>, <mbloch@nvidia.com>,
+        <michael.chan@broadcom.com>, <pabeni@redhat.com>,
+        <pavan.chebbi@broadcom.com>, <petrm@nvidia.com>,
+        <Prathosh.Satish@microchip.com>, <przemyslaw.kitszel@intel.com>,
+        <saeedm@nvidia.com>, <sgoutham@marvell.com>, <tariqt@nvidia.com>,
+        <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH v13 net-next 4/9] devlink: Implement devlink param multi
+ attribute nested data values
+Message-ID: <agNNPy2FoA1CFGrG@rkannoth-OptiPlex-7090>
+References: <20260511033923.1301976-1-rkannoth@marvell.com>
+ <20260511033923.1301976-5-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: AECCC524395
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260511033923.1301976-5-rkannoth@marvell.com>
+X-Proofpoint-GUID: 9uqlHyOr9Gzw71SII3R8MQ23GPKDmXcD
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTEyMDE3MSBTYWx0ZWRfX3I6zMTQdlafd
+ VzS7aYDP7tweiv9GiPNxLqo7w9RyGk6z5wl+/uUeIjsHYNZdQhjDrA1pR+ZbpkVu54Uw5euMZD6
+ zAU4umbIWjftrbYegrjEAHDGjKv81uPyqqwQ/2rDGYqXoH3WYuDgbbbhskvFVpYWTqdpGWDqKc3
+ O9UJRlAsk/+kJYc58VMAR2o3S4z4CHli5sQAiMvuTdlHlrJ1tGIz7O1erQp9aZktfJ/mHO3QJN7
+ u4fBCnVazPTgoIwq9/ASUo47WZANxrZlONlQm3f8wFDg+47gDgZfmcx5315GWdy4e+ay5kZhkNS
+ VD3Oz2AUzMOnRJRKkqD7AFqqrbAWmA9M7f0obtj9uSDIaqoBRenDIW5BATRf0VY42YCG7lotdL2
+ Y1vTDxnWr61FfI5U/sUNcMp8vdrm1Ln25qqEt8Abo8FYH5x+UPxprQY6B6FZPk2axoNfQxmcMFc
+ 4aTVy0ydzWzWPjNzDRw==
+X-Authority-Analysis: v=2.4 cv=ApDeGu9P c=1 sm=1 tr=0 ts=6a035506 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=qit2iCtTFQkLgVSMPQTB:22 a=VwQbUJbxAAAA:8
+ a=M5GUcnROAAAA:8 a=Ikd4Dj_1AAAA:8 a=qnsy3ciE5cuyejZEVdQA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22 a=Oh551-UHZqmTy8JkqTUo:22
+X-Proofpoint-ORIG-GUID: 9uqlHyOr9Gzw71SII3R8MQ23GPKDmXcD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-11_05,2026-05-08_02,2025-10-01_01
+X-Rspamd-Queue-Id: DFB36524B77
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-287225-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[amazon.com,lunn.ch,intel.com,amd.com,davemloft.net,gmail.com,google.com,kernel.org,nvidia.com,redhat.com,resnulli.us,broadcom.com,microchip.com,marvell.com,linux.dev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nvidia.com:email,marvell.com:email,marvell.com:dkim];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-287232-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	DKIM_TRACE(0.00)[marvell.com:+];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[31];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Action: no action
 
-On Tue, 12 May 2026 11:26:37 +0100 (BST) Maciej W. Rozycki wrote:
-> On Mon, 11 May 2026, Jakub Kicinski wrote:
-> > > Here:
-> > > https://lore.kernel.org/all/alpine.DEB.2.21.2604240004280.28583@angie.orcam.me.uk/  
-> > 
-> > Maciej, what's the relevance of your machine in the lab?  
-> 
->  It's one of my test machines for the defxx driver, specifically the EISA 
-> binding.  The Ethernet link served by the 3c509 driver is for Internet 
-> access, FDDI is intranet.
-> 
-> > Does the platform or any component that you test on this
-> > platform have actual users?  
-> 
->  I believe the defxx driver does, yes; unsure about the EISA binding.
-> 
-> > If the answer is no / unsure please fix the driver up to
-> > follow modern coding standards and submit the patch.  
-> 
->  I don't mind updating for our coding standards, though such a change 
-> might be considered just irritating noise that interferes with `git blame' 
-> (though with the removal of the code upstream, this got broken already 
-> anyway).  NB it's the reason why I have hesitated to reformat the defxx 
-> driver for decades now, which obviously has much more serious issues here 
-> such as the assumption of 4-character tabs.
-> 
->  I think the re-addition needs to be done in two stages, first being a 
-> plain revert so that no code change comes unrecorded in git, followed by 
-> the actual formatting cleanup.  Sadly this won't fix `git blame', but at 
-> least the diff will be empty between the repo states as at respectively 
-> the removal and the re-addition.
+On 2026-05-11 at 09:09:18, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
+> From: Saeed Mahameed <saeedm@nvidia.com>
+>
+> Devlink param value attribute is not defined since devlink is handling
+> the value validating and parsing internally, this allows us to implement
+> multi attribute values without breaking any policies.
 
-Right, since it was already removed the git blame is going to point
-to the re-addition. Hence it's an opportunity for a cleanup.
+Jiri,
 
->  Does it answer your questions and seem like a reasonable course of 
-> action?
+Sashiko raised below issue.
+> diff --git a/net/devlink/param.c b/net/devlink/param.c
+> index 1a196d3a843db..4cc479bd019fd 100644
+> --- a/net/devlink/param.c
+> +++ b/net/devlink/param.c
+> @@ -252,6 +252,11 @@ devlink_nl_param_value_put(struct sk_buff *msg, enum devlink_param_type type,
+>  				return -EMSGSIZE;
+>  		}
+>  		break;
+> +	case DEVLINK_PARAM_TYPE_U64_ARRAY:
+> +		for (int i = 0; i < val->u64arr.size; i++)
+Can this loop read out of bounds of val->u64arr.val[]?
+There is no bounds check against __DEVLINK_PARAM_MAX_ARRAY_SIZE. If
+val->u64arr.size contains garbage or a maliciously large value, this will read
+past the end of the u64arr.val array.
+Could this leak adjacent kernel memory to userspace via nla_put_uint()?
+> +			if (nla_put_uint(msg, nla_type, val->u64arr.val[i]))
+> +				return -EMSGSIZE;
+> +		break;
+>  	}
+>  	return 0;
+>  }
+I had modified in v12 as per https://lore.kernel.org/netdev/3pk4hkzgwy3a55zveapgmk23bsevru55xv75vhkzbpmzkfofcx@rlnkrvynofig/
 
-Sounds fine, I'd squash them, but as long as the patches come in one
-series - either way works!
+Is it okay to incorperate the sashiko comment and modify as below ?
+
+@@ -252,6 +252,15 @@ devlink_nl_param_value_put(struct sk_buff *msg, enum devlink_param_type type,
+                                return -EMSGSIZE;
+                }
+                break;
++       case DEVLINK_PARAM_TYPE_U64_ARRAY:
++               for (int i = 0; i < val->u64arr.size; i++) {
++                       if (i >= __DEVLINK_PARAM_MAX_ARRAY_SIZE)
++                               return -EINVAL;
++
++                       if (nla_put_uint(msg, nla_type, val->u64arr.val[i]))
++                               return -EMSGSIZE;
++               }
++               break;
+        }
+
+>
 
