@@ -1,182 +1,139 @@
-Return-Path: <netdev+bounces-287186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287187-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kGdeE8o/A2rO2AEAu9opvQ
-	(envelope-from <netdev+bounces-287186-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:57:14 +0200
+	id YLV2FHA+A2qr2AEAu9opvQ
+	(envelope-from <netdev+bounces-287187-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:51:28 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA96E52317A
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:57:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD2F1522F58
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:51:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9AEEF3211DA7
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 14:02:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 658323232F21
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 14:02:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CAFB3A599C;
-	Tue, 12 May 2026 14:02:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E5D63A71A1;
+	Tue, 12 May 2026 14:02:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sM1ZpHVo"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pJcZuYlK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE69A3A599E
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 14:02:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFA63A5984;
+	Tue, 12 May 2026 14:02:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778594542; cv=none; b=aZElKEdvzUg8G+Ayu4o2RAEXgTq2liTt4v0VlwBuynoFY/AGMIttj7iuDsdmlGyg0+eYqpevckWCP5kGTSAcY3WyJdrwjT4JLfLsXdZUa8M2mfusYcx32Fg2aXJIKodS+tww+2JIRCGk8mAdz0I65Tr4dyIvIU46RxgSvOT1UJk=
+	t=1778594554; cv=none; b=j1wnERF6JYKf/RYktos3z15PVQI4m/h0Wxraax+KLdOzgTIvpZQOOmIQzicPl82Nv74eifziPvwRTLzCDehH+aSmYVdo8bv1mHtSLt0wkThLL10etCmBWgVPcbwL9i7u+tPpBSsVVtpJXMME6KKyra9uucKrRb3vasTOw/E+2Nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778594542; c=relaxed/simple;
-	bh=5WlhEMQh9X34pszkCamo0PzCnz+T6O0Wx6dkjqd2UpA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=B2sKcNk88q5IH3gIUPvNHYs2aYKsb2mvjNNVzAFcqy7nFEPwPj6g90Ff/lMmpzAbOWuVzYtWkSO1arPquqNH71MDFmDrQj+gQH/gfOdHuVsepxod2dHmlmZCsJl5LamixbPjkpGzv0m9AVojNnUX2sy2LZGlFH+TRJwFx/pkDqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sM1ZpHVo; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-488940ccfa6so3465e9.1
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 07:02:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778594539; x=1779199339; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ail+SStMh4bLPlZ1kUt87DuDvaaI1f9S+0ECKZGp8xA=;
-        b=sM1ZpHVozQRQLIQypok2xQUjDek/o4mK9iW1DmoN979vrW9WYcPC74KEyHzzmt8EVW
-         qYelecM2t3rg2+AgfjYOKNYPgpjYxCQ0c2UP803uS27H0EGCvtFusqpvtrDfiAeVRimk
-         nvReGYQvaPpjmMpn7+hvKzviqKKej02OzotAsCC4jQQJn4FjoVEkxFJ+3PXc+e/R2655
-         D0vr0E1mvynYgW4wRznNjh0HHL0p8FZwcDnIgi/gl7u3F1khtCeVRfmE/8rCpoaavRxf
-         o3nWYzoGBEG/Z11MJOx7c/tR5y58VoI3q+pYQxxUtzirOauOEO09YGq8H3hcVpo1JpFV
-         d9KQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778594539; x=1779199339;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ail+SStMh4bLPlZ1kUt87DuDvaaI1f9S+0ECKZGp8xA=;
-        b=QbJUJ9Is2dZzBCnLi+5Tc/M6vtct96kPNrftz3h6YbaGYiwPlCyzxXr6Csrj92w+PH
-         Hll3F94vewD6OF/OpeFYhvLRcVuPqO46WjQqeYfSUsxqBA7uLZU+Yx1/qFAWi3gVhhmj
-         wQVbvJ7jNb7zRy8judJWxPUaEA8eLZgD55gH1M0y4b7lQESjZzjEwYkUlemOXUSDJiF0
-         Uhq9x78+gtskqK93uYgmWiQTuwIUseIvG+5IKiWXWnT0E781ozKjPN/+Ev3NZGwcVSSx
-         TBK3krLsyrr6c3/038YSiXMS5hEnrnMl6yU8kubZjEwzk5jwjGrHKmOg3GlTuojThiGj
-         LAJA==
-X-Forwarded-Encrypted: i=1; AFNElJ/B838iqcd3l6EvIUYCp/t2PJkzBGbIoCTTvlMhv+LXAWJD9ku6vju4qwJjeroPZl99ARsiUyk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxuUxStIUzzBeoDMNqfPc9VxyLG7Ps7k6UQi1Wb1XqxRF6XXgTC
-	Cf6481Ge3B3lAhnVtj8xGGvwgiQmWR4DmJLS6Gj0yPYiPfyS19WfHCA0yS8nNNSDNQ==
-X-Gm-Gg: Acq92OFg/3JLG8Fyg2ImLo3TVEeU0BDBEmLOJSDzp2g2430V4nSZBzFMNXDACNysZvw
-	AmpVqy8rmh7IzJFu7Lq79Tz8djDCwQvJiLQpdcAPhlTBKPXylTZY+wVTcWzdD4VdP2z4b/DTWIJ
-	PBeoxAqOqyiG2Vk55UepCHB+yHD0LeIojrHS7HV60DFYyrQs2uKoAkLIO40PkgHoTotZUYJWga7
-	CLJCq+b1fqrareWXmu8DjQOyvvC7DY0gb8mO2dwgtR0biYnqRM3zbMyO5jD6/ViDUAkbUl16M93
-	3mK4jLvottA99rimKcfxBWzHsUdroNGBqY7UqtYnyGqZXzEEbEwHzeUBSvOYP91fitFx5al6AqT
-	1KJbACw2umSYNPOW8GzsMlYtz9sPFsh6ioqDYRmQXew/3VyCLyHhdUcNPWjjMrYu5i/zqZVrgv9
-	nGGmTM997YKJ4AYTMwhO5UITzY20FKadw52KcAu+cD3/vywegym0PTnWIs5gHdJElxbqao//er
-X-Received: by 2002:a05:600c:696:b0:48a:56fa:36dd with SMTP id 5b1f17b1804b1-48e906a0e5bmr424205e9.11.1778594538445;
-        Tue, 12 May 2026 07:02:18 -0700 (PDT)
-Received: from localhost ([2a00:79e0:288a:8:118e:a0ac:896b:9240])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e8e62944bsm20059215e9.8.2026.05.12.07.02.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 May 2026 07:02:17 -0700 (PDT)
-From: Jann Horn <jannh@google.com>
-Date: Tue, 12 May 2026 16:02:03 +0200
-Subject: [PATCH] net: block MSG_NO_SHARED_FRAGS in sendmsg()
+	s=arc-20240116; t=1778594554; c=relaxed/simple;
+	bh=r4LhqCDOXCOIgOMtRFWNsqidjd2CmAB3hcLb7o5BO04=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SUYmfeNms1Mw16NCfH4qsS/a4RRSXzHSbR6wGQQPfO7kjkMnezTaKadxouoGJyfaRKjDx834tJ7oMkBMY/j2a7HRYp2PFnAdzXq1esL4DjnfYLKJNDNYb4QSjyLOA1Kn3EaItD4bay7j0xlkCTsAXQIo1A3NLSf5d5aTwrMFO6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pJcZuYlK; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=9ct6ivuY+SOQDy0tlA0NuuDqdOfuD2l2mBFU84wV/1c=; b=pJcZuYlK8h/8RGhlQOWRkZhfgY
+	wcso++R/MZaToJ7YfLbc3b8fu9l2WCB5cH6wD11muNqqg1AF2WNUIv+Y58RLAcJXmNFl8NefaiDUC
+	7tEg1VqG7Ga7/olh3z65QXt8tEsEdCMk+1b5KKDJNZVdCz23XWLly2stMsDtQJetzZzY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wMngf-002Z1I-2v; Tue, 12 May 2026 16:02:17 +0200
+Date: Tue, 12 May 2026 16:02:17 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+Cc: Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
+	"parthiban.veerasooran@microchip.com" <parthiban.veerasooran@microchip.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 5/9] net: ethernet: oa_tc6: Adding vendor
+ specific MMS
+Message-ID: <758c0984-c9a5-4eba-ac1d-a0d165328e5e@lunn.ch>
+References: <CY8PR02MB924967FCDC5FE1A541D4DDC683382@CY8PR02MB9249.namprd02.prod.outlook.com>
+ <066bf036-715c-45d3-a817-f2719eb5d9d6@lunn.ch>
+ <CY8PR02MB92490ED7D572EB0C124E4C1F83392@CY8PR02MB9249.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260512-msg_no_shared_frags-v1-1-55ea46760331@google.com>
-X-B4-Tracking: v=1; b=H4sIANoyA2oC/x3MQQqAIBBA0avErBMyMqOrRIjlaLPIYgYiiO6et
- HyL/x8QZEKBsXqA8SKhIxfouoJ18zmholAMbdP2jdFa7ZJcPpxsnjG4yD6JCsbYVXfYDXaBUp6
- Mke7/Os3v+wF5JhmLZQAAAA==
-X-Change-ID: 20260511-msg_no_shared_frags-d557c14e487b
-To: Eric Dumazet <edumazet@google.com>, 
- Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, John Fastabend <john.fastabend@gmail.com>, 
- Jann Horn <jannh@google.com>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1778594532; l=1721;
- i=jannh@google.com; s=20240730; h=from:subject:message-id;
- bh=5WlhEMQh9X34pszkCamo0PzCnz+T6O0Wx6dkjqd2UpA=;
- b=hUvaf76umJyRj59Fwa2jB8xSKsjTfjBkUeptCHuX3J0V2Hz7Cd+v3xVeUNVm1PJxb9bGOLjNA
- NJW18y4oxIIAXYkktGx+WbpnWDtzDL7dM+XtIiwPWD2SAmvQP8a7s+/
-X-Developer-Key: i=jannh@google.com; a=ed25519;
- pk=AljNtGOzXeF6khBXDJVVvwSEkVDGnnZZYqfWhP1V+C8=
-X-Rspamd-Queue-Id: DA96E52317A
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CY8PR02MB92490ED7D572EB0C124E4C1F83392@CY8PR02MB9249.namprd02.prod.outlook.com>
+X-Rspamd-Queue-Id: DD2F1522F58
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,google.com];
-	TAGGED_FROM(0.00)[bounces-287186-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287187-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jannh@google.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-This change should cause no difference in behavior; it just cleans up some
-hazardous code that could have become a problem in the future.
+On Tue, May 12, 2026 at 04:57:01AM +0000, Selvamani Rajagopal wrote:
+> [..]
+> 
+> > 
+> > > -static int oa_tc6_get_phy_c45_mms(int devnum)
+> > > +static int oa_tc6_get_phy_c45_mms(struct oa_tc6 *tc6, int devnum)
+> > > {
+> > > switch (devnum) {
+> > > case MDIO_MMD_PCS:
+> > > @@ -456,6 +470,8 @@ static int oa_tc6_get_phy_c45_mms(int devnum)
+> > > return OA_TC6_PHY_C45_AUTO_NEG_MMS5;
+> > > case MDIO_MMD_POWER_UNIT:
+> > > return OA_TC6_PHY_C45_POWER_UNIT_MMS6;
+> > > + case MDIO_MMD_VEND1:
+> > > + return tc6->vend1_mms;
+> > 
+> > MMS 0 would be against the specification. So i would do
+> > 
+> > case MDIO_MMD_VEND1:
+> > if (!tc6->vend1_mms)
+> > return -EOPNOTSUPP;
+> > return tc6->vend1_mms;
+> > 
+> > That should catch uses of VEND1 without first defining the mapping to
+> > the MMS.
+> 
+> 
+> vend1_mms is initialized to -EOPNOTSUPP in oa_tc6_init. So, it won't be 0 by default.
 
-MSG_NO_SHARED_FRAGS is a kernel-internal flag that cancels the effect of
-MSG_SPLICE_PAGES, another kernel-internal flag that influences the
-data-sharing semantics of SKBs.
+Ah, missed that. So this is O.K.
 
-Prevent passing this flag in from userspace via sendmsg() by adding it to
-MSG_INTERNAL_SENDMSG_FLAGS.
-
-This is not currently an observable problem because MSG_NO_SHARED_FRAGS
-only has an effect if kernel code adds MSG_SPLICE_PAGES to it.
-The only codepath that adds MSG_SPLICE_PAGES to user-supplied flags from
-which MSG_NO_SHARED_FRAGS hasn't been cleared is the path
-tcp_bpf_sendmsg -> tcp_bpf_send_verdict -> tcp_bpf_push, and that is not a
-problem because tcp_bpf_sendmsg always intentionally sets
-MSG_NO_SHARED_FRAGS anyway.
-
-Signed-off-by: Jann Horn <jannh@google.com>
----
- include/linux/socket.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/include/linux/socket.h b/include/linux/socket.h
-index ec4a0a025793..1a4d0d128a13 100644
---- a/include/linux/socket.h
-+++ b/include/linux/socket.h
-@@ -357,7 +357,7 @@ struct ucred {
- 
- /* Flags to be cleared on entry by sendmsg and sendmmsg syscalls */
- #define MSG_INTERNAL_SENDMSG_FLAGS \
--	(MSG_SPLICE_PAGES | MSG_SENDPAGE_NOPOLICY | MSG_SENDPAGE_DECRYPTED)
-+	(MSG_SPLICE_PAGES | MSG_SENDPAGE_NOPOLICY | MSG_SENDPAGE_DECRYPTED | MSG_NO_SHARED_FRAGS)
- 
- /* Setsockoptions(2) level. Thanks to BSD these must match IPPROTO_xxx */
- #define SOL_IP		0
-
----
-base-commit: 5d6919055dec134de3c40167a490f33c74c12581
-change-id: 20260511-msg_no_shared_frags-d557c14e487b
-
---  
-Jann Horn <jannh@google.com>
-
+    Andrew
 
