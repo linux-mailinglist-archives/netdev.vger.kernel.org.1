@@ -1,278 +1,229 @@
-Return-Path: <netdev+bounces-286918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286919-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cPzmOAyMAmrzuAEAu9opvQ
-	(envelope-from <netdev+bounces-286918-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 04:10:20 +0200
+	id 2OYVA8eMAmrzuAEAu9opvQ
+	(envelope-from <netdev+bounces-286919-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 04:13:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63270518B94
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 04:10:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E0A4518C0D
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 04:13:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4325A30509AE
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 02:09:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F1DC6303029E
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 02:12:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B2032F748;
-	Tue, 12 May 2026 02:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41BAD2FFDE1;
+	Tue, 12 May 2026 02:12:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RvV22kOC"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="LCu5a9nd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DBC332692B;
-	Tue, 12 May 2026 02:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A7C23372C;
+	Tue, 12 May 2026 02:12:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778551732; cv=none; b=Y1dmwtQD9Ii0XTpMeBudschIgVt68v+C5euNeIpLmpdJSNkDKD63l0LfXRT/lFUzHfExJmcuh6JMBcBuPQr4M/4+Z1KcETQ9cE9wvjw6OaQn3skJOsR3T49uQhzqPSzy6S6Q7F7zEF+vhFONFL9qBnZMkG+0CNGfJfjh2/w0d58=
+	t=1778551933; cv=none; b=jKAclcdWrdmdnVJPPfm3ZVIsjJ0OvDGYmlSOdk9EyRudXmTpPLWr9Yp8bQa7iySab5bWYEqe+KcusMDLnfgfZAeC6XEk+EUB38tNFYRuHINZyYVcQQS6Gj3sSjhmTggwbO7Ql3VVGfWPq+tIZiTX/pVElA6JJQJVaW8xQal/TjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778551732; c=relaxed/simple;
-	bh=9YHeJCp7aCV0gDz+cZgsWduJeVKpG8HROteJtCMbCIs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bTSRKYiL6Rr1T+O5COMPAVB1UPKsP84ePfdkYr2QQRPdH+NyncZkidAm82aW/nzUwABahDkDYJ6+yu0L6FGXHVf2oPsQEKKYlAh3j+eq5yS4hawRs8acb8pyOeBimrkJNFuEUz6g7YZNz9h/ceBXag1z63pz5VC6az7+qo8Hvdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RvV22kOC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D184FC2BCB0;
-	Tue, 12 May 2026 02:08:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778551732;
-	bh=9YHeJCp7aCV0gDz+cZgsWduJeVKpG8HROteJtCMbCIs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RvV22kOCA5JCqe/qsGKFAtTDvRn0oxtfr9r1QIq+shv5L/OP6FvvbBlnuGVzpXIE+
-	 qYOzp3Ut3M/2wcXy2RTFaTZt1zcGrlqmAmGl/gnqRxgUqCXu3GYeaHcuf13iiyux6x
-	 xI2wBjnaTtIH/oyZcqADZpq5xaw0Y7veNlmozrxSZZmWmdbBlOuujrOaJRJn5GWlbq
-	 7Yvxd30MrOM9ZSJIMEOSdkOzoLS+GVGSwS0dP3BN1xBLnW2wuI696uDu2UkUH1mhqB
-	 kpozQhrLdy08X7JHXgQxbDv0Li22UpewMm4g3oPxXhwa10MJ312WdK3wKL0mF3p2Rh
-	 dUCUX783q8ptQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: thangaraj.s@microchip.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	bryan.whitehead@microchip.com,
-	UNGLinuxDriver@microchip.com,
-	linux@armlinux.org.uk,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 5/5] net: lan743x: Add PCS/XPCS support for SFP on PCI11x1x
-Date: Mon, 11 May 2026 19:08:51 -0700
-Message-ID: <20260512020851.839084-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260508052150.11852-6-thangaraj.s@microchip.com>
-References: <20260508052150.11852-6-thangaraj.s@microchip.com>
+	s=arc-20240116; t=1778551933; c=relaxed/simple;
+	bh=dB7wodfmYyeBFfuqu+fr434xZE8Ot/avf0LWfJL+7BQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oTvDqVYfJzo7NozKqP85ACM0+L/jUSHMGyuJUaRZTeBHhjS0nc+MFHHXlQ+QaTU25l6MOe7YWx5am2kKM4vSpNt2ioEYhtZ+bBjdsssT28h9avGLuNESwLjyosl8a2loSqYhNeert7Pu4BnTLqx6xh4CqI8gAMiTgEKfRwXCKMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=LCu5a9nd; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64BK6DVB032171;
+	Mon, 11 May 2026 19:11:50 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=kydP5WknIupnQ7Cl8mM2hf5vz
+	PgtnylcpjlH8tHygDs=; b=LCu5a9ndT6GNVPD9r1S7V6ioRuIyUytYM/+2IofFP
+	XlaK/ke8SVSvK8wbj3flcefPQeVDfoTjs9GFgjpTujkyKOXc1ZIrMyn2zt0uDziq
+	kknzirxt1lD6sH9xHGiBDh+qjMIMqfrAbxAJzcbyIOpDWDzXV9tVtKZN0uqOGtZC
+	YSYo+tbbaSIubK2ts8TKLEKAH4WyTpX9s3bjPtsxmILONI6xstG07uNbtIYAjDpN
+	ga/0JExhRSaBaDpB9eU3QrixI2ONgKLYFeCLfkirLuelND+SXK+k/aFOFwG/Puaf
+	O8eUrkbK2KlGmw4GzVSDbrs9qjGogz/zhf6dnA6iKaAJw==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4e3nus8wam-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 May 2026 19:11:49 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 11 May 2026 19:11:48 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Mon, 11 May 2026 19:11:48 -0700
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 21D513F7075;
+	Mon, 11 May 2026 19:11:38 -0700 (PDT)
+Date: Tue, 12 May 2026 07:41:37 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "oss-drivers@corigine.com"
+	<oss-drivers@corigine.com>,
+        "akiyano@amazon.com" <akiyano@amazon.com>,
+        "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+        "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>,
+        "Kubalewski, Arkadiusz"
+	<arkadiusz.kubalewski@intel.com>,
+        "brett.creeley@amd.com"
+	<brett.creeley@amd.com>,
+        "darinzon@amazon.com" <darinzon@amazon.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "donald.hunter@gmail.com"
+	<donald.hunter@gmail.com>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "horms@kernel.org" <horms@kernel.org>,
+        "idosch@nvidia.com"
+	<idosch@nvidia.com>,
+        "Vecera, Ivan" <ivecera@redhat.com>,
+        "jiri@resnulli.us"
+	<jiri@resnulli.us>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "leon@kernel.org"
+	<leon@kernel.org>,
+        "mbloch@nvidia.com" <mbloch@nvidia.com>,
+        "michael.chan@broadcom.com" <michael.chan@broadcom.com>,
+        "pabeni@redhat.com"
+	<pabeni@redhat.com>,
+        "pavan.chebbi@broadcom.com" <pavan.chebbi@broadcom.com>,
+        "petrm@nvidia.com" <petrm@nvidia.com>,
+        "Prathosh.Satish@microchip.com"
+	<Prathosh.Satish@microchip.com>,
+        "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>,
+        "saeedm@nvidia.com" <saeedm@nvidia.com>,
+        "sgoutham@marvell.com" <sgoutham@marvell.com>,
+        "tariqt@nvidia.com"
+	<tariqt@nvidia.com>,
+        "vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>
+Subject: Re: [Intel-wired-lan] [PATCH v12 net-next 7/9] octeontx2-af: npc:
+ Support for custom KPU profile from filesystem
+Message-ID: <agKMWQFXv0SSJxL4@rkannoth-OptiPlex-7090>
+References: <20260508034912.4082520-1-rkannoth@marvell.com>
+ <20260508034912.4082520-8-rkannoth@marvell.com>
+ <IA3PR11MB89869B60A745F66E6C43A9E4E5382@IA3PR11MB8986.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 63270518B94
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <IA3PR11MB89869B60A745F66E6C43A9E4E5382@IA3PR11MB8986.namprd11.prod.outlook.com>
+X-Proofpoint-GUID: 8xLNq5TTRN-1K2Jb4SPu1xHQkXFGL-wG
+X-Authority-Analysis: v=2.4 cv=fbCdDUQF c=1 sm=1 tr=0 ts=6a028c65 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=qit2iCtTFQkLgVSMPQTB:22 a=QyXUC8HyAAAA:8
+ a=aGKvhz9Wq4K746KUVQ8A:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: 8xLNq5TTRN-1K2Jb4SPu1xHQkXFGL-wG
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTEyMDAxOSBTYWx0ZWRfX8AI24YLKmyME
+ 2k1u+fu0wkPvbb+n09jl9KvYYSsAUD8Bp9cF6zDKkTJXBzJVGdXDV9bIJWnGiifmATzHgPFZ0FN
+ 5OhCrh2+CC7TNU8+/Kd7gIz5+2LEEIt9u6i8o9sTwAecid0WOQWarfa1kxiLwarlOSX8QB8HWcj
+ 0swfhqo5+vG3PvmpaNwyecOmqsta1m/zEpRNl2ONUiAfZgmsrvFHZuApILBjlHF6XvkDDCUkVmt
+ /9XJ+50gMYS2cacokcE7b2Xq49LxCrG2Rksgl/wVUR5sfQIOKqJ5FxPqyF+Y9oH2o0giGmlM3f5
+ pyesgoLh6abiuiNkH4V/zO4zoWO3E6LoIYErVBOqHqcTnBfcLuJLoJbFV3BHgKeYT8OhZT1plx+
+ 9CEIiYXDQB87zc1LxIVUzfzew47BcRInAqPUP4EINyfPASjVc80uuvcduS/ybq+bmVL4OQTUiCJ
+ Yf2phWlSLfgmze9vt+A==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-11_05,2026-05-08_02,2025-10-01_01
+X-Rspamd-Queue-Id: 6E0A4518C0D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-286919-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[31];
+	FREEMAIL_CC(0.00)[vger.kernel.org,corigine.com,amazon.com,lunn.ch,intel.com,amd.com,davemloft.net,gmail.com,google.com,kernel.org,nvidia.com,redhat.com,resnulli.us,broadcom.com,microchip.com,marvell.com,linux.dev];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286918-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,marvell.com:dkim];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-net: lan743x: Add PCS/XPCS support for SFP on PCI11x1x
+On 2026-05-11 at 17:25:39, Loktionov, Aleksandr (aleksandr.loktionov@intel.com) wrote:
 
-Adds a dedicated PCS mdiobus and an XPCS instance driven through the
-existing SGMII register access helpers, integrates the xpcs with phylink
-via mac_select_pcs, and extends phylink support to cover SGMII and
-2500BASE-X for SFP modules on PCI11x1x.
+> > +
+> > +	npc_prepare_default_kpu(rvu, profile);
+> > +
+> > +	/* If user not specified profile customization */
+> > +	if (!strncmp(kpu_profile, def_pfl_name, KPU_NAME_LEN))
+> > +		return;
+> > +
+> > +	/* Order of preceedence for load loading NPC profile (high to
+> > low)
+> > +	 * Firmware binary in filesystem.
+> > +	 * Firmware database method.
+> > +	 * Default KPU profile.
+> > +	 */
+> > +
+> > +	/* Filesystem-based KPU loading is not supported on cn20k.
+> > +	 * npc_prepare_default_kpu() was invoked earlier, but control
+> > +	 * reached this point because the default profile was not
+> > selected.
+> > +	 * No need to call it again.
+> > +	 */
+> It looks like comment contradicts with the code below?
+> Isn't it?
 
-> diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-> index 88a2d11552f8..485fbc678481 100644
-> --- a/drivers/net/ethernet/microchip/lan743x_main.c
-> +++ b/drivers/net/ethernet/microchip/lan743x_main.c
+No, there is no contradiction. Let me clarify the intent of the
+comment.
 
-[ ... ]
+npc_prepare_default_kpu() is called unconditionally at the top of
+the function to ensure the hardware is always initialized with a
+valid baseline KPU profile.
 
-> @@ -3806,6 +3845,42 @@ static int lan743x_hardware_init(struct lan743x_adapter *adapter,
->  	return 0;
->  }
->  
-> +static int lan743x_pcs_mdiobus_init(struct lan743x_adapter *adapter)
-> +{
-> +	struct phylink_pcs *pcs;
-> +	int ret;
-> +
-> +	adapter->pcs_mdiobus = devm_mdiobus_alloc(&adapter->pdev->dev);
-> +	if (!(adapter->pcs_mdiobus)) {
-> +		ret = -ENOMEM;
-> +		goto return_error;
-> +	}
-> +
-> +	adapter->pcs_mdiobus->priv = (void *)adapter;
-> +	adapter->pcs_mdiobus->read_c45 = pci11x1x_pcs_read;
-> +	adapter->pcs_mdiobus->write_c45 = pci11x1x_pcs_write;
-> +	adapter->pcs_mdiobus->name = "lan743x-pcs-mdiobus-c45";
-> +	netif_dbg(adapter, drv, adapter->netdev, "lan743x-pcs-mdiobus-c45\n");
-> +	sn printf(adapter->pcs_mdiobus->id, MII_BUS_ID_SIZE, "pci-pcs-%s", pci_name(adapter->pdev));
-> +
-> +	if (!adapter->phy_interface)
-> +		lan743x_phy_interface_select(adapter);
-> +
-> +	pcs = xpcs_create_pcs_mdiodev(adapter->pcs_mdiobus, 0);
+The strncmp(kpu_profile, def_pfl_name, KPU_NAME_LEN) check that
+follows determines whether the user has explicitly requested a
+non-default profile via the kpu_profile module parameter. If the
+default profile name matches, we return early -- the job is
+already done by npc_prepare_default_kpu().
 
-[Critical]
-Is this pcs_mdiobus ever registered?  The bus is obtained from
-devm_mdiobus_alloc() and then handed straight to xpcs_create_pcs_mdiodev()
-without a mdiobus_register()/devm_mdiobus_register() call in between, so
-it stays in MDIOBUS_ALLOCATED state.
+However, if the user has specified a custom profile name,
+execution continues past the early return. At that point, the
+comment is clarifying that even though we are in the "custom
+profile requested" code path, we must NOT call
+npc_prepare_default_kpu() again -- it was already invoked above
+and the HW is already initialized.
 
-bus->mdio_lock is only initialized by __mdiobus_register():
+In summary: the comment is not describing what the code below
+does -- it's explaining why npc_prepare_default_kpu() is
+intentionally absent from the non cn20k-specific code path that
+follows.
 
-    drivers/net/phy/mdio_bus_provider.c:__mdiobus_register() {
-        ...
-        mutex_init(&bus->mdio_lock);
-        ...
-    }
-
-mdiobus_alloc_size() does not initialize it. xpcs_create_pcs_mdiodev()
-flows into xpcs_create() -> xpcs_init_id() -> xpcs_identify() and each
-C45 read grabs bus->mdio_lock via mutex_lock().
-
-Can this end up locking an uninitialized mutex during probe on
-CONFIG_DEBUG_MUTEXES or lockdep kernels, and silently corrupting state
-otherwise?
-
-Similarly, mdio_device_create() sets mdiodev->dev.parent = &bus->dev on
-a struct device that has never been through device_register(), which
-other xpcs consumers (txgbe_mdio_pcs_init, ksz9477_pcs_create,
-sja1105_mdiobus_pcs_register) avoid by registering the bus first.
-
-> +	if (IS_ERR(pcs)) {
-> +		netdev_err(adapter->netdev, "failed to create xpcs\n");
-> +		ret = PTR_ERR(pcs);
-> +		goto return_error;
-> +	}
-> +
-> +	adapter->xpcs = pcs;
-> +	return 0;
-> +
-> +return_error:
-> +	mdiobus_free(adapter->pcs_mdiobus);
-> +	return ret;
-> +}
-
-[Critical, Critical]
-Can this error path dereference a NULL pointer and also double-free the
-bus?
-
-When devm_mdiobus_alloc() returns NULL, adapter->pcs_mdiobus is NULL and
-the code still jumps to return_error, which calls mdiobus_free():
-
-    drivers/net/phy/mdio_bus_provider.c:mdiobus_free() {
-        if (bus->state == MDIOBUS_ALLOCATED) {
-            kfree(bus);
-            return;
-        }
-        ...
-    }
-
-There is no NULL guard, so the OOM path dereferences NULL.
-
-On the xpcs-create failure path, the bus was allocated by
-devm_mdiobus_alloc(), which registers devm_mdiobus_free() as a devres
-destructor that calls mdiobus_free() at device teardown
-(drivers/net/phy/mdio_devres.c). Calling mdiobus_free() here manually
-frees the bus (state == MDIOBUS_ALLOCATED takes the kfree(bus) path),
-and then devres runs again on the same pointer.
-
-Would it be simpler to drop the return_error cleanup entirely and just
-return the error, letting devres free the bus?
-
-> +
->  static int lan743x_mdiobus_init(struct lan743x_adapter *adapter)
->  {
->  	int ret;
-> @@ -3927,6 +4002,11 @@ static int lan743x_pcidev_probe(struct pci_dev *pdev,
->  	if (ret)
->  		goto cleanup_hardware;
->  
-> +	if (adapter->is_sfp_support_en) {
-> +		ret = lan743x_pcs_mdiobus_init(adapter);
-> +		if (ret)
-> +			goto cleanup_hardware;
-> +	}
-
-[High]
-Is cleanup_hardware the right target here?
-
-lan743x_mdiobus_init() was just called above and has already invoked
-mdiobus_register(adapter->mdiobus), so adapter->mdiobus is in state
-MDIOBUS_REGISTERED. Jumping to cleanup_hardware skips cleanup_mdiobus
--> lan743x_mdiobus_cleanup() -> mdiobus_unregister(adapter->mdiobus).
-
-The bus is then torn down only by the devm_mdiobus_free devres
-destructor, which reaches mdiobus_free() on a still-registered bus and
-trips:
-
-    drivers/net/phy/mdio_bus_provider.c:mdiobus_free() {
-        ...
-        WARN(bus->state != MDIOBUS_UNREGISTERED,
-             "%s: not in UNREGISTERED state\n", bus->id);
-        ...
-    }
-
-device_del() on the bus device is never called. Should this instead
-goto cleanup_mdiobus?
-
-[Medium]
-On PCI11x1x, pci11x1x_strap_get_status() can leave is_sfp_support_en
-true while is_pcs_en is false (SFP strap set, SGMII strap cleared) with
-only a netif_err().  In that case lan743x_hardware_init() takes the
-SGMII-disabled path and writes SGMII_CTL with SGMII_CTL_SGMII_POWER_DN_
-set and SGMII_CTL_SGMII_ENABLE_ cleared.
-
-Then lan743x_pcidev_probe() still enters this branch because
-is_sfp_support_en is true, invoking lan743x_pcs_mdiobus_init() which
-drives xpcs_create_pcs_mdiodev() -> xpcs_identify() -> multiple C45
-reads through pci11x1x_pcs_read() -> lan743x_sgmii_read():
-
-    drivers/net/ethernet/microchip/lan743x_main.c:lan743x_sgmii_read() {
-        ...
-        lan743x_csr_write(adapter, SGMII_ACC, mmd_access);
-        ret = lan743x_sgmii_wait_till_not_busy(adapter);
-        ...
-    }
-
-With the SGMII block powered down, can the busy bit ever clear, or will
-every read hit the 1-second readx_poll_timeout, producing an extremely
-slow probe and a bogus xpcs identification?
-
->  	adapter->netdev->netdev_ops = &lan743x_netdev_ops;
->  	adapter->netdev->ethtool_ops = &lan743x_ethtool_ops;
->  	adapter->netdev->features = NETIF_F_SG | NETIF_F_TSO |
+>
+> > +	if (!is_cn20k(rvu->pdev)) {
+> > +		if (!npc_load_kpu_profile_from_fs(rvu))
+> > +			return;
+> > +	}
 
