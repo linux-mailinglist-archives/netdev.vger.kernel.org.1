@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-287248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287249-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6Mi+COddA2qE5QEAu9opvQ
-	(envelope-from <netdev+bounces-287248-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 19:05:43 +0200
+	id 0MDMBjVdA2qE5QEAu9opvQ
+	(envelope-from <netdev+bounces-287249-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 19:02:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD468525688
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 19:05:42 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F9F6525585
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 19:02:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7F956302D104
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:58:31 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BE5E7303B0A8
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:58:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7750C3D79E3;
-	Tue, 12 May 2026 16:58:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4D323A7188;
+	Tue, 12 May 2026 16:58:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="UHm4qtTU";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="uU09qoGv"
+	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="dTk5n4dD";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="G/VAqPXx"
 X-Original-To: netdev@vger.kernel.org
 Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BBA3D9680
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 16:58:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B313D9678
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 16:58:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778605104; cv=none; b=a+D0tJ0Cgbq96txXooX8priInahql/iGAo2xnwSUvnlNjMPDuOyg/3cB9Fy/V2I9RRHYjJMeQaZXy/WX528Vmq8CUaprLhNdc17ziyqnhaw+3H5BCQbvwJCR0DE6f/kYeb8uIe7sBHOk4WFD5pgWVYlwvdvOBRKQmNwqAkSCj6k=
+	t=1778605107; cv=none; b=ll627RKi4g4+VSJtS5++3LqiTRb/FD2X9iXh8IRW4ti4cc0yBQwD20sCT9SQ5AanjpcS7mhdPXvyMmyyHk/nGMUqLuEez+SKTwHBxuhfxTzlxAABwe8L2xNQB/7Hw/xd1HWzhcjaK1e83spdcwULRjXf4RMUFuRcPXjN/jgBylA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778605104; c=relaxed/simple;
-	bh=NfyjXcXPVZPF7w6Bcme5G+ASurpWWQTb1BYBNJKEMuk=;
+	s=arc-20240116; t=1778605107; c=relaxed/simple;
+	bh=ktZTNAYFzFI3SMwRKFUKCyf7HRa8KtDnukxDqX5JaPI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BLdwRLKQx5IlGHrxPgLaz5ZP/tCzRgptYKI0SSpup0U2hDGw7b3Po9I22IiY8RKXWnhLNeAfi4C0xy3UETf53So/5p7AYHLDvH3OGkZZ9/w6iMQrwyBSWKg81LltwYT6AuT4huCedb0e0p2bzJpr8leVRjQi1jUY28XrEXLGoK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=UHm4qtTU; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=uU09qoGv; arc=none smtp.client-ip=103.168.172.155
+	 MIME-Version; b=YlZEUBdHhKMXS51d2TNyJiibe2QJIPDGiEK/ms+VRd0b9Ce9D28bW4a9wvii7RJUPJumWFpfP4x7eO1O/dtWCExqXGV46r9qWYvfFrBxQ/ppNSUVfd3l6DoIvLJ1E0wk7hKvvrZsry4UYgtc3lWXZ4OXdsQXQB5vUSQwN9Pnxuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=dTk5n4dD; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=G/VAqPXx; arc=none smtp.client-ip=103.168.172.155
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 58437140018A;
-	Tue, 12 May 2026 12:58:22 -0400 (EDT)
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 1D81B1400185;
+	Tue, 12 May 2026 12:58:25 -0400 (EDT)
 Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Tue, 12 May 2026 12:58:22 -0400
+  by phl-compute-06.internal (MEProxy); Tue, 12 May 2026 12:58:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
 	cc:cc:content-transfer-encoding:content-type:date:date:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1778605102; x=
-	1778691502; bh=q45lDLMJsqLmY/ucK1IYEGTdKCA/4/17rWNxl6f9Ca0=; b=U
-	Hm4qtTUXQAVGHzD8A2KFncLwKVZKbyrMqYIQpNP0m3fzVxiXRPr6G0Wv5Wfc2ysd
-	OFZ9/dz2JX81RrYzcPQhzmatVICTT4hnHrbJ8Z/iamtNKqbAD3T8o+FzhaVVcuQO
-	8GYJYBA3ZA1ojAs2U6fp1Xw+mylKb/Mm4DdscQUM9XFQEJgF/quNMo9c5KhLMebI
-	2Ei462B4rdZrLKMgdxSlokELBpsbDvGhuu2onrnCas/ljUT+GG8uwpKhQjN/fcsI
-	olk10WQo9jD9jRnMCWLz+s2zKoEokFi8wZFC0km8SVbZRnOKM5vqzlAz5FsCS7pV
-	f0mDpTEKrMzjvRYFjEPxA==
+	:reply-to:subject:subject:to:to; s=fm3; t=1778605105; x=
+	1778691505; bh=4ewkjjKpOooEKjMj/krXiGkU0YBRhpCPaXi/wc7vAT8=; b=d
+	Tk5n4dDVopcoZ5l8zNEw//y0LmWM2cHxOyGtWrcQZAS8hpUneRzXc02R2oynEPun
+	agRCjuciPVLSmTdbLq0RPK2msIrg8RsgviylSDFeGdkDrIUQ9nX6Zxch9Vl09HtI
+	VxNWnkH8XPYlyhzx5xb9D67zhLWY1vrbP8j4PEx2r087fFsaj/sVDE1DxU/1liKX
+	AtYC4oj+GO8752sdo2Y6HTU5Fdq1URBlxAxFd1sWY761XXEAwco7hmt7+hmJ3I6l
+	r7KoO+wM8SSlwdJ3G6Wv+zyE+LdicPUYYtbajrER3V7Jb8nig/yHWUbjRK28ETz3
+	ttLDpqD0eKZropqRPe9gg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1778605102; x=1778691502; bh=q
-	45lDLMJsqLmY/ucK1IYEGTdKCA/4/17rWNxl6f9Ca0=; b=uU09qoGvnJyY1kHNE
-	tFAEKZlVqv+XTrui0EC6A1zUsfOU+6/2HGrZAThQIySAV2nidKa3bKtPab1iOpLo
-	llfBZ6hHeweoO8ccD7TKWh8JvzEGWZNEbpPMf1J2KEra+TjAG8v9/a/5I8QiM/hK
-	NlYCCB8bI6IB3RHmot71bQPWaBW+7/AkqKj3pNrRgS458w8q12EMysB2VPmcVLyl
-	/tuzv/A2KmtSo8aRZ9l4g3DEJRGUw/DLRFyjRxFDne7lMQdXQTjvRiSWw/rWjr/H
-	wLYKTOVN2Yq5LcFDe5BbOhCo4SEKfNzfx9ZfAUtUGYbNgM8urpmVv3IA3zipB/Qx
-	jYK8A==
-X-ME-Sender: <xms:LlwDauBnFoYdFbIMiccUpbEMlN2ROHYsDa_lKCZZ77Pg9-HOeCyYlA>
-    <xme:LlwDanC44xqL1Oj-9adGZrCMAbNeNzc60igMKnNVOE24QEaiS0cWIYKbfToHzW7b4
-    aITonG2sU21WykxM_8VLdp5WqDfKj1QXIqKMrvNo9yKDP8Ps9NdfpY>
-X-ME-Received: <xmr:LlwDaoZD5qffUmn6Wq_k-XfG7pctlhQT33qTk2RcESzHWspvQ4vXyj2UTI88NIupgPTGD25X6Ls-0LKXpA>
+	:x-me-sender:x-sasl-enc; s=fm3; t=1778605105; x=1778691505; bh=4
+	ewkjjKpOooEKjMj/krXiGkU0YBRhpCPaXi/wc7vAT8=; b=G/VAqPXxBwlDQnuxd
+	duSo4m70OwUVVlezPKUB50wnNUcu9db23VISROpqca4/tHPDDmLHcK5Rp8jySzJq
+	RZtcIOTOsf2lpUrwZVM3hErXv+e4XwpKOPZuK1PsvI8lhrDx974RVMwPEeRImRPG
+	ejTiPA7dtSvurh0GjzmXqw3wAO7I9orZ3g6PMUAn4uClLQN+z9iD7VBHRPnTbjJ8
+	rSIkQuE6il7LUPtdH9HLt1UOqxNsd0UcJ9QBEi/cG1qpgYrVGkAl3gsxTyOJIQus
+	NKYMk4eKAaTOgOaA1Uh45SSnNIaJ0qLK7NRTZhQGKCZUQS7x34xEokVPmfNZPIjS
+	OLnYg==
+X-ME-Sender: <xms:MVwDaql9LuGKdnZIFF7E5gUbd6GCCRRTLiATKlGmoZIav3YoIxQi9A>
+    <xme:MVwDastyeYE2MaNtOl0hRt5aa2nm9D21jviqTovJSBs7XGt8jf75xqw8re7ZtwXkh
+    eK41MSIa-Y5W89CNDW93LiJspRZh3LIzhMtFFIxk4dPzd4SGl75E2Qd>
+X-ME-Received: <xmr:MVwDai2OYuzk8rADpWJpk6KNPmvv4VPxAzr1dTMutS3_6_I0LbOiIkb8pl6nV2JiBafX9SZABSdbmBwCJA>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduvddvfeegucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
     gurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomheptehlihgtvgcu
     ofhikhhithihrghnshhkrgcuoegrlhhitggvrdhkvghrnhgvlhesfhgrshhtmhgrihhlrd
     himheqnecuggftrfgrthhtvghrnhepteffleejfedvhfehieejlefgkeeljeevueeggeev
-    tefhgfeuhfduffegkedvtddtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    tefhgfeuhfduffegkedvtddtnecuvehluhhsthgvrhfuihiivgepgeenucfrrghrrghmpe
     hmrghilhhfrhhomheprghlihgtvgdrkhgvrhhnvghlsehfrghsthhmrghilhdrihhmpdhn
     sggprhgtphhtthhopedujedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrnh
     hivghlsehiohhgvggrrhgsohigrdhnvghtpdhrtghpthhtohepuggrvhgvmhesuggrvhgv
@@ -84,14 +84,14 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduvddvfeegucetufdote
     grihhlrdgtohhmpdhrtghpthhtohepfihilhhlvghmuggvsghruhhijhhnrdhkvghrnhgv
     lhesghhmrghilhdrtghomhdprhgtphhtthhopeifihhllhgvmhgssehgohhoghhlvgdrtg
     homhdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:LlwDasxvo6JYUoJQ_flY4zDTyKderIFZ7_xAEK7zR1z2yoRSiX4IOg>
-    <xmx:LlwDarcfF94p5U1SHcRksXpwBJVanT5lGVbfYPVh9QwNBcugAo2_lg>
-    <xmx:LlwDaiJpQ4Gj22bWJWvwE-b-fqaoT5xpHYQgNg6gCfwwIr7dIea8pA>
-    <xmx:LlwDak1VLeATjUURvWoJMmV9p-1t1fKGVX9fP5jPuUIyrKAoxYIH7w>
-    <xmx:LlwDat98KR8qc7lIS5OO0OYjCUOs-SWKhSct3ViRUNytkcBkheifiK64>
+X-ME-Proxy: <xmx:MVwDagQ1LhluzPLBBGlOi95rxFtaUhU62odWSNwgS4kuIMsUZ94ahQ>
+    <xmx:MVwDauuoNtAOeu3AM0RvNJCMOHIx6JQnxZi_-yWx6j4xyY1UYYAQ8Q>
+    <xmx:MVwDauITWiSLsN4NqBAfxuRMBSZSbjv0ZuBonAMElvY7THCwwpNn9A>
+    <xmx:MVwDaidNEWZMPtaszfHgKr3nuX6lq8fg0RvODhSprfKGbXb4xHu9ew>
+    <xmx:MVwDaq9tSPpy2igCcovbtz6XFIUSLD2_ddET4fsnUr_BwPDolwek-mvO>
 Feedback-ID: i559e4809:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 12 May 2026 12:58:21 -0400 (EDT)
+ 12 May 2026 12:58:24 -0400 (EDT)
 From: Alice Mikityanska <alice.kernel@fastmail.im>
 To: Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -110,9 +110,9 @@ Cc: Shuah Khan <shuah@kernel.org>,
 	Florian Westphal <fw@strlen.de>,
 	netdev@vger.kernel.org,
 	Alice Mikityanska <alice@isovalent.com>
-Subject: [PATCH net-next v4 09/12] udp: Set length in UDP header to 0 for big GSO packets
-Date: Tue, 12 May 2026 18:56:45 +0200
-Message-ID: <20260512165648.386518-10-alice.kernel@fastmail.im>
+Subject: [PATCH net-next v4 10/12] vxlan: Enable BIG TCP packets
+Date: Tue, 12 May 2026 18:56:46 +0200
+Message-ID: <20260512165648.386518-11-alice.kernel@fastmail.im>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260512165648.386518-1-alice.kernel@fastmail.im>
 References: <20260512165648.386518-1-alice.kernel@fastmail.im>
@@ -123,7 +123,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: AD468525688
+X-Rspamd-Queue-Id: 5F9F6525585
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -132,13 +132,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm3,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,strlen.de,vger.kernel.org,isovalent.com];
 	FREEMAIL_FROM(0.00)[fastmail.im];
-	TAGGED_FROM(0.00)[bounces-287248-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-287249-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[17];
@@ -152,53 +152,197 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.981];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.974];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,fastmail.im:mid,fastmail.im:dkim,isovalent.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[fastmail.im:mid,fastmail.im:dkim,isovalent.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,iogearbox.net:email,messagingengine.com:dkim,blackwall.org:email]
 X-Rspamd-Action: no action
 
 From: Alice Mikityanska <alice@isovalent.com>
 
-skb->len may be bigger than 65535 in UDP-based tunnels that have BIG TCP
-enabled. If GSO aggregates packets that large, set the length in the UDP
-header to 0, so that tcpdump can print such packets properly (treating
-them as RFC 2675 jumbograms). Later in the pipeline, __udp_gso_segment
-will set uh->len to the size of individual packets.
+In Cilium we do support BIG TCP, but so far the latter has only been
+enabled for direct routing use-cases. A lot of users rely on Cilium
+with vxlan/geneve tunneling though. The underlying kernel infra for
+tunneling has not been supporting BIG TCP up to this point.
+
+Given we do now, bump tso_max_size for vxlan netdevs up to GSO_MAX_SIZE
+to allow the admin to use BIG TCP with vxlan tunnels.
+
+BIG TCP on vxlan disabled:
+
+  Standard MTU:
+
+    # netperf -H 10.1.0.2 -t TCP_STREAM -l60
+    MIGRATED TCP STREAM TEST from 0.0.0.0 (0.0.0.0) port 0 AF_INET to 10.1.0.2 () port 0 AF_INET : demo
+    Recv   Send    Send
+    Socket Socket  Message  Elapsed
+    Size   Size    Size     Time     Throughput
+    bytes  bytes   bytes    secs.    10^6bits/sec
+
+    131072  16384  16384    30.00    34440.00
+
+  8k MTU:
+
+    # netperf -H 10.1.0.2 -t TCP_STREAM -l60
+    MIGRATED TCP STREAM TEST from 0.0.0.0 (0.0.0.0) port 0 AF_INET to 10.1.0.2 () port 0 AF_INET : demo
+    Recv   Send    Send
+    Socket Socket  Message  Elapsed
+    Size   Size    Size     Time     Throughput
+    bytes  bytes   bytes    secs.    10^6bits/sec
+
+    262144  32768  32768    30.00    55684.26
+
+BIG TCP on vxlan enabled:
+
+  Standard MTU:
+
+    # netperf -H 10.1.0.2 -t TCP_STREAM -l60
+    MIGRATED TCP STREAM TEST from 0.0.0.0 (0.0.0.0) port 0 AF_INET to 10.1.0.2 () port 0 AF_INET : demo
+    Recv   Send    Send
+    Socket Socket  Message  Elapsed
+    Size   Size    Size     Time     Throughput
+    bytes  bytes   bytes    secs.    10^6bits/sec
+
+    131072  16384  16384    30.00    39564.78
+
+  8k MTU:
+
+    # netperf -H 10.1.0.2 -t TCP_STREAM -l60
+    MIGRATED TCP STREAM TEST from 0.0.0.0 (0.0.0.0) port 0 AF_INET to 10.1.0.2 () port 0 AF_INET : demo
+    Recv   Send    Send
+    Socket Socket  Message  Elapsed
+    Size   Size    Size     Time     Throughput
+    bytes  bytes   bytes    secs.    10^6bits/sec
+
+    262144  32768  32768    30.00    61466.47
+
+When tunnel offloads are not enabled/exposed and we fully need to rely on
+SW-based segmentation on transmit (e.g. in case of Azure) then the more
+aggressive batching also has a visible effect. Below example was on the
+same setup as with above benchmarks but with HW support disabled:
+
+  # ethtool -k enp10s0f0np0 | grep udp
+  tx-udp_tnl-segmentation: off
+  tx-udp_tnl-csum-segmentation: off
+  tx-udp-segmentation: off
+  rx-udp_tunnel-port-offload: off
+  rx-udp-gro-forwarding: off
+
+  Before:
+
+    # netperf -H 10.1.0.2 -t TCP_STREAM -l60
+    MIGRATED TCP STREAM TEST from 0.0.0.0 (0.0.0.0) port 0 AF_INET to 10.1.0.2 () port 0 AF_INET : demo
+    Recv   Send    Send
+    Socket Socket  Message  Elapsed
+    Size   Size    Size     Time     Throughput
+    bytes  bytes   bytes    secs.    10^6bits/sec
+
+    131072  16384  16384    60.00    21820.82
+
+  After:
+
+    # netperf -H 10.1.0.2 -t TCP_STREAM -l60
+    MIGRATED TCP STREAM TEST from 0.0.0.0 (0.0.0.0) port 0 AF_INET to 10.1.0.2 () port 0 AF_INET : demo
+    Recv   Send    Send
+    Socket Socket  Message  Elapsed
+    Size   Size    Size     Time     Throughput
+    bytes  bytes   bytes    secs.    10^6bits/sec
+
+    131072  16384  16384    60.00    29390.78
+
+Example receive side:
+
+  swapper       0 [002]  4712.645070: net:netif_receive_skb: dev=enp10s0f0np0 skbaddr=0xffff8f3b086e0200 len=129542
+        ffffffff8cfe3aaa __netif_receive_skb_core.constprop.0+0x6ca ([kernel.kallsyms])
+        ffffffff8cfe3aaa __netif_receive_skb_core.constprop.0+0x6ca ([kernel.kallsyms])
+        ffffffff8cfe47dd __netif_receive_skb_list_core+0xed ([kernel.kallsyms])
+        ffffffff8cfe4e52 netif_receive_skb_list_internal+0x1d2 ([kernel.kallsyms])
+        ffffffff8d0210d8 gro_complete.constprop.0+0x108 ([kernel.kallsyms])
+        ffffffff8d021724 dev_gro_receive+0x4e4 ([kernel.kallsyms])
+        ffffffff8d021a99 gro_receive_skb+0x89 ([kernel.kallsyms])
+        ffffffffc06edb71 mlx5e_handle_rx_cqe_mpwrq+0x131 ([kernel.kallsyms])
+        ffffffffc06ee38a mlx5e_poll_rx_cq+0x9a ([kernel.kallsyms])
+        ffffffffc06ef2c7 mlx5e_napi_poll+0x107 ([kernel.kallsyms])
+        ffffffff8cfe586d __napi_poll+0x2d ([kernel.kallsyms])
+        ffffffff8cfe5f8d net_rx_action+0x20d ([kernel.kallsyms])
+        ffffffff8c35d252 handle_softirqs+0xe2 ([kernel.kallsyms])
+        ffffffff8c35d556 __irq_exit_rcu+0xd6 ([kernel.kallsyms])
+        ffffffff8c35d81e irq_exit_rcu+0xe ([kernel.kallsyms])
+        ffffffff8d2602b8 common_interrupt+0x98 ([kernel.kallsyms])
+        ffffffff8c000da7 asm_common_interrupt+0x27 ([kernel.kallsyms])
+        ffffffff8d2645c5 cpuidle_enter_state+0xd5 ([kernel.kallsyms])
+        ffffffff8cf6358e cpuidle_enter+0x2e ([kernel.kallsyms])
+        ffffffff8c3ba932 call_cpuidle+0x22 ([kernel.kallsyms])
+        ffffffff8c3bfb5e do_idle+0x1ce ([kernel.kallsyms])
+        ffffffff8c3bfd79 cpu_startup_entry+0x29 ([kernel.kallsyms])
+        ffffffff8c30a6c2 start_secondary+0x112 ([kernel.kallsyms])
+        ffffffff8c2c142d common_startup_64+0x13e ([kernel.kallsyms])
+
+Example transmit side:
+
+  swapper       0 [005]  4768.021375: net:net_dev_xmit: dev=enp10s0f0np0 skbaddr=0xffff8af32ebe1200 len=129556 rc=0
+        ffffffffa75e19c3 dev_hard_start_xmit+0x173 ([kernel.kallsyms])
+        ffffffffa75e19c3 dev_hard_start_xmit+0x173 ([kernel.kallsyms])
+        ffffffffa7653823 sch_direct_xmit+0x143 ([kernel.kallsyms])
+        ffffffffa75e2780 __dev_queue_xmit+0xc70 ([kernel.kallsyms])
+        ffffffffa76a1205 ip_finish_output2+0x265 ([kernel.kallsyms])
+        ffffffffa76a1577 __ip_finish_output+0x87 ([kernel.kallsyms])
+        ffffffffa76a165b ip_finish_output+0x2b ([kernel.kallsyms])
+        ffffffffa76a179e ip_output+0x5e ([kernel.kallsyms])
+        ffffffffa76a19d5 ip_local_out+0x35 ([kernel.kallsyms])
+        ffffffffa770d0e5 iptunnel_xmit+0x185 ([kernel.kallsyms])
+        ffffffffc179634e nf_nat_used_tuple_new.cold+0x1129 ([kernel.kallsyms])
+        ffffffffc17a7301 vxlan_xmit_one+0xc21 ([kernel.kallsyms])
+        ffffffffc17a80a2 vxlan_xmit+0x4a2 ([kernel.kallsyms])
+        ffffffffa75e18af dev_hard_start_xmit+0x5f ([kernel.kallsyms])
+        ffffffffa75e1d3f __dev_queue_xmit+0x22f ([kernel.kallsyms])
+        ffffffffa76a1205 ip_finish_output2+0x265 ([kernel.kallsyms])
+        ffffffffa76a1577 __ip_finish_output+0x87 ([kernel.kallsyms])
+        ffffffffa76a165b ip_finish_output+0x2b ([kernel.kallsyms])
+        ffffffffa76a179e ip_output+0x5e ([kernel.kallsyms])
+        ffffffffa76a1de2 __ip_queue_xmit+0x1b2 ([kernel.kallsyms])
+        ffffffffa76a2135 ip_queue_xmit+0x15 ([kernel.kallsyms])
+        ffffffffa76c70a2 __tcp_transmit_skb+0x522 ([kernel.kallsyms])
+        ffffffffa76c931a tcp_write_xmit+0x65a ([kernel.kallsyms])
+        ffffffffa76cb42e tcp_tsq_write+0x5e ([kernel.kallsyms])
+        ffffffffa76cb7ef tcp_tasklet_func+0x10f ([kernel.kallsyms])
+        ffffffffa695d9f7 tasklet_action_common+0x107 ([kernel.kallsyms])
+        ffffffffa695db99 tasklet_action+0x29 ([kernel.kallsyms])
+        ffffffffa695d252 handle_softirqs+0xe2 ([kernel.kallsyms])
+        ffffffffa695d556 __irq_exit_rcu+0xd6 ([kernel.kallsyms])
+        ffffffffa695d81e irq_exit_rcu+0xe ([kernel.kallsyms])
+        ffffffffa78602b8 common_interrupt+0x98 ([kernel.kallsyms])
+        ffffffffa6600da7 asm_common_interrupt+0x27 ([kernel.kallsyms])
+        ffffffffa78645c5 cpuidle_enter_state+0xd5 ([kernel.kallsyms])
+        ffffffffa756358e cpuidle_enter+0x2e ([kernel.kallsyms])
+        ffffffffa69ba932 call_cpuidle+0x22 ([kernel.kallsyms])
+        ffffffffa69bfb5e do_idle+0x1ce ([kernel.kallsyms])
+        ffffffffa69bfd79 cpu_startup_entry+0x29 ([kernel.kallsyms])
+        ffffffffa690a6c2 start_secondary+0x112 ([kernel.kallsyms])
+        ffffffffa68c142d common_startup_64+0x13e ([kernel.kallsyms])
 
 Signed-off-by: Alice Mikityanska <alice@isovalent.com>
+Co-developed-by: Daniel Borkmann <daniel@iogearbox.net>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 ---
- net/ipv4/udp_tunnel_core.c | 2 +-
- net/ipv6/ip6_udp_tunnel.c  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/vxlan/vxlan_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/ipv4/udp_tunnel_core.c b/net/ipv4/udp_tunnel_core.c
-index 0fccb38f074d..a128fe85620d 100644
---- a/net/ipv4/udp_tunnel_core.c
-+++ b/net/ipv4/udp_tunnel_core.c
-@@ -178,7 +178,7 @@ void udp_tunnel_xmit_skb(struct rtable *rt, struct sock *sk, struct sk_buff *skb
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index 00facbfabced..d3249c319779 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -3371,6 +3371,8 @@ static void vxlan_setup(struct net_device *dev)
+ 	dev->mangleid_features = NETIF_F_GSO_PARTIAL;
  
- 	uh->dest = dst_port;
- 	uh->source = src_port;
--	udp_set_len_short(uh, skb->len);
-+	udp_set_len(uh, skb->len);
- 
- 	memset(&(IPCB(skb)->opt), 0, sizeof(IPCB(skb)->opt));
- 
-diff --git a/net/ipv6/ip6_udp_tunnel.c b/net/ipv6/ip6_udp_tunnel.c
-index dcff7fb16ff6..32525a051a6f 100644
---- a/net/ipv6/ip6_udp_tunnel.c
-+++ b/net/ipv6/ip6_udp_tunnel.c
-@@ -93,7 +93,7 @@ void udp_tunnel6_xmit_skb(struct dst_entry *dst, struct sock *sk,
- 	uh->dest = dst_port;
- 	uh->source = src_port;
- 
--	udp_set_len_short(uh, skb->len);
-+	udp_set_len(uh, skb->len);
- 
- 	skb_dst_set(skb, dst);
- 
+ 	netif_keep_dst(dev);
++	netif_set_tso_max_size(dev, GSO_MAX_SIZE);
++
+ 	dev->priv_flags |= IFF_NO_QUEUE;
+ 	dev->change_proto_down = true;
+ 	dev->lltx = true;
 -- 
 2.54.0
 
