@@ -1,353 +1,293 @@
-Return-Path: <netdev+bounces-287222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287223-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YDDXC29QA2pQ4QEAu9opvQ
-	(envelope-from <netdev+bounces-287222-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 18:08:15 +0200
+	id mGUMI0FMA2pq3AEAu9opvQ
+	(envelope-from <netdev+bounces-287223-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:50:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 848EB5245C1
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 18:08:14 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E04752402C
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:50:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 05D003044099
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:33:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7DC483028D38
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:40:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 506CE3BFAC8;
-	Tue, 12 May 2026 15:33:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 272783C4152;
+	Tue, 12 May 2026 15:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MmEeMgqR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HaGFRURu";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gx8LZy0A"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011050.outbound.protection.outlook.com [52.101.62.50])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0F733BB680;
-	Tue, 12 May 2026 15:33:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778600003; cv=fail; b=mMs4/livRnvLo6pYbC/+UPdJJsuP0a7YyS+57HzeHz6me8bXubDYSgzTH7ZEe1mWnls2cl83VjMszbX+8/atJiONoIyE0lOs0s71AoubJsxz9RJqCaE4IB7Yp5hdmz0trjh/yLQ6UC90Qswn3L4RJA/rw7v+8sVY6pB13n8TcAI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778600003; c=relaxed/simple;
-	bh=7/M8qMhfAOkDQ+CC0wfVd3k5RWFevUW7kORBbugOj64=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=T/vAjncsgyCZMIPY1a8BmruWIfWlMi+cU7YqrsQwAQZRIC0xvcid4fn5XYctGblHp5bfZKwhwb9XSZMTIN63e2UxD7Vel/58P1Qz+cKoKZEeuDnCCsBwr/7K4NKiwY6yE9Hwf1a70iXq1EfIDroIWryTJBVs+EYgnRdvVODXsRE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=MmEeMgqR; arc=fail smtp.client-ip=52.101.62.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=X6F0kzEWCFlXFcGx/AeCmR9SaoHhFkW+x7A66jDuzCPoOt1aFaC0w9Br+T03N+AQ8U+wp0t4Ke3CbQHJD0gcwxy++bIS0Zje3YrwbNZyaWnu8SQyBkYpIEjij7wCBfE74H6AMbarwOqR+yhSHLD+1Jj9q45ZZnP9gLCYkoShfg4yGOjDVrMYoJb42iEatO2zq2KfYVbM8M6dtX4dmNYAGvNElJG0u1PqFU5NE/G4ZoFcEYAMDpdoqix2/RCqRXT80/RRQuqoSeuFtAOvExEBvBg+TWII3qeqxfpQQRiicsOX5q2nt1jxhUmV1EIR8/4QnUXcke3GJ0qx61l2YQo0mg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/SJG4Ubv6q03zfFZH4HtpuHypnCw6yKySKwps04g6pM=;
- b=wGap+6EuWfIsf6qGZAs+qsGn5jGG4x6NRa9Uwn8q29DCz2VepSg9+0RDF1qKcfi9UpR6kPASJfpdBM3Ey2aG+geI262+lOghgnXCjZ0F9jrBs99+8gwjMof+q+gWLVb0n5NEnXH90yaKHQeS01G/26SmDaasuTV/baPT+pCQ0zTpQNwDBvAOzrifF7073FSEq40bOY9Ob5H5+rAruvZ449Ku47wowbc1K9p4MZdF+OvYoXNn9aYzgt6rjcTKmp9Gm2DkWQZI7yB/QGhJ5+HcLnZTSmG/2P/g/abv4+1SIDQE8oAUboz0KGwmcw/dPP2TeSpT+YyGHzzPKslGVk8Rgg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/SJG4Ubv6q03zfFZH4HtpuHypnCw6yKySKwps04g6pM=;
- b=MmEeMgqRzrWK8J/ByUgx4OeFsvcNDgrqp3I1fzTXesQdtFgr53syhJxuJ9Pwk22XGKGANAnA6bNNFewWFt259bBpg9Xu2AbnuXmqPLHgLzjemj8YQr8klTt79VyyIcI2c9jlCwccFPD+luoC4ENjrp1VIJYf/ApB4NNyk86u5qlPViSsPFIbWXTy8sws3a5bw7TRw16ecH1jz+UwkU2p6cgPAvSEZjpXISnN/1DuW2LY4WuGm6Ri63sRVcwSb2BWjNhxhNjjM8JfLVzGqU39OaDlsO0FQ615Hwt8K3+TQC5D6FAEPzrGlmb35o91/KhEFd8GgnvjrEsS6lJsGukQTg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8728.namprd12.prod.outlook.com (2603:10b6:610:171::12)
- by CY8PR12MB7291.namprd12.prod.outlook.com (2603:10b6:930:54::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.23; Tue, 12 May
- 2026 15:33:14 +0000
-Received: from CH3PR12MB8728.namprd12.prod.outlook.com
- ([fe80::2641:1046:bdf3:93d7]) by CH3PR12MB8728.namprd12.prod.outlook.com
- ([fe80::2641:1046:bdf3:93d7%7]) with mapi id 15.20.9891.021; Tue, 12 May 2026
- 15:33:14 +0000
-Message-ID: <47630ed4-3028-4716-816e-d4f803423b37@nvidia.com>
-Date: Tue, 12 May 2026 17:33:08 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V6 2/3] net/mlx5e: Avoid copying payload to the
- skb's linear part
-To: Amery Hung <ameryhung@gmail.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Christoph Paasch <cpaasch@openai.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>
-References: <20260507095330.318892-1-tariqt@nvidia.com>
- <20260507095330.318892-3-tariqt@nvidia.com>
- <CAMB2axOFQN2f=veYgeJs+4tbZmb9PuNHk03TH_bmE8UL_REd7w@mail.gmail.com>
- <b1d3f9bc-a5d7-4236-8bda-49e6327ee533@nvidia.com>
- <CAMB2axPNhveQaDPs-ttu4uFcpvAfJCdzJ3d05HWQf4+p7uVUsg@mail.gmail.com>
- <70d0b319-178f-4233-b0da-9618489a1dd6@nvidia.com>
- <CAMB2axPdqBUORn7Qy35Xccqbn+8aArZ-weegZyz=j0STh+iPNA@mail.gmail.com>
- <6b7998e7-b2c1-4650-9564-679d647146cf@nvidia.com>
- <ef926d49-81d6-4d26-8d74-440d4a6bb8b1@nvidia.com>
- <CAMB2axN6USwsGaUQWkL52G=9V=kSe2La_gE-ppOFLWbPCnaVKQ@mail.gmail.com>
-Content-Language: en-US
-From: Dragos Tatulea <dtatulea@nvidia.com>
-In-Reply-To: <CAMB2axN6USwsGaUQWkL52G=9V=kSe2La_gE-ppOFLWbPCnaVKQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR4P281CA0347.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:f4::15) To CH3PR12MB8728.namprd12.prod.outlook.com
- (2603:10b6:610:171::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 016513C3797
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 15:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778600400; cv=none; b=fX8JUz5FFFO2kvmx/00uMv39qmzK7rpL7KB4NbBRSQKtoTM7ncIdex5daZrIQNfXb32V9MZ9+J8TuI36qL9wvk9I3S32OQ7pDFmrnsdTdXpscV+7NOdjwJPs5+P8a4Y96pN/B4nqXljOwUxQAgKja6qh2bDvKM28dYaIm7OWiEM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778600400; c=relaxed/simple;
+	bh=KglCHTuNm3x37ez9MagfZauxo69r9aH1IwV/+zMyGZw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RehJQQBQNdzPNG1FodWkwoZoywwK5xY4XnXf+vUBvLU3THa9pUUaNWlYhLZzDh+X5LK2bU0lwMPo37TfDJE6kE+8NOAY3ULCx2DsW8am/tKHpFPaOGZLf9Unf0wv8JjqEXzihAE+PNzzujtCppYW9zFk/BjDIXRtu2i9ID3VCCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HaGFRURu; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gx8LZy0A; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778600397;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LsdZjZ26kSZ8u0NFCo8P+xxqj1x4mfPz9ccyxXizpko=;
+	b=HaGFRURu15nLJFMO1lYQHNUQuPLLZ7nPjaZoWohAFsSGxvbKUlOItQq5zHdY/JhxRtzDRr
+	0XudZvAwjMjKjGZQqPCRSTB/DdPH3QYrndxswdT8IE37pyZk3yPpIbHLtI2wr5ljNHzNYQ
+	jbcV537sr04hsZKgimRsvnOxaIXa8s8=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-674-VI29M3ZPM0ustSnAR4VB2A-1; Tue, 12 May 2026 11:39:55 -0400
+X-MC-Unique: VI29M3ZPM0ustSnAR4VB2A-1
+X-Mimecast-MFC-AGG-ID: VI29M3ZPM0ustSnAR4VB2A_1778600395
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-48e6af7a9cdso29101445e9.3
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 08:39:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1778600394; x=1779205194; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LsdZjZ26kSZ8u0NFCo8P+xxqj1x4mfPz9ccyxXizpko=;
+        b=gx8LZy0AQWXtWli29riSYzatxdUFLb69mWrRWWMVgiUbVeMBTMo67jQDV+8wadk0nQ
+         G1EA9RLBmI39XYxQ6ltucZ9QyE9/Lh12WqDWqx0bqNvho7C0wVlUuD0djBgXvRywJZQ1
+         VbKVqR+Gl0+Ow8bXEIdKwNrIOLajygTg+r6qNGblYv12YG/KPXNnRHHmfRgT5jPel8AI
+         brX9n/sElEaD5n//TVqz2bAxdFUZNfIUM6lRgUa8F7uV3jbYlN00nLIj7KtVgZJuAKCK
+         Anm0cj0UuSEIyPNqzb9EMbWiUKMS12qiDRnX+l7p4dvXnSUF80BgFBiXlrhUwxmC7tQz
+         e3JQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778600394; x=1779205194;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LsdZjZ26kSZ8u0NFCo8P+xxqj1x4mfPz9ccyxXizpko=;
+        b=QbX2ZRTwQEVljnFaflI6x4gpyIxwnvSDJQd1MxZBoP1qUFj9wQtId0JeIa3drZGt0b
+         5k6TsvkpWioCiKUYAXuvj2S6fZzK3kKUVr/FbNW3oy5uiZo6d5aCycw0kGvJxoVi4oyt
+         415T4Sm2AuM0KSmnQyN3fiMGXpp3tjF15Dfu2+ib7UK2F/ecocqBKnxrTYNOKTqa4/+V
+         va7KBLBwuLiId350oZ0rHigz8aRhti1EFl/+/2wCviLkMBWm7ekVB3IOVbnbx6kJF67E
+         VVHke6oTZO8TQOnyZzvCzCeWwfMqT/Onn2xWU0/CZFPK0ChMSUmr0RGHllLwfvB7S/bR
+         t93A==
+X-Forwarded-Encrypted: i=1; AFNElJ+As6xbWF+wF0ofXaVKDN2j8czXBRgNVKgZXAw4JmOUo3YoD4SBby7VQTroqqjOceRoB8L+ANw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwJuTTF4nYwZ4MFYwNhuta2WYPdb7g6cvQHoow328ecNyuRdv/
+	yHWaSV8Ag57i25uu3EV1wQZFgathysa8Aa4fQpCxJpTROV8d8J3iazglWbxy2d/y1H7hqlzLR4V
+	S3hbCh0O2fTI4qtI9mF2OT6x7+mar4MnPavp1pj1667pdiG01++2JuDM7vg==
+X-Gm-Gg: Acq92OET4xQZKv2VQYPASBUUpOWYstTUkZwTyHQGvD0cOVz+i1Ok5WramRxmBhvkx7W
+	2IljkWdxsLcouF02cItk1Ee7gAL9miHePcs4Q5dNFJhpIRTfIzSA6iHnI/opzZ87W6vXIkZojKD
+	cK1a+Vx6uxfeyUmJRvFI4K7BJluzojkQEEN1GSxwZQPq6EwL6pGZYRE3pfkgeVYplwkOsn6Qdvd
+	e/eV9Flkz1VUzWGg2G1sBmXkjDXJ53a+8sLy06VrwBLZ0Nr6/I9ZYFT7bPm4HM0eNNczPcHZzeL
+	gtiC+IYjH9fFWjXK9fwBkMm1bxqrPmdTVcgMiMdtEWYJbXYzK+FUy2wlR7AVtvkD5hVq7+t/P/Q
+	GXnCICXgpbz64JnzU+pahseLDTiKOLqm+cO1xAmMxehdaehcw5PDwWXB8rM8iOZ7UKi3mVd7eyA
+	==
+X-Received: by 2002:a05:600c:621a:b0:48d:35e:849d with SMTP id 5b1f17b1804b1-48e8fe4dca6mr55140355e9.6.1778600394437;
+        Tue, 12 May 2026 08:39:54 -0700 (PDT)
+X-Received: by 2002:a05:600c:621a:b0:48d:35e:849d with SMTP id 5b1f17b1804b1-48e8fe4dca6mr55139695e9.6.1778600393794;
+        Tue, 12 May 2026 08:39:53 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-16-204-231.retail.telecomitalia.it. [87.16.204.231])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e8f41a8b1sm31709705e9.7.2026.05.12.08.39.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 May 2026 08:39:53 -0700 (PDT)
+Date: Tue, 12 May 2026 17:39:48 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Polina Vishneva <polina.vishneva@virtuozzo.com>
+Cc: "den@openvz.org" <den@openvz.org>, 
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, "stefanha@redhat.com" <stefanha@redhat.com>, 
+	"eperezma@redhat.com" <eperezma@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "jasowang@redhat.com" <jasowang@redhat.com>
+Subject: Re: [PATCH] vhost/vsock: Refuse the connection immediately when
+ guest isn't ready
+Message-ID: <agM8cxqUCJNjBDlm@sgarzare-redhat>
+References: <20260511145610.413210-1-polina.vishneva@virtuozzo.com>
+ <agH3WvJtAsQ_5zx4@sgarzare-redhat>
+ <962b26d2d1daa9411fb71efab6af2c75d1c5f0d0.camel@virtuozzo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8728:EE_|CY8PR12MB7291:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7a1e9ea0-5f79-4d86-66b5-08deb03bc851
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|56012099003|11063799003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	Hx94CPdz98AjU3nWGYVIUl0n7MZlYo6RkNCRG6cPHmL0AA6wQojgLEZc3q8a3HXcUSonYAghRJZwPIAh79yl6i6iCynWzsxCYBDjmLuP2q29CqXWne3x84UEkX0YwlnDToy3Z7Ka9emqRc7yyEtUBv31XkqJ3Djbr73o6YhfexTRSqjer8eEQShbSsW4wZKhyhT+FHzjfhyn3hRbEljG7Yo0X+btHsieprX1Z4i0DlPFuu9fGDhELd1LMjdWoD9EqP/sOGu+ILqdViJHL0MHjxEMNS9nYNJYFXH77/rIdMH0nBIJardwUKD1kfQi0+yK9lMzhLD+Nem1We/ApkaMvd8JQnchix6RVfd6GKoFsw2SWc9n6pAn0sIHwzTQ4LN7OuAhnKwIGDDvcPxTZ+ALknoOSXZiWDFxZG4IOytlA2DsEyAuCpEeLnTcCjNaxXh05uv01xtBxLDSMUt7AnUPpsLIXF9aOoFz2hxBOPyOG4OkPRE7u4ivu6djGAsCRmCpg5lhP9HxaJdHhyKaHfsMsPuPFlIf1TkvILRJ+8S9s/Mtd0NE46my/3xAZstjnZr/HYPaE42fsknPGquwfDyY6pXfP6yGrIWeIxtg+YAhucIe15g+twou3dXTOr0s5qKSWfwvyfBWw+EP6OWwYrAvvXNzrE0UmwvTue5E7e1E5HFsU2N0sVo8Bq3BVlTwLYEZ
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8728.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(56012099003)(11063799003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?OG9KMHhSUHh3SjV5ekJGMkppLzZOZXlEL0xmZEJpZ2ZTK1B4SXFEU3ZKTTRk?=
- =?utf-8?B?c3NFVGhISHBqaXowNWNBUG9iaHY5OXdzWTJoU2JBanRjNTMxdUVscnRkWVl6?=
- =?utf-8?B?dGhhdzEzMWNvNFJiL2g0YU5nRWFXM2F1ZWN6UVJaSmI5bEZNUFI4bUpFeTFr?=
- =?utf-8?B?aUc3UzRhZXFoZ0c4WERQcnZoTThnL2VpWnFWajg3eSs3TENSUGM2MHlvRktR?=
- =?utf-8?B?Nyt1SlRYSTlROXdSaHVGdlREcFI0NlNSQlpyYldoNTRKNWpEekNoL1JFd1lO?=
- =?utf-8?B?Q0ViblE4R3pHajJwV25vYStPVDNaTkRlYVd1UGt2em5hY09HWHdGTW1UR01z?=
- =?utf-8?B?aFV5SVFzRWd3OEJPenZnK2F3TDR0TTJyN3UwYnJlNncwWVlFcDQ3UzRIeXl1?=
- =?utf-8?B?YWZsSnhyYTQ5YWNjOGpTWlhkQ2xsYzdmY3hXVGduWXZma3NPNDgzNWZVbHJy?=
- =?utf-8?B?djRXMXdydW1NZFlEVGJCaFR4MVp6dWlqa2ozK0g0Nnp1UW9kVXBzY2dQSGRW?=
- =?utf-8?B?Q3EybXhwTXRDRWFIOE5NeE9KNGF5aEZrU2poZlNPWXRzeTYyVEtkbEZNVXdk?=
- =?utf-8?B?WFVOanVmMXR1cGdtemY0M01qbm8xOVNxRERqZTdMOXkzSUtEZldEQThmVjNP?=
- =?utf-8?B?b1h5eVh2VFFtRzhEek90RFhiajYxeFRNbEkvRmphT3RHRmpaM2Y0OE5ld0xV?=
- =?utf-8?B?T0xONmhUT2Fick8rVVd5Ulh6cnh5bU0vVEZRVHdLWHVYVWxjbUQ0OERJaURa?=
- =?utf-8?B?cldXTWEzayt0TVdkdGdHVnh0c1hkZk1McEovNzFzMEROQmFWSnBtR3BCaXJ6?=
- =?utf-8?B?bnpmVTRyck1WZXcyWW9uS0NsUm9sSlAyazNIQkZPK2dZSm9lSlpMYUlGV1B4?=
- =?utf-8?B?anlmRElCdzdXWFpCTmFDK3RKWjNKSDhmMlg4anQ2ZXhJODY3dTZvU3N1T0d1?=
- =?utf-8?B?eUhjWXFObTRvTkwyQWtVRU1qRlhWdVpyQVA3QllzSXRvdVZDRC9HWGNuMDIx?=
- =?utf-8?B?MGswQXdYdTlITEtPYnlFTHhneGtRY2RXcnk4ZE40eiszSUwzSWNpSHFFNHRQ?=
- =?utf-8?B?SWt3THM0WFBid3J1dGVWdVMxNGU2SGNiVW5vUWxlQkZPQWJKbTEzbkhEZmhh?=
- =?utf-8?B?ZDgzcEloeGZhblZmc3VhVXZQR2NDMDl3eHlmTDZYYzNLMjR3akh1VzdNbVEz?=
- =?utf-8?B?NjB1WCtwVTM4ZXVPVUZtVDdaMEp5V1JxNjMzcWtPVXRMRERjZnhVbm54VktL?=
- =?utf-8?B?bWFLZzllaFh1QjVFUWVjdDgwcnB2SmRIOFNETWFoV2s1bERWdm9hTjZZV1ZB?=
- =?utf-8?B?TjhSbC95WCtSbmFSZFN0ZUlXTXNubVZER2tqZ3lMYXlzdE1aRkwwRHVoT0Jm?=
- =?utf-8?B?MVRTaDNZcVpHUER3cW4vY1ArWkhkMVhvWHFCSjNUMDBWUC9wRUE1S3hXTSt4?=
- =?utf-8?B?NGxXWEZyUHhwOGRPbTh4bGRnZm5WOFJWWTYvWjdBM0w1SFNNSEZxby9Kbldk?=
- =?utf-8?B?Q3Y2MWkrRVpUdW9XMTBYell5MktzQU9oaTVPdnVPMjFlUVlneGh5aVNLdWtL?=
- =?utf-8?B?emtIM3ZscXkwTFZmZ1c3TUxGRTM0eklUeXh5ZmlseWZwTXVhUTdObzdYSXoz?=
- =?utf-8?B?aC9CeG54em5iS0JuWlBleVpCTkFLVWt2VU5rVmo1RlpBUlpXdFc4alBPSW81?=
- =?utf-8?B?YWNYMU9SR1FuVHZiTG9mRzdHckJXV01HcVBiTWNTKzdZTXJnRW9KbWFhWFBC?=
- =?utf-8?B?Q09oeDVNWDREWjZoTjhSUWdoQUdiZXFqS2hCYUpicG5iUzNSYjQwZnFRVE1P?=
- =?utf-8?B?M3A3TlcxNUJXeE9ybUx3NmJnbm1JU2txV1JRTXdsTUFScC9CWi8zMkxyeUZl?=
- =?utf-8?B?bC8xTldycWZpWDB4aWZwelpWOWJ0VFdMeDc4VUJXNUxINEZKRlJmMDB5dm5Y?=
- =?utf-8?B?WkRoYU03MXZkUlo4Zk8zUVVJOGlDWlo0M1lRM1YzK1hkcC9FQUV4a3BLd0pE?=
- =?utf-8?B?TjR2Um1mYStwSDdHdzdPOHltTTdLSDc4bzJvSHpXU1ROTnczQXJBQU1EZmZu?=
- =?utf-8?B?KzZ6K1ZPSFg0SzdGaVhic0UzSldYc09mMmVjU2tFRG1VVmNjbSt1SmVvM3Fz?=
- =?utf-8?B?VE1YRUEreCtoTFl2QkZzVjZpaU1pVFh6ZW54TldsT0ExZVQyb0VLb1djSUFm?=
- =?utf-8?B?SU02WWVLdURPRXNmVVc4Ujk0a2c5WndZdytWaWNpRU95TTZ2eitkeUdFWnBa?=
- =?utf-8?B?ZlhXYkdCWllReGgwaFRnb3lIM1RESkRZMWZ5SVgvT0oycjFXODFEK2JxVVRv?=
- =?utf-8?B?SHhJUEJYdEpiRW0waVliUlVTZ0VuVStCaldrNXVoZnZJTXlhVjUvUT09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7a1e9ea0-5f79-4d86-66b5-08deb03bc851
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8728.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2026 15:33:14.6650
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SHWPsVDXy/yRIZj/IOQO3So9twhBM7+a4hZ4XVZ+CKJKh04kJpac6BOXry/B+pNiGkSuQJgrzbAz2xJHzda6sA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7291
-X-Rspamd-Queue-Id: 848EB5245C1
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <962b26d2d1daa9411fb71efab6af2c75d1c5f0d0.camel@virtuozzo.com>
+X-Rspamd-Queue-Id: 8E04752402C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287222-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287223-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[nvidia.com,openai.com,google.com,kernel.org,redhat.com,lunn.ch,davemloft.net,vger.kernel.org,iogearbox.net,gmail.com,fomichev.me];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dtatulea@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[virtuozzo.com:email,openvz.org:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-
-
-On 12.05.26 01:08, Amery Hung wrote:
-> On Sat, May 9, 2026 at 11:51 PM Dragos Tatulea <dtatulea@nvidia.com> wrote:
+On Tue, May 12, 2026 at 02:32:14PM +0000, Polina Vishneva wrote:
+>On Mon, 2026-05-11 at 17:56 +0200, Stefano Garzarella wrote:
+>> On Mon, May 11, 2026 at 04:56:10PM +0200, Polina Vishneva wrote:
+>> > From: "Denis V. Lunev" <den@openvz.org>
+>> >
+>> > When the host initiates an AF_VSOCK connect() to a guest that has not
+>> > yet loaded the virtio-vsock transport (i.e. still booting), the caller
+>> > blocks for VSOCK_DEFAULT_CONNECT_TIMEOUT (2 seconds), because
+>> > vhost_transport_do_send_pkt() silently exits when
+>> > vhost_vq_get_backend(vq) returns NULL.
 >>
->>
->>
->> On 08.05.26 20:42, Dragos Tatulea wrote:
->>>
->>>
->>> On 08.05.26 19:44, Amery Hung wrote:
->>>> On Fri, May 8, 2026 at 2:15 AM Dragos Tatulea <dtatulea@nvidia.com> wrote:
->>>>>
->>>>>
->>>>>
->>>>> On 07.05.26 22:50, Amery Hung wrote:
->>>>>> On Thu, May 7, 2026 at 4:50 PM Dragos Tatulea <dtatulea@nvidia.com> wrote:
->>>>>>>
->>>>>>>
->>>>>>> Hi Amery,
->>>>>>>
->>>>>>> On 07.05.26 15:53, Amery Hung wrote:
->>>>>>>> [...]
->>>>>>>> Am I understanding correctly that the better performance comes with
->>>>>>>> the assumption that the XDP does not change headers?
->>>>>>>>
->>>>>>>> headlen is determined before the XDP program runs. If it push/pop
->>>>>>>> headers, there could be headers in frags or data in the linear region
->>>>>>>> after __pskb_pull_tail().
->>>>>>>>
->>>>>>> That's right.
->>>>>>>
->>>>>>>>>                         if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flags)) {
->>>>>>>>>                                 struct mlx5e_frag_page *pfp;
->>>>>>>>> @@ -2060,8 +2066,7 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq *rq, struct mlx5e_mpw_info *w
->>>>>>>>>                                 pagep->frags++;
->>>>>>>>>                         while (++pagep < frag_page);
->>>>>>>>>
->>>>>>>>> -                       headlen = min_t(u16, MLX5E_RX_MAX_HEAD - len,
->>>>>>>>> -                                       skb->data_len);
->>>>>>>>> +                       headlen = min_t(u16, headlen - len, skb->data_len);
->>>>>>>>
->>>>>>>> headlen - len can underflow but will be capped by skb->data_len, so
->>>>>>>> this should be okay, right?
->>>>>>> It is safe. But it might trigger an extra allocation in the pull when
->>>>>>> len > headlen. We could also skip the pull in that case. Or do a
->>>>>>> min(headlen - len, min(skb->data_len, MLX5E_RX_MAX_HEAD)). WDYT?
->>>>>>
->>>>>> Make sense, but this line took me a bit to understand. Maybe consider
->>>>>> checking len < headlen first?
->>>>>>
->>>>>> if (len < headlen) {
->>>>>>         headlen = min_t(u32, headlen - len, skb->data_len);
->>>>>>         __pskb_pull_tail(skb, headlen);
->>>>>> }
->>>>>>
->>>>> Yes, that's what I had in mind when skipping the pull. I would also
->>>>> tag this as likely.
->>>>>
->>>>>> Another clarifying question. So this patch will improve the
->>>>>> performance when the XDP programs don't change header length. For
->>>>>> those that encap/decap, they should precisely pull only headers into
->>>>>> the linear area for optimal performance. Is it correct?
->>>>>>
->>>>> Right for encap, but for decap not quite:
->>>>>
->>>>> Let's say that the XDP program pulls 64B header into the linear part
->>>>> and snips 4B of the encap out. This would result in a pull of an
->>>>> additional 4B (headlen (64B) - len (60B) = 4B) which are now
->>>>> data bytes => sub-optimal layout.
->>>>>
->>>>> I don't see how we can improve this corner case though.
->>>>
->>>> I see. Thanks for the clarification.
->>>>
->>>> I think the "if (len < headlen)" makes too many assumptions about what
->>>> the XDP program did.
->>>>
->>>> How about this policy instead: If the XDP program did not create/pull
->>>> data into the linear area, pull the parsed headers; otherwise, assume
->>>> the XDP program owns the geometry. min() is still needed since the
->>>> program can shrink the packet.
->>>>
->>>> if (!len) {
->>>>         headlen = min(headlen, skb->data_len);
->>>>         __pskb_pull_tail(skb, headen);
->>>> }
->>>>
->>>> This preserves the optimization for the default no-modification case,
->>>> and most importantly allow XDP program to get the optimal performance
->>>> if it gets the final geometry right.
->>>>
->>> I like this. It will also save us some neurons next time we need to
->>> touch these lines.
->>>
->> Sashiko disagrees:
->>
->> """
->> If an XDP program changes the packet geometry by prepending data, len will
->> be greater than 0, which skips the __pskb_pull_tail() call entirely.
->> The resulting SKB's linear part will only contain the prepended data, with
->> the Ethernet headers remaining in the fragments.
->> When the network stack later calls eth_type_trans(), it unconditionally
->> pulls ETH_HLEN:
->> net/ethernet/eth.c:eth_type_trans() {
->>     ...
->>     skb_pull_inline(skb, ETH_HLEN);
->>     ...
->> }
->> Could pulling 14 bytes from a smaller linear area cause skb->len to drop
->> below skb->data_len and trigger a BUG() in __skb_pull()?
->> """
->>
->> So I think we need an else where we preserve the old behavior:
->>   if (!len)
->>           headlen = min(headlen, skb->data_len);
->>   else
->>           headlen = min(MLX5E_RX_MAX_HEAD - len, skb->data_len);
->>
->>   __pskb_pull_tail(skb, headlen);
-> 
-> I see. I am okay with the fallback.
-> 
-> One last question: if the fallback is mainly to preserve the minimum
-> linear head needed by eth_type_trans(), can we make that explicit
-> instead?
-> 
-> unsigned int pull_len = 0;
-> 
-> if (!len)
->         pull_len = headlen;
-> else if (len < ETH_HLEN)
->         pull_len = ETH_HLEN - len;
-> 
-> if (pull_len)
->         __pskb_pull_tail(skb, min(pull_len, skb->data_len));
-> 
-> This keeps the parsed-header pull for the fully nonlinear case, but once
-> XDP leaves some linear data, the driver only pulls enough to satisfy the
-> Ethernet header invariant and otherwise leaves the final geometry to XDP.
+>> Can SO_VM_SOCKETS_CONNECT_TIMEOUT helps on this?
 >
-That would work, but maybe with one less conditional:
+>It can, but it might be difficult to find a correct timeout.
+>
+>And, generally, there's no way to distinguish "the guest hasn't yet initialized
+>the vq" from "the guest is up and running, but didn't reply to connect() in
+>time". That's exactly what this patch is attempting to fix.
 
-if (!len)
-        __pskb_pull_tail(skb, min(headlen, skb->data_len);
-else if (len < ETH_HLEN)
-        __pskb_pull_tail(skb, min(ETH_LEN - len, skb->data_len));
+Okay, so please mention this in the commit message, I mean why 
+SO_VM_SOCKETS_CONNECT_TIMEOUT can't really help.
 
-Tariq suggested to make sure that we have an xdp selftest for this.
-Will take it as a follow-up after this series.
+>
+>>
+>> >
+>> > If the guest doesn't start listening within this timeout, connect()
+>> > returns ETIMEDOUT.
+>> >
+>> > This delay is usually pointless and it doesn't well align with our
+
+I still don't understand why this is pointless. If an application wants 
+to wait while sleeping, it can simply increase the timeout long enough 
+to wait for the VM to start up and use a single `connect()` call, 
+instead of continuing to try and wasting CPU cycles unnecessarily.
+
+Hmm, or maybe not, because the driver will definitely be initialized 
+before the application that wants to listen on that port, so it will 
+respond that no one is listening, and the `connect()` call will fail 
+with an `ECONNRESET` error in any case. Right?
+
+If it is the case, is the following line in the commit description 
+correct?
+
+     If the guest doesn't start listening within this timeout, connect()
+     returns ETIMEDOUT.
+
+I mean, also if the application starts to listen within the timeout, I 
+think the connect() will fail in any case as I pointed out above (this 
+should be another point in favour of this change)
+
+
+BTW, I think we should explain this more clearly both here and briefly 
+in the code as well.
+
+>> > behavior at other initialization stages: for example, if a connection is
+>> > attempted when the guest driver is already loaded, but when nothing is
+>> > listening yet, it returns ECONNRESET immediately without any wait.
+>> >
+>> > Fix this by checking the RX virtqueue backend in
+>> > vhost_transport_send_pkt() before queuing. If the backend is NULL,
+>> > return -ECONNREFUSED immediately.
+>> >
+>> > Signed-off-by: Denis V. Lunev <den@openvz.org>
+>> > Co-developed-by: Polina Vishneva <polina.vishneva@virtuozzo.com>
+>> > Signed-off-by: Polina Vishneva <polina.vishneva@virtuozzo.com>
+>> > ---
+>> > drivers/vhost/vsock.c | 10 ++++++++++
+>> > 1 file changed, 10 insertions(+)
+>> >
+>> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>> > index 1d8ec6bed53e..a3f218292c3a 100644
+>> > --- a/drivers/vhost/vsock.c
+>> > +++ b/drivers/vhost/vsock.c
+>> > @@ -302,6 +302,16 @@ vhost_transport_send_pkt(struct sk_buff *skb, struct net *net)
+>> > 		return -ENODEV;
+>> > 	}
+>> >
+>> > +	/* Fast-fail if the guest hasn't enabled the RX vq yet. Reading
+>> > +	 * private_data without vq->mutex is deliberate: even if the backend becomes
+>> > +	 * NULL right after that check, do_send_pkt() checks it under the mutex.
+>> > +	 */
+>> > +	if (!data_race(READ_ONCE(vsock->vqs[VSOCK_VQ_RX].private_data)))
+>>
+>> Why not using vhost_vq_get_backend() ?
+>
+>Because it locks the mutex, which is slow and unacceptable in this hot 
+>path.
+
+ehm, sorry, which mutex are you talking about?
+
+I see just a comment about the mutex to be acquired by the caller, but I 
+don't see any lock there.
+
+>
+>>
+>> Also is READ_ONCE() okay without WRITE_ONCE() where it is set ?
+>
+>It's racy, but as described here in the comment and in the commit message,
+>any possible race outcome is covered by the subsequent checks.
+
+Okay, so what is the point to call READ_ONCE()?
+
+>
+>> > {
+>> > +		rcu_read_unlock();
+>> > +		kfree_skb(skb);
+>> > +		return -ECONNREFUSED;
+>>
+>> This is a generic send_pkt, is it okay to return ECONNREFUSED in any
+>> case?
+>
+>EHOSTUNREACH would probably be better.
+>All the current send_pkt functions only return ENODEV, but it has different
+>semantics: they mean that the local device isn't yet ready, while there we're
+>dealing with the opposite end not being ready.
+
+In the AF_VSOCK prespective, I see ENODEV like the transport is not 
+ready, so I think it can eventually fit here too, but also EHOSTUNREACH 
+is fine, for sure better than ECONNREFUSED.
 
 Thanks,
-Dragos
+Stefano
+
+>
+>Best regards, Polina.
+>
+>>
+>> Thanks,
+>> Stefano
+>>
+>> > +	}
+>> > +
+>> > 	if (virtio_vsock_skb_reply(skb))
+>> > 		atomic_inc(&vsock->queued_replies);
+>> >
+>> >
+>> > base-commit: 8ab992f815d6736b5c7a6f5fd7bfe7bc106bb3dc
+>> > --
+>> > 2.53.0
+>> >
 
 
