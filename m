@@ -1,157 +1,259 @@
-Return-Path: <netdev+bounces-286935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286936-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iIKEG4KYAmoauwEAu9opvQ
-	(envelope-from <netdev+bounces-286935-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 05:03:30 +0200
+	id mP97KFaZAmpyuwEAu9opvQ
+	(envelope-from <netdev+bounces-286936-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 05:07:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C14EF51921C
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 05:03:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D45751928A
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 05:07:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5E5003052B56
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 03:00:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5AA8A301A706
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 03:05:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6354378830;
-	Tue, 12 May 2026 03:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FAD1370D69;
+	Tue, 12 May 2026 03:05:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Qn48XRVi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d0x7E03g"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5134F383325
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 02:59:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E8D211A28;
+	Tue, 12 May 2026 03:05:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778554800; cv=none; b=SeIAx61GEeLx6xyv73PnFmvNOU7bhgrfp3PoHB3pUIa+zxsCWTxG/AfvDDKVVrHC5UeKuSU5wqn5eWn/TrTp40Gm+CbrqE6qw5Jpp64XiBaWt58w89zuAHATp2/qYCZe7ISPXOhEr0MX4Gf7vXQjIKZ8VVuAgiWYDEPsIy5z3aQ=
+	t=1778555135; cv=none; b=thTvmg19/ZAZKac9rtVmNNvWjXmtGmrlOFQgnP9ubkwW3TuZpNjFpSHgunXAZcOdRsS9YjaX6CVnPVAfnxM5bvZYHA7GARlCFhSuh1iLO3RjpNm9aGNOThzkMfv9w/aIeULo4deN4hOFODB6PeusABrnFkBn1jF2EcTwlb0ibHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778554800; c=relaxed/simple;
-	bh=JhpW2oLnsp+cHZSVAOb2zeeYn5TQyM7DdQhGOiyM1po=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jFx1iGY2iKBREstbXCiZxuOKdRp0GOD0KuRONHdnteoZvqYr9/ymdnGaTCK1+SHxop4+Iw7qOtCsStNLAbqOhPqe+IHAmqd4CwjMMjY0BzpiB/tZHqhFuiEh6zQ9Pvy7doyADzroZXGQuUj1mLIF64RZXyfpzbJqXaNF1eAH/4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Qn48XRVi; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <47b7dc3c-7092-49fe-b849-6847b73df86d@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1778554787;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IGNV/YJpEn+sge8vj57aYddAEttZNzqCrydxjg3s/MA=;
-	b=Qn48XRViZV3QR/2bV55pzmxbfYlU4fpwsUevkFv0aG/p1C4tc0ZbOMPUgvwLxI5Q/kbFBE
-	/cOK2D4Op6Iid4DewpSVIW/kNzjJ0o+ShH7U4Yum+fMdZJgsEeErHGWU3uQ4i6TnTXzWLo
-	ZeENjlI4qWB/lO1k/6dr2C7vLorlkGA=
-Date: Tue, 12 May 2026 10:59:35 +0800
+	s=arc-20240116; t=1778555135; c=relaxed/simple;
+	bh=1w2UOoO1tnxzUBHVNiml1kjKXTz7nAaO6k3r5W8GT1k=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=IEl4TODV1Ko9yBLT62sAzrQmt9rdKIT/wxU6OdPWa+SKPF1wyrRjm5HK8fDT96dIP8UD18DxsfLETrgAWyZzyI7bv/RBQcIOhsS9MtL2CGdyT4UNRBd6GCIXmCkBscxGAAwTxoA3qi9DG2cbo+ePJeqXWF3KDD5otGFsx03kGb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d0x7E03g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D240C2BCB0;
+	Tue, 12 May 2026 03:05:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778555134;
+	bh=1w2UOoO1tnxzUBHVNiml1kjKXTz7nAaO6k3r5W8GT1k=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=d0x7E03g0fkkNy0im+bNUEyZx542jOsy6iuW98pWaS4iN007wIfVwiOFKJaj4e0c7
+	 4dMZRWTFKS0txGG64KScJ/b4VqemIlRIgtwEcTeNlA6PARW6snGZ9a4eTvH4lBzL+3
+	 zGGp1oFKEgxUVGZN2qaKzFafuV2Zl377rmHLWbp+G/76rCs90Pvra6wfY0mfNfdiTY
+	 aJCR097h/v97kBuYXR5yzOcwIecEu538pJidzuO5/gGyJcnT60Cze9m0zdpxJSmEIL
+	 ghG8vP8bRfOYCRnGcV2LNqiLpY1BvcNrXH9SI6VLQdQBCL9u7RZ+hnn1YlW+0BqRCR
+	 QgZNccop0nwaw==
+Message-ID: <8f5bd75c7328d3b314a4c503ea16fb3c1bfffc08.camel@kernel.org>
+Subject: Re: [PATCH net] net/rds: fix zerocopy page ownership on partial
+ copy failure
+From: Allison Henderson <achender@kernel.org>
+To: Spencer ?? <spencer.phillips@live.com>, "netdev@vger.kernel.org"
+	 <netdev@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, 
+ "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Date: Mon, 11 May 2026 20:05:32 -0700
+In-Reply-To: <CY8PR11MB70846C6CD3C93572660CCC40EA3B2@CY8PR11MB7084.namprd11.prod.outlook.com>
+References: 
+	<CY8PR11MB70846C6CD3C93572660CCC40EA3B2@CY8PR11MB7084.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v4 0/2] net/tls: fix UAF when TLS_RX is set on sockmap
- socket
-To: Jakub Kicinski <kuba@kernel.org>, xw x <v3rdant.xiang@gmail.com>
-Cc: jakub@cloudflare.com, sd@queasysnail.net, davem@davemloft.net,
- pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- Jiayuan Chen <mrpre@163.com>, Daniel Borkmann <daniel@iogearbox.net>,
- john.fastabend@gmail.com, bpf@vger.kernel.org
-References: <20260511155210.32926-1-v3rdant.xiang@gmail.com>
- <20260511161320.358cfaad@kernel.org>
- <CAFFJMPzw8pcwX9g7iv3F=FpHQyovUgZZ28P7XfH3gmiay-JfpA@mail.gmail.com>
- <CAFFJMPwtWZDrD0=hANXk2cdZGt2ArQEWROGRswKPyiZ+FrG1XQ@mail.gmail.com>
- <20260511190644.23334e6d@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-In-Reply-To: <20260511190644.23334e6d@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: C14EF51921C
+X-Rspamd-Queue-Id: 0D45751928A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286935-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286936-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[cloudflare.com,queasysnail.net,davemloft.net,redhat.com,kernel.org,vger.kernel.org,163.com,iogearbox.net,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[live.com,vger.kernel.org];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.995];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:mid,linux.dev:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lpc.events:url]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,live.com:email]
 X-Rspamd-Action: no action
 
+On Sun, 2026-05-10 at 21:20 +0000, Spencer ?? wrote:
+> RDS zerocopy sends pin user pages into the message data SG list and uses =
+a
+> zerocopy notifier to carry pin accounting and completion state.
+>=20
+> If iov_iter_get_pages2() fails after some SG entries have already been
+> populated, the copy helper currently tears down the notifier and returns =
+an
+> error while leaving the partial SG count live.
+>=20
+> The common message purge path no longer has a notifier to distinguish
+> zerocopy user pages from copied-send pages in that state, so it can relea=
+se
+> a still-mapped user page with __free_page().
+>=20
+> Make data page ownership explicit with an op_zcopy bit. Once zerocopy pin
+> accounting succeeds, leave the notifier, ownership bit, and populated SG
+> count attached to the message and let rds_message_purge() perform the
+> single cleanup path.
+>=20
+> The notifier still controls zerocopy completion and pin accounting. The n=
+ew
+> op_zcopy bit controls whether counted data SG entries are released with
+> put_page() or __free_page().
+>=20
+> This preserves normal copied-send cleanup and queued zerocopy completion
+> behavior. It fixes the partial-build failure path without adding a second
+> manual unwind path.
+>=20
+> Tested with an AF_RDS/RDS_TCP MSG_ZEROCOPY partial-fault reproducer on a
+> KASAN kernel. Before the fix the run triggered bad page/accounting report=
+s;
+> after the fix sendmsg returns -EFAULT and no bad page or KASAN report occ=
+urs.
+>=20
+> Fixes: 0cebaccef3ac ("rds: zerocopy Tx support.")
+> Cc: stable@vger.kernel.org
+> Assisted-By: Codex:GPT-5.5-xhigh
+> Signed-off-by: Spencer Phillips <spencer.phillips@live.com>
 
-On 5/12/26 10:06 AM, Jakub Kicinski wrote:
-> On Tue, 12 May 2026 08:10:03 +0800 xw x wrote:
->> On Tue, May 12, 2026 at 7:13 AM Jakub Kicinski <kuba@kernel.org> wrote:
->>> Just to check - how much of this code or the patch do you understand?
->> I think I understand the root cause. Based on Jiayuan Chen’s
->> feedback—that we should deny TLS_RX attachments for sockets already in
->> a sockmap—I've prepared my patch to do exactly that. Do you see any
->> issues with this approach?
-> I mean.. I have no proof that real users of the TLS + sockmap exist
-> but I thought that they did.
+Hi Spencer,
 
+Thanks for finding this.  The fix itself looks ok to me.  When you resend t=
+he patch with the corrected author name, you
+can add my rvb.
 
-Sorry, my earlier advice was wrong on this point. TLS_RX + sockmap is
-intentional.
+Reviewed-by: Allison Henderson <achender@kernel.org>
 
-And there are public discussions about combination of KTLS with SOCKMAP, 
-e.g.
-https://lpc.events/event/2/contributions/105/attachments/103/126/ktls_bpf.pdf
+Thanks!
+Allison
 
+> ---
+>  net/rds/message.c | 33 ++++++++++-----------------------
+>  net/rds/rds.h     |  1 +
+>  2 files changed, 11 insertions(+), 23 deletions(-)
+>=20
+> diff --git a/net/rds/message.c b/net/rds/message.c
+> index 25fedcb3cd00..a381a895339c 100644
+> --- a/net/rds/message.c
+> +++ b/net/rds/message.c
+> @@ -141,7 +141,7 @@ static void rds_message_purge(struct rds_message *rm)
+>  	spin_lock_irqsave(&rm->m_rs_lock, flags);
+>  	znotifier =3D rm->data.op_mmp_znotifier;
+>  	rm->data.op_mmp_znotifier =3D NULL;
+> -	zcopy =3D !!znotifier;
+> +	zcopy =3D rm->data.op_zcopy || !!znotifier;
+>=20
+>  	if (rm->m_rs) {
+>  		struct rds_sock *rs =3D rm->m_rs;
+> @@ -170,6 +170,7 @@ static void rds_message_purge(struct rds_message *rm)
+>  			put_page(sg_page(&rm->data.op_sg[i]));
+>  	}
+>  	rm->data.op_nents =3D 0;
+> +	rm->data.op_zcopy =3D 0;
+>=20
+>  	if (rm->rdma.op_active)
+>  		rds_rdma_free_op(&rm->rdma);
+> @@ -414,7 +415,6 @@ struct rds_message *rds_message_map_pages(unsigned lo=
+ng *page_addrs, unsigned in
+>  static int rds_message_zcopy_from_user(struct rds_message *rm, struct io=
+v_iter *from)
+>  {
+>  	struct scatterlist *sg;
+> -	int ret =3D 0;
+>  	int length =3D iov_iter_count(from);
+>  	struct rds_msg_zcopy_info *info;
+>=20
+> @@ -429,12 +429,12 @@ static int rds_message_zcopy_from_user(struct rds_m=
+essage *rm, struct iov_iter *
+>  	if (!info)
+>  		return -ENOMEM;
+>  	INIT_LIST_HEAD(&info->rs_zcookie_next);
+> -	rm->data.op_mmp_znotifier =3D &info->znotif;
+> -	if (mm_account_pinned_pages(&rm->data.op_mmp_znotifier->z_mmp,
+> -				    length)) {
+> -		ret =3D -ENOMEM;
+> -		goto err;
+> +	if (mm_account_pinned_pages(&info->znotif.z_mmp, length)) {
+> +		kfree(info);
+> +		return -ENOMEM;
+>  	}
+> +	rm->data.op_mmp_znotifier =3D &info->znotif;
+> +	rm->data.op_zcopy =3D 1;
+>  	while (iov_iter_count(from)) {
+>  		struct page *pages;
+>  		size_t start;
+> @@ -442,28 +442,15 @@ static int rds_message_zcopy_from_user(struct rds_m=
+essage *rm, struct iov_iter *
+>=20
+>  		copied =3D iov_iter_get_pages2(from, &pages, PAGE_SIZE,
+>  					    1, &start);
+> -		if (copied < 0) {
+> -			struct mmpin *mmp;
+> -			int i;
+> -
+> -			for (i =3D 0; i < rm->data.op_nents; i++)
+> -				put_page(sg_page(&rm->data.op_sg[i]));
+> -			mmp =3D &rm->data.op_mmp_znotifier->z_mmp;
+> -			mm_unaccount_pinned_pages(mmp);
+> -			ret =3D -EFAULT;
+> -			goto err;
+> -		}
+> +		if (copied < 0)
+> +			return -EFAULT;
+>  		length -=3D copied;
+>  		sg_set_page(sg, pages, copied, start);
+>  		rm->data.op_nents++;
+>  		sg++;
+>  	}
+>  	WARN_ON_ONCE(length !=3D 0);
+> -	return ret;
+> -err:
+> -	kfree(info);
+> -	rm->data.op_mmp_znotifier =3D NULL;
+> -	return ret;
+> +	return 0;
+>  }
+>=20
+>  int rds_message_copy_from_user(struct rds_message *rm, struct iov_iter *=
+from,
+> diff --git a/net/rds/rds.h b/net/rds/rds.h
+> index 6e0790e4b570..b27848ec5c5a 100644
+> --- a/net/rds/rds.h
+> +++ b/net/rds/rds.h
+> @@ -496,6 +496,7 @@ struct rds_message {
+>  		} rdma;
+>  		struct rm_data_op {
+>  			unsigned int		op_active:1;
+> +			unsigned int		op_zcopy:1;
+>  			unsigned int		op_nents;
+>  			unsigned int		op_count;
+>  			unsigned int		op_dmasg;
+> --
+> 2.54.0
 
->> On Mon, May 11, 2026 at 10:13 PM Jiayuan Chen <jiayuan.chen@linux.dev> wrote:
->>> I think sockmap + TLS_RX has no useful semantics(fix me if i'm wrong).
->>> sk_skb sees ciphertext and the TLS keys are pinned to this socket, so
->>> redirect is meaningless. And both sides racing on sk_receive_queue is
->>> what produces the UAF.
->>>
->>> The fix should be to reject TLS_RX when the socket is already in a sockmap.
->>>
->>> Note TLS_TX + sockmap remains useful and unaffected.
->> Additionally, my changes seem to trigger a failure in the
->> test_sockmap_ktls_tx_no_buf test. Specifically, it attempts to set
->> TLS_RX on a socket that is already in a sockmap within
->> init_ktls_pairs. Since I didn't author this test, I’m not sure if the
->> TLS_RX requirement there is essential for what’s being tested. I could
->> use some guidance on whether the test should be updated or if my
->> approach needs adjustment.
-> Your report is narrowly for the verdict-only case in sockmap.
-> But you're banning all TLS + sockmap.
->
-> I think we need a similar workaround in sk_psock_verdict_data_ready()
-> as what e91de6afa81c ("bpf: Fix running sk_skb program types with ktls")
-> added for the full sockmap path. Or selectively ban the verdict only
-
-
-Agreed, sk_psock_verdict_data_ready should process tls like sk_psock_strp_data_ready.
-
-> format. But that feels a little less clean. Dunno.
->
-> Please, do not repost this until 24h have passed. Maybe Jiayuan Chen
-> or sockmap folks (who you apparently didn't CC?) have some comments.
 
