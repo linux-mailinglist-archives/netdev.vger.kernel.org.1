@@ -1,250 +1,194 @@
-Return-Path: <netdev+bounces-287328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287329-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SGDoADKcA2qF8AEAu9opvQ
-	(envelope-from <netdev+bounces-287328-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 23:31:30 +0200
+	id kKVIDmCdA2rm8AEAu9opvQ
+	(envelope-from <netdev+bounces-287329-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 23:36:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04FF052A4F7
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 23:31:28 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EF0052A60E
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 23:36:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E81823006930
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 21:31:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EBD1C302CD3C
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 21:36:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E0C36F913;
-	Tue, 12 May 2026 21:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EE9D386C31;
+	Tue, 12 May 2026 21:36:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ggN3G67r"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Man6gt3H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D413EDE76
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 21:31:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778621484; cv=pass; b=jqHC2eOJDxoYwlow4MR6br/zJb+c6zSHoKAexfMx/fDsKWB1ccBOlNaB5c3EkE1dSiSWfkG5j5dmJw2O7y+MwxO8bSJfxPw/8SS4F10iqFi+6zbyqwN3s79IJKHuMS0UQz+qLccpldorHNqSTDWGpu+OFqW9s0oObkYGqBoX3IA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778621484; c=relaxed/simple;
-	bh=PkC5s/4Uy0m2CN2hO3KoNCLTqq0UuYmaEjzo9fWkdZY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WgeOToqjtMVqtiy77RejMOY5eAzO6myzVP+5VWqf690OmvosjGSGIwh/a4iHswZUJ4NGnTwxTgRgQr/ZEnasFYTsIJ+Vqy7jBWg06nzw4yeQiiMaptu3+8oiv3pM/r8y4dyUaJpxMTEDQfTG+0FSZAn3QW+6l9CDuvdXoZ2HMhM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ggN3G67r; arc=pass smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11062386575
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 21:36:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778621775; cv=none; b=Qwdaxj40A8HRGxcheBbpLkvToyf70dlT0Lbr6cmAl4C9Tj1OQhkPSZkCu7EdXVqomIKKzlQpfVKPB1+ApfXwfMjDiZz2NEiDYyaVWvP9Q5+EmpL7Otmg88Lpu8LG+aS/yHLXiaY/2odnRI1BPqiQsAq1p8xRyjG0DmI0Mg+/SJQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778621775; c=relaxed/simple;
+	bh=2CAQv7WlIuAn9ZzlbSWxK35EKEEcUTbGAVGhewVtMtY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mQHeKYoS8Q+LCUwUdcwm/+KYtb+ou04dgCxY3tBMI2YOtxIZK/oT4jedf5eRfvsD9ixpwLeeK9xVlt4rBf6C4GGXWPomP1FAjUkb412SYpnnvNDyav3DeIStHMWgiqryuaxjVkuaeNdAosO0q7dimvbkCzbZfvQG2Xo4mg/JQEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Man6gt3H; arc=none smtp.client-ip=209.85.218.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-7bf14e33f5bso55595957b3.1
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 14:31:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778621482; cv=none;
-        d=google.com; s=arc-20240605;
-        b=dRinU4C8yQao6DvtBpGo7Vh0kKxhfpdchunVU/eZZwVPpCbmh2q8l5yBy6/j/l1BTd
-         vVzAdsSX4h/Av3kTjwPHvj43RwhgD3mMZSgYl7DCJMXMcAamKPlgNm4D803oKBcQCDJF
-         o4qCHOkBm1/vdr2WfpSPoaeuebAjMiq3rLLMW02VZqIqNrehm8k03x0U6bU6yO/314oc
-         o4SgCRqqVCJr7Qo8IRHnZoQMWPRoyEzW63Qym3UN/1xV9N6C2/w378PS9vKeMtbyS71j
-         Y7Xp8/v9MD0mkxvl+5PbsNemFsqNITqSqNFIXO1KY/aivriRFaZlOQRLcKfi7MI7w2ZI
-         cpwQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=7W6y2t+nJOe9TUUMwUkhxdnxRPcdVhvGuxKswbifoKM=;
-        fh=kKibDW6yqoHGykKO1QwQE6rZd3GXxUTp/9tA6cgXBI0=;
-        b=c36teGIfphaAPCkNQDJMZuV7t6urqDB6NPEV7OVsF+cBh7RlKVs7RUAbySme1a0/C4
-         A6WBQvLS7359ehmBLUgQzp4KkawOrtiVTEtDJr4t0k7HRNv1aj58QRTX5VhsGDPxgWUT
-         b9SqeTdndPBZi4A2tcd7Z4jgXXJJNeEuWLSqFRmwyDsR5cSON2prO96uTC2x2cSfQFjX
-         fpowB/wRIiO4SIQFXAozk0TzUgDaPX4ke1yWqVHMSht20sRAllKg4rz7FAtQAueDBt9C
-         bA5HPTHq2GM3q0Cy8pjROYIXi/Jbxe0dMNb1opP8krUVadmHz3ulZ106WZXDBah/n93j
-         LPSA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-bcc1459daddso557303866b.1
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 14:36:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778621482; x=1779226282; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1778621772; x=1779226572; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7W6y2t+nJOe9TUUMwUkhxdnxRPcdVhvGuxKswbifoKM=;
-        b=ggN3G67rWqVlp5MMgZoOlp+RR467rJEeDqWMIg4duWAlSoD0l8HB5D7A/hmnSNV30S
-         oEvYtAGgYbdPhJh5oEP95It8BlNRuptO/+ry/5x1sdIicwG/8ZxSfVXEG1wpr+H9NUUh
-         s6NnUqoti0MfCG/1CLVJYHu4n5etI2T+NwXO1naJc+IPSAQyJCXtVTrGvCJuwGM4FT3W
-         d9aCMit7z966MLIBv5XvZd3oIUHUWxts1t0CBcAWo2tw4vCgAvfMRXo1DQFqzbhQfp0D
-         ZjNsuDn+KqpVF2mf9mBSKK8LaY5lCONdYP1zIuor8wCNftPTP08vmXTDVOeQ5XPap4cC
-         dugg==
+        bh=7AjtpQdf3BmRecSAJyeyKfM2fj5WACdiXZCkmVYfRjk=;
+        b=Man6gt3HqG6GzEP1vSuEzftvOuWnSv16zXSzP6qL11GKFd3TdlLJNaShwgFMqswMKg
+         D0omN2+Owj3Emb0iUoEl5E1kDgRVS5p2LqJQaoZSipbppgpw2HBV7tbx6FLO8xoTk5iQ
+         H0980Js9f9AE79xQ3aflnZmkUHMZvvx7VjsPhwS+Qfm2HGII7k3ohC5O+GVrHh0plJZj
+         JshrsjIkJ6mVts+YXQIpBifTVayW8ub4hE7W50ut0Zio4BnS4OI5JCBzGACH6mh8o4xR
+         wByQ4/tiiPbf2TtofEsLljXmgO7DeDqNnAkNpQpNNZplV+hLn/FyMht1i453aCvnBnM1
+         8MbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778621482; x=1779226282;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1778621772; x=1779226572;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=7W6y2t+nJOe9TUUMwUkhxdnxRPcdVhvGuxKswbifoKM=;
-        b=BvmhdKpXgQQPStn+fHrUzIzjzgfgSmK5kZFN7p6i/riak+qeXVV1040Y7qogQYk4sp
-         /QtUZBEGM10qEVj5spoZZtKeBDlWj8wNzZZ+9rXPnaYzl5ESA01VghXhOeNaz+7YuNRH
-         fs25a2fOsIPZ1G2+yo7SR4SLkzgNX2w2Y4ejcMp9xvu1aCkviefRxVurg4DfRXc7v/a4
-         cqcW5yWSYfCAPh2ON6I8nJc5ZBVe57ojNz/TXZRTXkKl/mnghgVjIYdLr/qqYN3MJjNt
-         DEIimL8gIEG3sBzPG39JJYf6XchyHiwWKalu1JHYn83hIVv0Ofxs+UruQdqohxXOgR3L
-         4g3A==
-X-Forwarded-Encrypted: i=1; AFNElJ9AG4aglI3w6tAqh8PXegDDMPdkAL1okVsXoE7coZuGAlu0calCK1cRmrqpw1R6g2rl25tuAjg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPyJ9tNnhEsfSVLyWTqdDodVN9C7WbQfm6M9hEEuCQ80wIbjlX
-	4nDRFq4HKZAbaJugsYhwVHJRI6Q+GjWnHiAydX0LboBoZzWT5I27FTmVlz3YGAAk77F6E+QcqUT
-	bmmWrNOxXkQZiX6E7pgnp3pgxWY8THvY=
-X-Gm-Gg: Acq92OH+y+cMEwVIyXRBfRNptPsELgGQFUB3FiEwSGZVxja3RrTtdPkkqVdYWOzAVgx
-	0u2fpAt0s5In/bAIPmUQxdOVIdnP+LL4KzmABPiyE7Mz/qxmbrIUwwtsrj3LjSDpoZq3SLLtK+d
-	JLbZwjvrYiR2PWlKHVwbg5RkAQKkcBpo4v5yVu8o90edvuwajMV7lkIa8WRNnOE2Fuoc/u/0bwq
-	xV0g4BdYOnBHvRi71+ePI4xtZMmjgpB/xJFsnpMyzKYNV3TJUFgm7QQDbeAX0TNAIe07NWR01jf
-	uzcnPhyomGZQ5VoxL4kIijg=
-X-Received: by 2002:a05:690c:9e:b0:7ba:ef98:9712 with SMTP id
- 00721157ae682-7c6a9b31e3bmr6451997b3.11.1778621482311; Tue, 12 May 2026
- 14:31:22 -0700 (PDT)
+        bh=7AjtpQdf3BmRecSAJyeyKfM2fj5WACdiXZCkmVYfRjk=;
+        b=ghhy3hMITVJovbYz5o4AuxqESX2dWXz4NFRqaC6DEMdIloABpR0u/hIY22TaYNJt6Q
+         u98wtGHGcz8eKImAbbOLqebIrYpTpiv9YsvFKbehVMC/o1wXSW7pAPaCUWVXTXTcVplX
+         ogLeg0qjn5FEzj8Cpo95N1jM28F17v0JNEHXNPE4oaEyh19b1EGF46lashXRVDl38yEM
+         wHzV3Kqmudn7iWY2aa3qBrwkVCRfB+o78YAj8OF/wMAHN3RiluvcHkScj8IMzpMYsqG8
+         mf204kq1kxsxkqlsbUfjztt1PRN/UdY7xy4RG1vEc9uKaxiEUjo4F4TqyEhsPTHerh0l
+         MSvA==
+X-Gm-Message-State: AOJu0YywRQ0Xn/Z/XD2yFBVk7K2jfVurtYRG+zxlpPZwp45lUV6CmuNE
+	meRB7aUVrMuV7v4bKA6EM7Zyw2lSCbt6MkCCTcj7K/kjQgEO1nihitvL
+X-Gm-Gg: Acq92OF1HBcc/bfNhINGxMsVjEbI6x2aO0BG5LzK8WXQzEbdu2yo67G/NMeOgQymn79
+	mMnN7JUP3iaGgokgTqrFcrZmTCRx2tKkj6yX52ZHP4jlUBODEaudcY+St0Go5i5MJLKDtfq9mFH
+	w9JxRblHsznaBVgJNLJMNnhlVoyHN+7hSDG1DMk+Waoh9G35JNUBbWynvknlkl9BEFeIDgK9IU7
+	HWAPnw8al/xiXDsOnZC02hCUly3easV5960qy40SfrcGOdNB43NakxlfcheHRhZQAYlGk0Rl9Zm
+	82QeTRiuvzTXUpyGVKZn82b+55tKec9A0C/dUY1b1lT3e8lGiYY3XKiccTndnRNpcb+o7Iix0BH
+	y1fhYB05Qqj+ueloJfcPZjs/ZDHKrKaFlhK9o84Q/3AxVJCpo/MeE6x9BjESf7r8MIf5lNagI8U
+	p4IpjBke50Px+1FBZe4n+ZiUv2Xe3wGMuAk10cRWBC3sUQa8gmRvfrzCbN5d8y
+X-Received: by 2002:a17:907:801:b0:bc2:9733:9ecc with SMTP id a640c23a62f3a-bd3e27ef0famr8796166b.32.1778621772132;
+        Tue, 12 May 2026 14:36:12 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bcd9decf173sm507580066b.43.2026.05.12.14.36.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 May 2026 14:36:11 -0700 (PDT)
+Date: Tue, 12 May 2026 22:36:09 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, Hyunwoo Kim <imv4bel@gmail.com>, Marc Dionne
+ <marc.dionne@auristor.com>, Jakub Kicinski <kuba@kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org, Jeffrey Altman
+ <jaltman@auristor.com>, Jiayuan Chen <jiayuan.chen@linux.dev>,
+ stable@vger.kernel.org
+Subject: Re: [PATCH net 2/3] rxrpc: Fix DATA decrypt vs splice() by copying
+ data to buffer in recvmsg
+Message-ID: <20260512223609.57150707@pumpkin>
+In-Reply-To: <1072349.1778604723@warthog.procyon.org.uk>
+References: <20260512143835.13af8bc4@pumpkin>
+	<20260511160753.607296-1-dhowells@redhat.com>
+	<20260511160753.607296-3-dhowells@redhat.com>
+	<1072349.1778604723@warthog.procyon.org.uk>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260506142709.2298255-1-ameryhung@gmail.com> <20260506142709.2298255-8-ameryhung@gmail.com>
- <23140ed4c48babfa8af91f3b67f379773bdc04c1.camel@gmail.com>
- <CAMB2axM8hR=OVqbkbTMJw_ej2pfnEm9Cm-quuoFPqsVhmJxO0g@mail.gmail.com>
- <701f9924ff6d13cf948c4ce4527eb866a26950e2.camel@gmail.com>
- <CAMB2axOsnVj=PBuMU8utqKsSj7DsVhWNi9Vddytx6BKfFGs0JQ@mail.gmail.com> <073fd24d1220adccec5248b094f4f80fd5e66f93.camel@gmail.com>
-In-Reply-To: <073fd24d1220adccec5248b094f4f80fd5e66f93.camel@gmail.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Tue, 12 May 2026 23:31:09 +0200
-X-Gm-Features: AVHnY4L9IEgzBtCBDye1dKv4hRa9WilvXqRGKK6a36Cij0o4gsGIpgpGL2yqSGQ
-Message-ID: <CAMB2axMSBOxpUkSPr9JtD2KT4FVvwKho-G8HKJp0DP+WEK0aEQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 07/12] bpf: Unify referenced object tracking
- in verifier
-To: Eduard Zingerman <eddyz87@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, memxor@gmail.com, 
-	martin.lau@kernel.org, mykyta.yatsenko5@gmail.com, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 04FF052A4F7
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 9EF0052A60E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287328-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-287329-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,auristor.com,kernel.org,davemloft.net,google.com,redhat.com,lists.infradead.org,linux.dev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Tue, May 12, 2026 at 2:29=E2=80=AFPM Eduard Zingerman <eddyz87@gmail.com=
-> wrote:
->
-> On Tue, 2026-05-12 at 23:27 +0200, Amery Hung wrote:
-> > On Tue, May 12, 2026 at 2:09=E2=80=AFPM Eduard Zingerman <eddyz87@gmail=
-.com> wrote:
-> > >
-> > > On Tue, 2026-05-12 at 22:37 +0200, Amery Hung wrote:
-> > > > On Tue, May 12, 2026 at 12:04=E2=80=AFPM Eduard Zingerman <eddyz87@=
-gmail.com> wrote:
-> > > > >
-> > > > > On Wed, 2026-05-06 at 07:27 -0700, Amery Hung wrote:
-> > > > >
-> > > > > LGTM, a nit below.
-> > > > >
-> > > > > [...]
-> > > > >
-> > > > > > @@ -8028,14 +8024,13 @@ static int check_func_arg(struct bpf_ve=
-rifier_env *env, u32 arg,
-> > > > > >       }
-> > > > > >
-> > > > > >       if (reg->ref_obj_id && base_type(arg_type) !=3D ARG_KPTR_=
-XCHG_DEST) {
-> > > > > > -             if (meta->ref_obj_id) {
-> > > > > > -                     verbose(env, "more than one arg with ref_=
-obj_id R%d %u %u",
-> > > > > > -                             regno, reg->ref_obj_id,
-> > > > > > -                             meta->ref_obj_id);
-> > > > > > +             if (meta->release_regno && meta->ref_obj.cnt) {
-> > > > > > +                     verbose(env, "more than one arg with ref_=
-obj_id %s %u %u",
-> > > > > > +                             reg_arg_name(env, argno), reg->re=
-f_obj_id,
-> > > > > > +                             meta->ref_obj.ref_obj_id);
-> > > > >
-> > > > > I think this should be reported from update_ref_obj() itself,
-> > > > > it is more consistent logically and also avoids reporting code
-> > > > > duplication in check_kfunc_args() and check_kfunc_call().
-> > > > > Also, technically the reg_arg_name() is an independent fix.
-> > > >
-> > > > We have kfuncs that have more than one ref_obj. This is not a probl=
-em
-> > > > unless ref_obj is referenced in the verification and is ambiguous
-> > > > (e.g., used it to tie the lifetime of the allocated memory with
-> > > > ref_obj). Therefore, it is kept at the location of use instead of
-> > > > update_ref_obj() to prevent breaking existing kfuncs.
-> > >
-> > > Ack, thank you for explaining.
-> > >
-> > > > >
-> > > > > > Drop the selftest introduced in 7ec899ac90a2 (=E2=80=9Cselftest=
-s/bpf: Negative
-> > > > > > test case for ref_obj_id in args=E2=80=9D) since the verifier n=
-o longer
-> > > > > > complains about ambiguous ref_obj if it is not used.
-> > > > >
-> > > > > On the other hand, if you think that this property is worth havin=
-g,
-> > > > > then maybe wrap the check with in some utility function?
-> > > >
-> > > > A utility function like below makes sense if we fold ref_obj_id int=
-o
-> > > > id. It would be too cumbersome for v3 as we may need two of this fo=
-r
-> > > > ref_obj->ref_obj_id and ref_obj->id.
-> > > >
-> > > > static int get_ref_obj_id()
-> > > > {
-> > > >         if (ref_obj->cnt > 1) {
-> > > >                 verifier_bug(env, "function expects only one
-> > > > referenced object but got %d\n", ref_obj->cnt);
-> > > >                 return -EFAULT;
-> > > >         }
-> > > >         return ref_obj->id;
-> > > > }
-> > >
-> > > Maybe just like this:
-> > >
-> > >   static void validate_ref_obj(struct ref_obj_desc *d) { ... }
-> > >
-> >
-> > Do you mean:
-> > static int validate_ref_obj(struct ref_obj_desc *d) { ... }
-> >
-> > Then to use it:
-> > err =3D validate_ref_obj(meta.ref_obj);
-> > if (err)
-> >         return err;
-> >
-> > regs[BPF_REG_0].ref_obj_id =3D meta.ref_obj.ref_obj_id;
-> >
-> > > ?
->
-> Yes, like that, sorry.
+On Tue, 12 May 2026 17:52:03 +0100
+David Howells <dhowells@redhat.com> wrote:
 
-Np. Thanks for the suggestion. I will add the utility function.
+> David Laight <david.laight.linux@gmail.com> wrote:
+...
+> > > +		size_t size = umin(round_up(sp->len, 32), 2048);  
+> > 
+> > Doesn't min() work?  
+> 
+> Actually, it should be umax() as I want the largest of the values (as Jeff
+> pointed out).  I prefer using umin/umax for values that are known to be
+> unsigned as you don't get casting errors (see the number of places we end up
+> using min/max_t(<unsigned-type>, ...) when we should use umin/umax() instead)
+> and the compiler may generate better code as we've told it that it doesn't
+> have to worry about negatives.
+
+umin() and umax() are better than min_t() and max_t() (which is why I added
+them); but you lose the compile-time check in min() and max() that rejects
+comparisons where one side is unsigned and the compiler doesn't know that the 
+other is always non-negative.
+
+Basically if you compare a signed 32bit value and an unsigned 64bit one
+with umin() the 32bit one is zero-extended to 64 bits.
+OTOH min_t(u64) will sign-extend the 32bit value and then treat it as unsigned.
+In both cases the onus is on the programmer to ensure the 32bit value isn't
+negative.
+For valid non-negative values the result is the same.
+Zero-extending is usually free, sign-extending is particularly horrid on 32bit.
+
+But it is better to use min() or max().
+The compile-time tests will reject any cases where the integer promotion
+rules could convert a negative value to a large positive one.
+Note that the types no longer have to match.
+Code like this is (usually) ok:
+	unsigned int blk_len = ...;
+	int rval = fun(...);
+	while (rval > 0) {
+		u32 len = min(rval, blk_len);
+		// process len bytes;
+		rval -= len;
+	}
+even though the types passed to min() differ in signedness the compiler's
+value tracking means it knows that rval can never become a large unsigned
+value - and min() uses that to allow it all through.
+	
+-- David
+
+> 
+> > That doesn't look right.
+> > If sp->len is bigger than 2048 the you keep allocating a new buffer
+> > and the call below overruns the allocated buffer.  
+> 
+> Yep - see the aforementioned umax comment.
+> 
+> David
+> 
+
 
