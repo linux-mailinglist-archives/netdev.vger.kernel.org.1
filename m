@@ -1,150 +1,200 @@
-Return-Path: <netdev+bounces-287043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287044-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MMOjNr/3AmqvzAEAu9opvQ
-	(envelope-from <netdev+bounces-287043-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:49:51 +0200
+	id iD12ALn4AmqvzAEAu9opvQ
+	(envelope-from <netdev+bounces-287044-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:54:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7044B51E0B3
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:49:51 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9725F51E189
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:54:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E95FF30305EE
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 09:49:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8408B300AB3F
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 09:53:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C56BA48C405;
-	Tue, 12 May 2026 09:49:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E8844BCAC3;
+	Tue, 12 May 2026 09:53:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V3qkS5sB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WAfDxPPN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE254963AD
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 09:49:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8447349250D
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 09:53:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778579346; cv=none; b=JO9+mY88B76dpLZ+zR9JTZ1aJJvK3gDuE4YjMpol2/+ffaGjczQjj2rDXStCM9143a22ooxgf1RtjxaCYtH+WVrDniZ0cpTI5LLHtlhGWuVYPrp+NkCTxzWDbsYkNGV1urfymNfsDHwrNuii9XrzsaYMzvTrIEty5yVD3reFvq0=
+	t=1778579637; cv=none; b=qqP1nDS0YWlmkVp2szy+8SBAPy8i86wClc0F2aJtpKE7rgTrxiLEM2bah3t4tJOVotsZkIFZ65Z2XUn7w1gNnZbI8ipcgHfcwNFn0GfAvDhI8xWKRzBkVPi1LUaT7FBRqr9Zh38HqSnd/+oO7SqnEGvaLuezpgsysNaRj8a7iFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778579346; c=relaxed/simple;
-	bh=8D9RWI7T1YMFEt7m0jIFY4JJvYnA1SyrvvgRB9LpkdE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JovsZOho9n/LbaOktNH+yFC4f3L46oEj53mYljmeLzMZ4SDwlImPCZBHe/DXsCLdcdqb1xm+7b81iZqrrGajXNybuuVfhh8yMpRjehUDnYzJxHNyt6h/uSD0XVUmz7cTbUBAo3MQbpYwSnC289eMivW6inYEL8PHusbUtaRtzKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V3qkS5sB; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-50d812c898cso129742491cf.1
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 02:49:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778579344; x=1779184144; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wOZsG67LOHJdRdsAuNcWorxZMozNPyZMrt7hSZoTtTE=;
-        b=V3qkS5sBvim7g1boisajDAubL+ZLgcueRf0KIvZH7HWZX9M4xZmt+DGeoXNYy0fyMd
-         sTo8x4pPyuJzF+fBQaK4T1Y/zt6y7EPV2yw/tH9H6qSpbs5IfX3gbFwFXQNKgnNUBiR7
-         TvaZ+baHPQDxELvts05VoAVMQqXTE6hdyKCDbR/Z9QxIHz4MSzSS0l7MDF6jHVTfqjeb
-         BXRHLJBW7pw9g5hi058TcWICFu97bjEL97O8myiSclxCwcHu/KwVK6jiCuBfLdNkVVhH
-         xEnf9huqruE4xZY3A1SE5/Epltact2lYiglQ7y6TW7zhNN+HV+73GG7t3CpeAM5nAGTX
-         /1rA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778579344; x=1779184144;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wOZsG67LOHJdRdsAuNcWorxZMozNPyZMrt7hSZoTtTE=;
-        b=LJvgiAhwqgTEpWFRQvnkpPbar3exedGpJcSAEsJoUiO+YZFzlZ7xbJj+RBROkAGqC1
-         fPv69Fys5oYHAZwxcI27sG55024iWV7bbf9DGeCwAP+wnpIxVzKRpi/CD5KFiIAXDxyt
-         h45x6/fsDT56bsMWYr0h5BMBfyNXtj2Zxt3+yivAUBsd4lzFBeXBW2vzyGxqeLdXv0l6
-         jrYLYoUi2jOam7bwgOG6DtGICcKvvdPvsJLT+32V0Xop9LT6xPcl+NWs/QL0FWyGGNad
-         lwoXn0+oQQDj0pffGemI8LG/DypFyTH6ZRq0E8ZlIhRlV3FTYbsJTvhwNJAH1UWr1cZG
-         0viw==
-X-Forwarded-Encrypted: i=1; AFNElJ8aHfrrtsx/VsSgbddnkbyqLXhHIhOih4+RPmhFeM9jeuCimYe+gB5ocnFINx7v5ZKUbvPG1Jo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVzNtXuuuCp4ys9lNY7oD/La4/vhfIdxMZ6Pi6zVpgODVC8am1
-	WSISXl/XuLy4CjH6hpTflbZqaxAc4dM7DB3NdkF7yIfk1sRH1ydT2nyN4OTg+Pby/w95M0bMMZx
-	Jci4Vl1va0sRm5Q==
-X-Received: from qtbfw12.prod.google.com ([2002:a05:622a:4a8c:b0:50e:5fa5:fee2])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:19aa:b0:509:35d1:ca3c with SMTP id d75a77b69052e-51461be04f8mr397083411cf.5.1778579343820;
- Tue, 12 May 2026 02:49:03 -0700 (PDT)
-Date: Tue, 12 May 2026 09:48:59 +0000
-In-Reply-To: <20260512094859.3673997-1-edumazet@google.com>
+	s=arc-20240116; t=1778579637; c=relaxed/simple;
+	bh=q9UFIGH2TFyvxqrySWxohYUwuY3EZ77lFKUOAZJOgME=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=edbnCFkC8s0ozTHPSxDLlnI5FbZuV4UTUdR1Nx5fa0RTiHT/PcwnrdMdN1YG0Rkhp1PCQd56Kd5Km2hKzc1rQJ4336/Xm3KjtLsbuQOApICLYoS55pWEi2ykCghmOel+f4mp6GI/bc7zt6i+dRTdh8bFp10ZvF7cTVIEcYvinBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WAfDxPPN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778579634;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+wQWXx5MVHKxpx3NSTHnfj/VmgVwD/333uvQQPjns28=;
+	b=WAfDxPPNZ8JKpoWKhhQRmIPAtDrPs6KozPpjL+QpnDf+Kps2hL63qxVu7XWWwt+KW6YrZr
+	h9L5z3rggdLpPNZdzh0qxXZhZXH0pixXD1skt48m9IWslDtk1BnaeL9SURDap5+pLMqSOG
+	jqh7Phko0Pc9cYFaUoekG4S8JM6HHeI=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-657-x1yydIMMOvqUfzjcilPG6Q-1; Tue,
+ 12 May 2026 05:53:50 -0400
+X-MC-Unique: x1yydIMMOvqUfzjcilPG6Q-1
+X-Mimecast-MFC-AGG-ID: x1yydIMMOvqUfzjcilPG6Q_1778579629
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D4FF9180034C;
+	Tue, 12 May 2026 09:53:48 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.48.142])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5224418004A3;
+	Tue, 12 May 2026 09:53:45 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: sukhdeeps@marvell.com
+Cc: netdev@vger.kernel.org,
+	irusskikh@marvell.com,
+	epomozov@marvell.com,
+	richardcochran@gmail.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/9] net: atlantic: move active_ipv4/ipv6 bitmap updates after HW write updates after HW write
+Date: Tue, 12 May 2026 11:53:31 +0200
+Message-ID: <20260512095339.134878-1-pabeni@redhat.com>
+In-Reply-To: <20260506135706.2834-3-sukhdeeps@marvell.com>
+References: <20260506135706.2834-3-sukhdeeps@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260512094859.3673997-1-edumazet@google.com>
-X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
-Message-ID: <20260512094859.3673997-3-edumazet@google.com>
-Subject: [PATCH net-next 2/2] net/sched: fq_codel: local packets no longer
- count against memory limit
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
-	"=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?=" <toke@toke.dk>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 7044B51E0B3
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Rspamd-Queue-Id: 9725F51E189
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,toke.dk,vger.kernel.org,gmail.com,google.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,marvell.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287044-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287043-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.998];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Commit 95b58430abe7 ("fq_codel: add memory limitation per queue")
-claimed that the 32Mb default was "reasonable even for heavy duty usages."
+From: AI Reviewer <ai@example.com>
 
-In practice, this is not the case.
-
-Packets that are associated with local sockets sk_wmem_alloc
-do not really need additional memory control.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://netdev-ai.bots.linux.dev/sashiko/
 ---
- net/sched/sch_fq_codel.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+net: atlantic: move active_ipv4/ipv6 bitmap updates after HW write updates after HW write
 
-diff --git a/net/sched/sch_fq_codel.c b/net/sched/sch_fq_codel.c
-index 1b1de693d4c64a1f5f4e9e788371829dea91740e..71107dc52be799a14f370f2ad74d2eadd93992c1 100644
---- a/net/sched/sch_fq_codel.c
-+++ b/net/sched/sch_fq_codel.c
-@@ -212,7 +212,7 @@ static int fq_codel_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		q->new_flow_count++;
- 		WRITE_ONCE(flow->deficit, q->quantum);
- 	}
--	get_codel_cb(skb)->mem_usage = skb->truesize;
-+	get_codel_cb(skb)->mem_usage = is_skb_wmem(skb) ? 0 : skb->truesize;
- 	q->memory_usage += get_codel_cb(skb)->mem_usage;
- 	memory_limited = q->memory_usage > q->memory_limit;
- 	qdisc_qlen_inc(sch);
+This change moves the active_ipv4/active_ipv6 bitmap updates out of
+aq_set_data_fl3l4() and into aq_add_del_fl3l4() after the HW write, and
+removes the bitmap manipulation from aq_nic_reserve_filter() and
+aq_nic_release_filter().
+
+> net: atlantic: move active_ipv4/ipv6 bitmap updates after HW write updates after HW write
+
+The subject line repeats "updates after HW write" twice.  Was this
+intended, or should it read "net: atlantic: move active_ipv4/ipv6 bitmap
+updates after HW write"?
+
+A few other subjects in this series look like they have the same
+copy-paste pattern (for example "masking and IPv6 handling masking and
+IPv6 handling", "driver internals driver internals", "TX path setup TX
+path setup", "(Antigua) (Antigua)") and may want the same cleanup.
+
+> diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
+> index ef9447810071..3cec853e9fad 100644
+> --- a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
+> +++ b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
+> @@ -1522,8 +1522,6 @@ u8 aq_nic_reserve_filter(struct aq_nic_s *self, enum aq_rx_filter_type type)
+>  	case aq_rx_filter_l3l4:
+>  		fltr_cnt = AQ_RX_LAST_LOC_FL3L4 - AQ_RX_FIRST_LOC_FL3L4;
+>  		n_bit = fltr_cnt - self->aq_hw_rx_fltrs.fl3l4.reserved_count;
+> -
+> -		self->aq_hw_rx_fltrs.fl3l4.active_ipv4 |= BIT(n_bit);
+>  		self->aq_hw_rx_fltrs.fl3l4.reserved_count++;
+>  		location = n_bit;
+>  		break;
+
+Could dropping the active_ipv4 update here regress PTP's IPv4/IPv6
+collision protection?
+
+The PTP path calls aq_nic_reserve_filter(aq_rx_filter_l3l4) from
+aq_ptp_init() to grab a single L3L4 slot, and then programs its IPv4 UDP
+filter by calling hw_ops->hw_filter_l3l4_set() directly from
+aq_ptp_hwtstamp_config_set() / aq_ptp_prepare_filters() — it never goes
+through aq_add_del_fl3l4() where the new bitmap update now lives.
+
+Before this change, aq_nic_reserve_filter() set:
+
+    self->aq_hw_rx_fltrs.fl3l4.active_ipv4 |= BIT(n_bit);
+
+which caused aq_check_approve_fl3l4() to reject any later IPv6 L3L4 rule,
+protecting PTP's reserved slot.
+
+After this change, active_ipv4 stays zero while PTP is actively filtering
+IPv4 in hardware.  Can a user now add an IPv6 L3L4 rule at
+AQ_RX_FIRST_LOC_FL3L4 + 4 (still within AQ_RX_LAST_LOC_FL3L4) and have
+the IPv6 filter program HW slots 4..7, silently overwriting PTP's IPv4
+filter at HW slot 7?
+
+I looked through the rest of the series including the AQC113 PTP patches
+(aq_ptp_dpath_enable / aq_ptp_add_a2_filter) and they also call
+hw_filter_l3l4_set() directly rather than going through
+aq_add_del_fl3l4(), so the reserved PTP slot does not get re-reflected
+into active_ipv4 by a later patch.
+
+> @@ -1543,7 +1541,6 @@ void aq_nic_release_filter(struct aq_nic_s *self, enum aq_rx_filter_type type,
+>  		break;
+>  	case aq_rx_filter_l3l4:
+>  		self->aq_hw_rx_fltrs.fl3l4.reserved_count--;
+> -		self->aq_hw_rx_fltrs.fl3l4.active_ipv4 &= ~BIT(location);
+>  		break;
+
+Would it be worth keeping these updates (or adding equivalent ones on the
+PTP reserve/release path) so that aq_check_approve_fl3l4() continues to
+see PTP's reserved slot as active_ipv4?
 -- 
-2.54.0.563.g4f69b47b94-goog
+This is an AI-generated review.
 
 
