@@ -1,180 +1,120 @@
-Return-Path: <netdev+bounces-287111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287112-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eGHcIU0RA2qX0AEAu9opvQ
-	(envelope-from <netdev+bounces-287111-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:38:53 +0200
+	id YIsjI84SA2r20AEAu9opvQ
+	(envelope-from <netdev+bounces-287112-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:45:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C67B951F7B2
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:38:52 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75E1E51F89E
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:45:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D65333064668
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:36:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8FA383003BC2
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:45:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F9E84D2EFC;
-	Tue, 12 May 2026 11:36:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87BE6349CEC;
+	Tue, 12 May 2026 11:45:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jRfyD+IW";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="iNOR1zEY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bL7UfvCZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9544D98F4
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 11:36:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65604349CE8
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 11:45:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778585794; cv=none; b=akW1Dk9bUSNPQuoKx63rVe4v/KbINn+asMLV576IFCgLcV9PpcNbQ+baLBkOooGLSo4V4pJ+tbpBlYkjHMN8l64Q2DpD75aJnMe9zTzVl15GJM4mOTJrv4sWjOvjjVmNJmwvrffVsSc1uUyO6zP30VGIglZcV6hZxWsgoPp6c70=
+	t=1778586313; cv=none; b=rMtBD8Dcp20KwtggME6+wnxUfw/XwhFBebU9QvAv7NoR9Q5XkRaAOODkhvQW/r3lDD9VcFf9tmCAlQF3mjrxp9wOaAhW/OoZHvly5T/qopusOaL4WrDrOODHr3UnNhc4Sq17oZKJkSeVnEpBmiiDQ06IN+HuukUzlNpv3aNtdK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778585794; c=relaxed/simple;
-	bh=tD09wB0HSocpKa+1WEGTLBF7rc8s7bhV3jRNSldHa2o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D6vsJmmZVyGR2rhXUQUoOeg9KYm4vvOhgXqZxa+mDVB93po09NEcNvFX2q6o8NTFphNQDTldMeO21SZfITNCgEnvfRGMDZPp6NZjhC9Rys5I7dmL/ZLo350hB8XubhYOgMNBxv1+S2PW8lunQyOnNTzkltNDrn+Wz//VtZVS3qY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jRfyD+IW; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=iNOR1zEY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778585790;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ph9gHYsx1MwJsXlOBpqpwZIJ5iQf/Q82Dt7OeJw2IpI=;
-	b=jRfyD+IW0W/Ibtt5+agFRZQ/tTj/wB7bs/FcLSqNNBKHFSzTJ1Y5UoCWc9PIe3YU1pKCEY
-	E7y6GC+zkLNqInN9zMOvKHZTeRda9HJM9U4vY2cjU83Qux5jRj99oh3yOVwq/g0aIoYFAL
-	EOXmyL/BxcSZlwxoKtU9VzGMRSURMKg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-693-ns71KD6TNxS7xrqsRZ0xtw-1; Tue, 12 May 2026 07:36:29 -0400
-X-MC-Unique: ns71KD6TNxS7xrqsRZ0xtw-1
-X-Mimecast-MFC-AGG-ID: ns71KD6TNxS7xrqsRZ0xtw_1778585788
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-48a9592f666so36346885e9.1
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 04:36:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1778585788; x=1779190588; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ph9gHYsx1MwJsXlOBpqpwZIJ5iQf/Q82Dt7OeJw2IpI=;
-        b=iNOR1zEY30kw1wXLvG4XGfDkPXMPNxWcqIj+P2vM45ZHyG5dfLGX58Ap9I/npdHI4A
-         bQqFi/d76Ktln5lcalAc0QMHNjmzwdPeIp6H0KHuKWy+KBWVnR0EZWinCitMFsrQl2iF
-         JfMQFtEZ73OLQBgcgH/elwE5qqif0srNSYHpwk4Nm/JatBUT9wYG4K8jTKawPxdLnlqO
-         EkGz3GYwwopHLYgCESE3I/sp8eTPh7U9op0ZPHynkb9kJbR+dU/EfW29FtywKD+3OhSy
-         EGMWlsy24uJjmzddHQ1Q0QbkwIY9J1Sldu1cqemEb0W42GrN6X6YjVEJ2DGXV0/b9/W3
-         bexQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778585788; x=1779190588;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ph9gHYsx1MwJsXlOBpqpwZIJ5iQf/Q82Dt7OeJw2IpI=;
-        b=B8/o/cNWRsFE+T/0vPgMKeQDsRHcPJJ/C9kpeXU9Q+BGexzuicMN2E2nzvlr4kV+M6
-         ddOX+yQuHKex84zkOwk6E9vpOjzNejHzmWFyQJGYxQ0KK9+IYpVXR+RpkJ70RStr7dH8
-         aJ6Qxt8VxYrHZG3sRQdrs/ACQC/eHiVosNe0ZqwLmd+UQ6cxTgfCmCZhleciMrllkP5Y
-         v3wNNXGvoyPdtbJKOHZClTx+JMlWs0dVnq0nuZicxiRxs0dJ8I5p/PIObfXFBHYWhKgP
-         CXRfM44KgD2o9sQQOggU/X7bwKqwaAbukUepaj0Wd27RgFf0CE472cBV3/dntdL23aEy
-         DOKA==
-X-Forwarded-Encrypted: i=1; AFNElJ9vXNDz04pqD8n9gdYdXbqJbYuwdQW3K5TrkyLQZmUUDBw58lKYYbv5JegaMBkZu3n6ZK5KBqM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywn82zp3vZLej57YIdPFNjukDT2HZADhcroTe4DxY+rEXZmg6aC
-	HESR4rq19zZsZlKUKynsfofUWJ7TT8rcoC7Z3Vvaqnj6DP8jcczeYrtdCHnnmPTe3my9m0KqMpg
-	kVBQzl/uO1FgkQubVgC4FgYgfGVH9QqD1mYRMLgQt6uMl/oXRTnP7RBbF9g==
-X-Gm-Gg: Acq92OFT8rB/lMGgLptw+4XwiMLh90pjFDqw+6asLKUN8S7jxihHrrVOvCSTKM1yWdC
-	YC5IlgX9k+jiRj9tA5/+3kVSZju4v7OiLODGvTy7H5v6agNDNdKM//Mwh1NnZGmbbqBLFH1THau
-	oNy0kcEq3Dkt2LrBHlF6DO0mAvymfes+/asPWj+irfO/P3j0dEow/QSwkXYd1CnCnV2O50RByMX
-	lgdppi33rPj0JeuHQgjH8fhxHEBLHQaZyiG8J78VnYRcwZPXZOmPW27cy+keO7GFjw8nAUPfTYg
-	4ZoqrWxZft2c2SJOJzGkDY+pjVQ+G0NP+GzdgQQbCYNBoZos5r3C85U2kbxknfOW9suAXoxdd76
-	9PTcAuBZPErR/msQEZBAIwTDNWKRf3oJht2fjIuHw4PTyU6dp1xqDiTg=
-X-Received: by 2002:a05:600c:8486:b0:48a:6fd4:d3d3 with SMTP id 5b1f17b1804b1-48e706be062mr230118795e9.20.1778585788046;
-        Tue, 12 May 2026 04:36:28 -0700 (PDT)
-X-Received: by 2002:a05:600c:8486:b0:48a:6fd4:d3d3 with SMTP id 5b1f17b1804b1-48e706be062mr230118195e9.20.1778585787633;
-        Tue, 12 May 2026 04:36:27 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.9.106])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e90681760sm40268075e9.12.2026.05.12.04.36.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 May 2026 04:36:27 -0700 (PDT)
-Message-ID: <259b0641-fba1-4977-adc7-fd4002412d7e@redhat.com>
-Date: Tue, 12 May 2026 13:36:24 +0200
+	s=arc-20240116; t=1778586313; c=relaxed/simple;
+	bh=jP7rpAaaRmEue3I1LYG0dyLesrRQsMAvT38J5HBqEwk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zyz62K3QwV2cnijBMqWuTfreg56S/hd5aqjKrZQr+dNzubmeZHWDC++YVq1BCWXDyvSKVl9L3kdVMLpN6g/vw/sHabbZ96Sty0zV/xFpL6joahPVNENPXNSKxBc3RYVgpr3aD04WVWjlM9wtk7eGmw9BO4qEHH77ZNrGXUzfaB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bL7UfvCZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 150D4C2BCB0;
+	Tue, 12 May 2026 11:45:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778586313;
+	bh=jP7rpAaaRmEue3I1LYG0dyLesrRQsMAvT38J5HBqEwk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bL7UfvCZDyr2+dZUbfIoPovt7UiTYBYtp6CF/djqws7TCfe9ckq7HtPy20CybMjlW
+	 0p+a62P9/OB0hbm1yCKr4GXj3gz3sF4mBZKIjW5Zg1pByMnTiKuKifFGGCLBmR359z
+	 8xWnQ9fK+VMJtxPumTWeqW6qnxuY8P+tWwfOcKGiOXCCimTmdIkmApv4K0Yrz9iQk1
+	 YVTGGFU+aDZmt4+naHTSnS3GmmPytNJQhwO/88N4kBfuMy47Q9vvsUGpNVVRSwNZVC
+	 ec3NXiXsUsPNnkm2xFVpzIqOnD7oGtO/0FncOy+5IrTmjFwZPmbaZ9QtCCUnklJA7w
+	 i2DL0hLHsWlew==
+Date: Tue, 12 May 2026 14:45:08 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2] rdama: sync kernel headers and fix build
+Message-ID: <20260512114508.GS15586@unreal>
+References: <20260505181045.748088-1-stephen@networkplumber.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 3/6] net: mana: Introduce GIC context with
- refcounting for interrupt management
-To: Long Li <longli@microsoft.com>,
- Konstantin Taranov <kotaranov@microsoft.com>,
- Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
- Haiyang Zhang <haiyangz@microsoft.com>,
- "K . Y . Srinivasan" <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, shradhagupta@linux.microsoft.com
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260508221202.15725-1-longli@microsoft.com>
- <20260508221202.15725-4-longli@microsoft.com>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260508221202.15725-4-longli@microsoft.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: C67B951F7B2
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260505181045.748088-1-stephen@networkplumber.org>
+X-Rspamd-Queue-Id: 75E1E51F89E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287111-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWO(0.00)[2];
+	TAGGED_FROM(0.00)[bounces-287112-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,networkplumber.org:email]
 X-Rspamd-Action: no action
 
-On 5/9/26 12:11 AM, Long Li wrote:
-> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> index 4673ff62e6d9..78cb89c46ff3 100644
-> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> @@ -1618,6 +1618,164 @@ static irqreturn_t mana_gd_intr(int irq, void *arg)
->  	return IRQ_HANDLED;
->  }
->  
-> +void mana_gd_put_gic(struct gdma_context *gc, bool use_msi_bitmap, int msi)
-> +{
-> +	struct pci_dev *dev = to_pci_dev(gc->dev);
-> +	struct msi_map irq_map;
-> +	struct gdma_irq_context *gic;
-> +	int irq;
+On Tue, May 05, 2026 at 11:10:44AM -0700, Stephen Hemminger wrote:
+> The upstream kernel removed the 'RES_' prefix from RDMA netlink
+> command and attribute names, but the rdma tool was still using
+> the old names, causing build failures.
+> 
+> Update all references to match the new kernel header names:
+> - RDMA_NLDEV_CMD_RES_FRMR_POOLS_* → RDMA_NLDEV_CMD_FRMR_POOLS_*
+> - RDMA_NLDEV_ATTR_RES_FRMR_POOL* → RDMA_NLDEV_ATTR_FRMR_POOL*
+> - RDMA_NLDEV_ATTR_FRMR_POOL_PINNED → RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES
+> - RDMA_NLDEV_ATTR_FRMR_POOL_AGING_PERIOD → RDMA_NLDEV_ATTR_FRMR_POOLS_AGING_PERIOD
+> 
+>   Fixes build error:
+>     res.h:203:26: error: 'RDMA_NLDEV_CMD_RES_FRMR_POOLS_GET' undeclared
+> 
+> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+> ---
+>  rdma/include/uapi/rdma/rdma_netlink.h | 30 ++++----
+>  rdma/res-frmr-pools.c                 | 98 +++++++++++++--------------
+>  rdma/res.h                            |  2 +-
+>  3 files changed, 65 insertions(+), 65 deletions(-)
 
-Since a new revision is needed, please fix the reverse christmas tree
-above and elsewhere, thanks!
+There is a typo in the title: rdama -> rdma
 
-/P
-
+Thanks,
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 
