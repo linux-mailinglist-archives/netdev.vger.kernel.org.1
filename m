@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-287291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287292-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SBaIGbSPA2qM7QEAu9opvQ
-	(envelope-from <netdev+bounces-287291-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:38:12 +0200
+	id UHrjM6GPA2rI7QEAu9opvQ
+	(envelope-from <netdev+bounces-287292-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:37:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4478152963C
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:38:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3270B529617
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:37:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0DABB308AF93
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 20:31:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4378231448B2
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 20:32:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98C93C9EDF;
-	Tue, 12 May 2026 20:30:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 328D23CAA48;
+	Tue, 12 May 2026 20:30:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BQfYjtqA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cVluOorI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBBCE3BB13A
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 20:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2843CAA25
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 20:30:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778617840; cv=none; b=RcZvNtiR14wG1oK9n2HjFj+BSQ/MQStj2+W/1x/QYPdgqzVAOkmZvVZEkftzcK8PJrLsc/5NyYR4DRxgIgPok7EKTO92hEaWXsOGVxECDXwJ3og3rRfDuvtkIjo06IjDgxN+WB04ILw2N/o2LJjQ1QbnowieURHrcYGAwAlDNqM=
+	t=1778617844; cv=none; b=n9e3KqL8u9tNGGGgpKvyIm12enAJKTu0Hm7Cvdw0gl1JG0Wp16ZJb7VH7/cvo3SroNlaw0BGBwb+YAEoZd/LWvYk7mXN8KS9nqDoevhVWI1yhr2Kn75TiC16i0L61REXXxzblhuEMRYFF8R+M9LAczlo5lz7F2zrmCGwir778Uw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778617840; c=relaxed/simple;
-	bh=xEjbSd03AEqF56W5JQp+tlvPw6vwMv+uTO2jL7BCgwU=;
+	s=arc-20240116; t=1778617844; c=relaxed/simple;
+	bh=VaFRdFo9VibEiQ3eBuEP9D4AW5KzamADAu0IY56lq0w=;
 	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=FOsniIUJAlRmoxPUF4dYjfNhjyBaeMwvjeFD1CifPgJNn4OihgHY7uUQadTecWQrL0QHd3r+CoSKsNvXWKwXjspl4Rf9x4tG3+VF5ua18kwbfKlPrqg1PxnD9WI/J9YVAG5ix+vIHYp3IgGG/WXIfQYSpUSRzY++U0HyaC44qY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BQfYjtqA; arc=none smtp.client-ip=209.85.221.51
+	 In-Reply-To:Content-Type; b=ahDv19UlvTWHQspDcK6ibZ2TSmkqJcS2UHIIBeF7+8MxsAddG5ryyilscX5F9SjPo7rpBW2LilW1gzE/V5XC5nHOn0sGcT/mcyfVCQQJijFqfItN60mng5c6MaxMgHRB05dbw/jWxkOMi1ctze+AxpIFKwgmRuLtMrI1G+L41Rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cVluOorI; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-44e1ebb3122so3108657f8f.2
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 13:30:38 -0700 (PDT)
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-43d77f6092eso3703220f8f.2
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 13:30:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778617837; x=1779222637; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778617841; x=1779222641; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=KQqkMs5rzijAsNU858PzEAUmb8Oapc0XAI2uPfZhi94=;
-        b=BQfYjtqAM6PvY8j9QPSCHW/32gDPYJ5vP2nnWkhJNAIVLaI7RvEZQ0h9CD4JJnYNUg
-         UDZsvk109qf6iIQ5BtCaP7zwIEu80j7vxB7qzHYjHf5s0BwjnHpBUFFwsLPtzIQAUWJm
-         U4XgZMADNbQNhIILHMKIukqfviQmD06aW10g/sIw9sPkrbxcFZGA/G2/p7+QvIYujfjJ
-         f4c2J7IPzbLstVXrFDg2v737AhjJ2gL3LioZSaQSOJoSF1Osndyq0VMCKfBDDFfnYD/V
-         DdvUNNVFASrLwCme8gdz9ww+oovOu3ybX7aMDIZxQbxxi64FzZECuvtaeMdoYuKcsHkS
-         sM2A==
+        bh=IOyXPZFidKiz6EcOZ9YcQmiYuPdH1hxNMH2N2Yn0x/o=;
+        b=cVluOorIFZSBUc3J60XHG+/ps/1/aWORVKIHm12hY7I45eiF/raPXKQyFdknrlZDrz
+         2GDqBcSB2SI4a9KLyDpcq01cPNf045dGMDTPBcRDhQ58ZFFtPGM9+4sjS39opKJJ8jTY
+         HK8HgNzPbn01zGw4xwNIb3mfBKPuRENJNA+lNxadiEKXOC0peSc0pdRl6LfKMVc27G74
+         45Twg9oAwuwO2PNEPzW+ZYjTnSYFBS+9dkeFdYER7lZeuvNFkoGfHJ4HyXpy1hRfkPB6
+         TBc9YcTWn2NKWw2cC8ySS+BIIwg7c7/sJJYi0wBp9b+vexXZ7upzqw5hlDCtkY8ZWGcQ
+         m+gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778617837; x=1779222637;
+        d=1e100.net; s=20251104; t=1778617841; x=1779222641;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KQqkMs5rzijAsNU858PzEAUmb8Oapc0XAI2uPfZhi94=;
-        b=mYCwsaGK5E1mas9AouGG+ZWfEJNJPqR3lEeP5K8NZHDTlvx734O+oW/UnwbsGgvth6
-         4ZV/ULVp25fyTRnclpoNSGTlUDoUe5E3F2dRAoxJ+A1yEArbYvZn7rnhyODAmJyZIMfp
-         jR29StnWvlSqojpJ/8tpVMM2nd0X6n41JEQLl6eHo4lyL1qq7DArfDKzTL476l3sAJJ6
-         vcxNjPQ5QFquvU6tHbkkQ70Su/bcnIHjgLuQ1OXjrjeVCQJa1P/zCIi+lhgmWVxZWHkh
-         CnwnTGI4CM0Nln8JQGzBBznCoN/p2SrtLQrxwXwUoNe6ZHWgX8TVMiy58pjt1Oev78VV
-         fdxg==
-X-Gm-Message-State: AOJu0Yx/RT+EsHIGxsAYAk+WxIMFIUoO3CJOYtUWY9S7h738HK6ts1r1
-	s3a9jB2GtV2ZGI4K3A+DmQrT+Yf1D5oJd5uMo3mtx+XXzt/1vWzZYVZ0qQyNPg==
-X-Gm-Gg: Acq92OHJagnRCQHy1qHNukGEa7hpBwwcN9oyEE6nbZiTMuJuVrtT7q0b6KxCYtBnDfB
-	IdtLQY5WDxxZUfNpZPTF8yM0muNfowRPBcdMz94At9+yXhL6Zfkb2O9NEtwMoDo1W0BiHZz40fL
-	rhIReXhppVOKzwI0IPpiXiFpIgkaESxyqd7lP0xkZmdN+Gvl8e93SEJtMiuAty4EGhBDEgCqYu5
-	DJE6ERL2sOOa+XZ4a0QI0nuDthrwFg5nHzv/K5uCtQP1GQArUD05pqa7vxf3R0SMqpCxerKx0FN
-	0W+iNOUKpBUrLbGTqmaIh9KDiOFlSs+EwbozQEEeJtBgBMKnYH0TyCkN0Fy7AkE/RULb02Eebcx
-	p1mResMr77U6gM6f8AhUu6hURN6VOTtbLIdTNaCu/MXFrf2FRr9L0CCvlyi2ZfEDKa74uKlHscK
-	7X3gzC2gIN9ws+tauVny4Kh3n0gJf7muRS2Vl3METOxMfhuYzusPJxuOSFKnz22VoJLZCIUky0J
-	zPQzbzuYieoBZHzszudeZflKpIpMkrUZChakHgADkd+9FKovvo0PyPSvFMXqIA7cg==
-X-Received: by 2002:a05:6000:1841:b0:451:2157:6291 with SMTP id ffacd0b85a97d-45c5ad4b0e5mr349658f8f.41.1778617836889;
-        Tue, 12 May 2026 13:30:36 -0700 (PDT)
+        bh=IOyXPZFidKiz6EcOZ9YcQmiYuPdH1hxNMH2N2Yn0x/o=;
+        b=USDQeXBmiEhw5pIj/5k2XGQr+DIwLifOMcLYqURE/oezqzLN9HwS6g5F4lHqr5o+up
+         qpTQUlbS009MoLIZeQJanNX9c/GNOAGHh0o3Nrm/y4FaFBYZhlY7sna71jRxsBJLED4P
+         gYsMCqi09JJGLNRkAiNcfhx3di9zTzP1yLYUfaTHO9Co3eiZ1KNm7EewXG9EYVygxGHd
+         LSSSBHb2FM1ge4ldk5mcumUhEva86prwZDdBvHs78iBtx6TEnIXBECMypoBc9B5aYeAN
+         t2UzFRgNTiKD2DhiHTjzbMc66yzcjQX06+zRHqBv/VprDwVXB5vSbNjwNDHfxxrXZHv3
+         DFdg==
+X-Gm-Message-State: AOJu0YzdqFaR0Llly5UICyxb35m/CP1ahziL+kW54BAiHQRvYBCJd2UX
+	yt5egYRgUDqYCVnmtKDZ1B/gXBvQWy8VpsLAKhR28UPX/JVjzCchY0dQ
+X-Gm-Gg: Acq92OGnPBCpZJH9HyEmvxSmQb10KUi4RGLVTyPw2OakVWp65WhVXK/iVRikA1MUp/N
+	cCq/BGk5n398AhuePk26R831kCedpj1h7/EUm9DQpaReCRYy8KWICgiRtIagg0nXk7M7U7lBDwe
+	cN0lJ/uH6H8Oc+TvJyF0IgcrXtJ0CQuhq80t3bmWtlpTczkbvkEx5nRDJ3gzpAeBsydzL0ig6VM
+	SmsRgnMBQu8n0pXNE7pNOPlVb+mfAuSzq+s0IiOZ3wDaD7jYSzCfwPWWXDZ2j/gXjJXXS5Rabz+
+	Vb2/r03DqxSGEOU2ffq1VsrttV4gmJ2enaVehBqVicnn9Wdep6CHVGaMCUDAoJhR6p96sNvwUHI
+	+ErmKegBNng4BkKmxeOZmCXmY9rk0dmeF8pZhjErPrLUiENPs/MtgJ7LQYkSBdq3eQhqbDnpHpD
+	xl69l+L+ciRSNAq153YZaUFQgtj0mZouvsHh4K4HSywaxV4eMy0cgw8Fai0roILhyjOa3jyowb3
+	R/HlYPIL2yMDhG5JMqqs361pkjHyrcMPTQo55NSgwlwvqJSvaz3YkGO7QnTCTtkQQ==
+X-Received: by 2002:a05:6000:288c:b0:43c:fe66:43ec with SMTP id ffacd0b85a97d-45c584a793bmr419324f8f.14.1778617840988;
+        Tue, 12 May 2026 13:30:40 -0700 (PDT)
 Received: from ?IPV6:2003:ea:8f47:3200:655a:16b8:d272:9436? (p200300ea8f473200655a16b8d2729436.dip0.t-ipconnect.de. [2003:ea:8f47:3200:655a:16b8:d272:9436])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4548e6a66bfsm30698945f8f.4.2026.05.12.13.30.35
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4548e6a66bfsm30698945f8f.4.2026.05.12.13.30.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 May 2026 13:30:36 -0700 (PDT)
-Message-ID: <4487f8da-1cb7-4683-b96a-6b8613d8654c@gmail.com>
-Date: Tue, 12 May 2026 22:30:35 +0200
+        Tue, 12 May 2026 13:30:40 -0700 (PDT)
+Message-ID: <f97ae96b-74ab-4e0f-aa8d-c3a3306a7c47@gmail.com>
+Date: Tue, 12 May 2026 22:30:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,25 +86,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [Patch net-next v2 3/7] r8169: add support for new interrupt
- mapping
+Subject: Re: [Patch net-next v2 4/7] r8169: enable new interrupt mapping
 To: javen <javen_xu@realsil.com.cn>, nic_swsd@realtek.com,
  andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
  kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20260508121802.2010-1-javen_xu@realsil.com.cn>
- <20260508121802.2010-4-javen_xu@realsil.com.cn>
+ <20260508121802.2010-5-javen_xu@realsil.com.cn>
 Content-Language: en-US
-In-Reply-To: <20260508121802.2010-4-javen_xu@realsil.com.cn>
+In-Reply-To: <20260508121802.2010-5-javen_xu@realsil.com.cn>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 4478152963C
+X-Rspamd-Queue-Id: 3270B529617
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -112,7 +111,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287291-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-287292-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -121,317 +120,58 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[realsil.com.cn:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,realsil.com.cn:email]
 X-Rspamd-Action: no action
 
 On 08.05.2026 14:17, javen wrote:
 > From: Javen Xu <javen_xu@realsil.com.cn>
 > 
-> To support RSS, the number of hardware interrupt bits should match the
-> interrupt of software. So we add support for new interrupt mapping here.
-> ISR_VER_MAP_REG is the hardware register to indicate interrupt status.
-> IMR_SET_VEC_MAP_REG is interrupt mask which is set to enable irq.
+> This patch enables new interrupt mapping for RTL8127.
 > 
 > Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
 > ---
->  drivers/net/ethernet/realtek/r8169_main.c | 158 ++++++++++++++++++++--
->  1 file changed, 147 insertions(+), 11 deletions(-)
+>  drivers/net/ethernet/realtek/r8169_main.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 > 
 > diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index 29fcd469eebb..bb72a2030f44 100644
+> index bb72a2030f44..0ff0671fc2ac 100644
 > --- a/drivers/net/ethernet/realtek/r8169_main.c
 > +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -77,6 +77,7 @@
->  #define R8169_TX_STOP_THRS	(MAX_SKB_FRAGS + 1)
->  #define R8169_TX_START_THRS	(2 * R8169_TX_STOP_THRS)
->  #define R8169_MAX_RX_QUEUES	8
-> +#define R8127_MAX_TX_QUEUES	8
->  #define R8169_MAX_MSIX_VEC	32
->  #define R8127_MAX_RX_QUEUES	8
->  #define R8169_DEFAULT_RX_QUEUES	1
-> @@ -452,8 +453,13 @@ enum rtl8125_registers {
->  	RSS_CTRL_8125		= 0x4500,
->  	Q_NUM_CTRL_8125		= 0x4800,
->  	EEE_TXIDLE_TIMER_8125	= 0x6048,
-> +	IMR_CLEAR_VEC_MAP_REG	= 0x0d00,
-> +	ISR_VEC_MAP_REG		= 0x0d04,
-> +	IMR_SET_VEC_MAP_REG	= 0x0d0c,
->  };
+> @@ -3965,6 +3965,15 @@ DECLARE_RTL_COND(rtl_mac_ocp_e00e_cond)
+>  	return r8168_mac_ocp_read(tp, 0xe00e) & BIT(13);
+>  }
 >  
-> +#define MSIX_ID_VEC_MAP_LINKCHG	29
-> +#define RTL_VEC_MAP_ENABLE	BIT(0)
->  #define LEDSEL_MASK_8125	0x23f
->  
->  #define RX_VLAN_INNER_8125	BIT(22)
-> @@ -584,6 +590,9 @@ enum rtl_register_content {
->  
->  	/* magic enable v2 */
->  	MagicPacket_v2	= (1 << 16),	/* Wake up when receives a Magic Packet */
-> +#define	ISRIMR_LINKCHG	BIT(29)
-> +#define	ISRIMR_TOK_Q0	BIT(8)
-> +#define	ISRIMR_ROK_Q0	BIT(0)
->  };
->  
->  enum rtl_desc_bit {
-> @@ -750,6 +759,7 @@ struct rtl8169_rx_ring {
->  struct rtl8169_napi {
->  	struct napi_struct napi;
->  	void *priv;
-> +	int index;
+> +static void rtl8125_hw_set_interrupt_type(struct rtl8169_private *tp)
+> +{
+> +	u8 tmp;
+> +
+> +	tmp = RTL_R8(tp, INT_CFG0_8125);
+> +	tmp |= INT_CFG0_ENABLE_8125;
 
-napi_struct has a member index for the same purpose,
-can't you use this one?
+What is meant with interrupt type here, and what does this bit set?
+A self-explanatory function name would be preferred.
 
->  };
->  
->  struct rtl8169_irq {
-> @@ -787,6 +797,7 @@ struct rtl8169_private {
->  	u8 hw_curr_isr_ver;
->  	u8 irq_nvecs;
->  	bool recheck_desc_ownbit;
-> +	unsigned int features;
->  	int irq;
->  	struct clk *clk;
->  
-> @@ -1685,26 +1696,36 @@ static u32 rtl_get_events(struct rtl8169_private *tp)
->  
->  static void rtl_ack_events(struct rtl8169_private *tp, u32 bits)
+> +	RTL_W8(tp, INT_CFG0_8125, tmp);
+> +}
+> +
+>  static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
 >  {
-> -	if (rtl_is_8125(tp))
-> +	if (rtl_is_8125(tp)) {
->  		RTL_W32(tp, IntrStatus_8125, bits);
-> -	else
-> +		if (tp->features & RTL_VEC_MAP_ENABLE)
-> +			RTL_W32(tp, ISR_VEC_MAP_REG, 0xffffffff);
-> +	} else {
->  		RTL_W16(tp, IntrStatus, bits);
-> +	}
->  }
+>  	rtl_pcie_state_l2l3_disable(tp);
+> @@ -3973,6 +3982,9 @@ static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
+>  	RTL_W32(tp, RSS_CTRL_8125, 0);
+>  	RTL_W16(tp, Q_NUM_CTRL_8125, 0);
 >  
->  static void rtl_irq_disable(struct rtl8169_private *tp)
->  {
-> -	if (rtl_is_8125(tp))
-> +	if (rtl_is_8125(tp)) {
->  		RTL_W32(tp, IntrMask_8125, 0);
-> -	else
-> +		if (tp->features & RTL_VEC_MAP_ENABLE)
-> +			RTL_W32(tp, IMR_CLEAR_VEC_MAP_REG, 0xffffffff);
-> +	} else {
->  		RTL_W16(tp, IntrMask, 0);
-> +	}
->  }
+> +	if (tp->features & RTL_VEC_MAP_ENABLE)
+> +		rtl8125_hw_set_interrupt_type(tp);
+> +
+>  	/* disable UPS */
+>  	r8168_mac_ocp_modify(tp, 0xd40a, 0x0010, 0x0000);
 >  
->  static void rtl_irq_enable(struct rtl8169_private *tp)
->  {
-> -	if (rtl_is_8125(tp))
-> -		RTL_W32(tp, IntrMask_8125, tp->irq_mask);
-> -	else
-> +	if (rtl_is_8125(tp)) {
-> +		if (tp->features & RTL_VEC_MAP_ENABLE)
-> +			RTL_W32(tp, IMR_SET_VEC_MAP_REG, tp->irq_mask);
-> +		else
-> +			RTL_W32(tp, IntrMask_8125, tp->irq_mask);
-> +	} else {
->  		RTL_W16(tp, IntrMask, tp->irq_mask);
-> +	}
->  }
->  
->  static void rtl8169_irq_mask_and_ack(struct rtl8169_private *tp)
-> @@ -5080,6 +5101,44 @@ static void rtl8169_free_irq(struct rtl8169_private *tp)
->  	}
->  }
->  
-> +static void rtl8169_disable_hw_interrupt_msix(struct rtl8169_private *tp, int message_id)
-> +{
-> +	RTL_W32(tp, IMR_CLEAR_VEC_MAP_REG, BIT(message_id));
-> +}
-> +
-> +static void rtl8169_clear_hw_isr(struct rtl8169_private *tp, int message_id)
-> +{
-> +	RTL_W32(tp, ISR_VEC_MAP_REG, BIT(message_id));
-> +}
-> +
-> +static void rtl8169_enable_hw_interrupt_msix(struct rtl8169_private *tp, int message_id)
-> +{
-> +	RTL_W32(tp, IMR_SET_VEC_MAP_REG, BIT(message_id));
-> +}
-> +
-> +static irqreturn_t rtl8169_interrupt_msix(int irq, void *dev_instance)
-> +{
-> +	struct rtl8169_napi *napi = dev_instance;
-
-Name napi is typically used for the napi_struct. This may cause confusion.
-Better reflect in the name that this is about a custom struct.
-
-> +	struct rtl8169_private *tp = napi->priv;
-> +	int message_id = napi->index;
-> +
-> +	rtl8169_disable_hw_interrupt_msix(tp, message_id);
-> +
-
-Why do you disable interrupts here, and not directly before the
-call to napi_schedule()?
-
-> +	rtl8169_clear_hw_isr(tp, message_id);
-> +
-> +	if (message_id == MSIX_ID_VEC_MAP_LINKCHG) {
-> +		phy_mac_interrupt(tp->phydev);
-> +		rtl8169_enable_hw_interrupt_msix(tp, message_id);
-> +		return IRQ_HANDLED;
-> +	}
-> +
-> +	tp->recheck_desc_ownbit = true;
-> +
-> +	napi_schedule(&napi->napi);
-> +
-> +	return IRQ_HANDLED;
-> +}
-> +
->  static int rtl8169_request_irq(struct rtl8169_private *tp)
->  {
->  	struct net_device *dev = tp->dev;
-> @@ -5089,8 +5148,11 @@ static int rtl8169_request_irq(struct rtl8169_private *tp)
->  
->  	for (int i = 0; i < tp->irq_nvecs; i++) {
->  		irq = &tp->irq_tbl[i];
-> +		if (tp->features & RTL_VEC_MAP_ENABLE && tp->hw_curr_isr_ver > 1)
-
-What's the difference between this check and tp->rss_enable?
-
-> +			irq->handler = rtl8169_interrupt_msix;
-> +		else
-> +			irq->handler = rtl8169_interrupt;
-
-AFAIK indirect calls are expensive, what may hurt in a hot path.
-
->  		napi = &tp->r8169napi[i];
-> -		irq->handler = rtl8169_interrupt;
->  		rc = pci_request_irq(tp->pci_dev, i, irq->handler,
->  				     NULL, napi, "%s-%d", dev->name, i);
->  		if (rc)
-> @@ -5539,10 +5601,16 @@ static const struct net_device_ops rtl_netdev_ops = {
->  
->  static void rtl_set_irq_mask(struct rtl8169_private *tp)
->  {
-> -	tp->irq_mask = RxOK | RxErr | TxOK | TxErr | LinkChg;
-> +	if (tp->features & RTL_VEC_MAP_ENABLE) {
-> +		tp->irq_mask = ISRIMR_LINKCHG | ISRIMR_TOK_Q0;
-> +		for (int i = 0; i < tp->num_rx_rings; i++)
-> +			tp->irq_mask |= ISRIMR_ROK_Q0 << i;
-> +	} else {
-> +		tp->irq_mask = RxOK | RxErr | TxOK | TxErr | LinkChg;
->  
-> -	if (tp->mac_version <= RTL_GIGA_MAC_VER_06)
-> -		tp->irq_mask |= SYSErr | RxFIFOOver;
-> +		if (tp->mac_version <= RTL_GIGA_MAC_VER_06)
-> +			tp->irq_mask |= SYSErr | RxFIFOOver;
-> +	}
->  }
->  
->  static int rtl_alloc_irq(struct rtl8169_private *tp)
-> @@ -5573,6 +5641,9 @@ static int rtl_alloc_irq(struct rtl8169_private *tp)
->  	tp->irq = pci_irq_vector(pdev, 0);
->  	tp->irq_nvecs = nvecs;
->  
-> +	if (nvecs > 1)
-> +		tp->features |= RTL_VEC_MAP_ENABLE;
-> +
->  	return 0;
->  }
->  
-> @@ -5839,6 +5910,53 @@ static bool rtl_aspm_is_safe(struct rtl8169_private *tp)
->  	return false;
->  }
->  
-> +static int rtl8169_poll_msix_rx(struct napi_struct *napi, int budget)
-> +{
-> +	struct rtl8169_napi *r8169_napi = container_of(napi, struct rtl8169_napi, napi);
-> +	struct rtl8169_private *tp = r8169_napi->priv;
-> +	const int message_id = r8169_napi->index;
-> +	struct net_device *dev = tp->dev;
-> +	int work_done = 0;
-> +
-> +	if (message_id < tp->num_rx_rings)
-> +		work_done += rtl_rx(dev, tp, &tp->rx_ring[message_id], budget);
-> +
-> +	if (work_done < budget && napi_complete_done(napi, work_done))
-> +		rtl8169_enable_hw_interrupt_msix(tp, message_id);
-> +
-> +	return work_done;
-> +}
-> +
-> +static int rtl8169_poll_msix_tx(struct napi_struct *napi, int budget)
-> +{
-> +	struct rtl8169_napi *r8169_napi = container_of(napi, struct rtl8169_napi, napi);
-> +	struct rtl8169_private *tp = r8169_napi->priv;
-> +	const int message_id = r8169_napi->index;
-> +	int tx_ring_idx = message_id - 8;
-> +	struct net_device *dev = tp->dev;
-> +	unsigned int work_done = 0;
-> +
-> +	if (tx_ring_idx >= 0)
-> +		rtl_tx(dev, tp, budget);
-> +
-> +	if (work_done < budget && napi_complete_done(napi, work_done))
-> +		rtl8169_enable_hw_interrupt_msix(tp, message_id);
-> +
-> +	return work_done;
-> +}
-> +
-> +static int rtl8169_poll_msix_other(struct napi_struct *napi, int budget)
-> +{
-> +	struct rtl8169_napi *r8169_napi = container_of(napi, struct rtl8169_napi, napi);
-> +	struct rtl8169_private *tp = r8169_napi->priv;
-> +	const int message_id = r8169_napi->index;
-> +
-> +	napi_complete_done(napi, budget);
-> +	rtl8169_enable_hw_interrupt_msix(tp, message_id);
-> +
-> +	return 1;
-> +}
-> +
->  static void r8169_init_napi(struct rtl8169_private *tp)
->  {
->  	for (int i = 0; i < tp->irq_nvecs; i++) {
-> @@ -5846,8 +5964,25 @@ static void r8169_init_napi(struct rtl8169_private *tp)
->  		int (*poll)(struct napi_struct *napi, int budget);
->  
->  		poll = rtl8169_poll;
-> +		if (tp->features & RTL_VEC_MAP_ENABLE) {
-> +			switch (tp->hw_curr_isr_ver) {
-> +			case 6:
-> +				if (i < R8127_MAX_RX_QUEUES)
-> +					poll = rtl8169_poll_msix_rx;
-> +				else if (i >= R8127_MAX_RX_QUEUES &&
-> +					 i < (R8127_MAX_RX_QUEUES +
-> +					 R8127_MAX_TX_QUEUES))
-> +					poll = rtl8169_poll_msix_tx;
-> +				else
-> +					poll = rtl8169_poll_msix_other;
-> +				break;
-> +			default:
-> +				break;
-> +			}
-> +		}
->  		netif_napi_add(tp->dev, &r8169napi->napi, poll);
->  		r8169napi->priv = tp;
-> +		r8169napi->index = i;
->  	}
->  }
->  
-> @@ -5975,6 +6110,7 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->  	if (!tp->rss_support) {
->  		netif_napi_add(dev, &tp->r8169napi[0].napi, rtl8169_poll);
->  		tp->r8169napi[0].priv = tp;
-> +		tp->r8169napi[0].index = 0;
->  	} else {
->  		r8169_init_napi(tp);
->  	}
 
 
