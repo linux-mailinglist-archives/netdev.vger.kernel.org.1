@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-286915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286916-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YOJTI86LAmrzuAEAu9opvQ
-	(envelope-from <netdev+bounces-286915-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 04:09:18 +0200
+	id +JXeGtqLAmrzuAEAu9opvQ
+	(envelope-from <netdev+bounces-286916-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 04:09:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C5E6518B4A
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 04:09:17 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 007AA518B60
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 04:09:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EFC8D3007B06
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 02:08:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DFF20303989A
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 02:08:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 719B92E8B81;
-	Tue, 12 May 2026 02:08:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC45130BF70;
+	Tue, 12 May 2026 02:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pjzbkxdA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V5qB95du"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0D81A3029;
-	Tue, 12 May 2026 02:08:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98672308F1D;
+	Tue, 12 May 2026 02:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778551728; cv=none; b=jgDCsjLF6b3KLjwrpapXu0oaaCy2lkywoTg+kShPW3sRv3i3OaXNFXJuIt5zmnaYnZyjIfhLpUSy6wEKGT8z30osZRSER60D6IOfar8XBdVVlw48/44Ndob5VTuaDWH7w7j1XNjOoAZkqS9e5Bjfbs3p/HF2t+nldG+ndphl5U0=
+	t=1778551729; cv=none; b=bSYc1v+19pfyK/efTVV7i7qfvhe4tC2aM+AXYTUVieORvVKFlc5UoQLHUXBCWQSz3FowOdn1IGPniXNwF7326B1j2rjv13AQu898wtHCSLdTPsU2qdAUj3lj7USwKbz+Bk3x+CAXop7a2+KFbFiFp+eJFZQ+WP/3QeecqGy9zho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778551728; c=relaxed/simple;
-	bh=lBZP5QpmSCXCKWcyIqiWPDW3A8meH7aym7gPU5t7gsU=;
+	s=arc-20240116; t=1778551729; c=relaxed/simple;
+	bh=82dK58KE+X6Oi6ezoFAIdeH0gF/I8wGORz9rUXggHWs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aCivsM4/JWpgv4GZKFuT7nOzxDjQYlzYELkjh4c3sC5YvN5FeBj6V9QwieVexRZ0RES8djRWrt67AZL5hhbeUV5+pLuh5pB/6k21Cvih8cXwrnR6JmIv6tidSk+G2FiRNPWi1zuJCXdhV9sPtqCOC8zhsrj4mxY51ufv1GB4pgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pjzbkxdA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69876C2BCB0;
-	Tue, 12 May 2026 02:08:47 +0000 (UTC)
+	 MIME-Version; b=iT6mwGsyMh8wSecJJ7G1K/Bq7/5R/evo3NB6lQKFtVlE9hmPmhI4DMb519r8r+k3UfLp6CodD1xfaGvPiP5C+Q9J9p1VltpdkautC7kTuw0SHyQLsUh0ZMtYvjM8wE1C93z4EXRfggos6FsRct4inbzMJLkrdoxY+QyJ9zAhJEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V5qB95du; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFDC9C2BCB0;
+	Tue, 12 May 2026 02:08:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778551727;
-	bh=lBZP5QpmSCXCKWcyIqiWPDW3A8meH7aym7gPU5t7gsU=;
+	s=k20201202; t=1778551729;
+	bh=82dK58KE+X6Oi6ezoFAIdeH0gF/I8wGORz9rUXggHWs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pjzbkxdAWPjuRJeHvDth2Khd2ZSyMuBLnbAFtNvGAU6idtlg+oS6tXpsRZ/TaruTD
-	 svh2IfJG1xTNxPfzOjo6SiI3VwQA5WvNbd6yz1Hxv/UVm5JXHN1TaRI47WfX9dYHEd
-	 1/dsuuCyxjPK1ayozjXDDSQY1OFjHgG/7BASwceV7gU43GPpEmYE7G7nU4EsDuD9VG
-	 POiWrxP3Be6PbNPEIPqK93AVuRJnDWzpw80o+vHRlB+QnK9J7zaVqSLe+V3EOfy1Ju
-	 C9qrtaY+IWT0dbTFt+ybyTK1qQRAWX47VeXal6mwCVtqJvzGt37WuY4JMlDDIWcUFD
-	 czNgAVkTN13Rg==
+	b=V5qB95dutYZb072hnh98e7ySfh4xEBs7hoW6duqk+YNTh/6Uv1p67TfHKtdXPP6zZ
+	 m9CZb145Jd7SovudExt9Il1zIG/bgxuZrW2pL6HBgTmj4EdvUxK2yHrOu/tOLAU1Ul
+	 uvxhei6mkn1CxvxIAqPDUd2kz/csvPbRUtO4YKQ19jnNlN+VsJMmublG8w/ppR0t4f
+	 s0W8VulcTUS5RTx7ZeRh7rQHxhI+aRy4oLfAcGvi6fnjIKO4h2c0Cx3pWzPoopXLfe
+	 O8Gv04GF1SqvRmxODhKYWJGs2W98OZXuHvZPmeHjLI5Zn1zYqbTraEPaxPEBazF8tn
+	 7WhoGbwhvARMg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: thangaraj.s@microchip.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -56,12 +56,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	UNGLinuxDriver@microchip.com,
 	linux@armlinux.org.uk,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 2/5] net: lan743x: read SFP straps from PCI11x1x device
-Date: Mon, 11 May 2026 19:08:42 -0700
-Message-ID: <20260512020842.838975-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v3 3/5] net: lan743x: Add support to software-nodes for SFP
+Date: Mon, 11 May 2026 19:08:48 -0700
+Message-ID: <20260512020848.839006-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260508052150.11852-3-thangaraj.s@microchip.com>
-References: <20260508052150.11852-3-thangaraj.s@microchip.com>
+In-Reply-To: <20260508052150.11852-4-thangaraj.s@microchip.com>
+References: <20260508052150.11852-4-thangaraj.s@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,7 +69,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 8C5E6518B4A
+X-Rspamd-Queue-Id: 007AA518B60
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -77,7 +77,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -86,166 +86,306 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286915-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-286916-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
+	NEURAL_HAM(-0.00)[-0.992];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-net: lan743x: read SFP straps from PCI11x1x device
+Subject: net: lan743x: Add support to software-nodes for SFP
 
-This commit reads SFP enable bits from the PCI11x1x strap registers and
-stores the result in a new adapter->is_sfp_support_en flag, with a
-validation message when SFP support appears to be requested without SGMII.
+This change registers a software-node hierarchy (GPIO/I2C/SFP/phylink)
+for the LAN743x so that SFP cages on PCI11x1x devices can be described
+to phylink/sfp. It wires the lan743x probe to the sibling pci1xxxx I2C
+and GPIO peripheral drivers by walking the PCIe topology and dereferencing
+their drvdata.
+
+A few questions on the patch below.
+
+> diff --git a/drivers/net/ethernet/microchip/Kconfig b/drivers/net/ethernet/microchip/Kconfig
+> index ee046468652c..a83db3c7404f 100644
+> --- a/drivers/net/ethernet/microchip/Kconfig
+> +++ b/drivers/net/ethernet/microchip/Kconfig
+> @@ -50,6 +50,8 @@ config LAN743X
+>  	select CRC16
+>  	select CRC32
+>  	select PHYLINK
+> +	select I2C_PCI1XXXX
+> +	select GP_PCI1XXXX
+>  	help
+>  	  Support for the Microchip LAN743x and PCI11x1x families of PCI
+>  	  Express Ethernet devices
+
+[High]
+Should LAN743X inherit the dependencies of the symbols it now selects?
+
+GP_PCI1XXXX in drivers/misc/mchp_pci1xxxx/Kconfig carries:
+
+    depends on PCI
+    depends on GPIOLIB
+    depends on NVMEM_SYSFS
+
+and I2C_PCI1XXXX is sourced inside an "if I2C" block in drivers/i2c/Kconfig,
+so it has an implicit depends on I2C. The LAN743X entry here does not
+depend on I2C, GPIOLIB, or NVMEM_SYSFS. On configurations where any of
+those are disabled (randconfig, allmodconfig variants), would this
+produce unmet-direct-dependency warnings from sym_warn_unmet_dep() and
+potentially fail to link because the selected drivers' helpers are not
+built?
+
+Would adding "depends on I2C && GPIOLIB && NVMEM_SYSFS" (or gating the
+SFP glue behind a nested Kconfig symbol) be appropriate here?
 
 > diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-> index fad4a246e06e..867310dbe9ba 100644
+> index 867310dbe9ba..b90b35cef2e6 100644
 > --- a/drivers/net/ethernet/microchip/lan743x_main.c
 > +++ b/drivers/net/ethernet/microchip/lan743x_main.c
-> @@ -62,6 +62,12 @@ static void pci11x1x_strap_get_status(struct lan743x_adapter *adapter)
->  			adapter->is_pcs_en = true;
->  		else
->  			adapter->is_pcs_en = false;
-> +
-> +		if ((strap & STRAP_SFP_USE_EN_) && (strap & STRAP_SFP_EN_))
-> +			adapter->is_sfp_support_en = true;
-> +		else
-> +			adapter->is_sfp_support_en = false;
-> +
-
-[Low]
-Is there a reason STRAP_SFP_USE_EN_ and STRAP_SFP_EN_ are only evaluated
-inside the branch gated by (strap & STRAP_READ_USE_SGMII_EN_) (or the A0
-workaround)?
-
-If a board is strapped with STRAP_SFP_USE_EN_=1 but
-STRAP_READ_USE_SGMII_EN_=0, the SFP straps are silently ignored,
-is_sfp_support_en keeps its default of false, and no diagnostic is
-emitted.
-
-The two "use strap" gate bits look independent (one for SGMII, one for
-SFP); nesting the SFP decode inside the SGMII decode appears to conflate
-them.  The "SFP_EN without SGMII_EN" validation block below will also
-never fire in this configuration because is_sfp_support_en is forced to
-false.
-
->  	} else {
->  		fpga_rev = lan743x_csr_read(adapter, FPGA_REV);
->  		if (fpga_rev) {
-> @@ -73,8 +79,17 @@ static void pci11x1x_strap_get_status(struct lan743x_adapter *adapter)
->  			adapter->is_pcs_en = false;
->  		}
->  	}
-
-[Low]
-In the else (FPGA/non-strap) branch, adapter->is_sfp_support_en is never
-assigned, while adapter->is_pcs_en is written in every sub-branch.  The
-code relies on the one-time initialization of is_sfp_support_en = false
-in lan743x_pcidev_probe().
-
-Today pci11x1x_strap_get_status() is only called once from
-lan743x_hardware_init() during probe, so the current behavior is well
-defined.  Would it be worth setting adapter->is_sfp_support_en = false in
-this else branch as well to mirror is_pcs_en and keep the function
-idempotent if it is ever called from a reset, resume, or error-recovery
-path later?
-
-> +
-> +	if (adapter->is_pci11x1x && !adapter->is_pcs_en &&
-> +	    adapter->is_sfp_support_en) {
-> +		netif_err(adapter, drv, adapter->netdev,
-> +			  "Invalid EEPROM configuration: SFP_EN strap specified without SGMII_EN strap\n");
+> @@ -112,6 +113,91 @@ static void lan743x_pci_cleanup(struct lan743x_adapter *adapter)
+> +static void *pci1xxxx_perif_drvdata_get(struct lan743x_adapter *adapter,
+> +					u16 perif_id)
+> +{
+> +	struct pci_dev *pdev = adapter->pdev;
+> +	struct pci_bus *perif_bus;
+> +	struct pci_dev *perif_dev;
+> +	struct pci_dev *br_dev;
+> +	struct pci_bus *br_bus;
+> +	struct pci_dev *dev;
+[ ... ]
+> +	br_bus = br_dev->bus;
+> +	list_for_each_entry(dev, &br_bus->devices, bus_list) {
+> +		if (dev->vendor == PCI1XXXX_VENDOR_ID &&
+> +		    (dev->device & ~PCI1XXXX_DEV_MASK) == PCI1XXXX_BR_PERIF_ID) {
+> +			perif_bus = dev->subordinate;
+> +			list_for_each_entry(perif_dev, &perif_bus->devices,
+> +					    bus_list) {
+> +				if (perif_dev->vendor == PCI1XXXX_VENDOR_ID &&
+> +				    (perif_dev->device & ~PCI1XXXX_DEV_MASK) ==
+> +				     perif_id)
+> +					return pci_get_drvdata(perif_dev);
+> +			}
+> +		}
 > +	}
 
-[Medium]
-The commit message describes this as:
+[High]
+Is it safe to walk br_bus->devices and perif_bus->devices without
+holding pci_bus_sem?
 
-    Add a validation check to ensure PCS is enabled when SFP support
-    is requested, as SFP operation requires the PCS interface.
+Both pci_device_add() and pci_destroy_dev() take down_write(&pci_bus_sem)
+when mutating pci_bus->devices, and pci_walk_bus() / other in-tree
+consumers either wrap the iteration in down_read(&pci_bus_sem) or assert
+lockdep_assert_held(&pci_bus_sem). If a PCI hotplug or sibling
+bind/unbind happens concurrently here, could the traversal corrupt, loop,
+or step through a pci_dev that is being freed?
 
-Does this block actually enforce that invariant?  It logs the invalid
-combination but leaves adapter->is_sfp_support_en set to true and does
-not propagate an error out of pci11x1x_strap_get_status() or
-lan743x_hardware_init().
+Relatedly, pci_get_drvdata(perif_dev) is returned directly with no
+reference acquired on the peer device or its driver. Can the following
+sequence occur?
 
-Later patches in the same series (for example "net: lan743x: Add PCS/XPCS
-support for SFP on PCI11x1x") gate lan743x_pcs_mdiobus_init() and the
-swnodes/SFP platform-device registration on is_sfp_support_en alone,
-without an is_pcs_en check.  With a misconfigured EEPROM the driver would
-then attempt PCS/XPCS MDIO operations on hardware whose PCS is disabled.
+    lan743x probe stores adapter->i2c_adap = &i2c_drvdata->adap
+    user unbinds i2c-mchp-pci1xxxx via sysfs
+    i2c_drvdata (and its embedded i2c_adapter) is freed
+    SFP EEPROM access via the software-node fwnode still dereferences it
 
-Would it be preferable to either force adapter->is_sfp_support_en = false
-when the invalid combination is detected, or return an error from
-pci11x1x_strap_get_status() so lan743x_hardware_init() can fail probe?
+Would using pci_get_device() (or pci_dev_get() under pci_bus_sem) plus a
+device_link_add() from the peer device to the lan743x consumer be a more
+robust pairing, or alternatively routing this coupling through the
+auxiliary bus?
 
+> +static int pci1xxxx_i2c_adapter_get(struct lan743x_adapter *adapter)
+> +{
+> +	struct pci1xxxx_i2c *i2c_drvdata;
 > +
->  	netif_dbg(adapter, drv, adapter->netdev,
->  		  "PCS I/F %s\n", str_enable_disable(adapter->is_pcs_en));
-> +	netif_dbg(adapter, drv, adapter->netdev,
-> +		  "SFP support %s\n", str_enable_disable(adapter->is_sfp_support_en));
->  }
+> +	i2c_drvdata = pci1xxxx_perif_drvdata_get(adapter, PCI1XXXX_PERIF_I2C_ID);
+> +	if (!i2c_drvdata)
+> +		return -EPROBE_DEFER;
+> +
+> +	adapter->i2c_adap = &i2c_drvdata->adap;
 
-[Low]
-The commit message says:
+[Medium]
+The cast here relies on struct pci1xxxx_i2c being textually redeclared
+in lan743x_main.h, identical to the authoritative definition in
+drivers/i2c/busses/i2c-mchp-pci1xxxx.c. Nothing ties the two copies
+together at build time (no shared header, no BUILD_BUG_ON on sizeof or
+offsetof), and there is no runtime check that perif_dev->driver is the
+expected pci_driver before the drvdata is cast.
 
-    Refactor debug logging to use the str_enable_disable() helper for
-    consistency with modern kernel standards.
+If the i2c driver later reorders or resizes a field, would
+&i2c_drvdata->adap silently read from a wrong offset? And if the peer
+PCI function is bound to vfio-pci or any other driver,
+pci_get_drvdata() returns an unrelated pointer which is then
+dereferenced as struct pci1xxxx_i2c. Would it make sense to add a
+narrow accessor exported by the peripheral driver, e.g. something like
+pci1xxxx_i2c_get_adapter(pdev), so the layout is not duplicated across
+subsystems?
 
-Is this description accurate?  The existing "PCS I/F %s" netif_dbg()
-already uses str_enable_disable() prior to this patch (it was introduced
-by the earlier "net: lan743x: rename is_sgmii_en to is_pcs_en" commit).
+The same question applies to the redeclarations of struct
+auxiliary_device_wrapper, struct gp_aux_data_type and struct
+aux_bus_device in lan743x_main.h.
 
-This patch only adds a new netif_dbg() for is_sfp_support_en using the
-same helper; no existing debug line is refactored.  Could the bullet be
-reworded to reflect that a new debug line was added rather than an
-existing one refactored?
+> +static int pci1xxxx_gpio_dev_get(struct lan743x_adapter *adapter)
+> +{
+> +	struct aux_bus_device *aux_bus;
+> +	struct device *gpio_dev;
+> +
+> +	aux_bus = pci1xxxx_perif_drvdata_get(adapter, PCI1XXXX_PERIF_GPIO_ID);
+> +	if (!aux_bus)
+> +		return -EPROBE_DEFER;
+> +
+> +	gpio_dev = &aux_bus->aux_device_wrapper[1]->aux_dev.dev;
 
-> diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
-> index f0fa0580b04e..26c30dc2e55c 100644
-> --- a/drivers/net/ethernet/microchip/lan743x_main.h
-> +++ b/drivers/net/ethernet/microchip/lan743x_main.h
-> @@ -37,6 +37,8 @@
+[Medium]
+Is the hardcoded index [1] here guaranteed by anything?
+
+In drivers/misc/mchp_pci1xxxx/mchp_pci1xxxx_gp.c the wrapper array has
+slot 0 = gp_otp_e2p and slot 1 = gp_gpio today, but that ordering is an
+internal detail of the GP driver and is not enforced by a shared type,
+a name check, or a documented contract. If the GP driver ever reorders
+the registration, fails partway so slot 1 is unpopulated, or adds a
+new slot, would this dereference pick up the wrong aux_dev (or a NULL)?
+
+Would it be preferable to look up the GPIO aux device by name (e.g.
+matching aux_dev.name == "gp_gpio") or expose a named accessor from
+the GP driver?
+
+> @@ -2890,6 +2976,96 @@ static int lan743x_rx_open(struct lan743x_rx *rx)
+> +static int lan743x_swnodes_register(struct lan743x_adapter *adapter)
+> +{
+> +	struct pci_dev *pdev = adapter->pdev;
+> +	struct lan743x_sw_nodes *nodes;
+> +	struct software_node *swnodes;
+> +	int ret;
+> +	u32 id;
+> +
+> +	nodes = kzalloc_obj(*nodes);
+> +	if (!nodes)
+> +		return -ENOMEM;
+> +
+> +	adapter->nodes = nodes;
+> +
+> +	ret = pci1xxxx_gpio_dev_get(adapter);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = pci1xxxx_i2c_adapter_get(adapter);
+> +	if (ret < 0)
+> +		return ret;
+
+[High]
+Does this leak the lan743x_sw_nodes allocation on error?
+
+adapter->nodes is set unconditionally before the two peripheral lookups,
+both of which commonly return -EPROBE_DEFER while the sibling pci1xxxx
+drivers are still probing. On that error, lan743x_swnodes_register()
+returns without freeing nodes and without clearing adapter->nodes.
+
+The caller in lan743x_phylink_create() handles the failure as:
+
+    ret = lan743x_swnodes_register(adapter);
+    if (ret) {
+        netdev_err(netdev, "failed to register software nodes\n");
+        return ret;
+    }
+
+without calling lan743x_swnodes_unregister(). The probe error path
+(lan743x_pcidev_probe) then jumps to cleanup_mdiobus, which does not
+reach lan743x_destroy_phylink() (the only caller of
+lan743x_swnodes_unregister). Each -EPROBE_DEFER retry would allocate a
+fresh struct and discard the previous one.
+
+The same concern applies to the software_node_register_node_group()
+return at the end of this function: its failure is returned to a caller
+that does not call lan743x_swnodes_unregister().
+
+Would cleaning up in lan743x_swnodes_register() itself on every error
+path (kfree(nodes); adapter->nodes = NULL) be appropriate?
+
+> +	nodes->gpio_props[0] = PROPERTY_ENTRY_STRING("pinctrl-names", "default");
+> +	swnodes[SWNODE_GPIO] = NODE_PROP(nodes->gpio_name, nodes->gpio_props);
+[ ... ]
+> +	nodes->i2c_props[0] = PROPERTY_ENTRY_STRING("pinctrl-names", "default");
+> +	swnodes[SWNODE_I2C] = NODE_PROP(nodes->i2c_name, nodes->i2c_props);
+[ ... ]
+> +	nodes->phylink_props[0] = PROPERTY_ENTRY_STRING("managed",
+> +							"in-band-status");
+> +	nodes->phylink_props[1] = PROPERTY_ENTRY_REF_ARRAY("sfp",
+> +							   nodes->sfp_ref);
+> +	swnodes[SWNODE_PHYLINK] = NODE_PROP(nodes->phylink_name,
+> +					    nodes->phylink_props);
+
+[High]
+Do the property_entry arrays need a trailing NULL sentinel?
+
+The struct definition in lan743x_main.h sizes them to the exact number
+of used entries:
+
+    struct property_entry gpio_props[1];
+    struct property_entry i2c_props[1];
+    struct property_entry sfp_props[8];    /* 7 used + terminator */
+    struct property_entry phylink_props[2];
+
+The swnode code in drivers/base/swnode.c iterates with
+
+    for (; prop->name; prop++)
+
+in property_entry_get() and property_entries_dup(), which relies on a
+zeroed terminator. Only sfp_props[8] includes such a slot.
+
+Because gpio_props, i2c_props, sfp_props and phylink_props are laid out
+contiguously in struct lan743x_sw_nodes, when iteration walks past
+gpio_props[0] or i2c_props[0] it would land on the next array's entries
+(for example i2c_props[0].name = "pinctrl-names", then sfp_props entries
+"compatible"/"sff,sfp", "i2c-bus", ...), only terminating at
+sfp_props[7]. The GPIO and I2C software nodes could silently acquire SFP
+properties.
+
+For phylink_props[2], iteration would continue into i2c_ref[0], whose
+first field swnode is a non-NULL pointer; would that pointer then be
+interpreted as prop->name and passed to strcmp() during lookups for
+names other than "managed"/"sfp", producing an out-of-bounds read of
+kernel memory?
+
+Would sizing each array with +1 for a zero terminator address this?
+
+> @@ -3134,7 +3310,9 @@ static const struct phylink_mac_ops lan743x_phylink_mac_ops = {
+>  static int lan743x_phylink_create(struct lan743x_adapter *adapter)
+>  {
+>  	struct net_device *netdev = adapter->netdev;
+> +	struct fwnode_handle *fwnode = NULL;
+>  	struct phylink *pl;
+> +	int ret;
+[ ... ]
+> +	if (adapter->is_sfp_support_en) {
+> +		ret = lan743x_swnodes_register(adapter);
+> +		if (ret) {
+> +			netdev_err(netdev, "failed to register software nodes\n");
+> +			return ret;
+> +		}
+> +		fwnode = software_node_fwnode(adapter->nodes->group[SWNODE_PHYLINK]);
+> +		if (!fwnode) {
+> +			lan743x_swnodes_unregister(adapter);
+> +			return -ENODEV;
+> +		}
+> +	}
 >  
->  #define STRAP_READ			(0x0C)
->  #define STRAP_READ_USE_SGMII_EN_	BIT(22)
-> +#define STRAP_SFP_USE_EN_              BIT(31)
-> +#define STRAP_SFP_EN_                  BIT(15)
->  #define STRAP_READ_SGMII_EN_		BIT(6)
+> +	pl = phylink_create(&adapter->phylink_config, fwnode,
+> +			    adapter->phy_interface, &lan743x_phylink_mac_ops);
+>  	if (IS_ERR(pl)) {
+>  		netdev_err(netdev, "Could not create phylink (%pe)\n", pl);
+> +		lan743x_swnodes_unregister(adapter);
+>  		return PTR_ERR(pl);
+>  	}
 
-[Low]
-The two new STRAP_SFP_*_ macros use spaces for alignment while every
-surrounding STRAP_* definition uses tabs.  Was this intentional, or
-should they be tab-aligned to match the rest of the file (and avoid a
-checkpatch warning)?
-
->  #define STRAP_READ_SGMII_REFCLK_	BIT(5)
->  #define STRAP_READ_SGMII_2_5G_		BIT(4)
-> @@ -1081,6 +1083,7 @@ struct lan743x_adapter {
->  	u8			max_tx_channels;
->  	u8			used_tx_channels;
->  	u8			max_vector_count;
-> +	bool                    is_sfp_support_en;
-
-[Low]
-Same question here: the new is_sfp_support_en field uses spaces for
-alignment while the surrounding struct members use tabs.  Should this be
-tab-aligned for consistency with the rest of struct lan743x_adapter?
-
->  
->  #define LAN743X_ADAPTER_FLAG_OTP		BIT(0)
->  	u32			flags;
--- 
-pw-bot: cr
+Thanks for reading.
 
