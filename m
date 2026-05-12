@@ -1,162 +1,226 @@
-Return-Path: <netdev+bounces-287006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287007-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +KkpB0LoAmpEyQEAu9opvQ
-	(envelope-from <netdev+bounces-287006-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:43:46 +0200
+	id iHW5FgboAmpEyQEAu9opvQ
+	(envelope-from <netdev+bounces-287007-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:42:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72CFE51CE4E
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:43:45 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97BF051CDEC
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:42:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5396730A3E7F
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 08:37:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id ABA97300462D
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 08:42:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F18D49550F;
-	Tue, 12 May 2026 08:37:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E9F94A2E28;
+	Tue, 12 May 2026 08:42:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="E5AwiwDA"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b="sY20+c4Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE5C30DEB8
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 08:37:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EADD495520
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 08:42:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778575076; cv=none; b=nR53S2WDikyBROcVsZyzmrdjzAcl0JNzGBjsZdzp7iGJPFf8gACe+S1RfqmN3O4r9HK50tA52Pxvabf4RcojkX6Z2U9wUI4RU9koB9s9fDXWo3Y7F2ZFY4G5x7bw4OKChHST1Jh3PiU+c2Fcml8VkZfVGngv4RcxF6+G+8TSsvQ=
+	t=1778575356; cv=none; b=fx1Vc+Dh0EHkE+KPUKcEoSA9KKGFWJT8gHlR4XUus0N1h02FYwfb7PmXgQAmEPgiopAUB8zElSl1F//qOOalUDMulASCgkGq9PsIMRP/I8xkeFhf5vdLkmsTtVStACceg5WA0g+RE6zYaYqJjNTRJjRFfVitEXY2BXWsNQr6EMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778575076; c=relaxed/simple;
-	bh=Z2cAAIkr6iMWfJpguX929CHX4z3mxExtUL7mVN9afKM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=Hf4h2h8etrA5FwLCZZgxbUun2dL2cHFbDPfjJQ4HsYtQh/s2MklDyrJZr9LT8WXWpd1MAc9u0G29h+sMHhxkps48tc2HVE1xd+P+pyMeuKEfhzhTIxPq5dFyRJsbnP+gI0/FOzzKzeNMKoc6C7FGYbu6s/fLRrId0izwjaiEp6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=E5AwiwDA; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20260512083751euoutp02adb5e865a0d8c40fa0716e7d6a2b7b78~uxJrBYWjP1153011530euoutp02R
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 08:37:51 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20260512083751euoutp02adb5e865a0d8c40fa0716e7d6a2b7b78~uxJrBYWjP1153011530euoutp02R
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1778575071;
-	bh=P+WzoEiF7scbrcGL30MDai0Mqm4NhhCQaJizIZE8db0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=E5AwiwDAMGB7RSWPZLRxM0BZ9Y+v/VfoAWWo3XaYvlObtQLlmKj3fqIOltyNjcqOx
-	 Z2w8Fa9Zr9D/vp1R0er3vkWyoCH7L+QCLp3aJW+1wWWVZLwBW9iQkPdMvA/UEH/K89
-	 dPbxNW3Ls3pFdGTg91Bt0omKwgJJ8d8w2Xv9eVAA=
-Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20260512083751eucas1p293e684cc51c2fef348703824f0efe447~uxJqqzJvr1439714397eucas1p2d;
-	Tue, 12 May 2026 08:37:51 +0000 (GMT)
-Received: from AMDC4622.eu.corp.samsungelectronics.net (unknown
-	[106.120.77.34]) by eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20260512083750eusmtip138caf2d0ef97dcdc9ce9f285e0bfe8bd~uxJqGshoK3069330693eusmtip1j;
-	Tue, 12 May 2026 08:37:50 +0000 (GMT)
-Date: Tue, 12 May 2026 10:37:50 +0200
-From: Jakub Raczynski <j.raczynski@samsung.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, k.domagalski@samsung.com,
-	k.tegowski@samsung.com
-Subject: Re: [PATCH net-next 1/3] net/stmmac/dwxgmac: Modify DMA functions
- for future hardware
-Message-ID: <agLm3rvbVp4MpHT7@AMDC4622.eu.corp.samsungelectronics.net>
+	s=arc-20240116; t=1778575356; c=relaxed/simple;
+	bh=YsbKMtLsF8n757WsDejnc9PnHwNnAlr9Ml5HzNjnAY4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SyN58wUZNzOYywIhmq00ZcwhgDYMcd0axUwIDfAZaSC4Kja++hZh2wUsxS8OjNj/QAPNnh2Lea7k9HrBy+drOrXZuffGEh5IrYG5nVPzLKSPT9S90ia56HHlZUmZRhJMXvidRguYOGytC3jp0EX+nOCQSH6nNRyOXIFrnd4djaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=sY20+c4Q; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-488a9033b2cso48007565e9.2
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 01:42:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1778575345; x=1779180145; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=22yyk03jobS7/yf02FbmawWzo9rxTI9n393P7VL0W2c=;
+        b=sY20+c4Q7FYmUxNrxfwNltQGQG/Q2Ncwgj7CINFni1jYq3boPZrA154ZIy9YKMR6BD
+         9tur3ntpLTCkxlDpPHiu4PRO5F9BedG/cGipgnQdOl1L7uN5QCTyuvcmdOojeWLZvnX9
+         8o+TDscy3ReFabiawRcyBWqnlI8ecwA/E7I5P3cw90Mu/ro6sYEK8V9sXadSH4TMTHfR
+         h7KhyTNgWTUvSPWsXygY+zeFGoimXrTMHq1GTynXwheC34ru7XjVUnf3B0lnnsRgKr1D
+         S48ktP3gapZNRMFSm23KLt40kHH78/7NdKWkFIQBuP/XTWMPYwqOfpaTJaeWuhevgaEa
+         RIgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778575345; x=1779180145;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=22yyk03jobS7/yf02FbmawWzo9rxTI9n393P7VL0W2c=;
+        b=rJ/6xHL/nNrzREpX1j+V9Y2+n06/MEJoDAKAAeep+alGO1F3YWc+Sln1W6R6d4XgV2
+         ZgZw2SKrdngLQg0H8mi+f1WEEm9YmYFdoiWEt7NgkyUkhCUJRbCZA6IhSFhH21B+AV9r
+         DTovYrMCP427SiKHjxoprHlIAU8y+xXwX0FnZnaDuUaIRCws2B98mUKLTH12oeXD1y6B
+         QPd6lSxhSUrq+XT3XeUMGqGHuphWgqR3WgPtZvGDMBVCZkklKR2D7VFIrL3ZFU5Tp+Fp
+         ENpu8khl7rXd/rFK+KocnVWLykS9iEKOU2jxzfs4tsmA4thu0RHsekBfK9TQG3IM6PsB
+         6Opg==
+X-Forwarded-Encrypted: i=1; AFNElJ9g8QuMa2ITPyCqw4AYltKp86VHeWT1nVj+Oe9LQmCn6CjY2tgYgecIevS9XGgaiK4BQr7uolI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzc92mO6tunxeiFCe2UMa+iuQV4ySAWDcOBYETTNB/7AkVn7Pie
+	Iqh/dbGvNtEJysF3a/7CD+KOSaTMlB1l/56DugNar/XDVt1zGpJQkp3jKXwkkuaBoDU=
+X-Gm-Gg: Acq92OHEJGKd286U0PGBTd91FaF//6j+tdAL5jVplfdAbGWKz/vXlS1etiYtB6v+U/9
+	UYvBuEe+EKXso6TAmuLeOjB4E6KE1zNug8C9vfJd++782eWR3Zn+V7Ni+Dl/Ol8hb0di21tU478
+	63bRTVcEE3scV9Ne3I+9Nc9chDh2f2s09ZyaK2XXNA85hz25E12qRWISHDAqlTfzvUfxavGGvld
+	llcuZ+kWSL8o6RYwuT1Tz13m5+boZSrP5F0eOUUPeyNQLGcf8mwY8+dvhVZwGZPUIwNOIUk5ptB
+	cZY8WEIBB8sCxOHkeYOoSDcpcc3dfoZG4t8noop1RS3zpkPFUKIanul+xbMyG59tB7YrPUGXOjq
+	Gl158XRGvUA5Ze/1zQI4ujEvSesgtYScxeKI8wLhSxAlQyamPmjJjOv3sBTLlYhP1oxTjOCRBGZ
+	PjRscqgekcfYPrKBcdpCPBLpbY50Yz+wWPPsFPM0Y7FRFiUw==
+X-Received: by 2002:a05:600c:6299:b0:489:1f97:6b1d with SMTP id 5b1f17b1804b1-48e706edd0dmr212584825e9.28.1778575344445;
+        Tue, 12 May 2026 01:42:24 -0700 (PDT)
+Received: from FV6GYCPJ69 ([140.209.217.212])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45491cab9c2sm32800055f8f.31.2026.05.12.01.42.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 May 2026 01:42:23 -0700 (PDT)
+Date: Tue, 12 May 2026 10:42:20 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Mark Bloch <mbloch@nvidia.com>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Simon Horman <horms@kernel.org>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	Tariq Toukan <tariqt@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	"Borislav Petkov (AMD)" <bp@alien8.de>, Randy Dunlap <rdunlap@infradead.org>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Christian Brauner <brauner@kernel.org>, 
+	Petr Mladek <pmladek@suse.com>, "Peter Zijlstra (Intel)" <peterz@infradead.org>, 
+	Thomas Gleixner <tglx@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
+	Dapeng Mi <dapeng1.mi@linux.intel.com>, Kees Cook <kees@kernel.org>, Marco Elver <elver@google.com>, 
+	Eric Biggers <ebiggers@kernel.org>, Li RongQing <lirongqing@baidu.com>, 
+	"Paul E. McKenney" <paulmck@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [RFC net-next 0/4] devlink: Add boot-time defaults
+Message-ID: <agLlIAX7EuYNuSNk@FV6GYCPJ69>
+References: <aftaW-irGmkfA7FS@FV6GYCPJ69>
+ <3f9215c4-7c84-46d9-ba74-30dabe24db09@nvidia.com>
+ <afxvzOjqw-vxUAED@FV6GYCPJ69>
+ <b6a9b568-dd09-4414-be57-6b9cd282a43c@nvidia.com>
+ <af4lBIJdCuN5VKq_@FV6GYCPJ69>
+ <20260508175213.1952097f@kernel.org>
+ <af7Y4AYv-XDCbK_8@FV6GYCPJ69>
+ <20260510093732.6ba47e54@kernel.org>
+ <agGOeqeNwJGJ_-2A@FV6GYCPJ69>
+ <20260511164132.2df9c5a1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <5b94f49e-5f1a-40fb-af34-f4a9d4738502@lunn.ch>
-X-CMS-MailID: 20260512083751eucas1p293e684cc51c2fef348703824f0efe447
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="-----ovPTPTVSqDshbadlcck0r4M7-N_rZ7qlFcbt45lvJNOWX_g=_1f670_"
-X-RootMTR: 20260511165431eucas1p1450bdea6486a72257f6463d5f40abc50
-X-EPHeader: CA
-X-CMS-RootMailID: 20260511165431eucas1p1450bdea6486a72257f6463d5f40abc50
-References: <20260511165416.3093015-1-j.raczynski@samsung.com>
-	<CGME20260511165431eucas1p1450bdea6486a72257f6463d5f40abc50@eucas1p1.samsung.com>
-	<20260511165416.3093015-2-j.raczynski@samsung.com>
-	<5b94f49e-5f1a-40fb-af34-f4a9d4738502@lunn.ch>
-X-Rspamd-Queue-Id: 72CFE51CE4E
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260511164132.2df9c5a1@kernel.org>
+X-Rspamd-Queue-Id: 97BF051CDEC
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,samsung.com];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287007-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[resnulli.us];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287006-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+,1:+,2:+];
-	DKIM_TRACE(0.00)[samsung.com:+];
+	RCPT_COUNT_TWELVE(0.00)[31];
+	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[AMDC4622.eu.corp.samsungelectronics.net:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,samsung.com:dkim]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
--------ovPTPTVSqDshbadlcck0r4M7-N_rZ7qlFcbt45lvJNOWX_g=_1f670_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
+Tue, May 12, 2026 at 01:41:32AM +0200, kuba@kernel.org wrote:
+>On Mon, 11 May 2026 10:42:56 +0200 Jiri Pirko wrote:
+>> Sun, May 10, 2026 at 06:37:32PM +0200, kuba@kernel.org wrote:
+>> >On Sat, 9 May 2026 09:01:23 +0200 Jiri Pirko wrote:  
+>> >> Sat, May 09, 2026 at 02:52:13AM +0200, kuba@kernel.org wrote:  
+>> >> As "a non-SR-IOV user", what extra representors you talk about? When you
+>> >> have pfs only, you don't have anything extra. Just 1 netdev per-pf, one
+>> >> devlink port per-pf. What's extra about it? When you don't have VFs/SFs.
+>> >> Everyhing is the same:  
+>> >
+>> >Some devices have separate uplink ports and PF representors.
+>> >As I said, what you're proposing isn't going to work for all drivers.  
+>> 
+>> Well, the point is, mlx5 appears to the the one needing this, not other
+>> drivers. What I'm trying to point at, mlx5 should not need this.
+>> It makes things compicated, adding a ugly knob for no good reason.
+>> Legacy/switchdev mode, in both, the non-sriov/eswitch user should not
+>> see different behaviour. The mode is an eswitch attribute.
+>> 
+>>    devlink dev eswitch set - sets devlink device eswitch attributes
+>>        mode { legacy | switchdev }
+>>               Set eswitch mode
+>> 
+>>               legacy - Legacy SRIOV
+>> 
+>>               switchdev - SRIOV switchdev offloads
+>> 
+>> 
+>> Briefly looking over other drivers, looks like ice, bnxt, octeon, sfc,
+>> there is no new entity created in case of switching to switchdev mode.
+>> The only driver that creates separate pf entities seems to be nfp,
+>> but the mode seems to be determined by the app being run (loaded
+>> firmware).
+>> 
+>> Am I missing something?
+>
+>Hm. Okay, I wasn't aware that mlx5 was the only driver that did
+>heavy-duty reinit for switching modes.
+>
+>> >> I look at it from the perspective that from some CX generation,
+>> >> switchdev mode should be default. So that is a device-based decision.
+>> >> I believe as such it can optionally be permanenty configured (nv config)
+>> >> on older device. Why not?  
+>> >
+>> >Feels a bit arbitrary and won't cover all cases. The question should be  
+>> 
+>> What cases it does not cover? I don't follow.
+>
+>Other FW and HW versions. People are still using EOL devices (CX4/CX5),
+>IIUC the nvmem config path would require FW upgrade.
 
-On Mon, May 11, 2026 at 08:02:14PM +0200, Andrew Lunn wrote:
-> > +	/* Newer XGMAC hardware does support up to 16 MTL/DMA queues but
-> > +	 * only 8 traffic class queues. Redirect these, but this is error in
-> > +	 * configuration.
-> > +	 */
-> 
-> If this is an error in configuration why not return -EINVAL when the
-> configuration is requested?
-> 
-> 	Andrew
-> 
-Because is generally would not change a thing and would probably cause more
-problems.
+If user wants to have a new feature (a bit odd to call this feature,
+but ok), he is obliged to upgrade FW. What's wrong about it?
 
-Parent function of stmmac_set_dma_operation_mode() -> stmmac_dma_tx_mode()
-does not have any error handling. So we end up in situation where
-tx_queues_to_use from DTS is still at its value, so we still have situation
-where amount of DMA/MTL queueus is higher than number of TC's.
-
-So then in case of XGMAC 3.20a/3.40a, we would have 8 DMA/MTL queues that
-have assigned TC and 8 that don't. I cannot speak for older/other XGMAC if
-there were ever a case like that where number of DMA/MTL != number of TC's.
-
-So we will get many unusable MTL queues, eg. NAPI does use tx_queues_to_use in
-its initialization, these queues will still be visible in system and can
-be sent to. Leaving them unconfigured will very much likely lead to
-'Tx queue timeout' and endless loop of interface restart via
-stmmac_reset_subtask().
-
-I think it is just simplier to leave warning that configuration is wrong,
-handling error would be quite big change to make.
-
-BR
-Jakub Raczynski
-
--------ovPTPTVSqDshbadlcck0r4M7-N_rZ7qlFcbt45lvJNOWX_g=_1f670_
-Content-Type: text/plain; charset="utf-8"
+But, even without nvconfig knob, what's stopping us from fixing the
+behaviour (/bugs) and just make "switchdev" mode default in net-next for
+all in mlx5 driver? Again, perhaps I'm missing something.
 
 
--------ovPTPTVSqDshbadlcck0r4M7-N_rZ7qlFcbt45lvJNOWX_g=_1f670_--
+
+>
+>> >why you are nacking a more reasonable solution. Keeping Linux config in
+>> >Linux params.  
+>> 
+>> What's reasonable about adding basically a module option (kernel cmdline
+>> is pretty much the same) for no reason?
+>
+>The initial patch as posted added this to a mlx5-specific module param.
+>If we need a module param IMO generic one is much better.
+>Doesn't matter if other drivers take no time to reinit into switchdev
+>mode, having to switch mlx5 with a module param and all the rest in
+>runtime is not the best user experience?
+
+I still believe we don't need either, not module param, not cmdline
+devlink option. We just need to fix bugs and have proper defaults. The
+rest is shortcut.
+
+
 
