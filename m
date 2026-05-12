@@ -1,381 +1,205 @@
-Return-Path: <netdev+bounces-287149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287150-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +HXkDDIsA2pI1QEAu9opvQ
-	(envelope-from <netdev+bounces-287149-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:33:38 +0200
+	id yBTzArEpA2qw1AEAu9opvQ
+	(envelope-from <netdev+bounces-287150-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:22:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E224521439
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:33:37 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BF51521145
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:22:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 55EDD30F799F
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:17:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2EB37308AC97
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:18:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8DB3390601;
-	Tue, 12 May 2026 13:12:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1EA3ABD8B;
+	Tue, 12 May 2026 13:15:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Ied+elYx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tik147On"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f227.google.com (mail-dy1-f227.google.com [74.125.82.227])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151F7372049
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 13:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D787F3ABD8F
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 13:15:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778591571; cv=none; b=fFJRck4jlpWs5FYVv+WK8YA0GCNtTykyue5cK1I+Cnj5eTQoLa8OvVZ8glwF9iHAYalUpcNSSk64RVxq/eXefTjQsH+V4o7qk2lPUu8+VVatx1lGxv9AxZ09CmPVz7O5WgAyfvu9Aif9XXsi2Mic3zpCg40J34w4z49qXRzO/4E=
+	t=1778591718; cv=none; b=qHx27FHoj8FgmshWy6Jz7PDjZpeXMsqkYmxGHWj6WgrQulGpF0Ch7eDQwlKfRjhQX7UoxmHpvwBoBfUVVh/DnlzgSLf9g/jKD1AobV9W+GOiHGphHNJXXZMWY2NmLYn4daNwaUCUhCCWIT9/Ix7gy2iOTmtRXZA1SpvuINYLW18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778591571; c=relaxed/simple;
-	bh=yoKSlLHIq6V2t8JPFWGuhQTw54VkN7WgpI0fkEQ3Ud8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M2XA6Hgem13zDAgqh9pZef90BUSxUoTlViHObFBMVW5TAVLqj7i0jRofO2LpL3WvMPIr+u9ARcXw0hq57NVntyU6rhdKZYnaQr84qhICuH/13tN4FpCewWLYiuEOX51o+lV7FENavrJg36EFGUdkXE2Awnz+we+0EFOQB6r6c/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Ied+elYx; arc=none smtp.client-ip=74.125.82.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-dy1-f227.google.com with SMTP id 5a478bee46e88-2bdcf5970cdso3981922eec.0
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 06:12:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778591569; x=1779196369;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+cChEzuuu8TfNLT1wjdx7G1mW04jJX2qj3GsuyxG+w4=;
-        b=UppUuHryQb7yfbqCPWyvOH76TJt5bFRlsU/maB/rF4aXKLq53ViVQVRi/c9+loDaM9
-         yrhN4AVQkFACeGLzLmvdE5I6N+Gi5EmXpk/flx4LP8yomNGop7E3KLsDEFNI4SxpNuPM
-         7jMNY386jI9FapjVvj4v/XqsrjeLDPK97f/PHLv4+fuTl/F+freLJCvBpM6GeIr0Tmtk
-         TAMHbmFJtGoaWc+yVjMIN4WHA0sg1oGL2m+M/09nZ5AIfYdMC4g/i5c+OeipC/xyTMRA
-         fy1jzdEBksO1iAZ2EDTa56rT+K5vLxJzvPob7a49bUe3QPKYXx9CANZjv2EywHl7ccKb
-         dA+Q==
-X-Forwarded-Encrypted: i=1; AFNElJ/3hUxjyg9B4WCOJuuGwVGpM+T8J81xdpl8oOOTmLUnlnxjZl8jimxXX5qg2UZUcJvxLsKcgzQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPngZO/rkUbh1G37FVp/qGvSPd3wobEr1lHfDaT6o2r5p73NRJ
-	rhd41CoABgtx+mb7WnBsTf4PGzPm2uVaRiGRxzgD7OpO7BDJRCedRK3iniT8K0T0NRk0RQdz1Ku
-	IXzyiOIT8100grYS+CNVCbH5p5Mu3Q4CLy30Xy1BTjjtf3KntonvpRHxVKI9nJzTxm1d+LujqQw
-	1aqJxYtStMLQKjdk52E1LXtSCSGf4euOOxHTZ2ARoN10EIUB3LDBk4igp533geuzRZDqVMBxuyq
-	PJ23RlzWixB7Q==
-X-Gm-Gg: Acq92OEhmweFyBXs/Si+TXOGCgJbgMyylQc5Rakp6NeXqedPuMs9jMngQMwZmvgSSn6
-	5yz/ssCamhGXQ37k+mYMvz30GbwxpA2YOp1L1qOGH4g7nF31oIiE33k+TItRS8nXCLBTZdP3kEF
-	WnDb1ZFZVPxRiOBLib7mafEPxNgI1QW5DtIYdx1clq3aUYW8xKX5YXxyZGTjPCpvtcRZAaVPQXa
-	AGGhlgfmOGLencAAh9ZHGlsKRIQSj41XmrNzq4uo6j5W8TuPJXpID1UvnCM1iSTFyFzfItgMGYL
-	puks6ghroJ4YJOddTR9sR0x+aMs8LF5lXlRkwLToqBGBXD2S2SCRjSc6RS1fMM6gyx8mCZuLut/
-	28zQIcUMOPCE3SS5e86FFC9sH9hw2jI80dj2xHKxGSrOLWpmbKYrwf8jtLDbNXIfc6pFDlSYgdg
-	9YfNrf
-X-Received: by 2002:a05:7301:1698:b0:2f0:c593:986a with SMTP id 5a478bee46e88-2ff906d92fbmr1926800eec.0.1778591568812;
-        Tue, 12 May 2026 06:12:48 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com ([144.49.247.127])
-        by smtp-relay.gmail.com with ESMTPS id 5a478bee46e88-2f88924a58fsm1414512eec.19.2026.05.12.06.12.48
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 12 May 2026 06:12:48 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-38e9c93b90bso21045201fa.2
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 06:12:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1778591566; x=1779196366; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+cChEzuuu8TfNLT1wjdx7G1mW04jJX2qj3GsuyxG+w4=;
-        b=Ied+elYxyPjmvYZpdDhpxgeYaV3s+krQQtlN8gQiPVBB5/u34+6uBMOpVGRd14ggAT
-         fVFZZM6ngwyqPD1Y7618FokG8lEmEVze5xHT2JHHLZKhloslO9KeUIxwKo3PfGeKH155
-         e0arkUfg32PMZqqgdPV6QpP+R38Mf4Z+Uhwis=
-X-Forwarded-Encrypted: i=1; AFNElJ8I1n8j5SH5pwOopCftGJgjLEQ+iLjnKWzapY+1slXvkB8sns8+lvsvbrQpko1UQkoTHILnEOo=@vger.kernel.org
-X-Received: by 2002:a05:6512:691:b0:5a8:950f:e92e with SMTP id 2adb3069b0e04-5a8950fe96amr7209620e87.23.1778591565955;
-        Tue, 12 May 2026 06:12:45 -0700 (PDT)
-X-Received: by 2002:a05:6512:691:b0:5a8:950f:e92e with SMTP id
- 2adb3069b0e04-5a8950fe96amr7209595e87.23.1778591565364; Tue, 12 May 2026
- 06:12:45 -0700 (PDT)
+	s=arc-20240116; t=1778591718; c=relaxed/simple;
+	bh=LNzoUU/2QmhkFyXEGhah7Q+IjNKnmapBS3zKbsjg6Dk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Em3+bERcrj+fE7CBabaGrDqdEWH2qXQwA7jcmvjb2JcA9O+JermlQobROVrUVLwa8zPM4Dw4kKg45j3c+VD5XI0sN3T3muJOcgKbnxeWxNEezjaJ9lDnYGtdNCpi5n5cX7uMxZSu2jYsBK1klZoR9GK3R706bL4F/zXsptFmgLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Tik147On; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778591715;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=595qiilA325bhyPMHLeNox7kYeTKtRQEqpL9CIDA3mg=;
+	b=Tik147OnBxgDRzoMJtZBpwTIYjNpn69nZLCac0DHwcwNzC/8bV2C0TwXY/WhX9PMX/t0vz
+	XocoBFxypKe7JZmtxhZJcbqcGH1Z4nu/nyu7eBGY6LGe1wqcRJBT9OVsxpun1m3W0BOtTN
+	cwg1hC1F4APAb8UEUoHSoDcPZdCiI+w=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-346-n8ZHX2AlO1GxdJbh-Uw_vg-1; Tue,
+ 12 May 2026 09:15:08 -0400
+X-MC-Unique: n8ZHX2AlO1GxdJbh-Uw_vg-1
+X-Mimecast-MFC-AGG-ID: n8ZHX2AlO1GxdJbh-Uw_vg_1778591707
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A365D18005B4;
+	Tue, 12 May 2026 13:15:06 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.48.142])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 36B89180034E;
+	Tue, 12 May 2026 13:15:02 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: linusw@kernel.org
+Cc: eitschman@nebelreich.de,
+	ulli.kroll@googlemail.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mirq-linux@rere.qmqm.pl,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net 4/4] net: ethernet: cortina: Fix budget accounting
+Date: Tue, 12 May 2026 15:14:56 +0200
+Message-ID: <20260512131456.189452-1-pabeni@redhat.com>
+In-Reply-To: <20260509-gemini-ethernet-fixes-v1-4-6c5d20ddc35b@kernel.org>
+References: <20260509-gemini-ethernet-fixes-v1-4-6c5d20ddc35b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260512025851.189140-1-minhnguyen.080505@gmail.com>
-In-Reply-To: <20260512025851.189140-1-minhnguyen.080505@gmail.com>
-From: Bryan Tan <bryan-bt.tan@broadcom.com>
-Date: Tue, 12 May 2026 14:12:33 +0100
-X-Gm-Features: AVHnY4JaHYtrFk7C3Gzaaq5WjUZyW7kD6ZyNBupTar3Gjfb-zbg1FAqP6O5Y-2s
-Message-ID: <CAOuBmub=XEwqy8LJxx7_=__OHzGuRcg-nQpF1o37L8+ZOwyesQ@mail.gmail.com>
-Subject: Re: [PATCH net v2] vsock/vmci: fix UAF when peer resets connection
- during handshake
-To: Minh Nguyen <minhnguyen.080505@gmail.com>
-Cc: Vishnu Dasa <vishnu.dasa@broadcom.com>, Stefano Garzarella <sgarzare@redhat.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000087fa0906519e9e16"
-X-Rspamd-Queue-Id: 8E224521439
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Rspamd-Queue-Id: 9BF51521145
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.76 / 15.00];
-	SIGNED_SMIME(-2.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287149-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TO_DN_NONE(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	HAS_ATTACHMENT(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FREEMAIL_CC(0.00)[nebelreich.de,googlemail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,rere.qmqm.pl,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-287150-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bryan-bt.tan@broadcom.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.995];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,sashiko.dev:url]
 X-Rspamd-Action: no action
 
---00000000000087fa0906519e9e16
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: AI Reviewer <ai@example.com>
 
-On Tue, May 12, 2026 at 3:59=E2=80=AFAM Minh Nguyen <minhnguyen.080505@gmai=
-l.com> wrote:
->
-> vmci_transport_recv_connecting_server() jumps to its destroy: label
-> and performs an unconditional sock_put(pending) to release the
-> explicit sock_hold() taken by vmci_transport_recv_listen() before
-> schedule_delayed_work().  The existing comment claimed this was safe
-> because the listen handler removes pending from the pending list on
-> the way out, which would prevent vsock_pending_work() from dropping
-> the same reference later.
->
-> That assumption breaks for a peer RST.  The default arm of the packet
-> switch sets:
->
->         err =3D pkt->type =3D=3D VMCI_TRANSPORT_PACKET_TYPE_RST ? 0 : -EI=
-NVAL;
->
-> and vmci_transport_recv_listen() only calls vsock_remove_pending()
-> when err < 0:
->
->         if (err < 0)
->                 vsock_remove_pending(sk, pending);
->
-> For RST (err =3D=3D 0) the socket stays on the pending list, so when
-> vsock_pending_work() fires it takes the is_pending=3Dtrue path and
-> drops all three references itself: the pending-list reference via
-> vsock_remove_pending(), then the two trailing sock_put(sk) calls.
-> The unconditional sock_put() in destroy: had already dropped the
-> explicit sock_hold() reference, so the second trailing sock_put(sk)
-> in vsock_pending_work() is a write into the freed AF_VSOCK slab
-> object.  KASAN reports a slab-use-after-free write of 4 bytes from
-> refcount_warn_saturate() on the workqueue path:
->
->   BUG: KASAN: slab-use-after-free in refcount_warn_saturate
->   Write of size 4 at addr ffff88800b1cac80 by task kworker
->   Workqueue: events vsock_pending_work
->   Call Trace:
->    refcount_warn_saturate
->    vsock_pending_work
->    process_one_work
->    worker_thread
->
-> Triggering the bug requires only the ability to open a VSOCK
-> connection to the target and send a RST before the listener accepts.
->
-> Skip the sock_put() in destroy: when err =3D=3D 0 so it only compensates
-> the cases where vmci_transport_recv_listen() actually calls
-> vsock_remove_pending().  RST is the only path that reaches destroy:
-> with err =3D=3D 0; every other path produces a negative value, so their
-> behaviour is unchanged.
->
-> Verified on lts-6.12.79 with KASAN enabled (CONFIG_KASAN_INLINE=3Dy,
-> kasan_multi_shot): same trigger binary, same VM, 100 iterations:
-> without this patch 52 KASAN slab-use-after-free reports fire; with
-> this patch applied, 0 reports.
->
-> Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Minh Nguyen <minhnguyen.080505@gmail.com>
-> Assisted-by: Claude:claude-opus-4-7
-> ---
-> v2:
->   - Resubmit to netdev per Stefano Garzarella's request after v1 review.
->   - Retested the PoC with the patch applied on lts-6.12.79 with KASAN
->     enabled: 52/100 unpatched -> 0/100 patched (same trigger binary,
->     same VM, 100 iterations); test summary captured in the commit
->     message.
->   - Changed Cc: stable@kernel.org -> stable@vger.kernel.org now that the
->     bug is no longer embargoed.
->   - Rebased onto net/main (no functional change to the diff).
->
-> v1 was sent to security@kernel.org on 2026-05-10 (not on lore archives;
-> no public link available).  v1 review summary, for reference:
->   - Stefano Garzarella (vsock maintainer): "Overall LGTM, but I'd wait
->     vmware guys on this that know this code better."  Asked for retest
->     and resubmission via the net tree workflow.
->   - Bryan Tan (VMCI maintainer): "Thanks for the fix, it looks good to
->     me."  Also noted that no modern VMware product allows guest-to-guest
->     VMCI communication, so the practical attack surface is host -> guest.
->
->  net/vmw_vsock/vmci_transport.c | 16 +++++++++-------
->  1 file changed, 9 insertions(+), 7 deletions(-)
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+---
+net: ethernet: cortina: Fix budget accounting
 
-Acked-by: Bryan Tan <bryan-bt.tan@broadcom.com>
+This patch changes gmac_rx() to return the number of packets received
+rather than the remaining budget, and updates the napi_complete_done()
+call in gmac_napi_poll() to pass the new value.
 
+Link: https://sashiko.dev/#/patchset/20260505-gemini-ethernet-fix-v2-1-997c31d06079%40kernel.org
+
+> diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethernet/cortina/gemini.c
+> index 4c762229ce42..5839e00aa649 100644
+> --- a/drivers/net/ethernet/cortina/gemini.c
+> +++ b/drivers/net/ethernet/cortina/gemini.c
+> @@ -1545,7 +1546,8 @@ static unsigned int gmac_rx(struct net_device *netdev, unsigned int budget)
+>  			napi_gro_frags(&port->napi);
+>  			skb = NULL;
+>  			frag_nr = 0;
+> -			--budget;
+> +			budget--;
+> +			received++;
+>  		}
+>  		continue;
 >
-> diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transpor=
-t.c
-> index 4296ca1..88d7128 100644
-> --- a/net/vmw_vsock/vmci_transport.c
-> +++ b/net/vmw_vsock/vmci_transport.c
-> @@ -1269,14 +1269,16 @@ vmci_transport_recv_connecting_server(struct sock=
- *listener,
->  destroy:
->         pending->sk_err =3D skerr;
->         pending->sk_state =3D TCP_CLOSE;
-> -       /* As long as we drop our reference, all necessary cleanup will h=
-andle
-> -        * when the cleanup function drops its reference and our destruct
-> -        * implementation is called.  Note that since the listen handler =
-will
-> -        * remove pending from the pending list upon our failure, the cle=
-anup
-> -        * function won't drop the additional reference, which is why we =
-do it
-> -        * here.
-> +       /* Drop the reference taken by vmci_transport_recv_listen() befor=
-e
-> +        * schedule_delayed_work() only on real errors.  For a peer RST
-> +        * (err =3D=3D 0) the listener leaves pending on the pending list=
-, and
-> +        * vsock_pending_work() will drop that reference itself when it
-> +        * later cleans the socket up.  Calling sock_put() here in that
-> +        * case would be a double-put and free the socket while
-> +        * vsock_pending_work() still holds it.
->          */
-> -       sock_put(pending);
-> +       if (err < 0)
-> +               sock_put(pending);
->
->         return err;
+> @@ -1565,7 +1567,7 @@ static unsigned int gmac_rx(struct net_device *netdev, unsigned int budget)
+>  	port->rx_skb = skb;
+>  	port->rx_frag_nr = frag_nr;
+>  	writew(r, ptr_reg);
+> -	return budget;
+> +	return received;
 >  }
->
-> base-commit: be48e5fe51a5864566307998286a699d6b986934
-> --
-> 2.54.0
->
 
---00000000000087fa0906519e9e16
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+[High]
+With the return value's meaning inverted, does the second consumer of
+gmac_rx()'s return value in gmac_napi_poll() still compute what it used
+to?
 
-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
-kKXUf8BmgVwrm4J21BIjpK/E9/meSALtIG7FIMpiIKpgHf1MRTzmYywQIWohaXxPRAEIYZK2DSMY
-n+fDChhou4ePAtzo6/x8PTSWPrJbH05U1DQt9FRG7+xcvkNqnjJq+XZK0kiDDFD8BzIKO/cq3ziS
-50EhbzFKXPpa46ztpJqQ+UJTJod2dB7SexAYJlBkjKlGc+niNQIDAQABo4IB2jCCAdYwDgYDVR0P
-AQH/BAQDAgWgMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3NlY3VyZS5n
-bG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEFBQcwAYYt
-aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1UdIAReMFww
-CQYHZ4EMAQUDATALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIBFiZodHRw
-czovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEEGA1UdHwQ6MDgw
-NqA0oDKGMGh0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzLmNybDAk
-BgNVHREEHTAbgRlicnlhbi1idC50YW5AYnJvYWRjb20uY29tMBMGA1UdJQQMMAoGCCsGAQUFBwME
-MB8GA1UdIwQYMBaAFAApNp5ceroPry1QLdugI4UYsKCSMB0GA1UdDgQWBBQWxgja/oUqPdrOSir6
-U+YDJVND/DANBgkqhkiG9w0BAQsFAAOCAgEAIL+CGrIYdRkQ80Psq9FtFG65/EZQH8dFSXv3AJTk
-220m3Q98q4NHh+AkBRw/pvzVQMJlRKEBKgM1qYw5FYYoC3IRpeqQ9NqnJHsEAHX2p7Hfkt3l8zd7
-rT9DuQ4Tws1Fjxo4L7OcRz8NDD9f0Y+LHADvcMUHoex2PldpXkGuWd4K1eMjga8xPOrKKYYdvWYw
-cX/rc+AYfo3B0OnjSWXjdsufMPVDDK23uGYfti1djyVhYG7hOCKjW3fg9QdDcVjVa4q7spoCPGnQ
-HGghAH5+ZauOJU1r26oGjwR/73xvsig9pX887/zvEM5WdbTXK82mciLRR4iQB0UlV+8UxxpJzfGd
-j/6onem1o3e1fTH0owcQEn59i7Ygo5cWJm0qnT7zPTS6pgkXJ4xmskj6Dcqi/hRkMlxovq3K05uN
-+lgAFg6F7ugpiGTUcxngHsGMRlj8cXIhg8KZO0gBU5KthBSvioQgN2JpAyE5gUV7stnVCu8l+SAr
-Oo+OqcCeAc14zE+TlRnoQVn/xF+q0zAyONDNmQO4uyl0EyLpTIYLK7wFxC6IDrz2FsEzlioH2cBJ
-lUyNMZuhR7c1KUj3dr4qBG1506iDiJ5qqn2rBKJAvk0ph2Irlh+82seX1iL/wX+M+Wwkzoo34GGq
-6CGv4ffBr8W+eQ2/QT4X10tgfAgSZ+Sag3gxggJXMIICUwIBATBiMFIxCzAJBgNVBAYTAkJFMRkw
-FwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBSNiBTTUlN
-RSBDQSAyMDIzAgx+bIvtS2ArBR9RakkwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIE
-IEpkaUONAsOygFvcB8jIOtP2zmmgUtq3e6SHK32KqxzaMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0B
-BwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDUxMjEzMTI0NlowXAYJKoZIhvcNAQkPMU8wTTALBglghkgB
-ZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcw
-CwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAHzP3T4WPue/akYrPLRFH0TBNfxlTaABeN2K
-pUTDK+W1b5atddPW77XtFCtt0K6PAC8qK7qySauCc/hlUDGt/tAJ+vZ57lLzA6Ra9Ekc5GuHldZI
-V/UXR+IIJtF4pNWh7ptL4oSt8ZTyi3JJ6jIejaBQQJ9x7OcZfF/5GwhPlguv8C/Krc/o+dnMOXes
-maqKJzP075e6mlI1rqHpJg/DOJbS6W2rGHETcrBRDgVBuyuawDRzcD7hvspMLWykUTesgvNjQlwu
-4X9KCi15/15SO+FiNa/++7Zb8GUIG1Sq7HuAje4ztQJmxwVu0Ih1rYXfGrLnNR2dB4EYJobZyknI
-V0M=
---00000000000087fa0906519e9e16--
+drivers/net/ethernet/cortina/gemini.c:gmac_napi_poll() {
+    ...
+    received = gmac_rx(napi->dev, budget);
+    if (received < budget) {
+        napi_gro_flush(napi, false);
+        napi_complete_done(napi, received);
+        gmac_enable_rx_irq(napi->dev, 1);
+        ++port->rx_napi_exits;
+    }
+
+    port->freeq_refill += (budget - received);
+    ...
+}
+
+Before this patch, gmac_rx() returned the remaining budget, so
+(budget - received) evaluated to the number of packets received, i.e.
+the number of freeq pages consumed.
+
+After this patch, received already holds the number of packets
+received, so (budget - received) now evaluates to the unused budget,
+which is the opposite quantity.
+
+Does this invert the freeq_refill accounting?
+
+On an idle/light-load poll where received is 0, freeq_refill would now
+be incremented by the full budget every poll, causing geth_fill_freeq()
+to be invoked much more often than before.
+
+On a saturated poll where received is close to budget, freeq_refill
+would barely grow, which is precisely the case where refilling matters
+most (and also the case where the napi_complete_done() early-exit
+branch above is skipped).
+
+Would updating this consumer in the same patch, for example:
+
+    port->freeq_refill += received;
+
+restore the original behavior?
+
+> 
+>  static int gmac_napi_poll(struct napi_struct *napi, int budget)
+-- 
+This is an AI-generated review.
+
 
