@@ -1,341 +1,226 @@
-Return-Path: <netdev+bounces-287045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287046-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MOkzF974AmqvzAEAu9opvQ
-	(envelope-from <netdev+bounces-287045-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:54:38 +0200
+	id QIVNGun4AmqvzAEAu9opvQ
+	(envelope-from <netdev+bounces-287046-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:54:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AC2451E1A5
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:54:36 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A5B751E1AD
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:54:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 35A4730121E9
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 09:54:12 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8FD513018D60
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 09:54:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0674C042F;
-	Tue, 12 May 2026 09:54:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 208A54C6EE9;
+	Tue, 12 May 2026 09:54:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BlRwYRAr"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="oJioO+zq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012060.outbound.protection.outlook.com [40.107.209.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71EC14BCADE
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 09:54:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778579649; cv=none; b=fKsUCAolKwvF31XBZ+y6ZiTCZzZxbPhFJVA2E2NrjabxK6gq4I3W75dE3RTrwMd+q1Ibe9aPEGpNHQvsUvlIcSTly+Crg4TXYsn2iQtcjLI1bg18nibaEBzxb+b/3lyq+xFJYtO3JT0PXQeMCHi/aNW+29xH9NPnMRuSmM/4zyA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778579649; c=relaxed/simple;
-	bh=GhcbWShvWu0HBoL4vJTJZaZ4YXcm4LYzQBrJroNK88g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ufMgP2CemBxT3/WaPSfzVoLmh0H5K2pRjuZGtOS/OVFyZ+PcujXJ6ffTS/8sGxKTXCQY+nARc1sIDWeBXBhl9egn40jjh5k8Xvlz3dIX9uKPPtBihtMBwzH3JrHbWnq2iRLyl9IKQKJyL1ARebgJWL7T/UJ5OGk/dd5/J7WHxtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BlRwYRAr; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778579645;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5QE9d9z2R7mk3rN0owPm0GllpWfqewHyaYRZUy3W9Hc=;
-	b=BlRwYRArrvGArQWEwA1FfwyuAbHvUz78ztv6SQWaCL1pEF7B+Igoy5CYQH16RmMh4d4JwH
-	VF4ncd4hJwk9Jr8FdQNhNWri4EjjlqstbUmCVjiz9ADnkPBwA4B64TErw+rhAUJSo5P8xa
-	Sh+fbKs3duwiJS8HuAtsavDo/77DI9A=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-48-j6uhMd5cM3q75A7lfzPjSg-1; Tue,
- 12 May 2026 05:54:02 -0400
-X-MC-Unique: j6uhMd5cM3q75A7lfzPjSg-1
-X-Mimecast-MFC-AGG-ID: j6uhMd5cM3q75A7lfzPjSg_1778579640
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 683AE18005B3;
-	Tue, 12 May 2026 09:54:00 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.48.142])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0665519560A2;
-	Tue, 12 May 2026 09:53:56 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: sukhdeeps@marvell.com
-Cc: netdev@vger.kernel.org,
-	irusskikh@marvell.com,
-	epomozov@marvell.com,
-	richardcochran@gmail.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 5/9] net: atlantic: add AQC113 filter data structures and firmware query and firmware query firmware query
-Date: Tue, 12 May 2026 11:53:49 +0200
-Message-ID: <20260512095354.134894-1-pabeni@redhat.com>
-In-Reply-To: <20260506135706.2834-6-sukhdeeps@marvell.com>
-References: <20260506135706.2834-6-sukhdeeps@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE024A3402;
+	Tue, 12 May 2026 09:54:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.60
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778579651; cv=fail; b=u8suUsi6CcUfcceZDm+gxlsn8QN5HYzMqv0cKmWDDXxTXRu+13tA1iQWyVYJzrx6gi/jO4TcF1fs4IfVQhk9Fqo0u6Dnko7a1rGFHh9ndNaLV+X1cjKedCqXjh8YIEpVQzbkjFXO5maAm8u3crcXuZ/IFkzJmLAeKH8KsQE7ojs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778579651; c=relaxed/simple;
+	bh=5XalBylogepL6k0Yl9WSCrlwDukXWss0eA3mJ1wuusk=;
+	h=Date:From:To:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=dNX6eS4UwAFJgQy7LZHNbKuFwSl4N/yYz0A0PAaI6Jf+dRlA/YoVn8tDcwvVab6VaS3l84P9VEsg+fXQfUTw7OEl58I6jpDv6anduJK9F77H/B22hB4570wEO++GV3msK4rqnFvKduSYh+4iq+awsKUdyOSexCdGdKOaq0MB9LE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=oJioO+zq; arc=fail smtp.client-ip=40.107.209.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=eAkgSppr6TtESe37Ri5VvTdh6GZlf9305uhNuulqbHsIXmPSkxftiJt1kRUwof08lt3vix6Ku1DA0To3TRS3+bE+NZlwH9I21zRP4Fg9Twx3COupuKXkdvMIbrOuA3lnSkUN/r6Bg72/WvNP7z7+qM70z9Q/GEJVQCwYX8WJ7mdQq0/agjF5dlsS2NO1v5wi3aRkHsbIXYbeld9halqxVtOdRuaOJZ6Mt5R9y6JpzlKw4mAAEdEDnZE1w6h2cLUKG7zNht7H6ABTpkRF2xJa4K3Xpl0Ae9AqEkEVQ5vUELUKhNvi5KUtRSm8blOF/NjgXGExY1jzLOyzhr6ndHk0iw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xx1FtB9Qq5bTa30hydDu1009D6LGvwR+ndnPyVPKRvk=;
+ b=YeQ87tTZGFp2Jk9NDRY765dsMJzOkB5DnUUKzWeYOWSEcmZJHAj3YdI9LxNAQ+tYcV13hgcDFYBnJdHBwxnhkDWj5+2weYSDoXAKtZwwXpd/A03463JR7mlRnJ/vRA9BR9/xxisBPe7I4fO4QhnBv/Y4d4nQjH4KeThBMa95p6dsu+51k4vC8wjbHAOWSHLXm27p/mk66wi/4jdYw+Krd6aiGenVF+CNo9A2aL9w4dUaNmPMz1eTtkWoBpwNKXGEe3SvclLI5ObnlQxnOtpWxTvUYtYWjxt8eLegYjzSFZx3hJFLsJul3XoboYg4Z4M3XIL660CxiOYty/YMmkWiuQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xx1FtB9Qq5bTa30hydDu1009D6LGvwR+ndnPyVPKRvk=;
+ b=oJioO+zqkZD8VlrtEZJiNhZsKSsHVrm7hzk5v7JqQueou4BX6FVKWqorc3VGy7XGuRPKN1KE/MKqDGvbv1f9QymFT7bOtM/0yCwEkv1SvxZkBN1riCHloT61Fv/BTWnwkCR5IrXzrozmjToTMxlhpOz1Z+ku4fnQq9vJDWHPskcx6qtDOJN+YxX0/gRe9kS9VNM+NHu1s6zbewisABjwTGd8+cbm29eSdOruEJoUIO3lI44Y89jTcVi7qwwgpk5TfUIcXcj8vXUETLSWUN6YByS1vVVELIXH2aaSu6+ojYa7k5CEtWHUPHkoGeqBG4w9lcWoqtezdPbv8tM1DJvKlw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8728.namprd12.prod.outlook.com (2603:10b6:610:171::12)
+ by DS7PR12MB8321.namprd12.prod.outlook.com (2603:10b6:8:ec::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.11; Tue, 12 May
+ 2026 09:54:01 +0000
+Received: from CH3PR12MB8728.namprd12.prod.outlook.com
+ ([fe80::2641:1046:bdf3:93d7]) by CH3PR12MB8728.namprd12.prod.outlook.com
+ ([fe80::2641:1046:bdf3:93d7%7]) with mapi id 15.20.9891.021; Tue, 12 May 2026
+ 09:54:00 +0000
+Date: Tue, 12 May 2026 09:53:56 +0000
+From: Dragos Tatulea <dtatulea@nvidia.com>
+To: Anshumali Gaur <agaur@marvell.com>, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	gakula@marvell.com, hkelam@marvell.com, sbhatta@marvell.com, sgoutham@marvell.com, 
+	bbhushan2@marvell.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3] octeontx2-pf: Retain ethtool stats across
+ interface down/up.
+Message-ID: <7jiq4s63gnolplmqcgnip76mkv6sztls6bds6alaygxvkqxwow@yswtunwuvi5q>
+References: <20260512072338.1460580-1-agaur@marvell.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260512072338.1460580-1-agaur@marvell.com>
+X-ClientProxiedBy: TL0P290CA0008.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:5::19) To CH3PR12MB8728.namprd12.prod.outlook.com
+ (2603:10b6:610:171::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-X-Rspamd-Queue-Id: 5AC2451E1A5
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8728:EE_|DS7PR12MB8321:EE_
+X-MS-Office365-Filtering-Correlation-Id: 54681e94-6d81-4f87-cc01-08deb00c6490
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|921020|11063799003|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	TQK3pnqTZPhKk4A8vqAq/VKoW7umQY7qru9EcUlo0DAGGGvQiX1Dz8k2JR3xPrtFZv/xDNMvG0Sk++0duDqUn5gZaxJYMD98RqKVfxJZBC/3RlTPY5y+iT6TlVw+YsOTCHylp6sY3gB0vxrbzQwiYPKn2NXSEy2QrwpaZvz2C7b0HcPA3FCkDOEOS/H4zwJRiJRFAfAhSACoczhCUHovfXA79hW2QgkZ2+/ClRFv6XEyioVoy1k0bylqDdr4Cpx0S+cJmo22A96a1SsjXYF4E/RmBVPhCunR0eBqFTq0pmpaolOG+EPPsM/tGqrw+ndJJlwWQTO1ya5mlNd0I2FAKXAciOLBViy3FuFqxJ6lKsZU+vLI3wzUNZSAwCNf92N8hIs9mlExrTEM5a4IFQVuyT09/u2ubaJe2dhpZOY3PNGzsTTGQRdfn1UNN8FluDP7GKm0JZ0kgh2jcwDkvr2l0d54ift4BlncjnGRWq+CBnd/1JdX0xQVWvvxRLfOwOHZH/ULEi6O635CPiaZXRUBgJ8NqF5AjUhPmZcx52ZWoQwBhE+lCNGAdpQDGhl0zHmT0QGEj7yQodSZ9/O308VAe8mFmnzK6Xu7VbfmQfHeMEET8s1PHCcy8ERgypueecHeCMlkj1JyAJtS8gYPeSdhrBdAaYMGFCDq1SbVHSaDaNW/rGTk8hTCZigWdm3ZYBGBi+W59iAi5lesXnLB+qOeR36ZyEiBb9jhNPXz06aL80e9++Y6oAWa0dIJV1Qjql0H
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8728.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(921020)(11063799003)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?TXOTptc2NLB5qsLwenM0XVgr8TAFnVFvMgydqWqd82vcgEgiQmfkaC44BmnW?=
+ =?us-ascii?Q?DH+0qVlRmdxzl9Da/2bhBYKxpGkFnedKED0/UgI7YnkkrOvxip+yNoZb7rw5?=
+ =?us-ascii?Q?nflNxRjn8MTbrUlSo2UYr1wZwnqiVfcrWn1ZXTFs0UcEqJ0/AgX65Rq4QUTl?=
+ =?us-ascii?Q?jn63/yrcThh9uios07Za/mwuegT9ErvmAvHRZVElQ9JMOuo9TeR4KhsZ+qjF?=
+ =?us-ascii?Q?ME7uHBLUL7JBPrkna/YeEyRIBgMXSnUsfTIwZ1Bg6MvFPTfa32oKhMoxOuUK?=
+ =?us-ascii?Q?Bmb2LxhoDNrydPV1V+1G16g1T6pf3E4x9I1Fx/6l3lL3cWnxHiN8/oIPmkfU?=
+ =?us-ascii?Q?iRNOr1xj0Cb0YGh5qYXCnWQkJhBmXJPt9PaPiO7Bdy/8JJxTD84KhZfeipw8?=
+ =?us-ascii?Q?qjtaLbt+o338CuqBfMoawDEPAcrQPfWLSqafwx5r5XjyCLkrT5Oi+avNdEkC?=
+ =?us-ascii?Q?QKZkyeD98zGK9vqK11tEIWGN1lS9KB+oSOvgwZo9eopjaUtyzigCfx3cL9fU?=
+ =?us-ascii?Q?Qzlpp1QUWktxUZhXglcModFzx/80Ahao7YFo9tIurSFDysgxy3sxGNzsVXWl?=
+ =?us-ascii?Q?DMb8UQcga7lNQn3n1aQIeo7+qf9dQVZPbO+Xu2cHhl82dYgbMBX8NPrGXZ34?=
+ =?us-ascii?Q?O0o9QpAlcX5/3pa+GbIbI+rBp82wFnrOoeguoy+3GO6Xj293w4otVrUxSYzc?=
+ =?us-ascii?Q?hf5I6Hyk3S2+zfdIBL4sTnSHn4bf3ELxnCaTfB24j6MO6xIh5K34hKfXqnCV?=
+ =?us-ascii?Q?fTS2JU+fsSon37VK3gvlhlWQvVlsyMBtEdDBuSZAOY5oco9iR+zzV8oE+Vlt?=
+ =?us-ascii?Q?79HiIQeZq79TGud92DKv87tlXewl3aPo91Y7X7r76fiTFRDVIkqo92JdCaS4?=
+ =?us-ascii?Q?Jjme/w1epY4PGme4BWFnx3aOjb7l32rC5YbqiDYapsXe2eX6aSJGaaVKXq7k?=
+ =?us-ascii?Q?gj41uktQebsFb4yu05XefpAzofcfzZHCKw0hZSxykAIup1IeyXGsUCqQOTFL?=
+ =?us-ascii?Q?N/MTotyG5E5BRf7zHiiPxSCWNAX4uAm9UiHyC7hQcA9N1b+fbLkXf3UhFc3o?=
+ =?us-ascii?Q?I5xrUCuEIaE+EQeWpBU/X6adNVYK7qc/p//AnGOm8aaZLTcjaCiEYhpCKuGU?=
+ =?us-ascii?Q?iNBAC4K17sWpnMKFusiyoLLG0RYKwRa2sWVdwy6GrJ/IovfNhiMlDbzkh5Qy?=
+ =?us-ascii?Q?rwyL1ioKfvvUk+2GksDlvB+znTJ59Sew0iGlFvzFieueu7zdcvm3+IHQH/bO?=
+ =?us-ascii?Q?EMhSFxAeRyGoMrmEieHjN4nNcTCD+bkNZ97eoKtEHU2lqdkUhW/u6Cmu1CuF?=
+ =?us-ascii?Q?11Xh4/o7IDbbMkIAiASGUYZ2cz8hpAVWyMoncUzGdULivPo0jhVLgQP/Mcr8?=
+ =?us-ascii?Q?vsGr8pDXPe1CuQiMmuKZRUdSvr1XBiWabwvEnGENN2Hy3BhVQqa+dnJmWtuU?=
+ =?us-ascii?Q?RY8/kzh9FLTjvAheWr59zq1DwEvcNDTroNOJrnl8ajbXtxUCHDNBhzmyMCWW?=
+ =?us-ascii?Q?upIs+dyjrM/XkXlUA7mPtWfeGy2FVPSjNYSPdtocUKQnhM501BGYP7KxCRkg?=
+ =?us-ascii?Q?QnWD7GWCZtD9e0YNn8eykU90XL0azcwvbuayf6EVp0D3lw/yn6t46A+JC7Mt?=
+ =?us-ascii?Q?9b84n9Hj0y1IqtD3rx5mSBO3aPBBxyISTf5GNQefBaPkViIb83nYvdKl7xdm?=
+ =?us-ascii?Q?gIutj/VpsAFxZQg6ZFJHJAITo1fQBRtR3wt827dcjaRMe6mbrRwcrG2cNwml?=
+ =?us-ascii?Q?lUrcvBmerg=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 54681e94-6d81-4f87-cc01-08deb00c6490
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8728.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2026 09:54:00.8273
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sP8cvA9dHdBWOZrB+jBNHuLhKJTzRxjeACe6+aFIzqbExzMIBatRDKbMPaTmyNnlo9ioIU6cfVGt8tfl2Dqzyg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8321
+X-Rspamd-Queue-Id: 6A5B751E1AD
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [1.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,marvell.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287045-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287046-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[dtatulea@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:url]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,marvell.com:email]
 X-Rspamd-Action: no action
 
-From: AI Reviewer <ai@example.com>
-
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://netdev-ai.bots.linux.dev/sashiko/
----
-net: atlantic: add AQC113 filter data structures and firmware query and firmware query firmware query
-
-This patch adds filter data structures, RPF L3/L4 command bits, filter
-count constants, and a firmware capability query used to populate filter
-base indices and counts stored in hw_atl2_priv. It also adds a MAC
-register dump helper for debug support.
-
-> net: atlantic: add AQC113 filter data structures and firmware query and firmware query firmware query
-
-The subject line has "firmware query" repeated three times.  Similar
-duplication appears on other subjects in this series (for example
-"filter management filter management management", "(Antigua) (Antigua)",
-"TX path setup TX path setup").  Would it be possible to regenerate the
-series so each subject reads cleanly?
-
-> diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h
-> index 5a89bb8722f9..fc086d84fb91 100644
-> --- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h
-> +++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_internal.h
-
-[ ... ]
-
-> @@ -119,9 +137,54 @@ enum HW_ATL2_RPF_RSS_HASH_TYPE {
+On Tue, May 12, 2026 at 12:53:38PM +0530, Anshumali Gaur wrote:
+> Currently the hardware counters reset when the interface is
+> brought down, causing stats visible to userspace to drop to zero.
+> Save the accumulated stats before bringing the interface down
+> so they persist across routine down/up cycles.
+> 
+> Signed-off-by: Anshumali Gaur <agaur@marvell.com>
+> ---
+> v3:
+>   - Code format according to kernel coding style
+>   - Reword commit message
+> v2:
+>   - Fix subject prefix to target net-next
+>  .../marvell/octeontx2/nic/otx2_common.c       | 20 ++++++++++---------
+>  .../marvell/octeontx2/nic/otx2_common.h       |  1 +
+>  .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 17 ++++++++++++++++
+>  3 files changed, 29 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> index 971fcab1c248..0ffcc613a4b2 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> @@ -139,19 +139,21 @@ void otx2_get_stats64(struct net_device *netdev,
+>  		      struct rtnl_link_stats64 *stats)
+>  {
+>  	struct otx2_nic *pfvf = netdev_priv(netdev);
+> -	struct otx2_dev_stats *dev_stats;
+> +	struct otx2_dev_stats *dev_stats, *old_stats;
 >  
->  #define HW_ATL_MCAST_FLT_ANY_TO_HOST 0x00010FFFU
+>  	otx2_get_dev_stats(pfvf);
 >  
-> +struct hw_atl2_l3_filter {
-> +	u8 proto;
-> +	u8 usage;
-> +	u32 cmd;
-> +	u32 srcip[4];
-> +	u32 dstip[4];
-> +};
-
-[ ... ]
-
->  struct hw_atl2_priv {
-> +	struct hw_atl2_l3_filter l3_v4_filters[HW_ATL2_RPF_L3L4_FILTERS];
-> +	struct hw_atl2_l3_filter l3_v6_filters[HW_ATL2_RPF_L3L4_FILTERS];
-> +	struct hw_atl2_l4_filter l4_filters[HW_ATL2_RPF_L3L4_FILTERS];
-> +	struct hw_atl2_l3l4_filter l3l4_filters[HW_ATL2_RPF_L3L4_FILTERS];
-> +	struct hw_atl2_tag_policy etype_policy[HW_ATL2_RPF_ETYPE_FILTERS];
->  	struct statistics_s last_stats;
->  	unsigned int art_base_index;
-> +	unsigned int art_count;
-> +	unsigned int l2_filters_base_index;
-> +	unsigned int l2_filter_count;
-> +	unsigned int etype_filter_base_index;
-> +	unsigned int etype_filter_count;
-> +	unsigned int etype_filter_tag_top;
-> +	unsigned int vlan_filter_base_index;
-> +	unsigned int vlan_filter_count;
-> +	unsigned int l3_v4_filter_base_index;
-> +	unsigned int l3_v4_filter_count;
-> +	unsigned int l3_v6_filter_base_index;
-> +	unsigned int l3_v6_filter_count;
-> +	unsigned int l4_filter_base_index;
-> +	unsigned int l4_filter_count;
->  };
-
-The backing arrays l3_v4_filters[], l3_v6_filters[], l4_filters[] and
-etype_policy[] are fixed-size (HW_ATL2_RPF_L3L4_FILTERS == 8, and
-HW_ATL2_RPF_ETYPE_FILTERS == 16), but the *_count and *_base_index
-fields are populated from firmware below.  See the next comment in
-hw_atl2_utils_get_filter_caps() about validation.
-
-> diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.c b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.c
-> index 0fe6257d9c08..ffd723dcfb63 100644
-> --- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.c
-> +++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils.c
-> @@ -128,3 +128,36 @@ int hw_atl2_utils_soft_reset(struct aq_hw_s *self)
->  err_exit:
->  	return err;
+>  	dev_stats = &pfvf->hw.dev_stats;
+> -	stats->rx_bytes = dev_stats->rx_bytes;
+> -	stats->rx_packets = dev_stats->rx_frames;
+> -	stats->rx_dropped = dev_stats->rx_drops;
+> -	stats->multicast = dev_stats->rx_mcast_frames;
+> -
+> -	stats->tx_bytes = dev_stats->tx_bytes;
+> -	stats->tx_packets = dev_stats->tx_frames;
+> -	stats->tx_dropped = dev_stats->tx_drops;
+> +	old_stats = &pfvf->hw.old_stats;
+> +
+> +	stats->rx_bytes = old_stats->rx_bytes + dev_stats->rx_bytes;
+> +	stats->rx_packets = old_stats->rx_frames + dev_stats->rx_frames;
+> +	stats->rx_dropped = old_stats->rx_drops + dev_stats->rx_drops;
+> +	stats->multicast = old_stats->rx_mcast_frames + dev_stats->rx_mcast_frames;
+> +
+> +	stats->tx_bytes = old_stats->tx_bytes + dev_stats->tx_bytes;
+> +	stats->tx_packets = old_stats->tx_frames + dev_stats->tx_frames;
+> +	stats->tx_dropped = old_stats->tx_drops + dev_stats->tx_drops;
 >  }
-> +
-> +static const u32 hw_atl2_utils_hw_mac_regs[] = {
-> +	0x00005580U, 0x00005590U, 0x000055B0U, 0x000055B4U,
+Missed comment from v2:
+https://lore.kernel.org/netdev/bf626b44-efad-43f2-b8b4-509934f4befa@nvidia.com/
 
-[ ... array of 72 entries ... ]
-
-> +	0x00007CD0U, 0x00007CD4U, 0x00007CD8U, 0x00007CDCU,
-> +};
-> +
-> +int hw_atl2_utils_hw_get_regs(struct aq_hw_s *self,
-> +			      const struct aq_hw_caps_s *aq_hw_caps,
-> +			      u32 *regs_buff)
-> +{
-> +	unsigned int i;
-> +
-> +	for (i = 0; i < aq_hw_caps->mac_regs_count; i++)
-> +		regs_buff[i] = aq_hw_read_reg(self,
-> +					      hw_atl2_utils_hw_mac_regs[i]);
-> +	return 0;
-> +}
-
-This isn't a bug today, since hw_atl2_caps_aqc113.mac_regs_count is 72
-and hw_atl2_utils_hw_mac_regs[] has 72 entries, but would a
-BUILD_BUG_ON() or a runtime min_t() tying the loop bound to
-ARRAY_SIZE(hw_atl2_utils_hw_mac_regs) be worth adding?  If a future
-variant bumps mac_regs_count without updating the table, the loop
-would read past the rodata array and issue readl() on unintended
-register offsets.
-
-Also, hw_atl2_utils_hw_get_regs() only ever returns 0.  Does it need
-to be declared as returning int, or could it be void?
-
-> diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c
-> index 7370e3f76b62..546b48f897d3 100644
-> --- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c
-> +++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c
-
-[ ... ]
-
-> @@ -606,6 +610,54 @@ u32 hw_atl2_utils_get_fw_version(struct aq_hw_s *self)
->  	       version.bundle.build;
->  }
->  
-> +int hw_atl2_utils_get_filter_caps(struct aq_hw_s *self)
-> +{
-> +	struct hw_atl2_priv *priv = self->priv;
-> +	struct filter_caps_s filter_caps;
-> +	u32 tag_top;
-> +	int err;
-> +
-> +	err = hw_atl2_shared_buffer_read_safe(self, filter_caps, &filter_caps);
-> +	if (err)
-> +		return err;
-> +
-> +	priv->art_base_index = filter_caps.rslv_tbl_base_index * 8;
-> +	priv->art_count = filter_caps.rslv_tbl_count * 8;
-> +	if (priv->art_count == 0)
-> +		priv->art_count = 128;
-> +	priv->l2_filters_base_index = filter_caps.l2_filters_base_index;
-> +	priv->l2_filter_count = filter_caps.l2_filter_count;
-> +	priv->etype_filter_base_index = filter_caps.ethertype_filter_base_index;
-> +	priv->etype_filter_count = filter_caps.ethertype_filter_count;
-
-Should priv->l2_filter_count and priv->etype_filter_count also be
-clamped against their backing arrays the way the v4/L4 paths below
-are?  The etype_policy[] array is sized HW_ATL2_RPF_ETYPE_FILTERS
-(16), and the base indices are accepted verbatim from firmware
-without any check that base_index + count stays within the array.
-
-> +	priv->etype_filter_tag_top =
-> +		(priv->etype_filter_count >= HW_ATL2_RPF_ETYPE_TAGS) ?
-> +		 (HW_ATL2_RPF_ETYPE_TAGS) : (HW_ATL2_RPF_ETYPE_TAGS >> 1);
-> +	priv->vlan_filter_base_index = filter_caps.vlan_filter_base_index;
-> +	/* 0 - no tag, 1 - reserved for vlan-filter-offload filters */
-> +	tag_top =
-> +		  (filter_caps.vlan_filter_count == HW_ATL2_RPF_VLAN_FILTERS) ?
-> +		  (HW_ATL2_RPF_VLAN_FILTERS - 2) :
-> +		  (HW_ATL2_RPF_VLAN_FILTERS / 2 - 2);
-> +
-> +	if (filter_caps.vlan_filter_count > 2)
-> +		priv->vlan_filter_count = min_t(u32,
-> +						filter_caps.vlan_filter_count - 2,
-> +						tag_top);
-> +	else
-> +		priv->vlan_filter_count = 0;
-> +
-> +	priv->l3_v4_filter_base_index = filter_caps.l3_ip4_filter_base_index;
-> +	priv->l3_v4_filter_count = min_t(u32, filter_caps.l3_ip4_filter_count,
-> +					 HW_ATL2_RPF_L3V4_FILTERS - 1);
-> +	priv->l3_v6_filter_base_index = filter_caps.l3_ip6_filter_base_index;
-> +	priv->l3_v6_filter_count = filter_caps.l3_ip6_filter_count;
-
-Can priv->l3_v6_filter_count overflow l3_v6_filters[]?  The l3_v4 and
-l4 counts just above/below are clamped:
-
-    priv->l3_v4_filter_count = min_t(u32, filter_caps.l3_ip4_filter_count,
-                                     HW_ATL2_RPF_L3V4_FILTERS - 1);
-    ...
-    priv->l4_filter_count = min_t(u32, filter_caps.l4_filter_count,
-                                  HW_ATL2_RPF_L4_FILTERS - 1);
-
-but l3_v6_filter_count takes filter_caps.l3_ip6_filter_count directly.
-The backing array is
-
-    struct hw_atl2_l3_filter l3_v6_filters[HW_ATL2_RPF_L3L4_FILTERS];
-
-and HW_ATL2_RPF_L3L4_FILTERS is 8.  The l3_ip6_filter_count field in
-struct filter_caps_s is wider than 3 bits, so the firmware can report
-a count above 8.
-
-The consumer added in the follow-up patch in this series then walks
-priv->l3_v6_filters[] using the unclamped count:
-
-    first = priv->l3_v6_filter_base_index;
-    last  = priv->l3_v6_filter_base_index + priv->l3_v6_filter_count;
-    for (i = first; i < last; i++)
-        if (hw_atl2_rxf_l3_is_equal(&l3_filters[i], l3))
-            return i;
-
-and hw_atl2_rxf_l3_get() writes through &l3_filters[idx]
-(l3->usage++, l3->cmd = ...).  If firmware reports an oversized
-l3_ip6_filter_count, or any non-zero base_index that pushes the
-window past slot 7, doesn't this read and write past
-priv->l3_v6_filters[] into the adjacent priv fields?
-
-The same question applies to priv->l3_v4_filter_base_index and
-priv->l3_v6_filter_base_index — they are stored verbatim from
-firmware with no check that base_index + count stays within the
-corresponding backing array.  Would it make sense to validate the
-full window for every filter category?
-
-> +	priv->l4_filter_base_index = filter_caps.l4_filter_base_index;
-> +	priv->l4_filter_count = min_t(u32, filter_caps.l4_filter_count,
-> +				      HW_ATL2_RPF_L4_FILTERS - 1);
-> +
-> +	return 0;
-> +}
--- 
-This is an AI-generated review.
-
+Thanks,
+Dragos
 
