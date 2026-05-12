@@ -1,51 +1,84 @@
-Return-Path: <netdev+bounces-287183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287184-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0P8dFxQ+A2po2AEAu9opvQ
-	(envelope-from <netdev+bounces-287183-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:49:56 +0200
+	id uM+FFQEyA2oA1gEAu9opvQ
+	(envelope-from <netdev+bounces-287184-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:58:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEB9C522EA1
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:49:55 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EC0F521D38
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:58:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 60F6A317AFD0
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:55:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9B1E7303801A
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1782239D3F1;
-	Tue, 12 May 2026 13:54:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E057839E9C0;
+	Tue, 12 May 2026 13:55:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EMOAil2L"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="bh4punbO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E64B839D3CE;
-	Tue, 12 May 2026 13:54:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B0B239E9BB
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 13:55:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778594096; cv=none; b=Jb5buI8Xw3R0JI+wKPOiaSTFGBRdxS23aNu5mSWGBm/qx0hmPwuuyuTs2W9EKEkpwavEdcc1gFxtBZ83XZUcOJEwhZIzzRdxnMdsc4ChcwO528DHVgW/Rv2AE8L5Lb/8+ieKjvrS2ZjjHs8m9WmAzWfCUwqzA3bUUkO+FSh6fRI=
+	t=1778594144; cv=none; b=f5k3de4Pdma+5X5e1E/NTrakvgAvLD9O7yHvdo/uLVzfqxoRnTJfr0ac/sneNNVIDEBxRN8y9sCGxk7+qMAs6KiAdcVp66LLv50rYj6NRrA8d/nD9JNTXV/OGZ7eZW2GPoTQVSVp/by5lLVphIv8/zKs67bKKFw5PvF00y9ZoAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778594096; c=relaxed/simple;
-	bh=8FUrlrnlV2S6IbQzISn71o21kS6vMOb4QyGxMRKQLhQ=;
+	s=arc-20240116; t=1778594144; c=relaxed/simple;
+	bh=L2obTzioIky7Xe62sdUdJugOF/DLMnYd+se+yIwRjpI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=POUG+i4b+xsB3VTMID05607FM/WAn2DT+GsDnn1OuCVQ0Jq7H0DR6C2mjSWUNHVskKU+dOmP8kKBn0wamkTGNEboQ5etH/m+iZekFdUxiK0Onp0XCXKxbLfIHW2aLMXNOTHdl3uyMotwQpdNb0S2JyLYhxK9CzGVKjEwsndmMFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EMOAil2L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 626DAC2BCFA;
-	Tue, 12 May 2026 13:54:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778594095;
-	bh=8FUrlrnlV2S6IbQzISn71o21kS6vMOb4QyGxMRKQLhQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EMOAil2LP3RXQaSYLvOdjEAcx/+vWF7UQieKCZ5bPd/Na731IVp7R5WdbFCTdJfrR
-	 LQGs79cWxu4/tNwNO2oodluAbFxGPwWzWwfUX+sFeIaWUN6YWAwRmO7rNtdtQnHXWd
-	 rxvY3FD1ZSDzwnWeSXhseqojhdGaYuYsiz+VnoPJBk67zhRqCtVTEuywfkAl6bLxm7
-	 zO33mjvVKeARllNi6NgiK7psUJWZ/YjsXz2cOCBLsMh9EJnqfqvowJPrLulH10ZeRc
-	 T0Uf2/SKDLH+PG5CvelGBwIXtOn8Wf3sOXSeSWpLkFgePWoMS9dSrms2iX/9XBHdfs
-	 sniWXNatMgiEg==
-Message-ID: <18855e57-f050-411f-9958-d4babcc81ba3@kernel.org>
-Date: Tue, 12 May 2026 15:54:50 +0200
+	 In-Reply-To:Content-Type; b=o1gZPCJFfwHqV3B/qhrl0Ci1HYOqIUqvVWnRcYH7REX1rFyzeHeSqSWJ+CkYjSV8iVZ7TqINgb4Qcht0Mad2IID51jWWtQADEhy0I9Hc5dN98E3HuDY3/S8WkXswKnbd7QWyHeQ2U7T1gCh1RISvjuy6bgBANyJWcNZ5g+IdwGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=bh4punbO; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4891c00e7aeso47886825e9.2
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 06:55:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1778594142; x=1779198942; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=c9Ujg9pQGDL6jd9yyZ5NSQ4d/MQLU1mdX7ZdiG8lxiU=;
+        b=bh4punbOIGB0/HAet2LnovnLp/Ov6L46gzk4y2rkaVhOjpa7OzM1Ry3MojAEAUluPc
+         oLn5KsD4fwNoo0HGkSjmwCic3QeboX+utYdU/I8QKCIFzWG5C18AEYOJ2XJvuM7gKkDG
+         xy/OVRD0TCD/nFKteiWofMfTWGWfoi2EYi2xFWAdpUXFpVQW6XZg2kxLQPmZnF1oQwUq
+         78CkQqU6E8G938H9klBXaNeMuefJ/crzcwBFPDbc9FexzPAQLlnkDAlM8oVyKgjJL2W5
+         EPWTTCZbDcMMW2YzuqxD7blux5ivKrlwXn0MR8fTrLZJdhRLQO9STutu50QHwP/Pcr83
+         lpDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778594142; x=1779198942;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c9Ujg9pQGDL6jd9yyZ5NSQ4d/MQLU1mdX7ZdiG8lxiU=;
+        b=ChISDM9elynShCgWKvzuhd/qn+dAQk7f6RL+dJ2B09FUyQot2EsQcuQ/v78/o3RU4L
+         WGk+Nj9qx/PVaDxvaxDy91bCr9HMFjtEM1tWaah9m2Gg0h/7qpFYaXJVomuxnbmwltKj
+         oNPPThSVAtyoSQSzrmL5N42xF+ekZ/S4Hd9/Hr8wc0AO0YJmLvkDgbbzPIfP6T7gWT14
+         PfgxXUTmdwkh6/soG+G6iQ3exzEoEid7S3Lk5Jt/nhnR7ibTzK7ml3139behkxWARFiX
+         QGhwqpThRy1TD+eSL/Z5haE8BAm8WsExzQgNleYZanbTy/pyhZyAeYl/bJzyRzzUKywV
+         BUVA==
+X-Gm-Message-State: AOJu0Yw3GlJnsZ1kVMd/HoPxRoCzZP4Nw7rV0/72+xsIHim/1MxJveyw
+	KOULHXsh6wiQ6U5JiXD5GCeZrgl+PrP9F+ZCayF6ZyAovl0QC/3krDW8GUk5e19YqhMoN/GmMmT
+	qbmwfuW4Tovb34cm4hV+SiuwScDKaZerilMg8PTcQaUICKzjS/kQ=
+X-Gm-Gg: Acq92OEbQX+UDeN2JE8ygGXQwIs9TgkeNpCB/88VjRU+MTO8LNvnTgf74QhFqu3b0nt
+	QvZxxMoznPPP5ub9Rk13Ved9lk1rsBaUgQy4fBxJt5jC7CA5fWKm7P6ib7DSm23MOFOMiCY0qwp
+	3/51vyE+K+ypiOtjBN7xhI085hJgOkLGfEyYENJFPUTsJMZP1Ae4c3L1HTwvnSdsQgFqXArPe0U
+	ckAXLc3EWi3PFxa8XhTsfpRJaucpGj2rNOF364a/Rf0z52f+ky6bYpOEs8MExKt/SlZgAOT5ViX
+	tjf/WuUz09TjV9cvFpPoJ8jyVH0I3Qv2sWfpUz5hfH5zTOD2+9Fi3DU13Awhy+fXs7BpaTzB0TZ
+	x/rnc0jVRCKfJI7tYpd5bHj+svyGLKXGI2omEQKc2aZfNIs54r2O3hU/im6X51tRNzojqy/XJ6d
+	opmmXJTaKB4g9SnJJh9h6CxL0rxT86KAqIiwKRksxd1ebZ+UtonLTrs7tryfT7Ng==
+X-Received: by 2002:a05:600c:3510:b0:48a:53ea:1408 with SMTP id 5b1f17b1804b1-48e8fe50a02mr41693535e9.8.1778594141558;
+        Tue, 12 May 2026 06:55:41 -0700 (PDT)
+Received: from ?IPV6:2001:67c:2fbc:1:7245:d44f:b95f:a2c6? ([2001:67c:2fbc:1:7245:d44f:b95f:a2c6])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e8f410558sm36090165e9.5.2026.05.12.06.55.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 May 2026 06:55:41 -0700 (PDT)
+Message-ID: <4ff6590a-6695-4c6c-b677-a7891b249165@openvpn.net>
+Date: Tue, 12 May 2026 15:55:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,430 +86,107 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 3/5] veth: implement Byte Queue Limits (BQL)
- for latency reduction
-To: Simon Schippers <simon@schippers-hamm.de>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- kernel-team@cloudflare.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20260505132159.241305-1-hawk@kernel.org>
- <20260505132159.241305-4-hawk@kernel.org>
- <ee275aa6-af27-4dac-9afa-da88abde312b@schippers-hamm.de>
- <8f2f7f2e-6aa2-4e5b-b52d-0025b2525579@redhat.com>
- <e3a91545-13cd-4f87-8375-d707865bdbca@schippers-hamm.de>
- <6a597dbd-70bf-4b14-b495-2f7248fd3220@kernel.org>
- <20260508190626.4285fac0@kernel.org>
- <f459b95c-80d5-4e05-84b2-f574c92724de@kernel.org>
- <20260510085602.57c7a081@kernel.org>
- <daa05c21-dcfc-4cc4-aa22-9e25c7f6c743@kernel.org>
- <41023c34-87a3-4e4f-b3ab-3ed53d171910@schippers-hamm.de>
- <b78f002a-8cb9-4857-bf8f-0137e790f644@kernel.org>
- <873511fa-4316-4411-a76b-ec4c5805abd3@schippers-hamm.de>
+Subject: Re: [PATCH net 1/2] ovpn: tcp - use cached peer pointer in
+ ovpn_tcp_close()
+To: David CARLIER <devnexen@gmail.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, Sabrina Dubroca <sd@queasysnail.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
+References: <20260512042036.19870-1-devnexen@gmail.com>
+ <20260512042036.19870-2-devnexen@gmail.com>
+ <CANn89i+qfzW_S-Z_vT3=UH00Qu2KodJf=V7O3o=yMVgfjK82xg@mail.gmail.com>
+ <CA+XhMqy50a8zq1foi564r2niHzJo54E3TCpT-YmYa=r2n75Uyg@mail.gmail.com>
 Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <873511fa-4316-4411-a76b-ec4c5805abd3@schippers-hamm.de>
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <CA+XhMqy50a8zq1foi564r2niHzJo54E3TCpT-YmYa=r2n75Uyg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: CEB9C522EA1
+X-Rspamd-Queue-Id: 0EC0F521D38
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
+	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287183-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-287184-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,vger.kernel.org,cloudflare.com,lunn.ch,davemloft.net,google.com,kernel.org,iogearbox.net,gmail.com,fomichev.me];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,google.com];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[openvpn.net:+];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,veth_bql_test_virtme.sh:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,openvpn.net:mid,openvpn.net:dkim]
 X-Rspamd-Action: no action
 
+Hi,
+
+On 12/05/2026 06:56, David CARLIER wrote:
+>    Same multi-read pattern shows up in ovpn_tcp_recvmsg(),
+>    ovpn_tcp_sendmsg(), ovpn_tcp_data_ready() and ovpn_tcp_write_space()
+>    - happy to roll those into v2 as well, or punt to a follow-up,
+>    whichever you'd prefer.
+
+@Eric, if you have no objection, I'd pick this patch up in my tree and 
+let David follow with a new patch for net-next.
+
+Regards,
 
 
-
-On 11/05/2026 22.37, Simon Schippers wrote:
-> On 5/11/26 20:08, Jesper Dangaard Brouer wrote:
->>
->>
->> On 11/05/2026 11.55, Simon Schippers wrote:
->>> On 5/11/26 10:11, Jesper Dangaard Brouer wrote:
->>>>
->>>>
->>>> On 10/05/2026 17.56, Jakub Kicinski wrote:
->>>>> On Sat, 9 May 2026 11:09:51 +0200 Jesper Dangaard Brouer wrote:
->>>>>> On 09/05/2026 04.06, Jakub Kicinski wrote:
->>>>>>> On Thu, 7 May 2026 21:09:09 +0200 Jesper Dangaard Brouer wrote:
->>>>>>>> Not against being able to modify VETH_RING_SIZE, but I don't think it is
->>>>>>>> the solution here.
->>>>>>>
->>>>>>> Was it evaluated, tho?
->>>>>>>
->>>>>>> It's obviously super easy these days have AI spew no end of complex
->>>>>>> code. So it'd be great to have some solid, ideally production-like
->>>>>>> data to back this all up.
->>>>>>>
->>>>>>> VETH_RING_SIZE seems trivial, ethtool set ringparam
->>>>>>
->>>>>> No, unfortunately we cannot just decrease the VETH_RING_SIZE.
->>>>>
->>>>> To be clear - I said may it configurable with ethtool -G
->>>>> not change the default.
->>>>>
->>>>
->>>> Sure, I understand the desire to make VETH_RING_SIZE configurable.
->>>> If doing so we are making Linux network stack harder to tune and setup
->>>> correctly. E.g. adding a qdisc to veth would also require changing the
->>>> ring size, but if system also uses XDP then tuning below 64 (likely 128)
->>>> will lead to hard-to-find packet drops.
->>>
->>> I mean 64 still could be a 4x improvement at least.
->>>
->>
->> No not really, setting it to 64 will give same (bad) latency from "BQL
->> off" which that patchset is trying to address.
->>
->>>>
->>>> I prefer adding something (like BQL) that auto-tune how much of the ring
->>>> queue we are using.  Good queues function as shock absorbers when
->>>> concurrent processes in the OS have scheduling noise.
->>>>
->>>> I acknowledge that Simon Schippers found that the BQL implementation was
->>>> actually not auto-tuning.  We need to work on this, my prototype
->>>> implementation [1] [2] works surprisingly well.
->>>>
->>>>
->>>> - [1] https://lore.kernel.org/all/3e43117f-356d-4086-a176-abd7fe2e6f0a@kernel.org/2-09-veth-time-based-bql-coalescing.patch
->>>> - [2] https://lore.kernel.org/all/3e43117f-356d-4086-a176-abd7fe2e6f0a@kernel.org/
->>>>
->>>>
->>>>>> The reason is that XDP-redirect into veth don't have any
->>>>>> back-pressure and would simply drop packets if queue size becomes
->>>>>> less than the NAPI budget (64). (Yes, we use both normal path and
->>>>>> XDP-redirect in production).
->>>>>
->>>>> Doesn't this mean you have a queue which is not under BQL control?
->>>>>
->>>>
->>>> It is a matter of perspective. BQL needs between 17-55 elements in the
->>>> 256 queue.  At the same time we handle if the ring runs full, e.g. due
->>>> to a sudden burst of XDP redirected packets, which pushes packets into
->>>> the qdisc layer.
->>>
->>> You are checking inflight/limit in /sys directory to get the 17-55
->>> number, right?
->>>
->>
->> Nope, I'm using a bpftrace program to keep track of the inflight/limit
->> in a BPF hashmap.  Reading from /sys will not be accurate.
-> 
-> Ah nice.
-
-Add the option --hist to have both NAPI and BQL histograms printed when
-script ends.  This will give you an accurate pattern of how inflight and
-limit evolves.
-
->>
->> I moved the selftests into a github repo [1] to allow us to collaborate
->> and evaluate the changes more easily.  I explicitly kept the new BPF
->> based BQL tracking as a commit[2] for your benefit.
->>
->>   [1] https://github.com/netoptimizer/veth-backpressure-performance-testing/tree/main/selftests
->>
->>   [2] https://github.com/netoptimizer/veth-backpressure-performance-testing/commit/f25c5dc92977
-> 
-> Thanks for sharing. After minor issues I was able to set it up
-> (currently I am just using plain v5, will look at the coalescing patch
-> when I find the time):
-> 
-> Can confirm the latency reduction with the default settings, in my case
-> 4.888ms to 0.241ms.
-> 
-> With the same script I was also able to see a performance slow down:
-> veth_bql_test_virtme.sh --qdisc fq_codel --nrules 0
-> --> ~510 Kpps
-> Same with --bql-disable
-> --> ~570 Kpps
-> --> 12% faster
-> 
-
-Thanks for running these benchmarks.
-
-Notice that --nrules 0 can easily result in no-queuing (on average),
-because the veth NAPI consumer is faster than the producer.  You will
-likely see BQL inflight=1 and sink reported avg latency very low
-(remember it okay that sink get high latency penalty as long at ping
-latency remains low, as that show AQM is working).
-
-There is an important gotcha. We actually have micro-burst of queuing
-(likely due to scheduling noise). Reading BQL stats from /sys will show
-BQL inflight=1, but when using the option --hist is it visible that
-@inflight have a long tail (see below signature).  The "qdisc" output
-line also shows this happening via requeues increasing (approx 17/sec in
-a test with 567Kpps). (this was with the time-based BQL impl).
-
-
->>
->> Sorry for cutting the remaining of the message, but I ran out of time,
->> as things are a bit challenging/hectic here at Cloudflare at the moment.
->>
->> --Jesper
-> 
-> All good, just ignore it. I think I misunderstood something anyway.
-
-Okay, I'll ignore it as I couldn't make sense of it ;-)
---Jesper
-
-
-
---- BQL inflight histogram (VETH_BQL_UNIT=1, values = packets) ---
-@inflight:
-[0, 1)            306565 |@ 
-      |
-[1, 2)           9250454 
-|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-[2, 3)           5561919 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
-      |
-[3, 4)            354341 |@ 
-      |
-[4, 5)             50137 | 
-      |
-[5, 6)             16771 | 
-      |
-[6, 7)              6001 | 
-      |
-[7, 8)              3076 | 
-      |
-[8, 9)              1949 | 
-      |
-[9, 10)             1965 | 
-      |
-[10, 11)            1954 | 
-      |
-[11, 12)            1914 | 
-      |
-[12, 13)            1732 | 
-      |
-[13, 14)            1559 | 
-      |
-[14, 15)            1405 | 
-      |
-[15, 16)            1269 | 
-      |
-[16, 17)            1194 | 
-      |
-[17, 18)            1190 | 
-      |
-[18, 19)            1148 | 
-      |
-[19, 20)            1079 | 
-      |
-[20, 21)            1008 | 
-      |
-[21, 22)             951 | 
-      |
-[22, 23)             870 | 
-      |
-[23, 24)             826 | 
-      |
-[24, 25)             775 | 
-      |
-[25, 26)             764 | 
-      |
-[26, 27)             740 | 
-      |
-[27, 28)             714 | 
-      |
-[28, 29)             665 | 
-      |
-[29, 30)             626 | 
-      |
-[30, 31)             607 | 
-      |
-[31, 32)             601 | 
-      |
-[32, 33)             583 | 
-      |
-[33, 34)             593 | 
-      |
-[34, 35)             574 | 
-      |
-[35, 36)             562 | 
-      |
-[36, 37)             554 | 
-      |
-[37, 38)             538 | 
-      |
-[38, 39)             528 | 
-      |
-[39, 40)             525 | 
-      |
-[40, 41)             512 | 
-      |
-[41, 42)             542 | 
-      |
-[42, 43)             529 | 
-      |
-[43, 44)             526 | 
-      |
-[44, 45)             513 | 
-      |
-[45, 46)             503 | 
-      |
-[46, 47)             485 | 
-      |
-[47, 48)             480 | 
-      |
-[48, 49)             473 | 
-      |
-[49, 50)             474 | 
-      |
-[50, 51)             476 | 
-      |
-[51, 52)             476 | 
-      |
-[52, 53)             465 | 
-      |
-[53, 54)             454 | 
-      |
-[54, 55)             446 | 
-      |
-[55, 56)             430 | 
-      |
-[56, 57)             425 | 
-      |
-[57, 58)             425 | 
-      |
-[58, 59)             422 | 
-      |
-[59, 60)             407 | 
-      |
-[60, 61)             390 | 
-      |
-[61, 62)             370 | 
-      |
-[62, 63)             354 | 
-      |
-[63, 64)             343 | 
-      |
-[64, 65)             325 | 
-      |
-[65, 66)             303 | 
-      |
-[66, 67)             158 | 
-      |
-[67, 68)             136 | 
-      |
-[68, 69)             124 | 
-      |
-[69, 70)             110 | 
-      |
-[70, 71)              99 | 
-      |
-[71, 72)              94 | 
-      |
-[72, 73)              82 | 
-      |
-[73, 74)              74 | 
-      |
-[74, 75)              58 | 
-      |
-[75, 76)              52 | 
-      |
-[76, 77)              45 | 
-      |
-[77, 78)              40 | 
-      |
-[78, 79)              39 | 
-      |
-[79, 80)              38 | 
-      |
-[80, 81)              21 | 
-      |
-[81, 82)               4 | 
-      |
-[82, 83)               4 | 
-      |
-[83, 84)               4 | 
-      |
-[84, 85)               2 | 
-      |
-[85, 86)               2 | 
-      |
-[86, 87)               2 | 
-      |
-[87, 88)               2 | 
-      |
-[88, 89)               1 | 
-      |
-
-
---- BQL limit histogram (auto-tuned, values = packets) ---
-@limit_val:
-[61, 62)          221346 |@ 
-      |
-[62, 63)               0 | 
-      |
-[63, 64)          772169 |@@@ 
-      |
-[64, 65)        10053949 
-|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-[65, 66)               0 | 
-      |
-[66, 67)               0 | 
-      |
-[67, 68)               0 | 
-      |
-[68, 69)               0 | 
-      |
-[69, 70)               0 | 
-      |
-[70, 71)          457838 |@@ 
-      |
-[71, 72)               0 | 
-      |
-[72, 73)          610198 |@@@ 
-      |
-[73, 74)               0 | 
-      |
-[74, 75)               0 | 
-      |
-[75, 76)               0 | 
-      |
-[76, 77)               0 | 
-      |
-[77, 78)               0 | 
-      |
-[78, 79)         2328284 |@@@@@@@@@@@@ 
-      |
-[79, 80)         1150181 |@@@@@ 
-      |
-
-@inflight_stats: count 15593965, average 1, total 23078061
-
-@limit_stats: count 15593965, average 67, total 1054054856
-
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
 
