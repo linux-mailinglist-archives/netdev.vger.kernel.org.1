@@ -1,222 +1,232 @@
-Return-Path: <netdev+bounces-286978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286979-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KODFDmfWAmpXyAEAu9opvQ
-	(envelope-from <netdev+bounces-286978-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 09:27:35 +0200
+	id +DmHMgjXAmpXyAEAu9opvQ
+	(envelope-from <netdev+bounces-286979-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 09:30:16 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7F3751BD02
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 09:27:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37F5D51BD96
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 09:30:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 566383055BD1
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 07:20:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0D9B2303D2D2
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 07:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1363947DD66;
-	Tue, 12 May 2026 07:20:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38D4B47A0C2;
+	Tue, 12 May 2026 07:24:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a/qLRcRr";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="cP9wZRSx"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="lUXMmUla"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D74478E5D
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 07:20:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95192379C5F;
+	Tue, 12 May 2026 07:24:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778570412; cv=none; b=pAnDeTe3yuwwhxihd3nwkrQcZcEO9H5HYbn4X9zExwONnglTQQkIo91pOUwwL7+YBRUGLRk+kR81/4ZgRkrgViPzGOHuazxuO58ka0SNDBoeVS43DFGeQwNKHs+xiceV9q2HH+G4QmqlDR1umIcj3oXwzX8CbYE0gcbk7u7iiNM=
+	t=1778570656; cv=none; b=pEC2G/vhHIAyR5KwTV/VzIqDMjfbAWVPZBfvfqJwBc4VKKA3BoGTfYQjT7eYxl+fwHzSAeMhL8kvn4DL4xoKMBcED+XMKihKjMs0Zql2Iyyyso8JrNSu4AKLdpuJR5LHYFR9dAF+BNlO9zRux2IAAkpYGHCV7KteTSp3xGB4nhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778570412; c=relaxed/simple;
-	bh=C9nOtZphHGvpRbbB1mh095pYAR4HXW7ByitF0l7nAq0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zu11cTk09ZLA/rSUMDYdUMHjBTEGlEvZCB5M2Xr1Z61qbgBe+vjF1dUtsa2Vto7Wea8r2p1qrezILyvPHmIcWjVbAwU+qq09/xW0zxAv+gwAhl4oZqpLXnn7xjRSIIUWQNpDqvEOOuPCrACaw6ASq13pm0Yt7IKnDpA8H3XjcQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a/qLRcRr; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=cP9wZRSx; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778570406;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QjTia8hEEWTMEUzJIZRRaWOPCFQqnc9xnPKI05ARaEw=;
-	b=a/qLRcRrpV7bC6S1euMGgPpBYOi/lVZ3WoGPZefAZ5arSzWMlsi/v9pIopdBvpcRqqOsTP
-	TazwQYW0Act/DJuN4vxWi4FXbT/tYIXvZHaha03usQakdu6yE0SPyIhAvEiO/yKfOUeNSy
-	BeL0j7jroPSe/yLV0hVlv6meuGDacrk=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-576-aHMKUtdlPZCqQt-HmyBFzA-1; Tue, 12 May 2026 03:20:05 -0400
-X-MC-Unique: aHMKUtdlPZCqQt-HmyBFzA-1
-X-Mimecast-MFC-AGG-ID: aHMKUtdlPZCqQt-HmyBFzA_1778570404
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-488bd1ee9e7so56931945e9.1
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 00:20:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1778570404; x=1779175204; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=QjTia8hEEWTMEUzJIZRRaWOPCFQqnc9xnPKI05ARaEw=;
-        b=cP9wZRSxRq8qvPmqlHHwVZQSEVFNWuYPiFxG6iNVSMEjb1K27TVa5fm4HpT3pZASoc
-         GLh8Zb3BOB3M7ty4wevx8EJ2pZIfeHEuKy+w+I37/JGJw4hbNmei+W6YmIkJOo8pPKGJ
-         y2M/xhsDhCihHUE7hWw/jqofFw4JrOhl6oPyM5pxDVR7ubSsj4cf7l2eRJniry9k8juT
-         GSIxRBFFmMXFMmnGdMVYQsUltfpo3xLlt8jmQZkv+rtkMboXg2TxwiVLO8TvzpV2EYM6
-         mWlFOGJ5vyavE1lUAWs20qj4RQnAJPm3Mj/vpswFkuFjsXSCvd4iIvVIS1JT1rlkfeOX
-         Zygw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778570404; x=1779175204;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QjTia8hEEWTMEUzJIZRRaWOPCFQqnc9xnPKI05ARaEw=;
-        b=IB8KG8+EVqqJLeb2mGzGFAPMr4mZl7Cs1iPHLtVG+wPfRgbUW+FWDshOCTf6LtPKOC
-         Z+tNfQZ2KUkbBtPL5CcMLTdUy/mzpAA3ofDxyTr0vjF3ZKTf7HuUfyftDmgkHs6sMKr0
-         /iJV8LKBZcN5DgV/gbGBxZzisgiyAuILgbeeiKgnF091fOn5RfY/eHyW6nbWs/TBYPGt
-         3E8pqDr7tuMyVL2bTk3hIIYQ2SFM2OqH6d49FVexLJF+3i7YzbNGnfR/2+14SkEp8WbM
-         hi9SL91eeH4Gs0absJt/7+OkrL0zNOvFSnVfFQi1vjO3Xql54cBsFHljU/nCIf1A7fJw
-         Pp3Q==
-X-Forwarded-Encrypted: i=1; AFNElJ88stnj9hhIKfHvzoomxNFArnMytog7sK64p+9OT2yhwYwHqFGnvd81EwGOuxQ8czQBHQDk8dw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxddbBBQsGqNPOvzeVpQhR1IWf3D8mE5pVfWiyHrB5QeM3rF/Sg
-	X3yBQyYgtZR61Mbf6iRESh6mtEmLhtyGWgDS/HXkxntPJ6v3vWURvyvMiStrET9vfKmSvZB4izP
-	52/m0aUrTz34WRxQGD5VxrA0YvcV0sn7RyCNUmcSL6mzrOjiXtcS1QnoYng==
-X-Gm-Gg: Acq92OEA7OFlEVVFpkfwRzKIkeslK4c1Kt+J+yDe0Rzn3oJNv56MOw5CBUgz/9yC7bo
-	uQ/yI2cvsCq13XQyGpnfGEBy1ad5yV1KbUhH09NsHX92wTWyDEMfkjemL0OBKSrZ+Zoux96ZXm2
-	nQ7fgcZe2t3ordPTeQyKL31AsWOuifZJOMcYdYnfS5c2TC9TxsEnxASG54iOSuY27pKVjdWL9JF
-	4UvIueL+OP28nd4B2UStg/25/rQ3oo6crFdgPOueKm/XFwYaLZzpyri+y1xjPJx9dBFZiGw8ag9
-	/F4SbK4R5Xb8iicfmXs7uKiUfseMA7ZPsMKEEGCQlaVb1ZE5Rmk5/Kc+tJH+iE5ongH/D3xQ0dR
-	9+2ch//3Hk4jp2n2Ymel3IHhteFx+FV4dPbjFIHMbv7YRLz2xMMZeoWQ44l9ISkaOTSJlMiaozw
-	==
-X-Received: by 2002:a05:600c:3ba8:b0:48a:97b6:7420 with SMTP id 5b1f17b1804b1-48e707fbac7mr215488935e9.24.1778570403941;
-        Tue, 12 May 2026 00:20:03 -0700 (PDT)
-X-Received: by 2002:a05:600c:3ba8:b0:48a:97b6:7420 with SMTP id 5b1f17b1804b1-48e707fbac7mr215488205e9.24.1778570403394;
-        Tue, 12 May 2026 00:20:03 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-16-204-231.retail.telecomitalia.it. [87.16.204.231])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e906ae8b5sm44119615e9.6.2026.05.12.00.20.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 May 2026 00:20:02 -0700 (PDT)
-Date: Tue, 12 May 2026 09:19:58 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	virtualization@lists.linux.dev, "David S. Miller" <davem@davemloft.net>, 
-	Jason Wang <jasowang@redhat.com>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, 
-	Paolo Abeni <pabeni@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, kvm@vger.kernel.org, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>
-Subject: Re: [PATCH net] vsock/virtio: fix skb overhead accounting to
- preserve full buf_alloc
-Message-ID: <agLR7RkX_3kvL_qw@sgarzare-redhat>
-References: <20260508092330.69690-1-sgarzare@redhat.com>
- <20260508055125-mutt-send-email-mst@kernel.org>
- <af2y2Fyp7H-om-ur@sgarzare-redhat>
- <20260508063104-mutt-send-email-mst@kernel.org>
- <af28MAV0LF4qHVmB@sgarzare-redhat>
- <CAGxU2F65pw0P1uKOOJpBc4p6KjCz8iePEh9aPybUyECBm1=otg@mail.gmail.com>
- <20260511084551-mutt-send-email-mst@kernel.org>
- <CAGxU2F6TPfRxZ7SX20vXiqDM4_sY3yUQBUSfEM=Nr+TKXwT9mA@mail.gmail.com>
- <20260511164841.7f7ff557@kernel.org>
+	s=arc-20240116; t=1778570656; c=relaxed/simple;
+	bh=Q8m6yJUAzZ1DjBo1Ixq9BK6Whyd7fptgdjG/9Qab3rA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=S8IoeM2S5Htoml46W4vpOQG/cb8rI7bPl9i61JdPUdpJq1+Yh17l1jCvu6QoYcPxHMtUxOhkrJGt4Hl3Xme6Szt3n4E3FIyb3AUYYmooA1/8jBtdrbzXoF9tq3txAuKHJtVMZ5yaSXudRVP+rSAAd+BoXDHJjZanCuo7jMkjv7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=lUXMmUla; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64BK5wbG276015;
+	Tue, 12 May 2026 00:23:48 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=T4H+J9WLDC5qHv1EsOkjJz7
+	BFbbOeejtKz2mlsp8SaU=; b=lUXMmUlaxYZfu8qnlTMclvdQWrVIvNtxwWXDL6J
+	pUaaIK2WW6Rj2J1ISGH8YFlYchC0S1Zt7gB80+jRe5r6IQIvOh993MNqlWfrlkKS
+	eiCETVOCz7p/I7ku4AkfUdmtfEyDsuqIu2Dw52Q2UfVT91AHdy+XdZeML972ftFW
+	js5LRe1HUURSYHxMmt/GLzjgapcWIYaFmc4kcO0Gx+VWnIFvIOcTXTFsGhJHkuwZ
+	KiqRXLjaWPBWhKKFlhOzWmX3rsu21fZ7J1SIP57gWCwmiF1xGBk8NGrfDCR0+Gho
+	2PRbwrdMk5fdNeTGNQWMWEQhPBcYBP9YF9Ni9c7BwZ+Lw9w==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4e3nuqhne3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 May 2026 00:23:48 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 12 May 2026 00:23:47 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Tue, 12 May 2026 00:23:47 -0700
+Received: from hyd1vellox1.032marvell.com032caveonetworks.com (unknown [10.29.37.43])
+	by maili.marvell.com (Postfix) with ESMTP id 58DA13F7062;
+	Tue, 12 May 2026 00:23:42 -0700 (PDT)
+From: Anshumali Gaur <agaur@marvell.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <gakula@marvell.com>,
+        <hkelam@marvell.com>, <sbhatta@marvell.com>, <sgoutham@marvell.com>,
+        <bbhushan2@marvell.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: Anshumali Gaur <agaur@marvell.com>
+Subject: [PATCH net-next v3] octeontx2-pf: Retain ethtool stats across interface down/up.
+Date: Tue, 12 May 2026 12:53:38 +0530
+Message-ID: <20260512072338.1460580-1-agaur@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260511164841.7f7ff557@kernel.org>
-X-Rspamd-Queue-Id: C7F3751BD02
+Content-Type: text/plain
+X-Proofpoint-GUID: k0a4LadxCJInkmIdDHX5xUX5HU-tEdtY
+X-Authority-Analysis: v=2.4 cv=TufWQjXh c=1 sm=1 tr=0 ts=6a02d584 cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=TtqV-g6YmW1Jfm2GSLaY:22 a=M5GUcnROAAAA:8 a=xvtfhBl5x4iTznrZZiMA:9
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTEyMDA3MSBTYWx0ZWRfX432UzIhAV24F
+ v15w8DQCGeirzi6kCPtEvC5zLx6KpYBcBoxOyVrdgMYlhiprRnreCeKHCKtyQKrudl/kU5CO5BK
+ 1zcWWVFdZIq6+rGhOsZNlWwO5q/+ZVxGXDm2DUUBLuny266O1dRUPzysy1acVao6L3zkqZu74wn
+ 5sSlqZVlMy/+2RUpcvJb0tk1zdjRvjZPkIHSjG8KUAE4Ccl2DQCV2WnhT2g0z7ThK9e0cUVt0Gs
+ 8WFVPuh2BKo4lO4xSJFAj1NlNlSd2ioFdjlpEqewyjrI6LYYwDNx+mdS2Me/wDd/MFqWOZzgvLJ
+ WbDqpZp3w6/qpriNMSQL1duvOAQn8ojktK6b3lBt9x130JuEgP8ODCju/91HPoUDDy+ljChfLDQ
+ oHcsMNXQ/zmzjko5ZCALLQHU/cZy6vvbQwO+jdAK+cKSoCXYa9lMt3bD/3RVeQ4rpXqugBW2CK9
+ fEiQ6Lkk4rv+XLS5USQ==
+X-Proofpoint-ORIG-GUID: k0a4LadxCJInkmIdDHX5xUX5HU-tEdtY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-11_05,2026-05-08_02,2025-10-01_01
+X-Rspamd-Queue-Id: 37F5D51BD96
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286978-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-286979-lists,netdev=lfdr.de];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[agaur@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,marvell.com:email,marvell.com:mid,marvell.com:dkim];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.998];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Action: no action
 
-On Mon, May 11, 2026 at 04:48:41PM -0700, Jakub Kicinski wrote:
->On Mon, 11 May 2026 15:17:56 +0200 Stefano Garzarella wrote:
->> > > Okay, I thought it over over the weekend, and I agree that this patch
->> > > still doesn't solve the problem and would still result in packet loss.
->> > > So, until we resolve the issue permanently, and since 059b7dbd20a6 is
->> > > coming to stable, I'd like to rework this patch so that we only start
->> > > dropping packets when the overhead plus the queued bytes exceeds
->> > > `buf_alloc * 2`.
->> > > Removing the other changes to reduce the buf_alloc advertised, but
->> > > terminating the connection so that both peers are aware that something
->> > > went wrong.
->> > >
->> > > Any objections?
->> > >
->> > > Stefano
->> >
->> > Let's try to first fix it upstream properly please. Discuss backporting
->> > later.
->>
->> Commit 059b7dbd20a6 ("vsock/virtio: fix potential unbounded skb
->> queue") is already in Linus tree and will land soon on stable. Which
->> issue do you see on having a patch on top of that to close the
->> connection instead of losing data and breaking our test suite?
->>
->> IMO we need that change in any case, because the previous code also
->> discarded packets without any notification, whereas breaking the
->> connection would be better in that case.
->
->Sorry if I'm speaking out of turn or misunderstanding but, like Michael
->says, let's focus on fixing this the way we want it to be fixed?
+Currently the hardware counters reset when the interface is
+brought down, causing stats visible to userspace to drop to zero.
+Save the accumulated stats before bringing the interface down
+so they persist across routine down/up cycles.
 
-IMHO, these are two separate issues (related but still separated):
+Signed-off-by: Anshumali Gaur <agaur@marvell.com>
+---
+v3:
+  - Code format according to kernel coding style
+  - Reword commit message
+v2:
+  - Fix subject prefix to target net-next
+ .../marvell/octeontx2/nic/otx2_common.c       | 20 ++++++++++---------
+ .../marvell/octeontx2/nic/otx2_common.h       |  1 +
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 17 ++++++++++++++++
+ 3 files changed, 29 insertions(+), 9 deletions(-)
 
-1. taking overhead into account and setting a limit (which Eric started 
-doing in 059b7dbd20a6)
-
-2. reducing overhead by also merging SEQPACKET as Michael proposed (we 
-already do this for STREAM).
-
-Even with option 2, the overhead won’t disappear, and we should maintain 
-a limit as Eric rightly pointed out, especially since the initial 
-problem was a flood of EOMs with 0 or 1 bytes, which option 2 doesn’t 
-solve, since the overhead will eventually explode.
-
-So I agree that we should implement 2 as Michael proposed, but I think 
-we also need to fix 1 by improving it slightly (as I’ve tried here, and 
-would like to do in v2).
-
-Since I have v2 ready and tested, I'll send it because I think we should 
-have it in any case, even with option 2 implemented.
-
->IIUC you are trying to minimize the size of the fix, please don't worry
->about the LoC in the diff at this stage.
->
-
-Okay, I'll try to work on it, but this week is a nightmare. I hope to 
-come up with something by building on Michael's idea.
-
-Thanks,
-Stefano
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+index 971fcab1c248..0ffcc613a4b2 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+@@ -139,19 +139,21 @@ void otx2_get_stats64(struct net_device *netdev,
+ 		      struct rtnl_link_stats64 *stats)
+ {
+ 	struct otx2_nic *pfvf = netdev_priv(netdev);
+-	struct otx2_dev_stats *dev_stats;
++	struct otx2_dev_stats *dev_stats, *old_stats;
+ 
+ 	otx2_get_dev_stats(pfvf);
+ 
+ 	dev_stats = &pfvf->hw.dev_stats;
+-	stats->rx_bytes = dev_stats->rx_bytes;
+-	stats->rx_packets = dev_stats->rx_frames;
+-	stats->rx_dropped = dev_stats->rx_drops;
+-	stats->multicast = dev_stats->rx_mcast_frames;
+-
+-	stats->tx_bytes = dev_stats->tx_bytes;
+-	stats->tx_packets = dev_stats->tx_frames;
+-	stats->tx_dropped = dev_stats->tx_drops;
++	old_stats = &pfvf->hw.old_stats;
++
++	stats->rx_bytes = old_stats->rx_bytes + dev_stats->rx_bytes;
++	stats->rx_packets = old_stats->rx_frames + dev_stats->rx_frames;
++	stats->rx_dropped = old_stats->rx_drops + dev_stats->rx_drops;
++	stats->multicast = old_stats->rx_mcast_frames + dev_stats->rx_mcast_frames;
++
++	stats->tx_bytes = old_stats->tx_bytes + dev_stats->tx_bytes;
++	stats->tx_packets = old_stats->tx_frames + dev_stats->tx_frames;
++	stats->tx_dropped = old_stats->tx_drops + dev_stats->tx_drops;
+ }
+ EXPORT_SYMBOL(otx2_get_stats64);
+ 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+index eecee612b7b2..ad65aa19b80d 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+@@ -255,6 +255,7 @@ struct otx2_hw {
+ 
+ 	/* Stats */
+ 	struct otx2_dev_stats	dev_stats;
++	struct otx2_dev_stats	old_stats;
+ 	struct otx2_drv_stats	drv_stats;
+ 	u64			cgx_rx_stats[CGX_RX_STATS_COUNT];
+ 	u64			cgx_tx_stats[CGX_TX_STATS_COUNT];
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index ee623476e5ff..a68d1c42d16b 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -2154,6 +2154,8 @@ EXPORT_SYMBOL(otx2_open);
+ int otx2_stop(struct net_device *netdev)
+ {
+ 	struct otx2_nic *pf = netdev_priv(netdev);
++	struct otx2_dev_stats *old_stats = &pf->hw.old_stats;
++	struct otx2_dev_stats *dev = &pf->hw.dev_stats;
+ 	struct otx2_cq_poll *cq_poll = NULL;
+ 	struct otx2_qset *qset = &pf->qset;
+ 	int qidx, vec, wrk;
+@@ -2162,6 +2164,21 @@ int otx2_stop(struct net_device *netdev)
+ 	if (pf->flags & OTX2_FLAG_INTF_DOWN)
+ 		return 0;
+ 
++	/* Accumulate old stats */
++	old_stats->rx_bytes     += dev->rx_bytes;
++	old_stats->rx_drops     += dev->rx_drops;
++	old_stats->rx_bcast_frames      += dev->rx_bcast_frames;
++	old_stats->rx_mcast_frames      += dev->rx_mcast_frames;
++	old_stats->rx_ucast_frames      += dev->rx_ucast_frames;
++	old_stats->rx_frames            += dev->rx_frames;
++
++	old_stats->tx_bytes             += dev->tx_bytes;
++	old_stats->tx_drops             += dev->tx_drops;
++	old_stats->tx_bcast_frames      += dev->tx_bcast_frames;
++	old_stats->tx_mcast_frames      += dev->tx_mcast_frames;
++	old_stats->tx_ucast_frames      += dev->tx_ucast_frames;
++	old_stats->tx_frames            += dev->tx_frames;
++
+ 	netif_carrier_off(netdev);
+ 	netif_tx_stop_all_queues(netdev);
+ 
+-- 
+2.25.1
 
 
