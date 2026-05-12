@@ -1,161 +1,185 @@
-Return-Path: <netdev+bounces-287130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287131-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iIAgCfsoA2qw1AEAu9opvQ
-	(envelope-from <netdev+bounces-287130-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:19:55 +0200
+	id QCacDJwnA2qw1AEAu9opvQ
+	(envelope-from <netdev+bounces-287131-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:14:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 771FC521011
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:19:53 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29F37520E60
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:14:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2917031CDDA9
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:01:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2A3543091FDC
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:03:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6791739D3CB;
-	Tue, 12 May 2026 12:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA9113812C8;
+	Tue, 12 May 2026 13:02:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MOIzxd8M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XsxOwoWF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62ED39AD49
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 12:58:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 847D937DAC1;
+	Tue, 12 May 2026 13:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778590705; cv=none; b=lkf3+EB2/WYNPh6KuEGimzA+NZvcIxITKbdoH5bkhW9t+7SHFblRscUM8OShs50DUmN8ZVhxTEHCTSJznTCmioW03dpZhQRuBJriSsyDX7PLRwQTgfh9suTmGYxLtL8jiuVsKH6qP2zdKDLJrN/9GhRvkZrzbQ6WsGYC4hflZiM=
+	t=1778590948; cv=none; b=Lm3Ce/A6TTRirKxmyJ+bD/43XJrah5CCkg9M1LNOKkS+Q4LwLqGhLBtrBUjeur89uc4ECoZD0X6J/jh+PSzu1OoQVOUFcPSf11z5tJDNsC4wEf+8aCgfP3VAqMgzNl5DJX6KwApccu7qxRP38ZshuLe2g4wCEMNhakh+p251yhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778590705; c=relaxed/simple;
-	bh=pLY3GB/npkRWavBDYzVZGZTO+VbOpmmXpr9lI4mz4fA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=b0cwKn04qsigOZs8n9O4zgfEzmYwVY35r4JuPNeRyKQZariaXaKYSYxFXcAgEI4KmYoS9calesniQZ2Kg+CsC8emr2F8pjBaNQ+1tO3iy/4icoj7Mm8U7jjGfQPGZ4sQ89HKoKBhavplETRLvQWkK+yrUDVexnLSRAHj5D6CD2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MOIzxd8M; arc=none smtp.client-ip=209.85.221.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-44d9ace59efso3653620f8f.1
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 05:58:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778590702; x=1779195502; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vDWMnr041UI5ryil+k7XvoK/2F/EkGtTQwaeX0kDxi0=;
-        b=MOIzxd8M06jLqZdVnSSn+fl9/YjNb4fjltt3R3ync0g1aVCwi8YsgnwqqEWpVN8yDC
-         n+OZ7ayH7XM6XVwBPjR1+VLhNblCt+0q//YKBpjHER2l7IYfYuYOOxQ7f8ecykI7F02P
-         qkpSKl184Vd6WqziVquto1rxJ8hyAXM56pR5oWegNIdo1wSO0nnxkzMeh/4dD3Wh1nVf
-         nooc/ABS+gZVsfESPEkewzYXTezcopIVf1niMTLkEcyFxRmkfrARRbeksuYo94w0359A
-         VfwaoWUawNdMkdyXjfVfZJEmZG/iFsEiRQH/30Eqo3ct21ffxyFsmlAAXOItNxt9+WeH
-         W3Ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778590702; x=1779195502;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vDWMnr041UI5ryil+k7XvoK/2F/EkGtTQwaeX0kDxi0=;
-        b=dazapgfaFhukVf6ODnolYCTdtEmy4CSKcLrih1KXhrjSK6ZnrV9GxySWXppTkY67a3
-         dnVqNVvAtRfmkXfdzNB2uzgWpueLG6VGxFR0LUgEwjJR4uUVRamVUax+lrP2P3OZ+h7B
-         i0d50hmru9sQ4AmtBmOCu872Z5mzCEX4KyHdNkG1L364+rDucWuhFRVPTb199izk5HR/
-         cgy64VDSCiqUP+Kzt+mg6nNDcH1M2yHGSLO13AfDSx01uCYoAnrKGarNVyy3Sw4tZGH4
-         NErDJCbhdMq01jD19JezuyY6+UOSxZm8oRBxHDN8VJsPp9diPjyI2Kj0S3ItpsePe78p
-         CeLg==
-X-Forwarded-Encrypted: i=1; AFNElJ+l+MvzFnna3NRY9u59jjb/buPgK/+2I4O4S3pxC/iy2xBa96hH2b6FCFQ70lyFOAfONX6FVcQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxwle4Uyyhj8wr6XNLqRWLgHm3Bf3RQBoGS2BQrGsOQHRc9w/k0
-	JJfFxqe9tMZwc/8wE2NFxXnWRTSt8bFTw1rNM3HyM6mTbmG2oQv8QUzeZ3EKz8iW2auoMtJqIj2
-	F8rZ9oJuBVbBsIA==
-X-Received: from wmby19.prod.google.com ([2002:a05:600c:c053:b0:485:3aa2:da59])
- (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:8010:b0:48a:5339:ef0e with SMTP id 5b1f17b1804b1-48e70687eabmr216165565e9.3.1778590701567;
- Tue, 12 May 2026 05:58:21 -0700 (PDT)
-Date: Tue, 12 May 2026 12:58:20 +0000
-In-Reply-To: <20260326-gfp64-v2-0-d916021cecdf@google.com>
+	s=arc-20240116; t=1778590948; c=relaxed/simple;
+	bh=f1Cmp6x7er93//nyD3TawZv0vsj07LKElhYzhE9mgUA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TOMLeTq3kIExr8y5v+Xt9WbVWJRoRxWj1RKXabmHH8WYxcjvkcTtOG5yKa217bD6YUtBYsEgWl+eAct4bw7iIpIlrVkUa7ts4HnywBCPbtwEaFdEYhOSZQLydPjpl2JwXzE5CzsNk91fnZGmpLr3ygww/Lv43yDYEbxrOOi0zds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XsxOwoWF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47591C2BCB0;
+	Tue, 12 May 2026 13:02:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778590948;
+	bh=f1Cmp6x7er93//nyD3TawZv0vsj07LKElhYzhE9mgUA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=XsxOwoWF67H2XEf/xVTeAJlQVGVO5Cx0h5UifrJMBevWdPjUn7bKn5L+OouFDf4/M
+	 QtEt4YjpdDdBKFuzS6/cUvJ2XZUthYfLJJRylJu/q1Lr9FsbpAllICbkkyIS7qedF7
+	 IOntVcQbTvr2bUwEf8ANcKzrGJRt1PPPJ8lLWKCk/h4dGOTBFd6bTLToHJVT89r2bD
+	 N42V8CcbTkYvarUR2Fe6VZkwO4aoYgg30CkwRRkQZDbofLYTVYLvLHjHccLsswiD2l
+	 eJ0AdwHmzU/gf7pdBLKFYrUwzZs3Jgk2+KD5RxFfmanV96rFm1rJtzdDlG/w6GMsnM
+	 ZNTqinlGhvguQ==
+Message-ID: <03ad4927-6bde-45c4-a90c-92ecfa0a680f@kernel.org>
+Date: Tue, 12 May 2026 15:02:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260326-gfp64-v2-0-d916021cecdf@google.com>
-X-Mailer: aerc 0.21.0
-Message-ID: <DIGPS83BGEGA.5I7VLH8TV7XE@google.com>
-Subject: Re: [PATCH v2 0/4] treewide: fixup gfp_t printks
-From: Brendan Jackman <jackmanb@google.com>
-To: Brendan Jackman <jackmanb@google.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Stanislaw Gruszka <stf_xl@wp.pl>, 
-	Alexander Potapenko <glider@google.com>, Marco Elver <elver@google.com>, 
-	Dmitry Vyukov <dvyukov@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Allison Henderson <allison.henderson@oracle.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>
-Cc: <dri-devel@lists.freedesktop.org>, <linux-kernel@vger.kernel.org>, 
-	<linux-wireless@vger.kernel.org>, <kasan-dev@googlegroups.com>, 
-	<linux-mm@kvack.org>, <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>, 
-	<rds-devel@oss.oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 771FC521011
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net 5/5] mptcp: update window_clamp on subflows when
+ SO_RCVBUF is set
+Content-Language: fr
+To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Gang Yan <yangang@kylinos.cn>,
+ stable@vger.kernel.org
+References: <20260511-net-mptcp-misc-fixes-7-1-rc4-v1-0-5ee57cb2b7eb@kernel.org>
+ <20260511-net-mptcp-misc-fixes-7-1-rc4-v1-5-5ee57cb2b7eb@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20260511-net-mptcp-misc-fixes-7-1-rc4-v1-5-5ee57cb2b7eb@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 29F37520E60
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-287131-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287130-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[google.com,linux.intel.com,kernel.org,suse.de,gmail.com,ffwll.ch,wp.pl,linux-foundation.org,oracle.com,davemloft.net,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[25];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jackmanb@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Thu Mar 26, 2026 at 12:31 PM UTC, Brendan Jackman wrote:
-> This patchset used to be about switching gfp_t to unsigned long. That is
-> probably not gonna happen any more but while writing it I found these
-> cleanups that seem worthwhile regardless.
->
-> Signed-off-by: Brendan Jackman <jackmanb@google.com>
-> ---
-> Changes in v2:
-> - Drop gfp_t changes
-> - Add correct CCs
-> - Add minor fixups to preexisting code spotted by AI review
-> - Link to v1: https://lore.kernel.org/r/20260319-gfp64-v1-0-2c73b8d42b7f@google.com
->
-> ---
-> Brendan Jackman (4):
->       drm/managed: Use special gfp_t format specifier
->       iwlegacy: 3945-mac: Fixup allocation failure log
->       mm/kfence: Use special gfp_t format specifier
->       net/rds: Use special gfp_t format specifier
->
->  drivers/gpu/drm/drm_managed.c                  | 4 ++--
->  drivers/net/wireless/intel/iwlegacy/3945-mac.c | 4 ++--
->  mm/kfence/kfence_test.c                        | 2 +-
->  net/rds/tcp_recv.c                             | 2 +-
->  4 files changed, 6 insertions(+), 6 deletions(-)
-> ---
-> base-commit: c369299895a591d96745d6492d4888259b004a9e
-> change-id: 20260319-gfp64-7a970a80ba4e
->
-> Best regards,
+Hello,
 
-Hi all,
+On 11/05/2026 17:46, Matthieu Baerts (NGI0) wrote:
+> From: Gang Yan <yangang@kylinos.cn>
+> 
+> Add __mptcp_subflow_set_rcvbuf() helper to write the subflow sk_rcvbuf,
+> but also to call the recently added tcp_set_rcvbuf() helper to update
+> window_clamp. This is needed because the window clap is updated when
+> scaling_ratio changes, in tcp_measure_rcv_mss(). Until scaling_ratio
+> changes, the subflow is stuck with the old window clamp which may be
+> based on a small initial buffer.
+> 
+> Use this new helper in both mptcp_sol_socket_sync_intval() (setsockopt
+> path) and sync_socket_options() (new subflow creation path).
 
-Any chance someone can take these?
+(...)
+
+> diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+> index 1cf608e7357b..1544e3563852 100644
+> --- a/net/mptcp/sockopt.c
+> +++ b/net/mptcp/sockopt.c
+> @@ -67,6 +67,12 @@ static int mptcp_get_int_option(struct mptcp_sock *msk, sockptr_t optval,
+>  	return 0;
+>  }
+>  
+> +static inline void __mptcp_subflow_set_rcvbuf(struct sock *ssk, int val)
+
+Arf, I missed that when reviewing this patch: the 'inline' keyword
+should be dropped here.
+
+This patch can be dropped from the series as it is not related with the
+rest, or I can send a v2 for the whole series later on.
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
