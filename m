@@ -1,144 +1,191 @@
-Return-Path: <netdev+bounces-287207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287208-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2DL8IABHA2ri2QEAu9opvQ
-	(envelope-from <netdev+bounces-287207-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:28:00 +0200
+	id wPVXEE5BA2oy2QEAu9opvQ
+	(envelope-from <netdev+bounces-287208-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:03:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BD03523A21
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:27:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 46E8E52336D
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:03:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5618D31B05C9
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 14:43:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CCBB731FEF27
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 14:45:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE2163B5F50;
-	Tue, 12 May 2026 14:41:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9E63BB68F;
+	Tue, 12 May 2026 14:44:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h2dNJszl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Parc8l9R"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA52432143D;
-	Tue, 12 May 2026 14:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7AD132143D
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 14:44:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778596872; cv=none; b=NZwpMmPKnFGFbeGmptZMHtqxPf+kYUeBgozUIM6Ec2emXpCwrFP+sWJRdS/tRdo3zRcV77oZU9ZOCbaoKrXIEpWeGb2XniMsobjEFulZyIQ2V7NjElh7agIRC89eDDy0GD0KRC3iSmCp2iv9tZzPGRb8u7j9HOS2h4Bi8vccJZ8=
+	t=1778597066; cv=none; b=KgHPZPGlR6Cw9PrmlbWmVgWdaxrwEGL3A7EU1KUniH1AFHYzmybGJeX7FgfOqxuldpg2MNe1pQJjTSIMMBRNMRTyj/7ZarMMudmGr+gaJ95irN5xYbEQ5ToPSCDeDfd992w96MQHBzOCDVenU1Wy0+gekzwQuBfp7w+DXnm9Sx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778596872; c=relaxed/simple;
-	bh=BXG5s7Yd2g7rT7VjpjIRc3pzygNpmdAU8FwMqxST/ys=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fRlyjT9oWzMYOSjmHFzOUXrIFuadQg6LR9ILpkpS+IzY9GTa/QSPksqukUwcmwx/qedgA4LNC9ak452zQHq/wcPrpJ9vPurl0cRUOHdmCsY6jl3PxqJ0bxxa7Jh/T6sGbVxB7QiZs5u7VHdqdRjWg007mFIJ9/9C3rSEeGBg6h4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h2dNJszl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60867C2BCB0;
-	Tue, 12 May 2026 14:41:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778596872;
-	bh=BXG5s7Yd2g7rT7VjpjIRc3pzygNpmdAU8FwMqxST/ys=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=h2dNJszlCMJgG6P1X7XIT8yBEL9DAJI4hexe90uTyt0/VUSL2144/LWiUCLccLjVp
-	 T6qDq32wLBzLN+rF2lRL3Ls560tn1edEehT5BwLzrDoQ4CHMb8+sdeOkx56QQ4MbCq
-	 upaPmfTQe67Wy7N8OVYo3NRIpk4GfNu/gqwpepQqI2utDHSVgV/ccagtfOR8E0GIME
-	 YNqkiZ3rbHMEgQQ82uYVlQPNNmCe4hD76f8k78/H9bBpZPH5Jcc8OOwHWqRp/trBzv
-	 3VlT24j59ju0Mt4GDiVy9e/pxdppkCs7vq5t82eifioxg3jHOmq1FU9AIwi0yI09lD
-	 sne05Jsj+oUng==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9EE13811A5D;
-	Tue, 12 May 2026 14:40:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1778597066; c=relaxed/simple;
+	bh=pNjPLUfYOnlL9AuWfKEjlCxudFzPIGw2EJqVl9WOMxQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=L9cpmrUQKrQKjwHt45oUN7gefbztdv+C/nIu5nVxNCcPOhOj6/PTihcF3T8JZUKwIe2bkP+vxjRKOu+reeoa+k3T58oS8HKnn38RMrriZAucJmcqEbPbJQBhvk90r1p12eCVR8t1rcUF/eb8QPKURI4oldQ1f9LmrWbTYkJM2zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Parc8l9R; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-43fe62837baso2938106f8f.3
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 07:44:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778597063; x=1779201863; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Sza2ZxpHlBY8pmqC5zMaFu/RPKkibTVxTiEJ6kAqjb8=;
+        b=Parc8l9RtSWs1uSoBeSworOcRTD0ctS3rqLYfEtNkczKqfx9HYKPvgQs4ABgELQw57
+         VXadQdQIH+fsvzks32Q8j6wKH44MDtuV0rg8mI5fdjaL/mIDpUpxFw2+2gVTP6isqz8o
+         7AXHio+M/gEDejoCF7tXuHoY3Zid1fh9enhiyxmT8Jjd8MRtiZD/t8ffw5SVehrmggUs
+         9OqGfo7OOFlknp6X8Hm32QjNNgJDEFD/B6gwGVf+GgNVGuxzmf2ZbqN7f8svy2v9NNq3
+         wHGb+XGijRq24soHDH39ni1pWy26RB2ej9ZtBLqKXO92PA/g1z12221VM+pReObyhNjY
+         Gwcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778597063; x=1779201863;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Sza2ZxpHlBY8pmqC5zMaFu/RPKkibTVxTiEJ6kAqjb8=;
+        b=KJ97HMGBet2MNdx1rAoOfzp40gJYfHZVkuAjsXBTI1usx2zHYP5V0BqafkVksMcLDg
+         NvKXbWuNMxZxGoA0jv56SzGaJ4AOM6gcBU2h1fPqg7EcttoButVJzihaH07ox3CWCm/d
+         guYjZHmdTKAf7IMbqetKUCWcsKKQRdx2gjh4KDQewQz3GUmyDo+kkH/Bytl+Lq+1PiT5
+         IJvAs4CouqLr5vKVzGrOPaY+zx0AGvNXfIJ1A0wOcxb2m1oXKX025oW3gaWVbChr9ZFq
+         RI1PvXbSK74of+3lyu2GtPa3dKslDsalKkmZOJ8gIT3zacmKmw1DrAoP7eUJCJek8mhO
+         A20Q==
+X-Forwarded-Encrypted: i=1; AFNElJ+VcEXKsLOaDZG/JoS7uC0VvO5pNaXWtFlS5QiIvXAb0dMIyICZfLCPx6WWmkn4jZEVYcNQ9vk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcYQTltVN7cdrs58kWvZfrFTu3wFb4b+dl5/hMeVpF4/cpmj82
+	sXzv537n6l2l5b8kpwBGM68ZHYhwq4GM0gvjPuzBPw2uSwShejlRo95l
+X-Gm-Gg: Acq92OEIcQBHjOmI/C/DzARW2HimD+pIbKGlm1V9PF/LKiQ1tWXt7It2J48sDDH+vxX
+	MmA2sJ1WZw1j0wX1xu6w3Qm6LsT9Cqrb3khJ7a/LYzI3zPcIziui2w34CnXbkNkwYGgswk5bxT/
+	/JTk0eGG/rH9cbWMyPffYKQNWBkrxnRA6N2xc9+GJ3sl/Fz1/sSmn0caNGIffKivIGq6JdEBB4g
+	4lAg0++UNjQvFv5au6mVrQi1tZ2NCkwSyOoOLGsLL3mktLgI0mfZMwftKhwsBo5CJfK1Ta7kJ36
+	g88jPHP/tHvSP64EgeALT58XMsmIlV8QcfQMChKvZ97460JhxoUZmMy60UjKld1HHpptdFSVNtr
+	qLt0CyC0b90xAJX2Y6RAU14NL9ins1AWV9SZ3f2LHlPfz/1dEeKLbgsGY0/f9FDy0RGuuQg/e5a
+	nfamxmJF77dvmBv/O1RHViNHShiOxkDDa3Xd9sNKEtmdRnl/YZG99ZpbdL1JrzoK0gPl1D3mInF
+	H/1
+X-Received: by 2002:a05:6000:4011:b0:44a:aa3c:5927 with SMTP id ffacd0b85a97d-45b13e55d33mr5041184f8f.29.1778597063157;
+        Tue, 12 May 2026 07:44:23 -0700 (PDT)
+Received: from ubuntu-f6bvp (lfbn-idf1-1-304-238.w86-195.abo.wanadoo.fr. [86.195.26.238])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45491f8d4c3sm32858657f8f.34.2026.05.12.07.44.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 May 2026 07:44:22 -0700 (PDT)
+From: f6bvp <bernard.f6bvp@gmail.com>
+To: toke@toke.dk,
+	kuba@kernel.org,
+	stable@vger.kernel.org
+Cc: Bernard Pidoux <bernard.f6bvp@gmail.com>,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	gregkh@linuxfoundation.org,
+	linux-hams@vger.kernel.org
+Subject: Re: [PATCH net-deletions] net: remove ax25 and amateur radio (hamradio) subsystem
+Date: Tue, 12 May 2026 16:42:28 +0200
+Message-ID: <20260512144416.9848-1-bernard.f6bvp@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <87se8mytvv.fsf@toke.dk>
+References: <87se8mytvv.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 00/10] net: shaper: fix various minor bugs
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177859681855.2901456.10504449767222718446.git-patchwork-notify@kernel.org>
-Date: Tue, 12 May 2026 14:40:18 +0000
-References: <20260510192904.3987113-1-kuba@kernel.org>
-In-Reply-To: <20260510192904.3987113-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
- linux-kselftest@vger.kernel.org
-X-Rspamd-Queue-Id: 6BD03523A21
+X-Rspamd-Queue-Id: 46E8E52336D
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287207-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,vger.kernel.org,redhat.com,linuxfoundation.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287208-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[bernardf6bvp@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[toke.dk:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Hello:
+From: Bernard Pidoux <bernard.f6bvp@gmail.com>
 
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Toke Høiland-Jørgensen <toke@toke.dk> writes:
 
-On Sun, 10 May 2026 12:28:54 -0700 you wrote:
-> Fix various minor bugs in the net shaper API.
-> 
-> First 2 patches deal with ordering issues around inserting
-> and publishing new shapers. Shapers are inserted "tentatively"
-> and marked valid only after HW op succeeded, this used to
-> be slightly racy.
-> 
-> [...]
+> Acked-by: Toke Høiland-Jørgensen <toke@toke.dk>
 
-Here is the summary with links:
-  - [net,v2,01/10] net: shaper: flip the polarity of the valid flag
-    https://git.kernel.org/netdev/net/c/7cee43fcb0c3
-  - [net,v2,02/10] net: shaper: fix trivial ordering issue in net_shaper_commit()
-    https://git.kernel.org/netdev/net/c/235fb5376139
-  - [net,v2,03/10] net: shaper: reject duplicate leaves in GROUP request
-    https://git.kernel.org/netdev/net/c/a9a2fa1da619
-  - [net,v2,04/10] selftests: drv-net: add shaper test for duplicate leaves
-    https://git.kernel.org/netdev/net/c/6e8ae9d805d4
-  - [net,v2,05/10] net: shaper: set ret to -ENOMEM when genlmsg_new() fails in group_doit
-    https://git.kernel.org/netdev/net/c/8054f85b83f4
-  - [net,v2,06/10] net: shaper: fix undersized reply skb allocation in GROUP command
-    https://git.kernel.org/netdev/net/c/0f9a857e34d0
-  - [net,v2,07/10] tools: ynl: add scope qualifier for definitions
-    https://git.kernel.org/netdev/net/c/fbf5df34a4db
-  - [net,v2,08/10] net: shaper: reject handle IDs exceeding internal bit-width
-    https://git.kernel.org/netdev/net/c/8d5806c600fd
-  - [net,v2,09/10] net: shaper: enforce singleton NETDEV scope with id 0
-    https://git.kernel.org/netdev/net/c/b62b29e6de67
-  - [net,v2,10/10] net: shaper: reject QUEUE scope handle with missing id
-    https://git.kernel.org/netdev/net/c/ce372e869f9f
+Hello Toke, Jakub, all,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I understand the decision to move AX.25, NET/ROM, and ROSE out of tree,
+and I am not opposing it. The maintenance burden caused by AI-generated
+syzbot reports with no human follow-up is a legitimate reason to act.
 
+That said, I would like to raise one specific concern: the ROSE subsystem
+accumulated a number of real bugs through upstream commits that were merged
+without hardware testing. I have been running ROSE on actual packet radio
+equipment and was able to reproduce and fix five of these bugs, confirmed
+via KASAN and netconsole.
 
+The most severe symptom is that the ROSE module cannot be cleanly unloaded
+once an AX.25 connection has been established, which makes amateur radio
+applications that rely on ROSE effectively unusable until a reboot.
+
+My five patches address:
+
+1. rose: fix dev_put() leak in rose_loopback_timer()
+   Fixes: 0453c6824595 ("net/rose: fix unbound loop in rose_loopback_timer()")
+
+2. rose: hold loopback neighbour reference across timer callback
+   Fixes: d860d1faa6b2 ("net: rose: convert 'use' field to refcount_t")
+
+3. rose: fix race between loopback timer and module removal
+   Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+
+4. rose: clear neighbour pointer after rose_neigh_put() in state machines
+   Fixes: d860d1faa6b2 ("net: rose: convert 'use' field to refcount_t")
+
+5. rose: guard rose_neigh_put() against NULL in timer expiry
+   Fixes: 5de7665e0a07 ("net: rose: fix timer races against user threads")
+
+Each patch carries the appropriate Fixes: tag and a Tested-by from me on
+real hardware. They are visible on lore.kernel.org.
+
+Since ROSE will no longer be maintained in-tree from 7.1 onward, the only
+remaining users are those running current stable kernels (7.0.y and
+earlier). Would it be possible to have these five patches queued for the
+stable trees via Greg's stable process?
+
+I am happy to resend them as a formal series tagged [PATCH stable] against
+the current stable releases if that is preferred.
+
+Thank you for your work on the Linux networking subsystem.
+
+73 de Bernard Pidoux, F6BVP
+<f6bvp@free.fr>
 
