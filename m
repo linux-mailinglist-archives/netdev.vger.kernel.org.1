@@ -1,212 +1,160 @@
-Return-Path: <netdev+bounces-287092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287091-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MOnHKOEIA2pmzwEAu9opvQ
-	(envelope-from <netdev+bounces-287092-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:02:57 +0200
+	id qIQxJKAIA2pmzwEAu9opvQ
+	(envelope-from <netdev+bounces-287091-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:01:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 978B451F016
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:02:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DBE3151EFF1
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:01:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 27D27302C0F3
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:59:53 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BE7E130055EC
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 10:59:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C9E38E8B0;
-	Tue, 12 May 2026 10:59:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6008E384CDE;
+	Tue, 12 May 2026 10:59:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qurh9UKE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="htg5d6Cd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6693938E8CB
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 10:59:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3494138E8A7
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 10:59:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778583581; cv=none; b=N4FXOx3vb6UFMS7JArWQbq9VTAU0m3dRdam/ZhTufTDtkzNbNYv1uYKmNVN6tbQbWbeQ+wnjZMmZcRF/LkjO8bAuKCadW0uRr97jcC6aRQ3Tek3q5lWse9KidbfRJH9kktKv6DPE4Nmpm6oNmv7BxfUC4S4OGOinIiaCrZUosWE=
+	t=1778583575; cv=none; b=i21bdJl5sX1nO46BpgfQbNG+CXi35ReSUue+8eEvlGaFOEl1x0pAVTWFgDnAjdiAiWMqSTQtJ6lwxra5uiL4espACQaslvROoLbT9sRTBhZzBQ0T4ly2RqhQ9CFlkzr+FQ3ysMK/vzf+ijjRWRv7CdACXVtMmdqKrfAREJr1fdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778583581; c=relaxed/simple;
-	bh=KCShsNDFwaVgc0g936GzfxoTB5zHdp5tRc26zVLP33U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WI2/98Py/wo/xqxtDKnZ+zB+v0u/ICJyYnL+1yOKeOPouK73INMdHhkhYpyCMe06WnSDmBBoPwSpD2CXRK/ls9+9YltQjFqQHGjjesogF05dWta/gxkfaaA1ui7SdfCRZhH1a/QDPQvosoJJLaWpMP2fyakKc3bNGE27WkQZgJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Qurh9UKE; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778583580; x=1810119580;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=KCShsNDFwaVgc0g936GzfxoTB5zHdp5tRc26zVLP33U=;
-  b=Qurh9UKEgzBHZr3pK9gNJxS0VccyDvh+qauhvcG1lW2lc385Tsv387Ph
-   Bp4eaI4eSEe5mc+Soag6XoW0hTdwSiMQxjMOOqMCOAngfIvJ/eLyzn4TM
-   jV/arWdnu3VRwH0mH30HDXwVYU3D/qlBcVWUK6x3fPer6SNGjkDMQylBL
-   BaxeHD/CAgSUwBGznswrwE93HeSWK5qsBFxP1rng6QxUUqU3b25Hkuw9v
-   yggoTLExyQ5iubEtfcskX7lRxBn7vDB6n+jGJL7f4ubzqcPwpa7LK0MDq
-   k7RQSqg5RVqpHH1tW3vywaevDS4+208oq7vxOVeYacGVPYUBiXfjsJnz6
-   A==;
-X-CSE-ConnectionGUID: bxOeKVwXTYqD+8zSIY7TCQ==
-X-CSE-MsgGUID: R/XUwOYjRZCR5o9BY7gSqg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11783"; a="89792058"
-X-IronPort-AV: E=Sophos;i="6.23,230,1770624000"; 
-   d="scan'208";a="89792058"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2026 03:59:38 -0700
-X-CSE-ConnectionGUID: RetFvmcTQSmOeRYouH+sBw==
-X-CSE-MsgGUID: 46O51GTFSGq9B5iWl/uclQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,230,1770624000"; 
-   d="scan'208";a="275853671"
-Received: from lkp-server01.sh.intel.com (HELO dca79079c3eb) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 12 May 2026 03:59:35 -0700
-Received: from kbuild by dca79079c3eb with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wMkpo-0000000020w-0kb3;
-	Tue, 12 May 2026 10:59:32 +0000
-Date: Tue, 12 May 2026 18:59:18 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: Re: [PATCH net v2] ptp: ocp: fix resource freeing order
-Message-ID: <202605121813.ZVbOZfjr-lkp@intel.com>
-References: <20260511161838.1413499-1-vadim.fedorenko@linux.dev>
+	s=arc-20240116; t=1778583575; c=relaxed/simple;
+	bh=2O6kMZeCfa2WzuVxLVjO6q02eX3L6eA7J+7iqPYMAV0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tZCYnV3gQYMkokkGFXASxCuoJ7zV71ynV8XAd8Ymsnd0Y6PIZa6/9jatGmRssgllsOqBq8ycdKjfkCM2NA8pvCVcNLXR/bYFBumevQxWvqnJe4+8naWtjcTcgj+HR4Q/kfuCpu0btC5XdMjyzjjVJuaekHbNy58E1S6fGF+V4Uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=htg5d6Cd; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-488a88aeec9so60009465e9.2
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 03:59:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778583571; x=1779188371; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uhHS6zVrC9HlZ4w9H9Y7re+MM/8aX/6jJDkwDStDfFo=;
+        b=htg5d6Cdq6YZFukk5+nG+yX0wzoJ9Ss8Hi6w+Frzd5rNbk+/ZgcWNez/43uXtwSEze
+         h+2d0/0fHDqceJff76lQ0IYJOeY32NktATIyibop5TsxzTkPEpBiqhtalzE4O8ZMj2jj
+         xHiNGOar8P0og8mBB1tkuXSrlj7GJMTl/HJ82FqBgnkDymQkweYNEmMd50l6CKpXI/Ls
+         6GT2LLxdoA5FghfXUsQZxXbqd1W7ooRJvZoEgRa68fbZccb3tG3msU+OubN1rCA/UiLh
+         UW3vVG9kB9QZ2o5yWPSj+bmOyMAeJtCooL87mNSff/5okn2m4EHWbjvDfKiCJm3uxQYR
+         0BbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778583571; x=1779188371;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uhHS6zVrC9HlZ4w9H9Y7re+MM/8aX/6jJDkwDStDfFo=;
+        b=fSawU3yWZPGV2B302SYZLvddwFm9lVau5XvaUbuu643C1+vZ1B3QaDxuGPXi15bz9u
+         JYZGWcqaiGJ7F2LLaciZHu3+/jhtA7TJ/Kj/Pt4jDYu+UiBoMnOOEyMtASEGq1SwAD5E
+         WurfgeYJWlxWxqOx4I/4LrdUtskDjgqHiD7lwoP2Bj2yEZ8tLUI9qHtA2maqkvAmTlTL
+         ZJnnW3hYXAt4KdP61MlbCeUd0icM1sF+XghUPKFLkjCjUna8H9HpszYFJ3P/lvzv1sv8
+         QxNp4Bla8m8LAX3pV+3ERzWlnjxBaOs8TdJzqu3uwF/Z1lS2YmFh/OCa82FyVMB4wNaA
+         Xq2Q==
+X-Forwarded-Encrypted: i=1; AFNElJ8KeFoDuOHVWel3nPFriAa/znHAe0ZEDUr37takgd2yBkjODuguIPMG+eNuU1aS/W6lNzK49Tg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwASg6AIw58E6wS2oSVDJ4+d1YDiQuk5sNpAJZwfR6WNIWN+lUz
+	5ua2QanAVSZdCJWxq5JJi2pW53rM8qXzbaBhq1Zk6BgxnyknAxqAM7un
+X-Gm-Gg: Acq92OG11B4YvpMLAGYAKXOU8aH2mBNmv9u5rclvGSA335UIQ6KGWT4pHvuGeAXXdrB
+	YM6MWfh4NNyKdCiKgXnqIb81IuljOwpQAohtggOwNsvlDQWMTY6YllnrX8q/sbsg0+CgDfSwzOA
+	/Yn1dbwtKNJK70XoURDktNGV5//x8katGXVvUMU7jULMs0PnFmfvFpxt46voRFMGdy6O30nIfIg
+	7aqNp0er9Lz67DnewUETlRFe7tMBeRRIw70akmNJNXVdGaAnq1H7UuAkCU/2Nqy9NHHdhZTcqvr
+	YLBeaoKAjv7dmv2xuxfiBQuBG7yOhoBRaHWS+w6d5GzoETwsDgMVolh1gE5FjQh5mz1QUYmXizV
+	LvxtpuzQAJAOg1HABDTxPA58yye3SCK8EvOEMUEuErpDiKXtmFrahPwsys07mys3rm2/strZSrT
+	aUzeQdQfh729unVyC+jLT5iDnpPX2ERv2qeIXtgsxEVNoiuH8wi4NXxWznJUR6SJhffhztdbInt
+	dIzK4SlteKUzFsEfmLD98IcGpTVY5C6zIrBe1Y=
+X-Received: by 2002:a05:600c:45d0:b0:488:7ff6:1f75 with SMTP id 5b1f17b1804b1-48e707f821dmr219403715e9.21.1778583571615;
+        Tue, 12 May 2026 03:59:31 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325::372? ([2620:10d:c092:600::1:8c90])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4548ec6b00fsm35042477f8f.11.2026.05.12.03.59.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 May 2026 03:59:30 -0700 (PDT)
+Message-ID: <1ae85366-de3e-4891-8581-bdfc6e605a23@gmail.com>
+Date: Tue, 12 May 2026 11:59:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260511161838.1413499-1-vadim.fedorenko@linux.dev>
-X-Rspamd-Queue-Id: 978B451F016
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/5] io_uring/zcrx: notify user when out of buffers
+To: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@meta.com>,
+ io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, Vishwanath Seshagiri <vishs@fb.com>,
+ Vishwanath Seshagiri <vishs@meta.com>
+References: <20260422112522.3316660-1-cleger@meta.com>
+ <20260422112522.3316660-2-cleger@meta.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20260422112522.3316660-2-cleger@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: DBE3151EFF1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287092-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[linux.dev,gmail.com,lunn.ch,davemloft.net,redhat.com,nxp.com,armlinux.org.uk,kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287091-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email,intel.com:mid,intel.com:dkim]
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
+	RSPAMD_EMAILBL_FAIL(0.00)[asmlsilence.gmail.com:query timed out];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Hi Vadim,
+On 4/22/26 12:25, Clément Léger wrote:
+> From: Pavel Begunkov <asml.silence@gmail.com>
+...
+> +static void zcrx_notif_tw(struct io_tw_req tw_req, io_tw_token_t tw)
+> +{
+> +	struct io_kiocb *req = tw_req.req;
+> +	struct io_ring_ctx *ctx = req->ctx;
+> +
+> +	io_post_aux_cqe(ctx, req->cqe.user_data, req->cqe.res, 0);
+> +	percpu_ref_put(&ctx->refs);
+> +	kfree_rcu(req, rcu_head);
+> +}
 
-kernel test robot noticed the following build errors:
+Note to myself:
 
-[auto build test ERROR on net/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/ptp-ocp-fix-resource-freeing-order/20260512-061754
-base:   net/main
-patch link:    https://lore.kernel.org/r/20260511161838.1413499-1-vadim.fedorenko%40linux.dev
-patch subject: [PATCH net v2] ptp: ocp: fix resource freeing order
-config: riscv-allyesconfig (https://download.01.org/0day-ci/archive/20260512/202605121813.ZVbOZfjr-lkp@intel.com/config)
-compiler: clang version 16.0.6 (https://github.com/llvm/llvm-project 7cbf1a2591520c2491aa35339f227775f4d3adf6)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260512/202605121813.ZVbOZfjr-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202605121813.ZVbOZfjr-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> drivers/ptp/ptp_ocp.c:4872:39: error: expected ';' after expression
-                   ptp_ocp_ts_enable(bp->ts1, 0, false)
-                                                       ^
-                                                       ;
-   drivers/ptp/ptp_ocp.c:4874:39: error: expected ';' after expression
-                   ptp_ocp_ts_enable(bp->ts2, 0, false)
-                                                       ^
-                                                       ;
-   drivers/ptp/ptp_ocp.c:4876:39: error: expected ';' after expression
-                   ptp_ocp_ts_enable(bp->ts3, 0, false)
-                                                       ^
-                                                       ;
-   drivers/ptp/ptp_ocp.c:4878:39: error: expected ';' after expression
-                   ptp_ocp_ts_enable(bp->ts4, 0, false)
-                                                       ^
-                                                       ;
-   4 errors generated.
-
-
-vim +4872 drivers/ptp/ptp_ocp.c
-
-  4860	
-  4861	static void
-  4862	ptp_ocp_detach(struct ptp_ocp *bp)
-  4863	{
-  4864		int i;
-  4865	
-  4866		ptp_ocp_debugfs_remove_device(bp);
-  4867		ptp_ocp_detach_sysfs(bp);
-  4868		ptp_ocp_attr_group_del(bp);
-  4869		timer_delete_sync(&bp->watchdog);
-  4870		/* Disable interrupts on all timestampers */
-  4871		if (bp->ts1)
-> 4872			ptp_ocp_ts_enable(bp->ts1, 0, false)
-  4873		if (bp->ts2)
-  4874			ptp_ocp_ts_enable(bp->ts2, 0, false)
-  4875		if (bp->ts3)
-  4876			ptp_ocp_ts_enable(bp->ts3, 0, false)
-  4877		if (bp->ts4)
-  4878			ptp_ocp_ts_enable(bp->ts4, 0, false)
-  4879		if (bp->ptp)
-  4880			ptp_clock_unregister(bp->ptp);
-  4881		kfree(bp->ptp_info.pin_config);
-  4882		ptp_ocp_unregister_ext(bp->ts0);
-  4883		ptp_ocp_unregister_ext(bp->ts1);
-  4884		ptp_ocp_unregister_ext(bp->ts2);
-  4885		ptp_ocp_unregister_ext(bp->ts3);
-  4886		ptp_ocp_unregister_ext(bp->ts4);
-  4887		ptp_ocp_unregister_ext(bp->pps);
-  4888		for (i = 0; i < 4; i++)
-  4889			ptp_ocp_unregister_ext(bp->signal_out[i]);
-  4890		for (i = 0; i < __PORT_COUNT; i++)
-  4891			if (bp->port[i].line != -1)
-  4892				serial8250_unregister_port(bp->port[i].line);
-  4893		platform_device_unregister(bp->spi_flash);
-  4894		platform_device_unregister(bp->i2c_ctrl);
-  4895		if (bp->i2c_clk)
-  4896			clk_hw_unregister_fixed_rate(bp->i2c_clk);
-  4897		if (bp->n_irqs)
-  4898			pci_free_irq_vectors(bp->pdev);
-  4899		device_unregister(&bp->dev);
-  4900	}
-  4901	
+io_poison_req(req);
+kmem_cache_free(req_cachep, req);
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Pavel Begunkov
+
 
