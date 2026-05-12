@@ -1,172 +1,172 @@
-Return-Path: <netdev+bounces-287036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287037-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GL8KLRj2AmqvzAEAu9opvQ
-	(envelope-from <netdev+bounces-287036-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:42:48 +0200
+	id 0Fg7KK71AmqvzAEAu9opvQ
+	(envelope-from <netdev+bounces-287037-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:41:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38F0151DF7C
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:42:48 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A24C51DEDF
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:41:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC437300CC20
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 09:37:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 68059302012C
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 09:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC1B03C3BF6;
-	Tue, 12 May 2026 09:37:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53AFB3B5851;
+	Tue, 12 May 2026 09:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Ykfdx9BH";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="rR1fDih6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UD4r/Q8S"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817273859D2;
-	Tue, 12 May 2026 09:37:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E440388374;
+	Tue, 12 May 2026 09:40:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778578650; cv=none; b=Xiu1MeF9z1504VF2wIYWtkboOVpAfOE916kZH7NRY8N7xOOfXvy3cxqr6MWU1cdFMCPk++2eVzsRRifEKbwHuF3Sdj+zFYFObEBEYHnF2HdQXW/MxuP/iQ6sCx7Yk4VEqTLgQMz31uxdv4qrVwM54/p6J1VkNaucI//hBJO6PXA=
+	t=1778578840; cv=none; b=usJt5GOHXz6tKcObh0V5+JaUiGa4o1LQ0tqj2e1tIbfUiAlF6eueAyWzQ9EO9uhsSGOIEzAn7lOKYGRuPUy5PWrbXxwDeenF1ta7V+x+9iqx/CmDnKc9MdnXjRlgTmSlNc70Zlfu9oxJeayiwqrK/CztHCJvkojobkGsEuvziU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778578650; c=relaxed/simple;
-	bh=0hm3cPekJMMQolV82Yt1HCxdHPmcvpWJufglPSy9bBM=;
+	s=arc-20240116; t=1778578840; c=relaxed/simple;
+	bh=MQw7xk7AK7vUUFTxVKsaMlXHU3CigVS/H91vrn522b8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a/CDpT/t+0WPSuaXOx3mBnfSD8KRz0m3sQ905ladXrgz3ruT7ULCWphFB7MRysbI/0Gt1gS5+dFURzUdga+B7hqvW2wEm/pCrJMQlqbVuoE77dMmvAI7Fsaf4/cAxc/bp9hmXDRWumQvFvcqC2YJa+4e1OlUdwIksy0c5yQmyQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Ykfdx9BH; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=rR1fDih6; arc=none smtp.client-ip=202.12.124.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 18B427A00DB;
-	Tue, 12 May 2026 05:37:26 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Tue, 12 May 2026 05:37:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1778578645; x=
-	1778665045; bh=KZtompXgFSACAAOw8haMO9lseia0fCbyR29abWb4baI=; b=Y
-	kfdx9BHaDD8vhlYzb43v4k4ro7f+rprHcajBSvQmWAeXBDROXXlnDMlOMVfqQ64x
-	DfggUY/bBCIouwvhHLGx0+WKwSaY2nH/S5GcCbPB23LOfYZMNC29hKRoptuRHFhx
-	VqHEBvzAdWxpNROqgEBqA6x8UVdKhHUnsTSn/SpmJIkCigo4aHyw3FMVIXI3fW3J
-	zzdFemSL82a3EBs1J29Yz0JkLzNjvW7p4la94bunH9w3WeDS3REQDZlBHN3NCjbI
-	W747c0sEU8gxZiWocmyo3Dn2yFBONWBTFEL5I7mrTAK73l+srywlTIJ6/Dboq/qd
-	2pk8L+wJs4rlU6FVrlCbQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1778578645; x=1778665045; bh=KZtompXgFSACAAOw8haMO9lseia0fCbyR29
-	abWb4baI=; b=rR1fDih6cX0XPQm6gbA+MIhesJJsAliscSlvjuHrmdUIKZkYm54
-	D2I09B+4eWxwaCvX2STdOVAxTwM5YCMnmT7yOazPValGcjOjjNHYynkgliP3+HOV
-	S73S1JVu4LJzKdpBCjqsr0YXXZcSjpa4qFLzetkGXCZ86zESwGfogiu9NcIQB5xs
-	BzMMqwmbXFA7pFJ/yHXpZziGOgebvOpvnCQ6aWMyVShP0xNLNMUCc0WsxIPh6Qcw
-	nSv3DBMpzA1jE6XkjwGxfcF5OFkRxjP8HbnZowy8c4ooWk0+38goSC1Uk9iamyn8
-	0JP47w2B04Om7ZyO2UFantGOVdAhVjtJx1w==
-X-ME-Sender: <xms:1fQCalEvN1D071S6eQU4DvKmvyhCGZHEeVQ7koJzaxr7zgnPsoJTnw>
-    <xme:1fQCar4oXMvhQDagaNrRxBzs6C0Zp2qlVMUrinb7mLqxTG78LpZb-j0h24ZECCH6j
-    LGyMZ0FQvWmJdm-zFpdVAd1ZWsY_QFNQ8JutLpInUg4mkCEqKGEhw>
-X-ME-Received: <xmr:1fQCamajivxRjOLnhn2ek4SWJ9cKIvKMTNOmKn_0D532zGVbdMT5-D3aBCyNS6fSbjq_J5xtem8VbEdVeEH5Ezs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduvddugeeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepgefhffdtvedugfekffejvdeiieelhfetffeffefghedvvefhjeejvdek
-    feelgefgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
-    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdr
-    nhgvthdpnhgspghrtghpthhtohepuddvpdhmohguvgepshhmthhpohhuthdprhgtphhtth
-    hopehjrghkuhgssegtlhhouhgufhhlrghrvgdrtghomhdprhgtphhtthhopegurghnihgv
-    lhesihhoghgvrghrsghogidrnhgvthdprhgtphhtthhopehjohhhnhdrfhgrshhtrggsvg
-    hnugesghhmrghilhdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
-    pdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhope
-    hnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgr
-    iigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrth
-    drtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
-X-ME-Proxy: <xmx:1fQCahgI3FZOBz830Q-XGj1a1JPafTloBAwNpEXvOqBZv8vYXWUqfw>
-    <xmx:1fQCagcQrrpAS9tmZzVyIFWTD3xsP9bIK8Om-jGjgaTWe35Wrr0YUQ>
-    <xmx:1fQCaombYQmensgQaadfK_lYFygRVS7cCeesAUHOD7RmoKXu-ncfWw>
-    <xmx:1fQCatxwiF3qSVmj3Dm3mhngpGYdFjFKzKmpCl-g0ZFQ-iphCipgMA>
-    <xmx:1fQCaikE-Msn7iroFEwDfvQWPokJxkp00r9-w7HLrDmwNSvwpPAWpNpM>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 12 May 2026 05:37:24 -0400 (EDT)
-Date: Tue, 12 May 2026 11:37:23 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jakub Sitnicki <jakub@cloudflare.com>,
-	Daniel Borkmann <daniel@iogearbox.net>, john.fastabend@gmail.com
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org, bpf@vger.kernel.org,
-	Jiayuan Chen <jiayuan.chen@linux.dev>
-Subject: Re: [PATCH net v2 0/4] net: tls: net: tls: fix a few random bugs
-Message-ID: <agL004kpTMjsaJJO@krikkit>
-References: <20260511174920.433155-1-kuba@kernel.org>
- <87se7x7z8k.fsf@cloudflare.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZhUNmc44qX/L3V4LEf8sqa1/BgEhFAmhiv+T4NXAFxitCnea02T9Zw7qYnYESd5eBbcxz6eITJwXPbS4QWq5faODaV3ro2txcwvpln7548Q4SFRLpj80ONheqr05/xUa5/nmfhe/go7XR8CUASa6btzC/SkrXb3J5VjsLXOuJvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UD4r/Q8S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E2D3C2BCF5;
+	Tue, 12 May 2026 09:40:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778578839;
+	bh=MQw7xk7AK7vUUFTxVKsaMlXHU3CigVS/H91vrn522b8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UD4r/Q8SkhsDvHSeevTzvHmw6vz0Z+dZ58YkwWZkda6Ul7/l5f/CCzmlRP0IomKA5
+	 aynp0zH103Kmr4Eixzpci+QzROxprbZXnvAw0q4d0E7PC5QHBqpo0cU9PttPlRhM2o
+	 Bdw0s7lt2PrsE/IHKalO15/J1qYM4kTagd1v6cpiQ0mKs7DaCXmN0MRyaLV1YrKq8+
+	 RJUw/11YbCCJnOd2h1H2WCehjtJquNzS9aYRZboEYm25V81Ez7OhUt59g/Z2oSEvmv
+	 vOi0ZyWhaAd7tY1WjTQJ4L1LIQsKnm2wiBFX87ptwvUgcm1pwEg7kA05doboaeXvDK
+	 fJfUQXv/NTBTA==
+Date: Tue, 12 May 2026 10:40:32 +0100
+From: Simon Horman <horms@kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Arnd Bergmann <arnd@kernel.org>, Netdev <netdev@vger.kernel.org>,
+	Aaro Koskinen <aaro.koskinen@iki.fi>,
+	Andreas Kemnade <andreas@kemnade.info>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	=?utf-8?Q?Beno=C3=AEt?= Cousson <bcousson@baylibre.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Eric Dumazet <edumazet@google.com>, Felipe Balbi <balbi@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Kevin Hilman <khilman@baylibre.com>, krzk+dt@kernel.org,
+	Linus Walleij <linusw@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>, Roger Quadros <rogerq@kernel.org>,
+	Tony Lindgren <tony@atomide.com>, linux-wireless@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	"open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+	Linux-OMAP <linux-omap@vger.kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH 2/3] [v5 net-next] p54spi: convert to devicetree
+Message-ID: <20260512094032.GI27589@horms.kernel.org>
+References: <20260507212451.3333185-3-arnd@kernel.org>
+ <20260511161243.49098-3-horms@kernel.org>
+ <edc4d6d6-7a43-442e-adb5-148e37402924@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87se7x7z8k.fsf@cloudflare.com>
-X-Rspamd-Queue-Id: 38F0151DF7C
+In-Reply-To: <edc4d6d6-7a43-442e-adb5-148e37402924@app.fastmail.com>
+X-Rspamd-Queue-Id: 3A24C51DEDF
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-287037-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[cloudflare.com,iogearbox.net,gmail.com];
-	TAGGED_FROM(0.00)[bounces-287036-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DMARC_NA(0.00)[queasysnail.net];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iki.fi,kemnade.info,baylibre.com,davemloft.net,gmail.com,google.com,sipsolutions.net,redhat.com,atomide.com,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,messagingengine.com:dkim,queasysnail.net:dkim]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-2026-05-12, 11:28:59 +0200, Jakub Sitnicki wrote:
-> General question - do we know about any kTLS with sockmap-redirects
-> users out there? I've been asking around at conferences for a couple
-> years now and haven't heard about any consumers of this feature.
+On Mon, May 11, 2026 at 09:45:18PM +0200, Arnd Bergmann wrote:
+> On Mon, May 11, 2026, at 18:12, Simon Horman wrote:
+> >
+> > Simon says: As a pre-existing issue I don't think we need to be concerned
+> >             about this in the scope of this patch-set. But it may
+> > 	    be a potential for follow-up.
+> >
+> > This problem wasn't introduced by this patch, but I noticed a pre-existing
+> > issue in the context here. Does the p54spi_spi_read() function perform an SPI
+> > transfer using a stack-allocated buffer?
+> >
+> > Looking at p54spi_spi_read(), the addr variable is allocated on the stack and
+> > passed as a transfer buffer to spi_sync(). The SPI framework maps transfer
+> > buffers for DMA. Passing a stack-allocated buffer is illegal, particularly with
+> > CONFIG_VMAP_STACK enabled, because stack memory resides in vmalloc space and
+> > cannot be safely DMA-mapped.
+> >
+> > Could this cause memory corruption or a kernel panic during the transfer?
 > 
-> If there are no known users, maybe we can have kTLS+sockmap glue code
-> behind a build-time config option and put it on a path to deprecation?
+> I already commented on this earlier: This is indeed a theoretical
+> bug, but it works in practice because DMA-capable SPI controllers
+> tend to all use MMIO for short transfers instead of DMA.
 > 
-> WDYT?
+> SPI is very fragile this way, and I do have some patches to improve
+> that overall, but it seems out of scope for this one driver.
 
-I was also thinking about this recently (well, more about ripping it
-out directly, without a "polite" deprecation path). It's a lot of
-complexity (on the same level as the async crypto code, which is also
-causing us some pain).
+Thanks, I agree this is out of scope.
 
-In
-https://lore.kernel.org/netdev/47b7dc3c-7092-49fe-b849-6847b73df86d@linux.dev/
-Jiayuan Chen linked to a 2018 LPC presentation, which is... not strong
-evidence of current use :)
+> >> -
+> >> -	gpio_direction_output(p54spi_gpio_power, 0);
+> >> -	gpio_direction_input(p54spi_gpio_irq);
+> >> -
+> >> -	ret = request_irq(gpio_to_irq(p54spi_gpio_irq),
+> >> -			  p54spi_interrupt, IRQF_NO_AUTOEN, "p54spi",
+> >> -			  priv->spi);
+> >> +	ret = request_irq(spi->irq, p54spi_interrupt, IRQF_NO_AUTOEN, "p54spi", priv->spi);
+> >
+> > Simon says: This one seems more concerning in the context of this patch-set.
+> >
+> > Is there missing validation for spi->irq before calling request_irq()?
+> >
+> > If the device tree node lacks an interrupts property, the SPI core may set
+> > spi->irq to 0 or a negative error code.
+> >
+> > Passing this directly to request_irq() without validation can successfully
+> > hijack a core system interrupt like the system timer on some architectures,
+> > leading to system instability or deadlocks.
+> >
+> > Should there be a check like if (spi->irq <= 0) to fail the probe gracefully?
+> 
+> I also commented on this: request_irq() already fails gracefully
+> with -EINVAL when presented with an invalid IRQ. IRQ 0 is guaranteed
+> to be invalid on any target that uses devicetree.
 
-Daniel, John?
-
--- 
-Sabrina
+Thanks, and sorry for not seeing your earlier comment.
+Or realising it is a false positive.
 
