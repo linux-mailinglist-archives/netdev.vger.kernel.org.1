@@ -1,230 +1,264 @@
-Return-Path: <netdev+bounces-286930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286929-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UH4eMf2OAmryuQEAu9opvQ
-	(envelope-from <netdev+bounces-286930-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 04:22:53 +0200
+	id 8BCzLbmOAmryuQEAu9opvQ
+	(envelope-from <netdev+bounces-286929-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 04:21:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E77C4518E59
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 04:22:52 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61F3F518E00
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 04:21:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C72C0301DE13
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 02:22:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 540E8301B52C
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 02:21:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BA7335B63B;
-	Tue, 12 May 2026 02:22:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D3073630A4;
+	Tue, 12 May 2026 02:21:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b="jHpnq8Eg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g+ZNzb8x"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [4.193.249.245])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C60B2C11D7;
-	Tue, 12 May 2026 02:22:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=4.193.249.245
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9BAC1A680C;
+	Tue, 12 May 2026 02:21:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778552548; cv=none; b=umnyhqnt0PD3uGkeJXo0JniHy5+pc5OvLA05Y/3ov+w1a2Eb/ddSy3DJpfDyeEZjgbMwjXMWrAq1ccPUbSIqYHzT98HROfkAkY1PInI6GusHXe0FUdyE7Ajb467N/XKemdWG3iq5+CSdvOlJRticXOh2IokFV+2wpH+8tml+X6Y=
+	t=1778552497; cv=none; b=Wfj7qU2Y79Txb1w/MNqUhxqOz5RDXUZV2D2f7eaVJlZTM3wxA0d25/fpkq7AmsUtVTJz0TWnBKVVbzyPpdFBPSq9gbDIs/KWSxVMp12SwbxESg0imCFrzAk1Qe505sY+ugsieelFLc1rJvgIhUtUa6wHLRPRDP8vEGlI+h9IxM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778552548; c=relaxed/simple;
-	bh=nCGCk9nO53mpivZHHRmXfPHk3o4XtL+YR7DcW/1QUEg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ENNW9MEju2eMJ9FGAa3/qhHdRxK9lgCf2eP2vYjPj4Q+sGEtBylBZAQTzSmy+nN4EiuliAPR0t69pbo/f43Ta/mcI4CNBUsA3E8nN7cQhx7XxWEh/5rZD6tS3/2knhgBWiqH8KY2f465z0kT4Bqc2qMW60Ro+d8EKKWlqWDr0fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=jHpnq8Eg; arc=none smtp.client-ip=4.193.249.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
-	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=Sl66K
-	CFSM9dXF20QRxPhYCPriLvb1D36CVfC7x3Vn5s=; b=jHpnq8EgUdh/I+zrc+ZKF
-	N+iwuuPia4LPn2t5/jW2t/0QLRavyZcdF5rQ4002VyxsTIrU5nn5NnG9Naxa9+LC
-	DTdrPcQsi2LeU4s0GMT0rIZSjhbFdoAsSR2zRTq/R+TIAsZhPtdM21fAbO+N1gpw
-	/LTJ8D4DGo92qgiajWEDug=
-Received: from localhost.localdomain (unknown [36.110.46.68])
-	by web3 (Coremail) with SMTP id ygQGZQCX45DBjgJqHQeCAQ--.10025S2;
-	Tue, 12 May 2026 10:21:54 +0800 (CST)
-From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-To: netdev@vger.kernel.org
-Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf.kernel@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Krishna Kumar <krikku@gmail.com>,
-	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
-	Xuewei Feng <fengxw06@126.com>,
-	Qi Li <qli01@tsinghua.edu.cn>,
-	Ke Xu <xuke@tsinghua.edu.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH v2 net] net: core: dev: add reprocess depth limit for another_round in __netif_receive_skb_core
-Date: Tue, 12 May 2026 10:21:25 +0800
-Message-ID: <20260512022127.7818-1-zhaoyz24@mails.tsinghua.edu.cn>
-X-Mailer: git-send-email 2.46.2
+	s=arc-20240116; t=1778552497; c=relaxed/simple;
+	bh=T+0Nef/1KS8+15UPaVvnoK25b9jw3Qq81QPRwdPZQYc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ON15t93W1RXTI2GQJ7bQVTOi6zudA5I4Rp5Roy83p+SIe1dUhZiQuRMhYwSwAfql47Wl9R8bZNaYTVa4DF6rZmfG2J/F/bLVlZyfIoC54Ihn07qRfcQGXHuGUB3sdRd0klYPkHAVx+0iuMjeX9ekSDTQu7F7CLeitkfh9U8IxZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g+ZNzb8x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C70AC2BCF5;
+	Tue, 12 May 2026 02:21:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778552496;
+	bh=T+0Nef/1KS8+15UPaVvnoK25b9jw3Qq81QPRwdPZQYc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=g+ZNzb8xj6Rp4yY/07754ewJ407kQs9VG7mxAtf+AbcxcvXzPR2THpc+eUjyyCSeb
+	 DomBi0XfG321XOM8wlEnDXeIsxHrsImaGk0DDcHTBnY7cPTP3q41NcKEgz1Av4Ii6Y
+	 wwJKqPqgklKg+mzVcFUaDOFEnvSxnsz5jGZl4fIKSbUyDplNJh2xDlZ3TKCuPQ73lC
+	 onkzFmQXESTrVP9yO7ksHshCS6eKXxCbjKTKstTw0zThg3JhhSpWTPL3QKfgNI0aPe
+	 xVtO7UVsnDVMQHDOuTrbKSBO9jUzX7oMEs+essH8t4s2h4NAONpCLbIellTKr9Zzkd
+	 I5d5LIwXpZQGA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: dipayanroy@linux.microsoft.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	leon@kernel.org,
+	longli@microsoft.com,
+	kotaranov@microsoft.com,
+	horms@kernel.org,
+	shradhagupta@linux.microsoft.com,
+	ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com,
+	shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	stephen@networkplumber.org,
+	jacob.e.keller@intel.com,
+	dipayanroy@microsoft.com,
+	leitao@debian.org,
+	kees@kernel.org,
+	john.fastabend@gmail.com,
+	hawk@kernel.org,
+	bpf@vger.kernel.org,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	sdf@fomichev.me,
+	yury.norov@gmail.com
+Subject: Re: [PATCH v8 2/2] net: mana: force full-page RX buffers via ethtool private flag
+Date: Mon, 11 May 2026 19:21:33 -0700
+Message-ID: <20260512022133.856196-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260508115100.488506-3-dipayanroy@linux.microsoft.com>
+References: <20260508115100.488506-3-dipayanroy@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-CM-TRANSID:ygQGZQCX45DBjgJqHQeCAQ--.10025S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxCF1DGw18Gr4rJr48Zr4ktFb_yoWrWw45pF
-	W5KFyIyFW8Cr129ws2y3ZF9ryfCFZ5XFsxX34fGa47A3Z3GF1rGrySyryYqF13AryrWFyj
-	qFWDJr48Zan8X3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUP014x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_GFv_Wrylc2xSY4AK67
-	AK6r4UMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
-	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc4
-	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
-	xVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
-	1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRisqXtUU
-	UUU==
-X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAgUEAWoBi6DyAAABsx
-X-Rspamd-Queue-Id: E77C4518E59
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 61F3F518E00
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[kernel.org,microsoft.com,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	TAGGED_FROM(0.00)[bounces-286929-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286930-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,126.com,tsinghua.edu.cn,vger.kernel.org];
-	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.989];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tsinghua.edu.cn:email,mails.tsinghua.edu.cn:mid,mails.tsinghua.edu.cn:dkim]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-In __netif_receive_skb_core(), the another_round label can be reached=20
-via a TC ingress redirect (bpf_redirect_peer returning -EAGAIN).
-
-Across network namespaces, two BPF programs on peer devices can redirect
-packets back and forth indefinitely, creating an unbounded loop that=20
-monopolizes a CPU core in softirq context. This leads to RCU stalls,=20
-soft lockups, and system-wide denial of service.
-
-We reproduced it by creating a pair of TC BPF programs across two=20
-network namespaces that redirect packets to each other, and the RCU=20
-subsystem detects a stall:
-
-```
-[   24.835219] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:=0D
-[   24.835837] rcu: 	(detected by 0, t=3D21002 jiffies, g=3D-627, q=3D2 ncp=
-us=3D1)=0D
-[   24.835959] rcu: All QSes seen, last rcu_preempt kthread activity 21002 =
-(4294691810-4294670808), jiffies_till_next_fqs=3D3, root ->qsmask 0x0=0D
-[   24.836239] rcu: rcu_preempt kthread starved for 21002 jiffies! g-627 f0=
-x2 RCU_GP_WAIT_FQS(5) ->state=3D0x0 ->cpu=3D0=0D
-[   24.836362] rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, O=
-OM is now expected behavior.=0D
-[   24.836460] rcu: RCU grace-period kthread stack dump:=0D
-[   24.836601] task:rcu_preempt     state:R  running task     stack:15448 p=
-id:15    tgid:15    ppid:2      task_flags:0x208040 flags:0x00080000=0D
-[   24.837139] Call Trace:=0D
-[   24.837568]  <TASK>=0D
-[   24.838008]  __schedule+0x4ed/0xea0=0D
-[   24.838934]  schedule+0x22/0xd0=0D
-[   24.839023]  schedule_timeout+0x81/0x100=0D
-[   24.839095]  ? __pfx_process_timeout+0x10/0x10=0D
-[   24.839165]  rcu_gp_fqs_loop+0x11b/0x650=0D
-[   24.839226]  ? __pfx_rcu_gp_kthread+0x10/0x10=0D
-[   24.839282]  rcu_gp_kthread+0x17e/0x210=0D
-[   24.839333]  ? __pfx_rcu_gp_kthread+0x10/0x10=0D
-[   24.839383]  kthread+0xdd/0x110=0D
-[   24.839433]  ? __pfx_kthread+0x10/0x10=0D
-[   24.839481]  ret_from_fork+0x1aa/0x260=0D
-[   24.839538]  ? __pfx_kthread+0x10/0x10=0D
-[   24.839585]  ret_from_fork_asm+0x1a/0x30=0D
-[   24.839686]  </TASK>=0D
-......
-```
-
-Fix this by adding a depth counter when it is about to go to another_round
-label. When the counter exceeds XMIT_RECURSION_LIMIT (8), the packet is=20
-dropped. This follows the same pattern as dev_xmit_recursion() which=20
-protects the TX redirect path with the same limit.
-
-Reuse SKB_DROP_REASON_TC_RECLASSIFY_LOOP for observability.
-
-Fixes: 9aa1206e8f48 ("bpf: Add redirect_peer helper")
-Cc: stable@vger.kernel.org
-Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
-Reported-by: Xuewei Feng <fengxw06@126.com>
-Reported-by: Qi Li <qli01@tsinghua.edu.cn>
-Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
-Assisted-by: GLM:GLM-5.1
-Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 ---
-Changes in v2:
-- Move the check just after `another` is set to true to avoid affecting the=
- fast path
-- Reuse SKB_DROP_REASON_TC_RECLASSIFY_LOOP to avoid adding new drop reason
-- Link to v1: https://lore.kernel.org/netdev/20260511063005.38134-1-zhaoyz2=
-4@mails.tsinghua.edu.cn/
----
- net/core/dev.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+net: mana: force full-page RX buffers via ethtool private flag
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 831129f2a..bb9ae92f0 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -5958,6 +5958,7 @@ static int __netif_receive_skb_core(struct sk_buff **=
-pskb, bool pfmemalloc,
- 	struct net_device *orig_dev;
- 	bool deliver_exact =3D false;
- 	int ret =3D NET_RX_DROP;
-+	int redirect_depth =3D 0;
- 	__be16 type;
+This patch adds an ethtool private flag "full-page-rx" that forces one
+RX buffer per page, bypassing the page_pool fragment path, to address
+a 15-20% throughput regression seen on some 4K PAGE_SIZE ARM64
+platforms under high connection counts.  Toggling the flag triggers
+mana_detach() + mana_attach() to apply the new RX buffer layout.
 
- 	net_timestamp_check(!READ_ONCE(net_hotdata.tstamp_prequeue), skb);
-@@ -6031,8 +6032,16 @@ static int __netif_receive_skb_core(struct sk_buff *=
-*pskb, bool pfmemalloc,
- 		nf_skip_egress(skb, true);
- 		skb =3D sch_handle_ingress(skb, &pt_prev, &ret, orig_dev,
- 					 &another);
--		if (another)
-+		if (another) {
-+			if (unlikely(++redirect_depth > XMIT_RECURSION_LIMIT)) {
-+				net_warn_ratelimited(
-+					"%s: redirect loop limit reached, dropping (dev=3D%s)\n",
-+					__func__, skb->dev->name);
-+				drop_reason =3D SKB_DROP_REASON_TC_RECLASSIFY_LOOP;
-+				goto drop;
-+			}
- 			goto another_round;
-+		}
- 		if (!skb)
- 			goto out;
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> index a28ca461c135..dfd222de11d0 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
 
---
-2.43.0=
+[ ... ]
 
+> @@ -590,6 +609,88 @@ static int mana_get_link_ksettings(struct net_device *ndev,
+>  	return 0;
+>  }
+>  
+
+[ ... ]
+
+> +static int mana_set_priv_flags(struct net_device *ndev, u32 priv_flags)
+> +{
+> +	struct mana_port_context *apc = netdev_priv(ndev);
+> +	u32 changed = apc->priv_flags ^ priv_flags;
+> +	u32 old_priv_flags = apc->priv_flags;
+> +	bool schedule_port_reset = false;
+> +	int err = 0;
+> +
+> +	if (!changed)
+> +		return 0;
+> +
+> +	/* Reject unknown bits */
+> +	if (priv_flags & ~GENMASK(MANA_PRIV_FLAG_MAX - 1, 0))
+> +		return -EINVAL;
+> +
+> +	if (changed & BIT(MANA_PRIV_FLAG_USE_FULL_PAGE_RXBUF)) {
+> +		apc->priv_flags = priv_flags;
+> +
+> +		if (!apc->port_is_up) {
+> +			/* Port is down, flag updated to apply on next up
+> +			 * so just return.
+> +			 */
+> +			return 0;
+> +		}
+> +
+> +		/* Pre-allocate buffers to prevent failure in mana_attach
+> +		 * later
+> +		 */
+> +		err = mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
+> +		if (err) {
+> +			netdev_err(ndev,
+> +				   "Insufficient memory for new allocations\n");
+> +			apc->priv_flags = old_priv_flags;
+> +			return err;
+> +		}
+> +
+> +		err = mana_detach(ndev, false);
+> +		if (err) {
+> +			netdev_err(ndev, "mana_detach failed: %d\n", err);
+> +			apc->priv_flags = old_priv_flags;
+> +
+> +			/* Port is in an inconsistent state. Restore
+> +			 * 'port_is_up' so that queue reset work handler
+> +			 * can properly detach and re-attach.
+> +			 */
+> +			apc->port_is_up = true;
+> +			schedule_port_reset = true;
+> +			goto out;
+> +		}
+> +
+> +		err = mana_attach(ndev);
+> +		if (err) {
+> +			netdev_err(ndev, "mana_attach failed: %d\n", err);
+> +			apc->priv_flags = old_priv_flags;
+> +
+> +			/* Restore 'port_is_up' so the reset work handler
+> +			 * can properly detach/attach. Without this,
+> +			 * the handler sees port_is_up=false and skips
+> +			 * queue allocation, leaving the port dead.
+> +			 */
+> +			apc->port_is_up = true;
+> +			schedule_port_reset = true;
+> +		}
+> +	}
+> +
+> +out:
+> +	mana_pre_dealloc_rxbufs(apc);
+> +
+> +	if (schedule_port_reset)
+> +		queue_work(apc->ac->per_port_queue_reset_wq,
+> +			   &apc->queue_reset_work);
+> +
+> +	return err;
+> +}
+
+[High]
+Can this failure path oops inside the reset work handler?
+
+When mana_attach() fails after mana_detach() has already torn the vport
+down, apc->tx_qp has been set to NULL by mana_destroy_txq() and apc->rxqs
+has been cleared by mana_cleanup_port_context().  This code then forces
+apc->port_is_up back to true and queues apc->queue_reset_work:
+
+    apc->port_is_up = true;
+    schedule_port_reset = true;
+
+When mana_per_port_queue_reset_work_handler runs it calls
+mana_detach(ndev, false), which latches port_st_save = port_is_up = true
+and, because port_st_save is true, invokes mana_dealloc_queues().  The TX
+drain loop there does:
+
+    txq = &apc->tx_qp[i].txq;
+    atomic_read(&txq->pending_sends);
+
+with no NULL check on apc->tx_qp, and mana_destroy_vport further down
+iterates apc->rxqs[rxq_idx] while rxqs is NULL.  Would that produce a
+NULL pointer dereference in the workqueue worker whenever mana_attach()
+fails here (for example on an allocation failure in
+mana_init_port_context or mana_create_txq, or a transient HW command
+failure in mana_query_vport_cfg / mana_cfg_vport)?
+
+The mana_detach() failure path above (goto out) reaches
+mana_dealloc_queues() through the same chain and looks to have the same
+exposure.
+
+For comparison, mana_change_mtu() handles a mana_attach() failure by
+returning the error without scheduling a reset.  Would a similar
+treatment here avoid the asynchronous oops, or is there a reason the
+reset must be scheduled in this specific failure case?
+-- 
+pw-bot: cr
 
