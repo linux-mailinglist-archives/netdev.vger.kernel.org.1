@@ -1,80 +1,82 @@
-Return-Path: <netdev+bounces-287298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287299-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CPHzHJyUA2rY7gEAu9opvQ
-	(envelope-from <netdev+bounces-287298-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:59:08 +0200
+	id qPRnCteSA2pz7gEAu9opvQ
+	(envelope-from <netdev+bounces-287299-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:51:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 761C9529BF1
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:59:07 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B80EB529960
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:51:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8EAB43029977
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 20:51:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 475333020C2E
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 20:51:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179363C81BF;
-	Tue, 12 May 2026 20:51:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 726AC3C5529;
+	Tue, 12 May 2026 20:51:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q67Ia9mM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L4WGyJBq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F08443C4555
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 20:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3204B3AD530
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 20:51:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778619083; cv=none; b=VHOan9JOgTKLTU4twRsEXsiC54yvLUc5NO9fC8EVRJ6PmY91+lk1WRE4Z9afh2FPmBfgazAXGcoZaCXW2dNNOg9GNL+eKlWcFfdghBvFXQotIkksqJ6KKrO281SxOmeraFtfF1DJvTrZcxQQcbrrqbLRPRtthC8kNo3/b2CuFb8=
+	t=1778619086; cv=none; b=szm1tbpmFX+0qYj8yv6wOi07nSXdY0cSdWojawiSbEhonkd/K5Fd3gOWlDzx/NzQYLfSAE/hdX4wXvDKBpcWwP/V9C6oX+W6UXHgdQT+ixDC0rOzF8EdwaXp9WG/PGI/lmm9WRvDFI6o5hx6Lpv8V8CHD3pnuvVI702mITHFQDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778619083; c=relaxed/simple;
-	bh=DaExS6jVhCbFdfpu1jp+ptHK+FugGZYNQVrAif7iSd8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=melEBYOhLrMJY9RuwDZGwrOHCKdDd8ajfNgPIcmlJaHTa8nnBNEPOcc1lSHLXdjPt8QtZhrC6fX7l8BM6WnTbs4xdZs49V2EmHYAGizRw+MfCr4X+xd37YuaPImjd8Nm+2eV4XJDJz/D/TartWmnQiXV5f5GWKBx0ZtQY4iK6yU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=q67Ia9mM; arc=none smtp.client-ip=209.85.222.180
+	s=arc-20240116; t=1778619086; c=relaxed/simple;
+	bh=SrGWi/6wHIXpn0Jzv1Nk8znKQrM+sdOspj2f3aHSYS0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=tiElAuDJeTZk5txKWMby3dc2yvGMyFW7VvR7JdaN1HKpX5nXvYBPUOVOri/2BY3wE0fu23bx6GStl8nj200lOL29/KjAr8m1od8ax7ftnYxpKRx0Y/CUgxS2YvLDt67zLdG25bq3a1jTWnW/Ly+dDVLaO51VLZ6Co4yqhbiP4Ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L4WGyJBq; arc=none smtp.client-ip=209.85.222.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-8ea8563c693so646548485a.2
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 13:51:20 -0700 (PDT)
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-8d736211595so419482685a.0
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 13:51:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778619080; x=1779223880; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XUMHU/SEZPYFwgbrY/+Ks3cr/YWBTknXiaWwRLGqhxk=;
-        b=q67Ia9mMETYGr8O2ZyTVYha1e1u1W6iKNLtotcCxUeBF3OzAV/HYSRsXg50aw/ydCD
-         9RgOzehLJUIZqHDciV+zgf1Z+T9L0rBwVYnpjlwbFSIwUr5yE9pQ0tCipcgGDpUBVeIQ
-         g4wAQSoVTSQd+Blz8eM4JDvPUdKVZ44eprrXnI+tzUcWsEn7IHV1niuUUYGU0jMDPVlo
-         rN3ClC4UQhBAHDHKLLnGef6DGveSEDCy/lFThOWhZjW8kZk6d/QELHWANuPXX1AVEf+5
-         FmNaeMWbwNFp7+TjNLkF4QOuXFcVz8geOBF/WgnnzBIzLsTZNCPUC5T4AFOXPXTqzjQH
-         DXHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778619080; x=1779223880;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1778619081; x=1779223881; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XUMHU/SEZPYFwgbrY/+Ks3cr/YWBTknXiaWwRLGqhxk=;
-        b=owLPhLg36ZgmO9LgjwK+clDFnphiVynz5TfgigeDLYRjb0y95V42iTsglP90cnI8cR
-         PdnU55k+QXCG3xFE3ExaHnYXhAyDV3VgbTYIjBFHCiHgmpHLIJqMD4cW2ET4QRSzdkrS
-         QuyCE4+g9a+/4Dup0bM5Q7v6U0nD58yQ4TS0sA2waMFNkBHK4lQPcwyRL19FODxVlEKF
-         HvSBziXdPCnRb1R1CUNUOHbO9x5zruZgsywWaQu3gNsffMGA0NOsFRtNBdi1sI/d4Lpb
-         aG3wbdwnT/Eo28Knu0O4KVUtUZ9A8KmEEBZ3d6phVxmRsx/ICD/8E/XFfq9IxjR6QhKF
-         TF7Q==
-X-Forwarded-Encrypted: i=1; AFNElJ8HnkSWtdTCgyJLyRh0HDmSqn+O6IxNZYyeBV9g04UcrhnOVy2E6ZWiYsyO3GKhasz79tnPfJY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyE+fUFg+7q9R2QSCus97MSaq7xRQdT8SEQ0pgIMUiEXjTYnDZm
-	Br8WXSDtn0Q8kDy+VN2ovnHBlz7ptws7nXB8LJM94e7hlDWtK5eIqJSY
-X-Gm-Gg: Acq92OHDbX7QUglHo0xcFdRzXpkT0z0SWCKNwxTSMEKsFTFnH0DyGtXmGsGGLpx3xEy
-	FpKkTOuYwnAFENd6O7y5P32rDf17KWjsc/T3Z48D8+u8HsYG/Slrh6vzt5ZdsfnPmOH/VFH1Phz
-	GrpRoTLf0rdKMPVJ/uSerJb5RxWHOAVRVew9qS7HID4jmDwQBLFX32N1sohs6FyYgHdy4ObCgMJ
-	yk0Zi8jIg+sYVklMBnl0zv4hvsnH5DmqUEZFXLw6nKEHdeu4ilRfm1rkZRb3gUMKkK0jJQPFVei
-	9z/vRSn43CHdQUUcXZ8HaAeqsU0keRYTB+bUZ1ndvI6J9ci93DVP/q2dCXP50KC+mGnHAocPery
-	ZxtSi6B0zHF4RkrTOnEkxmVpoLeZepflIy5BikXSXmEuPbmaTqqcydLPAk9LEP4rDvZkop5gIhq
-	xcu5eZKQFjtSt9YBKjbcULqFJXxL8UmgXYOCQPk6PfoS3EgoqaxLeggKp/GUmiApLeU33wvT7KR
-	YANxvY9UDuMJqssxJ8YfKj3OrAfsH33KTdHK9kO9p0=
-X-Received: by 2002:a05:620a:7014:b0:8d9:3cb9:9905 with SMTP id af79cd13be357-90fade53b89mr6198085a.54.1778619079364;
-        Tue, 12 May 2026 13:51:19 -0700 (PDT)
+        bh=Gga6YQiahEkWcYcvgOogf9AGzn6VBTkh6VyNbP8w6hs=;
+        b=L4WGyJBqW98rGzfUq48UkQf+sLoqqFqTRI8lsOY9ffyHrujzBc46X+w82lmEugol6+
+         6CiCMw5AaJAXJs5x7AJiCKQczN/xlvzsFlEZjKHUMQ3smEUIVzrnvgaWzTAdQHA9rv/i
+         UkQ/neWqYsrRVUtMWtK4qIsix3oaH4DCdYEMlcD9g8Bqt7i8MN+iK26pwgWncfW0i5Cb
+         RWWQQHdyYfU/da8eXynlyL1UFFjUqO5ezHQ83AN3RGnBlKXMC/r0IU9wWzE0fT5KzeN6
+         Ny06CFroIcEVNJhWVDcqv+QyQ13sSY1EOAApL4mXVfFcS45wNTi7cYVVrlcaOJyzpPoc
+         n3PQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778619081; x=1779223881;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Gga6YQiahEkWcYcvgOogf9AGzn6VBTkh6VyNbP8w6hs=;
+        b=gMfqNyftsDrB5Er8q8XYewtitm5JzX6ebVwE2eDnJIwhwdACHRBJm6L4AV5ci3OyUK
+         qJgX+oR9v1juTK6XK+wBrGpCISrhxTNJEt5wfZlx29X2qlJNXBZT3Qt5ptvy4RkwwUCa
+         VpjU3A/wJ2mXoF7hahSYexV8G36c9RPA5zxCjzHR/Gfnl/OgK0Y1oZ/u+9qO4YOGQ9b6
+         sLoLYxMiV4lnjx2JJm06PkQ+56yydZfuKm3pL+lYu/lh5e05py0Bhb63sEUMqwyi5jYC
+         RmOXCuAdhBxTemDKDqc15AY695eLUZjhvbfZCfssWzoIPmLgXnuorcSYk9HxaqeO7yxK
+         GB5A==
+X-Forwarded-Encrypted: i=1; AFNElJ9OH56NBk5daRUFVXBJv97HemEQ23NMvClSr3Hlt0xFSMUIowTXbv9IRvNnQ29KiIbe4lrooIQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKUn5l8z8TCTxprU9NI8lgFUMjQXUCsGeWzq7JMEgGwNuIQq64
+	YgLgpG1cC6dCCGD9IwyY4ymnqiyT2RyJ8qArSgK8RHlP2pfGO7leTHM/
+X-Gm-Gg: Acq92OG2l6+3RwUJRWq2pwnHAVG5jQFMPF2q6axluyLzwWzDE0a7zf2ZOCikC/6FCyw
+	9Q6Hcw+cvvW9V0tE2sf4F8HDoG6TDbW2CzMkMrM56+cRXe/93j1zbX5W66bry2mGak9umWiAP1E
+	QaUZEwT28oY5EE2IlehcLvQDvq0d6T7YDWe7aiE4lFde8C1hVZ/AozGcX+q21rQUrevRtzsJUYC
+	+t1WYuH5K4pSkE65kOy1yX8eDTbwQzg0P90mcc2ta8imm8Xq6pd6PtGHNRyMb+5ut3duCIsVzv+
+	MyMOiHg3VzLWAzeMeQsRa6W9ZKSwWTjWGZNqysiC4z8lI6dk8YAOTuQBjJaFDjeMzWqZNmn3iFp
+	t5a793oFdhYkmVdwea4ZT9Mj0uUsIXYSZQq9oOeOWHlGq+JTBeHYDxEMTzHYpY+aRGGCqiYAz66
+	/Gvva4AYHkGlVzrOM/vyKhT+rVtgto07nwQnDCT5dreECva5ZbbkBttcpL+6OSG0/GP1PW5w0RO
+	POgQ23bghu7BT/8sT0cw4fhKF6t2ygf6JPhW5aD9jlV0cxOG3aJPA==
+X-Received: by 2002:a05:620a:d8e:b0:90b:263:f6b with SMTP id af79cd13be357-90fabcf968amr11126885a.21.1778619080781;
+        Tue, 12 May 2026 13:51:20 -0700 (PDT)
 Received: from server0.tail6e7dd.ts.net (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-907b8d9eed0sm1490734285a.19.2026.05.12.13.51.18
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-907b8d9eed0sm1490734285a.19.2026.05.12.13.51.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 May 2026 13:51:18 -0700 (PDT)
+        Tue, 12 May 2026 13:51:20 -0700 (PDT)
 From: Michael Bommarito <michael.bommarito@gmail.com>
 To: Steffen Klassert <steffen.klassert@secunet.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
@@ -92,11 +94,14 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	Florian Westphal <fw@strlen.de>,
 	netfilter-devel@vger.kernel.org,
 	coreteam@netfilter.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net 0/2] ipv4: harden against ihl < 5 IP_HDRINCL packets
-Date: Tue, 12 May 2026 16:51:13 -0400
-Message-ID: <cover.1778614451.git.michael.bommarito@gmail.com>
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net 1/2] ipv4: raw: reject IP_HDRINCL packets with ihl < 5
+Date: Tue, 12 May 2026 16:51:14 -0400
+Message-ID: <77ec2b5e8111961c2c39883c92e8aa2709039c17.1778614451.git.michael.bommarito@gmail.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <cover.1778614451.git.michael.bommarito@gmail.com>
+References: <cover.1778614451.git.michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,27 +109,27 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 761C9529BF1
+X-Rspamd-Queue-Id: B80EB529960
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287298-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-287299-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
@@ -133,138 +138,87 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,apana.org.au:email]
 X-Rspamd-Action: no action
 
-This series fixes a size_t underflow in net/ipv4/ah4.c:ah_output()
-reachable when a raw IP_HDRINCL socket sends a packet with ihl < 5
-through an xfrm AH policy.  Originally triaged on security@kernel.org;
-moving to netdev at Herbert's suggestion so nftables / netfilter
-maintainers can weigh in on a related question (see "Open question"
-below).  Herbert also asked for the malformed packet to be rejected
-upstream of AH rather than guarded at the AH consumer; that is
-patch 1/2.  v1's AH-side guard is kept here as 2/2 defense-in-depth.
+raw_send_hdrinc() validates that the caller-supplied IPv4 header
+fits within the message length:
 
-Bug
----
+    iphlen = iph->ihl * 4;
+    err = -EINVAL;
+    if (iphlen > length)
+        goto error_free;
 
-In net/ipv4/ah4.c, ah_output_done() and ah_output() copy the IPv4
-options area with
-
-    if (top_iph->ihl != 5) {
-        memcpy(dst, src, top_iph->ihl * 4 - sizeof(struct iphdr));
+    if (iphlen >= sizeof(*iph)) {
+        /* fix up saddr, tot_len, id, csum, transport_header */
     }
 
-The "!= 5" guard correctly excludes the no-options case but does
-NOT exclude ihl < 5.  For ihl in [0, 4], top_iph->ihl * 4 is less
-than sizeof(struct iphdr) (20); the subtraction is computed as int
-and becomes negative, then is implicitly converted to size_t at the
-memcpy() call.  The resulting length is close to SIZE_MAX and
-memcpy walks off the slab allocation backing the skb's network
-header.
+It does not, however, reject ihl < 5.  For such a packet the
+"if (iphlen >= sizeof(*iph))" branch is skipped, leaving the
+crafted iphdr untouched, but the packet is still handed to
+__ip_local_out() and onward.  Downstream consumers that read
+iph->ihl assume a sane value: net/ipv4/ah4.c:ah_output() in
+particular subtracts sizeof(struct iphdr) from top_iph->ihl * 4
+and passes the (signed-int-negative, then cast to size_t)
+result to memcpy(), producing an OOB access of length close to
+SIZE_MAX and a host kernel panic.
 
-The malformed packet arrives via raw_send_hdrinc() in net/ipv4/raw.c.
-raw_send_hdrinc() validates "iphlen > length" but does not reject
-"iphlen < sizeof(struct iphdr)".  An IP_HDRINCL caller with
-CAP_NET_RAW (acquirable in an unprivileged user+net namespace on a
-distro kernel with CONFIG_USER_NS=y) can therefore craft an ihl < 5
-packet; if a matching xfrm AH policy is installed on the outgoing
-route, ah_output() runs on the crafted packet and panics the host
-kernel.
+An IPv4 header with ihl < 5 is malformed by definition (RFC 791:
+"Internet Header Length is the length of the internet header in
+32 bit words ... Note that the minimum value for a correct header
+is 5.").  The kernel should not be willing to inject such a
+packet into its own output path.
 
-The guard has been in place since 1da177e4c3f4 ("Linux-2.6.12-rc2",
-2005).  No prior fix on lore (3-year window) and no CVE on the file.
+Reject "iphlen < sizeof(*iph)" alongside the existing
+"iphlen > length" check.  This matches the principle that locally
+constructed packets that re-enter the IP stack must pass the same
+basic sanity tests that a foreign packet would be subjected to.
 
-Reproduction
-------------
+Once this lands, the "if (iphlen >= sizeof(*iph))" wrapper around
+the fixup branch becomes redundant; left in place to keep the
+patch minimal and backport-friendly.  A follow-up can unwrap it.
 
-x86 + KASAN (QEMU KVM, net-next 7.1.0-rc2):
+Note that commit 86f4c90a1c5c ("ipv4, ipv6: ensure raw socket
+message is big enough to hold an IP header") ensures the message
+buffer is large enough to hold an iphdr, but does not constrain
+the self-reported iph->ihl.
 
-  BUG: KASAN: out-of-bounds in ah_output+0x696/0x19e0
-  Read of size 18446744073709551596 at addr ffff88800bae9824 \
-      by task trigger_ah4_ihl/97
-  Call Trace:
-   __asan_memcpy+0x23/0x60
-   ah_output+0x696/0x19e0
-   xfrm_output_resume+0xdc8/0x6280
-   xfrm4_output+0xfe/0x4c0
-   raw_sendmsg+0x2531/0x26f0
-   __sys_sendto+0x32b/0x390
-   __x64_sys_sendto+0xdf/0x1f0
-   do_syscall_64+0xf3/0x6a0
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-  The buggy address belongs to the object at ffff88800bae9800
-   which belongs to the cache kmalloc-1k of size 1024
-  The buggy address is located 36 bytes inside of
-   1024-byte region [ffff88800bae9800, ffff88800bae9c00)
+Reachability: the malformed packet source is any caller with
+CAP_NET_RAW, including an unprivileged process in a user+net
+namespace on a kernel with CONFIG_USER_NS=y.  The reproduced AH
+crash also requires a matching xfrm AH policy on the outgoing
+route; a container granted CAP_NET_ADMIN can install that state
+and policy in its netns.  Loopback bypasses xfrm_output, so the
+trigger uses a real netdev.
 
-The read size 0xFFFFFFFFFFFFFFEC (SIZE_MAX - 19) is the
-underflowed result of (top_iph->ihl * 4 - sizeof(struct iphdr))
-for ihl = 0.  Trigger: veth pair (loopback bypasses
-xfrm_output), xfrm AH transport-mode policy, IP_HDRINCL
-sendto() of a 128-byte packet with iph->ihl in [0, 4].
+Reproduced on UML + KASAN: kernel-mode fault at addr 0x0 with
+memcpy_orig at the crash site.  Same shape reproduces inside a
+rootless Docker container with --cap-add NET_ADMIN on a stock
+distro kernel.
 
-A container-only variant (CAP_NET_ADMIN container, no
---privileged, no host networking) panics the host kernel on a
-stock distro kernel with CONFIG_INET_AH=m + module autoload.
-Repro harness + container Dockerfile + console logs available
-privately on request; not attached to this public posting.
-
-Patches
--------
-
-1/2 ipv4: raw: reject IP_HDRINCL packets with ihl < 5
-
-    Upstream-of-AH fix.  An IPv4 header with ihl < 5 is malformed
-    by definition (RFC 791) and must not be allowed to continue
-    along the in-stack output path.  This is the primary fix.
-
-2/2 ipv4: ah: harden ah_output options-copy guard against ihl < 5
-
-    Defense-in-depth at the three memcpy sites in ah_output() and
-    ah_output_done().  Changes "if (top_iph->ihl != 5)" to
-    "if (top_iph->ihl > 5)" so a future path delivering an ihl < 5
-    packet cannot re-introduce the OOB access.  With patch 1/2 in
-    place an IP_HDRINCL-crafted ihl < 5 packet should no longer
-    reach ah_output; this patch closes the OOB primitive
-    specifically at the AH consumer.
-
-Open question for netfilter / netdev
-------------------------------------
-
-After patch 1/2 lands, a caller with CAP_NET_ADMIN can still
-deliver an ihl < 5 packet into the post-LOCAL_OUT in-stack path by
-attaching an nftables payload-set rule on NF_INET_LOCAL_OUT (or an
-NFQUEUE reinject on the same hook) that rewrites byte 0 of the
-IPv4 header after the raw_send_hdrinc / __ip_local_out validation
-has run.  Construction:
-
-    nft add table ip mangle
-    nft add chain ip mangle output { type filter hook output \
-                                     priority -150 \; }
-    nft add rule ip mangle output ip daddr <victim> \
-                                  @nh,0,8 set 0x40
-
-I reproduced this separately with nftables payload-set delivering an
-ihl = 0 packet to xfrm4_output() and onward.  Patch 2/2 covers the
-AH consumer; other consumers that read iph->ihl after the LOCAL_OUT
-hook may be similarly exposed and I have not enumerated them.
-
-Direction question rather than a fix proposal: does basic iphdr
-re-sanitization after a header-mangling hook belong in the netfilter
-machinery, in each in-stack consumer, or both?
-
-Michael Bommarito (2):
-  ipv4: raw: reject IP_HDRINCL packets with ihl < 5
-  ipv4: ah: harden ah_output options-copy guard against ihl < 5
-
- net/ipv4/ah4.c | 6 +++---
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Cc: stable@vger.kernel.org
+Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+Assisted-by: Claude:claude-opus-4-7
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+---
  net/ipv4/raw.c | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-base-commit: 73d587ae684d176fac9db94173f77d78a794ea4f
---
+diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
+index 5aaf9c62c8e1..68e88cb3e55c 100644
+--- a/net/ipv4/raw.c
++++ b/net/ipv4/raw.c
+@@ -391,7 +391,7 @@ static int raw_send_hdrinc(struct sock *sk, struct flowi4 *fl4,
+ 	 * in, reject the frame as invalid
+ 	 */
+ 	err = -EINVAL;
+-	if (iphlen > length)
++	if (iphlen > length || iphlen < sizeof(*iph))
+ 		goto error_free;
+ 
+ 	if (iphlen >= sizeof(*iph)) {
+-- 
 2.53.0
 
 
