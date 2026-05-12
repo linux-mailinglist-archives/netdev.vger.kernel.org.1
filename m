@@ -1,280 +1,128 @@
-Return-Path: <netdev+bounces-286900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286902-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YF4vA+uAAmpDtwEAu9opvQ
-	(envelope-from <netdev+bounces-286900-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 03:22:51 +0200
+	id uPKmEliBAmpDtwEAu9opvQ
+	(envelope-from <netdev+bounces-286902-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 03:24:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60A095182DC
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 03:22:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3D7B51834A
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 03:24:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C5F713022951
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 01:18:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3241E303749B
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 01:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C57D82E62A9;
-	Tue, 12 May 2026 01:18:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E78F4259CB2;
+	Tue, 12 May 2026 01:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tGD1xBAm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m7ggUw8t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1085C2BE7AC
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 01:18:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4CF4253B58
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 01:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778548709; cv=none; b=mhsI/vFq0u79NPeoQg0Cqnv/rCi00HDTdxWTBWz7zAUtNThKZh+8BxHHWxdE26vX+OZsTFMGdCj8NR4DyJkvpMK6M3PnUiWcMOWJqciw882bzoihOciQjVKePyiRBoTsUXnUrnyOOMtBnQx2ElqNCo6J1BXaFNFKfI1Ex75u20k=
+	t=1778548825; cv=none; b=K00V+YfV4Ron3qQ5tDB2xbHdmC2LPDnTzIRXJqbx+zPyibnE4Y0LO9VhN68/c1CTKT+vYG3TPM7pwiXJId6m05iSw2KSCC16ovTLp5dQsKh5SlycRfj7oy1SV0oxlPOZ9589h+Duup0msj23S82CD+3KH3yA3G2ScpY1/0PqMj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778548709; c=relaxed/simple;
-	bh=w3CtU+hYwk0vuDDvZWpVkcnsbUsLWI9bRzUE1HZQ2bs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ThQuWjtLr7xL/7HKD79jCjzETjxBhU3hKT1EkJHwcjh1wGHDEIRp7wUzDM9iU0HIchCTbHVgERT2QUl+qjGjZTSVIqv6TQKspc0rP6G0yYoSL8gCfG+8gngWNZIwKbWDyeIdc2LzrzygILulx7LW794Tmaem3s3tZwbrtmeCJeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=tGD1xBAm; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-512f750d4b2so39782631cf.1
-        for <netdev@vger.kernel.org>; Mon, 11 May 2026 18:18:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778548705; x=1779153505; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=T4O7WaEUgH7uVF1t7R5QzWbPYxx8khqSIJzO/Wkups0=;
-        b=tGD1xBAmuKbAf60hHbmrhLIh/GOC3eDjfW/1xR61lPL6YWmQkkF/rfbm/xJoxHjuZ+
-         Qag2O9wajlRkgDpLU+V0ABhLAn4ILDcFiOp3tIy7mtnzBK0rqeF2qXptBJhbaNqR1jWI
-         cMf648R7YQgT2p8Xg0+PakWlV6Czvj+ArGkxJVlNEY7mphYoQIGTP6C8LZykq0wRaxI/
-         Y8Vzx+p8im7VdbfdHt6h7jb6TeGW7rJqOEtqWUw6Ia8+tJO/4omkHerzrzXsI2wzcoy1
-         iBIPYRezCFtASQz5aN6YKXQjrFmzSc7HoUG2NfEzeHWBfKE4eESo2cMWmxhIR/LdjtwJ
-         QM2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778548705; x=1779153505;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=T4O7WaEUgH7uVF1t7R5QzWbPYxx8khqSIJzO/Wkups0=;
-        b=oiA3HQfBZg9LVo6DNcRvwfBnn0YsjR/tImMn0YUQf5iKznl3ovKfHZWkeuuOaedF6O
-         OnkC9mWdnScAEmyNtnTvt26BYDHueqhhS2pZJWUOrgL1SRwV2lD4VXriSG8ZxC9/Ts5N
-         kWi5ikP9AoJJGXbjM6fPLHRTKqLaU+x/T0yj6ldvParuC5t8Cie/f8MpgjEZXIFjORq7
-         z8QZ/1VNMzsTxxP8lqP9U1DLEBavvnrMInAbqWx/Sa5hvfM0qwRuiUcVejHIgb3tROxh
-         I8TOxqpNMr5l3L7d4pleGuird8uScyvMROo8TQTOqIrVk+PJ5sLgKkbIb2ByHVxJCCIj
-         PYLQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8/SUxR3/4/xluls9fBfqWX6DS3CXwchspBN84btgrpjQZ9w/aYXs4h+sxssuudEC2RbRCE3Hg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4lF8oJ/zyUcRvaP9NJdYc2WRP3IJ8Dq1b1EGdBXT+nrN5VZnF
-	pL3LIyosV07PLiY+S7C+FlWjg8SaIcp78CVhXBRDsZL7RRu5N0Js3Qvc
-X-Gm-Gg: Acq92OFaSr6rxCIFBpD+tlwoehfgYKh6bUgNj3VN0YJxHkTrgq7D8RGihkfzfNUN+W5
-	yI9xo5bHfr81/PyKKAdIx+QNUhpjYABvW0R40glGBhegW8/M1TH2xPuROHSZhCRqkYBsb8sjM+L
-	u/MihGK7svC1MDitn/3YIM83JxiWC/Kk1nhy9Yko2+wmDq6X5SDI/NLi4rTptRknaVJOAip2hEA
-	71aKuGDro9Md5AoQtp6WmWmGuwSA6AnuSp4+qcs16U8k8scSRaAQO/E1LF6XdsiSDrSUJE/u3KP
-	uxiY56g/dvZ5kecGzex+hI0IhVZc952+i/20i1xPDpP72ZegxQF2wbMlcRssGd6jniuKO8FoEYW
-	LpUntfhshh8Qo20DLUZVVWi+32SX2HHgheXfDclVxP3rZ/YzUZLNA4mQUlih/Q7h7dXXQ/Knwf/
-	WfGnPO2iGdADRc0lg4tng=
-X-Received: by 2002:a05:622a:92:b0:50d:770f:ad23 with SMTP id d75a77b69052e-514d1c943c9mr15635691cf.26.1778548704810;
-        Mon, 11 May 2026 18:18:24 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:72::])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-514a956cad9sm71871261cf.9.2026.05.11.18.18.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 18:18:24 -0700 (PDT)
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Mon, 11 May 2026 18:18:02 -0700
-Subject: [PATCH net-next v4 8/8] selftests: drv-net: add netkit devmem
- tests
+	s=arc-20240116; t=1778548825; c=relaxed/simple;
+	bh=zrTOB7Ajk8FLNHB3+mfBCcvDyXiKX7X+bSHYzT5wv8U=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=chL2ZAchglrpuiP92IvQVrtR6ycZ9WTjotmd2qFyqX6xEzZgtNvicAdxYGa13AXI7rw38fuGn6C90Xz7L89s9wst8J+FwY/nXB2oECJ/vcFZaqoFGKsK+Zj4wHEa+ug+LaC5Xyj64noQ7/yXFqjmSe1rmlYOM43EgOaIW/nQvVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m7ggUw8t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DFCCC2BCB0;
+	Tue, 12 May 2026 01:20:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778548825;
+	bh=zrTOB7Ajk8FLNHB3+mfBCcvDyXiKX7X+bSHYzT5wv8U=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=m7ggUw8t4bh8EuuyeHbMB/l5jzhMbMzDZ4KCSVZnZro5X7/a9KPJ1yRNuFM52wak/
+	 pvZ7DKDKQE9NXket3TGi/oxzAJlJM2O79v0BBpUm5P8qZlMfXY3gurXi8GJFil9rcR
+	 yQWlgIbhsbwb2P8nUGze9lTQw+Cd/xOIiEh3G8ymYn2nLrP8VjLjb6VNOiL3U6hAzZ
+	 I8YO2RzdzCqfvQISs2mdoePI281Q/+dGG1nHhoA9clIVBoDoF7Uoc5+G4Sq7Xc3qfW
+	 D9PFS/hYcp7s1ojc5orlWjXrlhSTHj3uRzV7Tye8jTJtGrczcEWVeIj2hySVbxWZm2
+	 cGq4l9NQIrahA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02CAB39308E4;
+	Tue, 12 May 2026 01:19:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260511-tcp-dm-netkit-v4-8-841b78b99d74@meta.com>
-References: <20260511-tcp-dm-netkit-v4-0-841b78b99d74@meta.com>
-In-Reply-To: <20260511-tcp-dm-netkit-v4-0-841b78b99d74@meta.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <skhan@linuxfoundation.org>, Alex Shi <alexs@kernel.org>, 
- Yanteng Si <si.yanteng@linux.dev>, Dongliang Mu <dzm91@hust.edu.cn>, 
- Michael Chan <michael.chan@broadcom.com>, 
- Pavan Chebbi <pavan.chebbi@broadcom.com>, 
- Joshua Washington <joshwash@google.com>, 
- Harshitha Ramamurthy <hramamurthy@google.com>, 
- Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, 
- Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
- Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Nikolay Aleksandrov <razor@blackwall.org>, Shuah Khan <shuah@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <skhan@linuxfoundation.org>, Alex Shi <alexs@kernel.org>, 
- Yanteng Si <si.yanteng@linux.dev>, Dongliang Mu <dzm91@hust.edu.cn>, 
- Michael Chan <michael.chan@broadcom.com>, 
- Pavan Chebbi <pavan.chebbi@broadcom.com>, 
- Joshua Washington <joshwash@google.com>, 
- Harshitha Ramamurthy <hramamurthy@google.com>, 
- Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, 
- Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
- Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Nikolay Aleksandrov <razor@blackwall.org>, Shuah Khan <shuah@kernel.org>
-Cc: dw@davidwei.uk, sdf.kernel@gmail.com, mohsin.bashr@gmail.com, 
- willemb@google.com, jiang.kun2@zte.com.cn, xu.xin16@zte.com.cn, 
- wang.yaxin@zte.com.cn, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- Stanislav Fomichev <sdf@fomichev.me>, Mina Almasry <almasrymina@google.com>, 
- netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- Bobby Eshleman <bobbyeshleman@meta.com>
-X-Mailer: b4 0.14.3
-X-Rspamd-Queue-Id: 60A095182DC
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net] tcp: Fix out-of-bounds access for twsk in
+ tcp_ao_established_key().
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177854877154.2528168.10390585844173110753.git-patchwork-notify@kernel.org>
+Date: Tue, 12 May 2026 01:19:31 +0000
+References: <20260508120853.4098365-1-kuniyu@google.com>
+In-Reply-To: <20260508120853.4098365-1-kuniyu@google.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: edumazet@google.com, ncardwell@google.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, 0x7f454c46@gmail.com, horms@kernel.org,
+ kuni1840@gmail.com, netdev@vger.kernel.org, melotti@google.com
+X-Rspamd-Queue-Id: C3D7B51834A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286900-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,redhat.com,gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_CC(0.00)[davidwei.uk,gmail.com,google.com,zte.com.cn,vger.kernel.org,fomichev.me,meta.com];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-286902-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCPT_COUNT_GT_50(0.00)[70];
+	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lib.py:url,fomichev.me:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nk_devmem.py:url,meta.com:email,meta.com:mid,devmem.py:url,nk_qlease.py:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-From: Bobby Eshleman <bobbyeshleman@meta.com>
+Hello:
 
-Add nk_devmem.py with four tests for TCP devmem through a netkit device:
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-These tests are just duplicates of the original devmem tests, with some
-adjusted parameters such as telling ncdevmem to avoid device setup
-(since it only has access to netkit, not a phys device).
+On Fri,  8 May 2026 12:08:46 +0000 you wrote:
+> lockdep_sock_is_held() was added in tcp_ao_established_key()
+> by the cited commit.
+> 
+> It can be called from tcp_v[46]_timewait_ack() with twsk.
+> 
+> Since it does not have sk->sk_lock, the lockdep annotation
+> results in out-of-bound access.
+> 
+> [...]
 
-Each test uses NetDrvContEnv with primary_rx_redirect=True to set up the
-BPF redirect program on the primary netkit interface.
+Here is the summary with links:
+  - [v2,net] tcp: Fix out-of-bounds access for twsk in tcp_ao_established_key().
+    https://git.kernel.org/netdev/net/c/03cb001ef87b
 
-The NIC (HDS, RSS, queue lease) is configured once in main() before
-ksft_run() and torn down in a finally block via cleanup_nic(), mirroring
-the nk_qlease.py pattern. This avoids re-toggling NIC settings around
-every test case.
-
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
----
-Changes in v4:
-- Call configure_nic()/cleanup_nic() once around ksft_run() rather than
-  relying on per-test configuration inside the run_* helpers.
-
-Changes in v3:
-- Reorder os.path expressions
-- Drop @ksft_disruptive from check_nk_rx_hds to mirror the original
-  check_rx_hds in devmem.py
-
-Changes in v2:
-- Add nk_devmem.py to TEST_PROGS in Makefile (Sashiko)
----
- tools/testing/selftests/drivers/net/hw/Makefile    |  1 +
- .../testing/selftests/drivers/net/hw/nk_devmem.py  | 55 ++++++++++++++++++++++
- 2 files changed, 56 insertions(+)
-
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index 85ca4d1ecf9e..2f78c6aec397 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -34,6 +34,7 @@ TEST_PROGS = \
- 	irq.py \
- 	loopback.sh \
- 	nic_timestamp.py \
-+	nk_devmem.py \
- 	nk_netns.py \
- 	nk_qlease.py \
- 	ntuple.py \
-diff --git a/tools/testing/selftests/drivers/net/hw/nk_devmem.py b/tools/testing/selftests/drivers/net/hw/nk_devmem.py
-new file mode 100755
-index 000000000000..0e36a0fa9688
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/nk_devmem.py
-@@ -0,0 +1,55 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+"""Test devmem TCP with netkit."""
-+
-+import os
-+from lib.py import ksft_run, ksft_exit, ksft_disruptive
-+from lib.py import NetDrvContEnv
-+from lib.py.devmem import (setup_test, require_devmem, configure_nic,
-+                           cleanup_nic, run_rx, run_tx, run_tx_chunks,
-+                           run_rx_hds)
-+
-+
-+@ksft_disruptive
-+def check_nk_rx(cfg) -> None:
-+    """Run the devmem RX test through netkit."""
-+    run_rx(cfg)
-+
-+
-+@ksft_disruptive
-+def check_nk_tx(cfg) -> None:
-+    """Run the devmem TX test through netkit."""
-+    run_tx(cfg)
-+
-+
-+@ksft_disruptive
-+def check_nk_tx_chunks(cfg) -> None:
-+    """Run the devmem TX chunking test through netkit."""
-+    run_tx_chunks(cfg)
-+
-+
-+def check_nk_rx_hds(cfg) -> None:
-+    """Run the HDS test through netkit."""
-+    run_rx_hds(cfg)
-+
-+
-+def main() -> None:
-+    """Configure the NIC once, then run the netkit devmem test cases."""
-+    with NetDrvContEnv(__file__, rxqueues=2, primary_rx_redirect=True) as cfg:
-+        setup_test(cfg,
-+                   os.path.join(os.path.dirname(os.path.abspath(__file__)),
-+                                "ncdevmem"))
-+
-+        require_devmem(cfg)
-+        configure_nic(cfg)
-+        try:
-+            ksft_run([check_nk_rx, check_nk_tx, check_nk_tx_chunks,
-+                      check_nk_rx_hds], args=(cfg,))
-+        finally:
-+            cleanup_nic(cfg)
-+
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
-
+You are awesome, thank you!
 -- 
-2.53.0-Meta
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
