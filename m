@@ -1,459 +1,381 @@
-Return-Path: <netdev+bounces-287148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287149-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oAh1BRA1A2oA1gEAu9opvQ
-	(envelope-from <netdev+bounces-287148-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:11:28 +0200
+	id +HXkDDIsA2pI1QEAu9opvQ
+	(envelope-from <netdev+bounces-287149-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:33:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0C5F522058
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:11:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E224521439
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:33:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E0494344B635
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:14:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 55EDD30F799F
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 318BD3BB685;
-	Tue, 12 May 2026 13:07:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8DB3390601;
+	Tue, 12 May 2026 13:12:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="f7Io3Qo+"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Ied+elYx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f227.google.com (mail-dy1-f227.google.com [74.125.82.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C5D397345
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 13:07:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151F7372049
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 13:12:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778591231; cv=none; b=F8nrS3T5PRwnLeJR1OTzFb9JH7OtLSHIlnuslbSh4Ij7HWcjYg7yLVUa4X+xvcJSXky1HUA4NSbZMw17rwBG2oPH440i6WtmI7DdFQAsOED2/1QBAs1AnYC9SxZaurN5vuaM2dF8YogP5APDZCtzx5G3lR1ctCJtg/jFawkuOzI=
+	t=1778591571; cv=none; b=fFJRck4jlpWs5FYVv+WK8YA0GCNtTykyue5cK1I+Cnj5eTQoLa8OvVZ8glwF9iHAYalUpcNSSk64RVxq/eXefTjQsH+V4o7qk2lPUu8+VVatx1lGxv9AxZ09CmPVz7O5WgAyfvu9Aif9XXsi2Mic3zpCg40J34w4z49qXRzO/4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778591231; c=relaxed/simple;
-	bh=Zp73zPEl6Z63oDdKOCgzNdNf9GZJrbXcpTLDXzaZ+OI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=L+XezjbSnuojh6XCt1Q2W6U6VMTed/bKtcJhjEnr+mRehlho2+bh5xHZSc4mwnzvLDauWpNokdXnBB0VC8QBgcyByGfy0OVahp+Pf/d0pi82NPdJ1NED9EM5OI7WyRt/pqCfYHS2r+j6ayWxAck9PXGsKUT25+2bp2xv5sBOhS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=f7Io3Qo+; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 1C3904E42C1C;
-	Tue, 12 May 2026 13:07:08 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id E604560646;
-	Tue, 12 May 2026 13:07:07 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A936A11AF88B7;
-	Tue, 12 May 2026 15:07:04 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1778591226; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=Cuuoi4MmFU77/JsO+2+fHWyEr7klhAMu0yIZiSuj6V4=;
-	b=f7Io3Qo+ZNyOJ/m6XYun7ANlsuCJ8lRXYpuFL0Q5vzZn9KntNNjUk1hu0TI6WcsCil5MHw
-	0X9nq+4Kg2O8Q2wXyLrGRsc8yHXVu7hHcnFJfv0p0kLHbtBi2RmKkkMN1x6qmwfbApn3mK
-	sLaZiz/gIBV1m9VC4CEwF3VYFwdErAabtKZHfGiX2K5aH/1L22FHftMHzdn1/cI59V0/3z
-	N83fIht80/fCKZhBRz7+XEX9N6EgBbc6FgEEb0Uuf6lyjFRKaBoWg/YvwKSkv8/n2yyHGN
-	I0FGMJhjzmYx+ReBTSUHomIDrIiTiRjJgiR3u4MJM/yTr2eBSo2GLQAvIXgyZQ==
-From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Date: Tue, 12 May 2026 15:06:37 +0200
-Subject: [PATCH net-next 15/15] net: dsa: microchip: bypass dev_ops for
- phy_read()/phy_write()
+	s=arc-20240116; t=1778591571; c=relaxed/simple;
+	bh=yoKSlLHIq6V2t8JPFWGuhQTw54VkN7WgpI0fkEQ3Ud8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M2XA6Hgem13zDAgqh9pZef90BUSxUoTlViHObFBMVW5TAVLqj7i0jRofO2LpL3WvMPIr+u9ARcXw0hq57NVntyU6rhdKZYnaQr84qhICuH/13tN4FpCewWLYiuEOX51o+lV7FENavrJg36EFGUdkXE2Awnz+we+0EFOQB6r6c/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Ied+elYx; arc=none smtp.client-ip=74.125.82.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-dy1-f227.google.com with SMTP id 5a478bee46e88-2bdcf5970cdso3981922eec.0
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 06:12:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778591569; x=1779196369;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+cChEzuuu8TfNLT1wjdx7G1mW04jJX2qj3GsuyxG+w4=;
+        b=UppUuHryQb7yfbqCPWyvOH76TJt5bFRlsU/maB/rF4aXKLq53ViVQVRi/c9+loDaM9
+         yrhN4AVQkFACeGLzLmvdE5I6N+Gi5EmXpk/flx4LP8yomNGop7E3KLsDEFNI4SxpNuPM
+         7jMNY386jI9FapjVvj4v/XqsrjeLDPK97f/PHLv4+fuTl/F+freLJCvBpM6GeIr0Tmtk
+         TAMHbmFJtGoaWc+yVjMIN4WHA0sg1oGL2m+M/09nZ5AIfYdMC4g/i5c+OeipC/xyTMRA
+         fy1jzdEBksO1iAZ2EDTa56rT+K5vLxJzvPob7a49bUe3QPKYXx9CANZjv2EywHl7ccKb
+         dA+Q==
+X-Forwarded-Encrypted: i=1; AFNElJ/3hUxjyg9B4WCOJuuGwVGpM+T8J81xdpl8oOOTmLUnlnxjZl8jimxXX5qg2UZUcJvxLsKcgzQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPngZO/rkUbh1G37FVp/qGvSPd3wobEr1lHfDaT6o2r5p73NRJ
+	rhd41CoABgtx+mb7WnBsTf4PGzPm2uVaRiGRxzgD7OpO7BDJRCedRK3iniT8K0T0NRk0RQdz1Ku
+	IXzyiOIT8100grYS+CNVCbH5p5Mu3Q4CLy30Xy1BTjjtf3KntonvpRHxVKI9nJzTxm1d+LujqQw
+	1aqJxYtStMLQKjdk52E1LXtSCSGf4euOOxHTZ2ARoN10EIUB3LDBk4igp533geuzRZDqVMBxuyq
+	PJ23RlzWixB7Q==
+X-Gm-Gg: Acq92OEhmweFyBXs/Si+TXOGCgJbgMyylQc5Rakp6NeXqedPuMs9jMngQMwZmvgSSn6
+	5yz/ssCamhGXQ37k+mYMvz30GbwxpA2YOp1L1qOGH4g7nF31oIiE33k+TItRS8nXCLBTZdP3kEF
+	WnDb1ZFZVPxRiOBLib7mafEPxNgI1QW5DtIYdx1clq3aUYW8xKX5YXxyZGTjPCpvtcRZAaVPQXa
+	AGGhlgfmOGLencAAh9ZHGlsKRIQSj41XmrNzq4uo6j5W8TuPJXpID1UvnCM1iSTFyFzfItgMGYL
+	puks6ghroJ4YJOddTR9sR0x+aMs8LF5lXlRkwLToqBGBXD2S2SCRjSc6RS1fMM6gyx8mCZuLut/
+	28zQIcUMOPCE3SS5e86FFC9sH9hw2jI80dj2xHKxGSrOLWpmbKYrwf8jtLDbNXIfc6pFDlSYgdg
+	9YfNrf
+X-Received: by 2002:a05:7301:1698:b0:2f0:c593:986a with SMTP id 5a478bee46e88-2ff906d92fbmr1926800eec.0.1778591568812;
+        Tue, 12 May 2026 06:12:48 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com ([144.49.247.127])
+        by smtp-relay.gmail.com with ESMTPS id 5a478bee46e88-2f88924a58fsm1414512eec.19.2026.05.12.06.12.48
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 12 May 2026 06:12:48 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-38e9c93b90bso21045201fa.2
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 06:12:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1778591566; x=1779196366; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=+cChEzuuu8TfNLT1wjdx7G1mW04jJX2qj3GsuyxG+w4=;
+        b=Ied+elYxyPjmvYZpdDhpxgeYaV3s+krQQtlN8gQiPVBB5/u34+6uBMOpVGRd14ggAT
+         fVFZZM6ngwyqPD1Y7618FokG8lEmEVze5xHT2JHHLZKhloslO9KeUIxwKo3PfGeKH155
+         e0arkUfg32PMZqqgdPV6QpP+R38Mf4Z+Uhwis=
+X-Forwarded-Encrypted: i=1; AFNElJ8I1n8j5SH5pwOopCftGJgjLEQ+iLjnKWzapY+1slXvkB8sns8+lvsvbrQpko1UQkoTHILnEOo=@vger.kernel.org
+X-Received: by 2002:a05:6512:691:b0:5a8:950f:e92e with SMTP id 2adb3069b0e04-5a8950fe96amr7209620e87.23.1778591565955;
+        Tue, 12 May 2026 06:12:45 -0700 (PDT)
+X-Received: by 2002:a05:6512:691:b0:5a8:950f:e92e with SMTP id
+ 2adb3069b0e04-5a8950fe96amr7209595e87.23.1778591565364; Tue, 12 May 2026
+ 06:12:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260512-clean-ksz-2nd-series-v1-15-c00f6ce037fa@bootlin.com>
-References: <20260512-clean-ksz-2nd-series-v1-0-c00f6ce037fa@bootlin.com>
-In-Reply-To: <20260512-clean-ksz-2nd-series-v1-0-c00f6ce037fa@bootlin.com>
-To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Russell King <linux@armlinux.org.uk>, 
- Richard Cochran <richardcochran@gmail.com>
-Cc: Pascal Eberhard <pascal.eberhard@se.com>, 
- =?utf-8?q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Tristram Ha <tristram.ha@microchip.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-X-Mailer: b4 0.14.3
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: A0C5F522058
+References: <20260512025851.189140-1-minhnguyen.080505@gmail.com>
+In-Reply-To: <20260512025851.189140-1-minhnguyen.080505@gmail.com>
+From: Bryan Tan <bryan-bt.tan@broadcom.com>
+Date: Tue, 12 May 2026 14:12:33 +0100
+X-Gm-Features: AVHnY4JaHYtrFk7C3Gzaaq5WjUZyW7kD6ZyNBupTar3Gjfb-zbg1FAqP6O5Y-2s
+Message-ID: <CAOuBmub=XEwqy8LJxx7_=__OHzGuRcg-nQpF1o37L8+ZOwyesQ@mail.gmail.com>
+Subject: Re: [PATCH net v2] vsock/vmci: fix UAF when peer resets connection
+ during handshake
+To: Minh Nguyen <minhnguyen.080505@gmail.com>
+Cc: Vishnu Dasa <vishnu.dasa@broadcom.com>, Stefano Garzarella <sgarzare@redhat.com>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000087fa0906519e9e16"
+X-Rspamd-Queue-Id: 8E224521439
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-2.76 / 15.00];
+	SIGNED_SMIME(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287148-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-287149-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	HAS_ATTACHMENT(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bryan-bt.tan@broadcom.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[broadcom.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:email,bootlin.com:mid,bootlin.com:dkim]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-phy_read() and phy_write() are handled through common functions that
-redirect the treatment to ksz_dev_ops callbacks. This layer of
-indirection isn't needed since we now have a dsa_switch_ops for each
-kind of switch
+--00000000000087fa0906519e9e16
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Remove one indirection layer for KSZ switches, by connecting the
-ksz_dev_ops::phy_r() and ksz_dev_ops::phy_w() operations directly to
-dsa_switch_ops.
-Remove the now unused phy_r()/phy_w() callbacks from ksz_dev_ops.
+On Tue, May 12, 2026 at 3:59=E2=80=AFAM Minh Nguyen <minhnguyen.080505@gmai=
+l.com> wrote:
+>
+> vmci_transport_recv_connecting_server() jumps to its destroy: label
+> and performs an unconditional sock_put(pending) to release the
+> explicit sock_hold() taken by vmci_transport_recv_listen() before
+> schedule_delayed_work().  The existing comment claimed this was safe
+> because the listen handler removes pending from the pending list on
+> the way out, which would prevent vsock_pending_work() from dropping
+> the same reference later.
+>
+> That assumption breaks for a peer RST.  The default arm of the packet
+> switch sets:
+>
+>         err =3D pkt->type =3D=3D VMCI_TRANSPORT_PACKET_TYPE_RST ? 0 : -EI=
+NVAL;
+>
+> and vmci_transport_recv_listen() only calls vsock_remove_pending()
+> when err < 0:
+>
+>         if (err < 0)
+>                 vsock_remove_pending(sk, pending);
+>
+> For RST (err =3D=3D 0) the socket stays on the pending list, so when
+> vsock_pending_work() fires it takes the is_pending=3Dtrue path and
+> drops all three references itself: the pending-list reference via
+> vsock_remove_pending(), then the two trailing sock_put(sk) calls.
+> The unconditional sock_put() in destroy: had already dropped the
+> explicit sock_hold() reference, so the second trailing sock_put(sk)
+> in vsock_pending_work() is a write into the freed AF_VSOCK slab
+> object.  KASAN reports a slab-use-after-free write of 4 bytes from
+> refcount_warn_saturate() on the workqueue path:
+>
+>   BUG: KASAN: slab-use-after-free in refcount_warn_saturate
+>   Write of size 4 at addr ffff88800b1cac80 by task kworker
+>   Workqueue: events vsock_pending_work
+>   Call Trace:
+>    refcount_warn_saturate
+>    vsock_pending_work
+>    process_one_work
+>    worker_thread
+>
+> Triggering the bug requires only the ability to open a VSOCK
+> connection to the target and send a RST before the listener accepts.
+>
+> Skip the sock_put() in destroy: when err =3D=3D 0 so it only compensates
+> the cases where vmci_transport_recv_listen() actually calls
+> vsock_remove_pending().  RST is the only path that reaches destroy:
+> with err =3D=3D 0; every other path produces a negative value, so their
+> behaviour is unchanged.
+>
+> Verified on lts-6.12.79 with KASAN enabled (CONFIG_KASAN_INLINE=3Dy,
+> kasan_multi_shot): same trigger binary, same VM, 100 iterations:
+> without this patch 52 KASAN slab-use-after-free reports fire; with
+> this patch applied, 0 reports.
+>
+> Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Minh Nguyen <minhnguyen.080505@gmail.com>
+> Assisted-by: Claude:claude-opus-4-7
+> ---
+> v2:
+>   - Resubmit to netdev per Stefano Garzarella's request after v1 review.
+>   - Retested the PoC with the patch applied on lts-6.12.79 with KASAN
+>     enabled: 52/100 unpatched -> 0/100 patched (same trigger binary,
+>     same VM, 100 iterations); test summary captured in the commit
+>     message.
+>   - Changed Cc: stable@kernel.org -> stable@vger.kernel.org now that the
+>     bug is no longer embargoed.
+>   - Rebased onto net/main (no functional change to the diff).
+>
+> v1 was sent to security@kernel.org on 2026-05-10 (not on lore archives;
+> no public link available).  v1 review summary, for reference:
+>   - Stefano Garzarella (vsock maintainer): "Overall LGTM, but I'd wait
+>     vmware guys on this that know this code better."  Asked for retest
+>     and resubmission via the net tree workflow.
+>   - Bryan Tan (VMCI maintainer): "Thanks for the fix, it looks good to
+>     me."  Also noted that no modern VMware product allows guest-to-guest
+>     VMCI communication, so the practical attack surface is host -> guest.
+>
+>  net/vmw_vsock/vmci_transport.c | 16 +++++++++-------
+>  1 file changed, 9 insertions(+), 7 deletions(-)
 
-Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
----
- drivers/net/dsa/microchip/ksz8.c         | 68 ++++++++++++++++++++++++++------
- drivers/net/dsa/microchip/ksz9477.c      | 31 +++++++++++++--
- drivers/net/dsa/microchip/ksz_common.c   | 25 ------------
- drivers/net/dsa/microchip/ksz_common.h   |  4 --
- drivers/net/dsa/microchip/lan937x_main.c | 29 ++++++++++----
- 5 files changed, 104 insertions(+), 53 deletions(-)
+Acked-by: Bryan Tan <bryan-bt.tan@broadcom.com>
 
-diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
-index 09968aec65063..0f84b2e7d25d8 100644
---- a/drivers/net/dsa/microchip/ksz8.c
-+++ b/drivers/net/dsa/microchip/ksz8.c
-@@ -1057,6 +1057,19 @@ static int ksz8_r_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 *val)
- 	return 0;
- }
- 
-+static int ksz8_phy_read16(struct dsa_switch *ds, int addr, int reg)
-+{
-+	struct ksz_device *dev = ds->priv;
-+	u16 val = 0xffff;
-+	int ret;
-+
-+	ret = ksz8_r_phy(dev, addr, reg, &val);
-+	if (ret)
-+		return ret;
-+
-+	return val;
-+}
-+
- /**
-  * ksz8_w_phy_ctrl - Translates and writes to the SMI interface from a MIIM PHY
-  *		     Control register (Reg. 31).
-@@ -1266,6 +1279,18 @@ static int ksz8_w_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 val)
- 	return 0;
- }
- 
-+static int ksz8_phy_write16(struct dsa_switch *ds, int addr, int reg, u16 val)
-+{
-+	struct ksz_device *dev = ds->priv;
-+	int ret;
-+
-+	ret = ksz8_w_phy(dev, addr, reg, val);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
- static void ksz8_cfg_port_member(struct ksz_device *dev, int port, u8 member)
- {
- 	int offset = P_MIRROR_CTRL;
-@@ -2194,6 +2219,19 @@ static int ksz8463_r_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 *val)
- 	return 0;
- }
- 
-+static int ksz8463_phy_read16(struct dsa_switch *ds, int addr, int reg)
-+{
-+	struct ksz_device *dev = ds->priv;
-+	u16 val = 0xffff;
-+	int ret;
-+
-+	ret = ksz8463_r_phy(dev, addr, reg, &val);
-+	if (ret)
-+		return ret;
-+
-+	return val;
-+}
-+
- static int ksz8463_w_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 val)
- {
- 	u16 sw_reg = 0;
-@@ -2222,6 +2260,18 @@ static int ksz8463_w_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 val)
- 	return 0;
- }
- 
-+static int ksz8463_phy_write16(struct dsa_switch *ds, int addr, int reg, u16 val)
-+{
-+	struct ksz_device *dev = ds->priv;
-+	int ret;
-+
-+	ret = ksz8463_w_phy(dev, addr, reg, val);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
- static int ksz8_switch_init(struct ksz_device *dev)
- {
- 	dev->cpu_port = fls(dev->info->cpu_ports) - 1;
-@@ -2330,8 +2380,6 @@ const struct phylink_mac_ops ksz8_phylink_mac_ops = {
- const struct ksz_dev_ops ksz8463_dev_ops = {
- 	.get_port_addr = ksz8463_get_port_addr,
- 	.cfg_port_member = ksz8_cfg_port_member,
--	.r_phy = ksz8463_r_phy,
--	.w_phy = ksz8463_w_phy,
- 	.r_mib_cnt = ksz8_r_mib_cnt,
- 	.r_mib_pkt = ksz8_r_mib_pkt,
- 	.r_mib_stat64 = ksz88xx_r_mib_stats64,
-@@ -2343,8 +2391,6 @@ const struct ksz_dev_ops ksz8463_dev_ops = {
- const struct ksz_dev_ops ksz87xx_dev_ops = {
- 	.get_port_addr = ksz8_get_port_addr,
- 	.cfg_port_member = ksz8_cfg_port_member,
--	.r_phy = ksz8_r_phy,
--	.w_phy = ksz8_w_phy,
- 	.r_mib_cnt = ksz8_r_mib_cnt,
- 	.r_mib_pkt = ksz8_r_mib_pkt,
- 	.r_mib_stat64 = ksz_r_mib_stats64,
-@@ -2359,8 +2405,6 @@ const struct ksz_dev_ops ksz87xx_dev_ops = {
- const struct ksz_dev_ops ksz88xx_dev_ops = {
- 	.get_port_addr = ksz8_get_port_addr,
- 	.cfg_port_member = ksz8_cfg_port_member,
--	.r_phy = ksz8_r_phy,
--	.w_phy = ksz8_w_phy,
- 	.r_mib_cnt = ksz8_r_mib_cnt,
- 	.r_mib_pkt = ksz8_r_mib_pkt,
- 	.r_mib_stat64 = ksz88xx_r_mib_stats64,
-@@ -2378,8 +2422,8 @@ const struct dsa_switch_ops ksz8463_switch_ops = {
- 	.get_phy_flags		= ksz_get_phy_flags,
- 	.setup			= ksz8_setup,
- 	.teardown		= ksz_teardown,
--	.phy_read		= ksz_phy_read16,
--	.phy_write		= ksz_phy_write16,
-+	.phy_read		= ksz8463_phy_read16,
-+	.phy_write		= ksz8463_phy_write16,
- 	.phylink_get_caps	= ksz8_phylink_get_caps,
- 	.port_setup		= ksz8_dsa_port_setup,
- 	.get_strings		= ksz_get_strings,
-@@ -2438,8 +2482,8 @@ const struct dsa_switch_ops ksz87xx_switch_ops = {
- 	.get_phy_flags		= ksz_get_phy_flags,
- 	.setup			= ksz8_setup,
- 	.teardown		= ksz_teardown,
--	.phy_read		= ksz_phy_read16,
--	.phy_write		= ksz_phy_write16,
-+	.phy_read		= ksz8_phy_read16,
-+	.phy_write		= ksz8_phy_write16,
- 	.phylink_get_caps	= ksz8_phylink_get_caps,
- 	.port_setup		= ksz8_dsa_port_setup,
- 	.get_strings		= ksz_get_strings,
-@@ -2498,8 +2542,8 @@ const struct dsa_switch_ops ksz88xx_switch_ops = {
- 	.get_phy_flags		= ksz_get_phy_flags,
- 	.setup			= ksz8_setup,
- 	.teardown		= ksz_teardown,
--	.phy_read		= ksz_phy_read16,
--	.phy_write		= ksz_phy_write16,
-+	.phy_read		= ksz8_phy_read16,
-+	.phy_write		= ksz8_phy_write16,
- 	.phylink_get_caps	= ksz8_phylink_get_caps,
- 	.port_setup		= ksz8_dsa_port_setup,
- 	.get_strings		= ksz_get_strings,
-diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
-index 2f63a3a7d6ceb..00c2e23bc5669 100644
---- a/drivers/net/dsa/microchip/ksz9477.c
-+++ b/drivers/net/dsa/microchip/ksz9477.c
-@@ -575,6 +575,19 @@ static int ksz9477_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
- 	return 0;
- }
- 
-+static int ksz9477_phy_read16(struct dsa_switch *ds, int addr, int reg)
-+{
-+	struct ksz_device *dev = ds->priv;
-+	u16 val = 0xffff;
-+	int ret;
-+
-+	ret = ksz9477_r_phy(dev, addr, reg, &val);
-+	if (ret)
-+		return ret;
-+
-+	return val;
-+}
-+
- static int ksz9477_w_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 val)
- {
- 	u32 mask, val32;
-@@ -600,6 +613,18 @@ static int ksz9477_w_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 val)
- 	return ksz_prmw32(dev, addr, 0x100 + (reg << 1), mask, val32);
- }
- 
-+static int ksz9477_phy_write16(struct dsa_switch *ds, int addr, int reg, u16 val)
-+{
-+	struct ksz_device *dev = ds->priv;
-+	int ret;
-+
-+	ret = ksz9477_w_phy(dev, addr, reg, val);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
- void ksz9477_cfg_port_member(struct ksz_device *dev, int port, u8 member)
- {
- 	ksz_pwrite32(dev, port, REG_PORT_VLAN_MEMBERSHIP__4, member);
-@@ -1912,8 +1937,6 @@ const struct phylink_mac_ops ksz9477_phylink_mac_ops = {
- const struct ksz_dev_ops ksz9477_dev_ops = {
- 	.get_port_addr = ksz9477_get_port_addr,
- 	.cfg_port_member = ksz9477_cfg_port_member,
--	.r_phy = ksz9477_r_phy,
--	.w_phy = ksz9477_w_phy,
- 	.r_mib_cnt = ksz9477_r_mib_cnt,
- 	.r_mib_pkt = ksz9477_r_mib_pkt,
- 	.r_mib_stat64 = ksz_r_mib_stats64,
-@@ -1932,8 +1955,8 @@ const struct dsa_switch_ops ksz9477_switch_ops = {
- 	.get_phy_flags		= ksz_get_phy_flags,
- 	.setup			= ksz9477_setup,
- 	.teardown		= ksz_teardown,
--	.phy_read		= ksz_phy_read16,
--	.phy_write		= ksz_phy_write16,
-+	.phy_read		= ksz9477_phy_read16,
-+	.phy_write		= ksz9477_phy_write16,
- 	.phylink_get_caps	= ksz9477_phylink_get_caps,
- 	.port_setup		= ksz9477_dsa_port_setup,
- 	.set_ageing_time	= ksz9477_set_ageing_time,
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 0d66592dff703..95aa3ab5b5719 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -2838,31 +2838,6 @@ void ksz_init_mib_timer(struct ksz_device *dev)
- 	}
- }
- 
--int ksz_phy_read16(struct dsa_switch *ds, int addr, int reg)
--{
--	struct ksz_device *dev = ds->priv;
--	u16 val = 0xffff;
--	int ret;
--
--	ret = dev->dev_ops->r_phy(dev, addr, reg, &val);
--	if (ret)
--		return ret;
--
--	return val;
--}
--
--int ksz_phy_write16(struct dsa_switch *ds, int addr, int reg, u16 val)
--{
--	struct ksz_device *dev = ds->priv;
--	int ret;
--
--	ret = dev->dev_ops->w_phy(dev, addr, reg, val);
--	if (ret)
--		return ret;
--
--	return 0;
--}
--
- u32 ksz_get_phy_flags(struct dsa_switch *ds, int port)
- {
- 	struct ksz_device *dev = ds->priv;
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index c66d75347c6cb..b67038cf1bd09 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -398,8 +398,6 @@ struct ksz_dev_ops {
- 	 *  - Negative error code on failure (e.g., invalid configuration).
- 	 */
- 	int (*create_phy_addr_map)(struct ksz_device *dev, bool side_mdio);
--	int (*r_phy)(struct ksz_device *dev, u16 phy, u16 reg, u16 *val);
--	int (*w_phy)(struct ksz_device *dev, u16 phy, u16 reg, u16 val);
- 	void (*r_mib_cnt)(struct ksz_device *dev, int port, u16 addr,
- 			  u64 *cnt);
- 	void (*r_mib_pkt)(struct ksz_device *dev, int port, u16 addr,
-@@ -442,8 +440,6 @@ void ksz_switch_macaddr_put(struct dsa_switch *ds);
- void ksz_switch_shutdown(struct ksz_device *dev);
- int ksz_handle_wake_reason(struct ksz_device *dev, int port);
- 
--int ksz_phy_read16(struct dsa_switch *ds, int addr, int reg);
--int ksz_phy_write16(struct dsa_switch *ds, int addr, int reg, u16 val);
- u32 ksz_get_phy_flags(struct dsa_switch *ds, int port);
- 
- int ksz_sset_count(struct dsa_switch *ds, int port, int sset);
-diff --git a/drivers/net/dsa/microchip/lan937x_main.c b/drivers/net/dsa/microchip/lan937x_main.c
-index aff0c2735c307..5b0e8d2002c7d 100644
---- a/drivers/net/dsa/microchip/lan937x_main.c
-+++ b/drivers/net/dsa/microchip/lan937x_main.c
-@@ -334,14 +334,29 @@ static int lan937x_internal_phy_read(struct ksz_device *dev, int addr, int reg,
- 	return ksz_read16(dev, REG_VPHY_IND_DATA__2, val);
- }
- 
--static int lan937x_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
-+static int lan937x_phy_read16(struct dsa_switch *ds, int addr, int reg)
- {
--	return lan937x_internal_phy_read(dev, addr, reg, data);
-+	struct ksz_device *dev = ds->priv;
-+	u16 val = 0xffff;
-+	int ret;
-+
-+	ret =  lan937x_internal_phy_read(dev, addr, reg, &val);
-+	if (ret)
-+		return ret;
-+
-+	return val;
- }
- 
--static int lan937x_w_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 val)
-+static int lan937x_phy_write16(struct dsa_switch *ds, int addr, int reg, u16 val)
- {
--	return lan937x_internal_phy_write(dev, addr, reg, val);
-+	struct ksz_device *dev = ds->priv;
-+	int ret;
-+
-+	ret = lan937x_internal_phy_write(dev, addr, reg, val);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
- }
- 
- static int lan937x_reset_switch(struct ksz_device *dev)
-@@ -801,8 +816,6 @@ const struct ksz_dev_ops lan937x_dev_ops = {
- 	.cfg_port_member = ksz9477_cfg_port_member,
- 	.mdio_bus_preinit = lan937x_mdio_bus_preinit,
- 	.create_phy_addr_map = lan937x_create_phy_addr_map,
--	.r_phy = lan937x_r_phy,
--	.w_phy = lan937x_w_phy,
- 	.r_mib_cnt = ksz9477_r_mib_cnt,
- 	.r_mib_pkt = ksz9477_r_mib_pkt,
- 	.r_mib_stat64 = ksz_r_mib_stats64,
-@@ -819,8 +832,8 @@ const struct dsa_switch_ops lan937x_switch_ops = {
- 	.get_phy_flags		= ksz_get_phy_flags,
- 	.setup			= lan937x_setup,
- 	.teardown		= ksz_teardown,
--	.phy_read		= ksz_phy_read16,
--	.phy_write		= ksz_phy_write16,
-+	.phy_read		= lan937x_phy_read16,
-+	.phy_write		= lan937x_phy_write16,
- 	.phylink_get_caps	= lan937x_phylink_get_caps,
- 	.port_setup		= ksz9477_dsa_port_setup,
- 	.set_ageing_time	= lan937x_set_ageing_time,
+>
+> diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transpor=
+t.c
+> index 4296ca1..88d7128 100644
+> --- a/net/vmw_vsock/vmci_transport.c
+> +++ b/net/vmw_vsock/vmci_transport.c
+> @@ -1269,14 +1269,16 @@ vmci_transport_recv_connecting_server(struct sock=
+ *listener,
+>  destroy:
+>         pending->sk_err =3D skerr;
+>         pending->sk_state =3D TCP_CLOSE;
+> -       /* As long as we drop our reference, all necessary cleanup will h=
+andle
+> -        * when the cleanup function drops its reference and our destruct
+> -        * implementation is called.  Note that since the listen handler =
+will
+> -        * remove pending from the pending list upon our failure, the cle=
+anup
+> -        * function won't drop the additional reference, which is why we =
+do it
+> -        * here.
+> +       /* Drop the reference taken by vmci_transport_recv_listen() befor=
+e
+> +        * schedule_delayed_work() only on real errors.  For a peer RST
+> +        * (err =3D=3D 0) the listener leaves pending on the pending list=
+, and
+> +        * vsock_pending_work() will drop that reference itself when it
+> +        * later cleans the socket up.  Calling sock_put() here in that
+> +        * case would be a double-put and free the socket while
+> +        * vsock_pending_work() still holds it.
+>          */
+> -       sock_put(pending);
+> +       if (err < 0)
+> +               sock_put(pending);
+>
+>         return err;
+>  }
+>
+> base-commit: be48e5fe51a5864566307998286a699d6b986934
+> --
+> 2.54.0
+>
 
--- 
-2.53.0
+--00000000000087fa0906519e9e16
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
+MIIVJQYJKoZIhvcNAQcCoIIVFjCCFRICAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+ghKSMIIGqDCCBJCgAwIBAgIQfofDCS7XZu8vIeKo0KeY9DANBgkqhkiG9w0BAQwFADBMMSAwHgYD
+VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSNjETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
+AxMKR2xvYmFsU2lnbjAeFw0yMzA0MTkwMzUzNTNaFw0yOTA0MTkwMDAwMDBaMFIxCzAJBgNVBAYT
+AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBS
+NiBTTUlNRSBDQSAyMDIzMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAwjAEbSkPcSyn
+26Zn9VtoE/xBvzYmNW29bW1pJZ7jrzKwPJm/GakCvy0IIgObMsx9bpFaq30X1kEJZnLUzuE1/hlc
+hatYqyORVBeHlv5V0QRSXY4faR0dCkIhXhoGknZ2O0bUJithcN1IsEADNizZ1AJIaWsWbQ4tYEYj
+ytEdvfkxz1WtX3SjtecZR+9wLJLt6HNa4sC//QKdjyfr/NhDCzYrdIzAssoXFnp4t+HcMyQTrj0r
+pD8KkPj96sy9axzegLbzte7wgTHbWBeJGp0sKg7BAu+G0Rk6teO1yPd75arbCvfY/NaRRQHk6tmG
+71gpLdB1ZhP9IcNYyeTKXIgfMh2tVK9DnXGaksYCyi6WisJa1Oa+poUroX2ESXO6o03lVxiA1xyf
+G8lUzpUNZonGVrUjhG5+MdY16/6b0uKejZCLbgu6HLPvIyqdTb9XqF4XWWKu+OMDs/rWyQ64v3mv
+Sa0te5Q5tchm4m9K0Pe9LlIKBk/gsgfaOHJDp4hYx4wocDr8DeCZe5d5wCFkxoGc1ckM8ZoMgpUc
+4pgkQE5ShxYMmKbPvNRPa5YFzbFtcFn5RMr1Mju8gt8J0c+dxYco2hi7dEW391KKxGhv7MJBcc+0
+x3FFTnmhU+5t6+CnkKMlrmzyaoeVryRTvOiH4FnTNHtVKUYDsCM0CLDdMNgoxgkCAwEAAaOCAX4w
+ggF6MA4GA1UdDwEB/wQEAwIBhjBMBgNVHSUERTBDBggrBgEFBQcDAgYIKwYBBQUHAwQGCisGAQQB
+gjcUAgIGCisGAQQBgjcKAwwGCisGAQQBgjcKAwQGCSsGAQQBgjcVBjASBgNVHRMBAf8ECDAGAQH/
+AgEAMB0GA1UdDgQWBBQAKTaeXHq6D68tUC3boCOFGLCgkjAfBgNVHSMEGDAWgBSubAWjkxPioufi
+1xzWx/B/yGdToDB7BggrBgEFBQcBAQRvMG0wLgYIKwYBBQUHMAGGImh0dHA6Ly9vY3NwMi5nbG9i
+YWxzaWduLmNvbS9yb290cjYwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
+b20vY2FjZXJ0L3Jvb3QtcjYuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
+c2lnbi5jb20vcm9vdC1yNi5jcmwwEQYDVR0gBAowCDAGBgRVHSAAMA0GCSqGSIb3DQEBDAUAA4IC
+AQCRkUdr1aIDRmkNI5jx5ggapGUThq0KcM2dzpMu314mJne8yKVXwzfKBtqbBjbUNMODnBkhvZcn
+bHUStur2/nt1tP3ee8KyNhYxzv4DkI0NbV93JChXipfsan7YjdfEk5vI2Fq+wpbGALyyWBgfy79Y
+IgbYWATB158tvEh5UO8kpGpjY95xv+070X3FYuGyeZyIvao26mN872FuxRxYhNLwGHIy38N9ASa1
+Q3BTNKSrHrZngadofHglG5W3TMFR11JOEOAUHhUgpbVVvgCYgGA6dSX0y5z7k3rXVyjFOs7KBSXr
+dJPKadpl4vqYphH7+P40nzBRcxJHrv5FeXlTrb+drjyXNjZSCmzfkOuCqPspBuJ7vab0/9oeNERg
+nz6SLCjLKcDXbMbKcRXgNhFBlzN4OUBqieSBXk80w2Nzx12KvNj758WavxOsXIbX0Zxwo1h3uw75
+AI2v8qwFWXNclO8qW2VXoq6kihWpeiuvDmFfSAwRLxwwIjgUuzG9SaQ+pOomuaC7QTKWMI0hL0b4
+mEPq9GsPPQq1UmwkcYFJ/Z4I93DZuKcXmKMmuANTS6wxwIEw8Q5MQ6y9fbJxGEOgOgYL4QIqNULb
+5CYPnt2LeiIiEnh8Uuh8tawqSjnR0h7Bv5q4mgo3L1Z9QQuexUntWD96t4o0q1jXWLyrpgP7Zcnu
+CzCCBYMwggNroAMCAQICDkXmuwODM8OFZUjm/0VRMA0GCSqGSIb3DQEBDAUAMEwxIDAeBgNVBAsT
+F0dsb2JhbFNpZ24gUm9vdCBDQSAtIFI2MRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpH
+bG9iYWxTaWduMB4XDTE0MTIxMDAwMDAwMFoXDTM0MTIxMDAwMDAwMFowTDEgMB4GA1UECxMXR2xv
+YmFsU2lnbiBSb290IENBIC0gUjYxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2Jh
+bFNpZ24wggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQCVB+hzymb57BTKezz3DQjxtEUL
+LIK0SMbrWzyug7hBkjMUpG9/6SrMxrCIa8W2idHGsv8UzlEUIexK3RtaxtaH7k06FQbtZGYLkoDK
+RN5zlE7zp4l/T3hjCMgSUG1CZi9NuXkoTVIaihqAtxmBDn7EirxkTCEcQ2jXPTyKxbJm1ZCatzEG
+xb7ibTIGph75ueuqo7i/voJjUNDwGInf5A959eqiHyrScC5757yTu21T4kh8jBAHOP9msndhfuDq
+jDyqtKT285VKEgdt/Yyyic/QoGF3yFh0sNQjOvddOsqi250J3l1ELZDxgc1Xkvp+vFAEYzTfa5MY
+vms2sjnkrCQ2t/DvthwTV5O23rL44oW3c6K4NapF8uCdNqFvVIrxclZuLojFUUJEFZTuo8U4lptO
+TloLR/MGNkl3MLxxN+Wm7CEIdfzmYRY/d9XZkZeECmzUAk10wBTt/Tn7g/JeFKEEsAvp/u6P4W4L
+sgizYWYJarEGOmWWWcDwNf3J2iiNGhGHcIEKqJp1HZ46hgUAntuA1iX53AWeJ1lMdjlb6vmlodiD
+D9H/3zAR+YXPM0j1ym1kFCx6WE/TSwhJxZVkGmMOeT31s4zKWK2cQkV5bg6HGVxUsWW2v4yb3BPp
+DW+4LtxnbsmLEbWEFIoAGXCDeZGXkdQaJ783HjIH2BRjPChMrwIDAQABo2MwYTAOBgNVHQ8BAf8E
+BAMCAQYwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUrmwFo5MT4qLn4tcc1sfwf8hnU6AwHwYD
+VR0jBBgwFoAUrmwFo5MT4qLn4tcc1sfwf8hnU6AwDQYJKoZIhvcNAQEMBQADggIBAIMl7ejR/ZVS
+zZ7ABKCRaeZc0ITe3K2iT+hHeNZlmKlbqDyHfAKK0W63FnPmX8BUmNV0vsHN4hGRrSMYPd3hckSW
+tJVewHuOmXgWQxNWV7Oiszu1d9xAcqyj65s1PrEIIaHnxEM3eTK+teecLEy8QymZjjDTrCHg4x36
+2AczdlQAIiq5TSAucGja5VP8g1zTnfL/RAxEZvLS471GABptArolXY2hMVHdVEYcTduZlu8aHARc
+phXveOB5/l3bPqpMVf2aFalv4ab733Aw6cPuQkbtwpMFifp9Y3s/0HGBfADomK4OeDTDJfuvCp8g
+a907E48SjOJBGkh6c6B3ace2XH+CyB7+WBsoK6hsrV5twAXSe7frgP4lN/4Cm2isQl3D7vXM3PBQ
+ddI2aZzmewTfbgZptt4KCUhZh+t7FGB6ZKppQ++Rx0zsGN1s71MtjJnhXvJyPs9UyL1n7KQPTEX/
+07kwIwdMjxC/hpbZmVq0mVccpMy7FYlTuiwFD+TEnhmxGDTVTJ267fcfrySVBHioA7vugeXaX3yL
+SqGQdCWnsz5LyCxWvcfI7zjiXJLwefechLp0LWEBIH5+0fJPB1lfiy1DUutGDJTh9WZHeXfVVFsf
+rSQ3y0VaTqBESMjYsJnFFYQJ9tZJScBluOYacW6gqPGC6EU+bNYC1wpngwVayaQQMIIGWzCCBEOg
+AwIBAgIMfmyL7UtgKwUfUWpJMA0GCSqGSIb3DQEBCwUAMFIxCzAJBgNVBAYTAkJFMRkwFwYDVQQK
+ExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBSNiBTTUlNRSBDQSAy
+MDIzMB4XDTI0MTEyODA2NDUwNloXDTI2MTEyOTA2NDUwNlowgaYxCzAJBgNVBAYTAlVTMRMwEQYD
+VQQIEwpDYWxpZm9ybmlhMREwDwYDVQQHEwhTYW4gSm9zZTEZMBcGA1UEYRMQTlRSVVMrREUtNjYx
+MDExNzEWMBQGA1UEChMNQlJPQURDT00gSU5DLjESMBAGA1UEAxMJQnJ5YW4gVGFuMSgwJgYJKoZI
+hvcNAQkBFhlicnlhbi1idC50YW5AYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A
+MIIBCgKCAQEAtnDfEBTP+8BpUYXDnl2RR6diPVyZP+OXe26wz2P72s7LDPppHJCGg+szN/XvjzOq
+Qti/18aO+LxEceP3KxE2YkHy7ypitSOrF0rsDAVotZx76YVMLJ3xvBrm2ApOHYQfRvzHk5pNWPwz
+kKXUf8BmgVwrm4J21BIjpK/E9/meSALtIG7FIMpiIKpgHf1MRTzmYywQIWohaXxPRAEIYZK2DSMY
+n+fDChhou4ePAtzo6/x8PTSWPrJbH05U1DQt9FRG7+xcvkNqnjJq+XZK0kiDDFD8BzIKO/cq3ziS
+50EhbzFKXPpa46ztpJqQ+UJTJod2dB7SexAYJlBkjKlGc+niNQIDAQABo4IB2jCCAdYwDgYDVR0P
+AQH/BAQDAgWgMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3NlY3VyZS5n
+bG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEFBQcwAYYt
+aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1UdIAReMFww
+CQYHZ4EMAQUDATALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIBFiZodHRw
+czovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEEGA1UdHwQ6MDgw
+NqA0oDKGMGh0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzLmNybDAk
+BgNVHREEHTAbgRlicnlhbi1idC50YW5AYnJvYWRjb20uY29tMBMGA1UdJQQMMAoGCCsGAQUFBwME
+MB8GA1UdIwQYMBaAFAApNp5ceroPry1QLdugI4UYsKCSMB0GA1UdDgQWBBQWxgja/oUqPdrOSir6
+U+YDJVND/DANBgkqhkiG9w0BAQsFAAOCAgEAIL+CGrIYdRkQ80Psq9FtFG65/EZQH8dFSXv3AJTk
+220m3Q98q4NHh+AkBRw/pvzVQMJlRKEBKgM1qYw5FYYoC3IRpeqQ9NqnJHsEAHX2p7Hfkt3l8zd7
+rT9DuQ4Tws1Fjxo4L7OcRz8NDD9f0Y+LHADvcMUHoex2PldpXkGuWd4K1eMjga8xPOrKKYYdvWYw
+cX/rc+AYfo3B0OnjSWXjdsufMPVDDK23uGYfti1djyVhYG7hOCKjW3fg9QdDcVjVa4q7spoCPGnQ
+HGghAH5+ZauOJU1r26oGjwR/73xvsig9pX887/zvEM5WdbTXK82mciLRR4iQB0UlV+8UxxpJzfGd
+j/6onem1o3e1fTH0owcQEn59i7Ygo5cWJm0qnT7zPTS6pgkXJ4xmskj6Dcqi/hRkMlxovq3K05uN
++lgAFg6F7ugpiGTUcxngHsGMRlj8cXIhg8KZO0gBU5KthBSvioQgN2JpAyE5gUV7stnVCu8l+SAr
+Oo+OqcCeAc14zE+TlRnoQVn/xF+q0zAyONDNmQO4uyl0EyLpTIYLK7wFxC6IDrz2FsEzlioH2cBJ
+lUyNMZuhR7c1KUj3dr4qBG1506iDiJ5qqn2rBKJAvk0ph2Irlh+82seX1iL/wX+M+Wwkzoo34GGq
+6CGv4ffBr8W+eQ2/QT4X10tgfAgSZ+Sag3gxggJXMIICUwIBATBiMFIxCzAJBgNVBAYTAkJFMRkw
+FwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBSNiBTTUlN
+RSBDQSAyMDIzAgx+bIvtS2ArBR9RakkwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIE
+IEpkaUONAsOygFvcB8jIOtP2zmmgUtq3e6SHK32KqxzaMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0B
+BwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDUxMjEzMTI0NlowXAYJKoZIhvcNAQkPMU8wTTALBglghkgB
+ZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcw
+CwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAHzP3T4WPue/akYrPLRFH0TBNfxlTaABeN2K
+pUTDK+W1b5atddPW77XtFCtt0K6PAC8qK7qySauCc/hlUDGt/tAJ+vZ57lLzA6Ra9Ekc5GuHldZI
+V/UXR+IIJtF4pNWh7ptL4oSt8ZTyi3JJ6jIejaBQQJ9x7OcZfF/5GwhPlguv8C/Krc/o+dnMOXes
+maqKJzP075e6mlI1rqHpJg/DOJbS6W2rGHETcrBRDgVBuyuawDRzcD7hvspMLWykUTesgvNjQlwu
+4X9KCi15/15SO+FiNa/++7Zb8GUIG1Sq7HuAje4ztQJmxwVu0Ih1rYXfGrLnNR2dB4EYJobZyknI
+V0M=
+--00000000000087fa0906519e9e16--
 
