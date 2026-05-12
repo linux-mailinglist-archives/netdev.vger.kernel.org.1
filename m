@@ -1,216 +1,149 @@
-Return-Path: <netdev+bounces-287199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287200-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iMZ5FAU4A2qK1wEAu9opvQ
-	(envelope-from <netdev+bounces-287199-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:24:05 +0200
+	id eJ4EKwtDA2qP2QEAu9opvQ
+	(envelope-from <netdev+bounces-287200-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:11:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DD5B5225EC
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:24:04 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00CF45235C6
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:11:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4E948302C4FB
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 14:17:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E65EB3042BE9
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 14:25:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA98B3AFAF9;
-	Tue, 12 May 2026 14:17:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B5883AFAED;
+	Tue, 12 May 2026 14:25:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="IKKoP8MZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="byNxjpVe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A513AF670
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 14:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23FF33AB49A;
+	Tue, 12 May 2026 14:25:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778595466; cv=none; b=XrsfQwrwXbyGVvdLOyzQAdoQ+MIwPsOl/229kXsTV8vSrtSVWl4pO/oQt+dp7hgMXJEDVUvLHrZi84+C8wE3y/OnlXd006iBHVGxcQJpWLUFvEXbtqf8Ym1JdRscORH5tnlpdkttqiLWe72cLS10ARqc/AdCg1QCJveByFUx5X4=
+	t=1778595954; cv=none; b=P8Ch1Ipj/NcFacRS21gFbxCeqwf2/+1R6vAsANzaORpR9tAI1t+agpnRPxCSx0W2C5uGj7OW7q/zuCpv/iCbSFS2JVVpnlKxY8S+L28Q1B70m7iHcm5FQuXfF0e8pk7RhrBGBeNtM7eYRK5A9XWwJlPpcK/5XaNBvQCAGQV34ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778595466; c=relaxed/simple;
-	bh=NVggfJLPOArhx8otVfCM2tXZ5uP0At3kls0Rgg9Ls2o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mVl20DVk3zggBZrpPzCuI0eMl1fRhAZ6AOEc4BtJuByGYzxpBgKMlbD9Y3GT8Bw0WvGMnyJOxBc/f1WPqvd0mR2OTsMnkFG3lxWk2IK7NtsMWn39SDeNkg89WVwn/UKYUEhxwevSV+86YQEahBToKF9y0VVkcpCONGcbfI/SLIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=IKKoP8MZ; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4893940bb5eso34890185e9.3
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 07:17:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1778595461; x=1779200261; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ir04jsaDaoE/Fgj2pkJq5xz4Zo9Hfr5WjmH+ZtcvAI4=;
-        b=IKKoP8MZhvVVK7sCrTAljPeObZPRzoHEvHEm4lrHtAwmVbNF74UqWRmWLjGjbErxBE
-         +Asn6dUOLn9163uNanfMkX/YZQllKRMzaiPlLyiRoOEb3dfWwdEfDifV/uugQgKHhngY
-         h+oBX4GkTwo9bypSAIv2HUrng7Y0rk7R7JTd+9p1dN+PXs7LhmW8HfuKyZWdriKdwtRV
-         iuTkszaf8jsT0n+sFBaat0ahyxTN0X+8BSA5ArUf9rkyplaJnYItETXYfeCAes+d9swB
-         pijRPBvvEM3828YtkeM0iW46CzJ/36id1uKO/ITus4XkP/K3zI5CPSBp3bFSxgUJigmX
-         8E7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778595461; x=1779200261;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ir04jsaDaoE/Fgj2pkJq5xz4Zo9Hfr5WjmH+ZtcvAI4=;
-        b=L2gcyyfe4qgQ/LbT9KgynsiRiEZo3mti7qdFlz9IujdR/BUn9NPx98DlBObrnpbv7r
-         7j/e5pxu3Y1T6hiN5HkeZSoYSzaKWA0WkBakqKn1+XEjAACR6/nfsEF3P5bG7SZfhPyH
-         C86y4X/YgmtgKEUdUsln30ZcLvqyiXjovtS/JxpLC9Sz91iZ/R7PwdWdgqQh93Z43wTF
-         SR1lXsr78ANh+PykG2qWJrybLiKhNXC1qICzTsA4VQoyq5RRv6abAwOWEt3VJEmtdhKG
-         1MawgqxCmatOBbc1mQzHRbFaTHSj1oUbItVzKYxAJbBgTspcxKwzDGJs+OKbbVVJzI5e
-         Nt3Q==
-X-Forwarded-Encrypted: i=1; AFNElJ+TIaTX4qa9Nd0+b9fDax/1eubvnuVwhiX6aPKn0UDjhYpoRMZGNhLb5YGT4q1uWAAPaqDoDyw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvkjaOAUNrZOnyAXrctklkHqTKFwHjwFRCttoOQCsyI1/HCgXg
-	H1rn3jOkGcF7dWmaKgqWSpOgqLCLpzXmzBD8Dl1P8g5E+vrKDM6Vk8FmuvPmr5neIQlYjAA8YLu
-	KPM6WLK1CGdUT12iWHOVXozzO8A7mVzlzkVk6Ie5qOHmL7p5No9Q=
-X-Gm-Gg: Acq92OH3lZM3bFf6mf8EjrYFABubvb262Qmf7g9rWac8l3uToasUwXrd1NV8FD7FL/S
-	JaIHvDBU/Zlflbj5sztN7yfDIVdByp6/Zz1Gk8BaLbpI5+iu0YhXjczEuUHRA5qSSqmEtgJqqmv
-	ibrf0ruQ5P56z5wRLqLbRCid7G6DD6ppFPv17UToDQf0Gsp8uoQvati9drWT0QZKsAUctI+vTLV
-	ZuZwMHHB9yT80Bb0nVdwAEX7HoVInQWM+UKqkrHITtpiKXSJx0DD72NJVFtoYYb5OjYwb/driXT
-	f9LMNLrjk1wbTooBCEt2iOsnX2dXbKNoi7UftsWsUWvCwtG5KxUoZZ9AimQWR8xjm5S9xIMsZG4
-	tT82BVBtr3HQXSMZIXe/3BSnjLB/XT1oD5SQBCRVOD+NE9dQvXcO4c0OWLUm9/0+iNsRLOUT7N5
-	JkK93XBPaE8o2wygVYzEfoc3xhnBFOMp4hhH2Z++79hOqIxKzMX38f/P+VRd1mr5nYbTeKuwpS
-X-Received: by 2002:a05:600c:524e:b0:489:1d74:56d with SMTP id 5b1f17b1804b1-48e676c14b9mr297461955e9.29.1778595460908;
-        Tue, 12 May 2026 07:17:40 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:7245:d44f:b95f:a2c6? ([2001:67c:2fbc:1:7245:d44f:b95f:a2c6])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e8f3cf0cdsm34893875e9.2.2026.05.12.07.17.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 May 2026 07:17:40 -0700 (PDT)
-Message-ID: <a2cbd426-cf71-40d5-9b5e-220758775660@openvpn.net>
-Date: Tue, 12 May 2026 16:17:39 +0200
+	s=arc-20240116; t=1778595954; c=relaxed/simple;
+	bh=wzHx8U3YU/VosQrKhU0dd/6zx1HBC6wt+nZjKdR/Wz4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PKmjTHgI68ZAcBZ3RFHmrTi2avy+FAIu6HBE79d644/1BagGTtoc20PIxHhQVvl+rRtuhu3toKJFBgm0SeUbYei2U5Cy50wRtDyJeqQ9XXWD0b6gYL7/SG3xV64pQM5ui6Ah8aBiMiARUcm0yNjW1yXnH1dHuglYsxGUAYDIHvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=byNxjpVe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A095FC2BCB0;
+	Tue, 12 May 2026 14:25:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778595953;
+	bh=wzHx8U3YU/VosQrKhU0dd/6zx1HBC6wt+nZjKdR/Wz4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=byNxjpVekJys5eNoSvbc82GjaPtRMPRF59hytuculE24GTqZ7sdMmuzQhbTBiWUW5
+	 Ge3jMvfWby2RTnXLPuv9kPvmvRtbYB4E9UbqnWKC6XamV6fsq2G4uf0eW9VlHWobG3
+	 +auJPsrmNC6FhcuInoUmi/HhZ51Pt3caPtorh4/1OWACcBLHqbR7x7J2iScllUGmIE
+	 NqZqZiC5Et+qOXvpfSMhGcSBVm+T5QatM8vZF6btWYSUVrzD9qqJA9JU5JCEx+2/2v
+	 aaIRuiSkPonA/ergOXvA2OZ687gMDtA7MhMfYILrNwGB17Pc2eiKRk5m2p9M96SPdM
+	 TFCmSZQqhytpw==
+Date: Tue, 12 May 2026 09:25:49 -0500
+From: Bjorn Andersson <andersson@kernel.org>
+To: Komal Bajaj <komal.bajaj@oss.qualcomm.com>
+Cc: Linus Walleij <linusw@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Richard Cochran <richardcochran@gmail.com>, linux-arm-msm@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+Subject: Re: [PATCH v4 0/2] pinctrl: qcom: Add support for Qualcomm Shikra SoC
+Message-ID: <agM4ZM5Xe10OGzDy@baldur>
+References: <20260512-shikra-pinctrl-v4-0-b93c3a2e4c08@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] ovpn: tcp - use cached peer pointer in
- ovpn_tcp_close()
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: David CARLIER <devnexen@gmail.com>, Eric Dumazet <edumazet@google.com>,
- netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
-References: <20260512042036.19870-1-devnexen@gmail.com>
- <20260512042036.19870-2-devnexen@gmail.com>
- <CANn89i+qfzW_S-Z_vT3=UH00Qu2KodJf=V7O3o=yMVgfjK82xg@mail.gmail.com>
- <CA+XhMqy50a8zq1foi564r2niHzJo54E3TCpT-YmYa=r2n75Uyg@mail.gmail.com>
- <4ff6590a-6695-4c6c-b677-a7891b249165@openvpn.net> <agM1LMZ30jZDRqZ3@krikkit>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <agM1LMZ30jZDRqZ3@krikkit>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 0DD5B5225EC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260512-shikra-pinctrl-v4-0-b93c3a2e4c08@oss.qualcomm.com>
+X-Rspamd-Queue-Id: 00CF45235C6
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,google.com,vger.kernel.org,lunn.ch,davemloft.net,kernel.org,redhat.com];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287199-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[openvpn.net:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287200-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,oss.qualcomm.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andersson@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,openvpn.net:mid,openvpn.net:dkim]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On 12/05/2026 16:11, Sabrina Dubroca wrote:
-> 2026-05-12, 15:55:39 +0200, Antonio Quartulli wrote:
->> Hi,
->>
->> On 12/05/2026 06:56, David CARLIER wrote:
->>>     Same multi-read pattern shows up in ovpn_tcp_recvmsg(),
->>>     ovpn_tcp_sendmsg(), ovpn_tcp_data_ready() and ovpn_tcp_write_space()
->>>     - happy to roll those into v2 as well, or punt to a follow-up,
->>>     whichever you'd prefer.
->>
->> @Eric, if you have no objection, I'd pick this patch up in my tree and let
->> David follow with a new patch for net-next.
+On Tue, May 12, 2026 at 06:55:42PM +0530, Komal Bajaj wrote:
+> Add the pinctrl driver, document the bindings and enable the
+> driver in defconfig as default.
 > 
-> But this patch is not fixing any problem either, right?
+> Signed-off-by: Komal Bajaj <komal.bajaj@oss.qualcomm.com>
 
-Mh, because the sock outlives the peer, so there is no risk in accessing 
-sock->peer in this case, right?
+Reviewed-by: Bjorn Andersson <andersson@kernel.org>
 
- >  Then just wait until David sends the whole change at once?
+Regards,
+Bjorn
 
-Yap.
-
+> ---
+> Changes in v4:
+> - Remove eGPIO fields not supported on Shikra: drop .egpio_func, .egpio_enable
+>   and .egpio_present from the PINGROUP macro and shikra_tlmm (sashiko-bot)
+> - Link to v3: https://lore.kernel.org/r/20260508-shikra-pinctrl-v3-0-771144cdc411@oss.qualcomm.com
 > 
-> And since the "rcu_dereference_sk_user_data + !sock || !sock->peer ||
-> !ovpn_peer_hold(sock->peer)" pattern is used multiple times, it would
-> be better to turn it into a helper (ovpn_tcp_get_peer()?). That way
-> the caller can't be tempted to play with sock->peer.
+> Changes in v3:
+> - Move MODULE_DEVICE_TABLE(of, shikra_tlmm_of_match) immediately after
+>   the of_device_id table definition (Krzysztof)
+> - Link to v2: https://lore.kernel.org/r/20260504-shikra-pinctrl-v2-0-14e9dcc2d685@oss.qualcomm.com
 > 
-> (also, please wait at least the usual 24 hours before applying)
-
-ACK
-
-
-Cheers,
-
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
-
+> Changes in v2:
+> - Fix Kconfig description to drop "Technologies Inc" (Linus Walleij)
+> - Remove unused UFS_RESET macro (Maulik Shah)
+> - Add spaces inside braces in shikra_mpm_map (Maulik Shah)
+> - Fix gpio-line-names maxItems: 165 -> 166 (Krzysztof Kozlowski)
+> - Link to v1: https://lore.kernel.org/r/20260429-shikra-pinctrl-v1-0-1b4bb2b3a8d6@oss.qualcomm.com
+> 
+> ---
+> Komal Bajaj (2):
+>       dt-bindings: pinctrl: qcom: Document Shikra Top Level Mode Multiplexer
+>       pinctrl: qcom: Add Shikra pinctrl driver
+> 
+>  .../bindings/pinctrl/qcom,shikra-tlmm.yaml         |  123 ++
+>  drivers/pinctrl/qcom/Kconfig.msm                   |   11 +
+>  drivers/pinctrl/qcom/Makefile                      |    1 +
+>  drivers/pinctrl/qcom/pinctrl-shikra.c              | 1253 ++++++++++++++++++++
+>  4 files changed, 1388 insertions(+)
+> ---
+> base-commit: 39704f00f747aba3144289870b5fd8ac230a9aaf
+> change-id: 20260429-shikra-pinctrl-fd71ab6ecd6f
+> prerequisite-change-id: 20260428-shikra-socid-a27ae38cb7e3:v1
+> prerequisite-patch-id: 843f28095c0d42d0d60ab7000095c64dcb2e90ca
+> prerequisite-patch-id: 1069d6880c3ff91c230c20fcd876738001c6d35d
+> 
+> Best regards,
+> -- 
+> Komal Bajaj <komal.bajaj@oss.qualcomm.com>
+> 
 
