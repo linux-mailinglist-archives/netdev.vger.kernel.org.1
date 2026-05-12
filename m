@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-286903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-286904-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iIGMMmaBAmpDtwEAu9opvQ
-	(envelope-from <netdev+bounces-286903-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 03:24:54 +0200
+	id oE5FEnmBAmpDtwEAu9opvQ
+	(envelope-from <netdev+bounces-286904-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 03:25:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35F39518354
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 03:24:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A954D51835B
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 03:25:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7BFA4303E4A0
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 01:20:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C3B38304455B
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 01:20:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37264273D8D;
-	Tue, 12 May 2026 01:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5919C26A1C4;
+	Tue, 12 May 2026 01:20:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="me5j//2X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lZ1uxS59"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144F472618
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 01:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 361E141754;
+	Tue, 12 May 2026 01:20:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778548827; cv=none; b=Z4ejAx0GOP+ahN+xymi6BYftws/KH4wSCyBP57qmdfY7ySSkvSD5hK1nLWjLAaobE5asJNjr3ycXcf2Za2SKnbc7CIPut8tshZmoFdvNbKww25duT6AEVL2sbkLHJznabtgIh7wsm3+BSB8gTxY22bShZhvzV/g/5fHSIc8GVPQ=
+	t=1778548846; cv=none; b=ij2SxlvGTJUJx2dRUcBLDd1XrSTMWLPVNvkrGRf16SQLDbceq7God/vdZTxi8hj3KOeQ2qrQxkvlC03bodWJdAa+3iEyduLOozvwUmlPq54DpjvwEnxRsI8LibSigkbbPJuRiuU/dF+SYTijPtERhmfyPCgtK7T4VrLNiQHDv0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778548827; c=relaxed/simple;
-	bh=RFU/1OHHTzuqFkcEJI5i1DO4+2qF3nQ9kaBxSXGbiMU=;
+	s=arc-20240116; t=1778548846; c=relaxed/simple;
+	bh=rmhmgjf9pNbch508V7x5oA7WF+QOIlAxgYvbMVZNPDQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=edOJuc9ATtxbTnFb0l6q7DsBlcQYdOfr3ml/hG791q6uqB6l+S7jMBFWFeTIBNNvmQ1VJlI4pjXYpC/IlMii6SAfsRu4BjDXSk4iam4IkEVB9qo+lxApofXGLXrXvKAJE0H6dnjcpckzEmkmoCfFh4HEPA+KiWJ3TdTR4SRYq6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=me5j//2X; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2F86C2BCB0;
-	Tue, 12 May 2026 01:20:26 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Wx2k0fLuD8nNv2QRQWY8e8DPBW2KjRs5owfa7cQrZB0exlXHOEaEytjXDcPajhKWeps5XhZ480aSHxbcOgII0IGxBaGaDJBroG8a2Ll3Yp9b4+7x3/jHWBDle1Ng05F3ZJt0XtkemnAkolacLdYj/g2pqxvfHRoMf/p2FImRWVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lZ1uxS59; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3429C2BCB0;
+	Tue, 12 May 2026 01:20:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778548826;
-	bh=RFU/1OHHTzuqFkcEJI5i1DO4+2qF3nQ9kaBxSXGbiMU=;
+	s=k20201202; t=1778548845;
+	bh=rmhmgjf9pNbch508V7x5oA7WF+QOIlAxgYvbMVZNPDQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=me5j//2XgKIXdGAgBxMb6T/ta6McVyrj9nRy++CdBk0LMo5C9m+okEI0hZoG0LsMG
-	 BeyRiEw6l7L4wvqtmxNR15+XBKqkv64Zj82YgF7m7IZ4HowSMo4B6hM3Kw1kdUUi2V
-	 q9H429KGHbuKwZ9GuFMAk4QDiIoaSu5s0GZTeghEwOB1rwLqRMisGS9+y+xuARICpe
-	 q268QvEOPIY/dhJ50maTWvQ4Z4EpBQEoYVFyuYJ7jr6Y9wHBJR8eBCsrQWXPgrZt6S
-	 PgF/ZgctRmNr3Mks9q7mHkEWve9urehKfvIaQeoH5BuYirqRRnR9G5BjDaAldOIgZt
-	 Dd7oB6E5bTpWg==
+	b=lZ1uxS59S2WcIzQvvsc+Zao5NxRjWGQV8LatMZ7CYTnf7vIGiKcV3pYkh01xATBgj
+	 ixfxDLJzj7L/22CIgp21SVqd+qmXZu/AJF3ySI2F5Fy+8o/2Hy7evsgSSuPWKXNON8
+	 tKVXufDSle97m+x0pIdL6C8y2JRgFoK5kPm4iRcYaF0ApJFyoPBaxsVAVcTV9Pnxa6
+	 lh0hVqwKKpBsHHjuN13KOeCUIEZMqdhNNpSzdK05ZML7RSS875KrecA/p0kw0IlRst
+	 TZwZRn/dXCAOG/zOv3FCeXIfqCnfbqU1O/zWLBuWRBCg6RRwjPg4SlmBf356sJe8cG
+	 XGB5Hb9CvHWTQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CF0C39308E4;
-	Tue, 12 May 2026 01:19:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CF1339308E4;
+	Tue, 12 May 2026 01:19:53 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,113 +55,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net/sched: dualpi2: initialize timer earlier in
- dualpi2_init()
+Subject: Re: [PATCH net-next 0/8] mptcp: pm: in-kernel: increase limits
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177854877304.2528168.12550829856617698082.git-patchwork-notify@kernel.org>
-Date: Tue, 12 May 2026 01:19:33 +0000
+ <177854879234.2528168.4119644465151651447.git-patchwork-notify@kernel.org>
+Date: Tue, 12 May 2026 01:19:52 +0000
 References: 
- <1faca91179702b31da5d87653e1e036543e32722.1778259798.git.dcaratti@redhat.com>
+ <20260508-net-next-mptcp-pm-inc-limits-v1-0-c84e3fdf9b6a@kernel.org>
 In-Reply-To: 
- <1faca91179702b31da5d87653e1e036543e32722.1778259798.git.dcaratti@redhat.com>
-To: Davide Caratti <dcaratti@redhat.com>
-Cc: jhs@mojatatu.com, jiri@resnulli.us, davem@davemloft.net,
+ <20260508-net-next-mptcp-pm-inc-limits-v1-0-c84e3fdf9b6a@kernel.org>
+To: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Cc: martineau@kernel.org, geliang@kernel.org, davem@davemloft.net,
  edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org
-X-Rspamd-Queue-Id: 35F39518354
+ netdev@vger.kernel.org, mptcp@lists.linux.dev, linux-kernel@vger.kernel.org,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org
+X-Rspamd-Queue-Id: A954D51835B
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-286904-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-286903-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  8 May 2026 19:05:10 +0200 you wrote:
-> 'pi2_timer' needs to be initialized in all error paths of dualpi2_init():
-> otherwise, a failure in qdisc_create_dflt() causes the following crash in
-> dualpi2_destroy():
+On Fri, 08 May 2026 17:40:45 +0200 you wrote:
+> Allow switching from 8 to 64 for the maximum number of subflows and
+> accepted ADD_ADDR, and from 8 to 255 for the number of MPTCP endpoints.
 > 
->   # tc qdisc add dev crash0 handle 1: root dualpi2
->   BUG: kernel NULL pointer dereference, address: 0000000000000010
->   #PF: supervisor read access in kernel mode
->   #PF: error_code(0x0000) - not-present page
->   PGD 0 P4D 0
->   Oops: Oops: 0000 [#1] SMP PTI
->   CPU: 4 UID: 0 PID: 471 Comm: tc Tainted: G            E       7.1.0-rc1-virtme #2 PREEMPT(full)
->   Tainted: [E]=UNSIGNED_MODULE
->   Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
->   RIP: 0010:hrtimer_active+0x39/0x60
->   Code: f9 eb 23 0f b6 41 38 3c 01 0f 87 87 64 c0 ff 83 e0 01 75 33 48 39 4a 50 74 28 44 3b 42 10 75 06 48 3b 51 30 74 21 48 8b 51 30 <44> 8b 42 10 41 f6 c0 01 74 cf f3 90 44 8b 42 10 41 f6 c0 01 74 c3
->   RSP: 0018:ffffd0db80b93620 EFLAGS: 00010282
->   RAX: ffffffffc0400320 RBX: ffff8cf24a4c86b8 RCX: ffff8cf24a4c86b8
->   RDX: 0000000000000000 RSI: ffff8cf2429c2ab0 RDI: ffff8cf24a4c86b8
->   RBP: 00000000fffffff4 R08: 0000000000000003 R09: 0000000000000000
->   R10: 0000000000000001 R11: ffff8cf24a39c500 R12: ffff8cf24822c000
->   R13: ffffd0db80b936c0 R14: ffffffffc02cf360 R15: 00000000ffffffff
->   FS:  00007fbc01706580(0000) GS:ffff8cf2dc759000(0000) knlGS:0000000000000000
->   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->   CR2: 0000000000000010 CR3: 0000000008e02003 CR4: 0000000000172ef0
->   Call Trace:
->    <TASK>
->    hrtimer_cancel+0x15/0x40
->    dualpi2_destroy+0x20/0x40 [sch_dualpi2]
->    qdisc_create+0x230/0x570
->    tc_modify_qdisc+0x716/0xc10
->    rtnetlink_rcv_msg+0x188/0x780
->    netlink_rcv_skb+0xcd/0x150
->    netlink_unicast+0x1ba/0x290
->    netlink_sendmsg+0x242/0x4d0
->    ____sys_sendmsg+0x39e/0x3e0
->    ___sys_sendmsg+0xe1/0x130
->    __sys_sendmsg+0xad/0x110
->    do_syscall_64+0x14f/0xf80
->    entry_SYSCALL_64_after_hwframe+0x77/0x7f
->   RIP: 0033:0x7fbc0188b08e
->   Code: 4d 89 d8 e8 94 bd 00 00 4c 8b 5d f8 41 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 11 c9 c3 0f 1f 80 00 00 00 00 48 8b 45 10 0f 05 <c9> c3 83 e2 39 83 fa 08 75 e7 e8 03 ff ff ff 0f 1f 00 f3 0f 1e fa
->   RSP: 002b:00007fff593260e0 EFLAGS: 00000202 ORIG_RAX: 000000000000002e
->   RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fbc0188b08e
->   RDX: 0000000000000000 RSI: 00007fff59326190 RDI: 0000000000000003
->   RBP: 00007fff593260f0 R08: 0000000000000000 R09: 0000000000000000
->   R10: 0000000000000000 R11: 0000000000000202 R12: 000055f06124f260
->   R13: 0000000069fca043 R14: 000055f061255640 R15: 000055f06124d3f8
->    </TASK>
->   Modules linked in: sch_dualpi2(E)
->   CR2: 0000000000000010
+> The previous limit of 8 subflows makes sense in most cases. Using more
+> subflows will very likely *not* improve the situation, and could even
+> decrease the performances. But there are no technical limitations nor
+> performance impact to raise this limit, so let's do it: this will allow
+> people with very specific use-cases, and researchers to easily create
+> more subflows, and measure the performance impact by themselves.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net/sched: dualpi2: initialize timer earlier in dualpi2_init()
-    https://git.kernel.org/netdev/net/c/f8e64e956a63
+  - [net-next,1/8] mptcp: pm: in-kernel: explicitly limit batches to array size
+    https://git.kernel.org/netdev/net-next/c/9031e5e31d5d
+  - [net-next,2/8] mptcp: pm: in-kernel: increase all limits to 64
+    https://git.kernel.org/netdev/net-next/c/c8646664fbf1
+  - [net-next,3/8] mptcp: pm: kernel: allow flushing more than 8 endpoints
+    https://git.kernel.org/netdev/net-next/c/607f16ab462b
+  - [net-next,4/8] mptcp: pm: in-kernel: increase endpoints limit
+    https://git.kernel.org/netdev/net-next/c/e845e6397d78
+  - [net-next,5/8] selftests: mptcp: join: allow changing ifaces nr per test
+    https://git.kernel.org/netdev/net-next/c/e1515a1a494b
+  - [net-next,6/8] selftests: mptcp: join: validate 8x8 subflows
+    https://git.kernel.org/netdev/net-next/c/1697837a67fa
+  - [net-next,7/8] selftests: mptcp: pm: validate new limits
+    https://git.kernel.org/netdev/net-next/c/c9b581e619d2
+  - [net-next,8/8] selftests: mptcp: pm: use simpler send/recv forms
+    https://git.kernel.org/netdev/net-next/c/ed5372634c5b
 
 You are awesome, thank you!
 -- 
