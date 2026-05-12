@@ -1,68 +1,120 @@
-Return-Path: <netdev+bounces-287187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287188-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YLV2FHA+A2qr2AEAu9opvQ
-	(envelope-from <netdev+bounces-287187-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:51:28 +0200
+	id 65OFBr41A2of1wEAu9opvQ
+	(envelope-from <netdev+bounces-287188-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:14:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD2F1522F58
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:51:27 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00010522182
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:14:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 658323232F21
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 14:02:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B69C9307E49D
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 14:07:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E5D63A71A1;
-	Tue, 12 May 2026 14:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E4B53A83B6;
+	Tue, 12 May 2026 14:07:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pJcZuYlK"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b="a1AKBlkb"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFA63A5984;
-	Tue, 12 May 2026 14:02:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA3E3A71A9
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 14:07:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778594554; cv=none; b=j1wnERF6JYKf/RYktos3z15PVQI4m/h0Wxraax+KLdOzgTIvpZQOOmIQzicPl82Nv74eifziPvwRTLzCDehH+aSmYVdo8bv1mHtSLt0wkThLL10etCmBWgVPcbwL9i7u+tPpBSsVVtpJXMME6KKyra9uucKrRb3vasTOw/E+2Nc=
+	t=1778594838; cv=none; b=ZBtTN+Aej/OCp/R93qzsmF/qo0b0el/F+URT21/Ls2pwRXR1T0zAx9XnXayzXv7FbrbF79lUJUVNWoFB7rx+JlCswAU8kFinbCy/1QYMXS0HNsLd8pLztDmmd7rsWimZFxpis8ha6Gi6p/z/MqrNHAMI00wztgInckB21b3T1ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778594554; c=relaxed/simple;
-	bh=r4LhqCDOXCOIgOMtRFWNsqidjd2CmAB3hcLb7o5BO04=;
+	s=arc-20240116; t=1778594838; c=relaxed/simple;
+	bh=bgBCtNkJnsiY/BqSw+6iZ38DMKEEFC29v57mwpmfH+w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SUYmfeNms1Mw16NCfH4qsS/a4RRSXzHSbR6wGQQPfO7kjkMnezTaKadxouoGJyfaRKjDx834tJ7oMkBMY/j2a7HRYp2PFnAdzXq1esL4DjnfYLKJNDNYb4QSjyLOA1Kn3EaItD4bay7j0xlkCTsAXQIo1A3NLSf5d5aTwrMFO6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pJcZuYlK; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9ct6ivuY+SOQDy0tlA0NuuDqdOfuD2l2mBFU84wV/1c=; b=pJcZuYlK8h/8RGhlQOWRkZhfgY
-	wcso++R/MZaToJ7YfLbc3b8fu9l2WCB5cH6wD11muNqqg1AF2WNUIv+Y58RLAcJXmNFl8NefaiDUC
-	7tEg1VqG7Ga7/olh3z65QXt8tEsEdCMk+1b5KKDJNZVdCz23XWLly2stMsDtQJetzZzY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wMngf-002Z1I-2v; Tue, 12 May 2026 16:02:17 +0200
-Date: Tue, 12 May 2026 16:02:17 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-Cc: Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
-	"parthiban.veerasooran@microchip.com" <parthiban.veerasooran@microchip.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=i8Gxt09LS8neQPTgTOLijfTW7GPGwKDdkb+1ZoLbUftrxIEgTOxiDj1cFzZczcvjjeEtU9/+Bsxr+v5DMYjvZS458Ru++XpAGYEtVGbpAkHdV772rrzRcKGAyIajqr1srIlITYNkOMpsiQaOiYqRoZ1c9H/3TALm0sZ+RmTjFkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=a1AKBlkb; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4891b0786beso36334485e9.1
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 07:07:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1778594834; x=1779199634; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vEuT8mU5zwj23z5tjg7/0cCroKq2YLlwPoM85Ob95Js=;
+        b=a1AKBlkb+zbjKzr07CAkgRAWlSxhhCfxvhMVUJtl54NRRR3SzBFMSHkFXqxZ0CvFH0
+         iykelWeVpz5jqx2sWOMkX1zpUKUqmUlJumpneggyJocP76N5ObtIS9wLFaMZLQnSKl8k
+         zJmnek8cMvX7V0a3vUCT5uJvmpMYaN59HhNaRy7kNyoV0MPtM7nUss9WAw10rjZrmLRE
+         3r0PYgcK320mAkTBC9fQHgzs+zijdiSji4Zus1qJNscR2/NJKgnQEEkQ29WeXLoVUpeC
+         ufbYJLvUIrXy+hXWSW8pOTc3Ss5xLcJLKC3A+e6iw3AMoIesVhAWwOgTbTmE/vMR97gq
+         anSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778594834; x=1779199634;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vEuT8mU5zwj23z5tjg7/0cCroKq2YLlwPoM85Ob95Js=;
+        b=XyAWRRegzfGfVPK2g9AvaI23FCcja2gVynke60nWFy+7uTtI0hw/1KclfOuB9BOrcn
+         RWTI/dN5bIShcbGXoFI41TUceRhZlWhWtgo3mwb/+p+ZIVS9MDqpsR9CuH5LhTMd6TWM
+         GSkRKfWGoOLqwFfT7u1A8zWyZsDnVP0mvHClJSwGYivd+RTDm9mycD5yo8xNh6HbkK1L
+         /Jpv919IBCz0Vu89GOUIVV5kfsfMuXAHzrzh+ZPSaWq+uki/LsG0N91cpgD3RjoLe5xV
+         Ws9kEh7JZzPN/2VxObwz/Hd17gnezKNb7RdUpb3bqk7F2ks3beoLP9DYrwLzS5WKa5HB
+         byVg==
+X-Forwarded-Encrypted: i=1; AFNElJ9GiufJk/DKvKS3TkPhApZH8VGN79PAPdPt80W5YGjoUCu80xKKrStqPhg5t5TlVwPCBylRh8E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxx9zHG6bDcLi8wZgxXlOsFbSW46aenmzP1JI9M/jKIYK/GQ3EG
+	K36N3f+lZBw2euY5GI+Tvuzfa26EFGiDamR9+cnqvkO5s7slkNUlTBa7EJktoQev6mk=
+X-Gm-Gg: Acq92OHbmuEBPhya/KY6IVejxJPppE6L4hJgbaX/SgMbvm9FF1teqgEUnvxXxmAw8yN
+	f4Fi1CNrnUXd6ilAgFoDOJuPPfDu9gl4unRfnfElombgtKy2BvR0ENoFK8hHN6A+D7vApLdRLru
+	Uq8pEHK2H71yrVhhuySPMgyX3Z51bASPvA85hZXVJ8P1ATMxdKsX7BPxuBeIQgO1e6esucmA6Um
+	ntVwL2zkj1h5sloznR7vePgdC2jBJZjdO8+4SANQwGGQUolCt++VNJPFRkZVTMsJjgvKNQjQLLx
+	bnrHHcRcifH14W6mmIv/eTguQ546mreIG38miQeC0gGX/o5Qa+6O7/yep3OOMSjlVIX+Qib9A7V
+	yz9Oq6BugiMBu7G3k0CvHBHvjBh91rHDzRkRryvxD9k6Ams95WnD/i+yGxVgmryqY9LNl8aZTNI
+	J5LWDYQ6VWEAdLRrLvK8mSFr/ndOBsy4OXHSM=
+X-Received: by 2002:a05:600c:8115:b0:48a:9540:1a3a with SMTP id 5b1f17b1804b1-48e51e196f9mr466793535e9.8.1778594834461;
+        Tue, 12 May 2026 07:07:14 -0700 (PDT)
+Received: from FV6GYCPJ69 ([140.209.217.212])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fc8d19854sm520285e9.1.2026.05.12.07.07.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 May 2026 07:07:13 -0700 (PDT)
+Date: Tue, 12 May 2026 16:07:10 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Parav Pandit <parav@nvidia.com>
+Cc: Mark Bloch <mbloch@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Simon Horman <horms@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"Borislav Petkov (AMD)" <bp@alien8.de>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Petr Mladek <pmladek@suse.com>,
+	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>, Kees Cook <kees@kernel.org>,
+	Marco Elver <elver@google.com>, Eric Biggers <ebiggers@kernel.org>,
+	"NBU-Contact-Li Rongqing (EXTERNAL)" <lirongqing@baidu.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 5/9] net: ethernet: oa_tc6: Adding vendor
- specific MMS
-Message-ID: <758c0984-c9a5-4eba-ac1d-a0d165328e5e@lunn.ch>
-References: <CY8PR02MB924967FCDC5FE1A541D4DDC683382@CY8PR02MB9249.namprd02.prod.outlook.com>
- <066bf036-715c-45d3-a817-f2719eb5d9d6@lunn.ch>
- <CY8PR02MB92490ED7D572EB0C124E4C1F83392@CY8PR02MB9249.namprd02.prod.outlook.com>
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Subject: Re: [RFC net-next 0/4] devlink: Add boot-time defaults
+Message-ID: <agM0DsiaAH8-Ox7N@FV6GYCPJ69>
+References: <3f9215c4-7c84-46d9-ba74-30dabe24db09@nvidia.com>
+ <afxvzOjqw-vxUAED@FV6GYCPJ69>
+ <b6a9b568-dd09-4414-be57-6b9cd282a43c@nvidia.com>
+ <af4lBIJdCuN5VKq_@FV6GYCPJ69>
+ <20260508175213.1952097f@kernel.org>
+ <af7Y4AYv-XDCbK_8@FV6GYCPJ69>
+ <580a774b-ba9e-4523-b43a-476f75dd5b12@nvidia.com>
+ <SJ0PR12MB68068C50EE9776A3D9060635DC382@SJ0PR12MB6806.namprd12.prod.outlook.com>
+ <agLoeZtsSizR-R24@FV6GYCPJ69>
+ <SJ0PR12MB68061C61AA2BF5D81005984FDC392@SJ0PR12MB6806.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,69 +123,103 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CY8PR02MB92490ED7D572EB0C124E4C1F83392@CY8PR02MB9249.namprd02.prod.outlook.com>
-X-Rspamd-Queue-Id: DD2F1522F58
+In-Reply-To: <SJ0PR12MB68061C61AA2BF5D81005984FDC392@SJ0PR12MB6806.namprd12.prod.outlook.com>
+X-Rspamd-Queue-Id: 00010522182
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287187-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287188-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DMARC_NA(0.00)[resnulli.us];
+	RCPT_COUNT_TWELVE(0.00)[32];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,resnulli.us:email,nvidia.com:email]
 X-Rspamd-Action: no action
 
-On Tue, May 12, 2026 at 04:57:01AM +0000, Selvamani Rajagopal wrote:
-> [..]
-> 
-> > 
-> > > -static int oa_tc6_get_phy_c45_mms(int devnum)
-> > > +static int oa_tc6_get_phy_c45_mms(struct oa_tc6 *tc6, int devnum)
-> > > {
-> > > switch (devnum) {
-> > > case MDIO_MMD_PCS:
-> > > @@ -456,6 +470,8 @@ static int oa_tc6_get_phy_c45_mms(int devnum)
-> > > return OA_TC6_PHY_C45_AUTO_NEG_MMS5;
-> > > case MDIO_MMD_POWER_UNIT:
-> > > return OA_TC6_PHY_C45_POWER_UNIT_MMS6;
-> > > + case MDIO_MMD_VEND1:
-> > > + return tc6->vend1_mms;
-> > 
-> > MMS 0 would be against the specification. So i would do
-> > 
-> > case MDIO_MMD_VEND1:
-> > if (!tc6->vend1_mms)
-> > return -EOPNOTSUPP;
-> > return tc6->vend1_mms;
-> > 
-> > That should catch uses of VEND1 without first defining the mapping to
-> > the MMS.
-> 
-> 
-> vend1_mms is initialized to -EOPNOTSUPP in oa_tc6_init. So, it won't be 0 by default.
+Tue, May 12, 2026 at 03:48:32PM CEST, parav@nvidia.com wrote:
+>
+>> From: Jiri Pirko <jiri@resnulli.us>
+>> Sent: 12 May 2026 02:16 PM
+>> 
+>> Mon, May 11, 2026 at 08:21:37PM +0200, parav@nvidia.com wrote:
+>> >
+>> >> From: Mark Bloch <mbloch@nvidia.com>
+>> >> Sent: 10 May 2026 06:02 PM
+>> >>
+>> >
+>> >[..]
+>> >
+>> >> > I look at it from the perspective that from some CX generation,
+>> >> > switchdev mode should be default. So that is a device-based decision.
+>> >> > I believe as such it can optionally be permanenty configured (nv config)
+>> >> > on older device. Why not?
+>> >>
+>> >Because sometimes switchdev_inactive is needed and sometimes not.
+>> >Such knob is not device decision.
+>> 
+>> That is what I would call corner case. In that, user can use userspace
+>> configuration to change the mode in runtime.
+>> 
+>Corner vs common depends on users one talks to. :)
+>If fw has switchdev(active) as default, and then 
+>And user needs to run switchdev_inactive, it will actually break their switching applications.
 
-Ah, missed that. So this is O.K.
+Can you describe the actutal breakage please?
 
-    Andrew
+>
+>So, one needs to invent switchdev_inactive in the FW.
+>
+>Jakub's suggestion in this RFC is covering both the scenarios uniformly without above problems.
+>Single uapi for all the cases, so looks good to me.
+>
+>Moreover, do not understand how alternative solves such problems.
+>i.e. user is unable to configure the fw because driver is not yet loaded/up.
+
+See my other reply in this thread. I don't think there is a need to
+configure anything in FW. If we fix the behaviour in switchdev mode for
+non-sriov user and change the default, no fw knob needed. What am I
+missing?
+
+
+>
+>> 
+>> >If it is placed in the device, orchestration needs to yet use additional vendor tool to configure in the device.
+>> >And that theoretical tool cannot even run yet because driver is not yet loaded.
+>> >
+>> >That sort of defeats the purpose.
+>> >
+>> >> This is a deployment policy decision, not a permanent property of the card.
+>> >+1
+>> >
+>> >> The same adapter can be used in a regular host/RDMA setup or in a
+>> >> switchdev/offload setup. If we store this in NVM, that Linux switchdev policy
+>> >> follows the device across hosts, kernels and use cases, and can surprise the
+>> >> next deployment that just expects a normal NIC.
+>> >>
+>> >> I'll send another RFC v2 with support limited to:
+>> >> devlink=[...]:esw:mode:{ switchdev | switchdev_inactive | legacy }
+>> >> and let's see where we land with that.
+>> >>
+>> >This looks elegant to me as well covering all eswitch modes and still sw is in control.
 
