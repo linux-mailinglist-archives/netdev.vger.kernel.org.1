@@ -1,152 +1,157 @@
-Return-Path: <netdev+bounces-287173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287175-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iBWeMtEvA2qN1QEAu9opvQ
-	(envelope-from <netdev+bounces-287173-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:49:05 +0200
+	id aJNmDBY5A2q11wEAu9opvQ
+	(envelope-from <netdev+bounces-287175-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:28:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C32A45219EB
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:49:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F716522770
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 16:28:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8C4B830EE05E
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:31:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 65F01312D9A7
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:32:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF1B239061A;
-	Tue, 12 May 2026 13:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEA243911A6;
+	Tue, 12 May 2026 13:32:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V78pH50R"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MdHX5i1Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4C93905EB
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 13:31:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A2B3E1730
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 13:32:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778592693; cv=none; b=u1903VNU0/dU6zH5s07/F28siB5AerRz/GWyVvr/UhbzGr/+eSWxl6MyXLnb9ccIb9GusxwWS6yzvyQh/juCymlTT0laIdK0jf1rg1RRW1fH2cJrG1IJsbz9pBrAQG3EqrwORRFp3hFptuDbYe1ppQNlDGgkiqK1LbfJeG0eih0=
+	t=1778592743; cv=none; b=YF2aEugGmtAbJ80IQ8IuYgL7V+/O+JZuDiZlVHv5e6wxEySzzIADJneLAcg8z8EbLZeU0hQYhMmrSFgLDU8pi3cxEicK5Y2zId83pEcgu9dkKQhg6WjFw16+I4zMRYNCIjP3krSrcC4h6pt1NHaYilAykSAjqwGHAN9RloxL7q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778592693; c=relaxed/simple;
-	bh=R45r9yU7MMX7pT+++mCU8H39a39mlzYwFvuPyP+hqQc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QBNTznpmFrvbTR8xb//cZSlU0jCoPR8Q9uH3R69cCP8Xz2fpy0V4DwcnGSWgeigsD7aYIM7You2bJk/B1Q7HTOFNzq6qWFktRPApH0X3QJzyknFjTDspQmAor0BiztubBBzEGYkh4K6AQsM/mgQlHV2Vbf4IOxC02iEIT3AJiZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V78pH50R; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2ba928852a5so36508935ad.1
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 06:31:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778592691; x=1779197491; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QDYkhHfQmXQhrZX6ApB+iupAaO7l8zpahGGh7xZwSNQ=;
-        b=V78pH50R1sM1uE0bPuqXiOmAzERQZq5XSzRjG5OI8SH/nhpM2aSgyNzMoL0/3nYwzL
-         KAZraVLizlUAEbxVYf0fSGdiPbnM7B9R7qqQDyCfRx1o5H+Pf98at0LvKhsxRniJ9wVB
-         VlACJJ1iBLpatNMrsmMCy90Jag78SwTEpmkdgTCXMyf7/ruei4PPiJUl8DAs3GXT2fJ/
-         8IaQb8xK1eRVrrEJIqeihCvLJ1tZPs37PktGSy+PFweWe04TZefzr2ylc1CZ7YuBzRL0
-         yi/o7he43lQyWQvI2FIYKckhgzxicPjLcwIV+W/QnmxbNAQqkd4TQxVHWiBMnT1hMJc3
-         iwNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778592691; x=1779197491;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QDYkhHfQmXQhrZX6ApB+iupAaO7l8zpahGGh7xZwSNQ=;
-        b=L7heIBpxGTVfITIjWoVFycmjI64KU/t5VoQJ4vg+geBQkOlFd0wr24u5SMgekQgUFJ
-         PJVn1OnI9JC7GZK+Yj+YQPGxTI9FeVnu6RQUgfztDOHqVjeeoGaVm1soj0zafBueJHQO
-         8aWEQRN4TqoBI2mClGQ3wyB2qflDs2k8yxzyRjYcQHLg3mZ8x2Kaqq5mpZiMAvpSXgXr
-         J1CNn0mGjHaAdikEFJGcadf7zn0WeXt9ZMSjlkzTsdhLSxpuzjfIZAdFaViayS14TYMp
-         A/DQIinT79xEprzo5TbB3cF16VHHXee0kVSL6CIy8hG1PY+cX1AHYRI4bBjDhM0zFgZV
-         urvg==
-X-Gm-Message-State: AOJu0YxQxd2cbotQz5N6sGzaehEWmrYgj2K8mFVzKqCf8EKRbQWRIAvU
-	Tjv8P3S067FwK1QCeTOjoT4kJZJjBljBrb99xRDSqwx2usOfO5JIDioBnlFxAGKf
-X-Gm-Gg: Acq92OF+MTz7PQFJxtmeBoITr/OnA4Krhn2xXR9XcX0SHF2zadhn4KSVjA99h6J+5RF
-	G2jxowJzcjF0kPYvVgGmQbxxGiRc/H9j6LIf5wSpl8I8y4bG6iFnfH/3s9KH12DUmQwGMviBkGD
-	1xhQ5bJhjvJTBJyUa8vXllGY/pOAPQjvjnbRVKPWNB2/0EUkyGRAsJD74cloZdGV7CcYOSXbZRW
-	8DHGC4NPu/dF3HnAQcVAeoSRH/oDGoYZ2jmOZo4PuAaq4m5BPjHXNAlNkShOnf9MN+X6c7u7pY5
-	INVFjM34K1uU5S5r7DgFJfhFw3I3Yam1ImxaOtqAnYTwQyk0ubjM74IkaPNdfQ2T4+nSRfKjLiu
-	vtwYgV57VA9zEnhAvgQuT3vRA2anV6G2nGPpqtY/3QS/zkkUB5XRuc13FzfyauUQS4531JAErBW
-	ovAEIU1RMrBAQYzE0Dwnmt08J53KDRnPh3UxtqVK9BNf2DQmjgxIeZT4tDBL3Iew==
-X-Received: by 2002:a17:903:1ac3:b0:2bd:7ca:e67d with SMTP id d9443c01a7336-2bd07caea66mr26778545ad.29.1778592691438;
-        Tue, 12 May 2026 06:31:31 -0700 (PDT)
-Received: from r912.lan.4v1.in ([182.70.116.80])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1d2700dsm139967095ad.2.2026.05.12.06.31.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 May 2026 06:31:30 -0700 (PDT)
-From: Avinash Duduskar <avinash.duduskar@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	horms@kernel.org,
-	corbet@lwn.net,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] Documentation: networking: ip-sysctl: fix typo in tcp_ecn_option
-Date: Tue, 12 May 2026 19:01:25 +0530
-Message-ID: <20260512133125.1772658-1-avinash.duduskar@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1778592743; c=relaxed/simple;
+	bh=2a0VEEh++ToCnDM9Nu78zdEEiYidXVyrGVfaJTq+Q0E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FFDelYIhTOYo4Mx4JzRecEKq2x2cEY506ekcDUvgh0BF1QCeBXfKywViHj8PlflDjSBZ+16XLx36BZVMHFwGvvwd4JTiA+I0VPZfjihuizRhR6YqELDrKQavg5pOi6d398Fs+1WxOkarfXeQ83Yjq/lRl1WDmS2prHBNbFLoxy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MdHX5i1Q; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id B01A74E42C83;
+	Tue, 12 May 2026 13:32:20 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 7972F60646;
+	Tue, 12 May 2026 13:32:20 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id F14E311AF874F;
+	Tue, 12 May 2026 15:32:12 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1778592739; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=wbVp7XXps13Zl+aS41wr/B33E+sqORYJAXToq+Zs+Ik=;
+	b=MdHX5i1Q8NssOZq+1LruwkFS6kyKJ4OV8H3ot/+3hAFAfhsbunczThxiQWnNZxANw74X5V
+	zMeWluvrhl//mYxDzfVc8KUIEG2cgEtqxBQwRd0gum7+HWwrEWMcjbR3LxwWZRn+An5AOv
+	eeuWQ0VNbwCRZfnIFcvM662lvqfdPsCQX9dAGDMVPUSZwve68pLbzyUlgRxquewNv/5RiH
+	4YGuBgmUIvBzR3S+jXfVMHogC/zTTKUukH7tlUQMR4g51xa/K1Ip8GTmRM3oyN9gENMmKi
+	6V5o65XlpWme6f4JAQNwmcqu5B6Y2xvMozTc8Be7416H7/3k5w38FxkfDlI0zw==
+Message-ID: <91f86e6c-6013-42cc-8a4b-2b32093b9eae@bootlin.com>
+Date: Tue, 12 May 2026 15:32:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: C32A45219EB
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next v3 2/3] net: motorcomm: phy: set drive strength in
+ YT8531s RGMII
+To: Minda Chen <minda.chen@starfivetech.com>, Frank
+ <Frank.Sae@motor-comm.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+References: <20260508094522.3952-1-minda.chen@starfivetech.com>
+ <20260508094522.3952-3-minda.chen@starfivetech.com>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <20260508094522.3952-3-minda.chen@starfivetech.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Queue-Id: 9F716522770
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[avinashduduskar@gmail.com,netdev@vger.kernel.org];
-	TO_DN_NONE(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287173-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-287175-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[starfivetech.com,motor-comm.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_RCPT(0.00)[netdev];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,starfivetech.com:email,bootlin.com:mid,bootlin.com:dkim]
 X-Rspamd-Action: no action
 
-"regarless" should be "regardless".
 
-Signed-off-by: Avinash Duduskar <avinash.duduskar@gmail.com>
----
- Documentation/networking/ip-sysctl.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index 2e3a746fcc6d..4c6a35d07a08 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -489,7 +489,7 @@ tcp_ecn - INTEGER
- tcp_ecn_option - INTEGER
- 	Control Accurate ECN (AccECN) option sending when AccECN has been
- 	successfully negotiated during handshake. Send logic inhibits
--	sending AccECN options regarless of this setting when no AccECN
-+	sending AccECN options regardless of this setting when no AccECN
- 	option has been seen for the reverse direction.
- 
- 	Possible values are:
--- 
-2.54.0
+On 5/8/26 11:45, Minda Chen wrote:
+> Set RXD and RX CLK pin drive strength while in YT8531s connect
+> with RGMII.
+> 
+> Signed-off-by: Minda Chen <minda.chen@starfivetech.com>
+> ---
+>   drivers/net/phy/motorcomm.c | 5 +++++
+>   1 file changed, 5 insertions(+)
+> 
+> diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
+> index c66804537aa2..ebc24f51e626 100644
+> --- a/drivers/net/phy/motorcomm.c
+> +++ b/drivers/net/phy/motorcomm.c
+> @@ -1698,6 +1698,11 @@ static int yt8521_config_init(struct phy_device *phydev)
+>   		if (ret < 0)
+>   			goto err_restore_page;
+>   	}
+> +
+> +	if (phydev->drv->phy_id == PHY_ID_YT8531S &&
+> +	    phy_interface_is_rgmii(phydev))
+> +		ret = yt8531_set_ds(phydev);
+
+Minor detail if you re-spin, there's already a check for the interface 
+being RGMII a bit above in the same function, but it's written as :
+
+
+	/* set rgmii delay mode */
+	if (phydev->interface != PHY_INTERFACE_MODE_SGMII)
+            ...
+
+could be a good idea to change that check to a more explicit
+call to phy_interface_is_rgmii(), or even add the drive-strength
+configuration under the same block, provided the order of operation
+doesn't matter w.r.t the pll/auto-sleep configuration.
+
+Maxime
+
+> +
+>   err_restore_page:
+>   	return phy_restore_page(phydev, old_page, ret);
+>   }
 
 
