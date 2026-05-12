@@ -1,429 +1,190 @@
-Return-Path: <netdev+bounces-287330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287331-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4Ey4H/ifA2pL8QEAu9opvQ
-	(envelope-from <netdev+bounces-287330-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 23:47:36 +0200
+	id eAz5IsahA2qe8QEAu9opvQ
+	(envelope-from <netdev+bounces-287331-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 23:55:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E730C52A900
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 23:47:35 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9012852AA7A
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 23:55:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D5D9E3016825
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 21:47:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0C48B300B288
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 21:55:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7076A392C36;
-	Tue, 12 May 2026 21:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D12394E93;
+	Tue, 12 May 2026 21:55:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="QfjhSA4A"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N1ww8I9i"
 X-Original-To: netdev@vger.kernel.org
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011067.outbound.protection.outlook.com [52.101.70.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFF5A2DFA25;
-	Tue, 12 May 2026 21:47:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778622452; cv=fail; b=ABAcWlhKScj7lokkXVL8Yg+qjQ+w97sbywwP3dxMDK33wlj5buPH9bwxFTnhYZnzm+Rrm2eHACJfqhnRBOnngVPDHpDXbZuoeiIIp9j1QqWVZSNp7tCgQn/aAsUNasyZ4hHhUgv7CSxpEte9derTWMSogaUfEjUsr2hssotOcoA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778622452; c=relaxed/simple;
-	bh=wltcME82shZiCkPLyr7ncxuE14e7tFnXAddVwazzhgY=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=A0FDrKbJIGrGYAJ3LYLywnMT8jVA5L0cSl56RujLTJxSnFqcFeXfF4mN1DTzkjF837FKonsY3ycG3gUt0Fqd2tG70U/q0qL7FUdcXFW2xYWV9tK5nMasG11vqTiqHsEBakd8hux1z9NwcE64jH67EeKzu6MnetOO5ByjRi2k65w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=QfjhSA4A; arc=fail smtp.client-ip=52.101.70.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wz1qYQW4Nv3i4i8AVZNwjpVzqnV0XurWxIJu4/KLA8GdUPw8jjr2ED62EyUKD0+F2hvWIgFRYfndZ9xHRp73WsFNSiAQosdf5PQBLBSl1b+hLwkJZ+sgeWCiC8EGnRB851ranfigurJxADNCXhTwKg3Fgmyd1Z9DOOyyKBBo/gkkgKGiOv+IfDhgbLZZZxUttEwTN4iVsL1RtU5KyrTfpvDwEFi59FFI+lPNYtnQyZP6oVRl8Bd/2rGRYXDx6Rt+jVk9vQotShsgNCI1vwIAdqBnx70eJpTFYKJYmvW6aQJq6Xdqc+gQQz9KP7c374okw3iXiwOSX806/GncGKiv9Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dm9vbSW+elDATPm1NqXx1sfIjXMEYAKVSHece4JBhWw=;
- b=yAWuyb3Za3IskSaVvZr7xoQeRKh16T6QFGVoRomHEfV3EfPC98jTQCk34oNaikYv/JZ9+0Xa4wOPp4oWA/5vqAU1OYzHJPqSP2l+RYedZ/5ZLF4QAuv66lzERG/s85mIR+yPI3R6sRDYRQzNCGFFupoqfZ0FLAVBbwK3NuQx4KEnEzyJgxi30agpGL8KhKCVfO8EuTmh1r5Qfkap0htLlugROo1M+BvF6nUvpt01N/uoVkuOrLlrAh00go7yCkCYSwCxyX72mywlvJZUixnvnLJ23RD0nkXqoPAFxW6diMX7ZHnfNCX/p10hPH/FDluFPFVxRhIzkCdEOVgTjk+R6A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dm9vbSW+elDATPm1NqXx1sfIjXMEYAKVSHece4JBhWw=;
- b=QfjhSA4A8xis/E9uMA0umvZuBR0vWeUc/18w0c1dpfi7215thKdYznh8vBzkYSKWCe/quQEt2E+sunZkOTCL0U8NexHGP65tBUgUhVMV7eY6LaUoK/cBr/oU5X+DiLWQnwqoalMSUOXDWZrHld9sdI/C0WZzlYjWwmYhHChlEhG4+Ws5jvadGhzGpTcFW7QA0w+F6HKMuzIIX+UXJnSS9aBSTs11eFUpgd2sy3Sc5bLR0SLQLB7ZGaEToi6qbzjfRgfs1O9FCJOl2G61xWD869RtNDbjj9hUjcEWVZeQ85AOLLNI07v6zJ/u9mwl+w28QdM39fFvggZETLUvihWXcg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PA4PR04MB9366.eurprd04.prod.outlook.com (2603:10a6:102:2a9::8)
- by PAXPR04MB9399.eurprd04.prod.outlook.com (2603:10a6:102:2b3::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.11; Tue, 12 May
- 2026 21:47:26 +0000
-Received: from PA4PR04MB9366.eurprd04.prod.outlook.com
- ([fe80::75e4:8143:ddbc:6588]) by PA4PR04MB9366.eurprd04.prod.outlook.com
- ([fe80::75e4:8143:ddbc:6588%3]) with mapi id 15.20.9913.009; Tue, 12 May 2026
- 21:47:25 +0000
-From: Frank Li <Frank.Li@nxp.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Frank Li <Frank.Li@nxp.com>,
-	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS),
-	linux-kernel@vger.kernel.org (open list)
-Cc: imx@lists.linux.dev
-Subject: [PATCH 1/1] dt-bindings: net: dsa: Convert lan9303.txt to yaml format
-Date: Tue, 12 May 2026 17:47:02 -0400
-Message-ID: <20260512214704.1084890-1-Frank.Li@nxp.com>
-X-Mailer: git-send-email 2.43.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BY3PR05CA0024.namprd05.prod.outlook.com
- (2603:10b6:a03:254::29) To DU0PR04MB9372.eurprd04.prod.outlook.com
- (2603:10a6:10:35b::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538A0393DE2
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 21:55:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778622910; cv=none; b=ogFFLzyCoobrjmXmQ/aoRQW4s9czXL6GEG+QkGZpo3uD39gfxmovLarWbh9zkskyG3mNafeRBurA+Rt0OFZu68NeNDGbN/QKaVoXfaOngtGVa/I0ua2daG+7lv0enkGlyty1xtgDa0dkcTk7gwM9a29fzbbN7fb0LkOkrgK/0GM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778622910; c=relaxed/simple;
+	bh=reuPeR5st+dNjQ+dUnUpP6RytIN2DJ+Tp7VAQwercNQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kLai8kiGu4WyenKItjNJ+ibeudtMhNUjDLGRZflyFkbsBs4y9kdqLBvBkgOZXHeHKkCv9v4gl8I+wES1Ge36VHnI8GjhjD9G+QT+5Kxa7zs3w/2TtA2j0W4SpI1Z/VFmg5HmzPPbYIbGModAsq6uy2RC4yKT2Q3ekdktbB2Pfs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N1ww8I9i; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-365e20fe3b8so3507975a91.3
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 14:55:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778622908; x=1779227708; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9nTYItNBEtJamr9+Qzv1BppMHRb0qZCJCrUuytaYaF0=;
+        b=N1ww8I9ilxYYwzVoA1zQfsqh9AE/Fnfno45zOPpuBlhwAsZjVLY04NHry8axtMI2NA
+         z+EQCom2rmmbaX9ZcgJ5HEQK4CL9iPVOmurfhrMb/DtFgYpu0Q+r5PUxjpq1ZSrUTTFq
+         8CPAYmh7i0uGAbkIvpAtV2q57EHwABKz2wgXx3jx0BCam6FvH1+YS2mJf9LadON4MOSg
+         Y1nD0HNdHJpnCyD+VWVjW4AfbtvYEQFUfOi15MXq0x1OfHQtwJzjT98Mi5qljsWkNX8a
+         3CyHmvFtg/fAX1O/TlxVPYGzjyPD+UvTV4ZDfPaB0JbZEFtJzZ3NWZk263pkbuhYMXHH
+         mFmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778622908; x=1779227708;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9nTYItNBEtJamr9+Qzv1BppMHRb0qZCJCrUuytaYaF0=;
+        b=b10wMMvn1F4l1nX4OGI6FPATuJaZL9dVqXiwF8xPtcGohO9KRzN+Zgh4RnaWXw2BHX
+         mSbJGYY4v6Y5oHBDdTT3uhTlyXJx21WhtA2uzjcz7+BBDSuGYto2wktFdsQ0HzuBF9zK
+         3ZkDHBbOkE8ldJSwzUzS1N+jAXfvnoxHviL8U44OefpJWWUGhsKlI6x71fja3UvaQlNO
+         KB1/p3p7nz4dyi12A7vBCQuvxkhTfNDOXyU3EWZaJoM05uV9CHYBW9RA0vbEGsALk82K
+         Acn/O/h3UTwDZcPBfQ2q+iLV6hXj25Y2MsoX7RQI5bjv1FuWtLEDu2K/gW2MLrWpmOTt
+         gGvw==
+X-Forwarded-Encrypted: i=1; AFNElJ+smuc+I8tYge60z1LB2PfGxr7ZFVkHHxc7nN2xDVqaHbKDqqTYXrdWrhLdyxIQp+7ZZDgcLNQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPAeHkBTWwzGungukhATtI2UkD77CBGtBNHD994x1mVYWdZFaW
+	cmDHMufLQb6UavoQGht/SDF7p2ZxMs4s7+Mq1l6agolmlFPBaB/0y0MM
+X-Gm-Gg: Acq92OHdHDUiAtag5d8pJYCWQvz57x/r2HHsJdyaZg5Yl5xQsnl2LAkct/qvWl+f7Ra
+	mm0EoNTNOFi3e+FRrAMu+glBgm06DFbaX4zddzIubhV2f3uvo3zjU2t7bYhPrazOhyhJX85p34q
+	yhD5bNKrRNsWIMhfiMnczDsYtWiLb5GOMWGNsJf4PlMz4JPikHozGOs49paMME8KxSb/5bpIGJi
+	8mR7SINv6Q6UqoYasMHssxxhy56Z12rCNu4Hgrz7qioYs920CKxbfSZZF0o21VVeCXCrMP+RDIV
+	Tcbew0PDWrzlLuO66xvwkLfYJ8y4mH+ET8FFv09Xhyzqegp+QBCFFC7TWYozM9CQYPnkj6kMMR2
+	FW+PSSYrXvFSZbot/6UPNh2e5mu1wMX4gOBaqUGPi+xAYyYGSX6C9f4Bn+TeECHSnY04pJ6zFMj
+	9Pf1j6tJBgc6uQmLXGUuVwGhDNvqj6SnUoidBLUrpdDaY2q9NS3eT5jy5n7ESS5MshuUijJ1lg
+X-Received: by 2002:a17:90b:37c3:b0:368:3d3e:efa6 with SMTP id 98e67ed59e1d1-368f3f87c51mr696927a91.20.1778622908222;
+        Tue, 12 May 2026 14:55:08 -0700 (PDT)
+Received: from r912.lan.4v1.in ([182.70.116.80])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1d52f27sm180335295ad.36.2026.05.12.14.55.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 May 2026 14:55:07 -0700 (PDT)
+From: Avinash Duduskar <avinash.duduskar@gmail.com>
+To: netfilter-devel@vger.kernel.org
+Cc: pablo@netfilter.org,
+	fw@strlen.de,
+	phil@nwl.cc,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] netfilter: nf_conntrack_proto_tcp: fix typos in comments
+Date: Wed, 13 May 2026 03:25:01 +0530
+Message-ID: <20260512215501.1988242-1-avinash.duduskar@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PA4PR04MB9366:EE_|PAXPR04MB9399:EE_
-X-MS-Office365-Filtering-Correlation-Id: 80808e14-7fe4-4cc9-488f-08deb0700e34
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|19092799006|7416014|52116014|376014|1800799024|38350700014|921020|18002099003|56012099003|11063799003|3023799003;
-X-Microsoft-Antispam-Message-Info:
-	lhZjThALOeI1V+Bz01jkWsv9uUVV96Z3tX8pmF5QwNRAtJ6pfSb4/JolRGjXzdXByZxBoi5/HArthMCdhj3IyT93QESkesvFvhPN1cfoIVxq8OmL8SycPg7q673Q65DDcCnOxaDN+6t9DXfOHEfjcJUtzqXtERF4JqjoXVpU3B0pzuort5fOY+PNLFAzIRRkz9OkWmeesKGT8JpWuSeBghj4q504UuXheRCvTbEj6BoZ5uPyOFeow/n9fJWdubel6+PDyZjMfw4PMTT1LR7xzt7YtfiIZ1db2PryrkQTvvmP0w87jVx7LqELFxOrdW4JSrm4IpWR2LDgjsbD0Atz8xRtGV5KMw0iH16ITXo4GJENA/blEBkyr2xjniudSe87SeKd6mjRe7H6B3HHYF6w8jttvQVVLCNcJQ2SkphM+Op3zx0ku5XgzfRmeie+ljYmuGy5TboeoATIMDfUVbgMrgbABxfNzy3X/SX6kfBOi76lWJDJahibpLi43Edtf3rnbnO+BaOQ0h0CshL0rYICz/97oEaqo2d58gwEMpBTZXnBPrRvubCSH3tObJwX9oywKqjKBGJyOiCwvVfDop8NG47jmdpD+ozw/rBJ2Gk+3AHQrG89QAUiqXsLBgxCGBNAMKWWcz6mNZfdMmKX9G+QlCt3GuY4cH8oTvq3T6CiD3gI8gtAbQtNs+GyJgI7A5qtV2FUCvb4xnPzDWzp2c+yUw==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB9366.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(7416014)(52116014)(376014)(1800799024)(38350700014)(921020)(18002099003)(56012099003)(11063799003)(3023799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?UgWet1Q6pP1ByOdtN1KUZQjCAogQwwoFwGo+G3W9dI+poMnTJyKUl3/9EAcR?=
- =?us-ascii?Q?p82JNam1mTpTPAh9bfqSKeDxr6LwVLAv2oqVtL/AOoS1VWSqmT1WLfVVV4jl?=
- =?us-ascii?Q?oKTLPp9eyROfew2gfOfpeqQtYlcKoJ92KSf87KcmtSo5oBqmRejwzHAc8JKE?=
- =?us-ascii?Q?c+L6VYTRmI9oSqR0n7R3w6rz321OGLs71ADIkFthT1nsrokx6i8ya6kvo32Z?=
- =?us-ascii?Q?LM5rp+GNEMzbk/gYeTSNix4YZLBq0dOFomMJHv9MN7f0s7MJ/Ne2dP3ty+xh?=
- =?us-ascii?Q?EI0+m+5Le83w9SQwZqPxs7Hl6P5kw6aoHZcWpQOqyapo01T4V/rBANqNo3/i?=
- =?us-ascii?Q?+HwzzCR4MTs1ZZvFXLE8E9x/iQpA/PBN3CT9hil393C62XpbF1Mn65qUqgzr?=
- =?us-ascii?Q?HeMAQpiwL0o7ojibSzadffwXmxwdO+W9I1i453XdzOlIyFH8NuO0GuQOq131?=
- =?us-ascii?Q?oHmteq+NADAHkBNpHovRVQ3JeifAZNc5wozHNk+AbAG336XH1S6FGUvAMoUq?=
- =?us-ascii?Q?GGH/qfDIEqIen+vWGAT6QEtmRIsmA12t0Hayd0MfIg+JMvN120RpT0ZpfCn/?=
- =?us-ascii?Q?pId3z+WR5r8FhqBIG49eZucKgpFMNhhxGrvnq+kFNVnLiZJxfAJleCaGIxwH?=
- =?us-ascii?Q?zJXvYJcB2o32VrtGrg9xER2sauQqZAZcSpkO0g5ikASXu374X4UnTtTK1iml?=
- =?us-ascii?Q?UjK1u0XSNN1OGeDAfddBoGTZ/OUy/SroyE+KjsmlpzE399CBkOcUnVgghtmj?=
- =?us-ascii?Q?zTLiMQqloZt26ERHMlXcWs6JudFuPY4wVLyNTlOcG/blhIU47MmkGeqxQJp7?=
- =?us-ascii?Q?Cn2JT7yHZt+Z+mUufgs983swUPTgvknHI4xU+3/ftstTTpKj3a4xf+8lr5Bs?=
- =?us-ascii?Q?oNt3RncaSmg0WQ8YruEZUhPTdNE2MjspNYdENtbk8dZJ74r2LcWIh895yVuR?=
- =?us-ascii?Q?kiebD9+RRp39ADkb58X2IMVrJcvTaFgoC7yuTXySGwANJK230OeCy5c8FW9j?=
- =?us-ascii?Q?LQb1DSY5hVXDTlDJIKJwRJuE96p88TzQRfVCSbLg9EEbl5ef5UCBRBPyOKGw?=
- =?us-ascii?Q?z786Cwgpt3DKapBDzEiuGy03HCDGzm4Dk3uslJXZVH6DQdNlcxDfyEKNtoO7?=
- =?us-ascii?Q?OsIkd20rdEg5Kl8xCnDhQKvDfDLwa/vouPYeiVVsE4qJyktcNdwRmO1qCLfb?=
- =?us-ascii?Q?Xm4OvNlHK7uROGcRNc8Po0tZAYsSgIYxOO7J+obzpPMN8G3j260N4yl6+Lgr?=
- =?us-ascii?Q?YSpbb4gyoT2Ecn6YhWsC8bQb1C/AWzoAIAv78QJK2m+GHFkNfcKz+D/JNyo4?=
- =?us-ascii?Q?cHDxxsZWX52jGqTAEnKoeqh3sapA8ve1RH8M79zRjMKbRztRtCTKR3GJTUrH?=
- =?us-ascii?Q?LwAw/lBZo3sMUivGyycL7194J3Riy7mYfRUkWsoR7u648dq2LDrQhpGW/hg2?=
- =?us-ascii?Q?BiEzaXajQCci+BIzA0OcGkE+BiCt9WTBhvXo+2bXXeqNmPtozNh+N0obUD/T?=
- =?us-ascii?Q?QGFYw4DTDFqmOZTHvNkCVcpQfRjAv3UMe8Ga5k/stg+OKQqMWvhzZ3E0inxI?=
- =?us-ascii?Q?tly7xoPw95zYTwj+ut5PJmMguam+eJt0dengvYoOn0dSGKKHNoHdZKYGqC5e?=
- =?us-ascii?Q?auUqdpwoIIUthwfp6tWilBSbCinOHYDRAzgzJVz5ChsTtTTLYzPfLrVmW2Vq?=
- =?us-ascii?Q?MRddzAtHqbW9IRNI/LITgwg6KILWMy5JFKRvAOFqj+5dHK+S?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 80808e14-7fe4-4cc9-488f-08deb0700e34
-X-MS-Exchange-CrossTenant-AuthSource: DU0PR04MB9372.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2026 21:47:25.8745
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: v9s8qH3mnmZt0UywR6FyxycuKi3gPiwXJj1/FlZKnQaUlSyxUZTLHdKD7yk51MydcsPwdjQ/LMoIqclg6ZaQ6w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB9399
-X-Rspamd-Queue-Id: E730C52A900
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 9012852AA7A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,nxp.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-287331-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287330-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Frank.Li@nxp.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[avinashduduskar@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	NEURAL_HAM(-0.00)[-1.000];
-	DBL_PROHIBIT(0.00)[0.0.0.0:email];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nxp.com:email,nxp.com:mid,nxp.com:dkim,2.250.240.128:email,0.0.0.2:email]
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Convert lan9303.txt to yaml format to fix below CHECK_DTBS warnings:
-arch/arm/boot/dts/nxp/imx/imx53-kp-hsc.dtb: /soc/bus@50000000/i2c@53fec000/switch@a: failed to match any schema with compatible: ['smsc,lan9303-i2c']
+Fix three typos in comments:
 
-Addtional changes:
-  - rename switch-phy to switch in example.
+- "migth"/"Migth" -> "might" (two adjacent occurrences in the
+  tcp_conntracks[] state-transition table comment block).
+- "agaist" -> "against" (tcp_error() header comment).
+- "intrepretated" -> "interpreted" (RFC 5961 challenge-ACK
+  marker comment in nf_conntrack_tcp_packet()).
 
-Signed-off-by: Frank Li <Frank.Li@nxp.com>
+Signed-off-by: Avinash Duduskar <avinash.duduskar@gmail.com>
 ---
- .../devicetree/bindings/net/dsa/lan9303.txt   | 100 --------------
- .../bindings/net/dsa/smsc,lan9303.yaml        | 123 ++++++++++++++++++
- 2 files changed, 123 insertions(+), 100 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/net/dsa/lan9303.txt
- create mode 100644 Documentation/devicetree/bindings/net/dsa/smsc,lan9303.yaml
+ net/netfilter/nf_conntrack_proto_tcp.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/lan9303.txt b/Documentation/devicetree/bindings/net/dsa/lan9303.txt
-deleted file mode 100644
-index 46a732087f5ca..0000000000000
---- a/Documentation/devicetree/bindings/net/dsa/lan9303.txt
-+++ /dev/null
-@@ -1,100 +0,0 @@
--SMSC/MicroChip LAN9303 three port ethernet switch
---------------------------------------------------
--
--Required properties:
--
--- compatible: should be
--  - "smsc,lan9303-i2c" for I2C managed mode
--    or
--  - "smsc,lan9303-mdio" for mdio managed mode
--
--Optional properties:
--
--- reset-gpios: GPIO to be used to reset the whole device
--- reset-duration: reset duration in milliseconds, defaults to 200 ms
--
--Subnodes:
--
--The integrated switch subnode should be specified according to the binding
--described in dsa/dsa.txt. The CPU port of this switch is always port 0.
--
--Note: always use 'reg = <0/1/2>;' for the three DSA ports, even if the device is
--configured to use 1/2/3 instead. This hardware configuration will be
--auto-detected and mapped accordingly.
--
--Example:
--
--I2C managed mode:
--
--	master: masterdevice@X {
--
--		fixed-link { /* RMII fixed link to LAN9303 */
--			speed = <100>;
--			full-duplex;
--		};
--	};
--
--	switch: switch@a {
--		compatible = "smsc,lan9303-i2c";
--		reg = <0xa>;
--		reset-gpios = <&gpio7 6 GPIO_ACTIVE_LOW>;
--		reset-duration = <200>;
--
--		ports {
--			#address-cells = <1>;
--			#size-cells = <0>;
--
--			port@0 { /* RMII fixed link to master */
--				reg = <0>;
--				ethernet = <&master>;
--			};
--
--			port@1 { /* external port 1 */
--				reg = <1>;
--				label = "lan1";
--			};
--
--			port@2 { /* external port 2 */
--				reg = <2>;
--				label = "lan2";
--			};
--		};
--	};
--
--MDIO managed mode:
--
--	master: masterdevice@X {
--		phy-handle = <&switch>;
--
--		mdio {
--			#address-cells = <1>;
--			#size-cells = <0>;
--
--			switch: switch-phy@0 {
--				compatible = "smsc,lan9303-mdio";
--				reg = <0>;
--				reset-gpios = <&gpio7 6 GPIO_ACTIVE_LOW>;
--				reset-duration = <100>;
--
--				ports {
--					#address-cells = <1>;
--					#size-cells = <0>;
--
--					port@0 {
--						reg = <0>;
--						ethernet = <&master>;
--					};
--
--					port@1 { /* external port 1 */
--						reg = <1>;
--						label = "lan1";
--					};
--
--					port@2 { /* external port 2 */
--						reg = <2>;
--						label = "lan2";
--					};
--				};
--			};
--		};
--	};
-diff --git a/Documentation/devicetree/bindings/net/dsa/smsc,lan9303.yaml b/Documentation/devicetree/bindings/net/dsa/smsc,lan9303.yaml
-new file mode 100644
-index 0000000000000..42f8473538a07
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/dsa/smsc,lan9303.yaml
-@@ -0,0 +1,123 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/dsa/smsc,lan9303.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: SMSC/MicroChip LAN9303 three port ethernet switch
-+
-+maintainers:
-+  - Frank Li <Frank.Li@nxp.com>
-+
-+description:
-+  The LAN9303 is a three port ethernet switch with integrated PHYs for the
-+  two external ports. The third port is an RMII/MII interface to a host
-+  processor. The device can be managed via I2C or MDIO.
-+
-+  Note - always use 'reg = <0/1/2>;' for the three DSA ports, even if the
-+  device is configured to use 1/2/3 instead. This hardware configuration
-+  will be auto-detected and mapped accordingly.
-+
-+properties:
-+  compatible:
-+    enum:
-+      - smsc,lan9303-i2c
-+      - smsc,lan9303-mdio
-+
-+  reg:
-+    maxItems: 1
-+
-+  reset-gpios:
-+    description:
-+      GPIO to be used to reset the whole device
-+    maxItems: 1
-+
-+  reset-duration:
-+    description:
-+      Reset duration in milliseconds
-+    default: 200
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+
-+required:
-+  - compatible
-+  - reg
-+
-+unevaluatedProperties: false
-+
-+allOf:
-+  - $ref: dsa.yaml#
-+
-+examples:
-+  - |
-+    #include <dt-bindings/gpio/gpio.h>
-+
-+    /* I2C managed mode */
-+    i2c {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        switch@a {
-+            compatible = "smsc,lan9303-i2c";
-+            reg = <0xa>;
-+            reset-gpios = <&gpio7 6 GPIO_ACTIVE_LOW>;
-+            reset-duration = <200>;
-+
-+            ports {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
-+
-+                port@0 {
-+                    reg = <0>;
-+                    label = "cpu";
-+                    ethernet = <&master>;
-+                };
-+
-+                port@1 {
-+                    reg = <1>;
-+                    label = "lan1";
-+                };
-+
-+                port@2 {
-+                    reg = <2>;
-+                    label = "lan2";
-+                };
-+            };
-+        };
-+    };
-+
-+  - |
-+    #include <dt-bindings/gpio/gpio.h>
-+
-+    /* MDIO managed mode */
-+    mdio {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        switch@0 {
-+            compatible = "smsc,lan9303-mdio";
-+            reg = <0>;
-+            reset-gpios = <&gpio7 6 GPIO_ACTIVE_LOW>;
-+            reset-duration = <100>;
-+
-+            ports {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
-+
-+                port@0 {
-+                    reg = <0>;
-+                    label = "cpu";
-+                    ethernet = <&master>;
-+                };
-+
-+                port@1 {
-+                    reg = <1>;
-+                    label = "lan1";
-+                };
-+
-+                port@2 {
-+                    reg = <2>;
-+                    label = "lan2";
-+                };
-+            };
-+        };
-+    };
+diff --git a/net/netfilter/nf_conntrack_proto_tcp.c b/net/netfilter/nf_conntrack_proto_tcp.c
+index b67426c2189b..47dc6edb4431 100644
+--- a/net/netfilter/nf_conntrack_proto_tcp.c
++++ b/net/netfilter/nf_conntrack_proto_tcp.c
+@@ -169,14 +169,14 @@ static const u8 tcp_conntracks[2][6][TCP_CONNTRACK_MAX] = {
+ /*fin*/    { sIV, sIV, sFW, sFW, sLA, sLA, sLA, sTW, sCL, sIV },
+ /*
+  *	sNO -> sIV	Too late and no reason to do anything...
+- *	sSS -> sIV	Client migth not send FIN in this state:
++ *	sSS -> sIV	Client might not send FIN in this state:
+  *			we enforce waiting for a SYN/ACK reply first.
+  *	sS2 -> sIV
+  *	sSR -> sFW	Close started.
+  *	sES -> sFW
+  *	sFW -> sLA	FIN seen in both directions, waiting for
+  *			the last ACK.
+- *			Migth be a retransmitted FIN as well...
++ *			Might be a retransmitted FIN as well...
+  *	sCW -> sLA
+  *	sLA -> sLA	Retransmitted FIN. Remain in the same state.
+  *	sTW -> sTW
+@@ -798,7 +798,7 @@ static void tcp_error_log(const struct sk_buff *skb,
+ 	nf_l4proto_log_invalid(skb, state, IPPROTO_TCP, "%s", msg);
+ }
+ 
+-/* Protect conntrack agaist broken packets. Code taken from ipt_unclean.c.  */
++/* Protect conntrack against broken packets. Code taken from ipt_unclean.c.  */
+ static bool tcp_error(const struct tcphdr *th,
+ 		      struct sk_buff *skb,
+ 		      unsigned int dataoff,
+@@ -1098,7 +1098,7 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
+ 			}
+ 			/* Mark the potential for RFC5961 challenge ACK,
+ 			 * this pose a special problem for LAST_ACK state
+-			 * as ACK is intrepretated as ACKing last FIN.
++			 * as ACK is interpreted as ACKing last FIN.
+ 			 */
+ 			if (old_state == TCP_CONNTRACK_LAST_ACK)
+ 				ct->proto.tcp.last_flags |=
+
+base-commit: 73d587ae684d176fac9db94173f77d78a794ea4f
 -- 
-2.43.0
+2.54.0
 
 
