@@ -1,144 +1,153 @@
-Return-Path: <netdev+bounces-287039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287040-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0OrKGib3AmqvzAEAu9opvQ
-	(envelope-from <netdev+bounces-287039-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:47:18 +0200
+	id OLXNCD33AmrezAEAu9opvQ
+	(envelope-from <netdev+bounces-287040-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:47:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 643D251E03E
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:47:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8243F51E06E
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:47:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 587773014A3A
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 09:45:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3FBA13009508
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 09:47:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED96A3AE70D;
-	Tue, 12 May 2026 09:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5532D2F90C9;
+	Tue, 12 May 2026 09:47:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AgHAkiT7"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B5A64BC016
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 09:45:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E980B28C2A1
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 09:47:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778579136; cv=none; b=m/7Qo5M6h2BBTQJCrC6OjcFL+P+7r6T6Ob1fIKtWY8aE0HFcvCGAE76CUu5G8tktemedQ/eZuvGhOTMoR+MbOSsNJYdKxXkHkZBqGaboUsS/LIOq5TwKwI2DtppegBUjzn1xL94KkpFiTX/D3lRUN2yrigwBp77Dy9x+IXUehCA=
+	t=1778579258; cv=none; b=OR65L/i9mQC6STL2a+fLouCu8EYgN4Bw5u2gY4hPuHJbc0QGMwpeFwCwTTWmsMEf55wd5U6my5zI8aw0kTtn4oGhfX/+nk+I0I35uDVkcivtJZtVnuRYtS89zh0b4os3NTQIhaFK8lG5cNLYRBTfrTmvfwxwWdNjGfu6DSkGSAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778579136; c=relaxed/simple;
-	bh=kB3FgQ1v4x2nNTOvP/co8m4IKeLd7kxFg6GkVhqpuFk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uyOYC6q++iEa5OTlEZJFdfzgBTtUInznrs3eVR/VW5DdfHx0YZmghCVSDbqkEMCJt6WyFWSuMnOukdPYUOfUF2gClmemulfKwEB1SFpsLVSJrjgcMw52y9WHTtX5dAGkVuBnb7Gz5xWsgopefD4QseXEHXB6xZdPs+mGuGaozd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 3E3B66092A; Tue, 12 May 2026 11:45:33 +0200 (CEST)
-Date: Tue, 12 May 2026 11:45:30 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Yuan Tan <yuantan098@gmail.com>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>, Ren Wei <n05ec@lzu.edu.cn>,
-	bridge@lists.linux.dev, netdev@vger.kernel.org, idosch@nvidia.com,
-	davem@davemloft.net, yifanwucs@gmail.com, tomapufckgml@gmail.com,
-	bird@lzu.edu.cn, tonanli66@gmail.com
-Subject: Re: [PATCH net 1/1] net: bridge: guard local finish against missing
- port
-Message-ID: <agL2up-rblE9Y6yP@strlen.de>
-References: <cover.1778504155.git.tonanli66@gmail.com>
- <ad183a40c4d906f39e03590b371fdcfdffb863c6.1778504155.git.tonanli66@gmail.com>
- <1bfd86a2-e7f8-42ef-8486-4d7fa91b2199@blackwall.org>
- <CAPuPA7JzZC1veoLtdmsGdqZ4xuy7Znu=z=+7FsyX0_iUQxcZAQ@mail.gmail.com>
- <c2bbd2ab-e4f9-4142-a3d4-531f3d5ce6d7@blackwall.org>
- <CAPuPA7+jMHLjpY-RWK6-EQqs-NjrGUmanuPVVTDZJv1yeRk1oA@mail.gmail.com>
+	s=arc-20240116; t=1778579258; c=relaxed/simple;
+	bh=oP+lMTpCs/MmCwIYHBt69Rx7OGgXh1o1Niw4wj3xXv8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mJd+/EodJCKdaat4wuHiXxEXpE8Pzi1+yq/GiuwVCN7y70IyzKwMF18/8UpDY6/VQ2RMjg2vpMs2YInAchjVUeLF44If0XUqBsSivGHwY8Gnm59Re/yxkJ6BlmnC9f86z6CItrX9K3ppKlSZfw/YzYTsmsc6m9QeJHnVgk6RQv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AgHAkiT7; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <e683a7db-b465-4b34-b002-8f22031c77ce@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1778579253;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IvrH+Ii9BjHSgJDxxEyJuHR+FWTHspsLDdnJSbT4jsE=;
+	b=AgHAkiT7KixQP/FeD0poHKsx5Dep01WrHLXHY434tmofh2griLBM+z7tLjN/RTd0qLAdee
+	SOAUP0TwZ2xxb/j75elDqp8wnaAsozzfA8zqPSsAOV2wUO2jUgQPYKqqiL0KIOJN9DYTdy
+	bhpJniS6bqnmABez6b8u8oMg2Y3WjpE=
+Date: Tue, 12 May 2026 17:47:13 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPuPA7+jMHLjpY-RWK6-EQqs-NjrGUmanuPVVTDZJv1yeRk1oA@mail.gmail.com>
-X-Rspamd-Queue-Id: 643D251E03E
+Subject: Re: [PATCH net v2 3/4] net: tls: fix use-after-free in
+ tls_sw_sendmsg_locked after bpf verdict
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, sd@queasysnail.net,
+ john.fastabend@gmail.com, bpf@vger.kernel.org,
+ Sashiko <sashiko-bot@kernel.org>
+References: <20260511174920.433155-1-kuba@kernel.org>
+ <20260511174920.433155-4-kuba@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260511174920.433155-4-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 8243F51E06E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,queasysnail.net,gmail.com];
+	TAGGED_FROM(0.00)[bounces-287040-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287039-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[blackwall.org,lzu.edu.cn,lists.linux.dev,vger.kernel.org,nvidia.com,davemloft.net,gmail.com];
-	DMARC_NA(0.00)[strlen.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.849];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,strlen.de:mid,ozlabs.org:url]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim]
 X-Rspamd-Action: no action
 
-Yuan Tan <yuantan098@gmail.com> wrote:
-> > >>> The bridge local receive path may be deferred by netfilter and resumed
-> > >>> later. By the time br_handle_local_finish() runs, skb->dev may still be
-> > >>> valid while its bridge port association has already been removed.
-> > >>>
-> > >>> br_handle_local_finish() unconditionally looks up the bridge port from
-> > >>> skb->dev and dereferences it for source learning. If the port is no
-> > >>> longer attached to the bridge, the lookup returns NULL and the deferred
-> > >>> local receive path can no longer rely on the port state being present.
-> > You should update the Fixes: tag but also wait 24h before re-posting another
-> > patch version.
-> 
-> Ok we will send the v2 with fix tag f350a0a87374 after 24h
 
-Would you mind exploring an alternative fix for this?
+On 5/12/26 1:49 AM, Jakub Kicinski wrote:
+> bpf_exec_tx_verdict() may return having modified the record
+> and the plaintext/encrypted sk_msg pointers. We must always
+> reload those pointers after calling bpf_exec_tx_verdict().
+>
+> On the wait_for_memory path after sk_stream_wait_memory() returns,
+> the post-wait contains a shortcut:
+>
+> 	if (ctx->open_rec && msg_en->sg.size < required_size)
+> 		goto alloc_encrypted;
+>
+> which dereferences the cached msg_en, which can equally point at
+> a freed record if the prior bpf_exec_tx_verdict() split the open
+> rec before returning -ENOMEM. Drop the shortcut it seems to have
+> only been an optimization to skip trivial intro of the loop.
+>
+> Reported-by: Sashiko <sashiko-bot@kernel.org>
+> Fixes: 54a3ecaeeeae ("bpf: fix ktls panic with sockmap")
 
-As nfnetlink_queue'd skbs leave rcu read locked section, great
-care has to be taken on reinject.
 
-Either bridge could call nf_queue_nf_hook_drop() on bridge
-port removal, or nfqnl_reinject() could revalidate that skb->dev
-is part of a bridge and munge verdict to NF_DROP in case
-the assocication was removed while packet was out.
+Is the blamed commit correct? I don't think I touched the following code 
+in this commit.
 
-static bool nfqnl_bridge_port_removed(const struct nf_queue_entry *e)
-{
-	return e->state.pf == NFPROTO_BRIDGE &&
-		!br_port_get_rcu(e->skb->dev) == NULL;
-}
-
-static void nfqnl_reinject(struct nf_queue_entry *entry, unsigned int verdict)
-{
-        const struct nf_ct_hook *ct_hook;
-
-        if (verdict == NF_ACCEPT ||
-            verdict == NF_REPEAT ||
-            verdict == NF_STOP) {
-                unsigned int ct_verdict = verdict;
-
-		....
-
-		if (nfqnl_bridge_port_removed(entry))
-			verdict = NF_DROP;
-
-Its more work, but it places the extra checks to where
-they are really needed.
-
-Also see related bug fix:  At this time, entire bridge device can go
-away while packet is out.
-
-https://patchwork.ozlabs.org/project/netfilter-devel/patch/ca7ee343bbcb44905e1f5b853df2f3a5b7d40548.1778493188.git.royenheart@gmail.com/
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>   net/tls/tls_sw.c | 4 ----
+>   1 file changed, 4 deletions(-)
+>
+> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+> index 3bfdaf5e64f5..360f71fd7884 100644
+> --- a/net/tls/tls_sw.c
+> +++ b/net/tls/tls_sw.c
+> @@ -1112,7 +1112,6 @@ static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
+>   		if (!sk_stream_memory_free(sk))
+>   			goto wait_for_sndbuf;
+>   
+> -alloc_encrypted:
+>   		ret = tls_alloc_encrypted_msg(sk, required_size);
+>   		if (ret) {
+>   			if (ret != -ENOSPC)
+> @@ -1255,9 +1254,6 @@ static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
+>   				tls_trim_both_msgs(sk, orig_size);
+>   			goto send_end;
+>   		}
+> -
+> -		if (ctx->open_rec && msg_en->sg.size < required_size)
+> -			goto alloc_encrypted;
+>   	}
+>   
+>   send_end:
 
