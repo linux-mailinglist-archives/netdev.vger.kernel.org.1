@@ -1,146 +1,142 @@
-Return-Path: <netdev+bounces-287224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287225-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gCscKbVNA2r63gEAu9opvQ
-	(envelope-from <netdev+bounces-287224-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:56:37 +0200
+	id +LINATNOA2pq3AEAu9opvQ
+	(envelope-from <netdev+bounces-287225-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:58:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 502BE5242BC
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:56:36 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id AECCC524395
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 17:58:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3F388303F542
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:52:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 04DB73083AA0
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 15:53:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CF8B3B8139;
-	Tue, 12 May 2026 15:52:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 121F23B8139;
+	Tue, 12 May 2026 15:53:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HtGUEZVX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h6MR8EU3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 366533B440E
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 15:52:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FA53905E7;
+	Tue, 12 May 2026 15:53:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778601167; cv=none; b=gWVPMcRThzGU/Q2tsFc9lI2Zkef2KeMUuC/fLIvq3pqc2S6gecvU2A23wVtUVWVvxpshyIH1aK8G+AjqEeS4akPV0tp7btWV20jQ+Zrlw0GeqDelZluopo2AdSNy8j7pIziaST7zY3tYTY+9b9cj4Wn9ZCsg5PfXUTFs7ToZzQA=
+	t=1778601184; cv=none; b=t8ZkIc6AVaTfRfIsk0/BwdWcOGGZB7Dy+nHGnB8TFXTk40DUH54QtLcvSJioAYFRru8SunHFcOlvROeSIrCVycNwzTADemsvGI8GjjBdED/YfmgUd3f2Q6dCesLmhgDLoEcNzuC7JvNCxLpRT+4wG/AaWqVCil5mNEZSk+tq5eM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778601167; c=relaxed/simple;
-	bh=C6rjWr8gpAVtsmvbG/OGXeJAFdVJsxnAkPSkLDVNQbI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=cjD4jdU90lrYum5EmF2XLk7hUkfDF7h0FCWsiUkKspIln7kBnlkzWVpM1fhIODCUOKL+5zjMZY2XKwPruf91c/s3M60G8rBYMyeLqx+O+f0JnwM40vWDL58I6rrtcA7GgW8qKjI/A49EL7mNGcS0aBBCRG6ymuNyNAl52M8blPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HtGUEZVX; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-90c991bfc92so268297085a.1
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 08:52:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778601165; x=1779205965; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=V5ewSQV6TmjW19dbKUL2ioh/mEw0LWfnAG+rUEp/X0I=;
-        b=HtGUEZVXrCLEYSdqqW6K8M7fPxasd6iVEQeJ1lcbXy1W9NRmEJqaYNlmVy4kU+B9YZ
-         PVTNV+f0fryWRMh8dsgJi3XNuXRR80o+0+cKDZhVe9Y5XfsQJ89roTCyleaWhBTi9gVB
-         nnXclxKiqmx9JDsbQ/R51X3H+QEeGERb+X6AmoZQKPOqBqzoOWn6tbZNylko9Dv2pVfu
-         TuKiRMtSjcrcc1uwNroypcLvoRSxPP7GxWzy/ybqUKuKL1V33IeKCJUuM47CK30G87kc
-         oNaYZ9T6thOwdtaJQRwjNOsmaIMtafrXJ9aL3xh9kHOuheoQ2erNZMQtnqHLuPyaAjTo
-         ROUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778601165; x=1779205965;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=V5ewSQV6TmjW19dbKUL2ioh/mEw0LWfnAG+rUEp/X0I=;
-        b=pfe33ZE6n0ujA9AYDJNHEJGySFLP/oVXMcjEa5Hnx9J0A4alsY0wIOyf0Qpf6EVba/
-         Zgm4Mcyjikij92mRTKlEVtIgCcKxthI8cpQa63e6GTDjVV29autlXD2e2ev4i4wxCW51
-         xVMOEw8e8LWCStYFqf5pdHFttfaVW+PtVVebDatNHEt+QliONrqdcm28qztUs/e6l+1u
-         LCiMOSPJMLT7Xkj/nabO1uQXbcMJ5xtKtqy8nr2PQiPHqvQnSdNVrL0e4aMtbDMh8XZl
-         3aHKM+/4d+YShUz1WywycXZ0UPj3OTA1RAsYGBWofevyRvOfzvT9UK4YdsNFDebGjJQJ
-         fwNw==
-X-Forwarded-Encrypted: i=1; AFNElJ8WQdyMA1Jp9XUOP6jNnWNXbLxhJO6Yk8xb/In5aB+RC4gHwnlK6Gjg1St57wvEpd8lk9N09sU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBYOsRhJCi05DG1i+aomryNc/0VpiV/dj/S663qacnKssuLvej
-	XKVENydlbVWpXxbrSkdpDAtNc1J8itngj1bPnNGomUK5MwOTnpVf+b6z8uiQv/7q8E+CYYC3t/w
-	/ZdGy1W1GJMno9Q==
-X-Received: from qkkh15.prod.google.com ([2002:a05:620a:10af:b0:8cf:c902:6c60])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:468b:b0:8db:f83f:6d91 with SMTP id af79cd13be357-904d0b9dd15mr4256448985a.0.1778601164854;
- Tue, 12 May 2026 08:52:44 -0700 (PDT)
-Date: Tue, 12 May 2026 15:52:44 +0000
+	s=arc-20240116; t=1778601184; c=relaxed/simple;
+	bh=+A6RU+3DA3OxZ4iB9Ss03OoR1eraZj8TU5tTdmq4D8U=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BQzuA+Xch6hvLP2rK5oFsPiS5VJhuFO+kdvaQnj+WNYQObZvoAbRDv8AMgCrRYoRkCR/4MwInxtEJQLVTSok5MS8LW8xc7O+4jtG5mZn6diSkM5GlJVSHlgvuhyua2+W2tpD0k+PVByzkdlIJCSBaPkOwCGfX3WGkBx5t8sI7A8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h6MR8EU3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A093C2BCB0;
+	Tue, 12 May 2026 15:53:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778601183;
+	bh=+A6RU+3DA3OxZ4iB9Ss03OoR1eraZj8TU5tTdmq4D8U=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=h6MR8EU30uldPZH2L/gkkWTPKN210PZs/Dzp3UirV62WyFlMoTbasbowHOU+7Flq1
+	 aS6eSIg5gheeIaPERQByxDVVCyPUyiAbOnaytN2JMhYEqSgK0MQ+Zg3oNNVOD8CjhP
+	 SRyYLQFULt5tRTnuwDRsSJEsnKgVgmCDwCP8wAWf2XplEB+J2enOWnEDCj3Q0s2SbJ
+	 ts/mQe5zfzO9J4WomL2GT9+8AYbuYrREfjOUYMFuc0rPaesKZ9Wh8QoqWKUVdL6s4j
+	 mFtyEx/fLl+74i6w8NtsHumdEZG9L16Y9Wdb95UdSgOm/+hrdsBVCEm55GfIHSWvqH
+	 4HM1+XuuG7mwA==
+Date: Tue, 12 May 2026 08:53:02 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Maciej W. Rozycki" <macro@orcam.me.uk>
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>, Andrew Lunn
+ <andrew@lunn.ch>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: MAINTAINERS: Add self for the 3c509 network driver
+Message-ID: <20260512085302.53cca49a@kernel.org>
+In-Reply-To: <alpine.DEB.2.21.2605120123260.46195@angie.orcam.me.uk>
+References: <177827761704.865600.12887598979033208728.git-patchwork-notify@kernel.org>
+	<20260509230519.57607-2-enelsonmoore@gmail.com>
+	<alpine.DEB.2.21.2605100246020.46195@angie.orcam.me.uk>
+	<20260510085841.243bdd7e@kernel.org>
+	<CADkSEUj3qUFDG-Hc3_RNZjm6=h8wJF63OOcHWsZGumG18VdLkA@mail.gmail.com>
+	<20260511162044.45494456@kernel.org>
+	<alpine.DEB.2.21.2605120123260.46195@angie.orcam.me.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
-Message-ID: <20260512155244.4137851-1-edumazet@google.com>
-Subject: [PATCH net-next] netlink: add one debug check in nla_nest_end()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 502BE5242BC
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: AECCC524395
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-287225-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287224-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Add a DEBUG_NET_WARN_ON_ONCE(diff > U16_MAX)
-to warn if the kernel sends corrupted nested attribute
-to user space.
+On Tue, 12 May 2026 11:26:37 +0100 (BST) Maciej W. Rozycki wrote:
+> On Mon, 11 May 2026, Jakub Kicinski wrote:
+> > > Here:
+> > > https://lore.kernel.org/all/alpine.DEB.2.21.2604240004280.28583@angie.orcam.me.uk/  
+> > 
+> > Maciej, what's the relevance of your machine in the lab?  
+> 
+>  It's one of my test machines for the defxx driver, specifically the EISA 
+> binding.  The Ethernet link served by the 3c509 driver is for Internet 
+> access, FDDI is intranet.
+> 
+> > Does the platform or any component that you test on this
+> > platform have actual users?  
+> 
+>  I believe the defxx driver does, yes; unsure about the EISA binding.
+> 
+> > If the answer is no / unsure please fix the driver up to
+> > follow modern coding standards and submit the patch.  
+> 
+>  I don't mind updating for our coding standards, though such a change 
+> might be considered just irritating noise that interferes with `git blame' 
+> (though with the removal of the code upstream, this got broken already 
+> anyway).  NB it's the reason why I have hesitated to reformat the defxx 
+> driver for decades now, which obviously has much more serious issues here 
+> such as the assumption of 4-character tabs.
+> 
+>  I think the re-addition needs to be done in two stages, first being a 
+> plain revert so that no code change comes unrecorded in git, followed by 
+> the actual formatting cleanup.  Sadly this won't fix `git blame', but at 
+> least the diff will be empty between the repo states as at respectively 
+> the removal and the re-addition.
 
-Offenders can be converted to nla_nest_end_safe().
+Right, since it was already removed the git blame is going to point
+to the re-addition. Hence it's an opportunity for a cleanup.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/netlink.h | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+>  Does it answer your questions and seem like a reasonable course of 
+> action?
 
-diff --git a/include/net/netlink.h b/include/net/netlink.h
-index 546d10586576e7b1c44348ac48762667ebb00f61..b5048dd1d5115dc94e9ea18b3b6d1822c878a75d 100644
---- a/include/net/netlink.h
-+++ b/include/net/netlink.h
-@@ -2260,7 +2260,10 @@ static inline struct nlattr *nla_nest_start(struct sk_buff *skb, int attrtype)
-  */
- static inline int nla_nest_end(struct sk_buff *skb, struct nlattr *start)
- {
--	start->nla_len = skb_tail_pointer(skb) - (unsigned char *)start;
-+	unsigned long diff = skb_tail_pointer(skb) - (unsigned char *)start;
-+
-+	DEBUG_NET_WARN_ON_ONCE(diff > U16_MAX);
-+	start->nla_len = diff;
- 	return skb->len;
- }
- 
--- 
-2.54.0.563.g4f69b47b94-goog
-
+Sounds fine, I'd squash them, but as long as the patches come in one
+series - either way works!
 
