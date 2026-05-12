@@ -1,169 +1,382 @@
-Return-Path: <netdev+bounces-287109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287110-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gBWXI9YPA2qX0AEAu9opvQ
-	(envelope-from <netdev+bounces-287109-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:32:38 +0200
+	id 4HuWEoIQA2qX0AEAu9opvQ
+	(envelope-from <netdev+bounces-287110-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:35:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B52E51F607
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:32:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BD9B51F6B4
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 13:35:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8520530157CB
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:32:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 850C8305035F
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 11:35:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DED62390230;
-	Tue, 12 May 2026 11:32:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6474D98F4;
+	Tue, 12 May 2026 11:35:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MGXEzfjI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FiIuBnsv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A9B4D90AE
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 11:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778585553; cv=pass; b=nzgpILqQir+4hJUvqRoBSfrrb2dbTiQvQIS/Miw3GK7NIGrhXQ6JyKptvV3/BnE9bRnnZiSlcRuNCxRX4MJ0fyHBJp427lUEMtPWGROosvdqUmtJV1Sxkiuj/oW/V0vc0aK0yu4x/IA/l5k0RCZ3m9WhvlUkK1tJ0qlIFSXTRdI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778585553; c=relaxed/simple;
-	bh=5Ic8h0yoyT6T1nhHXx4EipIfx10zGGWoapXnusF0nDc=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=X+qyiLzW1iCw0aM1DABlbA5Nej3iiZuuIt5qNJsUl067JvqYo4uGOSIkgBhIfLfH0tR7ODmRGJEHMakOFvm3LhN63+fMSi4EzeIILRXy8JT/uqxReUnQdPBywZz8pHo5eqM/mIZELdS1fLvnlvo72nALmzRkUe63iQnKZf+a+9Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MGXEzfjI; arc=pass smtp.client-ip=74.125.82.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-2ee990e8597so9259113eec.1
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 04:32:31 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778585550; cv=none;
-        d=google.com; s=arc-20240605;
-        b=KrBgPj9JmbNJ68iusTAI3eDFFhun4ZBPNU3y6Ey7DJc3Ez7k5EmVRamcD95GxbLo0x
-         2n5Q97e4MHea32olveZs7+gKBlGJxCBgWw6bizcHAfMm4jrvIQLBL24lakFBLGE7NU9B
-         CKGLi9RolKHTlYJiGET0MLDwst5HYbxIzSq7yAzUkIUwZvTc8dQIUXyOU+ZLLZrNYJCv
-         FwZoCqR7dRgpxxA/Fkrqw+3OpA1gEqkvGcI/744ob9quWWF4I6vnSWswgHvzxk68lIKQ
-         RUimIda/L5OV9bF2Su4GefeHWpKv+RFn/6P6WmPEj+qSyF0GmK3Ae1c4XC0ZCQSE0qok
-         ndSg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:dkim-signature;
-        bh=5Ic8h0yoyT6T1nhHXx4EipIfx10zGGWoapXnusF0nDc=;
-        fh=iFIhTbJKikyfWuU66vrInLjOOS9pO0TYoBfQfpJU0E8=;
-        b=LMbN7ErQGq/JTWNsX0vyF9JhL8A2rY9V8OaucyYzrwigRn2NSkKxq+mMRoUDv1+mPa
-         Rvc4VLRGwRgmdxfNVP4rhOIEaOQ8aMhrkgK9is/xmY8bgQa/CEU0DNvPMZllnOVyP/G5
-         EkQC2Tauwiv5IeICfuxPyrEGASrPWwOZcq28V/jEFI55k2wDCeKNFv6KwXYZE98LOdX0
-         JlNgC40fgyYC07O3Lmqt1osw7qfxQ53J8hh0lbT2X96aQA1OpX3x8k0d76h/oGRnQx43
-         NbpkwzvVPiWQSdf4FWP+359azPec4nUZv7NxeVfdgn2Iq9YnblqCnFZEpy0RSKGEfzhD
-         gFSA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778585550; x=1779190350; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=5Ic8h0yoyT6T1nhHXx4EipIfx10zGGWoapXnusF0nDc=;
-        b=MGXEzfjIgTp08vXIJO/VZdv8lsBzpm7eaPQV6ik/B1Hb+0JJ1d3O5XbU2bxxllLA93
-         mGLXqGWPKbPLzQtPK7b+u/iH1Tg24RVyI2B0G9ELTfH029xyQ+a7e2gm7x6s+O7ruQm3
-         Mrrepw7mc2bRGpJvYzv/33lFTI6po952U78CWXLVZOPVOjTg26u6vCo6FXVj6yeQLJer
-         +ltXaLLnbI1C0KIGbBAYfW45yVwT5AGp4MCqmc33UsMxzGXylS1K2WTp0usrh5ZTEqZB
-         lWRUzIMMtomG71V75LPVoQQrfHivNkpUAgDc092N57dACeqiwL0VA7G2I4WOcjIqXzrG
-         SqOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778585550; x=1779190350;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5Ic8h0yoyT6T1nhHXx4EipIfx10zGGWoapXnusF0nDc=;
-        b=YAEpwjuR+klgDXvHNEaJBiWilmba96VVgxDDRTgvdrLL5iasL1PO73K/bwrJfa/jY9
-         TwKPZgaxheZ9PrGvxrA9a/PsdZoZHUsFHBGXQWWf1DsHGIGzIX/CFbz6kijhAzpb96eU
-         O38wjyFy99Pf7Gb72yni5Nbox2QZjjCCS8ghZfRxnR95s+yV7AO+tvK9PAVQo+BoB+SA
-         B4GeD1Q8vEhlQJvcQx7DiBnhhLEp8BVHQGT9GeSmDptcxA8sxG0MObkbPfTwHRSeYYhi
-         JHXRRQbIvC9gLL2mRn+271jugJtRJch9ENB0rQMqjSLSETEeLYReFWxdMN7e1FuYr8z7
-         4HyQ==
-X-Gm-Message-State: AOJu0YyzvdJuiX9+HKdt7xi2dO5htn71N1Jqk2Sanu82yIJkKxYRfCqy
-	ImmXO95Un0lG7RCC4uNr9C35MVyxSKkQBfGGZ0pzy/zTFcrE+P4PInI9LUPCAZGoz3oFaOkttsi
-	Up+7vFqPm92h3PbI8AwacuixbtG7whaKFCWwjnAQ=
-X-Gm-Gg: Acq92OFvVZkHXOgzWgJmo3scCbkbG4Yj1f1/NQ/jE3YF0zC0OlaPh1fNd9GQhQBHaw1
-	Jg4fDl117c9HjmOLC1VD754pMHNrWHhQROLJZNVwp3zh4RSIUUFdm/8CHU/7LSP+lGHShOOyJcN
-	wNqF0iXMytwNkWKX8ES4PLoyCjybmkOYtG59U5alzLm8BhwUeDhjB9vHiVYUi0Y5zHd7lvz5YmH
-	IJ12qDgzGpQ5u6P2dCL/a00NVDPpXH63ARcnRRRr5fDWqMq6VDiHWubNREY+DlTe2deamCjVsFe
-	l49s7WI=
-X-Received: by 2002:a05:7300:6115:b0:2da:44ac:6d0d with SMTP id
- 5a478bee46e88-2ffd71fe5bfmr1429730eec.20.1778585550104; Tue, 12 May 2026
- 04:32:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29A54D90D2
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 11:34:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778585700; cv=none; b=dFrW3OpNw88POLViS0S8rMFgycb7twAI3N+VhGxWPEbonXXPL5dJ4qEeFUPtdSWQ6Mwa0RHUgTTPOKnNRWXuYU1DiBAQ829jkl4KkiRSgHJp44vi3cUTwfiWTqwewNkqt4elatP8m4ZL+ZNOjBopYyJy2Aq9sRSGLgsLG5joJMw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778585700; c=relaxed/simple;
+	bh=1IpsV88xPvhWRZi6mj/I6mhERZcG0HdszvNzOvfLg+8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=MKP8yhdD7JnYz/zGrlFnOXmAAUqEpFf3tAUaFBaiFI30pRgQr/ezklic/lZV/Q2mqJln96YWZ0y8bs8qgKPPQ89ba6GvYGg4jf176pPGi2XNc2MP4jW6PAf+4z6ZMRp3ZXHinjB/gBHP2EnVLCiEPA8pwcsTvxI75jYtNGL89SA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FiIuBnsv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778585698;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2T1P80e2ayXiD4FLmzXcH0SJv4nUG0BB/kIni+nI35U=;
+	b=FiIuBnsv8xR4X/j+lS5MMsoE0iW7rpYPHLXMhmkk4Xwyqza8ZTyeriOdLubW0fomdAdX+H
+	IHGB/ShwnHilI6pAneynLFHwLaEDukAK5H1XC0LzZK8/43wX7DkR6hXHP5R5wjn3KP2wzB
+	MhWiJvonDNBoGKEUZxxmjazVhW+ZtCw=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-684-r2p_ab2aMVy41g7ch2XGkg-1; Tue,
+ 12 May 2026 07:34:52 -0400
+X-MC-Unique: r2p_ab2aMVy41g7ch2XGkg-1
+X-Mimecast-MFC-AGG-ID: r2p_ab2aMVy41g7ch2XGkg_1778585690
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 17CA4195608B;
+	Tue, 12 May 2026 11:34:50 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.48.142])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A466C1800465;
+	Tue, 12 May 2026 11:34:44 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: longli@microsoft.com
+Cc: kotaranov@microsoft.com,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	jgg@ziepe.ca,
+	leon@kernel.org,
+	haiyangz@microsoft.com,
+	kys@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	shradhagupta@linux.microsoft.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v8 1/6] net: mana: Create separate EQs for each vPort
+Date: Tue, 12 May 2026 13:34:38 +0200
+Message-ID: <20260512113438.168454-1-pabeni@redhat.com>
+In-Reply-To: <20260508221202.15725-2-longli@microsoft.com>
+References: <20260508221202.15725-2-longli@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Tiju Jacob <jacobtiju@gmail.com>
-Date: Tue, 12 May 2026 07:32:19 -0400
-X-Gm-Features: AVHnY4LifR-95X9Lohl0xXWpsM0-q4iVFg2AaGbpr40v_o3HOF6DOFFun3Evmmw
-Message-ID: <CADAg6uxK+xjPRgmSXeqfmbw1RgzOhUukkc-X72O61ywKhvx1_Q@mail.gmail.com>
-Subject: =?UTF-8?Q?mv88e6xxx=3A_88E6320_external_PHY_on_MDC=5FPHY=2FMDIO=5FPHY_?=
-	=?UTF-8?Q?=2D_=28GPIO_7=2F8=29_=E2=80=94_is_mdio=2Dgpio_the_right_approach=3F?=
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>, Vivien Didelot <vivien.didelot@gmail.com>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 0B52E51F607
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Rspamd-Queue-Id: 9BD9B51F6B4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	SUBJECT_ENDS_QUESTION(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287109-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287110-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jacobtiju@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-0.989];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Hi All,
+From: AI Reviewer <ai@example.com>
 
-We have an 88E6320 (marvell,mv88e6085) with an 88E1512 PHY on Port 5.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+---
+Subject: net: mana: Create separate EQs for each vPort
 
-The PHY's MDIO is wired to the switch's MDC_PHY/MDIO_PHY pins (52/53
-=3DGPIO 7/8), which are separate physical pins from MDC_CPU/MDIO_CPU
-(54/55) used by the CPU. GPIO 7/8 read HIGH as inputs confirming the
-PHY is alive.
+This patch moves EQ ownership from struct mana_context to
+struct mana_port_context, creates per-vPort EQs in mana_alloc_queues()
+and mana_ib_cfg_vport(), and exports mana_create_eq()/mana_destroy_eq()
+for use by the MANA RDMA driver.
 
-We tested exhaustively at runtime: marvell,mv88e6xxx-mdio-external,
-NORMALSMI set and cleared, PHY in internal mdio bus, and all 8 PCTL
-modes on GPIO 7/8. In every case the PHY at address 5 was unreachable.
+A few questions below about the new lifetime and ordering rules for
+mpc->eqs.
 
-The mv88e6390_g2_scratch_gpio_set_smi() NO_CPU inversion appears
-designed for chips where MDC_CPU and MDC_PHY are muxed on the same
-pins.
-On the 88E6320 they are physically separate, making the inversion
-wrong =E2=80=94 but even manually correcting NORMALSMI did not help.
+> diff --git a/drivers/infiniband/hw/mana/main.c b/drivers/infiniband/hw/mana/main.c
+> index ac5e75dd3494..8000ab6e8beb 100644
+> --- a/drivers/infiniband/hw/mana/main.c
+> +++ b/drivers/infiniband/hw/mana/main.c
+> @@ -20,8 +20,10 @@ void mana_ib_uncfg_vport(struct mana_ib_dev *dev, struct mana_ib_pd *pd,
+>  	pd->vport_use_count--;
+>  	WARN_ON(pd->vport_use_count < 0);
+>  
+> -	if (!pd->vport_use_count)
+> +	if (!pd->vport_use_count) {
+> +		mana_destroy_eq(mpc);
+>  		mana_uncfg_vport(mpc);
+> +	}
+>  
+>  	mutex_unlock(&pd->vport_mutex);
+>  }
 
-Is virtual,mdio-gpio (CONFIG_MDIO_GPIO) over GPIO 7/8 the correct
-upstream solution here? Or is there a mechanism to activate the
-hardware MDC_PHY/MDIO_PHY master on the 88E6320 that we have missed?
+[High]
+After this change, mpc->eqs lifetime is governed by pd->vport_use_count,
+and only raw QPs call mana_ib_cfg_vport()/mana_ib_uncfg_vport().  RSS
+QPs in mana_ib_create_qp_rss() read mpc->eqs and latch eq->eq->id into
+the HW CQ via cq_spec.attached_eq, but they do not bump
+pd->vport_use_count.
 
-Thanks,
-Tiju
+So if a user creates a raw QP on a PD (use_count=1, mpc->eqs allocated),
+then creates an RSS QP on the same PD whose CQs now reference those EQ
+ids, and finally destroys the raw QP first, this path runs with
+use_count dropping to 0 and calls mana_destroy_eq(mpc) -> kfree(apc->eqs)
+and mana_gd_destroy_queue() for each EQ while the surviving RSS QP's HW
+CQs are still attached to those EQs.
+
+Is there an intended rule that enforces destruction ordering between raw
+and RSS QPs on the same PD, or should RSS QPs also participate in the
+refcount that guards mpc->eqs?
+
+> @@ -55,15 +57,22 @@ int mana_ib_cfg_vport(struct mana_ib_dev *dev, u32 port, struct mana_ib_pd *pd,
+>  		return err;
+>  	}
+>  
+> -	mutex_unlock(&pd->vport_mutex);
+>  
+>  	pd->tx_shortform_allowed = mpc->tx_shortform_allowed;
+>  	pd->tx_vp_offset = mpc->tx_vp_offset;
+> +	err = mana_create_eq(mpc);
+> +	if (err) {
+> +		mana_uncfg_vport(mpc);
+> +		pd->vport_use_count--;
+> +	}
+>  
+> -	ibdev_dbg(&dev->ib_dev, "vport handle %llx pdid %x doorbell_id %x\n",
+> -		  mpc->port_handle, pd->pdn, doorbell_id);
+> +	mutex_unlock(&pd->vport_mutex);
+>  
+> -	return 0;
+> +	if (!err)
+> +		ibdev_dbg(&dev->ib_dev, "vport handle %llx pdid %x doorbell_id %x\n",
+> +			  mpc->port_handle, pd->pdn, doorbell_id);
+> +
+> +	return err;
+>  }
+
+[Low]
+pd->tx_shortform_allowed and pd->tx_vp_offset are written before
+mana_create_eq() is attempted.  On the mana_create_eq() failure branch,
+mana_uncfg_vport(mpc) is called and pd->vport_use_count is decremented
+back to 0, but pd->tx_shortform_allowed/pd->tx_vp_offset are left set to
+the values derived from a vport whose HW-side configuration has been
+reverted.  Should these fields only be committed to pd after
+mana_create_eq() succeeds?
+
+> diff --git a/drivers/infiniband/hw/mana/qp.c b/drivers/infiniband/hw/mana/qp.c
+> index 0fbcf449c134..6167742df9d2 100644
+> --- a/drivers/infiniband/hw/mana/qp.c
+> +++ b/drivers/infiniband/hw/mana/qp.c
+> @@ -171,7 +171,15 @@ static int mana_ib_create_qp_rss(struct ib_qp *ibqp, struct ib_pd *pd,
+>  		cq_spec.gdma_region = cq->queue.gdma_region;
+>  		cq_spec.queue_size = cq->cqe * COMP_ENTRY_SIZE;
+>  		cq_spec.modr_ctx_id = 0;
+> -		eq = &mpc->ac->eqs[cq->comp_vector];
+> +		/* EQs are created when a raw QP configures the vport.
+> +		 * A raw QP must be created before creating rwq_ind_tbl.
+> +		 */
+> +		if (!mpc->eqs) {
+> +			ret = -EINVAL;
+> +			i--;
+> +			goto fail;
+> +		}
+> +		eq = &mpc->eqs[cq->comp_vector % mpc->num_queues];
+>  		cq_spec.attached_eq = eq->eq->id;
+
+[Critical]
+mana_ib_create_qp_rss() does not acquire pd->vport_mutex and does not
+touch pd->vport_use_count.  The NULL check above reads mpc->eqs without
+synchronization; immediately after it, the same mpc->eqs is dereferenced
+and eq->eq->id is latched into cq_spec.attached_eq.
+
+Can the following sequence occur?
+
+  thread A (creating RSS QP on pd)        thread B (destroying last raw QP on pd)
+  mana_ib_create_qp_rss()
+    if (!mpc->eqs)  /* non-NULL */
+    ...                                   mana_ib_uncfg_vport()
+                                            mutex_lock(&pd->vport_mutex);
+                                            if (!--pd->vport_use_count)
+                                              mana_destroy_eq(mpc);
+                                                kfree(apc->eqs);
+    eq = &mpc->eqs[... % mpc->num_queues];
+    cq_spec.attached_eq = eq->eq->id;     /* reads freed memory */
+
+Is there something else serializing these paths that this reviewer is
+missing?
+
+[Medium]
+The off-by-one on the error path looks inconsistent with the other fail
+sites in this function.  Every other goto fail in this loop leaves i
+alone and relies on:
+
+  while (i-- > 0) {
+      ibwq = ind_tbl->ind_tbl[i];
+      ...
+      mana_ib_remove_cq_cb(mdev, cq);
+      mana_destroy_wq_obj(mpc, GDMA_RQ, wq->rx_object);
+  }
+
+Here the new branch does ret = -EINVAL; i--; goto fail, which drops one
+extra iteration of cleanup.  If this check ever fires at i > 0 (for
+example if the lifetime issue above is fixed by making mpc->eqs
+observable as NULL mid-loop), the WQ object and installed CQ callback
+created in the previous iteration are not torn down.  Should this match
+the other fail sites and omit the i--?
+
+[Medium]
+Before this patch ac->eqs was populated unconditionally in mana_probe()
+and existed for the lifetime of the device, so mana_ib_create_qp_rss()
+and mana_ib_create_qp_raw() always had EQs available regardless of
+whether any netdev was up or any raw QP had been created.
+
+After this patch, mpc->eqs is populated only by mana_alloc_queues()
+(netdev open) or by mana_ib_cfg_vport() (which is only invoked from
+mana_ib_create_qp_raw()).  An RDMA user who creates an RSS QP on a PD
+while the netdev is down and without a prior raw QP on the same PD will
+now see -EINVAL from this new check, where the same call succeeded
+before.
+
+The commit message describes this work as preparatory and does not
+mention this user-visible ordering requirement.  Should this semantic
+change be called out in the commit log, and should the implicit "a raw
+QP must be created first" rule be documented somewhere user-facing?
+
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> index b2faa7cf398f..131a997e1083 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> @@ -1615,78 +1615,83 @@ void mana_destroy_wq_obj(struct mana_port_context *apc, u32 wq_type,
+>  }
+>  EXPORT_SYMBOL_NS(mana_destroy_wq_obj, "NET_MANA");
+>  
+> -static void mana_destroy_eq(struct mana_context *ac)
+> +void mana_destroy_eq(struct mana_port_context *apc)
+>  {
+> +	struct mana_context *ac = apc->ac;
+>  	struct gdma_context *gc = ac->gdma_dev->gdma_context;
+>  	struct gdma_queue *eq;
+>  	int i;
+>  
+> -	if (!ac->eqs)
+> +	if (!apc->eqs)
+>  		return;
+>  
+> -	debugfs_remove_recursive(ac->mana_eqs_debugfs);
+> -	ac->mana_eqs_debugfs = NULL;
+> +	debugfs_remove_recursive(apc->mana_eqs_debugfs);
+> +	apc->mana_eqs_debugfs = NULL;
+>  
+> -	for (i = 0; i < gc->max_num_queues; i++) {
+> -		eq = ac->eqs[i].eq;
+> +	for (i = 0; i < apc->num_queues; i++) {
+> +		eq = apc->eqs[i].eq;
+>  		if (!eq)
+>  			continue;
+>  
+>  		mana_gd_destroy_queue(gc, eq);
+>  	}
+
+[High]
+The loop bound is now apc->num_queues rather than the immutable
+gc->max_num_queues.  mana_create_eq() allocates apc->eqs sized to
+apc->num_queues, and mana_destroy_eq() walks the same count.
+
+When RDMA has called mana_ib_cfg_vport() -> mana_create_eq() while the
+netdev is down, apc->num_queues can still be mutated underneath it.
+mana_detach(false) skips mana_dealloc_queues() when port_st_save is
+false, and then mana_set_channels() (ethtool -L) writes
+apc->num_queues = new_count while mpc->eqs is already held by the RDMA
+side.  mana_attach() then also skips mana_alloc_queues().
+
+When the RDMA user later destroys the last raw QP and this function
+runs, i iterates 0..new_count-1.  If new_count is larger than the count
+used at kzalloc_objs() time, apc->eqs is read out of bounds and
+potentially passed to mana_gd_destroy_queue().  If new_count is smaller,
+the tail EQs (real gdma_queue objects with MSI-X and DMA regions) are
+leaked.
+
+Before this patch both sides used gc->max_num_queues so no mismatch was
+possible.  Should apc->num_queues be snapshotted into apc at
+mana_create_eq() time (or should changing num_queues be forbidden while
+mpc->eqs is populated by the RDMA path)?
+
+> -static int mana_create_eq(struct mana_context *ac)
+> +int mana_create_eq(struct mana_port_context *apc)
+>  {
+> -	struct gdma_dev *gd = ac->gdma_dev;
+> +	struct gdma_dev *gd = apc->ac->gdma_dev;
+>  	struct gdma_context *gc = gd->gdma_context;
+>  	struct gdma_queue_spec spec = {};
+>  	int err;
+>  	int i;
+>  
+> -	ac->eqs = kzalloc_objs(struct mana_eq, gc->max_num_queues);
+> -	if (!ac->eqs)
+> +	WARN_ON(apc->eqs);
+> +	apc->eqs = kzalloc_objs(struct mana_eq, apc->num_queues);
+> +	if (!apc->eqs)
+>  		return -ENOMEM;
+
+[Low]
+WARN_ON(apc->eqs) here is advisory only; execution continues into
+apc->eqs = kzalloc_objs(...), which unconditionally overwrites any
+non-NULL pointer.  If the invariant is ever violated by a future caller
+or error path, the prior EQ array and its gdma_queue objects are
+orphaned (kernel memory and firmware EQ state leaked) with only a WARN
+splat as the signal.
+
+Would "if (WARN_ON(apc->eqs)) return -EEXIST;" express the intent more
+safely?
+-- 
+This is an AI-generated review.
+
 
