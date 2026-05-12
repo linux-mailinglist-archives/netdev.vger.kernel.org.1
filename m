@@ -1,699 +1,274 @@
-Return-Path: <netdev+bounces-287296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287297-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wFWDGziSA2pm7gEAu9opvQ
-	(envelope-from <netdev+bounces-287296-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:48:56 +0200
+	id 8E07J3qUA2q37gEAu9opvQ
+	(envelope-from <netdev+bounces-287297-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:58:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D54045298C3
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:48:55 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A073C529BCA
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:58:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D81D73086A08
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 20:48:54 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 94201306FF11
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 20:49:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 019FA3C3425;
-	Tue, 12 May 2026 20:48:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E95C13AD50B;
+	Tue, 12 May 2026 20:49:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lVM82ISP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E6PzgKFK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9CD93BF672
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 20:48:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778618931; cv=none; b=j9ArClDdQxBQ4z1MM/ye6gFpQQebFwdT82xzaYwmTC1cpHTCirVUG7D7D+EFl04EK9jS8OfegT9nzyWpRtmGO4RVpfq3sy0YOmFDkDR8mILd3sXfVxfGMO55WEoOyKjrOnIAwXzf/2gaVU0Buet89YuGOTrPS1pSTuWY9A9EW9Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778618931; c=relaxed/simple;
-	bh=QMyBmJloi5EUMSnyjWkxXl2hUdzrWSUhMhaAkWzyBIY=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=QEsgavwr5r3dE1rD0pL88WRrzUe+ScAGdiLm56WVtI6Zot2SLPI+iRBpbwUplqF3cD4bSdbpRkLNJygolSvAL0Ie+/iaAaaleh6G8pCIPYn+uKJjNT2im+lRXvLSelJHil0484vnxpvBeW7UnaH/4BptOEXexKXaFkWFeLxfEjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lVM82ISP; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-48d146705b4so72881575e9.3
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 13:48:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778618928; x=1779223728; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=xYcdWBfrbMOtZ/5eUXwVKNW9hm2kOf/rLx+RY3/eMME=;
-        b=lVM82ISPd2t7URs7xmUSTTj+aSeyma8wh+vfMN7yHc+hfAjsytRJEjpeDBFWgyH3Oe
-         JH06nZ5fI0KZpWw0k+DvTY83X1xXgG9pj0iW6z91TGdaXmHYXEjex+nxWkQnhuUTz5yB
-         kFCW8QzzRyR7odijtBLH6S5DJ3uB2XAzn3U7KVjDPo/NxRkpUa9xS3qVY3UcMOpi2B6I
-         PGxycMEdrBD5KdIWl1ZJ9002kHJBxQlHX6JXfpVb84+RGpGykFXxirUa/SbHNBTCp/39
-         FHFuAvMLrbsR+1HzUcaJ/JBTI73VVf+6npMN2s0aHTSkReKtCbjHCxbhyxiDk5s8+PkN
-         FsJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778618928; x=1779223728;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xYcdWBfrbMOtZ/5eUXwVKNW9hm2kOf/rLx+RY3/eMME=;
-        b=kMxorY5ZV2uXfLs5fLfWdLmIzSCEPY/4XiI+id++43wltOUgOLpPdDt8aaZFvOy0ne
-         HxyWQeTVE6Z18sVKqw2q4EO1SrBCVsFEUWeV8GoooRV/JLOpWanYm/LE6t8QS/KA9EJr
-         +c+iiC8WPjaG8xih0Vo+wu+3YVBB5nHnv2uoQ9Do28zsGtgMpC+XnpMwakFer9fBzbqm
-         1G4DdqEEjje+XDYrpRF7U/gce4pQ8krKQk2VLDzNTxSMx7te9FpPCscI6gSHQHF23MrY
-         ubB6jiHjv/M+TIr2V2hw6seIqe1HSZ4wavFtiTiPD3C3AjapxnPxOzDB28JtoUbrYY8P
-         KFWQ==
-X-Gm-Message-State: AOJu0YwHEfEfYHYeMkpc+r31I1aXw0i5DDMp3kI7vi5e95CokWBS7Jy3
-	4GKPOvF8h50t6YCc5Ondfqvl9Q+M24iCanQe/tSNIoh2usJ8heIQHQH/
-X-Gm-Gg: Acq92OFu07Mmf8RGZcS4Mpo4CGay6LMaaocJowAmx6PbLCWMHi46/+CCVOVmpeyPpmB
-	qC610fVcvrc36OSWioEUECgCuptq+q1tbhdlXjrl3TN58vY25Ep8OP/tc55a1zoIuW54QSz0uXe
-	7VSZUzTmYHulvDL3dgxheGqMgEdZCywd7aSeA0fF6fWKAJclG/Lfa77jmGUCALTlFrR7X5NWHCN
-	jWeHBozfNsBrej8XPLgjeL+l3F2fmi3BcRGiYU2poBXXe08wrrBl4cgFLWYkdeLGpVhth12ndwm
-	ZjrwfQMrM0uITUyVkBoIP7B+FM4hdlkn8zEPkv/cGGfpip7zXJg994MZt6SU2gtmfj2AtmFZ7KJ
-	hhLPvRhGjGQbzRaT4HYqRNOppD/kl9T/CFQRZKTsjXi1tijCzPv3+I7OMuK2O1AletpegGcXuAA
-	viRSv5U5R1AuvkBG1M19qfkCjJRVKbF7RSeYDxxDD19QblSjHISdCEB2h+vmTpRTFm3KpZDCk2G
-	T7YTa9q8rw2VSrQPHCzbQRGDiIOWeBbhhQXKxJTvsTVaq6LxDpoWPLdDLbTGzE2o94htUKq47Yf
-X-Received: by 2002:a05:600c:19c9:b0:489:1a63:509c with SMTP id 5b1f17b1804b1-48fc999e736mr6447565e9.0.1778618927601;
-        Tue, 12 May 2026 13:48:47 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f47:3200:655a:16b8:d272:9436? (p200300ea8f473200655a16b8d2729436.dip0.t-ipconnect.de. [2003:ea:8f47:3200:655a:16b8:d272:9436])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e8f3f5174sm40332025e9.5.2026.05.12.13.48.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 May 2026 13:48:45 -0700 (PDT)
-Message-ID: <f514063b-24d9-4d1a-aa37-fc9592e287c6@gmail.com>
-Date: Tue, 12 May 2026 22:48:44 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FF913559DF
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 20:49:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778618984; cv=fail; b=UZkxdl5n9oB9RcCkkQfOD3/kSxUg9ll6nRate5SljjLh5v2fOaTm1cuE5U3dFZScw+w3+sAJmqtt62ZfpQVXexDIR8gxx4P9kmvxppK6nbvKf6QVwsOc2uTTRDLy6dgrvydrDCj97ExcfqkHO0OQKFMuDvxhgB0QNc5YroaBbcM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778618984; c=relaxed/simple;
+	bh=Ij0tK49vNZDguv61F1sBuae81qLTCXi617pRoIJktnU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=WgaaoZfgO3F5qReZ5idGO9uIOp+NoGr/Ct4ZukZ/w2wAX+lwC0OIBARCU6XEO4kwKTOGaYAqYBMq91D2RU34w9fQ6GQSOc4slp0FAwUn33ORNofDBD6zV35awKGL74ckDEgYPyE0IU5RYcgyqNiwqeKv1i4Hs94QKgxyVwfR5Yk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E6PzgKFK; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778618984; x=1810154984;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=Ij0tK49vNZDguv61F1sBuae81qLTCXi617pRoIJktnU=;
+  b=E6PzgKFKoOI/bLzGT8paHJUrUJChO4TCQM1IjGcNJWYFZ/OFZVwLI7fV
+   RBmnN5lHiLp+hEs/FBatDqg3rfzwJzPai1GcE9km8ps7g26RfDXksZVAn
+   nBZpOI7mUUVTf8nVmi73YwnLsyrjgOdGvwdVY6wrXSjBx0TS8ARAQ2BVV
+   YGJGDeEY38lSM9hnrSdNxBmYl2wTpav8e0xJQWhoLsuJJYZJllnVPcalL
+   wizGJisc2Bq5Skp5nspoBRIdOQmlR9nnXoLPU+2W7+9/T5eFudimYO6YP
+   cF06lHjB27iJoBhK4wYFQCp7Mt0oQQUez+BT6eG1MLjvPlG1LyUo+rVhv
+   g==;
+X-CSE-ConnectionGUID: wR3UJR+tTw6ld8D8IsvwCQ==
+X-CSE-MsgGUID: QaVnDw9HRxWlSoBkvr70TA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11784"; a="79522147"
+X-IronPort-AV: E=Sophos;i="6.23,231,1770624000"; 
+   d="scan'208";a="79522147"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2026 13:49:42 -0700
+X-CSE-ConnectionGUID: DohZLROyQiiSYzZasyQzkQ==
+X-CSE-MsgGUID: hkl5ZSc2R9OTBWIRX+g3ww==
+X-ExtLoop1: 1
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2026 13:49:42 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Tue, 12 May 2026 13:49:41 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Tue, 12 May 2026 13:49:41 -0700
+Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.47) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Tue, 12 May 2026 13:49:41 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=V2YEvDeGEa+lB5nceaEoZKVFOc0qK3mWbNHlCxtX/ccTDnUk9ODiFMamQSyCcfJo/p9242sV6D+vtzf2RQRTgZCT53z6bJZZxM3WPmu6mYRzVKgX5eYRDzFAHB6jo56VOuGEdvORaznPVvl8w0iAM0UhGQz99IHkotunKFRmwhQoXkrHGfeGYIHXhdWRqKkZmhkYzsNhY3NdmP/mG69eN9cUMDFwEUv6RJED6mLkziRBU4jA4D00AGnQZ5VAnFE+IeU7SnXsFjsyzw/JeAbWx0P++twY2iBKi1SxdtcOngZeKa6SRql2leEuyLexluIEncLO1tCNcB90MrP+bsW0/g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nP2SPYo2+pbdbI+71r/A8YeKBe2zJsZDp8ju8aVRaF8=;
+ b=W+BZM31Z0g1c3eaMhqOJM27is7z9UnynpgKekxoBlsN2hU4zDPVxBBnUMrl3lCPG7NKyyi0OPAhpfH4n5RW++aqZB4MEjmHMFycq9T67NFRaRFQK+9oBrZjL0+HYCEVfr64QDbxmtQebGLOyQ63BUsOZsec74GDvxtO0WeNsfT9x6qUE3iNvahn7KntOsqsehVyClsMicmJh1Tnv4Fgvu0joOLEalY83U3reswYj021tU7++xNhoNDLzb/dnf9zfX/e7+6rVpZq6mD38CmR8P8BbWqlUxcXoTihvvBhF3rJQhtHDssrHNwuA3YvUzDyCt1ewo3jwucKFztHijQbsvA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CYYPR11MB8430.namprd11.prod.outlook.com (2603:10b6:930:c6::19)
+ by CYXPR11MB8731.namprd11.prod.outlook.com (2603:10b6:930:db::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.23; Tue, 12 May
+ 2026 20:49:37 +0000
+Received: from CYYPR11MB8430.namprd11.prod.outlook.com
+ ([fe80::1d86:a34:519a:3b0d]) by CYYPR11MB8430.namprd11.prod.outlook.com
+ ([fe80::1d86:a34:519a:3b0d%5]) with mapi id 15.20.9891.021; Tue, 12 May 2026
+ 20:49:37 +0000
+Date: Tue, 12 May 2026 16:49:31 -0400
+From: Rodrigo Vivi <rodrigo.vivi@intel.com>
+To: Raag Jadav <raag.jadav@intel.com>
+CC: <intel-xe@lists.freedesktop.org>, <dri-devel@lists.freedesktop.org>,
+	<netdev@vger.kernel.org>, <simona.vetter@ffwll.ch>, <airlied@gmail.com>,
+	<kuba@kernel.org>, <lijo.lazar@amd.com>, <Hawking.Zhang@amd.com>,
+	<davem@davemloft.net>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<maarten@lankhorst.se>, <zachary.mckevitt@oss.qualcomm.com>,
+	<riana.tauro@intel.com>, <michal.wajdeczko@intel.com>,
+	<matthew.d.roper@intel.com>, <umesh.nerlige.ramappa@intel.com>,
+	<mallesh.koujalagi@intel.com>, <anoop.c.vijay@intel.com>,
+	<aravind.iddamsetty@linux.intel.com>
+Subject: Re: [PATCH v2 1/9] drm/ras: Update counter helpers with counter
+ naming
+Message-ID: <agOSW70ZR59ubyP5@intel.com>
+References: <20260512191610.1817578-1-raag.jadav@intel.com>
+ <20260512191610.1817578-2-raag.jadav@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260512191610.1817578-2-raag.jadav@intel.com>
+X-ClientProxiedBy: SJ0PR13CA0218.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c1::13) To CYYPR11MB8430.namprd11.prod.outlook.com
+ (2603:10b6:930:c6::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [Patch net-next v2 2/7] r8169: add support for multi rx queues
-To: javen <javen_xu@realsil.com.cn>, nic_swsd@realtek.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260508121802.2010-1-javen_xu@realsil.com.cn>
- <20260508121802.2010-3-javen_xu@realsil.com.cn>
-Content-Language: en-US
-In-Reply-To: <20260508121802.2010-3-javen_xu@realsil.com.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: D54045298C3
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CYYPR11MB8430:EE_|CYXPR11MB8731:EE_
+X-MS-Office365-Filtering-Correlation-Id: b6acb596-b689-4bd7-92c2-08deb067fae5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024|11063799003|56012099003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info: JXr9xbrdDWxfQVAdUM9eAS78mWyJh0FLO9xot2MUWYqpGpUYWjJHVUmMaczFQaWT2EZr6NFdrIH3RE20z05oMmjOGOFIDQ8h1rGJ1ysAhNzi9V0XnebBiQ3x5hNp4Y0Z05y/5oFx2pbOhuxbrrdh1ixMN+yhhasxEPS0qlu2/b02BoCrrAR6G+JDL72gLho8rVh87XtqbbS7MfT2jwhtW9wcuZ/+xrzFl8gAJHo/7ZVQLxjG8oemhFvhlqgTMJi6OsDQNZFkg367fqmwPhi9XNUtSkQxwmEsOzmY/Vgd7gOB8sUJdG7BYJxpqfOdw7Z3Fjhj/oewPlh93XlMjDh+3kMRYOvMtY3aDGlNDh6jLUcrWMxr8/89Vudo0emp6NiBrDxhwtkRonrDgyPpFw8ccj2COm8mF+LaALQz+/a9g/nv5ZwmxI0D0asJnFBN/Qg34J6x9iaCH9058NpP2BoeYaEDQF+hDP+1MHY2ADLFjhZyLQXG9uAUuBF7Il6Q+FQwHQ5Ll8mxcy2uNoU2156E0suvCkPc+CLH8h+b7QwRLfst+cQENNb1AR7KOnvUK71JLRvH7truPQuqgf9kIaIig6Jt3mXLuos098H7486DthBmhbJj4sIfJ1jESdoMftShjK2m6MCm4wu34yRteD1ZnxaNT6f8MGB5qtHpqZvLxs0GIusN7205dYg3cvIJrFez
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8430.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(11063799003)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?i31WNTVkyIKT6x3zshc4kmxPbLnqJw5EdnlRBNCVdQ3hv1AHKl3hVv2miw8A?=
+ =?us-ascii?Q?o7vRYSNEjiHXSO31BLX4CRoaOf+hEm6e8RAf+MHJwzHAPblV+gJvk9sswlJ0?=
+ =?us-ascii?Q?5DyFXfz5gStbz8rqktKiQRnPxvlyjUcel95tP/mhqaDwC4HW8eq26i8G1BxC?=
+ =?us-ascii?Q?rzYmkB3ocRwVFZnzy8RdVvE9ezjg/DeLnQOqbhuQnSiUT98TxiUO7U7qn1id?=
+ =?us-ascii?Q?6RZq74yPEVJkdLI8jwGa4Em92vcdSdFmm9G8IujoEBGa0ZSkwHtGOz15JXp5?=
+ =?us-ascii?Q?tStylP7QlNpALJEmaRVh/EKinw2t8AvEAfZYUtTZ3dwDqQJngfYI1GT9zepK?=
+ =?us-ascii?Q?A1Z0Z47pJOHrmaP/XdGqGC5fyE7gImLTjqEcewDqGhuRIEMjvDUXe7jHOO1p?=
+ =?us-ascii?Q?1bi2vO4ImKPQlaPR+Lw4MBBWmP1Ab768Xo4ASfLEk/noi1UyXmVpgZB4srqU?=
+ =?us-ascii?Q?svhOC+yh80JNfv/dwbPHFcp7GxxPcGm1S2pPkftkHSvdoMKi+s4i7TZCqaRx?=
+ =?us-ascii?Q?N6/OXOGwFHkLEFxVz5NxYvAeluAMJF9I68Ts99sEYSmHNjdqQOmZE/uqwRL9?=
+ =?us-ascii?Q?s3h7ZadYX/cV1+CMbJZJ+EvPAMfdfhHZv3/mBEFy93MbG8BDfcgv/Y9wmW2t?=
+ =?us-ascii?Q?YZ5sT0q+S9Umb4jFj7Xgyx7HlL6KD1QbbiBwBC1sHnHidFz7p1pxUCek3gfO?=
+ =?us-ascii?Q?HFG0/vF6RPXqO7hYgrX3gNVKgAGxPgWDEC/J/Meo/lpgDdxelgXXtctq/kZq?=
+ =?us-ascii?Q?C936Hyi7MtYtiJZCiCU7GYbnupj4pQR/9pLPxuxlgHJbcfzRr4QJbLKafRXn?=
+ =?us-ascii?Q?FSU3GmEHLmA+W4uTPFSdoRBWWJmwmRP03NyS8imgrNyefioJr9J2V/t54g7V?=
+ =?us-ascii?Q?zaL+ubv3O5fC1HLwwdtBA/qM8DlI7SDgDuPzf84WS5A89X9CMdR7vA3g1rWp?=
+ =?us-ascii?Q?koZ+oVea0Tdt+sVof7/olcorEvSl79zFua2fTgLKrnZ8UUWlmxnmhjWVlhoR?=
+ =?us-ascii?Q?o3iEmxqX4xthG8t39eiQDtrdIc5EYxpAG5KhvAzQc9t1reWQ7G09cX9xkXSi?=
+ =?us-ascii?Q?YtnnaQ4FktS3yp1gB5kih9YNNWvulWRHql1siYkQEbdLnqjbCxI2wKBvmSvz?=
+ =?us-ascii?Q?UvHILKqeoF0zOftC+GB4poceNAivlGRkSnZvCyza0jNI6f6GabMrhDZ9waoX?=
+ =?us-ascii?Q?yBzfbyKwpXsKPzMLdo/bTV+hIZe27a0IHnu6JCDXc1+EBFTEoLagYfyE4BR9?=
+ =?us-ascii?Q?FRarRt3oP7cZCFHLEHU6EJYH2TjVYQkuyVNbL+3BxedqPDCOoqG+EFCUwUX2?=
+ =?us-ascii?Q?ceAkLkP4L2YqWUqr2boBhgYLbj0DhrXhIwUQKOH067CchW+Ri4EAGtkXev5S?=
+ =?us-ascii?Q?aqH7IiPmFpvOxjG0or4kq4zqeLL+U1RaLF49WNkmuJlUsv79MWFUj39AkNW2?=
+ =?us-ascii?Q?ngUONDKXs7f7u1Blz1+bAd3nlgquzDRnQvhlvRq0pcvuacEnc8bkoRLL1FtF?=
+ =?us-ascii?Q?2SGFkid5ttQAhNN6XRoHK9k2xUoHyq7fQHzIK0zME1uh2tKCBIPcpQKfHmOE?=
+ =?us-ascii?Q?4hYeNEmc9VJ5R6dMQV5X3/QBCLNcrOjCRm7QmdotOJAPuwR0QNzDp0vGnBZC?=
+ =?us-ascii?Q?k5RU/ulNies8ti8rBTuAVxCDkf12yE+Kzb+IHeoKB45aVphfdze892z949Os?=
+ =?us-ascii?Q?4S/WKIcagI+cSZWriGWhoqV8F2VinNsEZIz+7LmtG8q7WlPJFdgjXXy+4uw4?=
+ =?us-ascii?Q?QBvTGPLcSQ=3D=3D?=
+X-Exchange-RoutingPolicyChecked: P2hvtxB77ojqBXwluIoE3IcrTEbNoSUhTHq3QntNEJWrTSDsvYxuGoX41AtROaIsdjZojZdEuqxgToturg6wOh3miUHdXpaVu9mpr7HmO5ucCUzA+cxAWiBzZs2kutcLkVPa+l+DNffPaEyxtzBb5BT77eodOovXCEB1St03CQjX8aYsEDkyZ469XpDAKDtCs7Uc2IFi9fciZ4M4ToJIAgWsCPHTnYtZ+jZGq+FPBAt107f16daBr/oN7hY8cPvAsxQZElp3igKgwHOVZkI3emJKvXznP2NLr44x8SY2yu5reudiS/tq6LoD/1QBmunos9eugwge+o1Rxu2wSHGLDQ==
+X-MS-Exchange-CrossTenant-Network-Message-Id: b6acb596-b689-4bd7-92c2-08deb067fae5
+X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8430.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2026 20:49:37.2960
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mApWimxfPJawZ5mDf/jfhWm910dA5FrhM0+85k5knQWi9JFFxhJf/EPPEL1lapcbChXeWFqyuXxpV2rbVXCbeQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR11MB8731
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: A073C529BCA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[lists.freedesktop.org,vger.kernel.org,ffwll.ch,gmail.com,kernel.org,amd.com,davemloft.net,redhat.com,google.com,lankhorst.se,oss.qualcomm.com,intel.com,linux.intel.com];
+	TAGGED_FROM(0.00)[bounces-287297-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email,intel.com:mid,intel.com:dkim];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287296-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[rodrigo.vivi@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[realsil.com.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Action: no action
 
-On 08.05.2026 14:17, javen wrote:
-> From: Javen Xu <javen_xu@realsil.com.cn>
+On Wed, May 13, 2026 at 12:46:02AM +0530, Raag Jadav wrote:
+> Counter helpers deal with counter values. Use the appropriate naming to
+> match with their functionality.
 > 
-> This patch adds support for multi rx queues. RSS requires multi rx
-> queues to receive packets. So we need struct rtl8169_rx_ring for each
-> queue.
-> 
-> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
+> Signed-off-by: Raag Jadav <raag.jadav@intel.com>
+
+Reviewed-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
+
 > ---
-> Changes in v2:
->  - sort some registers by its number
->  - remove some unused definitions, like RX_DESC_RING_TYPE_MAX
->  - change recheck_desc_ownbit type
->  - remove rdsar_reg in rx_ring struct
->  - opts1 are different in rx_desc and rx_desc_rss, move the judgement
->    to Patch 5/7
+>  drivers/gpu/drm/drm_ras.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
 > 
->  drivers/net/ethernet/realtek/r8169_main.c | 264 ++++++++++++++++------
->  1 file changed, 201 insertions(+), 63 deletions(-)
+> diff --git a/drivers/gpu/drm/drm_ras.c b/drivers/gpu/drm/drm_ras.c
+> index d6eab29a1394..03db53d03329 100644
+> --- a/drivers/gpu/drm/drm_ras.c
+> +++ b/drivers/gpu/drm/drm_ras.c
+> @@ -168,8 +168,8 @@ static int get_node_error_counter(u32 node_id, u32 error_id,
+>  	return node->query_error_counter(node, error_id, name, value);
+>  }
+>  
+> -static int msg_reply_value(struct sk_buff *msg, u32 error_id,
+> -			   const char *error_name, u32 value)
+> +static int msg_reply_counter_value(struct sk_buff *msg, u32 error_id,
+> +				   const char *error_name, u32 value)
+>  {
+>  	int ret;
+>  
+> @@ -186,8 +186,8 @@ static int msg_reply_value(struct sk_buff *msg, u32 error_id,
+>  			   value);
+>  }
+>  
+> -static int doit_reply_value(struct genl_info *info, u32 node_id,
+> -			    u32 error_id)
+> +static int doit_reply_counter_value(struct genl_info *info, u32 node_id,
+> +				    u32 error_id)
+>  {
+>  	struct sk_buff *msg;
+>  	struct nlattr *hdr;
+> @@ -210,7 +210,7 @@ static int doit_reply_value(struct genl_info *info, u32 node_id,
+>  	if (ret)
+>  		return ret;
+>  
+> -	ret = msg_reply_value(msg, error_id, error_name, value);
+> +	ret = msg_reply_counter_value(msg, error_id, error_name, value);
+>  	if (ret) {
+>  		genlmsg_cancel(msg, hdr);
+>  		nlmsg_free(msg);
+> @@ -278,7 +278,7 @@ int drm_ras_nl_get_error_counter_dumpit(struct sk_buff *skb,
+>  			break;
+>  		}
+>  
+> -		ret = msg_reply_value(skb, error_id, error_name, value);
+> +		ret = msg_reply_counter_value(skb, error_id, error_name, value);
+>  		if (ret) {
+>  			genlmsg_cancel(skb, hdr);
+>  			break;
+> @@ -317,7 +317,7 @@ int drm_ras_nl_get_error_counter_doit(struct sk_buff *skb,
+>  	node_id = nla_get_u32(info->attrs[DRM_RAS_A_ERROR_COUNTER_ATTRS_NODE_ID]);
+>  	error_id = nla_get_u32(info->attrs[DRM_RAS_A_ERROR_COUNTER_ATTRS_ERROR_ID]);
+>  
+> -	return doit_reply_value(info, node_id, error_id);
+> +	return doit_reply_counter_value(info, node_id, error_id);
+>  }
+>  
+>  /**
+> -- 
+> 2.43.0
 > 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index f02c4aa66b9d..29fcd469eebb 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -74,10 +74,12 @@
->  #define NUM_TX_DESC	256	/* Number of Tx descriptor registers */
->  #define NUM_RX_DESC	256	/* Number of Rx descriptor registers */
->  #define R8169_TX_RING_BYTES	(NUM_TX_DESC * sizeof(struct TxDesc))
-> -#define R8169_RX_RING_BYTES	(NUM_RX_DESC * sizeof(struct RxDesc))
->  #define R8169_TX_STOP_THRS	(MAX_SKB_FRAGS + 1)
->  #define R8169_TX_START_THRS	(2 * R8169_TX_STOP_THRS)
-> +#define R8169_MAX_RX_QUEUES	8
->  #define R8169_MAX_MSIX_VEC	32
-> +#define R8127_MAX_RX_QUEUES	8
-> +#define R8169_DEFAULT_RX_QUEUES	1
->  #define RTL_ISR_VER_DEFAULT	1
->  #define RTL_ISR_VER_8127	6
->  
-> @@ -446,6 +448,7 @@ enum rtl8125_registers {
->  	TxPoll_8125		= 0x90,
->  	LEDSEL3			= 0x96,
->  	MAC0_BKP		= 0x19e0,
-> +	RDSAR_Q1_LOW		= 0x4000,
->  	RSS_CTRL_8125		= 0x4500,
->  	Q_NUM_CTRL_8125		= 0x4800,
->  	EEE_TXIDLE_TIMER_8125	= 0x6048,
-> @@ -733,6 +736,17 @@ enum rtl_dash_type {
->  	RTL_DASH_25_BP,
->  };
->  
-> +struct rtl8169_rx_ring {
-> +	u32 index;					/* Rx queue index */
-> +	u32 cur_rx;					/* Index of next Rx pkt. */
-> +	u32 dirty_rx;					/* Index for recycling. */
-> +	struct RxDesc *rx_desc_array;			/* array of Rx Desc*/
-> +	u32 rx_desc_alloc_size;				/* memory size per descs of ring */
-> +	dma_addr_t rx_desc_phy_addr[NUM_RX_DESC];	/* Rx data buffer physical dma address */
-> +	dma_addr_t rx_phy_addr;				/* Rx desc physical address */
-> +	struct page *rx_databuff[NUM_RX_DESC];		/* Rx data buffers */
-> +};
-> +
->  struct rtl8169_napi {
->  	struct napi_struct napi;
->  	void *priv;
-> @@ -742,6 +756,12 @@ struct rtl8169_irq {
->  	irq_handler_t	handler;
->  	unsigned int	vector;
->  };
-> +
-> +enum rx_desc_ring_type {
-> +	RX_DESC_RING_TYPE_DEFAULT,
-> +	RX_DESC_RING_TYPE_RSS,
-> +};
-> +
->  struct rtl8169_private {
->  	void __iomem *mmio_addr;	/* memory map physical address */
->  	struct pci_dev *pci_dev;
-> @@ -750,17 +770,14 @@ struct rtl8169_private {
->  	struct napi_struct napi;
->  	enum mac_version mac_version;
->  	enum rtl_dash_type dash_type;
-> -	u32 cur_rx; /* Index into the Rx descriptor buffer of next Rx pkt. */
->  	u32 cur_tx; /* Index into the Tx descriptor buffer of next Rx pkt. */
->  	u32 dirty_tx;
->  	struct TxDesc *TxDescArray;	/* 256-aligned Tx descriptor ring */
-> -	struct RxDesc *RxDescArray;	/* 256-aligned Rx descriptor ring */
->  	dma_addr_t TxPhyAddr;
-> -	dma_addr_t RxPhyAddr;
-> -	struct page *Rx_databuff[NUM_RX_DESC];	/* Rx data buffers */
->  	struct ring_info tx_skb[NUM_TX_DESC];	/* Tx data buffers */
->  	struct rtl8169_irq irq_tbl[R8169_MAX_MSIX_VEC];
->  	struct rtl8169_napi r8169napi[R8169_MAX_MSIX_VEC];
-> +	struct rtl8169_rx_ring rx_ring[R8169_MAX_RX_QUEUES];
->  	unsigned int num_rx_rings;
->  	u16 cp_cmd;
->  	u16 tx_lpi_timer;
-> @@ -2643,9 +2660,27 @@ static void rtl_init_rxcfg(struct rtl8169_private *tp)
->  	}
->  }
->  
-> +static void rtl8169_rx_desc_init(struct rtl8169_private *tp)
-> +{
-> +	for (int i = 0; i < tp->num_rx_rings; i++) {
-> +		struct rtl8169_rx_ring *ring = &tp->rx_ring[i];
-> +
-> +		memset(ring->rx_desc_array, 0x0, ring->rx_desc_alloc_size);
-> +	}
-> +}
-> +
->  static void rtl8169_init_ring_indexes(struct rtl8169_private *tp)
->  {
-> -	tp->dirty_tx = tp->cur_tx = tp->cur_rx = 0;
-> +	tp->dirty_tx = 0;
-> +	tp->cur_tx = 0;
-> +
-> +	for (int i = 0; i < tp->hw_supp_num_rx_queues; i++) {
-> +		struct rtl8169_rx_ring *ring = &tp->rx_ring[i];
-> +
-> +		ring->dirty_rx = 0;
-> +		ring->cur_rx = 0;
-> +		ring->index = i;
-> +	}
->  }
->  
->  static void rtl_jumbo_config(struct rtl8169_private *tp)
-> @@ -2710,9 +2745,11 @@ static void rtl_software_parameter_initialize(struct rtl8169_private *tp)
->  
->  	switch (tp->mac_version) {
->  	case RTL_GIGA_MAC_VER_80:
-> +		tp->hw_supp_num_rx_queues = R8127_MAX_RX_QUEUES;
->  		tp->hw_supp_isr_ver = RTL_ISR_VER_8127;
->  		break;
->  	default:
-> +		tp->hw_supp_num_rx_queues = R8169_DEFAULT_RX_QUEUES;
->  		tp->hw_supp_isr_ver = RTL_ISR_VER_DEFAULT;
->  		break;
->  	}
-> @@ -2843,6 +2880,8 @@ static void rtl_set_rx_max_size(struct rtl8169_private *tp)
->  
->  static void rtl_set_rx_tx_desc_registers(struct rtl8169_private *tp)
->  {
-> +	struct rtl8169_rx_ring *ring = &tp->rx_ring[0];
-> +
->  	/*
->  	 * Magic spell: some iop3xx ARM board needs the TxDescAddrHigh
->  	 * register to be written before TxDescAddrLow to work.
-> @@ -2850,8 +2889,16 @@ static void rtl_set_rx_tx_desc_registers(struct rtl8169_private *tp)
->  	 */
->  	RTL_W32(tp, TxDescStartAddrHigh, ((u64) tp->TxPhyAddr) >> 32);
->  	RTL_W32(tp, TxDescStartAddrLow, ((u64) tp->TxPhyAddr) & DMA_BIT_MASK(32));
-> -	RTL_W32(tp, RxDescAddrHigh, ((u64) tp->RxPhyAddr) >> 32);
-> -	RTL_W32(tp, RxDescAddrLow, ((u64) tp->RxPhyAddr) & DMA_BIT_MASK(32));
-> +	RTL_W32(tp, RxDescAddrHigh, ((u64) ring->rx_phy_addr) >> 32);
-> +	RTL_W32(tp, RxDescAddrLow, ((u64) ring->rx_phy_addr) & DMA_BIT_MASK(32));
-> +
-> +	for (int i = 1; i < tp->num_rx_rings; i++) {
-> +		struct rtl8169_rx_ring *ring = &tp->rx_ring[i];
-> +		u16 rdsar_reg = (u16)(RDSAR_Q1_LOW + (i - 1) * 8);
-> +
-> +		RTL_W32(tp, rdsar_reg + 4, ((u64)ring->rx_phy_addr >> 32));
-> +		RTL_W32(tp, rdsar_reg, ((u64)ring->rx_phy_addr) & DMA_BIT_MASK(32));
-> +	}
->  }
->  
->  static void rtl8169_set_magic_reg(struct rtl8169_private *tp)
-> @@ -4198,12 +4245,13 @@ static void rtl8169_mark_to_asic(struct RxDesc *desc)
->  }
->  
->  static struct page *rtl8169_alloc_rx_data(struct rtl8169_private *tp,
-> -					  struct RxDesc *desc)
-> +					  struct rtl8169_rx_ring *ring, unsigned int index)
->  {
->  	struct device *d = tp_to_dev(tp);
->  	int node = dev_to_node(d);
->  	dma_addr_t mapping;
->  	struct page *data;
-> +	struct RxDesc *desc = ring->rx_desc_array + index;
->  
->  	data = alloc_pages_node(node, GFP_KERNEL, get_order(R8169_RX_BUF_SIZE));
->  	if (!data)
-> @@ -4217,55 +4265,101 @@ static struct page *rtl8169_alloc_rx_data(struct rtl8169_private *tp,
->  	}
->  
->  	desc->addr = cpu_to_le64(mapping);
-> +	ring->rx_desc_phy_addr[index] = mapping;
->  	rtl8169_mark_to_asic(desc);
->  
->  	return data;
->  }
->  
-> -static void rtl8169_rx_clear(struct rtl8169_private *tp)
-> +static void rtl8169_rx_clear(struct rtl8169_private *tp, struct rtl8169_rx_ring *ring)
->  {
->  	int i;
->  
-> -	for (i = 0; i < NUM_RX_DESC && tp->Rx_databuff[i]; i++) {
-> +	for (i = 0; i < NUM_RX_DESC && ring->rx_databuff[i]; i++) {
->  		dma_unmap_page(tp_to_dev(tp),
-> -			       le64_to_cpu(tp->RxDescArray[i].addr),
-> +			       ring->rx_desc_phy_addr[i],
->  			       R8169_RX_BUF_SIZE, DMA_FROM_DEVICE);
-> -		__free_pages(tp->Rx_databuff[i], get_order(R8169_RX_BUF_SIZE));
-> -		tp->Rx_databuff[i] = NULL;
-> -		tp->RxDescArray[i].addr = 0;
-> -		tp->RxDescArray[i].opts1 = 0;
-> +		__free_pages(ring->rx_databuff[i], get_order(R8169_RX_BUF_SIZE));
-> +		ring->rx_databuff[i] = NULL;
-> +		ring->rx_desc_phy_addr[i] = 0;
-> +		ring->rx_desc_array[i].addr = 0;
-> +		ring->rx_desc_array[i].opts1 = 0;
->  	}
->  }
->  
-> -static int rtl8169_rx_fill(struct rtl8169_private *tp)
-> +static int rtl8169_rx_fill(struct rtl8169_private *tp, struct rtl8169_rx_ring *ring)
->  {
->  	int i;
->  
->  	for (i = 0; i < NUM_RX_DESC; i++) {
->  		struct page *data;
->  
-> -		data = rtl8169_alloc_rx_data(tp, tp->RxDescArray + i);
-> +		data = rtl8169_alloc_rx_data(tp, ring, i);
->  		if (!data) {
-> -			rtl8169_rx_clear(tp);
-> +			rtl8169_rx_clear(tp, ring);
->  			return -ENOMEM;
->  		}
-> -		tp->Rx_databuff[i] = data;
-> +		ring->rx_databuff[i] = data;
->  	}
->  
->  	/* mark as last descriptor in the ring */
-> -	tp->RxDescArray[NUM_RX_DESC - 1].opts1 |= cpu_to_le32(RingEnd);
-> +	ring->rx_desc_array[NUM_RX_DESC - 1].opts1 |= cpu_to_le32(RingEnd);
->  
->  	return 0;
->  }
->  
-> +static int rtl8169_alloc_rx_desc(struct rtl8169_private *tp)
-> +{
-> +	struct rtl8169_rx_ring *ring;
-> +	struct pci_dev *pdev = tp->pci_dev;
-> +
-> +	for (int i = 0; i < tp->num_rx_rings; i++) {
-> +		ring = &tp->rx_ring[i];
-> +		ring->rx_desc_alloc_size = (NUM_RX_DESC + 1) * sizeof(struct RxDesc);
-
-Why member rx_desc_alloc_size if value is a compile-time constant?
-
-> +		ring->rx_desc_array = dma_alloc_coherent(&pdev->dev,
-> +							 ring->rx_desc_alloc_size,
-> +							 &ring->rx_phy_addr,
-> +							 GFP_KERNEL);
-> +		if (!ring->rx_desc_array)
-> +			return -1;
-> +	}
-> +	return 0;
-> +}
-> +
-> +static void rtl8169_free_rx_desc(struct rtl8169_private *tp)
-> +{
-> +	struct rtl8169_rx_ring *ring;
-> +	struct pci_dev *pdev = tp->pci_dev;
-> +
-> +	for (int i = 0; i < tp->num_rx_rings; i++) {
-> +		ring = &tp->rx_ring[i];
-> +		if (ring->rx_desc_array) {
-> +			dma_free_coherent(&pdev->dev,
-> +					  ring->rx_desc_alloc_size,
-> +					  ring->rx_desc_array,
-> +					  ring->rx_phy_addr);
-> +			ring->rx_desc_array = NULL;
-> +		}
-> +	}
-> +}
-> +
->  static int rtl8169_init_ring(struct rtl8169_private *tp)
->  {
-> +	int retval = 0;
-> +
->  	rtl8169_init_ring_indexes(tp);
-> +	rtl8169_rx_desc_init(tp);
->  
->  	memset(tp->tx_skb, 0, sizeof(tp->tx_skb));
-> -	memset(tp->Rx_databuff, 0, sizeof(tp->Rx_databuff));
->  
-> -	return rtl8169_rx_fill(tp);
-> +	for (int i = 0; i < tp->num_rx_rings; i++) {
-> +		struct rtl8169_rx_ring *ring = &tp->rx_ring[i];
-> +
-> +		memset(ring->rx_databuff, 0, sizeof(ring->rx_databuff));
-> +		retval = rtl8169_rx_fill(tp, ring);
-> +	}
-> +
-> +	return retval;
->  }
->  
->  static void rtl8169_unmap_tx_skb(struct rtl8169_private *tp, unsigned int entry)
-> @@ -4354,16 +4448,23 @@ static void rtl8169_cleanup(struct rtl8169_private *tp)
->  	rtl8169_init_ring_indexes(tp);
->  }
->  
-> -static void rtl_reset_work(struct rtl8169_private *tp)
-> +static void rtl8169_rx_desc_reset(struct rtl8169_private *tp)
->  {
-> -	int i;
-> +	for (int i = 0; i < tp->num_rx_rings; i++) {
-> +		struct rtl8169_rx_ring *ring = &tp->rx_ring[i];
->  
-> +		for (int j = 0; j < NUM_RX_DESC; j++)
-> +			rtl8169_mark_to_asic(ring->rx_desc_array + j);
-> +	}
-> +}
-> +
-> +static void rtl_reset_work(struct rtl8169_private *tp)
-> +{
->  	netif_stop_queue(tp->dev);
->  
->  	rtl8169_cleanup(tp);
->  
-> -	for (i = 0; i < NUM_RX_DESC; i++)
-> -		rtl8169_mark_to_asic(tp->RxDescArray + i);
-> +	rtl8169_rx_desc_reset(tp);
->  
->  	rtl8169_napi_enable(tp);
->  	rtl_hw_start(tp);
-> @@ -4757,6 +4858,11 @@ static void rtl8169_pcierr_interrupt(struct net_device *dev)
->  	rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_PENDING);
->  }
->  
-> +static void rtl8169_desc_quirk(struct rtl8169_private *tp)
-> +{
-> +	RTL_R8(tp, LED_CTRL);
-> +}
-> +
->  static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
->  		   int budget)
->  {
-> @@ -4809,9 +4915,10 @@ static inline int rtl8169_fragmented_frame(u32 status)
->  	return (status & (FirstFrag | LastFrag)) != (FirstFrag | LastFrag);
->  }
->  
-> -static inline void rtl8169_rx_csum(struct sk_buff *skb, u32 opts1)
-> +static inline void rtl8169_rx_csum(struct sk_buff *skb,
-> +				   struct RxDesc *desc)
->  {
-> -	u32 status = opts1 & (RxProtoMask | RxCSFailMask);
-> +	u32 status = le32_to_cpu(desc->opts1) & (RxProtoMask | RxCSFailMask);
->  
->  	if (status == RxProtoTCP || status == RxProtoUDP)
->  		skb->ip_summed = CHECKSUM_UNNECESSARY;
-> @@ -4819,22 +4926,58 @@ static inline void rtl8169_rx_csum(struct sk_buff *skb, u32 opts1)
->  		skb_checksum_none_assert(skb);
->  }
->  
-> -static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, int budget)
-> +static bool rtl8169_check_rx_desc_error(struct net_device *dev,
-> +					struct rtl8169_private *tp,
-> +					u32 status)
-> +{
-> +	if (unlikely(status & RxRES)) {
-> +		if (status & (RxRWT | RxRUNT))
-> +			dev->stats.rx_length_errors++;
-> +		if (status & RxCRC)
-> +			dev->stats.rx_crc_errors++;
-> +		return true;
-> +	}
-> +	return false;
-> +}
-> +
-> +static inline void rtl8169_set_desc_dma_addr(struct RxDesc *desc,
-> +					     dma_addr_t mapping)
-> +{
-> +	desc->addr = cpu_to_le64(mapping);
-> +}
-> +
-> +static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp,
-> +		  struct rtl8169_rx_ring *ring, int budget)
->  {
->  	struct device *d = tp_to_dev(tp);
->  	int count;
->  
-> -	for (count = 0; count < budget; count++, tp->cur_rx++) {
-> -		unsigned int pkt_size, entry = tp->cur_rx % NUM_RX_DESC;
-> -		struct RxDesc *desc = tp->RxDescArray + entry;
-> +	for (count = 0; count < budget; count++, ring->cur_rx++) {
-> +		unsigned int pkt_size, entry = ring->cur_rx % NUM_RX_DESC;
-> +		struct RxDesc *desc = ring->rx_desc_array + entry;
->  		struct sk_buff *skb;
->  		const void *rx_buf;
->  		dma_addr_t addr;
->  		u32 status;
->  
->  		status = le32_to_cpu(READ_ONCE(desc->opts1));
-> -		if (status & DescOwn)
-> -			break;
-> +
-> +		if (status & DescOwn) {
-> +			if (!tp->recheck_desc_ownbit)
-> +				break;
-> +
-> +			/* Workaround for a hardware issue:
-> +			 * Hardware might trigger RX interrupt before the DMA
-> +			 * engine fully updates RX desc ownbit in host memory.
-> +			 * So we do a quirk and re-read to avoid missing RX
-> +			 * packets.
-> +			 */
-> +			tp->recheck_desc_ownbit = false;
-> +			rtl8169_desc_quirk(tp);
-> +			status = le32_to_cpu(READ_ONCE(desc->opts1));
-> +			if (status & DescOwn)
-> +				break;
-> +		}
->  
->  		/* This barrier is needed to keep us from reading
->  		 * any other fields out of the Rx descriptor until
-> @@ -4842,20 +4985,14 @@ static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, int budget
->  		 */
->  		dma_rmb();
->  
-> -		if (unlikely(status & RxRES)) {
-> +		if (rtl8169_check_rx_desc_error(dev, tp, status)) {
->  			if (net_ratelimit())
->  				netdev_warn(dev, "Rx ERROR. status = %08x\n",
->  					    status);
->  			dev->stats.rx_errors++;
-> -			if (status & (RxRWT | RxRUNT))
-> -				dev->stats.rx_length_errors++;
-> -			if (status & RxCRC)
-> -				dev->stats.rx_crc_errors++;
->  
->  			if (!(dev->features & NETIF_F_RXALL))
->  				goto release_descriptor;
-> -			else if (status & RxRWT || !(status & (RxRUNT | RxCRC)))
-> -				goto release_descriptor;
->  		}
->  
->  		pkt_size = status & GENMASK(13, 0);
-> @@ -4871,14 +5008,14 @@ static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, int budget
->  			goto release_descriptor;
->  		}
->  
-> -		skb = napi_alloc_skb(&tp->r8169napi[0].napi, pkt_size);
-> +		skb = napi_alloc_skb(&tp->r8169napi[ring->index].napi, pkt_size);
->  		if (unlikely(!skb)) {
->  			dev->stats.rx_dropped++;
->  			goto release_descriptor;
->  		}
->  
-> -		addr = le64_to_cpu(desc->addr);
-> -		rx_buf = page_address(tp->Rx_databuff[entry]);
-> +		addr = ring->rx_desc_phy_addr[entry];
-> +		rx_buf = page_address(ring->rx_databuff[entry]);
->  
->  		dma_sync_single_for_cpu(d, addr, pkt_size, DMA_FROM_DEVICE);
->  		prefetch(rx_buf);
-> @@ -4887,7 +5024,7 @@ static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, int budget
->  		skb->len = pkt_size;
->  		dma_sync_single_for_device(d, addr, pkt_size, DMA_FROM_DEVICE);
->  
-> -		rtl8169_rx_csum(skb, status);
-> +		rtl8169_rx_csum(skb, desc);
->  		skb->protocol = eth_type_trans(skb, dev);
->  
->  		rtl8169_rx_vlan_tag(desc, skb);
-> @@ -4895,10 +5032,11 @@ static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, int budget
->  		if (skb->pkt_type == PACKET_MULTICAST)
->  			dev->stats.multicast++;
->  
-> -		napi_gro_receive(&tp->r8169napi[0].napi, skb);
-> +		napi_gro_receive(&tp->r8169napi[ring->index].napi, skb);
->  
->  		dev_sw_netstats_rx_add(dev, pkt_size);
->  release_descriptor:
-> +		rtl8169_set_desc_dma_addr(desc, ring->rx_desc_phy_addr[entry]);
->  		rtl8169_mark_to_asic(desc);
->  	}
->  
-> @@ -4925,6 +5063,7 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
->  		phy_mac_interrupt(tp->phydev);
->  
->  	rtl_irq_disable(tp);
-> +	tp->recheck_desc_ownbit = true;
->  	napi_schedule(&napi->napi);
->  out:
->  	rtl_ack_events(tp, status);
-> @@ -5006,7 +5145,8 @@ static int rtl8169_poll(struct napi_struct *napi, int budget)
->  
->  	rtl_tx(dev, tp, budget);
->  
-> -	work_done = rtl_rx(dev, tp, budget);
-> +	for (int i = 0; i < tp->num_rx_rings; i++)
-> +		work_done += rtl_rx(dev, tp, &tp->rx_ring[i], budget);
->  
->  	if (work_done < budget && napi_complete_done(napi, work_done))
->  		rtl_irq_enable(tp);
-> @@ -5134,21 +5274,19 @@ static int rtl8169_close(struct net_device *dev)
->  	struct pci_dev *pdev = tp->pci_dev;
->  
->  	pm_runtime_get_sync(&pdev->dev);
-> -
->  	netif_stop_queue(dev);
->  	rtl8169_down(tp);
-> -	rtl8169_rx_clear(tp);
-> +	for (int i = 0; i < tp->num_rx_rings; i++)
-> +		rtl8169_rx_clear(tp, &tp->rx_ring[i]);
->  
->  	rtl8169_free_irq(tp);
->  
->  	phy_disconnect(tp->phydev);
->  
-> -	dma_free_coherent(&pdev->dev, R8169_RX_RING_BYTES, tp->RxDescArray,
-> -			  tp->RxPhyAddr);
->  	dma_free_coherent(&pdev->dev, R8169_TX_RING_BYTES, tp->TxDescArray,
->  			  tp->TxPhyAddr);
->  	tp->TxDescArray = NULL;
-> -	tp->RxDescArray = NULL;
-> +	rtl8169_free_rx_desc(tp);
->  
->  	pm_runtime_put_sync(&pdev->dev);
->  
-> @@ -5179,13 +5317,11 @@ static int rtl_open(struct net_device *dev)
->  	tp->TxDescArray = dma_alloc_coherent(&pdev->dev, R8169_TX_RING_BYTES,
->  					     &tp->TxPhyAddr, GFP_KERNEL);
->  	if (!tp->TxDescArray)
-> -		goto out;
-> -
-> -	tp->RxDescArray = dma_alloc_coherent(&pdev->dev, R8169_RX_RING_BYTES,
-> -					     &tp->RxPhyAddr, GFP_KERNEL);
-> -	if (!tp->RxDescArray)
->  		goto err_free_tx_0;
->  
-> +	if (rtl8169_alloc_rx_desc(tp) < 0)
-> +		goto err_free_rx_1;
-> +
->  	retval = rtl8169_init_ring(tp);
->  	if (retval < 0)
->  		goto err_free_rx_1;
-> @@ -5212,11 +5348,10 @@ static int rtl_open(struct net_device *dev)
->  	rtl8169_free_irq(tp);
->  err_release_fw_2:
->  	rtl_release_firmware(tp);
-> -	rtl8169_rx_clear(tp);
-> +	for (int i = 0; i < tp->num_rx_rings; i++)
-> +		rtl8169_rx_clear(tp, &tp->rx_ring[i]);
->  err_free_rx_1:
-> -	dma_free_coherent(&pdev->dev, R8169_RX_RING_BYTES, tp->RxDescArray,
-> -			  tp->RxPhyAddr);
-> -	tp->RxDescArray = NULL;
-> +	rtl8169_free_rx_desc(tp);
->  err_free_tx_0:
->  	dma_free_coherent(&pdev->dev, R8169_TX_RING_BYTES, tp->TxDescArray,
->  			  tp->TxPhyAddr);
-> @@ -5726,7 +5861,10 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->  	u32 txconfig;
->  	u32 xid;
->  
-> -	dev = devm_alloc_etherdev(&pdev->dev, sizeof (*tp));
-> +	dev = devm_alloc_etherdev_mqs(&pdev->dev, sizeof(*tp),
-> +				      1,
-> +				      R8169_MAX_RX_QUEUES);
-> +
->  	if (!dev)
->  		return -ENOMEM;
->  
-
 
