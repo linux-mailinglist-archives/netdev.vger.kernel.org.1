@@ -1,238 +1,276 @@
-Return-Path: <netdev+bounces-287300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287301-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gOXOG+GSA2pz7gEAu9opvQ
-	(envelope-from <netdev+bounces-287300-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:51:45 +0200
+	id wBn+HY2UA2q37gEAu9opvQ
+	(envelope-from <netdev+bounces-287301-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:58:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13F4E529968
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:51:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA030529BE9
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 22:58:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1F7E43021BC8
-	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 20:51:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2C96E30EB0BA
+	for <lists+netdev@lfdr.de>; Tue, 12 May 2026 20:54:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 316243C9EF4;
-	Tue, 12 May 2026 20:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F8C3C345A;
+	Tue, 12 May 2026 20:53:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YKDuELNx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gCzbgDxb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70FA03C3795
-	for <netdev@vger.kernel.org>; Tue, 12 May 2026 20:51:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778619087; cv=none; b=XdwKon2zNSkO5kJtg4RHDAh85JhEW1vGKRBS3YgCyy0gcFqWM86d4m3KfuUs1AWIbKet2R1iVPAUZ+vtl90OhwhzdSWCOL7iiJTIHjI9Jteu2vNB0v/TS+ZvDw9PKb1KEx98gXX9qMBYYyKkhl5v090KLE7YKm9s4ARJO4lDY84=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778619087; c=relaxed/simple;
-	bh=J5gmNSPNQxxcqs8XDR9P+NOgy6ibnVJAuMTAtqZpUZ4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ovQAGLI3wgbEMHCvJ/OK7EUbuDwD+uorchM7QDBTvQtFmEEMZ2HG8SiKT6/PkIcLsFIEUckYUNb8MiO2RCupqXFnoK828MmDM7rt9ZIYti151J1m2yZvEeczlEw+t8BnIfbbb7BOqdNgkcsytRX/LVmgd3kw5L2UgoZtCJkk/WM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YKDuELNx; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E668140855
+	for <netdev@vger.kernel.org>; Tue, 12 May 2026 20:53:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778619239; cv=pass; b=i4q9dY25MZYhTxmhfkvX0mtRPMGFbWqeBKS7sxZfu7avxHBgbMxsVjvWziIRohnrPWBOCvzFKF2PRenTOCUFYBVYMqI6GTLXy+UqoGKox9QtXAGkfhPw7AkzSS4pDSChQazjhN1P86heDAcI7T0yVeFyLHQC5UI9loc2tceZmEE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778619239; c=relaxed/simple;
+	bh=uVDdxovl8BEZRGiUt5lo0AdiXLLC3ZtT7UawYlMre8s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QInDITq6CiGxo7nkhq5qkKSEFzt1JpkDnwlcuuAo4vmSl9Qo/I4oit9exMwQOAQsm9/GfA2CBGNWQaDD+4IR2YQjumgT03WFFwb7GRTH1mx/BTz0JrdGEd5+Bcj86fejjJFAjIZyRMkjWoKhn5ihePgpqCRzJJ4p4rGrxo/3/UY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gCzbgDxb; arc=pass smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-90caad2e944so166579885a.2
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 13:51:23 -0700 (PDT)
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-67bc6098640so9608460a12.0
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 13:53:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778619236; cv=none;
+        d=google.com; s=arc-20240605;
+        b=CcBjl5XI1GJwMV2+25x+gT5/97zazs3Do+SSnfrLlSo2ME7rDiQHOSDXxe6tLU5jSA
+         A2YQcUVBKeZHg/I6xz0cRJ3xWkRVkVD3jTeU0+tojOvNYFvlusH2zhJzfa7CxScUL83N
+         ujfOMh0auLoeW4XBexUqJgIOYOuAbzPkAlSVZTSZ/nC2vtPgetCCJSXa0VPDcOTwgh5E
+         YjxOW13B/KfukJBZfs4fcMNTn0JP+uLUkdFu+UHfyns0+96BGIwk2Th2Bi5WLIIWTe6x
+         SjJKEZjSz9crAhhd4Zi+n/bBrsR78sLehmm/7QBUOiDBsW60GGXSvActX4igl6lXmGi5
+         IDAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=RbcJK6vCoZqA+nNfHhXD+KaqnS5ArNZN7XG3rTFznHs=;
+        fh=CtXAUHG5hXeQXUYJSxxeRoaVJVFL1X1w/SfKr1Ij600=;
+        b=fOUwudgGUkJTwHpu1HEwCOnL/HjUWJp/udpWzQy1LmOdXx2QB5LQqisfbHTcQNehXB
+         ATY0rshn0s1fLba7A4EgBvR5PeZsuomLhvZDH1yazvVGXUM4lYz0X+eUJ7t0QRvH1fHy
+         gmqFxv+sIxauTtwgkL8Hj1zcUhTGpFhXrKz8tMHy+ZaS98xY3ZgMHT1SFbw/uTUr7WXV
+         javCthYwvmFMLDKBXsdSLMU45XoX0O4hCLturbv2Ad6ZboR9IWNR0JRuvm+bZVBA7CJY
+         +aiYX4fr4tOQ/NtgcW3Z4d7F/yn6Po9WrQxJJJZm7A1qP5aCKCpT/JrYGGih6MC11R2Y
+         hKaQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778619082; x=1779223882; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RpARctubxx8lA4XtZtvDCBF0ktNsLEKbeHjau0kupPc=;
-        b=YKDuELNxPRrDXZRddMTCvxBXg7tuOMXxHNohdJP86e9wVCAjhJQf0FWbA8tMPE3TEk
-         lRKj2tBaUEN1lrjuK/HrsJpEHPlT1YZqUJWK0puHJjVn+g5/GnI/oa3YI6/Al2df2f1E
-         r0bJ17t477l3849Whf3YPA8IrqxYJspTaGMQb7MQdIKZzrpoKOArn25n5m3k8PYXX2cH
-         TzKA58WKiCi9QSfjOBAjypwkiKq8tZK/+NXaggA94FUI+2Q1XYAfRksslU0WhItrrQqr
-         +hYrX93WSpcUo1MOOaLU1iyk43fL2Nn8GZSBJEyWbFPNoqiveHZJH/KlL6lWwkllAUgq
-         rFjQ==
+        d=gmail.com; s=20251104; t=1778619236; x=1779224036; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=RbcJK6vCoZqA+nNfHhXD+KaqnS5ArNZN7XG3rTFznHs=;
+        b=gCzbgDxbXrJfvWBt0tqTY7OQn6x3+5Pz3Qi94lpVdIPjv9Yl7KSq53CGzbS9gZ2C+l
+         xNR8UmOhkzNA06YiWb26cyr4L1ZRAO3WCD4yDOJvOw7x6A5HKPBFFLFsVd51EQCRMgOD
+         n5DqHAtolhnmXkjsQcOqSV6nyl/Qn+h0cVQxPLswOArnKXVNmTYnkm8KaKVQ6/FW80dj
+         TjU5Rvd38NlhGvxSTKNZZ6yBne79hfTVHFbgm+0mKtXJ21S2J5FMiYfhOOLlGTCLwW+u
+         MhvKh34G48Ysphv1yQrGiV3pyusRqv87zKN5pDbqdTza9w8a13DP7sFij+u9JU5CIphg
+         Vr4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778619082; x=1779223882;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=RpARctubxx8lA4XtZtvDCBF0ktNsLEKbeHjau0kupPc=;
-        b=YuTK8t1LmyMAK3yQjrQEceZGjEwGo+n7NxqK4LFV7dESkrhwXg9KGxKC7oSDmWfxmm
-         P5d5b70kz0f9/2R5TSpg1rPntiQ6u6FBw6zJwWokL6JOxJs2GVzwXfgkotL1UM0XZEfm
-         c5kzKVbtKY9H1ViUXkOgUKDMXtGPWrBWXXexg943ixsdmfFn/uY7Qh5KRBI7fQNNEo8f
-         NmluUq97nLXBCrDsevcQ4e7YX5Pni8NoJUvHSq/oHNqw/dZbQBYf7zJ3qQ8pUdLzTOSz
-         XrsUDF4kp4SsYahf9xJQUqscEe2CkMomtO70rW/WTtfIqst5khEgYrJ8Oj7g2tIKoyoA
-         UWyQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+R8NbG5Ba8IItnEVDUl+GpPfkzGqNrFw1XokgQmgzJg32xUagKqXESSi/Rf3LWOhwHxLznKbs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh8dri4kXslv+jVtJ8kPpgfJOV+1CYwSnGmTeMTy8kdUFEjzhg
-	H9glCNBUQjEetZ8C86/6oAFxQGxPxCs0R3hnYq3fzfw0p9wghPZiVpvp
-X-Gm-Gg: Acq92OGtIqA1nrn7kTB/RIIJudrqKy3vB07dggBSfOLsZWasUba+igrpScumsfgr2Tu
-	OWMYWxBcw/IRUJf9mAqruDR0rMINYPHVWNsxth2EhSmGDhqFnY2nZtmH9BkBOKb6x14I+qUK6cL
-	dyH+yDTZhAnmgK4CUGCZA6I7G0Lon7NqEncBozN46uHFQd0Yfe19BzkCJnCMtGpzxd0oNbi9WK0
-	87EyFr81yEGpYu5ug4XSCcoj4N3lki9v2MscAG5ueeMzIwjZ7D15ULKECxKJ2/OgMJ82wGwOjVM
-	rTPE1x9D3hQoEzYKyRQD4bK/YUpw5z/UP7u9CJd3405FVksnK3d/NZyOlVACNMkVjZmdNpPiG3q
-	vElWny5orzT9g8A/SLiN1vOzAjKy9FG/JauMh2akUYBjDx+N6xF0BIAMyLlyCst8KNqSiaUAkL+
-	JB+caJn/IQdMYyKmWL3vbXPtnNlRTURXt4zZo3AW2+3fRBn9TMsnDlOY/8/W7HcxyoRM/s1ps5B
-	203Iwg/zDrNZ2l3OlLlLQa/tQ8C/8dxdZN1LpZHZVQ=
-X-Received: by 2002:a05:620a:7003:b0:8eb:10d4:a46c with SMTP id af79cd13be357-90facf9e383mr9443985a.35.1778619082195;
-        Tue, 12 May 2026 13:51:22 -0700 (PDT)
-Received: from server0.tail6e7dd.ts.net (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-907b8d9eed0sm1490734285a.19.2026.05.12.13.51.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 May 2026 13:51:21 -0700 (PDT)
-From: Michael Bommarito <michael.bommarito@gmail.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Maciej Zenczykowski <maze@google.com>,
-	Kees Cook <kees@kernel.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	"Gustavo A . R . Silva" <gustavoars@kernel.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net 2/2] ipv4: ah: harden ah_output options-copy guard against ihl < 5
-Date: Tue, 12 May 2026 16:51:15 -0400
-Message-ID: <423b9ce3b45782c09a2fd9c65ad6674a9abb7c72.1778614451.git.michael.bommarito@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <cover.1778614451.git.michael.bommarito@gmail.com>
-References: <cover.1778614451.git.michael.bommarito@gmail.com>
+        d=1e100.net; s=20251104; t=1778619236; x=1779224036;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RbcJK6vCoZqA+nNfHhXD+KaqnS5ArNZN7XG3rTFznHs=;
+        b=GaqNy7fIEtJRUQ4bNBe3LfJ63AgJSCvwFwDC6VfWZLuZ5JEtBpbB2V1K6x+IxX3t6s
+         nKZUuLlI9/kvL6uBlp5zH2a7bxyRhEtteot1tPXLNODQM8QH7zfEQp2m7xLF42iCmxBX
+         WG46bdxUUGNb2r42eg4RYIKdBsS/JfhdQO1nfotfkHJKY1WvSGFmxYgVFGwFFNqfLpsO
+         S0GjTr2Zq1SXTHAx51o5aDgxdmbaYNqxotMdShnSR5FXHxryMnTcbDQdwapVYI43sQYo
+         GxbE9e/bRNTyGAiXTnu/PCqmhZa1VQt1ZXOqidlW7uwidKCsxA21mrhtjz4nrpLuXMWb
+         y4cg==
+X-Forwarded-Encrypted: i=1; AFNElJ8+78kr6wJT17ADLllvNc9QTi/x5nGIBECPAckQjATzel7LTOVk78mj/AKbaT9X8ScARdsZTp8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/L/2maYZ7E8eVlQgri5t53QtEWLm7ofxxElgvE0NCqSfEuUaD
+	b2fRtyjLf4aH8J588Fca9CxcX4nZEbAPzjdbUUmkZ+dr3pDUaek6CwSDVvad2nysHoAKVpxZekR
+	QGsGUDrB+R2LXiplrw1n44a/gSXUKxZn0mB3H
+X-Gm-Gg: Acq92OFXw9S9m4VQYkMaOWFLnURVeNxzkK1RoeJt5uZJzdeInGAha2wCKF5sS6UQrxv
+	3zqkSr7Auesd3e8maM7fYs12O8Y8tzoK2eTGrj1yyEVHmZFD7ygKxcsMmkVlrsw+wmWmpqYQgfS
+	L0qh/YPAwc9F916YHtgHUBeCt4zAZgMcPDxzC1oPw8WpMERHnY1XzWbHN4DrkXLd0rr0HOcUU+d
+	c9t+x6RH6AMYTzRukR1oIoIugd08D6o2eWUeXvozmwzM9l6WCxZvLLn9QmyCSIw0ZRfmfrrxKvo
+	8Qh6SDhU
+X-Received: by 2002:a17:906:5191:20b0:bad:f5dd:6740 with SMTP id
+ a640c23a62f3a-bd3bf773c89mr21012966b.3.1778619236128; Tue, 12 May 2026
+ 13:53:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 13F4E529968
+References: <20260506-realtek_forward-v3-7-1d87c5f85a3b@gmail.com>
+ <20260510173516.3920093-1-kuba@kernel.org> <0cbce7f4-e7e5-4a03-bde8-4a62556c3b12@yahoo.com>
+In-Reply-To: <0cbce7f4-e7e5-4a03-bde8-4a62556c3b12@yahoo.com>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Tue, 12 May 2026 17:53:42 -0300
+X-Gm-Features: AVHnY4IqkvaoisxcFLOoBpgP3wFTkF4yL6KKJ7O6tZLxky8WX6LyNVP8dRPXkQQ
+Message-ID: <CAJq09z6NU4asJiEdMo9gJHkOjiUKcGAMjRb2Dmc3oM1CY8XVRQ@mail.gmail.com>
+Subject: Re: [net-next PATCH v3 7/8] net: dsa: realtek: rtl8365mb: add FDB support
+To: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, horms@kernel.org, linusw@kernel.org, 
+	alsi@bang-olufsen.dk, yury.norov@gmail.com, linux@rasmusvillemoes.dk, 
+	linux@armlinux.org.uk, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jakub Kicinski <kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: EA030529BE9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287300-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-287301-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_TO(0.00)[yahoo.com];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-ah_output() and ah_output_done() copy the IPv4 options area with
+> On 5/10/2026 7:35 PM, Jakub Kicinski wrote:
+> > This is an AI-generated review of your patch. The human sending this
+> > email has considered the AI review valid, or at least plausible.
+> > ---
+> > net: dsa: realtek: rtl8365mb: add FDB support
+> >
+> > Implement support for FDB and MDB management for the RTL8365MB series
+> > switches. Introduce a mutex lock (l2_lock) to protect concurrent L2 table
+> > updates. Add support for forwarding database operations, including unicast
+> > and multicast entry handling as well as fast aging support.
+> >
+> >> diff --git a/drivers/net/dsa/realtek/rtl8365mb_l2.c b/drivers/net/dsa/realtek/rtl8365mb_l2.c
+> >> --- /dev/null
+> >> +++ b/drivers/net/dsa/realtek/rtl8365mb_l2.c
+> >
+> > [ ... ]
+> >
+> >> +static void rtl8365mb_l2_data_to_uc(const u16 *data, struct rtl8365mb_l2_uc *uc)
+> >> +{
+> >
+> > [ ... ]
+> >
+> >> +    uc->key.efid = FIELD_GET(RTL8365MB_L2_UC_D4_EFID_MASK, data[4]);
+> >> +    uc->key.vid = FIELD_GET(RTL8365MB_L2_UC_D3_VID_MASK, data[3]);
+> >> +    uc->key.ivl = FIELD_GET(RTL8365MB_L2_UC_D3_IVL_MASK, data[3]);
+> >> +    uc->key.fid = FIELD_GET(RTL8365MB_L2_UC_D4_FID_MASK, data[4]);
+> >
+> > Because vid and fid share the same union memory in struct rtl8365mb_l2_uc_key,
+> > does setting fid immediately after vid overwrite the 12-bit vid value with
+> > the 4-bit fid value?
+>
+> Change code to:
+>
+> uc->key.efid = FIELD_GET(RTL8365MB_L2_UC_D4_EFID_MASK, data[4]);
+> uc->key.ivl  = FIELD_GET(RTL8365MB_L2_UC_D3_IVL_MASK, data[3]);
+>
+> if (uc->key.ivl)
+>         uc->key.vid = FIELD_GET(RTL8365MB_L2_UC_D3_VID_MASK, data[3]);
+> else
+>         uc->key.fid = FIELD_GET(RTL8365MB_L2_UC_D4_FID_MASK, data[4]);
+>
 
-    if (top_iph->ihl != 5) {
-        memcpy(dst, src, top_iph->ihl * 4 - sizeof(struct iphdr));
-    }
+Thanks Mieczyslaw,
 
-The "!= 5" guard correctly excludes the no-options case (ihl == 5)
-and allows ihl > 5 where options are present.  It does NOT exclude
-ihl < 5.  For ihl in [0, 4], top_iph->ihl * 4 is less than
-sizeof(struct iphdr) (20); the subtraction is computed as int,
-becomes negative, and is then implicitly converted to size_t at
-the memcpy() call.  The resulting length is close to SIZE_MAX and
-memcpy walks off the slab allocation backing the skb's network
-header.
+It is a little more complicated than that. There are three FIDs in a
+Unicast L2 table:
 
-With the preceding patch ("ipv4: raw: reject IP_HDRINCL packets
-with ihl < 5") in place, an ihl < 5 packet from a raw IP_HDRINCL
-socket is rejected before it reaches the local-output path.
-However, post-LOCAL_OUT hook mangling (nftables payload-set,
-NFQUEUE reinject) can still rewrite the IPv4 header after the
-raw_send_hdrinc validation has run and deliver an ihl < 5 packet
-to ah_output().  Reachability of this path requires CAP_NET_ADMIN
-in the relevant netns; it is a smaller class than the original
-CAP_NET_RAW path but it is not zero.
+RTL8367C:
+        15  14  13  12  11  10   9   8   7   6   5   4   3   2   1   0
+        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+Index 0 |     MAC Octet [4] (High)      |      MAC Octet [5] (Low)      |
+        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+Index 1 |     MAC Octet [2] (High)      |      MAC Octet [3] (Low)      |
+        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+Index 2 |     MAC Octet [0] (High)      |      MAC Octet [1] (Low)      |
+        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+        | S |   | I | L |               |                               |
+Index 3 | P | 0 | V | 3 |               CVID / FID                      |
+        | A |   | L | L |               (12 bits)                       |
+        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+        | S |   |       |               | S |           |               |
+Index 4 | A | A |  AGE  |      SPA      | A |    FID    |     EFID      |
+        | B | U |       |    (bits 2-0) | E |           |               |
+        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+        |                               | N | F |       |       | D |
+Index 5 |           (Reserved)          | O | W | (Res) |  PRI  | A |
+        |                               | S | D |       |       | B |
+        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-Independently of the post-LOCAL_OUT mangling question, the AH
-consumer should not contain a memcpy whose size is derived from
-an attacker-influenced field without a floor.  Change the guard
-to "top_iph->ihl > 5" at all three sites:
+One shared between CVID/FID (word 3), and two FID/EFID in work 4.
 
-  - ah_output_done() (the .complete callback path)
-  - ah_output()      (the synchronous options-copy site)
-  - ah_output()      (the post-hash restore site)
+For Unicast entries, the vendor code just store CVID/FID in a cvid
+unconditionally:
 
-Behavior for valid packets (ihl in {5, 6, ..., 15}) is unchanged.
-For malformed packets with ihl < 5, the options copy is cleanly
-skipped; the malformed field no longer becomes a huge memcpy
-length.  This is the defense-in-depth half of the series; the
-upstream sanity check in the preceding patch is the primary fix.
+       pL2_entry->ivl       = l2Table.ivl_svl;
+       pL2_entry->cvid      = l2Table.cvid_fid;
+       pL2_entry->fid       = l2Table.fid;
 
-A mirror-pattern audit found no analogous bug in ah_input(),
-ip_clear_mutable_options(), or net/ipv6/ah6.c (IPv6 has a
-fixed-length header and no IP_HDRINCL equivalent for crafting an
-ihl < 5 ipv6hdr).
+Only for Multicast that it uses that condition:
 
-Reproduced on UML + KASAN: kernel-mode fault at addr 0x0 with
-memcpy_orig at the crash site on a pre-fix kernel.  The AH guard
-was verified by forcing the same packets through xfrm: the xfrm
-state counter incremented and no KASAN splat or panic occurred.
-With the preceding patch in this series, the original raw
-IP_HDRINCL path is rejected before AH.
+       if(l2Table.ivl_svl == 1) /* IVL */
+       {
+           pL2_entry->cvid      = l2Table.cvid_fid;
+           pL2_entry->fid       = 0;
+       }
+       else /* SVL*/
+       {
+           pL2_entry->cvid      = 0;
+           pL2_entry->fid       = l2Table.cvid_fid;
+       }
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-4-7
-Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
----
- net/ipv4/ah4.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+So, for unicast entries, we need dedicated fid/efid struct fields and
+that cvid_fid is always cvid.
 
-diff --git a/net/ipv4/ah4.c b/net/ipv4/ah4.c
-index 4366cbac3f06..8fa31bdf9792 100644
---- a/net/ipv4/ah4.c
-+++ b/net/ipv4/ah4.c
-@@ -137,7 +137,7 @@ static void ah_output_done(void *data, int err)
- 	top_iph->tos = iph->tos;
- 	top_iph->ttl = iph->ttl;
- 	top_iph->frag_off = iph->frag_off;
--	if (top_iph->ihl != 5) {
-+	if (top_iph->ihl > 5) {
- 		top_iph->daddr = iph->daddr;
- 		memcpy(top_iph+1, iph+1, top_iph->ihl*4 - sizeof(struct iphdr));
- 	}
-@@ -197,7 +197,7 @@ static int ah_output(struct xfrm_state *x, struct sk_buff *skb)
- 	iph->ttl = top_iph->ttl;
- 	iph->frag_off = top_iph->frag_off;
- 
--	if (top_iph->ihl != 5) {
-+	if (top_iph->ihl > 5) {
- 		iph->daddr = top_iph->daddr;
- 		memcpy(iph+1, top_iph+1, top_iph->ihl*4 - sizeof(struct iphdr));
- 		err = ip_clear_mutable_options(top_iph, &top_iph->daddr);
-@@ -253,7 +253,7 @@ static int ah_output(struct xfrm_state *x, struct sk_buff *skb)
- 	top_iph->tos = iph->tos;
- 	top_iph->ttl = iph->ttl;
- 	top_iph->frag_off = iph->frag_off;
--	if (top_iph->ihl != 5) {
-+	if (top_iph->ihl > 5) {
- 		top_iph->daddr = iph->daddr;
- 		memcpy(top_iph+1, iph+1, top_iph->ihl*4 - sizeof(struct iphdr));
- 	}
--- 
-2.53.0
+According to the delete method, the Unicast key is (MAC, IVL/SVL, FID, EFID):
 
+    /* fill key (MAC,FID) to get L2 entry */
+   memcpy(l2Table.mac.octet, pMac->octet, ETHER_ADDR_LEN);
+   l2Table.ivl_svl     = pL2_data->ivl;
+   l2Table.cvid_fid    = pL2_data->cvid;
+   l2Table.fid         = pL2_data->fid;
+   l2Table.efid        = pL2_data->efid;
+
+The union just makes sense for multicast. The multicast key is (MAC,
+IVL/SVL, VID/FID), without extra FID/EFID. The same delete code but
+for multicast is:
+
+   /* fill key (MAC,FID) to get L2 entry */
+   memcpy(l2Table.mac.octet, pMcastAddr->mac.octet, ETHER_ADDR_LEN);
+   l2Table.ivl_svl     = pMcastAddr->ivl;
+   if(pMcastAddr->ivl)
+       l2Table.cvid_fid    = pMcastAddr->vid;
+   else
+       l2Table.cvid_fid    = pMcastAddr->fid;
+
+And without FID/EFID, we can have collisions between different bridges.
+
+I'm also preparing the code for other families
+(RTL8367,RTL8367B,RTL8367D) but they have their own problems. RTL8367
+does not have a CVID field and RTL8367D does not have FID/EFID.
+It will take some time to figure out everything here. And more time to
+test it properly.
+
+Regards,
+
+Luiz
 
