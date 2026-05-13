@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-287424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287425-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CGNpMJ/1A2rKBAIAu9opvQ
-	(envelope-from <netdev+bounces-287424-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 05:53:03 +0200
+	id 6EPoHe30A2rKBAIAu9opvQ
+	(envelope-from <netdev+bounces-287425-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 05:50:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39E0452D054
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 05:53:03 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78ADF52CFE9
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 05:50:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1B32231131F4
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 03:46:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 76148305C019
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 03:47:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B47839D6CC;
-	Wed, 13 May 2026 03:46:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B933A1E9E;
+	Wed, 13 May 2026 03:46:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o+GgzQUP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DLi8MPMM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1602E39BFE3;
-	Wed, 13 May 2026 03:46:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49833A256B
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 03:46:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778644001; cv=none; b=kcJ83+fz2sz43P13Vh2jIat2r6+iBh+aGrqnQW0vKuAWSk7ytxXc+BVLQSt83gXg1ms/AJ1sQwfYjcCcZo55vgKhzn7E0rezGoVP6kW2phA7v/JoxxY+zFR8uFW5s41MnAv4M2XJgwGTlH5E3m4MWqEllEePQZH0mSpJhRZ2xsw=
+	t=1778644002; cv=none; b=WcAZItjHYj65qDSnakn9mpwhTRyafHkV5Nqgpl1EBLMysEP0pVY2j6nxKQp3IxWuJumletlGZuLGn/LaQFDRr5MQQFBm5oBSGs5zNw4ol0eXB0BI3gUXHnfr+SC4a2EPRTQr7+PCh8Eo7+SQz5nnXGfa8m7ebtskCLjBOrsyh6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778644001; c=relaxed/simple;
-	bh=wx8jql1ToDwOs5ShWi330sByxn+12rrcPbCFPrQs+Ms=;
+	s=arc-20240116; t=1778644002; c=relaxed/simple;
+	bh=lLLV4GZVdWHB+PFC7+PErUWf6Jr4HoHhUNv1lODe+aA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qFUSTwc8WyxX/S/HhhiraCCbDs3ggEngB4ebEs9/7jgpkm9Qk6mjnaxc6uB6t1NTXQdAWNO7Rbw5f4xwmofOfFv5RhbnCnLkm6R+9YB+rogIfKj0oPQi/hgzaVYFhFGXgQUQirgEnKKtuq97cY+RZC8bchehUVdRjdtof2U5nZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o+GgzQUP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC0E2C2BCC7;
-	Wed, 13 May 2026 03:46:40 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=hmKOdtEh8sZE+/Wn1TCDSTWGBII9bEz6VKF7oWoIO8TpW2MBHjy9conRolGTSim73ikbaODxsR0LqyIxBD5+jVwBFdkIXz75LW5iqukt3ssV+2J7IoXTHn2eGkT/zbchtBwh2rjJFsN9Quergj/8XYDgvuGABWszILSZhRf/2pQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DLi8MPMM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C55DC2BCC7;
+	Wed, 13 May 2026 03:46:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778644001;
-	bh=wx8jql1ToDwOs5ShWi330sByxn+12rrcPbCFPrQs+Ms=;
+	s=k20201202; t=1778644002;
+	bh=lLLV4GZVdWHB+PFC7+PErUWf6Jr4HoHhUNv1lODe+aA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=o+GgzQUPqxww6cRyn+lGLyXDkvjlniJPnsXpJpYyBDf3hI8oJLPT7c1YFUspotDRJ
-	 9xIQR1hU3n9WaF70tcSm5FS1o0GFnB0cosQ38btjgF/4ea4tRfvusAKAXRGNP9TQOQ
-	 rzgWlTGIw2PaUCtRAJiSqvYdjtLVRTORvK2WhYEV2EzqKO+Qc5RnMuzK/TBMpqnyA0
-	 AdkfXQzBTth4HhK+bDH4MQRmrG8RDT6L+PPJ8W6pSXBOJYvzPTqBbi5kCTQ8T+KRj0
-	 fptqmLIBvaApQPZM8N3EXDkmbXQxbmNPVDTc/ds7nayHxa9KIhNBXF9zp1QlRl7bQ7
-	 LSXxIOg5H9mLQ==
+	b=DLi8MPMMhLxIfGUhbQ7vUcQxCCUNVDhNgetIp9QfhzCyeYxciw4koZCPGQaKsQWBm
+	 FdcTraWZ3Ijt744rkpE+zP144lkDoWEdRvBf/Dxk23xEiRvaQmWZr4M82brRmZJAuF
+	 jj4FgdgOjGz92hC6BpM8HCMW8Q89FDlJU6FeEeofDqSpHX+uLefb97OZzsUrTsuncY
+	 vLhiR0Gy+hAG59Ro0Ww22QxeZE1BxrGvwbv73NrTEFL9JkGA1NhhOGMuTrn6ovArox
+	 kNL1rDd0R66A7yYPFEgK0B6KXHTw7KwI9W9dS5Z/6WV6WXp15RETzNspz7Fxg0uov/
+	 ho8HUck2MCMuQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id E8ECC3822D60;
-	Wed, 13 May 2026 03:45:47 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FD103822D60;
+	Wed, 13 May 2026 03:45:49 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,54 +55,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 0/2] dpll: rework fractional frequency offset
- reporting
+Subject: Re: [PATCH v2 net-next 0/3] net: use IP_OUTNOROUTES drop reason
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177864394680.3173643.9892837998399060130.git-patchwork-notify@kernel.org>
-Date: Wed, 13 May 2026 03:45:46 +0000
-References: <20260511155816.99936-1-ivecera@redhat.com>
-In-Reply-To: <20260511155816.99936-1-ivecera@redhat.com>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch,
- arkadiusz.kubalewski@intel.com, davem@davemloft.net, donald.hunter@gmail.com,
- edumazet@google.com, kuba@kernel.org, jiri@resnulli.us, corbet@lwn.net,
- leon@kernel.org, mbloch@nvidia.com, mschmidt@redhat.com, pabeni@redhat.com,
- pvaanane@redhat.com, poros@redhat.com, Prathosh.Satish@microchip.com,
- saeedm@nvidia.com, skhan@linuxfoundation.org, horms@kernel.org,
- tariqt@nvidia.com, vadim.fedorenko@linux.dev, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
-X-Rspamd-Queue-Id: 39E0452D054
+ <177864394798.3173643.8934700558237549763.git-patchwork-notify@kernel.org>
+Date: Wed, 13 May 2026 03:45:47 +0000
+References: <20260511072310.1094859-1-edumazet@google.com>
+In-Reply-To: <20260511072310.1094859-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ dsahern@kernel.org, kuniyu@google.com, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
+X-Rspamd-Queue-Id: 78ADF52CFE9
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287424-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,intel.com,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,lwn.net,nvidia.com,redhat.com,microchip.com,linuxfoundation.org,linux.dev];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-287425-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FROM_NO_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
 Hello:
@@ -110,22 +104,26 @@ Hello:
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 11 May 2026 17:58:14 +0200 you wrote:
-> Rework how the fractional frequency offset (FFO) is reported in
-> the DPLL subsystem.
+On Mon, 11 May 2026 07:23:07 +0000 you wrote:
+> First patch changes sk_skb_reason_drop() sock to be const.
 > 
-> Both fractional-frequency-offset (PPM) and
-> fractional-frequency-offset-ppt (PPT) attributes are now present at
-> the top level of a pin and inside each pin-parent-device nest. They
-> carry the same measurement at different precisions.
+> Second and last patch add SKB_DROP_REASON_IP_OUTNOROUTES
+> to both tcp_v6_send_response() and inet6_csk_xmit().
+> 
+> Eric Dumazet (3):
+>   net: constify sk_skb_reason_drop() sock parameter
+>   tcp: use SKB_DROP_REASON_IP_OUTNOROUTES in tcp_v6_send_response()
+>   ipv6: use SKB_DROP_REASON_IP_OUTNOROUTES in inet6_csk_xmit()
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v4,1/2] dpll: add fractional frequency offset to pin-parent-device
-    https://git.kernel.org/netdev/net-next/c/9c11fcb2e9a5
-  - [net-next,v4,2/2] dpll: zl3073x: report FFO as DPLL vs input reference offset
-    https://git.kernel.org/netdev/net-next/c/54e65df8cf18
+  - [v2,net-next,1/3] net: constify sk_skb_reason_drop() sock parameter
+    https://git.kernel.org/netdev/net-next/c/5c4b709b5fc1
+  - [v2,net-next,2/3] tcp: use SKB_DROP_REASON_IP_OUTNOROUTES in tcp_v6_send_response()
+    https://git.kernel.org/netdev/net-next/c/254084223f93
+  - [v2,net-next,3/3] ipv6: use SKB_DROP_REASON_IP_OUTNOROUTES in inet6_csk_xmit()
+    https://git.kernel.org/netdev/net-next/c/4a64f9732577
 
 You are awesome, thank you!
 -- 
