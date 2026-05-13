@@ -1,566 +1,350 @@
-Return-Path: <netdev+bounces-287629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287630-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UEQLGjKOBGoALgIAu9opvQ
-	(envelope-from <netdev+bounces-287629-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 16:44:02 +0200
+	id ML9RKO6PBGpYLgIAu9opvQ
+	(envelope-from <netdev+bounces-287630-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 16:51:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0804F53557A
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 16:44:01 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A11A553576D
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 16:51:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5A46A3018F80
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 14:39:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5E6063030F7B
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 14:41:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1051443DA42;
-	Wed, 13 May 2026 14:39:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ADED42189F;
+	Wed, 13 May 2026 14:41:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gSLoykrZ"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="OmlfdabT";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="go/biU1R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31202423A8E
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 14:39:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB2B313E24;
+	Wed, 13 May 2026 14:41:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778683154; cv=none; b=H8g0fhRk/8R4C2J5QvI3Pw4GclGNTSNiOP5L54RAAR4ltofYCx/AjaER2mumxaj1zsAeujNoo66aiIsBd9j+nhK+j5G4X+BtRkvTmb/60rw+ptVg38WL+ThYsjJ2zE+ULJAOi4SpL/djjL+I7xeKs55Y7uuJf/v2XPw4vDAdkME=
+	t=1778683300; cv=none; b=l2QqQANfzJAz4zc1ZTnuUWhjd7xLluaUTNCi80zQYTtqlLbdo+L5TK+T07/MCnadv0uGMDSRFQAS0ndPxMkRCBn14q7aUYjWDYqJryqefHKmfx9MJ9vD7V5aV0QaZqsuPP/63qzPDbXdX9VzhXCacJARwkqT4dZSyIHm9c4mojM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778683154; c=relaxed/simple;
-	bh=tLJ9CfalQcWKJarLwUgnz4rFuVSrwbgfTI7Iyffc850=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=j3C73nySkg2Z8Avz9p/aFWakk/4rYDA2NJwN54tf2/GqTpLpT6v7oQ6M7g779W08oRBuOaWrFtFtxybd0Y1yAhR3RFTVuj52fYQmAbELYHQTfXIQRS3cQ5tHyNUREJVsVgT0n/mWq2IXDf70PRw3dPRCz3Mqvt82DG/lvf7hOQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gSLoykrZ; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2bc763e2ba8so22411675ad.3
-        for <netdev@vger.kernel.org>; Wed, 13 May 2026 07:39:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778683151; x=1779287951; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+v+A2S+ZiZWa4ABzfTfoSKES+pA5RrDCYVE5sdxAhwY=;
-        b=gSLoykrZb46iWFX7VmuHUbI6Nlz94/as+d2CCFWL374cy6HQyPlenCWMQE0Q9Dh5/y
-         K+lrLlBkn0tusaY+dD60fNu/ctXQqu0G9hS8rfzU9v5gYMWgvzGYoxYsmJd/5ZovWinz
-         uPB35xGwpOAIC6QmovyxS0M7J0bML7XtFEr9j76ClXlFlueZ8oAmx5ffnh+V/ZIirCG/
-         Jl1xMZQpsqWL0+PimreH028sNb79pMJLijPFCwKAaDukJJk1UoiMrKhX3r1PNesUOKEy
-         ENDzpT3aQPq+GYRl6A2IbJf/TUgjMf7gVVN1Qae5QvXYtu+KeNyMOsPqPHz09Zm5wpaw
-         8cnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778683151; x=1779287951;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+v+A2S+ZiZWa4ABzfTfoSKES+pA5RrDCYVE5sdxAhwY=;
-        b=QfFR3yuOuc3ufWX990OKNeg7v52Qk2bVrqSAlKnHGudNSG9LuLFrRX6gDusCAmS9da
-         VRxbTXX+XhOdVsYyDczFMIzSKGYF2xMOyQY1hRDOHP3L7IyPpuYu/2ypc363D2QjpYwv
-         QvwnxNaxs5xJqAiR7icQEfGgPbQJeF+ENoy5l9+hBY4R/ssqByl+xpPWdEAEPVAHry+k
-         aiEguydUXmOjiAIV3Hohp1zBuWLl5ugLpiB6qC/JFSFeuSsQWlv9nqQg0I1wUtIfFa/P
-         OlsDUkBT0V4N+8jwCPnzBIiOb/BNPTyNEJ4L0GEPXvophuzJBXIciH+YRFYpcZsLXmKL
-         +xVA==
-X-Forwarded-Encrypted: i=1; AFNElJ83MqsblWnWmv/xekV3NSw21IHgKYpyZWZRbVaERZbflwsPVfVHEOvYrZQkF2/OPhLz+vdifEk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaIDwCh8Rw9hxu063BYaen2eZzFwD784BAAnrDHmDsR3WoIdd4
-	soxQAxuM+tL2V+ntQ7iEtWIUf4pzV1U0t3lzWDrd7J54/dRU1dE/ObMS
-X-Gm-Gg: Acq92OGSG28b13LB7Ng/M2q8GVlHMwYjY8znZZngXb4perB1RnoepluJWGa1Wv3Ooj6
-	1fjRuk9Ofv0J1CoDxV6HCoKGDoEYLxysUTMDsLMRXzIvZbaEUPtkKBSqp6iqQ88QSnPP4E0fXVi
-	Zw3AaOuJVRWFohEOEn/LZcGzwzq+GOPQiMaEhL5VwAoUw0FtmxaULzKEPC0Jf8JTCeKZCq4aood
-	MgFpPFLfEoC4h7hD//IYxmFrIpqem2OF5gxgnujXZv519sU8YJVE88dWV/cFvgSzWUjtMoyw2Vg
-	QjDCkW0keNX4Fv+WMjJthAWqT6F867mhgQjylmkQpH7mOpY7hwI0QOKkAvgPlesJBo0s5JDLqw8
-	bNZWTgouyw5GYMcs7GBFdMuGkivFp38JbQ2493gDUFdPYl6eonGCqODBK2odvt6MdgnsSJk+Pr2
-	OVYT8lG+cOmxgUkp6HMBkDBrAGuGO53R1zN+iJyYnkgh/W91c4ktfJiB1h
-X-Received: by 2002:a17:903:f8e:b0:2b2:ebed:7af5 with SMTP id d9443c01a7336-2bd271773f9mr40825345ad.13.1778683151100;
-        Wed, 13 May 2026 07:39:11 -0700 (PDT)
-Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1c5466bsm171638535ad.0.2026.05.13.07.39.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2026 07:39:10 -0700 (PDT)
-From: Maoyi Xie <maoyixie.tju@gmail.com>
-X-Google-Original-From: Maoyi Xie <maoyi.xie@ntu.edu.sg>
-To: achender@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: horms@kernel.org,
-	praveen.kakkolangara@aumovio.com,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	rds-devel@oss.oracle.com,
-	linux-kernel@vger.kernel.org,
-	Maoyi Xie <maoyi.xie@ntu.edu.sg>
-Subject: [PATCH net v4] rds: filter RDS_INFO_* getsockopt by caller's netns
-Date: Wed, 13 May 2026 22:39:04 +0800
-Message-Id: <20260513143904.2497520-1-maoyi.xie@ntu.edu.sg>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1778683300; c=relaxed/simple;
+	bh=qNgXJvbsLIcsIkCAQt+hbx2gxOBgKFnGhfiMpsUtuKM=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=u2yLzxC4RgiAWhny9SnkpTsfoeVH9q27M9WDuNAN65ZOPWeZIjKNPmS0qD3ZLFyIZvsnxQOmk/lA9P5+/VPIv77dU4bTY78WzYbw7yIKP1guLtJBoBu536ohGSXu2ct+XaPMk1XT3yh+low7J7WFw52RN0ekCjljJnJ+v2bimAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=OmlfdabT; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=go/biU1R; arc=none smtp.client-ip=202.12.124.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfout.stl.internal (Postfix) with ESMTP id 5BE161D00125;
+	Wed, 13 May 2026 10:41:31 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-03.internal (MEProxy); Wed, 13 May 2026 10:41:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-transfer-encoding:content-type
+	:content-type:date:date:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to; s=fm1; t=1778683291; x=1778769691; bh=H+GvKvCtKswoDd20kyu6c
+	69y++9vdRjqJHz+B29Lo4w=; b=OmlfdabToR0xhakvous5BbAwdSZboTr5OWaJH
+	PYjnlFEYCnBSwMb+KvF2rTdiQ7B35di2FwNjEpSnjhiIU8HQGGZEhTEpBuJHVBhx
+	T3WpaukXQDWMwJlhdtWGtG3p/9lv5DCDXNRIlbKba+ogZUNC/5W5WEWTeS2gDbIz
+	ZamWAbgZ9dXgCCs6JRXFxo7ZK4RV9biapMdhtMl5GylsedS8o1sfahBlBS6ycZYJ
+	nsvtkngCUmBO9iMLULQZB+zfrMlR2ynuCjesFBESSG3d15WqlK2thR6g0HYtbGDu
+	nwPW6p17e3uCpN14YErb/DznW9YdTLLGCHM9k4pZWv4aRL91Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-id
+	:content-transfer-encoding:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1778683291; x=1778769691; bh=H+GvKvCtKswoDd20kyu6c69y++9vdRjqJHz
+	+B29Lo4w=; b=go/biU1RvzIl35pEErD1fNwxHvkc7SV9Zgi8jzEJXdatIf+IGks
+	UgqKhPH52Bwi14gA5EuTDUx/OzSIQ4kdVuaAcydMQGnv0klO7cyjSOwV9S2ISTNc
+	fAlobjioXLsABjRuW4Yc2eHtnTgZZNxtHNJhpyFM8QrQ1CylpbYSQpFBLbyCO0mR
+	3xFrUJaDJObgMYsG1z9RNH2SkfEswvT7IwiQr5SmHrehD1l6PT2EvtdGC/WlrLAb
+	UdT/NdUdSxFq6G7yLZSedzBd9MM7lnF9VYw7wIycyztg0x2RbOJHTc/jvlDcxu0G
+	6iHLqIPnpfhCIbLhhT69bEq+9h9/6GVOT+w==
+X-ME-Sender: <xms:mo0Eamy4w7tDuBiUwq3DWY6TeUuaDT3w_gDQhV6CraeyYPkoAdCsCg>
+    <xme:mo0EaitEOIdFOV6kWb4xg-QW0EDKHQw9AYPVWpepymtntsBhLrFlorRZY0Vh6HAG2
+    kZdfE68-eVacg68ZRY7Vcid8ZZILlDbRb8-4MuOZtxOjUvexRbrcP0>
+X-ME-Received: <xmr:mo0EapCk3gpm5ktked6rkXmMgv4yeUrwPErV1MNiwZp3dnX5sQ_3T5_Drln7VoAkbc6bW-rSYg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduvdegleefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucgoufhushhpvggtthffohhmrghinhculdegledmnecujf
+    gurhephffvvefujghfofggtgfgfffksehtqhertdertddvnecuhfhrohhmpeflrgihucgg
+    ohhssghurhhghhcuoehjvhesjhhvohhssghurhhghhdrnhgvtheqnecuggftrfgrthhtvg
+    hrnhepkeetfeduhfehhfegteeukedtjeeiheeijedugefhvddufffggfejffevtdfhgfel
+    necuffhomhgrihhnpehshiiikhgrlhhlvghrrdgrphhpshhpohhtrdgtohhmpdhgohhogh
+    hlvggrphhishdrtghomhdpghhoohdrghhlnecuvehluhhsthgvrhfuihiivgeptdenucfr
+    rghrrghmpehmrghilhhfrhhomhepjhhvsehjvhhoshgsuhhrghhhrdhnvghtpdhnsggprh
+    gtphhtthhopeelpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegurghvvghmsegu
+    rghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvg
+    drtghomhdprhgtphhtthhopehshiiikhgrlhhlvghrqdgsuhhgshesghhoohhglhgvghhr
+    ohhuphhsrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtph
+    htthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepphgr
+    sggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehshiiisghothdoudgusgehke
+    gusggstggtsghfleeftgeihegtkeefsehshiiikhgrlhhlvghrrdgrphhpshhpohhtmhgr
+    ihhlrdgtohhmpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrh
+    hnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdho
+    rhhg
+X-ME-Proxy: <xmx:mo0EakFYMbXlN1Zm8-Ewo7a0m0_SeauJDrQdak0KfJFTHbxMTLVhHg>
+    <xmx:mo0EapAy36gPZhiJiytpeyWnULr6l4-5eo0oMHV1Nr8l2ejNODjbeg>
+    <xmx:mo0Eaqnoqhs5Bv2yEruVasqKAQBr_DFyMqdLAU8SjJfCCh25homM0Q>
+    <xmx:mo0EavO9trpZ8nUcyo6aSV_K8H8IUffC19qb73nIltpz0S6Y9IMuvQ>
+    <xmx:m40EaklswtP7gDC8Up9e3UeMcpahlC2EZ_7zZphZgLyHmtgE3TyTTKud>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 13 May 2026 10:41:30 -0400 (EDT)
+Received: by vermin.localdomain (Postfix, from userid 1000)
+	id 020AF1C04E2; Wed, 13 May 2026 07:41:28 -0700 (PDT)
+Received: from vermin (localhost [127.0.0.1])
+	by vermin.localdomain (Postfix) with ESMTP id 002901C04DB;
+	Wed, 13 May 2026 16:41:28 +0200 (CEST)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: syzbot <syzbot+1db58dbbccbf93c65c83@syzkaller.appspotmail.com>
+cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+    kuba@kernel.org, linux-kernel@vger.kernel.org,
+    netdev@vger.kernel.org, pabeni@redhat.com,
+    syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] possible deadlock in rlb_choose_channel (2)
+In-reply-to: <6a043a69.170a0220.1fd042.0004.GAE@google.com>
+References: <6a043a69.170a0220.1fd042.0004.GAE@google.com>
+Comments: In-reply-to syzbot <syzbot+1db58dbbccbf93c65c83@syzkaller.appspotmail.com>
+   message dated "Wed, 13 May 2026 01:46:33 -0700."
+X-Mailer: MH-E 8.6+git; nmh 1.7+dev; Emacs 29.0.50
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 0804F53557A
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <197246.1778683288.1@vermin>
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 13 May 2026 16:41:28 +0200
+Message-ID: <197247.1778683288@vermin>
+X-Rspamd-Queue-Id: A11A553576D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=4caf64b1ee83dac0];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[jvosburgh.net,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[jvosburgh.net:s=fm1,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-287629-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287630-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[jvosburgh.net:+,messagingengine.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
+	SUBJECT_HAS_QUESTION(0.00)[];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,syzkaller.appspot.com:url,goo.gl:url,messagingengine.com:dkim,storage.googleapis.com:url,googlegroups.com:email];
+	FROM_NEQ_ENVFROM(0.00)[jv@jvosburgh.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,1db58dbbccbf93c65c83];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	REDIRECTOR_URL(0.00)[goo.gl];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Action: no action
 
-The RDS_INFO_* family of getsockopt(2) options reads several
-file-scope global lists that are not per-netns:
+syzbot <syzbot+1db58dbbccbf93c65c83@syzkaller.appspotmail.com> wrote:
 
-  rds_sock_info / rds6_sock_info,
-  rds_sock_inc_info / rds6_sock_inc_info        -> rds_sock_list
-  rds_tcp_tc_info / rds6_tcp_tc_info            -> rds_tcp_tc_list
-  rds_conn_info / rds6_conn_info,
-  rds_conn_message_info_cmn (for the *_SEND_MESSAGES and
-  *_RETRANS_MESSAGES variants),
-  rds_for_each_conn_info (for RDS_INFO_IB_CONNECTIONS)
-                                                -> rds_conn_hash[]
+>Hello,
+>
+>syzbot found the following issue on:
+>
+>HEAD commit:    c21b90f77687 x86/CPU/AMD: Prevent improper isolation of s=
+h..
+>git tree:       upstream
+>console output: https://syzkaller.appspot.com/x/log.txt?x=3D10ec7dba58000=
+0
+>kernel config:  https://syzkaller.appspot.com/x/.config?x=3D4caf64b1ee83d=
+ac0
+>dashboard link: https://syzkaller.appspot.com/bug?extid=3D1db58dbbccbf93c=
+65c83
+>compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25=
+a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+>
+>Unfortunately, I don't have any reproducer for this issue yet.
+>
+>Downloadable assets:
+>disk image: https://storage.googleapis.com/syzbot-assets/2f3edabe3b67/dis=
+k-c21b90f7.raw.xz
+>vmlinux: https://storage.googleapis.com/syzbot-assets/539b63753e79/vmlinu=
+x-c21b90f7.xz
+>kernel image: https://storage.googleapis.com/syzbot-assets/48e6e7cbc4ca/b=
+zImage-c21b90f7.xz
+>
+>IMPORTANT: if you fix the issue, please add the following tag to the comm=
+it:
+>Reported-by: syzbot+1db58dbbccbf93c65c83@syzkaller.appspotmail.com
+>
+>ip6_tunnel: ip6tnl1 xmit: Local address not yet configured!
+>ip6_tunnel: ip6tnl1 xmit: Local address not yet configured!
+>=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>WARNING: possible recursive locking detected
+>syzkaller #0 Tainted: G             L     =
 
-The handlers do not filter by the caller's network namespace.
-rds_info_getsockopt() has no netns or capable() check, and
-rds_create() has no capable() check, so AF_RDS is reachable from
-an unprivileged user namespace. As a result, an unprivileged
-caller in a fresh user_ns plus netns can read the bound address
-and sock inode of every RDS socket on the host, the peer address
-of incoming messages on every RDS socket on the host, the peer
-address and TCP sequence numbers of every rds-tcp connection on
-the host, and the peer address and RDS sequence numbers of every
-RDS connection on the host.
+>--------------------------------------------
+>kworker/u8:3/47 is trying to acquire lock:
+>ffff88807a618e98 (&bond->mode_lock){+.-.}-{3:3}, at: spin_lock include/li=
+nux/spinlock.h:342 [inline]
+>ffff88807a618e98 (&bond->mode_lock){+.-.}-{3:3}, at: rlb_choose_channel+0=
+x37/0x19a0 drivers/net/bonding/bond_alb.c:562
+>
+>but task is already holding lock:
+>ffff88807ffa0e98 (&bond->mode_lock){+.-.}-{3:3}, at: spin_lock_bh include=
+/linux/spinlock.h:348 [inline]
+>ffff88807ffa0e98 (&bond->mode_lock){+.-.}-{3:3}, at: rlb_update_rx_client=
+s drivers/net/bonding/bond_alb.c:466 [inline]
+>ffff88807ffa0e98 (&bond->mode_lock){+.-.}-{3:3}, at: bond_alb_monitor+0xe=
+8a/0x17e0 drivers/net/bonding/bond_alb.c:1618
+>
+>other info that might help us debug this:
+> Possible unsafe locking scenario:
+>
+>       CPU0
+>       ----
+>  lock(&bond->mode_lock);
+>  lock(&bond->mode_lock);
+>
+> *** DEADLOCK ***
+>
+> May be due to missing lock nesting notation
+>
+>7 locks held by kworker/u8:3/47:
+> #0: ffff8880516b7140 ((wq_completion)bond5#2){+.+.}-{0:0}, at: process_o=
+ne_work kernel/workqueue.c:3277 [inline]
+> #0: ffff8880516b7140 ((wq_completion)bond5#2){+.+.}-{0:0}, at: process_s=
+cheduled_works+0xa35/0x1860 kernel/workqueue.c:3385
+> #1: ffffc90000b77c40 ((work_completion)(&(&bond->alb_work)->work)){+.+.}=
+-{0:0}, at: process_one_work kernel/workqueue.c:3278 [inline]
+> #1: ffffc90000b77c40 ((work_completion)(&(&bond->alb_work)->work)){+.+.}=
+-{0:0}, at: process_scheduled_works+0xa70/0x1860 kernel/workqueue.c:3385
+> #2: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire i=
+nclude/linux/rcupdate.h:300 [inline]
+> #2: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock incl=
+ude/linux/rcupdate.h:838 [inline]
+> #2: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: bond_alb_monitor+0=
+xf8/0x17e0 drivers/net/bonding/bond_alb.c:1546
+> #3: ffff88807ffa0e98 (&bond->mode_lock){+.-.}-{3:3}, at: spin_lock_bh in=
+clude/linux/spinlock.h:348 [inline]
+> #3: ffff88807ffa0e98 (&bond->mode_lock){+.-.}-{3:3}, at: rlb_update_rx_c=
+lients drivers/net/bonding/bond_alb.c:466 [inline]
+> #3: ffff88807ffa0e98 (&bond->mode_lock){+.-.}-{3:3}, at: bond_alb_monito=
+r+0xe8a/0x17e0 drivers/net/bonding/bond_alb.c:1618
+> #4: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire i=
+nclude/linux/rcupdate.h:300 [inline]
+> #4: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock incl=
+ude/linux/rcupdate.h:838 [inline]
+> #4: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: arp_xmit+0x23/0x27=
+0 net/ipv4/arp.c:663
+> #5: ffffffff8e95cdc0 (rcu_read_lock_bh){....}-{1:3}, at: local_bh_disabl=
+e include/linux/bottom_half.h:20 [inline]
+> #5: ffffffff8e95cdc0 (rcu_read_lock_bh){....}-{1:3}, at: rcu_read_lock_b=
+h include/linux/rcupdate.h:891 [inline]
+> #5: ffffffff8e95cdc0 (rcu_read_lock_bh){....}-{1:3}, at: __dev_queue_xmi=
+t+0x2b6/0x3950 net/core/dev.c:4791
+> #6: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire i=
+nclude/linux/rcupdate.h:300 [inline]
+> #6: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock incl=
+ude/linux/rcupdate.h:838 [inline]
+> #6: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: bond_start_xmit+0x=
+b4/0x1900 drivers/net/bonding/bond_main.c:5591
+>
+>stack backtrace:
+>CPU: 0 UID: 0 PID: 47 Comm: kworker/u8:3 Tainted: G             L      sy=
+zkaller #0 PREEMPT(full) =
 
-The rds-tcp transport is reachable from a non-initial netns (see
-rds_set_transport()), so a one-shot init_net gate at
-rds_info_getsockopt() would deny legitimate per-netns visibility
-to rds-tcp callers. Instead, filter at each handler by comparing
-the netns of the caller's socket to the netns of the list entry,
-or to rds_conn_net(conn) for connection paths. Only copy entries
-whose netns matches the caller. Counters (RDS_INFO_COUNTERS) are
-aggregate statistics and remain global.
+>Tainted: [L]=3DSOFTLOCKUP
+>Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 04/18/2026
+>Workqueue: bond5 bond_alb_monitor
+>Call Trace:
+> <TASK>
+> dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+> print_deadlock_bug+0x279/0x290 kernel/locking/lockdep.c:3041
+> check_deadlock kernel/locking/lockdep.c:3093 [inline]
+> validate_chain kernel/locking/lockdep.c:3895 [inline]
+> __lock_acquire+0x253f/0x2cf0 kernel/locking/lockdep.c:5237
+> lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5868
+> __raw_spin_lock include/linux/spinlock_api_smp.h:158 [inline]
+> _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:158
+> spin_lock include/linux/spinlock.h:342 [inline]
+> rlb_choose_channel+0x37/0x19a0 drivers/net/bonding/bond_alb.c:562
+> rlb_arp_xmit drivers/net/bonding/bond_alb.c:680 [inline]
+> bond_xmit_alb_slave_get+0x1071/0x20a0 drivers/net/bonding/bond_alb.c:149=
+3
+> bond_alb_xmit+0x24/0x40 drivers/net/bonding/bond_alb.c:1528
+> __bond_start_xmit drivers/net/bonding/bond_main.c:5569 [inline]
+> bond_start_xmit+0x6a2/0x1900 drivers/net/bonding/bond_main.c:5593
+> __netdev_start_xmit include/linux/netdevice.h:5368 [inline]
+> netdev_start_xmit include/linux/netdevice.h:5377 [inline]
+> xmit_one net/core/dev.c:3888 [inline]
+> dev_hard_start_xmit+0x2cd/0x830 net/core/dev.c:3904
+> __dev_queue_xmit+0x14d9/0x3950 net/core/dev.c:4870
+> NF_HOOK+0x33a/0x3c0 include/linux/netfilter.h:-1
+> arp_xmit+0x16c/0x270 net/ipv4/arp.c:665
+> rlb_update_client+0x2a8/0x6b0 drivers/net/bonding/bond_alb.c:455
+> rlb_update_rx_clients drivers/net/bonding/bond_alb.c:473 [inline]
+> bond_alb_monitor+0xf6a/0x17e0 drivers/net/bonding/bond_alb.c:1618
 
-Reproducer (KASAN VM, rds and rds_tcp loaded): an AF_RDS socket
-binds 127.0.0.1:4242 in init_net as root. A child process enters
-a fresh user_ns plus netns and opens AF_RDS there, then calls
-getsockopt(SOL_RDS, RDS_INFO_SOCKETS). Before this change, the
-child sees the init_net socket. After this change, the child
-sees zero entries.
+	Just looking at the stack, I suspect that this is either a false
+positive, or the NF_HOOK action (a netfilter rule) is reinjecting the
+ARP packet in to the same bond that created it.
 
-Drop the rds_sock_count, rds_tcp_tc_count, and rds6_tcp_tc_count
-globals. v2 used them for the size precheck and lens->nr; v3
-replaced the precheck with a per-ns count from a first pass over
-the list, so the globals have no remaining readers. The matching
-increments and decrements in rds_create()/rds_destroy_sock() and
-rds_tcp_set_callbacks()/rds_tcp_restore_callbacks() go away with
-them. Reported by the kernel test robot under clang W=1.
+	If the packet is being reinjected to the same interface that
+generated it in rlb_update_client, then I believe the above would be the
+expected behavior.
 
-Suggested-by: Allison Henderson <achender@kernel.org>
-Suggested-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Allison Henderson <achender@kernel.org>
-Co-developed-by: Praveen Kakkolangara <praveen.kakkolangara@aumovio.com>
-Signed-off-by: Praveen Kakkolangara <praveen.kakkolangara@aumovio.com>
-Signed-off-by: Maoyi Xie <maoyi.xie@ntu.edu.sg>
+	On the other hand, if the network configuration is nested bonds,
+then the rlb_arp_xmit -> rlb_choose_channel call path above would be
+operating on a different instance of the bond->mode_lock, and would not
+actually deadlock.
+
+	-J
+
+> process_one_work kernel/workqueue.c:3302 [inline]
+> process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3385
+> worker_thread+0xa53/0xfc0 kernel/workqueue.c:3466
+> kthread+0x388/0x470 kernel/kthread.c:436
+> ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+> ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+> </TASK>
+>
+>
+>---
+>This report is generated by a bot. It may contain errors.
+>See https://goo.gl/tpsmEJ for more information about syzbot.
+>syzbot engineers can be reached at syzkaller@googlegroups.com.
+>
+>syzbot will keep track of this issue. See:
+>https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+>
+>If the report is already addressed, let syzbot know by replying with:
+>#syz fix: exact-commit-title
+>
+>If you want to overwrite report's subsystems, reply with:
+>#syz set subsystems: new-subsystem
+>(See the list of subsystem names on the web dashboard)
+>
+>If the report is a duplicate of another one, reply with:
+>#syz dup: exact-subject-of-another-report
+>
+>If you want to undo deduplication, reply with:
+>#syz undup
+
 ---
-v4: Drop the rds_sock_count, rds_tcp_tc_count, and rds6_tcp_tc_count
-    globals reported by the kernel test robot under clang W=1
-    (-Wunused-but-set-global). They have no remaining readers after v3
-    replaced the size precheck with a per-ns count from the first pass.
-    Inc/dec sites in rds_create()/rds_destroy_sock() and
-    rds_tcp_set_callbacks()/rds_tcp_restore_callbacks() are removed
-    with them. No functional change beyond v3 for the netns-filter
-    behaviour.
-
-    Note for applier: this patch touches rds_tcp_set_callbacks() in the
-    same hunk window as a separate [PATCH net] sent earlier (Message-Id
-    <20260512142807.1855619-1-maoyi.xie@ntu.edu.sg>, "rds_tcp: close
-    NULL deref window in rds_tcp_set_callbacks"). Both apply cleanly
-    to net/main tip b266bacba in isolation. When applied together the
-    second one needs a trivial 3-way merge in net/rds/tcp.c.
-v3: Address Simon Horman's review of v2. The size precheck and the
-    lens count are now both restricted to the caller's netns in
-    rds_sock_info, rds6_sock_info, rds_tcp_tc_info and
-    rds6_tcp_tc_info. Each handler now does a first pass under the
-    list lock to count entries visible in the caller's netns, then
-    short-circuits with that count if the user buffer is too small,
-    then a second pass to fill data. This closes both issues Simon
-    flagged: a zero-length probe no longer returns the global count,
-    and a caller that sizes its buffer to the value returned by lens
-    no longer hits ENOSPC on the second call.
-    Re-verified on KASAN VM with the v1 PoC: attacker in fresh
-    user_ns + netns sees zero RDS_INFO_SOCKETS entries; init_net
-    access sees its own entries; lens returns the ns-scoped count
-    on both probe and full reads.
-v2: rebased onto net/main tip (b266bacba) so patchwork can apply.
-    No code changes. Carries forward Reviewed-by from v1 review.
-v1: https://lore.kernel.org/r/20260506075031.2238596-1-maoyixie.tju@gmail.com
-
- net/rds/af_rds.c     | 45 +++++++++++++++++++++++++++++--------
- net/rds/connection.c | 13 +++++++++++
- net/rds/tcp.c        | 53 ++++++++++++++++++++++++++------------------
- 3 files changed, 80 insertions(+), 31 deletions(-)
-
-diff --git a/net/rds/af_rds.c b/net/rds/af_rds.c
-index 76f625986..ace52d3ce 100644
---- a/net/rds/af_rds.c
-+++ b/net/rds/af_rds.c
-@@ -43,7 +43,6 @@
- 
- /* this is just used for stats gathering :/ */
- static DEFINE_SPINLOCK(rds_sock_lock);
--static unsigned long rds_sock_count;
- static LIST_HEAD(rds_sock_list);
- DECLARE_WAIT_QUEUE_HEAD(rds_poll_waitq);
- 
-@@ -82,7 +81,6 @@ static int rds_release(struct socket *sock)
- 
- 	spin_lock_bh(&rds_sock_lock);
- 	list_del_init(&rs->rs_item);
--	rds_sock_count--;
- 	spin_unlock_bh(&rds_sock_lock);
- 
- 	rds_trans_put(rs->rs_transport);
-@@ -694,7 +692,6 @@ static int __rds_create(struct socket *sock, struct sock *sk, int protocol)
- 
- 	spin_lock_bh(&rds_sock_lock);
- 	list_add_tail(&rs->rs_item, &rds_sock_list);
--	rds_sock_count++;
- 	spin_unlock_bh(&rds_sock_lock);
- 
- 	return 0;
-@@ -735,6 +732,7 @@ static void rds_sock_inc_info(struct socket *sock, unsigned int len,
- 			      struct rds_info_iterator *iter,
- 			      struct rds_info_lengths *lens)
- {
-+	struct net *net = sock_net(sock->sk);
- 	struct rds_sock *rs;
- 	struct rds_incoming *inc;
- 	unsigned int total = 0;
-@@ -744,6 +742,9 @@ static void rds_sock_inc_info(struct socket *sock, unsigned int len,
- 	spin_lock_bh(&rds_sock_lock);
- 
- 	list_for_each_entry(rs, &rds_sock_list, rs_item) {
-+		/* Only show sockets in the caller's netns. */
-+		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
-+			continue;
- 		/* This option only supports IPv4 sockets. */
- 		if (!ipv6_addr_v4mapped(&rs->rs_bound_addr))
- 			continue;
-@@ -774,6 +775,7 @@ static void rds6_sock_inc_info(struct socket *sock, unsigned int len,
- 			       struct rds_info_iterator *iter,
- 			       struct rds_info_lengths *lens)
- {
-+	struct net *net = sock_net(sock->sk);
- 	struct rds_incoming *inc;
- 	unsigned int total = 0;
- 	struct rds_sock *rs;
-@@ -783,6 +785,9 @@ static void rds6_sock_inc_info(struct socket *sock, unsigned int len,
- 	spin_lock_bh(&rds_sock_lock);
- 
- 	list_for_each_entry(rs, &rds_sock_list, rs_item) {
-+		/* Only show sockets in the caller's netns. */
-+		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
-+			continue;
- 		read_lock(&rs->rs_recv_lock);
- 
- 		list_for_each_entry(inc, &rs->rs_recv_queue, i_item) {
-@@ -806,6 +811,7 @@ static void rds_sock_info(struct socket *sock, unsigned int len,
- 			  struct rds_info_iterator *iter,
- 			  struct rds_info_lengths *lens)
- {
-+	struct net *net = sock_net(sock->sk);
- 	struct rds_info_socket sinfo;
- 	unsigned int cnt = 0;
- 	struct rds_sock *rs;
-@@ -814,12 +820,22 @@ static void rds_sock_info(struct socket *sock, unsigned int len,
- 
- 	spin_lock_bh(&rds_sock_lock);
- 
--	if (len < rds_sock_count) {
--		cnt = rds_sock_count;
--		goto out;
-+	/* First pass: count entries visible in the caller's netns. */
-+	list_for_each_entry(rs, &rds_sock_list, rs_item) {
-+		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
-+			continue;
-+		if (!ipv6_addr_v4mapped(&rs->rs_bound_addr))
-+			continue;
-+		cnt++;
- 	}
- 
-+	if (len < cnt)
-+		goto out;
-+
- 	list_for_each_entry(rs, &rds_sock_list, rs_item) {
-+		/* Only show sockets in the caller's netns. */
-+		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
-+			continue;
- 		/* This option only supports IPv4 sockets. */
- 		if (!ipv6_addr_v4mapped(&rs->rs_bound_addr))
- 			continue;
-@@ -832,7 +848,6 @@ static void rds_sock_info(struct socket *sock, unsigned int len,
- 		sinfo.inum = sock_i_ino(rds_rs_to_sk(rs));
- 
- 		rds_info_copy(iter, &sinfo, sizeof(sinfo));
--		cnt++;
- 	}
- 
- out:
-@@ -847,17 +862,29 @@ static void rds6_sock_info(struct socket *sock, unsigned int len,
- 			   struct rds_info_iterator *iter,
- 			   struct rds_info_lengths *lens)
- {
-+	struct net *net = sock_net(sock->sk);
- 	struct rds6_info_socket sinfo6;
-+	unsigned int cnt = 0;
- 	struct rds_sock *rs;
- 
- 	len /= sizeof(struct rds6_info_socket);
- 
- 	spin_lock_bh(&rds_sock_lock);
- 
--	if (len < rds_sock_count)
-+	/* First pass: count entries visible in the caller's netns. */
-+	list_for_each_entry(rs, &rds_sock_list, rs_item) {
-+		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
-+			continue;
-+		cnt++;
-+	}
-+
-+	if (len < cnt)
- 		goto out;
- 
- 	list_for_each_entry(rs, &rds_sock_list, rs_item) {
-+		/* Only show sockets in the caller's netns. */
-+		if (!net_eq(sock_net(rds_rs_to_sk(rs)), net))
-+			continue;
- 		sinfo6.sndbuf = rds_sk_sndbuf(rs);
- 		sinfo6.rcvbuf = rds_sk_rcvbuf(rs);
- 		sinfo6.bound_addr = rs->rs_bound_addr;
-@@ -870,7 +897,7 @@ static void rds6_sock_info(struct socket *sock, unsigned int len,
- 	}
- 
-  out:
--	lens->nr = rds_sock_count;
-+	lens->nr = cnt;
- 	lens->each = sizeof(struct rds6_info_socket);
- 
- 	spin_unlock_bh(&rds_sock_lock);
-diff --git a/net/rds/connection.c b/net/rds/connection.c
-index c10b7ed06..7c8ab8e97 100644
---- a/net/rds/connection.c
-+++ b/net/rds/connection.c
-@@ -568,6 +568,7 @@ static void rds_conn_message_info_cmn(struct socket *sock, unsigned int len,
- 				      struct rds_info_lengths *lens,
- 				      int want_send, bool isv6)
- {
-+	struct net *net = sock_net(sock->sk);
- 	struct hlist_head *head;
- 	struct list_head *list;
- 	struct rds_connection *conn;
-@@ -590,6 +591,9 @@ static void rds_conn_message_info_cmn(struct socket *sock, unsigned int len,
- 			struct rds_conn_path *cp;
- 			int npaths;
- 
-+			/* Only show connections in the caller's netns. */
-+			if (!net_eq(rds_conn_net(conn), net))
-+				continue;
- 			if (!isv6 && conn->c_isv6)
- 				continue;
- 
-@@ -688,6 +692,7 @@ void rds_for_each_conn_info(struct socket *sock, unsigned int len,
- 			  u64 *buffer,
- 			  size_t item_len)
- {
-+	struct net *net = sock_net(sock->sk);
- 	struct hlist_head *head;
- 	struct rds_connection *conn;
- 	size_t i;
-@@ -700,6 +705,9 @@ void rds_for_each_conn_info(struct socket *sock, unsigned int len,
- 	for (i = 0, head = rds_conn_hash; i < ARRAY_SIZE(rds_conn_hash);
- 	     i++, head++) {
- 		hlist_for_each_entry_rcu(conn, head, c_hash_node) {
-+			/* Only show connections in the caller's netns. */
-+			if (!net_eq(rds_conn_net(conn), net))
-+				continue;
- 
- 			/* Zero the per-item buffer before handing it to the
- 			 * visitor so any field the visitor does not write -
-@@ -733,6 +741,7 @@ static void rds_walk_conn_path_info(struct socket *sock, unsigned int len,
- 				    u64 *buffer,
- 				    size_t item_len)
- {
-+	struct net *net = sock_net(sock->sk);
- 	struct hlist_head *head;
- 	struct rds_connection *conn;
- 	size_t i;
-@@ -747,6 +756,10 @@ static void rds_walk_conn_path_info(struct socket *sock, unsigned int len,
- 		hlist_for_each_entry_rcu(conn, head, c_hash_node) {
- 			struct rds_conn_path *cp;
- 
-+			/* Only show connections in the caller's netns. */
-+			if (!net_eq(rds_conn_net(conn), net))
-+				continue;
-+
- 			/* XXX We only copy the information from the first
- 			 * path for now.  The problem is that if there are
- 			 * more than one underlying paths, we cannot report
-diff --git a/net/rds/tcp.c b/net/rds/tcp.c
-index 654e23d13..c2e44e9e2 100644
---- a/net/rds/tcp.c
-+++ b/net/rds/tcp.c
-@@ -46,14 +46,6 @@
- static DEFINE_SPINLOCK(rds_tcp_tc_list_lock);
- static LIST_HEAD(rds_tcp_tc_list);
- 
--/* rds_tcp_tc_count counts only IPv4 connections.
-- * rds6_tcp_tc_count counts both IPv4 and IPv6 connections.
-- */
--static unsigned int rds_tcp_tc_count;
--#if IS_ENABLED(CONFIG_IPV6)
--static unsigned int rds6_tcp_tc_count;
--#endif
--
- /* Track rds_tcp_connection structs so they can be cleaned up */
- static DEFINE_SPINLOCK(rds_tcp_conn_lock);
- static LIST_HEAD(rds_tcp_conn_list);
-@@ -110,11 +102,6 @@ void rds_tcp_restore_callbacks(struct socket *sock,
- 	/* done under the callback_lock to serialize with write_space */
- 	spin_lock(&rds_tcp_tc_list_lock);
- 	list_del_init(&tc->t_list_item);
--#if IS_ENABLED(CONFIG_IPV6)
--	rds6_tcp_tc_count--;
--#endif
--	if (!tc->t_cpath->cp_conn->c_isv6)
--		rds_tcp_tc_count--;
- 	spin_unlock(&rds_tcp_tc_list_lock);
- 
- 	tc->t_sock = NULL;
-@@ -201,11 +188,6 @@ void rds_tcp_set_callbacks(struct socket *sock, struct rds_conn_path *cp)
- 	/* done under the callback_lock to serialize with write_space */
- 	spin_lock(&rds_tcp_tc_list_lock);
- 	list_add_tail(&tc->t_list_item, &rds_tcp_tc_list);
--#if IS_ENABLED(CONFIG_IPV6)
--	rds6_tcp_tc_count++;
--#endif
--	if (!tc->t_cpath->cp_conn->c_isv6)
--		rds_tcp_tc_count++;
- 	spin_unlock(&rds_tcp_tc_list_lock);
- 
- 	/* accepted sockets need our listen data ready undone */
-@@ -235,13 +217,24 @@ static void rds_tcp_tc_info(struct socket *rds_sock, unsigned int len,
- 			    struct rds_info_iterator *iter,
- 			    struct rds_info_lengths *lens)
- {
-+	struct net *net = sock_net(rds_sock->sk);
- 	struct rds_info_tcp_socket tsinfo;
- 	struct rds_tcp_connection *tc;
-+	unsigned int cnt = 0;
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(&rds_tcp_tc_list_lock, flags);
- 
--	if (len / sizeof(tsinfo) < rds_tcp_tc_count)
-+	/* First pass: count entries visible in the caller's netns. */
-+	list_for_each_entry(tc, &rds_tcp_tc_list, t_list_item) {
-+		if (tc->t_cpath->cp_conn->c_isv6)
-+			continue;
-+		if (!net_eq(rds_conn_net(tc->t_cpath->cp_conn), net))
-+			continue;
-+		cnt++;
-+	}
-+
-+	if (len / sizeof(tsinfo) < cnt)
- 		goto out;
- 
- 	list_for_each_entry(tc, &rds_tcp_tc_list, t_list_item) {
-@@ -249,6 +242,9 @@ static void rds_tcp_tc_info(struct socket *rds_sock, unsigned int len,
- 
- 		if (tc->t_cpath->cp_conn->c_isv6)
- 			continue;
-+		/* Only show connections in the caller's netns. */
-+		if (!net_eq(rds_conn_net(tc->t_cpath->cp_conn), net))
-+			continue;
- 
- 		tsinfo.local_addr = inet->inet_saddr;
- 		tsinfo.local_port = inet->inet_sport;
-@@ -266,7 +262,7 @@ static void rds_tcp_tc_info(struct socket *rds_sock, unsigned int len,
- 	}
- 
- out:
--	lens->nr = rds_tcp_tc_count;
-+	lens->nr = cnt;
- 	lens->each = sizeof(tsinfo);
- 
- 	spin_unlock_irqrestore(&rds_tcp_tc_list_lock, flags);
-@@ -281,19 +277,32 @@ static void rds6_tcp_tc_info(struct socket *sock, unsigned int len,
- 			     struct rds_info_iterator *iter,
- 			     struct rds_info_lengths *lens)
- {
-+	struct net *net = sock_net(sock->sk);
- 	struct rds6_info_tcp_socket tsinfo6;
- 	struct rds_tcp_connection *tc;
-+	unsigned int cnt = 0;
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(&rds_tcp_tc_list_lock, flags);
- 
--	if (len / sizeof(tsinfo6) < rds6_tcp_tc_count)
-+	/* First pass: count entries visible in the caller's netns. */
-+	list_for_each_entry(tc, &rds_tcp_tc_list, t_list_item) {
-+		if (!net_eq(rds_conn_net(tc->t_cpath->cp_conn), net))
-+			continue;
-+		cnt++;
-+	}
-+
-+	if (len / sizeof(tsinfo6) < cnt)
- 		goto out;
- 
- 	list_for_each_entry(tc, &rds_tcp_tc_list, t_list_item) {
- 		struct sock *sk = tc->t_sock->sk;
- 		struct inet_sock *inet = inet_sk(sk);
- 
-+		/* Only show connections in the caller's netns. */
-+		if (!net_eq(rds_conn_net(tc->t_cpath->cp_conn), net))
-+			continue;
-+
- 		tsinfo6.local_addr = sk->sk_v6_rcv_saddr;
- 		tsinfo6.local_port = inet->inet_sport;
- 		tsinfo6.peer_addr = sk->sk_v6_daddr;
-@@ -309,7 +318,7 @@ static void rds6_tcp_tc_info(struct socket *sock, unsigned int len,
- 	}
- 
- out:
--	lens->nr = rds6_tcp_tc_count;
-+	lens->nr = cnt;
- 	lens->each = sizeof(tsinfo6);
- 
- 	spin_unlock_irqrestore(&rds_tcp_tc_list_lock, flags);
-
-base-commit: b266bacba796ff5c4dcd2ae2fc08aacf7ab39153
--- 
-2.34.1
-
+	-Jay Vosburgh, jv@jvosburgh.net
 
