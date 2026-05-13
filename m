@@ -1,199 +1,307 @@
-Return-Path: <netdev+bounces-287594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287595-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WCmqBgB7BGpoKgIAu9opvQ
-	(envelope-from <netdev+bounces-287594-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 15:22:08 +0200
+	id 4AYLIhh8BGpoKgIAu9opvQ
+	(envelope-from <netdev+bounces-287595-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 15:26:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6711F533F21
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 15:22:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7FA45340A2
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 15:26:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A345E31E1440
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 13:00:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 776E7310BD5F
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 13:03:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C6E94279ED;
-	Wed, 13 May 2026 12:59:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D7BD25D1E9;
+	Wed, 13 May 2026 13:03:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X1d6r5F4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LyZ6H2/H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E438426692
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 12:59:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF4A1F0E25;
+	Wed, 13 May 2026 13:02:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778677185; cv=none; b=N14cj3WygylStJ8q3DBJ4JICJ9gy7f1DUxJeLWNn1dKfKkbhjUjrDCfbcxlJLkAnyNcKOBseF/KveF4NhNVnSzlsLk8wR2zQgeeeeW6i6xd8YHMgqkhJYeLXnQ6/SwBKmL17DodNUNEqoeZ2X180DTXPrqZkAAd7/4lhQo8hZoY=
+	t=1778677379; cv=none; b=Q9I6LgEXF/pFAfwvclGb8PgwIrBNH5b+VuvHh9mPteHeAj5bKIxF/0wixuGjjZrvgeDKbUB+lB3tOP7/BeczBN6FIBZL5N3ZgLScdz7Y+UZkzjdMQHCAqgK+1eW4Vk8oTTZIoU0pYXM7KjtCa74g6NDa6I+LAD710sVHEAWsNhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778677185; c=relaxed/simple;
-	bh=LHOE1mMbJxQim/OpEcoRlURxuH0eMEhtOg9F7R8wTPE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DVJcF54vSSGV1LfpPfyNbx0ZSjBS5RPkfa5hmW1evfI4Wiy4JVoxUaHrG0IlCVJCgB0OLLFJSK6K/eXWgZXonc0MUGy6VCfCG91zf79cmmx4yk3WEfQ+cozKNsY3xQlBMPQzH6sOzt8D77ZNZZN6IxDRN2ACTveb+6nbo8N3CbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X1d6r5F4; arc=none smtp.client-ip=209.85.167.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-4756e74f8edso5199086b6e.1
-        for <netdev@vger.kernel.org>; Wed, 13 May 2026 05:59:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778677183; x=1779281983; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=f23t0zSaqUAfWSysjbdO/3Qdq/GLiYIEowumVnM/uXw=;
-        b=X1d6r5F4OIR/xwrnP96n4s0rJOA+PgXSDt7sPGI4KXgr6Isx55LQ5c39eaMcozXymQ
-         5hz8aL0phRxOZ1d9xvalaseN/8BhwzQ5816FtAcwks19DrDdJvcDGWxKBxbyYOoyTL7L
-         qKvFQpDJKWsk0qEF8RxwC+mbAYr/tjSa8Ougvs4PDC/xQIPt3wHjB9oER21Q9RetaaGA
-         5rp2huZJj7loOol5Nc6u0Om3SqH3sSdWXNApXw8WsehpeB6HeiSRe+hTMqucJfCfFUpU
-         g5oXpb8iqkHRHl3KobI9J+T71iSxfKelnW7oFwUC77Y6RNoAGFkS+wxRACfcOqJWrPxx
-         1mTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778677183; x=1779281983;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=f23t0zSaqUAfWSysjbdO/3Qdq/GLiYIEowumVnM/uXw=;
-        b=bbfDc5qPRy8vJt/2EgiKde+KsKWcJYW89NXx5c09dEmtVUka3TeKjwwH1tLGp91Pnt
-         WugTO311jxqUAMwcvHlh8VWWEuKquVqLGAhRYkbYFrqtiKIa+VtmOB9VcMkH3DkgPl8X
-         kI7Ft/CxZDdlYImnqmUWTtNlpVF+azcprBAKVD+m0klzxkgY9F7IhWsIcBmVokvJFuSN
-         V2Iweb5hMUNZvw6jSqtSq2IsjYpn9icZPpU48xI16mjkWXIk8xr6o0QU2lW6YKpT2Wx4
-         HSebxapuyhMLI/UEenhEBZjx5NPb9NOGPZKthVFoWfIBxfv5pXbbXKtTHR3YMWw4WTat
-         /fVw==
-X-Gm-Message-State: AOJu0Yy6P7FYm6ukwODE/Ie/53IDnz2IZiS36zvuJFg3/t/pJ99sQkIa
-	SM/y8W1+gwR3+gjv2SpPFl2jc48nWP+YW8+WPlmROZYL7SEYqnMvHp5/
-X-Gm-Gg: Acq92OEI/+GTLUj5lW1dhhLag0dz9EFHDKZNoS5qc8w6+uzDa1iV51KH6BZPH86+Mvn
-	p2pnSfROl0JOA6rEN4h+Dlt6LEMuHo3qw9VmRUM5FJHGQ6B13/xDiy2OCaoFgy9ZSDtZzYM3Tvh
-	QL23xK+g5F43erZRwzhZhBJJpyG0/LtMq6pRdNrcWau/nAtrIgHZ2tN92zysLd59QblQPWrw72B
-	ahoVJ4GMOBIwyARvQfOiUDLlEnGGjnIi8hUICZW2PhWr1jYDBn1WufCb0/TT7WB9SFtFjvW/YNz
-	rH4skBpul9wqQrp/x56hN0BoRjs4nCKc5146vts8KZqoJtj6ofwNu0Nc88M/ZpKQnXflOMnQYWt
-	4TDFAng+XaKmONDSV2JZGR1gh4XC2CAO5ljXKha3Kky4ZovMm1L2af4n+FqNQGOmE/5kfgi27Xj
-	+uL2GfUOLYDuJ37HL1rNko
-X-Received: by 2002:a05:6808:5390:b0:479:ae1d:ffe8 with SMTP id 5614622812f47-482b5d460c2mr1560078b6e.4.1778677183125;
-        Wed, 13 May 2026 05:59:43 -0700 (PDT)
-Received: from localhost ([2a03:2880:10ff:41::])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-47c76986404sm24249176b6e.15.2026.05.13.05.59.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2026 05:59:42 -0700 (PDT)
-From: Daniel Zahka <daniel.zahka@gmail.com>
-Date: Wed, 13 May 2026 05:59:38 -0700
-Subject: [PATCH net 3/3] netdevsim: psp: serialize psp stats writers
+	s=arc-20240116; t=1778677379; c=relaxed/simple;
+	bh=w952/StbTzQQpvTv4IVGtb68QWI9Nein9ogKmCl+tws=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZnJdgsJLpdJaUJH2OsCmZ+u+ado1A3UnQ5nDbR0QCb0W0PkX1X5ThhBIMPu4Z9oC4D3XCH53O1hfnpGX16O585U3qfADVKFnT/C2J0I/XI3eEpj7dOkmzze+UR9S6qWlmGNZyxjfM5ztmt0hs/COll1NzEYeZYo/wZEs3+Rp7P4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LyZ6H2/H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F06F4C2BCB7;
+	Wed, 13 May 2026 13:02:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778677379;
+	bh=w952/StbTzQQpvTv4IVGtb68QWI9Nein9ogKmCl+tws=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=LyZ6H2/H0XwhRgDFLwozCZOLN2EiPvTtwDpX/dq/KctJfZrNZU0Yb1NL5rBKULsrZ
+	 jbUa1UFigmYYxEslnZPJFSFQ0Q0/9PYrAgAXc+BgPZlQSTLpfqhj/L09CSffY8WVX1
+	 xowoiIuBynVFBoupy5E/b30TuKbfNhMRxtSVhcICglhWbHL+46LEDl5T8W4moytKgf
+	 oNcgcEHEbUFBhg/WBMRKpzv+KANUEjI+V5nKtsVgfq4Ks5ZVfYbGwz87B/+lgQBcpU
+	 4LnI7IEFZxJbkOGQe8O5rsSp3qYCmn9uvqs+SUbNosbWfqTsnaBeJORpokAocL2Dbl
+	 Nmu/fqxw6905A==
+Message-ID: <627bb280-be44-4648-8771-5a479cda988f@kernel.org>
+Date: Wed, 13 May 2026 15:02:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] mm: introduce a new page type for page pool in page
+ type
+To: Byungchul Park <byungchul@sk.com>
+Cc: Dragos Tatulea <dtatulea@nvidia.com>, linux-mm@kvack.org,
+ akpm@linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel_team@skhynix.com, harry.yoo@oracle.com,
+ ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org,
+ hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me,
+ saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
+ andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
+ lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
+ rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
+ jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com,
+ ilias.apalodimas@linaro.org, willy@infradead.org, brauner@kernel.org,
+ kas@kernel.org, yuzhao@google.com, usamaarif642@gmail.com,
+ baolin.wang@linux.alibaba.com, almasrymina@google.com, toke@redhat.com,
+ asml.silence@gmail.com, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
+ sfr@canb.auug.org.au, dw@davidwei.uk, ap420073@gmail.com
+References: <20260224051347.19621-1-byungchul@sk.com>
+ <982b9bc1-0a0a-4fc5-8e3a-3672db2b29a1@nvidia.com>
+ <20260513121805.GA22430@system.software.com>
+ <8348d867-f8a1-432c-be2d-699ad96b2e93@kernel.org>
+ <20260513123920.GA51788@system.software.com>
+From: "David Hildenbrand (Arm)" <david@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=david@kernel.org; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <20260513123920.GA51788@system.software.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260513-fix-psp-stats-v1-3-cdb3174f252f@gmail.com>
-References: <20260513-fix-psp-stats-v1-0-cdb3174f252f@gmail.com>
-In-Reply-To: <20260513-fix-psp-stats-v1-0-cdb3174f252f@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-X-Mailer: b4 0.13.0
-X-Rspamd-Queue-Id: 6711F533F21
+X-Rspamd-Queue-Id: E7FA45340A2
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287594-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-287595-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[nvidia.com,kvack.org,linux-foundation.org,vger.kernel.org,skhynix.com,oracle.com,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,lunn.ch,google.com,redhat.com,suse.cz,suse.com,cmpxchg.org,linaro.org,infradead.org,linux.alibaba.com,canb.auug.org.au,davidwei.uk];
+	RCPT_COUNT_TWELVE(0.00)[47];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[danielzahka@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[david@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-The u64_stats_* api requires mutual exclusion on writers. The simplest
-way to do this is just to add a spinlock to the writer path, rather
-than making the stats per queue.
+On 5/13/26 14:39, Byungchul Park wrote:
+> On Wed, May 13, 2026 at 02:29:46PM +0200, David Hildenbrand (Arm) wrote:
+>  On 5/13/26 14:18, Byungchul Park wrote:
+>>>
+>>> Hi,
+>>>
+>>> The problem comes from the fact that page_type and _mapcount are
+>>> union'ed but there is a case where these two information should be kept
+>>> at the same time.
+>>>
+>>> Why don't we allow these two information can be kept in the 4 bytes at
+>>> the same time until Zi Yan's work on _mapcount and page_type will be
+>>> done, instead of taking a step back?
+>>>
+>>> It can be more optimized but I suggest the approach I just mentioned:
+>>> ---
+>>> diff --git a/fs/proc/internal.h b/fs/proc/internal.h
+>>> index 64dc44832808..e5ec204866dc 100644
+>>> --- a/fs/proc/internal.h
+>>> +++ b/fs/proc/internal.h
+>>> @@ -185,8 +185,7 @@ static inline int folio_precise_page_mapcount(struct folio *folio,
+>>>  {
+>>>       int mapcount = atomic_read(&page->_mapcount) + 1;
+>>>
+>>> -     if (page_mapcount_is_type(mapcount))
+>>> -             mapcount = 0;
+>>> +     mapcount = page_mapcount_clear_type(mapcount);
+>>>       if (folio_test_large(folio))
+>>>               mapcount += folio_entire_mapcount(folio);
+>>>
+>>> diff --git a/include/linux/mm.h b/include/linux/mm.h
+>>> index 8260e28205e9..f45064796313 100644
+>>> --- a/include/linux/mm.h
+>>> +++ b/include/linux/mm.h
+>>> @@ -1865,8 +1865,7 @@ static inline int folio_mapcount(const struct folio *folio)
+>>>
+>>>       if (likely(!folio_test_large(folio))) {
+>>>               mapcount = atomic_read(&folio->_mapcount) + 1;
+>>> -             if (page_mapcount_is_type(mapcount))
+>>> -                     mapcount = 0;
+>>> +             mapcount = page_mapcount_clear_type(mapcount);
+>>>               return mapcount;
+>>>       }
+>>>       return folio_large_mapcount(folio);
+>>> diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+>>> index 0e03d816e8b9..f3b0d1fa262d 100644
+>>> --- a/include/linux/page-flags.h
+>>> +++ b/include/linux/page-flags.h
+>>> @@ -934,9 +934,9 @@ static inline bool page_type_has_type(int page_type)
+>>>  }
+>>>
+>>>  /* This takes a mapcount which is one more than page->_mapcount */
+>>> -static inline bool page_mapcount_is_type(unsigned int mapcount)
+>>> +static inline unsigned int page_mapcount_clear_type(unsigned int mapcount)
+>>>  {
+>>> -     return page_type_has_type(mapcount - 1);
+>>> +     return (unsigned int)(((int)(mapcount << 8)) >> 8);
+>>>  }
+>>>
+>>>  static inline bool page_has_type(const struct page *page)
+>>> @@ -953,16 +953,20 @@ static __always_inline void __folio_set_##fname(struct folio *folio)    \
+>>>  {                                                                    \
+>>>       if (folio_test_##fname(folio))                                  \
+>>>               return;                                                 \
+>>> -     VM_BUG_ON_FOLIO(data_race(folio->page.page_type) != UINT_MAX,   \
+>>> +     VM_BUG_ON_FOLIO(page_type_has_type(data_race(folio->page.page_type)), \
+>>>                       folio);                                         \
+>>> -     folio->page.page_type = (unsigned int)PGTY_##lname << 24;       \
+>>> +     folio->page.page_type &= ~(PGTY_mapcount_underflow << 24);      \
+>>> +     folio->page.page_type |= (unsigned int)PGTY_##lname << 24;      \
+>>>  }                                                                    \
+>>>  static __always_inline void __folio_clear_##fname(struct folio *folio)       \
+>>>  {                                                                    \
+>>> -     if (folio->page.page_type == UINT_MAX)                          \
+>>> +     int mapcount;                                                   \
+>>> +                                                                     \
+>>> +     if (!page_type_has_type(folio->page.page_type))                 \
+>>>               return;                                                 \
+>>>       VM_BUG_ON_FOLIO(!folio_test_##fname(folio), folio);             \
+>>> -     folio->page.page_type = UINT_MAX;                               \
+>>> +     mapcount = atomic_read(&folio->page._mapcount);                 \
+>>> +     folio->page.page_type = page_mapcount_clear_type(mapcount);     \
+>>>  }
+>>>
+>>>  #define PAGE_TYPE_OPS(uname, lname, fname)                           \
+>>> @@ -975,15 +979,20 @@ static __always_inline void __SetPage##uname(struct page *page)         \
+>>>  {                                                                    \
+>>>       if (Page##uname(page))                                          \
+>>>               return;                                                 \
+>>> -     VM_BUG_ON_PAGE(data_race(page->page_type) != UINT_MAX, page);   \
+>>> -     page->page_type = (unsigned int)PGTY_##lname << 24;             \
+>>> +     VM_BUG_ON_PAGE(page_type_has_type(data_race(page->page_type)),  \
+>>> +                             page);                                  \
+>>> +     page->page_type &= ~(PGTY_mapcount_underflow << 24);            \
+>>> +     page->page_type |= (unsigned int)PGTY_##lname << 24;            \
+>>>  }                                                                    \
+>>>  static __always_inline void __ClearPage##uname(struct page *page)    \
+>>>  {                                                                    \
+>>> -     if (page->page_type == UINT_MAX)                                \
+>>> +     int mapcount;                                                   \
+>>> +                                                                     \
+>>> +     if (!page_type_has_type(page->page_type))                       \
+>>>               return;                                                 \
+>>>       VM_BUG_ON_PAGE(!Page##uname(page), page);                       \
+>>> -     page->page_type = UINT_MAX;                                     \
+>>> +     mapcount = atomic_read(&page->_mapcount);                       \
+>>> +     page->page_type = page_mapcount_clear_type(mapcount);           \
+>>>  }
+>>>
+>>>  /*
+>>> diff --git a/mm/debug.c b/mm/debug.c
+>>> index 77fa8fe1d641..9a932ded09d4 100644
+>>> --- a/mm/debug.c
+>>> +++ b/mm/debug.c
+>>> @@ -74,8 +74,7 @@ static void __dump_folio(const struct folio *folio, const struct page *page,
+>>>       int mapcount = atomic_read(&page->_mapcount) + 1;
+>>>       char *type = "";
+>>>
+>>> -     if (page_mapcount_is_type(mapcount))
+>>> -             mapcount = 0;
+>>> +     mapcount = page_mapcount_clear_type(mapcount);
+>>>
+>>>       pr_warn("page: refcount:%d mapcount:%d mapping:%p index:%#lx pfn:%#lx\n",
+>>>                       folio_ref_count(folio), mapcount, mapping,
+>>> ---
+>>>
+>>> Thoughts?
+>>
+>> God no.
+> 
+> This is not final patch, but for sharing the rough idea *with code* -
+> maybe there are more points in code that should be adjusted by the
+> change.  I just typed the draft patch quick just for sharing idea.
+> 
+> If we should allow pp type pages to be used in mapping as well, then
+> we should allow a page to keep both its type and mapcount at the same
+> time.  Am I missing something?
 
-Synchronization of the reader and writer paths use the
-u64_stats_update_begin() api and does not require any fixes.
+We don't want code to accidentally overflow mapcounts into these bits and have
+them wrongly be detected as page types.
 
-Fixes: 178f0763c5f3 ("netdevsim: implement psp device stats")
-Assisted-by: Codex:gpt-5.5
-Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
----
- drivers/net/netdevsim/netdevsim.h | 1 +
- drivers/net/netdevsim/psp.c       | 5 +++++
- 2 files changed, 6 insertions(+)
-
-diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-index d909c4160ea1..bc36033b511b 100644
---- a/drivers/net/netdevsim/netdevsim.h
-+++ b/drivers/net/netdevsim/netdevsim.h
-@@ -115,6 +115,7 @@ struct netdevsim {
- 	int rq_reset_mode;
- 
- 	struct {
-+		spinlock_t stats_lock;
- 		u64_stats_t rx_packets;
- 		u64_stats_t rx_bytes;
- 		u64_stats_t tx_packets;
-diff --git a/drivers/net/netdevsim/psp.c b/drivers/net/netdevsim/psp.c
-index 5ff91da24539..56ddbf146489 100644
---- a/drivers/net/netdevsim/psp.c
-+++ b/drivers/net/netdevsim/psp.c
-@@ -50,10 +50,12 @@ nsim_do_psp(struct sk_buff *skb, struct netdevsim *ns,
- 	}
- 
- 	psp_len = skb->len - skb_inner_transport_offset(skb);
-+	spin_lock_bh(&ns->psp.stats_lock);
- 	u64_stats_update_begin(&ns->psp.syncp);
- 	u64_stats_inc(&ns->psp.tx_packets);
- 	u64_stats_add(&ns->psp.tx_bytes, psp_len);
- 	u64_stats_update_end(&ns->psp.syncp);
-+	spin_unlock_bh(&ns->psp.stats_lock);
- 
- 	/* Now pretend we just received this frame */
- 	peer_psd = rcu_dereference(peer_ns->psp.dev);
-@@ -79,10 +81,12 @@ nsim_do_psp(struct sk_buff *skb, struct netdevsim *ns,
- 		refcount_inc(&(*psp_ext)->refcnt);
- 		skb->decrypted = 1;
- 
-+		spin_lock_bh(&peer_ns->psp.stats_lock);
- 		u64_stats_update_begin(&peer_ns->psp.syncp);
- 		u64_stats_inc(&peer_ns->psp.rx_packets);
- 		u64_stats_add(&peer_ns->psp.rx_bytes, psp_len);
- 		u64_stats_update_end(&peer_ns->psp.syncp);
-+		spin_unlock_bh(&peer_ns->psp.stats_lock);
- 	} else {
- 		struct ipv6hdr *ip6h __maybe_unused;
- 		struct iphdr *iph;
-@@ -271,6 +275,7 @@ int nsim_psp_init(struct netdevsim *ns)
- 	struct dentry *ddir = ns->nsim_dev_port->ddir;
- 	struct psp_dev *psd;
- 
-+	spin_lock_init(&ns->psp.stats_lock);
- 	u64_stats_init(&ns->psp.syncp);
- 
- 	psd = psp_dev_create(ns->netdev, &nsim_psp_ops, &nsim_psp_caps, ns);
+This is just very fragile.
 
 -- 
-2.52.0
+Cheers,
 
+David
 
