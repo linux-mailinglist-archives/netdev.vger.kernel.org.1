@@ -1,203 +1,195 @@
-Return-Path: <netdev+bounces-287491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287492-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8BuGDqJGBGp2GgIAu9opvQ
-	(envelope-from <netdev+bounces-287491-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:38:42 +0200
+	id QH1UIGNHBGrzGgIAu9opvQ
+	(envelope-from <netdev+bounces-287492-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:41:55 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F8EF530C7C
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:38:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E48BE530D5B
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:41:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D6BFD31BFDD4
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 09:18:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DB258305430D
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 09:23:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97E943E5A24;
-	Wed, 13 May 2026 09:18:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22E193E5EF5;
+	Wed, 13 May 2026 09:23:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="D0yZT3v2";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="THx3x4p7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="URqbReW+"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b1-smtp.messagingengine.com (fhigh-b1-smtp.messagingengine.com [202.12.124.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8621D30676A
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 09:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D50433E5588
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 09:22:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778663889; cv=none; b=A2SGHcD65t2i7wyvAzk2rWCjU5A+SqSwLVpb221/mcuA/ogsDTv81/jRppmIWOcjhGa+Xi7IpVkmFkdygEsL+Wjg57iWo3uc/e3g+ky5v/uUzGQMLLO5fwREMwpnAPrWMEucx/Ta9UlbgxClDTg2cgOQ/Ly1pZ4mLzE9juI9fvc=
+	t=1778664181; cv=none; b=CSM0mtH8v62RDpl6ksQPH/VKhdra2u7bm+/mQeIPOShz7bUFzPdlCSxadq5MfBYzlK65HzfXGtt3syuzagga1N8BGTSy2kzu90ISu3SpzLw6b92mfuiivg5D0J9I5shzuCvPMRKVE4QtQteQHYsjFIqVGd55x5uV25g6iJiLUJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778663889; c=relaxed/simple;
-	bh=raMftH6D9YARKJvdfPGfZLGMahxfFWS658sdsOIS1AY=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=nSnTBz4OlsO6oq0FMML9MS91Xp3ORYWwQnERIqpiai1gbvrEY9mXX+TXjFPXiQ3PG5MyjbULRzVIyI9ojpn3sXHVBA3PNKwrnmWTjO8Yr45exfy6EBZ5+bZ2iPoczOXiy9yS+6M8XyIS5Fzz5+RmgXXZQ5+6CQBFTXbcczjtyOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=D0yZT3v2; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=THx3x4p7; arc=none smtp.client-ip=202.12.124.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 16A647A0185;
-	Wed, 13 May 2026 05:18:05 -0400 (EDT)
-Received: from phl-imap-14 ([10.202.2.87])
-  by phl-compute-10.internal (MEProxy); Wed, 13 May 2026 05:18:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1778663884;
-	 x=1778750284; bh=CZzyZnP316grrL9Fo/vVZ+OYfn6mmxN+qddwd2EOk3I=; b=
-	D0yZT3v2dLb6295rRc1924QmXhbB2Tjl6ntxBqugrr7HzJbVu8pw01VhRzOCmVlC
-	wBmg8Ogk7aLc8eLKOw7VMjjRY/S16XbtgE+JTvZxQmAMulfRHKdTXYH5/JcmiS1J
-	DK2ojBY7+ThiP3G4F4Tx4j2233MUQoFD/AEHocp0Uc/GqgN7RWLoRmbdws4dGXrc
-	oXM4jlml3FZUhWoTF1eRy/hFKhD6/vHy5LVFoAIHw8cGvSMrL7gKKrxGGlhdDgPp
-	LLiJACFopLFykXJUclv8UshFatz9j4lXAqoDSMqMa3zva2P2Kn3sRyKM94Z+TV7J
-	SajTCY3CO9gfJDkgAlvcgg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1778663884; x=
-	1778750284; bh=CZzyZnP316grrL9Fo/vVZ+OYfn6mmxN+qddwd2EOk3I=; b=T
-	Hx3x4p7HXUnL+FmIPPnRxKfXe9DY9t7vzTCE2BAElVlLn60easKbnBtztIyq4HnH
-	eFpGpQY6q6MmCCC/vmFH1FDCwq2RbESgWaQgaT22Na6ZhMUOuNXWcApu+dpi3zoA
-	FMDMoYc1tNIRvNJApNu7OCqP6clCJTfH4oXl4SnKLZomin1Xz6JHv6Puyp7ifJEr
-	Emc2ztjtFgUB55G3hQe+IOglzX5SbXFqVpOPQokPOff7dOnQEVi0mVuzfBLyfItn
-	v2AucYBZh1e3hgiFYRfS0abQpfUhKpxyjQicyl92Bq4SzUoZn/RlIbVmryHvDR/r
-	atcPgMvNfFCp4S5ItemcQ==
-X-ME-Sender: <xms:zEEEaqNkdIhaMnNM5mvQ_aGgEIMLz7tKM7dDIzXQx7yZ2yWWSqXuLQ>
-    <xme:zEEEajwfzKe-x9aCLspe6oeE0HA2rITl53d5ZZKpssXf3V9sRPLADSLBfOdjw8-7X
-    dtlFbKk04gYD_XlaszQgYPr76uCNly2Gk1tF11Yrh-oEpZYNfVcXE8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduvdegvdekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehlihgt
-    vgcuofhikhhithihrghnshhkrgdfuceorghlihgtvgdrkhgvrhhnvghlsehfrghsthhmrg
-    hilhdrihhmqeenucggtffrrghtthgvrhhnpefhgfevgeeljeegleeiffduheegieehtdff
-    tdetvdffieelkedthfejleejgfeftdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgne
-    cuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghlihgt
-    vgdrkhgvrhhnvghlsehfrghsthhmrghilhdrihhmpdhnsggprhgtphhtthhopeduuddpmh
-    houggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdr
-    nhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpth
-    htohepfihilhhlvghmsgesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhhorhhmshes
-    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprh
-    gtphhtthhopehmrghtthhhvgifrdhstghhfigrrhhtiieslhhinhhugidruggvvhdprhgt
-    phhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepug
-    htrghtuhhlvggrsehnvhhiughirgdrtghomhdprhgtphhtthhopehgrghlsehnvhhiughi
-    rgdrtghomh
-X-ME-Proxy: <xmx:zEEEat7IZ8TEGj7bauXbLjcxX9OvfbCQD6mU0INud6Q8VRJG8DYmJg>
-    <xmx:zEEEapKAyPHdW-Nv1pObXDrCFb9NlX0pxMK_SbceJoRz6_LG4-T5lA>
-    <xmx:zEEEatwtyC_HsC5lyUuzFRj4eIVx9hbey9RhWSME2w9vjxd1jCOohw>
-    <xmx:zEEEapIBJDeiofR2R5f1hz8md-NbpJPWjgtnjCVMvrZ29EzYdXskZg>
-    <xmx:zEEEavNRoFumzAC8ekjwRJwzCxjLIvRSyepnTa6qj-8Y_YJATDgZOzHg>
-Feedback-ID: i559e4809:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 5D2DAC4006E; Wed, 13 May 2026 05:18:04 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1778664181; c=relaxed/simple;
+	bh=N/rB15ox1cgPlD7+hK+mFAOLfFqtnpiPMNHcmTa+DDQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WOWK9E11qEjv42wGXiB5PkzMtGyimZILbP1+I6T97v4+zzhmw4Q3LKue/1qnai5wpvSBBI09uefX5WFXw5U+oJmNh0mv6Hq/z8tlhY8uNsSL5uW0xQgLjVcX1Hbd32d6d3KvRVHewHKk2hXZzXYq9BxWrnpuXVzmHqV52BxJJ88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=URqbReW+; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2b45cb89f7eso41798355ad.0
+        for <netdev@vger.kernel.org>; Wed, 13 May 2026 02:22:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778664179; x=1779268979; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kpyzv2VHIhgzTfaCglkBvOnwlisO3O8fbQYUx8aZ6LM=;
+        b=URqbReW+SWffxEfZus0B2tRaQslrQ+e61f9uyvFzBcOc5gr6WenTkZqDIfFjmAqDZr
+         Ybc3n16LLQc5k0PqXhaoh2uDd/7qQMe/M9YH03EJ+FW0bVoq1WCfD43rcrOE97m2hc9c
+         9+u7fMmVxCi2KRWhlBCiM58/sAzTrWxsQ0w2KNBm8E+mcryO4nyWzGs7WpIBG8GXB3NF
+         WPrbLp3mhrC2kmlHpMANTKEjzdOfhStZrYv8q+qGjvFk6Vxddb+5yDkyGm4MAZKyrZ1C
+         rDw8YaDI8nBylfPEAGb992aXxF9isgQJrBzLaJ8umi8egScOhdo9X4gCjiIslHDDOvjq
+         Z8Nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778664179; x=1779268979;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kpyzv2VHIhgzTfaCglkBvOnwlisO3O8fbQYUx8aZ6LM=;
+        b=kJFdqZfE8z58LKJPW/2goAESy8Qym367OKTqb5n+65BQER31bZvPpfAs45+/gb9R2W
+         g6cYc6a+oGidQOsi3jZxhfhJ3sJ3RiMfnhOmKGVxyMqcg5m/SRHAsuvx7wu4A854NENW
+         eu2iLotZKsrcWa6ZKYzou/x3p3U3M/1HFPhxkrqPxyacvz4e1hEd2oCsFs0x6OaQbZ39
+         0AsH3gjK7EGOwvSQUP19J3B3kYMLGNbTJrj7N6IFyh9yF7N1SPi4RpJoOaFILu9oyX/b
+         VNfSmsdHX2rjYfnvC1cz9gvUpX9f9kWBUp4XVIIt429mqTff3HmbrGvySfc57LGRGGU8
+         cUmw==
+X-Gm-Message-State: AOJu0YyRsJ3MyN1F9nJd/NKnK5MwvnViImVJGCDdx91hFzWHKY6+l1i7
+	ZNv0jUlp6Vugl8E5sH/GyrmbpTXIA0QlMY9NJfTzbdHsE9r3HutJtBRixkAzboyF
+X-Gm-Gg: Acq92OE1Y35GpNPxE5DF89oVdQcuef0yWcoBFPo7bb/q5ykyR3pqvb6Ov5XCvnGWbWj
+	fSaT7vI9Ydz0NXonoWUspll/ykVYJzQl1AkiuzKsLziryK5RFeerz4i0f3tpf6ELX0alrVEtF94
+	e6As6L2qkM716BSQETQEO4YrCAfFyT11TlGMCzZd7TqJk+nvVvdta6IKnFF1hO+Kz6lZPX6QDSO
+	zAytpLj/ArCom7UmJEd7oOU1g8gli0BgImDHHdrZuWkqpAiWDN5lOFxCPQOhpYwg+P9xyNEv1H0
+	3nSu64xq5MThARekWyBjEjC2ppXZqNUs2ZxkP8Emr30KEHayjq2F86tkM2r0LTy86Kma0Lw2y52
+	3fjbj9bfritdcZrQaZEx2KF9goVLvs7IIl2k+6UKu59F46uOST5LA5K958dOlQ3w3ubAvcVSvj9
+	OBM3V6e3JwAK/aOKCkAfdUptZwldFsIMKMFlzNq32hNuz/hN2UflAVvO5t0kjEjg==
+X-Received: by 2002:a17:902:db0d:b0:2b0:7d3d:756a with SMTP id d9443c01a7336-2bd276e200bmr30136155ad.35.1778664178592;
+        Wed, 13 May 2026 02:22:58 -0700 (PDT)
+Received: from r912.lan.4v1.in ([182.70.116.80])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1d27002sm167791555ad.8.2026.05.13.02.22.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 May 2026 02:22:58 -0700 (PDT)
+From: Avinash Duduskar <avinash.duduskar@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] llc: avoid sparse cast-truncates warning in counter clamps
+Date: Wed, 13 May 2026 14:52:53 +0530
+Message-ID: <20260513092253.3035961-1-avinash.duduskar@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 13 May 2026 11:17:43 +0200
-From: "Alice Mikityanska" <alice.kernel@fastmail.im>
-To: "Gal Pressman" <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Andrew Lunn" <andrew+netdev@lunn.ch>,
- netdev@vger.kernel.org
-Cc: "Simon Horman" <horms@kernel.org>, "Dragos Tatulea" <dtatulea@nvidia.com>,
- "Willem de Bruijn" <willemb@google.com>,
- "Matthew Schwartz" <matthew.schwartz@linux.dev>
-Message-Id: <f75c1cf5-b5ad-47db-952f-faad9f0a33ed@app.fastmail.com>
-In-Reply-To: <20260513074349.2152146-1-gal@nvidia.com>
-References: <20260513074349.2152146-1-gal@nvidia.com>
-Subject: Re: [PATCH net] udp: Fix UDP length on last GSO_PARTIAL segment
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 7F8EF530C7C
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: E48BE530D5B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.65 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm3,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
-	TAGGED_FROM(0.00)[bounces-287491-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[avinashduduskar@gmail.com,netdev@vger.kernel.org];
+	TO_DN_NONE(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287492-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FREEMAIL_FROM(0.00)[fastmail.im];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email,nvidia.com:email,messagingengine.com:dkim,fastmail.im:dkim]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Wed, May 13, 2026, at 09:43, Gal Pressman wrote:
-> Following the cited commit, __udp_gso_segment() writes single MSS length
-> in the UDP header.
-> The cited patch doesn't account for the fact that the last segment could
-> be a GSO skb by itself. This could happen when the size of the packet is
-> a multiple of MSS, hence the first segment is also the last one (there
-> is no need for a remainder skb).
->
-> When the post-loop segment is a GSO skb, assign the single MSS length in
-> the UDP header.
->
-> Fixes: b10b446ce7ad ("udp: gso: Use single MSS length in UDP header for 
-> GSO_PARTIAL")
-> Reported-by: Matthew Schwartz <matthew.schwartz@linux.dev>
-> Closes: 
-> https://lore.kernel.org/all/6c3fb15e-711d-4b8d-b152-e03d9b05293f@linux.dev/
-> Tested-by: Matthew Schwartz <matthew.schwartz@linux.dev>
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Signed-off-by: Gal Pressman <gal@nvidia.com>
-> ---
->  net/ipv4/udp_offload.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-> index a0813d425b71..71df45f9488a 100644
-> --- a/net/ipv4/udp_offload.c
-> +++ b/net/ipv4/udp_offload.c
-> @@ -604,7 +604,7 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
->  		       seg->data_len);
->  	check = csum16_add(csum16_sub(uh->check, uh->len), newlen);
-> 
-> -	uh->len = newlen;
-> +	uh->len = skb_is_gso(seg) ? msslen : newlen;
->  	uh->check = check;
+llc_conn_ac_inc_npta_value() and llc_conn_ac_inc_tx_win_size()
+clamp their counters to the maximum valid 7-bit value via
+(u8) ~LLC_2_SEQ_NBR_MODULO. LLC_2_SEQ_NBR_MODULO is defined as
+((u8) 128) in include/net/llc_pdu.h, but the (u8) cast does not
+prevent integer promotion of the operand of ~: ~128 is computed
+as int (0xffffff7f), and the surrounding (u8) cast truncates
+back to 0x7f. The result is correct (127), but the implicit
+truncation is flagged by sparse:
 
-This is going to have the same checksum bug as your first commit, which
-I'm fixing in [1]. You should use the right value of either msslen or
-newlen when modifying check a couple of lines above.
+  net/llc/llc_c_ac.c:1008:38: warning: cast truncates bits from
+      constant value (ffffff7f becomes 7f)
+  (and three more at lines 1009, 1099, 1100)
 
-That said, maybe you can base your patch on top of my checksum fix? For
-the last packet, it will then be:
+Replace the (u8) ~LLC_2_SEQ_NBR_MODULO expression with
+LLC_2_SEQ_NBR_MODULO - 1, which evaluates to 127 directly and
+silences sparse.
 
-if (!skb_is_gso(seg))
-        newlen = /* the new value */;
-/* keep newlen as is otherwise: my newlen is your msslen */
-check = csum16_add(csum16_sub(uh->check, uh->len), newlen);
-uh->len = newlen;
-uh->check = check;
+The same ~LLC_2_SEQ_NBR_MODULO pattern also appears in
+include/net/llc_pdu.h:148 as part of PDU_GET_NEXT_Vr, but there
+the result is immediately &-masked, so the int promotion is
+harmless and sparse does not flag it; it is left alone.
 
-[1]: https://lore.kernel.org/netdev/20260512165648.386518-3-alice.kernel@fastmail.im/
+This patch is the minimum diff to silence the warning. The
+counter-clamp idiom itself could be modernized to
+min_t(u8, ..., LLC_2_SEQ_NBR_MODULO - 1), but that is a
+separate cleanup left for another patch.
 
-> 
->  	if (seg->ip_summed == CHECKSUM_PARTIAL)
-> -- 
-> 2.52.0
+No functional change.
+
+Signed-off-by: Avinash Duduskar <avinash.duduskar@gmail.com>
+---
+Built with CONFIG_LLC2=m; full kernel build clean, sparse no
+longer warns on the touched lines.
+
+ net/llc/llc_c_ac.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/net/llc/llc_c_ac.c b/net/llc/llc_c_ac.c
+index 0779daa8aa8f..ab86c720b3ec 100644
+--- a/net/llc/llc_c_ac.c
++++ b/net/llc/llc_c_ac.c
+@@ -1005,8 +1005,8 @@ static int llc_conn_ac_inc_npta_value(struct sock *sk, struct sk_buff *skb)
+ 		llc->dec_step = 0;
+ 		llc->dec_cntr = llc->inc_cntr = 2;
+ 		++llc->npta;
+-		if (llc->npta > (u8) ~LLC_2_SEQ_NBR_MODULO)
+-			llc->npta = (u8) ~LLC_2_SEQ_NBR_MODULO;
++		if (llc->npta > LLC_2_SEQ_NBR_MODULO - 1)
++			llc->npta = LLC_2_SEQ_NBR_MODULO - 1;
+ 	} else
+ 		--llc->inc_cntr;
+ 	return 0;
+@@ -1096,8 +1096,8 @@ int llc_conn_ac_inc_tx_win_size(struct sock *sk, struct sk_buff *skb)
+ 	struct llc_sock *llc = llc_sk(sk);
+ 
+ 	llc->k += 1;
+-	if (llc->k > (u8) ~LLC_2_SEQ_NBR_MODULO)
+-		llc->k = (u8) ~LLC_2_SEQ_NBR_MODULO;
++	if (llc->k > LLC_2_SEQ_NBR_MODULO - 1)
++		llc->k = LLC_2_SEQ_NBR_MODULO - 1;
+ 	return 0;
+ }
+ 
+
+base-commit: 8ebd24a7822cbae25beeafba49b2159d6a68a5f2
+-- 
+2.54.0
+
 
