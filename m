@@ -1,224 +1,162 @@
-Return-Path: <netdev+bounces-287485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287486-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6H7gNZA/BGoqFgIAu9opvQ
-	(envelope-from <netdev+bounces-287485-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:08:32 +0200
+	id 4MKIAZxBBGpJGQIAu9opvQ
+	(envelope-from <netdev+bounces-287486-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:17:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79B1B530434
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:08:32 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83C495307BC
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:17:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0B4513017E49
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 09:07:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2AE9430EEEAA
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 09:09:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD41426B971;
-	Wed, 13 May 2026 09:07:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B5913A5E86;
+	Wed, 13 May 2026 09:09:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J2cq6pwc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RFD11lWO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 240A42836A0
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 09:07:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A453672BE
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 09:09:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778663257; cv=none; b=EF2W3hTCH5q1MLhgmwBUNhq/gILISiNeBkjIjUuVTB9WJVEv3XbTm34LRpRR3tjlYDBX5GxyEqvL1YB7uxCbCERQX8cdmJIdx15Y1NWk6IVdcDSSmBrOoMnMgSAHPF0K50ikdCcrkgB5sfhXwrsMP8j6qEL6DuhGcBKBQ9GkgPc=
+	t=1778663370; cv=none; b=scaNfAEDKHkuWBPI7tpegoBGudAQV1q/hWOvSgZXvjwQfV4ASSSx3yLB0RewjIkZFF8vkNqtXfenGxZpnFPyqkKbnArnvFYJMjVGQptjCmQfoJhJaUPuONcEWB9xnOpOMoVSy0OisrRRXaVdQAs3jTN6AJsxxHmTohEwJH2mNE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778663257; c=relaxed/simple;
-	bh=ERwsM3PJL5y8q+Lhj4NVYS3FtGsrJrNfL6nETyLWeik=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KzoAfv1y0dVivmPNXXGQG2VnEOZIUkHP0uz+fe7tmUwwVBvw1oUlyvI87CuOwrV0pWl60cYa/6SnXw1MKqtEFNtd4x5bogVsK0QH6J1SzuXXsVVlTDE8wdJg/ReZMX5X3LJjVdDmuOrGYb8PjbC7jFPoxemWdQYR+zS3WLdJ68U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J2cq6pwc; arc=none smtp.client-ip=209.85.128.45
+	s=arc-20240116; t=1778663370; c=relaxed/simple;
+	bh=8wgVrvTzhPuyby+YsggHPtQ7/AgumtARByVyaARbZb0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=PcQ+NyRJDIQOC5HbFknL1LPIUS0s8SGlm+FE2nmv9+x1YYjCvrvaD6JMhFSGZg32+Eia3SHtON5dwmplctht18n1CnIOZ1sdbYjiIDDLVXDkeeIebqf5n9tfibYagWJWiCWTXpdNzSiTWzqMMVleZSLnZYlajVgIQNgC1WKvuyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RFD11lWO; arc=none smtp.client-ip=209.85.167.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-48e82c23840so28648105e9.3
-        for <netdev@vger.kernel.org>; Wed, 13 May 2026 02:07:35 -0700 (PDT)
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5a8cb92f26aso3135830e87.1
+        for <netdev@vger.kernel.org>; Wed, 13 May 2026 02:09:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778663254; x=1779268054; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qN/W8ebLgutWz02+3OnJOFBU8z3ZOcJD73mdZlWwDCo=;
-        b=J2cq6pwcDO2IC+Mc/8cYcTi8F1NkF78835iJBAZdO75gebMz+98F2IB9CSI040LdHo
-         2TydZOoxCXlx0M/S1EEieyq/sTl9Z4NNBwJbZXTbm/N1KARxLuRmgoJv7T2+Y2qZG370
-         lXUEEiH0Td/Zp1DwCRkpdpKn571UM+Co/UmVUkL6bsxjxOBqQtcq/uU1aVjeBqSQZRuH
-         YVlOk99sMYmJDSeF4mrvRN+6Ysp7unme3EEWSEzpep9OLcnXZfy/kCAP/Ovnya6i8mFJ
-         l7/8CLXdmPMlxir6tuFTkozkzqxw6ur0z04NnA46vCnpe5zuJFoMROHZaDV4Mzv+A2Y9
-         Bxjg==
+        d=gmail.com; s=20251104; t=1778663367; x=1779268167; darn=vger.kernel.org;
+        h=user-agent:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fYyER6YbOgaODTitWGTBF5s2T8z2KS499gj7ChXFEfA=;
+        b=RFD11lWOlZNOM7VW69G9qtkwmzUFfIqvRKEAUuB1Dc7GC1oQLe7fF+aIyGz0N6AIXh
+         hmrPGpO5sAYhj4agTDPx/dPn0xKj4dKLmbKExH6IwouQ07Zs07V+WR3HqD3FP7YTt65g
+         HQh1qVazOKOfMZf0FmH7N+tFHak5eR3BsQ08MHyZtrxDSqgw9BTSijmCAjMg9lCK+WMD
+         gopENqdZ875x6Qa3zMA594hEmSkaRjuGfcd07buA1a1k9p5zGm67TPmvptk7kngETZaD
+         fjmKZ7MnudlWDOTTAOmpTLgcgE+3W8C1/zs6C9Wx0k8gALdVoUUB7AwKmWdZQB8ovr15
+         GepQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778663254; x=1779268054;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=qN/W8ebLgutWz02+3OnJOFBU8z3ZOcJD73mdZlWwDCo=;
-        b=jVv+vRvIZzF2UCfJLLV8DelsdUgEu8BPuR7da8cHwzfryi3RWXoMPiw8dSSwlIcCLX
-         bbf1/4WboLdl1ci792Y0uJXVbXF7NU8lMJgdXJXJmculMuysNroqL+A0uo2MjV9B9q9x
-         iqzsbRATt3h7r1mAmB8QLREVaoyaU5UKQRQXTI7dSUN7j1rEMG6vZ0hJzgTUTTa/WH78
-         LbE5NVhIY+3nXt4SYKzIMxsrDunY/gJK3dTAZhJE4jC4UXsJI8P6xPdLqzWlLjxTiJNT
-         0+lPgS7TZP76yqgUadjAJcQ+ZXmuxwrRRCgYxwwqH/Ukxx+8y+KYpmgACjpNIH+dGPew
-         wRLQ==
-X-Forwarded-Encrypted: i=1; AFNElJ90Zs8deqVbkWgeOYLFLBZX0FwV9cp3yaEooFS2X/3JvE68Q0smfWBTS0zeNApqDG8W9WK0g+E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDL2tpnFDxhWQmTaFtVCxPWAKmc4SUrOerVdJ93dOUlY44XmcH
-	2nEjlZUht7Q3z2crjLUbqqxmu9IRvyyAUzgzs8XfRyxXqLbMikYXeTTa
-X-Gm-Gg: Acq92OEhWFrvZA5AG9jCzOigfq2Vk9UynFXtCuZDQsMgXBs01QIaZ9RVs7gLo/yhWGc
-	7q8sYUbIx258/gOtLpCiBrGvKenDOehEEm3oRGw4wcDvgcXRan3NS/Cs4mbh1sVI9iotRWPj2fs
-	h5pk8R3CZx2Po30MPPHeAkp0tNnouRyKt+feYlCNRTADGCqaPHsLe3bzxrRW5J08ivaqj1BYdr6
-	bAawayskDtFQT72sED0HIE6m1RavHlXnfnB0GPylgDHWJxLxKPY6ehHLvNopvCgTYrFGmuJiB7M
-	UZCNRB/6OGb2aUjOD7WuK4TLoI5808wVwmvwqdD14SUEVB+BtgSzL1pGXEy+Iv4PJcYOYtCDfNx
-	e6zqxSvL/z+2bDT+NlkWrOAclqEIqCqsDR3ErzoKT2GIa/jDu1zQzLlpK8K8wRfoMDh5+e7QNSy
-	hdGfFQGIcwYARfWxDQw8493p7MIRBoUSCaM4A7bVcldYzg9eCVmjNcPqyupTNa
-X-Received: by 2002:a05:600c:3b84:b0:48a:8b02:ae91 with SMTP id 5b1f17b1804b1-48fc9a0e266mr36229105e9.11.1778663254336;
-        Wed, 13 May 2026 02:07:34 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fce06ca2csm30681655e9.8.2026.05.13.02.07.33
+        d=1e100.net; s=20251104; t=1778663367; x=1779268167;
+        h=user-agent:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fYyER6YbOgaODTitWGTBF5s2T8z2KS499gj7ChXFEfA=;
+        b=dI4wnHRLOo+qCha0+wpJaAN4LSgfNsL0p8Sb5eXSIjNxAfqElf3CE3NHqFbzTC/bw2
+         bZ4PkG5l+kfoXYXGFr7iLRTDklGMcJFQ/xT4mPsL7YUyb5UZNBpJkY6NsNFKfUoOn468
+         oGzg3BBoAuDKI30eeLyxi7FB/ojwnNlHEkrL8R10C7xvVb/UFMclkqBvHeNwVuntL5vg
+         TDBu4ua4Sh5MlZ/AoxvZEydrqLECbHa4IXa8RZfk3gu82vfgFfg0VdQeeSNRZS069J9J
+         sxwcmkLY+1YOJJO4H585P9dFeoQS/vpm8bvB2NgVnrZoeGEPtzsaxiFEVKCTD6h1klzO
+         LkQg==
+X-Forwarded-Encrypted: i=1; AFNElJ/Le/8ldJ79BNeZT7G+E9Gwm5KLhzDNROK7guPHr5lU+IdW0nEUaQtsGJC+XT2ykG577URzZ3Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzuYjMBzFflfdUdz3Jbq78mU67uwzE0oU7ubISS+4qErsLOIH0
+	PoAAsJI1kjIGyzzK9171Ljm1Jl55wHSgoLR1Qxn9DHM0UAUoAiuXK60DNtTIDQ==
+X-Gm-Gg: Acq92OGb1BT01w8sFoQg4JWsg42sXNZhj5vm5rcmvLnWrBiAxz6uOZyVdQbNY5dJPBz
+	4jOsXxauOW/ZP5Zx+IU4fi8DbGkhL/NJ84/bT70Z0E2ZpOuLXj2jDNIBKguhE5iC5wa78mCUJzd
+	WIqA3u69jC+gNP768RRGJDjzHdXih049tePGZIYSkzMpF39bxiaYNJbtXd03IaEaFlF4Wb4pHTd
+	qJft0C2yhIDTY6IG2IY9Yt50dtJqJZWYjfq2DKUTs5GlwowcxM3UxW8JYFRb/0r9BwQeBaE103v
+	gSrY9II/NQmbIKZGhj6iGgesHJE65mQ2hwzU/kPJlttChbd8d0wpQRT77aiDmx+yUws/C17eYXl
+	Zt3hySXCorbvbz2RwLK16TJj/s4He2PL34xzC3pUtODWN2X/QV0s6PNNTlTH5AXaPxTr9D9wEDY
+	K6PGKJZqPS+YvGgU2kDr+Try02
+X-Received: by 2002:a05:6512:3c9f:b0:5a8:d1ed:8d4a with SMTP id 2adb3069b0e04-5a8f445a687mr630442e87.40.1778663366402;
+        Wed, 13 May 2026 02:09:26 -0700 (PDT)
+Received: from grain.localdomain ([5.18.255.97])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a8a956b1cfsm3975152e87.73.2026.05.13.02.09.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2026 02:07:34 -0700 (PDT)
-Date: Wed, 13 May 2026 10:07:32 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: stable@vger.kernel.org, anthony.l.nguyen@intel.com,
- intel-wired-lan@lists.osuosl.org, przemyslaw.kitszel@intel.com,
- netdev@vger.kernel.org, jacob.e.keller@intel.com
-Subject: Re: [PATCH net v3] ice: fix packet corruption due to extraneous
- page flip
-Message-ID: <20260513100732.499e3f49@pumpkin>
-In-Reply-To: <20260512181953.1689-1-ouster@cs.stanford.edu>
-References: <20260512181953.1689-1-ouster@cs.stanford.edu>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        Wed, 13 May 2026 02:09:26 -0700 (PDT)
+Received: by grain.localdomain (Postfix, from userid 1000)
+	id 8720A5A0185; Wed, 13 May 2026 12:09:25 +0300 (MSK)
+Date: Wed, 13 May 2026 12:09:25 +0300
+From: Cyrill Gorcunov <gorcunov@gmail.com>
+To: LKML <linux-kernel@vger.kernel.org>, NETDEV <netdev@vger.kernel.org>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH] ice: Fix wrong dsn read in ice_adapter_put
+Message-ID: <agQ_xZUp3Sq905O_@grain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 79B1B530434
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/2.3.1 (2026-03-20)
+X-Rspamd-Queue-Id: 83C495307BC
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287485-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-287486-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_THREE(0.00)[4];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[gorcunov@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[stanford.edu:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Tue, 12 May 2026 11:19:53 -0700
-John Ousterhout <ouster@cs.stanford.edu> wrote:
+When registering an adapter instance, we read the PCI configuration
+space to fetch the DSN and generate an adapter index for lookups.
 
-> Consider the following sequence of events:
-> * The bottom half of a buffer page is filled with data from
->   packet A. The page has a net reference count (reference count
->   - bias) of 1. The page is returned to the NIC, flipped to
->   use the top half.
-> * Before the reference on the page is released, the NIC returns
->   the page with no data in it ('size' is zero in ice_clean_rx_irq).
->   In this case the bias does not get decremented. The page still
->   has a net reference count of 1, so it gets returned to the NIC.
->   However, ice_put_rx_mbuf flipped the page so that the bottom
->   half is active.
-> * If the NIC stores another packet in the page before packet A
->   has released its reference, the data in packet A will be
->   overwritten with data from the new packet.
-> * Unfortunately zero-length buffers occur frequently: they seem
->   to occur whenever a packet uses every available byte in a
->   buffer, ending precisely at the end of the buffer. When this
->   happens the NIC seems to generate an extra zero-length
->   buffer.
-> The fix is for ice_put_rx_mbuf not to flip pages that have a
-> size of 0.
+However, if the adapter has been physically unplugged, the PCI space
+is no longer accessible. Reading it returns a zero value, which results
+in either an incorrect adapter instance being put or the proper instance
+not being put at all. To fix this, we will use the previously known
+index instead.
 
-How is this different from packet B (in the top half) being
-freed before packet A (in the bottom half)?
+Signed-off-by: Cyrill Gorcunov <gorcunov@gmail.com>
+---
+ drivers/net/ethernet/intel/ice/ice_adapter.c |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-> This patch applies directly to longterm stable versions 6.18.27
-> and 6.12.86; it also seems relevant for 6.6.137 but would need
-> modifcations for that version. I have not examined earlier
-> versions.
-> 
-> Unfortunately there is no upstream commit id for this patch because
-> the ICE driver has undergone a major revision (libeth refactor and
-> pagepool conversion) that eliminated the buggy code. Thus the
-> problem no longer exists in the main line.
-> 
-> Cc: stable@vger.kernel.org # 6.12+
-> Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
-> ---
->  drivers/net/ethernet/intel/ice/ice_txrx.c | 23 ++++++++++++++++++++---
->  1 file changed, 20 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-> index 51c459a3e722..081c7a7392b7 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-> @@ -1215,6 +1215,13 @@ static void ice_put_rx_mbuf(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
->  		xdp_frags = xdp_get_shared_info_from_buff(xdp)->nr_frags;
->  
->  	while (idx != ntc) {
-> +		union ice_32b_rx_flex_desc *rx_desc;
-> +		unsigned int size;
-> +
-> +		rx_desc = ICE_RX_DESC(rx_ring, idx);
-> +		size = le16_to_cpu(rx_desc->wb.pkt_len) &
-> +		       ICE_RX_FLX_DESC_PKT_LEN_M;
-> +
-
-Looks like you only need to calculate 'size' for the !ICE_XDP_CONSUMED path.
-You could also use the (likely cheaper) test for zero:
-		if (!(rx_desc->wb.pkt_len & cpu_to_le16(ICE_RX_FLX_DESC_PKT_LEN_M))
-
--- David
-
->  		buf = &rx_ring->rx_buf[idx];
->  		if (++idx == cnt)
->  			idx = 0;
-> @@ -1224,10 +1231,20 @@ static void ice_put_rx_mbuf(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
->  		 * To do this, only adjust pagecnt_bias for fragments up to
->  		 * the total remaining after the XDP program has run.
->  		 */
-> -		if (verdict != ICE_XDP_CONSUMED)
-> -			ice_rx_buf_adjust_pg_offset(buf, xdp->frame_sz);
-> -		else if (i++ <= xdp_frags)
-> +		if (verdict != ICE_XDP_CONSUMED) {
-> +			/* Don't "flip" the page if size is 0: in this case
-> +			 * the data in the current half will not be used so
-> +			 * it's OK to reuse that half. And, since the bias
-> +			 * didn't get decremented for this half, the page can
-> +			 * be returned to the NIC even if the other half is
-> +			 * still in use, so flipping the page could cause
-> +			 * live packet data to be overwritten.
-> +			 */
-> +			if (size != 0)
-> +				ice_rx_buf_adjust_pg_offset(buf, xdp->frame_sz);
-> +		} else if (i++ <= xdp_frags) {
->  			buf->pagecnt_bias++;
-> +		}
->  
->  		ice_put_rx_buf(rx_ring, buf);
->  	}
-
+Index: linux-tip.git/drivers/net/ethernet/intel/ice/ice_adapter.c
+===================================================================
+--- linux-tip.git.orig/drivers/net/ethernet/intel/ice/ice_adapter.c
++++ linux-tip.git/drivers/net/ethernet/intel/ice/ice_adapter.c
+@@ -130,13 +130,13 @@ struct ice_adapter *ice_adapter_get(stru
+  */
+ void ice_adapter_put(struct pci_dev *pdev)
+ {
++	const struct ice_pf *pf = pci_get_drvdata(pdev);
++	unsigned long index = pf->adapter->index;
+ 	struct ice_adapter *adapter;
+-	unsigned long index;
+ 
+-	index = ice_adapter_xa_index(pdev);
+ 	scoped_guard(mutex, &ice_adapters_mutex) {
+ 		adapter = xa_load(&ice_adapters, index);
+-		if (WARN_ON(!adapter))
++		if (WARN_ON(!adapter || adapter != pf->adapter))
+ 			return;
+ 		if (!refcount_dec_and_test(&adapter->refcount))
+ 			return;
 
