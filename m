@@ -1,316 +1,206 @@
-Return-Path: <netdev+bounces-287747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287748-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4KKxAu0HBWpRRgIAu9opvQ
-	(envelope-from <netdev+bounces-287747-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 01:23:25 +0200
+	id +CXlFZcLBWo1RwIAu9opvQ
+	(envelope-from <netdev+bounces-287748-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 01:39:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3B1D53BF64
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 01:23:24 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D36D53C13B
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 01:39:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B7121303238F
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 23:23:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B4E3E300BEB7
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 23:38:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0575A3CBE76;
-	Wed, 13 May 2026 23:23:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 756133CCFBD;
+	Wed, 13 May 2026 23:38:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="fSvsGtuv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pTdYvx5M"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47EA038F927;
-	Wed, 13 May 2026 23:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99C5399354
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 23:38:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778714595; cv=none; b=GFgIoVElEYw4P5CGvQqYAnQ0pECsERPhcUKSA1AsBAK281Xeg3lRur7Pt6FJUK3dQ+4TCt+8XTHceGjtkfBpp+45Y7I6JHNKR2+VGrrWVQCGEiB+rJ1BnfnM72AwFP+odqnCa5ssEoeZXxMmrjOSOK310vClTmMI7bQv2HST9Vg=
+	t=1778715536; cv=none; b=bAefj3O5BOSF4P/2/MSxRkTc//p3YK4UYYL2lqzRAkGymHY//cn4fz1Moh6G/ajV9dHl95OfsJh3AcpXLmzTZGZLtZWavWwNacl72vdSVe2yFMtrsCS7gq5NwQCyBfNYSfbxkmWN9wxdpbWztV9XEbyZbUNUopcnrZxxp846jMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778714595; c=relaxed/simple;
-	bh=UqKXtkxhUYUmfTGbxi8Ej81/IDEynkmKhfdkw0638Vw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y/fzI92m9X7mtM5BOciAGM6XfJirqvlOLcoktDfxNsqj2W37JO236sbbTelKgXJa4stz8kaEckkjBlJXUDIDSIkQ7zZi84AFgBz+0PZTofM4vMccqmNsr4WJZlgvWlQTweZhZopXoHsHENQgYqdCEZMlC/dv+2OnH3/eIJp+hlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=fSvsGtuv; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14B3132D1;
-	Wed, 13 May 2026 16:23:06 -0700 (PDT)
-Received: from ryzen.lan (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 345083F85F;
-	Wed, 13 May 2026 16:23:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1778714591; bh=UqKXtkxhUYUmfTGbxi8Ej81/IDEynkmKhfdkw0638Vw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fSvsGtuvB/105JKD4o3LcVotY4DW3QbA/HGA3OSKyNCw8KiZLDRFrH6AapSLcK9X3
-	 5rHVRN64SOkwH6d95nd5ZB+CVH6eVnGEFoevpsgJnAWLaznwLhRJhkZtv94fiw7LAz
-	 dJjNjs448lM6fKyzNmYgRnX9e5QGrXgYg8PlHjzg=
-Date: Thu, 14 May 2026 01:22:26 +0200
-From: Andre Przywara <andre.przywara@arm.com>
-To: Junhui Liu <junhui.liu@pigmoral.tech>
-Cc: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai
- <wens@kernel.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel
- Holland <samuel@sholland.org>, Philipp Zabel <p.zabel@pengutronix.de>, Paul
- Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
- <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, Richard Cochran
- <richardcochran@gmail.com>, linux-clk@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH RFC 8/8] clk: sunxi-ng: a733: Add reset lines
-Message-ID: <20260514012226.691ae185@ryzen.lan>
-In-Reply-To: <20260310-a733-clk-v1-8-36b4e9b24457@pigmoral.tech>
-References: <20260310-a733-clk-v1-0-36b4e9b24457@pigmoral.tech>
-	<20260310-a733-clk-v1-8-36b4e9b24457@pigmoral.tech>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 4.4.0 (GTK 3.24.31; x86_64-slackware-linux-gnu)
+	s=arc-20240116; t=1778715536; c=relaxed/simple;
+	bh=oBAEVZATeASbH0nhe5drMl+9AytTIzOltLbIrseS608=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gps7bdPBVqKPCp/lSd9cJ+OZNij/MJbamx42YsJR1VhJLjldPFVh5xyysb4KmQDo9Jx3kEFa+gFfmrixsaab9bcD3/J7ZlUauOEc30ARy2pZJIKBcjMGLDYaiqyANaKbE++H15R3Egb7ln3MYhpzzAa91z4RpBr2H7J/eh3PkTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pTdYvx5M; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-90caad2e944so308128585a.2
+        for <netdev@vger.kernel.org>; Wed, 13 May 2026 16:38:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778715534; x=1779320334; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tPQGmLtEe0WJuWlk4o1gxSupMduAnwXuzQSwzyxZi4M=;
+        b=pTdYvx5MO4zbPeh/PcIK5Gh1pZTloEHd+8KGbwCGZJj5Vopexg0esPVevrd7hZ3ens
+         FBRnqm/cFBM77WHWpAvTsbuxe8G73LNFOuE8cS5wlrkgpkp7UhpfiKeYu+G3+fLKRPvY
+         M+9uwmmfhBqnZbTBAXqLMd6CI8BbkvwOay11E8vabUCnUga8GczhJSMWiL7ZAbsAxGWN
+         t5syL1QGav+fokBHNbx825t8KNxMD4mZ3+J0S3BB4mMWbo9pYfUeiYrph+Er+OzPvBz6
+         b9B/IfWlkEF80jgrvJgyDU76QmC2jhLgE5nrrMNbdke81ELQH9U+LNSlDsuezWxXI7cz
+         +nmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778715534; x=1779320334;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tPQGmLtEe0WJuWlk4o1gxSupMduAnwXuzQSwzyxZi4M=;
+        b=OYN/drJXLIsfD8xCwTiDd092nsJL99i86SmsaovJff5WxowbRVl6MalRT2otMH+0cL
+         Ssb2n5lonL6IXz3RHUw0/fjC+VhXrEDMzBlKiLM075Wq66lanNucXYIxQODHJdLqsFhl
+         p1b98DpmERVHMb2I6wvebTvd961HJq48qUOg7Sn/BLVXAYvXsS0Tb/yKKp3omvyHz7ZY
+         hdktGY5SmIc06wB6emq8WOVfzNd0XJUdWrWKYrx04luGaknCKbct2gkBz/FSyZLUSPOc
+         od1s6aMibT9KMqliqs3j4OHUdb9vXp50UsUUPFYfYMi7ASsJwCzOE4DABz8QQw8AcBAB
+         mkag==
+X-Forwarded-Encrypted: i=1; AFNElJ8QxE7OWPoywz1KRXILvUNd7gdykvMBi2e3n+lFyRJKQ+W4ZaJ4ONPhB1c6EF7aWorTJjE0uU0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz21fPEIbRi002Djtzf5y0UFa7prDZwJz4AE1Sa1R8f8bi7GLQG
+	HS5dI9UQfoJneN4jvyOBzaS2mN+1UlD7rR484DED9WowverjnACgbART
+X-Gm-Gg: Acq92OE/ybvOQ4rIjl5IluuVBKM7sxzlX2mrMS/es75Cz545Q4BDEJYtzF6a75aH2mi
+	yfMLHxdYlI5sU876pwdQ1ECmtx7B8NMgFHqpqhVMkV/dd/+1R0jlTAC4acXtUkI34qTwV2KHO6K
+	s6RoJT6P0FWcnYOZ8jna9zjq2BgwTXGyb2YKGopOJneVwQzvWp1WJBFZgL6Z1WDXp58hbI2fz/r
+	2xaMShnPALjC99XI0vcR6YovkYJelE7ZBQSA+RU57sE5zqWuLTCIl+B0I7UkZ8mFvndJPxT1/g1
+	7odAk6ruhPbKL8Opxm+1nh5zNTYCmdNwd9RaMJ0WQkjUJ+2PtTZ5D1BncJKrWyk/yTVk5uy4ibw
+	CHxtEzH0sqIDwCbAwoqqKagtzn1d6pk/IOL9RaMqrPddUDV1CwrLdhCiKQ2hu5dfKj1dK868SW+
+	XKBdSCHhTstBcoiVdHrVUuDXCzQbUoXG3EScdVFP7ptdUZKxsGNyFZ28u4LUBZRV6dUOVXah7Xg
+	YxF+ndpiZs74+RO4Pyykg/LyAOxGsPn+PqYQc86qVg=
+X-Received: by 2002:a05:620a:1a1a:b0:8e4:ebbb:b162 with SMTP id af79cd13be357-90fab222fedmr756739285a.9.1778715533884;
+        Wed, 13 May 2026 16:38:53 -0700 (PDT)
+Received: from server0.tail6e7dd.ts.net (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-910baf2236fsm94186085a.20.2026.05.13.16.38.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 May 2026 16:38:53 -0700 (PDT)
+From: Michael Bommarito <michael.bommarito@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org
+Cc: Felix Maurer <fmaurer@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Luka Gejak <luka.gejak@linux.dev>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Kexin Sun <kexinsun@smail.nju.edu.cn>,
+	stable@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net 0/1] net: hsr: fix node-table UAF on device teardown
+Date: Wed, 13 May 2026 19:38:37 -0400
+Message-ID: <20260513233838.3064715-1-michael.bommarito@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: B3B1D53BF64
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 5D36D53C13B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[arm.com,none];
-	R_DKIM_ALLOW(-0.20)[arm.com:s=foss];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[baylibre.com,kernel.org,gmail.com,sholland.org,pengutronix.de,dabbelt.com,eecs.berkeley.edu,ghiti.fr,vger.kernel.org,lists.infradead.org,lists.linux.dev];
-	TAGGED_FROM(0.00)[bounces-287747-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[redhat.com,linutronix.de,linux.dev,gmail.com,smail.nju.edu.cn,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[arm.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287748-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andre.przywara@arm.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,pigmoral.tech:email]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
-
-On Tue, 10 Mar 2026 16:34:01 +0800
-Junhui Liu <junhui.liu@pigmoral.tech> wrote:
 
 Hi,
 
-compare the list below against my version of the manual. You list more
-than shown there, can you say where those extra reset bits come from?
+HSR generic-netlink node-list/status readers walk hsr->node_db under
+rcu_read_lock(), but RTM_DELLINK teardown frees the same node table
+immediately via plain list_del() + kfree(). A reader that has already
+obtained a struct hsr_node can race hsr_dellink() and dereference
+freed node memory.
 
-> Add the reset lines for the Allwinner A733 SoC. These reset control bits
-> are integrated into the Bus Gate Reset (BGR) registers, typically
-> sharing the same register address with their corresponding bus clock
-> gates. Integrate them into the main CCU driver using the existing
-> sunxi-ng ccu_reset framework, allowing the CCU to also function as a
-> reset controller for the SoC.
-> 
-> Signed-off-by: Junhui Liu <junhui.liu@pigmoral.tech>
-> ---
->  drivers/clk/sunxi-ng/ccu-sun60i-a733.c | 128 +++++++++++++++++++++++++++++++++
->  1 file changed, 128 insertions(+)
-> 
-> diff --git a/drivers/clk/sunxi-ng/ccu-sun60i-a733.c b/drivers/clk/sunxi-ng/ccu-sun60i-a733.c
-> index c0b09f9197d1..7d1ee9235436 100644
-> --- a/drivers/clk/sunxi-ng/ccu-sun60i-a733.c
-> +++ b/drivers/clk/sunxi-ng/ccu-sun60i-a733.c
-> @@ -17,6 +17,7 @@
->  #include "../clk.h"
->  
->  #include "ccu_common.h"
-> +#include "ccu_reset.h"
->  
->  #include "ccu_div.h"
->  #include "ccu_gate.h"
-> @@ -2169,11 +2170,138 @@ static struct clk_hw_onecell_data sun60i_a733_hw_clks = {
->  	.num	= CLK_FANOUT3 + 1,
->  };
->  
-> +static struct ccu_reset_map sun60i_a733_ccu_resets[] = {
-> +	[RST_BUS_ITS_PCIE]		= { 0x574, BIT(16) },
-> +	[RST_BUS_NSI]			= { 0x580, BIT(30) },
+The patch below uses list_del_rcu() and the existing
+hsr_free_node_rcu() callback in hsr_del_nodes(). The HSR prune paths
+already use this lifetime rule for the same node_db.
 
-What is this NSI device? Some interconnect? Do we really want to handle
-this reset and clock? Is there some device referencing this? Otherwise
-the kernel will turn at least the clock off, which is probably fatal.
-Also the manual says this is a secure register, so I feel like the
-kernel must not mess with this.
+Reproduction.
 
-> +	[RST_BUS_NSI_CFG]		= { 0x584, BIT(16) },
+  The natural reader window between hsr_get_next_node() acquiring
+  a node and ether_addr_copy() consuming it is short, so I widened
+  it with a temporary udelay() in hsr_get_next_node() and
+  hsr_get_node_data() (debug-only, not in this submission). Under
+  x86_64 KVM with KASAN, an in-netns RTM_NEWLINK / parallel-readers
+  / RTM_DELLINK loop then produces:
 
-Similar here, I guess, though this might not be secure only.
+    BUG: KASAN: slab-use-after-free in hsr_get_next_node+0x1db/0x350
+    Read of size 6 at addr ffff888009e6f290 by task hsr_genl_spam/...
+    Freed by task ip:
+      hsr_del_nodes+0x144/0x250
+      hsr_dellink+0x6c/0x90
+      rtnl_dellink+...
 
-> +	[RST_BUS_IOMMU0_SYS]		= { 0x58c, BIT(16) },
-> +	[RST_BUS_MSI_LITE0_AHB]		= { 0x594, BIT(16) },
-> +	[RST_BUS_MSI_LITE0_MBUS]	= { 0x594, BIT(17) },
-> +	[RST_BUS_MSI_LITE1_AHB]		= { 0x59c, BIT(16) },
-> +	[RST_BUS_MSI_LITE1_MBUS]	= { 0x59c, BIT(17) },
-> +	[RST_BUS_MSI_LITE2_AHB]		= { 0x5a4, BIT(16) },
-> +	[RST_BUS_MSI_LITE2_MBUS]	= { 0x5a4, BIT(17) },
-> +	[RST_BUS_IOMMU1_SYS]		= { 0x5b4, BIT(16) },
-> +	[RST_BUS_DMA0]			= { 0x704, BIT(16) },
-> +	[RST_BUS_DMA1]			= { 0x70c, BIT(16) },
-> +	[RST_BUS_SPINLOCK]		= { 0x724, BIT(16) },
-> +	[RST_BUS_MSGBOX]		= { 0x744, BIT(16) },
-> +	[RST_BUS_PWM0]			= { 0x784, BIT(16) },
-> +	[RST_BUS_PWM1]			= { 0x78c, BIT(16) },
-> +	[RST_BUS_DBG]			= { 0x7a4, BIT(16) },
-> +	[RST_BUS_SYSDAP]		= { 0x7ac, BIT(16) },
-> +	[RST_BUS_TIMER0]		= { 0x850, BIT(16) },
-> +	[RST_BUS_DE]			= { 0xa04, BIT(16) },
-> +	[RST_BUS_DI]			= { 0xa24, BIT(16) },
-> +	[RST_BUS_G2D]			= { 0xa44, BIT(16) },
-> +	[RST_BUS_EINK]			= { 0xa6c, BIT(16) },
-> +	[RST_BUS_DE_SYS]		= { 0xa74, BIT(16) },
-> +	[RST_BUS_VE_ENC]		= { 0xa8c, BIT(16) },
+  The reader walks node_db under rcu_read_lock() while hsr_dellink()
+  -> hsr_del_nodes() removes and immediately frees the entries.
 
-The manual calls this ENC0, and since bit 17 is not documented, I
-wonder if there is an ENC1 used with some other packaging, maybe? So
-maybe calling it ENC0 would be safer here.
+  Without the artificial widening the race is still real but the
+  observable window is ns-to-us scale, which is presumably why
+  syzbot has not flagged it in the open. The fix is the same
+  either way: honour the RCU lifetime that the prune paths
+  already use.
 
-> +	[RST_BUS_VE_DEC]		= { 0xa8c, BIT(18) },
-> +	[RST_BUS_CE]			= { 0xac4, BIT(16) },
-> +	[RST_BUS_CE_SYS]		= { 0xac4, BIT(17) },
-> +	[RST_BUS_NPU_CORE]		= { 0xb04, BIT(16) },
-> +	[RST_BUS_NPU_AXI]		= { 0xb04, BIT(17) },
-> +	[RST_BUS_NPU_AHB]		= { 0xb04, BIT(18) },
-> +	[RST_BUS_NPU_SRAM]		= { 0xb04, BIT(19) },
-> +	[RST_BUS_GPU]			= { 0xb24, BIT(16) },
-> +	[RST_BUS_DRAM]			= { 0xc0c, BIT(16) },
-> +	[RST_BUS_NAND]			= { 0xc8c, BIT(16) },
-> +	[RST_BUS_MMC0]			= { 0xd0c, BIT(16) },
-> +	[RST_BUS_MMC1]			= { 0xd1c, BIT(16) },
-> +	[RST_BUS_MMC2]			= { 0xd2c, BIT(16) },
-> +	[RST_BUS_MMC3]			= { 0xd3c, BIT(16) },
-> +	[RST_BUS_UFS_AHB]		= { 0xd8c, BIT(16) },
-> +	[RST_BUS_UFS_AXI]		= { 0xd8c, BIT(17) },
-> +	[RST_BUS_UFS_PHY]		= { 0xd8c, BIT(18) },
-> +	[RST_BUS_UFS_CORE]		= { 0xd8c, BIT(19) },
-> +	[RST_BUS_UART0]			= { 0xe00, BIT(16) },
-> +	[RST_BUS_UART1]			= { 0xe04, BIT(16) },
-> +	[RST_BUS_UART2]			= { 0xe08, BIT(16) },
-> +	[RST_BUS_UART3]			= { 0xe0c, BIT(16) },
-> +	[RST_BUS_UART4]			= { 0xe10, BIT(16) },
-> +	[RST_BUS_UART5]			= { 0xe14, BIT(16) },
-> +	[RST_BUS_UART6]			= { 0xe18, BIT(16) },
-> +	[RST_BUS_I2C0]			= { 0xe80, BIT(16) },
-> +	[RST_BUS_I2C1]			= { 0xe84, BIT(16) },
-> +	[RST_BUS_I2C2]			= { 0xe88, BIT(16) },
-> +	[RST_BUS_I2C3]			= { 0xe8c, BIT(16) },
-> +	[RST_BUS_I2C4]			= { 0xe90, BIT(16) },
-> +	[RST_BUS_I2C5]			= { 0xe94, BIT(16) },
-> +	[RST_BUS_I2C6]			= { 0xe98, BIT(16) },
-> +	[RST_BUS_I2C7]			= { 0xe9c, BIT(16) },
-> +	[RST_BUS_I2C8]			= { 0xea0, BIT(16) },
-> +	[RST_BUS_I2C9]			= { 0xea4, BIT(16) },
-> +	[RST_BUS_I2C10]			= { 0xea8, BIT(16) },
-> +	[RST_BUS_I2C11]			= { 0xeac, BIT(16) },
-> +	[RST_BUS_I2C12]			= { 0xeb0, BIT(16) },
-> +	[RST_BUS_SPI0]			= { 0xf04, BIT(16) },
-> +	[RST_BUS_SPI1]			= { 0xf0c, BIT(16) },
-> +	[RST_BUS_SPI2]			= { 0xf14, BIT(16) },
-> +	[RST_BUS_SPIF]			= { 0xf1c, BIT(16) },
-> +	[RST_BUS_SPI3]			= { 0xf24, BIT(16) },
-> +	[RST_BUS_SPI4]			= { 0xf2c, BIT(16) },
+Testing.
 
-SPI4 isn't mentioned in my version of the manual.
+  - net/hsr/hsr_framereg.o builds clean on an x86_64 KASAN config.
+  - With the widening patch applied on top of this fix, 50 rounds
+    of the RTM_NEWLINK / parallel-readers / RTM_DELLINK harness
+    run KASAN-silent. The same harness fires the splat above on
+    the unpatched tree in the first round.
+  - Without the widening, 100 rounds of the same harness in
+    list-readers mode run clean on the patched kernel.
+  - tools/testing/selftests/net/hsr/{hsr_ping,prp_ping,hsr_redbox}.sh
+    -4 all pass on both stock and patched kernels, diff-clean.
+  - scripts/checkpatch.pl --strict is clean.
 
-> +	[RST_BUS_GPADC]			= { 0xfc4, BIT(16) },
-> +	[RST_BUS_THS]			= { 0xfe4, BIT(16) },
-> +	[RST_BUS_IRRX]			= { 0x1004, BIT(16) },
-> +	[RST_BUS_IRTX]			= { 0x100c, BIT(16) },
-> +	[RST_BUS_LRADC]			= { 0x1024, BIT(16) },
-> +	[RST_BUS_SGPIO]			= { 0x1064, BIT(16) },
-> +	[RST_BUS_LPC]			= { 0x1084, BIT(16) },
+A separate status-path NULL deref in hsr_get_node_data() shows up
+when the same harness runs with status readers and the widening
+patch. That predates this fix and is not addressed here; I will
+send it as its own patch once the primitive is characterised.
 
-Where do those two come from? There are not in my version of the manual.
+This targets net and carries a stable tag back to the dellink
+cleanup commit b9a1e627405d.
 
-> +	[RST_BUS_I2SPCM0]		= { 0x120c, BIT(16) },
-> +	[RST_BUS_I2SPCM1]		= { 0x121c, BIT(16) },
-> +	[RST_BUS_I2SPCM2]		= { 0x122c, BIT(16) },
-> +	[RST_BUS_I2SPCM3]		= { 0x123c, BIT(16) },
-> +	[RST_BUS_I2SPCM4]		= { 0x124c, BIT(16) },
-> +	[RST_BUS_OWA]			= { 0x128c, BIT(16) },
-> +	[RST_BUS_DMIC]			= { 0x12cc, BIT(16) },
-> +	[RST_USB_PHY0]			= { 0x1300, BIT(30) },
-> +	[RST_BUS_OHCI0]			= { 0x1304, BIT(16) },
-> +	[RST_BUS_EHCI0]			= { 0x1304, BIT(20) },
-> +	[RST_BUS_OTG]			= { 0x1304, BIT(24) },
-> +	[RST_USB_PHY1]			= { 0x1308, BIT(30) },
-> +	[RST_BUS_OHCI1]			= { 0x130c, BIT(16) },
-> +	[RST_BUS_EHCI1]			= { 0x130c, BIT(20) },
-> +	[RST_BUS_USB2]			= { 0x135c, BIT(16) },
-> +	[RST_BUS_PCIE]			= { 0x138c, BIT(17) },
-> +	[RST_BUS_PCIE_PWRUP]		= { 0x138c, BIT(16) },
+Michael Bommarito (1):
+  net: hsr: defer node table free until after RCU readers
 
-Just a nit, but those two are ordered wrongly.
+ net/hsr/hsr_framereg.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> +	[RST_BUS_SERDES]		= { 0x13c4, BIT(16) },
-> +	[RST_BUS_GMAC0]			= { 0x141c, BIT(16) },
-> +	[RST_BUS_GMAC0_AXI]		= { 0x141c, BIT(17) },
-> +	[RST_BUS_GMAC1]			= { 0x142c, BIT(16) },
-> +	[RST_BUS_GMAC1_AXI]		= { 0x142c, BIT(17) },
 
-GMAC1 is not listed in my manual, where does this come from?
-
-> +	[RST_BUS_TCON_LCD0]		= { 0x1504, BIT(16) },
-> +	[RST_BUS_TCON_LCD1]		= { 0x150c, BIT(16) },
-> +	[RST_BUS_TCON_LCD2]		= { 0x1514, BIT(16) },
-
-No LCD2 in my manual.
-
-The rest looks alright.
-
-Cheers,
-Andre
-
-> +	[RST_BUS_LVDS0]			= { 0x1544, BIT(16) },
-> +	[RST_BUS_LVDS1]			= { 0x154c, BIT(16) },
-> +	[RST_BUS_DSI0]			= { 0x1584, BIT(16) },
-> +	[RST_BUS_DSI1]			= { 0x158c, BIT(16) },
-> +	[RST_BUS_TCON_TV0]		= { 0x1604, BIT(16) },
-> +	[RST_BUS_TCON_TV1]		= { 0x160c, BIT(16) },
-> +	[RST_BUS_EDP]			= { 0x164c, BIT(16) },
-> +	[RST_BUS_HDMI_MAIN]		= { 0x168c, BIT(16) },
-> +	[RST_BUS_HDMI_SUB]		= { 0x168c, BIT(17) },
-> +	[RST_BUS_HDMI_HDCP]		= { 0x168c, BIT(18) },
-> +	[RST_BUS_DPSS_TOP0]		= { 0x16c4, BIT(16) },
-> +	[RST_BUS_DPSS_TOP1]		= { 0x16cc, BIT(16) },
-> +	[RST_BUS_VIDEO_OUT0]		= { 0x16e4, BIT(16) },
-> +	[RST_BUS_VIDEO_OUT1]		= { 0x16ec, BIT(16) },
-> +	[RST_BUS_LEDC]			= { 0x1704, BIT(16) },
-> +	[RST_BUS_DSC]			= { 0x1744, BIT(16) },
-> +	[RST_BUS_CSI]			= { 0x1844, BIT(16) },
-> +	[RST_BUS_VIDEO_IN]		= { 0x1884, BIT(16) },
-> +	[RST_BUS_APB2JTAG]		= { 0x1c04, BIT(16) },
-> +};
-> +
->  static const struct sunxi_ccu_desc sun60i_a733_ccu_desc = {
->  	.ccu_clks	= sun60i_a733_ccu_clks,
->  	.num_ccu_clks	= ARRAY_SIZE(sun60i_a733_ccu_clks),
->  
->  	.hw_clks	= &sun60i_a733_hw_clks,
-> +
-> +	.resets		= sun60i_a733_ccu_resets,
-> +	.num_resets	= ARRAY_SIZE(sun60i_a733_ccu_resets),
->  };
->  
->  static const u32 pll_regs[] = {
-> 
+base-commit: 8d90b09e6741f5103ccc81a53bf2391ea09419a7
+--
+2.53.0
 
 
