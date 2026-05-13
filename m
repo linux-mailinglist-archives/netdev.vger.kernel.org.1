@@ -1,276 +1,283 @@
-Return-Path: <netdev+bounces-287556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287563-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aBirOLdnBGpVIAIAu9opvQ
-	(envelope-from <netdev+bounces-287556-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 13:59:51 +0200
+	id SGiqGD1oBGpVIAIAu9opvQ
+	(envelope-from <netdev+bounces-287563-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 14:02:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BEAB532A91
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 13:59:51 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07EDE532AF6
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 14:02:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 92C243132AC9
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:56:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 138C4304C9F5
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:01:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E038401497;
-	Wed, 13 May 2026 11:56:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BBCA3FD128;
+	Wed, 13 May 2026 12:01:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="bDk86c9o"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ie2Xdk9i"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013027.outbound.protection.outlook.com [40.93.196.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A7A3FAE11;
-	Wed, 13 May 2026 11:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778673367; cv=none; b=Nc6cmdLJ657ZTlKDbNRuLY3PeNoFiScO4SNLSYYs/zw1ZQOrsyZ5BPrAOTrM6z9a/vKJ2AAcpl8+2u1g1QFsJmyzVymwhYmbHqo/rdlcJIH5gfNwNY+2m6g2LO88XWxelZmRp28uPGEwe3UR+Wm4WC4zVr1wn/+pu62zvuo6MEY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778673367; c=relaxed/simple;
-	bh=UxDlJTXmkJOSOG3IHVK24JNJ6xBG7j1zICMLkcGapac=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KWP6RbYXoav3Grrf4zs1FhpzV65Eeq3JUnWXYL0ORZC/TFt9gwrUF+qrcVgFAEJp8V465MyBE+f/PPsVRMlY0X9rUa+I11c5hjo2S4xbR972prq+U40Z/UYN0K/D0WSo9TBGavOwkiK5KYtu1HK6yVQOBRoVl8iweit/QRvdV7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=bDk86c9o; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 64DBtlAP3894741, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1778673348;
-	bh=s8S5jT4MCnFtf4Wgp5E6ypQHJ+OL4m7tuHEy0GK+in0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=bDk86c9ogmFnBGz+qOUQHZfgXT1IH83wdFgJ4yqxZ50r8vwuZ/BVATTqzvDVwwCXC
-	 TN8pbLuH/4zcd4dsBLNSqk8j/DRYh2C/+gpUEJr9/hJcAMTl3+LH4qIZFfQGVmF70w
-	 GtoZytOYyM/hffUMPmdr2k6/KOUXvajFW0CNBaV+GiKIpJ/ApmJlEXpl9CsPohJqjw
-	 u7o2OpwEE+SV1Iu3yEUmnluHsNyMTd5F9SRyI9NCZPraDZ7pWOt88IkOlmgS75irSi
-	 u8g5RUjta6Wa5PrpWhSRBvF/LYo6G2ckcli1AIQWnjMkeItXX6e3X7p7jtQlHdUmM3
-	 b8c1ZB+FybRZQ==
-Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
-	by rtits2.realtek.com.tw (8.15.2/3.27/5.94) with ESMTPS id 64DBtlAP3894741
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 13 May 2026 19:55:47 +0800
-Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
- RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Wed, 13 May 2026 19:55:47 +0800
-Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS1.realsil.com.cn
- (172.29.17.101) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Wed, 13 May 2026 19:55:47 +0800
-From: javen <javen_xu@realsil.com.cn>
-To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Javen Xu
-	<javen_xu@realsil.com.cn>
-Subject: [Patch net-next v3 7/7] r8169: add support for ethtool
-Date: Wed, 13 May 2026 19:55:43 +0800
-Message-ID: <20260513115543.1730-8-javen_xu@realsil.com.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
-In-Reply-To: <20260513115543.1730-1-javen_xu@realsil.com.cn>
-References: <20260513115543.1730-1-javen_xu@realsil.com.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7473B38E8B0
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 12:01:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.27
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778673713; cv=fail; b=KV0gwU/fGtvvA34sdPKJilbwPNmXro5tiQgZqW3NVmnLsPIsuCzsmOG0iZKLkJ3mO/WDM0pvL8FqB1Qtd1QY4m2ZoOUF79hMUnOKHq0iYwv8mqTaFXoxBEbcVQpI9xiHcu49RkiVsVWAqOs8f7Cx+VmZ8GWn3leSYmBwlArvN2c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778673713; c=relaxed/simple;
+	bh=lTe5lqKwCDmS4/o716Oeph61IrXSAzG8vhqcK1dUrIg=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=JzCkw9VHSiLIAVZ0Zh92H30/70cMXndolKaXBzYkpvVyvxh405lC4njrJDlX3nJV+qIkLN/SWXj1Cb3ianLHjKYiIEPb+yf3sFDCud43sWH7UUPuqR62chZvz5CUAroAZ0mZe9W3FgfhQErqMZgAmx+mo61EVtpX9x7rBt1Bark=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ie2Xdk9i; arc=fail smtp.client-ip=40.93.196.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=TbMulhWPC6RRYooXRPXc/0Oe1S0cwiMid6IDrP5dWi8JAo+Cz5X7JN0PTFoRtYny6fAQDY8DgEVqT4xmLDfwcFt4Nzkpbaa/F5Qzr3ugQSCdYbGYSSyrRLNCZXqQ4DHfMfRQ8Nw0VqoX5MYySRY9pjoJag1DbInCbAhPJplwjjH6aYycSop+8BTM0+/uuM5a3sbZkOvOjw2S3JVWReY/ReT6lc/HR5lEgothGkfMfl7fcp+8DnV3KvcD1A+rqT1viGiyjijZS3Jp13vjLAW+FYxB10qKJqj8ztcgCmkyWYK49YvylBXTT3jrKQypMytRZKSC2DjTHDair7vLHMiS3g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=txJSxIZ1OxiDOKQGjA2xuQdg1wVmyNoMfb4hvD5a76Y=;
+ b=O0NbA6zk8MeGh8CmLCrvm1f0KKjFIZ3gfAQAIbSSMdQ7WLt2hKDTjKPfqqtx2RznMOEbN6tRyE+N+zAEf9Gt2zyz+Go9HVZZ8f+0MSRm2ukOtEbVydjnyOcWjSZEyOQFjfXrm6twTJI5wr2mnN2BBeHiS7uvzTPfE+CFTZIp4l0n/bFfOjbXmuJER9EvRiTP3cGMgES5r2LwrLnwe8DHEAxEgDNzs67EvLtfKdTTOyYoVCzupmypsrjgkeOH3azHXN4I+i+lpUsd+yZRHBOG5Y4Y0PrU1dZOTJlmjWjoDhXSWb4LRP6ogAAVKDmT+ISBkxySwHup503EYQqomj5zSw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=txJSxIZ1OxiDOKQGjA2xuQdg1wVmyNoMfb4hvD5a76Y=;
+ b=ie2Xdk9ioXTBYEG+psO6mcYB7w5pA+SLbXRbp4c0XqbDmuUJDq26YZ3JA3mn9Auifl8932AGomRU1A73FiDpmKVUVkANO0d3GCJQMa5PyppHd2ip8KmgDiMMrrqJRDwsjldf2eIf2oBPufvOdP6AppvJZve67PnOExIYX8rheRmtsCODMBlNLMRRO755NI6udmD66PYRUnpudd00ifNzrrZv/DQt+00QLETG5ePiCB2Ht4jCtD9+H/Kzar4LxuewxbzfmJj5nz/999b4Y2aOkwi5YjHka4E05yr+Y5jIuHZXGJ2VTBoNE/rhwT+2yvmbytgoX68Xc7uhXFPtDlM1VA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DM4PR12MB5248.namprd12.prod.outlook.com (2603:10b6:5:39c::15)
+ by CH3PR12MB8536.namprd12.prod.outlook.com (2603:10b6:610:15e::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.11; Wed, 13 May
+ 2026 12:01:46 +0000
+Received: from DM4PR12MB5248.namprd12.prod.outlook.com
+ ([fe80::92d8:797b:4db0:d385]) by DM4PR12MB5248.namprd12.prod.outlook.com
+ ([fe80::92d8:797b:4db0:d385%4]) with mapi id 15.20.9913.009; Wed, 13 May 2026
+ 12:01:46 +0000
+Message-ID: <c4279000-dd9a-4e59-ae0d-6dcc5c7b03a2@nvidia.com>
+Date: Wed, 13 May 2026 15:01:40 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] udp: Fix UDP length on last GSO_PARTIAL segment
+To: Alice Mikityanska <alice.kernel@fastmail.im>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org
+Cc: Simon Horman <horms@kernel.org>, Dragos Tatulea <dtatulea@nvidia.com>,
+ Willem de Bruijn <willemb@google.com>,
+ Matthew Schwartz <matthew.schwartz@linux.dev>
+References: <20260513074349.2152146-1-gal@nvidia.com>
+ <f75c1cf5-b5ad-47db-952f-faad9f0a33ed@app.fastmail.com>
+ <f356add6-e173-4020-a8af-8cc70aec955d@nvidia.com>
+ <ea0d0e1c-bfc2-4271-94d7-3bec2f2e85a3@app.fastmail.com>
+ <c129979f-7494-433c-92c4-6d4290add4d9@nvidia.com>
+ <23e6e0f4-29ee-4f86-b02d-8c8d881c51f7@app.fastmail.com>
+From: Gal Pressman <gal@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <23e6e0f4-29ee-4f86-b02d-8c8d881c51f7@app.fastmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FRYP281CA0001.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::11)
+ To DM4PR12MB5248.namprd12.prod.outlook.com (2603:10b6:5:39c::15)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Rspamd-Queue-Id: 4BEAB532A91
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5248:EE_|CH3PR12MB8536:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6bfac103-3dbf-44ec-1ed3-08deb0e76812
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|18002099003|56012099003|11063799003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	5FRp/Gcv3tK9E6pzt2ycBXIyqLpUzRQruvIU6WtL5QEGl9Pz+Wh2yVjT/jlgIfdijSktFajtPFY9og2PuE4bF4MWUIDVHsIZCe80ekI84K35gmtbEm0Q1tuyX+gdqPtFt26T6XwKuaCDll48OrnXyFCsfwGcBG77GbAzZf9V4OUMmhuG24B2L1DqZ/TcxcxSnQMJ74cClcuiik/vBxi6z+OeYQ5u4OXIOIZj1IFhvuCXNOOJUu2N6xJGmARRPagjYJr9NglFFIJ8l+bRbF346VWBSePr/FVxw00TmqTjKsy8sFuF4OHFy5KNl0iQWsIE3MrdjoOHrh42oDsyx82iWXKEZajRiRCw4Nsha0QL+Wti5HbkEjtpbwyulvtZ2qj3mqdWF+bAgZ5Ed2ZXD3yN6PZ31jXBgWzit/F7w0XwHKrQCWcwGEAEyFljfP5zxA8UrUW6OPao93HU+q1JdnP70XfWEZEJ7XxTiYR0+EDG7DFcIcgHAcuykOoSdVDGD5zwZUvDYHE4527cjHa14vTAn6oQbgIbakmX1IdOXu4FZOpCrC27rzvZjDyopvjaZnAr70+oGN+NevCNIimnRVcpl4WY+uARl2guyjVH8WBK062sCiMQ/Z3w3KteLviW7U405oUrgG8/6TC1wjeNY83qe5WwFhZVHmXrR9Kf+sFA0T1wGKNKtEyXraaB6PlB5545WRUmKVR/S+8xP9ctn/djXQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5248.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(18002099003)(56012099003)(11063799003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?eEdIUHRXK2RKUVVwZ29oQlQ4bEV1R1orYTlFZTdEd3prai9tZU1TSkxHL0d2?=
+ =?utf-8?B?bzhDVkxxb3FRTkxnNUw1Z05FUFU5VjBpUnp0d01ENzB0NllJS2l5WlhncEVZ?=
+ =?utf-8?B?cktJVmZwQ0dqQmNoeWpUT091ZHRPVUNOREFZR0RFdGUxT3FPRHJqYWNqckFO?=
+ =?utf-8?B?cmNxd1laSjZyTjcrUmFMV1JYNXBGMjI2dGRKbWFOVmhra0VQRmwwb1dCRjRZ?=
+ =?utf-8?B?MGdNcUtQaVVVclpER3hOVDVub0MrUUtaWVlqVnpoSG91QitJWmM0T2NRM2xO?=
+ =?utf-8?B?Z3hieUR0dk94dVZIV3EzNU1ZRTdZZTY1bGFGS2IrRmpsTDhNWm5sMXJXbURn?=
+ =?utf-8?B?UDhZNDUzVjRmSUFQczlhd05pYXNjeDd2M2JuejhaZHVFZEtsYk40aFJubDVp?=
+ =?utf-8?B?WDNFZ3lDNzJBa1ZTelIwR2NFN0NWRi91NndFYmhuWkFNcHZCNE9sWEU2MU92?=
+ =?utf-8?B?MVpKM2p1ajR6alVaMkZ2U211SFB4VThJRkp5WnY1TGdRUzFOb2o0ejZzVmhE?=
+ =?utf-8?B?ZjJLcnNVMThGYzZ6MXdQUklWaTI4OTJpaWFGODR0aUFJdWxiMDdrVWgyYTAy?=
+ =?utf-8?B?aXdGNUtOWG1oekdTRThvdE1sa1ZhcktJaTJPTzZBNm82VDZ0VkZlbnB1WEsw?=
+ =?utf-8?B?K2FzNStoZUpDV1p3dG1PUXI5ai9LYnl6S1lzcGJFNGhnd09CUG00THlSK2pT?=
+ =?utf-8?B?eCtRRm9UdnFiSkVtVGMvYm9WbWlYMkJzaXpvWTN3NkJtbzRkbXM0Z1ZQQTQ1?=
+ =?utf-8?B?V2FzM0haUGs1VnVCMjZOSlFxWlRNNVI4WmttcEg5QkpmdzQzenFPMGRxY2Nz?=
+ =?utf-8?B?VDRrR3MyZXRUWmVFc0VzbXdVYnB6eHRuL2QzTTRsZjhYdnJWR0g5eXdHUnlX?=
+ =?utf-8?B?UlZkbzV6YUFmL1BOTncxbU0yaDRwY0ZBUmgxaXljUUxNSzlZNkF0aXo4TW0x?=
+ =?utf-8?B?ZXJlL0p2OG10bk5UT2cvN3Q0RDEzRUpNdndRYzhLS3JxalFVa3JBUlJsWW5V?=
+ =?utf-8?B?SDA4VlZobE9PVzR6cFFmUGpTbkxYYVQwZGhvNitOUU95ZlQyQXNqdi8xbjRL?=
+ =?utf-8?B?Ujd1TGJsVGt5Vzl1WkEwS1pTb1cycm41MENjckJ5YStwUWwzejhsSkNVSHJq?=
+ =?utf-8?B?amdEOXBOQjBPdENOTTBnQ2krWmJNWXpXYVZNdk15RHcwM0l1Z1BRdnRsTDZV?=
+ =?utf-8?B?Rjd3SVo1blpoS2Y4Z0xUQnY2TUZ1NzM5c3dFWldNVjVUOS9WL0ozNUpkVk1N?=
+ =?utf-8?B?OWRoWS9MZXJzc1lTWVljYUpaTmZhcm9NUUhxcUg1NDIyVHRnbGJDWkJ4U2Uy?=
+ =?utf-8?B?bXcxeGJxS1ZEVTRHSTVPOC9JVlhHbklNTTQyVFVPRnpXekZpM0grZVhqUjlw?=
+ =?utf-8?B?QXlGL0FXZU9lN3FZYTR3dFBnVWQ4eEFHcnphSFpkVXpHK3NEaEZpYmJmTkhG?=
+ =?utf-8?B?RHhmM3dpMGZJQ3FxVVp2QVgxUzBJdC9wcEQ2V3ZpWlpzRGYrZTdQeXpRcmhZ?=
+ =?utf-8?B?QndMaXJmNnBnTExEUTN5UmhrdEVPOGpZcXdJYU9lZzZJa21WYkJhdWFrcWR4?=
+ =?utf-8?B?cjRrL2hiSkNxeitSR0FaNVJzNTJ4aVQ0ektiSVp4eUU3d29OanVHQ1NhNFQ3?=
+ =?utf-8?B?Q2w4ZjNDVDhMRVBza1RuVVc5ZTBGSHFFQ1Ria0t0TUpBTlVQUCtCSlZCM2U4?=
+ =?utf-8?B?bFNhYkRHYWxxa2F0SXdYaXlWSk9ZYmtDYmJvZzNaT3NFZ09YaDJteHZOTnd6?=
+ =?utf-8?B?bEp1MTlWUjNZU3o4M3NtdkhvejV0RDZwQ2IvZDhhbU1jc1BlNDJpTU1RazJw?=
+ =?utf-8?B?Q2xDVUhWK0M2enRFVWx3VVRzbmlzWEFNVlphdm9uRG1WY3UxRC9WN05lYWJG?=
+ =?utf-8?B?c1pEZ2pjZTVtUEZ6K0szUDc3aG5qbnlOd2dHQlRQWTdLS3hka0NOZ0UyNHpp?=
+ =?utf-8?B?UThPV2hLTmdEZHJFZWdjRHIwc3pxSDZjWVBDZmVjaXd5WTRjcXlERUlEYWxh?=
+ =?utf-8?B?VGxhTC9ERGZGQlpYc0w5NEU4YlBrTytNYlFQNzdxODV2enJBL0RzWHRqZ2NF?=
+ =?utf-8?B?L0x0cVRSSTVKZ2tQUi9CUWVpZHZ0cEhDT09pWGZlQmVpd3BBeWJxSEg1c3Y2?=
+ =?utf-8?B?TjkwWDF1SUhQU1pxSzJOSUNWOVRkL2xSRDg1T05ZQUwxQ0tYMEVLbDdEUW1S?=
+ =?utf-8?B?QkpxU1hKWmZ0MEhKR1cwK3hNa0szdHdCaTY5b2krVmV3MHBBeXVMTUtHYUZM?=
+ =?utf-8?B?bjhmdHkvNGRzQUgyaCtzZzZTSEpzaW9vUG5TbTNFNTVGcmdBQnQ1NzZCbmhG?=
+ =?utf-8?Q?TiphYWo/4WsPSmYix7?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6bfac103-3dbf-44ec-1ed3-08deb0e76812
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5248.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2026 12:01:46.6250
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JDbPvs3r3hph8jtkTpPO6caJ5bjVrMCTdUZhDRW8eiH6Ljoe58Zi4yKT6AlVUpAD
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8536
+X-Rspamd-Queue-Id: 07EDE532AF6
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-287563-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[fastmail.im,davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-287556-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gal@nvidia.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[realsil.com.cn:email,realsil.com.cn:mid,realsil.com.cn:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,Nvidia.com:dkim,nvidia.com:email,nvidia.com:mid,linux.dev:email]
 X-Rspamd-Action: no action
 
-From: Javen Xu <javen_xu@realsil.com.cn>
+On 13/05/2026 14:48, Alice Mikityanska wrote:
+> On Wed, May 13, 2026, at 13:28, Gal Pressman wrote:
+>> On 13/05/2026 13:08, Alice Mikityanska wrote:
+>>> On Wed, May 13, 2026, at 11:43, Gal Pressman wrote:
+>>>> On 13/05/2026 12:17, Alice Mikityanska wrote:
+>>>>> On Wed, May 13, 2026, at 09:43, Gal Pressman wrote:
+>>>>>> Following the cited commit, __udp_gso_segment() writes single MSS length
+>>>>>> in the UDP header.
+>>>>>> The cited patch doesn't account for the fact that the last segment could
+>>>>>> be a GSO skb by itself. This could happen when the size of the packet is
+>>>>>> a multiple of MSS, hence the first segment is also the last one (there
+>>>>>> is no need for a remainder skb).
+>>>>>>
+>>>>>> When the post-loop segment is a GSO skb, assign the single MSS length in
+>>>>>> the UDP header.
+>>>>>>
+>>>>>> Fixes: b10b446ce7ad ("udp: gso: Use single MSS length in UDP header for 
+>>>>>> GSO_PARTIAL")
+>>>>>> Reported-by: Matthew Schwartz <matthew.schwartz@linux.dev>
+>>>>>> Closes: 
+>>>>>> https://lore.kernel.org/all/6c3fb15e-711d-4b8d-b152-e03d9b05293f@linux.dev/
+>>>>>> Tested-by: Matthew Schwartz <matthew.schwartz@linux.dev>
+>>>>>> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+>>>>>> Signed-off-by: Gal Pressman <gal@nvidia.com>
+>>>>>> ---
+>>>>>>  net/ipv4/udp_offload.c | 2 +-
+>>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+>>>>>> index a0813d425b71..71df45f9488a 100644
+>>>>>> --- a/net/ipv4/udp_offload.c
+>>>>>> +++ b/net/ipv4/udp_offload.c
+>>>>>> @@ -604,7 +604,7 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+>>>>>>  		       seg->data_len);
+>>>>>>  	check = csum16_add(csum16_sub(uh->check, uh->len), newlen);
+>>>>>>
+>>>>>> -	uh->len = newlen;
+>>>>>> +	uh->len = skb_is_gso(seg) ? msslen : newlen;
+>>>>>>  	uh->check = check;
+>>>>>
+>>>>> This is going to have the same checksum bug as your first commit, which
+>>>>> I'm fixing in [1]. You should use the right value of either msslen or
+>>>>> newlen when modifying check a couple of lines above.
+>>>>
+>>>> I tend to agree that the checksum seems to have the wrong value, the
+>>>> reason I chose not to change it is because my work only moved the UDP
+>>>> length assignment from the drivers to the stack.
+>>>>
+>>>> The "wrong" checksum value was used regardless of my change,
+>>>
+>>> The wrong checksum was visible only inside the driver, and since the
+>>> hardware didn't care (due to the offload), it worked well. It was the
+>>> driver business to make sure the corresponding hardware likes the
+>>> packet. After commit b10b446ce7ad ("udp: gso: Use single MSS length in
+>>> UDP header for GSO_PARTIAL"), however, the wrong checksum moved one
+>>> abstraction layer higher - to the networking stack, which attempts to
+>>> keep the checksum correct for a more generic case. It's not the same,
+>>> and while I'm trying to fix one occurrence, I'd prefer not to
+>>> introduce more.
+>>>
+>>>> and I
+>>>> prefer not to change it as part of this work.
+>>>>
+>>>>>
+>>>>> That said, maybe you can base your patch on top of my checksum fix? For
+>>>>> the last packet, it will then be:
+>>>>>
+>>>>> if (!skb_is_gso(seg))
+>>>>>         newlen = /* the new value */;
+>>>>> /* keep newlen as is otherwise: my newlen is your msslen */
+>>>>> check = csum16_add(csum16_sub(uh->check, uh->len), newlen);
+>>>>> uh->len = newlen;
+>>>>> uh->check = check;
+>>>>>
+>>>>> [1]: https://lore.kernel.org/netdev/20260512165648.386518-3-alice.kernel@fastmail.im/
+>>>>
+>>>> As I mentioned in the other thread, this fix goes to net, I can't take
+>>>> your patch.
+>>>
+>>> Ah, that's right. Still, I guess you can take mine to net for the
+>>> checksum fix.
+>>
+>> Do you think it is suitable for net?
+> 
+> This is always a mystery to me... I've had different experiences:
+> sometimes I am asked to resubmit less important fixes to -next,
+> sometimes a fix is a fix and must go to net. This one is a refactoring
+> useful for my further patches + the checksum fix, which we get for free
+> and which I considered not important enough to submit to net (hardware
+> offload fixes the checksum in most cases anyway). Following the "a fix
+> is a fix" logic, we may try sending it to net. What do you think?
 
-This patch add support for changing rx queues by ethtool. We can set rx
-1, 2, 4, 8 by ethtool -L eth1 rx num.
-
-Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
----
-Changes in v2:
- - no changes
-
-Changes in v3:
- - no changes
----
- drivers/net/ethernet/realtek/r8169_main.c | 126 ++++++++++++++++++++++
- 1 file changed, 126 insertions(+)
-
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index f654e98e47be..ae64955e47d4 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -6269,6 +6269,130 @@ static void r8169_init_napi(struct rtl8169_private *tp)
- 	}
- }
- 
-+static void rtl8169_get_channels(struct net_device *dev,
-+				 struct ethtool_channels *ch)
-+{
-+	struct rtl8169_private *tp = netdev_priv(dev);
-+
-+	ch->max_rx = tp->hw_supp_num_rx_queues;
-+	ch->max_tx = 1;
-+	ch->max_other = 0;
-+	ch->max_combined = 0;
-+
-+	ch->rx_count = tp->num_rx_rings;
-+	ch->tx_count = 1;
-+	ch->other_count = 0;
-+	ch->combined_count = 0;
-+}
-+
-+static int rtl8169_realloc_rx(struct rtl8169_private *tp,
-+			      struct rtl8169_rx_ring *new_rx,
-+			      int new_count)
-+{
-+	int i, ret;
-+
-+	for (i = 0; i < new_count; i++) {
-+		struct rtl8169_rx_ring *ring = &new_rx[i];
-+
-+		ring->rx_desc_array = dma_alloc_coherent(&tp->pci_dev->dev,
-+							 R8169_RX_RING_BYTES,
-+							 &ring->rx_phy_addr,
-+							 GFP_KERNEL);
-+		if (!ring->rx_desc_array) {
-+			ret = -ENOMEM;
-+			goto err_free;
-+		}
-+
-+		memset(ring->rx_databuff, 0, sizeof(ring->rx_databuff));
-+		ret = rtl8169_rx_fill(tp, ring);
-+		if (ret) {
-+			dma_free_coherent(&tp->pci_dev->dev, R8169_RX_RING_BYTES,
-+					  ring->rx_desc_array, ring->rx_phy_addr);
-+			goto err_free;
-+		}
-+	}
-+	return 0;
-+
-+err_free:
-+	while (--i >= 0) {
-+		rtl8169_rx_clear(tp, &new_rx[i]);
-+		dma_free_coherent(&tp->pci_dev->dev, R8169_RX_RING_BYTES,
-+				  new_rx[i].rx_desc_array, new_rx[i].rx_phy_addr);
-+	}
-+	return ret;
-+}
-+
-+static int rtl8169_set_channels(struct net_device *dev,
-+				struct ethtool_channels *ch)
-+{
-+	struct rtl8169_private *tp = netdev_priv(dev);
-+	bool if_running = netif_running(dev);
-+	struct rtl8169_rx_ring *new_rx;
-+	u8 old_tx_desc_type = tp->init_rx_desc_type;
-+	u8 new_desc_type;
-+	bool new_rss_enable;
-+	int i, ret;
-+
-+	if (!tp->rss_support && (ch->rx_count > 1 || ch->tx_count > 1)) {
-+		netdev_warn(dev, "This chip does not support multiple channels/RSS.\n");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (!(tp->features & RTL_VEC_MAP_ENABLE))
-+		return -EINVAL;
-+
-+	new_rss_enable = (ch->rx_count > 1 && tp->rss_support);
-+	new_desc_type = new_rss_enable ? RX_DESC_RING_TYPE_RSS : RX_DESC_RING_TYPE_DEFAULT;
-+	tp->init_rx_desc_type = new_desc_type;
-+
-+	if (!if_running) {
-+		tp->num_rx_rings = ch->rx_count;
-+		tp->rss_enable = new_rss_enable;
-+		return 0;
-+	}
-+
-+	new_rx = kcalloc(R8169_MAX_RX_QUEUES, sizeof(*new_rx), GFP_KERNEL);
-+	if (!new_rx)
-+		return -ENOMEM;
-+
-+	ret = rtl8169_realloc_rx(tp, new_rx, ch->rx_count);
-+	if (ret) {
-+		kfree(new_rx);
-+		tp->init_rx_desc_type = old_tx_desc_type;
-+		return ret;
-+	}
-+
-+	netif_stop_queue(dev);
-+	rtl8169_down(tp);
-+
-+	for (i = 0; i < tp->num_rx_rings; i++)
-+		rtl8169_rx_clear(tp, &tp->rx_ring[i]);
-+	rtl8169_free_rx_desc(tp);
-+
-+	tp->num_rx_rings = ch->rx_count;
-+	tp->rss_enable = new_rss_enable;
-+
-+	memset(tp->rx_ring, 0, sizeof(tp->rx_ring));
-+	memcpy(tp->rx_ring, new_rx, sizeof(*new_rx) * ch->rx_count);
-+
-+	for (i = 0; i < tp->rss_data->hw_supp_indir_tbl_entries; i++) {
-+		if (tp->rss_enable)
-+			tp->rss_data->rss_indir_tbl[i] =
-+				ethtool_rxfh_indir_default(i, tp->num_rx_rings);
-+		else
-+			tp->rss_data->rss_indir_tbl[i] = 0;
-+	}
-+
-+	rtl_set_irq_mask(tp);
-+
-+	rtl8169_up(tp);
-+	netif_start_queue(dev);
-+
-+	kfree(new_rx);
-+
-+	return 0;
-+}
-+
- static const struct ethtool_ops rtl8169_ethtool_ops = {
- 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
- 				     ETHTOOL_COALESCE_MAX_FRAMES,
-@@ -6287,6 +6411,8 @@ static const struct ethtool_ops rtl8169_ethtool_ops = {
- 	.nway_reset		= phy_ethtool_nway_reset,
- 	.get_eee		= rtl8169_get_eee,
- 	.set_eee		= rtl8169_set_eee,
-+	.get_channels		= rtl8169_get_channels,
-+	.set_channels		= rtl8169_set_channels,
- 	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
- 	.set_link_ksettings	= rtl8169_set_link_ksettings,
- 	.get_ringparam		= rtl8169_get_ringparam,
--- 
-2.43.0
-
+IMHO, the motivation you provided in your previous message for the
+checksum fix is convincing, but as I said, I think the commit message
+should be phrased to explain the bug rather than the refactoring (and
+add a Fixes tag).
 
