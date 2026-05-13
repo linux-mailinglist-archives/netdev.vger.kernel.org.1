@@ -1,83 +1,63 @@
-Return-Path: <netdev+bounces-287428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287429-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WEoAF+b7A2rKBgIAu9opvQ
-	(envelope-from <netdev+bounces-287428-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 06:19:50 +0200
+	id YAXJEiEDBGrLCAIAu9opvQ
+	(envelope-from <netdev+bounces-287429-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 06:50:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BC0F52D20A
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 06:19:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E90F452D45D
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 06:50:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B26E8305B028
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 04:19:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DF6B430534D8
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 04:49:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D7C436E47E;
-	Wed, 13 May 2026 04:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A44535DD1C;
+	Wed, 13 May 2026 04:49:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EISLT9Ve"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="EsVf3TWh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25572D5436;
-	Wed, 13 May 2026 04:19:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55155299923;
+	Wed, 13 May 2026 04:49:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778645987; cv=none; b=HWIi8BWy8R4+01lJf/MwtemBpN2NviL2k7rE/FfH+umJi5AeHBInDIcnHKa3NduYVLgVMqcTBP6LLtbBd5rfpZG1CnD4Sb3icgGaG+4bm1YSnLj2XtCAqGwRz1GzX749biFw4bKFCSuntipK9f+axwSCLEsWutwZ22s+vAcT/yE=
+	t=1778647776; cv=none; b=FbdU50hqR0UqEHYNp0wGxSEbPmFqMpMft+2RvR+HcF/5frgcZMjL1U/V8Q7tK6PMXxhyWL6G9l/wjtduMAb/U8wb25Gvx4pNi/5dC4PuUCPp6aUqcTBKYNeWMXQMyWuyWfTagMkgUCIeHsmUJVgLzQCW2TaFA5S54azTTW/a134=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778645987; c=relaxed/simple;
-	bh=/nSFQ2/8daCssLI1ptOVAQPaTh12fuEua1jAKxHxKZw=;
+	s=arc-20240116; t=1778647776; c=relaxed/simple;
+	bh=dT77H9ORPste/t0zfSTlk15UTBP295wtZR/6wSlJ3A4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QFeLustw2tlCGJhVOKTx+q3yRbD0T17RQG4+Ijd3mizoUy8MVjTUdlYGJxzzkD0sTLq81M4UFaPGEXtfIFug/upIO+2V7IULZJrqaDX55V9l0UyQnF0hzkTPjYoDA3bJpbAEVBLU04RedQ0B/y43tlKd5E7tPNHLuxC1sRH9/os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EISLT9Ve; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778645985; x=1810181985;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/nSFQ2/8daCssLI1ptOVAQPaTh12fuEua1jAKxHxKZw=;
-  b=EISLT9VeVWc5O1YT8x7deljAni7VhL3o5yYxS/LP6gh/aQ6pTVn+DIxJ
-   yCxre/K+p33SY/m54tASYeUlTNGjdBSXryCoBnlJirXLf5/a5kDCCEA5f
-   HYiO9uUEtnsPhHTCf4Dbb+KVyr9j7ELeT8jjxweJ3bF8GA+TXyWs1a85Y
-   I3VVV0sn2klFnTWYbwt+cEZ/SN56WXI0N1vTifEPfymlo0XiPS5ZN5vpo
-   zVoFWQd30IH5q/EGiwM/nFeCU+nDN4jWhrRQ+nBe45M/8jFPB/Whd1JXd
-   BgQ2rpRCeD3Nmriumb9xajvCPexPD7MtHZOrtDWMfjD+K2p6OnlN8YckI
-   w==;
-X-CSE-ConnectionGUID: fjJxU4aJRUe8G66CZ1MNPQ==
-X-CSE-MsgGUID: xln78hRWTpGE/FmgjUYlxA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11784"; a="79743060"
-X-IronPort-AV: E=Sophos;i="6.23,232,1770624000"; 
-   d="scan'208";a="79743060"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2026 21:19:44 -0700
-X-CSE-ConnectionGUID: d/4PRzmUQie3DPdgWsdSyQ==
-X-CSE-MsgGUID: oO2nSQnXTtm/JFV7Fzzuaw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,232,1770624000"; 
-   d="scan'208";a="242318375"
-Received: from lkp-server01.sh.intel.com (HELO dca79079c3eb) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 12 May 2026 21:19:42 -0700
-Received: from kbuild by dca79079c3eb with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wN14M-000000003Pb-2eHO;
-	Wed, 13 May 2026 04:19:38 +0000
-Date: Wed, 13 May 2026 12:18:59 +0800
-From: kernel test robot <lkp@intel.com>
-To: faicker.mo@gmail.com
-Cc: oe-kbuild-all@lists.linux.dev, kuba@kernel.org,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] net: net_failover: Fix the deadlock in slave register
-Message-ID: <202605131216.7sSRq0Gy-lkp@intel.com>
-References: <20260507074332.2543229-1-faicker.mo@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Js5k1N1SmkjNRvqMXxqNOx8SxsYmks8zLw/fbEiX5X8+xVgBPQHk7nzyjT26O3uWaRConUKlVjZevex6lWmqJg3gtkzCv9g2CPBegEvUGx+GHhfL9ILVPdjZG54J/O/a4g9/hmXfPsbsT2TeOgLXdemspw0tQDsx6U8GGrUJ480=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=EsVf3TWh; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id 7EC0D20B7166; Tue, 12 May 2026 21:49:31 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7EC0D20B7166
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1778647771;
+	bh=Omuq11ywLwTC5q3IVHAFOC9whRswGzaRH2gtVx0YPH0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EsVf3TWhP3f3icGssZBLG13b1+ZhIUVGdz8weHlOEC0XuepUUsVQTT3inEn8BIRgM
+	 3OnM9nYc854GL6hcpJh2yhN+75lpV5KV3JplTvixMIKFV18Ni9QfxF60I6zdHnDbve
+	 c87pcYaFriR1kQvueonMyzS/0ZKapiU8t0xLIf+c=
+Date: Tue, 12 May 2026 21:49:31 -0700
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, dipayanroy@linux.microsoft.com,
+	shirazsaleem@microsoft.com, yury.norov@gmail.com, kees@kernel.org,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next v8] net: mana: Expose hardware diagnostic info
+ via debugfs
+Message-ID: <agQC2/HG6FsCgFZn@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20260506055128.291494-1-ernis@linux.microsoft.com>
+ <20260508220114.3342627-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,100 +66,150 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260507074332.2543229-1-faicker.mo@gmail.com>
-X-Rspamd-Queue-Id: 7BC0F52D20A
+In-Reply-To: <20260508220114.3342627-1-kuba@kernel.org>
+X-Rspamd-Queue-Id: E90F452D45D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287428-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287429-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,gmail.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[git-scm.com:url,intel.com:email,intel.com:mid,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,01.org:url]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Hi,
+On Fri, May 08, 2026 at 03:01:14PM -0700, Jakub Kicinski wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> ---
+> net: mana: Expose hardware diagnostic info via debugfs
+> 
+> Add debugfs entries to expose hardware configuration and diagnostic
+> information that aids in debugging driver initialization and runtime
+> operations without adding noise to dmesg.
+> 
+> > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> [ ... ]
+> > @@ -2231,13 +2239,18 @@ int mana_gd_resume(struct pci_dev *pdev)
+> >  
+> >  	err = mana_probe(&gc->mana, true);
+> >  	if (err)
+> > -		return err;
+> > +		goto cleanup_gd;
+> >  
+> >  	err = mana_rdma_probe(&gc->mana_ib);
+> >  	if (err)
+> > -		return err;
+> > +		goto cleanup_mana;
+> >  
+> >  	return 0;
+> > +cleanup_mana:
+> > +	mana_remove(&gc->mana, true);
+> > +cleanup_gd:
+> > +	mana_gd_cleanup_device(pdev);
+> > +	return err;
+> >  }
+> 
+> Since mana_remove() called with true for suspending skips
+> unregister_netdevice(), the network devices remain registered in the system.
+> 
+> If mana_gd_cleanup_device() is then called, which destroys the hardware
+> channel and clears gc->hwc.driver_data, could this lead to a NULL pointer
+> dereference if userspace later interacts with the still-registered devices?
 
-kernel test robot noticed the following build errors:
+Sorry for delayed response.
 
-[auto build test ERROR on net-next/main]
-[also build test ERROR on net/main linus/master v7.1-rc3 next-20260508]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+This is a valid concern. I will update it to mana_remove(&gc->mana, false) in
+the next version.
+> 
+> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> [ ... ]
+> > @@ -3161,6 +3169,23 @@ static int mana_init_port(struct net_device *ndev)
+> >  	eth_hw_addr_set(ndev, apc->mac_addr);
+> >  	sprintf(vport, "vport%d", port_idx);
+> >  	apc->mana_port_debugfs = debugfs_create_dir(vport, gc->mana_pci_debugfs);
+> > +
+> > +	debugfs_create_u64("port_handle", 0400, apc->mana_port_debugfs,
+> > +			   &apc->port_handle);
+> 
+> When the device suspends, mana_gd_suspend() calls mana_gd_cleanup_device(),
+> which recursively removes the entire debugfs directory tree.
+> 
+> During resume, the parent debugfs directory is recreated, but mana_probe()
+> skips calling mana_init_port() for existing ports.
+> 
+> Does this mean the per-vPort debugfs entries are permanently lost after a
+> suspend and resume cycle?
+> 
+This is false positive.
+The per-vPort debugfs entries are recreated during resume. The flow is:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/faicker-mo-gmail-com/net-net_failover-Fix-the-deadlock-in-slave-register/20260513-045805
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260507074332.2543229-1-faicker.mo%40gmail.com
-patch subject: [PATCH v3] net: net_failover: Fix the deadlock in slave register
-config: i386-randconfig-141-20260513 (https://download.01.org/0day-ci/archive/20260513/202605131216.7sSRq0Gy-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-smatch: v0.5.0-9185-gbcc58b9c
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260513/202605131216.7sSRq0Gy-lkp@intel.com/reproduce)
+Suspend: mana_gd_cleanup_device() removes the entire debugfs tree.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202605131216.7sSRq0Gy-lkp@intel.com/
+Resume: mana_gd_setup() recreates the top-level mana_pci_debugfs
+directory. Then mana_probe(gd, true) takes the resuming=true path,
+which calls mana_attach() for each port. mana_attach() calls
+mana_init_port(), which recreates the vportN directory and all
+per-vPort debugfs files (port_handle, max_sq, max_rq, steer_*,
+current_speed).
 
-All errors (new ones prefixed by >>):
+So the per-vPort entries are not permanently lost, they survive the
+suspend/resume cycle.
+> [ ... ]
+> > @@ -3800,6 +3830,9 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+> >  
+> >  	mana_gd_deregister_device(gd);
+> >  
+> > +	debugfs_lookup_and_remove("bm_hostmode", gc->mana_pci_debugfs);
+> > +	debugfs_lookup_and_remove("num_vports", gc->mana_pci_debugfs);
+> > +
+> >  	if (suspending)
+> >  		return;
+> 
+> Earlier in mana_remove(), free_netdev() is called, which frees the port
+> context structure (apc) allocated via netdev_priv(ndev).
+> 
+> Since the per-vPort debugfs files created in mana_init_port() directly
+> reference memory within apc, and apc->mana_port_debugfs is not explicitly
+> removed here, does this leave the debugfs files accessible but pointing to
+> freed memory until the parent directory is finally removed in
+> mana_gd_cleanup_device()?
 
-   net/core/failover.c: In function 'failover_existing_slave_register':
->> net/core/failover.c:225:25: error: implicit declaration of function 'netdev_lock_ops'; did you mean 'netdev_lock'? [-Wimplicit-function-declaration]
-     225 |                         netdev_lock_ops(dev);
-         |                         ^~~~~~~~~~~~~~~
-         |                         netdev_lock
->> net/core/failover.c:227:25: error: implicit declaration of function 'netdev_unlock_ops'; did you mean 'netdev_unlock'? [-Wimplicit-function-declaration]
-     227 |                         netdev_unlock_ops(dev);
-         |                         ^~~~~~~~~~~~~~~~~
-         |                         netdev_unlock
+This is a false positive.
+The per-vPort debugfs files are removed before free_netdev() frees apc.
 
+In mana_remove(gd, false), the sequence for each port is:
 
-vim +225 net/core/failover.c
-
-   213	
-   214	static void
-   215	failover_existing_slave_register(struct net_device *failover_dev)
-   216	{
-   217		struct net *net = dev_net(failover_dev);
-   218		struct net_device *dev;
-   219	
-   220		rtnl_lock();
-   221		for_each_netdev(net, dev) {
-   222			if (netif_is_failover(dev))
-   223				continue;
-   224			if (ether_addr_equal(failover_dev->perm_addr, dev->perm_addr)) {
- > 225				netdev_lock_ops(dev);
-   226				failover_slave_register(dev);
- > 227				netdev_unlock_ops(dev);
-   228			}
-   229		}
-   230		rtnl_unlock();
-   231	}
-   232	
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+mana_detach(ndev, false) -> mana_cleanup_port_context(apc)
+-> debugfs_remove(apc->mana_port_debugfs).
+This removes the entire vportN directory and all its child files, since
+debugfs_remove() is recursive (simple_recursive_removal()).
+free_netdev(ndev) which frees apc.
+Because step 1 removes all debugfs files referencing apc fields before
+step 2 frees the memory, there is no window where the files point to
+freed memory.
 
