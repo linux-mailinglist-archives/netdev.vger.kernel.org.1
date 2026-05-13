@@ -1,178 +1,158 @@
-Return-Path: <netdev+bounces-287440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287438-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kAY7H1MYBGpLDgIAu9opvQ
-	(envelope-from <netdev+bounces-287440-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 08:21:07 +0200
+	id uDPZNd8XBGpLDgIAu9opvQ
+	(envelope-from <netdev+bounces-287438-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 08:19:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 200DC52E0A2
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 08:21:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3183052E05C
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 08:19:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4BDB13059937
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 06:19:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DD9473051D2E
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 06:18:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E58843D1A86;
-	Wed, 13 May 2026 06:19:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53F603D3CF6;
+	Wed, 13 May 2026 06:18:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.cn header.i=@sina.cn header.b="OmJz31EG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L4VqkFNV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail114-241.sinamail.sina.com.cn (mail114-241.sinamail.sina.com.cn [218.30.114.241])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD6D3D3D0E
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 06:19:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.114.241
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778653159; cv=none; b=Y40BeBD4baOYZ0fIFceFXLSFTmE55DVnAsMGZ9AVkHw2qMKPUGRkA9fIttBJQG+1DAp6rh8luXjZjyWbg66y0ZBvcjjVEMnKSn6s9K0bO2D1svhwB7Q0lt/dSSQi4XTdxO1Txs8znz6omRuByHyTW4k8EgZrRugdd0hY3YgvgPo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778653159; c=relaxed/simple;
-	bh=PHaGKgtvzC6KHwX0lmmeI2qFFzCI2UodpxK+IBGcxnM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=P2nkQ5ePmrhl5v72i9t9jfayZ6q45hdToDk0+5A/zFFL8gPfqJghR0ZbE1lcskhjx4PeKp7D6jlXV3YbPc5Rm+iaTzvGvsPS6JcA+wf+0YYSpUAvJ2JwTlJ4MYO4GCw1twHaqNXzCanN3IjVuQogtigU8QZBYEeZrVLdk3j4zqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.cn; spf=pass smtp.mailfrom=sina.cn; dkim=pass (1024-bit key) header.d=sina.cn header.i=@sina.cn header.b=OmJz31EG; arc=none smtp.client-ip=218.30.114.241
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.cn
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.cn; s=201208; t=1778653154;
-	bh=ZPfd4QVU32sg85rtvgJTvaqyRqM7XRlftnMouVyTzP4=;
-	h=From:Subject:Date:Message-Id;
-	b=OmJz31EG7h+zTML2k81GveU61yDfqtBaFFJ5k5JbPB75aoCQ9jGnZwxddpb7Fnpmr
-	 lHieQ28ImRL8hjFJ7x401B/i/XD3MKYo2ajloGGFWjrg86Qt4U//0GywA5Frotfxzu
-	 AtNtJeJuJ5HeClAE/7y6kil/2iNmW40hR1Ju714c=
-X-SMAIL-HELO: NTT-kernel-dev
-Received: from unknown (HELO NTT-kernel-dev)([60.247.85.88])
-	by sina.cn (10.185.250.23) with ESMTP
-	id 6A0417B4000014C5; Wed, 13 May 2026 14:18:34 +0800 (CST)
-X-Sender: jianqkang@sina.cn
-X-Auth-ID: jianqkang@sina.cn
-Authentication-Results: sina.cn;
-	 spf=none smtp.mailfrom=jianqkang@sina.cn;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=jianqkang@sina.cn
-X-SMAIL-MID: 3135098913013
-X-SMAIL-UIID: CD07E9044C1644B3847C377BF3937D6D-20260513-141834-1
-From: Jianqiang kang <jianqkang@sina.cn>
-To: gregkh@linuxfoundation.org,
-	stable@vger.kernel.org,
-	sam@bynar.io
-Cc: patches@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	socketcan@hartkopp.net,
-	mkl@pengutronix.de,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH 6.1.y] can: raw: fix ro->uniq use-after-free in raw_rcv()
-Date: Wed, 13 May 2026 14:18:28 +0800
-Message-Id: <20260513061828.3671533-1-jianqkang@sina.cn>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA02C3D1A86
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 06:18:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778653127; cv=pass; b=IivbjUwXDhmQ/qsGsYKXDLnvTRXBYlfQv6N5qfr50bneJyq1ke+jTtSP6+xf2SP/51elJqpbceHwTtyUmhKEY81dS4Md8Pgc6vZA5WelLbTmFhYz8TWIIGK++KKp7JHlCPTewF5LP+FIyVdNy8E3lElKg/hKTwDjxIwclG544Os=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778653127; c=relaxed/simple;
+	bh=WrY2hZPMMxxQ1LWP6MgclBD3iRLMofj8yrbwp/ZI7kY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UflOfcUcO8jkcJtRJJt8u9g3lG80u05Hx3z+HjBUpRT/Nm1rxk4vRcYgmML4r6HAX5Bjr2Iny+k62rR1VYvcdSlHMcyVEHB4DoHAuc/vuE36SeDWo6SCe0mUs2A/8HZwVLr5CXswjpUjpNHV83BKSvaBwT7LLm6k2VLFcGjedco=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L4VqkFNV; arc=pass smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-488af96f6b2so75721375e9.0
+        for <netdev@vger.kernel.org>; Tue, 12 May 2026 23:18:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778653124; cv=none;
+        d=google.com; s=arc-20240605;
+        b=SFkJMnyvGxVILddDPI/EQMJxOhpxNcEkSB8Ak4A5B0eihXcLpLQa2kyx0M2zfK3+EU
+         5q+Iu29o+TuggwPI4B2SpOKgb2gLoDOqD8Al1Ogx4fLlxmniMYPjiJhnLrZAeijRSWEy
+         FMHfIyFRHwNK1RrRT23/t1LawPhxOnP46kaWR6iYDmFymI0EQD9rwix0u+4Eorz0gWfz
+         cyJCy6T++2toHHBCPkd6tjpJY/4VSLBAMz6jJXO9Wyipk/cfR5StndE1HmsqI06xCM7z
+         SAzLojInDSZD3F1SJ77x6aoZepaVMe1BIDL/6kabYWSew3pMqT80x4L5x+Bf5X1WJHFx
+         yYZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=WrY2hZPMMxxQ1LWP6MgclBD3iRLMofj8yrbwp/ZI7kY=;
+        fh=0XK8nYwosRUNGVibhpm9w5Km/AolWAlu7opLEZ2/cX0=;
+        b=ZNnS3zdSDd+Il7kF0i4KQwlZ+in3TEEz33c0vMo3/5reV+fmm7Au/bGPsxRJSqXyUe
+         q6UlNJ1adlUaTjwhFHA6mLnd12aWATKyZCcTFQr5t3G2tjWFcKgvxvgmyEbEs1Y3xAWa
+         Vs63JU97L/xgXJY6n5fcIuCOLsPRB2DshWfPPUjpKuhRj+VHz15H+wWNlKO+FOJoL6YF
+         Nr6KNomILa+3Ex0itfaFzpbV7DPSn6GTcP7f82Rk9JUrc4POEECXSwJ+y1+L2YTmvn8a
+         8mgILf1RIxOYlCaejtv1gp0rLLl3WeUwmz3wfcNmzd06sPRYoSwDGW80n4tfD6OSAAky
+         /7BQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778653124; x=1779257924; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=WrY2hZPMMxxQ1LWP6MgclBD3iRLMofj8yrbwp/ZI7kY=;
+        b=L4VqkFNVw7lQg5Wv+6QgazCzrAZt2c3hwqn4QSKnF0XObuHGJSIXFtwwtYU2elGr2S
+         2Mzs/VIdbRkXhxvWIg9JboEKYzKmC7V5vq0CFEr6Pjru89GMD7miYJD+DRSukE320XJx
+         a9f29VfxTWWWYCzavbnOFocc3+NnXAAZ/VWgqLMKS0ZXCAPwmXeyHKoeDMZWD/Q4Z/h6
+         oK62kfckBon4TjMHI2vAMGJZDwrVZl9W1AWkD0nas+wOVzcdCsmpZOfdG03928pIgYE8
+         BzHiUnBkebOzqU1uj5+t4mL/icxCcqtZdjQAWletIhlS2w8SBj5g1FgN56msmRne/XG4
+         IAAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778653124; x=1779257924;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WrY2hZPMMxxQ1LWP6MgclBD3iRLMofj8yrbwp/ZI7kY=;
+        b=epKG3nmOSL0tLEtz72Z0Z2vSo4I6AEtyqoVF+RyIpMFVUX0PmMl9/69XyCtutHjYt6
+         exmGl1TBrwywHNNDYHDTN72DSBUVaPn74jvrpjTHa6CV8Avj0MU4+yE1fOo0pHu51TTu
+         FJ/mq0sBJh9pSC9+PttY6hoLkgHDsFQ8AFnG3GWhzZfQ/ABh96ZNVWPGecTm+wMQRUs0
+         wK/XQvqrhQbKFXZcfuXJoojlULWSO4p6cHrRkNN3lT+Jf7NDvamCCLU4RRP3TUYfUCQJ
+         ksBZmpYXjKKNo24hY3kehjEVp/LiFI90dTgByabM1Uh/Bpn31i+bXjeHmnEOrj5DT3hn
+         +dew==
+X-Forwarded-Encrypted: i=1; AFNElJ+wmTHNRbCuxxRm3t0R2W6pb/xvl6qWSbsqpCRGH7ZwrWQ4lXn2yKu/qNdZFqEe98SOnMNPIi8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXFUFJ8SW0C9s0qCkOU0TXn6C8gXiSWYv+SNVKfCAntpotgalQ
+	vgR9vICc8MTyD0krKd7r8tRFOX+ARhXFd7+6BU0dMB2KkdDQphW6297abyd9RMgsBODQp1s7Jgb
+	+uImo30U2rk8W1DC7CoRAEeRRz2v2HF8=
+X-Gm-Gg: Acq92OGfE2JCR7SVEJmWD/4XRC//9z4e4JZQBfNyzIg/qq4IqdVXoLS5ukkJ3+G+zw7
+	EYfjtgc7vAO91BEbxnZ5IghUj8qSgvgaZaXj4URMjb7k7ByQ3PNDh+LPCaCnTEBjPcrIeBrqKMm
+	NYNhr7trP+AXAB5FAkbA++yCxHMPGVvqsJjlmgKcY/LsZWQDhGQOIlVaKfmRcnEM154hAGRxGb/
+	zIqWUbGJWvLKGbXSzMXtZNMJGR6vkOwCpNb15Pr/tIOJ8+dbzc/XP4/Ms/3dTAgzdRy3PKNJOng
+	RF2NuCgdxKGNd2G/QA==
+X-Received: by 2002:a05:600c:a48:b0:48a:52ee:5776 with SMTP id
+ 5b1f17b1804b1-48fc9a0ef80mr25793175e9.11.1778653124195; Tue, 12 May 2026
+ 23:18:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 200DC52E0A2
+References: <20260511070211.1033178-1-maoyi.xie@ntu.edu.sg> <9b6148b29f57728d97a9fea8a400e87a3f6a1526.camel@kernel.org>
+In-Reply-To: <9b6148b29f57728d97a9fea8a400e87a3f6a1526.camel@kernel.org>
+From: Maoyi Xie <maoyixie.tju@gmail.com>
+Date: Wed, 13 May 2026 14:18:31 +0800
+X-Gm-Features: AVHnY4IcN0Jh7DC42BSM0bqJQ3RvCnFtHU0k-WlbQCijrYUbo8dXtGmCYJeD58E
+Message-ID: <CAHPEe=HK5=T6OwozBwKR_i_ULNPbWC2k6PNhBfJLX6_gK76+qw@mail.gmail.com>
+Subject: Re: [PATCH net v3] rds: filter RDS_INFO_* getsockopt by caller's netns
+To: Allison Henderson <achender@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-rdma@vger.kernel.org, 
+	rds-devel@oss.oracle.com, linux-kernel@vger.kernel.org, 
+	Praveen Kakkolangara <praveen.kakkolangara@aumovio.com>, Maoyi Xie <maoyi.xie@ntu.edu.sg>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 3183052E05C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[sina.cn,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[sina.cn:s=201208];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-287440-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jianqkang@sina.cn,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-287438-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[sina.cn:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	FREEMAIL_FROM(0.00)[sina.cn];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[hartkopp.net:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pengutronix.de:email,bynar.io:email,msgid.link:url]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-From: Samuel Page <sam@bynar.io>
+Hi Allison,
 
-[ Upstream commit a535a9217ca3f2fccedaafb2fddb4c48f27d36dc ]
+Thanks for the v3 confirmation.
 
-raw_release() unregisters raw CAN receive filters via can_rx_unregister(),
-but receiver deletion is deferred with call_rcu(). This leaves a window
-where raw_rcv() may still be running in an RCU read-side critical section
-after raw_release() frees ro->uniq, leading to a use-after-free of the
-percpu uniq storage.
+One small follow-up: kernel test robot reported -Wunused-but-set-global
+for rds_sock_count, rds_tcp_tc_count, and rds6_tcp_tc_count after v3.
+They became unused once v3 replaced the precheck with the per-ns
+count. I plan to send v4 dropping these three globals (delete-only,
+same files as v3) and carrying your Reviewed-by forward.
 
-Move free_percpu(ro->uniq) out of raw_release() and into a raw-specific
-socket destructor. can_rx_unregister() takes an extra reference to the
-socket and only drops it from the RCU callback, so freeing uniq from
-sk_destruct ensures the percpu area is not released until the relevant
-callbacks have drained.
-
-Fixes: 514ac99c64b2 ("can: fix multiple delivery of a single CAN frame for overlapping CAN filters")
-Cc: stable@vger.kernel.org # v4.1+
-Assisted-by: Bynario AI
-Signed-off-by: Samuel Page <sam@bynar.io>
-Link: https://patch.msgid.link/26ec626d-cae7-4418-9782-7198864d070c@bynar.io
-Acked-by: Oliver Hartkopp <socketcan@hartkopp.net>
-[mkl: applied manually]
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-Signed-off-by: Jianqiang kang <jianqkang@sina.cn>
----
- net/can/raw.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/net/can/raw.c b/net/can/raw.c
-index 488320738e31..bcd6061f43d8 100644
---- a/net/can/raw.c
-+++ b/net/can/raw.c
-@@ -336,6 +336,14 @@ static int raw_notifier(struct notifier_block *nb, unsigned long msg,
- 	return NOTIFY_DONE;
- }
- 
-+static void raw_sock_destruct(struct sock *sk)
-+{
-+	struct raw_sock *ro = raw_sk(sk);
-+
-+	free_percpu(ro->uniq);
-+	can_sock_destruct(sk);
-+}
-+
- static int raw_init(struct sock *sk)
- {
- 	struct raw_sock *ro = raw_sk(sk);
-@@ -362,6 +370,8 @@ static int raw_init(struct sock *sk)
- 	if (unlikely(!ro->uniq))
- 		return -ENOMEM;
- 
-+	sk->sk_destruct = raw_sock_destruct;
-+
- 	/* set notifier */
- 	spin_lock(&raw_notifier_lock);
- 	list_add_tail(&ro->notifier, &raw_notifier_list);
-@@ -409,7 +419,6 @@ static int raw_release(struct socket *sock)
- 	ro->bound = 0;
- 	ro->dev = NULL;
- 	ro->count = 0;
--	free_percpu(ro->uniq);
- 
- 	sock_orphan(sk);
- 	sock->sk = NULL;
--- 
-2.34.1
-
+Best,
+Maoyi
 
