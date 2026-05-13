@@ -1,204 +1,232 @@
-Return-Path: <netdev+bounces-287727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287728-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8KOwHyvoBGqnQQIAu9opvQ
-	(envelope-from <netdev+bounces-287727-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 23:07:55 +0200
+	id 2Pf1NC/oBGqnQQIAu9opvQ
+	(envelope-from <netdev+bounces-287728-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 23:07:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0104B53AD4D
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 23:07:54 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1D1853AD65
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 23:07:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E41BD3019440
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 21:07:53 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 16FEE300AB0C
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 21:07:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3BC3363084;
-	Wed, 13 May 2026 21:07:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CD67397E91;
+	Wed, 13 May 2026 21:07:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QyT84jP3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UPIZCOur"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A81DA1F2380
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 21:07:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778706472; cv=none; b=sKGcqTnX6rWMbr5kAsJdeydE/OzvFFIC+GLl7KenQ/7itb1/AcaArx7ijdcpr1I64TnAO7Zg8yKH4vo6c8MDjDTuA2paj72QL27p3QARfQ70CZJxXS+lBBtqBxFqop17DkACU05urrc9n+125L/DwKiB2WoibRobeJvrl7tas24=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778706472; c=relaxed/simple;
-	bh=uKjpy6mZcAKH6MrZUZmS6VAiqXKWfj84zFJxwe+av8I=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=V6bRm219Ym4OMx/tGN5Ud3nLaI5gWQuDNIYpQazQFZVl+n1uFIB7BvgKyasj5Ys8m8+8FILu4eGSX3qU1RI+PnNQr6cjh3NcrrZ3FqPPKka51hQfG2iaOh/HKXWzNVNPYtri7jINmfZb1gsefQDKrC3Dc6jzjpBdu4LxIHZKb5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QyT84jP3; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-36900945df5so720120a91.0
-        for <netdev@vger.kernel.org>; Wed, 13 May 2026 14:07:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778706470; x=1779311270; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lmUB95Voc4Y//0lmslcCl8gB+7WwYY40nezEV7x/XVs=;
-        b=QyT84jP3xP8jgw/9kq+ZWcpg4BflotMXsohLI7UhHnOX/brBb+Q/RVHhcB29eUfgIX
-         CWBP3xZLZTbrsdd6dkrlL7Amjo6tBrbStp0eP1aqs7tjh2Ad3DzeKK5WHngTbFfUL87d
-         4cfLLgztJ4LFrfz1meZAxfnNIbGFlhBbrr24gN+O0HAFNEWoj3WPGrLod0CckBGaHmum
-         d0P7Sfhey3oycHPEtP7DcmkmtqXXyxAyKrxQpN4InWccQeE/bsrqxBy7+c3lKqM0DKh1
-         DqkBJQHKH07RhxvHDrRC3P+gK9sw7sb8ILi6xveXXh0coPotfz86ZyCkGs2NK3UzcEpF
-         M+fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778706470; x=1779311270;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lmUB95Voc4Y//0lmslcCl8gB+7WwYY40nezEV7x/XVs=;
-        b=opdt/bO83bqmmwVekorhqmwydBbw7G5KxP+dxDJdcIfBfFOnUMXB4MnJXXFSf6wcpj
-         02qun79q73GTooMuXFul6LuTwCaHFRHW7dDUJ6B1W6uWLtP3YDOQ4tE0ZxFbu4klTo/o
-         HZlWXBHK9kFA3s+1pMo3IaeGgo4N62YAhoPYdHb4k0v8uxw55vDLeaNT6AoNjY0wnrTq
-         AbeA0KoEFDCg2mnAj5BLZvgG6+HT8SEffWJfbVM4X+C5Kn1mSK1nrh8S+eJVUW8/bL/v
-         N9g/dAFUwVOquMn1+3NgZIGc5o1dPR5+5X+ZPsjSAcyK5kLxqMvql+NZAbqIFulkI3VO
-         QN2A==
-X-Gm-Message-State: AOJu0YwbbRc3NBxjRDdG90xMU/1yORg4pguEZG+yn4PaJKZBLk2Zb2iV
-	+XaKdNk/ymK+2Wu4qYkesHnGDuHrcpd8jvFvijipbMJZU06LlBFZ6iz9
-X-Gm-Gg: Acq92OF+/S0lBY3Zs6WC9Wa+XBaZAz57jEjmnxTr9ahTlQOm9tzcN87OvT/fs5JFdgW
-	Wk6UH80pqsdU6djbd+i4w/RSaMI/Xg4e9szTowAGgE0Q4Lem9iakvIMlZhk0a15mOIUpPo1S/mh
-	TUjxbbrY4tRxMYmmy2xmjQWOiSxdIj57ywni1SfWW1oBPCcRBBDI7/70Dl31Bf2afkPDS9M02Uk
-	VusPHMQRw/dlUIJLUFlyyCTUVL7lJOIQ40c/z/+JsDjCfcwvF3IJRuI7aU4NSlXAtRx30EgL/En
-	cqASOHZiLTheNMcoxvxEn9Ydyn/XkPrO7ayEwg1PMf4VpuI2bm5VyalrsVFNXbgcEgnB56i2zf4
-	TvGhLpHwo8Z2BpfhXvwPqLqUvoH0qGueXLWogUAc6qLCmDPBn1NGJL55wHo+gHIOwuig61tU27T
-	XIUyzd5ozdikphGrxQCcJymFLDSrufTurG/tiAXLAPvM5RtN8BiFIknw==
-X-Received: by 2002:a17:90a:c105:b0:368:5367:d681 with SMTP id 98e67ed59e1d1-368f782ef5amr4634594a91.10.1778706469883;
-        Wed, 13 May 2026 14:07:49 -0700 (PDT)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3692e72c584sm189648a91.6.2026.05.13.14.07.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2026 14:07:49 -0700 (PDT)
-Date: Thu, 14 May 2026 06:07:44 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, kerneljasonxing@gmail.com,
-	kuniyu@google.com, mhal@rbox.co, jiayuan.chen@linux.dev,
-	steffen.klassert@secunet.com, vakzz@zellic.io, ben@decadent.org.uk,
-	herbert@gondor.apana.org.au, dsahern@kernel.org
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org, imv4bel@gmail.com
-Subject: [PATCH net v2] net: skbuff: propagate shared-frag marker through
- frag-transfer helpers
-Message-ID: <agToIEDI4TaTNLRb@v4bel>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 257F830F806
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 21:07:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778706475; cv=fail; b=Km+IT/95D9jqsB3R236RciJUNub8SYBZlUm5Xg0xSlKw0/Pr1nPCk3WcMG5nTqHEXMGAuIg9tqEn9EyX7wbF43iguNcn5Ck33PRnTZwOUFlDJbU39TXkrESi4LZLELB9MYH7iZMSCF8FhnkZ40w0ac4X2IUldWtK/xPg5u2aULo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778706475; c=relaxed/simple;
+	bh=WHVAgtdgggvR3wqD+JNgbmkpI3S1LRgpJp3gJoXviXc=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=uZB3MfaF5He50oZC2pat4pzV+9NV20pUK7/i7YbAuiMsPrGwjEHpo8H57BbzyYWKa1RoHsK2i5cLqr2pJ4G9ew4ENe+JnpTh/1beXseBOCI5bW2DXWgCLkKqJeIOt4DOplE5Sclm9BnDPuWxIiR2wjcq0Ta+JqdgBBEAjcdIGwI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UPIZCOur; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778706473; x=1810242473;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=WHVAgtdgggvR3wqD+JNgbmkpI3S1LRgpJp3gJoXviXc=;
+  b=UPIZCOurlLNAUFu+QpXG1AFErC2Lkh69+MPorqiochitiy21grL09wZG
+   8cjC1N7FX/9xPhtTOvNadHmDSBjvJOj91pSiLWJub7R8nwHu2lTvLXqTw
+   jLPphPEQ1rndPaRc03forF7xm91Zmgmf74HazqlHO1BC6k2HU7fiMyv6h
+   nelvWztXSQn/E8Mk7nbwFz3BgJZqo628XctPS3pDXhZECGu+HvjrI6Mgm
+   YA219Vi901bU1S2LREblvhvD3DCOA5FgeKLt6B4lR3fSGFvoL2xotDb4C
+   umSEiNSH4H/XlIbG8AaTsiUiw8YLXACGRSxgUSkiy+FM5XY0TePADyskd
+   g==;
+X-CSE-ConnectionGUID: edtdz8ZdQmOSTtIFGJipUw==
+X-CSE-MsgGUID: U2nLIBRMR+GBWAldNmbghg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11785"; a="97215272"
+X-IronPort-AV: E=Sophos;i="6.23,233,1770624000"; 
+   d="scan'208";a="97215272"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2026 14:07:52 -0700
+X-CSE-ConnectionGUID: OXiVdtwNQpi+DzaKBpt1ng==
+X-CSE-MsgGUID: xtEp7xOgQbyNtUb9BXzVfw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,233,1770624000"; 
+   d="scan'208";a="268550104"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2026 14:07:52 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 13 May 2026 14:07:51 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Wed, 13 May 2026 14:07:51 -0700
+Received: from BL2PR02CU003.outbound.protection.outlook.com (52.101.52.54) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 13 May 2026 14:07:51 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JYNICfyHmOMfGXrPMdbMebRPBJ9PYuGP9VaU8Du4tk53nfmdl/soWsHx8tCtQYo37IgIot8qnNqTwDHqNCwKN63UMfZaHnhx0F3RYfoFnyt08uXglc9zTQHb4ZZg5FuxcV/jvEUn+spT0Y9DU/q1MbqScuW3IIfQsvhqP4rNubXzotchHSLwg7jzEUVzTOQRCT2l95fJasoxKApY40snflgHQFMqDbE0vWgI8sJi9IEoskzUKNX3XzeFumYzgF8YkFii3M7DoO4XenLwKHoPa/UmBeC0+ytwe+JYUmhHAGDDsYdhsPlhetL/1d3eW9e29/5Teq9na+d3ZR3RyVJOjg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ewRLmHkzRAEnMoxZGUnphAscLoXoMYgS20WAGgQdRRU=;
+ b=CHyLv2/QpQlsm6S/eeaXibbtSwhMTI6aEM4QYbqvZUd1ydGcCDYQnsdEjNwxcetru937VoW3kaVM/t3gVlgv4qPJj/0HcgmjXPVKRdvBSmf50Rli+2nVzwPRw/yFU5cm7ek1tAsXiwLkMRcQQ+zSgjyjnoheWFMyrrMtBI6cKWTkNYXey9R6G4a7DMGKoEz7BsWSSA6aDc9Gs+d8fS79gC6ZooHn2Ys9L7uiVm21p150Q0V50iirPEmzmsL4GXAjT/3PpjWmMNeiaXU095epX4IeoSh85zWS8hF3A+EvWPv+mkEg58P0854cDpEIscfSAX+FyDo/FqdB6mpuaNaOiQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8241.namprd11.prod.outlook.com (2603:10b6:208:473::9)
+ by SJ2PR11MB7501.namprd11.prod.outlook.com (2603:10b6:a03:4d2::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.11; Wed, 13 May
+ 2026 21:07:48 +0000
+Received: from MN6PR11MB8241.namprd11.prod.outlook.com
+ ([fe80::cf79:ceec:e277:9d46]) by MN6PR11MB8241.namprd11.prod.outlook.com
+ ([fe80::cf79:ceec:e277:9d46%7]) with mapi id 15.20.9913.009; Wed, 13 May 2026
+ 21:07:48 +0000
+Message-ID: <775f497c-7ae4-4484-9990-4d610bdb77be@intel.com>
+Date: Wed, 13 May 2026 14:07:46 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH linux-firmware v1] ice: add DDP COMMS triple VLAN package
+ 1.3.2.0
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <netdev@vger.kernel.org>, Mark Craig <mark.craig@intel.com>
+References: <20260430123050.131101-1-aleksandr.loktionov@intel.com>
+Content-Language: en-US
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+In-Reply-To: <20260430123050.131101-1-aleksandr.loktionov@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0120.namprd03.prod.outlook.com
+ (2603:10b6:303:b7::35) To MN6PR11MB8241.namprd11.prod.outlook.com
+ (2603:10b6:208:473::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Rspamd-Queue-Id: 0104B53AD4D
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8241:EE_|SJ2PR11MB7501:EE_
+X-MS-Office365-Filtering-Correlation-Id: 39141c40-8c56-46eb-ad1d-08deb133afa5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|11063799003|22082099003|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info: B0PSPmaLEGBztZJ+XrAxIkB0/bQelILwucaExP2thVNGF+BJBQAkNlBpCv+GJnCQLpnm1vhIt/VTIWNU+4d0a0Slox8qPfuFb2JfuhPJ9Jg/2EeJwVjy1cLBpj0QxsbuvxJqTD5KFTBk/7mA+gvkDTAw/l8BKPmwehVJRsZ2EgQCoZ8GVZYMxZCwmiB2fO0YG+jP2GIeQ9EO7jI5/VyOIUYboF2PTzj5FKjTBK3pvBrq/mIDRHVMR1L7C38uoUFrP+ZnwHx2P8Gl4vti9nLKnz0t9Z84FLRkePFe9sJ8OIH5iBg07b8KXq2CkVaDmuZdVwTGEkTBX64uLKKHlqmbuyrayDRGQD6/iFPPUB5GW9IsY6rzoVqB6/926O8Za/dtwQYUtDT4zbkUWaV1xYGdtn/OHC/nHRGi1TVP/rrxTjtVcDArDi+oU3meFPyr6TKkoE3226aZCFiUGpxUtZGpuOd6HbyhL5uwymHC1b6RdR1Ke7YS0lhQOhByGlwvj0uyCmxeAUY1rkPXDziOmXO/qVDSUhStwPDXR9Fd+SITDVrkb6XT60NfBFdNMBsTrHus5U5ToXTsz3t2gT9GEHGl9D4QMZsc2xwMD9cIV1xGKiH5XElU99GfgpE5CvLfs6fDvIYJc36kqbdMI317/S9wchaNN5Ioq0UUxr3Dk99mN4ORYK7Yb66L3uIsr2VVZlH9
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(11063799003)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cFczbWdRQUYvemJ0MU5DRUZId25VUWd4VG9yajR2aE9CVnZXcStTMVFOOVFH?=
+ =?utf-8?B?a3VPVWNYNGtkLzA3dWVXbkJwS2VzZ0Q2WGdoQ215SjlVbHo3eUtCZjVScVYv?=
+ =?utf-8?B?ei93VnFDRGFhQkM4cjRYZGdSamoxN2Y3T2pSdXNVZU5MaTdaZXE5c3FlYjVm?=
+ =?utf-8?B?T0RoWDdrZ0ZyYk5teTRKTXI0YWRoUUwxNnhsUHJIeVAwb2RkWkRYblI5TFdZ?=
+ =?utf-8?B?N1NBNGVlUkE1Yk5VNXp4Z0JMdlREckFKSjFhRzR3UWdoMzhkMGRwS2d1NG5R?=
+ =?utf-8?B?aitjbDNMeU0vOE9JVGhZVHkwT3pxdGxuSHR2enFUSVJWNnl1TlFVMFJ5SmZJ?=
+ =?utf-8?B?ODV5QzZod1Q5cGFvZkpvUDlTVjNMN1hDMm52ZVJjWFlkM1pLWlBValVLbjRa?=
+ =?utf-8?B?b09xVU83c2d1eVg1UEc2R3RmbkdXN3gvZTdIblpTOVBVa2pHaHlBa0k4bU9t?=
+ =?utf-8?B?UXNlczUybHIzQVpLVUl4S3Zlejc1UGxWRUhXdGZkdXVPRXBYM25kNTlIOFZQ?=
+ =?utf-8?B?Y0ZhTWhoVElacHRvcW5QQVlnMk1NWWtDQysweHRnY0JzajNBZTVHdHRpUmVn?=
+ =?utf-8?B?ZmJINGpOMjlGMVpSRkcwTnBrZ3lkOVcyOVFieVFMcUhNVTRhbk9ha0gyWlc5?=
+ =?utf-8?B?K3NxMWh6V2taVGFreWJWbU9JdmVXMXYxc2NrL1ZwdWs1MmpsVnlxb0hlb1Vq?=
+ =?utf-8?B?ODk1bnJTcnZQR3ZlVlJITWNxSGZ2VlRiVjZTRmZFYjRWYlY2V3BEZFRPV3BH?=
+ =?utf-8?B?OVRwSk56Nm53ZnZBdUFFeDF0NzlsVjR5NVB4V1M0dVN1dHh5Mjh5VldnY1BO?=
+ =?utf-8?B?bTcxSVVKMnBaSWpuZHBaMUd0eE9NMXkzYW1HcDJGVnZOTG1qdTdzVFFSYTRt?=
+ =?utf-8?B?cm4yOGFMN2kyMmN5czFFTkdSYktGbHplNWI0bExZeURaNnp6bTZFL01MQmhU?=
+ =?utf-8?B?anlJVzRGSkdxbW5NK0duZnJ5WGZQM09CQ2c1UnFxR0lkdWg3cGpVeUtPZlVO?=
+ =?utf-8?B?OW5xY1BmNFFVVVZwc0hEWDgvNERSNXRJaHEra3lYT2VUQjdiVE0yTVB6b2tI?=
+ =?utf-8?B?dUQ0REs3OE5jbTg5eFJBSjc5QXNUaEhuVGZncWdkeXBGWm5pKy9YaHpnaDNh?=
+ =?utf-8?B?MGxpRllWVG93a1Q4L1YvRWJZVU9tRlZTNzRDK1YydWtFWWFzYlZHci82R3FS?=
+ =?utf-8?B?Ym9wL0UrWTRiMHU0K3VGQXRlRHI4THdPZEsyZk9nWVVlbmhkMSs2TmJSTi8v?=
+ =?utf-8?B?TFVyYjlPaXpnV01uZFlQZlc5UktoV1JDZTZPWkx3VUVSQXlKWXk3WUlmNll4?=
+ =?utf-8?B?TzN1Mk9lL1JTNThaSm83Wk1LSkhUUzhsZytCOFhvY21EdEliYkhhZFZORmIv?=
+ =?utf-8?B?eVdnT3JqQ3QxQUtUREgwT3FqVlU0YlZ1T2dnNkNCNUpRRzlPem81Y3hnVHZ2?=
+ =?utf-8?B?SnJSTyswb0sxTDlsYzcrMUJFU1RnQVBsdUt6cXV2aEFDOHVPZE1LSlJhbFA5?=
+ =?utf-8?B?TFg5d0ZubzZDMzVmK0tLc3R3L3FZYXJUR3ZYTUR0VVBwMnVxS1dLUUtYdE9X?=
+ =?utf-8?B?TVpOWVNETG9qcURIZm8vQzBWRWluc2RhekNlaFp5c0FPdFl4YTAra25hUm9y?=
+ =?utf-8?B?QkZhaWFmUmErbWw3SXpQUFFHcHlaUmJ5STFGbU1XYkUvMHI1bXl6amRxVWNa?=
+ =?utf-8?B?SXVJUXFFbFpWNFZWN1RRR1R4U3NReUt5YXpIak9JbEh3ZzcwVWJ2SXZMVnRS?=
+ =?utf-8?B?SnpBVmFZV0VPRHZveW5hcGtvK3JHckNTZGVnT3NQeDFQU2tYRHB6RUM5aVZM?=
+ =?utf-8?B?bmxzbmVLbEdTU2xGZHk0WjQzOFp0NmEyK2UrSTdFS29lNEV3OUpqUXpIdFRB?=
+ =?utf-8?B?SWFEZjVOdDZ2Z25oYnNJamk1dmNPTGRCV0hwMXZ0OHRheGVoWXBFWHRaTzJE?=
+ =?utf-8?B?VldFaEpVVVZ3OFFMd3kyMGc3bDhxemhZeXZUdlo5NnRuSmZyaCtORGJyZHJr?=
+ =?utf-8?B?b2Qvc0FPemp5UjZtYWVURm1TU256VlQ4blhIZURoQ0hCSmdteE80NUVXNG9h?=
+ =?utf-8?B?SVZCKzdKSjlMRmFaOFgwbWtVZWRNa3Y4UWFFM3pqZWdLbGgzc2VZSnB5eFhB?=
+ =?utf-8?B?MkVOY0x5dmR5WUl2enc4eTRhOVk5VUR4OHpaMkVmdnRnVHFRbjJ4STNVSmFn?=
+ =?utf-8?B?N21SN05RZ2RsUVFuOFpWcWJPbEhZbnQydDFtTS96YkZaeXAyMjBOOWZDeVZU?=
+ =?utf-8?B?UVZOSkNVQk9xWUhtMCtVeGprb3ovdjdYS0xqbFJvWnVaaVY1anUyUjVkY0FX?=
+ =?utf-8?B?ZzRiMWxHajc4M05FWXIzc3dZY2Z2Qm1Sdi9DT1UvUlVSOVRtTUxVL3lMclNp?=
+ =?utf-8?Q?bYCa7NfQE1N2srdE=3D?=
+X-Exchange-RoutingPolicyChecked: S2mvp+YnYrWmYZ/YxiPo3KwCG5DLfp/pQiWMAn9sxr7DQxIeoNbjJI1CGceeKOA5S8eNZTnkDnGtc7q0T2SU07dF1UQc7jcERzIFYJnkUj8rZ8DUjSfwoME6XJU7fOxQFxPU3SDUEMTWUjkNIzO+AhcmbyTpJdYO2P/NFg269h4xbjkHVEVmonKo81/UgxHeYuDC2tyXRLYUP9MvZgJnHVus6AN3HJ3k2VSVXJUTdawlkHDV6FcqYcYt2qlck5hEeENmg35Wx6RxqX1ho83wHC8XpYBm6/u8kuSHZ+30Myl/IFk9QbHv19wwTPN8qPcVvl/SLwq4NWhdfN+b/5jU3g==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 39141c40-8c56-46eb-ad1d-08deb133afa5
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8241.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2026 21:07:48.3475
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kUHgB81aSNavZxcAIn10tXO+xRnhlIgQMFLaAo/ljB0YR5KijnXfFYhi5rUGlKuqDfu7zcpz+XqekYcGSQw0yS+F87kUzDazXpHIFWypZl4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB7501
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: C1D1853AD65
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-287728-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:email,intel.com:mid,intel.com:dkim];
+	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287727-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,rbox.co,linux.dev,secunet.com,zellic.io,decadent.org.uk,gondor.apana.org.au];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,zellic.io:email]
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Action: no action
 
-Three frag-transfer helpers (__pskb_copy_fclone(), skb_try_coalesce(),
-and skb_shift()) fail to propagate the SKBFL_SHARED_FRAG bit in
-skb_shinfo()->flags when moving frags from source to destination.
-__pskb_copy_fclone() defers the rest of the shinfo metadata to
-skb_copy_header() after copying frag descriptors, but that helper
-only carries over gso_{size,segs,type} and never touches
-skb_shinfo()->flags; skb_try_coalesce() and skb_shift() move frag
-descriptors directly and leave flags untouched.  As a result, the
-destination skb keeps a reference to the same externally-owned or
-page-cache-backed pages while reporting skb_has_shared_frag() as
-false.
 
-The mismatch is harmful in any in-place writer that uses
-skb_has_shared_frag() to decide whether shared pages must be detoured
-through skb_cow_data().  ESP input is one such writer (esp4.c,
-esp6.c), and a single nft 'dup to <local>' rule -- or any other
-nf_dup_ipv4() / xt_TEE caller -- is enough to land a pskb_copy()'d
-skb in esp_input() with the marker stripped, letting an unprivileged
-user write into the page cache of a root-owned read-only file via
-authencesn-ESN stray writes.
 
-Set SKBFL_SHARED_FRAG on the destination whenever frag descriptors
-were actually moved from the source.  skb_copy() and skb_copy_expand()
-share skb_copy_header() too but linearize all paged data into freshly
-allocated head storage and emerge with nr_frags == 0, so
-skb_has_shared_frag() returns false on its own; they need no change.
+On 4/30/2026 5:30 AM, Aleksandr Loktionov wrote:
+> Add ice_comms_triple_vlan-1.3.2.0.pkg, a variant of the ICE COMMS DDP
+> package that enables transparent passthrough of a third inner VLAN tag
+> to a SR-IOV Virtual Function.
 
-Fixes: cef401de7be8 ("net: fix possible wrong checksum generation")
-Fixes: f4c50a4034e6 ("xfrm: esp: avoid in-place decrypt on shared skb frags")
-Reported-by: William Bowling <vakzz@zellic.io>
-Reported-by: Hyunwoo Kim <imv4bel@gmail.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
----
-Changes in v2:
-- Also propagate SHARED_FRAG in skb_shift()
-- v1: https://lore.kernel.org/all/agRfuVOeMI5pbHhY@v4bel/
----
- net/core/skbuff.c | 5 +++++
- 1 file changed, 5 insertions(+)
+...
+> Signed-off-by: Mark Craig <mark.craig@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
+>   .../ice_comms_triple_vlan-1.3.2.0.pkg         | Bin 0 -> 1442692 bytes
+>   1 file changed, 0 insertions(+), 0 deletions(-)
+>   create mode 100644 intel/ice/ddp-comms/ice_comms_triple_vlan-1.3.2.0.pkg
+The WHENCE file needs to be updated for the new package. Running a 'make 
+check' reports this:
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 7dad68e3b518..7cd388504297 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -2248,6 +2248,7 @@ struct sk_buff *__pskb_copy_fclone(struct sk_buff *skb, int headroom,
- 			skb_frag_ref(skb, i);
- 		}
- 		skb_shinfo(n)->nr_frags = i;
-+		skb_shinfo(n)->flags |= skb_shinfo(skb)->flags & SKBFL_SHARED_FRAG;
- 	}
- 
- 	if (skb_has_frag_list(skb)) {
-@@ -4349,6 +4350,8 @@ int skb_shift(struct sk_buff *tgt, struct sk_buff *skb, int shiftlen)
- 	tgt->ip_summed = CHECKSUM_PARTIAL;
- 	skb->ip_summed = CHECKSUM_PARTIAL;
- 
-+	skb_shinfo(tgt)->flags |= skb_shinfo(skb)->flags & SKBFL_SHARED_FRAG;
-+
- 	skb_len_add(skb, -shiftlen);
- 	skb_len_add(tgt, shiftlen);
- 
-@@ -6200,6 +6203,8 @@ bool skb_try_coalesce(struct sk_buff *to, struct sk_buff *from,
- 	       from_shinfo->frags,
- 	       from_shinfo->nr_frags * sizeof(skb_frag_t));
- 	to_shinfo->nr_frags += from_shinfo->nr_frags;
-+	if (from_shinfo->nr_frags)
-+		to_shinfo->flags |= from_shinfo->flags & SKBFL_SHARED_FRAG;
- 
- 	if (!skb_cloned(from))
- 		from_shinfo->nr_frags = 0;
--- 
-2.43.0
+	E: intel/ice/ddp-comms/ice_comms_triple_vlan-1.3.2.0.pkg not listed in 
+WHENCE
 
+Thanks,
+Tony
 
