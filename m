@@ -1,501 +1,133 @@
-Return-Path: <netdev+bounces-287410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287411-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aKFwAzjrA2qzAQIAu9opvQ
-	(envelope-from <netdev+bounces-287410-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 05:08:40 +0200
+	id sLRQBAX0A2rKBAIAu9opvQ
+	(envelope-from <netdev+bounces-287411-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 05:46:13 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7702F52CA1D
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 05:08:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7712752CF12
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 05:46:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4B9243117981
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 03:04:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 23E523023D8A
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 03:46:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15C403932E5;
-	Wed, 13 May 2026 03:04:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D9103911B6;
+	Wed, 13 May 2026 03:46:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ezqvr8EW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PQUx4m75"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010012.outbound.protection.outlook.com [52.101.69.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFD943921FB;
-	Wed, 13 May 2026 03:04:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778641463; cv=fail; b=G/a+ugqWWHPdOUUfwuyofbV7IdNGckHFg1Kqf3NTKHVt1k35atlfbYClqs2pgZNgHCEaWP7TaGd/9UVaB7zXL6Bxis2a471IUxbF2N6zlypq9kwePK+ugp21bWxsSmg7UHwQHcxwwNUM42CqCqpGdOmx2wDMQiSF/4Eeba2NnF4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778641463; c=relaxed/simple;
-	bh=SxoUUwk48aJ7VwPiRI56JoNK1fFfJGlqBWj59G/vqIU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=XPcWVj2iHs/lQd9blonlnz6Sxd9afw9PqEByV9aKsFTokL0oi0WIqAZOlsOVaulT9HcuiUnxkOtZIh9A84NaEtyaeFKnJEKHPT7uooa4YkFUbTUMjzbM8mRUs5fqvV0GT5qi29BglKh4Il7PDcNwTDcksRtFI3tnkIHMQ8DJmF8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ezqvr8EW; arc=fail smtp.client-ip=52.101.69.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rqGbuae9Z7EPzpl/jZR86fLXEWCg3IvX2R0GBGFBQzZ7lK1aqNgIGRVgNzqpxD1n9vrsbghBTDnONk2JLomCkA7vaU3acAlHG9NO27q3pQ8xagyvn306G8QBBS0srnKpwHSvLHtQeM4RB4xM9G3Numr9CImi9gJrJyves/z1F/34RAThVc3ju0YrcMoIRvrtuCc3QVikPaa2wvGZW3eicEa0nTgBl3+r+OqoJYfwRRJCCPpupiwCVbg22MS7TuRw91zU81JVZQz828ISHWgOHUH/mCWrckFwiLgLhS39B1kMNQBR03K0nhkKP0KwlRSSZoelZnbLGX/9uy7IHVDkGQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0xR1d6e8XJ0K/LDsSg/j3/H4fm3GCviKF2FjslXsJe8=;
- b=U+4D7qJFldKMtc+yhxTfcWrCfmAsHWbKYVj1r+idDcILLc1HSBWuuPrZPTn2gNScaZ2w8LTFnAett5Xlg79W8gLfLC44mjp0zpoTIRJ35z8b6WRyhInEtJqkBbSNwp1Bns7rXe8B2ru1sqr+JHPt175YbXNQo04ifKZecJtrgNISkVc1wbYxLQ8wbiOVOZ6IBNE3qJdoic3/0Cy5d3oSkoLjJ9ujystleyWYGroDsqiw/JM6FihZvsn9Q3IuUkQhIrfb7nranZdjBds8Xkhu1bLLKDscaOqbH8w/fArBZ02Wc8qJYboIkY1eO5w1+erkVqYHEWzx6GUyxqRLzEEw9Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0xR1d6e8XJ0K/LDsSg/j3/H4fm3GCviKF2FjslXsJe8=;
- b=ezqvr8EWlwwx5aqVUa2IUnTye+55/oZ9PA4wkvg3VAON81UgU5JHzKz/WE6ABTiY45ZpPqjbpI0yoNDOsDetfsHq+/WmHNEnIWFAL0AwfULr1CzJiJwfEOq3LLOhR1ELpiXj+doNQFjO9Y12+ze0LnB8RndewmlMHYKKj30vyCACfcBe2C+QylsqZ+y6LMaCdLzujAsjNNO0vgTcBbgliMNa6ZSOvTdwPu6nXT8FbQClZu5BnXYynxsa9SMtnZXFKSkfdizXcfRgkzNHAWBPJoCajKvV9oWaGiKmyFyNoBovRGvnaK/OqqQ2Q504dQ7iCswzJb3E/zAcpeBxxc2Z7g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
- by GV1PR04MB11525.eurprd04.prod.outlook.com (2603:10a6:150:282::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.11; Wed, 13 May
- 2026 03:04:17 +0000
-Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
- ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
- ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.20.9913.009; Wed, 13 May 2026
- 03:04:17 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	f.fainelli@gmail.com,
-	frank.li@nxp.com,
-	chleroy@kernel.org,
-	horms@kernel.org,
-	linux@armlinux.org.uk,
-	maxime.chevallier@bootlin.com,
-	andrew@lunn.ch,
-	olteanv@gmail.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-arm-kernel@lists.infradead.org,
-	imx@lists.linux.dev
-Subject: [PATCH v7 net-next 15/15] net: dsa: netc: add support for ethtool private statistics
-Date: Wed, 13 May 2026 11:04:54 +0800
-Message-Id: <20260513030454.1666570-16-wei.fang@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260513030454.1666570-1-wei.fang@nxp.com>
-References: <20260513030454.1666570-1-wei.fang@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MA5P287CA0029.INDP287.PROD.OUTLOOK.COM
- (2603:1096:a01:17a::13) To DBBPR04MB7500.eurprd04.prod.outlook.com
- (2603:10a6:10:1f4::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4F7357CFD;
+	Wed, 13 May 2026 03:46:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778643963; cv=none; b=l5KCzEpV031StfiC790K480u3Qs8pZUIaLxxoKjSy+uTFqZO8KjMJ/iXxPOvImO6XG1D3GGbbaPW6QEgqEdWEtcdwLb4aGLVy0tJ60yKc1p5YDh1e2kOdoIWIwYkLluqGJ/1ulNBc9rEHgkAHpMgw/0zjfPI3yWLU2X1//eyglA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778643963; c=relaxed/simple;
+	bh=W+2DW89lWk0ctxlivObCdElbjDuLO/zBU+7dq31WdDo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lB9MD5BPeG/DAFJu92hr+iWJtbSVjzXJEbDBihh+BrK9AaPiPWMA0MoWl7q4StxC/RDs+KDddjLhVhUK1AbmYuf4xPMQ0puIHsUTvpPZLgQK6e2lbIDw20UyrW4QAlwfwM9WPatCbv0ytgJ+s4TnNfHM29d6lnSP9FNiAP1CLZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PQUx4m75; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90248C2BCC7;
+	Wed, 13 May 2026 03:46:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778643962;
+	bh=W+2DW89lWk0ctxlivObCdElbjDuLO/zBU+7dq31WdDo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PQUx4m75Z6R4YBqxZX2Mca/rStukyU2uP5fArfXd0WkhYzuHSufhdqEZEU6Swc/o4
+	 df2OrYI8O/ZNeWIne77zRzxhy5ee9NoVdtGVF8ONweh6NBcJc2zzdBetE4HDnp5v4O
+	 +PUKfkBPiosTNFVZyVMwstx5bheE9n+pLZGklWIG1XSP924xjbgE2nVYA7XCWl+7Ly
+	 3yHx/VGiJpEeFO1luEk8iM7PETRYOnZR+1ujXCQ9WIF+1fUKSBYpX8KyC9wwsLydE2
+	 C5tEMaXmJNsu5HpE6B/1A8HH57IqPDpFq1iiKDgaI+Yf8K5JMN8WvegTiHNVfC8UFt
+	 a8SgzGbyUOR3g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CE543822D60;
+	Wed, 13 May 2026 03:45:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DBBPR04MB7500:EE_|GV1PR04MB11525:EE_
-X-MS-Office365-Filtering-Correlation-Id: c9ad2477-add1-40aa-aa4b-08deb09c51ed
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|52116014|366016|19092799006|56012099003|18002099003|22082099003|11063799003|38350700014|921020;
-X-Microsoft-Antispam-Message-Info:
-	5+T5ZU7GutDU9QAMGZNJZJHJ/LPB8TkTkjgINwNpVu0ZsU8XsIcZEutTeC30rHOV7IwDBehrAAXbTP0OzXOYnAnTidbHs6+yuFMjSkjx0iltxrUhTKGkpr3zRH9G2V8tkdkaRbZAdF8LfpK//4CBDPTsti0KgAfF5Qc4l1CBfx5rFPWWH7xBnw1kKwsVFOrrE3uNLG3CtQIySKcHGMvs+PE0RpJbuAJsUUPZaMBYirwmBwXA7MRQH7J0XxIxEFiYaskxXK85uNcN4XFc8RZfmeM/qdcPoOIPZmRkh+VcpgQu3nCjA0Dv8uuofOWdAU0ZlpSZC4BWaqo9VTz4nrAmVIVwIZlwadhZyA/FlWCXqVzIk8C/YkaSBuKjYUgVF2B24OTnN+pCpPHdQIBtno3nC1pyUgXRZbAEBTc9rZ6m7IGGPkj3GUHv02WZPH8aZp1FA3ZKhzIam0ZFaXOypH3yI4t41KBUoce8/PI4VEtZbc4p5cK8HbhyovOPOxsQc5celO2JTtTB41EBYVGNtikLhjwBkDuvarRVogZqrUNVQzVK5vOvPAb5WnDrNovf3QbJo16E6yhrZIP7iHjW2L8aA6WWiNZVd07f7OvMr/HItQg8abgdzs4XrWJJJ3Aq4JVD6bsrnjlZlvMynb/JrvEKu2y4dtUG4YeMeon6IJNBDLRzgD3nV87OAF2sJQ3JYgIByXH1iEGd9RI6C3PxeWXE/QezYRVvljVThAua/7sjAsx8vTeIduMCsgOmduXOcuZzrwAabzMGjA+hg8EUHM6RIQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(52116014)(366016)(19092799006)(56012099003)(18002099003)(22082099003)(11063799003)(38350700014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?S1e2wz+DQBYFO3tYShhjqOURBqEDPwP6s2uht8Kl+ocIJ51CCS2ewYhnrGi+?=
- =?us-ascii?Q?yNVBLyqqGHjwabywilAC6fpNFTvuL53OjOsJpjDTDQr7Rw+16K3MPdyycVI3?=
- =?us-ascii?Q?rdakA9UZSZU7Yx84c4xjz1buNmp9QC3sMTu3RMejc+DP0xFCT4wgmsjgc0OE?=
- =?us-ascii?Q?Bzd5lUSCNAwfz41/hFMhCV2viMoDoco6sw2DuaxQ8lMOSCImJNzyihDmDY+Q?=
- =?us-ascii?Q?8Ik6qDUvupIsByZ1p2Rr12MakekhI3ahIVy5bL3Iw5fyW/oMqE9cNqZL2aAj?=
- =?us-ascii?Q?RkgjTYPtkLS5YD3ZBeuHpqge67sg0a5g2K7LmFZaQNrjZBFhhISXq/hoJElW?=
- =?us-ascii?Q?vlL7Za26akU2k5cjiAUD1SfQw6lN6sGFdadXwH6ypaPa6EibqTY0Dqz9HuYB?=
- =?us-ascii?Q?mDJ3IUZXglhaH2wVGgQK/94PIiGwHrEWU4f4oxLejW4peWG6JDnTam5htV0c?=
- =?us-ascii?Q?rNJo0SQmqL/4ChjVdI4HsZez3PN7wX4GmL/BAF2keZyDJT/YZut/BRAaNs5s?=
- =?us-ascii?Q?ORQW9LgAdnPDXEACsZg+nG92TVY4PiBgOGeoKoQ0BENhZkfDl88ygtwrazj7?=
- =?us-ascii?Q?tkmiFgH9aNy5S3M8/8qzSPXQxaGDfawqht/thVeeYcGoFe9Nd9IClnbNpAfA?=
- =?us-ascii?Q?DPE+PaU+Sk+280N4kgGPnWEhOFOped/rw8DH6zmWE+5riVLPZTTK4A2Yk68H?=
- =?us-ascii?Q?KRvvEEz+Dtg/k70LPQ0QFPB7rxqmzr85QFW6vY5wczjcfr8iZzFqChtr0iat?=
- =?us-ascii?Q?z1rPXw8spJLjowzE17uLZlqqibaTMzCyPO4M/rE7fr5Z58sxLrfjTknp7ShI?=
- =?us-ascii?Q?l/Qdx4HLw3MQ4dvIINH8Jw5YtwbavTezMV7xJpsq3i5dEu+FGbXBfPpiCWSe?=
- =?us-ascii?Q?8uOcR765SVUe1ZskDay6ioZKXfVg9TEUQbFvhPyQ7ihZCHeqxLjxxx1ssSSZ?=
- =?us-ascii?Q?PAnhNzjieaXv5Gu7hIvm6HhjFmmAXrV229VJGUB84OBABvaAqw6nAExztcd8?=
- =?us-ascii?Q?nEvI1M5iy57OxmnaIaMu7iDWG54Q6ctbyNzEMkucDZ8tT76iZKM117kn1PTO?=
- =?us-ascii?Q?F0pq/T1UYrk0XluMVuW8fDtciPppzWAcXJPkkFQyHloQK/rBheSxXmHmgx5u?=
- =?us-ascii?Q?mixmV5jIyaitQrgZG1VKMuy2Bl29FkHmISiMSbaZZSg/To29g2eKWRs0xcTs?=
- =?us-ascii?Q?ksaXwVu/ydg3/ZFgPRik6wp6Fx7QKtFqhpOafjKeHkLTvGtST4cpBqkG8wv9?=
- =?us-ascii?Q?42eUBXI4DYiZp800Hf7KPORRsx4jivviwzfWFl6ak7PYBRv8K1rUYBfQZLjT?=
- =?us-ascii?Q?hXEuS0rA9vBBGeugjn1el20IkE/9ch+zAWDylhpzyAttkrpdrsPuAQ9Onpu0?=
- =?us-ascii?Q?AXPPH8W9jBQAlKa+c2u1yUP2dkhU0xCchWMsCOp3kB4zk6yULhbEt8h12PCf?=
- =?us-ascii?Q?7IV0y2spfb3+9zklH35wxBEb77HvFI631RdOlmOxWjQIcvetvgXj0Ig0H+zt?=
- =?us-ascii?Q?hPy+xMpULlk9NYX9qYMENuSAl0ZxnuOnmpVLpWCtG4gVhRZ+RfO3fXF7bqSt?=
- =?us-ascii?Q?Oo6kpNqdJ5etf+xghJdgi1OQJ12FYxJVKov0Ww94Z+C6lsayB6hXs1NLx2A3?=
- =?us-ascii?Q?siyc4lnn9bt77m4k94xtaBD3ZRMvg4WPy8YAJBeskqnG24FChuCz2mTBRXkD?=
- =?us-ascii?Q?1GPH239uJLO/D2HV8jASHXXeYwnvHlyAXf4v/aF/mTd7j5K3?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c9ad2477-add1-40aa-aa4b-08deb09c51ed
-X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2026 03:04:17.0757
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qeO5J2VRldCERk7wpbagiqNh/GY6DG0qEvkZiazBtz7wZyz4kbmwrqNq6vEkNMIfzZgS4b7WXW7Hiwk//jY2lA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR04MB11525
-X-Rspamd-Queue-Id: 7702F52CA1D
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: ethtool: phy: avoid NULL deref when PHY driver
+ is
+ unbound
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177864390830.3173643.3244266251206585026.git-patchwork-notify@kernel.org>
+Date: Wed, 13 May 2026 03:45:08 +0000
+References: <20260509215046.107157-1-devnexen@gmail.com>
+In-Reply-To: <20260509215046.107157-1-devnexen@gmail.com>
+To: David Carlier <devnexen@gmail.com>
+Cc: andrew+netdev@lunn.ch, hkallweit1@gmail.com, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, maxime.chevallier@bootlin.com, linux@armlinux.org.uk,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+X-Rspamd-Queue-Id: 7712752CF12
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,bootlin.com];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-287411-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,kernel.org,davemloft.net,google.com,redhat.com,bootlin.com,armlinux.org.uk,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287410-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,nxp.com:mid,nxp.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Implement the ethtool private statistics interface to expose additional
-port-level and MAC-level counters that are not covered by the standard
-IEEE 802.3 statistics. The pMAC counters are only reported when the port
-supports Frame Preemption (802.1Qbu/802.3br).
+Hello:
 
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
----
- drivers/net/dsa/netc/netc_ethtool.c   | 107 ++++++++++++++++++++++++++
- drivers/net/dsa/netc/netc_main.c      |   3 +
- drivers/net/dsa/netc/netc_switch.h    |   9 +++
- drivers/net/dsa/netc/netc_switch_hw.h |  58 ++++++++++++++
- 4 files changed, 177 insertions(+)
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/drivers/net/dsa/netc/netc_ethtool.c b/drivers/net/dsa/netc/netc_ethtool.c
-index ac8940b5a85c..8d04db534347 100644
---- a/drivers/net/dsa/netc/netc_ethtool.c
-+++ b/drivers/net/dsa/netc/netc_ethtool.c
-@@ -19,6 +19,56 @@ static const struct ethtool_rmon_hist_range netc_rmon_ranges[] = {
- 	{ }
- };
- 
-+static const struct netc_port_stat netc_port_counters[] = {
-+	{ NETC_PTGSLACR,	"port gate late arrival frames" },
-+	{ NETC_PSDFTCR,	"port SDF transmit frames" },
-+	{ NETC_PSDFDDCR,	"port SDF drop duplicate frames" },
-+	{ NETC_PRXDCR,		"port rx discard frames" },
-+	{ NETC_PRXDCRRR,	"port rx discard read-reset" },
-+	{ NETC_PRXDCRR0,	"port rx discard reason 0" },
-+	{ NETC_PRXDCRR1,	"port rx discard reason 1" },
-+	{ NETC_PTXDCR,		"port tx discard frames" },
-+	{ NETC_PTXDCRRR,	"port tx discard read-reset" },
-+	{ NETC_PTXDCRR0,	"port tx discard reason 0" },
-+	{ NETC_PTXDCRR1,	"port tx discard reason 1" },
-+	{ NETC_BPDCR,		"bridge port discard frames" },
-+	{ NETC_BPDCRRR,	"bridge port discard read-reset" },
-+	{ NETC_BPDCRR0,	"bridge port discard reason 0" },
-+	{ NETC_BPDCRR1,	"bridge port discard reason 1" },
-+};
-+
-+static const struct netc_port_stat netc_emac_counters[] = {
-+	{ NETC_PM_ROCT(0),	"eMAC rx octets" },
-+	{ NETC_PM_RVLAN(0),	"eMAC rx VLAN frames" },
-+	{ NETC_PM_RERR(0),	"eMAC rx frame errors" },
-+	{ NETC_PM_RUCA(0),	"eMAC rx unicast frames" },
-+	{ NETC_PM_RDRP(0),	"eMAC rx dropped packets" },
-+	{ NETC_PM_RPKT(0),	"eMAC rx packets" },
-+	{ NETC_PM_TOCT(0),	"eMAC tx octets" },
-+	{ NETC_PM_TVLAN(0),	"eMAC tx VLAN frames" },
-+	{ NETC_PM_TFCS(0),	"eMAC tx FCS errors" },
-+	{ NETC_PM_TUCA(0),	"eMAC tx unicast frames" },
-+	{ NETC_PM_TPKT(0),	"eMAC tx packets" },
-+	{ NETC_PM_TUND(0),	"eMAC tx undersized packets" },
-+	{ NETC_PM_TIOCT(0),	"eMAC tx invalid octets" },
-+};
-+
-+static const struct netc_port_stat netc_pmac_counters[] = {
-+	{ NETC_PM_ROCT(1),	"pMAC rx octets" },
-+	{ NETC_PM_RVLAN(1),	"pMAC rx VLAN frames" },
-+	{ NETC_PM_RERR(1),	"pMAC rx frame errors" },
-+	{ NETC_PM_RUCA(1),	"pMAC rx unicast frames" },
-+	{ NETC_PM_RDRP(1),	"pMAC rx dropped packets" },
-+	{ NETC_PM_RPKT(1),	"pMAC rx packets" },
-+	{ NETC_PM_TOCT(1),	"pMAC tx octets" },
-+	{ NETC_PM_TVLAN(1),	"pMAC tx VLAN frames" },
-+	{ NETC_PM_TFCS(1),	"pMAC tx FCS errors" },
-+	{ NETC_PM_TUCA(1),	"pMAC tx unicast frames" },
-+	{ NETC_PM_TPKT(1),	"pMAC tx packets" },
-+	{ NETC_PM_TUND(1),	"pMAC tx undersized packets" },
-+	{ NETC_PM_TIOCT(1),	"pMAC tx invalid octets" },
-+};
-+
- static void netc_port_pause_stats(struct netc_port *np, int mac,
- 				  struct ethtool_pause_stats *stats)
- {
-@@ -188,3 +238,60 @@ void netc_port_get_eth_mac_stats(struct dsa_switch *ds, int port,
- 		break;
- 	}
- }
-+
-+int netc_port_get_sset_count(struct dsa_switch *ds, int port, int sset)
-+{
-+	struct netc_port *np = NETC_PORT(ds, port);
-+	int size;
-+
-+	if (sset != ETH_SS_STATS)
-+		return -EOPNOTSUPP;
-+
-+	size = ARRAY_SIZE(netc_port_counters) +
-+	       ARRAY_SIZE(netc_emac_counters);
-+
-+	if (np->caps.pmac)
-+		size += ARRAY_SIZE(netc_pmac_counters);
-+
-+	return size;
-+}
-+
-+void netc_port_get_strings(struct dsa_switch *ds, int port,
-+			   u32 sset, u8 *data)
-+{
-+	struct netc_port *np = NETC_PORT(ds, port);
-+	int i;
-+
-+	if (sset != ETH_SS_STATS)
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_port_counters); i++)
-+		ethtool_cpy(&data, netc_port_counters[i].name);
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_emac_counters); i++)
-+		ethtool_cpy(&data, netc_emac_counters[i].name);
-+
-+	if (!np->caps.pmac)
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_pmac_counters); i++)
-+		ethtool_cpy(&data, netc_pmac_counters[i].name);
-+}
-+
-+void netc_port_get_ethtool_stats(struct dsa_switch *ds, int port, u64 *data)
-+{
-+	struct netc_port *np = NETC_PORT(ds, port);
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_port_counters); i++)
-+		*data++ = netc_port_rd(np, netc_port_counters[i].reg);
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_emac_counters); i++)
-+		*data++ = netc_port_rd64(np, netc_emac_counters[i].reg);
-+
-+	if (!np->caps.pmac)
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(netc_pmac_counters); i++)
-+		*data++ = netc_port_rd64(np, netc_pmac_counters[i].reg);
-+}
-diff --git a/drivers/net/dsa/netc/netc_main.c b/drivers/net/dsa/netc/netc_main.c
-index d79bd18b7e6e..fed2b1dcb856 100644
---- a/drivers/net/dsa/netc/netc_main.c
-+++ b/drivers/net/dsa/netc/netc_main.c
-@@ -1491,6 +1491,9 @@ static const struct dsa_switch_ops netc_switch_ops = {
- 	.get_rmon_stats			= netc_port_get_rmon_stats,
- 	.get_eth_ctrl_stats		= netc_port_get_eth_ctrl_stats,
- 	.get_eth_mac_stats		= netc_port_get_eth_mac_stats,
-+	.get_sset_count			= netc_port_get_sset_count,
-+	.get_strings			= netc_port_get_strings,
-+	.get_ethtool_stats		= netc_port_get_ethtool_stats,
- };
- 
- static int netc_switch_probe(struct pci_dev *pdev,
-diff --git a/drivers/net/dsa/netc/netc_switch.h b/drivers/net/dsa/netc/netc_switch.h
-index 40e54af0c356..740e1f307c45 100644
---- a/drivers/net/dsa/netc/netc_switch.h
-+++ b/drivers/net/dsa/netc/netc_switch.h
-@@ -94,6 +94,11 @@ struct netc_fdb_entry {
- 	struct hlist_node node;
- };
- 
-+struct netc_port_stat {
-+	int reg;
-+	char name[ETH_GSTRING_LEN] __nonstring;
-+};
-+
- struct netc_switch {
- 	struct pci_dev *pdev;
- 	struct device *dev;
-@@ -160,5 +165,9 @@ void netc_port_get_eth_ctrl_stats(struct dsa_switch *ds, int port,
- 				  struct ethtool_eth_ctrl_stats *ctrl_stats);
- void netc_port_get_eth_mac_stats(struct dsa_switch *ds, int port,
- 				 struct ethtool_eth_mac_stats *mac_stats);
-+int netc_port_get_sset_count(struct dsa_switch *ds, int port, int sset);
-+void netc_port_get_strings(struct dsa_switch *ds, int port,
-+			   u32 sset, u8 *data);
-+void netc_port_get_ethtool_stats(struct dsa_switch *ds, int port, u64 *data);
- 
- #endif
-diff --git a/drivers/net/dsa/netc/netc_switch_hw.h b/drivers/net/dsa/netc/netc_switch_hw.h
-index f8d436ad9623..1b016e7dd03e 100644
---- a/drivers/net/dsa/netc/netc_switch_hw.h
-+++ b/drivers/net/dsa/netc/netc_switch_hw.h
-@@ -87,6 +87,17 @@
- #define  PSR_TX_BUSY			BIT(0)
- #define  PSR_RX_BUSY			BIT(1)
- 
-+#define NETC_PTGSLACR			0x130
-+
-+#define NETC_PRXDCR			0x1c0
-+#define NETC_PRXDCRRR			0x1c4
-+#define NETC_PRXDCRR0			0x1c8
-+#define NETC_PRXDCRR1			0x1cc
-+#define NETC_PTXDCR			0x1e0
-+#define NETC_PTXDCRRR			0x1e4
-+#define NETC_PTXDCRR0			0x1e8
-+#define NETC_PTXDCRR1			0x1ec
-+
- #define NETC_PTCTMSDUR(a)		(0x208 + (a) * 0x20)
- #define  PTCTMSDUR_MAXSDU		GENMASK(15, 0)
- #define  PTCTMSDUR_SDU_TYPE		GENMASK(17, 16)
-@@ -94,6 +105,9 @@
- #define   SDU_TYPE_MPDU			1
- #define   SDU_TYPE_MSDU			2
- 
-+#define NETC_PSDFTCR			0x4c4
-+#define NETC_PSDFDDCR			0x4c8
-+
- #define NETC_BPCR			0x500
- #define  BPCR_DYN_LIMIT			GENMASK(15, 0)
- #define  BPCR_MLO			GENMASK(22, 20)
-@@ -142,6 +156,11 @@ enum netc_stg_stage {
- 	NETC_STG_STATE_FORWARDING,
- };
- 
-+#define NETC_BPDCR			0x580
-+#define NETC_BPDCRRR			0x584
-+#define NETC_BPDCRR0			0x588
-+#define NETC_BPDCRR1			0x58c
-+
- /* Definition of Switch ethernet MAC port registers */
- #define NETC_PMAC_OFFSET		0x400
- #define NETC_PM_CMD_CFG(a)		(0x1008 + (a) * 0x400)
-@@ -176,6 +195,9 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Receive Ethernet Octets Counter */
- #define NETC_PM_REOCT(a)		(0x1100 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Receive Octets Counter */
-+#define NETC_PM_ROCT(a)			(0x1108 + (a) * 0x400)
-+
- /* Port MAC 0/1 Receive Alignment Error Counter Register */
- #define NETC_PM_RALN(a)			(0x1110 + (a) * 0x400)
- 
-@@ -188,12 +210,27 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Receive Frame Check Sequence Error Counter */
- #define NETC_PM_RFCS(a)			(0x1128 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Receive VLAN Frame Counter */
-+#define NETC_PM_RVLAN(a)		(0x1130 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Receive Frame Error Counter */
-+#define NETC_PM_RERR(a)			(0x1138 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Receive Unicast Frame Counter */
-+#define NETC_PM_RUCA(a)			(0x1140 + (a) * 0x400)
-+
- /* Port MAC 0/1 Receive Multicast Frame Counter */
- #define NETC_PM_RMCA(a)			(0x1148 + (a) * 0x400)
- 
- /* Port MAC 0/1 Receive Broadcast Frame Counter */
- #define NETC_PM_RBCA(a)			(0x1150 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Receive Dropped Packets Counter */
-+#define NETC_PM_RDRP(a)			(0x1158 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Receive Packets Counter */
-+#define NETC_PM_RPKT(a)			(0x1160 + (a) * 0x400)
-+
- /* Port MAC 0/1 Receive Undersized Packet Counter */
- #define NETC_PM_RUND(a)			(0x1168 + (a) * 0x400)
- 
-@@ -236,6 +273,9 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Transmit Ethernet Octets Counter */
- #define NETC_PM_TEOCT(a)		(0x1200 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Octets Counter */
-+#define NETC_PM_TOCT(a)			(0x1208 + (a) * 0x400)
-+
- /* Port MAC 0/1 Transmit Excessive Deferral Packet Counter */
- #define NETC_PM_TEDFR(a)		(0x1210 + (a) * 0x400)
- 
-@@ -245,15 +285,30 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Transmit Frame Counter */
- #define NETC_PM_TFRM(a)			(0x1220 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Frame Check Sequence Error Counter */
-+#define NETC_PM_TFCS(a)			(0x1228 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Transmit VLAN Frame Counter */
-+#define NETC_PM_TVLAN(a)		(0x1230 + (a) * 0x400)
-+
- /* Port MAC 0/1 Transmit Frame Error Counter */
- #define NETC_PM_TERR(a)			(0x1238 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Unicast Frame Counter */
-+#define NETC_PM_TUCA(a)			(0x1240 + (a) * 0x400)
-+
- /* Port MAC 0/1 Transmit Multicast Frame Counter */
- #define NETC_PM_TMCA(a)			(0x1248 + (a) * 0x400)
- 
- /* Port MAC 0/1 Transmit Broadcast Frame Counter */
- #define NETC_PM_TBCA(a)			(0x1250 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Packets Counter */
-+#define NETC_PM_TPKT(a)			(0x1260 + (a) * 0x400)
-+
-+/* Port MAC 0/1 Transmit Undersized Packet Counter */
-+#define NETC_PM_TUND(a)			(0x1268 + (a) * 0x400)
-+
- /* Port MAC 0/1 Transmit 64-Octet Packet Counter */
- #define NETC_PM_T64(a)			(0x1270 + (a) * 0x400)
- 
-@@ -293,6 +348,9 @@ enum netc_stg_stage {
- /* Port MAC 0/1 Transmit Excessive Collisions Counter */
- #define NETC_PM_TECOL(a)		(0x12f0 + (a) * 0x400)
- 
-+/* Port MAC 0/1 Transmit Invalid Octets Counter */
-+#define NETC_PM_TIOCT(a)		(0x12f8 + (a) * 0x400)
-+
- #define NETC_PEMDIOCR			0x1c00
- #define NETC_EMDIO_BASE			NETC_PEMDIOCR
- 
+On Sat,  9 May 2026 22:50:46 +0100 you wrote:
+> phydev->drv can become NULL while the phy_device is still attached to
+> its net_device, namely after the PHY driver is unbound via sysfs:
+> 
+> 	echo <mdio_id> > /sys/bus/mdio_bus/drivers/<phy_drv>/unbind
+> 
+> phy_remove() clears phydev->drv but doesn't call phy_detach(), so the
+> phy_device stays in the link topology xarray and ethnl_req_get_phydev()
+> still hands it back. ETHTOOL_MSG_PHY_GET then oopses on:
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: ethtool: phy: avoid NULL deref when PHY driver is unbound
+    https://git.kernel.org/netdev/net/c/e3adf69f8eb1
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
