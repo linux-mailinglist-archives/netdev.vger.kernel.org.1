@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-287568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287569-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GJ3yKiFrBGprIQIAu9opvQ
-	(envelope-from <netdev+bounces-287568-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 14:14:25 +0200
+	id YFOeF0drBGprIQIAu9opvQ
+	(envelope-from <netdev+bounces-287569-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 14:15:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 682A6532E2B
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 14:14:25 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C05CF532E44
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 14:15:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 37F7B30A4D70
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:13:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 32176305BE85
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:13:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C333E402442;
-	Wed, 13 May 2026 12:13:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EFF9402442;
+	Wed, 13 May 2026 12:13:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kfHU2qMV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aL4Do+TC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 757D13F7A86
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 12:13:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89A5B39AD32
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 12:13:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778674388; cv=none; b=rNYVCuyyRGC0JHLTt98pxGgQdTBft8hNZbpvZv5FBbV7RpcAKwsVyyFAomjDC/F7TiJDXkcwVUa2n9+nyuz23B7mKeHwCjZfZcFmeHiKbCi/hdeMUKDxhjclNGG24wHKkfPeCNkQX2Q62gRH1baRdDfgGrpYrC2SgVESdthZ8qs=
+	t=1778674409; cv=none; b=H2VH1Eomd0aeS402Q13BIfBBtrPguOzVIbTh6qDCEk1fPcW75I1BavEEQVYnn+YzDwb5Q0z2bRsm3zyubh5G0R1UyBJ1u4uaxFbZ41kTMJ/IucvnLx8DnCQVxBYGcYrZqyQ/55Ndo6GwILqiEiyvvR0S74bkVRoYlWtKCMe2dFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778674388; c=relaxed/simple;
-	bh=H8Xj3KTe+E9/Icf7A/pFrLf3P4u43HDYe01sD8jBu5M=;
+	s=arc-20240116; t=1778674409; c=relaxed/simple;
+	bh=6vOeaWIFRWOCkQ2ypviIEtXbauIiLWVfp1rOWJGuDcA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fwBmEDi1Z2VHBqGTgKJUa5LMnQZ5FQ8HtwBhQjTIMIKCJwqq1MVcYoaRNT+aycGTjbHfJFd8PnpTjypRWv4JKn43wfjrD5Wei782ZiEGuBh2qGve7wY5fSofH3x41aKMz+q89QFK7klWtfyjMlmjYy7VO4N/A8EQ2RkzIEp92vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kfHU2qMV; arc=none smtp.client-ip=209.85.160.49
+	 MIME-Version; b=anAtT9TRoGmlXIRdGkNqP/7I3LzBB87MtDq0wZWbrSsAGuh17Riknt0J+FkyHingdk4zDS6ojjdbnxqjd6SdLo9u0Ca9mFNyb2LkMnhCFbW7EFkpbgJmZN2FDEAFV702KW0isHmG5SpqAd0U+aggZDfG8+Y3HDr8PcUvZ6UKZmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aL4Do+TC; arc=none smtp.client-ip=209.85.160.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-439bdbc86b1so868556fac.1
-        for <netdev@vger.kernel.org>; Wed, 13 May 2026 05:13:06 -0700 (PDT)
+Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-439bdbc86b1so868788fac.1
+        for <netdev@vger.kernel.org>; Wed, 13 May 2026 05:13:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778674385; x=1779279185; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778674406; x=1779279206; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZWNE3Q2DvPCR8hHHvFryq5OpzNlFSaZimilgjtTyjxY=;
-        b=kfHU2qMV0zsMCUXoqvYsddtZo51iwGIuI1aaWi8VeQwJ4XONTw5vMWPoyLK9QkBcO1
-         PI4eW3JJ737N4Y+/4Oe4Rs1zg0+LhQvkjFaluYgXxWRDO4LwPEJDsYqKwjLhbCW7qliT
-         rr9PCABQNyEbHyQhzaX3VaJTSEc+VlMbnKWnTNdL98YbeCFNv7D8GNnOSDF7ls+OXLnh
-         yXtr2pFP+8S8WuY8RmLw62gmyE/aJMdNDtld8fArOyGVNCXhXkqnQbz3Ky7dZ68i1/Oz
-         1TuqWi5rGWRn8TuIyhJlFcJeJJOspUfHh6ucnxW1zFK9DsbhgWFIB3WhBRXxwifEbkuO
-         hNaQ==
+        bh=KXar17g0k4H/KFHfDGYL5Bn3v4WqyC95txr2e3AusWE=;
+        b=aL4Do+TCAffC/QHj/7yY+XQkoQUtw5iRaOUqeEw5h9o9dZubF2Yiostzz/LJGJpDsr
+         nuTFwYvVdx1yfR/1RwVYQerZB4N7RDG2jszTwmfBmzqB4eo/F/oXixx16dl++FInRWX1
+         gff558rnQq1QedbE9vslp3fRgJnNts+RqL7SRMn7RLg+8lEuRu6w0HFf0To3AE3ksoye
+         j3vN+68/icCGZ2MfKX2HaKIXHh6cdsOuNDu54GykDd3tAWhHYyTzm7m5zvJiJIVNHZ7n
+         uBO6yQzFOhLqVeyTr5yB6ECDz7KEVw/b2Tj5xXbzsrOSVkN6/DrnWnXFb6t2PERm9xO7
+         X0tQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778674385; x=1779279185;
+        d=1e100.net; s=20251104; t=1778674406; x=1779279206;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ZWNE3Q2DvPCR8hHHvFryq5OpzNlFSaZimilgjtTyjxY=;
-        b=a+OEyrqUQ7zgeuTEdSr1bUvIokasAogcgS4+Ha65OYAaUyj99wftyfKKnp0GhOXhA9
-         mttxWadEliotYgqW6PNKxLY7Ye8Q/eLerss3ivqChpjiDgyKkZEsa/sbUOPFgqoo7WnZ
-         3fhouQarVebtJAFMduxhYAcZqxbxHdmCTEHzNv9YyIgOk10vxbezt2cxwyH2zk8kCJJI
-         pOrs5zDuV3UKz8/2Vnwu9cppMzY8a632B0XmiEis7fHZYMbG/jXdSWMO4nnarBCi42yb
-         q4SxON/YI3xWaYi78cuX6ouq1jXv120udKp3JhK+pYKcpAQLDVhlTxtGVzmER8eAw9G9
-         qpSg==
-X-Gm-Message-State: AOJu0YxnKBjn/JVV/6YzGixMFxiOM+IK9by+USaa8mtvWCw0QwLvL80x
-	/ui/VctBvrNykqlryZ+6qN13NAQV8GH47+G/MaF5dR1/ZwCcpSfckaax+ffeX95QVXY=
-X-Gm-Gg: Acq92OHC3zmZBIunbZ2Hm2GrPYVPtom3k2qgZfuUsiaqA7t8EufCyW9aeUiM9h2A3pM
-	u/v+Kstj1+ubrz5o1wClhbFA3+ZZMkgmUgN/4lpeDV3eh2L8yKQOvfdSP73SAaBb5zQoGmBxayG
-	/ygc9x5lasZQnUds55oI5FFhgWDECX/wT/qNXfu0M87wy5a0wY5I08TkBNMF6eL2/vEZRvWmFxD
-	S06F5ZNGFSDno1qb4Mm1zlXws3kiuJrQGqGPMN3IGIm+aVuVau9bdNoBFDmKE/m6BLjN1KEBlyw
-	rXe1VrdmDoYtYqM7Z7cdwg6yHfoJ1nGoqo6t/5AoyWy0SfFMwizWj2s6yioV5FZ16XnuxcT1zzr
-	XS9QOwJC0GiOYnfPC75+EqEyTBzZDS7KowGolNUVxViZBroQ/gwIuLylW3kpDOYjRTgZ0DilIQT
-	nyzwfPR5DYP5DX/AE=
-X-Received: by 2002:a05:6870:344a:b0:42f:d8b8:9faa with SMTP id 586e51a60fabf-4399bab5fedmr4099456fac.28.1778674384855;
-        Wed, 13 May 2026 05:13:04 -0700 (PDT)
+        bh=KXar17g0k4H/KFHfDGYL5Bn3v4WqyC95txr2e3AusWE=;
+        b=iDSm4zGFxY9cGGyWhm3MA5DwAa/n8w+wRNG27VEtern9gjmUnWD7bbpldLXZONeHtG
+         hNDEt1zcmloLOGS4P+Jv6HXGQt15PW4Ku9iVIohoNSjG68BViIUHEF455ZN/9UfSmApy
+         IUPJ0FDCJMapJqh4bgokxzup3TZd3hadsLgF3MUj1OQ19uBQBod5vbViS7C4awJ2H0hp
+         Hg7XpSvWeapJc0YLRwAexZRqZH7ZDcJ38DueK5Hw7JtJ0QJ8xOvkiJLmS6ailV9eEZqi
+         hJgE+H91fwMU6dbqoZbIzbTk7Zn58CuYHV/ql8u147p/7vjTvumSGc7Y5ZKdXiFrt3A9
+         mUew==
+X-Gm-Message-State: AOJu0Yw9Fh0KsJyPaGVHBc0J8fw1RH9sfkKLbr4XXNsDab11OyKiKGBX
+	hrEVcWdMPAeMVLRrY+VPRd54gXJZYmxczSJg9ZA5fXZJGhirKpfAfWbtpRK7tR4PRXU=
+X-Gm-Gg: Acq92OF1vLBAqR9X2UBRyoS4P0OZ1XvJatlYnDIWTmBQb3sAsqYkjGWgFGekS/IECoP
+	mA0ZfvaADocI9abqf4sN0caqzNzx8Mf4yIR6jQqZvY3sHl441lffIvSqSAFb+92sbIP2IEzRlkV
+	8pl8vyNXwukY/dp0cPqJSSuZFAg9AoegIOMoiSp4sTOBm7sypFzxYs86ucxFs247rL0vpphbHzP
+	dzyuzgUbZ+TFxTJHeIav32TUpM1jdlrPDkXaga5uD8yFkx0Zr/K5ga9r9v6SSJ82rW7KzYzI9fv
+	O1ZhNmj7sOV2gjZ35lktAb3brpi1rxgFCpSQ0foc4kEL0tRYPcAeKDKoqBcX26szZi+koF+HTro
+	Z/bTKgLWUceg1TCqcfuo5AxOlPl5S/pd+tNVyQshfvaEFzaBBO97qRi7HtGfjjiVbd4KSRRCQxu
+	Ga2VcSF8QoYCKzihPAgqZHixahxA==
+X-Received: by 2002:a05:6870:f14a:b0:42c:b9d:8987 with SMTP id 586e51a60fabf-439cac4a4aamr1607270fac.10.1778674406006;
+        Wed, 13 May 2026 05:13:26 -0700 (PDT)
 Received: from houminxi ([72.244.37.221])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4355736dbc0sm15189442fac.11.2026.05.13.05.12.57
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4355736dbc0sm15189442fac.11.2026.05.13.05.13.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2026 05:13:04 -0700 (PDT)
+        Wed, 13 May 2026 05:13:24 -0700 (PDT)
 From: Minxi Hou <houminxi@gmail.com>
 To: netdev@vger.kernel.org
 Cc: dev@openvswitch.org,
@@ -91,9 +91,9 @@ Cc: dev@openvswitch.org,
 	horms@kernel.org,
 	shuah@kernel.org,
 	Minxi Hou <houminxi@gmail.com>
-Subject: [PATCH net-next 1/5] selftests: openvswitch: convert %-formatting to f-strings
-Date: Wed, 13 May 2026 20:12:36 +0800
-Message-ID: <20260513121240.2590767-2-houminxi@gmail.com>
+Subject: [PATCH net-next 2/5] selftests: openvswitch: fix misc pylint warnings in ovs-dpctl.py
+Date: Wed, 13 May 2026 20:12:37 +0800
+Message-ID: <20260513121240.2590767-3-houminxi@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260513121240.2590767-1-houminxi@gmail.com>
 References: <20260513121240.2590767-1-houminxi@gmail.com>
@@ -104,7 +104,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 682A6532E2B
+X-Rspamd-Queue-Id: C05CF532E44
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
@@ -112,18 +112,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	FREEMAIL_CC(0.00)[openvswitch.org,vger.kernel.org,redhat.com,ovn.org,davemloft.net,google.com,kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-287568-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-287569-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
@@ -137,728 +137,200 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Convert all %-formatting instances to f-strings to fix C0209
-pylint warnings. No behavior change.
+Fix miscellaneous pylint warnings with no behavior change:
+  - W0611: remove unused import struct
+  - W0702: replace bare except with except Exception
+  - C0325: remove superfluous parentheses after return
+  - R1705: remove unnecessary elif after return
+  - W0108: replace unnecessary lambda with int
+  - R1714: merge comparisons with in operator
+  - W0719: replace raise Exception with raise ValueError
+  - C1802: use implicit boolean test instead of len()
+  - C0121: use is None instead of == None
+  - R1719: simplify if-expression to bool test
+  - R1703: simplify if/else to assignment expression
+  - W0612: remove unused variables (keybits, maskbits, lst)
+  - replace unused loop variable with underscore
 
 Signed-off-by: Minxi Hou <houminxi@gmail.com>
 ---
- .../selftests/net/openvswitch/ovs-dpctl.py    | 274 ++++++++----------
- 1 file changed, 123 insertions(+), 151 deletions(-)
+ .../selftests/net/openvswitch/ovs-dpctl.py    | 50 ++++++++-----------
+ 1 file changed, 21 insertions(+), 29 deletions(-)
 
 diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-index 3b6a26e265a4..3671fe16b5a7 100644
+index 3671fe16b5a7..5ce054768f48 100644
 --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
 +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-@@ -65,7 +65,7 @@ OVS_FLOW_CMD_SET = 4
- UINT32_MAX = 0xFFFFFFFF
+@@ -11,7 +11,6 @@ import logging
+ import math
+ import multiprocessing
+ import re
+-import struct
+ import sys
+ import time
+ import types
+@@ -125,10 +124,7 @@ def parse_flags(flag_str, flag_vals):
+         maskResult = int(digits, 0)
  
- def macstr(mac):
--    outstr = ":".join(["%02X" % i for i in mac])
-+    outstr = ":".join([f"{i:02X}" for i in mac])
-     return outstr
+     while len(flag_str) > 0 and (flag_str[0] == "+" or flag_str[0] == "-"):
+-        if flag_str[0] == "+":
+-            setFlag = True
+-        elif flag_str[0] == "-":
+-            setFlag = False
++        setFlag = flag_str[0] == "+"
  
+         flag_str = flag_str[1:]
  
-@@ -146,7 +146,7 @@ def parse_flags(flag_str, flag_vals):
-         if flag in flag_vals:
-             if maskResult & flag_vals[flag]:
-                 raise KeyError(
--                    "Flag %s set once, cannot be set in multiples" % flag
-+                    f"Flag {flag} set once, cannot be set in multiples"
-                 )
+@@ -221,10 +217,9 @@ def convert_int(size):
  
-             if setFlag:
-@@ -154,7 +154,7 @@ def parse_flags(flag_str, flag_vals):
+         if not value:
+             return 0, 0
+-        elif not mask:
++        if not mask:
+             return int(value, 0), pow(2, size) - 1
+-        else:
+-            return int(value, 0), int(mask, 0)
++        return int(value, 0), int(mask, 0)
  
-             maskResult |= flag_vals[flag]
-         else:
--            raise KeyError("Missing flag value: %s" % flag)
-+            raise KeyError(f"Missing flag value: {flag}")
+     return convert_int_sized
  
-         flag_str = flag_str[flag_len:]
- 
-@@ -211,7 +211,7 @@ def convert_ipv6(data):
-     elif not mask:
-         mask = 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'
-     elif mask.isdigit():
--        mask = ipaddress.IPv6Network("::/" + mask).hostmask
-+        mask = ipaddress.IPv6Network(f"::/{mask}").hostmask
- 
-     return ipaddress.IPv6Address(ip).packed, ipaddress.IPv6Address(mask).packed
- 
-@@ -342,13 +342,13 @@ def parse_attrs(actstr, attr_desc):
-                 del attr_desc[i]
- 
-         if not found:
--            raise ValueError("Unknown attribute: '%s'" % actstr)
-+            raise ValueError(f"Unknown attribute: '{actstr}'")
- 
-         actstr = actstr[strspn(actstr, ", ") :]
- 
-     if actstr[0] != ")":
-         raise ValueError("Action string contains extra garbage or has "
--                         "unbalanced parenthesis: '%s'" % actstr)
-+                         f"unbalanced parenthesis: '{actstr}'")
- 
-     return attrs, actstr[1:]
- 
-@@ -403,14 +403,13 @@ class ovsactions(nla):
-         )
- 
-         def dpstr(self, more=False):
--            args = "group=%d" % self.get_attr("OVS_PSAMPLE_ATTR_GROUP")
-+            args = f"group={self.get_attr('OVS_PSAMPLE_ATTR_GROUP')}"
- 
-             cookie = self.get_attr("OVS_PSAMPLE_ATTR_COOKIE")
-             if cookie:
--                args += ",cookie(%s)" % \
--                        "".join(format(x, "02x") for x in cookie)
-+                args += f",cookie({''.join(format(x, '02x') for x in cookie)})"
- 
--            return "psample(%s)" % args
-+            return f"psample({args})"
- 
-         def parse(self, actstr):
-             desc = (
-@@ -441,15 +440,15 @@ class ovsactions(nla):
-         def dpstr(self, more=False):
-             args = []
- 
--            args.append("sample={:.2f}%".format(
--                100 * self.get_attr("OVS_SAMPLE_ATTR_PROBABILITY") /
--                UINT32_MAX))
-+            prob = 100 * self.get_attr(
-+                "OVS_SAMPLE_ATTR_PROBABILITY") / UINT32_MAX
-+            args.append(f"sample={prob:.2f}%")
- 
-             actions = self.get_attr("OVS_SAMPLE_ATTR_ACTIONS")
-             if actions:
--                args.append("actions(%s)" % actions.dpstr(more))
-+                args.append(f"actions({actions.dpstr(more)})")
- 
--            return "sample(%s)" % ",".join(args)
-+            return f"sample({','.join(args)})"
- 
-         def parse(self, actstr):
-             def parse_nested_actions(actstr):
-@@ -518,26 +517,20 @@ class ovsactions(nla):
-                     "OVS_NAT_ATTR_IP_MAX"
-                 ):
-                     if self.get_attr("OVS_NAT_ATTR_IP_MIN"):
--                        print_str += "=%s," % str(
--                            self.get_attr("OVS_NAT_ATTR_IP_MIN")
--                        )
-+                        print_str += f"={self.get_attr('OVS_NAT_ATTR_IP_MIN')!s},"
- 
-                     if self.get_attr("OVS_NAT_ATTR_IP_MAX"):
--                        print_str += "-%s," % str(
--                            self.get_attr("OVS_NAT_ATTR_IP_MAX")
--                        )
-+                        print_str += f"-{self.get_attr('OVS_NAT_ATTR_IP_MAX')!s},"
+@@ -688,11 +683,11 @@ class ovsactions(nla):
+                     parsed = True
                  else:
-                     print_str += ","
+                     actstr = actstr[len("drop"): ]
+-                    return (totallen - len(actstr))
++                    return totallen - len(actstr)
  
-                 if self.get_attr("OVS_NAT_ATTR_PROTO_MIN"):
--                    print_str += "proto_min=%d," % self.get_attr(
--                        "OVS_NAT_ATTR_PROTO_MIN"
--                    )
-+                    val = self.get_attr("OVS_NAT_ATTR_PROTO_MIN")
-+                    print_str += f"proto_min={val},"
- 
-                 if self.get_attr("OVS_NAT_ATTR_PROTO_MAX"):
--                    print_str += "proto_max=%d," % self.get_attr(
--                        "OVS_NAT_ATTR_PROTO_MAX"
--                    )
-+                    val = self.get_attr("OVS_NAT_ATTR_PROTO_MAX")
-+                    print_str += f"proto_max={val},"
- 
-                 if self.get_attr("OVS_NAT_ATTR_PERSISTENT"):
-                     print_str += "persistent,"
-@@ -554,22 +547,18 @@ class ovsactions(nla):
-             if self.get_attr("OVS_CT_ATTR_COMMIT") is not None:
-                 print_str += "commit,"
-             if self.get_attr("OVS_CT_ATTR_ZONE") is not None:
--                print_str += "zone=%d," % self.get_attr("OVS_CT_ATTR_ZONE")
-+                print_str += f"zone={self.get_attr('OVS_CT_ATTR_ZONE')},"
-             if self.get_attr("OVS_CT_ATTR_HELPER") is not None:
--                print_str += "helper=%s," % self.get_attr("OVS_CT_ATTR_HELPER")
-+                print_str += f"helper={self.get_attr('OVS_CT_ATTR_HELPER')},"
-             if self.get_attr("OVS_CT_ATTR_NAT") is not None:
-                 print_str += self.get_attr("OVS_CT_ATTR_NAT").dpstr(more)
-                 print_str += ","
-             if self.get_attr("OVS_CT_ATTR_FORCE_COMMIT") is not None:
-                 print_str += "force,"
-             if self.get_attr("OVS_CT_ATTR_EVENTMASK") is not None:
--                print_str += "emask=0x%X," % self.get_attr(
--                    "OVS_CT_ATTR_EVENTMASK"
--                )
-+                print_str += f"emask=0x{self.get_attr('OVS_CT_ATTR_EVENTMASK'):X},"
-             if self.get_attr("OVS_CT_ATTR_TIMEOUT") is not None:
--                print_str += "timeout=%s" % self.get_attr(
--                    "OVS_CT_ATTR_TIMEOUT"
--                )
-+                print_str += f"timeout={self.get_attr('OVS_CT_ATTR_TIMEOUT')}"
-             print_str += ")"
-             return print_str
- 
-@@ -586,17 +575,15 @@ class ovsactions(nla):
-         def dpstr(self, more=False):
-             print_str = "userspace("
-             if self.get_attr("OVS_USERSPACE_ATTR_PID") is not None:
--                print_str += "pid=%d," % self.get_attr(
--                    "OVS_USERSPACE_ATTR_PID"
--                )
-+                print_str += f"pid={self.get_attr('OVS_USERSPACE_ATTR_PID')},"
-             if self.get_attr("OVS_USERSPACE_ATTR_USERDATA") is not None:
-                 print_str += "userdata="
-                 for f in self.get_attr("OVS_USERSPACE_ATTR_USERDATA"):
--                    print_str += "%x." % f
-+                    print_str += f"{f:x}."
-             if self.get_attr("OVS_USERSPACE_ATTR_EGRESS_TUN_PORT") is not None:
--                print_str += "egress_tun_port=%d" % self.get_attr(
--                    "OVS_USERSPACE_ATTR_EGRESS_TUN_PORT"
--                )
-+                val = self.get_attr(
-+                    "OVS_USERSPACE_ATTR_EGRESS_TUN_PORT")
-+                print_str += f"egress_tun_port={val}"
-             print_str += ")"
-             return print_str
- 
-@@ -624,13 +611,13 @@ class ovsactions(nla):
-                 print_str += ","
- 
-             if field[0] == "OVS_ACTION_ATTR_OUTPUT":
--                print_str += "%d" % int(self.get_attr(field[0]))
-+                print_str += f"{self.get_attr(field[0])}"
-             elif field[0] == "OVS_ACTION_ATTR_RECIRC":
--                print_str += "recirc(0x%x)" % int(self.get_attr(field[0]))
-+                print_str += f"recirc(0x{self.get_attr(field[0]):x})"
-             elif field[0] == "OVS_ACTION_ATTR_TRUNC":
--                print_str += "trunc(%d)" % int(self.get_attr(field[0]))
-+                print_str += f"trunc({self.get_attr(field[0])})"
-             elif field[0] == "OVS_ACTION_ATTR_DROP":
--                print_str += "drop(%d)" % int(self.get_attr(field[0]))
-+                print_str += f"drop({self.get_attr(field[0])})"
-             elif field[0] == "OVS_ACTION_ATTR_CT_CLEAR":
-                 print_str += "ct_clear"
-             elif field[0] == "OVS_ACTION_ATTR_POP_VLAN":
-@@ -641,8 +628,8 @@ class ovsactions(nla):
-                 tci = datum["vlan_tci"]
-                 vid = tci & 0x0FFF
-                 pcp = (tci >> 13) & 0x7
--                print_str += "push_vlan(vid=%d,pcp=%d" \
--                    ",tpid=0x%04x)" % (vid, pcp, tpid)
-+                print_str += (f"push_vlan(vid={vid},pcp={pcp}"
-+                              f",tpid=0x{tpid:04x})")
-             elif field[0] == "OVS_ACTION_ATTR_POP_ETH":
-                 print_str += "pop_eth"
-             elif field[0] == "OVS_ACTION_ATTR_POP_NSH":
-@@ -750,32 +737,27 @@ class ovsactions(nla):
-                 for kv in actstr[:paren].split(","):
-                     if "=" not in kv:
-                         raise ValueError(
--                            "push_vlan(): bad field '%s'"
--                            % kv.strip())
-+                            f"push_vlan(): bad field '{kv.strip()}'")
-                     k = kv[:kv.index("=")].strip()
-                     v = kv[kv.index("=") + 1:].strip()
-                     if k == "vid":
-                         vid = int(v, 0)
-                         if vid < 0 or vid > 0xFFF:
-                             raise ValueError(
--                                "push_vlan(): vid=%d out of "
--                                "range (0-4095)" % vid)
-+                                f"push_vlan(): vid={vid} out of range (0-4095)")
-                     elif k == "pcp":
-                         pcp = int(v, 0)
-                         if pcp < 0 or pcp > 7:
-                             raise ValueError(
--                                "push_vlan(): pcp=%d out of "
--                                "range (0-7)" % pcp)
-+                                f"push_vlan(): pcp={pcp} out of range (0-7)")
-                     elif k == "tpid":
-                         tpid = int(v, 0)
-                         if tpid < 0 or tpid > 0xFFFF:
-                             raise ValueError(
--                                "push_vlan(): tpid=0x%x out "
--                                "of range (0-0xffff)" % tpid)
-+                                f"push_vlan(): tpid=0x{tpid:x} out of range (0-0xffff)")
-                     else:
-                         raise ValueError(
--                            "push_vlan(): unknown key '%s'"
--                            % k)
-+                            f"push_vlan(): unknown key '{k}'")
-                 tci = (vid & 0x0FFF) | ((pcp & 0x7) << 13) \
-                     | 0x1000
-                 pvact = self.push_vlan()
-@@ -802,7 +784,7 @@ class ovsactions(nla):
-                 actstr = k.parse(actstr, None)
-                 self["attrs"].append(("OVS_ACTION_ATTR_SET", k))
-                 if not actstr.startswith(")"):
--                    actstr = ")" + actstr
-+                    actstr = f"){actstr}"
+             elif parse_starts_block(actstr, r"^(\d+)", False, True):
+                 actstr, output = parse_extract_field(
+-                    actstr, None, r"(\d+)", lambda x: int(x), False, "0"
++                    actstr, None, r"(\d+)", int, False, "0"
+                 )
+                 self["attrs"].append(["OVS_ACTION_ATTR_OUTPUT", output])
                  parsed = True
-             elif parse_starts_block(actstr, "set_masked(", False):
-                 parencount += 1
-@@ -812,7 +794,7 @@ class ovsactions(nla):
-                 actstr = k.parse(actstr, m)
-                 self["attrs"].append(("OVS_ACTION_ATTR_SET_MASKED", [k, m]))
-                 if not actstr.startswith(")"):
--                    actstr = ")" + actstr
-+                    actstr = f"){actstr}"
+@@ -773,7 +768,6 @@ class ovsactions(nla):
+                 subacts = ovsactions()
+                 actstr = actstr[len("clone("):]
+                 parsedLen = subacts.parse(actstr)
+-                lst = []
+                 self["attrs"].append(("OVS_ACTION_ATTR_CLONE", subacts))
+                 actstr = actstr[parsedLen:]
                  parsed = True
-             elif parse_starts_block(actstr, "ct(", False):
-                 parencount += 1
-@@ -943,7 +925,7 @@ class ovsactions(nla):
-                 parencount -= 1
-                 actstr = actstr[strspn(actstr, " "):]
-                 if len(actstr) and actstr[0] != ")":
--                    raise ValueError("Action str: '%s' unbalanced" % actstr)
-+                    raise ValueError(f"Action str: '{actstr}' unbalanced")
+@@ -929,14 +923,14 @@ class ovsactions(nla):
                  actstr = actstr[1:]
  
              if len(actstr) and actstr[0] == ")":
-@@ -952,7 +934,7 @@ class ovsactions(nla):
+-                return (totallen - len(actstr))
++                return totallen - len(actstr)
+ 
              actstr = actstr[strspn(actstr, ", ") :]
  
              if not parsed:
--                raise ValueError("Action str: '%s' not supported" % actstr)
-+                raise ValueError(f"Action str: '{actstr}' not supported")
+                 raise ValueError(f"Action str: '{actstr}' not supported")
  
-         return (totallen - len(actstr))
+-        return (totallen - len(actstr))
++        return totallen - len(actstr)
  
-@@ -1071,20 +1053,20 @@ class ovskey(nla):
-             return flowstr, k, m
  
-         def dpstr(self, masked=None, more=False):
--            outstr = self.proto_str + "("
-+            outstr = f"{self.proto_str}("
-             first = False
+ class ovskey(nla):
+@@ -1020,8 +1014,6 @@ class ovskey(nla):
+             if flowstr.startswith("("):
+                 flowstr = flowstr[1:]
+ 
+-            keybits = b""
+-            maskbits = b""
              for f in self.fields_map:
-                 if first:
-                     outstr += ","
-                 if masked is None:
--                    outstr += "%s=" % f[0]
-+                    outstr += f"{f[0]}="
-                     if isinstance(f[2], str):
-                         outstr += f[2] % self[f[1]]
-                     else:
-                         outstr += f[2](self[f[1]])
-                     first = True
-                 elif more or f[3](masked[f[1]]) != 0:
--                    outstr += "%s=" % f[0]
-+                    outstr += f"{f[0]}="
-                     if isinstance(f[2], str):
-                         outstr += f[2] % self[f[1]]
-                     else:
-@@ -1658,23 +1640,23 @@ class ovskey(nla):
-             for k in self["attrs"]:
-                 noprint = False
-                 if k[0] == "OVS_TUNNEL_KEY_ATTR_ID":
--                    print_str += "tun_id=%d" % k[1]
-+                    print_str += f"tun_id={k[1]}"
-                 elif k[0] == "OVS_TUNNEL_KEY_ATTR_IPV4_SRC":
--                    print_str += "src=%s" % k[1]
-+                    print_str += f"src={k[1]}"
-                 elif k[0] == "OVS_TUNNEL_KEY_ATTR_IPV4_DST":
--                    print_str += "dst=%s" % k[1]
-+                    print_str += f"dst={k[1]}"
-                 elif k[0] == "OVS_TUNNEL_KEY_ATTR_IPV6_SRC":
--                    print_str += "ipv6_src=%s" % k[1]
-+                    print_str += f"ipv6_src={k[1]}"
-                 elif k[0] == "OVS_TUNNEL_KEY_ATTR_IPV6_DST":
--                    print_str += "ipv6_dst=%s" % k[1]
-+                    print_str += f"ipv6_dst={k[1]}"
-                 elif k[0] == "OVS_TUNNEL_KEY_ATTR_TOS":
--                    print_str += "tos=%d" % k[1]
-+                    print_str += f"tos={k[1]}"
-                 elif k[0] == "OVS_TUNNEL_KEY_ATTR_TTL":
--                    print_str += "ttl=%d" % k[1]
-+                    print_str += f"ttl={k[1]}"
-                 elif k[0] == "OVS_TUNNEL_KEY_ATTR_TP_SRC":
--                    print_str += "tp_src=%d" % k[1]
-+                    print_str += f"tp_src={k[1]}"
-                 elif k[0] == "OVS_TUNNEL_KEY_ATTR_TP_DST":
--                    print_str += "tp_dst=%d" % k[1]
-+                    print_str += f"tp_dst={k[1]}"
-                 elif k[0] == "OVS_TUNNEL_KEY_ATTR_DONT_FRAGMENT":
-                     noprint = True
-                     flagsattrs.append("df")
-@@ -1689,7 +1671,7 @@ class ovskey(nla):
+                 if flowstr.startswith(f[1]):
+                     # the following assumes that the field looks
+@@ -1030,7 +1022,7 @@ class ovskey(nla):
+                     flowstr = flowstr[len(f[1]) + 1 :]
+                     splitchar = 0
+                     for c in flowstr:
+-                        if c == "," or c == ")":
++                        if c in (",", ")"):
+                             break
+                         splitchar += 1
+                     data = flowstr[:splitchar]
+@@ -1587,7 +1579,7 @@ class ovskey(nla):
+             for prefix, regex, typ, attr_name, mask_val, default_val, v46_flag in fields:
+                 flowstr, value = parse_extract_field(flowstr, prefix, regex, typ, False)
+                 if not attr_name:
+-                    raise Exception("Bad list value in tunnel fields")
++                    raise ValueError("Bad list value in tunnel fields")
+ 
+                 if value is None and attr_name in forced_include:
+                     value = default_val
+@@ -1670,7 +1662,7 @@ class ovskey(nla):
+                 if not noprint:
                      print_str += ","
  
-             if len(flagsattrs):
--                print_str += "flags(" + "|".join(flagsattrs) + ")"
-+                print_str += f"flags({'|'.join(flagsattrs)})"
+-            if len(flagsattrs):
++            if flagsattrs:
+                 print_str += f"flags({'|'.join(flagsattrs)})"
              print_str += ")"
              return print_str
+@@ -2250,7 +2242,7 @@ class OvsDatapath(GenericNetlinkSocket):
  
-@@ -1712,8 +1694,8 @@ class ovskey(nla):
-         pcp = (tci >> 13) & 0x7
-         cfi = (tci >> 12) & 0x1
-         if cfi:
--            return "vid=%d,pcp=%d,cfi=%d" % (vid, pcp, cfi)
--        return "tci=0x%04x" % tci
-+            return f"vid={vid},pcp={pcp},cfi={cfi}"
-+        return f"tci=0x{tci:04x}"
- 
-     @staticmethod
-     def _parse_vlan_from_flowstr(flowstr):
-@@ -1757,7 +1739,7 @@ class ovskey(nla):
-             eq = flowstr.find('=')
-             if eq == -1:
-                 raise ValueError(
--                    "vlan(): expected key=value, got '%s'" % flowstr)
-+                    f"vlan(): expected key=value, got '{flowstr}'")
-             key = flowstr[:eq].strip()
-             flowstr = flowstr[eq + 1:]
- 
-@@ -1771,13 +1753,12 @@ class ovskey(nla):
-             flowstr = flowstr[end:]
- 
-             if not val:
--                raise ValueError("vlan(): empty value for key '%s'" % key)
-+                raise ValueError(f"vlan(): empty value for key '{key}'")
-             try:
-                 v = int(val, 0)
-             except ValueError as exc:
-                 raise ValueError(
--                    "vlan(): invalid value '%s' for key '%s'"
--                    % (val, key)) from exc
-+                    f"vlan(): invalid value '{val}' for key '{key}'") from exc
- 
-             if key == 'tci':
-                 if has_tci:
-@@ -1785,7 +1766,7 @@ class ovskey(nla):
-                 if has_vid or has_pcp or has_cfi:
-                     raise ValueError(_tci_mix_err)
-                 if v > 0xFFFF or v < 0:
--                    raise ValueError("vlan(): tci=0x%x out of range" % v)
-+                    raise ValueError(f"vlan(): tci=0x{v:x} out of range")
-                 tci = v
-                 mask = 0xFFFF
-                 has_tci = True
-@@ -1795,7 +1776,7 @@ class ovskey(nla):
-                 if has_vid:
-                     raise ValueError("vlan(): duplicate 'vid'")
-                 if v < 0 or v > 0xFFF:
--                    raise ValueError("vlan(): vid=%d out of range (0-4095)" % v)
-+                    raise ValueError(f"vlan(): vid={v} out of range (0-4095)")
-                 tci |= v
-                 mask |= 0x0FFF
-                 has_vid = True
-@@ -1805,7 +1786,7 @@ class ovskey(nla):
-                 if has_pcp:
-                     raise ValueError("vlan(): duplicate 'pcp'")
-                 if v < 0 or v > 7:
--                    raise ValueError("vlan(): pcp=%d out of range (0-7)" % v)
-+                    raise ValueError(f"vlan(): pcp={v} out of range (0-7)")
-                 tci |= (v & 0x7) << 13
-                 mask |= 0xE000
-                 has_pcp = True
-@@ -1820,7 +1801,7 @@ class ovskey(nla):
-                 mask |= ovskey._VLAN_CFI_MASK
-                 has_cfi = True
-             else:
--                raise ValueError("vlan(): unknown key '%s'" % key)
-+                raise ValueError(f"vlan(): unknown key '{key}'")
- 
-         flowstr = flowstr[1:]  # skip ')'
-         # Catch immediate '))' (user error).  A ')' after ',' is consumed
-@@ -1856,7 +1837,7 @@ class ovskey(nla):
-                 depth -= 1
-                 if depth < 0:
-                     raise ValueError(
--                        "encap(): unmatched ')' at position %d" % i)
-+                        f"encap(): unmatched ')' at position {i}")
-                 if depth == 0:
-                     end = i
-                     break
-@@ -1879,8 +1860,7 @@ class ovskey(nla):
-         remaining = inner_key.parse(inner_str, inner_mask)
-         if remaining and re.search(r'[^\s,)]', remaining):
-             raise ValueError(
--                "encap(): unrecognized trailing "
--                "content '%s'" % remaining.strip())
-+                f"encap(): unrecognized trailing content '{remaining.strip()}'")
- 
-         return flowstr, inner_key, inner_mask
- 
-@@ -1951,7 +1931,7 @@ class ovskey(nla):
-                 lambda x: parse_flags(x, None),
-             ),
-         ):
--            fld = field[1] + "("
-+            fld = f"{field[1]}("
-             if not flowstr.startswith(fld):
-                 continue
- 
-@@ -2089,15 +2069,15 @@ class ovskey(nla):
-                 else:
-                     if m is None or field[3](m):
-                         val = fmt(v) if callable(fmt) else fmt % v
--                        print_str += field[1] + "(" + val + "),"
-+                        print_str += f"{field[1]}({val}),"
-                     elif more or m != 0:
-                         if field[0] == "OVS_KEY_ATTR_VLAN":
--                            val = "tci=0x%04x/0x%04x" % (v, m)
-+                            val = f"tci=0x{v:04x}/0x{m:04x}"
-                         elif callable(fmt):
--                            val = fmt(v) + "/" + fmt(m)
-+                            val = f"{fmt(v)}/{fmt(m)}"
-                         else:
--                            val = (fmt % v) + "/" + (fmt % m)
--                        print_str += field[1] + "(" + val + "),"
-+                            val = f"{fmt % v}/{fmt % m}"
-+                        print_str += f"{field[1]}({val}),"
- 
-         return print_str
- 
-@@ -2179,7 +2159,7 @@ class OvsPacket(GenericNetlinkSocket):
-                     elif msg["cmd"] == OvsPacket.OVS_PACKET_CMD_EXECUTE:
-                         up.execute(msg)
-                     else:
--                        print("Unknown cmd: %d" % msg["cmd"])
-+                        print(f"Unknown cmd: {msg['cmd']}")
-             except NetlinkError as ne:
-                 raise ne
- 
-@@ -2363,7 +2343,7 @@ class OvsVport(GenericNetlinkSocket):
+             nproc = multiprocessing.cpu_count()
+             procarray = []
+-            for i in range(1, nproc):
++            for _ in range(1, nproc):
+                 procarray += [int(p.epid)]
+             msg["attrs"].append(["OVS_DP_ATTR_UPCALL_PID", procarray])
+         msg["attrs"].append(["OVS_DP_ATTR_USER_FEATURES", dpfeatures])
+@@ -2335,26 +2327,26 @@ class OvsVport(GenericNetlinkSocket):
+     def type_to_str(vport_type):
+         if vport_type == OvsVport.OVS_VPORT_TYPE_NETDEV:
+             return "netdev"
+-        elif vport_type == OvsVport.OVS_VPORT_TYPE_INTERNAL:
++        if vport_type == OvsVport.OVS_VPORT_TYPE_INTERNAL:
+             return "internal"
+-        elif vport_type == OvsVport.OVS_VPORT_TYPE_GRE:
++        if vport_type == OvsVport.OVS_VPORT_TYPE_GRE:
+             return "gre"
+-        elif vport_type == OvsVport.OVS_VPORT_TYPE_VXLAN:
++        if vport_type == OvsVport.OVS_VPORT_TYPE_VXLAN:
              return "vxlan"
-         elif vport_type == OvsVport.OVS_VPORT_TYPE_GENEVE:
+-        elif vport_type == OvsVport.OVS_VPORT_TYPE_GENEVE:
++        if vport_type == OvsVport.OVS_VPORT_TYPE_GENEVE:
              return "geneve"
--        raise ValueError("Unknown vport type:%d" % vport_type)
-+        raise ValueError(f"Unknown vport type:{vport_type}")
+         raise ValueError(f"Unknown vport type:{vport_type}")
  
      def str_to_type(vport_type):
          if vport_type == "netdev":
-@@ -2376,7 +2356,7 @@ class OvsVport(GenericNetlinkSocket):
+             return OvsVport.OVS_VPORT_TYPE_NETDEV
+-        elif vport_type == "internal":
++        if vport_type == "internal":
+             return OvsVport.OVS_VPORT_TYPE_INTERNAL
+-        elif vport_type == "gre":
++        if vport_type == "gre":
+             return OvsVport.OVS_VPORT_TYPE_GRE
+-        elif vport_type == "vxlan":
++        if vport_type == "vxlan":
              return OvsVport.OVS_VPORT_TYPE_VXLAN
-         elif vport_type == "geneve":
+-        elif vport_type == "geneve":
++        if vport_type == "geneve":
              return OvsVport.OVS_VPORT_TYPE_GENEVE
--        raise ValueError("Unknown vport type: '%s'" % vport_type)
-+        raise ValueError(f"Unknown vport type: '{vport_type}'")
+         raise ValueError(f"Unknown vport type: '{vport_type}'")
  
-     def __init__(self, packet=OvsPacket()):
-         GenericNetlinkSocket.__init__(self)
-@@ -2550,16 +2530,14 @@ class OvsFlow(GenericNetlinkSocket):
-             ufid = self.get_attr("OVS_FLOW_ATTR_UFID")
-             ufid_str = ""
-             if ufid is not None:
--                ufid_str = (
--                    "ufid:{:08x}-{:04x}-{:04x}-{:04x}-{:04x}{:08x}".format(
--                        ufid[0],
--                        ufid[1] >> 16,
--                        ufid[1] & 0xFFFF,
--                        ufid[2] >> 16,
--                        ufid[2] & 0,
--                        ufid[3],
--                    )
--                )
-+                u0 = ufid[0]
-+                u1h = ufid[1] >> 16
-+                u1l = ufid[1] & 0xFFFF
-+                u2h = ufid[2] >> 16
-+                u2l = ufid[2] & 0
-+                u3 = ufid[3]
-+                ufid_str = (f"ufid:{u0:08x}-{u1h:04x}-{u1l:04x}"
-+                            f"-{u2h:04x}-{u2l:04x}{u3:08x}")
+@@ -2463,7 +2455,7 @@ class OvsVport(GenericNetlinkSocket):
+         msg["dpifindex"] = dpindex
+         msg["attrs"].append(["OVS_VPORT_ATTR_NAME", vport_ifname])
  
-             key_field = self.get_attr("OVS_FLOW_ATTR_KEY")
-             keymsg = None
-@@ -2579,7 +2557,7 @@ class OvsFlow(GenericNetlinkSocket):
-             print_str = ""
- 
-             if more:
--                print_str += ufid_str + ","
-+                print_str += f"{ufid_str},"
- 
-             if keymsg is not None:
-                 print_str += keymsg.dpstr(maskmsg, more)
-@@ -2588,10 +2566,9 @@ class OvsFlow(GenericNetlinkSocket):
-             if stats is None:
-                 print_str += " packets:0, bytes:0,"
-             else:
--                print_str += " packets:%d, bytes:%d," % (
--                    stats["packets"],
--                    stats["bytes"],
--                )
-+                pkts = stats["packets"]
-+                nbytes = stats["bytes"]
-+                print_str += f" packets:{pkts}, bytes:{nbytes},"
- 
-             used = self.get_attr("OVS_FLOW_ATTR_USED")
-             print_str += " used:"
-@@ -2601,7 +2578,7 @@ class OvsFlow(GenericNetlinkSocket):
-                 used_time = int(used)
-                 cur_time_sec = time.clock_gettime(time.CLOCK_MONOTONIC)
-                 used_time = (cur_time_sec * 1000) - used_time
--                print_str += "{}s,".format(used_time / 1000)
-+                print_str += f"{used_time / 1000}s,"
- 
-             print_str += " actions:"
-             if (
-@@ -2769,7 +2746,7 @@ class OvsFlow(GenericNetlinkSocket):
-         pktdata = packetmsg.get_attr("OVS_PACKET_ATTR_PACKET")
-         pktpres = "yes" if pktdata is not None else "no"
- 
--        print("MISS upcall[%d/%s]: %s" % (seq, pktpres, keystr), flush=True)
-+        print(f"MISS upcall[{seq}/{pktpres}]: {keystr}", flush=True)
- 
-     def execute(self, packetmsg):
-         print("userspace execute command", flush=True)
-@@ -2803,16 +2780,16 @@ class psample_sample(genlmsg):
-         data = ""
-         for (attr, value) in self["attrs"]:
-             if attr == "PSAMPLE_ATTR_SAMPLE_GROUP":
--                fields.append("group:%d" % value)
-+                fields.append(f"group:{value}")
-             if attr == "PSAMPLE_ATTR_SAMPLE_RATE":
--                fields.append("rate:%d" % value)
-+                fields.append(f"rate:{value}")
-             if attr == "PSAMPLE_ATTR_USER_COOKIE":
-                 value = "".join(format(x, "02x") for x in value)
--                fields.append("cookie:%s" % value)
-+                fields.append(f"cookie:{value}")
-             if attr == "PSAMPLE_ATTR_DATA" and len(value) > 0:
--                data = "data:%s" % "".join(format(x, "02x") for x in value)
-+                data = f"data:{''.join(format(x, '02x') for x in value)}"
- 
--        return ("%s %s" % (",".join(fields), data)).strip()
-+        return (f"{','.join(fields)} {data}").strip()
- 
- 
- class psample_msg(Marshal):
-@@ -2846,23 +2823,22 @@ def print_ovsdp_full(dp_lookup_rep, ifindex, ndb=NDB(), vpl=OvsVport()):
-     user_features = dp_lookup_rep.get_attr("OVS_DP_ATTR_USER_FEATURES")
-     masks_cache_size = dp_lookup_rep.get_attr("OVS_DP_ATTR_MASKS_CACHE_SIZE")
- 
--    print("%s:" % dp_name)
--    print(
--        "  lookups: hit:%d missed:%d lost:%d"
--        % (base_stats["hit"], base_stats["missed"], base_stats["lost"])
--    )
--    print("  flows:%d" % base_stats["flows"])
-+    print(f"{dp_name}:")
-+    hit = base_stats["hit"]
-+    missed = base_stats["missed"]
-+    lost = base_stats["lost"]
-+    print(f"  lookups: hit:{hit} missed:{missed} lost:{lost}")
-+    print(f"  flows:{base_stats['flows']}")
-     pkts = base_stats["hit"] + base_stats["missed"]
-     avg = (megaflow_stats["mask_hit"] / pkts) if pkts != 0 else 0.0
--    print(
--        "  masks: hit:%d total:%d hit/pkt:%f"
--        % (megaflow_stats["mask_hit"], megaflow_stats["masks"], avg)
--    )
-+    mhit = megaflow_stats["mask_hit"]
-+    mtotal = megaflow_stats["masks"]
-+    print(f"  masks: hit:{mhit} total:{mtotal} hit/pkt:{avg:f}")
-     print("  caches:")
--    print("    masks-cache: size:%d" % masks_cache_size)
-+    print(f"    masks-cache: size:{masks_cache_size}")
- 
-     if user_features is not None:
--        print("  features: 0x%X" % user_features)
-+        print(f"  features: 0x{user_features:X}")
- 
-     # port print out
-     for iface in ndb.interfaces:
-@@ -2873,16 +2849,12 @@ def print_ovsdp_full(dp_lookup_rep, ifindex, ndb=NDB(), vpl=OvsVport()):
-             if vpo:
-                 dpo = vpo.get_attr("OVS_TUNNEL_ATTR_DST_PORT")
-                 if dpo:
--                    opts += " tnl-dport:%s" % dpo
--            print(
--                "  port %d: %s (%s%s)"
--                % (
--                    rep.get_attr("OVS_VPORT_ATTR_PORT_NO"),
--                    rep.get_attr("OVS_VPORT_ATTR_NAME"),
--                    OvsVport.type_to_str(rep.get_attr("OVS_VPORT_ATTR_TYPE")),
--                    opts,
--                )
--            )
-+                    opts += f" tnl-dport:{dpo}"
-+            port_no = rep.get_attr("OVS_VPORT_ATTR_PORT_NO")
-+            name = rep.get_attr("OVS_VPORT_ATTR_NAME")
-+            vtype = OvsVport.type_to_str(
-+                rep.get_attr("OVS_VPORT_ATTR_TYPE"))
-+            print(f"  port {port_no}: {name} ({vtype}{opts})")
- 
- 
- def main(argv):
-@@ -3014,14 +2986,14 @@ def main(argv):
-         if not found:
-             msg = "No DP found"
-             if args.showdp is not None:
--                msg += ":'%s'" % args.showdp
-+                msg += f":'{args.showdp}'"
-             print(msg)
-     elif hasattr(args, "adddp"):
-         rep = ovsdp.create(args.adddp, args.upcall, args.versioning, ovspk)
-         if rep is None:
--            print("DP '%s' already exists" % args.adddp)
-+            print(f"DP '{args.adddp}' already exists")
+-        if p == None:
++        if p is None:
+             p = self.upcall_packet
          else:
--            print("DP '%s' added" % args.adddp)
-+            print(f"DP '{args.adddp}' added")
-         if args.upcall:
-             ovspk.upcall_handler(ovsflow)
-     elif hasattr(args, "deldp"):
-@@ -3029,12 +3001,12 @@ def main(argv):
-     elif hasattr(args, "addif"):
-         rep = ovsdp.info(args.dpname, 0)
-         if rep is None:
--            print("DP '%s' not found." % args.dpname)
-+            print(f"DP '{args.dpname}' not found.")
-             return 1
-         dpindex = rep["dpifindex"]
-         rep = ovsvp.attach(rep["dpifindex"], args.addif, args.ptype,
-                            args.dport, args.lwt)
--        msg = "vport '%s'" % args.addif
-+        msg = f"vport '{args.addif}'"
-         if rep and rep["header"]["error"] is None:
-             msg += " added."
-         else:
-@@ -3046,10 +3018,10 @@ def main(argv):
-     elif hasattr(args, "delif"):
-         rep = ovsdp.info(args.dpname, 0)
-         if rep is None:
--            print("DP '%s' not found." % args.dpname)
-+            print(f"DP '{args.dpname}' not found.")
-             return 1
-         rep = ovsvp.detach(rep["dpifindex"], args.delif)
--        msg = "vport '%s'" % args.delif
-+        msg = f"vport '{args.delif}'"
-         if rep and rep["header"]["error"] is None:
-             msg += " removed."
-         else:
-@@ -3060,7 +3032,7 @@ def main(argv):
-     elif hasattr(args, "dumpdp"):
-         rep = ovsdp.info(args.dumpdp, 0)
-         if rep is None:
--            print("DP '%s' not found." % args.dumpdp)
-+            print(f"DP '{args.dumpdp}' not found.")
+             self.upcall_packet = p
+@@ -3036,7 +3028,7 @@ def main(argv):
              return 1
          rep = ovsflow.dump(rep["dpifindex"])
          for flow in rep:
-@@ -3068,7 +3040,7 @@ def main(argv):
+-            print(flow.dpstr(True if args.verbose > 0 else False))
++            print(flow.dpstr(args.verbose > 0))
      elif hasattr(args, "flbr"):
          rep = ovsdp.info(args.flbr, 0)
          if rep is None:
--            print("DP '%s' not found." % args.flbr)
-+            print(f"DP '{args.flbr}' not found.")
-             return 1
-         flow = OvsFlow.ovs_flow_msg()
-         flow.parse(args.flow, args.acts, rep["dpifindex"])
-@@ -3076,7 +3048,7 @@ def main(argv):
-     elif hasattr(args, "flsbr"):
-         rep = ovsdp.info(args.flsbr, 0)
-         if rep is None:
--            print("DP '%s' not found." % args.flsbr)
-+            print(f"DP '{args.flsbr}' not found.")
-         ovsflow.del_flows(rep["dpifindex"])
- 
-     return 0
 -- 
 2.53.0
 
