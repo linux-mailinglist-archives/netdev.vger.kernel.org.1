@@ -1,170 +1,169 @@
-Return-Path: <netdev+bounces-287691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287692-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eNB+OAyyBGoQNQIAu9opvQ
-	(envelope-from <netdev+bounces-287691-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 19:17:00 +0200
+	id EO0NIhG5BGplNQIAu9opvQ
+	(envelope-from <netdev+bounces-287692-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 19:46:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A34E7537D7F
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 19:17:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E32CD538453
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 19:46:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4BC173010BF6
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 17:16:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1D7253213F6A
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 17:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CF583A425D;
-	Wed, 13 May 2026 17:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1336648C8C4;
+	Wed, 13 May 2026 17:25:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K7DpjLws"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GheIeQYZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0132A3A2E07
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 17:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA604DA553
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 17:25:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778692600; cv=none; b=PyefObqw4iTmhlMhn0nIBr8dy+qA1rRUS5Rg5S0D5Nr9gEEerT6wxBZ5BT/85Z3iOCsRuCgf5+k9+Shzr/OgwRdEetS8HYCZi+i3NC/VYJ+zixRhF0rIX43Aopi/PQwb8mYBuo6Ar1KBEUU0JvqR0/FOGZbGb9IY2kSBx90Ufsc=
+	t=1778693115; cv=none; b=EW0Dnv7+irOQmqS48+mHxUH5gCCskZCas9pzDGSiYmllPQuMSK6AVmS7pYS2c8huS3RMvazD1jMAPijvBlbFOzbC5KIAbDWHHAvm35WXvpeG82Vj31tCcCXA5nCFL4Nn3OhwYH7Vv0lfV/ySpku7D8MLNzMAk3Ru22FsgNZH6yQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778692600; c=relaxed/simple;
-	bh=faSlA/Gy4+hGhFjhHo18QPT5jT1Kuy+RVGGvkXN4szQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ApOJt7h7pofpbJhWvVpFlappAgn7q4z8gkBQ3NtqM7HvA/O/y+om6CLF2LZqaidnUfyNtpAKbKN+S0/H9x1NW7Eb1/Ky9YZ8LD72LyQeKeY9XNjfMN61BS2jcGOZpC5KCNexI3eHH+Ei63YmjcWUL9woVsdlLOyIuxdYWc/yh40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K7DpjLws; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-36622412e97so4591087a91.2
-        for <netdev@vger.kernel.org>; Wed, 13 May 2026 10:16:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778692596; x=1779297396; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KZWcV0rAryTMJnbVXU/76vXU1STIeSGIC5/F+Khj1D8=;
-        b=K7DpjLwsdDF8MGXRqWdydrjl1Qb0oEYyIvSmu47ohVZwaNOGTNYi4FllQr6alceT7f
-         F3jnWfJbE3xOnLdkQo4zSAnGxev8fWkUxVLl+AgMIKdD12aQVG5CWNGaY1djwJnbo4y6
-         jZOYR3f3amke4MpTgivCdN2zleQJqEy80fNY3spvdSHwvfKIvDcK+rR5jeD0OmM30bnZ
-         5n/giydgPctb6JVyQehb8IGNr1sh408f5MKEkDrLPNhZok89F2Y2QbHs1TeMucGsXd1u
-         7tCztZC89zdWbGEJrcoP7OYeQIfmU3KhqJz3An2Rdhdfv57A1R+e5nBBM/HCZ1aSjND3
-         KYZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778692596; x=1779297396;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KZWcV0rAryTMJnbVXU/76vXU1STIeSGIC5/F+Khj1D8=;
-        b=Oty/K9spL6OwRcxAdJr64jCGYCzWnKCvYOc4b9QpjKk7Q1TE5SqUnPBU8Xzz/DTCNl
-         3itv9w54tBpmeK6R+oXRWieeWyIO854uDw8nF30YUTqrn6t/ASIHhCRyc7zNARqHzMQm
-         7aDCZ+Zrx/H/TWo/aB5O8OHsY3WcJkZYDxNg4I88vR+Jjj0qTQu/vyIawKQYvg1u1zim
-         q4opx9ML8rqcjfd6KHp8BPAI5r/o0F0utevsJdANWsEDmFReZcJ7C1K+kabFLSaxrPLN
-         6pgJhvv7v3y1H2sWC5C2bccUuxsokpiZrlh+SPLXE9d0RtDoAT7NSAPWUg5lciTKlcq/
-         FjVA==
-X-Forwarded-Encrypted: i=1; AFNElJ8Uw1G/n9dkimeUA8toEikhqo5N7E/R4IZOwqbNvacyCWb8qVaEbHWVda814hEWsWXnj4jZ1Cg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywy3PAYEOmb1XOXmA+rjfT8HkakZptgsjwDt5OC0+bPjlWwnjn6
-	tK4dmAJiSVDGsqhIsIKdGHCXuTB35Um0Eqg+MaQ31zOiRmAJ8QZmUxWc
-X-Gm-Gg: Acq92OHeG3nGtbRAYur0doWkAOLB8DZV4vPmwokNtkKqbOAgXWf1szUYiEyIHACk8IO
-	WDc/Jpgre6bqP9T2oZ2/A772UQSJEbKztnQ9Gx/a8+kayG1x4J71Ga2O78BpiB80m843fyLuNoS
-	EA8eSt9tDkmXjhTznHQpjt60aUg5rTDasg1NsE+HRlQQ/TX9pqffUvRMQMLpLtd5GUdEnqzo4Vm
-	P5eU/zLD8wf+5EJflpJ2B7WqdHTQMGXSt/cujIn2SHu55Z66Dz6NfxKpMTZaXmcrQ2f1bYaFf6a
-	/8yOrOK2YL6rdUBdj1nIyJ1N+C+oBaLqYhEykRrygrKsiM2WAV7p0oQpF45aRqAbsJf4BZ9baXX
-	8H6Erp/0sPdg5Xr0saNsY12YWmX33hC+ttaXPXWKHZL5bCxlPd2vq3GKm0IDH44e6W6d6AcxY3B
-	QiuoK7fKjqYzijGxrEK02eeOhbTbCDZypAtiZhp6UyP6PyG/Llc+na05xlS4QxkRud
-X-Received: by 2002:a17:90a:a81:b0:369:1dff:6bd5 with SMTP id 98e67ed59e1d1-3691dff76dcmr743122a91.17.1778692595883;
-        Wed, 13 May 2026 10:16:35 -0700 (PDT)
-Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-368eddf5161sm5087917a91.2.2026.05.13.10.16.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2026 10:16:35 -0700 (PDT)
-Date: Thu, 14 May 2026 02:16:31 +0900
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au, dsahern@kernel.org, vakzz@zellic.io,
-	stable@vger.kernel.org, netdev@vger.kernel.org, imv4bel@gmail.com
-Subject: Re: [PATCH net] net: skbuff: propagate shared-frag marker through
- pskb_copy()
-Message-ID: <agSx78pXBFCdn08p@v4bel>
-References: <agRfuVOeMI5pbHhY@v4bel>
- <811b31f3373526d1ff60160c2f32ddb359e54c31.camel@decadent.org.uk>
+	s=arc-20240116; t=1778693115; c=relaxed/simple;
+	bh=0l3K1Vx6dDHrT4K/Ky69g1F83Rx5pkBVmYmgs7DnxK4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AUcqutFBHXmPmPGlf9QGg/GNb3SEukjFJ6RVjg274g1YtJQaXfz92qHnMLRkycldsZWQHAkwkwyBtm0tdO9biPXV17/+4UyzNx06sFLBXj7lj21pLl2KYlJ7tsvEc6ievdXMEhubtKuRO1PfaD1RqvaWdwen2Vwuqn5Z6flhTDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GheIeQYZ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778693112;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=P6Gxt0Syx0btkQxNHujdK6tAvcgI3DJpQWuCddcKTlE=;
+	b=GheIeQYZ+hfVRK91UZMrOepdDCKfWWXiagHUWYNs400cikqWIxfO2lbInANT3RRC3COcGQ
+	0XbQh9g/LJbfFphMD5xUEhGUnVp+ViDHkHyy/mZRTVZQklKlwnbnEom7OYtR0ZsfaBCECm
+	LEWsmVmpHoweUlV2YBaI7EYwVdfCBis=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-655-ajT9Fg5hMFel42STe0JZeg-1; Wed,
+ 13 May 2026 13:25:08 -0400
+X-MC-Unique: ajT9Fg5hMFel42STe0JZeg-1
+X-Mimecast-MFC-AGG-ID: ajT9Fg5hMFel42STe0JZeg_1778693107
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2B84D1800372;
+	Wed, 13 May 2026 17:25:07 +0000 (UTC)
+Received: from wsxc.redhat.com (unknown [10.96.134.76])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2678F300019F;
+	Wed, 13 May 2026 17:25:02 +0000 (UTC)
+From: Ricardo Robaina <rrobaina@redhat.com>
+To: audit@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: paul@paul-moore.com,
+	eparis@redhat.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	Ricardo Robaina <rrobaina@redhat.com>,
+	Steve Grubb <sgrubb@redhat.com>
+Subject: [PATCH v2] netlink, audit: prevent false ENOBUFS on timeout expiry
+Date: Wed, 13 May 2026 14:24:43 -0300
+Message-ID: <20260513172443.1128496-1-rrobaina@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <811b31f3373526d1ff60160c2f32ddb359e54c31.camel@decadent.org.uk>
-X-Rspamd-Queue-Id: A34E7537D7F
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Rspamd-Queue-Id: E32CD538453
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287691-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,secunet.com,gondor.apana.org.au,zellic.io,vger.kernel.org,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-287692-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rrobaina@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Wed, May 13, 2026 at 06:21:45PM +0200, Ben Hutchings wrote:
-> On Wed, 2026-05-13 at 20:25 +0900, Hyunwoo Kim wrote:
-> > __pskb_copy_fclone() shallow-copies the source's frag descriptors and
-> > bumps each page's refcount via skb_frag_ref(), then defers the rest
-> > of the shinfo metadata to skb_copy_header().  That helper only carries
-> > over gso_{size,segs,type} and never touches skb_shinfo()->flags, so
-> > the destination skb keeps a reference to the same externally-owned or
-> > page-cache-backed pages while reporting skb_has_shared_frag() as
-> > false.
-> >
-> > The mismatch is harmful in any in-place writer that uses
-> > skb_has_shared_frag() to decide whether shared pages must be detoured
-> > through skb_cow_data().  ESP input is one such writer (esp4.c,
-> > esp6.c), and a single nft 'dup to <local>' rule -- or any other
-> > nf_dup_ipv4() / xt_TEE caller -- is enough to land a pskb_copy()'d
-> > skb in esp_input() with the marker stripped, letting an unprivileged
-> > user write into the page cache of a root-owned read-only file via
-> > authencesn-ESN stray writes.
-> > 
-> > Set SKBFL_SHARED_FRAG on the destination whenever frag descriptors
-> > were actually moved from the source.  skb_copy() and skb_copy_expand()
-> > share skb_copy_header() too but linearize all paged data into freshly
-> > allocated head storage and emerge with nr_frags == 0, so
-> > skb_has_shared_frag() returns false on its own; they need no change.
-> 
-> What about skb_shift()?  It seems like that should also propagate this
-> flag.  But I could be missing some reason why it's not necessary.
+When auditd is bottlenecked (e.g., by slow disk I/O), kauditd blocks on
+the netlink socket. If the wait timeout fully expires (timeo == 0),
+netlink mistakenly interprets the zeroed timeout as a non-blocking
+request. It then triggers netlink_overrun that drops the event,
+completely bypassing the audit subsystem's internal retry queue, and
+falsely returns ENOBUFS to user-space, resulting in the following error:
 
-Yes, since skb_shift() is also a function that moves frag descriptors, 
-I think SHARED_FRAG should be propagated as well. The actual trigger 
-conditions are tricky (not deterministic) due to TCP write-queue skb 
-merging, but I believe the fix is the right thing to do. 
+ auditd[]: Error receiving audit netlink packet (No buffer space available)
 
-I'm planning to submit a v2 patch. What do you think?
+Fix this by detecting when a blocking sender's timeout has expired
+(timeo == 0 && !nonblock) in netlink_unicast(). In this case, instead
+of retrying with timeo=0 (which would incorrectly trigger netlink_overrun
+on the next iteration), safely free the skb and return -EAGAIN, allowing
+the audit subsystem to gracefully enqueue the pending event into its
+internal backlog.
 
+Suggested-by: Steve Grubb <sgrubb@redhat.com>
+Suggested-by: Paul Moore <paul@paul-moore.com>
+Signed-off-by: Ricardo Robaina <rrobaina@redhat.com>
+---
+Changes in v2:
+- Use the simple check (timeo == 0 && !nonblock) to detect
+  expired timeout, avoiding adding a new NETLINK flag.
 
-Best regards,
-Hyunwoo Kim
+ net/netlink/af_netlink.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+index 2aeb0680807d..fdc3db74b178 100644
+--- a/net/netlink/af_netlink.c
++++ b/net/netlink/af_netlink.c
+@@ -1351,8 +1351,18 @@ int netlink_unicast(struct sock *ssk, struct sk_buff *skb,
+ 	}
+ 
+ 	err = netlink_attachskb(sk, skb, &timeo, ssk);
+-	if (err == 1)
++	if (err == 1) {
++		/* timeo may have been zeroed by schedule_timeout inside
++		 * netlink_attachskb. If the caller is a timed-blocking sender
++		 * (not genuinely nonblocking), don't re-enter with timeo=0 as
++		 * that would misfire netlink_overrun on the next iteration.
++		 */
++		if (timeo == 0 && !nonblock) {
++			kfree_skb(skb);
++			return -EAGAIN;
++		}
+ 		goto retry;
++	}
+ 	if (err)
+ 		return err;
+ 
+-- 
+2.53.0
+
 
