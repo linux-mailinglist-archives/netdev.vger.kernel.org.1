@@ -1,262 +1,224 @@
-Return-Path: <netdev+bounces-287484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287485-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ENnnGilEBGp0GQIAu9opvQ
-	(envelope-from <netdev+bounces-287484-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:28:09 +0200
+	id 6H7gNZA/BGoqFgIAu9opvQ
+	(envelope-from <netdev+bounces-287485-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:08:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C59D85309F7
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:28:08 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79B1B530434
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:08:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0461932022DA
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 09:06:10 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0B4513017E49
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 09:07:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93523401498;
-	Wed, 13 May 2026 09:01:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD41426B971;
+	Wed, 13 May 2026 09:07:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hhqhT5AJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J2cq6pwc"
 X-Original-To: netdev@vger.kernel.org
-Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011048.outbound.protection.outlook.com [52.101.57.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B320D3EF659;
-	Wed, 13 May 2026 09:01:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778662885; cv=fail; b=MZ+BGz+2pmqHPuyj1IcmAZy1fSn8cT9U8KNK81HgtSwTTUS8Swc+pdjeTKaprkLOZ8qtPtxjakcWPbKRi2TCrQoHZSldOT5rWhlMm5KgoGvdcRhd7hWWE132yIM2Ynf9t+DBky0XSsfjno9TQPkb+vytMKeXbAfU+t5MfrXpzzg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778662885; c=relaxed/simple;
-	bh=2tG36kgO6GYBpoMT1GQ4/foR6YOdT6Z3g+CteCqKKDc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=dZ6ChBNkp3H12rM1abR9oSKdd1hiB8QkrJxvDIOFGKgQSv1krWd9qT9HT9lJRh2lgBGG51dAbXgYpw97W2NLeLI7gZv7YB4ZT5QZkHBwOxLneYOzO9PoaMzpyCKgz5nZqH1ksuT5/ZIg8fsHIwEZFpSH76QV52Y93sU1wNZhzQA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hhqhT5AJ; arc=fail smtp.client-ip=52.101.57.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hJzuhOFmNoJameyb4+WK8bvvwcR8tMrncmvjRvPgkv7HhWrXO8m9Ffrw5/dcHXpJJCjvkTXfhyjfXEhNOz7zDskDCQK0hEUqGJzLRfS/S6xA47d4dSvyJOFN2E63jrbIHIruQPyUpDyvOiYPAE0hmEuzSnN4XWnO+KLEcdvIP2rDI5cqLB/48vYNBrEAd2TMzBKv0l2lXvN1Gxli523NkdBKvYRDZPnoogiebfffvTL4Z5l5S4Ove70efnkD28aEPcxAVnxw/ih7yHAuSa1VU6vC34Jh4qoRG9YbpVwD3DE+LuYhr4FcloLyZu/Ly9o2rD0JTpwQnApKjhLXZOXLtQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rHWsNSGe4btIxjBPrpEbAKB5ddDPX54C5780Xr7IFzk=;
- b=XL5hYLA7dwP0f2UnJEJ8Jou2WvX3LpV4oFTOE/ztLzL4c+LeeagQv+PCA2Z6vF8s4ykGIdiUog/EJxRBe4PKjuIcL6zbgfAiZATywQFzxulF4l2NU+ihRiItoNbAvFL+inFzMbC/iYx1Kb/N+hsWF+eTdoiHIAXS8kdlbKob9O5/86+ehITIMcrhkFsGHtb2DICeH0KGGFKDcbtciE4XJyIV9deH+e6hZv+XvlQ8TU7XxPYb0PTUJLXf68nOoYTgHLZvam8Rqp53dt3HVFSYn7+mE7qHZbjU4jej9//p1DL5TIfnLWZ6ChL5pKDqnRYS03IqUmn5kb/QD2BNoqmVaQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rHWsNSGe4btIxjBPrpEbAKB5ddDPX54C5780Xr7IFzk=;
- b=hhqhT5AJdPKnbfnJ9hONldCO/zgnv0QnaTdl06DrbOanndWtq2kpwAUUaTtg4bEuPv0tbRx9jJ+6fcCKmM7aC7cfBbLf22nMdd9mDKnnggAhVY378PNS6z+uWgsZR9lUPh+IBSdTGch+bYco6GjwzLv+Zc/Q8OLkooruGNJ2JucHpOd84AV9MCzqNeUeuPJn/IN2NkbRZXuQJ6ynRGiVekwSpjgeKFg3aHOdZdNbNoOVdGxQaT+RRaqIs0GfrELCkzJmWlnsZSYaWT+iTI96nVbC/7uynCVMF25nvy2Am06NKS3wNLp1xIDPt6nxdsx8Eoi9S2j0+EeRdJQd0/Q8QA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from IA0PR12MB8716.namprd12.prod.outlook.com (2603:10b6:208:485::18)
- by PH7PR12MB9221.namprd12.prod.outlook.com (2603:10b6:510:2e8::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.11; Wed, 13 May
- 2026 09:01:16 +0000
-Received: from IA0PR12MB8716.namprd12.prod.outlook.com
- ([fe80::c18d:8eab:b36c:32da]) by IA0PR12MB8716.namprd12.prod.outlook.com
- ([fe80::c18d:8eab:b36c:32da%3]) with mapi id 15.20.9913.009; Wed, 13 May 2026
- 09:01:16 +0000
-Message-ID: <982b9bc1-0a0a-4fc5-8e3a-3672db2b29a1@nvidia.com>
-Date: Wed, 13 May 2026 11:00:51 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] mm: introduce a new page type for page pool in page
- type
-To: Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
- akpm@linux-foundation.org, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
- harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
- davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
- john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
- leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
- andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
- david@redhat.com, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
- vbabka@suse.cz, rppt@kernel.org, surenb@google.com, mhocko@suse.com,
- horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com,
- ilias.apalodimas@linaro.org, willy@infradead.org, brauner@kernel.org,
- kas@kernel.org, yuzhao@google.com, usamaarif642@gmail.com,
- baolin.wang@linux.alibaba.com, almasrymina@google.com, toke@redhat.com,
- asml.silence@gmail.com, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
- sfr@canb.auug.org.au, dw@davidwei.uk, ap420073@gmail.com
-References: <20260224051347.19621-1-byungchul@sk.com>
-Content-Language: en-US
-From: Dragos Tatulea <dtatulea@nvidia.com>
-In-Reply-To: <20260224051347.19621-1-byungchul@sk.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR2P281CA0093.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:9b::18) To CH3PR12MB8728.namprd12.prod.outlook.com
- (2603:10b6:610:171::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 240A42836A0
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 09:07:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778663257; cv=none; b=EF2W3hTCH5q1MLhgmwBUNhq/gILISiNeBkjIjUuVTB9WJVEv3XbTm34LRpRR3tjlYDBX5GxyEqvL1YB7uxCbCERQX8cdmJIdx15Y1NWk6IVdcDSSmBrOoMnMgSAHPF0K50ikdCcrkgB5sfhXwrsMP8j6qEL6DuhGcBKBQ9GkgPc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778663257; c=relaxed/simple;
+	bh=ERwsM3PJL5y8q+Lhj4NVYS3FtGsrJrNfL6nETyLWeik=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KzoAfv1y0dVivmPNXXGQG2VnEOZIUkHP0uz+fe7tmUwwVBvw1oUlyvI87CuOwrV0pWl60cYa/6SnXw1MKqtEFNtd4x5bogVsK0QH6J1SzuXXsVVlTDE8wdJg/ReZMX5X3LJjVdDmuOrGYb8PjbC7jFPoxemWdQYR+zS3WLdJ68U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J2cq6pwc; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-48e82c23840so28648105e9.3
+        for <netdev@vger.kernel.org>; Wed, 13 May 2026 02:07:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778663254; x=1779268054; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qN/W8ebLgutWz02+3OnJOFBU8z3ZOcJD73mdZlWwDCo=;
+        b=J2cq6pwcDO2IC+Mc/8cYcTi8F1NkF78835iJBAZdO75gebMz+98F2IB9CSI040LdHo
+         2TydZOoxCXlx0M/S1EEieyq/sTl9Z4NNBwJbZXTbm/N1KARxLuRmgoJv7T2+Y2qZG370
+         lXUEEiH0Td/Zp1DwCRkpdpKn571UM+Co/UmVUkL6bsxjxOBqQtcq/uU1aVjeBqSQZRuH
+         YVlOk99sMYmJDSeF4mrvRN+6Ysp7unme3EEWSEzpep9OLcnXZfy/kCAP/Ovnya6i8mFJ
+         l7/8CLXdmPMlxir6tuFTkozkzqxw6ur0z04NnA46vCnpe5zuJFoMROHZaDV4Mzv+A2Y9
+         Bxjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778663254; x=1779268054;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=qN/W8ebLgutWz02+3OnJOFBU8z3ZOcJD73mdZlWwDCo=;
+        b=jVv+vRvIZzF2UCfJLLV8DelsdUgEu8BPuR7da8cHwzfryi3RWXoMPiw8dSSwlIcCLX
+         bbf1/4WboLdl1ci792Y0uJXVbXF7NU8lMJgdXJXJmculMuysNroqL+A0uo2MjV9B9q9x
+         iqzsbRATt3h7r1mAmB8QLREVaoyaU5UKQRQXTI7dSUN7j1rEMG6vZ0hJzgTUTTa/WH78
+         LbE5NVhIY+3nXt4SYKzIMxsrDunY/gJK3dTAZhJE4jC4UXsJI8P6xPdLqzWlLjxTiJNT
+         0+lPgS7TZP76yqgUadjAJcQ+ZXmuxwrRRCgYxwwqH/Ukxx+8y+KYpmgACjpNIH+dGPew
+         wRLQ==
+X-Forwarded-Encrypted: i=1; AFNElJ90Zs8deqVbkWgeOYLFLBZX0FwV9cp3yaEooFS2X/3JvE68Q0smfWBTS0zeNApqDG8W9WK0g+E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDL2tpnFDxhWQmTaFtVCxPWAKmc4SUrOerVdJ93dOUlY44XmcH
+	2nEjlZUht7Q3z2crjLUbqqxmu9IRvyyAUzgzs8XfRyxXqLbMikYXeTTa
+X-Gm-Gg: Acq92OEhWFrvZA5AG9jCzOigfq2Vk9UynFXtCuZDQsMgXBs01QIaZ9RVs7gLo/yhWGc
+	7q8sYUbIx258/gOtLpCiBrGvKenDOehEEm3oRGw4wcDvgcXRan3NS/Cs4mbh1sVI9iotRWPj2fs
+	h5pk8R3CZx2Po30MPPHeAkp0tNnouRyKt+feYlCNRTADGCqaPHsLe3bzxrRW5J08ivaqj1BYdr6
+	bAawayskDtFQT72sED0HIE6m1RavHlXnfnB0GPylgDHWJxLxKPY6ehHLvNopvCgTYrFGmuJiB7M
+	UZCNRB/6OGb2aUjOD7WuK4TLoI5808wVwmvwqdD14SUEVB+BtgSzL1pGXEy+Iv4PJcYOYtCDfNx
+	e6zqxSvL/z+2bDT+NlkWrOAclqEIqCqsDR3ErzoKT2GIa/jDu1zQzLlpK8K8wRfoMDh5+e7QNSy
+	hdGfFQGIcwYARfWxDQw8493p7MIRBoUSCaM4A7bVcldYzg9eCVmjNcPqyupTNa
+X-Received: by 2002:a05:600c:3b84:b0:48a:8b02:ae91 with SMTP id 5b1f17b1804b1-48fc9a0e266mr36229105e9.11.1778663254336;
+        Wed, 13 May 2026 02:07:34 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fce06ca2csm30681655e9.8.2026.05.13.02.07.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 May 2026 02:07:34 -0700 (PDT)
+Date: Wed, 13 May 2026 10:07:32 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: John Ousterhout <ouster@cs.stanford.edu>
+Cc: stable@vger.kernel.org, anthony.l.nguyen@intel.com,
+ intel-wired-lan@lists.osuosl.org, przemyslaw.kitszel@intel.com,
+ netdev@vger.kernel.org, jacob.e.keller@intel.com
+Subject: Re: [PATCH net v3] ice: fix packet corruption due to extraneous
+ page flip
+Message-ID: <20260513100732.499e3f49@pumpkin>
+In-Reply-To: <20260512181953.1689-1-ouster@cs.stanford.edu>
+References: <20260512181953.1689-1-ouster@cs.stanford.edu>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA0PR12MB8716:EE_|PH7PR12MB9221:EE_
-X-MS-Office365-Filtering-Correlation-Id: c5c8a412-45fe-4226-96fc-08deb0ce29c8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|11063799003|22082099003|18002099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	fvva++7zvhN1Ou+9nx5owi3opkAK7Fbb7WrihxLVI+O3lUoMJ+HCtgFw5VRZVf5b4AxtHU8vggV3KvbHNlU9DNvITqMYjZjY7+dyMz3cWEV0ZIFTVvBfxPQPSNI7UvJ0JxujuRPbPCcGt3Wp+3v7SeCsP6YAPZ6uDthmtGKKucSQlmZJA976xQUw/No2F9PcP5+4RbnF78DdpHnCZHRTBP9DB2hpWxwA2isxz+KFEAlh4uwWwKb+Uhf6oihvp0AM6WMBDGQy0AOF/hx+UEODjkuRrLP/S4xIzjsG9KWxlF8Etje5tGmeBIChvxPWRrURgPgcOMaiLSu4S7AavG3iBoxtT7hezoBRNDoi5ttSAKS0FwrNkEJxdLR7+9vbHONhyw8ZGzrVrXmxoy0cZA3BD1gHYCxQzWQz9X7jbsrE88EK8HAwXICsNSmNoDJfGC1Bia8g78VyoW4BJ9LbcRLToECg5/yoldGiFcJVPXBP13qp3e90+eJJtVNlIReNruhpFrXzxBKGmRuTl28r1QO83AN1bGavCxEKHL9vzeJje/89KEA9Bh2cdPrniTIhprg4QRMU2VuMEl60fPzQK8JBF7tO0QEvgjumKPE8cYGm8JnU2bEhmBaXD4rma0oIQtpbWgr0jKmcbDknkFaLeadU1CLOpCMiRNdUwBb4wNswkKRfcXqa1x4MPuWS8K87rHrzYryPcbf5ITIG5npASuWqHw==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PR12MB8716.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(11063799003)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?YUMxL2tFbWFmcjB3djhWVllENUJYYlloc0kzd095OGlYUlRNdjdMbmtGenVZ?=
- =?utf-8?B?bFNnN1E0MHpIdGZpMFJZZlVzN2dLRHV3SUk5VFBKVUcxZFBaOWZDak40MUJV?=
- =?utf-8?B?NGpzeG4wOHpWcXIyWW9kMW9vZHhRWGFoQ3JkcEM4NWFNWDgzZUFOVGRiU0Vu?=
- =?utf-8?B?dHZ3VEF3bkNrdlE1V0toQmIzanlsTC9GN3ZKa2RlcVc4aDdSZmhGUWZSUjFH?=
- =?utf-8?B?MDFhWVJLU1p5RVRKaG1qVHhmNExYdGNrYUNFQ0tYSEd2SHdJSm8zK2dLaisx?=
- =?utf-8?B?OGp4Q2VHVm1oUEY1V1U4Q1dqU2xhMUpISWwwZk5XWituQmhSdGE4eE10MDlj?=
- =?utf-8?B?WDFIYTlyZFBraEpsNkh5WjNEcTNQd0gvRjFDcW9GZGhqQlAwdXg5RmloNW81?=
- =?utf-8?B?empjRDg1THJZMHZMbkp4ZVVvaThBRFNRMm1pQWtnbG40aExDZWZORFVXRjlJ?=
- =?utf-8?B?Q1RiQ3FpcDB1TVF5NnVQSFdyalExM0NDakw4MFJ2VkEvdi9HeGMxYWo3b1M0?=
- =?utf-8?B?UUhEN0ZrQ0JHVU1xYlIxanhiSDhBYm5jRHpPQmdMK3E1cXlaOWsxQzJSTldx?=
- =?utf-8?B?UGVmVGJhbHFHVUN6TmtBbG01M1RWTWRIcVM1MXB4a1BPVEhQVlZCc3B2c3dk?=
- =?utf-8?B?ZkVMNHU4REltTTdIb2hIb2cra3JvcjZGTmk5dGNFRzU2QkRuQ0Fwb3VKOXc4?=
- =?utf-8?B?Wnk2Vyttc2FBanYxZ05BaXVPT0FLSG9WTTBYaGlyMUl2cG85NEVDNVoyUlFJ?=
- =?utf-8?B?TytQbnBSc2hDQXJZS2pLUG5xSURadGxaV1RKeEFGc2hpa1pidE5vd1IwYTNj?=
- =?utf-8?B?cld6MC9IRlptUEhrTXp5SDVmMmQ0ZEdvcHB6S3ZMTkVINUxNMHBkd3phajRP?=
- =?utf-8?B?d1p4VGZTNkJSQkRxNkRuY3B2SG9MMW9GYVlCK01CMnY0aTNBd2crQ2RjK3Ew?=
- =?utf-8?B?UlNxZjB0MnBBTEkvMWx5aFREVEVyR1E5czZSNHdoM1pNZDVrRlI3amRhUGs0?=
- =?utf-8?B?VFRza3dQOHQ2ckJ6cW9VeVFtNG1OZmFSUU1DQUNhVmNmZDNYZjZqemlKMmhR?=
- =?utf-8?B?U2dQRkNCNEVqRDFINVc4cVUzUUlxbVFkMVdGT0VWbVFzRG81TUxGQjZIUndF?=
- =?utf-8?B?OVFGdXcyQUpJbHRqZUhteGRWQnVkbm9vN2lCL2tpMDdHSWNvYkV0dmpzRFZY?=
- =?utf-8?B?R3pRT1I3V0E2MWhwc2paVkVoSFpiMDVxZXBISUZaakdMczQwTHBVVWJxYTVI?=
- =?utf-8?B?djZEVmdrMXR1WUZBaTd0V1FvbHZnRysyKzRhOGE5S1BPV2ZHMVFMdlFJblJD?=
- =?utf-8?B?NGhiQzJLb2dEbVFMb1grTDlXUDZUZFZycTFabHlQWEc0TFgwYXlrUDZoU0xk?=
- =?utf-8?B?OGJsVW56U0M4QWducWRkanphcmZENWpIcms5QldmZ0wrSGlKOGlxVUNGMGlR?=
- =?utf-8?B?VVVRakMydFE5akV2QzdsVkVEVVpreWhvbVVMSVFReldWeVRmTUpHNWt0a0oy?=
- =?utf-8?B?cFI4RVU1cDRyRkRnRlhiRms1dEpGWTdEQml4Y2w5S2MzOXBDbTR0c3pvUk9Q?=
- =?utf-8?B?UVhKWjVmL3VOMXAxaUZkK1owQUZvZUJSV0hQdktNeDcrV0UyT1V5Si82ekZX?=
- =?utf-8?B?cGg2RmN5bUhHa0h5R0diMTZnTG1ROUJKZWhaU2VTUWVvNzJvRmRNTEUrRGwv?=
- =?utf-8?B?Z0hROUxPSjNhcmJGaG9ZcURsL0VpWEJmSkx4QWo1THRWMTkvQVJ2bDNpd3k0?=
- =?utf-8?B?VXB2UlN5NFVOMFpaVjh1c2I0S0lvbGIzdTNDOWFYQW1TL3RLTFkyMlI5cktX?=
- =?utf-8?B?am8vanhKcjJzSGlqNjhLUnFsNXRVMjhHaFNibU9JZnpNYlZYL0lHSTllVkpU?=
- =?utf-8?B?TlB5d0Q2akxFd0d2RzIzamc0OGxsdFF3SVpVUmUwYTBmQWR0YTFucXE5ZFgr?=
- =?utf-8?B?YTF2MUZkRUVwMnFpSFcxblJjQVhlMUE4eWtzblJqbndWNHNLWWp4eWVtMkl2?=
- =?utf-8?B?OFBtSWw4Zi9pcUc5b1ExWm5CQXkwamxuVjNvSFk3VlJ3bVJNc3ZPRmEvZjA2?=
- =?utf-8?B?eDdjYWljUzB0QWFQWlh5c1RBUkhUbUJic2JRdlMrTytrNmM0UFJqdTU5S0dy?=
- =?utf-8?B?V0pzcEVwRStlNVJQTFN1Q08wMElkdkg3SEJ0N1VOWjM4c1BJazk2U28xM3ox?=
- =?utf-8?B?VDlyL3pTRnY5UlBneVo4RUF0V2h2cDFwRDFVa1JETTJHdHZoSm1MVFU0bEZR?=
- =?utf-8?B?QXZUNFRjbHZrZ1Q4a1crY1RwaGpmcVQzcWloUjB1SHEvZktIZkxzNkxQVWVj?=
- =?utf-8?B?dUdPKzNGWE40ajRTalh2bmVSYTlWSkpMb0JQeUZxakU0dngwWlE5Zz09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c5c8a412-45fe-4226-96fc-08deb0ce29c8
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8728.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2026 09:01:16.5905
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /x4Guh25fP1dlvVEXZ70Nc5CimWxVjlBFuxqYlkc1noGqHXoayXDwhEry1lZ8Nm897zKVGRfE075zkbSoZ2mFw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9221
-X-Rspamd-Queue-Id: C59D85309F7
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 79B1B530434
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[47];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287484-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,skhynix.com,oracle.com,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,google.com,redhat.com,suse.cz,suse.com,cmpxchg.org,linaro.org,infradead.org,linux.alibaba.com,canb.auug.org.au,davidwei.uk];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287485-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dtatulea@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.cz:email,sk.com:email,Nvidia.com:dkim,nvidia.com:email,nvidia.com:mid]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[stanford.edu:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
+On Tue, 12 May 2026 11:19:53 -0700
+John Ousterhout <ouster@cs.stanford.edu> wrote:
 
+> Consider the following sequence of events:
+> * The bottom half of a buffer page is filled with data from
+>   packet A. The page has a net reference count (reference count
+>   - bias) of 1. The page is returned to the NIC, flipped to
+>   use the top half.
+> * Before the reference on the page is released, the NIC returns
+>   the page with no data in it ('size' is zero in ice_clean_rx_irq).
+>   In this case the bias does not get decremented. The page still
+>   has a net reference count of 1, so it gets returned to the NIC.
+>   However, ice_put_rx_mbuf flipped the page so that the bottom
+>   half is active.
+> * If the NIC stores another packet in the page before packet A
+>   has released its reference, the data in packet A will be
+>   overwritten with data from the new packet.
+> * Unfortunately zero-length buffers occur frequently: they seem
+>   to occur whenever a packet uses every available byte in a
+>   buffer, ending precisely at the end of the buffer. When this
+>   happens the NIC seems to generate an extra zero-length
+>   buffer.
+> The fix is for ice_put_rx_mbuf not to flip pages that have a
+> size of 0.
 
-On 24.02.26 06:13, Byungchul Park wrote:
-> Currently, the condition 'page->pp_magic == PP_SIGNATURE' is used to
-> determine if a page belongs to a page pool.  However, with the planned
-> removal of @pp_magic, we should instead leverage the page_type in struct
-> page, such as PGTY_netpp, for this purpose.
+How is this different from packet B (in the top half) being
+freed before packet A (in the bottom half)?
+
+> This patch applies directly to longterm stable versions 6.18.27
+> and 6.12.86; it also seems relevant for 6.6.137 but would need
+> modifcations for that version. I have not examined earlier
+> versions.
 > 
-> Introduce and use the page type APIs e.g. PageNetpp(), __SetPageNetpp(),
-> and __ClearPageNetpp() instead, and remove the existing APIs accessing
-> @pp_magic e.g. page_pool_page_is_pp(), netmem_or_pp_magic(), and
-> netmem_clear_pp_magic().
+> Unfortunately there is no upstream commit id for this patch because
+> the ICE driver has undergone a major revision (libeth refactor and
+> pagepool conversion) that eliminated the buggy code. Thus the
+> problem no longer exists in the main line.
 > 
-> Plus, add @page_type to struct net_iov at the same offset as struct page
-> so as to use the page_type APIs for struct net_iov as well.  While at it,
-> reorder @type and @owner in struct net_iov to avoid a hole and
-> increasing the struct size.
-> 
-> This work was inspired by the following link:
-> 
->   https://lore.kernel.org/all/582f41c0-2742-4400-9c81-0d46bf4e8314@gmail.com/
-> 
-> While at it, move the sanity check for page pool to on the free path.
-> 
-> Suggested-by: David Hildenbrand <david@redhat.com>
-> Co-developed-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: Byungchul Park <byungchul@sk.com>
-> Acked-by: David Hildenbrand <david@redhat.com>
-> Acked-by: Zi Yan <ziy@nvidia.com>
-> Acked-by: Vlastimil Babka <vbabka@suse.cz>
-> Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
+> Cc: stable@vger.kernel.org # 6.12+
+> Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
 > ---
+>  drivers/net/ethernet/intel/ice/ice_txrx.c | 23 ++++++++++++++++++++---
+>  1 file changed, 20 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+> index 51c459a3e722..081c7a7392b7 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+> @@ -1215,6 +1215,13 @@ static void ice_put_rx_mbuf(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+>  		xdp_frags = xdp_get_shared_info_from_buff(xdp)->nr_frags;
+>  
+>  	while (idx != ntc) {
+> +		union ice_32b_rx_flex_desc *rx_desc;
+> +		unsigned int size;
+> +
+> +		rx_desc = ICE_RX_DESC(rx_ring, idx);
+> +		size = le16_to_cpu(rx_desc->wb.pkt_len) &
+> +		       ICE_RX_FLX_DESC_PKT_LEN_M;
+> +
 
-Seems like this patch broke tcp_mmap because
-validate_page_before_insert() returns -EINVAL due
-to a page having a type. Here's the full flow:
+Looks like you only need to calculate 'size' for the !ICE_XDP_CONSUMED path.
+You could also use the (likely cheaper) test for zero:
+		if (!(rx_desc->wb.pkt_len & cpu_to_le16(ICE_RX_FLX_DESC_PKT_LEN_M))
 
-getsockopt(TCP_ZEROCOPY_RECEIVE) returns -EINVAL because of the
-below flow in the kernel:
+-- David
 
-tcp_zerocopy_receive()
--> tcp_zerocopy_vm_insert_batch()
-  -> vm_insert_pages()
-    -> insert_pages()
-      -> insert_page_in_batch_locked()
-        -> validate_page_before_insert() returns -EINVAL
-           because page_has_type(page) is now true.
-
-The patch below fixes the issue. But is this a valid fix?
-
-diff --git a/mm/memory.c b/mm/memory.c
-index ea6568571131..4cb12673f450 100644
---- a/mm/memory.c
-+++ b/mm/memory.c
-@@ -2326,7 +2326,7 @@ static int validate_page_before_insert(struct vm_area_struct *vma,
-                        return -EINVAL;
-                return 0;
-        }
--       if (folio_test_anon(folio) || page_has_type(page))
-+       if (folio_test_anon(folio) || (page_has_type(page) && !PageNetpp(page)))
-                return -EINVAL;
-        flush_dcache_folio(folio);
-        return 0;
-
-Thanks,
-Dragos
-
+>  		buf = &rx_ring->rx_buf[idx];
+>  		if (++idx == cnt)
+>  			idx = 0;
+> @@ -1224,10 +1231,20 @@ static void ice_put_rx_mbuf(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+>  		 * To do this, only adjust pagecnt_bias for fragments up to
+>  		 * the total remaining after the XDP program has run.
+>  		 */
+> -		if (verdict != ICE_XDP_CONSUMED)
+> -			ice_rx_buf_adjust_pg_offset(buf, xdp->frame_sz);
+> -		else if (i++ <= xdp_frags)
+> +		if (verdict != ICE_XDP_CONSUMED) {
+> +			/* Don't "flip" the page if size is 0: in this case
+> +			 * the data in the current half will not be used so
+> +			 * it's OK to reuse that half. And, since the bias
+> +			 * didn't get decremented for this half, the page can
+> +			 * be returned to the NIC even if the other half is
+> +			 * still in use, so flipping the page could cause
+> +			 * live packet data to be overwritten.
+> +			 */
+> +			if (size != 0)
+> +				ice_rx_buf_adjust_pg_offset(buf, xdp->frame_sz);
+> +		} else if (i++ <= xdp_frags) {
+>  			buf->pagecnt_bias++;
+> +		}
+>  
+>  		ice_put_rx_buf(rx_ring, buf);
+>  	}
 
 
