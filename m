@@ -1,81 +1,69 @@
-Return-Path: <netdev+bounces-287392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287393-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sFR4AB3lA2oRAAIAu9opvQ
-	(envelope-from <netdev+bounces-287392-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 04:42:37 +0200
+	id yNKGAXPoA2oPAQIAu9opvQ
+	(envelope-from <netdev+bounces-287393-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 04:56:51 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E618752C523
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 04:42:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5209552C793
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 04:56:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A4F5D30071F1
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 02:41:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 88A153048AC6
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 02:54:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3258B35DA55;
-	Wed, 13 May 2026 02:41:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 448E33644BC;
+	Wed, 13 May 2026 02:54:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="EP+tYA3g"
+	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="BFn8QPB1"
 X-Original-To: netdev@vger.kernel.org
-Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.53])
+Received: from n169-110.mail.139.com (n169-110.mail.139.com [120.232.169.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933001EA7DB
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 02:41:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E30FE38A71B;
+	Wed, 13 May 2026 02:54:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778640096; cv=none; b=Q5jEEaR4qaSqWqtmWZ98SPk4ir34WXsdksoMnBmJKZnGj0xFjY0NdKSzZIgeLMD//EFIe78dN1V30z2iUZKTT5ce8J5BZhHKpqIzW7wYDcpKarl1LydU1U3s5OWLAzGw9DXgOcpAhFlm/rBOf6HGzqq25x3FHYU2qRe2SlkMw2Y=
+	t=1778640846; cv=none; b=UraRJ5AojdL/DF0PR7o8NLvg5nyGz2OePprLFH9h/f1bLzx83wvHNBfw7OJ6De21WQ5Hi6t5M1p+sfjFih3STvfFxkmLzhaAWHWqaasdZXa7rE9IdM+xWNLOFcjLi0rdfSVwt1tL3wmhVv+NxzX/JWwPde6pNZTNXIVMnFkuRDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778640096; c=relaxed/simple;
-	bh=1mhpvweEuvC1qmquIvbyseT1tmctLqLlH0MSE1j3GJA=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=dzTpFM4bOE5NEVqPJqOyCxf6ptWYDtZAWHs5vFrSzMBXbUTMKwp0qbCgGtpTAimpewEPW0DNj+hlLEgYPR2e58s5yZCcLQjaflBTVnBU6QHUBqp57tJOqKWB21Y00XluQbr5R+rHI4IqR4mo9v1LkCBtuD2LDys2yHvwR9fsxy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=EP+tYA3g; arc=none smtp.client-ip=43.163.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1778640090;
-	bh=WmK2zD20CENFt9liQTaBLnpOLexRN/pxML6fuKKLXTg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=EP+tYA3gtg2tOhAtcHFMe8bGbkJQMP0+9HZpX7+S0gK84geFiaw5Y/SX+qxtkDnp4
-	 9LpEDS2juxQJcLDTp4+O4aT7OEbPviUFJJAVTGKNpzIDL/xH36kadsbpOdUUTLq4N4
-	 dQSEwzi4ahhqIJ5mnp691wyNz1jRhSHlqaXZgYnI=
-Received: from localhost.localdomain ([116.128.244.169])
-	by newxmesmtplogicsvrsza73-0.qq.com (NewEsmtp) with SMTP
-	id 98BA4C0A; Wed, 13 May 2026 10:38:11 +0800
-X-QQ-mid: xmsmtpt1778639891t0uemor3e
-Message-ID: <tencent_3798BB6EC69DCB45BBD25D7CF1C5CDA8A806@qq.com>
-X-QQ-XMAILINFO: MStTOrhA1CLVaRSBH305IXsZaobYd6KwaSW3XUDY24KyuG7vD0pH4RwMrIjlIq
-	 o3oRkkmkEACPdVinAapm1SGH0+o+K7vWfdzVp82ODu0zq4wFlQv/PFqOW85LMd0qVEd0VelOWqIp
-	 2JxppSSfpArMZ+L/tXN5TGdSLzYUO7Fg4oqErrub3zBKufC7Y6cGjswfojhOvCbtX5Y33nlzxmpF
-	 GI8h8zKgxuRNxrYcY5rpxyKCW1l9MSO2jnYFP6ZVztWavgLvloPtcnueOPUvCtvQBjKkFs376Zo2
-	 6g29ogjsmQBTp9zUfTXb1CHCYPRO2Bbur8GuZehEClWwe4R/1U8p4Z+GjZeRQzYDTcwLApX5eFv4
-	 uc4unZU8H5wk1w68Ae+bVa1I5wyuMTB8z+ce5n8WdBrJsKXMnRT1yXY6Jd7GG2QfdO95lZfa8xqz
-	 BMgu82rRi0pydmek0yxuHYNtjCqUVWwiZxDH0mK51sHSoKMwZGHnVy3KjVq+DvxKFE/qn6u6ZPcZ
-	 Q48e+uT+GQWB7+B8LAeGmh4yy4+KEJaGw+mMGMgQL2RY2nSZmaIn3hYUBG6z7fUHHw+JzYqMnVvi
-	 IUXyNTrhQte8aP+j1uplbcNRysnDSO2GOZcRq1nxGB+DViSrN3AWEfo/ZZiy79V0UmNSScP4/+l6
-	 oLwuJMS8ZdP9jfDefZO4Nnvzhljm735f9bm6PWSKmp6QHvYvmIAC2Si7JOM6YVhvy1eHdzCX1NTP
-	 F8q/L7Wx/rkhbsXZpF69C5NaGZpMVIvBpH5g3IMQC0iWbuItkSljoVA61toiLfMb+jiwrc5N2wwK
-	 AvxZfvMjE6Ihq8eXEYCO16VXBR5NSNWAXj9knvuqCDordfza7DPrPdwf7SKrt5po/DFRYQwH5leW
-	 uPsM4b7PR7nYZVM1tO2ogFUAoA6dTATyTchgxdvO/tDARWv7SS2Etvpwh40/zuCf5lrMDwDmh5Zy
-	 xcB1NBLxcN+oNUAsoNiH0ZFGyL6VrGvGu3xU8yUjrB5Dmhfr6drw81RSfUoY4m0A+JRCxzKwTJ9J
-	 ybPT9fEgu/7O5kO9fjqtuM2oYFl9Is3hGIyjqtnw==
-X-QQ-XMRINFO: MPJ6Tf5t3I/ylTmHUqvI8+Wpn+Gzalws3A==
-From: Zhao Dongdong <winter91@foxmail.com>
-To: andrew@lunn.ch
-Cc: davem@davemloft.net,
-	hkallweit1@gmail.com,
+	s=arc-20240116; t=1778640846; c=relaxed/simple;
+	bh=h81wKV3WHFoCuwtNrhGiVPTt55Ja70Wq+uFWGB7Lg4k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VQtCWTZZNn+it2ykmDe1lKg4mDgbcQA0wqQSQK+R5hON98WqejUX8+n5GUVREdZ5VUZD66CKcAuo6DNntjW6xugM9IDiONXw3lGwTnLbxHZiLkzl/yT3fYNQ92yjhKIOqh4woxMLKLUS5Als0LYUo+NBhJQZTTzg2ET6XRPcSjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=BFn8QPB1; arc=none smtp.client-ip=120.232.169.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=139.com; s=dkim; l=0;
+	h=from:subject:message-id:to:cc:mime-version;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	b=BFn8QPB1NlEX3gA4eJ5OAU6A9CCZggwhk4LlxmqkwDgvKEZbU04UjQNK/0kU968oylIVXvtAZoeys
+	 o51hj65Jc2avY5RzHve0rybXCSErSxnmZdkq/wUdIVnNMeV1f8EYIDSVjLmzeA20KeshxnkKcKu+vC
+	 A2YqUqi7TsRrZ1oI=
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM:                                                                                        
+X-RM-SPAM-FLAG:00000000
+Received:from NTT-kernel-dev (unknown[60.247.85.88])
+	by rmsmtp-lg-appmail-07-12085 (RichMail) with SMTP id 2f356a03e7c24b0-04504;
+	Wed, 13 May 2026 10:53:58 +0800 (CST)
+X-RM-TRANSID:2f356a03e7c24b0-04504
+From: Li hongliang <1468888505@139.com>
+To: gregkh@linuxfoundation.org,
+	stable@vger.kernel.org,
+	pengpeng@iscas.ac.cn
+Cc: patches@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	davem@davemloft.net,
+	yoshfuji@linux-ipv6.org,
+	dsahern@kernel.org,
 	kuba@kernel.org,
+	justin.iurman@uliege.be,
 	netdev@vger.kernel.org,
-	winter91@foxmail.com,
-	zhaodongdong@kylinos.cn
-Subject: Re: [PATCH] net: mdiobus: add mdio_c45_bad_oui_list for
-Date: Wed, 13 May 2026 10:38:11 +0800
-X-OQ-MSGID: <20260513023811.99362-1-winter91@foxmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <031a1fce-259b-4b1b-95ed-2917a6b81659@lunn.ch>
-References: <031a1fce-259b-4b1b-95ed-2917a6b81659@lunn.ch>
+	justin.iurman@gmail.com
+Subject: [PATCH 5.15.y] net/ipv6: ioam6: prevent schema length wraparound in trace fill
+Date: Wed, 13 May 2026 10:53:57 +0800
+Message-Id: <20260513025357.3161377-1-1468888505@139.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,61 +71,87 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: E618752C523
+X-Rspamd-Queue-Id: 5209552C793
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [2.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[foxmail.com,none];
+	R_DKIM_REJECT(1.00)[139.com:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[foxmail.com:s=s201512];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287392-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-287393-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,gmail.com,kernel.org,vger.kernel.org,foxmail.com,kylinos.cn];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,davemloft.net,linux-ipv6.org,kernel.org,uliege.be,gmail.com];
+	DMARC_NA(0.00)[139.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[winter91@foxmail.com,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_FROM(0.00)[139.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[1468888505@139.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[139.com:-];
 	TO_DN_NONE(0.00)[];
-	DKIM_TRACE(0.00)[foxmail.com:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	FREEMAIL_FROM(0.00)[foxmail.com];
-	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qq.com:mid,kylinos.cn:email]
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_SPAM(0.00)[0.929];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,139.com:email,139.com:mid,davemloft.net:email,iscas.ac.cn:email]
 X-Rspamd-Action: no action
 
-On Tue, 12 May 2026 14:26:48 +0200, Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Tue, May 12, 2026 at 04:25:21PM +0800, Zhao Dongdong wrote:
-> > From: Zhao Dongdong <zhaodongdong@kylinos.cn>
-> > 
-> > Added the mdio_c45_bad_oui_list to facilitate adding more PHYs that
-> > do not support C45 scanning.
-> > 
-> > Signed-off-by: Zhao Dongdong <zhaodongdong@kylinos.cn>
->
-> Please make this is patch series which adds the PHY you have which is
-> also broken.
->
->     Andrew
->
-> ---
-> pw-bot: cr
+From: Pengpeng Hou <pengpeng@iscas.ac.cn>
 
-Thanks for the review.
-The PHY driver hasn't been upstreamed yet. We can bundle it with this patch and submit them together once it's ready.
+[ Upstream commit 5e67ba9bb531e1ec6599a82a065dea9040b9ce50 ]
 
+ioam6_fill_trace_data() stores the schema contribution to the trace
+length in a u8. With bit 22 enabled and the largest schema payload,
+sclen becomes 1 + 1020 / 4, wraps from 256 to 0, and bypasses the
+remaining-space check. __ioam6_fill_trace_data() then positions the
+write cursor without reserving the schema area but still copies the
+4-byte schema header and the full schema payload, overrunning the trace
+buffer.
 
+Keep sclen in an unsigned int so the remaining-space check and the write
+cursor calculation both see the full schema length.
+
+Fixes: 8c6f6fa67726 ("ipv6: ioam: IOAM Generic Netlink API")
+Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
+Reviewed-by: Justin Iurman <justin.iurman@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Li hongliang <1468888505@139.com>
+---
+ net/ipv6/ioam6.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/ipv6/ioam6.c b/net/ipv6/ioam6.c
+index bb7ad0d1cacf..765b87c18a4c 100644
+--- a/net/ipv6/ioam6.c
++++ b/net/ipv6/ioam6.c
+@@ -645,7 +645,7 @@ static void __ioam6_fill_trace_data(struct sk_buff *skb,
+ 				    struct ioam6_namespace *ns,
+ 				    struct ioam6_trace_hdr *trace,
+ 				    struct ioam6_schema *sc,
+-				    u8 sclen)
++				    unsigned int sclen)
+ {
+ 	struct __kernel_sock_timeval ts;
+ 	u64 raw64;
+@@ -863,7 +863,7 @@ void ioam6_fill_trace_data(struct sk_buff *skb,
+ 			   struct ioam6_trace_hdr *trace)
+ {
+ 	struct ioam6_schema *sc;
+-	u8 sclen = 0;
++	unsigned int sclen = 0;
+ 
+ 	/* Skip if Overflow flag is set
+ 	 */
 -- 
-Regards,
-    Zhao Dongdong
+2.34.1
+
 
 
