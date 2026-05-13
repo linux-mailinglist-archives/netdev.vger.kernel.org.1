@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-287533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287534-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qDF5AhhZBGozHQIAu9opvQ
-	(envelope-from <netdev+bounces-287533-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:57:28 +0200
+	id uK3XKyxZBGozHQIAu9opvQ
+	(envelope-from <netdev+bounces-287534-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:57:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F08FE531B91
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:57:26 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B57C8531BA1
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:57:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6545330237D7
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 10:57:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 855E8302FFBA
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 10:57:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 526063F2109;
-	Wed, 13 May 2026 10:57:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4343FA5D6;
+	Wed, 13 May 2026 10:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="NwrhZ/xC"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="idwC4X6J"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013024.outbound.protection.outlook.com [52.101.72.24])
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010054.outbound.protection.outlook.com [52.101.69.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45103FB05B;
-	Wed, 13 May 2026 10:57:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECA83FB040;
+	Wed, 13 May 2026 10:57:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778669824; cv=fail; b=tIN9zaPclpJXP5fXs9J994ZSTnIVJHNJFwS35KWu/U036+OcFeZHFfnd7grnBzvESYXfEl13fpTTq+tPL9yIYNk9rVkvzbobjBPrDVmySdfgYNXdS8+rdqRuuyIMuUtpZdz1o89P98k43GccFAzu/XjUda9hiNufSRQ1P4JQJB0=
+	t=1778669830; cv=fail; b=mFpBerUabcBb8h3j3Nw4DLtfIvrq1FSuutKgdzF2T5j1xpBBdoItEeUMxlIE91FsxQrmXxfLMPhGak3Q/bNh2jD7dtMfZ02Ep8fZiHVS8YxAAX+HTnD/4ShSUXif4MkK9g4Np/KHP1Q6wDqw0GDxcP5QwJp2XB8cBPiqVHPA1Us=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778669824; c=relaxed/simple;
-	bh=Z1JfiqqHEkkNtT8VcxL1giiotJZURYF6B3NqxvyGFrM=;
+	s=arc-20240116; t=1778669830; c=relaxed/simple;
+	bh=+qmoWEHQGJFcV0Ckc8tN7eMS7M2UtpJpna1x+izfgGA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=czWwzC0g1bK0cmP/wT5Z2be6+p8+rXk9ZmVohu6fD/3nfHZwtDoDT5adU9R4q4qgA1UXTy1K+jf+YglQqa5STyJegzxFUJuFWBNLOoyOHUE1dOpfif2fGoQtlcRU3LOWriGSiLV9IbdhhECdQEXELyb8J9C7b/EKlwW4eCTmQ4o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=NwrhZ/xC; arc=fail smtp.client-ip=52.101.72.24
+	 Content-Type:MIME-Version; b=mIYJNuS3eAz6p4rPkIPimxrbyDxxfHJZbNatW/ZbPP3HrLC1aoBe+UuylxVm0C20AAwpVQJNAeoew5VuM7bs3NTsI0TQlQAbKmxkX8vxjSzZGQm7IfrQ6uXnhRc4ejrWApdCsDSROvNlwtpVfcfjoHgijhB10rYtUXpZtzPcSJU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=idwC4X6J; arc=fail smtp.client-ip=52.101.69.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TKzYkv3pUUxrVAeRLfK85PC88xeWAMjuwhUVV4AO/8NX650rxcne3dzuwFDpbZku3szisvjXRodG+8KwKQ0P7kOgNYr8luT+CesJQeoDm5uY0LoCQJQeDSzm8wTlDiBouJbsvcRmoC0XYLuCtcHWK/aPQBbNlizHmPwMXIJF7jN0PMoJp91Xby6xbyFv0V4IfR/VwSq/RpyP0ouCJINaxAre3+g4OLomKm+ZA6gbF+rAkiDjtecfonPyp6ZgYmenKh1Gahz6qMWSmEE4oYPWxFmp+39UmKGDSXy3v0W23d2XxcSVk/LXcAc3W+LdLTmLuYSkI9rAkaWTSWXJG1zvDw==
+ b=M5B9cn1CELFtbhV/kxBpeKHdztmFU3ackTrGgulxnD5KFoHevymZsLt9bgPyN80eMUevbX0wsVCPHG0ZZWNWhysiwKiAEkW+vInZ9lu+VBMtk2WpAG5qnwL4JzqhX03XRnOlr44Bz1QbbKhtIw7Qw+W7W4cCNpTGlO0mk3qhOyL/4EeQwi3hd68a116QubhM6xjvKdATkjLm0zz8kNvaIzFmQrvm6WdFeqONoQVzOmSOyMmqbi05XPM1Dy8vrnNRKoCpZjMTqazpj79VwqGcjppoZWQqmSEd91qnGzoUjuCQ/NgkK2rfsAnwxpUA+moQhzVmhZnnaCSt2eE5/RnanA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uvN68+eALDE7l62J9EyB1CDq1+TkfzMr/LqAjqMMMnY=;
- b=RK7lhFlup7ohB6+5qRWtlm7ciw6cHTleXWQ+cp26adfpqFLqrxUoXcUhntLqGHJUhc3U+cdSOTdxgNEM+5bHwS8Z96/JYYi3n8+cbodWuUyDzVEdJ6Kf3ZsY02iAswL9DIlnEJ/K8ulkjKQQyr2eean6d1jXAriIbVzEnuAbKF/VITBKHH7s3nRoa/Yi4kqje/z1+38EVomB95e9RhiYWypoYgN2kkApNbhc6/jJvzbpVIJh2MMD5q/GNo8eJHdY7SzpHJeYUIQCA4r0xt3SpyTfO+aS+iW43tcv0bfHnjfGODQnDDMmokxQ1vYTNQgjU2edwnmYP9cSMZMNqJWgMA==
+ bh=5up6Q96MH6+oFPXQZWxL/Z/eBOK/+Luh2aBgHGwKesQ=;
+ b=OXhNL6kS/ydDvSjY56JsB5cJMYmi6HGKR64uS8xbxsw9GFbs4NvauWjsc4PHjXigY4wsc5ALp8fPCZO0bc8CW7dYZ2Hv6+D02nvZTyY39M3rvtwYZb1nOz7AEyj7mXkEYHy0eXV2R4rj/e/g8ZqbSDMZjmTnbtiN/xfrjVu7E19k4G0M3xNGcDnxWk4XEVyAvKfu0Lqn5a6KD4V2HYBiZCqX6Piolr6EUaGMta8oE4BBRKor1CEaLvpGoNQCVqFbtZnZmxTzJ9wYtUQFQF5YO9OH7JKC87EzkdZbEMI589LdW949BnZFmOXNuude/p2QAuVzk8qGqjMLJ4qbAcmftA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uvN68+eALDE7l62J9EyB1CDq1+TkfzMr/LqAjqMMMnY=;
- b=NwrhZ/xCrnCKGa1KDd5JPctBtECr8EfxSlQelF98CkIrZsC3k08Z5bsp3GLyDnde9zMn5/ZJ5CgFPEWByYXYygiwUUUXNBI9/4wZOb4nA+l4riP+Qj5O8McWFwhtfPpr8ajqLYjtyY1xhTAPzXXUXS+SHJcIJqM2XqC+YuMRdhHV4hnyGloBxqEYXyAaIv1MCWhkM3Tg9fl6OG/2g+U6jNl4ED3958zhD2W95k6D0ISS8Io43ada2Xeicbe+jhMNdOdUsTv0l3s7JncelAlnom2q1LI8PpeSdvRnYcM5Cfb/SY3DeD3/jogSVUQENuHp+v7PvqrRFBiNGtlVMf0G1Q==
+ bh=5up6Q96MH6+oFPXQZWxL/Z/eBOK/+Luh2aBgHGwKesQ=;
+ b=idwC4X6JmUnknRzotFPGkP07KZq4YgRcOw86ppM8c9jkF+4nqRKi2PBtvHUYys/EuP1uTWc4yPIvj1lXcqJnMw0/NDkbBD9LVI7VXQa3XpuQ6nfpUJP03SkQnCr/38hk9nPcOUvAoT3Mm0OgPGa/DEvR/LSh7L1r6BGKIlo2hc84KSeT9th5c2+F4aVpeg8Qp+1nw1WOyBeJiQqdik6uRdHZNosxfNjRRbWTUS5ONGfJmIq0UIt0o6rWHyIko1jYHlQLicGiS7TtYif7B9cZxJjVo0P4pTwpQMhi5dxBQR7OGSWJE017nUUyWiHKjymtu5okYU4ZCoA5SOc74nV1tQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from DBBPR04MB7500.eurprd04.prod.outlook.com (2603:10a6:10:1f4::16)
  by VI1PR04MB9788.eurprd04.prod.outlook.com (2603:10a6:800:1d4::6) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.11; Wed, 13 May
- 2026 10:56:58 +0000
+ 2026 10:57:03 +0000
 Received: from DBBPR04MB7500.eurprd04.prod.outlook.com
  ([fe80::c291:543b:4bde:cee7]) by DBBPR04MB7500.eurprd04.prod.outlook.com
  ([fe80::c291:543b:4bde:cee7%6]) with mapi id 15.20.9913.009; Wed, 13 May 2026
- 10:56:58 +0000
+ 10:57:02 +0000
 From: Wei Fang <wei.fang@nxp.com>
 To: claudiu.manoil@nxp.com,
 	vladimir.oltean@nxp.com,
@@ -72,9 +72,9 @@ Cc: imx@lists.linux.dev,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	catalin.horghidan@nxp.com
-Subject: [PATCH net 2/6] net: enetc: fix race condition in VF MAC address configuration
-Date: Wed, 13 May 2026 18:30:17 +0800
-Message-Id: <20260513103021.2190593-3-wei.fang@nxp.com>
+Subject: [PATCH net 3/6] net: enetc: fix use-after-free in mailbox cleanup on interrupt race
+Date: Wed, 13 May 2026 18:30:18 +0800
+Message-Id: <20260513103021.2190593-4-wei.fang@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260513103021.2190593-1-wei.fang@nxp.com>
 References: <20260513103021.2190593-1-wei.fang@nxp.com>
@@ -91,59 +91,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DBBPR04MB7500:EE_|VI1PR04MB9788:EE_
-X-MS-Office365-Filtering-Correlation-Id: c9f5c48c-8e64-4b81-6bc7-08deb0de5a9c
+X-MS-Office365-Filtering-Correlation-Id: 5154eebb-b560-4622-4aa5-08deb0de5d2e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|19092799006|52116014|376014|38350700014|11063799003|56012099003|3023799003|22082099003|18002099003;
+	BCL:0;ARA:13230040|1800799024|366016|19092799006|52116014|376014|38350700014|11063799003|56012099003|22082099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	M4LZ1yLLmb9eUGojZVH7Z7mPVLoyVOJR83mbJZLCjx/P1QIo/Tb8ah/xXMhNAROgq8uV2vMucIUW85xq4ssL7bEJdwI1yOP1eXnsdQ9l9s1hE0SwYS6rdEYOcpEM6n8/4eJrEVbywfGXnY07dlpBgwlQgt6JXE43CAToem8b0N3SuQ1z+dajK8dQZrBMo/EHGnOUN2VcXQYq1RQAO5REzU6Y7jbsYT+/IlK2Q01f/RKFsN01i6wMXskD8xu+JSESN8qt7I5J398UjOGpRr0e/dtEK/RV6QZLG7J7bZC9nSgLkjHVqucX/qYxrIbIOSdKiBxg1DJUR98XRWfh8GgzdsFcUqLEOLAyjPNE5IjvaUGSvmlyFMqYGdSjkHUkx2Oze3tVRqrP4OScUkeuLZtpzDncv3DCVrX6z4unDdP+0nnge2jthZzzBABNuW1/ZzOt0dzCR5oEPaQsom1VfbViEm9UvRdKd4KWEfDf1yWdGTShwAHKXMyCMPWuPXVIiGpq9ojFKJSPOHv83PPZm7hIvwNeS3jDVY3F4TBUeKzYXKacupWkFyJvpalmOwvQfdLg0v74C2oPAjw2dVAGMyh/2zXRUyyYu+zWLtPa2aOd1Ef4uI45cbJcCjN/ocrDKwk8ruL4EzWywyBuzatISXOJMa/yHG6Z4qT1BKKB7APlMEddU4KBjEON0N41y3k9RGV0
+	JT+Xg7TWfAWgJ8GXf7nRb8Z+XyRNE4u/J5ZgwU9fArf9LdHHK+fgJwl7WFHvvgiaBO059u7o+wpWQx6m9LXvE5CYzLC1of20WfpfLgYzypGjuF81RZEM949kEZiEUsEHPXSbYq/TlXIuXZWl1CU6JCzcd35psUER6XYGlQag898fNr5qsRC5AafIcXaWqC6ct5KQzSfqBuStygKA0qcEyeXpRS3SWeiLTxsRtd9buGijq/+CywVn4Mk+Ejlx0Kk3JtqSpXztCvv8Zi3u0n1YtDEQJiUjff5C2gRLKeop+YHqQBsjEGuSFfNVFwHbniY+Mk6UdlQ7VwFNYvmxq8nV0YxvNx6zuvu4IYkt0ax7BwQRtK1eVdoEPtGIiTE8/po4yECg+JAz8i/0QpFiWeo7RLakQAsvUVYicJiUUDjN3oImeY5JuK8zx1KMukf5jTMOWsNLq2gPJ3G1ySn4keS5a8aB8u2YSvtKGHWWCKt9fGAL1yVKw+AixT58PgMCOVCCSbRGj1YpS/NxDyIy/2WmOtRajYGvXI746p26PSvOZEzpxr11DPXxY1wAeBBKyYFoowyUYd/NjvKGCXzN/I/kLP8gowhrbkFE3YMJI0jqPKCAV82+CCNb/f3k1StGCeRGKo0x2VmCXC/e/vVEDjSDo/poteV3Ydvz/ixhXiqim6AD4yIUQ2TVEdnQgsXRhbvq
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(19092799006)(52116014)(376014)(38350700014)(11063799003)(56012099003)(3023799003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7500.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(19092799006)(52116014)(376014)(38350700014)(11063799003)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ra/8NxKUWN1R5UPlyQS2oTyFqy9v759Ilk+nTlUHIrnubnmhiyu1yaIIrngU?=
- =?us-ascii?Q?6ltINjkkk/hAZgYWq6rPinjkKNhqE917/f5ELAFkCO5UMZJD4OsPj6uKtC7y?=
- =?us-ascii?Q?KngwmZ6N8PcS4aUPO3kUkvczwXsbXdKqZ4S9rrec/Tt7FDLRPC+G6FkmUD5/?=
- =?us-ascii?Q?xs/roi2Vi51JlPSTQTC2f4u37DJ/7VuWCqX5AExB2tLWya5ZXlmQkOYSI0Li?=
- =?us-ascii?Q?707+oxwSVX7IPPig/CUIJoypSFwaoylCColwXm02ad9U9USe0pStx/JS/caE?=
- =?us-ascii?Q?O7eAsNBpdcVtGqG4eJ26iqCXBwGNkwEG2WY3CmtNqEfU3LpwLrbvtkD7PVxh?=
- =?us-ascii?Q?oAzu7p0Ur3nAaoU1c4OwJsUxLA+usgSjhyq9uqh+A2ZWRAS/eC77HUUOgLaf?=
- =?us-ascii?Q?pMrW4uUzW20+UukXB/r/Nt25AcD4mjkWMw3uvy7w8G+UKyRv1O4Qp19EmFb+?=
- =?us-ascii?Q?QeHW5TlHdMgSb9cCsc4qUYHgbWGDA56bWNoJ2lyM4KsV1o2SXeJ38zZlNQzX?=
- =?us-ascii?Q?ehERCILM030D8yz2tU9Z6ECf9CWyupuntijHLje9GvrVqgnU47Ig+YsYKhLe?=
- =?us-ascii?Q?7C7xhoUJAldxZBm+3/kBVd09mBDC9L3/TWdx6Xv9YyiaKyU8hydaY+Z7kX2E?=
- =?us-ascii?Q?z77AcjMTI7OVJseujpp696u+A9PaEhhI7JWvMh3Kg/xWu9nwLUuoDy6CYIEr?=
- =?us-ascii?Q?URxTpcnjxGI3sOR5+lz3mGj6wXJQnY+64yKVq2IltdiVenVsgklKKJd+x7Ia?=
- =?us-ascii?Q?3hJeRtjoiRs74scNii8Ggw4JAOBb/X6pIQAMWHR6fti20a+AYSAzU4EY4axE?=
- =?us-ascii?Q?uTgHXvwPEo+GpVbxn4XJJ6gRggVHFpRmns+ANljKoAFFpjzsTsTtk9hr8Wud?=
- =?us-ascii?Q?QcETvC9OsND9pb1O7fN6wI/7CPorB3Dut2Jos8ezmZ3L2mouoRTHBWkMUNiB?=
- =?us-ascii?Q?bz7msQQY9jrrRXaHzowx3ApnXyldqem5S/EBLiM9ClXQ2u3KxbNX3XXbps+D?=
- =?us-ascii?Q?xU9uBwWSn/qESgJqheiNzyl7jNTqlWH4iU0ORnaNmRgzfLZ94kGJAEnfDYWV?=
- =?us-ascii?Q?9GXKITi8BkPGEd7/xFdkePSouF+YM1rbhyLVh9NKpQyaeJv+6uGKNEijNNxV?=
- =?us-ascii?Q?zXzZQNgsIhGmcxWOWn2LTHd0i++vf4TZtB1UQx0O5SG8DDewFmBac3sH2WPA?=
- =?us-ascii?Q?ylFu2G6dfOpqdzZgZQus/i2FONOT1KghU0QZ3bs9uV0oMWbTbV7er/LE14W2?=
- =?us-ascii?Q?lmR3bLHaNtwbSgaVuz+0pAlvcV+7z9In5m2xziPGriJZVvMEY64qcx1feYkf?=
- =?us-ascii?Q?Enw6djPmlLKwcV4RZ8ut+ZIBBmR41AVPxJ8bF5DiZKehZMFJDMu6IPoZRQAU?=
- =?us-ascii?Q?DkQqeiA7fNlvEZbV2GoOYrOYPRyy/ZPD2QXcVT0dovWIKWT68aScGQkmclJk?=
- =?us-ascii?Q?oSxAWOdo6RhM1ntp6fE/DDRvrPSFj7H/pfKiAc28Q0fGc8ytSUv3mumDf4UZ?=
- =?us-ascii?Q?2z7YfLlMlxJNDXqLCqUuiNtGFcJvbD/FrPqw4+1UCk5bq9A57TijUK5/Nf7s?=
- =?us-ascii?Q?JHMj+MaBv8Gbn+UIa4Gta8jwCwnJMDGVSjFf6rgfptLtSw952/aFR54ZrJ8I?=
- =?us-ascii?Q?CIG5gan1LFjcdYwVB5QVhejwwhtxX5zwyjApWh6Wtn2XO6821pvQH2J01FMB?=
- =?us-ascii?Q?OznlG2OGjm461mRsriVmSVgvuTD+8D772Ln50JMo8xaHOnoPjh3oHiAVT7nm?=
- =?us-ascii?Q?YZwMD1qDxA=3D=3D?=
+	=?us-ascii?Q?QuPvThMNO5bnSf03IcaqOaf/EbB+p44Rc3qQ+NvigLC3jLLk/62Z1WcUN9m0?=
+ =?us-ascii?Q?MIXsi9gUxIZ4r0NLCDIj9R2ubWHwUNRO3Ebzwdj6cYa1Sa1hcm+1TS6dAS+P?=
+ =?us-ascii?Q?NTur60lHImOn83y/XKVfB1yxLggD8suyfd12FesgpVADj8IV5AYaFwueUOq7?=
+ =?us-ascii?Q?+3tpmt6QE2gZ4Vow4kz2YMYBbdDfdD0e6UrRT+JheVNzNMuYcjxCm8pgFE8a?=
+ =?us-ascii?Q?S1aaFQGj1880ZeJoZghSWZCRvpqyj3K7FecUQFoG8c6yIHphrTX+4aYdD43a?=
+ =?us-ascii?Q?6jm4fGZFxTdeKBNEzHFFalg6wmAvmFn3FVdw3ci4584Q++PMNM9CrnSvJFQ1?=
+ =?us-ascii?Q?QAWvIXA3xn7CumHaZR2wQKrRKH442chmXDlCiHMM+U+lEwcc5akLA/O2Cp6J?=
+ =?us-ascii?Q?4vmtigwQk90V54UgiajRc7SbiVlHCkHfRCyhmwcbZjWtio5rIhyBXF8B/reN?=
+ =?us-ascii?Q?YPzfMmXXOMa/i8JWdrFO5oRQL2IbGbATpNE84cxcG0SjKDPaIWXMfps7ec0T?=
+ =?us-ascii?Q?SF845EzicpKjVF2VxmrXB/PYqp7W676xVAAPFROgBBQFLCQ8h9c4MHI8qZny?=
+ =?us-ascii?Q?n/loquZdqvEuFG/XTIexudHk7akWd2EBeVg9k0u3RwPjkIdpZgUeZ96CfZi7?=
+ =?us-ascii?Q?ZnSB6qFA8s4e8EIfz2PR7FfNKhadd2S3DsqZmxoByyNnUlcdQcqB4U7Dshwk?=
+ =?us-ascii?Q?QTGqSNVa7jsXy8+p6atvCGSSEm2FZhKU6xNG9KoYLp/ITHmlrsNv2wFCyDJW?=
+ =?us-ascii?Q?dp4x0+gK62ZoIqKbyc1DLQYR7OTkt0lKTOsVmh73iJdM9ZA3sNJQicApLYWk?=
+ =?us-ascii?Q?o8C03BR5ScUF5eR4iynaQG5XYgtIbpZtZb1Bakabn9F34gFVHriv3M6yAzAq?=
+ =?us-ascii?Q?r4dc2ZIRQ8TQqd5BoFrvQxQ6dZMxu90trACf1m9AygpOuXQluM3VzyTYqcyV?=
+ =?us-ascii?Q?IW2ZTNbAoAQZIOSlbwGJx0pgZI2Q5IoCxzRVc3aYE0zOXnrX6vY+Gy45AtLY?=
+ =?us-ascii?Q?x1sDXfMaMtSJP1vPaYac8sCmJadXMmNBBcwcTUlDZYa4k+IyWJoj0UNnmoQJ?=
+ =?us-ascii?Q?k+gkB43bLR6RSE28G7He2B2xUlOG2sFJBuuLliUDG0Q8LFs6VAI26KF8UHyC?=
+ =?us-ascii?Q?IqZPi0YDOw550J/kT3qP1UDlLOuuKXIn+GTFeFX22pNKbgn9ctqMjQaNE8gC?=
+ =?us-ascii?Q?5z9CAqQl5H0oV8r523gDTTwsxFnTlop5dYi7X38N+7KyjUlRowyMOiHiTbqj?=
+ =?us-ascii?Q?6t97Fd/AjIKEWwmvMeq0/N+OesVc2EvZG1TXCzBlGVSVGm2E8kuEsccae3rg?=
+ =?us-ascii?Q?hk//XLcHgzjn/EafA/a0b1vNKrf8kx83hOx6/5oia7oezJEyxOIGQ4aHbN4K?=
+ =?us-ascii?Q?sqs0bDQpB1rjzubnFciNYgfaCMNr4tLkZGDTSfE7cFDUHW2VMJcV2/EXQBaP?=
+ =?us-ascii?Q?9amZfPRTICZr87+SHyEY7Yh6AKfLq8vfczc4BnLFA9KwOAicCb9JmJlKJiIx?=
+ =?us-ascii?Q?ElQLQ85rYj2ZQLkEK0pvTaciU0EnXaY2jb6l+WQTVJprhMIAdr79bn4BQ85D?=
+ =?us-ascii?Q?oX/zamoZ9njZpF2S8BivYyRjBKZv7cp0M7vSBtFXPOnkgFjRlyJe+v0dzMqj?=
+ =?us-ascii?Q?AHio3aH6WzR76OhSVYedvQA6nhXasjtNcTWRHuX0s/ymGd7lGw+7d1Khlnqq?=
+ =?us-ascii?Q?XKBNpWZTjh8fnmficJk2MLawv5B6g+Kf/lXvCPUvZdw6cNjCM9E9qOa6FZfR?=
+ =?us-ascii?Q?iqPXSeDYdQ=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c9f5c48c-8e64-4b81-6bc7-08deb0de5a9c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5154eebb-b560-4622-4aa5-08deb0de5d2e
 X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7500.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2026 10:56:58.4975
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2026 10:57:02.8631
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mETwqKtSLjzMtgTk0chCDZv9zmzONhno/Q/F6w3DHSB0bqNwZH3BxMIKE3FcufzybopUv/IzDPfDBl2jLKEt+w==
+X-MS-Exchange-CrossTenant-UserPrincipalName: Vaszg5tZsTgswf8e82URDHC8LN8Jc8NByo2RXwa4DlhIKjdORzTJjlh+llMHNW8YLIV1OnbZF7jbtCrwHpiDAw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB9788
-X-Rspamd-Queue-Id: F08FE531B91
+X-Rspamd-Queue-Id: B57C8531BA1
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -151,17 +151,17 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-287533-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-287534-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[nxp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
@@ -171,101 +171,88 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	NEURAL_HAM(-0.00)[-0.999];
 	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,nxp.com:mid,nxp.com:dkim,sashiko.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Sashiko reported a potential race condition between the VF message
-handler and administrative VF MAC configuration from the host [1].
+Sashiko reported a use-after-free issue in the PF mailbox teardown path
+due to incorrect shutdown ordering [1].
 
-The VF message handler (enetc_msg_pf_set_vf_primary_mac_addr) runs
-asynchronously in a workqueue context and accesses vf_state->flags
-without any locking. Concurrently, the host can administratively
-change the VF MAC address via enetc_pf_set_vf_mac(), which executes
-under RTNL lock and modifies both vf_state->flags and hardware
-registers.
+In enetc_msg_psi_free(), cancel_work_sync() is called before disabling
+the hardware MR interrupt and unregistering the interrupt handler via
+free_irq(). This creates a race window where:
 
-This creates two race windows:
+1. cancel_work_sync() completes and returns
+2. A hardware interrupt arrives and enetc_msg_psi_msix() executes
+3. The interrupt handler calls schedule_work(&pf->msg_task),
+   re-queuing the work
+4. enetc_msg_free_mbx() frees the mailbox DMA buffers
+5. The re-queued msg_task work runs and accesses freed memory
 
-1) TOCTOU race on vf_state->flags: The check of ENETC_VF_FLAG_PF_SET_MAC
-   and subsequent MAC programming are not atomic, allowing the flag state
-   to change between check and use.
+The timeline of the race:
 
-2) Torn MAC address writes: Hardware MAC programming requires multiple
-   non-atomic register writes (__raw_writel for lower 32 bits and
-   __raw_writew for upper 16 bits). Concurrent updates from VF mailbox
-   and PF admin paths can interleave these operations, resulting in a
-   corrupted MAC address being programmed into the hardware.
+  CPU0 (teardown)                   CPU1 (interrupt)
+  ================                  ================
+  cancel_work_sync()
+    -> work cancelled
+                                    <interrupt>
+                                    enetc_msg_psi_msix()
+                                      schedule_work() // work re-queued!
+  enetc_msg_disable_mr_int()
+  enetc_msg_free_mbx()
+    -> DMA buffers freed
+  free_irq()
+                                    worker runs
+                                    -> UAF: access freed rxmsg[]
 
-Fix by introducing a per-VF mutex to serialize access to vf_state and
-hardware MAC register updates. Both enetc_pf_set_vf_mac() and
-enetc_msg_pf_set_vf_primary_mac_addr() now acquire this lock before
-accessing vf_state->flags or programming the MAC address, ensuring
-atomic read-modify-write sequences and preventing register write
-interleaving.
+Fix by reordering the teardown sequence to follow proper driver shutdown
+discipline:
+
+1. Synchronously unregister interrupt handler (free_irq)
+   - Waits for any running handler to complete
+   - Guarantees no more schedule_work() calls after this point
+2. Cancel pending work (cancel_work_sync)
+   - Now safe, as no new work can be queued
+3. Free mailbox resources (enetc_msg_free_mbx)
+   - All accessors have stopped
+4. Disable hardware interrupt source (enetc_msg_disable_mr_int)
+   - Clean up hardware state (defense in depth)
+
+After free_irq() returns, the interrupt handler cannot run anymore,
+eliminating the possibility of work re-queuing after cancellation. This
+ensures mailbox buffers are only freed after all potential accessors
+have been shut down.
 
 Link: https://sashiko.dev/#/patchset/20260511080805.2052495-1-wei.fang%40nxp.com #1
 Fixes: beb74ac878c8 ("enetc: Add vf to pf messaging support")
 Signed-off-by: Wei Fang <wei.fang@nxp.com>
 ---
- drivers/net/ethernet/freescale/enetc/enetc_pf.c | 10 ++++++++++
- drivers/net/ethernet/freescale/enetc/enetc_pf.h |  1 +
- 2 files changed, 11 insertions(+)
+ drivers/net/ethernet/freescale/enetc/enetc_msg.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.c b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-index 756614ffa8c6..6939ab04dcdc 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-@@ -252,8 +252,12 @@ static int enetc_pf_set_vf_mac(struct net_device *ndev, int vf, u8 *mac)
- 		return -EADDRNOTAVAIL;
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc_msg.c b/drivers/net/ethernet/freescale/enetc/enetc_msg.c
+index 40d22ebe9224..fe9680a97b0e 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc_msg.c
++++ b/drivers/net/ethernet/freescale/enetc/enetc_msg.c
+@@ -151,14 +151,14 @@ void enetc_msg_psi_free(struct enetc_pf *pf)
+ 	struct enetc_si *si = pf->si;
+ 	int i;
  
- 	vf_state = &pf->vf_state[vf];
-+
-+	mutex_lock(&vf_state->lock);
- 	vf_state->flags |= ENETC_VF_FLAG_PF_SET_MAC;
- 	enetc_pf_set_primary_mac_addr(&priv->si->hw, vf + 1, mac);
-+	mutex_unlock(&vf_state->lock);
-+
- 	return 0;
+-	cancel_work_sync(&pf->msg_task);
++	/* de-register message passing interrupt handler */
++	free_irq(pci_irq_vector(si->pdev, ENETC_SI_INT_IDX), si);
+ 
+-	/* disable MR interrupts */
+-	enetc_msg_disable_mr_int(&si->hw);
++	cancel_work_sync(&pf->msg_task);
+ 
+ 	for (i = 0; i < pf->num_vfs; i++)
+ 		enetc_msg_free_mbx(si, i);
+ 
+-	/* de-register message passing interrupt handler */
+-	free_irq(pci_irq_vector(si->pdev, ENETC_SI_INT_IDX), si);
++	/* disable MR interrupts */
++	enetc_msg_disable_mr_int(&si->hw);
  }
- 
-@@ -499,12 +503,15 @@ static u16 enetc_msg_pf_set_vf_primary_mac_addr(struct enetc_pf *pf,
- 		return ENETC_MSG_CMD_STATUS_FAIL;
- 	}
- 
-+	mutex_lock(&vf_state->lock);
- 	if (vf_state->flags & ENETC_VF_FLAG_PF_SET_MAC)
- 		dev_warn(dev, "Attempt to override PF set mac addr for VF%d\n",
- 			 vf_id);
- 	else
- 		enetc_pf_set_primary_mac_addr(&pf->si->hw, vf_id + 1, addr);
- 
-+	mutex_unlock(&vf_state->lock);
-+
- 	return ENETC_MSG_CMD_STATUS_OK;
- }
- 
-@@ -968,6 +975,9 @@ static int enetc_pf_probe(struct pci_dev *pdev,
- 					    pf->total_vfs);
- 		if (!pf->vf_state)
- 			goto err_alloc_vf_state;
-+
-+		for (int i = 0; i < pf->total_vfs; i++)
-+			mutex_init(&pf->vf_state[i].lock);
- 	}
- 
- 	err = enetc_setup_mac_addresses(node, pf);
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.h b/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-index ae407e9e9ee7..35d484858c7b 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-@@ -14,6 +14,7 @@ enum enetc_vf_flags {
- };
- 
- struct enetc_vf_state {
-+	struct mutex lock; /* Prevent concurrent access */
- 	enum enetc_vf_flags flags;
- };
- 
 -- 
 2.34.1
 
