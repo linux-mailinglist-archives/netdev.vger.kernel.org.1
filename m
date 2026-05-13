@@ -1,355 +1,376 @@
-Return-Path: <netdev+bounces-287509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287511-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ONQcNidKBGrNGgIAu9opvQ
-	(envelope-from <netdev+bounces-287509-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:53:43 +0200
+	id kLAyABxJBGrNGgIAu9opvQ
+	(envelope-from <netdev+bounces-287511-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:49:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41A46530F99
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:53:43 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BFA4530EDD
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:49:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1959E3176DE6
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 09:46:59 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 284A33008D51
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 09:49:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB73438E5FE;
-	Wed, 13 May 2026 09:46:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97FE3E9C01;
+	Wed, 13 May 2026 09:49:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EERnPqSu"
+	dkim=pass (1024-bit key) header.d=auristor.com header.i=jaltman@auristor.com header.b="gy37sHbM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from monticello.secure-endpoints.com (monticello.secure-endpoints.com [208.125.0.237])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3690B38757F
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 09:46:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE4A3E9C1F
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 09:49:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.125.0.237
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778665605; cv=none; b=VZbklV4fLrQBXql4ToOiCrUEP+jGvJHyTywg0gs/Mp9f61U/nBJP+S/rn5JqLuMklD6ijG4NbpEyP/8WcXUqDLkkQjuNaCcXHi4pLxuFdt9NmNWHq6Uy8obL0Z/MPJHSWoHDU3KLW61cJAGlxHJ4n/vKATflCnwZh04r0EkZQto=
+	t=1778665745; cv=none; b=nJl/qu8vfgKU7AQ5Z62FfrkLxVC1oD03GjE6qJsjPVxhXOEKm0Mt+WUR3Jt6GZAspMBHRYsz/GCrua4aKLEeZI+r/xV8eDu8EMqHB+NlZRnxm4Jlf1sx+wfe8jAauah3dqJqABAB6yuLKBRqzG0zZXBKeME9NhJK4RNOe9wck1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778665605; c=relaxed/simple;
-	bh=HukMZmpUGcYPY6BIEm2TnA4heyUj0O0oyS03K/N4TII=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=owplY++1xlUVyH1rsnwPfZT7Y3/FO2+irp5DXkpXhGhcwbnO5jtGi/+GoPUbrxSXzxmj8ycnQgGPI97lVcQGW+f224DN4bR+iCrN2k55G2PHe7JX8MrkaKaBA/oULlnwjNPfarChqhmled+Y4YRz5hn28OAoMM5TId2rRls9Q6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EERnPqSu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8B99C2BCF5;
-	Wed, 13 May 2026 09:46:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778665604;
-	bh=HukMZmpUGcYPY6BIEm2TnA4heyUj0O0oyS03K/N4TII=;
-	h=Date:From:To:Subject:From;
-	b=EERnPqSuhnENTlQldVwNCTMUeGdVg26fUAY80jJaxrCNCBPl248/MTkcErrt4itWI
-	 AGsaOXXxIChrlZJGKQma0Kifhz1fDj6HPRakOzCKJ3oexNsJcRn72uAJP6BCRpdgoT
-	 ZUTNrYzKlM/3RVrltQzXoCebEGoCbat9iEz7EJ21YNz3817keeq9eRGv3O8wjgA3Ta
-	 6rsnrOggv7/XpKiBIuRB/UnEk3/9elqH06dCMtFa83hcPrqkk9nQwnEQfNYiNpOBIb
-	 4/oVGl9aL8HkXtHGDwkw1i1d/xjiPxW5rQZnOHVQEiJprVULSmxjT/naFgqAE/6YQY
-	 H2sVs5SVqBxaQ==
-Date: Wed, 13 May 2026 11:46:41 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: netdev@vger.kernel.org
-Subject: Fwd: Re: [PATCH net-next v6 09/12] net: airoha: Do not stop GDM port
- if it is shared
-Message-ID: <agRIgRXTS64UO5fO@lore-desk>
+	s=arc-20240116; t=1778665745; c=relaxed/simple;
+	bh=oBhZ4x5a7o3epmQFqTccZxZ+TbQdfZDHaW4QGS8Ao54=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=piP1F+4pZrXuv5rZpZwlorpBaY9hud8BUzCQ8RIoXvlAS0/DPV74HruFZM6D+zjbFkSQ9OkkMlco8/sq5YU2wYb9zcwTvr71ZBGY7HnWTVUD8zUhRvSU51oukNAPX+33vsGiYq4gW/d6g0KfWNnBn0FerQqIwjaJpDOWZfUjQOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=auristor.com; spf=pass smtp.mailfrom=auristor.com; dkim=pass (1024-bit key) header.d=auristor.com header.i=jaltman@auristor.com header.b=gy37sHbM; arc=none smtp.client-ip=208.125.0.237
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=auristor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=auristor.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=auristor.com; s=MDaemon; r=y; l=10673; t=1778665692;
+	x=1779270492; i=jaltman@auristor.com; q=dns/txt; h=Content-Type:
+	Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	Content-Transfer-Encoding:Message-Id:References:To; z=Received:=
+	20from=20smtpclient.apple=20([143.244.47.72])=20by=20auristor.co
+	m=20(208.125.0.237)=20(MDaemon=20PRO=20v26.0.2)=20=0D=0A=09with=
+	20ESMTPSA=20id=20md5001005270902.msg=3B=20Wed,=2013=20May=202026
+	=2005=3A48=3A12=20-0400|Content-Type:=20multipart/signed=3B=0D=0
+	A=09boundary=3D"Apple-Mail=3D_625BD158-258B-4AAE-9AD3-EB3800D12D
+	C1"=3B=0D=0A=09protocol=3D"application/pkcs7-signature"=3B=0D=0A
+	=09micalg=3Dsha-256|Mime-Version:=201.0=20(Mac=20OS=20X=20Mail=2
+	016.0=20\(3826.700.81.1.8\))|Subject:=20Re=3A=20[PATCH=20net=202
+	/3]=20rxrpc=3A=20Fix=20DATA=20decrypt=20vs=20splice()=20by=20cop
+	ying=0D=0A=20data=20to=20buffer=20in=20recvmsg|From:=20Jeffrey=2
+	0Altman=20<jaltman@auristor.com>|In-Reply-To:=20<1354628.1778659
+	274@warthog.procyon.org.uk>|Date:=20Wed,=2013=20May=202026=2005=
+	3A48=3A39=20-0400|Cc:=20netdev@vger.kernel.org,=0D=0A=20Hyunwoo=
+	20Kim=20<imv4bel@gmail.com>,=0D=0A=20Marc=20Dionne=20<marc.dionn
+	e@auristor.com>,=0D=0A=20Jakub=20Kicinski=20<kuba@kernel.org>,=0
+	D=0A=20"David=20S.=20Miller"=20<davem@davemloft.net>,=0D=0A=20Er
+	ic=20Dumazet=20<edumazet@google.com>,=0D=0A=20Paolo=20Abeni=20<p
+	abeni@redhat.com>,=0D=0A=20Simon=20Horman=20<horms@kernel.org>,=
+	0D=0A=20linux-afs@lists.infradead.org,=0D=0A=20linux-kernel@vger
+	.kernel.org,=0D=0A=20Jiayuan=20Chen=20<jiayuan.chen@linux.dev>,=
+	0D=0A=20stable@vger.kernel.org|Content-Transfer-Encoding:=20quot
+	ed-printable|Message-Id:=20<E1EC6457-E634-4C8B-B7F1-C03E440BA973
+	@auristor.com>|References:=20<437CCB8A-5333-4349-B120-A103B1F0E6
+	17@auristor.com>=0D=0A=20<20260511160753.607296-1-dhowells@redha
+	t.com>=0D=0A=20<20260511160753.607296-3-dhowells@redhat.com>=0D=
+	0A=20<1354628.1778659274@warthog.procyon.org.uk>|To:=20David=20H
+	owells=20<dhowells@redhat.com>; bh=9TwnbfnKTC2dwrRxqU537J9e1cSR+
+	mPjVMpsjvjcHVM=; b=gy37sHbMSvKQ4Dg2yJk+CW1UEbzsPzw58ANnbRrgwPOlu
+	RgVFdzZqEs2pyxzhhfNI/o6KVWw+obbzY6arYD1jfkwhOy1Bs3grjjBjRRIQpkGC
+	+d5FZWwWZ6wvrSGlNITh07T8LK20XnZ3TBBrQ9g+mBesbi6Mmm/RR9uw+9J+ZE=
+X-MDAV-Result: clean
+X-MDAV-Processed: monticello.secure-endpoints.com, Wed, 13 May 2026 05:48:12 -0400
+Received: from smtpclient.apple ([143.244.47.72]) by auristor.com (208.125.0.237) (MDaemon PRO v26.0.2) 
+	with ESMTPSA id md5001005270902.msg; Wed, 13 May 2026 05:48:12 -0400
+X-Spam-Processed: monticello.secure-endpoints.com, Wed, 13 May 2026 05:48:12 -0400
+	(not processed: message from trusted or authenticated source)
+X-MDRemoteIP: 143.244.47.72
+X-MDHelo: smtpclient.apple
+X-MDArrival-Date: Wed, 13 May 2026 05:48:12 -0400
+X-MDOrigin-Country: US, NA
+X-Authenticated-Sender: jaltman@auristor.com
+X-Return-Path: prvs=1593db9306=jaltman@auristor.com
+X-Envelope-From: jaltman@auristor.com
+X-MDaemon-Deliver-To: netdev@vger.kernel.org
+Content-Type: multipart/signed;
+	boundary="Apple-Mail=_625BD158-258B-4AAE-9AD3-EB3800D12DC1";
+	protocol="application/pkcs7-signature";
+	micalg=sha-256
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="d/PcUqUsNGyTp8Sh"
-Content-Disposition: inline
-X-Rspamd-Queue-Id: 41A46530F99
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.8\))
+Subject: Re: [PATCH net 2/3] rxrpc: Fix DATA decrypt vs splice() by copying
+ data to buffer in recvmsg
+From: Jeffrey Altman <jaltman@auristor.com>
+In-Reply-To: <1354628.1778659274@warthog.procyon.org.uk>
+Date: Wed, 13 May 2026 05:48:39 -0400
+Cc: netdev@vger.kernel.org,
+ Hyunwoo Kim <imv4bel@gmail.com>,
+ Marc Dionne <marc.dionne@auristor.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ linux-afs@lists.infradead.org,
+ linux-kernel@vger.kernel.org,
+ Jiayuan Chen <jiayuan.chen@linux.dev>,
+ stable@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <E1EC6457-E634-4C8B-B7F1-C03E440BA973@auristor.com>
+References: <437CCB8A-5333-4349-B120-A103B1F0E617@auristor.com>
+ <20260511160753.607296-1-dhowells@redhat.com>
+ <20260511160753.607296-3-dhowells@redhat.com>
+ <1354628.1778659274@warthog.procyon.org.uk>
+To: David Howells <dhowells@redhat.com>
+X-Mailer: Apple Mail (2.3826.700.81.1.8)
+X-MDCFSigsAdded: auristor.com
+X-Rspamd-Queue-Id: 5BFA4530EDD
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-3.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+	SIGNED_SMIME(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	MIME_GOOD(-0.20)[multipart/signed,multipart/mixed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[auristor.com,quarantine];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[auristor.com:s=MDaemon];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287509-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_ONE(0.00)[1];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:+,3:~,4:+,5:+,6:~,7:~];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287511-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	HAS_X_AS(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	HAS_ATTACHMENT(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jaltman@auristor.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,auristor.com,kernel.org,davemloft.net,google.com,redhat.com,lists.infradead.org,linux.dev];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+	DKIM_TRACE(0.00)[auristor.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-
---d/PcUqUsNGyTp8Sh
-Content-Type: multipart/mixed; boundary="rnuz2TvepxVF2bgU"
-Content-Disposition: inline
-
-
---rnuz2TvepxVF2bgU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-+netdev
-
-Regards,
-Lorenzo
-
---rnuz2TvepxVF2bgU
-Content-Type: message/rfc822
-Content-Disposition: inline
-
-Delivered-To: lorenzo.bianconi83@gmail.com
-Received: by 2002:a05:6504:d85:b0:2ff:497e:1c93 with SMTP id b5csp3093692lty;
-        Wed, 13 May 2026 02:43:55 -0700 (PDT)
-X-Forwarded-Encrypted: i=2; AFNElJ8elgz5DMuuxmE8lkV0QkKdEYtrsnsBUAYfIGGoCm3IdWg5oMNNiKLpFDGe2HQQ9gq1Nt4g/J5L9ey/EgxpyYPp2J0=@gmail.com
-X-Received: by 2002:a05:6214:4283:b0:8ac:aeed:b1e7 with SMTP id 6a1803df08f44-8c7df30e468mr34825786d6.30.1778665434983;
-        Wed, 13 May 2026 02:43:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778665434; cv=none;
-        d=google.com; s=arc-20240605;
-        b=AzX5TtpiN6GFGX4JfU4/JpbXPCM7cQCLc+CO6DAp7o53k3Qa53HRjFiA8ITKObp8WS
-         f7ynX37/NfiUBdVDlrT/8gCu79vHB48Bez8ZfvpKjtqBU2WyH/YVLXYK558MdrAozgUd
-         6Gyw6xOlizFMrPb2dqRNcrTj76CIIhgkyqMyUkrpiJ9W85n69Ca5dAuE+gc/oN1hFCGR
-         EAPHvorxz5o/shOsln+37wTXOBazr6hzFgOOVRNnGygakX4E8/cL4u+OOXltjnFS6Was
-         06EAElW5CXMGg1ZBLXhYfbfEKKc4DbMFpYHlg4vwz9Xh8i+R6yjrP4RVaFZ/YBQby/3J
-         P9MA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:dkim-signature:delivered-to;
-        bh=4AUp8SmhIpUjbn3TQC1mVizaWQ8nRCz5hQvlEfFFrJM=;
-        fh=oM/FUfO9VzU1XIzinFCRfvEjImk+uFgK/v3o/+pnRTg=;
-        b=lGxC5DfPpLzWkVq03UfblxXWsLhyyt5oz2l/ko44lzaII5tdR/SQxFPbP0QrVTeehV
-         S88AR0HNPKJBVqmranRfsZ+T659F1u6cG/Iip0SZn1DRjWNRqjJkLaa9GyTTABt9KNCO
-         UmZLDmCx2r/wxHAwyW3oX4QtnqKK87S2+knBjK3Smdq/q2f3JsMY/koDF0J64TyhrxbQ
-         FsW9kVzq9rVUl9EyGeUZG/jSgBraWnlG6X/DgnbqlOhoiD/YeqK5Q745iL05XkjsCMoq
-         l8JUoaFDKsy51dG3L/BQUSSxIcSqsO1FOch+54SwqUfA5CW5iSYrI3PczdKlJcqBMi3x
-         okXA==;
-        dara=google.com
-ARC-Authentication-Results: i=1; mx.google.com;
-       dkim=pass header.i=@kernel.org header.s=k20201202 header.b=K6mUypW6;
-       spf=pass (google.com: domain of lorenzo@kernel.org designates 172.105.4.254 as permitted sender) smtp.mailfrom=lorenzo@kernel.org;
-       dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=kernel.org
-Return-Path: <lorenzo@kernel.org>
-Received: from tor.source.kernel.org (tor.source.kernel.org. [172.105.4.254])
-        by mx.google.com with ESMTPS id 6a1803df08f44-8b730adba0asi358265006d6.545.2026.05.13.02.43.54
-        for <lorenzo.bianconi83@gmail.com>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2026 02:43:54 -0700 (PDT)
-Received-SPF: pass (google.com: domain of lorenzo@kernel.org designates 172.105.4.254 as permitted sender) client-ip=172.105.4.254;
-Authentication-Results: mx.google.com;
-       dkim=pass header.i=@kernel.org header.s=k20201202 header.b=K6mUypW6;
-       spf=pass (google.com: domain of lorenzo@kernel.org designates 172.105.4.254 as permitted sender) smtp.mailfrom=lorenzo@kernel.org;
-       dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=kernel.org
-Received: from smtp.kernel.org (transwarp.subspace.kernel.org [100.75.92.58])
-	by tor.source.kernel.org (Postfix) with ESMTP id 83B3C6013B
-	for <lorenzo.bianconi83@gmail.com>; Wed, 13 May 2026 09:43:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix)
-	id 4C5A6C4AF09; Wed, 13 May 2026 09:43:54 +0000 (UTC)
-Delivered-To: lorenzo@kernel.org
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6C1FC2BCB7;
-	Wed, 13 May 2026 09:43:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778665434;
-	bh=Ub62bfMWlc5R306323COfpZrvhEMCoZst8dt+8UYDFg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=K6mUypW6tPKXXJCcJqDZGBHIkwqhuVK5e2zNWl/FfNF89h9GALT+5TECc3xGo5cLe
-	 lwkzdaiP3cihxgij1lcEXDrajzJbGz+zV3r1MwhNh7kQZ8FJI+yjr8NNBi0L9efyvv
-	 Lox6nsDCpzXaSYaOiz3nLLCEQBgSLGnXxg88DJjJDhERyrxMdWAmvQj3lCTLV6qG4F
-	 dN+dgxa35w5q+BJpCtxa+04G95Xz5BRMEQD1PKZZ25ZmEEAHKJLfplYEMcWsXXbC+I
-	 zglX4GXfTGz1fsH8ngHJJE5SmUwPsK+n/OD6LBA0w19T0BLsQHqCDmOg4TUh5joTtR
-	 JU2XQnYIm6MEA==
-Date: Wed, 13 May 2026 11:43:51 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: sashiko@lists.linux.dev
-Cc: conor+dt@kernel.org, devicetree@vger.kernel.org, robh@kernel.org,
-	krzk+dt@kernel.org
-Subject: Re: [PATCH net-next v6 09/12] net: airoha: Do not stop GDM port if
- it is shared
-Message-ID: <agRH12v6OeetUmtJ@lore-desk>
-References: <20260511-airoha-eth-multi-serdes-v6-9-c899462c4f75@kernel.org>
- <20260512213116.7414FC2BCB0@smtp.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="fA35iJO0kV4N5A4K"
-Content-Disposition: inline
-In-Reply-To: <20260512213116.7414FC2BCB0@smtp.kernel.org>
-X-TUID: 4dQs7dXunW7S
-
-
---fA35iJO0kV4N5A4K
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+--Apple-Mail=_625BD158-258B-4AAE-9AD3-EB3800D12DC1
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-> Thank you for your contribution! Sashiko AI review found 3 potential issu=
-e(s) to consider:
-> - [High] Stopping a net_device leaves its packets in the shared QDMA hard=
-ware TX ring, causing a BUG_ON kernel panic or Use-After-Free when the hard=
-ware later transmits them.
-> - [Medium] When decreasing the MTU on a shared GDM port with multiple act=
-ive users, the hardware MTU is not reduced to match the new global maximum.
-> - [Low] The function parameter `netdev` is overwritten in a loop within `=
-airoha_dev_stop()`.
-> --
->=20
-> commit 30071ffd90f181adfa0fb1ab6717d5d5cfa7e0e8
-> Author: Lorenzo Bianconi <lorenzo@kernel.org>
->=20
-> net: airoha: Do not stop GDM port if it is shared
->=20
-> Theoretically, in the current codebase, two independent net_devices can
-> be connected to the same GDM port so we need to check the GDM port is not
-> used by any other running net_device before setting the forward
-> configuration to FE_PSE_PORT_DROP.
->=20
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
-ernet/airoha/airoha_eth.c
-> > index 4efd36779453e..aed182c7a5e17 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> [ ... ]
-> > @@ -1759,6 +1769,7 @@ static int airoha_dev_stop(struct net_device *net=
-dev)
-> >  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> >  	struct airoha_gdm_port *port =3D dev->port;
-> >  	struct airoha_qdma *qdma =3D dev->qdma;
-> > +	u32 len =3D 0;
-> >  	int i;
-> > =20
-> >  	netif_tx_disable(netdev);
-> > @@ -1766,8 +1777,23 @@ static int airoha_dev_stop(struct net_device *ne=
-tdev)
-> >  	for (i =3D 0; i < netdev->num_tx_queues; i++)
-> >  		netdev_tx_reset_subqueue(netdev, i);
->=20
-> If another device is still using the QDMA (qdma->users > 1), the hardware=
- TX
-> ring is not cleaned up. NAPI polling is bound to a dummy device and conti=
-nues
-> running.
->=20
-> When NAPI later processes the stopped device's pending TX completions, it
-> unconditionally calls netdev_tx_completed_queue() which invokes
-> dql_completed().
->=20
-> Since BQL was reset here, will this trigger a BUG_ON in
-> lib/dynamic_queue_limits.c? Furthermore, if the device was unregistered,
-> would the skb->dev access in the completion handler result in a
-> use-after-free?
 
-This issue is not introduced in this patch.
 
+> On May 13, 2026, at 4:01=E2=80=AFAM, David Howells =
+<dhowells@redhat.com> wrote:
 >=20
-> > =20
-> > -	airoha_set_gdm_port_fwd_cfg(qdma->eth, REG_GDM_FWD_CFG(port->id),
-> > -				    FE_PSE_PORT_DROP);
-> > +	for (i =3D 0; i < ARRAY_SIZE(port->devs); i++) {
-> > +		if (!port->devs[i])
-> > +			continue;
-> > +
-> > +		netdev =3D port->devs[i]->dev;
+> Jeffrey Altman <jaltman@auristor.com> wrote:
 >=20
-> This isn't a bug, but this loop reassigns the local parameter netdev. Whi=
-le
-> it might be functionally harmless right now because netdev isn't derefere=
-nced
-> later in this function, could this create issues for future modifications
-> expecting netdev to still point to the device being stopped?
+>>> + void *rx_dec_buffer; /* Decryption buffer */
+>>> + unsigned short rx_dec_bsize; /* rx_dec_buffer size */
+>>> + unsigned short rx_dec_offset; /* Decrypted packet data offset */
+>>> + unsigned short rx_dec_len; /* Decrypted packet data len */
+>>> + rxrpc_seq_t rx_dec_seq; /* Packet in decryption buffer */
+>>>=20
+>>> rxrpc_seq_t rx_highest_seq; /* Higest sequence number received */
+>>> rxrpc_seq_t rx_consumed; /* Highest packet consumed */
+>>=20
+>>=20
+>> Instead of allocating the storage within struct rxrpc_call perhaps
+>> It would be better to add them to struct rxrpc_channel.  Doing so=20
+>> would reduce the allocation/deallocation churn.  The majority of
+>> calls are short lived (perhaps a single packet in each direction)
+>> but there will be many calls in rapid succession.
+>=20
+> I'm trying to keep the I/O side separate from the application side.  I =
+don't
+> particularly want recvmsg (on the app side) reaching into the =
+rxrpc_connection
+> struct (on the I/O side).
+>=20
+> Further, by only looking at the rxrpc_call struct, I don't have to =
+deal with
+> locking required for the possibility that the next call on that =
+channel will
+> start before I've finished with this one (say an incoming call is =
+aborted and
+> immediately followed up by the first packet of the next call).
 
-ack, I will fix it in v7.
+There could only be one rxrpc_call structure at a time referring to the=20=
+
+rxrpc_channel.  If rxrpc_input_packet_on_conn() receives a DATA packet =
+for a
+later call number and there is a prior rxrpc_call assigned to =
+rxrpc_channel.call
+then an RX_PACKET_TYPE_BUSY should be sent to the peer if the rx_call =
+cannot be
+terminated without blocking the processing of incoming packets.  The Rx =
+BUSY
+informs the initiating peer that the DATA packet has been dropped and =
+that it
+should be retransmitted (which will occur anyway due to the lack of an =
+Rx ACK
+packet.
+
+The busy call channel logic is out of scope for this change and avoiding
+per-call allocation churn is an optimization that can be implemented =
+another
+day if desired.
 
 >=20
-> > +		if (netif_running(netdev))
-> > +			len =3D max_t(u32, len, netdev->mtu);
-> > +	}
-> > +	len +=3D ETH_HLEN + ETH_FCS_LEN;
-> > +	airoha_fe_rmw(qdma->eth, REG_GDM_LEN_CFG(port->id),
-> > +		      GDM_LONG_LEN_MASK,
-> > +		      FIELD_PREP(GDM_LONG_LEN_MASK, len));
-> > +
-> [ ... ]
-> > @@ -1919,13 +1945,18 @@ static void airoha_dev_get_stats64(struct net_d=
-evice *netdev,
-> >  static int airoha_dev_change_mtu(struct net_device *netdev, int mtu)
-> >  {
-> >  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> > +	u32 cur_len, len =3D ETH_HLEN + mtu + ETH_FCS_LEN;
-> >  	struct airoha_gdm_port *port =3D dev->port;
-> > -	u32 len =3D ETH_HLEN + mtu + ETH_FCS_LEN;
-> >  	struct airoha_eth *eth =3D dev->eth;
-> > =20
-> > -	airoha_fe_rmw(eth, REG_GDM_LEN_CFG(port->id),
-> > -		      GDM_LONG_LEN_MASK,
-> > -		      FIELD_PREP(GDM_LONG_LEN_MASK, len));
-> > +	cur_len =3D airoha_fe_get(eth, REG_GDM_LEN_CFG(port->id),
-> > +				GDM_LONG_LEN_MASK);
-> > +	if (len > cur_len || !port->users ||
-> > +	    (port->users =3D=3D 1 && netif_running(netdev)))
-> > +		airoha_fe_rmw(eth, REG_GDM_LEN_CFG(port->id),
-> > +			      GDM_LONG_LEN_MASK,
-> > +			      FIELD_PREP(GDM_LONG_LEN_MASK, len));
+>>> + size_t size =3D umin(round_up(sp->len, 32), 2048);
+>>=20
+>> I think you meant to use max() here so that a minimum of 2048 bytes
+>> is allocated. =20
 >=20
-> If there are multiple running devices on the shared port and they all low=
-er
-> their MTU, this condition prevents the hardware MTU from being updated to
-> match the new global maximum. Should this iterate over port->devs to comp=
-ute
-> the actual maximum MTU of all running devices, similar to how it is handl=
-ed
-> in airoha_dev_stop()?
+> Yeah.
+>=20
+>> I think applying a cap on the allocation size would also be=20
+>> beneficial.  IBM/Transarc derived Rx implementations have a hard
+>> upper-bound of 21180 (15 x 1412) bytes plus one 28 byte rx header.
+>> Applying a cap of 32KiB seems prudent.
+>=20
+> This would need checking earlier in the input path.  A DATA packet =
+that's too
+> large would need to be rejected as it comes off of the UDP socket if =
+we're not
+> going to be able to unpack it later.
 
-According to my understanding, airoha_dev_change_mtu() is running with RTNL
-lock held so we will always have the max configured mtu in cur_len.
-
-Regards,
-Lorenzo
+ok.
 
 >=20
-> > +
-> >  	WRITE_ONCE(netdev->mtu, mtu);
-> > =20
-> >  	return 0;
+>> It is also worth noting that there are no current implementations
+>> of Rx RPC which will send individual Rx DATA packets larger than=20
+>> 1444 bytes including the Rx header.  Rx RESPONSE packets can be sent
+>> as large as 16384 bytes (including the Rx header).  However, it is
+>> extremely unlikely that this buffer once allocated would ever need=20
+>> to be grown. =20
 >=20
-> --=20
-> Sashiko AI review =B7 https://sashiko.dev/#/patchset/20260511-airoha-eth-=
-multi-serdes-v6-0-c899462c4f75@kernel.org?part=3D9
+> For Rx RESPONSE packets, I'm fine with allocating a buffer on the spur =
+of the
+> moment and freeing it immediately.  Ideally, there would only be one =
+RESPONSE
+> per connection anyway.  I could do a static buffer with a lock, I =
+suppose, to
+> make sure I can process the things under memory pressure-based =
+writeback.
 
---fA35iJO0kV4N5A4K
-Content-Type: application/pgp-signature; name=signature.asc
+I agree.  The Rx RESPONSE packets belong to the rxrpc_connection and not =
+to=20
+any particular call.  It is possible for there to be more than one Rx =
+RESPONSE
+packet received due to Rx CHALLENGE retransmission or because this peer =
+decided
+it can no longer trust the prior authentication and sends a new Rx =
+CHALLENGE.
+However, RESPONSE packets are few and far between.  There is no benefit =
+to
+adding another 16KB to the rxrpc_connection allocation.
 
------BEGIN PGP SIGNATURE-----
+>=20
+>>> + kfree(call->rx_dec_buffer);
+>>=20
+>> It might be better to avoid deallocating the buffer on the error
+>> path and permit it to be freed during normal call (or call channel)
+>> deallocation.
+>=20
+> Hmmm.  But I then need some other way to note that the buffer is no =
+longer
+> occupied by valid data.  I suppose I could set ->rx_dec_offset to =
+USHRT_MAX.
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCagRH1wAKCRA6cBh0uS2t
-rM31AQDunwBJ0DVCS5kAHpHwul4CaN/W8nGCUKRkGWyRHdTNNAD9HDklGrcRS6YR
-qT2san+wDl2cbYm9Qr6rnVWH8iYZ8QM=
-=oOYX
------END PGP SIGNATURE-----
+That meaning was unclear and could warrant a code comment indicating =
+that
+is why the allocation is being freed.
 
---fA35iJO0kV4N5A4K--
 
---rnuz2TvepxVF2bgU--
+> David
+>=20
 
---d/PcUqUsNGyTp8Sh
-Content-Type: application/pgp-signature; name=signature.asc
+Thanks.
 
------BEGIN PGP SIGNATURE-----
+Jeffrey Altman=
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCagRIgQAKCRA6cBh0uS2t
-rM9+AP9944+6LpcBvQ3ONeJjZedzFcvl93rGY8woeDtjQXwwiQEAkabyx2unc1Do
-JXzWCNqJe3ITJiQC4mrpHZSPOb5nJws=
-=jRva
------END PGP SIGNATURE-----
+--Apple-Mail=_625BD158-258B-4AAE-9AD3-EB3800D12DC1
+Content-Disposition: attachment;
+	filename=smime.p7s
+Content-Type: application/pkcs7-signature;
+	name=smime.p7s
+Content-Transfer-Encoding: base64
 
---d/PcUqUsNGyTp8Sh--
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCDTAw
+ggY0MIIEHKADAgECAhBAAZimBAJ19t4m6OTgn3OxMA0GCSqGSIb3DQEBCwUAMDoxCzAJBgNVBAYT
+AlVTMRIwEAYDVQQKEwlJZGVuVHJ1c3QxFzAVBgNVBAMTDlRydXN0SUQgQ0EgQTE0MB4XDTI1MDgx
+NDAwMzg1N1oXDTI3MTEwMTAwMzc1N1owgcwxKDAmBgNVBAUTH0EwMTQxMEMwMDAwMDE5OEE2MDQw
+MjY3MDAxMEYyNjIxGTAXBgNVBGETEE5UUlVTK05ZLTM1ODIyMzcxFTATBgNVBAoTDEF1cmlTdG9y
+IEluYzEZMBcGA1UEAxMQSmVmZnJleSBFIEFsdG1hbjEPMA0GA1UEBBMGQWx0bWFuMRAwDgYDVQQq
+EwdKZWZmcmV5MSMwIQYJKoZIhvcNAQkBFhRqYWx0bWFuQGF1cmlzdG9yLmNvbTELMAkGA1UEBhMC
+VVMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDKtXD1tqgXxlJvgI10FM0ZvyWukq2I
+eXgVhbgOk4k4PbRk1TvrGB04QatXac9soW7yHv6RhoovQ+URaXBEpBYxOE8Tsx+XfKZNkGbWj9bE
+dWgi8HPb33rf8eKFuhjx1QEv/YtD7lGIp7RhKWC5kBfvyut8o3XJmJF0hCR1m663wsttrn89dwZc
+zLU4JUjbTF0ukM0DbDk55ItDB4dXnW/uRfhrVuemMvbDily+etLCWsuJjtrjRBCQ805eYRHq5Lon
+X3oNLdXituSHXLKvq+uChgFN/veDHKpeBnBWmoNtOQnV8fsq5NCz/WswIACeZj+xGmZsWx7fyuze
+e78ZePfBAgMBAAGjggGhMIIBnTAMBgNVHRMBAf8EAjAAMA4GA1UdDwEB/wQEAwIE8DCBhAYIKwYB
+BQUHAQEEeDB2MDAGCCsGAQUFBzABhiRodHRwOi8vY29tbWVyY2lhbC5vY3NwLmlkZW50cnVzdC5j
+b20wQgYIKwYBBQUHMAKGNmh0dHA6Ly92YWxpZGF0aW9uLmlkZW50cnVzdC5jb20vY2VydHMvdHJ1
+c3RpZGNhYTE0LnA3YzAfBgNVHSMEGDAWgBTC1ESZoHHPSFa+DI5oOFynt/dFvDAjBgNVHSAEHDAa
+MAkGB2eBDAEFAwIwDQYLYIZIAYb5LwAGAgEwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL3ZhbGlk
+YXRpb24uaWRlbnRydXN0LmNvbS9jcmwvdHJ1c3RpZGNhYTE0LmNybDAfBgNVHREEGDAWgRRqYWx0
+bWFuQGF1cmlzdG9yLmNvbTAdBgNVHQ4EFgQUY4JHedU4owyskKPvw4gOjSyBJZUwKQYDVR0lBCIw
+IAYIKwYBBQUHAwIGCCsGAQUFBwMEBgorBgEEAYI3CgMMMA0GCSqGSIb3DQEBCwUAA4ICAQCeOjCs
+cMFctL6UG8WBsFMIOHc7MpbrX7EIvO34SGVKhrbqS1RTIBQiVVWnQ4VI6qVw/n9dadUv4o1/F23s
+0uXE8/lGJAGn51kkw1xHU+0PGODOTWvAQOiPhSmaXG5xM4BgleroGggumd8fHRSKFK7DIdWcMMNb
+S6LpMAOUfXYzNBvcHbAcjJMHQ7N8pNXdEQDB9c6yIw4paVD6XDE5VFhLdf6749jGqSWXpyTMjXzr
+PMaDyxKiNOtsUrdT/fh8+Xx84nGpwiV9PA9/cGSAPcAc/qMBgPb4Qj9met/RUvCHPWr68Zlirgx4
+8W/7TTZFhXKZg3U+zCj4ASOfLJ6WT4PPoM+eLHbB402WNMFkQDmWBH4bMqUcbQWxarMxdQ/jHKTs
+JIkvg+rTCbWbDm7hgJbnPEZrJEghy69Opa9+F1HB90AQmb41N1PLZytu8pCGBJufyqjzNU0eyWkH
+JCwHDLFhoCENk/vujFCmsJUSh7a6ZMPSXf3PR4TPKkcgs9JBT0dyPGHEfC/Lp9ZHTGSO6zswK1Bd
+dBufYi3xqHNBO/s7ft6gpNvht7oKUhVcjM7EmQCA6t2ok44PNfeG8rJZxiDv04IruCbzLFwkPczW
+S5uCIuP3PWCfVtMnUPDamMVWAr4Ui/s6fy3TZbPUAPDjFRi7zpkFIKHlCS/HIHNR6Gr1lzCCBvQw
+ggTcoAMCAQICEEABif/SaQvad8Lp1U2SCE0wDQYJKoZIhvcNAQELBQAwSjELMAkGA1UEBhMCVVMx
+EjAQBgNVBAoTCUlkZW5UcnVzdDEnMCUGA1UEAxMeSWRlblRydXN0IENvbW1lcmNpYWwgUm9vdCBD
+QSAxMB4XDTIzMDgxNjE5Mjg0NloXDTMzMDgxMjE5Mjg0NVowOjELMAkGA1UEBhMCVVMxEjAQBgNV
+BAoTCUlkZW5UcnVzdDEXMBUGA1UEAxMOVHJ1c3RJRCBDQSBBMTQwggIiMA0GCSqGSIb3DQEBAQUA
+A4ICDwAwggIKAoICAQDoqfW8senk2X/L7Viky0ZgZYnwlxqsE/vDQWARa1i7gZ0wRJ7ZOWIbjYDc
+csGFBhCb8VLx1dershozyPcOizZ1LxAhstZhpz8KvKc4bHhu1+6ZJftmrDyAELLRu1gkPS0Bvong
+GBinxoTNo0XwafmS67jFRtYHe2VQSLvy0t9xRUsgdEeYgCUAnKO5eRVQMmBBNhnsTFtO5FzNmNKn
+uw/TDcBbOpGrQ1FSCuOZTHw3njDtZGqiRXSruX3MCpV190CefwryeGLXCsawSz2wMQZkqtjYV9Au
+73Zrqg1yDVj9KGKoRnJ8cUcg1Inxs/+Bo3xcM43y2h10yDrSWFTfvPSQhUJwYKHCYJSVQLFbeH9v
+xFJeLlewivaKQMGEg8PpnjevzDu8PVVzr9gkWcLubhztussqdAPF+dvyXIYJb/7l6idZkS4NeHAs
+rAtcv+UF+SGzSS5F28s376Kx35LUaJeOW4hQOjSj/118F9cyYAd2WlgGdBdaK2PSvH7aANZQfyEh
+NNMzk2GP83pHXXeXy+09LkTcIlgXr2rrXepxP+WBp+Ihu4Jh5uZWQkpGUUNqKSjxIpUJ6sDIIgGI
+qSY/uBFSp2ff+4OLLS3Z+XQ9gBu1Szd3kQ8PrGXAI5DXayXjM9YppsHld3OojXhoOsLdCji+be0m
+AgvbNa6AaSJcT7RF3QIDAQABo4IB5DCCAeAwEgYDVR0TAQH/BAgwBgEB/wIBADAOBgNVHQ8BAf8E
+BAMCAYYwgYkGCCsGAQUFBwEBBH0wezAwBggrBgEFBQcwAYYkaHR0cDovL2NvbW1lcmNpYWwub2Nz
+cC5pZGVudHJ1c3QuY29tMEcGCCsGAQUFBzAChjtodHRwOi8vdmFsaWRhdGlvbi5pZGVudHJ1c3Qu
+Y29tL3Jvb3RzL2NvbW1lcmNpYWxyb290Y2ExLnA3YzAfBgNVHSMEGDAWgBTtRBnA0/AGi+6ke75C
+5yZUyI42djBfBgNVHSAEWDBWMFQGBFUdIAAwTDBKBggrBgEFBQcCARY+aHR0cHM6Ly9zZWN1cmUu
+aWRlbnRydXN0LmNvbS9jZXJ0aWZpY2F0ZXMvcG9saWN5L3RzL2luZGV4Lmh0bWwwSgYDVR0fBEMw
+QTA/oD2gO4Y5aHR0cDovL3ZhbGlkYXRpb24uaWRlbnRydXN0LmNvbS9jcmwvY29tbWVyY2lhbHJv
+b3RjYTEuY3JsMB0GA1UdDgQWBBTC1ESZoHHPSFa+DI5oOFynt/dFvDBBBgNVHSUEOjA4BggrBgEF
+BQcDAgYIKwYBBQUHAwQGCisGAQQBgjcKAwwGCisGAQQBgjcUAgIGCisGAQQBgjcKAwQwDQYJKoZI
+hvcNAQELBQADggIBAJXyFF1baV3jUq5o3Q5FIysADRg5knGSFzcliSyYTBd5YZ4FYFZSDxrQ25J8
+7EFzq8q9a1lQxNwcj2R3IFNfx5QWU6EApuGwiOgX9igx3EAJuOa8JnSoLUI5zKflmNqTVHSz3b94
+UQy/MF+s8+OwbM8+FscUY0CxXRlOEETsW6MFXfliOSIEnQFmm5NraqzYHecXC8DJF6yTxbu1+101
+T66oqkp9+EAvU+SXgSIcHDpNxAmbm6XcSQFwEZLOLSctCVeZzLsvCE1Ozr5hvEAstYh07Qm/FtuZ
++M540l2qSydFaI4yD7uH6/SsjQAARQXYzezBauwR8YOTS7PUDWejFUpHzPy4q2JdYdU2jYTst4G7
+gW0+y6EQyXIiSEEaKePUrnIiRImK6ySZXDTB7A+td6giMATY61GcJUS9kdCHZ4brFJiLBg9az11c
+15e5SbS2bCNAMOIK6NwakjsWmh2jX+C6LJX37ehqQT0GVekYT4nGMBH89MiQ1kFnIQcIWTagA/Qq
+FHMhHFlUH5mWyby/6alKXu0ZeODdBRR/Tn39K6awTCVSbQH8P+KbF5kMky9b7IFzJI/fwxr/ZVoE
+KCj0aoicm2TTsXgqRUI7MgiLU6hE5ersxFh5yM2IBc8za+kvkB7SeXPhzloFqmayuM2QfrqjsX1F
+0CopS11iOE4QVaJmMYICpjCCAqICAQEwTjA6MQswCQYDVQQGEwJVUzESMBAGA1UEChMJSWRlblRy
+dXN0MRcwFQYDVQQDEw5UcnVzdElEIENBIEExNAIQQAGYpgQCdfbeJujk4J9zsTANBglghkgBZQME
+AgEFAKCCASkwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjYwNTEz
+MDk0ODM5WjAvBgkqhkiG9w0BCQQxIgQgbDzkLkA4VkKpAjpsUkduHg+DROAo6ICHKVTBkP3n38ww
+XQYJKwYBBAGCNxAEMVAwTjA6MQswCQYDVQQGEwJVUzESMBAGA1UEChMJSWRlblRydXN0MRcwFQYD
+VQQDEw5UcnVzdElEIENBIEExNAIQQAGYpgQCdfbeJujk4J9zsTBfBgsqhkiG9w0BCRACCzFQoE4w
+OjELMAkGA1UEBhMCVVMxEjAQBgNVBAoTCUlkZW5UcnVzdDEXMBUGA1UEAxMOVHJ1c3RJRCBDQSBB
+MTQCEEABmKYEAnX23ibo5OCfc7EwDQYJKoZIhvcNAQELBQAEggEAMUDR9xbmyNm6cYXAAi3W8w2z
+Ylt1e040GByjzDNg+aPpIoTqyqr1WjMhNYvWieXj/uwnzWJQsDHT1Qb+w+gwbaUs3Kz+jz+EYTkV
+kFiMp7Ri8wHZdaDz2zaU+JSFHr/vMzpRspOfBsLJkauYTkCzQK98psFzXF4XL1qMX7JfNEk3JIxw
+kNlKopO48J6OKrKH0D48mwusw+27ONT24BwB686IbfTmFv9hmirnEo8HHB+iKtF+aQjfrZ/2q1y4
+s65ex7ucwYh6d2BC3SGmX/ilrVswT9Rb05juCspS84fn+Cv92SPdKU0JnQ0Ua935G+t1iiefLDO3
+7G9iTzBHFUQUFwAAAAAAAA==
+--Apple-Mail=_625BD158-258B-4AAE-9AD3-EB3800D12DC1--
+
 
