@@ -1,189 +1,216 @@
-Return-Path: <netdev+bounces-287589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287590-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QOheCtR6BGpoKgIAu9opvQ
-	(envelope-from <netdev+bounces-287589-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 15:21:24 +0200
+	id qJarJJl1BGqdJwIAu9opvQ
+	(envelope-from <netdev+bounces-287590-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 14:59:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8094C533EC9
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 15:21:22 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 543D2533774
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 14:59:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5D87C32BF14C
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:57:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9BA2C30530AD
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:58:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80DEB3A1E6A;
-	Wed, 13 May 2026 12:55:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D423FA5D4;
+	Wed, 13 May 2026 12:58:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dwymHeD9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L+ZXpAm3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 088AE372698
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 12:55:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778676952; cv=pass; b=mpB+GpjPud22JL7jw0aKdKCh5ApX8COtoAhjQielYmJkl89XTGU3hhmkpIInXAg9tpTSyHlufHc9oVEA/KBDS1dOxXyAmy9FBkaim0PiLvfrTQNXYJ0CUaS8SRdKEyIGMhL6rZkf0Qqt0f/u2fyPr58I9m/9E8tktAPw+aQaqNc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778676952; c=relaxed/simple;
-	bh=z5pppaFfNtI94Xp4RMt+gQ7icJ5vvzLalnbJhVv8y7I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W4eyM5GQmViKjjbsDU/BOfa50nMSZagkJbVSp+aNwOF2G0LCmJ1bMZd/8SGkAt4H4o3jxHnxMaYCBqPDJ9maRs389HpbQIAwK/iR0sg4yzbyVMxzQUxJDhYo7JV1eAguQY9RQ/9Dmw8Ks3E/YjydSxzDqLKN63qgO6bWTNQwWd0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dwymHeD9; arc=pass smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-671588ab0cfso304a12.1
-        for <netdev@vger.kernel.org>; Wed, 13 May 2026 05:55:50 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778676949; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Z/8r6pJCHCSJnTFoBz49z+ubdXIoxwqrglOE16Wyrfa95wQm43k0E/jIVkH2Exhyg2
-         3FEdEztLCNcVhSnGkH2eTGpyjza/ExiQMCAvxOIEFa5Hu5aQpJ8HpXatFnR6EAgi6WMJ
-         bQmAaEgD5XrH1J3IeWKqGtr3Cb3xEtApRMbd5aGXGdRIMu0G6HDsbBd11Y7BwpEybiqv
-         OPpRegB3gyqQOX2g7D+ZZa1R+haqc8BYJi4C/wzE+HLBU79YYpUlyVXQGmyK8CrmkEIH
-         Fd2OfSwT+UwwulBxb1mXXEUOH9JICWUWO9HkZhNAgToiWbVBjTJfVHBUgMJBIaOQLEjs
-         Ymgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=z5pppaFfNtI94Xp4RMt+gQ7icJ5vvzLalnbJhVv8y7I=;
-        fh=bRVDoQsQ8Wsct0NQDW3nq5JPTtHLXbzE7Ms/q7xYkh0=;
-        b=ToS2gktYvoD0ZU0otEWNu6cw9hCYo9KeQLlRyebEL4Xg2QveJAlh4ADvjQjq/zvLCt
-         tIzar+oLdCxeN+hnV6HjAKxKxkmGqCEhUZgKV0UOrVxKlD6TJhK0fc+sDH12PR3wDssQ
-         2L4q0Nq4buHkdyNSe7h/r4XCPkpfWVJ5YQAv1rEm2dsE+QoBLTwjQOTuvmvbG1h5zhRg
-         HWNQf5O77EQnA3iDMf/LPlNIGdP8OuoP6Z0utGi60yGxYhTOzQJ0wMdUyvJGQThyhzIP
-         QTnuzM1/shuadMyii6bFiCuzmA1I1fU269EjQ2Di0mTZldoyamriJm71DiZq029pPr0+
-         uB7A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778676949; x=1779281749; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z5pppaFfNtI94Xp4RMt+gQ7icJ5vvzLalnbJhVv8y7I=;
-        b=dwymHeD9h93u/FzjRQDQxUSmcJhn6ndbmZWRkLN2eldp8GyxnRY9J987/MN3Ty9bcR
-         ieqyZxTAEkCgcko6NfN84r8Kxm/AL8s0vwhc7qegTN6XAA7Ntyr3BGbRDZj0/mj7kX+b
-         0DAZqLfJB4XSd/5eu7+vx0HdThGoiREPY+47ERKBumGqO+rCG6jVOUQTf6mNDog/Rzeh
-         ZjZ/v8MhyRO06dDaSFGujYB7nmtO22/vXToqbGWsiKs+hutZXyNBHhQMpSDPzQfo2PED
-         zMsCIudrCDDf3Qc5gl/XAqH/40YHBldWyLKIYLefmECekmZBvngimJ1PgOZenyM0A2OM
-         Gt/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778676949; x=1779281749;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=z5pppaFfNtI94Xp4RMt+gQ7icJ5vvzLalnbJhVv8y7I=;
-        b=mrJYvRAA4xzHkcmJhv1GD2wviGuTbd42wmM8Mots3ER+RwMG90v7Z+qgjwd4vABdVK
-         Djzr3hwkjHH3jWC/aDNwv68AT2UDlN78iAwUVOdfGbtk2KlyjSsgZX9GRPceRaceLnBY
-         0J3j3cRmenAbb9rbkUvEGY9TxVb6nuOyh4GMPSm6CwtKfAVMH8/tLTfvzTrY99eLiPqB
-         gCDCkQ4cwhuhqTZYPia52jMIhLPORl6dVeprQJvwulTz6mV2bn9jPNEog2qRnBVH7h0w
-         NRtUOVr0Cmj7friLQBxAxPt8dJjMdW2E2JakQtAzD1ZtM/RJWOT1fnmbDmk+CRPv7Rkc
-         kaAQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+c38dLmiyP7S0hNPdFnV5B1uZSx5g+H0HnG11VcShfBBya0iwjNrYBRmM5rf1gbw2gWOPv9qI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnkytQBMIy2FB4dVps0JUpBFYG+kRF0XGAiXsDyG//0LTshkpA
-	5TF0ZvYr9mTlQMAMB6UU+f1KPWHzkdkOYbM7V0x/CyBsjetQDaKxlUeVSt+bri6M5OjDGTT1q1B
-	LVgELcSdVn5JdsTP7BMLB1+gpE43tflJOYTfjAYu3
-X-Gm-Gg: Acq92OF4YfIufhNvsg+EMnPgcXMaf5O6jdwT+rgHQFNQGpoS4TW7jtWMng025vV+THR
-	qVzzaJDCPBlK6nEU+oqYeb35jWUjJZrWUoz78w16SQtmMnWzswYScxQcu/7eEPJaaFK6NHjUoWd
-	UDmb+5iQanumLf74VkDUwyrpZmEoUGITfPmveyDQhSDm3c8A1t6ITfJYSbIY72E7KZeGZmmTpYC
-	nbEAmt8suTqaORQxlIp3iiMGwSDpcfaAIVgZsDqcebN5+A4jSIcNpxV/zxxzWaPAPNPtES21xMO
-	UX/e3UUNPb6MGcIkdRr1j8m0wHUB9GIDZBpndyWuyVzm8zVq2nhUzy1+VDY=
-X-Received: by 2002:aa7:d987:0:b0:670:2007:668c with SMTP id
- 4fb4d7f45d1cf-682143aeccfmr62081a12.4.1778676948796; Wed, 13 May 2026
- 05:55:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D08073E5A0A
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 12:58:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778677110; cv=none; b=ByFZtP+GH08MxKkgBW5i335pYwY3RwleMeZnwoAe95jYiVMNRByx43obBHaTkNIMgyFD5+HWJ28aw88WLQ2MG34g3pm9r7fDhnaVAYF2evuCogz9IihGP0DFKAy3+wCrqCsvtRxIA+eHigaRxbXtXF8owb0CiYk6r3ZTH2HZgb0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778677110; c=relaxed/simple;
+	bh=LEUBIiNlhIwLVoS07r7CEgQFYEL3sJFAgY7Ax/ZODxY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m+EMWqyhJXjDGryETjlczwzVJHf5nIH5DJQ+mP2AAzSQ0pOBp1LTgOPBIgE6NAzQ+9+3cmnvsfBHNTp4tN/BJQ8t/igiBN50dz4CJ4P5ZIyZhWWj1kDwffSg4pX3Ou8wl6dPzNCXWxelcJnQrg3aG/CgXXU44sFLrVyoVRTLbLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L+ZXpAm3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE893C2BCB7;
+	Wed, 13 May 2026 12:58:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778677110;
+	bh=LEUBIiNlhIwLVoS07r7CEgQFYEL3sJFAgY7Ax/ZODxY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=L+ZXpAm32iTYghL2PacX7SpCOMUtLNwpgcdDO695PppdglN2aO+rJuYxeMh48zAzR
+	 Yo1wy5IDASrkbA5AsOL9umMSu9iXNYOUHhXZbNGiu3jBIyhE3YQLBi5t0pQ/L6oMPy
+	 16ee4xP1CKktkVo6cu6fiHbrEXpf4TRX7Fb/Ebco5CA4jyxmOAuaGAWeFpdATL2LhJ
+	 UfKBCUdWUMLvIXxfHo6KpMNxLEYUXFO3xlHEJqt6Yje28mFPRJeAudz+Pv3AasScIV
+	 P2PewY7KbMQSxrfizKnMH9cH3oa40qrFE+I87unW/BO29V5KvqQs0AoGczgtl4ILwQ
+	 hyke8s/xJVGIQ==
+From: Chuck Lever <cel@kernel.org>
+To: john.fastabend@gmail.com,
+	kuba@kernel.org,
+	sd@queasysnail.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com
+Cc: horms@kernel.org,
+	netdev@vger.kernel.org,
+	Chuck Lever <chuck.lever@oracle.com>
+Subject: [PATCH net] tls: Preserve sk_err across recvmsg() when data has been copied
+Date: Wed, 13 May 2026 08:58:25 -0400
+Message-ID: <20260513125825.205189-1-cel@kernel.org>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260512-msg_no_shared_frags-v1-1-55ea46760331@google.com> <20260513095038.116dcb34@pumpkin>
-In-Reply-To: <20260513095038.116dcb34@pumpkin>
-From: Jann Horn <jannh@google.com>
-Date: Wed, 13 May 2026 14:55:12 +0200
-X-Gm-Features: AVHnY4KfwE3y7h8hFZX8aDELXSD4dJEB9400TNzsk3fsPJWPaOeiLqvFuTUjsx4
-Message-ID: <CAG48ez3gw9F3YM9Xf5z-Ye+5Vfw8TmGT81sDMXV6pPHL_omrOw@mail.gmail.com>
-Subject: Re: [PATCH] net: block MSG_NO_SHARED_FRAGS in sendmsg()
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, John Fastabend <john.fastabend@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 8094C533EC9
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 543D2533774
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287589-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[google.com,redhat.com,vger.kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org,queasysnail.net,davemloft.net,google.com,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287590-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jannh@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,oracle.com:email]
 X-Rspamd-Action: no action
 
-On Wed, May 13, 2026 at 10:50=E2=80=AFAM David Laight
-<david.laight.linux@gmail.com> wrote:
-> On Tue, 12 May 2026 16:02:03 +0200
-> Jann Horn <jannh@google.com> wrote:
->
-> > This change should cause no difference in behavior; it just cleans up s=
-ome
-> > hazardous code that could have become a problem in the future.
-> >
-> > MSG_NO_SHARED_FRAGS is a kernel-internal flag that cancels the effect o=
-f
-> > MSG_SPLICE_PAGES, another kernel-internal flag that influences the
-> > data-sharing semantics of SKBs.
-> >
-> > Prevent passing this flag in from userspace via sendmsg() by adding it =
-to
-> > MSG_INTERNAL_SENDMSG_FLAGS.
-> >
-> > This is not currently an observable problem because MSG_NO_SHARED_FRAGS
-> > only has an effect if kernel code adds MSG_SPLICE_PAGES to it.
-> > The only codepath that adds MSG_SPLICE_PAGES to user-supplied flags fro=
-m
-> > which MSG_NO_SHARED_FRAGS hasn't been cleared is the path
-> > tcp_bpf_sendmsg -> tcp_bpf_send_verdict -> tcp_bpf_push, and that is no=
-t a
-> > problem because tcp_bpf_sendmsg always intentionally sets
-> > MSG_NO_SHARED_FRAGS anyway.
->
-> Should that be inverted to an explicit list of valid flags?
+From: Chuck Lever <chuck.lever@oracle.com>
 
-That would be more robust in the long term, yes. I figured I'd just
-add this one flag to MSG_INTERNAL_SENDMSG_FLAGS since that's more
-obviously correct than making sure I have a full list of allowed
-flags.
+The sk_err check in tls_rx_rec_wait() consumes the error via
+sock_error(), which clears sk_err atomically. When the caller
+(tls_sw_recvmsg, tls_sw_splice_read, or tls_sw_read_sock) already
+has bytes copied to userspace, it returns those bytes and discards
+the error from this call. sk_err is now zero on the socket, so the
+next read syscall observes only RCV_SHUTDOWN and reports a clean
+EOF instead of the actual error (typically -ECONNRESET).
 
-> Unfortunately it doesn't look like calls with unsupported flags can be
-> errored - which actually means that no new ones can be allocated for
-> new functionality.
+The race is reachable when tls_read_flush_backlog()'s periodic
+sk_flush_backlog() triggers tcp_reset() in the middle of a
+multi-record read.
 
-That's not entirely true - to avoid issues like that, MSG_ZEROCOPY was
-wired up such that it only takes effect if userspace first sets
-SO_ZEROCOPY, which essentially means "I promise I'm not passing
-MSG_ZEROCOPY to this socket accidentally".
+Pass a has_copied flag to tls_rx_rec_wait(). When has_copied is
+false, consume sk_err via sock_error() as before. When has_copied
+is true, report the error from READ_ONCE() but leave sk_err set:
+the caller returns the byte count and discards the err from this
+call, and the next read syscall surfaces the preserved sk_err. This
+mirrors the tcp_recvmsg() preserve-and-surface pattern.
+
+The decrypt-abort path is unaffected: tls_err_abort() raises
+sk_err to EBADMSG after tls_rx_rec_wait() returns, and nothing
+on the caller's return path consumes it, so the EBADMSG surfaces
+on the next read.
+
+tls_sw_splice_read() passes has_copied=false: it processes
+one record per call, so no bytes have been copied within the
+function when tls_rx_rec_wait() runs. A reset that arrives
+between iterations of splice_direct_to_actor() (the sendfile()
+path) is still consumed by sock_error() in the later call, and the
+outer loop returns the prior iterations' byte count and drops the
+error. tcp_splice_read() exhibits the same pattern at the iteration
+boundary; addressing it belongs at the splice_direct_to_actor()
+layer and is out of scope here.
+
+Fixes: c46b01839f7a ("tls: rx: periodically flush socket backlog")
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+---
+ net/tls/tls_sw.c | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
+
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 2590e855f6a5..c4cc4e357848 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -1356,9 +1356,14 @@ void tls_sw_splice_eof(struct socket *sock)
+ 	mutex_unlock(&tls_ctx->tx_lock);
+ }
+ 
++/* When has_copied is true the caller has already moved bytes to
++ * userspace. Report sk_err but leave it set so the next read
++ * surfaces it instead of a spurious EOF, otherwise sk_err is
++ * consumed via sock_error().
++ */
+ static int
+ tls_rx_rec_wait(struct sock *sk, struct sk_psock *psock, bool nonblock,
+-		bool released)
++		bool released, bool has_copied)
+ {
+ 	struct tls_context *tls_ctx = tls_get_ctx(sk);
+ 	struct tls_sw_context_rx *ctx = tls_sw_ctx_rx(tls_ctx);
+@@ -1376,8 +1381,11 @@ tls_rx_rec_wait(struct sock *sk, struct sk_psock *psock, bool nonblock,
+ 		if (!sk_psock_queue_empty(psock))
+ 			return 0;
+ 
+-		if (sk->sk_err)
++		if (sk->sk_err) {
++			if (has_copied)
++				return -READ_ONCE(sk->sk_err);
+ 			return sock_error(sk);
++		}
+ 
+ 		if (ret < 0)
+ 			return ret;
+@@ -1413,7 +1421,7 @@ tls_rx_rec_wait(struct sock *sk, struct sk_psock *psock, bool nonblock,
+ 	}
+ 
+ 	if (unlikely(!tls_strp_msg_load(&ctx->strp, released)))
+-		return tls_rx_rec_wait(sk, psock, nonblock, false);
++		return tls_rx_rec_wait(sk, psock, nonblock, false, has_copied);
+ 
+ 	return 1;
+ }
+@@ -2100,7 +2108,7 @@ int tls_sw_recvmsg(struct sock *sk,
+ 		int to_decrypt, chunk;
+ 
+ 		err = tls_rx_rec_wait(sk, psock, flags & MSG_DONTWAIT,
+-				      released);
++				      released, !!(decrypted + copied));
+ 		if (err <= 0) {
+ 			if (psock) {
+ 				chunk = sk_msg_recvmsg(sk, psock, msg, len,
+@@ -2287,7 +2295,7 @@ ssize_t tls_sw_splice_read(struct socket *sock,  loff_t *ppos,
+ 		struct tls_decrypt_arg darg;
+ 
+ 		err = tls_rx_rec_wait(sk, NULL, flags & SPLICE_F_NONBLOCK,
+-				      true);
++				      true, false);
+ 		if (err <= 0)
+ 			goto splice_read_end;
+ 
+@@ -2373,7 +2381,7 @@ int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
+ 		} else {
+ 			struct tls_decrypt_arg darg;
+ 
+-			err = tls_rx_rec_wait(sk, NULL, true, released);
++			err = tls_rx_rec_wait(sk, NULL, true, released, !!copied);
+ 			if (err <= 0)
+ 				goto read_sock_end;
+ 
+-- 
+2.54.0
+
 
