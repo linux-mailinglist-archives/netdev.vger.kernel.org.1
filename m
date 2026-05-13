@@ -1,125 +1,143 @@
-Return-Path: <netdev+bounces-287391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287392-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8NucBdbZA2qR/QEAu9opvQ
-	(envelope-from <netdev+bounces-287391-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 03:54:30 +0200
+	id sFR4AB3lA2oRAAIAu9opvQ
+	(envelope-from <netdev+bounces-287392-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 04:42:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 036B152C169
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 03:54:28 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E618752C523
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 04:42:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E16783009E06
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 01:54:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A4F5D30071F1
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 02:41:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A594B29AB1A;
-	Wed, 13 May 2026 01:54:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3258B35DA55;
+	Wed, 13 May 2026 02:41:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fi0ObpWe"
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="EP+tYA3g"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9031DF261;
-	Wed, 13 May 2026 01:54:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933001EA7DB
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 02:41:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778637262; cv=none; b=NuFzq223R+uVqV7vBizVAKzaDBdzpYx7YJalkHo24HcYwUlEJE+J8gAMOaL2xGqI5bAoUWkVuStbC3IWI3hfwCVFD4EcLmU95T6/GYVXzG5OREarqEIRa4Gtxr/kgv1lLYRZ9qpg70SDJCS7WUSfyfPJUIsQEsZIURgqBIhKDiQ=
+	t=1778640096; cv=none; b=Q5jEEaR4qaSqWqtmWZ98SPk4ir34WXsdksoMnBmJKZnGj0xFjY0NdKSzZIgeLMD//EFIe78dN1V30z2iUZKTT5ce8J5BZhHKpqIzW7wYDcpKarl1LydU1U3s5OWLAzGw9DXgOcpAhFlm/rBOf6HGzqq25x3FHYU2qRe2SlkMw2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778637262; c=relaxed/simple;
-	bh=nvkKlP+muh+e39AxYKH9NZ8enYjEU29a+h+cLGdElwQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SyjikUpwzEqvtx+m4idQm3UGHCHRwqm4MYEGKrkXSl1DJqFi1X3d65Kw22wTQe+mKRVreWA7Jht8/paxZ5u0W07OEpY8OAHfZ2RszHAI89nMD+NWbR3++pkmuPXpcABfxgQIN841JTAUlXWawg05DxPnPO5BiX5EKBE46BX6+zU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fi0ObpWe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 703B1C2BCB0;
-	Wed, 13 May 2026 01:54:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778637261;
-	bh=nvkKlP+muh+e39AxYKH9NZ8enYjEU29a+h+cLGdElwQ=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=Fi0ObpWePc/vTI/DoHV7qqDJ3dCfZwYGjWe/iamzdU+zmyLtetiCWsUVzVXe2Z0pE
-	 m8CIa4H/RuDFRVm011MWTTTuo+ua+nztjD9Juj6myZYMdtfOU7rSClP2rC6fL1/dKQ
-	 TSojoNBv/JZ+grbAD4ygFVkbNfURvO54DXSpSdwHH0GfaScpOi81/LZ+fEhAIGkjKH
-	 Hp9pxjtaLKi65clFZUa7eqizxf3CHfl1maiugSEdgX/FATVDhV2L8fHBScXWYpmO8f
-	 8sJKbExoArbHjI0VZh0H1wRi2zcCoExRS03gK2oU3D2oP/pCVpp9jXkKvWZ7/y8EDT
-	 cVUFHA6NbCwkA==
-Message-ID: <38c21a1067fbdf2f2780b6dfd06d839001943d59.camel@kernel.org>
-Subject: Re: [PATCH net-next v1 0/9] selftests: rds: Add ROCE support to rds
- selftests
-From: Allison Henderson <achender@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com, 
- horms@kernel.org, linux-rdma@vger.kernel.org,
- linux-kselftest@vger.kernel.org,  shuah@kernel.org
-Date: Tue, 12 May 2026 18:54:20 -0700
-In-Reply-To: <20260512184209.0956bcf1@kernel.org>
-References: <20260511072316.1174045-1-achender@kernel.org>
-	 <20260512184209.0956bcf1@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3-0ubuntu1.1 
+	s=arc-20240116; t=1778640096; c=relaxed/simple;
+	bh=1mhpvweEuvC1qmquIvbyseT1tmctLqLlH0MSE1j3GJA=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=dzTpFM4bOE5NEVqPJqOyCxf6ptWYDtZAWHs5vFrSzMBXbUTMKwp0qbCgGtpTAimpewEPW0DNj+hlLEgYPR2e58s5yZCcLQjaflBTVnBU6QHUBqp57tJOqKWB21Y00XluQbr5R+rHI4IqR4mo9v1LkCBtuD2LDys2yHvwR9fsxy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=EP+tYA3g; arc=none smtp.client-ip=43.163.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1778640090;
+	bh=WmK2zD20CENFt9liQTaBLnpOLexRN/pxML6fuKKLXTg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=EP+tYA3gtg2tOhAtcHFMe8bGbkJQMP0+9HZpX7+S0gK84geFiaw5Y/SX+qxtkDnp4
+	 9LpEDS2juxQJcLDTp4+O4aT7OEbPviUFJJAVTGKNpzIDL/xH36kadsbpOdUUTLq4N4
+	 dQSEwzi4ahhqIJ5mnp691wyNz1jRhSHlqaXZgYnI=
+Received: from localhost.localdomain ([116.128.244.169])
+	by newxmesmtplogicsvrsza73-0.qq.com (NewEsmtp) with SMTP
+	id 98BA4C0A; Wed, 13 May 2026 10:38:11 +0800
+X-QQ-mid: xmsmtpt1778639891t0uemor3e
+Message-ID: <tencent_3798BB6EC69DCB45BBD25D7CF1C5CDA8A806@qq.com>
+X-QQ-XMAILINFO: MStTOrhA1CLVaRSBH305IXsZaobYd6KwaSW3XUDY24KyuG7vD0pH4RwMrIjlIq
+	 o3oRkkmkEACPdVinAapm1SGH0+o+K7vWfdzVp82ODu0zq4wFlQv/PFqOW85LMd0qVEd0VelOWqIp
+	 2JxppSSfpArMZ+L/tXN5TGdSLzYUO7Fg4oqErrub3zBKufC7Y6cGjswfojhOvCbtX5Y33nlzxmpF
+	 GI8h8zKgxuRNxrYcY5rpxyKCW1l9MSO2jnYFP6ZVztWavgLvloPtcnueOPUvCtvQBjKkFs376Zo2
+	 6g29ogjsmQBTp9zUfTXb1CHCYPRO2Bbur8GuZehEClWwe4R/1U8p4Z+GjZeRQzYDTcwLApX5eFv4
+	 uc4unZU8H5wk1w68Ae+bVa1I5wyuMTB8z+ce5n8WdBrJsKXMnRT1yXY6Jd7GG2QfdO95lZfa8xqz
+	 BMgu82rRi0pydmek0yxuHYNtjCqUVWwiZxDH0mK51sHSoKMwZGHnVy3KjVq+DvxKFE/qn6u6ZPcZ
+	 Q48e+uT+GQWB7+B8LAeGmh4yy4+KEJaGw+mMGMgQL2RY2nSZmaIn3hYUBG6z7fUHHw+JzYqMnVvi
+	 IUXyNTrhQte8aP+j1uplbcNRysnDSO2GOZcRq1nxGB+DViSrN3AWEfo/ZZiy79V0UmNSScP4/+l6
+	 oLwuJMS8ZdP9jfDefZO4Nnvzhljm735f9bm6PWSKmp6QHvYvmIAC2Si7JOM6YVhvy1eHdzCX1NTP
+	 F8q/L7Wx/rkhbsXZpF69C5NaGZpMVIvBpH5g3IMQC0iWbuItkSljoVA61toiLfMb+jiwrc5N2wwK
+	 AvxZfvMjE6Ihq8eXEYCO16VXBR5NSNWAXj9knvuqCDordfza7DPrPdwf7SKrt5po/DFRYQwH5leW
+	 uPsM4b7PR7nYZVM1tO2ogFUAoA6dTATyTchgxdvO/tDARWv7SS2Etvpwh40/zuCf5lrMDwDmh5Zy
+	 xcB1NBLxcN+oNUAsoNiH0ZFGyL6VrGvGu3xU8yUjrB5Dmhfr6drw81RSfUoY4m0A+JRCxzKwTJ9J
+	 ybPT9fEgu/7O5kO9fjqtuM2oYFl9Is3hGIyjqtnw==
+X-QQ-XMRINFO: MPJ6Tf5t3I/ylTmHUqvI8+Wpn+Gzalws3A==
+From: Zhao Dongdong <winter91@foxmail.com>
+To: andrew@lunn.ch
+Cc: davem@davemloft.net,
+	hkallweit1@gmail.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	winter91@foxmail.com,
+	zhaodongdong@kylinos.cn
+Subject: Re: [PATCH] net: mdiobus: add mdio_c45_bad_oui_list for
+Date: Wed, 13 May 2026 10:38:11 +0800
+X-OQ-MSGID: <20260513023811.99362-1-winter91@foxmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <031a1fce-259b-4b1b-95ed-2917a6b81659@lunn.ch>
+References: <031a1fce-259b-4b1b-95ed-2917a6b81659@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: 036B152C169
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: E618752C523
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[foxmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[foxmail.com:s=s201512];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287391-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-287392-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[davemloft.net,gmail.com,kernel.org,vger.kernel.org,foxmail.com,kylinos.cn];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[winter91@foxmail.com,netdev@vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[foxmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	FREEMAIL_FROM(0.00)[foxmail.com];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qq.com:mid,kylinos.cn:email]
 X-Rspamd-Action: no action
 
-On Tue, 2026-05-12 at 18:42 -0700, Jakub Kicinski wrote:
-> On Mon, 11 May 2026 00:23:07 -0700 Allison Henderson wrote:
-> > Currently the rds selftests only tests the tcp transport.  This means
-> > most of rds_rdma.ko has no testing coverage.  This series refactors the
-> > rds self tests to add an rdma option when running tests.  When used,
-> > the test creates a pair of ROCE interfaces to run the payloads through.
-> >=20
-> > Most of this set is refactoring the existing test.py module.  Since mos=
-t
-> > of this code is one long procedure, it is difficult to modularize it
-> > without creating a lot of pylint complaints about lengthy functions
-> > with too many variables or branches.  The first seven patches address
-> > this by breaking down test.py into helper functions.  After we have
-> > modularized the send/recv packet logic, we introduce the new ROCE
-> > equivalent network configurations, add the new command line flags to
-> > build and run the test with rdma support. =20
->=20
-> Looks like there's a handful of ruff and pylint warnings flagged here.
+On Tue, 12 May 2026 14:26:48 +0200, Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Tue, May 12, 2026 at 04:25:21PM +0800, Zhao Dongdong wrote:
+> > From: Zhao Dongdong <zhaodongdong@kylinos.cn>
+> > 
+> > Added the mdio_c45_bad_oui_list to facilitate adding more PHYs that
+> > do not support C45 scanning.
+> > 
+> > Signed-off-by: Zhao Dongdong <zhaodongdong@kylinos.cn>
+>
+> Please make this is patch series which adds the PHY you have which is
+> also broken.
+>
+>     Andrew
+>
+> ---
+> pw-bot: cr
 
-Yes, I noticed those. I will send a v2 with some more pylint/ruff cleanups,=
- and anything else that comes up in the
-sashiko reports.
+Thanks for the review.
+The PHY driver hasn't been upstreamed yet. We can bundle it with this patch and submit them together once it's ready.
 
 
-Thanks!
-Allison
+-- 
+Regards,
+    Zhao Dongdong
 
 
