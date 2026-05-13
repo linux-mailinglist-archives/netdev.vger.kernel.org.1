@@ -1,291 +1,249 @@
-Return-Path: <netdev+bounces-287671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287672-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0B6lEcalBGogMQIAu9opvQ
-	(envelope-from <netdev+bounces-287671-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 18:24:38 +0200
+	id aJCYI9+eBGqbMAIAu9opvQ
+	(envelope-from <netdev+bounces-287672-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 17:55:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 966FE536FE4
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 18:24:37 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 491DF53694C
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 17:55:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8C4CA313DCEC
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 15:39:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BC9F630054ED
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 15:49:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDFBE46AF1A;
-	Wed, 13 May 2026 15:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A148C388885;
+	Wed, 13 May 2026 15:49:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wpz6TKW5";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="DaWzKrwd"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QxWDQ/fL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011042.outbound.protection.outlook.com [52.101.62.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5191D43E9CD
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 15:39:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C99B3F4129;
+	Wed, 13 May 2026 15:49:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778686791; cv=pass; b=qds8WPgN4gkqn93kR/MwuoG9Dl7gMHATBgpUNFg9uAhm0DpcM4tJ18re8AYSE+HurSmtxqFdyIsbSF+iAaPec0msuL+BJT1BhdeMCU8/QNk5KsplPKLQjF0EMYMkDrzNeBC+5Q5lRwJfIOx0ETuyEBTnN7Rj6er6XBncXSSvrfY=
+	t=1778687351; cv=fail; b=avD3O1p9J427cJVDS9feFaHBb0KtS1rtTpDmb42iOkiojP5aTL9fklREQWdh7N2bmjJaUHHTo9dRP08LhVr6BBScJ4xS/R9gyHSMIj3nQLAzYmVKEUi18sq6SBYkN/0W9XnhN6CTU2bNmbXWmaDSlvgRK+HPjTcE/U6dO6CIOv4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778686791; c=relaxed/simple;
-	bh=I6CRyv67nDUME5VvRLFuqsc58wOTMq7M6YaCgoHOEwE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y1Jm9ykUmhxJF/KabiRW5VA4v9EiypoAaALfAPsa5cySxGxGK+8xGix4boZ2SuNkvc/eRJkzFo9ShXGMGb2XpKyoIOuxdyNtMTsDdoRMF66wo7Ngy4L70DV5U3FDlWkpE+XK4KfBY7vcZ8uvURXcvdXJVA1WGqQ9ZPJegfcN42w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wpz6TKW5; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DaWzKrwd; arc=pass smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778686789;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZmYjZclztoGUcmB8bgTN3A8z10j8cbJPBMIgLaq9Wck=;
-	b=Wpz6TKW5c92MLIegUQzKAuoITmu3CaYxr1eMf1YVyzIzzSW2wicUumyR5IPKQckYBp96VJ
-	kyLHECUiv3oMZYNSI+FVlGeimfZ5q3Ln7+32bY8jlBBJSk9lxQhOXpZ/uolLUXFanc9xC3
-	tOWFWQ9g5RzJ5xv7DGjea4EqpIxt5co=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-508-W76_BvDSO56pjaavwKFNqA-1; Wed, 13 May 2026 11:39:48 -0400
-X-MC-Unique: W76_BvDSO56pjaavwKFNqA-1
-X-Mimecast-MFC-AGG-ID: W76_BvDSO56pjaavwKFNqA_1778686787
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-bcfd21f71ddso295229766b.3
-        for <netdev@vger.kernel.org>; Wed, 13 May 2026 08:39:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778686787; cv=none;
-        d=google.com; s=arc-20240605;
-        b=OU+MXrR2bduGmubnuAvR2nUEkOnLvhoIEj7c8oE6RJSvF9Lzx8x++1AnoakeFEFduR
-         s+uv6aR17I/K8VrMLnKFn17heTpoG4LCjeiWw/SQbOG4TBheWp5DpZZPOabHE3SFEzDU
-         cbv6HJLi5jnS5yzQIM61+Kse4B+pO+O5WeQk6INNlQBi7+iHUuOf3D6ZtpVSOxR559Sr
-         metViSY6+atQNGqcud/uOyptVFrLzsEP/Rfccs/xiRqniWYtH8FQ7Ffy52mtQ300uwXu
-         ktQ7RgA+/LWkMyZxWKvZw/qzJSnU0VjyOoWkOqPUsW4mf3/DEM+D6YgUtOFUAZA+2vJt
-         PThg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ZmYjZclztoGUcmB8bgTN3A8z10j8cbJPBMIgLaq9Wck=;
-        fh=Tmxz3a79UKdkumrKeS+Q+rDY27d+Mx6LCtVyAiXVNTI=;
-        b=bPaUjmCD1PJuQE+5++oLoqvN7DePwDIESPG2pc7HapBjsA7ZwqCzsRRS1fLGzo9YTg
-         WsaibPuebeWmht5BhiX+GnPDVc+6dthbPEzwlZjAK/9iwmLoUHl/co7mXVnpwL5hR7gT
-         l8XV12SRyQfiQAz6c+NcTVcQA5omwx9C3MA+xRZBi13mwj5EEHJFaUUsuhTR308oF/ey
-         JHafvt8/5C1jGbDYy7CLSuT9SR0m9JLH/Ryn8bq8JekcSrEBDadGmwuZqoL7gF8Ea8G7
-         W2Mn8t/G3br9EgzIsRUOpEPIAL0cWrrzcleplSJSAtrE46MrqSgXYloJW6zhwmG5gddU
-         hEKA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1778686787; x=1779291587; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZmYjZclztoGUcmB8bgTN3A8z10j8cbJPBMIgLaq9Wck=;
-        b=DaWzKrwdwmN4O8zrxXjTj4Dg8SsSSn1aYAzssJgeGHtBE9G33KH8/mpQkHkRgCPpY2
-         3iQQrkqdzhi8295xlJrBEK8Yw4SavS4ACGCHa/amTJnfVAzgkxSS1gj8kQNW/quzqAdG
-         wYLCnlMlEY1H/JQ6jadOtWQ9o9FgO1cKNM/rJgCbk/PyAFeO95762ZcRnegzCUyB6CdC
-         V8Tm3d1lyXWm17nEzz8D0um24TEN36vAER9UnwGZVdqL8KuI8852dcqUYmEvL2759nRk
-         TCQ3ZWq4nknAef0BzQZ1FeIrBvV7FXB1ahQJ9Z/6r5jbg52lNoJs0PfX9IPF9U7uLH2e
-         w+6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778686787; x=1779291587;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ZmYjZclztoGUcmB8bgTN3A8z10j8cbJPBMIgLaq9Wck=;
-        b=haM6E/UvA67/QfMGqyBWzUhff+4W6COjgWGd9d6/QOc2VK3bWfxn+D2IOcqOJHovKw
-         jn8JQ4NQM3UFekVKOTynojRwkkD2UO7PpnqPMMceGQA1CKBmO8akiqv94VRsaKcUR66T
-         UbZ3PI0tClUegZUO9gp8N3OioJymj5MeEExM+D8X/Cyh4Nuyr5L1Ww+uw2Zw/OX3H4i3
-         tZ461/MhUteyf5T5ZixMrR/FU33VJHTSHgKDQLXaj51t2ndvu7RKizZVAyQVQuoGZmkW
-         2Zvioed37Q+dhI7Sw5NmTIHnoGwy8sp63Spl5kfqelXLzC3lXOQ1j6TwENNkbQ0nqnxB
-         BqeQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+80lte4Q7nEAKfwOUX77mlYABCNaaKDWCEvK194u67MN0BTS1pR4rJ+SJqgbWWaQ1682tt79Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1KoBOwn9ff5c9Tkls84iCcSEtVFyKADMOr+slfXTZS8Hbrnmw
-	a6/c/CHRNP4HMXSxOfAx/GPwjB+Ca+dOm2HOAwDrB4Lgd2Wd1kw8h5UgKPEMh5avr2guy9uRpsz
-	gUHKzTkIaswPdGnnuy+Eu4FuKz+Tb/0RPCYmKQpeG71oFShmX72aSwJkd/4yRD0sv9ypt2KqrV6
-	SqZtZ/0GqUK9w6IE/SAKC3KyYa8Rq5k78l
-X-Gm-Gg: Acq92OFcAqm/V5Fho1CTOLZ6ljj1Uyye6Uk6udvrr6FaJr2MC7BGb9WQpPZkIL9ypqC
-	/waFxA1SrO+JwoY6Q3LuKYywRMAo3ctjACp0Pg8JYij9kZrFvooItYqRdHNki4z6r42IsP+1c8s
-	mIzLgfMXo/BcVk+cDtMfLqnJ5KYKphVhrGAja9eubCmkoCucbiZd0dzwKfMNLqCMtunZAQOr2+t
-	yS3iZrMOgyrIFA4PUbzUv0oRgAEgmN22hDLo5PORtH0D7+K42iRCKp2n28umVxObc87bc4avZSH
-	zUaghSsqpYDPTz6QmXW7Yys=
-X-Received: by 2002:a17:906:730a:b0:bab:b930:474d with SMTP id a640c23a62f3a-bd3dfb5e659mr240249366b.1.1778686786789;
-        Wed, 13 May 2026 08:39:46 -0700 (PDT)
-X-Received: by 2002:a17:906:730a:b0:bab:b930:474d with SMTP id
- a640c23a62f3a-bd3dfb5e659mr240245466b.1.1778686786238; Wed, 13 May 2026
- 08:39:46 -0700 (PDT)
+	s=arc-20240116; t=1778687351; c=relaxed/simple;
+	bh=0P/1wEZ77wyCPHX4RnpW+oFzd/6A2lXYIg5BS2Dln3A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Gisp+kLdflcswFxzEXUU3odm6T45URrrOhtl+JLGkN86qrDQ6Pe/t+DpLHQnhGF44PxQoo9uOQfhp9VQUfvNt2XVTbdpa2Z5dtj9faGfpfjGGJEpcmeGTgyMj1BY/n0ocHgW95FjIUvjWK+wIc0Vg0js2OqnXDHO8YdGO4xTBao=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=QxWDQ/fL; arc=fail smtp.client-ip=52.101.62.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=q50p2xDgLLI7ik57NY1w3RTZoiHSQ8rn4gT5ZLoCFHz9ZzsNOTjegNisWmrI6BU65b3Svhj8xy3sbbIPVBN18kIvI9LcKLXS71ZaUcLFfYcT64SUfsFXrU3Q/RY5gItlk4mrcmQd8CRQtCdq3rCQvdEAS9M6dj3uYyzhd01rfxMblDi7s3cuQ4tvBqHm9ZuNFlcmppHBPbYr1Eg4OoQ0WZMtMIpzc+N2IzIwAKLePA9nMjThnJ8cv+ANem0NpkRPAISn0duSB3mL7Hnjb8xtwSsxgTsiPLudBuuXmgxc8ENpkYjrKWaCCdXoHwXfL6o+1WIJcwx6xCUqWOWGhxeUKw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CHWIhqiyl11CIHz+tHMmOM2CxxEzIPwzkTRcRi7tDVg=;
+ b=YyNfO2OUOiZUI7LOl8bqeHyzYP4Z0e989KDrc2iHBWK41yBrkO6aAlp4pArOA3SXWHDt7HLGaamPX1zxWF8PykPN92HQoIrj1o6tRBhLbCPnAZyMPyvsKiYi4jhukXJDYQFScj4q5yrRt8rLap8n4T3FpqoHiC8VhPhXSQZe/wh7/POhpEyOsQqRlgN3Z/BH498adsrCUBMVffe2QCVoKZzii+AQBKjraLkV/GgXFgCgDSsPr3OslAr3LNMRfna+ETkJ/CfHEseYq6xELRTFdVdu08JTlFal02ek4J3MjtwJcIckEQEcZRROp2VNxkm5o4XeZ1zs8A33XZaNQqIkTw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CHWIhqiyl11CIHz+tHMmOM2CxxEzIPwzkTRcRi7tDVg=;
+ b=QxWDQ/fLUcuNIjE8AYcOkR1fD5iNXVH2o7BpZVHx6RDPrTcyWzUL6NgXlLBXZPhBXmFlWlO7Qwh3Uz/UagyfxOW7gvvMIl6i53ZLMK9BFKC2yV9gAnd7BAXQDsGDLe8jI5Lhlc+KPYyOHVrsM/vZFnx0Y6PwJprOI900ca4y3MhfwqlYJ/qQ3Ba3VFWUnZOah7endTabTlFC4FW+f5keUByeDB8T3BUirZ0AndNNTKbW+LNkgw6fP7cVFZqWO7Wg5bp6s9Nh30HXAhOH99KU54zZKwUF6GqJ14uQmCx7m8ddHQ1NgibOct37/TNbigUCW3Thhc717e6Kecqka+U6zQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by IA1PR12MB8238.namprd12.prod.outlook.com (2603:10b6:208:3f9::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.12; Wed, 13 May
+ 2026 15:49:05 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.20.9913.009; Wed, 13 May 2026
+ 15:49:05 +0000
+Date: Wed, 13 May 2026 18:48:55 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Bart De Schuymer <bdschuym@pandora.be>,
+	Patrick McHardy <kaber@trash.net>, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	bridge@lists.linux.dev
+Subject: Re: [PATCH net v2] net: neigh: Reallocate headroom if necessary in
+ neigh_hh_bridge()
+Message-ID: <20260513154855.GA425676@shredder>
+References: <20260511-nf-neigh_hh_bridge-fix-v2-1-c4964c7a7b8f@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260511-nf-neigh_hh_bridge-fix-v2-1-c4964c7a7b8f@kernel.org>
+X-ClientProxiedBy: FR4P281CA0092.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:cb::13) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260511184338.392420-1-rrobaina@redhat.com> <9802a1edc2f809440603350047f202e3@paul-moore.com>
-In-Reply-To: <9802a1edc2f809440603350047f202e3@paul-moore.com>
-From: Ricardo Robaina <rrobaina@redhat.com>
-Date: Wed, 13 May 2026 12:39:34 -0300
-X-Gm-Features: AVHnY4LvvCa0_cKymVrIA8eBbpHhIGvAvi3Lc-Gh0oHKmJHppjzn0OwWfWOkiZ0
-Message-ID: <CAABTaaAPx62gWTwMAa-O6bKXihv6eDHQFQq7D2=vrNhAO5gLrg@mail.gmail.com>
-Subject: Re: [PATCH] netlink, audit: prevent false ENOBUFS on timeout expiry
-To: Paul Moore <paul@paul-moore.com>
-Cc: audit@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, eparis@redhat.com, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	Steve Grubb <sgrubb@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 966FE536FE4
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|IA1PR12MB8238:EE_
+X-MS-Office365-Filtering-Correlation-Id: a9193f31-4be4-4168-da99-08deb10729a8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|1800799024|7416014|18002099003|22082099003|56012099003|11063799003;
+X-Microsoft-Antispam-Message-Info:
+	E8lKVk0hfhGPW93aTcl5yvpQcpe7oa+gOfePCe5caqFJDLrlPTANkr2i1vL3i21KVuR5p+iixlDjxErLIL9I6vdrowGbqslbrsDMRhj7rA6czC0UVhkRg0/9Pn13xTxVCXyRHb6dIfnhVkJmKhbqzLk//lzojG5TfCrdXVO+xv76rB/P0QcneH3HSUqVuMhT64QeegCVRoQDhyXp6iI69dPC8edUUx0SosY4oaUQxDrBYjn3FevrteFH4j+eO4xTfxhJr/nqs1w+NBR2Ll7t43HcgATNomANiMV/J34luhaY+CfgtBNRCgYe2fkKA6i7Abh5//YvhxahNIPqqz8VtTV6qr+L88QmCES2QKYfME8omcQrqgvITUK7zd86b9xYdUpTCufJWZHvjWHGBuzv7RczCH5pZCrWAyS3mD4qvNJB8JL0zGkp7hxhzmzdGLtTU4NLPA7m8kPby1xhH3kkK2+AxDoK68k9U3NT3Dd1LV0KnusbGF+AGEmf0UXAvC28ztQl2spgpr+5ICko/H/Lv6n1iHuKF46+i1wr6oFNVrn/lN968tWzQUcTP8s9dVrLdIYeN1sw/KzT8YGGxMSzbFkR7jLHMiCfElyUdpKN8d+fjFJCJUBsBm5HpBPmIxUF6G2FbRp8Yfcth1Yfv36Ao+pcyWjCa8HBP2XCr+vFVmMTddIdg5UmZQyyGlFWP6Sk
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014)(18002099003)(22082099003)(56012099003)(11063799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?4eF41KplNhj3ibVN9udaPpFKXzfIbLyypJ4eEbq4EFHIyIq8pDsSyzozjl6Z?=
+ =?us-ascii?Q?XTHTWeV3nT1DG3tuGZVtdG+nO7Sxux4PZjLmvw884A+RrOI8u5Il2ke2df2q?=
+ =?us-ascii?Q?XUDqpeKblSOmafLtu1ZijODRnMMCTaR00PNqWra8RezmcAZNEbydVL+8aH9S?=
+ =?us-ascii?Q?ZJjB79A1FSWV6gPCczB1H6fy5nIyedvKrbmT5UcyU96Y5bOfvBBDihNjhexL?=
+ =?us-ascii?Q?pjSdkOgGkWNyMW1ca+AUdkLJmUL6trSaLf/BtxSfY9EHI2xJ3vZHq5TKmKsx?=
+ =?us-ascii?Q?o3MXmBUdt46olHHlNF8i5tSYtTr1ccPbGDv/lx/6XrJnmhx04vpWcEQFnjLq?=
+ =?us-ascii?Q?H5ku2VnVg15/4+cTaLSa1xEn2SQwJaifq9pm3yGl2bJhWe8b4aLrL13idUXQ?=
+ =?us-ascii?Q?fNFMyPBpVQGH+LkrI0ZY29JC3GtulzezcnnVctGl7HoCseLt0OKZfrMBTJMB?=
+ =?us-ascii?Q?iEcQxWEQAUjyTvH5cZRXhZ6bXPuxJUWsDo1yvXKekVsNhvkH6x+kYIv9O92V?=
+ =?us-ascii?Q?ki0t/atVpYXqMnZapZCsSQQ2QEY8kvxdO3dsNC9u1tzpNPud17YijVOLylAl?=
+ =?us-ascii?Q?YL/OR3aOEKQ2Xlie+F+lsylSwzBJnTh9pi1vKuexe/0mUZLwmEo8flhSM8CC?=
+ =?us-ascii?Q?qHflIKrjBVatF2mjN0fmwPDQsHmkgKIlMHriuJYpkGukRKxjOPwW4KBye2Da?=
+ =?us-ascii?Q?Q8lqh73VGpn6HnS14yGWbwfabb4Fmn1KwUoLzTuLjAqHnlPBPDtcQx6qZy7x?=
+ =?us-ascii?Q?YYTYu0yfj0Qn0DYkK+/4VhnouPqFFPAtfZiddnrM563Il76Jb51a2WSXPXcW?=
+ =?us-ascii?Q?mPZB2dztetyijCF4a2cQtjP5veb3k3Nk/b9/eQ/QVkIB1Kul0D2wrtzuyz1X?=
+ =?us-ascii?Q?2B6ZjGvQTCK7Y9sCDeMjgolAI8TmEJIA683BuB/5uHMRFgvy4bq+3fOnWHce?=
+ =?us-ascii?Q?Ea3s42Tiw/SIHkNcjdD9JVf9qX3nY5sufd5IeR/LuzRH/IAvINou8l22ynWa?=
+ =?us-ascii?Q?qCSemfaE3WBqPJJ8tbfjzEu7OIeX0yywudZ0xOiqAOfTiAOLd7jgY+rbC0O9?=
+ =?us-ascii?Q?WpbHmiFhsnId0fmI9d6uv+Oc0zXq4cd4GvS+dsrDpXZ2VBlCNrVV8k15R6SG?=
+ =?us-ascii?Q?kyOkevOGeCr137ZYRC2M7hYudNB5kmrNBoMq+hSqyhns50NztI4xkgdwsC8X?=
+ =?us-ascii?Q?ssX7GPbP1zb6kLw+s54yXJhqZOVnDf+FqjxgezYoRyntW0BYjpxMy4orqiHQ?=
+ =?us-ascii?Q?AHQfzA8uctm5QuoYaY10e+Mi132bwmEdAYViJ6kbCARA3GZZtptVzvzMsKsI?=
+ =?us-ascii?Q?7o5gVUpEEYpfUfTxPD9fKEpvIrVZKEFkMt9m1418VOnNLmSQiczI3p3YCVvC?=
+ =?us-ascii?Q?uJsiijWvv2lT1om7114Q93I5TlfRkiYHyQw7rkY95ced3rHqDYW4TcWzdPcF?=
+ =?us-ascii?Q?u0EpHCRtCyhA4rFsAcvkAK4Jn8OI8T1tTdhFPemNrJQmij/f5q8c4+kv8qG8?=
+ =?us-ascii?Q?UKWvDcA5OK+5iHlK/ZVbqRDLEKpR+8veQ33Goch3nWGVdrxRtYceEcipzDkC?=
+ =?us-ascii?Q?xVpeIiv6FRcmYYY3a4MeNpxHXLOmb5bjyQweLCXkjRGP1FlekTLkLsmHTRhO?=
+ =?us-ascii?Q?VPS8F9IczS1Btco1CltI5Z75WGzvaDxyiijQnCF8bJsuJEINpPxjME6WOd0+?=
+ =?us-ascii?Q?wrRP6ssJ8LtzRQKlSi1qiDQb36LJLoG9sFhNuQPW5fZNYeN4?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a9193f31-4be4-4168-da99-08deb10729a8
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2026 15:49:05.7329
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: e6qlRwU6cM67Uio6ePnVHkQCv7yEbd2CWE5S9jfhqr/YhrCmxqwlhws442ikfjDgpY0VsMBdv5oEi84N48r3wQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8238
+X-Rspamd-Queue-Id: 491DF53694C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287671-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287672-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rrobaina@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,paul-moore.com:email,paul-moore.com:url]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Tue, May 12, 2026 at 4:35=E2=80=AFPM Paul Moore <paul@paul-moore.com> wr=
-ote:
->
-> On May 11, 2026 Ricardo Robaina <rrobaina@redhat.com> wrote:
-> >
-> > When auditd is bottlenecked (e.g., by slow disk I/O), kauditd blocks on
-> > the netlink socket. If the wait timeout fully expires (timeo =3D=3D 0),
-> > netlink mistakenly interprets the zeroed timeout as a non-blocking
-> > request. It then triggers netlink_overrun that drops the event,
-> > completely bypassing the audit subsystem's internal retry queue, and
-> > falsely returns ENOBUFS to user-space, resulting in the following error=
-:
-> >
-> >  auditd[]: Error receiving audit netlink packet (No buffer space availa=
-ble)
-> >
-> > Convert the `nonblock` argument in netlink_unicast() into a `flags`
-> > bitmask and introduce NETLINK_UNICAST_TIMED. When a caller specifies
-> > this flag and exhausts its timeout budget, netlink intercepts the
-> > zeroed timeo state. Instead of defaulting to an overrun condition, it
-> > safely frees the skb and returns -EAGAIN, allowing the audit subsystem
-> > to gracefully enqueue the pending event into its internal backlog.
-> >
-> > Suggested-by: Steve Grubb <sgrubb@redhat.com>
-> > Signed-off-by: Ricardo Robaina <rrobaina@redhat.com>
-> > ---
-> >  include/linux/netlink.h  |  5 ++++-
-> >  kernel/audit.c           |  8 ++++----
-> >  net/netlink/af_netlink.c | 17 +++++++++++++++--
-> >  3 files changed, 23 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/include/linux/netlink.h b/include/linux/netlink.h
-> > index 882e9c1b6c1d..1888c8ee416a 100644
-> > --- a/include/linux/netlink.h
-> > +++ b/include/linux/netlink.h
-> > @@ -226,7 +226,10 @@ void netlink_ack(struct sk_buff *in_skb, struct nl=
-msghdr *nlh, int err,
-> >  int netlink_has_listeners(struct sock *sk, unsigned int group);
-> >  bool netlink_strict_get_check(struct sk_buff *skb);
-> >
-> > -int netlink_unicast(struct sock *ssk, struct sk_buff *skb, __u32 porti=
-d, int nonblock);
-> > +/* Internal flags for netlink_unicast (do not overlap with MSG_* flags=
-) */
-> > +#define NETLINK_UNICAST_TIMED 0x80000
-> > +
-> > +int netlink_unicast(struct sock *ssk, struct sk_buff *skb, __u32 porti=
-d, int flags);
-> >  int netlink_broadcast(struct sock *ssk, struct sk_buff *skb, __u32 por=
-tid,
-> >                     __u32 group, gfp_t allocation);
->
-> ...
->
-> > diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-> > index 2aeb0680807d..acaa96695981 100644
-> > --- a/net/netlink/af_netlink.c
-> > +++ b/net/netlink/af_netlink.c
-> > @@ -1325,14 +1325,17 @@ static int netlink_unicast_kernel(struct sock *=
-sk, struct sk_buff *skb,
-> >  }
-> >
-> >  int netlink_unicast(struct sock *ssk, struct sk_buff *skb,
-> > -                 u32 portid, int nonblock)
-> > +                 u32 portid, int flags)
-> >  {
-> >       struct sock *sk;
-> >       int err;
-> >       long timeo;
-> > +     int nonblock;
-> >
-> >       skb =3D netlink_trim(skb, gfp_any());
-> >
-> > +     /* Extract blocking mode: strip internal flags, preserve MSG_DONT=
-WAIT */
-> > +     nonblock =3D flags & ~NETLINK_UNICAST_TIMED;
-> >       timeo =3D sock_sndtimeo(ssk, nonblock);
-> >  retry:
-> >       sk =3D netlink_getsockbyportid(ssk, portid);
-> > @@ -1351,8 +1354,18 @@ int netlink_unicast(struct sock *ssk, struct sk_=
-buff *skb,
-> >       }
-> >
-> >       err =3D netlink_attachskb(sk, skb, &timeo, ssk);
-> > -     if (err =3D=3D 1)
-> > +     if (err =3D=3D 1) {
-> > +             /* timeo may have been zeroed by schedule_timeout inside
-> > +              * netlink_attachskb. If the caller is a timed-blocking s=
-ender
-> > +              * (not genuinely nonblocking), don't re-enter with timeo=
-=3D0 as
-> > +              * that would misfire netlink_overrun on the next iterati=
-on.
-> > +              */
-> > +             if (!timeo && (flags & NETLINK_UNICAST_TIMED)) {
-> > +                     kfree_skb(skb);
-> > +                     return -EAGAIN;
-> > +             }
->
-> Is the new flag needed, couldn't you just check to see if a non-blocking
-> operation was requested and do the same?
->
->   if (timeo =3D=3D 0 && !nonblock) {
->     kfree_skb(skb);
->     return -EAGAIN;
->   }
->
+On Mon, May 11, 2026 at 05:57:39PM +0200, Lorenzo Bianconi wrote:
+> diff --git a/include/net/neighbour.h b/include/net/neighbour.h
+> index 2dfee6d4258a..c2b6196705ef 100644
+> --- a/include/net/neighbour.h
+> +++ b/include/net/neighbour.h
+> @@ -487,16 +487,24 @@ static inline int neigh_event_send(struct neighbour *neigh, struct sk_buff *skb)
+>  }
+>  
+>  #if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
+> -static inline int neigh_hh_bridge(struct hh_cache *hh, struct sk_buff *skb)
+> +static inline struct sk_buff *
+> +neigh_hh_bridge(struct hh_cache *hh, struct sk_buff *skb)
+>  {
+> -	unsigned int seq, hh_alen;
+> +	unsigned int seq, hh_alen = HH_DATA_ALIGN(ETH_HLEN);
+> +
+> +	if (unlikely(skb_headroom(skb) < hh_alen ||
+> +		     skb_header_cloned(skb) || skb_shared(skb))) {
+> +		skb = skb_expand_head(skb, hh_alen);
 
-Hi Paul,
+I don't think this is correct... The comment above skb_expand_head()
+says that it will generate a warning if there is sufficient headroom in
+the packet.
 
-Thanks for reviewing this patch. You're definitely right, it seems I
-overengineered the fix.
-I'm just doing some final testing, and I'll post the V2 shortly.
+I assumed that you would just call skb_cow_head() like the AI review
+suggested. There's skb_share_check() in br_handle_frame(), so no need to
+worry about the skb being shared.
 
-> >               goto retry;
-> > +     }
-> >       if (err)
-> >               return err;
-> >
-> > --
-> > 2.53.0
->
-> --
-> paul-moore.com
->
+> +		if (!skb)
+> +			return NULL;
+> +	}
+>  
+>  	do {
+>  		seq = read_seqbegin(&hh->hh_lock);
+> -		hh_alen = HH_DATA_ALIGN(ETH_HLEN);
+>  		memcpy(skb->data - hh_alen, hh->hh_data, ETH_ALEN + hh_alen - ETH_HLEN);
+>  	} while (read_seqretry(&hh->hh_lock, seq));
+> -	return 0;
+> +
+> +	return skb;
+>  }
+>  #endif
+>  
+> diff --git a/net/bridge/br_netfilter_hooks.c b/net/bridge/br_netfilter_hooks.c
+> index 0ab1c94db4b9..8d21c88c2116 100644
+> --- a/net/bridge/br_netfilter_hooks.c
+> +++ b/net/bridge/br_netfilter_hooks.c
+> @@ -297,7 +297,12 @@ int br_nf_pre_routing_finish_bridge(struct net *net, struct sock *sk, struct sk_
+>  				goto free_skb;
+>  			}
+>  
+> -			neigh_hh_bridge(&neigh->hh, skb);
+> +			skb = neigh_hh_bridge(&neigh->hh, skb);
+> +			if (!skb) {
+> +				neigh_release(neigh);
+> +				return -ENOMEM;
+> +			}
 
+This part looks correct.
+
+> +
+>  			skb->dev = br_indev;
+>  
+>  			ret = br_handle_frame_finish(net, sk, skb);
+> 
+> ---
+> base-commit: a450063ef86b9967234ca1f896c0d77400c74f11
+> change-id: 20260508-nf-neigh_hh_bridge-fix-9ab775ee23c6
+> 
+> Best regards,
+> -- 
+> Lorenzo Bianconi <lorenzo@kernel.org>
+> 
 
