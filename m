@@ -1,232 +1,261 @@
-Return-Path: <netdev+bounces-287521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287522-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WB6pA+FVBGqjHAIAu9opvQ
-	(envelope-from <netdev+bounces-287521-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:43:45 +0200
+	id EI0GEYRWBGqjHAIAu9opvQ
+	(envelope-from <netdev+bounces-287522-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:46:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98BA95317FF
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:43:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84D81531944
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:46:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0013B3033F7F
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 10:43:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0EC2B301A918
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 10:46:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB6753DD871;
-	Wed, 13 May 2026 10:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082A73E95A8;
+	Wed, 13 May 2026 10:46:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F/iwr7jP";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="QWvPXexi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hmyphwtr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66ED33914F0
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 10:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778669021; cv=pass; b=K33rccEEUEOWaAPrnraMx15UirjQmO9SjIjOgjjnQaykMLJ+khvzaUNacRr/vjOaRWoF4l2jvSR50XBeCs8tBJeGlateAA4JgrPfdq/DBgKQgN+O/VJQyyjCOWDHCNNFKAwr5BXSMjYqNB6TRFLBncT1DqeSmFGvs6HK4iYc9AU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778669021; c=relaxed/simple;
-	bh=M3yi0m59GWu+ht7J+laSLN+a+tUl3SFmteOOKCm+tpk=;
-	h=From:References:MIME-Version:In-Reply-To:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CNTyQ3jAU4s2ORCporB3Ap4c+8CIuCZ94IEBXabVpDWtISafEuZydadej3Mug2hJiS0455/AfM84qPnZk9N+ITxK09N21DLU/UTjpOvTeOf6SiEM+KNjiX/ryldzPD7f7gTe3okDrTe0Okiu2k5NTggQ1Hxcln9M4NICXY5wwwE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F/iwr7jP; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=QWvPXexi; arc=pass smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778669019;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=o29i8O2aaVs4bq4291ofGhSS+7I8Uy86KU6SAHMIQdc=;
-	b=F/iwr7jPFNKFgwTLtwu0rcOLFmC4gAkfJFC/zFVJqcfvZT/bKS8H+rqX3TU2aNffOdYsRR
-	iZw1jBwWeVM603qi8YOoBcjKr/UfI/c2or7ZnidfbDdDbIcXwAJs0DV43Ct2yzs7C5SUh7
-	TDNX74h1gO9N83qFtD4LEEUPsl0X0qA=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-673-u30WZAO4MmmFS4cAnZKePQ-1; Wed, 13 May 2026 06:43:38 -0400
-X-MC-Unique: u30WZAO4MmmFS4cAnZKePQ-1
-X-Mimecast-MFC-AGG-ID: u30WZAO4MmmFS4cAnZKePQ_1778669017
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-bcf70e19516so331429866b.2
-        for <netdev@vger.kernel.org>; Wed, 13 May 2026 03:43:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778669017; cv=none;
-        d=google.com; s=arc-20240605;
-        b=I+0A+aRfPrZ8BpyiQOw9dwAxyVkWtzmfNVUEFvJ0s7mIZdAgQQ53m1lDxuMeW4rrEU
-         xhOQbgqpKIS520tOpOOfY3I87gLvSYJeikElerPfzJcyqdWyBiZg2DNRUFOLFqytT2qY
-         yOB+a5bHG2PgvKRfRGMOhh7PgYCv7OcvfIZs0DGbJ0XWWXF20LYzNdZrz8+lOsCIBxXH
-         Eo1AIeQpIxLH1ajy7X2/dWgfaScdy7fdlV5dIPfXkNfLOx0SPTyJpHyuNkPVviMEdKtA
-         S5ZYjQU1sHs8B2UJ2vwmYIBlqgyTxEAW3n/yfAP02juaMzoXWQRhPBW9AUvHvAqzqk7+
-         FnDg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:in-reply-to
-         :mime-version:references:from:dkim-signature;
-        bh=o29i8O2aaVs4bq4291ofGhSS+7I8Uy86KU6SAHMIQdc=;
-        fh=j5CqZHL5zV7C/kjSXjXGxR17zjEpontygbIJoR8m8+Q=;
-        b=CgkRQGpQe6k3we6yX6jKld8mNZzrSbe9juKvJPhAMU82GQFMnGcIXAYLWqnALDJ0/n
-         pLKIbNLfdwoecNhLUhq/wV0U3kWzUty1cX9N79WX2WcOE7AhasujoE0SWMABWdrF8LqS
-         ZRV3z2FxQZheyQak0l8UAK8MHwVoUljBIx/2UsvcVzbtvGriXloRjOwKf+Q7KDbbDadA
-         FE/E6piOKsjB7LQRCB65u756xqkh+mmbZCIWi2OfIh3+W0jagmE0nJqcWx7/t9fp755a
-         tiJRnv1kp7/2DI3AL/iy9mvJclRIKDEwp7RZm2+ms8vxYY9a1DT6GR7Rq8vVjAiLL9p3
-         sHYQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1778669017; x=1779273817; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:in-reply-to
-         :mime-version:references:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=o29i8O2aaVs4bq4291ofGhSS+7I8Uy86KU6SAHMIQdc=;
-        b=QWvPXexiapeoeRjvz39Jm75YSkdRJ8081HxIaUBXWWJiPYaGBiJDakKHmCAmCFEMdR
-         jNpeY9NRxt2W93Q/2DyJAlr5ia86rwqYPpEwAw2JuZ6roSdVII/bpGFxsBfRY7FI7XNH
-         e3PMIEqHUyOi978HRICGbTUS/+7ToGTgS1rU1Ce+Lp8TvbVbGzMDafBLFe8QfNgvhEHJ
-         qzyzqJgiPXAx/cTjHAMfFpe3Krspk5xZOWD3Pr+l2689Iusxxq1kSxC+Tl3tMmNVdaUp
-         XgY9WzpxI2ZrtJv7DzlVluu14Fd+b2j+Ahw/K2wp79J4baTwwffguIkn3lPl5bq9g6Sn
-         +J5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778669017; x=1779273817;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:in-reply-to
-         :mime-version:references:from:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o29i8O2aaVs4bq4291ofGhSS+7I8Uy86KU6SAHMIQdc=;
-        b=PeMzP7f8KaqLnujVD0ftj4XNeRF88jEYTmK1kc4GjhcWrKZY5r5+v5PDenvQ/jLF10
-         PB8YWIKMEmzyNVDMsjZYiXn3Ox3pkvTnpjjcCfwrzD0rxdG4aFzGktzPF58x+ALyypfh
-         W+pb9csMlS8RvU8iBZDe9s80rqYaEVtncjd/lYy/vQMiYgSfzYTj/RZrwtpcFr+AI7F2
-         lEWT6fzgUnhsc5Yl9yvVQ3lM3qhEHJlwS4UXPEt4/nyrYJujvSVz7Bz7hRYCR/OUjhNa
-         2FkMvAmA4EHNw58BCP6LW4cl4W6poPVl6Yp4ao1+82NXGOSDN/LcDVQcVjDPDIyR7fVg
-         oBAw==
-X-Gm-Message-State: AOJu0YwdAZZ17rzeglIsa4ZkV3DG3ls0M2S5tZwKCkrgA6yMuDF1CSU0
-	n47z0fDzI0r7ekLW8fWnnlSlS1DW2gza9xUrViPIXUSDcR7SYy5zaRKxM/WuXmMmrJaF7utp577
-	58ivfIjUmyVOk4hzC7vnhOe+AWQkY2qObGpNBIU7rJ2kxgqBYx4kUXcGYm3q56kwASGPITf6Fl6
-	Me7BIDEfOOAiGXRCmuNiOC4BUYbL1VwjLA
-X-Gm-Gg: Acq92OEH3G6Mz6uep1PkYRa+hFQOOa1eC5NH3h7HEsBkYjkCz4VHumMHgx+PDJY+miq
-	Od1ZpBlHlly8gkY51qAVdG5v9akMEDrv+QHvMMG1as3KvDt99CpxpXxYFcrkJoDpvROAu6b0Pij
-	a6Pg6x+yCK8hKm47ahYRAVQZK+T0bJx/7g8p1WWHQNNi/RHsCpcVUzNUyCCoHeMKnpf1Mi59qIy
-	BI6o5zF
-X-Received: by 2002:a17:907:2682:b0:bd1:3b7e:bf8f with SMTP id a640c23a62f3a-bd3c14066aamr178538066b.35.1778669016904;
-        Wed, 13 May 2026 03:43:36 -0700 (PDT)
-X-Received: by 2002:a17:907:2682:b0:bd1:3b7e:bf8f with SMTP id
- a640c23a62f3a-bd3c14066aamr178534666b.35.1778669016511; Wed, 13 May 2026
- 03:43:36 -0700 (PDT)
-Received: from 753933720722 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 13 May 2026 10:43:34 +0000
-Received: from 753933720722 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 13 May 2026 10:43:34 +0000
-From: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
-References: <20260505084253.998548-1-amorenoz@redhat.com> <20260505084253.998548-2-amorenoz@redhat.com>
- <1cc38ea2-74ac-49f5-97b1-b9404726bdbc@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8BD6379C2F;
+	Wed, 13 May 2026 10:46:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778669183; cv=none; b=K/UvTWGGGjZ8yo1i9R2Kq1Vs9JjqxCDGGyMjTqUd7HtYcUM1QP2bFNAxeV4Rs+HEOZWOAAUDCkQY9tq5IsfjHeRBv6xilNfDSIyNsMxArD6a8a08ghObuvm+/iI7l7XixnN40yNUQYyptTDmOsk/gJK1H+1fWI9ptMYu9s1cpDQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778669183; c=relaxed/simple;
+	bh=S5jHqO9/OtD4Qp1sakoELifPOdsA247cnIKU/KM3hlw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M7QbgiYr7OLdIDd0y843Wz4RxKqdiue5pZ7nOaNYBReqroR9sSMIHhe/GMjPvVt1v2GUboBPILJg26V/idqg+pKxTAIqZKlixpaXsgr957Pi1CDc8EGsKYLCn1977kNnbwu1vWHn3Tzcn1rnSgLWJ2pYZzIZDkcJTe9I//cWU4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hmyphwtr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B3E0C2BCB7;
+	Wed, 13 May 2026 10:46:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778669183;
+	bh=S5jHqO9/OtD4Qp1sakoELifPOdsA247cnIKU/KM3hlw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HmyphwtrrjECq+DIfxVwN99APzgOZFjBQzM/sEWKBQNIB4CklodqhHMMwbOgiKYzv
+	 dCLz5kRsRAHzfordRV7VdVMooN0Dho4MZDstnA1goecgm6KLrXT6FgOeSnTU6WEj9G
+	 3MkvMpcs4Z4CdgzuviAp2z7PihAvLccf6LLaSXS4L+ygaHXGbxkIgGuNCp9rbSAjx7
+	 s0Tzye6fAnwOv+7FjO9901t2bc+e2D2zhsV9s+WN5xasNgDYjg/H/qRlsfveuxPok8
+	 lazmR/w8YYfZ9KCHcTnQWVZ9Rqllrr0wZS98ofiCM2HQ9eT5g3rUWT5LzWro1B9fYr
+	 iDqHQWsfiTTFQ==
+Date: Wed, 13 May 2026 12:46:21 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: robh@kernel.org, devicetree@vger.kernel.org, conor+dt@kernel.org,
+	krzk+dt@kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v6 12/12] net: airoha: Better handle MIB for GDM
+ with multiple port attached
+Message-ID: <agRWfSghLZGeMVOc@lore-desk>
+References: <20260511-airoha-eth-multi-serdes-v6-12-c899462c4f75@kernel.org>
+ <20260512233205.7CA40C2BCB0@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1cc38ea2-74ac-49f5-97b1-b9404726bdbc@redhat.com>
-Date: Wed, 13 May 2026 10:43:34 +0000
-X-Gm-Features: AVHnY4IqdpXoUaowxBFlRQCjpMpWwH_wD8ffDvD-nk8q6mmXS34mZRjxsIUlLoI
-Message-ID: <CAG=2xmNvgmQypHX3aznU0ZbQZrPCRZ95XeBRsWAsryryxr_W0Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/2] net: openvswitch: make flow_table an rcu pointer
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, aconole@redhat.com, 
-	Eelco Chaudron <echaudro@redhat.com>, Ilya Maximets <i.maximets@ovn.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	"open list:OPENVSWITCH" <dev@openvswitch.org>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 98BA95317FF
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="vN0T/RtPM7tQgdoY"
+Content-Disposition: inline
+In-Reply-To: <20260512233205.7CA40C2BCB0@smtp.kernel.org>
+X-Rspamd-Queue-Id: 84D81531944
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+X-Spamd-Result: default: False [-3.76 / 15.00];
+	SIGNED_PGP(-2.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287522-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287521-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[amorenoz@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
 X-Rspamd-Action: no action
 
-On Thu, May 07, 2026 at 01:03:45PM +0200, Paolo Abeni wrote:
-> On 5/5/26 10:42 AM, Adrian Moreno wrote:
-> > @@ -752,12 +759,16 @@ static struct genl_family dp_packet_genl_family _=
-_ro_after_init =3D {
-> >  static void get_dp_stats(const struct datapath *dp, struct ovs_dp_stat=
-s *stats,
-> >  			 struct ovs_dp_megaflow_stats *mega_stats)
-> >  {
-> > +	struct flow_table *table =3D ovsl_dereference(dp->table);
-> >  	int i;
-> >
-> >  	memset(mega_stats, 0, sizeof(*mega_stats));
-> > +	memset(stats, 0, sizeof(*stats));
->
-> Is this an unrelated bugfix, preventing random values from stack
-> clobbering the stats? Should it land to a separate fix for net?
 
-I don't think is a but, although it's definitely code that can be
-improved.
-Before this patch, all members of "stats" were being set in this
-function so there is no stack-pollution. This patch introduces a
-possibility of not setting mega_stats->n_stats if we fail to dereference
-the flow table, so clearing all fields becomes mandatory.
+--vN0T/RtPM7tQgdoY
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Would this qualify for a backportable bug-fix?
+> Thank you for your contribution! Sashiko AI review found 4 potential issu=
+e(s) to consider:
+> - [High] The RUNT_CNT statistic is overwritten and lost due to incorrect =
+assignment logic.
+> - [High] 32-bit free-running hardware statistics will wrap around and res=
+et 64-bit software counters to zero.
+> - [High] Torn hardware reads on 64-bit registers due to free-running coun=
+ters.
+> - [High] Pre-existing potential deadlock due to using `spin_lock()` inste=
+ad of `spin_lock_bh()` for stats lock.
+> --
+>=20
+> commit 2f0d0c633539afc37cceb4ad426afb56465e7b6d
+> Author: Christian Marangi <ansuelsmth@gmail.com>
+> Subject: net: airoha: Better handle MIB for GDM with multiple port attach=
+ed
+>=20
+> The commit enables the split MIB feature for GDM3 and GDM4, moving stats
+> from port to device, and modifying the stats update logic from clear-on-r=
+ead
+> to direct assignment since the MIB clear was removed.
+>=20
+> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
+ernet/airoha/airoha_eth.c
+> > index 533ffe20f8333..27ccc636d8009 100644
+> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> > @@ -1621,143 +1621,146 @@ static void airoha_update_hw_stats(struct air=
+oha_gdm_dev *dev)
+> >  	struct airoha_eth *eth =3D dev->eth;
+> >  	u32 val, i =3D 0;
+> > =20
+> > -	spin_lock(&port->stats.lock);
+> > -	u64_stats_update_begin(&port->stats.syncp);
+> > +	spin_lock(&port->stats_lock);
+>=20
+> This isn't a bug introduced by this patch, but could this spin_lock()
+> cause a deadlock? Since airoha_update_hw_stats() is called by
+> ndo_get_stats64() (which can run in softirq context) and ethtool
+> callbacks (which run in process context), a softirq could interrupt the
+> process context and spin forever trying to acquire the same lock. Should
+> this be spin_lock_bh()?
 
-Actually, now that I look at this hunk, I realize this line should be
-removed:
+ndo_get_stats64() does not run in softirq context.
 
-    stats->n_hit =3D stats->n_missed =3D stats->n_lost =3D 0;
+>=20
+> > +	u64_stats_update_begin(&dev->stats.syncp);
+> > +
+> > +	/* Read relevant MIB for GDM with multiple port attached */
+> > +	if (port->id =3D=3D AIROHA_GDM3_IDX || port->id =3D=3D AIROHA_GDM4_ID=
+X)
+> > +		airoha_fe_rmw(eth, REG_FE_GDM_MIB_CFG(port->id),
+> > +			      FE_TX_MIB_ID_MASK | FE_RX_MIB_ID_MASK,
+> > +			      FIELD_PREP(FE_TX_MIB_ID_MASK, dev->nbq) |
+> > +			      FIELD_PREP(FE_RX_MIB_ID_MASK, dev->nbq));
+> > =20
+> >  	/* TX */
+> >  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_OK_PKT_CNT_H(port->id));
+> > -	port->stats.tx_ok_pkts +=3D ((u64)val << 32);
+> > +	dev->stats.tx_ok_pkts =3D (u64)val << 32;
+> >  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_OK_PKT_CNT_L(port->id));
+> > -	port->stats.tx_ok_pkts +=3D val;
+>=20
+> Now that the hardware counters are free-running (the MIB clear operation
+> was removed later in the patch), can a torn read occur here? If the low
+> 32-bit register overflows and increments the high 32-bit register in the
+> brief window between the two reads, the resulting 64-bit value will be
+> corrupted and off by ~4.29 billion.
 
->
-> > @@ -1501,8 +1537,13 @@ static int ovs_flow_cmd_dump(struct sk_buff *skb=
-, struct netlink_callback *cb)
-> >  		rcu_read_unlock();
-> >  		return -ENODEV;
-> >  	}
-> > +	table =3D rcu_dereference_ovsl(dp->table);
->
-> Possibly:
-> 	table =3D rcu_dereference(dp->table);
-> would be more accurate
+ack, I will fit it in v7.
 
-You're right! Thanks.
+>=20
+> [ ... ]
+> >  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_DROP_CNT(port->id));
+> > -	port->stats.tx_drops +=3D val;
+> > +	dev->stats.tx_drops =3D val;
+>=20
+> Since TX_ETH_DROP_CNT is a 32-bit hardware register and the MIB clear
+> operation is removed, the hardware counter will eventually wrap back to
+> zero. By assigning it directly to dev->stats.tx_drops, won't this
+> cause the 64-bit software counter to also silently drop back to zero and
+> violate the monotonically increasing requirement of ndo_get_stats64?
+> Does this need to calculate the delta instead of directly assigning the
+> value?
 
->
-> > @@ -518,6 +524,7 @@ void ovs_flow_tbl_destroy(struct flow_table *table)
-> >  	call_rcu(&mc->rcu, mask_cache_rcu_cb);
-> >  	call_rcu(&ma->rcu, mask_array_rcu_cb);
->
-> This is always invoked after a rcu grace period, it would be probably
-> nice to follow-up, not necessarly in this series, moving the above
-> call_rcu together with the call_rcu(table). Such statements could be
-> bundled in a new helper.
->
+ack, I will fit it in v7.
 
-Sorry, bundled together with what exactly?
-Are you refering to the fact that full table deletion now spans over two
-rcu periods?
+>=20
+> [ ... ]
+> >  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_RUNT_CNT(port->id));
+> > -	port->stats.tx_len[i] +=3D val;
+> > +	dev->stats.tx_len[i] =3D val;
+> > =20
+> >  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_E64_CNT_H(port->id));
+> > -	port->stats.tx_len[i] +=3D ((u64)val << 32);
+> > +	dev->stats.tx_len[i] =3D (u64)val << 32;
+> >  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_E64_CNT_L(port->id));
+> > -	port->stats.tx_len[i++] +=3D val;
+>=20
+> Does this overwrite the RUNT_CNT statistic? The code assigns RUNT_CNT
+> to tx_len[i] (where i=3D0), but immediately overwrites it with
+> E64_CNT_H at the same index because i is not incremented between
+> the assignments.
 
-Thanks.
-Adri=C3=A1n
+ack, I will fit it in v7.
 
+>=20
+> [ ... ]
+> >  	i =3D 0;
+> >  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_RUNT_CNT(port->id));
+> > -	port->stats.rx_len[i] +=3D val;
+> > +	dev->stats.rx_len[i] =3D val;
+> > =20
+> >  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_E64_CNT_H(port->id));
+> > -	port->stats.rx_len[i] +=3D ((u64)val << 32);
+> > +	dev->stats.rx_len[i] =3D (u64)val << 32;
+> >  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_E64_CNT_L(port->id));
+> > -	port->stats.rx_len[i++] +=3D val;
+>=20
+> Does this also overwrite the RUNT_CNT statistic for the RX path in the
+> same way?
+
+ack, I will fit it in v7.
+
+Regards,
+Lorenzo
+
+>=20
+> [ ... ]
+> > -	/* reset mib counters */
+> > -	airoha_fe_set(eth, REG_FE_GDM_MIB_CLEAR(port->id),
+> > -		      FE_GDM_MIB_RX_CLEAR_MASK | FE_GDM_MIB_TX_CLEAR_MASK);
+> > +	dev->stats.rx_len[i++] =3D val;
+> > =20
+> > -	u64_stats_update_end(&port->stats.syncp);
+> > -	spin_unlock(&port->stats.lock);
+> > +	u64_stats_update_end(&dev->stats.syncp);
+> > +	spin_unlock(&port->stats_lock);
+> >  }
+>=20
+> --=20
+> Sashiko AI review =B7 https://sashiko.dev/#/patchset/20260511-airoha-eth-=
+multi-serdes-v6-0-c899462c4f75@kernel.org?part=3D12
+
+--vN0T/RtPM7tQgdoY
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCagRWfQAKCRA6cBh0uS2t
+rHRvAQDvhwEDz38SNHFl39yZrO6NXNUyv0ET+x02j6VV3qobLgD/cudIa265P1iZ
+NloiPq14rbXxC/WzJq7r3oLA/0hQJA8=
+=y+s9
+-----END PGP SIGNATURE-----
+
+--vN0T/RtPM7tQgdoY--
 
