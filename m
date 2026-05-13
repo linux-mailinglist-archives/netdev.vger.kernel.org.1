@@ -1,261 +1,259 @@
-Return-Path: <netdev+bounces-287522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287523-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EI0GEYRWBGqjHAIAu9opvQ
-	(envelope-from <netdev+bounces-287522-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:46:28 +0200
+	id oNucCmhXBGqjHAIAu9opvQ
+	(envelope-from <netdev+bounces-287523-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:50:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84D81531944
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:46:26 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B3F9531A27
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:50:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0EC2B301A918
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 10:46:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 84790300E6A8
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 10:49:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082A73E95A8;
-	Wed, 13 May 2026 10:46:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 432FB3EF678;
+	Wed, 13 May 2026 10:49:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hmyphwtr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YU94EwOb";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="F4gH3l9S"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8BD6379C2F;
-	Wed, 13 May 2026 10:46:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778669183; cv=none; b=K/UvTWGGGjZ8yo1i9R2Kq1Vs9JjqxCDGGyMjTqUd7HtYcUM1QP2bFNAxeV4Rs+HEOZWOAAUDCkQY9tq5IsfjHeRBv6xilNfDSIyNsMxArD6a8a08ghObuvm+/iI7l7XixnN40yNUQYyptTDmOsk/gJK1H+1fWI9ptMYu9s1cpDQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778669183; c=relaxed/simple;
-	bh=S5jHqO9/OtD4Qp1sakoELifPOdsA247cnIKU/KM3hlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M7QbgiYr7OLdIDd0y843Wz4RxKqdiue5pZ7nOaNYBReqroR9sSMIHhe/GMjPvVt1v2GUboBPILJg26V/idqg+pKxTAIqZKlixpaXsgr957Pi1CDc8EGsKYLCn1977kNnbwu1vWHn3Tzcn1rnSgLWJ2pYZzIZDkcJTe9I//cWU4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hmyphwtr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B3E0C2BCB7;
-	Wed, 13 May 2026 10:46:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778669183;
-	bh=S5jHqO9/OtD4Qp1sakoELifPOdsA247cnIKU/KM3hlw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HmyphwtrrjECq+DIfxVwN99APzgOZFjBQzM/sEWKBQNIB4CklodqhHMMwbOgiKYzv
-	 dCLz5kRsRAHzfordRV7VdVMooN0Dho4MZDstnA1goecgm6KLrXT6FgOeSnTU6WEj9G
-	 3MkvMpcs4Z4CdgzuviAp2z7PihAvLccf6LLaSXS4L+ygaHXGbxkIgGuNCp9rbSAjx7
-	 s0Tzye6fAnwOv+7FjO9901t2bc+e2D2zhsV9s+WN5xasNgDYjg/H/qRlsfveuxPok8
-	 lazmR/w8YYfZ9KCHcTnQWVZ9Rqllrr0wZS98ofiCM2HQ9eT5g3rUWT5LzWro1B9fYr
-	 iDqHQWsfiTTFQ==
-Date: Wed, 13 May 2026 12:46:21 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: robh@kernel.org, devicetree@vger.kernel.org, conor+dt@kernel.org,
-	krzk+dt@kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v6 12/12] net: airoha: Better handle MIB for GDM
- with multiple port attached
-Message-ID: <agRWfSghLZGeMVOc@lore-desk>
-References: <20260511-airoha-eth-multi-serdes-v6-12-c899462c4f75@kernel.org>
- <20260512233205.7CA40C2BCB0@smtp.kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C0037206D
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 10:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778669357; cv=pass; b=fj/9mZj5ZNSYEpFRc6+AGSc4lS3CT13OdajX4QohONAT9RU8MQ+Y3kUFdxg6Fewgnv2eP5VDZtcHHBIgqeDclEffAUebjvaTaG/r4CEW1fkWki1kwxARBzQ7IBUHH60WfVXYJYOkfveqGIDR7H6YYZpUhmG7e4bIl6072JWs5Lc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778669357; c=relaxed/simple;
+	bh=nk9gRKgZ4ygjLzTRcFYzb4Ab7c1f/0vyHhWeSg93DRk=;
+	h=From:References:MIME-Version:In-Reply-To:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YKqe+mqF6CrB0c8bR8WyZYbJkNiT3P+pVmRvh0RNVF26BmS9J5wIeCzpOxNwEGLs4O6Q8cHRMblYMMMglq7Vcd+Cek5eDmAJ/e0WT9yZhDkqSX3t71dRfexmejxrTpqQkprXoTQr5mABBFWONZ8dhmdzUgX8X3QQGk3ehNFd3dE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YU94EwOb; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=F4gH3l9S; arc=pass smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778669354;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DjDs87dmBBxM+X98oHq93kX30esB4qco5qSjYkhRk6o=;
+	b=YU94EwObhxYxbh7SRbX+TXy0G8cIX/MR91bCtlZH7pxnzDRbzb2CfXMhW3r4TOhQbghxOL
+	y3giQg/MIMq4/kH4dRyBuAXJ7qcYeOW4roEKr60RwnQkcR6Iq8y101TvEH/17ACLyYIwVE
+	QYqFw5q6Ivm8llSPC/c59Zhri8BSPIA=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-64-ShnfZuyxM6-jLZlsSeuyVg-1; Wed, 13 May 2026 06:49:12 -0400
+X-MC-Unique: ShnfZuyxM6-jLZlsSeuyVg-1
+X-Mimecast-MFC-AGG-ID: ShnfZuyxM6-jLZlsSeuyVg_1778669352
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b8ff07df5e4so588482866b.3
+        for <netdev@vger.kernel.org>; Wed, 13 May 2026 03:49:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778669351; cv=none;
+        d=google.com; s=arc-20240605;
+        b=aqCq1gg8MYCuE4j59zlPR4i3rNA32XadtHvzaeQwiZs3ce2rgen4oOdbyhiP5kMwAm
+         ZWRxM0kcSWcrJYV9rdYtFMU4eXYyjKT0Cjr6yfrqMZDj1plUvHLg10/NPuFizxRL8Yf+
+         nAskfHvwdyrl1Rt4aFHJ5SHrxFF8Si5/B40R97uiO5OPGmo2btCeK4AWjjlddaW1IFnR
+         64wbn1mMXUvaCJbtDW0feBTXk54gFQuyypPU35pt7/yLnhZbBQAsMAxzV8EbtiUGFKwK
+         azkzVbZy3m8vZ5sp7aSkHnGVlZLwHVkCTYJlpbX4RvwwJ4Lb8PhfkUVVFDh8RM0f+M8k
+         BhSg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:in-reply-to:mime-version:references
+         :from:dkim-signature;
+        bh=DjDs87dmBBxM+X98oHq93kX30esB4qco5qSjYkhRk6o=;
+        fh=j5CqZHL5zV7C/kjSXjXGxR17zjEpontygbIJoR8m8+Q=;
+        b=iFyqjD6zMg2UmgnAJmGb75gVh/QYyv3iKw25N5Y+YSsvxOrqBWbCHSyUm2w/l6NKCv
+         vo2JltpCPnZSFsGwiFvXXnZgNAlOGGBawecMBsDtoAy/TdPdZuoxvZmsRulvtaqqrjwm
+         eK8nYz/oMdhorh5g/Ujf/SmKpf5zhAQIqsMk7NjlAna3wtDOS01eJ6Spr8sE5GT/ysz3
+         bQj+zkn67CbFbE8NmUu6g7aXE2d4ivY/l1sstrQ3eLbJeKMlSEr9xw3AzcWf83wY8py0
+         fQtcqG0sVBB+LcyhWh1omBh3AHuFo0fDPPtdglLCURr77vUL0h0H7rpK8BuQS9n2UsdR
+         iHSg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1778669351; x=1779274151; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:in-reply-to:mime-version:references
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DjDs87dmBBxM+X98oHq93kX30esB4qco5qSjYkhRk6o=;
+        b=F4gH3l9SKlVbaNF/IE0QB3/tX2DSPrzjz9qPeeB/EOi8ExtUQsgF1chkqEMezMRiQz
+         lt/A0Yu1NX9voI01wNpo1S6RcBJ1xD5Wwkvshskkwzs5BMUftJWgSjUTY+SS4ISYOz2j
+         XU9ffvXbI6wC7zdzCimdyH/e10PPWLZJk1tCBm9G0CBNNTrpymFSPtLBVn/q9/AeS5bR
+         L3sykpmj08uO7/H0ZwNsW7CumLGC5vSBNhfYw9/V/wUFxW6OcY8JNcgoCpYlGb7si5Rj
+         UKd8f3E9of/LtY2WtJHZGME3lVpnhXJCfKFEuMUorQwofXom52xYS4rig5w8qQ6n1p0V
+         cJmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778669351; x=1779274151;
+        h=cc:to:subject:message-id:date:in-reply-to:mime-version:references
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DjDs87dmBBxM+X98oHq93kX30esB4qco5qSjYkhRk6o=;
+        b=sjGTZFklrUya0uQxe8mYgSaL2Ic9LRBGTE/ecjyH8LVEiKxPlEetICQyhVkzEhaHZr
+         +uEb5Vx3ytCk83ZulQIDLGr2pyA8RZ91oq0zo2aqrQrqjD1eWgj5TljZCsL8JcNXvxuq
+         b08oec6P+DiC4FOTJbfHpIeWaHxHvcnlft3nWrGnd+qGgIZ5g7Hz4Y0Lr84ziFRiTej2
+         MS+EYMI5PsHZ4LUNzXfqPpi/yfL1DJb2nobiAhjMFn0diiiOZwYYWv5CS8Uwjqt/AvPH
+         nNTJ3jyx+/sbUPrjrL/hlFOGVn9Pgg08rPXIIcCgwpA13LsGLTSa/4F1IkEjnwfbbeSc
+         qsuA==
+X-Gm-Message-State: AOJu0Yy2tli3ov4eMpoPOBP9mBPy2hIJozjdkj1i+rVXKXtL4ZW20DbK
+	NVnzN4XCJtVsheGF8zG3B+ScYhOgc2skgh+5Wny+q0rAXt5biNw7TwFALWH+utiBzK4JomqxT5z
+	WrSUXWwNeWmNuoZhGZQuUP3YrdLrlwhDQtpTXXbFoYRdV4QNUzbgxVlwW1oC2AZSKZv/zJXYSpm
+	0h5F66BlWLHoch0m1Ud/HBotV9g6DB+igLAcZXcpn3
+X-Gm-Gg: Acq92OFW2JHGgvFZBgUiz8fSexQh084po7+CiddXWy0gKcXo08lj2pIOX4MbMfHg6DO
+	K3cupTS7NBHLAffJVWGCTno5j4bGZqsofjcXDn/i6ffolNMwKzaZhz2vSEqL38xYuCGMPN8114Q
+	yiACLcX7NQ5CKuNiaZJnYBDYKM+jDYE1GJMl4MADSkTjm1/wPAuvq249QW1NPqLW86y4oG0NIqE
+	EMaaw9w
+X-Received: by 2002:a17:907:3f92:b0:bd2:27c4:f453 with SMTP id a640c23a62f3a-bd3df57e81dmr140694066b.9.1778669351564;
+        Wed, 13 May 2026 03:49:11 -0700 (PDT)
+X-Received: by 2002:a17:907:3f92:b0:bd2:27c4:f453 with SMTP id
+ a640c23a62f3a-bd3df57e81dmr140691566b.9.1778669351086; Wed, 13 May 2026
+ 03:49:11 -0700 (PDT)
+Received: from 753933720722 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 13 May 2026 03:49:08 -0700
+Received: from 753933720722 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 13 May 2026 03:49:08 -0700
+From: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
+References: <20260505084253.998548-1-amorenoz@redhat.com> <20260505084253.998548-3-amorenoz@redhat.com>
+ <b1820863-fd30-45b5-b03e-28225ea80780@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="vN0T/RtPM7tQgdoY"
-Content-Disposition: inline
-In-Reply-To: <20260512233205.7CA40C2BCB0@smtp.kernel.org>
-X-Rspamd-Queue-Id: 84D81531944
+In-Reply-To: <b1820863-fd30-45b5-b03e-28225ea80780@redhat.com>
+Date: Wed, 13 May 2026 03:49:08 -0700
+X-Gm-Features: AVHnY4LeCIGgPZOPOoQ0nSC8s9eyriH2InSeJCv4SqBT7k7rJfE783F74HBVf_Y
+Message-ID: <CAG=2xmOTW18Kr5rNp9NxPpDBjwQ3H0s62jp7MAy2Bcb8KVyUaQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/2] net: openvswitch: decouple flow_table
+ from ovs_mutex
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, aconole@redhat.com, 
+	Eelco Chaudron <echaudro@redhat.com>, Ilya Maximets <i.maximets@ovn.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
+	"open list:OPENVSWITCH" <dev@openvswitch.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 0B3F9531A27
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-3.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287522-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287523-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[amorenoz@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
+On Thu, May 07, 2026 at 01:31:24PM +0200, Paolo Abeni wrote:
+> On 5/5/26 10:42 AM, Adrian Moreno wrote:
+> > In order to protect flow operations from RTNL contention, this patch
+> > decouples flow_table modifications from ovs_mutex by means of the
+> > following:
+> >
+> > 1 - Create a new mutex inside the flow_table that protects it from
+> > concurrent modifications.
+> > Putting the mutex inside flow_table makes it easier to consume for
+> > functions inside flow_table.c that do not currently take pointers to the
+> > datapath.
+> > Some function signatures need to be changed to accept flow_table so that
+> > lockdep checks can be performed.
+> >
+> > 2 - Create a reference count to temporarily extend rcu protection from
+> > the datapath to the flow_table.
+> > One reference is held by the datapath, the other is temporarily
+> > increased during flow modifications.
+> >
+> > Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+> > ---
+> >  net/openvswitch/datapath.c   | 230 ++++++++++++++++++++++-------------
+> >  net/openvswitch/flow.c       |  13 +-
+> >  net/openvswitch/flow.h       |   9 +-
+> >  net/openvswitch/flow_table.c | 173 ++++++++++++++++----------
+> >  net/openvswitch/flow_table.h |  53 +++++++-
+> >  5 files changed, 318 insertions(+), 160 deletions(-)
+>
+> This is still considerably big. I'm wondering if introducing the
+> lockdep_ovs_tbl_is_held/rcu_dereference_ovs_tbl annotations with a
+> separate earlier patch would make it more palatable? Just a very wild
+> guess; if the result is ugly (or you have string feeling that would be)
+> please ignore.
 
---vN0T/RtPM7tQgdoY
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'll give it a try.
 
-> Thank you for your contribution! Sashiko AI review found 4 potential issu=
-e(s) to consider:
-> - [High] The RUNT_CNT statistic is overwritten and lost due to incorrect =
-assignment logic.
-> - [High] 32-bit free-running hardware statistics will wrap around and res=
-et 64-bit software counters to zero.
-> - [High] Torn hardware reads on 64-bit registers due to free-running coun=
-ters.
-> - [High] Pre-existing potential deadlock due to using `spin_lock()` inste=
-ad of `spin_lock_bh()` for stats lock.
-> --
->=20
-> commit 2f0d0c633539afc37cceb4ad426afb56465e7b6d
-> Author: Christian Marangi <ansuelsmth@gmail.com>
-> Subject: net: airoha: Better handle MIB for GDM with multiple port attach=
-ed
->=20
-> The commit enables the split MIB feature for GDM3 and GDM4, moving stats
-> from port to device, and modifying the stats update logic from clear-on-r=
-ead
-> to direct assignment since the MIB clear was removed.
->=20
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
-ernet/airoha/airoha_eth.c
-> > index 533ffe20f8333..27ccc636d8009 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> > @@ -1621,143 +1621,146 @@ static void airoha_update_hw_stats(struct air=
-oha_gdm_dev *dev)
-> >  	struct airoha_eth *eth =3D dev->eth;
-> >  	u32 val, i =3D 0;
-> > =20
-> > -	spin_lock(&port->stats.lock);
-> > -	u64_stats_update_begin(&port->stats.syncp);
-> > +	spin_lock(&port->stats_lock);
->=20
-> This isn't a bug introduced by this patch, but could this spin_lock()
-> cause a deadlock? Since airoha_update_hw_stats() is called by
-> ndo_get_stats64() (which can run in softirq context) and ethtool
-> callbacks (which run in process context), a softirq could interrupt the
-> process context and spin forever trying to acquire the same lock. Should
-> this be spin_lock_bh()?
+>
+> > @@ -1112,7 +1132,8 @@ static int ovs_flow_cmd_new(struct sk_buff *skb, struct genl_info *info)
+> >  						       ufid_flags);
+> >  			BUG_ON(error < 0);
+> >  		}
+> > -		ovs_unlock();
+> > +		mutex_unlock(&table->lock);
+> > +		ovs_flow_tbl_put(table);
+>
+> Minot nit: you can consolidate 2 ovs_flow_tbl_put() calls after the
+> if/than/else statement.
 
-ndo_get_stats64() does not run in softirq context.
+Good point! I'll fix it.
 
->=20
-> > +	u64_stats_update_begin(&dev->stats.syncp);
-> > +
-> > +	/* Read relevant MIB for GDM with multiple port attached */
-> > +	if (port->id =3D=3D AIROHA_GDM3_IDX || port->id =3D=3D AIROHA_GDM4_ID=
-X)
-> > +		airoha_fe_rmw(eth, REG_FE_GDM_MIB_CFG(port->id),
-> > +			      FE_TX_MIB_ID_MASK | FE_RX_MIB_ID_MASK,
-> > +			      FIELD_PREP(FE_TX_MIB_ID_MASK, dev->nbq) |
-> > +			      FIELD_PREP(FE_RX_MIB_ID_MASK, dev->nbq));
-> > =20
-> >  	/* TX */
-> >  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_OK_PKT_CNT_H(port->id));
-> > -	port->stats.tx_ok_pkts +=3D ((u64)val << 32);
-> > +	dev->stats.tx_ok_pkts =3D (u64)val << 32;
-> >  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_OK_PKT_CNT_L(port->id));
-> > -	port->stats.tx_ok_pkts +=3D val;
->=20
-> Now that the hardware counters are free-running (the MIB clear operation
-> was removed later in the patch), can a torn read occur here? If the low
-> 32-bit register overflows and increments the high 32-bit register in the
-> brief window between the two reads, the resulting 64-bit value will be
-> corrupted and off by ~4.29 billion.
-
-ack, I will fit it in v7.
-
->=20
-> [ ... ]
-> >  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_DROP_CNT(port->id));
-> > -	port->stats.tx_drops +=3D val;
-> > +	dev->stats.tx_drops =3D val;
->=20
-> Since TX_ETH_DROP_CNT is a 32-bit hardware register and the MIB clear
-> operation is removed, the hardware counter will eventually wrap back to
-> zero. By assigning it directly to dev->stats.tx_drops, won't this
-> cause the 64-bit software counter to also silently drop back to zero and
-> violate the monotonically increasing requirement of ndo_get_stats64?
-> Does this need to calculate the delta instead of directly assigning the
-> value?
-
-ack, I will fit it in v7.
-
->=20
-> [ ... ]
-> >  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_RUNT_CNT(port->id));
-> > -	port->stats.tx_len[i] +=3D val;
-> > +	dev->stats.tx_len[i] =3D val;
-> > =20
-> >  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_E64_CNT_H(port->id));
-> > -	port->stats.tx_len[i] +=3D ((u64)val << 32);
-> > +	dev->stats.tx_len[i] =3D (u64)val << 32;
-> >  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_E64_CNT_L(port->id));
-> > -	port->stats.tx_len[i++] +=3D val;
->=20
-> Does this overwrite the RUNT_CNT statistic? The code assigns RUNT_CNT
-> to tx_len[i] (where i=3D0), but immediately overwrites it with
-> E64_CNT_H at the same index because i is not incremented between
-> the assignments.
-
-ack, I will fit it in v7.
-
->=20
-> [ ... ]
-> >  	i =3D 0;
-> >  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_RUNT_CNT(port->id));
-> > -	port->stats.rx_len[i] +=3D val;
-> > +	dev->stats.rx_len[i] =3D val;
-> > =20
-> >  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_E64_CNT_H(port->id));
-> > -	port->stats.rx_len[i] +=3D ((u64)val << 32);
-> > +	dev->stats.rx_len[i] =3D (u64)val << 32;
-> >  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_E64_CNT_L(port->id));
-> > -	port->stats.rx_len[i++] +=3D val;
->=20
-> Does this also overwrite the RUNT_CNT statistic for the RX path in the
-> same way?
-
-ack, I will fit it in v7.
-
-Regards,
-Lorenzo
-
->=20
-> [ ... ]
-> > -	/* reset mib counters */
-> > -	airoha_fe_set(eth, REG_FE_GDM_MIB_CLEAR(port->id),
-> > -		      FE_GDM_MIB_RX_CLEAR_MASK | FE_GDM_MIB_TX_CLEAR_MASK);
-> > +	dev->stats.rx_len[i++] =3D val;
-> > =20
-> > -	u64_stats_update_end(&port->stats.syncp);
-> > -	spin_unlock(&port->stats.lock);
-> > +	u64_stats_update_end(&dev->stats.syncp);
-> > +	spin_unlock(&port->stats_lock);
+>
+> @@ -524,9 +540,22 @@ void ovs_flow_tbl_destroy_rcu(struct rcu_head *rcu)
+> >  	call_rcu(&mc->rcu, mask_cache_rcu_cb);
+> >  	call_rcu(&ma->rcu, mask_array_rcu_cb);
+> >  	table_instance_destroy(ti, ufid_ti);
+> > +	mutex_destroy(&table->lock);
+> >  	kfree(table);
 > >  }
->=20
-> --=20
-> Sashiko AI review =B7 https://sashiko.dev/#/patchset/20260511-airoha-eth-=
-multi-serdes-v6-0-c899462c4f75@kernel.org?part=3D12
+> >
+> > +void ovs_flow_tbl_put(struct flow_table *table)
+> > +{
+> > +	if (refcount_dec_and_test(&table->refcnt)) {
+> > +		mutex_lock(&table->lock);
+> > +		table_instance_flow_flush(table,
+> > +					  ovs_tbl_dereference(table->ti, table),
+> > +					  ovs_tbl_dereference(table->ufid_ti, table));
+> > +		mutex_unlock(&table->lock);
+>
+> As mentioned in the previous patch you can follow-up moving here the
+>
+> 	call_rcu(&mc->rcu, mask_cache_rcu_cb);
+>  	call_rcu(&ma->rcu, mask_array_rcu_cb);
+>
+> currently in ovs_flow_tbl_destroy_rcu.
 
---vN0T/RtPM7tQgdoY
-Content-Type: application/pgp-signature; name=signature.asc
+OK. I'll consolidate it in an independent follow-up patch.
 
------BEGIN PGP SIGNATURE-----
+>
+> > +/* Must be called with flow_table->lock held. */
+> >  int ovs_flow_tbl_flush(struct flow_table *flow_table)
+> >  {
+> >  	struct table_instance *old_ti, *new_ti;
+> >  	struct table_instance *old_ufid_ti, *new_ufid_ti;
+> >
+> > +	ASSERT_OVS_TBL(flow_table);
+>
+> Minor nit: adding the assert and the comment is redundant. I think the
+> assert alone would be better. There are other similar later occurrences.
+>
+> /P
+>
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCagRWfQAKCRA6cBh0uS2t
-rHRvAQDvhwEDz38SNHFl39yZrO6NXNUyv0ET+x02j6VV3qobLgD/cudIa265P1iZ
-NloiPq14rbXxC/WzJq7r3oLA/0hQJA8=
-=y+s9
------END PGP SIGNATURE-----
-
---vN0T/RtPM7tQgdoY--
 
