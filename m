@@ -1,386 +1,202 @@
-Return-Path: <netdev+bounces-287439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287441-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ANIuMeMXBGpLDgIAu9opvQ
-	(envelope-from <netdev+bounces-287439-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 08:19:15 +0200
+	id cJ4/ERIaBGp4DwIAu9opvQ
+	(envelope-from <netdev+bounces-287441-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 08:28:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53C5152E06A
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 08:19:15 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACDEC52E155
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 08:28:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8C32F302E38A
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 06:19:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 20774301411E
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 06:28:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BDC23D1A86;
-	Wed, 13 May 2026 06:19:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBEBF3D34B5;
+	Wed, 13 May 2026 06:28:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ZEfBsHgm"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="nIZlSx+z"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012001.outbound.protection.outlook.com [40.107.200.1])
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010022.outbound.protection.outlook.com [52.101.61.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7483D3492;
-	Wed, 13 May 2026 06:19:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705693BF672;
+	Wed, 13 May 2026 06:28:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.22
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778653153; cv=fail; b=HmSVWW8tYA9hOUZOM03x9wx2+moPm+3l4qyvs2pYz3XSKUi45IXHUJe+4k4+MwwWcXWYRyAYhxOaPlbGAeBE9nFxJcJxw7jglgZbm19+BXmbUuRwMX1jsjjiWRYPDUFZ4qW9W0gIi9kOSpBzD5O4t+1UstmWKoaKXtXMJ+kOf00=
+	t=1778653709; cv=fail; b=I7YL28oo10aGyfmStA0itx0iGhmTt6zdswfeZFUbRkzfrMDuRFN0JdwIIT4zXP5ohVu5Opv16v02XOW/n+x7RPn2ySPdQmRX7CEd/244HoqgpR2KO2bQQFqnGh3uwtNZ1b23ocy6klvPLhjrSvRYXMXDQur9mHaBpAMsGRwfeDU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778653153; c=relaxed/simple;
-	bh=LimqCC4SVkrruuYi9ZUBNZ4whDXJ8eID3uxaCWMZ81w=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=IcN1Wz/GfU6wflQua6uiW/i8Bxhf+PU0AeEW3sQQBmp1zg4EjFc7TklmU/x0HZ4aom5QF2PYJDXPnGp/iVkLwzorIq5nKDEfGxYfawTbJ59B8+hqztl/qyndv1JEHXpgIaxKpYI4X719tOKeXLqi/SLSkhzsKyzIia4AfYUmK6k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ZEfBsHgm; arc=fail smtp.client-ip=40.107.200.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+	s=arc-20240116; t=1778653709; c=relaxed/simple;
+	bh=el8GMn6nW8959Gl9NSE7folRYuGP7DeK73mEqIn/ZWA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qBsKfQ7qG2JjPNRwTin6FStBFAUUYTZBEAfDg9SRqLcLdiwW/XkQlReNrTBRasfUYt7vsO4W0y1btNant04v/aIgqpbiItmWiIp7dBWkmGc4jfe1K4mCd/8kxq0h+SyhJoJLEeVc3mSQsj2jgd50Fen4QauYnQ8T+Dp3OWU4ZQE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=nIZlSx+z; arc=fail smtp.client-ip=52.101.61.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=X6a53EcQ1HTJJnL5y59yukrJkCih5x+YbYOiRQWRBKHVNcEd8FhCqZGSbK6/xz4ktVYdeYORsFbp2Ve688E786OCJmapj2PgMk7piTf+l+tdSiDNXsMl2mhv+PA5/W5cDno0jaVyWVc8dZa9/ziz/LW3Z+7dvV9j0Z938baRviWuZarCnbQIwvEDQqnyZox2yYKz82xUz8CVfHdvSKZGTEEVcCbC4aE3+AO/nowbsjSTnYxV12Aie7LHxjV0jlaJ3QnmlFhQE4SYZyVoUW+pZZ5pXXj5vwOlCZWwQfDMvY9wBYEYKaXQs58TPPA0e7/2lN7lguPgCjVlc2V5Li+h+g==
+ b=TPy3zo6NOeCT0ugN+vMEPyfZCi85LgdZKjeXogOwYuOxHPNJIb7AoAalTxA26F4HpJoghN6Bn3DIFAozuOb/J/LSgWA6/p8Nxr72/aDls6oIiS9K0ri5A2yyyISEyLM6aGr7ZrZMZiGy2DiLwLai10rqWqzl/kiCfcy4fFNsr5x87BP6IruqGK/j1lTDTAf+evgBSWz/zEhnYo1gC2v52ebr/q4Lf6HYcHKF6izB6ZhDhWNTklw3d8JUKCiu65QDEw62fx0EfpYhKXNZnomra4bSX0YOmZjFi+TNdnx5/WrjapXHm9WkWkHQdbSWqDnOxXgcNTTvnMcl99RUkHQWsA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1iaxRwtdvkWyY4ReKnNp0vuNJGyS74UvTfLwWLqYmX4=;
- b=dlrkYvb4yl5FLfuQLFmxq49WKDuxNid5LslbAvqQW6YTYQ2vhMpACP6cm2MGgaLdTwJ2HfueaYkwyp4n9kz47PqrsDiDH9KE2t+wvRMtbcIbgFCMbl9qD7VtSd2lXw6jKPefo2QeB/Hz8m+6H96tB6nG/rbOzSCs7GbAY3R8AYJMxf+aAWQDAb74H14OHxBZTVnem8u/hiBujIOtmEySvn+kHdGm5VFzXBvVL1XL5vCRgyPzA+9et9BGjHHAFU4yX+hvUxxrl0W6+kaPZiZ16mkvcMad9wfUrEGrGdR+OGjLeqzTQ5/rmArcNRT5RcypkrgKooCvT8kmBM1OdouPsA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
+ bh=yRpS+V4WBaVuAoiTPKpV3dvO7OFRfogHAyqe1GpZ7mQ=;
+ b=fHzuc/wls2YLhOn/jF4t1eZjF/9snMt3U9IH7BzQP3IHY1JC5jLmBB7APm0cd49k1zRjybTHb8IJEt89ZsErHDEtU3Ch4P+sOEcYwWbfcxWWX2FQ+5pGZIO9PNF7hSJ5oLa2vOC10VLpgBmVS7FCF5D7rxjWp1Z8AXkNL5Mhetx6ACIw61KDK3sYlktnmwXJX53VuQMeRqNQyJ0OLrxloDzlVflcosderUTOhxWHSjrp79KE2wY4jSC3ctyKLBYuwDoSSlNAYj8wiW/ind0hFImR7q1rDvCJYwy93N/RG8QLkVKELSiGtPGRmDQoMQP6LX8u35J56z5qhlQHwEZH+A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1iaxRwtdvkWyY4ReKnNp0vuNJGyS74UvTfLwWLqYmX4=;
- b=ZEfBsHgmdHTpTx2bnv4GNE9NdEIkXRWQQHaNWB24s9mWCRBpnpqwHLl2CxKFC/LY1a9+ZwglhrPD1kTuWGiWEyQddOLYNt9r7NTaFdte03PLRCN5XXUnRpiXU126gbQlzA0P/J/Z+vDBC5ae6O+OWHKPaNTxmRSLo8jyg9lBk0PJagj2+YsxfL4/UC1krMJPPJwYUoJxCPO6oyU2CYWA0POgHxPXFoOhqbldnjMOxJSGvElEv2Lmt0FgoEL+Asv7g1UqZX4s3MB7eOm5S0JBxOv7398mZBBsrZxXosTzKhSX58rVj2oNwYKRPzp7QAbuAbEvgC5Af0ly5FIhf59KsA==
-Received: from DSWPR11MB9715.namprd11.prod.outlook.com (2603:10b6:8:355::17)
- by IA1PR11MB7810.namprd11.prod.outlook.com (2603:10b6:208:3f3::11) with
+ bh=yRpS+V4WBaVuAoiTPKpV3dvO7OFRfogHAyqe1GpZ7mQ=;
+ b=nIZlSx+zAmOBDIC8Fa3epbw/twFRx2X8kT5ZE9WhUXYaNO+6eDpjPrK7cX0TpDaX7msMkOJ54frsFp5eusle5//iW/jTocxCpVoGRTlnFkigjJDjhhPff7v9hD4zfsNkSOe4KPP/qupvSR5ZfeVKD9M5A4hwT/avNdVnbA8TTEkF+vN1kL6t/HaAtDPi5ymEckt/B3SZA1PVbNxNrhpIUBxVw1vDI1fryPfbVQAL8ob3pR11iZERXm1tFl31EcF6tWIkuRGjv+xWSHYV+yDKDUJknwBrcyi0xxKF1UuGgPW49tQsikr2AOeHD+erkWyWKnRGoJqoC7tGbiD1HL6CEw==
+Received: from BL1PR13CA0251.namprd13.prod.outlook.com (2603:10b6:208:2ba::16)
+ by SA1PR12MB9514.namprd12.prod.outlook.com (2603:10b6:806:458::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.12; Wed, 13 May
- 2026 06:19:07 +0000
-Received: from DSWPR11MB9715.namprd11.prod.outlook.com
- ([fe80::25ec:56c9:f864:9139]) by DSWPR11MB9715.namprd11.prod.outlook.com
- ([fe80::25ec:56c9:f864:9139%6]) with mapi id 15.20.9913.009; Wed, 13 May 2026
- 06:19:07 +0000
-From: <Thangaraj.S@microchip.com>
-To: <kuba@kernel.org>
-CC: <netdev@vger.kernel.org>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
-	<edumazet@google.com>, <pabeni@redhat.com>, <Bryan.Whitehead@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <linux@armlinux.org.uk>,
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net-next v3 4/5] net: lan743x: Register SFP platform
- device for PCI11x1x
-Thread-Topic: [PATCH net-next v3 4/5] net: lan743x: Register SFP platform
- device for PCI11x1x
-Thread-Index: AQHc3qq/rGHXO6wrbkyFrNwN580h6LYJqzWAgAHFBXA=
-Date: Wed, 13 May 2026 06:19:07 +0000
-Message-ID:
- <DSWPR11MB9715B60CCCCB60C8C26DEA73EC062@DSWPR11MB9715.namprd11.prod.outlook.com>
-References: <20260508052150.11852-5-thangaraj.s@microchip.com>
- <20260512020849.839044-1-kuba@kernel.org>
-In-Reply-To: <20260512020849.839044-1-kuba@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DSWPR11MB9715:EE_|IA1PR11MB7810:EE_
-x-ms-office365-filtering-correlation-id: 2f91f857-cb6c-4353-501d-08deb0b789f7
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|1800799024|366016|38070700021|18002099003|56012099003|11063799003|22082099003;
-x-microsoft-antispam-message-info:
- fVsM0f+bzoCsBN19mvylvH4p8DznPMUvzYN0KxHESDVbcRUyx2ggXl8VzqY2mZTwng3R9rtNwojJgmVL4+81km877F2L1F/YI2jIig9zSKJxJPHrNVc1auYge6+bDheVMTjHgZn6XIm3DjNpowEMZ3hxX4J+ujMUhsWLG1+sctYNRMDJpyr45AD3RUGxehecHIAxK7eNbiVKFIu67nen6XyIsfn/hw+mm3CTMprCt7vAubNPWeIZG3NHD1JweB2PoSTwY3cTdSHzqJYhXd3LdF6WR3VGj+qPHoq0HfQXYzbWTm2xqEAM+9G1TKfdQ70zlYNbS+TL0OAtmycGsFI4LCUsq8hsHsYHiIWzRwMFbt3hL5JoxlF3Lq8J1D6wWCmXgKuedgo19Cu6iRryeJSLLujVthl+4lwl3/2vuGKLY9GxStkE2wD4LD0Nz1yaYGDMNpBIle8jQN3iOmIhWWoYnviXLYPxu0HGLQr2s8aRY7Vhg9aSeEon7t4uR8y76KAVWtPsXlJK/mduERbplIJ7frXFePgHAfyLBFDNLFjjO1Ql4mlEJwOmhJP8KSSrhfynFWt18baugdFB84cP3ZAudDFDRe69qsIcY2nFt2fHHvMmySahCRq6YHvmNhfIUAaJep/75KK/NO7Jy+gklv8B1Nx/fC4FcGdMeCzXjEOeEGkj44eF97mgIFjs8h/E/jdleFyyLnGsSruoV3RJi3QiHOkbG024v8KH/GCj/eKWaERvGtbIyGB8ShtZvAsXs/Ei
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DSWPR11MB9715.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700021)(18002099003)(56012099003)(11063799003)(22082099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?kC+RdTFRkA33lpAlH9fQn3sxKdFA9V4SGg9cypcPLiLHpE9DJX9EcOl/AY4J?=
- =?us-ascii?Q?l1WyfJhDRwIN3xHIyzHNt61+EQuD29lDXMx4i1eCoKwHR+AUIQki4/vdY1HX?=
- =?us-ascii?Q?twbRdbNB9L44QTHdbtMq3+xRvAD7wsbZE5hTfja5eryrk0NFJ7PccH+Mx0gR?=
- =?us-ascii?Q?uzUsg2UmUhp8vbtOlvEmSfFhXIxd2g7JlyBX8+6sd7cu5LsfL6nWKbmYiEbA?=
- =?us-ascii?Q?nyKQA8a/mVKEnE8g8msgVWb1qnw00GtmIcVNXY2Z17wemoEu9wz356ViX4Oc?=
- =?us-ascii?Q?r+2yJ/xBgdwAZGgakQLYpFcrf3jzqZz9K4n9WzhC4HAexA8Os7zzJdz3O0f9?=
- =?us-ascii?Q?cMBh+IkLJrA2VL2U1vh8bTiomv3Kpid2Sw6Aaq00OTF9tDpMqZAiATJSdATm?=
- =?us-ascii?Q?rQZFwShT1p3PiEBNAA6QhTgQ9cfz3ZkQIb3Sz+QtdEUJSoiRltkuJ3aJhI56?=
- =?us-ascii?Q?6Up+h3nRWywpIs7fkjHSMUb8v1xBwAsA/oHGogQDz0wbswKOilEl3NJ1osIu?=
- =?us-ascii?Q?W4RuzXQBkjsRFI04xeXGsiYt1rw0zHE18z27L70V6vZRTVML3qewrlmn6JCj?=
- =?us-ascii?Q?4VG0MAHKHIqGC8ivcundcsiZ8Oa+fax55EQH8BsEWwxlDacG6WTjabwEj87J?=
- =?us-ascii?Q?f9NKr6HagbXjBYQX/QrIYMTyVxVKrIMR6VLUazmsKdNiqjTGcmgIwMA2blqv?=
- =?us-ascii?Q?/eE3WFjIwTGvALVREM/wCnbYuQVlNTtgJJaAGmcrk6mLnvt06Ca0rrE4HA08?=
- =?us-ascii?Q?cEKbQd1m10Fj1/xPTYa/iyjJYt+z0dO5Fo3lrG8WkXB7bCv+nkqKTS85/fM6?=
- =?us-ascii?Q?njJLDhkIJPF9kITSyF53oDI9lkZva2/6bFsEO3bGP1ddsyZrGuDobXycRwLZ?=
- =?us-ascii?Q?Ay6RLu9lzaMHYkXnRUH50BJX82ycWBVzLxxn8rQ91Gew4dCDmprLyxIds0Yb?=
- =?us-ascii?Q?3952m+B1V0nB+I0rfs5AxA5BHXy8SBE/xXc15XriTHruQo42BcPuwagAQuPS?=
- =?us-ascii?Q?7AbRS2dgySwQsd3LBE32dqkM3+kFpV/WQNK6B31RJqSfVhQO8YOnpaamTE6y?=
- =?us-ascii?Q?Ka+sF9fq74QUgssCwG9BtjkRy9VOEwrY7eqAmxDi8gtPHblwiAgfO5sk0v3x?=
- =?us-ascii?Q?/oS0RGzdbEev3QatY1p310A+XNTSRCGt+iTsY6JucXn45Ar58bYrg9QBSSnj?=
- =?us-ascii?Q?ZvenoNiE4xud2Ke9j7TXDVo8x5Mp3fogS1PRLGPwpLRHrkcGg1f92Fo/jG5/?=
- =?us-ascii?Q?hey/XkXnvAaeU3pxLDlWI1LRJnOhdNd8bdoxegfQ7CE3+MlRWdHTXExZAjXH?=
- =?us-ascii?Q?DzisDIF6smJeTqUp1bx9XKvRXX+TmwPMlllgdcOLqfNguG4u74A5WfSV4iRG?=
- =?us-ascii?Q?FDNpfNtqkxm16N8NmgSloXInwuc3STMTh/Ktwhv/6A3YZ4kE1wopRRYpxCF+?=
- =?us-ascii?Q?nto3UwSMVyH0M2BRNbiuKjGMO1GzsJsfR26rfbiW8Qh/yoWPaqUK84fJibMv?=
- =?us-ascii?Q?d4xKrdlmNPfthtI2X06YrHvXlmhLwSr12330xWyhcZrJSzA8Z0cKahR9eJSR?=
- =?us-ascii?Q?sOU4dVo1AvmzSxSZsnYSRdqT7UBSl6aSgvVGbrxJCJ8VyFPVb2LWQVLasfA8?=
- =?us-ascii?Q?fLUI3HnekXoQ39s8fNv1Z5nGMMVAUZ24YLq0LgbiwApufQPCwaS+1VTWh/iD?=
- =?us-ascii?Q?hcC66+TonrohtHWlHzyjmE6EgaFLf9AgprVtTNK2XbSYLxyFT6U8sHxWtS9Q?=
- =?us-ascii?Q?x8kB1/npvw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.21; Wed, 13 May
+ 2026 06:28:23 +0000
+Received: from BN2PEPF00004FBC.namprd04.prod.outlook.com
+ (2603:10b6:208:2ba:cafe::a6) by BL1PR13CA0251.outlook.office365.com
+ (2603:10b6:208:2ba::16) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.25.17 via Frontend Transport; Wed, 13
+ May 2026 06:28:22 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ BN2PEPF00004FBC.mail.protection.outlook.com (10.167.243.182) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.25.13 via Frontend Transport; Wed, 13 May 2026 06:28:22 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 12 May
+ 2026 23:28:09 -0700
+Received: from drhqmail201.nvidia.com (10.126.190.180) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Tue, 12 May 2026 23:28:09 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.180) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
+ Transport; Tue, 12 May 2026 23:28:05 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>
+CC: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+	"Mark Bloch" <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Aya
+ Levin <ayal@nvidia.com>, <netdev@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Gal Pressman
+	<gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, Nimrod Oren
+	<noren@nvidia.com>, Yael Chemla <ychemla@nvidia.com>
+Subject: [PATCH net] net/mlx5e: Don't leak RSS context in case of error
+Date: Wed, 13 May 2026 09:27:37 +0300
+Message-ID: <20260513062737.333259-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microchip.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DSWPR11MB9715.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f91f857-cb6c-4353-501d-08deb0b789f7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 May 2026 06:19:07.3111
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF00004FBC:EE_|SA1PR12MB9514:EE_
+X-MS-Office365-Filtering-Correlation-Id: cd171187-a021-4866-0f1c-08deb0b8d513
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|36860700016|82310400026|18002099003|11063799003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	lHFk46tiue08NBSc/QGBty9evQeovwC4WyaS8UI4/TdIwa5OidEa4NGENZXrRqmymA3HNulhJqxaAldIjeMEXz5o/AhwvkrToCSof8ZvHa9KLrgAoaj43k89Vtp4okRzJ6BAYX0OCIh1ftymsAVXQdDUy9x8rr9SCn4D/ssvfe5+K1++f1ur6LTVAO1smMGE9XAncf2nynreUOF+s39MZX/itaucvk7eOdJWPBVfh/l1HYWifgwV9VaHxNVyRgRFlRxG6Dt0nY8F1rFuCEx945sP7eHtofjKSBWWOhrONrw7ffIkriNqzBxAB6PjrUD50oQomVyrcI1fGlogjthsxVhBME17eQSgo5V2IbnT33r92tl0FnkxMf+sEvFj5JslW3fIQEyI5r4vDg7dpk1Dr6b23RUH9tLKvqKNfW1w7HxGJZls5wLNa4VRyWCBonGdTsnHInL+xt4oQP74UG0xQt+cXofGwX1o7l9B7iUz9dNz+jZZfFhSoGkwpc0g+sEkWzvY5fWX/d9OzIBpXFS67Dd8ncw7v/CpJeo8OTO/LlmJnm0DGrfwKU4ZGGsvXyau6aeO24wNlpiZoGcpejImrSEZuIT4VDyRrFSm3mltsXqnf4N/7UhyOr1/rT7VLvSptW9Y7ZWRf+atMXnuK7yMJjgnI+RUl6qSbJRHLe9U4COn/rLiGKE3mMhGdfHGoiyUtjTc3BOFHAa9duadT3Dc6hIFerk3cx6Z32939zhpxCo=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700016)(82310400026)(18002099003)(11063799003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	dZ0WeyyZ/Z87BppdD4MyrfXhKG/L9s6sZkDF+2R8GwDrfQ5IHeZRtb2j/Zzo8E4CqvjPhHOdkivPHDQAC18EXHVIjJtjP1jcajTf4/cPjRk1Hxq142g1+GVCK+jDph8/Dw86jDwh4Zftm6as9ox0cvtUncjMFvBJ5Ljbrz5x6p9mL82rrYjdYYowIJbf3YjnlK8I/bV6iLu0r5Nt2CKN3NiYgWoo9uo9yUQVhn7xwLM6sA89aMTq4CSMn6nzjYkRUPbAS7uQ4k7LNI2NxsZDJzsh7DfpkopVFJpLRFouW2aa/B3LLwMYOBSzzC+8Vq+78RiLFut9xHQUEbuF9499NJNXZ5YVoo8yIrqkc9bUPTAqU6tvcTG2DvwivSS80R6D5Bg4nKMvO7ikSWjvM4j8yRP27VF382Mc7m212V2nWlwG45IHZaBbm1t8jzWoT+im
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2026 06:28:22.6021
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4BJ4EqnDr0Hjjq57Zj6UUCSoMVQw7jASfY9JYQkrTYXZaDh87OO8QrL9ECa75YlpkLxCpWNq+sznFqcdp80zCndd30ozQQe5QFS3L2DT2x4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7810
-X-Rspamd-Queue-Id: 53C5152E06A
+X-MS-Exchange-CrossTenant-Network-Message-Id: cd171187-a021-4866-0f1c-08deb0b8d513
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF00004FBC.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB9514
+X-Rspamd-Queue-Id: ACDEC52E155
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=selector1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[Thangaraj.S@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	TAGGED_FROM(0.00)[bounces-287439-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-287441-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email,nvidia.com:mid,Nvidia.com:dkim];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,microchip.com:email,microchip.com:dkim,DSWPR11MB9715.namprd11.prod.outlook.com:mid,lunn.ch:email,davemloft.net:email,sfp_info.id:url]
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Action: no action
 
-Hi Jakub,
-Thanks for the comments.
+From: Gal Pressman <gal@nvidia.com>
 
-> -----Original Message-----
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: Tuesday, May 12, 2026 7:39 AM
-> To: Thangaraj Samynathan - I53494 <Thangaraj.S@microchip.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>; netdev@vger.kernel.org;
-> andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com;
-> pabeni@redhat.com; Bryan Whitehead - C21958
-> <Bryan.Whitehead@microchip.com>; UNGLinuxDriver
-> <UNGLinuxDriver@microchip.com>; linux@armlinux.org.uk; linux-
-> kernel@vger.kernel.org
-> Subject: Re: [PATCH net-next v3 4/5] net: lan743x: Register SFP platform
-> device for PCI11x1x
->=20
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e
-> content is safe
->=20
-> This is an AI-generated review of your patch. The human sending this emai=
-l
-> has considered the AI review valid, or at least plausible.
-> ---
-> net: lan743x: Register SFP platform device for PCI11x1x
->=20
-> This commit registers an SFP platform device for PCI11x1x when SFP suppor=
-t is
-> enabled, using the SFP software node as its firmware node and associating=
- the
-> I2C adapter with its own software node for module management.
->=20
-> > diff --git a/drivers/net/ethernet/microchip/Kconfig
-> > b/drivers/net/ethernet/microchip/Kconfig
-> > index a83db3c7404f..9857053dabf8 100644
-> > --- a/drivers/net/ethernet/microchip/Kconfig
-> > +++ b/drivers/net/ethernet/microchip/Kconfig
-> > @@ -52,6 +52,7 @@ config LAN743X
-> >       select PHYLINK
-> >       select I2C_PCI1XXXX
-> >       select GP_PCI1XXXX
-> > +     select SFP
->=20
-> [Medium]
-> Does this select need to inherit SFP's own dependencies?  In drivers/net/=
-pse-
-> pd/Kconfig the SFP symbol is declared as:
->=20
->     config SFP
->         tristate "SFP cage support"
->         depends on NETDEVICES && PHYLIB
->         depends on HWMON || HWMON=3Dn
->         ...
->=20
-> With HWMON=3Dm and LAN743X=3Dy, select SFP forces SFP=3Dy, which violates=
- the
-> HWMON || HWMON=3Dn constraint and produces an unmet direct
-> dependencies warning.
->=20
-> For comparison, drivers/net/ethernet/wangxun/Kconfig uses:
->=20
->     select HWMON if TXGBE=3Dy
->     select SFP
->=20
-> Would adding either depends on HWMON || HWMON=3Dn to LAN743X, or a
-> conditional HWMON select, be preferable here?
+If mlx5e_rx_res_rss_set_rxfh() fails during mlx5e_create_rxfh_context(),
+the RSS context is not cleaned up.
+This leaves a stale entry in 'res->rss[rss_idx]' that occupies a context
+slot.
 
-[Thangaraj Samynathan]  Agreed. Will Fix in next revision.
+Destroy the RSS context before returning the error.
 
->=20
-> >       help
-> >         Support for the Microchip LAN743x and PCI11x1x families of PCI
-> >         Express Ethernet devices
-> > diff --git a/drivers/net/ethernet/microchip/lan743x_main.c
-> > b/drivers/net/ethernet/microchip/lan743x_main.c
-> > index b90b35cef2e6..88a2d11552f8 100644
-> > --- a/drivers/net/ethernet/microchip/lan743x_main.c
-> > +++ b/drivers/net/ethernet/microchip/lan743x_main.c
-> > @@ -3066,6 +3066,31 @@ static int lan743x_swnodes_register(struct
-> lan743x_adapter *adapter)
-> >       return software_node_register_node_group(nodes->group);
-> >  }
-> >
-> > +static int lan743x_sfp_register(struct lan743x_adapter *adapter) {
-> > +     struct pci_dev *pdev =3D adapter->pdev;
-> > +     struct platform_device_info sfp_info;
-> > +     struct platform_device *sfp_dev;
-> > +
-> > +     memset(&sfp_info, 0, sizeof(sfp_info));
-> > +     sfp_info.parent =3D &adapter->pdev->dev;
-> > +     sfp_info.fwnode =3D software_node_fwnode(adapter->nodes-
-> >group[SWNODE_SFP]);
-> > +     sfp_info.name =3D "sfp";
-> > +     sfp_info.id =3D (pdev->bus->number << 8) | pdev->devfn;
->=20
-> [Medium]
-> Should the platform device id incorporate pci_domain_nr(pdev->bus)?
-> PCI bus numbers are only unique within a PCI domain, so on a multi-domain
-> system two PCI11x1x devices in different domains that happen to share the
-> same bus/devfn would both try to register as sfp.<same_id>.
->=20
-> The second platform_device_add() would then fail with -EEXIST from
-> device_add() and SFP would not come up on that device.  Something
-> like:
->=20
->     sfp_info.id =3D (pci_domain_nr(pdev->bus) << 16) |
->                   (pdev->bus->number << 8) | pdev->devfn;
->=20
-> would avoid that collision.
+Fixes: 6c2509d44636 ("net/mlx5e: Add error flow for ethtool -X command")
+Signed-off-by: Gal Pressman <gal@nvidia.com>
+Reviewed-by: Nimrod Oren <noren@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-[Thangaraj Samynathan] Agreed. Will be fixed in next revision.
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+index bb61e2179078..99a0034b9b20 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+@@ -1574,8 +1574,11 @@ static int mlx5e_create_rxfh_context(struct net_device *dev,
+ 					rxfh->indir, rxfh->key,
+ 					hfunc == ETH_RSS_HASH_NO_CHANGE ? NULL : &hfunc,
+ 					rxfh->input_xfrm == RXH_XFRM_NO_CHANGE ? NULL : &symmetric);
+-	if (err)
++	if (err) {
++		WARN_ON(mlx5e_rx_res_rss_destroy(priv->rx_res,
++						 rxfh->rss_context));
+ 		goto unlock;
++	}
+ 
+ 	mlx5e_rx_res_rss_get_rxfh(priv->rx_res, rxfh->rss_context,
+ 				  ethtool_rxfh_context_indir(ctx),
 
->=20
-> > +     sfp_dev =3D platform_device_register_full(&sfp_info);
-> > +     if (IS_ERR(sfp_dev)) {
-> > +             netif_err(adapter, drv, adapter->netdev,
-> > +                       "Failed to register SFP device\n");
-> > +             return PTR_ERR(sfp_dev);
-> > +     }
-> > +
-> > +     adapter->sfp_dev =3D sfp_dev;
-> > +     netif_dbg(adapter, drv, adapter->netdev,
-> > +               "SFP platform device registered");
-> > +
-> > +     return 0;
-> > +}
-> > +
->=20
-> [ ... ]
->=20
-> > @@ -3682,6 +3707,12 @@ static void lan743x_destroy_phylink(struct
-> > lan743x_adapter *adapter)  static void lan743x_full_cleanup(struct
-> > lan743x_adapter *adapter)  {
-> >       unregister_netdev(adapter->netdev);
-> > +     if (adapter->sfp_dev) {
-> > +             platform_device_unregister(adapter->sfp_dev);
-> > +             adapter->sfp_dev =3D NULL;
-> > +     }
-> > +     if (adapter->i2c_adap)
-> > +             adapter->i2c_adap =3D NULL;
->=20
-> [High]
-> Can this leave a dangling fwnode on the i2c_adap device?  The i2c_adap is
-> fetched from a different PCI function (the pci1xxxx_i2c driver via
-> pci1xxxx_i2c_adapter_get()) and outlives the lan743x instance.
->=20
-> In lan743x_pcidev_probe() the code does:
->=20
->     adapter->i2c_adap->dev.fwnode =3D
->         software_node_fwnode(adapter->nodes->group[SWNODE_I2C]);
->=20
-> But on teardown only the local pointer is cleared:
->=20
->     if (adapter->i2c_adap)
->         adapter->i2c_adap =3D NULL;
->=20
-> Meanwhile lan743x_destroy_phylink() calls
-> lan743x_swnodes_unregister() which invokes
-> software_node_unregister_node_group() and frees adapter->nodes.
-> After that, i2c_adap->dev.fwnode still references the released swnode-
-> backed fwnode.
->=20
-> Any subsequent access to i2c_adap->dev.fwnode (driver unload/rebind of
-> pci1xxxx_i2c, sysfs reads, fwnode iteration, or fwnode ops
-> dispatch) would then dereference freed memory.
->=20
-> Should the teardown also restore i2c_adap->dev.fwnode to what it was
-> before the probe-side assignment, symmetric to the mutation done in
-> lan743x_pcidev_probe()?
->=20
+base-commit: f5b2772d14884f4be9e718644f1203d4d0e6f0d6
+-- 
+2.44.0
 
-[Thangaraj Samynathan] Agreed. Will be fixed in next revision.=20
-
-> >
-> >       lan743x_destroy_phylink(adapter);
-> >       lan743x_mdiobus_cleanup(adapter); @@ -3909,11 +3940,29 @@ static
-> > int lan743x_pcidev_probe(struct pci_dev *pdev,
-> >               goto cleanup_mdiobus;
-> >       }
-> >
-> > +     if (adapter->is_sfp_support_en) {
-> > +             adapter->i2c_adap->dev.fwnode =3D
-> > +
-> > + software_node_fwnode(adapter->nodes->group[SWNODE_I2C]);
-> > +
-> > +             ret =3D lan743x_sfp_register(adapter);
-> > +             if (ret < 0) {
-> > +                     netif_err(adapter, probe, netdev,
-> > +                               "failed to sfp register (%d)\n", ret);
-> > +                     goto cleanup_phylink;
-> > +             }
-> > +     }
-> > +
-> >       ret =3D register_netdev(adapter->netdev);
-> >       if (ret < 0)
-> > -             goto cleanup_phylink;
-> > +             goto cleanup_sfp;
-> >       return 0;
-> >
-> > +cleanup_sfp:
-> > +     if (adapter->sfp_dev) {
-> > +             platform_device_unregister(adapter->sfp_dev);
-> > +             adapter->sfp_dev =3D NULL;
-> > +     }
-> > +
-> >  cleanup_phylink:
-> >       lan743x_destroy_phylink(adapter);
-> >
-Regards,
-Thangaraj Samynathan
 
