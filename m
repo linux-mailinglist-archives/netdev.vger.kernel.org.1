@@ -1,206 +1,192 @@
-Return-Path: <netdev+bounces-287467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287468-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8PotKFAvBGo/FAIAu9opvQ
-	(envelope-from <netdev+bounces-287467-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 09:59:12 +0200
+	id oMVkDf0wBGo/FAIAu9opvQ
+	(envelope-from <netdev+bounces-287468-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 10:06:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AFD952F377
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 09:59:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC33752F517
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 10:06:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1ED3730B52E9
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 07:57:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C81DB3068E54
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 08:01:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EDF33D6698;
-	Wed, 13 May 2026 07:57:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7BD336728F;
+	Wed, 13 May 2026 08:01:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=osuosl.org header.i=@osuosl.org header.b="0jZvNNfC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="effx/U+c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 036DC3D7D77
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 07:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B25C2D6E66
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 08:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778659046; cv=none; b=DFAfUDopbus53wu2X3SOETLr6CtRw3aPD3v3XxcL2INOgTGTmEmYlNEU1kQ2Bh3M+ZHyhtU4sdLWKBifgIkWXtlzEGMhjJ6UPQY4YqMcUIRGhwelW4RWxKO88tggqYiH7VPga7zKSBF5wctvgwApxwnneR6zm7l8pgQurGXtsOM=
+	t=1778659286; cv=none; b=bhyhtveOPzrBfwQJ0z+hALiIUG4A3e6dkN5RAppCR5LFEitaC508FmdQDeto9sY5s120WDQrmRPH3/ugavtLdvE7yzxONmIcMCogx0Vf+3dqU2e9ewh7vgt3zZ3V+q1Ssli71M12+dvPvf330eyZVBoYphJ9ffBxTMsM4anEU6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778659046; c=relaxed/simple;
-	bh=QIEEEBNc3gm+OmfgriT3rIOLfpDf7vX/Sd0R60v70Q8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version:MIME-Version; b=ZipiXB1LWUt4dz1UYMKbe6iz6LUcTb7ueChAAddyUPEqgrnVLO/aGyMk4rKRisREGZaLNjOaKk0o0WIf9Y+mrUn3VsgnXQ0RznqWQmsjvbsopLjBUCHaC3AwTIK2PYK7vR2STJZp+od0QeUkwNckXh2QLXPSzV6qU8tBr3aO0CY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=fail (2048-bit key) header.d=osuosl.org header.i=@osuosl.org header.b=0jZvNNfC reason="signature verification failed"; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-X-CSE-ConnectionGUID: 5aX1jBbWQdK4IaEyA1xWGQ==
-X-CSE-MsgGUID: JW21nUyeSACe7vEbOS18sA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11784"; a="83452613"
-X-IronPort-AV: E=Sophos;i="6.23,232,1770624000"; 
-   d="scan'208";a="83452613"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2026 00:57:24 -0700
-X-CSE-ConnectionGUID: TBWb0mfwQACTOab1UOuWPA==
-X-CSE-MsgGUID: Qflrrsf1QNKnbGXVOg80Dw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,232,1770624000"; 
-   d="scan'208";a="261759691"
-Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
-  by fmviesa001.fm.intel.com with ESMTP; 13 May 2026 00:57:21 -0700
-From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com,
-	aleksandr.loktionov@intel.com
-Cc: netdev@vger.kernel.org,
-	Simon Horman <horms@kernel.org>,
-	"Intel-wired-lan" <intel-wired-lan-bounces@osuosl.org>
-Subject: [Intel-wired-lan] [PATCH iwl-net v4 5/5] ixgbe: fix integer overflow and wrong bit position in ixgbe_validate_rtr()
-Date: Wed, 13 May 2026 09:57:10 +0200
-Message-ID: <20260415142841.3222399-7-aleksandr.loktionov@intel.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260415142841.3222399-1-aleksandr.loktionov@intel.com>
-References: <20260415142841.3222399-1-aleksandr.loktionov@intel.com>
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1778659286; c=relaxed/simple;
+	bh=n+tMx83Lpq2nnSneROrhedTv8YfST8C7unrL5fa+cjs=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=TMNUCT/br+Ly3SRN466fpNYhXq8YC95qGoyPALSIo6oRtbFJcMBZf7Un+6A5bGhx4YjMrxmcvVm4Ze4zcsY/UhwdZkgOxf+GWGwMgPMZ6eWlbyv4+BPCZ6HclE00sf9HgyIblNqfcsU/n0y0gzL8bp1Pidc9PQVgtPQjGl6EGas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=effx/U+c; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778659284;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s7tCsL/6PtC0ECoYeAcS4UPmxSgLubEwTSxD3rcZdAg=;
+	b=effx/U+cb3R385WHr5qbUVV56x0xI/YXl37A6YTCcMgIoWBOvEw8/lMs6mV67E6pgra34C
+	GS+Iw4EaILQZF2N/TeAB2qeZOakJbzF7HaNCOjaVnE+8XeDcjhlm1KBY5fnpSFzCuKMo+U
+	jqaUuqZGpdNpkCO/HAcjpHlLo2JSPtU=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-522-aJmxrpDfNM-aHK3i_nrFZw-1; Wed,
+ 13 May 2026 04:01:22 -0400
+X-MC-Unique: aJmxrpDfNM-aHK3i_nrFZw-1
+X-Mimecast-MFC-AGG-ID: aJmxrpDfNM-aHK3i_nrFZw_1778659280
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 45DB919560B7;
+	Wed, 13 May 2026 08:01:20 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.48.83])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1E0B43002D2D;
+	Wed, 13 May 2026 08:01:15 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <437CCB8A-5333-4349-B120-A103B1F0E617@auristor.com>
+References: <437CCB8A-5333-4349-B120-A103B1F0E617@auristor.com> <20260511160753.607296-1-dhowells@redhat.com> <20260511160753.607296-3-dhowells@redhat.com>
+To: Jeffrey Altman <jaltman@auristor.com>
+Cc: dhowells@redhat.com, netdev@vger.kernel.org,
+    Hyunwoo Kim <imv4bel@gmail.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Jakub Kicinski <kuba@kernel.org>,
+    "David S.
+ Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+    Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
+    linux-kernel@vger.kernel.org, Jiayuan Chen <jiayuan.chen@linux.dev>,
+    stable@vger.kernel.org
+Subject: Re: [PATCH net 2/3] rxrpc: Fix DATA decrypt vs splice() by copying data to buffer in recvmsg
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Patchwork-Submitter: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-X-Patchwork-Id: 2223539
-X-Patchwork-Delegate: anthony.l.nguyen@intel.com
-X-Original-To: incoming@patchwork.ozlabs.org
-Delivered-To: patchwork-incoming@legolas.ozlabs.org
-Authentication-Results: legolas.ozlabs.org; dkim=pass (2048-bit key; unprotected) header.d=osuosl.org header.i=@osuosl.org header.a=rsa-sha256 header.s=default header.b=0jZvNNfC; dkim-atps=neutral
-Authentication-Results: legolas.ozlabs.org; spf=pass (sender SPF authorized) smtp.mailfrom=osuosl.org (client-ip=2605:bc80:3010::136; helo=smtp3.osuosl.org; envelope-from=intel-wired-lan-bounces@osuosl.org; receiver=patchwork.ozlabs.org)
-Received: from smtp3.osuosl.org (smtp3.osuosl.org [IPv6:2605:bc80:3010::136]) (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits) key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384) (No client certificate requested) by legolas.ozlabs.org (Postfix) with ESMTPS id 4fwk6L0TB8z1yHc for <incoming@patchwork.ozlabs.org>; Thu, 16 Apr 2026 00:28:58 +1000 (AEST)
-Received: from localhost (localhost [127.0.0.1]) by smtp3.osuosl.org (Postfix) with ESMTP id 841DB6F74D; Wed, 15 Apr 2026 14:28:56 +0000 (UTC)
-X-Virus-Scanned: amavis at osuosl.org
-Received: from smtp3.osuosl.org ([127.0.0.1]) by localhost (smtp3.osuosl.org [127.0.0.1]) (amavis, port 10024) with ESMTP id hBoTrrce-4SJ; Wed, 15 Apr 2026 14:28:55 +0000 (UTC)
-X-Comment: SPF check N/A for local connections - client-ip=140.211.166.142; helo=lists1.osuosl.org; envelope-from=intel-wired-lan-bounces@osuosl.org; receiver=<UNKNOWN>
-DKIM-Filter: OpenDKIM Filter v2.11.0 smtp3.osuosl.org 04BA66F753
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=osuosl.org; s=default; t=1776263335; bh=it6igKY4qrJSpTkvyk0lUrw+wOK84Nrlw0QVHK9iASU=; h=From:To:Cc:Date:In-Reply-To:References:Subject:List-Id: List-Unsubscribe:List-Archive:List-Post:List-Help:List-Subscribe: From; b=0jZvNNfCLhkpU+R1jvDBhCFSkDzFYuNHSY16I5+2T34YcSacUmDRfN1iyhApTFLXw 3wJUGiBU8Ipph/IYRsCFGBLqZMAI2wha7Y0krjXnqdEAtKEaPlCgLac4Dc+ypOih5Q syg8+Cv7M4abmAw3Q9xuh8XqawPpFix9PqT47PlaV0z+2VlLzjutV+78f9ncVkchsq 0Jv8PGpjdI44JRBLMwyE98/O39nPXwnz/8QEWys4MKuGLAWV7u1lJ9x3vIFzkiXsbc NrTbm+ZkEu6yjXlcwAK6s0N5DC5Sh8Z4Y6QH71xVvGHSvJte8uj7zJE9HCzxiWxOov pWodpeeVK/mTQ==
-Received: from lists1.osuosl.org (lists1.osuosl.org [140.211.166.142]) by smtp3.osuosl.org (Postfix) with ESMTP id 04BA66F753; Wed, 15 Apr 2026 14:28:55 +0000 (UTC)
-X-Original-To: intel-wired-lan@lists.osuosl.org
-Delivered-To: intel-wired-lan@lists.osuosl.org
-Received: from smtp1.osuosl.org (smtp1.osuosl.org [IPv6:2605:bc80:3010::138]) by lists1.osuosl.org (Postfix) with ESMTP id 5F570375 for <intel-wired-lan@lists.osuosl.org>; Wed, 15 Apr 2026 14:28:54 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1]) by smtp1.osuosl.org (Postfix) with ESMTP id 4E82685476 for <intel-wired-lan@lists.osuosl.org>; Wed, 15 Apr 2026 14:28:54 +0000 (UTC)
-X-Virus-Scanned: amavis at osuosl.org
-Received: from smtp1.osuosl.org ([127.0.0.1]) by localhost (smtp1.osuosl.org [127.0.0.1]) (amavis, port 10024) with ESMTP id yuVAl-ppuZ-B for <intel-wired-lan@lists.osuosl.org>; Wed, 15 Apr 2026 14:28:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp1.osuosl.org 75BF585479
-DKIM-Filter: OpenDKIM Filter v2.11.0 smtp1.osuosl.org 75BF585479
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16]) by smtp1.osuosl.org (Postfix) with ESMTPS id 75BF585479 for <intel-wired-lan@lists.osuosl.org>; Wed, 15 Apr 2026 14:28:53 +0000 (UTC)
-X-CSE-ConnectionGUID: xkO6mPoqQZWE+juOq0ESXw==
-X-CSE-MsgGUID: 0tdYNp1/QneG/Ov1v7YKxw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11760"; a="77423750"
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; d="scan'208";a="77423750"
-Received: from orviesa003.jf.intel.com ([10.64.159.143]) by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 07:28:53 -0700
-X-CSE-ConnectionGUID: kgdYO5kKSESFmxxGDfIxZA==
-X-CSE-MsgGUID: jS2xfbJPRre/Vr72p4wZYA==
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; d="scan'208";a="234467899"
-Received: from amlin-019-225.igk.intel.com ([10.102.19.225]) by orviesa003.jf.intel.com with ESMTP; 15 Apr 2026 07:28:52 -0700
-X-Mailer: git-send-email 2.52.0
-MIME-Version: 1.0
-X-Mailman-Original-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=intel.com; i=@intel.com; q=dns/txt; s=Intel; t=1776263333; x=1807799333; h=from:to:cc:subject:date:message-id:in-reply-to: references:mime-version:content-transfer-encoding; bh=G7MmTf1h+5LioLTjjvjCKQN7jxTwWDeJLS/XSkZaGHM=; b=fl5Hybet6jl4TUbG1pG4jkV6NzpjT/xeaO+qumu8kvaoguxHnjwZntpU D5gXhWbG6HqoCljXjKy5f8yisKDoWYBANRfysjLeIILehSM0MngDmeJ0v LaLtFdEZ4+FuzggDtmy+hS7240DZvjphwEQTqBNSpZv9NqzAVrxpxXN7y lHEr1wKnB1m+8H7bqGcvk6K6rbLXmeMjOfq6NpizcmcwJafr9IBUXrORE D3VwIaE8Qk0wL5LI4/QpxyRHp0o4YCQHCZKbNt8IxVKhMMoirIi+sbEqA 0l5Y5xCVjEIUWyeF5444CDQTnkv0z3ovE2gdppMlfHqnj7ZpmkYgE7u2r w==;
-X-Mailman-Original-Authentication-Results: smtp1.osuosl.org; dmarc=pass (p=none dis=none) header.from=intel.com
-X-Mailman-Original-Authentication-Results: smtp1.osuosl.org; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=fl5Hybet
-X-BeenThere: intel-wired-lan@osuosl.org
-X-Mailman-Version: 2.1.30
-Precedence: list
-List-Archive: <http://lists.osuosl.org/pipermail/intel-wired-lan/>
-List-Post: <mailto:intel-wired-lan@osuosl.org>
-List-Help: <mailto:intel-wired-lan-request@osuosl.org?subject=help>
-Errors-To: intel-wired-lan-bounces@osuosl.org
-Sender: "Intel-wired-lan" <intel-wired-lan-bounces@osuosl.org>
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 1AFD952F377
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1354627.1778659274.1@warthog.procyon.org.uk>
+Date: Wed, 13 May 2026 09:01:14 +0100
+Message-ID: <1354628.1778659274@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Rspamd-Queue-Id: BC33752F517
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.59 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[osuosl.org:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	MAILLIST(-0.20)[mailman];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[intel.com : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287467-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[redhat.com,vger.kernel.org,gmail.com,auristor.com,kernel.org,davemloft.net,google.com,lists.infradead.org,linux.dev];
+	HAS_ORG_HEADER(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287468-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	MISSING_XM_UA(0.00)[];
+	SEM_URIBL_UNKNOWN_FAIL(0.00)[auristor.com:query timed out];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[osuosl.org:-];
-	RCVD_COUNT_TWELVE(0.00)[15];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	SEM_URIBL_FRESH15_UNKNOWN_FAIL(0.00)[auristor.com:query timed out];
+	RBL_SEM_IPV6_FAIL(0.00)[2600:3c0a:e001:db::12fc:5321:query timed out];
+	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.507];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,warthog.procyon.org.uk:mid]
 X-Rspamd-Action: no action
 
-Two bugs in the same loop in ixgbe_validate_rtr():
+Jeffrey Altman <jaltman@auristor.com> wrote:
 
-1. The 3-bit traffic-class field was extracted by shifting a u32 and
-   assigning the result directly to a u8.  For user priority 0 this is
-   harmless; for UP[5..7] the shift leaves bits [15..21] in the u32
-   which are then silently truncated when stored in u8.  Mask with
-   IXGBE_RTRUP2TC_UP_MASK before the assignment so only the intended
-   3 bits are kept.
+> > + void *rx_dec_buffer; /* Decryption buffer */
+> > + unsigned short rx_dec_bsize; /* rx_dec_buffer size */
+> > + unsigned short rx_dec_offset; /* Decrypted packet data offset */
+> > + unsigned short rx_dec_len; /* Decrypted packet data len */
+> > + rxrpc_seq_t rx_dec_seq; /* Packet in decryption buffer */
+> > 
+> > rxrpc_seq_t rx_highest_seq; /* Higest sequence number received */
+> > rxrpc_seq_t rx_consumed; /* Highest packet consumed */
+> 
+> 
+> Instead of allocating the storage within struct rxrpc_call perhaps
+> It would be better to add them to struct rxrpc_channel.  Doing so 
+> would reduce the allocation/deallocation churn.  The majority of
+> calls are short lived (perhaps a single packet in each direction)
+> but there will be many calls in rapid succession.
 
-2. When clearing an out-of-bounds entry the mask was always shifted by
-   the fixed constant IXGBE_RTRUP2TC_UP_SHIFT (== 3), regardless of
-   which loop iteration was being processed.  This means only UP1 (bit
-   position 3) was ever cleared; UP0,2..7 (positions 0, 6, 9, ..., 21)
-   were left unreset, so invalid TC mappings persisted in hardware and
-   could mis-steer received packets to the wrong traffic class.
-   Use i * IXGBE_RTRUP2TC_UP_SHIFT to target the correct 3-bit field
-   for each iteration.
+I'm trying to keep the I/O side separate from the application side.  I don't
+particularly want recvmsg (on the app side) reaching into the rxrpc_connection
+struct (on the I/O side).
 
-Swap the operand order in the mask expression to place the constant
-on the right per kernel coding style (noted by David Laight).
+Further, by only looking at the rxrpc_call struct, I don't have to deal with
+locking required for the possibility that the next call on that channel will
+start before I've finished with this one (say an incoming call is aborted and
+immediately followed up by the first packet of the next call).
 
-Fixes: 8b1c0b24d9af ("ixgbe: configure minimal packet buffers to support TC")
-Cc: stable@vger.kernel.org
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
-v2 -> v3:
- - Correct Fixes: tag to 8b1c0b24d9af ("ixgbe: configure minimal packet
-   buffers to support TC") -- the previously used e7589eab9291 predates
-   the buggy code path (Simon Horman); add Reviewed-by: Simon Horman.
+> > + size_t size = umin(round_up(sp->len, 32), 2048);
+> 
+> I think you meant to use max() here so that a minimum of 2048 bytes
+> is allocated.  
 
-v1 -> v2:
- - Add Fixes: tag; reroute to iwl-net (wrong bit positions cause packet
-   mis-steering); swap to (reg >> ...) & MASK operand order per David
-   Laight.
+Yeah.
 
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+> I think applying a cap on the allocation size would also be 
+> beneficial.  IBM/Transarc derived Rx implementations have a hard
+> upper-bound of 21180 (15 x 1412) bytes plus one 28 byte rx header.
+> Applying a cap of 32KiB seems prudent.
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 210c7b9..c9e4f12 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -9772,11 +9772,12 @@ static void ixgbe_validate_rtr(struct ixgbe_adapter *adapter, u8 tc)
- 	rsave = reg;
- 
- 	for (i = 0; i < MAX_TRAFFIC_CLASS; i++) {
--		u8 up2tc = reg >> (i * IXGBE_RTRUP2TC_UP_SHIFT);
-+		u8 up2tc = (reg >> (i * IXGBE_RTRUP2TC_UP_SHIFT)) &
-+			   IXGBE_RTRUP2TC_UP_MASK;
- 
- 		/* If up2tc is out of bounds default to zero */
- 		if (up2tc > tc)
--			reg &= ~(0x7 << IXGBE_RTRUP2TC_UP_SHIFT);
-+			reg &= ~(IXGBE_RTRUP2TC_UP_MASK << (i * IXGBE_RTRUP2TC_UP_SHIFT));
- 	}
- 
- 	if (reg != rsave)
+This would need checking earlier in the input path.  A DATA packet that's too
+large would need to be rejected as it comes off of the UDP socket if we're not
+going to be able to unpack it later.
+
+> It is also worth noting that there are no current implementations
+> of Rx RPC which will send individual Rx DATA packets larger than 
+> 1444 bytes including the Rx header.  Rx RESPONSE packets can be sent
+> as large as 16384 bytes (including the Rx header).  However, it is
+> extremely unlikely that this buffer once allocated would ever need 
+> to be grown.  
+
+For Rx RESPONSE packets, I'm fine with allocating a buffer on the spur of the
+moment and freeing it immediately.  Ideally, there would only be one RESPONSE
+per connection anyway.  I could do a static buffer with a lock, I suppose, to
+make sure I can process the things under memory pressure-based writeback.
+
+> > + kfree(call->rx_dec_buffer);
+> 
+> It might be better to avoid deallocating the buffer on the error
+> path and permit it to be freed during normal call (or call channel)
+> deallocation.
+
+Hmmm.  But I then need some other way to note that the buffer is no longer
+occupied by valid data.  I suppose I could set ->rx_dec_offset to USHRT_MAX.
+
+David
+
 
