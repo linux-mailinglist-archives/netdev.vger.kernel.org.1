@@ -1,360 +1,266 @@
-Return-Path: <netdev+bounces-287653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287659-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IFqkDlKbBGr3LwIAu9opvQ
-	(envelope-from <netdev+bounces-287653-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 17:40:02 +0200
+	id CNuuNrChBGqbMAIAu9opvQ
+	(envelope-from <netdev+bounces-287659-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 18:07:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0D0B536504
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 17:40:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 384D8536C12
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 18:07:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8254A31ADDE3
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 15:19:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A1B3634BA103
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 15:22:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 800194D90D9;
-	Wed, 13 May 2026 15:16:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A022547DFB3;
+	Wed, 13 May 2026 15:21:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cisco.com header.i=@cisco.com header.b="DHy2uowo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Jso9UWb0"
 X-Original-To: netdev@vger.kernel.org
-Received: from alln-iport-5.cisco.com (alln-iport-5.cisco.com [173.37.142.92])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8FB4CA282;
-	Wed, 13 May 2026 15:16:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.142.92
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778685376; cv=none; b=AonlTixeYxR/EvIxiHl+Iaa/bq5xcxy/6fxPZ1BpB5TM/48Dr5scs6s7sIHXqor77ziRe6AvRMwrnPVYkIhbGgV/iuvtpw6oguJzPJruPAf2pbk4c1ZSDJkpfepzlbk1xOtTO956Pm6ruiQk04XFeokjfG7O26SSwwIx7Tu4Txo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778685376; c=relaxed/simple;
-	bh=zzkYcyXi6N69CSiuCx09RarocX/ENESP+V0rdeC6Ydc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=D0BDDl1rNDmrKH4aKy2Xvznef9lO8w8RChPM50hGMZR5dkiA7PIfh/glvGHWUmrDigHZa2UV9MLg/tBXVahUamW5zPLfQRykWM2lJdbNcWgo8JNM9bJ2uTOxoSLH/F89YoeV+Um6A33aU5aiUlQq1Gbc91k26r3gMsgk6svRugo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (2048-bit key) header.d=cisco.com header.i=@cisco.com header.b=DHy2uowo; arc=none smtp.client-ip=173.37.142.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=cisco.com; i=@cisco.com; l=7725; q=dns/txt;
-  s=iport01; t=1778685374; x=1779894974;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=Eium11uD/vJCWWRYbHBfyGh7Si/SPzpgsVZKctkORY4=;
-  b=DHy2uowohEsC7k1pGs3nKY6AOvZxpx3tQXLoB5bx+lh5CcvqtEJEWD3n
-   O+kQWd4jg+vyW5hvfe7YJBWJjrDgeY6DGke7YCy2n1/XBk9KTKk3crjA6
-   e7p/ZYA82id1+tHwFN/rH9Ura6nnyJ3dxPJcLWpVXzmCu1NuT1OFVZXop
-   b4RP1UJXjTyJ5oQOgcQVNCLmAGDk79UdUCxIBkGw2GeRwQni3y9LoY+L3
-   tp/vx9JOkoJ4WhXhtWn6CLvnu6aUype82WsOrc7eMhVNsGcBdV0hOnE8S
-   6s6lUKRIS2gQtcWt4sKeSax+4OIumPPdvlStROw3rKPewPl6jGdEdQlbQ
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40562413240;
+	Wed, 13 May 2026 15:21:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778685669; cv=fail; b=uhG5ElKDTP+hH/+exsSKjmve+oxmK9t2ZIhVD0AANwNrQFz1TuGs++BUK7CjlNzYQ/EVIJlFOkr7Tx9du3oNDeANWVQfXLL32hGcm8QnIk35LGEzTo3nTLCdHqGelhP3iNm6SDmzfQrLAvUw60VpOWZ8L1csYGUNuq6swZNwhfs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778685669; c=relaxed/simple;
+	bh=48L9JqtQMpYSdQz/+ejKFFjwoEVucdHmk/cqK6xe3i4=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=iB5zvQn0oXNUAFkfKWnt4mTacBHCFpArfvJhvOXWB8vUrExBCieBE59rPLtqln9/UmoNHD50pu/FuOrNYYxc52R0oVFynYJ1syWJtdLzD4Av90sIs2RMeS+OZ4USjVh+dAtzj0qXZ2oGXfluPly/tk7fDwLtNLmBZtl4V1KxuVI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Jso9UWb0; arc=fail smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778685668; x=1810221668;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=48L9JqtQMpYSdQz/+ejKFFjwoEVucdHmk/cqK6xe3i4=;
+  b=Jso9UWb03zQF4LpaBG93q+34yvpTzL56Y4ljlYkSZM18G/JnZ9qiSid3
+   5OAjzuWnb6e9qyMbic5E1kQxeuNRJ1ItXGM9GSyePQL45lJb4RjIM5KmV
+   vVZTfoD4KPmRZ8hTHX8B4oHdRP5ATgQJ12pnj8qHGamgD7wJWNG5AUOq0
+   OMj+cTPB29PgRTUEP4CPK7eHPLs3llk6u2PT42wBVsLI0Q7bFNL+criT2
+   nVBXR7A9SX9ARmxmVZGgeQktn8e9zpW5J6bIHu5oYXwLs10MA3LwXDYRX
+   wtzsErbxVamH7U6F9l4U3EmsAbE/gu1E+RtFWmiqGMVwMRQLeDcLmH/nU
    A==;
-X-CSE-ConnectionGUID: i1nv6s03QLaLaxr9yzdrpg==
-X-CSE-MsgGUID: ojrpSLW7S2CLpSPSCqK2LQ==
-X-IPAS-Result: =?us-ascii?q?A0BFAgAclARq/5D/Ja1aglmCV4FQQ0mEV49TgiGeHRSBa?=
- =?us-ascii?q?w8BAQEPUQQBAYUGAo0yAiY0CQ4BAgQDAgMBAQEBAQEBAQEBAQsBAQUBAQECA?=
- =?us-ascii?q?QcFgQ4ThlyGWwIBAyMEUhAlAiYCAkYQBgESgwKCdAOzDHp/M4EBhH3ZRIFkA?=
- =?us-ascii?q?QsUAYEKLoVygmcBgXCEBjuEQCcbgUlEgRQBgnlvhAUlg3SCaQSCDYEPFI54C?=
- =?us-ascii?q?T+BAhwDWSwBVRMNCgsHBWFSMwMgCgsSEhgVAhQcEw8EFjIdcAwnEiwXM1gbB?=
- =?us-ascii?q?wWBS4IFchQxBCGBAoRfeCMsA06BQwMLGA1IESw3Bg4bBD0BbgeKPx0PgT0BA?=
- =?us-ascii?q?WoHAYEOQjkyAwwyJRUILQmTH4N+jV1rgTWfWYQmgWSgDgEyl2aTBZkGIqNeW?=
- =?us-ascii?q?YRogWg8gVkzGggbFYMiUxkPji0WHMwfJzI/BwIHDgKRcwSBeQEB?=
-IronPort-Data: A9a23:Lboog68Fm3jeFeSVog+KDrUDQH+TJUtcMsCJ2f8bNWPcYEJGY0x3y
- zFMDD+FP/rbNjD2LdFyPNvjo04B7MDdmNE2GQA4rSBEQiMRo6IpJzg2wmQcns+2BpeeJK6yx
- 5xGMrEsFOhtEDmE4EzrauS9xZVF/fngbqLmD+LZMTxGSwZhSSMw4TpugOdRbrRA2bBVOCvT/
- 4mpyyHjEAX9gWAsbztPs/vrRC5H5ZwehhtJ5jTSWtgT1LPuvyF9JI4SI6i3M0z5TuF8dsamR
- /zOxa2O5WjQ+REgELuNyt4XpWVTH9Y+lSDX4pZnc/DKbipq/0Te4Y5nXBYoUnq7vh3S9zxHJ
- HqhgrTrIeshFvWkdO3wyHC0GQkmVUFN0OevzXRSLaV/wmWeG0YAzcmCA2k3ZIsGpP0vWlhq/
- NgROCpcfwKPnfq5lefTpulE3qzPLeHxN48Z/3UlxjbDALN+HtbIQr7B4plT2zJYasJmRKmFI
- ZFGL2AyMVKZP0En1lQ/UPrSmM+zj2X+aD1bqHqepLE85C7YywkZPL3Fb4aMI4bQHJUN9qqej
- mXE5XzCJi5FD4a07SK+ykmHn8yVuRquDer+E5X9rJaGmma7ymUNBRg+WVKlrPy9jUCiHdRSN
- yQ89yYzqKEg+VCDQd76UBm15nWDu3Y0WMdaGsU55RuLx66S5ByWbkANSDJbZcNlssIqSTE0/
- luUmdWvDjwHmKWcQ3+b95+OoD+yMDRTJmgHDQcATA0Y85zgrZs1gxbnUNluCui2g8fzFDW2x
- CqFxAA4iqkfgNAjyaq25xbEjiiqq5yPSRQ6jjg7RUq/5Q9/IYrgbIuy5B2DsrBLLZ2SSR+Ku
- 31sd9Wi0d3ixKqlzESlKNjh1pnwjxpZGFUwWWJSIqQ=
-IronPort-HdrOrdr: A9a23:J01KUKnkCsniuXrtdbtcBVnn2/jpDfLa3DAbv31ZSRFFG/FwWf
- re+MjzsiWUtN9xYh8dcL+7VZVoLUm3yXcx2/hyAV7AZmbbURWTTL2KhLGKq1bd8m/Fh41gPM
- xbH5SWZueAaGRSvILW7Ba1FtA4zMLC0qy57N2utktFfEVGZ75t6gFhBh3eKE15QwFaGYE0fa
- DsgPav3wDQHkg/X4CcGmQPWfTFqpngkZLrZgNDOjscgTP+9Q9BLNXBYmKlNtB0aUI1/Ysf
-X-Talos-CUID: 9a23:Ml40ymyzizoqBgwbURH+BgUVQ8Y7LGaFl070KmuxGXw4Wa+ZU0efrfY=
-X-Talos-MUID: =?us-ascii?q?9a23=3AdS+aaA3BUuQN+VNNkqabeNEv1jUj5Ka0EHsprso?=
- =?us-ascii?q?94eKgLRdIAByEr26Te9py?=
-X-IronPort-Anti-Spam-Filtered: true
-X-IronPort-AV: E=Sophos;i="6.23,232,1770595200"; 
-   d="scan'208";a="741122180"
-Received: from rcdn-l-core-07.cisco.com ([173.37.255.144])
-  by alln-iport-5.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 13 May 2026 15:16:08 +0000
-Received: from [127.0.0.1] (unknown [10.25.128.216])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by rcdn-l-core-07.cisco.com (Postfix) with ESMTPS id 881321800048A;
-	Wed, 13 May 2026 15:16:07 +0000 (GMT)
-From: Satish Kharat <satishkh@cisco.com>
-Date: Wed, 13 May 2026 08:15:47 -0700
-Subject: [PATCH net-next v7 10/10] enic: add V2 VF probe with admin channel
- and PF registration
+X-CSE-ConnectionGUID: nDiNb880SsWplrAESgxu7w==
+X-CSE-MsgGUID: r8xvZqZ7Tty2cEwsrrOVKA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11785"; a="79646092"
+X-IronPort-AV: E=Sophos;i="6.23,232,1770624000"; 
+   d="scan'208";a="79646092"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2026 08:21:07 -0700
+X-CSE-ConnectionGUID: c/RBilK1QW6CR5rjjBXJJQ==
+X-CSE-MsgGUID: 7KaNV+rYR1iixB5uV/EX2w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,232,1770624000"; 
+   d="scan'208";a="243092618"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2026 08:21:07 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 13 May 2026 08:21:07 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Wed, 13 May 2026 08:21:07 -0700
+Received: from CO1PR03CU002.outbound.protection.outlook.com (52.101.46.10) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 13 May 2026 08:21:04 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ltCoX7QqSnLNmSKMPIP+tjTe5Sl3Hz23Cf9HFnIY5Lx6i+ww7TbQYXsJDkW5F59mW9b8OslaWbO5Br8bfXSOJeetRriHt4ygjeHnATYnAsk3ivw/B34oWJU56ZNCIQp2A4qQsqhoats7imDRqn0xe9NgnYcnwf/5qqk6IHRvP5a/uuaIRmJfDjSgNvMW02KiBTd3j2JVZGHu+YdJHb5W+ZI9CrLVJLJGqEifD/Ol4FHKb87JQGylc/xviOsfgZgrDTiz0FpbTRpJaoUy3PKo6YcfzMbyKP499obuv2pFoOWvz1xr+QKCkF6cg1qC6ksks1WxUdwFtDuIj/1ShqV9/w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EaKSVeapt2G99z6jD2sNqmkc6plHYXp33HkN8X9Onwg=;
+ b=lqPGC0iRsfntK0bymk/hlOOr5P2FMljwiX8aFRr1WOF00K63J/cdW5qxbpBi7djmzSFFyfW915/4JzNdosiKAEsVsQ2BgIvnacm4fNkCAptpBr3aTftBmkyMnN+dE/4ED/H5M10t2sdjFnajlSlsMByPBby6bzAACaGT2CZkQs2o5FOJdka5CHXfjqyyTunzrizgjSpu0SJkK+qgtNL2/edpOYpoZgnhHyzQTDPIXQQjCdHN9R3ivTBZkcbV+V4lJYYeToR1ZZbsnz/v1WCvmr27RnzlKIEeJlcXbgfwMEb9abmYEigY83ZDeC3byBJl16B/qx618bX4j20ZWw/5cg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by MW5PR11MB5858.namprd11.prod.outlook.com (2603:10b6:303:193::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.22; Wed, 13 May
+ 2026 15:21:00 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::6aa:411d:4bfa:619c]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::6aa:411d:4bfa:619c%5]) with mapi id 15.20.9913.009; Wed, 13 May 2026
+ 15:21:00 +0000
+Message-ID: <9c49ecf7-1d35-4b03-8a71-9d724562594d@intel.com>
+Date: Wed, 13 May 2026 17:18:50 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] xsk: switch xdp_build_skb_from_zc() to napi_alloc_skb()
+To: Lorenz Brun <lorenz@monogon.tech>
+CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, "John
+ Fastabend" <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, <stable@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
+References: <20260512152658.2818805-1-lorenz@monogon.tech>
+Content-Language: en-US
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <20260512152658.2818805-1-lorenz@monogon.tech>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DUZPR01CA0262.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4b9::24) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260513-enic-sriov-v2-admin-channel-v2-v7-10-68b9f4141f4c@cisco.com>
-References: <20260513-enic-sriov-v2-admin-channel-v2-v7-0-68b9f4141f4c@cisco.com>
-In-Reply-To: <20260513-enic-sriov-v2-admin-channel-v2-v7-0-68b9f4141f4c@cisco.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Sesidhar Baddela <sebaddel@cisco.com>, Satish Kharat <satishkh@cisco.com>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1778685360; l=7955;
- i=satishkh@cisco.com; h=from:subject:message-id;
- bh=zzkYcyXi6N69CSiuCx09RarocX/ENESP+V0rdeC6Ydc=;
- b=SZUcx9eUloaOpP5x6FWzndEmabCTJmruWiA9lqndiDJS41VP2xdIbeFXupfS9cK7uG1wZaO/z
- UPw1ybM2UUnAD0IXswKxDPhUySLrjaGwRH2AvOxXgoc5T3l+oIsadRH
-X-Developer-Key: i=satishkh@cisco.com; a=ed25519;
- pk=4BxbLoCGvHeIMH/PbpiNVx8/2IcTjFvqcr0AD8K6WLY=
-X-Outbound-Client-TLS: ANONYMOUS;unknown [10.25.128.216];TLSv1.3;TLS_AES_256_GCM_SHA384;256
-X-Outbound-SMTP-Client: 10.25.128.216, [10.25.128.216]
-X-Outbound-Node: rcdn-l-core-07.cisco.com
-X-Rspamd-Queue-Id: A0D0B536504
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|MW5PR11MB5858:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5a510027-062d-445b-d4b8-08deb1033cd3
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024|22082099003|56012099003|18002099003|11063799003;
+X-Microsoft-Antispam-Message-Info: UhIW6Xu3Z2rFhHOUJ5f7PyeyJbhH+V1w1gmEtxWRnSQnS7X6hdDzgfLIGN1MpuXqbtKFprAo25xBaAG8gl3cNyQhsTdS7mSmLSK5nGFjvtwXpx10c58tlyMb8YGnlEuPqaPWQmb45Id3y8xbL4MHI2zku3u9FafpEsbeXbrsV4VFtyBz/FKCXbWTHRLebKGVo5ggSnHu+yPDNzDBuo6NT28qRITVY7cjGj9SEaiZkGyN3KAH5c1+nowzzLI5Dha1E5/HedXi8GlUkhseE5NiUHs0BWEI4lFipfQyejCZc5srmRb69IjilGeu5zR0VcVqIaEM7ZJRku6PIJXynMq2EJutF7jwkfthLk/uaa0QU+e4IJ2G/EXvxBcxMkgZLreOxQxuc+SitSp6lTHhXsK6p+SJZjmkc6XCaqXAhesqOm4CNalCI3buHRWImPL9fadXwk7souQ9rX2bYHJyCA5ygfQkL3S1tdvKrEAgBTywj4LZwiLgTssDdb7JbpNk/jgqmdMVsRLwEnSJOvjEUX65wuMLX0hTuIOXxorM5IQz4BmGQXOAsp+phpQqDVEgt3GtjUaDULTOA+Cu/w3udN+i0sqkraUCJgurzqSYNvfo0ZkUz6wIsBxo/1pwfvk5YI/p4fTyZzdl7mSvvCMqCQhWms+NPnSRzEs8zcdYMdeqQEfFrmIhS5ROtc1SganLm9oB
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(22082099003)(56012099003)(18002099003)(11063799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QzVYZG5oaURuQys3OUoyZG1ZWFFVRE1PblJwNXo1YkNuSkpXaitIdU81Rnkx?=
+ =?utf-8?B?cW5oZk5ibHJKMGhGMFpTdCtTdllEajRsazFxVUpxOGhWcm1zTWNpYVU2KzNU?=
+ =?utf-8?B?VGh1RUlQZG1hUVhkcmVpQ1dqZUJrWGJzbkJwdkZYdVVBb1pxcVlVd3RjRk4x?=
+ =?utf-8?B?N3pBRTFiODNVZ2I3OW1nZHRubHB4MWlYdUExNmFmSkhJUzEwQXVZdHdHSTlE?=
+ =?utf-8?B?aS9CVTJ0WGtQTmFrSXE1R3NLVnhIZDB6TjJDSG5qbncxajdDa2xuUUtybnBa?=
+ =?utf-8?B?cytzK01oOWZTdm9IT2hXSFArbFNFQnlnZmtJR1ZBUHduTFlNeXBvUkc0R0RE?=
+ =?utf-8?B?QVozKzI3Q2k1STJZbU9XcG5GSnVyVUhSVkV0c2xxVGhGc1k3dSs3a0pOU3Zy?=
+ =?utf-8?B?bDFqdXZJK2xVSHc0OEZYZ0tZd3MrK1dsOHp5OGxWcnFpVFQxbkgxS3VUWTI5?=
+ =?utf-8?B?MmJBRXdtalpQcEJMVS9RM1pTTUtJdEZFZVVIb1R0ZWZnbnJ4cTA2NkltZHFw?=
+ =?utf-8?B?RE0ya1dUcDFsZFR5VEw0blB1TitrR3lLWjBzay8yV2Q3emhMNE1wc3N1YVcx?=
+ =?utf-8?B?NU42SURXRTJldTV3eTFFN0I0bzZla3JuR1N5VFhDbEM5SVo0ZSswaDJPOHNP?=
+ =?utf-8?B?QjM0aEFodHIySG56TGpoR3JYQkVzNGJGTGlOQ3BicnBES2d5c1g4eXA2RmxD?=
+ =?utf-8?B?QVZVYjd3SDlnQzRWd2lHSVZaNTUzcFNXVEJGUm90cHV1NW84YTUrSkpqaWsw?=
+ =?utf-8?B?VXRXS3ZvWFJ3Rlg5K0ZJQjB1VnNkR1hDN3VhN25Idyt4Vzl1SitUdkwrSzgw?=
+ =?utf-8?B?NFVoeFNteWo3TmJyWVZwc3ZtNnBRYlZ0ZDlwVjA4R2V0Szl2M0F1M0hSbm45?=
+ =?utf-8?B?MHBjdytQbVBsK3ladDgrY1dpRG0xaDZrVTBUbXJzWmxiZzJXU3N0MEprbzQ5?=
+ =?utf-8?B?SnNzMWlBTjB1bHNkZXRHckhRWnpPdDdpNkx4bVdBWGM0aitLMTFzSU9tKzV1?=
+ =?utf-8?B?TU1OanpxZjI1dHZFMlNQTWsyWExSY0psUnptZnc0YlM1Y3F0V09RYjV0b2or?=
+ =?utf-8?B?YnZNTXlzT05GcS92VGs0QXhEaytHTG1RdFNYMzBXNnEvdW1LL01uUFRCWEg4?=
+ =?utf-8?B?MEYwcTRrUXFrVzRWY2psLzJySkJPenhCNnBhY3hmeS8rdW9jVndKTFYwd0Fs?=
+ =?utf-8?B?Yk5FSTdiaWQ3V0tWUktOSkF3SUVocXV2YVVEeVErd3piNU9kYk1Vd0lNWjhm?=
+ =?utf-8?B?bXlpUWdFb1RwRFVjWmVuUHpvbTduak9oTFNQUkx6S1FkTWdZK2lCQ2cvWVA4?=
+ =?utf-8?B?ZnZLMEpYRW5NVVdsUndtN1VFaldJSVJNb1F1K09kbG5iSldEZlN4bVJMcUUv?=
+ =?utf-8?B?S25JaS9xRlhreEk0SU5vM0N5OFo5ejVLYWF3T0l5d05wVDdrZXdIczJiUWJ2?=
+ =?utf-8?B?N0FjWTZxZGJ4M0tQaE4rUC9EdVBwNjkzNkJMTEN3eXp5aTd5eWYvWDdiZDQ4?=
+ =?utf-8?B?aGpobEpQNEcrNm1vVmxFcXJ1T0NZUEQwbHhEQnl1RVBvTFdzaU4xUloxZVVl?=
+ =?utf-8?B?S2JrenRQZFV0b09OT3NCZ09TNVNma1RBM2dSRU5STWExMTFrTU1ic3kyYytI?=
+ =?utf-8?B?QVlCQ2Y3eW1MYW9TZ25nZkIxNTFHSnZTaElUZG50eUNwSkxBSFFEbzFEQStn?=
+ =?utf-8?B?MGw3QUNzMTVVZ1F1TnFxWXAyN2dsVkpqMGVrM3ArR0liaFU1bktSQ1c4c1Js?=
+ =?utf-8?B?OEx3cVZhSW1ESkpnWW0ydUwvaW92OE5WTFJjdWtqYjBHRit2M0djOU1Ba2Yy?=
+ =?utf-8?B?NVJjdHlCL2laR3E4K2NSMkJ5dGxIRmVWMjJXZGNjd3U1NldQYS9RM0d5N1Ns?=
+ =?utf-8?B?b3BpQnE2V3VXbGRwZ25Vd296Y2YwSmFGT1pLNndUQWIxWnUzYVNGSnZtSm92?=
+ =?utf-8?B?c0pRbXd2NlAxUnNzSWRQdEtQS1ZJaDZjVnBod05KenZXbTFxbm1EMW9QSWlS?=
+ =?utf-8?B?cEFPOFMrYlNnWVNEb1paVk5wSzNiTU1kdCtZY1RlZklSMzQ4STVKN0Y5OFZH?=
+ =?utf-8?B?c0NRNGdnUXFTSE1CWkNiNmZwNkoyb2xTWW9CUldYc0hKZEFONi9ZbmhQeUVH?=
+ =?utf-8?B?Nk9mdnQvSHAvTGsvUzVqbFRmR1VSbWxra2EyYWFJVE9yTzdnQzhqaVduQnRP?=
+ =?utf-8?B?dGdtTFlPbnJtaThXYkxnc25yZis3cnV2MGdEVUNENVVndCt0YllMM1l4T1Ur?=
+ =?utf-8?B?YVdnMDVwakV4NE5xMzJFNmh6NHN3UVNURjFqU2pBVmV1eGlwRkFKNmJWN252?=
+ =?utf-8?B?REJodk5kYmQyd01YVXIvOWIxc2ZqOFoweXJMblcrQldrRVJoTjUybHQxNzhw?=
+ =?utf-8?Q?g67aB+rW0Y+R4fok=3D?=
+X-Exchange-RoutingPolicyChecked: OWYo5CnPlU/rTvnDNpuce4CNKnkVXZ6BvEU2rlKdT/Pl6vjLCHjo6wsO+W6Xa6ZiTLW1udLWFVmI6Uo/a/yEAdCaZZGp+u32YD0LSxe6D3mjjoXLOEbn2NY2/SEXmPjVeZhvs7cg/Oy4RU2LcpSmIETagR+umnT2qQ0/YYvyqyukqz6qMs/IFjAHMwh26+bWRJlrhsauBmxtTNffZf84VeVjWLKk1byCKVn4g1c9BwPunt+RAuN0XilbCoTumwvYU0l+j6T2pbIhWPupXt3+GaH3WOfCb5QZH1sFQUudb/Pf7LcAKwCczEeSGSc9HvkhrTax+MeKuDociHuGD87F9A==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5a510027-062d-445b-d4b8-08deb1033cd3
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2026 15:20:59.9332
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SmHrt9BK81w7+g2ZE5jgvBUWlB7mCDwz//fjEDJZnY9oAd5qwVL/v/PVIVEww3ePffx2CQhQDxIAGUc6NNKj6YY2itkfgoqBiqBetbo76hs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR11MB5858
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: 384D8536C12
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[cisco.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[cisco.com:s=iport01];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287653-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[cisco.com:+];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287659-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org,lists.osuosl.org];
 	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,monogon.tech:email];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[satishkh@cisco.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksander.lobakin@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[cisco.com:email,cisco.com:mid,cisco.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Action: no action
 
-When a V2 SR-IOV VF probes, open the admin channel, initialize the
-MBOX protocol, perform the capability check with the PF, and register
-with the PF. This establishes the PF-VF communication path that the PF
-uses to send link state notifications.
+From: Lorenz Brun <lorenz@monogon.tech>
+Date: Tue, 12 May 2026 17:26:56 +0200
 
-The admin channel and MBOX registration happen after enic_dev_init()
-(which discovers admin channel resources) and before register_netdev()
-so the VF is fully initialized before the interface is visible to
-userspace.
+> xdp_build_skb_from_zc() allocated xdp->frame_sz bytes from the per-cpu
+> system_page_pool and built the skb head with napi_build_skb(). The
+> latter places skb_shared_info at the tail of the buffer, but the
+> helper sized the allocation as if the whole frame_sz were usable for
+> data. Whenever the packet plus reserved headroom approached frame_sz,
+> the head memcpy overran shinfo with packet content, corrupting
+> ->flags (SKBFL_ZEROCOPY_ENABLE) and ->nr_frags, which then drove
+> skb_copy_ubufs() off the end of frags[] on the RX path:
+> 
+>   UBSAN: array-index-out-of-bounds in include/linux/skbuff.h:2541
+>   index 113 is out of range for type 'skb_frag_t [17]'
+>    skb_copy_ubufs+0x7da/0x960
+>    ip_local_deliver_finish+0xcd/0x110
+>    ice_napi_poll+0xe4/0x2a0 [ice]
+> 
+> The overrun bytes come from the packet, so an on-wire sender can
+> corrupt kernel memory remotely whenever the XDP program returns
+> XDP_PASS.
+> 
+> Rather than patch the sizing math, switch to the pattern used by other
+> in-tree AF_XDP zero-copy drivers like mlx5 and i40e which use
+> napi_alloc_skb() sized to the actual packet plus skb_put_data().
+> This sizes the head exactly for the data being copied, drops the
+> system_page_pool local_lock from this path, and removes the
+> structural mismatch between frame_sz and the skb head buffer. Frags
+> are allocated with alloc_page() per frag, matching the other drivers.
 
-The admin channel is opened before enic_mbox_init() installs the
-receive handler.  This is safe because enic_admin_rq_cq_service()
-checks admin_rq_handler before enqueuing received buffers, so any
-interrupt that fires between open and mbox_init is harmlessly
-discarded.
+I used napi_build_skb() + system page_pool to enable PP recycling
+improving XSk XDP_PASS performance a lot.
+Are you sure there's no other way to approach this?
 
-On remove, the VF unregisters from the PF and closes its admin channel
-before tearing down data path resources.
+napi_alloc_skb() used in other drivers works, but it's sorta old
+approach which is way slower.
 
-V2 VFs are not provisioned with an RES_TYPE_SRIOV_INTR resource by
-firmware, so bypass that check in the admin channel capability
-detection for V2 VFs. The PF still requires this resource.
+System page_pools always allocate a full page, why can it create an skb
+prone to overruns?
 
-Reserve an additional MSI-X interrupt for the admin channel when
-has_admin_channel is set in enic_set_intr_mode() and
-enic_adjust_resources(), so enic_admin_setup_intr()'s
-intr_index = intr_count slot is guaranteed to be within intr_avail
-bounds even at maximum queue configurations.  The admin INTR uses a
-RES_TYPE_INTR_CTRL slot shared with the data path.
-
-Signed-off-by: Satish Kharat <satishkh@cisco.com>
----
- drivers/net/ethernet/cisco/enic/enic.h      |  1 +
- drivers/net/ethernet/cisco/enic/enic_main.c | 88 ++++++++++++++++++++++++++---
- drivers/net/ethernet/cisco/enic/enic_res.c  |  3 +-
- 3 files changed, 82 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/net/ethernet/cisco/enic/enic.h b/drivers/net/ethernet/cisco/enic/enic.h
-index 1bf7a91ad915..89cf412cec1d 100644
---- a/drivers/net/ethernet/cisco/enic/enic.h
-+++ b/drivers/net/ethernet/cisco/enic/enic.h
-@@ -450,6 +450,7 @@ void enic_reset_addr_lists(struct enic *enic);
- int enic_sriov_enabled(struct enic *enic);
- int enic_is_valid_vf(struct enic *enic, int vf);
- int enic_is_dynamic(struct enic *enic);
-+int enic_is_sriov_vf_v2(struct enic *enic);
- void enic_set_ethtool_ops(struct net_device *netdev);
- int __enic_set_rsskey(struct enic *enic);
- void enic_ext_cq(struct enic *enic);
-diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
-index 65069440ec9a..594c67d86e57 100644
---- a/drivers/net/ethernet/cisco/enic/enic_main.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_main.c
-@@ -316,6 +316,11 @@ static int enic_is_sriov_vf(struct enic *enic)
- 	       enic->pdev->device == PCI_DEVICE_ID_CISCO_VIC_ENET_VF_V2;
- }
- 
-+int enic_is_sriov_vf_v2(struct enic *enic)
-+{
-+	return enic->pdev->device == PCI_DEVICE_ID_CISCO_VIC_ENET_VF_V2;
-+}
-+
- int enic_is_valid_vf(struct enic *enic, int vf)
- {
- #ifdef CONFIG_PCI_IOV
-@@ -2338,15 +2343,19 @@ static int enic_adjust_resources(struct enic *enic)
- 		enic->intr_count = enic->intr_avail;
- 		break;
- 	case VNIC_DEV_INTR_MODE_MSIX: {
--		/* Reserve one MSI-X slot for the admin channel interrupt
--		 * when V2 SR-IOV admin channel resources are present.
--		 */
--		unsigned int admin_reserve =
--			enic->has_admin_channel ? 1 : 0;
--
- 		/* Adjust the number of wqs/rqs/cqs/interrupts that will be
--		 * used based on which resource is the most constrained
-+		 * used based on which resource is the most constrained.
-+		 * Reserve one extra MSI-X slot for the admin channel INTR
-+		 * when has_admin_channel is set so that
-+		 * enic_admin_setup_intr() can allocate at intr_count
-+		 * within the intr_avail bounds even when the data queue
-+		 * count is maxed out.  intr_count counts only the data-path
-+		 * IRQs (registered by enic_request_intr()); the admin INTR
-+		 * lives at msix index intr_count and is set up later by
-+		 * enic_admin_setup_intr().
- 		 */
-+		unsigned int admin_reserve = enic->has_admin_channel ? 1 : 0;
-+
- 		wq_avail = min(enic->wq_avail, ENIC_WQ_MAX);
- 		rq_default = max(netif_get_num_default_rss_queues(),
- 				 ENIC_RQ_MIN_DEFAULT);
-@@ -3027,6 +3036,38 @@ static int enic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto err_out_dev_close;
- 	}
- 
-+	/* V2 VF: open admin channel and register with PF.
-+	 * Must happen before register_netdev so the VF is fully
-+	 * initialized before the interface is visible to userspace.
-+	 *
-+	 * admin_channel_open() runs before enic_mbox_init() installs
-+	 * the receive handler.  This is safe because
-+	 * enic_admin_rq_cq_service() checks admin_rq_handler before
-+	 * enqueuing any received buffer, so interrupts that fire
-+	 * between open and mbox_init are harmlessly discarded.
-+	 */
-+	if (enic_is_sriov_vf_v2(enic)) {
-+		err = enic_admin_channel_open(enic);
-+		if (err) {
-+			dev_err(dev,
-+				"Failed to open admin channel: %d\n", err);
-+			goto err_out_dev_deinit;
-+		}
-+		enic_mbox_init(enic);
-+		err = enic_mbox_vf_capability_check(enic);
-+		if (err) {
-+			dev_err(dev,
-+				"MBOX capability check failed: %d\n", err);
-+			goto err_out_admin_close;
-+		}
-+		err = enic_mbox_vf_register(enic);
-+		if (err) {
-+			dev_err(dev,
-+				"MBOX VF registration failed: %d\n", err);
-+			goto err_out_admin_close;
-+		}
-+	}
-+
- 	netif_set_real_num_tx_queues(netdev, enic->wq_count);
- 	netif_set_real_num_rx_queues(netdev, enic->rq_count);
- 
-@@ -3051,7 +3092,7 @@ static int enic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	err = enic_set_mac_addr(netdev, enic->mac_addr);
- 	if (err) {
- 		dev_err(dev, "Invalid MAC address, aborting\n");
--		goto err_out_dev_deinit;
-+		goto err_out_admin_close;
- 	}
- 
- 	enic->tx_coalesce_usecs = enic->config.intr_timer_usec;
-@@ -3149,11 +3190,23 @@ static int enic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	err = register_netdev(netdev);
- 	if (err) {
- 		dev_err(dev, "Cannot register net device, aborting\n");
--		goto err_out_dev_deinit;
-+		goto err_out_admin_close;
- 	}
- 
- 	return 0;
- 
-+err_out_admin_close:
-+	if (enic_is_sriov_vf_v2(enic)) {
-+		if (enic->vf_registered) {
-+			int unreg_err = enic_mbox_vf_unregister(enic);
-+
-+			if (unreg_err)
-+				netdev_warn(netdev,
-+					    "Failed to unregister from PF: %d\n",
-+					    unreg_err);
-+		}
-+		enic_admin_channel_close(enic);
-+	}
- err_out_dev_deinit:
- 	enic_dev_deinit(enic);
- err_out_dev_close:
-@@ -3190,6 +3243,23 @@ static void enic_remove(struct pci_dev *pdev)
- 
- 		cancel_work_sync(&enic->reset);
- 		cancel_work_sync(&enic->change_mtu_work);
-+
-+		/* Close the admin channel and unregister from the PF before
-+		 * unregister_netdev() to prevent a late PF notification from
-+		 * touching a netdev that has been freed.
-+		 */
-+		if (enic_is_sriov_vf_v2(enic)) {
-+			if (enic->vf_registered) {
-+				int unreg_err = enic_mbox_vf_unregister(enic);
-+
-+				if (unreg_err)
-+					netdev_warn(netdev,
-+						    "Failed to unregister from PF: %d\n",
-+						    unreg_err);
-+			}
-+			enic_admin_channel_close(enic);
-+		}
-+
- 		unregister_netdev(netdev);
- #ifdef CONFIG_PCI_IOV
- 		if (enic_sriov_enabled(enic)) {
-diff --git a/drivers/net/ethernet/cisco/enic/enic_res.c b/drivers/net/ethernet/cisco/enic/enic_res.c
-index 436326ace049..74cd2ee3af5c 100644
---- a/drivers/net/ethernet/cisco/enic/enic_res.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_res.c
-@@ -211,7 +211,8 @@ void enic_get_res_counts(struct enic *enic)
- 		vnic_dev_get_res_count(enic->vdev, RES_TYPE_ADMIN_RQ) >= 1 &&
- 		vnic_dev_get_res_count(enic->vdev, RES_TYPE_ADMIN_CQ) >=
- 			ARRAY_SIZE(enic->admin_cq) &&
--		vnic_dev_get_res_count(enic->vdev, RES_TYPE_SRIOV_INTR) >= 1;
-+		(enic_is_sriov_vf_v2(enic) ||
-+		 vnic_dev_get_res_count(enic->vdev, RES_TYPE_SRIOV_INTR) >= 1);
- 
- 	dev_info(enic_get_dev(enic),
- 		"vNIC resources avail: wq %d rq %d cq %d intr %d admin %s\n",
-
--- 
-2.43.0
-
+> 
+> Fixes: 560d958c6c68 ("xsk: add generic XSk &xdp_buff -> skb conversion")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Lorenz Brun <lorenz@monogon.tech>
+Thanks,
+Olek
 
