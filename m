@@ -1,316 +1,230 @@
-Return-Path: <netdev+bounces-287500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287501-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QI9cM9hIBGrNGgIAu9opvQ
-	(envelope-from <netdev+bounces-287500-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:48:08 +0200
+	id yOc9F5VJBGrNGgIAu9opvQ
+	(envelope-from <netdev+bounces-287501-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:51:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28EE1530EB2
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:48:08 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59AFE530F46
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:51:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F03C830E07D7
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 09:37:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C5A8A3003BED
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 09:40:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEBB63AE195;
-	Wed, 13 May 2026 09:37:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E63333E869A;
+	Wed, 13 May 2026 09:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KIeX3R9l";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="k0VFa+7i"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="R3PFZFA/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010049.outbound.protection.outlook.com [52.101.56.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB1AD3C3BE6
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 09:37:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778665075; cv=none; b=dv45HIU4NUeIdYE5jFP3nt1kZ2LyXl/yioqfgzzg00GWpU50UXjE7V/4Qc8XDuHGelRz8unFRN6ls04p6fNIPJJ3K6D+2swXiBY5LVfFN+jUKhogKuhmmT8ByZbw1jembYkYmb/Oj+mJmz42OmU2AMmEed4NZemikxEL4SV8SIA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778665075; c=relaxed/simple;
-	bh=3ZE9OxERC0pyhWuHeI+A8r6DIJhoAQnYv0T9ivO+4HQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=S89uSxVbbENF1rsCR7LLMCqWSjnlKwJ6t+17Y1oq/JL+sm7i+YFSll5Mt4Wk6UcvVnnFa0z3JbYI3paABQWmfy9ZZ9lN7J/WyHLobyzmmq7LPkCjy0rZdQPTbUzTtvNP50IpOaflQHXR8o4BCNZZPE9BPz597g7Gh++okzEvgE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KIeX3R9l; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=k0VFa+7i; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778665072;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4gG8d2uNiMKq5bQSD3rz62Oi2tshDrpyy2LvH23JNt0=;
-	b=KIeX3R9lOQnEjqUp4+eb7fcxyLB5YAFRnGn7U6WD3gxmvM+nfxh3b/7N/ydQ0U/FQUpzmr
-	IpbU7D99izo3m66c3Bh0m4Np4VAldSxNBEtnoZ4BPU9pKlgieJ+sRH2NKl9diy4wlgrchY
-	J8Rb3aMoDocth7Nv5loy4WCzhBPtMzo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-398-HUjb1fbAPz-7Ta0E-sIkrQ-1; Wed, 13 May 2026 05:37:51 -0400
-X-MC-Unique: HUjb1fbAPz-7Ta0E-sIkrQ-1
-X-Mimecast-MFC-AGG-ID: HUjb1fbAPz-7Ta0E-sIkrQ_1778665070
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-44d83e45febso5922824f8f.0
-        for <netdev@vger.kernel.org>; Wed, 13 May 2026 02:37:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1778665070; x=1779269870; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4gG8d2uNiMKq5bQSD3rz62Oi2tshDrpyy2LvH23JNt0=;
-        b=k0VFa+7ibtEgdi1i9XiLwt+z8MLLNoXJZGiFv3QEVokA+ydy9nRaSOHM5mUfe8bUxC
-         8rC68Ec5npE9ICgPi4TLUBj8rr8R7MSngNpLbQ3vUWnPrCLLcVPjPhRDxCgqLDH/N6oa
-         Y7HLJY0Gg8vjc1sT8bAEf/78vnfQTT6Vl6HYO2i3hq3zeIpRrkjAyh+wX8Rac8qBbX+n
-         yHQNPL1nnHyej7ptm9AOZN/Akcgs51lPw1dVzQwOnpTfQ5szAqsCF1+3m3EYIYfdgobx
-         87pFG/ZYjjZ3XbdzQZhfTkMhDMclii1+EJr6h2UHnwQkyaVqiQ2dprcAsS7PbtLJisjl
-         HZHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778665070; x=1779269870;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4gG8d2uNiMKq5bQSD3rz62Oi2tshDrpyy2LvH23JNt0=;
-        b=LRtxIUM8MY2/karSC4Na/4WIdhZUlVn/ddYESbGvmjS/gPTrmoFRNtuxQmKX0xEL/M
-         rTrVofvPvxb+YdlJmLnNwuxQXyCvEo36UQT/xaSoHxBgmmAYxum6iGULtk29XCjTQM+9
-         mTM2OmrwXOx971xAks1VKIva+vVprh76qmyri8hkkDSM+xSg8VHu+EMJ0KZLXFBciD72
-         bq88qekrp/mnwsswaw2/dPc7JuYPB6XQ260zlNyi+EG4oG9zM3I89lc87mGvG/FFLmhB
-         bTSBNSWYaW0HtChdVOm8HhZQM+OyQmPgwNsLExBOUWGNPlFZ0T2rigbLFkUEkKzGdVpk
-         kWzg==
-X-Forwarded-Encrypted: i=1; AFNElJ9Q0Rgww/kxPh6tEZ2ETWLiDhvuVfyBi7tgACc2t1W1M8Dvr+23iHhF1K2YaFDNAmrqIVR4Y6k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/Bqml7zwS8TO2vLIYpq9wxNaukWxRXDzkn5zA5MjSTsDAsXOZ
-	JBSycwZ7whPppWFgSg29tLTSSoHzJbsofP0lrlvaHJdBFP2euRqHxvv9u1B6t9Sox7noVUhoowX
-	Qe9zQJAdGmZYLbHeAWwAQLpIEphFy176Z7nb+UI/gESPUHsW6FSKY6GAp7g==
-X-Gm-Gg: Acq92OFPUCNVAHhXhRSUxdBygOqk/AOV9Kp1TciFctIPw42D4rDgmGNFGZ2AueQmVQ9
-	tgnqVVpI+uJxh9GGL9kUjXs98ZFaJ5/3i9m+Q34YB5mYTe9A+LA1tB0B9E836U8DSRSf4bd3jr8
-	N1HBYKcboLvsQZk32+gwnTmZeVl3LX/aVneve5Pchw6ih7lotIiJymcT9nnmGAAUDmhh71a0ET/
-	1iYRO+5mGuUiULEMRQRsS96RBgv1Nij8LT0dY3pbpA3AawKIMR8tfP1khfojyDn6HeYRNfVAL0I
-	hN13z7TxLPngF9X/8sgqRoqs2cdsRws/3xAWk3b73SiBn3hOCks/anVqyvBLkGFKZ86PSiGGy9W
-	YjcTiJk/40aAbR6mfZwBTimov+TEM9lMXbvSgPqmk5BDVYFrIDlnNEYk=
-X-Received: by 2002:a05:600c:45cd:b0:485:3c2e:60d5 with SMTP id 5b1f17b1804b1-48fc971f0ecmr35736185e9.2.1778665069826;
-        Wed, 13 May 2026 02:37:49 -0700 (PDT)
-X-Received: by 2002:a05:600c:45cd:b0:485:3c2e:60d5 with SMTP id 5b1f17b1804b1-48fc971f0ecmr35735635e9.2.1778665069244;
-        Wed, 13 May 2026 02:37:49 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.9.106])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e8f4247fasm52677825e9.9.2026.05.13.02.37.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 May 2026 02:37:48 -0700 (PDT)
-Message-ID: <be1b6f66-207a-4ed6-8188-72ec11f222a4@redhat.com>
-Date: Wed, 13 May 2026 11:37:46 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8199D3E6DDC
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 09:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778665239; cv=fail; b=nKgy8iS+T/RWW8bVfobpo3MVcjgLgPEs3RHfol7KIAAocU5XIB2uTnlZalPx2EFkRNhGuCxB5618TOaNB7WJn1H2iyCWiuPJv2RG7Joy5xyjE5y3TjXIvyCdq5fTyKHCJbA8XdIkopqXMm7UMYCUizrURGn/HYoZ3g5VndpAmdI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778665239; c=relaxed/simple;
+	bh=C6733h6xBSyJYzORq+wPmpsvh874s5fOfcTwX54v11I=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=WdQMWd66eO74QJ9R8tCHtqafdqe9oP9ts7+mKBbY1EL9u48/VWTrnGO6Wm8BtBJo2hoWBgPc6/aBhc+w/Yb0mtxUwZmi9jL+VjcruL/+/ivxd5QHTyOlUeCQBi8qzRrWvwPnuQRTRridWSGukK/7Ni255+Vmcl5MKRd96uUPyEQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=R3PFZFA/; arc=fail smtp.client-ip=52.101.56.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dTt5BhlsJOO1MmeVBfUMODK3wrewEv+wr2l8z+RLKwQUXAL1Lrvks4YrWgzTBpDvjczJn9ZElrYkq89hb8jBh0bCiWFl9c8Ax2kWH23qfwZxghpfoRxXHAiRoEuecJ1dSEzw4+9NEdHH6593F0JA3czqVLPN7jGN0sMx9QLcuSWhNRYrTRfajfXrnJD5Rk4zZNZcpV5Ks2vZPAYxdxMONy/r6ugWzdjo52JGE6KsBl/Fn9wl8SDzQjT5GLn97eEw/Wm2upaZ+RYD0Ez14ecL1eh1OikJ9ucGXV39xZ3G6ntEgWIEuUnbnp7x0NJA75QYyP5cedvc98DfX584giAk/A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XzErpiHjsm5Ly0/pktrhBbmA+QGT4+xUbyqBwvwEwRU=;
+ b=AtHx8Fg+XsZWOwEg74J8p0h2U80qH3T6n3x8n9ryCaQqB73PH8mGugtF6ZUqPOeCnsytFqXpFHsHRHPHJsOLSyq1OnXqZspaYvFuJASXVoLikuLJ5kSvdeEMWi4WngZ2C1QTuwXn/ZwvE27eCWDaBSqUAIIag8XCQOriqyOM4qa+Z8Midfakveiqshw7ospfFVmChal2GI4y8cj31D5uKR0mpay3i1QmXXeXJkkD8meLs8pgokxy5YIJv8vgHOFzooDP9IM1fd2FBMLTx8B2i0SK5JJpRbXX8edoHckM2feFkr7ky/hQTe4wzktwOlqTJEBpMQH0y0hD/jOQ9pr9xQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XzErpiHjsm5Ly0/pktrhBbmA+QGT4+xUbyqBwvwEwRU=;
+ b=R3PFZFA/zPviHPFlZ5Fs85u9vmITa+2w3G+ZZOlHzGDb7RcRpHekN3Ipo1mFC2jr7rUJ85L9edTtInAkfQc5o0RamHW0BOKzNcZAwNL/cxouykenAxz5mjADq9CQwE4x7Zs/mJ8FSw7Rn7BzW+sehVM28qr1745788Ahp5CsnD1vW71T5A8ksCKjgDrUMmENbVEMmyomfWiRRQONdwdjjpwjnAyBWBrh+huXdZuoVrFUziJivb+2ZcL3Tx6Uy+dAfVlUPFIxROFFvRZX7OD28pxzsbF/jKvnIn5dsNSFkz0CjAlHxuou+3yTrFtNcg/ghGrn91UiD1NqV8AH4m0qRw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DM4PR12MB5248.namprd12.prod.outlook.com (2603:10b6:5:39c::15)
+ by IA4PR12MB9764.namprd12.prod.outlook.com (2603:10b6:208:5d0::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9913.12; Wed, 13 May
+ 2026 09:40:33 +0000
+Received: from DM4PR12MB5248.namprd12.prod.outlook.com
+ ([fe80::92d8:797b:4db0:d385]) by DM4PR12MB5248.namprd12.prod.outlook.com
+ ([fe80::92d8:797b:4db0:d385%4]) with mapi id 15.20.9913.009; Wed, 13 May 2026
+ 09:40:33 +0000
+Message-ID: <d7719a8f-83b8-4818-8301-15e145f551fa@nvidia.com>
+Date: Wed, 13 May 2026 12:40:26 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 02/12] udp: gso: Simplify handling length in
+ GSO_PARTIAL
+To: Alice Mikityanska <alice.kernel@fastmail.im>,
+ Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Xin Long <lucien.xin@gmail.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>,
+ Nikolay Aleksandrov <razor@blackwall.org>
+Cc: Shuah Khan <shuah@kernel.org>, Stanislav Fomichev <stfomichev@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
+ Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
+ Alice Mikityanska <alice@isovalent.com>
+References: <20260512165648.386518-1-alice.kernel@fastmail.im>
+ <20260512165648.386518-3-alice.kernel@fastmail.im>
+ <6bd88b37-4aeb-4783-8b92-62b38fe8603d@nvidia.com>
+ <35cf30b6-f3ac-4af3-816b-53511625d916@app.fastmail.com>
+From: Gal Pressman <gal@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <35cf30b6-f3ac-4af3-816b-53511625d916@app.fastmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR2P281CA0008.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a::18) To DM4PR12MB5248.namprd12.prod.outlook.com
+ (2603:10b6:5:39c::15)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/1] mptcp: fix request ownership when cloning
- reqsk
-To: Ren Wei <n05ec@lzu.edu.cn>, netdev@vger.kernel.org, mptcp@lists.linux.dev
-Cc: matttbe@kernel.org, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, horms@kernel.org,
- ncardwell@google.com, kuniyu@google.com, daniel@iogearbox.net, kafai@fb.com,
- yuantan098@gmail.com, yifanwucs@gmail.com, tomapufckgml@gmail.com,
- bird@lzu.edu.cn, caoruide123@gmail.com, enjou1224z@gmail.com
-References: <40fd38e7a368e5b7bc9bc83364a32241f977d53f.1778404619.git.caoruide123@gmail.com>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <40fd38e7a368e5b7bc9bc83364a32241f977d53f.1778404619.git.caoruide123@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 28EE1530EB2
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5248:EE_|IA4PR12MB9764:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3d4f85dc-05a0-489d-f3ad-08deb0d3ad6a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|1800799024|366016|921020|11063799003|56012099003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	T4IHhE1m7QsEY59tf9DC0EMlGd6P8Zq9Q97y2gKiJhPJv51vbOo4KRacnm9OMd+IHeXJqDHfzFMr62b6/hhzcc1IHkItrRp/fHdzUbtHhrRBuYw8LAnT1+OdqNzhGfO+PQMl1pLwC6lKoHVz2lwqtJCJSxiEsOetb6R8/VBZR33HCbhaig3rlCX9rPl3WvLlQygmn8/tY1AojgRA4waAQougAbXvZVLdPzBsPnnjb6huiixbSR5uD7x4hn2SjGlIZJr/Upx+9M1LKw+IN3YeuERETkL5XCSVBp+cMxLRDRuz7/AtyoLgf9qfVZ0TfnTHIZ7SuRWkzZc9kDEi7Sr/kZEYYawMcXUWBlq/fSZV3WvxJ9zIFyxLOz66bMFtSOV9ypPJfFwo/z+uib57ekwZHsUj/iKH7h7BnQoyvJ/2WQtOpoZJc0zk4Jd8Rr8BtgcIbza049zJ0VhBIoJJ1aVTNrLSmQnLgSklYe+yJf0obrF90l2TM7qJQesYShEcbW6c8zOjPXaJGS98UmX8YRixLboDW6/alkalzpVxITwdbozITCEOomRHnE1MCRORIJ93jqz7necGAOFUEwy2F+ABqS1xYgbb1CbdPukPmIQIAHTjGoptof4K4qLctMAc7nzVN5iQDgnRqnIQZF6M+DsSGamMhfHt15+P4sD3totVgb3cN3ZrUUnIFxXCPRni7VZfXndlt3+IG/ialuefXCIIMmINDrFiYxpw9YmumKjl0Ix6geGQzIFnY+v45jMwic+C
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5248.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(921020)(11063799003)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WU1Rd042MnpLZUJLK3lLaExZOHNId3dhaG9CTU11ODJkS3paTUVCNDB3ZWpw?=
+ =?utf-8?B?SWQ1cFN0Vkp0RmpzaWR3QjJ6VU91SXkyaGEzd0hHMnJvWi9Ya2wxdzl0QnVs?=
+ =?utf-8?B?TlZ2b0QvZzFPOGNpWHV4YjhkbEtEZXIvNXZqM3cwUm9IRU9CZnVmWGhIdzVz?=
+ =?utf-8?B?NDd5cVFEbVVxRlZqbS9tOHdKa1JGYmsvaGpCd3JJTzdGa3BvZFRURjN3RmNE?=
+ =?utf-8?B?QnJ5WXZhSU0wOHJLQU5IZm9LeG11VU8zSm1FTzBGL3ROaG5FMFVJSDdYR1Z3?=
+ =?utf-8?B?U3ZNd09xQkF4cXhRZGtmQk11bklFSFRvdm50c21FT2JMSkc1NXB4bDg1VURo?=
+ =?utf-8?B?YXl0NHN3QnJIempYMi9VbnhTWnlra1E2TG10Q2JFUERSUHRmbjJFeHRTcVUv?=
+ =?utf-8?B?YTFSTUpyTjUzdm5nMDV6U1puS21BNUloWUFKOTVhNmJBQko0N1lzanUwa2RN?=
+ =?utf-8?B?YmZkand5U25HbFFkc0l0MEtDeTcvaHVmd0c4WlJVcXAvTXpKanNBMlNHMTRY?=
+ =?utf-8?B?czBUZFptTmI1cVlydUpWd2Z5Ym1GNlNld1A0RXk0RWJCYWljdFdiOGRuQnpV?=
+ =?utf-8?B?bmZNMGJaQkdySDVvUjlXTXZ5VzhoSWVpV0gwOG41QmpqS1F3Q0pERzEzNGZ0?=
+ =?utf-8?B?aC9BNTN5ampJb2MrSldIYVF0eUZNNHRvY1F2SWN3YVJjYmhRTmJkejB0czVP?=
+ =?utf-8?B?bGl5YjBMdE9GWHRIczV5SlhUV2pnZ1hDRDZ4TGVRRDhyL293a2VOOFljNnFU?=
+ =?utf-8?B?SlphOEFZK3g1VkJ6YnA5NEJHa3N2RTY0TGRxTjUrSThFZGxLcEYxWElPWGhS?=
+ =?utf-8?B?cUtMeDJINjhqWnFZcW9KNUYrcFZoYnVWbDh0azM4cXJGNytoZVBQMThjaXNi?=
+ =?utf-8?B?M3I4d2lOOXg3VzRYNjdDK1owT1VUdXpTbmp5a0lrNUo5YzB6TCt5OUhvbFNw?=
+ =?utf-8?B?amlMZlFNSzJPanAvcmF2LzYwQWJEV1J5TVdQczcvVjBqeEx2N05rYWV1Q0Rv?=
+ =?utf-8?B?VVVwLzlMcnJtNlI0VWpoTElQMnVRODFtRStJYitEVUh4bGZOL3VUUktreXVW?=
+ =?utf-8?B?VFVGV3RReDhMVUFjaFdFcTJIUmUwdDI5Y2Q5dmNwT3lyb0JyMGdDQVhoejUr?=
+ =?utf-8?B?Wk1uRk40UDF0UDFzdmdCY3NrV0JCWFVQZG9VMk5TK1BzZnpWa000THp2OTFI?=
+ =?utf-8?B?dE1ZTWtBL0pIRnNpUm9xV0lTZUVpNVA2bGlmNWROWVNVY0VMbmRCbzFPVCt5?=
+ =?utf-8?B?OElkZ1FoM29yMDYra1Z3eEYvU1VVNEFTQ1Bic0RKd1V5ZmE5Z054bXA2YUty?=
+ =?utf-8?B?aE5NdWxDbU9XOGxteEcyeWFRL3hhQUR5SkVLZWRhaHErcXpZSE5FVFZJQSsx?=
+ =?utf-8?B?RVpNbGZIbFhXTktIaGljY0YzUENHN2htTVRtOExkME9HVnY2UmdDY1pzNVdK?=
+ =?utf-8?B?V3Y5RHhsMW1CZDVRcU0yNUZoTU5yN3Z6NzAxajkvOXlBL0JUT1l6NXFZZ3ZF?=
+ =?utf-8?B?L211NWlHcXlkWmVZWi9WcGZHemN5QlV5a1g3TkRaSW45dFoyaXkwb3U1VUx3?=
+ =?utf-8?B?M0pWWVhyN3ExQk4rbXZ1bXMxc0xwcDJNRjR4L3Z3Q093cUIxZ3Zmcktzc3Ez?=
+ =?utf-8?B?VVNrSEwxVGlyN2lDSUw0M1BUM214enFGVnd2ME90Z1NmZktjRmJXc0NVbkhl?=
+ =?utf-8?B?b2hiNjVNcnR6bUFBalRQNUpnRTdWdUZjTHJCUjllLzZCcVl1ZUJBTm5raEhF?=
+ =?utf-8?B?d2lKMFdBV0orM2VJQ0JDSzlNUWF0djN1OXVDbXVzZkdZVCtqZDZLQWk5bEow?=
+ =?utf-8?B?c3lLMGVpWDZjdlRkTDlleE9VWjRIdGhmc3JvMUl2UG1waWhMSzM5RnpseTI0?=
+ =?utf-8?B?TjlKeFhld0gyQitDd1paMlRUM2d1WVNaaFFxekxvYUtXb2UvR0NZWElaSzRO?=
+ =?utf-8?B?MVBiZUppc2NRejZxTlZSa1dxWm85NGQ0U05JdWc1SlJXL0tiaDB3c1IwY1Vl?=
+ =?utf-8?B?V094K3ZVYS8zY0tZZkZROGxUT251TjJVeEo1UC9HTEhaalNMVElKeEZEQ2tz?=
+ =?utf-8?B?YnNrMXh3cFVyMDNjQnQwVFZxcVNIUnExMDNzaXJtNGdycm1vbW1LSnQ4RDUx?=
+ =?utf-8?B?Y2t4QXJTZ3pTbXZRL2YvNk52NlZkT2tic0NHMzRlSEF4cWhqTTVVcm9hUjRN?=
+ =?utf-8?B?ZktrSGord01FWFJxc0VXSC9INGdWT2lTNit1MEQvek5qUENNdy9jc1dUc3ky?=
+ =?utf-8?B?TGI1bkRHVk5kMVhjVm4vYUgvYnFJQlYzam5rNlI2ck5rZ0Qrd2RKM2RXcVNO?=
+ =?utf-8?Q?fGCdlauPCpmYPtPrCM?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3d4f85dc-05a0-489d-f3ad-08deb0d3ad6a
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5248.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2026 09:40:32.9764
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NNhHOD80R7lPTDCA/C7actkaOcShksBnw7A1PtOcusJvia0yGnsCrgD+jzHHMRk1
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA4PR12MB9764
+X-Rspamd-Queue-Id: 59AFE530F46
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,iogearbox.net,fb.com,gmail.com,lzu.edu.cn];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-287500-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287501-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FREEMAIL_TO(0.00)[fastmail.im,iogearbox.net,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,blackwall.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,strlen.de,vger.kernel.org,isovalent.com];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[gal@nvidia.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:email,nvidia.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,isovalent.com:email]
 X-Rspamd-Action: no action
 
-On 5/10/26 4:14 PM, Ren Wei wrote:
-> From: Ruide Cao <caoruide123@gmail.com>
+On 13/05/2026 12:23, Alice Mikityanska wrote:
+> On Wed, May 13, 2026, at 09:53, Gal Pressman wrote:
+>> Hi Alice,
+>>
+>> On 12/05/2026 19:56, Alice Mikityanska wrote:
+>>> From: Alice Mikityanska <alice@isovalent.com>
+>>>
+>>> Taking further the idea of commit b10b446ce7ad ("udp: gso: Use single
+>>> MSS length in UDP header for GSO_PARTIAL"), simplify the implementation
+>>> and fix the checksum (apparently ignored by hardware anyway).
+>>>
+>>> The mentioned commit started using msslen for uh->len, but still uses
+>>> newlen to adjust uh->check. If the formula for check is fixed, newlen is
+>>> assigned but never used before the loop, and newlen is overwritten after
+>>> the loop. This makes msslen not really necessary, as we can reuse
+>>> newlen, if we don't adjust mss before. The adjustment of mss can be
+>>> simply dropped, because mss is not used anywhere else below.
+>>>
+>>> This brings us back to one variable, drops an unneeded arithmetic for
+>>> mss, and fixes the UDP checksum.
+>>>
+>>> Signed-off-by: Alice Mikityanska <alice@isovalent.com>
+>>> Cc: Gal Pressman <gal@nvidia.com>
+>>> Reviewed-by: Willem de Bruijn <willemb@google.com>
+>>
+>> Heads up, this is going to conflict with this fix:
+>> https://lore.kernel.org/netdev/20260513074349.2152146-1-gal@nvidia.com/
 > 
-> TCP request migration clones pending request sockets with
-> inet_reqsk_clone(). For MPTCP MP_JOIN requests this raw-copies
-> subflow_req->msk, but the cloned request does not take a new reference.
-> 
-> Both the original and the cloned request can later drop the same msk in
-> subflow_req_destructor(), and a migrated request may keep a dangling msk
-> pointer after the original owner has already been released.
-> 
-> MP_CAPABLE requests have a similar ownership issue for token_node. The
-> original request is hashed in the token table, and inet_reqsk_clone()
-> raw-copies the hlist pointers into the clone. The clone must not inherit
-> that hashed state on migration failure, and the token ownership must move
-> only after the new req has actually replaced the old one in the ehash.
-> 
-> Fix both cases while keeping the change local to MPTCP and the TCP
-> migration path: grab a reference for cloned subflow requests that carry an
-> msk, clear any raw-copied token hash state from the clone, and move the
-> hashed token request ownership only after migration succeeds.
-> 
-> Fixes: c905dee62232 ("tcp: Migrate TCP_NEW_SYN_RECV requests at retransmitting SYN+ACKs.")
-> Cc: stable@kernel.org
-> Reported-by: Yuan Tan <yuantan098@gmail.com>
-> Reported-by: Yifan Wu <yifanwucs@gmail.com>
-> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-> Reported-by: Xin Liu <bird@lzu.edu.cn>
-> Signed-off-by: Ruide Cao <caoruide123@gmail.com>
-> Tested-by: Ren Wei <enjou1224z@gmail.com>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
-> ---
-> changes in v2:
->   - drop the generic request_sock clone callback
->   - call MPTCP directly from inet_reqsk_clone() under the TCP protocol check
->   - keep cloned MP_JOIN requests holding an msk reference
->   - clear raw-copied MP_CAPABLE token hash state in the clone
->   - move MP_CAPABLE token ownership only after successful req migration
->   - avoid exposing token internals to inet_connection_sock.c
->   - update the commit message accordingly
->   - v1 link: https://lore.kernel.org/all/86e2514b533bf4d55d4aa2fdbf1404022e8c9430.1776149210.git.caoruide123@gmail.com/
-> 
->  include/net/mptcp.h             | 14 ++++++++++++++
->  net/ipv4/inet_connection_sock.c | 12 ++++++++++--
->  net/mptcp/protocol.h            |  2 ++
->  net/mptcp/subflow.c             | 20 ++++++++++++++++++++
->  net/mptcp/token.c               | 25 +++++++++++++++++++++++++
->  5 files changed, 71 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/net/mptcp.h b/include/net/mptcp.h
-> index f7263fe2a2e4..4bb24963afef 100644
-> --- a/include/net/mptcp.h
-> +++ b/include/net/mptcp.h
-> @@ -219,6 +219,10 @@ int mptcp_subflow_init_cookie_req(struct request_sock *req,
->  struct request_sock *mptcp_subflow_reqsk_alloc(const struct request_sock_ops *ops,
->  					       struct sock *sk_listener,
->  					       bool attach_listener);
-> +void mptcp_subflow_reqsk_clone(struct request_sock *req,
-> +			       struct request_sock *new_req);
-> +void mptcp_subflow_reqsk_migrated(struct request_sock *req,
-> +				  struct request_sock *new_req);
->  
->  __be32 mptcp_get_reset_option(const struct sk_buff *skb);
->  
-> @@ -314,6 +318,16 @@ static inline struct request_sock *mptcp_subflow_reqsk_alloc(const struct reques
->  	return NULL;
->  }
->  
-> +static inline void mptcp_subflow_reqsk_clone(struct request_sock *req,
-> +					     struct request_sock *new_req)
-> +{
-> +}
-> +
-> +static inline void mptcp_subflow_reqsk_migrated(struct request_sock *req,
-> +						struct request_sock *new_req)
-> +{
-> +}
-> +
->  static inline __be32 mptcp_reset_option(const struct sk_buff *skb)  { return htonl(0u); }
->  
->  static inline void mptcp_active_detect_blackhole(struct sock *sk, bool expired) { }
-> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-> index e961936b6be7..578471bb8a2b 100644
-> --- a/net/ipv4/inet_connection_sock.c
-> +++ b/net/ipv4/inet_connection_sock.c
-> @@ -17,6 +17,7 @@
->  #include <net/inet_timewait_sock.h>
->  #include <net/ip.h>
->  #include <net/route.h>
-> +#include <net/mptcp.h>
->  #include <net/tcp_states.h>
->  #include <net/xfrm.h>
->  #include <net/tcp.h>
-> @@ -951,8 +952,13 @@ static struct request_sock *inet_reqsk_clone(struct request_sock *req,
->  	/* We need not acquire fastopenq->lock
->  	 * because the child socket is locked in inet_csk_listen_stop().
->  	 */
-> -	if (sk->sk_protocol == IPPROTO_TCP && tcp_rsk(nreq)->tfo_listener)
-> -		rcu_assign_pointer(tcp_sk(nreq->sk)->fastopen_rsk, nreq);
-> +	if (sk->sk_protocol == IPPROTO_TCP) {
-> +		if (tcp_rsk(nreq)->tfo_listener)
-> +			rcu_assign_pointer(tcp_sk(nreq->sk)->fastopen_rsk, nreq);
-> +
-> +		if (rsk_is_mptcp(req))
-> +			mptcp_subflow_reqsk_clone(req, nreq);
-> +	}
->  
->  	return nreq;
->  }
-> @@ -1115,6 +1121,8 @@ static void reqsk_timer_handler(struct timer_list *t)
->  			goto no_ownership;
->  		}
->  
-> +		if (rsk_is_mptcp(oreq))
-> +			mptcp_subflow_reqsk_migrated(oreq, nreq);
+> Thanks for the heads up! When I submitted mine, your patch wasn't on the
+> list yet, so it's rather the other way around :). Anyway, let's combine
+> our efforts, since we are fixing different aspects of the same area of
+> code. I commented on your patch and suggested to base it on top of mine
+> to avoid creating a new bug with the checksum. If my series doesn't get
+> merged in this iteration, feel free to cherry-pick this commit, it's
+> pretty much independent.
 
-Sashiko says:
-
----
-Can this sequence trigger a race condition with network RX processing?
-In reqsk_timer_handler(), nreq is inserted into the global ehash table
-via inet_ehash_insert() right before this block. The ehash lock is
-immediately dropped, making nreq globally visible to concurrent network
-RX softirq processing.
-However, the MPTCP token state is not migrated to nreq until the call to
-mptcp_subflow_reqsk_migrated(oreq, nreq).
-If a concurrent RX thread processes an incoming ACK for the connection
-in this narrow window, it could find nreq in the ehash table,
-successfully process it, and invoke mptcp_token_accept(nreq).
-Inside mptcp_token_accept(), __token_lookup_req() searches the token
-bucket and finds oreq, because the timer thread hasn't moved the token yet.
-The code then asserts ownership:
-mptcp_token_accept()
-	pos = __token_lookup_req(bucket, req->token);
-	if (!WARN_ON_ONCE(pos != req))
-		hlist_nulls_del_init_rcu(&req->token_node);
-Since pos is oreq and req is nreq, would this fail the assertion and
-trigger a kernel warning?
-If the calls were reordered so that mptcp_subflow_reqsk_migrated()
-happens before inet_ehash_insert(), could that merely shift the race? If
-a concurrent ACK is already processing oreq, it might call
-mptcp_token_accept(oreq) after the token was moved to nreq, triggering
-the same warning, since the ehash table and the token bucket are
-protected by different locks and the updates are non-atomic.
-Could a remote attacker time ACKs to hit this window during a listener
-migration, potentially leading to a denial of service on systems
-configured to panic on warnings?
----
-
-I _think_ the above race could/should be solved squashing
-mptcp_subflow_reqsk_migrated() into mptcp_subflow_reqsk_clone() and
-adjusting  mptcp_token_destroy_request() and mptcp_token_accept() to
-deal with already removed token, checking (again) for unhased token_node
-under the bucket lock.
-
-The latter will require a little more work, returning a success status
-to the caller - mptcp_sk_clone_init() - and make the latter fail on
-mptcp_token_accept() failures.
-
-The above would also make the fix more encapsulated into the mptcp code.
-
-/P
-
+Right, but the fix goes to net.
 
