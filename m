@@ -1,166 +1,185 @@
-Return-Path: <netdev+bounces-287427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287428-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sFvYFkz7A2rKBgIAu9opvQ
-	(envelope-from <netdev+bounces-287427-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 06:17:16 +0200
+	id WEoAF+b7A2rKBgIAu9opvQ
+	(envelope-from <netdev+bounces-287428-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 06:19:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE12952D1F9
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 06:17:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BC0F52D20A
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 06:19:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D28DA3055DD0
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 04:17:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B26E8305B028
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 04:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DFEC2D5436;
-	Wed, 13 May 2026 04:17:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D7C436E47E;
+	Wed, 13 May 2026 04:19:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zellic.io header.i=@zellic.io header.b="kj40gSsH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EISLT9Ve"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7782FBE1F
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 04:16:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25572D5436;
+	Wed, 13 May 2026 04:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778645821; cv=none; b=IHZsoa3TB8yj7/iEp3InDZfZZ/IL4znaJBOV0WAU/oolaRoEIbbwsdsCMQvzeLCR46ANxlD63RY1febX+vGXb4aIUIdYtHZ1LF+CuB/4I29tXqcP+2MTLdgGZ4XAmTcK/atHN8AA2QF65J4bSHNuD0Mz/cIW2wukbS3aWm3E0sc=
+	t=1778645987; cv=none; b=HWIi8BWy8R4+01lJf/MwtemBpN2NviL2k7rE/FfH+umJi5AeHBInDIcnHKa3NduYVLgVMqcTBP6LLtbBd5rfpZG1CnD4Sb3icgGaG+4bm1YSnLj2XtCAqGwRz1GzX749biFw4bKFCSuntipK9f+axwSCLEsWutwZ22s+vAcT/yE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778645821; c=relaxed/simple;
-	bh=UJJH3HvbZB+PUz781NdtKzRJTlqAYbbhHCSz/n9ZLjw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=asHkdIfSlNnjBA5tI6F115wDLmxrtXvEcGDdFcFtbCi/sZO8fAZtXGmxLZHOnSILCjnzl70vQ8UWvVo4hTjyK/AJbBy7JqcgVERkza+s+eRc9+Gw545uCVnm74lUcc3tY6BdwplgvnatrPxuHl2szYav1n5npq/HmpkhMq7rAmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=zellic.io; spf=pass smtp.mailfrom=zellic.io; dkim=pass (2048-bit key) header.d=zellic.io header.i=@zellic.io header.b=kj40gSsH; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=zellic.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zellic.io
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2ba17c8cfacso64115855ad.2
-        for <netdev@vger.kernel.org>; Tue, 12 May 2026 21:16:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=zellic.io; s=google; t=1778645818; x=1779250618; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tamW6LEcUSzvVGTeLsD6U41HJv4m+9jBxic45+NHYBw=;
-        b=kj40gSsH7F7FxCz3qA20r05Btk4Z5CWnyeVKZJ24dxJhUicsVhCD++n66BOkV65kfF
-         Tv1EoNMFgIDyRlaMHYvd375gQCLKavs2kx0/lL7bwwFgl2pdn24dQlkgQVpdi5uZeyVk
-         9Wz5L7OMxiDUJbtWTQuB+zBentLmgUE38pP1pLgtWQTMhq7rK9edX0BGXnK++hYU9koD
-         Cp8HK+6XGSDT/X9AHyrYsmzAlHYBHbsWSuBe0WJZWunfFiJN2+6NJ2EM6qsNX6sSFIpM
-         2ANZwbVt6Rdb4ICV3wXF8LbBnUbDUu907pjIHoPSwK9EytOGFpMKaBwKIEuhriKIu/Br
-         xTNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778645818; x=1779250618;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tamW6LEcUSzvVGTeLsD6U41HJv4m+9jBxic45+NHYBw=;
-        b=Imgt0loPQH6vnCmN4zeEC6LDO7U4QppJdm4PbZiXRc7rh1Qr9Ki9kojrdHh4YLdFgd
-         h8Ls2KwhX4uHbDO6likBCdKONuIoFaP9+sE23XQMMsD73h4Mwb9kWQgvpT02EQ/oSG0m
-         OgBp9g1qOrsIKG7ZSPJpAsU1giBBYJmWzz3Qx3wYF1pmIhvnqqw6N1Evz7xEKRdbrKrx
-         WDrLJAnFRrkag8Bo1CLK8zF/JQLr8w3sTmwxkB7xfr5dhU1C09MnRTMm5ALReixF/Km6
-         bsL03KQ8X3SVvRBvbcbBF4XliR0Os0VAAv4Zw2OFsUOuz3FSTby9QZl+ebDKSL5oKoV7
-         OGiw==
-X-Gm-Message-State: AOJu0YxFZWku7DtYVLyGqgOvN53qf4vUQsOGLgCju/mLYArHaWl0uQBs
-	LwY1LIzDluo13ZQYd1mKTUHZkNEsEaawMCd99GLL6iAvrj1JSkDRbsBD8k4jReXN/pTlPdq0Q/4
-	tQlNgBsNheA==
-X-Gm-Gg: Acq92OHnqfjl/gPFcl00Ek9f8j9pXMVYyzLdZak6EoJ8uCSYOZ8sNZwYTAb0ZUs3Rkw
-	nqK5WSbvTz4VlCPQAJbEfVkNnIlplGBvaosLk/pEojOovQml3tZHy7HigEh21n2QACzKeff3Kit
-	WPEi6hPlM3FDcMqrHGPd//Wkgt8ttCI8oyoWzfyqMfG0z3Irgk8NloKxzZ1W7r7418a/JBxwxi6
-	u82B0dQzoZ5BA+llTecrKv2GsuP1ETCFulIFfl7sABOKEZBcIvMA/2M9CpSb8adNVt6ygSL1W4+
-	l/hs8ve9+OyhbJJnkFLYaBi4LITFwRcLVRDpBdJfrhSjtDAO1NcAMS99v+bgDzH/7yVI29KPMwN
-	GgQ3Wc3hRGfMOKWBuQ+fSNE38+Y53HryGbVMC5VG2f/jpCXTv0OqHmLNu08VFWi3s96sfIHVfNN
-	KJgaRy/suuceKCXSFdZ6obsb08W8l/nkCuIHbxuTdur1dKIExaTfiNohWGejWFkH8VpLiaj0Yx6
-	J0YGEzzUfG5bEiiXWiE00bvNigd334=
-X-Received: by 2002:a17:903:bce:b0:2ae:ce35:2686 with SMTP id d9443c01a7336-2bd2714692amr15025055ad.5.1778645818534;
-        Tue, 12 May 2026 21:16:58 -0700 (PDT)
-Received: from pn51.. (45.248.49.157.v4.dyn.launtel.au. [45.248.49.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1c5466bsm152988545ad.0.2026.05.12.21.16.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 May 2026 21:16:58 -0700 (PDT)
-From: William Bowling <vakzz@zellic.io>
-To: netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Ahern <dsahern@kernel.org>,
-	William Bowling <vakzz@zellic.io>
-Subject: [PATCH net] net: skbuff: preserve shared-frag marker during coalescing
-Date: Wed, 13 May 2026 04:16:35 +0000
-Message-ID: <20260513041635.1289541-1-vakzz@zellic.io>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1778645987; c=relaxed/simple;
+	bh=/nSFQ2/8daCssLI1ptOVAQPaTh12fuEua1jAKxHxKZw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QFeLustw2tlCGJhVOKTx+q3yRbD0T17RQG4+Ijd3mizoUy8MVjTUdlYGJxzzkD0sTLq81M4UFaPGEXtfIFug/upIO+2V7IULZJrqaDX55V9l0UyQnF0hzkTPjYoDA3bJpbAEVBLU04RedQ0B/y43tlKd5E7tPNHLuxC1sRH9/os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EISLT9Ve; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778645985; x=1810181985;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/nSFQ2/8daCssLI1ptOVAQPaTh12fuEua1jAKxHxKZw=;
+  b=EISLT9VeVWc5O1YT8x7deljAni7VhL3o5yYxS/LP6gh/aQ6pTVn+DIxJ
+   yCxre/K+p33SY/m54tASYeUlTNGjdBSXryCoBnlJirXLf5/a5kDCCEA5f
+   HYiO9uUEtnsPhHTCf4Dbb+KVyr9j7ELeT8jjxweJ3bF8GA+TXyWs1a85Y
+   I3VVV0sn2klFnTWYbwt+cEZ/SN56WXI0N1vTifEPfymlo0XiPS5ZN5vpo
+   zVoFWQd30IH5q/EGiwM/nFeCU+nDN4jWhrRQ+nBe45M/8jFPB/Whd1JXd
+   BgQ2rpRCeD3Nmriumb9xajvCPexPD7MtHZOrtDWMfjD+K2p6OnlN8YckI
+   w==;
+X-CSE-ConnectionGUID: fjJxU4aJRUe8G66CZ1MNPQ==
+X-CSE-MsgGUID: xln78hRWTpGE/FmgjUYlxA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11784"; a="79743060"
+X-IronPort-AV: E=Sophos;i="6.23,232,1770624000"; 
+   d="scan'208";a="79743060"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2026 21:19:44 -0700
+X-CSE-ConnectionGUID: d/4PRzmUQie3DPdgWsdSyQ==
+X-CSE-MsgGUID: oO2nSQnXTtm/JFV7Fzzuaw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,232,1770624000"; 
+   d="scan'208";a="242318375"
+Received: from lkp-server01.sh.intel.com (HELO dca79079c3eb) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 12 May 2026 21:19:42 -0700
+Received: from kbuild by dca79079c3eb with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wN14M-000000003Pb-2eHO;
+	Wed, 13 May 2026 04:19:38 +0000
+Date: Wed, 13 May 2026 12:18:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: faicker.mo@gmail.com
+Cc: oe-kbuild-all@lists.linux.dev, kuba@kernel.org,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] net: net_failover: Fix the deadlock in slave register
+Message-ID: <202605131216.7sSRq0Gy-lkp@intel.com>
+References: <20260507074332.2543229-1-faicker.mo@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: AE12952D1F9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260507074332.2543229-1-faicker.mo@gmail.com>
+X-Rspamd-Queue-Id: 7BC0F52D20A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[zellic.io,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[zellic.io:s=google];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[zellic.io:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287427-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vakzz@zellic.io,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-287428-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[git-scm.com:url,intel.com:email,intel.com:mid,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,01.org:url]
 X-Rspamd-Action: no action
 
-skb_try_coalesce() can attach paged frags from @from to @to.  If @from
-has SKBFL_SHARED_FRAG set, the resulting @to skb can contain the same
-externally-owned or page-cache-backed frags, but the shared-frag marker
-is currently lost.
+Hi,
 
-That breaks the invariant relied on by later in-place writers.  In
-particular, ESP input checks skb_has_shared_frag() before deciding
-whether an uncloned nonlinear skb can skip skb_cow_data().  If TCP
-receive coalescing has moved shared frags into an unmarked skb, ESP can
-see skb_has_shared_frag() as false and decrypt in place over page-cache
-backed frags.
+kernel test robot noticed the following build errors:
 
-Propagate SKBFL_SHARED_FRAG when skb_try_coalesce() transfers paged
-frags.  The tailroom copy path does not need the marker because it copies
-bytes into @to's linear data rather than transferring frag descriptors.
+[auto build test ERROR on net-next/main]
+[also build test ERROR on net/main linus/master v7.1-rc3 next-20260508]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Fixes: cef401de7be8 ("net: fix possible wrong checksum generation")
-Fixes: f4c50a4034e6 ("xfrm: esp: avoid in-place decrypt on shared skb frags")
-Signed-off-by: William Bowling <vakzz@zellic.io>
----
- net/core/skbuff.c | 2 ++
- 1 file changed, 2 insertions(+)
+url:    https://github.com/intel-lab-lkp/linux/commits/faicker-mo-gmail-com/net-net_failover-Fix-the-deadlock-in-slave-register/20260513-045805
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260507074332.2543229-1-faicker.mo%40gmail.com
+patch subject: [PATCH v3] net: net_failover: Fix the deadlock in slave register
+config: i386-randconfig-141-20260513 (https://download.01.org/0day-ci/archive/20260513/202605131216.7sSRq0Gy-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+smatch: v0.5.0-9185-gbcc58b9c
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260513/202605131216.7sSRq0Gy-lkp@intel.com/reproduce)
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 7dad68e3b..9c4e8d331 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -6200,6 +6200,8 @@ bool skb_try_coalesce(struct sk_buff *to, struct sk_buff *from,
- 	       from_shinfo->frags,
- 	       from_shinfo->nr_frags * sizeof(skb_frag_t));
- 	to_shinfo->nr_frags += from_shinfo->nr_frags;
-+	if (from_shinfo->nr_frags)
-+		to_shinfo->flags |= from_shinfo->flags & SKBFL_SHARED_FRAG;
- 
- 	if (!skb_cloned(from))
- 		from_shinfo->nr_frags = 0;
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202605131216.7sSRq0Gy-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   net/core/failover.c: In function 'failover_existing_slave_register':
+>> net/core/failover.c:225:25: error: implicit declaration of function 'netdev_lock_ops'; did you mean 'netdev_lock'? [-Wimplicit-function-declaration]
+     225 |                         netdev_lock_ops(dev);
+         |                         ^~~~~~~~~~~~~~~
+         |                         netdev_lock
+>> net/core/failover.c:227:25: error: implicit declaration of function 'netdev_unlock_ops'; did you mean 'netdev_unlock'? [-Wimplicit-function-declaration]
+     227 |                         netdev_unlock_ops(dev);
+         |                         ^~~~~~~~~~~~~~~~~
+         |                         netdev_unlock
+
+
+vim +225 net/core/failover.c
+
+   213	
+   214	static void
+   215	failover_existing_slave_register(struct net_device *failover_dev)
+   216	{
+   217		struct net *net = dev_net(failover_dev);
+   218		struct net_device *dev;
+   219	
+   220		rtnl_lock();
+   221		for_each_netdev(net, dev) {
+   222			if (netif_is_failover(dev))
+   223				continue;
+   224			if (ether_addr_equal(failover_dev->perm_addr, dev->perm_addr)) {
+ > 225				netdev_lock_ops(dev);
+   226				failover_slave_register(dev);
+ > 227				netdev_unlock_ops(dev);
+   228			}
+   229		}
+   230		rtnl_unlock();
+   231	}
+   232	
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
