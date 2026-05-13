@@ -1,181 +1,194 @@
-Return-Path: <netdev+bounces-287676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287677-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aNYWFDisBGrIMwIAu9opvQ
-	(envelope-from <netdev+bounces-287676-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 18:52:08 +0200
+	id IIFvNeKsBGrIMwIAu9opvQ
+	(envelope-from <netdev+bounces-287677-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 18:54:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FED353773A
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 18:52:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80778537817
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 18:54:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 019AC32D6108
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 16:20:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 913BE312965B
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 16:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA36C472766;
-	Wed, 13 May 2026 16:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bcv2C2Pb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C3534C77C6;
+	Wed, 13 May 2026 16:22:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from maynard.decadent.org.uk (maynard.decadent.org.uk [65.21.191.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7F32E0B58
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 16:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778689230; cv=pass; b=luXq58BxzpgEk5nowZENzx+NC9mKyX8qoVBZ9R54oHL/N+/ohJ94uzxj2DqckrlZg8y0WPKE1ZMmUaGh5rNCLI2bjKl+veHEUQ6Rg8yUU1xdoxYrSKZJ6xSVS24oeFTGaUpeXrhcr6K+mgQShArH8L3imGoCeV5RzK4+ixW0Kts=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778689230; c=relaxed/simple;
-	bh=eAJTGuNjyeN1H0W0agKrLwMo2FHLEctrW7qpgWkMFd8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=haI7N2SlpWH98zin43SW/V9Wem0Iy1iHZJqk/yBzvZqC9SL4z6KnTzh+w+ponmvPbfNPHmkpNuumSkDYc+pbeatGSTjHPLE66ksmVGD8K/AW0TWb/lEtSWC7lzsDpIihJrX1NU6eW5twWEkUwLMPbLjoMp5EszFNnxG/tcdBYo0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bcv2C2Pb; arc=pass smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-671f1a0d0c5so413a12.0
-        for <netdev@vger.kernel.org>; Wed, 13 May 2026 09:20:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778689228; cv=none;
-        d=google.com; s=arc-20240605;
-        b=bfMwlA39TWQjIhbOV/puK83dRsdkGt+pv2yY3LoOEIvMvzg9c0OIhd86VkFXfdWhMr
-         FW6QFmic3kp43rRBUBvP/jsM4BoPuYH3qQ1zWhJX5vahNYYKwauxg5R374CRGtyO6fOr
-         P23TfKbGs++VP83Q/u0cagUOK3J8qr/4rBMv0pRqkWLyV7Axz+EgcpQHvZ66lhUwhbub
-         o0KRD07CbSJBbK/11Tn2QKPevyt8EiGC/HxJj6P3QJk1Xs2okJB6xx+bdhPE8P7tJxER
-         HkKKmV60xafbwHY/ZqjJ4BTqCV0na4vwLFIKcA+JNWoK/rimW0Bpcr/evW78p6N7gcV6
-         PbzA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=eAJTGuNjyeN1H0W0agKrLwMo2FHLEctrW7qpgWkMFd8=;
-        fh=+AyL+Uw0aiqSkJuFINLU0pdH2dA29+E5/xd3vwcCwMA=;
-        b=HQIH77WDE+pjeWbsMa+g8ezY9lH7F+QELb8msbJgH5L12NGiTbul7Rkds7V5YQTN85
-         rKOOkIVZpPNk/f0LJt+gDqKIvYwRYAXLKg8KTuVPHcZr9Aj/gBCPlzUVg/7jDWSQNR0+
-         zy/AwSrjemnSunQl+3+YBguZof//UL2Pud/+gvScz7Zy289mVmcUG01xkGedNpvDp9mw
-         mFlZ0gvjkELIAOK48xd6HLHNewJzSZohpx7szAk2xZe9zHNlO+fh+UDq8Tei6iGHZ0Jy
-         mC5W/YIFOK1X8svQZO1PLmGtc9ixkXpNjIJx7qBWjV4b7POrofSEhFl3iGUKD+x+uXFi
-         00jA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778689228; x=1779294028; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eAJTGuNjyeN1H0W0agKrLwMo2FHLEctrW7qpgWkMFd8=;
-        b=bcv2C2Pb5BbAxkjDGC/Ls88uXgGODKKzM6B6ZJ+ZTPGGvpKaPY4erLix8MH4+WUDFM
-         rc02AfmZo5Y4xBo6l3X116tYg3xWV1J/yycnEHuJEgrtJ4cziwL2NxUULPaujYjU1UVK
-         ECQ1Af4dPWBH9uWNH5zphhUSVbeP9Z3eDQ/d6aaTYkJhoF3kwC3n5kEWjnWSLr8hQrBc
-         6IOzYomk+KR6h5Uh6bwengHL0SuXn0IF5D1zGwkfFD7Va6EiOKtm4P0FI12051jFNAPI
-         UXh0ArEI1bSzIptkLpkBLek3/GFqWZhnQmqMG+ZW2Jn/9CoA5nJzGh65rjdd/QuN4KXQ
-         4DEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778689228; x=1779294028;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=eAJTGuNjyeN1H0W0agKrLwMo2FHLEctrW7qpgWkMFd8=;
-        b=ODw3xENVWHkAFKpfapzc5IH6AtYYGEkVdA1/vOSXw3JYZ2c8uZYhiPzZOUZM/XAmLX
-         hgkZLV9kwi6m4W1ndFeoPBPssbimU6oqvFMI0KGSL/HQ+e1IBoWwi5W2KTu0UIXVdCC7
-         2qVz8QL5s6Rz4uvEgtB5mowc7SjPAQUQjAc2vi0AESXzkTy67SoBEcpV38uVPVKZ/yj5
-         kX4RMDI/hVlH97mSyN6idBU53CwME5WlpBx/7P+hkordSvAB6172d9ddKz0ewMP/5uOA
-         9Bf6KgyHOPWCChSSPT7h8ZyIGIBXFiDRuTG/iBaMraGg9zj2/IWRdta7MuyjrWlrCip9
-         Nc9g==
-X-Forwarded-Encrypted: i=1; AFNElJ/EVYPisyMBLD4q10C70agcgvS6LqUEZN99Nq7G8X6tJWYM8Tjm+6BcsEoSjB3Tz9hzOvQu0lM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxgp142xzkDAF2CbMO/gMXlptwaAYTQtuVHfbAqJzrZ6ABMYfH4
-	2nqTz6J/jRHQkHSucTXJFfGuNGK3zLzeHZz+vB10KW9YEAx3l47dUEkMNO6vLiuDtLDw38JBiZl
-	09dW1Y/XZp1ddJ1ymB1dcKloaUvjk2tLg3b2eiKMd
-X-Gm-Gg: Acq92OH5dfukQs77ScJUYmwcKqbpBPBzImTmStY5Ds4bGC3kIt2/WAFFkBib1yjFNHc
-	oisUuw82Ky0AeUm9B1K4y46B53/dIC1ZmB4fw1coEE5Kz8FNhHAw7fFyjK9yJkLXiEiiHGd09Gn
-	3goARoG55JW8wjOOFRqs/Xb3WRk2vc63C6SWGR1icdaUADNzGXTaaCXN+torBOOGix1Bn2/tSfy
-	U/Hc9U8gzJiX8ke2MSyNq2f1Zv41L4O3s1fzmCEwqTJd2TUgupmpirLIqH86W7iEA2kPqurNrfX
-	Ssq3NS/4258h1+9PDk6OgsAzWu1HAsU8VP/QVyjbvMzYnDixM1iAoEkmGioJSDbvMwweiTNr0jR
-	vkw==
-X-Received: by 2002:a05:6402:a554:10b0:682:a2f:a15c with SMTP id
- 4fb4d7f45d1cf-6827c43e148mr52503a12.11.1778689227392; Wed, 13 May 2026
- 09:20:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4CF849551B;
+	Wed, 13 May 2026 16:22:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.21.191.19
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778689342; cv=none; b=F05cS+izFIlPBxGt8Vy9I93gJpPTtjSTTFQIw5fsiNBAEt0nFFLEf9yNkF+4Ev8h3v5yRuJRmCR4x0QFa3zCmKRG+sNglvmD0zv9VLGESL0YNuVqyKi3oEmFcfvLDENl4HCoJYHH0na+ct0D4nPtIQHG+2w7KzNmI8pt7C56Lnk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778689342; c=relaxed/simple;
+	bh=vFAZgYDD5dZ4VzF0mMVbIqdZ7V3SXjVYPJfwu5WgA+o=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=gJtXOsRu+z7y01xs+FDrMQovO7UTyPZZOuyrZ6SCTVfdYGpVZdJ+d4CFIA2th4I0F+KL8PAIpT9sAKKbMkbsbhOg0Wnhj6Nh6N79/cJhYjAmUGZRopqjaBR3BKuyGR9y/SiSc5qR6VPE1eebzwANEPnUdjyDN+c5yTHRu+Cof6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=decadent.org.uk; spf=pass smtp.mailfrom=decadent.org.uk; arc=none smtp.client-ip=65.21.191.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=decadent.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=decadent.org.uk
+Received: from [2a02:578:851f:1502:391e:c5f5:10e2:b9a3] (helo=deadeye)
+	by maynard with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ben@decadent.org.uk>)
+	id 1wNCLL-000uBt-14;
+	Wed, 13 May 2026 16:21:55 +0000
+Received: from ben by deadeye with local (Exim 4.99.2)
+	(envelope-from <ben@decadent.org.uk>)
+	id 1wNCLJ-00000000Jmr-3fj7;
+	Wed, 13 May 2026 18:21:53 +0200
+Message-ID: <811b31f3373526d1ff60160c2f32ddb359e54c31.camel@decadent.org.uk>
+Subject: Re: [PATCH net] net: skbuff: propagate shared-frag marker through
+ pskb_copy()
+From: Ben Hutchings <ben@decadent.org.uk>
+To: Hyunwoo Kim <imv4bel@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, 	kuba@kernel.org, pabeni@redhat.com,
+ steffen.klassert@secunet.com, 	herbert@gondor.apana.org.au,
+ dsahern@kernel.org, vakzz@zellic.io
+Cc: stable@vger.kernel.org, netdev@vger.kernel.org
+Date: Wed, 13 May 2026 18:21:45 +0200
+In-Reply-To: <agRfuVOeMI5pbHhY@v4bel>
+References: <agRfuVOeMI5pbHhY@v4bel>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-VtuV1HUGkvWM/tnmIfYU"
+User-Agent: Evolution 3.56.2-9 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260428-mlx5_vxlan-v1-1-cf666d042618@google.com>
- <20260428184631.40f1f1b7@kernel.org> <CANkEMgkBnuRfurKcFEUAZcJcX1XYSnHbBozZGP8DpnKq--tWbw@mail.gmail.com>
- <20260429190150.417b0302@kernel.org> <CANkEMg=Xc9jN8McZmLerK_ffOwRFfX+yO=4Ha6+umVogbkBj3A@mail.gmail.com>
- <20260504181022.60ee2a1a@kernel.org> <c2258e70-4c2e-4999-8876-ad98f4259eda@nvidia.com>
-In-Reply-To: <c2258e70-4c2e-4999-8876-ad98f4259eda@nvidia.com>
-From: Marc Harvey <marcharvey@google.com>
-Date: Wed, 13 May 2026 11:20:16 -0500
-X-Gm-Features: AVHnY4LR-7un0veJqtGYLAWCLE6dTqG73RIFCxJa315MJ-hSMZ1fDaAXA4SUzUo
-Message-ID: <CANkEMgmhh40uE8asRO3WJpAtDZWDcSjJNVCzh54TgwcMUonhdA@mail.gmail.com>
-Subject: Re: [PATCH net-next] net/mlx5: Add MLX5_VXLAN config option
-To: Gal Pressman <gal@nvidia.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Kuniyuki Iwashima <kuniyu@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 9FED353773A
+X-SA-Exim-Connect-IP: 2a02:578:851f:1502:391e:c5f5:10e2:b9a3
+X-SA-Exim-Mail-From: ben@decadent.org.uk
+X-SA-Exim-Scanned: No (on maynard); SAEximRunCond expanded to false
+X-Rspamd-Queue-Id: 80778537817
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-3.56 / 15.00];
+	SIGNED_PGP(-2.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287676-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287677-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marcharvey@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,secunet.com,gondor.apana.org.au,zellic.io];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	DMARC_NA(0.00)[decadent.org.uk];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email,mail.gmail.com:mid]
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ben@decadent.org.uk,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[zellic.io:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Tue, May 5, 2026 at 1:21=E2=80=AFAM Gal Pressman <gal@nvidia.com> wrote:
->
-> Hi Marc,
->
-> On 05/05/2026 4:10, Jakub Kicinski wrote:
-> >
-> > Sorry, I don't know mlx5 very well. Sounds like you have to talk
-> > to nVidia or/and run some experiments. The current patch is a no-go.
-> >
->
-> The hardware offloads 4789 by default, hence the
-> UDP_TUNNEL_NIC_INFO_STATIC_IANA_VXLAN, you cannot simply remove it.
->
-> Have you tried disabling tx-udp_tnl-segmentation through ethtool?
 
-Thanks for the responses.
+--=-VtuV1HUGkvWM/tnmIfYU
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Gal, by "the hardware offloads 4789 by default," does that mean the
-hardware offloads 4789 even without an explicit command from the
-driver? I ask because mlx5 does send a command to offload 4789, but
-perhaps this command is redundant and only for bookkeeping purposes.
+On Wed, 2026-05-13 at 20:25 +0900, Hyunwoo Kim wrote:
+> __pskb_copy_fclone() shallow-copies the source's frag descriptors and
+> bumps each page's refcount via skb_frag_ref(), then defers the rest
+> of the shinfo metadata to skb_copy_header().  That helper only carries
+> over gso_{size,segs,type} and never touches skb_shinfo()->flags, so
+> the destination skb keeps a reference to the same externally-owned or
+> page-cache-backed pages while reporting skb_has_shared_frag() as
+> false.
+>
+> The mismatch is harmful in any in-place writer that uses
+> skb_has_shared_frag() to decide whether shared pages must be detoured
+> through skb_cow_data().  ESP input is one such writer (esp4.c,
+> esp6.c), and a single nft 'dup to <local>' rule -- or any other
+> nf_dup_ipv4() / xt_TEE caller -- is enough to land a pskb_copy()'d
+> skb in esp_input() with the marker stripped, letting an unprivileged
+> user write into the page cache of a root-owned read-only file via
+> authencesn-ESN stray writes.
+>=20
+> Set SKBFL_SHARED_FRAG on the destination whenever frag descriptors
+> were actually moved from the source.  skb_copy() and skb_copy_expand()
+> share skb_copy_header() too but linearize all paged data into freshly
+> allocated head storage and emerge with nr_frags =3D=3D 0, so
+> skb_has_shared_frag() returns false on its own; they need no change.
 
-I haven't tried changing the offload related ethtool parameters, and I
-will, but I suspect it won't help in this specific case since the
-perceived regression involved non-tunneled traffic.
+What about skb_shift()?  It seems like that should also propagate this
+flag.  But I could be missing some reason why it's not necessary.
 
-If the hardware indeed offloads 4789 autonomously, then the perceived
-regression we saw might not have been real or related to enabling
-vxlan.
+Ben.
+
+> Fixes: cef401de7be8 ("net: fix possible wrong checksum generation")
+> Fixes: f4c50a4034e6 ("xfrm: esp: avoid in-place decrypt on shared skb fra=
+gs")
+> Reported-by: William Bowling <vakzz@zellic.io>
+> Reported-by: Hyunwoo Kim <imv4bel@gmail.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+> ---
+>  net/core/skbuff.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index 7dad68e3b518..15bdec53e8d9 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -2248,6 +2248,7 @@ struct sk_buff *__pskb_copy_fclone(struct sk_buff *=
+skb, int headroom,
+>  			skb_frag_ref(skb, i);
+>  		}
+>  		skb_shinfo(n)->nr_frags =3D i;
+> +		skb_shinfo(n)->flags |=3D skb_shinfo(skb)->flags & SKBFL_SHARED_FRAG;
+>  	}
+> =20
+>  	if (skb_has_frag_list(skb)) {
+> @@ -6200,6 +6201,8 @@ bool skb_try_coalesce(struct sk_buff *to, struct sk=
+_buff *from,
+>  	       from_shinfo->frags,
+>  	       from_shinfo->nr_frags * sizeof(skb_frag_t));
+>  	to_shinfo->nr_frags +=3D from_shinfo->nr_frags;
+> +	if (from_shinfo->nr_frags)
+> +		to_shinfo->flags |=3D from_shinfo->flags & SKBFL_SHARED_FRAG;
+> =20
+>  	if (!skb_cloned(from))
+>  		from_shinfo->nr_frags =3D 0;
+
+--=20
+Ben Hutchings
+Tomorrow will be cancelled due to lack of interest.
+
+--=-VtuV1HUGkvWM/tnmIfYU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAmoEpRkACgkQ57/I7JWG
+EQnHXg//egi/k+h/cersu22OkNm+wnhtPoWEUjKNYOKjYkhfqAYa52XfiKXT4xRc
+ALIpU3ltu4JSO7/oFtDuwr0PCwjm7oFKQlN1CuhTI/GlRlHglyvwx2ZucNfQ7+gN
+Seqi1g09cceIcNT/R6SCyRQ/2rqNz0tGTiuCAnrw0dkCrp2chL8o1xvvNZUctu6A
+CXclAhcXC44VX+E19ER/RWEyAN7YQOcDuSiKsrzYJvquCcWBSRkVyNBNqrqNB8TN
+KiYraoeSG8lHuFkzazeYG/Jw20f+fMic35AlIF/fhNcvbPeV/Ol/3QyhTH66jJ6w
+7rr92kR5kcPcKu60JdooggKHYmpRTdGwO+TjqpTiKOuWPwcHKDufZcpNU//2fq00
+zugVf7l7JMN4tOktxm70q7nBqwK+q+scsweH/zOT0ixKManA0JKqgS9AIXLg7Nvx
+ao271w5kgPRz7YnNE3Biw2B2qEK0uKF/DchIxBAgFSns6ioiTs+kwWo70Do08RkU
+Ae1uckXZd3S85RK20Gz3uGX3tS5JdeNoJoxQ3Xr4ta2GmWTU9CQfgL4K/0ThGXzP
+5BRY7r9re55wbIaNXUQVvFhMhoPH1wcOFXDINyohAtVI0ysjP2zTANlnbnCLCorG
+7FGxkYuh4xo7R/zBLeyt0NTMKHMfPkz9I9uIOz5+yvwPow23Wds=
+=//TR
+-----END PGP SIGNATURE-----
+
+--=-VtuV1HUGkvWM/tnmIfYU--
 
