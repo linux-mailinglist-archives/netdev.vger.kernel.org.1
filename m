@@ -1,232 +1,189 @@
-Return-Path: <netdev+bounces-287481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287482-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cLnNA3A6BGoqFgIAu9opvQ
-	(envelope-from <netdev+bounces-287481-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 10:46:40 +0200
+	id KJccBrQ7BGoqFgIAu9opvQ
+	(envelope-from <netdev+bounces-287482-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 10:52:04 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5851852FE2C
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 10:46:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8473552FF55
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 10:52:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4C6D13013B51
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 08:46:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 463D9307837F
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 08:50:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB833DB635;
-	Wed, 13 May 2026 08:46:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D3173E51EC;
+	Wed, 13 May 2026 08:50:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DwTMoSVp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f77.google.com (mail-ot1-f77.google.com [209.85.210.77])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C27A3E3C75
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 08:46:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC67E3E0240
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 08:50:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778661996; cv=none; b=tFMnakU9ny0en6KOjNbgCwhqu0HJN0xbmMAXJbC9s+9FJLWk+EJ4t2NF0xNXLC8zqwCxszKEz1ryQ/qq8MErp1zFc00w0HhIUZpjptbJEo6OEr6u1FHYOX6j12bR48XCjfyuam/Tpdq9jhR4YZ8lC47bZXvedcPwGbnjILoJrJw=
+	t=1778662243; cv=none; b=bamnkUjxIe7XC+hH8J60PMcAgqWhe4FFiGkta4UPHC5GVh8wN759gXoLQh/dHlV71R4AgRdwCaXQEldwj2nctrH/GNOOl3gSTLN6JAb7A5h0eYx0lEcY7u/D3tX8JW7QOXiHlI8h4Xe3Y5RcU5TxIaCkTk31ovl3mBL/rlZspGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778661996; c=relaxed/simple;
-	bh=PyEIBIxmz3giPUp3x32NzdQIix779nXG1mrMvVkCPy0=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Q3cS91+X8T6c5k9AmnfXHuX1TOpM61ZscOcw0a+Y1hP88bYdYnSU3oMtM/MjQVyXp4vxM7zguTHQrvIFQcUMmtfKNgirPJ5UBSfTQuizX1S2R+z8hdIVk2kTL7+aFZ3pIlDCAtzOeheguyXBY7imT1cyu47P+2D4ybRPUmKNji0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f77.google.com with SMTP id 46e09a7af769-7dcda4880efso1683874a34.0
-        for <netdev@vger.kernel.org>; Wed, 13 May 2026 01:46:34 -0700 (PDT)
+	s=arc-20240116; t=1778662243; c=relaxed/simple;
+	bh=3atT8USYLIyolOIkhccSjZU/S/v3HIGIn0LtMDF2p5M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kf/dzjGMcNW4MMbFMFxhMwR09NuzecLCWwtAVnHIWV1gvnkjfV5BJncgLBDcWvRD6QWeAwEwNVLXjVbWovU8T4f6Afl7vgDUd8iUl5Zsi7g8oGpCjS6CuFoq9chnu0wTZf5FHAAR62MKaXaLocM83dFKw08/kdEJrP8sdxQw4aU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DwTMoSVp; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4891f625344so59266925e9.0
+        for <netdev@vger.kernel.org>; Wed, 13 May 2026 01:50:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778662240; x=1779267040; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pcw11gCqq0VyT35kEJZv5m0sbkpjx3GDV6qa/qW2fn0=;
+        b=DwTMoSVpLsanxE8CtUA3Q9WtxQ+80kxmf0smirjXzld9yQJRbkVYDGvZz3Kz0lPzZa
+         NxfQfXgphsMKYH+RzvbjRjSrB3j96N19BAnSOHGrHM6H3lkZc6WI/BbryEtkFr+HrkS/
+         Ms/FdEtV5d9qKq/ar1libMyVpzjGvfF1eP1+qPzjPWIBOEoj/bBTcgswWdlfJChL/Xiw
+         7wfYgPv778vHYCDOcJfzJSmRgMBDZkkcZtUxcuURbD/OwJuVmT16jguia6bqN/3DEX9p
+         EUfKktfvLbGRf5hyDvXfMVMJqOCK+IO4ouKjb1QVq4jUg5fzbpUKKJiWNfS2XrD4jAg/
+         2HMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778661993; x=1779266793;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zzuatPOb18GIRgLXk8GLq927I0Y+J1KKrLrVWO103Zs=;
-        b=O9g4BD6clBUbk2sFJLVGafJKl7hchRlhUYRnwZehEgkJSIQ5FC6Lu5vpF068s/lIh+
-         WudxtwLHG7Txhe6MVNPwMq9NqCQVjAT43z0cteAgOPMgP5qAQ8eRf7R8kpkY7fQX5ptb
-         jHGmW7gC642E88hjxdLVx1W+s05PEaN3D49o2oowiSzv3oHNMXpubPxaZRrKJ+56YwOh
-         0gxTNPVhPkrL+U14asLngo7vA/3tIy2V2exSCNmbzIz36+buRIcKQJi54+jamn/IwELz
-         m7XbecIpTrFv6959zo4SQEaG52FCZwriXn6jQW6Fh37iBE1Z64wMhW95ojWSWOhe8Zh/
-         GLfg==
-X-Forwarded-Encrypted: i=1; AFNElJ8vveQwj6ghrHefWroUaCurmOKTmbxi1RJ0e/cL0kf0HaQ8HJcevZ4iBmpc4+IlR3foft2MG/o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoZ/eKydYkKdA9685N8s+Xnu1QLlITawpQ0L1qitmZUAEHvDwQ
-	Np7BQ4fbaUBX9IoOpvHwh0/0U8EWP8sCoTghW701IRDdxA9SBBG5sNManETegsPGrnFuH3pGcp+
-	r7cI9cHpf5r4R+Ml+882CITiparnnY3yQq51ie49iAEHxngsb/w+s0zntA80=
+        d=1e100.net; s=20251104; t=1778662240; x=1779267040;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=pcw11gCqq0VyT35kEJZv5m0sbkpjx3GDV6qa/qW2fn0=;
+        b=llOycc50H8mVTkpS8Iify+92DKtJSpCEnfYFsy452v/2Z9Dsx/0pdmHyVzG9PkS3y3
+         ENVEjcEVlSDRw+Y2Go5cYyPT5IYeqptYjuwHhUFz4gFyNGWttl/psxrA7dRv60JoVITH
+         KwXSOrbJj1/BdJ2DqNTkqC70Gz6sD3DeLAaHu6qFr5+A/PCqT8Qti8cMllrLRHLaZhO7
+         uidozkn00f4KWPayuvnyY4GO7yWaUkI8oXEevIAZgi8Zmqhuc4wkuDbG2cQkYhiLVNoL
+         otCycYeRWu6wemHoGr1U4Xv8ekQxmO8XfyeQ1HUzZIO/iyN4Vp0uOzCAsTXL6Pl4aNBt
+         sMVw==
+X-Forwarded-Encrypted: i=1; AFNElJ8O7i6r3Zs8bN6XxV3/TVKycobesh2YfMSc5LLMO2U+yp3TEwqNPgQBDFDuDVox8IeQZFvF1Js=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyrj/Iwhb7i+AtfDGVJqtqpwncJ/U/4HA2i/7YC9gjMdBXteTAg
+	bbywm+YSg7URQZ0EGCangdgq1BsPjQwB4Ds5+06Od8EzNdl4nA3/gDaH
+X-Gm-Gg: Acq92OF4V1dbmX/2xjv7EytoPzbKqU06zZLn73jyOpzhWFd6sVHL5gRSBNW9rOAenxF
+	yXOEinf3jNKnFeZlMISMhBL73vs0onmQH1vl+Amn3s0JuHxnU6cxgDVoa9ovuRgZA7S4wxvctXc
+	bclwBUqp0mvzQmPQj3N/gK981u2Hr5NRudKNzR+WlMCy7ulvg10V5K1Dq36E+aYdnYuWu7YTLdr
+	pLQpdqv97Pe215TQCXlgSBWi5tPwvBlskZERganWJ9LWTbLVs0ZrK6uxypgy58UOJ5NI6JpKsuB
+	rb7ozXPDzoRXZoPp/NM1p4vl0hatCOB1w6hCmB2Uh0hKnMnl1sN9Q/bL6N+1Li4ZJtANPbGKx2v
+	DiHq/TE/KZHJJxe2PIV2zrOeSSJaJ088c/0/zFNx1LNE4hbOPkjl9h0YQcE1QyKS9xZC5L/UkHg
+	lXSM+tc9QMeNMerzJSAKYsubGCGid7M0xKwLR9Q4I5vCpw7os4ecj1c1AulxSS
+X-Received: by 2002:a05:600c:45cd:b0:485:3c2e:60d5 with SMTP id 5b1f17b1804b1-48fc971f0ecmr33004645e9.2.1778662240054;
+        Wed, 13 May 2026 01:50:40 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e8e62944bsm38225035e9.8.2026.05.13.01.50.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 May 2026 01:50:39 -0700 (PDT)
+Date: Wed, 13 May 2026 09:50:38 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Jann Horn <jannh@google.com>
+Cc: Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima
+ <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn
+ <willemb@google.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ John Fastabend <john.fastabend@gmail.com>
+Subject: Re: [PATCH] net: block MSG_NO_SHARED_FRAGS in sendmsg()
+Message-ID: <20260513095038.116dcb34@pumpkin>
+In-Reply-To: <20260512-msg_no_shared_frags-v1-1-55ea46760331@google.com>
+References: <20260512-msg_no_shared_frags-v1-1-55ea46760331@google.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2113:b0:69b:5486:e85 with SMTP id
- 006d021491bc7-69b78dd8399mr1219958eaf.36.1778661993613; Wed, 13 May 2026
- 01:46:33 -0700 (PDT)
-Date: Wed, 13 May 2026 01:46:33 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a043a69.170a0220.1fd042.0004.GAE@google.com>
-Subject: [syzbot] [net?] possible deadlock in rlb_choose_channel (2)
-From: syzbot <syzbot+1db58dbbccbf93c65c83@syzkaller.appspotmail.com>
-To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	jv@jvosburgh.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 5851852FE2C
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 8473552FF55
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=4caf64b1ee83dac0];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_FROM(0.00)[bounces-287481-lists,netdev=lfdr.de,1db58dbbccbf93c65c83];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,appspotmail.com:email,goo.gl:url,storage.googleapis.com:url,googlegroups.com:email,syzkaller.appspot.com:url];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-287482-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[google.com,redhat.com,vger.kernel.org,gmail.com];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.992];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	SUBJECT_HAS_QUESTION(0.00)[]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Hello,
+On Tue, 12 May 2026 16:02:03 +0200
+Jann Horn <jannh@google.com> wrote:
 
-syzbot found the following issue on:
+> This change should cause no difference in behavior; it just cleans up some
+> hazardous code that could have become a problem in the future.
+> 
+> MSG_NO_SHARED_FRAGS is a kernel-internal flag that cancels the effect of
+> MSG_SPLICE_PAGES, another kernel-internal flag that influences the
+> data-sharing semantics of SKBs.
+> 
+> Prevent passing this flag in from userspace via sendmsg() by adding it to
+> MSG_INTERNAL_SENDMSG_FLAGS.
+> 
+> This is not currently an observable problem because MSG_NO_SHARED_FRAGS
+> only has an effect if kernel code adds MSG_SPLICE_PAGES to it.
+> The only codepath that adds MSG_SPLICE_PAGES to user-supplied flags from
+> which MSG_NO_SHARED_FRAGS hasn't been cleared is the path
+> tcp_bpf_sendmsg -> tcp_bpf_send_verdict -> tcp_bpf_push, and that is not a
+> problem because tcp_bpf_sendmsg always intentionally sets
+> MSG_NO_SHARED_FRAGS anyway.
 
-HEAD commit:    c21b90f77687 x86/CPU/AMD: Prevent improper isolation of sh..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10ec7dba580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4caf64b1ee83dac0
-dashboard link: https://syzkaller.appspot.com/bug?extid=1db58dbbccbf93c65c83
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+Should that be inverted to an explicit list of valid flags?
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Unfortunately it doesn't look like calls with unsupported flags can be
+errored - which actually means that no new ones can be allocated for
+new functionality.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/2f3edabe3b67/disk-c21b90f7.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/539b63753e79/vmlinux-c21b90f7.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/48e6e7cbc4ca/bzImage-c21b90f7.xz
+-- David
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1db58dbbccbf93c65c83@syzkaller.appspotmail.com
+> 
+> Signed-off-by: Jann Horn <jannh@google.com>
+> ---
+>  include/linux/socket.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/socket.h b/include/linux/socket.h
+> index ec4a0a025793..1a4d0d128a13 100644
+> --- a/include/linux/socket.h
+> +++ b/include/linux/socket.h
+> @@ -357,7 +357,7 @@ struct ucred {
+>  
+>  /* Flags to be cleared on entry by sendmsg and sendmmsg syscalls */
+>  #define MSG_INTERNAL_SENDMSG_FLAGS \
+> -	(MSG_SPLICE_PAGES | MSG_SENDPAGE_NOPOLICY | MSG_SENDPAGE_DECRYPTED)
+> +	(MSG_SPLICE_PAGES | MSG_SENDPAGE_NOPOLICY | MSG_SENDPAGE_DECRYPTED | MSG_NO_SHARED_FRAGS)
+>  
+>  /* Setsockoptions(2) level. Thanks to BSD these must match IPPROTO_xxx */
+>  #define SOL_IP		0
+> 
+> ---
+> base-commit: 5d6919055dec134de3c40167a490f33c74c12581
+> change-id: 20260511-msg_no_shared_frags-d557c14e487b
+> 
+> --  
+> Jann Horn <jannh@google.com>
+> 
+> 
 
-ip6_tunnel: ip6tnl1 xmit: Local address not yet configured!
-ip6_tunnel: ip6tnl1 xmit: Local address not yet configured!
-============================================
-WARNING: possible recursive locking detected
-syzkaller #0 Tainted: G             L     
---------------------------------------------
-kworker/u8:3/47 is trying to acquire lock:
-ffff88807a618e98 (&bond->mode_lock){+.-.}-{3:3}, at: spin_lock include/linux/spinlock.h:342 [inline]
-ffff88807a618e98 (&bond->mode_lock){+.-.}-{3:3}, at: rlb_choose_channel+0x37/0x19a0 drivers/net/bonding/bond_alb.c:562
-
-but task is already holding lock:
-ffff88807ffa0e98 (&bond->mode_lock){+.-.}-{3:3}, at: spin_lock_bh include/linux/spinlock.h:348 [inline]
-ffff88807ffa0e98 (&bond->mode_lock){+.-.}-{3:3}, at: rlb_update_rx_clients drivers/net/bonding/bond_alb.c:466 [inline]
-ffff88807ffa0e98 (&bond->mode_lock){+.-.}-{3:3}, at: bond_alb_monitor+0xe8a/0x17e0 drivers/net/bonding/bond_alb.c:1618
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&bond->mode_lock);
-  lock(&bond->mode_lock);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-7 locks held by kworker/u8:3/47:
- #0: ffff8880516b7140 ((wq_completion)bond5#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3277 [inline]
- #0: ffff8880516b7140 ((wq_completion)bond5#2){+.+.}-{0:0}, at: process_scheduled_works+0xa35/0x1860 kernel/workqueue.c:3385
- #1: ffffc90000b77c40 ((work_completion)(&(&bond->alb_work)->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3278 [inline]
- #1: ffffc90000b77c40 ((work_completion)(&(&bond->alb_work)->work)){+.+.}-{0:0}, at: process_scheduled_works+0xa70/0x1860 kernel/workqueue.c:3385
- #2: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
- #2: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:838 [inline]
- #2: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: bond_alb_monitor+0xf8/0x17e0 drivers/net/bonding/bond_alb.c:1546
- #3: ffff88807ffa0e98 (&bond->mode_lock){+.-.}-{3:3}, at: spin_lock_bh include/linux/spinlock.h:348 [inline]
- #3: ffff88807ffa0e98 (&bond->mode_lock){+.-.}-{3:3}, at: rlb_update_rx_clients drivers/net/bonding/bond_alb.c:466 [inline]
- #3: ffff88807ffa0e98 (&bond->mode_lock){+.-.}-{3:3}, at: bond_alb_monitor+0xe8a/0x17e0 drivers/net/bonding/bond_alb.c:1618
- #4: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
- #4: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:838 [inline]
- #4: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: arp_xmit+0x23/0x270 net/ipv4/arp.c:663
- #5: ffffffff8e95cdc0 (rcu_read_lock_bh){....}-{1:3}, at: local_bh_disable include/linux/bottom_half.h:20 [inline]
- #5: ffffffff8e95cdc0 (rcu_read_lock_bh){....}-{1:3}, at: rcu_read_lock_bh include/linux/rcupdate.h:891 [inline]
- #5: ffffffff8e95cdc0 (rcu_read_lock_bh){....}-{1:3}, at: __dev_queue_xmit+0x2b6/0x3950 net/core/dev.c:4791
- #6: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
- #6: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:838 [inline]
- #6: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: bond_start_xmit+0xb4/0x1900 drivers/net/bonding/bond_main.c:5591
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 47 Comm: kworker/u8:3 Tainted: G             L      syzkaller #0 PREEMPT(full) 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
-Workqueue: bond5 bond_alb_monitor
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_deadlock_bug+0x279/0x290 kernel/locking/lockdep.c:3041
- check_deadlock kernel/locking/lockdep.c:3093 [inline]
- validate_chain kernel/locking/lockdep.c:3895 [inline]
- __lock_acquire+0x253f/0x2cf0 kernel/locking/lockdep.c:5237
- lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5868
- __raw_spin_lock include/linux/spinlock_api_smp.h:158 [inline]
- _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:158
- spin_lock include/linux/spinlock.h:342 [inline]
- rlb_choose_channel+0x37/0x19a0 drivers/net/bonding/bond_alb.c:562
- rlb_arp_xmit drivers/net/bonding/bond_alb.c:680 [inline]
- bond_xmit_alb_slave_get+0x1071/0x20a0 drivers/net/bonding/bond_alb.c:1493
- bond_alb_xmit+0x24/0x40 drivers/net/bonding/bond_alb.c:1528
- __bond_start_xmit drivers/net/bonding/bond_main.c:5569 [inline]
- bond_start_xmit+0x6a2/0x1900 drivers/net/bonding/bond_main.c:5593
- __netdev_start_xmit include/linux/netdevice.h:5368 [inline]
- netdev_start_xmit include/linux/netdevice.h:5377 [inline]
- xmit_one net/core/dev.c:3888 [inline]
- dev_hard_start_xmit+0x2cd/0x830 net/core/dev.c:3904
- __dev_queue_xmit+0x14d9/0x3950 net/core/dev.c:4870
- NF_HOOK+0x33a/0x3c0 include/linux/netfilter.h:-1
- arp_xmit+0x16c/0x270 net/ipv4/arp.c:665
- rlb_update_client+0x2a8/0x6b0 drivers/net/bonding/bond_alb.c:455
- rlb_update_rx_clients drivers/net/bonding/bond_alb.c:473 [inline]
- bond_alb_monitor+0xf6a/0x17e0 drivers/net/bonding/bond_alb.c:1618
- process_one_work kernel/workqueue.c:3302 [inline]
- process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3385
- worker_thread+0xa53/0xfc0 kernel/workqueue.c:3466
- kthread+0x388/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
