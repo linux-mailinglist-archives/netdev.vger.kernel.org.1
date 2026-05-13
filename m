@@ -1,172 +1,218 @@
-Return-Path: <netdev+bounces-287587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287588-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UM+kDpZ4BGqpKAIAu9opvQ
-	(envelope-from <netdev+bounces-287587-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 15:11:50 +0200
+	id qKdqHRV6BGoPKgIAu9opvQ
+	(envelope-from <netdev+bounces-287588-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 15:18:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDD5B533BF5
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 15:11:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9376533DED
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 15:18:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7334030C60F8
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:53:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8BB753255D0A
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:54:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 771AE4963AA;
-	Wed, 13 May 2026 12:49:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D40F4C8FE5;
+	Wed, 13 May 2026 12:49:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="sgVlDKOd"
+	dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b="anv6YcyT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2645B48A2DD
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 12:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EFD34C6F1C
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 12:49:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778676587; cv=none; b=uI2KLyMAuczJgM0kKeJ50Q6jRiimeycVq55T+o5C5sypScR9a8Nyaabzz95MYa9VGB355JScIkHLpHGxiD+W5bjysa6LhfvrNVBtPNSJ8CNmBeVUKaXwDvS0xlgE8uPmDyjOcb7dAB4S5S5OwxVFmnebA4RWWyMjTXwat39Pkv4=
+	t=1778676594; cv=none; b=EVdxSAJ4SfYomzsdLjkd8a33WhGMrLsbrlbX9sBOQ2qB7VqmfWNzKeYbJxHF3UXqv7a5sIwi1ejcpFaTRN6xTZTE3TfPHE1O1VXISlaJNxBkD89RkDBaBMxJSXjyVLGMIwN5YMWpG3nByF3OvKPNhnJxIHqMUYAdtfppFuC/GSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778676587; c=relaxed/simple;
-	bh=CfNcVj10qBM9P9PLyzMgngcL8HLdsqCqIUisDHfByCc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iKcl2Tb4mm2oQJWVHHEKRewqOzXihEopLgnnaq9Rf3JjAjoIZ3FGoiJ2hWYQ3OK9eL6/wx3nrGpKNdFSPBJGNwvBmG3bE2sLXGfK/YSeel8O6GFGFNu9sst8Iuk5F8t44lAiirKGN7Eqwbb9PUMHSyGSNnSQOwSZFhEwr0BdOx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=sgVlDKOd; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 917371A3592;
-	Wed, 13 May 2026 12:49:42 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 636855FE21;
-	Wed, 13 May 2026 12:49:42 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2CA8A11AF9021;
-	Wed, 13 May 2026 14:49:33 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1778676581; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=RtgLHFuD2Bclv96Rf+7+3DMG5yroMjMm+9TZ0Z3c6RY=;
-	b=sgVlDKOdp65Wsq8xbOV2LpNP1xjlUt1OUDJmNcahu2ETny/h1e9ju9EmoDvkugwEsphpBU
-	6jyIPCFFrm/7atPQrUH0ofwNnObeg/WAflYnbtyFCwfVFrGp1MVx86MbxKlfARkO1UyEhs
-	IMJzkhzlZ5jSPZ8ESzRZj+nxnAB8q1V3SUq2WxxCDB8UJD3/f6t6OVcuYw9OMng/1fFIvS
-	P3aeXpdtyAVzQ9fPOI9D70ZIY/otIeCL0RctoRVUMQZzKcYSFQJVabp9H9JBl23AvFSyy6
-	VWUeuX6eEXHBJvMIC0xk3VmgS5B97IkoxDBgWVtWjyMFB2f3qmtUmAopoO2T+A==
-Message-ID: <3c8c7d5e-9f21-4a2b-aec3-d79d68559e42@bootlin.com>
-Date: Wed, 13 May 2026 14:49:32 +0200
+	s=arc-20240116; t=1778676594; c=relaxed/simple;
+	bh=nI7YOzNufegrzrQMgLxNrwAqGVHXqCpVokhfGj2uJHs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HXoH5iS15KxoxOS5cT4TJ8pTvAlMvLarcdDHyk7YeE2WqVQlbijD1CQamIE0SUX2rYaKK7tRY0MkuEfkX0wc+OWH5DN/JzpidaTVACIyIJRnppMi9mHmw8A9iu9EiwPn28IGy9qv8wHjnaebWK5xQ+fZOwH1Yqr5lzwf2K5q7pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com; spf=pass smtp.mailfrom=riscstar.com; dkim=pass (2048-bit key) header.d=riscstar-com.20251104.gappssmtp.com header.i=@riscstar-com.20251104.gappssmtp.com header.b=anv6YcyT; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riscstar.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-488b8bc6bc9so42788265e9.3
+        for <netdev@vger.kernel.org>; Wed, 13 May 2026 05:49:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=riscstar-com.20251104.gappssmtp.com; s=20251104; t=1778676590; x=1779281390; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=u3zF8kES347TPoEbvDwkqQbzfa05yrB1P5lQaxsmy/k=;
+        b=anv6YcyT1kkN39tGg5nc5kZAg7zQpsefqN7H9k6nFlR+iDHfySQCgjAqbF1Vit5gd6
+         HGvL00FO0ndFtwsAGqbZi7Lq+ftGXgmMie1BQilW144IsLtBbTz8EenRf2GoJtXZXHct
+         8L45vMDjh070y3wWVV3Db08kBBIq0CLPhLkZKaHQuey9Hyn9kLtUPM6d/ueYS1lLmDYi
+         DWzO+AFK5ewpdDMcSm2BQfdphnr1Dy5xQINNfDbQhJegZhXsUoscwrcjBPJAQ5hersSM
+         Dk6KDwz/c9bXB9CgGMtY4vaFx65TH67HQJC9zt82spg6F/gWQGD3VkvQOfMJy9D4lOVf
+         BfGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778676590; x=1779281390;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u3zF8kES347TPoEbvDwkqQbzfa05yrB1P5lQaxsmy/k=;
+        b=CqTRFSMwhQZN4MKXOYBypzYh/+e88+7W0G0O1q9CB0o3zQi5AQfA66kEnBn9qlN0Mj
+         Jz5IAGbT8l3QwAtzSwbR1GIE15WesjRAqEuQIwDJJw2lBISdvCS3deqQMbjgFMsd9lra
+         oasOrIBzKT0GuTiV9WXXz27oQa8Vj0l8i47Iy3YSqbb1IG26KlKZZA+6isbxs5QFHtBc
+         qV9XpQd9kiN8emXk5H9hgdGKm/Lwuacr/iJaz+cQENnEUYnYFEK70ox8s5DwMyqrER41
+         gCcFqV2XCwU+1gXyAAt6F/jyawsjupyAgHL4ym8YDdJhCH9tp1OyOPYmUpfHbnifYZlf
+         roFA==
+X-Forwarded-Encrypted: i=1; AFNElJ9C35xBbwd+rIZ+CJ2xWrXgKbh6DTI0bsgZHBcj+Dq1/PNgr+m3HL0+ULP84ujwL2JP+lgeg6o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTCTmFI1Ynzcr2ciFuXmHaGl6rTICo4w0Pbe7djddv9uD+YRXa
+	BP1l4Ye46+i22d6uPqQxZNC1JUnCzsOM/SiShCAqcjpH3VXx6SZIDpjzRor/GAt9gHs=
+X-Gm-Gg: Acq92OEIxKWVMlG51dxBJVbvGzutb781QNzdoGdhWc0P0c4lSwSR1TXFxZULIE7wLZP
+	P85BnEpkeYMfcf4lEmmUwXGSZvMDyCKZsq5x9HFQ9763K86VbQSd4AwgRKJd2glyaaEgPDVSJzn
+	uTcJwGJi+XeY7i9lPYpFns0r2wfLKjO/wJB3Kwght/Z166w6Tk6s0I8osapt22RZiEjEtNUS0YR
+	AYDcuI8/X4J84cgc1+B9PMbfjuv09fFLqtfjCkiKyDO1T9+DXmdchIbQMJTJRGxOGXipe4+wmHI
+	+eo721WsXhn7saTkkJRXFLe03rhU5EY1PsJnCUQiYpsM+uqGVqKEWNO5JWVPUDohJSyssySGdfl
+	WizT/c+/Nz6Q6c4QmvJgBoShtkmOF26uMhAhUF8tbPIvkbPpnPgBir0Um2NVPkA7nSMnULNmTL9
+	wdwaVHHJGOA5Mmg2D2ACcqXWTGjEroCUsqZlhPV/ouCNs8ZXUOsdsmXUE8MlVch8Xzfhs8s2ahG
+	4Lqorl8oAQgQusU1GpPZxOA20YRkGZyhiJUCHnrEGcsV+hmVsiJpUc5raFhCp/9kESXVVBo28Tr
+	R2SP1Ed6
+X-Received: by 2002:a05:600c:6305:b0:48a:5301:bb5c with SMTP id 5b1f17b1804b1-48fc9a32aeamr49565525e9.16.1778676590239;
+        Wed, 13 May 2026 05:49:50 -0700 (PDT)
+Received: from aspen.lan (aztw-34-b2-v4wan-166919-cust780.vm26.cable.virginm.net. [82.37.195.13])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fc8cd49fesm78578015e9.0.2026.05.13.05.49.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 May 2026 05:49:49 -0700 (PDT)
+Date: Wed, 13 May 2026 13:49:46 +0100
+From: Daniel Thompson <daniel@riscstar.com>
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Cc: Alex Elder <elder@riscstar.com>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, maxime.chevallier@bootlin.com,
+	rmk+kernel@armlinux.org.uk, andersson@kernel.org,
+	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org,
+	arnd@arndb.de, gregkh@linuxfoundation.org,
+	mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com,
+	alexandre.torgue@foss.st.com, ast@kernel.org,
+	boon.khai.ng@altera.com, chenchuangyu@xiaomi.com,
+	chenhuacai@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	hkallweit1@gmail.com, inochiama@gmail.com, john.fastabend@gmail.com,
+	julianbraha@gmail.com, livelycarpet87@gmail.com,
+	matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
+	prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
+	rohan.g.thomas@altera.com, sdf@fomichev.me,
+	siyanteng@cqsoftware.com.cn, weishangjuan@eswincomputing.com,
+	wens@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 12/12] arm64: dts: qcom: qcs6490-rb3gen2: enable
+ TC9564 with a single QCS8081 phy
+Message-ID: <agRzai1UoHEIotZe@aspen.lan>
+References: <20260501155421.3329862-1-elder@riscstar.com>
+ <20260501155421.3329862-13-elder@riscstar.com>
+ <01d6ea18-e022-41c7-a642-ac0321957923@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 03/10] net: phylink: Register a phy_port for
- MAC-driven SFP busses
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, Heiner Kallweit
- <hkallweit1@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
- Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
- Romain Gantois <romain.gantois@bootlin.com>,
- Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-References: <20260403123755.175742-1-maxime.chevallier@bootlin.com>
- <20260403123755.175742-4-maxime.chevallier@bootlin.com>
- <7838a71b-ae3a-4681-8516-c450ea8a5321@lunn.ch>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <7838a71b-ae3a-4681-8516-c450ea8a5321@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Rspamd-Queue-Id: BDD5B533BF5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <01d6ea18-e022-41c7-a642-ac0321957923@oss.qualcomm.com>
+X-Rspamd-Queue-Id: C9376533DED
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.06 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[riscstar-com.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[riscstar.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287587-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com,csgroup.eu,nxp.com,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[riscstar.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	TAGGED_FROM(0.00)[bounces-287588-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DKIM_TRACE(0.00)[riscstar-com.20251104.gappssmtp.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@riscstar.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[50];
+	TAGGED_RCPT(0.00)[netdev,kernel,dt];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:mid,bootlin.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[riscstar-com.20251104.gappssmtp.com:dkim,riscstar.com:email,aspen.lan:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,checkpatch.pl:url]
 X-Rspamd-Action: no action
 
-Hi Andrew,
+On Fri, May 08, 2026 at 04:03:36PM +0200, Konrad Dybcio wrote:
+> On 5/1/26 5:54 PM, Alex Elder wrote:
+> > From: Daniel Thompson <daniel@riscstar.com>
+> >
+> > The QCS6490 RB3Gen2 includes a Toshiba TC9564 (a.k.a. Qualcomm QPS615).
+> > TC9564 is an twin Ethernet-AVB/TSN bridge with an integrated PCIe switch.
+> >
+> > There are multiple builds of RB3Gen2 with components included/excluded.
+> > That means whether or not there is a phy attached to eMAC0 depends on
+> > the exact board. However all versions include a TC9564 combined with a
+> > single QCS8081 attached to eMAC1.
+> >
+> > Add properties to the existing PCI nodes to describe how the TC9564 and
+> > QCS8081 are connected to each other (and to the host SoC).
+> >
+> > (Note: "pci1179,0220" is documented in the "net/toshiba,tc956x-dwmac.yaml"
+> > binding, but checkpatch.pl doesn't recognize that.)
+>
+> This should probably go under the --- line
 
-On 4/15/26 01:38, Andrew Lunn wrote:
->> This phy_port represents the SFP cage itself, and not the module
-> 
->> +static int phylink_create_sfp_port(struct phylink *pl)
-> 
-> I'm thinking about naming here. If this represent the cage, why not
-> call this phylink_create_sfp_cage_port(). I assume as some point there
-> is going to be something for the module, and it seem like the naming
-> is going to be confusing.
-> 
->> +{
->> +	struct phy_port *port;
->> +	int ret = 0;
->> +
->> +	if (!pl->netdev || !pl->sfp_bus)
->> +		return 0;
->> +
->> +	port = phy_port_alloc();
->> +	if (!port)
->> +		return -ENOMEM;
->> +
->> +	port->is_sfp = true;
->> +	port->is_mii = true;
->> +	port->active = true;
-> 
-> If this is a cage, not a module, does is_sfp = true make sense?
-> 
-> And what does an active cage mean?
+I'll leave that with Alex...
 
-My bad I realised that I forgot to reply to this comment :( So, is_sfp 
-is meant for sfp cages, I'll followup with some documentation update.
 
-Active means we want this port to be used. For now, every port we 
-represent is active. The next step for that work will implement the 
-muxing and port switchover logic, where the active ports will represent 
-the ones that actually got the link. For now, we don't have the logic
-to expose and use that.
+> > +	qep_1p8: regulator-qep-1p8 {
+> > +		compatible = "regulator-fixed";
+> > +		regulator-name = "qep_1p8";
+> > +		gpio = <&pm7325_gpios 8 GPIO_ACTIVE_HIGH>;
+> > +		regulator-min-microvolt = <1800000>;
+> > +		regulator-max-microvolt = <1800000>;
+> > +		enable-active-high;
+> > +		regulator-always-on;
+> > +	};
+>
+> If I'm reading the schematics right, this is only required for the PHY
+> - is it collapsible, or does it really need to be a-on?
 
-In retrospect, It's something that should've been added in later steps.
+It could be turned off if the socket isn't in use but it would prevent
+hotplug detection from working. In practice that means it can only
+collapse during suspend/resume.
 
-Maxime
+However the real reason we jammed this on is because I couldn't find a
+way to get the phy/mdio code to turn one on. However it is possible to
+add regulator support to MDIO devices by extending their existing logic
+to manage resets so it can also manage a regulator. It comes out fairly
+clean so we can add that to the patch set and remove the
+regulator-always-on.
 
-> 
-> 	Andrew
 
+> > +	qep_irq_pin: qep-irq-state {
+> > +		pins = "gpio101";
+> > +		function = "gpio";
+> > +		drive-strength = <2>;
+> > +		bias-disable;
+>
+> There's no pull-up onboard, should we use the on-chip one?
+
+It is configured the same as lt9611_irq_pin (which I couldn't see a
+pull-up for).
+
+I switched the interrupt trigger to active-low based on other feedback
+on the patchset and the counts in /proc/interrupts remain unchanged
+(with a single figure value). It certainly doesn't look like the irq
+line floats when the PHY interrupt is deasserted.
+
+
+Daniel.
 
