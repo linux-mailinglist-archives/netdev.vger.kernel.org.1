@@ -1,121 +1,181 @@
-Return-Path: <netdev+bounces-287707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287715-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CCR4EAfGBGrdNwIAu9opvQ
-	(envelope-from <netdev+bounces-287707-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 20:42:15 +0200
+	id CGjdIHTHBGrdNwIAu9opvQ
+	(envelope-from <netdev+bounces-287715-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 20:48:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95A57539261
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 20:42:14 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38C2A539402
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 20:48:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2CB77300F9E9
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 18:36:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BCEFB3018C2F
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 18:47:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AE7F3A8755;
-	Wed, 13 May 2026 18:36:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 242B63AE6FD;
+	Wed, 13 May 2026 18:47:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="miiOQM0v"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="awT7zjdg"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901B435B632
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 18:36:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA2E3AE6E2;
+	Wed, 13 May 2026 18:47:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778697364; cv=none; b=CxFYQMH4B9Srn8k+bmdeVuE8bYTdpItvHqJQ/fosfvUJsCDu9PykYb3pUVpTaqXS1MhMmiRHx9wtC4lUCICTUrxx0AL62Wkv3cofbVJIhuKrv0pSo5NIFFi2kBk5FAGn9ZvlxUYiEvWLl8nev3KzsF9zHMYRMeoSyApIHdqM/EY=
+	t=1778698074; cv=none; b=ccRQ7a0gJYNy9RQFPsIpitZwiY8OcLQ2RYxtK/D6Wb6reWYjGRB4S6qF0xeYam50Va8VGwhok7EmzxyRphwMByk0bdnfkunv0OwAS4aS3H7GYgX06O/l3DQdIf6zwD6zR9chAIQz6oZSrr24Xg//pNB+vwZV+CH6QjHr9xWRZQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778697364; c=relaxed/simple;
-	bh=+J8vDguIcTbUHW1595rtimwASjcABHZYtC2lDRVvj58=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=R+Uqk6GPnA1bdNn+qksaRb50efjC2StSJVKxyoAiKyOPc0oVxbsLhHo+1IhWHmiOQviUuCeMtbcrwsM5+Ss/Z4FujuaOTNAag+Wbc1svsjoOAg+TqssEfqHz9XiJKsf+wTX/16m+teGGGvdOLuRnzHxcfmQNnjc3I1pQI5iwZ5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=miiOQM0v; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 13 May 2026 20:35:56 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1778697360;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KZahbxcLMk4nFiXMIuxR7pAqjPA9tjQUCG0y2N20ur4=;
-	b=miiOQM0voUMout4J80B/M5yKxTaXCtTgD+KAfkWUCITTOCOycrH+VmAKy+fmLDhjr/6v1M
-	kcQag3+HWu6Rj0xPSHs4UXeIO9wVTAI94ROQN9ZwgMkiZSG3ri+AaMqGYjxZ/27OA9G05Q
-	GzRj26YFX6r0xXyMSgKKw8qWO1huqXU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Luka Gejak <luka.gejak@linux.dev>
-To: netdev@vger.kernel.org
-CC: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- fmaurer@redhat.com, luka.gejak@linux.dev
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_net-next_v6_0/2=5D_net=3A_hs?=
- =?US-ASCII?Q?r=3A_strict_supervision_TLV_validation?=
-In-Reply-To: <20260513182657.20346-1-luka.gejak@linux.dev>
-References: <20260513182657.20346-1-luka.gejak@linux.dev>
-Message-ID: <7D68E562-7941-46EF-B4B0-AE0DBAD15FC0@linux.dev>
+	s=arc-20240116; t=1778698074; c=relaxed/simple;
+	bh=erC7woJFVDIP0guJSuazt/H++XssVTUYjKzmOshpQVM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dUqlOiKs+JW7uTaQ8KXImN9alLH45yVh6SHtLn8N+/B322OFrVVvHhYl9QJJ39DNDO6cQRrHhHQkrsvuM5TSAZdwPwSa0rDv+6zpOweEs08aUV/B22pU9KviJKaVBAspJprLNPbfRQYP/p2CGV/+vKNvBofvhs0Qc9KC8U33hxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=awT7zjdg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D632C2BCC6;
+	Wed, 13 May 2026 18:47:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778698073;
+	bh=erC7woJFVDIP0guJSuazt/H++XssVTUYjKzmOshpQVM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=awT7zjdgJyOru8bU9mrbyY8ZLpO77VzumzKLlauOvWte3vlcg8/FD78kX0AMye4g8
+	 FE/iB+BpRrezItb7YSnKIBHfZp/bh0eXdaA/ZfOcjHwys/NzI5T5TqPa6HMBfGXmBO
+	 1B/h845+dRPKgIngApElFKK7LhqxTlLqmPgfocAXapEVl2B63dDjbuNsG0xWNHEJmJ
+	 hvVnyZY4oc+b2zOU1xwezIuNZ7iwCflRu+L9k6JIKwWTxmDmUFcMpSs1niGL7Wz6ej
+	 7c0AlPZ++8CB/MEBhyhOD0MRWyZAEP2cGIF9rlu7/FBMxUDJLeiTDOJpxNUYF5NU8X
+	 5DKVDOMu6weJw==
+Date: Wed, 13 May 2026 21:47:49 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Haiyang Zhang <haiyangz@microsoft.com>,
+	Haiyang Zhang <haiyangz@linux.microsoft.com>,
+	Paul Rosswurm <paulros@microsoft.com>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	KY Srinivasan <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <DECUI@microsoft.com>, Long Li <longli@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Simon Horman <horms@kernel.org>,
+	Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	Dipayaan Roy <dipayanroy@linux.microsoft.com>,
+	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>
+Subject: Re: [EXTERNAL] Re: [PATCH net-next] net: mana: Add handler for sriov
+ configure
+Message-ID: <20260513184749.GI15586@unreal>
+References: <SA3PR21MB38676896F76FD9C27127DA87CA3D2@SA3PR21MB3867.namprd21.prod.outlook.com>
+ <20260508231029.GA44712@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 95A57539261
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260508231029.GA44712@bhelgaas>
+X-Rspamd-Queue-Id: 38C2A539402
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.96 / 15.00];
-	SUBJ_EXCESS_QP(1.20)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	TAGGED_FROM(0.00)[bounces-287707-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-287715-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luka.gejak@linux.dev,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:mid,linux.dev:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:email,davemloft.net:email]
 X-Rspamd-Action: no action
 
-On May 13, 2026 8:26:55 PM GMT+02:00, luka=2Egejak@linux=2Edev wrote:
->From: Luka Gejak <luka=2Egejak@linux=2Edev>
->
+On Fri, May 08, 2026 at 06:10:29PM -0500, Bjorn Helgaas wrote:
+> On Fri, May 08, 2026 at 10:47:14PM +0000, Haiyang Zhang wrote:
+> > > -----Original Message-----
+> > > From: Bjorn Helgaas <helgaas@kernel.org>
+> > > Sent: Friday, May 8, 2026 6:38 PM
+> > > To: Haiyang Zhang <haiyangz@linux.microsoft.com>
+> > > Cc: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; KY Srinivasan
+> > > <kys@microsoft.com>; Haiyang Zhang <haiyangz@microsoft.com>; Wei Liu
+> > > <wei.liu@kernel.org>; Dexuan Cui <DECUI@microsoft.com>; Long Li
+> > > <longli@microsoft.com>; Andrew Lunn <andrew+netdev@lunn.ch>; David S.
+> > > Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
+> > > Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Bjorn Helgaas
+> > > <bhelgaas@google.com>; Simon Horman <horms@kernel.org>; Shradha Gupta
+> > > <shradhagupta@linux.microsoft.com>; Dipayaan Roy
+> > > <dipayanroy@linux.microsoft.com>; Erni Sri Satya Vennela
+> > > <ernis@linux.microsoft.com>; linux-kernel@vger.kernel.org; linux-
+> > > pci@vger.kernel.org; Paul Rosswurm <paulros@microsoft.com>
+> > > Subject: [EXTERNAL] Re: [PATCH net-next] net: mana: Add handler for sriov
+> > > configure
+> > > 
+> > > On Fri, May 08, 2026 at 03:04:06PM -0700, Haiyang Zhang wrote:
+> > > > From: Haiyang Zhang <haiyangz@microsoft.com>
+> > > >
+> > > > Add callback function for the pci_driver, sriov_configure.
+> > > >
+> > > > Also disable VF autoprobe when it runs as PF driver on bare metal,
+> > > > since the hardware side may not have the VF ready immediately.
+> > > >
+> > > > Export pci_vf_drivers_autoprobe() so the driver can toggle the VF
+> > > > autoprobe flag.
+> > > 
+> > > Technically pci_vf_drivers_autoprobe() doesn't *toggle* the autoprobe
+> > > flag.  That would mean setting it to the opposite of its current
+> > > value.
+> > > 
+> > > Here I would say "so the driver can prevent autoprobing of the VFs",
+> > > which is the intent.
+> > Thanks, I will change the wording.
+> > 
+> > > 
+> > > Out of curiosity, how do the VFs eventually get probed?  I guess
+> > > there's some other mechanism that tells you when they're ready, and
+> > > you manually use sysfs 'sriov_drivers_autoprobe' to enable probing,
+> > > then bind drivers to them via sysfs?
+> > We have a user program talking to the Azure backplane to get that information.
+> > @Paul Rosswurm, do you have more details?
+> > 
+> > 
+> > > The prevention of autoprobing sounds like a critical part of this
+> > > change; might be worth saying something in the subject, because "add
+> > > sriov configure" doesn't include much information.
+> > How about "Add handler for sriov configure with VF autoprobe off"?
+> 
+> OK by me :)
 
-=2E=2E=2E
+Bjorn,
 
->Luka Gejak (2):
->  net: hsr: require valid EOT supervision TLV
->  net: hsr: reject unresolved interlink ifindex
->
-> net/hsr/hsr_forward=2Ec | 6 +++---
-> net/hsr/hsr_netlink=2Ec | 7 ++++++-
-> 2 files changed, 9 insertions(+), 4 deletions(-)
->
+I believe it is the wrong decision to allow toggling a user‑visible knob  
+without the user’s awareness. In this case, they can either disable  
+autoprobe on the PF or rely on EPROBE_DEFER. In all cases, the same
+functionality can be achieved without changing PCI autoprobe code.
 
-Just one note: This series has been resubmitted because it was never=20
-merged due to window being closed and I was instructed by Felix to=20
-resubmit it now=2E Link to old thread is [1]=2E
-Best regards,
-Luka Gejak
-[1]: https://lore=2Ekernel=2Eorg/netdev/20260413103449=2E169913-1-luka=2Eg=
-ejak@linux=2Edev/
+Thanks.
+
+> 
 
