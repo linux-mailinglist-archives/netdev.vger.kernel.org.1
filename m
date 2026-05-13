@@ -1,639 +1,232 @@
-Return-Path: <netdev+bounces-287480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287481-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ELfPGEA6BGoqFgIAu9opvQ
-	(envelope-from <netdev+bounces-287480-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 10:45:52 +0200
+	id cLnNA3A6BGoqFgIAu9opvQ
+	(envelope-from <netdev+bounces-287481-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 10:46:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D168D52FE17
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 10:45:51 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5851852FE2C
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 10:46:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4C4BC3013899
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 08:45:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4C6D13013B51
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 08:46:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35B9E3DF00D;
-	Wed, 13 May 2026 08:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UhJDfSuA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB833DB635;
+	Wed, 13 May 2026 08:46:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f77.google.com (mail-ot1-f77.google.com [209.85.210.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1273839EF2B;
-	Wed, 13 May 2026 08:45:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C27A3E3C75
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 08:46:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778661926; cv=none; b=dVzT8QeUdqu+xe7m2MGMVxNrQERPINDj1gApzTdXa0IvQJDkW7HbT1kBE72PLKwfQ7k0PyA2rtkzi57nm9PUHTBlEaWYbM9V64IUN049H+eD4LAVjogNi5OCC8pcSay+H6kp55IvHq/RTisl0MG1nW8HE9Y7JdOZjcUSWYQZ6yI=
+	t=1778661996; cv=none; b=tFMnakU9ny0en6KOjNbgCwhqu0HJN0xbmMAXJbC9s+9FJLWk+EJ4t2NF0xNXLC8zqwCxszKEz1ryQ/qq8MErp1zFc00w0HhIUZpjptbJEo6OEr6u1FHYOX6j12bR48XCjfyuam/Tpdq9jhR4YZ8lC47bZXvedcPwGbnjILoJrJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778661926; c=relaxed/simple;
-	bh=jwu+uu0rnBLvJnhGeNme6KjpiIiHqGW+NsZ7oiFUHVU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O9QslL7FTjejnFxPm+ENzSV1JRaZB5KWBPcKkSQcS7Y39XouirivJsrIEJFpw2ZhOxoEd+/j3JkM8XrCJKLE+HcGA0sLvE3ix178M+yDptn1tvB6955SD1bPHe7ikGC3QEVr4+BvI0uZqZBTDMin3RHri+VmS9WrRwLnmL/2Tjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UhJDfSuA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AA33C2BCB7;
-	Wed, 13 May 2026 08:45:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778661925;
-	bh=jwu+uu0rnBLvJnhGeNme6KjpiIiHqGW+NsZ7oiFUHVU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UhJDfSuAZmfhq3NWC8YNKCfMmzOIuJ4HqDAY8EQl+Xa2T2A83GaAnvBi0evCJE2ua
-	 OUBEMg2v3h5V8GTzC3y3MRbT+vITxx0ie0NdvRRlD9gFkq24yfkLmBUyVqwYwbhz9Z
-	 7CcRX7xByP7R7OKbxuhWLiqqQbuQvVTSWNdmPfl36kc5AXgWLT0kNrtLGaQmjcf4rV
-	 qgEjB9cyvf3hSOIXBfetkw9ekQafNBOTgfiMaoTdbA5msYIt0Eoe+wSAJutf+SHGEr
-	 HghV64GbimXQg+oaWppLGxqdvrv+pQRrC79qnYPbmow7cYDopA8VqvFFil0eRbqr7T
-	 Fpt9DOFNmQgXw==
-Date: Wed, 13 May 2026 10:45:22 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	Benjamin Larsson <benjamin.larsson@genexis.eu>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, Xuegang Lu <xuegang.lu@airoha.com>
-Subject: Re: [PATCH net-next v6 04/12] net: airoha: Move airoha_qdma pointer
- in airoha_gdm_dev struct
-Message-ID: <agQ6ItB6HFgdffCx@lore-desk>
-References: <20260511-airoha-eth-multi-serdes-v6-0-c899462c4f75@kernel.org>
- <20260511-airoha-eth-multi-serdes-v6-4-c899462c4f75@kernel.org>
+	s=arc-20240116; t=1778661996; c=relaxed/simple;
+	bh=PyEIBIxmz3giPUp3x32NzdQIix779nXG1mrMvVkCPy0=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Q3cS91+X8T6c5k9AmnfXHuX1TOpM61ZscOcw0a+Y1hP88bYdYnSU3oMtM/MjQVyXp4vxM7zguTHQrvIFQcUMmtfKNgirPJ5UBSfTQuizX1S2R+z8hdIVk2kTL7+aFZ3pIlDCAtzOeheguyXBY7imT1cyu47P+2D4ybRPUmKNji0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f77.google.com with SMTP id 46e09a7af769-7dcda4880efso1683874a34.0
+        for <netdev@vger.kernel.org>; Wed, 13 May 2026 01:46:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778661993; x=1779266793;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zzuatPOb18GIRgLXk8GLq927I0Y+J1KKrLrVWO103Zs=;
+        b=O9g4BD6clBUbk2sFJLVGafJKl7hchRlhUYRnwZehEgkJSIQ5FC6Lu5vpF068s/lIh+
+         WudxtwLHG7Txhe6MVNPwMq9NqCQVjAT43z0cteAgOPMgP5qAQ8eRf7R8kpkY7fQX5ptb
+         jHGmW7gC642E88hjxdLVx1W+s05PEaN3D49o2oowiSzv3oHNMXpubPxaZRrKJ+56YwOh
+         0gxTNPVhPkrL+U14asLngo7vA/3tIy2V2exSCNmbzIz36+buRIcKQJi54+jamn/IwELz
+         m7XbecIpTrFv6959zo4SQEaG52FCZwriXn6jQW6Fh37iBE1Z64wMhW95ojWSWOhe8Zh/
+         GLfg==
+X-Forwarded-Encrypted: i=1; AFNElJ8vveQwj6ghrHefWroUaCurmOKTmbxi1RJ0e/cL0kf0HaQ8HJcevZ4iBmpc4+IlR3foft2MG/o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoZ/eKydYkKdA9685N8s+Xnu1QLlITawpQ0L1qitmZUAEHvDwQ
+	Np7BQ4fbaUBX9IoOpvHwh0/0U8EWP8sCoTghW701IRDdxA9SBBG5sNManETegsPGrnFuH3pGcp+
+	r7cI9cHpf5r4R+Ml+882CITiparnnY3yQq51ie49iAEHxngsb/w+s0zntA80=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="NE+4h+Wyx7O1ITBi"
-Content-Disposition: inline
-In-Reply-To: <20260511-airoha-eth-multi-serdes-v6-4-c899462c4f75@kernel.org>
-X-Rspamd-Queue-Id: D168D52FE17
+X-Received: by 2002:a05:6820:2113:b0:69b:5486:e85 with SMTP id
+ 006d021491bc7-69b78dd8399mr1219958eaf.36.1778661993613; Wed, 13 May 2026
+ 01:46:33 -0700 (PDT)
+Date: Wed, 13 May 2026 01:46:33 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a043a69.170a0220.1fd042.0004.GAE@google.com>
+Subject: [syzbot] [net?] possible deadlock in rlb_choose_channel (2)
+From: syzbot <syzbot+1db58dbbccbf93c65c83@syzkaller.appspotmail.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	jv@jvosburgh.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 5851852FE2C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=4caf64b1ee83dac0];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287480-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[gmail.com,genexis.eu,lists.infradead.org,vger.kernel.org,airoha.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,airoha.com:email]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_FROM(0.00)[bounces-287481-lists,netdev=lfdr.de,1db58dbbccbf93c65c83];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,appspotmail.com:email,goo.gl:url,storage.googleapis.com:url,googlegroups.com:email,syzkaller.appspot.com:url];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.992];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	SUBJECT_HAS_QUESTION(0.00)[]
 X-Rspamd-Action: no action
 
+Hello,
 
---NE+4h+Wyx7O1ITBi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+syzbot found the following issue on:
 
-On May 11, Lorenzo Bianconi wrote:
-> Move airoha_qdma pointer from airoha_gdm_port struct to airoha_gdm_dev
-> one since the QDMA block used depends on the particular net_device
-> WAN/LAN configuration and in the current codebase net_device pointer is
-> associated to airoha_gdm_dev struct.
-> This is a preliminary patch to support multiple net_devices connected
-> to the same GDM{3,4} port via an external hw arbiter.
->=20
-> Tested-by: Xuegang Lu <xuegang.lu@airoha.com>
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  drivers/net/ethernet/airoha/airoha_eth.c | 105 +++++++++++++++----------=
-------
->  drivers/net/ethernet/airoha/airoha_eth.h |   9 ++-
->  drivers/net/ethernet/airoha/airoha_ppe.c |  17 ++---
->  3 files changed, 64 insertions(+), 67 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
-net/airoha/airoha_eth.c
-> index 18a89de4d58a..e0cd401bbf67 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> @@ -71,9 +71,10 @@ static void airoha_qdma_irq_disable(struct airoha_irq_=
-bank *irq_bank,
->  	airoha_qdma_set_irqmask(irq_bank, index, mask, 0);
->  }
-> =20
-> -static void airoha_set_macaddr(struct airoha_gdm_port *port, const u8 *a=
-ddr)
-> +static void airoha_set_macaddr(struct airoha_gdm_dev *dev, const u8 *add=
-r)
->  {
-> -	struct airoha_eth *eth =3D port->qdma->eth;
-> +	struct airoha_gdm_port *port =3D dev->port;
-> +	struct airoha_eth *eth =3D dev->eth;
->  	u32 val, reg;
-> =20
->  	reg =3D airoha_is_lan_gdm_port(port) ? REG_FE_LAN_MAC_H
-> @@ -85,7 +86,7 @@ static void airoha_set_macaddr(struct airoha_gdm_port *=
-port, const u8 *addr)
->  	airoha_fe_wr(eth, REG_FE_MAC_LMIN(reg), val);
->  	airoha_fe_wr(eth, REG_FE_MAC_LMAX(reg), val);
-> =20
-> -	airoha_ppe_init_upd_mem(port);
-> +	airoha_ppe_init_upd_mem(dev);
->  }
-> =20
->  static void airoha_set_gdm_port_fwd_cfg(struct airoha_eth *eth, u32 addr,
-> @@ -101,10 +102,10 @@ static void airoha_set_gdm_port_fwd_cfg(struct airo=
-ha_eth *eth, u32 addr,
->  		      FIELD_PREP(GDM_UCFQ_MASK, val));
->  }
-> =20
-> -static int airoha_set_vip_for_gdm_port(struct airoha_gdm_port *port,
-> -				       bool enable)
-> +static int airoha_set_vip_for_gdm_port(struct airoha_gdm_dev *dev, bool =
-enable)
->  {
-> -	struct airoha_eth *eth =3D port->qdma->eth;
-> +	struct airoha_gdm_port *port =3D dev->port;
-> +	struct airoha_eth *eth =3D dev->eth;
->  	u32 vip_port;
-> =20
->  	vip_port =3D eth->soc->ops.get_vip_port(port, port->nbq);
-> @@ -858,10 +859,13 @@ static void airoha_qdma_wake_netdev_txqs(struct air=
-oha_queue *q)
->  		if (!port)
->  			continue;
-> =20
-> -		if (port->qdma !=3D qdma)
-> +		dev =3D port->dev;
-> +		if (!dev)
-> +			continue;
-> +
-> +		if (dev->qdma !=3D qdma)
->  			continue;
-> =20
-> -		dev =3D port->dev;
->  		for (j =3D 0; j < dev->dev->num_tx_queues; j++) {
->  			if (airoha_qdma_get_txq(qdma, j) !=3D qid)
->  				continue;
-> @@ -1562,9 +1566,10 @@ static void airoha_qdma_stop_napi(struct airoha_qd=
-ma *qdma)
->  	}
->  }
-> =20
-> -static void airoha_update_hw_stats(struct airoha_gdm_port *port)
-> +static void airoha_update_hw_stats(struct airoha_gdm_dev *dev)
->  {
-> -	struct airoha_eth *eth =3D port->qdma->eth;
-> +	struct airoha_gdm_port *port =3D dev->port;
-> +	struct airoha_eth *eth =3D dev->eth;
->  	u32 val, i =3D 0;
-> =20
->  	spin_lock(&port->stats.lock);
-> @@ -1711,11 +1716,11 @@ static int airoha_dev_open(struct net_device *net=
-dev)
->  	int err, len =3D ETH_HLEN + netdev->mtu + ETH_FCS_LEN;
->  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
->  	struct airoha_gdm_port *port =3D dev->port;
-> -	struct airoha_qdma *qdma =3D port->qdma;
-> +	struct airoha_qdma *qdma =3D dev->qdma;
->  	u32 pse_port =3D FE_PSE_PORT_PPE1;
-> =20
->  	netif_tx_start_all_queues(netdev);
-> -	err =3D airoha_set_vip_for_gdm_port(port, true);
-> +	err =3D airoha_set_vip_for_gdm_port(dev, true);
->  	if (err)
->  		return err;
-> =20
-> @@ -1751,11 +1756,11 @@ static int airoha_dev_stop(struct net_device *net=
-dev)
->  {
->  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
->  	struct airoha_gdm_port *port =3D dev->port;
-> -	struct airoha_qdma *qdma =3D port->qdma;
-> +	struct airoha_qdma *qdma =3D dev->qdma;
->  	int i;
-> =20
->  	netif_tx_disable(netdev);
-> -	airoha_set_vip_for_gdm_port(port, false);
-> +	airoha_set_vip_for_gdm_port(dev, false);
->  	for (i =3D 0; i < netdev->num_tx_queues; i++)
->  		netdev_tx_reset_subqueue(netdev, i);
-> =20
-> @@ -1781,21 +1786,21 @@ static int airoha_dev_stop(struct net_device *net=
-dev)
->  static int airoha_dev_set_macaddr(struct net_device *netdev, void *p)
->  {
->  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> -	struct airoha_gdm_port *port =3D dev->port;
->  	int err;
-> =20
->  	err =3D eth_mac_addr(netdev, p);
->  	if (err)
->  		return err;
-> =20
-> -	airoha_set_macaddr(port, netdev->dev_addr);
-> +	airoha_set_macaddr(dev, netdev->dev_addr);
-> =20
->  	return 0;
->  }
-> =20
-> -static int airoha_set_gdm2_loopback(struct airoha_gdm_port *port)
-> +static int airoha_set_gdm2_loopback(struct airoha_gdm_dev *dev)
->  {
-> -	struct airoha_eth *eth =3D port->qdma->eth;
-> +	struct airoha_gdm_port *port =3D dev->port;
-> +	struct airoha_eth *eth =3D dev->eth;
->  	u32 val, pse_port, chan;
->  	int i, src_port;
-> =20
-> @@ -1840,7 +1845,7 @@ static int airoha_set_gdm2_loopback(struct airoha_g=
-dm_port *port)
->  		      __field_prep(SP_CPORT_MASK(val), FE_PSE_PORT_CDM2));
-> =20
->  	for (i =3D 0; i < eth->soc->num_ppe; i++)
-> -		airoha_ppe_set_cpu_port(port, i, AIROHA_GDM2_IDX);
-> +		airoha_ppe_set_cpu_port(dev, i, AIROHA_GDM2_IDX);
-> =20
->  	if (port->id =3D=3D AIROHA_GDM4_IDX && airoha_is_7581(eth)) {
->  		u32 mask =3D FC_ID_OF_SRC_PORT_MASK(port->nbq);
-> @@ -1860,9 +1865,9 @@ static int airoha_dev_init(struct net_device *netde=
-v)
->  	int i;
-> =20
->  	/* QDMA0 is used for lan ports while QDMA1 is used for WAN ports */
-> -	port->qdma =3D &eth->qdma[!airoha_is_lan_gdm_port(port)];
-> -	dev->dev->irq =3D port->qdma->irq_banks[0].irq;
-> -	airoha_set_macaddr(port, netdev->dev_addr);
-> +	dev->qdma =3D &eth->qdma[!airoha_is_lan_gdm_port(port)];
-> +	dev->dev->irq =3D dev->qdma->irq_banks[0].irq;
-> +	airoha_set_macaddr(dev, netdev->dev_addr);
-> =20
->  	switch (port->id) {
->  	case AIROHA_GDM3_IDX:
-> @@ -1871,7 +1876,7 @@ static int airoha_dev_init(struct net_device *netde=
-v)
->  		if (!eth->ports[1]) {
->  			int err;
-> =20
-> -			err =3D airoha_set_gdm2_loopback(port);
-> +			err =3D airoha_set_gdm2_loopback(dev);
->  			if (err)
->  				return err;
->  		}
-> @@ -1881,8 +1886,7 @@ static int airoha_dev_init(struct net_device *netde=
-v)
->  	}
-> =20
->  	for (i =3D 0; i < eth->soc->num_ppe; i++)
-> -		airoha_ppe_set_cpu_port(port, i,
-> -					airoha_get_fe_port(port));
-> +		airoha_ppe_set_cpu_port(dev, i, airoha_get_fe_port(dev));
-> =20
->  	return 0;
->  }
-> @@ -1894,7 +1898,7 @@ static void airoha_dev_get_stats64(struct net_devic=
-e *netdev,
->  	struct airoha_gdm_port *port =3D dev->port;
->  	unsigned int start;
-> =20
-> -	airoha_update_hw_stats(port);
-> +	airoha_update_hw_stats(dev);
->  	do {
->  		start =3D u64_stats_fetch_begin(&port->stats.syncp);
->  		storage->rx_packets =3D port->stats.rx_ok_pkts;
-> @@ -1914,8 +1918,8 @@ static int airoha_dev_change_mtu(struct net_device =
-*netdev, int mtu)
->  {
->  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
->  	struct airoha_gdm_port *port =3D dev->port;
-> -	struct airoha_eth *eth =3D port->qdma->eth;
->  	u32 len =3D ETH_HLEN + mtu + ETH_FCS_LEN;
-> +	struct airoha_eth *eth =3D dev->eth;
-> =20
->  	airoha_fe_rmw(eth, REG_GDM_LEN_CFG(port->id),
->  		      GDM_LONG_LEN_MASK,
-> @@ -1989,10 +1993,10 @@ static u32 airoha_get_dsa_tag(struct sk_buff *skb=
-, struct net_device *dev)
->  #endif
->  }
-> =20
-> -int airoha_get_fe_port(struct airoha_gdm_port *port)
-> +int airoha_get_fe_port(struct airoha_gdm_dev *dev)
->  {
-> -	struct airoha_qdma *qdma =3D port->qdma;
-> -	struct airoha_eth *eth =3D qdma->eth;
-> +	struct airoha_gdm_port *port =3D dev->port;
-> +	struct airoha_eth *eth =3D dev->eth;
-> =20
->  	switch (eth->soc->version) {
->  	case 0x7583:
-> @@ -2009,8 +2013,7 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *=
-skb,
->  				   struct net_device *netdev)
->  {
->  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> -	struct airoha_gdm_port *port =3D dev->port;
-> -	struct airoha_qdma *qdma =3D port->qdma;
-> +	struct airoha_qdma *qdma =3D dev->qdma;
->  	u32 nr_frags, tag, msg0, msg1, len;
->  	struct airoha_queue_entry *e;
->  	struct netdev_queue *txq;
-> @@ -2048,7 +2051,7 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *=
-skb,
->  		}
->  	}
-> =20
-> -	fport =3D airoha_get_fe_port(port);
-> +	fport =3D airoha_get_fe_port(dev);
->  	msg1 =3D FIELD_PREP(QDMA_ETH_TXMSG_FPORT_MASK, fport) |
->  	       FIELD_PREP(QDMA_ETH_TXMSG_METER_MASK, 0x7f);
-> =20
-> @@ -2151,8 +2154,7 @@ static void airoha_ethtool_get_drvinfo(struct net_d=
-evice *netdev,
->  				       struct ethtool_drvinfo *info)
->  {
->  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> -	struct airoha_gdm_port *port =3D dev->port;
-> -	struct airoha_eth *eth =3D port->qdma->eth;
-> +	struct airoha_eth *eth =3D dev->eth;
-> =20
->  	strscpy(info->driver, eth->dev->driver->name, sizeof(info->driver));
->  	strscpy(info->bus_info, dev_name(eth->dev), sizeof(info->bus_info));
-> @@ -2165,7 +2167,7 @@ static void airoha_ethtool_get_mac_stats(struct net=
-_device *netdev,
->  	struct airoha_gdm_port *port =3D dev->port;
->  	unsigned int start;
-> =20
-> -	airoha_update_hw_stats(port);
-> +	airoha_update_hw_stats(dev);
->  	do {
->  		start =3D u64_stats_fetch_begin(&port->stats.syncp);
->  		stats->FramesTransmittedOK =3D port->stats.tx_ok_pkts;
-> @@ -2205,7 +2207,7 @@ airoha_ethtool_get_rmon_stats(struct net_device *ne=
-tdev,
->  		     ARRAY_SIZE(hw_stats->rx_len) + 1);
-> =20
->  	*ranges =3D airoha_ethtool_rmon_ranges;
-> -	airoha_update_hw_stats(port);
-> +	airoha_update_hw_stats(dev);
->  	do {
->  		int i;
-> =20
-> @@ -2225,18 +2227,17 @@ static int airoha_qdma_set_chan_tx_sched(struct n=
-et_device *netdev,
->  					 const u16 *weights, u8 n_weights)
->  {
->  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> -	struct airoha_gdm_port *port =3D dev->port;
->  	int i;
-> =20
->  	for (i =3D 0; i < AIROHA_NUM_TX_RING; i++)
-> -		airoha_qdma_clear(port->qdma, REG_QUEUE_CLOSE_CFG(channel),
-> +		airoha_qdma_clear(dev->qdma, REG_QUEUE_CLOSE_CFG(channel),
->  				  TXQ_DISABLE_CHAN_QUEUE_MASK(channel, i));
-> =20
->  	for (i =3D 0; i < n_weights; i++) {
->  		u32 status;
->  		int err;
-> =20
-> -		airoha_qdma_wr(port->qdma, REG_TXWRR_WEIGHT_CFG,
-> +		airoha_qdma_wr(dev->qdma, REG_TXWRR_WEIGHT_CFG,
->  			       TWRR_RW_CMD_MASK |
->  			       FIELD_PREP(TWRR_CHAN_IDX_MASK, channel) |
->  			       FIELD_PREP(TWRR_QUEUE_IDX_MASK, i) |
-> @@ -2244,13 +2245,12 @@ static int airoha_qdma_set_chan_tx_sched(struct n=
-et_device *netdev,
->  		err =3D read_poll_timeout(airoha_qdma_rr, status,
->  					status & TWRR_RW_CMD_DONE,
->  					USEC_PER_MSEC, 10 * USEC_PER_MSEC,
-> -					true, port->qdma,
-> -					REG_TXWRR_WEIGHT_CFG);
-> +					true, dev->qdma, REG_TXWRR_WEIGHT_CFG);
->  		if (err)
->  			return err;
->  	}
-> =20
-> -	airoha_qdma_rmw(port->qdma, REG_CHAN_QOS_MODE(channel >> 3),
-> +	airoha_qdma_rmw(dev->qdma, REG_CHAN_QOS_MODE(channel >> 3),
->  			CHAN_QOS_MODE_MASK(channel),
->  			__field_prep(CHAN_QOS_MODE_MASK(channel), mode));
-> =20
-> @@ -2316,9 +2316,9 @@ static int airoha_qdma_get_tx_ets_stats(struct net_=
-device *netdev, int channel,
->  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
->  	struct airoha_gdm_port *port =3D dev->port;
-> =20
-> -	u64 cpu_tx_packets =3D airoha_qdma_rr(port->qdma,
-> +	u64 cpu_tx_packets =3D airoha_qdma_rr(dev->qdma,
->  					    REG_CNTR_VAL(channel << 1));
-> -	u64 fwd_tx_packets =3D airoha_qdma_rr(port->qdma,
-> +	u64 fwd_tx_packets =3D airoha_qdma_rr(dev->qdma,
->  					    REG_CNTR_VAL((channel << 1) + 1));
->  	u64 tx_packets =3D (cpu_tx_packets - port->cpu_tx_packets) +
->  			 (fwd_tx_packets - port->fwd_tx_packets);
-> @@ -2582,17 +2582,16 @@ static int airoha_qdma_set_tx_rate_limit(struct n=
-et_device *netdev,
->  					 u32 bucket_size)
->  {
->  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> -	struct airoha_gdm_port *port =3D dev->port;
->  	int i, err;
-> =20
->  	for (i =3D 0; i <=3D TRTCM_PEAK_MODE; i++) {
-> -		err =3D airoha_qdma_set_trtcm_config(port->qdma, channel,
-> +		err =3D airoha_qdma_set_trtcm_config(dev->qdma, channel,
->  						   REG_EGRESS_TRTCM_CFG, i,
->  						   !!rate, TRTCM_METER_MODE);
->  		if (err)
->  			return err;
-> =20
-> -		err =3D airoha_qdma_set_trtcm_token_bucket(port->qdma, channel,
-> +		err =3D airoha_qdma_set_trtcm_token_bucket(dev->qdma, channel,
->  							 REG_EGRESS_TRTCM_CFG,
->  							 i, rate, bucket_size);
->  		if (err)
-> @@ -2642,11 +2641,11 @@ static int airoha_tc_htb_alloc_leaf_queue(struct =
-net_device *netdev,
->  	return 0;
->  }
-> =20
-> -static int airoha_qdma_set_rx_meter(struct airoha_gdm_port *port,
-> +static int airoha_qdma_set_rx_meter(struct airoha_gdm_dev *dev,
->  				    u32 rate, u32 bucket_size,
->  				    enum trtcm_unit_type unit_type)
->  {
-> -	struct airoha_qdma *qdma =3D port->qdma;
-> +	struct airoha_qdma *qdma =3D dev->qdma;
->  	int i;
-> =20
->  	for (i =3D 0; i < ARRAY_SIZE(qdma->q_rx); i++) {
-> @@ -2725,7 +2724,6 @@ static int airoha_dev_tc_matchall(struct net_device=
- *netdev,
->  {
->  	enum trtcm_unit_type unit_type =3D TRTCM_BYTE_UNIT;
->  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> -	struct airoha_gdm_port *port =3D dev->port;
->  	u32 rate =3D 0, bucket_size =3D 0;
-> =20
->  	switch (f->command) {
-> @@ -2750,7 +2748,7 @@ static int airoha_dev_tc_matchall(struct net_device=
- *netdev,
->  		fallthrough;
->  	}
->  	case TC_CLSMATCHALL_DESTROY:
-> -		return airoha_qdma_set_rx_meter(port, rate, bucket_size,
-> +		return airoha_qdma_set_rx_meter(dev, rate, bucket_size,
->  						unit_type);
->  	default:
->  		return -EOPNOTSUPP;
-> @@ -2762,8 +2760,7 @@ static int airoha_dev_setup_tc_block_cb(enum tc_set=
-up_type type,
->  {
->  	struct net_device *netdev =3D cb_priv;
->  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> -	struct airoha_gdm_port *port =3D dev->port;
-> -	struct airoha_eth *eth =3D port->qdma->eth;
-> +	struct airoha_eth *eth =3D dev->eth;
-> =20
->  	if (!tc_can_offload(netdev))
->  		return -EOPNOTSUPP;
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ether=
-net/airoha/airoha_eth.h
-> index c78cabbec753..f1eea492217c 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.h
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
-> @@ -537,12 +537,12 @@ struct airoha_qdma {
-> =20
->  struct airoha_gdm_dev {
->  	struct airoha_gdm_port *port;
-> +	struct airoha_qdma *qdma;
->  	struct net_device *dev;
->  	struct airoha_eth *eth;
->  };
-> =20
->  struct airoha_gdm_port {
-> -	struct airoha_qdma *qdma;
->  	struct airoha_gdm_dev *dev;
->  	int id;
->  	int nbq;
-> @@ -666,19 +666,18 @@ static inline bool airoha_is_7583(struct airoha_eth=
- *eth)
->  	return eth->soc->version =3D=3D 0x7583;
->  }
-> =20
-> -int airoha_get_fe_port(struct airoha_gdm_port *port);
-> +int airoha_get_fe_port(struct airoha_gdm_dev *dev);
->  bool airoha_is_valid_gdm_dev(struct airoha_eth *eth,
->  			     struct airoha_gdm_dev *dev);
-> =20
-> -void airoha_ppe_set_cpu_port(struct airoha_gdm_port *port, u8 ppe_id,
-> -			     u8 fport);
-> +void airoha_ppe_set_cpu_port(struct airoha_gdm_dev *dev, u8 ppe_id, u8 f=
-port);
->  bool airoha_ppe_is_enabled(struct airoha_eth *eth, int index);
->  void airoha_ppe_check_skb(struct airoha_ppe_dev *dev, struct sk_buff *sk=
-b,
->  			  u16 hash, bool rx_wlan);
->  int airoha_ppe_setup_tc_block_cb(struct airoha_ppe_dev *dev, void *type_=
-data);
->  int airoha_ppe_init(struct airoha_eth *eth);
->  void airoha_ppe_deinit(struct airoha_eth *eth);
-> -void airoha_ppe_init_upd_mem(struct airoha_gdm_port *port);
-> +void airoha_ppe_init_upd_mem(struct airoha_gdm_dev *dev);
->  u32 airoha_ppe_get_total_num_entries(struct airoha_ppe *ppe);
->  struct airoha_foe_entry *airoha_ppe_foe_get_entry(struct airoha_ppe *ppe,
->  						  u32 hash);
-> diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ether=
-net/airoha/airoha_ppe.c
-> index af7af4097b98..22f5f1bae730 100644
-> --- a/drivers/net/ethernet/airoha/airoha_ppe.c
-> +++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-> @@ -84,9 +84,9 @@ static u32 airoha_ppe_get_timestamp(struct airoha_ppe *=
-ppe)
->  			     AIROHA_FOE_IB1_BIND_TIMESTAMP);
->  }
-> =20
-> -void airoha_ppe_set_cpu_port(struct airoha_gdm_port *port, u8 ppe_id, u8=
- fport)
-> +void airoha_ppe_set_cpu_port(struct airoha_gdm_dev *dev, u8 ppe_id, u8 f=
-port)
->  {
-> -	struct airoha_qdma *qdma =3D port->qdma;
-> +	struct airoha_qdma *qdma =3D dev->qdma;
->  	struct airoha_eth *eth =3D qdma->eth;
->  	u8 qdma_id =3D qdma - &eth->qdma[0];
->  	u32 fe_cpu_port;
-> @@ -180,8 +180,8 @@ static void airoha_ppe_hw_init(struct airoha_ppe *ppe)
->  			if (!port)
->  				continue;
-> =20
-> -			airoha_ppe_set_cpu_port(port, i,
-> -						airoha_get_fe_port(port));
-> +			airoha_ppe_set_cpu_port(port->dev, i,
-> +						airoha_get_fe_port(port->dev));
->  		}
->  	}
->  }
-> @@ -1473,11 +1473,12 @@ void airoha_ppe_check_skb(struct airoha_ppe_dev *=
-dev, struct sk_buff *skb,
->  	airoha_ppe_foe_insert_entry(ppe, skb, hash, rx_wlan);
->  }
-> =20
-> -void airoha_ppe_init_upd_mem(struct airoha_gdm_port *port)
-> +void airoha_ppe_init_upd_mem(struct airoha_gdm_dev *dev)
->  {
-> -	struct airoha_eth *eth =3D port->qdma->eth;
-> -	struct net_device *dev =3D port->dev->dev;
-> -	const u8 *addr =3D dev->dev_addr;
-> +	struct airoha_gdm_port *port =3D dev->port;
-> +	struct net_device *netdev =3D dev->dev;
-> +	struct airoha_eth *eth =3D dev->eth;
-> +	const u8 *addr =3D netdev->dev_addr;
->  	u32 val;
-> =20
->  	val =3D (addr[2] << 24) | (addr[3] << 16) | (addr[4] << 8) | addr[5];
->=20
-> --=20
-> 2.54.0
->=20
+HEAD commit:    c21b90f77687 x86/CPU/AMD: Prevent improper isolation of sh..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10ec7dba580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4caf64b1ee83dac0
+dashboard link: https://syzkaller.appspot.com/bug?extid=1db58dbbccbf93c65c83
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
 
-Commenting on sashiko's report:
-https://sashiko.dev/#/patchset/20260511-airoha-eth-multi-serdes-v6-0-c89946=
-2c4f75%40kernel.org
-- This isn't a regression introduced by this patch, but is it safe to use
-  spin_lock() here instead of spin_lock_bh()?
-  - According to my understanding ndo_get_stats64 callback can't run softirq
-    context.
+Unfortunately, I don't have any reproducer for this issue yet.
 
---NE+4h+Wyx7O1ITBi
-Content-Type: application/pgp-signature; name=signature.asc
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/2f3edabe3b67/disk-c21b90f7.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/539b63753e79/vmlinux-c21b90f7.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/48e6e7cbc4ca/bzImage-c21b90f7.xz
 
------BEGIN PGP SIGNATURE-----
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1db58dbbccbf93c65c83@syzkaller.appspotmail.com
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCagQ6IgAKCRA6cBh0uS2t
-rEkcAQC2ig9Q3isG9GROZcAedOuCxFa7PNLkJr6FgQU71+9XKgD+KENnRdmunSv/
-sv4qVObbRaSCGbg1D1CLGPFCsU2UeAs=
-=eF2v
------END PGP SIGNATURE-----
+ip6_tunnel: ip6tnl1 xmit: Local address not yet configured!
+ip6_tunnel: ip6tnl1 xmit: Local address not yet configured!
+============================================
+WARNING: possible recursive locking detected
+syzkaller #0 Tainted: G             L     
+--------------------------------------------
+kworker/u8:3/47 is trying to acquire lock:
+ffff88807a618e98 (&bond->mode_lock){+.-.}-{3:3}, at: spin_lock include/linux/spinlock.h:342 [inline]
+ffff88807a618e98 (&bond->mode_lock){+.-.}-{3:3}, at: rlb_choose_channel+0x37/0x19a0 drivers/net/bonding/bond_alb.c:562
 
---NE+4h+Wyx7O1ITBi--
+but task is already holding lock:
+ffff88807ffa0e98 (&bond->mode_lock){+.-.}-{3:3}, at: spin_lock_bh include/linux/spinlock.h:348 [inline]
+ffff88807ffa0e98 (&bond->mode_lock){+.-.}-{3:3}, at: rlb_update_rx_clients drivers/net/bonding/bond_alb.c:466 [inline]
+ffff88807ffa0e98 (&bond->mode_lock){+.-.}-{3:3}, at: bond_alb_monitor+0xe8a/0x17e0 drivers/net/bonding/bond_alb.c:1618
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(&bond->mode_lock);
+  lock(&bond->mode_lock);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+7 locks held by kworker/u8:3/47:
+ #0: ffff8880516b7140 ((wq_completion)bond5#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3277 [inline]
+ #0: ffff8880516b7140 ((wq_completion)bond5#2){+.+.}-{0:0}, at: process_scheduled_works+0xa35/0x1860 kernel/workqueue.c:3385
+ #1: ffffc90000b77c40 ((work_completion)(&(&bond->alb_work)->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3278 [inline]
+ #1: ffffc90000b77c40 ((work_completion)(&(&bond->alb_work)->work)){+.+.}-{0:0}, at: process_scheduled_works+0xa70/0x1860 kernel/workqueue.c:3385
+ #2: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
+ #2: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:838 [inline]
+ #2: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: bond_alb_monitor+0xf8/0x17e0 drivers/net/bonding/bond_alb.c:1546
+ #3: ffff88807ffa0e98 (&bond->mode_lock){+.-.}-{3:3}, at: spin_lock_bh include/linux/spinlock.h:348 [inline]
+ #3: ffff88807ffa0e98 (&bond->mode_lock){+.-.}-{3:3}, at: rlb_update_rx_clients drivers/net/bonding/bond_alb.c:466 [inline]
+ #3: ffff88807ffa0e98 (&bond->mode_lock){+.-.}-{3:3}, at: bond_alb_monitor+0xe8a/0x17e0 drivers/net/bonding/bond_alb.c:1618
+ #4: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
+ #4: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:838 [inline]
+ #4: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: arp_xmit+0x23/0x270 net/ipv4/arp.c:663
+ #5: ffffffff8e95cdc0 (rcu_read_lock_bh){....}-{1:3}, at: local_bh_disable include/linux/bottom_half.h:20 [inline]
+ #5: ffffffff8e95cdc0 (rcu_read_lock_bh){....}-{1:3}, at: rcu_read_lock_bh include/linux/rcupdate.h:891 [inline]
+ #5: ffffffff8e95cdc0 (rcu_read_lock_bh){....}-{1:3}, at: __dev_queue_xmit+0x2b6/0x3950 net/core/dev.c:4791
+ #6: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
+ #6: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:838 [inline]
+ #6: ffffffff8e95cd60 (rcu_read_lock){....}-{1:3}, at: bond_start_xmit+0xb4/0x1900 drivers/net/bonding/bond_main.c:5591
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 47 Comm: kworker/u8:3 Tainted: G             L      syzkaller #0 PREEMPT(full) 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+Workqueue: bond5 bond_alb_monitor
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_deadlock_bug+0x279/0x290 kernel/locking/lockdep.c:3041
+ check_deadlock kernel/locking/lockdep.c:3093 [inline]
+ validate_chain kernel/locking/lockdep.c:3895 [inline]
+ __lock_acquire+0x253f/0x2cf0 kernel/locking/lockdep.c:5237
+ lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5868
+ __raw_spin_lock include/linux/spinlock_api_smp.h:158 [inline]
+ _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:158
+ spin_lock include/linux/spinlock.h:342 [inline]
+ rlb_choose_channel+0x37/0x19a0 drivers/net/bonding/bond_alb.c:562
+ rlb_arp_xmit drivers/net/bonding/bond_alb.c:680 [inline]
+ bond_xmit_alb_slave_get+0x1071/0x20a0 drivers/net/bonding/bond_alb.c:1493
+ bond_alb_xmit+0x24/0x40 drivers/net/bonding/bond_alb.c:1528
+ __bond_start_xmit drivers/net/bonding/bond_main.c:5569 [inline]
+ bond_start_xmit+0x6a2/0x1900 drivers/net/bonding/bond_main.c:5593
+ __netdev_start_xmit include/linux/netdevice.h:5368 [inline]
+ netdev_start_xmit include/linux/netdevice.h:5377 [inline]
+ xmit_one net/core/dev.c:3888 [inline]
+ dev_hard_start_xmit+0x2cd/0x830 net/core/dev.c:3904
+ __dev_queue_xmit+0x14d9/0x3950 net/core/dev.c:4870
+ NF_HOOK+0x33a/0x3c0 include/linux/netfilter.h:-1
+ arp_xmit+0x16c/0x270 net/ipv4/arp.c:665
+ rlb_update_client+0x2a8/0x6b0 drivers/net/bonding/bond_alb.c:455
+ rlb_update_rx_clients drivers/net/bonding/bond_alb.c:473 [inline]
+ bond_alb_monitor+0xf6a/0x17e0 drivers/net/bonding/bond_alb.c:1618
+ process_one_work kernel/workqueue.c:3302 [inline]
+ process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3385
+ worker_thread+0xa53/0xfc0 kernel/workqueue.c:3466
+ kthread+0x388/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
