@@ -1,241 +1,186 @@
-Return-Path: <netdev+bounces-287530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287538-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WFYoEHhZBGozHQIAu9opvQ
-	(envelope-from <netdev+bounces-287530-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:59:04 +0200
+	id wPwRGIVZBGqjHAIAu9opvQ
+	(envelope-from <netdev+bounces-287538-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:59:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A318B531C2B
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:59:03 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3A22531C58
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 12:59:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9A21A310DBB5
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 10:55:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1F812305D0DD
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 10:58:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D603F9F55;
-	Wed, 13 May 2026 10:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7BC13F9F5F;
+	Wed, 13 May 2026 10:58:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cvgvUuDZ"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="r/JD0yV0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD7A3F7AA8
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 10:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55A838E12D;
+	Wed, 13 May 2026 10:58:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778669732; cv=none; b=usveUggLf7yVR8GV9bVffXFUk0pz0trFlVq7LwSIfhKlwKKoaScbck8RFU0C6bDGlxvTZY0cDrd686D+guIY0GrB133QCqIdzZugwIFXYtvIh9svF2P4rAF95y5Lm2QSF1M/gKheINB1p6s6AAOQQ7Bgh2dh8Kt1FD6ORlL6jx8=
+	t=1778669915; cv=none; b=Nw2KIGvIr0UE7VsRHxTvzMWnc7pw22j8J16UTrtAG45htoXM3cfENGUyS+UV71csO/J+YAQWaV+GwuD8M/BFxEzse1VKvJE2nY7SUddGg+GJiE3snO3Ksr0u05DUhMy7/7koF5AO58KikwQPT0Tb1pm3oZrn/WgvVf7kJuYKd+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778669732; c=relaxed/simple;
-	bh=4GcPtw6yzDT+uQnJcBvUSlSFbsL2VlMJq3G4QuXz/kI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=E1/TGhO4Ag4XfsdAq4wwDJEiZhZEBdEz9dmKCWNpzDrYihGU/zFzuUkzayE6HEt7GEuGwAeGaKHoBIBDZ5D8moG+XmhulnP1S+OSZz8tSaDWaDDbMK5sRyZRWHsXA3CzVRRDcHeP4fa14dKuS4obD3Du4QiSS07uFsGWmj96dlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cvgvUuDZ; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-488a14c31eeso45192045e9.0
-        for <netdev@vger.kernel.org>; Wed, 13 May 2026 03:55:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778669729; x=1779274529; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cnMgQIZVl3j9s1upPLydgLf3EqbcIw1LZyyGapADhuc=;
-        b=cvgvUuDZG/D/3UdSHjNj8yyuyqKtgXmSHCM8zhqYQF1M0lI+ZUppWC9VVgtjkJmP4h
-         N4it0ypyC74vPDPPIulBAbtKbXXdpgWB3rML/2Z+u+AMfrF/ZlnsQIsAiwK3OssljvVe
-         XdepxNGFCn2DXad48DkTH9F6zRSm6Aa6RpOy6PomD0Pmx7iGOQJ7wPS6t0z2K5TSgkEg
-         Qlad0fVEdehn8RPuUa62uNi4jVfPbdewZdIagK/YOzzL7FREfdqfKGzUz1ISnie7FsnE
-         DLYEVxTY3bqXtKx9jjyDdFnrBE8MzVWyudgOG92+nWvbPgl3A5oI7m8PaODXTRgeQwAR
-         T8Pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778669729; x=1779274529;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=cnMgQIZVl3j9s1upPLydgLf3EqbcIw1LZyyGapADhuc=;
-        b=X5lrs3CgIYW7ldzDd3R/iK3/uxtkSyYVEaaLo70vQn1rVIaJxMTxKs9d9Y46EFbLKO
-         sEX5A/AFFbvLdOS+NJc0G9GU39UDIHIQ1IrGb6bq44is24dgUG7vRB1FyQ17QfGRkTmU
-         eK2TahaKwMf0SLYZ/QFaAu087ZjKthm6I3Z67+upAVyRovaym8f4nVID9BZaPm9r/QJG
-         pidUjsF5aLWXG4voMXotxlL3AwcWV+zgGm4sNXW5R0dc2s2MrmQ9zIiGTWjtOFc2cnlr
-         5f37vUKA9ynYO1JFyOHC9GbmauQr74Eqw//gnLb0eQkpE0JBhfwb43+rtQxjjGREWjuh
-         ulKw==
-X-Gm-Message-State: AOJu0Yz6uhWqhcAImyqDaRYgfaDxi+2GHr8HNXxW1T79D9kBlATsv/gV
-	O//1gEskILiDC4mMbnL0tg3am5AaPyrKp4iv9F7sv/fJXQFYBjRlg0AVYsym4mTn3XY=
-X-Gm-Gg: Acq92OHpEqKTln3qW2DN/99PpY2H3nXX/SPy5ObWl0Smo/dbB9P1f7Fa5UXBl9s/2sC
-	TPKCYWYWTBwqPZnyTn/VCoZmR3xVeuPVx3iGj3m/CSvHA7RZIlKPngL0GQNbl/kGn4HnDVIFVXQ
-	ru8eyPh3gtMTTxhRhVASTsxdYSVs+LOF8rrPxmXbIbJdFiNRX89LurRVlGjnbScOpaQ249AWXCq
-	b+A9xdn00xg4Pa9cNKk3hD/MokbsbPqHzEPI1QfsQB8NXACtdsWql99Pv9bveFgWIAdymt/lsDR
-	KK4j40amdbgwz7xkTAEtfmkutElRrRqZIN/pB9UggN9SVOLiRh11spNs3kvBZhe47kZnmEfsPrj
-	qPYV6clooRR5WAAXnNkGsIYQ43mD8ttWZa9l5MjP5kB0Bxkn745kk5/W9R5BRZVJQP7/GdOz+1k
-	XOO6b9irPyAI3dp/424FqxfAIc+Qw86hzw+xuAdQS7Vqxk2flt7AMVVXVq9uGQeIprh6fEJ1D1O
-	0kuuZAeEfA=
-X-Received: by 2002:a05:600c:3ba8:b0:48a:6798:52e9 with SMTP id 5b1f17b1804b1-48fc99a8bd4mr40049135e9.0.1778669729093;
-        Wed, 13 May 2026 03:55:29 -0700 (PDT)
-Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e8f438890sm46688195e9.23.2026.05.13.03.55.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2026 03:55:28 -0700 (PDT)
-From: David Carlier <devnexen@gmail.com>
-To: netdev@vger.kernel.org
-Cc: David Carlier <devnexen@gmail.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Antonio Quartulli <antonio@openvpn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] ovpn: respect peer refcount in CMD_NEW_PEER error path
-Date: Wed, 13 May 2026 11:55:21 +0100
-Message-ID: <20260513105521.21629-3-devnexen@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260512042036.19870-1-devnexen@gmail.com>
-References: <20260512042036.19870-1-devnexen@gmail.com>
+	s=arc-20240116; t=1778669915; c=relaxed/simple;
+	bh=QIA/aaUl+Tf7JJyWRrgCs8eHCQk13Eufaox2+xCY8+8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=mIg8gKOftNgl2Gs33U8kc4E7zFe8rc9gL6M4OtZI+Jlc/3jnqB9wCepKYSkNk2sUIaG4qelc6GSL5RXayOoDbGdMdy2jt1sJehwsZlV3Jzx9/BLfcLNSR79nxk/alwfmRCPWlZtvsZNEqMYdpmae+AYC6M/ZwHB18b9iqjITRkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=r/JD0yV0; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Message-Id:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:
+	Reply-To:Content-ID:Content-Description:In-Reply-To:References;
+	bh=b2vQAn4oTfcls0aM2yCHBuL5+9umU8OJL3yCGEj5204=; b=r/JD0yV07yKn/rGJzW6sVNAKbN
+	huAov3LYBDl2q5atVn5g94IkPk4SDZKg9fPdqFaslx3PUAuV/ZCRvndG4380AVJIR+Puq9Sem9E2c
+	DAZdWLsaFboqsWxDXGDVwHQosWydSb0Y/hPfYUoliIiesZA6TAf3kqMpY08Y++C7VmIXVWaGXKvtJ
+	rdyR/Aibg2JYdDDpN1QtW7CJZvKosopdDy8Dtt3lp4BT5QUPzOLsVoSUs1LAFk0WeDbuOfBGH2/Qv
+	zOPPaJyt3JpqbHHmR4B2tc6PfALmzuXtF63L3qkB6ZC1s8v4MYJmcuT7MfLlorzAO3ji4r7TJkxnI
+	49n/lFqA==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1wN7I2-00371Y-0r;
+	Wed, 13 May 2026 10:58:10 +0000
+From: Breno Leitao <leitao@debian.org>
+Date: Wed, 13 May 2026 03:57:54 -0700
+Subject: [PATCH net] nfc: llcp: avoid userspace overflow on invalid optlen
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: A318B531C2B
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260513-fix_llc-v1-1-33c76f931ff6@debian.org>
+X-B4-Tracking: v=1; b=H4sIADFZBGoC/yXMQQqDMBAF0KsMf23AJI2VXKWI2Dhpp0haEhVBv
+ Htp3b7F21E4Cxd42pF5lSLvBE+6IoTnkB6sZIQnmNo0tdNWRdn6aQrKXOOlta5ptXWoCJ/MUbb
+ /dEPiGd2JZbm/OMy/A8fxBVwhGBJwAAAA
+X-Change-ID: 20260513-fix_llc-27f483568135
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, David Heidelberg <david+nfc@ixit.cz>, 
+ Samuel Ortiz <sameo@linux.intel.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, oe-linux-nfc@lists.linux.dev, 
+ kernel-team@meta.com, Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.16-dev-d5d98
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2108; i=leitao@debian.org;
+ h=from:subject:message-id; bh=QIA/aaUl+Tf7JJyWRrgCs8eHCQk13Eufaox2+xCY8+8=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqBFk+AoW4oPCP5GFeTXU6bONFB9NA6e78wUQak
+ f0UWuFGWvKJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCagRZPgAKCRA1o5Of/Hh3
+ baIuD/9WV2i+Km1+S+9RNoOXRoOcjrz64ezSvMmj2PgL0WQuf6waZw4SN45WRtGigcorcNp7H+i
+ HB2nakWATkqD2AS5WOMLLzTZzZFA3Lh1VIx0iuAiEssLRLRStUW9YNbrKIkAwbTYb3Fs8zT++pW
+ adx+kddYkyH+m2kFXzIGVz6lfloNE8gqKfZ5JeqtdCFSNNKFs4BV7ho7XlBurPQ9SU/LYRu1mGS
+ MpgBc5c1l45gyVXToVfpKyAR+zasYeombAWk1rLDgppNJq0pkOJ28Z8tceMPv8Au5mFox3pcSSi
+ oeq+zBUaraEpZYIUU6ksy2CWFAnSI1LCKMwQ0RFc5vadtHKUzjOAnz0CNWTcgfo78O8stjtR9LY
+ saL5gVcEO8zpqpTephhAoZdvLnVwsAjuz7imUvZUTl+V9sREx0NJ2YvGEe6ZHViI04Q6HQnhF6h
+ +AMPqQGOuPCPIFOkdTLIflLqjzRn5xGgAtBKcqwJ6o06LevBh9QDcYHnFsoPPyDQygaf5xxb1CH
+ QC29DpPKp8mTy4cpAWaIxFMC3tgn0SCVNOxBneqZ0ApyG0zG86LxKbNOlT1kO7ZeYpnVeaxXViP
+ 9rEJWb76EhgjpWmq85KkTcM0JGftSqzrL2KQn+D3snErdOtxpcSsWyVEsqPww+FJFSfoOScrroC
+ EyUEuel0yP+FE2Q==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+X-Debian-User: leitao
+X-Rspamd-Queue-Id: F3A22531C58
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,queasysnail.net,openvpn.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287530-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287538-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[debian.org:+];
 	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,queasysnail.net:email]
+	TAGGED_RCPT(0.00)[netdev,nfc];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-ovpn_nl_peer_new_doit()'s error path calls ovpn_peer_release() directly
-rather than ovpn_peer_put(), bypassing the kref. The accompanying
-comment ("peer was not yet hashed, thus it is not used in any context")
-holds for UDP but not for TCP.
+nfc_llcp_getsockopt() returns each of its option values via:
 
-For UDP, the ovpn_socket union uses the .ovpn arm and never points back
-at a peer; UDP encap_recv looks up peers via the not-yet-populated
-hashtables, so the new peer is unreachable until ovpn_peer_add()
-publishes it.
+	put_user(value, (u32 __user *) optval);
 
-For TCP, ovpn_socket_new() sets ovpn_sock->peer and
-ovpn_tcp_socket_attach() publishes ovpn_sock via rcu_assign_sk_user_data().
-From that moment until ovpn_socket_release() detaches in the error path,
-the TCP fd is fully wired: userspace recvmsg / sendmsg / close / poll
-on the fd, as well as the strparser-driven ovpn_tcp_rcv() path, can
-reach the peer through sk_user_data -> ovpn_sock->peer and bump its
-refcount via ovpn_peer_hold().
+The (u32 __user *) cast tells put_user() to store sizeof(u32) = 4
+bytes, regardless of what optlen the caller supplied. The earlier
+clamp
 
-ovpn_tcp_socket_wait_finish() (called inside ovpn_socket_release())
-drains strparser and the tx work, but does not synchronize with
-userspace syscall callers that already hold a peer reference. If
-ovpn_nl_peer_modify() or ovpn_peer_add() returns an error while such
-a caller is in flight - notably an ovpn_tcp_recvmsg() blocked in
-__skb_recv_datagram() on peer->tcp.user_queue - the direct
-ovpn_peer_release() destroys the peer while the caller still holds
-the reference, and the eventual ovpn_peer_put() from that caller
-operates on freed memory.
+	len = min_t(u32, len, sizeof(u32));
 
-Replace the direct destructor call with ovpn_peer_put() so the kref
-correctly defers destruction until the last reference is dropped.
-In the common case where no concurrent user is present, behaviour is
-unchanged: the kref hits zero immediately and ovpn_peer_release_kref()
-runs the same destructor.
+only affects the optlen value that is later reported back to user
+space; it does not constrain the put_user() store itself.
 
-With this conversion ovpn_peer_release() has no callers outside peer.c
-- ovpn_peer_release_kref() in the same translation unit is the only
-remaining user - so make it static and drop its declaration from
-peer.h.
+If a caller invokes getsockopt(NFC_LLCP_RW/MIUX/REMOTE_*) with
+optlen < 4 (for example optlen = 1 against a single-byte buffer),
+the kernel still writes 4 bytes into optval, scribbling up to 3
+bytes of the caller's adjacent memory.
 
-Fixes: 11851cbd60ea ("ovpn: implement TCP transport")
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
-Assisted-by: Claude:claude-opus-4-7
-Signed-off-by: David Carlier <devnexen@gmail.com>
+That violates the getsockopt(2) contract that the kernel must not write
+more than *optlen bytes into the user buffer.
+
+All five supported optnames (NFC_LLCP_RW, NFC_LLCP_MIUX,
+NFC_LLCP_REMOTE_MIU, NFC_LLCP_REMOTE_LTO, NFC_LLCP_REMOTE_RW)
+are affected because they share the same put_user() pattern.
+
+Reject any call with optlen < sizeof(u32) up front so the
+put_user() stores always have enough room. This formalises the
+implicit u32 ABI these options have always returned.o
+
+Maybe it is possible to change nfc_llcp_getsockopt() to accept optlen
+< 4, but this might be a riskier operation than just keep the current
+approach and guarantee that users are doing the right thing.
+
+Fixes: 26fd76cab2e6 ("NFC: llcp: Implement socket options")
+Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
+ net/nfc/llcp_sock.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-v2:
-- Make ovpn_peer_release() static and drop its declaration from
-  peer.h, since the netlink callsite was the last external user
-  (Sabrina Dubroca, Antonio Quartulli)
-- Add Reviewed-by from Sabrina Dubroca
+diff --git a/net/nfc/llcp_sock.c b/net/nfc/llcp_sock.c
+index f1be1e84f6653..dc74e725ddd05 100644
+--- a/net/nfc/llcp_sock.c
++++ b/net/nfc/llcp_sock.c
+@@ -319,6 +319,9 @@ static int nfc_llcp_getsockopt(struct socket *sock, int level, int optname,
+ 	if (get_user(len, optlen))
+ 		return -EFAULT;
+ 
++	if (len < sizeof(u32))
++		return -EINVAL;
++
+ 	local = llcp_sock->local;
+ 	if (!local)
+ 		return -ENODEV;
 
- drivers/net/ovpn/netlink.c | 8 +++++---
- drivers/net/ovpn/peer.c    | 2 +-
- drivers/net/ovpn/peer.h    | 1 -
- 3 files changed, 6 insertions(+), 5 deletions(-)
+---
+base-commit: 1d5dcaa3bd65f2e8c9baa14a393d3a2dc5db7524
+change-id: 20260513-fix_llc-27f483568135
 
-diff --git a/drivers/net/ovpn/netlink.c b/drivers/net/ovpn/netlink.c
-index 291e2e5bb450..4c66c1ec497e 100644
---- a/drivers/net/ovpn/netlink.c
-+++ b/drivers/net/ovpn/netlink.c
-@@ -462,10 +462,12 @@ int ovpn_nl_peer_new_doit(struct sk_buff *skb, struct genl_info *info)
- sock_release:
- 	ovpn_socket_release(peer);
- peer_release:
--	/* release right away because peer was not yet hashed, thus it is not
--	 * used in any context
-+	/* For UDP, the peer is unreachable until added to the hashtables, so
-+	 * dropping the initial reference is enough. For TCP, the peer may be
-+	 * concurrently reachable via sk_user_data->peer until
-+	 * ovpn_socket_release() detaches; rely on the refcount.
- 	 */
--	ovpn_peer_release(peer);
-+	ovpn_peer_put(peer);
- 
- 	return ret;
- }
-diff --git a/drivers/net/ovpn/peer.c b/drivers/net/ovpn/peer.c
-index c02dfab51a6e..fb10d1fea940 100644
---- a/drivers/net/ovpn/peer.c
-+++ b/drivers/net/ovpn/peer.c
-@@ -354,7 +354,7 @@ static void ovpn_peer_release_rcu(struct rcu_head *head)
-  * ovpn_peer_release - release peer private members
-  * @peer: the peer to release
-  */
--void ovpn_peer_release(struct ovpn_peer *peer)
-+static void ovpn_peer_release(struct ovpn_peer *peer)
- {
- 	ovpn_crypto_state_release(&peer->crypto);
- 	spin_lock_bh(&peer->lock);
-diff --git a/drivers/net/ovpn/peer.h b/drivers/net/ovpn/peer.h
-index 328401570cba..86c8cffada6d 100644
---- a/drivers/net/ovpn/peer.h
-+++ b/drivers/net/ovpn/peer.h
-@@ -127,7 +127,6 @@ static inline bool ovpn_peer_hold(struct ovpn_peer *peer)
- 	return kref_get_unless_zero(&peer->refcount);
- }
- 
--void ovpn_peer_release(struct ovpn_peer *peer);
- void ovpn_peer_release_kref(struct kref *kref);
- 
- /**
--- 
-2.53.0
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
 
