@@ -1,177 +1,115 @@
-Return-Path: <netdev+bounces-287388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287389-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GEUkMx/XA2ol/AEAu9opvQ
-	(envelope-from <netdev+bounces-287388-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 03:42:55 +0200
+	id IAXfCjXXA2ol/AEAu9opvQ
+	(envelope-from <netdev+bounces-287389-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 03:43:17 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B4EB52C0B4
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 03:42:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84F4352C0BD
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 03:43:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 60991302EEFE
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 01:41:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5FB52308566C
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 01:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9735A37F8C6;
-	Wed, 13 May 2026 01:41:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 675E037DADD;
+	Wed, 13 May 2026 01:42:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="en1Mmekp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MNnPZOav"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3166836A35C
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 01:41:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C555A3603C3;
+	Wed, 13 May 2026 01:42:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778636517; cv=none; b=G/Vji5bGOuVHUs9QFBm0OyNKFqFVrAtc+6W0wOBrf3A4HCTi1/sHM42yrqQrhwWzhEBNIEzclSZ/thQ7gOeyt2rmZbwWh2GtMV4XitfGXXN+49G9jVn+PgJ2dWwP5ibUk5KP7ZFMxEac448288+52eeKFexxfYZW24iW2LagnYg=
+	t=1778636531; cv=none; b=gsdCdvRHtbmsTOlZupWi5kJ2xYKjamcwCn17FDUly1HKSywYKkWLR7x0Pq4oUfeT+ZO90jgLh4Owzi7RvDem6D1DgWx2AJHxdSuD9b7CLnuojpNkcNu59quyi0/0at6pz7Qts+d2MtPj223E6F4xqg0CWADVLQlZewJhY4wi+wE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778636517; c=relaxed/simple;
-	bh=QpP+nVlhexDDbFF/v/fM34uLgmfJGufnyksSM6QIH74=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iQ9xUoqCs1vIBhELGhVe/NYP87pbFHm+JkjkIxP+mhs99jgE4UolC87c67S8sGmR8X/ymcTDDcgeGR6gSEMk+4GOASezhgnuCURroMiAfEHeYpHEa5qR3mIz1DT/sLXfCLIzmTBVpF8xeYHU8n3bhSD5j7HOywa5s7HxuXRKE6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=en1Mmekp; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778636511;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UT5oGYZY32+rUjFuqBiLxCgevBNWLQoqsz5+vYhdrcg=;
-	b=en1MmekpBATQD9DDTmg2+yytog0Cbzzc7lBVgQaUypONPh1SILbEFGOdT9/M2q8mOBf+Dh
-	g4fitbFlWC4UpvU0cuhTTXrc+pSBqtXsHiIp7q90CsaWbNqqJUyJeGvaiBavJXaTSoa/5O
-	yrjFt4z2bgxEPLRB5giUQBrQcdgmsws=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-571-oLkdP7p7MimPfm9qP2zTYg-1; Tue,
- 12 May 2026 21:41:47 -0400
-X-MC-Unique: oLkdP7p7MimPfm9qP2zTYg-1
-X-Mimecast-MFC-AGG-ID: oLkdP7p7MimPfm9qP2zTYg_1778636505
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 09B1319560A1;
-	Wed, 13 May 2026 01:41:44 +0000 (UTC)
-Received: from [10.2.16.241] (unknown [10.2.16.241])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1B89930001BE;
-	Wed, 13 May 2026 01:41:39 +0000 (UTC)
-Message-ID: <5734ac41-af0f-4696-8af0-073d3f15537f@redhat.com>
-Date: Tue, 12 May 2026 21:41:38 -0400
+	s=arc-20240116; t=1778636531; c=relaxed/simple;
+	bh=AcS6l66vmeOrnUBLByEeYYoUa+SU5u6F9CFtq41oqoU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AlRKh0md92kOONFuRCw93Gqo4Bk+OF+xU3ab1AuX2T6RGAdEr13SaeKdHr8UJD1MxwZcDeX5v2o2eIq01Y1I4BsMF2K6+SM2QjNAC+XOSKhimI0b7S0y6IDiT1WHSn5JoCmngm7h7MUruBJqHcKV9cUOHNWa+3a9fv0/mn7bQVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MNnPZOav; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93B9BC2BCB0;
+	Wed, 13 May 2026 01:42:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778636530;
+	bh=AcS6l66vmeOrnUBLByEeYYoUa+SU5u6F9CFtq41oqoU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MNnPZOavBuJLi984hDOuavBnH48UVXPC6bqjqCL+d6ZIABE21CYlJpar8RL7PvmEU
+	 ZP4P9sVy6AzO/RSKFNDxphi9XUADn3Vwqvb0DuuxlJT6Ja1RmMW0h+XAHwmFOlREF3
+	 63TN+F34Akyg8EfTtHpivIzHcOpYEHBgSF5NL9uKCf+D3snkQWHv9sTi2F0C6WwLoe
+	 dmqwMZWUNFDqqbhAg4tAt7SCMubyfsxk6zt3+Lc2HgJP2PGWkuGBrPnOtTt4TmbOrj
+	 swkWn+wRrF8Q1nAr/F+QQneLpK7J0Xb3m24JySkDXDMNLgI86/EDfWNrHMfJr9Fhh9
+	 7wrR3yhzostXA==
+Date: Tue, 12 May 2026 18:42:09 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Allison Henderson <achender@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+ horms@kernel.org, linux-rdma@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, shuah@kernel.org
+Subject: Re: [PATCH net-next v1 0/9] selftests: rds: Add ROCE support to rds
+ selftests
+Message-ID: <20260512184209.0956bcf1@kernel.org>
+In-Reply-To: <20260511072316.1174045-1-achender@kernel.org>
+References: <20260511072316.1174045-1-achender@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 0/8] IPVS fixes for net
-To: Pablo Neira Ayuso <pablo@netfilter.org>, Julian Anastasov <ja@ssi.bg>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de, horms@kernel.org,
- lvs-devel@vger.kernel.org, Anna-Maria Behnsen <anna-maria@linutronix.de>,
- Frederic Weisbecker <frederic@kernel.org>, Ingo Molnar <mingo@kernel.org>,
- Thomas Gleixner <tglx@kernel.org>
-References: <20260505001648.360569-1-pablo@netfilter.org>
- <bce80830-1e2d-43ad-ba7f-055cb352b348@ssi.bg> <aftbVlmSOAFegQgf@chamomile>
-Content-Language: en-US
-From: Waiman Long <longman@redhat.com>
-In-Reply-To: <aftbVlmSOAFegQgf@chamomile>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Rspamd-Queue-Id: 2B4EB52C0B4
+X-Rspamd-Queue-Id: 84F4352C0BD
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-287388-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-287389-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[longman@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On 5/6/26 11:16 AM, Pablo Neira Ayuso wrote:
-> Hi Julian,
->
-> Cc'ing Waiman Long and NOHZ maintainers (apologies if this is dragging
-> more people that I should into this issue).
->
-> On Wed, May 06, 2026 at 11:56:05AM +0300, Julian Anastasov wrote:
-> [...]
->> 	Here are some comments after the last review from
->> Sashiko:
->>
->> https://sashiko.dev/#/patchset/20260505001648.360569-1-pablo%40netfilter.org
->>
->> Patch 1:
->> - while ip_vs_dst_event() should loop and ensure all dev
->> references are released, single change of svc_table_changes
->> does not indicate the old references are dropped by ip_vs_flush() or
->> ip_vs_del_service(). I'll post new change to abort the loop
->> when we are sure the services are at least once released.
->>
->> Patch 5:
->> - after executing ip_vs_est_calc_phase(), data can
->> remain only for kt0 because all estimators are stopped,
->> unlinked and the kt data structures for kt > 0 are empty
->> and as result freed and the kthread tasks stopped (which
->> happens early). After this, kt 0 calls
->> ip_vs_est_drain_temp_list() as part of its loop,
->> so it will eventually call ip_vs_est_add_kthread()
->> and ip_vs_est_reload_start() to request kthread tasks
->> to be started if data for new kthreads are created.
->> So, I don't see problem here.
->>
->> Patch 6:
->> - we will add conn_max sysctl soon
-> OK, just follow up on these for 1 and 6, thanks.
->
->> Patch 7 and 8:
->> - I can not decide how valid are the concerns in the review.
-> Placing here links for convenience:
->
-> https://sashiko.dev/#/message/20260505001648.360569-8-pablo%40netfilter.org
-> https://sashiko.dev/#/message/20260505001648.360569-9-pablo%40netfilter.org
->
-> This is away from my limited scope of knowledged.
->
-Sorry for the late reply. The latest upstream kernel has already been 
-updated to make kthreads follow HK_TYPE_DOMAIN in determining which 
-non-housekeeping CPUs should be avoided. For full CPU isolation, users 
-should set nohz_full, isolcpus=domain and isolcpus=managed_irq to 
-specify CPUs to isolate. Just one of them isn't enough for CPU 
-isolation. In fact, the current plan is to enable runtime modification 
-to these CPU isolation features so that users can acquire additional 
-isolated CPUs or release some of them on demand. This is still a work in 
-progress. So the AI comment on patch 8 isn't a real concern.
+On Mon, 11 May 2026 00:23:07 -0700 Allison Henderson wrote:
+> Currently the rds selftests only tests the tcp transport.  This means
+> most of rds_rdma.ko has no testing coverage.  This series refactors the
+> rds self tests to add an rdma option when running tests.  When used,
+> the test creates a pair of ROCE interfaces to run the payloads through.
+> 
+> Most of this set is refactoring the existing test.py module.  Since most
+> of this code is one long procedure, it is difficult to modularize it
+> without creating a lot of pylint complaints about lengthy functions
+> with too many variables or branches.  The first seven patches address
+> this by breaking down test.py into helper functions.  After we have
+> modularized the send/recv packet logic, we introduce the new ROCE
+> equivalent network configurations, add the new command line flags to
+> build and run the test with rdma support.  
 
-Please let me know if you have additional question.
-
-Cheers,
-Longman
-
+Looks like there's a handful of ruff and pylint warnings flagged here.
+-- 
+pw-bot: cr
 
