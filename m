@@ -1,211 +1,223 @@
-Return-Path: <netdev+bounces-287674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287675-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GC9MJtamBGogMQIAu9opvQ
-	(envelope-from <netdev+bounces-287674-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 18:29:10 +0200
+	id SMvfAlynBGogMQIAu9opvQ
+	(envelope-from <netdev+bounces-287675-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 18:31:24 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EBCF5370D6
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 18:29:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8EB0537178
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 18:31:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 26B5C3102F4C
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 16:17:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5DE42301912C
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 16:19:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3759B4C8FE8;
-	Wed, 13 May 2026 16:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB3C538837D;
+	Wed, 13 May 2026 16:19:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uikC00p7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jg2dKFzv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12CA8481FCE;
-	Wed, 13 May 2026 16:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AAD4494A19;
+	Wed, 13 May 2026 16:19:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778689019; cv=none; b=NhoiDTu1JqrDBsdrd2g8n1U8+iaq2Xt7/BRs+IDmzpll0lD/EAh6GwFPVOLzSDRVJ9Ls+LFmcho8mPqZJqNsSHK6XdnwK7slYzyHWNt9NcFHmwcMnePAQvHhw6bfk9HY700mWyyTYnGkInAmebpACYhcBRewl8ScTp6T7f7+0E4=
+	t=1778689187; cv=none; b=lv6H2BZtgCEIgxlv1eQQ4JwtJSKOO9jtmVj6saHUtoLZ4lFY0mAkS6m/A+DWHvDYS2u7Xnqq+CfCO8Ad1i2qBXcpGGK3zP6rHTRZv+02DFTcHKdS1DS+/sUDougcbt9g6XvCuExp6YJWFUGYYkmn4qyTX7I1Y8BpQXxJyhKuHyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778689019; c=relaxed/simple;
-	bh=txg5IRqMAAQxWXryox/D3NDnLrbEYJ7UtJmDgU0gCg0=;
+	s=arc-20240116; t=1778689187; c=relaxed/simple;
+	bh=nf/EGUFlU1Lh8RetUOEO9Cf1rjcOBc9mFE8STXI1blM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EmDwVhbMxIs3SnTgk9uf4WOS8XsCVsxE3C4lDsM0FE9CXoUy9ydddIgh4XbfKEb+rmXGALD5U/s2+XqK/GpH1242TqWsmgG4w7DD3p+vz81tGGpc8YNrgiXLSpp7IiQB5qChYoRjPhRXLJ0PJvDu2lPAJdUNU+NteUeJUFshrWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uikC00p7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AF1BC2BCB7;
-	Wed, 13 May 2026 16:16:58 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=G74Qq0TlRAuLC6+a7QxRUOtQ4ifx9tTp5i2SyNU9MYj+MuHl69Mef1Az9AoIF0bemSl46TfZ5N1W/8tuuIJQkmIZLMmUXj2gD9rGytIZOr9YPYsD8brfHcq2CJAXVgqnaHBkyN6CiFwTC17CBXo6kMNM3/edSPdcZN9VNpjyvT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jg2dKFzv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F64BC19425;
+	Wed, 13 May 2026 16:19:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778689018;
-	bh=txg5IRqMAAQxWXryox/D3NDnLrbEYJ7UtJmDgU0gCg0=;
+	s=k20201202; t=1778689186;
+	bh=nf/EGUFlU1Lh8RetUOEO9Cf1rjcOBc9mFE8STXI1blM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uikC00p7ZtAX+bOuhK4vYUguK9vKsM4MVaa/nY8qgRcKjJ4bcc1J/zj8Qk1n0j4Hp
-	 C+4J/Ae/PA3FIhpMvXWeA4bXCWuQUDW5NV+YzRbqlnFGEjDgTpaftAMRVZXzctZbmv
-	 57UE6w7vvvhiSPWIAMCD+TE1FKZNu5AjQ8huumuEDsbcunmm9imAkJnndqW2PpxK4Y
-	 nWl27V+sgXeW7n9ZKSGi6DRWBhR7bZo7Fk82M9Y/0oZqdu22YhYpPhAfwAaK/dJXqM
-	 kKQIn8mkj4vBOLTEvrPksgm+rNWKUeVZ/kVRy9x4yNr05TBgo0vOIDrddw62Y+L8vq
-	 di1apMzbvmTpQ==
-Date: Wed, 13 May 2026 18:16:56 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	b=jg2dKFzv6okX1KYFBRwCHm2sFYiTPHsJQ5YnZWeVNvP3Zj5cWasmXNArcBkCV4FtZ
+	 Cs1BE9Q0wZLhsOlBOHrsd2IopjTPWv7NKKb7t3BoTTz8JojO679pnlUVmPg4MeiGbQ
+	 6zLYjR4CDfYOUbsDGYpd1zSuzlauUB1NRNQRe01/tTMDwm8WH7XUhi1TfmpciK5Xsf
+	 0etPp1MQrSRS+wCfMxTZ7prR6YdLs4VaDtxPfv1lXObBTEuOwElYfZR/LUXvkzIUVc
+	 BxSEVAgFShBCjO6UrdwYJmioH2S+IXaukrL/d8KUwrmrSwv0XxF4LcRi90IVGiVlC/
+	 lhGeNl4KNuwVw==
+Date: Wed, 13 May 2026 18:19:43 +0200
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Waiman Long <longman@redhat.com>
+Cc: Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>, Guenter Roeck <linux@roeck-us.net>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun@kernel.org>, Uladzislau Rezki <urezki@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang@linux.dev>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+	Chen Ridong <chenridong@huaweicloud.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+	Valentin Schneider <vschneid@redhat.com>,
+	K Prateek Nayak <kprateek.nayak@amd.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Bart De Schuymer <bdschuym@pandora.be>,
-	Patrick McHardy <kaber@trash.net>, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	bridge@lists.linux.dev
-Subject: Re: [PATCH net v2] net: neigh: Reallocate headroom if necessary in
- neigh_hh_bridge()
-Message-ID: <agSj-N2cbp0FaC0n@lore-desk>
-References: <20260511-nf-neigh_hh_bridge-fix-v2-1-c4964c7a7b8f@kernel.org>
- <20260513154855.GA425676@shredder>
+	Simon Horman <horms@kernel.org>, cgroups@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-hyperv@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, rcu@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Costa Shulyupin <cshulyup@redhat.com>,
+	Qiliang Yuan <realwujing@gmail.com>
+Subject: Re: [PATCH 08/23] arm64: topology: Use RCU to protect access to
+ HK_TYPE_TICK cpumask
+Message-ID: <agSkn9H_Xsz3MZa6@localhost.localdomain>
+References: <20260421030351.281436-1-longman@redhat.com>
+ <20260421030351.281436-9-longman@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="lBwmQDFD7+fOeJfh"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20260513154855.GA425676@shredder>
-X-Rspamd-Queue-Id: 0EBCF5370D6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260421030351.281436-9-longman@redhat.com>
+X-Rspamd-Queue-Id: B8EB0537178
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-3.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287674-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FREEMAIL_CC(0.00)[kernel.org,cmpxchg.org,suse.com,lwn.net,linuxfoundation.org,arm.com,microsoft.com,roeck-us.net,nvidia.com,joshtriplett.org,gmail.com,goodmis.org,efficios.com,linux.dev,linutronix.de,huaweicloud.com,infradead.org,redhat.com,linaro.org,google.com,suse.de,amd.com,davemloft.net,vger.kernel.org,lists.infradead.org];
+	TAGGED_FROM(0.00)[bounces-287675-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[52];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[frederic@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[localhost.localdomain:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
+Le Mon, Apr 20, 2026 at 11:03:36PM -0400, Waiman Long a écrit :
+> As the HK_TYPE_TICK cpumask is going to be changeable at run time, we
+> need to use RCU to protect access to the cpumask to prevent it from
+> going away in the middle of the operation.
+> 
+> Signed-off-by: Waiman Long <longman@redhat.com>
+> ---
+>  arch/arm64/kernel/topology.c | 17 ++++++++++++++---
+>  1 file changed, 14 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/topology.c b/arch/arm64/kernel/topology.c
+> index b32f13358fbb..48f150801689 100644
+> --- a/arch/arm64/kernel/topology.c
+> +++ b/arch/arm64/kernel/topology.c
+> @@ -173,6 +173,7 @@ void arch_cpu_idle_enter(void)
+>  	if (!amu_fie_cpu_supported(cpu))
+>  		return;
+>  
+> +	guard(rcu)();
+>  	/* Kick in AMU update but only if one has not happened already */
+>  	if (housekeeping_cpu(cpu, HK_TYPE_TICK) &&
+>  	    time_is_before_jiffies(per_cpu(cpu_amu_samples.last_scale_update,
+>  	cpu)))
 
---lBwmQDFD7+fOeJfh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This is called with IRQs disabled in the current CPU that is online so it's
+already guaranteed to be stable.
 
-> On Mon, May 11, 2026 at 05:57:39PM +0200, Lorenzo Bianconi wrote:
-> > diff --git a/include/net/neighbour.h b/include/net/neighbour.h
-> > index 2dfee6d4258a..c2b6196705ef 100644
-> > --- a/include/net/neighbour.h
-> > +++ b/include/net/neighbour.h
-> > @@ -487,16 +487,24 @@ static inline int neigh_event_send(struct neighbo=
-ur *neigh, struct sk_buff *skb)
-> >  }
-> > =20
-> >  #if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
-> > -static inline int neigh_hh_bridge(struct hh_cache *hh, struct sk_buff =
-*skb)
-> > +static inline struct sk_buff *
-> > +neigh_hh_bridge(struct hh_cache *hh, struct sk_buff *skb)
-> >  {
-> > -	unsigned int seq, hh_alen;
-> > +	unsigned int seq, hh_alen =3D HH_DATA_ALIGN(ETH_HLEN);
-> > +
-> > +	if (unlikely(skb_headroom(skb) < hh_alen ||
-> > +		     skb_header_cloned(skb) || skb_shared(skb))) {
-> > +		skb =3D skb_expand_head(skb, hh_alen);
->=20
-> I don't think this is correct... The comment above skb_expand_head()
-> says that it will generate a warning if there is sufficient headroom in
-> the packet.
->=20
-> I assumed that you would just call skb_cow_head() like the AI review
-> suggested. There's skb_share_check() in br_handle_frame(), so no need to
-> worry about the skb being shared.
 
-Right, I was reviewing it. I will fix it in v3.
+> @@ -187,11 +188,16 @@ int arch_freq_get_on_cpu(int cpu)
+>  	unsigned int start_cpu = cpu;
+>  	unsigned long last_update;
+>  	unsigned int freq = 0;
+> +	bool hk_cpu;
+>  	u64 scale;
+>  
+>  	if (!amu_fie_cpu_supported(cpu) || !arch_scale_freq_ref(cpu))
+>  		return -EOPNOTSUPP;
+>  
+> +	scoped_guard(rcu) {
+> +		hk_cpu = housekeeping_cpu(cpu, HK_TYPE_TICK);
+> +	}
+> +
+>  	while (1) {
+>  
+>  		amu_sample = per_cpu_ptr(&cpu_amu_samples, cpu);
+> @@ -204,16 +210,21 @@ int arch_freq_get_on_cpu(int cpu)
+>  		 * (and thus freq scale), if available, for given policy: this boils
+>  		 * down to identifying an active cpu within the same freq domain, if any.
+>  		 */
+> -		if (!housekeeping_cpu(cpu, HK_TYPE_TICK) ||
+> +		if (!hk_cpu ||
+>  		    time_is_before_jiffies(last_update + msecs_to_jiffies(AMU_SAMPLE_EXP_MS))) {
+>  			struct cpufreq_policy *policy = cpufreq_cpu_get(cpu);
+> +			bool hk_intersects;
+>  			int ref_cpu;
+>  
+>  			if (!policy)
+>  				return -EINVAL;
+>  
+> -			if (!cpumask_intersects(policy->related_cpus,
+> -						housekeeping_cpumask(HK_TYPE_TICK))) {
+> +			scoped_guard(rcu) {
+> +				hk_intersects = cpumask_intersects(policy->related_cpus,
+> +							housekeeping_cpumask(HK_TYPE_TICK));
+> +			}
+> +
+> +			if (!hk_intersects) {
+>  				cpufreq_cpu_put(policy);
+>  				return -EOPNOTSUPP;
+>  			}
 
-Regards,
-Lorenzo
+Ok so this is racy but it's fine because:
 
->=20
-> > +		if (!skb)
-> > +			return NULL;
-> > +	}
-> > =20
-> >  	do {
-> >  		seq =3D read_seqbegin(&hh->hh_lock);
-> > -		hh_alen =3D HH_DATA_ALIGN(ETH_HLEN);
-> >  		memcpy(skb->data - hh_alen, hh->hh_data, ETH_ALEN + hh_alen - ETH_HL=
-EN);
-> >  	} while (read_seqretry(&hh->hh_lock, seq));
-> > -	return 0;
-> > +
-> > +	return skb;
-> >  }
-> >  #endif
-> > =20
-> > diff --git a/net/bridge/br_netfilter_hooks.c b/net/bridge/br_netfilter_=
-hooks.c
-> > index 0ab1c94db4b9..8d21c88c2116 100644
-> > --- a/net/bridge/br_netfilter_hooks.c
-> > +++ b/net/bridge/br_netfilter_hooks.c
-> > @@ -297,7 +297,12 @@ int br_nf_pre_routing_finish_bridge(struct net *ne=
-t, struct sock *sk, struct sk_
-> >  				goto free_skb;
-> >  			}
-> > =20
-> > -			neigh_hh_bridge(&neigh->hh, skb);
-> > +			skb =3D neigh_hh_bridge(&neigh->hh, skb);
-> > +			if (!skb) {
-> > +				neigh_release(neigh);
-> > +				return -ENOMEM;
-> > +			}
->=20
-> This part looks correct.
->=20
-> > +
-> >  			skb->dev =3D br_indev;
-> > =20
-> >  			ret =3D br_handle_frame_finish(net, sk, skb);
-> >=20
-> > ---
-> > base-commit: a450063ef86b9967234ca1f896c0d77400c74f11
-> > change-id: 20260508-nf-neigh_hh_bridge-fix-9ab775ee23c6
-> >=20
-> > Best regards,
-> > --=20
-> > Lorenzo Bianconi <lorenzo@kernel.org>
-> >=20
+This function is only used by cpufreq with either cpufreq_policy_write or
+cpufreq_policy_read held (that is, struct cpufreq_policy::rwsem).
 
---lBwmQDFD7+fOeJfh
-Content-Type: application/pgp-signature; name=signature.asc
+And that rwsem is write held on cpufreq_online() -> cpufreq_policy_online() and
+also offline to guarantee the policy->cpus and policy->cpu stability.
 
------BEGIN PGP SIGNATURE-----
+Therefore housekeeping_cpumask() should only deal with stable online CPUs here. So
+even if the housekeeping mask can be changed concurrently, those CPUs can't
+appear or disappear from it.
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCagSj+AAKCRA6cBh0uS2t
-rFO+AQC5RDeCneY5yiDoOKX2B+6hOZijkD4Kdhteuz9EdsId9QD+Om9iHXvB9ltL
-hUI0UrJnl7gtRuh3A2FT177P0rjkzQo=
-=6UIE
------END PGP SIGNATURE-----
+Would be worth adding a comment about that.
 
---lBwmQDFD7+fOeJfh--
+-- 
+Frederic Weisbecker
+SUSE Labs
 
