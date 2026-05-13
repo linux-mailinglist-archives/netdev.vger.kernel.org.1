@@ -1,195 +1,192 @@
-Return-Path: <netdev+bounces-287492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287493-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QH1UIGNHBGrzGgIAu9opvQ
-	(envelope-from <netdev+bounces-287492-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:41:55 +0200
+	id +LoEJYhDBGp0GQIAu9opvQ
+	(envelope-from <netdev+bounces-287493-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:25:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E48BE530D5B
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:41:54 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2033530948
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:25:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DB258305430D
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 09:23:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DB84D30AFFDF
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 09:24:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22E193E5EF5;
-	Wed, 13 May 2026 09:23:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B5F3E5A2A;
+	Wed, 13 May 2026 09:24:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="URqbReW+"
+	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="dEoBU4oL";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="SCdjyKsc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D50433E5588
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 09:22:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7185B3E5A01
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 09:24:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778664181; cv=none; b=CSM0mtH8v62RDpl6ksQPH/VKhdra2u7bm+/mQeIPOShz7bUFzPdlCSxadq5MfBYzlK65HzfXGtt3syuzagga1N8BGTSy2kzu90ISu3SpzLw6b92mfuiivg5D0J9I5shzuCvPMRKVE4QtQteQHYsjFIqVGd55x5uV25g6iJiLUJg=
+	t=1778664287; cv=none; b=hTdRApQ5qKEZ5Y+UpOrIV4JrvEq8Y4C4UhxUM71KwZlOWxZtjRW5fpYKxehBadUlM9Hm9ljyhiy1TKt4np3Gak3ZoZjx0yEKmCx43HYdIXe+kncTfjvGWMj3GZwaotIBgesacts63H7DbIkHNOQ1Mj1nwHKREcgpBwH5Mt3S4W0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778664181; c=relaxed/simple;
-	bh=N/rB15ox1cgPlD7+hK+mFAOLfFqtnpiPMNHcmTa+DDQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WOWK9E11qEjv42wGXiB5PkzMtGyimZILbP1+I6T97v4+zzhmw4Q3LKue/1qnai5wpvSBBI09uefX5WFXw5U+oJmNh0mv6Hq/z8tlhY8uNsSL5uW0xQgLjVcX1Hbd32d6d3KvRVHewHKk2hXZzXYq9BxWrnpuXVzmHqV52BxJJ88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=URqbReW+; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2b45cb89f7eso41798355ad.0
-        for <netdev@vger.kernel.org>; Wed, 13 May 2026 02:22:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778664179; x=1779268979; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kpyzv2VHIhgzTfaCglkBvOnwlisO3O8fbQYUx8aZ6LM=;
-        b=URqbReW+SWffxEfZus0B2tRaQslrQ+e61f9uyvFzBcOc5gr6WenTkZqDIfFjmAqDZr
-         Ybc3n16LLQc5k0PqXhaoh2uDd/7qQMe/M9YH03EJ+FW0bVoq1WCfD43rcrOE97m2hc9c
-         9+u7fMmVxCi2KRWhlBCiM58/sAzTrWxsQ0w2KNBm8E+mcryO4nyWzGs7WpIBG8GXB3NF
-         WPrbLp3mhrC2kmlHpMANTKEjzdOfhStZrYv8q+qGjvFk6Vxddb+5yDkyGm4MAZKyrZ1C
-         rDw8YaDI8nBylfPEAGb992aXxF9isgQJrBzLaJ8umi8egScOhdo9X4gCjiIslHDDOvjq
-         Z8Nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778664179; x=1779268979;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kpyzv2VHIhgzTfaCglkBvOnwlisO3O8fbQYUx8aZ6LM=;
-        b=kJFdqZfE8z58LKJPW/2goAESy8Qym367OKTqb5n+65BQER31bZvPpfAs45+/gb9R2W
-         g6cYc6a+oGidQOsi3jZxhfhJ3sJ3RiMfnhOmKGVxyMqcg5m/SRHAsuvx7wu4A854NENW
-         eu2iLotZKsrcWa6ZKYzou/x3p3U3M/1HFPhxkrqPxyacvz4e1hEd2oCsFs0x6OaQbZ39
-         0AsH3gjK7EGOwvSQUP19J3B3kYMLGNbTJrj7N6IFyh9yF7N1SPi4RpJoOaFILu9oyX/b
-         VNfSmsdHX2rjYfnvC1cz9gvUpX9f9kWBUp4XVIIt429mqTff3HmbrGvySfc57LGRGGU8
-         cUmw==
-X-Gm-Message-State: AOJu0YyRsJ3MyN1F9nJd/NKnK5MwvnViImVJGCDdx91hFzWHKY6+l1i7
-	ZNv0jUlp6Vugl8E5sH/GyrmbpTXIA0QlMY9NJfTzbdHsE9r3HutJtBRixkAzboyF
-X-Gm-Gg: Acq92OE1Y35GpNPxE5DF89oVdQcuef0yWcoBFPo7bb/q5ykyR3pqvb6Ov5XCvnGWbWj
-	fSaT7vI9Ydz0NXonoWUspll/ykVYJzQl1AkiuzKsLziryK5RFeerz4i0f3tpf6ELX0alrVEtF94
-	e6As6L2qkM716BSQETQEO4YrCAfFyT11TlGMCzZd7TqJk+nvVvdta6IKnFF1hO+Kz6lZPX6QDSO
-	zAytpLj/ArCom7UmJEd7oOU1g8gli0BgImDHHdrZuWkqpAiWDN5lOFxCPQOhpYwg+P9xyNEv1H0
-	3nSu64xq5MThARekWyBjEjC2ppXZqNUs2ZxkP8Emr30KEHayjq2F86tkM2r0LTy86Kma0Lw2y52
-	3fjbj9bfritdcZrQaZEx2KF9goVLvs7IIl2k+6UKu59F46uOST5LA5K958dOlQ3w3ubAvcVSvj9
-	OBM3V6e3JwAK/aOKCkAfdUptZwldFsIMKMFlzNq32hNuz/hN2UflAVvO5t0kjEjg==
-X-Received: by 2002:a17:902:db0d:b0:2b0:7d3d:756a with SMTP id d9443c01a7336-2bd276e200bmr30136155ad.35.1778664178592;
-        Wed, 13 May 2026 02:22:58 -0700 (PDT)
-Received: from r912.lan.4v1.in ([182.70.116.80])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1d27002sm167791555ad.8.2026.05.13.02.22.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2026 02:22:58 -0700 (PDT)
-From: Avinash Duduskar <avinash.duduskar@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] llc: avoid sparse cast-truncates warning in counter clamps
-Date: Wed, 13 May 2026 14:52:53 +0530
-Message-ID: <20260513092253.3035961-1-avinash.duduskar@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1778664287; c=relaxed/simple;
+	bh=3sDZx8wJDH/MgYRXdLpJuwCeABozDmK5MVT1YStA8RU=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=YiUuObbbwiBH/dFEaeTa9+hH2rD0/XPD8FojiuZU+MNCVdDFwNvFscIKd/s1dkUaiEgNZQ9KQCXNfJzC+fxqqw2/srPZ0dXd1T2S/xEHegIbp+u56dA5aQJWgaUdS2EH8l1Orh0CtFst7wzAvh8iEgd641kcIAg7chroY0GXJv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=dEoBU4oL; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=SCdjyKsc; arc=none smtp.client-ip=202.12.124.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfout.stl.internal (Postfix) with ESMTP id 0E8261D00132;
+	Wed, 13 May 2026 05:24:43 -0400 (EDT)
+Received: from phl-imap-14 ([10.202.2.87])
+  by phl-compute-10.internal (MEProxy); Wed, 13 May 2026 05:24:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1778664283;
+	 x=1778750683; bh=SMEJVBMFIpAxx0lGrFUPHaoARljfZ7a9TItOum/BAIE=; b=
+	dEoBU4oL25FFcb3KkvjTUWHX/qb1yNsiC3Cdn9SucIGrdHAHnjZBXgrGR8OuOsDr
+	z80sxaTH1ouzzPYa1TwBCIdlE+5Ljhz5v75uO2zumvZrAbHS6zxaQD6E39jGlvP0
+	mu9j6r2pmGoKOPP8vF8jzIozGgfzU3wdLI7C4M9EkO+hQq6n9ezGbZZK8NVh+tt2
+	lnQ8RBRzoiNIvCgrysbSRHuVt1a6BEJdbydPbxKs9ltfeSKCYoCLFaxWhelNyYNn
+	ugpL6Uyk3RuGF4ywjZCfE51bxlwpMnYfRZFgtp+cs2sAshXBeRKGVG7ckO2Z3oSY
+	D5bJaNKUE2BDSYEywmJWkg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1778664283; x=
+	1778750683; bh=SMEJVBMFIpAxx0lGrFUPHaoARljfZ7a9TItOum/BAIE=; b=S
+	CdjyKscZ+7ucKLqkk1DTfPTZy1DxF3GKuK0nreqICx7O/V5UYobZNb+aUJyHxg7d
+	SssyU1uVp1n4wBafsqJRQoItEOe64XE456sd3D8YUgUEijdXrxMT3wU7FrxuIn+5
+	4+JJ9/PTx55GESjC1tQfNev1mFi7Io99uIfg/lS3khI0wgVWJV1DwYdIGv4uzH58
+	V/RrggUfFZPeun/dBGrWBz1TJ94EShTXdM4P36yC8Zbn70OZi8rQW9327VbT7kNM
+	UHQwyMW5A01z+5p6BYLZo7W2Bt3hsMOlMaPvvft19+5H6UNdcigQt+Ir/xSrjC1Z
+	UnFtdlzAhgH2TTkE9kAJA==
+X-ME-Sender: <xms:W0MEao4Ee6B9KaIdexKaMmunEBEz5IVJAkxaAVvuHJQQpMQwXCGEsQ>
+    <xme:W0MEaktY7wz8HWs9fmkkvV3n_PNIdI8zDbe3Stb_THGCJWrwJrpCWcgEKYIugji1y
+    CszoRp7XjSPuWUm7eTQoBKdtZ6MAFUrUhX5t3ctC5UvQvlRAJzwLA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduvdegvdelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehlihgt
+    vgcuofhikhhithihrghnshhkrgdfuceorghlihgtvgdrkhgvrhhnvghlsehfrghsthhmrg
+    hilhdrihhmqeenucggtffrrghtthgvrhhnpefhgfevgeeljeegleeiffduheegieehtdff
+    tdetvdffieelkedthfejleejgfeftdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgne
+    cuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghlihgt
+    vgdrkhgvrhhnvghlsehfrghsthhmrghilhdrihhmpdhnsggprhgtphhtthhopedukedpmh
+    houggvpehsmhhtphhouhhtpdhrtghpthhtoheprhgriihorhessghlrggtkhifrghllhdr
+    ohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpth
+    htoheplhhutghivghnrdigihhnsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhtfhho
+    mhhitghhvghvsehgmhgrihhlrdgtohhmpdhrtghpthhtohepfihilhhlvghmuggvsghruh
+    hijhhnrdhkvghrnhgvlhesghhmrghilhdrtghomhdprhgtphhtthhopegvughumhgriigv
+    thesghhoohhglhgvrdgtohhmpdhrtghpthhtohepfihilhhlvghmsgesghhoohhglhgvrd
+    gtohhmpdhrtghpthhtohepuggrnhhivghlsehiohhgvggrrhgsohigrdhnvghtpdhrtghp
+    thhtoheprghlihgtvgesihhsohhvrghlvghnthdrtghomh
+X-ME-Proxy: <xmx:W0MEalE-jgBHZDVrnmq2YFjA0moSuMwMsS2LhzkaiJ2FltEKV-w8Lg>
+    <xmx:W0MEamQNfgITZ5DiNFNtwxP29K8GNoBUnUD2bfjK3IN2dJPL5tzUhA>
+    <xmx:W0MEatQnxSIwbk2f9Q_zikQKcB0uOmJfwwy6NIvZgRsSM5SgSgEQ7Q>
+    <xmx:W0MEahdG0KGdv7E_NAjtwbErmhCL1VuigzpBv4YL94pMB31iKBn3iQ>
+    <xmx:W0MEalaTIUtoM58yKXPdWI1_498wrbCTYbKQEd83i0QPIRs8BJu9Os5W>
+Feedback-ID: i559e4809:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 029F1C4006E; Wed, 13 May 2026 05:24:42 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: E48BE530D5B
+Date: Wed, 13 May 2026 11:23:22 +0200
+From: "Alice Mikityanska" <alice.kernel@fastmail.im>
+To: "Gal Pressman" <gal@nvidia.com>, "Daniel Borkmann" <daniel@iogearbox.net>,
+ "David S. Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Xin Long" <lucien.xin@gmail.com>,
+ "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>,
+ "Willem de Bruijn" <willemb@google.com>, "David Ahern" <dsahern@kernel.org>,
+ "Nikolay Aleksandrov" <razor@blackwall.org>
+Cc: "Shuah Khan" <shuah@kernel.org>,
+ "Stanislav Fomichev" <stfomichev@gmail.com>,
+ "Andrew Lunn" <andrew+netdev@lunn.ch>, "Simon Horman" <horms@kernel.org>,
+ "Florian Westphal" <fw@strlen.de>, netdev@vger.kernel.org,
+ "Alice Mikityanska" <alice@isovalent.com>
+Message-Id: <35cf30b6-f3ac-4af3-816b-53511625d916@app.fastmail.com>
+In-Reply-To: <6bd88b37-4aeb-4783-8b92-62b38fe8603d@nvidia.com>
+References: <20260512165648.386518-1-alice.kernel@fastmail.im>
+ <20260512165648.386518-3-alice.kernel@fastmail.im>
+ <6bd88b37-4aeb-4783-8b92-62b38fe8603d@nvidia.com>
+Subject: Re: [PATCH net-next v4 02/12] udp: gso: Simplify handling length in
+ GSO_PARTIAL
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: C2033530948
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.65 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
+	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm3,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[avinashduduskar@gmail.com,netdev@vger.kernel.org];
-	TO_DN_NONE(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287492-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[nvidia.com,iogearbox.net,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,blackwall.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[fastmail.im];
+	TAGGED_FROM(0.00)[bounces-287493-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,strlen.de,vger.kernel.org,isovalent.com];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email,messagingengine.com:dkim,app.fastmail.com:mid]
 X-Rspamd-Action: no action
 
-llc_conn_ac_inc_npta_value() and llc_conn_ac_inc_tx_win_size()
-clamp their counters to the maximum valid 7-bit value via
-(u8) ~LLC_2_SEQ_NBR_MODULO. LLC_2_SEQ_NBR_MODULO is defined as
-((u8) 128) in include/net/llc_pdu.h, but the (u8) cast does not
-prevent integer promotion of the operand of ~: ~128 is computed
-as int (0xffffff7f), and the surrounding (u8) cast truncates
-back to 0x7f. The result is correct (127), but the implicit
-truncation is flagged by sparse:
+On Wed, May 13, 2026, at 09:53, Gal Pressman wrote:
+> Hi Alice,
+>
+> On 12/05/2026 19:56, Alice Mikityanska wrote:
+>> From: Alice Mikityanska <alice@isovalent.com>
+>> 
+>> Taking further the idea of commit b10b446ce7ad ("udp: gso: Use single
+>> MSS length in UDP header for GSO_PARTIAL"), simplify the implementation
+>> and fix the checksum (apparently ignored by hardware anyway).
+>> 
+>> The mentioned commit started using msslen for uh->len, but still uses
+>> newlen to adjust uh->check. If the formula for check is fixed, newlen is
+>> assigned but never used before the loop, and newlen is overwritten after
+>> the loop. This makes msslen not really necessary, as we can reuse
+>> newlen, if we don't adjust mss before. The adjustment of mss can be
+>> simply dropped, because mss is not used anywhere else below.
+>> 
+>> This brings us back to one variable, drops an unneeded arithmetic for
+>> mss, and fixes the UDP checksum.
+>> 
+>> Signed-off-by: Alice Mikityanska <alice@isovalent.com>
+>> Cc: Gal Pressman <gal@nvidia.com>
+>> Reviewed-by: Willem de Bruijn <willemb@google.com>
+>
+> Heads up, this is going to conflict with this fix:
+> https://lore.kernel.org/netdev/20260513074349.2152146-1-gal@nvidia.com/
 
-  net/llc/llc_c_ac.c:1008:38: warning: cast truncates bits from
-      constant value (ffffff7f becomes 7f)
-  (and three more at lines 1009, 1099, 1100)
-
-Replace the (u8) ~LLC_2_SEQ_NBR_MODULO expression with
-LLC_2_SEQ_NBR_MODULO - 1, which evaluates to 127 directly and
-silences sparse.
-
-The same ~LLC_2_SEQ_NBR_MODULO pattern also appears in
-include/net/llc_pdu.h:148 as part of PDU_GET_NEXT_Vr, but there
-the result is immediately &-masked, so the int promotion is
-harmless and sparse does not flag it; it is left alone.
-
-This patch is the minimum diff to silence the warning. The
-counter-clamp idiom itself could be modernized to
-min_t(u8, ..., LLC_2_SEQ_NBR_MODULO - 1), but that is a
-separate cleanup left for another patch.
-
-No functional change.
-
-Signed-off-by: Avinash Duduskar <avinash.duduskar@gmail.com>
----
-Built with CONFIG_LLC2=m; full kernel build clean, sparse no
-longer warns on the touched lines.
-
- net/llc/llc_c_ac.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/net/llc/llc_c_ac.c b/net/llc/llc_c_ac.c
-index 0779daa8aa8f..ab86c720b3ec 100644
---- a/net/llc/llc_c_ac.c
-+++ b/net/llc/llc_c_ac.c
-@@ -1005,8 +1005,8 @@ static int llc_conn_ac_inc_npta_value(struct sock *sk, struct sk_buff *skb)
- 		llc->dec_step = 0;
- 		llc->dec_cntr = llc->inc_cntr = 2;
- 		++llc->npta;
--		if (llc->npta > (u8) ~LLC_2_SEQ_NBR_MODULO)
--			llc->npta = (u8) ~LLC_2_SEQ_NBR_MODULO;
-+		if (llc->npta > LLC_2_SEQ_NBR_MODULO - 1)
-+			llc->npta = LLC_2_SEQ_NBR_MODULO - 1;
- 	} else
- 		--llc->inc_cntr;
- 	return 0;
-@@ -1096,8 +1096,8 @@ int llc_conn_ac_inc_tx_win_size(struct sock *sk, struct sk_buff *skb)
- 	struct llc_sock *llc = llc_sk(sk);
- 
- 	llc->k += 1;
--	if (llc->k > (u8) ~LLC_2_SEQ_NBR_MODULO)
--		llc->k = (u8) ~LLC_2_SEQ_NBR_MODULO;
-+	if (llc->k > LLC_2_SEQ_NBR_MODULO - 1)
-+		llc->k = LLC_2_SEQ_NBR_MODULO - 1;
- 	return 0;
- }
- 
-
-base-commit: 8ebd24a7822cbae25beeafba49b2159d6a68a5f2
--- 
-2.54.0
-
+Thanks for the heads up! When I submitted mine, your patch wasn't on the
+list yet, so it's rather the other way around :). Anyway, let's combine
+our efforts, since we are fixing different aspects of the same area of
+code. I commented on your patch and suggested to base it on top of mine
+to avoid creating a new bug with the checksum. If my series doesn't get
+merged in this iteration, feel free to cherry-pick this commit, it's
+pretty much independent.
 
