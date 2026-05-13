@@ -1,263 +1,142 @@
-Return-Path: <netdev+bounces-287495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287496-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WP+GDcdDBGp0GQIAu9opvQ
-	(envelope-from <netdev+bounces-287495-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:26:31 +0200
+	id 2CR2FDVIBGrNGgIAu9opvQ
+	(envelope-from <netdev+bounces-287496-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:45:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A033953098D
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:26:30 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48EE6530E3B
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 11:45:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3B7B93020FF7
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 09:26:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 210F6307BFEB
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 09:29:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 184373E63AE;
-	Wed, 13 May 2026 09:26:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="B/MeBwzn";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="wolDbEnS";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="B/MeBwzn";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="wolDbEnS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83ACD3E9585;
+	Wed, 13 May 2026 09:29:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B812BD01B
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 09:26:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A29893019DC;
+	Wed, 13 May 2026 09:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778664382; cv=none; b=GK+JeG86lHdULtFI9ToYweDl8kKTum/go7iIJzWw4GWPU2Vtj9SSQJFf/jyip1WWZH8S3uVZ9vbG1t/eTuSNj4Y1Gy+LoElGsmZSRUanZyx/MIQp9hH+5pyTrhPr3YcYQH9uvPp8VCOAggSB9ocLh91/gx2WPgjCDv11dDPbTYQ=
+	t=1778664552; cv=none; b=KHMyT+MT5Okzujq2YqdGGBXcA1Rb3v+RxahCt3XYgj1JlBqGKkshYp7bidt+swBAYGcZSV59N23xCBvoadRNnjLKUBWb1mOjQRMVj+E9K4XNVytJNCAhCd7AJrSo+Z6L4FxxETnU4LLF9qsLJQh3Laqiq8CY0qBKZnCsi+NsuW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778664382; c=relaxed/simple;
-	bh=+A61wAMje7LEB0KBDcQB/mm5PLvDuXfGI5f1q6hv03U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KMpYuJLDi2hkfEHwcbyuy6JJGPf69XcTHrNqMa/Sad3hpuPblmwGe+aDheG4N2dqX0Ua05GI19sWdD29UZ4QmgE15gOXRDQsa64KHVa5zc9nacgBHfBEFnixh4feIWhQ5AOUZ9HGRROzX+JGaxiC7C442xJZi9AM8ixmgsx0uJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=B/MeBwzn; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=wolDbEnS; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=B/MeBwzn; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=wolDbEnS; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 99D635CFB0;
-	Wed, 13 May 2026 09:26:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1778664378; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XKMrjHaSnPAmYEI6gQbk/Eny6irDx2lJWYL45Uo3FA0=;
-	b=B/MeBwznYOdHc/hhIMg9XPMYhyMqz+Sdb6grPppKJNPaZvkz8i2c4x+aWC8+LAgaO/FZJx
-	nge+82TDRbcL6XHLe3AW3Iunic2rZc5jcWj8yGXITKqSeHN4etaxPrPR5mgcEq1JovUvq/
-	yaQsxHnoe1YsdisEooOv9J/luv5Pafw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1778664378;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XKMrjHaSnPAmYEI6gQbk/Eny6irDx2lJWYL45Uo3FA0=;
-	b=wolDbEnSGba8O5U4zO9fMtpF8uA3r+9Pj4N+aOadTPVOPcZbdRgl5zvxXLRiVAHYya/8DM
-	E1U/WxDRgYtsPKBA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1778664378; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XKMrjHaSnPAmYEI6gQbk/Eny6irDx2lJWYL45Uo3FA0=;
-	b=B/MeBwznYOdHc/hhIMg9XPMYhyMqz+Sdb6grPppKJNPaZvkz8i2c4x+aWC8+LAgaO/FZJx
-	nge+82TDRbcL6XHLe3AW3Iunic2rZc5jcWj8yGXITKqSeHN4etaxPrPR5mgcEq1JovUvq/
-	yaQsxHnoe1YsdisEooOv9J/luv5Pafw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1778664378;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XKMrjHaSnPAmYEI6gQbk/Eny6irDx2lJWYL45Uo3FA0=;
-	b=wolDbEnSGba8O5U4zO9fMtpF8uA3r+9Pj4N+aOadTPVOPcZbdRgl5zvxXLRiVAHYya/8DM
-	E1U/WxDRgYtsPKBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9893E593A9;
-	Wed, 13 May 2026 09:26:15 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id A7zjIbdDBGoVZwAAD6G6ig
-	(envelope-from <pfalcato@suse.de>); Wed, 13 May 2026 09:26:15 +0000
-Date: Wed, 13 May 2026 10:26:13 +0100
-From: Pedro Falcato <pfalcato@suse.de>
-To: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>
-Cc: Dragos Tatulea <dtatulea@nvidia.com>, 
-	Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org, akpm@linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel_team@skhynix.com, 
-	harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net, 
-	kuba@kernel.org, hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me, 
-	saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com, 
-	andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com, david@redhat.com, 
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org, 
-	surenb@google.com, mhocko@suse.com, horms@kernel.org, jackmanb@google.com, 
-	hannes@cmpxchg.org, ziy@nvidia.com, ilias.apalodimas@linaro.org, willy@infradead.org, 
-	brauner@kernel.org, kas@kernel.org, yuzhao@google.com, usamaarif642@gmail.com, 
-	baolin.wang@linux.alibaba.com, almasrymina@google.com, toke@redhat.com, asml.silence@gmail.com, 
-	bpf@vger.kernel.org, linux-rdma@vger.kernel.org, sfr@canb.auug.org.au, dw@davidwei.uk, 
-	ap420073@gmail.com
-Subject: Re: [PATCH v4] mm: introduce a new page type for page pool in page
- type
-Message-ID: <agRB2QTbzceRgpzX@pedro-suse>
-References: <20260224051347.19621-1-byungchul@sk.com>
- <982b9bc1-0a0a-4fc5-8e3a-3672db2b29a1@nvidia.com>
- <4af19eda-c29c-4302-92d5-c0915267fc0c@kernel.org>
+	s=arc-20240116; t=1778664552; c=relaxed/simple;
+	bh=iZdO5tfrEC0OdlmnndPXB576cc8IXVl/EBWV1fGg2nM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pU6QY5oupo0qTVD8bClC+pn6gXMEiD3/BtRt5D1C0AhzM8PyQM+TZiIhUcmugoDnQJ2ZfL4pPztV/WB4/sg7vYc4rXEji9s1CMUg/ZCSPoti6iQfaHeFyfWnFtsbNLxjMLIBAzEFUaXuGQqqL0qOL8jl542gFjcJzCrckn4TK+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 2e923c044eae11f1aa26b74ffac11d73-20260513
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:962183df-769f-4fc9-ae5d-57349e4edb99,IP:0,U
+	RL:0,TC:0,Content:-5,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:20
+X-CID-META: VersionHash:e7bac3a,CLOUDID:74ee4adb473dd5d5ef253debbc8e454a,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102|850|898,TC:nil,Content:0|15|50,EDM:5
+	,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV
+	:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 2e923c044eae11f1aa26b74ffac11d73-20260513
+X-User: zenghongling@kylinos.cn
+Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <zenghongling@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1572052449; Wed, 13 May 2026 17:29:03 +0800
+From: Hongling Zeng <zenghongling@kylinos.cn>
+To: chuck.lever@oracle.com,
+	jlayton@kernel.org,
+	neil@brown.name,
+	okorniev@redhat.com,
+	Dai.Ngo@oracle.com,
+	tom@talpey.com,
+	trondmy@kernel.org,
+	anna@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	bcodding@redhat.com
+Cc: linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zhongling0719@126.com,
+	Hongling Zeng <zenghongling@kylinos.cn>
+Subject: [PATCH] sunrpc: Fix error handling in rpc_sysfs_xprt_switch_add_xprt_store()
+Date: Wed, 13 May 2026 17:28:59 +0800
+Message-Id: <20260513092859.175466-1-zenghongling@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <4af19eda-c29c-4302-92d5-c0915267fc0c@kernel.org>
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: -2.30
-X-Rspamd-Queue-Id: A033953098D
+X-Rspamd-Queue-Id: 48EE6530E3B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287495-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[49];
+	TAGGED_FROM(0.00)[bounces-287496-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[kylinos.cn];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[nvidia.com,sk.com,kvack.org,linux-foundation.org,vger.kernel.org,skhynix.com,oracle.com,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,lunn.ch,google.com,redhat.com,suse.cz,suse.com,cmpxchg.org,linaro.org,infradead.org,linux.alibaba.com,canb.auug.org.au,davidwei.uk];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pfalcato@suse.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[suse.de:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[vger.kernel.org,126.com,kylinos.cn];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,suse.cz:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sk.com:email,suse.de:dkim]
+	FROM_NEQ_ENVFROM(0.00)[zenghongling@kylinos.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.988];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,kylinos.cn:email,kylinos.cn:mid]
 X-Rspamd-Action: no action
 
-On Wed, May 13, 2026 at 11:12:43AM +0200, Vlastimil Babka (SUSE) wrote:
-> On 5/13/26 11:00, Dragos Tatulea wrote:
-> > 
-> > 
-> > On 24.02.26 06:13, Byungchul Park wrote:
-> >> Currently, the condition 'page->pp_magic == PP_SIGNATURE' is used to
-> >> determine if a page belongs to a page pool.  However, with the planned
-> >> removal of @pp_magic, we should instead leverage the page_type in struct
-> >> page, such as PGTY_netpp, for this purpose.
-> >> 
-> >> Introduce and use the page type APIs e.g. PageNetpp(), __SetPageNetpp(),
-> >> and __ClearPageNetpp() instead, and remove the existing APIs accessing
-> >> @pp_magic e.g. page_pool_page_is_pp(), netmem_or_pp_magic(), and
-> >> netmem_clear_pp_magic().
-> >> 
-> >> Plus, add @page_type to struct net_iov at the same offset as struct page
-> >> so as to use the page_type APIs for struct net_iov as well.  While at it,
-> >> reorder @type and @owner in struct net_iov to avoid a hole and
-> >> increasing the struct size.
-> >> 
-> >> This work was inspired by the following link:
-> >> 
-> >>   https://lore.kernel.org/all/582f41c0-2742-4400-9c81-0d46bf4e8314@gmail.com/
-> >> 
-> >> While at it, move the sanity check for page pool to on the free path.
-> >> 
-> >> Suggested-by: David Hildenbrand <david@redhat.com>
-> >> Co-developed-by: Pavel Begunkov <asml.silence@gmail.com>
-> >> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> >> Signed-off-by: Byungchul Park <byungchul@sk.com>
-> >> Acked-by: David Hildenbrand <david@redhat.com>
-> >> Acked-by: Zi Yan <ziy@nvidia.com>
-> >> Acked-by: Vlastimil Babka <vbabka@suse.cz>
-> >> Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
-> >> ---
-> > 
-> > Seems like this patch broke tcp_mmap because
-> > validate_page_before_insert() returns -EINVAL due
-> > to a page having a type. Here's the full flow:
-> > 
-> > getsockopt(TCP_ZEROCOPY_RECEIVE) returns -EINVAL because of the
-> > below flow in the kernel:
-> > 
-> > tcp_zerocopy_receive()
-> > -> tcp_zerocopy_vm_insert_batch()
-> >   -> vm_insert_pages()
-> >     -> insert_pages()
-> >       -> insert_page_in_batch_locked()
-> >         -> validate_page_before_insert() returns -EINVAL
-> >            because page_has_type(page) is now true.
-> > 
-> > The patch below fixes the issue. But is this a valid fix?
-> 
-> Hmm the check traces back to commit 0ee930e6cafa0 "mm/memory.c: prevent
-> mapping typed pages to userspace"
-> 
-> > Pages which use page_type must never be mapped to userspace as it would
-> > destroy their page type.  Add an explicit check for this instead of
-> > assuming that kernel drivers always get this right.
-> 
-> So uh, this doesn't look good I think.
+xprt_create_transport() never returns NULL, only valid pointers or
+error pointers. Using IS_ERR_OR_NULL() is incorrect, and PTR_ERR(NULL)
+would return 0, which indicates EOF in a sysfs store function.
 
-Yep, you fundamentally can't map a page with a type as page type aliases with
-mapcount. Even with the given diff, just mapping it will increment the mapcount
-and wreak havoc. I think we need to revert this patch for now.
+Fix this by using IS_ERR() instead of IS_ERR_OR_NULL().
 
-I'm not sure what the long term plan for this would be. If page types are moved
-to memdesc types, then the two stop colliding and that could work. I don't know
-if that's Willy's plan, however.
+Fixes: df210d9b0951 ("sunrpc: Add a sysfs file for adding a new xprt")
+Signed-off-by: Hongling Zeng <zenghongling@kylinos.cn>
+---
+ net/sunrpc/sysfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-(then there's the other question: are page pool pages really folios? not really.
-they are mappable, but they aren't part of the page cache, or anon, nor are
-they in the LRU or have rmap capabilities. perhaps we need a different memdesc
-for those. we're one step away from reinventing class polymorphism from first
-principles ;)
-
-> 
-> > diff --git a/mm/memory.c b/mm/memory.c
-> > index ea6568571131..4cb12673f450 100644
-> > --- a/mm/memory.c
-> > +++ b/mm/memory.c
-> > @@ -2326,7 +2326,7 @@ static int validate_page_before_insert(struct vm_area_struct *vma,
-> >                         return -EINVAL;
-> >                 return 0;
-> >         }
-> > -       if (folio_test_anon(folio) || page_has_type(page))
-> > +       if (folio_test_anon(folio) || (page_has_type(page) && !PageNetpp(page)))
-> >                 return -EINVAL;
-> >         flush_dcache_folio(folio);
-> >         return 0;
-> > 
-> > Thanks,
-> > Dragos
-> > 
-> > 
-> 
-> 
-
+diff --git a/net/sunrpc/sysfs.c b/net/sunrpc/sysfs.c
+index a90480f80154..49686bf740e6 100644
+--- a/net/sunrpc/sysfs.c
++++ b/net/sunrpc/sysfs.c
+@@ -348,7 +348,7 @@ static ssize_t rpc_sysfs_xprt_switch_add_xprt_store(struct kobject *kobj,
+ 	xprt_create_args.reconnect_timeout = xprt->max_reconnect_timeout;
+ 
+ 	new = xprt_create_transport(&xprt_create_args);
+-	if (IS_ERR_OR_NULL(new)) {
++	if (IS_ERR(new)) {
+ 		count = PTR_ERR(new);
+ 		goto out_put_xprt;
+ 	}
 -- 
-Pedro
+2.25.1
+
 
