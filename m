@@ -1,223 +1,181 @@
-Return-Path: <netdev+bounces-287675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287676-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SMvfAlynBGogMQIAu9opvQ
-	(envelope-from <netdev+bounces-287675-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 18:31:24 +0200
+	id aNYWFDisBGrIMwIAu9opvQ
+	(envelope-from <netdev+bounces-287676-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 18:52:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8EB0537178
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 18:31:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FED353773A
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 18:52:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5DE42301912C
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 16:19:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 019AC32D6108
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 16:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB3C538837D;
-	Wed, 13 May 2026 16:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA36C472766;
+	Wed, 13 May 2026 16:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jg2dKFzv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bcv2C2Pb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AAD4494A19;
-	Wed, 13 May 2026 16:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778689187; cv=none; b=lv6H2BZtgCEIgxlv1eQQ4JwtJSKOO9jtmVj6saHUtoLZ4lFY0mAkS6m/A+DWHvDYS2u7Xnqq+CfCO8Ad1i2qBXcpGGK3zP6rHTRZv+02DFTcHKdS1DS+/sUDougcbt9g6XvCuExp6YJWFUGYYkmn4qyTX7I1Y8BpQXxJyhKuHyE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778689187; c=relaxed/simple;
-	bh=nf/EGUFlU1Lh8RetUOEO9Cf1rjcOBc9mFE8STXI1blM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G74Qq0TlRAuLC6+a7QxRUOtQ4ifx9tTp5i2SyNU9MYj+MuHl69Mef1Az9AoIF0bemSl46TfZ5N1W/8tuuIJQkmIZLMmUXj2gD9rGytIZOr9YPYsD8brfHcq2CJAXVgqnaHBkyN6CiFwTC17CBXo6kMNM3/edSPdcZN9VNpjyvT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jg2dKFzv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F64BC19425;
-	Wed, 13 May 2026 16:19:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778689186;
-	bh=nf/EGUFlU1Lh8RetUOEO9Cf1rjcOBc9mFE8STXI1blM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jg2dKFzv6okX1KYFBRwCHm2sFYiTPHsJQ5YnZWeVNvP3Zj5cWasmXNArcBkCV4FtZ
-	 Cs1BE9Q0wZLhsOlBOHrsd2IopjTPWv7NKKb7t3BoTTz8JojO679pnlUVmPg4MeiGbQ
-	 6zLYjR4CDfYOUbsDGYpd1zSuzlauUB1NRNQRe01/tTMDwm8WH7XUhi1TfmpciK5Xsf
-	 0etPp1MQrSRS+wCfMxTZ7prR6YdLs4VaDtxPfv1lXObBTEuOwElYfZR/LUXvkzIUVc
-	 BxSEVAgFShBCjO6UrdwYJmioH2S+IXaukrL/d8KUwrmrSwv0XxF4LcRi90IVGiVlC/
-	 lhGeNl4KNuwVw==
-Date: Wed, 13 May 2026 18:19:43 +0200
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Waiman Long <longman@redhat.com>
-Cc: Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>, Guenter Roeck <linux@roeck-us.net>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Joel Fernandes <joelagnelf@nvidia.com>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Boqun Feng <boqun@kernel.org>, Uladzislau Rezki <urezki@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Zqiang <qiang.zhang@linux.dev>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
-	Chen Ridong <chenridong@huaweicloud.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-	Valentin Schneider <vschneid@redhat.com>,
-	K Prateek Nayak <kprateek.nayak@amd.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, cgroups@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-hyperv@vger.kernel.org,
-	linux-hwmon@vger.kernel.org, rcu@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Costa Shulyupin <cshulyup@redhat.com>,
-	Qiliang Yuan <realwujing@gmail.com>
-Subject: Re: [PATCH 08/23] arm64: topology: Use RCU to protect access to
- HK_TYPE_TICK cpumask
-Message-ID: <agSkn9H_Xsz3MZa6@localhost.localdomain>
-References: <20260421030351.281436-1-longman@redhat.com>
- <20260421030351.281436-9-longman@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7F32E0B58
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 16:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778689230; cv=pass; b=luXq58BxzpgEk5nowZENzx+NC9mKyX8qoVBZ9R54oHL/N+/ohJ94uzxj2DqckrlZg8y0WPKE1ZMmUaGh5rNCLI2bjKl+veHEUQ6Rg8yUU1xdoxYrSKZJ6xSVS24oeFTGaUpeXrhcr6K+mgQShArH8L3imGoCeV5RzK4+ixW0Kts=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778689230; c=relaxed/simple;
+	bh=eAJTGuNjyeN1H0W0agKrLwMo2FHLEctrW7qpgWkMFd8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=haI7N2SlpWH98zin43SW/V9Wem0Iy1iHZJqk/yBzvZqC9SL4z6KnTzh+w+ponmvPbfNPHmkpNuumSkDYc+pbeatGSTjHPLE66ksmVGD8K/AW0TWb/lEtSWC7lzsDpIihJrX1NU6eW5twWEkUwLMPbLjoMp5EszFNnxG/tcdBYo0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bcv2C2Pb; arc=pass smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-671f1a0d0c5so413a12.0
+        for <netdev@vger.kernel.org>; Wed, 13 May 2026 09:20:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778689228; cv=none;
+        d=google.com; s=arc-20240605;
+        b=bfMwlA39TWQjIhbOV/puK83dRsdkGt+pv2yY3LoOEIvMvzg9c0OIhd86VkFXfdWhMr
+         FW6QFmic3kp43rRBUBvP/jsM4BoPuYH3qQ1zWhJX5vahNYYKwauxg5R374CRGtyO6fOr
+         P23TfKbGs++VP83Q/u0cagUOK3J8qr/4rBMv0pRqkWLyV7Axz+EgcpQHvZ66lhUwhbub
+         o0KRD07CbSJBbK/11Tn2QKPevyt8EiGC/HxJj6P3QJk1Xs2okJB6xx+bdhPE8P7tJxER
+         HkKKmV60xafbwHY/ZqjJ4BTqCV0na4vwLFIKcA+JNWoK/rimW0Bpcr/evW78p6N7gcV6
+         PbzA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=eAJTGuNjyeN1H0W0agKrLwMo2FHLEctrW7qpgWkMFd8=;
+        fh=+AyL+Uw0aiqSkJuFINLU0pdH2dA29+E5/xd3vwcCwMA=;
+        b=HQIH77WDE+pjeWbsMa+g8ezY9lH7F+QELb8msbJgH5L12NGiTbul7Rkds7V5YQTN85
+         rKOOkIVZpPNk/f0LJt+gDqKIvYwRYAXLKg8KTuVPHcZr9Aj/gBCPlzUVg/7jDWSQNR0+
+         zy/AwSrjemnSunQl+3+YBguZof//UL2Pud/+gvScz7Zy289mVmcUG01xkGedNpvDp9mw
+         mFlZ0gvjkELIAOK48xd6HLHNewJzSZohpx7szAk2xZe9zHNlO+fh+UDq8Tei6iGHZ0Jy
+         mC5W/YIFOK1X8svQZO1PLmGtc9ixkXpNjIJx7qBWjV4b7POrofSEhFl3iGUKD+x+uXFi
+         00jA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1778689228; x=1779294028; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eAJTGuNjyeN1H0W0agKrLwMo2FHLEctrW7qpgWkMFd8=;
+        b=bcv2C2Pb5BbAxkjDGC/Ls88uXgGODKKzM6B6ZJ+ZTPGGvpKaPY4erLix8MH4+WUDFM
+         rc02AfmZo5Y4xBo6l3X116tYg3xWV1J/yycnEHuJEgrtJ4cziwL2NxUULPaujYjU1UVK
+         ECQ1Af4dPWBH9uWNH5zphhUSVbeP9Z3eDQ/d6aaTYkJhoF3kwC3n5kEWjnWSLr8hQrBc
+         6IOzYomk+KR6h5Uh6bwengHL0SuXn0IF5D1zGwkfFD7Va6EiOKtm4P0FI12051jFNAPI
+         UXh0ArEI1bSzIptkLpkBLek3/GFqWZhnQmqMG+ZW2Jn/9CoA5nJzGh65rjdd/QuN4KXQ
+         4DEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778689228; x=1779294028;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=eAJTGuNjyeN1H0W0agKrLwMo2FHLEctrW7qpgWkMFd8=;
+        b=ODw3xENVWHkAFKpfapzc5IH6AtYYGEkVdA1/vOSXw3JYZ2c8uZYhiPzZOUZM/XAmLX
+         hgkZLV9kwi6m4W1ndFeoPBPssbimU6oqvFMI0KGSL/HQ+e1IBoWwi5W2KTu0UIXVdCC7
+         2qVz8QL5s6Rz4uvEgtB5mowc7SjPAQUQjAc2vi0AESXzkTy67SoBEcpV38uVPVKZ/yj5
+         kX4RMDI/hVlH97mSyN6idBU53CwME5WlpBx/7P+hkordSvAB6172d9ddKz0ewMP/5uOA
+         9Bf6KgyHOPWCChSSPT7h8ZyIGIBXFiDRuTG/iBaMraGg9zj2/IWRdta7MuyjrWlrCip9
+         Nc9g==
+X-Forwarded-Encrypted: i=1; AFNElJ/EVYPisyMBLD4q10C70agcgvS6LqUEZN99Nq7G8X6tJWYM8Tjm+6BcsEoSjB3Tz9hzOvQu0lM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxgp142xzkDAF2CbMO/gMXlptwaAYTQtuVHfbAqJzrZ6ABMYfH4
+	2nqTz6J/jRHQkHSucTXJFfGuNGK3zLzeHZz+vB10KW9YEAx3l47dUEkMNO6vLiuDtLDw38JBiZl
+	09dW1Y/XZp1ddJ1ymB1dcKloaUvjk2tLg3b2eiKMd
+X-Gm-Gg: Acq92OH5dfukQs77ScJUYmwcKqbpBPBzImTmStY5Ds4bGC3kIt2/WAFFkBib1yjFNHc
+	oisUuw82Ky0AeUm9B1K4y46B53/dIC1ZmB4fw1coEE5Kz8FNhHAw7fFyjK9yJkLXiEiiHGd09Gn
+	3goARoG55JW8wjOOFRqs/Xb3WRk2vc63C6SWGR1icdaUADNzGXTaaCXN+torBOOGix1Bn2/tSfy
+	U/Hc9U8gzJiX8ke2MSyNq2f1Zv41L4O3s1fzmCEwqTJd2TUgupmpirLIqH86W7iEA2kPqurNrfX
+	Ssq3NS/4258h1+9PDk6OgsAzWu1HAsU8VP/QVyjbvMzYnDixM1iAoEkmGioJSDbvMwweiTNr0jR
+	vkw==
+X-Received: by 2002:a05:6402:a554:10b0:682:a2f:a15c with SMTP id
+ 4fb4d7f45d1cf-6827c43e148mr52503a12.11.1778689227392; Wed, 13 May 2026
+ 09:20:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260421030351.281436-9-longman@redhat.com>
-X-Rspamd-Queue-Id: B8EB0537178
+References: <20260428-mlx5_vxlan-v1-1-cf666d042618@google.com>
+ <20260428184631.40f1f1b7@kernel.org> <CANkEMgkBnuRfurKcFEUAZcJcX1XYSnHbBozZGP8DpnKq--tWbw@mail.gmail.com>
+ <20260429190150.417b0302@kernel.org> <CANkEMg=Xc9jN8McZmLerK_ffOwRFfX+yO=4Ha6+umVogbkBj3A@mail.gmail.com>
+ <20260504181022.60ee2a1a@kernel.org> <c2258e70-4c2e-4999-8876-ad98f4259eda@nvidia.com>
+In-Reply-To: <c2258e70-4c2e-4999-8876-ad98f4259eda@nvidia.com>
+From: Marc Harvey <marcharvey@google.com>
+Date: Wed, 13 May 2026 11:20:16 -0500
+X-Gm-Features: AVHnY4LR-7un0veJqtGYLAWCLE6dTqG73RIFCxJa315MJ-hSMZ1fDaAXA4SUzUo
+Message-ID: <CANkEMgmhh40uE8asRO3WJpAtDZWDcSjJNVCzh54TgwcMUonhdA@mail.gmail.com>
+Subject: Re: [PATCH net-next] net/mlx5: Add MLX5_VXLAN config option
+To: Gal Pressman <gal@nvidia.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kuniyuki Iwashima <kuniyu@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 9FED353773A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,cmpxchg.org,suse.com,lwn.net,linuxfoundation.org,arm.com,microsoft.com,roeck-us.net,nvidia.com,joshtriplett.org,gmail.com,goodmis.org,efficios.com,linux.dev,linutronix.de,huaweicloud.com,infradead.org,redhat.com,linaro.org,google.com,suse.de,amd.com,davemloft.net,vger.kernel.org,lists.infradead.org];
-	TAGGED_FROM(0.00)[bounces-287675-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287676-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[52];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[frederic@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[localhost.localdomain:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marcharvey@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-Le Mon, Apr 20, 2026 at 11:03:36PM -0400, Waiman Long a écrit :
-> As the HK_TYPE_TICK cpumask is going to be changeable at run time, we
-> need to use RCU to protect access to the cpumask to prevent it from
-> going away in the middle of the operation.
-> 
-> Signed-off-by: Waiman Long <longman@redhat.com>
-> ---
->  arch/arm64/kernel/topology.c | 17 ++++++++++++++---
->  1 file changed, 14 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kernel/topology.c b/arch/arm64/kernel/topology.c
-> index b32f13358fbb..48f150801689 100644
-> --- a/arch/arm64/kernel/topology.c
-> +++ b/arch/arm64/kernel/topology.c
-> @@ -173,6 +173,7 @@ void arch_cpu_idle_enter(void)
->  	if (!amu_fie_cpu_supported(cpu))
->  		return;
->  
-> +	guard(rcu)();
->  	/* Kick in AMU update but only if one has not happened already */
->  	if (housekeeping_cpu(cpu, HK_TYPE_TICK) &&
->  	    time_is_before_jiffies(per_cpu(cpu_amu_samples.last_scale_update,
->  	cpu)))
+On Tue, May 5, 2026 at 1:21=E2=80=AFAM Gal Pressman <gal@nvidia.com> wrote:
+>
+> Hi Marc,
+>
+> On 05/05/2026 4:10, Jakub Kicinski wrote:
+> >
+> > Sorry, I don't know mlx5 very well. Sounds like you have to talk
+> > to nVidia or/and run some experiments. The current patch is a no-go.
+> >
+>
+> The hardware offloads 4789 by default, hence the
+> UDP_TUNNEL_NIC_INFO_STATIC_IANA_VXLAN, you cannot simply remove it.
+>
+> Have you tried disabling tx-udp_tnl-segmentation through ethtool?
 
-This is called with IRQs disabled in the current CPU that is online so it's
-already guaranteed to be stable.
+Thanks for the responses.
 
+Gal, by "the hardware offloads 4789 by default," does that mean the
+hardware offloads 4789 even without an explicit command from the
+driver? I ask because mlx5 does send a command to offload 4789, but
+perhaps this command is redundant and only for bookkeeping purposes.
 
-> @@ -187,11 +188,16 @@ int arch_freq_get_on_cpu(int cpu)
->  	unsigned int start_cpu = cpu;
->  	unsigned long last_update;
->  	unsigned int freq = 0;
-> +	bool hk_cpu;
->  	u64 scale;
->  
->  	if (!amu_fie_cpu_supported(cpu) || !arch_scale_freq_ref(cpu))
->  		return -EOPNOTSUPP;
->  
-> +	scoped_guard(rcu) {
-> +		hk_cpu = housekeeping_cpu(cpu, HK_TYPE_TICK);
-> +	}
-> +
->  	while (1) {
->  
->  		amu_sample = per_cpu_ptr(&cpu_amu_samples, cpu);
-> @@ -204,16 +210,21 @@ int arch_freq_get_on_cpu(int cpu)
->  		 * (and thus freq scale), if available, for given policy: this boils
->  		 * down to identifying an active cpu within the same freq domain, if any.
->  		 */
-> -		if (!housekeeping_cpu(cpu, HK_TYPE_TICK) ||
-> +		if (!hk_cpu ||
->  		    time_is_before_jiffies(last_update + msecs_to_jiffies(AMU_SAMPLE_EXP_MS))) {
->  			struct cpufreq_policy *policy = cpufreq_cpu_get(cpu);
-> +			bool hk_intersects;
->  			int ref_cpu;
->  
->  			if (!policy)
->  				return -EINVAL;
->  
-> -			if (!cpumask_intersects(policy->related_cpus,
-> -						housekeeping_cpumask(HK_TYPE_TICK))) {
-> +			scoped_guard(rcu) {
-> +				hk_intersects = cpumask_intersects(policy->related_cpus,
-> +							housekeeping_cpumask(HK_TYPE_TICK));
-> +			}
-> +
-> +			if (!hk_intersects) {
->  				cpufreq_cpu_put(policy);
->  				return -EOPNOTSUPP;
->  			}
+I haven't tried changing the offload related ethtool parameters, and I
+will, but I suspect it won't help in this specific case since the
+perceived regression involved non-tunneled traffic.
 
-Ok so this is racy but it's fine because:
-
-This function is only used by cpufreq with either cpufreq_policy_write or
-cpufreq_policy_read held (that is, struct cpufreq_policy::rwsem).
-
-And that rwsem is write held on cpufreq_online() -> cpufreq_policy_online() and
-also offline to guarantee the policy->cpus and policy->cpu stability.
-
-Therefore housekeeping_cpumask() should only deal with stable online CPUs here. So
-even if the housekeeping mask can be changed concurrently, those CPUs can't
-appear or disappear from it.
-
-Would be worth adding a comment about that.
-
--- 
-Frederic Weisbecker
-SUSE Labs
+If the hardware indeed offloads 4789 autonomously, then the perceived
+regression we saw might not have been real or related to enabling
+vxlan.
 
