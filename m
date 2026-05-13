@@ -1,326 +1,390 @@
-Return-Path: <netdev+bounces-287375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287376-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +OJjGxrVA2q5/AEAu9opvQ
-	(envelope-from <netdev+bounces-287375-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 03:34:18 +0200
+	id kJvxAEbVA2q5/AEAu9opvQ
+	(envelope-from <netdev+bounces-287376-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 03:35:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D502952BEEF
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 03:34:17 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9755052BF2C
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 03:35:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9C4FB3085025
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 01:34:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F2B0630A3188
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 01:34:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6033C3822A2;
-	Wed, 13 May 2026 01:33:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4FA137BE6B;
+	Wed, 13 May 2026 01:34:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="GpqnqSW9"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Lfqy6w/X"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A1137C0F3;
-	Wed, 13 May 2026 01:33:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F94374E41
+	for <netdev@vger.kernel.org>; Wed, 13 May 2026 01:34:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778636031; cv=none; b=gCyhdx6rDWZBxPXijBUBkwj1oM+tEcDzuUoLzUCW/lsDn7ROYoBHSr1gq8Ca6/p90EUGVrGOQObcTYjGgle4051fvsvLM2naAjzRrdqZ0yOP0xsYfPKGJ9NNZ88rNKik+dRKmRCSVcUYonKGxRo7YoeL5j/Xh8y0uUJG6ftlXMQ=
+	t=1778636059; cv=none; b=it+giPci6UEOD/u6hYwcQP8LlBTfZmzVsKCWlu/r3In/02P9CymANRqR6/v3WZ5zIb0aiMS1AmUjx/7VPPxyP6d8NBYE12YItxWba1HKdhAAJI925ETYvv4lX7OsRLZkstpMu2+ChYYbvDIGDb3P1Zs20hjYORKP6rwE/erjuTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778636031; c=relaxed/simple;
-	bh=rcRXXg7UbH+EbZfmiUxU8wywsb+Gdo2u01va/RHA5bs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=dBYArhUbaYkdkMrATlmyxGMwU3cSfBIbrpOD8wcTP5W9bSnuQVI4wUJnvyFbfjjd9bahUCRdF5qNUQOsGIiTtHFclAFaRnCKcSgYbYMN9LKBLHlkXqpy5nFM2hSZBcwKfccMVdf1vcnQuR3k7qGfsUSHwPDjDatOmTvJ3bNrfCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=GpqnqSW9; arc=none smtp.client-ip=113.46.200.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=4MWMrthRhdSdwUjqWPGVf9+M+ttsxk6C6GE7zy72DVU=;
-	b=GpqnqSW9DnQUvT/4OaKJjJbTQqrAQrBOKrhN5dxvRHERrIAOoabqj5gmZM7XwiyD022cWBNM4
-	GmR0cyhybc6ygTmrymtmyisAD576FqZgPfX19Lj2UKO2borJwIraf81eNaOQK/UmSFFcrCjlGQD
-	YPfvZ5rO27ylzaZIxcgMJho=
-Received: from mail.maildlp.com (unknown [172.19.162.140])
-	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4gFbQ15Ms5z1T4HC;
-	Wed, 13 May 2026 09:26:01 +0800 (CST)
-Received: from kwepemk500009.china.huawei.com (unknown [7.202.194.94])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9E81120104;
-	Wed, 13 May 2026 09:33:42 +0800 (CST)
-Received: from [10.67.121.161] (10.67.121.161) by
- kwepemk500009.china.huawei.com (7.202.194.94) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 13 May 2026 09:33:41 +0800
-Message-ID: <e6928a10-77b1-4fdf-8bc3-cd0154b4d4c5@huawei.com>
-Date: Wed, 13 May 2026 09:33:41 +0800
+	s=arc-20240116; t=1778636059; c=relaxed/simple;
+	bh=EuiTx1li/D8Xr+qhnNAIS0ui3340chWGlB8PK4qJvTM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B8l07CveJvCd8J/vVT3joEw0Cy5BOAAX5xmzLqXBmZ1/QsQEF5n+P9sLfePjQpj4JqimVNHjpOt/dHYj7pj3z6h0og6EO5uBGaiR5VRkR+aE1+nwrLebciticvzC8J6zGd/kptOzIaaERNAJcLvfyRruIUo1byOtWOfCD5EMxHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Lfqy6w/X; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1778636050;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=aL/A9Hf/c75f6L2PaNLCV8HeDahLG72LPCdaVaMaw0A=;
+	b=Lfqy6w/XzFRDNa5Hl8eLY/+9Fp3Et/MChrTeHYk1kFh+RRIKUb//YjmPhv2RL+sCGqD23K
+	duKQSHrpSUCKFjNOimgUjkQN625pS987NMkTjt+xKwGurXvA9FAn8yu0enN/61CPbEeWmN
+	BK7VRQGR8jomJLG3HFLsTa2axSJC/D0=
+From: Qingfang Deng <qingfang.deng@linux.dev>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Qingfang Deng <qingfang.deng@linux.dev>,
+	Guillaume Nault <gnault@redhat.com>,
+	Kees Cook <kees@kernel.org>,
+	Felix Fietkau <nbd@nbd.name>,
+	Eric Woudstra <ericwouds@gmail.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Richard Gobert <richardbgobert@gmail.com>,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: linux-ppp@vger.kernel.org,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>
+Subject: [PATCH net-next v10 1/2] net: pppoe: implement GRO/GSO support
+Date: Wed, 13 May 2026 09:33:48 +0800
+Message-ID: <20260513013400.7467-1-qingfang.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/2] vfio: add dma-buf get_tph callback and DMA_BUF_TPH
- feature
-To: Zhiping Zhang <zhipingz@meta.com>, Alex Williamson <alex@shazbot.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>
-CC: Bjorn Helgaas <helgaas@kernel.org>, <kvm@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <dri-devel@lists.freedesktop.org>, Keith Busch
-	<kbusch@kernel.org>, Yochai Cohen <yochai@nvidia.com>, Yishai Hadas
-	<yishaih@nvidia.com>
-References: <20260512184755.4137227-1-zhipingz@meta.com>
- <20260512184755.4137227-2-zhipingz@meta.com>
-Content-Language: en-US
-From: fengchengwen <fengchengwen@huawei.com>
-In-Reply-To: <20260512184755.4137227-2-zhipingz@meta.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- kwepemk500009.china.huawei.com (7.202.194.94)
-X-Rspamd-Queue-Id: D502952BEEF
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 9755052BF2C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-287375-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287376-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[huawei.com:+];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,nvidia.com,linux.dev,nbd.name,gmail.com,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fengchengwen@huawei.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:mid,huawei.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,netfilter.org:email,linux.dev:email,linux.dev:mid,linux.dev:dkim,nbd.name:email]
 X-Rspamd-Action: no action
 
-Hi Zhiping,
+From: Felix Fietkau <nbd@nbd.name>
 
-I have several suggestions:
+Only handles packets where the pppoe header length field matches the exact
+packet length. Significantly improves rx throughput.
 
-1. In struct vfio_device_feature_dma_buf_tph, steering_tag is defined as
-   __u16, but PCIe TPH base steering tag is only 8-bit. We can use __u8
-   for steering_tag to shrink structure size and reduce reserved padding.
+When running NAT traffic through a MediaTek MT7621 devices from a host
+behind PPPoE to a host directly connected via ethernet, the TCP throughput
+that the device is able to handle improves from ~130 Mbit/s to ~630 Mbit/s,
+using fraglist GRO.
 
-2. The flags field seems unnecessary. We can use value 0 of steering_tag
-   or steering_tag_ext to indicate the corresponding ST entry is not
-   available, which simplifies the uAPI design.
+Signed-off-by: Felix Fietkau <nbd@nbd.name>
+Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
+Tested-by: Pablo Neira Ayuso <pablo@netfilter.org>
+---
+v10: use NETIF_F_GSO_SOFTWARE instead of NETIF_F_TSO|TSO6
+v9: https://lore.kernel.org/netdev/20260509030507.387050-1-qingfang.deng@linux.dev
+ - clear TSO features to force software segmentation
+ - remove skb_gso_error_unwind(), which is intented for tunnel skbs
+v8: https://lore.kernel.org/netdev/20260501035102.293031-1-qingfang.deng@linux.dev
+ - no changes
+v7: https://lore.kernel.org/netdev/20260428064717.74794-1-qingfang.deng@linux.dev
+ - use PPPOE_SES_HLEN macro instead of +2 magic number
+v6: https://lore.kernel.org/netdev/20260326081127.61229-1-dqfext@gmail.com
+ - avoid phdr->length field overflow 
+ - restore skb_is_gso() check
+ - do not register GRO if INET=n
+ - do not check for PPP_IPV6 if IPV6=n
+ - tail call gro_complete
 
-3. All TPH metadata fields (st, ext st, ph) fit within 32 bits. We can
-   wrap them into a union with atomic_t, then use atomic read/write
-   instead of memory_lock plus smp_load_acquire/smp_store_release. This
-   makes lockless access cleaner and avoids ordering maintenance.
+ drivers/net/ppp/pppoe.c | 161 +++++++++++++++++++++++++++++++++++++++-
+ net/ipv4/af_inet.c      |   2 +
+ net/ipv6/ip6_offload.c  |   2 +
+ 3 files changed, 164 insertions(+), 1 deletion(-)
 
-For details, see the text.
-
-On 5/13/2026 2:47 AM, Zhiping Zhang wrote:
-> Add a dma-buf callback that returns raw TPH metadata from the exporter
-> so peer devices can reuse the steering tag and processing hint
-> associated with a VFIO-exported buffer. Add a new
-> VFIO_DEVICE_FEATURE_DMA_BUF_TPH ioctl that takes the fd from
-> VFIO_DEVICE_FEATURE_DMA_BUF along with the TPH values, validates the fd
-> is a vfio-exported dma-buf belonging to this device, and stores the TPH
-> metadata under memory_lock. The existing VFIO_DEVICE_FEATURE_DMA_BUF
-> uAPI is unchanged.
-> 
-> 8-bit ST and 16-bit Extended ST are distinct namespaces in the PCIe TPH
-> ST table (firmware reports them as separate fields with separate
-> validity bits in the ACPI _DSM ST table), so the uAPI carries both
-> values along with a flags field that indicates which value(s) are
-> valid for this device. The exporter selects the value that matches the
-> importer's requested width and returns -EOPNOTSUPP if that width is
-> not present, instead of substituting a value across namespaces.
-> 
-> Publish the TPH fields under memory_lock and gate readers on a
-> release/acquire on the flags field; this lets get_tph() run lockless
-> and avoids inverting the memory_lock -> dma_resv_lock ordering set up
-> by vfio_pci_dma_buf_move(). Convert the @revoked bitfield to a plain bool
-> so concurrent updates of @revoked (under dma_resv_lock) and the new TPH
-> fields (under memory_lock) cannot race on a shared bitfield byte.
-
-The commit log includes many implementation details, why not remove or simply it.
-
-> 
-> Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
-> 
-> ---
->  drivers/vfio/pci/vfio_pci_core.c   |   3 +
->  drivers/vfio/pci/vfio_pci_dmabuf.c | 113 ++++++++++++++++++++++++++++-
->  drivers/vfio/pci/vfio_pci_priv.h   |  11 +++
->  include/linux/dma-buf.h            |  21 ++++++
->  include/uapi/linux/vfio.h          |  35 +++++++++
->  5 files changed, 182 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index 3f8d093aacf8..94aa6dd95701 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -1534,6 +1534,9 @@ int vfio_pci_core_ioctl_feature(struct vfio_device *device, u32 flags,
->  		return vfio_pci_core_feature_token(vdev, flags, arg, argsz);
->  	case VFIO_DEVICE_FEATURE_DMA_BUF:
->  		return vfio_pci_core_feature_dma_buf(vdev, flags, arg, argsz);
-> +	case VFIO_DEVICE_FEATURE_DMA_BUF_TPH:
-> +		return vfio_pci_core_feature_dma_buf_tph(vdev, flags, arg,
-> +							 argsz);
->  	default:
->  		return -ENOTTY;
->  	}
-> diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> index f87fd32e4a01..28247602e359 100644
-> --- a/drivers/vfio/pci/vfio_pci_dmabuf.c
-> +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> @@ -19,7 +19,23 @@ struct vfio_pci_dma_buf {
->  	u32 nr_ranges;
->  	struct kref kref;
->  	struct completion comp;
-> -	u8 revoked : 1;
-> +	/*
-> +	 * TPH metadata published by VFIO_DEVICE_FEATURE_DMA_BUF_TPH and
-> +	 * consumed by the @get_tph dma-buf callback.
-> +	 *
-> +	 * @tph_flags is the publish/consume gate: writers populate
-> +	 * @steering_tag, @steering_tag_ext and @ph first, then store
-> +	 * @tph_flags with smp_store_release(); readers do
-> +	 * smp_load_acquire(&tph_flags) before accessing the value fields.
-> +	 * @tph_flags == 0 means "TPH not set". Writers serialize via
-> +	 * vdev->memory_lock; readers are lockless to avoid AB-BA against
-> +	 * the dma_resv_lock held by importers.
-> +	 */
-> +	u32 tph_flags;
-
-As subsequent comments, can proceed without tph_flags
-
-> +	u16 steering_tag;
-> +	u16 steering_tag_ext;
-> +	u8 ph;
-
-struct dma_buf_tph {
-        union {
-                atomic_t val;
-                struct {
-                        u16 st_ext;
-                        u8 st;
-                        u8 ph;
-                };
-        };
-};
-Set and get are done with atomic operation, no need for lock
-
-> +	bool revoked;
->  };
->  
->  static int vfio_pci_dma_buf_attach(struct dma_buf *dmabuf,
-> @@ -69,6 +85,35 @@ vfio_pci_dma_buf_map(struct dma_buf_attachment *attachment,
->  	return ret;
->  }
->  
-
-...
-
->  
-> +	/**
-> +	 * @get_tph:
-> +	 * @dmabuf: DMA buffer for which to retrieve TPH metadata
-> +	 * @steering_tag: Returns the raw TPH steering tag for @st_width
-> +	 * @ph: Returns the TPH processing hint (2-bit value)
-> +	 * @st_width: Consumer's supported steering tag width in bits (8 or 16)
-> +	 *
-> +	 * Return the TPH (TLP Processing Hints) metadata associated with this
-> +	 * DMA buffer for the requested steering-tag width. 8-bit ST and 16-bit
-> +	 * Extended ST are distinct namespaces in the PCIe TPH ST table, so the
-> +	 * exporter must select the value that matches @st_width and must not
-> +	 * substitute one for the other.
-> +	 *
-> +	 * Return 0 on success, -EOPNOTSUPP if no metadata is available for the
-> +	 * requested width, or -EINVAL if @st_width is not 8 or 16.
-> +	 *
-> +	 * This callback is optional.
-> +	 */
-> +	int (*get_tph)(struct dma_buf *dmabuf, u16 *steering_tag, u8 *ph,
-> +		       u8 st_width);
-
-how about rename steering_tag to st?
-
-> +
->  	/**
->  	 * @map_dma_buf:
->  	 *
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 5de618a3a5ee..53b2bbd9fc1e 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -1534,6 +1534,41 @@ struct vfio_device_feature_dma_buf {
->   */
->  #define VFIO_DEVICE_FEATURE_MIG_PRECOPY_INFOv2  12
->  
-> +/**
-> + * Upon VFIO_DEVICE_FEATURE_SET associate TPH (TLP Processing Hints) metadata
-> + * with a vfio-exported dma-buf. The dma-buf must have been created by
-> + * VFIO_DEVICE_FEATURE_DMA_BUF on this device.
-> + *
-> + * dmabuf_fd is the file descriptor returned by VFIO_DEVICE_FEATURE_DMA_BUF.
-> + *
-> + * 8-bit ST (steering_tag) and 16-bit Extended ST (steering_tag_ext) are
-> + * distinct namespaces in the PCIe TPH ST table; userspace should populate
-> + * the value(s) it has from the firmware ST table for this device and set
-> + * the matching VFIO_DMA_BUF_TPH_ST / VFIO_DMA_BUF_TPH_ST_EXT bit in @flags.
-> + * An importer requests a specific width and receives the matching value;
-> + * if the requested width is not present, the importer is told TPH is
-> + * unavailable for this dma-buf.
-> + *
-> + * ph is the 2-bit TLP Processing Hint and must be in the range [0, 3].
-> + *
-> + * The user must set TPH on the dma-buf before the importer consumes it.
-> + *
-> + * Return: 0 on success, -errno on failure.
-
--1 and errno is set on failure.
-
-> + */
-> +#define VFIO_DEVICE_FEATURE_DMA_BUF_TPH 13
-> +
-> +#define VFIO_DMA_BUF_TPH_ST		(1 << 0)  /* steering_tag valid */
-> +#define VFIO_DMA_BUF_TPH_ST_EXT		(1 << 1)  /* steering_tag_ext valid */
-
-It could be represented by judge whether steering_tag/ext == 0
-
-> +
-> +struct vfio_device_feature_dma_buf_tph {
-> +	__s32	dmabuf_fd;
-> +	__u32	flags;
-> +	__u16	steering_tag;
-> +	__u16	steering_tag_ext;
-> +	__u8	ph;
-> +	__u8	reserved[3];
-
-How about:
-struct vfio_device_feature_dma_buf_tph {
-	__s32	dmabuf_fd;
-	__u16	st_ext;
-	__u8	st;
-	__u8	ph;
-}
-If st_ext is not zero means it valid, and also with st field.
-
-Thanks
-
-> +};
-> +
->  /* -------- API for Type1 VFIO IOMMU -------- */
->  
->  /**
+diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
+index ad5bb98c1579..4a018acb5262 100644
+--- a/drivers/net/ppp/pppoe.c
++++ b/drivers/net/ppp/pppoe.c
+@@ -77,6 +77,7 @@
+ #include <net/net_namespace.h>
+ #include <net/netns/generic.h>
+ #include <net/sock.h>
++#include <net/gro.h>
+ 
+ #include <linux/uaccess.h>
+ 
+@@ -409,7 +410,7 @@ static int pppoe_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	if (ppp_skb_is_compressed_proto(skb))
+ 		goto drop;
+ 
+-	if (pskb_trim_rcsum(skb, len))
++	if (!skb_is_gso(skb) && pskb_trim_rcsum(skb, len))
+ 		goto drop;
+ 
+ 	ph = pppoe_hdr(skb);
+@@ -1103,6 +1104,160 @@ static struct pernet_operations pppoe_net_ops = {
+ 	.size = sizeof(struct pppoe_net),
+ };
+ 
++static u16
++compare_pppoe_header(const struct pppoe_hdr *phdr,
++		     const struct pppoe_hdr *phdr2)
++{
++	__be16 proto = *(const __be16 *)(phdr + 1);
++	__be16 proto2 = *(const __be16 *)(phdr2 + 1);
++
++	return (__force u16)((phdr->sid ^ phdr2->sid) | (proto ^ proto2));
++}
++
++static __be16 pppoe_hdr_proto(const struct pppoe_hdr *phdr)
++{
++	__be16 proto = *(const __be16 *)(phdr + 1);
++
++	switch (proto) {
++	case cpu_to_be16(PPP_IP):
++		return cpu_to_be16(ETH_P_IP);
++#if IS_ENABLED(CONFIG_IPV6)
++	case cpu_to_be16(PPP_IPV6):
++		return cpu_to_be16(ETH_P_IPV6);
++#endif
++	default:
++		return 0;
++	}
++}
++
++static struct sk_buff *pppoe_gro_receive(struct list_head *head,
++					 struct sk_buff *skb)
++{
++	const struct packet_offload *ptype;
++	unsigned int hlen, off_pppoe;
++	const struct pppoe_hdr *phdr;
++	struct sk_buff *pp = NULL;
++	struct sk_buff *p;
++	int flush = 1;
++	__be16 type;
++
++	off_pppoe = skb_gro_offset(skb);
++	hlen = off_pppoe + PPPOE_SES_HLEN;
++	phdr = skb_gro_header(skb, hlen, off_pppoe);
++	if (unlikely(!phdr))
++		goto out;
++
++	/* filter for session packets (type:1, ver:1, code:0) */
++	if (*(const __be16 *)phdr != cpu_to_be16(0x1100))
++		goto out;
++
++	/* ignore packets with padding or invalid length */
++	if (skb_gro_len(skb) != be16_to_cpu(phdr->length) + sizeof(*phdr))
++		goto out;
++
++	type = pppoe_hdr_proto(phdr);
++	ptype = gro_find_receive_by_type(type);
++	if (!ptype)
++		goto out;
++
++	flush = 0;
++
++	list_for_each_entry(p, head, list) {
++		const struct pppoe_hdr *phdr2;
++
++		if (!NAPI_GRO_CB(p)->same_flow)
++			continue;
++
++		phdr2 = (const struct pppoe_hdr *)(p->data + off_pppoe);
++		if (compare_pppoe_header(phdr, phdr2))
++			NAPI_GRO_CB(p)->same_flow = 0;
++	}
++
++	skb_gro_pull(skb, PPPOE_SES_HLEN);
++	skb_gro_postpull_rcsum(skb, phdr, PPPOE_SES_HLEN);
++
++	pp = indirect_call_gro_receive_inet(ptype->callbacks.gro_receive,
++					    ipv6_gro_receive, inet_gro_receive,
++					    head, skb);
++
++out:
++	skb_gro_flush_final(skb, pp, flush);
++
++	return pp;
++}
++
++static int pppoe_gro_complete(struct sk_buff *skb, int nhoff)
++{
++	struct pppoe_hdr *phdr = (struct pppoe_hdr *)(skb->data + nhoff);
++	__be16 type = pppoe_hdr_proto(phdr);
++	struct packet_offload *ptype;
++	unsigned int len;
++
++	ptype = gro_find_complete_by_type(type);
++	if (!ptype)
++		return -ENOENT;
++
++	len = skb->len - (nhoff + sizeof(*phdr));
++	len = min(len, 0xFFFFU);
++	phdr->length = cpu_to_be16(len);
++
++	return INDIRECT_CALL_INET(ptype->callbacks.gro_complete,
++				  ipv6_gro_complete, inet_gro_complete,
++				  skb, nhoff + PPPOE_SES_HLEN);
++}
++
++static struct sk_buff *pppoe_gso_segment(struct sk_buff *skb,
++					 netdev_features_t features)
++{
++	struct sk_buff *segs = ERR_PTR(-EINVAL);
++	struct packet_offload *ptype;
++	struct pppoe_hdr *phdr;
++	__be16 orig_type, type;
++	int len, nhoff;
++
++	skb_reset_network_header(skb);
++	nhoff = skb_network_header(skb) - skb_mac_header(skb);
++
++	if (unlikely(!pskb_may_pull(skb, PPPOE_SES_HLEN)))
++		goto out;
++
++	phdr = (struct pppoe_hdr *)skb_network_header(skb);
++	type = pppoe_hdr_proto(phdr);
++	ptype = gro_find_complete_by_type(type);
++	if (!ptype)
++		goto out;
++
++	orig_type = skb->protocol;
++	__skb_pull(skb, PPPOE_SES_HLEN);
++	features &= ~NETIF_F_GSO_SOFTWARE;
++	segs = ptype->callbacks.gso_segment(skb, features);
++	if (IS_ERR_OR_NULL(segs))
++		goto out;
++
++	skb = segs;
++	do {
++		phdr = (struct pppoe_hdr *)(skb_mac_header(skb) + nhoff);
++		len = skb->len - (nhoff + sizeof(*phdr));
++		phdr->length = cpu_to_be16(len);
++		skb->network_header = (u8 *)phdr - skb->head;
++		skb->protocol = orig_type;
++		skb_reset_mac_len(skb);
++	} while ((skb = skb->next));
++
++out:
++	return segs;
++}
++
++static struct packet_offload pppoe_packet_offload __read_mostly = {
++	.type = cpu_to_be16(ETH_P_PPP_SES),
++	.priority = 20,
++	.callbacks = {
++		.gro_receive = pppoe_gro_receive,
++		.gro_complete = pppoe_gro_complete,
++		.gso_segment = pppoe_gso_segment,
++	},
++};
++
+ static int __init pppoe_init(void)
+ {
+ 	int err;
+@@ -1119,6 +1274,8 @@ static int __init pppoe_init(void)
+ 	if (err)
+ 		goto out_unregister_pppoe_proto;
+ 
++	if (IS_ENABLED(CONFIG_INET))
++		dev_add_offload(&pppoe_packet_offload);
+ 	dev_add_pack(&pppoes_ptype);
+ 	dev_add_pack(&pppoed_ptype);
+ 	register_netdevice_notifier(&pppoe_notifier);
+@@ -1138,6 +1295,8 @@ static void __exit pppoe_exit(void)
+ 	unregister_netdevice_notifier(&pppoe_notifier);
+ 	dev_remove_pack(&pppoed_ptype);
+ 	dev_remove_pack(&pppoes_ptype);
++	if (IS_ENABLED(CONFIG_INET))
++		dev_remove_offload(&pppoe_packet_offload);
+ 	unregister_pppox_proto(PX_PROTO_OE);
+ 	proto_unregister(&pppoe_sk_proto);
+ 	unregister_pernet_device(&pppoe_net_ops);
+diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+index 0e62032e76b1..cbac072633bb 100644
+--- a/net/ipv4/af_inet.c
++++ b/net/ipv4/af_inet.c
+@@ -1540,6 +1540,7 @@ struct sk_buff *inet_gro_receive(struct list_head *head, struct sk_buff *skb)
+ 
+ 	return pp;
+ }
++EXPORT_INDIRECT_CALLABLE(inet_gro_receive);
+ 
+ static struct sk_buff *ipip_gro_receive(struct list_head *head,
+ 					struct sk_buff *skb)
+@@ -1625,6 +1626,7 @@ int inet_gro_complete(struct sk_buff *skb, int nhoff)
+ out:
+ 	return err;
+ }
++EXPORT_INDIRECT_CALLABLE(inet_gro_complete);
+ 
+ static int ipip_gro_complete(struct sk_buff *skb, int nhoff)
+ {
+diff --git a/net/ipv6/ip6_offload.c b/net/ipv6/ip6_offload.c
+index d8072ad6b8c4..78f50c93c536 100644
+--- a/net/ipv6/ip6_offload.c
++++ b/net/ipv6/ip6_offload.c
+@@ -297,6 +297,7 @@ INDIRECT_CALLABLE_SCOPE struct sk_buff *ipv6_gro_receive(struct list_head *head,
+ 
+ 	return pp;
+ }
++EXPORT_INDIRECT_CALLABLE(ipv6_gro_receive);
+ 
+ static struct sk_buff *sit_ip6ip6_gro_receive(struct list_head *head,
+ 					      struct sk_buff *skb)
+@@ -359,6 +360,7 @@ INDIRECT_CALLABLE_SCOPE int ipv6_gro_complete(struct sk_buff *skb, int nhoff)
+ out:
+ 	return err;
+ }
++EXPORT_INDIRECT_CALLABLE(ipv6_gro_complete);
+ 
+ static int sit_gro_complete(struct sk_buff *skb, int nhoff)
+ {
+-- 
+2.43.0
 
 
