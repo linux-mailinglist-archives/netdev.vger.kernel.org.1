@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-287416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287417-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oL0YDAX1A2rKBAIAu9opvQ
-	(envelope-from <netdev+bounces-287416-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 05:50:29 +0200
+	id IB8hIhL1A2rKBAIAu9opvQ
+	(envelope-from <netdev+bounces-287417-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 05:50:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71D8B52D00A
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 05:50:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F3FB852D011
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 05:50:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 36A4C30CECAF
-	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 03:46:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5175530D5AC5
+	for <lists+netdev@lfdr.de>; Wed, 13 May 2026 03:46:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C3C239D6F8;
-	Wed, 13 May 2026 03:46:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED59F399004;
+	Wed, 13 May 2026 03:46:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G0aLYNqG"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ODT40+2p"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53315351C25
-	for <netdev@vger.kernel.org>; Wed, 13 May 2026 03:46:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93618397E64;
+	Wed, 13 May 2026 03:46:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778643970; cv=none; b=ePddHEJhk2feCozmRN5ry/MNmBJ90UrijCcD5kSJLdmPVq9+kAA88yXXXrNXM75yoafFhQX9nBHQs6TquKduZHGbQ4LewEIAV1eYl1zWIY972BKnY2HsjHYWP+36CnJ9HWOTz+0wB46AsRG71ytnPSdh68SjGC1hOTgm8iZuxbA=
+	t=1778643971; cv=none; b=cbUSKDT442OGMVq3ZiXbF+kHs04XxfvHHy3wyEqlq9iwUHCs6K6G+0IGbfc67mdp3/JFbQYlPngPbqQZcnUZlD3UJIgnQp7Aiha3e04eAjXO03I9CBfR69NEcSlyWbMOtH90OvPa9917gllqE+6ghJMFF0hIwQinUuLFTcObKiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778643970; c=relaxed/simple;
-	bh=zR7j7CZrL+WaUbwULl98imuDq4uUCciikXbO1UKwj2k=;
+	s=arc-20240116; t=1778643971; c=relaxed/simple;
+	bh=j/ZWZ6nYtJAegsuNwpg1A7rc1Fkj1DJrX/2XmoQLtPg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MpjBTO2pvn53TfuUK7i3rmwgvCsb9G9JRkHfLJ3cxiyeD/II0pXb3tC94ueWCkNbdHkYm67KCZoLwTKxiuPwsKACI9A0rg5GcRhsHPQQUIE8O/2u0AGXjZL6MBShJDXCeygV/YhjlrHAlJcgaeJUtatyHA05nLHjsD4QZ5mNEA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G0aLYNqG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA828C2BCC7;
-	Wed, 13 May 2026 03:46:09 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=bZXzpI1ohYk5GWOq+yeoSr7ZvLknBwsNdi5fmWDJpaW8v3xNgfYVLc9a1mRcgrnIvzjlelV1R9rfHwXQ+zRO9iwKue470ZFjiKMrEBEQFJxC6ZZ0eCK/JySW4hTRxoguydLYD3H5BuU7ZU+g5GVZKIXvqohwSb5y7J132o7yhEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ODT40+2p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0268CC2BCC7;
+	Wed, 13 May 2026 03:46:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778643969;
-	bh=zR7j7CZrL+WaUbwULl98imuDq4uUCciikXbO1UKwj2k=;
+	s=k20201202; t=1778643971;
+	bh=j/ZWZ6nYtJAegsuNwpg1A7rc1Fkj1DJrX/2XmoQLtPg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=G0aLYNqG1q1CEKToJB6s9JI1EOqc6bh0Fxb34Cqx7c25dsrKMVGoS/LxzV01QzNn+
-	 R/ZhTWfPo9sdym4oVzHz7hoMeeVYh5hcUI6eL9UGfxyQh5qdWBO++RzcbMHXPqIM0S
-	 nt62eMa+/hyew3iOGZ2poZdhUMq2pPvhfWfliL47p5fRh+zRtwPfmtL1p6Y2pVhyUl
-	 mJmZxJ8XqQ0Y3K4LscDTFSByEqQMM/lZgyqCtl/KUsiHST3oaINaokiQhLT1SsUuPN
-	 1UVduCIaClS7T4Sr3CggnMyajcG9WM86GRgDw/0WH1uW9ocwfOr1SG7yDPuCLDyIet
-	 Czqznx1l8/OrA==
+	b=ODT40+2pWoO7xzEp6IsbAr3MUpahEORMoCXnDsAbUW3EPL2cq/wKJApwXxJb+QPxB
+	 VjG7YVZtjH3/iFEcXOJv1Bv16zqtv/Y4vTa+uvJHB9Lq4w1Gc5R+1pliwQy2qoky6A
+	 ECCNsgQgnp1Zlq50+qoyIASH+2jBwQVy8t0dyFHD8kIlIrSEtEJoC5Y+Xjf7bUQJw/
+	 xSNN030I16mRTyMFik/Bs1BM2jThY4nlvhjEZJ9teo2IwhqG1sey/X0TIlqsbFOpAA
+	 xUrD6N5nbDKtANmAgCCU6xJkqMywpuXw5XObuJv8F2A/mhzLxe/jhkNUP4j/aDLpxC
+	 ZRd5zj1PGByeg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9EA53822D60;
-	Wed, 13 May 2026 03:45:16 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02E423822D60;
+	Wed, 13 May 2026 03:45:18 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,45 +55,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] ethtool: fix ethnl_bitmap32_not_zero() bit interval
- semantics
+Subject: Re: [PATCH v3] net/smc: fix sleep-inside-lock in __smc_setsockopt()
+ causing local DoS
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177864391554.3173643.17820946029425811910.git-patchwork-notify@kernel.org>
-Date: Wed, 13 May 2026 03:45:15 +0000
-References: <20260511014343.133328-1-zhaochenguang@kylinos.cn>
-In-Reply-To: <20260511014343.133328-1-zhaochenguang@kylinos.cn>
-To: Chenguang Zhao <zhaochenguang@kylinos.cn>
-Cc: andrew@lunn.ch, kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, leitao@debian.org, horms@kernel.org,
- maxime.chevallier@bootlin.com, netdev@vger.kernel.org
-X-Rspamd-Queue-Id: 71D8B52D00A
+ <177864391679.3173643.11650967377034857635.git-patchwork-notify@kernel.org>
+Date: Wed, 13 May 2026 03:45:16 +0000
+References: <20260510163414.16651-1-n.coccia96@gmail.com>
+In-Reply-To: <20260510163414.16651-1-n.coccia96@gmail.com>
+To: =?utf-8?q?Nicol=C3=B2_Coccia_=3Cn=2Ecoccia96=40gmail=2Ecom=3E?=@codeaurora.org
+Cc: alibuda@linux.alibaba.com, dust.li@linux.alibaba.com,
+ sidraya@linux.ibm.com, wenjia@linux.ibm.com, mjambigi@linux.ibm.com,
+ tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
+ linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ nicolo.coccia@leonardo.com
+X-Rspamd-Queue-Id: F3FB852D011
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	DKIM_TRACE(0.00)[kernel.org:-];
+	R_DKIM_REJECT(0.00)[kernel.org:s=k20201202];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287416-lists,netdev=lfdr.de,netdevbpf];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-287417-lists,netdev=lfdr.de,netdevbpf];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,codeaurora.org];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TO_DN_NONE(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.836];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
@@ -103,22 +108,21 @@ Hello:
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 11 May 2026 09:43:43 +0800 you wrote:
-> ethnl_bitmap32_not_zero() should return true if some bit in [start, end)
-> is set:
+On Sun, 10 May 2026 12:34:13 -0400 you wrote:
+> A logic flaw in __smc_setsockopt() allows a local unprivileged user to
+> cause a Denial of Service (DoS) by holding the socket lock indefinitely.
 > 
-> - Fix inverted memchr_inv() sense: return true when the scan finds a
->   non-zero byte, not when the middle words are all zero.
-> - Return false for an empty interval (end <= start).
-> - When end is 32-bit aligned, indices in [start, end) do not include any
->   bits from map[end_word]; return false after earlier checks found no
->   non-zero data.
+> The function __smc_setsockopt() calls copy_from_sockptr() while holding
+> lock_sock(sk). By passing a userfaultfd-monitored memory page (or
+> FUSE-backed memory on systems where unprivileged userfaultfd is disabled)
+> as the optval, an attacker can halt execution during the copy operation,
+> keeping the lock held.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3] ethtool: fix ethnl_bitmap32_not_zero() bit interval semantics
-    https://git.kernel.org/netdev/net/c/3d042592ebd4
+  - [v3] net/smc: fix sleep-inside-lock in __smc_setsockopt() causing local DoS
+    https://git.kernel.org/netdev/net/c/a3fdd924d88c
 
 You are awesome, thank you!
 -- 
