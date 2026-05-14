@@ -1,175 +1,108 @@
-Return-Path: <netdev+bounces-287757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287758-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oEFVKMUVBWoUSQIAu9opvQ
-	(envelope-from <netdev+bounces-287757-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 02:22:29 +0200
+	id CHjJFfcVBWoUSQIAu9opvQ
+	(envelope-from <netdev+bounces-287758-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 02:23:19 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98E0953C4F4
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 02:22:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C8E2153C503
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 02:23:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 08F663015E3D
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 00:22:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AC1BC3015E17
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 00:23:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E1A426980F;
-	Thu, 14 May 2026 00:22:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B24B226F293;
+	Thu, 14 May 2026 00:23:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GlfHwn5a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RkoSgbwJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3344925B2F4
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 00:22:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F95B1A76BB;
+	Thu, 14 May 2026 00:23:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778718144; cv=none; b=O4ouj3dUZ9xVKH9gBQZS73tKPQKNHtk8kwkWv2zxcYAHbYhkCPL1fVvRqyiAaUFf4Iyt5TI/0V2OcEGjLsdBI6Cbw1PwToIjIPNcrYWAca7jBfAwM68L03OxWBYIWbkjkMvNSGhi9YBukL1SvAlkddntYpz8s542Teh0pbwSzx8=
+	t=1778718195; cv=none; b=QackDUH583WvsQQyLr7iq3Uz2Dk9Gxmx0uJEjgwwNykUZwpj9OFkceqmme8tQZUZNB/nmTYHLlGu4pfilXDWFUbCHwak9NwEuPKCDs4yfVfOGzrk7REkJgjBwpeCxQ2XuwJXQoJOBeK4kHRRyTnCLFh2vOYfCydz7A1X7RrgB7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778718144; c=relaxed/simple;
-	bh=r/dNhDtuahypA87C1YXJ4TllXHta2MJW4yZ//T4QsQI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gI958ZSF0w8/5/bcz9+PSkP1lPf5OkC1a+dCXy+9IElmwYCH2Rzsgm9YhCpQ8wO79SB1EvekeUUdgsU3/2PfNTMeLQuBkk1Gv7UnTDHE1b5+y3unlE79gd6xziWZqY2CGy4XFmmv/MyM5sOQjX3yASJHl0zy7Fw4eDxAqh3Sqls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GlfHwn5a; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-90d042fa745so399915185a.1
-        for <netdev@vger.kernel.org>; Wed, 13 May 2026 17:22:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778718142; x=1779322942; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=irXLMVW2G6pZT9ipRR8zg24QGfQC3eyv0or3evjGwyA=;
-        b=GlfHwn5aFaBo7uk+qB/5vco06qJa/pfRvDUCAL14cFaPS7yA0cfpLRCWcPvMriCX7v
-         MhzqE3MEmSwLvh9dUKoXyUmYDeBlvKg20t+HmEYNG5ZcfCtD/Zp0cAsJ+S/aBg9uCkUm
-         THHhtwTlu0vOWI9SJZNL8oaXlSrYQwvSV6cPxevdPGwhRrh5sBu5b12iW5gyU3S/V7/r
-         YZVlU8lNnI3cjHWbzfJZlBLp07KJ99depG58DStEEugJ3Z7jNEhTAnQXtOhu8E2WYUoJ
-         7TLslYZmHB1bpJ1jsabKCNwo7OwegJUgRGLXKkc0osFZbVR1axzvdCyvM2M1gRTJaMi5
-         v6jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778718142; x=1779322942;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=irXLMVW2G6pZT9ipRR8zg24QGfQC3eyv0or3evjGwyA=;
-        b=iXoLHplqByG/aeygfrGiNpErOe4pmVrN3NXgkk6Yc05gCskknzbq/PlKas28bLFDZA
-         rVr8aL7Y5s03Ucr5pG4w3qHo+7CmKrPxC5tvmaE++bRQMHGkLoAS/gIWizsNI/lOd4FL
-         +l+U620Y0w7rn5RJh6ydX7gPDqxqqXroRfeXFXjneN4npTKHVISwbQ9kFHL4CF5p6qIi
-         PThT8EO50snbbsQP3Is46dfgkrmcriKJqZ8BlgtxuuThhlNg9WV7vZhcm/185j/u/hbD
-         VVAWc/+O3JzKT6omqR9IQlut8b2Pt42u2JZLYv8/i3u4dCK7mPOFIp8+oj8P+pSaZ2r0
-         c1rw==
-X-Forwarded-Encrypted: i=1; AFNElJ+I+gq6nVP+kmBas0czUjA+h00EaQgC2AC25V8DOMBmZYc9PfasLEQaPwtRMY05FdoqNCqQN9o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLRz8+Qvy51ilHnXqr7IUBVtV3nGGXrlz5MHx1MQGDX6A5qTAV
-	YKH8ZPSQ5ZbGz23+6PP6pObS34C0BSB7KFNQyBy8DqPChX+DCpXHvkjG
-X-Gm-Gg: Acq92OHxPTAQTfOZ+yLlNqm/MOSCSOYuGth+w7+8GfNwZFEvrwNPwTkRp/EUzvOUpOC
-	09zfc2Yw3/iDb+IYauxMbG8rIhOkGh7sGjmvr2+Dnhmy6SomeC/JaG1mNvm3CPrAGreXXlInaWA
-	GSu1nvAsWomXBbBmrEsml1Apj4v1iqrWaDTzgeAnuw8s4ajBQzHvlxHkaHufRxe/WGKU//Ru5v5
-	FZ7Tx7KEIPK0UqWYA9ESWTlV1q8CbX6uY7vDZFsFwTBQo1LnOe2YWL4heS6xalG4V3nxpnhc/CX
-	bz3HEAqBCIE/Mmcbf7LYB1LzfnbMz2AqODxyM6LAXhBeudycNIZ1CchHj/0zzQvEzXe059Lti0s
-	ZDbQzQquOOVvSJ6MobMiKBgdCBcLCTfEjv/FOfTxQtwf8dY/NBCzIzdsiPxbeRsE8pY3Ug2xBhc
-	kYvuHQJg8zogzkJQk4yRjUGh91vE25Y3o24UHsU7cY
-X-Received: by 2002:a05:620a:4506:b0:90d:3af3:2a62 with SMTP id af79cd13be357-90f8a827302mr897456985a.46.1778718142168;
-        Wed, 13 May 2026 17:22:22 -0700 (PDT)
-Received: from i4-gl-tmk5904.ad.psu.edu ([130.203.156.186])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-910bcf3776dsm107829585a.39.2026.05.13.17.22.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2026 17:22:21 -0700 (PDT)
-From: Yuho Choi <dbgh9129@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yuho Choi <dbgh9129@gmail.com>
-Subject: [PATCH v1] ipv6: route: Unregister netdevice notifier on BPF init failure
-Date: Wed, 13 May 2026 20:22:18 -0400
-Message-ID: <20260514002218.677943-1-dbgh9129@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1778718195; c=relaxed/simple;
+	bh=LBlMw0rC/Sl8ZWesQ3L3vS8PBcEnOpafwNwjAK7J3iU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BHECixMfzGrGQchd3Y8xYPbjnyIr4o67Iw6k4yARYxAjKF/FXeraE9iLKRtR0I5fj5jdUP+bQIn+4Kouw93cejsbkSbKlWib8EQ1/3sYP8+5Y14YU1Duqllr9Fd8DlQ7ibOlg5Mqz/4r5tk0mypiRe6ahJ3Tr5QDok5Y7faG+xg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RkoSgbwJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7FF5C19425;
+	Thu, 14 May 2026 00:23:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778718195;
+	bh=LBlMw0rC/Sl8ZWesQ3L3vS8PBcEnOpafwNwjAK7J3iU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RkoSgbwJmWqPbAJACPMSC+HRD/oGmlD1NBCewEkZD/y6GGmQCUp7UsWoaDa6VQVKR
+	 j5YcMDdAJxtd6DSDkTtSEB4d4hIE53Ax9oE8tWb2LLjfYfd7dQXD74tlaQ9O5UfnTR
+	 kxOD5neDOHvn3e+KR7hvEX/pNYzJapeWcc4XdjYfBvf8knC5uhIyBjLSznP33AcMlO
+	 Ef9+GyYrc44ZtILO7gFlUcRaTJtd3Ax/2QfE/uMR2J+xWkQM+9oh4MLDvOSqN2RZKG
+	 3r1biYWk2pz8ENekFtXKwgY++ARTkubNfrFw0B+lXM5QZs3Ndb+J8vQPgntTuRwVhJ
+	 +NCXfxCIm40tA==
+Date: Wed, 13 May 2026 17:23:14 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Eric Joyner <eric.joyner@amd.com>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, Brett Creeley <brett.creeley@amd.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Abhijit
+ Gangurde <abhijit.gangurde@amd.com>, Allen Hubbe <allen.hubbe@amd.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH net-next 3/4] RDMA/ionic: Add debugfs support
+Message-ID: <20260513172314.35e71e7b@kernel.org>
+In-Reply-To: <20260513072113.GE15586@unreal>
+References: <20260506041935.1061-1-eric.joyner@amd.com>
+	<20260506041935.1061-4-eric.joyner@amd.com>
+	<20260513072113.GE15586@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 98E0953C4F4
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: C8E2153C503
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-287757-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287758-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dbgh9129@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-ip6_route_init() registers ip6_route_dev_notifier before registering the
-IPv6 route BPF iterator target. If bpf_iter_register() fails, the error
-path jumps to out_register_late_subsys and unwinds the RTNL handlers and
-late pernet subsystem, but leaves the netdevice notifier registered.
+On Wed, 13 May 2026 10:21:13 +0300 Leon Romanovsky wrote:
+> 3. The patch is too large and exposes too many details that should be
+>    gathered through the FW (fwctl).
 
-Add a separate unwind label for the BPF iterator failure path so the
-netdevice notifier is unregistered before continuing with the existing
-cleanup.
-
-Fixes: 138d0be35b14 ("net: bpf: Add netlink and ipv6_route bpf_iter targets")
-Signed-off-by: Yuho Choi <dbgh9129@gmail.com>
----
- net/ipv6/route.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index cb521700cee7..4333e11dc9c5 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -6925,7 +6925,7 @@ int __init ip6_route_init(void)
- #if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_PROC_FS)
- 	ret = bpf_iter_register();
- 	if (ret)
--		goto out_register_late_subsys;
-+		goto out_register_notifier;
- #endif
- #endif
- 
-@@ -6939,6 +6939,12 @@ int __init ip6_route_init(void)
- out:
- 	return ret;
- 
-+#if IS_BUILTIN(CONFIG_IPV6)
-+#if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_PROC_FS)
-+out_register_notifier:
-+	unregister_netdevice_notifier(&ip6_route_dev_notifier);
-+#endif
-+#endif
- out_register_late_subsys:
- 	rtnl_unregister_all(PF_INET6);
- 	unregister_pernet_subsys(&ip6_route_net_late_ops);
--- 
-2.43.0
-
+Why? What's wrong with debugfs? Much easier for people to access.
 
