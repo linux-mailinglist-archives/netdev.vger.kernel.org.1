@@ -1,154 +1,183 @@
-Return-Path: <netdev+bounces-287788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287789-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IIHWDyQzBWonTQIAu9opvQ
-	(envelope-from <netdev+bounces-287788-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 04:27:48 +0200
+	id 6Fo7E18zBWonTQIAu9opvQ
+	(envelope-from <netdev+bounces-287789-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 04:28:47 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1CE553D066
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 04:27:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A563553D08C
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 04:28:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1AA843046E8F
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 02:26:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D0C383032779
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 02:28:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7170B2E7BB6;
-	Thu, 14 May 2026 02:26:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB0C330641;
+	Thu, 14 May 2026 02:28:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fjnl5cjV"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94A1F329C60;
-	Thu, 14 May 2026 02:26:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.161.220
+Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB8F65C613
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 02:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778725606; cv=none; b=rBgm6PBWE7JTMoZlrAF7K06SKJjAb7y0hJK5VPvBPQa6cJdaP7gb2sR4g7+6H3F/PSMW0eMiPfjPosm+wcNXueBnEK6YNes51FHk/0UGS8AeWiJgP/+zYIMQZS1i6riZoFv8tzNMadDdspk1e7gPElQ6L7+pnOW2zJznQc8zA54=
+	t=1778725712; cv=none; b=fCqYCL53o1Vbr3p+KCNVSHDbF7lucwPdA1yLaMqzXYjaMnPrlSxaety1m8HihXL3HAs47Q3ocIo247drdD6hkOLhRrdi4nRmRy1N8fPNRk9mmEPxadkcF4kAFBakIxs3CZ5ac1n03boXUkAh+gW6v7RWceYOyYhAVPzvXqFtzTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778725606; c=relaxed/simple;
-	bh=u8MoHDV87EkButoVtnwYzpxxD5cG3nCo6IslC3GitKU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=GuJZr002ZhrzEUa0DZ2a2uSv1ToJEi+qa4b6/l73Bteq4bFq8Ehp5hgV0XO1x7AVgeGQ8FLX13NmfTq0yo3ph2aNuxoEFB1rWYBzTmMH8OnjJImDgEm/tZRh+ZTerfYgiT0hyyKDWTz84KZCOGdiYG+gNeckNR1bvK4HYKmszyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=162.243.161.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from lizhi2$eswincomputing.com ( [10.11.96.26] ) by
- ajax-webmail-app1 (Coremail) ; Thu, 14 May 2026 10:25:55 +0800 (GMT+08:00)
-Date: Thu, 14 May 2026 10:25:55 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: =?UTF-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>
-To: "Jakub Kicinski" <kuba@kernel.org>
-Cc: andrew+netdev@lunn.ch, devicetree@vger.kernel.org, davem@davemloft.net,
-	edumazet@google.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	rmk+kernel@armlinux.org.uk, pjw@kernel.org, palmer@dabbelt.com,
-	aou@eecs.berkeley.edu, alex@ghiti.fr,
-	linux-riscv@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	maxime.chevallier@bootlin.com, ningyu@eswincomputing.com,
-	linmin@eswincomputing.com, pinkesh.vaghela@einfochips.com,
-	pritesh.patel@einfochips.com, weishangjuan@eswincomputing.com,
-	horms@kernel.org
-Subject: Re: Re: [PATCH net-next v7 2/4] net: stmmac: eic7700: enable clocks
- before syscon access and correct RX sampling timing
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2024.2-cmXT6 build
- 20241203(6b039d88) Copyright (c) 2002-2026 www.mailtech.cn
- mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
-In-Reply-To: <20260512161315.141aba88@kernel.org>
-References: <20260427072353.1114-1-lizhi2@eswincomputing.com>
- <20260427072508.1151-1-lizhi2@eswincomputing.com>
- <20260428180625.738223cf@kernel.org>
- <2117464.7991.19ddd2125d1.Coremail.lizhi2@eswincomputing.com>
- <20260430163551.7491407a@kernel.org>
- <38d052b7.7a70.19dfb0d782b.Coremail.lizhi2@eswincomputing.com>
- <446f69bd.7fe4.19e1ab248fb.Coremail.lizhi2@eswincomputing.com>
- <20260512161315.141aba88@kernel.org>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1778725712; c=relaxed/simple;
+	bh=oaxgpoSbY65896j0Ju4jgMezNeznny82DVYv/Yi/2Gg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dLtIEtnRbhCPanWydkrMxsPWOdx0BHA3DZEf9F/ffDfuWnVzt6piZl+96E+E/HGiug6/57au9pRD8hrLpUOneuKkHV2iKZdRedcDpjaQy34JdE4IoxRzAmOWek3vv9N8hjaJgZeZ6mCAVJ372Fk6u4joj9AAH7CLJUDUBZVX2Nw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fjnl5cjV; arc=none smtp.client-ip=74.125.224.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-65c6a2158d3so5921104d50.3
+        for <netdev@vger.kernel.org>; Wed, 13 May 2026 19:28:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778725710; x=1779330510; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mxfGgciuIl8ecIFy9+5zcD49dfpTzAB0PVcZJYXaajU=;
+        b=fjnl5cjVVcoKnjVGGfmK/DNONvc0XgYuYhmB5ci7Ettt/CfRsbuO5BHrq6DMSp2Nsr
+         DoLzh1Y4AmVVFPN2/r/nvLFmeRPbCGbUht6a/fRJLcZBVwrUdui9qrHQSK25QcrFlyzO
+         qmFRzSKIf5H2QR2rW1he8KumP475SN3HL4ajJOmlivup1N4u4+RbQe30QQvgAz5Vfnod
+         d+1SDq7ueGLmSkAwjHZGgEwk4ENZ5r0Sl4kp9HCh7MnmuOFilHnrUml+lsA6IE9bhJl0
+         EhMxcJ3i9nCiDKnOTPNHqVIojk3we7X++fousEat7rt+2FaL9sPL5TRRMzM+y4IPcNe6
+         aFAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778725710; x=1779330510;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mxfGgciuIl8ecIFy9+5zcD49dfpTzAB0PVcZJYXaajU=;
+        b=dqS7wI2cATv6cO9RTRLopUMhjf9b7hTIZGH14s+s6M67aAqWln78dn1x3wa9n+1xip
+         IBy23ptwKCl+Ovp+0C3Z5Pje7OfCkPz98MAmtCc/oWd5TEGhBg8wX84/zaAyTsUj5ts7
+         fgVcpxqSwXDKiwCV73SMZfo1rtrcjbzQs4VgafdZclYO1mCNCMuVOL7R+tyTwFL2GrqN
+         Mhh4FJcXF8N+hezgXvKoGvZkYVt3oxPXnd/2vsJLoiSiwH37o7KdcvY0+nMC0I5WFyIf
+         rWAceQ15GjgXNZgq64Abwi+otEDtphLKkUBZa+kCqpZppRwmM6RfHFjbvguJ5Z8/2lef
+         EMLg==
+X-Forwarded-Encrypted: i=1; AFNElJ+DJII24fVic42Wl3QnxuXbBwiz9JPfgFqVdZnXRRpKdz4AphN8lx9JcaQnrqSWBCcgmHza/qI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXhMQ0Ke2f4SYtp9u0rDX8nY0zUd4Q/LG94cU7Ri+7LzZ569t6
+	tlliqBvoqv9vymb3xIwyFA4ycJ8sbVkqsXFuQFkzS/EooPFYWhsHd4oUXkQ92Qiw
+X-Gm-Gg: Acq92OH/SkONBXGh6mcDDB5eXH8XWOx3vdDkVeSwcZWPHneJDZr6OTdRVKEpwos+FsK
+	Mp6tTYX8p32I+TYzRmfoPdHvn+ZKR/CY+y6I2ZG1WmJRz1pSVL1+dSrGzE2T356vzNPNCZITkEr
+	pusYEgpJO5hu5FufO6XF6PSZ7hOtNncmeQ8wquXV3Uy22yG619eZGrMeFQgRIMzW+cp2Xa7F3FT
+	nsHNz2Q6Ef3h9kbkZ/+QAf0DzEvG39HvieYp9btxOSaQkjhGs2Kz52NxTeVkEZLK6VGz7pBU6/v
+	RhLhuGgv2Q17zXd51sAA3idU5FGqPAYCcyyeHRXZir2goQnFvZwJ353Sz+vMx5sjBfzJ0Q6J6ZA
+	x84fHlHf0Kw8fb8lj3IWf1ARMkSbYOonLzycvtvziRxHE3MYce/ewocXv2dRC3oU586hovhHEUG
+	IDwwCzMMqV1MJr0Il5JMGNNu1/p34+0Eg0JpDMOVXNVfhXQNA=
+X-Received: by 2002:a05:690e:118a:b0:658:a18:cdf0 with SMTP id 956f58d0204a3-65df625951amr6137491d50.29.1778725709828;
+        Wed, 13 May 2026 19:28:29 -0700 (PDT)
+Received: from devvm29614.prn0.facebook.com ([2a03:2880:f806:29::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65e0db0aa51sm438759d50.12.2026.05.13.19.28.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 May 2026 19:28:29 -0700 (PDT)
+Date: Wed, 13 May 2026 19:28:23 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>, Alex Shi <alexs@kernel.org>,
+	Yanteng Si <si.yanteng@linux.dev>, Dongliang Mu <dzm91@hust.edu.cn>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Joshua Washington <joshwash@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Shuah Khan <shuah@kernel.org>, dw@davidwei.uk, sdf.kernel@gmail.com,
+	mohsin.bashr@gmail.com, willemb@google.com, jiang.kun2@zte.com.cn,
+	xu.xin16@zte.com.cn, wang.yaxin@zte.com.cn, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Mina Almasry <almasrymina@google.com>,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v4 6/8] selftests: drv-net: refactor devmem
+ command builders into lib module
+Message-ID: <agUzR3O35Rx4RHnu@devvm29614.prn0.facebook.com>
+References: <20260511-tcp-dm-netkit-v4-0-841b78b99d74@meta.com>
+ <20260511-tcp-dm-netkit-v4-6-841b78b99d74@meta.com>
+ <20260513192133.60a82598@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <7171f9b3.81b6.19e244e0e9f.Coremail.lizhi2@eswincomputing.com>
-X-Coremail-Locale: en_US
-X-CM-TRANSID:TAJkCgDHaXO1MgVqOkkZAA--.7373W
-X-CM-SenderInfo: xol2xx2s6h245lqf0zpsxwx03jof0z/1tbiAQEGDGoDVh1cGAAEso
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
-X-Rspamd-Queue-Id: D1CE553D066
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260513192133.60a82598@kernel.org>
+X-Rspamd-Queue-Id: A563553D08C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287789-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287788-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[eswincomputing.com];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	HAS_X_PRIO_THREE(0.00)[3];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,lwn.net,linuxfoundation.org,linux.dev,hust.edu.cn,broadcom.com,nvidia.com,fb.com,meta.com,iogearbox.net,blackwall.org,davidwei.uk,gmail.com,zte.com.cn,vger.kernel.org,fomichev.me];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[40];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.907];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lizhi2@eswincomputing.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[lunn.ch,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,dabbelt.com,eecs.berkeley.edu,ghiti.fr,lists.infradead.org,st-md-mailman.stormreply.com,bootlin.com,eswincomputing.com,einfochips.com];
-	R_DKIM_NA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[devvm29614.prn0.facebook.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-CgoKPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2VzLS0tLS0KPiBGcm9tOiAiSmFrdWIgS2ljaW5za2ki
-IDxrdWJhQGtlcm5lbC5vcmc+Cj4gU2VuZCB0aW1lOldlZG5lc2RheSwgMTMvMDUvMjAyNiAwNzox
-MzoxNQo+IFRvOiDmnY7lv5cgPGxpemhpMkBlc3dpbmNvbXB1dGluZy5jb20+Cj4gQ2M6IGFuZHJl
-dytuZXRkZXZAbHVubi5jaCwgZGV2aWNldHJlZUB2Z2VyLmtlcm5lbC5vcmcsIGRhdmVtQGRhdmVt
-bG9mdC5uZXQsIGVkdW1hemV0QGdvb2dsZS5jb20sIHJvYmhAa2VybmVsLm9yZywga3J6aytkdEBr
-ZXJuZWwub3JnLCBjb25vcitkdEBrZXJuZWwub3JnLCBuZXRkZXZAdmdlci5rZXJuZWwub3JnLCBw
-YWJlbmlAcmVkaGF0LmNvbSwgbWNvcXVlbGluLnN0bTMyQGdtYWlsLmNvbSwgYWxleGFuZHJlLnRv
-cmd1ZUBmb3NzLnN0LmNvbSwgcm1rK2tlcm5lbEBhcm1saW51eC5vcmcudWssIHBqd0BrZXJuZWwu
-b3JnLCBwYWxtZXJAZGFiYmVsdC5jb20sIGFvdUBlZWNzLmJlcmtlbGV5LmVkdSwgYWxleEBnaGl0
-aS5mciwgbGludXgtcmlzY3ZAbGlzdHMuaW5mcmFkZWFkLm9yZywgbGludXgtc3RtMzJAc3QtbWQt
-bWFpbG1hbi5zdG9ybXJlcGx5LmNvbSwgbGludXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQu
-b3JnLCBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnLCBtYXhpbWUuY2hldmFsbGllckBib290
-bGluLmNvbSwgbmluZ3l1QGVzd2luY29tcHV0aW5nLmNvbSwgbGlubWluQGVzd2luY29tcHV0aW5n
-LmNvbSwgcGlua2VzaC52YWdoZWxhQGVpbmZvY2hpcHMuY29tLCBwcml0ZXNoLnBhdGVsQGVpbmZv
-Y2hpcHMuY29tLCB3ZWlzaGFuZ2p1YW5AZXN3aW5jb21wdXRpbmcuY29tLCBob3Jtc0BrZXJuZWwu
-b3JnCj4gU3ViamVjdDogUmU6IFtQQVRDSCBuZXQtbmV4dCB2NyAyLzRdIG5ldDogc3RtbWFjOiBl
-aWM3NzAwOiBlbmFibGUgY2xvY2tzIGJlZm9yZSBzeXNjb24gYWNjZXNzIGFuZCBjb3JyZWN0IFJY
-IHNhbXBsaW5nIHRpbWluZwo+IAo+IE9uIFR1ZSwgMTIgTWF5IDIwMjYgMTM6Mzk6MTIgKzA4MDAg
-KEdNVCswODowMCkg5p2O5b+XIHdyb3RlOgo+ID4gRm9yIHRoZSBldGgxIGVuYWJsZW1lbnQgcGFy
-dCwgbXkgY3VycmVudCB1bmRlcnN0YW5kaW5nIGlzIHRoYXQgaXQKPiA+IHNob3VsZCBiZSB0cmVh
-dGVkIGFzIGEgbmV3IGluZGVwZW5kZW50IHYxIHNlcmllcyBmb3IgbmV0LW5leHQsCj4gPiBzaW5j
-ZSB0aGUgc2NvcGUgYW5kIHRhcmdldCB0cmVlIGhhdmUgY2hhbmdlZCBhZnRlciB0aGUgc3BsaXQu
-Cj4gPiAKPiA+IFdvdWxkIHlvdSBwcmVmZXIgdGhpcyBldGgxIHNlcmllcyB0byBzdGFydCBhcyB2
-MSwgb3Igc2hvdWxkIGl0Cj4gPiBjb250aW51ZSBhcyB2OCBmb3IgY29udGludWl0eSB3aXRoIHRo
-ZSBvcmlnaW5hbCBzZXJpZXM/Cj4gCj4gdjggaXMgYmV0dGVyLCBidXQgaXMgdGhlIGZpeCBpbiBu
-ZXQtbmV4dCBhbHJlYWR5Pwo+IAo+IElmIHRoaXMgaXMgdGhlIHBvc3RpbmcgeW91J3JlIHJlZmVy
-cmluZyB0bzoKPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9hbGwvMjAyNjA1MDcwODMyMTQuMTky
-LTEtbGl6aGkyQGVzd2luY29tcHV0aW5nLmNvbS8KPiBpdCBoYXMgYmVlbiBkcm9wcGVkIGJhc2Vk
-IG9uIGZlZWRiYWNrIGZyb20gTWF4aW1lIGFuZCBJIGRvbid0IHNlZSBhIHYyLgoKWWVzLCB0aGUg
-ZXRoMCBmaXhlcyBoYXZlIG5vdyBiZWVuIHJlcG9zdGVkIGFzIGEgZGVkaWNhdGVkIHNlcmllcyB0
-YXJnZXRpbmcgbmV0OgpodHRwczovL2xvcmUua2VybmVsLm9yZy9sa21sLzIwMjYwNTA3MDgzMDM3
-LjE1Mi0xLWxpemhpMkBlc3dpbmNvbXB1dGluZy5jb20vCgpUaGUgcHJldmlvdXMgbmV0LW5leHQg
-ZXRoMS1yZWxhdGVkIHBvc3Rpbmcgd2FzIGRyb3BwZWQgZm9sbG93aW5nIHlvdXIgZ3VpZGFuY2UK
-dG8gZmlyc3QgY29tcGxldGUgdGhlIGV0aDAgZml4ZXMgaW4gbmV0IGJlZm9yZSBjb250aW51aW5n
-IHdpdGggZXRoMS4gSSB3aWxsCmtlZXAgZXRoMSBhcyB2OCBhcyBwcmV2aW91c2x5IHN1Z2dlc3Rl
-ZC4KCkZvciB0aGUgZXRoMCBuZXQgc2VyaWVzLCBJIHdpbGwgc3BsaXQgdGhlIHJlbWFpbmluZyBj
-aGFuZ2VzIGluIHYyIGFzIHN1Z2dlc3RlZApieSBNYXhpbWUgdG8gaW1wcm92ZSByZXZpZXdhYmls
-aXR5IGFuZCBiaXNlY3RhYmlsaXR5LCBhbmQgcmVzZW5kIHNob3J0bHkuCgpPbmNlIHRoYXQgaXMg
-Y29tcGxldGVkLCBJIHdpbGwgcHJvY2VlZCB3aXRoIHRoZSBldGgxIGVuYWJsZW1lbnQgc2VyaWVz
-ICh2OCkKYmFzZWQgb24gdGhlIHVwZGF0ZWQgY29udGV4dC4KClRoYW5rcywKWmhpCg==
+On Wed, May 13, 2026 at 07:21:33PM -0700, Jakub Kicinski wrote:
+> On Mon, 11 May 2026 18:18:00 -0700 Bobby Eshleman wrote:
+> >  tools/testing/selftests/drivers/net/hw/devmem.py   |  77 ++------
+> >  .../selftests/drivers/net/hw/lib/py/devmem.py      | 218 +++++++++++++++++++++
+> 
+> If the reuse is in the same dir I think you can create
+> 
+> tools/testing/selftests/drivers/net/hw/devmem_lib.py
+> 
+> and import:
+> 
+> from devmem_lib import bla
+> 
+> I _think_ that should "just work" ?
+> 
+> The lib/ is meant for things shared between targets.
+
+I will give that a try.
+
+> 
+> Also I think you missed adding the new file to Makefiles ?
+> It needs to be under TEST_FILES for building tarballs
+
+Ah okay, I wasn't sure if the already existing `TEST_INCLUDES :=
+$(wildcard lib/py/*.py ../lib/py/*.py)` was sufficient or not. Will use
+TEST_FILES with the devmem_lib approach above next rev.
+
+Thanks,
+Bobby
 
