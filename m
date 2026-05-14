@@ -1,213 +1,210 @@
-Return-Path: <netdev+bounces-287906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287907-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kI/bBM2hBWo1ZAIAu9opvQ
-	(envelope-from <netdev+bounces-287906-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:19:57 +0200
+	id LsVANBqiBWroZAIAu9opvQ
+	(envelope-from <netdev+bounces-287907-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:21:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8917E540509
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:19:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27A4654052E
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:21:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8990A3014133
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 10:19:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D40F230057BD
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 10:21:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2052A3A961A;
-	Thu, 14 May 2026 10:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02051367298;
+	Thu, 14 May 2026 10:21:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hKHc1P2N";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="QEnEIi0b"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="VS5aZHUb";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="srz6LnlD"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A1EF3A7598
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 10:19:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821A8386572;
+	Thu, 14 May 2026 10:21:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778753994; cv=none; b=rrZLCgGus8ZfW9LYnHsECz7M6G2DKr2AAewLWVHIPUaQmSnTX5AEA25t+XgpZQGtcMUob3JW0/C5YISWVJ6fsXIdcCo3T8CA800+dASbETweOKDUwgv76TZXKho7DMM+AEqVY3/RT6ukFQmZOMadq4lQxik6uLWEybg+3dUu7+0=
+	t=1778754071; cv=none; b=W2rhQVI9Yg5IbOH0P4S8/687a5QyhbZmvevYs0wDSMPi1RaPSsnPFsG/xzAv3hhfXLhVtH8mxJl2ks1oY5H5J4YlZz7MQKpoVAn2WRlLROOB3VqNOWOg8VuPEmv0vRr1v0IdiycMKWKi+LTef2qaiquu5Si48j4K45ZAjpS0ZFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778753994; c=relaxed/simple;
-	bh=0IKmOUzoumogJGoyd4uqy+VcQGNDmcN+WpyYRRIEP7U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MdV40dHj5wHivrNrfYcJyckigxaPflAOm+EZ8AOS3ufTr4s7v/xe7MtAKBmWebM9FjtiICn0gVV9jKNL4J6RmwM5C+/xNFF3iCoDWhxCEXn14mDZm8jCWeaaoM1zCSUq3wnLm0vB0Np87if5wCC0+V8Hp9y0loPIE1c+N0xqXTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hKHc1P2N; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=QEnEIi0b; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778753991;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mZTuW1IFKHF0KTPisCHVpLQ20OQQ1KfAlq590oafrkc=;
-	b=hKHc1P2N1cDAS+8QPdy26MEpDOeD8YJqsKQjt4jGMD4NmynOfkV07ddA13HbAFqukvOsMf
-	/i2uCwi9rGPTLsaCkpPV5BW7Xfiv2D4dvvd/gsMQNUZs7UP1n34y7KDUejkano/JHLOMWq
-	c/uItubeF1AqwWtCrODupFm50eq0flU=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-538-cQtFflYvOvmZD8lcTGb_2g-1; Thu, 14 May 2026 06:19:50 -0400
-X-MC-Unique: cQtFflYvOvmZD8lcTGb_2g-1
-X-Mimecast-MFC-AGG-ID: cQtFflYvOvmZD8lcTGb_2g_1778753989
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-43fe791a398so7153823f8f.0
-        for <netdev@vger.kernel.org>; Thu, 14 May 2026 03:19:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1778753989; x=1779358789; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mZTuW1IFKHF0KTPisCHVpLQ20OQQ1KfAlq590oafrkc=;
-        b=QEnEIi0bXeEekfIT4LaQXPEyyWxKR/fM3yitOQvv6rbkM31EKL/vl0CMih+c11ZMQn
-         MuYjbdJp8zklxo/ITCoZugDu9suHUE0LPVaGFdDonMJm3Y7CDowfmas1n8/y44WdGDGy
-         jdTf8DVZOJ94hBHayPqbCA+YJc+wh8M2M8WlSlwkIQBAXPemBQXX62bAGaSQFV8SuCxe
-         5TZgXcc6mNnEGFun0kpxbQ7vNmTS1iVDTN+yibj+BHPczdCUg9B+otRt/elpKp8Z9LL8
-         /E1jX9BMZfJi/MCUCe4jALCppaoS0vAVi2LsV+Acu21ryxw4Rp6PbMHNcqPDtdFpiQmV
-         2mtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778753989; x=1779358789;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mZTuW1IFKHF0KTPisCHVpLQ20OQQ1KfAlq590oafrkc=;
-        b=Fw5QWkW/aeizN5iA6TFL53jE8dIhDOljmj08sJnLUdEJT2eJJELWVaD7Pc8kx9QPxF
-         XpfaWqy4QHdGfvJVtJyZH0FI6l8oHXvJtFp8Js22AijuY3IEg9xficFApIb5U5sPw0tG
-         ikq5c/atSXKZ+tRyOInmFzhu5GrLA5oHJ96sKd7OUA9EIA20B6klQ68ChftiVu3nBH0V
-         5TVIieKy67AhZTWhfCrFwxzJWDxz7B1RhUCYISfq0AnJ5GkU/OcViFZXJ573GAm3eM/I
-         3ExIM59cM1kPez9vuWArOeGSV6iodjFWg6Ec6VzsiRWiWwn5AGd6SGzQD8wke3pQ/ojA
-         mzrQ==
-X-Forwarded-Encrypted: i=1; AFNElJ966T5qmp/KSzLQwcrcv+trE1OUeU5Xrq+QNNOQsK1oXN88sSbevuFlWmBt8vvSalN6R4M/zh8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykP3zKBY474Ghne18tOoIIW/byIWDMO4lnJSf+8fGv/cKAQh6O
-	SgraAYvoiXSRZKujn2i7XOpFHKf+l2otnf2gY1lAQ6U1xj2fEqA8Uzp3qRZSTFIhvadj5DDid9C
-	hb5rr+FaBQBhAa20Ew0vHCefvCnru0Y+x/KMC8CcgYcCmZnkFCl4MVjQMBA==
-X-Gm-Gg: Acq92OGPYrMWzCwa8k2r2jQ6UL1/YEIiTnOSpTRxT/EQj7LqMxTF0aGk64wrSJD/FQX
-	vMBHVwrD2Kbp5Ls/O9bUByJFlddW2l3abYdhbbUii4WFYfJYJe5zP2TFl1KpSQAXMpAurIAB93Q
-	GSuT0VfUqH91TWaPKFkjLcgFOk0/qGc/p/QeTon8pcwCmefXalvKKmH36hFQ+TQ+Wu4su/6TMOI
-	TE0x4chq4/f0aDrrhK5XKUDqmVgkccP01rojXlYtLybqKMJWEvAPL/t5hRTC4jkPcHlOdi3RIfc
-	+R0kXz9xC06ywocYnDJDS3ckcjWdlePQScgSs/9AsJ0Ddpz3i7Ntq6wOlmrpeOd7eMid6h1HiHP
-	YN6nO437UKhkl9wLBv3kWPw61wo1MNt4sBdRscNazgSzg2y9QlBo2jfE=
-X-Received: by 2002:a05:600c:1f85:b0:48f:e1ac:c94f with SMTP id 5b1f17b1804b1-48fe1accbf4mr11294205e9.10.1778753988933;
-        Thu, 14 May 2026 03:19:48 -0700 (PDT)
-X-Received: by 2002:a05:600c:1f85:b0:48f:e1ac:c94f with SMTP id 5b1f17b1804b1-48fe1accbf4mr11293815e9.10.1778753988485;
-        Thu, 14 May 2026 03:19:48 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.9.106])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fd6276741sm26923115e9.0.2026.05.14.03.19.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 May 2026 03:19:48 -0700 (PDT)
-Message-ID: <deb3e868-456c-43a6-886f-9d882d23975f@redhat.com>
-Date: Thu, 14 May 2026 12:19:46 +0200
+	s=arc-20240116; t=1778754071; c=relaxed/simple;
+	bh=fyftp4iasBnUciMCnM4ih4eUsfsD+0Ri23BKLLqY2ZA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G2NFLpGUG1bhqKKMDo+UEeIS/o6YHYfGQG6UJqSpuRaATnKE7osRc2p3TtaWZM3YGSNlLU8ZZBm1h4nHfpuWhTqENPY7NJeRrjF6Fyp6biMEreDGY3CxiDEDdHv2RN3QXfqo+GQpOs7LuCdae+fqdYpDkY/WDYa7cm7UErcc1HU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=VS5aZHUb; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=srz6LnlD; arc=none smtp.client-ip=103.168.172.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfout.phl.internal (Postfix) with ESMTP id 96F33EC021F;
+	Thu, 14 May 2026 06:21:07 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Thu, 14 May 2026 06:21:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1778754067; x=
+	1778840467; bh=oF8/clMVOVZTaaaI32fozRcP/Wi9a3HrHpi5Mv76kI0=; b=V
+	S5aZHUb5RPGhOhQnfFh3G4dJ7exkG4pk2NQXht8jHBSL+7QQ+rImjSWTrFQoLcqM
+	HGS26c9Uv62aScZ41am969nLFzhgAI2JoHUdpWD4Nk9J7wlYor2CfUVMMuZQuLd9
+	xtMNKMUK2z9bYebj4k7+xD2D5p3ya1Sl44SPCznuT/y9GYyrPT5xh4mjQbyPX09M
+	F1DAF8xURY56SLn6gvnfb8TGbBtM04NI0234pCnQvrAocg9Tu7RYBL+jyIBrRzCo
+	x5VydIebM5RBOObgyWvzLW9j4F/3A48agi/xZsgsTn5ZNfud0FqiE3tzEFeF3uq7
+	s1tZ1dm+6fJmzTU2l1Uug==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1778754067; x=1778840467; bh=oF8/clMVOVZTaaaI32fozRcP/Wi9a3HrHpi
+	5Mv76kI0=; b=srz6LnlDTMXtHv3m8z7dsucblkUkP9zWHgkFixn/QS+MRV/UUWP
+	1Qo7HO04W5+zDrUwibHJUDGlpxvi7QOrtRKaFtnm4kXUUwfq/HSByRFBUjP6NdnO
+	4nRfgZbjzOFi5wgR97phkLuFe2MmkUB5KWaSUu1ywBLEP8+fDSbXUeJgChC7Achr
+	1A8KCkcoHVRzje0GetL4fkiEi4D6ZnvZ7IvsHQvYqVLof35khCwGEZ23un+ApmMo
+	VlrLiqp+zIrsCbE5Aq4ULxxsSqJF2S99eBOPQJ+YjaFrcYGwNZzLwxn06JEO0Tcs
+	VMaW9MtfNjuDYXcUWQilqvOncO60FrjkEyA==
+X-ME-Sender: <xms:EaIFamyImrPr1ohksyZhJvs_5zPXw5VapGcAZkWBtr7qkSaxW-2PFw>
+    <xme:EaIFauPcMQSw6pLpb5jEkbwO3ngpLBEdB0QTCEPWreAzuGIutWnyr25Ljt0uYz_zT
+    GRU0CK4aj8NTvOuo4rm5tsgTZ5KHc0DsZ12xpv8HHr5frnIhIoyz8M>
+X-ME-Received: <xmr:EaIFauea1NNJspmCLGH4vcWRSPYWY914xpDqigqxjihLXHr4c8lxGlS8n10ysc5d6W3DK_sYs6uzymx1vJGXZkA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduvdejvdeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepgefhffdtvedugfekffejvdeiieelhfetffeffefghedvvefhjeejvdek
+    feelgefgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdr
+    nhgvthdpnhgspghrtghpthhtohepudejpdhmohguvgepshhmthhpohhuthdprhgtphhtth
+    hopehimhhvgegsvghlsehgmhgrihhlrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehr
+    vgguhhgrthdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtg
+    hpthhtohepshhtvghffhgvnhdrkhhlrghsshgvrhhtsehsvggtuhhnvghtrdgtohhmpdhr
+    tghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
+    epshhtrggslhgvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhhhrghl
+    sehrsghogidrtghopdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvth
+    dprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:EaIFai5XS3YJ6722Vai9ffVY4TNuq9NOkelNN-vWCdj4GMCi5dD2ow>
+    <xmx:EaIFamIlj13qmb0dxB7qgdstrg4MfG30Fz64qwhoXeyO-4VWXIxvew>
+    <xmx:EaIFam6SCYEJQ1qGK7b3ShqpX-vpudhDV9CBIZsBOuQC_aRYI5JbTQ>
+    <xmx:EaIFalZMqTakV01b7_KSkyKLnBHVyvkHSrbDHlFwoSPPWlQlqb3Yeg>
+    <xmx:E6IFagyq0Bl9nsFPUymvN7fvbKgePQ0jUgpv58QyXwdQelrwzOx6EYkj>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 14 May 2026 06:21:05 -0400 (EDT)
+Date: Thu, 14 May 2026 12:21:02 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, kuba@kernel.org,
+	steffen.klassert@secunet.com, netdev@vger.kernel.org,
+	stable@vger.kernel.org, mhal@rbox.co, davem@davemloft.net,
+	horms@kernel.org, edumazet@google.com, kerneljasonxing@gmail.com,
+	herbert@gondor.apana.org.au, vakzz@zellic.io, kuniyu@google.com,
+	jiayuan.chen@linux.dev, ben@decadent.org.uk, dsahern@kernel.org
+Subject: Re: [PATCH net v2] net: skbuff: propagate shared-frag marker through
+ frag-transfer helpers
+Message-ID: <agWiDlvu351MSuqO@krikkit>
+References: <agToIEDI4TaTNLRb@v4bel>
+ <92ec6190-0255-4b7c-9524-254cb37476ab@redhat.com>
+ <agWYGuJ__OtpgjnB@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: reject CHID-0 ACCEPT that matches an empty
- ism_dev slot
-To: Xiang Mei <xmei5@asu.edu>, netdev@vger.kernel.org
-Cc: alibuda@linux.alibaba.com, dust.li@linux.alibaba.com,
- sidraya@linux.ibm.com, wenjia@linux.ibm.com, ubraun@linux.ibm.com,
- linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, bestswngs@gmail.com
-References: <20260511062138.2839584-1-xmei5@asu.edu>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260511062138.2839584-1-xmei5@asu.edu>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 8917E540509
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <agWYGuJ__OtpgjnB@v4bel>
+X-Rspamd-Queue-Id: 27A4654052E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [3.34 / 15.00];
-	SEM_URIBL(3.50)[asu.edu:email];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm1,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
-	FREEMAIL_CC(0.00)[linux.alibaba.com,linux.ibm.com,vger.kernel.org,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	R_DKIM_ALLOW(0.00)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	TAGGED_FROM(0.00)[bounces-287906-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-287907-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DMARC_NA(0.00)[queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_SPAM(0.00)[0.492];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	FREEMAIL_CC(0.00)[redhat.com,kernel.org,secunet.com,vger.kernel.org,rbox.co,davemloft.net,google.com,gmail.com,gondor.apana.org.au,zellic.io,linux.dev,decadent.org.uk];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	R_SPF_ALLOW(0.00)[+ip4:172.105.105.114:c];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sashiko.dev:url,asu.edu:email]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,queasysnail.net:dkim]
 X-Rspamd-Action: no action
 
-On 5/11/26 8:21 AM, Xiang Mei wrote:
-> On the SMC-D client, slot 0 of ini->ism_dev[]/ini->ism_chid[] is
-> reserved for an SMC-Dv1 device. smc_find_ism_v2_device_clnt()
-> populates V2 entries starting at index 1, so when no V1 device is
-> selected slot 0 is left in its kzalloc()'ed state with ism_dev[0] ==
-> NULL and ism_chid[0] == 0.
+2026-05-14, 18:38:34 +0900, Hyunwoo Kim wrote:
+> On Thu, May 14, 2026 at 10:04:29AM +0200, Paolo Abeni wrote:
+> > On 5/13/26 11:07 PM, Hyunwoo Kim wrote:
+> > > Three frag-transfer helpers (__pskb_copy_fclone(), skb_try_coalesce(),
+> > > and skb_shift()) fail to propagate the SKBFL_SHARED_FRAG bit in
+> > > skb_shinfo()->flags when moving frags from source to destination.
+> > > __pskb_copy_fclone() defers the rest of the shinfo metadata to
+> > > skb_copy_header() after copying frag descriptors, but that helper
+> > > only carries over gso_{size,segs,type} and never touches
+> > > skb_shinfo()->flags; skb_try_coalesce() and skb_shift() move frag
+> > > descriptors directly and leave flags untouched.  As a result, the
+> > > destination skb keeps a reference to the same externally-owned or
+> > > page-cache-backed pages while reporting skb_has_shared_frag() as
+> > > false.
+> > > 
+> > > The mismatch is harmful in any in-place writer that uses
+> > > skb_has_shared_frag() to decide whether shared pages must be detoured
+> > > through skb_cow_data().  ESP input is one such writer (esp4.c,
+> > > esp6.c), and a single nft 'dup to <local>' rule -- or any other
+> > > nf_dup_ipv4() / xt_TEE caller -- is enough to land a pskb_copy()'d
+> > > skb in esp_input() with the marker stripped, letting an unprivileged
+> > > user write into the page cache of a root-owned read-only file via
+> > > authencesn-ESN stray writes.
+> > > 
+> > > Set SKBFL_SHARED_FRAG on the destination whenever frag descriptors
+> > > were actually moved from the source.  skb_copy() and skb_copy_expand()
+> > > share skb_copy_header() too but linearize all paged data into freshly
+> > > allocated head storage and emerge with nr_frags == 0, so
+> > > skb_has_shared_frag() returns false on its own; they need no change.
+> > > 
+> > > Fixes: cef401de7be8 ("net: fix possible wrong checksum generation")
+> > > Fixes: f4c50a4034e6 ("xfrm: esp: avoid in-place decrypt on shared skb frags")
+> > 
+> > WRT the 2nd fixes tag, I *think* f4c50a4034e6 would need
+> > additionally/instead a follow-up similar to the one mentioned by Jakub here:
+> > 
+> > https://lore.kernel.org/all/20260510084520.476745b5@kernel.org/
 > 
-> smc_v2_determine_accepted_chid() then matches the peer's CHID against
-> the array starting from index 0 using the CHID alone. A malicious
-> peer replying to a SMC-Dv2-only proposal with d1.chid == 0 matches
-> the empty slot, ini->ism_selected becomes 0, and the subsequent
-> ism_dev[0]->lgr_lock dereference in smc_conn_create() faults at
-> offsetof(struct smcd_dev, lgr_lock) == 0x68:
-> 
->   BUG: KASAN: null-ptr-deref in _raw_spin_lock_bh+0x79/0xe0
->   Write of size 4 at addr 0000000000000068 by task exploit/144
->   Call Trace:
->    _raw_spin_lock_bh
->    smc_conn_create (net/smc/smc_core.c:1997)
->    __smc_connect (net/smc/af_smc.c:1447)
->    smc_connect (net/smc/af_smc.c:1720)
->    __sys_connect
->    __x64_sys_connect
->    do_syscall_64
-> 
-> Require ism_dev[i] to be non-NULL before accepting a CHID match.
-> 
-> Fixes: a7c9c5f4af7f ("net/smc: CLC accept / confirm V2")
-> Reported-by: Weiming Shi <bestswngs@gmail.com>
-> Assisted-by: Claude:claude-opus-4-7
-> Signed-off-by: Xiang Mei <xmei5@asu.edu>
-> ---
->  net/smc/af_smc.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index 185dbed7de5d..12ea3b6dbc64 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -1400,7 +1400,8 @@ smc_v2_determine_accepted_chid(struct smc_clc_msg_accept_confirm *aclc,
->  	int i;
->  
->  	for (i = 0; i < ini->ism_offered_cnt + 1; i++) {
-> -		if (ini->ism_chid[i] == ntohs(aclc->d1.chid)) {
-> +		if (ini->ism_dev[i] &&
-> +		    ini->ism_chid[i] == ntohs(aclc->d1.chid)) {
->  			ini->ism_selected = i;
->  			return 0;
->  		}
+> Agreed. tracing SKBFL_SHARED_FRAG propagation paths one by one is
+> not a robust direction for the fix. Even minor logic changes elsewhere
+> could cause the issue to resurface.
+>
+> As a follow-up,	eliminating the in-place handling in esp_input -- accepting 
 
-Patch LGTM, thanks!
+It would close this group of vulnerabilities, but there are other
+parts of the networking stack that consume this flag. For those,
+chasing missing flag propagation is still a useful task.
 
-@smc maintainers, please note that sashiko reviews:
+> the performance trade-off -- seems necessary. That was actually the
+> direction of my initial proposal:
+>
+> https://lore.kernel.org/all/afLDKSvAvMwGh7Fy@v4bel/
 
-https://sashiko.dev/#/patchset/20260511062138.2839584-1-xmei5%40asu.edu
+But you chose to abandon this approach (I guess because of the AI
+feedback Simon forwarded? feedback doesn't necessarily mean "drop this
+entirely").
 
-pointed to another pre-existing issue in this area you may want to address.
-
-/P
-
+-- 
+Sabrina
 
