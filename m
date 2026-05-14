@@ -1,53 +1,75 @@
-Return-Path: <netdev+bounces-287927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287922-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8KiEAPOpBWrtZQIAu9opvQ
-	(envelope-from <netdev+bounces-287927-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:54:43 +0200
+	id YCvaHBOpBWrtZQIAu9opvQ
+	(envelope-from <netdev+bounces-287922-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:50:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15024540A5B
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:54:39 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D68854099A
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:50:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7633B3090A49
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 10:51:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 86ABD3000894
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 10:50:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B75F93B7B71;
-	Thu, 14 May 2026 10:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 876553AEF44;
+	Thu, 14 May 2026 10:50:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kGJ4ecdu"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="w4WOAcH7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B2C3B7751;
-	Thu, 14 May 2026 10:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E59C3B19B1;
+	Thu, 14 May 2026 10:50:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778755875; cv=none; b=MuHbnl75ttKxf3Er2ypRafnVzrUomOXv6C4fBAsYls7sZS6xqNM+yvQVRtFNjTBZBS7MsCNa/v+1zZ9mhDj2qxkkbrt9+CF2sOZu5rPXqR13maxIO1yT4jsApybe6uKFEGCoXTDzbjRjujBt7e3ZOYuzlDL27O4UVn5oMjJ0Sio=
+	t=1778755854; cv=none; b=hyTWj/hyfkKXf8iOWHpKEJDEL0fHRkphnRNunCZ3DAXQXI5XuK/E+KZI6QwAJKonat8+eZFCwvbfKGcQhBuMStiSZKX9r/Os3bzWjtYznkcDxSoGLwULoWAG76dxAFLT50eGD/MhTxXdbgdHA5uYxcp9LykyC6qLdzDt4bx18Rs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778755875; c=relaxed/simple;
-	bh=+x1FRlnUcjwLyuK/yNOv8UDz22Nry8z9aIdJLqVZYo0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BOQtynBR18jCa2D9ESWfQDp+c9PGdBrh8PhXZUQh76RwF5EgEeMo3yh+7B0JaJPqH8oUpg3WcJQmkLbv9rGEEson8ZTZOE925BK0eaJz4OOelJH8Zhtf0kNDf/b6kbPczSJbmYB7EeEkDYJWvH+yAxUImUIW3423mkGLBpbVAy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kGJ4ecdu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25C91C2BCB3;
-	Thu, 14 May 2026 10:51:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778755875;
-	bh=+x1FRlnUcjwLyuK/yNOv8UDz22Nry8z9aIdJLqVZYo0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kGJ4ecduY8vJjzxH6LkR7RPATN4q0A6GnZF+02NGBB5bL0Ualu1XTcVDkZ0wntwPZ
-	 rkN/JF+QsL56ZzcR6terJ8XARzTH/04af5LPSAuTI4sQKekDKLqQUsmnjZ7aH5K8Tx
-	 NGF0AIIP65XGB9ZFZYI0dZ16DilY0aI5/1RNR9DeEMzHn0vqEUPfEtlkKSqD1N2pRk
-	 jeTXbMpYIzoVc4U+JSfYSVc6bju6B6MgMp5d7OvlgjRZYJ0fIcNgnNocqsk/cFpcZ7
-	 RIf9TOZEjYPaH22bY6kj7GtoHatq2BOJgVTRtg0AtDPqzqdfBkVeP/bF6v9X/XXFJH
-	 xitRUwyVu9Xtw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FDB23931095;
-	Thu, 14 May 2026 10:50:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1778755854; c=relaxed/simple;
+	bh=xYq3XhE9D+cD8KHPW0WBAKksLBWcNGoAUf14L+sOG0s=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=T37TEHY6WALSoolsLADS5tVC8ycMVAG75twyZKKB3d567VPlWg60VOg+yljtt0PmpanWIGxBeVKO8xUuK8VagL8AysGQKTY859YjmZeCC99A5CLFJ6XYM7Ett0Est8xi6ErM46NygQFcPM2KlAfdBa/ZwRKRntoC6MKmOd2hWbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=w4WOAcH7; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1778755852; x=1810291852;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=xYq3XhE9D+cD8KHPW0WBAKksLBWcNGoAUf14L+sOG0s=;
+  b=w4WOAcH7NOr/GIt9RonWpRFhmnWLET2TiWcshyBLtuxrl8mAh8cK6PbR
+   +y6eJoATHBsEG3fnHiy4jQa84kOFCBI8y2DG5WEYPC+d8yzd3FXDlHrZz
+   I8agTkoeBTcJRHwVbtSqk7wWuOCDWWbzss0Sy9cVx+yyLQav4ppAaGA6q
+   GhGvuRT6dmM2WttCYBMPK6djf6rzNF4RdV07+pfunL/tOBKKhnYQ5vwVn
+   UiBAYdUsZC6mNH3qbGlvEt2OBe5TZjn5u5A2gpiB2V1R3P9OMRpXJdmT6
+   34cP/U/iHcf6HB86vbonVz7BdwkqyV9U3QAcflIILbhuRKt3NSR9TVRcU
+   g==;
+X-CSE-ConnectionGUID: nLLIMr+6ThGN7rVuX/yuXw==
+X-CSE-MsgGUID: MCQCzWOIT0Wc0uqEXKlBnQ==
+X-IronPort-AV: E=Sophos;i="6.23,234,1770620400"; 
+   d="scan'208";a="224736395"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 May 2026 03:50:45 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Thu, 14 May 2026 03:50:45 -0700
+Received: from che-ld-unglab06.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Thu, 14 May 2026 03:50:42 -0700
+From: Thangaraj Samynathan <thangaraj.s@microchip.com>
+To: <netdev@vger.kernel.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <bryan.whitehead@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, <linux@armlinux.org.uk>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH v4 0/5] net: lan743x: Add SFP support for PCI11x1x
+Date: Thu, 14 May 2026 16:20:23 +0530
+Message-ID: <20260514105028.42942-1-thangaraj.s@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,94 +77,162 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/6] bridge: Add selective forwarding of
- gratuitous neighbor announcements
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177875582014.4067480.7391428922035544724.git-patchwork-notify@kernel.org>
-Date: Thu, 14 May 2026 10:50:20 +0000
-References: <20260511065936.4173106-1-danieller@nvidia.com>
-In-Reply-To: <20260511065936.4173106-1-danieller@nvidia.com>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: netdev@vger.kernel.org, donald.hunter@gmail.com, kuba@kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, razor@blackwall.org, idosch@nvidia.com,
- andrew+netdev@lunn.ch, shuah@kernel.org, ast@fiberby.net,
- liuhangbin@gmail.com, daniel@iogearbox.net, aroulin@nvidia.com,
- fmaurer@redhat.com, sdf.kernel@gmail.com, sd@queasysnail.net,
- kees@kernel.org, nickgarlis@gmail.com, amorenoz@redhat.com,
- alasdair@mcwilliam.dev, johannes.wiesboeck@aisec.fraunhofer.de,
- petrm@nvidia.com, linux-kernel@vger.kernel.org, bridge@lists.linux.dev,
- linux-kselftest@vger.kernel.org
-X-Rspamd-Queue-Id: 15024540A5B
+Content-Type: text/plain
+X-Rspamd-Queue-Id: 6D68854099A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287927-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,davemloft.net,google.com,redhat.com,blackwall.org,nvidia.com,lunn.ch,fiberby.net,iogearbox.net,queasysnail.net,mcwilliam.dev,aisec.fraunhofer.de,lists.linux.dev];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_HAS_DN(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[thangaraj.s@microchip.com,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_FROM(0.00)[bounces-287922-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.999];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	TO_DN_NONE(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lwn.net:url]
 X-Rspamd-Action: no action
 
-Hello:
+This series adds SFP module support for the Microchip PCI11x1x Ethernet
+controller family by integrating with the kernel's phylink/SFP subsystem.
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+The PCI11x1x device contains an embedded PCIe switch with downstream
+ports for the Ethernet controller and a multi-function peripheral endpoint
+(GPIO, I2C, UART, SPI controllers). SFP support relies on this peripheral
+endpoint: the GPIO controller provides the SFP control/status signals and
+the I2C controller provides access to the SFP module EEPROM. SFP capability
+is hardware-strapped and detected at probe time.
 
-On Mon, 11 May 2026 09:59:30 +0300 you wrote:
-> The existing neighbor suppression unconditionally suppresses gratuitous
-> ARPs and unsolicited Neighbor Advertisements, which prevents fast
-> mobility of hosts between VTEPs.
-> 
-> This series adds a new neigh_forward_grat option that provides
-> independent control of gratuitous ARP and unsolicited NA forwarding.
-> When neigh_suppress is enabled but neigh_forward_grat is enabled,
-> regular neighbor discovery is suppressed while gratuitous announcements
-> are forwarded.
-> 
-> [...]
+Patch 1 renames the misleading is_sgmii_en flag to is_pcs_en to better
+reflect that it tracks PCS interface enablement rather than a specific
+SGMII mode. No functional change.
 
-Here is the summary with links:
-  - [net-next,v2,1/6] bridge: uapi: Add neigh_forward_grat netlink attributes
-    https://git.kernel.org/netdev/net-next/c/0c32db0761fe
-  - [net-next,v2,2/6] bridge: Add internal flags for neigh_forward_grat
-    https://git.kernel.org/netdev/net-next/c/3a28ccb9dd47
-  - [net-next,v2,3/6] bridge: Add selective forwarding of gratuitous neighbor announcements
-    https://git.kernel.org/netdev/net-next/c/27c082c600b1
-  - [net-next,v2,4/6] bridge: Add port-level netlink handling for neigh_forward_grat
-    https://git.kernel.org/netdev/net-next/c/2c75c438b9d9
-  - [net-next,v2,5/6] bridge: Add per-VLAN netlink handling for neigh_forward_grat
-    https://git.kernel.org/netdev/net-next/c/e65cf8815932
-  - [net-next,v2,6/6] selftests: net: Add tests for neigh_forward_grat option
-    https://git.kernel.org/netdev/net-next/c/4620aa6527d3
+Patch 2 reads the SFP enable straps (STRAP_SFP_USE_EN_ and STRAP_SFP_EN_)
+from the PCI11x1x strap registers and stores the result in a new
+is_sfp_support_en flag. A validation check ensures PCS is also enabled
+whenever SFP support is requested, since SFP operation requires the PCS
+interface.
 
-You are awesome, thank you!
+Patch 3 registers software nodes to describe the SFP hardware topology to
+the kernel: the GPIO device (for TX-fault, TX-disable, LOS, mod-def0, and
+rate-select0 signals), the I2C adapter (for SFP EEPROM access), the SFP
+cage node, and a phylink node configured for in-band-status mode. The
+driver navigates the PCI topology at probe time to locate the paired
+peripheral controller functions. A new CONFIG_LAN743X_SFP Kconfig symbol
+guards the feature and selects the required I2C, GPIO, SFP, and PCS_XPCS
+dependencies.
+
+Patch 4 registers an SFP platform device backed by the SFP software node
+when SFP support is enabled, and associates the I2C adapter's firmware node
+so the SFP subsystem can manage module detection and EEPROM reads.
+
+Patch 5 adds a dedicated PCS MDIO bus and an XPCS instance for SFP link
+management. C45 read/write callbacks are wired to the existing internal
+SGMII access functions. The mac_select_pcs phylink callback returns the
+XPCS instance when present. SGMII and 2.5GBASE-X interface modes are
+enabled in phylink to support the range of SFP modules. The phylink
+connect path is also updated to skip the fallback PHY scan when SFP
+support is active.
+
+Based on original work by Raju Lakkaraju:
+https://lwn.net/ml/all/20240911161054.4494-1-Raju.Lakkaraju%40microchip.com/
+
+Change Log:
+===========
+v3 -> v4:
+  - Use device_find_child() + i2c_verify_adapter() to locate the I2C
+    adapter and dev_is_auxiliary() + name match to locate the GPIO aux
+    device; removes dependency on peripheral driver struct layouts
+    [patch 3/5, 4/5]
+  - Use pci_walk_bus() for PCI peripheral device traversal [patch 4/5]
+  - Fix memory leak on error paths in lan743x_swnodes_register()
+    [patch 3/5]
+  - Fix missing NULL terminator in property_entry arrays [patch 3/5]
+  - Use DL_FLAG_AUTOREMOVE_CONSUMER for device links to peripheral
+    devices [patch 4/5]
+  - Set phy_mask = ~0 on PCS MDIO bus to prevent unintended PHY scan
+    [patch 5/5]
+  - Style fixes [patch 3/5]
+
+v2 -> v3:
+  - Add patch 1/5 to rename is_sgmii_en -> is_pcs_en as a prerequisite
+    cleanup before the SFP series [patch 1/5]
+  - Update error message to reference strap names:
+    "SFP_EN strap specified without SGMII_EN strap" [patch 2/5]
+  - Use str_enable_disable() helper for debug logging instead of open-coded
+    ternary [patch 2/5]
+  - Add is_sfp_support_en initialisation to false in probe [patch 2/5]
+  - Move <linux/i2c.h>, <linux/gpio/machine.h>, <linux/auxiliary_bus.h>
+    includes, PCI1XXXX_*/PCI11X1X_* macros, NODE_PROP macro and helper
+    structs from lan743x_main.c to lan743x_main.h [patch 3/5]
+  - Add lan743x_swnodes_unregister() helper with kfree inside the if block
+    [patch 3/5]
+  - Move software node registration out of lan743x_hardware_init() into
+    lan743x_phylink_create() with proper error unwind, so it is not called
+    on PM resume path [patch 3/5]
+  - Move software node unregistration from lan743x_full_cleanup() into
+    lan743x_destroy_phylink() to be symmetric with registration and handle
+    probe failure path correctly [patch 3/5]
+  - Use kzalloc_obj() instead of kzalloc() for sw_nodes allocation
+    [patch 3/5]
+  - Fix typo: "SPIcontrollers" -> "SPI controllers" in comment [patch 3/5]
+  - Add cleanup_sfp: label in probe error path; null sfp_dev and i2c_adap
+    pointers after unregister in lan743x_full_cleanup() [patch 4/5]
+  - Move <linux/platform_device.h> to lan743x_main.h where
+    struct platform_device *sfp_dev is declared [patch 4/5]
+  - Fix probe failure path: goto cleanup_hardware -> goto cleanup_phylink
+    on lan743x_sfp_register() failure [patch 4/5]
+  - Consolidate phylink PCS and 2500Base-X support into a single patch
+    [patch 5/5]
+  - Switch from struct dw_xpcs * to struct phylink_pcs * internally; use
+    xpcs_create_pcs_mdiodev() instead of xpcs_create_mdiodev() +
+    xpcs_to_phylink_pcs(), and xpcs_destroy_pcs() instead of
+    xpcs_destroy() [patch 5/5]
+  - Use devm_mdiobus_alloc() instead of mdiobus_alloc() for pcs_mdiobus
+    [patch 5/5]
+  - Move <linux/phylink.h> and <linux/pcs/pcs-xpcs.h> from
+    lan743x_main.c to lan743x_main.h [patch 5/5]
+
+v1 -> v2:
+  - Split the patches to 'PHYLINK' and 'SFP' parts
+  - Change variable name from 'chip_rev' to 'fpga_rev'
+  - SFP GPIO definitions and other macros move from lan743x_main.c to
+    lan743x_main.h file
+  - Change from 'PCI11X1X_' to 'PCI11X1X_EVB_PCI11010_' strings for
+    GPIO macros
+  - Add platform_device_unregister() when sfp register fail
+  - Add two new patches to this patch series
+
+Thangaraj Samynathan (5):
+  net: lan743x: rename is_sgmii_en to is_pcs_en
+  net: lan743x: read SFP straps from PCI11x1x device
+  net: lan743x: Add support to software-nodes for SFP
+  net: lan743x: Register SFP platform device for PCI11x1x
+  net: lan743x: Add PCS/XPCS support for SFP on PCI11x1x
+
+ drivers/net/ethernet/microchip/Kconfig        |  15 +
+ .../net/ethernet/microchip/lan743x_ethtool.c  |   4 +-
+ drivers/net/ethernet/microchip/lan743x_main.c | 450 +++++++++++++++++-
+ drivers/net/ethernet/microchip/lan743x_main.h |  69 ++-
+ 4 files changed, 520 insertions(+), 18 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
 
