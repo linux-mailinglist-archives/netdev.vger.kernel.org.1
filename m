@@ -1,272 +1,254 @@
-Return-Path: <netdev+bounces-288003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288004-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MAc6KhPiBWqNdAIAu9opvQ
-	(envelope-from <netdev+bounces-288003-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:54:11 +0200
+	id sIdGO0niBWqNdAIAu9opvQ
+	(envelope-from <netdev+bounces-288004-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:55:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C48E543886
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:54:10 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 716465438DC
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:55:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5138E30AA0AA
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 14:46:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2FCCF301A500
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 14:47:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B017410D1F;
-	Thu, 14 May 2026 14:46:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E78073DFC78;
+	Thu, 14 May 2026 14:47:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="M2Z41gV4";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="llZSehFa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xi48o0tQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997C82D5A19
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 14:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E1F23E334;
+	Thu, 14 May 2026 14:47:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778769963; cv=none; b=WwqIkAPPb0mC67UulGSFanfOoqRmRbPOqNeJeGlnyXP1UI80T9fhP8xgTQCY+3fZt6o8WZMvxCiXENunY9FEk/W7at09A1IMfUEFTKrj7gWROOFFjkdW5ta8e+Rnu2kk61Vn+XVpcVs7KH3uK6mBOZb4tqI8gEO7lL9MvX11gUY=
+	t=1778770020; cv=none; b=TVtlSW8pnPh2fZV5GvoF74M2Nc2q9QH5JDp9eTIhDMU6JtqKsNR3z07FrW/AffN+HhDL4sdGltpBx5Jrma82xk5ObN39S0XLzxFD59YxtWAu8Up7WVNdgIxuRXtq0lbPqOLMDzr7MWTg8iR1JWh1YTyWAzi4POLbONwefMLdpbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778769963; c=relaxed/simple;
-	bh=D9T/ymrP1TFdnznpfGLkuwLPI0URxou8azZPyWAZ+6o=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=EvBaLSADy+BHhwzxk9fp4+dAZTIzIMgSvUK6SH2dG7slU4vpau7medtL584JPbVEMKCKJh0VU8Ya5UhVZGaA2+yKCHUo39ZF1QaMD/MOooWDV4YIhV+OmNFmwJvTeodIgybmNZTFb9ZXLxm/IdWUm2FxZFNli00cscmM4tgEobQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=M2Z41gV4; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=llZSehFa; arc=none smtp.client-ip=202.12.124.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 586CD7A012B;
-	Thu, 14 May 2026 10:45:59 -0400 (EDT)
-Received: from phl-imap-14 ([10.202.2.87])
-  by phl-compute-10.internal (MEProxy); Thu, 14 May 2026 10:45:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1778769959;
-	 x=1778856359; bh=rkAFgTH/R30nUcrREWKv6FcDHDn1BD812za+dwCgBZU=; b=
-	M2Z41gV4wHzdqDxjKfhT1nUhv4DyAvOrd/m8/L+6otxK6gBkp1iJz4ucwrVXxlzl
-	dw+5ltYeXiTyW7Qc0JLys2IcNVFmVOGE0vTUAQqkvcjzoGb79h7oMY0nnAwrFgfY
-	O7zFznnBwR2T2qpxcbICp6IJLMkzpLwqJ5jg67E9kz1AuxvgAvXbQ1bhLTdeROTG
-	crX+uNcufDhTyAlsjiGeCTmRAsTEC+bE9BXZshpPlZuV9yPVIbQ1uVy4cIibs0X/
-	7tOLtfd3+17jbOSmmQ/teswFGHOwob0AGqWwSIfsHaUnDPY5Jc1jkm8A0+h/CL2e
-	kNsYVUg+4ByYQ88Hro3DaQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1778769959; x=
-	1778856359; bh=rkAFgTH/R30nUcrREWKv6FcDHDn1BD812za+dwCgBZU=; b=l
-	lZSehFawO7jNJrziiY8l581hZ+VffVGx2jsxoVSnEHvsX5TjFygBehUc6NaLChzB
-	a2vdP9ZaRwD+GO7IHj48mpdGtSzdLqV9EiDlFiovHQwMNkNWp9grj1kWSLC1XVyd
-	fMrenycPoJtipl915CXrNhphfgVsPsk1kQRzpVToYjWDbD4l2iv4fKzY6CfKdzNm
-	7SkMgyrrrZ2d5U8/TuPl3WBE4viC3E99ZfBFidYZV0k3oB41F2N9DMNl5Yz1Qbn+
-	Gp0OgsHyFXNf7G3r93MIp986S7bdxLcW1bnmg6lAqmmSU8hLfDtt/xbeu32qI4x+
-	9iPTAQVLdpni4iwpKYoug==
-X-ME-Sender: <xms:JuAFauv0JIQxqaM1ZRS5NA2FCNhYZ5hFQiNmHMnL_cBzwbeQFjnR7Q>
-    <xme:JuAFauQ9-uUzCAyFkRjs6CxyY-IAVj6OZfuTtMq-s5RCRj_cqSFiS_9QssLIU97Q2
-    niFo0nk6LNg5X1dCiVdgbVGLLZJdV9c9wfGhOWYXmn3SUZVMd6_bT4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduvdejkedtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehlihgt
-    vgcuofhikhhithihrghnshhkrgdfuceorghlihgtvgdrkhgvrhhnvghlsehfrghsthhmrg
-    hilhdrihhmqeenucggtffrrghtthgvrhhnpefhgfevgeeljeegleeiffduheegieehtdff
-    tdetvdffieelkedthfejleejgfeftdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgne
-    cuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghlihgt
-    vgdrkhgvrhhnvghlsehfrghsthhmrghilhdrihhmpdhnsggprhgtphhtthhopeduuddpmh
-    houggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdr
-    nhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpth
-    htohepfihilhhlvghmsgesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhhorhhmshes
-    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprh
-    gtphhtthhopehmrghtthhhvgifrdhstghhfigrrhhtiieslhhinhhugidruggvvhdprhgt
-    phhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepug
-    htrghtuhhlvggrsehnvhhiughirgdrtghomhdprhgtphhtthhopehgrghlsehnvhhiughi
-    rgdrtghomh
-X-ME-Proxy: <xmx:JuAFauZevOD45uafhYF8zzdvzgEqeYZDItIqMAgkqjdEymxnReRqag>
-    <xmx:JuAFavqR9z_IaDt2A5p-wBi76rjVURDZshim_xj2y5AAyLoWAKAjnA>
-    <xmx:JuAFaiQHVv-puLXwr4_dyEuDr1jgdIleOQ7YM3NUJgbdmbC6e5mtZA>
-    <xmx:JuAFajo1IMYQwFC95S60GSJs2anE9eRA6NRKTokzjD5d1Hp0ADoCLA>
-    <xmx:J-AFarsDz2gTBKhdE8xE7k8DcVS_ki5DnxEhfG8rpl8EigUx-eeabXD5>
-Feedback-ID: i559e4809:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id C4B0CC4006E; Thu, 14 May 2026 10:45:58 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1778770020; c=relaxed/simple;
+	bh=nl2nOQUnxsaEkYmrJ786ST6bsAhMobUA4j3jU4pmagE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=RjHyp6+5QfpNAJuz99XzgFqegjfQ+Fedt2LiJ0Swr/yKEsQCk7gU5boH2l40086a1nbHybVJsNZdMfQ0JDCj0ful9Ag5aHIWKrKTB5dA774NM2+nKbnH6Kgg/fh7tjy+T7HZSdf2uAfe1kLSoWQ3NSPzNJR1snOromKgRNL/EoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xi48o0tQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 119FEC2BCB3;
+	Thu, 14 May 2026 14:46:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778770020;
+	bh=nl2nOQUnxsaEkYmrJ786ST6bsAhMobUA4j3jU4pmagE=;
+	h=From:Date:Subject:To:Cc:From;
+	b=Xi48o0tQUtAKjDhAd1medSBOYpdGlRqe1MSQICKhvt9OFR3Jz8dF+NgbaKuTrHlW8
+	 KR8BNqKUqQ8YTlTzn0THQf0IcoWNMfCrk5RhxQsb8OR49Td4GITQPFXb3BJ/v/Swjc
+	 1wppCPRmmWRXBFQkS4JBKGbLo+ei/aFuGFIDvmet22Dy9z5P+NsQqh0G6Pviv9awb5
+	 9aiEnzouKMDyQYPs+RiR/zTJs9hm0cugO07Qfp6MyDU8mQBAtLxHoi+tCvNYNcEDmQ
+	 C3s7s3NzOInYvoHDQCMTJEGCVnASr7T7djakrRtVKlI3iLttkYcS0aGa5efTxCBQSI
+	 0VGqzoQy6MCvQ==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Thu, 14 May 2026 16:46:38 +0200
+Subject: [PATCH net v4] net: neigh: Reallocate headroom if necessary in
+ neigh_hh_bridge()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 14 May 2026 16:45:37 +0200
-From: "Alice Mikityanska" <alice.kernel@fastmail.im>
-To: "Gal Pressman" <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Andrew Lunn" <andrew+netdev@lunn.ch>,
- netdev@vger.kernel.org
-Cc: "Simon Horman" <horms@kernel.org>, "Dragos Tatulea" <dtatulea@nvidia.com>,
- "Willem de Bruijn" <willemb@google.com>,
- "Matthew Schwartz" <matthew.schwartz@linux.dev>
-Message-Id: <6702f4e4-cc0d-42ed-b11e-ba272018750a@app.fastmail.com>
-In-Reply-To: <c4279000-dd9a-4e59-ae0d-6dcc5c7b03a2@nvidia.com>
-References: <20260513074349.2152146-1-gal@nvidia.com>
- <f75c1cf5-b5ad-47db-952f-faad9f0a33ed@app.fastmail.com>
- <f356add6-e173-4020-a8af-8cc70aec955d@nvidia.com>
- <ea0d0e1c-bfc2-4271-94d7-3bec2f2e85a3@app.fastmail.com>
- <c129979f-7494-433c-92c4-6d4290add4d9@nvidia.com>
- <23e6e0f4-29ee-4f86-b02d-8c8d881c51f7@app.fastmail.com>
- <c4279000-dd9a-4e59-ae0d-6dcc5c7b03a2@nvidia.com>
-Subject: Re: [PATCH net] udp: Fix UDP length on last GSO_PARTIAL segment
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 8C48E543886
+Message-Id: <20260514-nf-neigh_hh_bridge-fix-v4-1-a56f4301923c@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/4XNywrCMBAF0F+RrI3k1Txc+R8ipU2nzaCkkpail
+ P67oauKFJf3zsyZmQyQEAZyPswkwYQD9jEHdTwQH6rYAcUmZyKY0KxglsaWRsAulCGUdcImb7T
+ 4oq6qjSkAhPSa5ONnglyv8JVEGMktlwGHsU/v9dnE19E/d+KU04orrZS2jRNwuUOK8Dj1qVvNS
+ WwczncdkR2vnFbeVKa27Y8jt47cdWR2LHgnC+mZY+7LWZblA3p2ej5SAQAA
+X-Change-ID: 20260508-nf-neigh_hh_bridge-fix-9ab775ee23c6
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, 
+ Phil Sutter <phil@nwl.cc>, Nikolay Aleksandrov <razor@blackwall.org>, 
+ Ido Schimmel <idosch@nvidia.com>, Bart De Schuymer <bdschuym@pandora.be>, 
+ Patrick McHardy <kaber@trash.net>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+ coreteam@netfilter.org, bridge@lists.linux.dev, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.3
+X-Rspamd-Queue-Id: 716465438DC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.65 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm3,messagingengine.com:s=fm3];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
-	TAGGED_FROM(0.00)[bounces-288003-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-288004-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FREEMAIL_FROM(0.00)[fastmail.im];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,app.fastmail.com:mid,isovalent.com:email,fastmail.im:dkim]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,openwrt:email]
 X-Rspamd-Action: no action
 
-On Wed, May 13, 2026, at 14:01, Gal Pressman wrote:
-> On 13/05/2026 14:48, Alice Mikityanska wrote:
->> On Wed, May 13, 2026, at 13:28, Gal Pressman wrote:
->>> On 13/05/2026 13:08, Alice Mikityanska wrote:
->>>> On Wed, May 13, 2026, at 11:43, Gal Pressman wrote:
->>>>> On 13/05/2026 12:17, Alice Mikityanska wrote:
->>>>>> On Wed, May 13, 2026, at 09:43, Gal Pressman wrote:
->>>>>>> Following the cited commit, __udp_gso_segment() writes single MSS length
->>>>>>> in the UDP header.
->>>>>>> The cited patch doesn't account for the fact that the last segment could
->>>>>>> be a GSO skb by itself. This could happen when the size of the packet is
->>>>>>> a multiple of MSS, hence the first segment is also the last one (there
->>>>>>> is no need for a remainder skb).
->>>>>>>
->>>>>>> When the post-loop segment is a GSO skb, assign the single MSS length in
->>>>>>> the UDP header.
->>>>>>>
->>>>>>> Fixes: b10b446ce7ad ("udp: gso: Use single MSS length in UDP header for 
->>>>>>> GSO_PARTIAL")
->>>>>>> Reported-by: Matthew Schwartz <matthew.schwartz@linux.dev>
->>>>>>> Closes: 
->>>>>>> https://lore.kernel.org/all/6c3fb15e-711d-4b8d-b152-e03d9b05293f@linux.dev/
->>>>>>> Tested-by: Matthew Schwartz <matthew.schwartz@linux.dev>
->>>>>>> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
->>>>>>> Signed-off-by: Gal Pressman <gal@nvidia.com>
->>>>>>> ---
->>>>>>>  net/ipv4/udp_offload.c | 2 +-
->>>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>>>>
->>>>>>> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
->>>>>>> index a0813d425b71..71df45f9488a 100644
->>>>>>> --- a/net/ipv4/udp_offload.c
->>>>>>> +++ b/net/ipv4/udp_offload.c
->>>>>>> @@ -604,7 +604,7 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
->>>>>>>  		       seg->data_len);
->>>>>>>  	check = csum16_add(csum16_sub(uh->check, uh->len), newlen);
->>>>>>>
->>>>>>> -	uh->len = newlen;
->>>>>>> +	uh->len = skb_is_gso(seg) ? msslen : newlen;
->>>>>>>  	uh->check = check;
->>>>>>
->>>>>> This is going to have the same checksum bug as your first commit, which
->>>>>> I'm fixing in [1]. You should use the right value of either msslen or
->>>>>> newlen when modifying check a couple of lines above.
->>>>>
->>>>> I tend to agree that the checksum seems to have the wrong value, the
->>>>> reason I chose not to change it is because my work only moved the UDP
->>>>> length assignment from the drivers to the stack.
->>>>>
->>>>> The "wrong" checksum value was used regardless of my change,
->>>>
->>>> The wrong checksum was visible only inside the driver, and since the
->>>> hardware didn't care (due to the offload), it worked well. It was the
->>>> driver business to make sure the corresponding hardware likes the
->>>> packet. After commit b10b446ce7ad ("udp: gso: Use single MSS length in
->>>> UDP header for GSO_PARTIAL"), however, the wrong checksum moved one
->>>> abstraction layer higher - to the networking stack, which attempts to
->>>> keep the checksum correct for a more generic case. It's not the same,
->>>> and while I'm trying to fix one occurrence, I'd prefer not to
->>>> introduce more.
->>>>
->>>>> and I
->>>>> prefer not to change it as part of this work.
->>>>>
->>>>>>
->>>>>> That said, maybe you can base your patch on top of my checksum fix? For
->>>>>> the last packet, it will then be:
->>>>>>
->>>>>> if (!skb_is_gso(seg))
->>>>>>         newlen = /* the new value */;
->>>>>> /* keep newlen as is otherwise: my newlen is your msslen */
->>>>>> check = csum16_add(csum16_sub(uh->check, uh->len), newlen);
->>>>>> uh->len = newlen;
->>>>>> uh->check = check;
->>>>>>
->>>>>> [1]: https://lore.kernel.org/netdev/20260512165648.386518-3-alice.kernel@fastmail.im/
->>>>>
->>>>> As I mentioned in the other thread, this fix goes to net, I can't take
->>>>> your patch.
->>>>
->>>> Ah, that's right. Still, I guess you can take mine to net for the
->>>> checksum fix.
->>>
->>> Do you think it is suitable for net?
->> 
->> This is always a mystery to me... I've had different experiences:
->> sometimes I am asked to resubmit less important fixes to -next,
->> sometimes a fix is a fix and must go to net. This one is a refactoring
->> useful for my further patches + the checksum fix, which we get for free
->> and which I considered not important enough to submit to net (hardware
->> offload fixes the checksum in most cases anyway). Following the "a fix
->> is a fix" logic, we may try sending it to net. What do you think?
->
-> IMHO, the motivation you provided in your previous message for the
-> checksum fix is convincing, but as I said, I think the commit message
-> should be phrased to explain the bug rather than the refactoring (and
-> add a Fixes tag).
+neigh_hh_bridge() assumes the skb always has sufficient headroom to copy
+the aligned  L2 header. This assumption can trigger the crash reported
+below using the following netfilter setup:
 
-I can put it like this:
+$modprobe br_netfilter
+$sysctl -w net.bridge.bridge-nf-call-iptables=1
 
-udp: gso: Fix handling checksum in __udp_gso_segment
+$root@OpenWrt:~# nft list ruleset
+table ip nat {
+        chain prerouting {
+                type nat hook prerouting priority dstnat; policy accept;
+                ip daddr 192.168.83.123 dnat to 192.168.83.120
+        }
+}
 
-The cited commit started using msslen for uh->len, but still uses newlen
-to adjust uh->check. Although the checksum is ignored in most cases due
-to the hardware offload, __udp_gso_segment attempts to maintain the
-correct one. Fix uh->check and adjust it by the right value.
+- iperf3 client (192.168.83.119) --> bridge (192.168.83.118) --> iperf3 server (192.168.83.120)
 
-Additionally, after the fix, newlen becomes assigned and unused before
-the loop. The code can be simplified a bit if mss adjustment is dropped,
-so that newlen becomes equal to msslen before the loop, and msslen can
-be also dropped, saving a few lines of code.
+the iperf3 client is sending packet for 192.168.83.123 to the bridge device.
 
-This brings us back to one variable, drops an unneeded arithmetic for
-mss, and fixes the UDP checksum.
+[ 1579.036575] Unable to handle kernel write to read-only memory at virtual address ffffff8004d76ffe
+[ 1579.045482] Mem abort info:
+[ 1579.048273]   ESR = 0x000000009600004f
+[ 1579.052024]   EC = 0x25: DABT (current EL), IL = 32 bits
+[ 1579.057363]   SET = 0, FnV = 0
+[ 1579.060417]   EA = 0, S1PTW = 0
+[ 1579.063550]   FSC = 0x0f: level 3 permission fault
+[ 1579.068345] Data abort info:
+[ 1579.071224]   ISV = 0, ISS = 0x0000004f, ISS2 = 0x00000000
+[ 1579.076720]   CM = 0, WnR = 1, TnD = 0, TagAccess = 0
+[ 1579.081770]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+[ 1579.087092] swapper pgtable: 4k pages, 39-bit VAs, pgdp=0000000080dc4000
+[ 1579.093794] [ffffff8004d76ffe] pgd=180000009ffff003, p4d=180000009ffff003, pud=180000009ffff003, pmd=180000009ffe3003, pte=0060000084d76787
+[ 1579.106343] Internal error: Oops: 000000009600004f [#1] SMP
+[ 1579.193824] CPU: 0 UID: 0 PID: 235 Comm: napi/qdma_eth-3 Tainted: G           O       6.12.57 #0
+[ 1579.202614] Tainted: [O]=OOT_MODULE
+[ 1579.206102] Hardware name: Airoha AN7581 Evaluation Board (DT)
+[ 1579.211929] pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[ 1579.218889] pc : br_nf_pre_routing_finish_bridge+0x1ac/0xcc8 [br_netfilter]
+[ 1579.225859] lr : br_nf_pre_routing_finish_bridge+0x18c/0xcc8 [br_netfilter]
+[ 1579.232822] sp : ffffffc0817cba20
+[ 1579.236128] x29: ffffffc0817cba20 x28: 0000000000000000 x27: ffffff8002b89000
+[ 1579.243273] x26: ffffff8004d7700e x25: 0000000000000008 x24: 0000000000000000
+[ 1579.250416] x23: ffffffc08179d4c0 x22: 0000000000000000 x21: ffffffc08179d4c0
+[ 1579.257561] x20: ffffff8004d9b800 x19: ffffff8015010000 x18: 0000000000000014
+[ 1579.264704] x17: ffffffbf9e930000 x16: ffffffc0817c8000 x15: 0000000000000070
+[ 1579.271848] x14: 0000000000000080 x13: 0000000000000001 x12: 0000000000000000
+[ 1579.278993] x11: ffffffc0798caae0 x10: ffffff8014db6fd8 x9 : 0000000000000000
+[ 1579.286136] x8 : 0000000000000003 x7 : ffffffc08171f628 x6 : 000000001a3b83d3
+[ 1579.293281] x5 : 0000000000000000 x4 : 1beb76f22fee0000 x3 : ffffff8004d7700e
+[ 1579.300425] x2 : 0000000000000000 x1 : ffffff8004d9b8bc x0 : ffffff80026ed000
+[ 1579.307570] Call trace:
+[ 1579.310018]  br_nf_pre_routing_finish_bridge+0x1ac/0xcc8 [br_netfilter]
+[ 1579.316632]  br_nf_hook_thresh+0xd4/0x14bc [br_netfilter]
+[ 1579.322032]  br_nf_hook_thresh+0x250/0x14bc [br_netfilter]
+[ 1579.327517]  br_nf_hook_thresh+0x76c/0x14bc [br_netfilter]
+[ 1579.333003]  br_handle_frame+0x180/0x480
+[ 1579.336935]  __netif_receive_skb_core.constprop.0+0x540/0xf40
+[ 1579.342682]  __netif_receive_skb_one_core+0x28/0x50
+[ 1579.347561]  process_backlog+0x98/0x1e0
+[ 1579.351398]  __napi_poll+0x34/0x1c4
+[ 1579.354887]  net_rx_action+0x178/0x330
+[ 1579.358638]  handle_softirqs+0x108/0x2d4
+[ 1579.362560]  __do_softirq+0x10/0x18
+[ 1579.366051]  ____do_softirq+0xc/0x20
+[ 1579.369627]  call_on_irq_stack+0x30/0x4c
+[ 1579.373550]  do_softirq_own_stack+0x18/0x20
+[ 1579.377734]  do_softirq+0x4c/0x60
+[ 1579.381050]  __local_bh_enable_ip+0x88/0x98
+[ 1579.385234]  napi_threaded_poll_loop+0x188/0x21c
+[ 1579.389853]  napi_threaded_poll+0x70/0x80
+[ 1579.393863]  kthread+0xd8/0xdc
+[ 1579.396918]  ret_from_fork+0x10/0x20
+[ 1579.400499] Code: 88dffc22 3707ffc2 f9406663 f9406684 (f81f0064)
+[ 1579.406589] ---[ end trace 0000000000000000 ]---
+[ 1579.411209] Kernel panic - not syncing: Oops: Fatal exception in interrupt
+[ 1579.418083] SMP: stopping secondary CPUs
+[ 1579.422012] Kernel Offset: disabled
 
-Fixes: b10b446ce7ad ("udp: gso: Use single MSS length in UDP header for GSO_PARTIAL")
-Signed-off-by: Alice Mikityanska <alice@isovalent.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Fix the issue reallocating the skb headroom if necessary in neigh_hh_bridge routine.
+
+Fixes: e179e6322ac33 ("netfilter: bridge-netfilter: Fix MAC header handling with IP DNAT")
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+Changes in v4:
+- cosmetics: jump to free_skb instead of freeing the skb directly
+- Link to v3: https://lore.kernel.org/r/20260513-nf-neigh_hh_bridge-fix-v3-1-8ec9353c0909@kernel.org
+
+Changes in v3:
+- Run skb_cow_head() instead of skb_expand_head() in neigh_hh_bridge()
+- Link to v2: https://lore.kernel.org/r/20260511-nf-neigh_hh_bridge-fix-v2-1-c4964c7a7b8f@kernel.org
+
+Changes in v2:
+- Fix neighbour reference count leak
+- Run skb_expand_head() even for cloned/shared skbs.
+- Link to v1: https://lore.kernel.org/r/20260508-nf-neigh_hh_bridge-fix-v1-1-a1464468d92e@kernel.org
+---
+ include/net/neighbour.h         | 8 ++++++--
+ net/bridge/br_netfilter_hooks.c | 6 +++++-
+ 2 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/include/net/neighbour.h b/include/net/neighbour.h
+index 2dfee6d4258a..8860cc2175fc 100644
+--- a/include/net/neighbour.h
++++ b/include/net/neighbour.h
+@@ -489,11 +489,15 @@ static inline int neigh_event_send(struct neighbour *neigh, struct sk_buff *skb)
+ #if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
+ static inline int neigh_hh_bridge(struct hh_cache *hh, struct sk_buff *skb)
+ {
+-	unsigned int seq, hh_alen;
++	unsigned int seq, hh_alen = HH_DATA_ALIGN(ETH_HLEN);
++	int err;
++
++	err = skb_cow_head(skb, hh_alen);
++	if (err)
++		return err;
+ 
+ 	do {
+ 		seq = read_seqbegin(&hh->hh_lock);
+-		hh_alen = HH_DATA_ALIGN(ETH_HLEN);
+ 		memcpy(skb->data - hh_alen, hh->hh_data, ETH_ALEN + hh_alen - ETH_HLEN);
+ 	} while (read_seqretry(&hh->hh_lock, seq));
+ 	return 0;
+diff --git a/net/bridge/br_netfilter_hooks.c b/net/bridge/br_netfilter_hooks.c
+index 0ab1c94db4b9..0a394e5f4391 100644
+--- a/net/bridge/br_netfilter_hooks.c
++++ b/net/bridge/br_netfilter_hooks.c
+@@ -297,7 +297,11 @@ int br_nf_pre_routing_finish_bridge(struct net *net, struct sock *sk, struct sk_
+ 				goto free_skb;
+ 			}
+ 
+-			neigh_hh_bridge(&neigh->hh, skb);
++			if (neigh_hh_bridge(&neigh->hh, skb)) {
++				neigh_release(neigh);
++				goto free_skb;
++			}
++
+ 			skb->dev = br_indev;
+ 
+ 			ret = br_handle_frame_finish(net, sk, skb);
+
+---
+base-commit: c78bdba7b9666020c0832150a4fc4c0aebc7c6ac
+change-id: 20260508-nf-neigh_hh_bridge-fix-9ab775ee23c6
+
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
