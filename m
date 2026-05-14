@@ -1,123 +1,105 @@
-Return-Path: <netdev+bounces-287965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287966-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0OBzDdDQBWoPbwIAu9opvQ
-	(envelope-from <netdev+bounces-287965-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 15:40:32 +0200
+	id KOS4FzbRBWpUbwIAu9opvQ
+	(envelope-from <netdev+bounces-287966-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 15:42:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A1DE5426E6
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 15:40:28 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F11FF5426F9
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 15:42:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0AB4F3017791
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:39:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 749B7301D5BE
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17163E0C4A;
-	Thu, 14 May 2026 13:39:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF82E3E51C6;
+	Thu, 14 May 2026 13:42:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86FC3E4C70
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 13:39:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA7D3E0739;
+	Thu, 14 May 2026 13:42:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778765976; cv=none; b=W3MPqe0V4Uc/KVPfOz8nAhBT/vmQLcB+VQ9oLxDDY0/DbewTY28l9omL3wykGM5Y2tOyzLbEX+v/mBkqKyhWJ1uOVf8967relc8IWTaejCuL698M/kYlUG98wgaHp+ykYskTngxv5n3uzk5i6DAm0PLT9QnDCl2O0Z2ALUh+Vxw=
+	t=1778766130; cv=none; b=VL6M4+N9dhZSDPLL5hopqukgdxvebTReoFhfmyGTQ72dVDw8M9sJw2jbm5+itLogyqMmysfgB1kOMUQW9awun+raF9iIm7smv5UhhMUEquX9xpxgjWAOpegVaQGwb5WBWwHhtw5a3TcW++SPzNp6AHKZII2ZAVeaBxiNV0ey3/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778765976; c=relaxed/simple;
-	bh=68A8qumFQBQ9MtT1CV1OR6pY9cZWxVL93bkySL9cgmM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rp03m3WznYHHqrQrq8RmFilWN2RimLWNipGUX4AsIGAfe83kqW6rZcvktaSrux3B5nTAxFe9dVhIaZ2fOgE3XY2rsMaFZ3jSGhA5XsyKXiG1S9GCC70ye5uCinODsVAqpG92zoWZR2GLNUXk+y64xW4XxpQyZSdz6K/Sz7tlZ0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 64EDd8hh006290;
-	Thu, 14 May 2026 22:39:08 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.5] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 64EDd8T8006285
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Thu, 14 May 2026 22:39:08 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <04ca05e8-de5b-4c2e-941d-fde0c348293f@I-love.SAKURA.ne.jp>
-Date: Thu, 14 May 2026 22:39:05 +0900
+	s=arc-20240116; t=1778766130; c=relaxed/simple;
+	bh=8qOkthjctEjSF1Pf2LzH+O4vQuS3zhaX/ADeJ3YmaS8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mb0CCaylUOWJZA9B2XFoCAYmv+hTnkCvdGCMWoxUN4I9UhDRq4OP+mrEEz3u2pQGtxJ8VxU+T3rTeJgoxDazHiJnimhoP4Fv60UGGGKzDyKrsrbMpGfR/EN2Fp8UOfv8u+cY+y+lfK6fi6fDr419/tqv2GXBgiY7QNE13otYaJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id C65776099C; Thu, 14 May 2026 15:42:04 +0200 (CEST)
+Date: Thu, 14 May 2026 15:42:04 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Ido Schimmel <idosch@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Bart De Schuymer <bdschuym@pandora.be>,
+	Patrick McHardy <kaber@trash.net>, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	bridge@lists.linux.dev
+Subject: Re: [PATCH net v3] net: neigh: Reallocate headroom if necessary in
+ neigh_hh_bridge()
+Message-ID: <agXRLM6esULBG4al@strlen.de>
+References: <20260513-nf-neigh_hh_bridge-fix-v3-1-8ec9353c0909@kernel.org>
+ <20260514081403.GA482081@shredder>
+ <agW6zjwDHB3dTiZC@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] ipv6: addrconf: skip autoconf on unregistering
- devices
-To: Xu Rao <raoxu@uniontech.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-        horms@kernel.org, idosch@nvidia.com, kuba@kernel.org,
-        kuniyu@google.com, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, pabeni@redhat.com,
-        syzbot+e2af46126e0644cbebdd@syzkaller.appspotmail.com,
-        willemb@google.com
-References: <260a0064-0fa2-40cc-bb8c-1ee29f12dd1d@I-love.SAKURA.ne.jp>
- <B2E03D908A12A79A+20260514131854.1752183-1-raoxu@uniontech.com>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <B2E03D908A12A79A+20260514131854.1752183-1-raoxu@uniontech.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Virus-Status: clean
-X-Anti-Virus-Server: fsav103.rs.sakura.ne.jp
-X-Rspamd-Queue-Id: 6A1DE5426E6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <agW6zjwDHB3dTiZC@lore-desk>
+X-Rspamd-Queue-Id: F11FF5426F9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287965-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[i-love.sakura.ne.jp];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287966-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	DMARC_NA(0.00)[strlen.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,e2af46126e0644cbebdd];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.963];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.996];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[I-love.SAKURA.ne.jp:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,strlen.de:mid]
 X-Rspamd-Action: no action
 
-On 2026/05/14 22:18, Xu Rao wrote:
-> So the no-patch baseline still triggers the leak in the same environment
-> where both the proposed patch and the WARN_ON() diagnostic patch returned
-> OK.
+Lorenzo Bianconi <lorenzo@kernel.org> wrote:
+> > Personally I would use 'goto free_skb' after releasing the neighbour, to
+> > be consistent with the other paths that free the packet.
 > 
-> I agree that the WARN_ON() result does not prove the exact
-> NETREG_UNREGISTERING hypothesis, because it did not trigger.  I also do
-> not think this negative result is strong enough to disprove the race:
-> this bug is timing-sensitive, and even adding the reg_state load, branch
-> and WARN_ON() site can perturb the execution enough for a best-effort
-> syzbot run not to hit the same interleaving.
+> ack, I do not have a strong opinion about it, but in this case we would need to
+> even move "ret" since the current codebase always returns 0. What do you prefer?
 
-Since easily reproducible cases have been fixed in
-"unregister_netdevice: waiting for DEV to become free (8)",
-cases reported in
-"unregister_netdevice: waiting for DEV to become free (9)" and
-afterwards are likely timing-dependent difficult-to-reproduce races.
-
-Therefore, we need careful reasoning for why a patch can fix the problem.
-Carrying my debug printk() patches in networking trees might help.
-
+I think It can return 0 unconditionally, there are no code paths in
+that function where skb doesn't disappear (ownership change or freed),
+and its prerouting so there is no use for an error code either.
 
