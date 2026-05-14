@@ -1,140 +1,148 @@
-Return-Path: <netdev+bounces-287935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287936-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id APTdBXqyBWqeZwIAu9opvQ
-	(envelope-from <netdev+bounces-287935-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:31:06 +0200
+	id 4MnFCPSyBWqeZwIAu9opvQ
+	(envelope-from <netdev+bounces-287936-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:33:08 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80F2A541084
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:31:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59EEE5410EB
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:33:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C60B73023A4F
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:31:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5E65630254D1
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:33:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC1633B5837;
-	Thu, 14 May 2026 11:31:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13D363A7588;
+	Thu, 14 May 2026 11:33:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ubFsvF0q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WZ9WxG//"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F5D1E515;
-	Thu, 14 May 2026 11:31:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E54FB368D67
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 11:33:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778758262; cv=none; b=I+mhnMQL6H36Uv+ydtZVs8PSovCpkw4cTPIxuOs1q6bhTllx8K9tWZtB0MFtTbaAhi+i454/Og6zdAnYIjISmKDnIHMTbOwfHJKEP1adNfgvtdokcPTC+OfnISo4sODzfK/BmtX7BY8J3NI+DckM4M5KFoNuCUlSxt2p5QTwpsY=
+	t=1778758384; cv=none; b=aFDlFtfJ6IPOamqnf44ftE30YQUgYWUWpDrmG5dMy+rxN5cUsdU7CBj8tm6qkFPzDzOKqmH7aYUnZim4bVA1+e0wizjkOynDRwDrRCiNd9shqOxt9g9WEJX9wM1y57/MG6x1mHHwF6OmGS7gjRul3wglD5Ra1/bKuzZj3mF8NIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778758262; c=relaxed/simple;
-	bh=VioNOjlurHh72ip0LTmmXgLOug9O1q0NyopeUvv3VDQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FkVcwPWmCgFEFJ6o3CnalHBLQyskguzolpzpEMkeLVAzZk3lhnAJU5HG2hp36K6G4XlcU+nFP4KIW8cmsnCh1Mvf+Yzi6t5O803kV3lF0tcK4hyoNzGGpt3DfZ6E77QpcDM5dr7CR/KhxnV7ocKEnzVpOzMxdeZJ1z87do4Byrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ubFsvF0q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63F64C2BCB3;
-	Thu, 14 May 2026 11:31:02 +0000 (UTC)
+	s=arc-20240116; t=1778758384; c=relaxed/simple;
+	bh=bhaZ8fijgpxpOxD/qtp5p7oENJE3emvbuPvo4yZJSLc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MFy4fQKezLiBbk36IP8i8jpbxqd7SGtTCWEPZ3Hl98jSITiioDNSrL3SJjURL8g4NAsEnzN+57jZxaPKZJTkRgL+XLLnLBonV6r+8I4glNuBfae0yZS3Dejhf7a8Xkq6rf+558tHuBzl/ylWmUoli826g5HkeEM/Xi6xV2Nf5ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WZ9WxG//; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55400C2BCB3;
+	Thu, 14 May 2026 11:33:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778758262;
-	bh=VioNOjlurHh72ip0LTmmXgLOug9O1q0NyopeUvv3VDQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ubFsvF0qOIaM3KXn1CkODpN7G1W1ta1vEWcQzZX+iYJg7+8Ibrqp6Vfh4xdf5uJ91
-	 iwRmI6u2q+UMew66GrjxB5h/SjhqXFDpb/Rup5DLMjY2SKG8+vdThJwqedSyYtS4Kr
-	 2oEdIWbwCOgSmq0MtE27sCDlIa41P4yMc/Sqw5TR8EOdTvH4nWQSGrdg0CmzNeNAx6
-	 t3LxvaZF1tHSzW4OCxBjhFsYU0QPUGiBNbbJUX+8ivc93tbutZ7DZuELIa4+ALsylk
-	 j9+vdRc1xba1EH3PUQlaiCFMMhvWnAYJ0hVKsiRTtL1kJzJWaYFZKhIFw+JJc5YSb3
-	 uDJO4NBaSNhUQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CD1C393109E;
-	Thu, 14 May 2026 11:30:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1778758383;
+	bh=bhaZ8fijgpxpOxD/qtp5p7oENJE3emvbuPvo4yZJSLc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WZ9WxG//iDWN/mAHeSRB7BsKoBmPjRAWXdWABglrMNKA2PUWvC9BRgVxJKcGW+As+
+	 C4cfKgyFd33AHlaCEpm5b8fu3ydwuCavx1xcnVhw4dEgQAzwgbKbH8bjlyS70f7HYZ
+	 nuLawvJzt9fp2yzbbLTfIkK9Ik9DG+fNpxBvVoL1wtgVkQ9RAfwXdd2e9ByVUA0BnJ
+	 jfnrwsr7Euy9jVxWQ84AgQ2vy7s4M/Qw+WfScgUD6L4gPZ+SEFZQKpR8ZEkr1m/yTj
+	 bUlV5hCGbRNnQ9ZGgREiO/jhj09WupzkwMHFVWzoYtWB5RmRE8+gEsjcLQs4s/ON8d
+	 61oXj2EieeA3A==
+Date: Thu, 14 May 2026 14:32:57 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Will Mortensen <will@extrahop.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>, netdev <netdev@vger.kernel.org>,
+	Shahar Shitrit <shshitrit@nvidia.com>,
+	Carolina Jubran <cjubran@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jeremy Royal <jeremyr@extrahop.com>
+Subject: Re: [PATCH v2] net/mlx5: don't printk garbage when transceiver
+ overheats
+Message-ID: <20260514113257.GO15586@unreal>
+References: <20260512-b4-mlx5-sensor-fix-v2-1-531fee4fd7fd@extrahop.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 0/4] net: tls: net: tls: fix a few random bugs
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177875820730.4080981.4018205848945747981.git-patchwork-notify@kernel.org>
-Date: Thu, 14 May 2026 11:30:07 +0000
-References: <20260511174920.433155-1-kuba@kernel.org>
-In-Reply-To: <20260511174920.433155-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- sd@queasysnail.net, john.fastabend@gmail.com, bpf@vger.kernel.org
-X-Rspamd-Queue-Id: 80F2A541084
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260512-b4-mlx5-sensor-fix-v2-1-531fee4fd7fd@extrahop.com>
+X-Rspamd-Queue-Id: 59EEE5410EB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,queasysnail.net,gmail.com];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-287936-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-287935-lists,netdev=lfdr.de,netdevbpf];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Mon, 11 May 2026 10:49:16 -0700 you wrote:
-> Fix a few random bugs, from external reports and my local scan
-> with various AI tools. Mostly corner cases in code which I don't
-> think TLS maintainers would consider "battle tested".
+On Tue, May 12, 2026 at 12:32:38AM -0700, Will Mortensen wrote:
+> When the mlx5 driver processes a temperature warning event, in events.c
+> and hwmon.c, temp_warn() calls print_sensor_names_in_bit_set(), which
+> calls hwmon_get_sensor_name() to get the NUL-terminated name of the
+> relevant sensor, and then prints it to dmesg. In particular,
+> print_sensor_names_in_bit_set() passes the bit index ("sensor index")
+> within the 128-bit vector in the warning event to
+> hwmon_get_sensor_name(). But hwmon_get_sensor_name() was expecting the
+> index of the hwmon channel, and the driver registers hwmon channels for
+> at most only two sensors: the ASIC sensor (sensor index 0) and the
+> module sensor (sensor index 64 or 65 if we're on a 2-port NIC). So when
+> the warning event concerned a module, hwmon_get_sensor_name() took the
+> 64th or 65th element of the likely 2-element temp_channel_desc array and
+> thus returned a pointer to some other kernel memory past the end of it,
+> which was printed to dmesg up to the first NUL byte.
 > 
-> v2:
->  - patches 2 and 3 are new (Sashiko report)
->  - patch 4 is rewritten to remove the code instead of fixing it
->  - drop the selftests, they were a little too specific, more PoC
->    triggers than selftests, and Sashiko kept nit picking
->  - old patches 1 and 2 were already applied
->  - old patch 3 is gone since it can't trigger today (I will send it
->    to net-next)
-> v1: https://lore.kernel.org/20260429222944.2139041-1-kuba@kernel.org
+> A further difficulty is that, at least in testing on our CX-8 C8240 with
+> firmware 40.47.1088, the warning event can have bits set for other
+> modules, e.g. if this PCI physical function is associated with
+> port/module 0, we might expect bit 64 to be set, but bit 65 (for port/
+> module 1) can also be set.
 > 
-> [...]
+> Fix this by clarifying that the argument to hwmon_get_sensor_name() is
+> the raw sensor index, and correctly converting it to the hwmon channel
+> index. Return NULL if the sensor index doesn't correspond to a hwmon
+> channel (e.g. because it's for the other port's module).
+> 
+> Fixes: 46fd50cfcc12 ("net/mlx5: Add sensor name to temperature event message")
+> Signed-off-by: Will Mortensen <will@extrahop.com>
 
-Here is the summary with links:
-  - [net,v2,1/4] net: tls: fix off-by-one in sg_chain entry count for wrapped sk_msg ring
-    https://git.kernel.org/netdev/net/c/285943c6e7ca
-  - [net,v2,2/4] net: tls: prevent chain-after-chain in plain text SG
-    https://git.kernel.org/netdev/net/c/ff26a0e8377d
-  - [net,v2,3/4] net: tls: fix use-after-free in tls_sw_sendmsg_locked after bpf verdict
-    (no matching commit)
-  - [net,v2,4/4] net: tls: remove bad rollback and UAF on ENOSPC
-    (no matching commit)
+Your Signed-off-by needs to be last.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> Reviewed-by: Jeremy Royal <jeremyr@extrahop.com>
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/events.c |  2 ++
+>  drivers/net/ethernet/mellanox/mlx5/core/hwmon.c  | 15 ++++++++++++++-
+>  drivers/net/ethernet/mellanox/mlx5/core/hwmon.h  |  2 +-
+>  3 files changed, 17 insertions(+), 2 deletions(-)
 
+I would take a simpler approach by removing this extra complexity and  
+using a static temp_channel_desc[64] array, avoiding any dynamic  
+allocation. But this change is acceptable as well.
 
+Thanks
 
