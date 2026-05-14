@@ -1,148 +1,117 @@
-Return-Path: <netdev+bounces-287994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287995-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2D1XFbXdBWokcgIAu9opvQ
-	(envelope-from <netdev+bounces-287994-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:35:33 +0200
+	id qF7dOZrbBWrAcQIAu9opvQ
+	(envelope-from <netdev+bounces-287995-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:26:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0CC054334A
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:35:32 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A7DD54310F
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:26:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6042231369CB
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 14:24:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 601723014C5C
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 14:26:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B08003FE34A;
-	Thu, 14 May 2026 14:24:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C49AA3D9686;
+	Thu, 14 May 2026 14:26:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LMz5yEuu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JMc97asG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F7E3F9F55;
-	Thu, 14 May 2026 14:24:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A07E026A1CF;
+	Thu, 14 May 2026 14:26:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778768661; cv=none; b=efM+EHr1vRMP/JlsEsA0NIqgEHas9hn15cWG++aYlaLcFpkQJ1sm32yeVU2IAghwkupczGeAQPO7naK4LX3kdHWf/4RCWQioDo51bczK8aw+v/9Mnbo/32Y+gzb+lbE8ecRjMUDJXkUCMLxKQedBYDxejGbgOgHcXES3pqMeXI0=
+	t=1778768791; cv=none; b=rPWv7MSNiDgcSKChwBu6GyX/qlZqwmBrutfnEbZJwtQZxwNRGM1rmMYUEWyPZEE+bKjmCaDGjKwrPtN0EbxH9jEbUkmAJhsemaa75kGLVMU9eoMl4u2JU/CQw4++9H/2iIPTYl6m/xQ+rvG0t7Eq891cETlgOC03lzaVpGI7NHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778768661; c=relaxed/simple;
-	bh=KfS8rctgTCv+zW5ml+hsbbU5dduwnEtsWWD5sMI5RrU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nU8oap6odOETqwakVrpVdCnrZqphQ4ZjiMYu0viXJGm1oiInPBmMwJ6kR2Eezt4u8G7qiVpnk43DYLgqkmKBDMpjf/cYJOc1QTHeA/GMXG9ZIZqtn7dT+5Oq/qqUfKWFWZ4JBqKA5gZXBEp5wKfJSVa2vwS0Kkko4SYN1pQSpRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LMz5yEuu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4A96C2BCB3;
-	Thu, 14 May 2026 14:24:20 +0000 (UTC)
+	s=arc-20240116; t=1778768791; c=relaxed/simple;
+	bh=MakjjHPiiWf8LipOqirfV6r1KF2OvJwCMBgR2HGJ4XU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X9UGlfiyAvVt69JZrxfyo1t5CAy24OTgBn3xiC/P9PfryE5eFHfaiHtsbdcDXmeBQ7mrQtX4e3EGqCpi+wbyBPlKI0YWjYaCjxL0PJQwuqyyEFT3fivgMYm8oFhYw//C8k+78C/mWg9d/Lvrr3YTtzN/2rLogDtYyQVcaAuc5Wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JMc97asG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C348C2BCB3;
+	Thu, 14 May 2026 14:26:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778768661;
-	bh=KfS8rctgTCv+zW5ml+hsbbU5dduwnEtsWWD5sMI5RrU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LMz5yEuuXCa61X1B1vFfMwVEoFqJEs7Sce+zpMpp7WOr0dMSSyzyj8IlicKCuyAb0
-	 pgJM3j819S2ow+4TD/qljo2p2p5t+qJMQi4qkfpD7UDP0kcQXMkuWRwgkrW5oVmznJ
-	 vWGxfiyP25PyrCKgxBcp7md2l9qIJJ+OodQqQZ47GyzCqNJKglzaJRLQPluQlIiqzr
-	 refIrN0qK0xdECwp6XcJMeh3WhHM5+bAL4icsHuy1BPGPLgIBiiLhodHd/HtCREc7Q
-	 xpju84PbS5guJJXtUNM+m5OMxvR5JONo+wxbhpWuQ0tXcP5GmIeU4jGK5OCMWZGbAe
-	 mgKItwSQx7nXQ==
-Date: Thu, 14 May 2026 16:24:18 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: Ido Schimmel <idosch@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Bart De Schuymer <bdschuym@pandora.be>,
-	Patrick McHardy <kaber@trash.net>, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	bridge@lists.linux.dev
-Subject: Re: [PATCH net v3] net: neigh: Reallocate headroom if necessary in
- neigh_hh_bridge()
-Message-ID: <agXbEs03zO48f10r@lore-desk>
-References: <20260513-nf-neigh_hh_bridge-fix-v3-1-8ec9353c0909@kernel.org>
- <20260514081403.GA482081@shredder>
- <agW6zjwDHB3dTiZC@lore-desk>
- <agXRLM6esULBG4al@strlen.de>
+	s=k20201202; t=1778768791;
+	bh=MakjjHPiiWf8LipOqirfV6r1KF2OvJwCMBgR2HGJ4XU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=JMc97asG90iJghqwyxCL/Eja605bkCsXDh5sFE0Qgi0LuhhHxM9LBVf6ri6WtO3tX
+	 LINsd+a1Tko4vKtbnmlxRXYQge53WhYZ4yvK9T/5P7g+2ICgvMlqnZiSJTrTk6vC5E
+	 UG8Hbn1rCd+ogpsKnBlJHq8nwbnvV9LNUNcvDNF0JeeGxyscTtiYrxvTU2xN47cwBx
+	 fgVn6Fck69sZtQGYxoBT2Khohvg3LrJPkTB9LRGsfOsRHFEJ6E0kta4wFhg8Y8d1a8
+	 ijBRidFh+FY1L5vyeqzawtZ4xNuWE2CS8jIuSGPXjxqC3Pjiyz74MFxHf4DLBmalNZ
+	 ynvtY/rhugm3g==
+Message-ID: <200b3923-d794-4779-8f90-a8b858861d4c@kernel.org>
+Date: Thu, 14 May 2026 08:26:29 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="dbl4ZuXZ6kJq2OX1"
-Content-Disposition: inline
-In-Reply-To: <agXRLM6esULBG4al@strlen.de>
-X-Rspamd-Queue-Id: C0CC054334A
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] RDMA/nldev: add mutual exclusion in nldev_dellink()
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@ziepe.ca>, Zhu Yanjun <yanjun.zhu@linux.dev>
+Cc: Edward Adam Davis <eadavis@qq.com>, akpm@linux-foundation.org,
+ arjan@linux.intel.com, davem@davemloft.net, edumazet@google.com,
+ hdanton@sina.com, horms@kernel.org, kuba@kernel.org, kuniyu@google.com,
+ leon@kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com,
+ syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com,
+ syzkaller-bugs@googlegroups.com, yanjun.zhu@linux.dev, zyjzyj2000@gmail.com
+References: <20260513234655.GW7702@ziepe.ca>
+ <tencent_3CCD70788A6EAC2D356D4C9674E8D2EEEA0A@qq.com>
+ <20260514115048.GX7702@ziepe.ca>
+ <139794f1-80b8-49d9-829a-0629379def51@kernel.org>
+ <20260514141409.GA7702@ziepe.ca>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20260514141409.GA7702@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 6A7DD54310F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-3.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-287995-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287994-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[qq.com,linux-foundation.org,linux.intel.com,davemloft.net,google.com,sina.com,kernel.org,vger.kernel.org,redhat.com,syzkaller.appspotmail.com,googlegroups.com,linux.dev,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev,d8f76778263ab65c2b21];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
+On 5/14/26 8:14 AM, Jason Gunthorpe wrote:
+> 
+> Edward, please come with a fixup on top of this since it was already
+> applied
+> 
 
---dbl4ZuXZ6kJq2OX1
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On May 14, Florian Westphal wrote:
-> Lorenzo Bianconi <lorenzo@kernel.org> wrote:
-> > > Personally I would use 'goto free_skb' after releasing the neighbour,=
- to
-> > > be consistent with the other paths that free the packet.
-> >=20
-> > ack, I do not have a strong opinion about it, but in this case we would=
- need to
-> > even move "ret" since the current codebase always returns 0. What do yo=
-u prefer?
->=20
-> I think It can return 0 unconditionally, there are no code paths in
-> that function where skb doesn't disappear (ownership change or freed),
-> and its prerouting so there is no use for an error code either.
-
-ack, I will fix it in v4.
-
-Regards,
-Lorenzo
-
---dbl4ZuXZ6kJq2OX1
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCagXbEgAKCRA6cBh0uS2t
-rCvoAP4zY5aXQeDlGpsfI+Jk5Tee251LeQId+erBQyv0s5HO/gD/RHqL2yt3wp8H
-RIu9zxE2N+TSUGRLSVNvxKyFLftSdgw=
-=4Q+b
------END PGP SIGNATURE-----
-
---dbl4ZuXZ6kJq2OX1--
+Zhu Yanjun: As author of the patch that introduced the bug and
+maintainer of the rxe code, why have you not addressed this problem? It
+has been well known for many weeks now and multiple people have
+attempted fixes. Seems like you need to step up and take care of it.
 
