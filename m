@@ -1,61 +1,91 @@
-Return-Path: <netdev+bounces-287942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287943-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SHVdIZy4BWpZaAIAu9opvQ
-	(envelope-from <netdev+bounces-287942-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:57:16 +0200
+	id UHiENeC4BWpZaAIAu9opvQ
+	(envelope-from <netdev+bounces-287943-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:58:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C509541470
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:57:16 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BBDC5414B1
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:58:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 29C0C3022F6C
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:57:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 25865302A1AB
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 11:57:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC65F3C2777;
-	Thu, 14 May 2026 11:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8373D3C1F5A;
+	Thu, 14 May 2026 11:57:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="VarKm4WV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DARS9AGx"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E48838B7D4;
-	Thu, 14 May 2026 11:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20D6395AEC
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 11:57:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778759831; cv=none; b=kb/t+1FwyP/7q/hZnW0vjdtpRjDefyaw4GYOv9+7FaFzP3F3VlVQHUTKd2Oy+w1nu4agog7Ivd7a4sa+reHJAvd+e4Rd1wgpilhG7WDNb0m9y54QhXBHh2r8i034hjoDLRDsCnJKmFZibqqTVDkLAw9pso8XjrqBOtDciZ8suTo=
+	t=1778759877; cv=none; b=cvsKS7Muzua5m90kxFMhK9FJOhouNArpJYGpomBSyJVz10Sf/mVoO5leExZdKAsFbho3vMkAid1oKa2I6i/h+IiwnwvMH/pjd8KiGt2DCsYFGRWFnDGWvI63QemBiY1XEL0CxeRYYiOml7nURSuWKO1oLAIdA3ydS4bnu7r9bPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778759831; c=relaxed/simple;
-	bh=MEnui99AOC05ZMNns0Dg5NkxafvMhTMW7fEeeHHtj+Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SIsvfFBQ7Lx9h8xZB1UJwhBIUijlobgT7LMXvGHsz09NjrVs7xotEMepbTivfJK00Tjf2SY4NRYnfNAjgruIDl0ao467GiB3/V8d2cBzjv41xvQQLtdBIxHpBB0/u7B6m4cHW2upCB+Kca5c63R0w8p12TZmf/6v1tqKtUv8ZBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=VarKm4WV; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1778759826; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=oX5ZBN+zeOjBNWXh/1Siqm5vdi/Yhm3ou9XNJ8IS0Qs=;
-	b=VarKm4WVtCnKjp07ANXWtjvaBPJHTQiQEaztr05cpShEGYfeAS00wKDaky4w4ZMRrenFf/gJnu/+U6HKG6EcXycp5D0p5zipLgsktrUwVSlg0jCOuEsmU8PkOnWmT3MvERkEa4AOjFV18+mkjqkCz/V5wppXVmQDWpZsjFX6gwY=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam011083073210;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0X2wk-cb_1778759825;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0X2wk-cb_1778759825 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 14 May 2026 19:57:05 +0800
-Date: Thu, 14 May 2026 19:57:05 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Paolo Abeni <pabeni@redhat.com>, Xiang Mei <xmei5@asu.edu>,
-	netdev@vger.kernel.org
-Cc: alibuda@linux.alibaba.com, sidraya@linux.ibm.com, wenjia@linux.ibm.com,
-	ubraun@linux.ibm.com, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, bestswngs@gmail.com
-Subject: Re: [PATCH net] net/smc: reject CHID-0 ACCEPT that matches an empty
- ism_dev slot
-Message-ID: <agW4kfDB5JjpPD-r@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20260511062138.2839584-1-xmei5@asu.edu>
- <deb3e868-456c-43a6-886f-9d882d23975f@redhat.com>
+	s=arc-20240116; t=1778759877; c=relaxed/simple;
+	bh=TlK/N3LWoErUOYKgkPO12sDSKmIAzUJCS0yzfed8TCA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ukxNulrtt5IO3nj8CQpFRj3pChpxnR/xUnIMiaVgtSqrXG0Z+gTJV32h6YlZUTvdmjoBibYu0dGgL15v7Q0xX92jG3YMEwOAdq7iWDiujQQorq9oqtT4ILI0OINvY7B7UnTxf1rA6T/MAn7burQUtkCrfkjp+M9Y7wYif8K9480=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DARS9AGx; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2bd2051167eso13361145ad.1
+        for <netdev@vger.kernel.org>; Thu, 14 May 2026 04:57:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778759874; x=1779364674; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9VdHfq+GU6K+dFfvRRHW29aQlKC/F7Pn8KdTUs23EV0=;
+        b=DARS9AGxfnrcTD6OmGk5LEI3yEOcnb+R65IZbwrKD+rKU6Jcg/4+dWvwff4uQ88QHm
+         X9yaNGJjS2zD54PRoi3QHGAdkL5+XkdLV47gujrmPo56pUz4j0YYKuwDFcwSda6+89Xh
+         ABlephzwWSonkTuLo0una22OCZT5n8EOU9t6nY6IaY899B+TOwUBuNFjg3XnbJYKQ0aY
+         72dECB00yfG/co3GOn/E1tUDlpDFI4ifgXDAaNoN82EYsguU5krVZmkXjfMCXJIQLYIP
+         MLiEIxUf8cwCWHcVUsHWeGzZPMhwEjS/noTQbel0d/tNi/kDgfJoAd/UfJLGE7MuodMZ
+         9Beg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778759874; x=1779364674;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9VdHfq+GU6K+dFfvRRHW29aQlKC/F7Pn8KdTUs23EV0=;
+        b=dF9OUMx/izRS8r0D412V+lfGn/81ywuLwMDCQXcofSudvv5dDlV18irIr7UYyIqo9n
+         Wfd9Iwq36TAooQCkloT7QwWokkqVr4f+gGwbAWt/OD4BIOANKg0YKZ5vzcNZ2KOecF/9
+         WLM32M9okd2DfqerwD5oEOzr7bQn5csN79vXmPrNLyBSt+IC9cE27APsuyIkdRZ141HN
+         DFLhuhLfh62lgT5z58FAgw3WWVm0SelGJHrvmJVzvIU9vzt8x9Hm+FXDvuMNJzCURj/I
+         ZDSl07YQt77sTszx9U2sEkaMEc+kGb3x1UEL06hrzGkWla4KCw8P2XMX3ffSJ9r22Q4G
+         rHXQ==
+X-Gm-Message-State: AOJu0Yyh55iRT7rYTupclfpEV4cq7s2BpHOjGioMgABUA+xEF+JNR6YK
+	8H8EiB2oiY36e1RQG4WoD8pnuSY9Cw0iJHXyDuRE7XK7uEenED5gwigk
+X-Gm-Gg: Acq92OEdNSaPIYtK1Y6+n8cHjcZW1FlKte+XCYfu1LubxsTnk79zSctAVkFEo0VStCD
+	n5Le72y8LmDYq7SmQNBUl8HogfmaFWsyjHEyuHUyMUQUwmMBJMBzQ7FR+I7ZE5vulkE6mOjp+D8
+	M8Fzh/oI6M1dN5Dbh+CTDRmGQdMuGT9svWLSkGQyRV+1R5coZX0JzzSuw3uE43u4NEltDNLH5Ko
+	10qAGGwH4OnoHwOISDKPxlPTj3OMoh1csYvFjnkch+LNBEJwQypXYHnh2OnemapYAP84TeRbQQ8
+	B4Z2uAwUJBBEERdRLab7zKPF4DP7LcyTinkuhm+3oqyLtEdz21r37U0Cy1Cb9WbHvIopKslmwsq
+	PN2nNK+SGWi68xt1KP7cTTdVXCDREn6ZjBbNHw/A9cKtOwEGeDfvrqzEIibPg9xCJq4tdfeWUru
+	n+tXxZ3wb5V/mwES++GuskzJDa5FwbmXQkYvJL8VjjFOQ=
+X-Received: by 2002:a17:903:4b24:b0:2b0:6e6a:8504 with SMTP id d9443c01a7336-2bd2ff232f6mr73288155ad.27.1778759873625;
+        Thu, 14 May 2026 04:57:53 -0700 (PDT)
+Received: from v4bel ([58.123.110.97])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bd5cfe6487sm23953245ad.54.2026.05.14.04.57.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 May 2026 04:57:53 -0700 (PDT)
+Date: Thu, 14 May 2026 20:57:48 +0900
+From: Hyunwoo Kim <imv4bel@gmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, kerneljasonxing@gmail.com,
+	kuniyu@google.com, mhal@rbox.co, jiayuan.chen@linux.dev,
+	steffen.klassert@secunet.com, vakzz@zellic.io, ben@decadent.org.uk,
+	herbert@gondor.apana.org.au, dsahern@kernel.org,
+	sultan@kerneltoast.com, sd@queasysnail.net
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org, imv4bel@gmail.com
+Subject: [PATCH net v3] net: skbuff: propagate shared-frag marker through
+ frag-transfer helpers
+Message-ID: <agW4vC0r8QOUKtRT@v4bel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,108 +94,150 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <deb3e868-456c-43a6-886f-9d882d23975f@redhat.com>
-X-Rspamd-Queue-Id: 2C509541470
+X-Rspamd-Queue-Id: 4BBDC5414B1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	SEM_URIBL(3.50)[asu.edu:email];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[linux.alibaba.com,linux.ibm.com,vger.kernel.org,gmail.com];
-	DMARC_POLICY_ALLOW(0.00)[linux.alibaba.com,none];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	TAGGED_FROM(0.00)[bounces-287942-lists,netdev=lfdr.de];
-	R_DKIM_ALLOW(0.00)[linux.alibaba.com:s=default];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-287943-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,rbox.co,linux.dev,secunet.com,zellic.io,decadent.org.uk,gondor.apana.org.au,kerneltoast.com,queasysnail.net];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MISSING_XM_UA(0.00)[];
-	HAS_REPLYTO(0.00)[dust.li@linux.alibaba.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.431];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[imv4bel@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(0.00)[+ip4:172.105.105.114:c];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,linux.alibaba.com:mid,linux.alibaba.com:dkim,linux.alibaba.com:replyto,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,asu.edu:email]
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,zellic.io:email]
 X-Rspamd-Action: no action
 
-On 2026-05-14 12:19:46, Paolo Abeni wrote:
->On 5/11/26 8:21 AM, Xiang Mei wrote:
->> On the SMC-D client, slot 0 of ini->ism_dev[]/ini->ism_chid[] is
->> reserved for an SMC-Dv1 device. smc_find_ism_v2_device_clnt()
->> populates V2 entries starting at index 1, so when no V1 device is
->> selected slot 0 is left in its kzalloc()'ed state with ism_dev[0] ==
->> NULL and ism_chid[0] == 0.
->> 
->> smc_v2_determine_accepted_chid() then matches the peer's CHID against
->> the array starting from index 0 using the CHID alone. A malicious
->> peer replying to a SMC-Dv2-only proposal with d1.chid == 0 matches
->> the empty slot, ini->ism_selected becomes 0, and the subsequent
->> ism_dev[0]->lgr_lock dereference in smc_conn_create() faults at
->> offsetof(struct smcd_dev, lgr_lock) == 0x68:
->> 
->>   BUG: KASAN: null-ptr-deref in _raw_spin_lock_bh+0x79/0xe0
->>   Write of size 4 at addr 0000000000000068 by task exploit/144
->>   Call Trace:
->>    _raw_spin_lock_bh
->>    smc_conn_create (net/smc/smc_core.c:1997)
->>    __smc_connect (net/smc/af_smc.c:1447)
->>    smc_connect (net/smc/af_smc.c:1720)
->>    __sys_connect
->>    __x64_sys_connect
->>    do_syscall_64
->> 
->> Require ism_dev[i] to be non-NULL before accepting a CHID match.
->> 
->> Fixes: a7c9c5f4af7f ("net/smc: CLC accept / confirm V2")
->> Reported-by: Weiming Shi <bestswngs@gmail.com>
->> Assisted-by: Claude:claude-opus-4-7
->> Signed-off-by: Xiang Mei <xmei5@asu.edu>
->> ---
->>  net/smc/af_smc.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->> 
->> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->> index 185dbed7de5d..12ea3b6dbc64 100644
->> --- a/net/smc/af_smc.c
->> +++ b/net/smc/af_smc.c
->> @@ -1400,7 +1400,8 @@ smc_v2_determine_accepted_chid(struct smc_clc_msg_accept_confirm *aclc,
->>  	int i;
->>  
->>  	for (i = 0; i < ini->ism_offered_cnt + 1; i++) {
->> -		if (ini->ism_chid[i] == ntohs(aclc->d1.chid)) {
->> +		if (ini->ism_dev[i] &&
->> +		    ini->ism_chid[i] == ntohs(aclc->d1.chid)) {
->>  			ini->ism_selected = i;
->>  			return 0;
->>  		}
->
->Patch LGTM, thanks!
->
->@smc maintainers, please note that sashiko reviews:
->
->https://sashiko.dev/#/patchset/20260511062138.2839584-1-xmei5%40asu.edu
->
->pointed to another pre-existing issue in this area you may want to address.
->
->/P
+Three frag-transfer helpers (__pskb_copy_fclone(), skb_try_coalesce(),
+and skb_shift()) fail to propagate the SKBFL_SHARED_FRAG bit in
+skb_shinfo()->flags when moving frags from source to destination.
+__pskb_copy_fclone() defers the rest of the shinfo metadata to
+skb_copy_header() after copying frag descriptors, but that helper
+only carries over gso_{size,segs,type} and never touches
+skb_shinfo()->flags; skb_try_coalesce() and skb_shift() move frag
+descriptors directly and leave flags untouched.  As a result, the
+destination skb keeps a reference to the same externally-owned or
+page-cache-backed pages while reporting skb_has_shared_frag() as
+false.
 
-I agree. Apologies, I overlooked your comments prior to replying to
-Xiang Mei's patch.
+The mismatch is harmful in any in-place writer that uses
+skb_has_shared_frag() to decide whether shared pages must be detoured
+through skb_cow_data().  ESP input is one such writer (esp4.c,
+esp6.c), and a single nft 'dup to <local>' rule -- or any other
+nf_dup_ipv4() / xt_TEE caller -- is enough to land a pskb_copy()'d
+skb in esp_input() with the marker stripped, letting an unprivileged
+user write into the page cache of a root-owned read-only file via
+authencesn-ESN stray writes.
 
-Best regards,
-Dust
+Set SKBFL_SHARED_FRAG on the destination whenever frag descriptors
+were actually moved from the source.  skb_copy() and skb_copy_expand()
+share skb_copy_header() too but linearize all paged data into freshly
+allocated head storage and emerge with nr_frags == 0, so
+skb_has_shared_frag() returns false on its own; they need no change.
+
+The same omission exists in skb_gro_receive() and skb_gro_receive_list().
+The former moves the incoming skb's frag descriptors into the
+accumulator's last sub-skb via two paths (a direct frag-move loop and
+the head_frag + memcpy path); the latter chains the incoming skb whole
+onto p's frag_list.  Downstream skb_segment() reads only
+skb_shinfo(p)->flags, and skb_segment_list() reuses each sub-skb's
+shinfo as the nskb -- both p and lp must carry the marker.
+
+Fixes: cef401de7be8 ("net: fix possible wrong checksum generation")
+Fixes: f4c50a4034e6 ("xfrm: esp: avoid in-place decrypt on shared skb frags")
+Reported-by: William Bowling <vakzz@zellic.io>
+Reported-by: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+---
+Changes in v3:
+- Include the skb_gro_receive() audit patch suggested by Sultan
+- v2: https://lore.kernel.org/all/agToIEDI4TaTNLRb@v4bel/
+Changes in v2:
+- Also propagate SHARED_FRAG in skb_try_coalesce() and skb_shift()
+- v1: https://lore.kernel.org/all/agRfuVOeMI5pbHhY@v4bel/
+---
+ net/core/gro.c    | 4 ++++
+ net/core/skbuff.c | 5 +++++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/net/core/gro.c b/net/core/gro.c
+index 31d21de5b15a..9f8960789b2c 100644
+--- a/net/core/gro.c
++++ b/net/core/gro.c
+@@ -213,10 +213,12 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
+ 	p->data_len += len;
+ 	p->truesize += delta_truesize;
+ 	p->len += len;
++	skb_shinfo(p)->flags |= skbinfo->flags & SKBFL_SHARED_FRAG;
+ 	if (lp != p) {
+ 		lp->data_len += len;
+ 		lp->truesize += delta_truesize;
+ 		lp->len += len;
++		skb_shinfo(lp)->flags |= skbinfo->flags & SKBFL_SHARED_FRAG;
+ 	}
+ 	NAPI_GRO_CB(skb)->same_flow = 1;
+ 	return 0;
+@@ -244,6 +246,8 @@ int skb_gro_receive_list(struct sk_buff *p, struct sk_buff *skb)
+ 	p->truesize += skb->truesize;
+ 	p->len += skb->len;
+ 
++	skb_shinfo(p)->flags |= skb_shinfo(skb)->flags & SKBFL_SHARED_FRAG;
++
+ 	NAPI_GRO_CB(skb)->same_flow = 1;
+ 
+ 	return 0;
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 7dad68e3b518..7cd388504297 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -2248,6 +2248,7 @@ struct sk_buff *__pskb_copy_fclone(struct sk_buff *skb, int headroom,
+ 			skb_frag_ref(skb, i);
+ 		}
+ 		skb_shinfo(n)->nr_frags = i;
++		skb_shinfo(n)->flags |= skb_shinfo(skb)->flags & SKBFL_SHARED_FRAG;
+ 	}
+ 
+ 	if (skb_has_frag_list(skb)) {
+@@ -4349,6 +4350,8 @@ int skb_shift(struct sk_buff *tgt, struct sk_buff *skb, int shiftlen)
+ 	tgt->ip_summed = CHECKSUM_PARTIAL;
+ 	skb->ip_summed = CHECKSUM_PARTIAL;
+ 
++	skb_shinfo(tgt)->flags |= skb_shinfo(skb)->flags & SKBFL_SHARED_FRAG;
++
+ 	skb_len_add(skb, -shiftlen);
+ 	skb_len_add(tgt, shiftlen);
+ 
+@@ -6200,6 +6203,8 @@ bool skb_try_coalesce(struct sk_buff *to, struct sk_buff *from,
+ 	       from_shinfo->frags,
+ 	       from_shinfo->nr_frags * sizeof(skb_frag_t));
+ 	to_shinfo->nr_frags += from_shinfo->nr_frags;
++	if (from_shinfo->nr_frags)
++		to_shinfo->flags |= from_shinfo->flags & SKBFL_SHARED_FRAG;
+ 
+ 	if (!skb_cloned(from))
+ 		from_shinfo->nr_frags = 0;
+-- 
+2.43.0
+
 
