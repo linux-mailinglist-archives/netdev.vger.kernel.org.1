@@ -1,136 +1,238 @@
-Return-Path: <netdev+bounces-287947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287948-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YPMGHmW+BWpZaAIAu9opvQ
-	(envelope-from <netdev+bounces-287947-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 14:21:57 +0200
+	id qCDLG0G/BWrXawIAu9opvQ
+	(envelope-from <netdev+bounces-287948-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 14:25:37 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2F29541889
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 14:21:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0C08541944
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 14:25:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 15AAB300BD81
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:21:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 06EAD302D13D
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 12:25:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 581F03D7D89;
-	Thu, 14 May 2026 12:21:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BAFE3D9686;
+	Thu, 14 May 2026 12:25:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="B97BlKiF"
+	dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b="EJVsfbx3"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9A33630A4;
-	Thu, 14 May 2026 12:21:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8FB1395AEC;
+	Thu, 14 May 2026 12:25:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.75.44.102
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778761277; cv=none; b=nklR/59USvocHsxyEOD75PwqKGsGnpV3hXeUoazRobUFHeoFjBrHt0nHPcpO0uX1G/jvzlb9kO9mnbNqUcWcUhXCx6pTlji7Q3W4qf5uuS3HHB2Rk+Ev0lk6BRAbctxSttt/Oh65wY2zDbC1Aer9fuWc4lw3yfvNCm1mZhKeVcQ=
+	t=1778761523; cv=none; b=esreAVVjbk8tw2iFlVA2NnmIWAM1MrzUfeTxiMyAN5wXPWQye1OqB84oUHD2pbXWQdpc1lnKZvppVVKLjKIS4Mzlc4p9zPjzSea17JYIPAgRN32JLl4VfBSrjSAHxQPNB4rgXFzHYjG2tBWVFsVGO9THFylQIjz0xWQa4JtnaOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778761277; c=relaxed/simple;
-	bh=khRa9McxbmLHTYp74Hoq8veFFCPgZN8lKtg5edbeejE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DzmG9Q/cZGz6drptfQ3Ikn4iX479Wc348Nv87hKJ9WlRsK5IIc7bgJMAnSCY6URxCUrCpAosxQPkz/gkcD9ktzIcBjgd44Nk1bj8qHAxgeAIrIXfI90uVjoEYS2gtshO4wta7JNFPiMCjjm6A0EWYUXdsl4R8J1gRsNdzvYxloI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=B97BlKiF; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=94Ic/9CsfFr/0ROJJfVe7Gx4bPx2TLQEhtf2mTZcMps=; b=B97BlKiF6k34mztIAQfNk/qG9I
-	aqN+0LW1JPDaYz3xsxxM3YcuqGWI5IA7SKeMcqoK36g0DwIumWwpD06o6TwL6FgGHPlC2hq8S0rzV
-	89lR403rrn5zNbC2TD7r9Tm2K+VdkAUOkJDlIW8pu8t5v8pa5kFu3btGpdXa0PxYDZzk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wNV3o-002tvn-BL; Thu, 14 May 2026 14:21:04 +0200
-Date: Thu, 14 May 2026 14:21:04 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-Cc: Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 1/9] dt-bindings: net: add onsemi's S2500
- 10BASE-T1S MACPHY
-Message-ID: <785c24de-056d-42d6-b810-2656c94cfb41@lunn.ch>
-References: <CY8PR02MB924920C8825C7AE5D22EFA4483382@CY8PR02MB9249.namprd02.prod.outlook.com>
- <20542d76-6f70-4c2d-9fef-0de620a8d6d1@lunn.ch>
- <CY8PR02MB924974BBC348DE4814DA3C7C83062@CY8PR02MB9249.namprd02.prod.outlook.com>
- <3c5aa072-9107-440c-820f-3f63aa3ac3e9@lunn.ch>
- <CY8PR02MB9249D14ADE162A6854C72B9783062@CY8PR02MB9249.namprd02.prod.outlook.com>
+	s=arc-20240116; t=1778761523; c=relaxed/simple;
+	bh=qiLlqUhsq6ljQJCdq9WxwzDePjMHxsqTFZRx9Dt3kR0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YRozMksCxd0Kyhkiyp6JEOdcGGxzfcv+x35mhP9T+f809WT3qo6SuOyqaBShtiylZaaT9pvC2dT5K4xENojCqBISltbuaYv7J4LhfRWklB8TMh4M6411Z0Gaj665YOfsoY/ZW7jOLZsdqUnbQGxM+m8XodQI8wVHGPuLureiibA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=EJVsfbx3; arc=none smtp.client-ip=13.75.44.102
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
+	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=j/zNI
+	sStPBQVpUcEqkks1bcxq+foZ6NfU/5Z5KVSJ68=; b=EJVsfbx3Q0bN8mrBTC+/K
+	SmDb8uf3Kg+2eV6gKgAJLGTIqR+sZ+jOCzED4r98YWYNo3sCZRhQ9WWX8R3cs7Au
+	eGPUrSPfhI7MW3dmsO8ANt0PPmXbjIkzbrnL7suUZ+HIZhRbX16dAW9xVUOZmxr9
+	gtcuy/EK4L4RzZk8xiwtas=
+Received: from localhost.localdomain (unknown [36.110.46.68])
+	by web5 (Coremail) with SMTP id zAQGZQCHPb0YvwVqQ+mQAQ--.27655S2;
+	Thu, 14 May 2026 20:24:57 +0800 (CST)
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+To: netdev@vger.kernel.org
+Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf.kernel@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Krishna Kumar <krikku@gmail.com>,
+	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+	Xuewei Feng <fengxw06@126.com>,
+	Qi Li <qli01@tsinghua.edu.cn>,
+	Ke Xu <xuke@tsinghua.edu.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH v3 net] net: core: dev: add reprocess depth limit for another_round in __netif_receive_skb_core
+Date: Thu, 14 May 2026 20:24:41 +0800
+Message-ID: <20260514122444.48184-1-zhaoyz24@mails.tsinghua.edu.cn>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CY8PR02MB9249D14ADE162A6854C72B9783062@CY8PR02MB9249.namprd02.prod.outlook.com>
-X-Rspamd-Queue-Id: D2F29541889
+Content-Transfer-Encoding: quoted-printable
+X-CM-TRANSID:zAQGZQCHPb0YvwVqQ+mQAQ--.27655S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxCF1DGw18Gr4rJr48Zr4ktFb_yoWrZF1xpF
+	W5KFWIyFW8Cry29392y3ZF9ryrGFZ5XFsxX34fGa47A3Z3GF1rGrySvryYqFnxZryrWryF
+	gFWDJr48Zan8X3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUP014x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
+	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_GFv_Wrylc2xSY4AK67
+	AK6ryUMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
+	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc4
+	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
+	xVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
+	1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sR_iSdJUU
+	UUU==
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAgQHAWoFbsalTQAAsv
+X-Rspamd-Queue-Id: C0C08541944
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-287947-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287948-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,126.com,tsinghua.edu.cn,vger.kernel.org];
+	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.999];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mails.tsinghua.edu.cn:mid,mails.tsinghua.edu.cn:dkim]
 X-Rspamd-Action: no action
 
-On Wed, May 13, 2026 at 11:53:07PM +0000, Selvamani Rajagopal wrote:
-> 
-> > > I believe this will affect the parameters passed to request_irq in oa_tc6.c. At present,
-> > IRQF_TRIGGER_FALLING is used. It has to be changed to IRQF_TRIGGER_LOW.
-> > > BTW, I did test with this configuration. Both edge triggered and active low, level
-> > triggered seem to work, though technically it is supposed to be level triggered.
-> > >
-> > > My understanding is that I should submit this particular change to oa_tc6, to net, not
-> > net-next as it falls under bug fix. Can you confirm?
-> > 
-> > Yes, this is a bug. Please submit it to net, and include a Fixes: tag.
-> 
-> Andrew,
-> 
-> I am preparing the patch for this issue.
-> 
-> Wondering who would fix this in the YAML file? The maintainers from the respective vendors ? The specific file in question is, microchip,lan8650.yaml.
+In __netif_receive_skb_core(), the another_round label can be reached=20
+via a TC ingress redirect (bpf_redirect_peer returning -EAGAIN).
 
-You could use git blame to find out who added that part, and report
-the issue to that person. Ask them if they have time to fix it.
+Across network namespaces, two BPF programs on peer devices can redirect
+packets back and forth indefinitely, creating an unbounded loop that=20
+monopolizes a CPU core in softirq context. This leads to RCU stalls,=20
+soft lockups, and system-wide denial of service.
 
-Or just fix it yourself, and Cc: everybody who has touched that file.
+We reproduced it by creating a pair of TC BPF programs across two=20
+network namespaces that redirect packets to each other, and the RCU=20
+subsystem detects a stall:
 
-    Andrew
+```
+[   24.835219] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:=0D
+[   24.835837] rcu: 	(detected by 0, t=3D21002 jiffies, g=3D-627, q=3D2 ncp=
+us=3D1)=0D
+[   24.835959] rcu: All QSes seen, last rcu_preempt kthread activity 21002 =
+(4294691810-4294670808), jiffies_till_next_fqs=3D3, root ->qsmask 0x0=0D
+[   24.836239] rcu: rcu_preempt kthread starved for 21002 jiffies! g-627 f0=
+x2 RCU_GP_WAIT_FQS(5) ->state=3D0x0 ->cpu=3D0=0D
+[   24.836362] rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, O=
+OM is now expected behavior.=0D
+[   24.836460] rcu: RCU grace-period kthread stack dump:=0D
+[   24.836601] task:rcu_preempt     state:R  running task     stack:15448 p=
+id:15    tgid:15    ppid:2      task_flags:0x208040 flags:0x00080000=0D
+[   24.837139] Call Trace:=0D
+[   24.837568]  <TASK>=0D
+[   24.838008]  __schedule+0x4ed/0xea0=0D
+[   24.838934]  schedule+0x22/0xd0=0D
+[   24.839023]  schedule_timeout+0x81/0x100=0D
+[   24.839095]  ? __pfx_process_timeout+0x10/0x10=0D
+[   24.839165]  rcu_gp_fqs_loop+0x11b/0x650=0D
+[   24.839226]  ? __pfx_rcu_gp_kthread+0x10/0x10=0D
+[   24.839282]  rcu_gp_kthread+0x17e/0x210=0D
+[   24.839333]  ? __pfx_rcu_gp_kthread+0x10/0x10=0D
+[   24.839383]  kthread+0xdd/0x110=0D
+[   24.839433]  ? __pfx_kthread+0x10/0x10=0D
+[   24.839481]  ret_from_fork+0x1aa/0x260=0D
+[   24.839538]  ? __pfx_kthread+0x10/0x10=0D
+[   24.839585]  ret_from_fork_asm+0x1a/0x30=0D
+[   24.839686]  </TASK>=0D
+......
+```
+
+Fix this by adding a depth counter when it is about to go to another_round
+label. When the counter exceeds XMIT_RECURSION_LIMIT (8), the packet is=20
+dropped. This follows the same pattern as dev_xmit_recursion() which=20
+protects the TX redirect path with the same limit.
+
+Reuse SKB_DROP_REASON_TC_RECLASSIFY_LOOP for observability.
+
+Fixes: 9aa1206e8f48 ("bpf: Add redirect_peer helper")
+Cc: stable@vger.kernel.org
+Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
+Reported-by: Xuewei Feng <fengxw06@126.com>
+Reported-by: Qi Li <qli01@tsinghua.edu.cn>
+Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
+Assisted-by: GLM:GLM-5.1
+Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+---
+Changes in v3:
+- Guard redirect_depth declaration with #ifdef CONFIG_NET_INGRESS to
+  avoid unused variable warning when CONFIG_NET_INGRESS is not set
+- Reorder variable declarations to follow reverse christmas tree style
+- Link to v2: https://lore.kernel.org/netdev/20260512022127.7818-1-zhaoyz24=
+@mails.tsinghua.edu.cn/
+Changes in v2:
+- Move the check just after `another` is set to true to avoid affecting the=
+ fast path
+- Reuse SKB_DROP_REASON_TC_RECLASSIFY_LOOP to avoid adding new drop reason
+- Link to v1: https://lore.kernel.org/netdev/20260511063005.38134-1-zhaoyz2=
+4@mails.tsinghua.edu.cn/
+---
+ net/core/dev.c | 12 ++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 831129f2a..c8e4a1d3f 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -5958,6 +5958,9 @@ static int __netif_receive_skb_core(struct sk_buff **=
+pskb, bool pfmemalloc,
+    struct net_device *orig_dev;
+    bool deliver_exact =3D false;
++#ifdef CONFIG_NET_INGRESS
++   int redirect_depth =3D 0;
++#endif
+    int ret =3D NET_RX_DROP;
+    __be16 type;
+
+@@ -6031,8 +6034,16 @@ static int __netif_receive_skb_core(struct sk_buff *=
+*pskb, bool pfmemalloc,
+        nf_skip_egress(skb, true);
+        skb =3D sch_handle_ingress(skb, &pt_prev, &ret, orig_dev,
+                     &another);
+-       if (another)
++       if (another) {
++           if (unlikely(++redirect_depth > XMIT_RECURSION_LIMIT)) {
++               net_warn_ratelimited(
++                   "%s: redirect loop limit reached, dropping (dev=3D%s)\n=
+",
++                   __func__, skb->dev->name);
++               drop_reason =3D SKB_DROP_REASON_TC_RECLASSIFY_LOOP;
++               goto drop;
++           }
+            goto another_round;
++       }
+        if (!skb)
+            goto out;
+
+--
+2.43.0
+
 
