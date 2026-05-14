@@ -1,300 +1,131 @@
-Return-Path: <netdev+bounces-287971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287972-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6DPaBLzSBWpUbwIAu9opvQ
-	(envelope-from <netdev+bounces-287971-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 15:48:44 +0200
+	id AKLSFxvTBWpUbwIAu9opvQ
+	(envelope-from <netdev+bounces-287972-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 15:50:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E2D95427C4
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 15:48:42 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 528805427EC
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 15:50:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 382AC301B4DE
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:48:41 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0BBDE300C7D9
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:50:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E76E23EDE77;
-	Thu, 14 May 2026 13:48:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66FB93F20FE;
+	Thu, 14 May 2026 13:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UYqdXWcc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ygI8fOEQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7164B223707
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 13:48:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA1593EDE5B;
+	Thu, 14 May 2026 13:50:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778766519; cv=none; b=VIdcLQLlU2QhjTtXiHV6+MdhYGWA13I6qoBOYMqjtUtM2Z3iPsaegfiMHeZULKp5odfn1JEX7mgQTyOV+E679zytEncgcA9AEJKs5c4fGyhiookFFSYM9OmUL8q3B/dJ3Efwqsfm9uJbw5RkzO2c0aoTREab8lMTJoTwJ3sYvbw=
+	t=1778766607; cv=none; b=J3FJBTieN+eiojQY1fAkRVwjUPh1XhyZw88I25owyMzjJ1NoCBN2Bzij0H585rbFKPLRnRItBOI22p3gOCqI9Gem9fCBbhBw477e7lxKsonG0LUqWeuW+LerJf8eHFI+fz1HEfLcOU7PwOVQEQM1UcCBUv13DUy1dBeWD3gJgFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778766519; c=relaxed/simple;
-	bh=/Jwmlr4yNkQzDVzsjm77kRSpBCNy/sGPCwGbJXpn7pc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=I+cDpbewLK2WdPPs4wx8pJt0L4cJHd+xoTF51jeMmWRtTbB8+RZqcLkXjcTI/mR4HJGBIuwQ+Y+cj0jX0no2d1Zfj6wdonKJTL0m+ZwFuwtLGp0v/RP+plUReytrbUfO8O2YbypUMGnjgJQls8o0ZrlqdjhXGztwB+zj1NLt1Gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UYqdXWcc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778766517;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Py2NBwAszrXeeyrlxYBxDuq+1AsGYDGoJTLIquOAmDw=;
-	b=UYqdXWccjR5aeNxOcWheUGo94S/A8DwcbLvZ5nerHASjJFqMCcyTu4NGIU22ub/ClMdjo6
-	OmD1rtz31fu35dbGu+RBSVtLRnCOc0AwuHTzmFYsCDcKXwn/9OBD0876/VV4RB883dtvjM
-	Ki+VF48VKm8pUnYzTDIWpe/NMpurCt4=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-647-iaQh7iIVPQS4nnorD1EDzw-1; Thu,
- 14 May 2026 09:48:32 -0400
-X-MC-Unique: iaQh7iIVPQS4nnorD1EDzw-1
-X-Mimecast-MFC-AGG-ID: iaQh7iIVPQS4nnorD1EDzw_1778766509
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EC0E5197752D;
-	Thu, 14 May 2026 13:48:22 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.81.221])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5128B1956053;
-	Thu, 14 May 2026 13:48:18 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Minxi Hou <houminxi@gmail.com>
-Cc: netdev@vger.kernel.org,  davem@davemloft.net,  echaudro@redhat.com,
-  edumazet@google.com,  horms@kernel.org,  i.maximets@ovn.org,
-  kuba@kernel.org,  pabeni@redhat.com,  shuah@kernel.org,
-  dev@openvswitch.org,  i.maximets@redhat.com,
-  linux-kselftest@vger.kernel.org, Eric Garver <eric@garver.life>
-Subject: Re: [PATCH net-next] selftests: openvswitch: add dec_ttl action
- support and test
-In-Reply-To: <20260514092747.3653656-1-houminxi@gmail.com> (Minxi Hou's
-	message of "Thu, 14 May 2026 17:27:47 +0800")
-References: <20260514092747.3653656-1-houminxi@gmail.com>
-Date: Thu, 14 May 2026 09:48:15 -0400
-Message-ID: <f7tecjeqezk.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1778766607; c=relaxed/simple;
+	bh=JpnbtmlzYRpqcnYS60A5O/R90rB73HxkCxR/8t+RChM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ShlzRxwb7459XMRg5Wd/CSWGfGbtUE8pal7m5POeaixqA8uqubwFQ+geaCpeDmwMk677kPrt3dmwO9dY6q7caW0hRbvDdI51WzqBc6skqLYfxDCELH0Nzrh+Vt2gz+12oAj2S7q4bhiRXFe0b7Uy9hdbtdfh+QaHH2ReiAlAL3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ygI8fOEQ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=UbytFVbfO60+brh0gQ9j9DNfvN8/+BhkvW5hmOTx2Gc=; b=ygI8fOEQkGWoS5vrYP1WHHU2VG
+	ygnYB9Fn0I0yqKTWuuJlx9JQac/fu8qMoyV8qnJDf8JERqWx0uD1K7huUhedmLcrZEwuXhuGD7jo7
+	WaYkklby5V2gmQ1ky9sls1vk/Bd0RX3o8uZ2n1Ou/XWdjim32qbSDAGtvJRe1GAMmyl0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wNWRr-002ubG-6X; Thu, 14 May 2026 15:49:59 +0200
+Date: Thu, 14 May 2026 15:49:59 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+	Frank Wunderlich <frank.wunderlich@linux.dev>
+Subject: Re: [PATCH net-next v10 5/9] net: phy: Represent PHY-less SFP
+ modules with phy_port
+Message-ID: <233de63c-f4a4-44cc-bb88-eb10d298b9b0@lunn.ch>
+References: <20260513130521.1064094-1-maxime.chevallier@bootlin.com>
+ <20260513130521.1064094-6-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
-X-Rspamd-Queue-Id: 5E2D95427C4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260513130521.1064094-6-maxime.chevallier@bootlin.com>
+X-Rspamd-Queue-Id: 528805427EC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	PRECEDENCE_BULK(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-287972-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com,csgroup.eu,nxp.com,pengutronix.de,chromium.org,makrotopia.org,liebherr.com,linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-287971-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aconole@redhat.com,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[6];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,openvswitch.sh:url,ovs-dpctl.py:url]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lunn.ch:email,lunn.ch:mid,lunn.ch:dkim]
 X-Rspamd-Action: no action
 
-Minxi Hou <houminxi@gmail.com> writes:
+On Wed, May 13, 2026 at 03:05:16PM +0200, Maxime Chevallier wrote:
+> Now that the SFP bus infrastructure notifies when PHY-less modules are
+> connected, we can create a phy_port to represent it. Instead of letting
+> the SFP subsystem handle that, the Bus' upstream is in charge of
+> maintaining that phy_port and register it to the topology, as the
+> upstream (in this case a phy device) is directly interacting with the
+> underlying net_device.
+> 
+> Add a phy_caps helper to get the achievable modes on this module based
+> on what the phy_port representing the bus supports.
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-> Add dec_ttl action support to the OVS kernel datapath selftest
-> framework:
->
->   - Add DecTtl nested NLA class to ovs-dpctl.py with proper
->     OVS_DEC_TTL_ATTR_ACTION sub-attribute handling
->   - Add parse support for dec_ttl(<inner_actions>) action string
->     following the same pattern as clone()
->   - Add dpstr output formatting for dec_ttl actions
->   - Add test_dec_ttl() to openvswitch.sh that verifies:
->     * Normal TTL packets are forwarded after decrement
->     * TTL=1 packets are dropped (TTL expiry)
->     * Graceful skip via ksft_skip if kernel lacks dec_ttl support
->
-> The DecTtl class uses late-binding type resolution to reference
-> ovsactions for its inner action list, avoiding circular references
-> at class definition time.
->
-> Tested with vng on x86_64, all OVS selftests pass.
->
-> Signed-off-by: Minxi Hou <houminxi@gmail.com>
-> ---
->  .../selftests/net/openvswitch/openvswitch.sh  | 55 +++++++++++++++++++
->  .../selftests/net/openvswitch/ovs-dpctl.py    | 39 ++++++++++++-
->  2 files changed, 92 insertions(+), 2 deletions(-)
->
-> diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> index 3cdd953f6813..200c36c4d7bf 100755
-> --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> @@ -28,6 +28,7 @@ tests="
->  	tunnel_metadata				ovs: test extraction of tunnel metadata
->  	tunnel_refcount				ovs: test tunnel vport reference cleanup
->  	drop_reason				drop: test drop reasons are emitted
-> +	dec_ttl					ttl: dec_ttl action decrements IP TTL
->  	psample					psample: Sampling packets with psample"
->  
->  info() {
-> @@ -244,6 +245,60 @@ usage() {
->  }
->  
->  
-> +test_dec_ttl() {
-> +	sbx_add "test_dec_ttl" || return $?
-> +	ovs_add_dp "test_dec_ttl" decttl || return 1
-> +
-> +	info "create namespaces"
-> +	for ns in client server; do
-> +		ovs_add_netns_and_veths "test_dec_ttl" "decttl" "$ns" \
-> +			"${ns:0:1}0" "${ns:0:1}1" || return 1
-> +	done
-> +
-> +	ip netns exec client ip addr add 10.0.0.1/24 dev c1
-> +	ip netns exec client ip link set c1 up
-> +	ip netns exec server ip addr add 10.0.0.2/24 dev s1
-> +	ip netns exec server ip link set s1 up
-> +
-> +	# Probe: check if kernel supports dec_ttl action.
-> +	ovs_add_flow "test_dec_ttl" decttl \
-> +		'in_port(1),eth(),eth_type(0x0800),ipv4()' \
-> +		'dec_ttl()' &>/dev/null
-> +	if [ $? == 1 ]; then
-> +		info "no support for dec_ttl - skipping"
-> +		ovs_exit_sig
-> +		return $ksft_skip
-> +	fi
-> +
-> +	ovs_del_flows "test_dec_ttl" decttl
-> +
-> +	# ARP flows (bidirectional)
-> +	ovs_add_flow "test_dec_ttl" decttl \
-> +		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
-> +	ovs_add_flow "test_dec_ttl" decttl \
-> +		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
-> +
-> +	# IP flows with dec_ttl action
-> +	ovs_add_flow "test_dec_ttl" decttl \
-> +		'in_port(1),eth(),eth_type(0x0800),ipv4()' \
-> +		'dec_ttl(),2' || return 1
-> +	ovs_add_flow "test_dec_ttl" decttl \
-> +		'in_port(2),eth(),eth_type(0x0800),ipv4()' \
-> +		'dec_ttl(),1' || return 1
-> +
-> +	info "verify connectivity with dec_ttl"
-> +	ovs_sbx "test_dec_ttl" ip netns exec client ping -c 1 -W 2 \
-> +		10.0.0.2 || return 1
-> +
-> +	info "verify TTL=1 is dropped by dec_ttl"
-> +	ovs_sbx "test_dec_ttl" ip netns exec client ping -c 1 -W 2 \
-> +		-t 1 10.0.0.2 >/dev/null 2>&1 \
-> +		&& { info "FAIL: ping should fail with TTL=1 and dec_ttl"
-> +		     return 1; }
-> +
-> +	return 0
-> +}
-> +
->  # psample test
->  # - use psample to observe packets
->  test_psample() {
-> diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> index bbe35e2718d2..a73ca98d7aef 100644
-> --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> @@ -388,11 +388,19 @@ class ovsactions(nla):
->          ("OVS_ACTION_ATTR_CLONE", "recursive"),
->          ("OVS_ACTION_ATTR_CHECK_PKT_LEN", "none"),
->          ("OVS_ACTION_ATTR_ADD_MPLS", "none"),
-> -        ("OVS_ACTION_ATTR_DEC_TTL", "none"),
-> +        ("OVS_ACTION_ATTR_DEC_TTL", "DecTtl"),
->          ("OVS_ACTION_ATTR_DROP", "uint32"),
->          ("OVS_ACTION_ATTR_PSAMPLE", "psample"),
->      )
->  
-> +    class DecTtl(nla):
-> +        nla_flags = NLA_F_NESTED
-> +
-> +        nla_map = (
-> +            ("OVS_DEC_TTL_ATTR_UNSPEC", "none"),
-> +            ("OVS_DEC_TTL_ATTR_ACTION", "actions"),
-> +        )
-> +
->      class psample(nla):
->          nla_flags = NLA_F_NESTED
->  
-> @@ -632,6 +640,13 @@ class ovsactions(nla):
->                  print_str += "ct_clear"
->              elif field[0] == "OVS_ACTION_ATTR_POP_VLAN":
->                  print_str += "pop_vlan"
-> +            elif field[0] == "OVS_ACTION_ATTR_DEC_TTL":
-> +                datum = self.get_attr(field[0])
-> +                print_str += "dec_ttl("
-> +                subacts = datum.get_attr("OVS_DEC_TTL_ATTR_ACTION")
-> +                if subacts and subacts.get("attrs"):
-> +                    print_str += subacts.dpstr(more)
-> +                print_str += ")"
->              elif field[0] == "OVS_ACTION_ATTR_POP_ETH":
->                  print_str += "pop_eth"
->              elif field[0] == "OVS_ACTION_ATTR_POP_NSH":
-> @@ -725,7 +740,21 @@ class ovsactions(nla):
->                      actstr = actstr[strspn(actstr, ", ") :]
->                      parsed = True
->  
-> -            if parse_starts_block(actstr, "clone(", False):
-> +            if parse_starts_block(actstr, "dec_ttl(", False):
-> +                parencount += 1
-> +                subacts = ovsactions()
-> +                actstr = actstr[len("dec_ttl("):]
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-It looks like in odp-util.c the dec_ttl block has a defined le_1(...)
-format for the TTL value being less-than-or-equal-to-1.  I've CC'd Eric
-since he added that parsing block.
-
-I think it makes sense to keep that consistent with the existing ODP
-utils.
-
-> +                parsedLen = subacts.parse(actstr)
-> +                decttl = ovsactions.DecTtl()
-> +                decttl["attrs"].append(
-> +                    ("OVS_DEC_TTL_ATTR_ACTION", subacts)
-> +                )
-> +                self["attrs"].append(
-> +                    ("OVS_ACTION_ATTR_DEC_TTL", decttl)
-> +                )
-> +                actstr = actstr[parsedLen:]
-> +                parsed = True
-> +            elif parse_starts_block(actstr, "clone(", False):
->                  parencount += 1
->                  subacts = ovsactions()
->                  actstr = actstr[len("clone("):]
-> @@ -896,6 +925,12 @@ class ovsactions(nla):
->          return (totallen - len(actstr))
->  
->  
-> +# pyroute2 resolves nla_map types via getattr(self, name).
-> +# DecTtl needs "actions" to resolve to ovsactions, but
-> +# ovsactions is not defined when DecTtl class body runs.
-> +ovsactions.DecTtl.actions = ovsactions
-> +
-> +
->  class ovskey(nla):
->      nla_flags = NLA_F_NESTED
->      nla_map = (
-
+    Andrew
 
