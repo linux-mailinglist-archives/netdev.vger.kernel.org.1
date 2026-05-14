@@ -1,110 +1,155 @@
-Return-Path: <netdev+bounces-287974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287975-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gPQQGwnXBWqacAIAu9opvQ
-	(envelope-from <netdev+bounces-287974-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:07:05 +0200
+	id OAl3KSXVBWrxbwIAu9opvQ
+	(envelope-from <netdev+bounces-287975-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 15:59:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 541BE542C4B
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:07:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06CAC542AA8
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 15:59:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id BF38D30357D8
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:57:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 253DC3014112
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 13:58:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 073EE3DFC8A;
-	Thu, 14 May 2026 13:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79ED03F164A;
+	Thu, 14 May 2026 13:58:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T9XCPoME"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i3PT/VTo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D844A23741;
-	Thu, 14 May 2026 13:57:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 570B23E51CA;
+	Thu, 14 May 2026 13:58:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778767047; cv=none; b=i8C6YftbqhCSVWWfh4M+LhKVBwyrvRhyu3WoHDY2hkV76B6WnXlGxRHk6OYI552GOL7AQjhyyXgz4YdgFci37745J+BJDnODQ2SApM47zveVozTe2JeXFT5FJINlmQAcXPL8JkaJAAUdPCx+/zy4LQJOpRlm4E7qkgYQ1C1Geq8=
+	t=1778767100; cv=none; b=TXbstj9TZEZ9y687R9W7V1s7WvxrQ+zDvBhPAfr34nc1jBWBBuQpHg4U69IyJtxthDE4RjPwFijD+i9Tz5ZG+VBPhTIE9D964rM+v3WrHZFLnWB2IlmEpnlxM4iFKKy9QtiTQ/jxvdL63ND75nDbyvD2J5Z5Pzpplrmo7Hbwwrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778767047; c=relaxed/simple;
-	bh=FgX4bM3joS/ARFp6Is0bSb6fIJUNZVHYKk7HXhHjg5c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LRmdUWl6l2yPx9In9jssUjLq9jQzA7mcfjzLRj9ucS1oX+xeqvdwDUijv/v6V5zT7PfRsjW/yfemX62p5wh3fxsr/ZCRWGH/e9mZ7eFUpEPP3pqthaCO+L+Pm7dTtRgmGTXJa2ygl41sZemHfrnyIEBAjJuWWxiw074VU08dn8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T9XCPoME; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2888CC2BCB3;
-	Thu, 14 May 2026 13:57:27 +0000 (UTC)
+	s=arc-20240116; t=1778767100; c=relaxed/simple;
+	bh=8oyZ/VO926g2lRdJgN02SOY8dwZhWLcwWuq6M6cDJys=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bamvvoedCRnos97VydtbiyYf6sXgBgT508LlYaxPxlCRFWS2XgPaxq+OiFz1k4HaHLI02Is3xjNfrnfc4meHVjVPp6gOuOxaStdnxA8czuRQEIKhoiQDxRV8WqnYDS05Qxn/AhdDMHRwC35d9/sF1Mo8D1IK2ddLxAyJBKi2LIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i3PT/VTo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 519A7C2BCB3;
+	Thu, 14 May 2026 13:58:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778767047;
-	bh=FgX4bM3joS/ARFp6Is0bSb6fIJUNZVHYKk7HXhHjg5c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=T9XCPoMEY5LbATYiWJCCU6q8/cu9u0kwLO8D+VnhNFYhfYs/Iw6uWgLa9Bw41ieIh
-	 wcbm95ZlzNMVkldq6CHZxQGtJ0Z3kkwbf1KMHUoMyVee60wp7FouOrSM1v3NsY+1VD
-	 M1u+NZP56T7fDt5SlN7m2We9WNLQw/eAd128XFIqjtJ/+VUivt9LRMGQOV90f/LLGH
-	 bw8D7cuqnoxpYVcFfJZJFLJimBmORYijt1PzXW5a6JXb/cuXY7CpR29Ftnj9J4fOM5
-	 nzq/NRttBhvAj0TyDqs4AyrUVD7UrM5BSNADRh7LQmm/1I/vIkhzI5WbC4gkuWz90d
-	 zVkJw/Dd7pnOQ==
-Date: Thu, 14 May 2026 06:57:26 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Chenguang Zhao <zhaochenguang@kylinos.cn>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net/ethtool: fix HWTSTAMP TX/FILTER BUILD_BUG_ON in
- tsconfig SET path
-Message-ID: <20260514065726.09d56535@kernel.org>
-In-Reply-To: <20260514091537.1544154-1-zhaochenguang@kylinos.cn>
-References: <20260514091537.1544154-1-zhaochenguang@kylinos.cn>
+	s=k20201202; t=1778767100;
+	bh=8oyZ/VO926g2lRdJgN02SOY8dwZhWLcwWuq6M6cDJys=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=i3PT/VTo3H2Z40TYgAHf60r2KXNlFgPxv0dhTjhOCRCQd/PwGsvt3q74nemk9NVEk
+	 wJ8eJD9ByWD1LYssmiR7hD+XQfyKjLGCuJ8Un7xZwksNXr8rD9gaqmneDpSpotsVp5
+	 vGc9Vxa+sDcj0uGhcW41A8fFJ0+j5/igO6RoSPus1Iw+7yZqlTgyiFrKVJKfo6vOrv
+	 yTKSoTuayFud6LihcH/hOxTAjvk75d+rrFSQrrrAekQOSzjnUzLnKzIE/aww5/3Ueu
+	 6jBGK6pczhWtewfVZg31/zKrK6h0oUkGrYlaTAF+/LeWSHYnwQ3Cr0251HdrZ4JziT
+	 7hv00CF4h6XsA==
+Message-ID: <139794f1-80b8-49d9-829a-0629379def51@kernel.org>
+Date: Thu, 14 May 2026 07:58:18 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] RDMA/nldev: add mutual exclusion in nldev_dellink()
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@ziepe.ca>, Edward Adam Davis <eadavis@qq.com>
+Cc: akpm@linux-foundation.org, arjan@linux.intel.com, davem@davemloft.net,
+ edumazet@google.com, hdanton@sina.com, horms@kernel.org, kuba@kernel.org,
+ kuniyu@google.com, leon@kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ syzbot+d8f76778263ab65c2b21@syzkaller.appspotmail.com,
+ syzkaller-bugs@googlegroups.com, yanjun.zhu@linux.dev, zyjzyj2000@gmail.com
+References: <20260513234655.GW7702@ziepe.ca>
+ <tencent_3CCD70788A6EAC2D356D4C9674E8D2EEEA0A@qq.com>
+ <20260514115048.GX7702@ziepe.ca>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20260514115048.GX7702@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 541BE542C4B
+X-Rspamd-Queue-Id: 06CAC542AA8
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-287974-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287975-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[ziepe.ca,qq.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[linux-foundation.org,linux.intel.com,davemloft.net,google.com,sina.com,kernel.org,vger.kernel.org,redhat.com,syzkaller.appspotmail.com,googlegroups.com,linux.dev,gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev,d8f76778263ab65c2b21];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On Thu, 14 May 2026 17:15:37 +0800 Chenguang Zhao wrote:
-> BUILD_BUG_ON(__HWTSTAMP_TX_CNT >= 32) and the same for
-> __HWTSTAMP_FILTER_CNT reject the valid upper bound of
-> 32 enum-derived bit positions in a u32 bitset (indices 0 .. 31).
-> Use > 32 so only counts strictly larger than the u32
-> width fail at compile time.
+On 5/14/26 5:50 AM, Jason Gunthorpe wrote:
+> On Thu, May 14, 2026 at 03:31:22PM +0800, Edward Adam Davis wrote:
+>> On Wed, 13 May 2026 20:46:55 -0300, Jason Gunthorpe wrote:
+>>> On Wed, May 13, 2026 at 02:17:28PM -0400, Leon Romanovsky wrote:
+>>>>
+>>>> On Thu, 07 May 2026 20:50:10 +0800, Edward Adam Davis wrote:
+>>>>> We must serialize calls to nldev_dellink() or risk a crash as syzbot
+>>>>> reported:
+>>>>>
+>>>>> Call Trace:
+>>>>>  udp_tunnel_sock_release+0x6d/0x80 net/ipv4/udp_tunnel_core.c:197
+>>>>>  rxe_release_udp_tunnel drivers/infiniband/sw/rxe/rxe_net.c:294 [inline]
+>>>>>  rxe_sock_put drivers/infiniband/sw/rxe/rxe_net.c:639 [inline]
+>>>>>  rxe_net_del+0xfb/0x290 drivers/infiniband/sw/rxe/rxe_net.c:660
+>>>>>  rxe_dellink+0x15/0x20 drivers/infiniband/sw/rxe/rxe.c:254
+>>>>>
+>>>>> [...]
+>>>>
+>>>> Applied, thanks!
+>>>>
+>>>> [1/1] RDMA/nldev: add mutual exclusion in nldev_dellink()
+>>>>       https://git.kernel.org/rdma/rdma/c/0b28000b64f40d
+>>>
+>>> This seems like a rxe bug, I would have expected the lock to be inside
+>>> rxe to protect its racy implementation of rxe_net_del(), which looks
+>>> like it is possibly also triggered by NETDEV_UNREGISTER...
+>> No, it was triggered by RDMA_NLDEV_CMD_DELLINK, you can see the "call trace".
 
-If someone needs to use 32 they can investigate this properly and bump
-the bound. Either you're not explaining the problem well or this is
-a complete noop right now
--- 
-pw-bot: reject
+Not that Jason's point. Code wise
+
+rxe_dellink -> rxe_net_del
+
+netdev NETDEV_UNREGISTER:
+ rxe_notify -> rxe_net_del
+
+both can lead to the same problem
+
+>>>
+>>> ie it should not change nldev_dellink().
+>> While this could be fixed within RXE, the same issue affects all other
+>> RXE-like submodules when they subsequently support the "dellink" interface,
+>> therefore, handling this within nldev_dellink() is relatively more appropriate.
+> 
+> Why would other modules have an issue? The problem is rxe's racey
+> refcounting scheme for its lazy socket creation. There is nothing
+> wrong with nldev, and now you've created some nasty BKL in the nldev
+> code to fix rxe while ignoring its other races.
+
++1
+
 
