@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-288005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288006-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8JKGI4niBWqNdAIAu9opvQ
-	(envelope-from <netdev+bounces-288005-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:56:09 +0200
+	id QDtrHoXiBWqNdAIAu9opvQ
+	(envelope-from <netdev+bounces-288006-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:56:05 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00CCC543923
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:56:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C67BA543919
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:56:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3F0D130A8ADD
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 14:48:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8BEFC30CB9C2
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 14:48:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7988540628F;
-	Thu, 14 May 2026 14:48:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59ACB421EE2;
+	Thu, 14 May 2026 14:48:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="mOjepNzY"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="EPKdib+D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 083C642188D
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 14:48:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CB2441B35F
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 14:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778770086; cv=none; b=JDB940aGL6cMAx2qe6yFBQKuGTxpXMyBrmUF6eLemWJvPFV7J3l0Us1wNU3DWC7dSRD0RqYBpRYMVV9s5KA1DiE0OUwn06fbbOrk7U16biZXWemV/dtHoxQcYxjFJ4EQB8FHdcsYQ9P40onLUOovc5sw0Y3fZl0ESt4dto5+7UA=
+	t=1778770088; cv=none; b=UDym9q+bmP84a2D8tLdlKzmdiiIgQgGOcq07TTFggvcYQqAaTHodURBvF8GklhRDI3tHuWjs6THwQ0N8dspAa86/5FyqwtDe/TYP16X01W0RxnkNifmQZT0dWjrT1I9IV6AChSKJZracN6h+oOQFjWBJhfDoV9aORUvkm107keI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778770086; c=relaxed/simple;
-	bh=QEQ+ldhG9cwEyKGeY3dZdBQvt3yyZvUPYGhmaL4DJes=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mT3X2Q33YTnDN29diSVLLYzhvaFaDgDHl+TJmpnn5WLMWaEyTVFTQkWy6akVHVlWKebCmYZz51d/z0ob6ykzrcoDIK+w5F6L1DvSDi3rrYCLfRNNBK7p+j+zYuU32NxZp1+ZtZ0NByUQbxr+2EVJqYihoSbdRepSyt1j5OTqmoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=mOjepNzY; arc=none smtp.client-ip=209.85.160.170
+	s=arc-20240116; t=1778770088; c=relaxed/simple;
+	bh=0X/Qlg/qBk19uNluQtTMn6fYbTZlVEgqOLOhHV3tu74=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=gAaJAqhLchcfx370q7z40XbkrDd1PCrUKs8wYlRYbKgTSFjdF+DDNtxFL3qVw6NkC6ymlNknxQB40Xg6ll0d97mthl85UZd29P0suTD3f6rGp0NKc8DTLMhWbcm53AZYiMJHKJrPTPQiNIiILsQAHn0mgEwU+8dtOj4pEKk10sE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=EPKdib+D; arc=none smtp.client-ip=209.85.160.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-51306c36c3eso74750411cf.0
-        for <netdev@vger.kernel.org>; Thu, 14 May 2026 07:48:03 -0700 (PDT)
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-50d876329bbso75073161cf.2
+        for <netdev@vger.kernel.org>; Thu, 14 May 2026 07:48:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1778770082; x=1779374882; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yu5ko0rzEh2QyDr1wpj7/FqYnuAO2Q65RdyfoM5VKZE=;
-        b=mOjepNzYAQuBoVNeqZDzEaSOkU4pk+4MOjqNVyD8s/cTtVU54XY7iFwGnFewFFrdKe
-         OZKVqX8gTSoJqZEHekLWotaVNSqnaokL87SeXw9NKXYWsmYf8uYKDfdA/p8xiCJsX+Uz
-         Xz6H3Kf484CHM6Lm9I1/hXQMYE2jMs7xoEyHfe3IMLZWItfmsNnNxU8O/+CuxqninO2B
-         2pboDbdSmHuSwhhApsmjLiAu5eOrtsyEwWjzEvJYFtln6sjuRvO6ykIqLtg1lP2FLj36
-         03IiaVFG9CabJeHxQfxxgtYoyh801dQT5N7A/k7aOHcx9dEGW6oQrnA1TPngI7lr8kcx
-         NxBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778770082; x=1779374882;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1778770084; x=1779374884; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yu5ko0rzEh2QyDr1wpj7/FqYnuAO2Q65RdyfoM5VKZE=;
-        b=C4Nee0RXaWQHtB6Xq5kJ2+aOS5z3g47MY3yP9MsNCey17C5rryZl7YOuOwGsBOe80V
-         httFbcZ8O906/mLlLhPAiBly/kmZTwL6vz+/jKG5lKOSJnBQdFd80UTsE8y8WoXx+6qD
-         kjsIW8VJERE5B2Fkzlg6+5VO0GLfI79l8GRoVc9RagfjwtUNg1Jl10iaqMCe2eCGBgQg
-         reU8Ljdb9DeBmgSlZ6vbSg0ZyAx57C6MxmWq34Z0NTX1bNL4PzbmuHGZ2QbETNC6jIDu
-         5eb30Oa6mbhqGiGBIIvDSUX22NTmbl4Ejr+bwJ2pF46u2KKrQf4YPJjb1Fc9BWyRGVrx
-         R5fQ==
-X-Gm-Message-State: AOJu0Yz7rYGJJP7myU9EacAmB8afsrDa2CoztCVf0xEV80jgtkBUjQgW
-	agPIBi+roU0jAWX1/MWoIKQPri1xdyrqlGRwXmqlUiZNp/fnVA7rD7y47I1mG4+A9iUA+0W9PkQ
-	cKzUNeQ==
-X-Gm-Gg: Acq92OHIbJWhltwzECn5dKGmpt8iI8Vi4ER2nHtG0EWCtK0e99yj6egMetHD/fm+oKq
-	1PqU5ckIinwss4m+Ca8M3XJaz08cdIb3b3v2Idr3/QXRfTQaxbtzBN/uEpuOFLvessFHNuVb3Kg
-	lwF2hW2zfkMB16bmH4JZ1ejNurVFmyu83/XzsCGJSmrnaF7udtT28UZqIMw4h4msMEtt9LZ5K+c
-	/lXFn4EzXcTfWaLuvngnj59j4AlINvzvrdVXMSvZhSu+mIF8LcaXcc2Pe52NXL+GP2moIOMB/t4
-	gYTZXcEIOYl7g/ZHglSLrgjaZRy17IXSDXsXu0+gGyNHBwBGaMY1G6L6SRfNVHzdKw9CGLbgt5A
-	jMlbOtE916/IDD2Y8KUKmRaDjIUZsIG2SDUJ0SXeagf1G5/XhjS+jDcZBWPXtZUDignvT7fk1W2
-	JXtT+6kfIu4eCApBrBhlCECWbJo0o=
-X-Received: by 2002:ac8:5d89:0:b0:50f:c36a:3826 with SMTP id d75a77b69052e-5162f483919mr112102261cf.16.1778770082346;
-        Thu, 14 May 2026 07:48:02 -0700 (PDT)
+        bh=bbUCXnKocSpDF9GHJTSkpxIzixr3Yn++mlpZxToj45k=;
+        b=EPKdib+DNox6Gwjede5bHZPdGXMuTy2W0NLssPOthODNIklXpMprcrKpN220wr2oi6
+         FWcYK4dmfbSD53LcYIyz8JGefgGtBL4xwFhcArSLrt4V7n0052AsMyGMrumodF7ln+iN
+         prtfzBExiLl4x+uGow+KerTjHZJMxHkPpWttjYf/+kWQwoJsyP7bZWsl7MyIsKlrRiTm
+         gQxFhp+tbzJzIF2Dq1Aj9V5x8epN16YVdopwlytNYvVvqU3aPPRz+6cqcQ5rdnwsi7DL
+         5jhbBTlAJ3NchX+TeDbhVdVA/PC9Z1cHuDk/JUwOzOlrbPy96w2n5o+PzacBQKItPBFs
+         ncDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778770084; x=1779374884;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=bbUCXnKocSpDF9GHJTSkpxIzixr3Yn++mlpZxToj45k=;
+        b=NTk6fp4CxsKdsD+/H9jarr2T5n+ERQ4S7dG4fsFODncJyxUlUZqPgFdD2S+GxIMC0a
+         mb6qwuf23tzODolsJYso4EeZHwW3teaWnf5H0g+Qy9+HnTKo8J8awcyIoI4mQQn+QkRw
+         Z7JLTAO0p6/GXseMVVOz4vpsZrUlcs62hEqetoH6ooXHhhLCIa2Y8z1aQXflB6JqTbYh
+         BGKzrkeDQj2LUJeIRIMup3s89tqrboHq/r/9TXD4ng/BtjZwOnUj0kf4EysxRAx38gNY
+         A/VUp0gFf8vpTxj+QoCLx5/mHW00PPmQ0bA26qIy7iFfFOAmLT2m49ybLGokVLtXkRVP
+         Gr3g==
+X-Gm-Message-State: AOJu0Yz0DWAfQIqfouCSgGN9l/98mT/0Aw0r5Bjsr9Ijqp9hvnZJLn32
+	IFpPgYhPgKHr6JhruPQzBu6xS7lumDnGUQHdycr7EJcEc83qkRxpw0eLBu9eHaxISpIGI0Su812
+	7U0wkEg==
+X-Gm-Gg: Acq92OFnkZer2wKjzrjuWYOvA73spq9prHkXzwjHFGxf/vzP3oNZ2kJldMdVoJ7FETX
+	aQ8c7ROey7vbx0ue492nemPYaifwVP6YPf6w336w8UgcP7n7Czp+I36Z5XAzDLrfTgzfk8mhA6z
+	vqDw+uizyozAJTA7QfsI+Z4esG55kbRIjqzpavUv7aKb1rCtrr/zkJzm7tnYs+hNnfo8ZJ27Y7D
+	/M37bwseRIe0Uqqn3zUeJoHOZdoMhjbWXgIP/mDJAtGj1gaT/yEEh3h+Fxefx3suILB0ciSZ7ip
+	CsgQw6/0tfBB8pCsgXXA2Erv7z4MuahbaxCKhcbrZ29f/pqBYE4wSrdjSNb8oazDzmIrqRN0fA6
+	vWDKSBXPZMTFIEv7+GDmJTMNFQb2nEqgiQfq1XpWPPxn/Uhax0u1FoFBqpsQHHpOqDMHj5mQQCx
+	t18ElRw1S3/E3Y3jYy/QvWSioM19w=
+X-Received: by 2002:a05:622a:60f:b0:50f:ae24:ecdb with SMTP id d75a77b69052e-5162f58e2f1mr118283911cf.37.1778770083717;
+        Thu, 14 May 2026 07:48:03 -0700 (PDT)
 Received: from majuu.waya ([184.144.29.222])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-516456c0a42sm19125461cf.10.2026.05.14.07.48.00
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-516456c0a42sm19125461cf.10.2026.05.14.07.48.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2026 07:48:01 -0700 (PDT)
+        Thu, 14 May 2026 07:48:03 -0700 (PDT)
 From: Jamal Hadi Salim <jhs@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -93,10 +95,12 @@ Cc: davem@davemloft.net,
 	willemdebruijnkernel@gmail.com,
 	hxzene@gmail.com,
 	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: [PATCH net v5 0/9] net/sched: Fix packet loops in mirred and netem
-Date: Thu, 14 May 2026 10:47:38 -0400
-Message-Id: <20260514144747.527175-1-jhs@mojatatu.com>
+Subject: [PATCH net v5 1/9] net: Introduce skb tc depth field to track packet loops
+Date: Thu, 14 May 2026 10:47:39 -0400
+Message-Id: <20260514144747.527175-2-jhs@mojatatu.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260514144747.527175-1-jhs@mojatatu.com>
+References: <20260514144747.527175-1-jhs@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,7 +108,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 00CCC543923
+X-Rspamd-Queue-Id: C67BA543919
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
@@ -115,7 +119,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288005-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-288006-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,networkplumber.org,mojatatu.com,syst3mfailure.io,willsroot.io,asu.edu,toke.dk,gmail.com];
 	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
@@ -133,70 +137,89 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url,mojatatu.com:mid,mojatatu-com.20251104.gappssmtp.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mojatatu.com:email,mojatatu.com:mid,networkplumber.org:email,mojatatu-com.20251104.gappssmtp.com:dkim]
 X-Rspamd-Action: no action
 
-This patchset adds a 2-bit per-skb tc_depth counter that travels with
-the packet. The existing per-CPU mirred nest tracking loses state
-when a packet is deferred through the backlog or moves between CPUs
-via XPS/RPS. A per-skb field covers both cases.
+Add a 2-bit per-skb tc depth field to track packet loops across the stack.
 
-Patch 1 adds the tc_depth field in a padding hole in sk_buff.
-Patches 2-3 revert the check_netem_in_tree() fix and its tests,
-which broke legitimate multi-netem configurations.
-Patch 4 uses tc_depth to stop netem duplicate recursion.
-Patch 5 uses tc_depth to catch mirred ingress redirect loops.
-Patch 6 fixes the infinite loop in the mirred egress blockcast case.
-Patch 7 fixes an skb leak in early return error scenarios in tcf_mirred_act
-for redirect (caught by Sashiko [1]).
-Patches 8-9 add mirred and netem test cases.
+The previous per-CPU loop counters like MIRRED_NEST_LIMIT
+assume a single call stack and lose state in two cases:
+1) When a packet is queued and reprocessed later (e.g., egress->ingress
+   via backlog), the per-cpu state is gone by the time it is dequeued.
+2) With XPS/RPS a packet may arrive on one CPU and be processed on
+   another.
 
-Changes in v5:
-- Fix issues in patches 6 and 7 found by Sashiko
-- Set limit (1000) in root qdisc in test 8c17 to avoid flakiness (Paolo)
+A per-skb field solves both by travelling with the packet itself.
 
-Changes in v4:
-- Fix the infinite loop for the mirred egress blockcast case
-- Fix skb leak in tcf_mirred_act caught by Sashiko
+The field fits in existing padding, using 2 bits that were previously a
+hole:
 
-Changes in v3:
-- Renamed skb->ttl to skb->tc_depth to avoid confusion with IP TTL
-- Expanded commit messages
-- Split mirred and netem test cases into separate patches
-- No code changes from v2
+pahole before(-) and after (+) diff looks like:
+   __u8       slow_gro:1;           /*   132: 3  1 */
+   __u8       csum_not_inet:1;      /*   132: 4  1 */
+   __u8       unreadable:1;         /*   132: 5  1 */
+ + __u8       tc_depth:2;           /*   132: 6  1 */
 
-Changes in v2:
-- Do not reuse skb->from_ingress (which was moved to skb->cb)
+ - /* XXX 2 bits hole, try to pack */
+   /* XXX 1 byte hole, try to pack */
 
-[1] https://sashiko.dev/#/patchset/20260413082027.2244884-1-hxzene%40gmail.com
+   __u16      tc_index;             /*   134     2 */
 
-Jamal Hadi Salim (5):
-  net: Introduce skb tc depth field to track packet loops
-  net/sched: Revert "net/sched: Restrict conditions for adding
-    duplicating netems to qdisc tree"
-  Revert "selftests/tc-testing: Add tests for restrictions on netem
-    duplication"
-  net/sched: fix packet loop on netem when duplicate is on
-  net/sched: Fix ethx:ingress -> ethy:egress -> ethx:ingress mirred loop
+There used to be a ttl field which was removed as part of tc_verd in commit
+aec745e2c520 ("net-tc: remove unused tc_verd fields").  It was already
+unused by that time, due to remove earlier in commit c19ae86a510c ("tc: remove
+unused redirect ttl").
 
-Kito Xu (veritas501) (1):
-  net/sched: act_mirred: Fix blockcast recursion bypass leading to stack
-    overflow
+The first user of this field is netem, which increments tc_depth on
+duplicated packets before re-enqueueing them at the root qdisc.  On
+re-entry, netem skips duplication for any skb with tc_depth already set,
+bounding recursion to a single level regardless of tree topology.
 
-Victor Nogueira (3):
-  net/sched: act_mirred: Fix skb leak in early mirred redirect returns
-  selftests/tc-testing: Add mirred test cases exercising loops
-  selftests/tc-testing: Add netem test case exercising loops
+The other user is mirred which increments it on each pass
+and limits to depth to MIRRED_DEFER_LIMIT (3).
 
- include/linux/skbuff.h                        |   2 +
- net/sched/act_mirred.c                        |  73 ++-
- net/sched/sch_netem.c                         |  47 +-
- .../tc-testing/tc-tests/actions/mirred.json   | 616 +++++++++++++++++-
- .../tc-testing/tc-tests/infra/qdiscs.json     |   5 +-
- .../tc-testing/tc-tests/qdiscs/netem.json     |  96 +--
- 6 files changed, 696 insertions(+), 143 deletions(-)
+The new field was called ttl in earlier versions of this patch
+but renamed to tc_depth to avoid confusion with IP ttl.
 
+Note (looking at you Sashiko! Dont ignore me and continue bringing this up):
+1. Since both mirred and netem utilize the same 2-bit tc_depth field it is
+   possible when netem and mirred are used together that netem qdisc to skip
+   the duplication step. This is a known trade-off, as a 2-bit field cannot
+   independently track both features' recursion depths and it is not considered
+   sane to have a setup that addresses both features on at the same time.
+
+2. skb_scrub_packet does not clear tc_depth. This means a packet's loop history
+  is preserved even across namespaces. While this might be restrictive for
+  some topologies, it is also design intent to provide robustness against loops
+  across namespaces.
+
+Reviewed-by: Stephen Hemminger <stephen@networkplumber.org>
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+---
+ include/linux/skbuff.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 2bcf78a4de7b..3f06254ab1b7 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -821,6 +821,7 @@ enum skb_tstamp_type {
+  *	@_sk_redir: socket redirection information for skmsg
+  *	@_nfct: Associated connection, if any (with nfctinfo bits)
+  *	@skb_iif: ifindex of device we arrived on
++ *	@tc_depth: counter for packet duplication
+  *	@tc_index: Traffic control index
+  *	@hash: the packet hash
+  *	@queue_mapping: Queue mapping for multiqueue devices
+@@ -1030,6 +1031,7 @@ struct sk_buff {
+ 	__u8			csum_not_inet:1;
+ #endif
+ 	__u8			unreadable:1;
++	__u8			tc_depth:2;
+ #if defined(CONFIG_NET_SCHED) || defined(CONFIG_NET_XGRESS)
+ 	__u16			tc_index;	/* traffic control index */
+ #endif
 -- 
-2.53.0
+2.34.1
 
 
