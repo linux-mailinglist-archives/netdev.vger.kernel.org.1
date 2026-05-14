@@ -1,294 +1,213 @@
-Return-Path: <netdev+bounces-288032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288033-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kFV+Iw3yBWq3dgIAu9opvQ
-	(envelope-from <netdev+bounces-288032-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:02:21 +0200
+	id OOzZASr1BWpVdwIAu9opvQ
+	(envelope-from <netdev+bounces-288033-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:15:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0940544685
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:02:20 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6837C54486E
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:15:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CFDC13011849
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:00:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 20AB630146B8
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E32F231E853;
-	Thu, 14 May 2026 16:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6BCC33507D;
+	Thu, 14 May 2026 16:15:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XAisUViV";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hqjT0A6w";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XAisUViV";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hqjT0A6w"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MHb8489x"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4107B31AA92
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 16:00:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16C703F4132;
+	Thu, 14 May 2026 16:15:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778774427; cv=none; b=UeXJgSS/JX4e8fo/FAcUplk8uJ/iqZ6WOHmj9v5kyfxu6jAJ0Inz5a0XgHcUr/owj+ME/skMb7Xfc9fdmDC3ENFfGpzJfWd20FUhvWPDBVztF/6GNjUcQdkrvl9BTfPoUuSOl+Ibz9uvsFxrKhdoVXXgRruClSpNwgf/fcuLVlM=
+	t=1778775313; cv=none; b=Lt6ep+PUnTp/gcDmLn2KKCW6s0SPvbXVw377QNbhqFj8BuVtif3uHVQOHKVzfW2qThlZjWwSzJDzGfiHTKIGjCVZjbykr4e9xu5uAWnDRUTTMxXZIgJJWDDfcBFRHX19jsLOnBTTMma2gpw/IXkh/8yuZAiqq3WjOhKYnVtQCnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778774427; c=relaxed/simple;
-	bh=9bz7ArJby5v7jeQA8ymGKl9RNGJQiBSe3pmorWJoSPE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fU874wuMPP3R6MHo4SCEbNYXQfeMnt/rAGKfJ6EZUTycpIYRDa2K8qO0d3cXQcZ5pFlMF0fV0oA8X9emSHV7mXXV0Dmtc2ftqEUfojTPkMfo+YvpYJdKISIfwaIon/N6kUvLuRFsY+Pe6bLJ6J4RIRPOYqe3cfqy1p2BFbe2sJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XAisUViV; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hqjT0A6w; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XAisUViV; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hqjT0A6w; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 7485A67CE3;
-	Thu, 14 May 2026 16:00:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1778774424; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i4EMS4p/wehXnBfvVDcG/5oQUtGRphLSbPMyRiQ5TBM=;
-	b=XAisUViVDjXvFFo43tlEnUaOeUu39L4yqTve7eH4kUoLeAhAcuWoxuymdWGEfxTXFh0Q1i
-	tfxBWzfV8CE/SD8XKNI7rKxwQ0Y7u3b2PZQLGcNYKvHdAHM8QBHwEUpl+6XFEFNzKnveVz
-	/yPhU2g5IfReHsNf3Gcz5PYwfU6hJlc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1778774424;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i4EMS4p/wehXnBfvVDcG/5oQUtGRphLSbPMyRiQ5TBM=;
-	b=hqjT0A6wHji0DF/4gW54QQh1Qnl9b11XGe5FHcg4/IYnLbsPsROH1hS6q9R1eGEX9bP8OU
-	MI/C/evGOKJ9j8AA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1778774424; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i4EMS4p/wehXnBfvVDcG/5oQUtGRphLSbPMyRiQ5TBM=;
-	b=XAisUViVDjXvFFo43tlEnUaOeUu39L4yqTve7eH4kUoLeAhAcuWoxuymdWGEfxTXFh0Q1i
-	tfxBWzfV8CE/SD8XKNI7rKxwQ0Y7u3b2PZQLGcNYKvHdAHM8QBHwEUpl+6XFEFNzKnveVz
-	/yPhU2g5IfReHsNf3Gcz5PYwfU6hJlc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1778774424;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i4EMS4p/wehXnBfvVDcG/5oQUtGRphLSbPMyRiQ5TBM=;
-	b=hqjT0A6wHji0DF/4gW54QQh1Qnl9b11XGe5FHcg4/IYnLbsPsROH1hS6q9R1eGEX9bP8OU
-	MI/C/evGOKJ9j8AA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D2468593A9;
-	Thu, 14 May 2026 16:00:23 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id wJfuL5fxBWplBQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Thu, 14 May 2026 16:00:23 +0000
-Message-ID: <2e046948-aa98-4159-b1c1-46368f034027@suse.de>
-Date: Thu, 14 May 2026 18:00:13 +0200
+	s=arc-20240116; t=1778775313; c=relaxed/simple;
+	bh=QaLPJbfJQww7S7O77K7IbSknP+7RC/p4rdgdP9IQW+g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tJAldRmjrycVvEo2Le90JlonF6bXVElj4mqUyIpUDf/U9sP2VHqIFxQ5vm6Fng20emk6z/ZUc5ZTOsdKhPf1LN4et/Qnu1xrZnsh2LDt+FsWhbYAsjTmubnwDnPRjoDRNFmJIiCklcexaIdXEX6cjIjEJjdGp/IYQEf+T3qZAgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MHb8489x; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=/0vlkD0eChacF5ETVs9gmQqQ0rk59QxBVpBmKOtfWuM=; b=MH
+	b8489xnA2ZxWUKc2vcNPg4J9fYfFtGzkdsdG0R2HUXd3IdFjthQWSwF9nbq0QRP0ufXfJArwfA0nB
+	B3GM5alMzhJoYuJLsJqMjxhoA+Fl1XFy0QStBr/zLnR/6LqkhTy5nd/UWuARxD6XpBBnKlm05OKqh
+	mMq21XRqy3xEaP8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wNYhL-002vrb-Oy; Thu, 14 May 2026 18:14:07 +0200
+Date: Thu, 14 May 2026 18:14:07 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Daniel Thompson <daniel@riscstar.com>
+Cc: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	Alex Elder <elder@riscstar.com>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, maxime.chevallier@bootlin.com,
+	rmk+kernel@armlinux.org.uk, andersson@kernel.org,
+	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, linusw@kernel.org, brgl@kernel.org,
+	arnd@arndb.de, gregkh@linuxfoundation.org,
+	mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com,
+	alexandre.torgue@foss.st.com, ast@kernel.org,
+	boon.khai.ng@altera.com, chenchuangyu@xiaomi.com,
+	chenhuacai@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	hkallweit1@gmail.com, inochiama@gmail.com, john.fastabend@gmail.com,
+	julianbraha@gmail.com, livelycarpet87@gmail.com,
+	matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
+	prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
+	rohan.g.thomas@altera.com, sdf@fomichev.me,
+	siyanteng@cqsoftware.com.cn, weishangjuan@eswincomputing.com,
+	wens@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 12/12] arm64: dts: qcom: qcs6490-rb3gen2: enable
+ TC9564 with a single QCS8081 phy
+Message-ID: <f113752b-b351-4a14-af6d-1e2751f0913d@lunn.ch>
+References: <20260501155421.3329862-1-elder@riscstar.com>
+ <20260501155421.3329862-13-elder@riscstar.com>
+ <01d6ea18-e022-41c7-a642-ac0321957923@oss.qualcomm.com>
+ <agRzai1UoHEIotZe@aspen.lan>
+ <3c6e7ec5-f600-44ee-a97a-211a99102744@lunn.ch>
+ <agXo_evi1oFLBJoo@aspen.lan>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2 net v4] ipv6: addrconf: fix temp address generation
- after prefix deprecation
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- horms@kernel.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- dsahern@kernel.org, davem@davemloft.net, =?UTF-8?Q?=C5=81ukasz_Stelmach?=
- <steelman@post.pl>
-References: <20260511122645.6233-2-fmancera@suse.de>
- <3f371efe-1b1b-464c-af21-ccd66b6c5df6@suse.de>
- <20260513143533.GA415119@shredder>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260513143533.GA415119@shredder>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
-X-Rspamd-Queue-Id: E0940544685
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <agXo_evi1oFLBJoo@aspen.lan>
+X-Rspamd-Queue-Id: 6837C54486E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
+	FREEMAIL_CC(0.00)[oss.qualcomm.com,riscstar.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	TAGGED_FROM(0.00)[bounces-288033-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-288032-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[51];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	TAGGED_RCPT(0.00)[netdev,kernel,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,1c:email]
 X-Rspamd-Action: no action
 
-On 5/13/26 4:35 PM, Ido Schimmel wrote:
-> On Tue, May 12, 2026 at 08:24:27PM +0200, Fernando Fernandez Mancera wrote:
->> Sashiko feedback [1] is right about the DoS, that is a router that sends
->> multiple 0-lft RA until it exhausts all spawn attempts, leaving temporary
->> addresses disabled on the system.
->>
->> About the leaked address, I do not think the feedback is right. If an ifp
->> does not have any ift, it means something went wrong most likely. Either
->> this address was removed manually (any RA would restore it, even with
->> previous implementation) or for some reason that prefix didn't get an RA but
->> we didn't try to generate one and we MUST do it.
->>
->> I think we can cover it by avoiding to attempt create a new temporary
->> address for a 0-lft RA, it makes sense to me. Something like this:
->>
->> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
->> index 18a6f2de30ce..6c511e9c1bf5 100644
->> --- a/net/ipv6/addrconf.c
->> +++ b/net/ipv6/addrconf.c
->> @@ -2654,7 +2654,7 @@ static void manage_tempaddrs(struct inet6_dev *idev,
->>   	 * We don't want that to result in creating a new temporary ip address.
->>   	 */
->>   	if ((list_empty(&idev->tempaddr_list) || all_regen) &&
->> -	    (valid_lft || prefered_lft))
->> +	    (valid_lft && prefered_lft))
->>   		create = true;
->>
->>   	if (create && READ_ONCE(idev->cnf.use_tempaddr) > 0) {
->>
->> Any thoughts?
+M> I’m afraid this must be necessarily long but to help navigate the
+> general structure is:
+
+Thanks for the long email.
+
+> Let’s turn our attention to MDIO.
 > 
-> This still leaves the case of RAs that alternate between prefered_lft >
-> 0 and prefered_lft == 0. It will cause the kernel to create an unbounded
-> amount of temporary addresses.
+> Following the pattern above where all the links related to power come
+> from the main device node, then the phy node for the qca8081 in an
+> rb3gen2 would look like something like this:
 > 
-> I think that a better fix would be to reset the regeneration counter of
-> the newest temporary address whenever the associated public address
-> becomes preferred. Something like [1].
+>     tc956x_emac1_phy: ethernet-phy@1c {
+>         compatible = "ethernet-phy-id004d.d101";
+>         reg = <0x1c>;
 > 
-> If the newest temporary address has yet to spawn a new address, then its
-> regeneration counter is 0 and nothing changes. However, if it was
-> incremented and no new address was created, then this patch will reset
-> its regeneration counter to reflect that. Before expiring,
-> addrconf_verify_rtnl() will notice that this address has yet to spawn a
-> new address and call ipv6_create_tempaddr().
+>         reset-gpios = <&tc956x_emac0 1 GPIO_ACTIVE_LOW>;
+>         # On RB3gen2 all supplies are controlled by a single GPIO
+>         # so we link all supplies to that single regulator
+>         avdd-supply = <&qep_1p8>;
+>         avdd18-supply = <&qep_1p8>;
+>         vdd-supply = <&qep_1p8>;
+>         vddldo-supply = <&qep_1p8>;
+>         vdd18-supply = <&qep_1p8>;
+>         vdd125-supply = <&qep_1p8>;
 > 
-> The case of constant RAs with prefered_lft == 0 is not an issue because
-> we only reset the regeneration counter when prefered_lft > 0.
+>         pinctrl-names = "default";
+>         pinctrl-0 = <&qep_irq_pin>;
+>         interrupts-extended = <&tlmm 101 IRQ_TYPE_LEVEL_LOW>;
+>     };
 > 
-> Alternating RAs are also not an issue because we don't call
-> ipv6_create_tempaddr() immediately and instead let
-> addrconf_verify_rtnl() handle it when the address is about to expire.
+> Once we have established what the DT looks like then the question
+> becomes where to put "something, written in C [or Rust], that contains
+> burned in knowledge of how to turn on a wcn6855^H^H^H^H^H^H^Hqca8081"?
 > 
+> The qca8081 on rb3gen2 just gets a bunch of individual regulators and a
+> reset. As in the pci-pwrctrl-tc9563 example above, this means there is
+> nothing in the DT for a pwrseq driver to bind to.
 
-Hi Ido, yes this looks good but I am afraid of using time_after(). Sure, 
-a temporary address should never be older than 2 ~ 7 days. Yet, we allow 
-configuring it up to 2147483647 (68~ years). And that might cause 
-problems in 32-bit systems.
+I don't understand that. We have a node in device tree for the PHY. We
+can put the needed properties there somehow. Maybe similar to how
+pinctrl works. Before probing the device, the driver core looks for
+the pinctrl- properties, and activates them. We could have similar
+properties for power sequencing, before enumerating an address, do
+whatever the pwrseq-names requests? It might need help for the driver
+actually enumerating the bus, to point to core at the node.
 
-I think we either limit this configuration on sysctl directly or we need 
-to support this nonsense.. another option would be to move inet6_ifaddr 
-out of jiffies which is something that I recently added to my TODO list. 
-But that is a bigger change I do not want to bundle with this one.
+> Even if we could find
+> a way to do that, it is not obviously useful to decouple how to turn on
+> an MDIO device from how to drive it. Thus I think the right answer to
+> that is to put the code to fire up the regulators into the qca808x.c
+> driver and it looks to me like the existing probe/remove methods would
+> already work perfectly well as the place to put it.
 
-I noticed that ipv6_add_addr() do:
+But you have a chicken/egg. Same as with PCI, with Ethernet PHYs, you
+ask the device what it is, and then find a driver to drive it, and
+then call the probe function. However, if its clock is off, its GPIO
+reset is held in reset, its power regulators are switch off, it never
+answers when you ask it, what are you? If you have no idea what it is,
+you cannot probe it. And if you cannot probe it, the probe function
+cannot turn all these things on.
 
-list_add(&ifa->tmp_list, &idev->tempaddr_list);
+The standard reply we have is, ignore the fact the device can be
+enumerated, hard code in DT what its ID is. And that is what you have
+above in your DT fragment. But you also need to live with the
+consequences of it being wrong, since that driver is going to be
+loaded, no questions asked. And don't think about having a rev A board
+and a rev B board which have different pin compatible PHYs, and want
+to use the enumeration to get the correct driver loaded.
 
-Doesn't it mean the first address that matches the base prefix is indeed 
-the most recent one? I tried a bit and it seems we can use just the 
-first match :)
+DT developers continually want to make use of the enumeration feature,
+since it is there, part of 802.3, it is how it was done for the first
+20 years of networking, etc. And they keep trying to extend the
+current code to get the PHY running to allow it to be enumerated.  And
+i keep rejecting it.
 
-In addition, I didn't check with Sashiko but it is likely going to 
-complain about a race condition for a RA arriving right after we have 
-spawned an address but it has not been added to the tempaddr list. 
-Therefore we would have two addresses.. anyway, that race is quite 
-unlikely. I also have planned work on that are to reduce the multiple 
-race windows, currently there are plenty. I suggest to acknowledge such 
-race condition for now and improve the code base for the reported scenario.
+Ideally, i would like some generic core code which can be given a list
+of resources, probably phandles, and timing information. And it will
+walk the list and turn them on, inserting the requested delays. And
+then we can enumerate the device.
 
-I propose this small change to your proposed diff, I acknowledge that it 
-is a bit fragile tho (maybe a comment at ipv6_add_addr() is worth to 
-avoid breaking this accidentally):
+Until such code exists, i agree, forget the device is enumerable, hard
+code the ID, and get the probe function to enable the regulators, take
+the device out of reset, enable the clocks, etc. And repeat that in
+every PHY driver.
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index d550524f4266..af0d3fcbef98 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -2607,7 +2607,7 @@ static void manage_tempaddrs(struct inet6_dev *idev,
-  		if (ifp != ift->ifpub)
-  			continue;
-
--		if (!newest_ift || time_after(ift->cstamp, newest_ift->cstamp))
-+		if (!newest_ift)
-  			newest_ift = ift;
-
-  		/* RFC 4941 section 3.3:
-
-
-Thanks!
-Fernando.
-
-
-> [1]
-> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-> index 5476b6536eb7..d550524f4266 100644
-> --- a/net/ipv6/addrconf.c
-> +++ b/net/ipv6/addrconf.c
-> @@ -2595,8 +2595,9 @@ static void manage_tempaddrs(struct inet6_dev *idev,
->                               __u32 valid_lft, __u32 prefered_lft,
->                               bool create, unsigned long now)
->   {
-> +       struct inet6_ifaddr *ift, *newest_ift = NULL;
-> +       u32 orig_prefered_lft = prefered_lft;
->          u32 flags;
-> -       struct inet6_ifaddr *ift;
->   
->          read_lock_bh(&idev->lock);
->          /* update all temporary addresses in the list */
-> @@ -2606,6 +2607,9 @@ static void manage_tempaddrs(struct inet6_dev *idev,
->                  if (ifp != ift->ifpub)
->                          continue;
->   
-> +               if (!newest_ift || time_after(ift->cstamp, newest_ift->cstamp))
-> +                       newest_ift = ift;
-> +
->                  /* RFC 4941 section 3.3:
->                   * If a received option will extend the lifetime of a public
->                   * address, the lifetimes of temporary addresses should
-> @@ -2643,6 +2647,12 @@ static void manage_tempaddrs(struct inet6_dev *idev,
->                          ipv6_ifa_notify(0, ift);
->          }
->   
-> +       if (newest_ift && orig_prefered_lft > 0) {
-> +               spin_lock(&newest_ift->lock);
-> +               newest_ift->regen_count = 0;
-> +               spin_unlock(&newest_ift->lock);
-> +       }
-> +
->          /* Also create a temporary address if it's enabled but no temporary
->           * address currently exists.
->           * However, we get called with valid_lft == 0, prefered_lft == 0, create == false
+       Andrew
 
 
