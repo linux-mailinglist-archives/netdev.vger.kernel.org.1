@@ -1,97 +1,81 @@
-Return-Path: <netdev+bounces-288070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288071-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OJI5M8cUBmp3egIAu9opvQ
-	(envelope-from <netdev+bounces-288070-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 20:30:31 +0200
+	id oKGTG9IYBmrGegIAu9opvQ
+	(envelope-from <netdev+bounces-288071-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 20:47:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9027545E18
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 20:30:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5FD4546026
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 20:47:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A166D30072AF
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:30:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CC6EA302712B
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89D023655FA;
-	Thu, 14 May 2026 18:30:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EDRWyMGM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBEAA3A6B95;
+	Thu, 14 May 2026 18:47:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com [209.85.128.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0681D26A1CF
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 18:30:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5FD43A48C2
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 18:47:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778783426; cv=none; b=bGtNTC0NZlc2bafwQkINudQDwnXkZBNUfettievjMuU4IyeYG69qyrG0s9F4mW2CwDPU9HAGpIPEQYs2gJ/gCQK/3fxfHVNRCSG4FIRgeyyADYDmJCfB6S5Nw5KIJNffNKv09MYEPOQZryV1zb3z3Iu0vWcCUwg91nV4fqPrsgU=
+	t=1778784431; cv=none; b=rbBJf5nuehaio6g/3twOApiuc/MVewkhbw2dGeNMyws7ST331OBi4P3ZGveu0wGbMqsZQ8qgcBCWKKMvr0NohCTGWTqYjNKhJIaXOxjL4BzUlPrdon9O2m4Ezp0ht8vQIvoOaZlPOeQlrJElaArLGW7Yo9kYn8n0fsTEoEKVETA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778783426; c=relaxed/simple;
-	bh=Geh2ltdSeCVx2RDd9OVcFGSMPDFuS/R9rLGG9L0n78w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aNkgox79habwkcQeP6Jl+fb0KI7Q0gK2vn05zH3v32JitxKclSnMAfXA3WBGRj/7O61dDukPRbYJkEtnKNfATYOkEcFcNnBsIlJtcHQRonnRWbizE5o110Q3tBHdwYpwBDhlQK5t7nYwVM0grKcNINHbvgf97vXnNz2IT1osOAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EDRWyMGM; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1778784431; c=relaxed/simple;
+	bh=ueUCl0EtJ8kWvVEv/1v3KaiqrbdukBjoCfFKdjqTu3I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nMNozPHCNzA9ALzYGAu+wzhNWxbMKBXrdUWz6JXzZ5IDowGKD1CCKYGPvby2OWxHq0NDAJo+rHeIfzWLVQv6oL5HKrMU4QTeoX3hNDAVreyf+5OevEljK2jAGFQ548qMr11UWxNgmMitibIm0LI4JM1ztBKmCSh+sImrYms/Zj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4893940bb5eso51864865e9.3
-        for <netdev@vger.kernel.org>; Thu, 14 May 2026 11:30:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778783423; x=1779388223; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QDvdudeeJAHgJGuZXL6tml+bzI7syuTzDcLB+eMLOx0=;
-        b=EDRWyMGMjir7OpKYn0HyzUeZIzVBWxj31SB8FtQr49EyffcWq+6Xj2MscHdzqwhYNe
-         qrzkEWhuxR4rdKZFvWaoWzeqSTmgCjxZm+BOuQ/ZShdhk1cXPLel70PEzZlx/7wxU938
-         /3cBVSN/twyjYPfZUeugziudPcDBg4OrKm3P23dLVVm50kpIq/9u90WFFeTgSEGJLn44
-         TOf+eXa0v9v363ViOyeUGoq72nK6U9nBu1Ngdj/lhkNfg0Ma5ugk/uhofJAkFommqTgr
-         u+pV8I8nV0JVO+XaAMxR7NusL9dF77VblO+h70UIlYa102sCgBJXp84iLUWZHrV9XBYc
-         +i8w==
+Received: by mail-wm1-f65.google.com with SMTP id 5b1f17b1804b1-488ad135063so68735675e9.0
+        for <netdev@vger.kernel.org>; Thu, 14 May 2026 11:47:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778783423; x=1779388223;
+        d=1e100.net; s=20251104; t=1778784427; x=1779389227;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QDvdudeeJAHgJGuZXL6tml+bzI7syuTzDcLB+eMLOx0=;
-        b=U3Pw1zKS3T6O1M6M35k5Bq9COoaQpykws8icG5tpSVKZqJBOxqanq8ylvgsn+L2VqM
-         X7g5VKDpxeArStX8LyhxjvyFfo416Bu50SZQ1oJKL3ZPzNdA7/IckTID30qieMMQJ20m
-         vSHU9jIt7bCbtkx5z3Aj74613EVfhQt/bZwJYrZ8vESz4YFu1PRNFr6U5/SyvtUNZUNw
-         8x0c8X+tNyIabtxS9Mu8ZCJhLfHV6d5NUPQd6m6ifbppbAm8d/eUgwHBD2JFwvI9NqOp
-         /7jG9xqFY7onwvKIiIBj2o/MvoX2ky8hEI5c1UVsE0CCznj2ZF1sL2gfawzqnOmneK9O
-         O6EQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9VpzLzf8Q+sQt+yBUFxS2ml5caumgk1oRWJC/ez5y0TszSqW0u34/rwBdElUWIROxvJZFXGG4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0KTZ+vjB8GDagV2+Psn5CNexNYvL+qT28PQ2u992fTgu/CfQJ
-	BWNdxNoOhT+HP25UHKjP+9o9zLr0E4hAYkXt4ErkMkCkYjC6BcMYzfdq
-X-Gm-Gg: Acq92OG2jTc9n4DpJgPKJ9GPSaAFAN9EkiIE+PzbRgyLEaln4ZLhEUHrd7U5OTEiZn8
-	jbsfv5AblFg0voVf7dktsALX0eKdw8+9OVTg0DNuece16bgj1P9ENmfCbF96YPP6TXrac1VpUkj
-	yByWetHgMYUZy7ngvcW171VPtGwbqkZcXI7v3lpyqUh1AD0eSFY5EnJsf+V5cs8Ubi+LzfEZ4H5
-	UWywBROKvGRKm7TKjcjVgs+nIJG/jW3g1q4S+aLYoXcIgd4jV0JhuZ7YrSfitZAbt0jNYXzYWAE
-	OiKBm8+CyXwRchHTqocBljb6kfAjIGm0+IJvgcE0G+U8jnt6K12eNPqQfR38JN8wIxhRk9C31dc
-	4L7jlnH/7ucEf/AfvJ1P9ZIQiPZMFouORmSr9zZNemoO49Vg6mDAx9/xjACAm0zaSlgXiOqBkLN
-	p6qskWUazHcXnOBUQEJ+RNhgG+TttJq7sQucpu8IulZEGPmIFv5Eq93gVqZ+yAw3tb8fTxQ15fM
-	K8kx1z6+T4=
-X-Received: by 2002:a05:600d:8447:b0:48f:e230:80a1 with SMTP id 5b1f17b1804b1-48fe6328b5fmr5516255e9.31.1778783423173;
-        Thu, 14 May 2026 11:30:23 -0700 (PDT)
-Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fd76801f2sm31320475e9.7.2026.05.14.11.30.22
+        bh=gbyuYskHezDgvxCcvU19slfVinGu/cOvscyqTQLVYVU=;
+        b=KkRwFb7EnTEm2Ke+pMrwyevakx+RuCt3BiB4vZQDQxl+kUku2wUWiZOWSEoUErSe++
+         SvCHfiM7+t2kIztYkYSRe5AfvfJSTe4p938rru3nptnuXPktYQD9uzePvPhIp4F3+lEE
+         d7JLqypQhEOjViMGigY0jRfyhSX5gqLjSXHQ7u71lyN5/lbFwkONdiyeDd5HKNXz8OSb
+         obzK6JQ+8HEhtYRhme2kxRVw0OUDYn06gVOxb7Ecmm0GpgnjMrtPX2Se/Fgs5JRu6gZx
+         549xHk7LOBmZvXpnk5d8BA7LT6O+L/ZvFur8a4Tm1QXgdfwcPTkEl5aDgSa95Hi7DO0x
+         xQHA==
+X-Gm-Message-State: AOJu0Yyir/Q1nkz7w9+JfmsDnga/cH0QG0D5hbyv/TnykD03WSFvjZ5Q
+	h7ouDmVy2coxjUL5u2fGS6WONsC/OedMKoii7GzPuSJMla0d3eZXnZQr5kbmkdH/
+X-Gm-Gg: Acq92OFyJ+5aqARzSDJSJwDb6zRQfg93dM+OKW3ybGE9tTQDCylOTiWV7d7Hd90irzz
+	puH4pocNC8k7+I5NDKddvGURqGljpu7nI4AFnOm+pdqQPt6kZyzguAZDbOBKM/21KmrTBR48qwe
+	LsHvRh9A0AC+yzcBVR68HrC7ADZ5CR/DmAgdoJq1CIkq0ryGf8NetRtxcW9R/6mmBqPrsRk+X8J
+	DXKtSRCpBQujqAP+yGb0CLm2NPu4xSG0SbOLAivhne+Imgrfe6llDmQ+6lUg0fxwjTEQ97Mv46D
+	qvLiDRw2jr/C4pflfb2Vn46mSWsY6EeV11x78pmDG2T4vztNe+6YQn3dHTOu15EgQfj3DbrHvur
+	zGAD7eAmKYnumBKm+Y0kgvBdZkqApPYfY3i6GxjEW++r+mfgnVgR/UvIu2NRnl3em2978LNYMRr
+	7PzVqpBffMW5h2Gi8PLzK8aIOULP6K1Rt5tP6zNTHQmVPVDMyUw2Hi62FMwffcm+9zw1B98uG0d
+	a7AeKf2
+X-Received: by 2002:a05:600c:34d4:b0:48f:e230:c3fa with SMTP id 5b1f17b1804b1-48fe6626a58mr7011795e9.32.1778784426674;
+        Thu, 14 May 2026 11:47:06 -0700 (PDT)
+Received: from im-t490s.redhat.com (89-24-32-159.nat.epc.tmcz.cz. [89.24.32.159])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fd62dad0esm24037965e9.6.2026.05.14.11.47.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2026 11:30:22 -0700 (PDT)
-From: David Carlier <devnexen@gmail.com>
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
+        Thu, 14 May 2026 11:47:06 -0700 (PDT)
+From: Ilya Maximets <i.maximets@ovn.org>
+To: netdev@vger.kernel.org
+Cc: Aaron Conole <aconole@redhat.com>,
+	Eelco Chaudron <echaudro@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	dev@openvswitch.org,
 	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	David Carlier <devnexen@gmail.com>
-Subject: [PATCH net v2] idpf: handle NULL adev in idpf_idc_vdev_mtu_event
-Date: Thu, 14 May 2026 19:30:19 +0100
-Message-ID: <20260514183019.49527-1-devnexen@gmail.com>
+	Ilya Maximets <i.maximets@ovn.org>
+Subject: [PATCH net v2] openvswitch: vport: fix race between linking and the device notifier
+Date: Thu, 14 May 2026 20:46:31 +0200
+Message-ID: <20260514184702.2461435-1-i.maximets@ovn.org>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -100,89 +84,91 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: C9027545E18
+X-Rspamd-Queue-Id: D5FD4546026
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lists.osuosl.org,vger.kernel.org,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-288070-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-288071-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[ovn.org];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.992];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-idpf_idc_vport_dev_ctrl(adapter, false) clears vport->vdev_info->adev
-to NULL but keeps vport->vdev_info itself. An MTU change after that
-calls idpf_idc_vdev_mtu_event(), which dereferences vdev_info->adev for
-device_lock() before reaching the (!adev || ...) check.
+Sashiko reports that it is technically possible that we got the device
+reference, but by the time we're linking it to the OVS datapath, it
+may be already in the process of being deleted.  In this case if the
+notifier wins the race for RTNL, it will see that the device is not
+yet in the OVS datapath (ovs_netdev_get_vport() will fail in the
+dp_device_event()) and will do nothing.  Then the ovs_netdev_link()
+will take the RTNL and link the unregistering device to OVS datapath.
 
-Cache vdev_info->adev once with READ_ONCE() and bail out if NULL before
-locking. Use the cached pointer on both the lock and unlock paths so
-the unlock matches the device actually acquired and cannot re-fetch a
-NULL slot.
+Eventually, netdev_wait_allrefs_any() will re-broadcast the event and
+the device will be properly detached, but it will take at least a
+second before that happens, so it's not something we should rely on.
 
-Fixes: ed6e1c8796a4 ("idpf: implement IDC vport aux driver MTU change handler")
-Cc: stable@vger.kernel.org
-Signed-off-by: David Carlier <devnexen@gmail.com>
+Let's avoid linking the non-registered device in the first place.
+
+Note: As per documentation, RTNL doesn't protect the reg_state, but
+it actually does for all the state transitions we care about here,
+so it should not be necessary to use READ_ONCE or taking the instance
+lock.  We can still do that, but we have a few more places even in
+this file where the reg_state is accessed without those while under
+RTNL, and many more places like this across the kernel code, so it
+might make more sense to change all of them in a more centralized
+fashion in the future, if necessary.
+
+Fixes: ccb1352e76cf ("net: Add Open vSwitch kernel components.")
+Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
 ---
-v2: cache vdev_info->adev with READ_ONCE() to avoid double-fetch and
-    use the cached pointer on the unlock path (Alok Tiwari)
----
- drivers/net/ethernet/intel/idpf/idpf_idc.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_idc.c b/drivers/net/ethernet/intel/idpf/idpf_idc.c
-index b7d6b08fc89e..9f764135507c 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_idc.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_idc.c
-@@ -162,9 +162,12 @@ void idpf_idc_vdev_mtu_event(struct iidc_rdma_vport_dev_info *vdev_info,
+Version 2:
+ * Added a comment. [Aaron]
+
+Version 1:
+ * https://lore.kernel.org/netdev/20260513095541.2010516-1-i.maximets@ovn.org/
+
+ net/openvswitch/vport-netdev.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/net/openvswitch/vport-netdev.c b/net/openvswitch/vport-netdev.c
+index c42642075685d..e7e8490a53d80 100644
+--- a/net/openvswitch/vport-netdev.c
++++ b/net/openvswitch/vport-netdev.c
+@@ -83,6 +83,14 @@ struct vport *ovs_netdev_link(struct vport *vport, bool tunnel)
+ 	}
  
- 	set_bit(event_type, event.type);
- 
--	device_lock(&vdev_info->adev->dev);
--	adev = vdev_info->adev;
--	if (!adev || !adev->dev.driver)
-+	adev = READ_ONCE(vdev_info->adev);
-+	if (!adev)
-+		return;
+ 	rtnl_lock();
++	/* Do not link devices that are not registered to avoid a potential
++	 * race with the NETDEV_UNREGISTER notification in dp_device_event().
++	 */
++	if (vport->dev->reg_state != NETREG_REGISTERED) {
++		err = -ENODEV;
++		goto error_put_unlock;
++	}
 +
-+	device_lock(&adev->dev);
-+	if (!adev->dev.driver)
- 		goto unlock;
- 	iadrv = container_of(adev->dev.driver,
- 			     struct iidc_rdma_vport_auxiliary_drv,
-@@ -172,7 +175,7 @@ void idpf_idc_vdev_mtu_event(struct iidc_rdma_vport_dev_info *vdev_info,
- 	if (iadrv->event_handler)
- 		iadrv->event_handler(vdev_info, &event);
- unlock:
--	device_unlock(&vdev_info->adev->dev);
-+	device_unlock(&adev->dev);
- }
- 
- /**
+ 	err = netdev_master_upper_dev_link(vport->dev,
+ 					   get_dpdev(vport->dp),
+ 					   NULL, NULL, NULL);
 -- 
 2.53.0
 
