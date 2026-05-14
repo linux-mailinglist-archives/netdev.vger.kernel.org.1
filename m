@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-287846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287847-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qKblDBt0BWpuXQIAu9opvQ
-	(envelope-from <netdev+bounces-287846-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 09:04:59 +0200
+	id eP5rLEd3BWoaXgIAu9opvQ
+	(envelope-from <netdev+bounces-287847-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 09:18:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEAEC53EAE9
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 09:04:58 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50A9C53ECA8
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 09:18:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2E60A30167A2
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 07:04:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B2C0E3018C17
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 07:18:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 757F03BF69C;
-	Thu, 14 May 2026 07:04:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F2E83CAE65;
+	Thu, 14 May 2026 07:18:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="FjUhgeo0"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="JPN+ukXv"
 X-Original-To: netdev@vger.kernel.org
 Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475AE3C553A;
-	Thu, 14 May 2026 07:04:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2E83A838A;
+	Thu, 14 May 2026 07:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778742297; cv=none; b=VXUUVc4eTz8v7XjFhrJPs8f1cIk6/yjn9NioEyc0A8S+O9SkI5PPjDQGmqgqn7Bf2wZQ2TV4BLMLVZneQFePm6Qfw7iq1ma/2hEuy3xY1KIT6q3zu0ALQGBkxfAmnIOdS2DFURIWy62xG0dgPz1N9tHlQbnYVkdwv6BIzvCEFv4=
+	t=1778743094; cv=none; b=W/RxqAE4u0OkFsUue76geE1GHG8KyzjtZhQMfOk/rdpRIKwR1ft+LJFT2tYOujZuYTpYW4fss5gJ0JQidT3Z6kCi+EEJz6BRIWV57ouvvh30jnkn/IdohYBHcm6S2Wmid9DG1IpF2CWqu8p5fbYiT9TA2oAaCA22gBQhTO72hgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778742297; c=relaxed/simple;
-	bh=1Fof8bGv7WfQGFEzb4EH/nupqI9HgUJooFYdpLsAyec=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rsB2/0CdSp518KixZToecNscQTARNdVPqHuXRtrttHtO/VgISngs6s7n/DLkpKzTC9r4MR6R/uxpZr0s/0zx/zKu5xkRhXFpi4WWYxG+EOwEhflGJJFqQZCSyvlFwjtzEqJ4MX271BNBZnAWYBreuEDC0acGf49+3Nv7GKt/qN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=FjUhgeo0; arc=none smtp.client-ip=213.133.104.62
+	s=arc-20240116; t=1778743094; c=relaxed/simple;
+	bh=XbLvFMTVBkbhXQIDvQEuxtjhgid5grkMFNtjKGD+bGI=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=mjvJoZK2x1KP+s75VHgi4CLPk1vMjyAYwOEuGXoxzyT2AkIv+Eu+ljNxKNx4fK4Y4pLEeZ11MZuFcWi+nABvsQQdGncBgILYlLuhrAzlp696MyI5qDnYftL/272PEmL+1nx5SEieF79nQi19lmGG3Fsc3fsQvx8Qh55Oc77eYUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=JPN+ukXv; arc=none smtp.client-ip=213.133.104.62
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	In-Reply-To:References:Cc:To:From:Subject:MIME-Version:Date:Message-ID:Sender
 	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=h0FbomOWXUO+RXlOUDS+kZDL+gKdY+qcePd+d44Ucvg=; b=FjUhgeo099P6VxDpgCtsF0kaPP
-	O35b8SxNDJo6ejN6OQCZKE5ftWBFahGVu2cCK3/ycE1wMNTQpEXu6e53RysZi2kCyTURaSyZ4RiBg
-	jaoXQyHncDUOk2KaJOguu+1Y/uagC4Rw0D1t5XcCFV1GSU0KemmzcbhhJc2OwHirjP004en80eCSl
-	V5S4gxUc9DGFFG6c54yjXOnrYm4hCdL1mf2HoPfpiPEIsFh5daYFgimPtelw5IFpGAWdDBqKFKigl
-	izfU1WAN85XyPHkvsjRwrkyhfPmoWz1nU0nlzxU5/blYwLcBtEJQLH68dWgmxsjmryYHflys/1Zqy
-	JeiVauKA==;
-Received: from sslproxy03.your-server.de ([88.198.220.132])
+	bh=uyRpXDDYcmi5+dF/3xB6MHzuquzxHMictaQbeGENGyw=; b=JPN+ukXvNW0QLMDOH9zssJgC6p
+	zLI00XqPZkWm5o3+H0C+W6qoVlqv0mOCs3T2XbYCNbwlDboVE9eXQjwxPsFDMB5sYYR/HrR0nj02F
+	m5ICKJ8WjnT4yiFN/Jz3rvEMSSX42g/CHb3LHVYUHNBQGo0tuIu7kdtp+FY2+9D733YZCGLObZ64L
+	JQ0ENSYzOt+GsEyrhJOAZbYjyitAEN4xMmwCvQCiQD8JTR+GKV7iYuT2M1KUdJ4I+KgpNw/2xrdvc
+	fkWvr15GugdH/6XtrbxWeH4YXag7Kf1LCwx9OoEmAyHliVqR3A4T1ZQircHz6ru8hw5KNCzbdk+r8
+	Ibf0YOlQ==;
+Received: from sslproxy05.your-server.de ([78.46.172.2])
 	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96.2)
 	(envelope-from <daniel@iogearbox.net>)
-	id 1wNQ7g-000Fuo-1r;
-	Thu, 14 May 2026 09:04:44 +0200
+	id 1wNQKe-000JeI-1i;
+	Thu, 14 May 2026 09:18:08 +0200
 Received: from localhost ([127.0.0.1])
-	by sslproxy03.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <daniel@iogearbox.net>)
-	id 1wNQ7f-000Ikr-2g;
-	Thu, 14 May 2026 09:04:43 +0200
-Message-ID: <dff89f5d-01ff-4869-bff2-5c5b285cf578@iogearbox.net>
-Date: Thu, 14 May 2026 09:04:43 +0200
+	id 1wNQKd-000GJ7-2a;
+	Thu, 14 May 2026 09:18:07 +0200
+Message-ID: <68a1cc81-80b2-4d49-916a-2d3aca4d54a6@iogearbox.net>
+Date: Thu, 14 May 2026 09:18:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,6 +67,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH net] net: Clear skb metadata before LWT xmit
+From: Daniel Borkmann <daniel@iogearbox.net>
 To: Jakub Kicinski <kuba@kernel.org>, Jakub Sitnicki <jakub@cloudflare.com>
 Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
  <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
@@ -76,8 +77,8 @@ Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
 References: <20260428-wip-skb-local-storage-from-scratch-v1-1-8f7ca9b378ce@cloudflare.com>
  <20260430173153.5cd1d348@kernel.org> <87jyt78y93.fsf@cloudflare.com>
  <20260513172612.6dcc5887@kernel.org>
+ <dff89f5d-01ff-4869-bff2-5c5b285cf578@iogearbox.net>
 Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
 Autocrypt: addr=daniel@iogearbox.net; keydata=
  xsFNBGNAkI0BEADiPFmKwpD3+vG5nsOznvJgrxUPJhFE46hARXWYbCxLxpbf2nehmtgnYpAN
  2HY+OJmdspBntWzGX8lnXF6eFUYLOoQpugoJHbehn9c0Dcictj8tc28MGMzxh4aK02H99KA8
@@ -121,50 +122,57 @@ Autocrypt: addr=daniel@iogearbox.net; keydata=
  rUD9YI1Je/WifL/HbIubHCCdK8/N7rblgUrZJMG3W+7vAvZsOh/6VTZeP4wCe7Gs/cJhE2gI
  DmGcR+7rQvbFQC4zQxEjo8fNaTwjpzLM9NIp4vG9SDIqAm20MXzLBAeVkofixCsosUWUODxP
  owLbpg7pFRJGL9YyEHpS7MGPb3jSLzucMAFXgoI8rVqoq6si2sxr2l0VsNH5o3NgoAgJNIg=
-In-Reply-To: <20260513172612.6dcc5887@kernel.org>
+In-Reply-To: <dff89f5d-01ff-4869-bff2-5c5b285cf578@iogearbox.net>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Virus-Scanned: Clear (ClamAV 1.4.3/27999/Wed May 13 08:25:21 2026)
-X-Rspamd-Queue-Id: CEAEC53EAE9
+X-Rspamd-Queue-Id: 50A9C53ECA8
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[iogearbox.net:+];
-	TAGGED_FROM(0.00)[bounces-287846-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-287847-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,iogearbox.net:mid,iogearbox.net:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[iogearbox.net:mid,iogearbox.net:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On 5/14/26 2:26 AM, Jakub Kicinski wrote:
-> On Wed, 13 May 2026 11:17:12 +0200 Jakub Sitnicki wrote:
->> I actually wanted to double-check with you and Daniel - is consuming
->> metadata from TC egress supposed to be supported?
+On 5/14/26 9:04 AM, Daniel Borkmann wrote:
+> On 5/14/26 2:26 AM, Jakub Kicinski wrote:
+>> On Wed, 13 May 2026 11:17:12 +0200 Jakub Sitnicki wrote:
+>>> I actually wanted to double-check with you and Daniel - is consuming
+>>> metadata from TC egress supposed to be supported?
+>>
+>> Not AFAIK, let's see if Daniel has a use case in mind.
 > 
-> Not AFAIK, let's see if Daniel has a use case in mind.
+> The only case I can think of would be if someone uses metadata
+> within the tc(x) layer, so from either tc ingress then xmit to
+> tc egress or vice versa in order to store BPF-related data in> front, but iiuc that should still work with your patch.
 
-
-The only case I can think of would be if someone uses metadata
-within the tc(x) layer, so from either tc ingress then xmit totc egress or vice versa in order to store BPF-related data in
-front, but iiuc that should still work with your patch.
+Maybe the one case where it could break down is if you would
+try to transport data from container-related iface (e.g. tc @
+host-facing veth, or netkit) all the way to phys dev when there
+is tunnel in between. Not sure if it would survive today,
+potentially yes. In such case maybe better to move this further
+into lwt related paths?
 
