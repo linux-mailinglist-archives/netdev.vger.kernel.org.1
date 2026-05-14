@@ -1,174 +1,196 @@
-Return-Path: <netdev+bounces-288068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288069-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id Gbb7LdsMBmrSeQIAu9opvQ
-	(envelope-from <netdev+bounces-288068-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 19:56:43 +0200
+	id GFzeAgARBmobegIAu9opvQ
+	(envelope-from <netdev+bounces-288069-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 20:14:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B76CF545919
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 19:56:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53ED8545C0E
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 20:14:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 82ABF30120C9
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 17:56:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 672CA3016ED0
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:14:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A309C3890E0;
-	Thu, 14 May 2026 17:56:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8887D391E6D;
+	Thu, 14 May 2026 18:14:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eBLoSkOk"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="TDklkNMk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 514FE26FA7A
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 17:56:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778781397; cv=pass; b=m3ErMocs3RwyyhW3gmJVHfQ2SMHpEeHrc0CHy1BusKvPjQNrfrgogjVjtksEpqGxbiPiPAxwxTHUNM9x6VlzkPTwSYj/CqZXRheBGkM9sC+DzUIHrz/anYrwD5VgdX5E0PMmDuZ/gT685RtX2vokR9423oKbsmRYBAr1PFL7Sdg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778781397; c=relaxed/simple;
-	bh=BnFR1MVna3CRaufQdcHPZCVj4voktoge6R45rDyddfc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FCBdKtFKpGeaxFzwS7TxQS0kqkaKxEdTzLwxzyO9Pxv1UJCkhxQbREwZOcC4TeU75mt8Yd+hGC4n48p0iC1oe0Bd8rSROGEZ5OeAa+Eo5JKpcz9xGQvra/ksH42H5W/XDhTGSgI+vkuQXbVIndw94kIQYpa0qmbcsw+Yc1dA5n8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eBLoSkOk; arc=pass smtp.client-ip=209.85.210.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7dcd17e19b6so4726162a34.1
-        for <netdev@vger.kernel.org>; Thu, 14 May 2026 10:56:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778781395; cv=none;
-        d=google.com; s=arc-20240605;
-        b=RZNFIUlzsXUYOH2cU+52qGoaAv2lz4U5gJAKPbQv8/NtrkOepaB3mX7XOsa3qKiToe
-         TBbssp8+Hk7rpEDVPi75I1304D8S/nc1OieYpAAS+Fsz1idKfRbDYET2WLudHlgzit7y
-         0PL9rAH4goErUQSqeWeSU7qCsf1HVb+bcVCYdKt7n3dvWH95lsHlsSbD6hxMPuxyFwW0
-         ZrNh3wiBr6hy2qm7i08m3Ykm8jWroWfeGI9xbIPm5IIADS0DwNTQ1B/y+CKk+D/L+SM7
-         egK8KeLegfU84W0TGLpQP5TRIciUUat4ECNFUZI1qwQcIp416Ws4q7ZisIx3sorr0/xi
-         AYwQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=WO7Vxg/KpE7haeje+D+H7hmJS41MpZOD31fBzc5qkJw=;
-        fh=BFDWOzYJ/zSIVa7Rp3D6pM8EqjQznk8pd1TLH7QTuck=;
-        b=Fo9F/UTNVgFrxsUPggol5syCzcUQPcogcEEtai3Br0obhctGmclM00xTqJGfVeAApq
-         Sqi5kcDK/h5GBMM0qTKn8qwA02CZ+ocsxse7iqmV1Q/4FQeoRqQrqnW0lzknzcxz7XjB
-         V2YvuC7NiBOcqE6kvoKxC+uVrwrQpPQRxvKELt6/KNlpo27DDsdTCy6RZkQAVxSBA/2s
-         ZFRIjSpFRDLGAak7sRafNWO/W7MX8+qg061lRZQihYJWxkw+KkPJcAjeW19LOym0Qmxr
-         ALvlD9tYIKmYAn4GVTnhMz8R9UVvxa0h1jHQhJrWxl+xTuQWa7DazidvU0rh8lnyyeMF
-         dMSw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778781395; x=1779386195; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WO7Vxg/KpE7haeje+D+H7hmJS41MpZOD31fBzc5qkJw=;
-        b=eBLoSkOk5irDbYdUwj0i+BMLFoI7lC5dXnLRwOBQCpsOYXFIHwftR/qBzEgIU/pzMm
-         uPKLviCyMxCyw00PwcUC0/Knn+3hTtcYWLHniXy3oT9UWWYAHLOcSCSXF2oqm6FuIRxa
-         Sr1jCX1sq4AAjnWQIA82MedCIRjBayf5QgFMbmldqWxdl0beu40DQ5Kd7kbfC072G3Dd
-         gJPLEsRfMvS/rh/CawDba6rwAhtykcvv+ljbTvTEJaAASgIzBTSe4LnLWt+djzMpui8K
-         SVcaE2cqLAM2n5SGr4PT0YmUjmJbSNL1FtOmZJEkiTftP6dH0kRrK6Pf0bCnWuIuRrxT
-         ndiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778781395; x=1779386195;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WO7Vxg/KpE7haeje+D+H7hmJS41MpZOD31fBzc5qkJw=;
-        b=YPmZzdOKO5fFxRghJjWYxrgXkCz3KuEEdKgypQLwXePauSt2IEt8/gBnDfkdxJ6wgv
-         aktq4YCYkkxKPMqbILk80n+JbGcOyObih94QyFt/ASDuOFQcrj5qTFI88TePQHomshT3
-         89oqUVTe5GFeEnGm3HbEnf/Z+YlXwYHU7xn3/mdXTHZc8Kenz/Gn1RDNzjM0vEFMP+P2
-         wI/wmOPBaZjzsFVgNfTknbNmFxI+m8HEdey4WQLvikidNHseSA4369F7oez2ZC91Upwr
-         xzLQIflij5m98gCz2/Odcy4TCOCvNbzDuRYnrRr+vzrPbdkwY5rvAv5KSUk7YfHj2QJ6
-         8P/Q==
-X-Gm-Message-State: AOJu0Yymi4n4D2lHJiyOCtL5/kPK04wrVVdGHMvz/j5CfObMsroTJDEZ
-	+b1aXdbpwzMJKWpaZXjENoOcM47I+7JjjwovkEJhyll9/jMElOzBomCD9kAP+nAHixEBJnL7HL4
-	2Qx4DRjHz3nLj+xjMkjwOfQUUzAqNfl0=
-X-Gm-Gg: Acq92OHbCVRkajkDqcVPxDhdBEut6MVyJGRo+p7YAzkMHGUG9H40ygRaIDr7CK8c2nF
-	9EstYaBDTmfcauO5vFdUmq3i2HSXO2/3iIN8oNzCeS0+g58a/91rQJTD9h9EGnQnbcKeHGBmeSb
-	ruFOtuvY7esdOOUw4clxP2H/z5kGUvDtLVVwCBl8jn/C2drvetD0t4t8koT887glaejY38IuRtT
-	D9Lp8kUQJSooCmQiTVko1L5lFZkolbt5gV4BPLLBUtrL6ZKIwkvRqHnOYIsyPwypnR4VEmv2scM
-	ObqDvBnGUDxe/N5pwKIMEC1z2JpiDP35k7+Lij0=
-X-Received: by 2002:a05:6820:1b0a:b0:696:1450:ff14 with SMTP id
- 006d021491bc7-69c94372453mr288909eaf.37.1778781395329; Thu, 14 May 2026
- 10:56:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19E213115BD;
+	Thu, 14 May 2026 18:14:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778782460; cv=none; b=CM0hfOkvpxV21gvAA3yIOJ+NurdQMYafLdwEZ+Ksor2qeJh9qukSGVr21LCLURKbZk3I9DYeEHvOPoYYpy8GqX6v3HN3IwheKtvU+SQta5Mf2kJWoDByk8Z0vCrqMcMhPn/MkYG1QQgIU+JziCeBgs5bkxX3URfNbly5kPO5HQ4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778782460; c=relaxed/simple;
+	bh=BQ7qpMLSNXeBFl5qOYux37jkMV7llWRcNVE9SfAA2MM=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A6qF2ADjvoZbKzPLoWGodJXb3bEFM8m4gef444bWWJzNE1CGw9+vG0DCWMmgCjgGS7ETCIHEGfKgmuPhvIxnkRRKT1+NpJR1JiU7vFNlnA1CIURgwhP3GmIF5B43f0kRHhB3wxJ5z2HyE2dS7/rq2yO4EFv6NIa9c4JGLwl9s+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=TDklkNMk; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1778782459; x=1810318459;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=BQ7qpMLSNXeBFl5qOYux37jkMV7llWRcNVE9SfAA2MM=;
+  b=TDklkNMkHE+ntWlumtmNhhu56wBJCDMd2kME0Hm/+lfq3fh3mOD1OPgF
+   1jtqjJt2vDeEca75ZyQ+22OzCObtOmppDWD7TsDw1BaDL9E5CyLpv7DYq
+   xUONDl2lm+T92f12xzjLPPiFL1R9p8D+MRtIMWfRcSgt39ZH8/jdG+7h5
+   X8GxvTO9bUvvRYHXWwQrxNx62lvx/tzzyPL38bTwI2zeSdgM8G9CYNMWr
+   xzujF4NX97U6khlIxkXDQ3bSjO0WxBwm+8QVdyfM7ApBvzKezGRZc7yps
+   37iuZI1MJvFMiDtJUPX+IX8bxz/JhLi/IjWcyiOnT+njfbG+NjdPB+xv1
+   w==;
+X-CSE-ConnectionGUID: l6cMKygMTVSs5+14yW2K1w==
+X-CSE-MsgGUID: vnaWtqheS02Sq0tvd0rzXA==
+X-IronPort-AV: E=Sophos;i="6.23,235,1770620400"; 
+   d="scan'208";a="288887666"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 May 2026 11:14:18 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Thu, 14 May 2026 11:14:17 -0700
+Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Thu, 14 May 2026 11:14:13 -0700
+Date: Thu, 14 May 2026 20:14:13 +0200
+From: Daniel Machon <daniel.machon@microchip.com>
+To: Paolo Abeni <pabeni@redhat.com>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Horatiu Vultur <horatiu.vultur@microchip.com>, "Steen
+ Hegelund" <steen.hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, "Herve
+ Codina" <herve.codina@bootlin.com>, Arnd Bergmann <arnd@arndb.de>, "Greg
+ Kroah-Hartman" <gregkh@linuxfoundation.org>, Mohsin Bashir
+	<mohsin.bashr@gmail.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH net-next v4 09/13] net: lan966x: add PCIe FDMA support
+Message-ID: <20260514181413.n7o6jwwfoez4up6z@DEN-DL-M70577>
+References: <20260508-lan966x-pci-fdma-v4-9-14e0c89d8d63@microchip.com>
+ <20260509082720.503A6C2BCB2@smtp.kernel.org>
+ <73a19f89-ccd7-4762-8e07-812d8d95ead2@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260508065757.2566258-3-mmyangfl@gmail.com> <20260512091026.279150-2-horms@kernel.org>
-In-Reply-To: <20260512091026.279150-2-horms@kernel.org>
-From: David Yang <mmyangfl@gmail.com>
-Date: Fri, 15 May 2026 01:55:58 +0800
-X-Gm-Features: AVHnY4IE3iX5QUa1wA2Epkhmh0cUWUkPBtz0iIjuZm0x6B5rdJzJzP-_ce25xyE
-Message-ID: <CAAXyoMOiokO-yh7AVs6qXDZzfM3PVYUDRKHY7FdXivjpcH=5mg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 2/2] net: dsa: yt921x: Add port TBF support
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, olteanv@gmail.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	jhs@mojatatu.com, jiri@resnulli.us, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: B76CF545919
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <73a19f89-ccd7-4762-8e07-812d8d95ead2@redhat.com>
+X-Rspamd-Queue-Id: 53ED8545C0E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288068-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,mojatatu.com,resnulli.us];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-288069-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,microchip.com,iogearbox.net,gmail.com,fomichev.me,bootlin.com,arndb.de,linuxfoundation.org,vger.kernel.org,lists.infradead.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel.machon@microchip.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,microchip.com:dkim]
 X-Rspamd-Action: no action
 
-On Tue, May 12, 2026 at 5:12=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
-te:
-> Is it intended to return 0 here without populating the hardware statistic=
-s?
->
-> When the driver handles this command by returning 0 without modifying
-> qopt->stats, it incorrectly signals to the TC core that hardware statisti=
-cs
-> were successfully fetched. As a result, the subsystem will report
-> unmodified (typically zeroed) statistics, which hides any packets shaped
-> or dropped by the hardware.
+> On 5/9/26 10:27 AM, sashiko-bot@kernel.org wrote:
+> > Thank you for your contribution! Sashiko AI review found 10 potential issue(s) to consider:
+> >> +static int lan966x_fdma_pci_napi_poll(struct napi_struct *napi, int weight)
+> >> +{
+> > [ ... ]
+> >> +    /* Get all received skbs. */
+> >> +    while (counter < weight) {
+> >> +            if (!fdma_has_frames(fdma))
+> >> +                    break;
+> >> +            /* Order DONE read before DCB/frame reads below. */
+> >> +            dma_rmb();
+> >> +            counter++;
+> >> +            switch (lan966x_fdma_pci_rx_check_frame(rx, &src_port)) {
+> >> +            case FDMA_PASS:
+> >> +                    break;
+> >> +            case FDMA_ERROR:
+> >> +                    fdma_dcb_advance(fdma);
+> >> +                    goto allocate_new;
+> >> +            }
+> >> +            skb = lan966x_fdma_pci_rx_get_frame(rx, src_port);
+> >> +            fdma_dcb_advance(fdma);
+> >> +            if (!skb)
+> >> +                    goto allocate_new;
+> >
+> > If napi_alloc_skb() fails due to memory pressure, does branching to
+> > allocate_new prematurely break out of the processing loop? Since the hardware
+> > interrupt was already cleared, and napi_complete_done() is called below,
+> > will this cause the RX queue to stall permanently for the remaining
+> > unprocessed frames? Should the code drop the packet and continue instead?
+> 
+> I went over the series and sashiko feedback, and generally speaking the
+> series LGTM, but I think this one is real and should be addressed.
 
-https://lore.kernel.org/all/20260507012311.2187979-1-kuba@kernel.org/
+Thanks for reviewing. Before I respin, I'd like to sanity-check the design
+expectation.
 
-Would a stub TC_TBF_STATS case that returns 0 (leaving bstats/qstats
-untouched) preserve the flag here?  mlxsw does this in its
-spectrum_qdisc.c.
+I had already looked at this and concluded it was fine — the reasoning being
+that any leftover DCBs (frames) would be drained on the next IRQ when new
+traffic arrives. Same pattern exists in all other Microchip FDMA drivers
+(lan966x platform, sparx5/lan969x, ocelot) and has been running since their
+introduction without a reported issue, AFAIK.
 
-(also trying to address that in
-https://lore.kernel.org/r/20260509122238.2792915-1-mmyangfl@gmail.com)
+Is calling napi_complete_done() with DCBs still pending in the ring itself a
+NAPI-contract violation — in that case this is a pattern that needs fixing
+across all four drivers.
 
-> Should this read the hardware statistic registers (like the newly defined
-> YT921X_PORTn_SHAPE_STAT) to update qopt->stats, or alternatively return
-> -EOPNOTSUPP to indicate a lack of support?
+Happy to go either way — just want to make sure I understand the problem :-)
 
-YT921X_PORTn_SHAPE_STAT gives the token bucket statistic, not flow meter.
+> 
+> Also it would be very helpful if you could (for future series/revision)
+> reply to the (wrong) sashiko comments individually explaining with a few
+> words why the are off: decoding the context requires much more time for
+> whoever has not wrote the code itself.
 
-(Not a real problem, but trying to suppress further AI gossip)
+Ack.
+
+> 
+> I understand that dealing with AI feedback is a pain, but, paraphrasing
+> a great aphorisms creator, I can assure you that ours (maintainers) pain
+> is greater.
+
+I can only imagine.
+
+> 
+> Thanks,
+> 
+> Paolo
+> 
+
+/Daniel
 
