@@ -1,66 +1,53 @@
-Return-Path: <netdev+bounces-287780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-287781-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gPxnL0EsBWqJTAIAu9opvQ
-	(envelope-from <netdev+bounces-287780-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 03:58:25 +0200
+	id qnVFB+IsBWrBTAIAu9opvQ
+	(envelope-from <netdev+bounces-287781-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 04:01:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D92053CE62
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 03:58:24 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 942C953CE86
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 04:01:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 636E83034A83
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 01:58:05 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 794253019E6D
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 02:01:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 206FF3246EF;
-	Thu, 14 May 2026 01:58:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3921724BBEB;
+	Thu, 14 May 2026 02:01:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="p6dgzZ/7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q0SO+KEp"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9741F03D9
-	for <netdev@vger.kernel.org>; Thu, 14 May 2026 01:58:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E8D17736;
+	Thu, 14 May 2026 02:01:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778723884; cv=none; b=hJGtPXxd/jQtDYPGXB7sM1sQKrK6cDXc4YRtv3iO0Tbo0kef+GEEFrzxk3GqRfxI+p21wywcjfzUwNsEA+aGeXaFfQMcDT7MBNmPo8EN8iKqK4WiQHEJFP0PZnmcm9FO9cxhEsIGTWwyd5TOfWb13zGW+gnA1Ra2DyONkLBVosA=
+	t=1778724062; cv=none; b=VjFR94BZ4mY1jDUspjr9iMmcT9s8bTYEzWnGebjO+TvqSEnARPoONyZkX2W3dXMbU5BQl7Jb6DYZVPBha6knKmrW29fCfxf/0G0YURtp02Hpo3Boje7kWLpUc1hy1IHGCscT3ouHFPVuu6xpK7rieOrDk4wxXw4pWBf8HlvqcwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778723884; c=relaxed/simple;
-	bh=QSENlRK6PdQcsKY4C3zA8cBazFvH+owMvKs28lxS/eo=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=n+mECSCmpxCgwo8KMq2fEX+qspBmSHo+8a2iOa6FQciL5sf+whjjQ/ipIXHzYAIriJbvTLxTXPDMdcJWr+9T49P1VJgf7NtGD/z4KproeDI1gufRVmRnhzn8xDiFqabc5MfCRVg32qJyp3jeUp3zVOZaq/FZ3mLIkxXRNAqi5cM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=p6dgzZ/7; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1778723870;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=AToiLp5s9PtrKKoXGsWO6tlmsClmnuo3iSqdPilSAGk=;
-	b=p6dgzZ/7Yacdx0s+aWXec47EyIriW1zz34Onqj9sr6CuAAnZRu4MoJ2EtjU3BTP2kIWbh7
-	6WBMoNX3yl7+AcG6r33gP7883NE1GJ57Ssk9ZtZEpBXuRlgSQjY7/W4bnnMC15Cn8KPv7N
-	ajjiPdB3+dfCiUtekxjft09YYSaBkDc=
-From: Qingfang Deng <qingfang.deng@linux.dev>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Felix Maurer <fmaurer@redhat.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Qingfang Deng <qingfang.deng@linux.dev>,
-	Petr Machata <petrm@nvidia.com>,
-	linux-kernel@vger.kernel.org,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v2] selftests: net: add tests for PPPoL2TP
-Date: Thu, 14 May 2026 09:57:32 +0800
-Message-ID: <20260514015743.37869-1-qingfang.deng@linux.dev>
+	s=arc-20240116; t=1778724062; c=relaxed/simple;
+	bh=JKdAI+bitHEPdgJrApAwtvVC5q9CMGqmjXD1fOFeQZI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=XX6xY8DI9h9GTG2c7UNIjGxztpce4qFtlAfDQ64bGY3/X7Q+NlZuw2I5KsyuAyDIT8roWN0LeUfhIYP5TwJ+1Pf7myikHGZA1tVWNYXcl5FY9H9zB2D26A2VUEr7MNXvWn61fJ0u2xDE6lpbHMO76kNq7M4F6Wl5wEKdP4kXd/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q0SO+KEp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4B3AC19425;
+	Thu, 14 May 2026 02:01:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778724061;
+	bh=JKdAI+bitHEPdgJrApAwtvVC5q9CMGqmjXD1fOFeQZI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Q0SO+KEpOflkQRcggLZQ+43cNXIynjzM7bbRsh3PE/+k37ibAAVkkwXfjkodXhCOr
+	 7G0PRLQYVhRC68IWiYPGd4TTxJRAeD0rncTEPghrLqBeGnSNNOEGivbxxq1NEuA7ed
+	 RNpnmUdADMIJducK1TwUJffaQJigOL4J5ySWqt+vV0zc0NCYLMfwdocOBysIE4WFA0
+	 qBJeWQ14hK1mz08RJaPBuLPqom2Lk+vAKg6MfEl8IimNlcfLNz/hUpzVAzltIoHmqI
+	 6DCtHOWvfWjh+chppXFs2eWEAZItKFidoGWd3uiZCpDdzQH/8Nhb2N/2UW009KQC4f
+	 yZvVqfrjgTA0Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BA061382330B;
+	Thu, 14 May 2026 02:00:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,184 +55,70 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: 1D92053CE62
+Subject: Re: [PATCH net] MAINTAINERS: update atlantic driver maintainer
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177872400629.3920037.7204020986534020620.git-patchwork-notify@kernel.org>
+Date: Thu, 14 May 2026 02:00:06 +0000
+References: <20260512125711.3142-1-sukhdeeps@marvell.com>
+In-Reply-To: <20260512125711.3142-1-sukhdeeps@marvell.com>
+To: Sukhdeep Soni [C] <sukhdeeps@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+ davem@davemloft.net, epomozov@marvell.com, irusskikh@marvell.com
+X-Rspamd-Queue-Id: 942C953CE86
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-287780-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_COUNT_THREE(0.00)[3];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-287781-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pppol2tp.sh:url,linux.dev:email,linux.dev:mid,linux.dev:dkim]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,marvell.com:email]
 X-Rspamd-Action: no action
 
-Add ping, iperf3, and recursion tests for PPPoL2TP.
+Hello:
 
-Assisted-by: Gemini:gemini-3-flash
-Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
----
-v2:
- - use named veth pair instead of netkit
- - reset RET prior to the recursion test
-v1: https://lore.kernel.org/netdev/20260508032158.67887-1-qingfang.deng@linux.dev
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
- tools/testing/selftests/net/ppp/Makefile    |  1 +
- tools/testing/selftests/net/ppp/config      |  2 +
- tools/testing/selftests/net/ppp/pppol2tp.sh | 95 +++++++++++++++++++++
- 3 files changed, 98 insertions(+)
- create mode 100755 tools/testing/selftests/net/ppp/pppol2tp.sh
+On Tue, 12 May 2026 18:27:11 +0530 you wrote:
+> From: Sukhdeep Singh <sukhdeeps@marvell.com>
+> 
+> Igor Russkikh and Egor Pomozov have left Marvell.
+> Take over maintenance of the atlantic driver and its PTP subsystem.
+> 
+> Signed-off-by: Sukhdeep Singh <sukhdeeps@marvell.com>
+> 
+> [...]
 
-diff --git a/tools/testing/selftests/net/ppp/Makefile b/tools/testing/selftests/net/ppp/Makefile
-index b39b0abadde6..6036fa134351 100644
---- a/tools/testing/selftests/net/ppp/Makefile
-+++ b/tools/testing/selftests/net/ppp/Makefile
-@@ -5,6 +5,7 @@ top_srcdir = ../../../../..
- TEST_PROGS := \
- 	ppp_async.sh \
- 	pppoe.sh \
-+	pppol2tp.sh \
- # end of TEST_PROGS
- 
- TEST_FILES := \
-diff --git a/tools/testing/selftests/net/ppp/config b/tools/testing/selftests/net/ppp/config
-index b45d25c5b970..843545df8f03 100644
---- a/tools/testing/selftests/net/ppp/config
-+++ b/tools/testing/selftests/net/ppp/config
-@@ -1,4 +1,5 @@
- CONFIG_IPV6=y
-+CONFIG_L2TP=m
- CONFIG_PACKET=y
- CONFIG_PPP=m
- CONFIG_PPP_ASYNC=m
-@@ -6,4 +7,5 @@ CONFIG_PPP_BSDCOMP=m
- CONFIG_PPP_DEFLATE=m
- CONFIG_PPPOE=m
- CONFIG_PPPOE_HASH_BITS_4=y
-+CONFIG_PPPOL2TP=m
- CONFIG_VETH=y
-diff --git a/tools/testing/selftests/net/ppp/pppol2tp.sh b/tools/testing/selftests/net/ppp/pppol2tp.sh
-new file mode 100755
-index 000000000000..5b592785f1f9
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/pppol2tp.sh
-@@ -0,0 +1,95 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+source ppp_common.sh
-+
-+VETH_SERVER="veth-server"
-+VETH_CLIENT="veth-client"
-+OUTER_IP_SERVER="172.16.1.1"
-+OUTER_IP_CLIENT="172.16.1.2"
-+
-+PPPOL2TP_DIR=$(mktemp -d /tmp/pppol2tp.XXXXXX)
-+
-+# shellcheck disable=SC2329
-+cleanup() {
-+	cleanup_all_ns
-+	rm -rf "$PPPOL2TP_DIR"
-+}
-+
-+trap cleanup EXIT
-+
-+require_command xl2tpd
-+ppp_common_init
-+modprobe -q l2tp_ppp
-+
-+# Create the veth pair
-+ip link add "$VETH_SERVER" type veth peer name "$VETH_CLIENT"
-+ip link set "$VETH_SERVER" netns "$NS_SERVER"
-+ip link set "$VETH_CLIENT" netns "$NS_CLIENT"
-+ip -netns "$NS_SERVER" link set "$VETH_SERVER" up
-+ip -netns "$NS_CLIENT" link set "$VETH_CLIENT" up
-+ip -netns "$NS_SERVER" address add dev "$VETH_SERVER" "$OUTER_IP_SERVER" peer "$OUTER_IP_CLIENT"
-+ip -netns "$NS_CLIENT" address add dev "$VETH_CLIENT" "$OUTER_IP_CLIENT" peer "$OUTER_IP_SERVER"
-+
-+# Generate configuration files
-+cat > "$PPPOL2TP_DIR/l2tp-server.conf" <<EOF
-+[global]
-+listen-addr = $OUTER_IP_SERVER
-+access control = no
-+
-+[lns default]
-+ip range = $IP_CLIENT
-+local ip = $IP_SERVER
-+require authentication = no
-+require chap = no
-+require pap = no
-+ppp debug = yes
-+pppoptfile = $(pwd)/pppoe-server-options
-+EOF
-+
-+cat > "$PPPOL2TP_DIR/l2tp-client.conf" <<EOF
-+[global]
-+listen-addr = $OUTER_IP_CLIENT
-+access control = no
-+
-+[lac server]
-+lns = $OUTER_IP_SERVER
-+require authentication = no
-+require chap = no
-+require pap = no
-+ppp debug = yes
-+pppoptfile = $(pwd)/pppoe-server-options
-+EOF
-+
-+# Start the L2TP Server
-+ip netns exec "$NS_SERVER" xl2tpd -D -c "$PPPOL2TP_DIR/l2tp-server.conf" \
-+	-p "$PPPOL2TP_DIR/l2tp-server.pid" -C "$PPPOL2TP_DIR/l2tp-server.control" &
-+
-+# Start the L2TP Client
-+ip netns exec "$NS_CLIENT" xl2tpd -D -c "$PPPOL2TP_DIR/l2tp-client.conf" \
-+	-p "$PPPOL2TP_DIR/l2tp-client.pid" -C "$PPPOL2TP_DIR/l2tp-client.control" &
-+
-+# Wait for xl2tpd to start and open their control pipes
-+slowwait 2 [ -p "$PPPOL2TP_DIR/l2tp-server.control" ]
-+slowwait 2 [ -p "$PPPOL2TP_DIR/l2tp-client.control" ]
-+
-+# Connect LAC to LNS
-+echo "c server" > "$PPPOL2TP_DIR/l2tp-client.control"
-+
-+ppp_test_connectivity
-+
-+log_test "PPPoL2TP"
-+
-+# Recursion test
-+RET=0
-+# Delete route to LNS IP
-+ip -netns "$NS_CLIENT" route del "$OUTER_IP_SERVER"
-+# Add default route through ppp0
-+ip -netns "$NS_CLIENT" route add default dev ppp0
-+# ping (we expect the ping to fail but not deadlock the system)
-+ip netns exec "$NS_CLIENT" ping -c 1 "$IP_SERVER" -w 1
-+check_fail $?
-+
-+log_test "PPPoL2TP Recursion"
-+
-+exit "$EXIT_STATUS"
+Here is the summary with links:
+  - [net] MAINTAINERS: update atlantic driver maintainer
+    https://git.kernel.org/netdev/net/c/9a390d34d55c
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
