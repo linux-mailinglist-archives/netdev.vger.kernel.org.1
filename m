@@ -1,334 +1,279 @@
-Return-Path: <netdev+bounces-288041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-288042-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qLFpD2H8BWrFdwIAu9opvQ
-	(envelope-from <netdev+bounces-288041-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:46:25 +0200
+	id YNlMGo/8BWrFdwIAu9opvQ
+	(envelope-from <netdev+bounces-288042-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:47:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EABC544E78
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:46:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B97BC544E87
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 18:47:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 34D993025E4A
-	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:43:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1D1C63043470
+	for <lists+netdev@lfdr.de>; Thu, 14 May 2026 16:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D2DC342C98;
-	Thu, 14 May 2026 16:43:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9FAB345749;
+	Thu, 14 May 2026 16:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P32KrxUl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I9Y7mUmi";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="elvNK8dw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A133A24DCF6;
-	Thu, 14 May 2026 16:43:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BAA82BE057
+	for <netdev@vger.kernel.org>; Thu, 14 May 2026 16:45:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778777024; cv=fail; b=a4g6tcpjQFGCsC1kc37YA0bS4o1nc3tn6euiKXcKE4s4tVCR1wM98PBh8P7yoK2qR+PWFwyLLUbVKKZYi+B4e2r/b1i2Vko/v6QqVPPpJ2cl+R16ly8ymCvsarqt006Qp464OAdOCIDs47teDrD/uoy1D4rnL60B0oKYwvep0o8=
+	t=1778777117; cv=pass; b=gJLyj74zQ7f1+6reUxbbcVZ+Y+buEg5MZzO7fs74yr16BZz+xdrEa73eKhb7vWnZ80uOKAUHZ6h57eDhHDAtE+hC6RTtKk3XnUodoOJQniwtxQ7BVqZhVn8VgFyi5F7e7SSAMtePeZVszB9kN2Fnw3gAjjvZLtRMxitIzov5ONQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778777024; c=relaxed/simple;
-	bh=cafjRY5hoAWUy13xukSi/27nxFKK25VuBZksf15+qKo=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=LzNM0jnbGpOW1MSSIQWviRbUptM2dI5du5ueP+JtEYV27JKClDXNqumNKAe9jsq61FUtw4T4TNhFMbopiR6Vyo0eP2xXkPLGSHn4rzoAmlpTHmB/ATdezTQcCc0VBGuq0cd3v9DXMWG1hi+7hm7tymzvk1kkjECzHblZpPne/bw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P32KrxUl; arc=fail smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778777023; x=1810313023;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=cafjRY5hoAWUy13xukSi/27nxFKK25VuBZksf15+qKo=;
-  b=P32KrxUlBcCCoNYOG1wpYWDyfG1ng4DfonD/tzi+O1RLYA8epHmlXDxO
-   gRabeoM3IaziBM1KxQD77OBXNRBMHD0e/BhqEfvRn97szbpTeteb0N02W
-   +QOLLhassDF1cyw+LihjEEcAFP5Ay9OTJWbbr8uY36qKwJ79gS3p5opPM
-   dXA4/xbRZzygORekgzx0FsOlAH2fUSCNS0525bZzyeOg1iiYKwTlMAiFQ
-   NOQOfGSXpQl0qRh0rDddfYJ5Lk/zF0b5VBH75mMMCyFTWX0NqLSx9x8m/
-   tg6JKqhYiBqiDJvZRtwLjrp78jDDmGya4/jkYf1K1qnlp5WbRxkzhgQm0
-   g==;
-X-CSE-ConnectionGUID: XHuked7USOydLU7ytrMSBg==
-X-CSE-MsgGUID: eJGblcw8S8qdeKw+a5DPFQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11786"; a="90417958"
-X-IronPort-AV: E=Sophos;i="6.23,234,1770624000"; 
-   d="scan'208";a="90417958"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2026 09:43:42 -0700
-X-CSE-ConnectionGUID: MCl4EMG7RKuz/6fySWhjig==
-X-CSE-MsgGUID: nyUv/ARTTNWuhixiMec7eg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,234,1770624000"; 
-   d="scan'208";a="261960873"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2026 09:43:42 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 14 May 2026 09:43:41 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Thu, 14 May 2026 09:43:41 -0700
-Received: from PH7PR06CU001.outbound.protection.outlook.com (52.101.201.61) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 14 May 2026 09:43:40 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=T0n/h8oh4pA8lAhTpO9nfxXjuwav6fnS5yYyvZjpnT7BCUV/pvK8H893EIsNH9VdjlLqnVUtg2urA7NE6rou+M7BPOZKn/6ye3nItnYyMMFhnyqBLHxys9H2RksvwEHKT2Bm+Uq1Wmy7hSuD7rIJ4YSOAMLsp/+nNjUfKvUdhvnXR0kpI79EquqgwGtrFD1kFDiGR0Xc6otN4lcFVze+Zv1MstQA7NdffcyMvpxp6zhIljkOocKDe0XzPszMrKc8iB8JVX/dYmhrjnYxCvA86L8CP5Mt7zaCCn+80X9o/dpMUjBLRJTPLGOTqUyxE8vcxUqStA/HSqX60Yu59ivYCA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=M9gxeOc4dWHLm47OxT+Mkl9/u1uJmuob77aqZpANVq8=;
- b=bpMw0zSZHpJ8NEfnzYHC9mK7vSAwuNNiKzQqwmtRuCJwi5MkKz4V52qtAedbX3b4G4U6Ep4OB4yNwXKmUgd6ycMjejFG2+PLCUV4BnJkLMjDHRqOifb8p3Vu4K+BUiVfGKhohxjxJ7LDFxFLpu4WJmVHqjWMU4myRuqGJP5pIFo1fj88U5Sf2B5g2gosZhKC3fsGdV+oCGO3HBzfkstS/WnYwhLJL4d1xAi67YuYcyOuUEKC0dpaZQeH0d/Q6hmZx3D62YgqoIJwmN6dE2kCag5qaKK/xm10cH1IO1EtAX3ZdSRVGMW048dnRBcy6tRkmRZlzDrXZW7V5ygc3MmT7A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7592.namprd11.prod.outlook.com (2603:10b6:806:343::16)
- by DM3PPFF3DEC9799.namprd11.prod.outlook.com (2603:10b6:f:fc00::f61) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9891.23; Thu, 14 May
- 2026 16:43:34 +0000
-Received: from SN7PR11MB7592.namprd11.prod.outlook.com
- ([fe80::3e09:8700:df72:37b6]) by SN7PR11MB7592.namprd11.prod.outlook.com
- ([fe80::3e09:8700:df72:37b6%6]) with mapi id 15.20.9913.012; Thu, 14 May 2026
- 16:43:33 +0000
-Message-ID: <30dc284c-8cc0-4bae-b7b0-99d6d71a66e3@intel.com>
-Date: Thu, 14 May 2026 09:43:32 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3] ice: fix packet corruption due to extraneous page
- flip
-To: David Laight <david.laight.linux@gmail.com>, John Ousterhout
-	<ouster@cs.stanford.edu>
-CC: <stable@vger.kernel.org>, <anthony.l.nguyen@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>, <przemyslaw.kitszel@intel.com>,
-	<netdev@vger.kernel.org>
-References: <20260512181953.1689-1-ouster@cs.stanford.edu>
- <20260513100732.499e3f49@pumpkin>
- <CAGXJAmzK+56DHnitD1g263mPSgWg9jZyq2z6R+vd8bV_c4ZbuQ@mail.gmail.com>
- <20260513214927.17a8dd45@pumpkin>
- <CAGXJAmx4LaVv=QJ=SanvF6iayJ8+SiLyUqht+jMxouXPX=54-g@mail.gmail.com>
- <20260514110112.12bdf5ff@pumpkin>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20260514110112.12bdf5ff@pumpkin>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MW4P221CA0022.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:303:8b::27) To SN7PR11MB7592.namprd11.prod.outlook.com
- (2603:10b6:806:343::16)
+	s=arc-20240116; t=1778777117; c=relaxed/simple;
+	bh=zZzMMRJMHDj4bAdx59InN/qWYOHXeVGUIGiGQSI5A2A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BAKARlRotIbrN163mzVEoIqkv0B4DMcoeE9G45sN6YSagefCC5b9jesp6Hl+eSnOCYxKHPnEEKt/9y+xurCjUHv8RzfiT01YGqg5mpIBt7AIuO0wPqOwcVzq4wy2057yex2qfrE774gS8pXkrYy+8+C01SnR0qLGMAYfxa8RnyM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I9Y7mUmi; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=elvNK8dw; arc=pass smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778777115;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GE7Sq5sTYAoJOxhLn6zS0szJk7y05mcClLoUpAWwPBg=;
+	b=I9Y7mUmi7VZpRRrL3l0hW4yoyJhdKKgtw6HNRWP4kwz1R+DcijcU905d3sKzaUoJR8Fyz+
+	RXtMI37WvA7iPctz9MNb13REWSPhBirnmQEhIUc6mNE2V/EoaRDNlK66lmkYEGS1R4OPuX
+	hnyb5FMeKJfr/rKf/C+QJEFS0nlSjWE=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-693-KLAel46FNCubXQycBZ6QYQ-1; Thu, 14 May 2026 12:45:14 -0400
+X-MC-Unique: KLAel46FNCubXQycBZ6QYQ-1
+X-Mimecast-MFC-AGG-ID: KLAel46FNCubXQycBZ6QYQ_1778777113
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-8230d6d54a5so10130b3a.1
+        for <netdev@vger.kernel.org>; Thu, 14 May 2026 09:45:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778777113; cv=none;
+        d=google.com; s=arc-20240605;
+        b=N7Lb70tBbFLSTmNOt3MfgiK2YBexaRHZRHXdBFL8yyb3Sw0N2q9MnSSjBJh0aCr6Ka
+         YtZX9aSQVvJjiUgtoHQ6tDsFnSKP/ass5k7YEi/65FYYiynE9NHHUwDL4r7AiWRZyOI+
+         MMEhp/aiPkbh+ACl6CpUxborZwWKsjVlhhgQr0ziBHkwg6z8KaMlMCIlHUKLtR5W0Jy/
+         X4mGHnjSfJphAH+Rfk6xARS5LWjXYheKly3h1dmWflO2YekW8suieATeSUx0sJaSMIAM
+         c95mZYua9WFbnurYs+rJbovd9e4p6qekHE69m+csORFzrNZ8apKHRIAhsgG8l+BtfhQ/
+         pmiw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=GE7Sq5sTYAoJOxhLn6zS0szJk7y05mcClLoUpAWwPBg=;
+        fh=ilGQbjYE7CEyZaiYPiDtafB0Na+ggF7MAKzsjiHGaZg=;
+        b=Dt1wd6DFCVD54cKP3snKahpx+Ogytk8m04yxinNMjr/YoeP2oTiFNpaywnKRNshSEj
+         C5zx9nGY6uUBuAPZlNFL0hYoUQWAce/PydSaWy15LRHWltseTQYyfABU7LnkrE3JYpsr
+         bak/7Km6k8vxOZwjTgk/XnZOWJzKsDUW7Ix4eW3jlFTNosXxQL6cCtpHMQe9R6eywh1j
+         8TUCNMd6t9M0UVtFL54UWHWtnoOl5IGUh9LnYqe1Jcfn4bnixE/ydfuE/l4lOarGfNzU
+         I2Qzk4BsvRb55lmCRS2nVAFsqVssJJuvl97rHRjttgZvJCS3ZW+B2k1lfadLhjXhp1Uw
+         aNNw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1778777113; x=1779381913; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GE7Sq5sTYAoJOxhLn6zS0szJk7y05mcClLoUpAWwPBg=;
+        b=elvNK8dwPFPa8bd/SvwkKvoDRKTMlQAvh1I+gty71xBaKnk6/D2aAoY+gXBJIO7z7h
+         yrjbG954ar8YEVSBWPhqSKsDkCrC8BsgBPDDsM+kBH/p0Wea289or3c8XiUJT5hynh42
+         3tvbs2I/ftgPqcDXbOeSIiCdnma5FANn+P7hfx4i5stTECDYYOM/ZxeYi1SoamSPu2Z4
+         WbzGC1pV2Ut6emSGHhi0thWMKgYjNgMrPNVz3A/D8d1qjWaM0Q1hF0Y2l/QxHWfiFFbK
+         SO+AJDtREFVuu2pFnRJ7MbvusO9avSLAQgaAf3NX7mcn7LPA5pWiW3ZogYZ2xx/gtspV
+         69eQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778777113; x=1779381913;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GE7Sq5sTYAoJOxhLn6zS0szJk7y05mcClLoUpAWwPBg=;
+        b=f2s7oTOsz9jDvNpxXjXURn9Ra6zBXO42yr7O7rU6LeSxcdm0HAom3tJUDFIBfxZm49
+         dcmXAqGTZtarp0aulosl03wPGcq080zDORrgAG+wKOH5580Bgx5FTBMrNNjqlyu9Mmll
+         1I9d7U0tp/fO5yEwFl97vSBa4crWnTK8gluWs7EF8VlOpQ7ktNXziezf1wJXwVINtGV/
+         JfQs77X++DVXHqR7oCeBK/6Ve5ohh/W2FbRvGMyQYX97gAmhHlMYTB/Q81SbEleOCDFX
+         cKNYVX+4Uu0zH9FQZVYFdjyiybFr4zqyTvi1O20uK8GVrSrXyPYzgsi2YPuMPjIT/JSE
+         r1bg==
+X-Gm-Message-State: AOJu0Yz/qxYyZBCC51CvS3tL+47zGvCXbPWLj8UdtAwtC6elradECnDE
+	w+dyM/RDmaJCBzsaX3mZ7Qf2tuiH7OFiRzUap5UNxbK1k1SmhO3VhIQ3+u+eCpf5FaYkgglKUAx
+	9MmXIXF7kN8qC1UM1NGJyYp23G+Ce5TEF/9dIxU7jqvE9Fu7LNii1vavZuSf14H28xceCRvGxwS
+	XtelY39FHAyP5RdDrNPmy9ghoUvVuoj5s1naLZ8XpSTL0=
+X-Gm-Gg: Acq92OGUbIv5aBreiKluBL2y6aEQfA/cA+LimwqV8oHpw+Ck7faNE6LkwOZ9EPsTKL6
+	BbpojOZPWk4c8Bqds3whbbjHAd2YOXSquvc0HaQdbJ7+8X9kVPJL9nAoNL9qLL16YGUzBi9FuEU
+	Qf7ZTNZmU78DiWlwB35A3R9QhguuKsTrDN08DV/R/squkXfHIyyvGCGmZJiMlXyn3R2V9LOsSee
+	taQPg==
+X-Received: by 2002:a05:6a00:bc93:b0:837:8a0c:8f70 with SMTP id d2e1a72fcca58-83f18ec2d11mr4217038b3a.28.1778777112652;
+        Thu, 14 May 2026 09:45:12 -0700 (PDT)
+X-Received: by 2002:a05:6a00:bc93:b0:837:8a0c:8f70 with SMTP id
+ d2e1a72fcca58-83f18ec2d11mr4217000b3a.28.1778777112018; Thu, 14 May 2026
+ 09:45:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7592:EE_|DM3PPFF3DEC9799:EE_
-X-MS-Office365-Filtering-Correlation-Id: bc0236dd-be6e-4191-bcbb-08deb1d7effe
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|20046099003|11063799003|4143699003|56012099003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info: ub+B4vt8SlUQ4DI03sD42xfi+l30WfenoFH+SiUYolRE/N57QP7JLfy5fD8yjS0mHU9AtCcnXFy5RXIIu6ALNHa6sfmddyrBVVoH5Q7uioYY8vHqf6iJaqzyIGh0CyosqWHYR9l2a6Tv1V/yqvvmyglEB4B0Les8GCz0Y0ZSaKFi7vHMHei0DSjqbHH99ekN+ULgFVjBdRLHYc/TZo1hi8tsoymNDdAKsz71InyKsP1KEps9wPhTe10MpfhBP2SspxYuWqdcf7difdLAG+1/9MZ31Kq1d4K2YhqkSY2RPuepUUW2I4Cbpi/CYCqAgzhh4d/Z4S48PB3wQYusHA2a1r9UmNhuJG1Hw0jCbT2uCiRo9zfqspqAPeZfjBm6fw+zbr5+L0F1C8kXs3xlBzoXr1OLas5hxCQQHL2lOyA+MGjdfo5d7vt9CEFkeLwu9uky9zOgks86R+cv9LO/icsvYvuo+BTCreaA+Ie1Dxkyipb12gyv8oe6ZA2/bfACcrpbQF8oJZJX9R366qMv6yuAhL+6S6NJkHb2Nmn6c9GkqSDOdjFSVLmlilDB9DrcED0W+yR78D09Zh1v0T4dgtYsF/Q1AztzKzpCMgAzZv9bOXKZIEfhD8138j1m7HcG9wcjMscxoykwJPZBlhcI3iXObtorbVqxC/WpT9s6FuWW32zMGFPSMwmen/VvtLV96wIj
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7592.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(20046099003)(11063799003)(4143699003)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eGJpZzNGcnEvZlZITld3eXYyS3NLWk5VSU1TR0YzZkwrcmZKMWI0U3dhQ012?=
- =?utf-8?B?ZmJQbDRxQVVyQi8xTWYxS3Z4bzN1Z3d0NUFCTUdiTGJqMnVCdHEwSDhZc0k1?=
- =?utf-8?B?TmI3a1RvRUNHSG9OaTRrRW93OUxDYXRtcWEwd3hpYmZERFJzWjc1NkZrQ1dR?=
- =?utf-8?B?WmlMem8ySkY2bTZxWEZZYTFwTmxsZGhWMERUV1JTT2VmbG4xZ1JXYmZiMkU3?=
- =?utf-8?B?YmliSE4zRjY3Zmg1S2FnY2p1NkJURlpxZm8vVjBvbmJRTTNBMExpVWVpbk1j?=
- =?utf-8?B?b1N2UkxjL1AvYmIvbG9STGwvTmwxckJVRm5HeStjZkJxcllqZVlCMkJuS0Q3?=
- =?utf-8?B?ZFIvMEdLa1dDOW1YWG9seWtOa2M1MU9KRmg4Rkhqdm1mV3hMeUNQUnF6NjV6?=
- =?utf-8?B?RDZpRGZxMXY0bUFUcTNPZmxybWdNYVYrNG5FTkdkU0pRZ2svYWFmSHQ2bVNp?=
- =?utf-8?B?Wldzemp0UFpKejhQUm9KNERNZ29hek5FeDkyeGVnRHBQNndEajJEOE9HbkxP?=
- =?utf-8?B?OXNWdnBCTUdHUGdhTWNxbzU2WXFMbm1BeFM4bnBXbmxtbG9HT2hNaTJldnJ3?=
- =?utf-8?B?ZnVLV3lxQ3Q2cUNSdVpLLzd3K3UxZmJUYU45Ymg3c0dDR3NXZnJZbkZ1K2s4?=
- =?utf-8?B?V0hhTmRJZDJicTVVYVNKZ2RQaXN6ZnVKU2FhQTR5MXJ5M3JiWG96Q0JGdDV2?=
- =?utf-8?B?UGtkTUNzMGhCbWNvbWwyZHlVZ1pxVUVXamhhakRyajJvb3JJT2VXZm1qR0tY?=
- =?utf-8?B?ZDJLaFBoZG1QQ1lHcDhTU2gyNnNUR1ZVNDNqYVpKOW5OWTNvcUdDTzlNT3RI?=
- =?utf-8?B?Zk1pUTN0U1VPeWUxUjJCSnNSbnd0blhldS9XVEJKREJxUjd5aGNaQmlqTW9s?=
- =?utf-8?B?MUZyenQvRUNkQmk4Q3M0Sko5YmU1YWxWMFdzcFprb0RyMUlLcnNwTGFEMFE5?=
- =?utf-8?B?dVpNMy9JdHZ3SjYrNjBkeVJ2QXREakRubTIvNWcveTliYUg4clQ1TW9oaFlo?=
- =?utf-8?B?cE1UWFl0Y3V0ZHU3bHgxQkdMWFlpVjNpWkFRWTMwSkJZQllRdmx0NWU4NVg1?=
- =?utf-8?B?T0g4U3ZUWWw0bzdVUk8vcFNFYlAzY09PMkxyVXVDNUFraVkzdGhLS2kvN05F?=
- =?utf-8?B?ci9VY2ZjUmQraVJOalBRYkpsNFNLQXg0cE12NW5IejNaZVh3SFZSbmZocURy?=
- =?utf-8?B?T3M4ZjJQU0QrOUxoZ3BuQllTR2N6VW8yN1RSUXN1bUNsSjRmVlZNL0puZUxt?=
- =?utf-8?B?Tm9wWGNYOU4yYjJqUTJWczRWWjJFa0RVMjlVR0ZjOHYvMFMzMUVqakFpYm11?=
- =?utf-8?B?N0tQUTdMQTRGbGZud01tN21DUEw0SmdoVFJmS3dhMWdJSXVQeHBROHQ3ajNi?=
- =?utf-8?B?TW90TFV6cW4yaS85NXFIbkdnRHVhSk5VelJVVWVLbnpFcjdubWxvNjE4QkhG?=
- =?utf-8?B?TzdERC9nTXJvM2RVK2d6SWV4YnRRODdNQm9kSVdncUlxcXRkZzMzWXR5MU5F?=
- =?utf-8?B?WXgvM1pSUklWVzdTZzBoemxRV2s0S3lYTjlkaFJvZGQ1RGw4SUdXSEcxTmx2?=
- =?utf-8?B?cTFaRDFZSXNGSWZWbkxpVlEwdlptc2M2K3RXMWdnaVlQbEJHSWkzV0E3Z21x?=
- =?utf-8?B?SW15cWpnMG1rdHluS0lORHltSUR5ZENET0pvcUR4dm9ucld6ZVFmYW1SNHRm?=
- =?utf-8?B?blJ2OG5PNzl0eU9OUkRMQ1NGemZHTHJaaUdlc0gvVVJMc2JYbzVDbnRiV2Z4?=
- =?utf-8?B?Yk9UMVNpNlZ6aTRudFJvQnU3Z2FjQnBjNlVrUWd1cWNWRGRkcUtwWVlLZzgz?=
- =?utf-8?B?YUJhYzRKbnZjYStoby9PRldZWEROMExncjBybnlSVVU3K1lhTGM5K2FqbVdK?=
- =?utf-8?B?Wi8vNXkzNjV4RGxVd25VaVN2YmlsdjJtQWM4ZHp6cXlpU3pON0VBbkJNRHVV?=
- =?utf-8?B?QWdqOWsyTFJuVFNiZDZVbFVvdExZaE1SNG56eE5aZkpuR2xYK1BKQWF1OW5z?=
- =?utf-8?B?Q0xvSEpOcHhhQVdlL05oUGZKVXdRdys3dUl1c0ZQRUNMQ09WMkVGaEJMQ2dk?=
- =?utf-8?B?bnkrTnRrc1JoRVJVaXZVa2IrNkdjSWNFRk5HU25qQ2VSYTZoaFZuNDRmSFlP?=
- =?utf-8?B?blJTb0FCMi8wTDVRNGZpL281d1V2MlgrNlduVW42aXdNRlhvRlJUUnppbDE5?=
- =?utf-8?B?UjdkTWl1ZWxqMnZkZFFrTmdRUmZZU3ZqUUJFWUtPK0piS2pDY3diWVBKQjJT?=
- =?utf-8?B?Z0RhaDdnTG43emMrSmpFUzIveWVpWlRnbEtXRXYyQ3RvRnUvR2d0citzYi9D?=
- =?utf-8?B?SWxKYy9SaXFPdVE4SU0yTk95L3M0L0dVSjBzY08rL1ZGUVVFdEsvM0lXcFBL?=
- =?utf-8?Q?fKvvmrx52P3PdUE8=3D?=
-X-Exchange-RoutingPolicyChecked: thEyP2vb9HjIbvfAEc3wXamiFAgVB9UMUKHVJVpmkvF32UO3WMNhN5Fe+QpNG7Y2/oTlw00KTLFQAwiGa4CJfrisulBIvfniOfgUMk6WvBnVBi0qZ149qvXv00M295KLxyoFAfZJ3WAD/S99hvy0hJ/N7g/AkVAH3gfHyHd9tGFhU2rw+ENkGx1e/QzMG5MZtJiyt8g3AMgeFf8cWyn9i5IMmwYLa4atIKZL2zaHsYB23zadVILz+OSGO8MNXupG1kusqfZi3xtw9n4lOW+wpKYgfdMjVxyWxCAEC76JoLMVQCwXqIAITB7nPvVGLyZsk0C/VDYJXbbNu3b8/ag8lA==
-X-MS-Exchange-CrossTenant-Network-Message-Id: bc0236dd-be6e-4191-bcbb-08deb1d7effe
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7592.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2026 16:43:33.8410
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1U/J5Ks76TWOZHFbppbEidCetsOG7e8YKWPM0F9MraTzIMG9+K1lsCx/s7GXlD+DofzbAfh0wnoc5aarV8154GEkpzyQmBBe0bBsbCcHmNs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PPFF3DEC9799
-X-OriginatorOrg: intel.com
-X-Rspamd-Queue-Id: 9EABC544E78
+References: <20260513105417.56761-1-sgarzare@redhat.com> <20260513105417.56761-2-sgarzare@redhat.com>
+ <agXh36gUe1K6__Bk@sgarzare-redhat> <20260514111513-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20260514111513-mutt-send-email-mst@kernel.org>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Thu, 14 May 2026 18:45:00 +0200
+X-Gm-Features: AVHnY4I_HyzF3GHdZFExrbox_xrkjrz-SlkZ9VT6btL5CcXjAJ3lI9yS4iPlqv8
+Message-ID: <CAGxU2F4qWcQTmXnH74V8xZKADLiEMUmCc0+ktW5fZOXdTP4Bdw@mail.gmail.com>
+Subject: Re: [PATCH net v3 1/2] vsock/virtio: reset connection on receiving
+ queue overflow
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Jason Wang <jasowang@redhat.com>, 
+	kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, 
+	Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: B97BC544E87
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-288041-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,stanford.edu:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	FREEMAIL_TO(0.00)[gmail.com,cs.stanford.edu];
+	TAGGED_FROM(0.00)[bounces-288042-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Action: no action
 
-On 5/14/2026 3:01 AM, David Laight wrote:
-> On Wed, 13 May 2026 21:47:11 -0700
-> John Ousterhout <ouster@cs.stanford.edu> wrote:
-> 
->> On Wed, May 13, 2026 at 1:49 PM David Laight
->> <david.laight.linux@gmail.com> wrote:
->>>
->>> On Wed, 13 May 2026 09:28:40 -0700
->>> John Ousterhout <ouster@cs.stanford.edu> wrote:
->>>  
->>>> On Wed, May 13, 2026 at 2:07 AM David Laight
->>>> <david.laight.linux@gmail.com> wrote:  
->>>>>
->>>>> On Tue, 12 May 2026 11:19:53 -0700
->>>>> John Ousterhout <ouster@cs.stanford.edu> wrote:
->>>>>  
->>>>>> Consider the following sequence of events:
->>>>>> * The bottom half of a buffer page is filled with data from
->>>>>>   packet A. The page has a net reference count (reference count
->>>>>>   - bias) of 1. The page is returned to the NIC, flipped to
->>>>>>   use the top half.
->>>>>> * Before the reference on the page is released, the NIC returns
->>>>>>   the page with no data in it ('size' is zero in ice_clean_rx_irq).
->>>>>>   In this case the bias does not get decremented. The page still
->>>>>>   has a net reference count of 1, so it gets returned to the NIC.
->>>>>>   However, ice_put_rx_mbuf flipped the page so that the bottom
->>>>>>   half is active.
->>>>>> * If the NIC stores another packet in the page before packet A
->>>>>>   has released its reference, the data in packet A will be
->>>>>>   overwritten with data from the new packet.
->>>>>> * Unfortunately zero-length buffers occur frequently: they seem
->>>>>>   to occur whenever a packet uses every available byte in a
->>>>>>   buffer, ending precisely at the end of the buffer. When this
->>>>>>   happens the NIC seems to generate an extra zero-length
->>>>>>   buffer.
->>>>>> The fix is for ice_put_rx_mbuf not to flip pages that have a
->>>>>> size of 0.  
->>>>>
->>>>> How is this different from packet B (in the top half) being
->>>>> freed before packet A (in the bottom half)?  
->>>>
->>>> I'm not sure exactly what you're referring to here. Are you asking
->>>> about a situation where both halves of the page get filled with packet
->>>> data and then the second half to be filled is the first to be freed? I
->>>> believe that the ICE driver abandons a page if both halves are ever
->>>> occupied simultaneously; the page will be returned to the system once
->>>> both halves have dropped their references. Thus it doesn't matter
->>>> which half is freed first.  
->>>
->>> That is what I was thinking, seems like the logic is over complicated.
->>>
->>> If you need to put 4k pages into some kind of iommu rather than 2k buffers
->>> (to contain 1536 byte ethernet packets) then I'd have thought you'd
->>> initially put both halves into adjacent tx ring entries.
->>> If a rx buffer is discarded (eg a zero length fragment or a CRC error,
->>> or even 'copy break' for short packets) then, as an optimisation,
->>> you could reuse the buffer for another receive.
->>> The same could be done if the page is freed by an application.
->>>
->>> However it sounds like it doesn't use the 2nd half until the first
->>> completes - otherwise you'd never 'flip' to make the other half
->>> active.
->>>
->>> Thinks...
->>> By only putting half of each 4k 'page' into the rx ring the code
->>> will usually save (expensive) iommu setup in the (probably) normal
->>> case where the buffers are freed 'reasonably quickly'.
->>> But that really requires a 'free/with_nic/busy' state for each half
->>> rather then trying to guess from a reference count.
->>>
->>> But if the low-level code is recycling the rx buffer (for any reason)
->>> it wants to use the same buffer.
->>>
->>> The ethernet driver I wrote (a long time ago, early 90s) allocated
->>> 64k as 128 512byte buffers and did an aligned word-sized copy of
->>> every receive frame - most frames were in contiguous memory.
->>> The simplicity of it made up for the cost of the copy, especially
->>> since that was an iommu system.  
->>
->> I'm not here to defend the logic (and it has been replaced with
->> something that is probably simpler and more efficient); I'm just
->> suggesting a bug fix for the stable releases that still have this
->> logic.
+On Thu, 14 May 2026 at 17:16, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Thu, May 14, 2026 at 04:57:16PM +0200, Stefano Garzarella wrote:
+> > On Wed, May 13, 2026 at 12:54:16PM +0200, Stefano Garzarella wrote:
+> > > From: Stefano Garzarella <sgarzare@redhat.com>
+> > >
+> > > When there is no more space to queue an incoming packet, the packet is
+> > > silently dropped. This causes data loss without any notification to
+> > > either peer, since there is no retransmission.
+> > >
+> > > Under normal circumstances, this should never happen. However, it could
+> > > happen if the other peer doesn't respect the credit, or if the skb
+> > > overhead, which we recently began to take into account with commit
+> > > 059b7dbd20a6 ("vsock/virtio: fix potential unbounded skb queue"),
+> > > is too high.
+> > >
+> > > Fix this by resetting the connection and setting the local socket error
+> > > to ENOBUFS when virtio_transport_recv_enqueue() can no longer queue a
+> > > packet, so both peers are explicitly notified of the failure rather than
+> > > silently losing data.
+> > >
+> > > Fixes: ae6fcfbf5f03 ("vsock/virtio: discard packets if credit is not respected")
+> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > ---
+> > > net/vmw_vsock/virtio_transport_common.c | 19 ++++++++++++++-----
+> > > 1 file changed, 14 insertions(+), 5 deletions(-)
+> > >
+> > > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > > index 989cc252d3d3..4a4ac69d1ad1 100644
+> > > --- a/net/vmw_vsock/virtio_transport_common.c
+> > > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > > @@ -1350,7 +1350,7 @@ virtio_transport_recv_connecting(struct sock *sk,
+> > >     return err;
+> > > }
+> > >
+> > > -static void
+> > > +static bool
+> > > virtio_transport_recv_enqueue(struct vsock_sock *vsk,
+> > >                           struct sk_buff *skb)
+> > > {
+> > > @@ -1365,10 +1365,8 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
+> > >     spin_lock_bh(&vvs->rx_lock);
+> > >
+> > >     can_enqueue = virtio_transport_inc_rx_pkt(vvs, len);
+> > > -   if (!can_enqueue) {
+> > > -           free_pkt = true;
+> > > +   if (!can_enqueue)
+> > >             goto out;
+> > > -   }
+> > >
+> > >     if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SEQ_EOM)
+> > >             vvs->msg_count++;
+> > > @@ -1408,6 +1406,8 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
+> > >     spin_unlock_bh(&vvs->rx_lock);
+> > >     if (free_pkt)
+> > >             kfree_skb(skb);
+> > > +
+> > > +   return can_enqueue;
+> > > }
+> > >
+> > > static int
+> > > @@ -1420,7 +1420,16 @@ virtio_transport_recv_connected(struct sock *sk,
+> > >
+> > >     switch (le16_to_cpu(hdr->op)) {
+> > >     case VIRTIO_VSOCK_OP_RW:
+> > > -           virtio_transport_recv_enqueue(vsk, skb);
+> > > +           if (!virtio_transport_recv_enqueue(vsk, skb)) {
+> > > +                   /* There is no more space to queue the packet, so let's
+> > > +                    * close the connection; otherwise, we'll lose data.
+> > > +                    */
+> > > +                   (void)virtio_transport_reset(vsk, skb);
+> > > +                   sk->sk_state = TCP_CLOSE;
+> > > +                   sk->sk_err = ENOBUFS;
+> > > +                   sk_error_report(sk);
+> >
+> > sashiko reported some issues related to setting TCP_CLOSE state and not
+> > removing the socket from the connect table:
+> > https://sashiko.dev/#/patchset/20260513105417.56761-1-sgarzare%40redhat.com
+> >
+> > I'll change this by calling virtio_transport_do_close() and
+> > vsock_remove_sock() in the next version.
+> >
+> > Stefano
+> >
+> > > +                   break;
+> > > +           }
+> > >             vsock_data_ready(sk);
+> > >             return err;
+> > >     case VIRTIO_VSOCK_OP_CREDIT_REQUEST:
+> > > --
+> > > 2.54.0
+> > >
+>
+>
+> And so the bag of hacks grows. I feel this is energy not well spent.
+> Please, let us fix this properly *first*. And then worry about how to
+> backport.  Maybe it will not be so terrible to backport after all.
+>
 
-Right. We definitely want a fix for the possible data corruption in
-stable. Ideally one as simple as possible.
+TBH I don't think this is an hack, but an issue we should fix in any case.
+Regarding the second patch, I see your point, but it's a big change
+that worries me. I'd like some more time to fix it properly without
+rushing. Staying calm without realizing that userspace is broken like
+we are now without this series :-(
 
-> 
-> You've forced me to look at all of the function :-)
-> I've noticed a few things:
-> - If ice_add_xdp_frag() fails (because there are too many fragments)
->   then the rest of the fragments are left in the tx ring (instead
->   of being discarded) - so are likely to be treated as a full packet
->   later on.
-> - Frames with status errors (crc, framing etc) are discarded after
->   the skb is built - surely that should happen before the xdp 'program'
->   is called.
-> - If the remote system send a very very long frame (traditionally the PHY's
->   'jabber detect' didn't always work) you can end up with all of the rx
->   ring being full of a single partial packet.
-> 
-> I think you need to avoid calling ice_add_xdp_frag() when 'size == 0'.
-> Then in ice_put_rx_mbuf() unconditionally call ice_put_rx_buf() for
-> zero length fragments.
-> The comment would be 'zero length fragments can always be reused'.
-> 
+That said, evaluating further, I think we have a similar issue also
+with STREAM on the host side where the skb usually doesn't free space,
+so we need a merge strategy also there.
 
-That seems correct.
+So, I'd like to have time to fix both definitely. If you have time and
+want to go ahead, please do.
 
-> The zero length fragments almost certainly exist because the mac hardware
-> advances the the new buffer expecting more data - but only gets the 
-> 4 byte CRC. So the zero length buffer contains the receive status.
-> 
+Thanks,
+Stefano
 
-That matches my understanding.
 
